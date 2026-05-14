@@ -41,7 +41,7 @@ export default function News() {
       <section className="page-hero" style={{ minHeight: 320 }}>
         <img
           src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1920&q=80"
-          alt="DWU news and media"
+          alt="VWU news and media"
           className="page-hero-image"
         />
         <div className="page-hero-overlay" />

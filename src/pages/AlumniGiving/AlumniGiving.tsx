@@ -73,7 +73,7 @@ export default function AlumniGiving() {
       <section className="page-hero">
         <img
           src="https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=1920&q=80"
-          alt="DWU alumni at campus reunion"
+          alt="VWU alumni at campus reunion"
           className="page-hero-image"
         />
         <div className="page-hero-overlay" />
@@ -203,7 +203,7 @@ export default function AlumniGiving() {
             </div>
             <img
               src="https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=800&q=80"
-              alt="DWU campus aerial view"
+              alt="VWU campus aerial view"
               className="ag-magazine-img"
               loading="lazy"
             />

@@ -61,7 +61,7 @@ export default function Admissions() {
       <section className="page-hero">
         <img
           src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1920&q=80"
-          alt="Students at DWU graduation ceremony"
+          alt="Students at VWU graduation ceremony"
           className="page-hero-image"
         />
         <div className="page-hero-overlay" />

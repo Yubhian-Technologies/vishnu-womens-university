@@ -129,7 +129,7 @@ export default function Home() {
       {/* Counter Stats */}
       <CounterSection />
 
-      {/* Study at DWU */}
+      {/* Study at VWU */}
       <section className="study-section section">
         <div className="container">
           <div className="study-intro reveal">
@@ -240,7 +240,7 @@ export default function Home() {
               <div className="mission-img">
                 <img
                   src="https://images.unsplash.com/photo-1571260899304-425eee4c7efc?w=800&q=80"
-                  alt="Students engaged in learning at DWU"
+                  alt="Students engaged in learning at VWU"
                   loading="lazy"
                 />
               </div>
@@ -366,7 +366,7 @@ export default function Home() {
       <section className="cta-banner">
         <img
           src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1920&q=80"
-          alt="DWU campus in background"
+          alt="VWU campus in background"
           className="cta-banner-bg"
           loading="lazy"
         />

@@ -65,7 +65,7 @@ export default function About() {
       <section className="page-hero">
         <img
           src="https://images.unsplash.com/photo-1562774053-701939374585?w=1920&q=80"
-          alt="Dakota Wesleyan University campus"
+          alt="Vishnu Womens University campus"
           className="page-hero-image"
         />
         <div className="page-hero-overlay" />
@@ -130,7 +130,7 @@ export default function About() {
             <div className="reveal-right">
               <img
                 src="https://images.unsplash.com/photo-1562774053-701939374585?w=900&q=80"
-                alt="DWU campus buildings"
+                alt="VWU campus buildings"
                 style={{ width: '100%', height: '450px', objectFit: 'cover', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-xl)' }}
                 loading="lazy"
               />

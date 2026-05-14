@@ -157,7 +157,7 @@ export default function Events() {
       <section className="page-hero" style={{ minHeight: 300 }}>
         <img
           src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1920&q=80"
-          alt="DWU campus events"
+          alt="VWU campus events"
           className="page-hero-image"
         />
         <div className="page-hero-overlay" />

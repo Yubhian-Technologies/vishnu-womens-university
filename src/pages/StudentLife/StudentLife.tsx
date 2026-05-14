@@ -71,7 +71,7 @@ export default function StudentLife() {
       <section className="page-hero">
         <img
           src="https://images.unsplash.com/photo-1571260899304-425eee4c7efc?w=1920&q=80"
-          alt="Students enjoying campus life at DWU"
+          alt="Students enjoying campus life at VWU"
           className="page-hero-image"
         />
         <div className="page-hero-overlay" />
@@ -104,7 +104,7 @@ export default function StudentLife() {
             <span className="section-label">Get Involved</span>
             <h2 className="section-title">Student Organizations & Clubs</h2>
             <p className="section-desc">
-              With 30+ student clubs and organizations, there's a place for everyone at DWU.
+              With 30+ student clubs and organizations, there's a place for everyone at VWU.
               Or start your own!
             </p>
           </div>
@@ -163,7 +163,7 @@ export default function StudentLife() {
             </div>
             <img
               src="https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&q=80"
-              alt="DWU Tigers athletics"
+              alt="VWU sports and athletics"
               className="sl-athletics-image reveal-scale"
               loading="lazy"
             />
@@ -187,7 +187,7 @@ export default function StudentLife() {
             <span className="section-label">Support</span>
             <h2 className="section-title">We're Here for You</h2>
             <p className="section-desc" style={{ margin: '0 auto' }}>
-              From your first day to graduation, DWU's student services team is dedicated to your success.
+              From your first day to graduation, VWU's student services team is dedicated to your success.
             </p>
           </div>
           <div className="sl-services-grid">
