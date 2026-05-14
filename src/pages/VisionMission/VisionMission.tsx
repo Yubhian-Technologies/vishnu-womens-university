@@ -10,6 +10,7 @@ const missionPoints = [
   'To extend financial assistance for the economically weaker sections',
   'To create self employment opportunities and skill up gradation',
   'To support environment friendly Green Practices',
+  'Creating innovation hubs',
 ];
 
 const values = [
@@ -22,11 +23,14 @@ const values = [
 ];
 
 const qualityPolicy = [
-  'Provide Quality Technical Education to women with emphasis on Academic Excellence and Placements',
-  'Inculcate creativity, innovations and entrepreneurial skills among students',
-  'Promote Research and Development activities',
-  'Ensure continuous improvement through systematic training of students, faculty and staff',
-  'Establish industry-institute interaction for mutual benefit',
+  'We strive for excellence in all that we do in order to model success for our students',
+  'We focus on students\' success and satisfaction and meeting the needs of the community',
+  'We take pride in the quality of our organization and work, and we value originality, integrity, consistency, and attention to detail',
+  'We stay abreast of ever-changing youth culture, emerging communication technologies and design trends',
+  'We set benchmarks and model high quality standards for students, faculty, staff, and community partners',
+  'We lay utmost importance on discipline, punctuality, personal values and healthy practices',
+  'We create an innovative environment for students and staff to develop an integrated personality',
+  'Inclusive community projects',
 ];
 
 export default function VisionMission() {

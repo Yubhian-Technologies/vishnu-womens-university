@@ -123,19 +123,22 @@ export default function AboutSVES() {
               <h2 className="section-title">About Sri Vishnu Educational Society</h2>
               <div className="divider" />
               <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-4)', color: 'var(--color-text-light)' }}>
-                The <strong>Sri Vishnu Educational Society (SVES)</strong> was founded by <strong>Dr. B. V. Raju</strong>,
-                a visionary educationist committed to transforming higher education in Andhra Pradesh and Telangana.
-                Established in 1999, SVES has grown into one of the most respected educational groups in the Telugu states.
+                The <strong>Sri Vishnu Educational Society (SVES)</strong> stands first among its counterparts for its
+                unending quest and diligence in shaping an ideal educational society. It was founded by the late
+                <strong> Padma Bhushan Dr. B. V. Raju</strong>, a foresighted visionary who established numerous
+                educational institutions dedicated to quality technical and professional education.
               </p>
               <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-4)', color: 'var(--color-text-light)' }}>
-                The Society operates <strong>20+ institutions</strong> across <strong>4 campuses</strong> — Green
-                Meadows (Bhimavaram), Orchard Park (Narsapur), Valley Vista (Hyderabad), and Lake View (Medak)
-                — catering to over <strong>50,000 students</strong> across engineering, pharmacy, dental,
-                polytechnic, and school education.
+                Following Dr. Raju's passing, his grandson <strong>Sri K. V. Vishnu Raju</strong> assumed the role
+                of Chairman and has continued advancing the original mission while actively supporting social welfare
+                initiatives. Beyond education, the <strong>Dr. B. V. Raju Foundation</strong> operates leprosy centres,
+                schools, women's associations, community halls, and veterinary facilities across surrounding villages —
+                all without Government assistance.
               </p>
               <p style={{ lineHeight: 1.8, color: 'var(--color-text-light)' }}>
-                Vishnu Womens University is the flagship women's institution in the SVES group, embodying the
-                Society's core mission: empowering women through world-class technical education.
+                Today SVES operates <strong>20+ institutions</strong> across <strong>4 campuses</strong> — Green Meadows
+                (Bhimavaram), Orchard Park (Narsapur), Valley Vista (Hyderabad), and Lake View (Medak) — serving over
+                <strong> 50,000 students</strong> across engineering, pharmacy, dental, polytechnic, and school education.
               </p>
             </div>
             <div className="reveal-right">
