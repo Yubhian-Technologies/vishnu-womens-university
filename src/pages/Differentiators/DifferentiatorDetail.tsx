@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { findItemBySlug } from './differentiators.data';
+import '../detail-layout.css';
 
 export default function DifferentiatorDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -56,7 +57,7 @@ export default function DifferentiatorDetail() {
       {/* Intro */}
       <section className="section bg-white">
         <div className="container">
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 360px', gap: 'var(--space-14)', alignItems: 'start' }}>
+          <div className="detail-grid">
             {/* Main content */}
             <div className="reveal">
               <span className="section-label">Overview</span>
@@ -79,7 +80,7 @@ export default function DifferentiatorDetail() {
             </div>
 
             {/* Sidebar: key highlights */}
-            <div className="reveal" data-delay="100">
+            <div className="reveal detail-sidebar" data-delay="100">
               <div style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', position: 'sticky', top: '110px' }}>
                 <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-4)' }}>
                   Key Highlights

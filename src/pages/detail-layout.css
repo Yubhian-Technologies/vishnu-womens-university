@@ -1,0 +1,22 @@
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: var(--space-14);
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-grid .detail-sidebar > div {
+    position: static !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .detail-grid {
+    gap: var(--space-8);
+  }
+}
