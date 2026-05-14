@@ -10,6 +10,17 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   {
+    label: 'Discover',
+    children: [
+      { label: 'About VWU', path: '/about' },
+      { label: 'Vision, Mission & Values', path: '/vision-mission' },
+      { label: 'Governance', path: '/governance' },
+      { label: 'About Society (SVES)', path: '/about-sves' },
+      { label: 'Campus Life', path: '/campus' },
+      { label: 'Information', path: '/information' },
+    ],
+  },
+  {
     label: 'Academics',
     children: [
       { label: 'B.Tech Programs', path: '/academics' },
@@ -17,7 +28,7 @@ const navItems: NavItem[] = [
       { label: 'MBA Program', path: '/academics' },
       { label: 'Ph.D. Programs', path: '/academics' },
       { label: 'Departments', path: '/academics' },
-      { label: 'Academic Calendar', path: '/academics' },
+      { label: 'Academic Calendar', path: '/information' },
       { label: 'Curriculum & Syllabus', path: '/academics' },
       { label: 'Research & Publications', path: '/academics' },
     ],
@@ -31,8 +42,8 @@ const navItems: NavItem[] = [
       { label: 'ICET Admissions', path: '/admissions' },
       { label: 'Fee Structure', path: '/admissions' },
       { label: 'Scholarships', path: '/admissions' },
-      { label: 'International Students', path: '/admissions' },
-      { label: 'Admissions Staff', path: '/admissions' },
+      { label: 'How to Reach', path: '/information' },
+      { label: 'Admissions FAQ', path: '/admissions' },
     ],
   },
   {
@@ -41,9 +52,9 @@ const navItems: NavItem[] = [
       { label: 'Career Services', path: '/student-life' },
       { label: 'Student Clubs & Activities', path: '/student-life' },
       { label: 'Sports & Games', path: '/student-life' },
-      { label: 'Campus Facilities', path: '/student-life' },
-      { label: 'Hostels', path: '/student-life' },
-      { label: 'Wellness Center', path: '/student-life' },
+      { label: 'Smart Classrooms & Labs', path: '/campus' },
+      { label: 'Hostels', path: '/campus' },
+      { label: 'Wellness Center', path: '/campus' },
       { label: 'Radio Vishnu 90.4', path: '/student-life' },
     ],
   },
@@ -54,20 +65,18 @@ const navItems: NavItem[] = [
       { label: 'Giving Opportunities', path: '/alumni-giving' },
       { label: 'Alumni Events', path: '/alumni-giving' },
       { label: 'Prathibha Magazine', path: '/alumni-giving' },
-      { label: 'Alumni Staff', path: '/alumni-giving' },
+      { label: 'Success Stories', path: '/alumni-giving' },
     ],
   },
   {
     label: 'About VWU',
     children: [
-      { label: 'History', path: '/about' },
-      { label: 'Mission & Values', path: '/about' },
-      { label: 'Accreditation', path: '/about' },
-      { label: 'Facts & Statistics', path: '/about' },
+      { label: 'About VWU', path: '/about' },
+      { label: 'Vision & Mission', path: '/vision-mission' },
+      { label: 'Governance', path: '/governance' },
+      { label: 'About SVES', path: '/about-sves' },
       { label: 'News', path: '/news' },
       { label: 'Events', path: '/events' },
-      { label: 'Leadership', path: '/about' },
-      { label: 'IQAC', path: '/about' },
     ],
   },
 ];

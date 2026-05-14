@@ -10,6 +10,11 @@ import AlumniGiving from './pages/AlumniGiving/AlumniGiving';
 import About from './pages/About/About';
 import News from './pages/News/News';
 import Events from './pages/Events/Events';
+import VisionMission from './pages/VisionMission/VisionMission';
+import Governance from './pages/Governance/Governance';
+import AboutSVES from './pages/AboutSVES/AboutSVES';
+import Campus from './pages/Campus/Campus';
+import Information from './pages/Information/Information';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -31,6 +36,11 @@ function AppLayout() {
         <Route path="/student-life" element={<StudentLife />} />
         <Route path="/alumni-giving" element={<AlumniGiving />} />
         <Route path="/about" element={<About />} />
+        <Route path="/vision-mission" element={<VisionMission />} />
+        <Route path="/governance" element={<Governance />} />
+        <Route path="/about-sves" element={<AboutSVES />} />
+        <Route path="/campus" element={<Campus />} />
+        <Route path="/information" element={<Information />} />
         <Route path="/news" element={<News />} />
         <Route path="/events" element={<Events />} />
         <Route path="*" element={<NotFound />} />
