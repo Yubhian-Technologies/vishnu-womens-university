@@ -67,6 +67,19 @@ const specialPrograms = [
   },
 ];
 
+const topRecruiters = [
+  'Amazon', 'TCS', 'Infosys', 'Wipro', 'Cognizant', 'HCL Technologies',
+  'Tech Mahindra', 'Capgemini', 'Accenture', 'IBM', 'Microsoft', 'Deloitte',
+  'Hexaware', 'Mphasis', 'L&T Infotech', 'Mindtree',
+];
+
+const placementStats = [
+  { value: '1,400+', label: 'Students Placed (2024–25)' },
+  { value: '52 LPA', label: 'Highest Package' },
+  { value: '6.2 LPA', label: 'Average Package' },
+  { value: '150+', label: 'Recruiting Companies' },
+];
+
 const supportItems = [
   { icon: '📖', title: 'Central Library', desc: 'Access thousands of engineering textbooks, research journals, digital databases, and comfortable study spaces.' },
   { icon: '🎯', title: 'Academic Advising', desc: 'Every student receives dedicated guidance from faculty advisors who help plan your academic journey and career goals.' },
@@ -231,19 +244,55 @@ export default function Academics() {
         </div>
       </section>
 
-      {/* CTA */}
+      {/* Placements */}
       <section className="section bg-off-white">
+        <div className="container">
+          <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-10)' }}>
+            <span className="section-label">Career Outcomes</span>
+            <h2 className="section-title">Where VWU Engineers Go</h2>
+            <p className="section-desc" style={{ margin: '0 auto' }}>
+              Our Training & Placement Cell works year-round to connect students with India's top employers.
+            </p>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-8)', flexWrap: 'wrap', marginBottom: 'var(--space-12)' }}>
+            {placementStats.map((s, i) => (
+              <div key={s.label} className="reveal" data-delay={`${i * 80}`} style={{ textAlign: 'center' }}>
+                <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2.2rem', fontWeight: 900, color: 'var(--color-primary)' }}>{s.value}</div>
+                <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', fontFamily: 'var(--font-sans)', marginTop: 'var(--space-1)' }}>{s.label}</div>
+              </div>
+            ))}
+          </div>
+          <div className="reveal" style={{ marginBottom: 'var(--space-6)' }}>
+            <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-text-light)', marginBottom: 'var(--space-5)' }}>
+              Top Recruiting Companies
+            </h3>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-3)' }}>
+              {topRecruiters.map((r) => (
+                <span key={r} style={{ background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-sm)', padding: '0.4rem 1rem', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-sans)', fontWeight: 600, color: 'var(--color-primary)', boxShadow: 'var(--shadow-sm)' }}>
+                  {r}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div style={{ textAlign: 'center', marginTop: 'var(--space-8)' }}>
+            <Link to="/admissions" className="btn btn-primary btn-lg">Explore Career Services</Link>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="section" style={{ background: 'var(--color-primary)' }}>
         <div className="container" style={{ textAlign: 'center' }}>
           <div className="reveal">
-            <span className="section-label">Get Started</span>
-            <h2 className="section-title">Ready to Join VWU?</h2>
-            <p className="section-desc" style={{ margin: '0 auto var(--space-8)' }}>
+            <span className="section-label" style={{ color: 'var(--color-accent)' }}>Get Started</span>
+            <h2 className="section-title" style={{ color: 'var(--color-white)' }}>Ready to Join VWU?</h2>
+            <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 'var(--text-lg)', maxWidth: 560, margin: '0 auto var(--space-8)' }}>
               Visit our campus, request more information, or apply today through EAPCET (Code: VISW).
             </p>
             <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Link to="/admissions" className="btn btn-primary btn-lg">Schedule a Visit</Link>
-              <Link to="/admissions" className="btn btn-outline btn-lg">Request Info</Link>
               <Link to="/admissions" className="btn btn-accent btn-lg">Apply via EAPCET</Link>
+              <Link to="/admissions" className="btn btn-secondary btn-lg">Schedule a Visit</Link>
+              <Link to="/admissions" className="btn btn-secondary btn-lg">Request Info</Link>
             </div>
           </div>
         </div>

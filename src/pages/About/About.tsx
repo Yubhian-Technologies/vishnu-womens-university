@@ -32,6 +32,26 @@ const fastFacts = [
   { label: 'Highest Package', value: '52 LPA' },
 ];
 
+const infrastructure = [
+  { icon: '🏛️', title: 'Smart Classrooms', desc: '200+ smart classrooms equipped with projectors, interactive boards, and digital learning tools.' },
+  { icon: '🔬', title: 'Research Labs', desc: '50+ state-of-the-art laboratories across CSE, ECE, EEE, Civil, and Mechanical departments.' },
+  { icon: '📚', title: 'Central Library', desc: 'A vast library with 1,00,000+ volumes, e-journals, NPTEL access, and quiet reading areas.' },
+  { icon: '🏃', title: 'Sports Complex', desc: 'Indoor and outdoor sports facilities including courts for cricket, volleyball, badminton, and a swimming pool.' },
+  { icon: '🏠', title: 'Women\'s Hostels', desc: 'Secure, comfortable on-campus hostels with modern amenities, 24/7 security, and high-speed Wi-Fi.' },
+  { icon: '🌐', title: 'High-Speed Internet', desc: '1 Gbps campus-wide Wi-Fi connectivity ensuring seamless digital learning and research access.' },
+  { icon: '🎭', title: 'Auditorium & Seminar Halls', desc: 'A 2,000-seat main auditorium and multiple seminar halls for events, symposia, and cultural programs.' },
+  { icon: '🍽️', title: 'Campus Dining', desc: 'Hygienic food courts and hostel mess serving fresh vegetarian and non-vegetarian meals daily.' },
+];
+
+const iqacPoints = [
+  'Ensuring continuous academic quality improvement through regular internal audits',
+  'Facilitating NBA and NAAC accreditation processes and compliance',
+  'Organising faculty development programs and research workshops',
+  'Monitoring student feedback and academic performance outcomes',
+  'Promoting best practices in teaching, learning, and evaluation',
+  'Publishing annual quality assurance reports for institutional transparency',
+];
+
 const accreditations = [
   { org: 'National Board of Accreditation (NBA-DCP)', scope: 'B.Tech Programs', since: '2022' },
   { org: 'National Assessment & Accreditation Council (NAAC)', scope: 'Institutional Accreditation', since: '2015' },
@@ -178,6 +198,60 @@ export default function About() {
                 <p>{person.title}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Infrastructure */}
+      <section className="section bg-white">
+        <div className="container">
+          <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>
+            <span className="section-label">Campus</span>
+            <h2 className="section-title">World-Class Infrastructure</h2>
+            <p className="section-desc" style={{ margin: '0 auto' }}>
+              VWU's 12-acre campus in Bhimavaram is designed to provide an inspiring, technology-rich environment for learning and growth.
+            </p>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-5)' }} className="about-infra-grid">
+            {infrastructure.map((item, i) => (
+              <div key={item.title} className="reveal" data-delay={`${i * 60}`} style={{ background: 'var(--color-off-white)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', borderLeft: '3px solid var(--color-accent)' }}>
+                <div style={{ fontSize: '2rem', marginBottom: 'var(--space-3)' }}>{item.icon}</div>
+                <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>{item.title}</h3>
+                <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6 }}>{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* IQAC */}
+      <section className="section" style={{ background: 'linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%)' }}>
+        <div className="container">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-12)', alignItems: 'center' }}>
+            <div className="reveal-left">
+              <span className="section-label" style={{ color: 'var(--color-accent)' }}>Quality Assurance</span>
+              <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>Internal Quality Assurance Cell (IQAC)</h2>
+              <p style={{ color: 'rgba(255,255,255,0.75)', lineHeight: 1.7, marginBottom: 'var(--space-6)' }}>
+                VWU's IQAC is committed to sustaining and enhancing the quality of academic programs,
+                faculty development, and institutional governance in alignment with national accreditation standards.
+              </p>
+              <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                {iqacPoints.map(p => (
+                  <li key={p} style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.8)', lineHeight: 1.6 }}>
+                    <span style={{ color: 'var(--color-accent)', fontWeight: 900, flexShrink: 0, marginTop: 2 }}>✓</span>
+                    {p}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="reveal-right" style={{ borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
+              <img
+                src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=900&q=80"
+                alt="VWU IQAC quality assurance"
+                style={{ width: '100%', height: '420px', objectFit: 'cover' }}
+                loading="lazy"
+              />
+            </div>
           </div>
         </div>
       </section>

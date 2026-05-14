@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import './Admissions.css';
 
@@ -28,6 +28,17 @@ const tuitionData = [
   { label: 'Average Net Price', value: 'Very Affordable' },
 ];
 
+const faqs = [
+  { q: 'What is the VWU college code for EAPCET?', a: 'The VWU college code for AP EAPCET (B.Tech admissions) is VISW. Use this code when entering your college preferences during the AP EAPCET counselling process.' },
+  { q: 'Is VWU an autonomous college?', a: 'Yes. VWU has been granted Autonomous Status by the University Grants Commission (UGC) since 2014. This allows VWU to design its own curriculum and conduct independent examinations.' },
+  { q: 'What is the hostel fee at VWU?', a: 'Hostel fees at VWU range from ₹60,000 to ₹80,000 per year, depending on the type of accommodation. Separate mess facilities are available for hostel residents.' },
+  { q: 'Are government scholarships available at VWU?', a: 'Yes. SC/ST/BC/EBC students are eligible for full or partial fee reimbursement under AP government scholarship schemes. Students can apply through the AP scholarship portal.' },
+  { q: 'What documents are required for admission?', a: 'You will need: EAPCET rank card, Class 10 & 12 mark sheets and certificates, transfer certificate, conduct certificate, Aadhaar card, caste certificate (if applicable), and 8 passport-size photographs.' },
+  { q: 'Is VWU affiliated to JNTUK?', a: 'Yes. Vishnu Womens University is affiliated to Jawaharlal Nehru Technological University Kakinada (JNTUK) for all its engineering programs.' },
+  { q: 'What are the placement opportunities at VWU?', a: 'VWU has a dedicated Training & Placement Cell with 1,400+ placements in 2024–25. Top recruiters include Amazon, TCS, Infosys, Wipro, and 150+ other companies. The highest package offered was 52 LPA.' },
+  { q: 'Can I take a campus tour before applying?', a: 'Absolutely! We encourage prospective students and parents to visit our campus in Bhimavaram. You can schedule a group tour, an individual visit day, or even a virtual tour by contacting our admissions office.' },
+];
+
 const visitOptions = [
   { icon: '👥', title: 'Group Campus Tour', desc: 'Join a guided tour of VWU\'s campus — visit cutting-edge labs, smart classrooms, hostels, and student life facilities in Bhimavaram.' },
   { icon: '🎯', title: 'Individual Visit Day', desc: 'Schedule a personalized visit with our admissions team, attend a demo class, and meet faculty in your area of interest.' },
@@ -36,6 +47,8 @@ const visitOptions = [
 ];
 
 export default function Admissions() {
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
+
   useEffect(() => {
     document.title = 'Admissions | Vishnu Womens University';
     const observer = new IntersectionObserver(
@@ -265,6 +278,42 @@ export default function Admissions() {
                 </button>
               </form>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="section bg-off-white">
+        <div className="container">
+          <div className="reveal" style={{ textAlign: 'center', maxWidth: 600, margin: '0 auto var(--space-12)' }}>
+            <span className="section-label">FAQ</span>
+            <h2 className="section-title">Frequently Asked Questions</h2>
+            <p className="section-desc" style={{ margin: '0 auto' }}>
+              Everything you need to know about joining VWU. Can't find your answer? Contact our admissions team.
+            </p>
+          </div>
+          <div className="adm-faq-list">
+            {faqs.map((faq, i) => (
+              <div key={i} className={`adm-faq-item reveal${openFaq === i ? ' open' : ''}`} data-delay={`${i * 50}`}>
+                <button
+                  className="adm-faq-question"
+                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                  aria-expanded={openFaq === i}
+                >
+                  <span>{faq.q}</span>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0, transition: 'transform 0.3s', transform: openFaq === i ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+                    <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
+                {openFaq === i && (
+                  <div className="adm-faq-answer">{faq.a}</div>
+                )}
+              </div>
+            ))}
+          </div>
+          <div style={{ textAlign: 'center', marginTop: 'var(--space-10)' }}>
+            <p style={{ color: 'var(--color-text-light)', marginBottom: 'var(--space-4)' }}>Still have questions?</p>
+            <a href="tel:08816250864" className="btn btn-primary btn-lg">Call Admissions: 08816-250864</a>
           </div>
         </div>
       </section>

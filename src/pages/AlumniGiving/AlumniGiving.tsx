@@ -185,6 +185,27 @@ export default function AlumniGiving() {
         </div>
       </section>
 
+      {/* Where Alumni Work */}
+      <section className="section bg-off-white">
+        <div className="container">
+          <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-10)' }}>
+            <span className="section-label">Our Alumni Network</span>
+            <h2 className="section-title">VWU Engineers Power the World's Best Companies</h2>
+          </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-4)', justifyContent: 'center', marginBottom: 'var(--space-10)' }}>
+            {['Amazon', 'Microsoft', 'Google', 'Intel', 'TCS', 'Infosys', 'Wipro', 'Cognizant',
+              'Accenture', 'IBM', 'Capgemini', 'HCL Technologies', 'Tech Mahindra', 'Samsung R&D', 'Qualcomm'].map((co, i) => (
+              <span key={co} className="reveal" data-delay={`${i * 30}`} style={{ background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-sm)', padding: '0.5rem 1.2rem', fontFamily: 'var(--font-sans)', fontWeight: 700, fontSize: 'var(--text-sm)', color: 'var(--color-primary)', boxShadow: 'var(--shadow-sm)' }}>
+                {co}
+              </span>
+            ))}
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <Link to="/academics" className="btn btn-primary">View Placement Details</Link>
+          </div>
+        </div>
+      </section>
+
       {/* Alumni Magazine */}
       <section className="section bg-off-white">
         <div className="container">
