@@ -65,15 +65,6 @@ const navItems: NavItem[] = [
       { label: 'Alumni Events', path: '/alumni-giving' },
       { label: 'Prathibha Magazine', path: '/alumni-giving' },
       { label: 'Success Stories', path: '/alumni-giving' },
-    ],
-  },
-  {
-    label: 'About VWU',
-    children: [
-      { label: 'About VWU', path: '/about' },
-      { label: 'Vision & Mission', path: '/vision-mission' },
-      { label: 'Governance', path: '/governance' },
-      { label: 'About SVES', path: '/about-sves' },
       { label: 'News', path: '/news' },
       { label: 'Events', path: '/events' },
     ],

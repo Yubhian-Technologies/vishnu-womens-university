@@ -13,70 +13,11 @@ const quickStats = [
   { value: 'JNTUK', label: 'Affiliated To' },
 ];
 
-const btechPrograms = [
-  { icon: '💻', name: 'Computer Science & Engineering (CSE)' },
-  { icon: '🤖', name: 'CSE – Artificial Intelligence & ML' },
-  { icon: '📊', name: 'CSE – Artificial Intelligence & Data Science' },
-  { icon: '🔒', name: 'CSE – Cyber Security' },
-  { icon: '🌐', name: 'Information Technology (IT)' },
-  { icon: '📡', name: 'Electronics & Communication Engineering (ECE)' },
-  { icon: '⚡', name: 'Electrical & Electronics Engineering (EEE)' },
-  { icon: '🏗️', name: 'Civil Engineering (CE)' },
-  { icon: '⚙️', name: 'Mechanical Engineering (ME)' },
-];
-
-const pgPrograms = [
-  { icon: '💻', name: 'M.Tech – Computer Science & Engineering' },
-  { icon: '🔬', name: 'M.Tech – VLSI Design' },
-  { icon: '⚡', name: 'M.Tech – Power Electronics' },
-  { icon: '🌐', name: 'M.Tech – Software Engineering' },
-  { icon: '💼', name: 'Master of Business Administration (MBA)' },
-  { icon: '🎓', name: 'Ph.D. – CSE / ECE / EEE' },
-];
-
-const departments = [
-  { code: 'CSE', name: 'Computer Science & Engineering', icon: '💻' },
-  { code: 'ECE', name: 'Electronics & Communication Engineering', icon: '📡' },
-  { code: 'IT', name: 'Information Technology', icon: '🌐' },
-  { code: 'EEE', name: 'Electrical & Electronics Engineering', icon: '⚡' },
-  { code: 'ME', name: 'Mechanical Engineering', icon: '⚙️' },
-  { code: 'CE', name: 'Civil Engineering', icon: '🏗️' },
-  { code: 'AI', name: 'Artificial Intelligence', icon: '🤖' },
-  { code: 'FE', name: 'Freshman Engineering', icon: '📚' },
-  { code: 'MBA', name: 'Master of Business Administration', icon: '💼' },
-];
-
 const differentiators = [
   { cat: 'Innovation & Entrepreneurship', icon: '🚀', items: ['Vishnu Technology Business Incubator (TBI)', 'Vishnu Space Application Center (VSAC)', 'Science Technology & Innovation Hub (STI Hub)', 'AICTE IDEA Lab', 'Chips to Startup (C2S)', 'Institution Innovation Cell'] },
   { cat: 'Industry Partnerships', icon: '🤝', items: ['NASSCOM Embedded Systems Training', 'HCL Tech VLSI Training', 'Microchip Embedded System', 'TI-DSP Centre of Excellence', 'TalentSprint @ NSE (WISE)', 'Smart Interviews – C&DS Programme'] },
   { cat: 'Specialised Labs', icon: '🔬', items: ['AR / VR Studio', 'High Performance Computing Lab', 'Vehicle Design Lab', 'Assistive Technology Lab (ATL)', 'Concrete Canoe Laboratory', 'Dream House Construction Lab'] },
   { cat: 'International & Global', icon: '🌍', items: ['Vishnu Japan Outreach Centre (VJOC)', 'Graduate Study Abroad Center (GSAC)', 'Foreign Languages Programme', 'TEDxSVECW', 'Rural Women Technology Park', 'Vishnu School of Music'] },
-];
-
-const campusFacilities = [
-  { icon: '📺', label: 'Smart Class Rooms' },
-  { icon: '🔬', label: 'State-of-the-art Labs' },
-  { icon: '📚', label: 'Central Library' },
-  { icon: '🎭', label: 'Auditoriums' },
-  { icon: '📖', label: 'Campus Book Stores' },
-  { icon: '📶', label: 'Wi-Fi Campus' },
-  { icon: '🏠', label: 'Campus Hostels' },
-  { icon: '🍽️', label: 'Food Courts' },
-  { icon: '💪', label: 'VISHNU Fitness Centre' },
-  { icon: '🏊', label: 'Swimming Pool' },
-  { icon: '🏥', label: 'Health Care' },
-  { icon: '🔐', label: 'Campus Security' },
-];
-
-const svesGroup = [
-  'Vishnu Institute of Technology',
-  'Vishnu Dental College & Hospital',
-  'Shri Vishnu College of Pharmacy',
-  'B. V. Raju College',
-  'Smt. B Seetha Polytechnic',
-  'BVRIT Hyderabad College of Engineering for Women',
-  'B V Raju Institute of Technology',
-  'Vishnu Educational Development & Innovation Centre (VEDIC)',
 ];
 
 export default function About() {
@@ -153,10 +94,8 @@ export default function About() {
                 drawing halls, and seminar rooms.
               </p>
               <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-6)', color: 'var(--color-text-light)' }}>
-                Sports facilities support physical fitness, personality development, and foster sportsmanship
-                and leadership qualities. With <strong>13,100+ engineers graduated</strong> and <strong>1,400+
-                annual placements</strong>, VWU is the premier destination for women's engineering education
-                in the Telugu states.
+                With <strong>13,100+ engineers graduated</strong> and <strong>1,400+ annual placements</strong>,
+                VWU is the premier destination for women's engineering education in the Telugu states.
               </p>
               <div style={{ display: 'flex', gap: 'var(--space-4)', flexWrap: 'wrap' }}>
                 <Link to="/vision-mission" className="btn btn-primary">Vision & Mission</Link>
@@ -175,67 +114,39 @@ export default function About() {
         </div>
       </section>
 
-      {/* Academic Programs */}
+      {/* Academic Snapshot */}
       <section className="section bg-white">
         <div className="container">
-          <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>
-            <span className="section-label">Academic Excellence</span>
-            <h2 className="section-title">Programs Offered</h2>
-            <p className="section-desc" style={{ margin: '0 auto' }}>
-              9 B.Tech specializations, 4 M.Tech programs, MBA, and Ph.D. — all designed for the demands of tomorrow's industry.
-            </p>
-          </div>
-
-          <div style={{ marginBottom: 'var(--space-10)' }}>
-            <h3 className="about-sub-heading">B.Tech Programs <span style={{ color: 'var(--color-accent)', fontSize: '1rem', fontWeight: 400 }}>(9 Specializations)</span></h3>
-            <div className="about-prog-grid">
-              {btechPrograms.map((p, i) => (
-                <div key={p.name} className="about-prog-card reveal" data-delay={`${i * 50}`}>
-                  <span className="about-prog-icon">{p.icon}</span>
-                  <span>{p.name}</span>
-                </div>
-              ))}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-12)', alignItems: 'center' }}>
+            <div className="reveal-left">
+              <span className="section-label">Academic Excellence</span>
+              <h2 className="section-title">Programs Across Engineering, Management & Research</h2>
+              <p style={{ color: 'var(--color-text-light)', lineHeight: 1.8, marginBottom: 'var(--space-6)' }}>
+                VWU offers 9 B.Tech specialisations, 4 M.Tech programs, MBA, and Ph.D. across 9 departments —
+                all affiliated to JNTUK, with full UGC Autonomous curricular freedom.
+              </p>
+              <Link to="/academics" className="btn btn-primary">View All Programs & Departments →</Link>
             </div>
-          </div>
-
-          <div>
-            <h3 className="about-sub-heading">Postgraduate & Doctoral Programs</h3>
-            <div className="about-prog-grid">
-              {pgPrograms.map((p, i) => (
-                <div key={p.name} className="about-prog-card reveal" data-delay={`${i * 50}`}>
-                  <span className="about-prog-icon">{p.icon}</span>
-                  <span>{p.name}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ textAlign: 'center', marginTop: 'var(--space-10)' }}>
-            <Link to="/academics" className="btn btn-primary btn-lg">Explore All Programs</Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Departments */}
-      <section className="section" style={{ background: 'var(--color-primary)' }}>
-        <div className="container">
-          <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-10)' }}>
-            <span className="section-label" style={{ color: 'var(--color-accent)' }}>Academic Departments</span>
-            <h2 className="section-title" style={{ color: 'var(--color-white)' }}>9 Departments of Excellence</h2>
-          </div>
-          <div className="about-dept-grid">
-            {departments.map((d, i) => (
-              <div key={d.code} className="about-dept-card reveal" data-delay={`${i * 60}`}>
-                <div className="about-dept-icon">{d.icon}</div>
-                <div className="about-dept-code">{d.code}</div>
-                <div className="about-dept-name">{d.name}</div>
+            <div className="reveal-right">
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
+                {[
+                  { label: 'B.Tech', value: '9 Specialisations' },
+                  { label: 'M.Tech', value: '4 Programs' },
+                  { label: 'MBA', value: '1 Program · 60 Seats' },
+                  { label: 'Ph.D.', value: 'CSE · ECE · EEE' },
+                ].map(p => (
+                  <div key={p.label} style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', borderLeft: '4px solid var(--color-accent)' }}>
+                    <div style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--color-accent)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 4 }}>{p.label}</div>
+                    <div style={{ fontFamily: 'var(--font-sans)', fontWeight: 900, color: 'var(--color-primary)', fontSize: 'var(--text-base)' }}>{p.value}</div>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Differentiators */}
+      {/* Differentiators — unique content, not duplicated anywhere */}
       <section className="section bg-off-white">
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>
@@ -264,56 +175,54 @@ export default function About() {
         </div>
       </section>
 
-      {/* Campus Facilities */}
+      {/* Campus Snapshot */}
       <section className="section bg-white">
         <div className="container">
-          <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>
-            <span className="section-label">Campus Life</span>
-            <h2 className="section-title">World-Class Infrastructure</h2>
-            <p className="section-desc" style={{ margin: '0 auto' }}>
-              A 100-acre campus in Bhimavaram designed to inspire, support, and elevate every student.
-            </p>
-          </div>
-          <div className="about-facilities-grid">
-            {campusFacilities.map((f, i) => (
-              <Link to="/campus" key={f.label} className="about-facility-card reveal" data-delay={`${i * 40}`}>
-                <span className="about-facility-icon">{f.icon}</span>
-                <span>{f.label}</span>
-              </Link>
-            ))}
-          </div>
-          <div style={{ textAlign: 'center', marginTop: 'var(--space-8)' }}>
-            <Link to="/campus" className="btn btn-primary">Explore Campus</Link>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-12)', alignItems: 'center' }}>
+            <div className="reveal-left">
+              <img
+                src="https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=900&q=80"
+                alt="VWU campus facilities"
+                style={{ width: '100%', height: '360px', objectFit: 'cover', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-xl)' }}
+                loading="lazy"
+              />
+            </div>
+            <div className="reveal-right">
+              <span className="section-label">Campus Life</span>
+              <h2 className="section-title">World-Class Infrastructure</h2>
+              <p style={{ color: 'var(--color-text-light)', lineHeight: 1.8, marginBottom: 'var(--space-5)' }}>
+                A 100-acre campus with 200+ smart classrooms, 50+ labs, an Olympic-standard swimming pool,
+                fitness centre, 1 Gbps Wi-Fi, hostels, food courts, health centre, and on-campus temples.
+              </p>
+              <Link to="/campus" className="btn btn-primary">Explore Campus Facilities →</Link>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* SVES Group */}
+      {/* SVES Snapshot */}
       <section className="section" style={{ background: 'linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%)' }}>
         <div className="container">
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-12)', alignItems: 'center' }}>
             <div className="reveal-left">
               <span className="section-label" style={{ color: 'var(--color-accent)' }}>Our Parent Society</span>
               <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>Sri Vishnu Educational Society (SVES)</h2>
-              <p style={{ color: 'rgba(255,255,255,0.75)', lineHeight: 1.8, marginBottom: 'var(--space-6)' }}>
-                Founded by Dr. B. V. Raju, the Sri Vishnu Educational Society operates a network of premier
-                educational institutions across Andhra Pradesh. VWU is the flagship women's institution in this
-                celebrated group dedicated to transforming education in the Telugu states.
+              <p style={{ color: 'rgba(255,255,255,0.75)', lineHeight: 1.8, marginBottom: 'var(--space-4)' }}>
+                Founded by Padma Bhushan Dr. B. V. Raju, SVES operates <strong style={{ color: 'var(--color-accent)' }}>20+ institutions</strong> across
+                4 campuses in Bhimavaram, Narsapur, Hyderabad, and Medak — serving over
+                <strong style={{ color: 'var(--color-accent)' }}> 50,000 students</strong> annually.
               </p>
-              <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', marginBottom: 'var(--space-6)' }}>
-                {svesGroup.map(inst => (
-                  <li key={inst} style={{ display: 'flex', gap: 'var(--space-2)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.8)', alignItems: 'center' }}>
-                    <span style={{ color: 'var(--color-accent)', fontWeight: 900 }}>›</span> {inst}
-                  </li>
-                ))}
-              </ul>
-              <Link to="/about-sves" className="btn btn-accent">Learn About SVES</Link>
+              <p style={{ color: 'rgba(255,255,255,0.7)', lineHeight: 1.8, marginBottom: 'var(--space-6)' }}>
+                VWU is the flagship women's institution of this celebrated society, embodying its core mission
+                of empowering women through world-class technical education.
+              </p>
+              <Link to="/about-sves" className="btn btn-accent">Learn About SVES →</Link>
             </div>
             <div className="reveal-right" style={{ borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
               <img
                 src="https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=900&q=80"
                 alt="Sri Vishnu Educational Society campus"
-                style={{ width: '100%', height: '420px', objectFit: 'cover' }}
+                style={{ width: '100%', height: '380px', objectFit: 'cover' }}
                 loading="lazy"
               />
             </div>
@@ -331,10 +240,10 @@ export default function About() {
           <div className="about-discover-grid">
             {[
               { title: 'Vision, Mission & Values', desc: 'Our guiding purpose, mission statements, and core institutional values.', path: '/vision-mission', icon: '🎯' },
-              { title: 'Institutional Development Plan', desc: 'Strategic roadmap and development initiatives shaping VWU\'s future.', path: '/governance', icon: '📋' },
-              { title: 'Governing Body', desc: 'Meet the governing body and core executive leaders of VWU.', path: '/governance', icon: '🏛️' },
+              { title: 'Governance & Leadership', desc: 'Governing body, core executive, committees, and development plan.', path: '/governance', icon: '🏛️' },
               { title: 'About Society (SVES)', desc: 'The Sri Vishnu Educational Society — our founding parent organization.', path: '/about-sves', icon: '🌿' },
               { title: 'Campus Life', desc: 'Smart classrooms, labs, hostels, fitness, swimming pool, and more.', path: '/campus', icon: '🏫' },
+              { title: 'Academics', desc: 'All B.Tech, M.Tech, MBA and Ph.D. programs with departments.', path: '/academics', icon: '📚' },
               { title: 'Information', desc: 'Academic calendar, holidays, how to reach, ICT platforms, and more.', path: '/information', icon: 'ℹ️' },
             ].map((item, i) => (
               <Link to={item.path} key={item.title} className="about-discover-card reveal" data-delay={`${i * 60}`}>
@@ -361,7 +270,7 @@ export default function About() {
             </p>
             <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
               <Link to="/admissions" className="btn btn-accent btn-lg">Apply Now</Link>
-              <Link to="/admissions" className="btn btn-secondary btn-lg">Visit Campus</Link>
+              <Link to="/campus" className="btn btn-secondary btn-lg">Visit Campus</Link>
             </div>
           </div>
         </div>
