@@ -50,7 +50,9 @@ input, textarea, select {
 /* ---- Utility Classes ---- */
 .container {
   width: 100%;
-  padding: 0 var(--space-8);
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 var(--space-12);
 }
 
 .section {
@@ -478,7 +480,7 @@ h6 { font-size: var(--text-lg); }
 
 @media (max-width: 768px) {
   .container {
-    padding: 0 var(--space-4);
+    padding: 0 var(--space-5);
   }
   .section {
     padding: var(--space-12) 0;
