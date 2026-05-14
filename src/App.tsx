@@ -15,6 +15,12 @@ import Governance from './pages/Governance/Governance';
 import AboutSVES from './pages/AboutSVES/AboutSVES';
 import Campus from './pages/Campus/Campus';
 import Information from './pages/Information/Information';
+import VishnuTV from './pages/StudentActivities/VishnuTV';
+import StudentClubs from './pages/StudentActivities/StudentClubs';
+import SocialServices from './pages/StudentActivities/SocialServices';
+import CampusMagazines from './pages/StudentActivities/CampusMagazines';
+import ArtsCulture from './pages/StudentActivities/ArtsCulture';
+import SportsGames from './pages/StudentActivities/SportsGames';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -41,6 +47,12 @@ function AppLayout() {
         <Route path="/about-sves" element={<AboutSVES />} />
         <Route path="/campus" element={<Campus />} />
         <Route path="/information" element={<Information />} />
+        <Route path="/vishnu-tv-academy" element={<VishnuTV />} />
+        <Route path="/student-clubs" element={<StudentClubs />} />
+        <Route path="/social-services" element={<SocialServices />} />
+        <Route path="/campus-magazines" element={<CampusMagazines />} />
+        <Route path="/arts-culture" element={<ArtsCulture />} />
+        <Route path="/sports-games" element={<SportsGames />} />
         <Route path="/news" element={<News />} />
         <Route path="/events" element={<Events />} />
         <Route path="*" element={<NotFound />} />

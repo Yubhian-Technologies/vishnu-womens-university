@@ -1,0 +1,172 @@
+import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
+
+const facilities = [
+  { icon: '💪', title: 'VISHNU Fitness Centre', desc: 'A fully equipped gymnasium with modern equipment, trained instructors, and scheduled fitness programs for all students.' },
+  { icon: '🏊', title: 'Swimming Pool', desc: 'An Olympic-standard swimming pool available for students and staff, with certified coaching and regular swimming sessions.' },
+  { icon: '🏟️', title: 'Spacious Playground', desc: 'A large, well-maintained outdoor ground for athletics, field sports, and team games — supporting a wide range of disciplines.' },
+  { icon: '🏸', title: 'Indoor Sports Hall', desc: 'Indoor facilities for badminton, table tennis, chess, carrom, and other indoor games available throughout the academic year.' },
+];
+
+const sportsProgram = [
+  { label: 'Physical Director', value: 'Qualified female Physical Director overseeing all athletic activities' },
+  { label: 'University Competitions', value: 'Regular participation in JNTUK and inter-university sports events' },
+  { label: 'Special Events', value: 'Annual Sports Day with track events, field sports, and team competitions' },
+  { label: 'Student Guidance', value: 'Individual coaching and motivation for students to compete at university level' },
+  { label: 'Inter-Collegiate', value: 'Regular inter-collegiate tournaments and sports meets' },
+  { label: 'Daily Sessions', value: 'Structured morning and evening sports sessions for student fitness' },
+];
+
+const achievements = [
+  { icon: '🥇', title: 'University-Level Champions', desc: 'VWU students regularly excel at JNTUK university-level sports competitions across multiple disciplines.' },
+  { icon: '🏋️', title: 'Fitness Excellence', desc: 'The campus fitness centre runs year-round programs helping students build discipline, strength, and well-being.' },
+  { icon: '🤽', title: 'Aquatics Coaching', desc: 'Certified swimming coaches provide structured training, producing competitive swimmers at university and state levels.' },
+  { icon: '🏃', title: 'Athletics', desc: 'Track and field athletes are nurtured through systematic training and exposure to inter-collegiate meets.' },
+];
+
+export default function SportsGames() {
+  useEffect(() => {
+    document.title = 'Sports & Games | VWU';
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const el = entry.target as HTMLElement;
+            setTimeout(() => el.classList.add('revealed'), parseInt(el.dataset.delay || '0'));
+            observer.unobserve(el);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+    document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <main className="page-wrapper">
+      <section className="page-hero" style={{ minHeight: 360 }}>
+        <img src="https://images.unsplash.com/photo-1546519638-68e109498ffc?w=1920&q=80" alt="Sports & Games at VWU" className="page-hero-image" />
+        <div className="page-hero-overlay" />
+        <div className="container page-hero-content">
+          <div className="breadcrumb animate-fade-in">
+            <Link to="/" className="breadcrumb-item">Home</Link>
+            <span className="breadcrumb-sep">›</span>
+            <Link to="/academics" className="breadcrumb-item">Academics</Link>
+            <span className="breadcrumb-sep">›</span>
+            <span className="breadcrumb-item active">Sports & Games</span>
+          </div>
+          <h1 className="animate-fade-in-up">Sports & Games</h1>
+          <p className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+            A sound mind dwells in a sound body — physical fitness is given utmost importance at VWU.
+          </p>
+        </div>
+      </section>
+
+      {/* Philosophy */}
+      <section className="section bg-white">
+        <div className="container">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-14)', alignItems: 'center' }}>
+            <div className="reveal-left">
+              <span className="section-label">Our Approach</span>
+              <h2 className="section-title">Sports as a Core Pillar</h2>
+              <div className="divider" />
+              <blockquote style={{ borderLeft: '4px solid var(--color-accent)', paddingLeft: 'var(--space-5)', marginBottom: 'var(--space-5)', fontFamily: 'var(--font-serif)', fontSize: '1.15rem', color: 'var(--color-primary)', fontStyle: 'italic', lineHeight: 1.8 }}>
+                "A sound mind dwells in a sound body. Physical exercises keep one healthy and fit."
+              </blockquote>
+              <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-4)', color: 'var(--color-text-light)' }}>
+                At VWU, sports and physical activities are not optional add-ons — they are a core component
+                of student development, given <em>utmost importance</em> alongside academics. Every student
+                is encouraged to participate, compete, and excel.
+              </p>
+              <p style={{ lineHeight: 1.8, color: 'var(--color-text-light)' }}>
+                A qualified female <strong>Physical Director</strong> oversees all day-to-day athletic activities
+                and guides students to compete in university and inter-collegiate events throughout the year.
+              </p>
+            </div>
+            <div className="reveal-right">
+              <img
+                src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=900&q=80"
+                alt="Students at VWU sports"
+                style={{ width: '100%', height: '400px', objectFit: 'cover', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-xl)' }}
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Facilities */}
+      <section className="section bg-off-white">
+        <div className="container">
+          <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>
+            <span className="section-label">Infrastructure</span>
+            <h2 className="section-title">Sports Facilities</h2>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-5)' }}>
+            {facilities.map((f, i) => (
+              <div key={f.title} className="reveal" data-delay={`${i * 80}`}
+                style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', transition: 'all var(--transition-base)' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-accent)'; (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-md)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-light-gray)'; (e.currentTarget as HTMLElement).style.boxShadow = 'none'; }}
+              >
+                <div style={{ fontSize: '2.2rem', marginBottom: 'var(--space-3)' }}>{f.icon}</div>
+                <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>{f.title}</h3>
+                <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6 }}>{f.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Sports Program + Achievements */}
+      <section className="section bg-white">
+        <div className="container">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-12)' }}>
+            <div className="reveal-left">
+              <span className="section-label">Program Structure</span>
+              <h2 className="section-title" style={{ fontSize: 'var(--text-2xl)' }}>Sports Program Highlights</h2>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', marginTop: 'var(--space-6)' }}>
+                {sportsProgram.map((sp) => (
+                  <div key={sp.label} style={{ display: 'flex', gap: 'var(--space-4)', padding: 'var(--space-4)', background: 'var(--color-off-white)', borderRadius: 'var(--radius-sm)', borderLeft: '3px solid var(--color-accent)' }}>
+                    <div style={{ minWidth: 130, fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.05em', paddingTop: 2 }}>{sp.label}</div>
+                    <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.5 }}>{sp.value}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="reveal-right">
+              <span className="section-label">Excellence</span>
+              <h2 className="section-title" style={{ fontSize: 'var(--text-2xl)' }}>Sports Achievements</h2>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', marginTop: 'var(--space-6)' }}>
+                {achievements.map((a) => (
+                  <div key={a.title} style={{ display: 'flex', gap: 'var(--space-4)', alignItems: 'flex-start' }}>
+                    <span style={{ fontSize: '1.8rem', flexShrink: 0 }}>{a.icon}</span>
+                    <div>
+                      <div style={{ fontFamily: 'var(--font-sans)', fontWeight: 900, fontSize: 'var(--text-sm)', color: 'var(--color-primary)', marginBottom: 4 }}>{a.title}</div>
+                      <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6 }}>{a.desc}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section style={{ background: 'var(--color-primary)', padding: 'var(--space-12) 0' }}>
+        <div className="container" style={{ textAlign: 'center' }}>
+          <div className="reveal">
+            <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>Explore More Student Activities</h2>
+            <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
+              <Link to="/student-clubs" className="btn btn-accent">Student Clubs</Link>
+              <Link to="/arts-culture" className="btn btn-secondary">Arts & Culture</Link>
+              <Link to="/social-services" className="btn btn-secondary">Social Services</Link>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+}

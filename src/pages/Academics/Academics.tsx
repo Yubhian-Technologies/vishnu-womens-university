@@ -87,13 +87,13 @@ const admissionItems = [
 ];
 
 const studentActivities = [
-  { icon: '📻', title: 'Radio Vishnu 90.4', desc: 'The first college community radio station in Andhra Pradesh, broadcasting programs on education, culture, and local issues — run entirely by students.' },
-  { icon: '🎬', title: 'Vishnu TV Academy', desc: 'A student-run TV production studio where students learn filmmaking, anchoring, journalism, and digital media production.' },
-  { icon: '👥', title: 'Student Clubs', desc: 'Technical, cultural, literary, and social clubs — including coding teams, robotics squads, debate societies, and more.' },
-  { icon: '🤝', title: 'Social Services', desc: 'NSS units and outreach programs engaging students in community development, rural welfare, and environmental initiatives.' },
-  { icon: '📰', title: 'Campus Magazines', desc: 'Student-published magazines covering campus news, technical writing, creative literature, and cultural events.' },
-  { icon: '🎭', title: 'Arts & Culture', desc: 'Dance, music, drama, fine arts, and cultural festivals celebrating student creativity and diversity.' },
-  { icon: '🏆', title: 'Sports & Games', desc: 'Indoor and outdoor sports, inter-collegiate tournaments, gymnasium, and Olympic-standard swimming pool.' },
+  { icon: '📻', title: 'Radio Vishnu 90.4', desc: 'The first college community radio station in Andhra Pradesh, broadcasting programs on education, culture, and local issues — run entirely by students.', path: '' },
+  { icon: '🎬', title: 'Vishnu TV Academy', desc: 'A student-run TV production studio where students learn filmmaking, anchoring, journalism, and digital media production.', path: '/vishnu-tv-academy' },
+  { icon: '👥', title: 'Student Clubs', desc: 'Technical, cultural, literary, and social clubs — including coding teams, robotics squads, debate societies, and more.', path: '/student-clubs' },
+  { icon: '🤝', title: 'Social Services', desc: 'NSS units and outreach programs engaging students in community development, rural welfare, and environmental initiatives.', path: '/social-services' },
+  { icon: '📰', title: 'Campus Magazines', desc: 'Student-published magazines covering campus news, technical writing, creative literature, and cultural events.', path: '/campus-magazines' },
+  { icon: '🎭', title: 'Arts & Culture', desc: 'Dance, music, drama, fine arts, and cultural festivals celebrating student creativity and diversity.', path: '/arts-culture' },
+  { icon: '🏆', title: 'Sports & Games', desc: 'Indoor and outdoor sports, inter-collegiate tournaments, gymnasium, and Olympic-standard swimming pool.', path: '/sports-games' },
 ];
 
 const topRecruiters = [
@@ -317,6 +317,11 @@ export default function Academics() {
                 <div className="activity-item-icon">{act.icon}</div>
                 <h3 className="activity-item-title">{act.title}</h3>
                 <p className="activity-item-desc">{act.desc}</p>
+                {act.path && (
+                  <Link to={act.path} style={{ marginTop: 'var(--space-2)', fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--color-accent)', textDecoration: 'none', fontFamily: 'var(--font-sans)', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                    Explore →
+                  </Link>
+                )}
               </div>
             ))}
           </div>
