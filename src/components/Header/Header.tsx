@@ -36,11 +36,10 @@ const navItems: NavItem[] = [
   {
     label: 'Admissions',
     children: [
-      { label: 'EAPCET Admissions', path: '/admissions' },
-      { label: 'ECET Admissions', path: '/admissions' },
-      { label: 'PGECET Admissions', path: '/admissions' },
-      { label: 'ICET Admissions', path: '/admissions' },
-      { label: 'Fee Structure', path: '/admissions' },
+      { label: 'Admissions Overview', path: '/admissions' },
+      { label: 'Programmes & Fee Structure', path: '/programmes-fee-structure' },
+      { label: 'Admission Procedure', path: '/admission-procedure' },
+      { label: 'Result Analysis', path: '/result-analysis' },
       { label: 'Scholarships', path: '/admissions' },
       { label: 'How to Reach', path: '/information' },
       { label: 'Admissions FAQ', path: '/admissions' },

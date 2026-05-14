@@ -79,12 +79,6 @@ const departments = [
   { icon: '💼', code: 'MBA', name: 'Master of Business Administration', desc: 'Business strategy, finance, marketing, human resources, and entrepreneurship.', labs: '2 Labs' },
 ];
 
-const admissionItems = [
-  { icon: '📋', title: 'Programmes & Fee Structure', desc: 'Detailed information on all B.Tech, M.Tech, MBA, and Ph.D. programs with annual fee structure and intake details.', path: '/programmes-fee-structure' },
-  { icon: '📝', title: 'Admission Procedure', desc: 'Step-by-step guide to applying through EAPCET (Code: VISW), document requirements, and selection process.', path: '/admission-procedure' },
-  { icon: '📊', title: 'Result Analysis', desc: 'Academic performance data, pass percentages, and university rank holders across all departments and batches.', path: '/result-analysis' },
-  { icon: '💳', title: 'Fee Payment Portal', desc: 'Secure online fee payment for tuition, hostel, and examination fees with multiple payment options.', path: '/admissions' },
-];
 
 const studentActivities = [
   { icon: '📻', title: 'Radio Vishnu 90.4', desc: 'The first college community radio station in Andhra Pradesh, broadcasting programs on education, culture, and local issues — run entirely by students.', path: 'http://radiovishnu.com/', external: true },
@@ -249,29 +243,6 @@ export default function Academics() {
                 <h3 className="dept-name">{d.name}</h3>
                 <p className="dept-desc">{d.desc}</p>
                 <div className="dept-labs">{d.labs}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Admission */}
-      <section className="section bg-off-white">
-        <div className="container">
-          <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>
-            <span className="section-label">Admissions</span>
-            <h2 className="section-title">Join VWU — EAPCET Code: VISW</h2>
-            <p className="section-desc" style={{ margin: '0 auto' }}>
-              Everything you need to apply, understand the fee structure, and secure your seat at Vishnu Womens University.
-            </p>
-          </div>
-          <div className="adm-items-grid">
-            {admissionItems.map((item, i) => (
-              <div key={item.title} className="adm-item-card reveal" data-delay={`${i * 80}`}>
-                <div className="adm-item-icon">{item.icon}</div>
-                <h3 className="adm-item-title">{item.title}</h3>
-                <p className="adm-item-desc">{item.desc}</p>
-                <Link to={item.path} className="adm-item-link">View Details →</Link>
               </div>
             ))}
           </div>
