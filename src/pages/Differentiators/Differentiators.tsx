@@ -4,7 +4,8 @@ import { Link } from 'react-router-dom';
 interface DiffItem {
   title: string;
   desc: string;
-  url: string;
+  url?: string;
+  external?: boolean;
   highlights?: string[];
 }
 
@@ -25,16 +26,17 @@ const categories: Category[] = [
         title: 'Vishnu Technology Business Incubator (TBI)',
         desc: 'NSTEDB-recognised incubator (VISHVA) fostering student and faculty startups with mentorship, seed funding, and industry connect to transform ideas into enterprises.',
         url: 'https://www.vishva.co/',
+        external: true,
       },
       {
         title: 'Science Technology & Innovation Hub (STI Hub)',
         desc: 'A state-of-the-art interdisciplinary hub for cutting-edge research, prototype development, and student-driven technology innovations.',
         url: 'https://svecwstihub.com/',
+        external: true,
       },
       {
         title: 'AICTE IDEA Lab',
         desc: "AICTE's Idea Development, Evaluation & Application Lab providing facilities to transform ideas into prototypes under one roof. Follows a 'Learn while make' philosophy emphasising green initiatives and proof-of-concept development.",
-        url: 'https://svecw.edu.in/aicte-idea-lab/',
         highlights: [
           'AQIS Application ID: IDEA202000128',
           'Emphasises green initiatives and proof-of-concept development',
@@ -45,7 +47,6 @@ const categories: Category[] = [
       {
         title: 'Institution Innovation Cell',
         desc: "MoE IIC-recognised cell fostering innovation and entrepreneurship. Partners with VISHVA TBI and the EDC to organise workshops, idea contests, and project exhibitions. Rated 4/5 stars in IIC 5.0 and ranked in the 151–300 band for NIRF Innovation 2023.",
-        url: 'https://svecw.edu.in/institution-innovation-cell/',
         highlights: [
           '4 out of 5 stars in IIC 5.0',
           'NIRF Innovation 2023 — 151–300 band',
@@ -56,7 +57,6 @@ const categories: Category[] = [
       {
         title: 'TEDxSVECW',
         desc: 'Licensed independently organised TED event bringing together speakers to share innovative ideas. Inaugural event "Sea of Voices" (December 14, 2024) featured eleven speakers spanning healthcare, entrepreneurship, and food technology.',
-        url: 'https://svecw.edu.in/tedxsvecw/',
         highlights: [
           'Inaugural event: "Sea of Voices" — December 14, 2024',
           'Eleven speakers from diverse fields',
@@ -74,7 +74,6 @@ const categories: Category[] = [
       {
         title: 'MEDA & PLM CoE',
         desc: 'Capgemini-partnered Centre of Excellence for Mechanical Engineering Design Automation and Product Life Cycle Management. Trains students on CATIA, Siemens NX, and ANSYS with internship and placement opportunities at Capgemini for top performers.',
-        url: 'https://svecw.edu.in/plm-meda-coe/',
         highlights: [
           'Industry partnership with Capgemini',
           'Training in CATIA, Siemens NX, and ANSYS',
@@ -85,7 +84,6 @@ const categories: Category[] = [
       {
         title: 'NASSCOM Embedded Systems Training',
         desc: 'NASSCOM-partnered programme aligned with the FutureSkills Prime framework under MeitY, Government of India. Trains ECE students in embedded C, RTOS, device drivers, and software validation. Industry clients include MicroChip Technologies and KPIT Technologies.',
-        url: 'https://svecw.edu.in/nasscom-embedded-systems-training/',
         highlights: [
           'Aligned to FutureSkills Prime framework — MeitY, GoI',
           'Covers embedded C, RTOS, device drivers, validation',
@@ -96,7 +94,6 @@ const categories: Category[] = [
       {
         title: 'HCL Tech VLSI Training',
         desc: 'HCL Tech-partnered VLSI design and verification training covering ASIC/FPGA design flows through SDL modules, VILT sessions, lab experiments, and chip design puzzles. Equips ECE students with industry-relevant semiconductor expertise.',
-        url: 'https://svecw.edu.in/hcl-tech-vlsi-training/',
         highlights: [
           'Industry partnership with HCL Technologies',
           'Covers VLSI fundamentals and ASIC/FPGA design flows',
@@ -107,7 +104,6 @@ const categories: Category[] = [
       {
         title: 'Microchip Embedded System',
         desc: 'Centre of Excellence with Eduskills providing embedded systems training on PIC microcontroller boards (8-bit to 32-bit). Serves ECE, EEE, and CSE disciplines with project-based learning in IoT, automation, and communication protocols. Supports AICTE ATAL faculty development.',
-        url: 'https://svecw.edu.in/microchip/',
         highlights: [
           'PIC microcontroller boards from 8-bit to 32-bit',
           'Partnership with Eduskills; AICTE ATAL faculty development',
@@ -118,7 +114,6 @@ const categories: Category[] = [
       {
         title: 'TI-DSP Centre of Excellence',
         desc: 'Texas Instruments DSP CoE advancing research in telecommunications, audio, video, and image processing. Campus MATLAB licence with unlimited student access. Winners of TI India Analog Maker Competition 2014. DST-sponsored research (Rs. 53 lakhs) on telephony speech enhancement for hearing-impaired individuals.',
-        url: 'https://svecw.edu.in/ti-dsp-centre-of-excellence/',
         highlights: [
           'Campus MATLAB licence — unlimited student access',
           '233 students trained across 60 batches',
@@ -129,7 +124,6 @@ const categories: Category[] = [
       {
         title: 'UltraTech CoE',
         desc: 'Collaboration between SVECW Civil Engineering and UltraTech Cement Ltd (est. March 20, 2024) advancing sustainable construction practices and materials through R&D, education, training, industry collaboration, and consultancy. Promotes women in civil engineering.',
-        url: 'https://svecw.edu.in/ultra-tech-coe/',
         highlights: [
           'Partnership with UltraTech Cement Ltd — March 20, 2024',
           '50 students benefited in first cohort',
@@ -140,7 +134,6 @@ const categories: Category[] = [
       {
         title: 'Chips to Startup (C2S)',
         desc: "MEITy-funded programme (Rs. 64.5 Lakhs) under India's semiconductor self-reliance mission. SVECW secured the project 'Memory Optimised Co-Processor for Enhanced Edge AI'. Equipped with EDA tools from AMD Xilinx, Cadence, Synopsys, and Siemens. Patent already filed.",
-        url: 'https://svecw.edu.in/chips-to-startup-c2s/',
         highlights: [
           'Funding: Rs. 64.5 Lakhs over 5 years — MEITy',
           'EDA tools: AMD Xilinx, Cadence, Synopsys, Siemens, Ansys',
@@ -158,7 +151,6 @@ const categories: Category[] = [
       {
         title: 'Vishnu Space Application Center (VSAC)',
         desc: 'S-band ground station with Dhruva Space Pvt Ltd, featuring a 3-metre parabolic mesh reflector at 2200–2290 MHz (35.4 dBi gain). 21 students have qualified for HAM radio licences. Offers satellite data acquisition, CubeSat design, and High Altitude Balloon payload training.',
-        url: 'https://svecw.edu.in/vishnu-space-application-center-vsac/',
         highlights: [
           '3-metre antenna · 2200–2290 MHz · 35.4 dBi gain',
           '21 students hold HAM radio licences',
@@ -169,7 +161,6 @@ const categories: Category[] = [
       {
         title: 'AR / VR Studio',
         desc: 'CSE Centre of Excellence (est. August 7, 2024) equipped with Meta Quest 3 devices, 30 Core i7 13th-gen PCs, dual 4K projectors, and Mac systems. Supports AR/VR, XR, and Deep Learning development using Unity, Unreal Engine, and Blender.',
-        url: 'https://svecw.edu.in/ar-vr-studio/',
         highlights: [
           'Meta Quest 3 + 30 Core i7 13th-gen PCs',
           'Dual 4K/2K projectors and Mac OS systems',
@@ -180,7 +171,6 @@ const categories: Category[] = [
       {
         title: 'Vehicle Design Lab',
         desc: 'Mechanical Engineering CoE inaugurated by Kamal Bali, MD of Volvo India (March 2019). Prepares students for SAE BAJA-ATV, SUPRA-F1, Go-kart, and ESVC-Solar car competitions through simulation, power-train systems, stability analysis, and fabrication training.',
-        url: 'https://svecw.edu.in/vehicle-design-lab/',
         highlights: [
           'Inaugurated by MD of Volvo India — March 2019',
           'Competitions: SAE BAJA-ATV, SUPRA-F1, Go-kart, ESVC',
@@ -191,7 +181,6 @@ const categories: Category[] = [
       {
         title: 'Assistive Technology Lab (ATL)',
         desc: 'Established 2009 in collaboration with University of Massachusetts Lowell, USA. Around 70 students and 15 faculty mentors design prosthetics, mobility aids, currency detectors for visually impaired, and communication devices for the deaf. Devices distributed to 6 partner organisations annually.',
-        url: 'https://svecw.edu.in/assistive-technology-lab-atl/',
         highlights: [
           'Est. 2009 · UMass Lowell, USA collaboration',
           '~70 students and 15 faculty mentors per year',
@@ -202,7 +191,6 @@ const categories: Category[] = [
       {
         title: 'High Performance Computing Lab',
         desc: 'GPU computing CoE (est. 2021) in the Department of AI for ML, deep learning, and data science research. Research outputs include publications on stroke recognition, chronic disease prediction, IoT-based ECG analysis, and shrimp disease detection.',
-        url: 'https://svecw.edu.in/high-performance-computing-lab/',
         highlights: [
           'Established 2021 — Department of Artificial Intelligence',
           'GPU infrastructure for ML, deep learning, computer vision',
@@ -213,7 +201,6 @@ const categories: Category[] = [
       {
         title: 'Concrete Canoe Laboratory',
         desc: "Organised India's first National Concrete Canoe Competition exclusively for female civil engineers (August 2023). Team WAKA selected among 75 iTIC BUILD winners at IIT Hyderabad with seed funding. Five completed canoe projects: WAKA, WAKA 1.0 & 2.0, KANU, AIKYAM, and CANOA.",
-        url: 'https://svecw.edu.in/concrete-canoe-laboratory/',
         highlights: [
           "India's first National Concrete Canoe Competition for women — 2023",
           'iTIC BUILD winner at IIT Hyderabad with seed funding',
@@ -224,7 +211,6 @@ const categories: Category[] = [
       {
         title: 'Dream House Construction Lab',
         desc: 'Specialised research facility for sustainable construction innovation. Team SMB selected among 75 iTIC BUILD winners at IIT Hyderabad TIC with Rs. 1 lakh seed funding for stabilised mud block research. 42+ students across II–IV year civil engineering in active projects.',
-        url: 'https://svecw.edu.in/dream-house-construction-lab/',
         highlights: [
           'iTIC BUILD Winner — Team SMB, IIT Hyderabad TIC',
           'Rs. 1 lakh seed funding for stabilised mud block research',
@@ -243,11 +229,11 @@ const categories: Category[] = [
         title: 'Vishnu Japan Outreach Centre – VJOC',
         desc: 'Strategic outreach centre fostering India-Japan academic and industrial partnerships — facilitating student exchange, Japanese language training, and joint research collaborations.',
         url: 'https://vjoc.in/',
+        external: true,
       },
       {
         title: 'Graduate Study Abroad Center – GSAC',
         desc: 'Dedicated centre guiding students on higher education abroad across 7 destinations: USA, Canada, UK, China, Germany, Australia, and Spain. Provides counselling, education loan facilitation, scholarship information, and pre-departure orientation on cultural adaptation, financial management, and safety.',
-        url: 'https://svecw.edu.in/graduate-study-abroad-center-gsac/',
         highlights: [
           '7 destinations: USA, Canada, UK, Germany, Australia & more',
           'Education loan facilitation and scholarship support',
@@ -258,7 +244,6 @@ const categories: Category[] = [
       {
         title: 'Foreign Languages',
         desc: 'Since 2012, offering 60-hour certified courses in French, German, Spanish, Japanese, and Korean delivered by Global Language Solutions, Chennai. 879 certified in French · 691 in German · 508 in Spanish · 348 in Japanese · 167 in Korean.',
-        url: 'https://svecw.edu.in/foreign-languages/',
         highlights: [
           '879 students certified in French; 260 enrolled 2024–25',
           '691 students certified in German; 395 enrolled 2024–25',
@@ -277,11 +262,11 @@ const categories: Category[] = [
         title: 'Vishnu Student Success Centre',
         desc: 'Holistic student support hub offering academic counselling, mental wellness, career guidance, and skill development services under one roof for all VWU students.',
         url: 'https://vishnussc.in',
+        external: true,
       },
       {
         title: 'TalentSprint – WISE',
         desc: "Women in Software Engineering programme with TalentSprint — running parallel to the regular curriculum and combining the ELITE Program, Microsoft Mentoring Program, and placement support to equip women engineers for top multinational software organisations.",
-        url: 'https://svecw.edu.in/talentsprint-wise/',
         highlights: [
           'Collaboration with TalentSprint Private Limited',
           'Includes ELITE Program and Microsoft Mentoring Program',
@@ -292,7 +277,6 @@ const categories: Category[] = [
       {
         title: 'Smart Interviews – C&DS Programme',
         desc: 'Data Structures and Algorithms training running since 2017 across 3 structured phases over 3 semesters. 142 students placed at Amazon, Flipkart, Adobe, and Palo Alto Networks with packages ranging 10–50 LPA. Up to 400 students selected annually via HackerRank.',
-        url: 'https://svecw.edu.in/smart-interviews-cds-programme/',
         highlights: [
           '142 students placed — packages 10 to 50 LPA',
           'Up to 400 students selected via HackerRank annually',
@@ -303,7 +287,6 @@ const categories: Category[] = [
       {
         title: 'Rural Women Technology Park – WTP',
         desc: 'Since 2015, the WTP has trained 1,200+ rural women in Bhimavaram across five skill areas: Virgin Coconut Oil production, CAD stitching, handloom weaving, food processing, and health & nutrition. Several graduates have established their own businesses.',
-        url: 'https://svecw.edu.in/rural-women-technology-park-wtp/',
         highlights: [
           '1,200+ rural women trained (2015–2018)',
           '5 areas: VCO, CAD stitching, handloom, food processing, health',
@@ -315,11 +298,11 @@ const categories: Category[] = [
         title: 'Radio Vishnu 90.4',
         desc: 'Campus community radio station providing students real-world broadcasting experience in content creation, RJ skills, live production, and radio journalism.',
         url: 'http://radiovishnu.com/',
+        external: true,
       },
       {
         title: 'Nirvahana',
         desc: "Management Studies flagship initiative cultivating strategic thinking and leadership among MBA students through workshops, case competitions, daily business news hours, stock market sessions, union budget analyses, and industry networking under dedicated faculty mentorship.",
-        url: 'https://svecw.edu.in/nirvahana/',
         highlights: [
           'Daily business news hours and stock market sessions',
           'Strategic workshops, seminars, and case competitions',
@@ -331,6 +314,7 @@ const categories: Category[] = [
         title: 'Vishnu School of Music',
         desc: 'A dedicated school nurturing musical talent and providing professional music education, continuing the Vishnu tradition of holistic arts and cultural development alongside engineering excellence.',
         url: 'https://svesschoolofmusic.in/',
+        external: true,
       },
     ],
   },
@@ -504,7 +488,8 @@ export default function Differentiators() {
                     </ul>
                   )}
 
-                  {/* Visit link */}
+                  {/* Visit link — only for external sites */}
+                  {item.external && item.url && (
                   <a
                     href={item.url}
                     target="_blank"
@@ -529,6 +514,7 @@ export default function Differentiators() {
                       <path d="M2.5 9.5l7-7M4 2.5h5.5V8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                   </a>
+                  )}
                 </div>
               ))}
             </div>
