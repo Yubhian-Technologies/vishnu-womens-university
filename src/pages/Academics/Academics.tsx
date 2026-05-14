@@ -67,6 +67,35 @@ const specialPrograms = [
   },
 ];
 
+const departments = [
+  { icon: '💻', code: 'CSE', name: 'Computer Science & Engineering', desc: 'AI, machine learning, data structures, algorithms, cloud computing, and software engineering.', labs: '12 Labs' },
+  { icon: '📡', code: 'ECE', name: 'Electronics & Communication Engineering', desc: 'VLSI design, embedded systems, signal processing, communications, and IoT.', labs: '10 Labs' },
+  { icon: '🌐', code: 'IT', name: 'Information Technology', desc: 'Web technologies, networking, database systems, cybersecurity, and cloud platforms.', labs: '8 Labs' },
+  { icon: '⚡', code: 'EEE', name: 'Electrical & Electronics Engineering', desc: 'Power systems, control systems, electric drives, smart grid, and renewable energy.', labs: '9 Labs' },
+  { icon: '⚙️', code: 'ME', name: 'Mechanical Engineering', desc: 'CAD/CAM, manufacturing, thermodynamics, fluid mechanics, and robotics.', labs: '11 Labs' },
+  { icon: '🏗️', code: 'CE', name: 'Civil Engineering', desc: 'Structural analysis, construction management, geotechnical engineering, and environmental engineering.', labs: '8 Labs' },
+  { icon: '🤖', code: 'AI', name: 'Artificial Intelligence', desc: 'Machine learning, deep learning, NLP, computer vision, and intelligent systems design.', labs: '6 Labs' },
+  { icon: '📐', code: 'FE', name: 'Freshman Engineering', desc: 'Foundation year covering mathematics, physics, chemistry, and core engineering fundamentals.', labs: '4 Labs' },
+  { icon: '💼', code: 'MBA', name: 'Master of Business Administration', desc: 'Business strategy, finance, marketing, human resources, and entrepreneurship.', labs: '2 Labs' },
+];
+
+const admissionItems = [
+  { icon: '📋', title: 'Programmes & Fee Structure', desc: 'Detailed information on all B.Tech, M.Tech, MBA, and Ph.D. programs with annual fee structure and intake details.' },
+  { icon: '📝', title: 'Admission Procedure', desc: 'Step-by-step guide to applying through EAPCET (Code: VISW), document requirements, and selection process.' },
+  { icon: '📊', title: 'Result Analysis', desc: 'Academic performance data, pass percentages, and university rank holders across all departments and batches.' },
+  { icon: '💳', title: 'Fee Payment Portal', desc: 'Secure online fee payment for tuition, hostel, and examination fees with multiple payment options.' },
+];
+
+const studentActivities = [
+  { icon: '📻', title: 'Radio Vishnu 90.4', desc: 'The first college community radio station in Andhra Pradesh, broadcasting programs on education, culture, and local issues — run entirely by students.' },
+  { icon: '🎬', title: 'Vishnu TV Academy', desc: 'A student-run TV production studio where students learn filmmaking, anchoring, journalism, and digital media production.' },
+  { icon: '👥', title: 'Student Clubs', desc: 'Technical, cultural, literary, and social clubs — including coding teams, robotics squads, debate societies, and more.' },
+  { icon: '🤝', title: 'Social Services', desc: 'NSS units and outreach programs engaging students in community development, rural welfare, and environmental initiatives.' },
+  { icon: '📰', title: 'Campus Magazines', desc: 'Student-published magazines covering campus news, technical writing, creative literature, and cultural events.' },
+  { icon: '🎭', title: 'Arts & Culture', desc: 'Dance, music, drama, fine arts, and cultural festivals celebrating student creativity and diversity.' },
+  { icon: '🏆', title: 'Sports & Games', desc: 'Indoor and outdoor sports, inter-collegiate tournaments, gymnasium, and Olympic-standard swimming pool.' },
+];
+
 const topRecruiters = [
   'Amazon', 'TCS', 'Infosys', 'Wipro', 'Cognizant', 'HCL Technologies',
   'Tech Mahindra', 'Capgemini', 'Accenture', 'IBM', 'Microsoft', 'Deloitte',
@@ -200,6 +229,55 @@ export default function Academics() {
         </div>
       </section>
 
+      {/* Departments */}
+      <section className="section bg-white">
+        <div className="container">
+          <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>
+            <span className="section-label">Departments</span>
+            <h2 className="section-title">Academic Departments</h2>
+            <p className="section-desc" style={{ margin: '0 auto' }}>
+              Nine specialised departments bringing together expert faculty, state-of-the-art laboratories, and industry-aligned curricula.
+            </p>
+          </div>
+          <div className="dept-grid">
+            {departments.map((d, i) => (
+              <div key={d.code} className="dept-card reveal" data-delay={`${i * 50}`}>
+                <div className="dept-card-top">
+                  <span className="dept-icon">{d.icon}</span>
+                  <span className="dept-code">{d.code}</span>
+                </div>
+                <h3 className="dept-name">{d.name}</h3>
+                <p className="dept-desc">{d.desc}</p>
+                <div className="dept-labs">{d.labs}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Admission */}
+      <section className="section bg-off-white">
+        <div className="container">
+          <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>
+            <span className="section-label">Admissions</span>
+            <h2 className="section-title">Join VWU — EAPCET Code: VISW</h2>
+            <p className="section-desc" style={{ margin: '0 auto' }}>
+              Everything you need to apply, understand the fee structure, and secure your seat at Vishnu Womens University.
+            </p>
+          </div>
+          <div className="adm-items-grid">
+            {admissionItems.map((item, i) => (
+              <div key={item.title} className="adm-item-card reveal" data-delay={`${i * 80}`}>
+                <div className="adm-item-icon">{item.icon}</div>
+                <h3 className="adm-item-title">{item.title}</h3>
+                <p className="adm-item-desc">{item.desc}</p>
+                <a href="/admissions" className="adm-item-link">View Details →</a>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Special Programs */}
       <section className="special-programs-section">
         <div className="container">
@@ -217,6 +295,28 @@ export default function Academics() {
                   <p>{sp.desc}</p>
                   <Link to="/academics" className="btn btn-accent" style={{ fontSize: '0.75rem' }}>Learn More</Link>
                 </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Student Activities */}
+      <section className="section bg-off-white">
+        <div className="container">
+          <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>
+            <span className="section-label">Student Life</span>
+            <h2 className="section-title">Student Activities</h2>
+            <p className="section-desc" style={{ margin: '0 auto' }}>
+              Life at VWU goes far beyond the classroom — from running a community radio station to competing in inter-collegiate sports.
+            </p>
+          </div>
+          <div className="activities-grid">
+            {studentActivities.map((act, i) => (
+              <div key={act.title} className="activity-item-card reveal" data-delay={`${i * 60}`}>
+                <div className="activity-item-icon">{act.icon}</div>
+                <h3 className="activity-item-title">{act.title}</h3>
+                <p className="activity-item-desc">{act.desc}</p>
               </div>
             ))}
           </div>
