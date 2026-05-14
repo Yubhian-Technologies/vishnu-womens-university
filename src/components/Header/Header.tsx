@@ -126,7 +126,7 @@ export default function Header() {
             <img src="https://res.cloudinary.com/dljzfysft/image/upload/v1777358383/download_u6eeyl.jpg" alt="VWU Logo" className="logo-icon" />
             <div className="logo-text">
               <span className="logo-text-main">VISHNU WOMENS UNIVERSITY</span>
-              <span className="logo-text-tag">First private university for women in telugu states</span>
+              <span className="logo-text-tag">First private state university for women in telugu states</span>
             </div>
           </Link>
 
