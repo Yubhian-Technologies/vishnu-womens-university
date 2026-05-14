@@ -14,13 +14,22 @@ const navItems: NavItem[] = [
     children: [
       { label: 'About VWU', path: '/about' },
       { label: 'Vision, Mission & Values', path: '/vision-mission' },
-      { label: 'Governance', path: '/governance' },
-      { label: 'Governing Body', path: '/governance/governing-body' },
-      { label: 'Committees', path: '/governance#committees' },
-      { label: 'IQAC', path: '/governance#iqac' },
       { label: 'About Society (SVES)', path: '/about-sves' },
       { label: 'Campus Life', path: '/campus' },
       { label: 'Information', path: '/information' },
+    ],
+  },
+  {
+    label: 'Statutory',
+    children: [
+      { label: 'Governance Overview', path: '/governance' },
+      { label: 'Governing Body', path: '/governance/governing-body' },
+      { label: 'Academic Council', path: '/governance/academic-council' },
+      { label: 'Board of Studies', path: '/governance/board-of-studies' },
+      { label: 'Finance Committee', path: '/governance/finance-committee' },
+      { label: 'Institutional Development Plan', path: '/governance/idp' },
+      { label: 'Committees', path: '/governance#committees' },
+      { label: 'IQAC', path: '/governance#iqac' },
     ],
   },
   {
