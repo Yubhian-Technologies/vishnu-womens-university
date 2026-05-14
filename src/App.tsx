@@ -12,6 +12,7 @@ import News from './pages/News/News';
 import Events from './pages/Events/Events';
 import VisionMission from './pages/VisionMission/VisionMission';
 import Governance from './pages/Governance/Governance';
+import GovernanceDetail from './pages/Governance/GovernanceDetail';
 import AboutSVES from './pages/AboutSVES/AboutSVES';
 import Campus from './pages/Campus/Campus';
 import Information from './pages/Information/Information';
@@ -55,6 +56,7 @@ function AppLayout() {
         <Route path="/about" element={<About />} />
         <Route path="/vision-mission" element={<VisionMission />} />
         <Route path="/governance" element={<Governance />} />
+        <Route path="/governance/:slug" element={<GovernanceDetail />} />
         <Route path="/about-sves" element={<AboutSVES />} />
         <Route path="/campus" element={<Campus />} />
         <Route path="/information" element={<Information />} />
