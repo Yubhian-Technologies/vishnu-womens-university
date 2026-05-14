@@ -80,10 +80,10 @@ const departments = [
 ];
 
 const admissionItems = [
-  { icon: '📋', title: 'Programmes & Fee Structure', desc: 'Detailed information on all B.Tech, M.Tech, MBA, and Ph.D. programs with annual fee structure and intake details.' },
-  { icon: '📝', title: 'Admission Procedure', desc: 'Step-by-step guide to applying through EAPCET (Code: VISW), document requirements, and selection process.' },
-  { icon: '📊', title: 'Result Analysis', desc: 'Academic performance data, pass percentages, and university rank holders across all departments and batches.' },
-  { icon: '💳', title: 'Fee Payment Portal', desc: 'Secure online fee payment for tuition, hostel, and examination fees with multiple payment options.' },
+  { icon: '📋', title: 'Programmes & Fee Structure', desc: 'Detailed information on all B.Tech, M.Tech, MBA, and Ph.D. programs with annual fee structure and intake details.', path: '/programmes-fee-structure' },
+  { icon: '📝', title: 'Admission Procedure', desc: 'Step-by-step guide to applying through EAPCET (Code: VISW), document requirements, and selection process.', path: '/admission-procedure' },
+  { icon: '📊', title: 'Result Analysis', desc: 'Academic performance data, pass percentages, and university rank holders across all departments and batches.', path: '/result-analysis' },
+  { icon: '💳', title: 'Fee Payment Portal', desc: 'Secure online fee payment for tuition, hostel, and examination fees with multiple payment options.', path: '/admissions' },
 ];
 
 const studentActivities = [
@@ -271,7 +271,7 @@ export default function Academics() {
                 <div className="adm-item-icon">{item.icon}</div>
                 <h3 className="adm-item-title">{item.title}</h3>
                 <p className="adm-item-desc">{item.desc}</p>
-                <a href="/admissions" className="adm-item-link">View Details →</a>
+                <Link to={item.path} className="adm-item-link">View Details →</Link>
               </div>
             ))}
           </div>

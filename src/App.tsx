@@ -15,6 +15,9 @@ import Governance from './pages/Governance/Governance';
 import AboutSVES from './pages/AboutSVES/AboutSVES';
 import Campus from './pages/Campus/Campus';
 import Information from './pages/Information/Information';
+import ProgrammesFee from './pages/Admissions/ProgrammesFee';
+import AdmissionProcedure from './pages/Admissions/AdmissionProcedure';
+import ResultAnalysis from './pages/Admissions/ResultAnalysis';
 import VishnuTV from './pages/StudentActivities/VishnuTV';
 import StudentClubs from './pages/StudentActivities/StudentClubs';
 import SocialServices from './pages/StudentActivities/SocialServices';
@@ -47,6 +50,9 @@ function AppLayout() {
         <Route path="/about-sves" element={<AboutSVES />} />
         <Route path="/campus" element={<Campus />} />
         <Route path="/information" element={<Information />} />
+        <Route path="/programmes-fee-structure" element={<ProgrammesFee />} />
+        <Route path="/admission-procedure" element={<AdmissionProcedure />} />
+        <Route path="/result-analysis" element={<ResultAnalysis />} />
         <Route path="/vishnu-tv-academy" element={<VishnuTV />} />
         <Route path="/student-clubs" element={<StudentClubs />} />
         <Route path="/social-services" element={<SocialServices />} />
