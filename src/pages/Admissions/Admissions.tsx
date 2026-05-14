@@ -19,13 +19,20 @@ const scholarships = [
   { name: 'Management Scholarship', amount: 'Up to ₹30,000/year', criteria: 'Academic excellence in previous semester' },
 ];
 
+const admissionHub = [
+  { icon: '📋', title: 'Programmes & Fee Structure', desc: 'All B.Tech, M.Tech, MBA & Ph.D. programmes with intake and annual fee details.', path: '/programmes-fee-structure', highlight: 'B.Tech: ₹1,05,000/yr' },
+  { icon: '📝', title: 'Admission Procedure', desc: 'Step-by-step guide — EAPCET (Code: VISW), GATE, ICET, ECET eligibility & process.', path: '/admission-procedure', highlight: 'EAPCET Code: VISW' },
+  { icon: '📊', title: 'Result Analysis', desc: 'Top 5 JNTUK affiliated college. 90%+ annual pass rate. University Gold Medalists.', path: '/result-analysis', highlight: 'Top 5 in JNTUK' },
+  { icon: '💳', title: 'Fee Payment Portal', desc: 'Secure online fee payment for tuition, hostel, and examination fees.', path: '/admissions', highlight: 'Pay Online' },
+];
+
 const tuitionData = [
-  { label: 'B.Tech Tuition (per year)', value: 'As per AP Govt.' },
-  { label: 'Hostel Fee (per year)', value: '₹60,000 – ₹80,000' },
-  { label: 'Books & Supplies', value: '₹10,000 (approx.)' },
-  { label: 'Total Cost of Attendance', value: 'Govt. Regulated' },
+  { label: 'B.Tech (per year)', value: '₹ 1,05,000' },
+  { label: 'M.Tech (per year)', value: '₹ 55,800' },
+  { label: 'MBA (per year)', value: '₹ 55,000' },
+  { label: 'Hostel Fee (per year)', value: '₹ 60,000 – ₹ 80,000' },
+  { label: 'PM Vidyalaxmi Scheme', value: 'Available' },
   { label: 'Scholarship Coverage', value: 'Up to 100%' },
-  { label: 'Average Net Price', value: 'Very Affordable' },
 ];
 
 const faqs = [
@@ -91,6 +98,30 @@ export default function Admissions() {
           <div style={{ display: 'flex', gap: 'var(--space-4)', marginTop: 'var(--space-6)', flexWrap: 'wrap' }} className="animate-fade-in-up">
             <a href="#apply" className="btn btn-accent btn-lg">Apply for Free</a>
             <a href="#visit" className="btn btn-secondary btn-lg">Schedule a Visit</a>
+          </div>
+        </div>
+      </section>
+
+      {/* Admissions Hub */}
+      <section className="section bg-off-white" style={{ paddingBottom: 0 }}>
+        <div className="container">
+          <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-8)' }}>
+            <span className="section-label">Admissions</span>
+            <h2 className="section-title">Everything You Need to Apply</h2>
+            <p className="section-desc" style={{ margin: '0 auto' }}>
+              All admission-related information in one place — fees, procedure, results, and payment.
+            </p>
+          </div>
+          <div className="adm-hub-grid">
+            {admissionHub.map((item, i) => (
+              <Link to={item.path} key={item.title} className="adm-hub-card reveal" data-delay={`${i * 80}`}>
+                <div className="adm-hub-icon">{item.icon}</div>
+                <div className="adm-hub-highlight">{item.highlight}</div>
+                <h3 className="adm-hub-title">{item.title}</h3>
+                <p className="adm-hub-desc">{item.desc}</p>
+                <span className="adm-hub-arrow">View Details →</span>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
@@ -161,10 +192,11 @@ export default function Admissions() {
               <span className="section-label" style={{ color: 'var(--color-accent)' }}>Fee Structure</span>
               <h2 className="section-title" style={{ color: 'var(--color-white)' }}>Understanding the Investment</h2>
               <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 'var(--text-lg)', lineHeight: 1.7, marginBottom: 'var(--space-6)' }}>
-                VWU follows the AP government's regulated fee structure. With generous scholarships
-                and government reimbursement schemes, engineering education here is highly affordable.
+                B.Tech annual fee is ₹1,05,000. M.Tech is ₹55,800 and MBA is ₹55,000 per year.
+                With government scholarships, SC/ST/BC fee reimbursement, and the PM Vidyalaxmi Scheme,
+                engineering education here is within reach for every deserving student.
               </p>
-              <Link to="/admissions" className="btn btn-accent">Estimate Your Cost</Link>
+              <Link to="/programmes-fee-structure" className="btn btn-accent">View Full Fee Structure</Link>
             </div>
             <div className="adm-tuition-table reveal-right">
               {tuitionData.map((row, i) => (
