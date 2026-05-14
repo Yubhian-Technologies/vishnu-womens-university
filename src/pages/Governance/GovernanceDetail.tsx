@@ -104,7 +104,7 @@ export default function GovernanceDetail() {
         </div>
       </section>
 
-      {/* Table */}
+      {/* Single Table */}
       {item.tableData && item.tableData.length > 0 && (
         <section className="section bg-off-white">
           <div className="container">
@@ -138,6 +138,49 @@ export default function GovernanceDetail() {
                 </tbody>
               </table>
             </div>
+          </div>
+        </section>
+      )}
+
+      {/* Multi-section Tables (Board of Studies) */}
+      {item.tableSections && item.tableSections.length > 0 && (
+        <section className="section bg-off-white">
+          <div className="container">
+            <div className="reveal" style={{ marginBottom: 'var(--space-8)' }}>
+              <span className="section-label">Members</span>
+              <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Department Boards of Studies</h2>
+            </div>
+            {item.tableSections.map((section, si) => (
+              <div key={section.title} className="reveal" data-delay={`${si * 40}`} style={{ marginBottom: 'var(--space-10)' }}>
+                <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>
+                  {section.title}
+                </h3>
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm)' }}>
+                    <thead>
+                      <tr style={{ background: 'var(--color-primary)' }}>
+                        {Object.keys(section.rows[0]).map((col) => (
+                          <th key={col} style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'left', color: 'var(--color-white)', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                            {col}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {section.rows.map((row: GovTableRow, i: number) => (
+                        <tr key={i} style={{ background: i % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)', borderBottom: '1px solid var(--color-light-gray)' }}>
+                          {Object.values(row).map((val, j) => (
+                            <td key={j} style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)', lineHeight: 1.5 }}>
+                              {String(val)}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ))}
           </div>
         </section>
       )}
