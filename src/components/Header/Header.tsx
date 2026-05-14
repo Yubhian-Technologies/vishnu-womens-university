@@ -53,6 +53,18 @@ const navItems: NavItem[] = [
     ],
   },
   {
+    label: 'Placements',
+    children: [
+      { label: 'Placements Overview', path: '/placements' },
+      { label: 'Placement Details', path: '/placements/placement-details' },
+      { label: 'Success Stories', path: '/placements/success-stories' },
+      { label: 'TPO Cell', path: '/placements/tpo-cell' },
+      { label: 'Campus Recruitment Training', path: '/placements/campus-recruitment-training' },
+      { label: 'Our Recruiters', path: '/placements/our-recruiters' },
+      { label: 'Study Abroad – GSAC', path: '/placements/gsac' },
+    ],
+  },
+  {
     label: 'Differentiators',
     children: [
       { label: 'All Differentiators', path: '/differentiators' },

@@ -26,6 +26,8 @@ import ArtsCulture from './pages/StudentActivities/ArtsCulture';
 import SportsGames from './pages/StudentActivities/SportsGames';
 import Differentiators from './pages/Differentiators/Differentiators';
 import DifferentiatorDetail from './pages/Differentiators/DifferentiatorDetail';
+import Placements from './pages/Placements/Placements';
+import PlacementDetail from './pages/Placements/PlacementDetail';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -63,6 +65,8 @@ function AppLayout() {
         <Route path="/sports-games" element={<SportsGames />} />
         <Route path="/differentiators" element={<Differentiators />} />
         <Route path="/differentiators/:slug" element={<DifferentiatorDetail />} />
+        <Route path="/placements" element={<Placements />} />
+        <Route path="/placements/:slug" element={<PlacementDetail />} />
         <Route path="/news" element={<News />} />
         <Route path="/events" element={<Events />} />
         <Route path="*" element={<NotFound />} />
