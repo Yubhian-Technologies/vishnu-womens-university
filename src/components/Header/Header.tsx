@@ -2,10 +2,22 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import './Header.css';
 
+interface NavChild {
+  label: string;
+  path: string;
+}
+
+interface NavGroup {
+  groupLabel: string;
+  groupPath?: string;
+  items: NavChild[];
+}
+
 interface NavItem {
   label: string;
   path?: string;
-  children?: { label: string; path: string }[];
+  children?: NavChild[];
+  groups?: NavGroup[];
 }
 
 const navItems: NavItem[] = [
@@ -21,15 +33,51 @@ const navItems: NavItem[] = [
   },
   {
     label: 'Statutory',
-    children: [
-      { label: 'Governance Overview', path: '/governance' },
-      { label: 'Governing Body', path: '/governance/governing-body' },
-      { label: 'Academic Council', path: '/governance/academic-council' },
-      { label: 'Board of Studies', path: '/governance/board-of-studies' },
-      { label: 'Finance Committee', path: '/governance/finance-committee' },
-      { label: 'Institutional Development Plan', path: '/governance/idp' },
-      { label: 'Committees', path: '/governance#committees' },
-      { label: 'IQAC', path: '/governance#iqac' },
+    groups: [
+      {
+        groupLabel: 'Governance',
+        groupPath: '/governance',
+        items: [
+          { label: 'Governing Body', path: '/governance/governing-body' },
+          { label: 'Academic Council', path: '/governance/academic-council' },
+          { label: 'Board of Studies', path: '/governance/board-of-studies' },
+          { label: 'Finance Committee', path: '/governance/finance-committee' },
+          { label: 'Institutional Development Plan', path: '/governance/idp' },
+        ],
+      },
+      {
+        groupLabel: 'Committees',
+        groupPath: '/governance#committees',
+        items: [
+          { label: 'College Academic Committee', path: '/governance/college-academic-committee' },
+          { label: 'Internal Quality Assurance Cell', path: '/governance/internal-quality-assurance-cell' },
+          { label: 'Acad. & Admin. Audit Committee', path: '/governance/academic-administrative-audit' },
+          { label: 'Freshmen Committee', path: '/governance/freshmen-committee' },
+          { label: 'Infrastructure Management', path: '/governance/infrastructure-management' },
+          { label: 'Faculty Grievance Redressal', path: '/governance/faculty-grievance' },
+          { label: 'Student Grievance Redressal', path: '/governance/student-grievance' },
+          { label: 'Central Purchase Committee', path: '/governance/central-purchase' },
+          { label: 'Counselling & Monitoring', path: '/governance/counselling-monitoring' },
+          { label: 'Anti Ragging Committee', path: '/governance/anti-ragging' },
+          { label: 'Internal Committee (POSH)', path: '/governance/internal-committee' },
+          { label: 'SC/ST Cell', path: '/governance/sc-st-cell' },
+          { label: 'R&D Committee', path: '/governance/rd-committee' },
+        ],
+      },
+      {
+        groupLabel: 'IQAC',
+        groupPath: '/governance#iqac',
+        items: [
+          { label: 'About IQAC', path: '/governance/about-iqac' },
+          { label: 'IQAC Worksystem', path: '/governance/iqac-worksystem' },
+          { label: 'Quality Parameters', path: '/governance/quality-parameters' },
+          { label: 'IQAC Committee', path: '/governance/iqac-committee' },
+          { label: 'Policies & Procedures', path: '/governance/policies-procedures' },
+          { label: 'Annual Reports & Reforms', path: '/governance/annual-reports' },
+          { label: 'MHRD NIRF Reports', path: '/governance/nirf-reports' },
+          { label: 'NBA – Data Capturing Points', path: '/governance/nba-data' },
+        ],
+      },
     ],
   },
   {
@@ -179,21 +227,45 @@ export default function Header() {
                       <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                   </button>
+
+                  {/* Flat dropdown */}
                   {item.children && (
                     <div className="dropdown" role="menu">
                       <ul className="dropdown-list">
                         {item.children.map((child) => (
                           <li key={child.label}>
-                            <Link
-                              to={child.path}
-                              className="dropdown-item"
-                              role="menuitem"
-                            >
+                            <Link to={child.path} className="dropdown-item" role="menuitem">
                               {child.label}
                             </Link>
                           </li>
                         ))}
                       </ul>
+                    </div>
+                  )}
+
+                  {/* Mega-menu dropdown */}
+                  {item.groups && (
+                    <div className="dropdown dropdown-mega" role="menu">
+                      {item.groups.map((group) => (
+                        <div key={group.groupLabel} className="mega-group">
+                          {group.groupPath ? (
+                            <Link to={group.groupPath} className="mega-group-label">
+                              {group.groupLabel}
+                            </Link>
+                          ) : (
+                            <span className="mega-group-label">{group.groupLabel}</span>
+                          )}
+                          <ul className="mega-group-list">
+                            {group.items.map((child) => (
+                              <li key={child.label}>
+                                <Link to={child.path} className="dropdown-item" role="menuitem">
+                                  {child.label}
+                                </Link>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
                     </div>
                   )}
                 </li>
@@ -242,6 +314,8 @@ export default function Header() {
                     <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 </button>
+
+                {/* Flat mobile submenu */}
                 {item.children && (
                   <ul className="mobile-submenu">
                     {item.children.map((child) => (
@@ -249,6 +323,22 @@ export default function Header() {
                         <Link to={child.path} className="mobile-sub-item">
                           {child.label}
                         </Link>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+
+                {/* Grouped mobile submenu */}
+                {item.groups && (
+                  <ul className="mobile-submenu mobile-submenu-mega">
+                    {item.groups.map((group) => (
+                      <li key={group.groupLabel}>
+                        <span className="mobile-group-label">{group.groupLabel}</span>
+                        {group.items.map((child) => (
+                          <Link key={child.label} to={child.path} className="mobile-sub-item">
+                            {child.label}
+                          </Link>
+                        ))}
                       </li>
                     ))}
                   </ul>
