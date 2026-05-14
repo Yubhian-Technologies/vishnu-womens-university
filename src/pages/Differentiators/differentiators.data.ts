@@ -65,7 +65,7 @@ export const categories: DiffCategory[] = [
           'Project-based learning for all engineering branches',
           'Fosters cooperative learning and institutional collaboration',
         ],
-        intro: 'The IDEA Lab at Shri Vishnu Engineering College for Women provides comprehensive facilities for converting student and faculty ideas into functional prototypes. Located in Bhimavaram, West Godavari District, this AICTE-funded initiative fosters creative thinking and problem-solving skills. It operates under the philosophy of "learn while make," enabling students to develop imaginative capabilities beyond conventional laboratory settings.',
+        intro: 'The IDEA Lab at Vishnu Womens University provides comprehensive facilities for converting student and faculty ideas into functional prototypes. Located in Bhimavaram, West Godavari District, this AICTE-funded initiative fosters creative thinking and problem-solving skills. It operates under the philosophy of "learn while make," enabling students to develop imaginative capabilities beyond conventional laboratory settings.',
         about: "The lab's mission centers on transforming engineering education by exposing all students to practical innovation spaces, supporting project-based learning while training faculty to integrate creative methodologies into teaching and research. It aims to provide an agile platform for students to convert ideas into working prototypes, build networks between institutes, and foster cooperative learning cultures. The facility also emphasizes faculty engagement in proof-of-concept development and knowledge dissemination, with a strong focus on GREEN initiatives across all operations.",
         facilities: [],
         outcomes: [],
@@ -83,7 +83,7 @@ export const categories: DiffCategory[] = [
           'Organises workshops, idea contests, and project exhibitions',
           'Implements MoE National Innovation and Startup Policy',
         ],
-        intro: 'The Institution Innovation Cell (IIC) at SVECW operates as part of the Ministry of Education\'s National Innovation and Startup Policy framework. It fosters an environment where innovation and entrepreneurship flourish among faculty and students through structured initiatives and mentorship programs. The cell works synergistically with VISHVA TBI (supported by NIDHI) and the Entrepreneurship Development Cell to cultivate entrepreneurial mindsets across campus.',
+        intro: 'The Institution Innovation Cell (IIC) at VWU operates as part of the Ministry of Education\'s National Innovation and Startup Policy framework. It fosters an environment where innovation and entrepreneurship flourish among faculty and students through structured initiatives and mentorship programs. The cell works synergistically with VISHVA TBI (supported by NIDHI) and the Entrepreneurship Development Cell to cultivate entrepreneurial mindsets across campus.',
         about: "The IIC was established to implement the MHRD's National Innovation and Startup Policy, creating pathways for transforming creative ideas into viable products and services. The cell organizes workshops, seminars, and networking sessions with entrepreneurs and investors; conducts idea contests and project exhibitions; and provides mentorship to translate concepts into market-ready solutions. Its vision is to establish the institution as a leading hub for innovation while developing students and faculty as job creators rather than job seekers.",
         facilities: [
           'Vishnu Technology Business Incubator (VISHVA TBI)',
@@ -105,7 +105,7 @@ export const categories: DiffCategory[] = [
       },
       {
         slug: 'tedxsvecw',
-        title: 'TEDxSVECW',
+        title: 'TEDxVWU',
         desc: 'Licensed independently organised TED event. Inaugural "Sea of Voices" (December 14, 2024) featured eleven speakers spanning healthcare, entrepreneurship, and food technology.',
         highlights: [
           'Inaugural event: "Sea of Voices" — December 14, 2024',
@@ -115,8 +115,8 @@ export const categories: DiffCategory[] = [
           'Faculty coordinators: Dr. G.J.V. Prasad and Dr. G. Ratnakanth',
           'Fosters intellectual growth and innovation culture',
         ],
-        intro: 'Shri Vishnu Engineering College for Women launched its inaugural TEDx event series with the theme "Sea of Voices" on December 14, 2024. The platform brings together thought leaders and innovators to share ideas spanning diverse fields including business, healthcare, and technology. TEDxSVECW serves as an intellectual forum for fostering innovation and collaboration among students and faculty.',
-        about: 'The inaugural TEDxSVECW event featured 11 speakers delivering talks on topics ranging from eye and dental care to business practices and food technology, reflecting the college\'s commitment to interdisciplinary discourse. The event was curated by Mr. Akash Rao Mallareddy under the guidance of Chairman Shri K.V. Vishnu Raju and Principal Dr. G. Srinivasa Rao, leaving attendees with a treasure trove of ideas and inspiration.',
+        intro: 'Vishnu Womens University launched its inaugural TEDx event series with the theme "Sea of Voices" on December 14, 2024. The platform brings together thought leaders and innovators to share ideas spanning diverse fields including business, healthcare, and technology. TEDxVWU serves as an intellectual forum for fostering innovation and collaboration among students and faculty.',
+        about: 'The inaugural TEDxVWU event featured 11 speakers delivering talks on topics ranging from eye and dental care to business practices and food technology, reflecting the college\'s commitment to interdisciplinary discourse. The event was curated by Mr. Akash Rao Mallareddy under the guidance of Chairman Shri K.V. Vishnu Raju and Principal Dr. G. Srinivasa Rao, leaving attendees with a treasure trove of ideas and inspiration.',
         facilities: [],
         outcomes: ['Attendees inspired with interdisciplinary ideas spanning healthcare, business, and technology'],
         partners: ['TED (TEDx programme)'],
@@ -141,7 +141,7 @@ export const categories: DiffCategory[] = [
           'Graduates eligible for Capgemini internships and placements',
           'Industry-ready credentials upon completion',
         ],
-        intro: 'Shri Vishnu Engineering College for Women has partnered with Capgemini through a Memorandum of Understanding to equip Mechanical Engineering students with industry-relevant skills in design automation and product lifecycle management. The MEDA (Mechanical Engineering Design Automation) track trains students in core design and analysis roles using professional engineering software, while the PLM (Product Life Cycle Management) track focuses on managing product data throughout development cycles.',
+        intro: 'Vishnu Womens University has partnered with Capgemini through a Memorandum of Understanding to equip Mechanical Engineering students with industry-relevant skills in design automation and product lifecycle management. The MEDA (Mechanical Engineering Design Automation) track trains students in core design and analysis roles using professional engineering software, while the PLM (Product Life Cycle Management) track focuses on managing product data throughout development cycles.',
         about: 'The MEDA programme covers 3D modeling, assembly design, parametric techniques, finite element analysis for structural and thermal validation, geometric dimensioning and tolerancing (GD&T), and design for manufacturing and assembly optimization. The PLM programme addresses product structure, bill of materials, configuration control, CAD-PLM tool integration, and workflow collaboration using Siemens Teamcenter. Students completing these modules receive mentorship from Capgemini, gain industry-ready credentials, and qualify for internship and placement opportunities.',
         facilities: ['CATIA', 'Siemens NX CAD', 'ANSYS', 'Siemens Teamcenter'],
         outcomes: [
@@ -162,7 +162,7 @@ export const categories: DiffCategory[] = [
           'Industry clients: MicroChip Technologies and KPIT Technologies',
           'Prepares students for embedded software engineer and IoT developer roles',
         ],
-        intro: 'The Department of Electronics and Communication Engineering at Shri Vishnu Engineering College for Women has partnered with NASSCOM to deliver comprehensive embedded systems instruction aligned with the FutureSkills Prime framework. This programme equips students with industry-relevant competencies and practical experience in embedded systems development, bridging the gap between academic learning and industry requirements.',
+        intro: 'The Department of Electronics and Communication Engineering at Vishnu Womens University has partnered with NASSCOM to deliver comprehensive embedded systems instruction aligned with the FutureSkills Prime framework. This programme equips students with industry-relevant competencies and practical experience in embedded systems development, bridging the gap between academic learning and industry requirements.',
         about: 'The NASSCOM-certified curriculum covers embedded C programming, real-time operating systems (RTOS), device driver design, and software validation methodologies. The initiative supports India\'s digital transformation goals by aligning training with the FutureSkills Prime framework developed jointly by NASSCOM and MeitY. Six dedicated faculty members oversee curriculum delivery, with additional collaboration from MicroChip Technologies and KPIT Technologies.',
         facilities: [
           'Embedded development boards',
@@ -189,7 +189,7 @@ export const categories: DiffCategory[] = [
           'Industry-recognised certification upon completion',
           'Faculty leads: Mrs. K Swathi and Mrs. B Vaisalini',
         ],
-        intro: 'The Electronics and Communication Engineering department at Shri Vishnu Engineering College for Women has partnered with HCL Tech to deliver comprehensive VLSI design and verification training. The programme equips students with cutting-edge knowledge and hands-on expertise in VLSI design, bridging the gap between academia and semiconductor sector expectations.',
+        intro: 'The Electronics and Communication Engineering department at Vishnu Womens University has partnered with HCL Tech to deliver comprehensive VLSI design and verification training. The programme equips students with cutting-edge knowledge and hands-on expertise in VLSI design, bridging the gap between academia and semiconductor sector expectations.',
         about: 'The curriculum is structured around self-directed learning modules with assignments and chip puzzles, virtual instructor-led training (VILT) sessions with HCL subject matter experts, formative assessments, and hands-on lab experiments. Students build a strong foundation in digital design, analog design, verification, and physical design while developing competencies aligned with semiconductor industry standards.',
         facilities: [
           'ASIC/FPGA design workflow tools',
@@ -215,7 +215,7 @@ export const categories: DiffCategory[] = [
           'Serves ECE, EEE, and CSE disciplines',
           'Faculty team led by E. R. Praveen Kumar',
         ],
-        intro: 'The Microchip Embedded System Centre at SVECW is a cutting-edge facility aimed at bridging the gap between academic knowledge and industry-relevant skills in embedded systems. Established through collaboration with Eduskills, the centre equips students with practical experience in designing, programming, and testing real-time embedded applications using PIC microcontroller-based development boards.',
+        intro: 'The Microchip Embedded System Centre at VWU is a cutting-edge facility aimed at bridging the gap between academic knowledge and industry-relevant skills in embedded systems. Established through collaboration with Eduskills, the centre equips students with practical experience in designing, programming, and testing real-time embedded applications using PIC microcontroller-based development boards.',
         about: 'The centre enables students to work with 8-bit, 16-bit, and 32-bit PIC microcontrollers across applications including IoT, automation, and sensor-based systems. Faculty mentorship and online certification programmes through Eduskills enhance student employability and technical competencies. Key objectives include advancing research in microchip design and testing, developing skilled talent through hands-on training, and promoting sustainable, energy-efficient microchip solutions.',
         facilities: [
           'Wide range of PIC microcontroller variants',
@@ -242,7 +242,7 @@ export const categories: DiffCategory[] = [
           'DST research grant: Rs. 53 lakhs for telephony speech enhancement',
           '21 project batches registered for IICDC 2019',
         ],
-        intro: 'The Texas Instruments Digital Signal Processing Centre of Excellence at SVECW is a pioneering research facility dedicated to advancing DSP innovation across telecommunications, audio, video, and image processing. The centre facilitates collaborations between academic institutions and industry partners while empowering students with practical expertise in signal processing technology.',
+        intro: 'The Texas Instruments Digital Signal Processing Centre of Excellence at VWU is a pioneering research facility dedicated to advancing DSP innovation across telecommunications, audio, video, and image processing. The centre facilitates collaborations between academic institutions and industry partners while empowering students with practical expertise in signal processing technology.',
         about: 'The facility aims to transform academia through pioneering research, collaboration, and education in digital signal processing. Its core mission encompasses advancing DSP research via interdisciplinary partnerships, preparing students for industry roles, and developing solutions addressing societal challenges. Research focus areas include speech processing, medical imaging, assistive technology for hearing-impaired individuals, robotic systems, and environmental monitoring.',
         facilities: [
           'TI DSP Starter Kits',
@@ -272,7 +272,7 @@ export const categories: DiffCategory[] = [
           'Focus: R&D, Training, Industry Collaboration, Technology Transfer',
           'Promotes women in sustainable civil engineering',
         ],
-        intro: 'The Centre of Excellence for Sustainable Construction Practices and Materials (CSCPM) operates within the Department of Civil Engineering at SVECW in partnership with UltraTech Cement Ltd. This collaborative initiative advances sustainable practices in the construction industry by combining academic expertise with industrial resources. The MoU was signed on March 20, 2024.',
+        intro: 'The Centre of Excellence for Sustainable Construction Practices and Materials (CSCPM) operates within the Department of Civil Engineering at VWU in partnership with UltraTech Cement Ltd. This collaborative initiative advances sustainable practices in the construction industry by combining academic expertise with industrial resources. The MoU was signed on March 20, 2024.',
         about: "The centre strives to be a beacon of excellence, shaping a world where sustainable construction materials lead the way in creating environmentally conscious built environments. Key focus areas include empowering civil engineering students — particularly women — with comprehensive education on sustainable materials, Research and Development, Education and Training, Industry Collaboration, Technology Transfer, and Consultancy Services.",
         facilities: [],
         outcomes: [
@@ -293,7 +293,7 @@ export const categories: DiffCategory[] = [
           'FPGA boards: PynqZ2, Xilinx Ultrascale, Zynq, Kria',
           'Chief Investigator: Dr. K. Padma Vasavi',
         ],
-        intro: "The Chips to Startup (C2S) programme at SVECW aligns with the Government of India's vision for making India self-reliant in electronics system design, aiming to train 85,000 specialised professionals over five years in VLSI and Embedded System Design. It is funded by the Ministry of Electronics and Information Technology (MeitY) with a project budget of Rs. 64.5 Lakhs.",
+        intro: "The Chips to Startup (C2S) programme at VWU aligns with the Government of India's vision for making India self-reliant in electronics system design, aiming to train 85,000 specialised professionals over five years in VLSI and Embedded System Design. It is funded by the Ministry of Electronics and Information Technology (MeitY) with a project budget of Rs. 64.5 Lakhs.",
         about: 'The C2S programme fosters a system-on-chip culture across educational levels and establishes an ASIC/IC design ecosystem. It emphasises industry-led translational research, reusable IP core development, startup incubation, and creating industry-ready manpower in system and SOC design. The college obtained advanced EDA tools from major vendors and modern FPGA boards through this programme.',
         facilities: [
           'AMD Xilinx EDA tools',
@@ -331,7 +331,7 @@ export const categories: DiffCategory[] = [
           'Collaboration with Dhruva Space (National Award winner)',
           'Satellite data analysis and payload design projects',
         ],
-        intro: 'The Vishnu Space Application Center (VSAC), established at the Department of Electronics and Communication Engineering at SVECW, is a collaborative initiative between Sri Vishnu Educational Society and Dhruva Space Private Limited. This facility serves as an S-band ground station dedicated to satellite tracking and space technology research.',
+        intro: 'The Vishnu Space Application Center (VSAC), established at the Department of Electronics and Communication Engineering at VWU, is a collaborative initiative between Sri Vishnu Educational Society and Dhruva Space Private Limited. This facility serves as an S-band ground station dedicated to satellite tracking and space technology research.',
         about: 'The center aims to acquire, decode, and analyze satellite data for scientific research, provide practical training in satellite tracking and CubeSat design, and conduct R&D projects improving satellite communication systems. It also supports HAM radio licensing and Morse code education to inspire students toward space technology careers. The facility features a 3-metre parabolic mesh reflector antenna operating at 2200–2290 MHz with 35.4 dBi gain.',
         facilities: [
           '3-metre parabolic mesh reflector antenna (2200–2290 MHz, 35.4 dBi gain)',
@@ -357,7 +357,7 @@ export const categories: DiffCategory[] = [
           'Sony 65-inch 4K display with 5.1 surround sound',
           'Development tools: Unity, Unreal Engine, Blender',
         ],
-        intro: 'The AR/VR Studio at Shri Vishnu Engineering College for Women is a state-of-the-art facility dedicated to exploring and developing augmented and virtual reality technologies. Established as a Centre of Excellence by the Department of Computer Science and Engineering on August 7, 2024, the studio creates a collaborative space for students, faculty, and researchers.',
+        intro: 'The AR/VR Studio at Vishnu Womens University is a state-of-the-art facility dedicated to exploring and developing augmented and virtual reality technologies. Established as a Centre of Excellence by the Department of Computer Science and Engineering on August 7, 2024, the studio creates a collaborative space for students, faculty, and researchers.',
         about: 'The studio aims to develop practical expertise in AR/VR development tools including Unity, Unreal Engine, and Blender while facilitating industry-oriented projects and workshops. It promotes applications in education, healthcare, and rural development, and establishes partnerships with industry leaders to provide internships and encourage research publications and patents.',
         facilities: [
           '2 Meta Quest 3 128GB VR devices',
@@ -381,7 +381,7 @@ export const categories: DiffCategory[] = [
           'Training in power-train systems, vehicle dynamics, and fabrication',
           'Sustainable vehicle design and fuel efficiency research',
         ],
-        intro: 'The Vehicle Design Lab is a Centre of Excellence established by the Department of Mechanical Engineering at Shri Vishnu Engineering College for Women, enabling students to design and fabricate vehicles for national-level competitions. Inaugurated on March 11, 2019 by Kamal Bali, Managing Director of Volvo India, the lab provides comprehensive facilities for automotive system development and research.',
+        intro: 'The Vehicle Design Lab is a Centre of Excellence established by the Department of Mechanical Engineering at Vishnu Womens University, enabling students to design and fabricate vehicles for national-level competitions. Inaugurated on March 11, 2019 by Kamal Bali, Managing Director of Volvo India, the lab provides comprehensive facilities for automotive system development and research.',
         about: 'The lab combines computing resources with hands-on training to prepare mechanically-minded students for automotive industry challenges, covering motorsport engineering, vehicle power-train systems, vehicle stability and dynamics testing, and fabrication. It promotes interdisciplinary collaboration, innovation research in fuel efficiency and safety, industry partnerships, and sustainable vehicle design practices.',
         facilities: [
           'CAD/CAE software for modelling, analysis, and drafting',
@@ -406,7 +406,7 @@ export const categories: DiffCategory[] = [
           'Exhibited at IIT Madras Makeathon and Telangana AT Summit',
           'Projects span mobility, prosthetics, and communication devices',
         ],
-        intro: 'The Assistive Technology Lab at Shri Vishnu Engineering College for Women develops innovative projects designed to benefit people with disabilities. Established in 2009 in collaboration with the University of Massachusetts Lowell, the ATL creates practical engineering solutions that help integrate differently-abled individuals into mainstream society.',
+        intro: 'The Assistive Technology Lab at Vishnu Womens University develops innovative projects designed to benefit people with disabilities. Established in 2009 in collaboration with the University of Massachusetts Lowell, the ATL creates practical engineering solutions that help integrate differently-abled individuals into mainstream society.',
         about: 'The ATL emphasises collaborative projects and community partnerships that nurture social responsibility among participants, encouraging cross-disciplinary collaboration on real-world societal issues. Over 70 students participate annually from multiple institutions, guided by 10+ faculty mentors, with annual visits from Prof. Alan Rux (ATP Coordinator, UMass Lowell). Completed devices are distributed to disability support organisations across the region.',
         facilities: [],
         outcomes: [
@@ -437,7 +437,7 @@ export const categories: DiffCategory[] = [
           'Addresses skill gaps in advanced HPC adoption',
           'Led by Dr. A Senthil Kumar and Dr. G Durga Prasad',
         ],
-        intro: 'The Centre of Excellence in High Performance Computing (HPC) Lab was established in 2021 at the Department of Artificial Intelligence at Shri Vishnu Engineering College for Women. The facility accelerates research across cloud computing, drug development, and scientific applications by pooling computing capacity far beyond standard workstations.',
+        intro: 'The Centre of Excellence in High Performance Computing (HPC) Lab was established in 2021 at the Department of Artificial Intelligence at Vishnu Womens University. The facility accelerates research across cloud computing, drug development, and scientific applications by pooling computing capacity far beyond standard workstations.',
         about: "The lab's mission includes carrying out cutting-edge research with maximised synergy and exploring novel computational methods for scalable data mining and optimisation with complex datasets. It provides GPU computing resources for faculty and students building models with large real-world datasets, and addresses skill gaps through specialised training in advanced HPC adoption.",
         facilities: [
           'High-performance GPU computing infrastructure',
@@ -461,7 +461,7 @@ export const categories: DiffCategory[] = [
           'Multiple first-prize wins at regional and national technical festivals',
           'Current research: eco-friendly lightweight concrete boats for sustainable aquaculture',
         ],
-        intro: 'The Concrete Canoe Laboratory at Shri Vishnu Engineering College for Women enables students to apply theoretical knowledge by constructing functional canoes entirely from concrete. This hands-on facility combines structural design, materials science, and project management while fostering innovation and teamwork among civil engineering students.',
+        intro: 'The Concrete Canoe Laboratory at Vishnu Womens University enables students to apply theoretical knowledge by constructing functional canoes entirely from concrete. This hands-on facility combines structural design, materials science, and project management while fostering innovation and teamwork among civil engineering students.',
         about: "The lab aims to equip learners with specialised skills in concrete canoe design and construction, cultivating a research-focused culture that explores innovative materials and techniques. Current research investigates eco-friendly lightweight concrete boats for sustainable aquaculture, exploring durable, environmentally responsible vessel designs incorporating recycled materials and innovative concrete compositions. The lab also hosted India's first concrete canoe competition in Andhra Pradesh and Telangana.",
         facilities: [
           'Concrete fabrication and testing equipment',
@@ -485,7 +485,7 @@ export const categories: DiffCategory[] = [
           'Optimal mix proportions examined for compressive strength and water absorption',
           'Led by Mr. Ramgopal L., specialising in concrete technology',
         ],
-        intro: 'The Dream House Construction Lab (DHCL) is a specialised facility at Shri Vishnu Engineering College for Women designed to support research and innovation in construction technology. It functions as a collaborative space where faculty, students, and industry partners work together on projects addressing real-world challenges in the built environment.',
+        intro: 'The Dream House Construction Lab (DHCL) is a specialised facility at Vishnu Womens University designed to support research and innovation in construction technology. It functions as a collaborative space where faculty, students, and industry partners work together on projects addressing real-world challenges in the built environment.',
         about: 'Key objectives include conducting innovative research on construction technology, materials, and sustainable practices; offering workshops and training programmes for practical skill enhancement; and advancing knowledge in the construction industry while meeting societal needs. Current research investigates optimal mix proportions for stabilised mud blocks, examining compressive strength, flexural properties, and water absorption using locally available materials and stabilisers including lime and cement.',
         facilities: [
           'Stabilised mud block fabrication and testing equipment',
@@ -530,7 +530,7 @@ export const categories: DiffCategory[] = [
           'Pre-departure orientation: cultural adaptation and safety',
           'Alumni network support in destination countries',
         ],
-        intro: 'The Graduate Study Abroad Center (GSAC) at Shri Vishnu Engineering College for Women supports students pursuing higher education internationally by providing comprehensive guidance to identify suitable destinations, universities, and academic programmes. The center was established to reduce the financial and emotional burden on families by offering hand-holding in GRE/TOEFL/IELTS training and application processing.',
+        intro: 'The Graduate Study Abroad Center (GSAC) at Vishnu Womens University supports students pursuing higher education internationally by providing comprehensive guidance to identify suitable destinations, universities, and academic programmes. The center was established to reduce the financial and emotional burden on families by offering hand-holding in GRE/TOEFL/IELTS training and application processing.',
         about: 'GSAC provides counselling on international course options and destinations, education loan assistance through partner banks, scholarship identification and application support, and pre-departure orientation programmes covering cultural adaptation and safety. Students are also connected with alumni already studying or working in destination countries to ease their transition.',
         facilities: [],
         outcomes: [
@@ -551,7 +551,7 @@ export const categories: DiffCategory[] = [
           '60-hour basic-level curriculum per language',
           'Delivered by Global Language Solutions, Chennai',
         ],
-        intro: 'The Foreign Languages programme at Shri Vishnu Engineering College for Women, launched in 2012, enables engineering students to develop foundational communication abilities in multiple international languages. The programme opens pathways to new cultures, perspectives, and career opportunities while fostering effective global communication.',
+        intro: 'The Foreign Languages programme at Vishnu Womens University, launched in 2012, enables engineering students to develop foundational communication abilities in multiple international languages. The programme opens pathways to new cultures, perspectives, and career opportunities while fostering effective global communication.',
         about: 'Each language follows a 60-hour basic-level curriculum covering fundamental vocabulary, grammar structures, pronunciation, listening comprehension, speaking practice, cultural contexts, and everyday communication scenarios. Students receive graded certificates upon successful completion, supporting international careers, study abroad aspirations, and personal professional growth. As of 2024–25, the programme serves 1,044 students across four languages.',
         facilities: [],
         outcomes: [
@@ -593,7 +593,7 @@ export const categories: DiffCategory[] = [
           'Project-based learning with industry mentorship',
           'Placement success documented across multiple batches',
         ],
-        intro: 'WISE is an exclusive collaborative programme between Shri Vishnu Engineering College for Women and TalentSprint Private Limited (Hyderabad) designed to develop women engineering students into highly trusted DeepTech Software Engineers. The initiative operates alongside regular coursework, blending rigorous academics with industry experience to prepare students for global technology industries.',
+        intro: 'WISE is an exclusive collaborative programme between Vishnu Womens University and TalentSprint Private Limited (Hyderabad) designed to develop women engineering students into highly trusted DeepTech Software Engineers. The initiative operates alongside regular coursework, blending rigorous academics with industry experience to prepare students for global technology industries.',
         about: 'The programme includes a Microsoft Mentoring Programme component, an ELITE Programme track, and project-based learning curriculum supported by industry partnerships and a dedicated WISE Team. It enables students to develop mid-size software systems through experiential learning, build competitive resumes tailored for multinational software organisations, and cultivate industry-necessary skills for confidence and competence as professionals.',
         facilities: [],
         outcomes: [
@@ -614,7 +614,7 @@ export const categories: DiffCategory[] = [
           'Packages ranging from 10 to 50 lakh annually',
           'Placements at Amazon, Flipkart, Adobe, and Palo Alto Networks',
         ],
-        intro: 'Shri Vishnu Engineering College for Women has collaborated with Smart Interviews to deliver specialised training in Problem Solving with Data Structures and Algorithms (C&DS) since 2017. The programme targets students for software development roles, as major tech companies increasingly recruit through coding contests and hackathons.',
+        intro: 'Vishnu Womens University has collaborated with Smart Interviews to deliver specialised training in Problem Solving with Data Structures and Algorithms (C&DS) since 2017. The programme targets students for software development roles, as major tech companies increasingly recruit through coding contests and hackathons.',
         about: 'The curriculum spans three phases across three semesters: Phase 1 covers programming fundamentals and complexity analysis; Phase 2 addresses sorting, hashing, and string operations; Phase 3 focuses on advanced data structures including trees, dynamic programming, and graph theory. Up to 400 students are selected annually via HackerRank coding contests, and students are mentored by previously placed graduates.',
         facilities: [
           'HackerRank coding contest platform',
@@ -638,7 +638,7 @@ export const categories: DiffCategory[] = [
           'Beneficiaries employed in bakeries and tailoring operations',
           'Government-recognised technology park',
         ],
-        intro: 'The Rural Women Technology Park (WTP) at Shri Vishnu Engineering College for Women enhances rural women\'s access to technology and practical skills, having trained approximately 1,200 rural women between 2015 and 2018 in Bhimavaram. The initiative empowers women through knowledge, attitude, and practice development across multiple skill areas.',
+        intro: 'The Rural Women Technology Park (WTP) at Vishnu Womens University enhances rural women\'s access to technology and practical skills, having trained approximately 1,200 rural women between 2015 and 2018 in Bhimavaram. The initiative empowers women through knowledge, attitude, and practice development across multiple skill areas.',
         about: 'The programme examines linkages between women\'s roles, responsibilities, and their use of technology in rural communities, focusing on tools central to livelihoods at the household level. Training is organised across five intervention areas: Virgin Coconut Oil Production, Computer-Aided Design/Stitching/Handloom Weaving, Women Health and Nutrition, Food Processing and Value-Added Products, and Waste Paper Recycling.',
         facilities: [
           'Baking equipment and food processing tools',
@@ -678,7 +678,7 @@ export const categories: DiffCategory[] = [
           'Budget analysis sessions and role-play simulations',
           'Three dedicated faculty across finance, operations, marketing, and HR',
         ],
-        intro: 'Nirvahana is a dynamic leadership initiative within the MBA programme at Shri Vishnu Engineering College for Women, functioning as a beacon of excellence within the Department of Management Studies. The programme cultivates strategic business acumen through workshops, seminars, and competitive case studies. Its vision is to establish a dynamic ecosystem where aspiring leaders harness strategic insights, embrace innovation, and champion ethical practices.',
+        intro: 'Nirvahana is a dynamic leadership initiative within the MBA programme at Vishnu Womens University, functioning as a beacon of excellence within the Department of Management Studies. The programme cultivates strategic business acumen through workshops, seminars, and competitive case studies. Its vision is to establish a dynamic ecosystem where aspiring leaders harness strategic insights, embrace innovation, and champion ethical practices.',
         about: "Nirvahana's mission centres on developing forward-thinking business leaders equipped to address global challenges. Primary objectives include developing strategic thinking, facilitating industry networking and peer collaboration, providing career development resources, fostering an entrepreneurial mindset, and promoting community service and ethical leadership. Activities include storytelling in business, logo redesign projects, budget analysis sessions, role-play simulations, entrepreneurial talks, stock market education, and industry immersion programmes.",
         facilities: [],
         outcomes: [
