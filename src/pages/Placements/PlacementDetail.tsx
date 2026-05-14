@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
-import { findPlacementItemBySlug } from './placements.data';
+import { findPlacementItemBySlug, TableRow } from './placements.data';
 
 export default function PlacementDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -124,6 +124,63 @@ export default function PlacementDetail() {
                   <span style={{ fontSize: '1.25rem', flexShrink: 0 }}>🏆</span>
                   <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6 }}>{o}</span>
                 </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Table Data */}
+      {item.tableData && item.tableData.length > 0 && (
+        <section className="section bg-white">
+          <div className="container">
+            <div className="reveal" style={{ marginBottom: 'var(--space-8)' }}>
+              <span className="section-label">Data</span>
+              <h2 className="section-title" style={{ fontSize: '1.75rem' }}>
+                {item.slug === 'tpo-team' ? 'Team Roster' : item.slug === 'industry-liaison-offices' ? 'Regional Offices' : 'Batch-wise Statistics'}
+              </h2>
+            </div>
+            <div className="reveal" style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm)' }}>
+                <thead>
+                  <tr style={{ background: 'var(--color-primary)' }}>
+                    {Object.keys(item.tableData[0]).map((col) => (
+                      <th key={col} style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'left', color: 'var(--color-white)', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                        {col}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {item.tableData.map((row: TableRow, i: number) => (
+                    <tr key={i} style={{ background: i % 2 === 0 ? 'var(--color-off-white)' : 'var(--color-white)', borderBottom: '1px solid var(--color-light-gray)' }}>
+                      {Object.values(row).map((val, j) => (
+                        <td key={j} style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)', lineHeight: 1.5 }}>
+                          {String(val)}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Partners Grid */}
+      {item.partners && item.partners.length > 0 && (
+        <section className="section bg-off-white">
+          <div className="container">
+            <div className="reveal" style={{ marginBottom: 'var(--space-8)' }}>
+              <span className="section-label">Network</span>
+              <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Recruiting Partners</h2>
+            </div>
+            <div className="reveal" style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+              {item.partners.map((p, i) => (
+                <span key={i} style={{ display: 'inline-block', fontSize: 'var(--text-sm)', fontWeight: 600, background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', color: 'var(--color-primary)', padding: '0.35rem 0.85rem', borderRadius: 'var(--radius-full)', lineHeight: 1.4 }}>
+                  {p}
+                </span>
               ))}
             </div>
           </div>
