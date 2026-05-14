@@ -52,7 +52,7 @@ input, textarea, select {
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 var(--space-12);
+  padding: 0 var(--space-8);
 }
 
 .section {
@@ -480,7 +480,7 @@ h6 { font-size: var(--text-lg); }
 
 @media (max-width: 768px) {
   .container {
-    padding: 0 var(--space-5);
+    padding: 0 var(--space-4);
   }
   .section {
     padding: var(--space-12) 0;
