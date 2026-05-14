@@ -24,6 +24,7 @@ import SocialServices from './pages/StudentActivities/SocialServices';
 import CampusMagazines from './pages/StudentActivities/CampusMagazines';
 import ArtsCulture from './pages/StudentActivities/ArtsCulture';
 import SportsGames from './pages/StudentActivities/SportsGames';
+import Differentiators from './pages/Differentiators/Differentiators';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -59,6 +60,7 @@ function AppLayout() {
         <Route path="/campus-magazines" element={<CampusMagazines />} />
         <Route path="/arts-culture" element={<ArtsCulture />} />
         <Route path="/sports-games" element={<SportsGames />} />
+        <Route path="/differentiators" element={<Differentiators />} />
         <Route path="/news" element={<News />} />
         <Route path="/events" element={<Events />} />
         <Route path="*" element={<NotFound />} />

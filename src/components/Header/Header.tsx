@@ -53,6 +53,17 @@ const navItems: NavItem[] = [
     ],
   },
   {
+    label: 'Differentiators',
+    children: [
+      { label: 'All Differentiators', path: '/differentiators' },
+      { label: 'Innovation & Entrepreneurship', path: '/differentiators#innovation' },
+      { label: 'Industry Centres of Excellence', path: '/differentiators#industry' },
+      { label: 'Research & Specialised Labs', path: '/differentiators#research' },
+      { label: 'International & Global Outreach', path: '/differentiators#global' },
+      { label: 'Student Development & Social Impact', path: '/differentiators#student' },
+    ],
+  },
+  {
     label: 'Alumni & Giving',
     children: [
       { label: 'Alumni Network', path: '/alumni-giving' },
