@@ -28,6 +28,10 @@ import Differentiators from './pages/Differentiators/Differentiators';
 import DifferentiatorDetail from './pages/Differentiators/DifferentiatorDetail';
 import Placements from './pages/Placements/Placements';
 import PlacementDetail from './pages/Placements/PlacementDetail';
+import NewsAwards from './pages/NewsAwards/NewsAwards';
+import Happenings from './pages/NewsAwards/Happenings';
+import Accreditations from './pages/NewsAwards/Accreditations';
+import GalleryPage from './pages/NewsAwards/Gallery';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -69,6 +73,10 @@ function AppLayout() {
         <Route path="/placements/:slug" element={<PlacementDetail />} />
         <Route path="/news" element={<News />} />
         <Route path="/events" element={<Events />} />
+        <Route path="/news-awards" element={<NewsAwards />} />
+        <Route path="/news-awards/happenings" element={<Happenings />} />
+        <Route path="/news-awards/accreditations-awards" element={<Accreditations />} />
+        <Route path="/news-awards/gallery" element={<GalleryPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Footer />

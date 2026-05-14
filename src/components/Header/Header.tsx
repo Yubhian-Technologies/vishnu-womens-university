@@ -76,6 +76,17 @@ const navItems: NavItem[] = [
     ],
   },
   {
+    label: 'News & Awards',
+    children: [
+      { label: 'News & Awards Overview', path: '/news-awards' },
+      { label: 'Happenings at VWU', path: '/news-awards/happenings' },
+      { label: 'Accreditations & Awards', path: '/news-awards/accreditations-awards' },
+      { label: 'Gallery', path: '/news-awards/gallery' },
+      { label: 'News', path: '/news' },
+      { label: 'Events', path: '/events' },
+    ],
+  },
+  {
     label: 'Alumni & Giving',
     children: [
       { label: 'Alumni Network', path: '/alumni-giving' },
@@ -83,8 +94,6 @@ const navItems: NavItem[] = [
       { label: 'Alumni Events', path: '/alumni-giving' },
       { label: 'Prathibha Magazine', path: '/alumni-giving' },
       { label: 'Success Stories', path: '/alumni-giving' },
-      { label: 'News', path: '/news' },
-      { label: 'Events', path: '/events' },
     ],
   },
 ];
