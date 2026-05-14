@@ -361,6 +361,15 @@ a.mega-group-label:hover {
   margin: 0;
 }
 
+.mega-group-list.cols-2 {
+  columns: 2;
+  column-gap: 0;
+}
+
+.mega-group-list.cols-2 li {
+  break-inside: avoid;
+}
+
 .mega-group-list .dropdown-item {
   padding: var(--space-2) var(--space-2);
   font-size: 0.72rem;

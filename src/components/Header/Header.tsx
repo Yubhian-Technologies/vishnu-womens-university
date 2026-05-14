@@ -23,12 +23,54 @@ interface NavItem {
 const navItems: NavItem[] = [
   {
     label: 'Discover',
-    children: [
-      { label: 'About VWU', path: '/about' },
-      { label: 'Vision, Mission & Values', path: '/vision-mission' },
-      { label: 'About Society (SVES)', path: '/about-sves' },
-      { label: 'Campus Life', path: '/campus' },
-      { label: 'Information', path: '/information' },
+    groups: [
+      {
+        groupLabel: 'About Us',
+        groupPath: '/about',
+        items: [
+          { label: 'About SVECW', path: '/about' },
+          { label: 'Vision, Mission & Values', path: '/vision-mission' },
+          { label: 'Institutional Development Plan', path: '/governance/idp' },
+          { label: 'Organizational Chart', path: '/about#org-chart' },
+          { label: 'Governing Body', path: '/governance/governing-body' },
+          { label: 'Core Executive Body', path: '/about#core-executive' },
+          { label: 'About Society (SVES)', path: '/about-sves' },
+        ],
+      },
+      {
+        groupLabel: 'Campus Life',
+        groupPath: '/campus',
+        items: [
+          { label: 'Smart Class Rooms', path: '/campus#smart-classrooms' },
+          { label: 'State-of-the-art Labs', path: '/campus#labs' },
+          { label: 'Central Library', path: '/campus#library' },
+          { label: 'Auditoriums', path: '/campus#auditoriums' },
+          { label: 'Campus Book Stores', path: '/campus#bookstores' },
+          { label: 'Wi-Fi Campus', path: '/campus#wifi' },
+          { label: 'Campus Hostels', path: '/campus#hostels' },
+          { label: 'Food Courts', path: '/campus#food-courts' },
+          { label: 'VISHNU Fitness Centre', path: '/campus#fitness' },
+          { label: 'Staff Quarters', path: '/campus#staff-quarters' },
+          { label: 'Travel Desk', path: '/campus#travel-desk' },
+          { label: 'Temples', path: '/campus#temples' },
+          { label: 'Health Care', path: '/campus#health-care' },
+          { label: 'Swimming Pool', path: '/campus#swimming-pool' },
+          { label: 'Campus Security', path: '/campus#security' },
+          { label: 'Other Facilities', path: '/campus#other-facilities' },
+        ],
+      },
+      {
+        groupLabel: 'Information',
+        groupPath: '/information',
+        items: [
+          { label: 'Academic Calendar', path: '/information#academic-calendar' },
+          { label: 'List of Holidays', path: '/information#holidays' },
+          { label: 'How to Reach', path: '/information#how-to-reach' },
+          { label: 'Counselling Scheme', path: '/information#counselling' },
+          { label: 'ICT Platforms', path: '/information#ict-platforms' },
+          { label: 'Other Practices', path: '/information#other-practices' },
+        ],
+      },
     ],
   },
   {
@@ -255,7 +297,7 @@ export default function Header() {
                           ) : (
                             <span className="mega-group-label">{group.groupLabel}</span>
                           )}
-                          <ul className="mega-group-list">
+                          <ul className={`mega-group-list${group.items.length > 9 ? ' cols-2' : ''}`}>
                             {group.items.map((child) => (
                               <li key={child.label}>
                                 <Link to={child.path} className="dropdown-item" role="menuitem">
