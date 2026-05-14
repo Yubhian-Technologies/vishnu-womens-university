@@ -40,33 +40,6 @@ const programCategories = [
   },
 ];
 
-const specialPrograms = [
-  {
-    title: 'Assistive Technology Lab (ATL)',
-    desc: 'A pioneering lab dedicated to developing assistive technologies for persons with disabilities, fostering inclusive innovation at VWU.',
-    image: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=800&q=80',
-    alt: 'Students in Assistive Technology Lab',
-  },
-  {
-    title: 'Rural Women Technology Park',
-    desc: 'Empowering rural women through technology training and skill development programs, bridging the digital divide in Andhra Pradesh.',
-    image: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&q=80',
-    alt: 'Rural Women Technology Park at VWU',
-  },
-  {
-    title: 'Vishnu Japan Outreach Centre',
-    desc: 'A unique international collaboration center facilitating cultural exchange, research partnerships, and global exposure for students.',
-    image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80',
-    alt: 'Vishnu Japan Outreach Centre',
-  },
-  {
-    title: 'Technology Business Incubator',
-    desc: 'Supporting student and faculty startups with mentoring, funding, and industry connections to turn innovative ideas into businesses.',
-    image: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=800&q=80',
-    alt: 'VWU Technology Business Incubator',
-  },
-];
-
 const departments = [
   { icon: '💻', code: 'CSE', name: 'Computer Science & Engineering', desc: 'AI, machine learning, data structures, algorithms, cloud computing, and software engineering.', labs: '12 Labs' },
   { icon: '📡', code: 'ECE', name: 'Electronics & Communication Engineering', desc: 'VLSI design, embedded systems, signal processing, communications, and IoT.', labs: '10 Labs' },
@@ -79,37 +52,14 @@ const departments = [
   { icon: '💼', code: 'MBA', name: 'Master of Business Administration', desc: 'Business strategy, finance, marketing, human resources, and entrepreneurship.', labs: '2 Labs' },
 ];
 
-
 const studentActivities = [
-  { icon: '📻', title: 'Radio Vishnu 90.4', desc: 'The first college community radio station in Andhra Pradesh, broadcasting programs on education, culture, and local issues — run entirely by students.', path: 'http://radiovishnu.com/', external: true },
-  { icon: '🎬', title: 'Vishnu TV Academy', desc: 'A student-run TV production studio where students learn filmmaking, anchoring, journalism, and digital media production.', path: '/vishnu-tv-academy', external: false },
-  { icon: '👥', title: 'Student Clubs', desc: 'Technical, cultural, literary, and social clubs — including coding teams, robotics squads, debate societies, and more.', path: '/student-clubs', external: false },
-  { icon: '🤝', title: 'Social Services', desc: 'NSS units and outreach programs engaging students in community development, rural welfare, and environmental initiatives.', path: '/social-services', external: false },
-  { icon: '📰', title: 'Campus Magazines', desc: 'Student-published magazines covering campus news, technical writing, creative literature, and cultural events.', path: '/campus-magazines', external: false },
-  { icon: '🎭', title: 'Arts & Culture', desc: 'Dance, music, drama, fine arts, and cultural festivals celebrating student creativity and diversity.', path: '/arts-culture', external: false },
-  { icon: '🏆', title: 'Sports & Games', desc: 'Indoor and outdoor sports, inter-collegiate tournaments, gymnasium, and Olympic-standard swimming pool.', path: '/sports-games', external: false },
-];
-
-const topRecruiters = [
-  'Amazon', 'TCS', 'Infosys', 'Wipro', 'Cognizant', 'HCL Technologies',
-  'Tech Mahindra', 'Capgemini', 'Accenture', 'IBM', 'Microsoft', 'Deloitte',
-  'Hexaware', 'Mphasis', 'L&T Infotech', 'Mindtree',
-];
-
-const placementStats = [
-  { value: '1,400+', label: 'Students Placed (2024–25)' },
-  { value: '52 LPA', label: 'Highest Package' },
-  { value: '6.2 LPA', label: 'Average Package' },
-  { value: '150+', label: 'Recruiting Companies' },
-];
-
-const supportItems = [
-  { icon: '📖', title: 'Central Library', desc: 'Access thousands of engineering textbooks, research journals, digital databases, and comfortable study spaces.' },
-  { icon: '🎯', title: 'Academic Advising', desc: 'Every student receives dedicated guidance from faculty advisors who help plan your academic journey and career goals.' },
-  { icon: '🏢', title: 'Career Services', desc: 'From resume preparation to mock interviews and campus drives, VWU connects you with 1,400+ placement opportunities annually.' },
-  { icon: '🚀', title: 'AR/VR Studio', desc: 'Cutting-edge augmented and virtual reality facilities for immersive learning, research, and prototyping.' },
-  { icon: '🛸', title: 'Space Application Center', desc: 'A specialized center for research in satellite technologies, remote sensing, and space applications.' },
-  { icon: '🌍', title: 'TalentSprint @ NSE', desc: 'Industry-partnered programs with NSE through TalentSprint, providing students with financial technology and advanced training.' },
+  { icon: '📻', title: 'Radio Vishnu 90.4', path: 'http://radiovishnu.com/', external: true },
+  { icon: '🎬', title: 'Vishnu TV Academy', path: '/vishnu-tv-academy', external: false },
+  { icon: '👥', title: 'Student Clubs', path: '/student-clubs', external: false },
+  { icon: '🤝', title: 'Social Services', path: '/social-services', external: false },
+  { icon: '📰', title: 'Campus Magazines', path: '/campus-magazines', external: false },
+  { icon: '🎭', title: 'Arts & Culture', path: '/arts-culture', external: false },
+  { icon: '🏆', title: 'Sports & Games', path: '/sports-games', external: false },
 ];
 
 export default function Academics() {
@@ -208,17 +158,21 @@ export default function Academics() {
             {activeCategory?.programs.map((prog) => (
               <Link
                 key={prog.name}
-                to="/academics"
+                to="/programmes-fee-structure"
                 className="program-card"
               >
                 <div className="program-card-icon">{prog.icon}</div>
                 <h3>{prog.name}</h3>
                 <p>{prog.desc}</p>
                 <div className="program-card-arrow">
-                  Learn More →
+                  Fee & Seats →
                 </div>
               </Link>
             ))}
+          </div>
+
+          <div style={{ textAlign: 'center', marginTop: 'var(--space-8)' }}>
+            <Link to="/programmes-fee-structure" className="btn btn-primary">View Full Fee Structure →</Link>
           </div>
         </div>
       </section>
@@ -249,109 +203,81 @@ export default function Academics() {
         </div>
       </section>
 
-      {/* Special Programs */}
-      <section className="special-programs-section">
-        <div className="container">
-          <div className="reveal" style={{ textAlign: 'center', marginBottom: 0 }}>
-            <span className="section-label">Signature Programs</span>
-            <h2 className="section-title">What Sets VWU Apart</h2>
-          </div>
-          <div className="special-grid">
-            {specialPrograms.map((sp, i) => (
-              <div key={sp.title} className={`special-card reveal${i % 2 === 0 ? '-left' : '-right'}`} data-delay={`${i * 100}`}>
-                <img src={sp.image} alt={sp.alt} className="special-card-bg" loading="lazy" />
-                <div className="special-card-overlay" />
-                <div className="special-card-content">
-                  <h3>{sp.title}</h3>
-                  <p>{sp.desc}</p>
-                  <Link to="/academics" className="btn btn-accent" style={{ fontSize: '0.75rem' }}>Learn More</Link>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Student Activities */}
+      {/* Student Activities — compact hub */}
       <section className="section bg-off-white">
         <div className="container">
-          <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>
+          <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-10)' }}>
             <span className="section-label">Student Life</span>
-            <h2 className="section-title">Student Activities</h2>
-            <p className="section-desc" style={{ margin: '0 auto' }}>
-              Life at VWU goes far beyond the classroom — from running a community radio station to competing in inter-collegiate sports.
+            <h2 className="section-title">Beyond the Classroom</h2>
+            <p className="section-desc" style={{ margin: '0 auto var(--space-8)' }}>
+              From running a community radio station to competing in inter-collegiate sports — life at VWU goes far beyond lectures.
             </p>
           </div>
           <div className="activities-grid">
             {studentActivities.map((act, i) => (
-              <div key={act.title} className="activity-item-card reveal" data-delay={`${i * 60}`}>
-                <div className="activity-item-icon">{act.icon}</div>
-                <h3 className="activity-item-title">{act.title}</h3>
-                <p className="activity-item-desc">{act.desc}</p>
-                {act.path && (
-                  act.external
-                    ? <a href={act.path} target="_blank" rel="noopener noreferrer" style={{ marginTop: 'var(--space-2)', fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--color-accent)', textDecoration: 'none', fontFamily: 'var(--font-sans)', letterSpacing: '0.05em', textTransform: 'uppercase' }}>Explore →</a>
-                    : <Link to={act.path} style={{ marginTop: 'var(--space-2)', fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--color-accent)', textDecoration: 'none', fontFamily: 'var(--font-sans)', letterSpacing: '0.05em', textTransform: 'uppercase' }}>Explore →</Link>
-                )}
-              </div>
+              act.external
+                ? (
+                  <a
+                    key={act.title}
+                    href={act.path}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="activity-item-card reveal"
+                    data-delay={`${i * 60}`}
+                    style={{ textDecoration: 'none' }}
+                  >
+                    <div className="activity-item-icon">{act.icon}</div>
+                    <h3 className="activity-item-title">{act.title}</h3>
+                    <span style={{ marginTop: 'auto', fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'var(--font-sans)' }}>Explore →</span>
+                  </a>
+                ) : (
+                  <Link
+                    key={act.title}
+                    to={act.path}
+                    className="activity-item-card reveal"
+                    data-delay={`${i * 60}`}
+                    style={{ textDecoration: 'none' }}
+                  >
+                    <div className="activity-item-icon">{act.icon}</div>
+                    <h3 className="activity-item-title">{act.title}</h3>
+                    <span style={{ marginTop: 'auto', fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'var(--font-sans)' }}>Explore →</span>
+                  </Link>
+                )
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Academic Support */}
-      <section className="academic-support-section">
-        <div className="container">
-          <div className="reveal" style={{ textAlign: 'center', marginBottom: 0 }}>
-            <span className="section-label" style={{ color: 'var(--color-accent)' }}>Resources</span>
-            <h2 className="section-title" style={{ color: 'var(--color-white)' }}>
-              Resources to Fuel Your Success
-            </h2>
-          </div>
-          <div className="support-grid">
-            {supportItems.map((item, i) => (
-              <div key={item.title} className="support-card reveal" data-delay={`${i * 80}`}>
-                <div className="support-card-icon">{item.icon}</div>
-                <h3>{item.title}</h3>
-                <p>{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Placements */}
-      <section className="section bg-off-white">
-        <div className="container">
-          <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-10)' }}>
-            <span className="section-label">Career Outcomes</span>
-            <h2 className="section-title">Where VWU Engineers Go</h2>
-            <p className="section-desc" style={{ margin: '0 auto' }}>
-              Our Training & Placement Cell works year-round to connect students with India's top employers.
-            </p>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-8)', flexWrap: 'wrap', marginBottom: 'var(--space-12)' }}>
-            {placementStats.map((s, i) => (
-              <div key={s.label} className="reveal" data-delay={`${i * 80}`} style={{ textAlign: 'center' }}>
-                <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2.2rem', fontWeight: 900, color: 'var(--color-primary)' }}>{s.value}</div>
-                <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', fontFamily: 'var(--font-sans)', marginTop: 'var(--space-1)' }}>{s.label}</div>
-              </div>
-            ))}
-          </div>
-          <div className="reveal" style={{ marginBottom: 'var(--space-6)' }}>
-            <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-text-light)', marginBottom: 'var(--space-5)' }}>
-              Top Recruiting Companies
-            </h3>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-3)' }}>
-              {topRecruiters.map((r) => (
-                <span key={r} style={{ background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-sm)', padding: '0.4rem 1rem', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-sans)', fontWeight: 600, color: 'var(--color-primary)', boxShadow: 'var(--shadow-sm)' }}>
-                  {r}
-                </span>
-              ))}
-            </div>
           </div>
           <div style={{ textAlign: 'center', marginTop: 'var(--space-8)' }}>
-            <Link to="/admissions" className="btn btn-primary btn-lg">Explore Career Services</Link>
+            <Link to="/student-life" className="btn btn-primary">Full Student Life Experience →</Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Placements — stats only, links to ResultAnalysis */}
+      <section className="section bg-white">
+        <div className="container">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-12)', alignItems: 'center' }}>
+            <div className="reveal-left">
+              <span className="section-label">Career Outcomes</span>
+              <h2 className="section-title">Where VWU Engineers Go</h2>
+              <p style={{ color: 'var(--color-text-light)', lineHeight: 1.8, marginBottom: 'var(--space-6)' }}>
+                Our Training & Placement Cell works year-round connecting students with India's top employers — Amazon, TCS, Infosys, Wipro, HCL, Cognizant, and 150+ more.
+              </p>
+              <Link to="/result-analysis" className="btn btn-primary">View Result Analysis →</Link>
+            </div>
+            <div className="reveal-right">
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
+                {[
+                  { value: '1,400+', label: 'Students Placed (2024–25)' },
+                  { value: '52 LPA', label: 'Highest Package' },
+                  { value: '6.2 LPA', label: 'Average Package' },
+                  { value: '150+', label: 'Recruiting Companies' },
+                ].map(s => (
+                  <div key={s.label} style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', borderLeft: '4px solid var(--color-accent)', textAlign: 'center' }}>
+                    <div style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(1.2rem, 2.5vw, 1.8rem)', fontWeight: 900, color: 'var(--color-primary)' }}>{s.value}</div>
+                    <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', fontFamily: 'var(--font-sans)', marginTop: 4 }}>{s.label}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -367,8 +293,8 @@ export default function Academics() {
             </p>
             <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
               <Link to="/admissions" className="btn btn-accent btn-lg">Apply via EAPCET</Link>
-              <Link to="/admissions" className="btn btn-secondary btn-lg">Schedule a Visit</Link>
-              <Link to="/admissions" className="btn btn-secondary btn-lg">Request Info</Link>
+              <Link to="/admission-procedure" className="btn btn-secondary btn-lg">Admission Procedure</Link>
+              <Link to="/programmes-fee-structure" className="btn btn-secondary btn-lg">Fee Structure</Link>
             </div>
           </div>
         </div>

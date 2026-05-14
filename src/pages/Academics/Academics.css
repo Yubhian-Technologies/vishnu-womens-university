@@ -94,111 +94,6 @@
   gap: var(--space-2);
 }
 
-/* Special Programs */
-.special-programs-section {
-  padding: var(--space-20) 0;
-  background: var(--color-white);
-}
-
-.special-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-6);
-  margin-top: var(--space-10);
-}
-
-.special-card {
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  position: relative;
-  min-height: 280px;
-  display: flex;
-  align-items: flex-end;
-}
-
-.special-card-bg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform var(--transition-slow);
-}
-
-.special-card:hover .special-card-bg {
-  transform: scale(1.06);
-}
-
-.special-card-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to top, rgba(0,28,84,0.92) 0%, rgba(0,28,84,0.3) 60%, transparent 100%);
-}
-
-.special-card-content {
-  position: relative;
-  z-index: 2;
-  padding: var(--space-6);
-  width: 100%;
-}
-
-.special-card-content h3 {
-  color: var(--color-white);
-  font-size: var(--text-2xl);
-  margin-bottom: var(--space-2);
-}
-
-.special-card-content p {
-  color: rgba(255,255,255,0.8);
-  font-size: var(--text-sm);
-  margin-bottom: var(--space-4);
-  line-height: 1.5;
-}
-
-/* Academic Support */
-.academic-support-section {
-  padding: var(--space-20) 0;
-  background: var(--color-primary);
-}
-
-.support-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-6);
-  margin-top: var(--space-10);
-}
-
-.support-card {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: var(--radius-md);
-  padding: var(--space-6);
-  transition: all var(--transition-base);
-}
-
-.support-card:hover {
-  background: rgba(255,255,255,0.1);
-  border-color: var(--color-accent);
-  transform: translateY(-4px);
-}
-
-.support-card-icon {
-  font-size: 2.5rem;
-  margin-bottom: var(--space-4);
-}
-
-.support-card h3 {
-  color: var(--color-white);
-  font-size: var(--text-xl);
-  margin-bottom: var(--space-3);
-}
-
-.support-card p {
-  color: rgba(255,255,255,0.65);
-  font-size: var(--text-sm);
-  line-height: 1.6;
-}
-
 /* Departments */
 .dept-grid {
   display: grid;
@@ -304,11 +199,6 @@
   color: var(--color-primary);
 }
 
-.activity-item-desc {
-  font-size: var(--text-sm);
-  color: var(--color-text-light);
-  line-height: 1.6;
-}
 
 @media (max-width: 1024px) {
   .programs-grid { grid-template-columns: repeat(3, 1fr); }
@@ -317,8 +207,6 @@
 
 @media (max-width: 768px) {
   .programs-grid { grid-template-columns: repeat(2, 1fr); }
-  .special-grid { grid-template-columns: 1fr; }
-  .support-grid { grid-template-columns: 1fr; }
   .dept-grid { grid-template-columns: repeat(2, 1fr); }
   .activities-grid { grid-template-columns: repeat(2, 1fr); }
 }
