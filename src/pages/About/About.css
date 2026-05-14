@@ -1,0 +1,296 @@
+.about-facts-bar {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: var(--space-2);
+}
+
+.about-fact {
+  text-align: center;
+  padding: var(--space-3);
+  border-right: 1px solid rgba(255,255,255,0.1);
+}
+
+.about-fact:last-child { border-right: none; }
+
+.about-fact-value {
+  font-family: var(--font-serif);
+  font-size: clamp(1rem, 2vw, 1.4rem);
+  font-weight: 900;
+  color: var(--color-accent);
+}
+
+.about-fact-label {
+  font-size: var(--text-xs);
+  color: rgba(255,255,255,0.55);
+  font-family: var(--font-sans);
+  margin-top: 2px;
+}
+
+/* Mission */
+.about-mission-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-12);
+  align-items: center;
+}
+
+.about-mv-card {
+  background: var(--color-white);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+  border-left: 4px solid var(--color-accent);
+  margin-bottom: var(--space-5);
+  box-shadow: var(--shadow-sm);
+}
+
+.about-mv-card h3 {
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  font-weight: 900;
+  color: var(--color-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: var(--space-2);
+}
+
+.about-mv-card p {
+  font-size: var(--text-base);
+  color: var(--color-text-light);
+  line-height: 1.6;
+}
+
+.about-values-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+.about-value-tag {
+  padding: 6px 16px;
+  background: var(--color-primary);
+  color: var(--color-white);
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  font-family: var(--font-sans);
+  letter-spacing: 0.04em;
+}
+
+/* Timeline */
+.about-timeline {
+  position: relative;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.about-timeline::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--color-primary), var(--color-accent), var(--color-primary));
+  transform: translateX(-50%);
+}
+
+.about-timeline-item {
+  display: flex;
+  justify-content: flex-end;
+  padding-right: calc(50% + var(--space-8));
+  margin-bottom: var(--space-8);
+  position: relative;
+}
+
+.about-timeline-item.right {
+  justify-content: flex-start;
+  padding-right: 0;
+  padding-left: calc(50% + var(--space-8));
+}
+
+.about-timeline-content {
+  background: var(--color-off-white);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+  border: 1.5px solid var(--color-light-gray);
+  transition: all var(--transition-base);
+  max-width: 320px;
+}
+
+.about-timeline-content:hover {
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-md);
+}
+
+.about-timeline-year {
+  font-family: var(--font-serif);
+  font-size: var(--text-2xl);
+  font-weight: 900;
+  color: var(--color-accent);
+  margin-bottom: var(--space-2);
+}
+
+.about-timeline-content h3 {
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: var(--space-2);
+}
+
+.about-timeline-content p {
+  font-size: var(--text-sm);
+  color: var(--color-text-light);
+  line-height: 1.5;
+}
+
+.about-timeline-dot {
+  position: absolute;
+  left: 50%;
+  top: 20px;
+  transform: translateX(-50%);
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  border: 3px solid var(--color-white);
+  box-shadow: 0 0 0 2px var(--color-accent);
+  z-index: 1;
+}
+
+/* Leadership */
+.about-leadership-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-6);
+}
+
+.about-leader-card {
+  text-align: center;
+  transition: all var(--transition-base);
+}
+
+.about-leader-card:hover {
+  transform: translateY(-6px);
+}
+
+.about-leader-img-wrap {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin: 0 auto var(--space-4);
+  border: 4px solid var(--color-light-gray);
+  transition: border-color var(--transition-base);
+}
+
+.about-leader-card:hover .about-leader-img-wrap {
+  border-color: var(--color-accent);
+}
+
+.about-leader-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+}
+
+.about-leader-card h3 {
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: 4px;
+}
+
+.about-leader-card > p {
+  font-size: var(--text-sm);
+  color: var(--color-text-light);
+}
+
+/* Accreditation */
+.about-accred-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.about-accred-card {
+  background: var(--color-off-white);
+  border: 1.5px solid var(--color-light-gray);
+  border-radius: var(--radius-md);
+  padding: var(--space-5) var(--space-6);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  transition: all var(--transition-base);
+}
+
+.about-accred-card:hover {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-md);
+}
+
+.about-accred-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.about-accred-card h3 {
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: 4px;
+}
+
+.about-accred-scope {
+  font-size: var(--text-sm);
+  color: var(--color-text-light);
+  margin-bottom: 4px;
+}
+
+.about-accred-since {
+  font-size: var(--text-xs);
+  color: var(--color-mid-gray);
+  font-family: var(--font-sans);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .about-facts-bar {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .about-mission-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+  }
+  .about-leadership-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .about-facts-bar {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .about-timeline::before { left: 20px; }
+  .about-timeline-item {
+    padding-right: 0;
+    padding-left: 52px;
+    justify-content: flex-start;
+  }
+  .about-timeline-item.right {
+    padding-left: 52px;
+  }
+  .about-timeline-dot {
+    left: 20px;
+  }
+  .about-timeline-content {
+    max-width: 100%;
+  }
+  .about-leadership-grid {
+    grid-template-columns: 1fr;
+  }
+}

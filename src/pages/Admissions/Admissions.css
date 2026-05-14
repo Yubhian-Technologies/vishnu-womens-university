@@ -1,0 +1,385 @@
+.adm-steps {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--space-4);
+  position: relative;
+}
+
+.adm-steps::before {
+  content: '';
+  position: absolute;
+  top: 36px;
+  left: 10%;
+  right: 10%;
+  height: 2px;
+  background: linear-gradient(to right, var(--color-primary), var(--color-accent), var(--color-primary));
+  z-index: 0;
+}
+
+.adm-step {
+  background: var(--color-white);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+  text-align: center;
+  border: 1.5px solid var(--color-light-gray);
+  position: relative;
+  z-index: 1;
+  transition: all var(--transition-base);
+}
+
+.adm-step:hover {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-6px);
+}
+
+.adm-step-number {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: var(--color-white);
+  font-family: var(--font-serif);
+  font-weight: 900;
+  font-size: var(--text-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto var(--space-3);
+  position: relative;
+  z-index: 2;
+  border: 3px solid var(--color-off-white);
+}
+
+.adm-step-icon {
+  font-size: 2rem;
+  margin-bottom: var(--space-3);
+}
+
+.adm-step-title {
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: var(--space-2);
+}
+
+.adm-step-desc {
+  font-size: var(--text-sm);
+  color: var(--color-text-light);
+  line-height: 1.5;
+}
+
+/* Scholarships */
+.adm-scholarship-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-5);
+  margin-bottom: var(--space-8);
+}
+
+.adm-scholarship-card {
+  background: var(--color-off-white);
+  border: 1.5px solid var(--color-light-gray);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+  transition: all var(--transition-base);
+}
+
+.adm-scholarship-card:hover {
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-3px);
+}
+
+.adm-scholarship-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--space-3);
+  gap: var(--space-3);
+}
+
+.adm-scholarship-header h3 {
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.adm-scholarship-amount {
+  font-family: var(--font-serif);
+  font-size: var(--text-base);
+  font-weight: 900;
+  color: var(--color-accent);
+  white-space: nowrap;
+}
+
+.adm-scholarship-criteria {
+  font-size: var(--text-sm);
+  color: var(--color-text-light);
+}
+
+/* FAFSA CTA */
+.adm-fafsa-cta {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  border-radius: var(--radius-lg);
+  padding: var(--space-6) var(--space-8);
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  color: var(--color-white);
+}
+
+.adm-fafsa-icon {
+  font-size: 3rem;
+  flex-shrink: 0;
+}
+
+.adm-fafsa-cta h3 {
+  color: var(--color-white);
+  font-size: var(--text-xl);
+  margin-bottom: var(--space-1);
+}
+
+.adm-fafsa-cta p {
+  color: rgba(255,255,255,0.75);
+  font-size: var(--text-sm);
+}
+
+.adm-fafsa-cta .btn {
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+/* Tuition */
+.adm-tuition-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-12);
+  align-items: center;
+}
+
+.adm-tuition-table {
+  background: rgba(255,255,255,0.05);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255,255,255,0.1);
+  overflow: hidden;
+}
+
+.adm-tuition-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  color: rgba(255,255,255,0.7);
+  transition: background var(--transition-fast);
+}
+
+.adm-tuition-row:hover {
+  background: rgba(255,255,255,0.05);
+}
+
+.adm-tuition-row:last-child {
+  border-bottom: none;
+}
+
+.adm-tuition-row strong {
+  font-weight: 700;
+}
+
+/* Visit */
+.adm-visit-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-5);
+}
+
+.adm-visit-card {
+  background: var(--color-white);
+  border: 1.5px solid var(--color-light-gray);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  transition: all var(--transition-base);
+}
+
+.adm-visit-card:hover {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-4px);
+}
+
+.adm-visit-icon {
+  font-size: 2.5rem;
+}
+
+.adm-visit-card h3 {
+  font-size: var(--text-lg);
+  color: var(--color-primary);
+  font-family: var(--font-sans);
+  font-weight: 700;
+}
+
+.adm-visit-card p {
+  font-size: var(--text-sm);
+  color: var(--color-text-light);
+  line-height: 1.6;
+  flex: 1;
+}
+
+/* Contact */
+.adm-contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-12);
+  align-items: start;
+}
+
+.adm-contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  margin-top: var(--space-6);
+}
+
+.adm-contact-item {
+  display: flex;
+  gap: var(--space-4);
+  align-items: flex-start;
+  font-size: 1.5rem;
+}
+
+.adm-contact-item > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.adm-contact-item strong {
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.adm-contact-item a,
+.adm-contact-item span {
+  font-size: var(--text-base);
+  color: var(--color-text-light);
+}
+
+.adm-contact-item a {
+  color: var(--color-secondary);
+  transition: color var(--transition-fast);
+}
+
+.adm-contact-item a:hover {
+  color: var(--color-primary);
+}
+
+/* Form */
+.adm-form-card {
+  background: var(--color-off-white);
+  border-radius: var(--radius-lg);
+  padding: var(--space-8);
+  border: 1px solid var(--color-light-gray);
+}
+
+.adm-form-card h3 {
+  font-size: var(--text-2xl);
+  color: var(--color-primary);
+  margin-bottom: var(--space-6);
+}
+
+.adm-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.adm-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+.adm-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.adm-form-group label {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-text);
+  font-family: var(--font-sans);
+}
+
+.adm-form-group input,
+.adm-form-group select {
+  padding: var(--space-3) var(--space-4);
+  border: 1.5px solid var(--color-light-gray);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-base);
+  color: var(--color-text);
+  background: var(--color-white);
+  outline: none;
+  transition: border-color var(--transition-fast);
+  font-family: var(--font-sans);
+}
+
+.adm-form-group input:focus,
+.adm-form-group select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(0,40,104,0.1);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .adm-steps {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .adm-steps::before { display: none; }
+  .adm-scholarship-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .adm-visit-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .adm-tuition-grid,
+  .adm-contact-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+  }
+}
+
+@media (max-width: 768px) {
+  .adm-steps {
+    grid-template-columns: 1fr;
+  }
+  .adm-scholarship-grid {
+    grid-template-columns: 1fr;
+  }
+  .adm-visit-grid {
+    grid-template-columns: 1fr;
+  }
+  .adm-fafsa-cta {
+    flex-direction: column;
+    text-align: center;
+  }
+  .adm-fafsa-cta .btn {
+    margin-left: 0;
+  }
+  .adm-form-row {
+    grid-template-columns: 1fr;
+  }
+}
