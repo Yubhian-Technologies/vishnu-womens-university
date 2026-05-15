@@ -5,6 +5,7 @@ import './Header.css';
 interface NavChild {
   label: string;
   path: string;
+  external?: boolean;
 }
 
 interface NavGroup {
@@ -195,6 +196,20 @@ const navItems: NavItem[] = [
       { label: 'Success Stories', path: '/alumni-giving' },
     ],
   },
+  {
+    label: 'Quick Links',
+    children: [
+      { label: 'Examinations', path: 'https://www.svecwexams.in/', external: true },
+      { label: 'Vishnu LMS', path: 'https://www.vishnulearning.com/login/index.php', external: true },
+      { label: 'VEDIC', path: 'https://vedic.edu.in/', external: true },
+      { label: "Vishnu's Wellness Center", path: 'https://vishnuwellness.in/', external: true },
+      { label: 'Global Alumni Network', path: 'https://alumni.srivishnu.edu.in/', external: true },
+      { label: 'Vishnu Era', path: 'https://www.srivishnu.edu.in/vishnu-era/', external: true },
+      { label: 'Prathibha Magazine', path: 'https://heyzine.com/flip-book/14449c1cd4.html', external: true },
+      { label: 'Careers', path: '/careers' },
+      { label: 'Contact Us', path: '/contact' },
+    ],
+  },
 ];
 
 export default function Header() {
@@ -273,9 +288,16 @@ export default function Header() {
                       <ul className="dropdown-list">
                         {item.children.map((child) => (
                           <li key={child.label}>
-                            <Link to={child.path} className="dropdown-item" role="menuitem">
-                              {child.label}
-                            </Link>
+                            {child.external ? (
+                              <a href={child.path} className="dropdown-item" role="menuitem" target="_blank" rel="noopener noreferrer">
+                                {child.label}
+                                <span style={{ fontSize: '0.6rem', opacity: 0.5, marginLeft: 4 }}>↗</span>
+                              </a>
+                            ) : (
+                              <Link to={child.path} className="dropdown-item" role="menuitem">
+                                {child.label}
+                              </Link>
+                            )}
                           </li>
                         ))}
                       </ul>
@@ -359,9 +381,15 @@ export default function Header() {
                   <ul className="mobile-submenu">
                     {item.children.map((child) => (
                       <li key={child.label}>
-                        <Link to={child.path} className="mobile-sub-item">
-                          {child.label}
-                        </Link>
+                        {child.external ? (
+                          <a href={child.path} className="mobile-sub-item" target="_blank" rel="noopener noreferrer">
+                            {child.label} <span style={{ fontSize: '0.6rem', opacity: 0.5 }}>↗</span>
+                          </a>
+                        ) : (
+                          <Link to={child.path} className="mobile-sub-item">
+                            {child.label}
+                          </Link>
+                        )}
                       </li>
                     ))}
                   </ul>

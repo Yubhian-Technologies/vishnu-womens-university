@@ -34,6 +34,8 @@ import NewsAwards from './pages/NewsAwards/NewsAwards';
 import Happenings from './pages/NewsAwards/Happenings';
 import Accreditations from './pages/NewsAwards/Accreditations';
 import GalleryPage from './pages/NewsAwards/Gallery';
+import Careers from './pages/Careers/Careers';
+import Contact from './pages/Contact/Contact';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -81,6 +83,8 @@ function AppLayout() {
         <Route path="/news-awards/happenings" element={<Happenings />} />
         <Route path="/news-awards/accreditations-awards" element={<Accreditations />} />
         <Route path="/news-awards/gallery" element={<GalleryPage />} />
+        <Route path="/careers" element={<Careers />} />
+        <Route path="/contact" element={<Contact />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Footer />
