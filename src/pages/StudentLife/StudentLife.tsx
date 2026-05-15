@@ -19,18 +19,18 @@ const clubs = [
 ];
 
 const housing = [
-  { name: 'Vishnu Girls Hostel – Block A', type: "Women's hostel", desc: 'Spacious rooms with modern amenities, 24/7 security, and high-speed Wi-Fi for all residents.' },
-  { name: 'Vishnu Girls Hostel – Block B', type: "Women's hostel", desc: 'Comfortable accommodation with attached food court, reading rooms, and recreational facilities.' },
-  { name: 'Staff Quarters', type: 'Faculty housing', desc: 'On-campus accommodation for faculty and staff within the Green Meadows campus network.' },
+  { name: 'Vishnu Girls Hostel – Block A', type: "Women's hostel", desc: 'Well-sized rooms with modern amenities, round-the-clock security, and fast Wi-Fi for all resident students.' },
+  { name: 'Vishnu Girls Hostel – Block B', type: "Women's hostel", desc: 'Comfortable accommodation with an attached food court, quiet reading rooms, and recreational facilities.' },
+  { name: 'Staff Quarters', type: 'Faculty housing', desc: 'On-campus residential accommodation for faculty and staff within the Green Meadows campus network.' },
 ];
 
 const services = [
-  { icon: '🎓', title: 'Career Services Center', desc: 'Resume building, mock interviews, campus placement drives, and career counseling — powering 1,400+ annual placements.' },
-  { icon: '🧠', title: 'Student Wellness Center', desc: 'Healthcare, mental wellness resources, and medical facilities available to all students on campus.' },
-  { icon: '📚', title: 'Central Library', desc: 'Thousands of engineering textbooks, e-journals, NPTEL resources, and quiet study spaces for academic excellence.' },
-  { icon: '💡', title: 'Assistive Technology Lab', desc: 'Pioneering lab developing assistive solutions for differently-abled persons — open to all for learning and research.' },
-  { icon: '🏅', title: 'Sports & Games Facilities', desc: 'Indoor and outdoor sports facilities including courts, a swimming pool, and a fitness center for holistic development.' },
-  { icon: '🌐', title: 'International Outreach', desc: 'Vishnu Japan Outreach Centre and international academic tie-ups for global exposure and exchange opportunities.' },
+  { icon: '🎓', title: 'Career Services Center', desc: 'Resume preparation, mock interviews, placement drives, and career guidance — supporting 1,400+ annual placements.' },
+  { icon: '🧠', title: 'Student Wellness Center', desc: 'Medical support, mental health resources, and on-campus healthcare accessible to every student.' },
+  { icon: '📚', title: 'Central Library', desc: 'Thousands of engineering texts, e-journals, NPTEL content, and quiet study spaces to support academic work.' },
+  { icon: '💡', title: 'Assistive Technology Lab', desc: 'A dedicated lab developing assistive tools for differently-abled individuals — open to all students for learning and research.' },
+  { icon: '🏅', title: 'Sports & Games Facilities', desc: 'A range of indoor and outdoor sports facilities — courts, swimming pool, and a fitness centre — to support physical development.' },
+  { icon: '🌐', title: 'International Outreach', desc: 'Vishnu Japan Outreach Centre and international academic partnerships offering global exposure and exchange pathways.' },
 ];
 
 const athletics = [
@@ -73,7 +73,7 @@ export default function StudentLife() {
         page="student-life"
         defaultImage="https://images.unsplash.com/photo-1571260899304-425eee4c7efc?w=1920&q=80"
         defaultTitle="Discover Your Place at VWU"
-  defaultSubtitle="At VWU, you'll find more than an engineering degree. You'll find your community, your purpose, and your future."
+  defaultSubtitle="VWU offers more than an engineering qualification. It is where you find your community, sharpen your purpose, and start building your future."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Student Life' }]}
       />
 
@@ -81,7 +81,7 @@ export default function StudentLife() {
       <section style={{ background: 'var(--color-accent)', padding: 'var(--space-6) 0' }}>
         <div className="container" style={{ textAlign: 'center' }}>
           <p style={{ fontFamily: 'var(--font-serif)', fontStyle: 'italic', fontSize: 'clamp(1rem, 2.5vw, 1.4rem)', color: 'var(--color-primary-dark)', fontWeight: 700 }}>
-            "VWU is about excellence and empowerment. If you want a space where you can grow into a confident, skilled engineer, VWU is the place for you." — Divya, ECE Graduate
+            "VWU is a place where excellence and genuine support go hand in hand. If you are serious about becoming a skilled, confident engineer, this is where you belong." — Divya, ECE Graduate
           </p>
         </div>
       </section>
@@ -93,8 +93,8 @@ export default function StudentLife() {
             <span className="section-label">Get Involved</span>
             <h2 className="section-title">Student Organizations & Clubs</h2>
             <p className="section-desc">
-              With 30+ student clubs and organizations, there's a place for everyone at VWU.
-              Or start your own!
+              With 30+ student clubs and organisations, VWU has a community for every interest.
+              If nothing fits, start your own.
             </p>
           </div>
           <div className="sl-clubs-grid">
@@ -146,8 +146,8 @@ export default function StudentLife() {
               <span className="section-label">VWU Sports</span>
               <h2 className="section-title">Sports & Games at VWU</h2>
               <p className="section-desc">
-                VWU encourages holistic development through a wide range of sports
-                facilities, inter-college tournaments, and state-level competitions.
+                VWU actively promotes physical development through diverse sports facilities,
+                inter-college competitions, and participation in state-level tournaments.
               </p>
             </div>
             <img
@@ -176,7 +176,7 @@ export default function StudentLife() {
             <span className="section-label">Support</span>
             <h2 className="section-title">We're Here for You</h2>
             <p className="section-desc" style={{ margin: '0 auto' }}>
-              From your first day to graduation, VWU's student services team is dedicated to your success.
+              From orientation to graduation, VWU's student services team is with you at every stage.
             </p>
           </div>
           <div className="sl-services-grid">
@@ -200,10 +200,10 @@ export default function StudentLife() {
           <div className="sl-dining-grid">
             <div className="reveal-left">
               <span className="section-label" style={{ color: 'var(--color-accent)' }}>Campus Dining</span>
-              <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>Nutritious, Delicious, and Convenient</h2>
+              <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>Fresh, Nourishing, and Convenient</h2>
               <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: 'var(--text-lg)', lineHeight: 1.7, marginBottom: 'var(--space-6)' }}>
                 VWU's campus food courts serve hygienic, freshly prepared vegetarian and
-                non-vegetarian meals. Separate mess facilities are available for hostel residents.
+                non-vegetarian meals daily. Dedicated mess facilities are provided for hostel residents.
               </p>
               <div className="sl-dining-features">
                 {['On-campus food court', 'Hostel mess facility', 'Hygienic & fresh meals daily', 'Vegetarian & non-vegetarian options', 'Affordable meal plans'].map(f => (
@@ -233,7 +233,7 @@ export default function StudentLife() {
             <span className="section-label">Take the Next Step</span>
             <h2 className="section-title">Ready to Join VWU?</h2>
             <p className="section-desc" style={{ margin: '0 auto var(--space-8)' }}>
-              Schedule a campus visit and experience student life at VWU for yourself.
+              Visit the campus and see what student life at VWU actually looks like — firsthand.
             </p>
             <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
               <Link to="/admissions" className="btn btn-primary btn-lg">Plan My Visit Now</Link>

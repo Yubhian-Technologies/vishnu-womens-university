@@ -52,13 +52,13 @@ const svesStats = [
 ];
 
 const milestones = [
-  { year: '1999', event: 'Sri Vishnu Educational Society founded by Dr. B. V. Raju in Bhimavaram, Andhra Pradesh.' },
-  { year: '2001', event: 'Vishnu Womens University (then SVECW) established as the first women\'s engineering college in the region.' },
-  { year: '2005', event: 'Vishnu Institute of Technology established at Bhimavaram, expanding the SVES engineering portfolio.' },
-  { year: '2010', event: 'BVRIT established at Narsapur, growing the SVES footprint to West Godavari district.' },
-  { year: '2015', event: 'BVRIT Hyderabad College of Engineering for Women inaugurated, marking SVES\'s expansion to Telangana.' },
-  { year: '2020', event: 'VEDIC (Vishnu Educational Development & Innovation Centre) established to promote innovation and research.' },
-  { year: '2024', event: 'VWU achieves record 1,400+ placements and gains recognition as a premier women\'s technical institution.' },
+  { year: '1999', event: 'Sri Vishnu Educational Society was established by Dr. B. V. Raju in Bhimavaram, Andhra Pradesh.' },
+  { year: '2001', event: 'Vishnu Womens University (then SVECW) was founded as the first women\'s engineering college in the region.' },
+  { year: '2005', event: 'Vishnu Institute of Technology was set up at Bhimavaram, broadening the SVES engineering portfolio.' },
+  { year: '2010', event: 'BVRIT was established at Narsapur, extending the SVES presence across West Godavari district.' },
+  { year: '2015', event: 'BVRIT Hyderabad College of Engineering for Women was inaugurated, marking SVES\'s entry into Telangana.' },
+  { year: '2020', event: 'VEDIC (Vishnu Educational Development & Innovation Centre) was launched to drive innovation and research.' },
+  { year: '2024', event: 'VWU recorded 1,400+ placements, earning recognition as a leading women\'s technical institution.' },
 ];
 
 export default function AboutSVES() {
@@ -87,7 +87,7 @@ export default function AboutSVES() {
         page="about-sves"
         defaultImage="https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=1920&q=80"
         defaultTitle="Sri Vishnu Educational Society"
-  defaultSubtitle="A legacy of educational excellence spanning 25+ years and 20+ institutions across Andhra Pradesh and Telangana."
+  defaultSubtitle="More than 25 years of educational commitment, spanning 20+ institutions across Andhra Pradesh and Telangana."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Discover', to: '/' }, { label: 'About SVES' }]}
       />
 
@@ -114,22 +114,21 @@ export default function AboutSVES() {
               <h2 className="section-title">About Sri Vishnu Educational Society</h2>
               <div className="divider" />
               <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-4)', color: 'var(--color-text-light)' }}>
-                The <strong>Sri Vishnu Educational Society (SVES)</strong> stands first among its counterparts for its
-                unending quest and diligence in shaping an ideal educational society. It was founded by the late
-                <strong> Padma Bhushan Dr. B. V. Raju</strong>, a foresighted visionary who established numerous
-                educational institutions dedicated to quality technical and professional education.
+                The <strong>Sri Vishnu Educational Society (SVES)</strong> has earned a distinguished reputation through
+                its sustained commitment to building institutions of genuine educational quality. It was established by the late
+                <strong> Padma Bhushan Dr. B. V. Raju</strong>, a visionary leader who created a network of educational
+                institutions with a clear focus on technical and professional learning.
               </p>
               <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-4)', color: 'var(--color-text-light)' }}>
-                Following Dr. Raju's passing, his grandson <strong>Sri K. V. Vishnu Raju</strong> assumed the role
-                of Chairman and has continued advancing the original mission while actively supporting social welfare
-                initiatives. Beyond education, the <strong>Dr. B. V. Raju Foundation</strong> operates leprosy centres,
-                schools, women's associations, community halls, and veterinary facilities across surrounding villages —
-                all without Government assistance.
+                After Dr. Raju's passing, his grandson <strong>Sri K. V. Vishnu Raju</strong> took over as Chairman
+                and has since carried the mission forward while also championing social welfare activities. Through the
+                <strong> Dr. B. V. Raju Foundation</strong>, the society runs leprosy care centres, schools, women's
+                associations, community halls, and veterinary services in surrounding villages — entirely independently of government funding.
               </p>
               <p style={{ lineHeight: 1.8, color: 'var(--color-text-light)' }}>
-                Today SVES operates <strong>20+ institutions</strong> across <strong>4 campuses</strong> — Green Meadows
-                (Bhimavaram), Orchard Park (Narsapur), Valley Vista (Hyderabad), and Lake View (Medak) — serving over
-                <strong> 50,000 students</strong> across engineering, pharmacy, dental, polytechnic, and school education.
+                SVES currently operates <strong>20+ institutions</strong> across <strong>4 campuses</strong> — Green Meadows
+                (Bhimavaram), Orchard Park (Narsapur), Valley Vista (Hyderabad), and Lake View (Medak) — collectively
+                educating over <strong> 50,000 students</strong> annually across engineering, pharmacy, dental, polytechnic, and school streams.
               </p>
             </div>
             <div className="reveal-right">
@@ -149,7 +148,7 @@ export default function AboutSVES() {
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>
             <span className="section-label">SVES Campuses</span>
-            <h2 className="section-title">Four World-Class Campuses</h2>
+            <h2 className="section-title">Four Distinct Campuses</h2>
           </div>
           <div className="sves-campuses-grid">
             {campuses.map((campus, i) => (

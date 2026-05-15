@@ -9,7 +9,7 @@ const magazines = [
     type: 'Newsletter',
     since: 'June 2003',
     patron: 'Sri K.V. Vishnu Raju, Chairman, SVES',
-    desc: 'Campus Browser has been documenting the progressive strides of VWU and all SVES institutions since June 2003. The newsletter covers academics, co-curricular activities, events, and community initiatives — forming an ongoing chronicle of campus life.',
+    desc: 'Since June 2003, Campus Browser has chronicled the growth and achievements of VWU and all SVES institutions. The newsletter covers academics, co-curricular activities, events, and community work, building an ongoing record of campus life.',
     highlights: ['Academic achievements & milestones', 'Co-curricular activity coverage', 'Community and outreach initiatives', 'Institutional news & updates'],
     color: 'var(--color-primary)',
   },
@@ -19,7 +19,7 @@ const magazines = [
     type: 'Quarterly Magazine',
     since: 'Ongoing',
     patron: 'Sri Vishnu Educational Society',
-    desc: 'Vishnu Era is the flagship quarterly magazine of SVES that "gives a bird\'s eye view of the saga of SVES." It highlights the activities and contributions of students and staff across all SVES institutions with a rich mix of content.',
+    desc: 'Vishnu Era is the flagship quarterly publication of SVES, offering a broad view of the society\'s journey. It brings together the work and contributions of students and staff across all SVES institutions in a varied and engaging format.',
     highlights: ['Technical & literary articles', '"Upper Cut" — profiles of influential figures', 'Alumni success stories from abroad', 'Thought-provoking essays & science articles'],
     color: '#7b1fa2',
   },
@@ -29,7 +29,7 @@ const magazines = [
     type: 'Digital Magazine',
     since: 'Ongoing',
     patron: 'VWU Students & Faculty',
-    desc: 'Prathibha is a student magazine available in digital flip-book format, showcasing the creativity, technical insights, and literary talent of VWU students in an accessible online format.',
+    desc: 'Prathibha is a student publication in digital flip-book format, presenting the creative writing, technical work, and literary contributions of VWU students in an accessible, shareable form.',
     highlights: ['Digital flip-book format', 'Student creative contributions', 'Technical articles & projects', 'Available online via VWU portal'],
     color: '#1565c0',
   },
@@ -61,7 +61,7 @@ export default function CampusMagazines() {
         page="campus-magazines"
         defaultImage="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1920&q=80"
         defaultTitle="Campus Magazines"
-  defaultSubtitle="Three publications capturing the academic achievements, creative voices, and campus life at VWU and SVES."
+  defaultSubtitle="Three publications that document academic achievements, student creativity, and the story of campus life at VWU and across SVES."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Student Life', to: '/student-life' }, { label: 'Campus Magazines' }]}
       />
 
@@ -72,7 +72,7 @@ export default function CampusMagazines() {
             <span className="section-label">Publications</span>
             <h2 className="section-title">Our Campus Publications</h2>
             <p className="section-desc" style={{ margin: '0 auto' }}>
-              From newsletters to quarterly magazines and digital flip-books — VWU's student voices reach across formats.
+              Newsletters, quarterly magazines, and digital flip-books — VWU student voices are represented across multiple formats.
             </p>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-8)' }}>

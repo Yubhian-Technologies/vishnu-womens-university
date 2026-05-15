@@ -3,26 +3,26 @@ import { Link } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
 
 const btechSteps = [
-  { step: '01', title: 'Check Eligibility', desc: 'Pass 10+2 with Physics & Mathematics as major subjects with a minimum of 50% marks.' },
-  { step: '02', title: 'Appear in EAPCET', desc: 'Qualify in EAPCET (Engineering, Agriculture and Pharmacy Common Entrance Test). Selection is based on EAPCET rank.' },
-  { step: '03', title: 'Choose Your Route', desc: 'Apply through EAPCET Counselling (Code: VISW) or contact VWU directly for management seat enrollment.' },
-  { step: '04', title: 'Lateral Entry (ECET)', desc: 'Diploma holders seeking lateral entry must qualify through ECET Counselling and apply to the second year directly.' },
-  { step: '05', title: 'Register & Submit Documents', desc: 'Register with the admissions office with intermediate marks memo shortly after results are declared.' },
-  { step: '06', title: 'Confirm Admission', desc: 'Pay the fee, submit all documents, and confirm your seat to complete the admission process.' },
+  { step: '01', title: 'Check Eligibility', desc: 'Candidates must have passed 10+2 with Physics and Mathematics as major subjects, securing a minimum of 50% marks.' },
+  { step: '02', title: 'Appear in EAPCET', desc: 'Qualify in the EAPCET (Engineering, Agriculture and Pharmacy Common Entrance Test). Admission is based on EAPCET rank.' },
+  { step: '03', title: 'Choose Your Route', desc: 'Proceed through EAPCET Counselling (Code: VISW) or approach VWU directly for management quota seat enrollment.' },
+  { step: '04', title: 'Lateral Entry (ECET)', desc: 'Diploma holders applying for lateral entry must qualify through ECET Counselling and join the second year directly.' },
+  { step: '05', title: 'Register & Submit Documents', desc: 'Report to the admissions office with your intermediate marks memo shortly after results are announced.' },
+  { step: '06', title: 'Confirm Admission', desc: 'Pay the required fee, submit all original documents, and finalise your seat to complete the admission.' },
 ];
 
 const mtechSteps = [
-  { step: '01', title: 'Check Eligibility', desc: 'Hold a B.Tech / BE degree in the relevant branch from a recognized university.' },
+  { step: '01', title: 'Check Eligibility', desc: 'Applicants must hold a B.Tech or BE degree in the relevant branch from a recognised university.' },
   { step: '02', title: 'Qualify GATE / PGECET', desc: 'Appear in GATE (Graduate Aptitude Test in Engineering) or PGECET (Post Graduate Engineering Common Entrance Test).' },
-  { step: '03', title: 'Choose Your Route', desc: 'Apply through PGECET Counselling or enroll directly with VWU for management quota seats.' },
-  { step: '04', title: 'Submit Documents', desc: 'Register with the admissions office and submit degree marks memo during registration.' },
+  { step: '03', title: 'Choose Your Route', desc: 'Apply through PGECET Counselling or register with VWU directly for available management quota seats.' },
+  { step: '04', title: 'Submit Documents', desc: 'Complete registration at the admissions office and submit your degree marks memo at the time of enrollment.' },
 ];
 
 const mbaSteps = [
-  { step: '01', title: 'Check Eligibility', desc: 'Be a graduate with a minimum of 50% marks in any recognised bachelor\'s degree program.' },
-  { step: '02', title: 'Qualify ICET', desc: 'Appear in ICET (Integrated Common Entrance Test) — the score determines admission placement.' },
-  { step: '03', title: 'Choose Your Route', desc: 'Apply through ICET Counselling or register directly with VWU for available seats.' },
-  { step: '04', title: 'Register & Confirm', desc: 'Submit degree marks memo during administrative registration and confirm your seat by paying the fee.' },
+  { step: '01', title: 'Check Eligibility', desc: 'Applicants must hold a bachelor\'s degree in any discipline from a recognised institution, with a minimum of 50% marks.' },
+  { step: '02', title: 'Qualify ICET', desc: 'Appear in ICET (Integrated Common Entrance Test) — your score determines your placement in the admission process.' },
+  { step: '03', title: 'Choose Your Route', desc: 'Proceed through ICET Counselling or register with VWU directly for available seats.' },
+  { step: '04', title: 'Register & Confirm', desc: 'Submit your degree marks memo during administrative registration, then confirm your seat by completing fee payment.' },
 ];
 
 const documents = [
@@ -91,7 +91,7 @@ export default function AdmissionProcedure() {
         page="admission-procedure"
         defaultImage="https://images.unsplash.com/photo-1434030216411-0b793f4b6f71?w=1920&q=80"
         defaultTitle="Admission Procedure"
-  defaultSubtitle="Step-by-step guide to joining VWU — eligibility, entrance tests, and enrollment for all programmes."
+  defaultSubtitle="A clear, step-by-step guide to joining VWU — covering eligibility, entrance examinations, and the enrollment process for all programmes."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Admissions', to: '/admissions' }, { label: 'Admission Procedure' }]}
       />
 
@@ -121,7 +121,7 @@ export default function AdmissionProcedure() {
             <span className="section-label">Undergraduate</span>
             <h2 className="section-title">B.Tech Admission Procedure</h2>
             <p style={{ color: 'var(--color-text-light)', maxWidth: 640 }}>
-              Candidates who have passed 10+2 with Physics & Mathematics as major subjects with minimum 50% marks are eligible. Selection is based on EAPCET rank.
+              Candidates who have completed 10+2 with Physics and Mathematics as major subjects — achieving at least 50% — are eligible. Admission is determined by EAPCET rank.
             </p>
           </div>
           {renderSteps(btechSteps)}
@@ -137,7 +137,7 @@ export default function AdmissionProcedure() {
                 <span className="section-label">Postgraduate</span>
                 <h2 className="section-title" style={{ fontSize: 'var(--text-2xl)' }}>M.Tech Admission</h2>
                 <p style={{ color: 'var(--color-text-light)', fontSize: 'var(--text-sm)' }}>
-                  Selection based on GATE or PGECET rank. Direct enrollment also available.
+                  Selection is based on GATE or PGECET rank. Direct enrollment is also available for management quota seats.
                 </p>
               </div>
               {renderSteps(mtechSteps)}
@@ -147,7 +147,7 @@ export default function AdmissionProcedure() {
                 <span className="section-label">Management</span>
                 <h2 className="section-title" style={{ fontSize: 'var(--text-2xl)' }}>MBA Admission</h2>
                 <p style={{ color: 'var(--color-text-light)', fontSize: 'var(--text-sm)' }}>
-                  Graduates with minimum 50% marks are eligible. Admission through ICET counselling.
+                  Graduates with a minimum of 50% marks are eligible. Admission is through ICET counselling.
                 </p>
               </div>
               {renderSteps(mbaSteps)}

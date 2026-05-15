@@ -3,12 +3,12 @@ import { Link } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
 
 const communities = [
-  { icon: '📚', title: 'Rural Students', desc: 'Supporting economically disadvantaged rural students through educational outreach and skills development programs.' },
-  { icon: '🏥', title: 'Leprosy Care', desc: 'Providing care, support, and dignity to individuals affected by leprosy through regular visits and welfare activities.' },
-  { icon: '🏘️', title: 'Village Communities', desc: 'Engaging with surrounding villages through technical literacy, nutritional awareness, and community welfare initiatives.' },
-  { icon: '♿', title: 'Persons with Disabilities', desc: 'Supporting persons with physical disabilities through awareness drives, assistive technology exposure, and inclusive activities.' },
-  { icon: '🏨', title: 'Hospital Patients', desc: 'Reaching out to hospital patients through care visits, blood donation camps, and welfare coordination with partner organisations.' },
-  { icon: '🏆', title: 'Academic Excellence', desc: 'Recognising and supporting academically accomplished students from nearby institutions through mentoring and interaction programs.' },
+  { icon: '📚', title: 'Rural Students', desc: 'Extending educational support and skills programs to economically disadvantaged students from rural backgrounds.' },
+  { icon: '🏥', title: 'Leprosy Care', desc: 'Offering care, compassion, and dignity to individuals affected by leprosy through regular visits and welfare activities.' },
+  { icon: '🏘️', title: 'Village Communities', desc: 'Working with nearby villages on technical literacy, nutritional awareness, and broader community welfare initiatives.' },
+  { icon: '♿', title: 'Persons with Disabilities', desc: 'Supporting individuals with physical disabilities through awareness programs, assistive technology exposure, and inclusive campus activities.' },
+  { icon: '🏨', title: 'Hospital Patients', desc: 'Serving hospital patients through welfare visits, blood donation drives, and coordination with partner organisations.' },
+  { icon: '🏆', title: 'Academic Excellence', desc: 'Acknowledging and supporting high-achieving students from nearby institutions through mentoring and motivational programs.' },
 ];
 
 const nssValues = [
@@ -46,7 +46,7 @@ export default function SocialServices() {
         page="social-services"
         defaultImage="https://images.unsplash.com/photo-1593113598332-cd288d649433?w=1920&q=80"
         defaultTitle="Social Services"
-  defaultSubtitle="National Service Scheme at VWU — building engineers who serve their nation, communities, and society."
+  defaultSubtitle="The National Service Scheme at VWU shapes engineers who are equally committed to their craft and to the communities they serve."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Student Life', to: '/student-life' }, { label: 'Social Services' }]}
       />
 
@@ -62,14 +62,14 @@ export default function SocialServices() {
                 "National integrity should flow from the heart of every citizen. Apart from academics, every student must involve in serving her country."
               </blockquote>
               <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-4)', color: 'var(--color-text-light)' }}>
-                At VWU, the <strong>National Service Scheme (NSS)</strong> is an integral part of student development.
-                The program is built on the belief that <em>"Education and Service to the community and by the community"</em>
-                forms the true foundation of a holistic education.
+                At VWU, the <strong>National Service Scheme (NSS)</strong> is a meaningful part of student formation.
+                The programme rests on the conviction that <em>"Education and Service to the community and by the community"</em>
+                is the true basis of a complete education.
               </p>
               <p style={{ lineHeight: 1.8, color: 'var(--color-text-light)' }}>
-                Through NSS, students participate in nation-building activities, develop interpersonal skills,
-                and build a <strong>Technocratic Environment</strong> in rural areas — carrying the ethos of
-                our founder Dr. B. V. Raju's lifelong humanitarian mission.
+                Through NSS, students take part in nation-building work, strengthen their interpersonal abilities,
+                and help foster a <strong>Technocratic Environment</strong> in rural communities — continuing
+                the humanitarian values that our founder Dr. B. V. Raju embodied throughout his life.
               </p>
             </div>
             <div className="reveal-right">
@@ -91,7 +91,7 @@ export default function SocialServices() {
             <span className="section-label">Outreach</span>
             <h2 className="section-title">Communities We Serve</h2>
             <p className="section-desc" style={{ margin: '0 auto' }}>
-              VWU's NSS program focuses on six key communities, creating meaningful impact beyond the campus boundary.
+              The VWU NSS programme directs its efforts toward six key communities, creating tangible impact well beyond the campus.
             </p>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-5)' }}>
@@ -130,13 +130,13 @@ export default function SocialServices() {
               <span className="section-label" style={{ color: 'var(--color-accent)' }}>Founder's Legacy</span>
               <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>Dr. B. V. Raju Foundation</h2>
               <p style={{ color: 'rgba(255,255,255,0.8)', lineHeight: 1.8, marginBottom: 'var(--space-4)' }}>
-                The social commitment at VWU traces directly to our founder, the late <strong style={{ color: 'var(--color-accent)' }}>Padma Bhushan Dr. B. V. Raju</strong>,
-                who dedicated his later years to humanitarian work — establishing leprosy care centres, schools,
-                women's associations, community halls, and veterinary facilities across surrounding villages, entirely without Government assistance.
+                VWU's ethos of service has deep roots in the life of our founder, the late <strong style={{ color: 'var(--color-accent)' }}>Padma Bhushan Dr. B. V. Raju</strong>,
+                who devoted his later years to humanitarian causes — building leprosy care centres, schools,
+                women's associations, community halls, and veterinary facilities in surrounding villages, all without government support.
               </p>
               <p style={{ color: 'rgba(255,255,255,0.7)', lineHeight: 1.8 }}>
-                Today, the <strong style={{ color: 'rgba(255,255,255,0.9)' }}>Dr. B. V. Raju Foundation</strong> carries forward this legacy of service.
-                VWU students participate in this mission — bringing technical skills, empathy, and purpose into communities that need them most.
+                The <strong style={{ color: 'rgba(255,255,255,0.9)' }}>Dr. B. V. Raju Foundation</strong> continues this tradition today.
+                VWU students take an active part in this mission, channelling their technical knowledge, empathy, and sense of purpose into communities that genuinely need both.
               </p>
             </div>
           </div>

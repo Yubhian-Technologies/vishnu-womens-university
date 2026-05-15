@@ -7,41 +7,41 @@ const clubCategories = [
     label: 'Technical Clubs',
     icon: '💻',
     clubs: [
-      { name: 'CodeChef SVECW Chapter', desc: 'Competitive programming, coding contests, webinars, and problem-solving. Inaugurated November 17, 2020.' },
-      { name: 'TECHXTREME Coding Club', desc: 'Enhances programming skills, promotes technology understanding, and prepares students for industry-level contests.' },
-      { name: 'TechPost Club', desc: 'Skills-based technology platform educating students on emerging technologies and publishing student tech perspectives. Est. March 2022.' },
-      { name: 'Energy Swaraj Club', desc: 'Inspired by the IIT Mumbai Climate Clock Program. 500+ students participated; received Silver Certificate from Energy Swaraj Foundation.' },
-      { name: 'Amateur Astronomy Association (AAA)', desc: 'Studies stars, galaxies, and planets using a KONUSMOTOR DIGIMAX 90 telescope. Organises field trips to Birla Planetarium, Hyderabad.' },
-      { name: 'Mathletes Club', desc: 'Established 2018 by the Mathematics Department. Organises maths competitions, Treasure Hunt, Roll to Win, and Math Palooza events.' },
-      { name: 'IDEA Club', desc: 'Platform for innovative and creative ideas. Promotes proactive thinking and creative talent development. Est. September 2011.' },
+      { name: 'CodeChef SVECW Chapter', desc: 'Runs competitive programming contests, coding challenges, webinars, and structured problem-solving sessions. Inaugurated November 17, 2020.' },
+      { name: 'TECHXTREME Coding Club', desc: 'Develops programming skills, deepens technology understanding, and grooms students for industry-level competitions.' },
+      { name: 'TechPost Club', desc: 'A skills-focused technology forum that introduces students to emerging technologies and publishes student-authored technical perspectives. Est. March 2022.' },
+      { name: 'Energy Swaraj Club', desc: 'Inspired by the IIT Mumbai Climate Clock Program. Over 500 students have participated; the club received a Silver Certificate from the Energy Swaraj Foundation.' },
+      { name: 'Amateur Astronomy Association (AAA)', desc: 'Explores stars, galaxies, and planets using a KONUSMOTOR DIGIMAX 90 telescope. Conducts field trips to Birla Planetarium, Hyderabad.' },
+      { name: 'Mathletes Club', desc: 'Founded in 2018 by the Mathematics Department. Hosts maths competitions, Treasure Hunt, Roll to Win, and the Math Palooza event.' },
+      { name: 'IDEA Club', desc: 'A platform for nurturing innovative and creative thinking. Promotes initiative and talent development in students. Est. September 2011.' },
     ],
   },
   {
     label: 'Social & Service Clubs',
     icon: '🤝',
     clubs: [
-      { name: 'EAGLE Club', desc: 'Elite Anti-Narcotics Group for Law Enforcement. Combats substance abuse through education and peer support. Helpline: 1972.' },
-      { name: 'Sahaya Club', desc: 'Charitable social outreach — partners with Red Cross Society Eluru for blood donation camps and redistributes food and clothing to underprivileged communities.' },
-      { name: 'ECHARTS', desc: '"Every Child Has A Right To Study" — provides educational support to financially disadvantaged but gifted students. Est. 2014.' },
-      { name: 'Eco Club', desc: 'Environmental protection and sustainability focused activities. Founded June 5, 2011.' },
-      { name: 'Empathy Club', desc: 'Develops the ability to understand others\' situations and feelings, fostering emotional connection and perspective-taking. Founded July 2017.' },
-      { name: 'Vishnu Cultural Club', desc: 'Promotes Indian culture and heritage. Organises cultural activities and helps students build a strong cultural identity.' },
-      { name: 'MECOW Club', desc: 'Mega Events Celebration of the World — celebrates UN-declared international days, enriching knowledge and LSRW skills.' },
-      { name: 'THE HINDU – Future India Club', desc: 'Provides free daily newspapers to all students. Develops communication skills through debates, JAM sessions, and group discussions.' },
+      { name: 'EAGLE Club', desc: 'Elite Anti-Narcotics Group for Law Enforcement. Counters substance abuse through student education and peer support. Helpline: 1972.' },
+      { name: 'Sahaya Club', desc: 'Social outreach club — collaborates with Red Cross Society Eluru on blood donation camps and supports underprivileged communities with food and clothing.' },
+      { name: 'ECHARTS', desc: '"Every Child Has A Right To Study" — delivers educational assistance to financially disadvantaged yet gifted students. Est. 2014.' },
+      { name: 'Eco Club', desc: 'Promotes environmental responsibility and sustainability through campus activities. Founded June 5, 2011.' },
+      { name: 'Empathy Club', desc: 'Cultivates the capacity to understand the experiences and feelings of others, building emotional intelligence and perspective. Founded July 2017.' },
+      { name: 'Vishnu Cultural Club', desc: 'Celebrates Indian culture and heritage through organised activities, helping students build a strong cultural identity and sense of belonging.' },
+      { name: 'MECOW Club', desc: 'Mega Events Celebration of the World — observes UN-recognised international days, expanding students\' knowledge and developing LSRW skills.' },
+      { name: 'THE HINDU – Future India Club', desc: 'Distributes free daily newspapers to all students. Builds communication through debates, JAM sessions, and group discussions.' },
     ],
   },
   {
     label: 'Creative & Arts Clubs',
     icon: '🎨',
     clubs: [
-      { name: 'Painting Club', desc: 'Identifies and nurtures artistic talent through competitions and exhibitions. Active since July 2012.' },
-      { name: 'Music Club', desc: 'Promotes Indian Classical Music with vocal training in the basics of "surs and taals," supporting students aspiring for music careers.' },
-      { name: 'Dance Club', desc: 'A platform for talented dancers providing performance arts training, entertainment, and motivational creative expression.' },
-      { name: 'Flash It Out Club', desc: 'Photography and short film club — covers campus events, provides photographic techniques training, and screens expert-guided films.' },
-      { name: 'Page Turners', desc: 'Reading club collecting fiction and non-fiction books and organising competitive literary events for book enthusiasts.' },
-      { name: 'ToastMasters Club', desc: 'Develops leadership and communication skills through regular speeches, structured feedback, and team leadership practice.' },
-      { name: 'Hobby Horses – Techni Safoos', desc: 'Organises performing arts, crafts, and design activities to promote creativity and diverse campus experiences.' },
-      { name: 'Rock Me Fab', desc: 'Platform for discussing social issues and showcasing diverse student talents through voluntary participation events.' },
+      { name: 'Painting Club', desc: 'Discovers and nurtures artistic talent through competitions and exhibitions on campus. Active since July 2012.' },
+      { name: 'Music Club', desc: 'Promotes Indian Classical Music with vocal training in the fundamentals of "surs and taals," supporting students who aspire to a career in music.' },
+      { name: 'Dance Club', desc: 'A performance arts platform offering training, creative expression, and a stage for talented dancers on campus.' },
+      { name: 'Flash It Out Club', desc: 'Photography and short film club that documents campus events, teaches photographic techniques, and screens expert-curated films.' },
+      { name: 'Page Turners', desc: 'A reading club that builds a shared library of fiction and non-fiction titles and runs literary events for book enthusiasts.' },
+      { name: 'ToastMasters Club', desc: 'Builds leadership and communication through structured speeches, constructive feedback sessions, and practical leadership exercises.' },
+      { name: 'Hobby Horses – Techni Safoos', desc: 'Brings together performing arts, crafts, and design to foster creativity and offer varied cultural experiences on campus.' },
+      { name: 'Rock Me Fab', desc: 'A voluntary platform for discussing social issues and showcasing the range of student talents through open events.' },
     ],
   },
 ];
@@ -72,7 +72,7 @@ export default function StudentClubs() {
         page="student-clubs"
         defaultImage="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1920&q=80"
         defaultTitle="Student Clubs"
-  defaultSubtitle="23 active clubs spanning technology, social service, arts, and culture — there is a place for every passion at VWU."
+  defaultSubtitle="23 active clubs across technology, social service, arts, and culture — VWU has a community for every interest."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Student Life', to: '/student-life' }, { label: 'Student Clubs' }]}
       />
 

@@ -1,14 +1,14 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import heroVideo from '../../data/YTDown_YouTube_Vishnu-Campus-Bhimavaram-Latest-Video-Dr_Media_jMN3oRKJnR0_002_720p.mp4';
 import './HeroSlider.css';
+
 
 interface Slide {
   id: number;
   tag: string;
   heading: string;
   description: string;
-  imageUrl: string;
-  imageAlt: string;
   primaryCta: { label: string; path: string };
   secondaryCta: { label: string; path: string };
 }
@@ -18,9 +18,7 @@ const slides: Slide[] = [
     id: 1,
     tag: 'Welcome to VWU',
     heading: 'Empowering.\nWomen.\nThrough Tech.',
-    description: 'At VWU, we are dedicated to empowering women with cutting-edge engineering education, world-class research, and industry-ready skills.',
-    imageUrl: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1920&q=80',
-    imageAlt: 'Vishnu Womens University campus',
+    description: 'VWU equips women with rigorous engineering education, research opportunities, and the practical skills that top employers demand.',
     primaryCta: { label: 'Schedule a Visit', path: '/admissions' },
     secondaryCta: { label: 'Apply Now', path: '/admissions' },
   },
@@ -28,9 +26,7 @@ const slides: Slide[] = [
     id: 2,
     tag: 'Academics',
     heading: '9 B.Tech Programs\nBuilt for Your\nSuccess',
-    description: 'From Computer Science to Civil Engineering — VWU offers comprehensive undergraduate, postgraduate, and doctoral programs with hands-on learning.',
-    imageUrl: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=1920&q=80',
-    imageAlt: 'Students in an engineering laboratory',
+    description: 'From Computer Science to Civil Engineering — VWU offers undergraduate, postgraduate, and doctoral programs rooted in applied, industry-aligned learning.',
     primaryCta: { label: 'Explore Programs', path: '/academics' },
     secondaryCta: { label: 'Request Info', path: '/admissions' },
   },
@@ -38,9 +34,7 @@ const slides: Slide[] = [
     id: 3,
     tag: 'Campus Life',
     heading: 'Learn, Grow\nand Excel',
-    description: "VWU is more than a college — it's a community where you discover your potential, build lifelong friendships, and become a leader in your field.",
-    imageUrl: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1920&q=80',
-    imageAlt: 'Students celebrating at graduation',
+    description: "VWU is more than a degree — it is a community where you build real skills, lasting connections, and the confidence to lead in your chosen field.",
     primaryCta: { label: 'Campus Life', path: '/student-life' },
     secondaryCta: { label: 'Apply Now', path: '/admissions' },
   },
@@ -48,9 +42,7 @@ const slides: Slide[] = [
     id: 4,
     tag: 'Outstanding Placements',
     heading: '52 LPA\nHighest\nPlacement Package',
-    description: 'With 1,400+ annual placements and a highest package of 52 LPA, VWU graduates lead in top companies across India and globally.',
-    imageUrl: 'https://images.unsplash.com/photo-1571260899304-425eee4c7efc?w=1920&q=80',
-    imageAlt: 'Students studying and collaborating',
+    description: 'VWU recorded 1,400+ placements in 2024–25, with a highest offer of 52 LPA — graduates are now driving impact at companies across India and beyond.',
     primaryCta: { label: 'Placement Records', path: '/about' },
     secondaryCta: { label: 'Our Story', path: '/about' },
   },
@@ -70,6 +62,8 @@ export default function HeroSlider() {
   const [current, setCurrent] = useState(0);
   const [progressWidth, setProgressWidth] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   const goTo = useCallback((index: number) => {
     if (isAnimating) return;
@@ -98,21 +92,36 @@ export default function HeroSlider() {
     return () => clearInterval(interval);
   }, [next]);
 
+  const toggleMute = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = !isMuted;
+      setIsMuted(m => !m);
+    }
+  };
+
   return (
     <section className="hero-slider" aria-label="Featured content">
+
+      {/* Background video */}
+      <video
+        ref={videoRef}
+        className="hero-video"
+        src={heroVideo}
+        autoPlay
+        muted
+        loop
+        playsInline
+        aria-hidden="true"
+      />
+      <div className="hero-video-overlay" />
+
+      {/* Slide content layers */}
       {slides.map((slide, i) => (
         <div
           key={slide.id}
           className={`slide${i === current ? ' active' : ''}`}
           aria-hidden={i !== current}
         >
-          <img
-            src={slide.imageUrl}
-            alt={slide.imageAlt}
-            className="slide-image"
-            loading={i === 0 ? 'eager' : 'lazy'}
-          />
-          <div className="slide-overlay" />
           <div className="slide-content">
             <div className="slide-inner">
               <span className="slide-tag">{slide.tag}</span>
@@ -134,6 +143,27 @@ export default function HeroSlider() {
           </div>
         </div>
       ))}
+
+      {/* Mute / Unmute */}
+      <button
+        className="hero-mute-btn"
+        onClick={toggleMute}
+        aria-label={isMuted ? 'Unmute video' : 'Mute video'}
+        title={isMuted ? 'Unmute' : 'Mute'}
+      >
+        {isMuted ? (
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M11 5L6 9H2v6h4l5 4V5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <line x1="23" y1="9" x2="17" y2="15" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            <line x1="17" y1="9" x2="23" y2="15" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+          </svg>
+        ) : (
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M11 5L6 9H2v6h4l5 4V5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+          </svg>
+        )}
+      </button>
 
       {/* Controls */}
       <div className="hero-controls">
@@ -174,6 +204,8 @@ export default function HeroSlider() {
         <div className="scroll-indicator-line" />
         <span>Scroll</span>
       </div>
+
+
 
       {/* Recognition Bar */}
       <div className="hero-recognition" aria-label="Awards and recognitions">

@@ -9,49 +9,49 @@ const programCategories = [
     id: 'btech',
     label: 'B.Tech',
     programs: [
-      { icon: '💻', slug: 'cse',            name: 'Computer Science & Engineering (CSE)', desc: 'Core computer science with strong industry preparation and placement support.' },
-      { icon: '🤖', slug: 'ai-ml',          name: 'CSE – Artificial Intelligence & ML', desc: 'Machine learning, deep learning, NLP, and AI-driven software development.' },
-      { icon: '📊', slug: 'ai-ds',          name: 'CSE – Artificial Intelligence & Data Science', desc: 'Data analytics, big data, visualization, and intelligent systems.' },
-      { icon: '🔒', slug: 'cyber-security', name: 'CSE – Cyber Security', desc: 'Network security, ethical hacking, cryptography, and digital forensics.' },
-      { icon: '🌐', slug: 'it',             name: 'Information Technology (IT)', desc: 'Web technologies, cloud computing, software development, and networking.' },
-      { icon: '📡', slug: 'ece',            name: 'Electronics & Communication Engineering (ECE)', desc: 'VLSI, embedded systems, signal processing, and communications.' },
-      { icon: '⚡', slug: 'eee',            name: 'Electrical & Electronics Engineering (EEE)', desc: 'Power systems, renewable energy, control systems, and smart grids.' },
-      { icon: '🏗️', slug: 'ce',             name: 'Civil Engineering (CE)', desc: 'Structural design, construction management, environmental engineering.' },
-      { icon: '⚙️', slug: 'me',             name: 'Mechanical Engineering (ME)', desc: 'CAD/CAM, manufacturing, thermodynamics, and robotics.' },
+      { icon: '💻', slug: 'cse',            name: 'Computer Science & Engineering (CSE)', desc: 'Foundational computer science paired with practical industry preparation and strong placement support.' },
+      { icon: '🤖', slug: 'ai-ml',          name: 'CSE – Artificial Intelligence & ML', desc: 'Machine learning, deep learning, NLP, and building AI-powered software systems.' },
+      { icon: '📊', slug: 'ai-ds',          name: 'CSE – Artificial Intelligence & Data Science', desc: 'Data analytics, big data processing, visualization, and the design of intelligent systems.' },
+      { icon: '🔒', slug: 'cyber-security', name: 'CSE – Cyber Security', desc: 'Network security, ethical hacking, cryptography, and digital forensics techniques.' },
+      { icon: '🌐', slug: 'it',             name: 'Information Technology (IT)', desc: 'Web technologies, cloud platforms, software development, and network infrastructure.' },
+      { icon: '📡', slug: 'ece',            name: 'Electronics & Communication Engineering (ECE)', desc: 'VLSI design, embedded systems, signal processing, and communication technologies.' },
+      { icon: '⚡', slug: 'eee',            name: 'Electrical & Electronics Engineering (EEE)', desc: 'Power systems, renewable energy, control engineering, and smart grid applications.' },
+      { icon: '🏗️', slug: 'ce',             name: 'Civil Engineering (CE)', desc: 'Structural design, construction project management, and environmental engineering.' },
+      { icon: '⚙️', slug: 'me',             name: 'Mechanical Engineering (ME)', desc: 'CAD/CAM, manufacturing processes, thermodynamics, and robotics.' },
     ],
   },
   {
     id: 'mtech',
     label: 'M.Tech',
     programs: [
-      { icon: '💻', slug: 'mtech-cse',                 name: 'M.Tech – Computer Science & Engineering', desc: 'Advanced computing, algorithms, and research in computer science.' },
-      { icon: '🔬', slug: 'mtech-vlsi',                name: 'M.Tech – VLSI Design', desc: 'Digital IC design, chip design, and advanced semiconductor technologies.' },
-      { icon: '⚡', slug: 'mtech-power-electronics',   name: 'M.Tech – Power Electronics', desc: 'Drives, converters, power management, and energy systems.' },
-      { icon: '🌐', slug: 'mtech-software-engineering', name: 'M.Tech – Software Engineering', desc: 'Advanced software design, architecture, testing, and project management.' },
+      { icon: '💻', slug: 'mtech-cse',                 name: 'M.Tech – Computer Science & Engineering', desc: 'In-depth study of advanced computing, algorithm design, and computer science research.' },
+      { icon: '🔬', slug: 'mtech-vlsi',                name: 'M.Tech – VLSI Design', desc: 'Digital IC design, chip architecture, and advanced semiconductor engineering.' },
+      { icon: '⚡', slug: 'mtech-power-electronics',   name: 'M.Tech – Power Electronics', desc: 'Drives, converters, power management circuits, and energy conversion systems.' },
+      { icon: '🌐', slug: 'mtech-software-engineering', name: 'M.Tech – Software Engineering', desc: 'Advanced software architecture, quality assurance, testing, and project leadership.' },
     ],
   },
   {
     id: 'mba',
     label: 'MBA & Ph.D.',
     programs: [
-      { icon: '💼', slug: 'mba',     name: 'Master of Business Administration (MBA)', desc: 'Business strategy, finance, marketing, HR, and entrepreneurship.' },
-      { icon: '🎓', slug: 'phd-cse', name: 'Ph.D. – Computer Science & Engineering', desc: 'Doctoral research in AI, ML, data science, and computing technologies.' },
-      { icon: '📡', slug: 'phd-ece', name: 'Ph.D. – Electronics & Communication', desc: 'Doctoral research in VLSI, signal processing, and communications.' },
-      { icon: '⚡', slug: 'phd-eee', name: 'Ph.D. – Electrical & Electronics', desc: 'Doctoral research in power systems, smart grids, and energy engineering.' },
+      { icon: '💼', slug: 'mba',     name: 'Master of Business Administration (MBA)', desc: 'Business strategy, finance, marketing, human resources, and entrepreneurial thinking.' },
+      { icon: '🎓', slug: 'phd-cse', name: 'Ph.D. – Computer Science & Engineering', desc: 'Doctoral-level investigation into AI, ML, data science, and computing technologies.' },
+      { icon: '📡', slug: 'phd-ece', name: 'Ph.D. – Electronics & Communication', desc: 'Doctoral research in VLSI design, signal processing, and communication systems.' },
+      { icon: '⚡', slug: 'phd-eee', name: 'Ph.D. – Electrical & Electronics', desc: 'Doctoral research spanning power systems, smart grid technologies, and energy engineering.' },
     ],
   },
 ];
 
 const departments = [
-  { icon: '💻', code: 'CSE', name: 'Computer Science & Engineering', desc: 'AI, machine learning, data structures, algorithms, cloud computing, and software engineering.', labs: '12 Labs', slug: 'cse' },
-  { icon: '📡', code: 'ECE', name: 'Electronics & Communication Engineering', desc: 'VLSI design, embedded systems, signal processing, communications, and IoT.', labs: '10 Labs', slug: 'ece' },
-  { icon: '🌐', code: 'IT', name: 'Information Technology', desc: 'Web technologies, networking, database systems, cybersecurity, and cloud platforms.', labs: '8 Labs', slug: 'it' },
-  { icon: '⚡', code: 'EEE', name: 'Electrical & Electronics Engineering', desc: 'Power systems, control systems, electric drives, smart grid, and renewable energy.', labs: '9 Labs', slug: 'eee' },
-  { icon: '⚙️', code: 'ME', name: 'Mechanical Engineering', desc: 'CAD/CAM, manufacturing, thermodynamics, fluid mechanics, and robotics.', labs: '11 Labs', slug: 'me' },
-  { icon: '🏗️', code: 'CE', name: 'Civil Engineering', desc: 'Structural analysis, construction management, geotechnical engineering, and environmental engineering.', labs: '8 Labs', slug: 'ce' },
-  { icon: '🤖', code: 'AI', name: 'Artificial Intelligence', desc: 'Machine learning, deep learning, NLP, computer vision, and intelligent systems design.', labs: '6 Labs', slug: 'ai-ds' },
-  { icon: '📐', code: 'FE', name: 'Freshman Engineering', desc: 'Foundation year covering mathematics, physics, chemistry, and core engineering fundamentals.', labs: '4 Labs', slug: null },
-  { icon: '💼', code: 'MBA', name: 'Master of Business Administration', desc: 'Business strategy, finance, marketing, human resources, and entrepreneurship.', labs: '2 Labs', slug: 'mba' },
+  { icon: '💻', code: 'CSE', name: 'Computer Science & Engineering', desc: 'AI and machine learning, data structures, algorithms, cloud computing, and software engineering disciplines.', labs: '12 Labs', slug: 'cse' },
+  { icon: '📡', code: 'ECE', name: 'Electronics & Communication Engineering', desc: 'VLSI design, embedded systems, signal processing, communication networks, and IoT technologies.', labs: '10 Labs', slug: 'ece' },
+  { icon: '🌐', code: 'IT', name: 'Information Technology', desc: 'Web development, networking, database management, cybersecurity, and cloud computing platforms.', labs: '8 Labs', slug: 'it' },
+  { icon: '⚡', code: 'EEE', name: 'Electrical & Electronics Engineering', desc: 'Power systems, control engineering, electric drives, smart grid technology, and renewable energy.', labs: '9 Labs', slug: 'eee' },
+  { icon: '⚙️', code: 'ME', name: 'Mechanical Engineering', desc: 'CAD/CAM, manufacturing systems, thermodynamics, fluid mechanics, and robotics applications.', labs: '11 Labs', slug: 'me' },
+  { icon: '🏗️', code: 'CE', name: 'Civil Engineering', desc: 'Structural analysis, construction management, geotechnical and environmental engineering principles.', labs: '8 Labs', slug: 'ce' },
+  { icon: '🤖', code: 'AI', name: 'Artificial Intelligence', desc: 'Machine learning, deep learning, NLP, computer vision, and the design of intelligent systems.', labs: '6 Labs', slug: 'ai-ds' },
+  { icon: '📐', code: 'FE', name: 'Freshman Engineering', desc: 'Foundation courses in mathematics, physics, chemistry, and the core principles of engineering.', labs: '4 Labs', slug: null },
+  { icon: '💼', code: 'MBA', name: 'Master of Business Administration', desc: 'Business strategy, finance, marketing, human resource management, and entrepreneurship.', labs: '2 Labs', slug: 'mba' },
 ];
 
 const studentActivities = [
@@ -95,7 +95,7 @@ export default function Academics() {
         page="academics"
         defaultImage="https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=1920&q=80"
         defaultTitle="You Will Excel."
-  defaultSubtitle="A comprehensive, industry-focused engineering education designed to develop your technical expertise, research skills, and professional leadership."
+  defaultSubtitle="Rigorous, industry-aligned programs designed to build your technical expertise, sharpen your research instincts, and develop you as a professional."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Academics' }]}
       />
 
@@ -125,7 +125,7 @@ export default function Academics() {
             <span className="section-label">Academic Programs</span>
             <h2 className="section-title">Explore Your Options</h2>
             <p className="section-desc" style={{ marginBottom: 'var(--space-8)' }}>
-              Whether you're starting your B.Tech journey, pursuing M.Tech, or seeking doctoral research — VWU has a program built for your goals.
+              Whether you are beginning your B.Tech, advancing to M.Tech, or pursuing doctoral research — VWU offers a program matched to your goals.
             </p>
           </div>
 
@@ -186,7 +186,7 @@ export default function Academics() {
             <span className="section-label">Departments</span>
             <h2 className="section-title">Academic Departments</h2>
             <p className="section-desc" style={{ margin: '0 auto' }}>
-              Nine specialised departments bringing together expert faculty, state-of-the-art laboratories, and industry-aligned curricula.
+              Nine specialised departments — each bringing together experienced faculty, well-equipped laboratories, and curricula shaped by industry demands.
             </p>
           </div>
           <div className="dept-grid">
@@ -226,7 +226,7 @@ export default function Academics() {
             <span className="section-label">Student Life</span>
             <h2 className="section-title">Beyond the Classroom</h2>
             <p className="section-desc" style={{ margin: '0 auto var(--space-8)' }}>
-              From running a community radio station to competing in inter-collegiate sports — life at VWU goes far beyond lectures.
+              From managing a campus radio station to competing at inter-collegiate sports meets — there is a great deal more to life at VWU than lectures alone.
             </p>
           </div>
           <div className="activities-grid">
@@ -275,7 +275,7 @@ export default function Academics() {
               <span className="section-label">Career Outcomes</span>
               <h2 className="section-title">Where VWU Engineers Go</h2>
               <p style={{ color: 'var(--color-text-light)', lineHeight: 1.8, marginBottom: 'var(--space-6)' }}>
-                Our Training & Placement Cell works year-round connecting students with India's top employers — Amazon, TCS, Infosys, Wipro, HCL, Cognizant, and 150+ more.
+                The Training & Placement Cell maintains year-round engagement with India's leading employers — including Amazon, TCS, Infosys, Wipro, HCL, Cognizant, and 150+ other companies.
               </p>
               <Link to="/result-analysis" className="btn btn-primary">View Result Analysis →</Link>
             </div>
@@ -305,7 +305,7 @@ export default function Academics() {
             <span className="section-label" style={{ color: 'var(--color-accent)' }}>Get Started</span>
             <h2 className="section-title" style={{ color: 'var(--color-white)' }}>Ready to Join VWU?</h2>
             <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 'var(--text-lg)', maxWidth: 560, margin: '0 auto var(--space-8)' }}>
-              Visit our campus, request more information, or apply today through EAPCET (Code: VISW).
+              Arrange a campus visit, request further information, or apply through EAPCET (Code: VISW) today.
             </p>
             <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
               <Link to="/admissions" className="btn btn-accent btn-lg">Apply via EAPCET</Link>

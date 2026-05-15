@@ -3,10 +3,10 @@ import { Link } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
 
 const focusAreas = [
-  { icon: '📚', title: 'Education', desc: 'Guest lectures, laboratory experiments, classroom presentations, and workshop recordings made accessible to the entire campus community.' },
-  { icon: '🎬', title: 'Entertainment', desc: 'Student-produced entertainment programs, creative shows, and campus experiences that capture the spirit of life at VWU.' },
-  { icon: '📅', title: 'Events', desc: 'Live and recorded coverage of symposia, cultural fests, sports days, and all major campus events.' },
-  { icon: '📰', title: 'News', desc: 'Campus news bulletins, institutional updates, and student journalism keeping the VWU community informed.' },
+  { icon: '📚', title: 'Education', desc: 'Recordings of guest lectures, laboratory experiments, classroom presentations, and workshops, made available across the campus community.' },
+  { icon: '🎬', title: 'Entertainment', desc: 'Student-produced shows, creative programs, and filmed campus experiences that reflect the energy of life at VWU.' },
+  { icon: '📅', title: 'Events', desc: 'Live and archived coverage of symposia, cultural festivals, sports days, and all notable campus events.' },
+  { icon: '📰', title: 'News', desc: 'Campus news updates, institutional announcements, and student journalism that keep the VWU community well informed.' },
 ];
 
 const docTopics = [
@@ -53,7 +53,7 @@ export default function VishnuTV() {
         page="vishnu-tv"
         defaultImage="https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=1920&q=80"
         defaultTitle="Vishnu TV Academy"
-  defaultSubtitle="By the students. For the students. — The only campus TV Academy in Andhra Pradesh."
+  defaultSubtitle="Student-run and student-driven — the only dedicated campus TV Academy in Andhra Pradesh."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Student Life', to: '/student-life' }, { label: 'Vishnu TV Academy' }]}
       />
 
@@ -66,15 +66,14 @@ export default function VishnuTV() {
               <h2 className="section-title">A First in Andhra Pradesh</h2>
               <div className="divider" />
               <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-4)', color: 'var(--color-text-light)' }}>
-                The <strong>Vishnu TV Academy</strong> is the only campus in Andhra Pradesh to have a TV Academy
-                built exclusively for students. Inspired by and built upon the success of
-                <strong> Radio Vishnu 90.4</strong>, the academy embodies a simple but powerful philosophy —
-                every program is created <em>"by the students, for the students."</em>
+                The <strong>Vishnu TV Academy</strong> is the only campus in Andhra Pradesh with a TV Academy
+                built entirely for and by students. Growing out of the model established by
+                <strong> Radio Vishnu 90.4</strong>, it operates on a clear principle — every program is made
+                <em> "by the students, for the students."</em>
               </p>
               <p style={{ lineHeight: 1.8, color: 'var(--color-text-light)' }}>
-                Students at Vishnu TV Academy take complete ownership of content creation — from conceptualisation
-                to production — developing real-world skills in filmmaking, journalism, anchoring, and digital media
-                while contributing meaningfully to campus life.
+                Students at the academy take full responsibility for content — from concept through to final production — building practical skills in filmmaking, journalism, anchoring, and digital media
+                while making a genuine contribution to campus life.
               </p>
             </div>
             <div className="reveal-right">
@@ -117,7 +116,7 @@ export default function VishnuTV() {
               <span className="section-label">Documentary Films</span>
               <h2 className="section-title" style={{ fontSize: 'var(--text-2xl)' }}>Social Impact Stories</h2>
               <p style={{ color: 'var(--color-text-light)', marginBottom: 'var(--space-6)', lineHeight: 1.7 }}>
-                Students create documentary films addressing real social challenges, giving future engineers and technologists a lens to understand the world they are building for.
+                Students produce documentary films on pressing social issues, giving engineering students a perspective on the world they will ultimately be designing for.
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
                 {docTopics.map((t) => (
@@ -132,7 +131,7 @@ export default function VishnuTV() {
               <span className="section-label">Content We Produce</span>
               <h2 className="section-title" style={{ fontSize: 'var(--text-2xl)' }}>Production Types</h2>
               <p style={{ color: 'var(--color-text-light)', marginBottom: 'var(--space-6)', lineHeight: 1.7 }}>
-                Beyond documentaries, the academy captures the full breadth of campus academic and creative life.
+                The academy's output extends well beyond documentaries, covering the full range of academic and creative life on campus.
               </p>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)' }}>
                 {productions.map((p) => (

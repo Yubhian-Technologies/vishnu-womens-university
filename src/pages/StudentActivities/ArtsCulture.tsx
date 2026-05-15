@@ -6,22 +6,22 @@ const initiatives = [
   {
     icon: '🎊',
     title: 'Festival Celebrations',
-    desc: 'VWU maintains a traditional atmosphere celebrating all Indian festivals with utmost enthusiasm, fostering an inclusive community spirit of "Vasudhaika Kutumbakam" — the world is one family.',
+    desc: 'VWU celebrates every Indian festival with genuine enthusiasm and collective participation, embodying the spirit of "Vasudhaika Kutumbakam" — the world is one family.',
   },
   {
     icon: '🎨',
     title: 'Artistic Development',
-    desc: 'Students with creative passions receive encouragement, mentoring, and facility access for painting, photography, music, and decorative art — nurturing talent alongside technical education.',
+    desc: 'Students with a passion for the arts receive encouragement, guidance, and access to facilities for painting, photography, music, and decorative arts, growing their talent alongside their technical studies.',
   },
   {
     icon: '🎭',
     title: 'Performing Arts',
-    desc: 'Dance, drama, and music form the heart of campus performing arts. Through dedicated clubs and events, students develop their talent and bring it to life on stage.',
+    desc: 'Dance, drama, and music are central to campus culture. Dedicated clubs and regular events give students the stage to develop their talents and share them with the wider community.',
   },
   {
     icon: '📸',
     title: 'Photography & Film',
-    desc: 'The Flash It Out Club and Vishnu TV Academy give students professional outlets for photography and filmmaking, documenting campus life and creating impactful visual stories.',
+    desc: 'The Flash It Out Club and Vishnu TV Academy offer students real creative outlets for photography and filmmaking, telling stories from campus life and beyond.',
   },
 ];
 
@@ -29,17 +29,17 @@ const events = [
   {
     icon: '🌟',
     name: 'Annual Day',
-    desc: 'The flagship annual celebration of VWU — showcasing student talent through cultural performances, awards, and recognition of academic and co-curricular excellence.',
+    desc: 'VWU\'s flagship annual celebration — a showcase of student talent through cultural performances, institutional awards, and recognition of academic and co-curricular achievement.',
   },
   {
     icon: '🔬',
     name: 'Medha Milan',
-    desc: 'A national-level technical symposium bringing together students from across Andhra Pradesh and Telangana for technical competitions, paper presentations, and cultural events.',
+    desc: 'A national-level technical symposium drawing students from across Andhra Pradesh and Telangana for competitions, paper presentations, and cultural programs.',
   },
   {
     icon: '🏅',
     name: 'Sports Day',
-    desc: 'Annual Sports Day celebrating athletic talent and the spirit of healthy competition, with track events, field sports, and special recognition for outstanding athletes.',
+    desc: 'The annual Sports Day that honours athletic achievement and healthy competition — featuring track events, field sports, and special recognition for standout performers.',
   },
 ];
 
@@ -69,7 +69,7 @@ export default function ArtsCulture() {
         page="arts-culture"
         defaultImage="https://images.unsplash.com/photo-1545959570-a94084071b5d?w=1920&q=80"
         defaultTitle="Arts & Culture"
-  defaultSubtitle="Cultivating creativity, heritage, and a sense of belonging — shaping cultured and responsible leaders of tomorrow."
+  defaultSubtitle="Nurturing creativity, preserving heritage, and building a sense of belonging — developing responsible and culturally grounded leaders."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Student Life', to: '/student-life' }, { label: 'Arts & Culture' }]}
       />
 
@@ -85,14 +85,13 @@ export default function ArtsCulture() {
                 "A healthy Nation would be built only when we have a strong force of cultured and responsible youngsters."
               </blockquote>
               <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-4)', color: 'var(--color-text-light)' }}>
-                At VWU, education goes far beyond academic preparation. We believe that cultural engagement,
-                artistic expression, and social awareness are essential pillars of a complete education —
-                not extras, but necessities.
+                At VWU, learning extends well beyond the classroom. Cultural participation, artistic expression, and social
+                awareness are treated as integral to a complete education — not supplementary, but essential.
               </p>
               <p style={{ lineHeight: 1.8, color: 'var(--color-text-light)' }}>
-                Our campus maintains the spirit of <strong>"Vasudhaika Kutumbakam"</strong> — the world is one family —
-                celebrating every Indian festival with the enthusiasm and community spirit that makes VWU
-                a truly inclusive place to live and learn.
+                Campus life is shaped by the spirit of <strong>"Vasudhaika Kutumbakam"</strong> — the world is one family —
+                and every Indian festival is observed with the energy and inclusivity that defines VWU
+                as a community.
               </p>
             </div>
             <div className="reveal-right">
@@ -137,7 +136,7 @@ export default function ArtsCulture() {
             <span className="section-label" style={{ color: 'var(--color-accent)' }}>Signature Events</span>
             <h2 style={{ color: 'var(--color-white)' }} className="section-title">Our Annual Celebrations</h2>
             <p style={{ color: 'rgba(255,255,255,0.75)', maxWidth: 600, margin: '0 auto', fontSize: 'var(--text-base)' }}>
-              Three flagship events each year provide "ventilation to knowledge, recreation, fine arts, creative ideas, and insightful interaction."
+              Three major annual events that offer students an outlet for knowledge, recreation, fine arts, creative expression, and meaningful interaction.
             </p>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-6)' }}>

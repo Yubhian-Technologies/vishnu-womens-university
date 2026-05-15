@@ -31,7 +31,7 @@ export default function Differentiators() {
         page="differentiators"
         defaultImage="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=1920&q=80"
         defaultTitle="What Sets VWU Apart"
-  defaultSubtitle="Unique initiatives spanning innovation, industry, research, global outreach, and student development — built to prepare women engineers for the world."
+  defaultSubtitle="Distinctive initiatives in innovation, industry engagement, research, international outreach, and student development — all aimed at producing well-rounded women engineers."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Differentiators' }]}
       />
 
@@ -148,7 +148,7 @@ export default function Differentiators() {
               Experience the VWU Difference
             </h2>
             <p style={{ color: 'rgba(255,255,255,0.75)', maxWidth: 560, margin: '0 auto var(--space-6)' }}>
-              Come see these world-class initiatives in person. Schedule a campus visit and explore the ecosystem built for India's next generation of women technologists.
+              Visit VWU in person to see these initiatives firsthand. Schedule a campus visit and explore the ecosystem built for India's next generation of women technologists.
             </p>
             <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
               <Link to="/admissions" className="btn btn-accent">Apply Now</Link>

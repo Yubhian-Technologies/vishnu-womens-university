@@ -3,26 +3,26 @@ import { Link } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
 
 const facilities = [
-  { icon: '💪', title: 'VISHNU Fitness Centre', desc: 'A fully equipped gymnasium with modern equipment, trained instructors, and scheduled fitness programs for all students.' },
-  { icon: '🏊', title: 'Swimming Pool', desc: 'An Olympic-standard swimming pool available for students and staff, with certified coaching and regular swimming sessions.' },
-  { icon: '🏟️', title: 'Spacious Playground', desc: 'A large, well-maintained outdoor ground for athletics, field sports, and team games — supporting a wide range of disciplines.' },
-  { icon: '🏸', title: 'Indoor Sports Hall', desc: 'Indoor facilities for badminton, table tennis, chess, carrom, and other indoor games available throughout the academic year.' },
+  { icon: '💪', title: 'VISHNU Fitness Centre', desc: 'A well-equipped gymnasium with modern training apparatus, qualified instructors, and structured fitness programs available to all students.' },
+  { icon: '🏊', title: 'Swimming Pool', desc: 'An Olympic-standard pool open to students and staff, supported by certified coaching and regularly scheduled training sessions.' },
+  { icon: '🏟️', title: 'Spacious Playground', desc: 'A large, well-kept outdoor ground for athletics, field sports, and team games — accommodating a broad range of sporting disciplines.' },
+  { icon: '🏸', title: 'Indoor Sports Hall', desc: 'Year-round indoor facilities for badminton, table tennis, chess, carrom, and a variety of other indoor games.' },
 ];
 
 const sportsProgram = [
-  { label: 'Physical Director', value: 'Qualified female Physical Director overseeing all athletic activities' },
-  { label: 'University Competitions', value: 'Regular participation in JNTUK and inter-university sports events' },
-  { label: 'Special Events', value: 'Annual Sports Day with track events, field sports, and team competitions' },
-  { label: 'Student Guidance', value: 'Individual coaching and motivation for students to compete at university level' },
-  { label: 'Inter-Collegiate', value: 'Regular inter-collegiate tournaments and sports meets' },
-  { label: 'Daily Sessions', value: 'Structured morning and evening sports sessions for student fitness' },
+  { label: 'Physical Director', value: 'A qualified female Physical Director oversees all athletic programs and day-to-day activities' },
+  { label: 'University Competitions', value: 'Students regularly participate in JNTUK and inter-university sports meets' },
+  { label: 'Special Events', value: 'Annual Sports Day featuring track events, field disciplines, and team competitions' },
+  { label: 'Student Guidance', value: 'Personalised coaching and motivation to prepare students for university-level competition' },
+  { label: 'Inter-Collegiate', value: 'Scheduled inter-collegiate tournaments and sports meets throughout the year' },
+  { label: 'Daily Sessions', value: 'Structured morning and evening sessions supporting regular fitness for all students' },
 ];
 
 const achievements = [
-  { icon: '🥇', title: 'University-Level Champions', desc: 'VWU students regularly excel at JNTUK university-level sports competitions across multiple disciplines.' },
-  { icon: '🏋️', title: 'Fitness Excellence', desc: 'The campus fitness centre runs year-round programs helping students build discipline, strength, and well-being.' },
-  { icon: '🤽', title: 'Aquatics Coaching', desc: 'Certified swimming coaches provide structured training, producing competitive swimmers at university and state levels.' },
-  { icon: '🏃', title: 'Athletics', desc: 'Track and field athletes are nurtured through systematic training and exposure to inter-collegiate meets.' },
+  { icon: '🥇', title: 'University-Level Champions', desc: 'VWU students consistently perform at JNTUK university-level competitions across a number of sports disciplines.' },
+  { icon: '🏋️', title: 'Fitness Excellence', desc: 'Year-round fitness centre programs help students develop discipline, physical strength, and overall well-being.' },
+  { icon: '🤽', title: 'Aquatics Coaching', desc: 'Certified coaches deliver structured swimming training, with students going on to compete at university and state levels.' },
+  { icon: '🏃', title: 'Athletics', desc: 'Track and field athletes are developed through systematic training and regular exposure to inter-collegiate competition.' },
 ];
 
 export default function SportsGames() {
@@ -51,7 +51,7 @@ export default function SportsGames() {
         page="sports-games"
         defaultImage="https://images.unsplash.com/photo-1546519638-68e109498ffc?w=1920&q=80"
         defaultTitle="Sports & Games"
-  defaultSubtitle="A sound mind dwells in a sound body — physical fitness is given utmost importance at VWU."
+  defaultSubtitle="Physical fitness is taken seriously at VWU — a sound body supports a sound mind, and both are essential to a complete education."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Student Life', to: '/student-life' }, { label: 'Sports & Games' }]}
       />
 
@@ -67,13 +67,13 @@ export default function SportsGames() {
                 "A sound mind dwells in a sound body. Physical exercises keep one healthy and fit."
               </blockquote>
               <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-4)', color: 'var(--color-text-light)' }}>
-                At VWU, sports and physical activities are not optional add-ons — they are a core component
-                of student development, given <em>utmost importance</em> alongside academics. Every student
-                is encouraged to participate, compete, and excel.
+                At VWU, sport and physical activity are not afterthoughts — they are a deliberate part of student
+                development, given serious attention alongside academics. Every student is encouraged to take part,
+                compete, and push herself.
               </p>
               <p style={{ lineHeight: 1.8, color: 'var(--color-text-light)' }}>
-                A qualified female <strong>Physical Director</strong> oversees all day-to-day athletic activities
-                and guides students to compete in university and inter-collegiate events throughout the year.
+                A qualified female <strong>Physical Director</strong> manages all day-to-day athletic programs
+                and prepares students to represent VWU at university and inter-collegiate competitions.
               </p>
             </div>
             <div className="reveal-right">

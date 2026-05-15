@@ -67,7 +67,7 @@ export default function Contact() {
           <p className="contact-hero__eyebrow">Get in Touch</p>
           <h1 className="contact-hero__title">Contact Us</h1>
           <p className="contact-hero__sub">
-            We're here to help. Reach out for admissions, enquiries, or just to say hello.
+            We're happy to assist. Contact us for admissions information, general enquiries, or anything else on your mind.
           </p>
         </div>
       </section>
@@ -237,7 +237,7 @@ export default function Contact() {
                   <div className="contact-success__icon">✓</div>
                   <h3>Message Sent!</h3>
                   <p>
-                    Thank you for reaching out. We'll get back to you within 1–2 working days.
+                    Thank you for writing to us. A member of our team will respond within 1–2 working days.
                   </p>
                   <button
                     className="btn btn-primary"

@@ -32,7 +32,7 @@ export default function Happenings() {
         page="news-awards-happenings"
         defaultImage="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1920&q=80"
         defaultTitle="Happenings at VWU"
-  defaultSubtitle="The latest workshops, MoUs, competitions, celebrations, and milestones from across the VWU campus."
+  defaultSubtitle="Workshops, MoUs, competitions, achievements, and institutional milestones — a running record of life at VWU."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'News & Awards', to: '/news-awards' }, { label: 'Happenings' }]}
       />
 

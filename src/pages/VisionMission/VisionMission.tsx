@@ -4,34 +4,34 @@ import './VisionMission.css';
 import PageHero from '../../components/PageHero/PageHero';
 
 const missionPoints = [
-  'To achieve Academic excellence through innovative learning practices',
-  'To instil self confidence among rural women students by supplementing with co-curricular and extra-curricular activities',
-  'To inculcate discipline and values among rural women students',
-  'To establish centers for Institute Industry partnership',
-  'To extend financial assistance for the economically weaker sections',
-  'To create self employment opportunities and skill up gradation',
-  'To support environment friendly Green Practices',
-  'Creating innovation hubs',
+  'To pursue academic excellence through progressive and innovative teaching practices',
+  'To build self-confidence among women from rural backgrounds through co-curricular and extra-curricular engagement',
+  'To nurture discipline and strong values in students from rural communities',
+  'To develop centres of Institute-Industry collaboration',
+  'To provide financial support to students from economically weaker sections',
+  'To generate self-employment avenues and promote skill development',
+  'To advance environmentally responsible green practices across the campus',
+  'To establish and sustain innovation hubs that drive student entrepreneurship',
 ];
 
 const values = [
-  { icon: '🏆', title: 'Excellence', desc: 'Pursuing the highest standards in academic programs, faculty, and research outcomes.' },
-  { icon: '💡', title: 'Innovation', desc: 'Fostering creativity, entrepreneurship, and technology-driven problem solving.' },
-  { icon: '🤝', title: 'Integrity', desc: 'Upholding honesty, transparency, and ethical conduct in all endeavours.' },
-  { icon: '♀️', title: 'Empowerment', desc: 'Strengthening women through education, confidence, and leadership development.' },
-  { icon: '🔬', title: 'Research', desc: 'Advancing knowledge through funded projects, publications, and innovation.' },
-  { icon: '🌿', title: 'Service', desc: 'Contributing to community, environment, and society through meaningful action.' },
+  { icon: '🏆', title: 'Excellence', desc: 'Holding ourselves to the highest standards across academic programs, faculty quality, and research outcomes.' },
+  { icon: '💡', title: 'Innovation', desc: 'Encouraging creative thinking, entrepreneurial initiative, and technology-driven solutions to real problems.' },
+  { icon: '🤝', title: 'Integrity', desc: 'Maintaining honesty, transparency, and ethical conduct across all activities and interactions.' },
+  { icon: '♀️', title: 'Empowerment', desc: 'Building women\'s confidence, capabilities, and readiness for leadership through education and opportunity.' },
+  { icon: '🔬', title: 'Research', desc: 'Advancing knowledge through funded projects, scholarly publications, and applied innovation.' },
+  { icon: '🌿', title: 'Service', desc: 'Making a positive and lasting contribution to community, environment, and society.' },
 ];
 
 const qualityPolicy = [
-  'We strive for excellence in all that we do in order to model success for our students',
-  'We focus on students\' success and satisfaction and meeting the needs of the community',
-  'We take pride in the quality of our organization and work, and we value originality, integrity, consistency, and attention to detail',
-  'We stay abreast of ever-changing youth culture, emerging communication technologies and design trends',
-  'We set benchmarks and model high quality standards for students, faculty, staff, and community partners',
-  'We lay utmost importance on discipline, punctuality, personal values and healthy practices',
-  'We create an innovative environment for students and staff to develop an integrated personality',
-  'Inclusive community projects',
+  'We pursue excellence in everything we do, setting a clear example of achievement for our students',
+  'We remain focused on student success and satisfaction, while responding to the broader needs of the community',
+  'We take pride in the quality of our institution and its work, upholding originality, integrity, consistency, and care in all we deliver',
+  'We keep pace with evolving student expectations, emerging communication technologies, and shifting design trends',
+  'We define and model high-quality standards for students, faculty, staff, and community partners alike',
+  'We hold discipline, punctuality, personal integrity, and healthy habits in the highest regard',
+  'We foster an environment of innovation so that students and staff can grow into well-rounded individuals',
+  'We actively pursue inclusive community initiatives that benefit those beyond our campus boundary',
 ];
 
 export default function VisionMission() {
@@ -60,7 +60,7 @@ export default function VisionMission() {
         page="vision-mission"
         defaultImage="https://images.unsplash.com/photo-1562774053-701939374585?w=1920&q=80"
         defaultTitle="Vision, Mission & Values"
-  defaultSubtitle="The guiding principles and purpose that drive every decision at Vishnu Womens University."
+  defaultSubtitle="The principles, purpose, and commitments that inform every decision and action at Vishnu Womens University."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Discover', to: '/' }, { label: 'Vision, Mission & Values' }]}
       />
 
@@ -114,7 +114,7 @@ export default function VisionMission() {
             <span className="section-label">Core Values</span>
             <h2 className="section-title">What We Stand For</h2>
             <p className="section-desc" style={{ margin: '0 auto' }}>
-              Six core values guide every aspect of life and learning at VWU.
+              Six enduring values that shape how we teach, how we work, and how we engage with the world.
             </p>
           </div>
           <div className="vm-values-grid">

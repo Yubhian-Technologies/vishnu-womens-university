@@ -10,6 +10,7 @@ const stats = [
   { num: '95%+', label: 'Placement Rate' },
 ];
 
+
 export default function Placements() {
   useEffect(() => {
     document.title = 'Placements | Vishnu Womens University';
@@ -36,7 +37,7 @@ export default function Placements() {
         page="placements"
         defaultImage="https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=1920&q=80"
         defaultTitle="Placements & Careers"
-  defaultSubtitle="Connecting VWU talent with world-class opportunities — from campus recruitment and career training to global study pathways."
+  defaultSubtitle="Linking VWU graduates with the best opportunities in industry — through campus recruitment, career development, and pathways to global study."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Placements' }]}
       />
 
@@ -61,7 +62,7 @@ export default function Placements() {
             <span className="section-label">Training & Placement Office</span>
             <h2 className="section-title">Explore Placements at VWU</h2>
             <p style={{ color: 'var(--color-text-light)', maxWidth: 640, lineHeight: 1.7 }}>
-              Everything you need to know about careers, campus recruitment, industry partnerships, and higher education pathways — all in one place.
+              Career outcomes, campus recruitment, industry partnerships, and higher education pathways — everything in one place.
             </p>
           </div>
 
@@ -126,7 +127,7 @@ export default function Placements() {
               Start Your Career Journey at VWU
             </h2>
             <p style={{ color: 'rgba(255,255,255,0.75)', maxWidth: 520, margin: '0 auto var(--space-6)' }}>
-              Join a university where careers are built, not just degrees. Apply now and take the first step toward a world-class future.
+              Join a university where academic rigour translates into real career outcomes. Apply now and take the first step toward a future you have earned.
             </p>
             <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
               <Link to="/admissions" className="btn btn-accent">Apply Now</Link>

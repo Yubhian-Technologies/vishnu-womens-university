@@ -56,12 +56,12 @@ const positions = [
 ];
 
 const perks = [
-  { icon: '🎓', title: 'Research Support', desc: 'Funding for research projects, conference attendance, and journal publications.' },
-  { icon: '💰', title: 'Competitive Pay', desc: 'Pay scales as per AICTE/UGC norms with performance-linked increments.' },
-  { icon: '🏥', title: 'Health & Wellness', desc: 'Medical facility, insurance coverage, and access to the Vishnu Wellness Centre.' },
-  { icon: '🏠', title: 'Staff Quarters', desc: 'On-campus residential quarters within the Green Meadows campus network.' },
-  { icon: '📚', title: 'Professional Development', desc: 'FDPs, workshops, certifications, and sabbatical leave for higher studies.' },
-  { icon: '🤝', title: 'Inclusive Culture', desc: 'A women-first, diverse, and collaborative academic community.' },
+  { icon: '🎓', title: 'Research Support', desc: 'Dedicated support for research projects, conference participation, and publication in recognised journals.' },
+  { icon: '💰', title: 'Competitive Pay', desc: 'Remuneration aligned with AICTE/UGC norms, with increments tied to performance.' },
+  { icon: '🏥', title: 'Health & Wellness', desc: 'On-campus medical services, insurance coverage, and access to the Vishnu Wellness Centre.' },
+  { icon: '🏠', title: 'Staff Quarters', desc: 'Residential accommodation available on campus within the Green Meadows campus network.' },
+  { icon: '📚', title: 'Professional Development', desc: 'Access to FDPs, workshops, certifications, and sabbatical provisions for advanced study.' },
+  { icon: '🤝', title: 'Inclusive Culture', desc: 'A women-centred, collaborative academic environment that values diversity and mutual respect.' },
 ];
 
 type FormData = {
@@ -102,7 +102,7 @@ export default function Careers() {
         page="careers"
         defaultImage="https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=1920&q=80"
         defaultTitle="Careers at VWU"
-  defaultSubtitle="Join a team of passionate educators and professionals dedicated to empowering the next generation of women engineers."
+  defaultSubtitle="Build your career alongside a community of educators and professionals who are genuinely invested in advancing women in engineering and technology."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Careers' }]}
       />
 
@@ -113,7 +113,7 @@ export default function Careers() {
             <span className="section-label">Why VWU</span>
             <h2 className="section-title">Why Work With Us</h2>
             <p className="section-desc" style={{ margin: '0 auto' }}>
-              VWU offers a supportive, research-driven environment where faculty and staff thrive alongside students.
+              VWU is a place where faculty and staff grow alongside students — in a focused, research-oriented academic environment.
             </p>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-5)' }}>
@@ -135,7 +135,7 @@ export default function Careers() {
           <div className="reveal" style={{ marginBottom: 'var(--space-10)' }}>
             <span className="section-label">Openings</span>
             <h2 className="section-title">Current Openings</h2>
-            <p className="section-desc">We welcome applications from qualified candidates across all departments on a rolling basis.</p>
+            <p className="section-desc">Applications from qualified candidates across all departments are accepted throughout the year.</p>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
             {positions.map((dept, i) => (
@@ -171,14 +171,14 @@ export default function Careers() {
             <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-10)' }}>
               <span className="section-label">Apply</span>
               <h2 className="section-title">Submit Your Application</h2>
-              <p className="section-desc">Fill in the form below and our HR team will get in touch within 5–7 working days.</p>
+              <p className="section-desc">Complete the form below and a member of our HR team will be in contact within 5–7 working days.</p>
             </div>
 
             {submitted ? (
               <div className="reveal" style={{ textAlign: 'center', background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-12)', borderTop: '4px solid var(--color-accent)' }}>
                 <div style={{ fontSize: '3rem', marginBottom: 'var(--space-4)' }}>✅</div>
                 <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.5rem', color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>Application Submitted!</h3>
-                <p style={{ color: 'var(--color-text-light)', lineHeight: 1.7 }}>Thank you for your interest in VWU. Our HR team will review your application and reach out within 5–7 working days.</p>
+                <p style={{ color: 'var(--color-text-light)', lineHeight: 1.7 }}>Thank you for applying to VWU. Our HR team will review your application and follow up with you within 5–7 working days.</p>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="reveal" style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-8)', display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
@@ -244,7 +244,7 @@ export default function Careers() {
             <span className="section-label" style={{ color: 'var(--color-accent)' }}>Questions?</span>
             <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>Reach Out to HR</h2>
             <p style={{ color: 'rgba(255,255,255,0.8)', maxWidth: 480, margin: '0 auto var(--space-6)', lineHeight: 1.7 }}>
-              For queries about positions, eligibility, or the selection process, write to us at <strong style={{ color: 'var(--color-accent)' }}>info@svecw.edu.in</strong> or call <strong style={{ color: 'var(--color-accent)' }}>08816-250864</strong>.
+              For questions about available roles, eligibility requirements, or the selection process, write to us at <strong style={{ color: 'var(--color-accent)' }}>info@svecw.edu.in</strong> or call <strong style={{ color: 'var(--color-accent)' }}>08816-250864</strong>.
             </p>
             <Link to="/contact" className="btn btn-accent btn-lg">Contact Us</Link>
           </div>

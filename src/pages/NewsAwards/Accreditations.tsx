@@ -85,7 +85,7 @@ export default function Accreditations() {
         page="news-awards-accreditations"
         defaultImage="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1920&q=80"
         defaultTitle="Accreditations & Awards"
-  defaultSubtitle="Recognised by India's leading bodies for quality, innovation, and academic excellence — a record built over two decades."
+  defaultSubtitle="Endorsed by India's foremost regulatory and ranking bodies — a record of recognised quality and consistent academic achievement."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'News & Awards', to: '/news-awards' }, { label: 'Accreditations & Awards' }]}
       />
 

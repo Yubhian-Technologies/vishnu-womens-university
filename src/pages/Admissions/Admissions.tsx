@@ -5,10 +5,10 @@ import PageHero from '../../components/PageHero/PageHero';
 
 const steps = [
   { step: 1, icon: '📝', title: 'Appear for EAPCET / ECET', desc: 'Qualify in AP EAPCET for B.Tech, AP ECET for lateral entry, or AP PGECET / ICET for PG programs. VWU Code: VISW.' },
-  { step: 2, icon: '📄', title: 'Submit Your Documents', desc: 'Provide your qualifying exam rank card, academic certificates, transfer certificate, and passport-size photographs.' },
-  { step: 3, icon: '💰', title: 'Explore Scholarships', desc: 'Check eligibility for SC/ST/BC scholarships, merit scholarships, and central government fee reimbursement schemes.' },
-  { step: 4, icon: '🏫', title: 'Visit Our Campus', desc: 'Schedule a personalized campus visit to meet faculty, tour world-class labs, and experience VWU firsthand.' },
-  { step: 5, icon: '🎉', title: 'Confirm Admission & Enroll', desc: 'Complete fee payment, submit original documents, and begin your engineering journey at VWU!' },
+  { step: 2, icon: '📄', title: 'Submit Your Documents', desc: 'Bring your qualifying exam rank card, academic certificates, transfer certificate, and passport-size photographs.' },
+  { step: 3, icon: '💰', title: 'Explore Scholarships', desc: 'Review your eligibility for SC/ST/BC scholarships, merit-based awards, and central government fee reimbursement schemes.' },
+  { step: 4, icon: '🏫', title: 'Visit Our Campus', desc: 'Book a personalised campus visit to meet faculty, see the facilities, and get a true sense of life at VWU.' },
+  { step: 5, icon: '🎉', title: 'Confirm Admission & Enroll', desc: 'Complete your fee payment, submit original documents, and officially begin your engineering journey at VWU.' },
 ];
 
 const scholarships = [
@@ -21,10 +21,10 @@ const scholarships = [
 ];
 
 const admissionHub = [
-  { icon: '📋', title: 'Programmes & Fee Structure', desc: 'All B.Tech, M.Tech, MBA & Ph.D. programmes with intake and annual fee details.', path: '/programmes-fee-structure', highlight: 'B.Tech: ₹1,05,000/yr' },
-  { icon: '📝', title: 'Admission Procedure', desc: 'Step-by-step guide — EAPCET (Code: VISW), GATE, ICET, ECET eligibility & process.', path: '/admission-procedure', highlight: 'EAPCET Code: VISW' },
-  { icon: '📊', title: 'Result Analysis', desc: 'Top 5 JNTUK affiliated college. 90%+ annual pass rate. University Gold Medalists.', path: '/result-analysis', highlight: 'Top 5 in JNTUK' },
-  { icon: '💳', title: 'Fee Payment Portal', desc: 'Secure online fee payment for tuition, hostel, and examination fees.', path: '/admissions', highlight: 'Pay Online' },
+  { icon: '📋', title: 'Programmes & Fee Structure', desc: 'B.Tech, M.Tech, MBA, and Ph.D. programmes listed with intake numbers and annual fee details.', path: '/programmes-fee-structure', highlight: 'B.Tech: ₹1,05,000/yr' },
+  { icon: '📝', title: 'Admission Procedure', desc: 'A step-by-step guide covering EAPCET (Code: VISW), GATE, ICET, and ECET eligibility and processes.', path: '/admission-procedure', highlight: 'EAPCET Code: VISW' },
+  { icon: '📊', title: 'Result Analysis', desc: 'Ranked among the Top 5 JNTUK-affiliated colleges. 90%+ annual pass rate. University Gold Medallists.', path: '/result-analysis', highlight: 'Top 5 in JNTUK' },
+  { icon: '💳', title: 'Fee Payment Portal', desc: 'Secure online portal for paying tuition, hostel, and examination fees.', path: '/admissions', highlight: 'Pay Online' },
 ];
 
 const tuitionData = [
@@ -37,21 +37,21 @@ const tuitionData = [
 ];
 
 const faqs = [
-  { q: 'What is the VWU college code for EAPCET?', a: 'The VWU college code for AP EAPCET (B.Tech admissions) is VISW. Use this code when entering your college preferences during the AP EAPCET counselling process.' },
-  { q: 'Is VWU an autonomous college?', a: 'Yes. VWU has been granted Autonomous Status by the University Grants Commission (UGC) since 2014. This allows VWU to design its own curriculum and conduct independent examinations.' },
-  { q: 'What is the hostel fee at VWU?', a: 'Hostel fees at VWU range from ₹60,000 to ₹80,000 per year, depending on the type of accommodation. Separate mess facilities are available for hostel residents.' },
-  { q: 'Are government scholarships available at VWU?', a: 'Yes. SC/ST/BC/EBC students are eligible for full or partial fee reimbursement under AP government scholarship schemes. Students can apply through the AP scholarship portal.' },
-  { q: 'What documents are required for admission?', a: 'You will need: EAPCET rank card, Class 10 & 12 mark sheets and certificates, transfer certificate, conduct certificate, Aadhaar card, caste certificate (if applicable), and 8 passport-size photographs.' },
-  { q: 'Is VWU affiliated to JNTUK?', a: 'Yes. Vishnu Womens University is affiliated to Jawaharlal Nehru Technological University Kakinada (JNTUK) for all its engineering programs.' },
-  { q: 'What are the placement opportunities at VWU?', a: 'VWU has a dedicated Training & Placement Cell with 1,400+ placements in 2024–25. Top recruiters include Amazon, TCS, Infosys, Wipro, and 150+ other companies. The highest package offered was 52 LPA.' },
-  { q: 'Can I take a campus tour before applying?', a: 'Absolutely! We encourage prospective students and parents to visit our campus in Bhimavaram. You can schedule a group tour, an individual visit day, or even a virtual tour by contacting our admissions office.' },
+  { q: 'What is the VWU college code for EAPCET?', a: 'The college code for VWU in AP EAPCET (B.Tech admissions) is VISW. Enter this code when selecting college preferences during the AP EAPCET counselling process.' },
+  { q: 'Is VWU an autonomous college?', a: 'Yes. VWU has held Autonomous Status granted by the University Grants Commission (UGC) since 2014. This enables VWU to frame its own curriculum and conduct independent examinations.' },
+  { q: 'What is the hostel fee at VWU?', a: 'Hostel fees at VWU range between ₹60,000 and ₹80,000 per year, based on the type of accommodation. Dedicated mess facilities are available for students residing in the hostel.' },
+  { q: 'Are government scholarships available at VWU?', a: 'Yes. SC/ST/BC/EBC students may qualify for full or partial fee reimbursement under AP government scholarship programs. Applications are submitted through the AP scholarship portal.' },
+  { q: 'What documents are required for admission?', a: 'Required documents include: EAPCET rank card, Class 10 and 12 mark sheets and certificates, transfer certificate, conduct certificate, Aadhaar card, caste certificate (if applicable), and 8 passport-size photographs.' },
+  { q: 'Is VWU affiliated to JNTUK?', a: 'Yes. Vishnu Womens University is affiliated to Jawaharlal Nehru Technological University Kakinada (JNTUK) for all its engineering programmes.' },
+  { q: 'What are the placement opportunities at VWU?', a: 'VWU\'s Training & Placement Cell recorded 1,400+ placements in 2024–25. Regular recruiters include Amazon, TCS, Infosys, Wipro, and 150+ other companies. The highest package in 2024–25 was 52 LPA.' },
+  { q: 'Can I take a campus tour before applying?', a: 'Yes, and we actively encourage it. Prospective students and their families are welcome to visit the campus in Bhimavaram. You can book a group tour, an individual visit, or a virtual walkthrough by reaching out to our admissions office.' },
 ];
 
 const visitOptions = [
-  { icon: '👥', title: 'Group Campus Tour', desc: 'Join a guided tour of VWU\'s campus — visit cutting-edge labs, smart classrooms, hostels, and student life facilities in Bhimavaram.' },
-  { icon: '🎯', title: 'Individual Visit Day', desc: 'Schedule a personalized visit with our admissions team, attend a demo class, and meet faculty in your area of interest.' },
-  { icon: '🌐', title: 'Virtual Campus Tour', desc: 'Can\'t make it to Bhimavaram? Explore our campus virtually and connect with our admissions team via video call.' },
-  { icon: '🏫', title: 'Open Day for Admitted Students', desc: 'Spend a full day at VWU after your admission — meet your future batchmates, faculty, and explore student activities.' },
+  { icon: '👥', title: 'Group Campus Tour', desc: 'Join a guided walkthrough of the VWU campus — see the labs, smart classrooms, hostels, and student facilities in Bhimavaram.' },
+  { icon: '🎯', title: 'Individual Visit Day', desc: 'Arrange a one-on-one visit with our admissions team, sit in on a demo class, and meet faculty from your preferred department.' },
+  { icon: '🌐', title: 'Virtual Campus Tour', desc: 'Unable to travel to Bhimavaram? Take an online tour of the campus and speak with our admissions team via video call.' },
+  { icon: '🏫', title: 'Open Day for Admitted Students', desc: 'Spend a full day at VWU after confirming your admission — meet your future classmates, faculty, and student activity groups.' },
 ];
 
 export default function Admissions() {
@@ -83,7 +83,7 @@ export default function Admissions() {
         page="admissions"
         defaultImage="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1920&q=80"
         defaultTitle="Your Journey Starts Here"
-  defaultSubtitle="Joining VWU is the first step toward a rewarding engineering career, a powerful network, and a future you'll be proud of."
+  defaultSubtitle="Choosing VWU sets you on a path to a fulfilling engineering career, a strong professional network, and a future built on real achievement."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Admissions' }]}
       />
 
@@ -94,7 +94,7 @@ export default function Admissions() {
             <span className="section-label">Admissions</span>
             <h2 className="section-title">Everything You Need to Apply</h2>
             <p className="section-desc" style={{ margin: '0 auto' }}>
-              All admission-related information in one place — fees, procedure, results, and payment.
+              Everything you need to apply — fees, step-by-step procedure, results, and the payment portal — in one place.
             </p>
           </div>
           <div className="adm-hub-grid">
@@ -141,8 +141,8 @@ export default function Admissions() {
             <span className="section-label">Financial Support</span>
             <h2 className="section-title">Make VWU Accessible</h2>
             <p className="section-desc">
-              VWU supports students through government scholarships, fee reimbursement, and
-              merit-based awards to ensure quality engineering education is within reach for all.
+              VWU helps students access government scholarships, fee reimbursement schemes, and
+              merit-based awards so that quality engineering education is genuinely within reach.
             </p>
           </div>
 
@@ -162,7 +162,7 @@ export default function Admissions() {
             <div className="adm-fafsa-icon">📋</div>
             <div>
               <h3>Apply for AP Scholarships</h3>
-              <p>Apply for AP government scholarships, SC/ST/BC fee reimbursement, and central government scholarship schemes via the National Scholarship Portal.</p>
+              <p>Submit applications for AP government scholarships, SC/ST/BC fee reimbursement, and central government scholarship schemes through the National Scholarship Portal.</p>
             </div>
             <a href="#" className="btn btn-accent">Check Scholarship Eligibility</a>
           </div>
@@ -177,9 +177,9 @@ export default function Admissions() {
               <span className="section-label" style={{ color: 'var(--color-accent)' }}>Fee Structure</span>
               <h2 className="section-title" style={{ color: 'var(--color-white)' }}>Understanding the Investment</h2>
               <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 'var(--text-lg)', lineHeight: 1.7, marginBottom: 'var(--space-6)' }}>
-                B.Tech annual fee is ₹1,05,000. M.Tech is ₹55,800 and MBA is ₹55,000 per year.
-                With government scholarships, SC/ST/BC fee reimbursement, and the PM Vidyalaxmi Scheme,
-                engineering education here is within reach for every deserving student.
+                B.Tech tuition is ₹1,05,000 per year. M.Tech is ₹55,800 and MBA is ₹55,000 annually.
+                Through government scholarships, SC/ST/BC fee reimbursement, and the PM Vidyalaxmi Scheme,
+                a VWU education is financially accessible to every deserving student.
               </p>
               <Link to="/programmes-fee-structure" className="btn btn-accent">View Full Fee Structure</Link>
             </div>
@@ -202,7 +202,7 @@ export default function Admissions() {
             <span className="section-label">Campus Visits</span>
             <h2 className="section-title">Come See VWU for Yourself</h2>
             <p className="section-desc" style={{ margin: '0 auto' }}>
-              The best way to decide if VWU is your home is to visit. Choose the experience that works best for you.
+              Seeing VWU in person is the best way to know if it is the right fit for you. Choose the visit format that suits you best.
             </p>
           </div>
           <div className="adm-visit-grid">
@@ -226,8 +226,8 @@ export default function Admissions() {
               <span className="section-label">Contact Us</span>
               <h2 className="section-title">Talk to Our Admissions Team</h2>
               <p className="section-desc" style={{ marginBottom: 'var(--space-6)' }}>
-                Our admissions team is here to answer your questions, guide you through the process,
-                and help you find your place at VWU.
+                Our admissions team is ready to answer your questions, walk you through each step,
+                and help you find your path at VWU.
               </p>
               <div className="adm-contact-info">
                 <div className="adm-contact-item">
@@ -306,7 +306,7 @@ export default function Admissions() {
             <span className="section-label">FAQ</span>
             <h2 className="section-title">Frequently Asked Questions</h2>
             <p className="section-desc" style={{ margin: '0 auto' }}>
-              Everything you need to know about joining VWU. Can't find your answer? Contact our admissions team.
+              Common questions about joining VWU, answered. If you do not find what you are looking for, contact our admissions team directly.
             </p>
           </div>
           <div className="adm-faq-list">

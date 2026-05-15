@@ -3,22 +3,22 @@ import { Link } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
 
 const facilities = [
-  { id: 'smart-classrooms', icon: '📺', title: 'Smart Class Rooms', desc: '200+ digitally-equipped smart classrooms with projectors, interactive whiteboards, and live-streaming capability for hybrid learning.' },
-  { id: 'labs',             icon: '🔬', title: 'State-of-the-art Labs', desc: '50+ specialised laboratories across all departments — from AI & ML labs to VLSI design, Power Electronics, and Civil Engineering labs.' },
-  { id: 'library',          icon: '📚', title: 'Central Library', desc: '1,00,000+ volumes, e-journals, NPTEL digital resources, Springer, IEEE Xplore access, and dedicated reading areas for all students.' },
-  { id: 'auditoriums',      icon: '🎭', title: 'Auditoriums', desc: 'A 2,000-seat main auditorium and multiple seminar halls for events, conferences, cultural programs, and symposia.' },
-  { id: 'bookstores',       icon: '📖', title: 'Campus Book Stores', desc: 'A fully stocked campus bookstore offering prescribed textbooks, reference materials, stationery, and digital resources.' },
-  { id: 'wifi',             icon: '📶', title: 'Wi-Fi Campus', desc: '1 Gbps campus-wide Wi-Fi across all academic blocks, hostels, and recreational areas for 24/7 seamless connectivity.' },
-  { id: 'hostels',          icon: '🏠', title: 'Campus Hostels', desc: 'Secure, modern women\'s hostels with 24/7 security, attached mess, high-speed Wi-Fi, and recreational facilities for resident students.' },
-  { id: 'food-courts',      icon: '🍽️', title: 'Food Courts', desc: 'Hygienic, well-equipped campus food courts serving freshly prepared vegetarian and non-vegetarian meals throughout the day.' },
-  { id: 'fitness',          icon: '💪', title: 'VISHNU Fitness Centre', desc: 'A fully equipped gymnasium and fitness centre with modern equipment, trained instructors, and scheduled fitness programs.' },
-  { id: 'swimming-pool',    icon: '🏊', title: 'Swimming Pool', desc: 'An Olympic-standard swimming pool available for students and staff, with certified coaching and regular swimming sessions.' },
-  { id: 'health-care',      icon: '🏥', title: 'Health Care', desc: 'On-campus medical facility with qualified doctors, nurses, and first aid — providing primary healthcare to all students and staff.' },
-  { id: 'security',         icon: '🔐', title: 'Campus Security', desc: '24/7 CCTV surveillance, security personnel, and controlled access entry points ensuring a safe and secure campus environment.' },
-  { id: 'travel-desk',      icon: '🚌', title: 'Travel Desk', desc: 'Dedicated travel desk providing transport coordination, bus passes, and travel assistance for students and staff.' },
-  { id: 'temples',          icon: '🛕', title: 'Temples', desc: 'On-campus temples and prayer spaces providing a place of reflection, peace, and spiritual well-being for all students.' },
-  { id: 'staff-quarters',   icon: '🏘️', title: 'Staff Quarters', desc: 'On-campus residential quarters for faculty and staff within the Green Meadows campus network for convenient living.' },
-  { id: 'other-facilities', icon: '♿', title: 'Other Facilities', desc: 'Facilities for differently-abled students, indoor games room, student lounge, ATM, photocopying, and more across campus.' },
+  { id: 'smart-classrooms', icon: '📺', title: 'Smart Class Rooms', desc: 'More than 200 digitally-fitted classrooms with projectors, interactive whiteboards, and live-streaming support for hybrid delivery.' },
+  { id: 'labs',             icon: '🔬', title: 'Specialised Laboratories', desc: 'Over 50 purpose-built labs spread across all departments — spanning AI & ML, VLSI design, Power Electronics, and Civil Engineering.' },
+  { id: 'library',          icon: '📚', title: 'Central Library', desc: 'More than 1,00,000 volumes alongside e-journals, NPTEL resources, Springer, and IEEE Xplore access, with quiet reading spaces.' },
+  { id: 'auditoriums',      icon: '🎭', title: 'Auditoriums', desc: 'A 2,000-seat main auditorium plus multiple seminar halls, supporting events, conferences, cultural programs, and symposia.' },
+  { id: 'bookstores',       icon: '📖', title: 'Campus Book Stores', desc: 'A well-stocked campus bookstore carrying prescribed texts, reference materials, stationery, and digital resources.' },
+  { id: 'wifi',             icon: '📶', title: 'Wi-Fi Campus', desc: 'Campus-wide 1 Gbps Wi-Fi covering academic blocks, hostels, and recreational areas, available around the clock.' },
+  { id: 'hostels',          icon: '🏠', title: 'Campus Hostels', desc: 'Secure women\'s hostels with round-the-clock security, an attached mess, fast Wi-Fi, and recreation spaces for resident students.' },
+  { id: 'food-courts',      icon: '🍽️', title: 'Food Courts', desc: 'Clean, well-run campus food courts offering freshly prepared vegetarian and non-vegetarian meals throughout the day.' },
+  { id: 'fitness',          icon: '💪', title: 'VISHNU Fitness Centre', desc: 'A fully equipped gym with modern training equipment, qualified instructors, and structured fitness programs for all students.' },
+  { id: 'swimming-pool',    icon: '🏊', title: 'Swimming Pool', desc: 'An Olympic-standard pool open to students and staff, with certified coaching and regularly scheduled swimming sessions.' },
+  { id: 'health-care',      icon: '🏥', title: 'Health Care', desc: 'An on-campus medical centre staffed by qualified doctors and nurses, providing primary healthcare to students and staff.' },
+  { id: 'security',         icon: '🔐', title: 'Campus Security', desc: 'Round-the-clock CCTV monitoring, trained security personnel, and controlled entry points maintaining a safe campus.' },
+  { id: 'travel-desk',      icon: '🚌', title: 'Travel Desk', desc: 'A dedicated travel desk handling transport coordination, bus passes, and travel-related support for students and staff.' },
+  { id: 'temples',          icon: '🛕', title: 'Temples', desc: 'On-campus temples and prayer spaces where students can find quiet, reflection, and a sense of spiritual grounding.' },
+  { id: 'staff-quarters',   icon: '🏘️', title: 'Staff Quarters', desc: 'Residential quarters for faculty and staff within the Green Meadows campus network, enabling convenient on-campus living.' },
+  { id: 'other-facilities', icon: '♿', title: 'Other Facilities', desc: 'Accessibility provisions for differently-abled students, an indoor games room, student lounge, ATM, photocopying services, and more.' },
 ];
 
 export default function Campus() {
@@ -47,7 +47,7 @@ export default function Campus() {
         page="campus"
         defaultImage="https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=1920&q=80"
         defaultTitle="Campus Life at VWU"
-  defaultSubtitle="A 100-acre campus in Bhimavaram designed to inspire learning, wellness, and community."
+  defaultSubtitle="A 100-acre campus in Bhimavaram where learning, wellness, and community life come together."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Campus Life' }]}
       />
 
@@ -77,7 +77,7 @@ export default function Campus() {
             <span className="section-label">Infrastructure</span>
             <h2 className="section-title">World-Class Campus Facilities</h2>
             <p className="section-desc" style={{ margin: '0 auto' }}>
-              Every facility at VWU is designed to support your academic journey, personal well-being, and campus life experience.
+              Each facility at VWU has been developed to support students academically, promote personal well-being, and enrich campus life.
             </p>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-5)' }} className="campus-facilities-grid">
@@ -131,7 +131,7 @@ export default function Campus() {
             <span className="section-label" style={{ color: 'var(--color-accent)' }}>Experience VWU</span>
             <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>Come See Our Campus</h2>
             <p style={{ color: 'rgba(255,255,255,0.8)', maxWidth: 500, margin: '0 auto var(--space-8)' }}>
-              Schedule a campus visit to experience VWU's world-class facilities, meet our faculty, and discover your future home.
+              Schedule a campus visit to tour the facilities in person, meet our faculty, and get a clear picture of life at VWU.
             </p>
             <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
               <Link to="/admissions" className="btn btn-accent btn-lg">Schedule a Visit</Link>

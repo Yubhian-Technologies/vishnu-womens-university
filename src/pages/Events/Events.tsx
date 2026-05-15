@@ -23,7 +23,7 @@ const events: Event[] = [
     time: '9:00 AM IST',
     location: 'VWU Main Auditorium, Bhimavaram',
     category: 'Academic Events',
-    desc: 'VWU\'s flagship annual national symposium featuring paper presentations, workshops, hackathons, and technical competitions from students across India.',
+    desc: 'VWU\'s annual national technical symposium, bringing together students from across India for paper presentations, workshops, hackathons, and competitive events.',
     featured: true,
   },
   {
@@ -33,7 +33,7 @@ const events: Event[] = [
     time: '10:00 AM',
     location: 'Seminar Hall, VWU Campus',
     category: 'Special Events',
-    desc: 'Felicitation ceremony for Team Ziba Racers, honoring the team\'s achievement at the mBAJA SAEINDIA 2026 national competition. Open to all students and faculty.',
+    desc: 'A felicitation ceremony recognising Team Ziba Racers for their performance at the mBAJA SAEINDIA 2026 national competition. All students and faculty are welcome to attend.',
     featured: true,
   },
   {
@@ -43,7 +43,7 @@ const events: Event[] = [
     time: '9:00 AM – 12:00 PM',
     location: 'Seminar Hall, VWU',
     category: 'Placements',
-    desc: 'Orientation session for VWU students selected for the Amazon AFE internship program. Mentors from Amazon will guide students on the internship process.',
+    desc: 'An orientation for VWU students selected for the Amazon AFE internship programme. Amazon mentors will walk students through expectations, processes, and preparation.',
   },
   {
     id: 4,
@@ -52,7 +52,7 @@ const events: Event[] = [
     time: '9:00 AM – 4:00 PM',
     location: 'VWU Auditorium, Bhimavaram',
     category: 'Admissions',
-    desc: 'A full-day welcome program for new VWU students. Meet faculty, advisors, and senior students. Explore clubs, facilities, and your academic journey.',
+    desc: 'A full-day induction for new VWU students. An opportunity to meet faculty, academic advisors, and senior peers — and get familiar with clubs, facilities, and what lies ahead.',
     featured: true,
   },
   {
@@ -62,7 +62,7 @@ const events: Event[] = [
     time: '3:00 PM IST',
     location: 'Conference Hall, VWU',
     category: 'Admissions',
-    desc: 'Learn about SC/ST/BC scholarships, merit scholarships, and government fee reimbursement schemes. Open to students and parents.',
+    desc: 'An information session covering SC/ST/BC scholarships, merit-based awards, and government fee reimbursement schemes. Students and parents are encouraged to attend.',
   },
   {
     id: 6,
@@ -71,7 +71,7 @@ const events: Event[] = [
     time: 'All Day',
     location: 'VWU Campus, Bhimavaram',
     category: 'Alumni Events',
-    desc: 'VWU\'s annual alumni reunion. Reconnect with batchmates, meet current students, and celebrate two decades of engineering excellence.',
+    desc: 'VWU\'s annual alumni gathering — a chance to reconnect with batchmates, meet current students, and mark the university\'s continuing journey in engineering education.',
     featured: true,
   },
   {
@@ -81,7 +81,7 @@ const events: Event[] = [
     time: '6:00 PM – 8:00 PM',
     location: 'Virtual (Online)',
     category: 'Alumni Events',
-    desc: 'VWU alumni from top companies share their career journeys and advice with current students in this inspiring online networking and mentoring session.',
+    desc: 'VWU alumni employed at leading companies share their career paths and practical guidance with current students through this online mentoring and networking session.',
   },
   {
     id: 8,
@@ -90,7 +90,7 @@ const events: Event[] = [
     time: '6:30 PM',
     location: 'VWU Auditorium, Bhimavaram',
     category: 'Academic Events',
-    desc: 'Annual celebration honoring VWU students, faculty, and staff for outstanding academic achievement, research contributions, and institutional service.',
+    desc: 'An annual ceremony recognising VWU students, faculty, and staff for distinguished academic performance, research output, and contributions to the institution.',
   },
   {
     id: 9,
@@ -99,7 +99,7 @@ const events: Event[] = [
     time: '8:00 AM',
     location: 'VWU Sports Complex, Bhimavaram',
     category: 'Sports',
-    desc: 'VWU hosts the annual inter-college sports tournament featuring cricket, volleyball, badminton, kabaddi, and athletics. Open to all engineering colleges in AP.',
+    desc: 'VWU hosts its annual inter-college sports tournament, with competition in cricket, volleyball, badminton, kabaddi, and athletics. Engineering colleges from across Andhra Pradesh are invited to participate.',
   },
   {
     id: 10,
@@ -108,7 +108,7 @@ const events: Event[] = [
     time: '10:00 AM',
     location: 'VWU Main Auditorium, Bhimavaram',
     category: 'Special Events',
-    desc: 'VWU proudly celebrates its 9th Graduation Day — honouring the graduating batch of engineers who are set to make their mark in the world.',
+    desc: 'VWU marks its 9th Graduation Day, celebrating the latest cohort of engineers as they complete their studies and step into their professional lives.',
   },
 ];
 
@@ -158,7 +158,7 @@ export default function Events() {
         page="events"
         defaultImage="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1920&q=80"
         defaultTitle="Campus Events"
-  defaultSubtitle="From technical symposia to sports tournaments and graduation celebrations — there's always something happening at VWU."
+  defaultSubtitle="Technical symposia, sports tournaments, graduation ceremonies, and much more — the VWU calendar is always full."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Events' }]}
       />
 
@@ -294,7 +294,7 @@ export default function Events() {
           <div className="ev-submit reveal" style={{ textAlign: 'center' }}>
             <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>Have an Event to Share?</h2>
             <p style={{ color: 'rgba(255,255,255,0.7)', maxWidth: 480, margin: '0 auto var(--space-6)' }}>
-              Faculty, staff, and student organizations can submit campus events for inclusion in the official VWU calendar.
+              Faculty, staff, and student organisations can submit events for listing in the official VWU campus calendar.
             </p>
             <a href="#" className="btn btn-accent">Submit Your Event</a>
           </div>

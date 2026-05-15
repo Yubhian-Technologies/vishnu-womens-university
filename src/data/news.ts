@@ -4,7 +4,7 @@ export const newsArticles: NewsArticle[] = [
   {
     id: 1,
     title: 'Team Ziba Racers Wins mBAJA SAEINDIA 2026 Award',
-    excerpt: 'VWU\'s Team Ziba Racers brought laurels to the institution by winning a prestigious award at the mBAJA SAEINDIA 2026 national competition, showcasing outstanding engineering design.',
+    excerpt: 'Team Ziba Racers from VWU claimed a prestigious award at the mBAJA SAEINDIA 2026 national competition, demonstrating the team\'s depth of engineering design and practical problem-solving.',
     date: 'May 10, 2026',
     category: 'Campus News',
     imageUrl: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800&q=80',
@@ -14,7 +14,7 @@ export const newsArticles: NewsArticle[] = [
   {
     id: 2,
     title: 'VWU Students Selected for Amazon AFE Internship Program',
-    excerpt: 'A record number of VWU students have been selected for the Amazon AFE internship program, reflecting the college\'s commitment to industry-academia collaboration and placement excellence.',
+    excerpt: 'A record number of VWU students have secured places in the Amazon AFE internship programme, underlining the strength of the university\'s industry partnerships and placement infrastructure.',
     date: 'May 3, 2026',
     category: 'Placements',
     imageUrl: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=800&q=80',
@@ -24,7 +24,7 @@ export const newsArticles: NewsArticle[] = [
   {
     id: 3,
     title: 'Technova2026 Symposium Draws National Participation',
-    excerpt: 'The annual Technova2026 national technical symposium hosted by VWU attracted hundreds of participants from across India, featuring paper presentations, workshops, and hackathons.',
+    excerpt: 'VWU\'s Technova2026 national technical symposium drew hundreds of participants from institutions across India, with sessions spanning paper presentations, workshops, and competitive hackathons.',
     date: 'April 25, 2026',
     category: 'Academics',
     imageUrl: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=800&q=80',
@@ -34,7 +34,7 @@ export const newsArticles: NewsArticle[] = [
   {
     id: 4,
     title: '8th Graduation Day 2025 Celebrated with Great Enthusiasm',
-    excerpt: 'VWU celebrated its 8th Graduation Day with pride and ceremony, honouring the graduating batch of engineers who are now set to make their mark in the industry and beyond.',
+    excerpt: 'VWU marked its 8th Graduation Day in a ceremony recognising the graduating cohort of engineers as they complete their academic journey and begin their professional careers.',
     date: 'April 18, 2026',
     category: 'Events',
     imageUrl: 'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=800&q=80',
@@ -44,7 +44,7 @@ export const newsArticles: NewsArticle[] = [
   {
     id: 5,
     title: 'VWU Receives IEI Award for Engineering Excellence',
-    excerpt: 'Vishnu Womens University has been recognized by the Institution of Engineers India (IEI) for its outstanding contribution to engineering education and research.',
+    excerpt: 'The Institution of Engineers India (IEI) has recognised Vishnu Womens University for its significant contribution to engineering education and research advancement.',
     date: 'April 10, 2026',
     category: 'Awards',
     imageUrl: 'https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=800&q=80',
@@ -54,7 +54,7 @@ export const newsArticles: NewsArticle[] = [
   {
     id: 6,
     title: 'Space Application Center Launched at VWU Campus',
-    excerpt: 'VWU inaugurated its new Space Application Center, furthering its mission to push the frontiers of technology education and research in emerging domains including satellite technologies.',
+    excerpt: 'VWU launched a dedicated Space Application Center to expand its research capabilities and give students direct exposure to emerging domains including satellite technologies.',
     date: 'April 2, 2026',
     category: 'Research',
     imageUrl: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&q=80',
@@ -64,7 +64,7 @@ export const newsArticles: NewsArticle[] = [
   {
     id: 7,
     title: 'VWU Achieves Record 1,400+ Placements in 2024–25',
-    excerpt: 'The Training & Placement Cell at VWU achieved a record-breaking 1,400+ placements in 2024–25, with top recruiters including Amazon, TCS, Infosys, Wipro, and Cognizant visiting campus.',
+    excerpt: 'The VWU Training & Placement Cell facilitated over 1,400 placements in 2024–25, with recruiters including Amazon, TCS, Infosys, Wipro, and Cognizant conducting drives on campus.',
     date: 'March 25, 2026',
     category: 'Placements',
     imageUrl: 'https://images.unsplash.com/photo-1573166953836-06864dc68063?w=800&q=80',
@@ -74,7 +74,7 @@ export const newsArticles: NewsArticle[] = [
   {
     id: 8,
     title: 'VWU Faculty Publishes Research in IEEE International Journal',
-    excerpt: 'A team of VWU faculty and students from the ECE and CSE departments have published groundbreaking research on AI-driven signal processing in a prestigious IEEE international journal.',
+    excerpt: 'Faculty and students from VWU\'s ECE and CSE departments have had their research on AI-driven signal processing accepted in an IEEE international journal.',
     date: 'March 18, 2026',
     category: 'Research',
     imageUrl: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800&q=80',
@@ -84,7 +84,7 @@ export const newsArticles: NewsArticle[] = [
   {
     id: 9,
     title: 'VWU Celebrates International Women\'s Day with Empowerment Conclave',
-    excerpt: 'VWU hosted an empowerment conclave on International Women\'s Day featuring keynote addresses by women leaders in technology, panel discussions, and cultural programs.',
+    excerpt: 'On International Women\'s Day, VWU hosted an empowerment conclave with keynote speakers from the technology sector, panel discussions on women in STEM, and cultural programmes.',
     date: 'March 8, 2026',
     category: 'Campus News',
     imageUrl: 'https://images.unsplash.com/photo-1571260899304-425eee4c7efc?w=800&q=80',
@@ -94,7 +94,7 @@ export const newsArticles: NewsArticle[] = [
   {
     id: 10,
     title: 'New AR/VR Studio Inaugurated at VWU',
-    excerpt: 'VWU unveiled a state-of-the-art Augmented Reality and Virtual Reality studio, offering students hands-on experience in immersive technologies for engineering design and simulation.',
+    excerpt: 'VWU opened a dedicated Augmented Reality and Virtual Reality studio, giving students direct access to immersive technologies for engineering design, simulation, and visualisation.',
     date: 'February 28, 2026',
     category: 'Campus News',
     imageUrl: 'https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=800&q=80',
@@ -104,7 +104,7 @@ export const newsArticles: NewsArticle[] = [
   {
     id: 11,
     title: 'VWU NSS Unit Completes 500-Hour Rural Service Campaign',
-    excerpt: 'The NSS unit of VWU completed an intensive 500-hour rural service campaign in villages around Bhimavaram, conducting health camps, digital literacy drives, and clean water initiatives.',
+    excerpt: 'VWU\'s NSS unit completed a 500-hour rural outreach campaign in villages near Bhimavaram, covering health camps, digital literacy sessions, and clean water awareness programmes.',
     date: 'February 15, 2026',
     category: 'Campus News',
     imageUrl: 'https://images.unsplash.com/photo-1551818255-e6e10975bc17?w=800&q=80',
@@ -114,7 +114,7 @@ export const newsArticles: NewsArticle[] = [
   {
     id: 12,
     title: 'VWU Signs MoU with Infosys for Industry-Ready Training',
-    excerpt: 'VWU signed a Memorandum of Understanding with Infosys to provide students with industry-ready training programs, internship opportunities, and access to the Infosys Springboard platform.',
+    excerpt: 'VWU entered into a Memorandum of Understanding with Infosys, enabling students to access structured training programmes, internship pathways, and the Infosys Springboard learning platform.',
     date: 'February 5, 2026',
     category: 'Academics',
     imageUrl: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&q=80',
@@ -124,7 +124,7 @@ export const newsArticles: NewsArticle[] = [
   {
     id: 13,
     title: 'VWU Wins Gold at AP Inter-University Sports Championship',
-    excerpt: 'VWU\'s athletics team brought home the gold medal from the AP Inter-University Sports Championship, with students excelling in kabaddi, volleyball, and track events.',
+    excerpt: 'VWU athletes returned with a gold medal from the AP Inter-University Sports Championship, with strong performances in kabaddi, volleyball, and track and field events.',
     date: 'January 28, 2026',
     category: 'Campus News',
     imageUrl: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&q=80',
@@ -134,7 +134,7 @@ export const newsArticles: NewsArticle[] = [
   {
     id: 14,
     title: 'VWU Introduces New B.Tech Curriculum with Industry 4.0 Focus',
-    excerpt: 'VWU\'s Board of Studies approved an updated B.Tech curriculum integrating Industry 4.0 technologies including IoT, AI, blockchain, and cloud computing across all engineering programs.',
+    excerpt: 'The VWU Board of Studies has approved a revised B.Tech curriculum incorporating Industry 4.0 technologies — including IoT, AI, blockchain, and cloud computing — across all engineering programmes.',
     date: 'January 15, 2026',
     category: 'Academics',
     imageUrl: 'https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?w=800&q=80',

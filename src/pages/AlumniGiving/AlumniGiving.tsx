@@ -4,10 +4,10 @@ import './AlumniGiving.css';
 import PageHero from '../../components/PageHero/PageHero';
 
 const givingImpact = [
-  { icon: '🎓', stat: '13,100+', label: 'Engineers Graduated', desc: 'VWU alumni are making an impact across India and globally.' },
-  { icon: '🏛️', stat: '1,400+', label: 'Annual Placements', desc: 'A strong placement record powered by alumni mentoring and recruiter networks.' },
-  { icon: '🌍', stat: '50+', label: 'Companies Recruiting', desc: 'Top firms from Amazon to Infosys actively recruit VWU graduates every year.' },
-  { icon: '📈', stat: '52 LPA', label: 'Highest Package', desc: 'Alumni-driven industry connect helps students land top-tier placements.' },
+  { icon: '🎓', stat: '13,100+', label: 'Engineers Graduated', desc: 'VWU alumni are contributing meaningfully to industry and research across India and internationally.' },
+  { icon: '🏛️', stat: '1,400+', label: 'Annual Placements', desc: 'A consistent placement record strengthened by alumni mentoring and active recruiter relationships.' },
+  { icon: '🌍', stat: '50+', label: 'Companies Recruiting', desc: 'Leading firms from Amazon to Infosys recruit VWU graduates on campus every year.' },
+  { icon: '📈', stat: '52 LPA', label: 'Highest Package', desc: 'Strong alumni-industry connections help students secure top-tier offers.' },
 ];
 
 const givingLevels = [
@@ -18,10 +18,10 @@ const givingLevels = [
 ];
 
 const alumniEvents = [
-  { title: 'Annual Alumni Meet', date: 'January 2027', desc: 'Our signature alumni reunion bringing graduates back to the VWU campus for networking, reunions, and celebrations.' },
-  { title: 'Alumni Career Talk Series', date: 'Ongoing 2026', desc: 'Connect with current students and share your career journey. Inspire the next generation of VWU engineers.' },
-  { title: 'Regional Alumni Meetups', date: 'Ongoing', desc: 'Join VWU alumni gatherings in cities across India — from Hyderabad to Bangalore to Chennai.' },
-  { title: 'Graduation Day Felicitation', date: 'December 2026', desc: 'Celebrate and honour outstanding alumni achievements at the annual Graduation Day ceremony.' },
+  { title: 'Annual Alumni Meet', date: 'January 2027', desc: 'The annual reunion that brings graduates back to the VWU campus for networking, catching up with batchmates, and celebrating shared milestones.' },
+  { title: 'Alumni Career Talk Series', date: 'Ongoing 2026', desc: 'Share your career story with current students and offer the kind of perspective that only real-world experience provides.' },
+  { title: 'Regional Alumni Meetups', date: 'Ongoing', desc: 'Meet fellow VWU graduates at informal gatherings held in cities across India — including Hyderabad, Bangalore, and Chennai.' },
+  { title: 'Graduation Day Felicitation', date: 'December 2026', desc: 'Recognise and honour the achievements of outstanding alumni at the annual Graduation Day ceremony.' },
 ];
 
 const alumniStories = [
@@ -29,21 +29,21 @@ const alumniStories = [
     name: 'Priya Reddy',
     year: "Class of '18",
     role: 'Senior Software Engineer, Amazon Web Services',
-    quote: 'VWU gave me the technical depth and the confidence to crack a top-tier product company. I owe my career to the faculty and placement team here.',
+    quote: 'The technical depth and self-assurance VWU built in me were what made a top-tier product company role possible. My faculty and the placement team deserve real credit for that.',
     img: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&q=80',
   },
   {
     name: 'Sravani Devi',
     year: "Class of '20",
     role: 'VLSI Design Engineer, Intel Corporation',
-    quote: 'The ECE labs and research mentoring at VWU prepared me for a global career. The Vishnu Japan Outreach Centre opened incredible international doors.',
+    quote: 'VWU\'s ECE labs and research guidance gave me the grounding for an international career. The Vishnu Japan Outreach Centre, in particular, opened doors I had not anticipated.',
     img: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&q=80',
   },
   {
     name: 'Lakshmi Prasanna',
     year: "Class of '22",
     role: 'Data Scientist, Microsoft India',
-    quote: 'The AI & Data Science program at VWU is cutting-edge. The hands-on project exposure and industry connections made all the difference in my placement.',
+    quote: 'The AI & Data Science curriculum at VWU is genuinely current. The project-based learning and the industry network we built here were decisive in landing my placement.',
     img: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&q=80',
   },
 ];
@@ -75,7 +75,7 @@ export default function AlumniGiving() {
         page="alumni-giving"
         defaultImage="https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=1920&q=80"
         defaultTitle="Always a Vishnu Engineer"
-  defaultSubtitle="Your VWU journey doesn't end at graduation. Stay connected, give back, and help shape the next generation of women engineers."
+  defaultSubtitle="Graduation is not the end of your VWU story. Stay engaged, give back, and help shape the next generation of women engineers."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Alumni & Giving' }]}
       />
 
@@ -102,7 +102,7 @@ export default function AlumniGiving() {
             <span className="section-label">Ways to Give</span>
             <h2 className="section-title">Your Gift Makes a Difference</h2>
             <p className="section-desc" style={{ margin: '0 auto' }}>
-              Every contribution — no matter the size — directly supports VWU students. Choose the giving level that's right for you.
+              Every contribution, regardless of amount, goes directly toward supporting VWU students. Select the giving level that works for you.
             </p>
           </div>
           <div className="ag-giving-grid">
@@ -199,8 +199,8 @@ export default function AlumniGiving() {
               <span className="section-label">Publications</span>
               <h2 className="section-title">Prathibha – The VWU Campus Magazine</h2>
               <p className="section-desc" style={{ marginBottom: 'var(--space-6)' }}>
-                Stay connected to your alma mater with the latest issue of Prathibha — VWU's
-                campus magazine featuring alumni profiles, research highlights, and campus news.
+                Stay in touch with your alma mater through the latest issue of Prathibha — VWU's
+                campus magazine carrying alumni profiles, research updates, and news from across campus.
               </p>
               <div style={{ display: 'flex', gap: 'var(--space-4)', flexWrap: 'wrap' }}>
                 <a href="#" className="btn btn-primary">Read Latest Issue</a>
