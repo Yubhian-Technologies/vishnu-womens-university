@@ -27,16 +27,16 @@ export default function PageHero({
   breadcrumb,
   size = 'medium',
 }: PageHeroProps) {
-  const { slides, loading } = usePageBanners(page);
+  const { slides } = usePageBanners(page);
   const [current, setCurrent] = useState(0);
   const [animating, setAnimating] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Use Firestore slides or fall back to default single slide
+  // Always start with the default slide so the hero renders instantly.
+  // Firestore slides replace it once loaded — no blank flash.
+  const defaultSlide = { imageUrl: defaultImage, title: defaultTitle, subtitle: defaultSubtitle ?? '', ctaLabel: '', ctaLink: '' };
   const allSlides: Omit<BannerSlide, 'id' | 'order'>[] =
-    slides.length > 0
-      ? slides
-      : [{ imageUrl: defaultImage, title: defaultTitle, subtitle: defaultSubtitle ?? '', ctaLabel: '', ctaLink: '' }];
+    slides.length > 0 ? slides : [defaultSlide];
 
   const goTo = (idx: number) => {
     if (animating || idx === current) return;
@@ -65,19 +65,6 @@ export default function PageHero({
 
   // Reset to slide 0 when slides change (e.g. Firestore update)
   useEffect(() => { setCurrent(0); }, [slides.length]);
-
-  if (loading) {
-    return (
-      <section className={`page-hero page-hero--${size} page-hero--loading`}>
-        <div className="page-hero-overlay" />
-        <div className="container page-hero-content">
-          <div className="breadcrumb animate-fade-in">
-            <Breadcrumbs items={breadcrumb} />
-          </div>
-        </div>
-      </section>
-    );
-  }
 
   const slide = allSlides[current];
 
