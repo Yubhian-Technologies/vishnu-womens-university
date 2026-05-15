@@ -2,22 +2,22 @@ import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 const facilities = [
-  { icon: '📺', title: 'Smart Class Rooms', desc: '200+ digitally-equipped smart classrooms with projectors, interactive whiteboards, and live-streaming capability for hybrid learning.' },
-  { icon: '🔬', title: 'State-of-the-art Labs', desc: '50+ specialised laboratories across all departments — from AI & ML labs to VLSI design, Power Electronics, and Civil Engineering labs.' },
-  { icon: '📚', title: 'Central Library', desc: '1,00,000+ volumes, e-journals, NPTEL digital resources, Springer, IEEE Xplore access, and dedicated reading areas for all students.' },
-  { icon: '🎭', title: 'Auditoriums', desc: 'A 2,000-seat main auditorium and multiple seminar halls for events, conferences, cultural programs, and symposia.' },
-  { icon: '📖', title: 'Campus Book Store', desc: 'A fully stocked campus bookstore offering prescribed textbooks, reference materials, stationery, and digital resources.' },
-  { icon: '📶', title: 'Wi-Fi Campus', desc: '1 Gbps campus-wide Wi-Fi across all academic blocks, hostels, and recreational areas for 24/7 seamless connectivity.' },
-  { icon: '🏠', title: 'Campus Hostels', desc: 'Secure, modern women\'s hostels with 24/7 security, attached mess, high-speed Wi-Fi, and recreational facilities for resident students.' },
-  { icon: '🍽️', title: 'Food Courts', desc: 'Hygienic, well-equipped campus food courts serving freshly prepared vegetarian and non-vegetarian meals throughout the day.' },
-  { icon: '💪', title: 'VISHNU Fitness Centre', desc: 'A fully equipped gymnasium and fitness centre with modern equipment, trained instructors, and scheduled fitness programs.' },
-  { icon: '🏊', title: 'Swimming Pool', desc: 'An Olympic-standard swimming pool available for students and staff, with certified coaching and regular swimming sessions.' },
-  { icon: '🏥', title: 'Health Care Centre', desc: 'On-campus medical facility with qualified doctors, nurses, and first aid — providing primary healthcare to all students and staff.' },
-  { icon: '🔐', title: 'Campus Security', desc: '24/7 CCTV surveillance, security personnel, and controlled access entry points ensuring a safe and secure campus environment.' },
-  { icon: '🚌', title: 'Travel Desk', desc: 'Dedicated travel desk providing transport coordination, bus passes, and travel assistance for students and staff.' },
-  { icon: '🛕', title: 'Temples', desc: 'On-campus temples and prayer spaces providing a place of reflection, peace, and spiritual well-being for all students.' },
-  { icon: '🏘️', title: 'Staff Quarters', desc: 'On-campus residential quarters for faculty and staff within the Green Meadows campus network for convenient living.' },
-  { icon: '♿', title: 'Other Facilities', desc: 'Facilities for differently-abled students, indoor games room, student lounge, ATM, photocopying, and more across campus.' },
+  { id: 'smart-classrooms', icon: '📺', title: 'Smart Class Rooms', desc: '200+ digitally-equipped smart classrooms with projectors, interactive whiteboards, and live-streaming capability for hybrid learning.' },
+  { id: 'labs',             icon: '🔬', title: 'State-of-the-art Labs', desc: '50+ specialised laboratories across all departments — from AI & ML labs to VLSI design, Power Electronics, and Civil Engineering labs.' },
+  { id: 'library',          icon: '📚', title: 'Central Library', desc: '1,00,000+ volumes, e-journals, NPTEL digital resources, Springer, IEEE Xplore access, and dedicated reading areas for all students.' },
+  { id: 'auditoriums',      icon: '🎭', title: 'Auditoriums', desc: 'A 2,000-seat main auditorium and multiple seminar halls for events, conferences, cultural programs, and symposia.' },
+  { id: 'bookstores',       icon: '📖', title: 'Campus Book Stores', desc: 'A fully stocked campus bookstore offering prescribed textbooks, reference materials, stationery, and digital resources.' },
+  { id: 'wifi',             icon: '📶', title: 'Wi-Fi Campus', desc: '1 Gbps campus-wide Wi-Fi across all academic blocks, hostels, and recreational areas for 24/7 seamless connectivity.' },
+  { id: 'hostels',          icon: '🏠', title: 'Campus Hostels', desc: 'Secure, modern women\'s hostels with 24/7 security, attached mess, high-speed Wi-Fi, and recreational facilities for resident students.' },
+  { id: 'food-courts',      icon: '🍽️', title: 'Food Courts', desc: 'Hygienic, well-equipped campus food courts serving freshly prepared vegetarian and non-vegetarian meals throughout the day.' },
+  { id: 'fitness',          icon: '💪', title: 'VISHNU Fitness Centre', desc: 'A fully equipped gymnasium and fitness centre with modern equipment, trained instructors, and scheduled fitness programs.' },
+  { id: 'swimming-pool',    icon: '🏊', title: 'Swimming Pool', desc: 'An Olympic-standard swimming pool available for students and staff, with certified coaching and regular swimming sessions.' },
+  { id: 'health-care',      icon: '🏥', title: 'Health Care', desc: 'On-campus medical facility with qualified doctors, nurses, and first aid — providing primary healthcare to all students and staff.' },
+  { id: 'security',         icon: '🔐', title: 'Campus Security', desc: '24/7 CCTV surveillance, security personnel, and controlled access entry points ensuring a safe and secure campus environment.' },
+  { id: 'travel-desk',      icon: '🚌', title: 'Travel Desk', desc: 'Dedicated travel desk providing transport coordination, bus passes, and travel assistance for students and staff.' },
+  { id: 'temples',          icon: '🛕', title: 'Temples', desc: 'On-campus temples and prayer spaces providing a place of reflection, peace, and spiritual well-being for all students.' },
+  { id: 'staff-quarters',   icon: '🏘️', title: 'Staff Quarters', desc: 'On-campus residential quarters for faculty and staff within the Green Meadows campus network for convenient living.' },
+  { id: 'other-facilities', icon: '♿', title: 'Other Facilities', desc: 'Facilities for differently-abled students, indoor games room, student lounge, ATM, photocopying, and more across campus.' },
 ];
 
 export default function Campus() {
@@ -91,8 +91,8 @@ export default function Campus() {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-5)' }} className="campus-facilities-grid">
             {facilities.map((f, i) => (
-              <div key={f.title} className="reveal" data-delay={`${i * 40}`}
-                style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', transition: 'all var(--transition-base)' }}
+              <div key={f.title} id={f.id} className="reveal" data-delay={`${i * 40}`}
+                style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', transition: 'all var(--transition-base)', scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-accent)'; (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-md)'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-light-gray)'; (e.currentTarget as HTMLElement).style.boxShadow = 'none'; }}
               >

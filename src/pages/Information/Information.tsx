@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 const academicCalendar = [
   { event: 'Odd Semester Commencement', date: 'July 15, 2026' },
@@ -58,12 +58,27 @@ const counsellingScheme = [
 
 type TabId = 'calendar' | 'holidays' | 'reach' | 'counselling' | 'ict' | 'practices';
 
+const hashToTab: Record<string, TabId> = {
+  '#academic-calendar': 'calendar',
+  '#holidays':          'holidays',
+  '#how-to-reach':      'reach',
+  '#counselling':       'counselling',
+  '#ict-platforms':     'ict',
+  '#other-practices':   'practices',
+};
+
 export default function Information() {
   const [activeTab, setActiveTab] = useState<TabId>('calendar');
+  const location = useLocation();
 
   useEffect(() => {
     document.title = 'Information | VWU';
   }, []);
+
+  useEffect(() => {
+    const tab = hashToTab[location.hash];
+    if (tab) setActiveTab(tab);
+  }, [location.hash]);
 
   const tabs: { id: TabId; label: string }[] = [
     { id: 'calendar', label: 'Academic Calendar' },

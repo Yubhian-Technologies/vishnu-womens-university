@@ -146,6 +146,92 @@ export default function About() {
         </div>
       </section>
 
+      {/* Core Executive Body */}
+      <section id="core-executive" className="section bg-off-white" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
+        <div className="container">
+          <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-10)' }}>
+            <span className="section-label">Leadership</span>
+            <h2 className="section-title">Core Executive Body</h2>
+            <p className="section-desc" style={{ margin: '0 auto' }}>
+              The senior leadership team steering VWU's academic excellence and institutional growth.
+            </p>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 'var(--space-5)' }}>
+            {[
+              { name: 'Dr. G. Srinivasa Rao',          role: 'Principal',                    icon: '🎓' },
+              { name: 'Prof. P. Venkata Rama Raju',     role: 'Vice-Principal',               icon: '🏛️' },
+              { name: 'Dr. G.R.L.V.N. Srinivasa Raju', role: 'Dean – Research & Development', icon: '🔬' },
+              { name: 'Dr. V. Purushothama Raju',       role: 'Dean – Academics',             icon: '📚' },
+              { name: 'Dr. V.V.R. Maheswara Rao',       role: 'Dean – Statutory Bodies / IQAC Coordinator', icon: '⚖️' },
+              { name: 'Dr. K.S.N. Raju',                role: 'Controller of Examinations',   icon: '📋' },
+              { name: 'Mr. Md. Siddiq',                 role: 'Administrative Officer',       icon: '🏢' },
+              { name: 'Mr. S.S.S. Varma',               role: 'Finance Manager',              icon: '💰' },
+            ].map((exec, i) => (
+              <div key={exec.name} className="reveal" data-delay={`${i * 50}`}
+                style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', display: 'flex', gap: 'var(--space-4)', alignItems: 'flex-start', borderTop: '3px solid var(--color-accent)' }}>
+                <span style={{ fontSize: '1.8rem', flexShrink: 0 }}>{exec.icon}</span>
+                <div>
+                  <div style={{ fontFamily: 'var(--font-sans)', fontWeight: 900, color: 'var(--color-primary)', fontSize: 'var(--text-base)', marginBottom: 4 }}>{exec.name}</div>
+                  <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)' }}>{exec.role}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Organizational Chart */}
+      <section id="org-chart" className="section bg-white" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
+        <div className="container">
+          <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-10)' }}>
+            <span className="section-label">Structure</span>
+            <h2 className="section-title">Organizational Chart</h2>
+          </div>
+          <div className="reveal" style={{ overflowX: 'auto' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, minWidth: 560 }}>
+              {/* Top */}
+              {[
+                { label: 'Sri K.V. Vishnu Raju', sub: 'Chairman, SVES', color: 'var(--color-primary)', textColor: 'var(--color-white)' },
+              ].map(n => (
+                <div key={n.label} style={{ background: n.color, color: n.textColor, padding: 'var(--space-3) var(--space-8)', borderRadius: 'var(--radius-md)', fontFamily: 'var(--font-sans)', fontWeight: 700, fontSize: 'var(--text-sm)', textAlign: 'center', minWidth: 240 }}>
+                  {n.label}<br /><span style={{ fontWeight: 400, fontSize: 'var(--text-xs)', opacity: 0.8 }}>{n.sub}</span>
+                </div>
+              ))}
+              <div style={{ width: 2, height: 28, background: 'var(--color-light-gray)' }} />
+              <div style={{ background: 'var(--color-accent)', color: 'var(--color-white)', padding: 'var(--space-3) var(--space-8)', borderRadius: 'var(--radius-md)', fontFamily: 'var(--font-sans)', fontWeight: 700, fontSize: 'var(--text-sm)', textAlign: 'center', minWidth: 240 }}>
+                Dr. G. Srinivasa Rao<br /><span style={{ fontWeight: 400, fontSize: 'var(--text-xs)', opacity: 0.9 }}>Principal</span>
+              </div>
+              <div style={{ width: 2, height: 28, background: 'var(--color-light-gray)' }} />
+              {/* Mid tier */}
+              <div style={{ display: 'flex', gap: 'var(--space-4)', flexWrap: 'wrap', justifyContent: 'center' }}>
+                {[
+                  { label: 'Vice-Principal', name: 'Prof. P. Venkata Rama Raju' },
+                  { label: 'Dean – R&D', name: 'Dr. G.R.L.V.N.S. Raju' },
+                  { label: 'Dean – Academics', name: 'Dr. V. Purushothama Raju' },
+                  { label: 'Dean – Statutory', name: 'Dr. V.V.R. Maheswara Rao' },
+                  { label: 'Controller of Exams', name: 'Dr. K.S.N. Raju' },
+                ].map(n => (
+                  <div key={n.label} style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-3) var(--space-4)', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', textAlign: 'center', minWidth: 150 }}>
+                    <div style={{ fontWeight: 700, color: 'var(--color-primary)', marginBottom: 2 }}>{n.label}</div>
+                    <div style={{ color: 'var(--color-text-light)' }}>{n.name}</div>
+                  </div>
+                ))}
+              </div>
+              <div style={{ width: 2, height: 28, background: 'var(--color-light-gray)' }} />
+              {/* HoDs */}
+              <div style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--color-text-light)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 'var(--space-3)' }}>Heads of Departments</div>
+              <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap', justifyContent: 'center' }}>
+                {['EEE','ECE','CSE','IT','Civil','ME','AI & DS','Mathematics','Chemistry','English','MBA'].map(dept => (
+                  <div key={dept} style={{ background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-sm)', padding: '0.3rem 0.7rem', fontFamily: 'var(--font-sans)', fontSize: '0.7rem', fontWeight: 600, color: 'var(--color-primary)' }}>
+                    {dept}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Differentiators — unique content, not duplicated anywhere */}
       <section className="section bg-off-white">
         <div className="container">
