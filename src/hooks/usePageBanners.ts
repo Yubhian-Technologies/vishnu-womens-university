@@ -12,17 +12,32 @@ export interface BannerSlide {
   order: number;
 }
 
-/** Returns all banner slides for a given page slug, ordered by `order` field. */
+const CACHE_KEY = (page: string) => `vwu_banner_${page}`;
+
+function readCache(page: string): BannerSlide[] {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY(page));
+    return raw ? (JSON.parse(raw) as BannerSlide[]) : [];
+  } catch { return []; }
+}
+
+function writeCache(page: string, slides: BannerSlide[]) {
+  try { localStorage.setItem(CACHE_KEY(page), JSON.stringify(slides)); } catch { /* quota full */ }
+}
+
+/**
+ * Returns banner slides for a page.
+ * First render uses localStorage cache (instant, no flash).
+ * Firestore result updates it in the background.
+ * loading=true only when cache is empty AND Firestore hasn't responded yet.
+ */
 export function usePageBanners(page: string): { slides: BannerSlide[]; loading: boolean } {
-  const [slides, setSlides] = useState<BannerSlide[]>([]);
-  const [loading, setLoading] = useState(true);
+  const cached = readCache(page);
+  const [slides, setSlides] = useState<BannerSlide[]>(cached);
+  const [loading, setLoading] = useState(cached.length === 0);
 
   useEffect(() => {
-    // Only use `where` — sort client-side to avoid requiring a Firestore composite index
-    const q = query(
-      collection(db, 'banners'),
-      where('page', '==', page),
-    );
+    const q = query(collection(db, 'banners'), where('page', '==', page));
     const unsub = onSnapshot(
       q,
       (snap) => {
@@ -37,10 +52,11 @@ export function usePageBanners(page: string): { slides: BannerSlide[]; loading: 
             order:    d.data().order     ?? 0,
           }))
           .sort((a, b) => a.order - b.order);
+        writeCache(page, docs);
         setSlides(docs);
         setLoading(false);
       },
-      () => setLoading(false), // on error: show fallback image
+      () => setLoading(false),
     );
     return unsub;
   }, [page]);
