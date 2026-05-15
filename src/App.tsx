@@ -36,6 +36,7 @@ import Accreditations from './pages/NewsAwards/Accreditations';
 import GalleryPage from './pages/NewsAwards/Gallery';
 import Careers from './pages/Careers/Careers';
 import Contact from './pages/Contact/Contact';
+import AdminLayout from './pages/Admin/AdminLayout';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -45,7 +46,7 @@ function ScrollToTop() {
   return null;
 }
 
-function AppLayout() {
+function PublicApp() {
   return (
     <>
       <ScrollToTop />
@@ -92,6 +93,18 @@ function AppLayout() {
   );
 }
 
+function RootRouter() {
+  const { pathname } = useLocation();
+  if (pathname.startsWith('/admin')) {
+    return (
+      <Routes>
+        <Route path="/admin/*" element={<AdminLayout />} />
+      </Routes>
+    );
+  }
+  return <PublicApp />;
+}
+
 function NotFound() {
   useEffect(() => {
     document.title = '404 | Vishnu Womens University';
@@ -127,7 +140,7 @@ function NotFound() {
 export default function App() {
   return (
     <BrowserRouter>
-      <AppLayout />
+      <RootRouter />
     </BrowserRouter>
   );
 }
