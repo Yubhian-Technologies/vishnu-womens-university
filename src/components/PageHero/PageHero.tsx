@@ -27,16 +27,18 @@ export default function PageHero({
   breadcrumb,
   size = 'medium',
 }: PageHeroProps) {
-  const { slides } = usePageBanners(page);
+  const { slides, loading } = usePageBanners(page);
   const [current, setCurrent] = useState(0);
   const [animating, setAnimating] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Always start with the default slide so the hero renders instantly.
-  // Firestore slides replace it once loaded — no blank flash.
+  // Image: always show something immediately (default image while loading).
+  // Text: only render once Firestore has responded — prevents flashing the
+  //       hardcoded title before the uploaded title appears.
   const defaultSlide = { imageUrl: defaultImage, title: defaultTitle, subtitle: defaultSubtitle ?? '', ctaLabel: '', ctaLink: '' };
   const allSlides: Omit<BannerSlide, 'id' | 'order'>[] =
     slides.length > 0 ? slides : [defaultSlide];
+  const showText = !loading;
 
   const goTo = (idx: number) => {
     if (animating || idx === current) return;
@@ -92,28 +94,32 @@ export default function PageHero({
           <Breadcrumbs items={breadcrumb} />
         </div>
 
-        <h1 key={`title-${current}`} className="page-hero__title animate-fade-in-up">
-          {slide.title}
-        </h1>
+        {showText && (
+          <>
+            <h1 key={`title-${current}`} className="page-hero__title animate-fade-in-up">
+              {slide.title}
+            </h1>
 
-        {slide.subtitle && (
-          <p key={`sub-${current}`} className="page-hero__subtitle animate-fade-in-up">
-            {slide.subtitle}
-          </p>
-        )}
-
-        {slide.ctaLabel && slide.ctaLink && (
-          <div key={`cta-${current}`} className="page-hero__cta animate-fade-in-up">
-            {slide.ctaLink.startsWith('http') ? (
-              <a href={slide.ctaLink} target="_blank" rel="noopener noreferrer" className="btn btn-primary">
-                {slide.ctaLabel}
-              </a>
-            ) : (
-              <Link to={slide.ctaLink} className="btn btn-primary">
-                {slide.ctaLabel}
-              </Link>
+            {slide.subtitle && (
+              <p key={`sub-${current}`} className="page-hero__subtitle animate-fade-in-up">
+                {slide.subtitle}
+              </p>
             )}
-          </div>
+
+            {slide.ctaLabel && slide.ctaLink && (
+              <div key={`cta-${current}`} className="page-hero__cta animate-fade-in-up">
+                {slide.ctaLink.startsWith('http') ? (
+                  <a href={slide.ctaLink} target="_blank" rel="noopener noreferrer" className="btn btn-primary">
+                    {slide.ctaLabel}
+                  </a>
+                ) : (
+                  <Link to={slide.ctaLink} className="btn btn-primary">
+                    {slide.ctaLabel}
+                  </Link>
+                )}
+              </div>
+            )}
+          </>
         )}
       </div>
 
