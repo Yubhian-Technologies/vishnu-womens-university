@@ -4,6 +4,7 @@ import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
 import Home from './pages/Home/Home';
 import Academics from './pages/Academics/Academics';
+import ProgramDetail from './pages/Academics/ProgramDetail';
 import Admissions from './pages/Admissions/Admissions';
 import StudentLife from './pages/StudentLife/StudentLife';
 import AlumniGiving from './pages/AlumniGiving/AlumniGiving';
@@ -50,6 +51,7 @@ function AppLayout() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/academics" element={<Academics />} />
+        <Route path="/academics/:slug" element={<ProgramDetail />} />
         <Route path="/admissions" element={<Admissions />} />
         <Route path="/student-life" element={<StudentLife />} />
         <Route path="/alumni-giving" element={<AlumniGiving />} />
