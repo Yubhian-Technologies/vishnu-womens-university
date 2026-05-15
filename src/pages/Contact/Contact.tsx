@@ -166,7 +166,7 @@ export default function Contact() {
               <div className="contact-map-wrapper">
                 <iframe
                   title="Vishnu Womens University Location"
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3822.6185386290433!2d81.54197847499!3d16.522579984263!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a37c43e9e4e9b1f%3A0x9e5c9d2a2e4a5e4a!2sSri%20Vishnu%20Educational%20College%20for%20Women!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin"
+                  src="https://maps.google.com/maps?q=16.568119,81.522098&z=15&output=embed"
                   width="100%"
                   height="400"
                   style={{ border: 0, borderRadius: '12px' }}
