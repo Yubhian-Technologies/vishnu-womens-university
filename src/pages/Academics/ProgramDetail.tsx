@@ -157,6 +157,66 @@ export default function ProgramDetail() {
         </div>
       </section>
 
+      {/* Faculty */}
+      {program.faculty && program.faculty.length > 0 && (
+        <section className="section bg-white">
+          <div className="container">
+            <div className="reveal" style={{ marginBottom: 'var(--space-10)' }}>
+              <span className="section-label">Our Team</span>
+              <h2 className="section-title">Faculty</h2>
+              <p className="section-desc">{program.faculty.length} dedicated faculty members bringing academic excellence and industry expertise to every classroom.</p>
+            </div>
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)' }}>
+                <thead>
+                  <tr style={{ background: 'var(--color-primary)' }}>
+                    {['S.No', 'Name', 'Designation', 'Qualification'].map(h => (
+                      <th key={h} style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-white)', fontWeight: 700, textAlign: 'left', fontSize: '0.72rem', letterSpacing: '0.07em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {program.faculty.map((f, i) => (
+                    <tr key={f.name} style={{ background: i % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)', borderBottom: '1px solid var(--color-light-gray)' }}>
+                      <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text-light)', fontWeight: 600, width: 48 }}>{i + 1}</td>
+                      <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary)', fontWeight: 700 }}>{f.name}</td>
+                      <td style={{ padding: 'var(--space-3) var(--space-4)' }}>
+                        <span style={{
+                          display: 'inline-block',
+                          fontSize: '0.68rem',
+                          fontWeight: 700,
+                          padding: '2px 10px',
+                          borderRadius: 'var(--radius-full)',
+                          whiteSpace: 'nowrap',
+                          background: f.designation.includes('HOD') || f.designation === 'Professor'
+                            ? 'rgba(10,35,81,0.1)'
+                            : f.designation.includes('Associate')
+                              ? 'rgba(201,168,76,0.15)'
+                              : 'rgba(0,0,0,0.05)',
+                          color: f.designation.includes('HOD') || f.designation === 'Professor'
+                            ? 'var(--color-primary)'
+                            : f.designation.includes('Associate')
+                              ? 'var(--color-accent)'
+                              : 'var(--color-text-light)',
+                          border: `1px solid ${f.designation.includes('HOD') || f.designation === 'Professor'
+                            ? 'rgba(10,35,81,0.2)'
+                            : f.designation.includes('Associate')
+                              ? 'rgba(201,168,76,0.3)'
+                              : 'rgba(0,0,0,0.1)'}`,
+                        }}>
+                          {f.designation}
+                        </span>
+                      </td>
+                      <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text-light)' }}>{f.qualification}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Curriculum — only if semesters present */}
       {program.semesters && program.semesters.length > 0 && (
         <section className="section bg-white">

@@ -1,3 +1,11 @@
+import type { FacultyMember } from './faculty.data';
+import {
+  cseFaculty, aiFaculty, itFaculty,
+  eceFaculty, eeeFaculty, ceFaculty, meFaculty, mbaFaculty,
+} from './faculty.data';
+
+export type { FacultyMember };
+
 export interface ProgramData {
   slug: string;
   name: string;
@@ -14,6 +22,7 @@ export interface ProgramData {
   labs: string[];
   outcomes: string[];
   semesters?: { label: string; subjects: string[] }[];
+  faculty?: FacultyMember[];
 }
 
 export const programs: ProgramData[] = [
@@ -61,6 +70,7 @@ export const programs: ProgramData[] = [
       'Product Manager',
       'Cybersecurity Analyst',
     ],
+    faculty: cseFaculty,
     semesters: [
       { label: 'Semester I', subjects: ['Engineering Mathematics I', 'Engineering Physics', 'Programming for Problem Solving', 'Engineering Drawing', 'English for Communication'] },
       { label: 'Semester II', subjects: ['Engineering Mathematics II', 'Engineering Chemistry', 'Data Structures', 'Digital Logic Design', 'Environmental Science'] },
@@ -114,6 +124,7 @@ export const programs: ProgramData[] = [
       'AI Product Manager',
       'Doctoral Research in AI',
     ],
+    faculty: aiFaculty,
     semesters: [
       { label: 'Semester I', subjects: ['Engineering Mathematics I', 'Programming for Problem Solving', 'Engineering Physics', 'English for Communication', 'Engineering Drawing'] },
       { label: 'Semester II', subjects: ['Engineering Mathematics II', 'Data Structures', 'Digital Logic Design', 'Statistics & Probability', 'Environmental Science'] },
@@ -177,6 +188,7 @@ export const programs: ProgramData[] = [
       { label: 'Semester VII', subjects: ['Generative AI', 'MLOps & DataOps', 'Elective III', 'Elective IV', 'Project Phase I'] },
       { label: 'Semester VIII', subjects: ['Project Phase II', 'Industry Internship', 'Professional Ethics', 'Elective V'] },
     ],
+    faculty: aiFaculty,
   },
   {
     slug: 'cyber-security',
@@ -230,6 +242,7 @@ export const programs: ProgramData[] = [
       { label: 'Semester VII', subjects: ['Advanced Threats & APT', 'Zero-Trust Architecture', 'Elective III', 'Elective IV', 'Project Phase I'] },
       { label: 'Semester VIII', subjects: ['Project Phase II', 'Industry Internship', 'Professional Ethics', 'Elective V'] },
     ],
+    faculty: cseFaculty,
   },
   {
     slug: 'it',
@@ -284,6 +297,7 @@ export const programs: ProgramData[] = [
       { label: 'Semester VII', subjects: ['Serverless Architecture', 'AI/ML for IT Systems', 'Elective III', 'Elective IV', 'Project Phase I'] },
       { label: 'Semester VIII', subjects: ['Project Phase II', 'Industry Internship', 'Professional Ethics', 'Elective V'] },
     ],
+    faculty: itFaculty,
   },
   {
     slug: 'ece',
@@ -338,6 +352,7 @@ export const programs: ProgramData[] = [
       { label: 'Semester VII', subjects: ['5G & Advanced Communications', 'IoT Systems', 'Elective III', 'Elective IV', 'Project Phase I'] },
       { label: 'Semester VIII', subjects: ['Project Phase II', 'Industry Internship', 'Professional Ethics', 'Elective V'] },
     ],
+    faculty: eceFaculty,
   },
   {
     slug: 'eee',
@@ -392,6 +407,7 @@ export const programs: ProgramData[] = [
       { label: 'Semester VII', subjects: ['Electric Vehicles & Charging Infrastructure', 'AI-based Control Systems', 'Elective III', 'Elective IV', 'Project Phase I'] },
       { label: 'Semester VIII', subjects: ['Project Phase II', 'Industry Internship', 'Professional Ethics', 'Elective V'] },
     ],
+    faculty: eeeFaculty,
   },
   {
     slug: 'ce',
@@ -446,6 +462,7 @@ export const programs: ProgramData[] = [
       { label: 'Semester VII', subjects: ['Estimation & Costing', 'Construction Management', 'Elective III', 'Elective IV', 'Project Phase I'] },
       { label: 'Semester VIII', subjects: ['Project Phase II', 'Industry Internship', 'Professional Ethics', 'Elective V'] },
     ],
+    faculty: ceFaculty,
   },
   {
     slug: 'me',
@@ -500,6 +517,7 @@ export const programs: ProgramData[] = [
       { label: 'Semester VII', subjects: ['Robotics & Automation', 'Renewable Energy Systems', 'Elective III', 'Elective IV', 'Project Phase I'] },
       { label: 'Semester VIII', subjects: ['Project Phase II', 'Industry Internship', 'Professional Ethics', 'Elective V'] },
     ],
+    faculty: meFaculty,
   },
 
   // ── M.Tech ──────────────────────────────────────────────────────────────
@@ -542,6 +560,7 @@ export const programs: ProgramData[] = [
       'Technical Lead / Engineering Manager',
       'Cloud Solutions Architect',
     ],
+    faculty: cseFaculty,
   },
   {
     slug: 'mtech-vlsi',
@@ -573,6 +592,7 @@ export const programs: ProgramData[] = [
       'Embedded Hardware Engineer',
       'PhD Scholar in VLSI / Microelectronics',
     ],
+    faculty: eceFaculty,
   },
   {
     slug: 'mtech-power-electronics',
@@ -604,6 +624,7 @@ export const programs: ProgramData[] = [
       'R&D Engineer in Power Systems',
       'PhD Scholar in Power Electronics',
     ],
+    faculty: eeeFaculty,
   },
   {
     slug: 'mtech-software-engineering',
@@ -643,6 +664,7 @@ export const programs: ProgramData[] = [
       'Project Manager / Scrum Master',
       'Technology Consultant',
     ],
+    faculty: itFaculty,
   },
 
   // ── MBA & Ph.D. ─────────────────────────────────────────────────────────
@@ -689,6 +711,7 @@ export const programs: ProgramData[] = [
       { label: 'Semester III', subjects: ['Strategic Management', 'Entrepreneurship Development', 'Elective II', 'Elective III', 'Elective IV', 'Industry Internship'] },
       { label: 'Semester IV', subjects: ['Project Management', 'Corporate Governance & Ethics', 'Elective V', 'Elective VI', 'Comprehensive Viva', 'Project Report & Presentation'] },
     ],
+    faculty: mbaFaculty,
   },
   {
     slug: 'phd-cse',
@@ -728,6 +751,7 @@ export const programs: ProgramData[] = [
       'Postdoctoral Researcher',
       'Government Research Scientist (C-DAC, NIC)',
     ],
+    faculty: cseFaculty,
   },
   {
     slug: 'phd-ece',
@@ -766,6 +790,7 @@ export const programs: ProgramData[] = [
       'Postdoctoral Researcher',
       'Technology Consultant / Standards Expert',
     ],
+    faculty: eceFaculty,
   },
   {
     slug: 'phd-eee',
@@ -805,6 +830,7 @@ export const programs: ProgramData[] = [
       'Postdoctoral Researcher',
       'EV Technology Lead / Energy Systems Architect',
     ],
+    faculty: eeeFaculty,
   },
 ];
 
