@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import PageHero from '../../components/PageHero/PageHero';
 
 const btechSteps = [
   { step: '01', title: 'Check Eligibility', desc: 'Pass 10+2 with Physics & Mathematics as major subjects with a minimum of 50% marks.' },
@@ -85,23 +86,14 @@ export default function AdmissionProcedure() {
 
   return (
     <main className="page-wrapper">
-      <section className="page-hero" style={{ minHeight: 340 }}>
-        <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b6f71?w=1920&q=80" alt="Admission Procedure" className="page-hero-image" />
-        <div className="page-hero-overlay" />
-        <div className="container page-hero-content">
-          <div className="breadcrumb animate-fade-in">
-            <Link to="/" className="breadcrumb-item">Home</Link>
-            <span className="breadcrumb-sep">›</span>
-            <Link to="/admissions" className="breadcrumb-item">Admissions</Link>
-            <span className="breadcrumb-sep">›</span>
-            <span className="breadcrumb-item active">Admission Procedure</span>
-          </div>
-          <h1 className="animate-fade-in-up">Admission Procedure</h1>
-          <p className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-            Step-by-step guide to joining VWU — eligibility, entrance tests, and enrollment for all programmes.
-          </p>
-        </div>
-      </section>
+      {/* Hero */}
+      <PageHero
+        page="admission-procedure"
+        defaultImage="https://images.unsplash.com/photo-1434030216411-0b793f4b6f71?w=1920&q=80"
+        defaultTitle="Admission Procedure"
+  defaultSubtitle="Step-by-step guide to joining VWU — eligibility, entrance tests, and enrollment for all programmes."
+        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Admissions', to: '/admissions' }, { label: 'Admission Procedure' }]}
+      />
 
       {/* EAPCET code banner */}
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-5) 0' }}>

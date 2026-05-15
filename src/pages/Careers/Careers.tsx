@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import PageHero from '../../components/PageHero/PageHero';
 
 const positions = [
   {
@@ -97,21 +98,13 @@ export default function Careers() {
   return (
     <main className="page-wrapper">
       {/* Hero */}
-      <section className="page-hero">
-        <img src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=1920&q=80" alt="Careers at VWU" className="page-hero-image" />
-        <div className="page-hero-overlay" />
-        <div className="container page-hero-content">
-          <div className="breadcrumb animate-fade-in">
-            <Link to="/" className="breadcrumb-item">Home</Link>
-            <span className="breadcrumb-sep">›</span>
-            <span className="breadcrumb-item active">Careers</span>
-          </div>
-          <h1 className="animate-fade-in-up">Build Your Career at VWU</h1>
-          <p className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-            Join a thriving community of educators, researchers, and administrators shaping the future of women's engineering education in India.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        page="careers"
+        defaultImage="https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=1920&q=80"
+        defaultTitle="Careers at VWU"
+  defaultSubtitle="Join a team of passionate educators and professionals dedicated to empowering the next generation of women engineers."
+        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Careers' }]}
+      />
 
       {/* Why Join */}
       <section className="section bg-off-white">

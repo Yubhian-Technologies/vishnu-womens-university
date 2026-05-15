@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './StudentLife.css';
+import PageHero from '../../components/PageHero/PageHero';
 
 const clubs = [
   { icon: '📻', name: 'Radio Vishnu 90.4', count: 'Campus FM station' },
@@ -68,25 +69,13 @@ export default function StudentLife() {
   return (
     <main className="page-wrapper">
       {/* Hero */}
-      <section className="page-hero">
-        <img
-          src="https://images.unsplash.com/photo-1571260899304-425eee4c7efc?w=1920&q=80"
-          alt="Students enjoying campus life at VWU"
-          className="page-hero-image"
-        />
-        <div className="page-hero-overlay" />
-        <div className="container page-hero-content">
-          <div className="breadcrumb animate-fade-in">
-            <Link to="/" className="breadcrumb-item">Home</Link>
-            <span className="breadcrumb-sep">›</span>
-            <span className="breadcrumb-item active">Student Life</span>
-          </div>
-          <h1 className="animate-fade-in-up">Discover Your Place at VWU</h1>
-          <p className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-            At VWU, you'll find more than an engineering degree. You'll find your community, your purpose, and your future.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        page="student-life"
+        defaultImage="https://images.unsplash.com/photo-1571260899304-425eee4c7efc?w=1920&q=80"
+        defaultTitle="Discover Your Place at VWU"
+  defaultSubtitle="At VWU, you'll find more than an engineering degree. You'll find your community, your purpose, and your future."
+        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Student Life' }]}
+      />
 
       {/* Quote Banner */}
       <section style={{ background: 'var(--color-accent)', padding: 'var(--space-6) 0' }}>

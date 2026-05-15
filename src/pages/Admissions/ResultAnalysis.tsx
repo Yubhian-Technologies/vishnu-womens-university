@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import PageHero from '../../components/PageHero/PageHero';
 
 const highlights = [
   { icon: '🏆', value: 'Top 5', label: 'Among JNTUK Affiliated Colleges', desc: 'VWU consistently ranks in the top 5 affiliated engineering colleges under JNTU Kakinada in terms of pass percentage.' },
@@ -49,23 +50,14 @@ export default function ResultAnalysis() {
 
   return (
     <main className="page-wrapper">
-      <section className="page-hero" style={{ minHeight: 340 }}>
-        <img src="https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?w=1920&q=80" alt="Result Analysis" className="page-hero-image" />
-        <div className="page-hero-overlay" />
-        <div className="container page-hero-content">
-          <div className="breadcrumb animate-fade-in">
-            <Link to="/" className="breadcrumb-item">Home</Link>
-            <span className="breadcrumb-sep">›</span>
-            <Link to="/admissions" className="breadcrumb-item">Admissions</Link>
-            <span className="breadcrumb-sep">›</span>
-            <span className="breadcrumb-item active">Result Analysis</span>
-          </div>
-          <h1 className="animate-fade-in-up">Result Analysis</h1>
-          <p className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-            VWU consistently ranks among the top 5 affiliated colleges of JNTU Kakinada with 90%+ annual pass rates.
-          </p>
-        </div>
-      </section>
+      {/* Hero */}
+      <PageHero
+        page="result-analysis"
+        defaultImage="https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?w=1920&q=80"
+        defaultTitle="Result Analysis"
+  defaultSubtitle="VWU consistently ranks among the top 5 affiliated colleges of JNTU Kakinada with 90%+ annual pass rates."
+        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Admissions', to: '/admissions' }, { label: 'Result Analysis' }]}
+      />
 
       {/* Key Statement Banner */}
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-8) 0' }}>

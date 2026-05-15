@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { awards, AwardItem } from './news-awards.data';
+import PageHero from '../../components/PageHero/PageHero';
 
 const tabs = [
   { key: 'ranking', label: 'Rankings & Ratings' },
@@ -80,30 +81,13 @@ export default function Accreditations() {
   return (
     <main className="page-wrapper">
       {/* Hero */}
-      <section className="page-hero" style={{ minHeight: 340 }}>
-        <img
-          src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1920&q=80"
-          alt="Accreditations and Awards at VWU"
-          className="page-hero-image"
-        />
-        <div className="page-hero-overlay" />
-        <div className="container page-hero-content">
-          <div className="breadcrumb animate-fade-in">
-            <Link to="/" className="breadcrumb-item">Home</Link>
-            <span className="breadcrumb-sep">›</span>
-            <Link to="/news-awards" className="breadcrumb-item">News & Awards</Link>
-            <span className="breadcrumb-sep">›</span>
-            <span className="breadcrumb-item active">Accreditations & Awards</span>
-          </div>
-          <div className="animate-fade-in-up" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'var(--color-accent)', color: 'var(--color-white)', fontSize: 'var(--text-xs)', fontWeight: 700, padding: '0.3rem 0.9rem', borderRadius: 'var(--radius-full)', marginBottom: 'var(--space-3)' }}>
-            <span>🏆</span> Recognition & Quality
-          </div>
-          <h1 className="animate-fade-in-up">Accreditations & Awards</h1>
-          <p className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-            Recognised by India's leading bodies for quality, innovation, and academic excellence — a record built over two decades.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        page="news-awards-accreditations"
+        defaultImage="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1920&q=80"
+        defaultTitle="Accreditations & Awards"
+  defaultSubtitle="Recognised by India's leading bodies for quality, innovation, and academic excellence — a record built over two decades."
+        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'News & Awards', to: '/news-awards' }, { label: 'Accreditations & Awards' }]}
+      />
 
       {/* Stats bar */}
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-6) 0' }}>

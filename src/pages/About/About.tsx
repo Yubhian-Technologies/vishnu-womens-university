@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './About.css';
+import PageHero from '../../components/PageHero/PageHero';
 
 const quickStats = [
   { value: '2001', label: 'Established' },
@@ -42,23 +43,13 @@ export default function About() {
   return (
     <main className="page-wrapper">
       {/* Hero */}
-      <section className="page-hero">
-        <img src="https://images.unsplash.com/photo-1562774053-701939374585?w=1920&q=80" alt="VWU campus" className="page-hero-image" />
-        <div className="page-hero-overlay" />
-        <div className="container page-hero-content">
-          <div className="breadcrumb animate-fade-in">
-            <Link to="/" className="breadcrumb-item">Home</Link>
-            <span className="breadcrumb-sep">›</span>
-            <span className="breadcrumb-item">Discover</span>
-            <span className="breadcrumb-sep">›</span>
-            <span className="breadcrumb-item active">About VWU</span>
-          </div>
-          <h1 className="animate-fade-in-up">About Vishnu Womens University</h1>
-          <p className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-            Empowering women through knowledge and action — since 2001, from Bhimavaram, Andhra Pradesh.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        page="about"
+        defaultImage="https://images.unsplash.com/photo-1562774053-701939374585?w=1920&q=80"
+        defaultTitle="About Vishnu Womens University"
+  defaultSubtitle="Empowering women through knowledge and action — since 2001, from Bhimavaram, Andhra Pradesh."
+        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'About VWU' }]}
+      />
 
       {/* Quick Stats */}
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-8) 0' }}>

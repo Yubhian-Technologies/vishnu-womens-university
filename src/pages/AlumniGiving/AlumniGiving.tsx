@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './AlumniGiving.css';
+import PageHero from '../../components/PageHero/PageHero';
 
 const givingImpact = [
   { icon: '🎓', stat: '13,100+', label: 'Engineers Graduated', desc: 'VWU alumni are making an impact across India and globally.' },
@@ -70,29 +71,13 @@ export default function AlumniGiving() {
   return (
     <main className="page-wrapper">
       {/* Hero */}
-      <section className="page-hero">
-        <img
-          src="https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=1920&q=80"
-          alt="VWU alumni at campus reunion"
-          className="page-hero-image"
-        />
-        <div className="page-hero-overlay" />
-        <div className="container page-hero-content">
-          <div className="breadcrumb animate-fade-in">
-            <Link to="/" className="breadcrumb-item">Home</Link>
-            <span className="breadcrumb-sep">›</span>
-            <span className="breadcrumb-item active">Alumni & Giving</span>
-          </div>
-          <h1 className="animate-fade-in-up">Always a Vishnu Engineer</h1>
-          <p className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-            Your VWU journey doesn't end at graduation. Stay connected, give back, and help shape the next generation of women engineers.
-          </p>
-          <div style={{ display: 'flex', gap: 'var(--space-4)', marginTop: 'var(--space-6)', flexWrap: 'wrap' }} className="animate-fade-in-up">
-            <a href="#give" className="btn btn-accent btn-lg">Make a Gift</a>
-            <a href="#alumni" className="btn btn-secondary btn-lg">Alumni Network</a>
-          </div>
-        </div>
-      </section>
+      <PageHero
+        page="alumni-giving"
+        defaultImage="https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=1920&q=80"
+        defaultTitle="Always a Vishnu Engineer"
+  defaultSubtitle="Your VWU journey doesn't end at graduation. Stay connected, give back, and help shape the next generation of women engineers."
+        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Alumni & Giving' }]}
+      />
 
       {/* Impact Stats */}
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-16) 0' }}>

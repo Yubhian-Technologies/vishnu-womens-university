@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import NewsCard from '../../components/NewsCard/NewsCard';
 import { newsArticles } from '../../data/news';
 import './News.css';
+import PageHero from '../../components/PageHero/PageHero';
 
 const categories = ['All', 'Campus News', 'Academics', 'Placements', 'Research', 'Awards', 'Events'];
 
@@ -38,25 +39,13 @@ export default function News() {
   return (
     <main className="page-wrapper">
       {/* Hero */}
-      <section className="page-hero" style={{ minHeight: 320 }}>
-        <img
-          src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1920&q=80"
-          alt="VWU news and media"
-          className="page-hero-image"
-        />
-        <div className="page-hero-overlay" />
-        <div className="container page-hero-content">
-          <div className="breadcrumb animate-fade-in">
-            <Link to="/" className="breadcrumb-item">Home</Link>
-            <span className="breadcrumb-sep">›</span>
-            <span className="breadcrumb-item active">News</span>
-          </div>
-          <h1 className="animate-fade-in-up">VWU News & Stories</h1>
-          <p className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-            Stay up-to-date with the latest happenings, achievements, and stories from the VWU community.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        page="news"
+        defaultImage="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1920&q=80"
+        defaultTitle="VWU News & Stories"
+  defaultSubtitle="Stay up-to-date with the latest happenings, achievements, and stories from the VWU community."
+        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'News' }]}
+      />
 
       {/* Featured Article */}
       <section className="news-featured">

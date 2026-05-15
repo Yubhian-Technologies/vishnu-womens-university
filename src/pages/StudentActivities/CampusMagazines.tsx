@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import PageHero from '../../components/PageHero/PageHero';
 
 const magazines = [
   {
@@ -55,23 +56,14 @@ export default function CampusMagazines() {
 
   return (
     <main className="page-wrapper">
-      <section className="page-hero" style={{ minHeight: 360 }}>
-        <img src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1920&q=80" alt="Campus Magazines" className="page-hero-image" />
-        <div className="page-hero-overlay" />
-        <div className="container page-hero-content">
-          <div className="breadcrumb animate-fade-in">
-            <Link to="/" className="breadcrumb-item">Home</Link>
-            <span className="breadcrumb-sep">›</span>
-            <Link to="/academics" className="breadcrumb-item">Academics</Link>
-            <span className="breadcrumb-sep">›</span>
-            <span className="breadcrumb-item active">Campus Magazines</span>
-          </div>
-          <h1 className="animate-fade-in-up">Campus Magazines</h1>
-          <p className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-            Three publications capturing the academic achievements, creative voices, and campus life at VWU and SVES.
-          </p>
-        </div>
-      </section>
+      {/* Hero */}
+      <PageHero
+        page="campus-magazines"
+        defaultImage="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1920&q=80"
+        defaultTitle="Campus Magazines"
+  defaultSubtitle="Three publications capturing the academic achievements, creative voices, and campus life at VWU and SVES."
+        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Student Life', to: '/student-life' }, { label: 'Campus Magazines' }]}
+      />
 
       {/* Magazines */}
       <section className="section bg-off-white">

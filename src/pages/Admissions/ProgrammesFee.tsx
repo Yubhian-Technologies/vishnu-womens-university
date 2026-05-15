@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import PageHero from '../../components/PageHero/PageHero';
 
 const btechPrograms = [
   { name: 'Computer Science & Engineering – AI & Data Science', code: 'CSE [AI & DS]', seats: 120 },
@@ -66,23 +67,14 @@ export default function ProgrammesFee() {
 
   return (
     <main className="page-wrapper">
-      <section className="page-hero" style={{ minHeight: 340 }}>
-        <img src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1920&q=80" alt="Programmes and Fee" className="page-hero-image" />
-        <div className="page-hero-overlay" />
-        <div className="container page-hero-content">
-          <div className="breadcrumb animate-fade-in">
-            <Link to="/" className="breadcrumb-item">Home</Link>
-            <span className="breadcrumb-sep">›</span>
-            <Link to="/admissions" className="breadcrumb-item">Admissions</Link>
-            <span className="breadcrumb-sep">›</span>
-            <span className="breadcrumb-item active">Programmes & Fee Structure</span>
-          </div>
-          <h1 className="animate-fade-in-up">Programmes & Fee Structure</h1>
-          <p className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-            Complete list of programs, intake capacities, and annual fee structure for AY 2025–26.
-          </p>
-        </div>
-      </section>
+      {/* Hero */}
+      <PageHero
+        page="programmes-fee"
+        defaultImage="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1920&q=80"
+        defaultTitle="Programmes & Fee Structure"
+  defaultSubtitle="Complete list of programs, intake capacities, and annual fee structure for AY 2025–26."
+        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Admissions', to: '/admissions' }, { label: 'Programmes & Fee' }]}
+      />
 
       {/* B.Tech */}
       <section className="section bg-off-white">

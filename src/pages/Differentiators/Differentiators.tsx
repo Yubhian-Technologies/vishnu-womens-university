@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { categories } from './differentiators.data';
+import PageHero from '../../components/PageHero/PageHero';
 
 export default function Differentiators() {
   useEffect(() => {
@@ -26,25 +27,13 @@ export default function Differentiators() {
   return (
     <main className="page-wrapper">
       {/* Hero */}
-      <section className="page-hero" style={{ minHeight: 400 }}>
-        <img
-          src="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=1920&q=80"
-          alt="Differentiators"
-          className="page-hero-image"
-        />
-        <div className="page-hero-overlay" />
-        <div className="container page-hero-content">
-          <div className="breadcrumb animate-fade-in">
-            <Link to="/" className="breadcrumb-item">Home</Link>
-            <span className="breadcrumb-sep">›</span>
-            <span className="breadcrumb-item active">Differentiators</span>
-          </div>
-          <h1 className="animate-fade-in-up">What Sets VWU Apart</h1>
-          <p className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-            {totalItems} unique initiatives spanning innovation, industry, research, global outreach, and student development — built to prepare women engineers for the world.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        page="differentiators"
+        defaultImage="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=1920&q=80"
+        defaultTitle="What Sets VWU Apart"
+  defaultSubtitle="Unique initiatives spanning innovation, industry, research, global outreach, and student development — built to prepare women engineers for the world."
+        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Differentiators' }]}
+      />
 
       {/* Stats bar */}
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-6) 0' }}>

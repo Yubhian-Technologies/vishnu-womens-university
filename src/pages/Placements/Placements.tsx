@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { placementItems } from './placements.data';
+import PageHero from '../../components/PageHero/PageHero';
 
 const stats = [
   { num: '1400+', label: 'Placements (2024–25)' },
@@ -31,25 +32,13 @@ export default function Placements() {
   return (
     <main className="page-wrapper">
       {/* Hero */}
-      <section className="page-hero" style={{ minHeight: 400 }}>
-        <img
-          src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=1920&q=80"
-          alt="Placements at VWU"
-          className="page-hero-image"
-        />
-        <div className="page-hero-overlay" />
-        <div className="container page-hero-content">
-          <div className="breadcrumb animate-fade-in">
-            <Link to="/" className="breadcrumb-item">Home</Link>
-            <span className="breadcrumb-sep">›</span>
-            <span className="breadcrumb-item active">Placements</span>
-          </div>
-          <h1 className="animate-fade-in-up">Placements & Careers</h1>
-          <p className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-            Connecting VWU talent with world-class opportunities — from campus recruitment and career training to global study pathways.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        page="placements"
+        defaultImage="https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=1920&q=80"
+        defaultTitle="Placements & Careers"
+  defaultSubtitle="Connecting VWU talent with world-class opportunities — from campus recruitment and career training to global study pathways."
+        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Placements' }]}
+      />
 
       {/* Stats bar */}
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-6) 0' }}>

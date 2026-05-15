@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import PageHero from '../../components/PageHero/PageHero';
 
 const facilities = [
   { id: 'smart-classrooms', icon: '📺', title: 'Smart Class Rooms', desc: '200+ digitally-equipped smart classrooms with projectors, interactive whiteboards, and live-streaming capability for hybrid learning.' },
@@ -42,23 +43,13 @@ export default function Campus() {
   return (
     <main className="page-wrapper">
       {/* Hero */}
-      <section className="page-hero">
-        <img src="https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=1920&q=80" alt="VWU campus" className="page-hero-image" />
-        <div className="page-hero-overlay" />
-        <div className="container page-hero-content">
-          <div className="breadcrumb animate-fade-in">
-            <Link to="/" className="breadcrumb-item">Home</Link>
-            <span className="breadcrumb-sep">›</span>
-            <Link to="/about" className="breadcrumb-item">Discover</Link>
-            <span className="breadcrumb-sep">›</span>
-            <span className="breadcrumb-item active">Campus Life</span>
-          </div>
-          <h1 className="animate-fade-in-up">Campus Life at VWU</h1>
-          <p className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-            A 100-acre campus in Bhimavaram designed to inspire learning, wellness, and community.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        page="campus"
+        defaultImage="https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=1920&q=80"
+        defaultTitle="Campus Life at VWU"
+  defaultSubtitle="A 100-acre campus in Bhimavaram designed to inspire learning, wellness, and community."
+        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Campus Life' }]}
+      />
 
       {/* Stats bar */}
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-6) 0' }}>

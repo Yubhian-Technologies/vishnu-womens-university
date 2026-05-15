@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import './Admissions.css';
+import PageHero from '../../components/PageHero/PageHero';
 
 const steps = [
   { step: 1, icon: '📝', title: 'Appear for EAPCET / ECET', desc: 'Qualify in AP EAPCET for B.Tech, AP ECET for lateral entry, or AP PGECET / ICET for PG programs. VWU Code: VISW.' },
@@ -78,29 +79,13 @@ export default function Admissions() {
   return (
     <main className="page-wrapper">
       {/* Hero */}
-      <section className="page-hero">
-        <img
-          src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1920&q=80"
-          alt="Students at VWU graduation ceremony"
-          className="page-hero-image"
-        />
-        <div className="page-hero-overlay" />
-        <div className="container page-hero-content">
-          <div className="breadcrumb animate-fade-in">
-            <Link to="/" className="breadcrumb-item">Home</Link>
-            <span className="breadcrumb-sep">›</span>
-            <span className="breadcrumb-item active">Admissions</span>
-          </div>
-          <h1 className="animate-fade-in-up">Your Journey Starts Here</h1>
-          <p className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-            Joining VWU is the first step toward a rewarding engineering career, a powerful network, and a future you'll be proud of.
-          </p>
-          <div style={{ display: 'flex', gap: 'var(--space-4)', marginTop: 'var(--space-6)', flexWrap: 'wrap' }} className="animate-fade-in-up">
-            <a href="#apply" className="btn btn-accent btn-lg">Apply for Free</a>
-            <a href="#visit" className="btn btn-secondary btn-lg">Schedule a Visit</a>
-          </div>
-        </div>
-      </section>
+      <PageHero
+        page="admissions"
+        defaultImage="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1920&q=80"
+        defaultTitle="Your Journey Starts Here"
+  defaultSubtitle="Joining VWU is the first step toward a rewarding engineering career, a powerful network, and a future you'll be proud of."
+        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Admissions' }]}
+      />
 
       {/* Admissions Hub */}
       <section className="section bg-off-white" style={{ paddingBottom: 0 }}>

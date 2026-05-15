@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { happenings } from './news-awards.data';
+import PageHero from '../../components/PageHero/PageHero';
 
 export default function Happenings() {
   useEffect(() => {
@@ -27,30 +28,13 @@ export default function Happenings() {
   return (
     <main className="page-wrapper">
       {/* Hero */}
-      <section className="page-hero" style={{ minHeight: 340 }}>
-        <img
-          src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1920&q=80"
-          alt="Happenings at VWU"
-          className="page-hero-image"
-        />
-        <div className="page-hero-overlay" />
-        <div className="container page-hero-content">
-          <div className="breadcrumb animate-fade-in">
-            <Link to="/" className="breadcrumb-item">Home</Link>
-            <span className="breadcrumb-sep">›</span>
-            <Link to="/news-awards" className="breadcrumb-item">News & Awards</Link>
-            <span className="breadcrumb-sep">›</span>
-            <span className="breadcrumb-item active">Happenings at VWU</span>
-          </div>
-          <div className="animate-fade-in-up" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'var(--color-accent)', color: 'var(--color-white)', fontSize: 'var(--text-xs)', fontWeight: 700, padding: '0.3rem 0.9rem', borderRadius: 'var(--radius-full)', marginBottom: 'var(--space-3)' }}>
-            <span>📅</span> Campus Events
-          </div>
-          <h1 className="animate-fade-in-up">Happenings at VWU</h1>
-          <p className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-            The latest workshops, MoUs, competitions, celebrations, and milestones from across the VWU campus.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        page="news-awards-happenings"
+        defaultImage="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1920&q=80"
+        defaultTitle="Happenings at VWU"
+  defaultSubtitle="The latest workshops, MoUs, competitions, celebrations, and milestones from across the VWU campus."
+        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'News & Awards', to: '/news-awards' }, { label: 'Happenings' }]}
+      />
 
       {/* Upcoming Events */}
       {upcoming.length > 0 && (

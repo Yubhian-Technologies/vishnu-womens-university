@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { govItems, govCategories } from './governance.data';
+import PageHero from '../../components/PageHero/PageHero';
 
 export default function Governance() {
   useEffect(() => {
@@ -24,25 +25,13 @@ export default function Governance() {
   return (
     <main className="page-wrapper">
       {/* Hero */}
-      <section className="page-hero" style={{ minHeight: 400 }}>
-        <img
-          src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1920&q=80"
-          alt="Governance at VWU"
-          className="page-hero-image"
-        />
-        <div className="page-hero-overlay" />
-        <div className="container page-hero-content">
-          <div className="breadcrumb animate-fade-in">
-            <Link to="/" className="breadcrumb-item">Home</Link>
-            <span className="breadcrumb-sep">›</span>
-            <span className="breadcrumb-item active">Governance</span>
-          </div>
-          <h1 className="animate-fade-in-up">Governance & Statutory Bodies</h1>
-          <p className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-            Transparent, accountable governance driving academic excellence — from apex statutory bodies to quality assurance committees.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        page="governance"
+        defaultImage="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1920&q=80"
+        defaultTitle="Governance & Statutory Bodies"
+  defaultSubtitle="Transparent, accountable governance driving academic excellence — from apex statutory bodies to quality assurance committees."
+        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Governance' }]}
+      />
 
       {/* Stats bar */}
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-6) 0' }}>

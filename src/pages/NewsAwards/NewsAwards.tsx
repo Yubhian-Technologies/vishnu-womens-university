@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import PageHero from '../../components/PageHero/PageHero';
 
 const sections = [
   {
@@ -51,25 +52,13 @@ export default function NewsAwards() {
   return (
     <main className="page-wrapper">
       {/* Hero */}
-      <section className="page-hero" style={{ minHeight: 400 }}>
-        <img
-          src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1920&q=80"
-          alt="News and Awards at VWU"
-          className="page-hero-image"
-        />
-        <div className="page-hero-overlay" />
-        <div className="container page-hero-content">
-          <div className="breadcrumb animate-fade-in">
-            <Link to="/" className="breadcrumb-item">Home</Link>
-            <span className="breadcrumb-sep">›</span>
-            <span className="breadcrumb-item active">News & Awards</span>
-          </div>
-          <h1 className="animate-fade-in-up">News & Awards</h1>
-          <p className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-            Celebrating VWU's achievements, events, and milestones — from national accreditations and rankings to campus happenings and visual memories.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        page="news-awards"
+        defaultImage="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1920&q=80"
+        defaultTitle="News & Awards"
+  defaultSubtitle="Celebrating VWU's achievements, events, and milestones — from national accreditations and rankings to campus happenings and visual memories."
+        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'News & Awards' }]}
+      />
 
       {/* Stats bar */}
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-6) 0' }}>

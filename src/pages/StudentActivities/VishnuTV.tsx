@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import PageHero from '../../components/PageHero/PageHero';
 
 const focusAreas = [
   { icon: '📚', title: 'Education', desc: 'Guest lectures, laboratory experiments, classroom presentations, and workshop recordings made accessible to the entire campus community.' },
@@ -47,23 +48,14 @@ export default function VishnuTV() {
 
   return (
     <main className="page-wrapper">
-      <section className="page-hero" style={{ minHeight: 360 }}>
-        <img src="https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=1920&q=80" alt="Vishnu TV Academy" className="page-hero-image" />
-        <div className="page-hero-overlay" />
-        <div className="container page-hero-content">
-          <div className="breadcrumb animate-fade-in">
-            <Link to="/" className="breadcrumb-item">Home</Link>
-            <span className="breadcrumb-sep">›</span>
-            <Link to="/academics" className="breadcrumb-item">Academics</Link>
-            <span className="breadcrumb-sep">›</span>
-            <span className="breadcrumb-item active">Vishnu TV Academy</span>
-          </div>
-          <h1 className="animate-fade-in-up">Vishnu TV Academy</h1>
-          <p className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-            By the students. For the students. — The only campus TV Academy in Andhra Pradesh.
-          </p>
-        </div>
-      </section>
+      {/* Hero */}
+      <PageHero
+        page="vishnu-tv"
+        defaultImage="https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=1920&q=80"
+        defaultTitle="Vishnu TV Academy"
+  defaultSubtitle="By the students. For the students. — The only campus TV Academy in Andhra Pradesh."
+        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Student Life', to: '/student-life' }, { label: 'Vishnu TV Academy' }]}
+      />
 
       {/* About */}
       <section className="section bg-white">

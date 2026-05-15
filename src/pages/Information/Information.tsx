@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import PageHero from '../../components/PageHero/PageHero';
 
 const academicCalendar = [
   { event: 'Odd Semester Commencement', date: 'July 15, 2026' },
@@ -92,23 +93,13 @@ export default function Information() {
   return (
     <main className="page-wrapper">
       {/* Hero */}
-      <section className="page-hero" style={{ minHeight: 300 }}>
-        <img src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1920&q=80" alt="VWU information" className="page-hero-image" />
-        <div className="page-hero-overlay" />
-        <div className="container page-hero-content">
-          <div className="breadcrumb animate-fade-in">
-            <Link to="/" className="breadcrumb-item">Home</Link>
-            <span className="breadcrumb-sep">›</span>
-            <Link to="/about" className="breadcrumb-item">Discover</Link>
-            <span className="breadcrumb-sep">›</span>
-            <span className="breadcrumb-item active">Information</span>
-          </div>
-          <h1 className="animate-fade-in-up">Information</h1>
-          <p className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-            Academic calendar, holidays, how to reach us, counselling, ICT platforms, and more.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        page="information"
+        defaultImage="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1920&q=80"
+        defaultTitle="Information"
+  defaultSubtitle="Academic calendar, holidays, how to reach us, counselling, ICT platforms, and more."
+        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Discover', to: '/' }, { label: 'Information' }]}
+      />
 
       {/* Tabs */}
       <section className="section bg-off-white">

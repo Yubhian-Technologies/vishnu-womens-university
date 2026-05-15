@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import PageHero from '../../components/PageHero/PageHero';
 
 const communities = [
   { icon: '📚', title: 'Rural Students', desc: 'Supporting economically disadvantaged rural students through educational outreach and skills development programs.' },
@@ -40,23 +41,14 @@ export default function SocialServices() {
 
   return (
     <main className="page-wrapper">
-      <section className="page-hero" style={{ minHeight: 360 }}>
-        <img src="https://images.unsplash.com/photo-1593113598332-cd288d649433?w=1920&q=80" alt="Social Services NSS" className="page-hero-image" />
-        <div className="page-hero-overlay" />
-        <div className="container page-hero-content">
-          <div className="breadcrumb animate-fade-in">
-            <Link to="/" className="breadcrumb-item">Home</Link>
-            <span className="breadcrumb-sep">›</span>
-            <Link to="/academics" className="breadcrumb-item">Academics</Link>
-            <span className="breadcrumb-sep">›</span>
-            <span className="breadcrumb-item active">Social Services</span>
-          </div>
-          <h1 className="animate-fade-in-up">Social Services</h1>
-          <p className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-            National Service Scheme at VWU — building engineers who serve their nation, communities, and society.
-          </p>
-        </div>
-      </section>
+      {/* Hero */}
+      <PageHero
+        page="social-services"
+        defaultImage="https://images.unsplash.com/photo-1593113598332-cd288d649433?w=1920&q=80"
+        defaultTitle="Social Services"
+  defaultSubtitle="National Service Scheme at VWU — building engineers who serve their nation, communities, and society."
+        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Student Life', to: '/student-life' }, { label: 'Social Services' }]}
+      />
 
       {/* NSS Philosophy */}
       <section className="section bg-white">

@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import PageHero from '../../components/PageHero/PageHero';
 
 const initiatives = [
   {
@@ -63,23 +64,14 @@ export default function ArtsCulture() {
 
   return (
     <main className="page-wrapper">
-      <section className="page-hero" style={{ minHeight: 360 }}>
-        <img src="https://images.unsplash.com/photo-1545959570-a94084071b5d?w=1920&q=80" alt="Arts and Culture" className="page-hero-image" />
-        <div className="page-hero-overlay" />
-        <div className="container page-hero-content">
-          <div className="breadcrumb animate-fade-in">
-            <Link to="/" className="breadcrumb-item">Home</Link>
-            <span className="breadcrumb-sep">›</span>
-            <Link to="/academics" className="breadcrumb-item">Academics</Link>
-            <span className="breadcrumb-sep">›</span>
-            <span className="breadcrumb-item active">Arts & Culture</span>
-          </div>
-          <h1 className="animate-fade-in-up">Arts & Culture</h1>
-          <p className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-            Cultivating creativity, heritage, and a sense of belonging — shaping cultured and responsible leaders of tomorrow.
-          </p>
-        </div>
-      </section>
+      {/* Hero */}
+      <PageHero
+        page="arts-culture"
+        defaultImage="https://images.unsplash.com/photo-1545959570-a94084071b5d?w=1920&q=80"
+        defaultTitle="Arts & Culture"
+  defaultSubtitle="Cultivating creativity, heritage, and a sense of belonging — shaping cultured and responsible leaders of tomorrow."
+        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Student Life', to: '/student-life' }, { label: 'Arts & Culture' }]}
+      />
 
       {/* Philosophy */}
       <section className="section bg-white">

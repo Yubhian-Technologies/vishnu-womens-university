@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { galleryAlbums, galleryYears } from './news-awards.data';
+import PageHero from '../../components/PageHero/PageHero';
 
 const yearColors: Record<number, string> = {
   2026: '#003087',
@@ -41,30 +42,13 @@ export default function Gallery() {
   return (
     <main className="page-wrapper">
       {/* Hero */}
-      <section className="page-hero" style={{ minHeight: 340 }}>
-        <img
-          src="https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=1920&q=80"
-          alt="VWU Gallery"
-          className="page-hero-image"
-        />
-        <div className="page-hero-overlay" />
-        <div className="container page-hero-content">
-          <div className="breadcrumb animate-fade-in">
-            <Link to="/" className="breadcrumb-item">Home</Link>
-            <span className="breadcrumb-sep">›</span>
-            <Link to="/news-awards" className="breadcrumb-item">News & Awards</Link>
-            <span className="breadcrumb-sep">›</span>
-            <span className="breadcrumb-item active">Gallery</span>
-          </div>
-          <div className="animate-fade-in-up" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'var(--color-accent)', color: 'var(--color-white)', fontSize: 'var(--text-xs)', fontWeight: 700, padding: '0.3rem 0.9rem', borderRadius: 'var(--radius-full)', marginBottom: 'var(--space-3)' }}>
-            <span>🖼️</span> Campus Life
-          </div>
-          <h1 className="animate-fade-in-up">Gallery</h1>
-          <p className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-            A visual archive of campus life at VWU — from national competitions and graduation days to cultural festivals and industry events.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        page="news-awards-gallery"
+        defaultImage="https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=1920&q=80"
+        defaultTitle="Gallery"
+  defaultSubtitle="A visual archive of campus life at VWU — from national competitions and graduation days to cultural festivals and industry events."
+        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'News & Awards', to: '/news-awards' }, { label: 'Gallery' }]}
+      />
 
       {/* Stats */}
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-6) 0' }}>

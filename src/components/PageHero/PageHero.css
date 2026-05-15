@@ -1,0 +1,196 @@
+/* =========================================================
+   PageHero — shared carousel hero for all pages
+   ========================================================= */
+
+.page-hero {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+/* Size variants */
+.page-hero--large  { min-height: 520px; }
+.page-hero--medium { min-height: 420px; }
+.page-hero--small  { min-height: 320px; }
+
+/* ---- Slides ---- */
+.page-hero__slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.7s ease;
+  z-index: 0;
+}
+
+.page-hero__slide--active {
+  opacity: 1;
+  z-index: 1;
+}
+
+.page-hero-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+/* ---- Overlay ---- */
+.page-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to right,
+    rgba(10, 30, 70, 0.78) 0%,
+    rgba(10, 30, 70, 0.55) 50%,
+    rgba(10, 30, 70, 0.35) 100%
+  );
+  z-index: 2;
+}
+
+/* ---- Content ---- */
+.page-hero-content {
+  position: relative;
+  z-index: 3;
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+  width: 100%;
+  max-width: 780px;
+}
+
+.page-hero__title {
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.15;
+  margin: 0.5rem 0 1rem;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.35);
+  animation-duration: 0.5s;
+  animation-fill-mode: both;
+}
+
+.page-hero__subtitle {
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.65;
+  max-width: 620px;
+  margin: 0 0 1.5rem;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.3);
+  animation-duration: 0.5s;
+  animation-delay: 0.1s;
+  animation-fill-mode: both;
+}
+
+.page-hero__cta {
+  animation-duration: 0.5s;
+  animation-delay: 0.2s;
+  animation-fill-mode: both;
+}
+
+/* ---- Loading state ---- */
+.page-hero--loading {
+  background: linear-gradient(135deg, var(--color-primary-dark, #0a1e46) 0%, var(--color-primary, #1a3a7a) 100%);
+  min-height: 420px;
+}
+
+/* ---- Arrows ---- */
+.page-hero__arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.2s;
+  backdrop-filter: blur(4px);
+}
+
+.page-hero__arrow:hover {
+  background: rgba(255, 255, 255, 0.28);
+  transform: translateY(-50%) scale(1.08);
+}
+
+.page-hero__arrow--prev { left: 1.25rem; }
+.page-hero__arrow--next { right: 1.25rem; }
+
+/* ---- Dots ---- */
+.page-hero__dots {
+  position: absolute;
+  bottom: 1.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.page-hero__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.25s, transform 0.25s;
+}
+
+.page-hero__dot--active {
+  background: #fff;
+  transform: scale(1.4);
+}
+
+/* ---- Counter ---- */
+.page-hero__counter {
+  position: absolute;
+  bottom: 1.2rem;
+  right: 1.5rem;
+  z-index: 10;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+/* ---- Breadcrumb (existing global styles, kept for reference) ---- */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+}
+
+.breadcrumb-item {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+}
+
+.breadcrumb-item.active { color: var(--color-accent, #c8a03c); font-weight: 600; }
+.breadcrumb-item:not(.active):hover { color: #fff; }
+.breadcrumb-sep { color: rgba(255, 255, 255, 0.4); font-size: 0.75rem; }
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+  .page-hero--large  { min-height: 380px; }
+  .page-hero--medium { min-height: 320px; }
+  .page-hero--small  { min-height: 260px; }
+
+  .page-hero__arrow { width: 36px; height: 36px; font-size: 1.2rem; }
+  .page-hero__arrow--prev { left: 0.5rem; }
+  .page-hero__arrow--next { right: 0.5rem; }
+}

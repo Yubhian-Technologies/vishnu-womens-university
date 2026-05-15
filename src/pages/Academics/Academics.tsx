@@ -1,16 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { findProgramBySlug } from './programs.data';
-import { usePageBanner } from '../../hooks/usePageBanner';
 import './Academics.css';
-
-const DEFAULT_BANNER = {
-  imageUrl: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=1920&q=80',
-  title: 'You Will Excel.',
-  subtitle: 'A comprehensive, industry-focused engineering education designed to develop your technical expertise, research skills, and professional leadership.',
-  ctaLabel: '',
-  ctaLink: '',
-};
+import PageHero from '../../components/PageHero/PageHero';
 
 const programCategories = [
   {
@@ -74,8 +66,6 @@ const studentActivities = [
 
 export default function Academics() {
   const [activeTab, setActiveTab] = useState('btech');
-  const firestoreBanner = usePageBanner('academics');
-  const banner = firestoreBanner ?? DEFAULT_BANNER;
 
   useEffect(() => {
     document.title = 'Academics | Vishnu Womens University';
@@ -100,39 +90,14 @@ export default function Academics() {
 
   return (
     <main className="page-wrapper">
-      {/* Hero — image and text managed via Admin → Banners → Academics */}
-      <section className="page-hero">
-        <img
-          src={banner.imageUrl}
-          alt={banner.title}
-          className="page-hero-image"
-        />
-        <div className="page-hero-overlay" />
-        <div className="container page-hero-content">
-          <div className="breadcrumb animate-fade-in">
-            <Link to="/" className="breadcrumb-item">Home</Link>
-            <span className="breadcrumb-sep">›</span>
-            <span className="breadcrumb-item active">Academics</span>
-          </div>
-          <h1 className="animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-            {banner.title}
-          </h1>
-          {banner.subtitle && (
-            <p className="animate-fade-in-up" style={{ animationDelay: '0.25s' }}>
-              {banner.subtitle}
-            </p>
-          )}
-          {banner.ctaLabel && banner.ctaLink && (
-            <Link
-              to={banner.ctaLink}
-              className="btn btn-primary animate-fade-in-up"
-              style={{ animationDelay: '0.4s', marginTop: '1rem', display: 'inline-block' }}
-            >
-              {banner.ctaLabel}
-            </Link>
-          )}
-        </div>
-      </section>
+      {/* Hero */}
+      <PageHero
+        page="academics"
+        defaultImage="https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=1920&q=80"
+        defaultTitle="You Will Excel."
+  defaultSubtitle="A comprehensive, industry-focused engineering education designed to develop your technical expertise, research skills, and professional leadership."
+        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Academics' }]}
+      />
 
       {/* Quick Stats */}
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-6) 0' }}>

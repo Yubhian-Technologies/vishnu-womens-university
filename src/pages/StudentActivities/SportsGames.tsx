@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import PageHero from '../../components/PageHero/PageHero';
 
 const facilities = [
   { icon: '💪', title: 'VISHNU Fitness Centre', desc: 'A fully equipped gymnasium with modern equipment, trained instructors, and scheduled fitness programs for all students.' },
@@ -45,23 +46,14 @@ export default function SportsGames() {
 
   return (
     <main className="page-wrapper">
-      <section className="page-hero" style={{ minHeight: 360 }}>
-        <img src="https://images.unsplash.com/photo-1546519638-68e109498ffc?w=1920&q=80" alt="Sports & Games at VWU" className="page-hero-image" />
-        <div className="page-hero-overlay" />
-        <div className="container page-hero-content">
-          <div className="breadcrumb animate-fade-in">
-            <Link to="/" className="breadcrumb-item">Home</Link>
-            <span className="breadcrumb-sep">›</span>
-            <Link to="/academics" className="breadcrumb-item">Academics</Link>
-            <span className="breadcrumb-sep">›</span>
-            <span className="breadcrumb-item active">Sports & Games</span>
-          </div>
-          <h1 className="animate-fade-in-up">Sports & Games</h1>
-          <p className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-            A sound mind dwells in a sound body — physical fitness is given utmost importance at VWU.
-          </p>
-        </div>
-      </section>
+      {/* Hero */}
+      <PageHero
+        page="sports-games"
+        defaultImage="https://images.unsplash.com/photo-1546519638-68e109498ffc?w=1920&q=80"
+        defaultTitle="Sports & Games"
+  defaultSubtitle="A sound mind dwells in a sound body — physical fitness is given utmost importance at VWU."
+        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Student Life', to: '/student-life' }, { label: 'Sports & Games' }]}
+      />
 
       {/* Philosophy */}
       <section className="section bg-white">

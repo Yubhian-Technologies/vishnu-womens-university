@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import PageHero from '../../components/PageHero/PageHero';
 
 const clubCategories = [
   {
@@ -66,23 +67,14 @@ export default function StudentClubs() {
 
   return (
     <main className="page-wrapper">
-      <section className="page-hero" style={{ minHeight: 360 }}>
-        <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1920&q=80" alt="Student Clubs" className="page-hero-image" />
-        <div className="page-hero-overlay" />
-        <div className="container page-hero-content">
-          <div className="breadcrumb animate-fade-in">
-            <Link to="/" className="breadcrumb-item">Home</Link>
-            <span className="breadcrumb-sep">›</span>
-            <Link to="/academics" className="breadcrumb-item">Academics</Link>
-            <span className="breadcrumb-sep">›</span>
-            <span className="breadcrumb-item active">Student Clubs</span>
-          </div>
-          <h1 className="animate-fade-in-up">Student Clubs</h1>
-          <p className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-            23 active clubs spanning technology, social service, arts, and culture — there is a place for every passion at VWU.
-          </p>
-        </div>
-      </section>
+      {/* Hero */}
+      <PageHero
+        page="student-clubs"
+        defaultImage="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1920&q=80"
+        defaultTitle="Student Clubs"
+  defaultSubtitle="23 active clubs spanning technology, social service, arts, and culture — there is a place for every passion at VWU."
+        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Student Life', to: '/student-life' }, { label: 'Student Clubs' }]}
+      />
 
       {/* Stats */}
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-6) 0' }}>
