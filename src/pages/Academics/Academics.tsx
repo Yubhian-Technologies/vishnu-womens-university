@@ -1,7 +1,16 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { findProgramBySlug } from './programs.data';
+import { usePageBanner } from '../../hooks/usePageBanner';
 import './Academics.css';
+
+const DEFAULT_BANNER = {
+  imageUrl: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=1920&q=80',
+  title: 'You Will Excel.',
+  subtitle: 'A comprehensive, industry-focused engineering education designed to develop your technical expertise, research skills, and professional leadership.',
+  ctaLabel: '',
+  ctaLink: '',
+};
 
 const programCategories = [
   {
@@ -65,6 +74,8 @@ const studentActivities = [
 
 export default function Academics() {
   const [activeTab, setActiveTab] = useState('btech');
+  const firestoreBanner = usePageBanner('academics');
+  const banner = firestoreBanner ?? DEFAULT_BANNER;
 
   useEffect(() => {
     document.title = 'Academics | Vishnu Womens University';
@@ -89,11 +100,11 @@ export default function Academics() {
 
   return (
     <main className="page-wrapper">
-      {/* Hero */}
+      {/* Hero — image and text managed via Admin → Banners → Academics */}
       <section className="page-hero">
         <img
-          src="https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=1920&q=80"
-          alt="Students studying in library"
+          src={banner.imageUrl}
+          alt={banner.title}
           className="page-hero-image"
         />
         <div className="page-hero-overlay" />
@@ -104,12 +115,22 @@ export default function Academics() {
             <span className="breadcrumb-item active">Academics</span>
           </div>
           <h1 className="animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-            You Will Excel.
+            {banner.title}
           </h1>
-          <p className="animate-fade-in-up" style={{ animationDelay: '0.25s' }}>
-            A comprehensive, industry-focused engineering education designed to develop
-            your technical expertise, research skills, and professional leadership.
-          </p>
+          {banner.subtitle && (
+            <p className="animate-fade-in-up" style={{ animationDelay: '0.25s' }}>
+              {banner.subtitle}
+            </p>
+          )}
+          {banner.ctaLabel && banner.ctaLink && (
+            <Link
+              to={banner.ctaLink}
+              className="btn btn-primary animate-fade-in-up"
+              style={{ animationDelay: '0.4s', marginTop: '1rem', display: 'inline-block' }}
+            >
+              {banner.ctaLabel}
+            </Link>
+          )}
         </div>
       </section>
 
