@@ -125,10 +125,7 @@ const navItems: NavItem[] = [
     label: 'Academics',
     children: [
       { label: 'Programs & Departments', path: '/academics' },
-      { label: 'Programmes & Fee Structure', path: '/programmes-fee-structure' },
-      { label: 'Admission Procedure', path: '/admission-procedure' },
-      { label: 'Result Analysis', path: '/result-analysis' },
-      { label: 'Academic Calendar', path: '/information' },
+      { label: 'Academic Calendar', path: '/information#academic-calendar' },
     ],
   },
   {
@@ -138,7 +135,7 @@ const navItems: NavItem[] = [
       { label: 'Programmes & Fee Structure', path: '/programmes-fee-structure' },
       { label: 'Admission Procedure', path: '/admission-procedure' },
       { label: 'Result Analysis', path: '/result-analysis' },
-      { label: 'How to Reach', path: '/information' },
+      { label: 'How to Reach', path: '/information#how-to-reach' },
     ],
   },
   {
