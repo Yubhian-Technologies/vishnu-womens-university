@@ -125,6 +125,7 @@ const navItems: NavItem[] = [
     label: 'Academics',
     children: [
       { label: 'Programs & Departments', path: '/academics' },
+      { label: 'Result Analysis', path: '/result-analysis' },
       { label: 'Academic Calendar', path: '/information#academic-calendar' },
     ],
   },
