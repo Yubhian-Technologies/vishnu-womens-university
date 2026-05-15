@@ -215,11 +215,11 @@
   gap: 3px;
   padding: 0 0.5rem;
   height: 100%;
-  font-size: 0.67rem;
+  font-size: 0.75rem;
   font-weight: 700;
   color: rgba(255,255,255,0.9);
   font-family: var(--font-sans);
-  letter-spacing: 0.025em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   transition: color var(--transition-fast);
   white-space: nowrap;
