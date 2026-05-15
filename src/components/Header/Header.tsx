@@ -32,7 +32,6 @@ const navItems: NavItem[] = [
           { label: 'Vision, Mission & Values', path: '/vision-mission' },
           { label: 'Institutional Development Plan', path: '/governance/idp' },
           { label: 'Organizational Chart', path: '/about#org-chart' },
-          { label: 'Governing Body', path: '/governance/governing-body' },
           { label: 'Core Executive Body', path: '/about#core-executive' },
           { label: 'About Society (SVES)', path: '/about-sves' },
         ],
