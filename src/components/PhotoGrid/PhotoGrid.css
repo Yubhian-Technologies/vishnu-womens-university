@@ -14,24 +14,114 @@
 
 .photo-grid {
   display: grid;
-  gap: var(--space-4);
+  gap: var(--space-3);
 }
 
+/* ---- Uniform grid ---- */
 .photo-grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
 .photo-grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
 .photo-grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
 
+.photo-grid-cols-2 .photo-grid-item,
+.photo-grid-cols-3 .photo-grid-item,
+.photo-grid-cols-4 .photo-grid-item { height: 220px; }
+
+/* ---- Collage — 3 columns ---- */
+/*
+  Layout for 6 images:
+  [ featured (wide+tall) ] [ 2 ] [ 3 ]
+  [ featured (wide+tall) ] [ 4 ] [ 5 ]
+  [  6 — full-width strip               ]
+
+  Layout for 9 images: same top 5, then:
+  [ 6 ] [ 7 ] [ 8 ] [ 9 — wide ]
+*/
+.photo-grid-collage-3 {
+  grid-template-columns: 1.7fr 1fr 1fr;
+  grid-auto-rows: 210px;
+}
+
+.photo-grid-collage-3 .photo-grid-item { height: auto; }
+
+/* featured: tall (spans 2 rows) */
+.photo-grid-collage-3 .photo-grid-item--featured {
+  grid-row: span 2;
+}
+
+/* 6th item: full-width strip */
+.photo-grid-collage-3 .photo-grid-item:nth-child(6) {
+  grid-column: 1 / -1;
+  height: 200px;
+  grid-row: auto;
+}
+
+/* 9th item: spans 2 cols */
+.photo-grid-collage-3 .photo-grid-item:nth-child(9) {
+  grid-column: span 2;
+}
+
+/* 12th item: full-width */
+.photo-grid-collage-3 .photo-grid-item:nth-child(12) {
+  grid-column: 1 / -1;
+  height: 200px;
+  grid-row: auto;
+}
+
+/* ---- Collage — 4 columns ---- */
+/*
+  Layout for 8 images:
+  [ featured (2col+2row) ] [ 2 ] [ 3 ]
+  [ featured (2col+2row) ] [ 4 ] [ 5 ]
+  [ 6 ] [ 7 ] [  8 — wide  ]
+*/
+.photo-grid-collage-4 {
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-auto-rows: 200px;
+}
+
+.photo-grid-collage-4 .photo-grid-item { height: auto; }
+
+.photo-grid-collage-4 .photo-grid-item--featured {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+
+/* 6th: spans 2 cols */
+.photo-grid-collage-4 .photo-grid-item:nth-child(6) {
+  grid-column: span 2;
+}
+
+/* 9th: full-width */
+.photo-grid-collage-4 .photo-grid-item:nth-child(9) {
+  grid-column: 1 / -1;
+  height: 200px;
+  grid-row: auto;
+}
+
+/* ---- Collage — 2 columns ---- */
+.photo-grid-collage-2 {
+  grid-template-columns: 1.4fr 1fr;
+  grid-auto-rows: 260px;
+}
+
+.photo-grid-collage-2 .photo-grid-item { height: auto; }
+
+.photo-grid-collage-2 .photo-grid-item--featured {
+  grid-row: span 2;
+}
+
+/* ---- Shared item styles ---- */
 .photo-grid-item {
   position: relative;
   border: none;
   padding: 0;
-  background: none;
+  background: var(--color-light-gray);
   cursor: zoom-in;
   border-radius: var(--radius-md);
   overflow: hidden;
-  height: 220px;
   display: block;
   width: 100%;
+  min-height: 160px;
 }
 
 .photo-grid-item img {
@@ -43,31 +133,35 @@
 }
 
 .photo-grid-item:hover img {
-  transform: scale(1.07);
+  transform: scale(1.06);
 }
 
+/* Caption — always visible at bottom of featured, hover for others */
 .photo-grid-caption {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  background: linear-gradient(to top, rgba(8,28,21,0.85) 0%, transparent 100%);
-  color: rgba(255,255,255,0.92);
+  background: linear-gradient(to top, rgba(8,28,21,0.82) 0%, rgba(8,28,21,0.1) 70%, transparent 100%);
+  color: rgba(255,255,255,0.95);
   font-size: var(--text-xs);
   font-family: var(--font-sans);
-  padding: var(--space-4) var(--space-3) var(--space-2);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: var(--space-6) var(--space-3) var(--space-2);
   transform: translateY(100%);
   transition: transform 0.3s ease;
 }
 
-.photo-grid-item:hover .photo-grid-caption {
+.photo-grid-item:hover .photo-grid-caption,
+.photo-grid-item--featured .photo-grid-caption {
   transform: translateY(0);
 }
 
 .photo-grid-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(8,28,21,0.25);
+  background: rgba(8,28,21,0.18);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -194,25 +288,75 @@
 /* ===== Responsive ===== */
 @media (max-width: 1024px) {
   .photo-grid-cols-4 { grid-template-columns: repeat(2, 1fr); }
+  .photo-grid-collage-4 {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+  .photo-grid-collage-4 .photo-grid-item--featured {
+    grid-column: span 2;
+  }
 }
 
 @media (max-width: 768px) {
+  /* All collage variants collapse to 2 columns */
+  .photo-grid-collage-3,
+  .photo-grid-collage-4 {
+    grid-template-columns: 1fr 1fr;
+    grid-auto-rows: 160px;
+  }
+
+  .photo-grid-collage-3 .photo-grid-item--featured,
+  .photo-grid-collage-4 .photo-grid-item--featured {
+    grid-column: 1 / -1;
+    grid-row: auto;
+    height: 220px;
+  }
+
+  /* Remove special spanning on mobile — everything flows as 2-col */
+  .photo-grid-collage-3 .photo-grid-item:nth-child(6),
+  .photo-grid-collage-3 .photo-grid-item:nth-child(9),
+  .photo-grid-collage-3 .photo-grid-item:nth-child(12),
+  .photo-grid-collage-4 .photo-grid-item:nth-child(6),
+  .photo-grid-collage-4 .photo-grid-item:nth-child(9) {
+    grid-column: auto;
+    height: auto;
+  }
+
+  .photo-grid-collage-2 {
+    grid-template-columns: 1fr 1fr;
+    grid-auto-rows: 160px;
+  }
+  .photo-grid-collage-2 .photo-grid-item--featured {
+    grid-column: 1 / -1;
+    grid-row: auto;
+    height: 220px;
+  }
+
+  /* Uniform grid mobile */
   .photo-grid-cols-2,
   .photo-grid-cols-3,
   .photo-grid-cols-4 {
     grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-3);
+    gap: var(--space-2);
   }
 
-  .photo-grid-item { height: 160px; }
+  .photo-grid-cols-2 .photo-grid-item,
+  .photo-grid-cols-3 .photo-grid-item,
+  .photo-grid-cols-4 .photo-grid-item { height: 160px; }
 
   .photo-lightbox-prev { left: var(--space-2); width: 38px; height: 38px; font-size: 1.4rem; }
   .photo-lightbox-next { right: var(--space-2); width: 38px; height: 38px; font-size: 1.4rem; }
 }
 
 @media (max-width: 480px) {
-  .photo-grid-cols-3,
-  .photo-grid-cols-4 {
+  .photo-grid-collage-3,
+  .photo-grid-collage-4,
+  .photo-grid-collage-2 {
     grid-template-columns: 1fr 1fr;
+    grid-auto-rows: 130px;
+  }
+  .photo-grid-collage-3 .photo-grid-item--featured,
+  .photo-grid-collage-4 .photo-grid-item--featured,
+  .photo-grid-collage-2 .photo-grid-item--featured {
+    height: 180px;
   }
 }

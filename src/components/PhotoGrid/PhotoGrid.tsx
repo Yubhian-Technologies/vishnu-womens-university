@@ -14,6 +14,7 @@ interface PhotoGridProps {
   title?: string;
   subtitle?: string;
   columns?: 2 | 3 | 4;
+  variant?: 'grid' | 'collage';
   showGalleryLink?: boolean;
   className?: string;
 }
@@ -24,6 +25,7 @@ export default function PhotoGrid({
   title = 'Campus in Pictures',
   subtitle,
   columns = 3,
+  variant = 'collage',
   showGalleryLink = true,
   className = '',
 }: PhotoGridProps) {
@@ -45,7 +47,9 @@ export default function PhotoGrid({
     return () => { document.body.style.overflow = ''; };
   }, [lightbox]);
 
-  const colClass = `photo-grid-cols-${columns}`;
+  const gridClass = variant === 'collage'
+    ? `photo-grid-collage photo-grid-collage-${columns}`
+    : `photo-grid-cols-${columns}`;
 
   return (
     <div className={`photo-grid-wrapper ${className}`}>
@@ -57,12 +61,12 @@ export default function PhotoGrid({
         </div>
       )}
 
-      <div className={`photo-grid ${colClass}`}>
+      <div className={`photo-grid ${gridClass}`}>
         {images.map((img, i) => (
           <button
             key={i}
-            className="photo-grid-item reveal"
-            data-delay={`${(i % columns) * 60}`}
+            className={`photo-grid-item reveal${i === 0 && variant === 'collage' ? ' photo-grid-item--featured' : ''}`}
+            data-delay={`${Math.min(i, 4) * 60}`}
             onClick={() => setLightbox(i)}
             aria-label={`View ${img.alt}`}
           >
