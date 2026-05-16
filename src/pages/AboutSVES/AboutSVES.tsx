@@ -189,7 +189,15 @@ export default function AboutSVES() {
             label="Our Campuses"
             title="SVES Institutions in Pictures"
             subtitle="Glimpses from the campuses, events, and milestones of the Sri Vishnu Educational Society."
+            highlights={[
+              '11 institutions across Andhra Pradesh & Telangana',
+              '4 campuses — Bhimavaram, Narsapur, Hyderabad, Medak',
+              '50,000+ students educated annually',
+              '25+ years of educational leadership',
+              'Engineering, Pharmacy, Dental, School & beyond',
+            ]}
             columns={3}
+            layout="side-text-reverse"
           />
         </div>
       </section>

@@ -145,7 +145,14 @@ export default function VisionMission() {
             label="Our Values in Action"
             title="Where Purpose Meets Practice"
             subtitle="Every corner of VWU reflects the values we stand for — in classrooms, on the field, and in the community."
+            highlights={[
+              'Excellence in teaching, research & outcomes',
+              'Innovation through TBI, STI Hub & AICTE IDEA Lab',
+              'Community service via NSS & Dr. B.V. Raju Foundation',
+              'Environmental stewardship — green campus initiative',
+            ]}
             columns={4}
+            layout="side-text"
             showGalleryLink={false}
           />
         </div>

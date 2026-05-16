@@ -139,7 +139,15 @@ export default function Governance() {
             label="Institutional Life"
             title="Governance in Action"
             subtitle="From council meetings to convocation, VWU's governance is built on transparency, accountability, and a commitment to excellence."
+            highlights={[
+              'NAAC accredited institution',
+              'NBA-DCP programme accreditation',
+              'UGC Autonomous status since 2014',
+              'AICTE approved with NBA outcomes framework',
+              'ISO-certified quality management systems',
+            ]}
             columns={3}
+            layout="side-text-reverse"
           />
         </div>
       </section>

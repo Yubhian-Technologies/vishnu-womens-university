@@ -244,7 +244,15 @@ export default function StudentLife() {
             label="Campus Moments"
             title="Life Beyond the Classroom"
             subtitle="From cultural fests and sports tournaments to club activities and quiet campus walks — VWU student life is vibrant and full."
+            highlights={[
+              'Annual Technova — national-level symposium',
+              '20+ student clubs across arts, tech & service',
+              'NSS, NCC & social service programs',
+              'Inter-collegiate sports & cultural competitions',
+              'Vishnu TV Academy & Radio Vishnu 90.4 FM',
+            ]}
             columns={3}
+            layout="side-text-reverse"
           />
         </div>
       </section>

@@ -237,8 +237,16 @@ export default function Admissions() {
             images={admissionsPhotos}
             label="Why VWU"
             title="Experience the VWU Difference"
-            subtitle="From modern labs and smart classrooms to hostels, sports grounds, and a buzzing placement season — see what awaits you."
+            subtitle="From modern labs and smart classrooms to hostels, sports grounds, and a buzzing placement season — see what awaits you at VWU."
+            highlights={[
+              'EAPCET college code: VISW',
+              '1,400+ placements in 2024–25 alone',
+              'Highest package: ₹52 LPA',
+              '100% scholarship coverage available for eligible students',
+              'Campus visit & virtual tour options available',
+            ]}
             columns={4}
+            layout="side-text"
           />
         </div>
       </section>

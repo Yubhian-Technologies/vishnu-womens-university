@@ -220,7 +220,15 @@ export default function About() {
             label="Campus Life"
             title="Life at Vishnu Womens University"
             subtitle="A glimpse of the people, spaces, and moments that make VWU a distinctive place to learn and grow."
+            highlights={[
+              '100-acre green campus in Bhimavaram',
+              '200+ smart classrooms & 50+ research labs',
+              'Olympic-standard sports & fitness facilities',
+              'Secure on-campus hostels with 1 Gbps Wi-Fi',
+              '1,400+ placements recorded in 2024–25',
+            ]}
             columns={3}
+            layout="side-text"
           />
         </div>
       </section>

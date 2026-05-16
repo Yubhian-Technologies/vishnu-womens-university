@@ -300,8 +300,16 @@ export default function Information() {
             images={infoPhotos}
             label="Campus Life"
             title="VWU in Pictures"
-            subtitle="A visual glimpse of the campus, facilities, and everyday life at Vishnu Womens University."
+            subtitle="A visual glimpse of the campus, facilities, and everyday life at Vishnu Womens University in Bhimavaram."
+            highlights={[
+              'Located in Vishnupur, 3 km from Bhimavaram',
+              'Well connected by road, rail, and air',
+              'Academic calendar follows JNTUK schedule',
+              'Vishnu LMS, e-Library & ERP systems in use',
+              'NPTEL & SWAYAM MOOCs integrated into curriculum',
+            ]}
             columns={3}
+            layout="side-text"
           />
         </div>
       </section>

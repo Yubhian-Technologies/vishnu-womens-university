@@ -119,8 +119,16 @@ export default function Campus() {
             images={campusGalleryPhotos}
             label="Gallery"
             title="A Glimpse of VWU Campus"
-            subtitle="Explore the spaces and moments that define everyday life at Vishnu Womens University."
+            subtitle="Explore the spaces and moments that define everyday life at Vishnu Womens University — from labs and classrooms to courts and canteens."
+            highlights={[
+              'Main auditorium seats 2,000+ students',
+              '24×7 secured campus with CCTV monitoring',
+              'Dedicated travel desk & transport network',
+              'On-campus temples, ATM & photocopying services',
+              'Fully accessible infrastructure for all students',
+            ]}
             columns={4}
+            layout="side-text"
           />
         </div>
       </section>

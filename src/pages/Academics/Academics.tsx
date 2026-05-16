@@ -316,7 +316,15 @@ export default function Academics() {
             label="Academic Life"
             title="Learning, Research & Innovation"
             subtitle="Inside VWU's labs, classrooms, and events — where students are trained to think, build, and lead."
+            highlights={[
+              '9 B.Tech specialisations with UGC Autonomous curriculum',
+              '50+ specialised labs across all departments',
+              '200+ smart classrooms with interactive boards',
+              'IEEE, Springer & NPTEL digital library access',
+              'Industry-sponsored research & funded projects',
+            ]}
             columns={3}
+            layout="side-text-reverse"
           />
         </div>
       </section>

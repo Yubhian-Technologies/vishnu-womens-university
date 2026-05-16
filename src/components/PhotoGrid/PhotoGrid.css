@@ -1,8 +1,73 @@
-/* ===== Photo Grid ===== */
+/* ===== Photo Grid Wrapper ===== */
 .photo-grid-wrapper {
   width: 100%;
 }
 
+/* ===== Side-text layout ===== */
+.photo-side-layout {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: var(--space-12);
+  align-items: center;
+}
+
+.photo-side-layout.photo-side-reversed {
+  grid-template-columns: 1fr 340px;
+}
+
+.photo-side-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.photo-side-text .section-title {
+  margin-bottom: var(--space-4);
+}
+
+.photo-text-desc {
+  font-size: var(--text-base);
+  color: var(--color-text-light);
+  line-height: 1.75;
+  margin-bottom: var(--space-5);
+}
+
+.photo-highlights {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--space-6) 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.photo-highlights li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--color-text);
+  line-height: 1.6;
+}
+
+.photo-highlight-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--color-accent);
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 6px;
+}
+
+.photo-text-cta {
+  align-self: flex-start;
+}
+
+.photo-side-images {
+  min-width: 0;
+}
+
+/* ===== Default layout header ===== */
 .photo-grid-header {
   text-align: center;
   margin-bottom: var(--space-10);
@@ -12,6 +77,12 @@
   margin: 0 auto;
 }
 
+.photo-grid-footer {
+  text-align: center;
+  margin-top: var(--space-8);
+}
+
+/* ===== Photo Grid ===== */
 .photo-grid {
   display: grid;
   gap: var(--space-3);
@@ -28,13 +99,9 @@
 
 /* ---- Collage — 3 columns ---- */
 /*
-  Layout for 6 images:
   [ featured (wide+tall) ] [ 2 ] [ 3 ]
   [ featured (wide+tall) ] [ 4 ] [ 5 ]
-  [  6 — full-width strip               ]
-
-  Layout for 9 images: same top 5, then:
-  [ 6 ] [ 7 ] [ 8 ] [ 9 — wide ]
+  [  6  —  full-width strip              ]
 */
 .photo-grid-collage-3 {
   grid-template-columns: 1.7fr 1fr 1fr;
@@ -43,24 +110,20 @@
 
 .photo-grid-collage-3 .photo-grid-item { height: auto; }
 
-/* featured: tall (spans 2 rows) */
 .photo-grid-collage-3 .photo-grid-item--featured {
   grid-row: span 2;
 }
 
-/* 6th item: full-width strip */
 .photo-grid-collage-3 .photo-grid-item:nth-child(6) {
   grid-column: 1 / -1;
   height: 200px;
   grid-row: auto;
 }
 
-/* 9th item: spans 2 cols */
 .photo-grid-collage-3 .photo-grid-item:nth-child(9) {
   grid-column: span 2;
 }
 
-/* 12th item: full-width */
 .photo-grid-collage-3 .photo-grid-item:nth-child(12) {
   grid-column: 1 / -1;
   height: 200px;
@@ -69,13 +132,12 @@
 
 /* ---- Collage — 4 columns ---- */
 /*
-  Layout for 8 images:
-  [ featured (2col+2row) ] [ 2 ] [ 3 ]
-  [ featured (2col+2row) ] [ 4 ] [ 5 ]
-  [ 6 ] [ 7 ] [  8 — wide  ]
+  [ featured (2col+2row) ] [2] [3]
+  [ featured (2col+2row) ] [4] [5]
+  [6] [7] [  8 — wide  ]
 */
 .photo-grid-collage-4 {
-  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-columns: repeat(4, 1fr);
   grid-auto-rows: 200px;
 }
 
@@ -86,12 +148,10 @@
   grid-row: span 2;
 }
 
-/* 6th: spans 2 cols */
 .photo-grid-collage-4 .photo-grid-item:nth-child(6) {
   grid-column: span 2;
 }
 
-/* 9th: full-width */
 .photo-grid-collage-4 .photo-grid-item:nth-child(9) {
   grid-column: 1 / -1;
   height: 200px;
@@ -110,7 +170,7 @@
   grid-row: span 2;
 }
 
-/* ---- Shared item styles ---- */
+/* ===== Item base ===== */
 .photo-grid-item {
   position: relative;
   border: none;
@@ -129,20 +189,52 @@
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: transform 0.45s ease;
+  transition: transform 0.5s ease;
 }
 
 .photo-grid-item:hover img {
   transform: scale(1.06);
 }
 
-/* Caption — always visible at bottom of featured, hover for others */
+/* ===== Scroll-in animations ===== */
+/* Initial hidden states */
+.photo-anim-scale {
+  opacity: 0;
+  transform: scale(0.88);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.photo-anim-up {
+  opacity: 0;
+  transform: translateY(48px);
+  transition: opacity 0.65s ease, transform 0.65s ease;
+}
+
+.photo-anim-left {
+  opacity: 0;
+  transform: translateX(-44px);
+  transition: opacity 0.65s ease, transform 0.65s ease;
+}
+
+.photo-anim-right {
+  opacity: 0;
+  transform: translateX(44px);
+  transition: opacity 0.65s ease, transform 0.65s ease;
+}
+
+/* Revealed state */
+.photo-grid-item.photo-animated {
+  opacity: 1;
+  transform: none;
+}
+
+/* ===== Caption ===== */
 .photo-grid-caption {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  background: linear-gradient(to top, rgba(8,28,21,0.82) 0%, rgba(8,28,21,0.1) 70%, transparent 100%);
+  background: linear-gradient(to top, rgba(8,28,21,0.85) 0%, rgba(8,28,21,0.1) 70%, transparent 100%);
   color: rgba(255,255,255,0.95);
   font-size: var(--text-xs);
   font-family: var(--font-sans);
@@ -151,6 +243,7 @@
   padding: var(--space-6) var(--space-3) var(--space-2);
   transform: translateY(100%);
   transition: transform 0.3s ease;
+  pointer-events: none;
 }
 
 .photo-grid-item:hover .photo-grid-caption,
@@ -158,6 +251,7 @@
   transform: translateY(0);
 }
 
+/* ===== Hover overlay ===== */
 .photo-grid-overlay {
   position: absolute;
   inset: 0;
@@ -167,6 +261,7 @@
   justify-content: center;
   opacity: 0;
   transition: opacity 0.3s ease;
+  pointer-events: none;
 }
 
 .photo-grid-item:hover .photo-grid-overlay {
@@ -178,11 +273,6 @@
   font-size: 1.8rem;
   line-height: 1;
   text-shadow: 0 2px 8px rgba(0,0,0,0.4);
-}
-
-.photo-grid-footer {
-  text-align: center;
-  margin-top: var(--space-8);
 }
 
 /* ===== Lightbox ===== */
@@ -241,9 +331,7 @@
   z-index: 1;
 }
 
-.photo-lightbox-close:hover {
-  background: rgba(255,255,255,0.2);
-}
+.photo-lightbox-close:hover { background: rgba(255,255,255,0.2); }
 
 .photo-lightbox-prev,
 .photo-lightbox-next {
@@ -268,11 +356,8 @@
 
 .photo-lightbox-prev { left: var(--space-5); }
 .photo-lightbox-next { right: var(--space-5); }
-
 .photo-lightbox-prev:hover,
-.photo-lightbox-next:hover {
-  background: rgba(255,255,255,0.2);
-}
+.photo-lightbox-next:hover { background: rgba(255,255,255,0.2); }
 
 .photo-lightbox-counter {
   position: absolute;
@@ -286,18 +371,41 @@
 }
 
 /* ===== Responsive ===== */
-@media (max-width: 1024px) {
-  .photo-grid-cols-4 { grid-template-columns: repeat(2, 1fr); }
-  .photo-grid-collage-4 {
-    grid-template-columns: 1fr 1fr 1fr;
+@media (max-width: 1200px) {
+  .photo-side-layout {
+    grid-template-columns: 280px 1fr;
+    gap: var(--space-8);
   }
-  .photo-grid-collage-4 .photo-grid-item--featured {
-    grid-column: span 2;
+  .photo-side-layout.photo-side-reversed {
+    grid-template-columns: 1fr 280px;
   }
 }
 
+@media (max-width: 1024px) {
+  .photo-grid-cols-4 { grid-template-columns: repeat(2, 1fr); }
+
+  .photo-grid-collage-4 {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .photo-side-layout,
+  .photo-side-layout.photo-side-reversed {
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+  }
+
+  .photo-side-layout.photo-side-reversed .photo-side-images {
+    order: -1;
+  }
+
+  .photo-text-cta { align-self: center; }
+  .photo-side-text { text-align: center; }
+  .photo-highlights li { justify-content: flex-start; }
+}
+
 @media (max-width: 768px) {
-  /* All collage variants collapse to 2 columns */
   .photo-grid-collage-3,
   .photo-grid-collage-4 {
     grid-template-columns: 1fr 1fr;
@@ -311,7 +419,6 @@
     height: 220px;
   }
 
-  /* Remove special spanning on mobile — everything flows as 2-col */
   .photo-grid-collage-3 .photo-grid-item:nth-child(6),
   .photo-grid-collage-3 .photo-grid-item:nth-child(9),
   .photo-grid-collage-3 .photo-grid-item:nth-child(12),
@@ -331,14 +438,12 @@
     height: 220px;
   }
 
-  /* Uniform grid mobile */
   .photo-grid-cols-2,
   .photo-grid-cols-3,
   .photo-grid-cols-4 {
     grid-template-columns: repeat(2, 1fr);
     gap: var(--space-2);
   }
-
   .photo-grid-cols-2 .photo-grid-item,
   .photo-grid-cols-3 .photo-grid-item,
   .photo-grid-cols-4 .photo-grid-item { height: 160px; }
@@ -351,12 +456,11 @@
   .photo-grid-collage-3,
   .photo-grid-collage-4,
   .photo-grid-collage-2 {
-    grid-template-columns: 1fr 1fr;
     grid-auto-rows: 130px;
   }
   .photo-grid-collage-3 .photo-grid-item--featured,
   .photo-grid-collage-4 .photo-grid-item--featured,
   .photo-grid-collage-2 .photo-grid-item--featured {
-    height: 180px;
+    height: 190px;
   }
 }
