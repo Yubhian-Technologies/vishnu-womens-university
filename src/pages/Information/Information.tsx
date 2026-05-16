@@ -42,7 +42,7 @@ const ictPlatforms = [
 ];
 
 const howToReach = [
-  { mode: '✈️ By Air', desc: 'Nearest airport: Rajamahendravaram (Rajahmundry) Airport — approximately 70 km from Bhimavaram. Taxis and buses are available from the airport.' },
+  { mode: '✈️ By Air', desc: 'Three airports serve Bhimavaram:\n• Rajamahendravaram (Rajahmundry) Airport — approx. 70 km away.\n• Gannavaram (Vijayawada) Airport — approx. 120 km away.\n• Visakhapatnam (VSKP) Airport — approx. 250 km away.\nTaxis and cab services are available from all three airports.' },
   { mode: '🚂 By Train', desc: 'Bhimavaram Town (BVRT) and Bhimavaram Junction (BZM) are well-connected to major cities. Direct trains from Hyderabad, Visakhapatnam, Chennai, and Vijayawada.' },
   { mode: '🚌 By Road', desc: 'Bhimavaram is accessible via NH-16 (East Coast Road). Regular APSRTC buses operate from Vijayawada (120 km), Hyderabad (400 km), and Visakhapatnam (250 km).' },
   { mode: '🚗 By Car', desc: 'VWU is located in Vishnupur, 3 km from Bhimavaram on the Tadepalligudem Road. Easily accessible by road from all major cities in Andhra Pradesh.' },
@@ -192,7 +192,7 @@ export default function Information() {
                     <span style={{ fontSize: '1.8rem', flexShrink: 0 }}>{r.mode.split(' ')[0]}</span>
                     <div>
                       <h3 style={{ fontFamily: 'var(--font-sans)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>{r.mode.split(' ').slice(1).join(' ')}</h3>
-                      <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.7 }}>{r.desc}</p>
+                      <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.7, whiteSpace: 'pre-line' }}>{r.desc}</p>
                     </div>
                   </div>
                 ))}
