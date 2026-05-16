@@ -10,7 +10,6 @@ const svesPhotos = [
   { src: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=800&q=80', alt: 'Students at campus event', caption: 'Student Events' },
   { src: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800&q=80', alt: 'Graduation ceremony', caption: 'Convocation' },
   { src: 'https://images.unsplash.com/photo-1544531585-9847b68c8c86?w=800&q=80', alt: 'Academic conference', caption: 'Conferences & Seminars' },
-  { src: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=800&q=80', alt: 'Modern classrooms', caption: 'Smart Classrooms' },
 ];
 
 const campuses = [
@@ -196,7 +195,7 @@ export default function AboutSVES() {
               '25+ years of educational leadership',
               'Engineering, Pharmacy, Dental, School & beyond',
             ]}
-            columns={3}
+            columns={2}
             layout="side-text-reverse"
           />
         </div>

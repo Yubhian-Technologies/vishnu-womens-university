@@ -10,10 +10,6 @@ const campusPhotos = [
   { src: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&q=80', alt: 'Central library', caption: 'Central Library' },
   { src: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80', alt: 'Students studying', caption: 'Student Collaboration' },
   { src: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&q=80', alt: 'Sports facilities', caption: 'Sports Facilities' },
-  { src: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&q=80', alt: 'Campus events and auditorium', caption: 'Auditorium & Events' },
-  { src: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=800&q=80', alt: 'Technical workshops', caption: 'Workshops & Hackathons' },
-  { src: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800&q=80', alt: 'Graduation ceremony', caption: 'Convocation' },
-  { src: 'https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=800&q=80', alt: 'VWU campus aerial', caption: 'VWU Campus' },
 ];
 
 const quickStats = [
@@ -227,7 +223,7 @@ export default function About() {
               'Secure on-campus hostels with 1 Gbps Wi-Fi',
               '1,400+ placements recorded in 2024–25',
             ]}
-            columns={3}
+            columns={2}
             layout="side-text"
           />
         </div>

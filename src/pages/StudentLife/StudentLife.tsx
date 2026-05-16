@@ -9,7 +9,6 @@ const studentLifePhotos = [
   { src: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&q=80', alt: 'Sports activities', caption: 'Sports & Fitness' },
   { src: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=800&q=80', alt: 'Campus festivals', caption: 'Campus Festivals' },
   { src: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=800&q=80', alt: 'Student clubs and workshops', caption: 'Club Activities' },
-  { src: 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?w=800&q=80', alt: 'Green campus walks', caption: 'Campus Life' },
   { src: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80', alt: 'Study groups and projects', caption: 'Teamwork' },
 ];
 
@@ -251,7 +250,7 @@ export default function StudentLife() {
               'Inter-collegiate sports & cultural competitions',
               'Vishnu TV Academy & Radio Vishnu 90.4 FM',
             ]}
-            columns={3}
+            columns={2}
             layout="side-text-reverse"
           />
         </div>

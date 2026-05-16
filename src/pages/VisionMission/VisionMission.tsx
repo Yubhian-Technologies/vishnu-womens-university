@@ -7,8 +7,9 @@ import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
 const inspirationPhotos = [
   { src: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80', alt: 'Students collaborating', caption: 'Collaboration' },
   { src: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&q=80', alt: 'Research and innovation', caption: 'Research & Innovation' },
-  { src: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&q=80', alt: 'Sports and wellness', caption: 'Sports & Wellness' },
   { src: 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?w=800&q=80', alt: 'Green campus environment', caption: 'Green Campus' },
+  { src: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&q=80', alt: 'Sports and wellness', caption: 'Sports & Wellness' },
+  { src: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=800&q=80', alt: 'Smart classrooms', caption: 'Smart Classrooms' },
 ];
 
 const missionPoints = [
@@ -151,7 +152,7 @@ export default function VisionMission() {
               'Community service via NSS & Dr. B.V. Raju Foundation',
               'Environmental stewardship — green campus initiative',
             ]}
-            columns={4}
+            columns={2}
             layout="side-text"
             showGalleryLink={false}
           />

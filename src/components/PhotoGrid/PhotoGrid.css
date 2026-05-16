@@ -6,13 +6,24 @@
 /* ===== Side-text layout ===== */
 .photo-side-layout {
   display: grid;
-  grid-template-columns: 340px 1fr;
-  gap: var(--space-12);
-  align-items: center;
+  grid-template-columns: 300px 1fr;
+  gap: var(--space-14);
+  align-items: start;        /* text anchors to top — not vertically centered */
 }
 
 .photo-side-layout.photo-side-reversed {
-  grid-template-columns: 1fr 340px;
+  grid-template-columns: 1fr 300px;
+}
+
+/* Compact collage rows when inside side-text */
+.photo-side-images .photo-grid-collage-2 {
+  grid-auto-rows: 185px;
+}
+
+/* In side-text, the 6th image goes full-width within the 2-col grid (short strip) */
+.photo-side-images .photo-grid-collage-2 .photo-grid-item:nth-child(6) {
+  grid-column: 1 / -1;
+  height: 160px;
 }
 
 .photo-side-text {
@@ -373,11 +384,11 @@
 /* ===== Responsive ===== */
 @media (max-width: 1200px) {
   .photo-side-layout {
-    grid-template-columns: 280px 1fr;
-    gap: var(--space-8);
+    grid-template-columns: 260px 1fr;
+    gap: var(--space-10);
   }
   .photo-side-layout.photo-side-reversed {
-    grid-template-columns: 1fr 280px;
+    grid-template-columns: 1fr 260px;
   }
 }
 

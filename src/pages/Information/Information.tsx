@@ -9,7 +9,6 @@ const infoPhotos = [
   { src: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&q=80', alt: 'Library resources', caption: 'e-Library' },
   { src: 'https://images.unsplash.com/photo-1567521464027-f127ff144326?w=800&q=80', alt: 'Campus dining', caption: 'Food Courts' },
   { src: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=800&q=80', alt: 'Students at orientation', caption: 'Freshers Orientation' },
-  { src: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&q=80', alt: 'Annual events', caption: 'Annual Events' },
 ];
 
 const academicCalendar = [
@@ -308,7 +307,7 @@ export default function Information() {
               'Vishnu LMS, e-Library & ERP systems in use',
               'NPTEL & SWAYAM MOOCs integrated into curriculum',
             ]}
-            columns={3}
+            columns={2}
             layout="side-text"
           />
         </div>
