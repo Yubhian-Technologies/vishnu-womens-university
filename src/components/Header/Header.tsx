@@ -29,10 +29,9 @@ const navItems: NavItem[] = [
         groupLabel: 'About Us',
         groupPath: '/about',
         items: [
-          { label: 'About SVECW', path: '/about' },
+          { label: 'About VWU', path: '/about' },
           { label: 'Vision, Mission & Values', path: '/vision-mission' },
           { label: 'Institutional Development Plan', path: '/governance/idp' },
-          { label: 'Organizational Chart', path: '/about#org-chart' },
           { label: 'Core Executive Body', path: '/about#core-executive' },
           { label: 'About Society (SVES)', path: '/about-sves' },
         ],
