@@ -429,12 +429,13 @@ a.mega-group-label:hover {
   left: 0;
   right: 0;
   bottom: 0;
-  background: var(--color-primary);
+  background: var(--color-primary-dark);
   transform: translateX(-100%);
   transition: transform var(--transition-smooth);
   overflow-y: auto;
+  overflow-x: hidden;
   z-index: 999;
-  padding-bottom: var(--space-12);
+  -webkit-overflow-scrolling: touch;
 }
 
 .mobile-menu.open {
@@ -442,18 +443,27 @@ a.mega-group-label:hover {
 }
 
 .mobile-menu-content {
-  padding: var(--space-6);
+  padding: var(--space-5) var(--space-5) var(--space-16);
 }
 
 .mobile-ctas {
   display: flex;
-  gap: var(--space-3);
-  margin-bottom: var(--space-6);
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
+  padding-bottom: var(--space-5);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
   flex-wrap: wrap;
 }
 
+/* ── Nav list ── */
+.mobile-nav-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
 .mobile-nav-item {
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
 .mobile-nav-link {
@@ -461,78 +471,116 @@ a.mega-group-label:hover {
   align-items: center;
   justify-content: space-between;
   padding: var(--space-4) 0;
-  font-size: var(--text-base);
+  font-size: 0.9rem;
   font-weight: 700;
-  color: var(--color-white);
+  color: rgba(255,255,255,0.92);
   font-family: var(--font-sans);
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.07em;
   cursor: pointer;
   background: none;
   border: none;
   width: 100%;
   text-align: left;
+  transition: color var(--transition-fast);
 }
 
-.mobile-nav-link svg {
+.mobile-nav-link.active,
+.mobile-nav-link:hover {
+  color: var(--color-accent);
+}
+
+.mobile-nav-arrow {
+  flex-shrink: 0;
   transition: transform var(--transition-base);
+  opacity: 0.7;
 }
 
-.mobile-nav-item.expanded .mobile-nav-link svg {
+.mobile-nav-arrow.rotated {
   transform: rotate(180deg);
+  opacity: 1;
 }
 
+/* ── Flat submenu ── */
 .mobile-submenu {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height var(--transition-slow);
-}
-
-.mobile-nav-item.expanded .mobile-submenu {
-  max-height: 500px;
+  padding: 0 0 var(--space-3) var(--space-2);
+  list-style: none;
+  margin: 0;
 }
 
 .mobile-sub-item {
   display: block;
-  padding: var(--space-3) var(--space-4);
+  padding: var(--space-2) var(--space-3);
   font-size: var(--text-sm);
-  color: rgba(255,255,255,0.75);
+  color: rgba(255,255,255,0.7);
   font-family: var(--font-sans);
-  border-left: 2px solid rgba(201,168,76,0.4);
-  margin-left: var(--space-2);
-  margin-bottom: var(--space-2);
+  border-left: 2px solid rgba(201,168,76,0.3);
+  margin-bottom: 2px;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   transition: all var(--transition-fast);
 }
 
 .mobile-sub-item:hover {
   color: var(--color-accent);
   border-left-color: var(--color-accent);
+  background: rgba(255,255,255,0.04);
 }
 
-.mobile-submenu-mega {
-  max-height: 1500px !important;
+/* ── Grouped submenu (mega) ── */
+.mobile-submenu-groups {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 var(--space-3) 0;
 }
 
-.mobile-group-label {
-  display: block;
-  font-size: 0.6rem;
+.mobile-group {
+  margin-bottom: 2px;
+}
+
+.mobile-group-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--space-3) var(--space-3);
+  font-size: 0.72rem;
   font-weight: 800;
   color: var(--color-accent);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  padding: var(--space-3) var(--space-4) var(--space-1);
-  margin-top: var(--space-2);
+  letter-spacing: 0.09em;
+  background: rgba(255,255,255,0.04);
+  border: none;
+  border-left: 3px solid rgba(201,168,76,0.5);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  cursor: pointer;
+  text-align: left;
+  transition: all var(--transition-fast);
+  margin-bottom: 2px;
+}
+
+.mobile-group-btn.active,
+.mobile-group-btn:hover {
+  background: rgba(201,168,76,0.1);
+  border-left-color: var(--color-accent);
+}
+
+.mobile-group-items {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 var(--space-2) var(--space-4);
 }
 
 .mobile-social {
   display: flex;
   gap: var(--space-4);
   margin-top: var(--space-8);
+  padding-top: var(--space-6);
+  border-top: 1px solid rgba(255,255,255,0.08);
   flex-wrap: wrap;
 }
 
 .mobile-social a {
-  color: rgba(255,255,255,0.6);
+  color: rgba(255,255,255,0.5);
   font-size: var(--text-sm);
   transition: color var(--transition-fast);
 }

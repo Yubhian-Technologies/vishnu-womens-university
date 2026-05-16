@@ -215,6 +215,7 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
+  const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
   const location = useLocation();
 
   useEffect(() => {
@@ -226,6 +227,7 @@ export default function Header() {
   useEffect(() => {
     setMobileOpen(false);
     setExpandedItem(null);
+    setExpandedGroup(null);
   }, [location]);
 
   useEffect(() => {
@@ -362,55 +364,75 @@ export default function Header() {
             </Link>
           </div>
 
-          <ul>
-            {navItems.map((item) => (
-              <li key={item.label} className={`mobile-nav-item${expandedItem === item.label ? ' expanded' : ''}`}>
-                <button
-                  className="mobile-nav-link"
-                  onClick={() => setExpandedItem(expandedItem === item.label ? null : item.label)}
-                >
-                  {item.label}
-                  <svg viewBox="0 0 12 12" width="14" height="14" fill="none">
-                    <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </button>
+          <ul className="mobile-nav-list">
+            {navItems.map((item) => {
+              const isExpanded = expandedItem === item.label;
+              return (
+                <li key={item.label} className="mobile-nav-item">
+                  <button
+                    className={`mobile-nav-link${isExpanded ? ' active' : ''}`}
+                    onClick={() => {
+                      setExpandedItem(isExpanded ? null : item.label);
+                      setExpandedGroup(null);
+                    }}
+                  >
+                    {item.label}
+                    <svg className={`mobile-nav-arrow${isExpanded ? ' rotated' : ''}`} viewBox="0 0 12 12" width="14" height="14" fill="none">
+                      <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </button>
 
-                {/* Flat mobile submenu */}
-                {item.children && (
-                  <ul className="mobile-submenu">
-                    {item.children.map((child) => (
-                      <li key={child.label}>
-                        {child.external ? (
-                          <a href={child.path} className="mobile-sub-item" target="_blank" rel="noopener noreferrer">
-                            {child.label} <span style={{ fontSize: '0.6rem', opacity: 0.5 }}>↗</span>
-                          </a>
-                        ) : (
-                          <Link to={child.path} className="mobile-sub-item">
-                            {child.label}
-                          </Link>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                )}
+                  {/* Flat submenu */}
+                  {item.children && isExpanded && (
+                    <ul className="mobile-submenu">
+                      {item.children.map((child) => (
+                        <li key={child.label}>
+                          {child.external ? (
+                            <a href={child.path} className="mobile-sub-item" target="_blank" rel="noopener noreferrer">
+                              {child.label} <span style={{ fontSize: '0.6rem', opacity: 0.5 }}>↗</span>
+                            </a>
+                          ) : (
+                            <Link to={child.path} className="mobile-sub-item">{child.label}</Link>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
 
-                {/* Grouped mobile submenu */}
-                {item.groups && (
-                  <ul className="mobile-submenu mobile-submenu-mega">
-                    {item.groups.map((group) => (
-                      <li key={group.groupLabel}>
-                        <span className="mobile-group-label">{group.groupLabel}</span>
-                        {group.items.map((child) => (
-                          <Link key={child.label} to={child.path} className="mobile-sub-item">
-                            {child.label}
-                          </Link>
-                        ))}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </li>
-            ))}
+                  {/* Grouped submenu — each group is its own accordion */}
+                  {item.groups && isExpanded && (
+                    <ul className="mobile-submenu mobile-submenu-groups">
+                      {item.groups.map((group) => {
+                        const groupKey = `${item.label}:${group.groupLabel}`;
+                        const groupOpen = expandedGroup === groupKey;
+                        return (
+                          <li key={group.groupLabel} className="mobile-group">
+                            <button
+                              className={`mobile-group-btn${groupOpen ? ' active' : ''}`}
+                              onClick={() => setExpandedGroup(groupOpen ? null : groupKey)}
+                            >
+                              {group.groupLabel}
+                              <svg className={`mobile-nav-arrow${groupOpen ? ' rotated' : ''}`} viewBox="0 0 12 12" width="12" height="12" fill="none">
+                                <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                              </svg>
+                            </button>
+                            {groupOpen && (
+                              <ul className="mobile-group-items">
+                                {group.items.map((child) => (
+                                  <li key={child.label}>
+                                    <Link to={child.path} className="mobile-sub-item">{child.label}</Link>
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
+                </li>
+              );
+            })}
           </ul>
 
           <div className="mobile-social">
