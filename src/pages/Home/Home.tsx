@@ -8,9 +8,9 @@ import './Home.css';
 
 /* ── Data ─────────────────────────────────────────────────── */
 const studyCards = [
-  { id: 1, icon: '💻', title: 'B.Tech Programs', desc: 'Choose from 9 B.Tech specializations — CSE, AI & ML, AI & DS, Cyber Security, IT, ECE, EEE, Civil, and Mechanical Engineering.', image: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=800&q=80', alt: 'Students in engineering classroom', path: '/academics', linkLabel: 'Explore Programs', color: '#1a4080' },
-  { id: 2, icon: '🎓', title: 'M.Tech & MBA', desc: 'Elevate your qualifications with postgraduate programs in CSE, VLSI Design, Power Electronics, Software Engineering, and MBA.', image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80', alt: 'Postgraduate students', path: '/academics', linkLabel: 'PG Programs', color: '#8B1A4A' },
-  { id: 3, icon: '🔬', title: 'Research & Ph.D.', desc: 'Conduct doctoral research in CSE, ECE, and EEE — backed by 2,500+ publications, 90+ patents, and purpose-built research facilities.', image: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&q=80', alt: 'Research laboratory', path: '/academics', linkLabel: 'Research Programs', color: '#1A6B3C' },
+  { id: 1, icon: '💻', title: 'B.Tech Programs', desc: 'Choose from 9 B.Tech specializations — CSE, AI & ML, AI & DS, Cyber Security, IT, ECE, EEE, Civil, and Mechanical Engineering.', image: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=800&q=80', alt: 'Students in engineering classroom', path: '/academics', linkLabel: 'Explore Programs', color: '#1b4332' },
+  { id: 2, icon: '🎓', title: 'M.Tech & MBA', desc: 'Elevate your qualifications with postgraduate programs in CSE, VLSI Design, Power Electronics, Software Engineering, and MBA.', image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80', alt: 'Postgraduate students', path: '/academics', linkLabel: 'PG Programs', color: '#2d6a4f' },
+  { id: 3, icon: '🔬', title: 'Research & Ph.D.', desc: 'Conduct doctoral research in CSE, ECE, and EEE — backed by 2,500+ publications, 90+ patents, and purpose-built research facilities.', image: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&q=80', alt: 'Research laboratory', path: '/academics', linkLabel: 'Research Programs', color: '#40916c' },
 ];
 
 const popularPrograms = ['CSE', 'AI & Machine Learning', 'AI & Data Science', 'Cyber Security', 'Information Technology', 'Electronics & Communication', 'Electrical & Electronics', 'Civil Engineering', 'Mechanical Engineering', 'MBA'];

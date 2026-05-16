@@ -180,8 +180,8 @@
 .crop-aspect-btn:hover { border-color: #aaa; }
 
 .crop-aspect-btn.active {
-  background: #1a3a7a;
-  border-color: #1a3a7a;
+  background: #1b4332;
+  border-color: #1b4332;
   color: #fff;
 }
 

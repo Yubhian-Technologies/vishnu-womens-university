@@ -114,11 +114,11 @@ const events: Event[] = [
 
 const categoryColors: Record<string, string> = {
   'Special Events': '#C9A84C',
-  'Academic Events': '#003087',
-  'Placements': '#0057B8',
-  'Admissions': '#2E7D32',
-  'Alumni Events': '#C8102E',
-  'Sports': '#E65100',
+  'Academic Events': '#1b4332',
+  'Placements': '#2d6a4f',
+  'Admissions': '#40916c',
+  'Alumni Events': '#081c15',
+  'Sports': '#52b788',
 };
 
 const categories = ['All', ...Array.from(new Set(events.map(e => e.category)))];

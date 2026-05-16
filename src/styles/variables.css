@@ -1,9 +1,9 @@
 :root {
-  /* DWU Brand Colors */
-  --color-primary: #002868;
-  --color-primary-dark: #001744;
-  --color-primary-light: #003a8c;
-  --color-secondary: #0057B8;
+  /* VWU Brand Colors — Forest Green */
+  --color-primary: #1b4332;
+  --color-primary-dark: #081c15;
+  --color-primary-light: #2d6a4f;
+  --color-secondary: #40916c;
   --color-accent: #C9A84C;
   --color-accent-light: #e8c96a;
   --color-red: #C8102E;

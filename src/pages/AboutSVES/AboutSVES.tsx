@@ -43,7 +43,7 @@ const campuses = [
 ];
 
 const svesStats = [
-  { value: '20+', label: 'Institutions' },
+  { value: '11', label: 'Institutions' },
   { value: '50,000+', label: 'Students' },
   { value: '3,000+', label: 'Faculty & Staff' },
   { value: '4', label: 'Campuses' },
@@ -87,7 +87,7 @@ export default function AboutSVES() {
         page="about-sves"
         defaultImage="https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=1920&q=80"
         defaultTitle="Sri Vishnu Educational Society"
-  defaultSubtitle="More than 25 years of educational commitment, spanning 20+ institutions across Andhra Pradesh and Telangana."
+  defaultSubtitle="More than 25 years of educational commitment, spanning 11 institutions across Andhra Pradesh and Telangana."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Discover', to: '/' }, { label: 'About SVES' }]}
       />
 
@@ -126,7 +126,7 @@ export default function AboutSVES() {
                 associations, community halls, and veterinary services in surrounding villages — entirely independently of government funding.
               </p>
               <p style={{ lineHeight: 1.8, color: 'var(--color-text-light)' }}>
-                SVES currently operates <strong>20+ institutions</strong> across <strong>4 campuses</strong> — Green Meadows
+                SVES currently operates <strong>11 institutions</strong> across <strong>4 campuses</strong> — Green Meadows
                 (Bhimavaram), Orchard Park (Narsapur), Valley Vista (Hyderabad), and Lake View (Medak) — collectively
                 educating over <strong> 50,000 students</strong> annually across engineering, pharmacy, dental, polytechnic, and school streams.
               </p>
