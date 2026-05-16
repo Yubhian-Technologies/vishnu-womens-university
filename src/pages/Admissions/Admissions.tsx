@@ -52,7 +52,7 @@ const faqs = [
   { q: 'Are government scholarships available at VWU?', a: 'Yes. SC/ST/BC/EBC students may qualify for full or partial fee reimbursement under AP government scholarship programs. Applications are submitted through the AP scholarship portal.' },
   { q: 'What documents are required for admission?', a: 'Required documents include: EAPCET rank card, Class 10 and 12 mark sheets and certificates, transfer certificate, conduct certificate, Aadhaar card, caste certificate (if applicable), and 8 passport-size photographs.' },
   { q: 'Is VWU affiliated to JNTUK?', a: 'Yes. Vishnu Womens University is affiliated to Jawaharlal Nehru Technological University Kakinada (JNTUK) for all its engineering programmes.' },
-  { q: 'What are the placement opportunities at VWU?', a: 'VWU\'s Training & Placement Cell recorded 1,400+ placements in 2024–25. Regular recruiters include Amazon, TCS, Infosys, Wipro, and 150+ other companies. The highest package in 2024–25 was 52 LPA.' },
+  { q: 'What are the placement opportunities at VWU?', a: 'VWU\'s Training & Placement Cell recorded 1,400+ placements in 2024–25. Regular recruiters include Amazon, TCS, Infosys, Wipro, and 150+ other companies. The highest package in 2024–25 was 59.28 LPA.' },
   { q: 'Can I take a campus tour before applying?', a: 'Yes, and we actively encourage it. Prospective students and their families are welcome to visit the campus in Bhimavaram. You can book a group tour, an individual visit, or a virtual walkthrough by reaching out to our admissions office.' },
 ];
 
@@ -238,7 +238,7 @@ export default function Admissions() {
             highlights={[
               'EAPCET college code: VISW',
               '1,400+ placements in 2024–25 alone',
-              'Highest package: ₹52 LPA',
+              'Highest package: ₹59.28 LPA',
               '100% scholarship coverage available for eligible students',
               'Campus visit & virtual tour options available',
             ]}

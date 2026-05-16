@@ -41,8 +41,8 @@ const slides: Slide[] = [
   {
     id: 4,
     tag: 'Outstanding Placements',
-    heading: '52 LPA\nHighest\nPlacement Package',
-    description: 'VWU recorded 1,400+ placements in 2024–25, with a highest offer of 52 LPA — graduates are now driving impact at companies across India and beyond.',
+    heading: '59.28 LPA\nHighest\nPlacement Package',
+    description: 'VWU recorded 1,400+ placements in 2024–25, with a highest offer of 59.28 LPA — graduates are now driving impact at companies across India and beyond.',
     primaryCta: { label: 'Placement Records', path: '/about' },
     secondaryCta: { label: 'Our Story', path: '/about' },
   },
@@ -51,7 +51,7 @@ const slides: Slide[] = [
 const recognitions = [
   { icon: '★', title: 'Top Engineering College', source: 'India Today Rankings' },
   { icon: '●', title: 'Best Engineering College', source: 'The Week Rankings' },
-  { icon: '♦', title: 'NBA-DCP Accredited', source: 'National Board of Accreditation' },
+  { icon: '♦', title: 'NBA Accredited', source: 'National Board of Accreditation' },
   { icon: '▲', title: 'NIRF Ranked Institution', source: 'Ministry of Education' },
   { icon: '★', title: 'IEI Award for Excellence', source: 'Institution of Engineers India' },
 ];

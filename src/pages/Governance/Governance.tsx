@@ -140,7 +140,7 @@ export default function Governance() {
             subtitle="From council meetings to convocation, VWU's governance is built on transparency, accountability, and a commitment to excellence."
             highlights={[
               'NAAC accredited institution',
-              'NBA-DCP programme accreditation',
+              'NBA programme accreditation',
               'UGC Autonomous status since 2014',
               'AICTE approved with NBA outcomes framework',
               'ISO-certified quality management systems',

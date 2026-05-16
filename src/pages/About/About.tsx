@@ -19,7 +19,7 @@ const quickStats = [
   { value: '230+', label: 'Expert Faculty' },
   { value: '1,400+', label: 'Annual Placements' },
   { value: '9', label: 'Departments' },
-  { value: '52 LPA', label: 'Highest Package' },
+  { value: '59.28 LPA', label: 'Highest Package' },
   { value: 'JNTUK', label: 'Affiliated To' },
 ];
 
@@ -89,7 +89,7 @@ export default function About() {
               </p>
               <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-4)', color: 'var(--color-text-light)' }}>
                 Operating under the <strong>Sri Vishnu Educational Society</strong> and affiliated to JNTUK,
-                VWU carries UGC Autonomous status, NBA-DCP accreditation, AICTE approval, and NAAC recognition.
+                VWU carries UGC Autonomous status, NBA Accreditation, AICTE approval, and NAAC recognition.
                 Its infrastructure includes fully equipped laboratories, smart classrooms, drawing halls, and seminar rooms.
               </p>
               <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-6)', color: 'var(--color-text-light)' }}>
@@ -262,7 +262,7 @@ export default function About() {
               <span className="section-label" style={{ color: 'var(--color-accent)' }}>Our Parent Society</span>
               <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>Sri Vishnu Educational Society (SVES)</h2>
               <p style={{ color: 'rgba(255,255,255,0.75)', lineHeight: 1.8, marginBottom: 'var(--space-4)' }}>
-                Established by Padma Bhushan Dr. B. V. Raju, SVES runs <strong style={{ color: 'var(--color-accent)' }}>20+ institutions</strong> across
+                Established by Padma Bhushan Dr. B. V. Raju, SVES runs <strong style={{ color: 'var(--color-accent)' }}>11 institutions</strong> across
                 4 campuses in Bhimavaram, Narsapur, Hyderabad, and Medak — reaching more than
                 <strong style={{ color: 'var(--color-accent)' }}> 50,000 students</strong> each year.
               </p>

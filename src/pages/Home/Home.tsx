@@ -18,7 +18,7 @@ const popularPrograms = ['CSE', 'AI & Machine Learning', 'AI & Data Science', 'C
 const recognitions = [
   { icon: '🏆', title: 'Top Engineering College', source: 'India Today Rankings' },
   { icon: '⭐', title: 'Best Engineering College', source: 'The Week Rankings' },
-  { icon: '📋', title: 'NBA-DCP Accreditation', source: 'National Board of Accreditation' },
+  { icon: '📋', title: 'NBA Accreditation', source: 'National Board of Accreditation' },
   { icon: '💼', title: 'NIRF Ranked Institution', source: 'Ministry of Education, India' },
   { icon: '📈', title: 'IEI Award for Excellence', source: 'Institution of Engineers India' },
   { icon: '🎖️', title: 'UGC Autonomous Status', source: 'University Grants Commission' },

@@ -116,7 +116,7 @@ export default function Academics() {
               { num: '9', label: 'B.Tech Programs' },
               { num: '1,400+', label: 'Annual Placements' },
               { num: '230+', label: 'Expert Faculty' },
-              { num: '52 LPA', label: 'Highest Package' },
+              { num: '59.28 LPA', label: 'Highest Package' },
             ].map(s => (
               <div key={s.label} style={{ textAlign: 'center' }}>
                 <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', fontWeight: 900, color: 'var(--color-accent)' }}>{s.num}</div>
@@ -292,7 +292,7 @@ export default function Academics() {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
                 {[
                   { value: '1,400+', label: 'Students Placed (2024–25)' },
-                  { value: '52 LPA', label: 'Highest Package' },
+                  { value: '59.28 LPA', label: 'Highest Package' },
                   { value: '6.2 LPA', label: 'Average Package' },
                   { value: '150+', label: 'Recruiting Companies' },
                 ].map(s => (

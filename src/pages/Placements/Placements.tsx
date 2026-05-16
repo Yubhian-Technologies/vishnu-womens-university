@@ -6,7 +6,7 @@ import PageHero from '../../components/PageHero/PageHero';
 const stats = [
   { num: '1400+', label: 'Placements (2024–25)' },
   { num: '150+', label: 'Recruiting Companies' },
-  { num: '52 LPA', label: 'Highest Package' },
+  { num: '59.28 LPA', label: 'Highest Package' },
   { num: '95%+', label: 'Placement Rate' },
 ];
 

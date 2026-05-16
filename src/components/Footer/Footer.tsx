@@ -39,7 +39,7 @@ const socialLinks = [
 ];
 
 const accreditations = [
-  'NBA-DCP Accredited',
+  'NBA Accredited',
   'NAAC Approved',
   'UGC Autonomous',
   'AICTE Approved',

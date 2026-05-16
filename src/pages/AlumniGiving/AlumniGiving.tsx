@@ -7,7 +7,7 @@ const givingImpact = [
   { icon: '🎓', stat: '13,100+', label: 'Engineers Graduated', desc: 'VWU alumni are contributing meaningfully to industry and research across India and internationally.' },
   { icon: '🏛️', stat: '1,400+', label: 'Annual Placements', desc: 'A consistent placement record strengthened by alumni mentoring and active recruiter relationships.' },
   { icon: '🌍', stat: '50+', label: 'Companies Recruiting', desc: 'Leading firms from Amazon to Infosys recruit VWU graduates on campus every year.' },
-  { icon: '📈', stat: '52 LPA', label: 'Highest Package', desc: 'Strong alumni-industry connections help students secure top-tier offers.' },
+  { icon: '📈', stat: '59.28 LPA', label: 'Highest Package', desc: 'Strong alumni-industry connections help students secure top-tier offers.' },
 ];
 
 const givingLevels = [
