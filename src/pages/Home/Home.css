@@ -59,7 +59,7 @@
 .home-page { overflow-x: hidden; }
 
 .gradient-text {
-  background: linear-gradient(135deg, var(--color-primary) 0%, #1a6bc8 45%, var(--color-accent) 100%);
+  background: linear-gradient(135deg, var(--color-primary) 0%, #52b788 45%, var(--color-accent) 100%);
   background-size: 200% 200%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -200,7 +200,7 @@
 .activity-card-label {
   position: absolute;
   bottom: 0; left: 0; right: 0;
-  background: linear-gradient(to top, rgba(0,15,50,0.92) 0%, rgba(0,15,50,0.5) 60%, transparent 100%);
+  background: linear-gradient(to top, rgba(8,20,14,0.92) 0%, rgba(8,20,14,0.5) 60%, transparent 100%);
   padding: var(--space-5) var(--space-3) var(--space-3);
   font-family: var(--font-sans);
   font-size: var(--text-xs);
@@ -383,9 +383,9 @@
 .program-tag--active {
   border-color: var(--color-primary);
   color: var(--color-primary);
-  background: rgba(0,40,104,0.05);
+  background: rgba(27,67,50,0.05);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,40,104,0.12);
+  box-shadow: 0 4px 12px rgba(27,67,50,0.12);
 }
 
 /* ===== Campus Life Section ===== */
@@ -411,13 +411,13 @@
 .campus-image-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(0,28,84,0.25) 0%, transparent 60%);
+  background: linear-gradient(135deg, rgba(27,67,50,0.25) 0%, transparent 60%);
 }
 .campus-image-badge {
   position: absolute;
   bottom: var(--space-8);
   right: var(--space-8);
-  background: rgba(0,28,84,0.88);
+  background: rgba(27,67,50,0.88);
   backdrop-filter: blur(10px);
   border: 2px solid var(--color-accent);
   border-radius: var(--radius-md);
@@ -572,7 +572,7 @@
 .mission-img-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(0,28,84,0.32) 0%, transparent 55%);
+  background: linear-gradient(to top, rgba(27,67,50,0.32) 0%, transparent 55%);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -903,7 +903,7 @@
 .cta-banner-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(0,28,84,0.92) 0%, rgba(0,87,184,0.82) 100%);
+  background: linear-gradient(135deg, rgba(27,67,50,0.92) 0%, rgba(64,145,108,0.82) 100%);
 }
 .cta-particles {
   position: absolute;

@@ -74,7 +74,7 @@
 
 .ag-giving-card--featured {
   border-color: var(--color-accent);
-  background: linear-gradient(135deg, rgba(0,40,104,0.04) 0%, rgba(201,168,76,0.06) 100%);
+  background: linear-gradient(135deg, rgba(27,67,50,0.04) 0%, rgba(201,168,76,0.06) 100%);
 }
 
 .ag-giving-badge {

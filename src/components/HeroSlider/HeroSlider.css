@@ -24,9 +24,9 @@
   inset: 0;
   background: linear-gradient(
     105deg,
-    rgba(0,18,60,0.82) 0%,
-    rgba(0,28,84,0.68) 40%,
-    rgba(0,60,140,0.3) 75%,
+    rgba(8,28,21,0.82) 0%,
+    rgba(27,67,50,0.68) 40%,
+    rgba(45,106,79,0.3) 75%,
     transparent 100%
   );
   z-index: 1;
@@ -244,7 +244,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(0,28,84,0.92);
+  background: rgba(27,67,50,0.92);
   backdrop-filter: blur(10px);
   z-index: 5;
   padding: var(--space-4) 0;

@@ -413,7 +413,7 @@
 .adm-form-group input:focus,
 .adm-form-group select:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(0,40,104,0.1);
+  box-shadow: 0 0 0 3px rgba(27,67,50,0.1);
 }
 
 /* Responsive */
