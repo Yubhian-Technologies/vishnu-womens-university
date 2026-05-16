@@ -58,7 +58,7 @@ export default function SportsGames() {
       {/* Philosophy */}
       <section className="section bg-white">
         <div className="container">
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-14)', alignItems: 'center' }}>
+          <div className="grid-img-text">
             <div className="reveal-left">
               <span className="section-label">Our Approach</span>
               <h2 className="section-title">Sports as a Core Pillar</h2>
@@ -95,7 +95,7 @@ export default function SportsGames() {
             <span className="section-label">Infrastructure</span>
             <h2 className="section-title">Sports Facilities</h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-5)' }}>
+          <div className="grid-4">
             {facilities.map((f, i) => (
               <div key={f.title} className="reveal" data-delay={`${i * 80}`}
                 style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', transition: 'all var(--transition-base)' }}
@@ -114,7 +114,7 @@ export default function SportsGames() {
       {/* Sports Program + Achievements */}
       <section className="section bg-white">
         <div className="container">
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-12)' }}>
+          <div className="grid-2">
             <div className="reveal-left">
               <span className="section-label">Program Structure</span>
               <h2 className="section-title" style={{ fontSize: 'var(--text-2xl)' }}>Sports Program Highlights</h2>

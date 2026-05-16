@@ -106,7 +106,7 @@ export default function StudentClubs() {
               </div>
               <h2 className="section-title">{cat.label}</h2>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-4)' }}>
+            <div className="grid-4">
               {cat.clubs.map((club, i) => (
                 <div key={club.name} className="reveal" data-delay={`${i * 50}`}
                   style={{ background: ci % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', transition: 'all var(--transition-base)' }}

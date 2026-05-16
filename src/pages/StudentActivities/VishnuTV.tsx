@@ -60,7 +60,7 @@ export default function VishnuTV() {
       {/* About */}
       <section className="section bg-white">
         <div className="container">
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-14)', alignItems: 'center' }}>
+          <div className="grid-img-text">
             <div className="reveal-left">
               <span className="section-label">About</span>
               <h2 className="section-title">A First in Andhra Pradesh</h2>
@@ -95,7 +95,7 @@ export default function VishnuTV() {
             <span className="section-label">What We Cover</span>
             <h2 className="section-title">Four Pillars of Vishnu TV</h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-5)' }}>
+          <div className="grid-4">
             {focusAreas.map((f, i) => (
               <div key={f.title} className="reveal" data-delay={`${i * 80}`}
                 style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderTop: '4px solid var(--color-accent)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)' }}>
@@ -111,7 +111,7 @@ export default function VishnuTV() {
       {/* Documentary Topics + Productions */}
       <section className="section bg-white">
         <div className="container">
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-12)' }}>
+          <div className="grid-2">
             <div className="reveal-left">
               <span className="section-label">Documentary Films</span>
               <h2 className="section-title" style={{ fontSize: 'var(--text-2xl)' }}>Social Impact Stories</h2>
@@ -133,7 +133,7 @@ export default function VishnuTV() {
               <p style={{ color: 'var(--color-text-light)', marginBottom: 'var(--space-6)', lineHeight: 1.7 }}>
                 The academy's output extends well beyond documentaries, covering the full range of academic and creative life on campus.
               </p>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)' }}>
+              <div className="grid-2">
                 {productions.map((p) => (
                   <div key={p.label} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', padding: 'var(--space-4)', background: 'var(--color-off-white)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-sm)' }}>
                     <span style={{ fontSize: '1.4rem' }}>{p.icon}</span>

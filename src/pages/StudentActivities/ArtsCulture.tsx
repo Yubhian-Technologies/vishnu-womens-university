@@ -76,7 +76,7 @@ export default function ArtsCulture() {
       {/* Philosophy */}
       <section className="section bg-white">
         <div className="container">
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-14)', alignItems: 'center' }}>
+          <div className="grid-img-text">
             <div className="reveal-left">
               <span className="section-label">Our Philosophy</span>
               <h2 className="section-title">Culture is the Heart of Education</h2>
@@ -113,7 +113,7 @@ export default function ArtsCulture() {
             <span className="section-label">What We Do</span>
             <h2 className="section-title">Cultural Initiatives</h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-5)' }}>
+          <div className="grid-4">
             {initiatives.map((init, i) => (
               <div key={init.title} className="reveal" data-delay={`${i * 80}`}
                 style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', transition: 'all var(--transition-base)' }}
@@ -139,7 +139,7 @@ export default function ArtsCulture() {
               Three major annual events that offer students an outlet for knowledge, recreation, fine arts, creative expression, and meaningful interaction.
             </p>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-6)' }}>
+          <div className="grid-3">
             {events.map((ev, i) => (
               <div key={ev.name} className="reveal" data-delay={`${i * 100}`}
                 style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 'var(--radius-md)', padding: 'var(--space-8)', textAlign: 'center', transition: 'all var(--transition-base)' }}

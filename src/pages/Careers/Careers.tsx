@@ -116,7 +116,7 @@ export default function Careers() {
               VWU is a place where faculty and staff grow alongside students — in a focused, research-oriented academic environment.
             </p>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-5)' }}>
+          <div className="grid-3">
             {perks.map((p, i) => (
               <div key={p.title} className="reveal" data-delay={`${i * 60}`}
                 style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', borderLeft: '4px solid var(--color-accent)' }}>
@@ -182,7 +182,7 @@ export default function Careers() {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="reveal" style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-8)', display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-5)' }}>
+                <div className="grid-2">
                   {([['name', 'Full Name', 'text'], ['email', 'Email Address', 'email'], ['phone', 'Phone Number', 'tel']] as const).map(([key, label, type]) => (
                     <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                       <label style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-primary)', fontFamily: 'var(--font-sans)' }}>{label} *</label>
@@ -199,7 +199,7 @@ export default function Careers() {
                     </select>
                   </div>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-5)' }}>
+                <div className="grid-2">
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                     <label style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-primary)', fontFamily: 'var(--font-sans)' }}>Department *</label>
                     <select required value={form.dept} onChange={e => setForm(f => ({ ...f, dept: e.target.value }))}

@@ -53,7 +53,7 @@ export default function SocialServices() {
       {/* NSS Philosophy */}
       <section className="section bg-white">
         <div className="container">
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-14)', alignItems: 'center' }}>
+          <div className="grid-img-text">
             <div className="reveal-left">
               <span className="section-label">NSS at VWU</span>
               <h2 className="section-title">Serving the Nation Through Education</h2>
@@ -94,7 +94,7 @@ export default function SocialServices() {
               The VWU NSS programme directs its efforts toward six key communities, creating tangible impact well beyond the campus.
             </p>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-5)' }}>
+          <div className="grid-3">
             {communities.map((c, i) => (
               <div key={c.title} className="reveal" data-delay={`${i * 80}`}
                 style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', transition: 'all var(--transition-base)' }}
@@ -113,7 +113,7 @@ export default function SocialServices() {
       {/* NSS Values + Founder Legacy */}
       <section className="section" style={{ background: 'linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%)' }}>
         <div className="container">
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-14)' }}>
+          <div className="grid-2">
             <div className="reveal-left">
               <span className="section-label" style={{ color: 'var(--color-accent)' }}>Our Values</span>
               <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-6)' }}>NSS Core Values</h2>

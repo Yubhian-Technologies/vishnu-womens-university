@@ -80,7 +80,7 @@ export default function Campus() {
               Each facility at VWU has been developed to support students academically, promote personal well-being, and enrich campus life.
             </p>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-5)' }} className="campus-facilities-grid">
+          <div className="grid-4 campus-facilities-grid">
             {facilities.map((f, i) => (
               <div key={f.title} id={f.id} className="reveal" data-delay={`${i * 40}`}
                 style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', transition: 'all var(--transition-base)', scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}
@@ -103,7 +103,7 @@ export default function Campus() {
             <span className="section-label">Gallery</span>
             <h2 className="section-title">A Glimpse of VWU Campus</h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-4)' }}>
+          <div className="grid-3">
             {[
               { src: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=800&q=80', alt: 'Smart classrooms' },
               { src: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&q=80', alt: 'Research labs' },

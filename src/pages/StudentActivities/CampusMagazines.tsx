@@ -78,7 +78,7 @@ export default function CampusMagazines() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-8)' }}>
             {magazines.map((mag, i) => (
               <div key={mag.name} className={i % 2 === 0 ? 'reveal-left' : 'reveal-right'}
-                style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 'var(--space-10)', background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-lg)', overflow: 'hidden', boxShadow: 'var(--shadow-sm)' }}>
+                className="grid-1-2" style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-lg)', overflow: 'hidden', boxShadow: 'var(--shadow-sm)' }}>
                 <div style={{ background: mag.color, padding: 'var(--space-10)', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', gap: 'var(--space-3)' }}>
                   <div style={{ fontSize: '4rem' }}>{mag.icon}</div>
                   <div style={{ fontFamily: 'var(--font-serif)', fontSize: 'var(--text-2xl)', fontWeight: 900, color: 'var(--color-white)' }}>{mag.name}</div>
