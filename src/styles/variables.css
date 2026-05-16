@@ -8,10 +8,10 @@
   --color-accent-light: #e8c96a;
   --color-red: #C8102E;
 
-  /* Neutrals */
-  --color-white: #ffffff;
-  --color-off-white: #F7F8FA;
-  --color-light-gray: #E8ECF0;
+  /* Neutrals — pale green tints */
+  --color-white: #f5fbf7;
+  --color-off-white: #e8f5ed;
+  --color-light-gray: #cde8d9;
   --color-mid-gray: #9BA5B4;
   --color-dark-gray: #555F6E;
   --color-text: #1a1f2e;

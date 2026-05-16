@@ -144,7 +144,7 @@
 }
 
 .page-hero__dot--active {
-  background: #fff;
+  background: var(--color-accent-light);
   transform: scale(1.4);
 }
 
