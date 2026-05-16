@@ -1,6 +1,16 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
+import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
+
+const infoPhotos = [
+  { src: 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?w=800&q=80', alt: 'Green campus environment', caption: 'Green Campus' },
+  { src: 'https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=800&q=80', alt: 'Campus aerial view', caption: 'Bhimavaram Campus' },
+  { src: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&q=80', alt: 'Library resources', caption: 'e-Library' },
+  { src: 'https://images.unsplash.com/photo-1567521464027-f127ff144326?w=800&q=80', alt: 'Campus dining', caption: 'Food Courts' },
+  { src: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=800&q=80', alt: 'Students at orientation', caption: 'Freshers Orientation' },
+  { src: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&q=80', alt: 'Annual events', caption: 'Annual Events' },
+];
 
 const academicCalendar = [
   { event: 'Odd Semester Commencement', date: 'July 15, 2026' },
@@ -280,6 +290,19 @@ export default function Information() {
               </div>
             </div>
           )}
+        </div>
+      </section>
+
+      {/* Campus Photos */}
+      <section className="section bg-off-white">
+        <div className="container">
+          <PhotoGrid
+            images={infoPhotos}
+            label="Campus Life"
+            title="VWU in Pictures"
+            subtitle="A visual glimpse of the campus, facilities, and everyday life at Vishnu Womens University."
+            columns={3}
+          />
         </div>
       </section>
     </main>

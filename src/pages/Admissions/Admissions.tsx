@@ -2,6 +2,18 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import './Admissions.css';
 import PageHero from '../../components/PageHero/PageHero';
+import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
+
+const admissionsPhotos = [
+  { src: 'https://images.unsplash.com/photo-1562774053-701939374585?w=800&q=80', alt: 'VWU campus buildings', caption: 'VWU Campus' },
+  { src: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=800&q=80', alt: 'Smart classrooms', caption: 'Smart Classrooms' },
+  { src: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&q=80', alt: 'Research labs', caption: 'Specialised Labs' },
+  { src: 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=800&q=80', alt: 'Campus hostel', caption: 'Student Hostels' },
+  { src: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&q=80', alt: 'Sports court', caption: 'Sports Facilities' },
+  { src: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800&q=80', alt: 'Graduation day', caption: 'Placement Season' },
+  { src: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=800&q=80', alt: 'Technical workshops', caption: 'Industry Workshops' },
+  { src: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&q=80', alt: 'Central library', caption: 'Central Library' },
+];
 
 const steps = [
   { step: 1, icon: '📝', title: 'Appear for EAPCET / ECET', desc: 'Qualify in AP EAPCET for B.Tech, AP ECET for lateral entry, or AP PGECET / ICET for PG programs. VWU Code: VISW.' },
@@ -215,6 +227,19 @@ export default function Admissions() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Campus Photos */}
+      <section className="section bg-off-white">
+        <div className="container">
+          <PhotoGrid
+            images={admissionsPhotos}
+            label="Why VWU"
+            title="Experience the VWU Difference"
+            subtitle="From modern labs and smart classrooms to hostels, sports grounds, and a buzzing placement season — see what awaits you."
+            columns={4}
+          />
         </div>
       </section>
 

@@ -2,6 +2,16 @@ import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { govItems, govCategories } from './governance.data';
 import PageHero from '../../components/PageHero/PageHero';
+import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
+
+const govPhotos = [
+  { src: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=800&q=80', alt: 'Governance and administration', caption: 'Institutional Governance' },
+  { src: 'https://images.unsplash.com/photo-1544531585-9847b68c8c86?w=800&q=80', alt: 'Academic council meeting', caption: 'Academic Council' },
+  { src: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=800&q=80', alt: 'Convocation ceremony', caption: 'Annual Convocation' },
+  { src: 'https://images.unsplash.com/photo-1562774053-701939374585?w=800&q=80', alt: 'University campus', caption: 'VWU Campus' },
+  { src: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&q=80', alt: 'Events and seminars', caption: 'Seminars & Events' },
+  { src: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80', alt: 'Faculty collaboration', caption: 'Faculty Development' },
+];
 
 export default function Governance() {
   useEffect(() => {
@@ -120,6 +130,19 @@ export default function Governance() {
           </section>
         );
       })}
+
+      {/* Institutional Photos */}
+      <section className="section bg-off-white">
+        <div className="container">
+          <PhotoGrid
+            images={govPhotos}
+            label="Institutional Life"
+            title="Governance in Action"
+            subtitle="From council meetings to convocation, VWU's governance is built on transparency, accountability, and a commitment to excellence."
+            columns={3}
+          />
+        </div>
+      </section>
 
       {/* CTA */}
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-14) 0' }}>

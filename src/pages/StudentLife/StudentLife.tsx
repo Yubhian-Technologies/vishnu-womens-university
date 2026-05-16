@@ -2,6 +2,16 @@ import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './StudentLife.css';
 import PageHero from '../../components/PageHero/PageHero';
+import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
+
+const studentLifePhotos = [
+  { src: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&q=80', alt: 'Cultural events', caption: 'Cultural Events' },
+  { src: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&q=80', alt: 'Sports activities', caption: 'Sports & Fitness' },
+  { src: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=800&q=80', alt: 'Campus festivals', caption: 'Campus Festivals' },
+  { src: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=800&q=80', alt: 'Student clubs and workshops', caption: 'Club Activities' },
+  { src: 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?w=800&q=80', alt: 'Green campus walks', caption: 'Campus Life' },
+  { src: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80', alt: 'Study groups and projects', caption: 'Teamwork' },
+];
 
 const clubs = [
   { icon: '📻', name: 'Radio Vishnu 90.4', count: 'Campus FM station' },
@@ -223,6 +233,19 @@ export default function StudentLife() {
               />
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Student Life Photos */}
+      <section className="section bg-white">
+        <div className="container">
+          <PhotoGrid
+            images={studentLifePhotos}
+            label="Campus Moments"
+            title="Life Beyond the Classroom"
+            subtitle="From cultural fests and sports tournaments to club activities and quiet campus walks — VWU student life is vibrant and full."
+            columns={3}
+          />
         </div>
       </section>
 

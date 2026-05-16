@@ -2,6 +2,19 @@ import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './About.css';
 import PageHero from '../../components/PageHero/PageHero';
+import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
+
+const campusPhotos = [
+  { src: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=800&q=80', alt: 'Smart classrooms at VWU', caption: 'Smart Classrooms' },
+  { src: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&q=80', alt: 'Research laboratories', caption: 'Research Labs' },
+  { src: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&q=80', alt: 'Central library', caption: 'Central Library' },
+  { src: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80', alt: 'Students studying', caption: 'Student Collaboration' },
+  { src: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&q=80', alt: 'Sports facilities', caption: 'Sports Facilities' },
+  { src: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&q=80', alt: 'Campus events and auditorium', caption: 'Auditorium & Events' },
+  { src: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=800&q=80', alt: 'Technical workshops', caption: 'Workshops & Hackathons' },
+  { src: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800&q=80', alt: 'Graduation ceremony', caption: 'Convocation' },
+  { src: 'https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=800&q=80', alt: 'VWU campus aerial', caption: 'VWU Campus' },
+];
 
 const quickStats = [
   { value: '2001', label: 'Established' },
@@ -199,8 +212,21 @@ export default function About() {
         </div>
       </section>
 
-      {/* Campus Snapshot */}
+      {/* Campus Photos */}
       <section className="section bg-white">
+        <div className="container">
+          <PhotoGrid
+            images={campusPhotos}
+            label="Campus Life"
+            title="Life at Vishnu Womens University"
+            subtitle="A glimpse of the people, spaces, and moments that make VWU a distinctive place to learn and grow."
+            columns={3}
+          />
+        </div>
+      </section>
+
+      {/* Campus Snapshot */}
+      <section className="section bg-off-white">
         <div className="container">
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-12)', alignItems: 'center' }}>
             <div className="reveal-left">

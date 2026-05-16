@@ -2,6 +2,16 @@ import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './AboutSVES.css';
 import PageHero from '../../components/PageHero/PageHero';
+import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
+
+const svesPhotos = [
+  { src: 'https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=800&q=80', alt: 'Green Meadows campus Bhimavaram', caption: 'Green Meadows — Bhimavaram' },
+  { src: 'https://images.unsplash.com/photo-1562774053-701939374585?w=800&q=80', alt: 'University buildings', caption: 'Academic Blocks' },
+  { src: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=800&q=80', alt: 'Students at campus event', caption: 'Student Events' },
+  { src: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800&q=80', alt: 'Graduation ceremony', caption: 'Convocation' },
+  { src: 'https://images.unsplash.com/photo-1544531585-9847b68c8c86?w=800&q=80', alt: 'Academic conference', caption: 'Conferences & Seminars' },
+  { src: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=800&q=80', alt: 'Modern classrooms', caption: 'Smart Classrooms' },
+];
 
 const campuses = [
   {
@@ -168,6 +178,19 @@ export default function AboutSVES() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Campus Photos */}
+      <section className="section bg-off-white">
+        <div className="container">
+          <PhotoGrid
+            images={svesPhotos}
+            label="Our Campuses"
+            title="SVES Institutions in Pictures"
+            subtitle="Glimpses from the campuses, events, and milestones of the Sri Vishnu Educational Society."
+            columns={3}
+          />
         </div>
       </section>
 

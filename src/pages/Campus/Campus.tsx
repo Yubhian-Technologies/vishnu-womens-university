@@ -1,6 +1,22 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
+import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
+
+const campusGalleryPhotos = [
+  { src: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=800&q=80', alt: 'Smart classrooms', caption: 'Smart Classrooms' },
+  { src: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&q=80', alt: 'Research labs', caption: 'Research Labs' },
+  { src: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&q=80', alt: 'Central library', caption: 'Central Library' },
+  { src: 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=800&q=80', alt: 'Campus hostel', caption: 'Student Hostels' },
+  { src: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&q=80', alt: 'Sports facilities', caption: 'Sports Courts' },
+  { src: 'https://images.unsplash.com/photo-1567521464027-f127ff144326?w=800&q=80', alt: 'Campus dining', caption: 'Food Courts' },
+  { src: 'https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=800&q=80', alt: 'Campus life', caption: 'Green Campus' },
+  { src: 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?w=800&q=80', alt: 'Green environment', caption: 'Campus Gardens' },
+  { src: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&q=80', alt: 'Events auditorium', caption: 'Main Auditorium' },
+  { src: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=800&q=80', alt: 'Technical events', caption: 'Technova Symposium' },
+  { src: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80', alt: 'Students studying', caption: 'Collaborative Learning' },
+  { src: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=800&q=80', alt: 'Campus events', caption: 'Cultural Programs' },
+];
 
 const facilities = [
   { id: 'smart-classrooms', icon: '📺', title: 'Smart Class Rooms', desc: 'More than 200 digitally-fitted classrooms with projectors, interactive whiteboards, and live-streaming support for hybrid delivery.' },
@@ -99,28 +115,13 @@ export default function Campus() {
       {/* Campus Image Gallery */}
       <section className="section bg-white">
         <div className="container">
-          <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-10)' }}>
-            <span className="section-label">Gallery</span>
-            <h2 className="section-title">A Glimpse of VWU Campus</h2>
-          </div>
-          <div className="grid-3">
-            {[
-              { src: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=800&q=80', alt: 'Smart classrooms' },
-              { src: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&q=80', alt: 'Research labs' },
-              { src: 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=800&q=80', alt: 'Campus hostel' },
-              { src: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&q=80', alt: 'Sports facilities' },
-              { src: 'https://images.unsplash.com/photo-1567521464027-f127ff144326?w=800&q=80', alt: 'Campus dining' },
-              { src: 'https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=800&q=80', alt: 'Campus life' },
-            ].map((img, i) => (
-              <div key={i} className="reveal" data-delay={`${i * 60}`} style={{ borderRadius: 'var(--radius-md)', overflow: 'hidden', height: 220 }}>
-                <img src={img.src} alt={img.alt} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.4s', display: 'block' }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'scale(1.06)'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'scale(1)'; }}
-                  loading="lazy"
-                />
-              </div>
-            ))}
-          </div>
+          <PhotoGrid
+            images={campusGalleryPhotos}
+            label="Gallery"
+            title="A Glimpse of VWU Campus"
+            subtitle="Explore the spaces and moments that define everyday life at Vishnu Womens University."
+            columns={4}
+          />
         </div>
       </section>
 

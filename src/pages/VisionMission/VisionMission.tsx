@@ -2,6 +2,14 @@ import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './VisionMission.css';
 import PageHero from '../../components/PageHero/PageHero';
+import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
+
+const inspirationPhotos = [
+  { src: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80', alt: 'Students collaborating', caption: 'Collaboration' },
+  { src: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&q=80', alt: 'Research and innovation', caption: 'Research & Innovation' },
+  { src: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&q=80', alt: 'Sports and wellness', caption: 'Sports & Wellness' },
+  { src: 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?w=800&q=80', alt: 'Green campus environment', caption: 'Green Campus' },
+];
 
 const missionPoints = [
   'To pursue academic excellence through progressive and innovative teaching practices',
@@ -126,6 +134,20 @@ export default function VisionMission() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Campus Photos */}
+      <section className="section bg-white">
+        <div className="container">
+          <PhotoGrid
+            images={inspirationPhotos}
+            label="Our Values in Action"
+            title="Where Purpose Meets Practice"
+            subtitle="Every corner of VWU reflects the values we stand for — in classrooms, on the field, and in the community."
+            columns={4}
+            showGalleryLink={false}
+          />
         </div>
       </section>
 
