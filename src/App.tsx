@@ -93,6 +93,57 @@ function PublicApp() {
   );
 }
 
+function MaintenancePage() {
+  useEffect(() => {
+    document.title = 'Under Maintenance | Vishnu Womens University';
+  }, []);
+
+  return (
+    <main
+      style={{
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        textAlign: 'center',
+        padding: '4rem 2rem',
+        background: 'var(--color-bg, #fff)',
+      }}
+    >
+      <img
+        src="/vwu-logo.png"
+        alt="Vishnu Womens University"
+        style={{ height: 80, marginBottom: '2rem', objectFit: 'contain' }}
+        onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+      />
+      <h1
+        style={{
+          fontSize: '2.5rem',
+          fontFamily: 'var(--font-serif)',
+          fontWeight: 900,
+          color: 'var(--color-primary)',
+          marginBottom: '1rem',
+        }}
+      >
+        Under Maintenance
+      </h1>
+      <p
+        style={{
+          color: 'var(--color-text-light, #666)',
+          fontSize: '1.1rem',
+          maxWidth: 480,
+          lineHeight: 1.7,
+        }}
+      >
+        We're making some updates to serve you better. Please check back shortly.
+      </p>
+    </main>
+  );
+}
+
+const IS_MAINTENANCE = import.meta.env.VITE_MAINTENANCE_MODE === 'true';
+
 function RootRouter() {
   const { pathname } = useLocation();
   if (pathname.startsWith('/admin')) {
@@ -101,6 +152,9 @@ function RootRouter() {
         <Route path="/admin/*" element={<AdminLayout />} />
       </Routes>
     );
+  }
+  if (IS_MAINTENANCE) {
+    return <MaintenancePage />;
   }
   return <PublicApp />;
 }
