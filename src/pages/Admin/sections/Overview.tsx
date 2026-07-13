@@ -37,7 +37,7 @@ export default function Overview() {
       <div className="admin-info-box">
         <h3>📌 How it works</h3>
         <ul>
-          <li>Upload images → they are stored on <strong>Cloudinary CDN</strong> automatically.</li>
+          <li>Upload images → they are stored on <strong>Firebase Storage</strong> automatically.</li>
           <li>All content (text + image URLs) is saved in <strong>Firestore</strong> in real-time.</li>
           <li>The live website reads from Firestore — changes appear immediately without a rebuild.</li>
         </ul>

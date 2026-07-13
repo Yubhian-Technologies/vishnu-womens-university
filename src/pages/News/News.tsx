@@ -1,18 +1,23 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import NewsCard from '../../components/NewsCard/NewsCard';
-import { newsArticles } from '../../data/news';
+import { useOrderedCollection } from '../../hooks/useCollection';
+import { formatDate } from '../../lib/formatDate';
+import { type NewsDoc, NEWS_CATEGORIES, NEWS_FALLBACK_IMAGE, newsDocToArticle } from '../../lib/news';
 import './News.css';
 import PageHero from '../../components/PageHero/PageHero';
 
-const categories = ['All', 'Campus News', 'Academics', 'Placements', 'Research', 'Awards', 'Events'];
+const categories = ['All', ...NEWS_CATEGORIES];
 
 export default function News() {
+  const { docs: items, loading, error } = useOrderedCollection<NewsDoc>('news', 'date', 'desc');
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     document.title = 'News | Vishnu Womens University';
+  }, []);
+
+  useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -27,12 +32,15 @@ export default function News() {
     );
     document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => observer.observe(el));
     return () => observer.disconnect();
-  }, []);
+  }, [items]);
 
-  const filtered = newsArticles.filter(article => {
+  const featuredItem = items.find(i => i.featured) ?? items[0];
+  const rest = items.filter(i => i.id !== featuredItem?.id);
+
+  const filtered = rest.filter(article => {
     const matchCategory = activeCategory === 'All' || article.category === activeCategory;
     const matchSearch = article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      article.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
+      article.summary.toLowerCase().includes(searchQuery.toLowerCase());
     return matchCategory && matchSearch;
   });
 
@@ -43,44 +51,33 @@ export default function News() {
         page="news"
         defaultImage="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1920&q=80"
         defaultTitle="VWU News & Stories"
-  defaultSubtitle="Stay up-to-date with the latest happenings, achievements, and stories from the VWU community."
+        defaultSubtitle="Stay up-to-date with the latest happenings, achievements, and stories from the VWU community."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'News' }]}
       />
 
       {/* Featured Article */}
-      <section className="news-featured">
-        <div className="container">
-          <div className="news-featured-card reveal">
-            <div className="news-featured-image">
-              <img
-                src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1200&q=80"
-                alt="Team Ziba Racers at mBAJA SAEINDIA 2026"
-                loading="lazy"
-              />
-              <span className="news-featured-badge">Featured Story</span>
-            </div>
-            <div className="news-featured-content">
-              <div className="news-card-date">May 10, 2026</div>
-              <h2>Team Ziba Racers Wins mBAJA SAEINDIA 2026 Award</h2>
-              <p>
-                VWU's Team Ziba Racers brought laurels to the institution by winning a prestigious
-                award at the mBAJA SAEINDIA 2026 national competition on May 10, showcasing
-                outstanding engineering design, teamwork, and innovation. The team competed
-                against top engineering colleges from across India.
-              </p>
-              <p>
-                The mBAJA SAEINDIA competition challenges student teams to design, build, and race
-                an all-terrain vehicle, testing engineering skills in real-world conditions. VWU's
-                victory reflects the college's commitment to hands-on technical excellence.
-              </p>
-              <div style={{ display: 'flex', gap: 'var(--space-4)', marginTop: 'var(--space-6)' }}>
-                <Link to="/news" className="btn btn-primary">Read Full Story</Link>
-                <Link to="/news" className="btn btn-outline">Share</Link>
+      {featuredItem && (
+        <section className="news-featured">
+          <div className="container">
+            <div className="news-featured-card reveal">
+              <div className="news-featured-image">
+                <img
+                  src={featuredItem.imageUrl || NEWS_FALLBACK_IMAGE}
+                  alt={featuredItem.title}
+                  loading="lazy"
+                />
+                <span className="news-featured-badge">Featured Story</span>
+              </div>
+              <div className="news-featured-content">
+                <div className="news-card-date">{formatDate(featuredItem.date)}</div>
+                <h2>{featuredItem.title}</h2>
+                <p>{featuredItem.summary}</p>
+                {featuredItem.body && <p>{featuredItem.body}</p>}
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Filters */}
       <section className="news-filter-section">
@@ -117,20 +114,30 @@ export default function News() {
       {/* Articles Grid */}
       <section className="section bg-off-white">
         <div className="container">
-          {filtered.length > 0 ? (
+          {loading ? (
+            <div className="news-empty"><p>Loading articles…</p></div>
+          ) : error ? (
+            <div className="news-empty"><p>Couldn't load news right now. Please try again later.</p></div>
+          ) : filtered.length > 0 ? (
             <>
               <div className="news-results-count">
                 Showing {filtered.length} {filtered.length === 1 ? 'article' : 'articles'}
                 {activeCategory !== 'All' && ` in ${activeCategory}`}
               </div>
               <div className="news-articles-grid">
-                {filtered.map((article, i) => (
-                  <div key={article.id} className="reveal" data-delay={`${(i % 3) * 100}`}>
-                    <NewsCard article={article} />
+                {filtered.map((item, i) => (
+                  <div key={item.id} className="reveal" data-delay={`${(i % 3) * 100}`}>
+                    <NewsCard article={newsDocToArticle(item)} />
                   </div>
                 ))}
               </div>
             </>
+          ) : items.length === 0 ? (
+            <div className="news-empty">
+              <div className="news-empty-icon">📰</div>
+              <h3>No news yet</h3>
+              <p>Check back soon for the latest updates from VWU.</p>
+            </div>
           ) : (
             <div className="news-empty">
               <div className="news-empty-icon">🔍</div>

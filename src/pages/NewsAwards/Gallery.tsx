@@ -1,7 +1,19 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { galleryAlbums, galleryYears } from './news-awards.data';
+import { useOrderedCollection } from '../../hooks/useCollection';
 import PageHero from '../../components/PageHero/PageHero';
+import './Gallery.css';
+
+interface GalleryPhoto {
+  id: string;
+  title: string;
+  category: string;
+  imageUrl: string;
+  order: number;
+}
+
+const PHOTO_CATEGORIES = ['Campus', 'Events', 'Academics', 'Sports', 'Cultural', 'Placements', 'Infrastructure'];
 
 const yearColors: Record<number, string> = {
   2026: '#003087',
@@ -18,9 +30,15 @@ const yearColors: Record<number, string> = {
 
 export default function Gallery() {
   const [activeYear, setActiveYear] = useState<number | 'all'>('all');
+  const { docs: photos, loading: photosLoading } = useOrderedCollection<GalleryPhoto>('gallery', 'order');
+  const [activeCategory, setActiveCategory] = useState<string>('all');
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   useEffect(() => {
     document.title = 'Gallery | Vishnu Womens University';
+  }, []);
+
+  useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -35,9 +53,16 @@ export default function Gallery() {
     );
     document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
     return () => observer.disconnect();
-  }, [activeYear]);
+  }, [activeYear, activeCategory, photos]);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setLightboxIndex(null); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
 
   const filtered = activeYear === 'all' ? galleryAlbums : galleryAlbums.filter(a => a.year === activeYear);
+  const filteredPhotos = activeCategory === 'all' ? photos : photos.filter((p) => p.category === activeCategory);
 
   return (
     <main className="page-wrapper">
@@ -70,9 +95,105 @@ export default function Gallery() {
         </div>
       </section>
 
+      {/* Photo Gallery — live from admin uploads */}
+      <section className="section bg-white">
+        <div className="container">
+          <div className="reveal" style={{ marginBottom: 'var(--space-6)' }}>
+            <span className="section-label">Fresh from Campus</span>
+            <h2 className="section-title">Photo Gallery</h2>
+            <p style={{ color: 'var(--color-text-light)', maxWidth: 600, lineHeight: 1.7 }}>
+              Photos uploaded by the VWU team, updated in real time.
+            </p>
+          </div>
+
+          {/* Category pills */}
+          <div style={{ display: 'flex', gap: 'var(--space-2)', marginBottom: 'var(--space-6)', flexWrap: 'wrap' }}>
+            <button
+              onClick={() => setActiveCategory('all')}
+              style={{
+                padding: '0.5rem 1.1rem',
+                borderRadius: 'var(--radius-full)',
+                border: '1.5px solid',
+                fontSize: 'var(--text-sm)',
+                fontWeight: 600,
+                cursor: 'pointer',
+                transition: 'all var(--transition-base)',
+                background: activeCategory === 'all' ? 'var(--color-primary)' : 'var(--color-white)',
+                borderColor: activeCategory === 'all' ? 'var(--color-primary)' : 'var(--color-light-gray)',
+                color: activeCategory === 'all' ? 'var(--color-white)' : 'var(--color-text)',
+              }}
+            >
+              All Photos
+            </button>
+            {PHOTO_CATEGORIES.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setActiveCategory(cat)}
+                style={{
+                  padding: '0.5rem 1.1rem',
+                  borderRadius: 'var(--radius-full)',
+                  border: '1.5px solid',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  transition: 'all var(--transition-base)',
+                  background: activeCategory === cat ? 'var(--color-primary)' : 'var(--color-white)',
+                  borderColor: activeCategory === cat ? 'var(--color-primary)' : 'var(--color-light-gray)',
+                  color: activeCategory === cat ? 'var(--color-white)' : 'var(--color-text)',
+                }}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+
+          {photosLoading ? (
+            <p style={{ color: 'var(--color-text-light)' }}>Loading photos…</p>
+          ) : filteredPhotos.length > 0 ? (
+            <div className="pg-grid">
+              {filteredPhotos.map((photo, i) => (
+                <div
+                  key={photo.id}
+                  className="pg-tile reveal"
+                  data-delay={`${(i % 4) * 60}`}
+                  onClick={() => setLightboxIndex(i)}
+                >
+                  <img src={photo.imageUrl} alt={photo.title} loading="lazy" />
+                  <div className="pg-tile__overlay">
+                    <span className="pg-tile__caption">{photo.title}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p style={{ color: 'var(--color-text-light)' }}>No photos in this category yet — check back soon.</p>
+          )}
+        </div>
+      </section>
+
+      {lightboxIndex !== null && filteredPhotos[lightboxIndex] && (
+        <div className="pg-lightbox" onClick={(e) => e.target === e.currentTarget && setLightboxIndex(null)}>
+          <div className="pg-lightbox__inner">
+            <button className="pg-lightbox__close" onClick={() => setLightboxIndex(null)} aria-label="Close">✕</button>
+            <img src={filteredPhotos[lightboxIndex].imageUrl} alt={filteredPhotos[lightboxIndex].title} />
+            <div className="pg-lightbox__caption">
+              <strong>{filteredPhotos[lightboxIndex].title}</strong>
+              <span>{filteredPhotos[lightboxIndex].category}</span>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Year Filter + Albums */}
       <section className="section bg-off-white">
         <div className="container">
+          <div className="reveal" style={{ marginBottom: 'var(--space-6)' }}>
+            <span className="section-label">Since 2017</span>
+            <h2 className="section-title">Milestones by Year</h2>
+            <p style={{ color: 'var(--color-text-light)', maxWidth: 600, lineHeight: 1.7 }}>
+              A written index of major campus events and milestones across the years.
+            </p>
+          </div>
           {/* Year pills */}
           <div style={{ display: 'flex', gap: 'var(--space-2)', marginBottom: 'var(--space-8)', flexWrap: 'wrap' }}>
             <button

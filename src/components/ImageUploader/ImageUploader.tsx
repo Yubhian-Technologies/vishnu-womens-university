@@ -1,13 +1,13 @@
 import { useRef, useState, useCallback } from 'react';
 import ReactCrop, { type Crop, type PixelCrop, centerCrop, makeAspectCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
-import { uploadToCloudinary, type CloudinaryResult } from '../../lib/cloudinary';
-import './CloudinaryUploader.css';
+import { uploadImage, type UploadResult } from '../../lib/storage';
+import './ImageUploader.css';
 
 interface Props {
   folder?: string;
   currentUrl?: string;
-  onUploaded: (result: CloudinaryResult) => void;
+  onUploaded: (result: UploadResult) => void;
   label?: string;
   aspect?: number; // e.g. 16/9, 4/3, 1 — omit for free crop
 }
@@ -42,7 +42,7 @@ async function cropImageToBlob(img: HTMLImageElement, px: PixelCrop): Promise<Bl
   );
 }
 
-export default function CloudinaryUploader({
+export default function ImageUploader({
   folder = 'vwu',
   currentUrl,
   onUploaded,
@@ -96,7 +96,7 @@ export default function CloudinaryUploader({
       const blob   = await cropImageToBlob(imgRef.current, pixelCrop);
       const file   = new File([blob], 'cropped.jpg', { type: 'image/jpeg' });
       setPreview(URL.createObjectURL(blob));
-      const result = await uploadToCloudinary(file, folder);
+      const result = await uploadImage(file, folder);
       onUploaded(result);
       setError(null);
     } catch (e) {

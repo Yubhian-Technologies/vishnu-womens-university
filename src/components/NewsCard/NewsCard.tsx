@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import './NewsCard.css';
 
 export interface NewsArticle {
-  id: number;
+  id: string;
   title: string;
   excerpt: string;
   date: string;

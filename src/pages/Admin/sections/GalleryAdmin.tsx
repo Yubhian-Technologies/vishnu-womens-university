@@ -2,14 +2,14 @@ import { useState, useRef } from 'react';
 import { collection, addDoc, deleteDoc, doc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
-import { uploadToCloudinary } from '../../../lib/cloudinary';
+import { uploadImage } from '../../../lib/storage';
 
 interface GalleryImage {
   id: string;
   title: string;
   category: string;
   imageUrl: string;
-  publicId: string;
+  storagePath: string;
   order: number;
 }
 
@@ -28,12 +28,12 @@ export default function GalleryAdmin() {
     for (let i = 0; i < arr.length; i++) {
       setProgress(`Uploading ${i + 1} / ${arr.length}…`);
       try {
-        const result = await uploadToCloudinary(arr[i], `vwu/gallery/${category.toLowerCase()}`);
+        const result = await uploadImage(arr[i], `vwu/gallery/${category.toLowerCase()}`);
         await addDoc(collection(db, 'gallery'), {
           title: arr[i].name.replace(/\.[^.]+$/, ''),
           category,
-          imageUrl: result.secure_url,
-          publicId: result.public_id,
+          imageUrl: result.url,
+          storagePath: result.path,
           order: images.length + i,
           createdAt: serverTimestamp(),
         });
@@ -80,7 +80,7 @@ export default function GalleryAdmin() {
             <>
               <span style={{ fontSize: '2.5rem' }}>📷</span>
               <p><strong>Click or drag & drop</strong> multiple images here</p>
-              <p style={{ fontSize: '0.8rem', color: '#888' }}>JPG, PNG, WebP — uploaded directly to Cloudinary</p>
+              <p style={{ fontSize: '0.8rem', color: '#888' }}>JPG, PNG, WebP — uploaded directly to Firebase Storage</p>
             </>
           )}
         </div>

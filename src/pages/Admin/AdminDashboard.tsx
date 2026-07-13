@@ -7,6 +7,7 @@ import ProgramsAdmin from './sections/ProgramsAdmin';
 import FacultyAdmin from './sections/FacultyAdmin';
 import GoverningBodyAdmin from './sections/GoverningBodyAdmin';
 import PlacementsAdmin from './sections/PlacementsAdmin';
+import AlumniAdmin from './sections/AlumniAdmin';
 import AnnouncementsAdmin from './sections/AnnouncementsAdmin';
 
 interface Props {
@@ -23,6 +24,7 @@ const SECTION_MAP: Record<string, React.ReactNode> = {
   faculty: <FacultyAdmin />,
   'governing-body': <GoverningBodyAdmin />,
   placements: <PlacementsAdmin />,
+  alumni: <AlumniAdmin />,
   announcements: <AnnouncementsAdmin />,
 };
 
