@@ -14,6 +14,7 @@ import Events from './pages/Events/Events';
 import VisionMission from './pages/VisionMission/VisionMission';
 import Governance from './pages/Governance/Governance';
 import GovernanceDetail from './pages/Governance/GovernanceDetail';
+import GoverningBody from './pages/Governance/GoverningBody';
 import AboutSVES from './pages/AboutSVES/AboutSVES';
 import Campus from './pages/Campus/Campus';
 import Information from './pages/Information/Information';
@@ -61,6 +62,7 @@ function PublicApp() {
         <Route path="/about" element={<About />} />
         <Route path="/vision-mission" element={<VisionMission />} />
         <Route path="/governance" element={<Governance />} />
+        <Route path="/governance/governing-body" element={<GoverningBody />} />
         <Route path="/governance/:slug" element={<GovernanceDetail />} />
         <Route path="/about-sves" element={<AboutSVES />} />
         <Route path="/campus" element={<Campus />} />

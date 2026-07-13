@@ -12,6 +12,7 @@ export const SECTIONS = [
   { id: 'gallery',        icon: '📷', label: 'Gallery' },
   { id: 'programs',       icon: '🎓', label: 'Programs' },
   { id: 'faculty',        icon: '👩‍🏫', label: 'Faculty' },
+  { id: 'governing-body', icon: '🏛️', label: 'Governing Body' },
   { id: 'placements',     icon: '💼', label: 'Placements' },
   { id: 'alumni',         icon: '🎓', label: 'Alumni & Giving' },
   { id: 'announcements',  icon: '📢', label: 'Announcements' },
