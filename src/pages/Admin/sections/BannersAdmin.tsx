@@ -4,8 +4,8 @@ import {
 } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
-import CloudinaryUploader from '../../../components/CloudinaryUploader/CloudinaryUploader';
-import type { CloudinaryResult } from '../../../lib/cloudinary';
+import ImageUploader from '../../../components/ImageUploader/ImageUploader';
+import type { UploadResult } from '../../../lib/storage';
 
 interface Banner {
   id: string;
@@ -13,14 +13,14 @@ interface Banner {
   title: string;
   subtitle: string;
   imageUrl: string;
-  publicId: string;
+  storagePath: string;
   ctaLabel: string;
   ctaLink: string;
   order: number;
 }
 
 const EMPTY: Omit<Banner, 'id'> = {
-  page: 'home', title: '', subtitle: '', imageUrl: '', publicId: '',
+  page: 'home', title: '', subtitle: '', imageUrl: '', storagePath: '',
   ctaLabel: '', ctaLink: '', order: 0,
 };
 
@@ -65,8 +65,8 @@ export default function BannersAdmin() {
 
   const set = (k: string, v: string | number) => setForm((p) => ({ ...p, [k]: v }));
 
-  const handleImageUploaded = (r: CloudinaryResult) => {
-    setForm((p) => ({ ...p, imageUrl: r.secure_url, publicId: r.public_id }));
+  const handleImageUploaded = (r: UploadResult) => {
+    setForm((p) => ({ ...p, imageUrl: r.url, storagePath: r.path }));
   };
 
   const save = async () => {
@@ -90,7 +90,7 @@ export default function BannersAdmin() {
     setForm({
       page: b.page ?? 'home',
       title: b.title, subtitle: b.subtitle, imageUrl: b.imageUrl,
-      publicId: b.publicId, ctaLabel: b.ctaLabel, ctaLink: b.ctaLink, order: b.order,
+      storagePath: b.storagePath, ctaLabel: b.ctaLabel, ctaLink: b.ctaLink, order: b.order,
     });
   };
 
@@ -127,7 +127,7 @@ export default function BannersAdmin() {
         <div className="admin-form-grid" style={{ marginTop: '1.25rem' }}>
           <div className="admin-field admin-field--full">
             <label>Banner Image *</label>
-            <CloudinaryUploader
+            <ImageUploader
               folder={`vwu/banners/${form.page}`}
               currentUrl={form.imageUrl}
               onUploaded={handleImageUploaded}

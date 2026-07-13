@@ -4,8 +4,8 @@ import {
 } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
-import CloudinaryUploader from '../../../components/CloudinaryUploader/CloudinaryUploader';
-import type { CloudinaryResult } from '../../../lib/cloudinary';
+import ImageUploader from '../../../components/ImageUploader/ImageUploader';
+import type { UploadResult } from '../../../lib/storage';
 
 interface FacultyDoc {
   id: string;
@@ -16,13 +16,13 @@ interface FacultyDoc {
   specialization: string;
   email: string;
   imageUrl: string;
-  publicId: string;
+  storagePath: string;
   order: number;
 }
 
 const EMPTY: Omit<FacultyDoc, 'id'> = {
   name: '', designation: 'Assistant Professor', department: 'CSE',
-  qualification: '', specialization: '', email: '', imageUrl: '', publicId: '', order: 0,
+  qualification: '', specialization: '', email: '', imageUrl: '', storagePath: '', order: 0,
 };
 
 const DEPARTMENTS = ['CSE', 'AI&ML', 'AI&DS', 'Cyber Security', 'IT', 'ECE', 'EEE', 'Civil', 'Mechanical', 'MBA'];
@@ -36,7 +36,7 @@ export default function FacultyAdmin() {
   const [filterDept, setFilterDept] = useState('All');
 
   const set = (k: string, v: string | number) => setForm((p) => ({ ...p, [k]: v }));
-  const handleImage = (r: CloudinaryResult) => setForm((p) => ({ ...p, imageUrl: r.secure_url, publicId: r.public_id }));
+  const handleImage = (r: UploadResult) => setForm((p) => ({ ...p, imageUrl: r.url, storagePath: r.path }));
 
   const save = async () => {
     if (!form.name) return alert('Name is required.');
@@ -55,7 +55,7 @@ export default function FacultyAdmin() {
     setEditing(f.id);
     setForm({ name: f.name, designation: f.designation, department: f.department,
                qualification: f.qualification, specialization: f.specialization,
-               email: f.email, imageUrl: f.imageUrl, publicId: f.publicId, order: f.order });
+               email: f.email, imageUrl: f.imageUrl, storagePath: f.storagePath, order: f.order });
   };
 
   const remove = async (id: string) => {
@@ -72,7 +72,7 @@ export default function FacultyAdmin() {
         <div className="admin-form-grid">
           <div className="admin-field" style={{ gridColumn: '1 / -1', maxWidth: 200 }}>
             <label>Photo</label>
-            <CloudinaryUploader folder="vwu/faculty" currentUrl={form.imageUrl} onUploaded={handleImage} label="Upload Photo" />
+            <ImageUploader folder="vwu/faculty" currentUrl={form.imageUrl} onUploaded={handleImage} label="Upload Photo" />
           </div>
           <div className="admin-field">
             <label>Full Name *</label>

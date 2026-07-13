@@ -4,14 +4,14 @@ import {
 } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
-import CloudinaryUploader from '../../../components/CloudinaryUploader/CloudinaryUploader';
-import type { CloudinaryResult } from '../../../lib/cloudinary';
+import ImageUploader from '../../../components/ImageUploader/ImageUploader';
+import type { UploadResult } from '../../../lib/storage';
 
 interface PlacementRecord {
   id: string;
   companyName: string;
   logoUrl: string;
-  publicId: string;
+  storagePath: string;
   year: string;
   package: string;
   studentsPlaced: number;
@@ -20,7 +20,7 @@ interface PlacementRecord {
 }
 
 const EMPTY: Omit<PlacementRecord, 'id'> = {
-  companyName: '', logoUrl: '', publicId: '', year: '2024-25',
+  companyName: '', logoUrl: '', storagePath: '', year: '2024-25',
   package: '', studentsPlaced: 0, sector: 'IT', featured: false,
 };
 
@@ -33,7 +33,7 @@ export default function PlacementsAdmin() {
   const [saving, setSaving] = useState(false);
 
   const set = (k: string, v: string | number | boolean) => setForm((p) => ({ ...p, [k]: v }));
-  const handleLogo = (r: CloudinaryResult) => setForm((p) => ({ ...p, logoUrl: r.secure_url, publicId: r.public_id }));
+  const handleLogo = (r: UploadResult) => setForm((p) => ({ ...p, logoUrl: r.url, storagePath: r.path }));
 
   const save = async () => {
     if (!form.companyName) return alert('Company name is required.');
@@ -50,7 +50,7 @@ export default function PlacementsAdmin() {
 
   const startEdit = (p: PlacementRecord) => {
     setEditing(p.id);
-    setForm({ companyName: p.companyName, logoUrl: p.logoUrl, publicId: p.publicId,
+    setForm({ companyName: p.companyName, logoUrl: p.logoUrl, storagePath: p.storagePath,
                year: p.year, package: p.package, studentsPlaced: p.studentsPlaced,
                sector: p.sector, featured: p.featured });
   };
@@ -67,7 +67,7 @@ export default function PlacementsAdmin() {
         <div className="admin-form-grid">
           <div className="admin-field" style={{ maxWidth: 180 }}>
             <label>Company Logo</label>
-            <CloudinaryUploader folder="vwu/placements" currentUrl={form.logoUrl} onUploaded={handleLogo} label="Upload Logo" />
+            <ImageUploader folder="vwu/placements" currentUrl={form.logoUrl} onUploaded={handleLogo} label="Upload Logo" />
           </div>
           <div className="admin-field">
             <label>Company Name *</label>

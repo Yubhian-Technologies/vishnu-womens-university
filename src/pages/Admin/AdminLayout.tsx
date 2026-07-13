@@ -13,6 +13,7 @@ export const SECTIONS = [
   { id: 'programs',       icon: '🎓', label: 'Programs' },
   { id: 'faculty',        icon: '👩‍🏫', label: 'Faculty' },
   { id: 'placements',     icon: '💼', label: 'Placements' },
+  { id: 'alumni',         icon: '🎓', label: 'Alumni & Giving' },
   { id: 'announcements',  icon: '📢', label: 'Announcements' },
 ];
 

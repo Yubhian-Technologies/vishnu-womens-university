@@ -4,8 +4,8 @@ import {
 } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
-import CloudinaryUploader from '../../../components/CloudinaryUploader/CloudinaryUploader';
-import type { CloudinaryResult } from '../../../lib/cloudinary';
+import ImageUploader from '../../../components/ImageUploader/ImageUploader';
+import type { UploadResult } from '../../../lib/storage';
 
 interface Program {
   id: string;
@@ -18,12 +18,12 @@ interface Program {
   hod: string;
   about: string;
   imageUrl: string;
-  publicId: string;
+  storagePath: string;
 }
 
 const EMPTY: Omit<Program, 'id'> = {
   name: '', shortName: '', category: 'btech', intake: 60,
-  established: '', accreditation: '', hod: '', about: '', imageUrl: '', publicId: '',
+  established: '', accreditation: '', hod: '', about: '', imageUrl: '', storagePath: '',
 };
 
 const CATEGORIES = ['btech', 'mtech', 'mba', 'phd'];
@@ -35,7 +35,7 @@ export default function ProgramsAdmin() {
   const [saving, setSaving] = useState(false);
 
   const set = (k: string, v: string | number) => setForm((p) => ({ ...p, [k]: v }));
-  const handleImage = (r: CloudinaryResult) => setForm((p) => ({ ...p, imageUrl: r.secure_url, publicId: r.public_id }));
+  const handleImage = (r: UploadResult) => setForm((p) => ({ ...p, imageUrl: r.url, storagePath: r.path }));
 
   const save = async () => {
     if (!form.name) return alert('Program name is required.');
@@ -54,7 +54,7 @@ export default function ProgramsAdmin() {
     setEditing(p.id);
     setForm({ name: p.name, shortName: p.shortName, category: p.category, intake: p.intake,
                established: p.established, accreditation: p.accreditation, hod: p.hod,
-               about: p.about, imageUrl: p.imageUrl, publicId: p.publicId });
+               about: p.about, imageUrl: p.imageUrl, storagePath: p.storagePath });
   };
 
   const remove = async (id: string) => {
@@ -69,7 +69,7 @@ export default function ProgramsAdmin() {
         <div className="admin-form-grid">
           <div className="admin-field admin-field--full">
             <label>Program Image</label>
-            <CloudinaryUploader folder="vwu/programs" currentUrl={form.imageUrl} onUploaded={handleImage} label="Upload Program Image" />
+            <ImageUploader folder="vwu/programs" currentUrl={form.imageUrl} onUploaded={handleImage} label="Upload Program Image" />
           </div>
           <div className="admin-field">
             <label>Full Name *</label>

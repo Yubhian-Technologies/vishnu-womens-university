@@ -4,8 +4,8 @@ import {
 } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
-import CloudinaryUploader from '../../../components/CloudinaryUploader/CloudinaryUploader';
-import type { CloudinaryResult } from '../../../lib/cloudinary';
+import ImageUploader from '../../../components/ImageUploader/ImageUploader';
+import type { UploadResult } from '../../../lib/storage';
 
 interface NewsItem {
   id: string;
@@ -15,13 +15,13 @@ interface NewsItem {
   summary: string;
   body: string;
   imageUrl: string;
-  publicId: string;
+  storagePath: string;
   featured: boolean;
 }
 
 const EMPTY: Omit<NewsItem, 'id'> = {
   title: '', category: 'News', date: new Date().toISOString().slice(0, 10),
-  summary: '', body: '', imageUrl: '', publicId: '', featured: false,
+  summary: '', body: '', imageUrl: '', storagePath: '', featured: false,
 };
 
 const CATEGORIES = ['News', 'Event', 'Achievement', 'Award', 'Announcement', 'Research'];
@@ -33,7 +33,7 @@ export default function NewsAdmin() {
   const [saving, setSaving] = useState(false);
 
   const set = (k: string, v: string | boolean) => setForm((p) => ({ ...p, [k]: v }));
-  const handleImage = (r: CloudinaryResult) => setForm((p) => ({ ...p, imageUrl: r.secure_url, publicId: r.public_id }));
+  const handleImage = (r: UploadResult) => setForm((p) => ({ ...p, imageUrl: r.url, storagePath: r.path }));
 
   const save = async () => {
     if (!form.title || !form.date) return alert('Title and date are required.');
@@ -52,7 +52,7 @@ export default function NewsAdmin() {
     setEditing(item.id);
     setForm({ title: item.title, category: item.category, date: item.date,
                summary: item.summary, body: item.body, imageUrl: item.imageUrl,
-               publicId: item.publicId, featured: item.featured });
+               storagePath: item.storagePath, featured: item.featured });
   };
 
   const remove = async (id: string) => {
@@ -67,7 +67,7 @@ export default function NewsAdmin() {
         <div className="admin-form-grid">
           <div className="admin-field admin-field--full">
             <label>Image</label>
-            <CloudinaryUploader folder="vwu/news" currentUrl={form.imageUrl} onUploaded={handleImage} label="Upload News Image" />
+            <ImageUploader folder="vwu/news" currentUrl={form.imageUrl} onUploaded={handleImage} label="Upload News Image" />
           </div>
           <div className="admin-field">
             <label>Title *</label>

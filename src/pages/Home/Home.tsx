@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom';
 import HeroSlider from '../../components/HeroSlider/HeroSlider';
 import CounterSection from '../../components/CounterSection/CounterSection';
 import NewsCard from '../../components/NewsCard/NewsCard';
-import { newsArticles } from '../../data/news';
+import { useOrderedCollection } from '../../hooks/useCollection';
+import { type NewsDoc, newsDocToArticle } from '../../lib/news';
 import './Home.css';
 
 /* ── Data ─────────────────────────────────────────────────── */
@@ -107,6 +108,8 @@ export default function Home() {
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [tagHovered, setTagHovered] = useState<number | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const { docs: newsItems } = useOrderedCollection<NewsDoc>('news', 'date', 'desc');
+  const featuredNews = newsItems.filter(n => n.featured).slice(0, 3);
 
   useEffect(() => {
     document.title = 'VWU | Empowering Women Through Knowledge and Action';
@@ -128,6 +131,25 @@ export default function Home() {
     document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale, .reveal-bounce, .reveal-zoom').forEach(el => observer.observe(el));
     return () => observer.disconnect();
   }, []);
+
+  // Re-run reveal for news cards once Firestore data arrives (they don't exist at initial mount)
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const el = entry.target as HTMLElement;
+            const delay = el.dataset.delay || '0';
+            setTimeout(() => el.classList.add('revealed'), parseInt(delay));
+            observer.unobserve(el);
+          }
+        });
+      },
+      { threshold: 0.08 }
+    );
+    document.querySelectorAll('.news-grid .reveal-bounce').forEach(el => observer.observe(el));
+    return () => observer.disconnect();
+  }, [featuredNews]);
 
   // Testimonial auto-advance
   useEffect(() => {
@@ -380,11 +402,14 @@ export default function Home() {
             <Link to="/news" className="btn btn-outline reveal-right">View All News →</Link>
           </div>
           <div className="news-grid">
-            {newsArticles.slice(0, 3).map((article, i) => (
-              <div key={article.id} className="reveal-bounce" data-delay={`${i * 110}`}>
-                <NewsCard article={article} />
+            {featuredNews.map((item, i) => (
+              <div key={item.id} className="reveal-bounce" data-delay={`${i * 110}`}>
+                <NewsCard article={newsDocToArticle(item)} />
               </div>
             ))}
+            {featuredNews.length === 0 && (
+              <p style={{ color: 'var(--color-text-light)' }}>No featured news yet — check back soon.</p>
+            )}
           </div>
         </div>
       </section>
