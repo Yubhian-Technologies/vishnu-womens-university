@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { Trophy, Lightbulb, Handshake, Venus, Microscope, Leaf } from 'lucide-react';
 import './VisionMission.css';
 import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
@@ -24,12 +25,12 @@ const missionPoints = [
 ];
 
 const values = [
-  { icon: '🏆', title: 'Excellence', desc: 'Holding ourselves to the highest standards across academic programs, faculty quality, and research outcomes.' },
-  { icon: '💡', title: 'Innovation', desc: 'Encouraging creative thinking, entrepreneurial initiative, and technology-driven solutions to real problems.' },
-  { icon: '🤝', title: 'Integrity', desc: 'Maintaining honesty, transparency, and ethical conduct across all activities and interactions.' },
-  { icon: '♀️', title: 'Empowerment', desc: 'Building women\'s confidence, capabilities, and readiness for leadership through education and opportunity.' },
-  { icon: '🔬', title: 'Research', desc: 'Advancing knowledge through funded projects, scholarly publications, and applied innovation.' },
-  { icon: '🌿', title: 'Service', desc: 'Making a positive and lasting contribution to community, environment, and society.' },
+  { icon: Trophy, title: 'Excellence', desc: 'Holding ourselves to the highest standards across academic programs, faculty quality, and research outcomes.' },
+  { icon: Lightbulb, title: 'Innovation', desc: 'Encouraging creative thinking, entrepreneurial initiative, and technology-driven solutions to real problems.' },
+  { icon: Handshake, title: 'Integrity', desc: 'Maintaining honesty, transparency, and ethical conduct across all activities and interactions.' },
+  { icon: Venus, title: 'Empowerment', desc: 'Building women\'s confidence, capabilities, and readiness for leadership through education and opportunity.' },
+  { icon: Microscope, title: 'Research', desc: 'Advancing knowledge through funded projects, scholarly publications, and applied innovation.' },
+  { icon: Leaf, title: 'Service', desc: 'Making a positive and lasting contribution to community, environment, and society.' },
 ];
 
 const qualityPolicy = [
@@ -129,7 +130,7 @@ export default function VisionMission() {
           <div className="vm-values-grid">
             {values.map((v, i) => (
               <div key={v.title} className="vm-value-card reveal" data-delay={`${i * 80}`}>
-                <div className="vm-value-icon">{v.icon}</div>
+                <div className="vm-value-icon"><v.icon size={40} strokeWidth={1.75} /></div>
                 <h3>{v.title}</h3>
                 <p>{v.desc}</p>
               </div>

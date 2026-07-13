@@ -1,3 +1,6 @@
+import type { LucideIcon } from 'lucide-react';
+import { Rocket, Factory, Microscope, Globe2, GraduationCap } from 'lucide-react';
+
 export interface DiffItem {
   slug: string;
   title: string;
@@ -15,7 +18,7 @@ export interface DiffItem {
 export interface DiffCategory {
   id: string;
   label: string;
-  icon: string;
+  icon: LucideIcon;
   heroImage: string;
   items: DiffItem[];
 }
@@ -24,7 +27,7 @@ export const categories: DiffCategory[] = [
   {
     id: 'innovation',
     label: 'Innovation & Entrepreneurship',
-    icon: '🚀',
+    icon: Rocket,
     heroImage: 'https://images.unsplash.com/photo-1553877522-43269d4ea984?w=1920&q=80',
     items: [
       {
@@ -126,7 +129,7 @@ export const categories: DiffCategory[] = [
   {
     id: 'industry',
     label: 'Industry Centres of Excellence',
-    icon: '🏭',
+    icon: Factory,
     heroImage: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=1920&q=80',
     items: [
       {
@@ -316,7 +319,7 @@ export const categories: DiffCategory[] = [
   {
     id: 'research',
     label: 'Research & Specialised Labs',
-    icon: '🔬',
+    icon: Microscope,
     heroImage: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=1920&q=80',
     items: [
       {
@@ -502,7 +505,7 @@ export const categories: DiffCategory[] = [
   {
     id: 'global',
     label: 'International & Global Outreach',
-    icon: '🌏',
+    icon: Globe2,
     heroImage: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1920&q=80',
     items: [
       {
@@ -565,7 +568,7 @@ export const categories: DiffCategory[] = [
   {
     id: 'student',
     label: 'Student Development & Social Impact',
-    icon: '🎓',
+    icon: GraduationCap,
     heroImage: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1920&q=80',
     items: [
       {

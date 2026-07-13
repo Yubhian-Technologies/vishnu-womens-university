@@ -48,7 +48,7 @@ export default function DifferentiatorDetail() {
             <span className="breadcrumb-item active">{item.title}</span>
           </div>
           <div className="animate-fade-in-up" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'var(--color-accent)', color: 'var(--color-white)', fontSize: 'var(--text-xs)', fontWeight: 700, padding: '0.3rem 0.9rem', borderRadius: 'var(--radius-full)', marginBottom: 'var(--space-3)' }}>
-            <span>{category.icon}</span> {category.label}
+            <category.icon size={14} /> {category.label}
           </div>
           <h1 className="animate-fade-in-up">{item.title}</h1>
         </div>

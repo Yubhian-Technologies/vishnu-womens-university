@@ -1,24 +1,25 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { Calendar, Trophy, Image } from 'lucide-react';
 import PageHero from '../../components/PageHero/PageHero';
 
 const sections = [
   {
     slug: 'happenings',
     title: 'Happenings at VWU',
-    icon: '📅',
+    icon: Calendar,
     desc: 'Stay updated with the latest events, workshops, MoUs, competitions, and campus milestones — from recent achievements to upcoming programmes.',
   },
   {
     slug: 'accreditations-awards',
     title: 'Accreditations & Awards',
-    icon: '🏆',
+    icon: Trophy,
     desc: 'VWU is recognised by NAAC, NBA, NIRF, ARIIA, IEI, ISTE, and more. Explore our full record of national rankings, quality awards, and institutional accreditations.',
   },
   {
     slug: 'gallery',
     title: 'Gallery',
-    icon: '🖼️',
+    icon: Image,
     desc: 'A visual archive of campus life — from national symposia, graduation days, and cultural festivals to sports championships and industry collaborations.',
   },
 ];
@@ -95,7 +96,7 @@ export default function NewsAwards() {
                 onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-accent)'; (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-md)'; (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; }}
                 onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-light-gray)'; (e.currentTarget as HTMLElement).style.boxShadow = 'none'; (e.currentTarget as HTMLElement).style.transform = 'none'; }}
               >
-                <div style={{ fontSize: '2.5rem', marginBottom: 'var(--space-4)' }}>{s.icon}</div>
+                <div style={{ marginBottom: 'var(--space-4)' }}><s.icon size={40} strokeWidth={1.75} /></div>
                 <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-lg)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-2)', lineHeight: 1.3 }}>
                   {s.title}
                 </h3>
