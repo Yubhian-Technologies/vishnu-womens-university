@@ -1,3 +1,6 @@
+import type { LucideIcon } from 'lucide-react';
+import { BarChart3, Sparkles, Building2, Users, Handshake, Compass, Target, Factory, Lightbulb, Microscope, Globe2, GraduationCap } from 'lucide-react';
+
 export interface TableRow {
   [key: string]: string | number;
 }
@@ -6,7 +9,7 @@ export interface PlacementItem {
   slug: string;
   title: string;
   desc: string;
-  icon: string;
+  icon: LucideIcon;
   external?: boolean;
   url?: string;
   intro?: string;
@@ -21,7 +24,7 @@ export const placementItems: PlacementItem[] = [
   {
     slug: 'placement-details',
     title: 'Placement Details',
-    icon: '📊',
+    icon: BarChart3,
     desc: 'VWU consistently delivers outstanding campus placement results, with over 8,000 students placed since 2003 across 200+ companies. Recent batches have seen packages as high as 49 LPA, with global tech giants like Amazon, Adobe, Microsoft, and Palo Alto Networks among top recruiters.',
     intro: "VWU's placement record reflects years of sustained industry engagement and student preparation. Each batch sees hundreds of students placed across IT services, product companies, core engineering, and financial services sectors. The college's strong ties with both mass recruiters and premium employers ensure diverse opportunities at every salary band.",
     about: 'Recent batches illustrate the breadth of placement outcomes: the 2021–2025 batch saw 1,156 placements with a highest package of 46 LPA (Amazon), while the 2018–2022 batch achieved 1,892 placements with a peak of 49 LPA (Palo Alto Networks). Mega recruiters such as Capgemini, Accenture, Infosys, TCS, IBM, and Wipro routinely select 100+ students per cycle, while premium companies like Adobe, PayPal, VISA, D.E. Shaw, and Flipkart offer packages in the 25–45 LPA range.\n\nThe placement ecosystem spans IT services, semiconductor firms, automotive and manufacturing companies, and global financial institutions. Regular engagement with 200+ companies annually ensures students from all departments—CSE, ECE, EEE, IT, ME, and CE—find relevant opportunities.',
@@ -70,7 +73,7 @@ export const placementItems: PlacementItem[] = [
   {
     slug: 'success-stories',
     title: 'Success Stories',
-    icon: '🌟',
+    icon: Sparkles,
     desc: "Inspiring journeys of VWU graduates who have secured positions at some of the world's leading technology, engineering, and financial services firms — from first-generation engineers to students achieving 40+ LPA packages.",
     intro: "The success stories section celebrates VWU graduates who have gone on to build remarkable careers at top national and international organizations. Enabled by rigorous campus recruitment training, mentorship from the TPO Cell, and a strong industry liaison network, these graduates exemplify the college's commitment to holistic career development.",
     about: "VWU's placement ecosystem — comprising the TPO Cell, Industry Liaison Offices, Career Guidance Cell, and Campus Recruitment Training programmes — has been instrumental in shaping student success. Graduates have secured positions at companies such as Amazon, Adobe, Microsoft, Palo Alto Networks, Flipkart, and PayPal, with packages ranging from competitive entry-level offers to premium packages exceeding 45 LPA.\n\nBeyond corporate placements, many VWU alumni have pursued higher education at universities in the USA, UK, Australia, Canada, and Germany, with support from the Graduate Study Abroad Center (GSAC). Others have pursued advanced research and R&D roles through Mission R&D, working at multinational product companies and innovative startups.",
@@ -98,7 +101,7 @@ export const placementItems: PlacementItem[] = [
   {
     slug: 'tpo-cell',
     title: 'TPO Cell',
-    icon: '🏢',
+    icon: Building2,
     desc: 'The Training and Placement Office (TPO) Cell at VWU is the central hub for student career development, coordinating campus recruitment, industrial training, and career counseling. VWU has topped AP private institution placement rankings for 7+ consecutive years.',
     intro: "The TPO Cell at VWU orchestrates a comprehensive suite of career development services — from organising campus interviews with 200+ companies to facilitating industrial internships and competitive exam preparation. The office's mandate extends to entrepreneurship development, industry interaction, and project sourcing for both students and faculty.",
     about: "Key activities of the TPO Cell include arranging in-plant industrial training during summer and intra-semester breaks, conducting Entrepreneurship Development Programs, and organising corporate executive lectures for career guidance. The cell also prepares students for competitive examinations such as GATE, GRE, GMAT, and TOEFL, broadening outcomes beyond campus placements to higher education and research pathways.\n\nThe cell operates with institutional-wide reach, recently expanding its mandate to include industry liaison duties through regional offices in Hyderabad, Chennai, Bengaluru, Pune, and Vadodara.",
@@ -121,7 +124,7 @@ export const placementItems: PlacementItem[] = [
   {
     slug: 'tpo-team',
     title: 'TPO Team',
-    icon: '👥',
+    icon: Users,
     desc: 'Meet the dedicated Training and Placement team at VWU — led by Mr. Satish Paruchuri, Director of Industry Relations — with regional liaison officers in Pune, Chennai, Bengaluru, and Delhi ensuring continuous industry outreach.',
     intro: "VWU's TPO Team combines deep industry expertise with academic insight to deliver exceptional placement outcomes. The team's leadership has overseen the placement of over 20,000 students across 200 engineering colleges and has negotiated MoUs with global companies including Microsoft, IBM, CSC, and Infosys on behalf of the government.",
     about: "The team is structured across four tiers: directorial leadership, management-level coordinators, Training and Placement Officers drawn from faculty, and regional Industry Liaison Officers. Dr. K Vamshi Krishna Varma brings 23.5 years of combined industry and training experience, while Ms. Venkata Swathi R contributes 16 years of teaching and placement expertise. Regional officers in Pune (since 2012), Chennai, Bengaluru, and Delhi maintain active relationships with manufacturing, IT, and service sector employers in their respective regions.",
@@ -157,7 +160,7 @@ export const placementItems: PlacementItem[] = [
   {
     slug: 'industry-liaison-offices',
     title: 'Industry Liaison Offices',
-    icon: '🤝',
+    icon: Handshake,
     desc: "VWU's Industry Liaison Offices across Hyderabad, Chennai, Bengaluru, Pune, and Vadodara facilitate 3,000+ student hires annually and drive deep industry-academia collaboration through MoUs, curriculum development, and joint programmes with 30+ global partners.",
     intro: 'The Industry Liaison Offices (ILO) operate as VWU\'s front-line engagement with the corporate world, maintaining active relationships with IT giants, automotive manufacturers, and global R&D organisations. By positioning VWU as an exclusive partner for sector-leading companies, the ILO secures consistent placement and internship pipelines for students across all engineering disciplines.',
     about: 'Beyond placements, the ILOs have cultivated landmark academic collaborations: 12,000+ students and faculty completed 50,000+ online courses on Coursera, edX, and NASSCOM Future Skills. VWU accounts for roughly 10% of TCS CodeVita results from the AP/Telangana region. The Women in Data Science (WiDS-Hyderabad) conference, organised in partnership with Stanford University, has drawn 60+ organisations.\n\nEach regional office is strategically positioned: Chennai serves the automotive hub (BMW, Ford) with 400+ alumni, Pune targets automobile manufacturing (est. 2012), Bengaluru focuses on IT sector recruitment, and Vadodara covers Gujarat-based industries.',
@@ -192,7 +195,7 @@ export const placementItems: PlacementItem[] = [
   {
     slug: 'career-guidance-cell',
     title: 'Career Guidance Cell',
-    icon: '🧭',
+    icon: Compass,
     desc: "VWU's Career Guidance Cell empowers students with structured career counseling, GRE/TOEFL/GATE coaching, and personality development programmes. Purpose-built with mock interview rooms and dedicated training spaces, it serves every career pathway — corporate, postgraduate, and civil services.",
     intro: "VWU's Career Guidance Cell serves as a comprehensive career development hub, addressing the diverse aspirations of engineering students — whether they aim for corporate careers, postgraduate education abroad, or competitive government examinations. The cell hosts senior corporate executives and visiting professors for seminars on interview skills, leadership, and communication.",
     about: "The cell's infrastructure is purpose-built for career readiness: air-conditioned training rooms, mock interview facilities, and individual counselling spaces ensure students can practice and prepare in a professional environment. The GRE/TOEFL programme covers verbal and quantitative reasoning, analytical writing, and test strategy, while the GATE programme offers progressive training that has resulted in improving student rankings over successive years.\n\nA recently launched initiative prepares students for IES, IFS, and IAS examinations, reflecting the cell's expanding scope beyond engineering placements. By integrating with the TPO Cell, Industry Liaison Offices, and Campus Recruitment Training programmes, the Career Guidance Cell ensures students benefit from a seamless, institution-wide support system.",
@@ -216,7 +219,7 @@ export const placementItems: PlacementItem[] = [
   {
     slug: 'campus-recruitment-training',
     title: 'Campus Recruitment Training',
-    icon: '🎯',
+    icon: Target,
     desc: "VWU's CRT programme is a faculty-led, in-house initiative augmented by partnerships with Elephos, Productivity Reach, and Gate Forum. Structured programmes for II B.Tech (C programming) and III B.Tech (Career Development Programme) ensure all students are placement-ready before entering the recruitment cycle.",
     intro: 'The CRT programme at VWU takes a holistic approach to placement preparation, combining in-house faculty expertise with external training partnerships. Students receive structured coaching in both soft and technical skills — from aptitude and group discussions to core programming languages and database fundamentals.',
     about: 'The Career Development Programme (CDP), targeted at III B.Tech students, covers aptitude, reasoning, English, C language, DBMS, and core subject modules through a structured curriculum. A separate C-Programme is run on a continuous basis for II B.Tech students in circuit branches, ensuring early and sustained exposure to programming fundamentals.\n\nExternal partners Elephos, Productivity Reach, and Gate Forum bring specialised expertise in competitive exam training and aptitude coaching, supplementing the in-house faculty team drawn from engineering, English, mathematics, and management departments.',
@@ -235,7 +238,7 @@ export const placementItems: PlacementItem[] = [
   {
     slug: 'our-recruiters',
     title: 'Our Recruiters',
-    icon: '🏭',
+    icon: Factory,
     desc: 'VWU partners with 200+ companies annually — from premium tech employers like Amazon, Adobe, and Microsoft (35+ LPA) to mass recruiters like TCS, Infosys, and Capgemini, plus core engineering and BFSI sector companies.',
     intro: "VWU's recruiter network is the result of sustained investment in industry relationships through its TPO Cell and regional Industry Liaison Offices. Companies return year after year to hire from VWU, recognising the quality of graduates produced by its rigorous academic and training programmes.",
     about: "The recruiter portfolio is organised across multiple tiers. Premium tech companies — including Amazon, Adobe, Microsoft, Google, Flipkart, PayPal, and Palo Alto Networks — consistently offer packages in the 25–49 LPA range. High-value employers like VISA, D.E. Shaw, Walmart, NXP, Expedia, and Myntra offer 20–35 LPA packages, while mid-level employers like Optum, IBM, Providence, and Publicis Sapient recruit in the 10–20 LPA range. Mass recruiters including TCS, Infosys, Capgemini, Accenture, HCL, and Cognizant ensure broad placement coverage at competitive entry-level packages.\n\nCore engineering and automotive companies — Mahindra & Mahindra, Hyundai Motors, TVS Motors, Hero MotoCorp, Renault Nissan, Caterpillar, and Robert Bosch — provide opportunities for ME, EEE, and CE graduates.",
@@ -267,7 +270,7 @@ export const placementItems: PlacementItem[] = [
   {
     slug: 'employability-skills',
     title: 'Employability Skills',
-    icon: '💡',
+    icon: Lightbulb,
     desc: "VWU's Employability Skills programme develops seven core competency domains — foundational habits, interpersonal skills, communication, problem-solving, teamwork, ethics, and professional development — to ensure graduates are work-ready from day one.",
     intro: 'Employability skills — also called soft skills or work-readiness skills — are the behavioural and interpersonal competencies that determine how effectively a person works within an organisation. VWU\'s structured programme addresses these systematically, helping students communicate with clarity, resolve conflicts calmly, take initiative, and adapt to diverse workplace settings.',
     about: "The programme's seven-domain framework covers: (1) Foundational skills — organisation, punctuality, dependability, adaptability, and professionalism; (2) Interpersonal skills — politeness, respect, feedback receptiveness, and conflict resolution; (3) Communication skills — active listening, written and verbal expression; (4) Problem-solving and critical thinking — change adaptability, self-initiation, and calm functioning under pressure; (5) Teamwork — collaborative contribution and personal accountability; (6) Ethics and legal responsibilities — honesty, trustworthiness, and policy adherence; and (7) Professional development — leadership, mentoring, negotiation, and industry knowledge.\n\nThe employability skills curriculum is integrated with Campus Recruitment Training, Career Guidance Cell programmes, and industry interaction sessions to ensure students develop these competencies through both structured instruction and practical exposure.",
@@ -287,7 +290,7 @@ export const placementItems: PlacementItem[] = [
   {
     slug: 'mission-rd',
     title: 'Mission R&D',
-    icon: '🔬',
+    icon: Microscope,
     desc: "Mission R&D is an intensive 40-day summer programme taught by R&D professionals with 10+ years of global experience. Students get 2 hours of instruction + 6 hours of hands-on product development daily, culminating in a 10-day real-world sprint. Graduates are directly interviewed by MNCs and startups for R&D roles.",
     intro: 'Mission R&D addresses the gap between conventional engineering education and the demands of product-focused R&D roles at global technology companies. The programme selects students who demonstrate strong logical thinking, perseverance, and genuine interest in product development, and immerses them in computer science fundamentals, professional development tools, and cutting-edge platforms.',
     about: 'The 40-day curriculum is structured around three pillars: computer science foundations (data structures, algorithms, design patterns, OS, OOP), professional development tooling (Visual Studio/Eclipse, source control, debugging), and emerging technology platforms (cloud computing, touch interfaces, HTML5/UX). The final 10 days shift entirely to real-world application development, allowing students to demonstrate applied competency before employer interviews.\n\nThe programme was piloted at BVRIT Hyderabad (6 students, 2012) and expanded to IIIT-Hyderabad (12 students, 2013), with major MNCs and startups signing up to interview graduates immediately upon completion.',
@@ -310,7 +313,7 @@ export const placementItems: PlacementItem[] = [
   {
     slug: 'gsac',
     title: 'Graduate Study Abroad Center – GSAC',
-    icon: '🌏',
+    icon: Globe2,
     desc: 'GSAC provides end-to-end guidance for students aspiring to study at international universities — GRE/TOEFL/IELTS preparation, education loan facilitation, scholarship support, and pre-departure orientation across 7 destinations: USA, Canada, UK, Germany, Australia, Spain, and China.',
     intro: 'GSAC was established to democratise access to overseas higher education by providing students with structured, institution-backed guidance at no additional cost. The centre empowers students to make informed decisions about courses, universities, and destinations aligned with their academic profiles and career goals.',
     about: "The centre's service portfolio covers the full admissions journey: counselling for course and university selection, standardised test preparation (GRE, TOEFL, IELTS), education loan facilitation through partner banks, scholarship application support, and pre-departure programmes covering cultural adaptation, financial management, safety, and social integration. Admitted students are also connected with senior VWU alumni already studying or working abroad.\n\nGSAC operates from the SVES Head Office with a centralised coordination model and designated Single Points of Contact (SPOCs) at each SVES college.",
@@ -334,7 +337,7 @@ export const placementItems: PlacementItem[] = [
   {
     slug: 'higher-education',
     title: 'Higher Education',
-    icon: '🎓',
+    icon: GraduationCap,
     desc: 'VWU offers M.Tech (CSE, VLSI, Power Electronics, Software Engineering), MBA, and Ph.D. programmes on campus, plus GSAC-supported pathways to 300+ international universities across the USA, UK, Australia, and Canada.',
     intro: 'Higher education at VWU extends well beyond undergraduate studies, with structured pathways for students seeking M.Tech specialisations, MBA degrees, doctoral research, or graduate programmes at international universities. The institution\'s NAAC approval, NBA Accreditation, and UGC recognition provide a strong academic foundation recognised by universities worldwide.',
     about: "VWU's on-campus postgraduate offerings include M.Tech programmes in Computer Science & Engineering, VLSI Design, Power Electronics, and Software Engineering, alongside an MBA programme and Ph.D. research tracks in CSE, ECE, and EEE. The institution operates 30+ specialised facilities — including the Technology Business Incubator, Space Application Center, AR/VR Studio, and AICTE IDEA Lab — all supporting advanced research.\n\nFor students seeking international opportunities, the Graduate Study Abroad Center maintains a directory of 300+ universities across the USA, UK, Australia, and Canada, with targeted support for GRE/TOEFL/IELTS preparation, visa guidance, and pre-departure orientation. The Career Guidance Cell's GATE coaching programme has progressively improved student rankings year on year.",

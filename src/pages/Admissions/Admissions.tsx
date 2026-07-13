@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import './Admissions.css';
 import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
+import { NotebookPen, FileText, IndianRupee, School, PartyPopper, ClipboardList, BarChart3, CreditCard, Users, Target, Globe } from 'lucide-react';
 
 const admissionsPhotos = [
   { src: 'https://images.unsplash.com/photo-1562774053-701939374585?w=800&q=80', alt: 'VWU campus buildings', caption: 'VWU Campus' },
@@ -13,11 +14,11 @@ const admissionsPhotos = [
 ];
 
 const steps = [
-  { step: 1, icon: '📝', title: 'Appear for EAPCET / ECET', desc: 'Qualify in AP EAPCET for B.Tech, AP ECET for lateral entry, or AP PGECET / ICET for PG programs. VWU Code: VISW.' },
-  { step: 2, icon: '📄', title: 'Submit Your Documents', desc: 'Bring your qualifying exam rank card, academic certificates, transfer certificate, and passport-size photographs.' },
-  { step: 3, icon: '💰', title: 'Explore Scholarships', desc: 'Review your eligibility for SC/ST/BC scholarships, merit-based awards, and central government fee reimbursement schemes.' },
-  { step: 4, icon: '🏫', title: 'Visit Our Campus', desc: 'Book a personalised campus visit to meet faculty, see the facilities, and get a true sense of life at VWU.' },
-  { step: 5, icon: '🎉', title: 'Confirm Admission & Enroll', desc: 'Complete your fee payment, submit original documents, and officially begin your engineering journey at VWU.' },
+  { step: 1, icon: NotebookPen, title: 'Appear for EAPCET / ECET', desc: 'Qualify in AP EAPCET for B.Tech, AP ECET for lateral entry, or AP PGECET / ICET for PG programs. VWU Code: VISW.' },
+  { step: 2, icon: FileText, title: 'Submit Your Documents', desc: 'Bring your qualifying exam rank card, academic certificates, transfer certificate, and passport-size photographs.' },
+  { step: 3, icon: IndianRupee, title: 'Explore Scholarships', desc: 'Review your eligibility for SC/ST/BC scholarships, merit-based awards, and central government fee reimbursement schemes.' },
+  { step: 4, icon: School, title: 'Visit Our Campus', desc: 'Book a personalised campus visit to meet faculty, see the facilities, and get a true sense of life at VWU.' },
+  { step: 5, icon: PartyPopper, title: 'Confirm Admission & Enroll', desc: 'Complete your fee payment, submit original documents, and officially begin your engineering journey at VWU.' },
 ];
 
 const scholarships = [
@@ -30,10 +31,10 @@ const scholarships = [
 ];
 
 const admissionHub = [
-  { icon: '📋', title: 'Programmes & Fee Structure', desc: 'B.Tech, M.Tech, MBA, and Ph.D. programmes listed with intake numbers and annual fee details.', path: '/programmes-fee-structure', highlight: 'B.Tech: ₹1,05,000/yr' },
-  { icon: '📝', title: 'Admission Procedure', desc: 'A step-by-step guide covering EAPCET (Code: VISW), GATE, ICET, and ECET eligibility and processes.', path: '/admission-procedure', highlight: 'EAPCET Code: VISW' },
-  { icon: '📊', title: 'Result Analysis', desc: 'Ranked among the Top 5 JNTUK-affiliated colleges. 90%+ annual pass rate. University Gold Medallists.', path: '/result-analysis', highlight: 'Top 5 in JNTUK' },
-  { icon: '💳', title: 'Fee Payment Portal', desc: 'Secure online portal for paying tuition, hostel, and examination fees.', path: '/admissions', highlight: 'Pay Online' },
+  { icon: ClipboardList, title: 'Programmes & Fee Structure', desc: 'B.Tech, M.Tech, MBA, and Ph.D. programmes listed with intake numbers and annual fee details.', path: '/programmes-fee-structure', highlight: 'B.Tech: ₹1,05,000/yr' },
+  { icon: NotebookPen, title: 'Admission Procedure', desc: 'A step-by-step guide covering EAPCET (Code: VISW), GATE, ICET, and ECET eligibility and processes.', path: '/admission-procedure', highlight: 'EAPCET Code: VISW' },
+  { icon: BarChart3, title: 'Result Analysis', desc: 'Ranked among the Top 5 JNTUK-affiliated colleges. 90%+ annual pass rate. University Gold Medallists.', path: '/result-analysis', highlight: 'Top 5 in JNTUK' },
+  { icon: CreditCard, title: 'Fee Payment Portal', desc: 'Secure online portal for paying tuition, hostel, and examination fees.', path: '/admissions', highlight: 'Pay Online' },
 ];
 
 const tuitionData = [
@@ -57,10 +58,10 @@ const faqs = [
 ];
 
 const visitOptions = [
-  { icon: '👥', title: 'Group Campus Tour', desc: 'Join a guided walkthrough of the VWU campus — see the labs, smart classrooms, hostels, and student facilities in Bhimavaram.' },
-  { icon: '🎯', title: 'Individual Visit Day', desc: 'Arrange a one-on-one visit with our admissions team, sit in on a demo class, and meet faculty from your preferred department.' },
-  { icon: '🌐', title: 'Virtual Campus Tour', desc: 'Unable to travel to Bhimavaram? Take an online tour of the campus and speak with our admissions team via video call.' },
-  { icon: '🏫', title: 'Open Day for Admitted Students', desc: 'Spend a full day at VWU after confirming your admission — meet your future classmates, faculty, and student activity groups.' },
+  { icon: Users, title: 'Group Campus Tour', desc: 'Join a guided walkthrough of the VWU campus — see the labs, smart classrooms, hostels, and student facilities in Bhimavaram.' },
+  { icon: Target, title: 'Individual Visit Day', desc: 'Arrange a one-on-one visit with our admissions team, sit in on a demo class, and meet faculty from your preferred department.' },
+  { icon: Globe, title: 'Virtual Campus Tour', desc: 'Unable to travel to Bhimavaram? Take an online tour of the campus and speak with our admissions team via video call.' },
+  { icon: School, title: 'Open Day for Admitted Students', desc: 'Spend a full day at VWU after confirming your admission — meet your future classmates, faculty, and student activity groups.' },
 ];
 
 export default function Admissions() {
@@ -109,7 +110,7 @@ export default function Admissions() {
           <div className="adm-hub-grid">
             {admissionHub.map((item, i) => (
               <Link to={item.path} key={item.title} className="adm-hub-card reveal" data-delay={`${i * 80}`}>
-                <div className="adm-hub-icon">{item.icon}</div>
+                <div className="adm-hub-icon"><item.icon size={38} strokeWidth={1.75} /></div>
                 <div className="adm-hub-highlight">{item.highlight}</div>
                 <h3 className="adm-hub-title">{item.title}</h3>
                 <p className="adm-hub-desc">{item.desc}</p>
@@ -131,7 +132,7 @@ export default function Admissions() {
             {steps.map((s, i) => (
               <div key={s.step} className="adm-step reveal" data-delay={`${i * 100}`}>
                 <div className="adm-step-number">{s.step}</div>
-                <div className="adm-step-icon">{s.icon}</div>
+                <div className="adm-step-icon"><s.icon size={32} strokeWidth={1.75} /></div>
                 <h3 className="adm-step-title">{s.title}</h3>
                 <p className="adm-step-desc">{s.desc}</p>
               </div>
@@ -217,7 +218,7 @@ export default function Admissions() {
           <div className="adm-visit-grid">
             {visitOptions.map((v, i) => (
               <div key={v.title} className="adm-visit-card reveal" data-delay={`${i * 80}`}>
-                <div className="adm-visit-icon">{v.icon}</div>
+                <div className="adm-visit-icon"><v.icon size={40} strokeWidth={1.75} /></div>
                 <h3>{v.title}</h3>
                 <p>{v.desc}</p>
                 <Link to="/admissions" className="btn btn-outline" style={{ marginTop: 'auto' }}>Schedule Now</Link>

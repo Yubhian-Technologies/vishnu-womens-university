@@ -4,14 +4,14 @@ import {
 } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
-import CloudinaryUploader from '../../../components/CloudinaryUploader/CloudinaryUploader';
-import type { CloudinaryResult } from '../../../lib/cloudinary';
+import ImageUploader from '../../../components/ImageUploader/ImageUploader';
+import type { UploadResult } from '../../../lib/storage';
 import type { GoverningBodyMember } from '../../Governance/GoverningBody';
 
-type GoverningBodyDoc = GoverningBodyMember & { publicId?: string };
+type GoverningBodyDoc = GoverningBodyMember & { storagePath?: string };
 
 const EMPTY: Omit<GoverningBodyDoc, 'id'> = {
-  name: '', position: '', category: 'Management', photoUrl: '', publicId: '', order: 0,
+  name: '', position: '', category: 'Management', photoUrl: '', storagePath: '', order: 0,
 };
 
 const CATEGORIES = [
@@ -27,7 +27,7 @@ export default function GoverningBodyAdmin() {
   const [clearing, setClearing] = useState(false);
 
   const set = (k: string, v: string | number) => setForm((p) => ({ ...p, [k]: v }));
-  const handleImage = (r: CloudinaryResult) => setForm((p) => ({ ...p, photoUrl: r.secure_url, publicId: r.public_id }));
+  const handleImage = (r: UploadResult) => setForm((p) => ({ ...p, photoUrl: r.url, storagePath: r.path }));
 
   const save = async () => {
     if (!form.name) return alert('Name is required.');
@@ -49,7 +49,7 @@ export default function GoverningBodyAdmin() {
   const startEdit = (m: GoverningBodyDoc) => {
     setEditing(m.id);
     setForm({ name: m.name, position: m.position, category: m.category,
-               photoUrl: m.photoUrl || '', publicId: m.publicId || '', order: m.order });
+               photoUrl: m.photoUrl || '', storagePath: m.storagePath || '', order: m.order });
   };
 
   const remove = async (id: string) => {
@@ -79,7 +79,7 @@ export default function GoverningBodyAdmin() {
         <div className="admin-form-grid">
           <div className="admin-field" style={{ gridColumn: '1 / -1', maxWidth: 200 }}>
             <label>Photo (optional — initials shown if omitted)</label>
-            <CloudinaryUploader folder="vwu/governing-body" currentUrl={form.photoUrl} onUploaded={handleImage} label="Upload Photo" />
+            <ImageUploader folder="vwu/governing-body" currentUrl={form.photoUrl} onUploaded={handleImage} label="Upload Photo" />
           </div>
           <div className="admin-field">
             <label>Full Name *</label>

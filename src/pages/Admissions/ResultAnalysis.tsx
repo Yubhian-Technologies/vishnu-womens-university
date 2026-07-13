@@ -1,12 +1,13 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
+import { Trophy, TrendingUp, BadgeCheck, GraduationCap, BookOpen, Presentation, Microscope, BarChart3, Award, Handshake } from 'lucide-react';
 
 const highlights = [
-  { icon: '🏆', value: 'Top 5', label: 'Among JNTUK Affiliated Colleges', desc: 'VWU consistently ranks in the top 5 affiliated engineering colleges under JNTU Kakinada in terms of pass percentage.' },
-  { icon: '📈', value: '90%+', label: 'Annual Pass Rate', desc: 'More than ninety percent of students receive their Engineering Degree every academic year across all departments.' },
-  { icon: '🥇', value: 'Gold Medals', label: 'University Rank Holders', desc: 'Students from VWU frequently achieve university Gold Medals, with many receiving multiple awards in a single convocation.' },
-  { icon: '🎓', value: '1,400+', label: 'Students Placed (2024–25)', desc: 'Record placements each year with leading companies including Amazon, TCS, Infosys, Wipro, and 150+ other recruiters.' },
+  { icon: Trophy, value: 'Top 5', label: 'Among JNTUK Affiliated Colleges', desc: 'VWU consistently ranks in the top 5 affiliated engineering colleges under JNTU Kakinada in terms of pass percentage.' },
+  { icon: TrendingUp, value: '90%+', label: 'Annual Pass Rate', desc: 'More than ninety percent of students receive their Engineering Degree every academic year across all departments.' },
+  { icon: BadgeCheck, value: 'Gold Medals', label: 'University Rank Holders', desc: 'Students from VWU frequently achieve university Gold Medals, with many receiving multiple awards in a single convocation.' },
+  { icon: GraduationCap, value: '1,400+', label: 'Students Placed (2024–25)', desc: 'Record placements each year with leading companies including Amazon, TCS, Infosys, Wipro, and 150+ other recruiters.' },
 ];
 
 const departmentStats = [
@@ -21,12 +22,12 @@ const departmentStats = [
 ];
 
 const factors = [
-  { icon: '📖', title: 'Rigorous Academic Curriculum', desc: 'Industry-aligned curriculum updated regularly with inputs from academia and industry experts.' },
-  { icon: '👩‍🏫', title: '230+ Expert Faculty', desc: 'Highly qualified faculty with doctoral degrees, research experience, and industry exposure.' },
-  { icon: '🔬', title: 'State-of-the-Art Labs', desc: '50+ specialised labs providing hands-on practical training alongside theoretical learning.' },
-  { icon: '📊', title: 'Continuous Assessment', desc: 'Regular internal assessments, remedial classes, and personalised mentoring for every student.' },
-  { icon: '🏅', title: 'Competitive Coaching', desc: 'Dedicated coaching for GATE, GRE, and competitive exams to boost higher education outcomes.' },
-  { icon: '🤝', title: 'Industry Partnerships', desc: 'MoUs with leading companies enable real-world project exposure and internship opportunities.' },
+  { icon: BookOpen, title: 'Rigorous Academic Curriculum', desc: 'Industry-aligned curriculum updated regularly with inputs from academia and industry experts.' },
+  { icon: Presentation, title: '230+ Expert Faculty', desc: 'Highly qualified faculty with doctoral degrees, research experience, and industry exposure.' },
+  { icon: Microscope, title: 'State-of-the-Art Labs', desc: '50+ specialised labs providing hands-on practical training alongside theoretical learning.' },
+  { icon: BarChart3, title: 'Continuous Assessment', desc: 'Regular internal assessments, remedial classes, and personalised mentoring for every student.' },
+  { icon: Award, title: 'Competitive Coaching', desc: 'Dedicated coaching for GATE, GRE, and competitive exams to boost higher education outcomes.' },
+  { icon: Handshake, title: 'Industry Partnerships', desc: 'MoUs with leading companies enable real-world project exposure and internship opportunities.' },
 ];
 
 export default function ResultAnalysis() {
@@ -82,7 +83,7 @@ export default function ResultAnalysis() {
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-accent)'; (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-md)'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-light-gray)'; (e.currentTarget as HTMLElement).style.boxShadow = 'none'; }}
               >
-                <div style={{ fontSize: '2.4rem', marginBottom: 'var(--space-3)' }}>{h.icon}</div>
+                <div style={{ marginBottom: 'var(--space-3)' }}><h.icon size={38} strokeWidth={1.75} /></div>
                 <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 4 }}>{h.value}</div>
                 <div style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 'var(--space-3)' }}>{h.label}</div>
                 <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6 }}>{h.desc}</p>
@@ -138,7 +139,7 @@ export default function ResultAnalysis() {
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'; (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-accent)'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.12)'; }}
               >
-                <div style={{ fontSize: '2rem', marginBottom: 'var(--space-3)' }}>{f.icon}</div>
+                <div style={{ marginBottom: 'var(--space-3)' }}><f.icon size={32} strokeWidth={1.75} /></div>
                 <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 900, color: 'var(--color-accent)', marginBottom: 'var(--space-2)' }}>{f.title}</h3>
                 <p style={{ fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.75)', lineHeight: 1.6 }}>{f.desc}</p>
               </div>
