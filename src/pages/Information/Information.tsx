@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
-import { Monitor, NotebookPen, Newspaper, BarChart3, BookOpen, Video, Leaf, Accessibility, Handshake, Scale, Brain, Plane, TrainFront, Bus, Car, type LucideIcon } from 'lucide-react';
+import { Monitor, NotebookPen, Newspaper, BarChart3, BookOpen, Video, Leaf, Accessibility, Handshake, Scale, Brain, Plane, TrainFront, Bus, Car, MapPin, Phone, Mail, type LucideIcon } from 'lucide-react';
+import './Information.css';
 
 const infoPhotos = [
   { src: 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?w=800&q=80', alt: 'Green campus environment', caption: 'Green Campus' },
@@ -114,27 +115,12 @@ export default function Information() {
       {/* Tabs */}
       <section className="section bg-off-white">
         <div className="container">
-          <div style={{ display: 'flex', gap: 'var(--space-2)', marginBottom: 'var(--space-10)', flexWrap: 'wrap', borderBottom: '2px solid var(--color-light-gray)', paddingBottom: 0 }}>
+          <div className="info-tabs">
             {tabs.map(tab => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                style={{
-                  padding: 'var(--space-3) var(--space-5)',
-                  background: 'none',
-                  border: 'none',
-                  borderBottom: `3px solid ${activeTab === tab.id ? 'var(--color-accent)' : 'transparent'}`,
-                  marginBottom: -2,
-                  fontFamily: 'var(--font-sans)',
-                  fontSize: 'var(--text-sm)',
-                  fontWeight: 700,
-                  color: activeTab === tab.id ? 'var(--color-primary)' : 'var(--color-text-light)',
-                  cursor: 'pointer',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em',
-                  transition: 'all 0.2s',
-                  whiteSpace: 'nowrap',
-                }}
+                className={`info-tab-btn${activeTab === tab.id ? ' active' : ''}`}
               >
                 {tab.label}
               </button>
@@ -145,21 +131,21 @@ export default function Information() {
           {activeTab === 'calendar' && (
             <div>
               <h2 className="section-title" style={{ marginBottom: 'var(--space-8)' }}>Academic Calendar 2026–27</h2>
-              <div style={{ background: 'var(--color-white)', borderRadius: 'var(--radius-md)', overflow: 'hidden', boxShadow: 'var(--shadow-md)' }}>
+              <div style={{ background: 'var(--color-white)', borderRadius: 'var(--radius-md)', overflow: 'hidden', boxShadow: 'var(--shadow-sm)', border: '1px solid var(--color-light-gray)' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)' }}>
                   <thead>
                     <tr style={{ background: 'var(--color-primary)' }}>
-                      <th style={{ padding: 'var(--space-4) var(--space-6)', textAlign: 'left', color: 'var(--color-white)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: 'var(--text-xs)' }}>S.No</th>
-                      <th style={{ padding: 'var(--space-4) var(--space-6)', textAlign: 'left', color: 'var(--color-white)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: 'var(--text-xs)' }}>Event / Activity</th>
-                      <th style={{ padding: 'var(--space-4) var(--space-6)', textAlign: 'left', color: 'var(--color-white)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: 'var(--text-xs)' }}>Date</th>
+                      <th style={{ padding: '12px 16px', textAlign: 'left', color: 'var(--color-white)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: 'var(--text-xs)' }}>S.No</th>
+                      <th style={{ padding: '12px 16px', textAlign: 'left', color: 'var(--color-white)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: 'var(--text-xs)' }}>Event / Activity</th>
+                      <th style={{ padding: '12px 16px', textAlign: 'left', color: 'var(--color-white)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: 'var(--text-xs)' }}>Date</th>
                     </tr>
                   </thead>
                   <tbody>
                     {academicCalendar.map((item, i) => (
-                      <tr key={i} style={{ borderBottom: '1px solid var(--color-light-gray)', background: i % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)' }}>
-                        <td style={{ padding: 'var(--space-4) var(--space-6)', color: 'var(--color-accent)', fontWeight: 900 }}>{i + 1}</td>
-                        <td style={{ padding: 'var(--space-4) var(--space-6)', fontWeight: 600, color: 'var(--color-primary)' }}>{item.event}</td>
-                        <td style={{ padding: 'var(--space-4) var(--space-6)', color: 'var(--color-text-light)' }}>{item.date}</td>
+                      <tr key={i} style={{ borderBottom: '1px solid rgba(27, 67, 50, 0.08)', background: i % 2 === 0 ? 'var(--color-white)' : 'rgba(27, 67, 50, 0.035)' }}>
+                        <td style={{ padding: '12px 16px', color: 'var(--color-accent)', fontWeight: 900 }}>{i + 1}</td>
+                        <td style={{ padding: '12px 16px', fontWeight: 600, color: 'var(--color-primary)' }}>{item.event}</td>
+                        <td style={{ padding: '12px 16px', color: 'var(--color-text-light)' }}>{item.date}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -208,11 +194,11 @@ export default function Information() {
                 ))}
               </div>
               <div style={{ background: 'var(--color-primary)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', color: 'rgba(255,255,255,0.8)', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', lineHeight: 1.8 }}>
-                <strong style={{ color: 'var(--color-accent)', display: 'block', marginBottom: 'var(--space-2)' }}>📍 Address</strong>
+                <strong style={{ color: 'var(--color-accent)', display: 'flex', alignItems: 'center', gap: '0.35rem', marginBottom: 'var(--space-2)' }}><MapPin size={15} /> Address</strong>
                 Vishnu Womens University, Vishnupur, Bhimavaram – 534 202<br />
                 West Godavari District, Andhra Pradesh, India<br />
-                <a href="tel:08816250864" style={{ color: 'var(--color-accent)' }}>📞 08816-250864</a> &nbsp;|&nbsp;
-                <a href="mailto:info@svecw.edu.in" style={{ color: 'var(--color-accent)' }}>✉ info@svecw.edu.in</a>
+                <a href="tel:08816250864" style={{ color: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><Phone size={14} /> 08816-250864</a> &nbsp;|&nbsp;
+                <a href="mailto:info@svecw.edu.in" style={{ color: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><Mail size={14} /> info@svecw.edu.in</a>
               </div>
             </div>
           )}

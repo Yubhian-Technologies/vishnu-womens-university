@@ -72,7 +72,7 @@ export default function Governance() {
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'var(--color-primary)'; (e.currentTarget as HTMLElement).style.borderBottomColor = 'var(--color-accent)'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'var(--color-text)'; (e.currentTarget as HTMLElement).style.borderBottomColor = 'transparent'; }}
             >
-              <span>{cat.icon}</span> {cat.label}
+              <cat.icon size={14} /> {cat.label}
             </a>
           ))}
         </div>
@@ -89,7 +89,7 @@ export default function Governance() {
           >
             <div className="container">
               <div className="reveal" style={{ marginBottom: 'var(--space-10)' }}>
-                <span className="section-label">{cat.icon} {cat.label}</span>
+                <span className="section-label" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}><cat.icon size={14} /> {cat.label}</span>
                 <h2 className="section-title">{cat.label}</h2>
                 <p style={{ color: 'var(--color-text-light)', maxWidth: 600, lineHeight: 1.7 }}>{cat.desc}</p>
               </div>

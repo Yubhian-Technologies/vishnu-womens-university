@@ -57,8 +57,12 @@
   align-items: center;
   justify-content: center;
   margin: 0 auto var(--space-4);
-  font-size: 1.3rem;
+  color: var(--color-accent);
   transition: all var(--transition-base);
+}
+
+.counter-item:hover .counter-icon {
+  color: var(--color-primary);
 }
 
 .counter-item:hover .counter-icon {

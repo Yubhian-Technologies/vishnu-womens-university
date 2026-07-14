@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { Check } from 'lucide-react';
 import PageHero from '../../components/PageHero/PageHero';
 
 const btechSteps = [
@@ -167,7 +168,7 @@ export default function AdmissionProcedure() {
             {documents.map((doc, i) => (
               <div key={doc} className="reveal" data-delay={`${i * 40}`}
                 style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 'var(--radius-sm)', padding: 'var(--space-3) var(--space-4)' }}>
-                <span style={{ color: 'var(--color-accent)', fontWeight: 900, flexShrink: 0 }}>✓</span>
+                <Check size={16} strokeWidth={2.5} style={{ color: 'var(--color-accent)', flexShrink: 0 }} />
                 <span style={{ fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.85)' }}>{doc}</span>
               </div>
             ))}

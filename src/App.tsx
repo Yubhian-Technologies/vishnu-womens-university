@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
+import { GraduationCap } from 'lucide-react';
 import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
 import Home from './pages/Home/Home';
@@ -178,7 +179,7 @@ function NotFound() {
           padding: '4rem 2rem',
         }}
       >
-        <div style={{ fontSize: '6rem', marginBottom: '1rem' }}>🎓</div>
+        <div style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'center' }}><GraduationCap size={96} strokeWidth={1.5} color="var(--color-primary)" /></div>
         <h1 style={{ fontSize: '5rem', fontFamily: 'var(--font-serif)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: '0.5rem' }}>
           404
         </h1>

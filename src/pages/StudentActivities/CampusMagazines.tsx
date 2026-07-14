@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
-import { Newspaper, BookOpen, Lightbulb } from 'lucide-react';
+import { Newspaper, BookOpen, Lightbulb, Check } from 'lucide-react';
 
 const magazines = [
   {
@@ -93,7 +93,7 @@ export default function CampusMagazines() {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                     {mag.highlights.map((h) => (
                       <div key={h} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                        <span style={{ color: 'var(--color-accent)', fontWeight: 900 }}>✓</span>
+                        <Check size={15} strokeWidth={2.5} style={{ color: 'var(--color-accent)', flexShrink: 0 }} />
                         <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)' }}>{h}</span>
                       </div>
                     ))}

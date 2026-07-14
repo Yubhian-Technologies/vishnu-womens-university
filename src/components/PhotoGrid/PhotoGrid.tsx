@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { X } from 'lucide-react';
 import './PhotoGrid.css';
 
 export interface PhotoItem {
@@ -170,7 +171,7 @@ export default function PhotoGrid({
       {/* Lightbox */}
       {lightbox !== null && (
         <div className="photo-lightbox" onClick={() => setLightbox(null)}>
-          <button className="photo-lightbox-close" onClick={() => setLightbox(null)} aria-label="Close">✕</button>
+          <button className="photo-lightbox-close" onClick={() => setLightbox(null)} aria-label="Close"><X size={18} /></button>
           <button
             className="photo-lightbox-prev"
             onClick={e => { e.stopPropagation(); setLightbox(i => i !== null ? (i - 1 + images.length) % images.length : null); }}

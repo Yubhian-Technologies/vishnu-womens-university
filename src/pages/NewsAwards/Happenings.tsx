@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { CalendarDays } from 'lucide-react';
 import { happenings } from './news-awards.data';
 import PageHero from '../../components/PageHero/PageHero';
 
@@ -48,7 +49,7 @@ export default function Happenings() {
               {upcoming.map((ev, i) => (
                 <div key={i} className="reveal" data-delay={`${i * 80}`}
                   style={{ background: 'var(--color-primary)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', display: 'flex', gap: 'var(--space-4)', alignItems: 'flex-start' }}>
-                  <span style={{ fontSize: '1.75rem', flexShrink: 0 }}>🗓️</span>
+                  <CalendarDays size={28} strokeWidth={1.75} style={{ flexShrink: 0, color: 'var(--color-accent)' }} />
                   <div>
                     <div style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 'var(--space-1)' }}>
                       {ev.date}

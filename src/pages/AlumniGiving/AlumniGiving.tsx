@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { Check } from 'lucide-react';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import './AlumniGiving.css';
 import PageHero from '../../components/PageHero/PageHero';
@@ -119,7 +120,7 @@ export default function AlumniGiving() {
                   <ul className="ag-giving-perks">
                     {level.perksText.split('\n').filter(Boolean).map(perk => (
                       <li key={perk}>
-                        <span className="ag-perk-check">✓</span>
+                        <Check size={15} strokeWidth={2.5} className="ag-perk-check" />
                         {perk}
                       </li>
                     ))}

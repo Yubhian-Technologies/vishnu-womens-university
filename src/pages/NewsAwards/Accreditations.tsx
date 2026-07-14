@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { BarChart3, Trophy, CheckCircle2, type LucideIcon } from 'lucide-react';
 import { awards, AwardItem } from './news-awards.data';
 import PageHero from '../../components/PageHero/PageHero';
 
@@ -11,10 +12,10 @@ const tabs = [
 
 type TabKey = typeof tabs[number]['key'];
 
-const categoryIcons: Record<TabKey, string> = {
-  ranking: '📊',
-  award: '🏆',
-  accreditation: '✅',
+const categoryIcons: Record<TabKey, LucideIcon> = {
+  ranking: BarChart3,
+  award: Trophy,
+  accreditation: CheckCircle2,
 };
 
 function AwardCard({ item, index }: { item: AwardItem; index: number }) {
@@ -134,7 +135,7 @@ export default function Accreditations() {
                   color: activeTab === tab.key ? 'var(--color-white)' : 'var(--color-text)',
                 }}
               >
-                <span>{categoryIcons[tab.key]}</span>
+                {(() => { const TabIcon = categoryIcons[tab.key]; return <TabIcon size={15} />; })()}
                 {tab.label}
                 <span style={{
                   fontSize: 'var(--text-xs)',
