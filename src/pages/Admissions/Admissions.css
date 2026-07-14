@@ -468,7 +468,11 @@
   gap: var(--space-3);
 }
 
-.adm-faq-item {
+/* .adm-faq-item itself carries only the scroll-in reveal animation and no
+   visual card styling — the card look and the click-driven "open" state
+   both live on the inner .adm-faq-card wrapper. See the comment in
+   Admissions.tsx for why this split matters. */
+.adm-faq-card {
   background: var(--color-white);
   border: 1px solid var(--color-light-gray);
   border-radius: var(--radius-md);
@@ -476,7 +480,7 @@
   transition: box-shadow var(--transition-fast);
 }
 
-.adm-faq-item.open {
+.adm-faq-card.open {
   box-shadow: var(--shadow-md);
   border-color: var(--color-accent);
 }
@@ -500,6 +504,28 @@
 
 .adm-faq-question:hover {
   background: var(--color-off-white);
+}
+
+/* Collapse animation: grid-template-rows 0fr -> 1fr animates smoothly to
+   whatever height the answer content needs, with no fixed max-height guess
+   and no layout jump. min-height: 0 on the inner wrapper is required —
+   grid items default to min-height: auto, which would otherwise refuse to
+   shrink below content size and break the collapse. */
+.adm-faq-collapse {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition: grid-template-rows 0.3s ease, opacity 0.25s ease;
+}
+
+.adm-faq-card.open .adm-faq-collapse {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.adm-faq-collapse-inner {
+  overflow: hidden;
+  min-height: 0;
 }
 
 .adm-faq-answer {
