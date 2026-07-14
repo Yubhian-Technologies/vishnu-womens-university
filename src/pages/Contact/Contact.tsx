@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { MapPin, Mail, Building2, GraduationCap, Phone, Printer, Clock, CheckCircle2 } from 'lucide-react';
 import './Contact.css';
 
 interface ContactForm {
@@ -82,7 +83,7 @@ export default function Contact() {
               ref={(el) => addReveal(el, 0)}
               data-delay="0"
             >
-              <div className="contact-info-icon">📍</div>
+              <div className="contact-info-icon"><MapPin size={32} strokeWidth={1.75} /></div>
               <h3>Main Campus</h3>
               <p>
                 Vishnupur, Bhimavaram – 534&nbsp;202<br />
@@ -90,8 +91,8 @@ export default function Contact() {
                 Andhra Pradesh, India
               </p>
               <div className="contact-info-meta">
-                <span>📞 08816-250864</span>
-                <span>📠 08816-250099</span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><Phone size={14} /> 08816-250864</span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><Printer size={14} /> 08816-250099</span>
               </div>
             </div>
 
@@ -101,14 +102,14 @@ export default function Contact() {
               ref={(el) => addReveal(el, 1)}
               data-delay="100"
             >
-              <div className="contact-info-icon">✉️</div>
+              <div className="contact-info-icon"><Mail size={32} strokeWidth={1.75} /></div>
               <h3>Email Us</h3>
               <p>
                 <a href="mailto:info@svecw.edu.in">info@svecw.edu.in</a><br />
                 <a href="mailto:principal@svecw.edu.in">principal@svecw.edu.in</a>
               </p>
               <div className="contact-info-meta">
-                <span>🕘 Mon–Sat: 9 AM – 5 PM</span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><Clock size={14} /> Mon–Sat: 9 AM – 5 PM</span>
               </div>
             </div>
 
@@ -118,7 +119,7 @@ export default function Contact() {
               ref={(el) => addReveal(el, 2)}
               data-delay="200"
             >
-              <div className="contact-info-icon">🏢</div>
+              <div className="contact-info-icon"><Building2 size={32} strokeWidth={1.75} /></div>
               <h3>Society Headquarters</h3>
               <p>
                 Plot 7 &amp; 8, Nagarjuna Hills<br />
@@ -126,8 +127,8 @@ export default function Contact() {
                 Hyderabad – 500&nbsp;082, Telangana
               </p>
               <div className="contact-info-meta">
-                <span>📞 040-40334899 / 897 / 866 / 829</span>
-                <span>📠 040-40334818 / 4848</span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><Phone size={14} /> 040-40334899 / 897 / 866 / 829</span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><Printer size={14} /> 040-40334818 / 4848</span>
               </div>
             </div>
 
@@ -137,7 +138,7 @@ export default function Contact() {
               ref={(el) => addReveal(el, 3)}
               data-delay="300"
             >
-              <div className="contact-info-icon">🎓</div>
+              <div className="contact-info-icon"><GraduationCap size={32} strokeWidth={1.75} /></div>
               <h3>Admissions Quick Info</h3>
               <p>
                 EAPCET Code: <strong>VISW</strong><br />
@@ -145,7 +146,7 @@ export default function Contact() {
                 NAAC Accredited
               </p>
               <div className="contact-info-meta">
-                <span>📞 08816-250864</span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><Phone size={14} /> 08816-250864</span>
               </div>
             </div>
           </div>
@@ -234,7 +235,7 @@ export default function Contact() {
 
               {submitted ? (
                 <div className="contact-success">
-                  <div className="contact-success__icon">✓</div>
+                  <div className="contact-success__icon"><CheckCircle2 size={36} strokeWidth={2} /></div>
                   <h3>Message Sent!</h3>
                   <p>
                     Thank you for writing to us. A member of our team will respond within 1–2 working days.

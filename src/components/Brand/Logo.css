@@ -1,0 +1,66 @@
+.vwu-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.vwu-logo__crest {
+  flex-shrink: 0;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
+}
+
+.vwu-logo__wordmark {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+  position: relative;
+  padding-left: 0.85rem;
+}
+
+.vwu-logo__wordmark::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 1px;
+  bottom: 1px;
+  width: 3px;
+  background: var(--vwu-logo-gold);
+  border-radius: 2px;
+}
+
+.vwu-logo__title {
+  font-family: var(--font-serif, Georgia, serif);
+  font-weight: 900;
+  font-size: 1.32rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.vwu-logo__tagline {
+  font-family: var(--font-sans, sans-serif);
+  font-weight: 600;
+  font-size: 0.6rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  margin-top: 0.3rem;
+  color: var(--vwu-logo-gold);
+}
+
+/* Dark backgrounds (e.g. the maroon/forest header): white title, gold tagline */
+.vwu-logo--light .vwu-logo__title {
+  color: #ffffff;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Light backgrounds (e.g. footer-on-white, printed letterhead, admin login): crest-colored title */
+.vwu-logo--dark .vwu-logo__title {
+  color: var(--vwu-logo-crest);
+}
+
+@media (max-width: 640px) {
+  .vwu-logo__wordmark {
+    display: none;
+  }
+}

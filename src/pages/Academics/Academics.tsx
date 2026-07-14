@@ -4,6 +4,10 @@ import { findProgramBySlug } from './programs.data';
 import './Academics.css';
 import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
+import {
+  Laptop, Bot, BarChart3, Lock, Globe, RadioTower, Zap, Construction, Settings, Briefcase, GraduationCap, Microscope,
+  PenTool, Radio, Clapperboard, Users, Handshake, Newspaper, Drama, Trophy,
+} from 'lucide-react';
 
 const academicsPhotos = [
   { src: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=800&q=80', alt: 'Smart lecture halls', caption: 'Smart Lecture Halls' },
@@ -18,59 +22,59 @@ const programCategories = [
     id: 'btech',
     label: 'B.Tech',
     programs: [
-      { icon: '💻', slug: 'cse',            name: 'Computer Science & Engineering (CSE)', desc: 'Foundational computer science paired with practical industry preparation and strong placement support.' },
-      { icon: '🤖', slug: 'ai-ml',          name: 'CSE – Artificial Intelligence & ML', desc: 'Machine learning, deep learning, NLP, and building AI-powered software systems.' },
-      { icon: '📊', slug: 'ai-ds',          name: 'CSE – Artificial Intelligence & Data Science', desc: 'Data analytics, big data processing, visualization, and the design of intelligent systems.' },
-      { icon: '🔒', slug: 'cyber-security', name: 'CSE – Cyber Security', desc: 'Network security, ethical hacking, cryptography, and digital forensics techniques.' },
-      { icon: '🌐', slug: 'it',             name: 'Information Technology (IT)', desc: 'Web technologies, cloud platforms, software development, and network infrastructure.' },
-      { icon: '📡', slug: 'ece',            name: 'Electronics & Communication Engineering (ECE)', desc: 'VLSI design, embedded systems, signal processing, and communication technologies.' },
-      { icon: '⚡', slug: 'eee',            name: 'Electrical & Electronics Engineering (EEE)', desc: 'Power systems, renewable energy, control engineering, and smart grid applications.' },
-      { icon: '🏗️', slug: 'ce',             name: 'Civil Engineering (CE)', desc: 'Structural design, construction project management, and environmental engineering.' },
-      { icon: '⚙️', slug: 'me',             name: 'Mechanical Engineering (ME)', desc: 'CAD/CAM, manufacturing processes, thermodynamics, and robotics.' },
+      { icon: Laptop, slug: 'cse',            name: 'Computer Science & Engineering (CSE)', desc: 'Foundational computer science paired with practical industry preparation and strong placement support.' },
+      { icon: Bot, slug: 'ai-ml',          name: 'CSE – Artificial Intelligence & ML', desc: 'Machine learning, deep learning, NLP, and building AI-powered software systems.' },
+      { icon: BarChart3, slug: 'ai-ds',          name: 'CSE – Artificial Intelligence & Data Science', desc: 'Data analytics, big data processing, visualization, and the design of intelligent systems.' },
+      { icon: Lock, slug: 'cyber-security', name: 'CSE – Cyber Security', desc: 'Network security, ethical hacking, cryptography, and digital forensics techniques.' },
+      { icon: Globe, slug: 'it',             name: 'Information Technology (IT)', desc: 'Web technologies, cloud platforms, software development, and network infrastructure.' },
+      { icon: RadioTower, slug: 'ece',            name: 'Electronics & Communication Engineering (ECE)', desc: 'VLSI design, embedded systems, signal processing, and communication technologies.' },
+      { icon: Zap, slug: 'eee',            name: 'Electrical & Electronics Engineering (EEE)', desc: 'Power systems, renewable energy, control engineering, and smart grid applications.' },
+      { icon: Construction, slug: 'ce',             name: 'Civil Engineering (CE)', desc: 'Structural design, construction project management, and environmental engineering.' },
+      { icon: Settings, slug: 'me',             name: 'Mechanical Engineering (ME)', desc: 'CAD/CAM, manufacturing processes, thermodynamics, and robotics.' },
     ],
   },
   {
     id: 'mtech',
     label: 'M.Tech',
     programs: [
-      { icon: '💻', slug: 'mtech-cse',                 name: 'M.Tech – Computer Science & Engineering', desc: 'In-depth study of advanced computing, algorithm design, and computer science research.' },
-      { icon: '🔬', slug: 'mtech-vlsi',                name: 'M.Tech – VLSI Design', desc: 'Digital IC design, chip architecture, and advanced semiconductor engineering.' },
-      { icon: '⚡', slug: 'mtech-power-electronics',   name: 'M.Tech – Power Electronics', desc: 'Drives, converters, power management circuits, and energy conversion systems.' },
-      { icon: '🌐', slug: 'mtech-software-engineering', name: 'M.Tech – Software Engineering', desc: 'Advanced software architecture, quality assurance, testing, and project leadership.' },
+      { icon: Laptop, slug: 'mtech-cse',                 name: 'M.Tech – Computer Science & Engineering', desc: 'In-depth study of advanced computing, algorithm design, and computer science research.' },
+      { icon: Microscope, slug: 'mtech-vlsi',                name: 'M.Tech – VLSI Design', desc: 'Digital IC design, chip architecture, and advanced semiconductor engineering.' },
+      { icon: Zap, slug: 'mtech-power-electronics',   name: 'M.Tech – Power Electronics', desc: 'Drives, converters, power management circuits, and energy conversion systems.' },
+      { icon: Globe, slug: 'mtech-software-engineering', name: 'M.Tech – Software Engineering', desc: 'Advanced software architecture, quality assurance, testing, and project leadership.' },
     ],
   },
   {
     id: 'mba',
     label: 'MBA & Ph.D.',
     programs: [
-      { icon: '💼', slug: 'mba',     name: 'Master of Business Administration (MBA)', desc: 'Business strategy, finance, marketing, human resources, and entrepreneurial thinking.' },
-      { icon: '🎓', slug: 'phd-cse', name: 'Ph.D. – Computer Science & Engineering', desc: 'Doctoral-level investigation into AI, ML, data science, and computing technologies.' },
-      { icon: '📡', slug: 'phd-ece', name: 'Ph.D. – Electronics & Communication', desc: 'Doctoral research in VLSI design, signal processing, and communication systems.' },
-      { icon: '⚡', slug: 'phd-eee', name: 'Ph.D. – Electrical & Electronics', desc: 'Doctoral research spanning power systems, smart grid technologies, and energy engineering.' },
+      { icon: Briefcase, slug: 'mba',     name: 'Master of Business Administration (MBA)', desc: 'Business strategy, finance, marketing, human resources, and entrepreneurial thinking.' },
+      { icon: GraduationCap, slug: 'phd-cse', name: 'Ph.D. – Computer Science & Engineering', desc: 'Doctoral-level investigation into AI, ML, data science, and computing technologies.' },
+      { icon: RadioTower, slug: 'phd-ece', name: 'Ph.D. – Electronics & Communication', desc: 'Doctoral research in VLSI design, signal processing, and communication systems.' },
+      { icon: Zap, slug: 'phd-eee', name: 'Ph.D. – Electrical & Electronics', desc: 'Doctoral research spanning power systems, smart grid technologies, and energy engineering.' },
     ],
   },
 ];
 
 const departments = [
-  { icon: '💻', code: 'CSE', name: 'Computer Science & Engineering', desc: 'AI and machine learning, data structures, algorithms, cloud computing, and software engineering disciplines.', labs: '12 Labs', slug: 'cse' },
-  { icon: '📡', code: 'ECE', name: 'Electronics & Communication Engineering', desc: 'VLSI design, embedded systems, signal processing, communication networks, and IoT technologies.', labs: '10 Labs', slug: 'ece' },
-  { icon: '🌐', code: 'IT', name: 'Information Technology', desc: 'Web development, networking, database management, cybersecurity, and cloud computing platforms.', labs: '8 Labs', slug: 'it' },
-  { icon: '⚡', code: 'EEE', name: 'Electrical & Electronics Engineering', desc: 'Power systems, control engineering, electric drives, smart grid technology, and renewable energy.', labs: '9 Labs', slug: 'eee' },
-  { icon: '⚙️', code: 'ME', name: 'Mechanical Engineering', desc: 'CAD/CAM, manufacturing systems, thermodynamics, fluid mechanics, and robotics applications.', labs: '11 Labs', slug: 'me' },
-  { icon: '🏗️', code: 'CE', name: 'Civil Engineering', desc: 'Structural analysis, construction management, geotechnical and environmental engineering principles.', labs: '8 Labs', slug: 'ce' },
-  { icon: '🤖', code: 'AI', name: 'Artificial Intelligence', desc: 'Machine learning, deep learning, NLP, computer vision, and the design of intelligent systems.', labs: '6 Labs', slug: 'ai-ds' },
-  { icon: '📐', code: 'FE', name: 'Freshman Engineering', desc: 'Foundation courses in mathematics, physics, chemistry, and the core principles of engineering.', labs: '4 Labs', slug: null },
-  { icon: '💼', code: 'MBA', name: 'Master of Business Administration', desc: 'Business strategy, finance, marketing, human resource management, and entrepreneurship.', labs: '2 Labs', slug: 'mba' },
+  { icon: Laptop, code: 'CSE', name: 'Computer Science & Engineering', desc: 'AI and machine learning, data structures, algorithms, cloud computing, and software engineering disciplines.', labs: '12 Labs', slug: 'cse' },
+  { icon: RadioTower, code: 'ECE', name: 'Electronics & Communication Engineering', desc: 'VLSI design, embedded systems, signal processing, communication networks, and IoT technologies.', labs: '10 Labs', slug: 'ece' },
+  { icon: Globe, code: 'IT', name: 'Information Technology', desc: 'Web development, networking, database management, cybersecurity, and cloud computing platforms.', labs: '8 Labs', slug: 'it' },
+  { icon: Zap, code: 'EEE', name: 'Electrical & Electronics Engineering', desc: 'Power systems, control engineering, electric drives, smart grid technology, and renewable energy.', labs: '9 Labs', slug: 'eee' },
+  { icon: Settings, code: 'ME', name: 'Mechanical Engineering', desc: 'CAD/CAM, manufacturing systems, thermodynamics, fluid mechanics, and robotics applications.', labs: '11 Labs', slug: 'me' },
+  { icon: Construction, code: 'CE', name: 'Civil Engineering', desc: 'Structural analysis, construction management, geotechnical and environmental engineering principles.', labs: '8 Labs', slug: 'ce' },
+  { icon: Bot, code: 'AI', name: 'Artificial Intelligence', desc: 'Machine learning, deep learning, NLP, computer vision, and the design of intelligent systems.', labs: '6 Labs', slug: 'ai-ds' },
+  { icon: PenTool, code: 'FE', name: 'Freshman Engineering', desc: 'Foundation courses in mathematics, physics, chemistry, and the core principles of engineering.', labs: '4 Labs', slug: null },
+  { icon: Briefcase, code: 'MBA', name: 'Master of Business Administration', desc: 'Business strategy, finance, marketing, human resource management, and entrepreneurship.', labs: '2 Labs', slug: 'mba' },
 ];
 
 const studentActivities = [
-  { icon: '📻', title: 'Radio Vishnu 90.4', path: 'http://radiovishnu.com/', external: true },
-  { icon: '🎬', title: 'Vishnu TV Academy', path: '/vishnu-tv-academy', external: false },
-  { icon: '👥', title: 'Student Clubs', path: '/student-clubs', external: false },
-  { icon: '🤝', title: 'Social Services', path: '/social-services', external: false },
-  { icon: '📰', title: 'Campus Magazines', path: '/campus-magazines', external: false },
-  { icon: '🎭', title: 'Arts & Culture', path: '/arts-culture', external: false },
-  { icon: '🏆', title: 'Sports & Games', path: '/sports-games', external: false },
+  { icon: Radio, title: 'Radio Vishnu 90.4', path: 'http://radiovishnu.com/', external: true },
+  { icon: Clapperboard, title: 'Vishnu TV Academy', path: '/vishnu-tv-academy', external: false },
+  { icon: Users, title: 'Student Clubs', path: '/student-clubs', external: false },
+  { icon: Handshake, title: 'Social Services', path: '/social-services', external: false },
+  { icon: Newspaper, title: 'Campus Magazines', path: '/campus-magazines', external: false },
+  { icon: Drama, title: 'Arts & Culture', path: '/arts-culture', external: false },
+  { icon: Trophy, title: 'Sports & Games', path: '/sports-games', external: false },
 ];
 
 export default function Academics() {
@@ -159,7 +163,7 @@ export default function Academics() {
                   to={`/academics/${prog.slug}`}
                   className="program-card"
                 >
-                  <div className="program-card-icon">{prog.icon}</div>
+                  <div className="program-card-icon"><prog.icon size={29} strokeWidth={1.75} /></div>
                   <h3>{prog.name}</h3>
                   <p>{prog.desc}</p>
                   {data && (
@@ -203,7 +207,7 @@ export default function Academics() {
               const inner = (
                 <>
                   <div className="dept-card-top">
-                    <span className="dept-icon">{d.icon}</span>
+                    <span className="dept-icon"><d.icon size={30} strokeWidth={1.75} /></span>
                     <span className="dept-code">{d.code}</span>
                   </div>
                   <h3 className="dept-name">{d.name}</h3>
@@ -251,7 +255,7 @@ export default function Academics() {
                     data-delay={`${i * 60}`}
                     style={{ textDecoration: 'none' }}
                   >
-                    <div className="activity-item-icon">{act.icon}</div>
+                    <div className="activity-item-icon"><act.icon size={35} strokeWidth={1.75} /></div>
                     <h3 className="activity-item-title">{act.title}</h3>
                     <span style={{ marginTop: 'auto', fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'var(--font-sans)' }}>Explore →</span>
                   </a>
@@ -263,7 +267,7 @@ export default function Academics() {
                     data-delay={`${i * 60}`}
                     style={{ textDecoration: 'none' }}
                   >
-                    <div className="activity-item-icon">{act.icon}</div>
+                    <div className="activity-item-icon"><act.icon size={35} strokeWidth={1.75} /></div>
                     <h3 className="activity-item-title">{act.title}</h3>
                     <span style={{ marginTop: 'auto', fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'var(--font-sans)' }}>Explore →</span>
                   </Link>

@@ -1,10 +1,11 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
+import { Newspaper, BookOpen, Lightbulb } from 'lucide-react';
 
 const magazines = [
   {
-    icon: '📰',
+    icon: Newspaper,
     name: 'Campus Browser',
     type: 'Newsletter',
     since: 'June 2003',
@@ -14,7 +15,7 @@ const magazines = [
     color: 'var(--color-primary)',
   },
   {
-    icon: '📖',
+    icon: BookOpen,
     name: 'Vishnu Era',
     type: 'Quarterly Magazine',
     since: 'Ongoing',
@@ -24,7 +25,7 @@ const magazines = [
     color: '#7b1fa2',
   },
   {
-    icon: '💡',
+    icon: Lightbulb,
     name: 'Prathibha',
     type: 'Digital Magazine',
     since: 'Ongoing',
@@ -80,7 +81,7 @@ export default function CampusMagazines() {
               <div key={mag.name} className={`grid-1-2 ${i % 2 === 0 ? 'reveal-left' : 'reveal-right'}`}
                 style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-lg)', overflow: 'hidden', boxShadow: 'var(--shadow-sm)' }}>
                 <div style={{ background: mag.color, padding: 'var(--space-10)', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', gap: 'var(--space-3)' }}>
-                  <div style={{ fontSize: '4rem' }}>{mag.icon}</div>
+                  <div><mag.icon size={64} strokeWidth={1.75} color="var(--color-white)" /></div>
                   <div style={{ fontFamily: 'var(--font-serif)', fontSize: 'var(--text-2xl)', fontWeight: 900, color: 'var(--color-white)' }}>{mag.name}</div>
                   <div style={{ background: 'rgba(255,255,255,0.2)', borderRadius: 'var(--radius-sm)', padding: '4px 14px', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.9)', fontFamily: 'var(--font-sans)', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' }}>{mag.type}</div>
                   <div style={{ fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)' }}>Since {mag.since}</div>

@@ -1,25 +1,26 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
+import { PartyPopper, Palette, Drama, Camera, Sparkles, Microscope, Award } from 'lucide-react';
 
 const initiatives = [
   {
-    icon: '🎊',
+    icon: PartyPopper,
     title: 'Festival Celebrations',
     desc: 'VWU celebrates every Indian festival with genuine enthusiasm and collective participation, embodying the spirit of "Vasudhaika Kutumbakam" — the world is one family.',
   },
   {
-    icon: '🎨',
+    icon: Palette,
     title: 'Artistic Development',
     desc: 'Students with a passion for the arts receive encouragement, guidance, and access to facilities for painting, photography, music, and decorative arts, growing their talent alongside their technical studies.',
   },
   {
-    icon: '🎭',
+    icon: Drama,
     title: 'Performing Arts',
     desc: 'Dance, drama, and music are central to campus culture. Dedicated clubs and regular events give students the stage to develop their talents and share them with the wider community.',
   },
   {
-    icon: '📸',
+    icon: Camera,
     title: 'Photography & Film',
     desc: 'The Flash It Out Club and Vishnu TV Academy offer students real creative outlets for photography and filmmaking, telling stories from campus life and beyond.',
   },
@@ -27,17 +28,17 @@ const initiatives = [
 
 const events = [
   {
-    icon: '🌟',
+    icon: Sparkles,
     name: 'Annual Day',
     desc: 'VWU\'s flagship annual celebration — a showcase of student talent through cultural performances, institutional awards, and recognition of academic and co-curricular achievement.',
   },
   {
-    icon: '🔬',
+    icon: Microscope,
     name: 'Medha Milan',
     desc: 'A national-level technical symposium drawing students from across Andhra Pradesh and Telangana for competitions, paper presentations, and cultural programs.',
   },
   {
-    icon: '🏅',
+    icon: Award,
     name: 'Sports Day',
     desc: 'The annual Sports Day that honours athletic achievement and healthy competition — featuring track events, field sports, and special recognition for standout performers.',
   },
@@ -120,7 +121,7 @@ export default function ArtsCulture() {
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-accent)'; (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-md)'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-light-gray)'; (e.currentTarget as HTMLElement).style.boxShadow = 'none'; }}
               >
-                <div style={{ fontSize: '2.2rem', marginBottom: 'var(--space-3)' }}>{init.icon}</div>
+                <div style={{ marginBottom: 'var(--space-3)' }}><init.icon size={35} strokeWidth={1.75} /></div>
                 <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>{init.title}</h3>
                 <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6 }}>{init.desc}</p>
               </div>
@@ -146,7 +147,7 @@ export default function ArtsCulture() {
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'; (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-accent)'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.12)'; }}
               >
-                <div style={{ fontSize: '3rem', marginBottom: 'var(--space-4)' }}>{ev.icon}</div>
+                <div style={{ marginBottom: 'var(--space-4)' }}><ev.icon size={48} strokeWidth={1.75} /></div>
                 <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: 'var(--text-xl)', fontWeight: 900, color: 'var(--color-accent)', marginBottom: 'var(--space-3)' }}>{ev.name}</h3>
                 <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: 'var(--text-sm)', lineHeight: 1.7 }}>{ev.desc}</p>
               </div>

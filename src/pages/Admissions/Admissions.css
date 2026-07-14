@@ -325,7 +325,7 @@
   display: flex;
   gap: var(--space-4);
   align-items: flex-start;
-  font-size: 1.5rem;
+  color: var(--color-primary);
 }
 
 .adm-contact-item > div {
