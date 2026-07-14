@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import './Admissions.css';
 import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
-import { NotebookPen, FileText, IndianRupee, School, PartyPopper, ClipboardList, BarChart3, CreditCard, Users, Target, Globe } from 'lucide-react';
+import { NotebookPen, FileText, IndianRupee, School, PartyPopper, ClipboardList, BarChart3, CreditCard, Users, Target, Globe, Phone, Mail, MapPin } from 'lucide-react';
 
 const admissionsPhotos = [
   { src: 'https://images.unsplash.com/photo-1562774053-701939374585?w=800&q=80', alt: 'VWU campus buildings', caption: 'VWU Campus' },
@@ -169,7 +169,7 @@ export default function Admissions() {
           </div>
 
           <div className="adm-fafsa-cta reveal" data-delay="200">
-            <div className="adm-fafsa-icon">📋</div>
+            <div className="adm-fafsa-icon"><ClipboardList size={44} strokeWidth={1.75} /></div>
             <div>
               <h3>Apply for AP Scholarships</h3>
               <p>Submit applications for AP government scholarships, SC/ST/BC fee reimbursement, and central government scholarship schemes through the National Scholarship Portal.</p>
@@ -262,21 +262,21 @@ export default function Admissions() {
               </p>
               <div className="adm-contact-info">
                 <div className="adm-contact-item">
-                  <span>📞</span>
+                  <Phone size={22} strokeWidth={1.75} />
                   <div>
                     <strong>Phone</strong>
                     <a href="tel:08816250864">08816-250864</a>
                   </div>
                 </div>
                 <div className="adm-contact-item">
-                  <span>📧</span>
+                  <Mail size={22} strokeWidth={1.75} />
                   <div>
                     <strong>Email</strong>
                     <a href="mailto:info@svecw.edu.in">info@svecw.edu.in</a>
                   </div>
                 </div>
                 <div className="adm-contact-item">
-                  <span>📍</span>
+                  <MapPin size={22} strokeWidth={1.75} />
                   <div>
                     <strong>Office Location</strong>
                     <span>Bhimavaram, West Godavari Dist., AP – 534 202</span>

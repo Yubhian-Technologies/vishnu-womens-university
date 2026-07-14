@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Clock, MapPin } from 'lucide-react';
 import './Events.css';
 import PageHero from '../../components/PageHero/PageHero';
 
@@ -187,8 +188,8 @@ export default function Events() {
                   <h3>{event.title}</h3>
                   <p>{event.desc}</p>
                   <div className="ev-meta">
-                    <span>🕐 {event.time}</span>
-                    <span>📍 {event.location}</span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><Clock size={14} /> {event.time}</span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><MapPin size={14} /> {event.location}</span>
                   </div>
                   <a href="#" className="btn btn-primary" style={{ marginTop: 'var(--space-4)', fontSize: 'var(--text-sm)' }}>
                     Register / Learn More
@@ -251,8 +252,8 @@ export default function Events() {
                     <h3 className="ev-list-title">{event.title}</h3>
                     <p className="ev-list-desc">{event.desc}</p>
                     <div className="ev-meta">
-                      <span>🕐 {event.time}</span>
-                      <span>📍 {event.location}</span>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><Clock size={14} /> {event.time}</span>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><MapPin size={14} /> {event.location}</span>
                     </div>
                   </div>
                   <a href="#" className="btn btn-outline ev-list-btn" style={{ fontSize: 'var(--text-xs)', padding: '0.5rem 1rem', flexShrink: 0 }}>
@@ -274,8 +275,8 @@ export default function Events() {
                     </span>
                     <h3>{event.title}</h3>
                     <div className="ev-meta" style={{ marginTop: 'var(--space-3)' }}>
-                      <span>🕐 {event.time}</span>
-                      <span>📍 {event.location}</span>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><Clock size={14} /> {event.time}</span>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><MapPin size={14} /> {event.location}</span>
                     </div>
                     <a href="#" className="btn btn-outline" style={{ marginTop: 'var(--space-4)', fontSize: 'var(--text-xs)', width: '100%' }}>
                       View Event
