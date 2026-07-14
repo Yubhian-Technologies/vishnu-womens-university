@@ -416,20 +416,38 @@ export default function Admissions() {
           </div>
           <div className="adm-faq-list">
             {faqs.map((faq, i) => (
-              <div key={i} className={`adm-faq-item reveal${openFaq === i ? ' open' : ''}`} data-delay={`${i * 50}`}>
-                <button
-                  className="adm-faq-question"
-                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                  aria-expanded={openFaq === i}
-                >
-                  <span>{faq.q}</span>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0, transition: 'transform 0.3s', transform: openFaq === i ? 'rotate(180deg)' : 'rotate(0deg)' }}>
-                    <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </button>
-                {openFaq === i && (
-                  <div className="adm-faq-answer">{faq.a}</div>
-                )}
+              // The outer element's className is a constant string ("adm-faq-item reveal")
+              // that never changes value across re-renders. The scroll-in fade-in
+              // IntersectionObserver adds "revealed" directly to this element's DOM node,
+              // outside React's knowledge — if this element's className were recomputed
+              // from openFaq (as it used to be), React would overwrite the whole
+              // className attribute on every click and silently strip that externally-added
+              // "revealed" class, causing the clicked item to fade itself back out via
+              // .reveal's base opacity:0/translateY(40px) transition. Keeping this
+              // className static means React never has a reason to touch it again after
+              // mount, so "revealed" can never be stripped. The click-driven "open" state
+              // lives on the inner .adm-faq-card instead, which the reveal mechanism never
+              // touches.
+              <div key={faq.q} className="adm-faq-item reveal" data-delay={`${i * 50}`}>
+                <div className={`adm-faq-card${openFaq === i ? ' open' : ''}`}>
+                  <button
+                    className="adm-faq-question"
+                    onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                    aria-expanded={openFaq === i}
+                  >
+                    <span>{faq.q}</span>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0, transition: 'transform 0.3s', transform: openFaq === i ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+                      <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </button>
+                  {/* Always mounted — collapse is done purely with CSS (grid-template-rows),
+                      so the answer animates open/closed instead of hard-mounting/unmounting. */}
+                  <div className="adm-faq-collapse" aria-hidden={openFaq !== i}>
+                    <div className="adm-faq-collapse-inner">
+                      <div className="adm-faq-answer">{faq.a}</div>
+                    </div>
+                  </div>
+                </div>
               </div>
             ))}
           </div>

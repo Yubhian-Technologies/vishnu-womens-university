@@ -1,0 +1,133 @@
+import { useState } from 'react';
+import {
+  collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp, writeBatch,
+} from 'firebase/firestore';
+import { db } from '../../../lib/firebase';
+import { useOrderedCollection } from '../../../hooks/useCollection';
+import ImageUploader from '../../../components/ImageUploader/ImageUploader';
+import type { UploadResult } from '../../../lib/storage';
+import type { CoreExecutiveMember } from '../../About/About';
+
+type CoreExecutiveDoc = CoreExecutiveMember & { storagePath?: string };
+
+const EMPTY: Omit<CoreExecutiveDoc, 'id'> = {
+  name: '', role: '', photoUrl: '', storagePath: '', order: 0,
+};
+
+export default function CoreExecutivesAdmin() {
+  const { docs: executives, loading } = useOrderedCollection<CoreExecutiveDoc>('coreExecutives', 'order');
+  const [form, setForm] = useState<Omit<CoreExecutiveDoc, 'id'>>(EMPTY);
+  const [editing, setEditing] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [clearing, setClearing] = useState(false);
+
+  const set = (k: string, v: string | number) => setForm((p) => ({ ...p, [k]: v }));
+  const handleImage = (r: UploadResult) => setForm((p) => ({ ...p, photoUrl: r.url, storagePath: r.path }));
+
+  const save = async () => {
+    if (!form.name) return alert('Name is required.');
+    setSaving(true);
+    try {
+      if (editing) {
+        await updateDoc(doc(db, 'coreExecutives', editing), { ...form });
+      } else {
+        await addDoc(collection(db, 'coreExecutives'), {
+          ...form,
+          order: form.order || executives.length + 1,
+          createdAt: serverTimestamp(),
+        });
+      }
+      setForm(EMPTY); setEditing(null);
+    } finally { setSaving(false); }
+  };
+
+  const startEdit = (m: CoreExecutiveDoc) => {
+    setEditing(m.id);
+    setForm({ name: m.name, role: m.role, photoUrl: m.photoUrl || '', storagePath: m.storagePath || '', order: m.order });
+  };
+
+  const remove = async (id: string) => {
+    if (!confirm('Remove this executive?')) return;
+    await deleteDoc(doc(db, 'coreExecutives', id));
+  };
+
+  const clearAll = async () => {
+    if (executives.length === 0) return;
+    if (!confirm(`Delete all ${executives.length} executives? This cannot be undone.`)) return;
+    setClearing(true);
+    try {
+      for (let i = 0; i < executives.length; i += 450) {
+        const batch = writeBatch(db);
+        executives.slice(i, i + 450).forEach((m) => batch.delete(doc(db, 'coreExecutives', m.id)));
+        await batch.commit();
+      }
+    } finally {
+      setClearing(false);
+    }
+  };
+
+  return (
+    <div className="admin-section">
+      <div className="admin-card">
+        <h2 className="admin-card__title">{editing ? 'Edit Executive' : 'Add Core Executive'}</h2>
+        <div className="admin-form-grid">
+          <div className="admin-field" style={{ gridColumn: '1 / -1', maxWidth: 200 }}>
+            <label>Photo (optional — initials shown if omitted)</label>
+            <ImageUploader folder="vwu/core-executives" currentUrl={form.photoUrl} onUploaded={handleImage} label="Upload Photo" />
+          </div>
+          <div className="admin-field">
+            <label>Full Name *</label>
+            <input value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="Dr. G. Srinivasa Rao" />
+          </div>
+          <div className="admin-field">
+            <label>Role / Title</label>
+            <input value={form.role} onChange={(e) => set('role', e.target.value)} placeholder="Principal" />
+          </div>
+          <div className="admin-field">
+            <label>Display Order</label>
+            <input type="number" value={form.order} onChange={(e) => set('order', Number(e.target.value))} />
+          </div>
+        </div>
+        <div className="admin-form-actions">
+          {editing && <button className="admin-btn admin-btn--ghost" onClick={() => { setEditing(null); setForm(EMPTY); }}>Cancel</button>}
+          <button className="admin-btn admin-btn--primary" onClick={save} disabled={saving}>
+            {saving ? 'Saving…' : editing ? 'Update' : 'Add Executive'}
+          </button>
+        </div>
+      </div>
+
+      <div className="admin-card">
+        <div className="admin-card__toolbar">
+          <h2 className="admin-card__title">Core Executive Body ({executives.length})</h2>
+          {executives.length > 0 && (
+            <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={clearAll} disabled={clearing}>
+              {clearing ? 'Clearing…' : 'Clear All'}
+            </button>
+          )}
+        </div>
+        {loading ? <p className="admin-loading">Loading…</p> : (
+          <div className="admin-table-wrap">
+            <table className="admin-table">
+              <thead><tr><th>Photo</th><th>Name</th><th>Role</th><th>Order</th><th>Actions</th></tr></thead>
+              <tbody>
+                {executives.map((m) => (
+                  <tr key={m.id}>
+                    <td>{m.photoUrl ? <img src={m.photoUrl} alt="" className="admin-table__avatar" /> : '👤'}</td>
+                    <td>{m.name}</td>
+                    <td>{m.role}</td>
+                    <td>{m.order}</td>
+                    <td>
+                      <button className="admin-btn admin-btn--sm" onClick={() => startEdit(m)}>Edit</button>
+                      <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(m.id)}>Delete</button>
+                    </td>
+                  </tr>
+                ))}
+                {executives.length === 0 && <tr><td colSpan={5} className="admin-empty">No executives yet — add one using the form above.</td></tr>}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

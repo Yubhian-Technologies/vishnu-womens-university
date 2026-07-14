@@ -3,10 +3,20 @@ import { Link } from 'react-router-dom';
 import './About.css';
 import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
+import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import { useHashScroll } from '../../hooks/useHashScroll';
+import { useOrderedCollection } from '../../hooks/useCollection';
 import {
-  Rocket, Handshake, Microscope, Globe2, GraduationCap, Landmark, BookOpen, Scale, ClipboardList, Building2, IndianRupee, Target, Leaf, School, Info,
+  Rocket, Handshake, Microscope, Globe2, Landmark, BookOpen, Target, Leaf, School, Info,
 } from 'lucide-react';
+
+function getInitials(name: string) {
+  const cleaned = name.replace(/\b(Dr|Sri|Prof|Mr|Mrs|Ms)\.?\s*/gi, '');
+  const parts = cleaned.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return '';
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
 
 const campusPhotos = [
   { src: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=800&q=80', alt: 'Smart classrooms at VWU', caption: 'Smart Classrooms' },
@@ -34,8 +44,33 @@ const differentiators = [
   { cat: 'International & Global', icon: Globe2, items: ['Vishnu Japan Outreach Centre (VJOC)', 'Graduate Study Abroad Center (GSAC)', 'Foreign Languages Programme', 'TEDxSVECW', 'Rural Women Technology Park', 'Vishnu School of Music'] },
 ];
 
+// Firestore-backed — see src/pages/Admin/sections/CoreExecutivesAdmin.tsx.
+// defaultExecutives is shown until an admin adds real docs to the
+// `coreExecutives` collection (same fallback pattern as GoverningBody.tsx).
+export interface CoreExecutiveMember {
+  id: string;
+  name: string;
+  role: string;
+  photoUrl?: string;
+  order: number;
+}
+
+export const defaultExecutives: Omit<CoreExecutiveMember, 'id'>[] = [
+  { name: 'Dr. G. Srinivasa Rao', role: 'Principal', order: 1 },
+  { name: 'Prof. P. Venkata Rama Raju', role: 'Vice-Principal', order: 2 },
+  { name: 'Dr. G.R.L.V.N. Srinivasa Raju', role: 'Dean – Research & Development', order: 3 },
+  { name: 'Dr. V. Purushothama Raju', role: 'Dean – Academics', order: 4 },
+  { name: 'Dr. V.V.R. Maheswara Rao', role: 'Dean – Statutory Bodies / IQAC Coordinator', order: 5 },
+  { name: 'Dr. K.S.N. Raju', role: 'Controller of Examinations', order: 6 },
+  { name: 'Mr. Md. Siddiq', role: 'Administrative Officer', order: 7 },
+  { name: 'Mr. S.S.S. Varma', role: 'Finance Manager', order: 8 },
+];
+
 export default function About() {
   useHashScroll();
+
+  const { docs: execDocs, loading: execLoading } = useOrderedCollection<CoreExecutiveMember>('coreExecutives', 'order');
+  const executives = !execLoading && execDocs.length > 0 ? execDocs : defaultExecutives;
 
   useEffect(() => {
     document.title = 'About VWU | Vishnu Womens University';
@@ -161,24 +196,16 @@ export default function About() {
               The senior leadership team responsible for guiding VWU's academic direction and institutional development.
             </p>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 'var(--space-5)' }}>
-            {[
-              { name: 'Dr. G. Srinivasa Rao',          role: 'Principal',                    icon: GraduationCap },
-              { name: 'Prof. P. Venkata Rama Raju',     role: 'Vice-Principal',               icon: Landmark },
-              { name: 'Dr. G.R.L.V.N. Srinivasa Raju', role: 'Dean – Research & Development', icon: Microscope },
-              { name: 'Dr. V. Purushothama Raju',       role: 'Dean – Academics',             icon: BookOpen },
-              { name: 'Dr. V.V.R. Maheswara Rao',       role: 'Dean – Statutory Bodies / IQAC Coordinator', icon: Scale },
-              { name: 'Dr. K.S.N. Raju',                role: 'Controller of Examinations',   icon: ClipboardList },
-              { name: 'Mr. Md. Siddiq',                 role: 'Administrative Officer',       icon: Building2 },
-              { name: 'Mr. S.S.S. Varma',               role: 'Finance Manager',              icon: IndianRupee },
-            ].map((exec, i) => (
-              <div key={exec.name} className="reveal" data-delay={`${i * 50}`}
-                style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', display: 'flex', gap: 'var(--space-4)', alignItems: 'flex-start', borderTop: '3px solid var(--color-accent)' }}>
-                <exec.icon size={29} strokeWidth={1.75} style={{ flexShrink: 0 }} />
-                <div>
-                  <div style={{ fontFamily: 'var(--font-sans)', fontWeight: 900, color: 'var(--color-primary)', fontSize: 'var(--text-base)', marginBottom: 4 }}>{exec.name}</div>
-                  <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)' }}>{exec.role}</div>
-                </div>
+          <div className="exec-grid">
+            {executives.map((exec, i) => (
+              <div key={exec.name} className="exec-card reveal" data-delay={`${i * 50}`}>
+                {exec.photoUrl ? (
+                  <SmoothImage src={exec.photoUrl} alt={exec.name} className="exec-card__photo" />
+                ) : (
+                  <div className="exec-card__avatar">{getInitials(exec.name)}</div>
+                )}
+                <h3 className="exec-card__name">{exec.name}</h3>
+                <p className="exec-card__role">{exec.role}</p>
               </div>
             ))}
           </div>
