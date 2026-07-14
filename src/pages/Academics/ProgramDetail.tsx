@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { Check, Microscope } from 'lucide-react';
+import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import { findProgramBySlug } from './programs.data';
 import '../detail-layout.css';
 
@@ -41,7 +42,7 @@ export default function ProgramDetail() {
     <main className="page-wrapper">
       {/* Hero */}
       <section className="page-hero" style={{ minHeight: 380 }}>
-        <img src={program.heroImage} alt={program.name} className="page-hero-image" />
+        <SmoothImage src={program.heroImage} alt={program.name} className="page-hero-image" />
         <div className="page-hero-overlay" />
         <div className="container page-hero-content">
           <div className="breadcrumb animate-fade-in">

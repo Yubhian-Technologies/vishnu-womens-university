@@ -315,7 +315,7 @@ export default function Home() {
                 'https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=800&q=80',
                 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=800&q=80',
               ].map((src, i) => (
-                <div key={i} className={`mission-img mission-img--${i}`}>
+                <div key={src} className={`mission-img mission-img--${i}`}>
                   <img src={src} alt="VWU campus" loading="lazy" />
                   <div className="mission-img-overlay" />
                 </div>

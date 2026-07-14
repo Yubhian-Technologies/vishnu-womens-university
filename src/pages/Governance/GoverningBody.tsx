@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useOrderedCollection } from '../../hooks/useCollection';
+import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import './GoverningBody.css';
 
 export interface GoverningBodyMember {
@@ -44,7 +45,7 @@ function MembersTiles() {
       {members.map((member, i) => (
         <motion.div
           className="gb-tile"
-          key={`${i}-${member.name}`}
+          key={member.name}
           initial={{ opacity: 0, y: 28, scale: 0.95 }}
           whileInView={{ opacity: 1, y: 0, scale: 1 }}
           viewport={{ once: true, margin: '-60px' }}
@@ -52,7 +53,7 @@ function MembersTiles() {
           whileHover={{ y: -8, transition: { duration: 0.25 } }}
         >
           {member.photoUrl ? (
-            <img src={member.photoUrl} alt={member.name} className="gb-tile__photo" />
+            <SmoothImage src={member.photoUrl} alt={member.name} className="gb-tile__photo" />
           ) : (
             <div className="gb-tile__avatar">{getInitials(member.name)}</div>
           )}

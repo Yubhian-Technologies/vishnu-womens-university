@@ -1,0 +1,11 @@
+/* Scoped transition — deliberately NOT `transition: all`, so nothing else
+   about the element (layout, borders, etc.) gets pulled into this timing
+   or animated unexpectedly by an unrelated property change elsewhere. */
+.smooth-image {
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.smooth-image--loaded {
+  opacity: 1;
+}
