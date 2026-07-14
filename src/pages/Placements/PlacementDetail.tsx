@@ -1,8 +1,49 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { Trophy } from 'lucide-react';
 import { findPlacementItemBySlug, TableRow } from './placements.data';
 import '../detail-layout.css';
+
+const PARTNER_DOMAINS: Record<string, string> = {
+  'Amazon': 'amazon.com', 'Adobe': 'adobe.com', 'Microsoft': 'microsoft.com',
+  'Google': 'google.com', 'Flipkart': 'flipkart.com', 'PayPal': 'paypal.com',
+  'Palo Alto Networks': 'paloaltonetworks.com', 'VISA': 'visa.com', 'D.E. Shaw': 'deshaw.com',
+  'Walmart': 'walmart.com', 'NXP': 'nxp.com', 'Expedia': 'expedia.com',
+  'Myntra': 'myntra.com', 'Optum': 'optum.com', 'IBM': 'ibm.com',
+  'Providence': 'providence.org', 'Publicis Sapient': 'publicissapient.com', 'State Street': 'statestreet.com',
+  'Athena Health': 'athenahealth.com', 'TCS': 'tcs.com', 'Infosys': 'infosys.com',
+  'Capgemini': 'capgemini.com', 'Accenture': 'accenture.com', 'HCL': 'hcltech.com',
+  'Cognizant': 'cognizant.com', 'Mahindra & Mahindra': 'mahindra.com', 'Hyundai Motors': 'hyundai.com',
+  'TVS Motors': 'tvsmotor.com', 'Hero MotoCorp': 'heromotocorp.com', 'Renault Nissan': 'renault.com',
+  'Daimler Truck': 'daimlertruck.com', 'Caterpillar': 'caterpillar.com', 'Robert Bosch': 'bosch.com',
+  'DBS Bank': 'dbs.com', 'EPAM': 'epam.com', 'Zenoti': 'zenoti.com',
+  'Persistent Systems': 'persistent.com', 'Intuit': 'intuit.com', 'OpenText': 'opentext.com',
+  'F5 Networks': 'f5.com', 'Cloudera': 'cloudera.com', 'Verizon': 'verizon.com',
+};
+
+function PartnerLogo({ name }: { name: string }) {
+  const domain = PARTNER_DOMAINS[name];
+  const [failed, setFailed] = useState(!domain);
+
+  return (
+    <div className="partner-logo-card">
+      {failed ? (
+        <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', height: 28, width: 28, flexShrink: 0, fontSize: 'var(--text-xs)', fontWeight: 700, background: 'var(--color-off-white)', color: 'var(--color-primary)', borderRadius: 'var(--radius-sm)' }}>
+          {name.charAt(0)}
+        </span>
+      ) : (
+        <img
+          src={`https://www.google.com/s2/favicons?domain=${domain}&sz=128`}
+          alt={name}
+          className="partner-logo-img"
+          loading="lazy"
+          onError={() => setFailed(true)}
+        />
+      )}
+      <span className="partner-logo-name">{name}</span>
+    </div>
+  );
+}
 
 export default function PlacementDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -96,14 +137,6 @@ export default function PlacementDetail() {
                       </li>
                     ))}
                   </ul>
-                  {item.partners && item.partners.length > 0 && (
-                    <div style={{ marginTop: 'var(--space-5)', paddingTop: 'var(--space-4)', borderTop: '1px solid var(--color-light-gray)' }}>
-                      <p style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--color-text-light)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 'var(--space-2)' }}>Partners</p>
-                      {item.partners.map((p) => (
-                        <span key={p} style={{ display: 'inline-block', fontSize: 'var(--text-xs)', background: 'var(--color-primary)', color: 'var(--color-white)', padding: '0.2rem 0.6rem', borderRadius: 'var(--radius-sm)', marginRight: 'var(--space-1)', marginBottom: 'var(--space-1)' }}>{p}</span>
-                      ))}
-                    </div>
-                  )}
                 </div>
               </div>
             )}
@@ -178,11 +211,9 @@ export default function PlacementDetail() {
               <span className="section-label">Network</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Recruiting Partners</h2>
             </div>
-            <div className="reveal" style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+            <div className="reveal partner-logo-grid">
               {item.partners.map((p, i) => (
-                <span key={i} style={{ display: 'inline-block', fontSize: 'var(--text-sm)', fontWeight: 600, background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', color: 'var(--color-primary)', padding: '0.35rem 0.85rem', borderRadius: 'var(--radius-full)', lineHeight: 1.4 }}>
-                  {p}
-                </span>
+                <PartnerLogo key={i} name={p} />
               ))}
             </div>
           </div>

@@ -20,3 +20,54 @@
     gap: var(--space-8);
   }
 }
+
+.partner-logo-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-4);
+  align-items: stretch;
+  justify-items: stretch;
+}
+
+@media (min-width: 768px) {
+  .partner-logo-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.partner-logo-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-white);
+  border: 1.5px solid var(--color-light-gray);
+  border-radius: var(--radius-md);
+  transition: all 0.3s ease;
+}
+
+.partner-logo-card:hover {
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-sm);
+}
+
+.partner-logo-img {
+  height: 28px;
+  width: 28px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+@media (min-width: 768px) {
+  .partner-logo-img {
+    height: 32px;
+    width: 32px;
+  }
+}
+
+.partner-logo-name {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-primary);
+  line-height: 1.3;
+}
