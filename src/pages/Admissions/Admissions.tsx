@@ -1,9 +1,38 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import emailjs from '@emailjs/browser';
 import './Admissions.css';
 import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
 import { NotebookPen, FileText, IndianRupee, School, PartyPopper, ClipboardList, BarChart3, CreditCard, Users, Target, Globe, Phone, Mail, MapPin } from 'lucide-react';
+
+interface RequestInfoForm {
+  firstName: string;
+  lastName: string;
+  email: string;
+  program: string;
+  term: string;
+}
+
+const INITIAL_REQUEST_FORM: RequestInfoForm = {
+  firstName: '',
+  lastName: '',
+  email: '',
+  program: '',
+  term: 'Fall 2026',
+};
+
+// EmailJS is frontend-only, so the "to" address for each template must be fixed
+// in the EmailJS dashboard rather than passed from the client — otherwise this
+// form could be used to relay email to any address a visitor supplies.
+//   - VITE_EMAILJS_TEMPLATE_ID_ADMISSIONS: "To Email" set to the VWU admissions inbox.
+//   - VITE_EMAILJS_TEMPLATE_ID_CONFIRMATION: an autoreply template with
+//     "To Email" set to the {{email}} template variable, so it only ever
+//     reaches the address the visitor themselves typed in.
+const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+const EMAILJS_TEMPLATE_ID_ADMISSIONS = import.meta.env.VITE_EMAILJS_TEMPLATE_ID_ADMISSIONS;
+const EMAILJS_TEMPLATE_ID_CONFIRMATION = import.meta.env.VITE_EMAILJS_TEMPLATE_ID_CONFIRMATION;
+const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 
 const admissionsPhotos = [
   { src: 'https://images.unsplash.com/photo-1562774053-701939374585?w=800&q=80', alt: 'VWU campus buildings', caption: 'VWU Campus' },
@@ -66,6 +95,41 @@ const visitOptions = [
 
 export default function Admissions() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [requestForm, setRequestForm] = useState<RequestInfoForm>(INITIAL_REQUEST_FORM);
+  const [requestStatus, setRequestStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+
+  const handleRequestFormChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setRequestForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleRequestInfoSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!EMAILJS_SERVICE_ID || !EMAILJS_TEMPLATE_ID_ADMISSIONS || !EMAILJS_TEMPLATE_ID_CONFIRMATION || !EMAILJS_PUBLIC_KEY) {
+      setRequestStatus('error');
+      return;
+    }
+
+    setRequestStatus('submitting');
+    const templateParams = {
+      first_name: requestForm.firstName,
+      last_name: requestForm.lastName,
+      email: requestForm.email,
+      program: requestForm.program,
+      term: requestForm.term,
+    };
+
+    try {
+      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID_ADMISSIONS, templateParams, EMAILJS_PUBLIC_KEY);
+      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID_CONFIRMATION, templateParams, EMAILJS_PUBLIC_KEY);
+      setRequestStatus('success');
+      setRequestForm(INITIAL_REQUEST_FORM);
+    } catch {
+      setRequestStatus('error');
+    }
+  };
 
   useEffect(() => {
     document.title = 'Admissions | Vishnu Womens University';
@@ -286,25 +350,25 @@ export default function Admissions() {
             </div>
             <div className="adm-form-card reveal-right">
               <h3>Request Information</h3>
-              <form onSubmit={e => e.preventDefault()} className="adm-form">
+              <form onSubmit={handleRequestInfoSubmit} className="adm-form">
                 <div className="adm-form-row">
                   <div className="adm-form-group">
                     <label>First Name</label>
-                    <input type="text" placeholder="First name" />
+                    <input type="text" name="firstName" placeholder="First name" value={requestForm.firstName} onChange={handleRequestFormChange} />
                   </div>
                   <div className="adm-form-group">
                     <label>Last Name</label>
-                    <input type="text" placeholder="Last name" />
+                    <input type="text" name="lastName" placeholder="Last name" value={requestForm.lastName} onChange={handleRequestFormChange} />
                   </div>
                 </div>
                 <div className="adm-form-group">
                   <label>Email Address</label>
-                  <input type="email" placeholder="your@email.com" />
+                  <input type="email" name="email" placeholder="your@email.com" value={requestForm.email} onChange={handleRequestFormChange} />
                 </div>
                 <div className="adm-form-group">
                   <label>Program Interest</label>
-                  <select>
-                    <option>Select a program...</option>
+                  <select name="program" value={requestForm.program} onChange={handleRequestFormChange}>
+                    <option value="">Select a program...</option>
                     <option>B.Tech – CSE / AI&ML / AI&DS / Cyber Security</option>
                     <option>B.Tech – ECE / EEE / IT</option>
                     <option>B.Tech – Civil / Mechanical Engineering</option>
@@ -315,15 +379,25 @@ export default function Admissions() {
                 </div>
                 <div className="adm-form-group">
                   <label>Expected Start Term</label>
-                  <select>
+                  <select name="term" value={requestForm.term} onChange={handleRequestFormChange}>
                     <option>Fall 2026</option>
                     <option>Spring 2027</option>
                     <option>Fall 2027</option>
                   </select>
                 </div>
-                <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
-                  Request Information
+                <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={requestStatus === 'submitting'}>
+                  {requestStatus === 'submitting' ? 'Sending…' : 'Request Information'}
                 </button>
+                {requestStatus === 'success' && (
+                  <p style={{ marginTop: 'var(--space-3)', fontSize: 'var(--text-sm)', color: 'var(--color-primary)' }}>
+                    Thanks! We've received your request and sent a confirmation to your email.
+                  </p>
+                )}
+                {requestStatus === 'error' && (
+                  <p style={{ marginTop: 'var(--space-3)', fontSize: 'var(--text-sm)', color: '#b3261e' }}>
+                    Something went wrong sending your request. Please try again or email us directly.
+                  </p>
+                )}
               </form>
             </div>
           </div>
