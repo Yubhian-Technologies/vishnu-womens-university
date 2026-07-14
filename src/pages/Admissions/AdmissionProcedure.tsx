@@ -89,7 +89,7 @@ export default function AdmissionProcedure() {
       {/* Hero */}
       <PageHero
         page="admission-procedure"
-        defaultImage="https://images.unsplash.com/photo-1434030216411-0b793f4b6f71?w=1920&q=80"
+        defaultImage="https://images.unsplash.com/photo-1555255707-c07966088b7b?w=1920&q=80"
         defaultTitle="Admission Procedure"
   defaultSubtitle="A clear, step-by-step guide to joining VWU — covering eligibility, entrance examinations, and the enrollment process for all programmes."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Admissions', to: '/admissions' }, { label: 'Admission Procedure' }]}

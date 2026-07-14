@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
+import { useHashScroll } from '../../hooks/useHashScroll';
 import {
   Monitor, Microscope, BookOpen, Drama, Wifi, Home, Utensils, Activity, Waves, Hospital, Lock, Bus, Landmark, Building, Accessibility,
 } from 'lucide-react';
@@ -41,6 +42,8 @@ const facilities = [
 ];
 
 export default function Campus() {
+  useHashScroll();
+
   useEffect(() => {
     document.title = 'Campus Life | VWU';
     const observer = new IntersectionObserver(

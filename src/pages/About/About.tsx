@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import './About.css';
 import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
+import { useHashScroll } from '../../hooks/useHashScroll';
 import {
   Rocket, Handshake, Microscope, Globe2, GraduationCap, Landmark, BookOpen, Scale, ClipboardList, Building2, IndianRupee, Target, Leaf, School, Info,
 } from 'lucide-react';
@@ -34,6 +35,8 @@ const differentiators = [
 ];
 
 export default function About() {
+  useHashScroll();
+
   useEffect(() => {
     document.title = 'About VWU | Vishnu Womens University';
     const observer = new IntersectionObserver(

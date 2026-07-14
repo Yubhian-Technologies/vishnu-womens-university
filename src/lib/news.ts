@@ -14,7 +14,7 @@ export interface NewsDoc {
 
 export const NEWS_CATEGORIES = ['News', 'Event', 'Achievement', 'Award', 'Announcement', 'Research'];
 
-export const NEWS_FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800&q=80';
+export const NEWS_FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=800&q=80';
 
 export function newsDocToArticle(item: NewsDoc): NewsArticle {
   return {
