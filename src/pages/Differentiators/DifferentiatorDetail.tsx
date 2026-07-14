@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { Trophy } from 'lucide-react';
+import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import { findItemBySlug } from './differentiators.data';
 import '../detail-layout.css';
 
@@ -36,7 +37,7 @@ export default function DifferentiatorDetail() {
     <main className="page-wrapper">
       {/* Hero */}
       <section className="page-hero" style={{ minHeight: 380 }}>
-        <img src={category.heroImage} alt={item.title} className="page-hero-image" />
+        <SmoothImage src={category.heroImage} alt={item.title} className="page-hero-image" />
         <div className="page-hero-overlay" />
         <div className="container page-hero-content">
           <div className="breadcrumb animate-fade-in">

@@ -7,6 +7,11 @@
   overflow: hidden;
   display: flex;
   align-items: center;
+  /* Placeholder color behind a still-loading .page-hero-image — mainly for
+     the detail pages (ProgramDetail, DifferentiatorDetail) that place a
+     bare <img class="page-hero-image"> directly here instead of going
+     through the slide-carousel markup below. */
+  background: var(--color-primary-dark);
 }
 
 /* Size variants */
@@ -19,6 +24,7 @@
   position: absolute;
   inset: 0;
   opacity: 0;
+  background: var(--color-primary-dark);
   transition: opacity 0.7s ease;
   z-index: 0;
 }

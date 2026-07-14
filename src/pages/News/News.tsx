@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Newspaper, Search } from 'lucide-react';
 import NewsCard from '../../components/NewsCard/NewsCard';
+import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { formatDate } from '../../lib/formatDate';
 import { type NewsDoc, NEWS_CATEGORIES, NEWS_FALLBACK_IMAGE, newsDocToArticle } from '../../lib/news';
@@ -62,7 +63,7 @@ export default function News() {
           <div className="container">
             <div className="news-featured-card reveal">
               <div className="news-featured-image">
-                <img
+                <SmoothImage
                   src={featuredItem.imageUrl || NEWS_FALLBACK_IMAGE}
                   alt={featuredItem.title}
                   loading="lazy"

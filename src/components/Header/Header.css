@@ -212,14 +212,14 @@
 .nav-link {
   display: flex;
   align-items: center;
-  gap: 2px;
-  padding: 0 0.35rem;
+  gap: 1px;
+  padding: 0 0.2rem;
   height: 100%;
-  font-size: 0.72rem;
+  font-size: 0.64rem;
   font-weight: 700;
   color: rgba(255,255,255,0.9);
   font-family: var(--font-sans);
-  letter-spacing: 0.03em;
+  letter-spacing: 0.01em;
   text-transform: uppercase;
   transition: color var(--transition-fast);
   white-space: nowrap;
@@ -253,8 +253,9 @@
 }
 
 .nav-arrow {
-  width: 12px;
-  height: 12px;
+  width: 9px;
+  height: 9px;
+  flex-shrink: 0;
   transition: transform var(--transition-base);
   opacity: 0.7;
 }
@@ -287,6 +288,22 @@
   opacity: 1;
   visibility: visible;
   transform: translateX(-50%) translateY(0);
+}
+
+/* The last couple of nav items (currently "Alumni & Giving" and "Quick
+   Links") sit close to the right edge of the bar. A dropdown centered on
+   its trigger would overflow past 100vw there, and body has
+   overflow-x:hidden — which clips that overflow so the menu becomes
+   invisible and unclickable. Right-anchor those instead of centering. */
+.nav-item:nth-last-child(-n+2) .dropdown:not(.dropdown-mega) {
+  left: auto;
+  right: 0;
+  transform: translateY(-10px);
+}
+
+.nav-item:nth-last-child(-n+2):hover .dropdown:not(.dropdown-mega),
+.nav-item:nth-last-child(-n+2):focus-within .dropdown:not(.dropdown-mega) {
+  transform: translateY(0);
 }
 
 .dropdown-list {
@@ -590,6 +607,15 @@ a.mega-group-label:hover {
 }
 
 /* ===== Responsive ===== */
+/* The logo block + full nav-item row need ~1379px to lay out without
+   overflowing (measured: ~477px logo + ~869px compacted nav + ~32px header
+   padding — .nav-link's padding/font-size/letter-spacing and .nav-arrow's
+   size were tightened specifically so the full nav stays visible, instead
+   of collapsing to the hamburger menu, at common laptop widths like
+   1440px). This breakpoint is intentionally its own query, separate from
+   the branding-simplification rules below: once .nav is hidden here, it no
+   longer competes for header width, so there's no overflow reason to also
+   hide the university name/subtitle at this same width. */
 @media (max-width: 1400px) {
   .nav {
     display: none;
@@ -597,6 +623,11 @@ a.mega-group-label:hover {
   .mobile-toggle {
     display: flex;
   }
+}
+
+/* Purely a visual simplification for narrower/tablet widths — not tied to
+   the nav-overflow fix above. */
+@media (max-width: 1400px) {
   .topbar-left {
     display: none;
   }

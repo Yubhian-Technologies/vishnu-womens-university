@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { usePageBanners, type BannerSlide } from '../../hooks/usePageBanners';
+import SmoothImage from '../SmoothImage/SmoothImage';
 import './PageHero.css';
 
 export interface BreadcrumbItem {
@@ -76,13 +77,20 @@ export default function PageHero({
       onMouseEnter={stopTimer}
       onMouseLeave={startTimer}
     >
-      {/* Slides */}
+      {/* Slides. Keyed by imageUrl (not array index) so that when the
+          default hardcoded image is replaced by a Firestore-loaded banner
+          at the same slide position, React unmounts the old <img> instead
+          of reusing the DOM node and silently swapping its src — the
+          latter causes the browser to keep painting the previous bitmap
+          until the new one finishes downloading (a visible "ghosting"
+          flash on every page navigation, since PageHero remounts fresh
+          per route and always starts from the default image). */}
       {allSlides.map((s, i) => (
         <div
-          key={i}
+          key={s.imageUrl}
           className={`page-hero__slide ${i === current ? 'page-hero__slide--active' : ''}`}
         >
-          <img src={s.imageUrl} alt={s.title} className="page-hero-image" />
+          <SmoothImage src={s.imageUrl} alt={s.title} className="page-hero-image" />
         </div>
       ))}
 
