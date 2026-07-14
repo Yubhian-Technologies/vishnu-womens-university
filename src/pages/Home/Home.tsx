@@ -36,7 +36,7 @@ const events = [
 const campusFeatures = ['Student Clubs & Organizations', 'Radio Vishnu 90.4', 'Vishnu TV Academy', 'Sports & Games Facilities', 'Career Services Center', "Women's Hostels", 'AR/VR Studio', 'Technology Business Incubator'];
 
 const activityItems = [
-  { img: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600&q=80', label: 'mBAJA SAEINDIA 2026 Win' },
+  { img: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=600&q=80', label: 'mBAJA SAEINDIA 2026 Win' },
   { img: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=600&q=80', label: 'Amazon AFE Internship' },
   { img: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=600&q=80', label: 'Technova2026 Symposium' },
   { img: 'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=600&q=80', label: '8th Graduation Day' },

@@ -91,7 +91,7 @@ export default function Admissions() {
       {/* Hero */}
       <PageHero
         page="admissions"
-        defaultImage="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1920&q=80"
+        defaultImage="https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=1920&q=80"
         defaultTitle="Your Journey Starts Here"
   defaultSubtitle="Choosing VWU sets you on a path to a fulfilling engineering career, a strong professional network, and a future built on real achievement."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Admissions' }]}
