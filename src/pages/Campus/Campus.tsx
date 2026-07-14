@@ -2,6 +2,9 @@ import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
+import {
+  Monitor, Microscope, BookOpen, Drama, Wifi, Home, Utensils, Activity, Waves, Hospital, Lock, Bus, Landmark, Building, Accessibility,
+} from 'lucide-react';
 
 const campusGalleryPhotos = [
   { src: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=800&q=80', alt: 'Smart classrooms', caption: 'Smart Classrooms' },
@@ -19,22 +22,22 @@ const campusGalleryPhotos = [
 ];
 
 const facilities = [
-  { id: 'smart-classrooms', icon: '📺', title: 'Smart Class Rooms', desc: 'More than 200 digitally-fitted classrooms with projectors, interactive whiteboards, and live-streaming support for hybrid delivery.' },
-  { id: 'labs',             icon: '🔬', title: 'Specialised Laboratories', desc: 'Over 50 purpose-built labs spread across all departments — spanning AI & ML, VLSI design, Power Electronics, and Civil Engineering.' },
-  { id: 'library',          icon: '📚', title: 'Central Library', desc: 'More than 1,00,000 volumes alongside e-journals, NPTEL resources, Springer, and IEEE Xplore access, with quiet reading spaces.' },
-  { id: 'auditoriums',      icon: '🎭', title: 'Auditoriums', desc: 'A 2,000-seat main auditorium plus multiple seminar halls, supporting events, conferences, cultural programs, and symposia.' },
-  { id: 'bookstores',       icon: '📖', title: 'Campus Book Stores', desc: 'A well-stocked campus bookstore carrying prescribed texts, reference materials, stationery, and digital resources.' },
-  { id: 'wifi',             icon: '📶', title: 'Wi-Fi Campus', desc: 'Campus-wide 1 Gbps Wi-Fi covering academic blocks, hostels, and recreational areas, available around the clock.' },
-  { id: 'hostels',          icon: '🏠', title: 'Campus Hostels', desc: 'Secure women\'s hostels with round-the-clock security, an attached mess, fast Wi-Fi, and recreation spaces for resident students.' },
-  { id: 'food-courts',      icon: '🍽️', title: 'Food Courts', desc: 'Clean, well-run campus food courts offering freshly prepared vegetarian and non-vegetarian meals throughout the day.' },
-  { id: 'fitness',          icon: '💪', title: 'VISHNU Fitness Centre', desc: 'A fully equipped gym with modern training equipment, qualified instructors, and structured fitness programs for all students.' },
-  { id: 'swimming-pool',    icon: '🏊', title: 'Swimming Pool', desc: 'An Olympic-standard pool open to students and staff, with certified coaching and regularly scheduled swimming sessions.' },
-  { id: 'health-care',      icon: '🏥', title: 'Health Care', desc: 'An on-campus medical centre staffed by qualified doctors and nurses, providing primary healthcare to students and staff.' },
-  { id: 'security',         icon: '🔐', title: 'Campus Security', desc: 'Round-the-clock CCTV monitoring, trained security personnel, and controlled entry points maintaining a safe campus.' },
-  { id: 'travel-desk',      icon: '🚌', title: 'Travel Desk', desc: 'A dedicated travel desk handling transport coordination, bus passes, and travel-related support for students and staff.' },
-  { id: 'temples',          icon: '🛕', title: 'Temples', desc: 'On-campus temples and prayer spaces where students can find quiet, reflection, and a sense of spiritual grounding.' },
-  { id: 'staff-quarters',   icon: '🏘️', title: 'Staff Quarters', desc: 'Residential quarters for faculty and staff within the Green Meadows campus network, enabling convenient on-campus living.' },
-  { id: 'other-facilities', icon: '♿', title: 'Other Facilities', desc: 'Accessibility provisions for differently-abled students, an indoor games room, student lounge, ATM, photocopying services, and more.' },
+  { id: 'smart-classrooms', icon: Monitor, title: 'Smart Class Rooms', desc: 'More than 200 digitally-fitted classrooms with projectors, interactive whiteboards, and live-streaming support for hybrid delivery.' },
+  { id: 'labs',             icon: Microscope, title: 'Specialised Laboratories', desc: 'Over 50 purpose-built labs spread across all departments — spanning AI & ML, VLSI design, Power Electronics, and Civil Engineering.' },
+  { id: 'library',          icon: BookOpen, title: 'Central Library', desc: 'More than 1,00,000 volumes alongside e-journals, NPTEL resources, Springer, and IEEE Xplore access, with quiet reading spaces.' },
+  { id: 'auditoriums',      icon: Drama, title: 'Auditoriums', desc: 'A 2,000-seat main auditorium plus multiple seminar halls, supporting events, conferences, cultural programs, and symposia.' },
+  { id: 'bookstores',       icon: BookOpen, title: 'Campus Book Stores', desc: 'A well-stocked campus bookstore carrying prescribed texts, reference materials, stationery, and digital resources.' },
+  { id: 'wifi',             icon: Wifi, title: 'Wi-Fi Campus', desc: 'Campus-wide 1 Gbps Wi-Fi covering academic blocks, hostels, and recreational areas, available around the clock.' },
+  { id: 'hostels',          icon: Home, title: 'Campus Hostels', desc: 'Secure women\'s hostels with round-the-clock security, an attached mess, fast Wi-Fi, and recreation spaces for resident students.' },
+  { id: 'food-courts',      icon: Utensils, title: 'Food Courts', desc: 'Clean, well-run campus food courts offering freshly prepared vegetarian and non-vegetarian meals throughout the day.' },
+  { id: 'fitness',          icon: Activity, title: 'VISHNU Fitness Centre', desc: 'A fully equipped gym with modern training equipment, qualified instructors, and structured fitness programs for all students.' },
+  { id: 'swimming-pool',    icon: Waves, title: 'Swimming Pool', desc: 'An Olympic-standard pool open to students and staff, with certified coaching and regularly scheduled swimming sessions.' },
+  { id: 'health-care',      icon: Hospital, title: 'Health Care', desc: 'An on-campus medical centre staffed by qualified doctors and nurses, providing primary healthcare to students and staff.' },
+  { id: 'security',         icon: Lock, title: 'Campus Security', desc: 'Round-the-clock CCTV monitoring, trained security personnel, and controlled entry points maintaining a safe campus.' },
+  { id: 'travel-desk',      icon: Bus, title: 'Travel Desk', desc: 'A dedicated travel desk handling transport coordination, bus passes, and travel-related support for students and staff.' },
+  { id: 'temples',          icon: Landmark, title: 'Temples', desc: 'On-campus temples and prayer spaces where students can find quiet, reflection, and a sense of spiritual grounding.' },
+  { id: 'staff-quarters',   icon: Building, title: 'Staff Quarters', desc: 'Residential quarters for faculty and staff within the Green Meadows campus network, enabling convenient on-campus living.' },
+  { id: 'other-facilities', icon: Accessibility, title: 'Other Facilities', desc: 'Accessibility provisions for differently-abled students, an indoor games room, student lounge, ATM, photocopying services, and more.' },
 ];
 
 export default function Campus() {
@@ -103,7 +106,7 @@ export default function Campus() {
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-accent)'; (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-md)'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-light-gray)'; (e.currentTarget as HTMLElement).style.boxShadow = 'none'; }}
               >
-                <div style={{ fontSize: '2.2rem', marginBottom: 'var(--space-3)' }}>{f.icon}</div>
+                <div style={{ marginBottom: 'var(--space-3)' }}><f.icon size={35} strokeWidth={1.75} /></div>
                 <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>{f.title}</h3>
                 <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6 }}>{f.desc}</p>
               </div>

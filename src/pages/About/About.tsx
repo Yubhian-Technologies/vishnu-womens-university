@@ -3,6 +3,9 @@ import { Link } from 'react-router-dom';
 import './About.css';
 import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
+import {
+  Rocket, Handshake, Microscope, Globe2, GraduationCap, Landmark, BookOpen, Scale, ClipboardList, Building2, IndianRupee, Target, Leaf, School, Info,
+} from 'lucide-react';
 
 const campusPhotos = [
   { src: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=800&q=80', alt: 'Smart classrooms at VWU', caption: 'Smart Classrooms' },
@@ -24,10 +27,10 @@ const quickStats = [
 ];
 
 const differentiators = [
-  { cat: 'Innovation & Entrepreneurship', icon: '🚀', items: ['Vishnu Technology Business Incubator (TBI)', 'Vishnu Space Application Center (VSAC)', 'Science Technology & Innovation Hub (STI Hub)', 'AICTE IDEA Lab', 'Chips to Startup (C2S)', 'Institution Innovation Cell'] },
-  { cat: 'Industry Partnerships', icon: '🤝', items: ['NASSCOM Embedded Systems Training', 'HCL Tech VLSI Training', 'Microchip Embedded System', 'TI-DSP Centre of Excellence', 'TalentSprint @ NSE (WISE)', 'Smart Interviews – C&DS Programme'] },
-  { cat: 'Specialised Labs', icon: '🔬', items: ['AR / VR Studio', 'High Performance Computing Lab', 'Vehicle Design Lab', 'Assistive Technology Lab (ATL)', 'Concrete Canoe Laboratory', 'Dream House Construction Lab'] },
-  { cat: 'International & Global', icon: '🌍', items: ['Vishnu Japan Outreach Centre (VJOC)', 'Graduate Study Abroad Center (GSAC)', 'Foreign Languages Programme', 'TEDxSVECW', 'Rural Women Technology Park', 'Vishnu School of Music'] },
+  { cat: 'Innovation & Entrepreneurship', icon: Rocket, items: ['Vishnu Technology Business Incubator (TBI)', 'Vishnu Space Application Center (VSAC)', 'Science Technology & Innovation Hub (STI Hub)', 'AICTE IDEA Lab', 'Chips to Startup (C2S)', 'Institution Innovation Cell'] },
+  { cat: 'Industry Partnerships', icon: Handshake, items: ['NASSCOM Embedded Systems Training', 'HCL Tech VLSI Training', 'Microchip Embedded System', 'TI-DSP Centre of Excellence', 'TalentSprint @ NSE (WISE)', 'Smart Interviews – C&DS Programme'] },
+  { cat: 'Specialised Labs', icon: Microscope, items: ['AR / VR Studio', 'High Performance Computing Lab', 'Vehicle Design Lab', 'Assistive Technology Lab (ATL)', 'Concrete Canoe Laboratory', 'Dream House Construction Lab'] },
+  { cat: 'International & Global', icon: Globe2, items: ['Vishnu Japan Outreach Centre (VJOC)', 'Graduate Study Abroad Center (GSAC)', 'Foreign Languages Programme', 'TEDxSVECW', 'Rural Women Technology Park', 'Vishnu School of Music'] },
 ];
 
 export default function About() {
@@ -157,18 +160,18 @@ export default function About() {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 'var(--space-5)' }}>
             {[
-              { name: 'Dr. G. Srinivasa Rao',          role: 'Principal',                    icon: '🎓' },
-              { name: 'Prof. P. Venkata Rama Raju',     role: 'Vice-Principal',               icon: '🏛️' },
-              { name: 'Dr. G.R.L.V.N. Srinivasa Raju', role: 'Dean – Research & Development', icon: '🔬' },
-              { name: 'Dr. V. Purushothama Raju',       role: 'Dean – Academics',             icon: '📚' },
-              { name: 'Dr. V.V.R. Maheswara Rao',       role: 'Dean – Statutory Bodies / IQAC Coordinator', icon: '⚖️' },
-              { name: 'Dr. K.S.N. Raju',                role: 'Controller of Examinations',   icon: '📋' },
-              { name: 'Mr. Md. Siddiq',                 role: 'Administrative Officer',       icon: '🏢' },
-              { name: 'Mr. S.S.S. Varma',               role: 'Finance Manager',              icon: '💰' },
+              { name: 'Dr. G. Srinivasa Rao',          role: 'Principal',                    icon: GraduationCap },
+              { name: 'Prof. P. Venkata Rama Raju',     role: 'Vice-Principal',               icon: Landmark },
+              { name: 'Dr. G.R.L.V.N. Srinivasa Raju', role: 'Dean – Research & Development', icon: Microscope },
+              { name: 'Dr. V. Purushothama Raju',       role: 'Dean – Academics',             icon: BookOpen },
+              { name: 'Dr. V.V.R. Maheswara Rao',       role: 'Dean – Statutory Bodies / IQAC Coordinator', icon: Scale },
+              { name: 'Dr. K.S.N. Raju',                role: 'Controller of Examinations',   icon: ClipboardList },
+              { name: 'Mr. Md. Siddiq',                 role: 'Administrative Officer',       icon: Building2 },
+              { name: 'Mr. S.S.S. Varma',               role: 'Finance Manager',              icon: IndianRupee },
             ].map((exec, i) => (
               <div key={exec.name} className="reveal" data-delay={`${i * 50}`}
                 style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', display: 'flex', gap: 'var(--space-4)', alignItems: 'flex-start', borderTop: '3px solid var(--color-accent)' }}>
-                <span style={{ fontSize: '1.8rem', flexShrink: 0 }}>{exec.icon}</span>
+                <exec.icon size={29} strokeWidth={1.75} style={{ flexShrink: 0 }} />
                 <div>
                   <div style={{ fontFamily: 'var(--font-sans)', fontWeight: 900, color: 'var(--color-primary)', fontSize: 'var(--text-base)', marginBottom: 4 }}>{exec.name}</div>
                   <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)' }}>{exec.role}</div>
@@ -194,7 +197,7 @@ export default function About() {
             {differentiators.map((d, i) => (
               <div key={d.cat} className="about-diff-card reveal" data-delay={`${i * 80}`}>
                 <div className="about-diff-header">
-                  <span className="about-diff-icon">{d.icon}</span>
+                  <span className="about-diff-icon"><d.icon size={29} strokeWidth={1.75} /></span>
                   <h3>{d.cat}</h3>
                 </div>
                 <ul className="about-diff-list">
@@ -293,15 +296,15 @@ export default function About() {
           </div>
           <div className="about-discover-grid">
             {[
-              { title: 'Vision, Mission & Values', desc: 'Our guiding purpose, mission statements, and core institutional values.', path: '/vision-mission', icon: '🎯' },
-              { title: 'Governance & Leadership', desc: 'Governing body, core executive, committees, and development plan.', path: '/governance', icon: '🏛️' },
-              { title: 'About Society (SVES)', desc: 'The Sri Vishnu Educational Society — our founding parent organization.', path: '/about-sves', icon: '🌿' },
-              { title: 'Campus Life', desc: 'Smart classrooms, labs, hostels, fitness, swimming pool, and more.', path: '/campus', icon: '🏫' },
-              { title: 'Academics', desc: 'All B.Tech, M.Tech, MBA and Ph.D. programs with departments.', path: '/academics', icon: '📚' },
-              { title: 'Information', desc: 'Academic calendar, holidays, how to reach, ICT platforms, and more.', path: '/information', icon: 'ℹ️' },
+              { title: 'Vision, Mission & Values', desc: 'Our guiding purpose, mission statements, and core institutional values.', path: '/vision-mission', icon: Target },
+              { title: 'Governance & Leadership', desc: 'Governing body, core executive, committees, and development plan.', path: '/governance', icon: Landmark },
+              { title: 'About Society (SVES)', desc: 'The Sri Vishnu Educational Society — our founding parent organization.', path: '/about-sves', icon: Leaf },
+              { title: 'Campus Life', desc: 'Smart classrooms, labs, hostels, fitness, swimming pool, and more.', path: '/campus', icon: School },
+              { title: 'Academics', desc: 'All B.Tech, M.Tech, MBA and Ph.D. programs with departments.', path: '/academics', icon: BookOpen },
+              { title: 'Information', desc: 'Academic calendar, holidays, how to reach, ICT platforms, and more.', path: '/information', icon: Info },
             ].map((item, i) => (
               <Link to={item.path} key={item.title} className="about-discover-card reveal" data-delay={`${i * 60}`}>
-                <span className="about-discover-icon">{item.icon}</span>
+                <span className="about-discover-icon"><item.icon size={32} strokeWidth={1.75} /></span>
                 <h3>{item.title}</h3>
                 <p>{item.desc}</p>
                 <span className="about-discover-link">Explore →</span>

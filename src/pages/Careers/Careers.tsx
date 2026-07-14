@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
+import { GraduationCap, IndianRupee, Hospital, Home, BookOpen, Handshake } from 'lucide-react';
 
 const positions = [
   {
@@ -56,12 +57,12 @@ const positions = [
 ];
 
 const perks = [
-  { icon: '🎓', title: 'Research Support', desc: 'Dedicated support for research projects, conference participation, and publication in recognised journals.' },
-  { icon: '💰', title: 'Competitive Pay', desc: 'Remuneration aligned with AICTE/UGC norms, with increments tied to performance.' },
-  { icon: '🏥', title: 'Health & Wellness', desc: 'On-campus medical services, insurance coverage, and access to the Vishnu Wellness Centre.' },
-  { icon: '🏠', title: 'Staff Quarters', desc: 'Residential accommodation available on campus within the Green Meadows campus network.' },
-  { icon: '📚', title: 'Professional Development', desc: 'Access to FDPs, workshops, certifications, and sabbatical provisions for advanced study.' },
-  { icon: '🤝', title: 'Inclusive Culture', desc: 'A women-centred, collaborative academic environment that values diversity and mutual respect.' },
+  { icon: GraduationCap, title: 'Research Support', desc: 'Dedicated support for research projects, conference participation, and publication in recognised journals.' },
+  { icon: IndianRupee, title: 'Competitive Pay', desc: 'Remuneration aligned with AICTE/UGC norms, with increments tied to performance.' },
+  { icon: Hospital, title: 'Health & Wellness', desc: 'On-campus medical services, insurance coverage, and access to the Vishnu Wellness Centre.' },
+  { icon: Home, title: 'Staff Quarters', desc: 'Residential accommodation available on campus within the Green Meadows campus network.' },
+  { icon: BookOpen, title: 'Professional Development', desc: 'Access to FDPs, workshops, certifications, and sabbatical provisions for advanced study.' },
+  { icon: Handshake, title: 'Inclusive Culture', desc: 'A women-centred, collaborative academic environment that values diversity and mutual respect.' },
 ];
 
 type FormData = {
@@ -120,7 +121,7 @@ export default function Careers() {
             {perks.map((p, i) => (
               <div key={p.title} className="reveal" data-delay={`${i * 60}`}
                 style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', borderLeft: '4px solid var(--color-accent)' }}>
-                <div style={{ fontSize: '2rem', marginBottom: 'var(--space-3)' }}>{p.icon}</div>
+                <div style={{ marginBottom: 'var(--space-3)' }}><p.icon size={32} strokeWidth={1.75} /></div>
                 <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 800, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>{p.title}</h3>
                 <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6 }}>{p.desc}</p>
               </div>

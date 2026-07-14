@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import './StudentLife.css';
 import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
+import { Radio, Tv, Handshake, Sprout, Shield, Laptop, Palette, BookOpen, Globe2, Bot, Venus, Leaf, GraduationCap, Brain, Lightbulb, Award, Globe, Target, Volleyball, Feather, CircleDot, Swords, Footprints, Waves, Disc, Crown } from 'lucide-react';
 
 const studentLifePhotos = [
   { src: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&q=80', alt: 'Cultural events', caption: 'Cultural Events' },
@@ -13,18 +14,18 @@ const studentLifePhotos = [
 ];
 
 const clubs = [
-  { icon: '📻', name: 'Radio Vishnu 90.4', count: 'Campus FM station' },
-  { icon: '📺', name: 'Vishnu TV Academy', count: 'Media & broadcasting' },
-  { icon: '🤝', name: 'Student Government', count: 'Student council' },
-  { icon: '🌱', name: 'NSS Unit', count: 'National Service Scheme' },
-  { icon: '🛡️', name: 'NCC Wing', count: 'National Cadet Corps' },
-  { icon: '💻', name: 'Tech Clubs (CSE/ECE/EEE)', count: 'Department-level clubs' },
-  { icon: '🎨', name: 'Arts & Culture Club', count: 'Creativity & expression' },
-  { icon: '📖', name: 'Prathibha Magazine', count: 'Campus literary journal' },
-  { icon: '🌍', name: 'Social Service Club', count: 'Community outreach' },
-  { icon: '🤖', name: 'Robotics Club', count: 'Innovation & design' },
-  { icon: '♀️', name: 'Women Empowerment Cell', count: 'Leadership & awareness' },
-  { icon: '🌿', name: 'Eco Club', count: 'Green campus initiative' },
+  { icon: Radio, name: 'Radio Vishnu 90.4', count: 'Campus FM station' },
+  { icon: Tv, name: 'Vishnu TV Academy', count: 'Media & broadcasting' },
+  { icon: Handshake, name: 'Student Government', count: 'Student council' },
+  { icon: Sprout, name: 'NSS Unit', count: 'National Service Scheme' },
+  { icon: Shield, name: 'NCC Wing', count: 'National Cadet Corps' },
+  { icon: Laptop, name: 'Tech Clubs (CSE/ECE/EEE)', count: 'Department-level clubs' },
+  { icon: Palette, name: 'Arts & Culture Club', count: 'Creativity & expression' },
+  { icon: BookOpen, name: 'Prathibha Magazine', count: 'Campus literary journal' },
+  { icon: Globe2, name: 'Social Service Club', count: 'Community outreach' },
+  { icon: Bot, name: 'Robotics Club', count: 'Innovation & design' },
+  { icon: Venus, name: 'Women Empowerment Cell', count: 'Leadership & awareness' },
+  { icon: Leaf, name: 'Eco Club', count: 'Green campus initiative' },
 ];
 
 const housing = [
@@ -34,25 +35,25 @@ const housing = [
 ];
 
 const services = [
-  { icon: '🎓', title: 'Career Services Center', desc: 'Resume preparation, mock interviews, placement drives, and career guidance — supporting 1,400+ annual placements.' },
-  { icon: '🧠', title: 'Student Wellness Center', desc: 'Medical support, mental health resources, and on-campus healthcare accessible to every student.' },
-  { icon: '📚', title: 'Central Library', desc: 'Thousands of engineering texts, e-journals, NPTEL content, and quiet study spaces to support academic work.' },
-  { icon: '💡', title: 'Assistive Technology Lab', desc: 'A dedicated lab developing assistive tools for differently-abled individuals — open to all students for learning and research.' },
-  { icon: '🏅', title: 'Sports & Games Facilities', desc: 'A range of indoor and outdoor sports facilities — courts, swimming pool, and a fitness centre — to support physical development.' },
-  { icon: '🌐', title: 'International Outreach', desc: 'Vishnu Japan Outreach Centre and international academic partnerships offering global exposure and exchange pathways.' },
+  { icon: GraduationCap, title: 'Career Services Center', desc: 'Resume preparation, mock interviews, placement drives, and career guidance — supporting 1,400+ annual placements.' },
+  { icon: Brain, title: 'Student Wellness Center', desc: 'Medical support, mental health resources, and on-campus healthcare accessible to every student.' },
+  { icon: BookOpen, title: 'Central Library', desc: 'Thousands of engineering texts, e-journals, NPTEL content, and quiet study spaces to support academic work.' },
+  { icon: Lightbulb, title: 'Assistive Technology Lab', desc: 'A dedicated lab developing assistive tools for differently-abled individuals — open to all students for learning and research.' },
+  { icon: Award, title: 'Sports & Games Facilities', desc: 'A range of indoor and outdoor sports facilities — courts, swimming pool, and a fitness centre — to support physical development.' },
+  { icon: Globe, title: 'International Outreach', desc: 'Vishnu Japan Outreach Centre and international academic partnerships offering global exposure and exchange pathways.' },
 ];
 
 const athletics = [
-  { sport: 'Cricket', season: 'Year-round', icon: '🏏' },
-  { sport: 'Volleyball', season: 'Year-round', icon: '🏐' },
-  { sport: 'Badminton', season: 'Year-round', icon: '🏸' },
-  { sport: 'Basketball', season: 'Year-round', icon: '🏀' },
-  { sport: 'Kabaddi', season: 'Year-round', icon: '🤼‍♀️' },
-  { sport: 'Athletics / Track', season: 'Annual', icon: '🏃‍♀️' },
-  { sport: 'Swimming', season: 'Year-round', icon: '🏊‍♀️' },
-  { sport: 'Table Tennis', season: 'Year-round', icon: '🏓' },
-  { sport: 'Chess', season: 'Year-round', icon: '♟️' },
-  { sport: 'Throwball', season: 'Year-round', icon: '🏐' },
+  { sport: 'Cricket', season: 'Year-round', icon: Target },
+  { sport: 'Volleyball', season: 'Year-round', icon: Volleyball },
+  { sport: 'Badminton', season: 'Year-round', icon: Feather },
+  { sport: 'Basketball', season: 'Year-round', icon: CircleDot },
+  { sport: 'Kabaddi', season: 'Year-round', icon: Swords },
+  { sport: 'Athletics / Track', season: 'Annual', icon: Footprints },
+  { sport: 'Swimming', season: 'Year-round', icon: Waves },
+  { sport: 'Table Tennis', season: 'Year-round', icon: Disc },
+  { sport: 'Chess', season: 'Year-round', icon: Crown },
+  { sport: 'Throwball', season: 'Year-round', icon: Volleyball },
 ];
 
 export default function StudentLife() {
@@ -109,7 +110,7 @@ export default function StudentLife() {
           <div className="sl-clubs-grid">
             {clubs.map((club, i) => (
               <div key={club.name} className="sl-club-card reveal" data-delay={`${i * 50}`}>
-                <div className="sl-club-icon">{club.icon}</div>
+                <div className="sl-club-icon"><club.icon size={40} strokeWidth={1.75} /></div>
                 <h3>{club.name}</h3>
                 <span>{club.count}</span>
               </div>
@@ -169,7 +170,7 @@ export default function StudentLife() {
           <div className="sl-sports-grid">
             {athletics.map((s, i) => (
               <div key={s.sport} className="sl-sport-card reveal" data-delay={`${i * 40}`}>
-                <span className="sl-sport-icon">{s.icon}</span>
+                <span className="sl-sport-icon"><s.icon size={32} strokeWidth={1.75} /></span>
                 <div className="sl-sport-name">{s.sport}</div>
                 <span className="sl-sport-season">{s.season}</span>
               </div>
@@ -191,7 +192,7 @@ export default function StudentLife() {
           <div className="sl-services-grid">
             {services.map((s, i) => (
               <div key={s.title} className="sl-service-card reveal" data-delay={`${i * 80}`}>
-                <div className="sl-service-icon">{s.icon}</div>
+                <div className="sl-service-icon"><s.icon size={40} strokeWidth={1.75} /></div>
                 <h3>{s.title}</h3>
                 <p>{s.desc}</p>
                 <Link to="/student-life" className="sl-service-link">

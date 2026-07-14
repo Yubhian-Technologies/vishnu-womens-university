@@ -89,7 +89,7 @@
 }
 
 .contact-info-icon {
-  font-size: 2rem;
+  color: var(--color-primary);
   margin-bottom: 0.75rem;
 }
 

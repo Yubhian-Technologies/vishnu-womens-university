@@ -66,7 +66,7 @@ export default function Differentiators() {
                 onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'var(--color-primary)'; (e.currentTarget as HTMLElement).style.color = 'var(--color-white)'; }}
                 onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.color = 'var(--color-primary)'; }}
               >
-                <span>{cat.icon}</span> {cat.label}
+                <cat.icon size={16} strokeWidth={1.75} /> {cat.label}
               </a>
             ))}
           </div>
@@ -79,7 +79,7 @@ export default function Differentiators() {
           <div className="container">
             <div className="reveal" style={{ marginBottom: 'var(--space-10)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-2)' }}>
-                <span style={{ fontSize: '2rem' }}>{cat.icon}</span>
+                <cat.icon size={32} strokeWidth={1.75} />
                 <span className="section-label" style={{ position: 'static', marginBottom: 0 }}>{cat.label}</span>
               </div>
               <h2 className="section-title">{cat.label}</h2>

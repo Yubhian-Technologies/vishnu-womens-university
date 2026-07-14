@@ -1,11 +1,12 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { Laptop, Handshake, Palette } from 'lucide-react';
 import PageHero from '../../components/PageHero/PageHero';
 
 const clubCategories = [
   {
     label: 'Technical Clubs',
-    icon: '💻',
+    icon: Laptop,
     clubs: [
       { name: 'CodeChef SVECW Chapter', desc: 'Runs competitive programming contests, coding challenges, webinars, and structured problem-solving sessions. Inaugurated November 17, 2020.' },
       { name: 'TECHXTREME Coding Club', desc: 'Develops programming skills, deepens technology understanding, and grooms students for industry-level competitions.' },
@@ -18,7 +19,7 @@ const clubCategories = [
   },
   {
     label: 'Social & Service Clubs',
-    icon: '🤝',
+    icon: Handshake,
     clubs: [
       { name: 'EAGLE Club', desc: 'Elite Anti-Narcotics Group for Law Enforcement. Counters substance abuse through student education and peer support. Helpline: 1972.' },
       { name: 'Sahaya Club', desc: 'Social outreach club — collaborates with Red Cross Society Eluru on blood donation camps and supports underprivileged communities with food and clothing.' },
@@ -32,7 +33,7 @@ const clubCategories = [
   },
   {
     label: 'Creative & Arts Clubs',
-    icon: '🎨',
+    icon: Palette,
     clubs: [
       { name: 'Painting Club', desc: 'Discovers and nurtures artistic talent through competitions and exhibitions on campus. Active since July 2012.' },
       { name: 'Music Club', desc: 'Promotes Indian Classical Music with vocal training in the fundamentals of "surs and taals," supporting students who aspire to a career in music.' },
@@ -101,7 +102,7 @@ export default function StudentClubs() {
           <div className="container">
             <div className="reveal" style={{ marginBottom: 'var(--space-10)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-2)' }}>
-                <span style={{ fontSize: '2rem' }}>{cat.icon}</span>
+                <cat.icon size={32} strokeWidth={1.75} />
                 <span className="section-label" style={{ position: 'static', marginBottom: 0 }}>{cat.label}</span>
               </div>
               <h2 className="section-title">{cat.label}</h2>

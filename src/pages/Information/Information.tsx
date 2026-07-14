@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
+import { Monitor, NotebookPen, Newspaper, BarChart3, BookOpen, Video, Leaf, Accessibility, Handshake, Scale, Brain, Plane, TrainFront, Bus, Car, type LucideIcon } from 'lucide-react';
 
 const infoPhotos = [
   { src: 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?w=800&q=80', alt: 'Green campus environment', caption: 'Green Campus' },
@@ -42,19 +43,19 @@ const holidays = [
 ];
 
 const ictPlatforms = [
-  { icon: '🖥️', name: 'Vishnu LMS', desc: 'The official Learning Management System for course materials, assignments, quizzes, and academic resources.', link: '#' },
-  { icon: '📝', name: 'Examination Portal', desc: 'Online portal for exam registration, hall ticket download, and result viewing for all JNTUK examinations.', link: '#' },
-  { icon: '📰', name: 'Prathibha Magazine', desc: 'VWU\'s official campus magazine featuring student articles, alumni stories, research highlights, and events.', link: '#' },
-  { icon: '📊', name: 'Academic ERP', desc: 'Integrated ERP system for attendance tracking, grade management, timetables, and student academic records.', link: '#' },
-  { icon: '📚', name: 'e-Library Access', desc: 'Digital library portal giving access to IEEE Xplore, Springer, NPTEL, and 1,00,000+ e-books and journals.', link: '#' },
-  { icon: '🎥', name: 'NPTEL & SWAYAM', desc: 'Access to NPTEL online courses and SWAYAM platform for supplementary learning and MOOC certifications.', link: '#' },
+  { icon: Monitor, name: 'Vishnu LMS', desc: 'The official Learning Management System for course materials, assignments, quizzes, and academic resources.', link: '#' },
+  { icon: NotebookPen, name: 'Examination Portal', desc: 'Online portal for exam registration, hall ticket download, and result viewing for all JNTUK examinations.', link: '#' },
+  { icon: Newspaper, name: 'Prathibha Magazine', desc: 'VWU\'s official campus magazine featuring student articles, alumni stories, research highlights, and events.', link: '#' },
+  { icon: BarChart3, name: 'Academic ERP', desc: 'Integrated ERP system for attendance tracking, grade management, timetables, and student academic records.', link: '#' },
+  { icon: BookOpen, name: 'e-Library Access', desc: 'Digital library portal giving access to IEEE Xplore, Springer, NPTEL, and 1,00,000+ e-books and journals.', link: '#' },
+  { icon: Video, name: 'NPTEL & SWAYAM', desc: 'Access to NPTEL online courses and SWAYAM platform for supplementary learning and MOOC certifications.', link: '#' },
 ];
 
-const howToReach = [
-  { mode: '✈️ By Air', desc: 'Three airports serve Bhimavaram:\n• Rajamahendravaram (Rajahmundry) Airport — approx. 70 km away.\n• Gannavaram (Vijayawada) Airport — approx. 120 km away.\n• Visakhapatnam (VSKP) Airport — approx. 250 km away.\nTaxis and cab services are available from all three airports.' },
-  { mode: '🚂 By Train', desc: 'Bhimavaram Town (BVRT) and Bhimavaram Junction (BZM) are well-connected to major cities. Direct trains from Hyderabad, Visakhapatnam, Chennai, and Vijayawada.' },
-  { mode: '🚌 By Road', desc: 'Bhimavaram is accessible via NH-16 (East Coast Road). Regular APSRTC buses operate from Vijayawada (120 km), Hyderabad (400 km), and Visakhapatnam (250 km).' },
-  { mode: '🚗 By Car', desc: 'VWU is located in Vishnupur, 3 km from Bhimavaram on the Tadepalligudem Road. Easily accessible by road from all major cities in Andhra Pradesh.' },
+const howToReach: { icon: LucideIcon; mode: string; desc: string }[] = [
+  { icon: Plane, mode: 'By Air', desc: 'Three airports serve Bhimavaram:\n• Rajamahendravaram (Rajahmundry) Airport — approx. 70 km away.\n• Gannavaram (Vijayawada) Airport — approx. 120 km away.\n• Visakhapatnam (VSKP) Airport — approx. 250 km away.\nTaxis and cab services are available from all three airports.' },
+  { icon: TrainFront, mode: 'By Train', desc: 'Bhimavaram Town (BVRT) and Bhimavaram Junction (BZM) are well-connected to major cities. Direct trains from Hyderabad, Visakhapatnam, Chennai, and Vijayawada.' },
+  { icon: Bus, mode: 'By Road', desc: 'Bhimavaram is accessible via NH-16 (East Coast Road). Regular APSRTC buses operate from Vijayawada (120 km), Hyderabad (400 km), and Visakhapatnam (250 km).' },
+  { icon: Car, mode: 'By Car', desc: 'VWU is located in Vishnupur, 3 km from Bhimavaram on the Tadepalligudem Road. Easily accessible by road from all major cities in Andhra Pradesh.' },
 ];
 
 const counsellingScheme = [
@@ -198,9 +199,9 @@ export default function Information() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', marginBottom: 'var(--space-10)' }}>
                 {howToReach.map((r, i) => (
                   <div key={i} style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', display: 'flex', gap: 'var(--space-5)', alignItems: 'flex-start', borderLeft: '4px solid var(--color-accent)' }}>
-                    <span style={{ fontSize: '1.8rem', flexShrink: 0 }}>{r.mode.split(' ')[0]}</span>
+                    <r.icon size={29} strokeWidth={1.75} style={{ flexShrink: 0, color: 'var(--color-primary)' }} />
                     <div>
-                      <h3 style={{ fontFamily: 'var(--font-sans)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>{r.mode.split(' ').slice(1).join(' ')}</h3>
+                      <h3 style={{ fontFamily: 'var(--font-sans)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>{r.mode}</h3>
                       <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.7, whiteSpace: 'pre-line' }}>{r.desc}</p>
                     </div>
                   </div>
@@ -250,7 +251,7 @@ export default function Information() {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-5)' }}>
                 {ictPlatforms.map((p, i) => (
                   <div key={i} style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', display: 'flex', gap: 'var(--space-4)', alignItems: 'flex-start' }}>
-                    <span style={{ fontSize: '2rem', flexShrink: 0 }}>{p.icon}</span>
+                    <p.icon size={32} strokeWidth={1.75} />
                     <div>
                       <h3 style={{ fontFamily: 'var(--font-sans)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>{p.name}</h3>
                       <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6, marginBottom: 'var(--space-3)' }}>{p.desc}</p>
@@ -271,15 +272,15 @@ export default function Information() {
               </p>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-5)' }}>
                 {[
-                  { icon: '🌿', title: 'Green Campus Initiative', desc: 'Solar energy, rainwater harvesting, waste management, and biodiversity conservation across the 100-acre campus.' },
-                  { icon: '♿', title: 'Facilities for Differently-Abled', desc: 'Ramps, accessible restrooms, assistive technology, and dedicated support for students with disabilities.' },
-                  { icon: '🤝', title: 'Anti-Ragging Policy', desc: 'Zero-tolerance anti-ragging policy with an active Anti-Ragging Committee, helpline, and regular awareness programs.' },
-                  { icon: '⚖️', title: 'Internal Complaints Committee', desc: 'A designated Internal Committee (IC) to address complaints related to sexual harassment, ensuring a safe campus.' },
-                  { icon: '🧠', title: 'Student Wellness Program', desc: 'Regular counselling sessions, mental health awareness workshops, and a dedicated student wellness center.' },
-                  { icon: '📊', title: 'Transparency & RTI', desc: 'VWU is committed to transparency with RTI compliance, public self-disclosure, and audited financial statements.' },
+                  { icon: Leaf, title: 'Green Campus Initiative', desc: 'Solar energy, rainwater harvesting, waste management, and biodiversity conservation across the 100-acre campus.' },
+                  { icon: Accessibility, title: 'Facilities for Differently-Abled', desc: 'Ramps, accessible restrooms, assistive technology, and dedicated support for students with disabilities.' },
+                  { icon: Handshake, title: 'Anti-Ragging Policy', desc: 'Zero-tolerance anti-ragging policy with an active Anti-Ragging Committee, helpline, and regular awareness programs.' },
+                  { icon: Scale, title: 'Internal Complaints Committee', desc: 'A designated Internal Committee (IC) to address complaints related to sexual harassment, ensuring a safe campus.' },
+                  { icon: Brain, title: 'Student Wellness Program', desc: 'Regular counselling sessions, mental health awareness workshops, and a dedicated student wellness center.' },
+                  { icon: BarChart3, title: 'Transparency & RTI', desc: 'VWU is committed to transparency with RTI compliance, public self-disclosure, and audited financial statements.' },
                 ].map((item, i) => (
                   <div key={i} style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', display: 'flex', gap: 'var(--space-4)', borderLeft: '4px solid var(--color-accent)' }}>
-                    <span style={{ fontSize: '2rem', flexShrink: 0 }}>{item.icon}</span>
+                    <item.icon size={32} strokeWidth={1.75} />
                     <div>
                       <h3 style={{ fontFamily: 'var(--font-sans)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>{item.title}</h3>
                       <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6 }}>{item.desc}</p>

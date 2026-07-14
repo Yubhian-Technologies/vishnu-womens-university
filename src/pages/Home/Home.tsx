@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Trophy, Star, ClipboardList, Briefcase, TrendingUp, Medal } from 'lucide-react';
 import HeroSlider from '../../components/HeroSlider/HeroSlider';
 import CounterSection from '../../components/CounterSection/CounterSection';
 import NewsCard from '../../components/NewsCard/NewsCard';
@@ -17,12 +18,12 @@ const studyCards = [
 const popularPrograms = ['CSE', 'AI & Machine Learning', 'AI & Data Science', 'Cyber Security', 'Information Technology', 'Electronics & Communication', 'Electrical & Electronics', 'Civil Engineering', 'Mechanical Engineering', 'MBA'];
 
 const recognitions = [
-  { icon: '🏆', title: 'Top Engineering College', source: 'India Today Rankings' },
-  { icon: '⭐', title: 'Best Engineering College', source: 'The Week Rankings' },
-  { icon: '📋', title: 'NBA Accreditation', source: 'National Board of Accreditation' },
-  { icon: '💼', title: 'NIRF Ranked Institution', source: 'Ministry of Education, India' },
-  { icon: '📈', title: 'IEI Award for Excellence', source: 'Institution of Engineers India' },
-  { icon: '🎖️', title: 'UGC Autonomous Status', source: 'University Grants Commission' },
+  { icon: Trophy, title: 'Top Engineering College', source: 'India Today Rankings' },
+  { icon: Star, title: 'Best Engineering College', source: 'The Week Rankings' },
+  { icon: ClipboardList, title: 'NBA Accreditation', source: 'National Board of Accreditation' },
+  { icon: Briefcase, title: 'NIRF Ranked Institution', source: 'Ministry of Education, India' },
+  { icon: TrendingUp, title: 'IEI Award for Excellence', source: 'Institution of Engineers India' },
+  { icon: Medal, title: 'UGC Autonomous Status', source: 'University Grants Commission' },
 ];
 
 const events = [
@@ -335,7 +336,7 @@ export default function Home() {
             {recognitions.map((r, i) => (
               <div key={r.title} className="rec-card reveal" data-delay={`${i * 90}`}>
                 <div className="rec-badge-wrap">
-                  <div className="rec-badge">{r.icon}</div>
+                  <div className="rec-badge"><r.icon size={24} strokeWidth={1.75} /></div>
                   <div className="rec-badge-ring" />
                 </div>
                 <div className="rec-body">

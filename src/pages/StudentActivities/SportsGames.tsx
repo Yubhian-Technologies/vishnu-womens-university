@@ -1,12 +1,13 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
+import { Activity, Waves, Goal, Feather, BadgeCheck, Dumbbell, Footprints } from 'lucide-react';
 
 const facilities = [
-  { icon: '💪', title: 'VISHNU Fitness Centre', desc: 'A well-equipped gymnasium with modern training apparatus, qualified instructors, and structured fitness programs available to all students.' },
-  { icon: '🏊', title: 'Swimming Pool', desc: 'An Olympic-standard pool open to students and staff, supported by certified coaching and regularly scheduled training sessions.' },
-  { icon: '🏟️', title: 'Spacious Playground', desc: 'A large, well-kept outdoor ground for athletics, field sports, and team games — accommodating a broad range of sporting disciplines.' },
-  { icon: '🏸', title: 'Indoor Sports Hall', desc: 'Year-round indoor facilities for badminton, table tennis, chess, carrom, and a variety of other indoor games.' },
+  { icon: Activity, title: 'VISHNU Fitness Centre', desc: 'A well-equipped gymnasium with modern training apparatus, qualified instructors, and structured fitness programs available to all students.' },
+  { icon: Waves, title: 'Swimming Pool', desc: 'An Olympic-standard pool open to students and staff, supported by certified coaching and regularly scheduled training sessions.' },
+  { icon: Goal, title: 'Spacious Playground', desc: 'A large, well-kept outdoor ground for athletics, field sports, and team games — accommodating a broad range of sporting disciplines.' },
+  { icon: Feather, title: 'Indoor Sports Hall', desc: 'Year-round indoor facilities for badminton, table tennis, chess, carrom, and a variety of other indoor games.' },
 ];
 
 const sportsProgram = [
@@ -19,10 +20,10 @@ const sportsProgram = [
 ];
 
 const achievements = [
-  { icon: '🥇', title: 'University-Level Champions', desc: 'VWU students consistently perform at JNTUK university-level competitions across a number of sports disciplines.' },
-  { icon: '🏋️', title: 'Fitness Excellence', desc: 'Year-round fitness centre programs help students develop discipline, physical strength, and overall well-being.' },
-  { icon: '🤽', title: 'Aquatics Coaching', desc: 'Certified coaches deliver structured swimming training, with students going on to compete at university and state levels.' },
-  { icon: '🏃', title: 'Athletics', desc: 'Track and field athletes are developed through systematic training and regular exposure to inter-collegiate competition.' },
+  { icon: BadgeCheck, title: 'University-Level Champions', desc: 'VWU students consistently perform at JNTUK university-level competitions across a number of sports disciplines.' },
+  { icon: Dumbbell, title: 'Fitness Excellence', desc: 'Year-round fitness centre programs help students develop discipline, physical strength, and overall well-being.' },
+  { icon: Waves, title: 'Aquatics Coaching', desc: 'Certified coaches deliver structured swimming training, with students going on to compete at university and state levels.' },
+  { icon: Footprints, title: 'Athletics', desc: 'Track and field athletes are developed through systematic training and regular exposure to inter-collegiate competition.' },
 ];
 
 export default function SportsGames() {
@@ -102,7 +103,7 @@ export default function SportsGames() {
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-accent)'; (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-md)'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-light-gray)'; (e.currentTarget as HTMLElement).style.boxShadow = 'none'; }}
               >
-                <div style={{ fontSize: '2.2rem', marginBottom: 'var(--space-3)' }}>{f.icon}</div>
+                <div style={{ marginBottom: 'var(--space-3)' }}><f.icon size={35} strokeWidth={1.75} /></div>
                 <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>{f.title}</h3>
                 <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6 }}>{f.desc}</p>
               </div>
@@ -133,7 +134,7 @@ export default function SportsGames() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', marginTop: 'var(--space-6)' }}>
                 {achievements.map((a) => (
                   <div key={a.title} style={{ display: 'flex', gap: 'var(--space-4)', alignItems: 'flex-start' }}>
-                    <span style={{ fontSize: '1.8rem', flexShrink: 0 }}>{a.icon}</span>
+                    <a.icon size={29} strokeWidth={1.75} style={{ flexShrink: 0 }} />
                     <div>
                       <div style={{ fontFamily: 'var(--font-sans)', fontWeight: 900, fontSize: 'var(--text-sm)', color: 'var(--color-primary)', marginBottom: 4 }}>{a.title}</div>
                       <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6 }}>{a.desc}</div>

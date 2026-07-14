@@ -1,14 +1,15 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
+import { BookOpen, Hospital, Building, Accessibility, Hotel, Trophy } from 'lucide-react';
 
 const communities = [
-  { icon: '📚', title: 'Rural Students', desc: 'Extending educational support and skills programs to economically disadvantaged students from rural backgrounds.' },
-  { icon: '🏥', title: 'Leprosy Care', desc: 'Offering care, compassion, and dignity to individuals affected by leprosy through regular visits and welfare activities.' },
-  { icon: '🏘️', title: 'Village Communities', desc: 'Working with nearby villages on technical literacy, nutritional awareness, and broader community welfare initiatives.' },
-  { icon: '♿', title: 'Persons with Disabilities', desc: 'Supporting individuals with physical disabilities through awareness programs, assistive technology exposure, and inclusive campus activities.' },
-  { icon: '🏨', title: 'Hospital Patients', desc: 'Serving hospital patients through welfare visits, blood donation drives, and coordination with partner organisations.' },
-  { icon: '🏆', title: 'Academic Excellence', desc: 'Acknowledging and supporting high-achieving students from nearby institutions through mentoring and motivational programs.' },
+  { icon: BookOpen, title: 'Rural Students', desc: 'Extending educational support and skills programs to economically disadvantaged students from rural backgrounds.' },
+  { icon: Hospital, title: 'Leprosy Care', desc: 'Offering care, compassion, and dignity to individuals affected by leprosy through regular visits and welfare activities.' },
+  { icon: Building, title: 'Village Communities', desc: 'Working with nearby villages on technical literacy, nutritional awareness, and broader community welfare initiatives.' },
+  { icon: Accessibility, title: 'Persons with Disabilities', desc: 'Supporting individuals with physical disabilities through awareness programs, assistive technology exposure, and inclusive campus activities.' },
+  { icon: Hotel, title: 'Hospital Patients', desc: 'Serving hospital patients through welfare visits, blood donation drives, and coordination with partner organisations.' },
+  { icon: Trophy, title: 'Academic Excellence', desc: 'Acknowledging and supporting high-achieving students from nearby institutions through mentoring and motivational programs.' },
 ];
 
 const nssValues = [
@@ -101,7 +102,7 @@ export default function SocialServices() {
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-accent)'; (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-md)'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-light-gray)'; (e.currentTarget as HTMLElement).style.boxShadow = 'none'; }}
               >
-                <div style={{ fontSize: '2.2rem', marginBottom: 'var(--space-3)' }}>{c.icon}</div>
+                <div style={{ marginBottom: 'var(--space-3)' }}><c.icon size={35} strokeWidth={1.75} /></div>
                 <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>{c.title}</h3>
                 <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6 }}>{c.desc}</p>
               </div>

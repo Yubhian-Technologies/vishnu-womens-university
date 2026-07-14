@@ -147,18 +147,17 @@ function MaintenancePage() {
 const IS_MAINTENANCE = import.meta.env.VITE_MAINTENANCE_MODE === 'true';
 
 function RootRouter() {
-  const { pathname } = useLocation();
-  if (pathname.startsWith('/admin')) {
-    return (
-      <Routes>
-        <Route path="/admin/*" element={<AdminLayout />} />
-      </Routes>
-    );
-  }
-  if (IS_MAINTENANCE) {
-    return <MaintenancePage />;
-  }
-  return <PublicApp />;
+  return (
+    <Routes>
+      {/* Admin shell is matched by react-router's own segment-aware routing
+          (not a manual pathname.startsWith check, which would also match
+          unrelated public routes like "/administration"). Everything under
+          /admin/* renders only AdminLayout — no public Header/Footer, no
+          maintenance gate. */}
+      <Route path="/admin/*" element={<AdminLayout />} />
+      <Route path="/*" element={IS_MAINTENANCE ? <MaintenancePage /> : <PublicApp />} />
+    </Routes>
+  );
 }
 
 function NotFound() {
