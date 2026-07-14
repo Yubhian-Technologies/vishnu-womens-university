@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
+import { Trophy } from 'lucide-react';
 import { findGovItemBySlug, GovTableRow } from './governance.data';
 import '../detail-layout.css';
 
@@ -197,7 +198,7 @@ export default function GovernanceDetail() {
               {item.outcomes.map((o, i) => (
                 <div key={o} className="reveal" data-delay={`${i * 60}`}
                   style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
-                  <span style={{ fontSize: '1.25rem', flexShrink: 0 }}>🏆</span>
+                  <Trophy size={20} strokeWidth={1.75} style={{ flexShrink: 0, color: 'var(--color-accent)' }} />
                   <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6 }}>{o}</span>
                 </div>
               ))}

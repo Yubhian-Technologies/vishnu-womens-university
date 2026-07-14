@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { MapPin } from 'lucide-react';
 import './AboutSVES.css';
 import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
@@ -164,7 +165,7 @@ export default function AboutSVES() {
               <div key={campus.name} className="sves-campus-card reveal" data-delay={`${i * 100}`}>
                 <div className="sves-campus-header">
                   <h3>{campus.name}</h3>
-                  <span className="sves-campus-location">📍 {campus.location}</span>
+                  <span className="sves-campus-location" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}><MapPin size={13} /> {campus.location}</span>
                 </div>
                 <ul className="sves-campus-list">
                   {campus.institutions.map(inst => (

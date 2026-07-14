@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
+import { GraduationCap, Presentation, Briefcase, FileText, Trophy, type LucideIcon } from 'lucide-react';
 import { useCounter } from '../../hooks/useCounter';
 import './CounterSection.css';
 
 interface CounterItem {
-  icon: string;
+  icon: LucideIcon;
   target: number;
   suffix: string;
   label: string;
@@ -11,18 +12,18 @@ interface CounterItem {
 }
 
 const counters: CounterItem[] = [
-  { icon: '🎓', target: 13100, suffix: '+', label: 'Engineers Graduated', sub: 'Alumni strong' },
-  { icon: '👩‍🏫', target: 230, suffix: '+', label: 'Experienced Faculty', sub: 'Expert educators' },
-  { icon: '💼', target: 1400, suffix: '+', label: 'Annual Placements', sub: 'Every year' },
-  { icon: '📄', target: 2500, suffix: '+', label: 'Research Publications', sub: 'International journals' },
-  { icon: '🏆', target: 90, suffix: '+', label: 'Patents Filed', sub: 'Innovations & inventions' },
+  { icon: GraduationCap, target: 13100, suffix: '+', label: 'Engineers Graduated', sub: 'Alumni strong' },
+  { icon: Presentation, target: 230, suffix: '+', label: 'Experienced Faculty', sub: 'Expert educators' },
+  { icon: Briefcase, target: 1400, suffix: '+', label: 'Annual Placements', sub: 'Every year' },
+  { icon: FileText, target: 2500, suffix: '+', label: 'Research Publications', sub: 'International journals' },
+  { icon: Trophy, target: 90, suffix: '+', label: 'Patents Filed', sub: 'Innovations & inventions' },
 ];
 
 function SingleCounter({ item, start }: { item: CounterItem; start: boolean }) {
   const count = useCounter(item.target, 2200, start);
   return (
     <div className="counter-item reveal" data-reveal>
-      <div className="counter-icon">{item.icon}</div>
+      <div className="counter-icon"><item.icon size={22} strokeWidth={1.75} /></div>
       <div className="counter-number">
         {count}
         <span className="counter-suffix">{item.suffix}</span>

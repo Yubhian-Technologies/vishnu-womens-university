@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { Trophy, Star, ClipboardList, Briefcase, TrendingUp } from 'lucide-react';
 import heroVideo from '../../data/YTDown_YouTube_Vishnu-Campus-Bhimavaram-Latest-Video-Dr_Media_jMN3oRKJnR0_002_720p.mp4';
 import './HeroSlider.css';
 
@@ -49,11 +50,11 @@ const slides: Slide[] = [
 ];
 
 const recognitions = [
-  { icon: '★', title: 'Top Engineering College', source: 'India Today Rankings' },
-  { icon: '●', title: 'Best Engineering College', source: 'The Week Rankings' },
-  { icon: '♦', title: 'NBA Accredited', source: 'National Board of Accreditation' },
-  { icon: '▲', title: 'NIRF Ranked Institution', source: 'Ministry of Education' },
-  { icon: '★', title: 'IEI Award for Excellence', source: 'Institution of Engineers India' },
+  { icon: Trophy, title: 'Top Engineering College', source: 'India Today Rankings' },
+  { icon: Star, title: 'Best Engineering College', source: 'The Week Rankings' },
+  { icon: ClipboardList, title: 'NBA Accredited', source: 'National Board of Accreditation' },
+  { icon: Briefcase, title: 'NIRF Ranked Institution', source: 'Ministry of Education' },
+  { icon: TrendingUp, title: 'IEI Award for Excellence', source: 'Institution of Engineers India' },
 ];
 
 const SLIDE_DURATION = 6000;
@@ -213,7 +214,7 @@ export default function HeroSlider() {
           {recognitions.map((r, i) => (
             <div key={r.title} style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
               <div className="recognition-item">
-                <div className="recognition-icon">{r.icon}</div>
+                <div className="recognition-icon"><r.icon size={16} strokeWidth={2} color="var(--color-primary-dark)" /></div>
                 <div className="recognition-text">
                   <strong>{r.title}</strong>
                   <span>{r.source}</span>

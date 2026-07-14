@@ -944,19 +944,19 @@ export const govCategories = [
   {
     key: 'governance' as const,
     label: 'Governance',
-    icon: '🏛️',
+    icon: Landmark,
     desc: 'Apex statutory bodies governing the academic, financial, and strategic direction of VWU.',
   },
   {
     key: 'committees' as const,
     label: 'Committees',
-    icon: '🏫',
+    icon: School,
     desc: 'Standing committees ensuring quality, welfare, compliance, and transparency across all institutional functions.',
   },
   {
     key: 'iqac' as const,
     label: 'IQAC',
-    icon: '✅',
+    icon: CheckCircle2,
     desc: 'Internal Quality Assurance Cell — driving continuous quality improvement and NAAC accreditation at VWU.',
   },
 ];
