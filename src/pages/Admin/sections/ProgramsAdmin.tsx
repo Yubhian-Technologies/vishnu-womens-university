@@ -82,6 +82,8 @@ export default function ProgramsAdmin() {
         await addDoc(collection(db, 'programs'), { ...form, createdAt: serverTimestamp() });
       }
       setForm(EMPTY); setEditing(null);
+    } catch (e) {
+      alert(`Couldn't save: ${(e as Error).message}`);
     } finally { setSaving(false); }
   };
 
@@ -98,7 +100,11 @@ export default function ProgramsAdmin() {
 
   const remove = async (id: string) => {
     if (!confirm('Delete this program?')) return;
-    await deleteDoc(doc(db, 'programs', id));
+    try {
+      await deleteDoc(doc(db, 'programs', id));
+    } catch (e) {
+      alert(`Couldn't delete: ${(e as Error).message}`);
+    }
   };
 
   return (

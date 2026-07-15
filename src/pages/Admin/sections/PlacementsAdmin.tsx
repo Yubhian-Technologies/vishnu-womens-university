@@ -45,6 +45,8 @@ export default function PlacementsAdmin() {
         await addDoc(collection(db, 'placements'), { ...form, createdAt: serverTimestamp() });
       }
       setForm(EMPTY); setEditing(null);
+    } catch (e) {
+      alert(`Couldn't save: ${(e as Error).message}`);
     } finally { setSaving(false); }
   };
 
@@ -57,7 +59,11 @@ export default function PlacementsAdmin() {
 
   const remove = async (id: string) => {
     if (!confirm('Delete this record?')) return;
-    await deleteDoc(doc(db, 'placements', id));
+    try {
+      await deleteDoc(doc(db, 'placements', id));
+    } catch (e) {
+      alert(`Couldn't delete: ${(e as Error).message}`);
+    }
   };
 
   return (
