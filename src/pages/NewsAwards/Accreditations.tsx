@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { BarChart3, Trophy, CheckCircle2, type LucideIcon } from 'lucide-react';
 import { awards, AwardItem } from './news-awards.data';
 import PageHero from '../../components/PageHero/PageHero';
+import { useHashScroll } from '../../hooks/useHashScroll';
 
 const tabs = [
   { key: 'ranking', label: 'Rankings & Ratings' },
@@ -57,6 +58,7 @@ function AwardCard({ item, index }: { item: AwardItem; index: number }) {
 
 export default function Accreditations() {
   const [activeTab, setActiveTab] = useState<TabKey>('ranking');
+  useHashScroll();
 
   useEffect(() => {
     document.title = 'Accreditations & Awards | Vishnu Womens University';
@@ -91,7 +93,7 @@ export default function Accreditations() {
       />
 
       {/* Stats bar */}
-      <section style={{ background: 'var(--color-primary)', padding: 'var(--space-6) 0' }}>
+      <section id="accreditations-content" style={{ background: 'var(--color-primary)', padding: 'var(--space-6) 0', scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
         <div className="container">
           <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-14)', flexWrap: 'wrap' }}>
             <div style={{ textAlign: 'center' }}>

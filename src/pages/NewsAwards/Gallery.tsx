@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { X } from 'lucide-react';
 import { galleryAlbums, galleryYears } from './news-awards.data';
 import { useOrderedCollection } from '../../hooks/useCollection';
+import { useHashScroll } from '../../hooks/useHashScroll';
 import PageHero from '../../components/PageHero/PageHero';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import './Gallery.css';
@@ -31,6 +32,7 @@ const yearColors: Record<number, string> = {
 };
 
 export default function Gallery() {
+  useHashScroll();
   const [activeYear, setActiveYear] = useState<number | 'all'>('all');
   const { docs: photos, loading: photosLoading } = useOrderedCollection<GalleryPhoto>('gallery', 'order');
   const [activeCategory, setActiveCategory] = useState<string>('all');
@@ -78,7 +80,7 @@ export default function Gallery() {
       />
 
       {/* Stats */}
-      <section style={{ background: 'var(--color-primary)', padding: 'var(--space-6) 0' }}>
+      <section id="gallery-content" style={{ background: 'var(--color-primary)', padding: 'var(--space-6) 0', scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
         <div className="container">
           <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-14)', flexWrap: 'wrap' }}>
             <div style={{ textAlign: 'center' }}>

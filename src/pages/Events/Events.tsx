@@ -144,7 +144,7 @@ export default function Events() {
     );
     document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => observer.observe(el));
     return () => observer.disconnect();
-  }, []);
+  }, [activeCategory, view]);
 
   const filtered = activeCategory === 'All'
     ? events

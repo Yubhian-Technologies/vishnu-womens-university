@@ -41,10 +41,14 @@ import Contact from './pages/Contact/Contact';
 import AdminLayout from './pages/Admin/AdminLayout';
 
 function ScrollToTop() {
-  const { pathname } = useLocation();
+  const { pathname, hash } = useLocation();
   useEffect(() => {
+    // Skip resetting scroll when the URL carries a hash (e.g. "/campus#library") —
+    // the destination page's own useHashScroll effect owns positioning in that
+    // case, and racing it here caused inconsistent/flaky landing positions.
+    if (hash) return;
     window.scrollTo({ top: 0, behavior: 'instant' });
-  }, [pathname]);
+  }, [pathname, hash]);
   return null;
 }
 

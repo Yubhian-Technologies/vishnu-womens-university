@@ -133,7 +133,7 @@
 }
 
 .gb-tile {
-  background: var(--gb-secondary);
+  background: #ffffff;
   border: 1px solid rgba(0, 37, 0, 0.08);
   border-radius: var(--radius-lg);
   padding: var(--space-8) var(--space-5);
