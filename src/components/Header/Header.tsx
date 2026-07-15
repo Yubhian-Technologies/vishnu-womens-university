@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import AnnouncementsTicker from '../AnnouncementsTicker/AnnouncementsTicker';
 import './Header.css';
 
 interface NavChild {
@@ -125,6 +126,7 @@ const navItems: NavItem[] = [
     label: 'Academics',
     children: [
       { label: 'Programs & Departments', path: '/academics' },
+      { label: 'Faculty', path: '/faculty' },
       { label: 'Result Analysis', path: '/result-analysis' },
       { label: 'Academic Calendar', path: '/information#academic-calendar' },
     ],
@@ -241,15 +243,19 @@ export default function Header() {
       <div className="topbar">
         <div className="topbar-inner">
           <div className="topbar-left">
-            <a href="tel:08816250864" className="topbar-link">08816-250864</a>
-            <span className="topbar-link" style={{ opacity: 0.3 }}>|</span>
-            <a href="#" className="topbar-link">Examination Portal</a>
-            <span className="topbar-link" style={{ opacity: 0.3 }}>|</span>
-            <a href="#" className="topbar-link">LMS Platform</a>
-            <span className="topbar-link" style={{ opacity: 0.3 }}>|</span>
-            <a href="#" className="topbar-link">Central Library</a>
-            <span className="topbar-link" style={{ opacity: 0.3 }}>|</span>
-            <a href="#" className="topbar-link">Campus Map</a>
+            <AnnouncementsTicker fallback={
+              <>
+                <a href="tel:08816250864" className="topbar-link">08816-250864</a>
+                <span className="topbar-link" style={{ opacity: 0.3 }}>|</span>
+                <a href="#" className="topbar-link">Examination Portal</a>
+                <span className="topbar-link" style={{ opacity: 0.3 }}>|</span>
+                <a href="#" className="topbar-link">LMS Platform</a>
+                <span className="topbar-link" style={{ opacity: 0.3 }}>|</span>
+                <a href="#" className="topbar-link">Central Library</a>
+                <span className="topbar-link" style={{ opacity: 0.3 }}>|</span>
+                <a href="#" className="topbar-link">Campus Map</a>
+              </>
+            } />
           </div>
           <div className="topbar-right">
             <Link to="/admissions" className="topbar-cta visit">Visit</Link>

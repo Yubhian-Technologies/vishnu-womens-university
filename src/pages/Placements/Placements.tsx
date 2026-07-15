@@ -1,7 +1,20 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { Building2 } from 'lucide-react';
 import { placementItems } from './placements.data';
 import PageHero from '../../components/PageHero/PageHero';
+import { useOrderedCollection } from '../../hooks/useCollection';
+
+interface PlacementRecord {
+  id: string;
+  companyName: string;
+  logoUrl: string;
+  year: string;
+  package: string;
+  studentsPlaced: number;
+  sector: string;
+  featured: boolean;
+}
 
 const stats = [
   { num: '1400+', label: 'Placements (2024–25)' },
@@ -12,6 +25,8 @@ const stats = [
 
 
 export default function Placements() {
+  const { docs: recruiters, loading: recruitersLoading } = useOrderedCollection<PlacementRecord>('placements', 'year', 'desc');
+
   useEffect(() => {
     document.title = 'Placements | Vishnu Womens University';
     const observer = new IntersectionObserver(
@@ -26,6 +41,9 @@ export default function Placements() {
       },
       { threshold: 0.1 }
     );
+    // Only static, always-present elements use .reveal — the Firestore-
+    // derived recruiter cards render without it (see comment in
+    // ProgramDetail.tsx), so a plain mount-only observer is safe here.
     document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
     return () => observer.disconnect();
   }, []);
@@ -118,6 +136,60 @@ export default function Placements() {
           </div>
         </div>
       </section>
+
+      {/* Our Recruiters — live from the placements collection, managed in /admin */}
+      {(recruitersLoading || recruiters.length > 0) && (
+        <section className="section bg-white">
+          <div className="container">
+            <div style={{ textAlign: 'center', marginBottom: 'var(--space-10)' }}>
+              <span className="section-label">Our Recruiters</span>
+              <h2 className="section-title">Companies That Hire from VWU</h2>
+              <p className="section-desc" style={{ margin: '0 auto' }}>
+                A running record of recruiters, packages, and placements — updated each season by the Training & Placement Cell.
+              </p>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 'var(--space-5)' }}>
+              {recruiters.map((r) => (
+                <div
+                  key={r.id}
+                  style={{ background: 'var(--color-white)', border: `1.5px solid ${r.featured ? 'var(--color-accent)' : 'var(--color-light-gray)'}`, borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+                    {r.logoUrl ? (
+                      <img src={r.logoUrl} alt={r.companyName} style={{ width: 44, height: 44, objectFit: 'contain', borderRadius: 'var(--radius-sm)', background: 'var(--color-off-white)', padding: 4 }} />
+                    ) : (
+                      <div style={{ width: 44, height: 44, borderRadius: 'var(--radius-sm)', background: 'var(--color-off-white)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        <Building2 size={22} strokeWidth={1.75} style={{ color: 'var(--color-text-light)' }} />
+                      </div>
+                    )}
+                    <div>
+                      <div style={{ fontFamily: 'var(--font-sans)', fontWeight: 800, color: 'var(--color-primary)', fontSize: 'var(--text-sm)' }}>{r.companyName}</div>
+                      <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)' }}>{r.year}</div>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
+                    {r.package && (
+                      <span style={{ fontSize: '0.7rem', fontWeight: 700, background: 'rgba(201,168,76,0.12)', border: '1px solid rgba(201,168,76,0.4)', borderRadius: 'var(--radius-sm)', padding: '2px 8px', color: 'var(--color-accent)' }}>
+                        {r.package}
+                      </span>
+                    )}
+                    {r.sector && (
+                      <span style={{ fontSize: '0.7rem', fontWeight: 700, background: 'var(--color-off-white)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-sm)', padding: '2px 8px', color: 'var(--color-text-light)' }}>
+                        {r.sector}
+                      </span>
+                    )}
+                    {r.studentsPlaced > 0 && (
+                      <span style={{ fontSize: '0.7rem', fontWeight: 700, background: 'var(--color-off-white)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-sm)', padding: '2px 8px', color: 'var(--color-text-light)' }}>
+                        {r.studentsPlaced} placed
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* CTA */}
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-14) 0' }}>

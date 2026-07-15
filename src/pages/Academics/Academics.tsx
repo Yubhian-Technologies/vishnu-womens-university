@@ -1,12 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { findProgramBySlug } from './programs.data';
 import './Academics.css';
 import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
+import { useOrderedCollection } from '../../hooks/useCollection';
+import { resolveProgramIcon } from '../../lib/programIcons';
+import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
 import {
-  Laptop, Bot, BarChart3, Lock, Globe, RadioTower, Zap, Construction, Settings, Briefcase, GraduationCap, Microscope,
-  PenTool, Radio, Clapperboard, Users, Handshake, Newspaper, Drama, Trophy,
+  PenTool,
+  Radio, Clapperboard, Users, Handshake, Newspaper, Drama, Trophy,
 } from 'lucide-react';
 
 const academicsPhotos = [
@@ -17,55 +19,11 @@ const academicsPhotos = [
   { src: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80', alt: 'Group learning sessions', caption: 'Collaborative Learning' },
 ];
 
-const programCategories = [
-  {
-    id: 'btech',
-    label: 'B.Tech',
-    programs: [
-      { icon: Laptop, slug: 'cse',            name: 'Computer Science & Engineering (CSE)', desc: 'Foundational computer science paired with practical industry preparation and strong placement support.' },
-      { icon: Bot, slug: 'ai-ml',          name: 'CSE – Artificial Intelligence & ML', desc: 'Machine learning, deep learning, NLP, and building AI-powered software systems.' },
-      { icon: BarChart3, slug: 'ai-ds',          name: 'CSE – Artificial Intelligence & Data Science', desc: 'Data analytics, big data processing, visualization, and the design of intelligent systems.' },
-      { icon: Lock, slug: 'cyber-security', name: 'CSE – Cyber Security', desc: 'Network security, ethical hacking, cryptography, and digital forensics techniques.' },
-      { icon: Globe, slug: 'it',             name: 'Information Technology (IT)', desc: 'Web technologies, cloud platforms, software development, and network infrastructure.' },
-      { icon: RadioTower, slug: 'ece',            name: 'Electronics & Communication Engineering (ECE)', desc: 'VLSI design, embedded systems, signal processing, and communication technologies.' },
-      { icon: Zap, slug: 'eee',            name: 'Electrical & Electronics Engineering (EEE)', desc: 'Power systems, renewable energy, control engineering, and smart grid applications.' },
-      { icon: Construction, slug: 'ce',             name: 'Civil Engineering (CE)', desc: 'Structural design, construction project management, and environmental engineering.' },
-      { icon: Settings, slug: 'me',             name: 'Mechanical Engineering (ME)', desc: 'CAD/CAM, manufacturing processes, thermodynamics, and robotics.' },
-    ],
-  },
-  {
-    id: 'mtech',
-    label: 'M.Tech',
-    programs: [
-      { icon: Laptop, slug: 'mtech-cse',                 name: 'M.Tech – Computer Science & Engineering', desc: 'In-depth study of advanced computing, algorithm design, and computer science research.' },
-      { icon: Microscope, slug: 'mtech-vlsi',                name: 'M.Tech – VLSI Design', desc: 'Digital IC design, chip architecture, and advanced semiconductor engineering.' },
-      { icon: Zap, slug: 'mtech-power-electronics',   name: 'M.Tech – Power Electronics', desc: 'Drives, converters, power management circuits, and energy conversion systems.' },
-      { icon: Globe, slug: 'mtech-software-engineering', name: 'M.Tech – Software Engineering', desc: 'Advanced software architecture, quality assurance, testing, and project leadership.' },
-    ],
-  },
-  {
-    id: 'mba',
-    label: 'MBA & Ph.D.',
-    programs: [
-      { icon: Briefcase, slug: 'mba',     name: 'Master of Business Administration (MBA)', desc: 'Business strategy, finance, marketing, human resources, and entrepreneurial thinking.' },
-      { icon: GraduationCap, slug: 'phd-cse', name: 'Ph.D. – Computer Science & Engineering', desc: 'Doctoral-level investigation into AI, ML, data science, and computing technologies.' },
-      { icon: RadioTower, slug: 'phd-ece', name: 'Ph.D. – Electronics & Communication', desc: 'Doctoral research in VLSI design, signal processing, and communication systems.' },
-      { icon: Zap, slug: 'phd-eee', name: 'Ph.D. – Electrical & Electronics', desc: 'Doctoral research spanning power systems, smart grid technologies, and energy engineering.' },
-    ],
-  },
-];
-
-const departments = [
-  { icon: Laptop, code: 'CSE', name: 'Computer Science & Engineering', desc: 'AI and machine learning, data structures, algorithms, cloud computing, and software engineering disciplines.', labs: '12 Labs', slug: 'cse' },
-  { icon: RadioTower, code: 'ECE', name: 'Electronics & Communication Engineering', desc: 'VLSI design, embedded systems, signal processing, communication networks, and IoT technologies.', labs: '10 Labs', slug: 'ece' },
-  { icon: Globe, code: 'IT', name: 'Information Technology', desc: 'Web development, networking, database management, cybersecurity, and cloud computing platforms.', labs: '8 Labs', slug: 'it' },
-  { icon: Zap, code: 'EEE', name: 'Electrical & Electronics Engineering', desc: 'Power systems, control engineering, electric drives, smart grid technology, and renewable energy.', labs: '9 Labs', slug: 'eee' },
-  { icon: Settings, code: 'ME', name: 'Mechanical Engineering', desc: 'CAD/CAM, manufacturing systems, thermodynamics, fluid mechanics, and robotics applications.', labs: '11 Labs', slug: 'me' },
-  { icon: Construction, code: 'CE', name: 'Civil Engineering', desc: 'Structural analysis, construction management, geotechnical and environmental engineering principles.', labs: '8 Labs', slug: 'ce' },
-  { icon: Bot, code: 'AI', name: 'Artificial Intelligence', desc: 'Machine learning, deep learning, NLP, computer vision, and the design of intelligent systems.', labs: '6 Labs', slug: 'ai-ds' },
-  { icon: PenTool, code: 'FE', name: 'Freshman Engineering', desc: 'Foundation courses in mathematics, physics, chemistry, and the core principles of engineering.', labs: '4 Labs', slug: null },
-  { icon: Briefcase, code: 'MBA', name: 'Master of Business Administration', desc: 'Business strategy, finance, marketing, human resource management, and entrepreneurship.', labs: '2 Labs', slug: 'mba' },
-];
+const TABS = [
+  { id: 'btech', label: 'B.Tech' },
+  { id: 'mtech', label: 'M.Tech' },
+  { id: 'mba', label: 'MBA & Ph.D.' },
+] as const;
 
 const studentActivities = [
   { icon: Radio, title: 'Radio Vishnu 90.4', path: 'http://radiovishnu.com/', external: true },
@@ -77,8 +35,14 @@ const studentActivities = [
   { icon: Trophy, title: 'Sports & Games', path: '/sports-games', external: false },
 ];
 
+function truncate(text: string, max: number) {
+  if (!text) return '';
+  return text.length > max ? `${text.slice(0, max).trimEnd()}…` : text;
+}
+
 export default function Academics() {
-  const [activeTab, setActiveTab] = useState('btech');
+  const [activeTab, setActiveTab] = useState<string>('btech');
+  const { docs: programs, loading } = useOrderedCollection<ProgramDoc>('programs', 'order');
 
   useEffect(() => {
     document.title = 'Academics | Vishnu Womens University';
@@ -95,11 +59,32 @@ export default function Academics() {
       },
       { threshold: 0.1 }
     );
+    // Only static, always-present elements use .reveal here — the
+    // Firestore-derived program/department cards render without it (see
+    // comment in ProgramDetail.tsx for why animating async content this way
+    // is unreliable), so a plain mount-only observer is safe.
     document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale').forEach(el => observer.observe(el));
     return () => observer.disconnect();
   }, []);
 
-  const activeCategory = programCategories.find(c => c.id === activeTab);
+  const btechCount = programs.filter(p => p.category === 'btech').length;
+
+  const activePrograms = useMemo(() => {
+    if (activeTab === 'mba') return programs.filter(p => p.category === 'mba' || p.category === 'phd');
+    return programs.filter(p => p.category === activeTab);
+  }, [programs, activeTab]);
+
+  // One representative card per B.Tech department, derived live from the
+  // programs collection (department field set by whoever added the program).
+  // "Freshman Engineering" has no corresponding program — it's first-year
+  // foundation coursework, not a degree — so it stays a fixed entry.
+  const departmentCards = useMemo(() => {
+    const seen = new Map<string, ProgramDoc>();
+    programs
+      .filter(p => p.category === 'btech' && p.department)
+      .forEach(p => { if (!seen.has(p.department)) seen.set(p.department, p); });
+    return Array.from(seen.values());
+  }, [programs]);
 
   return (
     <main className="page-wrapper">
@@ -117,7 +102,7 @@ export default function Academics() {
         <div className="container">
           <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-12)', flexWrap: 'wrap' }}>
             {[
-              { num: '9', label: 'B.Tech Programs' },
+              { num: String(btechCount || '—'), label: 'B.Tech Programs' },
               { num: '1,400+', label: 'Annual Placements' },
               { num: '230+', label: 'Expert Faculty' },
               { num: '59.28 LPA', label: 'Highest Package' },
@@ -143,47 +128,50 @@ export default function Academics() {
           </div>
 
           <div className="programs-tabs">
-            {programCategories.map(cat => (
+            {TABS.map(tab => (
               <button
-                key={cat.id}
-                className={`prog-tab${activeTab === cat.id ? ' active' : ''}`}
-                onClick={() => setActiveTab(cat.id)}
+                key={tab.id}
+                className={`prog-tab${activeTab === tab.id ? ' active' : ''}`}
+                onClick={() => setActiveTab(tab.id)}
               >
-                {cat.label}
+                {tab.label}
               </button>
             ))}
           </div>
 
           <div className="programs-grid">
-            {activeCategory?.programs.map((prog) => {
-              const data = findProgramBySlug(prog.slug);
+            {activePrograms.map((program) => {
+              const Icon = resolveProgramIcon(program.icon);
               return (
                 <Link
-                  key={prog.name}
-                  to={`/academics/${prog.slug}`}
+                  key={program.id}
+                  to={`/academics/${program.slug}`}
                   className="program-card"
                 >
-                  <div className="program-card-icon"><prog.icon size={29} strokeWidth={1.75} /></div>
-                  <h3>{prog.name}</h3>
-                  <p>{prog.desc}</p>
-                  {data && (
-                    <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap', marginTop: 'var(--space-3)' }}>
-                      <span style={{ fontSize: '0.68rem', fontWeight: 700, background: 'var(--color-off-white)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-sm)', padding: '2px 8px', color: 'var(--color-text-light)', fontFamily: 'var(--font-sans)', whiteSpace: 'nowrap' }}>
-                        {data.intake} Seats
+                  <div className="program-card-icon"><Icon size={29} strokeWidth={1.75} /></div>
+                  <h3>{program.name}</h3>
+                  <p>{truncate(program.about, 140)}</p>
+                  <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap', marginTop: 'var(--space-3)' }}>
+                    <span style={{ fontSize: '0.68rem', fontWeight: 700, background: 'var(--color-off-white)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-sm)', padding: '2px 8px', color: 'var(--color-text-light)', fontFamily: 'var(--font-sans)', whiteSpace: 'nowrap' }}>
+                      {program.intake} Seats
+                    </span>
+                    {program.accreditation && program.accreditation !== '—' && (
+                      <span style={{ fontSize: '0.68rem', fontWeight: 700, background: 'rgba(201,168,76,0.12)', border: '1px solid rgba(201,168,76,0.4)', borderRadius: 'var(--radius-sm)', padding: '2px 8px', color: 'var(--color-accent)', fontFamily: 'var(--font-sans)', whiteSpace: 'nowrap' }}>
+                        {program.accreditation.split(' ').slice(0, 2).join(' ')}
                       </span>
-                      {data.accreditation !== '—' && (
-                        <span style={{ fontSize: '0.68rem', fontWeight: 700, background: 'rgba(201,168,76,0.12)', border: '1px solid rgba(201,168,76,0.4)', borderRadius: 'var(--radius-sm)', padding: '2px 8px', color: 'var(--color-accent)', fontFamily: 'var(--font-sans)', whiteSpace: 'nowrap' }}>
-                          {data.accreditation.split(' ').slice(0, 2).join(' ')}
-                        </span>
-                      )}
-                    </div>
-                  )}
+                    )}
+                  </div>
                   <div className="program-card-arrow" style={{ marginTop: 'auto' }}>
                     Learn More →
                   </div>
                 </Link>
               );
             })}
+            {!loading && activePrograms.length === 0 && (
+              <p style={{ color: 'var(--color-text-light)', gridColumn: '1 / -1', textAlign: 'center' }}>
+                No programs added for this category yet.
+              </p>
+            )}
           </div>
 
           <div style={{ textAlign: 'center', marginTop: 'var(--space-8)' }}>
@@ -199,35 +187,39 @@ export default function Academics() {
             <span className="section-label">Departments</span>
             <h2 className="section-title">Academic Departments</h2>
             <p className="section-desc" style={{ margin: '0 auto' }}>
-              Nine specialised departments — each bringing together experienced faculty, well-equipped laboratories, and curricula shaped by industry demands.
+              Specialised departments — each bringing together experienced faculty, well-equipped laboratories, and curricula shaped by industry demands.
             </p>
           </div>
           <div className="dept-grid">
-            {departments.map((d, i) => {
-              const inner = (
-                <>
+            {departmentCards.map((program) => {
+              const Icon = resolveProgramIcon(program.icon);
+              return (
+                <Link key={program.department} to={`/academics/${program.slug}`} className="dept-card" style={{ textDecoration: 'none' }}>
                   <div className="dept-card-top">
-                    <span className="dept-icon"><d.icon size={30} strokeWidth={1.75} /></span>
-                    <span className="dept-code">{d.code}</span>
+                    <span className="dept-icon"><Icon size={30} strokeWidth={1.75} /></span>
+                    <span className="dept-code">{program.department}</span>
                   </div>
-                  <h3 className="dept-name">{d.name}</h3>
-                  <p className="dept-desc">{d.desc}</p>
+                  <h3 className="dept-name">{program.name}</h3>
+                  <p className="dept-desc">{truncate(program.about, 130)}</p>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto' }}>
-                    <div className="dept-labs">{d.labs}</div>
-                    {d.slug && <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--color-accent)', fontFamily: 'var(--font-sans)' }}>View →</span>}
+                    <div className="dept-labs">{program.labs?.length || 0} Labs</div>
+                    <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--color-accent)', fontFamily: 'var(--font-sans)' }}>View →</span>
                   </div>
-                </>
-              );
-              return d.slug ? (
-                <Link key={d.code} to={`/academics/${d.slug}`} className="dept-card reveal" data-delay={`${i * 50}`} style={{ textDecoration: 'none' }}>
-                  {inner}
                 </Link>
-              ) : (
-                <div key={d.code} className="dept-card reveal" data-delay={`${i * 50}`}>
-                  {inner}
-                </div>
               );
             })}
+            {/* Freshman Engineering: first-year foundation coursework, not a degree program of its own */}
+            <div className="dept-card">
+              <div className="dept-card-top">
+                <span className="dept-icon"><PenTool size={30} strokeWidth={1.75} /></span>
+                <span className="dept-code">FE</span>
+              </div>
+              <h3 className="dept-name">Freshman Engineering</h3>
+              <p className="dept-desc">Foundation courses in mathematics, physics, chemistry, and the core principles of engineering.</p>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto' }}>
+                <div className="dept-labs">4 Labs</div>
+              </div>
+            </div>
           </div>
         </div>
       </section>

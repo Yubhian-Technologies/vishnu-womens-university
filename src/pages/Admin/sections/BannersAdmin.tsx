@@ -27,6 +27,7 @@ const EMPTY: Omit<Banner, 'id'> = {
 export const PAGES = [
   { value: 'home',                    label: 'Home' },
   { value: 'academics',               label: 'Academics' },
+  { value: 'faculty',                 label: 'Faculty' },
   { value: 'admissions',              label: 'Admissions' },
   { value: 'student-life',            label: 'Student Life' },
   { value: 'placements',              label: 'Placements' },
