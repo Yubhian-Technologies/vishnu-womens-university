@@ -2,11 +2,35 @@ import { useEffect } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { Trophy } from 'lucide-react';
 import { findGovItemBySlug, GovTableRow } from './governance.data';
+import { useOrderedCollection } from '../../hooks/useCollection';
 import '../detail-layout.css';
+
+interface FacultyDoc {
+  id: string;
+  name: string;
+  designation: string;
+  department: string;
+}
+
+// Maps a Board of Studies table title to the matching FacultyAdmin department value,
+// so faculty added in /admin show up under the right department's BoS table.
+const BOS_DEPARTMENT_MAP: Record<string, string> = {
+  'Computer Science & Engineering': 'CSE',
+  'CSE [Cyber Security]': 'Cyber Security',
+  'CSE [Artificial Intelligence & Data Science]': 'AI&DS',
+  'CSE [Artificial Intelligence & Machine Learning]': 'AI&ML',
+  'Information Technology': 'IT',
+  'Electronics & Communication Engineering': 'ECE',
+  'Electrical & Electronics Engineering': 'EEE',
+  'Civil Engineering': 'Civil',
+  'Mechanical Engineering': 'Mechanical',
+  'Master of Business Administration (MBA)': 'MBA',
+};
 
 export default function GovernanceDetail() {
   const { slug } = useParams<{ slug: string }>();
   const item = slug ? findGovItemBySlug(slug) : null;
+  const { docs: faculty } = useOrderedCollection<FacultyDoc>('faculty', 'name');
 
   useEffect(() => {
     if (item) document.title = `${item.title} | Vishnu Womens University`;
@@ -27,6 +51,22 @@ export default function GovernanceDetail() {
   }, [item]);
 
   if (!item) return <Navigate to="/governance" replace />;
+
+  const tableSections = item.slug === 'board-of-studies' && item.tableSections
+    ? item.tableSections.map((section) => {
+        const dept = BOS_DEPARTMENT_MAP[section.title];
+        const deptFaculty = dept ? faculty.filter((f) => f.department === dept) : [];
+        if (deptFaculty.length === 0) return section;
+
+        const staticRows = section.rows.filter((r) => !String(r.Name).toLowerCase().startsWith('faculty member'));
+        const facultyRows: GovTableRow[] = deptFaculty.map((f, i) => ({
+          'S.No': staticRows.length + i + 1,
+          Name: f.name,
+          Designation: f.designation,
+        }));
+        return { ...section, rows: [...staticRows, ...facultyRows] };
+      })
+    : item.tableSections;
 
   const categoryLabel =
     item.category === 'governance' ? 'Governance'
@@ -144,14 +184,14 @@ export default function GovernanceDetail() {
       )}
 
       {/* Multi-section Tables (Board of Studies) */}
-      {item.tableSections && item.tableSections.length > 0 && (
+      {tableSections && tableSections.length > 0 && (
         <section className="section bg-off-white">
           <div className="container">
             <div className="reveal" style={{ marginBottom: 'var(--space-8)' }}>
               <span className="section-label">Members</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Department Boards of Studies</h2>
             </div>
-            {item.tableSections.map((section, si) => (
+            {tableSections.map((section, si) => (
               <div key={section.title} className="reveal" data-delay={`${si * 40}`} style={{ marginBottom: 'var(--space-10)' }}>
                 <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>
                   {section.title}
