@@ -33,6 +33,8 @@ export default function AnnouncementsAdmin() {
         await addDoc(collection(db, 'announcements'), { ...form, createdAt: serverTimestamp() });
       }
       setForm(EMPTY); setEditing(null);
+    } catch (e) {
+      alert(`Couldn't save: ${(e as Error).message}`);
     } finally { setSaving(false); }
   };
 
@@ -43,11 +45,19 @@ export default function AnnouncementsAdmin() {
 
   const remove = async (id: string) => {
     if (!confirm('Delete this announcement?')) return;
-    await deleteDoc(doc(db, 'announcements', id));
+    try {
+      await deleteDoc(doc(db, 'announcements', id));
+    } catch (e) {
+      alert(`Couldn't delete: ${(e as Error).message}`);
+    }
   };
 
   const toggle = async (a: Announcement) => {
-    await updateDoc(doc(db, 'announcements', a.id), { active: !a.active });
+    try {
+      await updateDoc(doc(db, 'announcements', a.id), { active: !a.active });
+    } catch (e) {
+      alert(`Couldn't update: ${(e as Error).message}`);
+    }
   };
 
   return (

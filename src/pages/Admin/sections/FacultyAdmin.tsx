@@ -48,6 +48,8 @@ export default function FacultyAdmin() {
         await addDoc(collection(db, 'faculty'), { ...form, createdAt: serverTimestamp() });
       }
       setForm(EMPTY); setEditing(null);
+    } catch (e) {
+      alert(`Couldn't save: ${(e as Error).message}`);
     } finally { setSaving(false); }
   };
 
@@ -60,7 +62,11 @@ export default function FacultyAdmin() {
 
   const remove = async (id: string) => {
     if (!confirm('Remove this faculty member?')) return;
-    await deleteDoc(doc(db, 'faculty', id));
+    try {
+      await deleteDoc(doc(db, 'faculty', id));
+    } catch (e) {
+      alert(`Couldn't delete: ${(e as Error).message}`);
+    }
   };
 
   const filtered = filterDept === 'All' ? faculty : faculty.filter((f) => f.department === filterDept);

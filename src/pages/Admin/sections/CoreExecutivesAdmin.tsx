@@ -38,6 +38,8 @@ export default function CoreExecutivesAdmin() {
         });
       }
       setForm(EMPTY); setEditing(null);
+    } catch (e) {
+      alert(`Couldn't save: ${(e as Error).message}`);
     } finally { setSaving(false); }
   };
 
@@ -48,7 +50,11 @@ export default function CoreExecutivesAdmin() {
 
   const remove = async (id: string) => {
     if (!confirm('Remove this executive?')) return;
-    await deleteDoc(doc(db, 'coreExecutives', id));
+    try {
+      await deleteDoc(doc(db, 'coreExecutives', id));
+    } catch (e) {
+      alert(`Couldn't delete: ${(e as Error).message}`);
+    }
   };
 
   const clearAll = async () => {
@@ -61,6 +67,8 @@ export default function CoreExecutivesAdmin() {
         executives.slice(i, i + 450).forEach((m) => batch.delete(doc(db, 'coreExecutives', m.id)));
         await batch.commit();
       }
+    } catch (e) {
+      alert(`Couldn't delete all: ${(e as Error).message}`);
     } finally {
       setClearing(false);
     }

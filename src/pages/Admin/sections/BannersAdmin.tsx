@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp,
 } from 'firebase/firestore';
@@ -63,6 +63,7 @@ export default function BannersAdmin() {
   const [form, setForm] = useState<Omit<Banner, 'id'>>(EMPTY);
   const [editing, setEditing] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const formRef = useRef<HTMLDivElement>(null);
 
   const set = (k: string, v: string | number) => setForm((p) => ({ ...p, [k]: v }));
 
@@ -81,6 +82,8 @@ export default function BannersAdmin() {
       }
       setForm(EMPTY);
       setEditing(null);
+    } catch (e) {
+      alert(`Couldn't save: ${(e as Error).message}`);
     } finally {
       setSaving(false);
     }
@@ -93,11 +96,19 @@ export default function BannersAdmin() {
       title: b.title, subtitle: b.subtitle, imageUrl: b.imageUrl,
       storagePath: b.storagePath, ctaLabel: b.ctaLabel, ctaLink: b.ctaLink, order: b.order,
     });
+    // The banner list (below the form) covers every page's banners, so the
+    // clicked one is often scrolled well past the form — without this the
+    // edit looks like it did nothing.
+    formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   const remove = async (id: string) => {
     if (!confirm('Delete this banner?')) return;
-    await deleteDoc(doc(db, 'banners', id));
+    try {
+      await deleteDoc(doc(db, 'banners', id));
+    } catch (e) {
+      alert(`Couldn't delete: ${(e as Error).message}`);
+    }
   };
 
   const pageLabel = (val: string) => PAGES.find((p) => p.value === val)?.label ?? val;
@@ -105,7 +116,7 @@ export default function BannersAdmin() {
   return (
     <div className="admin-section">
       {/* Form */}
-      <div className="admin-card">
+      <div className="admin-card" ref={formRef}>
         <h2 className="admin-card__title">{editing ? 'Edit Banner' : 'Add New Banner'}</h2>
 
         {/* Page selector — most important field, at the top */}

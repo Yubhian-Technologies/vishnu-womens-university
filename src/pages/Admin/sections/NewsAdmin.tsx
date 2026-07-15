@@ -45,6 +45,8 @@ export default function NewsAdmin() {
         await addDoc(collection(db, 'news'), { ...form, createdAt: serverTimestamp() });
       }
       setForm(EMPTY); setEditing(null);
+    } catch (e) {
+      alert(`Couldn't save: ${(e as Error).message}`);
     } finally { setSaving(false); }
   };
 
@@ -57,7 +59,11 @@ export default function NewsAdmin() {
 
   const remove = async (id: string) => {
     if (!confirm('Delete this item?')) return;
-    await deleteDoc(doc(db, 'news', id));
+    try {
+      await deleteDoc(doc(db, 'news', id));
+    } catch (e) {
+      alert(`Couldn't delete: ${(e as Error).message}`);
+    }
   };
 
   return (
