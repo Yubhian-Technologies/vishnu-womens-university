@@ -6,18 +6,21 @@ import PageHero from '../../components/PageHero/PageHero';
 const sections = [
   {
     slug: 'happenings',
+    anchor: 'happenings-content',
     title: 'Happenings at VWU',
     icon: Calendar,
     desc: 'Stay updated with the latest events, workshops, MoUs, competitions, and campus milestones — from recent achievements to upcoming programmes.',
   },
   {
     slug: 'accreditations-awards',
+    anchor: 'accreditations-content',
     title: 'Accreditations & Awards',
     icon: Trophy,
     desc: 'VWU is recognised by NAAC, NBA, NIRF, ARIIA, IEI, ISTE, and more. Explore our full record of national rankings, quality awards, and institutional accreditations.',
   },
   {
     slug: 'gallery',
+    anchor: 'gallery-content',
     title: 'Gallery',
     icon: Image,
     desc: 'A visual archive of campus life — from national symposia, graduation days, and cultural festivals to sports championships and industry collaborations.',
@@ -104,7 +107,7 @@ export default function NewsAwards() {
                   {s.desc}
                 </p>
                 <Link
-                  to={`/news-awards/${s.slug}`}
+                  to={`/news-awards/${s.slug}#${s.anchor}`}
                   style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-primary)', textDecoration: 'none', paddingTop: 'var(--space-3)', borderTop: '1px solid var(--color-light-gray)', marginTop: 'auto' }}
                   onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = 'var(--color-accent)'; }}
                   onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = 'var(--color-primary)'; }}

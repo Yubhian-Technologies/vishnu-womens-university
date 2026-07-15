@@ -3,8 +3,11 @@ import { Link } from 'react-router-dom';
 import { CalendarDays } from 'lucide-react';
 import { happenings } from './news-awards.data';
 import PageHero from '../../components/PageHero/PageHero';
+import { useHashScroll } from '../../hooks/useHashScroll';
 
 export default function Happenings() {
+  useHashScroll();
+
   useEffect(() => {
     document.title = 'Happenings at VWU | Vishnu Womens University';
     const observer = new IntersectionObserver(
@@ -39,7 +42,7 @@ export default function Happenings() {
 
       {/* Upcoming Events */}
       {upcoming.length > 0 && (
-        <section className="section bg-white">
+        <section id="happenings-content" className="section bg-white" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
           <div className="container">
             <div className="reveal" style={{ marginBottom: 'var(--space-8)' }}>
               <span className="section-label">Mark Your Calendar</span>
@@ -69,7 +72,7 @@ export default function Happenings() {
       )}
 
       {/* Recent Events — Timeline */}
-      <section className="section bg-off-white">
+      <section id={upcoming.length === 0 ? 'happenings-content' : undefined} className="section bg-off-white" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
         <div className="container">
           <div className="reveal" style={{ marginBottom: 'var(--space-8)' }}>
             <span className="section-label">Latest Updates</span>
