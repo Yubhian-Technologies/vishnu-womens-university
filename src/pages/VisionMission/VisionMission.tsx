@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Trophy, Lightbulb, Handshake, Venus, Microscope, Leaf } from 'lucide-react';
+import { Trophy, Lightbulb, Handshake, Venus, Microscope, Leaf, Check, Landmark, ClipboardList, School } from 'lucide-react';
 import './VisionMission.css';
 import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
@@ -170,7 +170,7 @@ export default function VisionMission() {
               <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
                 {qualityPolicy.map((p, i) => (
                   <li key={i} style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
-                    <span style={{ color: 'var(--color-accent)', fontWeight: 900, fontSize: '1.1rem', flexShrink: 0 }}>✓</span>
+                    <Check size={17} strokeWidth={2.5} style={{ color: 'var(--color-accent)', flexShrink: 0 }} />
                     <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: 'var(--text-sm)', lineHeight: 1.7 }}>{p}</p>
                   </li>
                 ))}
@@ -193,13 +193,13 @@ export default function VisionMission() {
         <div className="container">
           <div className="vm-discover-row">
             {[
-              { title: 'About VWU', path: '/about', icon: '🏛️' },
-              { title: 'Governance', path: '/governance', icon: '📋' },
-              { title: 'About SVES', path: '/about-sves', icon: '🌿' },
-              { title: 'Campus Life', path: '/campus', icon: '🏫' },
+              { title: 'About VWU', path: '/about', icon: Landmark },
+              { title: 'Governance', path: '/governance', icon: ClipboardList },
+              { title: 'About SVES', path: '/about-sves', icon: Leaf },
+              { title: 'Campus Life', path: '/campus', icon: School },
             ].map(l => (
               <Link to={l.path} key={l.title} className="vm-discover-link">
-                <span>{l.icon}</span>
+                <l.icon size={20} strokeWidth={1.75} />
                 <span>{l.title}</span>
                 <span style={{ marginLeft: 'auto', color: 'var(--color-accent)' }}>→</span>
               </Link>

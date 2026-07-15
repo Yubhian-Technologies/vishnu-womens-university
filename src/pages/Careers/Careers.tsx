@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
-import { GraduationCap, IndianRupee, Hospital, Home, BookOpen, Handshake } from 'lucide-react';
+import { GraduationCap, IndianRupee, Hospital, Home, BookOpen, Handshake, CheckCircle2 } from 'lucide-react';
 
 const positions = [
   {
@@ -177,7 +177,7 @@ export default function Careers() {
 
             {submitted ? (
               <div className="reveal" style={{ textAlign: 'center', background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-12)', borderTop: '4px solid var(--color-accent)' }}>
-                <div style={{ fontSize: '3rem', marginBottom: 'var(--space-4)' }}>✅</div>
+                <div style={{ marginBottom: 'var(--space-4)', display: 'flex', justifyContent: 'center' }}><CheckCircle2 size={48} strokeWidth={1.75} color="#22c55e" /></div>
                 <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.5rem', color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>Application Submitted!</h3>
                 <p style={{ color: 'var(--color-text-light)', lineHeight: 1.7 }}>Thank you for applying to VWU. Our HR team will review your application and follow up with you within 5–7 working days.</p>
               </div>

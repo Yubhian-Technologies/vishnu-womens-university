@@ -1,0 +1,39 @@
+/* Tab bar — horizontally scrollable on any viewport too narrow to fit all
+   tabs in one row, instead of wrapping a lone tab onto an awkward new line. */
+.info-tabs {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-10);
+  border-bottom: 2px solid var(--color-light-gray);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.info-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.info-tab-btn {
+  flex: 0 0 auto;
+  padding: var(--space-3) var(--space-5);
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-text-light);
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.info-tab-btn.active {
+  border-bottom-color: var(--color-accent);
+  color: var(--color-primary);
+}

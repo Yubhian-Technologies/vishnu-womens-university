@@ -2,8 +2,11 @@ import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { categories } from './differentiators.data';
 import PageHero from '../../components/PageHero/PageHero';
+import { useHashScroll } from '../../hooks/useHashScroll';
 
 export default function Differentiators() {
+  useHashScroll();
+
   useEffect(() => {
     document.title = 'Differentiators | Vishnu Womens University';
     const observer = new IntersectionObserver(
@@ -75,7 +78,7 @@ export default function Differentiators() {
 
       {/* Category sections */}
       {categories.map((cat, ci) => (
-        <section key={cat.id} id={cat.id} className={`section ${ci % 2 === 0 ? 'bg-off-white' : 'bg-white'}`} style={{ scrollMarginTop: '100px' }}>
+        <section key={cat.id} id={cat.id} className={`section ${ci % 2 === 0 ? 'bg-off-white' : 'bg-white'}`} style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
           <div className="container">
             <div className="reveal" style={{ marginBottom: 'var(--space-10)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-2)' }}>

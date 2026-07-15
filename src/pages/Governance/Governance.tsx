@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { govItems, govCategories } from './governance.data';
 import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
+import { useHashScroll } from '../../hooks/useHashScroll';
 
 const govPhotos = [
   { src: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=800&q=80', alt: 'Governance and administration', caption: 'Institutional Governance' },
@@ -13,6 +14,8 @@ const govPhotos = [
 ];
 
 export default function Governance() {
+  useHashScroll();
+
   useEffect(() => {
     document.title = 'Governance | Vishnu Womens University';
     const observer = new IntersectionObserver(
@@ -72,7 +75,7 @@ export default function Governance() {
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'var(--color-primary)'; (e.currentTarget as HTMLElement).style.borderBottomColor = 'var(--color-accent)'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'var(--color-text)'; (e.currentTarget as HTMLElement).style.borderBottomColor = 'transparent'; }}
             >
-              <span>{cat.icon}</span> {cat.label}
+              <cat.icon size={14} /> {cat.label}
             </a>
           ))}
         </div>
@@ -86,10 +89,11 @@ export default function Governance() {
             key={cat.key}
             id={cat.key}
             className={`section ${ci % 2 === 0 ? 'bg-off-white' : 'bg-white'}`}
+            style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 3.5rem)' }}
           >
             <div className="container">
               <div className="reveal" style={{ marginBottom: 'var(--space-10)' }}>
-                <span className="section-label">{cat.icon} {cat.label}</span>
+                <span className="section-label" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}><cat.icon size={14} /> {cat.label}</span>
                 <h2 className="section-title">{cat.label}</h2>
                 <p style={{ color: 'var(--color-text-light)', maxWidth: 600, lineHeight: 1.7 }}>{cat.desc}</p>
               </div>

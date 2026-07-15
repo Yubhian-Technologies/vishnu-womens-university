@@ -1,5 +1,7 @@
 import { useEffect } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
+import { Check, Microscope } from 'lucide-react';
+import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import { findProgramBySlug } from './programs.data';
 import '../detail-layout.css';
 
@@ -40,7 +42,7 @@ export default function ProgramDetail() {
     <main className="page-wrapper">
       {/* Hero */}
       <section className="page-hero" style={{ minHeight: 380 }}>
-        <img src={program.heroImage} alt={program.name} className="page-hero-image" />
+        <SmoothImage src={program.heroImage} alt={program.name} className="page-hero-image" />
         <div className="page-hero-overlay" />
         <div className="container page-hero-content">
           <div className="breadcrumb animate-fade-in">
@@ -98,7 +100,7 @@ export default function ProgramDetail() {
                 <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: 'var(--space-3)' }}>
                   {program.highlights.map((h) => (
                     <li key={h} style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start', color: 'var(--color-text)', fontSize: 'var(--text-sm)', lineHeight: 1.6 }}>
-                      <span style={{ color: 'var(--color-accent)', fontWeight: 900, fontSize: '1rem', flexShrink: 0, marginTop: 2 }}>✓</span>
+                      <Check size={16} strokeWidth={2.5} style={{ color: 'var(--color-accent)', flexShrink: 0, marginTop: 2 }} />
                       {h}
                     </li>
                   ))}
@@ -126,7 +128,7 @@ export default function ProgramDetail() {
 
                 {/* CTA Card */}
                 <div className="reveal" style={{ background: 'var(--color-primary)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', textAlign: 'center' }}>
-                  <div style={{ fontSize: '2rem', marginBottom: 'var(--space-3)' }}>{program.icon}</div>
+                  <div style={{ marginBottom: 'var(--space-3)', display: 'flex', justifyContent: 'center' }}><program.icon size={32} strokeWidth={1.75} color="var(--color-accent)" /></div>
                   <h4 style={{ color: 'var(--color-white)', fontFamily: 'var(--font-serif)', fontSize: '1.1rem', marginBottom: 'var(--space-2)' }}>Interested in {program.shortName}?</h4>
                   <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-5)', lineHeight: 1.6 }}>Apply through EAPCET (Code: VISW) or contact our admissions team.</p>
                   <Link to="/admissions" className="btn btn-accent" style={{ display: 'block', marginBottom: 'var(--space-2)', textAlign: 'center' }}>Apply Now</Link>
@@ -149,7 +151,7 @@ export default function ProgramDetail() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 'var(--space-4)' }}>
             {program.labs.map((lab, i) => (
               <div key={lab} className="reveal" data-delay={`${i * 50}`} style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', display: 'flex', alignItems: 'center', gap: 'var(--space-4)', borderLeft: '4px solid var(--color-accent)' }}>
-                <span style={{ fontSize: '1.4rem', flexShrink: 0 }}>🔬</span>
+                <Microscope size={22} strokeWidth={1.75} style={{ flexShrink: 0, color: 'var(--color-accent)' }} />
                 <span style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-primary)', lineHeight: 1.4 }}>{lab}</span>
               </div>
             ))}

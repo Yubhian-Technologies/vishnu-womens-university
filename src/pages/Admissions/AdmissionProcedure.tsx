@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { Check } from 'lucide-react';
 import PageHero from '../../components/PageHero/PageHero';
 
 const btechSteps = [
@@ -89,7 +90,7 @@ export default function AdmissionProcedure() {
       {/* Hero */}
       <PageHero
         page="admission-procedure"
-        defaultImage="https://images.unsplash.com/photo-1434030216411-0b793f4b6f71?w=1920&q=80"
+        defaultImage="https://images.unsplash.com/photo-1555255707-c07966088b7b?w=1920&q=80"
         defaultTitle="Admission Procedure"
   defaultSubtitle="A clear, step-by-step guide to joining VWU — covering eligibility, entrance examinations, and the enrollment process for all programmes."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Admissions', to: '/admissions' }, { label: 'Admission Procedure' }]}
@@ -167,7 +168,7 @@ export default function AdmissionProcedure() {
             {documents.map((doc, i) => (
               <div key={doc} className="reveal" data-delay={`${i * 40}`}
                 style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 'var(--radius-sm)', padding: 'var(--space-3) var(--space-4)' }}>
-                <span style={{ color: 'var(--color-accent)', fontWeight: 900, flexShrink: 0 }}>✓</span>
+                <Check size={16} strokeWidth={2.5} style={{ color: 'var(--color-accent)', flexShrink: 0 }} />
                 <span style={{ fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.85)' }}>{doc}</span>
               </div>
             ))}

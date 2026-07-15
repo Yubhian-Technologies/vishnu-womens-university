@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import './StudentLife.css';
 import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
-import { Radio, Tv, Handshake, Sprout, Shield, Laptop, Palette, BookOpen, Globe2, Bot, Venus, Leaf, GraduationCap, Brain, Lightbulb, Award, Globe, Target, Volleyball, Feather, CircleDot, Swords, Footprints, Waves, Disc, Crown } from 'lucide-react';
+import { Radio, Tv, Handshake, Sprout, Shield, Laptop, Palette, BookOpen, Globe2, Bot, Venus, Leaf, GraduationCap, Brain, Lightbulb, Award, Globe, Target, Volleyball, Feather, CircleDot, Swords, Footprints, Waves, Disc, Crown, Check } from 'lucide-react';
 
 const studentLifePhotos = [
   { src: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&q=80', alt: 'Cultural events', caption: 'Cultural Events' },
@@ -218,7 +218,7 @@ export default function StudentLife() {
               <div className="sl-dining-features">
                 {['On-campus food court', 'Hostel mess facility', 'Hygienic & fresh meals daily', 'Vegetarian & non-vegetarian options', 'Affordable meal plans'].map(f => (
                   <div key={f} style={{ color: 'rgba(255,255,255,0.8)', fontSize: 'var(--text-sm)', display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-2)' }}>
-                    <span style={{ color: 'var(--color-accent)', fontWeight: 900 }}>✓</span>
+                    <Check size={15} strokeWidth={2.5} style={{ color: 'var(--color-accent)', flexShrink: 0 }} />
                     {f}
                   </div>
                 ))}

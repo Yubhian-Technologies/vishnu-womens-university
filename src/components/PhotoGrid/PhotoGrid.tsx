@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { X } from 'lucide-react';
+import SmoothImage from '../SmoothImage/SmoothImage';
 import './PhotoGrid.css';
 
 export interface PhotoItem {
@@ -92,7 +94,7 @@ export default function PhotoGrid({
         const featured = i === 0 && variant === 'collage';
         return (
           <button
-            key={i}
+            key={img.src}
             className={`photo-grid-item ${getAnimClass(i, featured)}${featured ? ' photo-grid-item--featured' : ''}`}
             data-anim-delay={`${Math.min(i, 5) * 90}`}
             onClick={() => setLightbox(i)}
@@ -132,6 +134,27 @@ export default function PhotoGrid({
     </div>
   );
 
+  const lightboxModal = lightbox !== null && (
+    <div className="photo-lightbox" onClick={() => setLightbox(null)}>
+      <button className="photo-lightbox-close" onClick={() => setLightbox(null)} aria-label="Close"><X size={18} /></button>
+      <button
+        className="photo-lightbox-prev"
+        onClick={e => { e.stopPropagation(); setLightbox(i => i !== null ? (i - 1 + images.length) % images.length : null); }}
+        aria-label="Previous"
+      >‹</button>
+      <div className="photo-lightbox-img-wrap" onClick={e => e.stopPropagation()}>
+        <SmoothImage src={images[lightbox].src.replace('w=800', 'w=1600')} alt={images[lightbox].alt} />
+        {images[lightbox].caption && <p className="photo-lightbox-caption">{images[lightbox].caption}</p>}
+      </div>
+      <button
+        className="photo-lightbox-next"
+        onClick={e => { e.stopPropagation(); setLightbox(i => i !== null ? (i + 1) % images.length : null); }}
+        aria-label="Next"
+      >›</button>
+      <div className="photo-lightbox-counter">{lightbox + 1} / {images.length}</div>
+    </div>
+  );
+
   if (layout === 'side-text' || layout === 'side-text-reverse') {
     const reversed = layout === 'side-text-reverse';
     return (
@@ -147,6 +170,7 @@ export default function PhotoGrid({
             <div className="photo-side-images">{imageGrid}</div>
           </>
         )}
+        {lightboxModal}
       </div>
     );
   }
@@ -167,27 +191,7 @@ export default function PhotoGrid({
         </div>
       )}
 
-      {/* Lightbox */}
-      {lightbox !== null && (
-        <div className="photo-lightbox" onClick={() => setLightbox(null)}>
-          <button className="photo-lightbox-close" onClick={() => setLightbox(null)} aria-label="Close">✕</button>
-          <button
-            className="photo-lightbox-prev"
-            onClick={e => { e.stopPropagation(); setLightbox(i => i !== null ? (i - 1 + images.length) % images.length : null); }}
-            aria-label="Previous"
-          >‹</button>
-          <div className="photo-lightbox-img-wrap" onClick={e => e.stopPropagation()}>
-            <img src={images[lightbox].src.replace('w=800', 'w=1600')} alt={images[lightbox].alt} />
-            {images[lightbox].caption && <p className="photo-lightbox-caption">{images[lightbox].caption}</p>}
-          </div>
-          <button
-            className="photo-lightbox-next"
-            onClick={e => { e.stopPropagation(); setLightbox(i => i !== null ? (i + 1) % images.length : null); }}
-            aria-label="Next"
-          >›</button>
-          <div className="photo-lightbox-counter">{lightbox + 1} / {images.length}</div>
-        </div>
-      )}
+      {lightboxModal}
     </div>
   );
 }

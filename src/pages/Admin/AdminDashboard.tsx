@@ -6,6 +6,7 @@ import GalleryAdmin from './sections/GalleryAdmin';
 import ProgramsAdmin from './sections/ProgramsAdmin';
 import FacultyAdmin from './sections/FacultyAdmin';
 import GoverningBodyAdmin from './sections/GoverningBodyAdmin';
+import CoreExecutivesAdmin from './sections/CoreExecutivesAdmin';
 import PlacementsAdmin from './sections/PlacementsAdmin';
 import AlumniAdmin from './sections/AlumniAdmin';
 import AnnouncementsAdmin from './sections/AnnouncementsAdmin';
@@ -23,6 +24,7 @@ const SECTION_MAP: Record<string, React.ReactNode> = {
   programs: <ProgramsAdmin />,
   faculty: <FacultyAdmin />,
   'governing-body': <GoverningBodyAdmin />,
+  'core-executives': <CoreExecutivesAdmin />,
   placements: <PlacementsAdmin />,
   alumni: <AlumniAdmin />,
   announcements: <AnnouncementsAdmin />,

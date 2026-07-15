@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Trophy, Star, ClipboardList, Briefcase, TrendingUp, Medal } from 'lucide-react';
+import { Trophy, Star, ClipboardList, Briefcase, TrendingUp, Medal, Laptop, GraduationCap, FlaskConical, Presentation, Factory, FileText, Globe2, Check, Clock, MapPin } from 'lucide-react';
 import HeroSlider from '../../components/HeroSlider/HeroSlider';
 import CounterSection from '../../components/CounterSection/CounterSection';
 import NewsCard from '../../components/NewsCard/NewsCard';
@@ -10,9 +10,9 @@ import './Home.css';
 
 /* ── Data ─────────────────────────────────────────────────── */
 const studyCards = [
-  { id: 1, icon: '💻', title: 'B.Tech Programs', desc: 'Choose from 9 B.Tech specializations — CSE, AI & ML, AI & DS, Cyber Security, IT, ECE, EEE, Civil, and Mechanical Engineering.', image: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=800&q=80', alt: 'Students in engineering classroom', path: '/academics', linkLabel: 'Explore Programs', color: '#1b4332' },
-  { id: 2, icon: '🎓', title: 'M.Tech & MBA', desc: 'Elevate your qualifications with postgraduate programs in CSE, VLSI Design, Power Electronics, Software Engineering, and MBA.', image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80', alt: 'Postgraduate students', path: '/academics', linkLabel: 'PG Programs', color: '#2d6a4f' },
-  { id: 3, icon: '🔬', title: 'Research & Ph.D.', desc: 'Conduct doctoral research in CSE, ECE, and EEE — backed by 2,500+ publications, 90+ patents, and purpose-built research facilities.', image: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&q=80', alt: 'Research laboratory', path: '/academics', linkLabel: 'Research Programs', color: '#40916c' },
+  { id: 1, icon: Laptop, title: 'B.Tech Programs', desc: 'Choose from 9 B.Tech specializations — CSE, AI & ML, AI & DS, Cyber Security, IT, ECE, EEE, Civil, and Mechanical Engineering.', image: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=800&q=80', alt: 'Students in engineering classroom', path: '/academics', linkLabel: 'Explore Programs', color: '#1b4332' },
+  { id: 2, icon: GraduationCap, title: 'M.Tech & MBA', desc: 'Elevate your qualifications with postgraduate programs in CSE, VLSI Design, Power Electronics, Software Engineering, and MBA.', image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80', alt: 'Postgraduate students', path: '/academics', linkLabel: 'PG Programs', color: '#2d6a4f' },
+  { id: 3, icon: FlaskConical, title: 'Research & Ph.D.', desc: 'Conduct doctoral research in CSE, ECE, and EEE — backed by 2,500+ publications, 90+ patents, and purpose-built research facilities.', image: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&q=80', alt: 'Research laboratory', path: '/academics', linkLabel: 'Research Programs', color: '#40916c' },
 ];
 
 const popularPrograms = ['CSE', 'AI & Machine Learning', 'AI & Data Science', 'Cyber Security', 'Information Technology', 'Electronics & Communication', 'Electrical & Electronics', 'Civil Engineering', 'Mechanical Engineering', 'MBA'];
@@ -36,7 +36,7 @@ const events = [
 const campusFeatures = ['Student Clubs & Organizations', 'Radio Vishnu 90.4', 'Vishnu TV Academy', 'Sports & Games Facilities', 'Career Services Center', "Women's Hostels", 'AR/VR Studio', 'Technology Business Incubator'];
 
 const activityItems = [
-  { img: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600&q=80', label: 'mBAJA SAEINDIA 2026 Win' },
+  { img: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=600&q=80', label: 'mBAJA SAEINDIA 2026 Win' },
   { img: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=600&q=80', label: 'Amazon AFE Internship' },
   { img: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=600&q=80', label: 'Technova2026 Symposium' },
   { img: 'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=600&q=80', label: '8th Graduation Day' },
@@ -51,10 +51,10 @@ const testimonials = [
 ];
 
 const whyVwu = [
-  { icon: '👩‍🏫', stat: '300+', label: 'Qualified Faculty' },
-  { icon: '🏭', stat: '500+', label: 'Industry Partners' },
-  { icon: '📜', stat: '90+', label: 'Patents Filed' },
-  { icon: '🌍', stat: '25+', label: 'Global MoUs' },
+  { icon: Presentation, stat: '300+', label: 'Qualified Faculty' },
+  { icon: Factory, stat: '500+', label: 'Industry Partners' },
+  { icon: FileText, stat: '90+', label: 'Patents Filed' },
+  { icon: Globe2, stat: '25+', label: 'Global MoUs' },
 ];
 
 /* ── Tilt Hook ────────────────────────────────────────────── */
@@ -188,7 +188,7 @@ export default function Home() {
       <div className="quick-stats-bar">
         {whyVwu.map((w, i) => (
           <div key={i} className="quick-stat reveal" data-delay={`${i * 80}`}>
-            <span className="quick-stat__icon">{w.icon}</span>
+            <span className="quick-stat__icon"><w.icon size={22} strokeWidth={1.75} /></span>
             <span className="quick-stat__num">{w.stat}</span>
             <span className="quick-stat__label">{w.label}</span>
           </div>
@@ -224,7 +224,7 @@ export default function Home() {
                 <div className="study-card-image-wrap">
                   <img src={card.image} alt={card.alt} className="study-card-image" loading="lazy" />
                   <div className="study-card-overlay" style={{ background: `linear-gradient(to top, ${card.color}cc 0%, transparent 65%)` }} />
-                  <div className="study-card-icon">{card.icon}</div>
+                  <div className="study-card-icon"><card.icon size={24} strokeWidth={1.75} color="var(--color-primary-dark)" /></div>
                   <div className="study-card-shine" />
                 </div>
                 <div className="study-card-body">
@@ -279,7 +279,7 @@ export default function Home() {
             <div className="campus-features">
               {campusFeatures.map((f, i) => (
                 <div key={f} className="campus-feature" style={{ animationDelay: `${i * 60}ms` }}>
-                  <span className="campus-feature-check">✓</span>
+                  <span className="campus-feature-check"><Check size={14} strokeWidth={2.5} /></span>
                   {f}
                 </div>
               ))}
@@ -315,7 +315,7 @@ export default function Home() {
                 'https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=800&q=80',
                 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=800&q=80',
               ].map((src, i) => (
-                <div key={i} className={`mission-img mission-img--${i}`}>
+                <div key={src} className={`mission-img mission-img--${i}`}>
                   <img src={src} alt="VWU campus" loading="lazy" />
                   <div className="mission-img-overlay" />
                 </div>
@@ -436,8 +436,8 @@ export default function Home() {
                 <div className="event-content">
                   <div className="event-title">{event.title}</div>
                   <div className="event-meta">
-                    <span>🕐 {event.time}</span>
-                    <span>📍 {event.location}</span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><Clock size={14} /> {event.time}</span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><MapPin size={14} /> {event.location}</span>
                   </div>
                 </div>
                 <svg className="event-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none">

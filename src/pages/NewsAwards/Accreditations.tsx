@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { BarChart3, Trophy, CheckCircle2, type LucideIcon } from 'lucide-react';
 import { awards, AwardItem } from './news-awards.data';
 import PageHero from '../../components/PageHero/PageHero';
 
@@ -11,10 +12,10 @@ const tabs = [
 
 type TabKey = typeof tabs[number]['key'];
 
-const categoryIcons: Record<TabKey, string> = {
-  ranking: '📊',
-  award: '🏆',
-  accreditation: '✅',
+const categoryIcons: Record<TabKey, LucideIcon> = {
+  ranking: BarChart3,
+  award: Trophy,
+  accreditation: CheckCircle2,
 };
 
 function AwardCard({ item, index }: { item: AwardItem; index: number }) {
@@ -83,7 +84,7 @@ export default function Accreditations() {
       {/* Hero */}
       <PageHero
         page="news-awards-accreditations"
-        defaultImage="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1920&q=80"
+        defaultImage="https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=1920&q=80"
         defaultTitle="Accreditations & Awards"
   defaultSubtitle="Endorsed by India's foremost regulatory and ranking bodies — a record of recognised quality and consistent academic achievement."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'News & Awards', to: '/news-awards' }, { label: 'Accreditations & Awards' }]}
@@ -134,7 +135,7 @@ export default function Accreditations() {
                   color: activeTab === tab.key ? 'var(--color-white)' : 'var(--color-text)',
                 }}
               >
-                <span>{categoryIcons[tab.key]}</span>
+                {(() => { const TabIcon = categoryIcons[tab.key]; return <TabIcon size={15} />; })()}
                 {tab.label}
                 <span style={{
                   fontSize: 'var(--text-xs)',

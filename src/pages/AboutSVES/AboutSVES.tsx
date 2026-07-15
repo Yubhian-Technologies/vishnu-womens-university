@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { MapPin } from 'lucide-react';
 import './AboutSVES.css';
 import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
@@ -8,7 +9,7 @@ const svesPhotos = [
   { src: 'https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=800&q=80', alt: 'Green Meadows campus Bhimavaram', caption: 'Green Meadows — Bhimavaram' },
   { src: 'https://images.unsplash.com/photo-1562774053-701939374585?w=800&q=80', alt: 'University buildings', caption: 'Academic Blocks' },
   { src: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=800&q=80', alt: 'Students at campus event', caption: 'Student Events' },
-  { src: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800&q=80', alt: 'Graduation ceremony', caption: 'Convocation' },
+  { src: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=800&q=80', alt: 'Graduation ceremony', caption: 'Convocation' },
   { src: 'https://images.unsplash.com/photo-1544531585-9847b68c8c86?w=800&q=80', alt: 'Academic conference', caption: 'Conferences & Seminars' },
 ];
 
@@ -164,7 +165,7 @@ export default function AboutSVES() {
               <div key={campus.name} className="sves-campus-card reveal" data-delay={`${i * 100}`}>
                 <div className="sves-campus-header">
                   <h3>{campus.name}</h3>
-                  <span className="sves-campus-location">📍 {campus.location}</span>
+                  <span className="sves-campus-location" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}><MapPin size={13} /> {campus.location}</span>
                 </div>
                 <ul className="sves-campus-list">
                   {campus.institutions.map(inst => (

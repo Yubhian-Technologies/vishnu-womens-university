@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { X } from 'lucide-react';
 import { galleryAlbums, galleryYears } from './news-awards.data';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import PageHero from '../../components/PageHero/PageHero';
+import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import './Gallery.css';
 
 interface GalleryPhoto {
@@ -174,8 +176,8 @@ export default function Gallery() {
       {lightboxIndex !== null && filteredPhotos[lightboxIndex] && (
         <div className="pg-lightbox" onClick={(e) => e.target === e.currentTarget && setLightboxIndex(null)}>
           <div className="pg-lightbox__inner">
-            <button className="pg-lightbox__close" onClick={() => setLightboxIndex(null)} aria-label="Close">✕</button>
-            <img src={filteredPhotos[lightboxIndex].imageUrl} alt={filteredPhotos[lightboxIndex].title} />
+            <button className="pg-lightbox__close" onClick={() => setLightboxIndex(null)} aria-label="Close"><X size={16} /></button>
+            <SmoothImage src={filteredPhotos[lightboxIndex].imageUrl} alt={filteredPhotos[lightboxIndex].title} />
             <div className="pg-lightbox__caption">
               <strong>{filteredPhotos[lightboxIndex].title}</strong>
               <span>{filteredPhotos[lightboxIndex].category}</span>

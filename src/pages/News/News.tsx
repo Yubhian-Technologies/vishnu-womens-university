@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
+import { Newspaper, Search } from 'lucide-react';
 import NewsCard from '../../components/NewsCard/NewsCard';
+import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { formatDate } from '../../lib/formatDate';
 import { type NewsDoc, NEWS_CATEGORIES, NEWS_FALLBACK_IMAGE, newsDocToArticle } from '../../lib/news';
@@ -61,7 +63,7 @@ export default function News() {
           <div className="container">
             <div className="news-featured-card reveal">
               <div className="news-featured-image">
-                <img
+                <SmoothImage
                   src={featuredItem.imageUrl || NEWS_FALLBACK_IMAGE}
                   alt={featuredItem.title}
                   loading="lazy"
@@ -134,13 +136,13 @@ export default function News() {
             </>
           ) : items.length === 0 ? (
             <div className="news-empty">
-              <div className="news-empty-icon">📰</div>
+              <div className="news-empty-icon" style={{ display: 'flex', justifyContent: 'center' }}><Newspaper size={56} strokeWidth={1.5} color="var(--color-light-gray)" /></div>
               <h3>No news yet</h3>
               <p>Check back soon for the latest updates from VWU.</p>
             </div>
           ) : (
             <div className="news-empty">
-              <div className="news-empty-icon">🔍</div>
+              <div className="news-empty-icon" style={{ display: 'flex', justifyContent: 'center' }}><Search size={56} strokeWidth={1.5} color="var(--color-light-gray)" /></div>
               <h3>No articles found</h3>
               <p>Try adjusting your search or category filter.</p>
               <button

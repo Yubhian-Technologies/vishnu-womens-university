@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
-import { BookOpen, Hospital, Building, Accessibility, Hotel, Trophy } from 'lucide-react';
+import { BookOpen, Hospital, Building, Accessibility, Hotel, Trophy, Sparkle } from 'lucide-react';
 
 const communities = [
   { icon: BookOpen, title: 'Rural Students', desc: 'Extending educational support and skills programs to economically disadvantaged students from rural backgrounds.' },
@@ -121,7 +121,7 @@ export default function SocialServices() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
                 {nssValues.map((v) => (
                   <div key={v} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-                    <span style={{ color: 'var(--color-accent)', fontWeight: 900, fontSize: '1.2rem' }}>✦</span>
+                    <Sparkle size={17} strokeWidth={1.75} style={{ color: 'var(--color-accent)', flexShrink: 0 }} />
                     <span style={{ color: 'rgba(255,255,255,0.85)', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 600 }}>{v}</span>
                   </div>
                 ))}
