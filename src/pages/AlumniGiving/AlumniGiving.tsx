@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Check } from 'lucide-react';
 import { useOrderedCollection } from '../../hooks/useCollection';
+import { useHashScroll } from '../../hooks/useHashScroll';
 import './AlumniGiving.css';
 import PageHero from '../../components/PageHero/PageHero';
 
@@ -48,6 +49,8 @@ export default function AlumniGiving() {
   const { docs: alumniStories } = useOrderedCollection<AlumniStory>('alumniStories', 'order');
   const { docs: alumniEvents } = useOrderedCollection<AlumniEvent>('alumniEvents', 'order');
   const { docs: companies } = useOrderedCollection<Company>('alumniCompanies', 'order');
+
+  useHashScroll();
 
   useEffect(() => {
     document.title = 'Alumni & Giving | Vishnu Womens University';
@@ -162,7 +165,7 @@ export default function AlumniGiving() {
 
       {/* Events */}
       {alumniEvents.length > 0 && (
-        <section className="section" style={{ background: 'var(--color-primary)' }}>
+        <section id="events" className="section" style={{ background: 'var(--color-primary)' }}>
           <div className="container">
             <div className="reveal" style={{ marginBottom: 'var(--space-10)' }}>
               <span className="section-label" style={{ color: 'var(--color-accent)' }}>Events</span>
@@ -183,7 +186,7 @@ export default function AlumniGiving() {
 
       {/* Where Alumni Work */}
       {companies.length > 0 && (
-        <section className="section bg-off-white">
+        <section id="network" className="section bg-off-white">
           <div className="container">
             <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-10)' }}>
               <span className="section-label">Our Alumni Network</span>
@@ -204,7 +207,7 @@ export default function AlumniGiving() {
       )}
 
       {/* Alumni Magazine */}
-      <section className="section bg-off-white">
+      <section id="magazine" className="section bg-off-white">
         <div className="container">
           <div className="ag-magazine-block reveal">
             <div>

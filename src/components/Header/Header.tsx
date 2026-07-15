@@ -188,11 +188,11 @@ const navItems: NavItem[] = [
   {
     label: 'Alumni & Giving',
     children: [
-      { label: 'Alumni Network', path: '/alumni-giving' },
-      { label: 'Giving Opportunities', path: '/alumni-giving' },
-      { label: 'Alumni Events', path: '/alumni-giving' },
-      { label: 'Prathibha Magazine', path: '/alumni-giving' },
-      { label: 'Success Stories', path: '/alumni-giving' },
+      { label: 'Alumni Network', path: '/alumni-giving#network' },
+      { label: 'Giving Opportunities', path: '/alumni-giving#give' },
+      { label: 'Alumni Events', path: '/alumni-giving#events' },
+      { label: 'Prathibha Magazine', path: '/alumni-giving#magazine' },
+      { label: 'Success Stories', path: '/alumni-giving#alumni' },
     ],
   },
   {
