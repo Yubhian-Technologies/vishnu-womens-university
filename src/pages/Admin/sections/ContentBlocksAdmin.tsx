@@ -40,7 +40,6 @@ export const CONTENT_BLOCK_SECTIONS: { page: string; section: string; label: str
   { page: 'news-awards', section: 'highlights', label: 'News & Awards — Highlights' },
   { page: 'about-sves', section: 'stats', label: 'About SVES — Stats' },
   { page: 'about-sves', section: 'milestones', label: 'About SVES — Milestones' },
-  { page: 'home', section: 'whyVwu', label: 'Home — Why VWU Stats' },
   { page: 'home', section: 'recognitions', label: 'Home — Recognitions' },
   { page: 'home', section: 'campusFeatures', label: 'Home — Campus Features' },
   { page: 'home', section: 'testimonials', label: 'Home — Testimonials' },

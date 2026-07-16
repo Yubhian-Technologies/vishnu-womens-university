@@ -1,12 +1,17 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import AnnouncementsTicker from '../AnnouncementsTicker/AnnouncementsTicker';
+import { useOrderedCollection } from '../../hooks/useCollection';
+import type { CurriculumDoc } from '../../pages/Admin/sections/CurriculumAdmin';
+import type { DownloadDoc } from '../../pages/Admin/sections/DownloadsAdmin';
+import { PROGRAM_LABELS } from '../../pages/Academics/CurriculumMatrix';
 import './Header.css';
 
 interface NavChild {
   label: string;
   path: string;
   external?: boolean;
+  disabled?: boolean;
 }
 
 interface NavGroup {
@@ -123,12 +128,20 @@ const navItems: NavItem[] = [
     ],
   },
   {
+    // Course Curriculum / Academic Documents groups are appended at render
+    // time from live Firestore data — see academicsGroups in Header().
     label: 'Academics',
-    children: [
-      { label: 'Programs & Departments', path: '/academics' },
-      { label: 'Faculty', path: '/faculty' },
-      { label: 'Result Analysis', path: '/result-analysis' },
-      { label: 'Academic Calendar', path: '/information#academic-calendar' },
+    groups: [
+      {
+        groupLabel: 'Programs',
+        groupPath: '/academics',
+        items: [
+          { label: 'Programs & Departments', path: '/academics' },
+          { label: 'Faculty', path: '/faculty' },
+          { label: 'Result Analysis', path: '/result-analysis' },
+          { label: 'Academic Calendar', path: '/information#academic-calendar' },
+        ],
+      },
     ],
   },
   {
@@ -220,6 +233,40 @@ export default function Header() {
   const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
   const location = useLocation();
 
+  const { docs: curriculumDocs, loading: curriculumLoading } = useOrderedCollection<CurriculumDoc>('curriculum', 'rowOrder');
+  const { docs: downloadDocs, loading: downloadsLoading } = useOrderedCollection<DownloadDoc>('downloads', 'order');
+
+  const curriculumPrograms = Array.from(new Set(curriculumDocs.map((d) => d.program)));
+  const courseCurriculumGroup: NavGroup = {
+    groupLabel: 'Course Curriculum',
+    groupPath: '/academics/curriculum',
+    items: curriculumLoading
+      ? [{ label: 'Loading…', path: '', disabled: true }]
+      : curriculumPrograms.length > 0
+        ? curriculumPrograms.map((p) => ({
+            label: PROGRAM_LABELS[p] ?? p,
+            path: `/academics/curriculum#curriculum-${p}`,
+          }))
+        : [{ label: 'No documents yet', path: '', disabled: true }],
+  };
+  const academicDocsGroup: NavGroup = {
+    groupLabel: 'Academic Documents',
+    groupPath: '/academics/downloads',
+    items: downloadsLoading
+      ? [{ label: 'Loading…', path: '', disabled: true }]
+      : downloadDocs.length > 0
+        ? downloadDocs.map((d) => ({ label: d.title, path: d.fileUrl, external: true }))
+        : [{ label: 'No documents yet', path: '', disabled: true }],
+  };
+
+  // Academics' groups are static (Programs) + these two live-Firestore-derived
+  // ones, computed here since navItems itself is a module-level constant.
+  const renderedNavItems: NavItem[] = navItems.map((item) =>
+    item.label === 'Academics'
+      ? { ...item, groups: [...(item.groups ?? []), courseCurriculumGroup, academicDocsGroup] }
+      : item
+  );
+
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -280,7 +327,7 @@ export default function Header() {
           {/* Desktop Nav */}
           <nav className="nav" aria-label="Main navigation">
             <ul className="nav-list">
-              {navItems.map((item) => (
+              {renderedNavItems.map((item) => (
                 <li key={item.label} className="nav-item">
                   <button className="nav-link" aria-haspopup="true">
                     {item.label}
@@ -326,9 +373,19 @@ export default function Header() {
                           <ul className={`mega-group-list${group.items.length > 9 ? ' cols-2' : ''}`}>
                             {group.items.map((child) => (
                               <li key={child.label}>
-                                <Link to={child.path} className="dropdown-item" role="menuitem">
-                                  {child.label}
-                                </Link>
+                                {child.disabled ? (
+                                  <span className="dropdown-item" style={{ opacity: 0.5, cursor: 'default' }}>
+                                    {child.label}
+                                  </span>
+                                ) : child.external ? (
+                                  <a href={child.path} className="dropdown-item" role="menuitem" target="_blank" rel="noopener noreferrer">
+                                    {child.label}
+                                  </a>
+                                ) : (
+                                  <Link to={child.path} className="dropdown-item" role="menuitem">
+                                    {child.label}
+                                  </Link>
+                                )}
                               </li>
                             ))}
                           </ul>
@@ -371,7 +428,7 @@ export default function Header() {
           </div>
 
           <ul className="mobile-nav-list">
-            {navItems.map((item) => {
+            {renderedNavItems.map((item) => {
               const isExpanded = expandedItem === item.label;
               return (
                 <li key={item.label} className="mobile-nav-item">
@@ -426,7 +483,13 @@ export default function Header() {
                               <ul className="mobile-group-items">
                                 {group.items.map((child) => (
                                   <li key={child.label}>
-                                    <Link to={child.path} className="mobile-sub-item">{child.label}</Link>
+                                    {child.disabled ? (
+                                      <span className="mobile-sub-item" style={{ opacity: 0.5 }}>{child.label}</span>
+                                    ) : child.external ? (
+                                      <a href={child.path} className="mobile-sub-item" target="_blank" rel="noopener noreferrer">{child.label}</a>
+                                    ) : (
+                                      <Link to={child.path} className="mobile-sub-item">{child.label}</Link>
+                                    )}
                                   </li>
                                 ))}
                               </ul>

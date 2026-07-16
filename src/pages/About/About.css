@@ -1,10 +1,16 @@
 .about-facts-bar {
-  display: grid;
-  grid-template-columns: repeat(8, 1fr);
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: stretch;
   gap: var(--space-2);
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.3) transparent;
 }
 
 .about-fact {
+  flex: 1 1 0;
+  min-width: 90px;
   text-align: center;
   padding: var(--space-3);
   border-right: 1px solid rgba(255,255,255,0.1);
@@ -224,13 +230,12 @@
 
 /* Responsive */
 @media (max-width: 1024px) {
-  .about-facts-bar { grid-template-columns: repeat(4, 1fr); }
   .about-mission-grid { grid-template-columns: 1fr; gap: var(--space-8); }
   .about-diff-grid { grid-template-columns: 1fr; }
   .about-discover-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 640px) {
-  .about-facts-bar { grid-template-columns: repeat(2, 1fr); }
+  .about-fact { min-width: 76px; padding: var(--space-2); }
   .about-discover-grid { grid-template-columns: 1fr; }
 }

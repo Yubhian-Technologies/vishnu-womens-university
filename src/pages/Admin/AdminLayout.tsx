@@ -25,6 +25,8 @@ export const SECTIONS = [
   { id: 'content-blocks', icon: '🧩', label: 'Page Content Blocks' },
   { id: 'contacts',       icon: '📇', label: 'Department Contacts' },
   { id: 'sves-campuses',  icon: '🏘️', label: 'SVES Campuses' },
+  { id: 'downloads',      icon: '📄', label: 'Academic Documents' },
+  { id: 'curriculum',     icon: '📚', label: 'Course Curriculum Matrix' },
 ];
 
 export default function AdminLayout() {
