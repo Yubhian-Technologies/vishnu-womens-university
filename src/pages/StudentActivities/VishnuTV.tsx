@@ -37,10 +37,11 @@ export default function VishnuTV() {
         defaultTitle="Vishnu TV Academy"
   defaultSubtitle="Student-run and student-driven — the only dedicated campus TV Academy in Andhra Pradesh."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Student Life', to: '/student-life' }, { label: 'Vishnu TV Academy' }]}
+        scrollCtaTargetId="vishnu-tv-content"
       />
 
       {/* About */}
-      <section className="section bg-white">
+      <section id="vishnu-tv-content" className="section bg-white" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
         <div className="container">
           <div className="grid-img-text">
             <div className="reveal-left">

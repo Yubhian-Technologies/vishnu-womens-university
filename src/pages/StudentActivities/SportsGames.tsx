@@ -37,10 +37,11 @@ export default function SportsGames() {
         defaultTitle="Sports & Games"
   defaultSubtitle="Physical fitness is taken seriously at VWU — a sound body supports a sound mind, and both are essential to a complete education."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Student Life', to: '/student-life' }, { label: 'Sports & Games' }]}
+        scrollCtaTargetId="sports-games-content"
       />
 
       {/* Philosophy */}
-      <section className="section bg-white">
+      <section id="sports-games-content" className="section bg-white" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
         <div className="container">
           <div className="grid-img-text">
             <div className="reveal-left">

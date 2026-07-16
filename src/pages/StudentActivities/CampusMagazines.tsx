@@ -64,10 +64,11 @@ export default function CampusMagazines() {
         defaultTitle="Campus Magazines"
   defaultSubtitle="Three publications that document academic achievements, student creativity, and the story of campus life at VWU and across SVES."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Student Life', to: '/student-life' }, { label: 'Campus Magazines' }]}
+        scrollCtaTargetId="campus-magazines-content"
       />
 
       {/* Magazines */}
-      <section className="section bg-off-white">
+      <section id="campus-magazines-content" className="section bg-off-white" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-14)' }}>
             <span className="section-label">Publications</span>

@@ -58,10 +58,11 @@ export default function Careers() {
         defaultTitle="Careers at VWU"
   defaultSubtitle="Build your career alongside a community of educators and professionals who are genuinely invested in advancing women in engineering and technology."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Careers' }]}
+        scrollCtaTargetId="careers-content"
       />
 
       {/* Why Join */}
-      <section className="section bg-off-white">
+      <section id="careers-content" className="section bg-off-white" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>
             <span className="section-label">Why VWU</span>

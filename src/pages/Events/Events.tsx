@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Clock, MapPin } from 'lucide-react';
 import './Events.css';
 import PageHero from '../../components/PageHero/PageHero';
+import { useHashScroll } from '../../hooks/useHashScroll';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import type { EventDoc } from '../Admin/sections/EventsAdmin';
 
@@ -19,6 +20,8 @@ export default function Events() {
   const [activeCategory, setActiveCategory] = useState('All');
   const [view, setView] = useState<'list' | 'grid'>('list');
   const categories = ['All', ...Array.from(new Set(events.map(e => e.category)))];
+
+  useHashScroll();
 
   useEffect(() => {
     document.title = 'Events | Vishnu Womens University';
@@ -56,10 +59,11 @@ export default function Events() {
         defaultTitle="Campus Events"
   defaultSubtitle="Technical symposia, sports tournaments, graduation ceremonies, and much more — the VWU calendar is always full."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Events' }]}
+        scrollCtaTargetId="events-content"
       />
 
       {/* Featured Events */}
-      <section className="section bg-off-white">
+      <section id="events-content" className="section bg-off-white" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
         <div className="container">
           <div className="reveal" style={{ marginBottom: 'var(--space-8)' }}>
             <span className="section-label">Don't Miss</span>

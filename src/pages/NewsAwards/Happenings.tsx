@@ -38,6 +38,7 @@ export default function Happenings() {
         defaultTitle="Happenings at VWU"
   defaultSubtitle="Workshops, MoUs, competitions, achievements, and institutional milestones — a running record of life at VWU."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'News & Awards', to: '/news-awards' }, { label: 'Happenings' }]}
+        scrollCtaTargetId="happenings-content"
       />
 
       {/* Upcoming Events */}

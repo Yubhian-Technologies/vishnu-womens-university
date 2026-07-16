@@ -188,8 +188,8 @@ export default function About() {
             </p>
           </div>
           <div className="exec-grid">
-            {executives.map((exec, i) => (
-              <div key={exec.name} className="exec-card reveal" data-delay={`${i * 50}`}>
+            {executives.map((exec) => (
+              <div key={exec.name} className="exec-card">
                 {exec.photoUrl ? (
                   <SmoothImage src={exec.photoUrl} alt={exec.name} className="exec-card__photo" />
                 ) : (

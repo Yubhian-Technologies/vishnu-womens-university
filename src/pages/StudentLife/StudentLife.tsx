@@ -85,10 +85,11 @@ export default function StudentLife() {
         defaultTitle="Discover Your Place at VWU"
   defaultSubtitle="VWU offers more than an engineering qualification. It is where you find your community, sharpen your purpose, and start building your future."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Student Life' }]}
+        scrollCtaTargetId="student-life-content"
       />
 
       {/* Quote Banner */}
-      <section style={{ background: 'var(--color-accent)', padding: 'var(--space-6) 0' }}>
+      <section id="student-life-content" style={{ background: 'var(--color-accent)', padding: 'var(--space-6) 0', scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
         <div className="container" style={{ textAlign: 'center' }}>
           <p style={{ fontFamily: 'var(--font-serif)', fontStyle: 'italic', fontSize: 'clamp(1rem, 2.5vw, 1.4rem)', color: 'var(--color-primary-dark)', fontWeight: 700 }}>
             "VWU is a place where excellence and genuine support go hand in hand. If you are serious about becoming a skilled, confident engineer, this is where you belong." — Divya, ECE Graduate

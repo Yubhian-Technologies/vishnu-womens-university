@@ -77,6 +77,7 @@ export default function Gallery() {
         defaultTitle="Gallery"
   defaultSubtitle="A visual archive of campus life at VWU — from national competitions and graduation days to cultural festivals and industry events."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'News & Awards', to: '/news-awards' }, { label: 'Gallery' }]}
+        scrollCtaTargetId="gallery-content"
       />
 
       {/* Stats */}
