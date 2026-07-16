@@ -1,13 +1,15 @@
 import { useEffect } from 'react';
-import { Link, useParams, Navigate } from 'react-router-dom';
+import { Link, useParams, useLocation, Navigate } from 'react-router-dom';
 import { where } from 'firebase/firestore';
-import { Check, Microscope } from 'lucide-react';
+import { Check, Microscope, Compass, Target, Sparkles, Mail, ExternalLink } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import { useCollection, useOrderedCollection } from '../../hooks/useCollection';
 import { resolveProgramIcon } from '../../lib/programIcons';
 import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
 import type { FacultyDoc } from './Faculty';
 import '../detail-layout.css';
+
+const NAV_OFFSET = 'calc(var(--topbar-height) + var(--header-height) + 1rem)';
 
 const categoryLabel: Record<string, string> = {
   btech: 'B.Tech',
@@ -18,6 +20,7 @@ const categoryLabel: Record<string, string> = {
 
 export default function ProgramDetail() {
   const { slug } = useParams<{ slug: string }>();
+  const location = useLocation();
   const { docs, loading } = useCollection<ProgramDoc>('programs', [where('slug', '==', slug || '')]);
   const program = docs[0];
   const Icon = resolveProgramIcon(program?.icon);
@@ -31,8 +34,35 @@ export default function ProgramDetail() {
     }
   }, [program]);
 
+  // Content (and the #hod / #faculty / etc. anchors within it) only exists in the DOM
+  // once `program` has loaded — a plain useHashScroll() keyed on location.hash alone
+  // would fire before that and never re-run once the section actually mounts.
+  useEffect(() => {
+    if (!program || !location.hash) return;
+    const el = document.getElementById(location.hash.slice(1));
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [program, location.hash]);
+
   if (loading) return <main className="page-wrapper" style={{ minHeight: '60vh' }} />;
   if (!program) return <Navigate to="/academics" replace />;
+
+  const hasVisionMission = !!(program.vision || program.mission?.length || program.coreValues?.length);
+  const hasOutcomeStatements = !!(program.peos?.length || program.pos?.length || program.psos?.length);
+  const hasHod = !!(program.hodMessage || program.hodImage || program.hodEmail);
+  const hasMindMap = !!program.mindMapImage;
+  const hasLabs = !!(program.labs && program.labs.length > 0);
+  const hasCurriculum = !!(program.semesters && program.semesters.length > 0);
+
+  const quickLinks = [
+    { id: 'about', label: 'About the Department' },
+    hasVisionMission && { id: 'vision-mission', label: 'Vision, Mission & Values' },
+    hasOutcomeStatements && { id: 'peos-pos-psos', label: 'PEOs, POs & PSOs' },
+    hasHod && { id: 'hod', label: 'About HOD' },
+    faculty.length > 0 && { id: 'faculty', label: 'Faculty' },
+    hasMindMap && { id: 'mindmap', label: 'Mind Map' },
+    hasCurriculum && { id: 'curriculum', label: 'Curriculum' },
+    hasLabs && { id: 'labs', label: 'Laboratories' },
+  ].filter(Boolean) as { id: string; label: string }[];
 
   return (
     <main className="page-wrapper">
@@ -66,7 +96,11 @@ export default function ProgramDetail() {
               ...(program.hod ? [{ label: 'Head of Department', value: program.hod }] : []),
             ].map((s) => (
               <div key={s.label} style={{ textAlign: 'center' }}>
-                <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.15rem', fontWeight: 900, color: 'var(--color-accent)', whiteSpace: 'nowrap' }}>{s.value}</div>
+                {s.label === 'Head of Department' && hasHod ? (
+                  <a href="#hod" style={{ fontFamily: 'var(--font-serif)', fontSize: '1.15rem', fontWeight: 900, color: 'var(--color-accent)', whiteSpace: 'nowrap', textDecoration: 'underline', textUnderlineOffset: 3 }}>{s.value}</a>
+                ) : (
+                  <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.15rem', fontWeight: 900, color: 'var(--color-accent)', whiteSpace: 'nowrap' }}>{s.value}</div>
+                )}
                 <div style={{ fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.65)', fontFamily: 'var(--font-sans)', marginTop: 2, textTransform: 'uppercase', letterSpacing: '0.07em' }}>{s.label}</div>
               </div>
             ))}
@@ -75,7 +109,7 @@ export default function ProgramDetail() {
       </section>
 
       {/* About + Highlights */}
-      <section className="section bg-white">
+      <section id="about" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
         <div className="container">
           <div className="detail-grid">
             {/* Main content */}
@@ -109,6 +143,24 @@ export default function ProgramDetail() {
             {/* Sidebar */}
             <div className="detail-sidebar">
               <div style={{ position: 'sticky', top: 'calc(var(--topbar-height) + var(--header-height) + 1.5rem)', display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
+                {/* Quick Links */}
+                {quickLinks.length > 1 && (
+                  <div style={{ background: 'var(--color-primary)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)' }}>
+                    <h4 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 800, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 'var(--space-4)', paddingBottom: 'var(--space-3)', borderBottom: '1px solid rgba(255,255,255,0.15)' }}>
+                      Quick Links
+                    </h4>
+                    <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+                      {quickLinks.map((l) => (
+                        <li key={l.id}>
+                          <a href={`#${l.id}`} style={{ display: 'block', padding: 'var(--space-2) 0', color: 'rgba(255,255,255,0.85)', fontSize: 'var(--text-sm)', fontWeight: 600, textDecoration: 'none', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+                            {l.label}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
                 {/* Career Outcomes */}
                 {program.outcomes && program.outcomes.length > 0 && (
                   <div style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)' }}>
@@ -140,20 +192,86 @@ export default function ProgramDetail() {
         </div>
       </section>
 
-      {/* Labs & Resources */}
-      {program.labs && program.labs.length > 0 && (
-        <section className="section bg-off-white">
+      {/* Vision, Mission & Values */}
+      {hasVisionMission && (
+        <section id="vision-mission" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
           <div className="container">
             <div style={{ marginBottom: 'var(--space-10)' }}>
-              <span className="section-label">Infrastructure</span>
-              <h2 className="section-title">Labs & Resources</h2>
-              <p className="section-desc">State-of-the-art laboratory facilities that bring coursework to life with hands-on, industry-relevant experimentation.</p>
+              <span className="section-label">Our Foundation</span>
+              <h2 className="section-title">Vision, Mission &amp; Values</h2>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 'var(--space-4)' }}>
-              {program.labs.map((lab) => (
-                <div key={lab} style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', display: 'flex', alignItems: 'center', gap: 'var(--space-4)', borderLeft: '4px solid var(--color-accent)' }}>
-                  <Microscope size={22} strokeWidth={1.75} style={{ flexShrink: 0, color: 'var(--color-accent)' }} />
-                  <span style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-primary)', lineHeight: 1.4 }}>{lab}</span>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--space-6)' }}>
+              {program.vision && (
+                <div style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderTop: '4px solid var(--color-accent)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-3)' }}>
+                    <Compass size={20} strokeWidth={1.75} style={{ color: 'var(--color-accent)' }} />
+                    <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 800, color: 'var(--color-primary)' }}>Vision</h3>
+                  </div>
+                  <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.75 }}>{program.vision}</p>
+                </div>
+              )}
+              {program.mission && program.mission.length > 0 && (
+                <div style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderTop: '4px solid var(--color-accent)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-3)' }}>
+                    <Target size={20} strokeWidth={1.75} style={{ color: 'var(--color-accent)' }} />
+                    <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 800, color: 'var(--color-primary)' }}>Mission</h3>
+                  </div>
+                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                    {program.mission.map((m) => (
+                      <li key={m} style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'flex-start', fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6 }}>
+                        <Check size={14} strokeWidth={2.5} style={{ color: 'var(--color-accent)', flexShrink: 0, marginTop: 3 }} />
+                        {m}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {program.coreValues && program.coreValues.length > 0 && (
+                <div style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderTop: '4px solid var(--color-accent)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-3)' }}>
+                    <Sparkles size={20} strokeWidth={1.75} style={{ color: 'var(--color-accent)' }} />
+                    <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 800, color: 'var(--color-primary)' }}>Core Values</h3>
+                  </div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+                    {program.coreValues.map((v) => (
+                      <span key={v} style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--color-primary)', background: 'var(--color-off-white)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-full)', padding: '0.35rem 0.9rem' }}>
+                        {v}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* PEOs, POs & PSOs */}
+      {hasOutcomeStatements && (
+        <section id="peos-pos-psos" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
+          <div className="container">
+            <div style={{ marginBottom: 'var(--space-10)' }}>
+              <span className="section-label">Outcome-Based Education</span>
+              <h2 className="section-title">PEOs, POs &amp; PSOs</h2>
+              <p className="section-desc">The programme&apos;s educational objectives and outcomes, aligned to national accreditation frameworks.</p>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 'var(--space-6)' }}>
+              {[
+                { key: 'peos', title: 'Programme Educational Objectives (PEOs)', items: program.peos },
+                { key: 'pos', title: 'Programme Outcomes (POs)', items: program.pos },
+                { key: 'psos', title: 'Programme Specific Outcomes (PSOs)', items: program.psos },
+              ].filter((g) => g.items && g.items.length > 0).map((g) => (
+                <div key={g.key} style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)' }}>
+                  <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 800, color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 'var(--space-4)', paddingBottom: 'var(--space-3)', borderBottom: '2px solid var(--color-accent)' }}>
+                    {g.title}
+                  </h3>
+                  <ol style={{ padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', listStylePosition: 'inside' }}>
+                    {g.items!.map((item, i) => (
+                      <li key={item} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.65 }}>
+                        <strong style={{ color: 'var(--color-accent)' }}>{g.key.slice(0, -1).toUpperCase()}{i + 1}:</strong> {item}
+                      </li>
+                    ))}
+                  </ol>
                 </div>
               ))}
             </div>
@@ -161,9 +279,61 @@ export default function ProgramDetail() {
         </section>
       )}
 
+      {/* About HOD */}
+      {hasHod && (
+        <section id="hod" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
+          <div className="container">
+            <div style={{ marginBottom: 'var(--space-10)' }}>
+              <span className="section-label">Leadership</span>
+              <h2 className="section-title">About HOD</h2>
+            </div>
+            <div style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
+              <div style={{ display: 'flex', gap: 'var(--space-8)', flexWrap: 'wrap', alignItems: 'flex-start', padding: 'var(--space-8)' }}>
+                {program.hodImage && (
+                  <SmoothImage
+                    src={program.hodImage}
+                    alt={program.hod || 'Head of Department'}
+                    style={{ width: 180, height: 180, objectFit: 'cover', borderRadius: 'var(--radius-md)', flexShrink: 0 }}
+                  />
+                )}
+                <div style={{ flex: '1 1 260px', minWidth: 0 }}>
+                  {program.hod && (
+                    <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.35rem', color: 'var(--color-primary)', marginBottom: 'var(--space-1)' }}>{program.hod}</h3>
+                  )}
+                  <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
+                    <span style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>
+                      Head of Department, {program.shortName || program.name}
+                    </span>
+                    {program.hodEmail && (
+                      <a href={`mailto:${program.hodEmail}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1)', fontSize: 'var(--text-sm)', color: 'var(--color-primary)', fontWeight: 600, textDecoration: 'none' }}>
+                        <Mail size={14} strokeWidth={1.75} /> {program.hodEmail}
+                      </a>
+                    )}
+                  </div>
+                  {program.hodMessage && (
+                    <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.85, whiteSpace: 'pre-line' }}>{program.hodMessage}</p>
+                  )}
+                </div>
+              </div>
+              {program.hodResearchProfiles && program.hodResearchProfiles.length > 0 && (
+                <div style={{ background: 'var(--color-primary)', padding: 'var(--space-4) var(--space-8)', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-5)' }}>
+                  <span style={{ fontSize: 'var(--text-xs)', fontWeight: 800, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Research Profiles</span>
+                  {program.hodResearchProfiles.map((link) => (
+                    <a key={link.label} href={link.url} target="_blank" rel="noopener noreferrer"
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1)', fontSize: 'var(--text-sm)', color: 'var(--color-white)', fontWeight: 600, textDecoration: 'none' }}>
+                      {link.label} <ExternalLink size={12} strokeWidth={2} />
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Faculty — live from the faculty collection, filtered to this program's department */}
       {faculty.length > 0 && (
-        <section className="section bg-white">
+        <section id="faculty" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
           <div className="container">
             <div style={{ marginBottom: 'var(--space-10)' }}>
               <span className="section-label">Our Team</span>
@@ -221,9 +391,25 @@ export default function ProgramDetail() {
         </section>
       )}
 
+      {/* Mind Map */}
+      {hasMindMap && (
+        <section id="mindmap" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
+          <div className="container">
+            <div style={{ marginBottom: 'var(--space-10)' }}>
+              <span className="section-label">Curriculum Overview</span>
+              <h2 className="section-title">Mind Map</h2>
+              <p className="section-desc">A visual overview of how the programme&apos;s courses and specialisations connect together.</p>
+            </div>
+            <div style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4)', textAlign: 'center' }}>
+              <SmoothImage src={program.mindMapImage} alt={`${program.shortName || program.name} curriculum mind map`} style={{ maxWidth: '100%', height: 'auto', borderRadius: 'var(--radius-sm)' }} />
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Curriculum — only if semesters present */}
-      {program.semesters && program.semesters.length > 0 && (
-        <section className="section bg-white">
+      {hasCurriculum && (
+        <section id="curriculum" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
           <div className="container">
             <div style={{ marginBottom: 'var(--space-10)' }}>
               <span className="section-label">Curriculum</span>
@@ -243,6 +429,27 @@ export default function ProgramDetail() {
                       </li>
                     ))}
                   </ul>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Laboratories */}
+      {hasLabs && (
+        <section id="labs" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
+          <div className="container">
+            <div style={{ marginBottom: 'var(--space-10)' }}>
+              <span className="section-label">Infrastructure</span>
+              <h2 className="section-title">Laboratories</h2>
+              <p className="section-desc">State-of-the-art laboratory facilities that bring coursework to life with hands-on, industry-relevant experimentation.</p>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 'var(--space-4)' }}>
+              {program.labs.map((lab) => (
+                <div key={lab} style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', display: 'flex', alignItems: 'center', gap: 'var(--space-4)', borderLeft: '4px solid var(--color-accent)' }}>
+                  <Microscope size={22} strokeWidth={1.75} style={{ flexShrink: 0, color: 'var(--color-accent)' }} />
+                  <span style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-primary)', lineHeight: 1.4 }}>{lab}</span>
                 </div>
               ))}
             </div>
