@@ -131,6 +131,50 @@
   opacity: 1;
 }
 
+/* ===== Admin-uploaded photo slides (Hero Banners, page="home") =====
+   Video keeps playing behind every slide; the photo is shown as framed
+   content within the slide itself, alongside the text — not as a
+   background replacement. */
+.slide-inner--with-image {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-10);
+}
+
+.slide-text {
+  width: 100%;
+}
+
+.slide-photo-wrap {
+  flex-shrink: 0;
+  width: min(420px, 38vw);
+  display: none;
+}
+
+.slide-photo {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: var(--radius-lg);
+  border: 3px solid rgba(255,255,255,0.25);
+  box-shadow: 0 24px 60px rgba(0,0,0,0.45);
+  transform: translateY(30px);
+  opacity: 0;
+  transition: all 0.7s ease 0.45s;
+}
+
+.slide.active .slide-photo {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+@media (min-width: 900px) {
+  .slide-photo-wrap {
+    display: block;
+  }
+}
+
 /* ===== Controls ===== */
 .hero-controls {
   position: absolute;

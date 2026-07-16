@@ -431,7 +431,11 @@
   }
   .adm-tuition-grid,
   .adm-contact-grid {
-    grid-template-columns: 1fr;
+    /* minmax(0, 1fr) rather than 1fr: grid items default to min-width: auto,
+       so an unshrinkable child (the Program Interest <select>, whose longest
+       option text sets its min-content width) was forcing this track — and
+       the whole grid — wider than the viewport instead of collapsing. */
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--space-8);
   }
 }

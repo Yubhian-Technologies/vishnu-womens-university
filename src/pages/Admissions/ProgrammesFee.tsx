@@ -82,7 +82,7 @@ export default function ProgrammesFee() {
               ))}
             </div>
           </div>
-          <div className="reveal" style={{ borderRadius: 'var(--radius-md)', overflow: 'hidden', boxShadow: 'var(--shadow-md)' }}>
+          <div className="reveal" style={{ borderRadius: 'var(--radius-md)', overflowX: 'auto', overflowY: 'hidden', boxShadow: 'var(--shadow-md)' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', background: 'var(--color-white)' }}>
               <thead>
                 <tr>
@@ -112,7 +112,7 @@ export default function ProgrammesFee() {
       {/* M.Tech + MBA */}
       <section className="section bg-white">
         <div className="container">
-          <div style={{ display: 'grid', gridTemplateColumns: '3fr 2fr', gap: 'var(--space-10)' }}>
+          <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: '3fr 2fr', gap: 'var(--space-10)' }}>
             {/* M.Tech */}
             <div>
               <div className="reveal" style={{ marginBottom: 'var(--space-6)' }}>
@@ -127,7 +127,7 @@ export default function ProgrammesFee() {
                   ))}
                 </div>
               </div>
-              <div className="reveal" style={{ borderRadius: 'var(--radius-md)', overflow: 'hidden', boxShadow: 'var(--shadow-md)' }}>
+              <div className="reveal" style={{ borderRadius: 'var(--radius-md)', overflowX: 'auto', overflowY: 'hidden', boxShadow: 'var(--shadow-md)' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', background: 'var(--color-white)' }}>
                   <thead>
                     <tr>

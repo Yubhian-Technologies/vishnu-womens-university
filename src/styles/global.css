@@ -496,4 +496,28 @@ h6 { font-size: var(--text-lg); }
     grid-template-columns: 1fr;
     gap: var(--space-6);
   }
+
+  /* Escape hatch for inline `style={{ gridTemplateColumns: '...' }}` layouts
+     that have no responsive class of their own — inline styles can't be
+     overridden by a plain media-query rule, hence !important here. Using
+     minmax(0, 1fr) rather than plain 1fr also guards against a grid track
+     being forced wider than the viewport by an unshrinkable child (e.g. a
+     <select> with long option text), since grid items default to
+     min-width: auto instead of 0. */
+  .mobile-stack-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: var(--space-6) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  /* .btn defaults to white-space: nowrap (intentional — keeps normal button
+     text on one line). This only kicks in for the rare button whose text is
+     long enough to overflow a small phone's width; short button text still
+     renders as a single line either way, so this is a no-op for every other
+     button on the site. */
+  .btn {
+    white-space: normal;
+    text-align: center;
+  }
 }

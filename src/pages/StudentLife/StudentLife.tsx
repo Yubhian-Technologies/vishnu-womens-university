@@ -121,7 +121,7 @@ export default function StudentLife() {
       </section>
 
       {/* Housing */}
-      <section style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', minHeight: '480px' }}>
+      <section className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', minHeight: '480px' }}>
         <div className="reveal-left" style={{ position: 'relative', overflow: 'hidden' }}>
           <img
             src="https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=900&q=80"

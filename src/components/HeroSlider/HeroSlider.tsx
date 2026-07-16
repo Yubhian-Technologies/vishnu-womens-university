@@ -2,19 +2,21 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Trophy, Star, ClipboardList, Briefcase, TrendingUp } from 'lucide-react';
 import heroVideo from '../../data/YTDown_YouTube_Vishnu-Campus-Bhimavaram-Latest-Video-Dr_Media_jMN3oRKJnR0_002_720p.mp4';
+import { usePageBanners } from '../../hooks/usePageBanners';
 import './HeroSlider.css';
 
 
 interface Slide {
-  id: number;
+  id: number | string;
   tag: string;
   heading: string;
   description: string;
   primaryCta: { label: string; path: string };
-  secondaryCta: { label: string; path: string };
+  secondaryCta?: { label: string; path: string };
+  image?: string;
 }
 
-const slides: Slide[] = [
+const staticSlides: Slide[] = [
   {
     id: 1,
     tag: 'Welcome to VWU',
@@ -66,6 +68,22 @@ export default function HeroSlider() {
   const [isMuted, setIsMuted] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
 
+  // Admin-uploaded Hero Banners (page="home") are appended after the fixed
+  // marketing slides — the video keeps playing behind all of them, these
+  // just add their photo alongside the slide's own text/CTA.
+  const { slides: bannerSlides } = usePageBanners('home');
+  const slides: Slide[] = [
+    ...staticSlides,
+    ...bannerSlides.map((b) => ({
+      id: b.id,
+      tag: 'Announcement',
+      heading: b.title,
+      description: b.subtitle,
+      primaryCta: { label: b.ctaLabel || 'Learn More', path: b.ctaLink || '/admissions' },
+      image: b.imageUrl,
+    })),
+  ];
+
   const goTo = useCallback((index: number) => {
     if (isAnimating) return;
     setIsAnimating(true);
@@ -76,11 +94,11 @@ export default function HeroSlider() {
 
   const next = useCallback(() => {
     goTo((current + 1) % slides.length);
-  }, [current, goTo]);
+  }, [current, goTo, slides.length]);
 
   const prev = useCallback(() => {
     goTo((current - 1 + slides.length) % slides.length);
-  }, [current, goTo]);
+  }, [current, goTo, slides.length]);
 
   useEffect(() => {
     setProgressWidth(0);
@@ -124,22 +142,31 @@ export default function HeroSlider() {
           aria-hidden={i !== current}
         >
           <div className="slide-content">
-            <div className="slide-inner">
-              <span className="slide-tag">{slide.tag}</span>
-              <h1 className="slide-heading">
-                {slide.heading.split('\n').map((line, j) => (
-                  <span key={j}>{line}<br /></span>
-                ))}
-              </h1>
-              <p className="slide-desc">{slide.description}</p>
-              <div className="slide-actions">
-                <Link to={slide.primaryCta.path} className="btn btn-accent btn-lg">
-                  {slide.primaryCta.label}
-                </Link>
-                <Link to={slide.secondaryCta.path} className="btn btn-secondary btn-lg">
-                  {slide.secondaryCta.label}
-                </Link>
+            <div className={`slide-inner${slide.image ? ' slide-inner--with-image' : ''}`}>
+              <div className="slide-text">
+                <span className="slide-tag">{slide.tag}</span>
+                <h1 className="slide-heading">
+                  {slide.heading.split('\n').map((line, j) => (
+                    <span key={j}>{line}<br /></span>
+                  ))}
+                </h1>
+                <p className="slide-desc">{slide.description}</p>
+                <div className="slide-actions">
+                  <Link to={slide.primaryCta.path} className="btn btn-accent btn-lg">
+                    {slide.primaryCta.label}
+                  </Link>
+                  {slide.secondaryCta && (
+                    <Link to={slide.secondaryCta.path} className="btn btn-secondary btn-lg">
+                      {slide.secondaryCta.label}
+                    </Link>
+                  )}
+                </div>
               </div>
+              {slide.image && (
+                <div className="slide-photo-wrap">
+                  <img src={slide.image} alt={slide.heading} className="slide-photo" />
+                </div>
+              )}
             </div>
           </div>
         </div>

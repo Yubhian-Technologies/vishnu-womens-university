@@ -962,6 +962,14 @@
 }
 
 @media (max-width: 768px) {
+  /* .event-item is a single flex row (date badge + content + arrow) with no
+     wrap and no min-width:0 on the flexible content column — its .event-meta
+     children (time/location, each with an icon) refused to shrink and were
+     being squeezed into unreadably narrow wrapped slivers instead of
+     wrapping normally. */
+  .event-content { min-width: 0; }
+  .event-meta { flex-wrap: wrap; row-gap: var(--space-1); }
+
   .study-grid         { grid-template-columns: 1fr; }
   .recognition-grid   { grid-template-columns: 1fr; }
   .news-grid          { grid-template-columns: 1fr; }

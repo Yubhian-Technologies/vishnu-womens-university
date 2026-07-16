@@ -436,7 +436,10 @@
   .photo-grid-collage-3 .photo-grid-item--featured,
   .photo-grid-collage-4 .photo-grid-item--featured {
     grid-column: 1 / -1;
-    grid-row: auto;
+    /* span 2 rows (2 * 160px = 320px of track) rather than 1 (grid-row: auto,
+       i.e. 160px) — the explicit 220px height below overflowed a single
+       fixed-size auto-row and spilled into/over the row underneath it. */
+    grid-row: span 2;
     height: 220px;
   }
 
@@ -456,7 +459,7 @@
   }
   .photo-grid-collage-2 .photo-grid-item--featured {
     grid-column: 1 / -1;
-    grid-row: auto;
+    grid-row: span 2;
     height: 220px;
   }
 
