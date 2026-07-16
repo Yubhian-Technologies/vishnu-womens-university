@@ -1,27 +1,14 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
-import { BookOpen, Hospital, Building, Accessibility, Hotel, Trophy, Sparkle } from 'lucide-react';
-
-const communities = [
-  { icon: BookOpen, title: 'Rural Students', desc: 'Extending educational support and skills programs to economically disadvantaged students from rural backgrounds.' },
-  { icon: Hospital, title: 'Leprosy Care', desc: 'Offering care, compassion, and dignity to individuals affected by leprosy through regular visits and welfare activities.' },
-  { icon: Building, title: 'Village Communities', desc: 'Working with nearby villages on technical literacy, nutritional awareness, and broader community welfare initiatives.' },
-  { icon: Accessibility, title: 'Persons with Disabilities', desc: 'Supporting individuals with physical disabilities through awareness programs, assistive technology exposure, and inclusive campus activities.' },
-  { icon: Hotel, title: 'Hospital Patients', desc: 'Serving hospital patients through welfare visits, blood donation drives, and coordination with partner organisations.' },
-  { icon: Trophy, title: 'Academic Excellence', desc: 'Acknowledging and supporting high-achieving students from nearby institutions through mentoring and motivational programs.' },
-];
-
-const nssValues = [
-  'Not Me But You',
-  'Service before Self',
-  'Education through Community',
-  'Nation Building through Youth',
-  'Inclusive Development',
-  'Rural Empowerment',
-];
+import { BookOpen, Sparkle } from 'lucide-react';
+import { useContentBlocks } from '../../hooks/useContentBlocks';
+import { resolveContentIcon } from '../../lib/contentIcons';
 
 export default function SocialServices() {
+  const communities = useContentBlocks('social-services', 'communities');
+  const nssValues = useContentBlocks('social-services', 'values');
+
   useEffect(() => {
     document.title = 'Social Services | VWU';
     const observer = new IntersectionObserver(
@@ -97,17 +84,20 @@ export default function SocialServices() {
             </p>
           </div>
           <div className="grid-3">
-            {communities.map((c, i) => (
-              <div key={c.title} className="reveal" data-delay={`${i * 80}`}
-                style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', transition: 'all var(--transition-base)' }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-accent)'; (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-md)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-light-gray)'; (e.currentTarget as HTMLElement).style.boxShadow = 'none'; }}
-              >
-                <div style={{ marginBottom: 'var(--space-3)' }}><c.icon size={35} strokeWidth={1.75} /></div>
-                <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>{c.title}</h3>
-                <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6 }}>{c.desc}</p>
-              </div>
-            ))}
+            {communities.map((c) => {
+              const Icon = resolveContentIcon(c.icon) || BookOpen;
+              return (
+                <div key={c.id}
+                  style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', transition: 'all var(--transition-base)' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-accent)'; (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-md)'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-light-gray)'; (e.currentTarget as HTMLElement).style.boxShadow = 'none'; }}
+                >
+                  <div style={{ marginBottom: 'var(--space-3)' }}><Icon size={35} strokeWidth={1.75} /></div>
+                  <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>{c.title}</h3>
+                  <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6 }}>{c.desc}</p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -121,9 +111,9 @@ export default function SocialServices() {
               <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-6)' }}>NSS Core Values</h2>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
                 {nssValues.map((v) => (
-                  <div key={v} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+                  <div key={v.id} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
                     <Sparkle size={17} strokeWidth={1.75} style={{ color: 'var(--color-accent)', flexShrink: 0 }} />
-                    <span style={{ color: 'rgba(255,255,255,0.85)', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 600 }}>{v}</span>
+                    <span style={{ color: 'rgba(255,255,255,0.85)', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 600 }}>{v.title}</span>
                   </div>
                 ))}
               </div>

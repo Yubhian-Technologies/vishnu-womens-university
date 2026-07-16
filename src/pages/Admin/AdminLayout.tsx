@@ -17,6 +17,14 @@ export const SECTIONS = [
   { id: 'placements',     icon: '💼', label: 'Placements' },
   { id: 'alumni',         icon: '🎓', label: 'Alumni & Giving' },
   { id: 'announcements',  icon: '📢', label: 'Announcements' },
+  { id: 'information',    icon: '📅', label: 'Information Page' },
+  { id: 'events',         icon: '🎉', label: 'Events' },
+  { id: 'faqs',           icon: '❓', label: 'FAQs' },
+  { id: 'student-clubs',  icon: '🎭', label: 'Student Clubs' },
+  { id: 'job-openings',   icon: '💼', label: 'Job Openings' },
+  { id: 'content-blocks', icon: '🧩', label: 'Page Content Blocks' },
+  { id: 'contacts',       icon: '📇', label: 'Department Contacts' },
+  { id: 'sves-campuses',  icon: '🏘️', label: 'SVES Campuses' },
 ];
 
 export default function AdminLayout() {

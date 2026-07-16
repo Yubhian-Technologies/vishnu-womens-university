@@ -10,6 +10,14 @@ import CoreExecutivesAdmin from './sections/CoreExecutivesAdmin';
 import PlacementsAdmin from './sections/PlacementsAdmin';
 import AlumniAdmin from './sections/AlumniAdmin';
 import AnnouncementsAdmin from './sections/AnnouncementsAdmin';
+import InformationAdmin from './sections/InformationAdmin';
+import EventsAdmin from './sections/EventsAdmin';
+import FaqAdmin from './sections/FaqAdmin';
+import StudentClubsAdmin from './sections/StudentClubsAdmin';
+import JobOpeningsAdmin from './sections/JobOpeningsAdmin';
+import ContentBlocksAdmin from './sections/ContentBlocksAdmin';
+import ContactsAdmin from './sections/ContactsAdmin';
+import SvesCampusesAdmin from './sections/SvesCampusesAdmin';
 
 interface Props {
   activeSection: string;
@@ -28,6 +36,14 @@ const SECTION_MAP: Record<string, React.ReactNode> = {
   placements: <PlacementsAdmin />,
   alumni: <AlumniAdmin />,
   announcements: <AnnouncementsAdmin />,
+  information: <InformationAdmin />,
+  events: <EventsAdmin />,
+  faqs: <FaqAdmin />,
+  'student-clubs': <StudentClubsAdmin />,
+  'job-openings': <JobOpeningsAdmin />,
+  'content-blocks': <ContentBlocksAdmin />,
+  contacts: <ContactsAdmin />,
+  'sves-campuses': <SvesCampusesAdmin />,
 };
 
 export default function AdminDashboard({ activeSection, setActiveSection }: Props) {

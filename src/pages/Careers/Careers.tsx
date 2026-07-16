@@ -1,75 +1,28 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
-import { GraduationCap, IndianRupee, Hospital, Home, BookOpen, Handshake, CheckCircle2 } from 'lucide-react';
-
-const positions = [
-  {
-    dept: 'Computer Science & Engineering',
-    roles: [
-      { title: 'Professor / Associate Professor', type: 'Teaching', qual: 'Ph.D. in CSE / IT / AI & related fields' },
-      { title: 'Assistant Professor', type: 'Teaching', qual: 'M.Tech. in CSE / IT / AI (Ph.D. pursuing preferred)' },
-    ],
-  },
-  {
-    dept: 'Electronics & Communication Engineering',
-    roles: [
-      { title: 'Professor / Associate Professor', type: 'Teaching', qual: 'Ph.D. in ECE / VLSI / Signal Processing' },
-      { title: 'Assistant Professor', type: 'Teaching', qual: 'M.Tech. in ECE / Embedded Systems (Ph.D. pursuing preferred)' },
-    ],
-  },
-  {
-    dept: 'Electrical & Electronics Engineering',
-    roles: [
-      { title: 'Professor / Associate Professor', type: 'Teaching', qual: 'Ph.D. in EEE / Power Electronics / Power Systems' },
-      { title: 'Assistant Professor', type: 'Teaching', qual: 'M.Tech. in EEE / Power Systems (Ph.D. pursuing preferred)' },
-    ],
-  },
-  {
-    dept: 'Civil Engineering',
-    roles: [
-      { title: 'Professor / Associate Professor', type: 'Teaching', qual: 'Ph.D. in Civil Engineering / Structural Engineering' },
-      { title: 'Assistant Professor', type: 'Teaching', qual: 'M.Tech. in Civil / Structural / Environmental Engg.' },
-    ],
-  },
-  {
-    dept: 'Mechanical Engineering',
-    roles: [
-      { title: 'Professor / Associate Professor', type: 'Teaching', qual: 'Ph.D. in Mechanical Engineering / CAD / Manufacturing' },
-      { title: 'Assistant Professor', type: 'Teaching', qual: 'M.Tech. in ME / Thermal / Manufacturing (Ph.D. pursuing preferred)' },
-    ],
-  },
-  {
-    dept: 'Master of Business Administration',
-    roles: [
-      { title: 'Professor / Associate Professor', type: 'Teaching', qual: 'Ph.D. in Management / Finance / Marketing / HR' },
-      { title: 'Assistant Professor', type: 'Teaching', qual: 'MBA with Ph.D. / UGC-NET qualified' },
-    ],
-  },
-  {
-    dept: 'Non-Teaching / Administrative',
-    roles: [
-      { title: 'Lab Technician / Lab Assistant', type: 'Technical', qual: 'B.Sc. / Diploma in relevant field' },
-      { title: 'Administrative Officer', type: 'Administrative', qual: 'Graduate / Post-graduate with administrative experience' },
-      { title: 'Librarian', type: 'Technical', qual: 'M.Lib.Sc. / B.Lib.Sc. with relevant experience' },
-    ],
-  },
-];
-
-const perks = [
-  { icon: GraduationCap, title: 'Research Support', desc: 'Dedicated support for research projects, conference participation, and publication in recognised journals.' },
-  { icon: IndianRupee, title: 'Competitive Pay', desc: 'Remuneration aligned with AICTE/UGC norms, with increments tied to performance.' },
-  { icon: Hospital, title: 'Health & Wellness', desc: 'On-campus medical services, insurance coverage, and access to the Vishnu Wellness Centre.' },
-  { icon: Home, title: 'Staff Quarters', desc: 'Residential accommodation available on campus within the Green Meadows campus network.' },
-  { icon: BookOpen, title: 'Professional Development', desc: 'Access to FDPs, workshops, certifications, and sabbatical provisions for advanced study.' },
-  { icon: Handshake, title: 'Inclusive Culture', desc: 'A women-centred, collaborative academic environment that values diversity and mutual respect.' },
-];
+import { GraduationCap, CheckCircle2 } from 'lucide-react';
+import { useOrderedCollection } from '../../hooks/useCollection';
+import { useContentBlocks } from '../../hooks/useContentBlocks';
+import { resolveContentIcon } from '../../lib/contentIcons';
+import type { JobOpeningDoc } from '../Admin/sections/JobOpeningsAdmin';
 
 type FormData = {
   name: string; email: string; phone: string; dept: string; position: string; experience: string; message: string;
 };
 
 export default function Careers() {
+  const { docs: allOpenings } = useOrderedCollection<JobOpeningDoc>('jobOpenings', 'order');
+  const perks = useContentBlocks('careers', 'perks');
+  const positions = useMemo(() => {
+    const byDept = new Map<string, JobOpeningDoc[]>();
+    allOpenings.forEach((o) => {
+      if (!byDept.has(o.department)) byDept.set(o.department, []);
+      byDept.get(o.department)!.push(o);
+    });
+    return Array.from(byDept.entries()).map(([dept, roles]) => ({ dept, roles }));
+  }, [allOpenings]);
+
   const [form, setForm] = useState<FormData>({ name: '', email: '', phone: '', dept: '', position: '', experience: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
 
@@ -119,14 +72,17 @@ export default function Careers() {
             </p>
           </div>
           <div className="grid-3">
-            {perks.map((p, i) => (
-              <div key={p.title} className="reveal" data-delay={`${i * 60}`}
-                style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', borderLeft: '4px solid var(--color-accent)' }}>
-                <div style={{ marginBottom: 'var(--space-3)' }}><p.icon size={32} strokeWidth={1.75} /></div>
-                <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 800, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>{p.title}</h3>
-                <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6 }}>{p.desc}</p>
-              </div>
-            ))}
+            {perks.map((p) => {
+              const Icon = resolveContentIcon(p.icon) || GraduationCap;
+              return (
+                <div key={p.id}
+                  style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', borderLeft: '4px solid var(--color-accent)' }}>
+                  <div style={{ marginBottom: 'var(--space-3)' }}><Icon size={32} strokeWidth={1.75} /></div>
+                  <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 800, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>{p.title}</h3>
+                  <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6 }}>{p.desc}</p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -139,19 +95,21 @@ export default function Careers() {
             <h2 className="section-title">Current Openings</h2>
             <p className="section-desc">Applications from qualified candidates across all departments are accepted throughout the year.</p>
           </div>
+          {/* Rendered from Firestore, so no scroll-reveal animation here
+              (see the gotcha documented in CLAUDE.md). */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
-            {positions.map((dept, i) => (
-              <div key={dept.dept} className="reveal" data-delay={`${i * 40}`}
+            {positions.map((dept) => (
+              <div key={dept.dept}
                 style={{ border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
                 <div style={{ background: 'var(--color-primary)', padding: 'var(--space-4) var(--space-6)' }}>
                   <h3 style={{ color: 'var(--color-white)', fontFamily: 'var(--font-sans)', fontWeight: 800, fontSize: 'var(--text-base)' }}>{dept.dept}</h3>
                 </div>
                 <div style={{ padding: 'var(--space-4) 0' }}>
                   {dept.roles.map((role) => (
-                    <div key={role.title} style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: 'var(--space-4)', alignItems: 'center', padding: 'var(--space-3) var(--space-6)', borderBottom: '1px solid var(--color-off-white)' }}>
+                    <div key={role.id} style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: 'var(--space-4)', alignItems: 'center', padding: 'var(--space-3) var(--space-6)', borderBottom: '1px solid var(--color-off-white)' }}>
                       <div>
                         <div style={{ fontFamily: 'var(--font-sans)', fontWeight: 700, color: 'var(--color-primary)', fontSize: 'var(--text-sm)' }}>{role.title}</div>
-                        <div style={{ fontSize: '0.75rem', color: 'var(--color-text-light)', marginTop: 2 }}>{role.qual}</div>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--color-text-light)', marginTop: 2 }}>{role.qualification}</div>
                       </div>
                       <span style={{ fontSize: '0.68rem', fontWeight: 700, padding: '2px 10px', borderRadius: 'var(--radius-full)', background: 'rgba(201,168,76,0.12)', border: '1px solid rgba(201,168,76,0.35)', color: 'var(--color-accent)', whiteSpace: 'nowrap' }}>
                         {role.type}

@@ -1,11 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Trophy, Star, ClipboardList, Briefcase, TrendingUp, Medal, Laptop, GraduationCap, FlaskConical, Presentation, Factory, FileText, Globe2, Check, Clock, MapPin } from 'lucide-react';
+import { Laptop, GraduationCap, FlaskConical, Presentation, Check, Clock, MapPin } from 'lucide-react';
 import HeroSlider from '../../components/HeroSlider/HeroSlider';
 import CounterSection from '../../components/CounterSection/CounterSection';
 import NewsCard from '../../components/NewsCard/NewsCard';
 import { useOrderedCollection } from '../../hooks/useCollection';
+import { useContentBlocks } from '../../hooks/useContentBlocks';
+import { resolveContentIcon } from '../../lib/contentIcons';
 import { type NewsDoc, newsDocToArticle } from '../../lib/news';
+import type { EventDoc } from '../Admin/sections/EventsAdmin';
 import './Home.css';
 
 /* ── Data ─────────────────────────────────────────────────── */
@@ -17,24 +20,6 @@ const studyCards = [
 
 const popularPrograms = ['CSE', 'AI & Machine Learning', 'AI & Data Science', 'Cyber Security', 'Information Technology', 'Electronics & Communication', 'Electrical & Electronics', 'Civil Engineering', 'Mechanical Engineering', 'MBA'];
 
-const recognitions = [
-  { icon: Trophy, title: 'Top Engineering College', source: 'India Today Rankings' },
-  { icon: Star, title: 'Best Engineering College', source: 'The Week Rankings' },
-  { icon: ClipboardList, title: 'NBA Accreditation', source: 'National Board of Accreditation' },
-  { icon: Briefcase, title: 'NIRF Ranked Institution', source: 'Ministry of Education, India' },
-  { icon: TrendingUp, title: 'IEI Award for Excellence', source: 'Institution of Engineers India' },
-  { icon: Medal, title: 'UGC Autonomous Status', source: 'University Grants Commission' },
-];
-
-const events = [
-  { month: 'MAY', day: '20', title: 'Technova2026 National Symposium', time: '9:00 AM', location: 'VWU Auditorium, Bhimavaram' },
-  { month: 'JUN', day: '5',  title: 'mBAJA SAEINDIA 2026 Awards Ceremony', time: '10:00 AM', location: 'Main Campus, Bhimavaram' },
-  { month: 'JUN', day: '18', title: 'Amazon AFE Internship Orientation', time: '9:00 AM', location: 'Seminar Hall, VWU' },
-  { month: 'JUL', day: '10', title: '9th Graduation Day Ceremony', time: '10:00 AM', location: 'VWU Auditorium, Bhimavaram' },
-];
-
-const campusFeatures = ['Student Clubs & Organizations', 'Radio Vishnu 90.4', 'Vishnu TV Academy', 'Sports & Games Facilities', 'Career Services Center', "Women's Hostels", 'AR/VR Studio', 'Technology Business Incubator'];
-
 const activityItems = [
   { img: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=600&q=80', label: 'mBAJA SAEINDIA 2026 Win' },
   { img: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=600&q=80', label: 'Amazon AFE Internship' },
@@ -42,19 +27,6 @@ const activityItems = [
   { img: 'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=600&q=80', label: '8th Graduation Day' },
   { img: 'https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=600&q=80', label: 'IEI Award for Excellence' },
   { img: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=600&q=80', label: 'Space Application Center' },
-];
-
-const testimonials = [
-  { quote: 'VWU faculty genuinely invest in each student — they know your name, your ambitions, and they hold you to a high standard. The skills and confidence I gained here led directly to my placement at Google.', name: 'Lakshmi R., Class of 2024', role: 'Computer Science Engineering — Software Engineer at Google', avatar: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=200&q=80' },
-  { quote: 'VWU is a true launchpad. The research infrastructure, the labs, and the guidance I received here built the academic foundation that made my Ph.D. at IIT Hyderabad possible.', name: 'Anusha P., Class of 2022', role: 'M.Tech ECE — Research Scholar at IIT Hyderabad', avatar: 'https://images.unsplash.com/photo-1607746882042-944635dfe10e?w=200&q=80' },
-  { quote: 'Studying in an all-women environment gave me real confidence in my abilities. I led several national-level projects at VWU — and that leadership mindset is what drives my startup today.', name: 'Divya K., Class of 2023', role: 'CSE — Co-founder at TechFemme Startup', avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&q=80' },
-];
-
-const whyVwu = [
-  { icon: Presentation, stat: '300+', label: 'Qualified Faculty' },
-  { icon: Factory, stat: '500+', label: 'Industry Partners' },
-  { icon: FileText, stat: '90+', label: 'Patents Filed' },
-  { icon: Globe2, stat: '25+', label: 'Global MoUs' },
 ];
 
 /* ── Tilt Hook ────────────────────────────────────────────── */
@@ -111,6 +83,12 @@ export default function Home() {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const { docs: newsItems } = useOrderedCollection<NewsDoc>('news', 'date', 'desc');
   const featuredNews = newsItems.filter(n => n.featured).slice(0, 3);
+  const { docs: allEvents } = useOrderedCollection<EventDoc>('events', 'order');
+  const featuredEvents = allEvents.filter(e => e.featured).slice(0, 4);
+  const whyVwu = useContentBlocks('home', 'whyVwu');
+  const recognitions = useContentBlocks('home', 'recognitions');
+  const campusFeatures = useContentBlocks('home', 'campusFeatures');
+  const testimonials = useContentBlocks('home', 'testimonials');
 
   useEffect(() => {
     document.title = 'VWU | Empowering Women Through Knowledge and Action';
@@ -152,11 +130,12 @@ export default function Home() {
     return () => observer.disconnect();
   }, [featuredNews]);
 
-  // Testimonial auto-advance
+  // Testimonial auto-advance (re-armed once Firestore testimonials arrive)
   useEffect(() => {
+    if (testimonials.length === 0) return;
     timerRef.current = setInterval(() => setActiveTestimonial(p => (p + 1) % testimonials.length), 5000);
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
-  }, []);
+  }, [testimonials.length]);
 
   const tilt1 = useTilt(10);
   const tilt2 = useTilt(10);
@@ -184,15 +163,18 @@ export default function Home() {
         </div>
       </div>
 
-      {/* ── Quick Stats Bar ── */}
+      {/* ── Quick Stats Bar (Firestore-derived, no scroll-reveal — see CLAUDE.md gotcha) ── */}
       <div className="quick-stats-bar">
-        {whyVwu.map((w, i) => (
-          <div key={i} className="quick-stat reveal" data-delay={`${i * 80}`}>
-            <span className="quick-stat__icon"><w.icon size={22} strokeWidth={1.75} /></span>
-            <span className="quick-stat__num">{w.stat}</span>
-            <span className="quick-stat__label">{w.label}</span>
-          </div>
-        ))}
+        {whyVwu.map((w) => {
+          const Icon = resolveContentIcon(w.icon) || Presentation;
+          return (
+            <div key={w.id} className="quick-stat">
+              <span className="quick-stat__icon"><Icon size={22} strokeWidth={1.75} /></span>
+              <span className="quick-stat__num">{w.value}</span>
+              <span className="quick-stat__label">{w.title}</span>
+            </div>
+          );
+        })}
       </div>
 
       {/* ── Counter Stats ── */}
@@ -278,9 +260,9 @@ export default function Home() {
             <p>Belonging matters. At VWU, every student finds her footing in a community that genuinely supports her growth — academically, personally, and professionally.</p>
             <div className="campus-features">
               {campusFeatures.map((f, i) => (
-                <div key={f} className="campus-feature" style={{ animationDelay: `${i * 60}ms` }}>
+                <div key={f.id} className="campus-feature" style={{ animationDelay: `${i * 60}ms` }}>
                   <span className="campus-feature-check"><Check size={14} strokeWidth={2.5} /></span>
-                  {f}
+                  {f.title}
                 </div>
               ))}
             </div>
@@ -333,18 +315,21 @@ export default function Home() {
             <h2 className="section-title gradient-text">VWU's Commitment to Excellence</h2>
           </div>
           <div className="recognition-grid">
-            {recognitions.map((r, i) => (
-              <div key={r.title} className="rec-card reveal" data-delay={`${i * 90}`}>
-                <div className="rec-badge-wrap">
-                  <div className="rec-badge"><r.icon size={24} strokeWidth={1.75} /></div>
-                  <div className="rec-badge-ring" />
+            {recognitions.map((r) => {
+              const Icon = resolveContentIcon(r.icon) || Presentation;
+              return (
+                <div key={r.id} className="rec-card">
+                  <div className="rec-badge-wrap">
+                    <div className="rec-badge"><Icon size={24} strokeWidth={1.75} /></div>
+                    <div className="rec-badge-ring" />
+                  </div>
+                  <div className="rec-body">
+                    <strong>{r.title}</strong>
+                    <span>{r.desc}</span>
+                  </div>
                 </div>
-                <div className="rec-body">
-                  <strong>{r.title}</strong>
-                  <span>{r.source}</span>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -364,14 +349,14 @@ export default function Home() {
           </div>
           <div className="testimonial-carousel">
             {testimonials.map((t, i) => (
-              <div key={i} className={`testimonial-slide${i === activeTestimonial ? ' active' : ''}${i === (activeTestimonial - 1 + testimonials.length) % testimonials.length ? ' prev' : ''}`}>
+              <div key={t.id} className={`testimonial-slide${i === activeTestimonial ? ' active' : ''}${i === (activeTestimonial - 1 + testimonials.length) % testimonials.length ? ' prev' : ''}`}>
                 <div className="testimonial-quote-mark">"</div>
-                <p className="testimonial-quote">{t.quote}</p>
+                <p className="testimonial-quote">{t.desc}</p>
                 <div className="testimonial-author">
-                  <img src={t.avatar} alt={t.name} className="testimonial-avatar" loading="lazy" />
+                  {t.slug && <img src={t.slug} alt={t.title} className="testimonial-avatar" loading="lazy" />}
                   <div className="testimonial-info">
-                    <strong>{t.name}</strong>
-                    <span>{t.role}</span>
+                    <strong>{t.title}</strong>
+                    <span>{t.value}</span>
                   </div>
                 </div>
               </div>
@@ -426,8 +411,8 @@ export default function Home() {
             <Link to="/events" className="btn btn-outline reveal-right">All Events →</Link>
           </div>
           <div className="events-list">
-            {events.map((event, i) => (
-              <Link key={event.title} to="/events" className="event-item reveal" data-delay={`${i * 90}`}>
+            {featuredEvents.map((event) => (
+              <Link key={event.id} to="/events" className="event-item">
                 <div className="event-date-badge">
                   <span className="month">{event.month}</span>
                   <span className="day">{event.day}</span>

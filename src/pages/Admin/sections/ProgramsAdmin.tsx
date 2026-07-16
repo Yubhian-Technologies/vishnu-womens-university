@@ -25,6 +25,7 @@ export interface ProgramDoc {
   accreditation: string;
   hod: string;
   department: string;
+  fee: string;
   heroImage: string;
   storagePath: string;
   about: string;
@@ -37,7 +38,7 @@ export interface ProgramDoc {
 
 const EMPTY: Omit<ProgramDoc, 'id'> = {
   slug: '', name: '', shortName: '', icon: 'GraduationCap', category: 'btech', intake: 60,
-  established: '', accreditation: '', hod: '', department: '', heroImage: '', storagePath: '', about: '',
+  established: '', accreditation: '', hod: '', department: '', fee: '', heroImage: '', storagePath: '', about: '',
   highlights: [], labs: [], outcomes: [], semesters: [], order: 0,
 };
 
@@ -92,7 +93,7 @@ export default function ProgramsAdmin() {
     setForm({
       slug: p.slug, name: p.name, shortName: p.shortName, icon: p.icon || 'GraduationCap',
       category: p.category, intake: p.intake, established: p.established, accreditation: p.accreditation,
-      hod: p.hod, department: p.department || '', heroImage: p.heroImage, storagePath: p.storagePath, about: p.about,
+      hod: p.hod, department: p.department || '', fee: p.fee || '', heroImage: p.heroImage, storagePath: p.storagePath, about: p.about,
       highlights: p.highlights || [], labs: p.labs || [], outcomes: p.outcomes || [],
       semesters: p.semesters || [], order: p.order || 0,
     });
@@ -151,6 +152,10 @@ export default function ProgramsAdmin() {
           <div className="admin-field">
             <label>Accreditation</label>
             <input value={form.accreditation} onChange={(e) => set('accreditation', e.target.value)} placeholder="NBA Tier-I Accredited" />
+          </div>
+          <div className="admin-field">
+            <label>Annual Fee</label>
+            <input value={form.fee} onChange={(e) => set('fee', e.target.value)} placeholder="₹ 1,05,000" />
           </div>
           <div className="admin-field">
             <label>Head of Department</label>

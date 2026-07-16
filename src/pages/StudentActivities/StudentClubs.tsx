@@ -1,53 +1,28 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Laptop, Handshake, Palette } from 'lucide-react';
+import { Laptop, Handshake, Palette, type LucideIcon } from 'lucide-react';
 import PageHero from '../../components/PageHero/PageHero';
+import { useOrderedCollection } from '../../hooks/useCollection';
+import { useContentBlocks } from '../../hooks/useContentBlocks';
+import type { ClubDoc } from '../Admin/sections/StudentClubsAdmin';
+import { CLUB_CATEGORIES } from '../Admin/sections/StudentClubsAdmin';
 
-const clubCategories = [
-  {
-    label: 'Technical Clubs',
-    icon: Laptop,
-    clubs: [
-      { name: 'CodeChef SVECW Chapter', desc: 'Runs competitive programming contests, coding challenges, webinars, and structured problem-solving sessions. Inaugurated November 17, 2020.' },
-      { name: 'TECHXTREME Coding Club', desc: 'Develops programming skills, deepens technology understanding, and grooms students for industry-level competitions.' },
-      { name: 'TechPost Club', desc: 'A skills-focused technology forum that introduces students to emerging technologies and publishes student-authored technical perspectives. Est. March 2022.' },
-      { name: 'Energy Swaraj Club', desc: 'Inspired by the IIT Mumbai Climate Clock Program. Over 500 students have participated; the club received a Silver Certificate from the Energy Swaraj Foundation.' },
-      { name: 'Amateur Astronomy Association (AAA)', desc: 'Explores stars, galaxies, and planets using a KONUSMOTOR DIGIMAX 90 telescope. Conducts field trips to Birla Planetarium, Hyderabad.' },
-      { name: 'Mathletes Club', desc: 'Founded in 2018 by the Mathematics Department. Hosts maths competitions, Treasure Hunt, Roll to Win, and the Math Palooza event.' },
-      { name: 'IDEA Club', desc: 'A platform for nurturing innovative and creative thinking. Promotes initiative and talent development in students. Est. September 2011.' },
-    ],
-  },
-  {
-    label: 'Social & Service Clubs',
-    icon: Handshake,
-    clubs: [
-      { name: 'EAGLE Club', desc: 'Elite Anti-Narcotics Group for Law Enforcement. Counters substance abuse through student education and peer support. Helpline: 1972.' },
-      { name: 'Sahaya Club', desc: 'Social outreach club — collaborates with Red Cross Society Eluru on blood donation camps and supports underprivileged communities with food and clothing.' },
-      { name: 'ECHARTS', desc: '"Every Child Has A Right To Study" — delivers educational assistance to financially disadvantaged yet gifted students. Est. 2014.' },
-      { name: 'Eco Club', desc: 'Promotes environmental responsibility and sustainability through campus activities. Founded June 5, 2011.' },
-      { name: 'Empathy Club', desc: 'Cultivates the capacity to understand the experiences and feelings of others, building emotional intelligence and perspective. Founded July 2017.' },
-      { name: 'Vishnu Cultural Club', desc: 'Celebrates Indian culture and heritage through organised activities, helping students build a strong cultural identity and sense of belonging.' },
-      { name: 'MECOW Club', desc: 'Mega Events Celebration of the World — observes UN-recognised international days, expanding students\' knowledge and developing LSRW skills.' },
-      { name: 'THE HINDU – Future India Club', desc: 'Distributes free daily newspapers to all students. Builds communication through debates, JAM sessions, and group discussions.' },
-    ],
-  },
-  {
-    label: 'Creative & Arts Clubs',
-    icon: Palette,
-    clubs: [
-      { name: 'Painting Club', desc: 'Discovers and nurtures artistic talent through competitions and exhibitions on campus. Active since July 2012.' },
-      { name: 'Music Club', desc: 'Promotes Indian Classical Music with vocal training in the fundamentals of "surs and taals," supporting students who aspire to a career in music.' },
-      { name: 'Dance Club', desc: 'A performance arts platform offering training, creative expression, and a stage for talented dancers on campus.' },
-      { name: 'Flash It Out Club', desc: 'Photography and short film club that documents campus events, teaches photographic techniques, and screens expert-curated films.' },
-      { name: 'Page Turners', desc: 'A reading club that builds a shared library of fiction and non-fiction titles and runs literary events for book enthusiasts.' },
-      { name: 'ToastMasters Club', desc: 'Builds leadership and communication through structured speeches, constructive feedback sessions, and practical leadership exercises.' },
-      { name: 'Hobby Horses – Techni Safoos', desc: 'Brings together performing arts, crafts, and design to foster creativity and offer varied cultural experiences on campus.' },
-      { name: 'Rock Me Fab', desc: 'A voluntary platform for discussing social issues and showcasing the range of student talents through open events.' },
-    ],
-  },
-];
+const CATEGORY_ICONS: Record<string, LucideIcon> = {
+  'Technical Clubs': Laptop,
+  'Social & Service Clubs': Handshake,
+  'Creative & Arts Clubs': Palette,
+};
 
 export default function StudentClubs() {
+  const { docs: allClubs } = useOrderedCollection<ClubDoc>('studentClubs', 'order');
+  const stats = useContentBlocks('student-clubs', 'stats');
+
+  const clubCategories = useMemo(() => (
+    CLUB_CATEGORIES
+      .map((label) => ({ label, icon: CATEGORY_ICONS[label], clubs: allClubs.filter((c) => c.category === label) }))
+      .filter((cat) => cat.clubs.length > 0)
+  ), [allClubs]);
+
   useEffect(() => {
     document.title = 'Student Clubs | VWU';
     const observer = new IntersectionObserver(
@@ -82,26 +57,22 @@ export default function StudentClubs() {
       <section id="student-clubs-content" style={{ background: 'var(--color-primary)', padding: 'var(--space-6) 0', scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
         <div className="container">
           <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-14)', flexWrap: 'wrap' }}>
-            {[
-              { num: '23', label: 'Active Clubs' },
-              { num: '3', label: 'Categories' },
-              { num: '500+', label: 'Club Members' },
-              { num: 'Year-round', label: 'Activities' },
-            ].map(s => (
-              <div key={s.label} style={{ textAlign: 'center' }}>
-                <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', fontWeight: 900, color: 'var(--color-accent)' }}>{s.num}</div>
-                <div style={{ fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)' }}>{s.label}</div>
+            {stats.map(s => (
+              <div key={s.id} style={{ textAlign: 'center' }}>
+                <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', fontWeight: 900, color: 'var(--color-accent)' }}>{s.value}</div>
+                <div style={{ fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)' }}>{s.title}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Club Categories */}
+      {/* Club Categories — rendered from Firestore, so no scroll-reveal
+          animation here (see the gotcha documented in CLAUDE.md). */}
       {clubCategories.map((cat, ci) => (
         <section key={cat.label} className={`section ${ci % 2 === 0 ? 'bg-off-white' : 'bg-white'}`}>
           <div className="container">
-            <div className="reveal" style={{ marginBottom: 'var(--space-10)' }}>
+            <div style={{ marginBottom: 'var(--space-10)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-2)' }}>
                 <cat.icon size={32} strokeWidth={1.75} />
                 <span className="section-label" style={{ position: 'static', marginBottom: 0 }}>{cat.label}</span>
@@ -109,8 +80,8 @@ export default function StudentClubs() {
               <h2 className="section-title">{cat.label}</h2>
             </div>
             <div className="grid-4">
-              {cat.clubs.map((club, i) => (
-                <div key={club.name} className="reveal" data-delay={`${i * 50}`}
+              {cat.clubs.map((club) => (
+                <div key={club.id}
                   style={{ background: ci % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', transition: 'all var(--transition-base)' }}
                   onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-accent)'; (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-md)'; }}
                   onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-light-gray)'; (e.currentTarget as HTMLElement).style.boxShadow = 'none'; }}

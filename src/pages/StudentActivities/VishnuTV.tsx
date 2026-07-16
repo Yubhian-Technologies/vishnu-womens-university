@@ -1,34 +1,15 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
-import { BookOpen, Clapperboard, Calendar, Newspaper, Video, Mic2, Microscope, ClipboardList, Lightbulb, GraduationCap } from 'lucide-react';
-
-const focusAreas = [
-  { icon: BookOpen, title: 'Education', desc: 'Recordings of guest lectures, laboratory experiments, classroom presentations, and workshops, made available across the campus community.' },
-  { icon: Clapperboard, title: 'Entertainment', desc: 'Student-produced shows, creative programs, and filmed campus experiences that reflect the energy of life at VWU.' },
-  { icon: Calendar, title: 'Events', desc: 'Live and archived coverage of symposia, cultural festivals, sports days, and all notable campus events.' },
-  { icon: Newspaper, title: 'News', desc: 'Campus news updates, institutional announcements, and student journalism that keep the VWU community well informed.' },
-];
-
-const docTopics = [
-  'Health Care & Hygiene',
-  'Personality Development',
-  'Child Labour Awareness',
-  "Women's Education & Empowerment",
-  'Environmental Concerns',
-  'Social Issues',
-];
-
-const productions = [
-  { icon: Video, label: 'Documentary Films' },
-  { icon: Mic2, label: 'Guest Lecture Recordings' },
-  { icon: Microscope, label: 'Lab Experiment Videos' },
-  { icon: ClipboardList, label: 'Seminar & Workshop Coverage' },
-  { icon: Lightbulb, label: 'Student-Developed Programs' },
-  { icon: GraduationCap, label: 'Classroom Presentations' },
-];
+import { BookOpen, Video } from 'lucide-react';
+import { useContentBlocks } from '../../hooks/useContentBlocks';
+import { resolveContentIcon } from '../../lib/contentIcons';
 
 export default function VishnuTV() {
+  const focusAreas = useContentBlocks('vishnu-tv', 'focusAreas');
+  const docTopics = useContentBlocks('vishnu-tv', 'docTopics');
+  const productions = useContentBlocks('vishnu-tv', 'productions');
+
   useEffect(() => {
     document.title = 'Vishnu TV Academy | VWU';
     const observer = new IntersectionObserver(
@@ -98,14 +79,17 @@ export default function VishnuTV() {
             <h2 className="section-title">Four Pillars of Vishnu TV</h2>
           </div>
           <div className="grid-4">
-            {focusAreas.map((f, i) => (
-              <div key={f.title} className="reveal" data-delay={`${i * 80}`}
-                style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderTop: '4px solid var(--color-accent)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)' }}>
-                <div style={{ marginBottom: 'var(--space-3)' }}><f.icon size={35} strokeWidth={1.75} /></div>
-                <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>{f.title}</h3>
-                <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6 }}>{f.desc}</p>
-              </div>
-            ))}
+            {focusAreas.map((f) => {
+              const Icon = resolveContentIcon(f.icon) || BookOpen;
+              return (
+                <div key={f.id}
+                  style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderTop: '4px solid var(--color-accent)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)' }}>
+                  <div style={{ marginBottom: 'var(--space-3)' }}><Icon size={35} strokeWidth={1.75} /></div>
+                  <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>{f.title}</h3>
+                  <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6 }}>{f.desc}</p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -122,9 +106,9 @@ export default function VishnuTV() {
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
                 {docTopics.map((t) => (
-                  <div key={t} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', padding: 'var(--space-3) var(--space-4)', background: 'var(--color-off-white)', borderRadius: 'var(--radius-sm)', borderLeft: '3px solid var(--color-accent)' }}>
+                  <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', padding: 'var(--space-3) var(--space-4)', background: 'var(--color-off-white)', borderRadius: 'var(--radius-sm)', borderLeft: '3px solid var(--color-accent)' }}>
                     <span style={{ color: 'var(--color-accent)', fontWeight: 900 }}>›</span>
-                    <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', fontFamily: 'var(--font-sans)', fontWeight: 600 }}>{t}</span>
+                    <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', fontFamily: 'var(--font-sans)', fontWeight: 600 }}>{t.title}</span>
                   </div>
                 ))}
               </div>
@@ -136,12 +120,15 @@ export default function VishnuTV() {
                 The academy's output extends well beyond documentaries, covering the full range of academic and creative life on campus.
               </p>
               <div className="grid-2">
-                {productions.map((p) => (
-                  <div key={p.label} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', padding: 'var(--space-4)', background: 'var(--color-off-white)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-sm)' }}>
-                    <p.icon size={22} strokeWidth={1.75} />
-                    <span style={{ fontSize: 'var(--text-sm)', fontFamily: 'var(--font-sans)', fontWeight: 600, color: 'var(--color-primary)' }}>{p.label}</span>
-                  </div>
-                ))}
+                {productions.map((p) => {
+                  const Icon = resolveContentIcon(p.icon) || Video;
+                  return (
+                    <div key={p.id} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', padding: 'var(--space-4)', background: 'var(--color-off-white)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-sm)' }}>
+                      <Icon size={22} strokeWidth={1.75} />
+                      <span style={{ fontSize: 'var(--text-sm)', fontFamily: 'var(--font-sans)', fontWeight: 600, color: 'var(--color-primary)' }}>{p.title}</span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>

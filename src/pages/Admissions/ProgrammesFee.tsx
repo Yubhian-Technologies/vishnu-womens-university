@@ -1,33 +1,20 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
+import { useOrderedCollection } from '../../hooks/useCollection';
+import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
 
-const btechPrograms = [
-  { name: 'Computer Science & Engineering – AI & Data Science', code: 'CSE [AI & DS]', seats: 120 },
-  { name: 'Computer Science & Engineering – AI & Machine Learning', code: 'CSE [AI & ML]', seats: 180 },
-  { name: 'Computer Science & Engineering – Cyber Security', code: 'CSE [CS]', seats: 60 },
-  { name: 'Computer Science & Engineering', code: 'CSE', seats: 180 },
-  { name: 'Information Technology', code: 'IT', seats: 180 },
-  { name: 'Electronics & Communication Engineering', code: 'ECE', seats: 120 },
-  { name: 'Electrical & Electronics Engineering', code: 'EEE', seats: 60 },
-  { name: 'Civil Engineering', code: 'CE', seats: 60 },
-  { name: 'Mechanical Engineering', code: 'ME', seats: 60 },
-];
-
-const mtechPrograms = [
-  { name: 'M.Tech – Computer Science & Engineering', code: 'CSE', seats: 18 },
-  { name: 'M.Tech – VLSI Design', code: 'VLSI', seats: 18 },
-  { name: 'M.Tech – Power Electronics', code: 'PE', seats: 9 },
-  { name: 'M.Tech – Software Engineering', code: 'SE', seats: 9 },
-];
-
-const phdPrograms = [
-  'Computer Science & Engineering',
-  'Electronics & Communication Engineering',
-  'Electrical & Electronics Engineering',
-];
+const DEFAULT_BTECH_FEE = '₹ 1,05,000';
+const DEFAULT_MTECH_FEE = '₹ 55,800';
+const DEFAULT_MBA_FEE = '₹ 55,000';
 
 export default function ProgrammesFee() {
+  const { docs: allPrograms } = useOrderedCollection<ProgramDoc>('programs', 'order');
+  const btechPrograms = useMemo(() => allPrograms.filter(p => p.category === 'btech'), [allPrograms]);
+  const mtechPrograms = useMemo(() => allPrograms.filter(p => p.category === 'mtech'), [allPrograms]);
+  const mbaProgram = useMemo(() => allPrograms.find(p => p.category === 'mba'), [allPrograms]);
+  const phdPrograms = useMemo(() => allPrograms.filter(p => p.category === 'phd'), [allPrograms]);
+
   useEffect(() => {
     document.title = 'Programmes & Fee Structure | VWU';
     const observer = new IntersectionObserver(
@@ -85,8 +72,8 @@ export default function ProgrammesFee() {
             <div style={{ display: 'flex', gap: 'var(--space-6)', flexWrap: 'wrap', marginTop: 'var(--space-4)' }}>
               {[
                 { label: 'Duration', value: '4 Years' },
-                { label: 'Annual Fee', value: '₹ 1,05,000' },
-                { label: 'Total Intake', value: `${btechPrograms.reduce((s, p) => s + p.seats, 0)} Seats` },
+                { label: 'Annual Fee', value: btechPrograms[0]?.fee || DEFAULT_BTECH_FEE },
+                { label: 'Total Intake', value: `${btechPrograms.reduce((s, p) => s + (p.intake || 0), 0)} Seats` },
               ].map(s => (
                 <div key={s.label} style={{ background: 'var(--color-primary)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4) var(--space-6)', textAlign: 'center' }}>
                   <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.4rem', fontWeight: 900, color: 'var(--color-accent)' }}>{s.value}</div>
@@ -108,12 +95,12 @@ export default function ProgrammesFee() {
               </thead>
               <tbody>
                 {btechPrograms.map((p, i) => (
-                  <tr key={p.code} style={{ background: i % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)' }}>
+                  <tr key={p.id} style={{ background: i % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)' }}>
                     <td style={{ ...tableCell, color: 'var(--color-accent)', fontWeight: 900 }}>{String(i + 1).padStart(2, '0')}</td>
                     <td style={{ ...tableCell, fontWeight: 600, color: 'var(--color-primary)' }}>{p.name}</td>
-                    <td style={tableCell}>{p.code}</td>
-                    <td style={{ ...tableCell, textAlign: 'center', fontWeight: 700 }}>{p.seats}</td>
-                    <td style={{ ...tableCell, textAlign: 'center', fontWeight: 700, color: 'var(--color-primary)' }}>₹ 1,05,000</td>
+                    <td style={tableCell}>{p.shortName}</td>
+                    <td style={{ ...tableCell, textAlign: 'center', fontWeight: 700 }}>{p.intake}</td>
+                    <td style={{ ...tableCell, textAlign: 'center', fontWeight: 700, color: 'var(--color-primary)' }}>{p.fee || DEFAULT_BTECH_FEE}</td>
                   </tr>
                 ))}
               </tbody>
@@ -132,7 +119,7 @@ export default function ProgrammesFee() {
                 <span className="section-label">Postgraduate</span>
                 <h2 className="section-title" style={{ fontSize: 'var(--text-2xl)' }}>M.Tech Programs</h2>
                 <div style={{ display: 'flex', gap: 'var(--space-4)', marginTop: 'var(--space-4)', flexWrap: 'wrap' }}>
-                  {[{ label: 'Duration', value: '2 Years' }, { label: 'Annual Fee', value: '₹ 55,800' }].map(s => (
+                  {[{ label: 'Duration', value: '2 Years' }, { label: 'Annual Fee', value: mtechPrograms[0]?.fee || DEFAULT_MTECH_FEE }].map(s => (
                     <div key={s.label} style={{ background: 'var(--color-primary)', borderRadius: 'var(--radius-md)', padding: 'var(--space-3) var(--space-5)', textAlign: 'center' }}>
                       <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.1rem', fontWeight: 900, color: 'var(--color-accent)' }}>{s.value}</div>
                       <div style={{ fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.7)', marginTop: 2 }}>{s.label}</div>
@@ -151,10 +138,10 @@ export default function ProgrammesFee() {
                   </thead>
                   <tbody>
                     {mtechPrograms.map((p, i) => (
-                      <tr key={p.code} style={{ background: i % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)' }}>
+                      <tr key={p.id} style={{ background: i % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)' }}>
                         <td style={{ ...tableCell, fontWeight: 600, color: 'var(--color-primary)' }}>{p.name}</td>
-                        <td style={{ ...tableCell, textAlign: 'center', fontWeight: 700 }}>{p.seats}</td>
-                        <td style={{ ...tableCell, textAlign: 'center', fontWeight: 700 }}>₹ 55,800</td>
+                        <td style={{ ...tableCell, textAlign: 'center', fontWeight: 700 }}>{p.intake}</td>
+                        <td style={{ ...tableCell, textAlign: 'center', fontWeight: 700 }}>{p.fee || DEFAULT_MTECH_FEE}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -170,7 +157,7 @@ export default function ProgrammesFee() {
                 <div style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)' }}>
                   <div style={{ fontFamily: 'var(--font-sans)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>Master of Business Administration</div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-                    {[['Duration', '2 Years'], ['Intake', '60 Seats'], ['Annual Fee', '₹ 55,000'], ['Entrance', 'ICET']].map(([k, v]) => (
+                    {[['Duration', '2 Years'], ['Intake', `${mbaProgram?.intake || 60} Seats`], ['Annual Fee', mbaProgram?.fee || DEFAULT_MBA_FEE], ['Entrance', 'ICET']].map(([k, v]) => (
                       <div key={k} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--text-sm)', borderBottom: '1px solid var(--color-light-gray)', paddingBottom: 'var(--space-2)' }}>
                         <span style={{ color: 'var(--color-text-light)' }}>{k}</span>
                         <span style={{ fontWeight: 700, color: 'var(--color-primary)' }}>{v}</span>
@@ -185,9 +172,9 @@ export default function ProgrammesFee() {
                 <h2 className="section-title" style={{ fontSize: 'var(--text-2xl)', marginBottom: 'var(--space-5)' }}>Ph.D.</h2>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
                   {phdPrograms.map((p) => (
-                    <div key={p} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', padding: 'var(--space-4)', background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-sm)', borderLeft: '3px solid var(--color-accent)' }}>
+                    <div key={p.id} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', padding: 'var(--space-4)', background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-sm)', borderLeft: '3px solid var(--color-accent)' }}>
                       <span style={{ color: 'var(--color-accent)', fontWeight: 900 }}>PhD</span>
-                      <span style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-primary)' }}>{p}</span>
+                      <span style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-primary)' }}>{p.name}</span>
                     </div>
                   ))}
                 </div>

@@ -1,9 +1,11 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Trophy, Lightbulb, Handshake, Venus, Microscope, Leaf, Check, Landmark, ClipboardList, School } from 'lucide-react';
+import { Trophy, Check, Landmark, ClipboardList, Leaf, School } from 'lucide-react';
 import './VisionMission.css';
 import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
+import { useContentBlocks } from '../../hooks/useContentBlocks';
+import { resolveContentIcon } from '../../lib/contentIcons';
 
 const inspirationPhotos = [
   { src: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80', alt: 'Students collaborating', caption: 'Collaboration' },
@@ -13,38 +15,11 @@ const inspirationPhotos = [
   { src: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=800&q=80', alt: 'Smart classrooms', caption: 'Smart Classrooms' },
 ];
 
-const missionPoints = [
-  'To pursue academic excellence through progressive and innovative teaching practices',
-  'To build self-confidence among women from rural backgrounds through co-curricular and extra-curricular engagement',
-  'To nurture discipline and strong values in students from rural communities',
-  'To develop centres of Institute-Industry collaboration',
-  'To provide financial support to students from economically weaker sections',
-  'To generate self-employment avenues and promote skill development',
-  'To advance environmentally responsible green practices across the campus',
-  'To establish and sustain innovation hubs that drive student entrepreneurship',
-];
-
-const values = [
-  { icon: Trophy, title: 'Excellence', desc: 'Holding ourselves to the highest standards across academic programs, faculty quality, and research outcomes.' },
-  { icon: Lightbulb, title: 'Innovation', desc: 'Encouraging creative thinking, entrepreneurial initiative, and technology-driven solutions to real problems.' },
-  { icon: Handshake, title: 'Integrity', desc: 'Maintaining honesty, transparency, and ethical conduct across all activities and interactions.' },
-  { icon: Venus, title: 'Empowerment', desc: 'Building women\'s confidence, capabilities, and readiness for leadership through education and opportunity.' },
-  { icon: Microscope, title: 'Research', desc: 'Advancing knowledge through funded projects, scholarly publications, and applied innovation.' },
-  { icon: Leaf, title: 'Service', desc: 'Making a positive and lasting contribution to community, environment, and society.' },
-];
-
-const qualityPolicy = [
-  'We pursue excellence in everything we do, setting a clear example of achievement for our students',
-  'We remain focused on student success and satisfaction, while responding to the broader needs of the community',
-  'We take pride in the quality of our institution and its work, upholding originality, integrity, consistency, and care in all we deliver',
-  'We keep pace with evolving student expectations, emerging communication technologies, and shifting design trends',
-  'We define and model high-quality standards for students, faculty, staff, and community partners alike',
-  'We hold discipline, punctuality, personal integrity, and healthy habits in the highest regard',
-  'We foster an environment of innovation so that students and staff can grow into well-rounded individuals',
-  'We actively pursue inclusive community initiatives that benefit those beyond our campus boundary',
-];
-
 export default function VisionMission() {
+  const missionPoints = useContentBlocks('vision-mission', 'missionPoints');
+  const values = useContentBlocks('vision-mission', 'values');
+  const qualityPolicy = useContentBlocks('vision-mission', 'qualityPolicy');
+
   useEffect(() => {
     document.title = 'Vision, Mission & Values | VWU';
     const observer = new IntersectionObserver(
@@ -106,9 +81,9 @@ export default function VisionMission() {
             <div className="vm-content">
               <ul className="vm-mission-list">
                 {missionPoints.map((point, i) => (
-                  <li key={i} className="vm-mission-item reveal" data-delay={`${i * 60}`}>
+                  <li key={point.id} className="vm-mission-item">
                     <span className="vm-mission-num">{String(i + 1).padStart(2, '0')}</span>
-                    <p>{point}</p>
+                    <p>{point.title}</p>
                   </li>
                 ))}
               </ul>
@@ -128,13 +103,16 @@ export default function VisionMission() {
             </p>
           </div>
           <div className="vm-values-grid">
-            {values.map((v, i) => (
-              <div key={v.title} className="vm-value-card reveal" data-delay={`${i * 80}`}>
-                <div className="vm-value-icon"><v.icon size={40} strokeWidth={1.75} /></div>
-                <h3>{v.title}</h3>
-                <p>{v.desc}</p>
-              </div>
-            ))}
+            {values.map((v) => {
+              const Icon = resolveContentIcon(v.icon) || Trophy;
+              return (
+                <div key={v.id} className="vm-value-card">
+                  <div className="vm-value-icon"><Icon size={40} strokeWidth={1.75} /></div>
+                  <h3>{v.title}</h3>
+                  <p>{v.desc}</p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -168,10 +146,10 @@ export default function VisionMission() {
               <span className="section-label" style={{ color: 'var(--color-accent)' }}>Quality Commitment</span>
               <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-6)' }}>Quality Policy</h2>
               <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-                {qualityPolicy.map((p, i) => (
-                  <li key={i} style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
+                {qualityPolicy.map((p) => (
+                  <li key={p.id} style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
                     <Check size={17} strokeWidth={2.5} style={{ color: 'var(--color-accent)', flexShrink: 0 }} />
-                    <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: 'var(--text-sm)', lineHeight: 1.7 }}>{p}</p>
+                    <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: 'var(--text-sm)', lineHeight: 1.7 }}>{p.title}</p>
                   </li>
                 ))}
               </ul>
