@@ -4,7 +4,6 @@ import { where } from 'firebase/firestore';
 import { Check, Microscope, Compass, Target, Sparkles, Mail, ExternalLink } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import { useCollection, useOrderedCollection } from '../../hooks/useCollection';
-import { resolveProgramIcon } from '../../lib/programIcons';
 import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
 import type { FacultyDoc } from './Faculty';
 import '../detail-layout.css';
@@ -23,7 +22,6 @@ export default function ProgramDetail() {
   const location = useLocation();
   const { docs, loading } = useCollection<ProgramDoc>('programs', [where('slug', '==', slug || '')]);
   const program = docs[0];
-  const Icon = resolveProgramIcon(program?.icon);
 
   const { docs: allFaculty } = useOrderedCollection<FacultyDoc>('faculty', 'order');
   const faculty = program?.department ? allFaculty.filter((f) => f.department === program.department) : [];
@@ -52,6 +50,7 @@ export default function ProgramDetail() {
   const hasMindMap = !!program.mindMapImage;
   const hasLabs = !!(program.labs && program.labs.length > 0);
   const hasCurriculum = !!(program.semesters && program.semesters.length > 0);
+  const hasCareerOutcomes = !!(program.outcomes && program.outcomes.length > 0);
 
   const quickLinks = [
     { id: 'about', label: 'About the Department' },
@@ -63,6 +62,8 @@ export default function ProgramDetail() {
     hasCurriculum && { id: 'curriculum', label: 'Curriculum' },
     hasLabs && { id: 'labs', label: 'Laboratories' },
   ].filter(Boolean) as { id: string; label: string }[];
+
+  const hasSidebarContent = quickLinks.length > 1 || hasCareerOutcomes;
 
   return (
     <main className="page-wrapper">
@@ -111,7 +112,7 @@ export default function ProgramDetail() {
       {/* About + Highlights */}
       <section id="about" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
         <div className="container">
-          <div className="detail-grid">
+          <div className={hasSidebarContent ? 'detail-grid' : ''}>
             {/* Main content */}
             <div>
               <div>
@@ -141,6 +142,7 @@ export default function ProgramDetail() {
             </div>
 
             {/* Sidebar */}
+            {hasSidebarContent && (
             <div className="detail-sidebar">
               <div style={{ position: 'sticky', top: 'calc(var(--topbar-height) + var(--header-height) + 1.5rem)', display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
                 {/* Quick Links */}
@@ -177,17 +179,9 @@ export default function ProgramDetail() {
                     </ul>
                   </div>
                 )}
-
-                {/* CTA Card */}
-                <div style={{ background: 'var(--color-primary)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', textAlign: 'center' }}>
-                  <div style={{ marginBottom: 'var(--space-3)', display: 'flex', justifyContent: 'center' }}><Icon size={32} strokeWidth={1.75} color="var(--color-accent)" /></div>
-                  <h4 style={{ color: 'var(--color-white)', fontFamily: 'var(--font-serif)', fontSize: '1.1rem', marginBottom: 'var(--space-2)' }}>Interested in {program.shortName || program.name}?</h4>
-                  <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-5)', lineHeight: 1.6 }}>Apply through EAPCET (Code: VISW) or contact our admissions team.</p>
-                  <Link to="/admissions" className="btn btn-accent" style={{ display: 'block', marginBottom: 'var(--space-2)', textAlign: 'center' }}>Apply Now</Link>
-                  <Link to="/programmes-fee-structure" className="btn btn-secondary" style={{ display: 'block', textAlign: 'center' }}>View Fee Structure</Link>
-                </div>
               </div>
             </div>
+            )}
           </div>
         </div>
       </section>
