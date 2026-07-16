@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar, Trophy, Image } from 'lucide-react';
 import PageHero from '../../components/PageHero/PageHero';
+import { useHashScroll } from '../../hooks/useHashScroll';
 
 const sections = [
   {
@@ -35,6 +36,8 @@ const highlights = [
 ];
 
 export default function NewsAwards() {
+  useHashScroll();
+
   useEffect(() => {
     document.title = 'News & Awards | Vishnu Womens University';
     const observer = new IntersectionObserver(
@@ -62,10 +65,11 @@ export default function NewsAwards() {
         defaultTitle="News & Awards"
   defaultSubtitle="Celebrating VWU's achievements, events, and milestones — from national accreditations and rankings to campus happenings and visual memories."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'News & Awards' }]}
+        scrollCtaTargetId="news-awards-content"
       />
 
       {/* Stats bar */}
-      <section style={{ background: 'var(--color-primary)', padding: 'var(--space-6) 0' }}>
+      <section id="news-awards-content" style={{ background: 'var(--color-primary)', padding: 'var(--space-6) 0', scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
         <div className="container">
           <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-14)', flexWrap: 'wrap' }}>
             {highlights.map((h) => (

@@ -194,7 +194,7 @@ const navItems: NavItem[] = [
       { label: 'Giving Opportunities', path: '/alumni-giving#give' },
       { label: 'Alumni Events', path: '/alumni-giving#events' },
       { label: 'Prathibha Magazine', path: '/alumni-giving#magazine' },
-      { label: 'Success Stories', path: '/alumni-giving#alumni' },
+      { label: 'Success Stories', path: '/placements/success-stories' },
     ],
   },
   {

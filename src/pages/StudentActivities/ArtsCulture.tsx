@@ -72,10 +72,11 @@ export default function ArtsCulture() {
         defaultTitle="Arts & Culture"
   defaultSubtitle="Nurturing creativity, preserving heritage, and building a sense of belonging — developing responsible and culturally grounded leaders."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Student Life', to: '/student-life' }, { label: 'Arts & Culture' }]}
+        scrollCtaTargetId="arts-culture-content"
       />
 
       {/* Philosophy */}
-      <section className="section bg-white">
+      <section id="arts-culture-content" className="section bg-white" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
         <div className="container">
           <div className="grid-img-text">
             <div className="reveal-left">

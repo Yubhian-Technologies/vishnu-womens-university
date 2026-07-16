@@ -49,10 +49,11 @@ export default function SocialServices() {
         defaultTitle="Social Services"
   defaultSubtitle="The National Service Scheme at VWU shapes engineers who are equally committed to their craft and to the communities they serve."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Student Life', to: '/student-life' }, { label: 'Social Services' }]}
+        scrollCtaTargetId="social-services-content"
       />
 
       {/* NSS Philosophy */}
-      <section className="section bg-white">
+      <section id="social-services-content" className="section bg-white" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
         <div className="container">
           <div className="grid-img-text">
             <div className="reveal-left">

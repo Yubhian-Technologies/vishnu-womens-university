@@ -57,10 +57,11 @@ export default function Placements() {
         defaultTitle="Placements & Careers"
   defaultSubtitle="Linking VWU graduates with the best opportunities in industry — through campus recruitment, career development, and pathways to global study."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Placements' }]}
+        scrollCtaTargetId="placements-content"
       />
 
       {/* Stats bar */}
-      <section style={{ background: 'var(--color-primary)', padding: 'var(--space-6) 0' }}>
+      <section id="placements-content" style={{ background: 'var(--color-primary)', padding: 'var(--space-6) 0', scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
         <div className="container">
           <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-14)', flexWrap: 'wrap' }}>
             {stats.map((s) => (

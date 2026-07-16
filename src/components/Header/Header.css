@@ -379,12 +379,8 @@ a.mega-group-label:hover {
 }
 
 .mega-group-list.cols-2 {
-  columns: 2;
-  column-gap: 0;
-}
-
-.mega-group-list.cols-2 li {
-  break-inside: avoid;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
 }
 
 .mega-group-list .dropdown-item {

@@ -7,6 +7,7 @@ import { formatDate } from '../../lib/formatDate';
 import { type NewsDoc, NEWS_CATEGORIES, NEWS_FALLBACK_IMAGE, newsDocToArticle } from '../../lib/news';
 import './News.css';
 import PageHero from '../../components/PageHero/PageHero';
+import { useHashScroll } from '../../hooks/useHashScroll';
 
 const categories = ['All', ...NEWS_CATEGORIES];
 
@@ -14,6 +15,8 @@ export default function News() {
   const { docs: items, loading, error } = useOrderedCollection<NewsDoc>('news', 'date', 'desc');
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
+
+  useHashScroll();
 
   useEffect(() => {
     document.title = 'News | Vishnu Womens University';
@@ -55,6 +58,7 @@ export default function News() {
         defaultTitle="VWU News & Stories"
         defaultSubtitle="Stay up-to-date with the latest happenings, achievements, and stories from the VWU community."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'News' }]}
+        scrollCtaTargetId="news-content"
       />
 
       {/* Featured Article */}
@@ -82,7 +86,7 @@ export default function News() {
       )}
 
       {/* Filters */}
-      <section className="news-filter-section">
+      <section id="news-content" className="news-filter-section" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
         <div className="container">
           <div className="news-filter-bar">
             <div className="news-categories">

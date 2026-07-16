@@ -90,6 +90,7 @@ export default function Accreditations() {
         defaultTitle="Accreditations & Awards"
   defaultSubtitle="Endorsed by India's foremost regulatory and ranking bodies — a record of recognised quality and consistent academic achievement."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'News & Awards', to: '/news-awards' }, { label: 'Accreditations & Awards' }]}
+        scrollCtaTargetId="accreditations-content"
       />
 
       {/* Stats bar */}
