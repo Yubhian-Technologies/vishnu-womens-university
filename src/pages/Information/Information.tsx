@@ -107,7 +107,7 @@ export default function Information() {
           {activeTab === 'calendar' && (
             <div>
               <h2 className="section-title" style={{ marginBottom: 'var(--space-8)' }}>Academic Calendar 2026–27</h2>
-              <div style={{ background: 'var(--color-white)', borderRadius: 'var(--radius-md)', overflow: 'hidden', boxShadow: 'var(--shadow-sm)', border: '1px solid var(--color-light-gray)' }}>
+              <div style={{ background: 'var(--color-white)', borderRadius: 'var(--radius-md)', overflowX: 'auto', overflowY: 'hidden', boxShadow: 'var(--shadow-sm)', border: '1px solid var(--color-light-gray)' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)' }}>
                   <thead>
                     <tr style={{ background: 'var(--color-primary)' }}>
@@ -134,7 +134,7 @@ export default function Information() {
           {activeTab === 'holidays' && (
             <div>
               <h2 className="section-title" style={{ marginBottom: 'var(--space-8)' }}>List of Holidays 2026</h2>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-4)' }}>
+              <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-4)' }}>
                 {holidays.map((h) => (
                   <div key={h.id} style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
                     <div style={{ background: 'var(--color-primary)', color: 'var(--color-accent)', fontFamily: 'var(--font-serif)', fontWeight: 900, fontSize: '1.3rem', borderRadius: 'var(--radius-sm)', padding: 'var(--space-3)', minWidth: 52, textAlign: 'center', lineHeight: 1 }}>
@@ -210,7 +210,7 @@ export default function Information() {
               <p style={{ color: 'var(--color-text-light)', marginBottom: 'var(--space-8)', maxWidth: 680 }}>
                 VWU leverages a comprehensive suite of digital learning platforms to enhance academic delivery, student engagement, and research access.
               </p>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-5)' }}>
+              <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-5)' }}>
                 {ictPlatforms.map((p, i) => (
                   <div key={i} style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', display: 'flex', gap: 'var(--space-4)', alignItems: 'flex-start' }}>
                     <p.icon size={32} strokeWidth={1.75} />
@@ -232,7 +232,7 @@ export default function Information() {
               <p style={{ color: 'var(--color-text-light)', marginBottom: 'var(--space-8)', maxWidth: 680 }}>
                 Beyond academics, VWU follows best practices in sustainability, inclusivity, ethics, and community engagement.
               </p>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-5)' }}>
+              <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-5)' }}>
                 {[
                   { icon: Leaf, title: 'Green Campus Initiative', desc: 'Solar energy, rainwater harvesting, waste management, and biodiversity conservation across the 100-acre campus.' },
                   { icon: Accessibility, title: 'Facilities for Differently-Abled', desc: 'Ramps, accessible restrooms, assistive technology, and dedicated support for students with disabilities.' },

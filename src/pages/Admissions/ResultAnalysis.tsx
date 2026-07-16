@@ -55,7 +55,7 @@ export default function ResultAnalysis() {
             <span className="section-label">Academic Excellence</span>
             <h2 className="section-title">Result Highlights</h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-5)' }}>
+          <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-5)' }}>
             {highlights.map((h) => {
               const Icon = resolveContentIcon(h.icon) || Trophy;
               return (
@@ -82,7 +82,7 @@ export default function ResultAnalysis() {
             <span className="section-label">Department Performance</span>
             <h2 className="section-title">Department-Wise Results</h2>
           </div>
-          <div style={{ borderRadius: 'var(--radius-md)', overflow: 'hidden', boxShadow: 'var(--shadow-md)', maxWidth: 720, margin: '0 auto' }}>
+          <div style={{ borderRadius: 'var(--radius-md)', overflowX: 'auto', overflowY: 'hidden', boxShadow: 'var(--shadow-md)', maxWidth: 720, margin: '0 auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', background: 'var(--color-white)' }}>
               <thead>
                 <tr style={{ background: 'var(--color-primary)' }}>
@@ -114,7 +114,7 @@ export default function ResultAnalysis() {
             <span className="section-label" style={{ color: 'var(--color-accent)' }}>Why We Excel</span>
             <h2 style={{ color: 'var(--color-white)' }} className="section-title">Factors Behind Our Results</h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-5)' }}>
+          <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-5)' }}>
             {factors.map((f) => {
               const Icon = resolveContentIcon(f.icon) || Trophy;
               return (

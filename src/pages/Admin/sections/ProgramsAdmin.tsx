@@ -13,6 +13,11 @@ export interface ProgramSemester {
   subjects: string[];
 }
 
+export interface ProgramLink {
+  label: string;
+  url: string;
+}
+
 export interface ProgramDoc {
   id: string;
   slug: string;
@@ -33,13 +38,30 @@ export interface ProgramDoc {
   labs: string[];
   outcomes: string[];
   semesters: ProgramSemester[];
+  vision: string;
+  mission: string[];
+  coreValues: string[];
+  peos: string[];
+  pos: string[];
+  psos: string[];
+  hodMessage: string;
+  hodImage: string;
+  hodImageStoragePath: string;
+  hodEmail: string;
+  hodResearchProfiles: ProgramLink[];
+  mindMapImage: string;
+  mindMapImageStoragePath: string;
   order: number;
 }
 
 const EMPTY: Omit<ProgramDoc, 'id'> = {
   slug: '', name: '', shortName: '', icon: 'GraduationCap', category: 'btech', intake: 60,
   established: '', accreditation: '', hod: '', department: '', fee: '', heroImage: '', storagePath: '', about: '',
-  highlights: [], labs: [], outcomes: [], semesters: [], order: 0,
+  highlights: [], labs: [], outcomes: [], semesters: [],
+  vision: '', mission: [], coreValues: [], peos: [], pos: [], psos: [],
+  hodMessage: '', hodImage: '', hodImageStoragePath: '', hodEmail: '', hodResearchProfiles: [],
+  mindMapImage: '', mindMapImageStoragePath: '',
+  order: 0,
 };
 
 const CATEGORIES = ['btech', 'mtech', 'mba', 'phd'];
@@ -63,6 +85,18 @@ function textToSemesters(text: string): ProgramSemester[] {
     };
   });
 }
+function linksToText(links: ProgramLink[] = []): string {
+  return links.map((l) => `${l.label}: ${l.url}`).join('\n');
+}
+function textToLinks(text: string): ProgramLink[] {
+  return linesToArray(text).map((line) => {
+    const idx = line.indexOf(':');
+    return {
+      label: (idx === -1 ? line : line.slice(0, idx)).trim(),
+      url: (idx === -1 ? '' : line.slice(idx + 1)).trim(),
+    };
+  }).filter((l) => l.label && l.url);
+}
 
 export default function ProgramsAdmin() {
   const { docs: programs, loading } = useOrderedCollection<ProgramDoc>('programs', 'name');
@@ -70,8 +104,10 @@ export default function ProgramsAdmin() {
   const [editing, setEditing] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
-  const set = (k: string, v: string | number | string[] | ProgramSemester[]) => setForm((p) => ({ ...p, [k]: v }));
+  const set = (k: string, v: string | number | string[] | ProgramSemester[] | ProgramLink[]) => setForm((p) => ({ ...p, [k]: v }));
   const handleImage = (r: UploadResult) => setForm((p) => ({ ...p, heroImage: r.url, storagePath: r.path }));
+  const handleHodImage = (r: UploadResult) => setForm((p) => ({ ...p, hodImage: r.url, hodImageStoragePath: r.path }));
+  const handleMindMapImage = (r: UploadResult) => setForm((p) => ({ ...p, mindMapImage: r.url, mindMapImageStoragePath: r.path }));
 
   const save = async () => {
     if (!form.name || !form.slug) return alert('Program name and slug are required.');
@@ -95,7 +131,13 @@ export default function ProgramsAdmin() {
       category: p.category, intake: p.intake, established: p.established, accreditation: p.accreditation,
       hod: p.hod, department: p.department || '', fee: p.fee || '', heroImage: p.heroImage, storagePath: p.storagePath, about: p.about,
       highlights: p.highlights || [], labs: p.labs || [], outcomes: p.outcomes || [],
-      semesters: p.semesters || [], order: p.order || 0,
+      semesters: p.semesters || [],
+      vision: p.vision || '', mission: p.mission || [], coreValues: p.coreValues || [],
+      peos: p.peos || [], pos: p.pos || [], psos: p.psos || [],
+      hodMessage: p.hodMessage || '', hodImage: p.hodImage || '', hodImageStoragePath: p.hodImageStoragePath || '',
+      hodEmail: p.hodEmail || '', hodResearchProfiles: p.hodResearchProfiles || [],
+      mindMapImage: p.mindMapImage || '', mindMapImageStoragePath: p.mindMapImageStoragePath || '',
+      order: p.order || 0,
     });
   };
 
@@ -191,6 +233,58 @@ export default function ProgramsAdmin() {
           <div className="admin-field admin-field--full">
             <label>Semester-wise Syllabus (one per line: "Semester I: Subject A, Subject B")</label>
             <textarea rows={9} value={semestersToText(form.semesters)} onChange={(e) => set('semesters', textToSemesters(e.target.value))} placeholder="Semester I: Engineering Mathematics I, Engineering Physics" />
+          </div>
+
+          <div className="admin-field admin-field--full"><hr /><h3>Vision, Mission & Values</h3></div>
+          <div className="admin-field admin-field--full">
+            <label>Vision</label>
+            <textarea rows={3} value={form.vision} onChange={(e) => set('vision', e.target.value)} placeholder="To be a centre of excellence in…" />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label>Mission (one point per line)</label>
+            <textarea rows={4} value={arrayToLines(form.mission)} onChange={(e) => set('mission', linesToArray(e.target.value))} placeholder="To impart quality technical education…" />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label>Core Values (one per line)</label>
+            <textarea rows={3} value={arrayToLines(form.coreValues)} onChange={(e) => set('coreValues', linesToArray(e.target.value))} placeholder="Integrity" />
+          </div>
+
+          <div className="admin-field admin-field--full"><hr /><h3>PEOs, POs & PSOs</h3></div>
+          <div className="admin-field admin-field--full">
+            <label>Programme Educational Objectives — PEOs (one per line)</label>
+            <textarea rows={4} value={arrayToLines(form.peos)} onChange={(e) => set('peos', linesToArray(e.target.value))} placeholder="Graduates will excel in…" />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label>Programme Outcomes — POs (one per line)</label>
+            <textarea rows={5} value={arrayToLines(form.pos)} onChange={(e) => set('pos', linesToArray(e.target.value))} placeholder="Engineering knowledge…" />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label>Programme Specific Outcomes — PSOs (one per line)</label>
+            <textarea rows={4} value={arrayToLines(form.psos)} onChange={(e) => set('psos', linesToArray(e.target.value))} placeholder="Ability to apply…" />
+          </div>
+
+          <div className="admin-field admin-field--full"><hr /><h3>About HOD</h3></div>
+          <div className="admin-field admin-field--full">
+            <label>HOD Photo</label>
+            <ImageUploader folder="vwu/programs/hod" currentUrl={form.hodImage} onUploaded={handleHodImage} label="Upload HOD Photo" />
+          </div>
+          <div className="admin-field">
+            <label>HOD Email</label>
+            <input type="email" value={form.hodEmail} onChange={(e) => set('hodEmail', e.target.value)} placeholder="hodcse@vwu.ac.in" />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label>HOD Message / Profile</label>
+            <textarea rows={5} value={form.hodMessage} onChange={(e) => set('hodMessage', e.target.value)} placeholder="A brief message or profile from the Head of Department…" />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label>HOD Research Profiles (one per line: "Google Scholar: https://…")</label>
+            <textarea rows={4} value={linksToText(form.hodResearchProfiles)} onChange={(e) => set('hodResearchProfiles', textToLinks(e.target.value))} placeholder="Google Scholar: https://scholar.google.com/citations?user=…" />
+          </div>
+
+          <div className="admin-field admin-field--full"><hr /><h3>Mind Map</h3></div>
+          <div className="admin-field admin-field--full">
+            <label>Curriculum Mind Map Image</label>
+            <ImageUploader folder="vwu/programs/mindmap" currentUrl={form.mindMapImage} onUploaded={handleMindMapImage} label="Upload Mind Map Image" />
           </div>
         </div>
         <div className="admin-form-actions">

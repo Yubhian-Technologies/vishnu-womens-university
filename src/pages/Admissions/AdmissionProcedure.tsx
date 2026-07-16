@@ -130,7 +130,7 @@ export default function AdmissionProcedure() {
       {/* M.Tech + MBA side by side */}
       <section className="section bg-white">
         <div className="container">
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-12)' }}>
+          <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-12)' }}>
             <div>
               <div className="reveal" style={{ marginBottom: 'var(--space-8)' }}>
                 <span className="section-label">Postgraduate</span>
@@ -162,7 +162,7 @@ export default function AdmissionProcedure() {
             <span className="section-label" style={{ color: 'var(--color-accent)' }}>Checklist</span>
             <h2 style={{ color: 'var(--color-white)' }} className="section-title">Documents Required</h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-3)', maxWidth: 800, margin: '0 auto' }}>
+          <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-3)', maxWidth: 800, margin: '0 auto' }}>
             {documents.map((doc, i) => (
               <div key={doc} className="reveal" data-delay={`${i * 40}`}
                 style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 'var(--radius-sm)', padding: 'var(--space-3) var(--space-4)' }}>

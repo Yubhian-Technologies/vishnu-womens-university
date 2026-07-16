@@ -148,7 +148,7 @@ export default function About() {
       {/* Academic Snapshot */}
       <section className="section bg-white">
         <div className="container">
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-12)', alignItems: 'center' }}>
+          <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-12)', alignItems: 'center' }}>
             <div className="reveal-left">
               <span className="section-label">Academic Excellence</span>
               <h2 className="section-title">Programs Across Engineering, Management & Research</h2>
@@ -159,7 +159,7 @@ export default function About() {
               <Link to="/academics" className="btn btn-primary">View All Programs & Departments →</Link>
             </div>
             <div className="reveal-right">
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
+              <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
                 {[
                   { label: 'B.Tech', value: '9 Specialisations' },
                   { label: 'M.Tech', value: '4 Programs' },
@@ -256,7 +256,7 @@ export default function About() {
       {/* Campus Snapshot */}
       <section className="section bg-off-white">
         <div className="container">
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-12)', alignItems: 'center' }}>
+          <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-12)', alignItems: 'center' }}>
             <div className="reveal-left">
               <img
                 src="https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=900&q=80"
@@ -281,7 +281,7 @@ export default function About() {
       {/* SVES Snapshot */}
       <section className="section" style={{ background: 'linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%)' }}>
         <div className="container">
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-12)', alignItems: 'center' }}>
+          <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-12)', alignItems: 'center' }}>
             <div className="reveal-left">
               <span className="section-label" style={{ color: 'var(--color-accent)' }}>Our Parent Society</span>
               <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>Sri Vishnu Educational Society (SVES)</h2>

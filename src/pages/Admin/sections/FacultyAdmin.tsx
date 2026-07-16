@@ -35,8 +35,41 @@ export default function FacultyAdmin() {
   const [saving, setSaving] = useState(false);
   const [filterDept, setFilterDept] = useState('All');
 
+  const [bulkDept, setBulkDept] = useState('CSE');
+  const [bulkText, setBulkText] = useState('');
+  const [bulkImporting, setBulkImporting] = useState(false);
+
   const set = (k: string, v: string | number) => setForm((p) => ({ ...p, [k]: v }));
   const handleImage = (r: UploadResult) => setForm((p) => ({ ...p, imageUrl: r.url, storagePath: r.path }));
+
+  // Pastes a whole roster at once — "Name | Designation | Qualification | Specialization | Email"
+  // per line (trailing fields optional) — instead of one add-doc round trip per person.
+  const bulkImport = async () => {
+    const rows = bulkText.split('\n').map((l) => l.trim()).filter(Boolean);
+    if (rows.length === 0) return;
+    setBulkImporting(true);
+    try {
+      let order = faculty.filter((f) => f.department === bulkDept).length;
+      for (const row of rows) {
+        const [name, designation, qualification, specialization, email] = row.split('|').map((s) => (s || '').trim());
+        if (!name) continue;
+        await addDoc(collection(db, 'faculty'), {
+          name,
+          designation: designation || 'Assistant Professor',
+          department: bulkDept,
+          qualification: qualification || '',
+          specialization: specialization || '',
+          email: email || '',
+          imageUrl: '', storagePath: '',
+          order: order++,
+          createdAt: serverTimestamp(),
+        });
+      }
+      setBulkText('');
+    } catch (e) {
+      alert(`Couldn't import: ${(e as Error).message}`);
+    } finally { setBulkImporting(false); }
+  };
 
   const save = async () => {
     if (!form.name) return alert('Name is required.');
@@ -73,6 +106,32 @@ export default function FacultyAdmin() {
 
   return (
     <div className="admin-section">
+      <div className="admin-card">
+        <h2 className="admin-card__title">Bulk Import Faculty</h2>
+        <div className="admin-form-grid">
+          <div className="admin-field">
+            <label>Department</label>
+            <select value={bulkDept} onChange={(e) => setBulkDept(e.target.value)}>
+              {DEPARTMENTS.map((d) => <option key={d}>{d}</option>)}
+            </select>
+          </div>
+          <div className="admin-field admin-field--full">
+            <label>Paste one faculty member per line: "Name | Designation | Qualification | Specialization | Email" (last three optional)</label>
+            <textarea
+              rows={8}
+              value={bulkText}
+              onChange={(e) => setBulkText(e.target.value)}
+              placeholder={'Dr. Pokkuluri Kiran Sree | Professor & HOD | Ph.D.\nDr. V. Purushothama Raju | Professor | Ph.D.\nMr. Y. Ramu | Associate Professor | M.Tech.(Ph.D.)'}
+            />
+          </div>
+        </div>
+        <div className="admin-form-actions">
+          <button className="admin-btn admin-btn--primary" onClick={bulkImport} disabled={bulkImporting || !bulkText.trim()}>
+            {bulkImporting ? 'Importing…' : `Import ${bulkText.split('\n').filter((l) => l.trim()).length || ''} Faculty`}
+          </button>
+        </div>
+      </div>
+
       <div className="admin-card">
         <h2 className="admin-card__title">{editing ? 'Edit Faculty' : 'Add Faculty Member'}</h2>
         <div className="admin-form-grid">

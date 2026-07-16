@@ -275,7 +275,7 @@ export default function Academics() {
       {/* Placements — stats only, links to ResultAnalysis */}
       <section className="section bg-white">
         <div className="container">
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-12)', alignItems: 'center' }}>
+          <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-12)', alignItems: 'center' }}>
             <div className="reveal-left">
               <span className="section-label">Career Outcomes</span>
               <h2 className="section-title">Where VWU Engineers Go</h2>
@@ -285,7 +285,7 @@ export default function Academics() {
               <Link to="/result-analysis" className="btn btn-primary">View Result Analysis →</Link>
             </div>
             <div className="reveal-right">
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
+              <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
                 {[
                   { value: '1,400+', label: 'Students Placed (2024–25)' },
                   { value: '59.28 LPA', label: 'Highest Package' },
