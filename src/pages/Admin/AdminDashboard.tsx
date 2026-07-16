@@ -18,6 +18,8 @@ import JobOpeningsAdmin from './sections/JobOpeningsAdmin';
 import ContentBlocksAdmin from './sections/ContentBlocksAdmin';
 import ContactsAdmin from './sections/ContactsAdmin';
 import SvesCampusesAdmin from './sections/SvesCampusesAdmin';
+import DownloadsAdmin from './sections/DownloadsAdmin';
+import CurriculumAdmin from './sections/CurriculumAdmin';
 
 interface Props {
   activeSection: string;
@@ -44,6 +46,8 @@ const SECTION_MAP: Record<string, React.ReactNode> = {
   'content-blocks': <ContentBlocksAdmin />,
   contacts: <ContactsAdmin />,
   'sves-campuses': <SvesCampusesAdmin />,
+  downloads: <DownloadsAdmin />,
+  curriculum: <CurriculumAdmin />,
 };
 
 export default function AdminDashboard({ activeSection, setActiveSection }: Props) {

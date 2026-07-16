@@ -7,6 +7,8 @@ import Home from './pages/Home/Home';
 import Academics from './pages/Academics/Academics';
 import ProgramDetail from './pages/Academics/ProgramDetail';
 import Faculty from './pages/Academics/Faculty';
+import AcademicDownloads from './pages/Academics/Downloads';
+import CurriculumMatrix from './pages/Academics/CurriculumMatrix';
 import Admissions from './pages/Admissions/Admissions';
 import StudentLife from './pages/StudentLife/StudentLife';
 import AlumniGiving from './pages/AlumniGiving/AlumniGiving';
@@ -61,6 +63,8 @@ function PublicApp() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/academics" element={<Academics />} />
+        <Route path="/academics/downloads" element={<AcademicDownloads />} />
+        <Route path="/academics/curriculum" element={<CurriculumMatrix />} />
         <Route path="/academics/:slug" element={<ProgramDetail />} />
         <Route path="/faculty" element={<Faculty />} />
         <Route path="/admissions" element={<Admissions />} />

@@ -30,13 +30,18 @@
 .counter-grid {
   position: relative;
   z-index: 1;
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: stretch;
   gap: var(--space-2);
-  align-items: start;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.3) transparent;
 }
 
 .counter-item {
+  flex: 1 1 0;
+  min-width: 130px;
   text-align: center;
   padding: var(--space-6) var(--space-4);
   border-right: 1px solid rgba(255,255,255,0.1);
@@ -106,25 +111,9 @@
   margin-top: var(--space-1);
 }
 
-@media (max-width: 900px) {
-  .counter-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-  .counter-item:nth-child(3) {
-    border-right: none;
-  }
-}
-
 @media (max-width: 640px) {
-  .counter-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0;
-  }
   .counter-item {
-    border-right: 1px solid rgba(255,255,255,0.1);
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-  }
-  .counter-item:nth-child(even) {
-    border-right: none;
+    min-width: 110px;
+    padding: var(--space-5) var(--space-3);
   }
 }

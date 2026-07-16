@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { GraduationCap, Presentation, Briefcase, FileText, Trophy, type LucideIcon } from 'lucide-react';
+import { GraduationCap, Presentation, Briefcase, FileText, Trophy, Award, Factory, Globe2, type LucideIcon } from 'lucide-react';
 import { useCounter } from '../../hooks/useCounter';
 import './CounterSection.css';
 
@@ -17,6 +17,9 @@ const counters: CounterItem[] = [
   { icon: Briefcase, target: 1400, suffix: '+', label: 'Annual Placements', sub: 'Every year' },
   { icon: FileText, target: 2500, suffix: '+', label: 'Research Publications', sub: 'International journals' },
   { icon: Trophy, target: 90, suffix: '+', label: 'Patents Filed', sub: 'Innovations & inventions' },
+  { icon: Award, target: 300, suffix: '+', label: 'Qualified Faculty', sub: 'Across all departments' },
+  { icon: Factory, target: 500, suffix: '+', label: 'Industry Partners', sub: 'Recruiting & collaborating' },
+  { icon: Globe2, target: 25, suffix: '+', label: 'Global MoUs', sub: 'International outreach' },
 ];
 
 function SingleCounter({ item, start }: { item: CounterItem; start: boolean }) {

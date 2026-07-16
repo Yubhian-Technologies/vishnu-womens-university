@@ -85,7 +85,6 @@ export default function Home() {
   const featuredNews = newsItems.filter(n => n.featured).slice(0, 3);
   const { docs: allEvents } = useOrderedCollection<EventDoc>('events', 'order');
   const featuredEvents = allEvents.filter(e => e.featured).slice(0, 4);
-  const whyVwu = useContentBlocks('home', 'whyVwu');
   const recognitions = useContentBlocks('home', 'recognitions');
   const campusFeatures = useContentBlocks('home', 'campusFeatures');
   const testimonials = useContentBlocks('home', 'testimonials');
@@ -161,20 +160,6 @@ export default function Home() {
             ))}
           </div>
         </div>
-      </div>
-
-      {/* ── Quick Stats Bar (Firestore-derived, no scroll-reveal — see CLAUDE.md gotcha) ── */}
-      <div className="quick-stats-bar">
-        {whyVwu.map((w) => {
-          const Icon = resolveContentIcon(w.icon) || Presentation;
-          return (
-            <div key={w.id} className="quick-stat">
-              <span className="quick-stat__icon"><Icon size={22} strokeWidth={1.75} /></span>
-              <span className="quick-stat__num">{w.value}</span>
-              <span className="quick-stat__label">{w.title}</span>
-            </div>
-          );
-        })}
       </div>
 
       {/* ── Counter Stats ── */}
