@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Check } from 'lucide-react';
 import PageHero from '../../components/PageHero/PageHero';
+import { useContentBlocks } from '../../hooks/useContentBlocks';
 
 const btechSteps = [
   { step: '01', title: 'Check Eligibility', desc: 'Candidates must have passed 10+2 with Physics and Mathematics as major subjects, securing a minimum of 50% marks.' },
@@ -40,6 +41,8 @@ const documents = [
 ];
 
 export default function AdmissionProcedure() {
+  const stats = useContentBlocks('admission-procedure', 'stats');
+
   useEffect(() => {
     document.title = 'Admission Procedure | VWU';
     const observer = new IntersectionObserver(
@@ -100,15 +103,10 @@ export default function AdmissionProcedure() {
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-5) 0' }}>
         <div className="container">
           <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-12)', flexWrap: 'wrap' }}>
-            {[
-              { label: 'EAPCET Code (B.Tech)', value: 'VISW' },
-              { label: 'PGECET (M.Tech)', value: 'GATE / PGECET' },
-              { label: 'MBA Entrance', value: 'ICET' },
-              { label: 'Lateral Entry', value: 'ECET' },
-            ].map(s => (
-              <div key={s.label} style={{ textAlign: 'center' }}>
+            {stats.map(s => (
+              <div key={s.id} style={{ textAlign: 'center' }}>
                 <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.5rem', fontWeight: 900, color: 'var(--color-accent)' }}>{s.value}</div>
-                <div style={{ fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.65)', marginTop: 2 }}>{s.label}</div>
+                <div style={{ fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.65)', marginTop: 2 }}>{s.title}</div>
               </div>
             ))}
           </div>

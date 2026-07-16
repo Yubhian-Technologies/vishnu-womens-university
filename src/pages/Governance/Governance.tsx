@@ -4,6 +4,7 @@ import { govItems, govCategories } from './governance.data';
 import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
 import { useHashScroll } from '../../hooks/useHashScroll';
+import { useContentBlocks } from '../../hooks/useContentBlocks';
 
 const govPhotos = [
   { src: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=800&q=80', alt: 'Governance and administration', caption: 'Institutional Governance' },
@@ -15,6 +16,7 @@ const govPhotos = [
 
 export default function Governance() {
   useHashScroll();
+  const stats = useContentBlocks('governance', 'stats');
 
   useEffect(() => {
     document.title = 'Governance | Vishnu Womens University';
@@ -49,15 +51,10 @@ export default function Governance() {
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-6) 0' }}>
         <div className="container">
           <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-14)', flexWrap: 'wrap' }}>
-            {[
-              { num: '5', label: 'Governance Bodies' },
-              { num: '13', label: 'Standing Committees' },
-              { num: '8', label: 'IQAC Initiatives' },
-              { num: 'NAAC', label: 'Accredited' },
-            ].map(s => (
-              <div key={s.label} style={{ textAlign: 'center' }}>
-                <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', fontWeight: 900, color: 'var(--color-accent)' }}>{s.num}</div>
-                <div style={{ fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)' }}>{s.label}</div>
+            {stats.map(s => (
+              <div key={s.id} style={{ textAlign: 'center' }}>
+                <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', fontWeight: 900, color: 'var(--color-accent)' }}>{s.value}</div>
+                <div style={{ fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)' }}>{s.title}</div>
               </div>
             ))}
           </div>

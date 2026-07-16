@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar, Trophy, Image } from 'lucide-react';
 import PageHero from '../../components/PageHero/PageHero';
+import { useContentBlocks } from '../../hooks/useContentBlocks';
 
 const sections = [
   {
@@ -27,14 +28,9 @@ const sections = [
   },
 ];
 
-const highlights = [
-  { num: '15+', label: 'National Rankings & Ratings' },
-  { num: '10+', label: 'Awards & Recognitions' },
-  { num: '10', label: 'Accreditations & Approvals' },
-  { num: '200+', label: 'Gallery Albums (2017–2026)' },
-];
-
 export default function NewsAwards() {
+  const highlights = useContentBlocks('news-awards', 'highlights');
+
   useEffect(() => {
     document.title = 'News & Awards | Vishnu Womens University';
     const observer = new IntersectionObserver(
@@ -69,9 +65,9 @@ export default function NewsAwards() {
         <div className="container">
           <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-14)', flexWrap: 'wrap' }}>
             {highlights.map((h) => (
-              <div key={h.label} style={{ textAlign: 'center' }}>
-                <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', fontWeight: 900, color: 'var(--color-accent)' }}>{h.num}</div>
-                <div style={{ fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)' }}>{h.label}</div>
+              <div key={h.id} style={{ textAlign: 'center' }}>
+                <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', fontWeight: 900, color: 'var(--color-accent)' }}>{h.value}</div>
+                <div style={{ fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)' }}>{h.title}</div>
               </div>
             ))}
           </div>

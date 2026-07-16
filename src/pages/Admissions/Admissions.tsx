@@ -4,6 +4,9 @@ import emailjs from '@emailjs/browser';
 import './Admissions.css';
 import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
+import { useOrderedCollection } from '../../hooks/useCollection';
+import { useContentBlocks } from '../../hooks/useContentBlocks';
+import type { FaqDoc } from '../Admin/sections/FaqAdmin';
 import { NotebookPen, FileText, IndianRupee, School, PartyPopper, ClipboardList, BarChart3, CreditCard, Users, Target, Globe, Phone, Mail, MapPin } from 'lucide-react';
 
 interface RequestInfoForm {
@@ -50,40 +53,11 @@ const steps = [
   { step: 5, icon: PartyPopper, title: 'Confirm Admission & Enroll', desc: 'Complete your fee payment, submit original documents, and officially begin your engineering journey at VWU.' },
 ];
 
-const scholarships = [
-  { name: 'SC/ST Fee Reimbursement', amount: 'Full Tuition', criteria: 'SC/ST students with family income < ₹2.5 LPA' },
-  { name: 'BC Scholarship', amount: 'Partial Fee Waiver', criteria: 'BC category students as per government norms' },
-  { name: 'Merit Scholarship', amount: 'Up to ₹50,000/year', criteria: 'Top rank holders in EAPCET' },
-  { name: 'EBC Scholarship', amount: 'Partial Fee Support', criteria: 'Economically Backward Classes students' },
-  { name: 'Sports Scholarship', amount: 'Varies', criteria: 'Students with outstanding sports achievements' },
-  { name: 'Management Scholarship', amount: 'Up to ₹30,000/year', criteria: 'Academic excellence in previous semester' },
-];
-
 const admissionHub = [
   { icon: ClipboardList, title: 'Programmes & Fee Structure', desc: 'B.Tech, M.Tech, MBA, and Ph.D. programmes listed with intake numbers and annual fee details.', path: '/programmes-fee-structure', highlight: 'B.Tech: ₹1,05,000/yr' },
   { icon: NotebookPen, title: 'Admission Procedure', desc: 'A step-by-step guide covering EAPCET (Code: VISW), GATE, ICET, and ECET eligibility and processes.', path: '/admission-procedure', highlight: 'EAPCET Code: VISW' },
   { icon: BarChart3, title: 'Result Analysis', desc: 'Ranked among the Top 5 JNTUK-affiliated colleges. 90%+ annual pass rate. University Gold Medallists.', path: '/result-analysis', highlight: 'Top 5 in JNTUK' },
   { icon: CreditCard, title: 'Fee Payment Portal', desc: 'Secure online portal for paying tuition, hostel, and examination fees.', path: '/admissions', highlight: 'Pay Online' },
-];
-
-const tuitionData = [
-  { label: 'B.Tech (per year)', value: '₹ 1,05,000' },
-  { label: 'M.Tech (per year)', value: '₹ 55,800' },
-  { label: 'MBA (per year)', value: '₹ 55,000' },
-  { label: 'Hostel Fee (per year)', value: '₹ 60,000 – ₹ 80,000' },
-  { label: 'PM Vidyalaxmi Scheme', value: 'Available' },
-  { label: 'Scholarship Coverage', value: 'Up to 100%' },
-];
-
-const faqs = [
-  { q: 'What is the VWU college code for EAPCET?', a: 'The college code for VWU in AP EAPCET (B.Tech admissions) is VISW. Enter this code when selecting college preferences during the AP EAPCET counselling process.' },
-  { q: 'Is VWU an autonomous college?', a: 'Yes. VWU has held Autonomous Status granted by the University Grants Commission (UGC) since 2014. This enables VWU to frame its own curriculum and conduct independent examinations.' },
-  { q: 'What is the hostel fee at VWU?', a: 'Hostel fees at VWU range between ₹60,000 and ₹80,000 per year, based on the type of accommodation. Dedicated mess facilities are available for students residing in the hostel.' },
-  { q: 'Are government scholarships available at VWU?', a: 'Yes. SC/ST/BC/EBC students may qualify for full or partial fee reimbursement under AP government scholarship programs. Applications are submitted through the AP scholarship portal.' },
-  { q: 'What documents are required for admission?', a: 'Required documents include: EAPCET rank card, Class 10 and 12 mark sheets and certificates, transfer certificate, conduct certificate, Aadhaar card, caste certificate (if applicable), and 8 passport-size photographs.' },
-  { q: 'Is VWU affiliated to JNTUK?', a: 'Yes. Vishnu Womens University is affiliated to Jawaharlal Nehru Technological University Kakinada (JNTUK) for all its engineering programmes.' },
-  { q: 'What are the placement opportunities at VWU?', a: 'VWU\'s Training & Placement Cell recorded 1,400+ placements in 2024–25. Regular recruiters include Amazon, TCS, Infosys, Wipro, and 150+ other companies. The highest package in 2024–25 was 59.28 LPA.' },
-  { q: 'Can I take a campus tour before applying?', a: 'Yes, and we actively encourage it. Prospective students and their families are welcome to visit the campus in Bhimavaram. You can book a group tour, an individual visit, or a virtual walkthrough by reaching out to our admissions office.' },
 ];
 
 const visitOptions = [
@@ -94,6 +68,10 @@ const visitOptions = [
 ];
 
 export default function Admissions() {
+  const { docs: allFaqs } = useOrderedCollection<FaqDoc>('faqs', 'order');
+  const faqs = allFaqs.filter((f) => f.page === 'admissions');
+  const scholarships = useContentBlocks('admissions', 'scholarships');
+  const tuitionData = useContentBlocks('admissions', 'tuitionData');
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [requestForm, setRequestForm] = useState<RequestInfoForm>(INITIAL_REQUEST_FORM);
   const [requestStatus, setRequestStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
@@ -221,13 +199,13 @@ export default function Admissions() {
           </div>
 
           <div className="adm-scholarship-grid">
-            {scholarships.map((s, i) => (
-              <div key={s.name} className="adm-scholarship-card reveal" data-delay={`${i * 80}`}>
+            {scholarships.map((s) => (
+              <div key={s.id} className="adm-scholarship-card">
                 <div className="adm-scholarship-header">
-                  <h3>{s.name}</h3>
-                  <div className="adm-scholarship-amount">{s.amount}</div>
+                  <h3>{s.title}</h3>
+                  <div className="adm-scholarship-amount">{s.value}</div>
                 </div>
-                <p className="adm-scholarship-criteria">{s.criteria}</p>
+                <p className="adm-scholarship-criteria">{s.desc}</p>
               </div>
             ))}
           </div>
@@ -257,10 +235,10 @@ export default function Admissions() {
               </p>
               <Link to="/programmes-fee-structure" className="btn btn-accent">View Full Fee Structure</Link>
             </div>
-            <div className="adm-tuition-table reveal-right">
+            <div className="adm-tuition-table">
               {tuitionData.map((row, i) => (
-                <div key={row.label} className="adm-tuition-row" style={{ borderTop: i === tuitionData.length - 2 ? '2px solid rgba(201,168,76,0.4)' : undefined }}>
-                  <span>{row.label}</span>
+                <div key={row.id} className="adm-tuition-row" style={{ borderTop: i === tuitionData.length - 2 ? '2px solid rgba(201,168,76,0.4)' : undefined }}>
+                  <span>{row.title}</span>
                   <strong style={{ color: i >= tuitionData.length - 2 ? 'var(--color-accent)' : 'var(--color-white)' }}>{row.value}</strong>
                 </div>
               ))}
@@ -415,37 +393,25 @@ export default function Admissions() {
             </p>
           </div>
           <div className="adm-faq-list">
+            {/* Items render from Firestore, so no scroll-reveal animation here
+                (see the gotcha documented in CLAUDE.md). */}
             {faqs.map((faq, i) => (
-              // The outer element's className is a constant string ("adm-faq-item reveal")
-              // that never changes value across re-renders. The scroll-in fade-in
-              // IntersectionObserver adds "revealed" directly to this element's DOM node,
-              // outside React's knowledge — if this element's className were recomputed
-              // from openFaq (as it used to be), React would overwrite the whole
-              // className attribute on every click and silently strip that externally-added
-              // "revealed" class, causing the clicked item to fade itself back out via
-              // .reveal's base opacity:0/translateY(40px) transition. Keeping this
-              // className static means React never has a reason to touch it again after
-              // mount, so "revealed" can never be stripped. The click-driven "open" state
-              // lives on the inner .adm-faq-card instead, which the reveal mechanism never
-              // touches.
-              <div key={faq.q} className="adm-faq-item reveal" data-delay={`${i * 50}`}>
-                <div className={`adm-faq-card${openFaq === i ? ' open' : ''}`}>
-                  <button
-                    className="adm-faq-question"
-                    onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                    aria-expanded={openFaq === i}
-                  >
-                    <span>{faq.q}</span>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0, transition: 'transform 0.3s', transform: openFaq === i ? 'rotate(180deg)' : 'rotate(0deg)' }}>
-                      <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </button>
-                  {/* Always mounted — collapse is done purely with CSS (grid-template-rows),
-                      so the answer animates open/closed instead of hard-mounting/unmounting. */}
-                  <div className="adm-faq-collapse" aria-hidden={openFaq !== i}>
-                    <div className="adm-faq-collapse-inner">
-                      <div className="adm-faq-answer">{faq.a}</div>
-                    </div>
+              <div key={faq.id} className={`adm-faq-card${openFaq === i ? ' open' : ''}`}>
+                <button
+                  className="adm-faq-question"
+                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                  aria-expanded={openFaq === i}
+                >
+                  <span>{faq.question}</span>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0, transition: 'transform 0.3s', transform: openFaq === i ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+                    <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
+                {/* Always mounted — collapse is done purely with CSS (grid-template-rows),
+                    so the answer animates open/closed instead of hard-mounting/unmounting. */}
+                <div className="adm-faq-collapse" aria-hidden={openFaq !== i}>
+                  <div className="adm-faq-collapse-inner">
+                    <div className="adm-faq-answer">{faq.answer}</div>
                   </div>
                 </div>
               </div>
