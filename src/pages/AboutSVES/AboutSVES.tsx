@@ -4,6 +4,9 @@ import { MapPin } from 'lucide-react';
 import './AboutSVES.css';
 import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
+import { useContentBlocks } from '../../hooks/useContentBlocks';
+import { useOrderedCollection } from '../../hooks/useCollection';
+import type { SvesCampusDoc } from '../Admin/sections/SvesCampusesAdmin';
 
 const svesPhotos = [
   { src: 'https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=800&q=80', alt: 'Green Meadows campus Bhimavaram', caption: 'Green Meadows — Bhimavaram' },
@@ -13,65 +16,11 @@ const svesPhotos = [
   { src: 'https://images.unsplash.com/photo-1544531585-9847b68c8c86?w=800&q=80', alt: 'Academic conference', caption: 'Conferences & Seminars' },
 ];
 
-const campuses = [
-  {
-    name: 'Green Meadows Campus',
-    location: 'Bhimavaram, West Godavari',
-    institutions: [
-      'Shri Vishnu Engineering College for Women (VWU)',
-      'Vishnu Institute of Technology',
-      'Smt. B Seetha Polytechnic',
-      'Vishnu Dental College & Hospital',
-      'Shri Vishnu College of Pharmacy',
-      'B. V. Raju College',
-      'Vishnu School, Bhimavaram',
-    ],
-  },
-  {
-    name: 'Orchard Park',
-    location: 'Narsapur, West Godavari',
-    institutions: [
-      'B V Raju Institute of Technology (BVRIT)',
-      'Vishnu Institute of Pharmaceutical Education and Research',
-      'Vishnu High School, Narsapur',
-    ],
-  },
-  {
-    name: 'Valley Vista',
-    location: 'Hyderabad',
-    institutions: [
-      'BVRIT Hyderabad College of Engineering for Women',
-    ],
-  },
-  {
-    name: 'Lake View',
-    location: 'Medak',
-    institutions: [
-      'Vishnu Educational Development and Innovation Centre (VEDIC)',
-    ],
-  },
-];
-
-const svesStats = [
-  { value: '11', label: 'Institutions' },
-  { value: '50,000+', label: 'Students' },
-  { value: '3,000+', label: 'Faculty & Staff' },
-  { value: '4', label: 'Campuses' },
-  { value: '25+', label: 'Years of Service' },
-  { value: 'AP & TS', label: 'States' },
-];
-
-const milestones = [
-  { year: '1999', event: 'Sri Vishnu Educational Society was established by Dr. B. V. Raju in Bhimavaram, Andhra Pradesh.' },
-  { year: '2001', event: 'Vishnu Womens University (then SVECW) was founded as the first women\'s engineering college in the region.' },
-  { year: '2005', event: 'Vishnu Institute of Technology was set up at Bhimavaram, broadening the SVES engineering portfolio.' },
-  { year: '2010', event: 'BVRIT was established at Narsapur, extending the SVES presence across West Godavari district.' },
-  { year: '2015', event: 'BVRIT Hyderabad College of Engineering for Women was inaugurated, marking SVES\'s entry into Telangana.' },
-  { year: '2020', event: 'VEDIC (Vishnu Educational Development & Innovation Centre) was launched to drive innovation and research.' },
-  { year: '2024', event: 'VWU recorded 1,400+ placements, earning recognition as a leading women\'s technical institution.' },
-];
-
 export default function AboutSVES() {
+  const svesStats = useContentBlocks('about-sves', 'stats');
+  const milestones = useContentBlocks('about-sves', 'milestones');
+  const { docs: campuses } = useOrderedCollection<SvesCampusDoc>('svesCampuses', 'order');
+
   useEffect(() => {
     document.title = 'About SVES | VWU';
     const observer = new IntersectionObserver(
@@ -106,9 +55,9 @@ export default function AboutSVES() {
         <div className="container">
           <div className="sves-stats-bar">
             {svesStats.map(s => (
-              <div key={s.label} className="sves-stat">
+              <div key={s.id} className="sves-stat">
                 <div className="sves-stat-value">{s.value}</div>
-                <div className="sves-stat-label">{s.label}</div>
+                <div className="sves-stat-label">{s.title}</div>
               </div>
             ))}
           </div>
@@ -161,14 +110,14 @@ export default function AboutSVES() {
             <h2 className="section-title">Four Distinct Campuses</h2>
           </div>
           <div className="sves-campuses-grid">
-            {campuses.map((campus, i) => (
-              <div key={campus.name} className="sves-campus-card reveal" data-delay={`${i * 100}`}>
+            {campuses.map((campus) => (
+              <div key={campus.id} className="sves-campus-card">
                 <div className="sves-campus-header">
                   <h3>{campus.name}</h3>
                   <span className="sves-campus-location" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}><MapPin size={13} /> {campus.location}</span>
                 </div>
                 <ul className="sves-campus-list">
-                  {campus.institutions.map(inst => (
+                  {(campus.institutions || []).map(inst => (
                     <li key={inst}>
                       <span>›</span>
                       <span>{inst}</span>
@@ -210,11 +159,11 @@ export default function AboutSVES() {
             <h2 className="section-title" style={{ color: 'var(--color-white)' }}>25+ Years of SVES Excellence</h2>
           </div>
           <div className="sves-milestones">
-            {milestones.map((m, i) => (
-              <div key={m.year} className="sves-milestone reveal" data-delay={`${i * 80}`}>
-                <div className="sves-milestone-year">{m.year}</div>
+            {milestones.map((m) => (
+              <div key={m.id} className="sves-milestone">
+                <div className="sves-milestone-year">{m.title}</div>
                 <div className="sves-milestone-dot" />
-                <div className="sves-milestone-text">{m.event}</div>
+                <div className="sves-milestone-text">{m.desc}</div>
               </div>
             ))}
           </div>

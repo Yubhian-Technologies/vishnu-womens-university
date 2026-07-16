@@ -2,116 +2,8 @@ import { useEffect, useState } from 'react';
 import { Clock, MapPin } from 'lucide-react';
 import './Events.css';
 import PageHero from '../../components/PageHero/PageHero';
-
-interface Event {
-  id: number;
-  title: string;
-  month: string;
-  day: string;
-  year: string;
-  time: string;
-  location: string;
-  category: string;
-  desc: string;
-  featured?: boolean;
-}
-
-const events: Event[] = [
-  {
-    id: 1,
-    title: 'Technova2026 National Technical Symposium',
-    month: 'MAY', day: '20', year: '2026',
-    time: '9:00 AM IST',
-    location: 'VWU Main Auditorium, Bhimavaram',
-    category: 'Academic Events',
-    desc: 'VWU\'s annual national technical symposium, bringing together students from across India for paper presentations, workshops, hackathons, and competitive events.',
-    featured: true,
-  },
-  {
-    id: 2,
-    title: 'mBAJA SAEINDIA 2026 Award Celebration',
-    month: 'JUN', day: '5', year: '2026',
-    time: '10:00 AM',
-    location: 'Seminar Hall, VWU Campus',
-    category: 'Special Events',
-    desc: 'A felicitation ceremony recognising Team Ziba Racers for their performance at the mBAJA SAEINDIA 2026 national competition. All students and faculty are welcome to attend.',
-    featured: true,
-  },
-  {
-    id: 3,
-    title: 'Amazon AFE Internship Orientation',
-    month: 'JUN', day: '18', year: '2026',
-    time: '9:00 AM – 12:00 PM',
-    location: 'Seminar Hall, VWU',
-    category: 'Placements',
-    desc: 'An orientation for VWU students selected for the Amazon AFE internship programme. Amazon mentors will walk students through expectations, processes, and preparation.',
-  },
-  {
-    id: 4,
-    title: 'Freshers\' Orientation & Welcome Day',
-    month: 'JUL', day: '10', year: '2026',
-    time: '9:00 AM – 4:00 PM',
-    location: 'VWU Auditorium, Bhimavaram',
-    category: 'Admissions',
-    desc: 'A full-day induction for new VWU students. An opportunity to meet faculty, academic advisors, and senior peers — and get familiar with clubs, facilities, and what lies ahead.',
-    featured: true,
-  },
-  {
-    id: 5,
-    title: 'Scholarship & Financial Aid Information Session',
-    month: 'JUL', day: '22', year: '2026',
-    time: '3:00 PM IST',
-    location: 'Conference Hall, VWU',
-    category: 'Admissions',
-    desc: 'An information session covering SC/ST/BC scholarships, merit-based awards, and government fee reimbursement schemes. Students and parents are encouraged to attend.',
-  },
-  {
-    id: 6,
-    title: 'Annual Alumni Meet 2026',
-    month: 'SEP', day: '15', year: '2026',
-    time: 'All Day',
-    location: 'VWU Campus, Bhimavaram',
-    category: 'Alumni Events',
-    desc: 'VWU\'s annual alumni gathering — a chance to reconnect with batchmates, meet current students, and mark the university\'s continuing journey in engineering education.',
-    featured: true,
-  },
-  {
-    id: 7,
-    title: 'Alumni Career Talk Series',
-    month: 'OCT', day: '8', year: '2026',
-    time: '6:00 PM – 8:00 PM',
-    location: 'Virtual (Online)',
-    category: 'Alumni Events',
-    desc: 'VWU alumni employed at leading companies share their career paths and practical guidance with current students through this online mentoring and networking session.',
-  },
-  {
-    id: 8,
-    title: 'Academic Excellence Awards Ceremony',
-    month: 'OCT', day: '18', year: '2026',
-    time: '6:30 PM',
-    location: 'VWU Auditorium, Bhimavaram',
-    category: 'Academic Events',
-    desc: 'An annual ceremony recognising VWU students, faculty, and staff for distinguished academic performance, research output, and contributions to the institution.',
-  },
-  {
-    id: 9,
-    title: 'Inter-College Sports Tournament 2026',
-    month: 'NOV', day: '5', year: '2026',
-    time: '8:00 AM',
-    location: 'VWU Sports Complex, Bhimavaram',
-    category: 'Sports',
-    desc: 'VWU hosts its annual inter-college sports tournament, with competition in cricket, volleyball, badminton, kabaddi, and athletics. Engineering colleges from across Andhra Pradesh are invited to participate.',
-  },
-  {
-    id: 10,
-    title: '9th Annual Graduation Day Ceremony',
-    month: 'DEC', day: '15', year: '2026',
-    time: '10:00 AM',
-    location: 'VWU Main Auditorium, Bhimavaram',
-    category: 'Special Events',
-    desc: 'VWU marks its 9th Graduation Day, celebrating the latest cohort of engineers as they complete their studies and step into their professional lives.',
-  },
-];
+import { useOrderedCollection } from '../../hooks/useCollection';
+import type { EventDoc } from '../Admin/sections/EventsAdmin';
 
 const categoryColors: Record<string, string> = {
   'Special Events': '#C9A84C',
@@ -122,14 +14,17 @@ const categoryColors: Record<string, string> = {
   'Sports': '#52b788',
 };
 
-const categories = ['All', ...Array.from(new Set(events.map(e => e.category)))];
-
 export default function Events() {
+  const { docs: events } = useOrderedCollection<EventDoc>('events', 'order');
   const [activeCategory, setActiveCategory] = useState('All');
   const [view, setView] = useState<'list' | 'grid'>('list');
+  const categories = ['All', ...Array.from(new Set(events.map(e => e.category)))];
 
   useEffect(() => {
     document.title = 'Events | Vishnu Womens University';
+    // Only the static section headers use .reveal here — the event cards
+    // themselves render from Firestore data and don't use the scroll-reveal
+    // animation (see the gotcha documented in CLAUDE.md).
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -144,7 +39,7 @@ export default function Events() {
     );
     document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => observer.observe(el));
     return () => observer.disconnect();
-  }, [activeCategory, view]);
+  }, []);
 
   const filtered = activeCategory === 'All'
     ? events
@@ -171,8 +66,8 @@ export default function Events() {
             <h2 className="section-title">Featured Events</h2>
           </div>
           <div className="ev-featured-grid">
-            {featured.map((event, i) => (
-              <div key={event.id} className="ev-featured-card reveal" data-delay={`${i * 100}`}>
+            {featured.map((event) => (
+              <div key={event.id} className="ev-featured-card">
                 <div className="ev-featured-date">
                   <span className="ev-month">{event.month}</span>
                   <span className="ev-day">{event.day}</span>
@@ -236,8 +131,8 @@ export default function Events() {
 
           {view === 'list' ? (
             <div className="ev-list">
-              {filtered.map((event, i) => (
-                <div key={event.id} className="ev-list-item reveal" data-delay={`${i * 60}`}>
+              {filtered.map((event) => (
+                <div key={event.id} className="ev-list-item">
                   <div className="ev-list-date">
                     <span className="ev-month">{event.month}</span>
                     <span className="ev-day">{event.day}</span>
@@ -264,8 +159,8 @@ export default function Events() {
             </div>
           ) : (
             <div className="ev-grid-view">
-              {filtered.map((event, i) => (
-                <div key={event.id} className="ev-grid-card reveal" data-delay={`${i * 60}`}>
+              {filtered.map((event) => (
+                <div key={event.id} className="ev-grid-card">
                   <div className="ev-grid-date-bar" style={{ background: categoryColors[event.category] || 'var(--color-primary)' }}>
                     <span>{event.month} {event.day}, {event.year}</span>
                   </div>

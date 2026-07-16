@@ -6,6 +6,7 @@ import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import { useHashScroll } from '../../hooks/useHashScroll';
 import { useOrderedCollection } from '../../hooks/useCollection';
+import { useContentBlocks } from '../../hooks/useContentBlocks';
 import {
   Rocket, Handshake, Microscope, Globe2, Landmark, BookOpen, Target, Leaf, School, Info,
 } from 'lucide-react';
@@ -24,17 +25,6 @@ const campusPhotos = [
   { src: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&q=80', alt: 'Central library', caption: 'Central Library' },
   { src: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80', alt: 'Students studying', caption: 'Student Collaboration' },
   { src: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&q=80', alt: 'Sports facilities', caption: 'Sports Facilities' },
-];
-
-const quickStats = [
-  { value: '2001', label: 'Established' },
-  { value: '100 Acres', label: 'Campus Area' },
-  { value: '13,100+', label: 'Graduates' },
-  { value: '230+', label: 'Expert Faculty' },
-  { value: '1,400+', label: 'Annual Placements' },
-  { value: '9', label: 'Departments' },
-  { value: '59.28 LPA', label: 'Highest Package' },
-  { value: 'JNTUK', label: 'Affiliated To' },
 ];
 
 const differentiators = [
@@ -71,6 +61,7 @@ export default function About() {
 
   const { docs: execDocs, loading: execLoading } = useOrderedCollection<CoreExecutiveMember>('coreExecutives', 'order');
   const executives = !execLoading && execDocs.length > 0 ? execDocs : defaultExecutives;
+  const quickStats = useContentBlocks('about', 'quickStats');
 
   useEffect(() => {
     document.title = 'About VWU | Vishnu Womens University';
@@ -106,9 +97,9 @@ export default function About() {
         <div className="container">
           <div className="about-facts-bar">
             {quickStats.map(s => (
-              <div key={s.label} className="about-fact">
+              <div key={s.id} className="about-fact">
                 <div className="about-fact-value">{s.value}</div>
-                <div className="about-fact-label">{s.label}</div>
+                <div className="about-fact-label">{s.title}</div>
               </div>
             ))}
           </div>

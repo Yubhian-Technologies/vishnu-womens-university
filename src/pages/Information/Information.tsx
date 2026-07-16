@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
+import { useOrderedCollection } from '../../hooks/useCollection';
+import type { CalendarEntry } from '../Admin/sections/AcademicCalendarAdmin';
+import type { HolidayEntry } from '../Admin/sections/HolidaysAdmin';
 import { Monitor, NotebookPen, Newspaper, BarChart3, BookOpen, Video, Leaf, Accessibility, Handshake, Scale, Brain, Plane, TrainFront, Bus, Car, MapPin, Phone, Mail, type LucideIcon } from 'lucide-react';
 import './Information.css';
 
@@ -11,36 +14,6 @@ const infoPhotos = [
   { src: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&q=80', alt: 'Library resources', caption: 'e-Library' },
   { src: 'https://images.unsplash.com/photo-1567521464027-f127ff144326?w=800&q=80', alt: 'Campus dining', caption: 'Food Courts' },
   { src: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=800&q=80', alt: 'Students at orientation', caption: 'Freshers Orientation' },
-];
-
-const academicCalendar = [
-  { event: 'Odd Semester Commencement', date: 'July 15, 2026' },
-  { event: 'Freshers\' Orientation', date: 'July 16–18, 2026' },
-  { event: 'Internal Assessment – I', date: 'August 25–30, 2026' },
-  { event: 'Mid-Semester Break', date: 'September 15–17, 2026' },
-  { event: 'Internal Assessment – II', date: 'October 10–15, 2026' },
-  { event: 'Technova National Symposium', date: 'October 20, 2026' },
-  { event: 'End Semester Examinations', date: 'November 15 – December 5, 2026' },
-  { event: 'Even Semester Commencement', date: 'January 5, 2027' },
-  { event: 'Internal Assessment – I (Even)', date: 'February 10–15, 2027' },
-  { event: 'Internal Assessment – II (Even)', date: 'March 20–25, 2027' },
-  { event: 'End Semester Examinations (Even)', date: 'April 20 – May 10, 2027' },
-  { event: 'Summer Vacation', date: 'May 11 – July 14, 2027' },
-];
-
-const holidays = [
-  { name: 'Ugadi (Telugu New Year)', date: 'March 30, 2026' },
-  { name: 'Sri Rama Navami', date: 'April 6, 2026' },
-  { name: 'Dr. Ambedkar Jayanti', date: 'April 14, 2026' },
-  { name: 'Good Friday', date: 'April 18, 2026' },
-  { name: 'May Day (Labour Day)', date: 'May 1, 2026' },
-  { name: 'Eid-ul-Adha (Bakrid)', date: 'June 6, 2026' },
-  { name: 'Independence Day', date: 'August 15, 2026' },
-  { name: 'Ganesh Chaturthi', date: 'August 27, 2026' },
-  { name: 'Gandhi Jayanti', date: 'October 2, 2026' },
-  { name: 'Vijayadasami (Dussehra)', date: 'October 22, 2026' },
-  { name: 'Diwali', date: 'November 1, 2026' },
-  { name: 'Christmas', date: 'December 25, 2026' },
 ];
 
 const ictPlatforms = [
@@ -86,6 +59,9 @@ export default function Information() {
   useEffect(() => {
     document.title = 'Information | VWU';
   }, []);
+
+  const { docs: academicCalendar } = useOrderedCollection<CalendarEntry>('academicCalendar', 'order');
+  const { docs: holidays } = useOrderedCollection<HolidayEntry>('holidays', 'order');
 
   useEffect(() => {
     const tab = hashToTab[location.hash];
@@ -142,7 +118,7 @@ export default function Information() {
                   </thead>
                   <tbody>
                     {academicCalendar.map((item, i) => (
-                      <tr key={i} style={{ borderBottom: '1px solid rgba(27, 67, 50, 0.08)', background: i % 2 === 0 ? 'var(--color-white)' : 'rgba(27, 67, 50, 0.035)' }}>
+                      <tr key={item.id} style={{ borderBottom: '1px solid rgba(27, 67, 50, 0.08)', background: i % 2 === 0 ? 'var(--color-white)' : 'rgba(27, 67, 50, 0.035)' }}>
                         <td style={{ padding: '12px 16px', color: 'var(--color-accent)', fontWeight: 900 }}>{i + 1}</td>
                         <td style={{ padding: '12px 16px', fontWeight: 600, color: 'var(--color-primary)' }}>{item.event}</td>
                         <td style={{ padding: '12px 16px', color: 'var(--color-text-light)' }}>{item.date}</td>
@@ -159,8 +135,8 @@ export default function Information() {
             <div>
               <h2 className="section-title" style={{ marginBottom: 'var(--space-8)' }}>List of Holidays 2026</h2>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-4)' }}>
-                {holidays.map((h, i) => (
-                  <div key={i} style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
+                {holidays.map((h) => (
+                  <div key={h.id} style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
                     <div style={{ background: 'var(--color-primary)', color: 'var(--color-accent)', fontFamily: 'var(--font-serif)', fontWeight: 900, fontSize: '1.3rem', borderRadius: 'var(--radius-sm)', padding: 'var(--space-3)', minWidth: 52, textAlign: 'center', lineHeight: 1 }}>
                       {h.date.split(' ')[1].replace(',', '')}
                       <div style={{ fontSize: '0.55rem', color: 'rgba(255,255,255,0.6)', fontFamily: 'var(--font-sans)', fontWeight: 400, letterSpacing: '0.05em', textTransform: 'uppercase' }}>{h.date.split(' ')[0].toUpperCase()}</div>

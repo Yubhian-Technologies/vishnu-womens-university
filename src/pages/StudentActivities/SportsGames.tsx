@@ -1,32 +1,15 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
-import { Activity, Waves, Goal, Feather, BadgeCheck, Dumbbell, Footprints } from 'lucide-react';
-
-const facilities = [
-  { icon: Activity, title: 'VISHNU Fitness Centre', desc: 'A well-equipped gymnasium with modern training apparatus, qualified instructors, and structured fitness programs available to all students.' },
-  { icon: Waves, title: 'Swimming Pool', desc: 'An Olympic-standard pool open to students and staff, supported by certified coaching and regularly scheduled training sessions.' },
-  { icon: Goal, title: 'Spacious Playground', desc: 'A large, well-kept outdoor ground for athletics, field sports, and team games — accommodating a broad range of sporting disciplines.' },
-  { icon: Feather, title: 'Indoor Sports Hall', desc: 'Year-round indoor facilities for badminton, table tennis, chess, carrom, and a variety of other indoor games.' },
-];
-
-const sportsProgram = [
-  { label: 'Physical Director', value: 'A qualified female Physical Director oversees all athletic programs and day-to-day activities' },
-  { label: 'University Competitions', value: 'Students regularly participate in JNTUK and inter-university sports meets' },
-  { label: 'Special Events', value: 'Annual Sports Day featuring track events, field disciplines, and team competitions' },
-  { label: 'Student Guidance', value: 'Personalised coaching and motivation to prepare students for university-level competition' },
-  { label: 'Inter-Collegiate', value: 'Scheduled inter-collegiate tournaments and sports meets throughout the year' },
-  { label: 'Daily Sessions', value: 'Structured morning and evening sessions supporting regular fitness for all students' },
-];
-
-const achievements = [
-  { icon: BadgeCheck, title: 'University-Level Champions', desc: 'VWU students consistently perform at JNTUK university-level competitions across a number of sports disciplines.' },
-  { icon: Dumbbell, title: 'Fitness Excellence', desc: 'Year-round fitness centre programs help students develop discipline, physical strength, and overall well-being.' },
-  { icon: Waves, title: 'Aquatics Coaching', desc: 'Certified coaches deliver structured swimming training, with students going on to compete at university and state levels.' },
-  { icon: Footprints, title: 'Athletics', desc: 'Track and field athletes are developed through systematic training and regular exposure to inter-collegiate competition.' },
-];
+import { Activity, BadgeCheck } from 'lucide-react';
+import { useContentBlocks } from '../../hooks/useContentBlocks';
+import { resolveContentIcon } from '../../lib/contentIcons';
 
 export default function SportsGames() {
+  const facilities = useContentBlocks('sports-games', 'facilities');
+  const sportsProgram = useContentBlocks('sports-games', 'program');
+  const achievements = useContentBlocks('sports-games', 'achievements');
+
   useEffect(() => {
     document.title = 'Sports & Games | VWU';
     const observer = new IntersectionObserver(
@@ -97,17 +80,20 @@ export default function SportsGames() {
             <h2 className="section-title">Sports Facilities</h2>
           </div>
           <div className="grid-4">
-            {facilities.map((f, i) => (
-              <div key={f.title} className="reveal" data-delay={`${i * 80}`}
-                style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', transition: 'all var(--transition-base)' }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-accent)'; (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-md)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-light-gray)'; (e.currentTarget as HTMLElement).style.boxShadow = 'none'; }}
-              >
-                <div style={{ marginBottom: 'var(--space-3)' }}><f.icon size={35} strokeWidth={1.75} /></div>
-                <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>{f.title}</h3>
-                <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6 }}>{f.desc}</p>
-              </div>
-            ))}
+            {facilities.map((f) => {
+              const Icon = resolveContentIcon(f.icon) || Activity;
+              return (
+                <div key={f.id}
+                  style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', transition: 'all var(--transition-base)' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-accent)'; (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-md)'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-light-gray)'; (e.currentTarget as HTMLElement).style.boxShadow = 'none'; }}
+                >
+                  <div style={{ marginBottom: 'var(--space-3)' }}><Icon size={35} strokeWidth={1.75} /></div>
+                  <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>{f.title}</h3>
+                  <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6 }}>{f.desc}</p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -121,9 +107,9 @@ export default function SportsGames() {
               <h2 className="section-title" style={{ fontSize: 'var(--text-2xl)' }}>Sports Program Highlights</h2>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', marginTop: 'var(--space-6)' }}>
                 {sportsProgram.map((sp) => (
-                  <div key={sp.label} style={{ display: 'flex', gap: 'var(--space-4)', padding: 'var(--space-4)', background: 'var(--color-off-white)', borderRadius: 'var(--radius-sm)', borderLeft: '3px solid var(--color-accent)' }}>
-                    <div style={{ minWidth: 130, fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.05em', paddingTop: 2 }}>{sp.label}</div>
-                    <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.5 }}>{sp.value}</div>
+                  <div key={sp.id} style={{ display: 'flex', gap: 'var(--space-4)', padding: 'var(--space-4)', background: 'var(--color-off-white)', borderRadius: 'var(--radius-sm)', borderLeft: '3px solid var(--color-accent)' }}>
+                    <div style={{ minWidth: 130, fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.05em', paddingTop: 2 }}>{sp.title}</div>
+                    <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.5 }}>{sp.desc}</div>
                   </div>
                 ))}
               </div>
@@ -132,15 +118,18 @@ export default function SportsGames() {
               <span className="section-label">Excellence</span>
               <h2 className="section-title" style={{ fontSize: 'var(--text-2xl)' }}>Sports Achievements</h2>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', marginTop: 'var(--space-6)' }}>
-                {achievements.map((a) => (
-                  <div key={a.title} style={{ display: 'flex', gap: 'var(--space-4)', alignItems: 'flex-start' }}>
-                    <a.icon size={29} strokeWidth={1.75} style={{ flexShrink: 0 }} />
-                    <div>
-                      <div style={{ fontFamily: 'var(--font-sans)', fontWeight: 900, fontSize: 'var(--text-sm)', color: 'var(--color-primary)', marginBottom: 4 }}>{a.title}</div>
-                      <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6 }}>{a.desc}</div>
+                {achievements.map((a) => {
+                  const Icon = resolveContentIcon(a.icon) || BadgeCheck;
+                  return (
+                    <div key={a.id} style={{ display: 'flex', gap: 'var(--space-4)', alignItems: 'flex-start' }}>
+                      <Icon size={29} strokeWidth={1.75} style={{ flexShrink: 0 }} />
+                      <div>
+                        <div style={{ fontFamily: 'var(--font-sans)', fontWeight: 900, fontSize: 'var(--text-sm)', color: 'var(--color-primary)', marginBottom: 4 }}>{a.title}</div>
+                        <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6 }}>{a.desc}</div>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </div>

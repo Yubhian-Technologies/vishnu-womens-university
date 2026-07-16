@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { MapPin, Mail, Building2, GraduationCap, Phone, Printer, Clock, CheckCircle2 } from 'lucide-react';
 import './Contact.css';
+import { useOrderedCollection } from '../../hooks/useCollection';
+import type { ContactDoc } from '../Admin/sections/ContactsAdmin';
 
 interface ContactForm {
   name: string;
@@ -19,6 +21,7 @@ const INITIAL_FORM: ContactForm = {
 };
 
 export default function Contact() {
+  const { docs: deptContacts } = useOrderedCollection<ContactDoc>('contacts', 'order');
   const [form, setForm] = useState<ContactForm>(INITIAL_FORM);
   const [submitted, setSubmitted] = useState(false);
   const revealRefs = useRef<(HTMLElement | null)[]>([]);
@@ -347,22 +350,8 @@ export default function Contact() {
             Department Contacts
           </h2>
           <div className="contact-dept-grid">
-            {[
-              { dept: 'CSE', hod: 'Dr. P. Kiran Sree', phone: '08816-250864', email: 'hod.cse@svecw.edu.in' },
-              { dept: 'AI & ML / AI & DS', hod: 'Dr. P. Kiran Sree', phone: '08816-250864', email: 'hod.aiml@svecw.edu.in' },
-              { dept: 'Information Technology', hod: 'Dr. D. Venkata Naga Raju', phone: '08816-250864', email: 'hod.it@svecw.edu.in' },
-              { dept: 'Electronics & Communication', hod: 'Dr. K. Padma Vasavi', phone: '08816-250864', email: 'hod.ece@svecw.edu.in' },
-              { dept: 'Electrical & Electronics', hod: 'Dr. S. M. Padmaja', phone: '08816-250864', email: 'hod.eee@svecw.edu.in' },
-              { dept: 'Civil Engineering', hod: 'Dr. Pala Gireesh Kumar', phone: '08816-250864', email: 'hod.civil@svecw.edu.in' },
-              { dept: 'Mechanical Engineering', hod: 'Dr. Ch. Hari Krishna', phone: '08816-250864', email: 'hod.mech@svecw.edu.in' },
-              { dept: 'MBA', hod: 'Head of Department', phone: '08816-250864', email: 'hod.mba@svecw.edu.in' },
-            ].map((d, i) => (
-              <div
-                key={d.dept}
-                className="contact-dept-card reveal"
-                ref={(el) => addReveal(el, 7 + i)}
-                data-delay={`${(i % 4) * 100}`}
-              >
+            {deptContacts.map((d) => (
+              <div key={d.id} className="contact-dept-card">
                 <h4>{d.dept}</h4>
                 <p className="contact-dept-hod">{d.hod}</p>
                 <a href={`mailto:${d.email}`} className="contact-dept-email">{d.email}</a>

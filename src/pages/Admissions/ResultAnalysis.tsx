@@ -1,36 +1,15 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
-import { Trophy, TrendingUp, BadgeCheck, GraduationCap, BookOpen, Presentation, Microscope, BarChart3, Award, Handshake } from 'lucide-react';
-
-const highlights = [
-  { icon: Trophy, value: 'Top 5', label: 'Among JNTUK Affiliated Colleges', desc: 'VWU consistently ranks in the top 5 affiliated engineering colleges under JNTU Kakinada in terms of pass percentage.' },
-  { icon: TrendingUp, value: '90%+', label: 'Annual Pass Rate', desc: 'More than ninety percent of students receive their Engineering Degree every academic year across all departments.' },
-  { icon: BadgeCheck, value: 'Gold Medals', label: 'University Rank Holders', desc: 'Students from VWU frequently achieve university Gold Medals, with many receiving multiple awards in a single convocation.' },
-  { icon: GraduationCap, value: '1,400+', label: 'Students Placed (2024–25)', desc: 'Record placements each year with leading companies including Amazon, TCS, Infosys, Wipro, and 150+ other recruiters.' },
-];
-
-const departmentStats = [
-  { dept: 'CSE', passRate: '95%', ranks: 'Multiple Gold Medalists' },
-  { dept: 'ECE', passRate: '93%', ranks: 'University Rank Holders' },
-  { dept: 'IT', passRate: '94%', ranks: 'University Rank Holders' },
-  { dept: 'EEE', passRate: '91%', ranks: 'University Rank Holders' },
-  { dept: 'ME', passRate: '90%', ranks: 'University Rank Holders' },
-  { dept: 'CE', passRate: '92%', ranks: 'University Rank Holders' },
-  { dept: 'AI', passRate: '94%', ranks: 'University Rank Holders' },
-  { dept: 'MBA', passRate: '93%', ranks: 'University Rank Holders' },
-];
-
-const factors = [
-  { icon: BookOpen, title: 'Rigorous Academic Curriculum', desc: 'Industry-aligned curriculum updated regularly with inputs from academia and industry experts.' },
-  { icon: Presentation, title: '230+ Expert Faculty', desc: 'Highly qualified faculty with doctoral degrees, research experience, and industry exposure.' },
-  { icon: Microscope, title: 'State-of-the-Art Labs', desc: '50+ specialised labs providing hands-on practical training alongside theoretical learning.' },
-  { icon: BarChart3, title: 'Continuous Assessment', desc: 'Regular internal assessments, remedial classes, and personalised mentoring for every student.' },
-  { icon: Award, title: 'Competitive Coaching', desc: 'Dedicated coaching for GATE, GRE, and competitive exams to boost higher education outcomes.' },
-  { icon: Handshake, title: 'Industry Partnerships', desc: 'MoUs with leading companies enable real-world project exposure and internship opportunities.' },
-];
+import { useContentBlocks } from '../../hooks/useContentBlocks';
+import { resolveContentIcon } from '../../lib/contentIcons';
+import { Trophy } from 'lucide-react';
 
 export default function ResultAnalysis() {
+  const highlights = useContentBlocks('result-analysis', 'highlights');
+  const departmentStats = useContentBlocks('result-analysis', 'departmentStats');
+  const factors = useContentBlocks('result-analysis', 'factors');
+
   useEffect(() => {
     document.title = 'Result Analysis | VWU';
     const observer = new IntersectionObserver(
@@ -77,18 +56,21 @@ export default function ResultAnalysis() {
             <h2 className="section-title">Result Highlights</h2>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-5)' }}>
-            {highlights.map((h, i) => (
-              <div key={h.label} className="reveal" data-delay={`${i * 80}`}
-                style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', textAlign: 'center', transition: 'all var(--transition-base)' }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-accent)'; (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-md)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-light-gray)'; (e.currentTarget as HTMLElement).style.boxShadow = 'none'; }}
-              >
-                <div style={{ marginBottom: 'var(--space-3)' }}><h.icon size={38} strokeWidth={1.75} /></div>
-                <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 4 }}>{h.value}</div>
-                <div style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 'var(--space-3)' }}>{h.label}</div>
-                <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6 }}>{h.desc}</p>
-              </div>
-            ))}
+            {highlights.map((h) => {
+              const Icon = resolveContentIcon(h.icon) || Trophy;
+              return (
+                <div key={h.id}
+                  style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', textAlign: 'center', transition: 'all var(--transition-base)' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-accent)'; (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-md)'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-light-gray)'; (e.currentTarget as HTMLElement).style.boxShadow = 'none'; }}
+                >
+                  <div style={{ marginBottom: 'var(--space-3)' }}><Icon size={38} strokeWidth={1.75} /></div>
+                  <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 4 }}>{h.value}</div>
+                  <div style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 'var(--space-3)' }}>{h.title}</div>
+                  <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6 }}>{h.desc}</p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -100,7 +82,7 @@ export default function ResultAnalysis() {
             <span className="section-label">Department Performance</span>
             <h2 className="section-title">Department-Wise Results</h2>
           </div>
-          <div className="reveal" style={{ borderRadius: 'var(--radius-md)', overflow: 'hidden', boxShadow: 'var(--shadow-md)', maxWidth: 720, margin: '0 auto' }}>
+          <div style={{ borderRadius: 'var(--radius-md)', overflow: 'hidden', boxShadow: 'var(--shadow-md)', maxWidth: 720, margin: '0 auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', background: 'var(--color-white)' }}>
               <thead>
                 <tr style={{ background: 'var(--color-primary)' }}>
@@ -111,12 +93,12 @@ export default function ResultAnalysis() {
               </thead>
               <tbody>
                 {departmentStats.map((d, i) => (
-                  <tr key={d.dept} style={{ background: i % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)' }}>
-                    <td style={{ padding: 'var(--space-4) var(--space-5)', fontFamily: 'var(--font-sans)', fontWeight: 700, color: 'var(--color-primary)', fontSize: 'var(--text-sm)', borderBottom: '1px solid var(--color-light-gray)' }}>{d.dept}</td>
+                  <tr key={d.id} style={{ background: i % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)' }}>
+                    <td style={{ padding: 'var(--space-4) var(--space-5)', fontFamily: 'var(--font-sans)', fontWeight: 700, color: 'var(--color-primary)', fontSize: 'var(--text-sm)', borderBottom: '1px solid var(--color-light-gray)' }}>{d.title}</td>
                     <td style={{ padding: 'var(--space-4) var(--space-5)', fontSize: 'var(--text-sm)', borderBottom: '1px solid var(--color-light-gray)' }}>
-                      <span style={{ background: 'rgba(201,168,76,0.15)', color: 'var(--color-primary)', fontWeight: 700, padding: '2px 10px', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(201,168,76,0.3)' }}>{d.passRate}</span>
+                      <span style={{ background: 'rgba(201,168,76,0.15)', color: 'var(--color-primary)', fontWeight: 700, padding: '2px 10px', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(201,168,76,0.3)' }}>{d.value}</span>
                     </td>
-                    <td style={{ padding: 'var(--space-4) var(--space-5)', fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', borderBottom: '1px solid var(--color-light-gray)' }}>{d.ranks}</td>
+                    <td style={{ padding: 'var(--space-4) var(--space-5)', fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', borderBottom: '1px solid var(--color-light-gray)' }}>{d.desc}</td>
                   </tr>
                 ))}
               </tbody>
@@ -133,17 +115,20 @@ export default function ResultAnalysis() {
             <h2 style={{ color: 'var(--color-white)' }} className="section-title">Factors Behind Our Results</h2>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-5)' }}>
-            {factors.map((f, i) => (
-              <div key={f.title} className="reveal" data-delay={`${i * 70}`}
-                style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', transition: 'all var(--transition-base)' }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'; (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-accent)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.12)'; }}
-              >
-                <div style={{ marginBottom: 'var(--space-3)' }}><f.icon size={32} strokeWidth={1.75} /></div>
-                <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 900, color: 'var(--color-accent)', marginBottom: 'var(--space-2)' }}>{f.title}</h3>
-                <p style={{ fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.75)', lineHeight: 1.6 }}>{f.desc}</p>
-              </div>
-            ))}
+            {factors.map((f) => {
+              const Icon = resolveContentIcon(f.icon) || Trophy;
+              return (
+                <div key={f.id}
+                  style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', transition: 'all var(--transition-base)' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'; (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-accent)'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.12)'; }}
+                >
+                  <div style={{ marginBottom: 'var(--space-3)' }}><Icon size={32} strokeWidth={1.75} /></div>
+                  <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 900, color: 'var(--color-accent)', marginBottom: 'var(--space-2)' }}>{f.title}</h3>
+                  <p style={{ fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.75)', lineHeight: 1.6 }}>{f.desc}</p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>

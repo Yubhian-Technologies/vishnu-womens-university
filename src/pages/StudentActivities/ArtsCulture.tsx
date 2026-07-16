@@ -1,50 +1,14 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
-import { PartyPopper, Palette, Drama, Camera, Sparkles, Microscope, Award } from 'lucide-react';
-
-const initiatives = [
-  {
-    icon: PartyPopper,
-    title: 'Festival Celebrations',
-    desc: 'VWU celebrates every Indian festival with genuine enthusiasm and collective participation, embodying the spirit of "Vasudhaika Kutumbakam" — the world is one family.',
-  },
-  {
-    icon: Palette,
-    title: 'Artistic Development',
-    desc: 'Students with a passion for the arts receive encouragement, guidance, and access to facilities for painting, photography, music, and decorative arts, growing their talent alongside their technical studies.',
-  },
-  {
-    icon: Drama,
-    title: 'Performing Arts',
-    desc: 'Dance, drama, and music are central to campus culture. Dedicated clubs and regular events give students the stage to develop their talents and share them with the wider community.',
-  },
-  {
-    icon: Camera,
-    title: 'Photography & Film',
-    desc: 'The Flash It Out Club and Vishnu TV Academy offer students real creative outlets for photography and filmmaking, telling stories from campus life and beyond.',
-  },
-];
-
-const events = [
-  {
-    icon: Sparkles,
-    name: 'Annual Day',
-    desc: 'VWU\'s flagship annual celebration — a showcase of student talent through cultural performances, institutional awards, and recognition of academic and co-curricular achievement.',
-  },
-  {
-    icon: Microscope,
-    name: 'Medha Milan',
-    desc: 'A national-level technical symposium drawing students from across Andhra Pradesh and Telangana for competitions, paper presentations, and cultural programs.',
-  },
-  {
-    icon: Award,
-    name: 'Sports Day',
-    desc: 'The annual Sports Day that honours athletic achievement and healthy competition — featuring track events, field sports, and special recognition for standout performers.',
-  },
-];
+import { PartyPopper } from 'lucide-react';
+import { useContentBlocks } from '../../hooks/useContentBlocks';
+import { resolveContentIcon } from '../../lib/contentIcons';
 
 export default function ArtsCulture() {
+  const initiatives = useContentBlocks('arts-culture', 'initiatives');
+  const events = useContentBlocks('arts-culture', 'events');
+
   useEffect(() => {
     document.title = 'Arts & Culture | VWU';
     const observer = new IntersectionObserver(
@@ -115,17 +79,20 @@ export default function ArtsCulture() {
             <h2 className="section-title">Cultural Initiatives</h2>
           </div>
           <div className="grid-4">
-            {initiatives.map((init, i) => (
-              <div key={init.title} className="reveal" data-delay={`${i * 80}`}
-                style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', transition: 'all var(--transition-base)' }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-accent)'; (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-md)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-light-gray)'; (e.currentTarget as HTMLElement).style.boxShadow = 'none'; }}
-              >
-                <div style={{ marginBottom: 'var(--space-3)' }}><init.icon size={35} strokeWidth={1.75} /></div>
-                <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>{init.title}</h3>
-                <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6 }}>{init.desc}</p>
-              </div>
-            ))}
+            {initiatives.map((init) => {
+              const Icon = resolveContentIcon(init.icon) || PartyPopper;
+              return (
+                <div key={init.id}
+                  style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', transition: 'all var(--transition-base)' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-accent)'; (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-md)'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-light-gray)'; (e.currentTarget as HTMLElement).style.boxShadow = 'none'; }}
+                >
+                  <div style={{ marginBottom: 'var(--space-3)' }}><Icon size={35} strokeWidth={1.75} /></div>
+                  <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>{init.title}</h3>
+                  <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6 }}>{init.desc}</p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -141,17 +108,20 @@ export default function ArtsCulture() {
             </p>
           </div>
           <div className="grid-3">
-            {events.map((ev, i) => (
-              <div key={ev.name} className="reveal" data-delay={`${i * 100}`}
-                style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 'var(--radius-md)', padding: 'var(--space-8)', textAlign: 'center', transition: 'all var(--transition-base)' }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'; (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-accent)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.12)'; }}
-              >
-                <div style={{ marginBottom: 'var(--space-4)' }}><ev.icon size={48} strokeWidth={1.75} /></div>
-                <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: 'var(--text-xl)', fontWeight: 900, color: 'var(--color-accent)', marginBottom: 'var(--space-3)' }}>{ev.name}</h3>
-                <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: 'var(--text-sm)', lineHeight: 1.7 }}>{ev.desc}</p>
-              </div>
-            ))}
+            {events.map((ev) => {
+              const Icon = resolveContentIcon(ev.icon) || PartyPopper;
+              return (
+                <div key={ev.id}
+                  style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 'var(--radius-md)', padding: 'var(--space-8)', textAlign: 'center', transition: 'all var(--transition-base)' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'; (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-accent)'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.12)'; }}
+                >
+                  <div style={{ marginBottom: 'var(--space-4)' }}><Icon size={48} strokeWidth={1.75} /></div>
+                  <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: 'var(--text-xl)', fontWeight: 900, color: 'var(--color-accent)', marginBottom: 'var(--space-3)' }}>{ev.title}</h3>
+                  <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: 'var(--text-sm)', lineHeight: 1.7 }}>{ev.desc}</p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
