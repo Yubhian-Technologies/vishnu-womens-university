@@ -21,6 +21,7 @@ import GovernanceDetail from './pages/Governance/GovernanceDetail';
 import GoverningBody from './pages/Governance/GoverningBody';
 import AboutSVES from './pages/AboutSVES/AboutSVES';
 import Campus from './pages/Campus/Campus';
+import CampusFacilityDetail from './pages/Campus/CampusFacilityDetail';
 import Information from './pages/Information/Information';
 import ProgrammesFee from './pages/Admissions/ProgrammesFee';
 import AdmissionProcedure from './pages/Admissions/AdmissionProcedure';
@@ -77,6 +78,7 @@ function PublicApp() {
         <Route path="/governance/:slug" element={<GovernanceDetail />} />
         <Route path="/about-sves" element={<AboutSVES />} />
         <Route path="/campus" element={<Campus />} />
+        <Route path="/campus/:slug" element={<CampusFacilityDetail />} />
         <Route path="/information" element={<Information />} />
         <Route path="/programmes-fee-structure" element={<ProgrammesFee />} />
         <Route path="/admission-procedure" element={<AdmissionProcedure />} />

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from '../../lib/firebase';
 import AdminLogin from './AdminLogin';
@@ -33,7 +34,18 @@ export const SECTIONS = [
 export default function AdminLayout() {
   const [user, setUser] = useState<{ email: string | null } | null>(null);
   const [checking, setChecking] = useState(true);
-  const [activeSection, setActiveSection] = useState('overview');
+  // URL-backed so a section (and, deeper in, a specific Website Photos
+  // page/sub-section) is linkable/bookmarkable/shareable, and survives a
+  // refresh instead of resetting to Overview.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeSection = searchParams.get('section') ?? 'overview';
+  const setActiveSection = (id: string) => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set('section', id);
+      return next;
+    }, { replace: true });
+  };
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (u) => {

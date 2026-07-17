@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp,
 } from 'firebase/firestore';
@@ -33,6 +34,7 @@ export const SITE_PHOTO_PAGES = [
   { value: 'vishnu-tv', label: 'Vishnu TV Academy' },
   { value: 'sports-games', label: 'Sports & Games' },
   { value: 'social-services', label: 'Social Services (NSS)' },
+  { value: 'iqac', label: 'IQAC' },
 ];
 
 interface SlotDefault { imageUrl: string; alt: string; caption: string; label?: string; }
@@ -48,6 +50,20 @@ function placeholderSection(label: string, titles: string[]): SectionDef {
       alt: title,
       caption: '',
       label: title,
+    })),
+  };
+}
+
+// A single-topic sub-section (e.g. one specific facility) — 5 generic photo
+// slots for that one topic, rather than 5 differently-named topics.
+function placeholderPhotoBank(label: string): SectionDef {
+  return {
+    label,
+    slots: Array.from({ length: 5 }, (_, i) => ({
+      imageUrl: PHOTO_NEEDED_PLACEHOLDER,
+      alt: `${label} — Photo ${i + 1}`,
+      caption: '',
+      label: `Photo ${i + 1}`,
     })),
   };
 }
@@ -80,6 +96,24 @@ const DEFAULT_SECTIONS: Record<string, Record<string, SectionDef>> = {
     'hostels-living': placeholderSection('Hostels & Living', [
       'Hostel Blocks Exterior', 'Standard Room Layout', 'Dining Hall & Mess', 'Indoor Recreation Room', 'Security & Main Gate',
     ]),
+    // The 16 real "Discover > Campus Life" header dropdown items — each its
+    // own 5-photo bank, matching the real nav exactly (Header.tsx navItems).
+    'smart-classrooms': placeholderPhotoBank('Smart Class Rooms'),
+    'state-of-the-art-labs': placeholderPhotoBank('State-of-the-art Labs'),
+    'central-library': placeholderPhotoBank('Central Library'),
+    'auditoriums': placeholderPhotoBank('Auditoriums'),
+    'campus-book-stores': placeholderPhotoBank('Campus Book Stores'),
+    'wifi-campus': placeholderPhotoBank('Wi-Fi Campus'),
+    'campus-hostels': placeholderPhotoBank('Campus Hostels'),
+    'food-courts': placeholderPhotoBank('Food Courts'),
+    'fitness-centre': placeholderPhotoBank('VISHNU Fitness Centre'),
+    'staff-quarters': placeholderPhotoBank('Staff Quarters'),
+    'travel-desk': placeholderPhotoBank('Travel Desk'),
+    'temples': placeholderPhotoBank('Temples'),
+    'health-care': placeholderPhotoBank('Health Care'),
+    'swimming-pool': placeholderPhotoBank('Swimming Pool'),
+    'campus-security': placeholderPhotoBank('Campus Security'),
+    'other-facilities': placeholderPhotoBank('Other Facilities'),
   },
   about: {
     main: {
@@ -267,6 +301,20 @@ const DEFAULT_SECTIONS: Record<string, Record<string, SectionDef>> = {
       ],
     },
   },
+  // The 8 real "Statutory > IQAC" header dropdown items (Header.tsx
+  // navItems). Like the rest of Statutory, these pages share the generic
+  // GovernanceDetail.tsx template, which has no photo-rendering area yet —
+  // these slots are admin-side only until that template gets one built in.
+  iqac: {
+    main: placeholderPhotoBank('About IQAC'),
+    'iqac-worksystem': placeholderPhotoBank('IQAC Worksystem'),
+    'quality-parameters': placeholderPhotoBank('Quality Parameters'),
+    'iqac-committee': placeholderPhotoBank('IQAC Committee'),
+    'policies-procedures': placeholderPhotoBank('Policies & Procedures'),
+    'annual-reports': placeholderPhotoBank('Annual Reports & Reforms'),
+    'nirf-reports': placeholderPhotoBank('MHRD NIRF Reports'),
+    'nba-data': placeholderPhotoBank('NBA – Data Capturing Points'),
+  },
 };
 
 // Mirrors the real header nav (src/components/Header/Header.tsx `navItems`)
@@ -282,8 +330,15 @@ const NAV_CATEGORIES: NavCategory[] = [
   { label: 'Discover', pages: ['about', 'vision-mission', 'about-sves', 'campus', 'information'] },
   {
     label: 'Statutory',
-    pages: ['governance'],
-    emptyNote: 'The Governing Body / Committees / IQAC pages under this menu are individual text pages with only a shared banner image each (editable via Hero Banners) — they don\'t have their own photo galleries. Only the main Governance page itself does (select it above).',
+    // Governance = the real /governance hub page (real content, already
+    // built). IQAC's 8 pages share the generic photo-less GovernanceDetail
+    // template (see the comment on `iqac` in DEFAULT_SECTIONS above) — its
+    // slots are admin-side only until that template has somewhere to show
+    // them. The remaining Committees group (13 items) and the other 4
+    // Governance-group detail pages (Governing Body, Academic Council,
+    // Board of Studies, Finance Committee) use that same template too, so
+    // they're intentionally not listed here yet.
+    pages: ['governance', 'iqac'],
   },
   { label: 'Academics', pages: ['academics'] },
   { label: 'Admissions', pages: ['admissions'] },
@@ -313,9 +368,15 @@ const NAV_CATEGORIES: NavCategory[] = [
 
 export default function SitePhotosAdmin() {
   const { docs: allPhotos, loading } = useOrderedCollection<SitePhotoDoc>('sitePhotos', 'order');
-  const [selectedNavCategory, setSelectedNavCategory] = useState('Discover');
-  const [activePage, setActivePage] = useState('about');
-  const [selectedSection, setSelectedSection] = useState('main');
+  // URL-backed (not useState): which menu/page/sub-section is selected is
+  // reflected in the address bar (?navCategory=&photoPage=&photoSection=),
+  // so a specific module like "Smart Class Rooms" is directly linkable,
+  // shareable, and survives a refresh — clicking a dropdown item genuinely
+  // navigates rather than just flipping in-memory state.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const selectedNavCategory = searchParams.get('navCategory') ?? 'Discover';
+  const activePage = searchParams.get('photoPage') ?? 'about';
+  const selectedSection = searchParams.get('photoSection') ?? 'main';
   const [uploadingSlot, setUploadingSlot] = useState<number | null>(null);
   const [editingSlot, setEditingSlot] = useState<number | null>(null);
   const [textForm, setTextForm] = useState({ alt: '', caption: '' });
@@ -336,21 +397,33 @@ export default function SitePhotosAdmin() {
   const pageLabel = (val: string) => SITE_PHOTO_PAGES.find((p) => p.value === val)?.label ?? val;
 
   const selectNavCategory = (label: string) => {
-    setSelectedNavCategory(label);
     const cat = NAV_CATEGORIES.find((c) => c.label === label);
-    setActivePage(cat?.pages[0] ?? '');
-    setSelectedSection('main');
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set('navCategory', label);
+      next.set('photoPage', cat?.pages[0] ?? '');
+      next.set('photoSection', 'main');
+      return next;
+    }, { replace: true });
     setEditingSlot(null);
   };
 
   const selectPage = (page: string) => {
-    setActivePage(page);
-    setSelectedSection('main');
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set('photoPage', page);
+      next.set('photoSection', 'main');
+      return next;
+    }, { replace: true });
     setEditingSlot(null);
   };
 
   const selectSection = (section: string) => {
-    setSelectedSection(section);
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set('photoSection', section);
+      return next;
+    }, { replace: true });
     setEditingSlot(null);
   };
 
