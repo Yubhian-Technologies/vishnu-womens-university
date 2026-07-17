@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { BarChart3, Trophy, CheckCircle2, type LucideIcon } from 'lucide-react';
-import { awards, AwardItem } from './news-awards.data';
 import PageHero from '../../components/PageHero/PageHero';
 import { useHashScroll } from '../../hooks/useHashScroll';
+import { useOrderedCollection } from '../../hooks/useCollection';
+import type { AwardDoc } from '../Admin/sections/NewsAwardsDataAdmin';
 
 const tabs = [
   { key: 'ranking', label: 'Rankings & Ratings' },
@@ -19,11 +20,9 @@ const categoryIcons: Record<TabKey, LucideIcon> = {
   accreditation: CheckCircle2,
 };
 
-function AwardCard({ item, index }: { item: AwardItem; index: number }) {
+function AwardCard({ item }: { item: AwardDoc }) {
   return (
     <div
-      className="reveal"
-      data-delay={`${index * 50}`}
       style={{
         background: 'var(--color-white)',
         border: '1.5px solid var(--color-light-gray)',
@@ -59,6 +58,7 @@ function AwardCard({ item, index }: { item: AwardItem; index: number }) {
 export default function Accreditations() {
   const [activeTab, setActiveTab] = useState<TabKey>('ranking');
   useHashScroll();
+  const { docs: awards } = useOrderedCollection<AwardDoc>('awards', 'order');
 
   useEffect(() => {
     document.title = 'Accreditations & Awards | Vishnu Womens University';
@@ -154,8 +154,8 @@ export default function Accreditations() {
 
           {/* Cards grid */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 'var(--space-4)' }}>
-            {filtered.map((item, i) => (
-              <AwardCard key={item.name} item={item} index={i} />
+            {filtered.map((item) => (
+              <AwardCard key={item.id} item={item} />
             ))}
           </div>
         </div>

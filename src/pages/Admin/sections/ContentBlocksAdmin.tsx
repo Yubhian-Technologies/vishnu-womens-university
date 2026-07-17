@@ -30,26 +30,53 @@ const EMPTY: Omit<ContentBlockDoc, 'id'> = { page: '', section: '', value: '', t
 // collection. Add a new entry here first when wiring a new list.
 export const CONTENT_BLOCK_SECTIONS: { page: string; section: string; label: string }[] = [
   { page: 'about', section: 'quickStats', label: 'About — Quick Stats' },
+  { page: 'about', section: 'academicSnapshotStats', label: 'About — Academic Snapshot Stats' },
+  { page: 'about', section: 'differentiators', label: 'About — Differentiators (use Value field for category name)' },
+  { page: 'about', section: 'discoverCards', label: 'About — Discover Sub-pages' },
+  { page: 'academics', section: 'quickStats', label: 'Academics — Quick Stats' },
+  { page: 'academics', section: 'studentActivities', label: 'Academics — Student Activities Nav' },
+  { page: 'academics', section: 'careerOutcomeStats', label: 'Academics — Career Outcome Stats' },
   { page: 'campus', section: 'stats', label: 'Campus — Stats Bar' },
+  { page: 'information', section: 'ictPlatforms', label: 'Information — ICT Platforms' },
+  { page: 'information', section: 'howToReach', label: 'Information — How to Reach' },
+  { page: 'information', section: 'counsellingScheme', label: 'Information — Counselling Scheme' },
+  { page: 'information', section: 'otherPractices', label: 'Information — Other Practices' },
   { page: 'campus', section: 'facilities', label: 'Campus — Facilities' },
   { page: 'governance', section: 'stats', label: 'Governance — Stats Bar' },
   { page: 'result-analysis', section: 'highlights', label: 'Result Analysis — Highlights' },
   { page: 'result-analysis', section: 'departmentStats', label: 'Result Analysis — Department Stats' },
   { page: 'result-analysis', section: 'factors', label: 'Result Analysis — Success Factors' },
   { page: 'student-clubs', section: 'stats', label: 'Student Clubs — Stats Bar' },
+  { page: 'student-life', section: 'clubs', label: 'Student Life — Clubs & Orgs' },
+  { page: 'student-life', section: 'housing', label: 'Student Life — Housing' },
+  { page: 'student-life', section: 'services', label: 'Student Life — Support Services' },
+  { page: 'student-life', section: 'athletics', label: 'Student Life — Athletics/Sports' },
+  { page: 'student-life', section: 'diningFeatures', label: 'Student Life — Dining Features' },
   { page: 'news-awards', section: 'highlights', label: 'News & Awards — Highlights' },
   { page: 'about-sves', section: 'stats', label: 'About SVES — Stats' },
   { page: 'about-sves', section: 'milestones', label: 'About SVES — Milestones' },
+  { page: 'home', section: 'counters', label: 'Home — Key Statistics (animated counters)' },
   { page: 'home', section: 'recognitions', label: 'Home — Recognitions' },
   { page: 'home', section: 'campusFeatures', label: 'Home — Campus Features' },
   { page: 'home', section: 'testimonials', label: 'Home — Testimonials' },
+  { page: 'home', section: 'studyCards', label: 'Home — Study at VWU Cards' },
+  { page: 'home', section: 'popularPrograms', label: 'Home — Popular Programs Tags' },
   { page: 'vision-mission', section: 'missionPoints', label: 'Vision & Mission — Mission Points' },
   { page: 'vision-mission', section: 'values', label: 'Vision & Mission — Core Values' },
   { page: 'vision-mission', section: 'qualityPolicy', label: 'Vision & Mission — Quality Policy' },
   { page: 'careers', section: 'perks', label: 'Careers — Perks' },
+  { page: 'contact', section: 'infoCards', label: 'Contact — Info Cards (Campus/Email/HQ/Admissions)' },
+  { page: 'contact', section: 'socialLinks', label: 'Contact — Social Media Links' },
   { page: 'admissions', section: 'scholarships', label: 'Admissions — Scholarships' },
   { page: 'admissions', section: 'tuitionData', label: 'Admissions — Tuition Summary Table' },
+  { page: 'admissions', section: 'steps', label: 'Admissions — How to Apply Steps' },
+  { page: 'admissions', section: 'admissionHub', label: 'Admissions — Hub Cards' },
+  { page: 'admissions', section: 'visitOptions', label: 'Admissions — Campus Visit Options' },
   { page: 'admission-procedure', section: 'stats', label: 'Admission Procedure — Stats' },
+  { page: 'admission-procedure', section: 'btechSteps', label: 'Admission Procedure — B.Tech Steps' },
+  { page: 'admission-procedure', section: 'mtechSteps', label: 'Admission Procedure — M.Tech Steps' },
+  { page: 'admission-procedure', section: 'mbaSteps', label: 'Admission Procedure — MBA Steps' },
+  { page: 'admission-procedure', section: 'documents', label: 'Admission Procedure — Documents Checklist' },
   { page: 'arts-culture', section: 'initiatives', label: 'Arts & Culture — Initiatives' },
   { page: 'arts-culture', section: 'events', label: 'Arts & Culture — Signature Events' },
   { page: 'social-services', section: 'communities', label: 'Social Services — Communities' },
@@ -125,7 +152,7 @@ export default function ContentBlocksAdmin() {
             </select>
           </div>
           <div className="admin-field">
-            <label>Value (number/short value, if this is a stat)</label>
+            <label>Value (number/short value if a stat; a URL for Social Links; a meta line like a phone number for Contact Info Cards)</label>
             <input value={form.value} onChange={(e) => set('value', e.target.value)} placeholder="100 Acres" />
           </div>
           <div className="admin-field">
@@ -136,7 +163,7 @@ export default function ContentBlocksAdmin() {
             </select>
           </div>
           <div className="admin-field">
-            <label>Anchor Slug / Extra URL (only if this item needs a #link — or, for Home Testimonials, the avatar image URL)</label>
+            <label>Anchor Slug / Extra field (only if this item needs a #link — or the avatar URL for Home Testimonials, or a second meta line for Contact Info Cards)</label>
             <input value={form.slug} onChange={(e) => set('slug', e.target.value)} placeholder="smart-classrooms" />
           </div>
           <div className="admin-field">
@@ -148,8 +175,8 @@ export default function ContentBlocksAdmin() {
             <input value={form.title} onChange={(e) => set('title', e.target.value)} placeholder="Campus Area" />
           </div>
           <div className="admin-field admin-field--full">
-            <label>Description (if this item needs one)</label>
-            <textarea rows={2} value={form.desc} onChange={(e) => set('desc', e.target.value)} placeholder="Optional longer text…" />
+            <label>Description (if this item needs one — for Contact Info Cards, put each address line on its own line)</label>
+            <textarea rows={3} value={form.desc} onChange={(e) => set('desc', e.target.value)} placeholder="Optional longer text…" />
           </div>
         </div>
         <div className="admin-form-actions">

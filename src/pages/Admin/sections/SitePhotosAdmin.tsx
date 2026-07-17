@@ -19,7 +19,7 @@ export interface SitePhotoDoc {
 }
 
 export const SITE_PHOTO_PAGES = [
-  { value: 'campus', label: 'Campus' },
+  { value: 'campus', label: 'Campus Life' },
   { value: 'about', label: 'About VWU' },
   { value: 'academics', label: 'Academics' },
   { value: 'admissions', label: 'Admissions' },
@@ -276,10 +276,22 @@ const DEFAULT_SECTIONS: Record<string, Record<string, SectionDef>> = {
 // Links are text pages with a single shared banner (already editable via
 // Hero Banners) and no distinct content photos; News & Awards' Gallery is
 // managed by its own separate, already-working admin section.
-interface NavCategory { label: string; pages: string[]; emptyNote?: string; }
+interface NavSubGroup { label: string; pages: string[]; }
+interface NavCategory { label: string; pages: string[]; subGroups?: NavSubGroup[]; emptyNote?: string; }
 
 const NAV_CATEGORIES: NavCategory[] = [
-  { label: 'Discover', pages: ['about', 'vision-mission', 'about-sves', 'campus', 'information'] },
+  {
+    label: 'Discover',
+    pages: ['about', 'vision-mission', 'about-sves', 'campus', 'information'],
+    // Sub-grouped to match the header's "Discover" mega-menu exactly (About
+    // Us / Campus Life / Information) — flattening these into one list is
+    // what made it hard to find "Campus Life" and "Information" here before.
+    subGroups: [
+      { label: 'About Us', pages: ['about', 'vision-mission', 'about-sves'] },
+      { label: 'Campus Life', pages: ['campus'] },
+      { label: 'Information', pages: ['information'] },
+    ],
+  },
   {
     label: 'Statutory',
     pages: ['governance'],
@@ -493,7 +505,25 @@ export default function SitePhotosAdmin() {
           </div>
         </div>
 
-        {categoryPages.length > 0 ? (
+        {currentCategory?.subGroups ? (
+          currentCategory.subGroups.map((sg) => (
+            <div className="admin-page-selector" style={{ marginTop: '1.25rem' }} key={sg.label}>
+              <p className="admin-page-selector__label">{sg.label}</p>
+              <div className="admin-page-selector__grid">
+                {sg.pages.map((val) => (
+                  <button
+                    key={val}
+                    type="button"
+                    className={`admin-page-btn${activePage === val ? ' active' : ''}`}
+                    onClick={() => selectPage(val)}
+                  >
+                    {pageLabel(val)}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))
+        ) : categoryPages.length > 0 ? (
           <div className="admin-page-selector" style={{ marginTop: '1.25rem' }}>
             <p className="admin-page-selector__label">Which page?</p>
             <div className="admin-page-selector__grid">

@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { MapPin, Mail, Building2, GraduationCap, Phone, Printer, Clock, CheckCircle2 } from 'lucide-react';
+import { MapPin, CheckCircle2 } from 'lucide-react';
 import './Contact.css';
 import { useOrderedCollection } from '../../hooks/useCollection';
+import { useContentBlocks } from '../../hooks/useContentBlocks';
+import { resolveContentIcon } from '../../lib/contentIcons';
 import type { ContactDoc } from '../Admin/sections/ContactsAdmin';
 
 interface ContactForm {
@@ -20,8 +22,18 @@ const INITIAL_FORM: ContactForm = {
   message: '',
 };
 
+const SOCIAL_GLYPHS: Record<string, { glyph: string; className: string }> = {
+  YouTube: { glyph: '▶', className: 'contact-social-link--yt' },
+  Facebook: { glyph: 'f', className: 'contact-social-link--fb' },
+  Instagram: { glyph: '◎', className: 'contact-social-link--ig' },
+  Twitter: { glyph: '𝕏', className: 'contact-social-link--tw' },
+  LinkedIn: { glyph: 'in', className: 'contact-social-link--li' },
+};
+
 export default function Contact() {
   const { docs: deptContacts } = useOrderedCollection<ContactDoc>('contacts', 'order');
+  const infoCards = useContentBlocks('contact', 'infoCards');
+  const socialLinks = useContentBlocks('contact', 'socialLinks');
   const [form, setForm] = useState<ContactForm>(INITIAL_FORM);
   const [submitted, setSubmitted] = useState(false);
   const revealRefs = useRef<(HTMLElement | null)[]>([]);
@@ -76,82 +88,34 @@ export default function Contact() {
         </div>
       </section>
 
-      {/* Info Cards */}
+      {/* Info Cards — Firestore-derived, so no scroll-reveal animation
+          on the cards themselves (see the gotcha documented in CLAUDE.md). */}
       <section className="contact-info-section">
         <div className="contact-container">
           <div className="contact-info-grid">
-            {/* Main Campus */}
-            <div
-              className="contact-info-card reveal"
-              ref={(el) => addReveal(el, 0)}
-              data-delay="0"
-            >
-              <div className="contact-info-icon"><MapPin size={32} strokeWidth={1.75} /></div>
-              <h3>Main Campus</h3>
-              <p>
-                Vishnupur, Bhimavaram – 534&nbsp;202<br />
-                West Godavari District<br />
-                Andhra Pradesh, India
-              </p>
-              <div className="contact-info-meta">
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><Phone size={14} /> 08816-250864</span>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><Printer size={14} /> 08816-250099</span>
-              </div>
-            </div>
-
-            {/* Email */}
-            <div
-              className="contact-info-card reveal"
-              ref={(el) => addReveal(el, 1)}
-              data-delay="100"
-            >
-              <div className="contact-info-icon"><Mail size={32} strokeWidth={1.75} /></div>
-              <h3>Email Us</h3>
-              <p>
-                <a href="mailto:info@svecw.edu.in">info@svecw.edu.in</a><br />
-                <a href="mailto:principal@svecw.edu.in">principal@svecw.edu.in</a>
-              </p>
-              <div className="contact-info-meta">
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><Clock size={14} /> Mon–Sat: 9 AM – 5 PM</span>
-              </div>
-            </div>
-
-            {/* Society HQ */}
-            <div
-              className="contact-info-card reveal"
-              ref={(el) => addReveal(el, 2)}
-              data-delay="200"
-            >
-              <div className="contact-info-icon"><Building2 size={32} strokeWidth={1.75} /></div>
-              <h3>Society Headquarters</h3>
-              <p>
-                Plot 7 &amp; 8, Nagarjuna Hills<br />
-                Punjagutta Main Road<br />
-                Hyderabad – 500&nbsp;082, Telangana
-              </p>
-              <div className="contact-info-meta">
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><Phone size={14} /> 040-40334899 / 897 / 866 / 829</span>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><Printer size={14} /> 040-40334818 / 4848</span>
-              </div>
-            </div>
-
-            {/* Quick Info */}
-            <div
-              className="contact-info-card reveal"
-              ref={(el) => addReveal(el, 3)}
-              data-delay="300"
-            >
-              <div className="contact-info-icon"><GraduationCap size={32} strokeWidth={1.75} /></div>
-              <h3>Admissions Quick Info</h3>
-              <p>
-                EAPCET Code: <strong>VISW</strong><br />
-                Autonomous Institution under JNT University Kakinada<br />
-                NAAC Accredited
-              </p>
-              <div className="contact-info-meta">
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><Phone size={14} /> 08816-250864</span>
-              </div>
-            </div>
+            {infoCards.map((c) => {
+              const Icon = resolveContentIcon(c.icon) || MapPin;
+              return (
+                <div key={c.id} className="contact-info-card">
+                  <div className="contact-info-icon"><Icon size={32} strokeWidth={1.75} /></div>
+                  <h3>{c.title}</h3>
+                  <p>
+                    {c.desc.split('\n').map((line, i, arr) => (
+                      <span key={i}>
+                        {/^\S+@\S+\.\S+$/.test(line.trim()) ? <a href={`mailto:${line.trim()}`}>{line.trim()}</a> : line}
+                        {i < arr.length - 1 && <br />}
+                      </span>
+                    ))}
+                  </p>
+                  {(c.value || c.slug) && (
+                    <div className="contact-info-meta">
+                      {c.value && <span>{c.value}</span>}
+                      {c.slug && <span>{c.slug}</span>}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -184,46 +148,20 @@ export default function Contact() {
               <div className="contact-social">
                 <h3>Follow Us</h3>
                 <div className="contact-social-links">
-                  <a
-                    href="https://www.youtube.com/@SVECW-B0"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="contact-social-link contact-social-link--yt"
-                  >
-                    ▶ YouTube
-                  </a>
-                  <a
-                    href="https://www.facebook.com/svecwcollege"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="contact-social-link contact-social-link--fb"
-                  >
-                    f Facebook
-                  </a>
-                  <a
-                    href="https://www.instagram.com/vishnu_svecw/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="contact-social-link contact-social-link--ig"
-                  >
-                    ◎ Instagram
-                  </a>
-                  <a
-                    href="https://twitter.com/svecw2"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="contact-social-link contact-social-link--tw"
-                  >
-                    𝕏 Twitter
-                  </a>
-                  <a
-                    href="https://www.linkedin.com/school/vishnusvecw/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="contact-social-link contact-social-link--li"
-                  >
-                    in LinkedIn
-                  </a>
+                  {socialLinks.map((s) => {
+                    const meta = SOCIAL_GLYPHS[s.title] || { glyph: '●', className: '' };
+                    return (
+                      <a
+                        key={s.id}
+                        href={s.value}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`contact-social-link ${meta.className}`}
+                      >
+                        {meta.glyph} {s.title}
+                      </a>
+                    );
+                  })}
                 </div>
               </div>
             </div>

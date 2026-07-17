@@ -1,11 +1,25 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { categories } from './differentiators.data';
+import { Rocket, Factory, Microscope, Globe2, GraduationCap } from 'lucide-react';
 import PageHero from '../../components/PageHero/PageHero';
 import { useHashScroll } from '../../hooks/useHashScroll';
+import { useOrderedCollection } from '../../hooks/useCollection';
+import { DIFFERENTIATOR_CATEGORIES } from '../Admin/sections/DifferentiatorsAdmin';
+import type { DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
+
+// Fixed top-level categories — not admin content. Items within each are Firestore-backed.
+const CATEGORY_ICONS: Record<string, typeof Rocket> = {
+  innovation: Rocket, industry: Factory, research: Microscope, global: Globe2, student: GraduationCap,
+};
+const categoryMeta = DIFFERENTIATOR_CATEGORIES.map((c) => ({ ...c, id: c.id, icon: CATEGORY_ICONS[c.id] || Rocket }));
 
 export default function Differentiators() {
   useHashScroll();
+  const { docs: allItems } = useOrderedCollection<DifferentiatorItemDoc>('differentiatorItems', 'order');
+  const categories = useMemo(() => categoryMeta.map((cat) => ({
+    ...cat,
+    items: allItems.filter((i) => i.category === cat.id),
+  })), [allItems]);
 
   useEffect(() => {
     document.title = 'Differentiators | Vishnu Womens University';
@@ -89,11 +103,9 @@ export default function Differentiators() {
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 'var(--space-5)' }}>
-              {cat.items.map((item, i) => (
+              {cat.items.map((item) => (
                 <div
                   key={item.slug}
-                  className="reveal"
-                  data-delay={`${i * 60}`}
                   style={{ background: ci % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', display: 'flex', flexDirection: 'column', transition: 'all var(--transition-base)' }}
                   onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-accent)'; (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-md)'; (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; }}
                   onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-light-gray)'; (e.currentTarget as HTMLElement).style.boxShadow = 'none'; (e.currentTarget as HTMLElement).style.transform = 'none'; }}

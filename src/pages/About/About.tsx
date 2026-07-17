@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import './About.css';
 import PageHero from '../../components/PageHero/PageHero';
@@ -9,9 +9,8 @@ import { useOrderedCollection } from '../../hooks/useCollection';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { useSitePhotos, useSectionHasPhotos } from '../../hooks/useSitePhotos';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
-import {
-  Rocket, Handshake, Microscope, Globe2, Landmark, BookOpen, Target, Leaf, School, Info,
-} from 'lucide-react';
+import { Rocket, Target } from 'lucide-react';
+import { resolveContentIcon } from '../../lib/contentIcons';
 
 function getInitials(name: string) {
   const cleaned = name.replace(/\b(Dr|Sri|Prof|Mr|Mrs|Ms)\.?\s*/gi, '');
@@ -48,13 +47,6 @@ const defaultAccreditationRankPhotos = [
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Outstanding Achievement Awards', caption: '' },
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'ISO Certification', caption: '' },
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Global Affiliations', caption: '' },
-];
-
-const differentiators = [
-  { cat: 'Innovation & Entrepreneurship', icon: Rocket, items: ['Vishnu Technology Business Incubator (TBI)', 'Vishnu Space Application Center (VSAC)', 'Science Technology & Innovation Hub (STI Hub)', 'AICTE IDEA Lab', 'Chips to Startup (C2S)', 'Institution Innovation Cell'] },
-  { cat: 'Industry Partnerships', icon: Handshake, items: ['NASSCOM Embedded Systems Training', 'HCL Tech VLSI Training', 'Microchip Embedded System', 'TI-DSP Centre of Excellence', 'TalentSprint @ NSE (WISE)', 'Smart Interviews – C&DS Programme'] },
-  { cat: 'Specialised Labs', icon: Microscope, items: ['AR / VR Studio', 'High Performance Computing Lab', 'Vehicle Design Lab', 'Assistive Technology Lab (ATL)', 'Concrete Canoe Laboratory', 'Dream House Construction Lab'] },
-  { cat: 'International & Global', icon: Globe2, items: ['Vishnu Japan Outreach Centre (VJOC)', 'Graduate Study Abroad Center (GSAC)', 'Foreign Languages Programme', 'TEDxSVECW', 'Rural Women Technology Park', 'Vishnu School of Music'] },
 ];
 
 // Firestore-backed — see src/pages/Admin/sections/CoreExecutivesAdmin.tsx.
@@ -94,6 +86,25 @@ export default function About() {
   const whoWeAreImg = campusPhotos[5];
   const campusSnapshotImg = campusPhotos[6];
   const parentSocietyImg = campusPhotos[7];
+  const academicSnapshotStats = useContentBlocks('about', 'academicSnapshotStats');
+  const diffItems = useContentBlocks('about', 'differentiators');
+  const discoverCards = useContentBlocks('about', 'discoverCards');
+
+  const differentiators = useMemo(() => {
+    const groups: { cat: string; icon: string; items: { id: string; title: string }[] }[] = [];
+    const byCat = new Map<string, typeof groups[number]>();
+    diffItems.forEach((item) => {
+      const cat = item.value || 'Other';
+      let group = byCat.get(cat);
+      if (!group) {
+        group = { cat, icon: item.icon, items: [] };
+        byCat.set(cat, group);
+        groups.push(group);
+      }
+      group.items.push({ id: item.id, title: item.title });
+    });
+    return groups;
+  }, [diffItems]);
 
   useEffect(() => {
     document.title = 'About VWU | Vishnu Womens University';
@@ -192,14 +203,9 @@ export default function About() {
             </div>
             <div className="reveal-right">
               <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
-                {[
-                  { label: 'B.Tech', value: '9 Specialisations' },
-                  { label: 'M.Tech', value: '4 Programs' },
-                  { label: 'MBA', value: '1 Program · 60 Seats' },
-                  { label: 'Ph.D.', value: 'CSE · ECE · EEE' },
-                ].map(p => (
-                  <div key={p.label} style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', borderLeft: '4px solid var(--color-accent)' }}>
-                    <div style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--color-accent)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 4 }}>{p.label}</div>
+                {academicSnapshotStats.map(p => (
+                  <div key={p.id} style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', borderLeft: '4px solid var(--color-accent)' }}>
+                    <div style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--color-accent)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 4 }}>{p.title}</div>
                     <div style={{ fontFamily: 'var(--font-sans)', fontWeight: 900, color: 'var(--color-primary)', fontSize: 'var(--text-base)' }}>{p.value}</div>
                   </div>
                 ))}
@@ -247,19 +253,22 @@ export default function About() {
             </p>
           </div>
           <div className="about-diff-grid">
-            {differentiators.map((d, i) => (
-              <div key={d.cat} className="about-diff-card reveal" data-delay={`${i * 80}`}>
-                <div className="about-diff-header">
-                  <span className="about-diff-icon"><d.icon size={29} strokeWidth={1.75} /></span>
-                  <h3>{d.cat}</h3>
+            {differentiators.map((d) => {
+              const Icon = resolveContentIcon(d.icon) || Rocket;
+              return (
+                <div key={d.cat} className="about-diff-card">
+                  <div className="about-diff-header">
+                    <span className="about-diff-icon"><Icon size={29} strokeWidth={1.75} /></span>
+                    <h3>{d.cat}</h3>
+                  </div>
+                  <ul className="about-diff-list">
+                    {d.items.map(item => (
+                      <li key={item.id}><span>›</span>{item.title}</li>
+                    ))}
+                  </ul>
                 </div>
-                <ul className="about-diff-list">
-                  {d.items.map(item => (
-                    <li key={item}><span>›</span>{item}</li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -378,21 +387,17 @@ export default function About() {
             <h2 className="section-title">Explore VWU in Detail</h2>
           </div>
           <div className="about-discover-grid">
-            {[
-              { title: 'Vision, Mission & Values', desc: 'Our guiding purpose, mission statements, and core institutional values.', path: '/vision-mission', icon: Target },
-              { title: 'Governance & Leadership', desc: 'Governing body, core executive, committees, and development plan.', path: '/governance', icon: Landmark },
-              { title: 'About Society (SVES)', desc: 'The Sri Vishnu Educational Society — our founding parent organization.', path: '/about-sves', icon: Leaf },
-              { title: 'Campus Life', desc: 'Smart classrooms, labs, hostels, fitness, swimming pool, and more.', path: '/campus', icon: School },
-              { title: 'Academics', desc: 'All B.Tech, M.Tech, MBA and Ph.D. programs with departments.', path: '/academics', icon: BookOpen },
-              { title: 'Information', desc: 'Academic calendar, holidays, how to reach, ICT platforms, and more.', path: '/information', icon: Info },
-            ].map((item, i) => (
-              <Link to={item.path} key={item.title} className="about-discover-card reveal" data-delay={`${i * 60}`}>
-                <span className="about-discover-icon"><item.icon size={32} strokeWidth={1.75} /></span>
-                <h3>{item.title}</h3>
-                <p>{item.desc}</p>
-                <span className="about-discover-link">Explore →</span>
-              </Link>
-            ))}
+            {discoverCards.map((item) => {
+              const Icon = resolveContentIcon(item.icon) || Target;
+              return (
+                <Link to={item.slug || '/about'} key={item.id} className="about-discover-card">
+                  <span className="about-discover-icon"><Icon size={32} strokeWidth={1.75} /></span>
+                  <h3>{item.title}</h3>
+                  <p>{item.desc}</p>
+                  <span className="about-discover-link">Explore →</span>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>

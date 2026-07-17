@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Laptop, GraduationCap, FlaskConical, Presentation, Check, Clock, MapPin } from 'lucide-react';
+import { Laptop, Presentation, Check, Clock, MapPin } from 'lucide-react';
 import HeroSlider from '../../components/HeroSlider/HeroSlider';
 import CounterSection from '../../components/CounterSection/CounterSection';
 import NewsCard from '../../components/NewsCard/NewsCard';
@@ -12,13 +12,11 @@ import type { EventDoc } from '../Admin/sections/EventsAdmin';
 import './Home.css';
 
 /* ── Data ─────────────────────────────────────────────────── */
-const studyCards = [
-  { id: 1, icon: Laptop, title: 'B.Tech Programs', desc: 'Choose from 9 B.Tech specializations — CSE, AI & ML, AI & DS, Cyber Security, IT, ECE, EEE, Civil, and Mechanical Engineering.', image: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=800&q=80', alt: 'Students in engineering classroom', path: '/academics', linkLabel: 'Explore Programs', color: '#1b4332' },
-  { id: 2, icon: GraduationCap, title: 'M.Tech & MBA', desc: 'Elevate your qualifications with postgraduate programs in CSE, VLSI Design, Power Electronics, Software Engineering, and MBA.', image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80', alt: 'Postgraduate students', path: '/academics', linkLabel: 'PG Programs', color: '#2d6a4f' },
-  { id: 3, icon: FlaskConical, title: 'Research & Ph.D.', desc: 'Conduct doctoral research in CSE, ECE, and EEE — backed by 2,500+ publications, 90+ patents, and purpose-built research facilities.', image: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&q=80', alt: 'Research laboratory', path: '/academics', linkLabel: 'Research Programs', color: '#40916c' },
+const STUDY_CARD_IMAGES = [
+  { image: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=800&q=80', alt: 'Students in engineering classroom', color: '#1b4332' },
+  { image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80', alt: 'Postgraduate students', color: '#2d6a4f' },
+  { image: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&q=80', alt: 'Research laboratory', color: '#40916c' },
 ];
-
-const popularPrograms = ['CSE', 'AI & Machine Learning', 'AI & Data Science', 'Cyber Security', 'Information Technology', 'Electronics & Communication', 'Electrical & Electronics', 'Civil Engineering', 'Mechanical Engineering', 'MBA'];
 
 const activityItems = [
   { img: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=600&q=80', label: 'mBAJA SAEINDIA 2026 Win' },
@@ -88,6 +86,8 @@ export default function Home() {
   const recognitions = useContentBlocks('home', 'recognitions');
   const campusFeatures = useContentBlocks('home', 'campusFeatures');
   const testimonials = useContentBlocks('home', 'testimonials');
+  const studyCards = useContentBlocks('home', 'studyCards');
+  const popularPrograms = useContentBlocks('home', 'popularPrograms');
 
   useEffect(() => {
     document.title = 'VWU | Empowering Women Through Knowledge and Action';
@@ -180,45 +180,48 @@ export default function Home() {
             <p className="section-desc">Your education at VWU is personalized, industry-focused, and structured to develop your technical depth, leadership capacity, and innovative thinking.</p>
           </div>
           <div className="study-grid">
-            {studyCards.map((card, i) => (
-              <div
-                key={card.id}
-                className="study-card reveal-bounce"
-                data-delay={`${i * 130}`}
-                {...tilts[i]}
-                style={{ '--card-color': card.color } as React.CSSProperties}
-              >
-                <div className="study-card-image-wrap">
-                  <img src={card.image} alt={card.alt} className="study-card-image" loading="lazy" />
-                  <div className="study-card-overlay" style={{ background: `linear-gradient(to top, ${card.color}cc 0%, transparent 65%)` }} />
-                  <div className="study-card-icon"><card.icon size={24} strokeWidth={1.75} color="var(--color-primary-dark)" /></div>
-                  <div className="study-card-shine" />
+            {studyCards.map((card, i) => {
+              const Icon = resolveContentIcon(card.icon) || Laptop;
+              const visuals = STUDY_CARD_IMAGES[i % STUDY_CARD_IMAGES.length];
+              return (
+                <div
+                  key={card.id}
+                  className="study-card"
+                  {...tilts[i]}
+                  style={{ '--card-color': visuals.color } as React.CSSProperties}
+                >
+                  <div className="study-card-image-wrap">
+                    <img src={visuals.image} alt={visuals.alt} className="study-card-image" loading="lazy" />
+                    <div className="study-card-overlay" style={{ background: `linear-gradient(to top, ${visuals.color}cc 0%, transparent 65%)` }} />
+                    <div className="study-card-icon"><Icon size={24} strokeWidth={1.75} color="var(--color-primary-dark)" /></div>
+                    <div className="study-card-shine" />
+                  </div>
+                  <div className="study-card-body">
+                    <h3 className="study-card-title">{card.title}</h3>
+                    <p className="study-card-desc">{card.desc}</p>
+                    <Link to={card.slug || '/academics'} className="study-card-link">
+                      {card.value}
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    </Link>
+                  </div>
                 </div>
-                <div className="study-card-body">
-                  <h3 className="study-card-title">{card.title}</h3>
-                  <p className="study-card-desc">{card.desc}</p>
-                  <Link to={card.path} className="study-card-link">
-                    {card.linkLabel}
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                  </Link>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
-          <div className="reveal" data-delay="350">
+          <div>
             <p className="program-label">Popular Programs</p>
             <div className="study-programs">
               {popularPrograms.map((p, i) => (
                 <Link
                   to="/academics"
-                  key={p}
+                  key={p.id}
                   className={`program-tag${tagHovered === i ? ' program-tag--active' : ''}`}
                   onMouseEnter={() => setTagHovered(i)}
                   onMouseLeave={() => setTagHovered(null)}
                   style={{ transitionDelay: `${i * 30}ms` } as React.CSSProperties}
                 >
-                  {p}
+                  {p.title}
                 </Link>
               ))}
             </div>

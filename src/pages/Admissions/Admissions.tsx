@@ -9,7 +9,8 @@ import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { useSitePhotos, useSectionHasPhotos } from '../../hooks/useSitePhotos';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import type { FaqDoc } from '../Admin/sections/FaqAdmin';
-import { NotebookPen, FileText, IndianRupee, School, PartyPopper, ClipboardList, BarChart3, CreditCard, Users, Target, Globe, Phone, Mail, MapPin } from 'lucide-react';
+import { NotebookPen, ClipboardList, Users, Phone, Mail, MapPin } from 'lucide-react';
+import { resolveContentIcon } from '../../lib/contentIcons';
 
 interface RequestInfoForm {
   firstName: string;
@@ -63,33 +64,14 @@ const defaultPgPhotos = [
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Graduation Day Prep', caption: '' },
 ];
 
-const steps = [
-  { step: 1, icon: NotebookPen, title: 'Appear for EAPCET / ECET', desc: 'Qualify in AP EAPCET for B.Tech, AP ECET for lateral entry, or AP PGECET / ICET for PG programs. VWU Code: VISW.' },
-  { step: 2, icon: FileText, title: 'Submit Your Documents', desc: 'Bring your qualifying exam rank card, academic certificates, transfer certificate, and passport-size photographs.' },
-  { step: 3, icon: IndianRupee, title: 'Explore Scholarships', desc: 'Review your eligibility for SC/ST/BC scholarships, merit-based awards, and central government fee reimbursement schemes.' },
-  { step: 4, icon: School, title: 'Visit Our Campus', desc: 'Book a personalised campus visit to meet faculty, see the facilities, and get a true sense of life at VWU.' },
-  { step: 5, icon: PartyPopper, title: 'Confirm Admission & Enroll', desc: 'Complete your fee payment, submit original documents, and officially begin your engineering journey at VWU.' },
-];
-
-const admissionHub = [
-  { icon: ClipboardList, title: 'Programmes & Fee Structure', desc: 'B.Tech, M.Tech, MBA, and Ph.D. programmes listed with intake numbers and annual fee details.', path: '/programmes-fee-structure', highlight: 'B.Tech: ₹1,05,000/yr' },
-  { icon: NotebookPen, title: 'Admission Procedure', desc: 'A step-by-step guide covering EAPCET (Code: VISW), GATE, ICET, and ECET eligibility and processes.', path: '/admission-procedure', highlight: 'EAPCET Code: VISW' },
-  { icon: BarChart3, title: 'Result Analysis', desc: 'Ranked among the Top 5 JNTUK-affiliated colleges. 90%+ annual pass rate. University Gold Medallists.', path: '/result-analysis', highlight: 'Top 5 in JNTUK' },
-  { icon: CreditCard, title: 'Fee Payment Portal', desc: 'Secure online portal for paying tuition, hostel, and examination fees.', path: '/admissions', highlight: 'Pay Online' },
-];
-
-const visitOptions = [
-  { icon: Users, title: 'Group Campus Tour', desc: 'Join a guided walkthrough of the VWU campus — see the labs, smart classrooms, hostels, and student facilities in Bhimavaram.' },
-  { icon: Target, title: 'Individual Visit Day', desc: 'Arrange a one-on-one visit with our admissions team, sit in on a demo class, and meet faculty from your preferred department.' },
-  { icon: Globe, title: 'Virtual Campus Tour', desc: 'Unable to travel to Bhimavaram? Take an online tour of the campus and speak with our admissions team via video call.' },
-  { icon: School, title: 'Open Day for Admitted Students', desc: 'Spend a full day at VWU after confirming your admission — meet your future classmates, faculty, and student activity groups.' },
-];
-
 export default function Admissions() {
   const { docs: allFaqs } = useOrderedCollection<FaqDoc>('faqs', 'order');
   const faqs = allFaqs.filter((f) => f.page === 'admissions');
   const scholarships = useContentBlocks('admissions', 'scholarships');
   const tuitionData = useContentBlocks('admissions', 'tuitionData');
+  const steps = useContentBlocks('admissions', 'steps');
+  const admissionHub = useContentBlocks('admissions', 'admissionHub');
+  const visitOptions = useContentBlocks('admissions', 'visitOptions');
   const admissionsPhotos = useSitePhotos('admissions', 'main', defaultAdmissionsPhotos);
   const ugPhotos = useSitePhotos('admissions', 'ug', defaultUgPhotos);
   const hasUgPhotos = useSectionHasPhotos('admissions', 'ug');
@@ -173,15 +155,18 @@ export default function Admissions() {
             </p>
           </div>
           <div className="adm-hub-grid">
-            {admissionHub.map((item, i) => (
-              <Link to={item.path} key={item.title} className="adm-hub-card reveal" data-delay={`${i * 80}`}>
-                <div className="adm-hub-icon"><item.icon size={38} strokeWidth={1.75} /></div>
-                <div className="adm-hub-highlight">{item.highlight}</div>
-                <h3 className="adm-hub-title">{item.title}</h3>
-                <p className="adm-hub-desc">{item.desc}</p>
-                <span className="adm-hub-arrow">View Details →</span>
-              </Link>
-            ))}
+            {admissionHub.map((item) => {
+              const Icon = resolveContentIcon(item.icon) || ClipboardList;
+              return (
+                <Link to={item.slug || '/admissions'} key={item.id} className="adm-hub-card">
+                  <div className="adm-hub-icon"><Icon size={38} strokeWidth={1.75} /></div>
+                  <div className="adm-hub-highlight">{item.value}</div>
+                  <h3 className="adm-hub-title">{item.title}</h3>
+                  <p className="adm-hub-desc">{item.desc}</p>
+                  <span className="adm-hub-arrow">View Details →</span>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -194,14 +179,17 @@ export default function Admissions() {
             <h2 className="section-title">5 Steps to Join VWU</h2>
           </div>
           <div className="adm-steps">
-            {steps.map((s, i) => (
-              <div key={s.step} className="adm-step reveal" data-delay={`${i * 100}`}>
-                <div className="adm-step-number">{s.step}</div>
-                <div className="adm-step-icon"><s.icon size={32} strokeWidth={1.75} /></div>
-                <h3 className="adm-step-title">{s.title}</h3>
-                <p className="adm-step-desc">{s.desc}</p>
-              </div>
-            ))}
+            {steps.map((s, i) => {
+              const Icon = resolveContentIcon(s.icon) || NotebookPen;
+              return (
+                <div key={s.id} className="adm-step">
+                  <div className="adm-step-number">{i + 1}</div>
+                  <div className="adm-step-icon"><Icon size={32} strokeWidth={1.75} /></div>
+                  <h3 className="adm-step-title">{s.title}</h3>
+                  <p className="adm-step-desc">{s.desc}</p>
+                </div>
+              );
+            })}
           </div>
           <div style={{ textAlign: 'center', marginTop: 'var(--space-10)' }}>
             <a href="#" className="btn btn-primary btn-lg">Start Your Application</a>
@@ -281,14 +269,17 @@ export default function Admissions() {
             </p>
           </div>
           <div className="adm-visit-grid">
-            {visitOptions.map((v, i) => (
-              <div key={v.title} className="adm-visit-card reveal" data-delay={`${i * 80}`}>
-                <div className="adm-visit-icon"><v.icon size={40} strokeWidth={1.75} /></div>
-                <h3>{v.title}</h3>
-                <p>{v.desc}</p>
-                <Link to="/admissions" className="btn btn-outline" style={{ marginTop: 'auto' }}>Schedule Now</Link>
-              </div>
-            ))}
+            {visitOptions.map((v) => {
+              const Icon = resolveContentIcon(v.icon) || Users;
+              return (
+                <div key={v.id} className="adm-visit-card">
+                  <div className="adm-visit-icon"><Icon size={40} strokeWidth={1.75} /></div>
+                  <h3>{v.title}</h3>
+                  <p>{v.desc}</p>
+                  <Link to="/admissions" className="btn btn-outline" style={{ marginTop: 'auto' }}>Schedule Now</Link>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>

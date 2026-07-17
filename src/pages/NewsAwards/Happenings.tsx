@@ -1,12 +1,14 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { CalendarDays } from 'lucide-react';
-import { happenings } from './news-awards.data';
 import PageHero from '../../components/PageHero/PageHero';
 import { useHashScroll } from '../../hooks/useHashScroll';
+import { useOrderedCollection } from '../../hooks/useCollection';
+import type { HappeningDoc } from '../Admin/sections/NewsAwardsDataAdmin';
 
 export default function Happenings() {
   useHashScroll();
+  const { docs: happenings } = useOrderedCollection<HappeningDoc>('happenings', 'order');
 
   useEffect(() => {
     document.title = 'Happenings at VWU | Vishnu Womens University';
@@ -50,8 +52,8 @@ export default function Happenings() {
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Upcoming Events</h2>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 'var(--space-5)' }}>
-              {upcoming.map((ev, i) => (
-                <div key={i} className="reveal" data-delay={`${i * 80}`}
+              {upcoming.map((ev) => (
+                <div key={ev.id}
                   style={{ background: 'var(--color-primary)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', display: 'flex', gap: 'var(--space-4)', alignItems: 'flex-start' }}>
                   <CalendarDays size={28} strokeWidth={1.75} style={{ flexShrink: 0, color: 'var(--color-accent)' }} />
                   <div>
@@ -84,8 +86,8 @@ export default function Happenings() {
             {/* Timeline line */}
             <div style={{ position: 'absolute', left: '0.45rem', top: 0, bottom: 0, width: 2, background: 'var(--color-light-gray)' }} />
 
-            {recent.map((ev, i) => (
-              <div key={i} className="reveal" data-delay={`${i * 40}`}
+            {recent.map((ev) => (
+              <div key={ev.id}
                 style={{ position: 'relative', marginBottom: 'var(--space-5)' }}>
                 {/* Dot */}
                 <div style={{ position: 'absolute', left: '-2rem', top: '0.35rem', width: 14, height: 14, borderRadius: '50%', background: 'var(--color-accent)', border: '2.5px solid var(--color-white)', boxShadow: '0 0 0 2px var(--color-accent)' }} />

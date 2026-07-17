@@ -4,44 +4,12 @@ import { Check } from 'lucide-react';
 import PageHero from '../../components/PageHero/PageHero';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
 
-const btechSteps = [
-  { step: '01', title: 'Check Eligibility', desc: 'Candidates must have passed 10+2 with Physics and Mathematics as major subjects, securing a minimum of 50% marks.' },
-  { step: '02', title: 'Appear in EAPCET', desc: 'Qualify in the EAPCET (Engineering, Agriculture and Pharmacy Common Entrance Test). Admission is based on EAPCET rank.' },
-  { step: '03', title: 'Choose Your Route', desc: 'Proceed through EAPCET Counselling (Code: VISW) or approach VWU directly for management quota seat enrollment.' },
-  { step: '04', title: 'Lateral Entry (ECET)', desc: 'Diploma holders applying for lateral entry must qualify through ECET Counselling and join the second year directly.' },
-  { step: '05', title: 'Register & Submit Documents', desc: 'Report to the admissions office with your intermediate marks memo shortly after results are announced.' },
-  { step: '06', title: 'Confirm Admission', desc: 'Pay the required fee, submit all original documents, and finalise your seat to complete the admission.' },
-];
-
-const mtechSteps = [
-  { step: '01', title: 'Check Eligibility', desc: 'Applicants must hold a B.Tech or BE degree in the relevant branch from a recognised university.' },
-  { step: '02', title: 'Qualify GATE / PGECET', desc: 'Appear in GATE (Graduate Aptitude Test in Engineering) or PGECET (Post Graduate Engineering Common Entrance Test).' },
-  { step: '03', title: 'Choose Your Route', desc: 'Apply through PGECET Counselling or register with VWU directly for available management quota seats.' },
-  { step: '04', title: 'Submit Documents', desc: 'Complete registration at the admissions office and submit your degree marks memo at the time of enrollment.' },
-];
-
-const mbaSteps = [
-  { step: '01', title: 'Check Eligibility', desc: 'Applicants must hold a bachelor\'s degree in any discipline from a recognised institution, with a minimum of 50% marks.' },
-  { step: '02', title: 'Qualify ICET', desc: 'Appear in ICET (Integrated Common Entrance Test) — your score determines your placement in the admission process.' },
-  { step: '03', title: 'Choose Your Route', desc: 'Proceed through ICET Counselling or register with VWU directly for available seats.' },
-  { step: '04', title: 'Register & Confirm', desc: 'Submit your degree marks memo during administrative registration, then confirm your seat by completing fee payment.' },
-];
-
-const documents = [
-  '10th Class Marks Memo & Certificate',
-  '12th / Intermediate Marks Memo',
-  'EAPCET / GATE / PGECET / ICET Rank Card',
-  'Transfer Certificate (TC)',
-  'Study & Conduct Certificates',
-  'Caste Certificate (if applicable)',
-  'Income Certificate (if applicable)',
-  'Aadhar Card (Student & Parent)',
-  'Passport-size Photographs (6 copies)',
-  'Migration Certificate (if applicable)',
-];
-
 export default function AdmissionProcedure() {
   const stats = useContentBlocks('admission-procedure', 'stats');
+  const btechSteps = useContentBlocks('admission-procedure', 'btechSteps');
+  const mtechSteps = useContentBlocks('admission-procedure', 'mtechSteps');
+  const mbaSteps = useContentBlocks('admission-procedure', 'mbaSteps');
+  const documents = useContentBlocks('admission-procedure', 'documents');
 
   useEffect(() => {
     document.title = 'Admission Procedure | VWU';
@@ -71,14 +39,14 @@ export default function AdmissionProcedure() {
     transition: 'all var(--transition-base)',
   });
 
-  const renderSteps = (steps: typeof btechSteps) => (
+  const renderSteps = (steps: ReturnType<typeof useContentBlocks>) => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
       {steps.map((s, i) => (
-        <div key={s.step} className="reveal" data-delay={`${i * 60}`} style={stepStyle(0)}
+        <div key={s.id} style={stepStyle(0)}
           onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-accent)'; (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-sm)'; }}
           onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-light-gray)'; (e.currentTarget as HTMLElement).style.boxShadow = 'none'; }}
         >
-          <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'var(--color-primary)', color: 'var(--color-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-serif)', fontWeight: 900, fontSize: '0.85rem', flexShrink: 0 }}>{s.step}</div>
+          <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'var(--color-primary)', color: 'var(--color-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-serif)', fontWeight: 900, fontSize: '0.85rem', flexShrink: 0 }}>{String(i + 1).padStart(2, '0')}</div>
           <div>
             <div style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 4 }}>{s.title}</div>
             <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6 }}>{s.desc}</div>
@@ -163,11 +131,11 @@ export default function AdmissionProcedure() {
             <h2 style={{ color: 'var(--color-white)' }} className="section-title">Documents Required</h2>
           </div>
           <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-3)', maxWidth: 800, margin: '0 auto' }}>
-            {documents.map((doc, i) => (
-              <div key={doc} className="reveal" data-delay={`${i * 40}`}
+            {documents.map((doc) => (
+              <div key={doc.id}
                 style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 'var(--radius-sm)', padding: 'var(--space-3) var(--space-4)' }}>
                 <Check size={16} strokeWidth={2.5} style={{ color: 'var(--color-accent)', flexShrink: 0 }} />
-                <span style={{ fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.85)' }}>{doc}</span>
+                <span style={{ fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.85)' }}>{doc.title}</span>
               </div>
             ))}
           </div>

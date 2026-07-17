@@ -37,6 +37,8 @@ export const PAGES = [
   { value: 'campus',                  label: 'Campus' },
   { value: 'information',             label: 'Information' },
   { value: 'governance',              label: 'Governance' },
+  { value: 'governing-body',          label: 'Governing Body' },
+  { value: 'governance-detail',       label: 'Governance Detail Pages (Committees/IQAC)' },
   { value: 'vision-mission',          label: 'Vision & Mission' },
   { value: 'news-awards',             label: 'News & Awards' },
   { value: 'news-awards-happenings',  label: 'Happenings' },
