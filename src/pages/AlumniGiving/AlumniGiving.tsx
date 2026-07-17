@@ -5,6 +5,11 @@ import { useOrderedCollection } from '../../hooks/useCollection';
 import { useHashScroll } from '../../hooks/useHashScroll';
 import './AlumniGiving.css';
 import PageHero from '../../components/PageHero/PageHero';
+import { useSitePhotos } from '../../hooks/useSitePhotos';
+
+const defaultMagazinePhoto = [
+  { src: 'https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=800&q=80', alt: 'VWU campus aerial view', caption: '' },
+];
 
 interface ImpactStat {
   id: string;
@@ -49,6 +54,7 @@ export default function AlumniGiving() {
   const { docs: alumniStories } = useOrderedCollection<AlumniStory>('alumniStories', 'order');
   const { docs: alumniEvents } = useOrderedCollection<AlumniEvent>('alumniEvents', 'order');
   const { docs: companies } = useOrderedCollection<Company>('alumniCompanies', 'order');
+  const magazinePhoto = useSitePhotos('alumni-giving', 'main', defaultMagazinePhoto)[0];
 
   useHashScroll();
 
@@ -223,8 +229,8 @@ export default function AlumniGiving() {
               </div>
             </div>
             <img
-              src="https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=800&q=80"
-              alt="VWU campus aerial view"
+              src={magazinePhoto.src}
+              alt={magazinePhoto.alt}
               className="ag-magazine-img"
               loading="lazy"
             />

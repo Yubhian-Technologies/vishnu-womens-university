@@ -7,6 +7,8 @@ import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import { useHashScroll } from '../../hooks/useHashScroll';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
+import { useSitePhotos, useSectionHasPhotos } from '../../hooks/useSitePhotos';
+import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import {
   Rocket, Handshake, Microscope, Globe2, Landmark, BookOpen, Target, Leaf, School, Info,
 } from 'lucide-react';
@@ -19,12 +21,33 @@ function getInitials(name: string) {
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
-const campusPhotos = [
+const defaultCampusPhotos = [
+  // Slots 0-4: "Campus Life" PhotoGrid gallery
   { src: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=800&q=80', alt: 'Smart classrooms at VWU', caption: 'Smart Classrooms' },
   { src: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&q=80', alt: 'Research laboratories', caption: 'Research Labs' },
   { src: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&q=80', alt: 'Central library', caption: 'Central Library' },
   { src: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80', alt: 'Students studying', caption: 'Student Collaboration' },
   { src: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&q=80', alt: 'Sports facilities', caption: 'Sports Facilities' },
+  // Slots 5-7: standalone single-image sections below
+  { src: 'https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=900&q=80', alt: 'VWU campus Bhimavaram', caption: '' },
+  { src: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=900&q=80', alt: 'VWU campus facilities', caption: '' },
+  { src: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=900&q=80', alt: 'Sri Vishnu Educational Society campus', caption: '' },
+];
+
+const defaultHistoryHeritagePhotos = [
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Founders & Visionaries', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Historical Milestones', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Archive Photos', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'First Batch Celebration', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Legacy Buildings', caption: '' },
+];
+
+const defaultAccreditationRankPhotos = [
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'NAAC Certificate', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'NIRF Ranking Banner', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Outstanding Achievement Awards', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'ISO Certification', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Global Affiliations', caption: '' },
 ];
 
 const differentiators = [
@@ -62,6 +85,15 @@ export default function About() {
   const { docs: execDocs, loading: execLoading } = useOrderedCollection<CoreExecutiveMember>('coreExecutives', 'order');
   const executives = !execLoading && execDocs.length > 0 ? execDocs : defaultExecutives;
   const quickStats = useContentBlocks('about', 'quickStats');
+  const campusPhotos = useSitePhotos('about', 'main', defaultCampusPhotos);
+  const galleryPhotos = campusPhotos.slice(0, 5);
+  const historyHeritagePhotos = useSitePhotos('about', 'history-heritage', defaultHistoryHeritagePhotos);
+  const hasHistoryHeritagePhotos = useSectionHasPhotos('about', 'history-heritage');
+  const accreditationRankPhotos = useSitePhotos('about', 'accreditation-rank', defaultAccreditationRankPhotos);
+  const hasAccreditationRankPhotos = useSectionHasPhotos('about', 'accreditation-rank');
+  const whoWeAreImg = campusPhotos[5];
+  const campusSnapshotImg = campusPhotos[6];
+  const parentSocietyImg = campusPhotos[7];
 
   useEffect(() => {
     document.title = 'About VWU | Vishnu Womens University';
@@ -135,8 +167,8 @@ export default function About() {
             </div>
             <div className="reveal-right">
               <img
-                src="https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=900&q=80"
-                alt="VWU campus Bhimavaram"
+                src={whoWeAreImg.src}
+                alt={whoWeAreImg.alt}
                 style={{ width: '100%', height: '460px', objectFit: 'cover', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-xl)' }}
                 loading="lazy"
               />
@@ -236,7 +268,7 @@ export default function About() {
       <section className="section bg-white">
         <div className="container">
           <PhotoGrid
-            images={campusPhotos}
+            images={galleryPhotos}
             label="Campus Life"
             title="Life at Vishnu Womens University"
             subtitle="A glimpse of the people, spaces, and moments that make VWU a distinctive place to learn and grow."
@@ -253,14 +285,44 @@ export default function About() {
         </div>
       </section>
 
+      {/* History & Heritage — hidden until real photos are added */}
+      {hasHistoryHeritagePhotos && (
+        <section className="section bg-off-white">
+          <div className="container">
+            <PhotoGrid
+              images={historyHeritagePhotos}
+              label="History & Heritage"
+              title="Our Founding Story"
+              columns={3}
+              layout="default"
+            />
+          </div>
+        </section>
+      )}
+
+      {/* Accreditation & Rank — hidden until real photos are added */}
+      {hasAccreditationRankPhotos && (
+        <section className="section bg-white">
+          <div className="container">
+            <PhotoGrid
+              images={accreditationRankPhotos}
+              label="Accreditation & Rank"
+              title="Recognised for Academic Excellence"
+              columns={3}
+              layout="default"
+            />
+          </div>
+        </section>
+      )}
+
       {/* Campus Snapshot */}
       <section className="section bg-off-white">
         <div className="container">
           <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-12)', alignItems: 'center' }}>
             <div className="reveal-left">
               <img
-                src="https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=900&q=80"
-                alt="VWU campus facilities"
+                src={campusSnapshotImg.src}
+                alt={campusSnapshotImg.alt}
                 style={{ width: '100%', height: '360px', objectFit: 'cover', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-xl)' }}
                 loading="lazy"
               />
@@ -298,8 +360,8 @@ export default function About() {
             </div>
             <div className="reveal-right" style={{ borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
               <img
-                src="https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=900&q=80"
-                alt="Sri Vishnu Educational Society campus"
+                src={parentSocietyImg.src}
+                alt={parentSocietyImg.alt}
                 style={{ width: '100%', height: '380px', objectFit: 'cover' }}
                 loading="lazy"
               />

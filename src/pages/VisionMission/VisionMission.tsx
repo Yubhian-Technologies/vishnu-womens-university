@@ -4,20 +4,38 @@ import './VisionMission.css';
 import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
+import { useSitePhotos, useSectionHasPhotos } from '../../hooks/useSitePhotos';
+import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import { resolveContentIcon } from '../../lib/contentIcons';
 
-const inspirationPhotos = [
+const defaultInspirationPhotos = [
+  // Slots 0-4: "Our Values in Action" PhotoGrid gallery
   { src: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80', alt: 'Students collaborating', caption: 'Collaboration' },
   { src: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&q=80', alt: 'Research and innovation', caption: 'Research & Innovation' },
   { src: 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?w=800&q=80', alt: 'Green campus environment', caption: 'Green Campus' },
   { src: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&q=80', alt: 'Sports and wellness', caption: 'Sports & Wellness' },
   { src: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=800&q=80', alt: 'Smart classrooms', caption: 'Smart Classrooms' },
+  // Slot 5: standalone "Quality Policy" section image below
+  { src: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=900&q=80', alt: 'VWU quality education', caption: '' },
+];
+
+const defaultCoreValuesPhotos = [
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Empowering Women in Tech', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Tech Innovation', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Global Standards', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Research Excellence', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Social Responsibility', caption: '' },
 ];
 
 export default function VisionMission() {
   const missionPoints = useContentBlocks('vision-mission', 'missionPoints');
   const values = useContentBlocks('vision-mission', 'values');
   const qualityPolicy = useContentBlocks('vision-mission', 'qualityPolicy');
+  const visionMissionPhotos = useSitePhotos('vision-mission', 'main', defaultInspirationPhotos);
+  const inspirationPhotos = visionMissionPhotos.slice(0, 5);
+  const qualityPolicyImg = visionMissionPhotos[5];
+  const coreValuesPhotos = useSitePhotos('vision-mission', 'core-values', defaultCoreValuesPhotos);
+  const hasCoreValuesPhotos = useSectionHasPhotos('vision-mission', 'core-values');
 
   useEffect(() => {
     document.title = 'Vision, Mission & Values | VWU';
@@ -137,6 +155,21 @@ export default function VisionMission() {
         </div>
       </section>
 
+      {/* Our Core Values — hidden until real photos are added */}
+      {hasCoreValuesPhotos && (
+        <section className="section bg-off-white">
+          <div className="container">
+            <PhotoGrid
+              images={coreValuesPhotos}
+              label="Our Core Values"
+              title="What VWU Stands For"
+              columns={3}
+              layout="default"
+            />
+          </div>
+        </section>
+      )}
+
       {/* Quality Policy */}
       <section className="section" style={{ background: 'linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%)' }}>
         <div className="container">
@@ -155,8 +188,8 @@ export default function VisionMission() {
             </div>
             <div className="reveal-right">
               <img
-                src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=900&q=80"
-                alt="VWU quality education"
+                src={qualityPolicyImg.src}
+                alt={qualityPolicyImg.alt}
                 style={{ width: '100%', height: '400px', objectFit: 'cover', borderRadius: 'var(--radius-lg)' }}
                 loading="lazy"
               />

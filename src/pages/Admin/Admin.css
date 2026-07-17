@@ -221,6 +221,7 @@
 
 .admin-field { display: flex; flex-direction: column; gap: 0.35rem; }
 .admin-field--full { grid-column: 1 / -1; }
+.admin-field__hint { color: #9ca3af; font-size: 0.82rem; margin: -0.15rem 0 0.15rem; }
 
 .admin-field label {
   font-size: 0.78rem;
