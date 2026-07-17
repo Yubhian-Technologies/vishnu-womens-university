@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Trophy, Check, Landmark, ClipboardList, Leaf, School } from 'lucide-react';
+import { Trophy, Check } from 'lucide-react';
 import './VisionMission.css';
 import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
@@ -166,25 +165,6 @@ export default function VisionMission() {
         </div>
       </section>
 
-      {/* Discover sidebar links */}
-      <section className="section bg-off-white">
-        <div className="container">
-          <div className="vm-discover-row">
-            {[
-              { title: 'About VWU', path: '/about', icon: Landmark },
-              { title: 'Governance', path: '/governance', icon: ClipboardList },
-              { title: 'About SVES', path: '/about-sves', icon: Leaf },
-              { title: 'Campus Life', path: '/campus', icon: School },
-            ].map(l => (
-              <Link to={l.path} key={l.title} className="vm-discover-link">
-                <l.icon size={20} strokeWidth={1.75} />
-                <span>{l.title}</span>
-                <span style={{ marginLeft: 'auto', color: 'var(--color-accent)' }}>→</span>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
     </main>
   );
 }
