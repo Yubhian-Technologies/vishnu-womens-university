@@ -1,0 +1,96 @@
+/**
+ * Careers application handler for the VWU website's "Submit Your Application"
+ * form (src/pages/Careers/Careers.tsx). This is a Google Apps Script, NOT
+ * part of the Vite build — it does not run in this repo. Deploy it to
+ * script.google.com and it becomes an HTTP endpoint the React form posts to.
+ *
+ * DEPLOYMENT STEPS (one-time, requires your own Google account):
+ *   1. Go to https://script.google.com -> New Project.
+ *   2. Delete the default empty Code.gs contents and paste this whole file in.
+ *   3. (Optional) Change HR_EMAIL below if applications should go elsewhere.
+ *   4. Click Deploy -> New deployment.
+ *   5. Click the gear icon next to "Select type" -> choose "Web app".
+ *   6. Set "Execute as": Me (your account).
+ *      Set "Who has access": Anyone.
+ *      (This does NOT expose your Gmail account — the script only ever sends
+ *      the two emails coded below; it can't be used for anything else.)
+ *   7. Click Deploy. Google will ask you to authorize the script the first
+ *      time (Advanced -> Go to <project name> (unsafe) is expected/normal
+ *      for your own unpublished script) — approve it.
+ *   8. Copy the "Web app URL" it gives you (ends in /exec).
+ *   9. Paste that URL as VITE_CAREERS_APPLICATION_SCRIPT_URL in this
+ *      project's .env file, AND in Vercel's project environment variables
+ *      (Settings -> Environment Variables) for the production build.
+ *  10. Restart the dev server / redeploy so the new env var is picked up.
+ *
+ * Every time you edit this script afterward, you must create a NEW
+ * deployment version (Deploy -> Manage deployments -> edit -> New version)
+ * for the changes to take effect on the existing /exec URL.
+ */
+
+var HR_EMAIL = 'vthintern2@gmail.com';
+
+function doPost(e) {
+  var result = { status: 'ok' };
+  try {
+    var data = JSON.parse(e.postData.contents);
+
+    if (!data.name || !data.email || !data.position) {
+      return jsonResponse({ status: 'error', message: 'Missing required fields.' });
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+      return jsonResponse({ status: 'error', message: 'Invalid email address.' });
+    }
+
+    var attachments = [];
+    if (data.resumeBase64 && data.resumeName) {
+      var blob = Utilities.newBlob(
+        Utilities.base64Decode(data.resumeBase64),
+        data.resumeMimeType || 'application/octet-stream',
+        data.resumeName
+      );
+      attachments.push(blob);
+    }
+
+    // Email 1: notify HR of the new application.
+    var hrBody =
+      'A new application was submitted on the VWU careers page.\n\n' +
+      'Name: ' + data.name + '\n' +
+      'Email: ' + data.email + '\n' +
+      'Phone: ' + (data.phone || '-') + '\n' +
+      'Department: ' + (data.dept || '-') + '\n' +
+      'Position Applied For: ' + data.position + '\n' +
+      'Years of Experience: ' + (data.experience || '-') + '\n\n' +
+      'Cover Letter / Message:\n' + (data.message || '(none provided)') + '\n\n' +
+      (attachments.length ? 'Resume attached.' : 'No resume was attached.');
+
+    MailApp.sendEmail({
+      to: HR_EMAIL,
+      subject: 'New Job Application: ' + data.position + ' — ' + data.name,
+      body: hrBody,
+      attachments: attachments,
+    });
+
+    // Email 2: confirmation/thank-you to the applicant.
+    var applicantBody =
+      'Dear ' + data.name + ',\n\n' +
+      'Thank you for applying to Vishnu Womens University. Your application ' +
+      'for the ' + data.position + ' position has been successfully received. ' +
+      'Our HR team will review your application and reach back to you soon.\n\n' +
+      'Regards,\nVishnu Womens University';
+
+    MailApp.sendEmail({
+      to: data.email,
+      subject: 'Your application to VWU has been received',
+      body: applicantBody,
+    });
+  } catch (err) {
+    result = { status: 'error', message: err.message };
+  }
+  return jsonResponse(result);
+}
+
+function jsonResponse(obj) {
+  return ContentService.createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
+}

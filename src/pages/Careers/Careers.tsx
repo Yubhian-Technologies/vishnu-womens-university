@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
-import { GraduationCap, CheckCircle2 } from 'lucide-react';
+import { GraduationCap, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { resolveContentIcon } from '../../lib/contentIcons';
@@ -10,6 +10,23 @@ import type { JobOpeningDoc } from '../Admin/sections/JobOpeningsAdmin';
 type FormData = {
   name: string; email: string; phone: string; dept: string; position: string; experience: string; message: string;
 };
+
+const MAX_RESUME_BYTES = 5 * 1024 * 1024; // 5MB — well under Gmail's 25MB attachment cap
+
+// Google Apps Script Web App URL — see scripts/careers-application-apps-script.gs.txt
+// for the script source and deployment steps. Sent with a text/plain content
+// type (not application/json) to avoid triggering a CORS preflight, which
+// Apps Script Web Apps don't reliably handle.
+const CAREERS_SCRIPT_URL = import.meta.env.VITE_CAREERS_APPLICATION_SCRIPT_URL;
+
+function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve((reader.result as string).split(',')[1] ?? '');
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
+}
 
 export default function Careers() {
   const { docs: allOpenings } = useOrderedCollection<JobOpeningDoc>('jobOpenings', 'order');
@@ -24,7 +41,11 @@ export default function Careers() {
   }, [allOpenings]);
 
   const [form, setForm] = useState<FormData>({ name: '', email: '', phone: '', dept: '', position: '', experience: '', message: '' });
+  const [resume, setResume] = useState<File | null>(null);
+  const [resumeError, setResumeError] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   useEffect(() => {
     document.title = 'Careers | Vishnu Womens University';
@@ -44,9 +65,48 @@ export default function Careers() {
     return () => observer.disconnect();
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleResumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] ?? null;
+    if (file && file.size > MAX_RESUME_BYTES) {
+      setResumeError('File is too large — please upload a resume under 5MB.');
+      setResume(null);
+      e.target.value = '';
+      return;
+    }
+    setResumeError('');
+    setResume(file);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    if (!CAREERS_SCRIPT_URL) {
+      setSubmitError('Application submission is not configured yet. Please email your application to info@svecw.edu.in instead.');
+      return;
+    }
+    setSubmitting(true);
+    setSubmitError('');
+    try {
+      const payload: Record<string, string> = { ...form };
+      if (resume) {
+        payload.resumeBase64 = await fileToBase64(resume);
+        payload.resumeName = resume.name;
+        payload.resumeMimeType = resume.type;
+      }
+      const res = await fetch(CAREERS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload),
+      });
+      const result = await res.json().catch(() => null);
+      if (result && result.status === 'error') {
+        throw new Error(result.message || 'Submission failed.');
+      }
+      setSubmitted(true);
+    } catch (err) {
+      setSubmitError((err as Error).message || "Couldn't submit your application. Please try again or email info@svecw.edu.in directly.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -185,11 +245,23 @@ export default function Careers() {
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                   <label style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-primary)', fontFamily: 'var(--font-sans)' }}>Upload CV / Resume (PDF)</label>
-                  <input type="file" accept=".pdf,.doc,.docx"
+                  <input type="file" accept=".pdf,.doc,.docx" onChange={handleResumeChange}
                     style={{ padding: 'var(--space-2)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-sans)' }} />
+                  {resume && !resumeError && (
+                    <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)' }}>Selected: {resume.name}</span>
+                  )}
+                  {resumeError && (
+                    <span style={{ fontSize: 'var(--text-xs)', color: '#dc2626' }}>{resumeError}</span>
+                  )}
                 </div>
-                <button type="submit" className="btn btn-primary btn-lg" style={{ alignSelf: 'flex-start' }}>
-                  Submit Application →
+                {submitError && (
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-2)', padding: 'var(--space-3) var(--space-4)', background: 'rgba(220,38,38,0.06)', border: '1px solid rgba(220,38,38,0.25)', borderRadius: 'var(--radius-sm)' }}>
+                    <AlertCircle size={16} strokeWidth={2} color="#dc2626" style={{ flexShrink: 0, marginTop: 2 }} />
+                    <span style={{ fontSize: 'var(--text-sm)', color: '#dc2626' }}>{submitError}</span>
+                  </div>
+                )}
+                <button type="submit" className="btn btn-primary btn-lg" style={{ alignSelf: 'flex-start' }} disabled={submitting}>
+                  {submitting ? 'Submitting…' : 'Submit Application →'}
                 </button>
               </form>
             )}

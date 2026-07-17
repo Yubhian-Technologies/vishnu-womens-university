@@ -328,6 +328,38 @@
   padding-left: calc(var(--space-5) + 4px);
 }
 
+/* ===== Flyout (nested dropdown items, e.g. Academics > Course Curriculum) ===== */
+.dropdown-item--flyout-parent {
+  position: relative;
+}
+
+.dropdown-item__chevron {
+  float: right;
+  margin-left: var(--space-4);
+  opacity: 0.5;
+}
+
+.dropdown-flyout {
+  position: absolute;
+  left: 100%;
+  top: -3px;
+  min-width: 220px;
+  background: var(--color-white);
+  border-radius: 0 var(--radius-md) var(--radius-md) var(--radius-md);
+  box-shadow: var(--shadow-xl);
+  border-top: 3px solid var(--color-accent);
+  padding: var(--space-3) 0;
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--transition-base);
+  z-index: 101;
+}
+
+.dropdown-item--flyout-parent:hover .dropdown-flyout {
+  opacity: 1;
+  visibility: visible;
+}
+
 /* ===== Mega Menu ===== */
 .dropdown.dropdown-mega {
   left: 0;
