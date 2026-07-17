@@ -4,10 +4,12 @@ import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
 import { useHashScroll } from '../../hooks/useHashScroll';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
+import { useSitePhotos, useSectionHasPhotos } from '../../hooks/useSitePhotos';
 import { resolveContentIcon } from '../../lib/contentIcons';
+import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import { Building } from 'lucide-react';
 
-const campusGalleryPhotos = [
+const defaultCampusGalleryPhotos = [
   { src: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=800&q=80', alt: 'Smart classrooms', caption: 'Smart Classrooms' },
   { src: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&q=80', alt: 'Research labs', caption: 'Research Labs' },
   { src: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&q=80', alt: 'Central library', caption: 'Central Library' },
@@ -22,10 +24,31 @@ const campusGalleryPhotos = [
   { src: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=800&q=80', alt: 'Campus events', caption: 'Cultural Programs' },
 ];
 
+const defaultFacilitiesPhotos = [
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Main Entrance', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Academic Blocks', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Central Library Building', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Open Air Auditorium', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Green Spaces & Gardens', caption: '' },
+];
+
+const defaultHostelsLivingPhotos = [
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Hostel Blocks Exterior', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Standard Room Layout', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Dining Hall & Mess', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Indoor Recreation Room', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Security & Main Gate', caption: '' },
+];
+
 export default function Campus() {
   useHashScroll();
   const stats = useContentBlocks('campus', 'stats');
   const facilities = useContentBlocks('campus', 'facilities');
+  const campusGalleryPhotos = useSitePhotos('campus', 'main', defaultCampusGalleryPhotos);
+  const facilitiesPhotos = useSitePhotos('campus', 'facilities-infrastructure', defaultFacilitiesPhotos);
+  const hasFacilitiesPhotos = useSectionHasPhotos('campus', 'facilities-infrastructure');
+  const hostelsLivingPhotos = useSitePhotos('campus', 'hostels-living', defaultHostelsLivingPhotos);
+  const hasHostelsLivingPhotos = useSectionHasPhotos('campus', 'hostels-living');
 
   useEffect(() => {
     document.title = 'Campus Life | VWU';
@@ -120,6 +143,36 @@ export default function Campus() {
           />
         </div>
       </section>
+
+      {/* Facilities & Infrastructure — hidden until real photos are added */}
+      {hasFacilitiesPhotos && (
+        <section className="section bg-off-white">
+          <div className="container">
+            <PhotoGrid
+              images={facilitiesPhotos}
+              label="Facilities & Infrastructure"
+              title="Built for Focused, High-Quality Learning"
+              columns={3}
+              layout="default"
+            />
+          </div>
+        </section>
+      )}
+
+      {/* Hostels & Living — hidden until real photos are added */}
+      {hasHostelsLivingPhotos && (
+        <section className="section bg-white">
+          <div className="container">
+            <PhotoGrid
+              images={hostelsLivingPhotos}
+              label="Hostels & Living"
+              title="Comfortable, Secure On-Campus Living"
+              columns={3}
+              layout="default"
+            />
+          </div>
+        </section>
+      )}
 
       {/* CTA */}
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-16) 0' }}>

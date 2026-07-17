@@ -3,12 +3,18 @@ import { Link } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
 import { Activity, BadgeCheck } from 'lucide-react';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
+import { useSitePhotos } from '../../hooks/useSitePhotos';
 import { resolveContentIcon } from '../../lib/contentIcons';
+
+const defaultApproachPhoto = [
+  { src: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=900&q=80', alt: 'Students at VWU sports', caption: '' },
+];
 
 export default function SportsGames() {
   const facilities = useContentBlocks('sports-games', 'facilities');
   const sportsProgram = useContentBlocks('sports-games', 'program');
   const achievements = useContentBlocks('sports-games', 'achievements');
+  const approachPhoto = useSitePhotos('sports-games', 'main', defaultApproachPhoto)[0];
 
   useEffect(() => {
     document.title = 'Sports & Games | VWU';
@@ -63,8 +69,8 @@ export default function SportsGames() {
             </div>
             <div className="reveal-right">
               <img
-                src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=900&q=80"
-                alt="Students at VWU sports"
+                src={approachPhoto.src}
+                alt={approachPhoto.alt}
                 style={{ width: '100%', height: '400px', objectFit: 'cover', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-xl)' }}
                 loading="lazy"
               />

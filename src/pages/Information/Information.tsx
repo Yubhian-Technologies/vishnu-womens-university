@@ -3,17 +3,35 @@ import { Link, useLocation } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
 import { useOrderedCollection } from '../../hooks/useCollection';
+import { useSitePhotos, useSectionHasPhotos } from '../../hooks/useSitePhotos';
+import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import type { CalendarEntry } from '../Admin/sections/AcademicCalendarAdmin';
 import type { HolidayEntry } from '../Admin/sections/HolidaysAdmin';
 import { Monitor, NotebookPen, Newspaper, BarChart3, BookOpen, Video, Leaf, Accessibility, Handshake, Scale, Brain, Plane, TrainFront, Bus, Car, MapPin, Phone, Mail, type LucideIcon } from 'lucide-react';
 import './Information.css';
 
-const infoPhotos = [
+const defaultInfoPhotos = [
   { src: 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?w=800&q=80', alt: 'Green campus environment', caption: 'Green Campus' },
   { src: 'https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=800&q=80', alt: 'Campus aerial view', caption: 'Bhimavaram Campus' },
   { src: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&q=80', alt: 'Library resources', caption: 'e-Library' },
   { src: 'https://images.unsplash.com/photo-1567521464027-f127ff144326?w=800&q=80', alt: 'Campus dining', caption: 'Food Courts' },
   { src: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=800&q=80', alt: 'Students at orientation', caption: 'Freshers Orientation' },
+];
+
+const defaultPlacementsCareersPhotos = [
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Placement Drive', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Recruitment Interviews', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Mock Interview Prep', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Hall of Fame / Placed Students', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'HR Conclave', caption: '' },
+];
+
+const defaultAntiRaggingSafetyPhotos = [
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Student Safety Seminars', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Grievance Cell', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Awareness Poster Displays', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Counseling Room', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Campus Patrol & Security', caption: '' },
 ];
 
 const ictPlatforms = [
@@ -62,6 +80,11 @@ export default function Information() {
 
   const { docs: academicCalendar } = useOrderedCollection<CalendarEntry>('academicCalendar', 'order');
   const { docs: holidays } = useOrderedCollection<HolidayEntry>('holidays', 'order');
+  const infoPhotos = useSitePhotos('information', 'main', defaultInfoPhotos);
+  const placementsCareersPhotos = useSitePhotos('information', 'placements-careers', defaultPlacementsCareersPhotos);
+  const hasPlacementsCareersPhotos = useSectionHasPhotos('information', 'placements-careers');
+  const antiRaggingSafetyPhotos = useSitePhotos('information', 'anti-ragging-safety', defaultAntiRaggingSafetyPhotos);
+  const hasAntiRaggingSafetyPhotos = useSectionHasPhotos('information', 'anti-ragging-safety');
 
   useEffect(() => {
     const tab = hashToTab[location.hash];
@@ -275,6 +298,36 @@ export default function Information() {
           />
         </div>
       </section>
+
+      {/* Placements & Careers — hidden until real photos are added */}
+      {hasPlacementsCareersPhotos && (
+        <section className="section bg-off-white">
+          <div className="container">
+            <PhotoGrid
+              images={placementsCareersPhotos}
+              label="Placements & Careers"
+              title="Launching Careers at VWU"
+              columns={3}
+              layout="default"
+            />
+          </div>
+        </section>
+      )}
+
+      {/* Anti-Ragging & Safety — hidden until real photos are added */}
+      {hasAntiRaggingSafetyPhotos && (
+        <section className="section bg-white">
+          <div className="container">
+            <PhotoGrid
+              images={antiRaggingSafetyPhotos}
+              label="Anti-Ragging & Safety"
+              title="A Safe, Supportive Campus"
+              columns={3}
+              layout="default"
+            />
+          </div>
+        </section>
+      )}
     </main>
   );
 }

@@ -3,11 +3,17 @@ import { Link } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
 import { PartyPopper } from 'lucide-react';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
+import { useSitePhotos } from '../../hooks/useSitePhotos';
 import { resolveContentIcon } from '../../lib/contentIcons';
+
+const defaultPhilosophyPhoto = [
+  { src: 'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=900&q=80', alt: 'Cultural performances at VWU', caption: '' },
+];
 
 export default function ArtsCulture() {
   const initiatives = useContentBlocks('arts-culture', 'initiatives');
   const events = useContentBlocks('arts-culture', 'events');
+  const philosophyPhoto = useSitePhotos('arts-culture', 'main', defaultPhilosophyPhoto)[0];
 
   useEffect(() => {
     document.title = 'Arts & Culture | VWU';
@@ -62,8 +68,8 @@ export default function ArtsCulture() {
             </div>
             <div className="reveal-right">
               <img
-                src="https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=900&q=80"
-                alt="Cultural performances at VWU"
+                src={philosophyPhoto.src}
+                alt={philosophyPhoto.alt}
                 style={{ width: '100%', height: '400px', objectFit: 'cover', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-xl)' }}
                 loading="lazy"
               />

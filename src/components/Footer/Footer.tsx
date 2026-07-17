@@ -2,14 +2,14 @@ import { Link } from 'react-router-dom';
 import './Footer.css';
 
 const quickLinks = [
-  { label: 'Examination Portal', path: '#' },
-  { label: 'LMS Platform', path: '#' },
-  { label: 'Campus Map', path: '#' },
-  { label: 'Central Library', path: '#' },
-  { label: 'Prathibha Magazine', path: '#' },
-  { label: 'Academic Calendar', path: '#' },
-  { label: 'Career Opportunities', path: '#' },
-  { label: 'Wellness Center', path: '#' },
+  { label: 'Examination Portal', path: 'https://www.svecwexams.in/', external: true },
+  { label: 'LMS Platform', path: 'https://www.vishnulearning.com/login/index.php', external: true },
+  { label: 'Campus Map', path: 'https://maps.google.com/maps?q=16.568119,81.522098&z=15', external: true },
+  { label: 'Central Library', path: '/campus#library' },
+  { label: 'Prathibha Magazine', path: 'https://heyzine.com/flip-book/14449c1cd4.html', external: true },
+  { label: 'Academic Calendar', path: '/information#academic-calendar' },
+  { label: 'Career Opportunities', path: '/careers' },
+  { label: 'Wellness Center', path: 'https://vishnuwellness.in/', external: true },
 ];
 
 const academicLinks = [
@@ -91,7 +91,11 @@ export default function Footer() {
               <ul className="footer-links">
                 {quickLinks.map(l => (
                   <li key={l.label}>
-                    <Link to={l.path} className="footer-link">{l.label}</Link>
+                    {l.external ? (
+                      <a href={l.path} className="footer-link" target="_blank" rel="noopener noreferrer">{l.label}</a>
+                    ) : (
+                      <Link to={l.path} className="footer-link">{l.label}</Link>
+                    )}
                   </li>
                 ))}
               </ul>

@@ -3,11 +3,17 @@ import { Link } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
 import { BookOpen, Sparkle } from 'lucide-react';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
+import { useSitePhotos } from '../../hooks/useSitePhotos';
 import { resolveContentIcon } from '../../lib/contentIcons';
+
+const defaultNssPhoto = [
+  { src: 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=900&q=80', alt: 'NSS community service', caption: '' },
+];
 
 export default function SocialServices() {
   const communities = useContentBlocks('social-services', 'communities');
   const nssValues = useContentBlocks('social-services', 'values');
+  const nssPhoto = useSitePhotos('social-services', 'main', defaultNssPhoto)[0];
 
   useEffect(() => {
     document.title = 'Social Services | VWU';
@@ -63,8 +69,8 @@ export default function SocialServices() {
             </div>
             <div className="reveal-right">
               <img
-                src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=900&q=80"
-                alt="NSS community service"
+                src={nssPhoto.src}
+                alt={nssPhoto.alt}
                 style={{ width: '100%', height: '400px', objectFit: 'cover', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-xl)' }}
                 loading="lazy"
               />

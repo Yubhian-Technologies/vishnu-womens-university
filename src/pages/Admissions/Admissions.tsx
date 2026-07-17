@@ -6,6 +6,8 @@ import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
+import { useSitePhotos, useSectionHasPhotos } from '../../hooks/useSitePhotos';
+import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import type { FaqDoc } from '../Admin/sections/FaqAdmin';
 import { NotebookPen, FileText, IndianRupee, School, PartyPopper, ClipboardList, BarChart3, CreditCard, Users, Target, Globe, Phone, Mail, MapPin } from 'lucide-react';
 
@@ -37,12 +39,28 @@ const EMAILJS_TEMPLATE_ID_ADMISSIONS = import.meta.env.VITE_EMAILJS_TEMPLATE_ID_
 const EMAILJS_TEMPLATE_ID_CONFIRMATION = import.meta.env.VITE_EMAILJS_TEMPLATE_ID_CONFIRMATION;
 const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 
-const admissionsPhotos = [
+const defaultAdmissionsPhotos = [
   { src: 'https://images.unsplash.com/photo-1562774053-701939374585?w=800&q=80', alt: 'VWU campus buildings', caption: 'VWU Campus' },
   { src: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=800&q=80', alt: 'Smart classrooms', caption: 'Smart Classrooms' },
   { src: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&q=80', alt: 'Research labs', caption: 'Specialised Labs' },
   { src: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&q=80', alt: 'Sports court', caption: 'Sports Facilities' },
   { src: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&q=80', alt: 'Central library', caption: 'Central Library' },
+];
+
+const defaultUgPhotos = [
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'B.Tech Counseling', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'UG Orientation', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'UG Lab Demos', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Classroom Culture', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Campus Life Preview', caption: '' },
+];
+
+const defaultPgPhotos = [
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'PG Seminar & Orientation', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Specialization Research', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'PG Industry Meetups', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Advanced Computing', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Graduation Day Prep', caption: '' },
 ];
 
 const steps = [
@@ -72,6 +90,11 @@ export default function Admissions() {
   const faqs = allFaqs.filter((f) => f.page === 'admissions');
   const scholarships = useContentBlocks('admissions', 'scholarships');
   const tuitionData = useContentBlocks('admissions', 'tuitionData');
+  const admissionsPhotos = useSitePhotos('admissions', 'main', defaultAdmissionsPhotos);
+  const ugPhotos = useSitePhotos('admissions', 'ug', defaultUgPhotos);
+  const hasUgPhotos = useSectionHasPhotos('admissions', 'ug');
+  const pgPhotos = useSitePhotos('admissions', 'pg', defaultPgPhotos);
+  const hasPgPhotos = useSectionHasPhotos('admissions', 'pg');
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [requestForm, setRequestForm] = useState<RequestInfoForm>(INITIAL_REQUEST_FORM);
   const [requestStatus, setRequestStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
@@ -290,6 +313,36 @@ export default function Admissions() {
           />
         </div>
       </section>
+
+      {/* Undergraduate (UG) — hidden until real photos are added */}
+      {hasUgPhotos && (
+        <section className="section bg-off-white">
+          <div className="container">
+            <PhotoGrid
+              images={ugPhotos}
+              label="Undergraduate (UG)"
+              title="Your B.Tech Journey Starts Here"
+              columns={3}
+              layout="default"
+            />
+          </div>
+        </section>
+      )}
+
+      {/* Postgraduate (PG) — hidden until real photos are added */}
+      {hasPgPhotos && (
+        <section className="section bg-white">
+          <div className="container">
+            <PhotoGrid
+              images={pgPhotos}
+              label="Postgraduate (PG)"
+              title="Advance Your Career with a PG Degree"
+              columns={3}
+              layout="default"
+            />
+          </div>
+        </section>
+      )}
 
       {/* Contact Admissions */}
       <section className="section bg-white">

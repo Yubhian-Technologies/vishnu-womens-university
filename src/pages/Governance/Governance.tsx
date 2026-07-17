@@ -5,8 +5,10 @@ import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
 import { useHashScroll } from '../../hooks/useHashScroll';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
+import { useSitePhotos, useSectionHasPhotos } from '../../hooks/useSitePhotos';
+import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 
-const govPhotos = [
+const defaultGovPhotos = [
   { src: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=800&q=80', alt: 'Governance and administration', caption: 'Institutional Governance' },
   { src: 'https://images.unsplash.com/photo-1544531585-9847b68c8c86?w=800&q=80', alt: 'Academic council meeting', caption: 'Academic Council' },
   { src: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=800&q=80', alt: 'Convocation ceremony', caption: 'Annual Convocation' },
@@ -14,9 +16,30 @@ const govPhotos = [
   { src: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80', alt: 'Faculty collaboration', caption: 'Faculty Development' },
 ];
 
+const defaultBoardOfDirectorsPhotos = [
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: "Chairman's Address", caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Board Meeting Hall', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Vice Chancellor Meet', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Trust Board', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Annual General Meeting', caption: '' },
+];
+
+const defaultAcademicCouncilPhotos = [
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: "Dean's Conference", caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Board of Studies Meeting', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Curricular Workshop', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Faculty Council', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Quality Assurance Cell', caption: '' },
+];
+
 export default function Governance() {
   useHashScroll();
   const stats = useContentBlocks('governance', 'stats');
+  const govPhotos = useSitePhotos('governance', 'main', defaultGovPhotos);
+  const boardOfDirectorsPhotos = useSitePhotos('governance', 'board-of-directors', defaultBoardOfDirectorsPhotos);
+  const hasBoardOfDirectorsPhotos = useSectionHasPhotos('governance', 'board-of-directors');
+  const academicCouncilPhotos = useSitePhotos('governance', 'academic-council', defaultAcademicCouncilPhotos);
+  const hasAcademicCouncilPhotos = useSectionHasPhotos('governance', 'academic-council');
 
   useEffect(() => {
     document.title = 'Governance | Vishnu Womens University';
@@ -151,6 +174,36 @@ export default function Governance() {
           />
         </div>
       </section>
+
+      {/* Board of Directors — hidden until real photos are added */}
+      {hasBoardOfDirectorsPhotos && (
+        <section className="section bg-off-white">
+          <div className="container">
+            <PhotoGrid
+              images={boardOfDirectorsPhotos}
+              label="Board of Directors"
+              title="Guiding VWU's Strategic Direction"
+              columns={3}
+              layout="default"
+            />
+          </div>
+        </section>
+      )}
+
+      {/* Academic Council — hidden until real photos are added */}
+      {hasAcademicCouncilPhotos && (
+        <section className="section bg-white">
+          <div className="container">
+            <PhotoGrid
+              images={academicCouncilPhotos}
+              label="Academic Council"
+              title="Shaping Curriculum & Academic Quality"
+              columns={3}
+              layout="default"
+            />
+          </div>
+        </section>
+      )}
 
       {/* CTA */}
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-14) 0' }}>

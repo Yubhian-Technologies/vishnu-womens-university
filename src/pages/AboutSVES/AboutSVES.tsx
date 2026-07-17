@@ -6,20 +6,38 @@ import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { useOrderedCollection } from '../../hooks/useCollection';
+import { useSitePhotos, useSectionHasPhotos } from '../../hooks/useSitePhotos';
+import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import type { SvesCampusDoc } from '../Admin/sections/SvesCampusesAdmin';
 
-const svesPhotos = [
+const defaultSvesPhotos = [
+  // Slots 0-4: "Our Campuses" PhotoGrid gallery
   { src: 'https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=800&q=80', alt: 'Green Meadows campus Bhimavaram', caption: 'Green Meadows — Bhimavaram' },
   { src: 'https://images.unsplash.com/photo-1562774053-701939374585?w=800&q=80', alt: 'University buildings', caption: 'Academic Blocks' },
   { src: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=800&q=80', alt: 'Students at campus event', caption: 'Student Events' },
   { src: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=800&q=80', alt: 'Graduation ceremony', caption: 'Convocation' },
   { src: 'https://images.unsplash.com/photo-1544531585-9847b68c8c86?w=800&q=80', alt: 'Academic conference', caption: 'Conferences & Seminars' },
+  // Slot 5: standalone SVES intro section image below
+  { src: 'https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=900&q=80', alt: 'SVES campus', caption: '' },
+];
+
+const defaultSvesHeritagePhotos = [
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Society Central Office', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Sister Institutions', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Founder Chairman Vision', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Joint Campus Events', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Community Development Outreach', caption: '' },
 ];
 
 export default function AboutSVES() {
   const svesStats = useContentBlocks('about-sves', 'stats');
   const milestones = useContentBlocks('about-sves', 'milestones');
   const { docs: campuses } = useOrderedCollection<SvesCampusDoc>('svesCampuses', 'order');
+  const svesMainPhotos = useSitePhotos('about-sves', 'main', defaultSvesPhotos);
+  const svesPhotos = svesMainPhotos.slice(0, 5);
+  const svesIntroImg = svesMainPhotos[5];
+  const svesHeritagePhotos = useSitePhotos('about-sves', 'sves-heritage', defaultSvesHeritagePhotos);
+  const hasSvesHeritagePhotos = useSectionHasPhotos('about-sves', 'sves-heritage');
 
   useEffect(() => {
     document.title = 'About SVES | VWU';
@@ -92,8 +110,8 @@ export default function AboutSVES() {
             </div>
             <div className="reveal-right">
               <img
-                src="https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=900&q=80"
-                alt="SVES campus"
+                src={svesIntroImg.src}
+                alt={svesIntroImg.alt}
                 style={{ width: '100%', height: '420px', objectFit: 'cover', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-xl)' }}
                 loading="lazy"
               />
@@ -150,6 +168,21 @@ export default function AboutSVES() {
           />
         </div>
       </section>
+
+      {/* SVES Campuses & Heritage — hidden until real photos are added */}
+      {hasSvesHeritagePhotos && (
+        <section className="section bg-white">
+          <div className="container">
+            <PhotoGrid
+              images={svesHeritagePhotos}
+              label="SVES Campuses & Heritage"
+              title="The Legacy of Sri Vishnu Educational Society"
+              columns={3}
+              layout="default"
+            />
+          </div>
+        </section>
+      )}
 
       {/* Milestones */}
       <section className="section" style={{ background: 'linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%)' }}>

@@ -4,6 +4,8 @@ import './Academics.css';
 import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
 import { useOrderedCollection } from '../../hooks/useCollection';
+import { useSitePhotos, useSectionHasPhotos } from '../../hooks/useSitePhotos';
+import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import { resolveProgramIcon } from '../../lib/programIcons';
 import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
 import {
@@ -11,12 +13,28 @@ import {
   Radio, Clapperboard, Users, Handshake, Newspaper, Drama, Trophy,
 } from 'lucide-react';
 
-const academicsPhotos = [
+const defaultAcademicsPhotos = [
   { src: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=800&q=80', alt: 'Smart lecture halls', caption: 'Smart Lecture Halls' },
   { src: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&q=80', alt: 'Specialised research labs', caption: 'Research Labs' },
   { src: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=800&q=80', alt: 'Technical hackathons', caption: 'Hackathons & Projects' },
   { src: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&q=80', alt: 'Library resources', caption: 'Digital Library' },
   { src: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80', alt: 'Group learning sessions', caption: 'Collaborative Learning' },
+];
+
+const defaultClassroomsLabsPhotos = [
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Smart Lecture Halls', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Advanced Computer Lab', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Electronics Lab', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Physics & Chemistry Labs', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Seminar & Discussion Rooms', caption: '' },
+];
+
+const defaultResearchInnovationPhotos = [
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'R&D Centers', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Student Innovation Hub', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Project Expo Day', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Patents & Publications', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Incubation Center', caption: '' },
 ];
 
 const TABS = [
@@ -43,6 +61,11 @@ function truncate(text: string, max: number) {
 export default function Academics() {
   const [activeTab, setActiveTab] = useState<string>('btech');
   const { docs: programs, loading } = useOrderedCollection<ProgramDoc>('programs', 'order');
+  const academicsPhotos = useSitePhotos('academics', 'main', defaultAcademicsPhotos);
+  const classroomsLabsPhotos = useSitePhotos('academics', 'classrooms-labs', defaultClassroomsLabsPhotos);
+  const hasClassroomsLabsPhotos = useSectionHasPhotos('academics', 'classrooms-labs');
+  const researchInnovationPhotos = useSitePhotos('academics', 'research-innovation', defaultResearchInnovationPhotos);
+  const hasResearchInnovationPhotos = useSectionHasPhotos('academics', 'research-innovation');
 
   useEffect(() => {
     document.title = 'Academics | Vishnu Womens University';
@@ -323,6 +346,36 @@ export default function Academics() {
           />
         </div>
       </section>
+
+      {/* Classrooms & Labs — hidden until real photos are added */}
+      {hasClassroomsLabsPhotos && (
+        <section className="section bg-white">
+          <div className="container">
+            <PhotoGrid
+              images={classroomsLabsPhotos}
+              label="Classrooms & Labs"
+              title="Where Theory Meets Practice"
+              columns={3}
+              layout="default"
+            />
+          </div>
+        </section>
+      )}
+
+      {/* Research & Innovation — hidden until real photos are added */}
+      {hasResearchInnovationPhotos && (
+        <section className="section bg-off-white">
+          <div className="container">
+            <PhotoGrid
+              images={researchInnovationPhotos}
+              label="Research & Innovation"
+              title="Advancing Knowledge, Building the Future"
+              columns={3}
+              layout="default"
+            />
+          </div>
+        </section>
+      )}
 
       {/* CTA */}
       <section className="section" style={{ background: 'var(--color-primary)' }}>

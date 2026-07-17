@@ -3,12 +3,18 @@ import { Link } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
 import { BookOpen, Video } from 'lucide-react';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
+import { useSitePhotos } from '../../hooks/useSitePhotos';
 import { resolveContentIcon } from '../../lib/contentIcons';
+
+const defaultStudioPhoto = [
+  { src: 'https://images.unsplash.com/photo-1598387181032-a3103a2db5b3?w=900&q=80', alt: 'Students in TV studio', caption: '' },
+];
 
 export default function VishnuTV() {
   const focusAreas = useContentBlocks('vishnu-tv', 'focusAreas');
   const docTopics = useContentBlocks('vishnu-tv', 'docTopics');
   const productions = useContentBlocks('vishnu-tv', 'productions');
+  const studioPhoto = useSitePhotos('vishnu-tv', 'main', defaultStudioPhoto)[0];
 
   useEffect(() => {
     document.title = 'Vishnu TV Academy | VWU';
@@ -61,8 +67,8 @@ export default function VishnuTV() {
             </div>
             <div className="reveal-right">
               <img
-                src="https://images.unsplash.com/photo-1598387181032-a3103a2db5b3?w=900&q=80"
-                alt="Students in TV studio"
+                src={studioPhoto.src}
+                alt={studioPhoto.alt}
                 style={{ width: '100%', height: '380px', objectFit: 'cover', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-xl)' }}
                 loading="lazy"
               />
