@@ -12,6 +12,7 @@ interface NavChild {
   path: string;
   external?: boolean;
   disabled?: boolean;
+  subItems?: NavChild[];
 }
 
 interface NavGroup {
@@ -128,20 +129,14 @@ const navItems: NavItem[] = [
     ],
   },
   {
-    // Course Curriculum / Academic Documents groups are appended at render
-    // time from live Firestore data — see academicsGroups in Header().
+    // Course Curriculum / Academic Documents items are spliced in at render
+    // time from live Firestore data — see renderedNavItems in Header().
     label: 'Academics',
-    groups: [
-      {
-        groupLabel: 'Programs',
-        groupPath: '/academics',
-        items: [
-          { label: 'Programs & Departments', path: '/academics' },
-          { label: 'Faculty', path: '/faculty' },
-          { label: 'Result Analysis', path: '/result-analysis' },
-          { label: 'Academic Calendar', path: '/information#academic-calendar' },
-        ],
-      },
+    children: [
+      { label: 'Programs & Departments', path: '/academics' },
+      { label: 'Faculty', path: '/faculty' },
+      { label: 'Result Analysis', path: '/result-analysis' },
+      { label: 'Academic Calendar', path: '/information#academic-calendar' },
     ],
   },
   {
@@ -231,16 +226,17 @@ export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
   const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
+  const [expandedSubItem, setExpandedSubItem] = useState<string | null>(null);
   const location = useLocation();
 
   const { docs: curriculumDocs, loading: curriculumLoading } = useOrderedCollection<CurriculumDoc>('curriculum', 'rowOrder');
   const { docs: downloadDocs, loading: downloadsLoading } = useOrderedCollection<DownloadDoc>('downloads', 'order');
 
   const curriculumPrograms = Array.from(new Set(curriculumDocs.map((d) => d.program)));
-  const courseCurriculumGroup: NavGroup = {
-    groupLabel: 'Course Curriculum',
-    groupPath: '/academics/curriculum',
-    items: curriculumLoading
+  const courseCurriculumChild: NavChild = {
+    label: 'Course Curriculum',
+    path: '/academics/curriculum',
+    subItems: curriculumLoading
       ? [{ label: 'Loading…', path: '', disabled: true }]
       : curriculumPrograms.length > 0
         ? curriculumPrograms.map((p) => ({
@@ -249,23 +245,28 @@ export default function Header() {
           }))
         : [{ label: 'No documents yet', path: '', disabled: true }],
   };
-  const academicDocsGroup: NavGroup = {
-    groupLabel: 'Academic Documents',
-    groupPath: '/academics/downloads',
-    items: downloadsLoading
+  const academicDocsChild: NavChild = {
+    label: 'Academic Documents',
+    path: '/academics/downloads',
+    subItems: downloadsLoading
       ? [{ label: 'Loading…', path: '', disabled: true }]
       : downloadDocs.length > 0
         ? downloadDocs.map((d) => ({ label: d.title, path: d.fileUrl, external: true }))
         : [{ label: 'No documents yet', path: '', disabled: true }],
   };
 
-  // Academics' groups are static (Programs) + these two live-Firestore-derived
-  // ones, computed here since navItems itself is a module-level constant.
-  const renderedNavItems: NavItem[] = navItems.map((item) =>
-    item.label === 'Academics'
-      ? { ...item, groups: [...(item.groups ?? []), courseCurriculumGroup, academicDocsGroup] }
-      : item
-  );
+  // Academics' children are the static list + these two live-Firestore-derived
+  // flyout items, spliced in after "Faculty" since navItems itself is a
+  // module-level constant and can't hold live data directly.
+  const renderedNavItems: NavItem[] = navItems.map((item) => {
+    if (item.label !== 'Academics' || !item.children) return item;
+    const children: NavChild[] = [];
+    for (const child of item.children) {
+      children.push(child);
+      if (child.label === 'Faculty') children.push(courseCurriculumChild, academicDocsChild);
+    }
+    return { ...item, children };
+  });
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -277,6 +278,7 @@ export default function Header() {
     setMobileOpen(false);
     setExpandedItem(null);
     setExpandedGroup(null);
+    setExpandedSubItem(null);
   }, [location]);
 
   useEffect(() => {
@@ -341,8 +343,12 @@ export default function Header() {
                     <div className="dropdown" role="menu">
                       <ul className="dropdown-list">
                         {item.children.map((child) => (
-                          <li key={child.label}>
-                            {child.external ? (
+                          <li key={child.label} className={child.subItems ? 'dropdown-item--flyout-parent' : undefined}>
+                            {child.disabled ? (
+                              <span className="dropdown-item" style={{ opacity: 0.5, cursor: 'default' }}>
+                                {child.label}
+                              </span>
+                            ) : child.external ? (
                               <a href={child.path} className="dropdown-item" role="menuitem" target="_blank" rel="noopener noreferrer">
                                 {child.label}
                                 <span style={{ fontSize: '0.6rem', opacity: 0.5, marginLeft: 4 }}>↗</span>
@@ -350,7 +356,29 @@ export default function Header() {
                             ) : (
                               <Link to={child.path} className="dropdown-item" role="menuitem">
                                 {child.label}
+                                {child.subItems && <span className="dropdown-item__chevron">›</span>}
                               </Link>
+                            )}
+                            {child.subItems && (
+                              <ul className="dropdown-flyout" role="menu">
+                                {child.subItems.map((sub) => (
+                                  <li key={sub.label}>
+                                    {sub.disabled ? (
+                                      <span className="dropdown-item" style={{ opacity: 0.5, cursor: 'default' }}>
+                                        {sub.label}
+                                      </span>
+                                    ) : sub.external ? (
+                                      <a href={sub.path} className="dropdown-item" role="menuitem" target="_blank" rel="noopener noreferrer">
+                                        {sub.label}
+                                      </a>
+                                    ) : (
+                                      <Link to={sub.path} className="dropdown-item" role="menuitem">
+                                        {sub.label}
+                                      </Link>
+                                    )}
+                                  </li>
+                                ))}
+                              </ul>
                             )}
                           </li>
                         ))}
@@ -437,6 +465,7 @@ export default function Header() {
                     onClick={() => {
                       setExpandedItem(isExpanded ? null : item.label);
                       setExpandedGroup(null);
+                      setExpandedSubItem(null);
                     }}
                   >
                     {item.label}
@@ -448,17 +477,53 @@ export default function Header() {
                   {/* Flat submenu */}
                   {item.children && isExpanded && (
                     <ul className="mobile-submenu">
-                      {item.children.map((child) => (
-                        <li key={child.label}>
-                          {child.external ? (
-                            <a href={child.path} className="mobile-sub-item" target="_blank" rel="noopener noreferrer">
-                              {child.label} <span style={{ fontSize: '0.6rem', opacity: 0.5 }}>↗</span>
-                            </a>
-                          ) : (
-                            <Link to={child.path} className="mobile-sub-item">{child.label}</Link>
-                          )}
-                        </li>
-                      ))}
+                      {item.children.map((child) => {
+                        if (child.subItems) {
+                          const subKey = `${item.label}:${child.label}`;
+                          const subOpen = expandedSubItem === subKey;
+                          return (
+                            <li key={child.label} className="mobile-group">
+                              <button
+                                className={`mobile-group-btn${subOpen ? ' active' : ''}`}
+                                onClick={() => setExpandedSubItem(subOpen ? null : subKey)}
+                              >
+                                {child.label}
+                                <svg className={`mobile-nav-arrow${subOpen ? ' rotated' : ''}`} viewBox="0 0 12 12" width="12" height="12" fill="none">
+                                  <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                              </button>
+                              {subOpen && (
+                                <ul className="mobile-group-items">
+                                  {child.subItems.map((sub) => (
+                                    <li key={sub.label}>
+                                      {sub.disabled ? (
+                                        <span className="mobile-sub-item" style={{ opacity: 0.5 }}>{sub.label}</span>
+                                      ) : sub.external ? (
+                                        <a href={sub.path} className="mobile-sub-item" target="_blank" rel="noopener noreferrer">{sub.label}</a>
+                                      ) : (
+                                        <Link to={sub.path} className="mobile-sub-item">{sub.label}</Link>
+                                      )}
+                                    </li>
+                                  ))}
+                                </ul>
+                              )}
+                            </li>
+                          );
+                        }
+                        return (
+                          <li key={child.label}>
+                            {child.disabled ? (
+                              <span className="mobile-sub-item" style={{ opacity: 0.5 }}>{child.label}</span>
+                            ) : child.external ? (
+                              <a href={child.path} className="mobile-sub-item" target="_blank" rel="noopener noreferrer">
+                                {child.label} <span style={{ fontSize: '0.6rem', opacity: 0.5 }}>↗</span>
+                              </a>
+                            ) : (
+                              <Link to={child.path} className="mobile-sub-item">{child.label}</Link>
+                            )}
+                          </li>
+                        );
+                      })}
                     </ul>
                   )}
 
