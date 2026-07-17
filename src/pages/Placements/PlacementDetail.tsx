@@ -1,8 +1,14 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
-import { Trophy } from 'lucide-react';
-import { findPlacementItemBySlug, TableRow } from './placements.data';
+import { Trophy, BarChart3 } from 'lucide-react';
+import { useOrderedCollection } from '../../hooks/useCollection';
+import { usePageBanners } from '../../hooks/usePageBanners';
+import { resolveContentIcon } from '../../lib/contentIcons';
+import { parseStructuredTable } from '../../lib/structuredTable';
+import type { PlacementItemDoc } from '../Admin/sections/PlacementItemsAdmin';
 import '../detail-layout.css';
+
+const DEFAULT_HERO_IMAGE = 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=1920&q=80';
 
 const PARTNER_DOMAINS: Record<string, string> = {
   'Amazon': 'amazon.com', 'Adobe': 'adobe.com', 'Microsoft': 'microsoft.com',
@@ -47,34 +53,32 @@ function PartnerLogo({ name }: { name: string }) {
 
 export default function PlacementDetail() {
   const { slug } = useParams<{ slug: string }>();
-  const item = slug ? findPlacementItemBySlug(slug) : null;
+  const { docs: allItems, loading } = useOrderedCollection<PlacementItemDoc>('placementItems', 'order');
+  const item = allItems.find((i) => i.slug === slug) ?? null;
+  const { slides: heroSlides } = usePageBanners('placement-detail');
+  const heroImage = heroSlides[0]?.imageUrl || DEFAULT_HERO_IMAGE;
 
+  // No scroll-reveal here — this page's content only renders once the
+  // Firestore-backed `item` has loaded (see the gotcha documented in CLAUDE.md).
   useEffect(() => {
     if (item) document.title = `${item.title} | Vishnu Womens University`;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const el = entry.target as HTMLElement;
-            setTimeout(() => el.classList.add('revealed'), parseInt(el.dataset.delay || '0'));
-            observer.unobserve(el);
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-    document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
   }, [item]);
 
-  if (!item) return <Navigate to="/placements" replace />;
+  if (!item) {
+    if (loading) return null;
+    return <Navigate to="/placements" replace />;
+  }
+
+  const Icon = resolveContentIcon(item.icon) || BarChart3;
+  const tableSections = parseStructuredTable(item.tableText);
+  const tableRows = tableSections.flatMap((s) => s.rows);
 
   return (
     <main className="page-wrapper">
       {/* Hero */}
       <section className="page-hero" style={{ minHeight: 360 }}>
         <img
-          src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=1920&q=80"
+          src={heroImage}
           alt={item.title}
           className="page-hero-image"
         />
@@ -88,7 +92,7 @@ export default function PlacementDetail() {
             <span className="breadcrumb-item active">{item.title}</span>
           </div>
           <div className="animate-fade-in-up" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'var(--color-accent)', color: 'var(--color-white)', fontSize: 'var(--text-xs)', fontWeight: 700, padding: '0.3rem 0.9rem', borderRadius: 'var(--radius-full)', marginBottom: 'var(--space-3)' }}>
-            <item.icon size={16} /> Placements & Careers
+            <Icon size={16} /> Placements & Careers
           </div>
           <h1 className="animate-fade-in-up">{item.title}</h1>
         </div>
@@ -99,7 +103,7 @@ export default function PlacementDetail() {
         <div className="container">
           <div className={item.highlights && item.highlights.length > 0 ? 'detail-grid' : ''}>
             {/* Main */}
-            <div className="reveal">
+            <div>
               <span className="section-label">Overview</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>About {item.title}</h2>
               {item.intro ? (
@@ -122,7 +126,7 @@ export default function PlacementDetail() {
 
             {/* Sidebar: highlights */}
             {item.highlights && item.highlights.length > 0 && (
-              <div className="reveal detail-sidebar" data-delay="100">
+              <div className="detail-sidebar">
                 <div style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', position: 'sticky', top: '110px' }}>
                   <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-4)' }}>
                     Key Highlights
@@ -148,13 +152,13 @@ export default function PlacementDetail() {
       {item.outcomes && item.outcomes.length > 0 && (
         <section className="section bg-off-white">
           <div className="container">
-            <div className="reveal" style={{ marginBottom: 'var(--space-8)' }}>
+            <div style={{ marginBottom: 'var(--space-8)' }}>
               <span className="section-label">Impact</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Outcomes & Achievements</h2>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 'var(--space-4)' }}>
-              {item.outcomes.map((o, i) => (
-                <div key={o} className="reveal" data-delay={`${i * 60}`}
+              {item.outcomes.map((o) => (
+                <div key={o}
                   style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
                   <Trophy size={20} strokeWidth={1.75} style={{ flexShrink: 0, color: 'var(--color-accent)' }} />
                   <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6 }}>{o}</span>
@@ -166,34 +170,34 @@ export default function PlacementDetail() {
       )}
 
       {/* Table Data */}
-      {item.tableData && item.tableData.length > 0 && (
+      {tableRows.length > 0 && (
         <section className="section bg-white">
           <div className="container">
-            <div className="reveal" style={{ marginBottom: 'var(--space-8)' }}>
+            <div style={{ marginBottom: 'var(--space-8)' }}>
               <span className="section-label">Data</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>
                 {item.slug === 'tpo-team' ? 'Team Roster' : item.slug === 'industry-liaison-offices' ? 'Regional Offices' : 'Batch-wise Statistics'}
               </h2>
             </div>
-            <div className="reveal" style={{ overflowX: 'auto' }}>
+            <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm)' }}>
                 <thead>
                   <tr style={{ background: 'var(--color-primary)' }}>
-                    {Object.keys(item.tableData[0]).map((col) => (
-                      <th key={col} style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'left', color: 'var(--color-white)', fontWeight: 700, whiteSpace: 'nowrap' }}>
-                        {col}
-                      </th>
-                    ))}
+                    <th style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'left', color: 'var(--color-white)', fontWeight: 700, whiteSpace: 'nowrap' }}>Name</th>
+                    <th style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'left', color: 'var(--color-white)', fontWeight: 700, whiteSpace: 'nowrap' }}>Role</th>
+                    {tableRows.some((r) => r.notes) && (
+                      <th style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'left', color: 'var(--color-white)', fontWeight: 700, whiteSpace: 'nowrap' }}>Notes</th>
+                    )}
                   </tr>
                 </thead>
                 <tbody>
-                  {item.tableData.map((row: TableRow, i: number) => (
+                  {tableRows.map((row, i) => (
                     <tr key={i} style={{ background: i % 2 === 0 ? 'var(--color-off-white)' : 'var(--color-white)', borderBottom: '1px solid var(--color-light-gray)' }}>
-                      {Object.values(row).map((val, j) => (
-                        <td key={j} style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)', lineHeight: 1.5 }}>
-                          {String(val)}
-                        </td>
-                      ))}
+                      <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)', lineHeight: 1.5 }}>{row.name}</td>
+                      <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)', lineHeight: 1.5 }}>{row.role}</td>
+                      {tableRows.some((r) => r.notes) && (
+                        <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)', lineHeight: 1.5 }}>{row.notes}</td>
+                      )}
                     </tr>
                   ))}
                 </tbody>
@@ -207,11 +211,11 @@ export default function PlacementDetail() {
       {item.partners && item.partners.length > 0 && (
         <section className="section bg-off-white">
           <div className="container">
-            <div className="reveal" style={{ marginBottom: 'var(--space-8)' }}>
+            <div style={{ marginBottom: 'var(--space-8)' }}>
               <span className="section-label">Network</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Recruiting Partners</h2>
             </div>
-            <div className="reveal partner-logo-grid">
+            <div className="partner-logo-grid">
               {item.partners.map((p, i) => (
                 <PartnerLogo key={i} name={p} />
               ))}
@@ -223,7 +227,7 @@ export default function PlacementDetail() {
       {/* CTA */}
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-14) 0' }}>
         <div className="container" style={{ textAlign: 'center' }}>
-          <div className="reveal">
+          <div>
             <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>
               Explore More Placement Resources
             </h2>

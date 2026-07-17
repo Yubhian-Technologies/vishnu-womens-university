@@ -5,7 +5,9 @@ import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
 import { useSitePhotos, useSectionHasPhotos } from '../../hooks/useSitePhotos';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
-import { Radio, Tv, Handshake, Sprout, Shield, Laptop, Palette, BookOpen, Globe2, Bot, Venus, Leaf, GraduationCap, Brain, Lightbulb, Award, Globe, Target, Volleyball, Feather, CircleDot, Swords, Footprints, Waves, Disc, Crown, Check } from 'lucide-react';
+import { useContentBlocks } from '../../hooks/useContentBlocks';
+import { resolveContentIcon } from '../../lib/contentIcons';
+import { Radio, GraduationCap, Target, Check } from 'lucide-react';
 
 const defaultStudentLifePhotos = [
   // Slots 0-4: "Campus Moments" PhotoGrid gallery
@@ -36,50 +38,12 @@ const defaultClubsFestivalsPhotos = [
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Music & Band Performance', caption: '' },
 ];
 
-const clubs = [
-  { icon: Radio, name: 'Radio Vishnu 90.4', count: 'Campus FM station' },
-  { icon: Tv, name: 'Vishnu TV Academy', count: 'Media & broadcasting' },
-  { icon: Handshake, name: 'Student Government', count: 'Student council' },
-  { icon: Sprout, name: 'NSS Unit', count: 'National Service Scheme' },
-  { icon: Shield, name: 'NCC Wing', count: 'National Cadet Corps' },
-  { icon: Laptop, name: 'Tech Clubs (CSE/ECE/EEE)', count: 'Department-level clubs' },
-  { icon: Palette, name: 'Arts & Culture Club', count: 'Creativity & expression' },
-  { icon: BookOpen, name: 'Prathibha Magazine', count: 'Campus literary journal' },
-  { icon: Globe2, name: 'Social Service Club', count: 'Community outreach' },
-  { icon: Bot, name: 'Robotics Club', count: 'Innovation & design' },
-  { icon: Venus, name: 'Women Empowerment Cell', count: 'Leadership & awareness' },
-  { icon: Leaf, name: 'Eco Club', count: 'Green campus initiative' },
-];
-
-const housing = [
-  { name: 'Vishnu Girls Hostel – Block A', type: "Women's hostel", desc: 'Well-sized rooms with modern amenities, round-the-clock security, and fast Wi-Fi for all resident students.' },
-  { name: 'Vishnu Girls Hostel – Block B', type: "Women's hostel", desc: 'Comfortable accommodation with an attached food court, quiet reading rooms, and recreational facilities.' },
-  { name: 'Staff Quarters', type: 'Faculty housing', desc: 'On-campus residential accommodation for faculty and staff within the Green Meadows campus network.' },
-];
-
-const services = [
-  { icon: GraduationCap, title: 'Career Services Center', desc: 'Resume preparation, mock interviews, placement drives, and career guidance — supporting 1,400+ annual placements.' },
-  { icon: Brain, title: 'Student Wellness Center', desc: 'Medical support, mental health resources, and on-campus healthcare accessible to every student.' },
-  { icon: BookOpen, title: 'Central Library', desc: 'Thousands of engineering texts, e-journals, NPTEL content, and quiet study spaces to support academic work.' },
-  { icon: Lightbulb, title: 'Assistive Technology Lab', desc: 'A dedicated lab developing assistive tools for differently-abled individuals — open to all students for learning and research.' },
-  { icon: Award, title: 'Sports & Games Facilities', desc: 'A range of indoor and outdoor sports facilities — courts, swimming pool, and a fitness centre — to support physical development.' },
-  { icon: Globe, title: 'International Outreach', desc: 'Vishnu Japan Outreach Centre and international academic partnerships offering global exposure and exchange pathways.' },
-];
-
-const athletics = [
-  { sport: 'Cricket', season: 'Year-round', icon: Target },
-  { sport: 'Volleyball', season: 'Year-round', icon: Volleyball },
-  { sport: 'Badminton', season: 'Year-round', icon: Feather },
-  { sport: 'Basketball', season: 'Year-round', icon: CircleDot },
-  { sport: 'Kabaddi', season: 'Year-round', icon: Swords },
-  { sport: 'Athletics / Track', season: 'Annual', icon: Footprints },
-  { sport: 'Swimming', season: 'Year-round', icon: Waves },
-  { sport: 'Table Tennis', season: 'Year-round', icon: Disc },
-  { sport: 'Chess', season: 'Year-round', icon: Crown },
-  { sport: 'Throwball', season: 'Year-round', icon: Volleyball },
-];
-
 export default function StudentLife() {
+  const clubs = useContentBlocks('student-life', 'clubs');
+  const housing = useContentBlocks('student-life', 'housing');
+  const services = useContentBlocks('student-life', 'services');
+  const athletics = useContentBlocks('student-life', 'athletics');
+  const diningFeatures = useContentBlocks('student-life', 'diningFeatures');
   const studentLifeMainPhotos = useSitePhotos('student-life', 'main', defaultStudentLifePhotos);
   const studentLifePhotos = studentLifeMainPhotos.slice(0, 5);
   const hostelImg = studentLifeMainPhotos[5];
@@ -142,13 +106,16 @@ export default function StudentLife() {
             </p>
           </div>
           <div className="sl-clubs-grid">
-            {clubs.map((club, i) => (
-              <div key={club.name} className="sl-club-card reveal" data-delay={`${i * 50}`}>
-                <div className="sl-club-icon"><club.icon size={40} strokeWidth={1.75} /></div>
-                <h3>{club.name}</h3>
-                <span>{club.count}</span>
-              </div>
-            ))}
+            {clubs.map((club) => {
+              const Icon = resolveContentIcon(club.icon) || Radio;
+              return (
+                <div key={club.id} className="sl-club-card">
+                  <div className="sl-club-icon"><Icon size={40} strokeWidth={1.75} /></div>
+                  <h3>{club.title}</h3>
+                  <span>{club.value}</span>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -169,9 +136,9 @@ export default function StudentLife() {
           <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-6)' }}>Your Home Away from Home</h2>
           <div className="sl-housing-list">
             {housing.map(h => (
-              <div key={h.name} className="sl-housing-item">
-                <div className="sl-housing-name">{h.name}</div>
-                <div className="sl-housing-type">{h.type}</div>
+              <div key={h.id} className="sl-housing-item">
+                <div className="sl-housing-name">{h.title}</div>
+                <div className="sl-housing-type">{h.value}</div>
                 <div className="sl-housing-desc">{h.desc}</div>
               </div>
             ))}
@@ -202,13 +169,16 @@ export default function StudentLife() {
             />
           </div>
           <div className="sl-sports-grid">
-            {athletics.map((s, i) => (
-              <div key={s.sport} className="sl-sport-card reveal" data-delay={`${i * 40}`}>
-                <span className="sl-sport-icon"><s.icon size={32} strokeWidth={1.75} /></span>
-                <div className="sl-sport-name">{s.sport}</div>
-                <span className="sl-sport-season">{s.season}</span>
-              </div>
-            ))}
+            {athletics.map((s) => {
+              const Icon = resolveContentIcon(s.icon) || Target;
+              return (
+                <div key={s.id} className="sl-sport-card">
+                  <span className="sl-sport-icon"><Icon size={32} strokeWidth={1.75} /></span>
+                  <div className="sl-sport-name">{s.title}</div>
+                  <span className="sl-sport-season">{s.value}</span>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -224,16 +194,19 @@ export default function StudentLife() {
             </p>
           </div>
           <div className="sl-services-grid">
-            {services.map((s, i) => (
-              <div key={s.title} className="sl-service-card reveal" data-delay={`${i * 80}`}>
-                <div className="sl-service-icon"><s.icon size={40} strokeWidth={1.75} /></div>
-                <h3>{s.title}</h3>
-                <p>{s.desc}</p>
-                <Link to="/student-life" className="sl-service-link">
-                  Learn More →
-                </Link>
-              </div>
-            ))}
+            {services.map((s) => {
+              const Icon = resolveContentIcon(s.icon) || GraduationCap;
+              return (
+                <div key={s.id} className="sl-service-card">
+                  <div className="sl-service-icon"><Icon size={40} strokeWidth={1.75} /></div>
+                  <h3>{s.title}</h3>
+                  <p>{s.desc}</p>
+                  <Link to="/student-life" className="sl-service-link">
+                    Learn More →
+                  </Link>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -250,10 +223,10 @@ export default function StudentLife() {
                 non-vegetarian meals daily. Dedicated mess facilities are provided for hostel residents.
               </p>
               <div className="sl-dining-features">
-                {['On-campus food court', 'Hostel mess facility', 'Hygienic & fresh meals daily', 'Vegetarian & non-vegetarian options', 'Affordable meal plans'].map(f => (
-                  <div key={f} style={{ color: 'rgba(255,255,255,0.8)', fontSize: 'var(--text-sm)', display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-2)' }}>
+                {diningFeatures.map(f => (
+                  <div key={f.id} style={{ color: 'rgba(255,255,255,0.8)', fontSize: 'var(--text-sm)', display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-2)' }}>
                     <Check size={15} strokeWidth={2.5} style={{ color: 'var(--color-accent)', flexShrink: 0 }} />
-                    {f}
+                    {f.title}
                   </div>
                 ))}
               </div>

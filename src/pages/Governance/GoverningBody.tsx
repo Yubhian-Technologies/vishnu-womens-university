@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
+import PageHero from '../../components/PageHero/PageHero';
 import './GoverningBody.css';
 
 export interface GoverningBodyMember {
@@ -88,29 +89,13 @@ export default function GoverningBody() {
   return (
     <main className="page-wrapper governing-body-page">
       {/* Hero */}
-      <section className="gb-hero">
-        <div className="gb-hero__bg">
-          <img
-            src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1920&q=80"
-            alt="Governing Body of Shri Vishnu Engineering College for Women"
-          />
-        </div>
-        <div className="gb-hero__overlay" />
-        <div className="container gb-hero__content">
-          <h1 className="animate-fade-in-up">Governing Body</h1>
-          <p className="animate-fade-in-up delay-200">
-            Dedicated leaders and distinguished members committed to academic excellence,
-            institutional governance, innovation, and the continuous growth of Shri Vishnu
-            Engineering College for Women.
-          </p>
-        </div>
-        <div className="gb-scroll-indicator" aria-hidden="true">
-          <span>Scroll</span>
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <path d="M3 6l6 6 6-6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </div>
-      </section>
+      <PageHero
+        page="governing-body"
+        defaultImage="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1920&q=80"
+        defaultTitle="Governing Body"
+        defaultSubtitle="Dedicated leaders and distinguished members committed to academic excellence, institutional governance, innovation, and the continuous growth of Shri Vishnu Engineering College for Women."
+        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Governance', to: '/governance' }, { label: 'Governing Body' }]}
+      />
 
       {/* Overview */}
       <section className="section gb-overview">

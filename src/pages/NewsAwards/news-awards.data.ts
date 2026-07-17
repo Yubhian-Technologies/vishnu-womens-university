@@ -1,73 +1,14 @@
-export interface HappeningEvent {
-  title: string;
-  date: string;
-  type: 'recent' | 'upcoming';
-  dept?: string;
-}
-
-export interface AwardItem {
-  name: string;
-  issuedBy: string;
-  year?: string;
-  details?: string;
-  category: 'ranking' | 'award' | 'accreditation';
-}
-
+// Note: happenings and awards used to live here too, but both are now
+// Firestore-backed (see NewsAwardsDataAdmin.tsx / the `happenings` and
+// `awards` collections) since they're day-to-day editable content. This
+// file now only holds the gallery album archive — a historical, rarely-
+// changing year-by-year index of past event titles (no images; the actual
+// photo grid is the separate Firestore-backed `gallery` collection).
 export interface GalleryAlbum {
   title: string;
   date: string;
   year: number;
 }
-
-export const happenings: HappeningEvent[] = [
-  { title: 'Team Ziba Racers secured five prestigious awards @ mBAJA SAEINDIA 2026', date: 'February 25, 2026', type: 'recent' },
-  { title: 'Cyber Shield 2.1', date: 'January 31, 2026', type: 'recent' },
-  { title: 'MoU signing ceremony between VWU & Metey Engineering & Consultancy Pvt Ltd.', date: 'December 27, 2025', type: 'recent' },
-  { title: 'Guest Lecture on Construction Technologies for Rapid Delivery of Structures', date: 'December 27, 2025', type: 'recent', dept: 'Dept. of Civil Engineering with ASCE Students Chapter' },
-  { title: '138th Birth Anniversary Celebrations of Srinivasa Ramanujan', date: 'December 22, 2025', type: 'recent' },
-  { title: 'Empowering Women in Civil Engineering through Geospatial Engineering Techniques (WICE-GEO 2025)', date: 'December 12–13, 2025', type: 'recent' },
-  { title: '150 Years of Vande Mataram: Celebrating the Song of the Motherland', date: 'November 7, 2025', type: 'recent' },
-  { title: 'Team E-Ziba Racers Excel at SAE-India Autonomous BAJA 2025', date: 'October 6–13, 2025', type: 'recent' },
-  { title: 'Training Program on Data Structures using JAVA', date: 'September 8–20, 2025', type: 'recent' },
-  { title: 'Workshop on Hands-on Training: Microcontrollers and Sensor Interfacing', date: 'September 8–13, 2025', type: 'recent' },
-  { title: 'Commencement of I B.Tech. Classes for Academic Year 2025-26', date: 'August 4, 2025', type: 'recent' },
-  { title: 'Technova2026 – A National Level Technical Symposium for Women', date: 'March 6–7, 2026', type: 'upcoming' },
-  { title: 'Online FDP on "Foundations of Quantum Computing and Machine Learning"', date: 'June 2–6, 2026', type: 'upcoming', dept: 'CSE Department' },
-];
-
-export const awards: AwardItem[] = [
-  // Rankings
-  { name: 'IEI Engineering Education Excellence Award 2025', issuedBy: 'Indian Engineering Institute (IEI)', year: '2025', details: 'Excellence in Overall Performance among Women Engineering Colleges/Institutions', category: 'ranking' },
-  { name: 'MHW Ranking 2024 – Diamond Band', issuedBy: 'MHW Ranking', year: '2024', details: 'Ranked in Diamond Band across India for excellence in well-being of Faculty, Staff and Students', category: 'ranking' },
-  { name: 'India Today Best Engineering College', issuedBy: 'India Today Magazine', year: '2023', details: 'Listed as Best Engineering College', category: 'ranking' },
-  { name: 'Green Institutional Rankings 2022 – Rank 47', issuedBy: 'Sustainable Institutions of India', year: '2022', details: 'Ranked No. 47 across India', category: 'ranking' },
-  { name: 'ARIIA – Atal Ranking on Innovation Achievements', issuedBy: 'Ministry of Education', details: 'Ranked in innovation achievements category', category: 'ranking' },
-  { name: 'MHRD NIRF Ranking', issuedBy: 'Ministry of Education (MHRD)', details: 'Ranked in National Institutional Ranking Framework', category: 'ranking' },
-  { name: 'Outlook Magazine Top 100 Colleges – Rank 92', issuedBy: 'Outlook Magazine', year: '2017', details: "Ranked 92 in India's Top 100 Professional Colleges", category: 'ranking' },
-  { name: 'Careers 360 AAA+ Rating', issuedBy: 'Careers 360', details: 'AAA+ institutional quality rating', category: 'ranking' },
-  { name: 'THE WEEK – Best Engineering College', issuedBy: 'THE WEEK Magazine / Hansa Research', year: '2023', details: 'Listed as Best Engineering College', category: 'ranking' },
-  // Awards
-  { name: 'National Level Engineering Education Excellence Award', issuedBy: 'Indian Engineering Congress (37th IEC, Chennai)', year: '2022', details: 'Best Engineering College award', category: 'award' },
-  { name: 'ISTE A.P. Section Best Engineering College Award', issuedBy: 'Indian Society for Technical Education (ISTE), A.P. Section', year: '2022', category: 'award' },
-  { name: 'IIC 4-Star Rating', issuedBy: 'Ministry of Education (MoE)', year: '2022–23', details: '4-star rating for promoting innovation and startups on campus', category: 'award' },
-  { name: 'APQO Global Performance Excellence Award', issuedBy: 'Asia Pacific Quality Organization (APQO)', category: 'award' },
-  { name: 'IMC Ramkrishna Bajaj National Quality Awards', issuedBy: 'Indian Management Council (IMC)', year: '2017', category: 'award' },
-  { name: 'AICTE USVA 2020 – Winner', issuedBy: 'AICTE', year: '2020', category: 'award' },
-  { name: 'Radio Vishnu 90.4 – Best Community Radio Award', issuedBy: 'UNICEF – For Every Child', year: '2022', details: 'Award for Best Community Radio', category: 'award' },
-  { name: 'Best Consumer Award – Alternative Energy', issuedBy: 'APEPDCL (Andhra Pradesh Eastern Power Distribution Company)', details: 'Best consumer in West Godavari District for use of alternative energy resources', category: 'award' },
-  { name: 'Distinguished Alumnus Award', issuedBy: 'NIT Trichy', details: 'Recipient: Sri K V Vishnu Raju, Chairman SVES', category: 'award' },
-  // Accreditations
-  { name: 'NAAC Accreditation', issuedBy: 'National Assessment and Accreditation Council', year: '2022', category: 'accreditation' },
-  { name: 'NBA Accreditation', issuedBy: 'National Board of Accreditation', details: 'Engineering programs accredited', category: 'accreditation' },
-  { name: 'UGC Autonomous Status', issuedBy: 'University Grants Commission', category: 'accreditation' },
-  { name: 'UGC 2(f) & 12(B) Recognition', issuedBy: 'University Grants Commission', category: 'accreditation' },
-  { name: 'AICTE Recognition', issuedBy: 'All India Council for Technical Education', category: 'accreditation' },
-  { name: 'AICTE-CII Survey Recognition', issuedBy: 'AICTE and Confederation of Indian Industry', category: 'accreditation' },
-  { name: 'TEQIP-II', issuedBy: 'Technical Education Quality Improvement Program', category: 'accreditation' },
-  { name: 'JNTUK Affiliation', issuedBy: 'Jawaharlal Nehru Technological University Kakinada', category: 'accreditation' },
-  { name: 'JNTUK Autonomous Approval', issuedBy: 'JNTUK', details: 'Autonomous status from JNTUK', category: 'accreditation' },
-  { name: 'EduSkills Foundation – Institutional Member', issuedBy: 'EduSkills Foundation', category: 'accreditation' },
-];
 
 export const galleryAlbums: GalleryAlbum[] = [
   // 2026

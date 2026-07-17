@@ -1,9 +1,14 @@
 import { useEffect } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
-import { Trophy } from 'lucide-react';
-import { findGovItemBySlug, GovTableRow } from './governance.data';
+import { Trophy, Landmark } from 'lucide-react';
 import { useOrderedCollection } from '../../hooks/useCollection';
+import { usePageBanners } from '../../hooks/usePageBanners';
+import { resolveContentIcon } from '../../lib/contentIcons';
+import { parseStructuredTable } from '../../lib/structuredTable';
+import type { GovernanceItemDoc } from '../Admin/sections/GovernanceItemsAdmin';
 import '../detail-layout.css';
+
+const DEFAULT_HERO_IMAGE = 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1920&q=80';
 
 interface FacultyDoc {
   id: string;
@@ -29,44 +34,37 @@ const BOS_DEPARTMENT_MAP: Record<string, string> = {
 
 export default function GovernanceDetail() {
   const { slug } = useParams<{ slug: string }>();
-  const item = slug ? findGovItemBySlug(slug) : null;
+  const { docs: govDocs, loading: govLoading } = useOrderedCollection<GovernanceItemDoc>('governanceItems', 'order');
+  const item = govDocs.find((i) => i.slug === slug) ?? null;
   const { docs: faculty } = useOrderedCollection<FacultyDoc>('faculty', 'name');
+  const { slides: heroSlides } = usePageBanners('governance-detail');
+  const heroImage = heroSlides[0]?.imageUrl || DEFAULT_HERO_IMAGE;
 
+  // No scroll-reveal here — this whole page's content (including the hero
+  // title) only renders once the Firestore-backed `item` has loaded, so any
+  // .reveal/IntersectionObserver setup would be racing async data on every
+  // navigation (see the gotcha documented in CLAUDE.md).
   useEffect(() => {
     if (item) document.title = `${item.title} | Vishnu Womens University`;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const el = entry.target as HTMLElement;
-            setTimeout(() => el.classList.add('revealed'), parseInt(el.dataset.delay || '0'));
-            observer.unobserve(el);
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-    document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
   }, [item]);
 
-  if (!item) return <Navigate to="/governance" replace />;
+  if (!item) {
+    if (govLoading) return null;
+    return <Navigate to="/governance" replace />;
+  }
 
-  const tableSections = item.slug === 'board-of-studies' && item.tableSections
-    ? item.tableSections.map((section) => {
+  const parsedTable = parseStructuredTable(item.tableText);
+  const tableSections = item.slug === 'board-of-studies'
+    ? parsedTable.map((section) => {
         const dept = BOS_DEPARTMENT_MAP[section.title];
         const deptFaculty = dept ? faculty.filter((f) => f.department === dept) : [];
         if (deptFaculty.length === 0) return section;
 
-        const staticRows = section.rows.filter((r) => !String(r.Name).toLowerCase().startsWith('faculty member'));
-        const facultyRows: GovTableRow[] = deptFaculty.map((f, i) => ({
-          'S.No': staticRows.length + i + 1,
-          Name: f.name,
-          Designation: f.designation,
-        }));
+        const staticRows = section.rows.filter((r) => !r.name.toLowerCase().startsWith('faculty member'));
+        const facultyRows = deptFaculty.map((f) => ({ name: f.name, role: f.designation, notes: '' }));
         return { ...section, rows: [...staticRows, ...facultyRows] };
       })
-    : item.tableSections;
+    : parsedTable;
 
   const categoryLabel =
     item.category === 'governance' ? 'Governance'
@@ -78,7 +76,7 @@ export default function GovernanceDetail() {
       {/* Hero */}
       <section className="page-hero" style={{ minHeight: 340 }}>
         <img
-          src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1920&q=80"
+          src={heroImage}
           alt={item.title}
           className="page-hero-image"
         />
@@ -92,7 +90,7 @@ export default function GovernanceDetail() {
             <span className="breadcrumb-item active">{item.title}</span>
           </div>
           <div className="animate-fade-in-up" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'var(--color-accent)', color: 'var(--color-white)', fontSize: 'var(--text-xs)', fontWeight: 700, padding: '0.3rem 0.9rem', borderRadius: 'var(--radius-full)', marginBottom: 'var(--space-3)' }}>
-            <item.icon size={14} /> {categoryLabel}
+            {(() => { const Icon = resolveContentIcon(item.icon) || Landmark; return <Icon size={14} />; })()} {categoryLabel}
           </div>
           <h1 className="animate-fade-in-up">{item.title}</h1>
         </div>
@@ -102,7 +100,7 @@ export default function GovernanceDetail() {
       <section className="section bg-white">
         <div className="container">
           <div className={item.highlights && item.highlights.length > 0 ? 'detail-grid' : ''}>
-            <div className="reveal">
+            <div>
               <span className="section-label">Overview</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>About {item.title}</h2>
               {item.intro && (
@@ -123,7 +121,7 @@ export default function GovernanceDetail() {
             </div>
 
             {item.highlights && item.highlights.length > 0 && (
-              <div className="reveal detail-sidebar" data-delay="100">
+              <div className="detail-sidebar">
                 <div style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', position: 'sticky', top: '110px' }}>
                   <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-4)' }}>
                     Key Highlights
@@ -145,76 +143,43 @@ export default function GovernanceDetail() {
         </div>
       </section>
 
-      {/* Single Table */}
-      {item.tableData && item.tableData.length > 0 && (
+      {/* Members Table(s) */}
+      {tableSections.length > 0 && tableSections.some((s) => s.rows.length > 0) && (
         <section className="section bg-off-white">
           <div className="container">
-            <div className="reveal" style={{ marginBottom: 'var(--space-8)' }}>
+            <div style={{ marginBottom: 'var(--space-8)' }}>
               <span className="section-label">Members</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>
-                {item.slug === 'iqac-committee' ? 'Committee Composition' : 'Members & Composition'}
+                {tableSections.length > 1 ? 'Department Boards of Studies'
+                  : item.slug === 'iqac-committee' ? 'Committee Composition' : 'Members & Composition'}
               </h2>
             </div>
-            <div className="reveal" style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm)' }}>
-                <thead>
-                  <tr style={{ background: 'var(--color-primary)' }}>
-                    {Object.keys(item.tableData[0]).map((col) => (
-                      <th key={col} style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'left', color: 'var(--color-white)', fontWeight: 700, whiteSpace: 'nowrap' }}>
-                        {col}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {item.tableData.map((row: GovTableRow, i: number) => (
-                    <tr key={i} style={{ background: i % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)', borderBottom: '1px solid var(--color-light-gray)' }}>
-                      {Object.values(row).map((val, j) => (
-                        <td key={j} style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)', lineHeight: 1.5 }}>
-                          {String(val)}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Multi-section Tables (Board of Studies) */}
-      {tableSections && tableSections.length > 0 && (
-        <section className="section bg-off-white">
-          <div className="container">
-            <div className="reveal" style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label">Members</span>
-              <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Department Boards of Studies</h2>
-            </div>
             {tableSections.map((section, si) => (
-              <div key={section.title} className="reveal" data-delay={`${si * 40}`} style={{ marginBottom: 'var(--space-10)' }}>
-                <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>
-                  {section.title}
-                </h3>
+              <div key={section.title || si} style={{ marginBottom: 'var(--space-10)' }}>
+                {section.title && (
+                  <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>
+                    {section.title}
+                  </h3>
+                )}
                 <div style={{ overflowX: 'auto' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm)' }}>
                     <thead>
                       <tr style={{ background: 'var(--color-primary)' }}>
-                        {Object.keys(section.rows[0]).map((col) => (
-                          <th key={col} style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'left', color: 'var(--color-white)', fontWeight: 700, whiteSpace: 'nowrap' }}>
-                            {col}
-                          </th>
-                        ))}
+                        <th style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'left', color: 'var(--color-white)', fontWeight: 700, whiteSpace: 'nowrap' }}>Name</th>
+                        <th style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'left', color: 'var(--color-white)', fontWeight: 700, whiteSpace: 'nowrap' }}>Role</th>
+                        {section.rows.some((r) => r.notes) && (
+                          <th style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'left', color: 'var(--color-white)', fontWeight: 700, whiteSpace: 'nowrap' }}>Notes</th>
+                        )}
                       </tr>
                     </thead>
                     <tbody>
-                      {section.rows.map((row: GovTableRow, i: number) => (
+                      {section.rows.map((row, i) => (
                         <tr key={i} style={{ background: i % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)', borderBottom: '1px solid var(--color-light-gray)' }}>
-                          {Object.values(row).map((val, j) => (
-                            <td key={j} style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)', lineHeight: 1.5 }}>
-                              {String(val)}
-                            </td>
-                          ))}
+                          <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)', lineHeight: 1.5 }}>{row.name}</td>
+                          <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)', lineHeight: 1.5 }}>{row.role}</td>
+                          {section.rows.some((r) => r.notes) && (
+                            <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)', lineHeight: 1.5 }}>{row.notes}</td>
+                          )}
                         </tr>
                       ))}
                     </tbody>
@@ -230,13 +195,13 @@ export default function GovernanceDetail() {
       {item.outcomes && item.outcomes.length > 0 && (
         <section className="section bg-off-white">
           <div className="container">
-            <div className="reveal" style={{ marginBottom: 'var(--space-8)' }}>
+            <div style={{ marginBottom: 'var(--space-8)' }}>
               <span className="section-label">Impact</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Outcomes & Achievements</h2>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 'var(--space-4)' }}>
-              {item.outcomes.map((o, i) => (
-                <div key={o} className="reveal" data-delay={`${i * 60}`}
+              {item.outcomes.map((o) => (
+                <div key={o}
                   style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
                   <Trophy size={20} strokeWidth={1.75} style={{ flexShrink: 0, color: 'var(--color-accent)' }} />
                   <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6 }}>{o}</span>
@@ -250,7 +215,7 @@ export default function GovernanceDetail() {
       {/* CTA */}
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-14) 0' }}>
         <div className="container" style={{ textAlign: 'center' }}>
-          <div className="reveal">
+          <div>
             <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>
               Explore More Governance Resources
             </h2>

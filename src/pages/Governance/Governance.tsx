@@ -1,12 +1,23 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { govItems, govCategories } from './governance.data';
+import { Landmark, School, CheckCircle2 } from 'lucide-react';
 import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
 import { useHashScroll } from '../../hooks/useHashScroll';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
+import { useOrderedCollection } from '../../hooks/useCollection';
 import { useSitePhotos, useSectionHasPhotos } from '../../hooks/useSitePhotos';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
+import { resolveContentIcon } from '../../lib/contentIcons';
+import type { GovernanceItemDoc } from '../Admin/sections/GovernanceItemsAdmin';
+
+// Fixed top-level nav structure — not admin content, mirrors the site's
+// header menu. The items within each category are Firestore-backed.
+const govCategories = [
+  { key: 'governance' as const, label: 'Governance', icon: Landmark, desc: 'Apex statutory bodies governing the academic, financial, and strategic direction of VWU.' },
+  { key: 'committees' as const, label: 'Committees', icon: School, desc: 'Standing committees ensuring quality, welfare, compliance, and transparency across all institutional functions.' },
+  { key: 'iqac' as const, label: 'IQAC', icon: CheckCircle2, desc: 'Internal Quality Assurance Cell — driving continuous quality improvement and NAAC accreditation at VWU.' },
+];
 
 const defaultGovPhotos = [
   { src: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=800&q=80', alt: 'Governance and administration', caption: 'Institutional Governance' },
@@ -35,6 +46,7 @@ const defaultAcademicCouncilPhotos = [
 export default function Governance() {
   useHashScroll();
   const stats = useContentBlocks('governance', 'stats');
+  const { docs: govItems } = useOrderedCollection<GovernanceItemDoc>('governanceItems', 'order');
   const govPhotos = useSitePhotos('governance', 'main', defaultGovPhotos);
   const boardOfDirectorsPhotos = useSitePhotos('governance', 'board-of-directors', defaultBoardOfDirectorsPhotos);
   const hasBoardOfDirectorsPhotos = useSectionHasPhotos('governance', 'board-of-directors');
@@ -119,35 +131,36 @@ export default function Governance() {
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 'var(--space-5)' }}>
-                {items.map((item, i) => (
-                  <div
-                    key={item.slug}
-                    className="reveal"
-                    data-delay={`${i * 50}`}
-                    style={{ background: ci % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', display: 'flex', flexDirection: 'column', transition: 'all var(--transition-base)' }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-accent)'; (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-md)'; (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-light-gray)'; (e.currentTarget as HTMLElement).style.boxShadow = 'none'; (e.currentTarget as HTMLElement).style.transform = 'none'; }}
-                  >
-                    <div style={{ marginBottom: 'var(--space-3)' }}><item.icon size={32} strokeWidth={1.75} /></div>
-                    <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-2)', lineHeight: 1.35 }}>
-                      {item.title}
-                    </h3>
-                    <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.65, flex: 1, marginBottom: 'var(--space-4)' }}>
-                      {item.desc}
-                    </p>
-                    <Link
-                      to={`/governance/${item.slug}`}
-                      style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-primary)', textDecoration: 'none', paddingTop: 'var(--space-3)', borderTop: '1px solid var(--color-light-gray)', marginTop: 'auto' }}
-                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'var(--color-accent)'; }}
-                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'var(--color-primary)'; }}
+                {items.map((item) => {
+                  const Icon = resolveContentIcon(item.icon) || Landmark;
+                  return (
+                    <div
+                      key={item.slug}
+                      style={{ background: ci % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', display: 'flex', flexDirection: 'column', transition: 'all var(--transition-base)' }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-accent)'; (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-md)'; (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-light-gray)'; (e.currentTarget as HTMLElement).style.boxShadow = 'none'; (e.currentTarget as HTMLElement).style.transform = 'none'; }}
                     >
-                      Learn More
-                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-                        <path d="M2 6h8M6 2l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    </Link>
-                  </div>
-                ))}
+                      <div style={{ marginBottom: 'var(--space-3)' }}><Icon size={32} strokeWidth={1.75} /></div>
+                      <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-2)', lineHeight: 1.35 }}>
+                        {item.title}
+                      </h3>
+                      <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.65, flex: 1, marginBottom: 'var(--space-4)' }}>
+                        {item.desc}
+                      </p>
+                      <Link
+                        to={`/governance/${item.slug}`}
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-primary)', textDecoration: 'none', paddingTop: 'var(--space-3)', borderTop: '1px solid var(--color-light-gray)', marginTop: 'auto' }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'var(--color-accent)'; }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'var(--color-primary)'; }}
+                      >
+                        Learn More
+                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                          <path d="M2 6h8M6 2l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </Link>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </section>

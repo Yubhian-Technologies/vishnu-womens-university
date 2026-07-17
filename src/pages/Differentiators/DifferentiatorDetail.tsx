@@ -1,43 +1,48 @@
 import { useEffect } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
-import { Trophy } from 'lucide-react';
+import { Trophy, Rocket, Factory, Microscope, Globe2, GraduationCap } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
-import { findItemBySlug } from './differentiators.data';
+import { useOrderedCollection } from '../../hooks/useCollection';
+import { DIFFERENTIATOR_CATEGORIES } from '../Admin/sections/DifferentiatorsAdmin';
+import type { DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
 import '../detail-layout.css';
+
+const CATEGORY_ICONS: Record<string, typeof Rocket> = {
+  innovation: Rocket, industry: Factory, research: Microscope, global: Globe2, student: GraduationCap,
+};
+const CATEGORY_HERO_IMAGES: Record<string, string> = {
+  innovation: 'https://images.unsplash.com/photo-1553877522-43269d4ea984?w=1920&q=80',
+  industry: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=1920&q=80',
+  research: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=1920&q=80',
+  global: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1920&q=80',
+  student: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1920&q=80',
+};
 
 export default function DifferentiatorDetail() {
   const { slug } = useParams<{ slug: string }>();
-  const result = slug ? findItemBySlug(slug) : null;
+  const { docs: allItems, loading } = useOrderedCollection<DifferentiatorItemDoc>('differentiatorItems', 'order');
+  const item = allItems.find((i) => i.slug === slug) ?? null;
+  const category = item ? DIFFERENTIATOR_CATEGORIES.find((c) => c.id === item.category) : null;
 
   useEffect(() => {
-    if (result) {
-      document.title = `${result.item.title} | Vishnu Womens University`;
+    if (item) {
+      document.title = `${item.title} | Vishnu Womens University`;
     }
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const el = entry.target as HTMLElement;
-            setTimeout(() => el.classList.add('revealed'), parseInt(el.dataset.delay || '0'));
-            observer.unobserve(el);
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-    document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, [result]);
+  }, [item]);
 
-  if (!result) return <Navigate to="/differentiators" replace />;
+  if (!item || !category) {
+    if (loading) return null;
+    return <Navigate to="/differentiators" replace />;
+  }
 
-  const { item, category } = result;
+  const CategoryIcon = CATEGORY_ICONS[category.id] || Rocket;
+  const heroImage = CATEGORY_HERO_IMAGES[category.id] || CATEGORY_HERO_IMAGES.innovation;
 
   return (
     <main className="page-wrapper">
       {/* Hero */}
       <section className="page-hero" style={{ minHeight: 380 }}>
-        <SmoothImage src={category.heroImage} alt={item.title} className="page-hero-image" />
+        <SmoothImage src={heroImage} alt={item.title} className="page-hero-image" />
         <div className="page-hero-overlay" />
         <div className="container page-hero-content">
           <div className="breadcrumb animate-fade-in">
@@ -50,7 +55,7 @@ export default function DifferentiatorDetail() {
             <span className="breadcrumb-item active">{item.title}</span>
           </div>
           <div className="animate-fade-in-up" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'var(--color-accent)', color: 'var(--color-white)', fontSize: 'var(--text-xs)', fontWeight: 700, padding: '0.3rem 0.9rem', borderRadius: 'var(--radius-full)', marginBottom: 'var(--space-3)' }}>
-            <category.icon size={14} /> {category.label}
+            <CategoryIcon size={14} /> {category.label}
           </div>
           <h1 className="animate-fade-in-up">{item.title}</h1>
         </div>
@@ -61,7 +66,7 @@ export default function DifferentiatorDetail() {
         <div className="container">
           <div className="detail-grid">
             {/* Main content */}
-            <div className="reveal">
+            <div>
               <span className="section-label">Overview</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>About {item.title}</h2>
               {item.intro && (
@@ -82,7 +87,7 @@ export default function DifferentiatorDetail() {
             </div>
 
             {/* Sidebar: key highlights */}
-            <div className="reveal detail-sidebar" data-delay="100">
+            <div className="detail-sidebar">
               <div style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', position: 'sticky', top: '110px' }}>
                 <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-4)' }}>
                   Key Highlights
@@ -115,13 +120,13 @@ export default function DifferentiatorDetail() {
       {item.facilities && item.facilities.length > 0 && (
         <section className="section bg-off-white">
           <div className="container">
-            <div className="reveal" style={{ marginBottom: 'var(--space-8)' }}>
+            <div style={{ marginBottom: 'var(--space-8)' }}>
               <span className="section-label">Infrastructure</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Facilities & Equipment</h2>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 'var(--space-4)' }}>
-              {item.facilities.map((f, i) => (
-                <div key={f} className="reveal" data-delay={`${i * 50}`}
+              {item.facilities.map((f) => (
+                <div key={f}
                   style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4)', display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
                   <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--color-accent)', flexShrink: 0 }} />
                   <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', fontWeight: 500 }}>{f}</span>
@@ -136,13 +141,13 @@ export default function DifferentiatorDetail() {
       {item.outcomes && item.outcomes.length > 0 && (
         <section className="section bg-white">
           <div className="container">
-            <div className="reveal" style={{ marginBottom: 'var(--space-8)' }}>
+            <div style={{ marginBottom: 'var(--space-8)' }}>
               <span className="section-label">Impact</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Outcomes & Achievements</h2>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 'var(--space-4)' }}>
-              {item.outcomes.map((o, i) => (
-                <div key={o} className="reveal" data-delay={`${i * 60}`}
+              {item.outcomes.map((o) => (
+                <div key={o}
                   style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
                   <Trophy size={20} strokeWidth={1.75} style={{ flexShrink: 0, color: 'var(--color-accent)' }} />
                   <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6 }}>{o}</span>
@@ -156,7 +161,7 @@ export default function DifferentiatorDetail() {
       {/* CTA */}
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-14) 0' }}>
         <div className="container" style={{ textAlign: 'center' }}>
-          <div className="reveal">
+          <div>
             <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>
               Explore More Differentiators
             </h2>
