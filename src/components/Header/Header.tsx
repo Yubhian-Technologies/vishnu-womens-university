@@ -39,6 +39,7 @@ const navItems: NavItem[] = [
           { label: 'About VWU', path: '/about' },
           { label: 'Vision, Mission & Values', path: '/vision-mission' },
           { label: 'Institutional Development Plan', path: '/governance/idp' },
+          { label: 'Organizational Chart', path: 'https://svecw.edu.in/wp-content/uploads/2024/03/SVECWOrganizationChart.jpg', external: true },
           { label: 'Core Executive Body', path: '/about#core-executive' },
           { label: 'About Society (SVES)', path: '/about-sves' },
         ],
@@ -146,6 +147,7 @@ const navItems: NavItem[] = [
       { label: 'Programmes & Fee Structure', path: '/programmes-fee-structure' },
       { label: 'Admission Procedure', path: '/admission-procedure' },
       { label: 'Result Analysis', path: '/result-analysis' },
+      { label: 'Fee Payment Portal', path: 'https://svecw.ac.in/Default.aspx?ReturnUrl=%2f', external: true },
       { label: 'How to Reach', path: '/information#how-to-reach' },
     ],
   },
@@ -185,6 +187,42 @@ const navItems: NavItem[] = [
     ],
   },
   {
+    label: 'Research',
+    groups: [
+      {
+        groupLabel: 'R&D Governance',
+        groupPath: '/research#governance',
+        items: [
+          { label: 'About R&D', path: '/research/about-rd' },
+          { label: 'Research Advisory Committee', path: '/research/research-advisory-committee' },
+          { label: 'Research Ethics Committee', path: '/research/research-ethics-committee' },
+          { label: 'IPR Committee', path: '/research/ipr-committee' },
+          { label: 'Research Centers', path: '/research/research-centers' },
+        ],
+      },
+      {
+        groupLabel: 'Research Output',
+        groupPath: '/research#output',
+        items: [
+          { label: 'Thrust Areas of Research', path: '/research/thrust-areas-of-research' },
+          { label: 'Funded Projects', path: '/research/funded-projects' },
+          { label: 'Seed Money Projects', path: '/research/seed-money-projects' },
+          { label: 'Research Publications', path: '/research/research-publications' },
+          { label: 'Patents', path: '/research/patents' },
+        ],
+      },
+      {
+        groupLabel: 'Industry & Professional Engagement',
+        groupPath: '/research#engagement',
+        items: [
+          { label: 'MoUs', path: '/research/mous' },
+          { label: 'Consultancy', path: '/research/consultancy' },
+          { label: 'Professional Bodies', path: '/research/professional-bodies' },
+        ],
+      },
+    ],
+  },
+  {
     label: 'News & Awards',
     children: [
       { label: 'News & Awards Overview', path: '/news-awards' },
@@ -215,6 +253,7 @@ const navItems: NavItem[] = [
       { label: 'Global Alumni Network', path: 'https://alumni.srivishnu.edu.in/', external: true },
       { label: 'Vishnu Era', path: 'https://www.srivishnu.edu.in/vishnu-era/', external: true },
       { label: 'Prathibha Magazine', path: 'https://heyzine.com/flip-book/14449c1cd4.html', external: true },
+      { label: 'Disclosures – UGC', path: 'https://svecw.edu.in/infougc/', external: true },
       { label: 'Careers', path: '/careers' },
       { label: 'Contact Us', path: '/contact' },
     ],

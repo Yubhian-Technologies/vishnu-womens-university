@@ -157,13 +157,27 @@ export default function Admissions() {
           <div className="adm-hub-grid">
             {admissionHub.map((item) => {
               const Icon = resolveContentIcon(item.icon) || ClipboardList;
-              return (
-                <Link to={item.slug || '/admissions'} key={item.id} className="adm-hub-card">
+              // A content block's "slug" is normally an internal route, but admins
+              // can also paste a full external URL (e.g. the fee payment gateway) —
+              // route those through <a target="_blank"> instead of React Router's
+              // <Link>, which can't navigate to an off-site address.
+              const isExternal = /^https?:\/\//.test(item.slug);
+              const cardBody = (
+                <>
                   <div className="adm-hub-icon"><Icon size={38} strokeWidth={1.75} /></div>
                   <div className="adm-hub-highlight">{item.value}</div>
                   <h3 className="adm-hub-title">{item.title}</h3>
                   <p className="adm-hub-desc">{item.desc}</p>
                   <span className="adm-hub-arrow">View Details →</span>
+                </>
+              );
+              return isExternal ? (
+                <a href={item.slug} key={item.id} target="_blank" rel="noopener noreferrer" className="adm-hub-card">
+                  {cardBody}
+                </a>
+              ) : (
+                <Link to={item.slug || '/admissions'} key={item.id} className="adm-hub-card">
+                  {cardBody}
                 </Link>
               );
             })}
