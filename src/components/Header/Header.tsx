@@ -264,6 +264,16 @@ const navItems: NavItem[] = [
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  // Desktop dropdowns normally open/close purely on CSS :hover. Clicking a
+  // nav item's caret while its dropdown is open forces it shut (overriding
+  // hover) until the mouse actually leaves the item, at which point normal
+  // hover behavior resumes — clicking again while forced shut reopens it.
+  const [forceClosedItem, setForceClosedItem] = useState<string | null>(null);
+  // Desktop dropdowns are opened by CSS :hover/:focus-within, which stays
+  // true while the page scrolls under a stationary cursor (header is
+  // sticky) — this forces any open dropdown shut the moment scrolling
+  // starts, resetting the next time the mouse re-enters the nav.
+  const [scrollClosed, setScrollClosed] = useState(false);
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
   const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
   const [expandedSubItem, setExpandedSubItem] = useState<string | null>(null);
@@ -325,7 +335,11 @@ export default function Header() {
   });
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+      setScrollClosed(true);
+      (document.activeElement as HTMLElement | null)?.blur();
+    };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -335,6 +349,7 @@ export default function Header() {
     setExpandedItem(null);
     setExpandedGroup(null);
     setExpandedSubItem(null);
+    setForceClosedItem(null);
   }, [location]);
 
   useEffect(() => {
@@ -383,11 +398,20 @@ export default function Header() {
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="nav" aria-label="Main navigation">
-            <ul className="nav-list">
+          <nav className={`nav${scrollClosed ? ' nav--scroll-closed' : ''}`} aria-label="Main navigation">
+            <ul className="nav-list" onMouseEnter={() => setScrollClosed(false)}>
               {renderedNavItems.map((item) => (
-                <li key={item.label} className="nav-item">
-                  <button className="nav-link" aria-haspopup="true">
+                <li
+                  key={item.label}
+                  className={`nav-item${forceClosedItem === item.label ? ' nav-item--force-closed' : ''}${item.label === 'Research' ? ' nav-item--research' : ''}`}
+                  onMouseLeave={() => setForceClosedItem((prev) => (prev === item.label ? null : prev))}
+                >
+                  <button
+                    className="nav-link"
+                    aria-haspopup="true"
+                    aria-expanded={forceClosedItem !== item.label}
+                    onClick={() => setForceClosedItem((prev) => (prev === item.label ? null : item.label))}
+                  >
                     {item.label}
                     <svg className="nav-arrow" viewBox="0 0 12 12" fill="none" aria-hidden="true">
                       <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
