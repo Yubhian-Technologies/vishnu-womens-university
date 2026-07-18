@@ -206,7 +206,7 @@ export default function Admissions() {
             })}
           </div>
           <div style={{ textAlign: 'center', marginTop: 'var(--space-10)' }}>
-            <a href="#" className="btn btn-primary btn-lg">Start Your Application</a>
+            <Link to="/admission-procedure" className="btn btn-primary btn-lg">Start Your Application</Link>
           </div>
         </div>
       </section>
@@ -241,7 +241,7 @@ export default function Admissions() {
               <h3>Apply for AP Scholarships</h3>
               <p>Submit applications for AP government scholarships, SC/ST/BC fee reimbursement, and central government scholarship schemes through the National Scholarship Portal.</p>
             </div>
-            <a href="#" className="btn btn-accent">Check Scholarship Eligibility</a>
+            <a href="https://scholarships.gov.in/" target="_blank" rel="noopener noreferrer" className="btn btn-accent">Check Scholarship Eligibility</a>
           </div>
         </div>
       </section>
