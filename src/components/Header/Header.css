@@ -266,6 +266,11 @@
   opacity: 1;
 }
 
+.nav-item.nav-item--force-closed .nav-arrow {
+  transform: rotate(0deg) !important;
+  opacity: 0.7 !important;
+}
+
 /* ===== Dropdown ===== */
 .dropdown {
   position: absolute;
@@ -288,6 +293,24 @@
   opacity: 1;
   visibility: visible;
   transform: translateX(-50%) translateY(0);
+}
+
+/* Clicking a nav item's caret while its dropdown is open (via the hover
+   rules above) forces it shut, overriding hover, until the mouse leaves
+   the item — see forceClosedItem in Header.tsx. */
+.nav-item.nav-item--force-closed .dropdown {
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+/* The header is sticky, so scrolling with a stationary cursor can leave a
+   dropdown open (:hover/:focus-within stay true) while the page moves
+   underneath it. Forces every dropdown shut the instant scrolling starts —
+   see scrollClosed in Header.tsx — resetting on the next fresh hover. */
+.nav--scroll-closed .nav-item:hover .dropdown,
+.nav--scroll-closed .nav-item:focus-within .dropdown {
+  opacity: 0 !important;
+  visibility: hidden !important;
 }
 
 /* The last couple of nav items (currently "Alumni & Giving" and "Quick
@@ -373,6 +396,16 @@
 .nav-item:hover .dropdown.dropdown-mega,
 .nav-item:focus-within .dropdown.dropdown-mega {
   transform: translateX(0) translateY(0);
+}
+
+/* "Research" sits far enough right in the nav bar (8th of 10 items) that
+   this mega-menu's default left-anchored, 680px+-wide layout runs past the
+   right edge of the viewport, where body's overflow-x:hidden clips it —
+   right-anchor just this one item's mega-menu instead, same fix already
+   applied to flat dropdowns near the right edge above. */
+.nav-item--research .dropdown.dropdown-mega {
+  left: auto;
+  right: 0;
 }
 
 .mega-group {

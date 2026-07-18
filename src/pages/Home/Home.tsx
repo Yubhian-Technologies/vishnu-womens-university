@@ -9,6 +9,7 @@ import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import { type NewsDoc, newsDocToArticle } from '../../lib/news';
 import type { EventDoc } from '../Admin/sections/EventsAdmin';
+import type { ContentBlockDoc } from '../Admin/sections/ContentBlocksAdmin';
 import './Home.css';
 
 /* ── Data ─────────────────────────────────────────────────── */
@@ -16,6 +17,64 @@ const STUDY_CARD_IMAGES = [
   { image: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=800&q=80', alt: 'Students in engineering classroom', color: '#1b4332' },
   { image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80', alt: 'Postgraduate students', color: '#2d6a4f' },
   { image: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&q=80', alt: 'Research laboratory', color: '#40916c' },
+];
+
+// The original hardcoded content each of these sections shipped with,
+// before becoming admin-editable via /admin → Page Content Blocks (home /
+// <section>). Shown until an admin adds real entries there — same fallback
+// pattern used throughout this codebase (e.g. defaultExecutives in About.tsx).
+const defaultStudyCards: ContentBlockDoc[] = [
+  { id: 'default-1', page: 'home', section: 'studyCards', value: 'Explore Programs', title: 'B.Tech Programs', desc: 'Choose from 9 B.Tech specializations — CSE, AI & ML, AI & DS, Cyber Security, IT, ECE, EEE, Civil, and Mechanical Engineering.', icon: 'Laptop', slug: '/academics', order: 0 },
+  { id: 'default-2', page: 'home', section: 'studyCards', value: 'PG Programs', title: 'M.Tech & MBA', desc: 'Elevate your qualifications with postgraduate programs in CSE, VLSI Design, Power Electronics, Software Engineering, and MBA.', icon: 'GraduationCap', slug: '/academics', order: 1 },
+  { id: 'default-3', page: 'home', section: 'studyCards', value: 'Research Programs', title: 'Research & Ph.D.', desc: 'Conduct doctoral research in CSE, ECE, and EEE — backed by 2,500+ publications, 90+ patents, and purpose-built research facilities.', icon: 'FlaskConical', slug: '/academics', order: 2 },
+];
+
+// The real /academics/:slug values for each B.Tech program, exactly as used
+// by the live `programs` Firestore collection (department abbreviations, not
+// a generic slugified title — e.g. "AI & Machine Learning" is "ai-ml", not
+// "ai-machine-learning"). Recovered from programs.data.ts (the static file
+// these were migrated out of, see commit a0ddb39) and confirmed against the
+// live site. A generic slugify() can't derive these since they're
+// abbreviations, so each Popular Programs tag is matched by title here first.
+const POPULAR_PROGRAM_SLUGS: Record<string, string> = {
+  'CSE': 'cse',
+  'AI & Machine Learning': 'ai-ml',
+  'AI & Data Science': 'ai-ds',
+  'Cyber Security': 'cyber-security',
+  'Information Technology': 'it',
+  'Electronics & Communication': 'ece',
+  'Electrical & Electronics': 'eee',
+  'Civil Engineering': 'ce',
+  'Mechanical Engineering': 'me',
+  'MBA': 'mba',
+};
+
+const slugify = (title: string) =>
+  title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+
+const defaultPopularPrograms: ContentBlockDoc[] = Object.keys(POPULAR_PROGRAM_SLUGS).map((title, i) => ({
+  id: `default-${i}`, page: 'home', section: 'popularPrograms', value: '', title, desc: '', icon: '',
+  slug: POPULAR_PROGRAM_SLUGS[title], order: i,
+}));
+
+const defaultCampusFeatures: ContentBlockDoc[] = [
+  'Student Clubs & Organizations', 'Radio Vishnu 90.4', 'Vishnu TV Academy', 'Sports & Games Facilities',
+  'Career Services Center', "Women's Hostels", 'AR/VR Studio', 'Technology Business Incubator',
+].map((title, i) => ({ id: `default-${i}`, page: 'home', section: 'campusFeatures', value: '', title, desc: '', icon: '', slug: '', order: i }));
+
+const defaultRecognitions: ContentBlockDoc[] = [
+  { id: 'default-1', page: 'home', section: 'recognitions', value: '', title: 'Top Engineering College', desc: 'India Today Rankings', icon: 'Trophy', slug: '', order: 0 },
+  { id: 'default-2', page: 'home', section: 'recognitions', value: '', title: 'Best Engineering College', desc: 'The Week Rankings', icon: 'Star', slug: '', order: 1 },
+  { id: 'default-3', page: 'home', section: 'recognitions', value: '', title: 'NBA Accreditation', desc: 'National Board of Accreditation', icon: 'ClipboardList', slug: '', order: 2 },
+  { id: 'default-4', page: 'home', section: 'recognitions', value: '', title: 'NIRF Ranked Institution', desc: 'Ministry of Education, India', icon: 'Briefcase', slug: '', order: 3 },
+  { id: 'default-5', page: 'home', section: 'recognitions', value: '', title: 'IEI Award for Excellence', desc: 'Institution of Engineers India', icon: 'TrendingUp', slug: '', order: 4 },
+  { id: 'default-6', page: 'home', section: 'recognitions', value: '', title: 'UGC Autonomous Status', desc: 'University Grants Commission', icon: 'Award', slug: '', order: 5 },
+];
+
+const defaultTestimonials: ContentBlockDoc[] = [
+  { id: 'default-1', page: 'home', section: 'testimonials', value: 'Computer Science Engineering — Software Engineer at Google', title: 'Lakshmi R., Class of 2024', desc: 'VWU faculty genuinely invest in each student — they know your name, your ambitions, and they hold you to a high standard. The skills and confidence I gained here led directly to my placement at Google.', icon: '', slug: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=200&q=80', order: 0 },
+  { id: 'default-2', page: 'home', section: 'testimonials', value: 'M.Tech ECE — Research Scholar at IIT Hyderabad', title: 'Anusha P., Class of 2022', desc: 'VWU is a true launchpad. The research infrastructure, the labs, and the guidance I received here built the academic foundation that made my Ph.D. at IIT Hyderabad possible.', icon: '', slug: 'https://images.unsplash.com/photo-1607746882042-944635dfe10e?w=200&q=80', order: 1 },
+  { id: 'default-3', page: 'home', section: 'testimonials', value: 'CSE — Co-founder at TechFemme Startup', title: 'Divya K., Class of 2023', desc: 'Studying in an all-women environment gave me real confidence in my abilities. I led several national-level projects at VWU — and that leadership mindset is what drives my startup today.', icon: '', slug: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&q=80', order: 2 },
 ];
 
 const activityItems = [
@@ -83,11 +142,16 @@ export default function Home() {
   const featuredNews = newsItems.filter(n => n.featured).slice(0, 3);
   const { docs: allEvents } = useOrderedCollection<EventDoc>('events', 'order');
   const featuredEvents = allEvents.filter(e => e.featured).slice(0, 4);
-  const recognitions = useContentBlocks('home', 'recognitions');
-  const campusFeatures = useContentBlocks('home', 'campusFeatures');
-  const testimonials = useContentBlocks('home', 'testimonials');
-  const studyCards = useContentBlocks('home', 'studyCards');
-  const popularPrograms = useContentBlocks('home', 'popularPrograms');
+  const liveRecognitions = useContentBlocks('home', 'recognitions');
+  const recognitions = liveRecognitions.length > 0 ? liveRecognitions : defaultRecognitions;
+  const liveCampusFeatures = useContentBlocks('home', 'campusFeatures');
+  const campusFeatures = liveCampusFeatures.length > 0 ? liveCampusFeatures : defaultCampusFeatures;
+  const liveTestimonials = useContentBlocks('home', 'testimonials');
+  const testimonials = liveTestimonials.length > 0 ? liveTestimonials : defaultTestimonials;
+  const liveStudyCards = useContentBlocks('home', 'studyCards');
+  const studyCards = liveStudyCards.length > 0 ? liveStudyCards : defaultStudyCards;
+  const livePopularPrograms = useContentBlocks('home', 'popularPrograms');
+  const popularPrograms = livePopularPrograms.length > 0 ? livePopularPrograms : defaultPopularPrograms;
 
   useEffect(() => {
     document.title = 'VWU | Empowering Women Through Knowledge and Action';
@@ -214,7 +278,10 @@ export default function Home() {
             <div className="study-programs">
               {popularPrograms.map((p, i) => (
                 <Link
-                  to="/academics"
+                  to={(() => {
+                    const slug = p.slug || POPULAR_PROGRAM_SLUGS[p.title] || slugify(p.title);
+                    return slug ? `/academics/${slug}` : '/academics';
+                  })()}
                   key={p.id}
                   className={`program-tag${tagHovered === i ? ' program-tag--active' : ''}`}
                   onMouseEnter={() => setTagHovered(i)}
