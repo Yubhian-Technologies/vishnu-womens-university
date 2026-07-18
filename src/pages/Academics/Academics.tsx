@@ -229,9 +229,9 @@ export default function Academics() {
                 <span className="dept-code">FE</span>
               </div>
               <h3 className="dept-name">Freshman Engineering</h3>
-              <p className="dept-desc">Foundation courses in mathematics, physics, chemistry, and the core principles of engineering.</p>
+              <p className="dept-desc">The first year of engineering lays the foundation for every student&apos;s academic journey — core principles, critical thinking, and problem-solving through classroom discussion, industry seminars, and hands-on training.</p>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto' }}>
-                <div className="dept-labs">4 Labs</div>
+                <div className="dept-labs">Mathematics · Physics · Chemistry · English</div>
               </div>
             </div>
           </div>
