@@ -14,11 +14,12 @@ export interface EventDoc {
   category: string;
   desc: string;
   featured: boolean;
+  link: string;
   order: number;
 }
 
 const EMPTY: Omit<EventDoc, 'id'> = {
-  title: '', month: '', day: '', year: '', time: '', location: '', category: 'Academic Events', desc: '', featured: false, order: 0,
+  title: '', month: '', day: '', year: '', time: '', location: '', category: 'Academic Events', desc: '', featured: false, link: '', order: 0,
 };
 
 const CATEGORIES = ['Special Events', 'Academic Events', 'Placements', 'Admissions', 'Alumni Events', 'Sports'];
@@ -48,7 +49,7 @@ export default function EventsAdmin() {
 
   const startEdit = (e: EventDoc) => {
     setEditing(e.id);
-    setForm({ title: e.title, month: e.month, day: e.day, year: e.year, time: e.time, location: e.location, category: e.category, desc: e.desc, featured: e.featured, order: e.order });
+    setForm({ title: e.title, month: e.month, day: e.day, year: e.year, time: e.time, location: e.location, category: e.category, desc: e.desc, featured: e.featured, link: e.link || '', order: e.order });
   };
 
   const remove = async (id: string) => {
@@ -110,6 +111,10 @@ export default function EventsAdmin() {
           <div className="admin-field admin-field--full">
             <label>Description</label>
             <textarea rows={3} value={form.desc} onChange={(e) => set('desc', e.target.value)} placeholder="Event description…" />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label>Registration / Details Link (optional — leave blank to hide the button on the public page)</label>
+            <input value={form.link} onChange={(e) => set('link', e.target.value)} placeholder="https://forms.gle/… or https://svecw.edu.in/…" />
           </div>
         </div>
         <div className="admin-form-actions">

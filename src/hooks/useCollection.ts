@@ -8,6 +8,7 @@ import {
   type DocumentData,
 } from 'firebase/firestore';
 import { db } from '../lib/firebase';
+import { reportFirestoreError, clearFirestoreError } from './firestoreErrorStore';
 
 export interface WithId extends DocumentData {
   id: string;
@@ -29,13 +30,18 @@ export function useCollection<T extends WithId>(
       (snap) => {
         setDocs(snap.docs.map((d) => ({ id: d.id, ...d.data() } as T)));
         setLoading(false);
+        clearFirestoreError(collectionName);
       },
       (err) => {
         setError(err.message);
         setLoading(false);
+        reportFirestoreError(collectionName, err.message);
       }
     );
-    return unsub;
+    return () => {
+      unsub();
+      clearFirestoreError(collectionName);
+    };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [collectionName]);
 

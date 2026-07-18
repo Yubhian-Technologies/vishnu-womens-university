@@ -358,13 +358,13 @@ export default function Header() {
               <>
                 <a href="tel:08816250864" className="topbar-link">08816-250864</a>
                 <span className="topbar-link" style={{ opacity: 0.3 }}>|</span>
-                <a href="#" className="topbar-link">Examination Portal</a>
+                <a href="https://www.svecwexams.in/" target="_blank" rel="noopener noreferrer" className="topbar-link">Examination Portal</a>
                 <span className="topbar-link" style={{ opacity: 0.3 }}>|</span>
-                <a href="#" className="topbar-link">LMS Platform</a>
+                <a href="https://www.vishnulearning.com/login/index.php" target="_blank" rel="noopener noreferrer" className="topbar-link">LMS Platform</a>
                 <span className="topbar-link" style={{ opacity: 0.3 }}>|</span>
-                <a href="#" className="topbar-link">Central Library</a>
+                <Link to="/campus/central-library" className="topbar-link">Central Library</Link>
                 <span className="topbar-link" style={{ opacity: 0.3 }}>|</span>
-                <a href="#" className="topbar-link">Campus Map</a>
+                <a href="https://maps.google.com/maps?q=16.568119,81.522098&z=15" target="_blank" rel="noopener noreferrer" className="topbar-link">Campus Map</a>
               </>
             } />
           </div>
@@ -632,8 +632,14 @@ export default function Header() {
           </ul>
 
           <div className="mobile-social">
-            {['Instagram', 'Facebook', 'Twitter', 'LinkedIn', 'YouTube'].map(s => (
-              <a key={s} href="#" aria-label={s}>{s}</a>
+            {[
+              { label: 'Instagram', href: 'http://instagram.com/vishnu_svecw/' },
+              { label: 'Facebook', href: 'https://www.facebook.com/svecwcollege' },
+              { label: 'Twitter', href: 'https://twitter.com/svecw2' },
+              { label: 'LinkedIn', href: 'https://www.linkedin.com/school/vishnusvecw/' },
+              { label: 'YouTube', href: 'https://www.youtube.com/@SVECW-B0' },
+            ].map(s => (
+              <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label}>{s.label}</a>
             ))}
           </div>
         </div>

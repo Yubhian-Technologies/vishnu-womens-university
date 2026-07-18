@@ -1,9 +1,16 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Trophy, Star, ClipboardList, Briefcase, TrendingUp } from 'lucide-react';
-import heroVideo from '../../data/YTDown_YouTube_Vishnu-Campus-Bhimavaram-Latest-Video-Dr_Media_jMN3oRKJnR0_002_720p.mp4';
 import { usePageBanners } from '../../hooks/usePageBanners';
 import './HeroSlider.css';
+
+// Served from public/ (not imported as a JS module) so this ~27MB file never
+// enters Vite's module graph or gets processed/hashed on every build. It's
+// still a genuinely large download — re-encoding it to a smaller bitrate
+// with an external tool (ffmpeg/HandBrake) would help more than anything
+// done here — but deferring the fetch (below) at least keeps it from
+// competing with the JS bundle for bandwidth during initial page load.
+const HERO_VIDEO_SRC = '/hero-video.mp4';
 
 
 interface Slide {
@@ -66,7 +73,23 @@ export default function HeroSlider() {
   const [progressWidth, setProgressWidth] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
+  const [videoReady, setVideoReady] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Defer the video fetch until the browser is idle (or a short timeout, on
+  // browsers without requestIdleCallback) so it doesn't compete with the JS
+  // bundle for bandwidth while the page is still becoming interactive. The
+  // hero has a solid brand-colour background (.hero-slider) as a fallback
+  // in the meantime, so there's no blank flash.
+  useEffect(() => {
+    const ric = (window as unknown as { requestIdleCallback?: (cb: () => void) => number }).requestIdleCallback;
+    const handle = ric ? ric(() => setVideoReady(true)) : window.setTimeout(() => setVideoReady(true), 1200);
+    return () => {
+      const cic = (window as unknown as { cancelIdleCallback?: (h: number) => void }).cancelIdleCallback;
+      if (ric && cic) cic(handle as number);
+      else window.clearTimeout(handle as number);
+    };
+  }, []);
 
   // Admin-uploaded Hero Banners (page="home") are appended after the fixed
   // marketing slides — the video keeps playing behind all of them, these
@@ -121,17 +144,21 @@ export default function HeroSlider() {
   return (
     <section className="hero-slider" aria-label="Featured content">
 
-      {/* Background video */}
-      <video
-        ref={videoRef}
-        className="hero-video"
-        src={heroVideo}
-        autoPlay
-        muted
-        loop
-        playsInline
-        aria-hidden="true"
-      />
+      {/* Background video — src only set once idle (see effect above), so the
+          browser doesn't fetch it until the rest of the page is usable */}
+      {videoReady && (
+        <video
+          ref={videoRef}
+          className="hero-video"
+          src={HERO_VIDEO_SRC}
+          preload="auto"
+          autoPlay
+          muted
+          loop
+          playsInline
+          aria-hidden="true"
+        />
+      )}
       <div className="hero-video-overlay" />
 
       {/* Slide content layers */}

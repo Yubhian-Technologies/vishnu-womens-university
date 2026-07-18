@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Clock, MapPin } from 'lucide-react';
 import './Events.css';
 import PageHero from '../../components/PageHero/PageHero';
@@ -90,9 +91,11 @@ export default function Events() {
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><Clock size={14} /> {event.time}</span>
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><MapPin size={14} /> {event.location}</span>
                   </div>
-                  <a href="#" className="btn btn-primary" style={{ marginTop: 'var(--space-4)', fontSize: 'var(--text-sm)' }}>
-                    Register / Learn More
-                  </a>
+                  {event.link && (
+                    <a href={event.link} target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ marginTop: 'var(--space-4)', fontSize: 'var(--text-sm)' }}>
+                      Register / Learn More
+                    </a>
+                  )}
                 </div>
               </div>
             ))}
@@ -155,9 +158,11 @@ export default function Events() {
                       <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><MapPin size={14} /> {event.location}</span>
                     </div>
                   </div>
-                  <a href="#" className="btn btn-outline ev-list-btn" style={{ fontSize: 'var(--text-xs)', padding: '0.5rem 1rem', flexShrink: 0 }}>
-                    Details
-                  </a>
+                  {event.link && (
+                    <a href={event.link} target="_blank" rel="noopener noreferrer" className="btn btn-outline ev-list-btn" style={{ fontSize: 'var(--text-xs)', padding: '0.5rem 1rem', flexShrink: 0 }}>
+                      Details
+                    </a>
+                  )}
                 </div>
               ))}
             </div>
@@ -177,9 +182,11 @@ export default function Events() {
                       <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><Clock size={14} /> {event.time}</span>
                       <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><MapPin size={14} /> {event.location}</span>
                     </div>
-                    <a href="#" className="btn btn-outline" style={{ marginTop: 'var(--space-4)', fontSize: 'var(--text-xs)', width: '100%' }}>
-                      View Event
-                    </a>
+                    {event.link && (
+                      <a href={event.link} target="_blank" rel="noopener noreferrer" className="btn btn-outline" style={{ marginTop: 'var(--space-4)', fontSize: 'var(--text-xs)', width: '100%' }}>
+                        View Event
+                      </a>
+                    )}
                   </div>
                 </div>
               ))}
@@ -196,7 +203,7 @@ export default function Events() {
             <p style={{ color: 'rgba(255,255,255,0.7)', maxWidth: 480, margin: '0 auto var(--space-6)' }}>
               Faculty, staff, and student organisations can submit events for listing in the official VWU campus calendar.
             </p>
-            <a href="#" className="btn btn-accent">Submit Your Event</a>
+            <Link to="/contact" className="btn btn-accent">Submit Your Event</Link>
           </div>
         </div>
       </section>
