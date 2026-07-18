@@ -9,7 +9,7 @@ import './CounterSection.css';
 function SingleCounter({ item, start, Icon }: { item: ContentBlockDoc; start: boolean; Icon: LucideIcon }) {
   const count = useCounter(parseInt(item.value, 10) || 0, 2200, start);
   return (
-    <div className="counter-item reveal" data-reveal>
+    <div className="counter-item">
       <div className="counter-icon"><Icon size={22} strokeWidth={1.75} /></div>
       <div className="counter-number">
         {count}
