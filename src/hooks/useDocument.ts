@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { doc, onSnapshot, type DocumentData } from 'firebase/firestore';
 import { db } from '../lib/firebase';
+import { reportFirestoreError, clearFirestoreError } from './firestoreErrorStore';
 
 /** Real-time listener for a single Firestore document */
 export function useDocument<T extends DocumentData>(
@@ -16,18 +17,24 @@ export function useDocument<T extends DocumentData>(
       setLoading(false);
       return;
     }
+    const errorKey = `${collectionName}/${docId}`;
     const unsub = onSnapshot(
       doc(db, collectionName, docId),
       (snap) => {
         setData(snap.exists() ? ({ id: snap.id, ...snap.data() } as unknown as T) : null);
         setLoading(false);
+        clearFirestoreError(errorKey);
       },
       (err) => {
         setError(err.message);
         setLoading(false);
+        reportFirestoreError(errorKey, err.message);
       }
     );
-    return unsub;
+    return () => {
+      unsub();
+      clearFirestoreError(errorKey);
+    };
   }, [collectionName, docId]);
 
   return { data, loading, error };

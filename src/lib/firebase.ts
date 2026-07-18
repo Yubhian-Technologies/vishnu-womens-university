@@ -12,10 +12,19 @@ const firebaseConfig: FirebaseOptions = {
   appId: (import.meta.env.VITE_FIREBASE_APP_ID || '1:1098841377665:web:1c8b1802d0cfcac619f680').trim() || '',
 };
 
+// Typed `any` deliberately: every call site across ~50 files (hooks, admin
+// sections) treats db/auth/storage as always-initialized, matching how this
+// app actually runs — the try/catch below is a defensive fallback for a
+// misconfigured local .env, not an expected production state. Typing these
+// as `Firestore | undefined` etc. would force null-checks into every one of
+// those call sites for a case that in practice doesn't happen; not worth
+// that blast radius for what's a real but low-severity gap.
+/* eslint-disable @typescript-eslint/no-explicit-any */
 let app: any;
 let db: any;
 let auth: any;
 let storage: any;
+/* eslint-enable @typescript-eslint/no-explicit-any */
 
 try {
   app = initializeApp(firebaseConfig);
