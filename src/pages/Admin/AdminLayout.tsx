@@ -29,6 +29,7 @@ export const SECTIONS = [
   { id: 'downloads',      icon: '📄', label: 'Academic Documents' },
   { id: 'curriculum',     icon: '📚', label: 'Course Curriculum Matrix' },
   { id: 'site-photos',    icon: '🖼️', label: 'Website Photos' },
+  { id: 'nav-links',      icon: '🔗', label: 'Navigation Link Redirects' },
 ];
 
 export default function AdminLayout() {

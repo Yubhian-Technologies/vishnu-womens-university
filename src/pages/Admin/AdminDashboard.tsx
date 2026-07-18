@@ -21,6 +21,7 @@ import SvesCampusesAdmin from './sections/SvesCampusesAdmin';
 import DownloadsAdmin from './sections/DownloadsAdmin';
 import CurriculumAdmin from './sections/CurriculumAdmin';
 import SitePhotosAdmin from './sections/SitePhotosAdmin';
+import NavLinkOverridesAdmin from './sections/NavLinkOverridesAdmin';
 
 interface Props {
   activeSection: string;
@@ -50,6 +51,7 @@ const SECTION_MAP: Record<string, React.ReactNode> = {
   downloads: <DownloadsAdmin />,
   curriculum: <CurriculumAdmin />,
   'site-photos': <SitePhotosAdmin />,
+  'nav-links': <NavLinkOverridesAdmin />,
 };
 
 export default function AdminDashboard({ activeSection, setActiveSection }: Props) {

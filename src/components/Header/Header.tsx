@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import AnnouncementsTicker from '../AnnouncementsTicker/AnnouncementsTicker';
 import { useOrderedCollection } from '../../hooks/useCollection';
+import { useNavLinkOverride } from '../../hooks/useNavLinkOverride';
 import type { CurriculumDoc } from '../../pages/Admin/sections/CurriculumAdmin';
 import type { DownloadDoc } from '../../pages/Admin/sections/DownloadsAdmin';
 import { PROGRAM_LABELS } from '../../pages/Academics/CurriculumMatrix';
@@ -231,6 +232,10 @@ export default function Header() {
 
   const { docs: curriculumDocs, loading: curriculumLoading } = useOrderedCollection<CurriculumDoc>('curriculum', 'rowOrder');
   const { docs: downloadDocs, loading: downloadsLoading } = useOrderedCollection<DownloadDoc>('downloads', 'order');
+  // Admin-editable via /admin → Navigation Link Redirects (NavLinkOverridesAdmin.tsx).
+  // Decoupled from Placements' own "Success Stories" item, which stays hardcoded.
+  // Default target is AlumniGiving.tsx's own "#successstories" section, not Placements.
+  const alumniSuccessStories = useNavLinkOverride('alumni-success-stories', '/alumni-giving#successstories');
 
   const curriculumPrograms = Array.from(new Set(curriculumDocs.map((d) => d.program)));
   const courseCurriculumChild: NavChild = {
@@ -259,13 +264,25 @@ export default function Header() {
   // flyout items, spliced in after "Faculty" since navItems itself is a
   // module-level constant and can't hold live data directly.
   const renderedNavItems: NavItem[] = navItems.map((item) => {
-    if (item.label !== 'Academics' || !item.children) return item;
-    const children: NavChild[] = [];
-    for (const child of item.children) {
-      children.push(child);
-      if (child.label === 'Faculty') children.push(courseCurriculumChild, academicDocsChild);
+    if (item.label === 'Academics' && item.children) {
+      const children: NavChild[] = [];
+      for (const child of item.children) {
+        children.push(child);
+        if (child.label === 'Faculty') children.push(courseCurriculumChild, academicDocsChild);
+      }
+      return { ...item, children };
     }
-    return { ...item, children };
+    // "Success Stories" here is admin-redirectable independently of
+    // Placements' own "Success Stories" item — see alumniSuccessStories above.
+    if (item.label === 'Alumni & Giving' && item.children) {
+      const children = item.children.map((child) =>
+        child.label === 'Success Stories'
+          ? { ...child, path: alumniSuccessStories.path, external: alumniSuccessStories.external }
+          : child
+      );
+      return { ...item, children };
+    }
+    return item;
   });
 
   useEffect(() => {
