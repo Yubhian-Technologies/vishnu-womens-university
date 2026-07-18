@@ -7,11 +7,10 @@ import { useOrderedCollection } from '../../hooks/useCollection';
 import { useSitePhotos, useSectionHasPhotos } from '../../hooks/useSitePhotos';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import { resolveProgramIcon } from '../../lib/programIcons';
+import { useContentBlocks } from '../../hooks/useContentBlocks';
+import { resolveContentIcon } from '../../lib/contentIcons';
 import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
-import {
-  PenTool,
-  Radio, Clapperboard, Users, Handshake, Newspaper, Drama, Trophy,
-} from 'lucide-react';
+import { PenTool, Radio } from 'lucide-react';
 
 const defaultAcademicsPhotos = [
   { src: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=800&q=80', alt: 'Smart lecture halls', caption: 'Smart Lecture Halls' },
@@ -43,16 +42,6 @@ const TABS = [
   { id: 'mba', label: 'MBA & Ph.D.' },
 ] as const;
 
-const studentActivities = [
-  { icon: Radio, title: 'Radio Vishnu 90.4', path: 'http://radiovishnu.com/', external: true },
-  { icon: Clapperboard, title: 'Vishnu TV Academy', path: '/vishnu-tv-academy', external: false },
-  { icon: Users, title: 'Student Clubs', path: '/student-clubs', external: false },
-  { icon: Handshake, title: 'Social Services', path: '/social-services', external: false },
-  { icon: Newspaper, title: 'Campus Magazines', path: '/campus-magazines', external: false },
-  { icon: Drama, title: 'Arts & Culture', path: '/arts-culture', external: false },
-  { icon: Trophy, title: 'Sports & Games', path: '/sports-games', external: false },
-];
-
 function truncate(text: string, max: number) {
   if (!text) return '';
   return text.length > max ? `${text.slice(0, max).trimEnd()}…` : text;
@@ -66,6 +55,9 @@ export default function Academics() {
   const hasClassroomsLabsPhotos = useSectionHasPhotos('academics', 'classrooms-labs');
   const researchInnovationPhotos = useSitePhotos('academics', 'research-innovation', defaultResearchInnovationPhotos);
   const hasResearchInnovationPhotos = useSectionHasPhotos('academics', 'research-innovation');
+  const quickStats = useContentBlocks('academics', 'quickStats');
+  const studentActivities = useContentBlocks('academics', 'studentActivities');
+  const careerOutcomeStats = useContentBlocks('academics', 'careerOutcomeStats');
 
   useEffect(() => {
     document.title = 'Academics | Vishnu Womens University';
@@ -124,15 +116,14 @@ export default function Academics() {
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-6) 0' }}>
         <div className="container">
           <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-12)', flexWrap: 'wrap' }}>
-            {[
-              { num: String(btechCount || '—'), label: 'B.Tech Programs' },
-              { num: '1,400+', label: 'Annual Placements' },
-              { num: '230+', label: 'Expert Faculty' },
-              { num: '59.28 LPA', label: 'Highest Package' },
-            ].map(s => (
-              <div key={s.label} style={{ textAlign: 'center' }}>
-                <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', fontWeight: 900, color: 'var(--color-accent)' }}>{s.num}</div>
-                <div style={{ fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)', fontFamily: 'var(--font-sans)' }}>{s.label}</div>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', fontWeight: 900, color: 'var(--color-accent)' }}>{btechCount || '—'}</div>
+              <div style={{ fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)', fontFamily: 'var(--font-sans)' }}>B.Tech Programs</div>
+            </div>
+            {quickStats.map(s => (
+              <div key={s.id} style={{ textAlign: 'center' }}>
+                <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', fontWeight: 900, color: 'var(--color-accent)' }}>{s.value}</div>
+                <div style={{ fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)', fontFamily: 'var(--font-sans)' }}>{s.title}</div>
               </div>
             ))}
           </div>
@@ -238,9 +229,9 @@ export default function Academics() {
                 <span className="dept-code">FE</span>
               </div>
               <h3 className="dept-name">Freshman Engineering</h3>
-              <p className="dept-desc">Foundation courses in mathematics, physics, chemistry, and the core principles of engineering.</p>
+              <p className="dept-desc">The first year of engineering lays the foundation for every student&apos;s academic journey — core principles, critical thinking, and problem-solving through classroom discussion, industry seminars, and hands-on training.</p>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto' }}>
-                <div className="dept-labs">4 Labs</div>
+                <div className="dept-labs">Mathematics · Physics · Chemistry · English</div>
               </div>
             </div>
           </div>
@@ -258,36 +249,36 @@ export default function Academics() {
             </p>
           </div>
           <div className="activities-grid">
-            {studentActivities.map((act, i) => (
-              act.external
-                ? (
-                  <a
-                    key={act.title}
-                    href={act.path}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="activity-item-card reveal"
-                    data-delay={`${i * 60}`}
-                    style={{ textDecoration: 'none' }}
-                  >
-                    <div className="activity-item-icon"><act.icon size={35} strokeWidth={1.75} /></div>
-                    <h3 className="activity-item-title">{act.title}</h3>
-                    <span style={{ marginTop: 'auto', fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'var(--font-sans)' }}>Explore →</span>
-                  </a>
-                ) : (
-                  <Link
-                    key={act.title}
-                    to={act.path}
-                    className="activity-item-card reveal"
-                    data-delay={`${i * 60}`}
-                    style={{ textDecoration: 'none' }}
-                  >
-                    <div className="activity-item-icon"><act.icon size={35} strokeWidth={1.75} /></div>
-                    <h3 className="activity-item-title">{act.title}</h3>
-                    <span style={{ marginTop: 'auto', fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'var(--font-sans)' }}>Explore →</span>
-                  </Link>
-                )
-            ))}
+            {studentActivities.map((act) => {
+              const Icon = resolveContentIcon(act.icon) || Radio;
+              const path = act.slug || '/student-life';
+              const external = /^https?:\/\//.test(path);
+              return external ? (
+                <a
+                  key={act.id}
+                  href={path}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="activity-item-card"
+                  style={{ textDecoration: 'none' }}
+                >
+                  <div className="activity-item-icon"><Icon size={35} strokeWidth={1.75} /></div>
+                  <h3 className="activity-item-title">{act.title}</h3>
+                  <span style={{ marginTop: 'auto', fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'var(--font-sans)' }}>Explore →</span>
+                </a>
+              ) : (
+                <Link
+                  key={act.id}
+                  to={path}
+                  className="activity-item-card"
+                  style={{ textDecoration: 'none' }}
+                >
+                  <div className="activity-item-icon"><Icon size={35} strokeWidth={1.75} /></div>
+                  <h3 className="activity-item-title">{act.title}</h3>
+                  <span style={{ marginTop: 'auto', fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'var(--font-sans)' }}>Explore →</span>
+                </Link>
+              );
+            })}
           </div>
           <div style={{ textAlign: 'center', marginTop: 'var(--space-8)' }}>
             <Link to="/student-life" className="btn btn-primary">Full Student Life Experience →</Link>
@@ -309,15 +300,10 @@ export default function Academics() {
             </div>
             <div className="reveal-right">
               <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
-                {[
-                  { value: '1,400+', label: 'Students Placed (2024–25)' },
-                  { value: '59.28 LPA', label: 'Highest Package' },
-                  { value: '6.2 LPA', label: 'Average Package' },
-                  { value: '150+', label: 'Recruiting Companies' },
-                ].map(s => (
-                  <div key={s.label} style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', borderLeft: '4px solid var(--color-accent)', textAlign: 'center' }}>
+                {careerOutcomeStats.map(s => (
+                  <div key={s.id} style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', borderLeft: '4px solid var(--color-accent)', textAlign: 'center' }}>
                     <div style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(1.2rem, 2.5vw, 1.8rem)', fontWeight: 900, color: 'var(--color-primary)' }}>{s.value}</div>
-                    <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', fontFamily: 'var(--font-sans)', marginTop: 4 }}>{s.label}</div>
+                    <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', fontFamily: 'var(--font-sans)', marginTop: 4 }}>{s.title}</div>
                   </div>
                 ))}
               </div>

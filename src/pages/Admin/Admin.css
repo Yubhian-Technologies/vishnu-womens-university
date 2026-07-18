@@ -120,6 +120,22 @@
   flex-direction: column;
 }
 
+.admin-sidebar__group + .admin-sidebar__group {
+  margin-top: 0.6rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+.admin-sidebar__group-label {
+  padding: 0.4rem 1.25rem 0.3rem;
+  margin: 0;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.38);
+}
+
 .admin-sidebar__link {
   display: flex;
   align-items: center;

@@ -25,17 +25,18 @@ const aboutLinks = [
   { label: 'Our History', path: '/about' },
   { label: 'Mission & Values', path: '/about' },
   { label: 'Leadership', path: '/about' },
+  { label: 'Organizational Chart', path: 'https://svecw.edu.in/wp-content/uploads/2024/03/SVECWOrganizationChart.jpg', external: true },
   { label: 'News', path: '/news' },
   { label: 'Events', path: '/events' },
   { label: 'Accreditation', path: '/about' },
 ];
 
 const socialLinks = [
-  { label: 'Instagram', href: '#', icon: 'IG' },
-  { label: 'Facebook', href: '#', icon: 'FB' },
-  { label: 'Twitter', href: '#', icon: 'TW' },
-  { label: 'LinkedIn', href: '#', icon: 'LI' },
-  { label: 'YouTube', href: '#', icon: 'YT' },
+  { label: 'Instagram', href: 'http://instagram.com/vishnu_svecw/', icon: 'IG' },
+  { label: 'Facebook', href: 'https://www.facebook.com/svecwcollege', icon: 'FB' },
+  { label: 'Twitter', href: 'https://twitter.com/svecw2', icon: 'TW' },
+  { label: 'LinkedIn', href: 'https://www.linkedin.com/school/vishnusvecw/', icon: 'LI' },
+  { label: 'YouTube', href: 'https://www.youtube.com/@SVECW-B0', icon: 'YT' },
 ];
 
 const accreditations = [
@@ -44,6 +45,70 @@ const accreditations = [
   'UGC Autonomous',
   'AICTE Approved',
   'JNTUK Affiliated',
+];
+
+const feedbackLinks = [
+  { label: "Students' Feedback", href: 'https://forms.gle/UuURnxKUZw7wW1NW9' },
+  { label: "Parents' Feedback", href: 'https://forms.gle/eT2QF3WNJZDwpEzj8' },
+  { label: "Faculty's Feedback", href: 'https://forms.gle/K89PMmjNbJNGSVEa9' },
+  { label: 'AICTE Feedback Facility', href: 'https://svecw.edu.in/aicte-feedback-facility/' },
+];
+
+// Statutory/compliance documents an accredited institution is required to publish.
+// Hosted on svecw.edu.in — the same accreditation-bearing institution VWU operates
+// under (the site already links out to svecw.edu.in systems elsewhere, e.g. the
+// exam portal and LMS), so these are the authoritative documents, not a separate
+// entity's paperwork being misrepresented as VWU's own.
+const complianceGroups: { title: string; links: { label: string; href: string }[] }[] = [
+  {
+    title: 'Approvals & Accreditations',
+    links: [
+      { label: 'AICTE Approvals', href: 'https://svecw.edu.in/wp-content/uploads/2026/05/AICTEApprovals.pdf' },
+      { label: 'UGC Autonomous Approvals', href: 'https://svecw.edu.in/wp-content/uploads/2024/07/SVECWUGCLetter.pdf' },
+      { label: 'UGC - 12B 2f Letter', href: 'https://svecw.edu.in/wp-content/uploads/2024/07/SVECWForm12B2F.pdf' },
+      { label: 'JNTUK Affiliation Approvals', href: 'https://svecw.edu.in/wp-content/uploads/2024/07/SVECWJNTUKApprovals.pdf' },
+      { label: 'JNTUK Autonomous Approvals', href: 'https://svecw.edu.in/wp-content/uploads/2024/07/SVECWJNTUKAutonomousLetters.pdf' },
+      { label: 'NAAC Approvals', href: 'https://svecw.edu.in/wp-content/uploads/2024/07/SVECWNAACLetter.pdf' },
+      { label: 'NBA Approvals', href: 'https://svecw.edu.in/wp-content/uploads/2024/07/SVECW-NBA-Approvals.pdf' },
+    ],
+  },
+  {
+    title: 'Mandatory Disclosures',
+    links: [
+      { label: 'AICTE Mandatory Disclosures', href: 'https://svecw.edu.in/wp-content/uploads/2026/02/SVECWAICTEMD.pdf' },
+      { label: 'UGC Public Self Disclosure', href: 'https://svecw.edu.in/wp-content/uploads/2025/10/SVECWUGCPublicSelfDisclosureOct2025.pdf' },
+      { label: 'JNTUK Mandatory Disclosure', href: 'https://svecw.edu.in/jntuk-mandatory-disclosure/' },
+      { label: 'RTI-Undertaking', href: 'https://svecw.edu.in/wp-content/uploads/2025/10/SVECWRTIActOct2025.pdf' },
+      { label: 'Disclosures – UGC', href: 'https://svecw.edu.in/infougc/' },
+      { label: 'Anti Ragging Policies', href: 'https://svecw.edu.in/anti-ragging/' },
+      { label: 'Policies & Procedures', href: 'https://svecw.edu.in/policies-procedures/' },
+    ],
+  },
+  {
+    title: 'Infrastructure & Facilities',
+    links: [
+      { label: 'Modes of Payment', href: 'https://svecw.edu.in/modes-of-payment/' },
+      { label: 'Building Plans', href: 'https://svecw.edu.in/wp-content/uploads/2026/02/SVECWBuildingPlans.pdf' },
+      { label: 'Structural Stability', href: 'https://svecw.edu.in/wp-content/uploads/2026/02/SVECWStructuralStability.pdf' },
+      { label: 'Land Use Certificate', href: 'https://svecw.edu.in/wp-content/uploads/2024/07/SVECWLandUseCertificate.pdf' },
+      { label: 'Land Conversion Certificate', href: 'https://svecw.edu.in/wp-content/uploads/2024/07/SVECWLandConversion.pdf' },
+      { label: 'Fire NOC', href: 'https://svecw.edu.in/wp-content/uploads/2026/02/SVECWFireSafety2026.pdf' },
+      { label: 'Online Verification System', href: 'https://svecw.edu.in/wp-content/uploads/2024/04/online.pdf' },
+    ],
+  },
+  {
+    title: 'Institutional Data',
+    links: [
+      { label: 'Audited Statements', href: 'https://svecw.edu.in/wp-content/uploads/2026/03/SVECWAuditStatements.pdf' },
+      { label: 'Student Details', href: 'https://svecw.edu.in/wp-content/uploads/2026/03/StudentDetailsupto2025-26.pdf' },
+      { label: 'Faculty Details', href: 'https://svecw.edu.in/wp-content/uploads/2026/02/SVECW-Faculty-Details.pdf' },
+      { label: 'Faculty Qualification Details', href: 'https://svecw.edu.in/wp-content/uploads/2026/02/SVECWFacultyQualifications.pdf' },
+      { label: 'Faculty Ratification Details', href: 'https://svecw.edu.in/wp-content/uploads/2026/02/SVECWRatifiedFaculty.pdf' },
+      { label: 'Faculty Handbook', href: 'https://svecw.edu.in/wp-content/uploads/2026/04/FacultyHandbookSVECW.pdf' },
+      { label: 'Students Handbook', href: 'https://svecw.edu.in/wp-content/uploads/2025/11/SVECWStudentHandbook.pdf' },
+      { label: 'Facilities for Physically Challenged', href: 'https://svecw.edu.in/wp-content/uploads/2024/04/PhysicallyHansFac1.pdf' },
+    ],
+  },
 ];
 
 export default function Footer() {
@@ -78,7 +143,7 @@ export default function Footer() {
 
               <div className="footer-social" aria-label="Social Media">
                 {socialLinks.map(s => (
-                  <a key={s.label} href={s.href} className="social-link" aria-label={s.label} title={s.label}>
+                  <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" className="social-link" aria-label={s.label} title={s.label}>
                     {s.icon}
                   </a>
                 ))}
@@ -119,7 +184,11 @@ export default function Footer() {
               <ul className="footer-links">
                 {aboutLinks.map(l => (
                   <li key={l.label}>
-                    <Link to={l.path} className="footer-link">{l.label}</Link>
+                    {l.external ? (
+                      <a href={l.path} className="footer-link" target="_blank" rel="noopener noreferrer">{l.label}</a>
+                    ) : (
+                      <Link to={l.path} className="footer-link">{l.label}</Link>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -155,6 +224,37 @@ export default function Footer() {
         </div>
       </div>
 
+      {/* Compliance & Disclosures */}
+      <div className="footer-compliance">
+        <div className="container">
+          <h3 className="footer-col-title">Compliance &amp; Disclosures</h3>
+          <div className="footer-compliance-grid">
+            {complianceGroups.map(group => (
+              <div key={group.title}>
+                <h4 className="footer-compliance-group-title">{group.title}</h4>
+                <ul className="footer-compliance-links">
+                  {group.links.map(l => (
+                    <li key={l.label}>
+                      <a href={l.href} target="_blank" rel="noopener noreferrer" className="footer-link">{l.label}</a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+
+          <div className="footer-feedback">
+            <span className="footer-feedback-label">Feedback Facility:</span>
+            {feedbackLinks.map((l, i) => (
+              <span key={l.label}>
+                <a href={l.href} target="_blank" rel="noopener noreferrer" className="footer-link">{l.label}</a>
+                {i < feedbackLinks.length - 1 && <span className="footer-feedback-sep">·</span>}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* Bottom Bar */}
       <div className="footer-bottom">
         <div className="container">
@@ -163,11 +263,10 @@ export default function Footer() {
               &copy; {year} Vishnu Womens University. All rights reserved.
             </p>
             <nav className="footer-legal" aria-label="Legal links">
-              <a href="#">Privacy Policy</a>
-              <a href="#">Terms of Use</a>
-              <a href="#">Non-Discrimination</a>
-              <a href="#">FERPA</a>
-              <a href="#">Sitemap</a>
+              <a href="https://svecw.edu.in/policies-procedures/" target="_blank" rel="noopener noreferrer">Policies & Procedures</a>
+              <a href="https://svecw.edu.in/anti-ragging/" target="_blank" rel="noopener noreferrer">Anti Ragging Policy</a>
+              <a href="https://svecw.edu.in/infougc/" target="_blank" rel="noopener noreferrer">Disclosures – UGC</a>
+              <Link to="/contact">Contact Us</Link>
             </nav>
           </div>
         </div>

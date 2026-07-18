@@ -7,7 +7,9 @@ import { useSitePhotos, useSectionHasPhotos } from '../../hooks/useSitePhotos';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import type { CalendarEntry } from '../Admin/sections/AcademicCalendarAdmin';
 import type { HolidayEntry } from '../Admin/sections/HolidaysAdmin';
-import { Monitor, NotebookPen, Newspaper, BarChart3, BookOpen, Video, Leaf, Accessibility, Handshake, Scale, Brain, Plane, TrainFront, Bus, Car, MapPin, Phone, Mail, type LucideIcon } from 'lucide-react';
+import { Monitor, Plane, MapPin, Phone, Mail } from 'lucide-react';
+import { useContentBlocks } from '../../hooks/useContentBlocks';
+import { resolveContentIcon } from '../../lib/contentIcons';
 import './Information.css';
 
 const defaultInfoPhotos = [
@@ -32,31 +34,6 @@ const defaultAntiRaggingSafetyPhotos = [
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Awareness Poster Displays', caption: '' },
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Counseling Room', caption: '' },
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Campus Patrol & Security', caption: '' },
-];
-
-const ictPlatforms = [
-  { icon: Monitor, name: 'Vishnu LMS', desc: 'The official Learning Management System for course materials, assignments, quizzes, and academic resources.', link: '#' },
-  { icon: NotebookPen, name: 'Examination Portal', desc: 'Online portal for exam registration, hall ticket download, and result viewing for all JNTUK examinations.', link: '#' },
-  { icon: Newspaper, name: 'Prathibha Magazine', desc: 'VWU\'s official campus magazine featuring student articles, alumni stories, research highlights, and events.', link: '#' },
-  { icon: BarChart3, name: 'Academic ERP', desc: 'Integrated ERP system for attendance tracking, grade management, timetables, and student academic records.', link: '#' },
-  { icon: BookOpen, name: 'e-Library Access', desc: 'Digital library portal giving access to IEEE Xplore, Springer, NPTEL, and 1,00,000+ e-books and journals.', link: '#' },
-  { icon: Video, name: 'NPTEL & SWAYAM', desc: 'Access to NPTEL online courses and SWAYAM platform for supplementary learning and MOOC certifications.', link: '#' },
-];
-
-const howToReach: { icon: LucideIcon; mode: string; desc: string }[] = [
-  { icon: Plane, mode: 'By Air', desc: 'Three airports serve Bhimavaram:\n• Rajamahendravaram (Rajahmundry) Airport — approx. 70 km away.\n• Gannavaram (Vijayawada) Airport — approx. 120 km away.\n• Visakhapatnam (VSKP) Airport — approx. 250 km away.\nTaxis and cab services are available from all three airports.' },
-  { icon: TrainFront, mode: 'By Train', desc: 'Bhimavaram Town (BVRT) and Bhimavaram Junction (BZM) are well-connected to major cities. Direct trains from Hyderabad, Visakhapatnam, Chennai, and Vijayawada.' },
-  { icon: Bus, mode: 'By Road', desc: 'Bhimavaram is accessible via NH-16 (East Coast Road). Regular APSRTC buses operate from Vijayawada (120 km), Hyderabad (400 km), and Visakhapatnam (250 km).' },
-  { icon: Car, mode: 'By Car', desc: 'VWU is located in Vishnupur, 3 km from Bhimavaram on the Tadepalligudem Road. Easily accessible by road from all major cities in Andhra Pradesh.' },
-];
-
-const counsellingScheme = [
-  { step: '01', title: 'EAPCET Rank', desc: 'Qualify in AP EAPCET. VWU Code: VISW. Use your rank for counselling in all B.Tech specializations.' },
-  { step: '02', title: 'AP EAPCET Counselling', desc: 'Register at the official AP EAPCET Counselling portal. Enter VWU (Code: VISW) as your college preference.' },
-  { step: '03', title: 'Document Verification', desc: 'Report to the AP Counselling Authority with original certificates for verification and seat allotment.' },
-  { step: '04', title: 'Seat Allotment', desc: 'Download your allotment order and report to VWU with all original documents within the specified date.' },
-  { step: '05', title: 'Fee Payment', desc: 'Complete fee payment (Government-regulated) and submit documents at VWU Admissions Office.' },
-  { step: '06', title: 'Enrolment', desc: 'Receive your student ID, begin classes, and become a part of the VWU family!' },
 ];
 
 type TabId = 'calendar' | 'holidays' | 'reach' | 'counselling' | 'ict' | 'practices';
@@ -85,6 +62,10 @@ export default function Information() {
   const hasPlacementsCareersPhotos = useSectionHasPhotos('information', 'placements-careers');
   const antiRaggingSafetyPhotos = useSitePhotos('information', 'anti-ragging-safety', defaultAntiRaggingSafetyPhotos);
   const hasAntiRaggingSafetyPhotos = useSectionHasPhotos('information', 'anti-ragging-safety');
+  const ictPlatforms = useContentBlocks('information', 'ictPlatforms');
+  const howToReach = useContentBlocks('information', 'howToReach');
+  const counsellingScheme = useContentBlocks('information', 'counsellingScheme');
+  const otherPractices = useContentBlocks('information', 'otherPractices');
 
   useEffect(() => {
     const tab = hashToTab[location.hash];
@@ -182,15 +163,18 @@ export default function Information() {
                 Vishnu Womens University is located in Vishnupur, Bhimavaram, West Godavari District, Andhra Pradesh – 534 202.
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', marginBottom: 'var(--space-10)' }}>
-                {howToReach.map((r, i) => (
-                  <div key={i} style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', display: 'flex', gap: 'var(--space-5)', alignItems: 'flex-start', borderLeft: '4px solid var(--color-accent)' }}>
-                    <r.icon size={29} strokeWidth={1.75} style={{ flexShrink: 0, color: 'var(--color-primary)' }} />
-                    <div>
-                      <h3 style={{ fontFamily: 'var(--font-sans)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>{r.mode}</h3>
-                      <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.7, whiteSpace: 'pre-line' }}>{r.desc}</p>
+                {howToReach.map((r) => {
+                  const Icon = resolveContentIcon(r.icon) || Plane;
+                  return (
+                    <div key={r.id} style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', display: 'flex', gap: 'var(--space-5)', alignItems: 'flex-start', borderLeft: '4px solid var(--color-accent)' }}>
+                      <Icon size={29} strokeWidth={1.75} style={{ flexShrink: 0, color: 'var(--color-primary)' }} />
+                      <div>
+                        <h3 style={{ fontFamily: 'var(--font-sans)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>{r.title}</h3>
+                        <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.7, whiteSpace: 'pre-line' }}>{r.desc}</p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
               <div style={{ background: 'var(--color-primary)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', color: 'rgba(255,255,255,0.8)', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', lineHeight: 1.8 }}>
                 <strong style={{ color: 'var(--color-accent)', display: 'flex', alignItems: 'center', gap: '0.35rem', marginBottom: 'var(--space-2)' }}><MapPin size={15} /> Address</strong>
@@ -211,8 +195,8 @@ export default function Information() {
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
                 {counsellingScheme.map((s, i) => (
-                  <div key={i} style={{ display: 'flex', gap: 'var(--space-6)', background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5) var(--space-6)', alignItems: 'flex-start', transition: 'all 0.2s' }}>
-                    <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', fontWeight: 900, color: 'var(--color-accent)', minWidth: 48, flexShrink: 0 }}>{s.step}</div>
+                  <div key={s.id} style={{ display: 'flex', gap: 'var(--space-6)', background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5) var(--space-6)', alignItems: 'flex-start', transition: 'all 0.2s' }}>
+                    <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', fontWeight: 900, color: 'var(--color-accent)', minWidth: 48, flexShrink: 0 }}>{String(i + 1).padStart(2, '0')}</div>
                     <div>
                       <h3 style={{ fontFamily: 'var(--font-sans)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>{s.title}</h3>
                       <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.7 }}>{s.desc}</p>
@@ -234,16 +218,19 @@ export default function Information() {
                 VWU leverages a comprehensive suite of digital learning platforms to enhance academic delivery, student engagement, and research access.
               </p>
               <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-5)' }}>
-                {ictPlatforms.map((p, i) => (
-                  <div key={i} style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', display: 'flex', gap: 'var(--space-4)', alignItems: 'flex-start' }}>
-                    <p.icon size={32} strokeWidth={1.75} />
-                    <div>
-                      <h3 style={{ fontFamily: 'var(--font-sans)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>{p.name}</h3>
-                      <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6, marginBottom: 'var(--space-3)' }}>{p.desc}</p>
-                      <a href={p.link} className="btn btn-outline" style={{ fontSize: 'var(--text-xs)', padding: '0.35rem 0.9rem' }}>Access Portal</a>
+                {ictPlatforms.map((p) => {
+                  const Icon = resolveContentIcon(p.icon) || Monitor;
+                  return (
+                    <div key={p.id} style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', display: 'flex', gap: 'var(--space-4)', alignItems: 'flex-start' }}>
+                      <Icon size={32} strokeWidth={1.75} />
+                      <div>
+                        <h3 style={{ fontFamily: 'var(--font-sans)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>{p.title}</h3>
+                        <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6, marginBottom: 'var(--space-3)' }}>{p.desc}</p>
+                        <a href={p.slug || '#'} className="btn btn-outline" style={{ fontSize: 'var(--text-xs)', padding: '0.35rem 0.9rem' }}>Access Portal</a>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}
@@ -256,22 +243,18 @@ export default function Information() {
                 Beyond academics, VWU follows best practices in sustainability, inclusivity, ethics, and community engagement.
               </p>
               <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-5)' }}>
-                {[
-                  { icon: Leaf, title: 'Green Campus Initiative', desc: 'Solar energy, rainwater harvesting, waste management, and biodiversity conservation across the 100-acre campus.' },
-                  { icon: Accessibility, title: 'Facilities for Differently-Abled', desc: 'Ramps, accessible restrooms, assistive technology, and dedicated support for students with disabilities.' },
-                  { icon: Handshake, title: 'Anti-Ragging Policy', desc: 'Zero-tolerance anti-ragging policy with an active Anti-Ragging Committee, helpline, and regular awareness programs.' },
-                  { icon: Scale, title: 'Internal Complaints Committee', desc: 'A designated Internal Committee (IC) to address complaints related to sexual harassment, ensuring a safe campus.' },
-                  { icon: Brain, title: 'Student Wellness Program', desc: 'Regular counselling sessions, mental health awareness workshops, and a dedicated student wellness center.' },
-                  { icon: BarChart3, title: 'Transparency & RTI', desc: 'VWU is committed to transparency with RTI compliance, public self-disclosure, and audited financial statements.' },
-                ].map((item, i) => (
-                  <div key={i} style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', display: 'flex', gap: 'var(--space-4)', borderLeft: '4px solid var(--color-accent)' }}>
-                    <item.icon size={32} strokeWidth={1.75} />
-                    <div>
-                      <h3 style={{ fontFamily: 'var(--font-sans)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>{item.title}</h3>
-                      <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6 }}>{item.desc}</p>
+                {otherPractices.map((item) => {
+                  const Icon = resolveContentIcon(item.icon) || Monitor;
+                  return (
+                    <div key={item.id} style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', display: 'flex', gap: 'var(--space-4)', borderLeft: '4px solid var(--color-accent)' }}>
+                      <Icon size={32} strokeWidth={1.75} />
+                      <div>
+                        <h3 style={{ fontFamily: 'var(--font-sans)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>{item.title}</h3>
+                        <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6 }}>{item.desc}</p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}
@@ -283,7 +266,7 @@ export default function Information() {
         <div className="container">
           <PhotoGrid
             images={infoPhotos}
-            label="Campus Life"
+            label="Gallery"
             title="VWU in Pictures"
             subtitle="A visual glimpse of the campus, facilities, and everyday life at Vishnu Womens University in Bhimavaram."
             highlights={[

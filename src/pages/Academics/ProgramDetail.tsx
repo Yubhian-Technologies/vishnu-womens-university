@@ -91,7 +91,7 @@ export default function ProgramDetail() {
         <div className="container">
           <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-12)', flexWrap: 'wrap' }}>
             {[
-              { label: 'Annual Intake', value: `${program.intake} Seats` },
+              ...(program.intake ? [{ label: 'Annual Intake', value: `${program.intake} Seats` }] : []),
               ...(program.established ? [{ label: 'Established', value: program.established }] : []),
               ...(program.accreditation ? [{ label: 'Accreditation', value: program.accreditation }] : []),
               ...(program.hod ? [{ label: 'Head of Department', value: program.hod }] : []),

@@ -22,6 +22,10 @@ import DownloadsAdmin from './sections/DownloadsAdmin';
 import CurriculumAdmin from './sections/CurriculumAdmin';
 import SitePhotosAdmin from './sections/SitePhotosAdmin';
 import NavLinkOverridesAdmin from './sections/NavLinkOverridesAdmin';
+import GovernanceItemsAdmin from './sections/GovernanceItemsAdmin';
+import DifferentiatorsAdmin from './sections/DifferentiatorsAdmin';
+import PlacementItemsAdmin from './sections/PlacementItemsAdmin';
+import NewsAwardsDataAdmin from './sections/NewsAwardsDataAdmin';
 
 interface Props {
   activeSection: string;
@@ -52,6 +56,10 @@ const SECTION_MAP: Record<string, React.ReactNode> = {
   curriculum: <CurriculumAdmin />,
   'site-photos': <SitePhotosAdmin />,
   'nav-links': <NavLinkOverridesAdmin />,
+  'governance-items': <GovernanceItemsAdmin />,
+  differentiators: <DifferentiatorsAdmin />,
+  'placement-items': <PlacementItemsAdmin />,
+  'news-awards-data': <NewsAwardsDataAdmin />,
 };
 
 export default function AdminDashboard({ activeSection, setActiveSection }: Props) {

@@ -30,6 +30,31 @@ export const SECTIONS = [
   { id: 'curriculum',     icon: '📚', label: 'Course Curriculum Matrix' },
   { id: 'site-photos',    icon: '🖼️', label: 'Website Photos' },
   { id: 'nav-links',      icon: '🔗', label: 'Navigation Link Redirects' },
+  { id: 'governance-items', icon: '⚖️', label: 'Governance / Committees / IQAC' },
+  { id: 'differentiators', icon: '✨', label: 'Differentiators' },
+  { id: 'placement-items', icon: '📈', label: 'Placement Sub-pages' },
+  { id: 'news-awards-data', icon: '🏆', label: 'Happenings & Awards' },
+];
+
+// Groups the flat SECTIONS list under headers in the desktop sidebar only —
+// SECTIONS itself stays flat since it's also used for id→label lookups and
+// the mobile bottom nav. Every SECTIONS id must appear in exactly one group
+// here; groups are ordered to roughly match the public site's own nav order
+// (Discover/About → Academics → Admissions/Info → Student Life → Placements
+// → Differentiators → News & Awards → Alumni), so an admin can find a
+// section by thinking "where does this live on the website?" rather than
+// hunting through one long undifferentiated list.
+export const SECTION_GROUPS: { label: string; ids: string[] }[] = [
+  { label: 'Overview', ids: ['overview'] },
+  { label: 'Site Appearance', ids: ['banners', 'site-photos', 'nav-links', 'content-blocks'] },
+  { label: 'About & Governance', ids: ['governing-body', 'governance-items', 'core-executives', 'sves-campuses', 'contacts'] },
+  { label: 'Academics', ids: ['programs', 'faculty', 'curriculum', 'downloads'] },
+  { label: 'Admissions & Campus Info', ids: ['information'] },
+  { label: 'Student Life', ids: ['student-clubs', 'faqs', 'job-openings', 'events'] },
+  { label: 'Placements & Careers', ids: ['placements', 'placement-items'] },
+  { label: 'Differentiators', ids: ['differentiators'] },
+  { label: 'News & Awards', ids: ['news', 'gallery', 'news-awards-data', 'announcements'] },
+  { label: 'Alumni & Giving', ids: ['alumni'] },
 ];
 
 export default function AdminLayout() {
@@ -74,15 +99,24 @@ export default function AdminLayout() {
           <span>VWU Admin</span>
         </div>
         <nav className="admin-sidebar__nav">
-          {SECTIONS.map((s) => (
-            <button
-              key={s.id}
-              className={`admin-sidebar__link${activeSection === s.id ? ' active' : ''}`}
-              onClick={() => setActiveSection(s.id)}
-            >
-              <span>{s.icon}</span>
-              {s.label}
-            </button>
+          {SECTION_GROUPS.map((group) => (
+            <div className="admin-sidebar__group" key={group.label}>
+              <p className="admin-sidebar__group-label">{group.label}</p>
+              {group.ids.map((id) => {
+                const s = SECTIONS.find((sec) => sec.id === id);
+                if (!s) return null;
+                return (
+                  <button
+                    key={s.id}
+                    className={`admin-sidebar__link${activeSection === s.id ? ' active' : ''}`}
+                    onClick={() => setActiveSection(s.id)}
+                  >
+                    <span>{s.icon}</span>
+                    {s.label}
+                  </button>
+                );
+              })}
+            </div>
           ))}
         </nav>
         <div className="admin-sidebar__footer">
