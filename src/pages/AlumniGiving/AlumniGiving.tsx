@@ -142,14 +142,17 @@ export default function AlumniGiving() {
         </section>
       )}
 
-      {/* Alumni Stories */}
-      {alumniStories.length > 0 && (
-        <section id="alumni" className="section bg-white">
-          <div className="container">
-            <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>
-              <span className="section-label">Alumni Success</span>
-              <h2 className="section-title">Where VWU Engineers Go</h2>
-            </div>
+      {/* Success Stories — the "Alumni & Giving → Success Stories" nav item's
+          real destination (decoupled from Placements' own Success Stories
+          page). Always renders, even with zero alumniStories docs yet, so
+          the nav link never lands on a blank scroll target. */}
+      <section id="successstories" className="section bg-white">
+        <div className="container">
+          <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>
+            <span className="section-label">Alumni Success</span>
+            <h2 className="section-title">Where VWU Engineers Go</h2>
+          </div>
+          {alumniStories.length > 0 ? (
             <div className="ag-stories-grid">
               {alumniStories.map((story, i) => (
                 <div key={story.id} className="ag-story-card reveal" data-delay={`${i * 100}`}>
@@ -165,9 +168,13 @@ export default function AlumniGiving() {
                 </div>
               ))}
             </div>
-          </div>
-        </section>
-      )}
+          ) : (
+            <p style={{ textAlign: 'center', color: 'var(--color-text-light)' }}>
+              Alumni success stories are coming soon — check back shortly.
+            </p>
+          )}
+        </div>
+      </section>
 
       {/* Events */}
       {alumniEvents.length > 0 && (

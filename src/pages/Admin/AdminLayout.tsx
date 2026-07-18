@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from '../../lib/firebase';
 import AdminLogin from './AdminLogin';
@@ -28,6 +29,7 @@ export const SECTIONS = [
   { id: 'downloads',      icon: '📄', label: 'Academic Documents' },
   { id: 'curriculum',     icon: '📚', label: 'Course Curriculum Matrix' },
   { id: 'site-photos',    icon: '🖼️', label: 'Website Photos' },
+  { id: 'nav-links',      icon: '🔗', label: 'Navigation Link Redirects' },
   { id: 'governance-items', icon: '⚖️', label: 'Governance / Committees / IQAC' },
   { id: 'differentiators', icon: '✨', label: 'Differentiators' },
   { id: 'placement-items', icon: '📈', label: 'Placement Sub-pages' },
@@ -44,7 +46,7 @@ export const SECTIONS = [
 // hunting through one long undifferentiated list.
 export const SECTION_GROUPS: { label: string; ids: string[] }[] = [
   { label: 'Overview', ids: ['overview'] },
-  { label: 'Site Appearance', ids: ['banners', 'site-photos', 'content-blocks'] },
+  { label: 'Site Appearance', ids: ['banners', 'site-photos', 'nav-links', 'content-blocks'] },
   { label: 'About & Governance', ids: ['governing-body', 'governance-items', 'core-executives', 'sves-campuses', 'contacts'] },
   { label: 'Academics', ids: ['programs', 'faculty', 'curriculum', 'downloads'] },
   { label: 'Admissions & Campus Info', ids: ['information'] },
@@ -58,7 +60,18 @@ export const SECTION_GROUPS: { label: string; ids: string[] }[] = [
 export default function AdminLayout() {
   const [user, setUser] = useState<{ email: string | null } | null>(null);
   const [checking, setChecking] = useState(true);
-  const [activeSection, setActiveSection] = useState('overview');
+  // URL-backed so a section (and, deeper in, a specific Website Photos
+  // page/sub-section) is linkable/bookmarkable/shareable, and survives a
+  // refresh instead of resetting to Overview.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeSection = searchParams.get('section') ?? 'overview';
+  const setActiveSection = (id: string) => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set('section', id);
+      return next;
+    }, { replace: true });
+  };
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (u) => {

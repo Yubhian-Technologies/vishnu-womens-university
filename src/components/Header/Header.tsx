@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import AnnouncementsTicker from '../AnnouncementsTicker/AnnouncementsTicker';
 import { useOrderedCollection } from '../../hooks/useCollection';
+import { useNavLinkOverride } from '../../hooks/useNavLinkOverride';
 import type { CurriculumDoc } from '../../pages/Admin/sections/CurriculumAdmin';
 import type { DownloadDoc } from '../../pages/Admin/sections/DownloadsAdmin';
 import { PROGRAM_LABELS } from '../../pages/Academics/CurriculumMatrix';
@@ -48,22 +49,22 @@ const navItems: NavItem[] = [
         groupLabel: 'Campus Life',
         groupPath: '/campus',
         items: [
-          { label: 'Smart Class Rooms', path: '/campus#smart-classrooms' },
-          { label: 'State-of-the-art Labs', path: '/campus#labs' },
-          { label: 'Central Library', path: '/campus#library' },
-          { label: 'Auditoriums', path: '/campus#auditoriums' },
-          { label: 'Campus Book Stores', path: '/campus#bookstores' },
-          { label: 'Wi-Fi Campus', path: '/campus#wifi' },
-          { label: 'Campus Hostels', path: '/campus#hostels' },
-          { label: 'Food Courts', path: '/campus#food-courts' },
-          { label: 'VISHNU Fitness Centre', path: '/campus#fitness' },
-          { label: 'Staff Quarters', path: '/campus#staff-quarters' },
-          { label: 'Travel Desk', path: '/campus#travel-desk' },
-          { label: 'Temples', path: '/campus#temples' },
-          { label: 'Health Care', path: '/campus#health-care' },
-          { label: 'Swimming Pool', path: '/campus#swimming-pool' },
-          { label: 'Campus Security', path: '/campus#security' },
-          { label: 'Other Facilities', path: '/campus#other-facilities' },
+          { label: 'Smart Class Rooms', path: '/campus/smart-classrooms' },
+          { label: 'State-of-the-art Labs', path: '/campus/state-of-the-art-labs' },
+          { label: 'Central Library', path: '/campus/central-library' },
+          { label: 'Auditoriums', path: '/campus/auditoriums' },
+          { label: 'Campus Book Stores', path: '/campus/campus-book-stores' },
+          { label: 'Wi-Fi Campus', path: '/campus/wifi-campus' },
+          { label: 'Campus Hostels', path: '/campus/campus-hostels' },
+          { label: 'Food Courts', path: '/campus/food-courts' },
+          { label: 'VISHNU Fitness Centre', path: '/campus/fitness-centre' },
+          { label: 'Staff Quarters', path: '/campus/staff-quarters' },
+          { label: 'Travel Desk', path: '/campus/travel-desk' },
+          { label: 'Temples', path: '/campus/temples' },
+          { label: 'Health Care', path: '/campus/health-care' },
+          { label: 'Swimming Pool', path: '/campus/swimming-pool' },
+          { label: 'Campus Security', path: '/campus/campus-security' },
+          { label: 'Other Facilities', path: '/campus/other-facilities' },
         ],
       },
       {
@@ -270,6 +271,10 @@ export default function Header() {
 
   const { docs: curriculumDocs, loading: curriculumLoading } = useOrderedCollection<CurriculumDoc>('curriculum', 'rowOrder');
   const { docs: downloadDocs, loading: downloadsLoading } = useOrderedCollection<DownloadDoc>('downloads', 'order');
+  // Admin-editable via /admin → Navigation Link Redirects (NavLinkOverridesAdmin.tsx).
+  // Decoupled from Placements' own "Success Stories" item, which stays hardcoded.
+  // Default target is AlumniGiving.tsx's own "#successstories" section, not Placements.
+  const alumniSuccessStories = useNavLinkOverride('alumni-success-stories', '/alumni-giving#successstories');
 
   const curriculumPrograms = Array.from(new Set(curriculumDocs.map((d) => d.program)));
   const courseCurriculumChild: NavChild = {
@@ -298,13 +303,25 @@ export default function Header() {
   // flyout items, spliced in after "Faculty" since navItems itself is a
   // module-level constant and can't hold live data directly.
   const renderedNavItems: NavItem[] = navItems.map((item) => {
-    if (item.label !== 'Academics' || !item.children) return item;
-    const children: NavChild[] = [];
-    for (const child of item.children) {
-      children.push(child);
-      if (child.label === 'Faculty') children.push(courseCurriculumChild, academicDocsChild);
+    if (item.label === 'Academics' && item.children) {
+      const children: NavChild[] = [];
+      for (const child of item.children) {
+        children.push(child);
+        if (child.label === 'Faculty') children.push(courseCurriculumChild, academicDocsChild);
+      }
+      return { ...item, children };
     }
-    return { ...item, children };
+    // "Success Stories" here is admin-redirectable independently of
+    // Placements' own "Success Stories" item — see alumniSuccessStories above.
+    if (item.label === 'Alumni & Giving' && item.children) {
+      const children = item.children.map((child) =>
+        child.label === 'Success Stories'
+          ? { ...child, path: alumniSuccessStories.path, external: alumniSuccessStories.external }
+          : child
+      );
+      return { ...item, children };
+    }
+    return item;
   });
 
   useEffect(() => {

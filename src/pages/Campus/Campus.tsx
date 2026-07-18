@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import type { CSSProperties, MouseEvent as ReactMouseEvent } from 'react';
 import { Link } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
@@ -7,6 +8,7 @@ import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { useSitePhotos, useSectionHasPhotos } from '../../hooks/useSitePhotos';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
+import { campusFacilities, resolveCampusFacility } from './campusFacilities.data';
 import { Building } from 'lucide-react';
 
 const defaultCampusGalleryPhotos = [
@@ -107,15 +109,32 @@ export default function Campus() {
           <div className="grid-4 campus-facilities-grid">
             {facilities.map((f) => {
               const Icon = resolveContentIcon(f.icon) || Building;
-              return (
-                <div key={f.id} id={f.slug || undefined}
-                  style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', transition: 'all var(--transition-base)', scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-accent)'; (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-md)'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-light-gray)'; (e.currentTarget as HTMLElement).style.boxShadow = 'none'; }}
-                >
+              const cardStyle: CSSProperties = { display: 'block', textDecoration: 'none', background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', transition: 'all var(--transition-base)', scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' };
+              const onMouseEnter = (e: ReactMouseEvent<HTMLElement>) => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-accent)'; (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-md)'; };
+              const onMouseLeave = (e: ReactMouseEvent<HTMLElement>) => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-light-gray)'; (e.currentTarget as HTMLElement).style.boxShadow = 'none'; };
+              const cardInner = (
+                <>
                   <div style={{ marginBottom: 'var(--space-3)' }}><Icon size={35} strokeWidth={1.75} /></div>
                   <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>{f.title}</h3>
                   <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6 }}>{f.desc}</p>
+                </>
+              );
+              // Link tiles that match one of the 16 dedicated facility pages
+              // (/campus/:slug) — by slug first, falling back to a known
+              // title alias (e.g. "Specialised Laboratories" → the "State-
+              // of-the-art Labs" page) since admin-entered slugs don't
+              // always line up. No match just stays a plain, unlinked card.
+              const matchedFacility = resolveCampusFacility(f.title, f.slug);
+              if (matchedFacility) {
+                return (
+                  <Link key={f.id} id={f.slug || undefined} to={`/campus/${matchedFacility.slug}`} style={cardStyle} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+                    {cardInner}
+                  </Link>
+                );
+              }
+              return (
+                <div key={f.id} id={f.slug || undefined} style={cardStyle} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+                  {cardInner}
                 </div>
               );
             })}
@@ -173,6 +192,32 @@ export default function Campus() {
           </div>
         </section>
       )}
+
+      {/* Campus Life directory — each links to its own dedicated page
+          (/campus/:slug) with details and its own 5 photo slots. */}
+      <section className="section bg-off-white">
+        <div className="container">
+          <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>
+            <span className="section-label">Explore Campus Life</span>
+            <h2 className="section-title">Every Facility, In Detail</h2>
+            <p className="section-desc" style={{ margin: '0 auto' }}>
+              Click any facility below for its full details and photos.
+            </p>
+          </div>
+          <div className="grid-4 campus-facilities-grid">
+            {campusFacilities.map((f) => (
+              <Link key={f.slug} to={`/campus/${f.slug}`}
+                style={{ display: 'block', textDecoration: 'none', background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', transition: 'all var(--transition-base)' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-accent)'; (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-md)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-light-gray)'; (e.currentTarget as HTMLElement).style.boxShadow = 'none'; }}
+              >
+                <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>{f.title}</h3>
+                <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6 }}>{f.desc}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* CTA */}
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-16) 0' }}>
