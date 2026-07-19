@@ -275,6 +275,12 @@ export default function Header() {
   // hover) until the mouse actually leaves the item, at which point normal
   // hover behavior resumes — clicking again while forced shut reopens it.
   const [forceClosedItem, setForceClosedItem] = useState<string | null>(null);
+  // :hover/:focus-within alone can leave two dropdowns open at once (e.g. a
+  // lingering hover on one item plus keyboard focus on another, or a stuck
+  // synthetic hover on touch devices). Tracking which item was most recently
+  // entered/focused lets every other item be force-closed explicitly,
+  // guaranteeing only one dropdown is ever shown regardless of input device.
+  const [activeItem, setActiveItem] = useState<string | null>(null);
   // Desktop dropdowns are opened by CSS :hover/:focus-within, which stays
   // true while the page scrolls under a stationary cursor (header is
   // sticky) — this forces any open dropdown shut the moment scrolling
@@ -409,8 +415,13 @@ export default function Header() {
               {renderedNavItems.map((item) => (
                 <li
                   key={item.label}
-                  className={`nav-item${forceClosedItem === item.label ? ' nav-item--force-closed' : ''}${item.label === 'Research' ? ' nav-item--research' : ''}`}
-                  onMouseLeave={() => setForceClosedItem((prev) => (prev === item.label ? null : prev))}
+                  className={`nav-item${forceClosedItem === item.label || (activeItem !== null && activeItem !== item.label) ? ' nav-item--force-closed' : ''}${item.label === 'Research' ? ' nav-item--research' : ''}${item.label === 'Placements' ? ' nav-item--placements' : ''}`}
+                  onMouseEnter={() => setActiveItem(item.label)}
+                  onFocus={() => setActiveItem(item.label)}
+                  onMouseLeave={() => {
+                    setForceClosedItem((prev) => (prev === item.label ? null : prev));
+                    setActiveItem((prev) => (prev === item.label ? null : prev));
+                  }}
                 >
                   <button
                     className="nav-link"

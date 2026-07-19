@@ -1,12 +1,21 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Check } from 'lucide-react';
 import { findResearchItemBySlug, ResearchTableRow } from './research.data';
 import '../detail-layout.css';
 
 export default function ResearchDetail() {
   const { slug } = useParams<{ slug: string }>();
   const item = slug ? findResearchItemBySlug(slug) : null;
+  const [openThrustAreas, setOpenThrustAreas] = useState<Set<string>>(new Set());
+  const toggleThrustArea = (key: string) => {
+    setOpenThrustAreas((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
 
   useEffect(() => {
     if (item) document.title = `${item.title} | Vishnu Womens University`;
@@ -139,6 +148,91 @@ export default function ResearchDetail() {
                 </tbody>
               </table>
             </div>
+          </div>
+        </section>
+      )}
+
+      {/* Department Coordinators (About R&D only) */}
+      {item.coordinators && item.coordinators.length > 0 && (
+        <section className="section bg-white">
+          <div className="container">
+            <div className="reveal" style={{ marginBottom: 'var(--space-8)' }}>
+              <span className="section-label">Team</span>
+              <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Department Coordinators</h2>
+            </div>
+            <div className="reveal" style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm)' }}>
+                <thead>
+                  <tr style={{ background: 'var(--color-primary)' }}>
+                    {['S.No', 'Name', 'Role', 'Department'].map((col) => (
+                      <th key={col} style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'left', color: 'var(--color-white)', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                        {col}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {item.coordinators.map((c, i) => (
+                    <tr key={c.name} style={{ background: i % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)', borderBottom: '1px solid var(--color-light-gray)' }}>
+                      <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)', lineHeight: 1.5 }}>{i + 1}</td>
+                      <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)', lineHeight: 1.5 }}>{c.name}</td>
+                      <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)', lineHeight: 1.5 }}>{c.role}</td>
+                      <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)', lineHeight: 1.5 }}>{c.department}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Thrust Areas accordion (About R&D's thrust-areas-of-research only) */}
+      {item.thrustCategories && item.thrustCategories.length > 0 && (
+        <section className="section bg-off-white">
+          <div className="container">
+            <div className="reveal" style={{ marginBottom: 'var(--space-8)' }}>
+              <span className="section-label">Details</span>
+              <h2 className="section-title" style={{ fontSize: '1.75rem' }}>{item.title}</h2>
+            </div>
+            {item.thrustCategories.map((cat, ci) => (
+              <div key={cat.category} className="reveal" data-delay={`${ci * 40}`} style={{ marginBottom: 'var(--space-10)' }}>
+                <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>
+                  {cat.category}
+                </h3>
+                <div className="thrust-accordion">
+                  {cat.areas.map((area, ai) => {
+                    const key = `${ci}-${ai}`;
+                    const isOpen = openThrustAreas.has(key);
+                    return (
+                      <div key={area.name} className={`thrust-accordion-item${isOpen ? ' open' : ''}`}>
+                        <button
+                          type="button"
+                          className="thrust-accordion-header"
+                          onClick={() => toggleThrustArea(key)}
+                          aria-expanded={isOpen}
+                        >
+                          <span>{area.name}</span>
+                          <span className="thrust-accordion-icon">{isOpen ? '−' : '+'}</span>
+                        </button>
+                        <div className="thrust-accordion-collapse">
+                          <div className="thrust-accordion-collapse-inner">
+                            <ul className="thrust-accordion-list">
+                              {area.faculty.map((f) => (
+                                <li key={f}>
+                                  <Check size={13} strokeWidth={2.5} style={{ color: 'var(--color-accent)', flexShrink: 0 }} />
+                                  <span>{f}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </div>
         </section>
       )}

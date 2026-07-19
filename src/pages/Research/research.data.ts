@@ -17,6 +17,8 @@ export interface ResearchItem {
   highlights?: string[];
   tableData?: ResearchTableRow[];
   tableSections?: { title: string; rows: ResearchTableRow[] }[];
+  coordinators?: { name: string; role: string; department: string }[];
+  thrustCategories?: { category: string; areas: { name: string; faculty: string[] }[] }[];
 }
 
 export const researchCategories: { key: ResearchItem['category']; label: string; desc: string; icon: LucideIcon }[] = [
@@ -45,6 +47,17 @@ export const researchItems: ResearchItem[] = [
     highlights: [
       'Department-level R&D Coordinators across all nine departments',
       'Institutional R&D Policy governing sponsored and in-house research',
+    ],
+    coordinators: [
+      { name: 'Dr. R. Anuj', role: 'Asst. Professor', department: 'Department of Computer Science & Engineering' },
+      { name: 'Mr. K. Dileep Kumar', role: 'Asst. Professor', department: 'Department of Information & Technology' },
+      { name: 'Dr. P. S. Charani', role: 'Professor', department: 'Department of Artificial Intelligence' },
+      { name: 'Dr. R. Sahoo', role: 'Assoc. Professor', department: 'Department of Electronics & Communication Engineering' },
+      { name: 'Dr. K Kalyan Sagar', role: 'Assoc. Professor', department: 'Department of Electrical & Electronics Engineering' },
+      { name: 'Dr. B N Malleswara Rao', role: 'Assoc. Professor', department: 'Department of Mechanical Engineering' },
+      { name: 'Mr. N Haripavan', role: 'Asst. Professor', department: 'Department of Civil Engineering' },
+      { name: 'Dr. P. S. Brahmanandam', role: 'Professor', department: 'Department of Basic Science' },
+      { name: 'Dr. M. Karthik', role: 'Assoc. Professor', department: 'Department of Management Studies' },
     ],
   },
   {
@@ -143,28 +156,48 @@ export const researchItems: ResearchItem[] = [
     icon: Target,
     desc: 'Focused research domains spanning computing & AI, electronics, electrical engineering, mechanical, civil, sciences, and humanities.',
     intro: 'VWU faculty pursue focused research across the following thrust areas, each backed by faculty specialising in that field and linked to their profiles on the institutional research information system (IRINS).',
-    tableSections: [
-      { title: 'Computing & AI', rows: [
-        { Area: 'Machine Learning' }, { Area: 'Deep Learning' }, { Area: 'Data Mining' },
-        { Area: 'Computer Networks' }, { Area: 'IoT' }, { Area: 'Data Science' },
+    thrustCategories: [
+      { category: 'Computing & AI', areas: [
+        { name: 'Machine Learning', faculty: [
+          'K. Padma Vasavi', 'Pokkuluri Kiran Sree', 'A. Sri Krishna', 'V V R Maheswara Rao', 'Anuj Rapaka',
+          'M Narasimha Raju', 'S. Ravi Kumar', 'N D S S Kiran Relagi', 'G. Ratna Kanth', 'M. Venkata Subbarao', 'Dr. G Durga Prasad',
+        ] },
+        { name: 'Deep Learning', faculty: ['K. Padma Vasavi', 'A. Sri Krishna', 'M. Venkata Subbarao', 'G. Ratna Kanth'] },
+        { name: 'Data Mining', faculty: ['V. Purushothama Raju', 'T Gayathri', 'K. Ramachandra Rao', 'P R Sudha Rani', 'A Seenu'] },
+        { name: 'Computer Networks', faculty: ['D V Naga Raju', 'RajaRao PBV', 'M. Prasad'] },
+        { name: 'IoT', faculty: ['Srikanth Pala'] },
+        { name: 'Data Science', faculty: ['A. Sri Krishna', 'P. Sricharani', 'Chandra Sekhar Kolli', 'Dr V Pavan Kumar'] },
       ] },
-      { title: 'Electronics & Communication', rows: [
-        { Area: 'Antennas' }, { Area: 'VLSI' }, { Area: 'Communication Systems' }, { Area: 'Signal & Image Processing' },
+      { category: 'Electronics & Communication', areas: [
+        { name: 'Antennas', faculty: ['G R L V N Srivasa Raju', 'S Hanumantha Rao', 'Ratikanta Sahoo', 'Dr. M. Padmanabha Raju'] },
+        { name: 'VLSI', faculty: ['M V Ganeswara Rao', 'K. S. N. Raju', 'M. Sumalatha', 'Nilesh Kumar Jaiswal'] },
+        { name: 'Communication Systems', faculty: ['Sudheer Kumar Terlapu', 'P Ravikumar', 'Dr. M. Venkata Subbarao'] },
+        { name: 'Signal & Image Processing', faculty: ['K. Padma Vasavi', 'Dr M Pradeep', 'M. Prema Kumar', 'M. Venkata Subbarao', 'M. Sumalatha'] },
       ] },
-      { title: 'Electrical Engineering', rows: [
-        { Area: 'Control Systems' }, { Area: 'Power Electronics & Drives' }, { Area: 'Power Systems' }, { Area: 'Electrical Machines & Drives' },
+      { category: 'Electrical Engineering', areas: [
+        { name: 'Control Systems', faculty: ['M. V. Srikanth'] },
+        { name: 'Power Electronics & Drives', faculty: ['S. M. Padmaja', 'J. Rohith Balaji', 'B. Ramu'] },
+        { name: 'Power Systems', faculty: ['S. D. K. Varma', 'K. Kalyan Sagar'] },
+        { name: 'Electrical Machines & Drives', faculty: ['SSSR Sarathbabu Duvvuri'] },
       ] },
-      { title: 'Mechanical Engineering', rows: [
-        { Area: 'Metal Forming' }, { Area: 'Manufacturing' }, { Area: 'Nano Materials' }, { Area: 'Machine Design' }, { Area: 'Thermal Engineering' },
+      { category: 'Mechanical Engineering', areas: [
+        { name: 'Metal Forming', faculty: ['Dr Ch Hari Krishna', 'B. N. Malleswara Rao'] },
+        { name: 'Manufacturing', faculty: ['Dr Ch Hari Krishna', 'Asnit Gangwar'] },
+        { name: 'Nano Materials', faculty: ['Asnit Gangwar'] },
+        { name: 'Machine Design', faculty: ['G. Srinivasa Rao', 'P. Srinivasa Raju'] },
+        { name: 'Thermal Engineering', faculty: ['Siva Kumar Krishnan'] },
       ] },
-      { title: 'Civil Engineering', rows: [
-        { Area: 'Transportation Engineering & Management' },
+      { category: 'Civil Engineering', areas: [
+        { name: 'Transportation Engineering & Management', faculty: ['Pala Gireesh Kumar'] },
       ] },
-      { title: 'Science & Mathematics', rows: [
-        { Area: 'Mathematics' }, { Area: 'Physics' }, { Area: 'Chemistry' },
+      { category: 'Science & Mathematics', areas: [
+        { name: 'Mathematics', faculty: ['Ravi Kiran', 'T. Sree Rama Murthy', 'Yedlapalli Phani', 'R Vasu Babu', 'P. L. R. Kameswari'] },
+        { name: 'Physics', faculty: ['J. V. Srinivasu', 'PS Brahmanandam', 'B V Naveen Kumar'] },
+        { name: 'Chemistry', faculty: ['K. Jagadeesh', 'K Ganesh Kadiyala'] },
       ] },
-      { title: 'Humanities & Management', rows: [
-        { Area: 'English Language Teaching' }, { Area: 'Finance & HRM' },
+      { category: 'Humanities & Management', areas: [
+        { name: 'English Language Teaching', faculty: ['P. Sreehari Raju', 'G. J. V. Prasad'] },
+        { name: 'Finance & HRM', faculty: ['Subba Raju', 'M. Karthik', 'K. V. Rama Murthy'] },
       ] },
     ],
   },
