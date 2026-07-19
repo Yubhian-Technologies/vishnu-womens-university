@@ -26,6 +26,7 @@ import GovernanceItemsAdmin from './sections/GovernanceItemsAdmin';
 import DifferentiatorsAdmin from './sections/DifferentiatorsAdmin';
 import PlacementItemsAdmin from './sections/PlacementItemsAdmin';
 import NewsAwardsDataAdmin from './sections/NewsAwardsDataAdmin';
+import ResearchItemsAdmin from './sections/ResearchItemsAdmin';
 
 interface Props {
   activeSection: string;
@@ -60,6 +61,7 @@ const SECTION_MAP: Record<string, React.ReactNode> = {
   differentiators: <DifferentiatorsAdmin />,
   'placement-items': <PlacementItemsAdmin />,
   'news-awards-data': <NewsAwardsDataAdmin />,
+  'research-items': <ResearchItemsAdmin />,
 };
 
 export default function AdminDashboard({ activeSection, setActiveSection }: Props) {

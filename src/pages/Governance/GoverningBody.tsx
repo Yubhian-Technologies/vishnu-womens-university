@@ -3,7 +3,10 @@ import { motion } from 'framer-motion';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import PageHero from '../../components/PageHero/PageHero';
+import type { GovernanceItemDoc } from '../Admin/sections/GovernanceItemsAdmin';
 import './GoverningBody.css';
+
+const DEFAULT_OVERVIEW = "The Governing Body of Shri Vishnu Engineering College for Women serves as the apex decision-making authority responsible for guiding the institution's vision, strategic planning, academic excellence, and overall development. Comprising representatives from the management, distinguished academicians, industry experts, university nominees, government officials, faculty members, and the Principal, the Governing Body ensures transparent governance, quality education, innovation, and continuous institutional growth while upholding the values and mission of the college.";
 
 export interface GoverningBodyMember {
   id: string;
@@ -68,6 +71,14 @@ function MembersTiles() {
 }
 
 export default function GoverningBody() {
+  // The "Governing Body" entry in the Governance/Committees/IQAC admin
+  // (slug "governing-body") only ever powers this Overview text — its
+  // Members Table field is unused, since the real member list below comes
+  // from the separate `governingBody` collection/admin (with photos).
+  const { docs: govItems } = useOrderedCollection<GovernanceItemDoc>('governanceItems', 'order');
+  const overviewItem = govItems.find((i) => i.slug === 'governing-body');
+  const overviewText = [overviewItem?.intro, overviewItem?.about].filter(Boolean).join(' ') || DEFAULT_OVERVIEW;
+
   useEffect(() => {
     document.title = 'Governing Body | Vishnu Womens University';
     const observer = new IntersectionObserver(
@@ -103,15 +114,14 @@ export default function GoverningBody() {
           <div className="gb-overview__inner reveal">
             <span className="gb-label">Overview</span>
             <h2 className="gb-overview__title">Overview</h2>
-            <p>
-              The Governing Body of Shri Vishnu Engineering College for Women serves as the apex
-              decision-making authority responsible for guiding the institution's vision, strategic
-              planning, academic excellence, and overall development. Comprising representatives from
-              the management, distinguished academicians, industry experts, university nominees,
-              government officials, faculty members, and the Principal, the Governing Body ensures
-              transparent governance, quality education, innovation, and continuous institutional
-              growth while upholding the values and mission of the college.
-            </p>
+            <p>{overviewText}</p>
+            {overviewItem?.highlights && overviewItem.highlights.length > 0 && (
+              <ul style={{ marginTop: 'var(--space-4)', paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                {overviewItem.highlights.map((h) => (
+                  <li key={h} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6 }}>{h}</li>
+                ))}
+              </ul>
+            )}
           </div>
         </div>
       </section>

@@ -3,6 +3,8 @@ import { collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp } from '
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
 import { CONTENT_ICON_NAMES } from '../../../lib/contentIcons';
+import ImageUploader from '../../../components/ImageUploader/ImageUploader';
+import { deleteFile, type UploadResult } from '../../../lib/storage';
 
 export interface PlacementItemDoc {
   id: string;
@@ -18,12 +20,15 @@ export interface PlacementItemDoc {
   outcomes: string[];
   partners: string[];
   tableText: string;
+  heroImage: string;
+  heroStoragePath: string;
   order: number;
 }
 
 const EMPTY: Omit<PlacementItemDoc, 'id'> = {
   slug: '', title: '', icon: 'BarChart3', desc: '', external: false, url: '',
-  intro: '', about: '', highlights: [], outcomes: [], partners: [], tableText: '', order: 0,
+  intro: '', about: '', highlights: [], outcomes: [], partners: [], tableText: '',
+  heroImage: '', heroStoragePath: '', order: 0,
 };
 
 function linesToArray(text: string): string[] {
@@ -40,6 +45,7 @@ export default function PlacementItemsAdmin() {
   const [saving, setSaving] = useState(false);
 
   const set = (k: string, v: string | number | string[] | boolean) => setForm((p) => ({ ...p, [k]: v }));
+  const handleHeroImage = (r: UploadResult) => setForm((p) => ({ ...p, heroImage: r.url, heroStoragePath: r.path }));
 
   const save = async () => {
     if (!form.slug || !form.title) return alert('Slug and title are required.');
@@ -62,13 +68,14 @@ export default function PlacementItemsAdmin() {
       slug: it.slug, title: it.title, icon: it.icon || 'BarChart3', desc: it.desc || '',
       external: !!it.external, url: it.url || '', intro: it.intro || '', about: it.about || '',
       highlights: it.highlights || [], outcomes: it.outcomes || [], partners: it.partners || [],
-      tableText: it.tableText || '', order: it.order,
+      tableText: it.tableText || '', heroImage: it.heroImage || '', heroStoragePath: it.heroStoragePath || '', order: it.order,
     });
   };
 
-  const remove = async (id: string) => {
+  const remove = async (id: string, heroStoragePath?: string) => {
     if (!confirm('Delete this placement page?')) return;
     try {
+      if (heroStoragePath) await deleteFile(heroStoragePath);
       await deleteDoc(doc(db, 'placementItems', id));
     } catch (e) {
       alert(`Couldn't delete: ${(e as Error).message}`);
@@ -112,6 +119,10 @@ export default function PlacementItemsAdmin() {
           <div className="admin-field">
             <label>External URL (only if the box above is checked)</label>
             <input value={form.url} onChange={(e) => set('url', e.target.value)} />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label>Detail Page Hero Image (optional — falls back to the shared "Placement Detail" banner when not set)</label>
+            <ImageUploader folder="vwu/placement-items" currentUrl={form.heroImage} onUploaded={handleHeroImage} label="Upload Hero Image" />
           </div>
           <div className="admin-field admin-field--full">
             <label>Short Description (shown on the listing card)</label>
@@ -162,7 +173,7 @@ export default function PlacementItemsAdmin() {
                     <td>{it.slug}</td>
                     <td>
                       <button className="admin-btn admin-btn--sm" onClick={() => startEdit(it)}>Edit</button>
-                      <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(it.id)}>Delete</button>
+                      <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(it.id, it.heroStoragePath)}>Delete</button>
                     </td>
                   </tr>
                 ))}
