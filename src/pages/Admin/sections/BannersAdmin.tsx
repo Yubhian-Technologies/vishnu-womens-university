@@ -6,6 +6,7 @@ import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
 import ImageUploader from '../../../components/ImageUploader/ImageUploader';
 import type { UploadResult } from '../../../lib/storage';
+import { campusFacilities } from '../../Campus/campusFacilities.data';
 
 interface Banner {
   id: string;
@@ -27,6 +28,8 @@ const EMPTY: Omit<Banner, 'id'> = {
 export const PAGES = [
   { value: 'home',                    label: 'Home' },
   { value: 'academics',               label: 'Academics' },
+  { value: 'academics-curriculum',    label: 'Academics: Curriculum Matrix' },
+  { value: 'academics-downloads',     label: 'Academics: Documents' },
   { value: 'faculty',                 label: 'Faculty' },
   { value: 'admissions',              label: 'Admissions' },
   { value: 'student-life',            label: 'Student Life' },
@@ -35,11 +38,14 @@ export const PAGES = [
   { value: 'about',                   label: 'About VWU' },
   { value: 'about-sves',              label: 'About SVES' },
   { value: 'campus',                  label: 'Campus' },
+  ...campusFacilities.map((f) => ({ value: `campus-${f.slug}`, label: `Campus: ${f.title}` })),
   { value: 'information',             label: 'Information' },
   { value: 'governance',              label: 'Governance' },
   { value: 'governing-body',          label: 'Governing Body' },
-  { value: 'governance-detail',       label: 'Governance Detail Pages (Committees/IQAC)' },
+  { value: 'governance-detail',       label: 'Governance Detail Pages (fallback — used when a Governance/Committees/IQAC item has no image of its own)' },
   { value: 'vision-mission',          label: 'Vision & Mission' },
+  { value: 'news',                    label: 'News' },
+  { value: 'events',                  label: 'Events' },
   { value: 'news-awards',             label: 'News & Awards' },
   { value: 'news-awards-happenings',  label: 'Happenings' },
   { value: 'news-awards-accreditations', label: 'Accreditations' },
@@ -48,6 +54,7 @@ export const PAGES = [
   { value: 'admission-procedure',     label: 'Admission Procedure' },
   { value: 'result-analysis',         label: 'Result Analysis' },
   { value: 'differentiators',         label: 'Differentiators' },
+  { value: 'research',                label: 'Research' },
   { value: 'student-clubs',           label: 'Student Clubs' },
   { value: 'arts-culture',            label: 'Arts & Culture' },
   { value: 'social-services',         label: 'Social Services' },
@@ -56,8 +63,8 @@ export const PAGES = [
   { value: 'vishnu-tv',               label: 'Vishnu TV' },
   { value: 'careers',                 label: 'Careers' },
   { value: 'contact',                 label: 'Contact Us' },
-  { value: 'program-detail',          label: 'Program Pages' },
-  { value: 'placement-detail',        label: 'Placement Detail' },
+  { value: 'program-detail',          label: 'Program Pages (fallback — only shows on programs with no image set in Programs admin)' },
+  { value: 'placement-detail',        label: 'Placement Detail (fallback — used when a placement sub-page has no image of its own)' },
 ];
 
 export default function BannersAdmin() {

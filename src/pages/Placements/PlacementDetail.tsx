@@ -55,8 +55,12 @@ export default function PlacementDetail() {
   const { slug } = useParams<{ slug: string }>();
   const { docs: allItems, loading } = useOrderedCollection<PlacementItemDoc>('placementItems', 'order');
   const item = allItems.find((i) => i.slug === slug) ?? null;
+  // Each item can have its own hero image (set in the Placement Sub-pages
+  // admin); falls back to the one shared "Placement Detail" banner, then a
+  // hardcoded default — so a page never looks broken while an admin is
+  // still filling in per-item images.
   const { slides: heroSlides } = usePageBanners('placement-detail');
-  const heroImage = heroSlides[0]?.imageUrl || DEFAULT_HERO_IMAGE;
+  const heroImage = item?.heroImage || heroSlides[0]?.imageUrl || DEFAULT_HERO_IMAGE;
 
   // No scroll-reveal here — this page's content only renders once the
   // Firestore-backed `item` has loaded (see the gotcha documented in CLAUDE.md).

@@ -3,6 +3,7 @@ import { MapPin, CheckCircle2 } from 'lucide-react';
 import './Contact.css';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
+import { usePageBanner } from '../../hooks/usePageBanner';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import type { ContactDoc } from '../Admin/sections/ContactsAdmin';
 
@@ -34,6 +35,7 @@ export default function Contact() {
   const { docs: deptContacts } = useOrderedCollection<ContactDoc>('contacts', 'order');
   const infoCards = useContentBlocks('contact', 'infoCards');
   const socialLinks = useContentBlocks('contact', 'socialLinks');
+  const banner = usePageBanner('contact');
   const [form, setForm] = useState<ContactForm>(INITIAL_FORM);
   const [submitted, setSubmitted] = useState(false);
   const revealRefs = useRef<(HTMLElement | null)[]>([]);
@@ -76,14 +78,19 @@ export default function Contact() {
 
   return (
     <main className="contact-page">
-      {/* Hero */}
+      {/* Hero — admin-uploaded banner (page="contact") overrides title/
+          subtitle/image when present; otherwise falls back to the defaults
+          below, so this never looks broken while an admin edits it. */}
       <section className="contact-hero">
-        <div className="contact-hero__overlay" />
+        <div
+          className="contact-hero__overlay"
+          style={banner?.imageUrl ? { backgroundImage: `url(${banner.imageUrl})` } : undefined}
+        />
         <div className="contact-hero__content">
           <p className="contact-hero__eyebrow">Get in Touch</p>
-          <h1 className="contact-hero__title">Contact Us</h1>
+          <h1 className="contact-hero__title">{banner?.title || 'Contact Us'}</h1>
           <p className="contact-hero__sub">
-            We're happy to assist. Contact us for admissions information, general enquiries, or anything else on your mind.
+            {banner?.subtitle || "We're happy to assist. Contact us for admissions information, general enquiries, or anything else on your mind."}
           </p>
         </div>
       </section>

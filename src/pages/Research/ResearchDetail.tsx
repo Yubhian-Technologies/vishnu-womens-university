@@ -1,60 +1,61 @@
 import { useEffect } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
-import { Sparkles } from 'lucide-react';
-import { findResearchItemBySlug, ResearchTableRow } from './research.data';
+import { Sparkles, Microscope } from 'lucide-react';
+import { useOrderedCollection } from '../../hooks/useCollection';
+import { resolveContentIcon } from '../../lib/contentIcons';
+import { parseFlexibleTable } from '../../lib/structuredTable';
+import type { ResearchItemDoc } from '../Admin/sections/ResearchItemsAdmin';
 import '../detail-layout.css';
+
+const DEFAULT_HERO_IMAGE = 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=1920&q=80';
+
+const CATEGORY_LABELS: Record<string, string> = {
+  governance: 'R&D Governance',
+  output: 'Research Output',
+  engagement: 'Industry & Professional Engagement',
+};
 
 export default function ResearchDetail() {
   const { slug } = useParams<{ slug: string }>();
-  const item = slug ? findResearchItemBySlug(slug) : null;
+  const { docs: allItems, loading } = useOrderedCollection<ResearchItemDoc>('researchItems', 'order');
+  const item = allItems.find((i) => i.slug === slug) ?? null;
 
+  // No scroll-reveal here — this whole page's content (including the hero
+  // title) only renders once the Firestore-backed `item` has loaded, so any
+  // .reveal/IntersectionObserver setup would be racing async data on every
+  // navigation (see the gotcha documented in CLAUDE.md).
   useEffect(() => {
     if (item) document.title = `${item.title} | Vishnu Womens University`;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const el = entry.target as HTMLElement;
-            setTimeout(() => el.classList.add('revealed'), parseInt(el.dataset.delay || '0'));
-            observer.unobserve(el);
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-    document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
   }, [item]);
 
-  if (!item) return <Navigate to="/research" replace />;
+  if (!item) {
+    if (loading) return null;
+    return <Navigate to="/research" replace />;
+  }
 
-  const categoryLabel =
-    item.category === 'governance' ? 'R&D Governance'
-    : item.category === 'output' ? 'Research Output'
-    : 'Industry & Professional Engagement';
+  const Icon = resolveContentIcon(item.icon) || Microscope;
+  const categoryLabel = CATEGORY_LABELS[item.category] || item.category;
+  const heroImage = item.heroImage || DEFAULT_HERO_IMAGE;
+  const tableSections = parseFlexibleTable(item.tableText).filter((s) => s.headers.length > 0);
 
   return (
     <main className="page-wrapper">
       {/* Hero */}
       <section className="page-hero" style={{ minHeight: 340 }}>
-        <img
-          src="https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=1920&q=80"
-          alt={item.title}
-          className="page-hero-image"
-        />
+        <img src={heroImage} alt={item.title} className="page-hero-image" />
         <div className="page-hero-overlay" />
         <div className="container page-hero-content">
-          <div className="breadcrumb animate-fade-in">
+          <div className="breadcrumb">
             <Link to="/" className="breadcrumb-item">Home</Link>
             <span className="breadcrumb-sep">›</span>
             <Link to="/research" className="breadcrumb-item">Research & Development</Link>
             <span className="breadcrumb-sep">›</span>
             <span className="breadcrumb-item active">{item.title}</span>
           </div>
-          <div className="animate-fade-in-up" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'var(--color-accent)', color: 'var(--color-white)', fontSize: 'var(--text-xs)', fontWeight: 700, padding: '0.3rem 0.9rem', borderRadius: 'var(--radius-full)', marginBottom: 'var(--space-3)' }}>
-            <item.icon size={14} /> {categoryLabel}
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'var(--color-accent)', color: 'var(--color-white)', fontSize: 'var(--text-xs)', fontWeight: 700, padding: '0.3rem 0.9rem', borderRadius: 'var(--radius-full)', marginBottom: 'var(--space-3)' }}>
+            <Icon size={14} /> {categoryLabel}
           </div>
-          <h1 className="animate-fade-in-up">{item.title}</h1>
+          <h1>{item.title}</h1>
         </div>
       </section>
 
@@ -62,7 +63,7 @@ export default function ResearchDetail() {
       <section className="section bg-white">
         <div className="container">
           <div className={item.highlights && item.highlights.length > 0 ? 'detail-grid' : ''}>
-            <div className="reveal">
+            <div>
               <span className="section-label">Overview</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>About {item.title}</h2>
               {item.intro && (
@@ -83,7 +84,7 @@ export default function ResearchDetail() {
             </div>
 
             {item.highlights && item.highlights.length > 0 && (
-              <div className="reveal detail-sidebar" data-delay="100">
+              <div className="detail-sidebar">
                 <div style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', position: 'sticky', top: '110px' }}>
                   <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-4)' }}>
                     Key Highlights
@@ -105,74 +106,40 @@ export default function ResearchDetail() {
         </div>
       </section>
 
-      {/* Single Table */}
-      {item.tableData && item.tableData.length > 0 && (
+      {/* Data table(s) — a single unnamed section renders as one table under
+          the item's own title; multiple named sections (e.g. Patents grouped
+          by year) each get their own sub-heading. */}
+      {tableSections.length > 0 && (
         <section className="section bg-off-white">
           <div className="container">
-            <div className="reveal" style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label">Details</span>
-              <h2 className="section-title" style={{ fontSize: '1.75rem' }}>
-                {item.title}
-              </h2>
-            </div>
-            <div className="reveal" style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm)' }}>
-                <thead>
-                  <tr style={{ background: 'var(--color-primary)' }}>
-                    {Object.keys(item.tableData[0]).map((col) => (
-                      <th key={col} style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'left', color: 'var(--color-white)', fontWeight: 700, whiteSpace: 'nowrap' }}>
-                        {col}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {item.tableData.map((row: ResearchTableRow, i: number) => (
-                    <tr key={i} style={{ background: i % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)', borderBottom: '1px solid var(--color-light-gray)' }}>
-                      {Object.values(row).map((val, j) => (
-                        <td key={j} style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)', lineHeight: 1.5 }}>
-                          {String(val)}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Multi-section Tables (Thrust Areas, MoUs, Patents) */}
-      {item.tableSections && item.tableSections.length > 0 && (
-        <section className="section bg-off-white">
-          <div className="container">
-            <div className="reveal" style={{ marginBottom: 'var(--space-8)' }}>
+            <div style={{ marginBottom: 'var(--space-8)' }}>
               <span className="section-label">Details</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>{item.title}</h2>
             </div>
-            {item.tableSections.map((section, si) => (
-              <div key={section.title} className="reveal" data-delay={`${si * 40}`} style={{ marginBottom: 'var(--space-10)' }}>
-                <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>
-                  {section.title}
-                </h3>
+            {tableSections.map((section, si) => (
+              <div key={si} style={{ marginBottom: si < tableSections.length - 1 ? 'var(--space-10)' : 0 }}>
+                {section.title && (
+                  <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>
+                    {section.title}
+                  </h3>
+                )}
                 <div style={{ overflowX: 'auto' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm)' }}>
                     <thead>
                       <tr style={{ background: 'var(--color-primary)' }}>
-                        {Object.keys(section.rows[0]).map((col) => (
-                          <th key={col} style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'left', color: 'var(--color-white)', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                        {section.headers.map((col, ci) => (
+                          <th key={ci} style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'left', color: 'var(--color-white)', fontWeight: 700, whiteSpace: 'nowrap' }}>
                             {col}
                           </th>
                         ))}
                       </tr>
                     </thead>
                     <tbody>
-                      {section.rows.map((row: ResearchTableRow, i: number) => (
+                      {section.rows.map((row, i) => (
                         <tr key={i} style={{ background: i % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)', borderBottom: '1px solid var(--color-light-gray)' }}>
-                          {Object.values(row).map((val, j) => (
+                          {row.map((val, j) => (
                             <td key={j} style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)', lineHeight: 1.5 }}>
-                              {String(val)}
+                              {val}
                             </td>
                           ))}
                         </tr>
@@ -189,7 +156,7 @@ export default function ResearchDetail() {
       {/* CTA */}
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-14) 0' }}>
         <div className="container" style={{ textAlign: 'center' }}>
-          <div className="reveal">
+          <div>
             <span className="section-label" style={{ color: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', gap: '0.4rem', justifyContent: 'center' }}>
               <Sparkles size={14} /> Research at VWU
             </span>

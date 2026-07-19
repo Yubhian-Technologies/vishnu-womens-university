@@ -34,6 +34,7 @@ export const SECTIONS = [
   { id: 'differentiators', icon: '✨', label: 'Differentiators' },
   { id: 'placement-items', icon: '📈', label: 'Placement Sub-pages' },
   { id: 'news-awards-data', icon: '🏆', label: 'Happenings & Awards' },
+  { id: 'research-items', icon: '🔬', label: 'Research' },
 ];
 
 // Groups the flat SECTIONS list under headers in the desktop sidebar only —
@@ -53,6 +54,7 @@ export const SECTION_GROUPS: { label: string; ids: string[] }[] = [
   { label: 'Student Life', ids: ['student-clubs', 'faqs', 'job-openings', 'events'] },
   { label: 'Placements & Careers', ids: ['placements', 'placement-items'] },
   { label: 'Differentiators', ids: ['differentiators'] },
+  { label: 'Research', ids: ['research-items'] },
   { label: 'News & Awards', ids: ['news', 'gallery', 'news-awards-data', 'announcements'] },
   { label: 'Alumni & Giving', ids: ['alumni'] },
 ];

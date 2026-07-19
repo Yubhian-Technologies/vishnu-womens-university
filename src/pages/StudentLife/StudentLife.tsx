@@ -108,11 +108,34 @@ export default function StudentLife() {
           <div className="sl-clubs-grid">
             {clubs.map((club) => {
               const Icon = resolveContentIcon(club.icon) || Radio;
-              return (
-                <div key={club.id} className="sl-club-card">
+              const cardInner = (
+                <>
                   <div className="sl-club-icon"><Icon size={40} strokeWidth={1.75} /></div>
                   <h3>{club.title}</h3>
                   <span>{club.value}</span>
+                </>
+              );
+              // "slug" is repurposed here as a click-through link — an
+              // external https:// URL (e.g. Radio Vishnu's own site) or an
+              // internal /path (e.g. the dedicated Campus Magazines page for
+              // Prathibha). No link set just stays a plain, unlinked card.
+              if (club.slug?.startsWith('http')) {
+                return (
+                  <a key={club.id} href={club.slug} target="_blank" rel="noopener noreferrer" className="sl-club-card sl-club-card--link">
+                    {cardInner}
+                  </a>
+                );
+              }
+              if (club.slug) {
+                return (
+                  <Link key={club.id} to={club.slug} className="sl-club-card sl-club-card--link">
+                    {cardInner}
+                  </Link>
+                );
+              }
+              return (
+                <div key={club.id} className="sl-club-card">
+                  {cardInner}
                 </div>
               );
             })}

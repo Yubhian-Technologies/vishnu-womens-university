@@ -163,7 +163,7 @@ export default function ContentBlocksAdmin() {
             </select>
           </div>
           <div className="admin-field">
-            <label>Anchor Slug / Extra field (only if this item needs a #link — or the avatar URL for Home Testimonials, or a second meta line for Contact Info Cards)</label>
+            <label>Anchor Slug / Extra field (only if this item needs a #link — or the avatar URL for Home Testimonials, a second meta line for Contact Info Cards, or the click-through link for Student Life Clubs — an external https:// URL or an internal /path)</label>
             <input value={form.slug} onChange={(e) => set('slug', e.target.value)} placeholder="smart-classrooms" />
           </div>
           <div className="admin-field">
