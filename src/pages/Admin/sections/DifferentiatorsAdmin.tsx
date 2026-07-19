@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
+import ImageUploader from '../../../components/ImageUploader/ImageUploader';
+import { deleteFile, type UploadResult } from '../../../lib/storage';
 
 export interface DifferentiatorItemDoc {
   id: string;
@@ -17,12 +19,15 @@ export interface DifferentiatorItemDoc {
   facilities: string[];
   outcomes: string[];
   partners: string[];
+  heroImage: string;
+  heroStoragePath: string;
   order: number;
 }
 
 const EMPTY: Omit<DifferentiatorItemDoc, 'id'> = {
   slug: '', title: '', category: 'innovation', desc: '', external: false, url: '',
-  highlights: [], intro: '', about: '', facilities: [], outcomes: [], partners: [], order: 0,
+  highlights: [], intro: '', about: '', facilities: [], outcomes: [], partners: [],
+  heroImage: '', heroStoragePath: '', order: 0,
 };
 
 export const DIFFERENTIATOR_CATEGORIES = [
@@ -48,6 +53,7 @@ export default function DifferentiatorsAdmin() {
   const [filterCat, setFilterCat] = useState('All');
 
   const set = (k: string, v: string | number | string[] | boolean) => setForm((p) => ({ ...p, [k]: v }));
+  const handleHeroImage = (r: UploadResult) => setForm((p) => ({ ...p, heroImage: r.url, heroStoragePath: r.path }));
 
   const save = async () => {
     if (!form.slug || !form.title) return alert('Slug and title are required.');
@@ -70,13 +76,15 @@ export default function DifferentiatorsAdmin() {
       slug: it.slug, title: it.title, category: it.category, desc: it.desc || '',
       external: !!it.external, url: it.url || '', highlights: it.highlights || [],
       intro: it.intro || '', about: it.about || '', facilities: it.facilities || [],
-      outcomes: it.outcomes || [], partners: it.partners || [], order: it.order,
+      outcomes: it.outcomes || [], partners: it.partners || [],
+      heroImage: it.heroImage || '', heroStoragePath: it.heroStoragePath || '', order: it.order,
     });
   };
 
-  const remove = async (id: string) => {
+  const remove = async (id: string, heroStoragePath?: string) => {
     if (!confirm('Delete this differentiator item?')) return;
     try {
+      if (heroStoragePath) await deleteFile(heroStoragePath);
       await deleteDoc(doc(db, 'differentiatorItems', id));
     } catch (e) {
       alert(`Couldn't delete: ${(e as Error).message}`);
@@ -117,6 +125,10 @@ export default function DifferentiatorsAdmin() {
           <div className="admin-field">
             <label>External URL (only if the box above is checked)</label>
             <input value={form.url} onChange={(e) => set('url', e.target.value)} placeholder="https://www.vishva.co/" />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label>Detail Page Hero Image (optional — falls back to a shared category image when not set)</label>
+            <ImageUploader folder="vwu/differentiators" currentUrl={form.heroImage} onUploaded={handleHeroImage} label="Upload Hero Image" />
           </div>
           <div className="admin-field admin-field--full">
             <label>Short Description (shown on the listing card)</label>
@@ -174,7 +186,7 @@ export default function DifferentiatorsAdmin() {
                     <td>{it.slug}</td>
                     <td>
                       <button className="admin-btn admin-btn--sm" onClick={() => startEdit(it)}>Edit</button>
-                      <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(it.id)}>Delete</button>
+                      <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(it.id, it.heroStoragePath)}>Delete</button>
                     </td>
                   </tr>
                 ))}

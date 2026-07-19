@@ -6,32 +6,32 @@ import { CONTENT_ICON_NAMES } from '../../../lib/contentIcons';
 import ImageUploader from '../../../components/ImageUploader/ImageUploader';
 import { deleteFile, type UploadResult } from '../../../lib/storage';
 
-export interface GovernanceItemDoc {
+export interface ResearchItemDoc {
   id: string;
   slug: string;
   title: string;
-  category: 'governance' | 'committees' | 'iqac';
+  category: 'governance' | 'output' | 'engagement';
   icon: string;
   desc: string;
   intro: string;
   about: string;
   highlights: string[];
-  outcomes: string[];
   tableText: string;
+  accordionText: string;
   heroImage: string;
   heroStoragePath: string;
   order: number;
 }
 
-const EMPTY: Omit<GovernanceItemDoc, 'id'> = {
-  slug: '', title: '', category: 'governance', icon: 'Landmark', desc: '', intro: '', about: '',
-  highlights: [], outcomes: [], tableText: '', heroImage: '', heroStoragePath: '', order: 0,
+const EMPTY: Omit<ResearchItemDoc, 'id'> = {
+  slug: '', title: '', category: 'governance', icon: 'Microscope', desc: '', intro: '', about: '',
+  highlights: [], tableText: '', accordionText: '', heroImage: '', heroStoragePath: '', order: 0,
 };
 
-const CATEGORIES: { value: GovernanceItemDoc['category']; label: string }[] = [
-  { value: 'governance', label: 'Governance' },
-  { value: 'committees', label: 'Committees' },
-  { value: 'iqac', label: 'IQAC' },
+const CATEGORIES: { value: ResearchItemDoc['category']; label: string }[] = [
+  { value: 'governance', label: 'R&D Governance' },
+  { value: 'output', label: 'Research Output' },
+  { value: 'engagement', label: 'Industry & Professional Engagement' },
 ];
 
 function linesToArray(text: string): string[] {
@@ -41,9 +41,9 @@ function arrayToLines(arr: string[] = []): string {
   return arr.join('\n');
 }
 
-export default function GovernanceItemsAdmin() {
-  const { docs: items, loading } = useOrderedCollection<GovernanceItemDoc>('governanceItems', 'order');
-  const [form, setForm] = useState<Omit<GovernanceItemDoc, 'id'>>(EMPTY);
+export default function ResearchItemsAdmin() {
+  const { docs: items, loading } = useOrderedCollection<ResearchItemDoc>('researchItems', 'order');
+  const [form, setForm] = useState<Omit<ResearchItemDoc, 'id'>>(EMPTY);
   const [editing, setEditing] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [filterCat, setFilterCat] = useState<string>('All');
@@ -56,9 +56,9 @@ export default function GovernanceItemsAdmin() {
     setSaving(true);
     try {
       if (editing) {
-        await updateDoc(doc(db, 'governanceItems', editing), { ...form });
+        await updateDoc(doc(db, 'researchItems', editing), { ...form });
       } else {
-        await addDoc(collection(db, 'governanceItems'), { ...form, order: form.order || items.length + 1, createdAt: serverTimestamp() });
+        await addDoc(collection(db, 'researchItems'), { ...form, order: form.order || items.length + 1, createdAt: serverTimestamp() });
       }
       setForm(EMPTY); setEditing(null);
     } catch (e) {
@@ -66,21 +66,21 @@ export default function GovernanceItemsAdmin() {
     } finally { setSaving(false); }
   };
 
-  const startEdit = (it: GovernanceItemDoc) => {
+  const startEdit = (it: ResearchItemDoc) => {
     setEditing(it.id);
     setForm({
-      slug: it.slug, title: it.title, category: it.category, icon: it.icon || 'Landmark',
+      slug: it.slug, title: it.title, category: it.category, icon: it.icon || 'Microscope',
       desc: it.desc || '', intro: it.intro || '', about: it.about || '',
-      highlights: it.highlights || [], outcomes: it.outcomes || [], tableText: it.tableText || '',
+      highlights: it.highlights || [], tableText: it.tableText || '', accordionText: it.accordionText || '',
       heroImage: it.heroImage || '', heroStoragePath: it.heroStoragePath || '', order: it.order,
     });
   };
 
   const remove = async (id: string, heroStoragePath?: string) => {
-    if (!confirm('Delete this governance item?')) return;
+    if (!confirm('Delete this research item?')) return;
     try {
       if (heroStoragePath) await deleteFile(heroStoragePath);
-      await deleteDoc(doc(db, 'governanceItems', id));
+      await deleteDoc(doc(db, 'researchItems', id));
     } catch (e) {
       alert(`Couldn't delete: ${(e as Error).message}`);
     }
@@ -91,29 +91,22 @@ export default function GovernanceItemsAdmin() {
   return (
     <div className="admin-section">
       <div className="admin-card">
-        <h2 className="admin-card__title">{editing ? 'Edit Governance Item' : 'Add Governance Item'}</h2>
+        <h2 className="admin-card__title">{editing ? 'Edit Research Item' : 'Add Research Item'}</h2>
         <p className="admin-lead" style={{ marginBottom: '1rem' }}>
-          Powers the Statutory menu's Governance / Committees / IQAC sub-pages. The Members table below is edited
-          as plain text: put each person on their own line as <code>Name | Role | Notes</code> (Notes is optional).
-          For pages with multiple named tables (like Board of Studies), start each one with a line like{' '}
-          <code>## Computer Science &amp; Engineering</code>.
+          Powers the Research menu's R&D Governance / Research Output / Industry &amp; Professional Engagement
+          sub-pages. The Data Table below is edited as plain text: the first line is the column headers, every
+          line after it is one row of data, with cells separated by <code>|</code> — e.g. <code>Name | Role</code>{' '}
+          then <code>Dr. G. Srinivasa Rao | Chairman</code>. For pages with multiple named tables (like Patents,
+          grouped by year), start each one with a line like <code>## 2024</code>.
         </p>
-        {form.slug === 'governing-body' && (
-          <p className="admin-field__hint" style={{ background: '#fff8e6', border: '1px solid #f0d896', borderRadius: 6, padding: '0.6rem 0.9rem', marginBottom: '1rem' }}>
-            <strong>Note:</strong> this entry is special. Its Intro/About/Highlights below do show, on the live{' '}
-            <em>Governing Body</em> page's Overview section — but its Members Table does not. The actual member
-            list and photos for that page are managed separately, in the <strong>Governing Body</strong> admin
-            section (in the sidebar), not here.
-          </p>
-        )}
         <div className="admin-form-grid">
           <div className="admin-field">
-            <label>URL Slug * (used in the page link, e.g. governing-body)</label>
-            <input value={form.slug} onChange={(e) => set('slug', e.target.value.trim().toLowerCase().replace(/\s+/g, '-'))} placeholder="governing-body" />
+            <label>URL Slug * (used in the page link, e.g. research-advisory-committee)</label>
+            <input value={form.slug} onChange={(e) => set('slug', e.target.value.trim().toLowerCase().replace(/\s+/g, '-'))} placeholder="research-advisory-committee" />
           </div>
           <div className="admin-field">
             <label>Title *</label>
-            <input value={form.title} onChange={(e) => set('title', e.target.value)} placeholder="Governing Body" />
+            <input value={form.title} onChange={(e) => set('title', e.target.value)} placeholder="Research Advisory Committee" />
           </div>
           <div className="admin-field">
             <label>Category *</label>
@@ -132,11 +125,11 @@ export default function GovernanceItemsAdmin() {
             <input type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
           </div>
           <div className="admin-field admin-field--full">
-            <label>Detail Page Hero Image (optional — falls back to the shared "Governance Detail Pages" banner when not set)</label>
-            <ImageUploader folder="vwu/governance-items" currentUrl={form.heroImage} onUploaded={handleHeroImage} label="Upload Hero Image" />
+            <label>Detail Page Hero Image (optional — falls back to a shared default when not set)</label>
+            <ImageUploader folder="vwu/research-items" currentUrl={form.heroImage} onUploaded={handleHeroImage} label="Upload Hero Image" />
           </div>
           <div className="admin-field admin-field--full">
-            <label>Short Description (shown on the Governance listing card)</label>
+            <label>Short Description (shown on the Research listing card)</label>
             <textarea rows={2} value={form.desc} onChange={(e) => set('desc', e.target.value)} placeholder="One or two sentences…" />
           </div>
           <div className="admin-field admin-field--full">
@@ -144,20 +137,28 @@ export default function GovernanceItemsAdmin() {
             <textarea rows={3} value={form.intro} onChange={(e) => set('intro', e.target.value)} />
           </div>
           <div className="admin-field admin-field--full">
-            <label>About (longer detail paragraph)</label>
+            <label>About (longer detail paragraph — optional)</label>
             <textarea rows={4} value={form.about} onChange={(e) => set('about', e.target.value)} />
           </div>
           <div className="admin-field admin-field--full">
-            <label>Key Highlights (one per line)</label>
-            <textarea rows={5} value={arrayToLines(form.highlights)} onChange={(e) => set('highlights', linesToArray(e.target.value))} />
+            <label>Key Highlights (one per line — optional)</label>
+            <textarea rows={4} value={arrayToLines(form.highlights)} onChange={(e) => set('highlights', linesToArray(e.target.value))} />
           </div>
           <div className="admin-field admin-field--full">
-            <label>Outcomes & Achievements (one per line — optional)</label>
-            <textarea rows={4} value={arrayToLines(form.outcomes)} onChange={(e) => set('outcomes', linesToArray(e.target.value))} />
+            <label>Data Table (optional — see format above)</label>
+            <textarea rows={8} value={form.tableText} onChange={(e) => set('tableText', e.target.value)} placeholder={'Name | Role\nDr. G. Srinivasa Rao | Chairman\nProf. P. Venkata Rama Raju | Member'} />
           </div>
           <div className="admin-field admin-field--full">
-            <label>Members Table (optional — see format above)</label>
-            <textarea rows={8} value={form.tableText} onChange={(e) => set('tableText', e.target.value)} placeholder={'Dr. G. Srinivasa Rao | Principal (Chairman)\nProf. P. Venkata Rama Raju | Vice-Principal'} />
+            <label>Expandable Areas (optional — for pages like Thrust Areas of Research that group into
+              categories of collapsible areas instead of a table). Start each category with{' '}
+              <code>## Category</code>, each expandable area within it with <code>### Area Name</code>, then list
+              one item per line underneath (e.g. faculty names) — they'll render as a click-to-expand accordion.</label>
+            <textarea
+              rows={10}
+              value={form.accordionText}
+              onChange={(e) => set('accordionText', e.target.value)}
+              placeholder={'## Computing & AI\n### Machine Learning\nK. Padma Vasavi\nA. Sri Krishna\n### Deep Learning\nK. Padma Vasavi'}
+            />
           </div>
         </div>
         <div className="admin-form-actions">
@@ -183,7 +184,7 @@ export default function GovernanceItemsAdmin() {
                   <tr key={it.id}>
                     <td>{it.order}</td>
                     <td>{it.title}</td>
-                    <td>{it.category}</td>
+                    <td>{CATEGORIES.find((c) => c.value === it.category)?.label ?? it.category}</td>
                     <td>{it.slug}</td>
                     <td>
                       <button className="admin-btn admin-btn--sm" onClick={() => startEdit(it)}>Edit</button>
@@ -191,7 +192,7 @@ export default function GovernanceItemsAdmin() {
                     </td>
                   </tr>
                 ))}
-                {filtered.length === 0 && <tr><td colSpan={5} className="admin-empty">No governance items yet.</td></tr>}
+                {filtered.length === 0 && <tr><td colSpan={5} className="admin-empty">No research items yet.</td></tr>}
               </tbody>
             </table>
           </div>

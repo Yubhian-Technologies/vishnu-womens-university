@@ -6,7 +6,7 @@ import {
   Mail, Building2, Phone, Printer, NotebookPen, CreditCard, Users, Target, Globe, Radio, Tv, HeartHandshake,
   Library, Shield, HelpCircle, ShieldCheck, Recycle, Car, Train, Plane, Info, Layers, Rocket, Wrench,
   Sprout, Bot, Brain, Volleyball, CircleDot, Swords, Disc, Crown, TrainFront, Scale,
-  Search, Construction, Megaphone, ShoppingCart, MessageCircle, Settings, Flag, Compass,
+  Search, Construction, Megaphone, ShoppingCart, MessageCircle, Settings, Flag, Compass, UsersRound,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -21,7 +21,7 @@ export const CONTENT_ICONS: Record<string, LucideIcon> = {
   Mail, Building2, Phone, Printer, NotebookPen, CreditCard, Users, Target, Globe, Radio, Tv, HeartHandshake,
   Library, Shield, HelpCircle, ShieldCheck, Recycle, Car, Train, Plane, Info, Layers, Rocket, Wrench,
   Sprout, Bot, Brain, Volleyball, CircleDot, Swords, Disc, Crown, TrainFront, Scale,
-  Search, Construction, Megaphone, ShoppingCart, MessageCircle, Settings, Flag, Compass,
+  Search, Construction, Megaphone, ShoppingCart, MessageCircle, Settings, Flag, Compass, UsersRound,
 };
 
 export const CONTENT_ICON_NAMES = Object.keys(CONTENT_ICONS);

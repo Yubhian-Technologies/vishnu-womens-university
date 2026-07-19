@@ -36,7 +36,7 @@ export default function DifferentiatorDetail() {
   }
 
   const CategoryIcon = CATEGORY_ICONS[category.id] || Rocket;
-  const heroImage = CATEGORY_HERO_IMAGES[category.id] || CATEGORY_HERO_IMAGES.innovation;
+  const heroImage = item.heroImage || CATEGORY_HERO_IMAGES[category.id] || CATEGORY_HERO_IMAGES.innovation;
 
   return (
     <main className="page-wrapper">

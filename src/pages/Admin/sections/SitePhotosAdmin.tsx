@@ -5,8 +5,9 @@ import {
 } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
-import { uploadImage, deleteFile } from '../../../lib/storage';
+import { deleteFile, type UploadResult } from '../../../lib/storage';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../../lib/photoPlaceholder';
+import { useImageCropModal } from '../../../components/ImageUploader/useImageCropModal';
 
 export interface SitePhotoDoc {
   id: string;
@@ -394,6 +395,11 @@ export default function SitePhotosAdmin() {
   const [textForm, setTextForm] = useState({ alt: '', caption: '' });
   const [savingText, setSavingText] = useState(false);
   const [addingExtra, setAddingExtra] = useState(false);
+  // Every "Replace Image" / "Add More Photos" upload here goes through this
+  // one shared crop step — previously these bypassed cropping entirely and
+  // uploaded the raw file as-is, so a photo that didn't already match the
+  // slot's aspect ratio would look stretched/off on the public site.
+  const { openCrop, cropModal } = useImageCropModal();
 
   const currentCategory = NAV_CATEGORIES.find((c) => c.label === selectedNavCategory);
   const categoryPages = currentCategory?.pages ?? [];
@@ -443,11 +449,10 @@ export default function SitePhotosAdmin() {
   // (page, section, slot) — every other slot, sub-section, and page is
   // untouched, so the rest of the gallery (live or still-default) never
   // disappears.
-  const replaceSlot = async (slotIndex: number, file: File) => {
+  const finishReplaceSlot = async (slotIndex: number, result: UploadResult, fileName: string) => {
     setUploadingSlot(slotIndex);
     try {
       const existing = byOrder.get(slotIndex);
-      const result = await uploadImage(file, `vwu/site-photos/${activePage}/${selectedSection}`);
       if (existing) {
         await deleteFile(existing.storagePath);
         await updateDoc(doc(db, 'sitePhotos', existing.id), {
@@ -461,7 +466,7 @@ export default function SitePhotosAdmin() {
           section: selectedSection,
           imageUrl: result.url,
           storagePath: result.path,
-          alt: def?.alt ?? file.name,
+          alt: def?.alt ?? fileName,
           caption: def?.caption ?? '',
           order: slotIndex,
           createdAt: serverTimestamp(),
@@ -472,6 +477,11 @@ export default function SitePhotosAdmin() {
     } finally {
       setUploadingSlot(null);
     }
+  };
+
+  const replaceSlot = (slotIndex: number, file: File) => {
+    openCrop(file, `vwu/site-photos/${activePage}/${selectedSection}`, (result) =>
+      finishReplaceSlot(slotIndex, result, file.name));
   };
 
   const resetSlot = async (slotIndex: number) => {
@@ -520,15 +530,15 @@ export default function SitePhotosAdmin() {
     }
   };
 
-  // Appends brand-new photos beyond the default set — additive only, never
-  // touches an existing slot, another sub-section, or another page's docs.
-  const addExtraPhotos = async (files: FileList | null) => {
-    if (!files || files.length === 0) return;
+  // Appends one brand-new photo beyond the default set — additive only,
+  // never touches an existing slot, another sub-section, or another page's
+  // docs. One at a time (rather than the old multi-file picker) since each
+  // photo needs its own crop step — click "Add a Photo" again for another.
+  const addExtraPhoto = (file: File) => {
     setAddingExtra(true);
-    try {
-      let nextOrder = Math.max(defaults.length - 1, ...scopedPhotos.map((p) => p.order), -1) + 1;
-      for (const file of Array.from(files)) {
-        const result = await uploadImage(file, `vwu/site-photos/${activePage}/${selectedSection}`);
+    openCrop(file, `vwu/site-photos/${activePage}/${selectedSection}`, async (result) => {
+      try {
+        const nextOrder = Math.max(defaults.length - 1, ...scopedPhotos.map((p) => p.order), -1) + 1;
         const alt = file.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
         await addDoc(collection(db, 'sitePhotos'), {
           page: activePage,
@@ -537,15 +547,15 @@ export default function SitePhotosAdmin() {
           storagePath: result.path,
           alt,
           caption: '',
-          order: nextOrder++,
+          order: nextOrder,
           createdAt: serverTimestamp(),
         });
+      } catch (e) {
+        alert(`Couldn't add photo: ${(e as Error).message}`);
+      } finally {
+        setAddingExtra(false);
       }
-    } catch (e) {
-      alert(`Couldn't add photo: ${(e as Error).message}`);
-    } finally {
-      setAddingExtra(false);
-    }
+    });
   };
 
   const removeExtra = async (p: SitePhotoDoc) => {
@@ -618,14 +628,23 @@ export default function SitePhotosAdmin() {
           </p>
         )}
 
-        {categoryPages.length > 0 && (
-          <div className="admin-field" style={{ marginTop: '1.25rem', maxWidth: 360 }}>
-            <label>Sub-section</label>
-            <select value={selectedSection} onChange={(e) => selectSection(e.target.value)}>
+        {categoryPages.length > 0 && sectionKeys.length > 0 && (
+          <div className="admin-page-selector" style={{ marginTop: '1.25rem' }}>
+            <p className="admin-page-selector__label">
+              Which specific gallery? ({sectionKeys.length} available for {pageLabel(activePage)})
+            </p>
+            <div className="admin-page-selector__grid">
               {sectionKeys.map((key) => (
-                <option key={key} value={key}>{pageSections[key].label}</option>
+                <button
+                  key={key}
+                  type="button"
+                  className={`admin-page-btn${selectedSection === key ? ' active' : ''}`}
+                  onClick={() => selectSection(key)}
+                >
+                  {pageSections[key].label}
+                </button>
               ))}
-            </select>
+            </div>
           </div>
         )}
         {categoryPages.length > 0 && selectedSection !== 'main' && (
@@ -641,6 +660,7 @@ export default function SitePhotosAdmin() {
         <h2 className="admin-card__title">{pageLabel(activePage)} — {currentSection?.label} — {defaults.length} Photo Slots</h2>
         <p className="admin-field__hint">
           Each slot shows its original photo until you replace it. Replacing one slot never affects the others.
+          You'll get to crop the photo to fit before it's saved.
         </p>
         {loading ? <p className="admin-loading">Loading…</p> : (
           <div className="admin-image-grid">
@@ -706,9 +726,9 @@ export default function SitePhotosAdmin() {
         </div>
         <div className="admin-form-grid">
           <div className="admin-field admin-field--full">
-            <label>Add More Photos (beyond the {defaults.length} default slots)</label>
-            <input type="file" accept="image/*" multiple disabled={addingExtra}
-              onChange={(e) => addExtraPhotos(e.target.files)} />
+            <label>Add a Photo (beyond the {defaults.length} default slots) — you'll get to crop it before it's added</label>
+            <input type="file" accept="image/*" disabled={addingExtra}
+              onChange={(e) => { const file = e.target.files?.[0]; if (file) addExtraPhoto(file); e.target.value = ''; }} />
             {addingExtra && <p className="admin-loading">Adding…</p>}
           </div>
         </div>
@@ -730,6 +750,8 @@ export default function SitePhotosAdmin() {
       </div>
       </>
       )}
+
+      {cropModal}
     </div>
   );
 }

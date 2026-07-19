@@ -37,8 +37,12 @@ export default function GovernanceDetail() {
   const { docs: govDocs, loading: govLoading } = useOrderedCollection<GovernanceItemDoc>('governanceItems', 'order');
   const item = govDocs.find((i) => i.slug === slug) ?? null;
   const { docs: faculty } = useOrderedCollection<FacultyDoc>('faculty', 'name');
+  // Each item can have its own hero image (set in the Governance/Committees/
+  // IQAC admin); falls back to the one shared "Governance Detail Pages"
+  // banner, then a hardcoded default — so a page never looks broken while
+  // an admin is still filling in per-item images.
   const { slides: heroSlides } = usePageBanners('governance-detail');
-  const heroImage = heroSlides[0]?.imageUrl || DEFAULT_HERO_IMAGE;
+  const heroImage = item?.heroImage || heroSlides[0]?.imageUrl || DEFAULT_HERO_IMAGE;
 
   // No scroll-reveal here — this whole page's content (including the hero
   // title) only renders once the Firestore-backed `item` has loaded, so any

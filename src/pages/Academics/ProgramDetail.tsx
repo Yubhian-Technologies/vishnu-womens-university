@@ -4,11 +4,13 @@ import { where } from 'firebase/firestore';
 import { Check, Microscope, Compass, Target, Sparkles, Mail, ExternalLink } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import { useCollection, useOrderedCollection } from '../../hooks/useCollection';
+import { usePageBanner } from '../../hooks/usePageBanner';
 import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
 import type { FacultyDoc } from './Faculty';
 import '../detail-layout.css';
 
 const NAV_OFFSET = 'calc(var(--topbar-height) + var(--header-height) + 1rem)';
+const DEFAULT_PROGRAM_HERO = 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=1920&q=80';
 
 const categoryLabel: Record<string, string> = {
   btech: 'B.Tech',
@@ -25,6 +27,10 @@ export default function ProgramDetail() {
 
   const { docs: allFaculty } = useOrderedCollection<FacultyDoc>('faculty', 'order');
   const faculty = program?.department ? allFaculty.filter((f) => f.department === program.department) : [];
+  // Falls back to a shared "Program Pages" banner (Hero Banners admin) only
+  // when this specific program hasn't had its own image uploaded yet via
+  // the Programs admin section — that per-program image always wins.
+  const fallbackBanner = usePageBanner('program-detail');
 
   useEffect(() => {
     if (program) {
@@ -69,7 +75,11 @@ export default function ProgramDetail() {
     <main className="page-wrapper">
       {/* Hero */}
       <section className="page-hero" style={{ minHeight: 380 }}>
-        <SmoothImage src={program.heroImage} alt={program.name} className="page-hero-image" />
+        <SmoothImage
+          src={program.heroImage || fallbackBanner?.imageUrl || DEFAULT_PROGRAM_HERO}
+          alt={program.name}
+          className="page-hero-image"
+        />
         <div className="page-hero-overlay" />
         <div className="container page-hero-content">
           <div className="breadcrumb animate-fade-in">
