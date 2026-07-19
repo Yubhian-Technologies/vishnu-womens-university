@@ -135,3 +135,77 @@ export function parseAccordionTable(text: string): AccordionCategory[] {
   }
   return categories;
 }
+
+// A richer per-item accordion for content that's more than a flat list per
+// area — e.g. Research's Funded Projects, where each project (grouped under
+// an Ongoing/Completed category) has several labeled fields (PI, Department,
+// Amount, Agency, ...) plus a bulleted Outcome list.
+//
+// Format:
+//   ## Category Title              (optional — starts a new category, e.g. "Ongoing Projects")
+//   ### Project Title              (starts a new project)
+//   Label: value                   (a labeled field shown under the project)
+//   Another Label: value
+//   Outcome:                       (optional marker line, itself not shown — bullets below are)
+//   - Outcome bullet one
+//   - Outcome bullet two
+export interface ProjectAccordionField {
+  label: string;
+  value: string;
+}
+
+export interface ProjectAccordionItem {
+  title: string;
+  fields: ProjectAccordionField[];
+  outcomes: string[];
+}
+
+export interface ProjectAccordionCategory {
+  title: string;
+  projects: ProjectAccordionItem[];
+}
+
+export function parseProjectAccordion(text: string): ProjectAccordionCategory[] {
+  const lines = (text || '').split('\n').map((l) => l.trim()).filter(Boolean);
+  const categories: ProjectAccordionCategory[] = [];
+  let currentCategory: ProjectAccordionCategory | null = null;
+  let currentProject: ProjectAccordionItem | null = null;
+
+  for (const line of lines) {
+    if (line.startsWith('## ')) {
+      currentCategory = { title: line.slice(3).trim(), projects: [] };
+      categories.push(currentCategory);
+      currentProject = null;
+      continue;
+    }
+    if (line.startsWith('### ')) {
+      if (!currentCategory) {
+        currentCategory = { title: '', projects: [] };
+        categories.push(currentCategory);
+      }
+      currentProject = { title: line.slice(4).trim(), fields: [], outcomes: [] };
+      currentCategory.projects.push(currentProject);
+      continue;
+    }
+    if (!currentCategory) {
+      currentCategory = { title: '', projects: [] };
+      categories.push(currentCategory);
+    }
+    if (!currentProject) {
+      currentProject = { title: '', fields: [], outcomes: [] };
+      currentCategory.projects.push(currentProject);
+    }
+
+    if (line.startsWith('- ')) {
+      currentProject.outcomes.push(line.slice(2).trim());
+      continue;
+    }
+    const colonIndex = line.indexOf(':');
+    if (colonIndex > -1) {
+      const label = line.slice(0, colonIndex).trim();
+      const value = line.slice(colonIndex + 1).trim();
+      if (value) currentProject.fields.push({ label, value });
+    }
+  }
+  return categories;
+}

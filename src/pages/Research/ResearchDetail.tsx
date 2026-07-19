@@ -3,7 +3,7 @@ import { Link, useParams, Navigate } from 'react-router-dom';
 import { Sparkles, Microscope, Check } from 'lucide-react';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { resolveContentIcon } from '../../lib/contentIcons';
-import { parseFlexibleTable, parseAccordionTable } from '../../lib/structuredTable';
+import { parseFlexibleTable, parseAccordionTable, parseProjectAccordion } from '../../lib/structuredTable';
 import type { ResearchItemDoc } from '../Admin/sections/ResearchItemsAdmin';
 import '../detail-layout.css';
 
@@ -22,6 +22,15 @@ export default function ResearchDetail() {
   const [openAreas, setOpenAreas] = useState<Set<string>>(new Set());
   const toggleArea = (key: string) => {
     setOpenAreas((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
+  const [openProjects, setOpenProjects] = useState<Set<string>>(new Set());
+  const toggleProject = (key: string) => {
+    setOpenProjects((prev) => {
       const next = new Set(prev);
       if (next.has(key)) next.delete(key);
       else next.add(key);
@@ -47,6 +56,7 @@ export default function ResearchDetail() {
   const heroImage = item.heroImage || DEFAULT_HERO_IMAGE;
   const tableSections = parseFlexibleTable(item.tableText).filter((s) => s.headers.length > 0);
   const accordionCategories = parseAccordionTable(item.accordionText).filter((c) => c.areas.length > 0);
+  const projectCategories = parseProjectAccordion(item.projectsText).filter((c) => c.projects.length > 0);
 
   return (
     <main className="page-wrapper">
@@ -205,6 +215,79 @@ export default function ResearchDetail() {
                                 </li>
                               ))}
                             </ul>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Project accordion — a richer per-item card for content that has
+          several labeled fields plus an Outcome list per entry (e.g. Funded
+          Projects: PI, Department, Amount, Agency, ... and an outcome list),
+          grouped into categories (e.g. Ongoing / Completed). */}
+      {projectCategories.length > 0 && (
+        <section className="section bg-off-white">
+          <div className="container">
+            <div style={{ marginBottom: 'var(--space-8)' }}>
+              <span className="section-label">Details</span>
+              <h2 className="section-title" style={{ fontSize: '1.75rem' }}>{item.title}</h2>
+            </div>
+            {projectCategories.map((cat, ci) => (
+              <div key={ci} style={{ marginBottom: ci < projectCategories.length - 1 ? 'var(--space-10)' : 0 }}>
+                {cat.title && (
+                  <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>
+                    {cat.title}
+                  </h3>
+                )}
+                <div className="thrust-accordion">
+                  {cat.projects.map((project, pi) => {
+                    const key = `${ci}-${pi}`;
+                    const isOpen = openProjects.has(key);
+                    return (
+                      <div key={pi} className={`thrust-accordion-item${isOpen ? ' open' : ''}`}>
+                        <button
+                          type="button"
+                          className="thrust-accordion-header"
+                          onClick={() => toggleProject(key)}
+                          aria-expanded={isOpen}
+                        >
+                          <span>{project.title}</span>
+                          <span className="thrust-accordion-icon">{isOpen ? '−' : '+'}</span>
+                        </button>
+                        <div className="thrust-accordion-collapse">
+                          <div className="thrust-accordion-collapse-inner">
+                            <div style={{ padding: 'var(--space-4) var(--space-5)' }}>
+                              {project.fields.length > 0 && (
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 'var(--space-2) var(--space-5)', marginBottom: project.outcomes.length > 0 ? 'var(--space-4)' : 0 }}>
+                                  {project.fields.map((f, fi) => (
+                                    <div key={fi} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.5 }}>
+                                      <strong style={{ color: 'var(--color-primary)' }}>{f.label}:</strong> {f.value}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                              {project.outcomes.length > 0 && (
+                                <div>
+                                  <strong style={{ fontSize: 'var(--text-sm)', color: 'var(--color-primary)', display: 'block', marginBottom: 'var(--space-2)' }}>
+                                    Outcome
+                                  </strong>
+                                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                                    {project.outcomes.map((o, oi) => (
+                                      <li key={oi} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-2)' }}>
+                                        <Check size={13} strokeWidth={2.5} style={{ color: 'var(--color-accent)', flexShrink: 0, marginTop: 3 }} />
+                                        <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.5 }}>{o}</span>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </div>
