@@ -5,6 +5,7 @@ import { useOrderedCollection } from '../../hooks/useCollection';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import { parseFlexibleTable, parseAccordionTable, parseProjectAccordion } from '../../lib/structuredTable';
 import type { ResearchItemDoc } from '../Admin/sections/ResearchItemsAdmin';
+import { DEFAULT_FUNDED_PROJECTS_TEXT } from './fundedProjectsDefault';
 import '../detail-layout.css';
 
 const DEFAULT_HERO_IMAGE = 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=1920&q=80';
@@ -13,6 +14,14 @@ const CATEGORY_LABELS: Record<string, string> = {
   governance: 'R&D Governance',
   output: 'Research Output',
   engagement: 'Industry & Professional Engagement',
+};
+
+// Firestore's researchItems doc for these slugs may not have its
+// (newer) projectsText/accordionText field filled in yet from the admin
+// panel — fall back to the real source content so the page still renders
+// fully rather than staying blank until someone pastes it in manually.
+const DEFAULT_PROJECTS_TEXT_BY_SLUG: Record<string, string> = {
+  'funded-projects': DEFAULT_FUNDED_PROJECTS_TEXT,
 };
 
 export default function ResearchDetail() {
@@ -56,7 +65,8 @@ export default function ResearchDetail() {
   const heroImage = item.heroImage || DEFAULT_HERO_IMAGE;
   const tableSections = parseFlexibleTable(item.tableText).filter((s) => s.headers.length > 0);
   const accordionCategories = parseAccordionTable(item.accordionText).filter((c) => c.areas.length > 0);
-  const projectCategories = parseProjectAccordion(item.projectsText).filter((c) => c.projects.length > 0);
+  const projectsText = item.projectsText || DEFAULT_PROJECTS_TEXT_BY_SLUG[item.slug] || '';
+  const projectCategories = parseProjectAccordion(projectsText).filter((c) => c.projects.length > 0);
 
   return (
     <main className="page-wrapper">
@@ -129,7 +139,7 @@ export default function ResearchDetail() {
       {/* Data table(s) — a single unnamed section renders as one table under
           the item's own title; multiple named sections (e.g. Patents grouped
           by year) each get their own sub-heading. */}
-      {tableSections.length > 0 && (
+      {tableSections.length > 0 && projectCategories.length === 0 && (
         <section className="section bg-off-white">
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
