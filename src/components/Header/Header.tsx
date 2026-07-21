@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import AnnouncementsTicker from '../AnnouncementsTicker/AnnouncementsTicker';
 import { useOrderedCollection } from '../../hooks/useCollection';
@@ -270,26 +270,21 @@ const navItems: NavItem[] = [
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  // Desktop dropdowns normally open/close purely on CSS :hover. Clicking a
-  // nav item's caret while its dropdown is open forces it shut (overriding
-  // hover) until the mouse actually leaves the item, at which point normal
-  // hover behavior resumes — clicking again while forced shut reopens it.
-  const [forceClosedItem, setForceClosedItem] = useState<string | null>(null);
-  // :hover/:focus-within alone can leave two dropdowns open at once (e.g. a
-  // lingering hover on one item plus keyboard focus on another, or a stuck
-  // synthetic hover on touch devices). Tracking which item was most recently
-  // entered/focused lets every other item be force-closed explicitly,
-  // guaranteeing only one dropdown is ever shown regardless of input device.
-  const [activeItem, setActiveItem] = useState<string | null>(null);
-  // Desktop dropdowns are opened by CSS :hover/:focus-within, which stays
-  // true while the page scrolls under a stationary cursor (header is
-  // sticky) — this forces any open dropdown shut the moment scrolling
-  // starts, resetting the next time the mouse re-enters the nav.
-  const [scrollClosed, setScrollClosed] = useState(false);
+  // Single source of truth for which desktop dropdown is open — set by
+  // hover, keyboard focus, and click alike. Previously hover (via CSS
+  // :hover/:focus-within) and click (via a separate "force closed" flag)
+  // were two independent mechanisms layered on top of each other, and the
+  // force-closed flag got cleared on mouseleave — so so much as jiggling the
+  // mouse off and back onto an item you'd just clicked closed would let
+  // hover silently reopen it. Routing both through one state means the most
+  // recent interaction (of either kind) is simply what's true; there's
+  // nothing left for them to disagree about.
+  const [openItem, setOpenItem] = useState<string | null>(null);
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
   const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
   const [expandedSubItem, setExpandedSubItem] = useState<string | null>(null);
   const location = useLocation();
+  const navRef = useRef<HTMLElement>(null);
 
   const { docs: curriculumDocs, loading: curriculumLoading } = useOrderedCollection<CurriculumDoc>('curriculum', 'rowOrder');
   const { docs: downloadDocs, loading: downloadsLoading } = useOrderedCollection<DownloadDoc>('downloads', 'order');
@@ -349,19 +344,41 @@ export default function Header() {
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
-      setScrollClosed(true);
+      // The header is sticky, so scrolling under a stationary cursor would
+      // otherwise leave a dropdown open while the page moves underneath it.
+      setOpenItem(null);
       (document.activeElement as HTMLElement | null)?.blur();
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // The two standard ways users expect to dismiss an open menu: clicking
+  // anywhere outside it, or pressing Escape.
+  useEffect(() => {
+    if (!openItem) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (navRef.current && !navRef.current.contains(e.target as Node)) {
+        setOpenItem(null);
+      }
+    };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpenItem(null);
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [openItem]);
+
   useEffect(() => {
     setMobileOpen(false);
     setExpandedItem(null);
     setExpandedGroup(null);
     setExpandedSubItem(null);
-    setForceClosedItem(null);
+    setOpenItem(null);
   }, [location]);
 
   useEffect(() => {
@@ -410,24 +427,21 @@ export default function Header() {
           </Link>
 
           {/* Desktop Nav */}
-          <nav className={`nav${scrollClosed ? ' nav--scroll-closed' : ''}`} aria-label="Main navigation">
-            <ul className="nav-list" onMouseEnter={() => setScrollClosed(false)}>
+          <nav className="nav" aria-label="Main navigation" ref={navRef}>
+            <ul className="nav-list">
               {renderedNavItems.map((item) => (
                 <li
                   key={item.label}
-                  className={`nav-item${forceClosedItem === item.label || (activeItem !== null && activeItem !== item.label) ? ' nav-item--force-closed' : ''}${item.label === 'Research' ? ' nav-item--research' : ''}${item.label === 'Placements' ? ' nav-item--placements' : ''}`}
-                  onMouseEnter={() => setActiveItem(item.label)}
-                  onFocus={() => setActiveItem(item.label)}
-                  onMouseLeave={() => {
-                    setForceClosedItem((prev) => (prev === item.label ? null : prev));
-                    setActiveItem((prev) => (prev === item.label ? null : prev));
-                  }}
+                  className={`nav-item${openItem === item.label ? ' nav-item--open' : ''}${item.label === 'Research' ? ' nav-item--research' : ''}${item.label === 'Placements' ? ' nav-item--placements' : ''}`}
+                  onMouseEnter={() => setOpenItem(item.label)}
+                  onFocus={() => setOpenItem(item.label)}
+                  onMouseLeave={() => setOpenItem((prev) => (prev === item.label ? null : prev))}
                 >
                   <button
                     className="nav-link"
                     aria-haspopup="true"
-                    aria-expanded={forceClosedItem !== item.label}
-                    onClick={() => setForceClosedItem((prev) => (prev === item.label ? null : item.label))}
+                    aria-expanded={openItem === item.label}
+                    onClick={() => setOpenItem((prev) => (prev === item.label ? null : item.label))}
                   >
                     {item.label}
                     <svg className="nav-arrow" viewBox="0 0 12 12" fill="none" aria-hidden="true">

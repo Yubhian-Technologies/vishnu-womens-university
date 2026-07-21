@@ -242,13 +242,19 @@
   border-radius: var(--radius-sm) var(--radius-sm) 0 0;
 }
 
-.nav-item:hover .nav-link,
-.nav-item:focus-within .nav-link {
+/* Dropdown visibility (and the link/arrow styling that goes with it) is
+   driven entirely by the .nav-item--open class, which Header.tsx applies
+   from a single `openItem` state — set by hover, focus, and click alike.
+   There is deliberately no plain CSS :hover/:focus-within rule here: those
+   would show the dropdown independently of that state, and once click and
+   hover can each open/close things on their own, they inevitably disagree
+   with each other (this used to be a real bug — see the .nav-item--open
+   comment further down for the full story). */
+.nav-item--open .nav-link {
   color: var(--color-white);
 }
 
-.nav-item:hover .nav-link::after,
-.nav-item:focus-within .nav-link::after {
+.nav-item--open .nav-link::after {
   transform: scaleX(1);
 }
 
@@ -260,15 +266,9 @@
   opacity: 0.7;
 }
 
-.nav-item:hover .nav-arrow,
-.nav-item:focus-within .nav-arrow {
+.nav-item--open .nav-arrow {
   transform: rotate(180deg);
   opacity: 1;
-}
-
-.nav-item.nav-item--force-closed .nav-arrow {
-  transform: rotate(0deg) !important;
-  opacity: 0.7 !important;
 }
 
 /* ===== Dropdown ===== */
@@ -287,34 +287,15 @@
   z-index: 100;
 }
 
-/* Transition only lives on the open (:hover/:focus-within) rule, so opening
+/* Transition only lives on the open (.nav-item--open) rule, so opening
    fades in smoothly but closing (falling back to the base .dropdown rule,
    which has no transition) is instant — otherwise, switching from one open
    nav item straight to another let both dropdowns render mid-fade at once. */
-.nav-item:hover .dropdown,
-.nav-item:focus-within .dropdown {
+.nav-item--open .dropdown {
   opacity: 1;
   visibility: visible;
   transform: translateX(-50%) translateY(0);
   transition: all var(--transition-base);
-}
-
-/* Clicking a nav item's caret while its dropdown is open (via the hover
-   rules above) forces it shut, overriding hover, until the mouse leaves
-   the item — see forceClosedItem in Header.tsx. */
-.nav-item.nav-item--force-closed .dropdown {
-  opacity: 0 !important;
-  visibility: hidden !important;
-}
-
-/* The header is sticky, so scrolling with a stationary cursor can leave a
-   dropdown open (:hover/:focus-within stay true) while the page moves
-   underneath it. Forces every dropdown shut the instant scrolling starts —
-   see scrollClosed in Header.tsx — resetting on the next fresh hover. */
-.nav--scroll-closed .nav-item:hover .dropdown,
-.nav--scroll-closed .nav-item:focus-within .dropdown {
-  opacity: 0 !important;
-  visibility: hidden !important;
 }
 
 /* The last couple of nav items (currently "Alumni & Giving" and "Quick
@@ -328,8 +309,7 @@
   transform: translateY(-10px);
 }
 
-.nav-item:nth-last-child(-n+2):hover .dropdown:not(.dropdown-mega),
-.nav-item:nth-last-child(-n+2):focus-within .dropdown:not(.dropdown-mega) {
+.nav-item--open:nth-last-child(-n+2) .dropdown:not(.dropdown-mega) {
   transform: translateY(0);
 }
 
@@ -413,8 +393,7 @@
   padding: 0;
 }
 
-.nav-item:hover .dropdown.dropdown-mega,
-.nav-item:focus-within .dropdown.dropdown-mega {
+.nav-item--open .dropdown.dropdown-mega {
   transform: translateX(0) translateY(0);
 }
 
