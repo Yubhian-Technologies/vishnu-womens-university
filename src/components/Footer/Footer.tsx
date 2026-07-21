@@ -63,7 +63,7 @@ const complianceGroups: { title: string; links: { label: string; href: string; d
   {
     title: 'Approvals & Accreditations',
     links: [
-      { label: 'AICTE Approvals', href: 'https://svecw.edu.in/wp-content/uploads/2026/05/AICTEApprovals.pdf', download: true },
+      { label: 'AICTE Approvals', href: '/downloads/AICTEApprovals.pdf', download: true },
       { label: 'UGC Autonomous Approvals', href: 'https://svecw.edu.in/wp-content/uploads/2024/07/SVECWUGCLetter.pdf' },
       { label: 'UGC - 12B 2f Letter', href: 'https://svecw.edu.in/wp-content/uploads/2024/07/SVECWForm12B2F.pdf' },
       { label: 'JNTUK Affiliation Approvals', href: 'https://svecw.edu.in/wp-content/uploads/2024/07/SVECWJNTUKApprovals.pdf' },
