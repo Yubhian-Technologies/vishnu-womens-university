@@ -6,6 +6,7 @@ import CounterSection from '../../components/CounterSection/CounterSection';
 import NewsCard from '../../components/NewsCard/NewsCard';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
+import { useSitePhotos } from '../../hooks/useSitePhotos';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import { type NewsDoc, newsDocToArticle } from '../../lib/news';
 import type { EventDoc } from '../Admin/sections/EventsAdmin';
@@ -13,10 +14,39 @@ import type { ContentBlockDoc } from '../Admin/sections/ContentBlocksAdmin';
 import './Home.css';
 
 /* ── Data ─────────────────────────────────────────────────── */
-const STUDY_CARD_IMAGES = [
-  { image: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=800&q=80', alt: 'Students in engineering classroom', color: '#1b4332' },
-  { image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80', alt: 'Postgraduate students', color: '#2d6a4f' },
-  { image: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&q=80', alt: 'Research laboratory', color: '#40916c' },
+// Every photo on this page is admin-editable via /admin → Website Photos →
+// Home. These arrays are just the original defaults, shown until an admin
+// replaces a slot — same fallback pattern used throughout this codebase.
+const defaultActivityPhotos = [
+  { src: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=600&q=80', alt: 'mBAJA SAEINDIA 2026 Win', caption: 'mBAJA SAEINDIA 2026 Win' },
+  { src: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=600&q=80', alt: 'Amazon AFE Internship', caption: 'Amazon AFE Internship' },
+  { src: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=600&q=80', alt: 'Technova2026 Symposium', caption: 'Technova2026 Symposium' },
+  { src: 'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=600&q=80', alt: '8th Graduation Day', caption: '8th Graduation Day' },
+  { src: 'https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=600&q=80', alt: 'IEI Award for Excellence', caption: 'IEI Award for Excellence' },
+  { src: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=600&q=80', alt: 'Space Application Center', caption: 'Space Application Center' },
+];
+
+const defaultStudyCardPhotos = [
+  { src: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=800&q=80', alt: 'Students in engineering classroom', caption: '' },
+  { src: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80', alt: 'Postgraduate students', caption: '' },
+  { src: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&q=80', alt: 'Research laboratory', caption: '' },
+];
+// Study card accent colours aren't a "photo" — kept as a parallel,
+// index-matched, non-admin-editable array (matches by position).
+const STUDY_CARD_COLORS = ['#1b4332', '#2d6a4f', '#40916c'];
+
+const defaultCampusLifePhoto = [
+  { src: 'https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=1000&q=80', alt: 'VWU campus life', caption: '' },
+];
+
+const defaultMissionPhotos = [
+  { src: 'https://images.unsplash.com/photo-1571260899304-425eee4c7efc?w=800&q=80', alt: 'VWU campus', caption: '' },
+  { src: 'https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=800&q=80', alt: 'VWU campus', caption: '' },
+  { src: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=800&q=80', alt: 'VWU campus', caption: '' },
+];
+
+const defaultCtaBannerPhoto = [
+  { src: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1920&q=80', alt: 'VWU campus', caption: '' },
 ];
 
 // The original hardcoded content each of these sections shipped with,
@@ -75,15 +105,6 @@ const defaultTestimonials: ContentBlockDoc[] = [
   { id: 'default-1', page: 'home', section: 'testimonials', value: 'Computer Science Engineering — Software Engineer at Google', title: 'Lakshmi R., Class of 2024', desc: 'VWU faculty genuinely invest in each student — they know your name, your ambitions, and they hold you to a high standard. The skills and confidence I gained here led directly to my placement at Google.', icon: '', slug: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=200&q=80', order: 0 },
   { id: 'default-2', page: 'home', section: 'testimonials', value: 'M.Tech ECE — Research Scholar at IIT Hyderabad', title: 'Anusha P., Class of 2022', desc: 'VWU is a true launchpad. The research infrastructure, the labs, and the guidance I received here built the academic foundation that made my Ph.D. at IIT Hyderabad possible.', icon: '', slug: 'https://images.unsplash.com/photo-1607746882042-944635dfe10e?w=200&q=80', order: 1 },
   { id: 'default-3', page: 'home', section: 'testimonials', value: 'CSE — Co-founder at TechFemme Startup', title: 'Divya K., Class of 2023', desc: 'Studying in an all-women environment gave me real confidence in my abilities. I led several national-level projects at VWU — and that leadership mindset is what drives my startup today.', icon: '', slug: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&q=80', order: 2 },
-];
-
-const activityItems = [
-  { img: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=600&q=80', label: 'mBAJA SAEINDIA 2026 Win' },
-  { img: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=600&q=80', label: 'Amazon AFE Internship' },
-  { img: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=600&q=80', label: 'Technova2026 Symposium' },
-  { img: 'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=600&q=80', label: '8th Graduation Day' },
-  { img: 'https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=600&q=80', label: 'IEI Award for Excellence' },
-  { img: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=600&q=80', label: 'Space Application Center' },
 ];
 
 /* ── Tilt Hook ────────────────────────────────────────────── */
@@ -152,6 +173,11 @@ export default function Home() {
   const studyCards = liveStudyCards.length > 0 ? liveStudyCards : defaultStudyCards;
   const livePopularPrograms = useContentBlocks('home', 'popularPrograms');
   const popularPrograms = livePopularPrograms.length > 0 ? livePopularPrograms : defaultPopularPrograms;
+  const activityPhotos = useSitePhotos('home', 'activities', defaultActivityPhotos);
+  const studyCardPhotos = useSitePhotos('home', 'study-cards', defaultStudyCardPhotos);
+  const campusLifePhoto = useSitePhotos('home', 'campus-life', defaultCampusLifePhoto)[0];
+  const missionPhotos = useSitePhotos('home', 'mission', defaultMissionPhotos);
+  const ctaBannerPhoto = useSitePhotos('home', 'cta-banner', defaultCtaBannerPhoto)[0];
 
   useEffect(() => {
     document.title = 'VWU | Empowering Women Through Knowledge and Action';
@@ -216,10 +242,10 @@ export default function Home() {
         <div className="activity-strip-label">Recent<br />Activities</div>
         <div className="activity-track-wrap">
           <div className="activity-track">
-            {[...activityItems, ...activityItems].map((item, i) => (
+            {[...activityPhotos, ...activityPhotos].map((item, i) => (
               <div key={i} className="activity-card">
-                <img src={item.img} alt={item.label} className="activity-card-img" loading="lazy" />
-                <div className="activity-card-label">{item.label}</div>
+                <img src={item.src} alt={item.alt} className="activity-card-img" loading="lazy" />
+                <div className="activity-card-label">{item.caption || item.alt}</div>
               </div>
             ))}
           </div>
@@ -246,17 +272,18 @@ export default function Home() {
           <div className="study-grid">
             {studyCards.map((card, i) => {
               const Icon = resolveContentIcon(card.icon) || Laptop;
-              const visuals = STUDY_CARD_IMAGES[i % STUDY_CARD_IMAGES.length];
+              const photo = studyCardPhotos[i % studyCardPhotos.length];
+              const color = STUDY_CARD_COLORS[i % STUDY_CARD_COLORS.length];
               return (
                 <div
                   key={card.id}
                   className="study-card"
                   {...tilts[i]}
-                  style={{ '--card-color': visuals.color } as React.CSSProperties}
+                  style={{ '--card-color': color } as React.CSSProperties}
                 >
                   <div className="study-card-image-wrap">
-                    <img src={visuals.image} alt={visuals.alt} className="study-card-image" loading="lazy" />
-                    <div className="study-card-overlay" style={{ background: `linear-gradient(to top, ${visuals.color}cc 0%, transparent 65%)` }} />
+                    <img src={photo.src} alt={photo.alt} className="study-card-image" loading="lazy" />
+                    <div className="study-card-overlay" style={{ background: `linear-gradient(to top, ${color}cc 0%, transparent 65%)` }} />
                     <div className="study-card-icon"><Icon size={24} strokeWidth={1.75} color="var(--color-primary-dark)" /></div>
                     <div className="study-card-shine" />
                   </div>
@@ -301,7 +328,7 @@ export default function Home() {
       {/* ── Campus Life ── */}
       <section className="campus-section" aria-label="Campus Life">
         <div className="campus-image-side reveal-left">
-          <img src="https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=1000&q=80" alt="VWU campus life" className="campus-image" loading="lazy" />
+          <img src={campusLifePhoto.src} alt={campusLifePhoto.alt} className="campus-image" loading="lazy" />
           <div className="campus-image-overlay" />
           <div className="campus-image-badge reveal-scale" data-delay="300">
             <span className="campus-badge-num">100+</span>
@@ -347,13 +374,9 @@ export default function Home() {
               <MagneticBtn to="/about" className="btn btn-primary magnetic-btn">Learn More About VWU</MagneticBtn>
             </div>
             <div className="mission-image-grid reveal-right">
-              {[
-                'https://images.unsplash.com/photo-1571260899304-425eee4c7efc?w=800&q=80',
-                'https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=800&q=80',
-                'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=800&q=80',
-              ].map((src, i) => (
-                <div key={src} className={`mission-img mission-img--${i}`}>
-                  <img src={src} alt="VWU campus" loading="lazy" />
+              {missionPhotos.map((photo, i) => (
+                <div key={i} className={`mission-img mission-img--${i}`}>
+                  <img src={photo.src} alt={photo.alt} loading="lazy" />
                   <div className="mission-img-overlay" />
                 </div>
               ))}
@@ -491,7 +514,7 @@ export default function Home() {
 
       {/* ── CTA Banner ── */}
       <section className="cta-banner">
-        <img src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1920&q=80" alt="VWU campus" className="cta-banner-bg" loading="lazy" />
+        <img src={ctaBannerPhoto.src} alt={ctaBannerPhoto.alt} className="cta-banner-bg" loading="lazy" />
         <div className="cta-banner-overlay" />
         <div className="cta-particles" aria-hidden="true">
           {Array.from({ length: 12 }).map((_, i) => (
