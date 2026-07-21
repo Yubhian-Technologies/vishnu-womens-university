@@ -59,11 +59,11 @@ const feedbackLinks = [
 // under (the site already links out to svecw.edu.in systems elsewhere, e.g. the
 // exam portal and LMS), so these are the authoritative documents, not a separate
 // entity's paperwork being misrepresented as VWU's own.
-const complianceGroups: { title: string; links: { label: string; href: string }[] }[] = [
+const complianceGroups: { title: string; links: { label: string; href: string; download?: boolean }[] }[] = [
   {
     title: 'Approvals & Accreditations',
     links: [
-      { label: 'AICTE Approvals', href: 'https://svecw.edu.in/wp-content/uploads/2026/05/AICTEApprovals.pdf' },
+      { label: 'AICTE Approvals', href: 'https://svecw.edu.in/wp-content/uploads/2026/05/AICTEApprovals.pdf', download: true },
       { label: 'UGC Autonomous Approvals', href: 'https://svecw.edu.in/wp-content/uploads/2024/07/SVECWUGCLetter.pdf' },
       { label: 'UGC - 12B 2f Letter', href: 'https://svecw.edu.in/wp-content/uploads/2024/07/SVECWForm12B2F.pdf' },
       { label: 'JNTUK Affiliation Approvals', href: 'https://svecw.edu.in/wp-content/uploads/2024/07/SVECWJNTUKApprovals.pdf' },
@@ -235,7 +235,7 @@ export default function Footer() {
                 <ul className="footer-compliance-links">
                   {group.links.map(l => (
                     <li key={l.label}>
-                      <a href={l.href} target="_blank" rel="noopener noreferrer" className="footer-link">{l.label}</a>
+                      <a href={l.href} target="_blank" rel="noopener noreferrer" download={l.download} className="footer-link">{l.label}</a>
                     </li>
                   ))}
                 </ul>
