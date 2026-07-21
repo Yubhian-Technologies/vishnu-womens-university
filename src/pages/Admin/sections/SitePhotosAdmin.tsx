@@ -21,6 +21,7 @@ export interface SitePhotoDoc {
 }
 
 export const SITE_PHOTO_PAGES = [
+  { value: 'home', label: 'Home (Landing Page)' },
   { value: 'campus', label: 'Campus Life' },
   { value: 'about', label: 'About VWU' },
   { value: 'academics', label: 'Academics' },
@@ -73,6 +74,53 @@ function placeholderPhotoBank(label: string): SectionDef {
 // sub-sections existed. Every other key is a brand-new sub-section with no
 // real photos yet (see placeholderSection above).
 const DEFAULT_SECTIONS: Record<string, Record<string, SectionDef>> = {
+  home: {
+    // The scrolling "Recent Activities" strip, just below the hero.
+    activities: {
+      label: 'Recent Activities Strip',
+      slots: [
+        { imageUrl: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=600&q=80', alt: 'mBAJA SAEINDIA 2026 Win', caption: 'mBAJA SAEINDIA 2026 Win' },
+        { imageUrl: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=600&q=80', alt: 'Amazon AFE Internship', caption: 'Amazon AFE Internship' },
+        { imageUrl: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=600&q=80', alt: 'Technova2026 Symposium', caption: 'Technova2026 Symposium' },
+        { imageUrl: 'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=600&q=80', alt: '8th Graduation Day', caption: '8th Graduation Day' },
+        { imageUrl: 'https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=600&q=80', alt: 'IEI Award for Excellence', caption: 'IEI Award for Excellence' },
+        { imageUrl: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=600&q=80', alt: 'Space Application Center', caption: 'Space Application Center' },
+      ],
+    },
+    // The 3 "Study at VWU" cards (B.Tech / M.Tech & MBA / Research & Ph.D.).
+    'study-cards': {
+      label: 'Study at VWU Card Photos',
+      slots: [
+        { imageUrl: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=800&q=80', alt: 'Students in engineering classroom', caption: '', label: 'B.Tech Programs card' },
+        { imageUrl: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80', alt: 'Postgraduate students', caption: '', label: 'M.Tech & MBA card' },
+        { imageUrl: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&q=80', alt: 'Research laboratory', caption: '', label: 'Research & Ph.D. card' },
+      ],
+    },
+    // The single large photo in the "Learn, Grow and Excel" / Campus Life section.
+    'campus-life': {
+      label: 'Campus Life Section Photo',
+      slots: [
+        { imageUrl: 'https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=1000&q=80', alt: 'VWU campus life', caption: '' },
+      ],
+    },
+    // The 3-photo grid in the "Driven by Excellence" mission section.
+    mission: {
+      label: 'Mission Section Photos',
+      slots: [
+        { imageUrl: 'https://images.unsplash.com/photo-1571260899304-425eee4c7efc?w=800&q=80', alt: 'VWU campus', caption: '' },
+        { imageUrl: 'https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=800&q=80', alt: 'VWU campus', caption: '' },
+        { imageUrl: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=800&q=80', alt: 'VWU campus', caption: '' },
+      ],
+    },
+    // The full-width background photo behind the closing "Come see it for
+    // yourself" call-to-action, near the bottom of the page.
+    'cta-banner': {
+      label: 'Bottom CTA Background Photo',
+      slots: [
+        { imageUrl: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1920&q=80', alt: 'VWU campus', caption: '' },
+      ],
+    },
+  },
   campus: {
     main: {
       label: 'Main Gallery',
@@ -329,6 +377,7 @@ interface NavSubGroup { label: string; pages: string[]; }
 interface NavCategory { label: string; pages: string[]; subGroups?: NavSubGroup[]; emptyNote?: string; }
 
 const NAV_CATEGORIES: NavCategory[] = [
+  { label: 'Home', pages: ['home'] },
   {
     label: 'Discover',
     pages: ['about', 'vision-mission', 'about-sves', 'campus', 'information'],
@@ -406,21 +455,33 @@ export default function SitePhotosAdmin() {
 
   const pageSections = DEFAULT_SECTIONS[activePage] ?? {};
   const sectionKeys = Object.keys(pageSections);
-  const currentSection = pageSections[selectedSection] ?? pageSections.main;
+  // Most pages' first/primary gallery is called "main" — but not all (e.g.
+  // Home has no single "main" gallery, just several named ones), so fall
+  // back to whichever section key comes first rather than assuming "main"
+  // exists.
+  const currentSection = pageSections[selectedSection] ?? pageSections.main ?? pageSections[sectionKeys[0]];
   const defaults = currentSection?.slots ?? [];
 
   const scopedPhotos = allPhotos.filter((p) => p.page === activePage && (p.section ?? 'main') === selectedSection);
   const byOrder = new Map(scopedPhotos.map((p) => [p.order, p]));
   const extras = scopedPhotos.filter((p) => p.order >= defaults.length).sort((a, b) => a.order - b.order);
   const pageLabel = (val: string) => SITE_PHOTO_PAGES.find((p) => p.value === val)?.label ?? val;
+  // Most pages' first/primary gallery is called "main" — but not all (e.g.
+  // Home has no single "main" gallery, just several named ones), so default
+  // to whichever section key actually comes first for that page.
+  const firstSectionKey = (page: string) => {
+    const sections = DEFAULT_SECTIONS[page] ?? {};
+    return sections.main ? 'main' : Object.keys(sections)[0] ?? 'main';
+  };
 
   const selectNavCategory = (label: string) => {
     const cat = NAV_CATEGORIES.find((c) => c.label === label);
+    const page = cat?.pages[0] ?? '';
     setSearchParams((prev) => {
       const next = new URLSearchParams(prev);
       next.set('navCategory', label);
-      next.set('photoPage', cat?.pages[0] ?? '');
-      next.set('photoSection', 'main');
+      next.set('photoPage', page);
+      next.set('photoSection', firstSectionKey(page));
       return next;
     }, { replace: true });
     setEditingSlot(null);
@@ -430,7 +491,7 @@ export default function SitePhotosAdmin() {
     setSearchParams((prev) => {
       const next = new URLSearchParams(prev);
       next.set('photoPage', page);
-      next.set('photoSection', 'main');
+      next.set('photoSection', firstSectionKey(page));
       return next;
     }, { replace: true });
     setEditingSlot(null);
