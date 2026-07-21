@@ -1,10 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
-import { Sparkles, Microscope } from 'lucide-react';
+import { Sparkles, Microscope, Check } from 'lucide-react';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { resolveContentIcon } from '../../lib/contentIcons';
-import { parseFlexibleTable } from '../../lib/structuredTable';
+import { parseFlexibleTable, parseAccordionTable, parseProjectAccordion } from '../../lib/structuredTable';
 import type { ResearchItemDoc } from '../Admin/sections/ResearchItemsAdmin';
+import { DEFAULT_FUNDED_PROJECTS_TEXT } from './fundedProjectsDefault';
 import '../detail-layout.css';
 
 const DEFAULT_HERO_IMAGE = 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=1920&q=80';
@@ -15,10 +16,36 @@ const CATEGORY_LABELS: Record<string, string> = {
   engagement: 'Industry & Professional Engagement',
 };
 
+// Firestore's researchItems doc for these slugs may not have its
+// (newer) projectsText/accordionText field filled in yet from the admin
+// panel — fall back to the real source content so the page still renders
+// fully rather than staying blank until someone pastes it in manually.
+const DEFAULT_PROJECTS_TEXT_BY_SLUG: Record<string, string> = {
+  'funded-projects': DEFAULT_FUNDED_PROJECTS_TEXT,
+};
+
 export default function ResearchDetail() {
   const { slug } = useParams<{ slug: string }>();
   const { docs: allItems, loading } = useOrderedCollection<ResearchItemDoc>('researchItems', 'order');
   const item = allItems.find((i) => i.slug === slug) ?? null;
+  const [openAreas, setOpenAreas] = useState<Set<string>>(new Set());
+  const toggleArea = (key: string) => {
+    setOpenAreas((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
+  const [openProjects, setOpenProjects] = useState<Set<string>>(new Set());
+  const toggleProject = (key: string) => {
+    setOpenProjects((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
 
   // No scroll-reveal here — this whole page's content (including the hero
   // title) only renders once the Firestore-backed `item` has loaded, so any
@@ -37,6 +64,9 @@ export default function ResearchDetail() {
   const categoryLabel = CATEGORY_LABELS[item.category] || item.category;
   const heroImage = item.heroImage || DEFAULT_HERO_IMAGE;
   const tableSections = parseFlexibleTable(item.tableText).filter((s) => s.headers.length > 0);
+  const accordionCategories = parseAccordionTable(item.accordionText).filter((c) => c.areas.length > 0);
+  const projectsText = item.projectsText || DEFAULT_PROJECTS_TEXT_BY_SLUG[item.slug] || '';
+  const projectCategories = parseProjectAccordion(projectsText).filter((c) => c.projects.length > 0);
 
   return (
     <main className="page-wrapper">
@@ -109,7 +139,7 @@ export default function ResearchDetail() {
       {/* Data table(s) — a single unnamed section renders as one table under
           the item's own title; multiple named sections (e.g. Patents grouped
           by year) each get their own sub-heading. */}
-      {tableSections.length > 0 && (
+      {tableSections.length > 0 && projectCategories.length === 0 && (
         <section className="section bg-off-white">
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
@@ -146,6 +176,133 @@ export default function ResearchDetail() {
                       ))}
                     </tbody>
                   </table>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Expandable areas — a category > area accordion for content that
+          doesn't fit a table (e.g. Thrust Areas of Research: department ->
+          research area -> faculty names), each area toggling independently. */}
+      {accordionCategories.length > 0 && (
+        <section className="section bg-off-white">
+          <div className="container">
+            <div style={{ marginBottom: 'var(--space-8)' }}>
+              <span className="section-label">Details</span>
+              <h2 className="section-title" style={{ fontSize: '1.75rem' }}>{item.title}</h2>
+            </div>
+            {accordionCategories.map((cat, ci) => (
+              <div key={ci} style={{ marginBottom: ci < accordionCategories.length - 1 ? 'var(--space-10)' : 0 }}>
+                {cat.title && (
+                  <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>
+                    {cat.title}
+                  </h3>
+                )}
+                <div className="thrust-accordion">
+                  {cat.areas.map((area, ai) => {
+                    const key = `${ci}-${ai}`;
+                    const isOpen = openAreas.has(key);
+                    return (
+                      <div key={ai} className={`thrust-accordion-item${isOpen ? ' open' : ''}`}>
+                        <button
+                          type="button"
+                          className="thrust-accordion-header"
+                          onClick={() => toggleArea(key)}
+                          aria-expanded={isOpen}
+                        >
+                          <span>{area.name}</span>
+                          <span className="thrust-accordion-icon">{isOpen ? '−' : '+'}</span>
+                        </button>
+                        <div className="thrust-accordion-collapse">
+                          <div className="thrust-accordion-collapse-inner">
+                            <ul className="thrust-accordion-list">
+                              {area.items.map((it, ii) => (
+                                <li key={ii}>
+                                  <Check size={13} strokeWidth={2.5} style={{ color: 'var(--color-accent)', flexShrink: 0 }} />
+                                  <span>{it}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Project accordion — a richer per-item card for content that has
+          several labeled fields plus an Outcome list per entry (e.g. Funded
+          Projects: PI, Department, Amount, Agency, ... and an outcome list),
+          grouped into categories (e.g. Ongoing / Completed). */}
+      {projectCategories.length > 0 && (
+        <section className="section bg-off-white">
+          <div className="container">
+            <div style={{ marginBottom: 'var(--space-8)' }}>
+              <span className="section-label">Details</span>
+              <h2 className="section-title" style={{ fontSize: '1.75rem' }}>{item.title}</h2>
+            </div>
+            {projectCategories.map((cat, ci) => (
+              <div key={ci} style={{ marginBottom: ci < projectCategories.length - 1 ? 'var(--space-10)' : 0 }}>
+                {cat.title && (
+                  <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>
+                    {cat.title}
+                  </h3>
+                )}
+                <div className="thrust-accordion">
+                  {cat.projects.map((project, pi) => {
+                    const key = `${ci}-${pi}`;
+                    const isOpen = openProjects.has(key);
+                    return (
+                      <div key={pi} className={`thrust-accordion-item${isOpen ? ' open' : ''}`}>
+                        <button
+                          type="button"
+                          className="thrust-accordion-header"
+                          onClick={() => toggleProject(key)}
+                          aria-expanded={isOpen}
+                        >
+                          <span>{project.title}</span>
+                          <span className="thrust-accordion-icon">{isOpen ? '−' : '+'}</span>
+                        </button>
+                        <div className="thrust-accordion-collapse">
+                          <div className="thrust-accordion-collapse-inner">
+                            <div style={{ padding: 'var(--space-4) var(--space-5)' }}>
+                              {project.fields.length > 0 && (
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 'var(--space-2) var(--space-5)', marginBottom: project.outcomes.length > 0 ? 'var(--space-4)' : 0 }}>
+                                  {project.fields.map((f, fi) => (
+                                    <div key={fi} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.5 }}>
+                                      <strong style={{ color: 'var(--color-primary)' }}>{f.label}:</strong> {f.value}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                              {project.outcomes.length > 0 && (
+                                <div>
+                                  <strong style={{ fontSize: 'var(--text-sm)', color: 'var(--color-primary)', display: 'block', marginBottom: 'var(--space-2)' }}>
+                                    Outcome
+                                  </strong>
+                                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                                    {project.outcomes.map((o, oi) => (
+                                      <li key={oi} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-2)' }}>
+                                        <Check size={13} strokeWidth={2.5} style={{ color: 'var(--color-accent)', flexShrink: 0, marginTop: 3 }} />
+                                        <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.5 }}>{o}</span>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             ))}

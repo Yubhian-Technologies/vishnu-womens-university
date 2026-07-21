@@ -17,6 +17,8 @@ export interface ResearchItemDoc {
   about: string;
   highlights: string[];
   tableText: string;
+  accordionText: string;
+  projectsText: string;
   heroImage: string;
   heroStoragePath: string;
   order: number;
@@ -24,7 +26,7 @@ export interface ResearchItemDoc {
 
 const EMPTY: Omit<ResearchItemDoc, 'id'> = {
   slug: '', title: '', category: 'governance', icon: 'Microscope', desc: '', intro: '', about: '',
-  highlights: [], tableText: '', heroImage: '', heroStoragePath: '', order: 0,
+  highlights: [], tableText: '', accordionText: '', projectsText: '', heroImage: '', heroStoragePath: '', order: 0,
 };
 
 const CATEGORIES: { value: ResearchItemDoc['category']; label: string }[] = [
@@ -70,8 +72,8 @@ export default function ResearchItemsAdmin() {
     setForm({
       slug: it.slug, title: it.title, category: it.category, icon: it.icon || 'Microscope',
       desc: it.desc || '', intro: it.intro || '', about: it.about || '',
-      highlights: it.highlights || [], tableText: it.tableText || '',
-      heroImage: it.heroImage || '', heroStoragePath: it.heroStoragePath || '', order: it.order,
+      highlights: it.highlights || [], tableText: it.tableText || '', accordionText: it.accordionText || '',
+      projectsText: it.projectsText || '', heroImage: it.heroImage || '', heroStoragePath: it.heroStoragePath || '', order: it.order,
     });
   };
 
@@ -146,6 +148,31 @@ export default function ResearchItemsAdmin() {
           <div className="admin-field admin-field--full">
             <label>Data Table (optional — see format above)</label>
             <textarea rows={8} value={form.tableText} onChange={(e) => set('tableText', e.target.value)} placeholder={'Name | Role\nDr. G. Srinivasa Rao | Chairman\nProf. P. Venkata Rama Raju | Member'} />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label>Expandable Areas (optional — for pages like Thrust Areas of Research that group into
+              categories of collapsible areas instead of a table). Start each category with{' '}
+              <code>## Category</code>, each expandable area within it with <code>### Area Name</code>, then list
+              one item per line underneath (e.g. faculty names) — they'll render as a click-to-expand accordion.</label>
+            <textarea
+              rows={10}
+              value={form.accordionText}
+              onChange={(e) => set('accordionText', e.target.value)}
+              placeholder={'## Computing & AI\n### Machine Learning\nK. Padma Vasavi\nA. Sri Krishna\n### Deep Learning\nK. Padma Vasavi'}
+            />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label>Project Accordion (optional — for pages like Funded Projects that need a per-project
+              expandable card instead of a table). Start each category with <code>## Category</code> (e.g.{' '}
+              <code>## Ongoing Projects</code>), each project with <code>### Project Title</code>, then{' '}
+              <code>Label: value</code> lines for its fields (PI, Department, Amount, Agency, ...), and{' '}
+              <code>- bullet text</code> lines for its Outcome list.</label>
+            <textarea
+              rows={12}
+              value={form.projectsText}
+              onChange={(e) => set('projectsText', e.target.value)}
+              placeholder={'## Ongoing Projects\n### Memory-Optimized Co-Processing Unit for Enhanced Edge AI\nPI: Dr. K Padma Vasavi\nDepartment: ECE\nAmount: Rs. 64,55,000\nAgency: Ministry of Electronics & IT\nOutcome:\n- Design and develop a specialized co-processing unit\n- Ensure seamless integration with existing systems'}
+            />
           </div>
         </div>
         <div className="admin-form-actions">

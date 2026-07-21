@@ -94,6 +94,31 @@
   padding-top: 4px;
 }
 
+.vm-values-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.vm-values-item {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+}
+
+.vm-values-icon {
+  color: var(--color-accent);
+  flex-shrink: 0;
+  margin-top: 5px;
+}
+
+.vm-values-item p {
+  font-size: var(--text-base);
+  color: var(--color-text);
+  line-height: 1.6;
+}
+
 /* Values */
 .vm-values-grid {
   display: grid;

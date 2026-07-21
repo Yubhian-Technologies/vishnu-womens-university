@@ -80,3 +80,132 @@ export function parseFlexibleTable(text: string): FlexibleTableSection[] {
   }
   return sections;
 }
+
+// A two-level collapsible format for content that groups into named
+// categories, each containing several expandable areas with a flat list of
+// items inside (e.g. Research's Thrust Areas: department -> research area ->
+// faculty names). Rendered as an accordion rather than a table.
+//
+// Format:
+//   ## Category Title      (starts a new category)
+//   ### Area Name          (starts a new expandable area within the category)
+//   Item one               (plain lines after "### " are that area's items)
+//   Item two
+export interface AccordionArea {
+  name: string;
+  items: string[];
+}
+
+export interface AccordionCategory {
+  title: string;
+  areas: AccordionArea[];
+}
+
+export function parseAccordionTable(text: string): AccordionCategory[] {
+  const lines = (text || '').split('\n').map((l) => l.trim()).filter(Boolean);
+  const categories: AccordionCategory[] = [];
+  let currentCategory: AccordionCategory | null = null;
+  let currentArea: AccordionArea | null = null;
+
+  for (const line of lines) {
+    if (line.startsWith('## ')) {
+      currentCategory = { title: line.slice(3).trim(), areas: [] };
+      categories.push(currentCategory);
+      currentArea = null;
+      continue;
+    }
+    if (line.startsWith('### ')) {
+      if (!currentCategory) {
+        currentCategory = { title: '', areas: [] };
+        categories.push(currentCategory);
+      }
+      currentArea = { name: line.slice(4).trim(), items: [] };
+      currentCategory.areas.push(currentArea);
+      continue;
+    }
+    if (!currentCategory) {
+      currentCategory = { title: '', areas: [] };
+      categories.push(currentCategory);
+    }
+    if (!currentArea) {
+      currentArea = { name: '', items: [] };
+      currentCategory.areas.push(currentArea);
+    }
+    currentArea.items.push(line);
+  }
+  return categories;
+}
+
+// A richer per-item accordion for content that's more than a flat list per
+// area — e.g. Research's Funded Projects, where each project (grouped under
+// an Ongoing/Completed category) has several labeled fields (PI, Department,
+// Amount, Agency, ...) plus a bulleted Outcome list.
+//
+// Format:
+//   ## Category Title              (optional — starts a new category, e.g. "Ongoing Projects")
+//   ### Project Title              (starts a new project)
+//   Label: value                   (a labeled field shown under the project)
+//   Another Label: value
+//   Outcome:                       (optional marker line, itself not shown — bullets below are)
+//   - Outcome bullet one
+//   - Outcome bullet two
+export interface ProjectAccordionField {
+  label: string;
+  value: string;
+}
+
+export interface ProjectAccordionItem {
+  title: string;
+  fields: ProjectAccordionField[];
+  outcomes: string[];
+}
+
+export interface ProjectAccordionCategory {
+  title: string;
+  projects: ProjectAccordionItem[];
+}
+
+export function parseProjectAccordion(text: string): ProjectAccordionCategory[] {
+  const lines = (text || '').split('\n').map((l) => l.trim()).filter(Boolean);
+  const categories: ProjectAccordionCategory[] = [];
+  let currentCategory: ProjectAccordionCategory | null = null;
+  let currentProject: ProjectAccordionItem | null = null;
+
+  for (const line of lines) {
+    if (line.startsWith('## ')) {
+      currentCategory = { title: line.slice(3).trim(), projects: [] };
+      categories.push(currentCategory);
+      currentProject = null;
+      continue;
+    }
+    if (line.startsWith('### ')) {
+      if (!currentCategory) {
+        currentCategory = { title: '', projects: [] };
+        categories.push(currentCategory);
+      }
+      currentProject = { title: line.slice(4).trim(), fields: [], outcomes: [] };
+      currentCategory.projects.push(currentProject);
+      continue;
+    }
+    if (!currentCategory) {
+      currentCategory = { title: '', projects: [] };
+      categories.push(currentCategory);
+    }
+    if (!currentProject) {
+      currentProject = { title: '', fields: [], outcomes: [] };
+      currentCategory.projects.push(currentProject);
+    }
+
+    if (line.startsWith('- ')) {
+      currentProject.outcomes.push(line.slice(2).trim());
+      continue;
+    }
+    const colonIndex = line.indexOf(':');
+    if (colonIndex > -1) {
+      const label = line.slice(0, colonIndex).trim();
+      const value = line.slice(colonIndex + 1).trim();
+      if (value) currentProject.fields.push({ label, value });
+    }
+  }
+  return categories;
+}
