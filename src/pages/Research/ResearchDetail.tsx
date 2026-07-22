@@ -6,7 +6,13 @@ import { resolveContentIcon } from '../../lib/contentIcons';
 import { parseFlexibleTable, parseAccordionTable, parseProjectAccordion } from '../../lib/structuredTable';
 import type { ResearchItemDoc } from '../Admin/sections/ResearchItemsAdmin';
 import { DEFAULT_FUNDED_PROJECTS_TEXT } from './fundedProjectsDefault';
+import { DEFAULT_PATENTS_TEXT } from './patentsDefault';
 import { DEFAULT_THRUST_AREAS_TEXT } from './thrustAreasDefault';
+import { DEFAULT_RESEARCH_PUBLICATIONS_TEXT } from './researchPublicationsDefault';
+import { DEFAULT_CONSULTANCY_TEXT } from './consultancyDefault';
+import { DEFAULT_RESEARCH_CENTERS_TABLE_TEXT } from './researchCentersDefault';
+import { DEFAULT_SEED_MONEY_PROJECTS_TABLE_TEXT } from './seedMoneyProjectsDefault';
+import { DEFAULT_ABOUT_RD_TABLE_TEXT } from './aboutRdDefault';
 import '../detail-layout.css';
 
 const DEFAULT_HERO_IMAGE = 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=1920&q=80';
@@ -23,12 +29,27 @@ const CATEGORY_LABELS: Record<string, string> = {
 // fully rather than staying blank until someone pastes it in manually.
 const DEFAULT_PROJECTS_TEXT_BY_SLUG: Record<string, string> = {
   'funded-projects': DEFAULT_FUNDED_PROJECTS_TEXT,
+  'patents': DEFAULT_PATENTS_TEXT,
 };
 
 // Same fallback pattern as above, for the accordion (category -> area ->
 // faculty) content on Thrust Areas of Research.
 const DEFAULT_ACCORDION_TEXT_BY_SLUG: Record<string, string> = {
   'thrust-areas-of-research': DEFAULT_THRUST_AREAS_TEXT,
+  'research-publications': DEFAULT_RESEARCH_PUBLICATIONS_TEXT,
+  'consultancy': DEFAULT_CONSULTANCY_TEXT,
+};
+
+// Research Centers, Seed Money Projects, and About R&D all already have an
+// older/partial tableText value saved in Firestore that's missing sections
+// added later (fuller detail tables, department coordinators, etc.) — so
+// unlike the other two maps above, this one is checked *before*
+// item.tableText (see below) and always wins for these slugs until an admin
+// removes it.
+const DEFAULT_TABLE_TEXT_BY_SLUG: Record<string, string> = {
+  'research-centers': DEFAULT_RESEARCH_CENTERS_TABLE_TEXT,
+  'seed-money-projects': DEFAULT_SEED_MONEY_PROJECTS_TABLE_TEXT,
+  'about-rd': DEFAULT_ABOUT_RD_TABLE_TEXT,
 };
 
 export default function ResearchDetail() {
@@ -70,7 +91,8 @@ export default function ResearchDetail() {
   const Icon = resolveContentIcon(item.icon) || Microscope;
   const categoryLabel = CATEGORY_LABELS[item.category] || item.category;
   const heroImage = item.heroImage || DEFAULT_HERO_IMAGE;
-  const tableSections = parseFlexibleTable(item.tableText).filter((s) => s.headers.length > 0);
+  const tableText = DEFAULT_TABLE_TEXT_BY_SLUG[item.slug] || item.tableText || '';
+  const tableSections = parseFlexibleTable(tableText).filter((s) => s.headers.length > 0);
   const accordionText = item.accordionText || DEFAULT_ACCORDION_TEXT_BY_SLUG[item.slug] || '';
   const accordionCategories = parseAccordionTable(accordionText).filter((c) => c.areas.length > 0);
   const projectsText = item.projectsText || DEFAULT_PROJECTS_TEXT_BY_SLUG[item.slug] || '';
@@ -230,7 +252,14 @@ export default function ResearchDetail() {
                                 <li key={ii}>
                                   <Check size={13} strokeWidth={2.5} style={{ color: 'var(--color-accent)', flexShrink: 0 }} />
                                   {it.href ? (
-                                    <Link to={it.href} className="thrust-accordion-link">{it.label}</Link>
+                                    /\.[a-z0-9]+$/i.test(it.href) ? (
+                                      // A file path (e.g. a PDF), not another page — a router
+                                      // Link would just SPA-navigate to a nonexistent route
+                                      // instead of fetching the file, so use a plain anchor.
+                                      <a href={it.href} download target="_blank" rel="noopener noreferrer" className="thrust-accordion-link">{it.label}</a>
+                                    ) : (
+                                      <Link to={it.href} className="thrust-accordion-link">{it.label}</Link>
+                                    )
                                   ) : (
                                     <span>{it.label}</span>
                                   )}
@@ -289,7 +318,12 @@ export default function ResearchDetail() {
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 'var(--space-2) var(--space-5)', marginBottom: project.outcomes.length > 0 ? 'var(--space-4)' : 0 }}>
                                   {project.fields.map((f, fi) => (
                                     <div key={fi} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.5 }}>
-                                      <strong style={{ color: 'var(--color-primary)' }}>{f.label}:</strong> {f.value}
+                                      <strong style={{ color: 'var(--color-primary)' }}>{f.label}:</strong>{' '}
+                                      {f.href ? (
+                                        <a href={f.href} download target="_blank" rel="noopener noreferrer" className="thrust-accordion-link">{f.value}</a>
+                                      ) : (
+                                        f.value
+                                      )}
                                     </div>
                                   ))}
                                 </div>
