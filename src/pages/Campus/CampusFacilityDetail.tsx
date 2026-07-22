@@ -51,17 +51,19 @@ export default function CampusFacilityDetail() {
         </div>
       </section>
 
-      <section className="section bg-off-white">
-        <div className="container">
-          <PhotoGrid
-            images={photos}
-            label={facility.title}
-            title={`${facility.title} in Pictures`}
-            columns={3}
-            layout="default"
-          />
-        </div>
-      </section>
+      {photos.length > 0 && (
+        <section className="section bg-off-white">
+          <div className="container">
+            <PhotoGrid
+              images={photos}
+              label={facility.title}
+              title={`${facility.title} in Pictures`}
+              columns={3}
+              layout="default"
+            />
+          </div>
+        </section>
+      )}
 
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-14) 0' }}>
         <div className="container" style={{ textAlign: 'center' }}>
