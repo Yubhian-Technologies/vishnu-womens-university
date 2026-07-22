@@ -93,6 +93,11 @@
   overflow: hidden;
   border-bottom: 3px solid var(--color-accent);
   height: 180px;
+  /* Layout/paint/style for this strip never affects (or is affected by)
+     anything outside it, so the browser doesn't need to consider the rest
+     of the page when this subtree repaints (e.g. on scroll or the
+     skeleton→photo swap). */
+  contain: content;
 }
 .activity-strip-label {
   flex-shrink: 0;
@@ -138,9 +143,15 @@
 .activity-track {
   display: flex;
   gap: 3px;
-  animation: activity-scroll 28s linear infinite;
   width: max-content;
   height: 100%;
+  animation: activity-scroll 28s linear infinite;
+  /* Promotes the track to its own compositor layer up front, so the browser
+     never has to repaint the rest of the strip (or the page) on each
+     animation frame — the transform is handled entirely off the main
+     thread, which is what keeps this from ever competing with scroll/input
+     handling. */
+  will-change: transform;
 }
 .activity-track:hover { animation-play-state: paused; }
 
@@ -152,12 +163,26 @@
   overflow: hidden;
   cursor: default;
 }
+.activity-card--skeleton {
+  background: linear-gradient(
+    100deg,
+    rgba(255,255,255,0.06) 30%,
+    rgba(255,255,255,0.14) 50%,
+    rgba(255,255,255,0.06) 70%
+  );
+  background-size: 200% 100%;
+  animation: activity-skeleton-shimmer 1.4s ease-in-out infinite;
+}
+@keyframes activity-skeleton-shimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
 .activity-card-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: transform 0.4s ease;
+  transition: opacity 0.35s ease, transform 0.4s ease;
 }
 .activity-card:hover .activity-card-img { transform: scale(1.06); }
 .activity-card-label {
@@ -248,7 +273,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform var(--transition-slow);
+  transition: opacity 0.35s ease, transform var(--transition-slow);
 }
 .study-card:hover .study-card-image { transform: scale(1.08); }
 
@@ -368,7 +393,7 @@
   height: 100%;
   object-fit: cover;
   min-height: 460px;
-  transition: transform var(--transition-slow);
+  transition: opacity 0.35s ease, transform var(--transition-slow);
 }
 .campus-image-side:hover .campus-image { transform: scale(1.04); }
 .campus-image-overlay {
@@ -529,7 +554,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform var(--transition-slow);
+  transition: opacity 0.35s ease, transform var(--transition-slow);
 }
 .mission-img:hover img { transform: scale(1.06); }
 .mission-img-overlay {
