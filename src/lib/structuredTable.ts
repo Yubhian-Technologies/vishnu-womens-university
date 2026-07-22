@@ -155,13 +155,14 @@ export function parseAccordionTable(text: string): AccordionCategory[] {
 //   ## Category Title              (optional — starts a new category, e.g. "Ongoing Projects")
 //   ### Project Title              (starts a new project)
 //   Label: value                   (a labeled field shown under the project)
-//   Another Label: value
+//   Another Label: value | /link   (an optional "| link" makes the value a download/link)
 //   Outcome:                       (optional marker line, itself not shown — bullets below are)
 //   - Outcome bullet one
 //   - Outcome bullet two
 export interface ProjectAccordionField {
   label: string;
   value: string;
+  href?: string;
 }
 
 export interface ProjectAccordionItem {
@@ -213,8 +214,14 @@ export function parseProjectAccordion(text: string): ProjectAccordionCategory[] 
     const colonIndex = line.indexOf(':');
     if (colonIndex > -1) {
       const label = line.slice(0, colonIndex).trim();
-      const value = line.slice(colonIndex + 1).trim();
-      if (value) currentProject.fields.push({ label, value });
+      let value = line.slice(colonIndex + 1).trim();
+      let href: string | undefined;
+      const pipeIndex = value.indexOf('|');
+      if (pipeIndex > -1) {
+        href = value.slice(pipeIndex + 1).trim() || undefined;
+        value = value.slice(0, pipeIndex).trim();
+      }
+      if (value) currentProject.fields.push({ label, value, href });
     }
   }
   return categories;
