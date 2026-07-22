@@ -16,21 +16,34 @@ function centerAspectCrop(w: number, h: number, aspect: number): Crop {
   return centerCrop(makeAspectCrop({ unit: '%', width: 90 }, aspect, w, h), w, h);
 }
 
+// Nothing on this site is ever displayed larger than this, so there's no
+// benefit to uploading (and making every visitor download) pixels beyond
+// it — a source photo straight off a phone/DSLR can otherwise sail through
+// the crop step at its full native resolution (multi-MB, several thousand
+// pixels wide) and become one of the slowest things on the page.
+const MAX_OUTPUT_DIMENSION = 1920;
+
 async function cropImageToBlob(img: HTMLImageElement, px: PixelCrop): Promise<Blob> {
   const canvas = document.createElement('canvas');
   const scaleX = img.naturalWidth  / img.width;
   const scaleY = img.naturalHeight / img.height;
-  canvas.width  = px.width  * scaleX;
-  canvas.height = px.height * scaleY;
+  const cropWidth  = px.width  * scaleX;
+  const cropHeight = px.height * scaleY;
+  const outputScale = Math.min(1, MAX_OUTPUT_DIMENSION / Math.max(cropWidth, cropHeight));
+  canvas.width  = cropWidth  * outputScale;
+  canvas.height = cropHeight * outputScale;
   const ctx = canvas.getContext('2d')!;
   ctx.drawImage(
     img,
     px.x * scaleX, px.y * scaleY,
-    px.width * scaleX, px.height * scaleY,
+    cropWidth, cropHeight,
     0, 0, canvas.width, canvas.height,
   );
+  // WebP: same visual quality as JPEG at a meaningfully smaller byte size,
+  // and every browser this site supports can both encode (canvas.toBlob)
+  // and decode (<img>) it.
   return new Promise((res, rej) =>
-    canvas.toBlob((b) => b ? res(b) : rej(new Error('Canvas toBlob failed')), 'image/jpeg', 0.92),
+    canvas.toBlob((b) => b ? res(b) : rej(new Error('Canvas toBlob failed')), 'image/webp', 0.85),
   );
 }
 
@@ -86,7 +99,7 @@ export function useImageCropModal(defaultAspect = 16 / 9) {
     setCropSrc(null);
     try {
       const blob = await cropImageToBlob(imgRef.current, pixelCrop);
-      const file = new File([blob], 'cropped.jpg', { type: 'image/jpeg' });
+      const file = new File([blob], 'cropped.webp', { type: 'image/webp' });
       const result = await uploadImage(file, pending.folder);
       pending.onUploaded(result);
     } catch (e) {

@@ -4,6 +4,7 @@ import { Laptop, Presentation, Check, Clock, MapPin } from 'lucide-react';
 import HeroSlider from '../../components/HeroSlider/HeroSlider';
 import CounterSection from '../../components/CounterSection/CounterSection';
 import NewsCard from '../../components/NewsCard/NewsCard';
+import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { useSitePhotos } from '../../hooks/useSitePhotos';
@@ -11,6 +12,7 @@ import { resolveContentIcon } from '../../lib/contentIcons';
 import { type NewsDoc, newsDocToArticle } from '../../lib/news';
 import type { EventDoc } from '../Admin/sections/EventsAdmin';
 import type { ContentBlockDoc } from '../Admin/sections/ContentBlocksAdmin';
+import type { SitePhotoDoc } from '../Admin/sections/SitePhotosAdmin';
 import './Home.css';
 
 /* ── Data ─────────────────────────────────────────────────── */
@@ -174,6 +176,11 @@ export default function Home() {
   const livePopularPrograms = useContentBlocks('home', 'popularPrograms');
   const popularPrograms = livePopularPrograms.length > 0 ? livePopularPrograms : defaultPopularPrograms;
   const activityPhotos = useSitePhotos('home', 'activities', defaultActivityPhotos);
+  // Gates the strip's first paint: until Firestore actually responds, we
+  // don't yet know whether real activity photos exist, so a skeleton shows
+  // instead of the generic stock defaults — avoids ever rendering a photo
+  // that's about to be replaced by a different one a moment later.
+  const { loading: activitiesLoading } = useOrderedCollection<SitePhotoDoc>('sitePhotos', 'order');
   const studyCardPhotos = useSitePhotos('home', 'study-cards', defaultStudyCardPhotos);
   const campusLifePhoto = useSitePhotos('home', 'campus-life', defaultCampusLifePhoto)[0];
   const missionPhotos = useSitePhotos('home', 'mission', defaultMissionPhotos);
@@ -242,12 +249,31 @@ export default function Home() {
         <div className="activity-strip-label">Recent<br />Activities</div>
         <div className="activity-track-wrap">
           <div className="activity-track">
-            {[...activityPhotos, ...activityPhotos].map((item, i) => (
-              <div key={i} className="activity-card">
-                <img src={item.src} alt={item.alt} className="activity-card-img" loading="lazy" />
-                <div className="activity-card-label">{item.caption || item.alt}</div>
-              </div>
-            ))}
+            {activitiesLoading ? (
+              Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="activity-card activity-card--skeleton" aria-hidden="true" />
+              ))
+            ) : (
+              // Doubled so the loop point (translateX -50%) lands exactly on
+              // an identical copy of the start — the standard technique for
+              // a seamless CSS marquee. Every card, including the second
+              // copy, is going to scroll through within one 28s cycle, so
+              // all of them load eagerly: no `loading="lazy"` here — lazy
+              // images that only start decoding the instant they scroll
+              // into frame is what caused the visible stutter/freeze this
+              // strip used to have.
+              [...activityPhotos, ...activityPhotos].map((item, i) => (
+                <div key={i} className="activity-card">
+                  <SmoothImage
+                    src={item.src}
+                    alt={item.alt}
+                    className="activity-card-img"
+                    {...(i < 3 ? { fetchPriority: 'high' as const } : {})}
+                  />
+                  <div className="activity-card-label">{item.caption || item.alt}</div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>
@@ -282,7 +308,7 @@ export default function Home() {
                   style={{ '--card-color': color } as React.CSSProperties}
                 >
                   <div className="study-card-image-wrap">
-                    <img src={photo.src} alt={photo.alt} className="study-card-image" loading="lazy" />
+                    <SmoothImage src={photo.src} alt={photo.alt} className="study-card-image" />
                     <div className="study-card-overlay" style={{ background: `linear-gradient(to top, ${color}cc 0%, transparent 65%)` }} />
                     <div className="study-card-icon"><Icon size={24} strokeWidth={1.75} color="var(--color-primary-dark)" /></div>
                     <div className="study-card-shine" />
@@ -328,7 +354,7 @@ export default function Home() {
       {/* ── Campus Life ── */}
       <section className="campus-section" aria-label="Campus Life">
         <div className="campus-image-side reveal-left">
-          <img src={campusLifePhoto.src} alt={campusLifePhoto.alt} className="campus-image" loading="lazy" />
+          <SmoothImage src={campusLifePhoto.src} alt={campusLifePhoto.alt} className="campus-image" />
           <div className="campus-image-overlay" />
           <div className="campus-image-badge reveal-scale" data-delay="300">
             <span className="campus-badge-num">100+</span>
@@ -376,7 +402,7 @@ export default function Home() {
             <div className="mission-image-grid reveal-right">
               {missionPhotos.map((photo, i) => (
                 <div key={i} className={`mission-img mission-img--${i}`}>
-                  <img src={photo.src} alt={photo.alt} loading="lazy" />
+                  <SmoothImage src={photo.src} alt={photo.alt} />
                   <div className="mission-img-overlay" />
                 </div>
               ))}
@@ -431,7 +457,7 @@ export default function Home() {
                 <div className="testimonial-quote-mark">"</div>
                 <p className="testimonial-quote">{t.desc}</p>
                 <div className="testimonial-author">
-                  {t.slug && <img src={t.slug} alt={t.title} className="testimonial-avatar" loading="lazy" />}
+                  {t.slug && <img src={t.slug} alt={t.title} className="testimonial-avatar" />}
                   <div className="testimonial-info">
                     <strong>{t.title}</strong>
                     <span>{t.value}</span>
@@ -514,7 +540,7 @@ export default function Home() {
 
       {/* ── CTA Banner ── */}
       <section className="cta-banner">
-        <img src={ctaBannerPhoto.src} alt={ctaBannerPhoto.alt} className="cta-banner-bg" loading="lazy" />
+        <SmoothImage src={ctaBannerPhoto.src} alt={ctaBannerPhoto.alt} className="cta-banner-bg" />
         <div className="cta-banner-overlay" />
         <div className="cta-particles" aria-hidden="true">
           {Array.from({ length: 12 }).map((_, i) => (
