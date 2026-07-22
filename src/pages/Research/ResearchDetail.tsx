@@ -11,8 +11,11 @@ import { DEFAULT_THRUST_AREAS_TEXT } from './thrustAreasDefault';
 import { DEFAULT_RESEARCH_PUBLICATIONS_TEXT } from './researchPublicationsDefault';
 import { DEFAULT_CONSULTANCY_TEXT } from './consultancyDefault';
 import { DEFAULT_RESEARCH_CENTERS_TABLE_TEXT } from './researchCentersDefault';
-import { DEFAULT_SEED_MONEY_PROJECTS_TABLE_TEXT } from './seedMoneyProjectsDefault';
+import { DEFAULT_SEED_MONEY_PROJECTS_TABLE_TEXT, DEFAULT_SEED_MONEY_PROJECTS_INTRO } from './seedMoneyProjectsDefault';
 import { DEFAULT_ABOUT_RD_TABLE_TEXT } from './aboutRdDefault';
+import { DEFAULT_RAC_INTRO, DEFAULT_RAC_ABOUT } from './researchAdvisoryCommitteeDefault';
+import { DEFAULT_REC_INTRO, DEFAULT_REC_ABOUT } from './researchEthicsCommitteeDefault';
+import { DEFAULT_IPR_INTRO, DEFAULT_IPR_ABOUT } from './iprCommitteeDefault';
 import '../detail-layout.css';
 
 const DEFAULT_HERO_IMAGE = 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=1920&q=80';
@@ -51,6 +54,76 @@ const DEFAULT_TABLE_TEXT_BY_SLUG: Record<string, string> = {
   'seed-money-projects': DEFAULT_SEED_MONEY_PROJECTS_TABLE_TEXT,
   'about-rd': DEFAULT_ABOUT_RD_TABLE_TEXT,
 };
+
+// Research Advisory Committee, Research Ethics Committee, and IPR Committee
+// all already have a short one-line item.intro saved in Firestore that
+// predates the fuller committee description from svecw.edu.in — so like the
+// table map above, this one wins over item.intro for these slugs. item.about
+// is currently empty for all three, so it uses the normal (item value wins)
+// fallback further below.
+const DEFAULT_INTRO_BY_SLUG: Record<string, string> = {
+  'research-advisory-committee': DEFAULT_RAC_INTRO,
+  'research-ethics-committee': DEFAULT_REC_INTRO,
+  'ipr-committee': DEFAULT_IPR_INTRO,
+  'seed-money-projects': DEFAULT_SEED_MONEY_PROJECTS_INTRO,
+};
+const DEFAULT_ABOUT_BY_SLUG: Record<string, string> = {
+  'research-advisory-committee': DEFAULT_RAC_ABOUT,
+  'research-ethics-committee': DEFAULT_REC_ABOUT,
+  'ipr-committee': DEFAULT_IPR_ABOUT,
+};
+
+// The About paragraph is usually one plain block of text, but some items
+// (e.g. Research Advisory Committee) need a sub-heading plus a bulleted list
+// of "Bold Label: description" items — parsed from plain text so it stays a
+// single Firestore string field rather than needing new admin UI.
+type AboutBlock =
+  | { type: 'heading'; text: string }
+  | { type: 'paragraph'; text: string }
+  | { type: 'list'; items: string[] };
+
+function parseAboutContent(text: string): AboutBlock[] {
+  const blocks: AboutBlock[] = [];
+  let paragraphLines: string[] = [];
+  let listItems: string[] = [];
+
+  const flushParagraph = () => {
+    if (paragraphLines.length > 0) {
+      blocks.push({ type: 'paragraph', text: paragraphLines.join(' ') });
+      paragraphLines = [];
+    }
+  };
+  const flushList = () => {
+    if (listItems.length > 0) {
+      blocks.push({ type: 'list', items: listItems });
+      listItems = [];
+    }
+  };
+
+  for (const rawLine of (text || '').split('\n')) {
+    const line = rawLine.trim();
+    if (!line) {
+      flushParagraph();
+      continue;
+    }
+    if (line.startsWith('## ')) {
+      flushParagraph();
+      flushList();
+      blocks.push({ type: 'heading', text: line.slice(3).trim() });
+      continue;
+    }
+    if (line.startsWith('- ')) {
+      flushParagraph();
+      listItems.push(line.slice(2).trim());
+      continue;
+    }
+    flushList();
+    paragraphLines.push(line);
+  }
+  flushParagraph();
+  flushList();
+  return blocks;
+}
 
 export default function ResearchDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -91,6 +164,9 @@ export default function ResearchDetail() {
   const Icon = resolveContentIcon(item.icon) || Microscope;
   const categoryLabel = CATEGORY_LABELS[item.category] || item.category;
   const heroImage = item.heroImage || DEFAULT_HERO_IMAGE;
+  const intro = DEFAULT_INTRO_BY_SLUG[item.slug] || item.intro;
+  const about = item.about || DEFAULT_ABOUT_BY_SLUG[item.slug] || '';
+  const aboutBlocks = parseAboutContent(about);
   const tableText = DEFAULT_TABLE_TEXT_BY_SLUG[item.slug] || item.tableText || '';
   const tableSections = parseFlexibleTable(tableText).filter((s) => s.headers.length > 0);
   const accordionText = item.accordionText || DEFAULT_ACCORDION_TEXT_BY_SLUG[item.slug] || '';
@@ -126,17 +202,48 @@ export default function ResearchDetail() {
             <div>
               <span className="section-label">Overview</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>About {item.title}</h2>
-              {item.intro && (
+              {intro && (
                 <p style={{ fontSize: 'var(--text-lg)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-5)' }}>
-                  {item.intro}
+                  {intro}
                 </p>
               )}
-              {item.about && (
-                <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text-light)', lineHeight: 1.75 }}>
-                  {item.about}
-                </p>
-              )}
-              {!item.intro && !item.about && (
+              {aboutBlocks.map((block, bi) => {
+                if (block.type === 'heading') {
+                  return (
+                    <h3 key={bi} style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>
+                      {block.text}
+                    </h3>
+                  );
+                }
+                if (block.type === 'list') {
+                  return (
+                    <ul key={bi} style={{ listStyle: 'none', padding: 0, margin: '0 0 var(--space-4) 0', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                      {block.items.map((line, li) => {
+                        const colonIndex = line.indexOf(':');
+                        const label = colonIndex > -1 ? line.slice(0, colonIndex).trim() : '';
+                        const rest = colonIndex > -1 ? line.slice(colonIndex + 1).trim() : line;
+                        return (
+                          <li key={li} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-2)' }}>
+                            <span style={{ width: 20, height: 20, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 3 }}>
+                              <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                            </span>
+                            <span style={{ fontSize: 'var(--text-base)', color: 'var(--color-text-light)', lineHeight: 1.75 }}>
+                              {label && <strong style={{ color: 'var(--color-primary)' }}>{label}: </strong>}
+                              {rest}
+                            </span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  );
+                }
+                return (
+                  <p key={bi} style={{ fontSize: 'var(--text-base)', color: 'var(--color-text-light)', lineHeight: 1.75, marginBottom: 'var(--space-4)' }}>
+                    {block.text}
+                  </p>
+                );
+              })}
+              {!intro && aboutBlocks.length === 0 && (
                 <p style={{ fontSize: 'var(--text-lg)', color: 'var(--color-text)', lineHeight: 1.75 }}>
                   {item.desc}
                 </p>
