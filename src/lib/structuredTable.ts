@@ -90,10 +90,15 @@ export function parseFlexibleTable(text: string): FlexibleTableSection[] {
 //   ## Category Title      (starts a new category)
 //   ### Area Name          (starts a new expandable area within the category)
 //   Item one               (plain lines after "### " are that area's items)
-//   Item two
+//   Item two | /some/path  (an optional "| link" makes the item clickable)
+export interface AccordionItem {
+  label: string;
+  href?: string;
+}
+
 export interface AccordionArea {
   name: string;
-  items: string[];
+  items: AccordionItem[];
 }
 
 export interface AccordionCategory {
@@ -131,7 +136,12 @@ export function parseAccordionTable(text: string): AccordionCategory[] {
       currentArea = { name: '', items: [] };
       currentCategory.areas.push(currentArea);
     }
-    currentArea.items.push(line);
+    const pipeIndex = line.indexOf('|');
+    if (pipeIndex > -1) {
+      currentArea.items.push({ label: line.slice(0, pipeIndex).trim(), href: line.slice(pipeIndex + 1).trim() || undefined });
+    } else {
+      currentArea.items.push({ label: line });
+    }
   }
   return categories;
 }

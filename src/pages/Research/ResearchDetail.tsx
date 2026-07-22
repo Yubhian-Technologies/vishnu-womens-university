@@ -6,6 +6,7 @@ import { resolveContentIcon } from '../../lib/contentIcons';
 import { parseFlexibleTable, parseAccordionTable, parseProjectAccordion } from '../../lib/structuredTable';
 import type { ResearchItemDoc } from '../Admin/sections/ResearchItemsAdmin';
 import { DEFAULT_FUNDED_PROJECTS_TEXT } from './fundedProjectsDefault';
+import { DEFAULT_THRUST_AREAS_TEXT } from './thrustAreasDefault';
 import '../detail-layout.css';
 
 const DEFAULT_HERO_IMAGE = 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=1920&q=80';
@@ -22,6 +23,12 @@ const CATEGORY_LABELS: Record<string, string> = {
 // fully rather than staying blank until someone pastes it in manually.
 const DEFAULT_PROJECTS_TEXT_BY_SLUG: Record<string, string> = {
   'funded-projects': DEFAULT_FUNDED_PROJECTS_TEXT,
+};
+
+// Same fallback pattern as above, for the accordion (category -> area ->
+// faculty) content on Thrust Areas of Research.
+const DEFAULT_ACCORDION_TEXT_BY_SLUG: Record<string, string> = {
+  'thrust-areas-of-research': DEFAULT_THRUST_AREAS_TEXT,
 };
 
 export default function ResearchDetail() {
@@ -64,7 +71,8 @@ export default function ResearchDetail() {
   const categoryLabel = CATEGORY_LABELS[item.category] || item.category;
   const heroImage = item.heroImage || DEFAULT_HERO_IMAGE;
   const tableSections = parseFlexibleTable(item.tableText).filter((s) => s.headers.length > 0);
-  const accordionCategories = parseAccordionTable(item.accordionText).filter((c) => c.areas.length > 0);
+  const accordionText = item.accordionText || DEFAULT_ACCORDION_TEXT_BY_SLUG[item.slug] || '';
+  const accordionCategories = parseAccordionTable(accordionText).filter((c) => c.areas.length > 0);
   const projectsText = item.projectsText || DEFAULT_PROJECTS_TEXT_BY_SLUG[item.slug] || '';
   const projectCategories = parseProjectAccordion(projectsText).filter((c) => c.projects.length > 0);
 
@@ -139,7 +147,7 @@ export default function ResearchDetail() {
       {/* Data table(s) — a single unnamed section renders as one table under
           the item's own title; multiple named sections (e.g. Patents grouped
           by year) each get their own sub-heading. */}
-      {tableSections.length > 0 && projectCategories.length === 0 && (
+      {tableSections.length > 0 && projectCategories.length === 0 && accordionCategories.length === 0 && (
         <section className="section bg-off-white">
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
@@ -221,7 +229,11 @@ export default function ResearchDetail() {
                               {area.items.map((it, ii) => (
                                 <li key={ii}>
                                   <Check size={13} strokeWidth={2.5} style={{ color: 'var(--color-accent)', flexShrink: 0 }} />
-                                  <span>{it}</span>
+                                  {it.href ? (
+                                    <Link to={it.href} className="thrust-accordion-link">{it.label}</Link>
+                                  ) : (
+                                    <span>{it.label}</span>
+                                  )}
                                 </li>
                               ))}
                             </ul>
