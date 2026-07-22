@@ -35,6 +35,8 @@ export const SECTIONS = [
   { id: 'placement-items', icon: '📈', label: 'Placement Sub-pages' },
   { id: 'news-awards-data', icon: '🏆', label: 'Happenings & Awards' },
   { id: 'research-items', icon: '🔬', label: 'Research' },
+  { id: 'compliance-docs', icon: '📜', label: 'Compliance Documents' },
+  { id: 'policies', icon: '📋', label: 'Institutional Policies' },
 ];
 
 // Groups the flat SECTIONS list under headers in the desktop sidebar only —
@@ -47,8 +49,8 @@ export const SECTIONS = [
 // hunting through one long undifferentiated list.
 export const SECTION_GROUPS: { label: string; ids: string[] }[] = [
   { label: 'Overview', ids: ['overview'] },
-  { label: 'Site Appearance', ids: ['banners', 'site-photos', 'nav-links', 'content-blocks'] },
-  { label: 'About & Governance', ids: ['governing-body', 'governance-items', 'core-executives', 'sves-campuses', 'contacts'] },
+  { label: 'Site Appearance', ids: ['banners', 'site-photos', 'nav-links', 'content-blocks', 'compliance-docs'] },
+  { label: 'About & Governance', ids: ['governing-body', 'governance-items', 'core-executives', 'sves-campuses', 'contacts', 'policies'] },
   { label: 'Academics', ids: ['programs', 'faculty', 'curriculum', 'downloads'] },
   { label: 'Admissions & Campus Info', ids: ['information'] },
   { label: 'Student Life', ids: ['student-clubs', 'faqs', 'job-openings', 'events'] },

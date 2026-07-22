@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom';
+import { useOrderedCollection } from '../../hooks/useCollection';
+import { COMPLIANCE_GROUPS, DEFAULT_COMPLIANCE_DOCS, type ComplianceDocDoc } from '../../pages/Admin/sections/ComplianceDocsAdmin';
 import './Footer.css';
 
 const quickLinks = [
@@ -55,65 +57,30 @@ const feedbackLinks = [
 ];
 
 // Statutory/compliance documents an accredited institution is required to publish.
-// Hosted on svecw.edu.in — the same accreditation-bearing institution VWU operates
-// under (the site already links out to svecw.edu.in systems elsewhere, e.g. the
-// exam portal and LMS), so these are the authoritative documents, not a separate
-// entity's paperwork being misrepresented as VWU's own.
-const complianceGroups: { title: string; links: { label: string; href: string; download?: boolean }[] }[] = [
-  {
-    title: 'Approvals & Accreditations',
-    links: [
-      { label: 'AICTE Approvals', href: '/downloads/AICTEApprovals.pdf', download: true },
-      { label: 'UGC Autonomous Approvals', href: '/downloads/UGCAutonomousApprovals.pdf', download: true },
-      { label: 'UGC - 12B 2f Letter', href: '/downloads/UGC12B2FLetter.pdf', download: true },
-      { label: 'JNTUK Affiliation Approvals', href: '/downloads/JNTUKAffiliationApprovals.pdf', download: true },
-      { label: 'JNTUK Autonomous Approvals', href: '/downloads/JNTUKAutonomousApprovals.pdf', download: true },
-      { label: 'NAAC Approvals', href: '/downloads/NAACApprovals.pdf', download: true },
-      { label: 'NBA Approvals', href: '/downloads/NBAApprovals.pdf', download: true },
-    ],
-  },
-  {
-    title: 'Mandatory Disclosures',
-    links: [
-      { label: 'AICTE Mandatory Disclosures', href: '/downloads/AICTEMandatoryDisclosures.pdf', download: true },
-      { label: 'UGC Public Self Disclosure', href: '/downloads/UGCPublicSelfDisclosure.pdf', download: true },
-      { label: 'JNTUK Mandatory Disclosure', href: '/downloads/JNTUKMandatoryDisclosure.pdf', download: true },
-      { label: 'RTI-Undertaking', href: '/downloads/RTIUndertaking.pdf', download: true },
-      { label: 'Disclosures – UGC', href: 'https://svecw.edu.in/infougc/' },
-      { label: 'Anti Ragging Policies', href: 'https://svecw.edu.in/anti-ragging/' },
-      { label: 'Policies & Procedures', href: 'https://svecw.edu.in/policies-procedures/' },
-    ],
-  },
-  {
-    title: 'Infrastructure & Facilities',
-    links: [
-      { label: 'College Fee Payment', href: '/downloads/SVECWCollegeFeePayment.pdf' },
-      { label: 'Hostel Fee Payment', href: '/downloads/SVECWHostelFeePayment.pdf' },
-      { label: 'Building Plans', href: '/downloads/SVECWBuildingPlans.pdf' },
-      { label: 'Structural Stability', href: '/downloads/SVECWStructuralStability.pdf' },
-      { label: 'Land Use Certificate', href: '/downloads/SVECWLandUseCertificate.pdf' },
-      { label: 'Land Conversion Certificate', href: 'https://svecw.edu.in/wp-content/uploads/2024/07/SVECWLandConversion.pdf' },
-      { label: 'Fire NOC', href: '/downloads/SVECWFireSafety2026.pdf' },
-      { label: 'Online Verification System', href: '/downloads/SVECWOnlineVerification.pdf' },
-    ],
-  },
-  {
-    title: 'Institutional Data',
-    links: [
-      { label: 'Audited Statements', href: '/downloads/SVECWAuditStatements.pdf' },
-      { label: 'Student Details', href: '/downloads/SVECWStudentDetails.pdf' },
-      { label: 'Faculty Details', href: '/downloads/SVECWFacultyDetails.pdf' },
-      { label: 'Faculty Qualification Details', href: 'https://svecw.edu.in/wp-content/uploads/2026/02/SVECWFacultyQualifications.pdf' },
-      { label: 'Faculty Ratification Details', href: '/downloads/SVECWRatifiedFaculty.pdf' },
-      { label: 'Faculty Handbook', href: 'https://svecw.edu.in/wp-content/uploads/2026/04/FacultyHandbookSVECW.pdf' },
-      { label: 'Students Handbook', href: 'https://svecw.edu.in/wp-content/uploads/2025/11/SVECWStudentHandbook.pdf' },
-      { label: 'Facilities for Physically Challenged', href: '/downloads/SVECWPhysicallyChallengedFacilities.pdf' },
-    ],
-  },
-];
+// Admin-editable via /admin → Compliance Documents (ComplianceDocsAdmin.tsx);
+// DEFAULT_COMPLIANCE_DOCS below is both the "nothing uploaded yet" fallback
+// and the one-click starting point for moving these into Firestore, so the
+// footer never looks broken either way.
+//
+// "Disclosures – UGC" is the one fixed exception: it's an internal page
+// route (built from the same PDF, at /disclosures/ugc), not a document link,
+// so it's pinned into the Mandatory Disclosures group directly rather than
+// living in the editable document list.
+const pinnedDisclosuresLink = { label: 'Disclosures – UGC', href: '/disclosures/ugc', download: false };
 
 export default function Footer() {
   const year = new Date().getFullYear();
+  const { docs: liveComplianceDocs } = useOrderedCollection<ComplianceDocDoc>('complianceDocs', 'order');
+  const complianceDocs = liveComplianceDocs.length > 0 ? liveComplianceDocs : (DEFAULT_COMPLIANCE_DOCS as ComplianceDocDoc[]);
+  const complianceGroups = COMPLIANCE_GROUPS.map((title) => ({
+    title,
+    links: [
+      ...(title === 'Mandatory Disclosures' ? [pinnedDisclosuresLink] : []),
+      ...complianceDocs
+        .filter((d) => d.group === title)
+        .map((d) => ({ label: d.label, href: d.fileUrl, download: d.external ? false : d.download !== false })),
+    ],
+  })).filter((g) => g.links.length > 0);
 
   return (
     <footer className="footer">
@@ -264,9 +231,9 @@ export default function Footer() {
               &copy; {year} Vishnu Womens University. All rights reserved.
             </p>
             <nav className="footer-legal" aria-label="Legal links">
-              <a href="https://svecw.edu.in/policies-procedures/" target="_blank" rel="noopener noreferrer">Policies & Procedures</a>
-              <a href="https://svecw.edu.in/anti-ragging/" target="_blank" rel="noopener noreferrer">Anti Ragging Policy</a>
-              <a href="https://svecw.edu.in/infougc/" target="_blank" rel="noopener noreferrer">Disclosures – UGC</a>
+              <Link to="/policies-procedures">Policies & Procedures</Link>
+              <Link to="/anti-ragging">Anti Ragging Policy</Link>
+              <Link to="/disclosures/ugc">Disclosures – UGC</Link>
               <Link to="/contact">Contact Us</Link>
             </nav>
           </div>

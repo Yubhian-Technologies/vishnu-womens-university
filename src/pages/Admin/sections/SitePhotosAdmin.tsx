@@ -37,6 +37,7 @@ export const SITE_PHOTO_PAGES = [
   { value: 'sports-games', label: 'Sports & Games' },
   { value: 'social-services', label: 'Social Services (NSS)' },
   { value: 'iqac', label: 'IQAC' },
+  { value: 'anti-ragging', label: 'Anti Ragging' },
 ];
 
 interface SlotDefault { imageUrl: string; alt: string; caption: string; label?: string; }
@@ -364,6 +365,14 @@ const DEFAULT_SECTIONS: Record<string, Record<string, SectionDef>> = {
     'nirf-reports': placeholderPhotoBank('MHRD NIRF Reports'),
     'nba-data': placeholderPhotoBank('NBA – Data Capturing Points'),
   },
+  'anti-ragging': {
+    main: {
+      label: 'Anti Ragging Page Photo',
+      slots: [
+        { imageUrl: PHOTO_NEEDED_PLACEHOLDER, alt: 'Anti Ragging', caption: '' },
+      ],
+    },
+  },
 };
 
 // Mirrors the real header nav (src/components/Header/Header.tsx `navItems`)
@@ -423,8 +432,10 @@ const NAV_CATEGORIES: NavCategory[] = [
   { label: 'Alumni & Giving', pages: ['alumni-giving'] },
   {
     label: 'Quick Links',
-    pages: [],
-    emptyNote: 'This menu is external links and simple pages (Careers, Contact) — there\'s no photo content to manage here.',
+    // Mostly external links and simple pages with no photo content — Anti
+    // Ragging (footer-only, not in the header) is the one exception with an
+    // actual content photo to manage.
+    pages: ['anti-ragging'],
   },
 ];
 
