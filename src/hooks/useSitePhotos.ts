@@ -1,6 +1,7 @@
 import { useOrderedCollection } from './useCollection';
 import type { SitePhotoDoc } from '../pages/Admin/sections/SitePhotosAdmin';
 import type { PhotoItem } from '../components/PhotoGrid/PhotoGrid';
+import { PHOTO_NEEDED_PLACEHOLDER } from '../lib/photoPlaceholder';
 
 /**
  * PhotoGrid-ready photos for one (page, section) gallery, merged per slot
@@ -10,11 +11,16 @@ import type { PhotoItem } from '../components/PhotoGrid/PhotoGrid';
  * are appended as extra, admin-added photos beyond the default set.
  * A missing `section` on a live doc is treated as `'main'` (today's
  * pre-existing galleries, created before sections existed).
+ *
+ * Slots still showing the shared "Photo Needed" placeholder (no real photo
+ * uploaded yet, from either a default or a live doc) are dropped rather than
+ * rendered, so the public gallery only ever shows real photos and reflows
+ * without gaps as they're uploaded.
  */
 export function useSitePhotos(page: string, section: string, defaults: PhotoItem[]): PhotoItem[] {
   const { docs } = useOrderedCollection<SitePhotoDoc>('sitePhotos', 'order');
   const live = docs.filter((p) => p.page === page && (p.section ?? 'main') === section);
-  if (live.length === 0) return defaults;
+  if (live.length === 0) return defaults.filter((p) => p.src !== PHOTO_NEEDED_PLACEHOLDER);
 
   const byOrder = new Map(live.map((p) => [p.order, p]));
   const merged = defaults.map((def, i) => {
@@ -26,7 +32,7 @@ export function useSitePhotos(page: string, section: string, defaults: PhotoItem
     .sort((a, b) => a.order - b.order)
     .map((p) => ({ src: p.imageUrl, alt: p.alt, caption: p.caption }));
 
-  return [...merged, ...extra];
+  return [...merged, ...extra].filter((p) => p.src !== PHOTO_NEEDED_PLACEHOLDER);
 }
 
 /** Whether a (page, section) gallery has any real, admin-uploaded photo yet. */
