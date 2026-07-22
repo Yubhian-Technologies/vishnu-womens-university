@@ -260,7 +260,7 @@ const navItems: NavItem[] = [
       { label: 'Global Alumni Network', path: 'https://alumni.srivishnu.edu.in/', external: true },
       { label: 'Vishnu Era', path: 'https://www.srivishnu.edu.in/vishnu-era/', external: true },
       { label: 'Prathibha Magazine', path: 'https://heyzine.com/flip-book/14449c1cd4.html', external: true },
-      { label: 'Disclosures – UGC', path: 'https://svecw.edu.in/infougc/', external: true },
+      { label: 'Disclosures – UGC', path: '/disclosures/ugc' },
       { label: 'Careers', path: '/careers' },
       { label: 'Contact Us', path: '/contact' },
     ],

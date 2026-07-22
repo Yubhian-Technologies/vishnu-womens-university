@@ -46,6 +46,9 @@ const Accreditations = lazy(() => import('./pages/NewsAwards/Accreditations'));
 const GalleryPage = lazy(() => import('./pages/NewsAwards/Gallery'));
 const Careers = lazy(() => import('./pages/Careers/Careers'));
 const Contact = lazy(() => import('./pages/Contact/Contact'));
+const UGCDisclosure = lazy(() => import('./pages/Disclosures/UGCDisclosure'));
+const AntiRagging = lazy(() => import('./pages/AntiRagging/AntiRagging'));
+const PoliciesProcedures = lazy(() => import('./pages/PoliciesProcedures/PoliciesProcedures'));
 // The admin shell alone pulls in 20+ section components — keeping it out of
 // the public bundle entirely is the single biggest win here, since the vast
 // majority of visitors never touch /admin.
@@ -115,6 +118,9 @@ function PublicApp() {
           <Route path="/news-awards/gallery" element={<GalleryPage />} />
           <Route path="/careers" element={<Careers />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/disclosures/ugc" element={<UGCDisclosure />} />
+          <Route path="/anti-ragging" element={<AntiRagging />} />
+          <Route path="/policies-procedures" element={<PoliciesProcedures />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
