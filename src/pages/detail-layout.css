@@ -172,3 +172,14 @@
   color: var(--color-text);
   line-height: 1.5;
 }
+
+.thrust-accordion-link {
+  color: var(--color-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.thrust-accordion-link:hover {
+  color: var(--color-accent);
+  text-decoration: underline;
+}
