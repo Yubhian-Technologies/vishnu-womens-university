@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useParams, useLocation, Navigate } from 'react-router-dom';
 import { where } from 'firebase/firestore';
 import { Check, Microscope, Compass, Target, Sparkles, Mail, ExternalLink } from 'lucide-react';
@@ -31,6 +31,16 @@ export default function ProgramDetail() {
   // when this specific program hasn't had its own image uploaded yet via
   // the Programs admin section — that per-program image always wins.
   const fallbackBanner = usePageBanner('program-detail');
+
+  const [openSemesters, setOpenSemesters] = useState<Set<string>>(new Set());
+  const toggleSemester = (label: string) => {
+    setOpenSemesters((prev) => {
+      const next = new Set(prev);
+      if (next.has(label)) next.delete(label);
+      else next.add(label);
+      return next;
+    });
+  };
 
   useEffect(() => {
     if (program) {
@@ -79,6 +89,7 @@ export default function ProgramDetail() {
           src={program.heroImage || fallbackBanner?.imageUrl || DEFAULT_PROGRAM_HERO}
           alt={program.name}
           className="page-hero-image"
+          fetchPriority="high"
         />
         <div className="page-hero-overlay" />
         <div className="container page-hero-content">
@@ -420,21 +431,34 @@ export default function ProgramDetail() {
               <h2 className="section-title">Programme Structure</h2>
               <p className="section-desc">A well-structured curriculum blending core foundations with advanced specialisations and practical projects.</p>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 'var(--space-5)' }}>
-              {program.semesters.map((sem) => (
-                <div key={sem.label} style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)' }}>
-                  <h4 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 800, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 'var(--space-4)', paddingBottom: 'var(--space-2)', borderBottom: '1px solid var(--color-light-gray)' }}>
-                    {sem.label}
-                  </h4>
-                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-                    {sem.subjects.map((s) => (
-                      <li key={s} style={{ fontSize: '0.78rem', color: 'var(--color-text)', padding: '4px 0', borderBottom: '1px solid rgba(0,0,0,0.05)', lineHeight: 1.4 }}>
-                        {s}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
+            <div className="thrust-accordion">
+              {program.semesters.map((sem) => {
+                const isOpen = openSemesters.has(sem.label);
+                return (
+                  <div key={sem.label} className={`thrust-accordion-item${isOpen ? ' open' : ''}`}>
+                    <button
+                      type="button"
+                      className="thrust-accordion-header"
+                      onClick={() => toggleSemester(sem.label)}
+                      aria-expanded={isOpen}
+                    >
+                      <span>{sem.label}</span>
+                      <span className="thrust-accordion-icon">{isOpen ? '−' : '+'}</span>
+                    </button>
+                    <div className="thrust-accordion-collapse">
+                      <div className="thrust-accordion-collapse-inner">
+                        <ul style={{ listStyle: 'none', padding: 'var(--space-4) var(--space-5)', margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                          {sem.subjects.map((s) => (
+                            <li key={s} style={{ fontSize: '0.78rem', color: 'var(--color-text)', padding: '4px 0', borderBottom: '1px solid rgba(0,0,0,0.05)', lineHeight: 1.4 }}>
+                              {s}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </section>

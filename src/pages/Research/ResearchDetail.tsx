@@ -178,7 +178,7 @@ export default function ResearchDetail() {
     <main className="page-wrapper">
       {/* Hero */}
       <section className="page-hero" style={{ minHeight: 340 }}>
-        <img src={heroImage} alt={item.title} className="page-hero-image" />
+        <img src={heroImage} alt={item.title} className="page-hero-image" fetchPriority="high" />
         <div className="page-hero-overlay" />
         <div className="container page-hero-content">
           <div className="breadcrumb">

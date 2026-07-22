@@ -42,7 +42,7 @@ export default function DifferentiatorDetail() {
     <main className="page-wrapper">
       {/* Hero */}
       <section className="page-hero" style={{ minHeight: 380 }}>
-        <SmoothImage src={heroImage} alt={item.title} className="page-hero-image" />
+        <SmoothImage src={heroImage} alt={item.title} className="page-hero-image" fetchPriority="high" />
         <div className="page-hero-overlay" />
         <div className="container page-hero-content">
           <div className="breadcrumb animate-fade-in">
