@@ -43,7 +43,7 @@ export default function FacultyResearchProfile() {
   return (
     <main className="page-wrapper">
       <section className="page-hero" style={{ minHeight: 280 }}>
-        <img src={DEFAULT_HERO_IMAGE} alt={name} className="page-hero-image" />
+        <img src={DEFAULT_HERO_IMAGE} alt={name} className="page-hero-image" fetchPriority="high" />
         <div className="page-hero-overlay" />
         <div className="container page-hero-content">
           <div className="breadcrumb">

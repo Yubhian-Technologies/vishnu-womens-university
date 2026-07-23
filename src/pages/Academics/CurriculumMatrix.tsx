@@ -1,9 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Download } from 'lucide-react';
 import PageHero from '../../components/PageHero/PageHero';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useHashScroll } from '../../hooks/useHashScroll';
 import type { CurriculumDoc } from '../Admin/sections/CurriculumAdmin';
+import '../detail-layout.css';
 
 export const PROGRAM_LABELS: Record<string, string> = {
   btech: 'B.Tech', mtech: 'M.Tech', mba: 'MBA', phd: 'Ph.D.',
@@ -53,6 +55,24 @@ function groupByProgram(docs: CurriculumDoc[]): ProgramGroup[] {
 export default function CurriculumMatrix() {
   const { docs } = useOrderedCollection<CurriculumDoc>('curriculum', 'rowOrder');
   const groups = groupByProgram(docs);
+  const location = useLocation();
+
+  const [openPrograms, setOpenPrograms] = useState<Set<string>>(new Set());
+  const toggleProgram = (program: string) => {
+    setOpenPrograms((prev) => {
+      const next = new Set(prev);
+      if (next.has(program)) next.delete(program);
+      else next.add(program);
+      return next;
+    });
+  };
+  // A header nav link (e.g. "/academics/curriculum#curriculum-btech") should
+  // land on that programme already expanded, not on a collapsed header with
+  // nothing visible underneath it.
+  useEffect(() => {
+    const match = location.hash.match(/^#curriculum-(.+)$/);
+    if (match) setOpenPrograms((prev) => new Set(prev).add(match[1]));
+  }, [location.hash]);
 
   useHashScroll();
 
@@ -103,64 +123,80 @@ export default function CurriculumMatrix() {
               No curriculum documents have been added yet.
             </p>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))', gap: 'var(--space-8)', alignItems: 'start' }}>
-              {groups.map((group) => (
-                <div
-                  key={group.program}
-                  id={`curriculum-${group.program}`}
-                  style={{ border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}
-                >
-                  <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: '1.1rem', fontWeight: 800, color: 'var(--color-primary)', marginBottom: 'var(--space-4)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                    {(PROGRAM_LABELS[group.program] ?? group.program).toUpperCase()}
-                  </h3>
-                  <div style={{ overflowX: 'auto' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm)' }}>
-                      <thead>
-                        <tr style={{ background: 'var(--color-primary)' }}>
-                          <th style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'left', color: 'var(--color-white)', fontWeight: 700, whiteSpace: 'nowrap' }}>
-                            Semester
-                          </th>
-                          {group.regulations.map((reg) => (
-                            <th key={reg} style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'center', color: 'var(--color-white)', fontWeight: 700, whiteSpace: 'nowrap' }}>
-                              {reg} Regulation
-                            </th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {group.rows.map((row, i) => (
-                          <tr key={row.rowLabel} style={{ background: i % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)', borderBottom: '1px solid var(--color-light-gray)' }}>
-                            <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)', fontWeight: 600, whiteSpace: 'nowrap' }}>
-                              {row.rowLabel}
-                            </td>
-                            {group.regulations.map((reg) => {
-                              const entry = group.cells.get(row.rowLabel)?.get(reg);
-                              return (
-                                <td key={reg} style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'center' }}>
-                                  {entry ? (
-                                    <a
-                                      href={entry.fileUrl}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      download
-                                      aria-label={`Download ${row.rowLabel} ${reg} curriculum`}
-                                      style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: '50%', background: 'var(--color-accent)', color: 'var(--color-primary-dark)' }}
-                                    >
-                                      <Download size={15} strokeWidth={2.25} />
-                                    </a>
-                                  ) : (
-                                    <span style={{ color: 'var(--color-text-light)' }}>--</span>
-                                  )}
-                                </td>
-                              );
-                            })}
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+            <div className="thrust-accordion" style={{ gap: 'var(--space-5)' }}>
+              {groups.map((group) => {
+                const isOpen = openPrograms.has(group.program);
+                return (
+                  <div
+                    key={group.program}
+                    id={`curriculum-${group.program}`}
+                    className={`thrust-accordion-item${isOpen ? ' open' : ''}`}
+                    style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}
+                  >
+                    <button
+                      type="button"
+                      className="thrust-accordion-header"
+                      onClick={() => toggleProgram(group.program)}
+                      aria-expanded={isOpen}
+                    >
+                      <span style={{ textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                        {(PROGRAM_LABELS[group.program] ?? group.program).toUpperCase()}
+                      </span>
+                      <span className="thrust-accordion-icon">{isOpen ? '−' : '+'}</span>
+                    </button>
+                    <div className="thrust-accordion-collapse">
+                      <div className="thrust-accordion-collapse-inner">
+                        <div style={{ padding: 'var(--space-5)', overflowX: 'auto' }}>
+                          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm)' }}>
+                            <thead>
+                              <tr style={{ background: 'var(--color-primary)' }}>
+                                <th style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'left', color: 'var(--color-white)', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                                  Semester
+                                </th>
+                                {group.regulations.map((reg) => (
+                                  <th key={reg} style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'center', color: 'var(--color-white)', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                                    {reg} Regulation
+                                  </th>
+                                ))}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {group.rows.map((row, i) => (
+                                <tr key={row.rowLabel} style={{ background: i % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)', borderBottom: '1px solid var(--color-light-gray)' }}>
+                                  <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)', fontWeight: 600, whiteSpace: 'nowrap' }}>
+                                    {row.rowLabel}
+                                  </td>
+                                  {group.regulations.map((reg) => {
+                                    const entry = group.cells.get(row.rowLabel)?.get(reg);
+                                    return (
+                                      <td key={reg} style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'center' }}>
+                                        {entry ? (
+                                          <a
+                                            href={entry.fileUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            download
+                                            aria-label={`Download ${row.rowLabel} ${reg} curriculum`}
+                                            style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: '50%', background: 'var(--color-accent)', color: 'var(--color-primary-dark)' }}
+                                          >
+                                            <Download size={15} strokeWidth={2.25} />
+                                          </a>
+                                        ) : (
+                                          <span style={{ color: 'var(--color-text-light)' }}>--</span>
+                                        )}
+                                      </td>
+                                    );
+                                  })}
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

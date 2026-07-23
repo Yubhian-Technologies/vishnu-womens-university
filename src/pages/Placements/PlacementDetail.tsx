@@ -85,6 +85,7 @@ export default function PlacementDetail() {
           src={heroImage}
           alt={item.title}
           className="page-hero-image"
+          fetchPriority="high"
         />
         <div className="page-hero-overlay" />
         <div className="container page-hero-content">

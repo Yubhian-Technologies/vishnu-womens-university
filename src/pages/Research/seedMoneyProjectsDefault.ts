@@ -1,3 +1,10 @@
+// Fallback content for the Seed Money Projects item's Overview section.
+// Firestore's researchItems doc for this slug already has a short intro —
+// this constant is used by ResearchDetail.tsx so the page renders the fuller
+// description from svecw.edu.in instead, taking priority over the existing
+// item.intro (see ResearchDetail.tsx).
+export const DEFAULT_SEED_MONEY_PROJECTS_INTRO = `In-House R&D Projects / Seed Money Projects: Seed money projects at SVECW provide faculty and students with the chance to explore ideas, develop prototypes, and apply theoretical knowledge in practical settings. With initial funding and support, these projects empower faculty & students to embark on applying for external funding agencies, entrepreneurial ventures, fostering a culture of innovation and problem-solving.`;
+
 // Fallback content for the Seed Money Projects item, sourced from
 // https://svecw.edu.in/seed-money-projects/. Firestore's researchItems doc
 // for this slug may not have its tableText field filled in yet from the

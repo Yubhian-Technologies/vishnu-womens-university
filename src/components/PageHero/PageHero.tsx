@@ -72,6 +72,21 @@ export default function PageHero({
   // Reset to slide 0 when slides change (e.g. Firestore update)
   useEffect(() => { setCurrent(0); }, [slides.length]);
 
+  // Hints the browser to start fetching the hero image before React has even
+  // committed the <img> to the DOM — defaultImage is known synchronously (a
+  // prop, not something waiting on Firestore), so there's no reason to wait
+  // for render to request it. Re-added per route change, removed on
+  // unmount/re-run so navigating away doesn't leave a stale preload behind.
+  useEffect(() => {
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.as = 'image';
+    link.href = defaultImage;
+    link.setAttribute('fetchpriority', 'high');
+    document.head.appendChild(link);
+    return () => { document.head.removeChild(link); };
+  }, [defaultImage]);
+
   const slide = allSlides[current];
 
   return (
@@ -93,7 +108,12 @@ export default function PageHero({
           key={s.imageUrl}
           className={`page-hero__slide ${i === current ? 'page-hero__slide--active' : ''}`}
         >
-          <SmoothImage src={s.imageUrl} alt={s.title} className="page-hero-image" />
+          <SmoothImage
+            src={s.imageUrl}
+            alt={s.title}
+            className="page-hero-image"
+            {...(i === current ? { fetchPriority: 'high' as const } : {})}
+          />
         </div>
       ))}
 
