@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import emailjs from '@emailjs/browser';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import './Admissions.css';
 import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
+import { db } from '../../lib/firebase';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { useSitePhotos, useSectionHasPhotos } from '../../hooks/useSitePhotos';
@@ -20,6 +22,8 @@ interface RequestInfoForm {
   term: string;
 }
 
+type RequestInfoFormErrors = Partial<Record<keyof RequestInfoForm, string>>;
+
 const INITIAL_REQUEST_FORM: RequestInfoForm = {
   firstName: '',
   lastName: '',
@@ -27,6 +31,18 @@ const INITIAL_REQUEST_FORM: RequestInfoForm = {
   program: '',
   term: 'Fall 2026',
 };
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function validateRequestInfoForm(form: RequestInfoForm): RequestInfoFormErrors {
+  const errors: RequestInfoFormErrors = {};
+  if (!form.firstName.trim()) errors.firstName = 'Please enter your first name.';
+  if (!form.lastName.trim()) errors.lastName = 'Please enter your last name.';
+  if (!form.email.trim()) errors.email = 'Please enter your email address.';
+  else if (!EMAIL_RE.test(form.email.trim())) errors.email = 'Please enter a valid email address.';
+  if (!form.program) errors.program = 'Please select a program.';
+  return errors;
+}
 
 // EmailJS is frontend-only, so the "to" address for each template must be fixed
 // in the EmailJS dashboard rather than passed from the client — otherwise this
@@ -79,6 +95,7 @@ export default function Admissions() {
   const hasPgPhotos = useSectionHasPhotos('admissions', 'pg');
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [requestForm, setRequestForm] = useState<RequestInfoForm>(INITIAL_REQUEST_FORM);
+  const [requestErrors, setRequestErrors] = useState<RequestInfoFormErrors>({});
   const [requestStatus, setRequestStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
 
   const handleRequestFormChange = (
@@ -86,29 +103,47 @@ export default function Admissions() {
   ) => {
     const { name, value } = e.target;
     setRequestForm((prev) => ({ ...prev, [name]: value }));
+    setRequestErrors((prev) => (prev[name as keyof RequestInfoForm] ? { ...prev, [name]: undefined } : prev));
   };
 
   const handleRequestInfoSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!EMAILJS_SERVICE_ID || !EMAILJS_TEMPLATE_ID_ADMISSIONS || !EMAILJS_TEMPLATE_ID_CONFIRMATION || !EMAILJS_PUBLIC_KEY) {
-      setRequestStatus('error');
+    const validationErrors = validateRequestInfoForm(requestForm);
+    if (Object.keys(validationErrors).length > 0) {
+      setRequestErrors(validationErrors);
       return;
     }
 
     setRequestStatus('submitting');
-    const templateParams = {
-      first_name: requestForm.firstName,
-      last_name: requestForm.lastName,
-      email: requestForm.email,
-      program: requestForm.program,
-      term: requestForm.term,
-    };
-
     try {
-      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID_ADMISSIONS, templateParams, EMAILJS_PUBLIC_KEY);
-      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID_CONFIRMATION, templateParams, EMAILJS_PUBLIC_KEY);
+      // Firestore is the system of record for these inquiries — this must
+      // succeed for the submission to count. Emailing admissions/the visitor
+      // (below) via EmailJS is a best-effort convenience on top of it.
+      await addDoc(collection(db, 'admissionInquiries'), {
+        ...requestForm,
+        status: 'new',
+        createdAt: serverTimestamp(),
+      });
+
+      if (EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID_ADMISSIONS && EMAILJS_TEMPLATE_ID_CONFIRMATION && EMAILJS_PUBLIC_KEY) {
+        const templateParams = {
+          first_name: requestForm.firstName,
+          last_name: requestForm.lastName,
+          email: requestForm.email,
+          program: requestForm.program,
+          term: requestForm.term,
+        };
+        try {
+          await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID_ADMISSIONS, templateParams, EMAILJS_PUBLIC_KEY);
+          await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID_CONFIRMATION, templateParams, EMAILJS_PUBLIC_KEY);
+        } catch {
+          // Non-fatal — the inquiry is already saved above.
+        }
+      }
+
       setRequestStatus('success');
       setRequestForm(INITIAL_REQUEST_FORM);
+      setRequestErrors({});
     } catch {
       setRequestStatus('error');
     }
@@ -206,7 +241,13 @@ export default function Admissions() {
             })}
           </div>
           <div style={{ textAlign: 'center', marginTop: 'var(--space-10)' }}>
-            <Link to="/contact" className="btn btn-primary btn-lg">Start Your Application</Link>
+            <button
+              type="button"
+              className="btn btn-primary btn-lg"
+              onClick={() => document.getElementById('admissions-contact')?.scrollIntoView({ behavior: 'smooth' })}
+            >
+              Start Your Application
+            </button>
           </div>
         </div>
       </section>
@@ -350,7 +391,7 @@ export default function Admissions() {
       )}
 
       {/* Contact Admissions */}
-      <section className="section bg-white">
+      <section id="admissions-contact" className="section bg-white">
         <div className="container">
           <div className="adm-contact-grid">
             <div className="reveal-left">
@@ -386,24 +427,46 @@ export default function Admissions() {
             </div>
             <div className="adm-form-card reveal-right">
               <h3>Request Information</h3>
-              <form onSubmit={handleRequestInfoSubmit} className="adm-form">
+              <form onSubmit={handleRequestInfoSubmit} className="adm-form" noValidate>
                 <div className="adm-form-row">
                   <div className="adm-form-group">
                     <label>First Name</label>
-                    <input type="text" name="firstName" placeholder="First name" value={requestForm.firstName} onChange={handleRequestFormChange} />
+                    <input
+                      type="text" name="firstName" placeholder="First name"
+                      value={requestForm.firstName} onChange={handleRequestFormChange}
+                      className={requestErrors.firstName ? 'has-error' : undefined}
+                      aria-invalid={!!requestErrors.firstName}
+                    />
+                    {requestErrors.firstName && <span className="adm-form-error">{requestErrors.firstName}</span>}
                   </div>
                   <div className="adm-form-group">
                     <label>Last Name</label>
-                    <input type="text" name="lastName" placeholder="Last name" value={requestForm.lastName} onChange={handleRequestFormChange} />
+                    <input
+                      type="text" name="lastName" placeholder="Last name"
+                      value={requestForm.lastName} onChange={handleRequestFormChange}
+                      className={requestErrors.lastName ? 'has-error' : undefined}
+                      aria-invalid={!!requestErrors.lastName}
+                    />
+                    {requestErrors.lastName && <span className="adm-form-error">{requestErrors.lastName}</span>}
                   </div>
                 </div>
                 <div className="adm-form-group">
                   <label>Email Address</label>
-                  <input type="email" name="email" placeholder="your@email.com" value={requestForm.email} onChange={handleRequestFormChange} />
+                  <input
+                    type="email" name="email" placeholder="your@email.com"
+                    value={requestForm.email} onChange={handleRequestFormChange}
+                    className={requestErrors.email ? 'has-error' : undefined}
+                    aria-invalid={!!requestErrors.email}
+                  />
+                  {requestErrors.email && <span className="adm-form-error">{requestErrors.email}</span>}
                 </div>
                 <div className="adm-form-group">
                   <label>Program Interest</label>
-                  <select name="program" value={requestForm.program} onChange={handleRequestFormChange}>
+                  <select
+                    name="program" value={requestForm.program} onChange={handleRequestFormChange}
+                    className={requestErrors.program ? 'has-error' : undefined}
+                    aria-invalid={!!requestErrors.program}
+                  >
                     <option value="">Select a program...</option>
                     <option>B.Tech – CSE / AI&ML / AI&DS / Cyber Security</option>
                     <option>B.Tech – ECE / EEE / IT</option>
@@ -412,6 +475,7 @@ export default function Admissions() {
                     <option>MBA</option>
                     <option>Ph.D. Programs</option>
                   </select>
+                  {requestErrors.program && <span className="adm-form-error">{requestErrors.program}</span>}
                 </div>
                 <div className="adm-form-group">
                   <label>Expected Start Term</label>
@@ -426,7 +490,7 @@ export default function Admissions() {
                 </button>
                 {requestStatus === 'success' && (
                   <p style={{ marginTop: 'var(--space-3)', fontSize: 'var(--text-sm)', color: 'var(--color-primary)' }}>
-                    Thanks! We've received your request and sent a confirmation to your email.
+                    Thanks! We've received your request. Our admissions team will be in touch shortly.
                   </p>
                 )}
                 {requestStatus === 'error' && (
