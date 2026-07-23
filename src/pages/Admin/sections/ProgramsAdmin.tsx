@@ -8,9 +8,22 @@ import ImageUploader from '../../../components/ImageUploader/ImageUploader';
 import type { UploadResult } from '../../../lib/storage';
 import { PROGRAM_ICON_NAMES } from '../../../lib/programIcons';
 
+export interface ProgramSubject {
+  title: string;
+  code?: string;
+  credits?: number;
+}
+
 export interface ProgramSemester {
   label: string;
-  subjects: string[];
+  subjects: ProgramSubject[];
+}
+
+// Older programme docs stored subjects as plain strings — normalize either
+// shape to the richer one at read time so existing data keeps working
+// without a migration, both here and in <ProgrammeStructure>.
+export function normalizeSubject(s: string | ProgramSubject): ProgramSubject {
+  return typeof s === 'string' ? { title: s } : s;
 }
 
 export interface ProgramLink {
@@ -73,18 +86,6 @@ function linesToArray(text: string): string[] {
 function arrayToLines(arr: string[] = []): string {
   return arr.join('\n');
 }
-function semestersToText(semesters: ProgramSemester[] = []): string {
-  return semesters.map((s) => `${s.label}: ${s.subjects.join(', ')}`).join('\n');
-}
-function textToSemesters(text: string): ProgramSemester[] {
-  return linesToArray(text).map((line) => {
-    const [label, rest] = line.split(':');
-    return {
-      label: (label || '').trim(),
-      subjects: (rest || '').split(',').map((x) => x.trim()).filter(Boolean),
-    };
-  });
-}
 function linksToText(links: ProgramLink[] = []): string {
   return links.map((l) => `${l.label}: ${l.url}`).join('\n');
 }
@@ -109,6 +110,48 @@ export default function ProgramsAdmin() {
   const handleHodImage = (r: UploadResult) => setForm((p) => ({ ...p, hodImage: r.url, hodImageStoragePath: r.path }));
   const handleMindMapImage = (r: UploadResult) => setForm((p) => ({ ...p, mindMapImage: r.url, mindMapImageStoragePath: r.path }));
 
+  // Programme Structure (semesters + subjects) editing — structured add /
+  // remove / reorder, replacing the old free-text "Semester I: A, B" parser.
+  const addSemester = () => {
+    set('semesters', [...form.semesters, { label: `Semester ${form.semesters.length + 1}`, subjects: [] }]);
+  };
+  const updateSemesterLabel = (si: number, label: string) => {
+    set('semesters', form.semesters.map((s, i) => (i === si ? { ...s, label } : s)));
+  };
+  const moveSemester = (si: number, dir: -1 | 1) => {
+    const next = [...form.semesters];
+    const target = si + dir;
+    if (target < 0 || target >= next.length) return;
+    [next[si], next[target]] = [next[target], next[si]];
+    set('semesters', next);
+  };
+  const removeSemester = (si: number) => {
+    if (!confirm('Remove this semester and all its subjects?')) return;
+    set('semesters', form.semesters.filter((_, i) => i !== si));
+  };
+  const addSubject = (si: number) => {
+    set('semesters', form.semesters.map((s, i) => (i === si ? { ...s, subjects: [...s.subjects, { title: '' }] } : s)));
+  };
+  const updateSubject = (si: number, ji: number, patch: Partial<ProgramSubject>) => {
+    set('semesters', form.semesters.map((s, i) => (i !== si ? s : {
+      ...s,
+      subjects: s.subjects.map((sub, j) => (j === ji ? { ...sub, ...patch } : sub)),
+    })));
+  };
+  const moveSubject = (si: number, ji: number, dir: -1 | 1) => {
+    set('semesters', form.semesters.map((s, i) => {
+      if (i !== si) return s;
+      const subs = [...s.subjects];
+      const target = ji + dir;
+      if (target < 0 || target >= subs.length) return s;
+      [subs[ji], subs[target]] = [subs[target], subs[ji]];
+      return { ...s, subjects: subs };
+    }));
+  };
+  const removeSubject = (si: number, ji: number) => {
+    set('semesters', form.semesters.map((s, i) => (i === si ? { ...s, subjects: s.subjects.filter((_, j) => j !== ji) } : s)));
+  };
+
   const save = async () => {
     if (!form.name || !form.slug) return alert('Program name and slug are required.');
     setSaving(true);
@@ -131,7 +174,7 @@ export default function ProgramsAdmin() {
       category: p.category, intake: p.intake, established: p.established, accreditation: p.accreditation,
       hod: p.hod, department: p.department || '', fee: p.fee || '', heroImage: p.heroImage, storagePath: p.storagePath, about: p.about,
       highlights: p.highlights || [], labs: p.labs || [], outcomes: p.outcomes || [],
-      semesters: p.semesters || [],
+      semesters: (p.semesters || []).map((s) => ({ label: s.label, subjects: (s.subjects || []).map(normalizeSubject) })),
       vision: p.vision || '', mission: p.mission || [], coreValues: p.coreValues || [],
       peos: p.peos || [], pos: p.pos || [], psos: p.psos || [],
       hodMessage: p.hodMessage || '', hodImage: p.hodImage || '', hodImageStoragePath: p.hodImageStoragePath || '',
@@ -230,9 +273,56 @@ export default function ProgramsAdmin() {
             <label>Career Outcomes (one per line)</label>
             <textarea rows={5} value={arrayToLines(form.outcomes)} onChange={(e) => set('outcomes', linesToArray(e.target.value))} placeholder="Software Engineer / Developer" />
           </div>
+          <div className="admin-field admin-field--full"><hr /><h3>Programme Structure (Semester-wise Curriculum)</h3></div>
           <div className="admin-field admin-field--full">
-            <label>Semester-wise Syllabus (one per line: "Semester I: Subject A, Subject B")</label>
-            <textarea rows={9} value={semestersToText(form.semesters)} onChange={(e) => set('semesters', textToSemesters(e.target.value))} placeholder="Semester I: Engineering Mathematics I, Engineering Physics" />
+            {form.semesters.map((sem, si) => (
+              <div key={si} style={{ border: '1.5px solid var(--color-light-gray)', borderRadius: 8, padding: '0.75rem', marginBottom: '0.75rem' }}>
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.5rem' }}>
+                  <input
+                    value={sem.label}
+                    onChange={(e) => updateSemesterLabel(si, e.target.value)}
+                    placeholder="Semester I"
+                    style={{ flex: 1, fontWeight: 700 }}
+                  />
+                  <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveSemester(si, -1)} disabled={si === 0} title="Move up">↑</button>
+                  <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveSemester(si, 1)} disabled={si === form.semesters.length - 1} title="Move down">↓</button>
+                  <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeSemester(si)}>Remove Semester</button>
+                </div>
+
+                {sem.subjects.map((subj, ji) => (
+                  <div key={ji} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.4rem' }}>
+                    <input
+                      value={subj.title}
+                      onChange={(e) => updateSubject(si, ji, { title: e.target.value })}
+                      placeholder="Subject title"
+                      style={{ flex: 2 }}
+                    />
+                    <input
+                      value={subj.code ?? ''}
+                      onChange={(e) => updateSubject(si, ji, { code: e.target.value || undefined })}
+                      placeholder="Code (optional)"
+                      style={{ flex: 1 }}
+                    />
+                    <input
+                      type="number"
+                      value={subj.credits ?? ''}
+                      onChange={(e) => updateSubject(si, ji, { credits: e.target.value === '' ? undefined : Number(e.target.value) })}
+                      placeholder="Credits"
+                      style={{ width: 80 }}
+                      min={0}
+                    />
+                    <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveSubject(si, ji, -1)} disabled={ji === 0} title="Move up">↑</button>
+                    <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveSubject(si, ji, 1)} disabled={ji === sem.subjects.length - 1} title="Move down">↓</button>
+                    <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeSubject(si, ji)}>✕</button>
+                  </div>
+                ))}
+                <button type="button" className="admin-btn admin-btn--sm" onClick={() => addSubject(si)}>+ Add Subject</button>
+              </div>
+            ))}
+            <button type="button" className="admin-btn admin-btn--primary" onClick={addSemester}>+ Add Semester</button>
+            {form.semesters.length === 0 && (
+              <p className="admin-field__hint">No semesters yet — click "Add Semester" to start building this programme's curriculum.</p>
+            )}
           </div>
 
           <div className="admin-field admin-field--full"><hr /><h3>Vision, Mission & Values</h3></div>
