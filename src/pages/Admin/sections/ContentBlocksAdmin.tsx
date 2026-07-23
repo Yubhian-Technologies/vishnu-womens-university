@@ -3,6 +3,8 @@ import { collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp } from '
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
 import { CONTENT_ICON_NAMES } from '../../../lib/contentIcons';
+import ImageUploader from '../../../components/ImageUploader/ImageUploader';
+import type { UploadResult } from '../../../lib/storage';
 
 // A single flexible content type used across many pages for their small
 // repeating text blocks (stat bars, icon+title+desc feature lists, highlight
@@ -12,6 +14,9 @@ import { CONTENT_ICON_NAMES } from '../../../lib/contentIcons';
 // page + section together identify exactly one list on one page. "icon" and
 // "slug" are optional — only some sections use them (icon for feature-card
 // lists, slug for items with an in-page anchor link).
+// "storagePath" is optional and only populated for sections whose "slug"
+// holds an uploaded (rather than pasted) image, e.g. Home Testimonials —
+// lets us clean up the old Firebase Storage file when it's replaced.
 export interface ContentBlockDoc {
   id: string;
   page: string;
@@ -21,10 +26,15 @@ export interface ContentBlockDoc {
   desc: string;
   icon: string;
   slug: string;
+  storagePath?: string;
   order: number;
 }
 
-const EMPTY: Omit<ContentBlockDoc, 'id'> = { page: '', section: '', value: '', title: '', desc: '', icon: '', slug: '', order: 0 };
+const EMPTY: Omit<ContentBlockDoc, 'id'> = { page: '', section: '', value: '', title: '', desc: '', icon: '', slug: '', storagePath: '', order: 0 };
+
+// Sections whose "slug" field is an uploaded avatar/photo rather than a
+// pasted URL or anchor link — shows an ImageUploader instead of a text input.
+const IMAGE_SLUG_SECTIONS = new Set(['home::testimonials']);
 
 // Every (page, section) pair currently wired up to read from this
 // collection. Add a new entry here first when wiring a new list.
@@ -97,6 +107,7 @@ export default function ContentBlocksAdmin() {
   const [filterKey, setFilterKey] = useState(`${CONTENT_BLOCK_SECTIONS[0].page}::${CONTENT_BLOCK_SECTIONS[0].section}`);
 
   const set = (k: string, v: string | number) => setForm((p) => ({ ...p, [k]: v }));
+  const handleAvatarUpload = (r: UploadResult) => setForm((p) => ({ ...p, slug: r.url, storagePath: r.path }));
   const filtered = useMemo(() => {
     const [page, section] = filterKey.split('::');
     return blocks.filter((b) => b.page === page && b.section === section);
@@ -119,7 +130,7 @@ export default function ContentBlocksAdmin() {
 
   const startEdit = (b: ContentBlockDoc) => {
     setEditing(b.id);
-    setForm({ page: b.page, section: b.section, value: b.value, title: b.title, desc: b.desc, icon: b.icon || '', slug: b.slug || '', order: b.order });
+    setForm({ page: b.page, section: b.section, value: b.value, title: b.title, desc: b.desc, icon: b.icon || '', slug: b.slug || '', storagePath: b.storagePath || '', order: b.order });
   };
 
   const remove = async (id: string) => {
@@ -163,8 +174,17 @@ export default function ContentBlocksAdmin() {
             </select>
           </div>
           <div className="admin-field">
-            <label>Anchor Slug / Extra field (only if this item needs a #link — or the avatar URL for Home Testimonials, a second meta line for Contact Info Cards, or the click-through link for Student Life Clubs — an external https:// URL or an internal /path)</label>
-            <input value={form.slug} onChange={(e) => set('slug', e.target.value)} placeholder="smart-classrooms" />
+            {IMAGE_SLUG_SECTIONS.has(`${form.page}::${form.section}`) ? (
+              <>
+                <label>Avatar Photo</label>
+                <ImageUploader folder="vwu/testimonials" currentUrl={form.slug} onUploaded={handleAvatarUpload} label="Upload Avatar" aspect={1} />
+              </>
+            ) : (
+              <>
+                <label>Anchor Slug / Extra field (only if this item needs a #link — a second meta line for Contact Info Cards, or the click-through link for Student Life Clubs — an external https:// URL or an internal /path)</label>
+                <input value={form.slug} onChange={(e) => set('slug', e.target.value)} placeholder="smart-classrooms" />
+              </>
+            )}
           </div>
           <div className="admin-field">
             <label>Display Order</label>
