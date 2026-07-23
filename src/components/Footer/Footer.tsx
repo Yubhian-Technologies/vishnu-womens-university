@@ -23,11 +23,11 @@ const academicLinks = [
   { label: 'Research & Publications', path: '/academics' },
 ];
 
-const aboutLinks = [
+const aboutLinks: { label: string; path: string; external?: boolean; download?: boolean }[] = [
   { label: 'Our History', path: '/about' },
   { label: 'Mission & Values', path: '/about' },
   { label: 'Leadership', path: '/about' },
-  { label: 'Organizational Chart', path: 'https://svecw.edu.in/wp-content/uploads/2024/03/SVECWOrganizationChart.jpg', external: true },
+  { label: 'Organizational Chart', path: '/downloads/SVECWOrganizationChart.jpg', download: true },
   { label: 'News', path: '/news' },
   { label: 'Events', path: '/events' },
   { label: 'Accreditation', path: '/about' },
@@ -152,8 +152,8 @@ export default function Footer() {
               <ul className="footer-links">
                 {aboutLinks.map(l => (
                   <li key={l.label}>
-                    {l.external ? (
-                      <a href={l.path} className="footer-link" target="_blank" rel="noopener noreferrer">{l.label}</a>
+                    {(l.external || l.download) ? (
+                      <a href={l.path} className="footer-link" download={l.download} target={l.download ? undefined : '_blank'} rel="noopener noreferrer">{l.label}</a>
                     ) : (
                       <Link to={l.path} className="footer-link">{l.label}</Link>
                     )}

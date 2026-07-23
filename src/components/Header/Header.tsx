@@ -12,6 +12,7 @@ interface NavChild {
   label: string;
   path: string;
   external?: boolean;
+  download?: boolean;
   disabled?: boolean;
   subItems?: NavChild[];
 }
@@ -40,7 +41,7 @@ const navItems: NavItem[] = [
           { label: 'About VWU', path: '/about' },
           { label: 'Vision, Mission & Values', path: '/vision-mission' },
           { label: 'Institutional Development Plan', path: '/governance/idp' },
-          { label: 'Organizational Chart', path: 'https://svecw.edu.in/wp-content/uploads/2024/03/SVECWOrganizationChart.jpg', external: true },
+          { label: 'Organizational Chart', path: '/downloads/SVECWOrganizationChart.jpg', download: true },
           { label: 'Core Executive Body', path: '/about#core-executive' },
           { label: 'About Society (SVES)', path: '/about-sves' },
         ],
@@ -459,10 +460,10 @@ export default function Header() {
                               <span className="dropdown-item" style={{ opacity: 0.5, cursor: 'default' }}>
                                 {child.label}
                               </span>
-                            ) : child.external ? (
-                              <a href={child.path} className="dropdown-item" role="menuitem" target="_blank" rel="noopener noreferrer">
+                            ) : (child.external || child.download) ? (
+                              <a href={child.path} className="dropdown-item" role="menuitem" download={child.download} target={child.download ? undefined : '_blank'} rel="noopener noreferrer">
                                 {child.label}
-                                <span style={{ fontSize: '0.6rem', opacity: 0.5, marginLeft: 4 }}>↗</span>
+                                {!child.download && <span style={{ fontSize: '0.6rem', opacity: 0.5, marginLeft: 4 }}>↗</span>}
                               </a>
                             ) : (
                               <Link to={child.path} className="dropdown-item" role="menuitem">
@@ -478,8 +479,8 @@ export default function Header() {
                                       <span className="dropdown-item" style={{ opacity: 0.5, cursor: 'default' }}>
                                         {sub.label}
                                       </span>
-                                    ) : sub.external ? (
-                                      <a href={sub.path} className="dropdown-item" role="menuitem" target="_blank" rel="noopener noreferrer">
+                                    ) : (sub.external || sub.download) ? (
+                                      <a href={sub.path} className="dropdown-item" role="menuitem" download={sub.download} target={sub.download ? undefined : '_blank'} rel="noopener noreferrer">
                                         {sub.label}
                                       </a>
                                     ) : (
@@ -516,8 +517,8 @@ export default function Header() {
                                   <span className="dropdown-item" style={{ opacity: 0.5, cursor: 'default' }}>
                                     {child.label}
                                   </span>
-                                ) : child.external ? (
-                                  <a href={child.path} className="dropdown-item" role="menuitem" target="_blank" rel="noopener noreferrer">
+                                ) : (child.external || child.download) ? (
+                                  <a href={child.path} className="dropdown-item" role="menuitem" download={child.download} target={child.download ? undefined : '_blank'} rel="noopener noreferrer">
                                     {child.label}
                                   </a>
                                 ) : (
@@ -609,8 +610,8 @@ export default function Header() {
                                     <li key={sub.label}>
                                       {sub.disabled ? (
                                         <span className="mobile-sub-item" style={{ opacity: 0.5 }}>{sub.label}</span>
-                                      ) : sub.external ? (
-                                        <a href={sub.path} className="mobile-sub-item" target="_blank" rel="noopener noreferrer">{sub.label}</a>
+                                      ) : (sub.external || sub.download) ? (
+                                        <a href={sub.path} className="mobile-sub-item" download={sub.download} target={sub.download ? undefined : '_blank'} rel="noopener noreferrer">{sub.label}</a>
                                       ) : (
                                         <Link to={sub.path} className="mobile-sub-item">{sub.label}</Link>
                                       )}
@@ -625,9 +626,9 @@ export default function Header() {
                           <li key={child.label}>
                             {child.disabled ? (
                               <span className="mobile-sub-item" style={{ opacity: 0.5 }}>{child.label}</span>
-                            ) : child.external ? (
-                              <a href={child.path} className="mobile-sub-item" target="_blank" rel="noopener noreferrer">
-                                {child.label} <span style={{ fontSize: '0.6rem', opacity: 0.5 }}>↗</span>
+                            ) : (child.external || child.download) ? (
+                              <a href={child.path} className="mobile-sub-item" download={child.download} target={child.download ? undefined : '_blank'} rel="noopener noreferrer">
+                                {child.label} {!child.download && <span style={{ fontSize: '0.6rem', opacity: 0.5 }}>↗</span>}
                               </a>
                             ) : (
                               <Link to={child.path} className="mobile-sub-item">{child.label}</Link>
@@ -661,8 +662,8 @@ export default function Header() {
                                   <li key={child.label}>
                                     {child.disabled ? (
                                       <span className="mobile-sub-item" style={{ opacity: 0.5 }}>{child.label}</span>
-                                    ) : child.external ? (
-                                      <a href={child.path} className="mobile-sub-item" target="_blank" rel="noopener noreferrer">{child.label}</a>
+                                    ) : (child.external || child.download) ? (
+                                      <a href={child.path} className="mobile-sub-item" download={child.download} target={child.download ? undefined : '_blank'} rel="noopener noreferrer">{child.label}</a>
                                     ) : (
                                       <Link to={child.path} className="mobile-sub-item">{child.label}</Link>
                                     )}
