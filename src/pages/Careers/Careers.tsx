@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
 import { GraduationCap, CheckCircle2, AlertCircle } from 'lucide-react';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from '../../lib/firebase';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { resolveContentIcon } from '../../lib/contentIcons';
@@ -10,6 +12,24 @@ import type { JobOpeningDoc } from '../Admin/sections/JobOpeningsAdmin';
 type FormData = {
   name: string; email: string; phone: string; dept: string; position: string; experience: string; message: string;
 };
+
+type FormErrors = Partial<Record<keyof FormData, string>>;
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PHONE_RE = /^[+]?[\d\s-]{7,15}$/;
+
+function validateCareerForm(form: FormData): FormErrors {
+  const errors: FormErrors = {};
+  if (!form.name.trim()) errors.name = 'Please enter your full name.';
+  if (!form.email.trim()) errors.email = 'Please enter your email address.';
+  else if (!EMAIL_RE.test(form.email.trim())) errors.email = 'Please enter a valid email address.';
+  if (!form.phone.trim()) errors.phone = 'Please enter your phone number.';
+  else if (!PHONE_RE.test(form.phone.trim())) errors.phone = 'Please enter a valid phone number.';
+  if (!form.dept) errors.dept = 'Please select a department.';
+  if (!form.position) errors.position = 'Please select a position.';
+  if (!form.experience) errors.experience = 'Please select your years of experience.';
+  return errors;
+}
 
 const MAX_RESUME_BYTES = 5 * 1024 * 1024; // 5MB — well under Gmail's 25MB attachment cap
 
@@ -41,11 +61,17 @@ export default function Careers() {
   }, [allOpenings]);
 
   const [form, setForm] = useState<FormData>({ name: '', email: '', phone: '', dept: '', position: '', experience: '', message: '' });
+  const [errors, setErrors] = useState<FormErrors>({});
   const [resume, setResume] = useState<File | null>(null);
   const [resumeError, setResumeError] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
+
+  const setField = (key: keyof FormData, value: string) => {
+    setForm((f) => ({ ...f, [key]: value }));
+    setErrors((prev) => (prev[key] ? { ...prev, [key]: undefined } : prev));
+  };
 
   useEffect(() => {
     document.title = 'Careers | Vishnu Womens University';
@@ -79,29 +105,46 @@ export default function Careers() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!CAREERS_SCRIPT_URL) {
-      setSubmitError('Application submission is not configured yet. Please email your application to info@svecw.edu.in instead.');
+    const validationErrors = validateCareerForm(form);
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
       return;
     }
+
     setSubmitting(true);
     setSubmitError('');
     try {
-      const payload: Record<string, string> = { ...form };
-      if (resume) {
-        payload.resumeBase64 = await fileToBase64(resume);
-        payload.resumeName = resume.name;
-        payload.resumeMimeType = resume.type;
-      }
-      const res = await fetch(CAREERS_SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload),
+      // Firestore is the system of record for applications — this must
+      // succeed for the submission to count. Emailing HR (below) is a
+      // best-effort convenience on top of it, not a requirement.
+      await addDoc(collection(db, 'careerApplications'), {
+        ...form,
+        resumeFileName: resume?.name || '',
+        status: 'new',
+        createdAt: serverTimestamp(),
       });
-      const result = await res.json().catch(() => null);
-      if (result && result.status === 'error') {
-        throw new Error(result.message || 'Submission failed.');
+
+      if (CAREERS_SCRIPT_URL) {
+        try {
+          const payload: Record<string, string> = { ...form };
+          if (resume) {
+            payload.resumeBase64 = await fileToBase64(resume);
+            payload.resumeName = resume.name;
+            payload.resumeMimeType = resume.type;
+          }
+          await fetch(CAREERS_SCRIPT_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(payload),
+          });
+        } catch {
+          // Non-fatal — the application is already saved above.
+        }
       }
+
       setSubmitted(true);
+      setForm({ name: '', email: '', phone: '', dept: '', position: '', experience: '', message: '' });
+      setResume(null);
     } catch (err) {
       setSubmitError((err as Error).message || "Couldn't submit your application. Please try again or email info@svecw.edu.in directly.");
     } finally {
@@ -201,45 +244,49 @@ export default function Careers() {
                 <p style={{ color: 'var(--color-text-light)', lineHeight: 1.7 }}>Thank you for applying to VWU. Our HR team will review your application and follow up with you within 5–7 working days.</p>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="reveal" style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-8)', display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
+              <form onSubmit={handleSubmit} className="reveal" noValidate style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-8)', display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
                 <div className="grid-2">
                   {([['name', 'Full Name', 'text'], ['email', 'Email Address', 'email'], ['phone', 'Phone Number', 'tel']] as const).map(([key, label, type]) => (
                     <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                       <label style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-primary)', fontFamily: 'var(--font-sans)' }}>{label} *</label>
-                      <input type={type} required value={form[key]} onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
-                        style={{ padding: 'var(--space-3) var(--space-4)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-sans)', outline: 'none', color: 'var(--color-text)' }} />
+                      <input type={type} value={form[key]} onChange={e => setField(key, e.target.value)}
+                        style={{ padding: 'var(--space-3) var(--space-4)', border: `1.5px solid ${errors[key] ? '#dc2626' : 'var(--color-light-gray)'}`, borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-sans)', outline: 'none', color: 'var(--color-text)' }} />
+                      {errors[key] && <span style={{ fontSize: 'var(--text-xs)', color: '#dc2626' }}>{errors[key]}</span>}
                     </div>
                   ))}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                     <label style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-primary)', fontFamily: 'var(--font-sans)' }}>Years of Experience *</label>
-                    <select required value={form.experience} onChange={e => setForm(f => ({ ...f, experience: e.target.value }))}
-                      style={{ padding: 'var(--space-3) var(--space-4)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-sans)', outline: 'none', color: 'var(--color-text)', background: 'var(--color-white)' }}>
+                    <select value={form.experience} onChange={e => setField('experience', e.target.value)}
+                      style={{ padding: 'var(--space-3) var(--space-4)', border: `1.5px solid ${errors.experience ? '#dc2626' : 'var(--color-light-gray)'}`, borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-sans)', outline: 'none', color: 'var(--color-text)', background: 'var(--color-white)' }}>
                       <option value="">Select</option>
                       {['Fresher', '1–3 years', '3–5 years', '5–10 years', '10+ years'].map(o => <option key={o} value={o}>{o}</option>)}
                     </select>
+                    {errors.experience && <span style={{ fontSize: 'var(--text-xs)', color: '#dc2626' }}>{errors.experience}</span>}
                   </div>
                 </div>
                 <div className="grid-2">
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                     <label style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-primary)', fontFamily: 'var(--font-sans)' }}>Department *</label>
-                    <select required value={form.dept} onChange={e => setForm(f => ({ ...f, dept: e.target.value }))}
-                      style={{ padding: 'var(--space-3) var(--space-4)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-sans)', outline: 'none', color: 'var(--color-text)', background: 'var(--color-white)' }}>
+                    <select value={form.dept} onChange={e => setField('dept', e.target.value)}
+                      style={{ padding: 'var(--space-3) var(--space-4)', border: `1.5px solid ${errors.dept ? '#dc2626' : 'var(--color-light-gray)'}`, borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-sans)', outline: 'none', color: 'var(--color-text)', background: 'var(--color-white)' }}>
                       <option value="">Select Department</option>
                       {positions.map(d => <option key={d.dept} value={d.dept}>{d.dept}</option>)}
                     </select>
+                    {errors.dept && <span style={{ fontSize: 'var(--text-xs)', color: '#dc2626' }}>{errors.dept}</span>}
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                     <label style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-primary)', fontFamily: 'var(--font-sans)' }}>Position Applied For *</label>
-                    <select required value={form.position} onChange={e => setForm(f => ({ ...f, position: e.target.value }))}
-                      style={{ padding: 'var(--space-3) var(--space-4)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-sans)', outline: 'none', color: 'var(--color-text)', background: 'var(--color-white)' }}>
+                    <select value={form.position} onChange={e => setField('position', e.target.value)}
+                      style={{ padding: 'var(--space-3) var(--space-4)', border: `1.5px solid ${errors.position ? '#dc2626' : 'var(--color-light-gray)'}`, borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-sans)', outline: 'none', color: 'var(--color-text)', background: 'var(--color-white)' }}>
                       <option value="">Select Position</option>
                       {['Professor', 'Associate Professor', 'Assistant Professor', 'Lab Technician', 'Administrative Staff', 'Other'].map(o => <option key={o} value={o}>{o}</option>)}
                     </select>
+                    {errors.position && <span style={{ fontSize: 'var(--text-xs)', color: '#dc2626' }}>{errors.position}</span>}
                   </div>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                   <label style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-primary)', fontFamily: 'var(--font-sans)' }}>Cover Letter / Message</label>
-                  <textarea rows={4} value={form.message} onChange={e => setForm(f => ({ ...f, message: e.target.value }))}
+                  <textarea rows={4} value={form.message} onChange={e => setField('message', e.target.value)}
                     placeholder="Briefly describe your qualifications, research interests, and why you'd like to join VWU..."
                     style={{ padding: 'var(--space-3) var(--space-4)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-sans)', outline: 'none', color: 'var(--color-text)', resize: 'vertical' }} />
                 </div>

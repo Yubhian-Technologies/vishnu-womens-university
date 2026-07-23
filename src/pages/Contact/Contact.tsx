@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-import { MapPin, CheckCircle2 } from 'lucide-react';
+import { MapPin, CheckCircle2, AlertCircle } from 'lucide-react';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import './Contact.css';
+import { db } from '../../lib/firebase';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { usePageBanner } from '../../hooks/usePageBanner';
@@ -15,6 +17,8 @@ interface ContactForm {
   message: string;
 }
 
+type ContactFormErrors = Partial<Record<keyof ContactForm, string>>;
+
 const INITIAL_FORM: ContactForm = {
   name: '',
   email: '',
@@ -22,6 +26,21 @@ const INITIAL_FORM: ContactForm = {
   subject: '',
   message: '',
 };
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PHONE_RE = /^[+]?[\d\s-]{7,15}$/;
+
+function validateContactForm(form: ContactForm): ContactFormErrors {
+  const errors: ContactFormErrors = {};
+  if (!form.name.trim()) errors.name = 'Please enter your full name.';
+  if (!form.email.trim()) errors.email = 'Please enter your email address.';
+  else if (!EMAIL_RE.test(form.email.trim())) errors.email = 'Please enter a valid email address.';
+  if (form.phone.trim() && !PHONE_RE.test(form.phone.trim())) errors.phone = 'Please enter a valid phone number.';
+  if (!form.subject) errors.subject = 'Please select a subject.';
+  if (!form.message.trim()) errors.message = 'Please enter a message.';
+  else if (form.message.trim().length < 10) errors.message = 'Message should be at least 10 characters.';
+  return errors;
+}
 
 const SOCIAL_GLYPHS: Record<string, { glyph: string; className: string }> = {
   YouTube: { glyph: '▶', className: 'contact-social-link--yt' },
@@ -37,7 +56,10 @@ export default function Contact() {
   const socialLinks = useContentBlocks('contact', 'socialLinks');
   const banner = usePageBanner('contact');
   const [form, setForm] = useState<ContactForm>(INITIAL_FORM);
+  const [errors, setErrors] = useState<ContactFormErrors>({});
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
   const revealRefs = useRef<(HTMLElement | null)[]>([]);
 
   useEffect(() => {
@@ -69,11 +91,35 @@ export default function Contact() {
   ) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => (prev[name as keyof ContactForm] ? { ...prev, [name]: undefined } : prev));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    const validationErrors = validateContactForm(form);
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
+    setSubmitting(true);
+    setSubmitError('');
+    try {
+      await addDoc(collection(db, 'contactSubmissions'), {
+        name: form.name.trim(),
+        email: form.email.trim(),
+        phone: form.phone.trim(),
+        subject: form.subject,
+        message: form.message.trim(),
+        status: 'new',
+        createdAt: serverTimestamp(),
+      });
+      setSubmitted(true);
+    } catch (err) {
+      setSubmitError((err as Error).message || "Couldn't send your message. Please try again or email us directly.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -192,6 +238,8 @@ export default function Contact() {
                     className="btn btn-primary"
                     onClick={() => {
                       setForm(INITIAL_FORM);
+                      setErrors({});
+                      setSubmitError('');
                       setSubmitted(false);
                     }}
                   >
@@ -210,8 +258,10 @@ export default function Contact() {
                         placeholder="Your full name"
                         value={form.name}
                         onChange={handleChange}
-                        required
+                        className={errors.name ? 'has-error' : undefined}
+                        aria-invalid={!!errors.name}
                       />
+                      {errors.name && <span className="contact-field-error">{errors.name}</span>}
                     </div>
                     <div className="contact-form-group">
                       <label htmlFor="cf-email">Email Address *</label>
@@ -222,8 +272,10 @@ export default function Contact() {
                         placeholder="you@example.com"
                         value={form.email}
                         onChange={handleChange}
-                        required
+                        className={errors.email ? 'has-error' : undefined}
+                        aria-invalid={!!errors.email}
                       />
+                      {errors.email && <span className="contact-field-error">{errors.email}</span>}
                     </div>
                   </div>
 
@@ -237,7 +289,10 @@ export default function Contact() {
                         placeholder="+91 XXXXX XXXXX"
                         value={form.phone}
                         onChange={handleChange}
+                        className={errors.phone ? 'has-error' : undefined}
+                        aria-invalid={!!errors.phone}
                       />
+                      {errors.phone && <span className="contact-field-error">{errors.phone}</span>}
                     </div>
                     <div className="contact-form-group">
                       <label htmlFor="cf-subject">Subject *</label>
@@ -246,7 +301,8 @@ export default function Contact() {
                         name="subject"
                         value={form.subject}
                         onChange={handleChange}
-                        required
+                        className={errors.subject ? 'has-error' : undefined}
+                        aria-invalid={!!errors.subject}
                       >
                         <option value="">Select a subject</option>
                         <option value="Admissions Enquiry">Admissions Enquiry</option>
@@ -258,6 +314,7 @@ export default function Contact() {
                         <option value="Media & Press">Media &amp; Press</option>
                         <option value="Other">Other</option>
                       </select>
+                      {errors.subject && <span className="contact-field-error">{errors.subject}</span>}
                     </div>
                   </div>
 
@@ -270,12 +327,21 @@ export default function Contact() {
                       placeholder="How can we help you?"
                       value={form.message}
                       onChange={handleChange}
-                      required
+                      className={errors.message ? 'has-error' : undefined}
+                      aria-invalid={!!errors.message}
                     />
+                    {errors.message && <span className="contact-field-error">{errors.message}</span>}
                   </div>
 
-                  <button type="submit" className="btn btn-primary btn-full">
-                    Send Message →
+                  {submitError && (
+                    <div className="contact-form-error">
+                      <AlertCircle size={16} strokeWidth={2} style={{ flexShrink: 0, marginTop: 2 }} />
+                      <span>{submitError}</span>
+                    </div>
+                  )}
+
+                  <button type="submit" className="btn btn-primary btn-full" disabled={submitting}>
+                    {submitting ? 'Sending…' : 'Send Message →'}
                   </button>
                 </form>
               )}
