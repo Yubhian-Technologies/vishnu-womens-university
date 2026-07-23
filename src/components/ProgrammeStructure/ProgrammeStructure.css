@@ -1,0 +1,18 @@
+.programme-structure-skeleton {
+  height: 52px;
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-2);
+  background: linear-gradient(
+    100deg,
+    var(--color-light-gray) 30%,
+    #f3f4f6 50%,
+    var(--color-light-gray) 70%
+  );
+  background-size: 200% 100%;
+  animation: programme-structure-shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes programme-structure-shimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}

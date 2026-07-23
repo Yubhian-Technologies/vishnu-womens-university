@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Link, useParams, useLocation, Navigate } from 'react-router-dom';
 import { where } from 'firebase/firestore';
 import { Check, Microscope, Compass, Target, Sparkles, Mail, ExternalLink } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
+import ProgrammeStructure from '../../components/ProgrammeStructure/ProgrammeStructure';
 import { useCollection, useOrderedCollection } from '../../hooks/useCollection';
 import { usePageBanner } from '../../hooks/usePageBanner';
 import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
@@ -32,16 +33,6 @@ export default function ProgramDetail() {
   // the Programs admin section — that per-program image always wins.
   const fallbackBanner = usePageBanner('program-detail');
 
-  const [openSemesters, setOpenSemesters] = useState<Set<string>>(new Set());
-  const toggleSemester = (label: string) => {
-    setOpenSemesters((prev) => {
-      const next = new Set(prev);
-      if (next.has(label)) next.delete(label);
-      else next.add(label);
-      return next;
-    });
-  };
-
   useEffect(() => {
     if (program) {
       document.title = `${program.shortName || program.name} | Vishnu Womens University`;
@@ -65,7 +56,6 @@ export default function ProgramDetail() {
   const hasHod = !!(program.hodMessage || program.hodImage || program.hodEmail);
   const hasMindMap = !!program.mindMapImage;
   const hasLabs = !!(program.labs && program.labs.length > 0);
-  const hasCurriculum = !!(program.semesters && program.semesters.length > 0);
   const hasCareerOutcomes = !!(program.outcomes && program.outcomes.length > 0);
 
   const quickLinks = [
@@ -75,7 +65,7 @@ export default function ProgramDetail() {
     hasHod && { id: 'hod', label: 'About HOD' },
     faculty.length > 0 && { id: 'faculty', label: 'Faculty' },
     hasMindMap && { id: 'mindmap', label: 'Mind Map' },
-    hasCurriculum && { id: 'curriculum', label: 'Curriculum' },
+    { id: 'curriculum', label: 'Curriculum' },
     hasLabs && { id: 'labs', label: 'Laboratories' },
   ].filter(Boolean) as { id: string; label: string }[];
 
@@ -422,47 +412,20 @@ export default function ProgramDetail() {
         </section>
       )}
 
-      {/* Curriculum — only if semesters present */}
-      {hasCurriculum && (
-        <section id="curriculum" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
-          <div className="container">
-            <div style={{ marginBottom: 'var(--space-10)' }}>
-              <span className="section-label">Curriculum</span>
-              <h2 className="section-title">Programme Structure</h2>
-              <p className="section-desc">A well-structured curriculum blending core foundations with advanced specialisations and practical projects.</p>
-            </div>
-            <div className="thrust-accordion">
-              {program.semesters.map((sem) => {
-                const isOpen = openSemesters.has(sem.label);
-                return (
-                  <div key={sem.label} className={`thrust-accordion-item${isOpen ? ' open' : ''}`}>
-                    <button
-                      type="button"
-                      className="thrust-accordion-header"
-                      onClick={() => toggleSemester(sem.label)}
-                      aria-expanded={isOpen}
-                    >
-                      <span>{sem.label}</span>
-                      <span className="thrust-accordion-icon">{isOpen ? '−' : '+'}</span>
-                    </button>
-                    <div className="thrust-accordion-collapse">
-                      <div className="thrust-accordion-collapse-inner">
-                        <ul style={{ listStyle: 'none', padding: 'var(--space-4) var(--space-5)', margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-                          {sem.subjects.map((s) => (
-                            <li key={s} style={{ fontSize: '0.78rem', color: 'var(--color-text)', padding: '4px 0', borderBottom: '1px solid rgba(0,0,0,0.05)', lineHeight: 1.4 }}>
-                              {s}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+      {/* Curriculum — always rendered; ProgrammeStructure shows its own
+          empty state when a programme has no semesters yet, so admins can
+          see the section is there and waiting for content rather than it
+          silently disappearing. */}
+      <section id="curriculum" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
+        <div className="container">
+          <div style={{ marginBottom: 'var(--space-10)' }}>
+            <span className="section-label">Curriculum</span>
+            <h2 className="section-title">Programme Structure</h2>
+            <p className="section-desc">A well-structured curriculum blending core foundations with advanced specialisations and practical projects.</p>
           </div>
-        </section>
-      )}
+          <ProgrammeStructure semesters={program.semesters} />
+        </div>
+      </section>
 
       {/* Laboratories */}
       {hasLabs && (
