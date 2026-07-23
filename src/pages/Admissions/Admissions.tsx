@@ -206,7 +206,7 @@ export default function Admissions() {
             })}
           </div>
           <div style={{ textAlign: 'center', marginTop: 'var(--space-10)' }}>
-            <Link to="/admission-procedure" className="btn btn-primary btn-lg">Start Your Application</Link>
+            <Link to="/contact" className="btn btn-primary btn-lg">Start Your Application</Link>
           </div>
         </div>
       </section>

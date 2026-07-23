@@ -264,6 +264,35 @@
   box-shadow: 0 0 0 3px rgba(200, 160, 60, 0.15);
 }
 
+.contact-form-group input.has-error,
+.contact-form-group select.has-error,
+.contact-form-group textarea.has-error {
+  border-color: #dc2626;
+}
+
+.contact-form-group input.has-error:focus,
+.contact-form-group select.has-error:focus,
+.contact-form-group textarea.has-error:focus {
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+}
+
+.contact-field-error {
+  font-size: 0.8rem;
+  color: #dc2626;
+}
+
+.contact-form-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: rgba(220, 38, 38, 0.06);
+  border: 1px solid rgba(220, 38, 38, 0.25);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #dc2626;
+}
+
 .btn-full {
   width: 100%;
   justify-content: center;

@@ -461,6 +461,34 @@
 .admin-badge--clickable { cursor: pointer; border: none; font-family: inherit; transition: opacity 0.15s; }
 .admin-badge--clickable:hover { opacity: 0.75; }
 
+/* ---- Submission detail panel (Contact Messages / Career Applications) ---- */
+.admin-detail-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.admin-detail-row {
+  font-size: 0.9rem;
+  color: #374151;
+  margin-top: 0.5rem;
+}
+
+.admin-detail-row strong { color: #111827; margin-right: 0.3rem; }
+
+.admin-detail-message {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #f8f9fb;
+  border: 1px solid #eef0f3;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #374151;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
 /* ---- Misc ---- */
 .admin-lead { color: #6b7280; font-size: 0.95rem; margin-bottom: 1.5rem; }
 .admin-empty { text-align: center; color: #9ca3af; font-size: 0.9rem; padding: 1.5rem; }

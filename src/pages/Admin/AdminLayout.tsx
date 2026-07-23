@@ -25,6 +25,8 @@ export const SECTIONS = [
   { id: 'job-openings',   icon: '💼', label: 'Job Openings' },
   { id: 'content-blocks', icon: '🧩', label: 'Page Content Blocks' },
   { id: 'contacts',       icon: '📇', label: 'Department Contacts' },
+  { id: 'contact-messages', icon: '✉️', label: 'Contact Us Messages' },
+  { id: 'career-applications', icon: '🧑‍💼', label: 'Career Applications' },
   { id: 'sves-campuses',  icon: '🏘️', label: 'SVES Campuses' },
   { id: 'downloads',      icon: '📄', label: 'Academic Documents' },
   { id: 'curriculum',     icon: '📚', label: 'Course Curriculum Matrix' },
@@ -49,6 +51,7 @@ export const SECTIONS = [
 // hunting through one long undifferentiated list.
 export const SECTION_GROUPS: { label: string; ids: string[] }[] = [
   { label: 'Overview', ids: ['overview'] },
+  { label: 'Form Submissions', ids: ['contact-messages', 'career-applications'] },
   { label: 'Site Appearance', ids: ['banners', 'site-photos', 'nav-links', 'content-blocks', 'compliance-docs'] },
   { label: 'About & Governance', ids: ['governing-body', 'governance-items', 'core-executives', 'sves-campuses', 'contacts', 'policies'] },
   { label: 'Academics', ids: ['programs', 'faculty', 'curriculum', 'downloads'] },
