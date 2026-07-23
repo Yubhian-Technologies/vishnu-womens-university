@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { Image as ImageIcon } from 'lucide-react';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import PageHero from '../../components/PageHero/PageHero';
@@ -111,17 +112,23 @@ export default function GoverningBody() {
       {/* Overview */}
       <section className="section gb-overview">
         <div className="container">
-          <div className="gb-overview__inner reveal">
-            <span className="gb-label">Overview</span>
-            <h2 className="gb-overview__title">Overview</h2>
-            <p>{overviewText}</p>
-            {overviewItem?.highlights && overviewItem.highlights.length > 0 && (
-              <ul style={{ marginTop: 'var(--space-4)', paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-                {overviewItem.highlights.map((h) => (
-                  <li key={h} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6 }}>{h}</li>
-                ))}
-              </ul>
-            )}
+          <div className="gb-overview__grid reveal">
+            <div className="gb-overview__inner">
+              <span className="gb-label">Overview</span>
+              <h2 className="gb-overview__title">Overview</h2>
+              <p>{overviewText}</p>
+              {overviewItem?.highlights && overviewItem.highlights.length > 0 && (
+                <ul style={{ marginTop: 'var(--space-4)', paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                  {overviewItem.highlights.map((h) => (
+                    <li key={h} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6 }}>{h}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+            <div className="gb-overview__placeholder">
+              <ImageIcon size={40} strokeWidth={1.5} />
+              <span>Image Placeholder</span>
+            </div>
           </div>
         </div>
       </section>
