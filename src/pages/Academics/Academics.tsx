@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import './Academics.css';
 import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
@@ -48,7 +48,13 @@ function truncate(text: string, max: number) {
 }
 
 export default function Academics() {
-  const [activeTab, setActiveTab] = useState<string>('btech');
+  // Lets links elsewhere in the site (e.g. the Home page's "PG Programs" study
+  // card) open Academics with a specific tab pre-selected via ?tab=mtech,
+  // instead of always landing on the default B.Tech tab.
+  const [searchParams] = useSearchParams();
+  const requestedTab = searchParams.get('tab');
+  const initialTab = TABS.some((t) => t.id === requestedTab) ? requestedTab! : 'btech';
+  const [activeTab, setActiveTab] = useState<string>(initialTab);
   const { docs: programs, loading } = useOrderedCollection<ProgramDoc>('programs', 'order');
   const academicsPhotos = useSitePhotos('academics', 'main', defaultAcademicsPhotos);
   const classroomsLabsPhotos = useSitePhotos('academics', 'classrooms-labs', defaultClassroomsLabsPhotos);

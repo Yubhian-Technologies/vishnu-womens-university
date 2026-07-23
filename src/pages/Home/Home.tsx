@@ -84,6 +84,18 @@ const POPULAR_PROGRAM_SLUGS: Record<string, string> = {
 const slugify = (title: string) =>
   title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 
+// The "M.Tech & MBA" study card's slug is admin-editable in Firestore and
+// currently just points at the plain "/academics" page, which lands on its
+// default B.Tech tab. Route that specific card straight to the M.Tech tab
+// instead — but only when it's still the generic default, so an admin who
+// deliberately customizes the slug (e.g. to an external link) isn't overridden.
+function studyCardHref(card: ContentBlockDoc): string {
+  if (card.value === 'PG Programs' && (card.slug === '/academics' || !card.slug)) {
+    return '/academics?tab=mtech';
+  }
+  return card.slug || '/academics';
+}
+
 const defaultPopularPrograms: ContentBlockDoc[] = Object.keys(POPULAR_PROGRAM_SLUGS).map((title, i) => ({
   id: `default-${i}`, page: 'home', section: 'popularPrograms', value: '', title, desc: '', icon: '',
   slug: POPULAR_PROGRAM_SLUGS[title], order: i,
@@ -316,7 +328,7 @@ export default function Home() {
                   <div className="study-card-body">
                     <h3 className="study-card-title">{card.title}</h3>
                     <p className="study-card-desc">{card.desc}</p>
-                    <Link to={card.slug || '/academics'} className="study-card-link">
+                    <Link to={studyCardHref(card)} className="study-card-link">
                       {card.value}
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                     </Link>

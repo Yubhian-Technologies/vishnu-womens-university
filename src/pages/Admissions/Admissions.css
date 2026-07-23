@@ -416,6 +416,21 @@
   box-shadow: 0 0 0 3px rgba(27,67,50,0.1);
 }
 
+.adm-form-group input.has-error,
+.adm-form-group select.has-error {
+  border-color: #dc2626;
+}
+
+.adm-form-group input.has-error:focus,
+.adm-form-group select.has-error:focus {
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+}
+
+.adm-form-error {
+  font-size: 0.8rem;
+  color: #dc2626;
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
   .adm-hub-grid { grid-template-columns: repeat(2, 1fr); }
