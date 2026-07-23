@@ -4,6 +4,36 @@ import { COMPLIANCE_GROUPS, DEFAULT_COMPLIANCE_DOCS, type ComplianceDocDoc } fro
 import { InstagramIcon, FacebookIcon, TwitterIcon, LinkedInIcon, YouTubeIcon } from './SocialIcons';
 import './Footer.css';
 
+const quickLinks = [
+  { label: 'Examination Portal', path: 'https://www.svecwexams.in/', external: true },
+  { label: 'LMS Platform', path: 'https://www.vishnulearning.com/login/index.php', external: true },
+  { label: 'Campus Map', path: 'https://maps.google.com/maps?q=16.568119,81.522098&z=15', external: true },
+  { label: 'Central Library', path: '/campus/central-library' },
+  { label: 'Prathibha Magazine', path: 'https://heyzine.com/flip-book/14449c1cd4.html', external: true },
+  { label: 'Academic Calendar', path: '/information#academic-calendar' },
+  { label: 'Career Opportunities', path: '/careers' },
+  { label: 'Wellness Center', path: 'https://vishnuwellness.in/', external: true },
+];
+
+const academicLinks = [
+  { label: 'B.Tech Programs', path: '/academics' },
+  { label: 'M.Tech Programs', path: '/academics' },
+  { label: 'MBA Program', path: '/academics' },
+  { label: 'Ph.D. Programs', path: '/academics' },
+  { label: 'Departments', path: '/academics' },
+  { label: 'Research & Publications', path: '/academics' },
+];
+
+const aboutLinks: { label: string; path: string; external?: boolean; download?: boolean }[] = [
+  { label: 'Our History', path: '/about' },
+  { label: 'Mission & Values', path: '/about' },
+  { label: 'Leadership', path: '/about' },
+  { label: 'Organizational Chart', path: '/downloads/SVECWOrganizationChart.jpg', download: true },
+  { label: 'News', path: '/news' },
+  { label: 'Events', path: '/events' },
+  { label: 'Accreditation', path: '/about' },
+];
+
 const socialLinks = [
   { label: 'Instagram', href: 'http://instagram.com/vishnu_svecw/', Icon: InstagramIcon },
   { label: 'Facebook', href: 'https://www.facebook.com/svecwcollege', Icon: FacebookIcon },
