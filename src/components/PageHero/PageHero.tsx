@@ -34,6 +34,10 @@ export default function PageHero({
   const { slides, loading } = usePageBanners(page);
   const [current, setCurrent] = useState(0);
   const [animating, setAnimating] = useState(false);
+  // Only the slides a visitor has actually reached get an <img> in the DOM —
+  // otherwise every banner for a page (most have 2-4) downloads its full-size
+  // image on load even though just one is ever shown at a time.
+  const [visited, setVisited] = useState<Set<number>>(new Set([0]));
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Image: always show something immediately (default image while loading).
@@ -70,7 +74,11 @@ export default function PageHero({
   }, [allSlides.length, current]);
 
   // Reset to slide 0 when slides change (e.g. Firestore update)
-  useEffect(() => { setCurrent(0); }, [slides.length]);
+  useEffect(() => { setCurrent(0); setVisited(new Set([0])); }, [slides.length]);
+
+  useEffect(() => {
+    setVisited((prev) => (prev.has(current) ? prev : new Set(prev).add(current)));
+  }, [current]);
 
   // Hints the browser to start fetching the hero image before React has even
   // committed the <img> to the DOM — defaultImage is known synchronously (a
@@ -108,12 +116,14 @@ export default function PageHero({
           key={s.imageUrl}
           className={`page-hero__slide ${i === current ? 'page-hero__slide--active' : ''}`}
         >
-          <SmoothImage
-            src={s.imageUrl}
-            alt={s.title}
-            className="page-hero-image"
-            {...(i === current ? { fetchPriority: 'high' as const } : {})}
-          />
+          {visited.has(i) && (
+            <SmoothImage
+              src={s.imageUrl}
+              alt={s.title}
+              className="page-hero-image"
+              {...(i === current ? { fetchPriority: 'high' as const } : {})}
+            />
+          )}
         </div>
       ))}
 

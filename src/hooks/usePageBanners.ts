@@ -12,31 +12,20 @@ export interface BannerSlide {
   order: number;
 }
 
-const CACHE_KEY = (page: string) => `vwu_banner_${page}`;
-
-function readCache(page: string): BannerSlide[] {
-  try {
-    const raw = localStorage.getItem(CACHE_KEY(page));
-    return raw ? (JSON.parse(raw) as BannerSlide[]) : [];
-  } catch { return []; }
-}
-
-function writeCache(page: string, slides: BannerSlide[]) {
-  try { localStorage.setItem(CACHE_KEY(page), JSON.stringify(slides)); } catch { /* quota full */ }
-}
-
 /**
- * Returns banner slides for a page.
- * First render uses localStorage cache (instant, no flash).
- * Firestore result updates it in the background.
- * loading=true only when cache is empty AND Firestore hasn't responded yet.
+ * Returns banner slides for a page, straight from the live Firestore
+ * listener — no localStorage cache. PageHero/HeroSlider already show their
+ * own default image immediately regardless of `loading`, so there was
+ * nothing for a cache to avoid a flash of; it only risked briefly showing a
+ * stale banner (wrong image/title) from a previous visit before the live
+ * snapshot arrived.
  */
 export function usePageBanners(page: string): { slides: BannerSlide[]; loading: boolean } {
-  const cached = readCache(page);
-  const [slides, setSlides] = useState<BannerSlide[]>(cached);
-  const [loading, setLoading] = useState(cached.length === 0);
+  const [slides, setSlides] = useState<BannerSlide[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
     const q = query(collection(db, 'banners'), where('page', '==', page));
     const unsub = onSnapshot(
       q,
@@ -52,7 +41,6 @@ export function usePageBanners(page: string): { slides: BannerSlide[]; loading: 
             order:    d.data().order     ?? 0,
           }))
           .sort((a, b) => a.order - b.order);
-        writeCache(page, docs);
         setSlides(docs);
         setLoading(false);
       },
