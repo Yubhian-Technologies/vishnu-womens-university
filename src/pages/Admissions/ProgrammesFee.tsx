@@ -61,10 +61,11 @@ export default function ProgrammesFee() {
         defaultTitle="Programmes & Fee Structure"
   defaultSubtitle="Complete list of programs, intake capacities, and annual fee structure for AY 2025–26."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Admissions', to: '/admissions' }, { label: 'Programmes & Fee' }]}
+        scrollCtaTargetId="programmes-fee-content"
       />
 
       {/* B.Tech */}
-      <section className="section bg-off-white">
+      <section id="programmes-fee-content" className="section bg-off-white" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
         <div className="container">
           <div className="reveal" style={{ marginBottom: 'var(--space-8)' }}>
             <span className="section-label">Undergraduate</span>

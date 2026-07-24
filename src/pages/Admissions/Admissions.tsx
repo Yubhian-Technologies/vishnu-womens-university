@@ -177,10 +177,11 @@ export default function Admissions() {
         defaultTitle="Your Journey Starts Here"
   defaultSubtitle="Choosing VWU sets you on a path to a fulfilling engineering career, a strong professional network, and a future built on real achievement."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Admissions' }]}
+        scrollCtaTargetId="admissions-content"
       />
 
       {/* Admissions Hub */}
-      <section className="section bg-off-white" style={{ paddingBottom: 0 }}>
+      <section id="admissions-content" className="section bg-off-white" style={{ paddingBottom: 0, scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-8)' }}>
             <span className="section-label">Admissions</span>

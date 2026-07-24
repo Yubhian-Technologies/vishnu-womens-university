@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ShieldCheck, FlaskConical, Handshake } from 'lucide-react';
 import PageHero from '../../components/PageHero/PageHero';
 import { useOrderedCollection } from '../../hooks/useCollection';
+import { useHashScroll } from '../../hooks/useHashScroll';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import type { ResearchItemDoc } from '../Admin/sections/ResearchItemsAdmin';
 
@@ -17,6 +18,7 @@ const researchCategories = [
 
 export default function Research() {
   const { docs: researchItems } = useOrderedCollection<ResearchItemDoc>('researchItems', 'order');
+  useHashScroll();
 
   useEffect(() => {
     document.title = 'Research & Development | Vishnu Womens University';

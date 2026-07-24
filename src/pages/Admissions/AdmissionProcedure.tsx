@@ -65,10 +65,11 @@ export default function AdmissionProcedure() {
         defaultTitle="Admission Procedure"
   defaultSubtitle="A clear, step-by-step guide to joining VWU — covering eligibility, entrance examinations, and the enrollment process for all programmes."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Admissions', to: '/admissions' }, { label: 'Admission Procedure' }]}
+        scrollCtaTargetId="admission-procedure-content"
       />
 
       {/* EAPCET code banner */}
-      <section style={{ background: 'var(--color-primary)', padding: 'var(--space-5) 0' }}>
+      <section id="admission-procedure-content" style={{ background: 'var(--color-primary)', padding: 'var(--space-5) 0', scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
         <div className="container">
           <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-12)', flexWrap: 'wrap' }}>
             {stats.map(s => (

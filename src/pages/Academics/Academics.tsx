@@ -116,10 +116,11 @@ export default function Academics() {
         defaultTitle="You Will Excel."
   defaultSubtitle="Rigorous, industry-aligned programs designed to build your technical expertise, sharpen your research instincts, and develop you as a professional."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Academics' }]}
+        scrollCtaTargetId="academics-content"
       />
 
       {/* Quick Stats */}
-      <section style={{ background: 'var(--color-primary)', padding: 'var(--space-6) 0' }}>
+      <section id="academics-content" style={{ background: 'var(--color-primary)', padding: 'var(--space-6) 0', scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
         <div className="container">
           <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-12)', flexWrap: 'wrap' }}>
             <div style={{ textAlign: 'center' }}>
