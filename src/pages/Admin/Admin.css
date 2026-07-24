@@ -14,6 +14,15 @@
   margin: 0 0 0.6rem;
 }
 
+.admin-page-selector__group-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 0.4rem;
+}
+
 .admin-page-selector__grid {
   display: flex;
   flex-wrap: wrap;
@@ -39,6 +48,14 @@
   background: #081c15;
   border-color: #081c15;
   color: #fff;
+}
+
+/* Marks page-banner slots that are shared fallbacks (used only when a
+   per-item image, edited elsewhere in this same admin, isn't set) —
+   dashed border to visually read as "different in kind" from a normal
+   single-page banner. */
+.admin-page-btn--fallback {
+  border-style: dashed;
 }
 
 /* ---- Login ---- */
@@ -367,6 +384,18 @@
   width: 100%;
   height: 130px;
   object-fit: cover;
+}
+
+.admin-image-card__empty {
+  width: 100%;
+  height: 130px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #eef0f2;
+  color: #9ca3af;
+  font-size: 0.78rem;
+  font-weight: 600;
 }
 
 .admin-image-card__info {

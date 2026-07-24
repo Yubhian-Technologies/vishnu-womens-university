@@ -106,7 +106,6 @@ export default function ProgramsAdmin() {
   const [saving, setSaving] = useState(false);
 
   const set = (k: string, v: string | number | string[] | ProgramSemester[] | ProgramLink[]) => setForm((p) => ({ ...p, [k]: v }));
-  const handleImage = (r: UploadResult) => setForm((p) => ({ ...p, heroImage: r.url, storagePath: r.path }));
   const handleHodImage = (r: UploadResult) => setForm((p) => ({ ...p, hodImage: r.url, hodImageStoragePath: r.path }));
   const handleMindMapImage = (r: UploadResult) => setForm((p) => ({ ...p, mindMapImage: r.url, mindMapImageStoragePath: r.path }));
 
@@ -197,11 +196,10 @@ export default function ProgramsAdmin() {
     <div className="admin-section">
       <div className="admin-card">
         <h2 className="admin-card__title">{editing ? 'Edit Program' : 'Add Program'}</h2>
+        <p className="admin-field__hint" style={{ background: '#eef6ff', border: '1px solid #bcdcfd', borderRadius: 6, padding: '0.6rem 0.9rem', marginBottom: '1rem' }}>
+          This program's hero image is now edited from <strong>Hero Banners → Programs</strong>, not here.
+        </p>
         <div className="admin-form-grid">
-          <div className="admin-field admin-field--full">
-            <label>Program Image</label>
-            <ImageUploader folder="vwu/programs" currentUrl={form.heroImage} onUploaded={handleImage} label="Upload Program Image" />
-          </div>
           <div className="admin-field">
             <label>Full Name *</label>
             <input value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="B.Tech Computer Science and Engineering" />

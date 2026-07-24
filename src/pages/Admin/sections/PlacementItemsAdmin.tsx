@@ -3,8 +3,7 @@ import { collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp } from '
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
 import { CONTENT_ICON_NAMES } from '../../../lib/contentIcons';
-import ImageUploader from '../../../components/ImageUploader/ImageUploader';
-import { deleteFile, type UploadResult } from '../../../lib/storage';
+import { deleteFile } from '../../../lib/storage';
 
 export interface PlacementItemDoc {
   id: string;
@@ -45,7 +44,6 @@ export default function PlacementItemsAdmin() {
   const [saving, setSaving] = useState(false);
 
   const set = (k: string, v: string | number | string[] | boolean) => setForm((p) => ({ ...p, [k]: v }));
-  const handleHeroImage = (r: UploadResult) => setForm((p) => ({ ...p, heroImage: r.url, heroStoragePath: r.path }));
 
   const save = async () => {
     if (!form.slug || !form.title) return alert('Slug and title are required.');
@@ -91,6 +89,9 @@ export default function PlacementItemsAdmin() {
           For the Data table, put each row on its own line as <code>Column 1 | Column 2 | Column 3</code>.
           Not the same as the "Placements" section, which manages the recruiter logo list.
         </p>
+        <p className="admin-field__hint" style={{ background: '#eef6ff', border: '1px solid #bcdcfd', borderRadius: 6, padding: '0.6rem 0.9rem', marginBottom: '1rem' }}>
+          This page's hero image is now edited from <strong>Hero Banners → Placements</strong>, not here.
+        </p>
         <div className="admin-form-grid">
           <div className="admin-field">
             <label>URL Slug * (e.g. tpo-cell)</label>
@@ -119,10 +120,6 @@ export default function PlacementItemsAdmin() {
           <div className="admin-field">
             <label>External URL (only if the box above is checked)</label>
             <input value={form.url} onChange={(e) => set('url', e.target.value)} />
-          </div>
-          <div className="admin-field admin-field--full">
-            <label>Detail Page Hero Image (optional — falls back to the shared "Placement Detail" banner when not set)</label>
-            <ImageUploader folder="vwu/placement-items" currentUrl={form.heroImage} onUploaded={handleHeroImage} label="Upload Hero Image" />
           </div>
           <div className="admin-field admin-field--full">
             <label>Short Description (shown on the listing card)</label>
