@@ -74,6 +74,11 @@ export default function HeroSlider() {
   const [isAnimating, setIsAnimating] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
   const [videoReady, setVideoReady] = useState(false);
+  // Only slides a visitor has actually reached get their photo downloaded —
+  // admin-uploaded banner slides append photos after the 4 static marketing
+  // slides, so without this every one of them would load on first paint
+  // even though the carousel only shows one at a time.
+  const [visited, setVisited] = useState<Set<number>>(new Set([0]));
   const videoRef = useRef<HTMLVideoElement>(null);
 
   // Defer the video fetch until the browser is idle (or a short timeout, on
@@ -127,6 +132,10 @@ export default function HeroSlider() {
     setProgressWidth(0);
     const timer = setTimeout(() => setProgressWidth(100), 50);
     return () => clearTimeout(timer);
+  }, [current]);
+
+  useEffect(() => {
+    setVisited((prev) => (prev.has(current) ? prev : new Set(prev).add(current)));
   }, [current]);
 
   useEffect(() => {
@@ -191,7 +200,7 @@ export default function HeroSlider() {
               </div>
               {slide.image && (
                 <div className="slide-photo-wrap">
-                  <img src={slide.image} alt={slide.heading} className="slide-photo" />
+                  {visited.has(i) && <img src={slide.image} alt={slide.heading} className="slide-photo" />}
                 </div>
               )}
             </div>
