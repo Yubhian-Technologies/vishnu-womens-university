@@ -3,8 +3,7 @@ import { collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp } from '
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
 import { CONTENT_ICON_NAMES } from '../../../lib/contentIcons';
-import ImageUploader from '../../../components/ImageUploader/ImageUploader';
-import { deleteFile, type UploadResult } from '../../../lib/storage';
+import { deleteFile } from '../../../lib/storage';
 
 export interface ResearchItemDoc {
   id: string;
@@ -50,7 +49,6 @@ export default function ResearchItemsAdmin() {
   const [filterCat, setFilterCat] = useState<string>('All');
 
   const set = (k: string, v: string | number | string[]) => setForm((p) => ({ ...p, [k]: v }));
-  const handleHeroImage = (r: UploadResult) => setForm((p) => ({ ...p, heroImage: r.url, heroStoragePath: r.path }));
 
   const save = async () => {
     if (!form.slug || !form.title) return alert('Slug and title are required.');
@@ -100,6 +98,9 @@ export default function ResearchItemsAdmin() {
           then <code>Dr. G. Srinivasa Rao | Chairman</code>. For pages with multiple named tables (like Patents,
           grouped by year), start each one with a line like <code>## 2024</code>.
         </p>
+        <p className="admin-field__hint" style={{ background: '#eef6ff', border: '1px solid #bcdcfd', borderRadius: 6, padding: '0.6rem 0.9rem', marginBottom: '1rem' }}>
+          This item's detail-page hero image is now edited from <strong>Hero Banners → Research</strong>, not here.
+        </p>
         <div className="admin-form-grid">
           <div className="admin-field">
             <label>URL Slug * (used in the page link, e.g. research-advisory-committee)</label>
@@ -124,10 +125,6 @@ export default function ResearchItemsAdmin() {
           <div className="admin-field">
             <label>Display Order</label>
             <input type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
-          </div>
-          <div className="admin-field admin-field--full">
-            <label>Detail Page Hero Image (optional — falls back to a shared default when not set)</label>
-            <ImageUploader folder="vwu/research-items" currentUrl={form.heroImage} onUploaded={handleHeroImage} label="Upload Hero Image" />
           </div>
           <div className="admin-field admin-field--full">
             <label>Short Description (shown on the Research listing card)</label>

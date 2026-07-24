@@ -2,8 +2,7 @@ import { useState } from 'react';
 import { collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
-import ImageUploader from '../../../components/ImageUploader/ImageUploader';
-import { deleteFile, type UploadResult } from '../../../lib/storage';
+import { deleteFile } from '../../../lib/storage';
 
 export interface DifferentiatorItemDoc {
   id: string;
@@ -53,7 +52,6 @@ export default function DifferentiatorsAdmin() {
   const [filterCat, setFilterCat] = useState('All');
 
   const set = (k: string, v: string | number | string[] | boolean) => setForm((p) => ({ ...p, [k]: v }));
-  const handleHeroImage = (r: UploadResult) => setForm((p) => ({ ...p, heroImage: r.url, heroStoragePath: r.path }));
 
   const save = async () => {
     if (!form.slug || !form.title) return alert('Slug and title are required.');
@@ -97,6 +95,9 @@ export default function DifferentiatorsAdmin() {
     <div className="admin-section">
       <div className="admin-card">
         <h2 className="admin-card__title">{editing ? 'Edit Differentiator' : 'Add Differentiator'}</h2>
+        <p className="admin-field__hint" style={{ background: '#eef6ff', border: '1px solid #bcdcfd', borderRadius: 6, padding: '0.6rem 0.9rem', marginBottom: '1rem' }}>
+          This item's detail-page hero image is now edited from <strong>Hero Banners → Differentiators</strong>, not here.
+        </p>
         <div className="admin-form-grid">
           <div className="admin-field">
             <label>URL Slug * (e.g. vishnu-tbi)</label>
@@ -125,10 +126,6 @@ export default function DifferentiatorsAdmin() {
           <div className="admin-field">
             <label>External URL (only if the box above is checked)</label>
             <input value={form.url} onChange={(e) => set('url', e.target.value)} placeholder="https://www.vishva.co/" />
-          </div>
-          <div className="admin-field admin-field--full">
-            <label>Detail Page Hero Image (optional — falls back to a shared category image when not set)</label>
-            <ImageUploader folder="vwu/differentiators" currentUrl={form.heroImage} onUploaded={handleHeroImage} label="Upload Hero Image" />
           </div>
           <div className="admin-field admin-field--full">
             <label>Short Description (shown on the listing card)</label>
