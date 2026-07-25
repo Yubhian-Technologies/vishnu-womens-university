@@ -298,10 +298,11 @@
 .hero-recognition-inner {
   padding: 0 var(--space-8);
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-8);
-  overflow-x: auto;
-  scrollbar-width: none;
+  justify-content: center;
+  column-gap: var(--space-8);
+  row-gap: var(--space-3);
 }
 
 .hero-recognition-inner::-webkit-scrollbar { display: none; }

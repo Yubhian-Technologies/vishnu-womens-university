@@ -387,6 +387,7 @@
 .campus-image-side {
   position: relative;
   overflow: hidden;
+  background: var(--color-primary);
 }
 .campus-image {
   width: 100%;
