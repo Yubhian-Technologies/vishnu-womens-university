@@ -7,12 +7,11 @@ import NewsCard from '../../components/NewsCard/NewsCard';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
-import { useSitePhotos } from '../../hooks/useSitePhotos';
+import { useSitePhotos, useSitePhotosLoading } from '../../hooks/useSitePhotos';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import { type NewsDoc, newsDocToArticle } from '../../lib/news';
 import type { EventDoc } from '../Admin/sections/EventsAdmin';
 import type { ContentBlockDoc } from '../Admin/sections/ContentBlocksAdmin';
-import type { SitePhotoDoc } from '../Admin/sections/SitePhotosAdmin';
 import './Home.css';
 
 /* ── Data ─────────────────────────────────────────────────── */
@@ -191,8 +190,10 @@ export default function Home() {
   // Gates the strip's first paint: until Firestore actually responds, we
   // don't yet know whether real activity photos exist, so a skeleton shows
   // instead of the generic stock defaults — avoids ever rendering a photo
-  // that's about to be replaced by a different one a moment later.
-  const { loading: activitiesLoading } = useOrderedCollection<SitePhotoDoc>('sitePhotos', 'order');
+  // that's about to be replaced by a different one a moment later. Shares
+  // useSitePhotos' subscription (not its own useOrderedCollection call) so
+  // this always resolves at the exact same moment as activityPhotos itself.
+  const activitiesLoading = useSitePhotosLoading();
   const studyCardPhotos = useSitePhotos('home', 'study-cards', defaultStudyCardPhotos);
   const campusLifePhoto = useSitePhotos('home', 'campus-life', defaultCampusLifePhoto)[0];
   const missionPhotos = useSitePhotos('home', 'mission', defaultMissionPhotos);

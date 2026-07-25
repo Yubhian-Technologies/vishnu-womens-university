@@ -39,6 +39,27 @@ export default function Faculty() {
     document.title = 'Faculty | Vishnu Womens University';
   }, []);
 
+  // The intro heading above the department tabs uses .reveal (mount-only,
+  // static content — not gated behind Firestore data, see the CLAUDE.md
+  // gotcha) but nothing was ever observing it, so it sat at opacity:0
+  // forever — looking like an oversized empty gap above the department
+  // filter buttons rather than what it actually was: invisible text.
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('revealed');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+    document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
+
   const availableDepts = useMemo(() => {
     const present = new Set(faculty.map((f) => f.department).filter(Boolean));
     return DEPARTMENTS.filter((d) => present.has(d));
@@ -60,7 +81,7 @@ export default function Faculty() {
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Academics', to: '/academics' }, { label: 'Faculty' }]}
       />
 
-      <section className="section bg-off-white">
+      <section className="section faculty-intro-section bg-off-white">
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-10)' }}>
             <span className="section-label">Meet the Team</span>
