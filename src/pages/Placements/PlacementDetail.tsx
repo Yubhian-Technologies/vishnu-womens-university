@@ -10,6 +10,77 @@ import '../detail-layout.css';
 
 const DEFAULT_HERO_IMAGE = 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=1920&q=80';
 
+type BodyBlock =
+  | { type: 'paragraph'; text: string }
+  | { type: 'list'; items: string[] };
+
+const BODY_OVERRIDES: Record<string, string> = {
+  'tpo-cell': `Vishnu Womens University has been consistently topping, during the last seven years in the list of campus placement records among private institutions in Andhra Pradesh. Students of Vishnu Womens University are highly regarded by employers from industry and the public sector.
+
+Facilitating students by way of offering information, advice, guidance and job-seeking support for students is considered as a primary responsibility at Vishnu Womens University. Career Advisors are available to discuss ideas & plans, and students are encouraged to attend the wide range of talks, information fairs and recruitment events.
+
+With this goal in mind, the Training & Placement Office (TPO) Cell:
+
+- Arranges for in-plant industrial training for students during their summer and Intra semester break.
+- Encourages students to become entrepreneurs, through Entrepreneurship Development Programmes.
+- Promotes career guidance & counseling through lectures by senior corporate executives and visiting professors.
+- Training facilities for students to face competitive exams like GATE, GRE, GMAT, TOEFL and prepares them for the interviews.
+- Organizing campus interviews for pre-final and final year students with industrial and business houses of repute from all over India.
+
+The TRAINING AND PLACEMENT Cell is headed by a Dean and is assisted by the Placement Officers.
+
+TRAINING AND PLACEMENT Cell is now entrusted with the additional duty of interacting with the Industry to enhance the employment opportunities of the students and to get projects for staff to improve their “real world” awareness etc.`,
+};
+
+function parseBodyContent(text: string): BodyBlock[] {
+  const blocks: BodyBlock[] = [];
+  let paragraphLines: string[] = [];
+  let listItems: string[] = [];
+
+  const flushParagraph = () => {
+    if (paragraphLines.length > 0) {
+      blocks.push({ type: 'paragraph', text: paragraphLines.join(' ') });
+      paragraphLines = [];
+    }
+  };
+
+  const flushList = () => {
+    if (listItems.length > 0) {
+      blocks.push({ type: 'list', items: listItems });
+      listItems = [];
+    }
+  };
+
+  for (const rawLine of (text || '').split('\n')) {
+    const line = rawLine.trim();
+    if (!line) {
+      flushParagraph();
+      flushList();
+      continue;
+    }
+    if (line.startsWith('- ')) {
+      flushParagraph();
+      listItems.push(line.slice(2).trim());
+      continue;
+    }
+    flushList();
+    paragraphLines.push(line);
+  }
+
+  flushParagraph();
+  flushList();
+  return blocks;
+}
+
+function renderInlineText(text: string) {
+  return text.split(/(\*\*[^*]+\*\*)/g).map((part, index) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return <strong key={index}>{part.slice(2, -2)}</strong>;
+    }
+    return <span key={index}>{part}</span>;
+  });
+}
+
 const PARTNER_DOMAINS: Record<string, string> = {
   'Amazon': 'amazon.com', 'Adobe': 'adobe.com', 'Microsoft': 'microsoft.com',
   'Google': 'google.com', 'Flipkart': 'flipkart.com', 'PayPal': 'paypal.com',
@@ -76,6 +147,9 @@ export default function PlacementDetail() {
   const Icon = resolveContentIcon(item.icon) || BarChart3;
   const tableSections = parseStructuredTable(item.tableText);
   const tableRows = tableSections.flatMap((s) => s.rows);
+  const bodyText = BODY_OVERRIDES[item.slug] || item.intro || item.desc;
+  const bodyBlocks = parseBodyContent(bodyText);
+  const hasBodyOverride = Boolean(BODY_OVERRIDES[item.slug]);
 
   return (
     <main className="page-wrapper">
@@ -111,7 +185,28 @@ export default function PlacementDetail() {
             <div>
               <span className="section-label">Overview</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>About {item.title}</h2>
-              {item.intro ? (
+              {hasBodyOverride ? (
+                <div style={{ fontSize: 'var(--text-lg)', color: 'var(--color-text)', lineHeight: 1.75 }}>
+                  {bodyBlocks.map((block, index) => {
+                    if (block.type === 'list') {
+                      return (
+                        <ul key={index} style={{ paddingLeft: '1.25rem', margin: '0 0 1rem' }}>
+                          {block.items.map((entry, itemIndex) => (
+                            <li key={itemIndex} style={{ marginBottom: '0.7rem' }}>
+                              {renderInlineText(entry)}
+                            </li>
+                          ))}
+                        </ul>
+                      );
+                    }
+                    return (
+                      <p key={index} style={{ margin: '0 0 1rem' }}>
+                        {renderInlineText(block.text)}
+                      </p>
+                    );
+                  })}
+                </div>
+              ) : item.intro ? (
                 <>
                   <p style={{ fontSize: 'var(--text-lg)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-5)' }}>
                     {item.intro}

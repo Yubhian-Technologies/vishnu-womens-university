@@ -56,7 +56,7 @@ export default function StudentClubsAdmin() {
         <div className="admin-form-grid">
           <div className="admin-field">
             <label>Club Name *</label>
-            <input value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="CodeChef SVECW Chapter" />
+            <input value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="CodeChef Vishnu Womens University Chapter" />
           </div>
           <div className="admin-field">
             <label>Category</label>

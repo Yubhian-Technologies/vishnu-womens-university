@@ -25,7 +25,7 @@ export default function PoliciesProcedures() {
       <section className="section bg-white">
         <div className="container" style={{ maxWidth: 900 }}>
           <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-5)' }}>
-            SVECW has established a set of well-defined policies and standard operating procedures
+            Vishnu Womens University has established a set of well-defined policies and standard operating procedures
             to ensure effective governance, academic excellence, transparency, and continuous
             institutional development.
           </p>
