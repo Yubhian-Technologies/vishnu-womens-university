@@ -1,4 +1,4 @@
-import { useEffect, useState, type ImgHTMLAttributes } from 'react';
+import { useEffect, useRef, useState, type ImgHTMLAttributes } from 'react';
 import './SmoothImage.css';
 
 interface SmoothImageProps extends ImgHTMLAttributes<HTMLImageElement> {
@@ -18,15 +18,22 @@ interface SmoothImageProps extends ImgHTMLAttributes<HTMLImageElement> {
  */
 export default function SmoothImage({ src, alt, className = '', onLoad, ...rest }: SmoothImageProps) {
   const [loaded, setLoaded] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
 
   // Every time the src we're asked to show changes, go back to invisible
-  // until *that* image reports it has loaded.
+  // until *that* image reports it has loaded — except when the browser
+  // already has it decoded (e.g. served from cache, or the src didn't
+  // actually change on this particular re-render): `img.complete` catches
+  // that case, since the browser's own 'load' event only fires once and
+  // won't refire for a React effect that (re)attaches the listener after
+  // the fact, which would otherwise leave the image stuck invisible.
   useEffect(() => {
-    setLoaded(false);
+    setLoaded(imgRef.current?.complete ?? false);
   }, [src]);
 
   return (
     <img
+      ref={imgRef}
       src={src}
       alt={alt}
       className={`smooth-image${loaded ? ' smooth-image--loaded' : ''}${className ? ` ${className}` : ''}`}
