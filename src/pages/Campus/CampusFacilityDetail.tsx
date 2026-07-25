@@ -2,9 +2,11 @@ import { useEffect } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
+import CampusFacilitiesNav from './CampusFacilitiesNav';
 import { useSitePhotos } from '../../hooks/useSitePhotos';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import { findCampusFacilityBySlug } from './campusFacilities.data';
+import '../detail-layout.css';
 
 type DetailBlock =
   | { type: 'heading'; text: string; level: 1 | 2 | 3 | 4 }
@@ -122,43 +124,53 @@ export default function CampusFacilityDetail() {
 
       <section className="section bg-white">
         <div className="container">
-          <span className="section-label">Campus Life</span>
-          <h2 className="section-title" style={{ fontSize: '1.75rem' }}>About {facility.title}</h2>
-          <div style={{ fontSize: 'var(--text-lg)', color: 'var(--color-text)', lineHeight: 1.75, maxWidth: 760 }}>
-            {facilityContentBlocks.map((block, index) => {
-              if (block.type === 'heading') {
-                const HeadingTag = `h${block.level}` as const;
-                const headingStyle =
-                  block.level === 1
-                    ? { fontSize: '2rem', margin: index === 0 ? '0 0 1rem' : '1.5rem 0 1rem' }
-                    : block.level === 2
-                      ? { fontSize: '1.6rem', margin: '1.5rem 0 1rem' }
-                      : block.level === 3
-                        ? { fontSize: '1.2rem', margin: '1.25rem 0 0.75rem' }
-                        : { fontSize: '1rem', margin: '1rem 0 0.75rem' };
-                return (
-                  <HeadingTag key={index} style={{ fontFamily: 'var(--font-sans)', fontWeight: 800, color: 'var(--color-primary)', ...headingStyle }}>
-                    {block.text}
-                  </HeadingTag>
-                );
-              }
-              if (block.type === 'list') {
-                return (
-                  <ul key={index} style={{ paddingLeft: '1.25rem', margin: '0 0 1rem' }}>
-                    {block.items.map((item, itemIndex) => (
-                      <li key={itemIndex} style={{ marginBottom: '0.6rem' }}>
-                        {formatInlineText(item)}
-                      </li>
-                    ))}
-                  </ul>
-                );
-              }
-              return (
-                <p key={index} style={{ margin: '0 0 1rem' }}>
-                  {formatInlineText(block.text)}
-                </p>
-              );
-            })}
+          <div className="detail-grid">
+            <div>
+              <span className="section-label">Campus Life</span>
+              <h2 className="section-title" style={{ fontSize: '1.75rem' }}>About {facility.title}</h2>
+              <div style={{ fontSize: 'var(--text-lg)', color: 'var(--color-text)', lineHeight: 1.75, maxWidth: 760 }}>
+                {facilityContentBlocks.map((block, index) => {
+                  if (block.type === 'heading') {
+                    const HeadingTag = `h${block.level}` as const;
+                    const headingStyle =
+                      block.level === 1
+                        ? { fontSize: '2rem', margin: index === 0 ? '0 0 1rem' : '1.5rem 0 1rem' }
+                        : block.level === 2
+                          ? { fontSize: '1.6rem', margin: '1.5rem 0 1rem' }
+                          : block.level === 3
+                            ? { fontSize: '1.2rem', margin: '1.25rem 0 0.75rem' }
+                            : { fontSize: '1rem', margin: '1rem 0 0.75rem' };
+                    return (
+                      <HeadingTag key={index} style={{ fontFamily: 'var(--font-sans)', fontWeight: 800, color: 'var(--color-primary)', ...headingStyle }}>
+                        {block.text}
+                      </HeadingTag>
+                    );
+                  }
+                  if (block.type === 'list') {
+                    return (
+                      <ul key={index} style={{ paddingLeft: '1.25rem', margin: '0 0 1rem' }}>
+                        {block.items.map((item, itemIndex) => (
+                          <li key={itemIndex} style={{ marginBottom: '0.6rem' }}>
+                            {formatInlineText(item)}
+                          </li>
+                        ))}
+                      </ul>
+                    );
+                  }
+                  return (
+                    <p key={index} style={{ margin: '0 0 1rem' }}>
+                      {formatInlineText(block.text)}
+                    </p>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="detail-sidebar">
+              <div style={{ position: 'sticky', top: 'calc(var(--topbar-height) + var(--header-height) + 1.5rem)' }}>
+                <CampusFacilitiesNav activeSlug={facility.slug} />
+              </div>
+            </div>
           </div>
         </div>
       </section>

@@ -118,6 +118,12 @@
   transform: translateY(-4px);
 }
 
+.sl-sport-card--link {
+  display: block;
+  text-decoration: none;
+  cursor: pointer;
+}
+
 .sl-sport-icon {
   font-size: 2rem;
   display: block;

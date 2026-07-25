@@ -195,11 +195,11 @@ export default function StudentLife() {
             {athletics.map((s) => {
               const Icon = resolveContentIcon(s.icon) || Target;
               return (
-                <div key={s.id} className="sl-sport-card">
+                <Link key={s.id} to="/news-awards/gallery?category=Sports#photo-gallery" className="sl-sport-card sl-sport-card--link">
                   <span className="sl-sport-icon"><Icon size={32} strokeWidth={1.75} /></span>
                   <div className="sl-sport-name">{s.title}</div>
                   <span className="sl-sport-season">{s.value}</span>
-                </div>
+                </Link>
               );
             })}
           </div>
@@ -224,9 +224,15 @@ export default function StudentLife() {
                   <div className="sl-service-icon"><Icon size={40} strokeWidth={1.75} /></div>
                   <h3>{s.title}</h3>
                   <p>{s.desc}</p>
-                  <Link to="/student-life" className="sl-service-link">
-                    Learn More →
-                  </Link>
+                  {s.slug?.startsWith('http') ? (
+                    <a href={s.slug} target="_blank" rel="noopener noreferrer" className="sl-service-link">
+                      Learn More →
+                    </a>
+                  ) : s.slug ? (
+                    <Link to={s.slug} className="sl-service-link">
+                      Learn More →
+                    </Link>
+                  ) : null}
                 </div>
               );
             })}

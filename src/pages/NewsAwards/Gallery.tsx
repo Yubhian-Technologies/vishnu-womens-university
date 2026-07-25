@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { X } from 'lucide-react';
 import { galleryAlbums, galleryYears } from './news-awards.data';
 import { useOrderedCollection } from '../../hooks/useCollection';
@@ -16,7 +16,7 @@ interface GalleryPhoto {
   order: number;
 }
 
-const PHOTO_CATEGORIES = ['Campus', 'Events', 'Academics', 'Sports', 'Cultural', 'Placements', 'Infrastructure'];
+const PHOTO_CATEGORIES = ['Campus', 'Events', 'Academics', 'Sports', 'Clubs', 'Cultural', 'Placements', 'Infrastructure'];
 
 const yearColors: Record<number, string> = {
   2026: '#003087',
@@ -33,14 +33,27 @@ const yearColors: Record<number, string> = {
 
 export default function Gallery() {
   useHashScroll();
+  const [searchParams] = useSearchParams();
   const [activeYear, setActiveYear] = useState<number | 'all'>('all');
   const { docs: photos, loading: photosLoading } = useOrderedCollection<GalleryPhoto>('gallery', 'order');
-  const [activeCategory, setActiveCategory] = useState<string>('all');
+  const categoryParam = searchParams.get('category');
+  const [activeCategory, setActiveCategory] = useState<string>(
+    categoryParam && PHOTO_CATEGORIES.includes(categoryParam) ? categoryParam : 'all'
+  );
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   useEffect(() => {
     document.title = 'Gallery | Vishnu Womens University';
   }, []);
+
+  // Picks up ?category=Sports (etc.) when arriving via a link from another
+  // page (e.g. Student Life's sports cards) — re-checked on navigation since
+  // the component instance persists across query-only route changes.
+  useEffect(() => {
+    if (categoryParam && PHOTO_CATEGORIES.includes(categoryParam)) {
+      setActiveCategory(categoryParam);
+    }
+  }, [categoryParam]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -101,7 +114,7 @@ export default function Gallery() {
       </section>
 
       {/* Photo Gallery — live from admin uploads */}
-      <section className="section bg-white">
+      <section id="photo-gallery" className="section bg-white" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
         <div className="container">
           <div className="reveal" style={{ marginBottom: 'var(--space-6)' }}>
             <span className="section-label">Fresh from Campus</span>

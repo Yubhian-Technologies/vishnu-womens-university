@@ -97,18 +97,11 @@ export const CONTENT_BLOCK_SECTIONS: { page: string; section: string; label: str
   { page: 'vishnu-tv', section: 'focusAreas', label: 'Vishnu TV — Focus Areas' },
   { page: 'vishnu-tv', section: 'docTopics', label: 'Vishnu TV — Documentary Topics' },
   { page: 'vishnu-tv', section: 'productions', label: 'Vishnu TV — Productions' },
-  { page: 'central-library', section: 'resourceList', label: 'Central Library — Resource List (use Value field for a count, e.g. "12,000+")' },
   { page: 'central-library', section: 'digitalLibrary', label: 'Central Library — Digital Library Links (Slug field = URL)' },
-  { page: 'central-library', section: 'eDatabases', label: 'Central Library — e-Databases (Slug field = URL)' },
-  { page: 'central-library', section: 'journals', label: 'Central Library — Journals (Slug field = URL)' },
-  { page: 'campus-hostels', section: 'admissionProcedure', label: 'Campus Hostels — Admission Procedure Steps' },
-  { page: 'campus-hostels', section: 'accommodation', label: 'Campus Hostels — Accommodation Types' },
-  { page: 'campus-hostels', section: 'amenities', label: 'Campus Hostels — Amenities' },
-  { page: 'campus-hostels', section: 'disciplinePolicies', label: 'Campus Hostels — Discipline Policies' },
-  { page: 'other-facilities', section: 'banksAtms', label: 'Other Facilities — Banks & ATMs' },
-  { page: 'other-facilities', section: 'postOffice', label: 'Other Facilities — Post Office' },
-  { page: 'other-facilities', section: 'powerBackup', label: 'Other Facilities — Power Backup' },
-  { page: 'other-facilities', section: 'mineralWaterPlant', label: 'Other Facilities — Mineral Water Plant' },
+  { page: 'central-library', section: 'eDatabasesEbooks', label: 'Central Library — e-Databases: E-Books (Slug field = optional URL)' },
+  { page: 'central-library', section: 'eDatabasesOpenAccessJournals', label: 'Central Library — e-Databases: Open Access Online Journals/Magazines (Slug field = optional URL)' },
+  { page: 'central-library', section: 'eDatabasesVideoOnDemand', label: 'Central Library — e-Databases: Video On Demand (Slug field = optional URL)' },
+  { page: 'central-library', section: 'eDatabasesOpenCourseware', label: 'Central Library — e-Databases: Open Courseware (Slug field = optional URL)' },
 ];
 
 export default function ContentBlocksAdmin() {
