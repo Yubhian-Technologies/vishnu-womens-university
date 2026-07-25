@@ -162,6 +162,12 @@
   height: 100%;
   overflow: hidden;
   cursor: default;
+  /* SmoothImage keeps its <img> at opacity:0 until the photo has actually
+     downloaded (avoids a broken-image flash) — without a background here,
+     that invisible interval showed through to the page's white background
+     instead of a neutral placeholder, which on a real (non-cached) photo
+     can last a couple of seconds and reads as "blank/broken photos". */
+  background: var(--color-primary-dark);
 }
 .activity-card--skeleton {
   background: linear-gradient(
