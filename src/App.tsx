@@ -26,6 +26,9 @@ const ResearchDetail = lazy(() => import('./pages/Research/ResearchDetail'));
 const FacultyResearchProfile = lazy(() => import('./pages/Research/FacultyResearchProfile'));
 const AboutSVES = lazy(() => import('./pages/AboutSVES/AboutSVES'));
 const Campus = lazy(() => import('./pages/Campus/Campus'));
+const CentralLibrary = lazy(() => import('./pages/Campus/CentralLibrary'));
+const CampusHostels = lazy(() => import('./pages/Campus/CampusHostels'));
+const OtherFacilities = lazy(() => import('./pages/Campus/OtherFacilities'));
 const CampusFacilityDetail = lazy(() => import('./pages/Campus/CampusFacilityDetail'));
 const Information = lazy(() => import('./pages/Information/Information'));
 const ProgrammesFee = lazy(() => import('./pages/Admissions/ProgrammesFee'));
@@ -101,6 +104,9 @@ function PublicApp() {
           <Route path="/research/faculty/:id" element={<FacultyResearchProfile />} />
           <Route path="/about-sves" element={<AboutSVES />} />
           <Route path="/campus" element={<Campus />} />
+          <Route path="/campus/central-library" element={<CentralLibrary />} />
+          <Route path="/campus/campus-hostels" element={<CampusHostels />} />
+          <Route path="/campus/other-facilities" element={<OtherFacilities />} />
           <Route path="/campus/:slug" element={<CampusFacilityDetail />} />
           <Route path="/information" element={<Information />} />
           <Route path="/programmes-fee-structure" element={<ProgrammesFee />} />

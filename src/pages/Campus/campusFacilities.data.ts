@@ -91,7 +91,7 @@ Considering that a variety of events like cultural programmes, seminars, debates
 
 In addition to the Indoor Auditorium, Vishnu Womens University has an Open-air-Auditorium and Mini-Auditorium, where a vast variety of student activities are regularly arranged.
 
-Vishnu Womens University has well equipped **air conditioned Seminar Halls** which can accommodate 250 members each. They are centers for knowledge acquisition since right ambiance is created with a podium, a computer system with internet facility, an LCD projector and a sound system.",
+Vishnu Womens University has well equipped **air conditioned Seminar Halls** which can accommodate 250 members each. They are centers for knowledge acquisition since right ambiance is created with a podium, a computer system with internet facility, an LCD projector and a sound system.`,
     desc: "VWU's auditoriums host seminars, conferences, cultural events, and convocations, providing a large, well-equipped venue for campus-wide gatherings.",
   },
   {
