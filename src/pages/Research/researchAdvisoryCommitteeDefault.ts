@@ -5,7 +5,7 @@
 // the box. DEFAULT_RAC_INTRO takes priority over the existing (shorter)
 // item.intro; DEFAULT_RAC_ABOUT fills in item.about, which is currently
 // empty (see ResearchDetail.tsx).
-export const DEFAULT_RAC_INTRO = `The Research Advisory Committee (RAC) at Shri Vishnu Engineering College for Women (A) (SVECW), Bhimavaram is a pivotal body dedicated to fostering and enhancing research endeavors across various disciplines. Recognizing the significance of research in academic excellence and societal advancement and impact, the RAC plays a vital role in guiding, supporting, and promoting research activities within our institution.`;
+export const DEFAULT_RAC_INTRO = `The Research Advisory Committee (RAC) at Shri Vishnu Engineering College for Women (A) (Vishnu Womens University), Bhimavaram is a pivotal body dedicated to fostering and enhancing research endeavors across various disciplines. Recognizing the significance of research in academic excellence and societal advancement and impact, the RAC plays a vital role in guiding, supporting, and promoting research activities within our institution.`;
 
 export const DEFAULT_RAC_ABOUT = `Comprising distinguished members from diverse academic backgrounds and professional expertise, the RAC functions as a strategic think tank, providing valuable insights and recommendations to uphold the highest standards of research integrity and innovation. The committee diligently works towards aligning research initiatives with the institutional vision and Mission, thereby contributing to the enhancement of academic excellence and research culture.
 

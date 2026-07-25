@@ -12,7 +12,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Architecture
 
-This is a Vite + React + TypeScript marketing/CMS site for Vishnu Womens University (VWU), a rebrand of SVECW. Routing is via `react-router-dom` (`BrowserRouter`), with the `@` path alias mapped to `src/` (see [vite.config.ts](vite.config.ts) and [tsconfig.json](tsconfig.json)).
+This is a Vite + React + TypeScript marketing/CMS site for Vishnu Womens University (VWU). Routing is via `react-router-dom` (`BrowserRouter`), with the `@` path alias mapped to `src/` (see [vite.config.ts](vite.config.ts) and [tsconfig.json](tsconfig.json)).
 
 ### Public site vs. Admin split
 

@@ -39,7 +39,7 @@ export default function AntiRagging() {
               <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-5)' }}>
                 Since its inception, our institution has set high standards of education and is
                 committed to taking students to new heights year by year. These efforts have culminated
-                into consistently positioning SVECW among the best in the state.
+                into consistently positioning Vishnu Womens University among the best in the state.
               </p>
               <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-5)' }}>
                 As a fresher, you may have many apprehensions about Ragging but mind you, ours is a
@@ -48,14 +48,14 @@ export default function AntiRagging() {
                 in the campus. A series of measures have been devised and implemented for the years to
                 rule out any incident of ragging to be attempted by senior students at any place inside
                 the Campus. Having a fully residential campus, it enhances our responsibility and also
-                empowers us with greater control over students. For making ragging non-gratis at SVECW,
+                empowers us with greater control over students. For making ragging non-gratis at Vishnu Womens University,
                 all stakeholders viz. management, faculty, students and employees are extending full
                 support and cooperation. Students are enlightened in such a way that they never even
                 allow the thought of ragging.
               </p>
               <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-5)' }}>
                 Our anti-ragging committee members, anti-ragging squad and mentoring cell will always
-                extend their support and cooperation to you at any moment and we ensure that SVECW is
+                extend their support and cooperation to you at any moment and we ensure that Vishnu Womens University is
                 free from ragging virus. Please feel free to get in touch with us in case you need any
                 help, clarification or any other support in this regard.
               </p>

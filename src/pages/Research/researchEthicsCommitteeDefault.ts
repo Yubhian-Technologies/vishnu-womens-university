@@ -5,7 +5,7 @@
 // the box. DEFAULT_REC_INTRO takes priority over the existing (shorter)
 // item.intro; DEFAULT_REC_ABOUT fills in item.about, which is currently
 // empty (see ResearchDetail.tsx).
-export const DEFAULT_REC_INTRO = `The Research Ethics Committee (REC) at Shri Vishnu Engineering College for Women (A), (SVECW) Bhimavaram is a vital body committed to upholding the highest standards of ethical conduct in research practices across all disciplines. Recognizing the paramount importance of ethical considerations in research, the REC serves as a cornerstone in ensuring the integrity, credibility, and societal impact of our institution's research endeavors.`;
+export const DEFAULT_REC_INTRO = `The Research Ethics Committee (REC) at Shri Vishnu Engineering College for Women (A), (Vishnu Womens University) Bhimavaram is a vital body committed to upholding the highest standards of ethical conduct in research practices across all disciplines. Recognizing the paramount importance of ethical considerations in research, the REC serves as a cornerstone in ensuring the integrity, credibility, and societal impact of our institution's research endeavors.`;
 
 export const DEFAULT_REC_ABOUT = `Comprising esteemed members representing diverse academic disciplines, professional backgrounds, and ethical expertise, the REC functions as a vigilant guardian, overseeing and guiding research activities to ensure adherence to ethical principles.
 

@@ -24,13 +24,13 @@ export const defaultMembers: Omit<GoverningBodyMember, 'id'>[] = [
   { name: 'Sri Aditya Vissam', position: 'Secretary, SVES', category: 'Management', order: 3 },
   { name: 'Sri K. Sai Sumant', position: 'Joint Secretary, SVES', category: 'Management', order: 4 },
   { name: 'Sri JVSSRD Prasada Raju', position: 'Director, SVES', category: 'Management', order: 5 },
-  { name: 'Prof. P. Venkata Rama Raju', position: 'Vice-Principal, SVECW', category: 'Teachers', order: 6 },
+  { name: 'Prof. P. Venkata Rama Raju', position: 'Vice-Principal, Vishnu Womens University', category: 'Teachers', order: 6 },
   { name: 'Dr. S.M. Padmaja', position: 'Professor & Head, EEE', category: 'Teachers', order: 7 },
   { name: 'Dr. U. Chandra Sekhar', position: 'WIPRO, Bengaluru', category: 'Educationalist / Industrialist', order: 8 },
   { name: 'Dr. Buddha Singh', position: 'JNU, New Delhi', category: 'UGC Nominee', order: 9 },
   { name: 'Mr. J. Satyanarayana Murthy', position: 'RJD, Technical Education', category: 'State Government', order: 10 },
   { name: 'Prof. GVR Prasada Raju', position: 'JNTUK, Kakinada', category: 'University Nominee', order: 11 },
-  { name: 'Dr. G. Srinivasa Rao', position: 'Principal, SVECW', category: 'Principal (Ex-Officio)', order: 12 },
+  { name: 'Dr. G. Srinivasa Rao', position: 'Principal, Vishnu Womens University', category: 'Principal (Ex-Officio)', order: 12 },
 ];
 
 function getInitials(name: string) {

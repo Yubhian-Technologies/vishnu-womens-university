@@ -5,7 +5,7 @@
 // DEFAULT_IPR_INTRO takes priority over the existing (shorter) item.intro;
 // DEFAULT_IPR_ABOUT fills in item.about, which is currently empty (see
 // ResearchDetail.tsx).
-export const DEFAULT_IPR_INTRO = `The Intellectual Property Rights (IPR) Committee at Shri Vishnu Engineering College for Women (SVECW), Bhimavaram, is committed to encourage innovation and creativity while safeguarding individual intellectual property across all research and academic endeavors. Recognizing the significance of intellectual property in driving economic growth, technological advancement, and societal progress, the IPR Committee plays a pivotal role in promoting a culture of innovation and entrepreneurship within our institution.`;
+export const DEFAULT_IPR_INTRO = `The Intellectual Property Rights (IPR) Committee at Shri Vishnu Engineering College for Women (Vishnu Womens University), Bhimavaram, is committed to encourage innovation and creativity while safeguarding individual intellectual property across all research and academic endeavors. Recognizing the significance of intellectual property in driving economic growth, technological advancement, and societal progress, the IPR Committee plays a pivotal role in promoting a culture of innovation and entrepreneurship within our institution.`;
 
 export const DEFAULT_IPR_ABOUT = `The committee comprises experts in intellectual property law, technology transfer, innovation management, and industry collaboration. The IPR Committee serves as a strategic advisor and facilitator in matters related to intellectual property rights and commercialization.
 
