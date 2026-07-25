@@ -81,14 +81,14 @@ export default function StudentClubs() {
             </div>
             <div className="grid-4">
               {cat.clubs.map((club) => (
-                <div key={club.id}
-                  style={{ background: ci % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', transition: 'all var(--transition-base)' }}
+                <Link key={club.id} to="/news-awards/gallery?category=Clubs#photo-gallery"
+                  style={{ display: 'block', background: ci % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', transition: 'all var(--transition-base)' }}
                   onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-accent)'; (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-md)'; }}
                   onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-light-gray)'; (e.currentTarget as HTMLElement).style.boxShadow = 'none'; }}
                 >
                   <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 'var(--space-2)', lineHeight: 1.3 }}>{club.name}</h3>
                   <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6 }}>{club.desc}</p>
-                </div>
+                </Link>
               ))}
             </div>
           </div>

@@ -8,7 +8,7 @@ import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { useSitePhotos, useSectionHasPhotos } from '../../hooks/useSitePhotos';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
-import { campusFacilities, resolveCampusFacility } from './campusFacilities.data';
+import { resolveCampusFacility } from './campusFacilities.data';
 import { Building } from 'lucide-react';
 
 const defaultCampusGalleryPhotos = [
@@ -192,32 +192,6 @@ export default function Campus() {
           </div>
         </section>
       )}
-
-      {/* Campus Life directory — each links to its own dedicated page
-          (/campus/:slug) with details and its own 5 photo slots. */}
-      <section className="section bg-off-white">
-        <div className="container">
-          <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>
-            <span className="section-label">Explore Campus Life</span>
-            <h2 className="section-title">Every Facility, In Detail</h2>
-            <p className="section-desc" style={{ margin: '0 auto' }}>
-              Click any facility below for its full details and photos.
-            </p>
-          </div>
-          <div className="grid-4 campus-facilities-grid">
-            {campusFacilities.map((f) => (
-              <Link key={f.slug} to={`/campus/${f.slug}`}
-                style={{ display: 'block', textDecoration: 'none', background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', transition: 'all var(--transition-base)' }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-accent)'; (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-md)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-light-gray)'; (e.currentTarget as HTMLElement).style.boxShadow = 'none'; }}
-              >
-                <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>{f.title}</h3>
-                <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6 }}>{f.desc}</p>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* CTA */}
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-16) 0' }}>

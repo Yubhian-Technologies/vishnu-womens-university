@@ -48,3 +48,38 @@
     flex: 1 1 auto;
   }
 }
+
+/* Secondary, pill-shaped sub-tab row nested inside one of the main tabs
+   above (e.g. e-Databases → E-Books / Open Access Journals / ...) —
+   visually smaller and lighter than the outer tabs so the hierarchy reads
+   clearly at a glance. */
+.section-subtabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-6);
+}
+
+.section-subtab-btn {
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  background: var(--color-off-white);
+  border: 1.5px solid var(--color-light-gray);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-primary-dark);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.section-subtab-btn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-primary);
+}
+
+.section-subtab-btn.active {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-primary-dark);
+}

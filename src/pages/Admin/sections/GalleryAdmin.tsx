@@ -13,7 +13,7 @@ interface GalleryImage {
   order: number;
 }
 
-const CATEGORIES = ['Campus', 'Events', 'Academics', 'Sports', 'Cultural', 'Placements', 'Infrastructure'];
+const CATEGORIES = ['Campus', 'Events', 'Academics', 'Sports', 'Clubs', 'Cultural', 'Placements', 'Infrastructure'];
 
 export default function GalleryAdmin() {
   const { docs: images, loading } = useOrderedCollection<GalleryImage>('gallery', 'order');
