@@ -56,7 +56,11 @@ const PoliciesProcedures = lazy(() => import('./pages/PoliciesProcedures/Policie
 const AdminLayout = lazy(() => import('./pages/Admin/AdminLayout'));
 
 function RouteFallback() {
-  return <div style={{ minHeight: '60vh' }} />;
+  return (
+    <div className="route-fallback">
+      <div className="route-fallback__spinner" />
+    </div>
+  );
 }
 
 function ScrollToTop() {

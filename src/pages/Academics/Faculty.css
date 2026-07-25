@@ -1,3 +1,9 @@
+/* Overrides just the top of .section's padding — the default (5rem) left too
+   much empty space between the hero and the department filter buttons. */
+.faculty-intro-section {
+  padding-top: var(--space-8);
+}
+
 .faculty-tabs {
   display: flex;
   flex-wrap: wrap;
