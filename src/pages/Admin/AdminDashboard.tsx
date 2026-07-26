@@ -7,7 +7,7 @@ import ProgramsAdmin from './sections/ProgramsAdmin';
 import FacultyAdmin from './sections/FacultyAdmin';
 import GoverningBodyAdmin from './sections/GoverningBodyAdmin';
 import CoreExecutivesAdmin from './sections/CoreExecutivesAdmin';
-import PlacementsAdmin from './sections/PlacementsAdmin';
+import PlacementYearsAdmin from './sections/PlacementYearsAdmin';
 import AlumniAdmin from './sections/AlumniAdmin';
 import AnnouncementsAdmin from './sections/AnnouncementsAdmin';
 import InformationAdmin from './sections/InformationAdmin';
@@ -32,6 +32,9 @@ import NewsAwardsDataAdmin from './sections/NewsAwardsDataAdmin';
 import ResearchItemsAdmin from './sections/ResearchItemsAdmin';
 import ComplianceDocsAdmin from './sections/ComplianceDocsAdmin';
 import PoliciesAdmin from './sections/PoliciesAdmin';
+import TpoTeamPhotosAdmin from './sections/TpoTeamPhotosAdmin';
+import IloOfficePhotosAdmin from './sections/IloOfficePhotosAdmin';
+import GsacPhotosAdmin from './sections/GsacPhotosAdmin';
 
 interface Props {
   activeSection: string;
@@ -47,7 +50,7 @@ const SECTION_MAP: Record<string, React.ReactNode> = {
   faculty: <FacultyAdmin />,
   'governing-body': <GoverningBodyAdmin />,
   'core-executives': <CoreExecutivesAdmin />,
-  placements: <PlacementsAdmin />,
+  placements: <PlacementYearsAdmin />,
   alumni: <AlumniAdmin />,
   announcements: <AnnouncementsAdmin />,
   information: <InformationAdmin />,
@@ -68,6 +71,9 @@ const SECTION_MAP: Record<string, React.ReactNode> = {
   'governance-items': <GovernanceItemsAdmin />,
   differentiators: <DifferentiatorsAdmin />,
   'placement-items': <PlacementItemsAdmin />,
+  'tpo-team-photos': <TpoTeamPhotosAdmin />,
+  'ilo-office-photos': <IloOfficePhotosAdmin />,
+  'gsac-photos': <GsacPhotosAdmin />,
   'news-awards-data': <NewsAwardsDataAdmin />,
   'research-items': <ResearchItemsAdmin />,
   'compliance-docs': <ComplianceDocsAdmin />,
