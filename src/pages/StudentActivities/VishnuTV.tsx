@@ -39,7 +39,6 @@ export default function VishnuTV() {
       {/* Hero */}
       <PageHero
         page="vishnu-tv"
-        defaultImage="https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=1920&q=60&auto=format"
         defaultTitle="Vishnu TV Academy"
   defaultSubtitle="Student-run and student-driven — the only dedicated campus TV Academy in Andhra Pradesh."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Student Life', to: '/student-life' }, { label: 'Vishnu TV Academy' }]}

@@ -39,7 +39,6 @@ export default function SportsGames() {
       {/* Hero */}
       <PageHero
         page="sports-games"
-        defaultImage="https://images.unsplash.com/photo-1546519638-68e109498ffc?w=1920&q=60&auto=format"
         defaultTitle="Sports & Games"
   defaultSubtitle="Physical fitness is taken seriously at VWU — a sound body supports a sound mind, and both are essential to a complete education."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Student Life', to: '/student-life' }, { label: 'Sports & Games' }]}

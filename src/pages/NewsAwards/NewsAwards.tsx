@@ -56,7 +56,6 @@ export default function NewsAwards() {
       {/* Hero */}
       <PageHero
         page="news-awards"
-        defaultImage="https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=1920&q=60&auto=format"
         defaultTitle="News & Awards"
   defaultSubtitle="Celebrating VWU's achievements, events, and milestones — from national accreditations and rankings to campus happenings and visual memories."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'News & Awards' }]}

@@ -564,7 +564,6 @@ export default function CentralLibrary() {
     <main className="page-wrapper">
       <PageHero
         page="campus-central-library"
-        defaultImage="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=1920&q=60&auto=format"
         defaultTitle={facility.title}
         defaultSubtitle={facility.desc}
         breadcrumb={[

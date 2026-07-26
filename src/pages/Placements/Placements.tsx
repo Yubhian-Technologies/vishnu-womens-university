@@ -44,7 +44,6 @@ export default function Placements() {
       {/* Hero */}
       <PageHero
         page="placements"
-        defaultImage="https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=1920&q=60&auto=format"
         defaultTitle="Placements & Careers"
   defaultSubtitle="Linking VWU graduates with the best opportunities in industry — through campus recruitment, career development, and pathways to global study."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Placements' }]}

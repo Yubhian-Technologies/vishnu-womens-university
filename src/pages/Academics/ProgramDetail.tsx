@@ -12,7 +12,6 @@ import type { FacultyDoc } from './Faculty';
 import '../detail-layout.css';
 
 const NAV_OFFSET = 'calc(var(--topbar-height) + var(--header-height) + 1rem)';
-const DEFAULT_PROGRAM_HERO = 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=1920&q=60&auto=format';
 
 const categoryLabel: Record<string, string> = {
   btech: 'B.Tech',
@@ -76,14 +75,16 @@ export default function ProgramDetail() {
     <main className="page-wrapper">
       {/* Hero */}
       <section className="page-hero" style={{ minHeight: 380 }}>
-        <SmoothImage
-          src={program.heroImage || fallbackBanner?.imageUrl || DEFAULT_PROGRAM_HERO}
-          alt={program.name}
-          className="page-hero-image"
-          loading="eager"
-          decoding="sync"
-          fetchPriority="high"
-        />
+        {(program.heroImage || fallbackBanner?.imageUrl) && (
+          <SmoothImage
+            src={program.heroImage || fallbackBanner?.imageUrl || ''}
+            alt={program.name}
+            className="page-hero-image"
+            loading="eager"
+            decoding="sync"
+            fetchPriority="high"
+          />
+        )}
         <div className="page-hero-overlay" />
         <div className="container page-hero-content">
           <div className="breadcrumb animate-fade-in">

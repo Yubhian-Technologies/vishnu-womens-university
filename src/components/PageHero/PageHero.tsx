@@ -12,7 +12,10 @@ export interface BreadcrumbItem {
 
 interface PageHeroProps {
   page: string;
-  defaultImage: string;
+  /** Optional — when omitted, the hero shows just its solid brand-colour
+      background (no stock photo) until an admin uploads a real banner for
+      this page via Hero Banners in /admin. */
+  defaultImage?: string;
   defaultTitle: string;
   defaultSubtitle?: string;
   breadcrumb: BreadcrumbItem[];
@@ -41,10 +44,12 @@ export default function PageHero({
   const [visited, setVisited] = useState<Set<number>>(new Set([0]));
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Image: always show something immediately (default image while loading).
+  // Image: shows the given default (if any) immediately, then swaps to a
+  // real uploaded banner once Firestore responds. With no defaultImage, the
+  // hero just shows its solid background until a banner exists.
   // Text: only render once Firestore has responded — prevents flashing the
   //       hardcoded title before the uploaded title appears.
-  const defaultSlide = { imageUrl: defaultImage, title: defaultTitle, subtitle: defaultSubtitle ?? '', ctaLabel: '', ctaLink: '' };
+  const defaultSlide = { imageUrl: defaultImage ?? '', title: defaultTitle, subtitle: defaultSubtitle ?? '', ctaLabel: '', ctaLink: '' };
   const allSlides: Omit<BannerSlide, 'id' | 'order'>[] =
     slides.length > 0 ? slides : [defaultSlide];
   const showText = !loading;
@@ -87,6 +92,7 @@ export default function PageHero({
   // for render to request it. Re-added per route change, removed on
   // unmount/re-run so navigating away doesn't leave a stale preload behind.
   useEffect(() => {
+    if (!defaultImage) return;
     const link = document.createElement('link');
     link.rel = 'preload';
     link.as = 'image';
@@ -117,7 +123,7 @@ export default function PageHero({
           key={s.imageUrl}
           className={`page-hero__slide ${i === current ? 'page-hero__slide--active' : ''}`}
         >
-          {visited.has(i) && (
+          {visited.has(i) && s.imageUrl && (
             <SmoothImage
               src={s.imageUrl}
               alt={s.title}

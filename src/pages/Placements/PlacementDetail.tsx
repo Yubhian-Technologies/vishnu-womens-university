@@ -17,8 +17,6 @@ import { usePlacementYears } from './usePlacementYears';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import '../detail-layout.css';
 
-const DEFAULT_HERO_IMAGE = 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=1920&q=60&auto=format';
-
 // Our Recruiters shows the same companies already captured in "Placements,
 // Year by Year" (placementStats.data.ts / the placementYears collection),
 // just re-labeled from a batch's 4-year cohort span to the single
@@ -539,11 +537,11 @@ export default function PlacementDetail() {
   // Admin-uploaded gallery for the GSAC page.
   const { docs: gsacPhotos } = useCollection<WithId & { imageUrl: string }>('gsacPhotos', [orderBy('order', 'asc')], { silent: true });
   // Each item can have its own hero image (set in the Placement Sub-pages
-  // admin); falls back to the one shared "Placement Detail" banner, then a
-  // hardcoded default — so a page never looks broken while an admin is
-  // still filling in per-item images.
+  // admin); falls back to the shared "Placement Detail" banner. No
+  // hardcoded stock-photo fallback — the hero just shows its solid
+  // background color if neither is set yet.
   const { slides: heroSlides } = usePageBanners('placement-detail');
-  const heroImage = item?.heroImage || heroSlides[0]?.imageUrl || DEFAULT_HERO_IMAGE;
+  const heroImage = item?.heroImage || heroSlides[0]?.imageUrl;
 
   // No scroll-reveal here — this page's content only renders once the
   // Firestore-backed `item` has loaded (see the gotcha documented in CLAUDE.md).
@@ -573,14 +571,16 @@ export default function PlacementDetail() {
     <main className="page-wrapper">
       {/* Hero */}
       <section className="page-hero" style={{ minHeight: 360 }}>
-        <img
-          src={heroImage}
-          alt={item.title}
-          className="page-hero-image"
-          loading="eager"
-          decoding="sync"
-          fetchPriority="high"
-        />
+        {heroImage && (
+          <img
+            src={heroImage}
+            alt={item.title}
+            className="page-hero-image"
+            loading="eager"
+            decoding="sync"
+            fetchPriority="high"
+          />
+        )}
         <div className="page-hero-overlay" />
         <div className="container page-hero-content">
           <div className="breadcrumb animate-fade-in">

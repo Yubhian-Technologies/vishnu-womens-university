@@ -145,7 +145,6 @@ export default function CampusHostels() {
     <main className="page-wrapper">
       <PageHero
         page="campus-campus-hostels"
-        defaultImage="https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=1920&q=60&auto=format"
         defaultTitle={facility.title}
         defaultSubtitle={facility.desc}
         breadcrumb={[

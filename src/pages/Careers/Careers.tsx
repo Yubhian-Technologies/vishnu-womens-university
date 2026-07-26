@@ -157,7 +157,6 @@ export default function Careers() {
       {/* Hero */}
       <PageHero
         page="careers"
-        defaultImage="https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=1920&q=60&auto=format"
         defaultTitle="Careers at VWU"
   defaultSubtitle="Build your career alongside a community of educators and professionals who are genuinely invested in advancing women in engineering and technology."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Careers' }]}

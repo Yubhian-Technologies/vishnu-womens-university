@@ -60,7 +60,6 @@ export default function CampusMagazines() {
       {/* Hero */}
       <PageHero
         page="campus-magazines"
-        defaultImage="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1920&q=60&auto=format"
         defaultTitle="Campus Magazines"
   defaultSubtitle="Three publications that document academic achievements, student creativity, and the story of campus life at VWU and across SVES."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Student Life', to: '/student-life' }, { label: 'Campus Magazines' }]}

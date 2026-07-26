@@ -38,7 +38,6 @@ export default function SocialServices() {
       {/* Hero */}
       <PageHero
         page="social-services"
-        defaultImage="https://images.unsplash.com/photo-1593113598332-cd288d649433?w=1920&q=60&auto=format"
         defaultTitle="Social Services"
   defaultSubtitle="The National Service Scheme at VWU shapes engineers who are equally committed to their craft and to the communities they serve."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Student Life', to: '/student-life' }, { label: 'Social Services' }]}

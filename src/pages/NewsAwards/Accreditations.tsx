@@ -86,7 +86,6 @@ export default function Accreditations() {
       {/* Hero */}
       <PageHero
         page="news-awards-accreditations"
-        defaultImage="https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=1920&q=60&auto=format"
         defaultTitle="Accreditations & Awards"
   defaultSubtitle="Endorsed by India's foremost regulatory and ranking bodies — a record of recognised quality and consistent academic achievement."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'News & Awards', to: '/news-awards' }, { label: 'Accreditations & Awards' }]}
