@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState, type CSSProperties } from 'react';
+import { Fragment, useEffect, useState, type CSSProperties, type ReactNode } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { orderBy } from 'firebase/firestore';
 import { Trophy, Rocket, Factory, Microscope, Globe2, GraduationCap } from 'lucide-react';
@@ -16,6 +16,9 @@ import { microchipEmbedded, type TeamMember } from './microchipEmbedded.data';
 import { tiDspCoe, type TiDspFacultyMember, type ContentBlock } from './tiDspCoe.data';
 import { ultraTechCoe, type UltraTechInCharge, type StudentsBenefitedGroup } from './ultraTechCoe.data';
 import { chipsToStartup } from './chipsToStartup.data';
+import { vsac, type VsacMember, type SimpleTable, type TrainingResearchItem, type CollaborationItem } from './vsac.data';
+import { arVrStudio } from './arVrStudio.data';
+import { vehicleDesignLab, type VdlFacilityPhase } from './vehicleDesignLab.data';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import '../detail-layout.css';
 
@@ -46,6 +49,17 @@ const IIC_TABS = [
   'IIC Annual Reports',
   'SIH Internal Hackathon Reports',
   'National Innovation Start-Up Policy',
+];
+
+// Vehicle Design Lab's sidebar sections — only "About VDL" and "Facilities
+// & Projects" have real content so far; the rest show a coming-soon
+// placeholder until that content is provided.
+const VDL_TABS = [
+  'About VDL',
+  'Facilities & Projects',
+  'Industry Collaborations',
+  'Students Achievements & Placements',
+  'VDL Outcomes',
 ];
 
 function IicBulletList({ heading, items }: { heading: string; items: string[] }) {
@@ -673,6 +687,539 @@ function ChipsToStartupAccordion({
   );
 }
 
+function VdlTeamSection({ team }: { team: typeof vehicleDesignLab.team }) {
+  const [activeTab, setActiveTab] = useState<'Lab Head' | 'Faculty Members'>('Lab Head');
+
+  return (
+    <div style={{ border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
+      <div style={{ display: 'flex' }}>
+        {(['Lab Head', 'Faculty Members'] as const).map((tab) => {
+          const isActive = activeTab === tab;
+          return (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              style={{
+                flex: 1,
+                padding: 'var(--space-3) var(--space-5)',
+                border: 'none',
+                background: isActive ? 'var(--color-primary)' : 'var(--color-off-white)',
+                color: isActive ? 'var(--color-white)' : 'var(--color-primary)',
+                fontWeight: 700,
+                fontSize: 'var(--text-sm)',
+                cursor: 'pointer',
+              }}
+            >
+              {tab === 'Lab Head' ? 'Lab Head:' : tab}
+            </button>
+          );
+        })}
+      </div>
+      <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)' }}>
+        {activeTab === 'Lab Head' ? (
+          <TiDspMemberCard member={team.labHead} />
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--space-5)' }}>
+            {team.facultyMembers.map((m) => <TiDspMemberCard key={m.name} member={m} />)}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function VdlVideoEmbed({ url }: { url?: string }) {
+  if (!url) {
+    return null;
+  }
+  return (
+    <div style={{ position: 'relative', paddingTop: '56.25%', borderRadius: 'var(--radius-md)', overflow: 'hidden', border: '1px solid var(--color-light-gray)' }}>
+      <iframe
+        src={url}
+        title="Vehicle Design Lab video"
+        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 'none' }}
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+      />
+    </div>
+  );
+}
+
+function VdlSinglePhoto({ photos, alt }: { photos: (WithId & { imageUrl: string })[]; alt: string }) {
+  if (photos.length === 0) {
+    return null;
+  }
+  return (
+    <img
+      src={photos[0].imageUrl}
+      alt={alt}
+      style={{ width: '100%', maxHeight: 420, objectFit: 'cover', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-light-gray)' }}
+    />
+  );
+}
+
+function VdlFacilitiesSection({
+  facilities,
+  testingPhotos,
+  campusVehiclePhotos,
+}: {
+  facilities: typeof vehicleDesignLab.facilities;
+  testingPhotos: (WithId & { imageUrl: string })[];
+  campusVehiclePhotos: (WithId & { imageUrl: string })[];
+}) {
+  const [activeTab, setActiveTab] = useState<'Activities and Programs' | 'Campus Utility Vehicle Projects'>('Activities and Programs');
+
+  return (
+    <div>
+      <SectionHeading>Facility Overview</SectionHeading>
+      <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-6)' }}>
+        {facilities.overview}
+      </p>
+
+      <div style={{ display: 'flex', flexWrap: 'wrap', marginBottom: 'var(--space-6)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
+        {(['Activities and Programs', 'Campus Utility Vehicle Projects'] as const).map((tab) => {
+          const isActive = activeTab === tab;
+          return (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              style={{
+                flex: '1 1 240px',
+                padding: 'var(--space-3) var(--space-5)',
+                border: 'none',
+                background: isActive ? 'var(--color-primary)' : 'var(--color-off-white)',
+                color: isActive ? 'var(--color-white)' : 'var(--color-primary)',
+                fontWeight: 700,
+                fontSize: 'var(--text-sm)',
+                cursor: 'pointer',
+              }}
+            >
+              {tab}:
+            </button>
+          );
+        })}
+      </div>
+
+      {activeTab === 'Activities and Programs' ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-8)' }}>
+          {facilities.activitiesPrograms.map((phase: VdlFacilityPhase, i) => (
+            <div key={i}>
+              <h4 style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>
+                {phase.title}
+              </h4>
+              <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-4)' }}>
+                {phase.paragraph}
+              </p>
+              {phase.mediaType === 'video' ? (
+                <VdlVideoEmbed url={phase.videoUrl} />
+              ) : (
+                <VdlSinglePhoto photos={testingPhotos} alt={phase.title} />
+              )}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div>
+          <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-5)' }}>
+            {facilities.campusUtilityIntro}
+          </p>
+          <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 var(--space-6)', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+            {facilities.campusUtilityProjects.map((p, i) => (
+              <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-2)' }}>
+                <span style={{ width: 20, height: 20, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                </span>
+                <span style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.6 }}>
+                  <strong>{p.lead}</strong>{p.text}
+                </span>
+              </li>
+            ))}
+          </ul>
+          {campusVehiclePhotos.length > 0 ? (
+            <PhotoGrid photos={campusVehiclePhotos} alt="Campus Utility Vehicle Projects" />
+          ) : (
+            <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text-light)', margin: 0 }}>
+              Content for this section is coming soon.
+            </p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function VdlIndustryCollaborationsSection({
+  data,
+  photos,
+}: {
+  data: typeof vehicleDesignLab.industryCollaborations;
+  photos: (WithId & { imageUrl: string })[];
+}) {
+  return (
+    <div>
+      <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-6)' }}>
+        {data.intro}
+      </p>
+      <VsacInnerAccordion titles={data.endowments.map((e) => `${e.title}:`)}>
+        {(i) => {
+          const e = data.endowments[i];
+          const photo = photos[i];
+          return (
+            <>
+              <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-2)' }}>
+                <strong>Bestowed By:</strong> {e.bestowedBy}
+              </p>
+              <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: photo ? 'var(--space-4)' : 0 }}>
+                <strong>Contribution:</strong> {e.contribution}
+              </p>
+              {photo && (
+                <img
+                  src={photo.imageUrl}
+                  alt={e.title}
+                  style={{ width: '100%', maxHeight: 420, objectFit: 'cover', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-light-gray)' }}
+                />
+              )}
+            </>
+          );
+        }}
+      </VsacInnerAccordion>
+      <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginTop: 'var(--space-6)' }}>
+        {data.closing}
+      </p>
+    </div>
+  );
+}
+
+function VdlStudentsAchievementsSection({ data }: { data: typeof vehicleDesignLab.studentsAchievements }) {
+  return (
+    <div>
+      <SectionHeading>Achievements</SectionHeading>
+      <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-6)' }}>
+        {data.intro}
+      </p>
+      <VsacInnerAccordion titles={data.competitions.map((c) => `${c.title}:`)}>
+        {(i) => (
+          <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, margin: 0 }}>
+            {data.competitions[i].text}
+          </p>
+        )}
+      </VsacInnerAccordion>
+      <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, margin: 'var(--space-6) 0' }}>
+        {data.closing}
+      </p>
+
+      <SectionHeading>Placements</SectionHeading>
+      {data.placementsParagraphs.map((para, i) => (
+        <p key={i} style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-4)' }}>
+          {para}
+        </p>
+      ))}
+
+      <h4 style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginTop: 'var(--space-4)', marginBottom: 'var(--space-3)' }}>
+        Achievements:
+      </h4>
+      <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+        {data.achievementReports.map((report) => (
+          <li key={report.label} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+            <span style={{ width: 20, height: 20, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </span>
+            <a href={report.href} download style={{ fontSize: 'var(--text-base)', color: 'var(--color-primary)', fontWeight: 600 }}>{report.label}</a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function VdlOutcomesSection({ outcomes }: { outcomes: typeof vehicleDesignLab.outcomes }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
+      {outcomes.map((o) => (
+        <div key={o.title}>
+          <h4 style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-1)' }}>
+            {o.title}
+          </h4>
+          <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, margin: 0 }}>
+            {o.text}
+          </p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function VsacMemberCard({ member }: { member?: VsacMember }) {
+  if (!member) {
+    return (
+      <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)' }}>
+        Content for this section is coming soon.
+      </p>
+    );
+  }
+  return (
+    <div style={{ border: '1.5px solid var(--color-accent)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4)', maxWidth: 360, display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+      <span style={{ fontWeight: 700, color: 'var(--color-primary)', fontSize: 'var(--text-sm)' }}>{member.name}</span>
+      {member.designation && <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)' }}>{member.designation}</span>}
+      {member.email && (
+        <a href={`mailto:${member.email}`} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-primary)', fontWeight: 600 }}>{member.email}</a>
+      )}
+      {member.mobile && (
+        <a href={`tel:${member.mobile}`} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-primary)', fontWeight: 600 }}>{member.mobile}</a>
+      )}
+      {member.callSign && <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)' }}>Call sign: {member.callSign}</span>}
+      {member.interests && <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)' }}>{member.interests}</span>}
+      {member.profileLink && (
+        <a href={member.profileLink} target="_blank" rel="noopener noreferrer" style={{ fontSize: 'var(--text-sm)', color: 'var(--color-accent-dark, var(--color-accent))', fontWeight: 600, marginTop: 'var(--space-1)' }}>
+          Shri Vishnu Engineering College for Women (irins.org)
+        </a>
+      )}
+    </div>
+  );
+}
+
+function VsacTabGroup({ labels, activeIndex, onSelect }: { labels: string[]; activeIndex: number; onSelect: (i: number) => void }) {
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)', marginBottom: 'var(--space-4)' }}>
+      {labels.map((label, i) => {
+        const isActive = activeIndex === i;
+        return (
+          <button
+            key={label}
+            onClick={() => onSelect(i)}
+            style={{
+              padding: 'var(--space-2) var(--space-4)',
+              border: 'none',
+              borderRadius: 'var(--radius-md)',
+              background: isActive ? 'var(--color-primary)' : 'var(--color-off-white)',
+              color: isActive ? 'var(--color-white)' : 'var(--color-primary)',
+              fontWeight: 700,
+              fontSize: 'var(--text-sm)',
+              cursor: 'pointer',
+            }}
+          >
+            {label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function VsacTeamSection({ team }: { team: typeof vsac.team }) {
+  const [activeInCharge, setActiveInCharge] = useState(0);
+  const [activeFaculty, setActiveFaculty] = useState(0);
+
+  return (
+    <div>
+      <h4 style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>In-charge</h4>
+      <VsacTabGroup labels={team.inCharge.map((m) => m.name)} activeIndex={activeInCharge} onSelect={setActiveInCharge} />
+      <VsacMemberCard member={team.inCharge[activeInCharge]} />
+
+      <h4 style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', margin: 'var(--space-6) 0 var(--space-3)' }}>Faculty Members</h4>
+      <VsacTabGroup labels={team.facultyMembers.map((m) => m.name)} activeIndex={activeFaculty} onSelect={setActiveFaculty} />
+      <VsacMemberCard member={team.facultyMembers[activeFaculty]} />
+    </div>
+  );
+}
+
+function VsacSimpleTable({ table }: { table: SimpleTable }) {
+  return (
+    <div style={{ overflowX: 'auto', marginBottom: 'var(--space-5)' }}>
+      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <thead>
+          <tr>
+            {table.headers.map((h) => (
+              <th key={h} style={TI_DSP_TABLE_TH_STYLE}>{h}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {table.rows.map((row, ri) => (
+            <tr key={ri} style={{ background: ri % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)' }}>
+              {row.map((cell, ci) => (
+                <td key={ci} style={TI_DSP_TABLE_TD_STYLE}>{cell}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function VsacInnerAccordion({ titles, children }: { titles: string[]; children: (i: number) => ReactNode }) {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      {titles.map((title, i) => {
+        const isOpen = openIndex === i;
+        return (
+          <div key={title}>
+            <button
+              onClick={() => setOpenIndex(isOpen ? null : i)}
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                background: isOpen ? 'var(--color-primary)' : 'var(--color-off-white)',
+                border: 'none',
+                padding: 'var(--space-3) var(--space-5)',
+                cursor: 'pointer',
+                textAlign: 'left',
+              }}
+            >
+              <span style={{ fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-primary)', fontSize: 'var(--text-sm)' }}>{title}</span>
+              <span style={{ fontSize: '1.2rem', fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-text)', lineHeight: 1 }}>{isOpen ? '−' : '+'}</span>
+            </button>
+            {isOpen && (
+              <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderTop: 'none' }}>
+                {children(i)}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function VsacTrainingResearchSection({ items }: { items: TrainingResearchItem[] }) {
+  return (
+    <VsacInnerAccordion titles={items.map((it) => it.title)}>
+      {(i) => {
+        const item = items[i];
+        return (
+          <>
+            {item.paragraphs.map((para, pi) => (
+              <p key={pi} style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-4)' }}>
+                {para}
+              </p>
+            ))}
+            {item.table && (
+              <>
+                <p style={{ fontWeight: 700, color: 'var(--color-primary)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-2)' }}>
+                  Participant List:
+                </p>
+                <VsacSimpleTable table={item.table} />
+              </>
+            )}
+            {item.secondParagraph && (
+              <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-4)' }}>
+                {item.secondParagraph}
+              </p>
+            )}
+            {item.secondTable && <VsacSimpleTable table={item.secondTable} />}
+          </>
+        );
+      }}
+    </VsacInnerAccordion>
+  );
+}
+
+function VsacCollaborationsSection({ items, galleryPhotos }: { items: CollaborationItem[]; galleryPhotos: (WithId & { imageUrl: string })[] }) {
+  return (
+    <VsacInnerAccordion titles={items.map((it) => it.title)}>
+      {(i) => {
+        const item = items[i];
+        if (item.isGallery) {
+          return galleryPhotos.length > 0 ? (
+            <PhotoGrid photos={galleryPhotos} alt="VSAC Gallery" />
+          ) : (
+            <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text-light)', margin: 0 }}>
+              Content for this section is coming soon.
+            </p>
+          );
+        }
+        return (
+          <>
+            {item.paragraphs?.map((para, pi) => (
+              <p key={pi} style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-4)' }}>
+                {para}
+              </p>
+            ))}
+            {item.intro && (
+              <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-4)' }}>
+                {item.intro}
+              </p>
+            )}
+            {item.bullets && (
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                {item.bullets.map((b, bi) => (
+                  <li key={bi} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-2)' }}>
+                    <span style={{ width: 20, height: 20, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
+                      <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    </span>
+                    <span style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.6 }}>
+                      <strong>{b.lead}</strong>{b.text}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </>
+        );
+      }}
+    </VsacInnerAccordion>
+  );
+}
+
+function VsacAccordion({
+  team,
+  trainingResearch,
+  collaborations,
+  galleryPhotos,
+}: {
+  team: typeof vsac.team;
+  trainingResearch: TrainingResearchItem[];
+  collaborations: CollaborationItem[];
+  galleryPhotos: (WithId & { imageUrl: string })[];
+}) {
+  const sections = ['Team (VSAC)', 'Training / Research', 'Collaborations'];
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 2, marginTop: 'var(--space-6)' }}>
+      {sections.map((title, i) => {
+        const isOpen = openIndex === i;
+        return (
+          <div key={title}>
+            <button
+              onClick={() => setOpenIndex(isOpen ? null : i)}
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                background: isOpen ? 'var(--color-primary)' : 'var(--color-off-white)',
+                border: 'none',
+                padding: 'var(--space-3) var(--space-5)',
+                cursor: 'pointer',
+                textAlign: 'left',
+              }}
+            >
+              <span style={{ fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-primary)', fontSize: 'var(--text-base)' }}>{title}</span>
+              <span style={{ fontSize: '1.2rem', fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-text)', lineHeight: 1 }}>{isOpen ? '−' : '+'}</span>
+            </button>
+            {isOpen && (
+              <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderTop: 'none' }}>
+                {title === 'Team (VSAC)' ? (
+                  <VsacTeamSection team={team} />
+                ) : title === 'Training / Research' ? (
+                  <VsacTrainingResearchSection items={trainingResearch} />
+                ) : (
+                  <VsacCollaborationsSection items={collaborations} galleryPhotos={galleryPhotos} />
+                )}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function StudentsBenefitedTable({ groups }: { groups: StudentsBenefitedGroup[] }) {
   return (
     <div style={{ overflowX: 'auto' }}>
@@ -1149,6 +1696,136 @@ function IicPage({ iic }: { iic: typeof institutionInnovationCell }) {
   );
 }
 
+function VdlPage({ vdl }: { vdl: typeof vehicleDesignLab }) {
+  const [activeTab, setActiveTab] = useState(VDL_TABS[0]);
+  const { docs: testingPhotos } = useCollection<WithId & { imageUrl: string }>('vdlTestingPhotos', [orderBy('order', 'asc')], { silent: true });
+  const { docs: campusVehiclePhotos } = useCollection<WithId & { imageUrl: string }>('vdlCampusVehiclePhotos', [orderBy('order', 'asc')], { silent: true });
+  const { docs: industryCollabPhotos } = useCollection<WithId & { imageUrl: string }>('vdlIndustryCollabPhotos', [orderBy('order', 'asc')], { silent: true });
+
+  return (
+    <section className="section bg-white">
+      <div className="container">
+        <div className="detail-grid">
+          <div>
+            {activeTab === 'About VDL' && (
+              <>
+                <span className="section-label">Overview</span>
+                <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-5)' }}>About VDL</h2>
+                {vdl.paragraphs.map((para, i) => (
+                  <p key={i} style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-4)' }}>
+                    {para}
+                  </p>
+                ))}
+                <CheckBullets items={vdl.fundamentals} />
+
+                <div style={{ marginTop: 'var(--space-6)' }}>
+                  <SectionHeading>Vision</SectionHeading>
+                  <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75 }}>
+                    {vdl.vision}
+                  </p>
+                </div>
+
+                <div style={{ marginTop: 'var(--space-6)' }}>
+                  <SectionHeading>Mission</SectionHeading>
+                  <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75 }}>
+                    {vdl.mission}
+                  </p>
+                </div>
+
+                <div style={{ marginTop: 'var(--space-6)' }}>
+                  <SectionHeading>Objectives</SectionHeading>
+                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                    {vdl.objectives.map((o, i) => (
+                      <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-2)' }}>
+                        <span style={{ width: 20, height: 20, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
+                          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                        </span>
+                        <span style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.6 }}>
+                          <strong>{o.lead}</strong>{o.text}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div style={{ marginTop: 'var(--space-6)' }}>
+                  <VdlTeamSection team={vdl.team} />
+                </div>
+              </>
+            )}
+
+            {activeTab === 'Facilities & Projects' && (
+              <>
+                <span className="section-label">Infrastructure</span>
+                <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-5)' }}>Facilities & Projects</h2>
+                <VdlFacilitiesSection
+                  facilities={vdl.facilities}
+                  testingPhotos={testingPhotos}
+                  campusVehiclePhotos={campusVehiclePhotos}
+                />
+              </>
+            )}
+
+            {activeTab === 'Industry Collaborations' && (
+              <>
+                <span className="section-label">Partnerships</span>
+                <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-5)' }}>Industry Collaborations</h2>
+                <VdlIndustryCollaborationsSection data={vdl.industryCollaborations} photos={industryCollabPhotos} />
+              </>
+            )}
+
+            {activeTab === 'Students Achievements & Placements' && (
+              <>
+                <span className="section-label">Recognition</span>
+                <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-5)' }}>Students Achievements & Placements</h2>
+                <VdlStudentsAchievementsSection data={vdl.studentsAchievements} />
+              </>
+            )}
+
+            {activeTab === 'VDL Outcomes' && (
+              <>
+                <span className="section-label">Impact</span>
+                <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-5)' }}>VDL Outcomes</h2>
+                <VdlOutcomesSection outcomes={vdl.outcomes} />
+              </>
+            )}
+          </div>
+
+          {/* Section nav */}
+          <div className="detail-sidebar">
+            <div style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', overflow: 'hidden', position: 'sticky', top: '110px' }}>
+              {VDL_TABS.map((tab) => {
+                const isActive = activeTab === tab;
+                return (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    style={{
+                      display: 'block',
+                      width: '100%',
+                      textAlign: 'left',
+                      padding: 'var(--space-3) var(--space-5)',
+                      border: 'none',
+                      borderBottom: '1px solid var(--color-light-gray)',
+                      background: isActive ? 'var(--color-primary)' : 'transparent',
+                      color: isActive ? 'var(--color-white)' : 'var(--color-primary)',
+                      fontWeight: isActive ? 700 : 600,
+                      fontSize: 'var(--text-sm)',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {tab}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 const CATEGORY_ICONS: Record<string, typeof Rocket> = {
   innovation: Rocket, industry: Factory, research: Microscope, global: Globe2, student: GraduationCap,
 };
@@ -1167,6 +1844,7 @@ export default function DifferentiatorDetail() {
   const { docs: tiDspGalleryPhotos } = useCollection<WithId & { imageUrl: string }>('tiDspGalleryPhotos', [orderBy('order', 'asc')], { silent: true });
   const { docs: c2sActivityPhotos } = useCollection<WithId & { imageUrl: string }>('chipsToStartupActivityPhotos', [orderBy('order', 'asc')], { silent: true });
   const { docs: c2sOutcomePhotos } = useCollection<WithId & { imageUrl: string }>('chipsToStartupOutcomePhotos', [orderBy('order', 'asc')], { silent: true });
+  const { docs: vsacGalleryPhotos } = useCollection<WithId & { imageUrl: string }>('vsacGalleryPhotos', [orderBy('order', 'asc')], { silent: true });
   const item = allItems.find((i) => i.slug === slug) ?? null;
   const category = item ? DIFFERENTIATOR_CATEGORIES.find((c) => c.id === item.category) : null;
 
@@ -1193,6 +1871,9 @@ export default function DifferentiatorDetail() {
   const tidsp = item.slug === 'ti-dsp-coe' ? tiDspCoe : null;
   const ultraTech = item.slug === 'ultratech-coe' ? ultraTechCoe : null;
   const c2s = item.slug === 'chips-to-startup' ? chipsToStartup : null;
+  const vsacPage = item.slug === 'vsac' ? vsac : null;
+  const arVr = item.slug === 'ar-vr-studio' ? arVrStudio : null;
+  const vdl = item.slug === 'vehicle-design-lab' ? vehicleDesignLab : null;
 
   return (
     <main className="page-wrapper">
@@ -1220,15 +1901,97 @@ export default function DifferentiatorDetail() {
       {/* Intro — Institution Innovation Cell gets its own dedicated tabbed
           page (IicPage) below instead, since it has a persistent section
           nav sidebar rather than the generic Key Highlights sidebar. */}
-      {!iic && (
+      {!iic && !vdl && (
       <section className="section bg-white">
         <div className="container">
           <div className="detail-grid">
             {/* Main content */}
             <div>
               <span className="section-label">Overview</span>
-              <h2 className="section-title" style={{ fontSize: '1.75rem' }}>{ultraTech ? ultraTech.pageTitle : `About ${item.title}`}</h2>
-              {c2s ? (
+              <h2 className="section-title" style={{ fontSize: '1.75rem' }}>{ultraTech ? ultraTech.pageTitle : arVr ? arVr.pageTitle : `About ${item.title}`}</h2>
+              {arVr ? (
+                <>
+                  <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-6)' }}>
+                    {arVr.overview}
+                  </p>
+
+                  <div>
+                    <SectionHeading>Vision</SectionHeading>
+                    <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-6)' }}>
+                      {arVr.vision}
+                    </p>
+                  </div>
+
+                  <div>
+                    <SectionHeading>Mission</SectionHeading>
+                    <CheckBullets items={arVr.mission} />
+                  </div>
+
+                  <div>
+                    <SectionHeading>Objectives</SectionHeading>
+                    <CheckBullets items={arVr.objectives} />
+                  </div>
+
+                  <div>
+                    <SectionHeading>AR/VR Studio Features</SectionHeading>
+                    <CheckBullets items={arVr.features} />
+                  </div>
+
+                  <div style={{ marginTop: 'var(--space-6)' }}>
+                    <SectionHeading>Contact Us</SectionHeading>
+                    <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6, margin: 0, fontWeight: 700 }}>{arVr.contact.name}</p>
+                    {arVr.contact.address.map((line, i) => (
+                      <p key={i} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6, margin: 0 }}>{line}</p>
+                    ))}
+                    <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6, margin: 0 }}>
+                      Email: <a href={`mailto:${arVr.contact.email}`} style={{ color: 'var(--color-primary)', fontWeight: 600 }}>{arVr.contact.email}</a>
+                    </p>
+                    <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6, margin: 0 }}>
+                      Phone: <a href={`tel:${arVr.contact.phone}`} style={{ color: 'var(--color-primary)', fontWeight: 600 }}>{arVr.contact.phone}</a>
+                    </p>
+                    <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6, margin: 0 }}>
+                      Website: <a href={arVr.contact.website} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-primary)', fontWeight: 600 }}>{arVr.contact.website.replace(/^https?:\/\//, '')}</a>
+                    </p>
+                  </div>
+
+                  <div style={{ marginTop: 'var(--space-6)' }}>
+                    <SectionHeading>Faculty In-charge</SectionHeading>
+                    <TiDspMemberCard member={arVr.facultyInCharge} />
+                  </div>
+                </>
+              ) : vsacPage ? (
+                <>
+                  {vsacPage.paragraphs.map((para, i) => (
+                    <p key={i} style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-4)' }}>
+                      {para}
+                    </p>
+                  ))}
+
+                  <div>
+                    <SectionHeading>Vision</SectionHeading>
+                    <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-6)' }}>
+                      {vsacPage.vision}
+                    </p>
+                  </div>
+
+                  <div>
+                    <SectionHeading>Mission</SectionHeading>
+                    <CheckBullets items={vsacPage.mission} />
+                  </div>
+
+                  <div>
+                    <SectionHeading>Objectives</SectionHeading>
+                    <CheckBullets items={vsacPage.objectives} />
+                  </div>
+
+                  <VsacAccordion
+                    team={vsacPage.team}
+                    trainingResearch={vsacPage.trainingResearch}
+                    collaborations={vsacPage.collaborations}
+                    galleryPhotos={vsacGalleryPhotos}
+                  />
+                </>
+              ) : c2s ? (
                 <>
                   {c2s.paragraphs.map((para, i) => (
                     <p key={i} style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-4)' }}>
@@ -1597,6 +2360,10 @@ export default function DifferentiatorDetail() {
       {/* Institution Innovation Cell's own tabbed page (About IIC / IIC –
           Constitution / and 7 more sections navigable from its sidebar). */}
       {iic && <IicPage iic={iic} />}
+
+      {/* Vehicle Design Lab's own tabbed page (About VDL / Facilities &
+          Projects / and 3 more sections navigable from its sidebar). */}
+      {vdl && <VdlPage vdl={vdl} />}
 
       {/* Institute & Coordinator Details — only on the AICTE IDEA Lab page */}
       {ideaLab && (

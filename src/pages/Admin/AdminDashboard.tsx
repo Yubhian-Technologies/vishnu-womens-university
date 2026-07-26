@@ -39,6 +39,8 @@ import IicMemberPhotosAdmin from './sections/IicMemberPhotosAdmin';
 import TedxPhotosAdmin from './sections/TedxPhotosAdmin';
 import TiDspGalleryPhotosAdmin from './sections/TiDspGalleryPhotosAdmin';
 import ChipsToStartupPhotosAdmin from './sections/ChipsToStartupPhotosAdmin';
+import VsacGalleryPhotosAdmin from './sections/VsacGalleryPhotosAdmin';
+import VdlFacilitiesPhotosAdmin from './sections/VdlFacilitiesPhotosAdmin';
 
 interface Props {
   activeSection: string;
@@ -82,6 +84,8 @@ const SECTION_MAP: Record<string, React.ReactNode> = {
   'tedx-photos': <TedxPhotosAdmin />,
   'ti-dsp-gallery-photos': <TiDspGalleryPhotosAdmin />,
   'chips-to-startup-photos': <ChipsToStartupPhotosAdmin />,
+  'vsac-gallery-photos': <VsacGalleryPhotosAdmin />,
+  'vdl-facilities-photos': <VdlFacilitiesPhotosAdmin />,
   'news-awards-data': <NewsAwardsDataAdmin />,
   'research-items': <ResearchItemsAdmin />,
   'compliance-docs': <ComplianceDocsAdmin />,
