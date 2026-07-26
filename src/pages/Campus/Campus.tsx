@@ -75,7 +75,6 @@ export default function Campus() {
       {/* Hero */}
       <PageHero
         page="campus"
-        defaultImage="https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=1920&q=60&auto=format"
         defaultTitle="Campus Life at VWU"
   defaultSubtitle="A 100-acre campus in Bhimavaram where learning, wellness, and community life come together."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Campus Life' }]}

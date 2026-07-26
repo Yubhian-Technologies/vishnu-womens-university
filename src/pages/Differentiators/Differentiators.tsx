@@ -46,7 +46,6 @@ export default function Differentiators() {
       {/* Hero */}
       <PageHero
         page="differentiators"
-        defaultImage="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=1920&q=60&auto=format"
         defaultTitle="What Sets VWU Apart"
   defaultSubtitle="Distinctive initiatives in innovation, industry engagement, research, international outreach, and student development — all aimed at producing well-rounded women engineers."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Differentiators' }]}

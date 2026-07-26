@@ -459,6 +459,9 @@ h6 { font-size: var(--text-lg); }
   display: flex;
   align-items: center;
   overflow: hidden;
+  /* Shows behind the hero image, and alone whenever a detail page has no
+     heroImage set (no stock-photo fallback is used for these anymore). */
+  background: var(--color-primary-dark);
 }
 
 .page-hero-image {

@@ -129,7 +129,6 @@ export default function About() {
       {/* Hero */}
       <PageHero
         page="about"
-        defaultImage="https://images.unsplash.com/photo-1562774053-701939374585?w=1920&q=60&auto=format"
         defaultTitle="About Vishnu Womens University"
   defaultSubtitle="Rooted in Bhimavaram since 2001, VWU has grown into Andhra Pradesh's foremost institution for women's technical education."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'About VWU' }]}

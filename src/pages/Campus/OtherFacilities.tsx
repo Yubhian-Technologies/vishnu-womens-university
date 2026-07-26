@@ -76,7 +76,6 @@ export default function OtherFacilities() {
     <main className="page-wrapper">
       <PageHero
         page="campus-other-facilities"
-        defaultImage="https://images.unsplash.com/photo-1497366216548-37526070297c?w=1920&q=60&auto=format"
         defaultTitle={facility.title}
         defaultSubtitle={facility.desc}
         breadcrumb={[

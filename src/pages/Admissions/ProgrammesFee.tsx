@@ -57,7 +57,6 @@ export default function ProgrammesFee() {
       {/* Hero */}
       <PageHero
         page="programmes-fee"
-        defaultImage="https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=1920&q=60&auto=format"
         defaultTitle="Programmes & Fee Structure"
   defaultSubtitle="Complete list of programs, intake capacities, and annual fee structure for AY 2025–26."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Admissions', to: '/admissions' }, { label: 'Programmes & Fee' }]}

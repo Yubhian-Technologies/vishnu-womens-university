@@ -1829,13 +1829,6 @@ function VdlPage({ vdl }: { vdl: typeof vehicleDesignLab }) {
 const CATEGORY_ICONS: Record<string, typeof Rocket> = {
   innovation: Rocket, industry: Factory, research: Microscope, global: Globe2, student: GraduationCap,
 };
-const CATEGORY_HERO_IMAGES: Record<string, string> = {
-  innovation: 'https://images.unsplash.com/photo-1553877522-43269d4ea984?w=1920&q=60&auto=format',
-  industry: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=1920&q=60&auto=format',
-  research: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=1920&q=60&auto=format',
-  global: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1920&q=60&auto=format',
-  student: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1920&q=60&auto=format',
-};
 
 export default function DifferentiatorDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -1866,7 +1859,7 @@ export default function DifferentiatorDetail() {
   }
 
   const CategoryIcon = CATEGORY_ICONS[category.id] || Rocket;
-  const heroImage = item.heroImage || CATEGORY_HERO_IMAGES[category.id] || CATEGORY_HERO_IMAGES.innovation;
+  const heroImage = item.heroImage;
   const ideaLab = item.slug === 'aicte-idea-lab' ? aicteIdeaLab : null;
   const iic = item.slug === 'institution-innovation-cell' ? institutionInnovationCell : null;
   const tedx = item.slug === 'tedxsvecw' ? tedxSvecw : null;
@@ -1885,7 +1878,9 @@ export default function DifferentiatorDetail() {
     <main className="page-wrapper">
       {/* Hero */}
       <section className="page-hero" style={{ minHeight: 380 }}>
-        <SmoothImage src={heroImage} alt={item.title} className="page-hero-image" loading="eager" decoding="sync" fetchPriority="high" />
+        {heroImage && (
+          <SmoothImage src={heroImage} alt={item.title} className="page-hero-image" loading="eager" decoding="sync" fetchPriority="high" />
+        )}
         <div className="page-hero-overlay" />
         <div className="container page-hero-content">
           <div className="breadcrumb animate-fade-in">

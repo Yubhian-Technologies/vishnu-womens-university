@@ -18,7 +18,6 @@ export default function AntiRagging() {
     <main className="page-wrapper">
       <PageHero
         page="anti-ragging"
-        defaultImage="https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=1920&q=60&auto=format"
         defaultTitle="Anti Ragging"
         defaultSubtitle="Vishnu Womens University is committed to a safe, ragging-free campus for every student."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Anti Ragging' }]}

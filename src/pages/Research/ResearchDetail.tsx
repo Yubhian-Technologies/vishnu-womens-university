@@ -18,8 +18,6 @@ import { DEFAULT_REC_INTRO, DEFAULT_REC_ABOUT } from './researchEthicsCommitteeD
 import { DEFAULT_IPR_INTRO, DEFAULT_IPR_ABOUT } from './iprCommitteeDefault';
 import '../detail-layout.css';
 
-const DEFAULT_HERO_IMAGE = 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=1920&q=60&auto=format';
-
 const CATEGORY_LABELS: Record<string, string> = {
   governance: 'R&D Governance',
   output: 'Research Output',
@@ -163,7 +161,7 @@ export default function ResearchDetail() {
 
   const Icon = resolveContentIcon(item.icon) || Microscope;
   const categoryLabel = CATEGORY_LABELS[item.category] || item.category;
-  const heroImage = item.heroImage || DEFAULT_HERO_IMAGE;
+  const heroImage = item.heroImage;
   const intro = DEFAULT_INTRO_BY_SLUG[item.slug] || item.intro;
   const about = item.about || DEFAULT_ABOUT_BY_SLUG[item.slug] || '';
   const aboutBlocks = parseAboutContent(about);
@@ -178,7 +176,9 @@ export default function ResearchDetail() {
     <main className="page-wrapper">
       {/* Hero */}
       <section className="page-hero" style={{ minHeight: 340 }}>
-        <img src={heroImage} alt={item.title} className="page-hero-image" loading="eager" decoding="sync" fetchPriority="high" />
+        {heroImage && (
+          <img src={heroImage} alt={item.title} className="page-hero-image" loading="eager" decoding="sync" fetchPriority="high" />
+        )}
         <div className="page-hero-overlay" />
         <div className="container page-hero-content">
           <div className="breadcrumb">

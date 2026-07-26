@@ -5,8 +5,6 @@ import { useOrderedCollection } from '../../hooks/useCollection';
 import type { FacultyDoc } from '../Academics/Faculty';
 import '../detail-layout.css';
 
-const DEFAULT_HERO_IMAGE = 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=1920&q=60&auto=format';
-
 function stripTitles(name: string) {
   return name.replace(/\b(Dr|Sri|Prof|Mr|Mrs|Ms)\.?\s*/gi, '');
 }
@@ -43,7 +41,6 @@ export default function FacultyResearchProfile() {
   return (
     <main className="page-wrapper">
       <section className="page-hero" style={{ minHeight: 280 }}>
-        <img src={DEFAULT_HERO_IMAGE} alt={name} className="page-hero-image" loading="eager" decoding="sync" fetchPriority="high" />
         <div className="page-hero-overlay" />
         <div className="container page-hero-content">
           <div className="breadcrumb">

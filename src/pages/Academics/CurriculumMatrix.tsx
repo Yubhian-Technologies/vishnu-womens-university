@@ -99,7 +99,6 @@ export default function CurriculumMatrix() {
       {/* Hero */}
       <PageHero
         page="academics-curriculum"
-        defaultImage="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=1920&q=60&auto=format"
         defaultTitle="Course Curriculum"
         defaultSubtitle="Semester-wise curriculum documents for every programme and regulation."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Academics', to: '/academics' }, { label: 'Course Curriculum' }]}

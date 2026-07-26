@@ -76,7 +76,6 @@ export default function Governance() {
       {/* Hero */}
       <PageHero
         page="governance"
-        defaultImage="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1920&q=60&auto=format"
         defaultTitle="Governance & Statutory Bodies"
   defaultSubtitle="Transparent, accountable governance driving academic excellence — from apex statutory bodies to quality assurance committees."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Governance' }]}

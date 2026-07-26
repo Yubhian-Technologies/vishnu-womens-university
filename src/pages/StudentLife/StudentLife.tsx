@@ -78,7 +78,6 @@ export default function StudentLife() {
       {/* Hero */}
       <PageHero
         page="student-life"
-        defaultImage="https://images.unsplash.com/photo-1571260899304-425eee4c7efc?w=1920&q=60&auto=format"
         defaultTitle="Discover Your Place at VWU"
   defaultSubtitle="VWU offers more than an engineering qualification. It is where you find your community, sharpen your purpose, and start building your future."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Student Life' }]}

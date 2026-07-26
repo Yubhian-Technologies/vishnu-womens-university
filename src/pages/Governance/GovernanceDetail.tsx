@@ -8,8 +8,6 @@ import { parseStructuredTable } from '../../lib/structuredTable';
 import type { GovernanceItemDoc } from '../Admin/sections/GovernanceItemsAdmin';
 import '../detail-layout.css';
 
-const DEFAULT_HERO_IMAGE = 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1920&q=60&auto=format';
-
 interface FacultyDoc {
   id: string;
   name: string;
@@ -38,11 +36,11 @@ export default function GovernanceDetail() {
   const item = govDocs.find((i) => i.slug === slug) ?? null;
   const { docs: faculty } = useOrderedCollection<FacultyDoc>('faculty', 'name');
   // Each item can have its own hero image (set in the Governance/Committees/
-  // IQAC admin); falls back to the one shared "Governance Detail Pages"
-  // banner, then a hardcoded default — so a page never looks broken while
-  // an admin is still filling in per-item images.
+  // IQAC admin); falls back to the shared "Governance Detail Pages" banner.
+  // No hardcoded stock-photo fallback — the hero just shows its solid
+  // background color if neither is set yet.
   const { slides: heroSlides } = usePageBanners('governance-detail');
-  const heroImage = item?.heroImage || heroSlides[0]?.imageUrl || DEFAULT_HERO_IMAGE;
+  const heroImage = item?.heroImage || heroSlides[0]?.imageUrl;
 
   // No scroll-reveal here — this whole page's content (including the hero
   // title) only renders once the Firestore-backed `item` has loaded, so any
@@ -79,14 +77,16 @@ export default function GovernanceDetail() {
     <main className="page-wrapper">
       {/* Hero */}
       <section className="page-hero" style={{ minHeight: 340 }}>
-        <img
-          src={heroImage}
-          alt={item.title}
-          className="page-hero-image"
-          loading="eager"
-          decoding="sync"
-          fetchPriority="high"
-        />
+        {heroImage && (
+          <img
+            src={heroImage}
+            alt={item.title}
+            className="page-hero-image"
+            loading="eager"
+            decoding="sync"
+            fetchPriority="high"
+          />
+        )}
         <div className="page-hero-overlay" />
         <div className="container page-hero-content">
           <div className="breadcrumb animate-fade-in">

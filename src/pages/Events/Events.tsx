@@ -56,7 +56,6 @@ export default function Events() {
       {/* Hero */}
       <PageHero
         page="events"
-        defaultImage="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1920&q=60&auto=format"
         defaultTitle="Campus Events"
   defaultSubtitle="Technical symposia, sports tournaments, graduation ceremonies, and much more — the VWU calendar is always full."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Events' }]}

@@ -85,7 +85,6 @@ export default function AlumniGiving() {
       {/* Hero */}
       <PageHero
         page="alumni-giving"
-        defaultImage="https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=1920&q=60&auto=format"
         defaultTitle="Always a Vishnu Engineer"
   defaultSubtitle="Graduation is not the end of your VWU story. Stay engaged, give back, and help shape the next generation of women engineers."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Alumni & Giving' }]}
