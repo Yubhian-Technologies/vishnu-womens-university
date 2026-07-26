@@ -38,7 +38,7 @@ export default function ArtsCulture() {
       {/* Hero */}
       <PageHero
         page="arts-culture"
-        defaultImage="https://images.unsplash.com/photo-1545959570-a94084071b5d?w=1920&q=80"
+        defaultImage="https://images.unsplash.com/photo-1545959570-a94084071b5d?w=1920&q=60&auto=format"
         defaultTitle="Arts & Culture"
   defaultSubtitle="Nurturing creativity, preserving heritage, and building a sense of belonging — developing responsible and culturally grounded leaders."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Student Life', to: '/student-life' }, { label: 'Arts & Culture' }]}
@@ -71,7 +71,6 @@ export default function ArtsCulture() {
                 src={philosophyPhoto.src}
                 alt={philosophyPhoto.alt}
                 style={{ width: '100%', height: '400px', objectFit: 'cover', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-xl)' }}
-                loading="lazy"
               />
             </div>
           </div>

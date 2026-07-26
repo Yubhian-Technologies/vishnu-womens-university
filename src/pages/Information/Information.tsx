@@ -86,7 +86,7 @@ export default function Information() {
       {/* Hero */}
       <PageHero
         page="information"
-        defaultImage="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1920&q=80"
+        defaultImage="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1920&q=60&auto=format"
         defaultTitle="Information"
   defaultSubtitle="Academic calendar, holidays, how to reach us, counselling, ICT platforms, and more."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Discover', to: '/' }, { label: 'Information' }]}

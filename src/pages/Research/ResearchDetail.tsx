@@ -18,7 +18,7 @@ import { DEFAULT_REC_INTRO, DEFAULT_REC_ABOUT } from './researchEthicsCommitteeD
 import { DEFAULT_IPR_INTRO, DEFAULT_IPR_ABOUT } from './iprCommitteeDefault';
 import '../detail-layout.css';
 
-const DEFAULT_HERO_IMAGE = 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=1920&q=80';
+const DEFAULT_HERO_IMAGE = 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=1920&q=60&auto=format';
 
 const CATEGORY_LABELS: Record<string, string> = {
   governance: 'R&D Governance',
@@ -178,7 +178,7 @@ export default function ResearchDetail() {
     <main className="page-wrapper">
       {/* Hero */}
       <section className="page-hero" style={{ minHeight: 340 }}>
-        <img src={heroImage} alt={item.title} className="page-hero-image" fetchPriority="high" />
+        <img src={heroImage} alt={item.title} className="page-hero-image" loading="eager" decoding="sync" fetchPriority="high" />
         <div className="page-hero-overlay" />
         <div className="container page-hero-content">
           <div className="breadcrumb">

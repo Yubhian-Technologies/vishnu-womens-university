@@ -3,35 +3,27 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     // Public collections — anyone can read, only logged-in admin can write.
-    // When adding a new Firestore-backed section, add its collection name
-    // here too — otherwise reads are denied by default (including for
-    // logged-in admins; Firestore's local-cache optimism can make a freshly
-    // added doc appear to work in the admin UI even when the underlying read
-    // is actually blocked, which is misleading during testing).
+    // This is a catch-all: ANY collection not explicitly excluded below is
+    // publicly readable, so adding a brand-new Firestore-backed section (a
+    // new photo gallery, a new differentiators sub-page, whatever comes
+    // next) never requires touching this file again. Writes always require
+    // auth regardless of collection name, which is the actual security
+    // boundary that matters (only the admin panel signs in).
+    //
+    // The ONLY reason to come back and edit this file in the future is if a
+    // new collection holds visitor-submitted PII (like the three below) —
+    // in that case, add its name to the exclusion list here AND give it its
+    // own explicit match block with the same shape as contactSubmissions.
     match /{collection}/{docId} {
-      allow read: if collection in [
-        'banners', 'news', 'gallery', 'programs',
-        'faculty', 'announcements',
-        'givingLevels', 'alumniImpact', 'alumniStories',
-        'alumniEvents', 'alumniCompanies',
-        'governingBody', 'coreExecutives',
-        'academicCalendar', 'holidays', 'events',
-        'faqs', 'studentClubs', 'jobOpenings',
-        'contentBlocks', 'contacts', 'svesCampuses', 'downloads', 'curriculum',
-        'sitePhotos', 'navLinkOverrides', 'governanceItems', 'differentiatorItems',
-        'placementItems', 'happenings', 'awards', 'researchItems', 'complianceDocs',
-        'institutionalPolicies', 'placementYears', 'tpoTeamPhotos', 'iloOfficePhotos', 'gsacPhotos',
-        'iicMemberPhotos', 'tedxSvecwPhotos', 'tiDspGalleryPhotos',
-        'chipsToStartupActivityPhotos', 'chipsToStartupOutcomePhotos', 'vsacGalleryPhotos',
-        'vdlTestingPhotos', 'vdlCampusVehiclePhotos', 'vdlIndustryCollabPhotos'
-      ];
+      allow read: if !(collection in ['contactSubmissions', 'careerApplications', 'admissionInquiries']);
       allow write: if request.auth != null;
     }
 
-    // Public form submissions (Contact Us, Careers application) — anyone
-    // (including signed-out visitors) can submit a new entry, but only a
-    // logged-in admin can read, update (e.g. mark as read), or delete them,
-    // since these collections hold visitor-supplied PII.
+    // Public form submissions (Contact Us, Careers application, Admissions
+    // inquiry) — anyone (including signed-out visitors) can submit a new
+    // entry, but only a logged-in admin can read, update (e.g. mark as
+    // read), or delete them, since these collections hold visitor-supplied
+    // PII (name, email, phone, etc.) that shouldn't be publicly readable.
     match /contactSubmissions/{docId} {
       allow create: if true;
       allow read, update, delete: if request.auth != null;

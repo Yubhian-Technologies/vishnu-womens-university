@@ -46,7 +46,7 @@ export default function StudentClubs() {
       {/* Hero */}
       <PageHero
         page="student-clubs"
-        defaultImage="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1920&q=80"
+        defaultImage="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1920&q=60&auto=format"
         defaultTitle="Student Clubs"
   defaultSubtitle="23 active clubs across technology, social service, arts, and culture — VWU has a community for every interest."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Student Life', to: '/student-life' }, { label: 'Student Clubs' }]}

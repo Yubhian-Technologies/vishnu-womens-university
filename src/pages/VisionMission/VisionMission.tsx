@@ -71,7 +71,7 @@ export default function VisionMission() {
       {/* Hero */}
       <PageHero
         page="vision-mission"
-        defaultImage="https://images.unsplash.com/photo-1562774053-701939374585?w=1920&q=80"
+        defaultImage="https://images.unsplash.com/photo-1562774053-701939374585?w=1920&q=60&auto=format"
         defaultTitle="Vision, Mission & Values"
   defaultSubtitle="The principles, purpose, and commitments that inform every decision and action at Vishnu Womens University."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Discover', to: '/' }, { label: 'Vision, Mission & Values' }]}
@@ -224,7 +224,6 @@ export default function VisionMission() {
                 src={qualityPolicyImg.src}
                 alt={qualityPolicyImg.alt}
                 style={{ width: '100%', height: '400px', objectFit: 'cover', borderRadius: 'var(--radius-lg)' }}
-                loading="lazy"
               />
             </div>
           </div>

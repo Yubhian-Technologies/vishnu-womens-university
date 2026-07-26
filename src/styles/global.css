@@ -7,7 +7,10 @@
 }
 
 html {
-  scroll-behavior: smooth;
+  /* No CSS scroll-behavior here — Lenis (mounted in App.tsx) now owns all
+     scroll easing via its own rAF loop. Leaving native smooth-scroll on
+     top of that would double-animate any native anchor jump it doesn't
+     intercept, fighting Lenis's position updates every frame. */
   font-size: 16px;
 }
 
@@ -92,6 +95,37 @@ input, textarea, select {
   cursor: pointer;
   white-space: nowrap;
   border: 2px solid transparent;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* Gradient sheen sweep — a diagonal band of light slides across every
+   button on hover, shared by all .btn-* variants since they all extend
+   this base class. Sits above the button's own background/text via
+   isolation+z-index but ignores pointer events so clicks still land. */
+.btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -75%;
+  width: 45%;
+  height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+  transform: skewX(-20deg);
+  transition: left 0.65s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.btn:hover::after {
+  left: 130%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn::after {
+    display: none;
+  }
 }
 
 .btn-primary {

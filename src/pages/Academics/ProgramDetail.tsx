@@ -6,12 +6,13 @@ import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import ProgrammeStructure from '../../components/ProgrammeStructure/ProgrammeStructure';
 import { useCollection, useOrderedCollection } from '../../hooks/useCollection';
 import { usePageBanner } from '../../hooks/usePageBanner';
+import { smoothScrollTo } from '../../lib/smoothScroll';
 import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
 import type { FacultyDoc } from './Faculty';
 import '../detail-layout.css';
 
 const NAV_OFFSET = 'calc(var(--topbar-height) + var(--header-height) + 1rem)';
-const DEFAULT_PROGRAM_HERO = 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=1920&q=80';
+const DEFAULT_PROGRAM_HERO = 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=1920&q=60&auto=format';
 
 const categoryLabel: Record<string, string> = {
   btech: 'B.Tech',
@@ -45,7 +46,7 @@ export default function ProgramDetail() {
   useEffect(() => {
     if (!program || !location.hash) return;
     const el = document.getElementById(location.hash.slice(1));
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (el) smoothScrollTo(el);
   }, [program, location.hash]);
 
   if (loading) return <main className="page-wrapper" style={{ minHeight: '60vh' }} />;
@@ -79,6 +80,8 @@ export default function ProgramDetail() {
           src={program.heroImage || fallbackBanner?.imageUrl || DEFAULT_PROGRAM_HERO}
           alt={program.name}
           className="page-hero-image"
+          loading="eager"
+          decoding="sync"
           fetchPriority="high"
         />
         <div className="page-hero-overlay" />

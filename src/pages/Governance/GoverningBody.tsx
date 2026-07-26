@@ -103,7 +103,7 @@ export default function GoverningBody() {
       {/* Hero */}
       <PageHero
         page="governing-body"
-        defaultImage="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1920&q=80"
+        defaultImage="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1920&q=60&auto=format"
         defaultTitle="Governing Body"
         defaultSubtitle="Dedicated leaders and distinguished members committed to academic excellence, institutional governance, innovation, and the continuous growth of Shri Vishnu Engineering College for Women."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Governance', to: '/governance' }, { label: 'Governing Body' }]}

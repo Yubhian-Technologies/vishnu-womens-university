@@ -8,7 +8,7 @@ import { parseStructuredTable } from '../../lib/structuredTable';
 import type { GovernanceItemDoc } from '../Admin/sections/GovernanceItemsAdmin';
 import '../detail-layout.css';
 
-const DEFAULT_HERO_IMAGE = 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1920&q=80';
+const DEFAULT_HERO_IMAGE = 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1920&q=60&auto=format';
 
 interface FacultyDoc {
   id: string;
@@ -83,6 +83,8 @@ export default function GovernanceDetail() {
           src={heroImage}
           alt={item.title}
           className="page-hero-image"
+          loading="eager"
+          decoding="sync"
           fetchPriority="high"
         />
         <div className="page-hero-overlay" />

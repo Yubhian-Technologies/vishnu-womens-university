@@ -9,6 +9,7 @@ import type { UploadResult } from '../../../lib/storage';
 import { campusFacilities } from '../../Campus/campusFacilities.data';
 import { DIFFERENTIATOR_CATEGORIES } from './DifferentiatorsAdmin';
 import ItemHeroImagesAdmin from './ItemHeroImagesAdmin';
+import { smoothScrollTo } from '../../../lib/smoothScroll';
 
 const PROGRAM_CATEGORIES = [
   { value: 'btech', label: 'B.Tech' },
@@ -158,7 +159,7 @@ function PageBannersAdmin() {
     // The banner list (below the form) covers every page's banners, so the
     // clicked one is often scrolled well past the form — without this the
     // edit looks like it did nothing.
-    formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (formRef.current) smoothScrollTo(formRef.current);
   };
 
   const remove = async (id: string) => {

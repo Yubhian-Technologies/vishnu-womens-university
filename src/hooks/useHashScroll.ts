@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import { smoothScrollTo } from '../lib/smoothScroll';
 
 // React Router's <Link> (used by the top Header nav's dropdown menus, which link
 // to paths like "/campus#library") only updates the URL — unlike a native
@@ -11,6 +12,6 @@ export function useHashScroll() {
   useEffect(() => {
     if (!location.hash) return;
     const el = document.getElementById(location.hash.slice(1));
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (el) smoothScrollTo(el);
   }, [location.hash]);
 }

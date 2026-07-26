@@ -112,7 +112,7 @@ export default function Academics() {
       {/* Hero */}
       <PageHero
         page="academics"
-        defaultImage="https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=1920&q=80"
+        defaultImage="https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=1920&q=60&auto=format"
         defaultTitle="You Will Excel."
   defaultSubtitle="Rigorous, industry-aligned programs designed to build your technical expertise, sharpen your research instincts, and develop you as a professional."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Academics' }]}

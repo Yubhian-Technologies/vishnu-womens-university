@@ -129,7 +129,7 @@ export default function About() {
       {/* Hero */}
       <PageHero
         page="about"
-        defaultImage="https://images.unsplash.com/photo-1562774053-701939374585?w=1920&q=80"
+        defaultImage="https://images.unsplash.com/photo-1562774053-701939374585?w=1920&q=60&auto=format"
         defaultTitle="About Vishnu Womens University"
   defaultSubtitle="Rooted in Bhimavaram since 2001, VWU has grown into Andhra Pradesh's foremost institution for women's technical education."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'About VWU' }]}
@@ -181,7 +181,6 @@ export default function About() {
                 src={whoWeAreImg.src}
                 alt={whoWeAreImg.alt}
                 style={{ width: '100%', height: '460px', objectFit: 'cover', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-xl)' }}
-                loading="lazy"
               />
             </div>
           </div>
@@ -333,7 +332,6 @@ export default function About() {
                 src={campusSnapshotImg.src}
                 alt={campusSnapshotImg.alt}
                 style={{ width: '100%', height: '360px', objectFit: 'cover', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-xl)' }}
-                loading="lazy"
               />
             </div>
             <div className="reveal-right">
@@ -372,7 +370,6 @@ export default function About() {
                 src={parentSocietyImg.src}
                 alt={parentSocietyImg.alt}
                 style={{ width: '100%', height: '380px', objectFit: 'cover' }}
-                loading="lazy"
               />
             </div>
           </div>

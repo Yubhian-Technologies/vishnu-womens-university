@@ -100,7 +100,7 @@ export default function PhotoGrid({
             onClick={() => setLightbox(i)}
             aria-label={`View ${img.alt}`}
           >
-            <img src={img.src} alt={img.alt} loading="lazy" />
+            <img src={img.src} alt={img.alt} />
             {img.caption && <div className="photo-grid-caption">{img.caption}</div>}
             <div className="photo-grid-overlay">
               <span className="photo-grid-zoom">⤢</span>

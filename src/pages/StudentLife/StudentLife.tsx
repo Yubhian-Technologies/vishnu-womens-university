@@ -78,7 +78,7 @@ export default function StudentLife() {
       {/* Hero */}
       <PageHero
         page="student-life"
-        defaultImage="https://images.unsplash.com/photo-1571260899304-425eee4c7efc?w=1920&q=80"
+        defaultImage="https://images.unsplash.com/photo-1571260899304-425eee4c7efc?w=1920&q=60&auto=format"
         defaultTitle="Discover Your Place at VWU"
   defaultSubtitle="VWU offers more than an engineering qualification. It is where you find your community, sharpen your purpose, and start building your future."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Student Life' }]}
@@ -150,7 +150,6 @@ export default function StudentLife() {
             src={hostelImg.src}
             alt={hostelImg.alt}
             style={{ width: '100%', height: '100%', objectFit: 'cover', minHeight: '380px' }}
-            loading="lazy"
           />
           <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,28,84,0.25)' }} />
         </div>
@@ -188,7 +187,6 @@ export default function StudentLife() {
               src={athleticsImg.src}
               alt={athleticsImg.alt}
               className="sl-athletics-image reveal-scale"
-              loading="lazy"
             />
           </div>
           <div className="sl-sports-grid">
@@ -265,7 +263,6 @@ export default function StudentLife() {
                 src={diningImg.src}
                 alt={diningImg.alt}
                 style={{ width: '100%', height: '320px', objectFit: 'cover' }}
-                loading="lazy"
               />
             </div>
           </div>

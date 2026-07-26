@@ -36,7 +36,7 @@ export default function Happenings() {
       {/* Hero */}
       <PageHero
         page="news-awards-happenings"
-        defaultImage="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1920&q=80"
+        defaultImage="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1920&q=60&auto=format"
         defaultTitle="Happenings at VWU"
   defaultSubtitle="Workshops, MoUs, competitions, achievements, and institutional milestones — a running record of life at VWU."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'News & Awards', to: '/news-awards' }, { label: 'Happenings' }]}

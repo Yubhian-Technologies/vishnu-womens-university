@@ -16,7 +16,7 @@ export default function PoliciesProcedures() {
     <main className="page-wrapper">
       <PageHero
         page="policies-procedures"
-        defaultImage="https://images.unsplash.com/photo-1568667256549-094345857637?w=1920&q=80"
+        defaultImage="https://images.unsplash.com/photo-1568667256549-094345857637?w=1920&q=60&auto=format"
         defaultTitle="Policies & Procedures"
         defaultSubtitle="A structured framework for governance, academics, research, and campus sustainability at VWU."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Policies & Procedures' }]}

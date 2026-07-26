@@ -75,7 +75,7 @@ export default function Faculty() {
     <main className="page-wrapper">
       <PageHero
         page="faculty"
-        defaultImage="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=1920&q=80"
+        defaultImage="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=1920&q=60&auto=format"
         defaultTitle="Our Faculty"
         defaultSubtitle="Experienced educators and researchers across every department, dedicated to academic excellence and student success."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Academics', to: '/academics' }, { label: 'Faculty' }]}

@@ -33,7 +33,7 @@ export default function ResultAnalysis() {
       {/* Hero */}
       <PageHero
         page="result-analysis"
-        defaultImage="https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?w=1920&q=80"
+        defaultImage="https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?w=1920&q=60&auto=format"
         defaultTitle="Result Analysis"
   defaultSubtitle="VWU consistently ranks among the top 5 affiliated colleges of JNTU Kakinada with 90%+ annual pass rates."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Admissions', to: '/admissions' }, { label: 'Result Analysis' }]}

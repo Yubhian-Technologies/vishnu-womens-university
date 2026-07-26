@@ -47,7 +47,7 @@ const defaultMissionPhotos = [
 ];
 
 const defaultCtaBannerPhoto = [
-  { src: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1920&q=80', alt: 'VWU campus', caption: '' },
+  { src: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1920&q=60&auto=format', alt: 'VWU campus', caption: '' },
 ];
 
 // The original hardcoded content each of these sections shipped with,

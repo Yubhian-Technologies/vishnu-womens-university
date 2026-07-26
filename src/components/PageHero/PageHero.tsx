@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { usePageBanners, type BannerSlide } from '../../hooks/usePageBanners';
 import SmoothImage from '../SmoothImage/SmoothImage';
+import { smoothScrollTo } from '../../lib/smoothScroll';
 import './PageHero.css';
 
 export interface BreadcrumbItem {
@@ -121,7 +122,9 @@ export default function PageHero({
               src={s.imageUrl}
               alt={s.title}
               className="page-hero-image"
-              {...(i === current ? { fetchPriority: 'high' as const } : {})}
+              loading="eager"
+              decoding={i === current ? 'sync' : 'async'}
+              {...(i === current ? { fetchPriority: 'high' as const } : { fetchPriority: 'low' as const })}
             />
           )}
         </div>
@@ -153,7 +156,7 @@ export default function PageHero({
                   <button
                     type="button"
                     className="btn btn-primary"
-                    onClick={() => document.getElementById(scrollCtaTargetId)?.scrollIntoView({ behavior: 'smooth' })}
+                    onClick={() => smoothScrollTo(`#${scrollCtaTargetId}`)}
                   >
                     {slide.ctaLabel}
                   </button>

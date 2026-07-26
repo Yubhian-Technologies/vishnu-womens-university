@@ -25,7 +25,6 @@ export default function NewsCard({ article, className = '' }: NewsCardProps) {
           src={article.imageUrl}
           alt={article.imageAlt}
           className="news-card-image"
-          loading="lazy"
         />
         <span className="news-card-category">{article.category}</span>
       </div>

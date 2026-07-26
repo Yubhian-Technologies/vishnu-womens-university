@@ -192,7 +192,6 @@ export default function Contact() {
                   height="400"
                   style={{ border: 0, borderRadius: '12px' }}
                   allowFullScreen
-                  loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
                 />
               </div>
