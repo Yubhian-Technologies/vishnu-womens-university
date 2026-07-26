@@ -42,7 +42,7 @@ export default function Research() {
     <main className="page-wrapper">
       <PageHero
         page="research"
-        defaultImage="https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=1920&q=80"
+        defaultImage="https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=1920&q=60&auto=format"
         defaultTitle="Research & Development"
         defaultSubtitle="From funded projects and patents to industry MoUs and professional bodies — a look at how VWU builds knowledge that matters."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Research & Development' }]}

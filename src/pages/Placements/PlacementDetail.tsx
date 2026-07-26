@@ -17,7 +17,7 @@ import { usePlacementYears } from './usePlacementYears';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import '../detail-layout.css';
 
-const DEFAULT_HERO_IMAGE = 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=1920&q=80';
+const DEFAULT_HERO_IMAGE = 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=1920&q=60&auto=format';
 
 // Our Recruiters shows the same companies already captured in "Placements,
 // Year by Year" (placementStats.data.ts / the placementYears collection),
@@ -288,7 +288,6 @@ function PartnerLogo({ name }: { name: string }) {
           src={logoOverride || `https://www.google.com/s2/favicons?domain=${domain}&sz=128`}
           alt={name}
           className="partner-logo-img"
-          loading="lazy"
           onError={() => setFailed(true)}
         />
       )}
@@ -553,7 +552,13 @@ export default function PlacementDetail() {
   }, [item]);
 
   if (!item) {
-    if (loading) return null;
+    if (loading) {
+      return (
+        <main className="route-fallback">
+          <div className="route-fallback__spinner" />
+        </main>
+      );
+    }
     return <Navigate to="/placements" replace />;
   }
 
@@ -572,6 +577,8 @@ export default function PlacementDetail() {
           src={heroImage}
           alt={item.title}
           className="page-hero-image"
+          loading="eager"
+          decoding="sync"
           fetchPriority="high"
         />
         <div className="page-hero-overlay" />

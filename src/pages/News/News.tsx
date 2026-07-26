@@ -54,7 +54,7 @@ export default function News() {
       {/* Hero */}
       <PageHero
         page="news"
-        defaultImage="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1920&q=80"
+        defaultImage="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1920&q=60&auto=format"
         defaultTitle="VWU News & Stories"
         defaultSubtitle="Stay up-to-date with the latest happenings, achievements, and stories from the VWU community."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'News' }]}
@@ -70,7 +70,6 @@ export default function News() {
                 <SmoothImage
                   src={featuredItem.imageUrl || NEWS_FALLBACK_IMAGE}
                   alt={featuredItem.title}
-                  loading="lazy"
                 />
                 <span className="news-featured-badge">Featured Story</span>
               </div>

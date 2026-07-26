@@ -188,7 +188,7 @@ export default function UGCDisclosure() {
     <main className="page-wrapper">
       <PageHero
         page="disclosures-ugc"
-        defaultImage="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=1920&q=80"
+        defaultImage="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=1920&q=60&auto=format"
         defaultTitle="UGC Public Self-Disclosure"
         defaultSubtitle="Shri Vishnu Engineering College for Women (Autonomous) — published as required by the University Grants Commission."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'UGC Public Self-Disclosure' }]}

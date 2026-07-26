@@ -4,6 +4,8 @@ import { GraduationCap } from 'lucide-react';
 import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
 import FirestoreErrorBanner from './components/FirestoreErrorBanner/FirestoreErrorBanner';
+import SmoothScroll from './components/SmoothScroll/SmoothScroll';
+import { smoothScrollTo } from './lib/smoothScroll';
 
 const Home = lazy(() => import('./pages/Home/Home'));
 const Academics = lazy(() => import('./pages/Academics/Academics'));
@@ -73,7 +75,7 @@ function ScrollToTop() {
     // the destination page's own useHashScroll effect owns positioning in that
     // case, and racing it here caused inconsistent/flaky landing positions.
     if (hash) return;
-    window.scrollTo({ top: 0, behavior: 'instant' });
+    smoothScrollTo(0, { immediate: true });
   }, [pathname, hash]);
   return null;
 }
@@ -249,6 +251,7 @@ function NotFound() {
 export default function App() {
   return (
     <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <SmoothScroll />
       <RootRouter />
     </BrowserRouter>
   );

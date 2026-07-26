@@ -86,7 +86,7 @@ export default function Gallery() {
       {/* Hero */}
       <PageHero
         page="news-awards-gallery"
-        defaultImage="https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=1920&q=80"
+        defaultImage="https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=1920&q=60&auto=format"
         defaultTitle="Gallery"
   defaultSubtitle="A visual archive of campus life at VWU — from national competitions and graduation days to cultural festivals and industry events."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'News & Awards', to: '/news-awards' }, { label: 'Gallery' }]}
@@ -176,7 +176,7 @@ export default function Gallery() {
                   data-delay={`${(i % 4) * 60}`}
                   onClick={() => setLightboxIndex(i)}
                 >
-                  <img src={photo.imageUrl} alt={photo.title} loading="lazy" />
+                  <img src={photo.imageUrl} alt={photo.title} />
                   <div className="pg-tile__overlay">
                     <span className="pg-tile__caption">{photo.title}</span>
                   </div>

@@ -32,7 +32,7 @@ export default function AcademicDownloads() {
       {/* Hero */}
       <PageHero
         page="academics-downloads"
-        defaultImage="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=1920&q=80"
+        defaultImage="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=1920&q=60&auto=format"
         defaultTitle="Academic Documents"
         defaultSubtitle="Official academic documents — calendar and regulations — available for download."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Academics', to: '/academics' }, { label: 'Academic Documents' }]}

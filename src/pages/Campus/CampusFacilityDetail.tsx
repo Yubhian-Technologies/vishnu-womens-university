@@ -112,7 +112,7 @@ export default function CampusFacilityDetail() {
     <main className="page-wrapper">
       <PageHero
         page={`campus-${facility.slug}`}
-        defaultImage="https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=1920&q=80"
+        defaultImage="https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=1920&q=60&auto=format"
         defaultTitle={facility.title}
         defaultSubtitle={facility.heroSubtitle ?? facility.desc}
         breadcrumb={[

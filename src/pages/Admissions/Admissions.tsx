@@ -13,6 +13,7 @@ import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import type { FaqDoc } from '../Admin/sections/FaqAdmin';
 import { NotebookPen, ClipboardList, Users, Phone, Mail, MapPin } from 'lucide-react';
 import { resolveContentIcon } from '../../lib/contentIcons';
+import { smoothScrollTo } from '../../lib/smoothScroll';
 
 interface RequestInfoForm {
   firstName: string;
@@ -173,7 +174,7 @@ export default function Admissions() {
       {/* Hero */}
       <PageHero
         page="admissions"
-        defaultImage="https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=1920&q=80"
+        defaultImage="https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=1920&q=60&auto=format"
         defaultTitle="Your Journey Starts Here"
   defaultSubtitle="Choosing VWU sets you on a path to a fulfilling engineering career, a strong professional network, and a future built on real achievement."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Admissions' }]}
@@ -245,7 +246,7 @@ export default function Admissions() {
             <button
               type="button"
               className="btn btn-primary btn-lg"
-              onClick={() => document.getElementById('admissions-contact')?.scrollIntoView({ behavior: 'smooth' })}
+              onClick={() => smoothScrollTo('#admissions-contact')}
             >
               Start Your Application
             </button>

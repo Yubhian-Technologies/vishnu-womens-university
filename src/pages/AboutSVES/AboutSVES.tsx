@@ -62,7 +62,7 @@ export default function AboutSVES() {
       {/* Hero */}
       <PageHero
         page="about-sves"
-        defaultImage="https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=1920&q=80"
+        defaultImage="https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=1920&q=60&auto=format"
         defaultTitle="Sri Vishnu Educational Society"
   defaultSubtitle="More than 25 years of educational commitment, spanning 11 institutions across Andhra Pradesh and Telangana."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Discover', to: '/' }, { label: 'About SVES' }]}
@@ -113,7 +113,6 @@ export default function AboutSVES() {
                 src={svesIntroImg.src}
                 alt={svesIntroImg.alt}
                 style={{ width: '100%', height: '420px', objectFit: 'cover', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-xl)' }}
-                loading="lazy"
               />
             </div>
           </div>
