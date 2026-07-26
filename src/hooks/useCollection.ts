@@ -17,7 +17,15 @@ export interface WithId extends DocumentData {
 /** Real-time listener for a Firestore collection */
 export function useCollection<T extends WithId>(
   collectionName: string,
-  constraints: QueryConstraint[] = []
+  constraints: QueryConstraint[] = [],
+  options?: {
+    /** Skip the site-wide "some content couldn't be loaded" banner for this
+     *  listener's errors — for collections with their own graceful fallback
+     *  (e.g. PlacementYearAccordion falling back to its built-in data), a
+     *  blocked/failed read is already handled and isn't worth alarming a
+     *  visitor about. */
+    silent?: boolean;
+  }
 ) {
   const [docs, setDocs] = useState<T[]>([]);
   const [loading, setLoading] = useState(true);
@@ -35,7 +43,7 @@ export function useCollection<T extends WithId>(
       (err) => {
         setError(err.message);
         setLoading(false);
-        reportFirestoreError(collectionName, err.message);
+        if (!options?.silent) reportFirestoreError(collectionName, err.message);
       }
     );
     return () => {
