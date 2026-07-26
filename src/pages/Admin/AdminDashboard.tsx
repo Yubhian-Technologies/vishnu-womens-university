@@ -35,6 +35,10 @@ import PoliciesAdmin from './sections/PoliciesAdmin';
 import TpoTeamPhotosAdmin from './sections/TpoTeamPhotosAdmin';
 import IloOfficePhotosAdmin from './sections/IloOfficePhotosAdmin';
 import GsacPhotosAdmin from './sections/GsacPhotosAdmin';
+import IicMemberPhotosAdmin from './sections/IicMemberPhotosAdmin';
+import TedxPhotosAdmin from './sections/TedxPhotosAdmin';
+import TiDspGalleryPhotosAdmin from './sections/TiDspGalleryPhotosAdmin';
+import ChipsToStartupPhotosAdmin from './sections/ChipsToStartupPhotosAdmin';
 
 interface Props {
   activeSection: string;
@@ -74,6 +78,10 @@ const SECTION_MAP: Record<string, React.ReactNode> = {
   'tpo-team-photos': <TpoTeamPhotosAdmin />,
   'ilo-office-photos': <IloOfficePhotosAdmin />,
   'gsac-photos': <GsacPhotosAdmin />,
+  'iic-member-photos': <IicMemberPhotosAdmin />,
+  'tedx-photos': <TedxPhotosAdmin />,
+  'ti-dsp-gallery-photos': <TiDspGalleryPhotosAdmin />,
+  'chips-to-startup-photos': <ChipsToStartupPhotosAdmin />,
   'news-awards-data': <NewsAwardsDataAdmin />,
   'research-items': <ResearchItemsAdmin />,
   'compliance-docs': <ComplianceDocsAdmin />,
