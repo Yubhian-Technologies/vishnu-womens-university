@@ -1,7 +1,5 @@
 import { initializeApp, type FirebaseOptions } from 'firebase/app';
 import { initializeFirestore } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
-import { getStorage } from 'firebase/storage';
 
 const firebaseConfig: FirebaseOptions = {
   apiKey: (import.meta.env.VITE_FIREBASE_API_KEY || 'AIzaSyBx7QuCoFweGI5BCbSRL2hu6yX97CFAXxs').trim() || '',
@@ -13,17 +11,15 @@ const firebaseConfig: FirebaseOptions = {
 };
 
 // Typed `any` deliberately: every call site across ~50 files (hooks, admin
-// sections) treats db/auth/storage as always-initialized, matching how this
-// app actually runs — the try/catch below is a defensive fallback for a
-// misconfigured local .env, not an expected production state. Typing these
-// as `Firestore | undefined` etc. would force null-checks into every one of
-// those call sites for a case that in practice doesn't happen; not worth
-// that blast radius for what's a real but low-severity gap.
+// sections) treats db as always-initialized, matching how this app actually
+// runs — the try/catch below is a defensive fallback for a misconfigured
+// local .env, not an expected production state. Typing this as
+// `Firestore | undefined` would force null-checks into every one of those
+// call sites for a case that in practice doesn't happen; not worth that
+// blast radius for what's a real but low-severity gap.
 /* eslint-disable @typescript-eslint/no-explicit-any */
 let app: any;
 let db: any;
-let auth: any;
-let storage: any;
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
 try {
@@ -31,10 +27,14 @@ try {
   // Some networks/antivirus/proxies reset Firestore's default WebChannel transport
   // (visible as net::ERR_CONNECTION_RESET); auto-detect falls back to long-polling.
   db = initializeFirestore(app, { experimentalAutoDetectLongPolling: true });
-  auth = getAuth(app);
-  storage = getStorage(app);
 } catch (error) {
   console.warn('Firebase initialization failed:', error);
 }
 
-export { db, auth, storage };
+// `auth`/`storage` deliberately live in a separate module (see firebaseAdmin.ts)
+// rather than being initialized here — they're only used by /admin (login +
+// image/PDF uploads), and every public page imports `db` from this file.
+// Keeping firebase/auth and firebase/storage out of this module is what keeps
+// them out of the public bundle too, since AdminLayout is the only thing that
+// pulls in firebaseAdmin.ts and it's already lazy-loaded behind /admin.
+export { app, db };

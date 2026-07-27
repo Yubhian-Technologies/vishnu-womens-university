@@ -39,7 +39,7 @@ export default function FacultyModal({ faculty, program, onClose }: FacultyModal
 
   return (
     <div className="faculty-modal-overlay" onClick={onClose}>
-      <div className="faculty-modal" onClick={(e) => e.stopPropagation()}>
+      <div className="faculty-modal" data-lenis-prevent onClick={(e) => e.stopPropagation()}>
         <button className="faculty-modal-close" onClick={onClose} aria-label="Close">
           <X size={18} />
         </button>

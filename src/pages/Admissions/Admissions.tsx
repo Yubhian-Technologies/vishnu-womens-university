@@ -58,11 +58,11 @@ const EMAILJS_TEMPLATE_ID_CONFIRMATION = import.meta.env.VITE_EMAILJS_TEMPLATE_I
 const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 
 const defaultAdmissionsPhotos = [
-  { src: 'https://images.unsplash.com/photo-1562774053-701939374585?w=800&q=80', alt: 'VWU campus buildings', caption: 'VWU Campus' },
-  { src: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=800&q=80', alt: 'Smart classrooms', caption: 'Smart Classrooms' },
-  { src: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&q=80', alt: 'Research labs', caption: 'Specialised Labs' },
-  { src: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&q=80', alt: 'Sports court', caption: 'Sports Facilities' },
-  { src: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&q=80', alt: 'Central library', caption: 'Central Library' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'VWU campus buildings', caption: 'VWU Campus' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Smart classrooms', caption: 'Smart Classrooms' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Research labs', caption: 'Specialised Labs' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Sports court', caption: 'Sports Facilities' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Central library', caption: 'Central Library' },
 ];
 
 const defaultUgPhotos = [

@@ -4,10 +4,11 @@ import PageHero from '../../components/PageHero/PageHero';
 import { BookOpen, Sparkle } from 'lucide-react';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { useSitePhotos } from '../../hooks/useSitePhotos';
+import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import { resolveContentIcon } from '../../lib/contentIcons';
 
 const defaultNssPhoto = [
-  { src: 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=900&q=80', alt: 'NSS community service', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'NSS community service', caption: '' },
 ];
 
 export default function SocialServices() {
@@ -66,13 +67,15 @@ export default function SocialServices() {
                 the humanitarian values that our founder Dr. B. V. Raju embodied throughout his life.
               </p>
             </div>
-            <div className="reveal-right">
-              <img
-                src={nssPhoto.src}
-                alt={nssPhoto.alt}
-                style={{ width: '100%', height: '400px', objectFit: 'cover', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-xl)' }}
-              />
-            </div>
+            {nssPhoto && (
+              <div>
+                <img
+                  src={nssPhoto.src}
+                  alt={nssPhoto.alt}
+                  style={{ width: '100%', height: '400px', objectFit: 'cover', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-xl)' }}
+                />
+              </div>
+            )}
           </div>
         </div>
       </section>

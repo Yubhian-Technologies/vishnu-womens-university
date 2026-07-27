@@ -12,13 +12,13 @@ import type { SvesCampusDoc } from '../Admin/sections/SvesCampusesAdmin';
 
 const defaultSvesPhotos = [
   // Slots 0-4: "Our Campuses" PhotoGrid gallery
-  { src: 'https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=800&q=80', alt: 'Green Meadows campus Bhimavaram', caption: 'Green Meadows — Bhimavaram' },
-  { src: 'https://images.unsplash.com/photo-1562774053-701939374585?w=800&q=80', alt: 'University buildings', caption: 'Academic Blocks' },
-  { src: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=800&q=80', alt: 'Students at campus event', caption: 'Student Events' },
-  { src: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=800&q=80', alt: 'Graduation ceremony', caption: 'Convocation' },
-  { src: 'https://images.unsplash.com/photo-1544531585-9847b68c8c86?w=800&q=80', alt: 'Academic conference', caption: 'Conferences & Seminars' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Green Meadows campus Bhimavaram', caption: 'Green Meadows — Bhimavaram' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'University buildings', caption: 'Academic Blocks' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Students at campus event', caption: 'Student Events' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Graduation ceremony', caption: 'Convocation' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Academic conference', caption: 'Conferences & Seminars' },
   // Slot 5: standalone SVES intro section image below
-  { src: 'https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=900&q=80', alt: 'SVES campus', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'SVES campus', caption: '' },
 ];
 
 const defaultSvesHeritagePhotos = [
@@ -107,13 +107,15 @@ export default function AboutSVES() {
                 educating over <strong> 50,000 students</strong> annually across engineering, pharmacy, dental, polytechnic, and school streams.
               </p>
             </div>
-            <div className="reveal-right">
-              <img
-                src={svesIntroImg.src}
-                alt={svesIntroImg.alt}
-                style={{ width: '100%', height: '420px', objectFit: 'cover', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-xl)' }}
-              />
-            </div>
+            {svesIntroImg && (
+              <div>
+                <img
+                  src={svesIntroImg.src}
+                  alt={svesIntroImg.alt}
+                  style={{ width: '100%', height: '420px', objectFit: 'cover', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-xl)' }}
+                />
+              </div>
+            )}
           </div>
         </div>
       </section>

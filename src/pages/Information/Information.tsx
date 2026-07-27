@@ -13,11 +13,11 @@ import { resolveContentIcon } from '../../lib/contentIcons';
 import './Information.css';
 
 const defaultInfoPhotos = [
-  { src: 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?w=800&q=80', alt: 'Green campus environment', caption: 'Green Campus' },
-  { src: 'https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=800&q=80', alt: 'Campus aerial view', caption: 'Bhimavaram Campus' },
-  { src: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&q=80', alt: 'Library resources', caption: 'e-Library' },
-  { src: 'https://images.unsplash.com/photo-1567521464027-f127ff144326?w=800&q=80', alt: 'Campus dining', caption: 'Food Courts' },
-  { src: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=800&q=80', alt: 'Students at orientation', caption: 'Freshers Orientation' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Green campus environment', caption: 'Green Campus' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Campus aerial view', caption: 'Bhimavaram Campus' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Library resources', caption: 'e-Library' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Campus dining', caption: 'Food Courts' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Students at orientation', caption: 'Freshers Orientation' },
 ];
 
 const defaultPlacementsCareersPhotos = [

@@ -22,15 +22,15 @@ function getInitials(name: string) {
 
 const defaultCampusPhotos = [
   // Slots 0-4: "Campus Life" PhotoGrid gallery
-  { src: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=800&q=80', alt: 'Smart classrooms at VWU', caption: 'Smart Classrooms' },
-  { src: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&q=80', alt: 'Research laboratories', caption: 'Research Labs' },
-  { src: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&q=80', alt: 'Central library', caption: 'Central Library' },
-  { src: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80', alt: 'Students studying', caption: 'Student Collaboration' },
-  { src: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&q=80', alt: 'Sports facilities', caption: 'Sports Facilities' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Smart classrooms at VWU', caption: 'Smart Classrooms' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Research laboratories', caption: 'Research Labs' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Central library', caption: 'Central Library' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Students studying', caption: 'Student Collaboration' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Sports facilities', caption: 'Sports Facilities' },
   // Slots 5-7: standalone single-image sections below
-  { src: 'https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=900&q=80', alt: 'VWU campus Bhimavaram', caption: '' },
-  { src: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=900&q=80', alt: 'VWU campus facilities', caption: '' },
-  { src: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=900&q=80', alt: 'Sri Vishnu Educational Society campus', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'VWU campus Bhimavaram', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'VWU campus facilities', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Sri Vishnu Educational Society campus', caption: '' },
 ];
 
 const defaultHistoryHeritagePhotos = [
@@ -175,13 +175,15 @@ export default function About() {
                 <Link to="/about-sves" className="btn btn-outline">About SVES</Link>
               </div>
             </div>
-            <div className="reveal-right">
-              <img
-                src={whoWeAreImg.src}
-                alt={whoWeAreImg.alt}
-                style={{ width: '100%', height: '460px', objectFit: 'cover', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-xl)' }}
-              />
-            </div>
+            {whoWeAreImg && (
+              <div>
+                <img
+                  src={whoWeAreImg.src}
+                  alt={whoWeAreImg.alt}
+                  style={{ width: '100%', height: '460px', objectFit: 'cover', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-xl)' }}
+                />
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -326,13 +328,15 @@ export default function About() {
       <section className="section bg-off-white">
         <div className="container">
           <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-12)', alignItems: 'center' }}>
-            <div className="reveal-left">
-              <img
-                src={campusSnapshotImg.src}
-                alt={campusSnapshotImg.alt}
-                style={{ width: '100%', height: '360px', objectFit: 'cover', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-xl)' }}
-              />
-            </div>
+            {campusSnapshotImg && (
+              <div>
+                <img
+                  src={campusSnapshotImg.src}
+                  alt={campusSnapshotImg.alt}
+                  style={{ width: '100%', height: '360px', objectFit: 'cover', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-xl)' }}
+                />
+              </div>
+            )}
             <div className="reveal-right">
               <span className="section-label">Campus Life</span>
               <h2 className="section-title">Purpose-Built Infrastructure</h2>
@@ -364,13 +368,15 @@ export default function About() {
               </p>
               <Link to="/about-sves" className="btn btn-accent">Learn About SVES →</Link>
             </div>
-            <div className="reveal-right" style={{ borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
-              <img
-                src={parentSocietyImg.src}
-                alt={parentSocietyImg.alt}
-                style={{ width: '100%', height: '380px', objectFit: 'cover' }}
-              />
-            </div>
+            {parentSocietyImg && (
+              <div style={{ borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
+                <img
+                  src={parentSocietyImg.src}
+                  alt={parentSocietyImg.alt}
+                  style={{ width: '100%', height: '380px', objectFit: 'cover' }}
+                />
+              </div>
+            )}
           </div>
         </div>
       </section>

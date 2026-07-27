@@ -19,6 +19,17 @@ import { chipsToStartup } from './chipsToStartup.data';
 import { vsac, type VsacMember, type SimpleTable, type TrainingResearchItem, type CollaborationItem } from './vsac.data';
 import { arVrStudio } from './arVrStudio.data';
 import { vehicleDesignLab, type VdlFacilityPhase } from './vehicleDesignLab.data';
+import {
+  assistiveTechLab,
+  type AtlMember,
+  type AtlBatchGroup,
+  type AtlProject,
+  type AtlActivity,
+  type AtlBlock,
+  type AtlSeminarYear,
+  type AtlOutcomeEvent,
+  type AtlYearTraining,
+} from './assistiveTechLab.data';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import '../detail-layout.css';
 
@@ -1085,6 +1096,559 @@ function VsacInnerAccordion({ titles, children }: { titles: string[]; children: 
   );
 }
 
+function AtlMemberCard({ member }: { member?: AtlMember }) {
+  if (!member) {
+    return (
+      <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)' }}>
+        Content for this section is coming soon.
+      </p>
+    );
+  }
+  const isIrins = member.profileLink?.includes('irins.org');
+  return (
+    <div style={{ border: '1.5px solid var(--color-accent)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4)', maxWidth: 380, display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+      <p style={{ margin: 0, fontSize: 'var(--text-sm)', color: 'var(--color-text)' }}><strong>Name:</strong> {member.name}</p>
+      {member.designation && <p style={{ margin: 0, fontSize: 'var(--text-sm)', color: 'var(--color-text)' }}><strong>Designation:</strong> {member.designation}</p>}
+      {member.email && (
+        <p style={{ margin: 0, fontSize: 'var(--text-sm)', color: 'var(--color-text)' }}>
+          <strong>Email Id:</strong> <a href={`mailto:${member.email}`} style={{ color: 'var(--color-primary)', fontWeight: 600 }}>{member.email}</a>
+        </p>
+      )}
+      {member.mobile && (
+        <p style={{ margin: 0, fontSize: 'var(--text-sm)', color: 'var(--color-text)' }}>
+          <strong>Mobile No:</strong> <a href={`tel:${member.mobile}`} style={{ color: 'var(--color-primary)', fontWeight: 600 }}>{member.mobile}</a>
+        </p>
+      )}
+      {member.interests && <p style={{ margin: 0, fontSize: 'var(--text-sm)', color: 'var(--color-text)' }}><strong>Areas of Interest:</strong> {member.interests}</p>}
+      {member.profileLink && (
+        <a href={member.profileLink} target="_blank" rel="noopener noreferrer" style={{ fontSize: 'var(--text-sm)', color: 'var(--color-accent-dark, var(--color-accent))', fontWeight: 600, marginTop: 'var(--space-1)' }}>
+          {isIrins ? 'Shri Vishnu Engineering College for Women (irins.org)' : member.profileLink}
+        </a>
+      )}
+    </div>
+  );
+}
+
+function AtlTeamSection({ team }: { team: typeof assistiveTechLab.team }) {
+  const [activeTab, setActiveTab] = useState<'ATL Dean' | 'In-Charge' | 'Faculty Members'>('ATL Dean');
+  const tabs = ['ATL Dean', 'In-Charge', 'Faculty Members'] as const;
+  return (
+    <div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', overflow: 'hidden', marginBottom: 'var(--space-5)' }}>
+        {tabs.map((tab) => {
+          const isActive = activeTab === tab;
+          return (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              style={{
+                flex: '1 1 33%',
+                padding: 'var(--space-3) var(--space-4)',
+                border: 'none',
+                background: isActive ? 'var(--color-primary)' : 'var(--color-off-white)',
+                color: isActive ? 'var(--color-white)' : 'var(--color-primary)',
+                fontWeight: 700,
+                fontSize: 'var(--text-sm)',
+                cursor: 'pointer',
+              }}
+            >
+              {tab}
+            </button>
+          );
+        })}
+      </div>
+      {activeTab === 'ATL Dean' ? (
+        <AtlMemberCard member={team.dean} />
+      ) : activeTab === 'In-Charge' ? (
+        <AtlMemberCard member={team.inCharge} />
+      ) : (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--space-5)' }}>
+          {team.facultyMembers.map((m) => <AtlMemberCard key={m.name} member={m} />)}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function AtlBatchTable({ groups, showMentors = true, showBatchName = false }: { groups: AtlBatchGroup[]; showMentors?: boolean; showBatchName?: boolean }) {
+  const headers = [
+    'Batch No.',
+    ...(showBatchName ? ['Name of the Batch'] : []),
+    'Regd.No',
+    'Name of the Student',
+    'Department',
+    ...(showMentors ? ['Mentors'] : []),
+    'Selected Project',
+  ];
+  return (
+    <div style={{ overflowX: 'auto', marginBottom: 'var(--space-5)' }}>
+      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <thead>
+          <tr>
+            {headers.map((h) => <th key={h} style={TI_DSP_TABLE_TH_STYLE}>{h}</th>)}
+          </tr>
+        </thead>
+        <tbody>
+          {groups.map((group) => (
+            <Fragment key={group.batchNo}>
+              {group.members.map((m, mi) => (
+                <tr key={`${group.batchNo}-${mi}`} style={{ background: group.batchNo % 2 === 0 ? 'var(--color-off-white)' : 'var(--color-white)' }}>
+                  {mi === 0 && (
+                    <td rowSpan={group.members.length} style={{ ...TI_DSP_TABLE_TD_STYLE, fontWeight: 700, textAlign: 'center' }}>
+                      {group.batchNo}
+                    </td>
+                  )}
+                  {showBatchName && mi === 0 && (
+                    <td rowSpan={group.members.length} style={{ ...TI_DSP_TABLE_TD_STYLE, fontWeight: 700 }}>{group.batchName}</td>
+                  )}
+                  <td style={TI_DSP_TABLE_TD_STYLE}>{m.regdNo}</td>
+                  <td style={TI_DSP_TABLE_TD_STYLE}>{m.name}</td>
+                  <td style={TI_DSP_TABLE_TD_STYLE}>{m.department}</td>
+                  {showMentors && mi === 0 && (
+                    <td rowSpan={group.members.length} style={TI_DSP_TABLE_TD_STYLE}>{group.mentors}</td>
+                  )}
+                  {mi === 0 && (
+                    <td rowSpan={group.members.length} style={TI_DSP_TABLE_TD_STYLE}>{group.selectedProject}</td>
+                  )}
+                </tr>
+              ))}
+            </Fragment>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function AtlProjectsTable({ projects, photos }: { projects: AtlProject[]; photos: (WithId & { imageUrl: string })[] }) {
+  return (
+    <div style={{ overflowX: 'auto' }}>
+      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <thead>
+          <tr>
+            <th style={TI_DSP_TABLE_TH_STYLE}>Title</th>
+            <th style={TI_DSP_TABLE_TH_STYLE}>Description</th>
+            <th style={TI_DSP_TABLE_TH_STYLE}>Prototype</th>
+          </tr>
+        </thead>
+        <tbody>
+          {projects.map((p, i) => (
+            <tr key={p.title} style={{ background: i % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)' }}>
+              <td style={{ ...TI_DSP_TABLE_TD_STYLE, fontWeight: 700 }}>{p.title}</td>
+              <td style={TI_DSP_TABLE_TD_STYLE}>{p.description}</td>
+              <td style={TI_DSP_TABLE_TD_STYLE}>
+                {photos[i] ? (
+                  <img src={photos[i].imageUrl} alt={p.title} style={{ width: 120, height: 90, objectFit: 'cover', borderRadius: 'var(--radius-sm)' }} />
+                ) : (
+                  <span style={{ color: 'var(--color-text-light)', fontSize: 'var(--text-xs)' }}>Photo coming soon</span>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function AtlBlockRenderer({ block }: { block: AtlBlock }) {
+  switch (block.type) {
+    case 'meta':
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)', marginBottom: 'var(--space-4)' }}>
+          {block.items.map((m) => (
+            <p key={m.label} style={{ margin: 0, fontSize: 'var(--text-sm)', color: 'var(--color-text)' }}>
+              <strong>{m.label}:</strong> {m.value}
+            </p>
+          ))}
+        </div>
+      );
+    case 'paragraph':
+      return (
+        <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-4)' }}>
+          {block.text}
+        </p>
+      );
+    case 'heading':
+      return <SectionHeading>{block.text}</SectionHeading>;
+    case 'bullets':
+      return (
+        <div style={{ marginBottom: 'var(--space-4)' }}>
+          <CheckBullets items={block.items} />
+        </div>
+      );
+    case 'boldBullets':
+      return (
+        <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 var(--space-4)', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+          {block.items.map((b, i) => (
+            <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-2)' }}>
+              <span style={{ width: 18, height: 18, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
+                <svg width="9" height="9" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </span>
+              <span style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.6 }}>
+                <strong>{b.lead}</strong>{b.text}
+              </span>
+            </li>
+          ))}
+        </ul>
+      );
+    case 'numbered':
+      return (
+        <ol style={{ paddingLeft: 'var(--space-6)', marginBottom: 'var(--space-4)', display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+          {block.items.map((item, i) => (
+            <li key={i} style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)' }}>{item}</li>
+          ))}
+        </ol>
+      );
+    case 'table':
+      return (
+        <div style={{ marginBottom: 'var(--space-4)' }}>
+          {block.title && (
+            <p style={{ fontWeight: 700, color: 'var(--color-primary)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-2)' }}>{block.title}:</p>
+          )}
+          <VsacSimpleTable table={block.table} />
+        </div>
+      );
+    default:
+      return null;
+  }
+}
+
+function AtlActivitySection({ activity, photos }: { activity: AtlActivity; photos: (WithId & { imageUrl: string })[] }) {
+  return (
+    <div>
+      {activity.blocks.map((block, i) => <AtlBlockRenderer key={i} block={block} />)}
+      <div>
+        <p style={{ fontWeight: 700, color: 'var(--color-primary)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-2)' }}>Photographs:</p>
+        {photos.length > 0 ? (
+          <PhotoGrid photos={photos} alt={activity.title} />
+        ) : (
+          <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text-light)', margin: 0 }}>
+            Content for this section is coming soon.
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function AtlSeminarsSection({ seminars }: { seminars: AtlSeminarYear[] }) {
+  const [activeYear, setActiveYear] = useState(0);
+  return (
+    <div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)', marginBottom: 'var(--space-5)' }}>
+        {seminars.map((s, i) => {
+          const isActive = activeYear === i;
+          return (
+            <button
+              key={s.year}
+              onClick={() => setActiveYear(i)}
+              style={{
+                padding: 'var(--space-2) var(--space-4)',
+                border: 'none',
+                borderRadius: 'var(--radius-md)',
+                background: isActive ? 'var(--color-primary)' : 'var(--color-off-white)',
+                color: isActive ? 'var(--color-white)' : 'var(--color-primary)',
+                fontWeight: 700,
+                fontSize: 'var(--text-sm)',
+                cursor: 'pointer',
+              }}
+            >
+              {s.year}
+            </button>
+          );
+        })}
+      </div>
+      <CheckBullets items={seminars[activeYear].items} />
+    </div>
+  );
+}
+
+function AtlOutcomesGallerySection({
+  outcomes,
+  summitTable,
+  atlInNewsCaption,
+  regionalPhotos,
+  iitPhotos,
+  newsPhotos,
+}: {
+  outcomes: AtlOutcomeEvent[];
+  summitTable: { title: string; headers: string[]; rows: string[][] };
+  atlInNewsCaption: string;
+  regionalPhotos: (WithId & { imageUrl: string })[];
+  iitPhotos: (WithId & { imageUrl: string })[];
+  newsPhotos: (WithId & { imageUrl: string })[];
+}) {
+  const [activeTab, setActiveTab] = useState<'Outcomes' | 'Gallery'>('Outcomes');
+  return (
+    <div>
+      <div style={{ display: 'flex', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', overflow: 'hidden', marginBottom: 'var(--space-5)' }}>
+        {(['Outcomes', 'Gallery'] as const).map((tab) => {
+          const isActive = activeTab === tab;
+          return (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              style={{
+                flex: 1,
+                padding: 'var(--space-3) var(--space-5)',
+                border: 'none',
+                background: isActive ? 'var(--color-primary)' : 'var(--color-off-white)',
+                color: isActive ? 'var(--color-white)' : 'var(--color-primary)',
+                fontWeight: 700,
+                fontSize: 'var(--text-sm)',
+                cursor: 'pointer',
+              }}
+            >
+              {tab}
+            </button>
+          );
+        })}
+      </div>
+      {activeTab === 'Outcomes' ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-8)' }}>
+          {outcomes.map((event) => (
+            <div key={event.title}>
+              <h4 style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>{event.title}</h4>
+              <AtlBatchTable groups={event.batches} showMentors={false} />
+            </div>
+          ))}
+          <div>
+            <h4 style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>{summitTable.title}</h4>
+            <VsacSimpleTable table={summitTable} />
+          </div>
+        </div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-8)' }}>
+          <div>
+            <h4 style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>{outcomes[0]?.title}</h4>
+            {regionalPhotos.length > 0 ? (
+              <PhotoGrid photos={regionalPhotos} alt={outcomes[0]?.title || ''} />
+            ) : (
+              <p style={{ color: 'var(--color-text-light)', margin: 0 }}>Content for this section is coming soon.</p>
+            )}
+          </div>
+          <div>
+            <h4 style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>{outcomes[1]?.title}</h4>
+            {iitPhotos.length > 0 ? (
+              <PhotoGrid photos={iitPhotos} alt={outcomes[1]?.title || ''} />
+            ) : (
+              <p style={{ color: 'var(--color-text-light)', margin: 0 }}>Content for this section is coming soon.</p>
+            )}
+          </div>
+          <div>
+            <h4 style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>ATL in News</h4>
+            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', marginBottom: 'var(--space-3)' }}>{atlInNewsCaption}</p>
+            {newsPhotos.length > 0 ? (
+              <PhotoGrid photos={newsPhotos} alt="ATL in News" />
+            ) : (
+              <p style={{ color: 'var(--color-text-light)', margin: 0 }}>Content for this section is coming soon.</p>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+const ATL_ACTIVITY_PHOTO_KEYS = [
+  'zion-2023-24',
+  'day-2023-24',
+  'day-2024-25',
+  'trance-2024-25',
+  'zion-2025-26',
+  'day-2025-26',
+  'regional-meet-2025-26',
+  'jntu-kakinada-2025-26',
+  'rtih-2025-26',
+  'rajahmundry-expo-2025-26',
+];
+
+function AtlTrainingResearchSection({
+  years,
+  projectPhotosByYear,
+}: {
+  years: AtlYearTraining[];
+  projectPhotosByYear: (WithId & { imageUrl: string })[][];
+}) {
+  const [activeYear, setActiveYear] = useState(0);
+  const year = years[activeYear];
+  return (
+    <div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)', marginBottom: 'var(--space-5)' }}>
+        {years.map((y, i) => {
+          const isActive = activeYear === i;
+          return (
+            <button
+              key={y.yearLabel}
+              onClick={() => setActiveYear(i)}
+              style={{
+                padding: 'var(--space-2) var(--space-4)',
+                border: 'none',
+                borderRadius: 'var(--radius-md)',
+                background: isActive ? 'var(--color-primary)' : 'var(--color-off-white)',
+                color: isActive ? 'var(--color-white)' : 'var(--color-primary)',
+                fontWeight: 700,
+                fontSize: 'var(--text-sm)',
+                cursor: 'pointer',
+              }}
+            >
+              {y.yearLabel}
+            </button>
+          );
+        })}
+      </div>
+      {year.pdfHref && (
+        <p style={{ marginBottom: 'var(--space-5)' }}>
+          <a
+            href={year.pdfHref}
+            download
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-primary)', background: 'var(--color-off-white)', padding: 'var(--space-2) var(--space-4)', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-light-gray)' }}
+          >
+            ⬇ Download {year.yearLabel} Report (PDF)
+          </a>
+        </p>
+      )}
+      <VsacInnerAccordion titles={['Details of Bridge Course in ATL Lab', 'ATL Lab Projects']}>
+        {(si) => si === 0 ? (
+          <VsacSimpleTable table={year.bridgeCourse} />
+        ) : (
+          <AtlProjectsTable projects={year.projects} photos={projectPhotosByYear[activeYear] ?? []} />
+        )}
+      </VsacInnerAccordion>
+    </div>
+  );
+}
+
+function AtlAccordion({
+  data,
+  photoMap,
+}: {
+  data: typeof assistiveTechLab;
+  photoMap: Record<string, (WithId & { imageUrl: string })[]>;
+}) {
+  const sections = [
+    'Faculty Members',
+    'Training/ Research or Academic Projects',
+    'Students & Collaborations',
+    'Clients',
+    'Testimonials',
+    'Seminars',
+    'Activities',
+    'People',
+    'Publications',
+    'Outcomes & Gallery',
+  ];
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const activityPhotosBySection = ATL_ACTIVITY_PHOTO_KEYS.map((k) => photoMap[k] ?? []);
+  const trainingProjectPhotos = [
+    photoMap['projects-2025-26'] ?? [],
+    photoMap['projects-2024-25'] ?? [],
+    photoMap['projects-2023-24'] ?? [],
+  ];
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 2, marginTop: 'var(--space-6)' }}>
+      {sections.map((title, i) => {
+        const isOpen = openIndex === i;
+        return (
+          <div key={title}>
+            <button
+              onClick={() => setOpenIndex(isOpen ? null : i)}
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                background: isOpen ? 'var(--color-primary)' : 'var(--color-off-white)',
+                border: 'none',
+                padding: 'var(--space-3) var(--space-5)',
+                cursor: 'pointer',
+                textAlign: 'left',
+              }}
+            >
+              <span style={{ fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-primary)', fontSize: 'var(--text-base)' }}>{title}</span>
+              <span style={{ fontSize: '1.2rem', fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-text)', lineHeight: 1 }}>{isOpen ? '−' : '+'}</span>
+            </button>
+            {isOpen && (
+              <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderTop: 'none' }}>
+                {title === 'Faculty Members' && <AtlTeamSection team={data.team} />}
+
+                {title === 'Training/ Research or Academic Projects' && (
+                  <AtlTrainingResearchSection years={data.trainingByYear} projectPhotosByYear={trainingProjectPhotos} />
+                )}
+
+                {title === 'Students & Collaborations' && (
+                  <VsacInnerAccordion titles={[data.studentsBenefitted.yearLabel, data.studentsBenefitted2024.yearLabel, 'ATL Selected Students (2025-26)', 'Collaborations']}>
+                    {(si) => {
+                      if (si === 0) return <AtlBatchTable groups={data.studentsBenefitted.batches} showMentors />;
+                      if (si === 1) return <AtlBatchTable groups={data.studentsBenefitted2024.batches} showMentors showBatchName />;
+                      if (si === 2) return <VsacSimpleTable table={data.selectedStudents2025} />;
+                      return <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, margin: 0 }}>{data.collaborations}</p>;
+                    }}
+                  </VsacInnerAccordion>
+                )}
+
+                {title === 'Clients' && (
+                  <ol style={{ paddingLeft: 'var(--space-6)', margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                    {data.clients.map((c, ci) => <li key={ci} style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)' }}>{c}</li>)}
+                  </ol>
+                )}
+
+                {title === 'Testimonials' && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
+                    {data.testimonials.map((t, ti) => (
+                      <div key={ti} style={{ paddingBottom: 'var(--space-4)', borderBottom: ti < data.testimonials.length - 1 ? '1px solid var(--color-light-gray)' : 'none' }}>
+                        <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', fontStyle: 'italic', lineHeight: 1.7, marginBottom: 'var(--space-2)' }}>"{t.quote}"</p>
+                        <p style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-primary)', margin: 0 }}>{t.author}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {title === 'Seminars' && <AtlSeminarsSection seminars={data.seminars} />}
+
+                {title === 'Activities' && (
+                  <VsacInnerAccordion titles={data.activities.map((a) => a.title)}>
+                    {(si) => <AtlActivitySection activity={data.activities[si]} photos={activityPhotosBySection[si] ?? []} />}
+                  </VsacInnerAccordion>
+                )}
+
+                {title === 'People' && (
+                  <div>
+                    <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-3)' }}>{data.people.institutionsIntro}</p>
+                    <CheckBullets items={data.people.institutions} />
+                    {data.people.facultyParagraph.split('\n').map((para, pi) => (
+                      <p key={pi} style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-3)' }}>{para}</p>
+                    ))}
+                  </div>
+                )}
+
+                {title === 'Publications' && (
+                  <ol style={{ paddingLeft: 'var(--space-6)', margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                    {data.publications.map((p, pi) => <li key={pi} style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.6 }}>{p}</li>)}
+                  </ol>
+                )}
+
+                {title === 'Outcomes & Gallery' && (
+                  <AtlOutcomesGallerySection
+                    outcomes={data.outcomes}
+                    summitTable={data.summitTable}
+                    atlInNewsCaption={data.atlInNewsCaption}
+                    regionalPhotos={photoMap['outcomes-regional-meet-2023-24'] ?? []}
+                    iitPhotos={photoMap['outcomes-iit-madras-2023-24'] ?? []}
+                    newsPhotos={photoMap['outcomes-news-2023-24'] ?? []}
+                  />
+                )}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function VsacTrainingResearchSection({ items }: { items: TrainingResearchItem[] }) {
   return (
     <VsacInnerAccordion titles={items.map((it) => it.title)}>
@@ -1838,6 +2402,22 @@ export default function DifferentiatorDetail() {
   const { docs: c2sActivityPhotos } = useCollection<WithId & { imageUrl: string }>('chipsToStartupActivityPhotos', [orderBy('order', 'asc')], { silent: true });
   const { docs: c2sOutcomePhotos } = useCollection<WithId & { imageUrl: string }>('chipsToStartupOutcomePhotos', [orderBy('order', 'asc')], { silent: true });
   const { docs: vsacGalleryPhotos } = useCollection<WithId & { imageUrl: string }>('vsacGalleryPhotos', [orderBy('order', 'asc')], { silent: true });
+  const { docs: atlProjectPhotos2023 } = useCollection<WithId & { imageUrl: string }>('atlProjectPrototypePhotos', [orderBy('order', 'asc')], { silent: true });
+  const { docs: atlProjectPhotos2024 } = useCollection<WithId & { imageUrl: string }>('atlProjectPrototypePhotos2024', [orderBy('order', 'asc')], { silent: true });
+  const { docs: atlProjectPhotos2025 } = useCollection<WithId & { imageUrl: string }>('atlProjectPrototypePhotos2025', [orderBy('order', 'asc')], { silent: true });
+  const { docs: atlZionPhotos } = useCollection<WithId & { imageUrl: string }>('atlZionVisitPhotos', [orderBy('order', 'asc')], { silent: true });
+  const { docs: atlDayPhotos } = useCollection<WithId & { imageUrl: string }>('atlDayEventPhotos', [orderBy('order', 'asc')], { silent: true });
+  const { docs: atlDay2024Photos } = useCollection<WithId & { imageUrl: string }>('atlDay2024EventPhotos', [orderBy('order', 'asc')], { silent: true });
+  const { docs: atlTrance2025Photos } = useCollection<WithId & { imageUrl: string }>('atlTrance2025Photos', [orderBy('order', 'asc')], { silent: true });
+  const { docs: atlZion2025Photos } = useCollection<WithId & { imageUrl: string }>('atlZion2025VisitPhotos', [orderBy('order', 'asc')], { silent: true });
+  const { docs: atlDay2025Photos } = useCollection<WithId & { imageUrl: string }>('atlDay2025EventPhotos', [orderBy('order', 'asc')], { silent: true });
+  const { docs: atlRegionalMeet2025Photos } = useCollection<WithId & { imageUrl: string }>('atlRegionalMeet2025Photos', [orderBy('order', 'asc')], { silent: true });
+  const { docs: atlJntuKakinadaPhotos } = useCollection<WithId & { imageUrl: string }>('atlJntuKakinadaPhotos', [orderBy('order', 'asc')], { silent: true });
+  const { docs: atlRtihPhotos } = useCollection<WithId & { imageUrl: string }>('atlRtihPhotos', [orderBy('order', 'asc')], { silent: true });
+  const { docs: atlRajahmundryExpoPhotos } = useCollection<WithId & { imageUrl: string }>('atlRajahmundryExpoPhotos', [orderBy('order', 'asc')], { silent: true });
+  const { docs: atlRegionalMeetPhotos } = useCollection<WithId & { imageUrl: string }>('atlGalleryRegionalMeetPhotos', [orderBy('order', 'asc')], { silent: true });
+  const { docs: atlIitMadrasPhotos } = useCollection<WithId & { imageUrl: string }>('atlGalleryIitMadrasPhotos', [orderBy('order', 'asc')], { silent: true });
+  const { docs: atlNewsPhotos } = useCollection<WithId & { imageUrl: string }>('atlGalleryNewsPhotos', [orderBy('order', 'asc')], { silent: true });
   const item = allItems.find((i) => i.slug === slug) ?? null;
   const category = item ? DIFFERENTIATOR_CATEGORIES.find((c) => c.id === item.category) : null;
 
@@ -1873,6 +2453,7 @@ export default function DifferentiatorDetail() {
   const vsacPage = item.slug === 'vsac' ? vsac : null;
   const arVr = item.slug === 'ar-vr-studio' ? arVrStudio : null;
   const vdl = item.slug === 'vehicle-design-lab' ? vehicleDesignLab : null;
+  const atl = item.slug === 'assistive-tech-lab' ? assistiveTechLab : null;
 
   return (
     <main className="page-wrapper">
@@ -1910,7 +2491,56 @@ export default function DifferentiatorDetail() {
             <div>
               <span className="section-label">Overview</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>{ultraTech ? ultraTech.pageTitle : arVr ? arVr.pageTitle : `About ${item.title}`}</h2>
-              {arVr ? (
+              {atl ? (
+                <>
+                  {atl.paragraphs.map((para, i) => (
+                    <p key={i} style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-4)' }}>
+                      {para}
+                    </p>
+                  ))}
+
+                  {atl.vision && (
+                    <div>
+                      <SectionHeading>Vision</SectionHeading>
+                      <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-6)' }}>
+                        {atl.vision}
+                      </p>
+                    </div>
+                  )}
+
+                  <div>
+                    <SectionHeading>Mission</SectionHeading>
+                    <CheckBullets items={atl.mission} />
+                  </div>
+
+                  <div>
+                    <SectionHeading>Objectives</SectionHeading>
+                    <CheckBullets items={atl.objectives} />
+                  </div>
+
+                  <AtlAccordion
+                    data={atl}
+                    photoMap={{
+                      'projects-2023-24': atlProjectPhotos2023,
+                      'projects-2024-25': atlProjectPhotos2024,
+                      'projects-2025-26': atlProjectPhotos2025,
+                      'zion-2023-24': atlZionPhotos,
+                      'day-2023-24': atlDayPhotos,
+                      'day-2024-25': atlDay2024Photos,
+                      'trance-2024-25': atlTrance2025Photos,
+                      'zion-2025-26': atlZion2025Photos,
+                      'day-2025-26': atlDay2025Photos,
+                      'regional-meet-2025-26': atlRegionalMeet2025Photos,
+                      'jntu-kakinada-2025-26': atlJntuKakinadaPhotos,
+                      'rtih-2025-26': atlRtihPhotos,
+                      'rajahmundry-expo-2025-26': atlRajahmundryExpoPhotos,
+                      'outcomes-regional-meet-2023-24': atlRegionalMeetPhotos,
+                      'outcomes-iit-madras-2023-24': atlIitMadrasPhotos,
+                      'outcomes-news-2023-24': atlNewsPhotos,
+                    }}
+                  />
+                </>
+              ) : arVr ? (
                 <>
                   <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-6)' }}>
                     {arVr.overview}

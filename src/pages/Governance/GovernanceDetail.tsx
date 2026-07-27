@@ -51,7 +51,13 @@ export default function GovernanceDetail() {
   }, [item]);
 
   if (!item) {
-    if (govLoading) return null;
+    if (govLoading) {
+      return (
+        <main className="route-fallback">
+          <div className="route-fallback__spinner" />
+        </main>
+      );
+    }
     return <Navigate to="/governance" replace />;
   }
 

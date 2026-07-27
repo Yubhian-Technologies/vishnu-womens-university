@@ -12,18 +12,18 @@ import { resolveCampusFacility } from './campusFacilities.data';
 import { Building } from 'lucide-react';
 
 const defaultCampusGalleryPhotos = [
-  { src: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=800&q=80', alt: 'Smart classrooms', caption: 'Smart Classrooms' },
-  { src: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&q=80', alt: 'Research labs', caption: 'Research Labs' },
-  { src: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&q=80', alt: 'Central library', caption: 'Central Library' },
-  { src: 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=800&q=80', alt: 'Campus hostel', caption: 'Student Hostels' },
-  { src: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&q=80', alt: 'Sports facilities', caption: 'Sports Courts' },
-  { src: 'https://images.unsplash.com/photo-1567521464027-f127ff144326?w=800&q=80', alt: 'Campus dining', caption: 'Food Courts' },
-  { src: 'https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=800&q=80', alt: 'Campus life', caption: 'Green Campus' },
-  { src: 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?w=800&q=80', alt: 'Green environment', caption: 'Campus Gardens' },
-  { src: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&q=80', alt: 'Events auditorium', caption: 'Main Auditorium' },
-  { src: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=800&q=80', alt: 'Technical events', caption: 'Technova Symposium' },
-  { src: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80', alt: 'Students studying', caption: 'Collaborative Learning' },
-  { src: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=800&q=80', alt: 'Campus events', caption: 'Cultural Programs' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Smart classrooms', caption: 'Smart Classrooms' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Research labs', caption: 'Research Labs' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Central library', caption: 'Central Library' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Campus hostel', caption: 'Student Hostels' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Sports facilities', caption: 'Sports Courts' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Campus dining', caption: 'Food Courts' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Campus life', caption: 'Green Campus' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Green environment', caption: 'Campus Gardens' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Events auditorium', caption: 'Main Auditorium' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Technical events', caption: 'Technova Symposium' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Students studying', caption: 'Collaborative Learning' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Campus events', caption: 'Cultural Programs' },
 ];
 
 const defaultFacilitiesPhotos = [

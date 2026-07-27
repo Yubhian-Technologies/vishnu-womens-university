@@ -11,15 +11,15 @@ import { Radio, GraduationCap, Target, Check } from 'lucide-react';
 
 const defaultStudentLifePhotos = [
   // Slots 0-4: "Campus Moments" PhotoGrid gallery
-  { src: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&q=80', alt: 'Cultural events', caption: 'Cultural Events' },
-  { src: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&q=80', alt: 'Sports activities', caption: 'Sports & Fitness' },
-  { src: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=800&q=80', alt: 'Campus festivals', caption: 'Campus Festivals' },
-  { src: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=800&q=80', alt: 'Student clubs and workshops', caption: 'Club Activities' },
-  { src: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80', alt: 'Study groups and projects', caption: 'Teamwork' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Cultural events', caption: 'Cultural Events' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Sports activities', caption: 'Sports & Fitness' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Campus festivals', caption: 'Campus Festivals' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Student clubs and workshops', caption: 'Club Activities' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Study groups and projects', caption: 'Teamwork' },
   // Slots 5-7: standalone single-image sections below
-  { src: 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=900&q=80', alt: "Women's hostel at VWU", caption: '' },
-  { src: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&q=80', alt: 'VWU sports and athletics', caption: '' },
-  { src: 'https://images.unsplash.com/photo-1567521464027-f127ff144326?w=900&q=80', alt: 'Campus dining hall', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: "Women's hostel at VWU", caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'VWU sports and athletics', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Campus dining hall', caption: '' },
 ];
 
 const defaultSportsRecreationPhotos = [
@@ -144,13 +144,17 @@ export default function StudentLife() {
 
       {/* Housing */}
       <section className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', minHeight: '480px' }}>
-        <div className="reveal-left" style={{ position: 'relative', overflow: 'hidden' }}>
-          <img
-            src={hostelImg.src}
-            alt={hostelImg.alt}
-            style={{ width: '100%', height: '100%', objectFit: 'cover', minHeight: '380px' }}
-          />
-          <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,28,84,0.25)' }} />
+        <div style={{ position: 'relative', overflow: 'hidden', background: 'var(--color-primary-dark)' }}>
+          {hostelImg && (
+            <>
+              <img
+                src={hostelImg.src}
+                alt={hostelImg.alt}
+                style={{ width: '100%', height: '100%', objectFit: 'cover', minHeight: '380px' }}
+              />
+              <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,28,84,0.25)' }} />
+            </>
+          )}
         </div>
         <div className="reveal-right" style={{ background: 'var(--color-primary)', padding: 'var(--space-12) var(--space-10)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           <span className="section-label" style={{ color: 'var(--color-accent)' }}>Campus Hostels</span>
@@ -182,11 +186,13 @@ export default function StudentLife() {
                 inter-college competitions, and participation in state-level tournaments.
               </p>
             </div>
-            <img
-              src={athleticsImg.src}
-              alt={athleticsImg.alt}
-              className="sl-athletics-image reveal-scale"
-            />
+            {athleticsImg && (
+              <img
+                src={athleticsImg.src}
+                alt={athleticsImg.alt}
+                className="sl-athletics-image"
+              />
+            )}
           </div>
           <div className="sl-sports-grid">
             {athletics.map((s) => {
@@ -257,13 +263,15 @@ export default function StudentLife() {
                 ))}
               </div>
             </div>
-            <div className="reveal-right" style={{ borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
-              <img
-                src={diningImg.src}
-                alt={diningImg.alt}
-                style={{ width: '100%', height: '320px', objectFit: 'cover' }}
-              />
-            </div>
+            {diningImg && (
+              <div style={{ borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
+                <img
+                  src={diningImg.src}
+                  alt={diningImg.alt}
+                  style={{ width: '100%', height: '320px', objectFit: 'cover' }}
+                />
+              </div>
+            )}
           </div>
         </div>
       </section>

@@ -1,5 +1,4 @@
-import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
-import { storage } from './firebase';
+import { getFirebaseStorage } from './firebaseAdmin';
 
 export interface UploadResult {
   url: string;
@@ -8,6 +7,10 @@ export interface UploadResult {
 
 /** Upload a File to Firebase Storage, returns the public download URL and storage path */
 export async function uploadImage(file: File, folder = 'vwu'): Promise<UploadResult> {
+  const [{ ref, uploadBytes, getDownloadURL }, storage] = await Promise.all([
+    import('firebase/storage'),
+    getFirebaseStorage(),
+  ]);
   const path = `${folder}/${Date.now()}-${file.name}`;
   const storageRef = ref(storage, path);
   await uploadBytes(storageRef, file);
@@ -22,6 +25,10 @@ export const uploadFile = uploadImage;
  *  (e.g. deleted manually, or the record still points at a static /public asset). */
 export async function deleteFile(path: string): Promise<void> {
   if (!path) return;
+  const [{ ref, deleteObject }, storage] = await Promise.all([
+    import('firebase/storage'),
+    getFirebaseStorage(),
+  ]);
   try {
     await deleteObject(ref(storage, path));
   } catch (e) {
