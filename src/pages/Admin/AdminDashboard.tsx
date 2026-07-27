@@ -41,6 +41,7 @@ import TiDspGalleryPhotosAdmin from './sections/TiDspGalleryPhotosAdmin';
 import ChipsToStartupPhotosAdmin from './sections/ChipsToStartupPhotosAdmin';
 import VsacGalleryPhotosAdmin from './sections/VsacGalleryPhotosAdmin';
 import VdlFacilitiesPhotosAdmin from './sections/VdlFacilitiesPhotosAdmin';
+import AssistiveTechLabPhotosAdmin from './sections/AssistiveTechLabPhotosAdmin';
 
 interface Props {
   activeSection: string;
@@ -86,6 +87,7 @@ const SECTION_MAP: Record<string, React.ReactNode> = {
   'chips-to-startup-photos': <ChipsToStartupPhotosAdmin />,
   'vsac-gallery-photos': <VsacGalleryPhotosAdmin />,
   'vdl-facilities-photos': <VdlFacilitiesPhotosAdmin />,
+  'atl-photos': <AssistiveTechLabPhotosAdmin />,
   'news-awards-data': <NewsAwardsDataAdmin />,
   'research-items': <ResearchItemsAdmin />,
   'compliance-docs': <ComplianceDocsAdmin />,
