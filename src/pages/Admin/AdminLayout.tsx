@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { auth } from '../../lib/firebase';
+import { getFirebaseAuth } from '../../lib/firebaseAdmin';
 import AdminLogin from './AdminLogin';
 import AdminDashboard from './AdminDashboard';
 import './Admin.css';
@@ -41,6 +40,7 @@ export const SECTIONS = [
   { id: 'chips-to-startup-photos', icon: '🧩', label: 'Chips to Startup (C2S) Photos' },
   { id: 'vsac-gallery-photos', icon: '🛰️', label: 'VSAC Gallery Photos' },
   { id: 'vdl-facilities-photos', icon: '🚗', label: 'Vehicle Design Lab Photos' },
+  { id: 'atl-photos', icon: '🦾', label: 'Assistive Technology Lab (ATL) Photos' },
   { id: 'placement-items', icon: '📈', label: 'Placement Sub-pages' },
   { id: 'tpo-team-photos', icon: '🪪', label: 'TPO Team Photos' },
   { id: 'ilo-office-photos', icon: '🏢', label: 'Industry Liaison Office Photos' },
@@ -68,7 +68,7 @@ export const SECTION_GROUPS: { label: string; ids: string[] }[] = [
   { label: 'Admissions & Campus Info', ids: ['information'] },
   { label: 'Student Life', ids: ['student-clubs', 'faqs', 'job-openings', 'events'] },
   { label: 'Placements & Careers', ids: ['placements', 'placement-items', 'tpo-team-photos', 'ilo-office-photos', 'gsac-photos'] },
-  { label: 'Differentiators', ids: ['differentiators', 'iic-member-photos', 'tedx-photos', 'ti-dsp-gallery-photos', 'chips-to-startup-photos', 'vsac-gallery-photos', 'vdl-facilities-photos'] },
+  { label: 'Differentiators', ids: ['differentiators', 'iic-member-photos', 'tedx-photos', 'ti-dsp-gallery-photos', 'chips-to-startup-photos', 'vsac-gallery-photos', 'vdl-facilities-photos', 'atl-photos'] },
   { label: 'Research', ids: ['research-items'] },
   { label: 'News & Awards', ids: ['news', 'gallery', 'news-awards-data', 'announcements'] },
   { label: 'Alumni & Giving', ids: ['alumni'] },
@@ -91,11 +91,19 @@ export default function AdminLayout() {
   };
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (u) => {
-      setUser(u ? { email: u.email } : null);
-      setChecking(false);
+    let unsub: (() => void) | undefined;
+    let cancelled = false;
+    Promise.all([import('firebase/auth'), getFirebaseAuth()]).then(([{ onAuthStateChanged }, auth]) => {
+      if (cancelled) return;
+      unsub = onAuthStateChanged(auth, (u) => {
+        setUser(u ? { email: u.email } : null);
+        setChecking(false);
+      });
     });
-    return unsub;
+    return () => {
+      cancelled = true;
+      unsub?.();
+    };
   }, []);
 
   if (checking) {
@@ -109,7 +117,17 @@ export default function AdminLayout() {
   if (!user) return <AdminLogin />;
 
   return (
-    <div className="admin-shell">
+    // data-lenis-prevent: the admin shell has its own internal scroll
+    // containers (.admin-sidebar, .admin-main), each independently
+    // overflow-y: auto — Lenis's global wheel interception (added for the
+    // public site's inertia scroll) was swallowing wheel events before they
+    // reached these nested containers, so the mouse wheel stopped working
+    // here even though dragging the scrollbar thumb still did (that's a
+    // native drag, not a wheel event, so it bypassed Lenis entirely). This
+    // attribute tells Lenis to skip its own handling for anything inside
+    // and let native scroll behavior take over, which is what a CMS
+    // dashboard wants anyway.
+    <div className="admin-shell" data-lenis-prevent>
       <aside className="admin-sidebar">
         <div className="admin-sidebar__brand">
           <span>🎓</span>
@@ -138,7 +156,12 @@ export default function AdminLayout() {
         </nav>
         <div className="admin-sidebar__footer">
           <p className="admin-sidebar__email">{user.email}</p>
-          <button onClick={() => signOut(auth)} className="admin-btn admin-btn--ghost">
+          <button
+            onClick={() => {
+              Promise.all([import('firebase/auth'), getFirebaseAuth()]).then(([{ signOut }, auth]) => signOut(auth));
+            }}
+            className="admin-btn admin-btn--ghost"
+          >
             Sign Out
           </button>
         </div>

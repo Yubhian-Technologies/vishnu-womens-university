@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../../lib/firebase';
+import { getFirebaseAuth } from '../../lib/firebaseAdmin';
 import './Admin.css';
 
 export default function AdminLogin() {
@@ -14,6 +13,10 @@ export default function AdminLogin() {
     setError('');
     setLoading(true);
     try {
+      const [{ signInWithEmailAndPassword }, auth] = await Promise.all([
+        import('firebase/auth'),
+        getFirebaseAuth(),
+      ]);
       await signInWithEmailAndPassword(auth, email, password);
     } catch {
       setError('Invalid email or password.');
