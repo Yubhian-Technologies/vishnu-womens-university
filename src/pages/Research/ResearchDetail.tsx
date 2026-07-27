@@ -155,7 +155,13 @@ export default function ResearchDetail() {
   }, [item]);
 
   if (!item) {
-    if (loading) return null;
+    if (loading) {
+      return (
+        <main className="route-fallback">
+          <div className="route-fallback__spinner" />
+        </main>
+      );
+    }
     return <Navigate to="/research" replace />;
   }
 

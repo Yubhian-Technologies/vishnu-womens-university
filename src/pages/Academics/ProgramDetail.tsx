@@ -48,7 +48,13 @@ export default function ProgramDetail() {
     if (el) smoothScrollTo(el);
   }, [program, location.hash]);
 
-  if (loading) return <main className="page-wrapper" style={{ minHeight: '60vh' }} />;
+  if (loading) {
+    return (
+      <main className="route-fallback">
+        <div className="route-fallback__spinner" />
+      </main>
+    );
+  }
   if (!program) return <Navigate to="/academics" replace />;
 
   const hasVisionMission = !!(program.vision || program.mission?.length || program.coreValues?.length);
