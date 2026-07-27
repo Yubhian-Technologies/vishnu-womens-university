@@ -553,7 +553,7 @@ export default function Header() {
       </header>
 
       {/* Mobile Menu */}
-      <div className={`mobile-menu${mobileOpen ? ' open' : ''}`} aria-hidden={!mobileOpen}>
+      <div className={`mobile-menu${mobileOpen ? ' open' : ''}`} aria-hidden={!mobileOpen} data-lenis-prevent>
         <div className="mobile-menu-content">
           <div className="mobile-ctas">
             <Link to="/admissions" className="btn btn-secondary" style={{ fontSize: '0.75rem', padding: '0.5rem 1rem' }}>
