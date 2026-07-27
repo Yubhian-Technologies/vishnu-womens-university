@@ -4,10 +4,11 @@ import PageHero from '../../components/PageHero/PageHero';
 import { PartyPopper } from 'lucide-react';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { useSitePhotos } from '../../hooks/useSitePhotos';
+import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import { resolveContentIcon } from '../../lib/contentIcons';
 
 const defaultPhilosophyPhoto = [
-  { src: 'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=900&q=80', alt: 'Cultural performances at VWU', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Cultural performances at VWU', caption: '' },
 ];
 
 export default function ArtsCulture() {
@@ -65,13 +66,15 @@ export default function ArtsCulture() {
                 as a community.
               </p>
             </div>
-            <div className="reveal-right">
-              <img
-                src={philosophyPhoto.src}
-                alt={philosophyPhoto.alt}
-                style={{ width: '100%', height: '400px', objectFit: 'cover', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-xl)' }}
-              />
-            </div>
+            {philosophyPhoto && (
+              <div>
+                <img
+                  src={philosophyPhoto.src}
+                  alt={philosophyPhoto.alt}
+                  style={{ width: '100%', height: '400px', objectFit: 'cover', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-xl)' }}
+                />
+              </div>
+            )}
           </div>
         </div>
       </section>

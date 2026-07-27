@@ -8,6 +8,7 @@ import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { useSitePhotos, useSitePhotosLoading } from '../../hooks/useSitePhotos';
+import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import { type NewsDoc, newsDocToArticle } from '../../lib/news';
 import type { EventDoc } from '../Admin/sections/EventsAdmin';
@@ -19,35 +20,35 @@ import './Home.css';
 // Home. These arrays are just the original defaults, shown until an admin
 // replaces a slot — same fallback pattern used throughout this codebase.
 const defaultActivityPhotos = [
-  { src: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=600&q=80', alt: 'mBAJA SAEINDIA 2026 Win', caption: 'mBAJA SAEINDIA 2026 Win' },
-  { src: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=600&q=80', alt: 'Amazon AFE Internship', caption: 'Amazon AFE Internship' },
-  { src: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=600&q=80', alt: 'Technova2026 Symposium', caption: 'Technova2026 Symposium' },
-  { src: 'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=600&q=80', alt: '8th Graduation Day', caption: '8th Graduation Day' },
-  { src: 'https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=600&q=80', alt: 'IEI Award for Excellence', caption: 'IEI Award for Excellence' },
-  { src: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=600&q=80', alt: 'Space Application Center', caption: 'Space Application Center' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'mBAJA SAEINDIA 2026 Win', caption: 'mBAJA SAEINDIA 2026 Win' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Amazon AFE Internship', caption: 'Amazon AFE Internship' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Technova2026 Symposium', caption: 'Technova2026 Symposium' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: '8th Graduation Day', caption: '8th Graduation Day' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'IEI Award for Excellence', caption: 'IEI Award for Excellence' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Space Application Center', caption: 'Space Application Center' },
 ];
 
 const defaultStudyCardPhotos = [
-  { src: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=800&q=80', alt: 'Students in engineering classroom', caption: '' },
-  { src: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80', alt: 'Postgraduate students', caption: '' },
-  { src: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&q=80', alt: 'Research laboratory', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Students in engineering classroom', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Postgraduate students', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Research laboratory', caption: '' },
 ];
 // Study card accent colours aren't a "photo" — kept as a parallel,
 // index-matched, non-admin-editable array (matches by position).
 const STUDY_CARD_COLORS = ['#1b4332', '#2d6a4f', '#40916c'];
 
 const defaultCampusLifePhoto = [
-  { src: 'https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=1000&q=80', alt: 'VWU campus life', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'VWU campus life', caption: '' },
 ];
 
 const defaultMissionPhotos = [
-  { src: 'https://images.unsplash.com/photo-1571260899304-425eee4c7efc?w=800&q=80', alt: 'VWU campus', caption: '' },
-  { src: 'https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=800&q=80', alt: 'VWU campus', caption: '' },
-  { src: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=800&q=80', alt: 'VWU campus', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'VWU campus', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'VWU campus', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'VWU campus', caption: '' },
 ];
 
 const defaultCtaBannerPhoto = [
-  { src: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1920&q=60&auto=format', alt: 'VWU campus', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'VWU campus', caption: '' },
 ];
 
 // The original hardcoded content each of these sections shipped with,
@@ -311,7 +312,7 @@ export default function Home() {
           <div className="study-grid">
             {studyCards.map((card, i) => {
               const Icon = resolveContentIcon(card.icon) || Laptop;
-              const photo = studyCardPhotos[i % studyCardPhotos.length];
+              const photo = studyCardPhotos.length > 0 ? studyCardPhotos[i % studyCardPhotos.length] : undefined;
               const color = STUDY_CARD_COLORS[i % STUDY_CARD_COLORS.length];
               return (
                 <div
@@ -321,7 +322,7 @@ export default function Home() {
                   style={{ '--card-color': color } as React.CSSProperties}
                 >
                   <div className="study-card-image-wrap">
-                    <SmoothImage src={photo.src} alt={photo.alt} className="study-card-image" />
+                    {photo && <SmoothImage src={photo.src} alt={photo.alt} className="study-card-image" />}
                     <div className="study-card-overlay" style={{ background: `linear-gradient(to top, ${color}cc 0%, transparent 65%)` }} />
                     <div className="study-card-icon"><Icon size={24} strokeWidth={1.75} color="var(--color-primary-dark)" /></div>
                     <div className="study-card-shine" />
@@ -367,7 +368,7 @@ export default function Home() {
       {/* ── Campus Life ── */}
       <section className="campus-section" aria-label="Campus Life">
         <div className="campus-image-side reveal-left">
-          <SmoothImage src={campusLifePhoto.src} alt={campusLifePhoto.alt} className="campus-image" />
+          {campusLifePhoto && <SmoothImage src={campusLifePhoto.src} alt={campusLifePhoto.alt} className="campus-image" />}
           <div className="campus-image-overlay" />
           <div className="campus-image-badge reveal-scale" data-delay="300">
             <span className="campus-badge-num">100+</span>
@@ -553,7 +554,7 @@ export default function Home() {
 
       {/* ── CTA Banner ── */}
       <section className="cta-banner">
-        <SmoothImage src={ctaBannerPhoto.src} alt={ctaBannerPhoto.alt} className="cta-banner-bg" />
+        {ctaBannerPhoto && <SmoothImage src={ctaBannerPhoto.src} alt={ctaBannerPhoto.alt} className="cta-banner-bg" />}
         <div className="cta-banner-overlay" />
         <div className="cta-particles" aria-hidden="true">
           {Array.from({ length: 12 }).map((_, i) => (

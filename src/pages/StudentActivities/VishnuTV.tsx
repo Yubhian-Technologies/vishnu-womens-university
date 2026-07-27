@@ -4,10 +4,11 @@ import PageHero from '../../components/PageHero/PageHero';
 import { BookOpen, Video } from 'lucide-react';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { useSitePhotos } from '../../hooks/useSitePhotos';
+import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import { resolveContentIcon } from '../../lib/contentIcons';
 
 const defaultStudioPhoto = [
-  { src: 'https://images.unsplash.com/photo-1598387181032-a3103a2db5b3?w=900&q=80', alt: 'Students in TV studio', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Students in TV studio', caption: '' },
 ];
 
 export default function VishnuTV() {
@@ -64,13 +65,15 @@ export default function VishnuTV() {
                 while making a genuine contribution to campus life.
               </p>
             </div>
-            <div className="reveal-right">
-              <img
-                src={studioPhoto.src}
-                alt={studioPhoto.alt}
-                style={{ width: '100%', height: '380px', objectFit: 'cover', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-xl)' }}
-              />
-            </div>
+            {studioPhoto && (
+              <div>
+                <img
+                  src={studioPhoto.src}
+                  alt={studioPhoto.alt}
+                  style={{ width: '100%', height: '380px', objectFit: 'cover', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-xl)' }}
+                />
+              </div>
+            )}
           </div>
         </div>
       </section>

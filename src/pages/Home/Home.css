@@ -274,6 +274,7 @@
   position: relative;
   height: 220px;
   overflow: hidden;
+  background: var(--color-primary-dark);
 }
 .study-card-image {
   width: 100%;
@@ -888,6 +889,9 @@
   position: relative;
   overflow: hidden;
   padding: var(--space-24) 0;
+  /* Fallback behind .cta-banner-overlay's gradient for when no background
+     photo has been uploaded yet (see cta-banner-bg's conditional render). */
+  background: var(--color-primary-dark);
 }
 .cta-banner-bg {
   position: absolute;

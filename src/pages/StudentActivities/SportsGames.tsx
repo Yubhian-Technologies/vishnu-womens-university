@@ -4,10 +4,11 @@ import PageHero from '../../components/PageHero/PageHero';
 import { Activity, BadgeCheck } from 'lucide-react';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { useSitePhotos } from '../../hooks/useSitePhotos';
+import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import { resolveContentIcon } from '../../lib/contentIcons';
 
 const defaultApproachPhoto = [
-  { src: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=900&q=80', alt: 'Students at VWU sports', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Students at VWU sports', caption: '' },
 ];
 
 export default function SportsGames() {
@@ -66,13 +67,15 @@ export default function SportsGames() {
                 and prepares students to represent VWU at university and inter-collegiate competitions.
               </p>
             </div>
-            <div className="reveal-right">
-              <img
-                src={approachPhoto.src}
-                alt={approachPhoto.alt}
-                style={{ width: '100%', height: '400px', objectFit: 'cover', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-xl)' }}
-              />
-            </div>
+            {approachPhoto && (
+              <div>
+                <img
+                  src={approachPhoto.src}
+                  alt={approachPhoto.alt}
+                  style={{ width: '100%', height: '400px', objectFit: 'cover', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-xl)' }}
+                />
+              </div>
+            )}
           </div>
         </div>
       </section>

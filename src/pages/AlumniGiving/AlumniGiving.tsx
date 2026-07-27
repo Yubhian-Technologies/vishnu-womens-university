@@ -6,9 +6,10 @@ import { useHashScroll } from '../../hooks/useHashScroll';
 import './AlumniGiving.css';
 import PageHero from '../../components/PageHero/PageHero';
 import { useSitePhotos } from '../../hooks/useSitePhotos';
+import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 
 const defaultMagazinePhoto = [
-  { src: 'https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=800&q=80', alt: 'VWU campus aerial view', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'VWU campus aerial view', caption: '' },
 ];
 
 interface ImpactStat {
@@ -234,11 +235,13 @@ export default function AlumniGiving() {
                 <Link to="/contact" className="btn btn-outline">Update Your Info</Link>
               </div>
             </div>
-            <img
-              src={magazinePhoto.src}
-              alt={magazinePhoto.alt}
-              className="ag-magazine-img"
-            />
+            {magazinePhoto && (
+              <img
+                src={magazinePhoto.src}
+                alt={magazinePhoto.alt}
+                className="ag-magazine-img"
+              />
+            )}
           </div>
         </div>
       </section>

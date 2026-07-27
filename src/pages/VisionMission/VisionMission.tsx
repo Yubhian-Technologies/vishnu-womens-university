@@ -10,13 +10,13 @@ import { resolveContentIcon } from '../../lib/contentIcons';
 
 const defaultInspirationPhotos = [
   // Slots 0-4: "Our Values in Action" PhotoGrid gallery
-  { src: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80', alt: 'Students collaborating', caption: 'Collaboration' },
-  { src: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&q=80', alt: 'Research and innovation', caption: 'Research & Innovation' },
-  { src: 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?w=800&q=80', alt: 'Green campus environment', caption: 'Green Campus' },
-  { src: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&q=80', alt: 'Sports and wellness', caption: 'Sports & Wellness' },
-  { src: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=800&q=80', alt: 'Smart classrooms', caption: 'Smart Classrooms' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Students collaborating', caption: 'Collaboration' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Research and innovation', caption: 'Research & Innovation' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Green campus environment', caption: 'Green Campus' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Sports and wellness', caption: 'Sports & Wellness' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Smart classrooms', caption: 'Smart Classrooms' },
   // Slot 5: standalone "Quality Policy" section image below
-  { src: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=900&q=80', alt: 'VWU quality education', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'VWU quality education', caption: '' },
 ];
 
 const valuesPolicyPoints = [
@@ -218,13 +218,15 @@ export default function VisionMission() {
                 ))}
               </ul>
             </div>
-            <div className="reveal-right">
-              <img
-                src={qualityPolicyImg.src}
-                alt={qualityPolicyImg.alt}
-                style={{ width: '100%', height: '400px', objectFit: 'cover', borderRadius: 'var(--radius-lg)' }}
-              />
-            </div>
+            {qualityPolicyImg && (
+              <div>
+                <img
+                  src={qualityPolicyImg.src}
+                  alt={qualityPolicyImg.alt}
+                  style={{ width: '100%', height: '400px', objectFit: 'cover', borderRadius: 'var(--radius-lg)' }}
+                />
+              </div>
+            )}
           </div>
         </div>
       </section>

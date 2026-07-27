@@ -13,11 +13,11 @@ import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
 import { PenTool, Radio } from 'lucide-react';
 
 const defaultAcademicsPhotos = [
-  { src: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=800&q=80', alt: 'Smart lecture halls', caption: 'Smart Lecture Halls' },
-  { src: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&q=80', alt: 'Specialised research labs', caption: 'Research Labs' },
-  { src: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=800&q=80', alt: 'Technical hackathons', caption: 'Hackathons & Projects' },
-  { src: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&q=80', alt: 'Library resources', caption: 'Digital Library' },
-  { src: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80', alt: 'Group learning sessions', caption: 'Collaborative Learning' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Smart lecture halls', caption: 'Smart Lecture Halls' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Specialised research labs', caption: 'Research Labs' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Technical hackathons', caption: 'Hackathons & Projects' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Library resources', caption: 'Digital Library' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Group learning sessions', caption: 'Collaborative Learning' },
 ];
 
 const defaultClassroomsLabsPhotos = [

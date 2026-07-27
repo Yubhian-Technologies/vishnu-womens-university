@@ -20,11 +20,11 @@ const govCategories = [
 ];
 
 const defaultGovPhotos = [
-  { src: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=800&q=80', alt: 'Governance and administration', caption: 'Institutional Governance' },
-  { src: 'https://images.unsplash.com/photo-1544531585-9847b68c8c86?w=800&q=80', alt: 'Academic council meeting', caption: 'Academic Council' },
-  { src: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=800&q=80', alt: 'Convocation ceremony', caption: 'Annual Convocation' },
-  { src: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&q=80', alt: 'Events and seminars', caption: 'Seminars & Events' },
-  { src: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80', alt: 'Faculty collaboration', caption: 'Faculty Development' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Governance and administration', caption: 'Institutional Governance' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Academic council meeting', caption: 'Academic Council' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Convocation ceremony', caption: 'Annual Convocation' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Events and seminars', caption: 'Seminars & Events' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Faculty collaboration', caption: 'Faculty Development' },
 ];
 
 const defaultBoardOfDirectorsPhotos = [
