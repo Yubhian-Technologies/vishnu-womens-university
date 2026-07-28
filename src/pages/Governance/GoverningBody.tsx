@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Image as ImageIcon } from 'lucide-react';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import PageHero from '../../components/PageHero/PageHero';
@@ -124,9 +123,8 @@ export default function GoverningBody() {
                 </ul>
               )}
             </div>
-            <div className="gb-overview__placeholder">
-              <ImageIcon size={40} strokeWidth={1.5} />
-              <span>Image Placeholder</span>
+            <div className="gb-overview__photo-frame">
+              <SmoothImage src="/images/governing-body-founder.jpg" alt="Founder, Vishnu Womens University" className="gb-overview__photo" />
             </div>
           </div>
         </div>

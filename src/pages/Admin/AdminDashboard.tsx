@@ -42,6 +42,13 @@ import ChipsToStartupPhotosAdmin from './sections/ChipsToStartupPhotosAdmin';
 import VsacGalleryPhotosAdmin from './sections/VsacGalleryPhotosAdmin';
 import VdlFacilitiesPhotosAdmin from './sections/VdlFacilitiesPhotosAdmin';
 import AssistiveTechLabPhotosAdmin from './sections/AssistiveTechLabPhotosAdmin';
+import ConcreteCanoePhotosAdmin from './sections/ConcreteCanoePhotosAdmin';
+import WisePlacementsAdmin from './sections/WisePlacementsAdmin';
+import WiseTeamPhotosAdmin from './sections/WiseTeamPhotosAdmin';
+import WiseEliteProjectPhotosAdmin from './sections/WiseEliteProjectPhotosAdmin';
+import WiseTestimonialPhotosAdmin from './sections/WiseTestimonialPhotosAdmin';
+import WiseNseClippingsAdmin from './sections/WiseNseClippingsAdmin';
+import NirvahanaEventPhotosAdmin from './sections/NirvahanaEventPhotosAdmin';
 
 interface Props {
   activeSection: string;
@@ -88,6 +95,13 @@ const SECTION_MAP: Record<string, React.ReactNode> = {
   'vsac-gallery-photos': <VsacGalleryPhotosAdmin />,
   'vdl-facilities-photos': <VdlFacilitiesPhotosAdmin />,
   'atl-photos': <AssistiveTechLabPhotosAdmin />,
+  'concrete-canoe-photos': <ConcreteCanoePhotosAdmin />,
+  'wise-placements': <WisePlacementsAdmin />,
+  'wise-team-photos': <WiseTeamPhotosAdmin />,
+  'wise-elite-photos': <WiseEliteProjectPhotosAdmin />,
+  'wise-testimonial-photos': <WiseTestimonialPhotosAdmin />,
+  'wise-nse-clippings': <WiseNseClippingsAdmin />,
+  'nirvahana-photos': <NirvahanaEventPhotosAdmin />,
   'news-awards-data': <NewsAwardsDataAdmin />,
   'research-items': <ResearchItemsAdmin />,
   'compliance-docs': <ComplianceDocsAdmin />,

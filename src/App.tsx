@@ -3,7 +3,6 @@ import { Suspense, lazy, useEffect } from 'react';
 import { GraduationCap } from 'lucide-react';
 import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
-import FirestoreErrorBanner from './components/FirestoreErrorBanner/FirestoreErrorBanner';
 import SmoothScroll from './components/SmoothScroll/SmoothScroll';
 import { smoothScrollTo } from './lib/smoothScroll';
 
@@ -139,7 +138,6 @@ function PublicApp() {
         </Routes>
       </Suspense>
       <Footer />
-      <FirestoreErrorBanner />
     </>
   );
 }
