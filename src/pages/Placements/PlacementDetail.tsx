@@ -173,7 +173,7 @@ USA, Canada, UK, China, Germany, Australia, Spain
 
 **Contact Details:**
 
-Mrs. P. Prasanthi, Asst. Professor — Email: [jprasanthi@svecw.edu.in](mailto:jprasanthi@svecw.edu.in) — Phone: [0440111470](tel:0440111470)`,
+Mrs. P. Prasanthi, Asst. Professor — Email: [jprasanthi@svecw.edu.in](mailto:jprasanthi@svecw.edu.in) — Phone: [9440111470](tel:9440111470)`,
 };
 
 function parseBodyContent(text: string): BodyBlock[] {
