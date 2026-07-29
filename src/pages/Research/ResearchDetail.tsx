@@ -7,10 +7,10 @@ import { parseFlexibleTable, parseAccordionTable, parseProjectAccordion } from '
 import type { ResearchItemDoc } from '../Admin/sections/ResearchItemsAdmin';
 import { DEFAULT_FUNDED_PROJECTS_TEXT } from './fundedProjectsDefault';
 import { DEFAULT_PATENTS_TEXT } from './patentsDefault';
-import { DEFAULT_THRUST_AREAS_TEXT } from './thrustAreasDefault';
+import { DEFAULT_THRUST_AREAS_INTRO, DEFAULT_THRUST_AREAS_TEXT } from './thrustAreasDefault';
 import { DEFAULT_RESEARCH_PUBLICATIONS_TEXT } from './researchPublicationsDefault';
 import { DEFAULT_CONSULTANCY_TEXT } from './consultancyDefault';
-import { DEFAULT_RESEARCH_CENTERS_TABLE_TEXT } from './researchCentersDefault';
+import { DEFAULT_RESEARCH_CENTERS_INTRO, DEFAULT_RESEARCH_CENTERS_TABLE_TEXT } from './researchCentersDefault';
 import { DEFAULT_SEED_MONEY_PROJECTS_TABLE_TEXT, DEFAULT_SEED_MONEY_PROJECTS_INTRO } from './seedMoneyProjectsDefault';
 import { DEFAULT_ABOUT_RD_TABLE_TEXT } from './aboutRdDefault';
 import { DEFAULT_RAC_INTRO, DEFAULT_RAC_ABOUT } from './researchAdvisoryCommitteeDefault';
@@ -34,11 +34,20 @@ const DEFAULT_PROJECTS_TEXT_BY_SLUG: Record<string, string> = {
 };
 
 // Same fallback pattern as above, for the accordion (category -> area ->
-// faculty) content on Thrust Areas of Research.
+// faculty) content on Research Publications and Consultancy.
 const DEFAULT_ACCORDION_TEXT_BY_SLUG: Record<string, string> = {
-  'thrust-areas-of-research': DEFAULT_THRUST_AREAS_TEXT,
   'research-publications': DEFAULT_RESEARCH_PUBLICATIONS_TEXT,
   'consultancy': DEFAULT_CONSULTANCY_TEXT,
+};
+
+// Thrust Areas of Research already has an older accordionText value saved in
+// Firestore that links each faculty member out to their external IRINS
+// profile as a raw pasted URL — DEFAULT_THRUST_AREAS_TEXT was rebuilt to
+// link to our own internal /research/faculty/:id profile page instead, so
+// (like the table-text map below) this one wins over item.accordionText
+// until an admin replaces it.
+const DEFAULT_ACCORDION_TEXT_OVERRIDE_BY_SLUG: Record<string, string> = {
+  'thrust-areas-of-research': DEFAULT_THRUST_AREAS_TEXT,
 };
 
 // Research Centers, Seed Money Projects, and About R&D all already have an
@@ -64,6 +73,8 @@ const DEFAULT_INTRO_BY_SLUG: Record<string, string> = {
   'research-ethics-committee': DEFAULT_REC_INTRO,
   'ipr-committee': DEFAULT_IPR_INTRO,
   'seed-money-projects': DEFAULT_SEED_MONEY_PROJECTS_INTRO,
+  'research-centers': DEFAULT_RESEARCH_CENTERS_INTRO,
+  'thrust-areas-of-research': DEFAULT_THRUST_AREAS_INTRO,
 };
 const DEFAULT_ABOUT_BY_SLUG: Record<string, string> = {
   'research-advisory-committee': DEFAULT_RAC_ABOUT,
@@ -173,7 +184,7 @@ export default function ResearchDetail() {
   const aboutBlocks = parseAboutContent(about);
   const tableText = DEFAULT_TABLE_TEXT_BY_SLUG[item.slug] || item.tableText || '';
   const tableSections = parseFlexibleTable(tableText).filter((s) => s.headers.length > 0);
-  const accordionText = item.accordionText || DEFAULT_ACCORDION_TEXT_BY_SLUG[item.slug] || '';
+  const accordionText = DEFAULT_ACCORDION_TEXT_OVERRIDE_BY_SLUG[item.slug] || item.accordionText || DEFAULT_ACCORDION_TEXT_BY_SLUG[item.slug] || '';
   const accordionCategories = parseAccordionTable(accordionText).filter((c) => c.areas.length > 0);
   const projectsText = item.projectsText || DEFAULT_PROJECTS_TEXT_BY_SLUG[item.slug] || '';
   const projectCategories = parseProjectAccordion(projectsText).filter((c) => c.projects.length > 0);

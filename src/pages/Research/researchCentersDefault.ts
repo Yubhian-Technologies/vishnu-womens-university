@@ -1,11 +1,14 @@
 // Fallback content for the Research Centers item, sourced from
 // https://svecw.edu.in/research-centers/. Firestore's researchItems doc for
-// this slug may not have its tableText field filled in yet from the admin
-// panel — this constant is used by ResearchDetail.tsx so the page renders
-// the full recognition/renewal and guides/scholars tables out of the box
-// instead of staying blank until someone pastes the same text into the
+// this slug may not have its intro/tableText fields filled in yet from the
+// admin panel — these constants are used by ResearchDetail.tsx so the page
+// renders the real overview paragraph and the full recognition/renewal and
+// guides/scholars tables out of the box instead of staying blank (or
+// showing a generic paraphrase) until someone pastes the same text into the
 // admin panel. Once an admin does fill in the Firestore field, that value
 // takes over (see ResearchDetail.tsx).
+export const DEFAULT_RESEARCH_CENTERS_INTRO = 'SVECW is having JNTUK recognised Research centres for Electrical & Electronics Engineering, Electronics & Communication Engineering and Computer Science & Engineering departments. The scholars allocated in these recognised research centres pursue their Ph.D. under full-time or part-time categories. These recognized centres maintain high standards of research infrastructure, ensuring that scholars have access to the necessary resources and expertise to pursue their research effectively.';
+
 export const DEFAULT_RESEARCH_CENTERS_TABLE_TEXT = `## Recognition & Validity
 Department | Year of Recognition & Validity | First Renewal | Second Renewal
 Electronics and Communication Engineering | 2019-20 & 2020-21 | 2021-22 & 2022-23 | 2023-24 & 2024-25

@@ -1,15 +1,17 @@
 // Fallback content for the Thrust Areas of Research item, sourced from
 // https://svecw.edu.in/thrust-areas-of-research/. Firestore's researchItems
-// doc for this slug may not have its accordionText field filled in yet from
-// the admin panel — this constant is used by ResearchDetail.tsx so the page
-// renders the full department -> research area -> faculty accordion out of
-// the box instead of staying blank (or falling back to a plain table) until
-// someone pastes the same text into the admin panel. Once an admin does fill
-// in the Firestore field, that value takes over (see ResearchDetail.tsx).
+// doc for this slug may not have its intro/accordionText fields filled in
+// yet from the admin panel — these constants are used by ResearchDetail.tsx
+// so the page renders the real overview paragraph and the full department ->
+// research area -> faculty accordion out of the box instead of staying blank
+// (or falling back to a plain table) until someone pastes the same text into
+// the admin panel. Once an admin does fill in the Firestore field, that value
+// takes over (see ResearchDetail.tsx).
 //
 // Each faculty member links to our own internal research-profile page
 // (/research/faculty/:id) rather than their external IRINS profile — the
 // numeric id is kept only as a stable, unique key for that internal route.
+export const DEFAULT_THRUST_AREAS_INTRO = 'VWU faculty members specialize in a variety of research trust areas fostering interdisciplinary collaboration and impactful discoveries. Through their dedicated expertise, they contribute significantly to advancing knowledge and addressing complex challenges in these critical domains.';
 interface ThrustFaculty {
   name: string;
   id: string;
