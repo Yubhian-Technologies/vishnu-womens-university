@@ -8,6 +8,9 @@ import { useOrderedCollection } from '../../../hooks/useCollection';
 import { deleteFile, type UploadResult } from '../../../lib/storage';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../../lib/photoPlaceholder';
 import { useImageCropModal } from '../../../components/ImageUploader/useImageCropModal';
+import { useAdminSession } from '../AdminSessionContext';
+import ReadOnlyGate from '../ReadOnlyGate';
+import { canEdit, RESOURCES } from '../../../lib/rbac';
 
 export interface SitePhotoDoc {
   id: string;
@@ -440,6 +443,7 @@ const NAV_CATEGORIES: NavCategory[] = [
 ];
 
 export default function SitePhotosAdmin() {
+  const session = useAdminSession();
   const { docs: allPhotos, loading } = useOrderedCollection<SitePhotoDoc>('sitePhotos', 'order');
   // URL-backed (not useState): which menu/page/sub-section is selected is
   // reflected in the address bar (?navCategory=&photoPage=&photoSection=),
@@ -472,6 +476,10 @@ export default function SitePhotosAdmin() {
   // exists.
   const currentSection = pageSections[selectedSection] ?? pageSections.main ?? pageSections[sectionKeys[0]];
   const defaults = currentSection?.slots ?? [];
+
+  // Like Hero Banners, Website Photos covers every page on the site from one
+  // screen — only the Placements page's photos are a Placements resource.
+  const pageEditable = canEdit(session, RESOURCES.PLACEMENTS_WEBSITE_PHOTOS, activePage === 'placements');
 
   const scopedPhotos = allPhotos.filter((p) => p.page === activePage && (p.section ?? 'main') === selectedSection);
   const byOrder = new Map(scopedPhotos.map((p) => [p.order, p]));
@@ -743,6 +751,7 @@ export default function SitePhotosAdmin() {
               return (
                 <div key={i} className="admin-image-card">
                   <img src={img.imageUrl} alt={img.alt} />
+                  <ReadOnlyGate readOnly={!pageEditable}>
                   {editingSlot === i ? (
                     <div className="admin-image-card__info" style={{ gap: '0.4rem' }}>
                       <input value={textForm.alt} onChange={(e) => setTextForm((f) => ({ ...f, alt: e.target.value }))} placeholder="Alt text" />
@@ -785,6 +794,7 @@ export default function SitePhotosAdmin() {
                       </div>
                     </>
                   )}
+                  </ReadOnlyGate>
                 </div>
               );
             })}
@@ -796,6 +806,7 @@ export default function SitePhotosAdmin() {
         <div className="admin-card__toolbar">
           <h2 className="admin-card__title">Extra {currentSection?.label} Photos ({extras.length})</h2>
         </div>
+        <ReadOnlyGate readOnly={!pageEditable}>
         <div className="admin-form-grid">
           <div className="admin-field admin-field--full">
             <label>Add a Photo (beyond the {defaults.length} default slots) — you'll get to crop it before it's added</label>
@@ -804,6 +815,7 @@ export default function SitePhotosAdmin() {
             {addingExtra && <p className="admin-loading">Adding…</p>}
           </div>
         </div>
+        </ReadOnlyGate>
         {extras.length > 0 && (
           <div className="admin-image-grid" style={{ marginTop: '1rem' }}>
             {extras.map((p) => (
@@ -812,9 +824,11 @@ export default function SitePhotosAdmin() {
                 <div className="admin-image-card__info">
                   <strong>{p.caption || p.alt}</strong>
                 </div>
-                <div className="admin-image-card__actions">
-                  <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeExtra(p)}>Remove</button>
-                </div>
+                <ReadOnlyGate readOnly={!pageEditable}>
+                  <div className="admin-image-card__actions">
+                    <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeExtra(p)}>Remove</button>
+                  </div>
+                </ReadOnlyGate>
               </div>
             ))}
           </div>

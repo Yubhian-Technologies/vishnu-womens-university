@@ -1,8 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import type { User } from 'firebase/auth';
 import { useSearchParams } from 'react-router-dom';
 import { getFirebaseAuth } from '../../lib/firebaseAdmin';
+import { resolveAdminSession } from '../../lib/rbac';
 import AdminLogin from './AdminLogin';
 import AdminDashboard from './AdminDashboard';
+import AdminSessionProvider, { useAdminSession } from './AdminSessionContext';
 import './Admin.css';
 
 export const SECTIONS = [
@@ -82,28 +85,42 @@ export const SECTION_GROUPS: { label: string; ids: string[] }[] = [
 ];
 
 export default function AdminLayout() {
-  const [user, setUser] = useState<{ email: string | null } | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [checking, setChecking] = useState(true);
-  // URL-backed so a section (and, deeper in, a specific Website Photos
-  // page/sub-section) is linkable/bookmarkable/shareable, and survives a
-  // refresh instead of resetting to Overview.
-  const [searchParams, setSearchParams] = useSearchParams();
-  const activeSection = searchParams.get('section') ?? 'overview';
-  const setActiveSection = (id: string) => {
-    setSearchParams((prev) => {
-      const next = new URLSearchParams(prev);
-      next.set('section', id);
-      return next;
-    }, { replace: true });
-  };
+  const [loginError, setLoginError] = useState('');
+  // Which department the in-flight sign-in was submitted under — set by
+  // AdminLogin synchronously, before it calls signInWithEmailAndPassword, so
+  // it's available the instant this listener sees the resulting auth state
+  // change. A ref (not state) because it must be current inside the very
+  // next onAuthStateChanged callback, not just on AdminLogin's next render.
+  const attemptedDepartmentRef = useRef('');
 
   useEffect(() => {
     let unsub: (() => void) | undefined;
     let cancelled = false;
-    Promise.all([import('firebase/auth'), getFirebaseAuth()]).then(([{ onAuthStateChanged }, auth]) => {
+    Promise.all([import('firebase/auth'), getFirebaseAuth()]).then(([{ onAuthStateChanged, signOut }, auth]) => {
       if (cancelled) return;
-      unsub = onAuthStateChanged(auth, (u) => {
-        setUser(u ? { email: u.email } : null);
+      unsub = onAuthStateChanged(auth, async (u) => {
+        if (cancelled) return;
+        const attempted = attemptedDepartmentRef.current;
+        if (u && attempted) {
+          const session = await resolveAdminSession(u);
+          if (cancelled) return;
+          if (session.department.toLowerCase() !== attempted.toLowerCase()) {
+            // Wrong department for this account — sign back out without ever
+            // exposing `user` as truthy, so AdminLogin never unmounts and
+            // this error survives to be shown on the same screen. The
+            // signOut below re-fires this same listener with u=null, which
+            // is a no-op past this point since attemptedDepartmentRef is
+            // already cleared.
+            attemptedDepartmentRef.current = '';
+            setLoginError(`This account isn't registered under the "${attempted}" department.`);
+            await signOut(auth);
+            return;
+          }
+        }
+        attemptedDepartmentRef.current = '';
+        setUser(u);
         setChecking(false);
       });
     });
@@ -121,7 +138,39 @@ export default function AdminLayout() {
     );
   }
 
-  if (!user) return <AdminLogin />;
+  if (!user) {
+    return (
+      <AdminLogin
+        error={loginError}
+        onAttempt={(department) => {
+          setLoginError('');
+          attemptedDepartmentRef.current = department;
+        }}
+      />
+    );
+  }
+
+  return (
+    <AdminSessionProvider user={user}>
+      <AdminShell email={user.email} />
+    </AdminSessionProvider>
+  );
+}
+
+function AdminShell({ email }: { email: string | null }) {
+  const session = useAdminSession();
+  // URL-backed so a section (and, deeper in, a specific Website Photos
+  // page/sub-section) is linkable/bookmarkable/shareable, and survives a
+  // refresh instead of resetting to Overview.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeSection = searchParams.get('section') ?? 'overview';
+  const setActiveSection = (id: string) => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set('section', id);
+      return next;
+    }, { replace: true });
+  };
 
   return (
     // data-lenis-prevent: the admin shell has its own internal scroll
@@ -162,7 +211,8 @@ export default function AdminLayout() {
           ))}
         </nav>
         <div className="admin-sidebar__footer">
-          <p className="admin-sidebar__email">{user.email}</p>
+          {session && <p className="admin-sidebar__email">Department: {session.department}</p>}
+          <p className="admin-sidebar__email">{email}</p>
           <button
             onClick={() => {
               Promise.all([import('firebase/auth'), getFirebaseAuth()]).then(([{ signOut }, auth]) => signOut(auth));

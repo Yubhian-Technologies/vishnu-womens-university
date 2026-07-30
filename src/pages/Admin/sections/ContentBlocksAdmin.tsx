@@ -5,6 +5,9 @@ import { useOrderedCollection } from '../../../hooks/useCollection';
 import { CONTENT_ICON_NAMES } from '../../../lib/contentIcons';
 import ImageUploader from '../../../components/ImageUploader/ImageUploader';
 import type { UploadResult } from '../../../lib/storage';
+import { useAdminSession } from '../AdminSessionContext';
+import ReadOnlyGate from '../ReadOnlyGate';
+import { canEdit, RESOURCES } from '../../../lib/rbac';
 
 // A single flexible content type used across many pages for their small
 // repeating text blocks (stat bars, icon+title+desc feature lists, highlight
@@ -105,11 +108,17 @@ export const CONTENT_BLOCK_SECTIONS: { page: string; section: string; label: str
 ];
 
 export default function ContentBlocksAdmin() {
+  const session = useAdminSession();
   const { docs: blocks, loading } = useOrderedCollection<ContentBlockDoc>('contentBlocks', 'order');
   const [form, setForm] = useState<Omit<ContentBlockDoc, 'id'>>({ ...EMPTY, page: CONTENT_BLOCK_SECTIONS[0].page, section: CONTENT_BLOCK_SECTIONS[0].section });
   const [editing, setEditing] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [filterKey, setFilterKey] = useState(`${CONTENT_BLOCK_SECTIONS[0].page}::${CONTENT_BLOCK_SECTIONS[0].section}`);
+  // This screen covers page-content blocks for the whole site, not just
+  // Placements, so — like Hero Banners — permission is scoped per item
+  // rather than to the section as a whole.
+  const formEditable = canEdit(session, RESOURCES.PLACEMENTS_PAGE_CONTENT, form.page === 'placements')
+    || canEdit(session, RESOURCES.PLACEMENTS_BLOCKS, form.page === 'placements');
 
   const set = (k: string, v: string | number) => setForm((p) => ({ ...p, [k]: v }));
   const handleAvatarUpload = (r: UploadResult) => setForm((p) => ({ ...p, slug: r.url, storagePath: r.path }));
@@ -167,47 +176,54 @@ export default function ContentBlocksAdmin() {
               ))}
             </select>
           </div>
-          <div className="admin-field">
-            <label>Value (number/short value if a stat; a URL for Social Links; a meta line like a phone number for Contact Info Cards)</label>
-            <input value={form.value} onChange={(e) => set('value', e.target.value)} placeholder="100 Acres" />
-          </div>
-          <div className="admin-field">
-            <label>Icon (if this section uses icon cards)</label>
-            <select value={form.icon} onChange={(e) => set('icon', e.target.value)}>
-              <option value="">None</option>
-              {CONTENT_ICON_NAMES.map((n) => <option key={n} value={n}>{n}</option>)}
-            </select>
-          </div>
-          <div className="admin-field">
-            {IMAGE_SLUG_SECTIONS.has(`${form.page}::${form.section}`) ? (
-              <>
-                <label>Avatar Photo</label>
-                <ImageUploader folder="vwu/testimonials" currentUrl={form.slug} onUploaded={handleAvatarUpload} label="Upload Avatar" aspect={1} />
-              </>
-            ) : (
-              <>
-                <label>Anchor Slug / Extra field (only if this item needs a #link — a second meta line for Contact Info Cards, or the click-through link for Student Life Clubs — an external https:// URL or an internal /path)</label>
-                <input value={form.slug} onChange={(e) => set('slug', e.target.value)} placeholder="smart-classrooms" />
-              </>
-            )}
-          </div>
-          <div className="admin-field">
-            <label>Display Order</label>
-            <input type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
-          </div>
-          <div className="admin-field admin-field--full">
-            <label>Title *</label>
-            <input value={form.title} onChange={(e) => set('title', e.target.value)} placeholder="Campus Area" />
-          </div>
-          <div className="admin-field admin-field--full">
-            <label>Description (if this item needs one — for Contact Info Cards, put each address line on its own line)</label>
-            <textarea rows={3} value={form.desc} onChange={(e) => set('desc', e.target.value)} placeholder="Optional longer text…" />
-          </div>
+          {/* display:contents on ReadOnlyGate's fieldset means these fields
+              stay direct children of this grid — wrapping them here doesn't
+              change the grid layout at all, only whether they're disabled. */}
+          <ReadOnlyGate readOnly={!formEditable}>
+            <div className="admin-field">
+              <label>Value (number/short value if a stat; a URL for Social Links; a meta line like a phone number for Contact Info Cards)</label>
+              <input value={form.value} onChange={(e) => set('value', e.target.value)} placeholder="100 Acres" />
+            </div>
+            <div className="admin-field">
+              <label>Icon (if this section uses icon cards)</label>
+              <select value={form.icon} onChange={(e) => set('icon', e.target.value)}>
+                <option value="">None</option>
+                {CONTENT_ICON_NAMES.map((n) => <option key={n} value={n}>{n}</option>)}
+              </select>
+            </div>
+            <div className="admin-field">
+              {IMAGE_SLUG_SECTIONS.has(`${form.page}::${form.section}`) ? (
+                <>
+                  <label>Avatar Photo</label>
+                  <ImageUploader folder="vwu/testimonials" currentUrl={form.slug} onUploaded={handleAvatarUpload} label="Upload Avatar" aspect={1} />
+                </>
+              ) : (
+                <>
+                  <label>Anchor Slug / Extra field (only if this item needs a #link — a second meta line for Contact Info Cards, or the click-through link for Student Life Clubs — an external https:// URL or an internal /path)</label>
+                  <input value={form.slug} onChange={(e) => set('slug', e.target.value)} placeholder="smart-classrooms" />
+                </>
+              )}
+            </div>
+            <div className="admin-field">
+              <label>Display Order</label>
+              <input type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
+            </div>
+            <div className="admin-field admin-field--full">
+              <label>Title *</label>
+              <input value={form.title} onChange={(e) => set('title', e.target.value)} placeholder="Campus Area" />
+            </div>
+            <div className="admin-field admin-field--full">
+              <label>Description (if this item needs one — for Contact Info Cards, put each address line on its own line)</label>
+              <textarea rows={3} value={form.desc} onChange={(e) => set('desc', e.target.value)} placeholder="Optional longer text…" />
+            </div>
+          </ReadOnlyGate>
         </div>
-        <div className="admin-form-actions">
-          {editing && <button className="admin-btn admin-btn--ghost" onClick={() => { setEditing(null); setForm({ ...EMPTY, page: form.page, section: form.section }); }}>Cancel</button>}
-          <button className="admin-btn admin-btn--primary" onClick={save} disabled={saving}>{saving ? 'Saving…' : editing ? 'Update' : 'Add Item'}</button>
-        </div>
+        <ReadOnlyGate readOnly={!formEditable}>
+          <div className="admin-form-actions">
+            {editing && <button className="admin-btn admin-btn--ghost" onClick={() => { setEditing(null); setForm({ ...EMPTY, page: form.page, section: form.section }); }}>Cancel</button>}
+            <button className="admin-btn admin-btn--primary" onClick={save} disabled={saving}>{saving ? 'Saving…' : editing ? 'Update' : 'Add Item'}</button>
+          </div>
+        </ReadOnlyGate>
       </div>
 
       <div className="admin-card">
@@ -230,8 +246,13 @@ export default function ContentBlocksAdmin() {
                     <td>{b.value || '—'}</td>
                     <td>{b.title}</td>
                     <td>
-                      <button className="admin-btn admin-btn--sm" onClick={() => startEdit(b)}>Edit</button>
-                      <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(b.id)}>Delete</button>
+                      <ReadOnlyGate readOnly={
+                        !canEdit(session, RESOURCES.PLACEMENTS_PAGE_CONTENT, b.page === 'placements')
+                        && !canEdit(session, RESOURCES.PLACEMENTS_BLOCKS, b.page === 'placements')
+                      }>
+                        <button className="admin-btn admin-btn--sm" onClick={() => startEdit(b)}>Edit</button>
+                        <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(b.id)}>Delete</button>
+                      </ReadOnlyGate>
                     </td>
                   </tr>
                 ))}

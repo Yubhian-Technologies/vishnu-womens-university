@@ -201,6 +201,9 @@
   position: sticky;
   top: 0;
   z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 .admin-content__header h1 {
@@ -489,6 +492,17 @@
 .admin-badge--gray { background: #f3f4f6; color: #6b7280; }
 .admin-badge--clickable { cursor: pointer; border: none; font-family: inherit; transition: opacity 0.15s; }
 .admin-badge--clickable:hover { opacity: 0.75; }
+
+/* ---- RBAC read-only gating ---- */
+/* `display: contents` keeps this fieldset from adding any box of its own
+   (no border/padding/margin), so a read-only module looks pixel-identical
+   to its editable state — only interaction is blocked. */
+.admin-readonly-fieldset {
+  all: unset;
+  display: contents;
+  pointer-events: none;
+  user-select: none;
+}
 
 /* ---- Submission detail panel (Contact Messages / Career Applications) ---- */
 .admin-detail-card__header {
