@@ -21,17 +21,69 @@
   padding: 0 var(--space-4);
   height: 100%;
   display: flex;
-  align-items: center;
+  align-items: stretch;
   justify-content: space-between;
 }
 
-/* ===== Header actions (announcements ticker) ===== */
-.header-actions {
+/* ===== Header right column (topline + nav, stacked) ===== */
+.header-right {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.header-topline {
+  flex: 0 0 34px;
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: var(--space-3);
-  margin-left: auto;
-  margin-right: var(--space-4);
+  min-height: 0;
+}
+
+.header-ctas {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.topbar-cta {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 14px;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+  font-family: var(--font-sans);
+}
+
+.topbar-cta.visit,
+.topbar-cta.give {
+  background: transparent;
+  color: rgba(255,255,255,0.85);
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+.topbar-cta.visit:hover,
+.topbar-cta.give:hover {
+  background: rgba(255,255,255,0.1);
+  color: var(--color-white);
+  border-color: rgba(255,255,255,0.6);
+}
+
+.topbar-cta.apply {
+  background: var(--color-accent);
+  color: var(--color-primary-dark);
+  border: 1px solid var(--color-accent);
+}
+
+.topbar-cta.apply:hover {
+  background: var(--color-accent-light);
+  border-color: var(--color-accent-light);
 }
 
 /* ===== Logo ===== */
@@ -109,7 +161,8 @@
 .nav {
   display: flex;
   align-items: center;
-  height: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .nav-list {
@@ -379,6 +432,7 @@ a.mega-group-label:hover {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  align-self: center;
   gap: 5px;
   width: 40px;
   height: 40px;
@@ -596,10 +650,19 @@ a.mega-group-label:hover {
 /* Purely a visual simplification for narrower/tablet widths — not tied to
    the nav-overflow fix above. */
 @media (max-width: 1400px) {
+  .header-topline .announcements-ticker {
+    display: none;
+  }
   .logo-text {
     display: none;
   }
-  .header-actions .announcements-ticker {
-    display: none;
+}
+
+@media (max-width: 480px) {
+  .header-ctas {
+    gap: var(--space-1);
+  }
+  .topbar-cta {
+    padding: 3px 10px;
   }
 }

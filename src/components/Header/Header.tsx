@@ -401,9 +401,20 @@ export default function Header() {
             </div>
           </Link>
 
-          {/* Desktop Nav */}
-          <nav className="nav" aria-label="Main navigation" ref={navRef}>
-            <ul className="nav-list">
+          <div className="header-right">
+            {/* Topline: announcements ticker + Visit/Give/Apply */}
+            <div className="header-topline">
+              <AnnouncementsTicker fallback={null} />
+              <div className="header-ctas">
+                <Link to="/admissions" className="topbar-cta visit">Visit</Link>
+                <Link to="/alumni-giving" className="topbar-cta give">Give</Link>
+                <Link to="/admissions" className="topbar-cta apply">Apply Now</Link>
+              </div>
+            </div>
+
+            {/* Desktop Nav */}
+            <nav className="nav" aria-label="Main navigation" ref={navRef}>
+              <ul className="nav-list">
               {renderedNavItems.map((item) => (
                 <li
                   key={item.label}
@@ -509,12 +520,8 @@ export default function Header() {
                   )}
                 </li>
               ))}
-            </ul>
-          </nav>
-
-          {/* Actions */}
-          <div className="header-actions">
-            <AnnouncementsTicker fallback={null} />
+              </ul>
+            </nav>
           </div>
 
           {/* Mobile Toggle */}
