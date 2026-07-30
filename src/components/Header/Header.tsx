@@ -389,32 +389,6 @@ export default function Header() {
 
   return (
     <>
-      {/* Top Bar */}
-      <div className="topbar">
-        <div className="topbar-inner">
-          <div className="topbar-left">
-            <AnnouncementsTicker fallback={
-              <>
-                <a href="tel:08816250864" className="topbar-link">08816-250864</a>
-                <span className="topbar-link" style={{ opacity: 0.3 }}>|</span>
-                <a href="https://www.svecwexams.in/" target="_blank" rel="noopener noreferrer" className="topbar-link">Examination Portal</a>
-                <span className="topbar-link" style={{ opacity: 0.3 }}>|</span>
-                <a href="https://www.vishnulearning.com/login/index.php" target="_blank" rel="noopener noreferrer" className="topbar-link">LMS Platform</a>
-                <span className="topbar-link" style={{ opacity: 0.3 }}>|</span>
-                <Link to="/campus/central-library" className="topbar-link">Central Library</Link>
-                <span className="topbar-link" style={{ opacity: 0.3 }}>|</span>
-                <a href="https://maps.google.com/maps?q=16.568119,81.522098&z=15" target="_blank" rel="noopener noreferrer" className="topbar-link">Campus Map</a>
-              </>
-            } />
-          </div>
-          <div className="topbar-right">
-            <Link to="/admissions" className="topbar-cta visit">Visit</Link>
-            <Link to="/alumni-giving" className="topbar-cta give">Give</Link>
-            <Link to="/admissions" className="topbar-cta apply">Apply Now</Link>
-          </div>
-        </div>
-      </div>
-
       {/* Main Header */}
       <header className={`header${scrolled ? ' scrolled' : ''}`}>
         <div className="header-inner">
@@ -538,6 +512,11 @@ export default function Header() {
             </ul>
           </nav>
 
+          {/* Actions */}
+          <div className="header-actions">
+            <AnnouncementsTicker fallback={null} />
+          </div>
+
           {/* Mobile Toggle */}
           <button
             className={`mobile-toggle${mobileOpen ? ' open' : ''}`}
@@ -555,18 +534,6 @@ export default function Header() {
       {/* Mobile Menu */}
       <div className={`mobile-menu${mobileOpen ? ' open' : ''}`} aria-hidden={!mobileOpen} data-lenis-prevent>
         <div className="mobile-menu-content">
-          <div className="mobile-ctas">
-            <Link to="/admissions" className="btn btn-secondary" style={{ fontSize: '0.75rem', padding: '0.5rem 1rem' }}>
-              Schedule Visit
-            </Link>
-            <Link to="/admissions" className="btn btn-accent" style={{ fontSize: '0.75rem', padding: '0.5rem 1rem' }}>
-              Apply Now
-            </Link>
-            <Link to="/alumni-giving" className="btn btn-secondary" style={{ fontSize: '0.75rem', padding: '0.5rem 1rem' }}>
-              Give
-            </Link>
-          </div>
-
           <ul className="mobile-nav-list">
             {renderedNavItems.map((item) => {
               const isExpanded = expandedItem === item.label;
