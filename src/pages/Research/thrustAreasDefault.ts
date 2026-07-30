@@ -8,9 +8,9 @@
 // the admin panel. Once an admin does fill in the Firestore field, that value
 // takes over (see ResearchDetail.tsx).
 //
-// Each faculty member links to our own internal research-profile page
-// (/research/faculty/:id) rather than their external IRINS profile — the
-// numeric id is kept only as a stable, unique key for that internal route.
+// Each faculty member links straight out to their external IRINS profile
+// (https://svecw.irins.org/profile/:id) — the numeric id is the IRINS
+// profile id itself, not an internal route key.
 export const DEFAULT_THRUST_AREAS_INTRO = 'VWU faculty members specialize in a variety of research trust areas fostering interdisciplinary collaboration and impactful discoveries. Through their dedicated expertise, they contribute significantly to advancing knowledge and addressing complex challenges in these critical domains.';
 interface ThrustFaculty {
   name: string;
@@ -251,16 +251,15 @@ const THRUST_CATEGORIES: ThrustCategory[] = [
   },
 ];
 
-function facultyProfilePath(name: string, id: string, area: string, category: string): string {
-  const params = new URLSearchParams({ name, area, category });
-  return `/research/faculty/${id}?${params.toString()}`;
+function facultyIrinsUrl(id: string): string {
+  return `https://svecw.irins.org/profile/${id}`;
 }
 
 export const DEFAULT_THRUST_AREAS_TEXT = THRUST_CATEGORIES.map((cat) => {
   const areasText = cat.areas
     .map((area) => {
       const itemsText = area.faculty
-        .map((f) => `${f.name} | ${facultyProfilePath(f.name, f.id, area.name, cat.title)}`)
+        .map((f) => `${f.name} | ${facultyIrinsUrl(f.id)}`)
         .join('\n');
       return `### ${area.name}\n${itemsText}`;
     })

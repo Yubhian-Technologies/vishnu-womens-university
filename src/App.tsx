@@ -24,7 +24,6 @@ const GovernanceDetail = lazy(() => import('./pages/Governance/GovernanceDetail'
 const GoverningBody = lazy(() => import('./pages/Governance/GoverningBody'));
 const Research = lazy(() => import('./pages/Research/Research'));
 const ResearchDetail = lazy(() => import('./pages/Research/ResearchDetail'));
-const FacultyResearchProfile = lazy(() => import('./pages/Research/FacultyResearchProfile'));
 const AboutSVES = lazy(() => import('./pages/AboutSVES/AboutSVES'));
 const Campus = lazy(() => import('./pages/Campus/Campus'));
 const CentralLibrary = lazy(() => import('./pages/Campus/CentralLibrary'));
@@ -102,7 +101,6 @@ function PublicApp() {
           <Route path="/governance/:slug" element={<GovernanceDetail />} />
           <Route path="/research" element={<Research />} />
           <Route path="/research/:slug" element={<ResearchDetail />} />
-          <Route path="/research/faculty/:id" element={<FacultyResearchProfile />} />
           <Route path="/about-sves" element={<AboutSVES />} />
           <Route path="/campus" element={<Campus />} />
           <Route path="/campus/central-library" element={<CentralLibrary />} />
