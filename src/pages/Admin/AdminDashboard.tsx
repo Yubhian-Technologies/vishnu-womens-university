@@ -49,11 +49,38 @@ import WiseEliteProjectPhotosAdmin from './sections/WiseEliteProjectPhotosAdmin'
 import WiseTestimonialPhotosAdmin from './sections/WiseTestimonialPhotosAdmin';
 import WiseNseClippingsAdmin from './sections/WiseNseClippingsAdmin';
 import NirvahanaEventPhotosAdmin from './sections/NirvahanaEventPhotosAdmin';
+import { useAdminSession } from './AdminSessionContext';
+import ReadOnlyGate from './ReadOnlyGate';
+import { canEdit, RESOURCES, type ResourceKey } from '../../lib/rbac';
 
 interface Props {
   activeSection: string;
   setActiveSection: (id: string) => void;
 }
+
+// Sections wholly dedicated to Placements — a department account holding the
+// mapped resource gets full, unwrapped access to the whole section. Every
+// other section not listed here (except the self-gated ones below) is
+// wrapped read-only for any non-Admin session by default, so a brand-new
+// department starts with zero edit access anywhere until its own resources
+// are granted — no per-section code change needed to add that department.
+const SECTION_RESOURCE: Partial<Record<string, ResourceKey>> = {
+  placements: RESOURCES.PLACEMENTS_PAGE_CONTENT,
+  'placement-items': RESOURCES.PLACEMENTS_PAGE_CONTENT,
+  'tpo-team-photos': RESOURCES.PLACEMENTS_GALLERY,
+  'ilo-office-photos': RESOURCES.PLACEMENTS_GALLERY,
+  'gsac-photos': RESOURCES.PLACEMENTS_GALLERY,
+};
+
+// These sections mix Placements content with unrelated content in the same
+// screen (e.g. Hero Banners covers every page on the site, not just
+// Placements'), so they apply canEdit()/isReadOnly() internally, scoped to
+// the specific item being edited, rather than being wrapped wholesale here.
+const SELF_GATED_SECTIONS = new Set(['banners', 'site-photos', 'content-blocks']);
+
+// Overview is a read-only stats dashboard for every session (nothing to
+// edit even for Admin), so it never shows a read-only badge or gets wrapped.
+const UNGATED_SECTIONS = new Set(['overview']);
 
 const SECTION_MAP: Record<string, React.ReactNode> = {
   overview: <Overview />,
@@ -109,15 +136,24 @@ const SECTION_MAP: Record<string, React.ReactNode> = {
 };
 
 export default function AdminDashboard({ activeSection, setActiveSection }: Props) {
+  const session = useAdminSession();
   const current = SECTIONS.find((s) => s.id === activeSection);
+
+  const selfGated = SELF_GATED_SECTIONS.has(activeSection) || UNGATED_SECTIONS.has(activeSection);
+  const mappedResource = SECTION_RESOURCE[activeSection];
+  const sectionEditable = mappedResource ? canEdit(session, mappedResource) : !!session?.isAdmin;
+  const readOnly = !selfGated && !sectionEditable;
 
   return (
     <div className="admin-content">
       <div className="admin-content__header">
         <h1>{current?.icon} {current?.label}</h1>
+        {readOnly && <span className="admin-badge admin-badge--gray">🔒 Read Only</span>}
       </div>
       <div className="admin-content__body">
-        {SECTION_MAP[activeSection] ?? <Overview />}
+        <ReadOnlyGate readOnly={readOnly}>
+          {SECTION_MAP[activeSection] ?? <Overview />}
+        </ReadOnlyGate>
       </div>
       {/* Mobile bottom nav */}
       <nav className="admin-bottom-nav">

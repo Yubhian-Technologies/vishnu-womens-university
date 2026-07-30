@@ -10,6 +10,16 @@ import { campusFacilities } from '../../Campus/campusFacilities.data';
 import { DIFFERENTIATOR_CATEGORIES } from './DifferentiatorsAdmin';
 import ItemHeroImagesAdmin from './ItemHeroImagesAdmin';
 import { smoothScrollTo } from '../../../lib/smoothScroll';
+import { useAdminSession } from '../AdminSessionContext';
+import ReadOnlyGate from '../ReadOnlyGate';
+import { canEdit, RESOURCES } from '../../../lib/rbac';
+
+// Hero Banners covers every page on the site from one screen, so unlike a
+// wholly-Placements section, permission here is scoped per banner: only
+// banners for the Placements hub page and its sub-page fallback are a
+// Placements resource — every other page's banner stays read-only for a
+// department account.
+const PLACEMENTS_BANNER_PAGES = new Set(['placements', 'placement-detail']);
 
 const PROGRAM_CATEGORIES = [
   { value: 'btech', label: 'B.Tech' },
@@ -113,6 +123,7 @@ function groupOfPage(pageValue: string): string | undefined {
 }
 
 function PageBannersAdmin() {
+  const session = useAdminSession();
   const { docs: banners, loading } = useOrderedCollection<Banner>('banners', 'order');
   const [form, setForm] = useState<Omit<Banner, 'id'>>(EMPTY);
   const [editing, setEditing] = useState<string | null>(null);
@@ -171,6 +182,7 @@ function PageBannersAdmin() {
     }
   };
 
+  const formEditable = canEdit(session, RESOURCES.PLACEMENTS_HERO_BANNERS, PLACEMENTS_BANNER_PAGES.has(form.page));
   const pageLabel = (val: string) => PAGES.find((p) => p.value === val)?.label ?? val;
   const bannersForPage = (val: string) => banners.filter((b) => (b.page ?? 'home') === val).length;
   const bannersInGroup = (label: string) => {
@@ -237,54 +249,56 @@ function PageBannersAdmin() {
           )}
         </div>
 
-        <div className="admin-form-grid" style={{ marginTop: '1.25rem' }}>
-          <div className="admin-field admin-field--full">
-            <label>Banner Image *</label>
-            <ImageUploader
-              folder={`vwu/banners/${form.page}`}
-              currentUrl={form.imageUrl}
-              onUploaded={handleImageUploaded}
-              label="Upload Hero Image (recommended: 1920×600px)"
-            />
+        <ReadOnlyGate readOnly={!formEditable}>
+          <div className="admin-form-grid" style={{ marginTop: '1.25rem' }}>
+            <div className="admin-field admin-field--full">
+              <label>Banner Image *</label>
+              <ImageUploader
+                folder={`vwu/banners/${form.page}`}
+                currentUrl={form.imageUrl}
+                onUploaded={handleImageUploaded}
+                label="Upload Hero Image (recommended: 1920×600px)"
+              />
+            </div>
+            <div className="admin-field">
+              <label>Heading *</label>
+              <input value={form.title} onChange={(e) => set('title', e.target.value)}
+                placeholder="e.g. You Will Excel." />
+            </div>
+            <div className="admin-field">
+              <label>Subheading</label>
+              <input value={form.subtitle} onChange={(e) => set('subtitle', e.target.value)}
+                placeholder="Supporting text shown below the heading" />
+            </div>
+            <div className="admin-field">
+              <label>Button Label</label>
+              <input value={form.ctaLabel} onChange={(e) => set('ctaLabel', e.target.value)}
+                placeholder="e.g. Explore Programs" />
+            </div>
+            <div className="admin-field">
+              <label>Button Link</label>
+              <input value={form.ctaLink} onChange={(e) => set('ctaLink', e.target.value)}
+                placeholder="/academics" />
+            </div>
+            <div className="admin-field">
+              <label>Order (for carousel)</label>
+              <input type="number" value={form.order}
+                onChange={(e) => set('order', +e.target.value)} min={0} />
+            </div>
           </div>
-          <div className="admin-field">
-            <label>Heading *</label>
-            <input value={form.title} onChange={(e) => set('title', e.target.value)}
-              placeholder="e.g. You Will Excel." />
-          </div>
-          <div className="admin-field">
-            <label>Subheading</label>
-            <input value={form.subtitle} onChange={(e) => set('subtitle', e.target.value)}
-              placeholder="Supporting text shown below the heading" />
-          </div>
-          <div className="admin-field">
-            <label>Button Label</label>
-            <input value={form.ctaLabel} onChange={(e) => set('ctaLabel', e.target.value)}
-              placeholder="e.g. Explore Programs" />
-          </div>
-          <div className="admin-field">
-            <label>Button Link</label>
-            <input value={form.ctaLink} onChange={(e) => set('ctaLink', e.target.value)}
-              placeholder="/academics" />
-          </div>
-          <div className="admin-field">
-            <label>Order (for carousel)</label>
-            <input type="number" value={form.order}
-              onChange={(e) => set('order', +e.target.value)} min={0} />
-          </div>
-        </div>
 
-        <div className="admin-form-actions">
-          {editing && (
-            <button className="admin-btn admin-btn--ghost"
-              onClick={() => { setEditing(null); setForm(EMPTY); }}>
-              Cancel
+          <div className="admin-form-actions">
+            {editing && (
+              <button className="admin-btn admin-btn--ghost"
+                onClick={() => { setEditing(null); setForm(EMPTY); }}>
+                Cancel
+              </button>
+            )}
+            <button className="admin-btn admin-btn--primary" onClick={save} disabled={saving}>
+              {saving ? 'Saving…' : editing ? 'Update Banner' : `Add to ${pageLabel(form.page)}`}
             </button>
-          )}
-          <button className="admin-btn admin-btn--primary" onClick={save} disabled={saving}>
-            {saving ? 'Saving…' : editing ? 'Update Banner' : `Add to ${pageLabel(form.page)}`}
-          </button>
-        </div>
+          </div>
+        </ReadOnlyGate>
       </div>
 
       {/* List — narrows to the selected category above, same drill-down */}
@@ -309,10 +323,12 @@ function PageBannersAdmin() {
                       {pageLabel(b.page ?? 'home').split(' (')[0]}
                     </span>
                   </div>
-                  <div className="admin-image-card__actions">
-                    <button className="admin-btn admin-btn--sm" onClick={() => startEdit(b)}>Edit</button>
-                    <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(b.id)}>Delete</button>
-                  </div>
+                  <ReadOnlyGate readOnly={!canEdit(session, RESOURCES.PLACEMENTS_HERO_BANNERS, PLACEMENTS_BANNER_PAGES.has(b.page ?? 'home'))}>
+                    <div className="admin-image-card__actions">
+                      <button className="admin-btn admin-btn--sm" onClick={() => startEdit(b)}>Edit</button>
+                      <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(b.id)}>Delete</button>
+                    </div>
+                  </ReadOnlyGate>
                 </div>
               ))}
               {banners.filter((b) => activeGroup.values.includes(b.page ?? 'home')).length === 0 && (
@@ -338,7 +354,13 @@ const TABS = [
 type TabId = typeof TABS[number]['id'];
 
 export default function BannersAdmin() {
+  const session = useAdminSession();
   const [tab, setTab] = useState<TabId>('pages');
+  // Only the "Placements" tab (per-item hero images for placement sub-pages)
+  // is a Placements resource — the other item-hero tabs (Programs,
+  // Governance, Differentiators, Research) belong to no department yet.
+  const placementsTabEditable = canEdit(session, RESOURCES.PLACEMENTS_HERO_BANNERS);
+  const otherTabsEditable = !!session?.isAdmin;
 
   return (
     <div>
@@ -364,6 +386,7 @@ export default function BannersAdmin() {
 
       {tab === 'pages' && <PageBannersAdmin />}
       {tab === 'programs' && (
+        <ReadOnlyGate readOnly={!otherTabsEditable}>
         <ItemHeroImagesAdmin
           collectionName="programs"
           orderByField="name"
@@ -375,8 +398,10 @@ export default function BannersAdmin() {
           categories={PROGRAM_CATEGORIES}
           emptyMessage="No programs yet — add one in the Programs admin section."
         />
+        </ReadOnlyGate>
       )}
       {tab === 'governance' && (
+        <ReadOnlyGate readOnly={!otherTabsEditable}>
         <ItemHeroImagesAdmin
           collectionName="governanceItems"
           orderByField="order"
@@ -389,8 +414,10 @@ export default function BannersAdmin() {
           getBannerPageOverride={(d) => (d.slug === 'governing-body' ? 'governing-body' : null)}
           emptyMessage="No governance items yet — add one in the Governance / Committees / IQAC admin section."
         />
+        </ReadOnlyGate>
       )}
       {tab === 'placements' && (
+        <ReadOnlyGate readOnly={!placementsTabEditable}>
         <ItemHeroImagesAdmin
           collectionName="placementItems"
           orderByField="order"
@@ -400,8 +427,10 @@ export default function BannersAdmin() {
           getLabel={(d) => d.title as string}
           emptyMessage="No placement sub-pages yet — add one in the Placement Sub-pages admin section."
         />
+        </ReadOnlyGate>
       )}
       {tab === 'differentiators' && (
+        <ReadOnlyGate readOnly={!otherTabsEditable}>
         <ItemHeroImagesAdmin
           collectionName="differentiatorItems"
           orderByField="order"
@@ -413,8 +442,10 @@ export default function BannersAdmin() {
           categories={DIFFERENTIATOR_CATEGORY_OPTIONS}
           emptyMessage="No differentiator items yet — add one in the Differentiators admin section."
         />
+        </ReadOnlyGate>
       )}
       {tab === 'research' && (
+        <ReadOnlyGate readOnly={!otherTabsEditable}>
         <ItemHeroImagesAdmin
           collectionName="researchItems"
           orderByField="order"
@@ -426,6 +457,7 @@ export default function BannersAdmin() {
           categories={RESEARCH_CATEGORIES}
           emptyMessage="No research items yet — add one in the Research admin section."
         />
+        </ReadOnlyGate>
       )}
     </div>
   );
