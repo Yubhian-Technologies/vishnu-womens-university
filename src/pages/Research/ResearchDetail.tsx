@@ -4,13 +4,17 @@ import { Sparkles, Microscope, Check } from 'lucide-react';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import { parseFlexibleTable, parseAccordionTable, parseProjectAccordion } from '../../lib/structuredTable';
+import { parseAboutContent } from '../../lib/aboutContent';
 import type { ResearchItemDoc } from '../Admin/sections/ResearchItemsAdmin';
+import ThrustAreasSection from './ThrustAreasSection';
+import ProfessionalBodiesSection from './ProfessionalBodiesSection';
 import { DEFAULT_FUNDED_PROJECTS_TEXT } from './fundedProjectsDefault';
 import { DEFAULT_PATENTS_TEXT } from './patentsDefault';
 import { DEFAULT_THRUST_AREAS_INTRO, DEFAULT_THRUST_AREAS_TEXT } from './thrustAreasDefault';
 import { DEFAULT_RESEARCH_PUBLICATIONS_TEXT } from './researchPublicationsDefault';
 import { DEFAULT_CONSULTANCY_TEXT } from './consultancyDefault';
 import { DEFAULT_RESEARCH_CENTERS_INTRO, DEFAULT_RESEARCH_CENTERS_TABLE_TEXT } from './researchCentersDefault';
+import { DEFAULT_MOUS_TABLE_TEXT } from './mousDefault';
 import { DEFAULT_SEED_MONEY_PROJECTS_TABLE_TEXT, DEFAULT_SEED_MONEY_PROJECTS_INTRO } from './seedMoneyProjectsDefault';
 import { DEFAULT_ABOUT_RD_TABLE_TEXT } from './aboutRdDefault';
 import { DEFAULT_RAC_INTRO, DEFAULT_RAC_ABOUT } from './researchAdvisoryCommitteeDefault';
@@ -40,26 +44,26 @@ const DEFAULT_ACCORDION_TEXT_BY_SLUG: Record<string, string> = {
   'consultancy': DEFAULT_CONSULTANCY_TEXT,
 };
 
-// Thrust Areas of Research already has an older accordionText value saved in
-// Firestore that links each faculty member out to their external IRINS
-// profile as a raw pasted URL — DEFAULT_THRUST_AREAS_TEXT was rebuilt to
-// link to our own internal /research/faculty/:id profile page instead, so
+// Thrust Areas of Research already has an older/partial accordionText value
+// saved in Firestore (e.g. missing the department-category grouping) — so
 // (like the table-text map below) this one wins over item.accordionText
-// until an admin replaces it.
+// until an admin replaces it. Each faculty member links out to their
+// external IRINS profile (https://svecw.irins.org/profile/:id).
 const DEFAULT_ACCORDION_TEXT_OVERRIDE_BY_SLUG: Record<string, string> = {
   'thrust-areas-of-research': DEFAULT_THRUST_AREAS_TEXT,
 };
 
-// Research Centers, Seed Money Projects, and About R&D all already have an
-// older/partial tableText value saved in Firestore that's missing sections
-// added later (fuller detail tables, department coordinators, etc.) — so
-// unlike the other two maps above, this one is checked *before*
-// item.tableText (see below) and always wins for these slugs until an admin
-// removes it.
+// Research Centers, Seed Money Projects, About R&D, and MoUs all already
+// have an older/partial tableText value saved in Firestore that's missing
+// content added later (fuller detail tables, department coordinators, the
+// full MoU partner lists, etc.) — so unlike the other two maps above, this
+// one is checked *before* item.tableText (see below) and always wins for
+// these slugs until an admin removes it.
 const DEFAULT_TABLE_TEXT_BY_SLUG: Record<string, string> = {
   'research-centers': DEFAULT_RESEARCH_CENTERS_TABLE_TEXT,
   'seed-money-projects': DEFAULT_SEED_MONEY_PROJECTS_TABLE_TEXT,
   'about-rd': DEFAULT_ABOUT_RD_TABLE_TEXT,
+  mous: DEFAULT_MOUS_TABLE_TEXT,
 };
 
 // Research Advisory Committee, Research Ethics Committee, and IPR Committee
@@ -81,58 +85,6 @@ const DEFAULT_ABOUT_BY_SLUG: Record<string, string> = {
   'research-ethics-committee': DEFAULT_REC_ABOUT,
   'ipr-committee': DEFAULT_IPR_ABOUT,
 };
-
-// The About paragraph is usually one plain block of text, but some items
-// (e.g. Research Advisory Committee) need a sub-heading plus a bulleted list
-// of "Bold Label: description" items — parsed from plain text so it stays a
-// single Firestore string field rather than needing new admin UI.
-type AboutBlock =
-  | { type: 'heading'; text: string }
-  | { type: 'paragraph'; text: string }
-  | { type: 'list'; items: string[] };
-
-function parseAboutContent(text: string): AboutBlock[] {
-  const blocks: AboutBlock[] = [];
-  let paragraphLines: string[] = [];
-  let listItems: string[] = [];
-
-  const flushParagraph = () => {
-    if (paragraphLines.length > 0) {
-      blocks.push({ type: 'paragraph', text: paragraphLines.join(' ') });
-      paragraphLines = [];
-    }
-  };
-  const flushList = () => {
-    if (listItems.length > 0) {
-      blocks.push({ type: 'list', items: listItems });
-      listItems = [];
-    }
-  };
-
-  for (const rawLine of (text || '').split('\n')) {
-    const line = rawLine.trim();
-    if (!line) {
-      flushParagraph();
-      continue;
-    }
-    if (line.startsWith('## ')) {
-      flushParagraph();
-      flushList();
-      blocks.push({ type: 'heading', text: line.slice(3).trim() });
-      continue;
-    }
-    if (line.startsWith('- ')) {
-      flushParagraph();
-      listItems.push(line.slice(2).trim());
-      continue;
-    }
-    flushList();
-    paragraphLines.push(line);
-  }
-  flushParagraph();
-  flushList();
-  return blocks;
-}
 
 export default function ResearchDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -218,7 +170,9 @@ export default function ResearchDetail() {
           <div className={item.highlights && item.highlights.length > 0 ? 'detail-grid' : ''}>
             <div>
               <span className="section-label">Overview</span>
-              <h2 className="section-title" style={{ fontSize: '1.75rem' }}>About {item.title}</h2>
+              <h2 className="section-title" style={{ fontSize: '1.75rem' }}>
+                {item.title.toLowerCase().startsWith('about ') ? item.title : `About ${item.title}`}
+              </h2>
               {intro && (
                 <p style={{ fontSize: 'var(--text-lg)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-5)' }}>
                   {intro}
@@ -290,10 +244,27 @@ export default function ResearchDetail() {
         </div>
       </section>
 
+      {/* Professional Bodies gets its own richer per-body layout (paragraphs,
+          advisor/chair details, chapter info, and activity-log tables) —
+          far more structure than the plain summary table Firestore's
+          tableText field currently holds for this slug, so it's rendered
+          directly instead of through the generic table renderer below. */}
+      {item.slug === 'professional-bodies' && (
+        <section className="section bg-off-white">
+          <div className="container">
+            <div style={{ marginBottom: 'var(--space-8)' }}>
+              <span className="section-label">Details</span>
+              <h2 className="section-title" style={{ fontSize: '1.75rem' }}>{item.title}</h2>
+            </div>
+            <ProfessionalBodiesSection />
+          </div>
+        </section>
+      )}
+
       {/* Data table(s) — a single unnamed section renders as one table under
           the item's own title; multiple named sections (e.g. Patents grouped
           by year) each get their own sub-heading. */}
-      {tableSections.length > 0 && projectCategories.length === 0 && accordionCategories.length === 0 && (
+      {item.slug !== 'professional-bodies' && tableSections.length > 0 && projectCategories.length === 0 && accordionCategories.length === 0 && (
         <section className="section bg-off-white">
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
@@ -338,9 +309,25 @@ export default function ResearchDetail() {
       )}
 
       {/* Expandable areas — a category > area accordion for content that
-          doesn't fit a table (e.g. Thrust Areas of Research: department ->
-          research area -> faculty names), each area toggling independently. */}
-      {accordionCategories.length > 0 && (
+          doesn't fit a table (e.g. Research Publications, Consultancy: a
+          category -> research area -> faculty accordion), each area toggling
+          independently. Thrust Areas of Research uses the same underlying
+          category/area/faculty data shape but gets its own department-tab
+          browsing UI below instead (it has far more categories/areas than
+          the others, so the plain stacked accordion read as one long
+          undifferentiated list). */}
+      {accordionCategories.length > 0 && item.slug === 'thrust-areas-of-research' && (
+        <section className="section bg-off-white">
+          <div className="container">
+            <div style={{ marginBottom: 'var(--space-8)' }}>
+              <span className="section-label">Details</span>
+              <h2 className="section-title" style={{ fontSize: '1.75rem' }}>{item.title}</h2>
+            </div>
+            <ThrustAreasSection categories={accordionCategories} />
+          </div>
+        </section>
+      )}
+      {accordionCategories.length > 0 && item.slug !== 'thrust-areas-of-research' && (
         <section className="section bg-off-white">
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
@@ -376,10 +363,15 @@ export default function ResearchDetail() {
                                 <li key={ii}>
                                   <Check size={13} strokeWidth={2.5} style={{ color: 'var(--color-accent)', flexShrink: 0 }} />
                                   {it.href ? (
-                                    /\.[a-z0-9]+$/i.test(it.href) ? (
-                                      // A file path (e.g. a PDF), not another page — a router
-                                      // Link would just SPA-navigate to a nonexistent route
-                                      // instead of fetching the file, so use a plain anchor.
+                                    /^https?:\/\//i.test(it.href) ? (
+                                      // An absolute URL (e.g. an external IRINS faculty profile) —
+                                      // a router Link would try to SPA-navigate to it as an
+                                      // internal route instead of leaving the site.
+                                      <a href={it.href} target="_blank" rel="noopener noreferrer" className="thrust-accordion-link">{it.label}</a>
+                                    ) : /\.[a-z0-9]+$/i.test(it.href) ? (
+                                      // A local file path (e.g. a PDF), not another page — a
+                                      // router Link would just SPA-navigate to a nonexistent
+                                      // route instead of fetching the file, so use a plain anchor.
                                       <a href={it.href} download target="_blank" rel="noopener noreferrer" className="thrust-accordion-link">{it.label}</a>
                                     ) : (
                                       <Link to={it.href} className="thrust-accordion-link">{it.label}</Link>

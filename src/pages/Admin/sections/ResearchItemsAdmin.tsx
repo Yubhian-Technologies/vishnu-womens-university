@@ -151,13 +151,13 @@ export default function ResearchItemsAdmin() {
               categories of collapsible areas instead of a table). Start each category with{' '}
               <code>## Category</code>, each expandable area within it with <code>### Area Name</code>, then list
               one item per line underneath (e.g. faculty names) — they'll render as a click-to-expand accordion.
-              Add <code>| /some/path</code> after an item to make it a clickable link (e.g. to a faculty member's
-              profile page) — leave it off for plain text.</label>
+              Add <code>| https://some-url</code> after an item to make it a clickable link (e.g. to a faculty
+              member's external IRINS profile) — leave it off for plain text.</label>
             <textarea
               rows={10}
               value={form.accordionText}
               onChange={(e) => set('accordionText', e.target.value)}
-              placeholder={'## Computing & AI\n### Machine Learning\nK. Padma Vasavi | /research/faculty/149610?name=K.%20Padma%20Vasavi\nA. Sri Krishna\n### Deep Learning\nK. Padma Vasavi'}
+              placeholder={'## Computing & AI\n### Machine Learning\nK. Padma Vasavi | https://svecw.irins.org/profile/149610\nA. Sri Krishna\n### Deep Learning\nK. Padma Vasavi'}
             />
           </div>
           <div className="admin-field admin-field--full">
