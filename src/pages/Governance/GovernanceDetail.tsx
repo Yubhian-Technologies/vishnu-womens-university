@@ -14,6 +14,7 @@ import InternalQACellSection from './InternalQACellSection';
 import PoliciesListSection from '../PoliciesProcedures/PoliciesListSection';
 import AnnualReportsSection from './AnnualReportsSection';
 import NirfReportsSection from './NirfReportsSection';
+import NbaDataSection from './NbaDataSection';
 import type { GovernanceItemDoc } from '../Admin/sections/GovernanceItemsAdmin';
 import '../detail-layout.css';
 
@@ -368,6 +369,21 @@ export default function GovernanceDetail() {
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>{item.title}</h2>
             </div>
             <NirfReportsSection />
+          </div>
+        </section>
+      )}
+
+      {/* NBA – Data Capturing Points gets a plain bulleted list of the real
+          per-programme and institution-wide DCP document links, instead of
+          the plain paragraph/table content the other Governance/IQAC subpages use. */}
+      {item.slug === 'nba-data' && (
+        <section className="section bg-off-white">
+          <div className="container">
+            <div style={{ marginBottom: 'var(--space-8)' }}>
+              <span className="section-label">Details</span>
+              <h2 className="section-title" style={{ fontSize: '1.75rem' }}>{item.title}</h2>
+            </div>
+            <NbaDataSection />
           </div>
         </section>
       )}

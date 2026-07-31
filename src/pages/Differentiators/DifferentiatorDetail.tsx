@@ -3,6 +3,7 @@ import { Link, useParams, Navigate } from 'react-router-dom';
 import { orderBy } from 'firebase/firestore';
 import { Trophy, Rocket, Factory, Microscope, Globe2, GraduationCap } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
+import SmoothCollapse from '../../components/SmoothCollapse/SmoothCollapse';
 import { useCollection, useOrderedCollection, type WithId } from '../../hooks/useCollection';
 import { DIFFERENTIATOR_CATEGORIES } from '../Admin/sections/DifferentiatorsAdmin';
 import type { DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
@@ -184,7 +185,7 @@ function NasscomAccordion({ nasscom }: { nasscom: typeof nasscomEmbedded }) {
               <span style={{ fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-primary)', fontSize: 'var(--text-base)' }}>{title}</span>
               <span style={{ fontSize: '1.2rem', fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-text)', lineHeight: 1 }}>{isOpen ? '−' : '+'}</span>
             </button>
-            {isOpen && (
+            <SmoothCollapse open={isOpen}>
               <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderTop: 'none' }}>
                 {title === 'Training / Research' && (
                   <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', margin: 0 }}>
@@ -216,7 +217,7 @@ function NasscomAccordion({ nasscom }: { nasscom: typeof nasscomEmbedded }) {
                 )}
                 {title === 'Outcomes' && <CheckBullets items={nasscom.outcomes} />}
               </div>
-            )}
+            </SmoothCollapse>
           </div>
         );
       })}
@@ -251,7 +252,7 @@ function HclAccordion({ hcl }: { hcl: typeof hclVlsiTraining }) {
               <span style={{ fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-primary)', fontSize: 'var(--text-base)' }}>{title}</span>
               <span style={{ fontSize: '1.2rem', fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-text)', lineHeight: 1 }}>{isOpen ? '−' : '+'}</span>
             </button>
-            {isOpen && (
+            <SmoothCollapse open={isOpen}>
               <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderTop: 'none' }}>
                 {title === 'Testimonials' && (
                   <>
@@ -289,7 +290,7 @@ function HclAccordion({ hcl }: { hcl: typeof hclVlsiTraining }) {
                   )
                 )}
               </div>
-            )}
+            </SmoothCollapse>
           </div>
         );
       })}
@@ -405,7 +406,7 @@ function MicrochipAccordion({ activities, outcomes }: { activities: string[]; ou
               <span style={{ fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-primary)', fontSize: 'var(--text-base)' }}>{title}</span>
               <span style={{ fontSize: '1.2rem', fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-text)', lineHeight: 1 }}>{isOpen ? '−' : '+'}</span>
             </button>
-            {isOpen && (
+            <SmoothCollapse open={isOpen}>
               <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderTop: 'none' }}>
                 {items.length > 0 ? (
                   <CheckBullets items={items} />
@@ -415,7 +416,7 @@ function MicrochipAccordion({ activities, outcomes }: { activities: string[]; ou
                   </p>
                 )}
               </div>
-            )}
+            </SmoothCollapse>
           </div>
         );
       })}
@@ -711,7 +712,7 @@ function ChipsToStartupAccordion({
               <span style={{ fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-primary)', fontSize: 'var(--text-base)' }}>{title}</span>
               <span style={{ fontSize: '1.2rem', fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-text)', lineHeight: 1 }}>{isOpen ? '−' : '+'}</span>
             </button>
-            {isOpen && (
+            <SmoothCollapse open={isOpen}>
               <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderTop: 'none' }}>
                 {isActivities || isOutcomes ? (
                   photos.length > 0 ? (
@@ -729,7 +730,7 @@ function ChipsToStartupAccordion({
                   </p>
                 )}
               </div>
-            )}
+            </SmoothCollapse>
           </div>
         );
       })}
@@ -1123,11 +1124,11 @@ function VsacInnerAccordion({ titles, children }: { titles: string[]; children: 
               <span style={{ fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-primary)', fontSize: 'var(--text-sm)' }}>{title}</span>
               <span style={{ fontSize: '1.2rem', fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-text)', lineHeight: 1 }}>{isOpen ? '−' : '+'}</span>
             </button>
-            {isOpen && (
+            <SmoothCollapse open={isOpen}>
               <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderTop: 'none' }}>
                 {children(i)}
               </div>
-            )}
+            </SmoothCollapse>
           </div>
         );
       })}
@@ -1609,7 +1610,7 @@ function AtlAccordion({
               <span style={{ fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-primary)', fontSize: 'var(--text-base)' }}>{title}</span>
               <span style={{ fontSize: '1.2rem', fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-text)', lineHeight: 1 }}>{isOpen ? '−' : '+'}</span>
             </button>
-            {isOpen && (
+            <SmoothCollapse open={isOpen}>
               <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderTop: 'none' }}>
                 {title === 'Faculty Members' && <AtlTeamSection team={data.team} />}
 
@@ -1680,7 +1681,7 @@ function AtlAccordion({
                   />
                 )}
               </div>
-            )}
+            </SmoothCollapse>
           </div>
         );
       })}
@@ -1805,7 +1806,7 @@ function VsacAccordion({
               <span style={{ fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-primary)', fontSize: 'var(--text-base)' }}>{title}</span>
               <span style={{ fontSize: '1.2rem', fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-text)', lineHeight: 1 }}>{isOpen ? '−' : '+'}</span>
             </button>
-            {isOpen && (
+            <SmoothCollapse open={isOpen}>
               <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderTop: 'none' }}>
                 {title === 'Team (VSAC)' ? (
                   <VsacTeamSection team={team} />
@@ -1815,7 +1816,7 @@ function VsacAccordion({
                   <VsacCollaborationsSection items={collaborations} galleryPhotos={galleryPhotos} />
                 )}
               </div>
-            )}
+            </SmoothCollapse>
           </div>
         );
       })}
@@ -1934,7 +1935,7 @@ function HpcAccordion({ data }: { data: typeof highPerformanceComputingLab }) {
               <span style={{ fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-primary)', fontSize: 'var(--text-base)' }}>{title}</span>
               <span style={{ fontSize: '1.2rem', fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-text)', lineHeight: 1 }}>{isOpen ? '−' : '+'}</span>
             </button>
-            {isOpen && (
+            <SmoothCollapse open={isOpen}>
               <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderTop: 'none' }}>
                 {title === 'Team' ? (
                   <HpcTeamSection team={data.team} />
@@ -1957,7 +1958,7 @@ function HpcAccordion({ data }: { data: typeof highPerformanceComputingLab }) {
                   <CheckBullets items={data.activities} />
                 )}
               </div>
-            )}
+            </SmoothCollapse>
           </div>
         );
       })}
@@ -2123,7 +2124,7 @@ function CanoeAccordion({
               <span style={{ fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-primary)', fontSize: 'var(--text-base)' }}>{title}</span>
               <span style={{ fontSize: '1.2rem', fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-text)', lineHeight: 1 }}>{isOpen ? '−' : '+'}</span>
             </button>
-            {isOpen && (
+            <SmoothCollapse open={isOpen}>
               <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderTop: 'none' }}>
                 {title === 'In-charge' ? (
                   <HpcMemberCard member={data.inCharge} />
@@ -2176,7 +2177,7 @@ function CanoeAccordion({
                   <CheckBullets items={data.activities} />
                 )}
               </div>
-            )}
+            </SmoothCollapse>
           </div>
         );
       })}
@@ -2246,7 +2247,7 @@ function DhclAccordion({ data }: { data: typeof dreamHouseConstructionLab }) {
               <span style={{ fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-primary)', fontSize: 'var(--text-base)' }}>{title}</span>
               <span style={{ fontSize: '1.2rem', fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-text)', lineHeight: 1 }}>{isOpen ? '−' : '+'}</span>
             </button>
-            {isOpen && (
+            <SmoothCollapse open={isOpen}>
               <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderTop: 'none' }}>
                 {title === 'In-charge' ? (
                   <DhclMemberCard member={data.inCharge} />
@@ -2285,7 +2286,7 @@ function DhclAccordion({ data }: { data: typeof dreamHouseConstructionLab }) {
                   <CheckBullets items={data.activities} />
                 )}
               </div>
-            )}
+            </SmoothCollapse>
           </div>
         );
       })}
@@ -2551,7 +2552,7 @@ function UltraTechAccordion({
               <span style={{ fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-primary)', fontSize: 'var(--text-base)' }}>{title}</span>
               <span style={{ fontSize: '1.2rem', fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-text)', lineHeight: 1 }}>{isOpen ? '−' : '+'}</span>
             </button>
-            {isOpen && (
+            <SmoothCollapse open={isOpen}>
               <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderTop: 'none' }}>
                 {isInCharge ? (
                   <TiDspMemberCard member={inCharge} />
@@ -2571,7 +2572,7 @@ function UltraTechAccordion({
                   </p>
                 )}
               </div>
-            )}
+            </SmoothCollapse>
           </div>
         );
       })}
@@ -2621,7 +2622,7 @@ function TiDspAccordion({
               <span style={{ fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-primary)', fontSize: 'var(--text-base)' }}>{title}</span>
               <span style={{ fontSize: '1.2rem', fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-text)', lineHeight: 1 }}>{isOpen ? '−' : '+'}</span>
             </button>
-            {isOpen && (
+            <SmoothCollapse open={isOpen}>
               <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderTop: 'none' }}>
                 {isTrainingResearch ? (
                   <TrainingResearchSection data={trainingResearch} />
@@ -2650,7 +2651,7 @@ function TiDspAccordion({
                   </p>
                 )}
               </div>
-            )}
+            </SmoothCollapse>
           </div>
         );
       })}
@@ -3206,11 +3207,11 @@ function WiseTeamAccordion({ team, photoMap }: { team: WiseTeamMember[]; photoMa
               </span>
               <span style={{ fontSize: '1.2rem', fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-text)', lineHeight: 1 }}>{isOpen ? '−' : '+'}</span>
             </button>
-            {isOpen && (
+            <SmoothCollapse open={isOpen}>
               <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderTop: 'none' }}>
                 <WiseTeamMemberCard member={member} photoUrl={photoMap[member.id]} />
               </div>
-            )}
+            </SmoothCollapse>
           </div>
         );
       })}
@@ -3397,12 +3398,12 @@ function WisePlacementStatsAccordion({ years }: { years: WisePlacementStatsYear[
               <span style={{ fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-primary)', fontSize: 'var(--text-base)' }}>{y.heading}</span>
               <span style={{ fontSize: '1.2rem', fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-text)', lineHeight: 1 }}>{isOpen ? '−' : '+'}</span>
             </button>
-            {isOpen && (
+            <SmoothCollapse open={isOpen}>
               <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderTop: 'none' }}>
                 <p style={{ fontWeight: 700, color: 'var(--color-primary)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-3)' }}>{y.heading}</p>
                 <WisePlacementStatsTable ranges={y.ranges} />
               </div>
-            )}
+            </SmoothCollapse>
           </div>
         );
       })}
@@ -3459,11 +3460,11 @@ function WiseTestimonialAccordion({ testimonials, photoMap }: { testimonials: Wi
               </span>
               <span style={{ fontSize: '1.2rem', fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-text)', lineHeight: 1 }}>{isOpen ? '−' : '+'}</span>
             </button>
-            {isOpen && (
+            <SmoothCollapse open={isOpen}>
               <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderTop: 'none' }}>
                 <WiseTestimonialCard testimonial={t} photoUrl={photoMap[t.id]} />
               </div>
-            )}
+            </SmoothCollapse>
           </div>
         );
       })}

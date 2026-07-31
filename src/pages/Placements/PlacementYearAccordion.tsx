@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { BranchOfferCount } from './placementStats.data';
 import { usePlacementYears } from './usePlacementYears';
+import SmoothCollapse from '../../components/SmoothCollapse/SmoothCollapse';
 
 interface Props {
   /** Restrict to just these batch labels (e.g. only the 4 most recent) —
@@ -14,29 +15,188 @@ interface Props {
   enrichedYears?: string[];
 }
 
-function BranchOffersChart({ data }: { data: BranchOfferCount[] }) {
-  const max = Math.max(...data.map((d) => d.offers));
+// Each branch's share of the batch's total offers, e.g. 24.9% rather than
+// a raw offer count.
+function branchPercentage(offers: number, total: number): number {
+  return total > 0 ? (offers / total) * 100 : 0;
+}
+
+// A fixed categorical color per branch identity (not per array position —
+// batches don't all list the same branches in the same order, and some
+// omit a branch entirely, so the same real-world branch must always land
+// on the same hue). Validated CVD-safe/normal-vision-safe as a set via the
+// dataviz skill's validate_palette.js against this page's white card
+// surface; the gold slot doubles as the site's own --color-accent so the
+// chart still reads as "on brand" rather than a generic palette drop-in.
+const BRANCH_COLORS: Record<string, string> = {
+  'AI&DS': '#1f8f5c',
+  Civil: '#C9A84C',
+  CSE: '#17a398',
+  ECE: '#d97a3f',
+  EEE: '#3d5a99',
+  IT: '#c0463f',
+  MBA: '#7551a8',
+  Mechanical: '#a8710a',
+};
+
+function branchKey(label: string): string {
+  const stripped = label.replace(/\s*Offers$/i, '').trim();
+  if (stripped === 'AIDS') return 'AI&DS';
+  if (stripped === 'Mech.') return 'Mechanical';
+  return stripped;
+}
+
+function branchColor(label: string): string {
+  return BRANCH_COLORS[branchKey(label)] ?? 'var(--color-mid-gray)';
+}
+
+// Polar → cartesian for a donut sector, angle 0 = 12 o'clock, clockwise.
+function polarPoint(cx: number, cy: number, r: number, angleDeg: number) {
+  const rad = ((angleDeg - 90) * Math.PI) / 180;
+  return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
+}
+
+function donutSectorPath(cx: number, cy: number, rOuter: number, rInner: number, startAngle: number, endAngle: number): string {
+  const largeArc = endAngle - startAngle > 180 ? 1 : 0;
+  const p1 = polarPoint(cx, cy, rOuter, startAngle);
+  const p2 = polarPoint(cx, cy, rOuter, endAngle);
+  const p3 = polarPoint(cx, cy, rInner, endAngle);
+  const p4 = polarPoint(cx, cy, rInner, startAngle);
+  return [
+    `M ${p1.x} ${p1.y}`,
+    `A ${rOuter} ${rOuter} 0 ${largeArc} 1 ${p2.x} ${p2.y}`,
+    `L ${p3.x} ${p3.y}`,
+    `A ${rInner} ${rInner} 0 ${largeArc} 0 ${p4.x} ${p4.y}`,
+    'Z',
+  ].join(' ');
+}
+
+const DONUT_SIZE = 240;
+const DONUT_CENTER = DONUT_SIZE / 2;
+const DONUT_OUTER_R = 105;
+const DONUT_INNER_R = 64;
+
+// Donut proportions are each branch's share *among the listed branches*
+// (so the arcs always complete a full circle); the printed percentage
+// alongside every slice stays the approved "share of the batch's total
+// offers" figure — the two agree on relative order and magnitude (same
+// underlying offers, just a different common denominator), so nothing
+// reads as contradictory.
+function BranchOffersDonut({ data, total }: { data: BranchOfferCount[]; total: number }) {
+  const [hovered, setHovered] = useState<string | null>(null);
+  const sumOffers = data.reduce((s, d) => s + d.offers, 0) || 1;
+  let cumulative = 0;
+  const slices = data.map((d) => {
+    const sweep = (d.offers / sumOffers) * 360;
+    const startAngle = cumulative;
+    const endAngle = cumulative + sweep;
+    cumulative = endAngle;
+    return { ...d, startAngle, endAngle, pct: branchPercentage(d.offers, total), color: branchColor(d.branch) };
+  });
+  const topBranch = [...slices].sort((a, b) => b.offers - a.offers)[0];
+
   return (
-    <div style={{ display: 'flex', alignItems: 'flex-end', gap: 'var(--space-4)', height: 220, padding: 'var(--space-5) var(--space-4) var(--space-6)', overflowX: 'auto' }}>
-      {data.map((d) => {
-        const heightPct = max > 0 ? (d.offers / max) * 100 : 0;
-        return (
-          <div key={d.branch} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-2)', minWidth: 64 }}>
-            <div style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--color-text)' }}>{d.offers}</div>
-            <div style={{ display: 'flex', alignItems: 'flex-end', height: 160 }}>
-              <div
+    <div
+      style={{
+        background: 'var(--color-white)',
+        border: '1.5px solid var(--color-light-gray)',
+        borderRadius: 'var(--radius-md)',
+        padding: 'var(--space-6) var(--space-5)',
+        display: 'flex',
+        flexWrap: 'wrap',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 'var(--space-8)',
+      }}
+    >
+      <div style={{ position: 'relative', width: DONUT_SIZE, height: DONUT_SIZE, flexShrink: 0 }}>
+        <svg viewBox={`0 0 ${DONUT_SIZE} ${DONUT_SIZE}`} width={DONUT_SIZE} height={DONUT_SIZE}>
+          {slices.map((s) => {
+            const isHovered = hovered === s.branch;
+            return (
+              <path
+                key={s.branch}
+                d={donutSectorPath(DONUT_CENTER, DONUT_CENTER, DONUT_OUTER_R, DONUT_INNER_R, s.startAngle, s.endAngle)}
+                fill={s.color}
+                stroke="var(--color-white)"
+                strokeWidth={3}
+                strokeLinejoin="round"
                 style={{
-                  width: 22,
-                  height: `${Math.max(heightPct, 2)}%`,
-                  background: 'var(--color-primary)',
-                  borderRadius: '4px 4px 0 0',
+                  transformOrigin: `${DONUT_CENTER}px ${DONUT_CENTER}px`,
+                  transform: isHovered ? 'scale(1.045)' : 'scale(1)',
+                  transition: 'transform var(--transition-fast), opacity var(--transition-fast)',
+                  opacity: hovered && !isHovered ? 0.55 : 1,
+                  cursor: 'pointer',
                 }}
+                tabIndex={0}
+                role="img"
+                aria-label={`${s.branch}: ${s.pct.toFixed(1)} percent, ${s.offers.toLocaleString('en-IN')} offers`}
+                onMouseEnter={() => setHovered(s.branch)}
+                onMouseLeave={() => setHovered(null)}
+                onFocus={() => setHovered(s.branch)}
+                onBlur={() => setHovered(null)}
               />
-            </div>
-            <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', textAlign: 'center', lineHeight: 1.3 }}>{d.branch}</div>
-          </div>
-        );
-      })}
+            );
+          })}
+        </svg>
+
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none', textAlign: 'center' }}>
+          {hovered ? (
+            <>
+              <div style={{ fontSize: 'var(--text-2xl)', fontWeight: 900, color: branchColor(hovered), lineHeight: 1 }}>
+                {slices.find((s) => s.branch === hovered)!.pct.toFixed(1)}%
+              </div>
+              <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', marginTop: 'var(--space-1)', maxWidth: 120, lineHeight: 1.3 }}>{hovered}</div>
+              <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', marginTop: 2 }}>
+                {slices.find((s) => s.branch === hovered)!.offers.toLocaleString('en-IN')} offers
+              </div>
+            </>
+          ) : (
+            <>
+              <div style={{ fontSize: 'var(--text-2xl)', fontWeight: 900, color: 'var(--color-primary)', lineHeight: 1 }}>
+                {total.toLocaleString('en-IN')}
+              </div>
+              <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', marginTop: 'var(--space-1)' }}>Total Offers</div>
+              {topBranch && (
+                <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', marginTop: 2 }}>
+                  Top: <span style={{ fontWeight: 700, color: topBranch.color }}>{topBranch.branch}</span>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+
+      <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 'var(--space-2) var(--space-4)', minWidth: 260, flex: 1 }}>
+        {slices.map((s) => {
+          const isHovered = hovered === s.branch;
+          return (
+            <li
+              key={s.branch}
+              tabIndex={0}
+              onMouseEnter={() => setHovered(s.branch)}
+              onMouseLeave={() => setHovered(null)}
+              onFocus={() => setHovered(s.branch)}
+              onBlur={() => setHovered(null)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--space-2)',
+                padding: '0.35rem 0.5rem',
+                borderRadius: 'var(--radius-sm)',
+                background: isHovered ? 'var(--color-off-white)' : 'transparent',
+                transition: 'background var(--transition-fast)',
+                cursor: 'pointer',
+                outline: 'none',
+              }}
+            >
+              <span style={{ width: 12, height: 12, borderRadius: 3, background: s.color, flexShrink: 0 }} />
+              <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', flex: 1 }}>{s.branch}</span>
+              <span style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-primary)' }}>{s.pct.toFixed(1)}%</span>
+            </li>
+          );
+        })}
+      </ul>
     </div>
   );
 }
@@ -93,13 +253,26 @@ export default function PlacementYearAccordion({ years, enrichedYears }: Props) 
                 padding: 'var(--space-3) var(--space-5)',
                 cursor: 'pointer',
                 textAlign: 'left',
+                transition: 'background var(--transition-base)',
               }}
             >
-              <span style={{ fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-primary)', fontSize: 'var(--text-base)' }}>{y.batch}</span>
-              <span style={{ fontSize: '1.2rem', fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-text)', lineHeight: 1 }}>{isOpen ? '−' : '+'}</span>
+              <span style={{ fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-primary)', fontSize: 'var(--text-base)', transition: 'color var(--transition-base)' }}>{y.batch}</span>
+              <span
+                style={{
+                  fontSize: '1.2rem',
+                  fontWeight: 700,
+                  color: isOpen ? 'var(--color-white)' : 'var(--color-text)',
+                  lineHeight: 1,
+                  display: 'inline-block',
+                  transform: isOpen ? 'scale(1.1)' : 'scale(1)',
+                  transition: 'transform var(--transition-base), color var(--transition-base)',
+                }}
+              >
+                {isOpen ? '−' : '+'}
+              </span>
             </button>
 
-            {isOpen && (
+            <SmoothCollapse open={isOpen}>
               <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderTop: 'none' }}>
                 <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', marginBottom: 'var(--space-5)' }}>
                   {y.batch} Placements as on date: <strong>{y.total !== null ? y.total.toLocaleString('en-IN') : '—'}</strong>
@@ -130,9 +303,22 @@ export default function PlacementYearAccordion({ years, enrichedYears }: Props) 
 
                     <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-3)', marginBottom: 'var(--space-6)' }}>
                       {y.branchOffers.map((b) => (
-                        <div key={b.branch} style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-accent)', borderRadius: 'var(--radius-md)', padding: 'var(--space-3)', textAlign: 'center' }}>
+                        <div
+                          key={b.branch}
+                          style={{
+                            position: 'relative',
+                            background: 'var(--color-white)',
+                            border: '1px solid var(--color-light-gray)',
+                            borderRadius: 'var(--radius-md)',
+                            padding: 'var(--space-3) var(--space-3) var(--space-3) calc(var(--space-3) + 4px)',
+                            textAlign: 'center',
+                            overflow: 'hidden',
+                            boxShadow: 'var(--shadow-sm)',
+                          }}
+                        >
+                          <span style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, background: branchColor(b.branch) }} />
                           <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', fontWeight: 700 }}>{b.branch}</div>
-                          <div style={{ fontSize: '1.3rem', fontWeight: 900, color: 'var(--color-primary)' }}>{b.offers}</div>
+                          <div style={{ fontSize: '1.3rem', fontWeight: 900, color: 'var(--color-primary)' }}>{branchPercentage(b.offers, y.total ?? 0).toFixed(1)}%</div>
                         </div>
                       ))}
                     </div>
@@ -140,7 +326,7 @@ export default function PlacementYearAccordion({ years, enrichedYears }: Props) 
                     <h3 style={{ fontFamily: 'var(--font-sans)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 'var(--space-3)', fontSize: 'var(--text-base)' }}>
                       Branch-wise Offers — {y.batch}
                     </h3>
-                    <BranchOffersChart data={y.branchOffers} />
+                    <BranchOffersDonut data={y.branchOffers} total={y.total ?? 0} />
                   </div>
                 )}
 
@@ -212,7 +398,7 @@ export default function PlacementYearAccordion({ years, enrichedYears }: Props) 
                   </>
                 )}
               </div>
-            )}
+            </SmoothCollapse>
           </div>
         );
       })}
