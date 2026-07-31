@@ -55,7 +55,7 @@ export const placementYearData: PlacementYear[] = [
       { branch: 'EEE Offers', offers: 78 },
       { branch: 'IT Offers', offers: 191 },
       { branch: 'MBA Offers', offers: 16 },
-      { branch: 'Mech. Offers', offers: 2 },
+      { branch: 'Mech. Offers', offers: 60 },
     ],
     students: [
       { regdNo: '22B01A4501', branch: 'CSE(AI&DS)', studentName: 'Addanki Nikhita', company: 'Capgemini', salary: '₹4,25,000', offers: 1 },
