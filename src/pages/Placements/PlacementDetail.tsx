@@ -8,6 +8,7 @@ import { resolveContentIcon } from '../../lib/contentIcons';
 import { parseStructuredTable } from '../../lib/structuredTable';
 import type { PlacementItemDoc } from '../Admin/sections/PlacementItemsAdmin';
 import PlacementYearAccordion from './PlacementYearAccordion';
+import SmoothCollapse from '../../components/SmoothCollapse/SmoothCollapse';
 import { successStories } from './successStories.data';
 import { tpoTeamBios } from './tpoTeamBios.data';
 import { industryLiaisonOffices } from './industryLiaisonOffices.data';
@@ -321,13 +322,14 @@ function RecruitersByYear() {
                 padding: 'var(--space-3) var(--space-5)',
                 cursor: 'pointer',
                 textAlign: 'left',
+                transition: 'background var(--transition-base)',
               }}
             >
-              <span style={{ fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-primary)', fontSize: 'var(--text-base)' }}>{label}</span>
-              <span style={{ fontSize: '1.2rem', fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-text)', lineHeight: 1 }}>{isOpen ? '−' : '+'}</span>
+              <span style={{ fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-primary)', fontSize: 'var(--text-base)', transition: 'color var(--transition-base)' }}>{label}</span>
+              <span style={{ fontSize: '1.2rem', fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-text)', lineHeight: 1, transition: 'color var(--transition-base)' }}>{isOpen ? '−' : '+'}</span>
             </button>
 
-            {isOpen && (
+            <SmoothCollapse open={isOpen}>
               <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderTop: 'none' }}>
                 {companies.length > 0 ? (
                   <div className="partner-logo-grid">
@@ -341,7 +343,7 @@ function RecruitersByYear() {
                   </p>
                 )}
               </div>
-            )}
+            </SmoothCollapse>
           </div>
         );
       })}
@@ -452,17 +454,18 @@ function HigherEducationAccordion() {
                 cursor: 'pointer',
                 textAlign: 'left',
                 gap: 'var(--space-4)',
+                transition: 'background var(--transition-base)',
               }}
             >
-              <span style={{ fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-primary)', fontSize: 'var(--text-base)' }}>
+              <span style={{ fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-primary)', fontSize: 'var(--text-base)', transition: 'color var(--transition-base)' }}>
                 {section.title}
               </span>
-              <span style={{ fontSize: '1.2rem', fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-text)', lineHeight: 1, flexShrink: 0 }}>
+              <span style={{ fontSize: '1.2rem', fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-text)', lineHeight: 1, flexShrink: 0, transition: 'color var(--transition-base)' }}>
                 {isOpen ? '−' : '+'}
               </span>
             </button>
 
-            {isOpen && (
+            <SmoothCollapse open={isOpen}>
               <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderTop: 'none' }}>
                 {section.tabs && (
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)', marginBottom: 'var(--space-5)' }}>
@@ -511,7 +514,7 @@ function HigherEducationAccordion() {
                   </p>
                 )}
               </div>
-            )}
+            </SmoothCollapse>
           </div>
         );
       })}
@@ -809,17 +812,18 @@ export default function PlacementDetail() {
                         cursor: 'pointer',
                         textAlign: 'left',
                         gap: 'var(--space-4)',
+                        transition: 'background var(--transition-base)',
                       }}
                     >
-                      <span style={{ fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-primary)', fontSize: 'var(--text-base)' }}>
+                      <span style={{ fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-primary)', fontSize: 'var(--text-base)', transition: 'color var(--transition-base)' }}>
                         {row.name} - {row.role}
                       </span>
-                      <span style={{ fontSize: '1.2rem', fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-text)', lineHeight: 1, flexShrink: 0 }}>
+                      <span style={{ fontSize: '1.2rem', fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-text)', lineHeight: 1, flexShrink: 0, transition: 'color var(--transition-base)' }}>
                         {isOpen ? '−' : '+'}
                       </span>
                     </button>
 
-                    {isOpen && (
+                    <SmoothCollapse open={isOpen}>
                       <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderTop: 'none' }}>
                         {tpoTeamBios[row.name] ? (
                           <div style={{ display: 'flex', gap: 'var(--space-5)', flexWrap: 'wrap' }}>
@@ -904,7 +908,7 @@ export default function PlacementDetail() {
                           </>
                         )}
                       </div>
-                    )}
+                    </SmoothCollapse>
                   </div>
                 );
               })}

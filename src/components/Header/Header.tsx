@@ -4,6 +4,7 @@ import AnnouncementsTicker from '../AnnouncementsTicker/AnnouncementsTicker';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useNavLinkOverride } from '../../hooks/useNavLinkOverride';
 import type { DownloadDoc } from '../../pages/Admin/sections/DownloadsAdmin';
+import SmoothCollapse from '../SmoothCollapse/SmoothCollapse';
 import './Header.css';
 
 interface NavChild {
@@ -545,7 +546,8 @@ export default function Header() {
                   </button>
 
                   {/* Flat submenu */}
-                  {item.children && isExpanded && (
+                  {item.children && (
+                    <SmoothCollapse open={isExpanded}>
                     <ul className="mobile-submenu">
                       {item.children.map((child) => {
                         if (child.subItems) {
@@ -562,7 +564,7 @@ export default function Header() {
                                   <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                                 </svg>
                               </button>
-                              {subOpen && (
+                              <SmoothCollapse open={subOpen}>
                                 <ul className="mobile-group-items">
                                   {child.subItems.map((sub) => (
                                     <li key={sub.label}>
@@ -576,7 +578,7 @@ export default function Header() {
                                     </li>
                                   ))}
                                 </ul>
-                              )}
+                              </SmoothCollapse>
                             </li>
                           );
                         }
@@ -595,10 +597,12 @@ export default function Header() {
                         );
                       })}
                     </ul>
+                    </SmoothCollapse>
                   )}
 
                   {/* Grouped submenu — each group is its own accordion */}
-                  {item.groups && isExpanded && (
+                  {item.groups && (
+                    <SmoothCollapse open={isExpanded}>
                     <ul className="mobile-submenu mobile-submenu-groups">
                       {item.groups.map((group) => {
                         const groupKey = `${item.label}:${group.groupLabel}`;
@@ -614,7 +618,7 @@ export default function Header() {
                                 <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                               </svg>
                             </button>
-                            {groupOpen && (
+                            <SmoothCollapse open={groupOpen}>
                               <ul className="mobile-group-items">
                                 {group.items.map((child) => (
                                   <li key={child.label}>
@@ -628,11 +632,12 @@ export default function Header() {
                                   </li>
                                 ))}
                               </ul>
-                            )}
+                            </SmoothCollapse>
                           </li>
                         );
                       })}
                     </ul>
+                    </SmoothCollapse>
                   )}
                 </li>
               );
