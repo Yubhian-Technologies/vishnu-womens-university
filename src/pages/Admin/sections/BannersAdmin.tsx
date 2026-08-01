@@ -68,8 +68,8 @@ export const PAGES = [
   { value: 'alumni-giving',           label: 'Alumni & Giving' },
   { value: 'about',                   label: 'About VWU' },
   { value: 'about-sves',              label: 'About SVES' },
-  { value: 'campus',                  label: 'Campus' },
-  ...campusFacilities.map((f) => ({ value: `campus-${f.slug}`, label: `Campus: ${f.title}` })),
+  { value: 'campus',                  label: 'Campus Life (Overview)' },
+  ...campusFacilities.map((f) => ({ value: `campus-${f.slug}`, label: `Campus Life: ${f.title}` })),
   { value: 'information',             label: 'Information' },
   { value: 'governance',              label: 'Governance' },
   { value: 'governing-body',          label: 'Governing Body' },
@@ -85,7 +85,9 @@ export const PAGES = [
   { value: 'admission-procedure',     label: 'Admission Procedure' },
   { value: 'result-analysis',         label: 'Result Analysis' },
   { value: 'differentiators',         label: 'Differentiators' },
+  { value: 'differentiators-detail',  label: 'Differentiators Detail Pages (fallback — used when a differentiator item has no image of its own)' },
   { value: 'research',                label: 'Research' },
+  { value: 'research-detail',         label: 'Research Detail Pages (fallback — used when a research item has no image of its own)' },
   { value: 'student-clubs',           label: 'Student Clubs' },
   { value: 'arts-culture',            label: 'Arts & Culture' },
   { value: 'social-services',         label: 'Social Services' },
@@ -110,13 +112,13 @@ const PAGE_GROUPS: { label: string; values: string[] }[] = [
   { label: 'About, Society & Governance', values: ['about-sves', 'vision-mission', 'governance', 'governing-body', 'governance-detail'] },
   { label: 'Academics', values: ['academics-curriculum', 'academics-downloads', 'faculty', 'program-detail', 'programmes-fee', 'admission-procedure', 'result-analysis'] },
   { label: 'Student Life', values: ['student-clubs', 'arts-culture', 'social-services', 'sports-games', 'vishnu-tv', 'campus-magazines'] },
-  { label: 'Placements, Careers & Research', values: ['placement-detail', 'careers', 'differentiators', 'research'] },
+  { label: 'Placements, Careers & Research', values: ['placement-detail', 'careers', 'differentiators', 'differentiators-detail', 'research', 'research-detail'] },
   { label: 'News & Awards', values: ['news', 'events', 'news-awards', 'news-awards-happenings', 'news-awards-accreditations', 'news-awards-gallery'] },
-  { label: 'Campus', values: ['campus', ...campusFacilities.map((f) => `campus-${f.slug}`)] },
+  { label: 'Campus Life', values: ['campus', ...campusFacilities.map((f) => `campus-${f.slug}`)] },
   { label: 'Compliance & Contact', values: ['disclosures-ugc', 'anti-ragging', 'policies-procedures', 'contact'] },
 ];
 
-const FALLBACK_PAGES = new Set(['program-detail', 'governance-detail', 'placement-detail']);
+const FALLBACK_PAGES = new Set(['program-detail', 'governance-detail', 'placement-detail', 'differentiators-detail', 'research-detail']);
 
 function groupOfPage(pageValue: string): string | undefined {
   return PAGE_GROUPS.find((g) => g.values.includes(pageValue))?.label;
