@@ -5,6 +5,7 @@ import { Trophy, Rocket, Factory, Microscope, Globe2, GraduationCap } from 'luci
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import SmoothCollapse from '../../components/SmoothCollapse/SmoothCollapse';
 import { useCollection, useOrderedCollection, type WithId } from '../../hooks/useCollection';
+import { usePageBanners } from '../../hooks/usePageBanners';
 import { DIFFERENTIATOR_CATEGORIES } from '../Admin/sections/DifferentiatorsAdmin';
 import type { DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
 import { aicteIdeaLab } from './aicteIdeaLab.data';
@@ -3684,6 +3685,7 @@ const CATEGORY_ICONS: Record<string, typeof Rocket> = {
 export default function DifferentiatorDetail() {
   const { slug } = useParams<{ slug: string }>();
   const { docs: allItems, loading } = useOrderedCollection<DifferentiatorItemDoc>('differentiatorItems', 'order');
+  const { slides: heroSlides } = usePageBanners('differentiators-detail');
   const { docs: tedxPhotos } = useCollection<WithId & { imageUrl: string }>('tedxSvecwPhotos', [orderBy('order', 'asc')], { silent: true });
   const { docs: tiDspGalleryPhotos } = useCollection<WithId & { imageUrl: string }>('tiDspGalleryPhotos', [orderBy('order', 'asc')], { silent: true });
   const { docs: c2sActivityPhotos } = useCollection<WithId & { imageUrl: string }>('chipsToStartupActivityPhotos', [orderBy('order', 'asc')], { silent: true });
@@ -3733,7 +3735,7 @@ export default function DifferentiatorDetail() {
   }
 
   const CategoryIcon = CATEGORY_ICONS[category.id] || Rocket;
-  const heroImage = item.heroImage;
+  const heroImage = item.heroImage || heroSlides[0]?.imageUrl;
   const ideaLab = item.slug === 'aicte-idea-lab' ? aicteIdeaLab : null;
   const iic = item.slug === 'institution-innovation-cell' ? institutionInnovationCell : null;
   const tedx = item.slug === 'tedxsvecw' ? tedxSvecw : null;

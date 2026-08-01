@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { Sparkles, Microscope, Check } from 'lucide-react';
 import { useOrderedCollection } from '../../hooks/useCollection';
+import { usePageBanners } from '../../hooks/usePageBanners';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import { parseFlexibleTable, parseAccordionTable, parseProjectAccordion } from '../../lib/structuredTable';
 import { parseAboutContent } from '../../lib/aboutContent';
@@ -130,7 +131,8 @@ export default function ResearchDetail() {
 
   const Icon = resolveContentIcon(item.icon) || Microscope;
   const categoryLabel = CATEGORY_LABELS[item.category] || item.category;
-  const heroImage = item.heroImage;
+  const { slides: heroSlides } = usePageBanners('research-detail');
+  const heroImage = item.heroImage || heroSlides[0]?.imageUrl;
   const intro = DEFAULT_INTRO_BY_SLUG[item.slug] || item.intro;
   const about = item.about || DEFAULT_ABOUT_BY_SLUG[item.slug] || '';
   const aboutBlocks = parseAboutContent(about);
