@@ -120,6 +120,60 @@ const PAGE_GROUPS: { label: string; values: string[] }[] = [
 
 const FALLBACK_PAGES = new Set(['program-detail', 'governance-detail', 'placement-detail', 'differentiators-detail', 'research-detail']);
 
+// The heading/subtitle each page currently shows by default (the
+// `defaultTitle`/`defaultSubtitle` props passed to that page's <PageHero>,
+// or the facility's own title/heroSubtitle for Campus Life pages) — used to
+// prefill the form below so an admin adding a page's first banner starts
+// from the text already live on the site instead of a blank field they'd
+// otherwise have to retype from scratch. Once a page has a real banner,
+// this default text stops showing on the site at all (PageHero swaps to
+// the uploaded banner's own title/subtitle entirely) — so it only matters
+// for that first banner. Pages with no single "current" text of their own
+// (home's rotating marketing slides, and the "-detail" fallbacks shared by
+// many different items with their own titles) are intentionally omitted.
+const PAGE_TEXT_DEFAULTS: Record<string, { title: string; subtitle?: string }> = {
+  'about': { title: 'About Vishnu Womens University', subtitle: "Rooted in Bhimavaram since 2001, VWU has grown into Andhra Pradesh's foremost institution for women's technical education." },
+  'anti-ragging': { title: 'Anti Ragging', subtitle: 'Vishnu Womens University is committed to a safe, ragging-free campus for every student.' },
+  'alumni-giving': { title: 'Always a Vishnu Engineer', subtitle: 'Graduation is not the end of your VWU story. Stay engaged, give back, and help shape the next generation of women engineers.' },
+  'admissions': { title: 'Your Journey Starts Here', subtitle: 'Choosing VWU sets you on a path to a fulfilling engineering career, a strong professional network, and a future built on real achievement.' },
+  'disclosures-ugc': { title: 'UGC Public Self-Disclosure', subtitle: 'Shri Vishnu Engineering College for Women (Autonomous) — published as required by the University Grants Commission.' },
+  'result-analysis': { title: 'Result Analysis', subtitle: 'VWU consistently ranks among the top 5 affiliated colleges of JNTU Kakinada with 90%+ annual pass rates.' },
+  'about-sves': { title: 'Sri Vishnu Educational Society', subtitle: 'More than 25 years of educational commitment, spanning 11 institutions across Andhra Pradesh and Telangana.' },
+  'admission-procedure': { title: 'Admission Procedure', subtitle: 'A clear, step-by-step guide to joining VWU — covering eligibility, entrance examinations, and the enrollment process for all programmes.' },
+  'careers': { title: 'Careers at VWU', subtitle: 'Build your career alongside a community of educators and professionals who are genuinely invested in advancing women in engineering and technology.' },
+  'vision-mission': { title: 'Vision, Mission & Values', subtitle: 'The principles, purpose, and commitments that inform every decision and action at Vishnu Womens University.' },
+  'events': { title: 'Campus Events', subtitle: 'Technical symposia, sports tournaments, graduation ceremonies, and much more — the VWU calendar is always full.' },
+  'academics': { title: 'You Will Excel.', subtitle: 'Rigorous, industry-aligned programs designed to build your technical expertise, sharpen your research instincts, and develop you as a professional.' },
+  'faculty': { title: 'Our Faculty', subtitle: 'Experienced educators and researchers across every department, dedicated to academic excellence and student success.' },
+  'academics-downloads': { title: 'Academic Documents', subtitle: 'Official academic documents — calendar and regulations — available for download.' },
+  'programmes-fee': { title: 'Programmes & Fee Structure', subtitle: 'Complete list of programs, intake capacities, and annual fee structure for AY 2025–26.' },
+  'student-life': { title: 'Discover Your Place at VWU', subtitle: 'VWU offers more than an engineering qualification. It is where you find your community, sharpen your purpose, and start building your future.' },
+  'differentiators': { title: 'What Sets VWU Apart', subtitle: 'Distinctive initiatives in innovation, industry engagement, research, international outreach, and student development — all aimed at producing well-rounded women engineers.' },
+  'governing-body': { title: 'Governing Body', subtitle: 'Dedicated leaders and distinguished members committed to academic excellence, institutional governance, innovation, and the continuous growth of Shri Vishnu Engineering College for Women.' },
+  'academics-curriculum': { title: 'Course Curriculum', subtitle: 'Semester-wise curriculum documents for every programme and regulation.' },
+  'governance': { title: 'Governance & Statutory Bodies', subtitle: 'Transparent, accountable governance driving academic excellence — from apex statutory bodies to quality assurance committees.' },
+  'placements': { title: 'Placements & Careers', subtitle: 'Linking VWU graduates with the best opportunities in industry — through campus recruitment, career development, and pathways to global study.' },
+  'campus-magazines': { title: 'Campus Magazines', subtitle: 'Three publications that document academic achievements, student creativity, and the story of campus life at VWU and across SVES.' },
+  'arts-culture': { title: 'Arts & Culture', subtitle: 'Nurturing creativity, preserving heritage, and building a sense of belonging — developing responsible and culturally grounded leaders.' },
+  'vishnu-tv': { title: 'Vishnu TV Academy', subtitle: 'Student-run and student-driven — the only dedicated campus TV Academy in Andhra Pradesh.' },
+  'social-services': { title: 'Social Services', subtitle: 'The National Service Scheme at VWU shapes engineers who are equally committed to their craft and to the communities they serve.' },
+  'student-clubs': { title: 'Student Clubs', subtitle: '23 active clubs across technology, social service, arts, and culture — VWU has a community for every interest.' },
+  'sports-games': { title: 'Sports & Games', subtitle: 'Physical fitness is taken seriously at VWU — a sound body supports a sound mind, and both are essential to a complete education.' },
+  'policies-procedures': { title: 'Policies & Procedures', subtitle: 'A structured framework for governance, academics, research, and campus sustainability at VWU.' },
+  'research': { title: 'Research & Development', subtitle: 'From funded projects and patents to industry MoUs and professional bodies — a look at how VWU builds knowledge that matters.' },
+  'news-awards-accreditations': { title: 'Accreditations & Awards', subtitle: "Endorsed by India's foremost regulatory and ranking bodies — a record of recognised quality and consistent academic achievement." },
+  'information': { title: 'Information', subtitle: 'Academic calendar, holidays, how to reach us, counselling, ICT platforms, and more.' },
+  'news-awards': { title: 'News & Awards', subtitle: "Celebrating VWU's achievements, events, and milestones — from national accreditations and rankings to campus happenings and visual memories." },
+  'campus': { title: 'Campus Life at VWU', subtitle: 'A 100-acre campus in Bhimavaram where learning, wellness, and community life come together.' },
+  'news-awards-happenings': { title: 'Happenings at VWU', subtitle: 'Workshops, MoUs, competitions, achievements, and institutional milestones — a running record of life at VWU.' },
+  'news-awards-gallery': { title: 'Gallery', subtitle: 'A visual archive of campus life at VWU — from national competitions and graduation days to cultural festivals and industry events.' },
+  'news': { title: 'VWU News & Stories', subtitle: 'Stay up-to-date with the latest happenings, achievements, and stories from the VWU community.' },
+  'contact': { title: 'Contact Us', subtitle: "We're happy to assist. Contact us for admissions information, general enquiries, or anything else on your mind." },
+  ...Object.fromEntries(
+    campusFacilities.map((f) => [`campus-${f.slug}`, { title: f.title, subtitle: f.heroSubtitle ?? f.desc }])
+  ),
+};
+
 function groupOfPage(pageValue: string): string | undefined {
   return PAGE_GROUPS.find((g) => g.values.includes(pageValue))?.label;
 }
@@ -138,6 +192,28 @@ function PageBannersAdmin() {
   const formRef = useRef<HTMLDivElement>(null);
 
   const set = (k: string, v: string | number) => setForm((p) => ({ ...p, [k]: v }));
+
+  // Switching the page selector keeps Heading/Subheading in sync with that
+  // page's current live text — every click, not just the first — as long as
+  // the field is still showing either nothing or the previously-selected
+  // page's own default (i.e. the admin hasn't typed something custom yet).
+  // The moment they edit away from that, further page clicks leave their
+  // text alone instead of silently discarding it. Never fires while editing
+  // an existing banner, which already has its own saved title/subtitle.
+  const selectPage = (value: string) => {
+    setForm((p) => {
+      const prevDefaults = PAGE_TEXT_DEFAULTS[p.page];
+      const defaults = PAGE_TEXT_DEFAULTS[value];
+      const titleUntouched = p.title === EMPTY.title || p.title === prevDefaults?.title;
+      const subtitleUntouched = p.subtitle === EMPTY.subtitle || p.subtitle === prevDefaults?.subtitle;
+      return {
+        ...p,
+        page: value,
+        title: !editing && titleUntouched ? (defaults?.title ?? EMPTY.title) : p.title,
+        subtitle: !editing && subtitleUntouched ? (defaults?.subtitle ?? EMPTY.subtitle) : p.subtitle,
+      };
+    });
+  };
 
   const handleImageUploaded = (r: UploadResult) => {
     setForm((p) => ({ ...p, imageUrl: r.url, storagePath: r.path }));
@@ -229,6 +305,16 @@ function PageBannersAdmin() {
                   {!editing && ' Adding another here adds a slide to that page\'s rotation — it doesn\'t replace the existing one(s). Scroll down to "Banners in this category" if you meant to edit an existing one instead.'}
                 </p>
               )}
+              {!editing && form.page && PAGE_TEXT_DEFAULTS[form.page] && form.title === PAGE_TEXT_DEFAULTS[form.page].title && (
+                <p className="admin-field__hint" style={{ background: '#eefbf0', border: '1px solid #bfe8c9', borderRadius: 6, padding: '0.55rem 0.85rem', marginBottom: '0.85rem' }}>
+                  Heading/Subheading below are prefilled with the text currently live on this page — edit them, or leave as-is.
+                </p>
+              )}
+              {!editing && form.page && FALLBACK_PAGES.has(form.page) && (
+                <p className="admin-field__hint" style={{ background: '#fff8e6', border: '1px solid #f0dca0', borderRadius: 6, padding: '0.55rem 0.85rem', marginBottom: '0.85rem' }}>
+                  This is a shared fallback image for sub-pages without their own photo — its Heading/Subheading text isn't shown on the site (each sub-page keeps its own title), so any short label works.
+                </p>
+              )}
               <p className="admin-page-selector__group-label">{activeGroup.label}</p>
               <div className="admin-page-selector__grid">
                 {activeGroup.values.map((val) => {
@@ -239,7 +325,7 @@ function PageBannersAdmin() {
                       key={p.value}
                       type="button"
                       className={`admin-page-btn${form.page === p.value ? ' active' : ''}${FALLBACK_PAGES.has(p.value) ? ' admin-page-btn--fallback' : ''}`}
-                      onClick={() => set('page', p.value)}
+                      onClick={() => selectPage(p.value)}
                       title={p.label}
                     >
                       {FALLBACK_PAGES.has(p.value) ? p.label.split(' (')[0] : p.label}
