@@ -90,6 +90,7 @@ const DEFAULT_ABOUT_BY_SLUG: Record<string, string> = {
 export default function ResearchDetail() {
   const { slug } = useParams<{ slug: string }>();
   const { docs: allItems, loading } = useOrderedCollection<ResearchItemDoc>('researchItems', 'order');
+  const { slides: heroSlides } = usePageBanners('research-detail');
   const item = allItems.find((i) => i.slug === slug) ?? null;
   const [openAreas, setOpenAreas] = useState<Set<string>>(new Set());
   const toggleArea = (key: string) => {
@@ -131,7 +132,6 @@ export default function ResearchDetail() {
 
   const Icon = resolveContentIcon(item.icon) || Microscope;
   const categoryLabel = CATEGORY_LABELS[item.category] || item.category;
-  const { slides: heroSlides } = usePageBanners('research-detail');
   const heroImage = item.heroImage || heroSlides[0]?.imageUrl;
   const intro = DEFAULT_INTRO_BY_SLUG[item.slug] || item.intro;
   const about = item.about || DEFAULT_ABOUT_BY_SLUG[item.slug] || '';
