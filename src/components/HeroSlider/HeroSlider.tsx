@@ -160,7 +160,7 @@ export default function HeroSlider() {
           ref={videoRef}
           className="hero-video"
           src={HERO_VIDEO_SRC}
-          preload="auto"
+          preload="metadata"
           autoPlay
           muted
           loop
