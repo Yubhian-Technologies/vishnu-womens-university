@@ -12,13 +12,15 @@ export interface CampusFacility {
 }
 
 export const campusFacilities: CampusFacility[] = [
-  { slug: 'smart-classrooms', title: 'Smart Class Rooms', heroSubtitle: "VWU's smart classrooms are equipped with interactive displays and modern audio-visual systems, creating an engaging, technology-enabled learning environment for every session.", desc: `Classrooms architecturally designed with optimal room for natural light and air, provide a vibrant backdrop to the academic achievements and offer a unique place to study, relax and develop.
+  { slug: 'smart-classrooms', title: 'Smart Class Rooms', heroSubtitle: "VWU's smart classrooms are equipped with interactive displays and modern audio-visual systems, creating an engaging, technology-enabled learning environment for every session.", desc: `The classrooms are architecturally designed to create a comfortable, inspiring, and student-friendly learning environment. Spacious interiors, large windows, and scientifically planned ventilation ensure an abundance of natural light and fresh air throughout the day. This thoughtfully designed atmosphere promotes concentration, creativity, and overall well-being, providing students with the ideal setting to learn, collaborate, relax, and grow both academically and personally.
 
-The classrooms are equipped with an array of Hi-Tech equipment which enables the competent teachers to conduct classes in such a manner that the students can make use of all the available resources at the click of a button.
+Each classroom is equipped with state-of-the-art technological facilities that support modern teaching methodologies. Advanced digital teaching aids, including LCD projectors, interactive presentation systems, video players, high-speed internet connectivity, and audio-visual equipment, enable teachers to deliver engaging and effective lessons. These smart classroom facilities make learning more interactive, helping students understand concepts through visual demonstrations, multimedia presentations, educational videos, and real-time digital resources.
 
-In this very special learning environment, LCD projectors, video players are available.
+The integration of technology into everyday classroom instruction allows teachers to adopt innovative and student-centered teaching practices. Lessons become more dynamic through presentations, animations, virtual demonstrations, and collaborative learning activities, encouraging active participation and critical thinking among students. With access to digital resources at the click of a button, teachers can seamlessly incorporate the latest educational content into their lessons, making learning more relevant and meaningful.
 
-All these facilities enable the teachers to teach in a unique and innovative manner which makes the students feel involved in the teaching – learning process and improves the pace and quality of learning.` },
+The classrooms are also designed to facilitate group discussions, project-based learning, seminars, and interactive sessions that nurture communication skills, teamwork, and problem-solving abilities. Comfortable seating arrangements and a well-organized layout ensure that every student enjoys an inclusive and distraction-free learning experience.
+
+Our technologically advanced classrooms create an environment where teaching and learning go beyond traditional methods. By blending modern infrastructure with innovative educational practices, the institution ensures that students remain actively involved in the learning process. This not only enhances the pace and quality of education but also fosters curiosity, confidence, creativity, and a lifelong passion for learning, preparing students to meet the challenges of a rapidly evolving world.` },
   {
     slug: 'state-of-the-art-labs',
     title: 'State-of-the-art Labs',

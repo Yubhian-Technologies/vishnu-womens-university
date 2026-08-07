@@ -253,19 +253,24 @@
   box-shadow: var(--shadow-xl);
   opacity: 0;
   visibility: hidden;
+  pointer-events: none;
   border-top: 3px solid var(--color-accent);
   z-index: 100;
+  /* Closing animates too (shorter + a touch snappier than opening), so
+     switching between nav items never leaves a dropdown just vanishing —
+     but it's still quick enough that the next item's dropdown opening
+     doesn't visibly overlap it mid-fade. visibility is delayed to the end
+     of the fade so the closed dropdown stays out of the layout/hit-testing
+     the instant it's not needed, without cutting the fade-out short. */
+  transition: opacity 140ms ease, transform 140ms ease, visibility 0s linear 140ms;
 }
 
-/* Transition only lives on the open (.nav-item--open) rule, so opening
-   fades in smoothly but closing (falling back to the base .dropdown rule,
-   which has no transition) is instant — otherwise, switching from one open
-   nav item straight to another let both dropdowns render mid-fade at once. */
 .nav-item--open .dropdown {
   opacity: 1;
   visibility: visible;
+  pointer-events: auto;
   transform: translateX(-50%) translateY(0);
-  transition: all var(--transition-base);
+  transition: opacity 220ms ease, transform 220ms ease, visibility 0s linear 0s;
 }
 
 /* The last couple of nav items (currently "Alumni & Giving" and "Quick
