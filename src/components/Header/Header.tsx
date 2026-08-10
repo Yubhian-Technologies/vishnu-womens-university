@@ -33,7 +33,11 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   {
-    label: 'Discover',
+    // "Discover"'s old groups (Governance/Committees/IQAC/Information) now
+    // live here too, alongside About Us's own items — no longer its own
+    // top-level nav item. Committees (13 items) auto-splits into two
+    // sub-columns (see .mega-group-list.cols-2 in Header.css).
+    label: 'About Us',
     groups: [
       {
         groupLabel: 'About Us',
@@ -47,45 +51,6 @@ const navItems: NavItem[] = [
           { label: 'About Society (SVES)', path: '/about-sves' },
         ],
       },
-      {
-        groupLabel: 'Campus Life',
-        groupPath: '/campus',
-        items: [
-          { label: 'Smart Class Rooms', path: '/campus/smart-classrooms' },
-          { label: 'State-of-the-art Labs', path: '/campus/state-of-the-art-labs' },
-          { label: 'Central Library', path: '/campus/central-library' },
-          { label: 'Auditoriums', path: '/campus/auditoriums' },
-          { label: 'Campus Book Stores', path: '/campus/campus-book-stores' },
-          { label: 'Wi-Fi Campus', path: '/campus/wifi-campus' },
-          { label: 'Campus Hostels', path: '/campus/campus-hostels' },
-          { label: 'Food Courts', path: '/campus/food-courts' },
-          { label: 'VISHNU Fitness Centre', path: '/campus/fitness-centre' },
-          { label: 'Staff Quarters', path: '/campus/staff-quarters' },
-          { label: 'Travel Desk', path: '/campus/travel-desk' },
-          { label: 'Temples', path: '/campus/temples' },
-          { label: 'Health Care', path: '/campus/health-care' },
-          { label: 'Swimming Pool', path: '/campus/swimming-pool' },
-          { label: 'Campus Security', path: '/campus/campus-security' },
-          { label: 'Other Facilities', path: '/campus/other-facilities' },
-        ],
-      },
-      {
-        groupLabel: 'Information',
-        groupPath: '/information',
-        items: [
-          { label: 'Academic Calendar', path: '/information#academic-calendar' },
-          { label: 'List of Holidays', path: '/information#holidays' },
-          { label: 'How to Reach', path: '/information#how-to-reach' },
-          { label: 'Counselling Scheme', path: '/information#counselling' },
-          { label: 'ICT Platforms', path: '/information#ict-platforms' },
-          { label: 'Other Practices', path: '/information#other-practices' },
-        ],
-      },
-    ],
-  },
-  {
-    label: 'Statutory',
-    groups: [
       {
         groupLabel: 'Governance',
         groupPath: '/governance',
@@ -130,6 +95,18 @@ const navItems: NavItem[] = [
           { label: 'NBA – Data Capturing Points', path: '/governance/nba-data' },
         ],
       },
+      {
+        groupLabel: 'Information',
+        groupPath: '/information',
+        items: [
+          { label: 'Academic Calendar', path: '/information#academic-calendar' },
+          { label: 'List of Holidays', path: '/information#holidays' },
+          { label: 'How to Reach', path: '/information#how-to-reach' },
+          { label: 'Counselling Scheme', path: '/information#counselling' },
+          { label: 'ICT Platforms', path: '/information#ict-platforms' },
+          { label: 'Other Practices', path: '/information#other-practices' },
+        ],
+      },
     ],
   },
   {
@@ -155,18 +132,6 @@ const navItems: NavItem[] = [
     ],
   },
   {
-    label: 'Student Life',
-    children: [
-      { label: 'Student Life Overview', path: '/student-life' },
-      { label: 'Student Clubs', path: '/student-clubs' },
-      { label: 'Sports & Games', path: '/sports-games' },
-      { label: 'Arts & Culture', path: '/arts-culture' },
-      { label: 'Social Services (NSS)', path: '/social-services' },
-      { label: 'Campus Magazines', path: '/campus-magazines' },
-      { label: 'Vishnu TV Academy', path: '/vishnu-tv-academy' },
-    ],
-  },
-  {
     label: 'Placements',
     children: [
       { label: 'Placements Overview', path: '/placements' },
@@ -185,19 +150,20 @@ const navItems: NavItem[] = [
     ],
   },
   {
-    label: 'Differentiators',
-    children: [
-      { label: 'All Differentiators', path: '/differentiators' },
-      { label: 'Innovation & Entrepreneurship', path: '/differentiators#innovation' },
-      { label: 'Industry Centres of Excellence', path: '/differentiators#industry' },
-      { label: 'Research & Specialised Labs', path: '/differentiators#research' },
-      { label: 'International & Global Outreach', path: '/differentiators#global' },
-      { label: 'Student Development & Social Impact', path: '/differentiators#student' },
-    ],
-  },
-  {
     label: 'Research',
     groups: [
+      {
+        groupLabel: 'Differentiators',
+        groupPath: '/differentiators',
+        items: [
+          { label: 'All Differentiators', path: '/differentiators' },
+          { label: 'Innovation & Entrepreneurship', path: '/differentiators#innovation' },
+          { label: 'Industry Centres of Excellence', path: '/differentiators#industry' },
+          { label: 'Research & Specialised Labs', path: '/differentiators#research' },
+          { label: 'International & Global Outreach', path: '/differentiators#global' },
+          { label: 'Student Development & Social Impact', path: '/differentiators#student' },
+        ],
+      },
       {
         groupLabel: 'R&D Governance',
         groupPath: '/research#governance',
@@ -232,39 +198,80 @@ const navItems: NavItem[] = [
     ],
   },
   {
-    label: 'News & Awards',
-    children: [
-      { label: 'News & Awards Overview', path: '/news-awards' },
-      { label: 'Happenings at VWU', path: '/news-awards/happenings' },
-      { label: 'Accreditations & Awards', path: '/news-awards/accreditations-awards' },
-      { label: 'Gallery', path: '/news-awards/gallery' },
-      { label: 'News', path: '/news' },
-      { label: 'Events', path: '/events' },
+    // Two groups instead of a flat 17-item list, now that Student Life's
+    // own items live here too — matches the Discover mega-menu pattern.
+    // Each group with >9 items auto-splits into two sub-columns (see
+    // .mega-group-list.cols-2 in Header.css), so Campus Facilities (17
+    // items) renders as two columns and Student Life (7) as one.
+    label: 'Campus Life',
+    groups: [
+      {
+        groupLabel: 'Campus Facilities',
+        groupPath: '/campus',
+        items: [
+          { label: 'Campus Life Overview', path: '/campus' },
+          { label: 'Smart Class Rooms', path: '/campus/smart-classrooms' },
+          { label: 'State-of-the-art Labs', path: '/campus/state-of-the-art-labs' },
+          { label: 'Central Library', path: '/campus/central-library' },
+          { label: 'Auditoriums', path: '/campus/auditoriums' },
+          { label: 'Campus Book Stores', path: '/campus/campus-book-stores' },
+          { label: 'Wi-Fi Campus', path: '/campus/wifi-campus' },
+          { label: 'Campus Hostels', path: '/campus/campus-hostels' },
+          { label: 'Food Courts', path: '/campus/food-courts' },
+          { label: 'VISHNU Fitness Centre', path: '/campus/fitness-centre' },
+          { label: 'Staff Quarters', path: '/campus/staff-quarters' },
+          { label: 'Travel Desk', path: '/campus/travel-desk' },
+          { label: 'Temples', path: '/campus/temples' },
+          { label: 'Health Care', path: '/campus/health-care' },
+          { label: 'Swimming Pool', path: '/campus/swimming-pool' },
+          { label: 'Campus Security', path: '/campus/campus-security' },
+          { label: 'Other Facilities', path: '/campus/other-facilities' },
+        ],
+      },
+      {
+        groupLabel: 'Student Life',
+        groupPath: '/student-life',
+        items: [
+          { label: 'Student Life Overview', path: '/student-life' },
+          { label: 'Student Clubs', path: '/student-clubs' },
+          { label: 'Sports & Games', path: '/sports-games' },
+          { label: 'Arts & Culture', path: '/arts-culture' },
+          { label: 'Social Services (NSS)', path: '/social-services' },
+          { label: 'Campus Magazines', path: '/campus-magazines' },
+          { label: 'Vishnu TV Academy', path: '/vishnu-tv-academy' },
+        ],
+      },
     ],
   },
   {
-    label: 'Alumni & Giving',
-    children: [
-      { label: 'Alumni Network', path: '/alumni-giving#network' },
-      { label: 'Giving Opportunities', path: '/alumni-giving#give' },
-      { label: 'Alumni Events', path: '/alumni-giving#events' },
-      { label: 'Prathibha Magazine', path: '/alumni-giving#magazine' },
-      { label: 'Success Stories', path: '/placements/success-stories' },
-    ],
-  },
-  {
-    label: 'Quick Links',
-    children: [
-      { label: 'Examinations', path: 'https://www.svecwexams.in/', external: true },
-      { label: 'Vishnu LMS', path: 'https://www.vishnulearning.com/login/index.php', external: true },
-      { label: 'VEDIC', path: 'https://vedic.edu.in/', external: true },
-      { label: "Vishnu's Wellness Center", path: 'https://vishnuwellness.in/', external: true },
-      { label: 'Global Alumni Network', path: 'https://alumni.srivishnu.edu.in/', external: true },
-      { label: 'Vishnu Era', path: 'https://www.srivishnu.edu.in/vishnu-era/', external: true },
-      { label: 'Prathibha Magazine', path: 'https://heyzine.com/flip-book/14449c1cd4.html', external: true },
-      { label: 'Disclosures – UGC', path: '/disclosures/ugc' },
-      { label: 'Careers', path: '/careers' },
-      { label: 'Contact Us', path: '/contact' },
+    // Alumni & Giving's items live here as a second group (no longer its
+    // own top-level nav item) — see the "Success Stories" admin-redirect
+    // splice for this group in renderedNavItems below.
+    label: 'News & Events',
+    groups: [
+      {
+        groupLabel: 'News & Events',
+        groupPath: '/news-awards',
+        items: [
+          { label: 'News & Awards Overview', path: '/news-awards' },
+          { label: 'Happenings at VWU', path: '/news-awards/happenings' },
+          { label: 'Accreditations & Awards', path: '/news-awards/accreditations-awards' },
+          { label: 'Gallery', path: '/news-awards/gallery' },
+          { label: 'News', path: '/news' },
+          { label: 'Events', path: '/events' },
+        ],
+      },
+      {
+        groupLabel: 'Alumni & Giving',
+        groupPath: '/alumni-giving',
+        items: [
+          { label: 'Alumni Network', path: '/alumni-giving#network' },
+          { label: 'Giving Opportunities', path: '/alumni-giving#give' },
+          { label: 'Alumni Events', path: '/alumni-giving#events' },
+          { label: 'Prathibha Magazine', path: '/alumni-giving#magazine' },
+          { label: 'Success Stories', path: '/placements/success-stories' },
+        ],
+      },
     ],
   },
 ];
@@ -332,13 +339,20 @@ export default function Header() {
     }
     // "Success Stories" here is admin-redirectable independently of
     // Placements' own "Success Stories" item — see alumniSuccessStories above.
-    if (item.label === 'Alumni & Giving' && item.children) {
-      const children = item.children.map((child) =>
-        child.label === 'Success Stories'
-          ? { ...child, path: alumniSuccessStories.path, external: alumniSuccessStories.external }
-          : child
+    if (item.label === 'News & Events' && item.groups) {
+      const groups = item.groups.map((group) =>
+        group.groupLabel === 'Alumni & Giving'
+          ? {
+              ...group,
+              items: group.items.map((child) =>
+                child.label === 'Success Stories'
+                  ? { ...child, path: alumniSuccessStories.path, external: alumniSuccessStories.external }
+                  : child
+              ),
+            }
+          : group
       );
-      return { ...item, children };
+      return { ...item, groups };
     }
     return item;
   });
@@ -419,7 +433,7 @@ export default function Header() {
               {renderedNavItems.map((item) => (
                 <li
                   key={item.label}
-                  className={`nav-item${openItem === item.label ? ' nav-item--open' : ''}${item.label === 'Research' ? ' nav-item--research' : ''}${item.label === 'Placements' ? ' nav-item--placements' : ''}`}
+                  className={`nav-item${openItem === item.label ? ' nav-item--open' : ''}${item.label === 'About Us' || item.label === 'Research' || item.label === 'Campus Life' || item.label === 'News & Events' ? ' nav-item--mega-right' : ''}${item.label === 'Placements' ? ' nav-item--placements' : ''}`}
                   onMouseEnter={() => setOpenItem(item.label)}
                   onFocus={() => setOpenItem(item.label)}
                   onMouseLeave={() => setOpenItem((prev) => (prev === item.label ? null : prev))}

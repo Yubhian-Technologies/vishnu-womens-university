@@ -27,6 +27,20 @@ const feedbackLinks = [
   { label: 'AICTE Feedback Facility', href: 'https://svecw.edu.in/aicte-feedback-facility/' },
 ];
 
+// Mirrors the header nav's "Quick Links" dropdown (see navItems in
+// Header.tsx), minus Disclosures – UGC and Contact Us — those two already
+// have their own links in the bottom bar just below (.footer-legal).
+const quickLinks = [
+  { label: 'Examinations', href: 'https://www.svecwexams.in/', external: true },
+  { label: 'Vishnu LMS', href: 'https://www.vishnulearning.com/login/index.php', external: true },
+  { label: 'VEDIC', href: 'https://vedic.edu.in/', external: true },
+  { label: "Vishnu's Wellness Center", href: 'https://vishnuwellness.in/', external: true },
+  { label: 'Global Alumni Network', href: 'https://alumni.srivishnu.edu.in/', external: true },
+  { label: 'Vishnu Era', href: 'https://www.srivishnu.edu.in/vishnu-era/', external: true },
+  { label: 'Prathibha Magazine', href: 'https://heyzine.com/flip-book/14449c1cd4.html', external: true },
+  { label: 'Careers', href: '/careers', external: false },
+];
+
 // Statutory/compliance documents an accredited institution is required to publish.
 // Admin-editable via /admin → Compliance Documents (ComplianceDocsAdmin.tsx);
 // DEFAULT_COMPLIANCE_DOCS below is both the "nothing uploaded yet" fallback
@@ -125,6 +139,20 @@ export default function Footer() {
               <span key={l.label}>
                 <a href={l.href} target="_blank" rel="noopener noreferrer" className="footer-link">{l.label}</a>
                 {i < feedbackLinks.length - 1 && <span className="footer-feedback-sep">·</span>}
+              </span>
+            ))}
+          </div>
+
+          <div className="footer-feedback footer-quicklinks">
+            <span className="footer-feedback-label">Quick Links:</span>
+            {quickLinks.map((l, i) => (
+              <span key={l.label}>
+                {l.external ? (
+                  <a href={l.href} target="_blank" rel="noopener noreferrer" className="footer-link">{l.label}</a>
+                ) : (
+                  <Link to={l.href} className="footer-link">{l.label}</Link>
+                )}
+                {i < quickLinks.length - 1 && <span className="footer-feedback-sep">·</span>}
               </span>
             ))}
           </div>

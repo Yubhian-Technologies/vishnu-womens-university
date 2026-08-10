@@ -33,8 +33,15 @@
   flex-direction: column;
 }
 
+/* Taller than its content strictly needs (was 34px) so the Visit/Give/Apply
+   buttons get real breathing room above and below instead of sitting
+   almost flush against the header's top edge — align-items:center then
+   centers them in that extra space. .nav below simply gets the header's
+   remaining height (both are siblings inside a fixed-height .header-right),
+   so this doesn't require touching --header-height or any of its many
+   scroll-offset consumers sitewide. */
 .header-topline {
-  flex: 0 0 34px;
+  flex: 0 0 42px;
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -161,6 +168,7 @@
 .nav {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   flex: 1 1 auto;
   min-height: 0;
 }
@@ -273,11 +281,12 @@
   transition: opacity 220ms ease, transform 220ms ease, visibility 0s linear 0s;
 }
 
-/* The last couple of nav items (currently "Alumni & Giving" and "Quick
-   Links") sit close to the right edge of the bar. A dropdown centered on
-   its trigger would overflow past 100vw there, and body has
-   overflow-x:hidden — which clips that overflow so the menu becomes
-   invisible and unclickable. Right-anchor those instead of centering. */
+/* The last couple of nav items sit close to the right edge of the bar,
+   whichever items those happen to be as the nav gets restructured. A
+   dropdown centered on its trigger would overflow past 100vw there, and
+   body has overflow-x:hidden — which clips that overflow so the menu
+   becomes invisible and unclickable. Right-anchor those instead of
+   centering. */
 .nav-item:nth-last-child(-n+2) .dropdown:not(.dropdown-mega) {
   left: auto;
   right: 0;
@@ -372,12 +381,14 @@
   transform: translateX(0) translateY(0);
 }
 
-/* "Research" sits far enough right in the nav bar (8th of 10 items) that
-   this mega-menu's default left-anchored, 680px+-wide layout runs past the
-   right edge of the viewport, where body's overflow-x:hidden clips it —
-   right-anchor just this one item's mega-menu instead, same fix already
-   applied to flat dropdowns near the right edge above. */
-.nav-item--research .dropdown.dropdown-mega {
+/* Any mega-menu item sitting far enough right in the nav bar (currently
+   Research and News & Events) has its default left-anchored, 680px+-wide
+   layout run past the right edge of the viewport, where body's
+   overflow-x:hidden clips it — right-anchor those instead, same fix
+   already applied to flat dropdowns near the right edge above. Generic
+   class name (not tied to one item's label) since which items land here
+   shifts as the nav gets restructured. */
+.nav-item--mega-right .dropdown.dropdown-mega {
   left: auto;
   right: 0;
 }
@@ -391,6 +402,14 @@
 
 .mega-group:last-child {
   border-right: none;
+}
+
+/* A group with a two-column item list needs meaningfully more than the
+   flex:1 equal share the other (single-column) groups get in the same
+   row, or its sub-columns end up far too narrow and every item wraps
+   heavily. */
+.mega-group:has(.mega-group-list.cols-2) {
+  flex: 1.8;
 }
 
 .mega-group-label {
@@ -417,9 +436,19 @@ a.mega-group-label:hover {
   margin: 0;
 }
 
+/* CSS multi-column (not grid) so items flow top-to-bottom through column 1
+   before continuing into column 2 — preserving the list's natural reading
+   order. A grid with auto-flow:row instead pairs items 1&2, 3&4, 5&6... into
+   rows left-to-right, which scrambles that order and, since row height is
+   the tallest of each mismatched pair, produces uneven, misaligned-looking
+   rows whenever paired items wrap to different lengths. */
 .mega-group-list.cols-2 {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  column-count: 2;
+  column-gap: var(--space-4);
+}
+
+.mega-group-list.cols-2 li {
+  break-inside: avoid;
 }
 
 .mega-group-list .dropdown-item {

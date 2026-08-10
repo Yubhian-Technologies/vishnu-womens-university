@@ -304,6 +304,15 @@
   margin: 0 var(--space-2);
 }
 
+/* Second row directly under Feedback Facility — same look, but no repeated
+   border/margin-top since that divider already separates the pair of rows
+   from the compliance grid above them. */
+.footer-quicklinks {
+  margin-top: var(--space-3);
+  padding-top: 0;
+  border-top: none;
+}
+
 /* Responsive */
 @media (max-width: 640px) {
   .footer-bottom-inner {
