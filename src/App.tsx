@@ -4,9 +4,9 @@ import { GraduationCap } from 'lucide-react';
 import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
 import SmoothScroll from './components/SmoothScroll/SmoothScroll';
+import LandingPageLoader from './components/LandingPageLoader/LandingPageLoader';
 import { smoothScrollTo } from './lib/smoothScroll';
 
-const Home = lazy(() => import('./pages/Home/Home'));
 const Academics = lazy(() => import('./pages/Academics/Academics'));
 const ProgramDetail = lazy(() => import('./pages/Academics/ProgramDetail'));
 const Faculty = lazy(() => import('./pages/Academics/Faculty'));
@@ -85,7 +85,7 @@ function PublicApp() {
       <Header />
       <Suspense fallback={<RouteFallback />}>
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<LandingPageLoader />} />
           <Route path="/academics" element={<Academics />} />
           <Route path="/academics/downloads" element={<AcademicDownloads />} />
           <Route path="/academics/curriculum" element={<CurriculumMatrix />} />

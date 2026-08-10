@@ -1,6 +1,7 @@
 import { SECTIONS } from './AdminLayout';
 import Overview from './sections/Overview';
 import BannersAdmin from './sections/BannersAdmin';
+import LandingPagesAdmin from './sections/LandingPagesAdmin';
 import NewsAdmin from './sections/NewsAdmin';
 import GalleryAdmin from './sections/GalleryAdmin';
 import ProgramsAdmin from './sections/ProgramsAdmin';
@@ -85,6 +86,7 @@ const UNGATED_SECTIONS = new Set(['overview']);
 const SECTION_MAP: Record<string, React.ReactNode> = {
   overview: <Overview />,
   banners: <BannersAdmin />,
+  'landing-pages': <LandingPagesAdmin />,
   news: <NewsAdmin />,
   gallery: <GalleryAdmin />,
   programs: <ProgramsAdmin />,

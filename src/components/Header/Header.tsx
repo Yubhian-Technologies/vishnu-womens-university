@@ -3,9 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import AnnouncementsTicker from '../AnnouncementsTicker/AnnouncementsTicker';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useNavLinkOverride } from '../../hooks/useNavLinkOverride';
-import type { CurriculumDoc } from '../../pages/Admin/sections/CurriculumAdmin';
 import type { DownloadDoc } from '../../pages/Admin/sections/DownloadsAdmin';
-import { PROGRAM_LABELS } from '../../pages/Academics/CurriculumMatrix';
 import SmoothCollapse from '../SmoothCollapse/SmoothCollapse';
 import './Header.css';
 
@@ -295,26 +293,12 @@ export default function Header() {
   const location = useLocation();
   const navRef = useRef<HTMLElement>(null);
 
-  const { docs: curriculumDocs, loading: curriculumLoading } = useOrderedCollection<CurriculumDoc>('curriculum', 'rowOrder');
   const { docs: downloadDocs, loading: downloadsLoading } = useOrderedCollection<DownloadDoc>('downloads', 'order');
   // Admin-editable via /admin → Navigation Link Redirects (NavLinkOverridesAdmin.tsx).
   // Decoupled from Placements' own "Success Stories" item, which stays hardcoded.
   // Default target is AlumniGiving.tsx's own "#successstories" section, not Placements.
   const alumniSuccessStories = useNavLinkOverride('alumni-success-stories', '/alumni-giving#successstories');
 
-  const curriculumPrograms = Array.from(new Set(curriculumDocs.map((d) => d.program)));
-  const courseCurriculumChild: NavChild = {
-    label: 'Course Curriculum',
-    path: '/academics/curriculum',
-    subItems: curriculumLoading
-      ? [{ label: 'Loading…', path: '', disabled: true }]
-      : curriculumPrograms.length > 0
-        ? curriculumPrograms.map((p) => ({
-            label: PROGRAM_LABELS[p] ?? p,
-            path: `/academics/curriculum#curriculum-${p}`,
-          }))
-        : [{ label: 'No documents yet', path: '', disabled: true }],
-  };
   const academicDocsChild: NavChild = {
     label: 'Academic Documents',
     path: '/academics/downloads',
@@ -325,15 +309,15 @@ export default function Header() {
         : [{ label: 'No documents yet', path: '', disabled: true }],
   };
 
-  // Academics' children are the static list + these two live-Firestore-derived
-  // flyout items, spliced in after "Faculty" since navItems itself is a
+  // Academics' children are the static list + this live-Firestore-derived
+  // flyout item, spliced in after "Faculty" since navItems itself is a
   // module-level constant and can't hold live data directly.
   const renderedNavItems: NavItem[] = navItems.map((item) => {
     if (item.label === 'Academics' && item.children) {
       const children: NavChild[] = [];
       for (const child of item.children) {
         children.push(child);
-        if (child.label === 'Faculty') children.push(courseCurriculumChild, academicDocsChild);
+        if (child.label === 'Faculty') children.push(academicDocsChild);
       }
       return { ...item, children };
     }
@@ -356,6 +340,112 @@ export default function Header() {
     }
     return item;
   });
+
+  const renderNavItem = (item: NavItem) => (
+    <li
+      key={item.label}
+      className={`nav-item${openItem === item.label ? ' nav-item--open' : ''}${item.label === 'About Us' || item.label === 'Research' || item.label === 'Campus Life' || item.label === 'News & Events' ? ' nav-item--mega-right' : ''}${item.label === 'Placements' ? ' nav-item--placements' : ''}`}
+      onMouseEnter={() => setOpenItem(item.label)}
+      onFocus={() => setOpenItem(item.label)}
+      onMouseLeave={() => setOpenItem((prev) => (prev === item.label ? null : prev))}
+    >
+      <button
+        className="nav-link"
+        aria-haspopup="true"
+        aria-expanded={openItem === item.label}
+        onClick={() => setOpenItem((prev) => (prev === item.label ? null : item.label))}
+      >
+        {item.label}
+        <svg className="nav-arrow" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+          <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </button>
+
+      {/* Flat dropdown */}
+      {item.children && (
+        <div className="dropdown" role="menu">
+          <ul className="dropdown-list">
+            {item.children.map((child) => (
+              <li key={child.label} className={child.subItems ? 'dropdown-item--flyout-parent' : undefined}>
+                {child.disabled ? (
+                  <span className="dropdown-item" style={{ opacity: 0.5, cursor: 'default' }}>
+                    {child.label}
+                  </span>
+                ) : (child.external || child.download) ? (
+                  <a href={child.path} className="dropdown-item" role="menuitem" download={child.download} target={child.download ? undefined : '_blank'} rel="noopener noreferrer">
+                    {child.label}
+                    {!child.download && <span style={{ fontSize: '0.6rem', opacity: 0.5, marginLeft: 4 }}>↗</span>}
+                  </a>
+                ) : (
+                  <Link to={child.path} className="dropdown-item" role="menuitem">
+                    {child.label}
+                    {child.subItems && <span className="dropdown-item__chevron">›</span>}
+                  </Link>
+                )}
+                {child.subItems && (
+                  <ul className="dropdown-flyout" role="menu">
+                    {child.subItems.map((sub) => (
+                      <li key={sub.label}>
+                        {sub.disabled ? (
+                          <span className="dropdown-item" style={{ opacity: 0.5, cursor: 'default' }}>
+                            {sub.label}
+                          </span>
+                        ) : (sub.external || sub.download) ? (
+                          <a href={sub.path} className="dropdown-item" role="menuitem" download={sub.download} target={sub.download ? undefined : '_blank'} rel="noopener noreferrer">
+                            {sub.label}
+                          </a>
+                        ) : (
+                          <Link to={sub.path} className="dropdown-item" role="menuitem">
+                            {sub.label}
+                          </Link>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Mega-menu dropdown */}
+      {item.groups && (
+        <div className="dropdown dropdown-mega" role="menu">
+          {item.groups.map((group) => (
+            <div key={group.groupLabel} className="mega-group">
+              {group.groupPath ? (
+                <Link to={group.groupPath} className="mega-group-label">
+                  {group.groupLabel}
+                </Link>
+              ) : (
+                <span className="mega-group-label">{group.groupLabel}</span>
+              )}
+              <ul className={`mega-group-list${group.items.length > 9 ? ' cols-2' : ''}`}>
+                {group.items.map((child) => (
+                  <li key={child.label}>
+                    {child.disabled ? (
+                      <span className="dropdown-item" style={{ opacity: 0.5, cursor: 'default' }}>
+                        {child.label}
+                      </span>
+                    ) : (child.external || child.download) ? (
+                      <a href={child.path} className="dropdown-item" role="menuitem" download={child.download} target={child.download ? undefined : '_blank'} rel="noopener noreferrer">
+                        {child.label}
+                      </a>
+                    ) : (
+                      <Link to={child.path} className="dropdown-item" role="menuitem">
+                        {child.label}
+                      </Link>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      )}
+    </li>
+  );
 
   useEffect(() => {
     const handleScroll = () => {
@@ -409,11 +499,7 @@ export default function Header() {
         <div className="header-inner">
           {/* Logo */}
           <Link to="/" className="logo" aria-label="Vishnu Womens University Home">
-            <img src="https://res.cloudinary.com/dljzfysft/image/upload/v1777358383/download_u6eeyl.jpg" alt="VWU Logo" className="logo-icon" />
-            <div className="logo-text">
-              <span className="logo-text-main">VISHNU WOMENS UNIVERSITY</span>
-              <span className="logo-text-tag">First private state university for women in telugu states</span>
-            </div>
+            <img src="/images/logo.png" alt="VWU Logo" className="logo-icon" />
           </Link>
 
           <div className="header-right">
@@ -430,111 +516,7 @@ export default function Header() {
             {/* Desktop Nav */}
             <nav className="nav" aria-label="Main navigation" ref={navRef}>
               <ul className="nav-list">
-              {renderedNavItems.map((item) => (
-                <li
-                  key={item.label}
-                  className={`nav-item${openItem === item.label ? ' nav-item--open' : ''}${item.label === 'About Us' || item.label === 'Research' || item.label === 'Campus Life' || item.label === 'News & Events' ? ' nav-item--mega-right' : ''}${item.label === 'Placements' ? ' nav-item--placements' : ''}`}
-                  onMouseEnter={() => setOpenItem(item.label)}
-                  onFocus={() => setOpenItem(item.label)}
-                  onMouseLeave={() => setOpenItem((prev) => (prev === item.label ? null : prev))}
-                >
-                  <button
-                    className="nav-link"
-                    aria-haspopup="true"
-                    aria-expanded={openItem === item.label}
-                    onClick={() => setOpenItem((prev) => (prev === item.label ? null : item.label))}
-                  >
-                    {item.label}
-                    <svg className="nav-arrow" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-                      <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </button>
-
-                  {/* Flat dropdown */}
-                  {item.children && (
-                    <div className="dropdown" role="menu">
-                      <ul className="dropdown-list">
-                        {item.children.map((child) => (
-                          <li key={child.label} className={child.subItems ? 'dropdown-item--flyout-parent' : undefined}>
-                            {child.disabled ? (
-                              <span className="dropdown-item" style={{ opacity: 0.5, cursor: 'default' }}>
-                                {child.label}
-                              </span>
-                            ) : (child.external || child.download) ? (
-                              <a href={child.path} className="dropdown-item" role="menuitem" download={child.download} target={child.download ? undefined : '_blank'} rel="noopener noreferrer">
-                                {child.label}
-                                {!child.download && <span style={{ fontSize: '0.6rem', opacity: 0.5, marginLeft: 4 }}>↗</span>}
-                              </a>
-                            ) : (
-                              <Link to={child.path} className="dropdown-item" role="menuitem">
-                                {child.label}
-                                {child.subItems && <span className="dropdown-item__chevron">›</span>}
-                              </Link>
-                            )}
-                            {child.subItems && (
-                              <ul className="dropdown-flyout" role="menu">
-                                {child.subItems.map((sub) => (
-                                  <li key={sub.label}>
-                                    {sub.disabled ? (
-                                      <span className="dropdown-item" style={{ opacity: 0.5, cursor: 'default' }}>
-                                        {sub.label}
-                                      </span>
-                                    ) : (sub.external || sub.download) ? (
-                                      <a href={sub.path} className="dropdown-item" role="menuitem" download={sub.download} target={sub.download ? undefined : '_blank'} rel="noopener noreferrer">
-                                        {sub.label}
-                                      </a>
-                                    ) : (
-                                      <Link to={sub.path} className="dropdown-item" role="menuitem">
-                                        {sub.label}
-                                      </Link>
-                                    )}
-                                  </li>
-                                ))}
-                              </ul>
-                            )}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {/* Mega-menu dropdown */}
-                  {item.groups && (
-                    <div className="dropdown dropdown-mega" role="menu">
-                      {item.groups.map((group) => (
-                        <div key={group.groupLabel} className="mega-group">
-                          {group.groupPath ? (
-                            <Link to={group.groupPath} className="mega-group-label">
-                              {group.groupLabel}
-                            </Link>
-                          ) : (
-                            <span className="mega-group-label">{group.groupLabel}</span>
-                          )}
-                          <ul className={`mega-group-list${group.items.length > 9 ? ' cols-2' : ''}`}>
-                            {group.items.map((child) => (
-                              <li key={child.label}>
-                                {child.disabled ? (
-                                  <span className="dropdown-item" style={{ opacity: 0.5, cursor: 'default' }}>
-                                    {child.label}
-                                  </span>
-                                ) : (child.external || child.download) ? (
-                                  <a href={child.path} className="dropdown-item" role="menuitem" download={child.download} target={child.download ? undefined : '_blank'} rel="noopener noreferrer">
-                                    {child.label}
-                                  </a>
-                                ) : (
-                                  <Link to={child.path} className="dropdown-item" role="menuitem">
-                                    {child.label}
-                                  </Link>
-                                )}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </li>
-              ))}
+                {renderedNavItems.map(renderNavItem)}
               </ul>
             </nav>
           </div>

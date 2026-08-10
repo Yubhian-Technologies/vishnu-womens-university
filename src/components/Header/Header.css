@@ -106,14 +106,18 @@
 }
 
 .logo-icon {
-  width: 60px;
-  height: 60px;
+  /* The logo file is a wide lockup (founder mark + wordmark) with its own
+     dark background baked in, not a small square icon — size by height so
+     it keeps its native aspect ratio instead of being squeezed into a
+     square box, and drop the white card background/padding that was meant
+     to set off a small icon against the dark header (this logo already
+     carries its own background). */
+  height: 78px;
+  width: auto;
   border-radius: var(--radius-sm);
   object-fit: contain;
   flex-shrink: 0;
   transition: transform var(--transition-fast);
-  background: var(--color-white);
-  padding: 3px;
   box-shadow: 0 2px 12px rgba(0,0,0,0.3);
 }
 
