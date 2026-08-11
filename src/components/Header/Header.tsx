@@ -151,18 +151,6 @@ const navItems: NavItem[] = [
     label: 'Research',
     groups: [
       {
-        groupLabel: 'Differentiators',
-        groupPath: '/differentiators',
-        items: [
-          { label: 'All Differentiators', path: '/differentiators' },
-          { label: 'Innovation & Entrepreneurship', path: '/differentiators#innovation' },
-          { label: 'Industry Centres of Excellence', path: '/differentiators#industry' },
-          { label: 'Research & Specialised Labs', path: '/differentiators#research' },
-          { label: 'International & Global Outreach', path: '/differentiators#global' },
-          { label: 'Student Development & Social Impact', path: '/differentiators#student' },
-        ],
-      },
-      {
         groupLabel: 'R&D Governance',
         groupPath: '/research#governance',
         items: [
@@ -193,6 +181,18 @@ const navItems: NavItem[] = [
           { label: 'Professional Bodies', path: '/research/professional-bodies' },
         ],
       },
+    ],
+  },
+  {
+    // Was a group inside Research's mega-menu — now its own top-level item.
+    label: 'Differentiators',
+    children: [
+      { label: 'All Differentiators', path: '/differentiators' },
+      { label: 'Innovation & Entrepreneurship', path: '/differentiators#innovation' },
+      { label: 'Industry Centres of Excellence', path: '/differentiators#industry' },
+      { label: 'Research & Specialised Labs', path: '/differentiators#research' },
+      { label: 'International & Global Outreach', path: '/differentiators#global' },
+      { label: 'Student Development & Social Impact', path: '/differentiators#student' },
     ],
   },
   {
