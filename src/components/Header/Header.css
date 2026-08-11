@@ -1,120 +1,69 @@
-/* ===== Main Header =====
-   Two layers: a thin dark ticker strip (keeps the white-text
-   AnnouncementsTicker legible against whatever the page behind it looks
-   like), then a floating white pill below it holding the logo, nav, and
-   Visit/Give/Apply. .header itself has no background of its own; the page
-   shows through around the pill. */
+/* ===== Main Header ===== */
 .header {
+  background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%);
+  height: var(--header-height);
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 1000;
-  padding-top: var(--space-2);
   transition: all var(--transition-base);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.35);
+  border-bottom: 2px solid var(--color-accent);
 }
 
-.header-ticker-strip {
-  background: rgba(8, 28, 21, 0.55);
-  backdrop-filter: blur(4px);
-  padding: 5px 0;
+.header.scrolled {
+  box-shadow: 0 6px 36px rgba(0,0,0,0.4);
 }
 
-.header-ticker-strip .container {
-  padding: 0 var(--space-6);
-}
-
-.header-pill-wrap {
-  padding: var(--space-2) var(--space-4) 0;
-}
-
-.header-bar {
-  max-width: 1700px;
-  margin: 0 auto;
+.header-inner {
+  width: 100%;
+  padding: 0 var(--space-4);
+  height: 100%;
   display: flex;
-  align-items: center;
-  gap: var(--space-4);
+  align-items: stretch;
+  justify-content: space-between;
 }
 
-/* The white capsule itself. No overflow:hidden here — the mega-menu
-   dropdowns are children of .nav further down and need to hang below the
-   pill uncropped. Clipping happens locally on each .pill-pod instead (see
-   below), which don't contain any dropdown content. */
-.header-pill {
+/* ===== Header right column (topline + nav, stacked) ===== */
+.header-right {
   flex: 1 1 auto;
   min-width: 0;
-  background: var(--color-white);
-  border-radius: var(--radius-full);
-  box-shadow: 0 8px 28px rgba(0,0,0,0.18);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Taller than its content strictly needs (was 34px) so the Visit/Give/Apply
+   buttons get real breathing room above and below instead of sitting
+   almost flush against the header's top edge — align-items:center then
+   centers them in that extra space. .nav below simply gets the header's
+   remaining height (both are siblings inside a fixed-height .header-right),
+   so this doesn't require touching --header-height or any of its many
+   scroll-offset consumers sitewide. */
+.header-topline {
+  flex: 0 0 42px;
   display: flex;
   align-items: center;
-  height: 64px;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  min-height: 0;
 }
 
-.header.scrolled .header-pill {
-  box-shadow: 0 10px 32px rgba(0,0,0,0.26);
-}
-
-.pill-pod {
-  position: relative;
-  flex-shrink: 0;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  overflow: hidden;
-}
-
-.pill-pod--logo {
-  width: 220px;
-  padding-left: 6px;
-  border-radius: var(--radius-full) 0 0 var(--radius-full);
-}
-
-/* Thin decorative bookend, not a full-width pod — a small flourish before
-   the pill's right edge, not a mirror of the logo pod's footprint. */
-.pill-pod--accent {
-  width: 46px;
-  border-radius: 0 var(--radius-full) var(--radius-full) 0;
-}
-
-.pill-pod-wave {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 0;
-}
-
-.pill-pod-wave--mirror {
-  transform: scaleX(-1);
-}
-
-.logo {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  text-decoration: none;
-}
-
-/* Visit/Give/Apply sit outside the white pill, directly on the page
-   background — light text/icons to stay legible there. */
 .header-ctas {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  flex-shrink: 0;
+  gap: var(--space-2);
 }
 
 .topbar-cta {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 9px 12px;
+  padding: 4px 14px;
   font-size: var(--text-xs);
   font-weight: 700;
-  letter-spacing: 0.03em;
-  border-radius: var(--radius-full);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: var(--radius-sm);
   transition: all var(--transition-fast);
   font-family: var(--font-sans);
 }
@@ -122,56 +71,120 @@
 .topbar-cta.visit,
 .topbar-cta.give {
   background: transparent;
-  color: var(--color-white);
+  color: rgba(255,255,255,0.85);
+  border: 1px solid rgba(255,255,255,0.3);
 }
 
 .topbar-cta.visit:hover,
 .topbar-cta.give:hover {
   background: rgba(255,255,255,0.1);
+  color: var(--color-white);
+  border-color: rgba(255,255,255,0.6);
 }
 
 .topbar-cta.apply {
   background: var(--color-accent);
   color: var(--color-primary-dark);
-  padding: 9px 16px;
+  border: 1px solid var(--color-accent);
 }
 
 .topbar-cta.apply:hover {
   background: var(--color-accent-light);
+  border-color: var(--color-accent-light);
 }
 
 /* ===== Logo ===== */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  text-decoration: none;
+  flex-shrink: 0;
+  padding: var(--space-4) var(--space-3) var(--space-4) 0;
+  border-right: 1px solid rgba(255,255,255,0.12);
+  margin-right: var(--space-6);
+}
+
 .logo-icon {
   /* The logo file is a wide lockup (founder mark + wordmark) with its own
-     dark background baked in — size by height so it keeps its native
-     aspect ratio, sized to fit the pill's compact height. */
-  height: 50px;
+     dark background baked in, not a small square icon — size by height so
+     it keeps its native aspect ratio instead of being squeezed into a
+     square box, and drop the white card background/padding that was meant
+     to set off a small icon against the dark header (this logo already
+     carries its own background). Sized up from 78px along with
+     --header-height below, both to read better on its own and to help
+     close the large empty gap that used to sit between the logo and the
+     (right-aligned) nav items. */
+  height: 96px;
   width: auto;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-sm);
   object-fit: contain;
   flex-shrink: 0;
   transition: transform var(--transition-fast);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.3);
 }
 
 .logo:hover .logo-icon {
-  transform: scale(1.04);
+  transform: scale(1.06);
+}
+
+.logo-text {
+  color: var(--color-white);
+  font-family: var(--font-serif);
+  line-height: 1.2;
+  position: relative;
+  padding-left: var(--space-3);
+}
+
+.logo-text::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 2px;
+  bottom: 2px;
+  width: 3px;
+  background: var(--color-accent);
+  border-radius: 2px;
+}
+
+.logo-text-main {
+  font-size: 1.5rem;
+  font-weight: 900;
+  display: block;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  line-height: 1.3;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.logo-text-tag {
+  display: block;
+  font-size: 0.68rem;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  white-space: nowrap;
+  margin-top: 7px;
+  opacity: 0.9;
 }
 
 /* ===== Navigation ===== */
 .nav {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
   flex: 1 1 auto;
   min-height: 0;
-  min-width: 0;
 }
 
 .nav-list {
   display: flex;
   align-items: center;
   height: 100%;
-  gap: var(--space-1);
+  gap: 0;
 }
 
 .nav-item {
@@ -181,23 +194,19 @@
   align-items: center;
 }
 
-/* Icon-over-label pill nav buttons — a stacked column per item rather than
-   a single row of text. */
 .nav-link {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 2px;
-  padding: 6px 10px;
-  border-radius: var(--radius-lg);
-  font-size: 0.6rem;
+  gap: 3px;
+  padding: 0 0.5rem;
+  height: 100%;
+  font-size: 0.85rem;
   font-weight: 700;
-  color: var(--color-text-light);
+  color: rgba(255,255,255,0.9);
   font-family: var(--font-sans);
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
   text-transform: uppercase;
-  transition: color var(--transition-fast), background var(--transition-fast);
+  transition: color var(--transition-fast);
   white-space: nowrap;
   cursor: pointer;
   background: none;
@@ -205,48 +214,46 @@
   position: relative;
 }
 
-.nav-link-icon {
-  color: var(--color-text-light);
-  transition: color var(--transition-fast);
-}
-
-.nav-link:hover {
-  background: var(--color-off-white);
-}
-
-.nav-link-label {
-  position: relative;
-  padding-bottom: 3px;
-}
-
-.nav-link-label::after {
+.nav-link::after {
   content: '';
   position: absolute;
-  bottom: -1px;
-  left: 0;
-  right: 0;
-  height: 2px;
+  bottom: 0;
+  left: 0.5rem;
+  right: 0.5rem;
+  height: 3px;
   background: var(--color-accent);
   transform: scaleX(0);
   transition: transform var(--transition-base);
-  border-radius: 2px;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
 }
 
-/* Dropdown visibility (and the link styling that goes with it) is driven
-   entirely by the .nav-item--open class, which Header.tsx applies from a
-   single `openItem` state — set by hover, focus, and click alike. There is
-   deliberately no plain CSS :hover/:focus-within rule here: those would
-   show the dropdown independently of that state, and once click and hover
-   can each open/close things on their own, they inevitably disagree with
-   each other (this used to be a real bug — see the .nav-item--open comment
-   further down for the full story). */
-.nav-item--open .nav-link,
-.nav-item--open .nav-link-icon {
-  color: var(--color-primary);
+/* Dropdown visibility (and the link/arrow styling that goes with it) is
+   driven entirely by the .nav-item--open class, which Header.tsx applies
+   from a single `openItem` state — set by hover, focus, and click alike.
+   There is deliberately no plain CSS :hover/:focus-within rule here: those
+   would show the dropdown independently of that state, and once click and
+   hover can each open/close things on their own, they inevitably disagree
+   with each other (this used to be a real bug — see the .nav-item--open
+   comment further down for the full story). */
+.nav-item--open .nav-link {
+  color: var(--color-white);
 }
 
-.nav-item--open .nav-link-label::after {
+.nav-item--open .nav-link::after {
   transform: scaleX(1);
+}
+
+.nav-arrow {
+  width: 11px;
+  height: 11px;
+  flex-shrink: 0;
+  transition: transform var(--transition-base);
+  opacity: 0.7;
+}
+
+.nav-item--open .nav-arrow {
+  transform: rotate(180deg);
+  opacity: 1;
 }
 
 /* ===== Dropdown ===== */
@@ -295,11 +302,6 @@
 
 .nav-item--open:nth-last-child(-n+2) .dropdown:not(.dropdown-mega) {
   transform: translateY(0);
-}
-
-.nav-item:nth-last-child(-n+2) .dropdown.dropdown-mega {
-  left: auto;
-  right: 0;
 }
 
 .dropdown-list {
@@ -392,6 +394,17 @@
   transform: translateX(0) translateY(0);
 }
 
+/* Any mega-menu item sitting far enough right in the nav bar (currently
+   Research and News & Events) has its default left-anchored, 680px+-wide
+   layout run past the right edge of the viewport, where body's
+   overflow-x:hidden clips it — right-anchor those instead, same fix
+   already applied to flat dropdowns near the right edge above. Generic
+   class name (not tied to one item's label) since which items land here
+   shifts as the nav gets restructured. */
+.nav-item--mega-right .dropdown.dropdown-mega {
+  left: auto;
+  right: 0;
+}
 
 .mega-group {
   flex: 1;
@@ -663,14 +676,17 @@ a.mega-group-label:hover {
 }
 
 /* ===== Responsive ===== */
+/* The logo block + full nav-item row need ~1379px to lay out without
+   overflowing (measured: ~477px logo + ~869px compacted nav + ~32px header
+   padding — .nav-link's padding/font-size/letter-spacing and .nav-arrow's
+   size were tightened specifically so the full nav stays visible, instead
+   of collapsing to the hamburger menu, at common laptop widths like
+   1440px). This breakpoint is intentionally its own query, separate from
+   the branding-simplification rules below: once .nav is hidden here, it no
+   longer competes for header width, so there's no overflow reason to also
+   hide the university name/subtitle at this same width. */
 @media (max-width: 1400px) {
   .nav {
-    display: none;
-  }
-  /* Purely decorative once .nav is gone — with no nav content between the
-     two pods, the pill would just collapse them together into an odd
-     double-dark-blob shape with nothing in between. */
-  .pill-pod--accent {
     display: none;
   }
   .mobile-toggle {
@@ -678,27 +694,14 @@ a.mega-group-label:hover {
   }
 }
 
-/* Purely a visual simplification for narrower/tablet widths. */
+/* Purely a visual simplification for narrower/tablet widths — not tied to
+   the nav-overflow fix above. */
 @media (max-width: 1400px) {
-  .header-ticker-strip .announcements-ticker {
+  .header-topline .announcements-ticker {
     display: none;
   }
-}
-
-@media (max-width: 640px) {
-  .header-ctas {
-    gap: var(--space-1);
-    padding-left: var(--space-2);
-  }
-  .topbar-cta.visit,
-  .topbar-cta.give {
+  .logo-text {
     display: none;
-  }
-  .topbar-cta.apply {
-    padding: 8px 12px;
-  }
-  .logo-icon {
-    height: 44px;
   }
 }
 

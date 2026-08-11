@@ -1,35 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, GraduationCap, FileText, Briefcase, FlaskConical, Sparkles, Users, Calendar, MapPin, Heart, ArrowRight } from 'lucide-react';
 import AnnouncementsTicker from '../AnnouncementsTicker/AnnouncementsTicker';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useNavLinkOverride } from '../../hooks/useNavLinkOverride';
 import type { DownloadDoc } from '../../pages/Admin/sections/DownloadsAdmin';
 import SmoothCollapse from '../SmoothCollapse/SmoothCollapse';
 import './Header.css';
-
-// One icon per top-level nav label, matching the icon+label pill nav
-// design. Falls through to no icon for any label not listed here, so a
-// future nav restructure doesn't need to touch this to keep working.
-const NAV_ICONS: Record<string, typeof Home> = {
-  'About Us': Home,
-  'Academics': GraduationCap,
-  'Admissions': FileText,
-  'Placements': Briefcase,
-  'Research': FlaskConical,
-  'Differentiators': Sparkles,
-  'Campus Life': Users,
-  'News & Events': Calendar,
-};
-
-// Wavy divider shape for the pill's two dark end-pods (logo pod on the
-// left, a thin decorative bookend on the right before Visit/Give/Apply —
-// see .pill-pod in Header.css). A single clean S-curve; the straight edges
-// are cropped to the pod's own rounded-capsule corner by that element's
-// own overflow:hidden, so this path only needs to draw the wavy side
-// facing the white nav area.
-const POD_WAVE_VIEWBOX = '0 0 220 64';
-const POD_WAVE_PATH = 'M0,0 H150 C195,0 195,28 160,32 C195,36 195,64 150,64 H0 Z';
 
 interface NavChild {
   label: string;
@@ -365,12 +341,10 @@ export default function Header() {
     return item;
   });
 
-  const renderNavItem = (item: NavItem) => {
-    const Icon = NAV_ICONS[item.label];
-    return (
+  const renderNavItem = (item: NavItem) => (
     <li
       key={item.label}
-      className={`nav-item${openItem === item.label ? ' nav-item--open' : ''}${item.label === 'Placements' ? ' nav-item--placements' : ''}`}
+      className={`nav-item${openItem === item.label ? ' nav-item--open' : ''}${item.label === 'About Us' || item.label === 'Research' || item.label === 'Campus Life' || item.label === 'News & Events' ? ' nav-item--mega-right' : ''}${item.label === 'Placements' ? ' nav-item--placements' : ''}`}
       onMouseEnter={() => setOpenItem(item.label)}
       onFocus={() => setOpenItem(item.label)}
       onMouseLeave={() => setOpenItem((prev) => (prev === item.label ? null : prev))}
@@ -381,8 +355,10 @@ export default function Header() {
         aria-expanded={openItem === item.label}
         onClick={() => setOpenItem((prev) => (prev === item.label ? null : item.label))}
       >
-        {Icon && <Icon className="nav-link-icon" size={16} strokeWidth={1.75} aria-hidden="true" />}
-        <span className="nav-link-label">{item.label}</span>
+        {item.label}
+        <svg className="nav-arrow" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+          <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
       </button>
 
       {/* Flat dropdown */}
@@ -469,8 +445,7 @@ export default function Header() {
         </div>
       )}
     </li>
-    );
-  };
+  );
 
   useEffect(() => {
     const handleScroll = () => {
@@ -519,71 +494,44 @@ export default function Header() {
 
   return (
     <>
-      {/* Main Header — thin dark ticker strip, then a floating white pill
-          (logo, nav, Visit/Give/Apply) below it. */}
+      {/* Main Header */}
       <header className={`header${scrolled ? ' scrolled' : ''}`}>
-        <div className="header-ticker-strip">
-          <div className="container">
-            <AnnouncementsTicker fallback={null} />
-          </div>
-        </div>
+        <div className="header-inner">
+          {/* Logo */}
+          <Link to="/" className="logo" aria-label="Vishnu Womens University Home">
+            <img src="/images/logo.png" alt="VWU Logo" className="logo-icon" />
+          </Link>
 
-        <div className="header-pill-wrap">
-          <div className="header-bar">
-            <div className="header-pill">
-              {/* Logo pod — the wavy SVG cutout is purely decorative,
-                  rendered behind the logo within the same pod box. */}
-              <div className="pill-pod pill-pod--logo">
-                <svg className="pill-pod-wave" viewBox={POD_WAVE_VIEWBOX} preserveAspectRatio="none" aria-hidden="true">
-                  <path d={POD_WAVE_PATH} fill="var(--color-primary-dark)" stroke="var(--color-accent)" strokeWidth="2" />
-                </svg>
-                <Link to="/" className="logo" aria-label="Vishnu Womens University Home">
-                  <img src="/images/logo.png" alt="VWU Logo" className="logo-icon" />
-                </Link>
-              </div>
-
-              {/* Desktop Nav */}
-              <nav className="nav" aria-label="Main navigation" ref={navRef}>
-                <ul className="nav-list">
-                  {renderedNavItems.map(renderNavItem)}
-                </ul>
-              </nav>
-
-              {/* Empty mirrored pod — purely decorative bookend before the
-                  pill's right edge. */}
-              <div className="pill-pod pill-pod--accent" aria-hidden="true">
-                <svg className="pill-pod-wave pill-pod-wave--mirror" viewBox={POD_WAVE_VIEWBOX} preserveAspectRatio="none" aria-hidden="true">
-                  <path d={POD_WAVE_PATH} fill="var(--color-primary-dark)" stroke="var(--color-accent)" strokeWidth="2" />
-                </svg>
+          <div className="header-right">
+            {/* Topline: announcements ticker + Visit/Give/Apply */}
+            <div className="header-topline">
+              <AnnouncementsTicker fallback={null} />
+              <div className="header-ctas">
+                <Link to="/admissions" className="topbar-cta visit">Visit</Link>
+                <Link to="/alumni-giving" className="topbar-cta give">Give</Link>
+                <Link to="/admissions" className="topbar-cta apply">Apply Now</Link>
               </div>
             </div>
 
-            {/* Visit/Give/Apply sit outside the white pill, on the page
-                background — not inside it. */}
-            <div className="header-ctas">
-              <Link to="/admissions" className="topbar-cta visit">
-                <MapPin size={14} strokeWidth={2} aria-hidden="true" /> Visit
-              </Link>
-              <Link to="/alumni-giving" className="topbar-cta give">
-                <Heart size={14} strokeWidth={2} aria-hidden="true" /> Give
-              </Link>
-              <Link to="/admissions" className="topbar-cta apply">
-                Apply Now <ArrowRight size={14} strokeWidth={2.5} aria-hidden="true" />
-              </Link>
-            </div>
-
-            {/* Mobile Toggle */}
-            <button
-              className={`mobile-toggle${mobileOpen ? ' open' : ''}`}
-              onClick={() => setMobileOpen(!mobileOpen)}
-              aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
-              aria-expanded={mobileOpen}
-            >
-              <span />
-              <span />
-              <span />
-            </button>
+            {/* Desktop Nav */}
+            <nav className="nav" aria-label="Main navigation" ref={navRef}>
+              <ul className="nav-list">
+                {renderedNavItems.map(renderNavItem)}
+              </ul>
+            </nav>
           </div>
+
+          {/* Mobile Toggle */}
+          <button
+            className={`mobile-toggle${mobileOpen ? ' open' : ''}`}
+            onClick={() => setMobileOpen(!mobileOpen)}
+            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={mobileOpen}
+          >
+            <span />
+            <span />
+            <span />
+          </button>
         </div>
       </header>
 
