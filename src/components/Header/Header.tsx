@@ -344,7 +344,7 @@ export default function Header() {
   const renderNavItem = (item: NavItem) => (
     <li
       key={item.label}
-      className={`nav-item${openItem === item.label ? ' nav-item--open' : ''}${item.label === 'About Us' || item.label === 'Research' || item.label === 'Campus Life' || item.label === 'News & Events' ? ' nav-item--mega-right' : ''}${item.label === 'Placements' ? ' nav-item--placements' : ''}`}
+      className={`nav-item${openItem === item.label ? ' nav-item--open' : ''}${item.label === 'Research' || item.label === 'Campus Life' || item.label === 'News & Events' ? ' nav-item--mega-right' : ''}${item.label === 'Placements' ? ' nav-item--placements' : ''}`}
       onMouseEnter={() => setOpenItem(item.label)}
       onFocus={() => setOpenItem(item.label)}
       onMouseLeave={() => setOpenItem((prev) => (prev === item.label ? null : prev))}
