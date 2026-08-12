@@ -388,7 +388,7 @@ export default function About() {
             <span className="section-label">Discover More</span>
             <h2 className="section-title">Explore VWU in Detail</h2>
           </div>
-          <div className="about-discover-grid">
+          <div className="about-discover-grid card-grid">
             {discoverCards.map((item) => {
               const Icon = resolveContentIcon(item.icon) || Target;
               return (

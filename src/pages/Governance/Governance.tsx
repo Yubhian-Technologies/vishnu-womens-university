@@ -129,7 +129,7 @@ export default function Governance() {
                 <p style={{ color: 'var(--color-text-light)', maxWidth: 600, lineHeight: 1.7 }}>{cat.desc}</p>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 'var(--space-5)' }}>
+              <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 'var(--space-5)' }}>
                 {items.map((item) => {
                   const Icon = resolveContentIcon(item.icon) || Landmark;
                   return (

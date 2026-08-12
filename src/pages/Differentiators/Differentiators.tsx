@@ -101,7 +101,7 @@ export default function Differentiators() {
               <h2 className="section-title">{cat.label}</h2>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 'var(--space-5)' }}>
+            <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 'var(--space-5)' }}>
               {cat.items.map((item) => (
                 <div
                   key={item.slug}
