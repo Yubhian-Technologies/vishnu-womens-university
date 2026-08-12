@@ -342,6 +342,7 @@ export default function Header() {
   const [expandedSubItem, setExpandedSubItem] = useState<string | null>(null);
   const location = useLocation();
   const navRef = useRef<HTMLElement>(null);
+  const megaRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   // Admin-editable via /admin → Navigation Link Redirects (NavLinkOverridesAdmin.tsx).
   // Decoupled from Placements' own "Success Stories" item, which stays hardcoded.
@@ -457,7 +458,11 @@ export default function Header() {
 
       {/* Mega-menu dropdown */}
       {item.groups && (
-        <div className="dropdown dropdown-mega" role="menu">
+        <div
+          className="dropdown dropdown-mega"
+          role="menu"
+          ref={(el) => { megaRefs.current[item.label] = el; }}
+        >
           {item.groups.map((group) => (
             <div key={group.groupLabel} className="mega-group">
               {group.groupPath ? (
@@ -525,6 +530,39 @@ export default function Header() {
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, [openItem]);
+
+  // Mega-menus wide enough (many columns of real content) can run past one
+  // of the header's dark end-pods and get visually overlapped by it — the
+  // default left-anchored ones grow rightward from their trigger and can
+  // reach the Visit/Give/Apply pod; the last two nav items' dropdowns are
+  // right-anchored instead (see the nth-last-child rule in Header.css) and
+  // grow leftward, so they can reach the logo pod instead. Most menus have
+  // plenty of room and should keep their comfortable CSS min-width; only
+  // when that natural size would actually overlap the relevant pod do we
+  // override both min- and max-width (min-width normally beats max-width,
+  // so max-width alone can't shrink a menu below the CSS floor) to the
+  // room actually available, so the menu wraps its columns taller instead
+  // of overlapping.
+  useEffect(() => {
+    const el = openItem ? megaRefs.current[openItem] : null;
+    if (!el) return;
+    el.style.minWidth = '';
+    el.style.maxWidth = '';
+    const idx = renderedNavItems.findIndex((i) => i.label === openItem);
+    const isRightAnchored = idx !== -1 && idx >= renderedNavItems.length - 2;
+    const podEl = document.querySelector<HTMLElement>(isRightAnchored ? '.header-end--logo' : '.header-end--cta');
+    if (!podEl) return;
+    const margin = 24;
+    const podRect = podEl.getBoundingClientRect();
+    const rect = el.getBoundingClientRect();
+    const available = isRightAnchored
+      ? rect.right - podRect.right - margin
+      : podRect.left - rect.left - margin;
+    if (available > 0 && available < rect.width) {
+      el.style.minWidth = '0';
+      el.style.maxWidth = `${available}px`;
+    }
+  }, [openItem, renderedNavItems]);
 
   useEffect(() => {
     setMobileOpen(false);
