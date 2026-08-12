@@ -22,14 +22,18 @@ const NAV_ICONS: Record<string, typeof Home> = {
   'News & Events': Calendar,
 };
 
-// Straight diagonal divider for the header's two dark end-sections (logo
+// Straight diagonal dividers for the header's two dark end-sections (logo
 // section on the left, Visit/Give/Apply section on the right — see
-// .header-end/.header-end-wave in Header.css). A plain slanted cut tracing
-// the boundary where each dark section meets the white nav area in the
-// middle; drawn as a dark shape on top of the header's own white base, so
-// the straight top/bottom/outer edges need no explicit drawing.
+// .header-end/.header-end-wave in Header.css). Each is a plain slanted cut
+// tracing the boundary where the dark section meets the white nav area in
+// the middle; drawn as a dark shape on top of the header's own white base,
+// so the straight top/bottom/outer edges need no explicit drawing.
+// The logo end uses its own (wider, opposite-direction) slant so the
+// diagonal clears the logo instead of cutting across it; the CTA end keeps
+// the original slant, mirrored via the --mirror CSS transform.
 const END_WAVE_VIEWBOX = '0 0 220 64';
-const END_WAVE_PATH = 'M0,0 H140 L180,64 H0 Z';
+const LOGO_WAVE_PATH = 'M0,0 H195 L155,64 H0 Z';
+const CTA_WAVE_PATH = 'M0,0 H140 L180,64 H0 Z';
 
 interface NavChild {
   label: string;
@@ -536,7 +540,7 @@ export default function Header() {
               header's left edge. */}
           <div className="header-end header-end--logo">
             <svg className="header-end-wave" viewBox={END_WAVE_VIEWBOX} preserveAspectRatio="none" aria-hidden="true">
-              <path d={END_WAVE_PATH} fill="var(--color-primary-dark)" stroke="var(--color-accent)" strokeWidth="2" />
+              <path d={LOGO_WAVE_PATH} fill="var(--color-primary-dark)" stroke="var(--color-accent)" strokeWidth="2" />
             </svg>
             <Link to="/" className="logo" aria-label="Vishnu Womens University Home">
               <img src="/images/logo.png" alt="VWU Logo" className="logo-icon" />
@@ -555,7 +559,7 @@ export default function Header() {
               plain icon+text; Apply Now is styled as an actual button. */}
           <div className="header-end header-end--cta">
             <svg className="header-end-wave header-end-wave--mirror" viewBox={END_WAVE_VIEWBOX} preserveAspectRatio="none" aria-hidden="true">
-              <path d={END_WAVE_PATH} fill="var(--color-primary-dark)" stroke="var(--color-accent)" strokeWidth="2" />
+              <path d={CTA_WAVE_PATH} fill="var(--color-primary-dark)" stroke="var(--color-accent)" strokeWidth="2" />
             </svg>
             <div className="header-ctas">
               <Link to="/admissions" className="topbar-cta visit">
