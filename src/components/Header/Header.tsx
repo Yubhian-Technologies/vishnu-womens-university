@@ -1,11 +1,35 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { Home, GraduationCap, FileText, Briefcase, FlaskConical, Sparkles, Users, Calendar, MapPin, Heart, ArrowRight } from 'lucide-react';
 import AnnouncementsTicker from '../AnnouncementsTicker/AnnouncementsTicker';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useNavLinkOverride } from '../../hooks/useNavLinkOverride';
 import type { DownloadDoc } from '../../pages/Admin/sections/DownloadsAdmin';
 import SmoothCollapse from '../SmoothCollapse/SmoothCollapse';
 import './Header.css';
+
+// One icon per top-level nav label, matching the icon+label nav design.
+// Falls through to no icon for any label not listed here, so a future
+// nav restructure doesn't need to touch this to keep working.
+const NAV_ICONS: Record<string, typeof Home> = {
+  'About Us': Home,
+  'Academics': GraduationCap,
+  'Admissions': FileText,
+  'Placements': Briefcase,
+  'Research': FlaskConical,
+  'Differentiators': Sparkles,
+  'Campus Life': Users,
+  'News & Events': Calendar,
+};
+
+// Wavy divider shape for the header's two dark end-sections (logo section
+// on the left, Visit/Give/Apply section on the right — see
+// .header-end/.header-end-wave in Header.css). A single clean S-curve
+// tracing the boundary where each dark section meets the white nav area in
+// the middle; drawn as a dark shape on top of the header's own white base,
+// so the straight top/bottom/outer edges need no explicit drawing.
+const END_WAVE_VIEWBOX = '0 0 220 64';
+const END_WAVE_PATH = 'M0,0 H150 C195,0 195,28 160,32 C195,36 195,64 150,64 H0 Z';
 
 interface NavChild {
   label: string;
@@ -341,10 +365,12 @@ export default function Header() {
     return item;
   });
 
-  const renderNavItem = (item: NavItem) => (
+  const renderNavItem = (item: NavItem) => {
+    const Icon = NAV_ICONS[item.label];
+    return (
     <li
       key={item.label}
-      className={`nav-item${openItem === item.label ? ' nav-item--open' : ''}${item.label === 'Research' || item.label === 'Campus Life' || item.label === 'News & Events' ? ' nav-item--mega-right' : ''}${item.label === 'Placements' ? ' nav-item--placements' : ''}`}
+      className={`nav-item${openItem === item.label ? ' nav-item--open' : ''}${item.label === 'Placements' ? ' nav-item--placements' : ''}`}
       onMouseEnter={() => setOpenItem(item.label)}
       onFocus={() => setOpenItem(item.label)}
       onMouseLeave={() => setOpenItem((prev) => (prev === item.label ? null : prev))}
@@ -355,10 +381,8 @@ export default function Header() {
         aria-expanded={openItem === item.label}
         onClick={() => setOpenItem((prev) => (prev === item.label ? null : item.label))}
       >
-        {item.label}
-        <svg className="nav-arrow" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-          <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
+        {Icon && <Icon className="nav-link-icon" size={16} strokeWidth={1.75} aria-hidden="true" />}
+        <span className="nav-link-label">{item.label}</span>
       </button>
 
       {/* Flat dropdown */}
@@ -445,7 +469,8 @@ export default function Header() {
         </div>
       )}
     </li>
-  );
+    );
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -494,31 +519,55 @@ export default function Header() {
 
   return (
     <>
-      {/* Main Header */}
+      {/* Main Header — full-width edge-to-edge, no floating/inset look. A
+          thin dark ticker strip sits above; the bar below is one
+          continuous white strip with two dark end-sections (logo on the
+          left, Visit/Give/Apply on the right), each with a wavy inner
+          edge cut into the white — not a detached rounded pill. */}
       <header className={`header${scrolled ? ' scrolled' : ''}`}>
-        <div className="header-inner">
-          {/* Logo */}
-          <Link to="/" className="logo" aria-label="Vishnu Womens University Home">
-            <img src="/images/logo.png" alt="VWU Logo" className="logo-icon" />
-          </Link>
+        <div className="header-ticker-strip">
+          <div className="container">
+            <AnnouncementsTicker fallback={null} />
+          </div>
+        </div>
 
-          <div className="header-right">
-            {/* Topline: announcements ticker + Visit/Give/Apply */}
-            <div className="header-topline">
-              <AnnouncementsTicker fallback={null} />
-              <div className="header-ctas">
-                <Link to="/admissions" className="topbar-cta visit">Visit</Link>
-                <Link to="/alumni-giving" className="topbar-cta give">Give</Link>
-                <Link to="/admissions" className="topbar-cta apply">Apply Now</Link>
-              </div>
+        <div className="header-bar">
+          {/* Logo section — dark, wave-edged on the right, flush at the
+              header's left edge. */}
+          <div className="header-end header-end--logo">
+            <svg className="header-end-wave" viewBox={END_WAVE_VIEWBOX} preserveAspectRatio="none" aria-hidden="true">
+              <path d={END_WAVE_PATH} fill="var(--color-primary-dark)" stroke="var(--color-accent)" strokeWidth="2" />
+            </svg>
+            <Link to="/" className="logo" aria-label="Vishnu Womens University Home">
+              <img src="/images/logo.png" alt="VWU Logo" className="logo-icon" />
+            </Link>
+          </div>
+
+          {/* Desktop Nav — centered in the white middle section. */}
+          <nav className="nav" aria-label="Main navigation" ref={navRef}>
+            <ul className="nav-list">
+              {renderedNavItems.map(renderNavItem)}
+            </ul>
+          </nav>
+
+          {/* Visit/Give/Apply section — dark, wave-edged on the left
+              (mirrored), flush at the header's right edge. Visit/Give are
+              plain icon+text; Apply Now is styled as an actual button. */}
+          <div className="header-end header-end--cta">
+            <svg className="header-end-wave header-end-wave--mirror" viewBox={END_WAVE_VIEWBOX} preserveAspectRatio="none" aria-hidden="true">
+              <path d={END_WAVE_PATH} fill="var(--color-primary-dark)" stroke="var(--color-accent)" strokeWidth="2" />
+            </svg>
+            <div className="header-ctas">
+              <Link to="/admissions" className="topbar-cta visit">
+                <MapPin size={14} strokeWidth={2} aria-hidden="true" /> Visit
+              </Link>
+              <Link to="/alumni-giving" className="topbar-cta give">
+                <Heart size={14} strokeWidth={2} aria-hidden="true" /> Give
+              </Link>
+              <Link to="/admissions" className="topbar-cta apply">
+                Apply Now <ArrowRight size={14} strokeWidth={2.5} aria-hidden="true" />
+              </Link>
             </div>
-
-            {/* Desktop Nav */}
-            <nav className="nav" aria-label="Main navigation" ref={navRef}>
-              <ul className="nav-list">
-                {renderedNavItems.map(renderNavItem)}
-              </ul>
-            </nav>
           </div>
 
           {/* Mobile Toggle */}
