@@ -149,6 +149,7 @@ const navItems: NavItem[] = [
           { label: 'Faculty', path: '/faculty' },
           { label: 'Academic Documents', path: '/academics/downloads' },
           { label: 'Result Analysis', path: '/result-analysis' },
+          { label: 'Examinations', path: 'https://www.svecwexams.in/', external: true },
         ],
       },
       { groupLabel: 'UG Programmes', groupPath: '/academics?tab=btech', items: [] },
