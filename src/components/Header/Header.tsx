@@ -385,7 +385,7 @@ export default function Header() {
         aria-expanded={openItem === item.label}
         onClick={() => setOpenItem((prev) => (prev === item.label ? null : item.label))}
       >
-        {Icon && <Icon className="nav-link-icon" size={16} strokeWidth={1.75} aria-hidden="true" />}
+        {Icon && <Icon className="nav-link-icon" size={19} strokeWidth={1.75} aria-hidden="true" />}
         <span className="nav-link-label">{item.label}</span>
       </button>
 
@@ -563,13 +563,13 @@ export default function Header() {
             </svg>
             <div className="header-ctas">
               <Link to="/admissions" className="topbar-cta visit">
-                <MapPin size={14} strokeWidth={2} aria-hidden="true" /> Visit
+                <MapPin size={16} strokeWidth={2} aria-hidden="true" /> Visit
               </Link>
               <Link to="/alumni-giving" className="topbar-cta give">
-                <Heart size={14} strokeWidth={2} aria-hidden="true" /> Give
+                <Heart size={16} strokeWidth={2} aria-hidden="true" /> Give
               </Link>
               <Link to="/admissions" className="topbar-cta apply">
-                Apply Now <ArrowRight size={14} strokeWidth={2.5} aria-hidden="true" />
+                Apply Now <ArrowRight size={16} strokeWidth={2.5} aria-hidden="true" />
               </Link>
             </div>
           </div>
