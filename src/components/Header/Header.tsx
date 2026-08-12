@@ -467,7 +467,7 @@ export default function Header() {
               ) : (
                 <span className="mega-group-label">{group.groupLabel}</span>
               )}
-              <ul className={`mega-group-list${group.items.length > 9 ? ' cols-2' : ''}`}>
+              <ul className={`mega-group-list${group.items.length >= 9 ? ' cols-2' : ''}`}>
                 {group.items.map((child) => (
                   <li key={child.label}>
                     {child.disabled ? (
