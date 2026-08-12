@@ -22,14 +22,14 @@ const NAV_ICONS: Record<string, typeof Home> = {
   'News & Events': Calendar,
 };
 
-// Wavy divider shape for the header's two dark end-sections (logo section
-// on the left, Visit/Give/Apply section on the right — see
-// .header-end/.header-end-wave in Header.css). A single clean S-curve
-// tracing the boundary where each dark section meets the white nav area in
-// the middle; drawn as a dark shape on top of the header's own white base,
-// so the straight top/bottom/outer edges need no explicit drawing.
+// Straight diagonal divider for the header's two dark end-sections (logo
+// section on the left, Visit/Give/Apply section on the right — see
+// .header-end/.header-end-wave in Header.css). A plain slanted cut tracing
+// the boundary where each dark section meets the white nav area in the
+// middle; drawn as a dark shape on top of the header's own white base, so
+// the straight top/bottom/outer edges need no explicit drawing.
 const END_WAVE_VIEWBOX = '0 0 220 64';
-const END_WAVE_PATH = 'M0,0 H150 C195,0 195,28 160,32 C195,36 195,64 150,64 H0 Z';
+const END_WAVE_PATH = 'M0,0 H140 L180,64 H0 Z';
 
 interface NavChild {
   label: string;
