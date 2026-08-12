@@ -529,12 +529,6 @@ export default function Header() {
           left, Visit/Give/Apply on the right), each with a wavy inner
           edge cut into the white — not a detached rounded pill. */}
       <header className={`header${scrolled ? ' scrolled' : ''}`}>
-        <div className="header-ticker-strip">
-          <div className="container">
-            <AnnouncementsTicker fallback={null} />
-          </div>
-        </div>
-
         <div className="header-bar">
           {/* Logo section — dark, wave-edged on the right, flush at the
               header's left edge. */}
@@ -585,6 +579,12 @@ export default function Header() {
             <span />
             <span />
           </button>
+        </div>
+
+        <div className="header-ticker-strip">
+          <div className="container">
+            <AnnouncementsTicker fallback={null} />
+          </div>
         </div>
       </header>
 
