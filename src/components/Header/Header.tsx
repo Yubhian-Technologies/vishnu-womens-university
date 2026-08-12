@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Home, GraduationCap, FileText, Briefcase, FlaskConical, Sparkles, Users, Calendar, MapPin, Heart, ArrowRight } from 'lucide-react';
+import { useOrderedCollection } from '../../hooks/useCollection';
 import { useNavLinkOverride } from '../../hooks/useNavLinkOverride';
+import type { ProgramDoc } from '../../pages/Admin/sections/ProgramsAdmin';
 import SmoothCollapse from '../SmoothCollapse/SmoothCollapse';
 import './Header.css';
 
@@ -44,6 +46,7 @@ interface NavChild {
 interface NavGroup {
   groupLabel: string;
   groupPath?: string;
+  external?: boolean;
   items: NavChild[];
 }
 
@@ -133,13 +136,37 @@ const navItems: NavItem[] = [
     ],
   },
   {
+    // UG/PG/Ph.D. Programmes groups are spliced in at render time from live
+    // Firestore `programs` data — see renderedNavItems in Header() — so
+    // this menu always matches whatever's actually configured in the
+    // Programs admin section rather than a hardcoded, driftable list.
     label: 'Academics',
-    children: [
-      { label: 'Programs & Departments', path: '/academics' },
-      { label: 'Faculty', path: '/faculty' },
-      { label: 'Academic Documents', path: '/academics/downloads' },
-      { label: 'Result Analysis', path: '/result-analysis' },
-      { label: 'Academic Calendar', path: '/information#academic-calendar' },
+    groups: [
+      {
+        groupLabel: 'Overview',
+        groupPath: '/academics',
+        items: [
+          { label: 'Programs & Departments', path: '/academics' },
+          { label: 'Faculty', path: '/faculty' },
+          { label: 'Academic Documents', path: '/academics/downloads' },
+          { label: 'Result Analysis', path: '/result-analysis' },
+        ],
+      },
+      { groupLabel: 'UG Programmes', groupPath: '/academics?tab=btech', items: [] },
+      { groupLabel: 'PG Programmes', groupPath: '/academics?tab=mtech', items: [] },
+      { groupLabel: 'Ph.D. Programmes', groupPath: '/academics?tab=mba', items: [] },
+      { groupLabel: 'Examinations', groupPath: 'https://www.svecwexams.in/', external: true, items: [] },
+      {
+        groupLabel: 'Information',
+        groupPath: '/information',
+        items: [
+          { label: 'Academic Calendar', path: '/information#academic-calendar' },
+          { label: 'List of Holidays', path: '/information#holidays' },
+          { label: 'Counselling Scheme', path: '/information#counselling' },
+          { label: 'ICT Platforms', path: '/information#ict-platforms' },
+          { label: 'Other Practices', path: '/information#other-practices' },
+        ],
+      },
     ],
   },
   {
@@ -322,7 +349,25 @@ export default function Header() {
   // Default target is AlumniGiving.tsx's own "#successstories" section, not Placements.
   const alumniSuccessStories = useNavLinkOverride('alumni-success-stories', '/alumni-giving#successstories');
 
+  const { docs: programs } = useOrderedCollection<ProgramDoc>('programs', 'order');
+  const programItem = (p: ProgramDoc): NavChild => ({ label: p.name, path: `/academics/${p.slug}` });
+  const ugProgrammes = programs.filter((p) => p.category === 'btech').map(programItem);
+  const pgProgrammes = programs.filter((p) => p.category === 'mtech' || p.category === 'mba').map(programItem);
+  const phdProgrammes = programs.filter((p) => p.category === 'phd').map(programItem);
+
   const renderedNavItems: NavItem[] = navItems.map((item) => {
+    // Academics' UG/PG/Ph.D. Programmes groups are populated here from live
+    // Firestore data since navItems itself is a module-level constant and
+    // can't hold live data directly — see the "Overview" comment above.
+    if (item.label === 'Academics' && item.groups) {
+      const groups = item.groups.map((group) => {
+        if (group.groupLabel === 'UG Programmes') return { ...group, items: ugProgrammes };
+        if (group.groupLabel === 'PG Programmes') return { ...group, items: pgProgrammes };
+        if (group.groupLabel === 'Ph.D. Programmes') return { ...group, items: phdProgrammes };
+        return group;
+      });
+      return { ...item, groups };
+    }
     // "Success Stories" here is admin-redirectable independently of
     // Placements' own "Success Stories" item — see alumniSuccessStories above.
     if (item.label === 'News & Events' && item.groups) {
@@ -417,9 +462,15 @@ export default function Header() {
           {item.groups.map((group) => (
             <div key={group.groupLabel} className="mega-group">
               {group.groupPath ? (
-                <Link to={group.groupPath} className="mega-group-label">
-                  {group.groupLabel}
-                </Link>
+                group.external ? (
+                  <a href={group.groupPath} className="mega-group-label" target="_blank" rel="noopener noreferrer">
+                    {group.groupLabel}
+                  </a>
+                ) : (
+                  <Link to={group.groupPath} className="mega-group-label">
+                    {group.groupLabel}
+                  </Link>
+                )
               ) : (
                 <span className="mega-group-label">{group.groupLabel}</span>
               )}
@@ -639,6 +690,25 @@ export default function Header() {
                       {item.groups.map((group) => {
                         const groupKey = `${item.label}:${group.groupLabel}`;
                         const groupOpen = expandedGroup === groupKey;
+                        // A group with no items of its own (e.g. Examinations,
+                        // an external-only link) has nothing to expand into —
+                        // render it as a plain link instead of a dead-end
+                        // accordion button.
+                        if (group.items.length === 0 && group.groupPath) {
+                          return (
+                            <li key={group.groupLabel} className="mobile-group">
+                              {group.external ? (
+                                <a href={group.groupPath} className="mobile-group-btn" target="_blank" rel="noopener noreferrer">
+                                  {group.groupLabel}
+                                </a>
+                              ) : (
+                                <Link to={group.groupPath} className="mobile-group-btn">
+                                  {group.groupLabel}
+                                </Link>
+                              )}
+                            </li>
+                          );
+                        }
                         return (
                           <li key={group.groupLabel} className="mobile-group">
                             <button
