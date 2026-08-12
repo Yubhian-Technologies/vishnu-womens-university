@@ -1,4 +1,14 @@
 import { lazy } from 'react';
+import { PHOTO_NEEDED_PLACEHOLDER } from './photoPlaceholder';
+
+// A calmer, brand-toned placeholder (soft diagonal ink-to-green gradient,
+// no icon/caption) for image slots where an obvious "Photo Needed" card
+// would undercut an otherwise-finished editorial layout — e.g. Campus Life,
+// which is meant to read as art-directed even before real photography is
+// uploaded. Self-hosted inline SVG, same reasoning as PHOTO_NEEDED_PLACEHOLDER
+// (never 404s), just visually quieter.
+const NEUTRAL_IMAGE_PLACEHOLDER =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='600'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23081c15'/%3E%3Cstop offset='100%25' stop-color='%232d6a4f'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='800' height='600' fill='url(%23g)'/%3E%3C/svg%3E";
 
 // A landing page's admin-editable image slots. `home` (the original
 // homepage) has none here — its photos are already managed entirely by the
@@ -10,6 +20,17 @@ export interface LandingPageImageSlot {
   aspect?: number;
 }
 
+// Admin-editable video slots (Firebase Storage-backed, uploaded via
+// VideoUploader in LandingPagesAdmin). `posterSlotKey`, when set, points at
+// an imageSlots key whose image is used as the <video poster> / fallback
+// while no video has been uploaded yet (or on browsers/connections where
+// video playback is skipped).
+export interface LandingPageVideoSlot {
+  key: string;
+  label: string;
+  posterSlotKey?: string;
+}
+
 export interface LandingPageRegistryEntry {
   id: string;
   fallbackName: string;
@@ -17,6 +38,7 @@ export interface LandingPageRegistryEntry {
   fallbackPreviewImage: string;
   component: React.LazyExoticComponent<() => React.ReactElement>;
   imageSlots?: LandingPageImageSlot[];
+  videoSlots?: LandingPageVideoSlot[];
 }
 
 // The single place a landing page's existence is declared in code. Adding a
@@ -54,6 +76,41 @@ export const LANDING_PAGE_REGISTRY: LandingPageRegistryEntry[] = [
       { key: 'gallery-5', label: 'Spotlight Gallery — Photo 5', defaultUrl: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&q=80', aspect: 4 / 3 },
       { key: 'gallery-6', label: 'Spotlight Gallery — Photo 6', defaultUrl: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=800&q=80', aspect: 4 / 3 },
       { key: 'campus-experience', label: 'Campus Experience — Aerial Photo', defaultUrl: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=1600&q=80', aspect: 21 / 9 },
+    ],
+  },
+  {
+    id: 'editorial',
+    fallbackName: 'Landing Page 3 — Editorial',
+    fallbackDescription: "Vishnu Women's University — Editorial University Experience",
+    fallbackPreviewImage: PHOTO_NEEDED_PLACEHOLDER,
+    component: lazy(() => import('../pages/LandingEditorial/LandingEditorial')),
+    // Self-hosted "Photo Needed" placeholders (no external hotlinks) —
+    // every image on this page is admin-uploaded from a clean slate rather
+    // than shipping with unrelated stock photography standing in for VWU's
+    // actual campus.
+    imageSlots: [
+      { key: 'hero', label: 'Hero — Full-bleed Photo/Video Poster', defaultUrl: PHOTO_NEEDED_PLACEHOLDER, aspect: 16 / 9 },
+      { key: 'about', label: 'About — University Story Photo', defaultUrl: PHOTO_NEEDED_PLACEHOLDER, aspect: 4 / 5 },
+      { key: 'campus-aerial', label: 'Campus Aerial — Full-bleed Photo/Video Poster', defaultUrl: PHOTO_NEEDED_PLACEHOLDER, aspect: 16 / 9 },
+      { key: 'research-feature', label: 'Research — Feature Photo', defaultUrl: PHOTO_NEEDED_PLACEHOLDER, aspect: 4 / 5 },
+      { key: 'research-spotlight', label: 'Research — Spotlight Video Poster', defaultUrl: PHOTO_NEEDED_PLACEHOLDER, aspect: 4 / 3 },
+      { key: 'campus-life-hero', label: 'Campus Life — Large Feature Photo', defaultUrl: NEUTRAL_IMAGE_PLACEHOLDER, aspect: 16 / 9 },
+      { key: 'campus-life-story1', label: 'Campus Life — Student Clubs Photo', defaultUrl: NEUTRAL_IMAGE_PLACEHOLDER, aspect: 4 / 5 },
+      { key: 'campus-life-story2', label: 'Campus Life — Hostel Life Photo', defaultUrl: NEUTRAL_IMAGE_PLACEHOLDER, aspect: 16 / 10 },
+      { key: 'campus-life-story3', label: 'Campus Life — Sports & Fitness Photo', defaultUrl: NEUTRAL_IMAGE_PLACEHOLDER, aspect: 3 / 4 },
+      { key: 'stories-student', label: 'University Stories — Student Success', defaultUrl: PHOTO_NEEDED_PLACEHOLDER, aspect: 4 / 3 },
+      { key: 'stories-faculty', label: 'University Stories — Faculty Achievement', defaultUrl: PHOTO_NEEDED_PLACEHOLDER, aspect: 4 / 3 },
+      { key: 'stories-research', label: 'University Stories — Research Breakthrough', defaultUrl: PHOTO_NEEDED_PLACEHOLDER, aspect: 4 / 3 },
+      { key: 'stories-entrepreneurship', label: 'University Stories — Entrepreneurship', defaultUrl: PHOTO_NEEDED_PLACEHOLDER, aspect: 4 / 3 },
+      { key: 'stories-community', label: 'University Stories — Community Impact', defaultUrl: PHOTO_NEEDED_PLACEHOLDER, aspect: 4 / 3 },
+      { key: 'community', label: 'Community & Social Impact Photo', defaultUrl: PHOTO_NEEDED_PLACEHOLDER, aspect: 4 / 5 },
+      { key: 'final-cinematic', label: 'Closing Cinematic — Full-bleed Photo/Video Poster', defaultUrl: PHOTO_NEEDED_PLACEHOLDER, aspect: 16 / 9 },
+    ],
+    videoSlots: [
+      { key: 'hero', label: 'Hero — Background Video', posterSlotKey: 'hero' },
+      { key: 'campus-aerial', label: 'Campus Aerial — Full-bleed Video (after News)', posterSlotKey: 'campus-aerial' },
+      { key: 'research-spotlight', label: 'Research — Spotlight Video', posterSlotKey: 'research-spotlight' },
+      { key: 'final-cinematic', label: 'Closing Cinematic Video (before footer)', posterSlotKey: 'final-cinematic' },
     ],
   },
 ];
