@@ -162,6 +162,7 @@
   align-items: center;
   height: 100%;
   gap: 2px;
+  transform: translateX(14px);
 }
 
 .nav-item {
@@ -179,7 +180,7 @@
   align-items: center;
   justify-content: center;
   gap: 3px;
-  padding: 7px 4px;
+  padding: 7px 3px;
   border-radius: var(--radius-lg);
   font-size: 0.64rem;
   font-weight: 700;
