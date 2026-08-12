@@ -48,8 +48,9 @@
 }
 
 .header-end--logo {
-  width: 220px;
-  padding-left: var(--space-3);
+  width: 300px;
+  justify-content: center;
+  padding: 0 var(--space-2);
 }
 
 /* Fixed width, sized to comfortably fit Visit + Give + Apply Now — not
@@ -178,7 +179,7 @@
   align-items: center;
   justify-content: center;
   gap: 2px;
-  padding: 6px 10px;
+  padding: 6px 5px;
   border-radius: var(--radius-lg);
   font-size: 0.6rem;
   font-weight: 700;
