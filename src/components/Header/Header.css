@@ -41,7 +41,7 @@
    so this doesn't require touching --header-height or any of its many
    scroll-offset consumers sitewide. */
 .header-topline {
-  flex: 0 0 42px;
+  flex: 0 0 30px;
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -97,12 +97,12 @@
 .logo {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--space-2);
   text-decoration: none;
   flex-shrink: 0;
-  padding: var(--space-4) var(--space-3) var(--space-4) 0;
+  padding: var(--space-2) var(--space-3) var(--space-2) 0;
   border-right: 1px solid rgba(255,255,255,0.12);
-  margin-right: var(--space-6);
+  margin-right: var(--space-4);
 }
 
 .logo-icon {
@@ -111,11 +111,8 @@
      it keeps its native aspect ratio instead of being squeezed into a
      square box, and drop the white card background/padding that was meant
      to set off a small icon against the dark header (this logo already
-     carries its own background). Sized up from 78px along with
-     --header-height below, both to read better on its own and to help
-     close the large empty gap that used to sit between the logo and the
-     (right-aligned) nav items. */
-  height: 96px;
+     carries its own background). */
+  height: 56px;
   width: auto;
   border-radius: var(--radius-sm);
   object-fit: contain;
@@ -198,9 +195,9 @@
   display: flex;
   align-items: center;
   gap: 3px;
-  padding: 0 0.5rem;
+  padding: 0 0.45rem;
   height: 100%;
-  font-size: 0.85rem;
+  font-size: 0.68rem;
   font-weight: 700;
   color: rgba(255,255,255,0.9);
   font-family: var(--font-sans);
