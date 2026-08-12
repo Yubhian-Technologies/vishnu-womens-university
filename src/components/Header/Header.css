@@ -456,6 +456,10 @@ a.mega-group-label:hover {
   padding: 4px;
   border-radius: var(--radius-sm);
   transition: background var(--transition-fast);
+  /* With .nav hidden below 1400px, nothing else in .header-bar grows to
+     fill the freed space, so without this the toggle sits wherever it
+     falls in flex order instead of at the header's right edge. */
+  margin-left: auto;
 }
 
 .mobile-toggle:hover {
@@ -665,6 +669,12 @@ a.mega-group-label:hover {
   .header-end--cta {
     width: auto;
     padding-right: var(--space-3);
+    /* The dark backdrop is normally just the SVG wave's fill — with the
+       wave hidden below, Visit/Give's white text/icons would otherwise
+       render invisible against the plain white header-bar. */
+    background: var(--color-primary-dark);
+    border-top-left-radius: var(--radius-lg);
+    border-bottom-left-radius: var(--radius-lg);
   }
   .header-end-wave {
     display: none;
@@ -672,15 +682,8 @@ a.mega-group-label:hover {
 }
 
 @media (max-width: 640px) {
-  .header-ctas {
-    gap: var(--space-1);
-  }
-  .topbar-cta.visit,
-  .topbar-cta.give {
+  .header-end--cta {
     display: none;
-  }
-  .topbar-cta.apply {
-    padding: 8px 12px;
   }
   .logo-icon {
     height: 40px;
