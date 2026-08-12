@@ -49,8 +49,8 @@
 
 .header-end--logo {
   width: 300px;
-  justify-content: center;
-  padding: 0 var(--space-2);
+  justify-content: flex-start;
+  padding-left: var(--space-3);
 }
 
 /* Fixed width, sized to comfortably fit Visit + Give + Apply Now — not
