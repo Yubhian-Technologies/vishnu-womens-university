@@ -1,9 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Home, GraduationCap, FileText, Briefcase, FlaskConical, Sparkles, Users, Calendar, MapPin, Heart, ArrowRight } from 'lucide-react';
-import { useOrderedCollection } from '../../hooks/useCollection';
 import { useNavLinkOverride } from '../../hooks/useNavLinkOverride';
-import type { DownloadDoc } from '../../pages/Admin/sections/DownloadsAdmin';
 import SmoothCollapse from '../SmoothCollapse/SmoothCollapse';
 import './Header.css';
 
@@ -135,12 +133,11 @@ const navItems: NavItem[] = [
     ],
   },
   {
-    // Course Curriculum / Academic Documents items are spliced in at render
-    // time from live Firestore data — see renderedNavItems in Header().
     label: 'Academics',
     children: [
       { label: 'Programs & Departments', path: '/academics' },
       { label: 'Faculty', path: '/faculty' },
+      { label: 'Academic Documents', path: '/academics/downloads' },
       { label: 'Result Analysis', path: '/result-analysis' },
       { label: 'Academic Calendar', path: '/information#academic-calendar' },
     ],
@@ -320,34 +317,12 @@ export default function Header() {
   const location = useLocation();
   const navRef = useRef<HTMLElement>(null);
 
-  const { docs: downloadDocs, loading: downloadsLoading } = useOrderedCollection<DownloadDoc>('downloads', 'order');
   // Admin-editable via /admin → Navigation Link Redirects (NavLinkOverridesAdmin.tsx).
   // Decoupled from Placements' own "Success Stories" item, which stays hardcoded.
   // Default target is AlumniGiving.tsx's own "#successstories" section, not Placements.
   const alumniSuccessStories = useNavLinkOverride('alumni-success-stories', '/alumni-giving#successstories');
 
-  const academicDocsChild: NavChild = {
-    label: 'Academic Documents',
-    path: '/academics/downloads',
-    subItems: downloadsLoading
-      ? [{ label: 'Loading…', path: '', disabled: true }]
-      : downloadDocs.length > 0
-        ? downloadDocs.map((d) => ({ label: d.title, path: d.fileUrl, external: true }))
-        : [{ label: 'No documents yet', path: '', disabled: true }],
-  };
-
-  // Academics' children are the static list + this live-Firestore-derived
-  // flyout item, spliced in after "Faculty" since navItems itself is a
-  // module-level constant and can't hold live data directly.
   const renderedNavItems: NavItem[] = navItems.map((item) => {
-    if (item.label === 'Academics' && item.children) {
-      const children: NavChild[] = [];
-      for (const child of item.children) {
-        children.push(child);
-        if (child.label === 'Faculty') children.push(academicDocsChild);
-      }
-      return { ...item, children };
-    }
     // "Success Stories" here is admin-redirectable independently of
     // Placements' own "Success Stories" item — see alumniSuccessStories above.
     if (item.label === 'News & Events' && item.groups) {
