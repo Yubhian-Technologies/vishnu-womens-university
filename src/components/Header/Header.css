@@ -48,7 +48,7 @@
 }
 
 .header-end--logo {
-  width: 340px;
+  width: 300px;
   justify-content: flex-start;
   padding-left: var(--space-3);
 }
@@ -57,7 +57,7 @@
    content-sized, so it stays proportional to .header-end-wave's viewBox
    (which would otherwise stretch/distort at an unpredictable width). */
 .header-end--cta {
-  width: 500px;
+  width: 460px;
   justify-content: flex-end;
   padding-right: var(--space-4);
 }
@@ -161,7 +161,7 @@
   display: flex;
   align-items: center;
   height: 100%;
-  gap: var(--space-1);
+  gap: 2px;
 }
 
 .nav-item {
@@ -179,9 +179,9 @@
   align-items: center;
   justify-content: center;
   gap: 3px;
-  padding: 8px 7px;
+  padding: 7px 4px;
   border-radius: var(--radius-lg);
-  font-size: 0.68rem;
+  font-size: 0.64rem;
   font-weight: 700;
   color: var(--color-text-light);
   font-family: var(--font-sans);
@@ -653,7 +653,7 @@ a.mega-group-label:hover {
 }
 
 /* ===== Responsive ===== */
-@media (max-width: 1600px) {
+@media (max-width: 1400px) {
   .nav {
     display: none;
   }
@@ -663,7 +663,7 @@ a.mega-group-label:hover {
 }
 
 /* Purely a visual simplification for narrower/tablet widths. */
-@media (max-width: 1600px) {
+@media (max-width: 1400px) {
   .header-ticker-strip .announcements-ticker {
     display: none;
   }

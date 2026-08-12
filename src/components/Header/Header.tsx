@@ -385,7 +385,7 @@ export default function Header() {
         aria-expanded={openItem === item.label}
         onClick={() => setOpenItem((prev) => (prev === item.label ? null : item.label))}
       >
-        {Icon && <Icon className="nav-link-icon" size={19} strokeWidth={1.75} aria-hidden="true" />}
+        {Icon && <Icon className="nav-link-icon" size={17} strokeWidth={1.75} aria-hidden="true" />}
         <span className="nav-link-label">{item.label}</span>
       </button>
 
