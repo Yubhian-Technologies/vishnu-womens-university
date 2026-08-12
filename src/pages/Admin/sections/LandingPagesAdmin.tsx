@@ -3,6 +3,7 @@ import { doc, setDoc, updateDoc, writeBatch, serverTimestamp } from 'firebase/fi
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
 import ImageUploader from '../../../components/ImageUploader/ImageUploader';
+import VideoUploader from '../../../components/VideoUploader/VideoUploader';
 import { uploadImage, type UploadResult } from '../../../lib/storage';
 import { LANDING_PAGE_REGISTRY, DEFAULT_LANDING_PAGE_ID } from '../../../lib/landingPageRegistry';
 import ConfirmDialog from '../ConfirmDialog';
@@ -11,6 +12,11 @@ export interface LandingPageImageValue {
   url: string;
   storagePath: string;
   alt: string;
+}
+
+export interface LandingPageVideoValue {
+  url: string;
+  storagePath: string;
 }
 
 export interface LandingPageDoc {
@@ -22,6 +28,7 @@ export interface LandingPageDoc {
   order: number;
   active: boolean;
   images?: Record<string, LandingPageImageValue>;
+  videos?: Record<string, LandingPageVideoValue>;
 }
 
 export default function LandingPagesAdmin() {
@@ -33,6 +40,7 @@ export default function LandingPagesAdmin() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({ name: '', description: '' });
   const [expandedImagesId, setExpandedImagesId] = useState<string | null>(null);
+  const [expandedVideosId, setExpandedVideosId] = useState<string | null>(null);
   const [uploadingPreviewId, setUploadingPreviewId] = useState<string | null>(null);
 
   // Auto-provision a Firestore doc for any registry entry that doesn't have
@@ -125,6 +133,24 @@ export default function LandingPagesAdmin() {
     }
   };
 
+  const handleVideoSlotUpload = async (id: string, slotKey: string, result: UploadResult) => {
+    try {
+      await updateDoc(doc(db, 'landingPages', id), {
+        [`videos.${slotKey}`]: { url: result.url, storagePath: result.path },
+      });
+    } catch (e) {
+      alert(`Couldn't save video: ${(e as Error).message}`);
+    }
+  };
+
+  const handleVideoSlotRemove = async (id: string, slotKey: string) => {
+    try {
+      await updateDoc(doc(db, 'landingPages', id), { [`videos.${slotKey}`]: { url: '', storagePath: '' } });
+    } catch (e) {
+      alert(`Couldn't remove video: ${(e as Error).message}`);
+    }
+  };
+
   const confirmingCard = cards.find((c) => c.doc.id === confirmId);
 
   return (
@@ -184,6 +210,11 @@ export default function LandingPagesAdmin() {
                       {expandedImagesId === c.doc.id ? 'Hide Images' : 'Manage Images'}
                     </button>
                   )}
+                  {c.entry.videoSlots && (
+                    <button className="admin-btn admin-btn--sm" onClick={() => setExpandedVideosId(expandedVideosId === c.doc.id ? null : c.doc.id)}>
+                      {expandedVideosId === c.doc.id ? 'Hide Videos' : 'Manage Videos'}
+                    </button>
+                  )}
                   <button
                     className="admin-btn admin-btn--sm admin-btn--primary"
                     disabled={c.doc.active || activating}
@@ -213,6 +244,38 @@ export default function LandingPagesAdmin() {
                           aspect={slot.aspect}
                           label="Replace Image"
                           onUploaded={(r) => handleSlotUpload(c.doc.id, slot.key, slot.label, r)}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {expandedVideosId === c.doc.id && c.entry.videoSlots && (
+              <div className="admin-image-grid" style={{ borderTop: '1px solid #e5e7eb', paddingTop: '1rem' }}>
+                {c.entry.videoSlots.map((slot) => {
+                  const current = c.doc.videos?.[slot.key];
+                  const poster = slot.posterSlotKey ? c.doc.images?.[slot.posterSlotKey]?.url : undefined;
+                  return (
+                    <div key={slot.key} className="admin-image-card">
+                      {current?.url ? (
+                        <video src={current.url} poster={poster} muted loop playsInline controls style={{ width: '100%', maxHeight: 220, objectFit: 'cover' }} />
+                      ) : (
+                        <img src={poster || c.doc.previewImage} alt={slot.label} />
+                      )}
+                      <div className="admin-image-card__info">
+                        <strong>{slot.label}</strong>
+                        {!current?.url && <span className="admin-badge admin-badge--gray admin-badge--sm">No video — showing photo</span>}
+                      </div>
+                      <div className="admin-image-card__actions">
+                        <VideoUploader
+                          folder={`landing-pages/${c.doc.id}/video`}
+                          currentUrl={current?.url}
+                          currentPath={current?.storagePath}
+                          label="Upload Video"
+                          onUploaded={(r) => handleVideoSlotUpload(c.doc.id, slot.key, r)}
+                          onRemoved={() => handleVideoSlotRemove(c.doc.id, slot.key)}
                         />
                       </div>
                     </div>
