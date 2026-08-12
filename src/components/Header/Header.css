@@ -1,12 +1,11 @@
 /* ===== Main Header =====
-   Full-width, edge-to-edge — not a detached/floating pill. A thin dark
-   ticker strip sits above (keeps the white-text AnnouncementsTicker
-   legible), then one continuous white bar below it: a dark logo section
-   flush at the left edge, a dark Visit/Give/Apply section flush at the
-   right edge, and white nav in between. The dark sections are drawn as
-   shaped SVG paths on top of the bar's own white background rather than
-   given their own background-color, so each can have a wavy inner edge
-   facing the nav instead of a plain straight one (see .header-end-wave). */
+   Full-width, edge-to-edge — not a detached/floating pill. One continuous
+   white bar: a dark logo section flush at the left edge, a dark
+   Visit/Give/Apply section flush at the right edge, and white nav in
+   between. The dark sections are drawn as shaped SVG paths on top of the
+   bar's own white background rather than given their own background-color,
+   so each can have a wavy inner edge facing the nav instead of a plain
+   straight one (see .header-end-wave). */
 .header {
   position: fixed;
   top: 0;
@@ -14,16 +13,6 @@
   right: 0;
   z-index: 1000;
   transition: all var(--transition-base);
-}
-
-.header-ticker-strip {
-  background: rgba(8, 28, 21, 0.55);
-  backdrop-filter: blur(4px);
-  padding: 5px 0;
-}
-
-.header-ticker-strip .container {
-  padding: 0 var(--space-6);
 }
 
 .header-bar {
@@ -660,13 +649,6 @@ a.mega-group-label:hover {
   }
   .mobile-toggle {
     display: flex;
-  }
-}
-
-/* Purely a visual simplification for narrower/tablet widths. */
-@media (max-width: 1400px) {
-  .header-ticker-strip .announcements-ticker {
-    display: none;
   }
 }
 

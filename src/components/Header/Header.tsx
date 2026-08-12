@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Home, GraduationCap, FileText, Briefcase, FlaskConical, Sparkles, Users, Calendar, MapPin, Heart, ArrowRight } from 'lucide-react';
-import AnnouncementsTicker from '../AnnouncementsTicker/AnnouncementsTicker';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useNavLinkOverride } from '../../hooks/useNavLinkOverride';
 import type { DownloadDoc } from '../../pages/Admin/sections/DownloadsAdmin';
@@ -523,8 +522,7 @@ export default function Header() {
 
   return (
     <>
-      {/* Main Header — full-width edge-to-edge, no floating/inset look. A
-          thin dark ticker strip sits above; the bar below is one
+      {/* Main Header — full-width edge-to-edge, no floating/inset look. One
           continuous white strip with two dark end-sections (logo on the
           left, Visit/Give/Apply on the right), each with a wavy inner
           edge cut into the white — not a detached rounded pill. */}
@@ -579,12 +577,6 @@ export default function Header() {
             <span />
             <span />
           </button>
-        </div>
-
-        <div className="header-ticker-strip">
-          <div className="container">
-            <AnnouncementsTicker fallback={null} />
-          </div>
         </div>
       </header>
 
