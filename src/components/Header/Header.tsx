@@ -46,7 +46,6 @@ interface NavChild {
 interface NavGroup {
   groupLabel: string;
   groupPath?: string;
-  external?: boolean;
   items: NavChild[];
 }
 
@@ -155,7 +154,6 @@ const navItems: NavItem[] = [
       { groupLabel: 'UG Programmes', groupPath: '/academics?tab=btech', items: [] },
       { groupLabel: 'PG Programmes', groupPath: '/academics?tab=mtech', items: [] },
       { groupLabel: 'Ph.D. Programmes', groupPath: '/academics?tab=mba', items: [] },
-      { groupLabel: 'Examinations', groupPath: 'https://www.svecwexams.in/', external: true, items: [] },
       {
         groupLabel: 'Information',
         groupPath: '/information',
@@ -462,15 +460,9 @@ export default function Header() {
           {item.groups.map((group) => (
             <div key={group.groupLabel} className="mega-group">
               {group.groupPath ? (
-                group.external ? (
-                  <a href={group.groupPath} className="mega-group-label" target="_blank" rel="noopener noreferrer">
-                    {group.groupLabel}
-                  </a>
-                ) : (
-                  <Link to={group.groupPath} className="mega-group-label">
-                    {group.groupLabel}
-                  </Link>
-                )
+                <Link to={group.groupPath} className="mega-group-label">
+                  {group.groupLabel}
+                </Link>
               ) : (
                 <span className="mega-group-label">{group.groupLabel}</span>
               )}
@@ -690,22 +682,17 @@ export default function Header() {
                       {item.groups.map((group) => {
                         const groupKey = `${item.label}:${group.groupLabel}`;
                         const groupOpen = expandedGroup === groupKey;
-                        // A group with no items of its own (e.g. Examinations,
-                        // an external-only link) has nothing to expand into —
-                        // render it as a plain link instead of a dead-end
-                        // accordion button.
+                        // A group with no items of its own has nothing to
+                        // expand into — render it as a plain link instead of
+                        // a dead-end accordion button. Mainly hit while a
+                        // live-data group (e.g. UG/PG/Ph.D. Programmes)
+                        // hasn't loaded any items yet.
                         if (group.items.length === 0 && group.groupPath) {
                           return (
                             <li key={group.groupLabel} className="mobile-group">
-                              {group.external ? (
-                                <a href={group.groupPath} className="mobile-group-btn" target="_blank" rel="noopener noreferrer">
-                                  {group.groupLabel}
-                                </a>
-                              ) : (
-                                <Link to={group.groupPath} className="mobile-group-btn">
-                                  {group.groupLabel}
-                                </Link>
-                              )}
+                              <Link to={group.groupPath} className="mobile-group-btn">
+                                {group.groupLabel}
+                              </Link>
                             </li>
                           );
                         }
