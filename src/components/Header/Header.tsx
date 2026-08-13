@@ -549,14 +549,18 @@ export default function Header() {
     const width = el.getBoundingClientRect().width;
     const triggerRect = triggerEl.getBoundingClientRect();
 
+    // Left as shrink-to-fit, the menu only ever renders at its own
+    // content's natural width — on anything wider than a fairly narrow
+    // desktop window that leaves real, unused room between it and the pod
+    // sitting completely unused instead of giving the columns more
+    // breathing room. STRETCH_CAP just keeps it from growing absurdly
+    // wide on an ultra-wide monitor.
+    const STRETCH_CAP = 960;
+
     if (isRightAnchored) {
       const available = triggerRect.right - logoRect.right - margin;
-      // Decide the final width *before* using it to judge whether a shift
-      // is needed — shifting to fit the natural width, only to separately
-      // clamp that width smaller afterward, leaves the (now too-large)
-      // shift wildly overshooting for the actually-rendered size.
-      const finalWidth = available > 0 && available < width ? available : width;
-      if (finalWidth < width) {
+      const finalWidth = available > 0 ? Math.min(available, STRETCH_CAP) : width;
+      if (finalWidth !== width) {
         el.style.minWidth = '0';
         el.style.width = `${finalWidth}px`;
       }
@@ -568,8 +572,8 @@ export default function Header() {
     }
 
     const available = safeRight - safeLeft;
-    const finalWidth = available > 0 && available < width ? available : width;
-    if (finalWidth < width) {
+    const finalWidth = available > 0 ? Math.min(available, STRETCH_CAP) : width;
+    if (finalWidth !== width) {
       el.style.minWidth = '0';
       el.style.width = `${finalWidth}px`;
     }
