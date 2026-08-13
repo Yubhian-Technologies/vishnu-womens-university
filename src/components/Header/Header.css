@@ -49,6 +49,12 @@
   width: 460px;
   justify-content: flex-end;
   padding-right: var(--space-4);
+  /* No-op at desktop widths (.nav's flex:1 already consumes all the free
+     space first) — but below the .nav breakpoint, with .nav gone, this is
+     what pulls the CTA pod over to sit flush against the mobile-toggle
+     instead of leaving it stranded next to the logo with a large empty
+     gap before the (also margin-left:auto) toggle button. */
+  margin-left: auto;
 }
 
 .header-end-wave {
@@ -652,13 +658,30 @@ a.mega-group-label:hover {
   color: var(--color-accent);
 }
 
-/* ===== Responsive ===== */
-@media (max-width: 1400px) {
+/* ===== Responsive =====
+   1650px (not the more typical ~1024-1280px breakpoint) is deliberate:
+   the mega-menus (e.g. Academics' 5 columns of UG/PG/Ph.D. programme
+   names) need real horizontal room between the header's logo and
+   Visit/Give/Apply pods to lay out without cramming into misaligned
+   multi-line wraps, and that room only exists this wide. */
+@media (max-width: 1650px) {
   .nav {
     display: none;
   }
   .mobile-toggle {
     display: flex;
+  }
+}
+
+/* Whenever the CTA pod is still visible (i.e. above the 640px width where
+   it gets hidden below) but .nav isn't (≤1650px), its own margin-left:auto
+   above is already doing the job of pulling both it and the toggle over to
+   the right together — a second margin-left:auto here as well would split
+   the free space between the two gaps instead of collapsing it into one,
+   stranding the CTA pod away from the toggle with its own empty gap. */
+@media (min-width: 641px) and (max-width: 1650px) {
+  .mobile-toggle {
+    margin-left: 0;
   }
 }
 
