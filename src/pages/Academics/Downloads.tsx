@@ -63,7 +63,7 @@ export default function AcademicDownloads() {
               </button>
               <div className="thrust-accordion-collapse">
                 <div className="thrust-accordion-collapse-inner">
-                  <div style={{ padding: 'var(--space-5)', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 'var(--space-6)' }}>
+                  <div className="card-grid" style={{ padding: 'var(--space-5)', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 'var(--space-6)' }}>
                     {downloads.map((d) => (
                       <div
                         key={d.id}

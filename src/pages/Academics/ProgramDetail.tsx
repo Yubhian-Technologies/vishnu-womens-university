@@ -446,7 +446,7 @@ export default function ProgramDetail() {
               <h2 className="section-title">Laboratories</h2>
               <p className="section-desc">State-of-the-art laboratory facilities that bring coursework to life with hands-on, industry-relevant experimentation.</p>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 'var(--space-4)' }}>
+            <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 'var(--space-4)' }}>
               {program.labs.map((lab) => (
                 <div key={lab} style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', display: 'flex', alignItems: 'center', gap: 'var(--space-4)', borderLeft: '4px solid var(--color-accent)' }}>
                   <Microscope size={22} strokeWidth={1.75} style={{ flexShrink: 0, color: 'var(--color-accent)' }} />

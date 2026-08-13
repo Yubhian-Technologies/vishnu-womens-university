@@ -258,7 +258,7 @@ export default function Gallery() {
           </div>
 
           {/* Albums grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 'var(--space-4)' }}>
+          <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 'var(--space-4)' }}>
             {filtered.map((album, i) => {
               const color = yearColors[album.year] || 'var(--color-primary)';
               return (

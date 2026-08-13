@@ -52,6 +52,12 @@
   width: 260px;
   justify-content: flex-end;
   padding-right: var(--space-4);
+  /* No-op at desktop widths (.nav's flex:1 already consumes all the free
+     space first) — but below the .nav breakpoint, with .nav gone, this is
+     what pulls the CTA pod over to sit flush against the mobile-toggle
+     instead of leaving it stranded next to the logo with a large empty
+     gap before the (also margin-left:auto) toggle button. */
+  margin-left: auto;
 }
 
 .header-end-wave {
@@ -141,7 +147,7 @@
   align-items: center;
   height: 100%;
   gap: 2px;
-  transform: translateX(14px);
+  transform: translateX(6px);
 }
 
 .nav-item {
@@ -257,9 +263,17 @@
   transform: translateY(0);
 }
 
+/* Right-anchored: no centering transform needed (right:0 already
+   positions it), just the same optional --mega-shift pod-avoidance nudge
+   as the left-anchored translateX(-50% + shift) above. */
 .nav-item:nth-last-child(-n+2) .dropdown.dropdown-mega {
   left: auto;
   right: 0;
+  transform: translateX(var(--mega-shift, 0px)) translateY(-10px);
+}
+
+.nav-item--open:nth-last-child(-n+2) .dropdown.dropdown-mega {
+  transform: translateX(var(--mega-shift, 0px)) translateY(0);
 }
 
 .dropdown-list {
@@ -334,8 +348,15 @@
 
 /* ===== Mega Menu ===== */
 .dropdown.dropdown-mega {
-  left: 0;
-  transform: translateX(0) translateY(-10px);
+  left: 50%;
+  /* Centered on the trigger by default, same as a flat dropdown — the
+     -50% keeps that true regardless of the menu's own width. --mega-shift
+     (set from Header.tsx) nudges it left or right only when centered
+     would overlap one of the header's end-pods; left at 0px the rest of
+     the time, so a menu doesn't inconsistently open dead-center in one
+     spot and hard against a pod in another depending on which trigger
+     opened it or how wide the viewport happens to be. */
+  transform: translateX(calc(-50% + var(--mega-shift, 0px))) translateY(-10px);
   display: flex;
   gap: 0;
   min-width: 680px;
@@ -349,13 +370,13 @@
 }
 
 .nav-item--open .dropdown.dropdown-mega {
-  transform: translateX(0) translateY(0);
+  transform: translateX(calc(-50% + var(--mega-shift, 0px))) translateY(0);
 }
 
 
 .mega-group {
   flex: 1;
-  padding: var(--space-3) var(--space-2);
+  padding: var(--space-3) var(--space-4);
   border-right: 1px solid var(--color-light-gray);
   min-width: 0;
 }
@@ -412,7 +433,7 @@ a.mega-group-label:hover {
 }
 
 .mega-group-list .dropdown-item {
-  padding: var(--space-2) var(--space-2);
+  padding: var(--space-3) var(--space-2);
   font-size: 0.8rem;
 }
 
@@ -436,6 +457,10 @@ a.mega-group-label:hover {
   padding: 4px;
   border-radius: var(--radius-sm);
   transition: background var(--transition-fast);
+  /* With .nav hidden below 1400px, nothing else in .header-bar grows to
+     fill the freed space, so without this the toggle sits wherever it
+     falls in flex order instead of at the header's right edge. */
+  margin-left: auto;
 }
 
 .mobile-toggle:hover {
@@ -632,6 +657,18 @@ a.mega-group-label:hover {
   }
 }
 
+/* Whenever the CTA pod is still visible (i.e. above the 640px width where
+   it gets hidden below) but .nav isn't (≤1400px), its own margin-left:auto
+   above is already doing the job of pulling both it and the toggle over to
+   the right together — a second margin-left:auto here as well would split
+   the free space between the two gaps instead of collapsing it into one,
+   stranding the CTA pod away from the toggle with its own empty gap. */
+@media (min-width: 641px) and (max-width: 1400px) {
+  .mobile-toggle {
+    margin-left: 0;
+  }
+}
+
 /* Below this width the fixed-width dark end-sections (sized to fit the
    full desktop nav + CTAs comfortably) no longer make sense — .nav is
    already hidden, so simplify both ends to their content's natural size
@@ -645,6 +682,12 @@ a.mega-group-label:hover {
   .header-end--cta {
     width: auto;
     padding-right: var(--space-3);
+    /* The dark backdrop is normally just the SVG wave's fill — with the
+       wave hidden below, Visit/Give's white text/icons would otherwise
+       render invisible against the plain white header-bar. */
+    background: var(--color-primary-dark);
+    border-top-left-radius: var(--radius-lg);
+    border-bottom-left-radius: var(--radius-lg);
   }
   .header-end-wave {
     display: none;

@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useNavLinkOverride } from '../../hooks/useNavLinkOverride';
-import type { DownloadDoc } from '../../pages/Admin/sections/DownloadsAdmin';
+import type { ProgramDoc } from '../../pages/Admin/sections/ProgramsAdmin';
 import SmoothCollapse from '../SmoothCollapse/SmoothCollapse';
 import './Header.css';
 
@@ -44,10 +44,11 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   {
-    // "Discover"'s old groups (Governance/Committees/IQAC/Information) now
-    // live here too, alongside About Us's own items — no longer its own
-    // top-level nav item. Committees (13 items) auto-splits into two
-    // sub-columns (see .mega-group-list.cols-2 in Header.css).
+    // "Discover"'s old groups (Governance/Committees/IQAC) now live here
+    // too, alongside About Us's own items — no longer its own top-level
+    // nav item. Committees (13 items) auto-splits into two sub-columns
+    // (see .mega-group-list.cols-2 in Header.css). Information dropped
+    // (2026-08-13) since it's now under Academics instead.
     label: 'About Us',
     groups: [
       {
@@ -106,29 +107,40 @@ const navItems: NavItem[] = [
           { label: 'NBA – Data Capturing Points', path: '/governance/nba-data' },
         ],
       },
+    ],
+  },
+  {
+    // UG/PG/Ph.D. Programmes groups are spliced in at render time from live
+    // Firestore `programs` data — see renderedNavItems in Header() — so
+    // this menu always matches whatever's actually configured in the
+    // Programs admin section rather than a hardcoded, driftable list.
+    label: 'Academics',
+    groups: [
+      {
+        groupLabel: 'Overview',
+        groupPath: '/academics',
+        items: [
+          { label: 'Programs & Departments', path: '/academics' },
+          { label: 'Faculty', path: '/faculty' },
+          { label: 'Academic Documents', path: '/academics/downloads' },
+          { label: 'Result Analysis', path: '/result-analysis' },
+          { label: 'Examinations', path: 'https://www.svecwexams.in/', external: true },
+        ],
+      },
+      { groupLabel: 'UG Programmes', groupPath: '/academics?tab=btech', items: [] },
+      { groupLabel: 'PG Programmes', groupPath: '/academics?tab=mtech', items: [] },
+      { groupLabel: 'Ph.D. Programmes', groupPath: '/academics?tab=mba', items: [] },
       {
         groupLabel: 'Information',
         groupPath: '/information',
         items: [
           { label: 'Academic Calendar', path: '/information#academic-calendar' },
           { label: 'List of Holidays', path: '/information#holidays' },
-          { label: 'How to Reach', path: '/information#how-to-reach' },
           { label: 'Counselling Scheme', path: '/information#counselling' },
           { label: 'ICT Platforms', path: '/information#ict-platforms' },
           { label: 'Other Practices', path: '/information#other-practices' },
         ],
       },
-    ],
-  },
-  {
-    // Course Curriculum / Academic Documents items are spliced in at render
-    // time from live Firestore data — see renderedNavItems in Header().
-    label: 'Academics',
-    children: [
-      { label: 'Programs & Departments', path: '/academics' },
-      { label: 'Faculty', path: '/faculty' },
-      { label: 'Result Analysis', path: '/result-analysis' },
-      { label: 'Academic Calendar', path: '/information#academic-calendar' },
     ],
   },
   {
@@ -305,8 +317,8 @@ export default function Header() {
   const [expandedSubItem, setExpandedSubItem] = useState<string | null>(null);
   const location = useLocation();
   const navRef = useRef<HTMLElement>(null);
+  const megaRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  const { docs: downloadDocs, loading: downloadsLoading } = useOrderedCollection<DownloadDoc>('downloads', 'order');
   // Admin-editable via /admin → Navigation Link Redirects (NavLinkOverridesAdmin.tsx).
   // Decoupled from Placements' own "Success Stories" item, which stays hardcoded.
   // Default target is AlumniGiving.tsx's own "#successstories" section, not Placements.
@@ -315,27 +327,24 @@ export default function Header() {
   // admissions cycle or an external application portal) without a deploy.
   const headerApplyNow = useNavLinkOverride('header-apply-now', '/admissions');
 
-  const academicDocsChild: NavChild = {
-    label: 'Academic Documents',
-    path: '/academics/downloads',
-    subItems: downloadsLoading
-      ? [{ label: 'Loading…', path: '', disabled: true }]
-      : downloadDocs.length > 0
-        ? downloadDocs.map((d) => ({ label: d.title, path: d.fileUrl, external: true }))
-        : [{ label: 'No documents yet', path: '', disabled: true }],
-  };
+  const { docs: programs } = useOrderedCollection<ProgramDoc>('programs', 'order');
+  const programItem = (p: ProgramDoc): NavChild => ({ label: p.name, path: `/academics/${p.slug}` });
+  const ugProgrammes = programs.filter((p) => p.category === 'btech').map(programItem);
+  const pgProgrammes = programs.filter((p) => p.category === 'mtech' || p.category === 'mba').map(programItem);
+  const phdProgrammes = programs.filter((p) => p.category === 'phd').map(programItem);
 
-  // Academics' children are the static list + this live-Firestore-derived
-  // flyout item, spliced in after "Faculty" since navItems itself is a
-  // module-level constant and can't hold live data directly.
   const renderedNavItems: NavItem[] = navItems.map((item) => {
-    if (item.label === 'Academics' && item.children) {
-      const children: NavChild[] = [];
-      for (const child of item.children) {
-        children.push(child);
-        if (child.label === 'Faculty') children.push(academicDocsChild);
-      }
-      return { ...item, children };
+    // Academics' UG/PG/Ph.D. Programmes groups are populated here from live
+    // Firestore data since navItems itself is a module-level constant and
+    // can't hold live data directly — see the "Overview" comment above.
+    if (item.label === 'Academics' && item.groups) {
+      const groups = item.groups.map((group) => {
+        if (group.groupLabel === 'UG Programmes') return { ...group, items: ugProgrammes };
+        if (group.groupLabel === 'PG Programmes') return { ...group, items: pgProgrammes };
+        if (group.groupLabel === 'Ph.D. Programmes') return { ...group, items: phdProgrammes };
+        return group;
+      });
+      return { ...item, groups };
     }
     // "Success Stories" here is admin-redirectable independently of
     // Placements' own "Success Stories" item — see alumniSuccessStories above.
@@ -424,7 +433,11 @@ export default function Header() {
 
       {/* Mega-menu dropdown */}
       {item.groups && (
-        <div className="dropdown dropdown-mega" role="menu">
+        <div
+          className="dropdown dropdown-mega"
+          role="menu"
+          ref={(el) => { megaRefs.current[item.label] = el; }}
+        >
           {item.groups.map((group) => (
             <div key={group.groupLabel} className="mega-group">
               {group.groupPath ? (
@@ -434,7 +447,7 @@ export default function Header() {
               ) : (
                 <span className="mega-group-label">{group.groupLabel}</span>
               )}
-              <ul className={`mega-group-list${group.items.length > 9 ? ' cols-2' : ''}`}>
+              <ul className={`mega-group-list${group.items.length >= 9 ? ' cols-2' : ''}`}>
                 {group.items.map((child) => (
                   <li key={child.label}>
                     {child.disabled ? (
@@ -491,6 +504,92 @@ export default function Header() {
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, [openItem]);
+
+  // Mega-menus are centered on their trigger by default (see .dropdown-mega
+  // in Header.css), same as a flat dropdown — the width/height of the menu
+  // and the position of the trigger that opened it don't otherwise matter.
+  // The only time that changes is when centering would run the menu into
+  // one of the header's dark end-pods (e.g. Research, mid-bar, opening a
+  // wide menu can reach the Visit/Give/Apply pod on the right): then it's
+  // nudged left/right via --mega-shift just enough to clear that pod,
+  // rather than always anchoring to one side — which was the previous
+  // approach, and is exactly what made a menu look like it opened
+  // "sometimes centered, sometimes off to a side" depending on viewport
+  // width. Right-anchored menus (the last two nav items — see the
+  // nth-last-child rule in Header.css) don't need centering since right:0
+  // already positions them consistently; they still get the same nudge
+  // against the logo pod. Width is only reduced (via an explicit width,
+  // not max-width — min-width otherwise wins the conflict, and a
+  // shrink-to-fit auto width doesn't reliably fill a max-width budget
+  // once min-width is overridden to 0) if the menu genuinely can't fit
+  // even using the full gap between both pods.
+  useEffect(() => {
+    const el = openItem ? megaRefs.current[openItem] : null;
+    const triggerEl = el?.parentElement;
+    if (!el || !triggerEl) return;
+    el.style.minWidth = '';
+    el.style.width = '';
+    el.style.removeProperty('--mega-shift');
+    const idx = renderedNavItems.findIndex((i) => i.label === openItem);
+    const isRightAnchored = idx !== -1 && idx >= renderedNavItems.length - 2;
+    const logoEl = document.querySelector<HTMLElement>('.header-end--logo');
+    const ctaEl = document.querySelector<HTMLElement>('.header-end--cta');
+    if (!logoEl || !ctaEl) return;
+    const margin = 24;
+    const logoRect = logoEl.getBoundingClientRect();
+    const ctaRect = ctaEl.getBoundingClientRect();
+    const safeLeft = logoRect.right + margin;
+    const safeRight = ctaRect.left - margin;
+    // Width is trustworthy to read off the dropdown itself (transform
+    // doesn't affect it), but its *position* can still be mid-transition
+    // right after the reset above (transform is a transitioned property),
+    // so the natural, unshifted position is computed from the trigger's
+    // own (never-transformed) geometry instead of trusting the dropdown's
+    // own rect.left/right.
+    const width = el.getBoundingClientRect().width;
+    const triggerRect = triggerEl.getBoundingClientRect();
+
+    // Left as shrink-to-fit, the menu only ever renders at its own
+    // content's natural width — on anything wider than a fairly narrow
+    // desktop window that leaves real, unused room between it and the pod
+    // sitting completely unused instead of giving the columns more
+    // breathing room. STRETCH_CAP just keeps it from growing absurdly
+    // wide on an ultra-wide monitor.
+    const STRETCH_CAP = 960;
+
+    if (isRightAnchored) {
+      const available = triggerRect.right - logoRect.right - margin;
+      const finalWidth = available > 0 ? Math.min(available, STRETCH_CAP) : width;
+      if (finalWidth !== width) {
+        el.style.minWidth = '0';
+        el.style.width = `${finalWidth}px`;
+      }
+      const naturalLeft = triggerRect.right - finalWidth;
+      if (naturalLeft < safeLeft) {
+        el.style.setProperty('--mega-shift', `${safeLeft - naturalLeft}px`);
+      }
+      return;
+    }
+
+    const available = safeRight - safeLeft;
+    const finalWidth = available > 0 ? Math.min(available, STRETCH_CAP) : width;
+    if (finalWidth !== width) {
+      el.style.minWidth = '0';
+      el.style.width = `${finalWidth}px`;
+    }
+    const naturalCenter = triggerRect.left + triggerRect.width / 2;
+    const naturalLeft = naturalCenter - finalWidth / 2;
+    const naturalRight = naturalCenter + finalWidth / 2;
+    let shift = 0;
+    if (naturalRight > safeRight) {
+      shift = safeRight - naturalRight;
+    } else if (naturalLeft < safeLeft) {
+      shift = safeLeft - naturalLeft;
+    }
+    if (shift !== 0) {
+      el.style.setProperty('--mega-shift', `${shift}px`);
+    }
+  }, [openItem, renderedNavItems]);
 
   useEffect(() => {
     setMobileOpen(false);
@@ -649,6 +748,20 @@ export default function Header() {
                       {item.groups.map((group) => {
                         const groupKey = `${item.label}:${group.groupLabel}`;
                         const groupOpen = expandedGroup === groupKey;
+                        // A group with no items of its own has nothing to
+                        // expand into — render it as a plain link instead of
+                        // a dead-end accordion button. Mainly hit while a
+                        // live-data group (e.g. UG/PG/Ph.D. Programmes)
+                        // hasn't loaded any items yet.
+                        if (group.items.length === 0 && group.groupPath) {
+                          return (
+                            <li key={group.groupLabel} className="mobile-group">
+                              <Link to={group.groupPath} className="mobile-group-btn">
+                                {group.groupLabel}
+                              </Link>
+                            </li>
+                          );
+                        }
                         return (
                           <li key={group.groupLabel} className="mobile-group">
                             <button
