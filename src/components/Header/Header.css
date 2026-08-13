@@ -355,7 +355,13 @@
 /* ===== Mega Menu ===== */
 .dropdown.dropdown-mega {
   left: 0;
-  transform: translateX(0) translateY(-10px);
+  /* --mega-shift (set from Header.tsx) slides a left-anchored mega-menu
+     off its trigger's position to start right after the logo pod instead
+     — the full gap between the two end-pods is meaningfully wider than
+     the room to the right of any one trigger, so this is what actually
+     lets a many-column menu (e.g. Academics) breathe instead of cramming
+     into whatever's left of wherever its trigger happens to sit. */
+  transform: translateX(var(--mega-shift, 0px)) translateY(-10px);
   display: flex;
   gap: 0;
   min-width: 680px;
@@ -369,7 +375,7 @@
 }
 
 .nav-item--open .dropdown.dropdown-mega {
-  transform: translateX(0) translateY(0);
+  transform: translateX(var(--mega-shift, 0px)) translateY(0);
 }
 
 
@@ -432,7 +438,7 @@ a.mega-group-label:hover {
 }
 
 .mega-group-list .dropdown-item {
-  padding: var(--space-2) var(--space-2);
+  padding: var(--space-3) var(--space-2);
   font-size: 0.8rem;
 }
 
