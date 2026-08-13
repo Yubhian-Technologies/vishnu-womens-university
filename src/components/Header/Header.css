@@ -298,20 +298,31 @@
   padding-left: calc(var(--space-5) + 4px);
 }
 
-/* Placements has too many items for a single column without the dropdown
-   running past the viewport height — split it into two columns instead. */
-.nav-item--placements .dropdown {
+/* Any flat dropdown with too many items (Placements, Research, Campus
+   Life, …) runs past the viewport height in a single column — split it
+   into two instead. Applied via nav-item--wide-dropdown whenever a nav
+   item's children list is long (see Header.tsx), not hardcoded per label. */
+.nav-item--wide-dropdown .dropdown {
   min-width: 480px;
 }
 
-.nav-item--placements .dropdown-list {
+.nav-item--wide-dropdown .dropdown-list {
   column-count: 2;
   column-gap: 0;
   column-rule: 1px solid var(--color-light-gray);
 }
 
-.nav-item--placements .dropdown-list li {
+.nav-item--wide-dropdown .dropdown-list li {
   break-inside: avoid;
+}
+
+/* Safety net for the longest lists (e.g. Campus Life) so they scroll
+   internally instead of running off the bottom of the page on shorter
+   viewports, even split across two columns — mirrors .dropdown-mega's
+   own max-height/overflow rule below. */
+.dropdown:not(.dropdown-mega) {
+  max-height: calc(100vh - var(--header-height) - 24px);
+  overflow-y: auto;
 }
 
 /* ===== Flyout (nested dropdown items, e.g. Academics > Course Curriculum) ===== */

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { BarChart3, Trophy, CheckCircle2, type LucideIcon } from 'lucide-react';
 import PageHero from '../../components/PageHero/PageHero';
 import { useHashScroll } from '../../hooks/useHashScroll';
@@ -55,10 +55,25 @@ function AwardCard({ item }: { item: AwardDoc }) {
   );
 }
 
+function tabFromHash(hash: string): TabKey | null {
+  const key = hash.slice(1);
+  return tabs.some((t) => t.key === key) ? (key as TabKey) : null;
+}
+
 export default function Accreditations() {
-  const [activeTab, setActiveTab] = useState<TabKey>('ranking');
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState<TabKey>(() => tabFromHash(location.hash) ?? 'ranking');
   useHashScroll();
   const { docs: awards } = useOrderedCollection<AwardDoc>('awards', 'order');
+
+  // Lets nav links target a specific tab directly (e.g. "…#accreditation"
+  // vs "…#ranking") — needed since the two now live on the same page/route
+  // instead of separate nav items, and a hash change alone doesn't remount
+  // the component to pick up the lazy initial state above.
+  useEffect(() => {
+    const tab = tabFromHash(location.hash);
+    if (tab) setActiveTab(tab);
+  }, [location.hash]);
 
   useEffect(() => {
     document.title = 'Accreditations & Awards | Vishnu Womens University';

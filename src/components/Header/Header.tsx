@@ -4,6 +4,8 @@ import { ArrowRight } from 'lucide-react';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useNavLinkOverride } from '../../hooks/useNavLinkOverride';
 import type { ProgramDoc } from '../../pages/Admin/sections/ProgramsAdmin';
+import { DIFFERENTIATOR_CATEGORIES } from '../../pages/Admin/sections/DifferentiatorsAdmin';
+import type { DifferentiatorItemDoc } from '../../pages/Admin/sections/DifferentiatorsAdmin';
 import SmoothCollapse from '../SmoothCollapse/SmoothCollapse';
 import './Header.css';
 
@@ -155,9 +157,24 @@ const navItems: NavItem[] = [
     ],
   },
   {
+    // Was a group inside Research's mega-menu — now its own top-level item.
+    // Category groups' items are spliced in at render time from live
+    // Firestore `differentiatorItems` data — see renderedNavItems in
+    // Header() — so the dropdown always lists the actual differentiators
+    // configured in the Differentiators admin section rather than a
+    // hardcoded, driftable list.
+    label: 'Differentiators',
+    groups: [
+      ...DIFFERENTIATOR_CATEGORIES.map((cat) => ({
+        groupLabel: cat.label,
+        groupPath: `/differentiators#${cat.id}`,
+        items: [],
+      })),
+    ],
+  },
+  {
     label: 'Placements',
     children: [
-      { label: 'Placements Overview', path: '/placements' },
       { label: 'Placement Details', path: '/placements/placement-details' },
       { label: 'Success Stories', path: '/placements/success-stories' },
       { label: 'TPO Cell', path: '/placements/tpo-cell' },
@@ -168,102 +185,60 @@ const navItems: NavItem[] = [
       { label: 'Our Recruiters', path: '/placements/our-recruiters' },
       { label: 'Employability Skills', path: '/placements/employability-skills' },
       { label: 'Mission R&D', path: '/placements/mission-rd' },
-      { label: 'Study Abroad – GSAC', path: '/placements/gsac' },
+      { label: 'Graduate Study Abroad Center – GSAC', path: '/placements/gsac' },
       { label: 'Higher Education', path: '/placements/higher-education' },
     ],
   },
   {
+    // Flat list (no sub-groups) — was a 3-group mega-menu, collapsed to
+    // match the flat dropdown style used by Placements/Admissions.
     label: 'Research',
-    groups: [
-      {
-        groupLabel: 'R&D Governance',
-        groupPath: '/research#governance',
-        items: [
-          { label: 'About R&D', path: '/research/about-rd' },
-          { label: 'Research Advisory Committee', path: '/research/research-advisory-committee' },
-          { label: 'Research Ethics Committee', path: '/research/research-ethics-committee' },
-          { label: 'IPR Committee', path: '/research/ipr-committee' },
-          { label: 'Research Centers', path: '/research/research-centers' },
-        ],
-      },
-      {
-        groupLabel: 'Research Output',
-        groupPath: '/research#output',
-        items: [
-          { label: 'Thrust Areas of Research', path: '/research/thrust-areas-of-research' },
-          { label: 'Funded Projects', path: '/research/funded-projects' },
-          { label: 'Seed Money Projects', path: '/research/seed-money-projects' },
-          { label: 'Research Publications', path: '/research/research-publications' },
-          { label: 'Patents', path: '/research/patents' },
-        ],
-      },
-      {
-        groupLabel: 'Industry & Professional Engagement',
-        groupPath: '/research#engagement',
-        items: [
-          { label: 'MoUs', path: '/research/mous' },
-          { label: 'Consultancy', path: '/research/consultancy' },
-          { label: 'Professional Bodies', path: '/research/professional-bodies' },
-        ],
-      },
-    ],
-  },
-  {
-    // Was a group inside Research's mega-menu — now its own top-level item.
-    label: 'Differentiators',
     children: [
-      { label: 'All Differentiators', path: '/differentiators' },
-      { label: 'Innovation & Entrepreneurship', path: '/differentiators#innovation' },
-      { label: 'Industry Centres of Excellence', path: '/differentiators#industry' },
-      { label: 'Research & Specialised Labs', path: '/differentiators#research' },
-      { label: 'International & Global Outreach', path: '/differentiators#global' },
-      { label: 'Student Development & Social Impact', path: '/differentiators#student' },
+      { label: 'About R&D', path: '/research/about-rd' },
+      { label: 'Research Advisory Committee', path: '/research/research-advisory-committee' },
+      { label: 'Research Ethics Committee', path: '/research/research-ethics-committee' },
+      { label: 'Intellectual Property Rights (IPR) Committee', path: '/research/ipr-committee' },
+      { label: 'Thrust Areas of Research', path: '/research/thrust-areas-of-research' },
+      { label: 'Research Centers', path: '/research/research-centers' },
+      { label: 'Funded Projects', path: '/research/funded-projects' },
+      { label: 'Seed Money Projects', path: '/research/seed-money-projects' },
+      { label: 'Research Publications', path: '/research/research-publications' },
+      { label: 'MoUs', path: '/research/mous' },
+      { label: 'Patents', path: '/research/patents' },
+      { label: 'Consultancy', path: '/research/consultancy' },
+      { label: 'Professional Bodies', path: '/research/professional-bodies' },
     ],
   },
   {
-    // Two groups instead of a flat 17-item list, now that Student Life's
-    // own items live here too — matches the Discover mega-menu pattern.
-    // Each group with >9 items auto-splits into two sub-columns (see
-    // .mega-group-list.cols-2 in Header.css), so Campus Facilities (17
-    // items) renders as two columns and Student Life (7) as one.
+    // Flat list (no sub-groups) — was a 2-group Campus Facilities/Student
+    // Life mega-menu, collapsed to match the flat dropdown style used by
+    // Placements/Admissions/Research. Radio Vishnu 90.4 has no page of its
+    // own — it reuses its existing Differentiators detail page rather than
+    // pointing at a route that doesn't exist.
     label: 'Campus Life',
-    groups: [
-      {
-        groupLabel: 'Campus Facilities',
-        groupPath: '/campus',
-        items: [
-          { label: 'Campus Life Overview', path: '/campus' },
-          { label: 'Smart Class Rooms', path: '/campus/smart-classrooms' },
-          { label: 'State-of-the-art Labs', path: '/campus/state-of-the-art-labs' },
-          { label: 'Central Library', path: '/campus/central-library' },
-          { label: 'Auditoriums', path: '/campus/auditoriums' },
-          { label: 'Campus Book Stores', path: '/campus/campus-book-stores' },
-          { label: 'Wi-Fi Campus', path: '/campus/wifi-campus' },
-          { label: 'Campus Hostels', path: '/campus/campus-hostels' },
-          { label: 'Food Courts', path: '/campus/food-courts' },
-          { label: 'VISHNU Fitness Centre', path: '/campus/fitness-centre' },
-          { label: 'Staff Quarters', path: '/campus/staff-quarters' },
-          { label: 'Travel Desk', path: '/campus/travel-desk' },
-          { label: 'Temples', path: '/campus/temples' },
-          { label: 'Health Care', path: '/campus/health-care' },
-          { label: 'Swimming Pool', path: '/campus/swimming-pool' },
-          { label: 'Campus Security', path: '/campus/campus-security' },
-          { label: 'Other Facilities', path: '/campus/other-facilities' },
-        ],
-      },
-      {
-        groupLabel: 'Student Life',
-        groupPath: '/student-life',
-        items: [
-          { label: 'Student Life Overview', path: '/student-life' },
-          { label: 'Student Clubs', path: '/student-clubs' },
-          { label: 'Sports & Games', path: '/sports-games' },
-          { label: 'Arts & Culture', path: '/arts-culture' },
-          { label: 'Social Services (NSS)', path: '/social-services' },
-          { label: 'Campus Magazines', path: '/campus-magazines' },
-          { label: 'Vishnu TV Academy', path: '/vishnu-tv-academy' },
-        ],
-      },
+    children: [
+      { label: 'Smart Class Rooms', path: '/campus/smart-classrooms' },
+      { label: 'State-of-the-art Labs', path: '/campus/state-of-the-art-labs' },
+      { label: 'Central Library', path: '/campus/central-library' },
+      { label: 'Auditoriums', path: '/campus/auditoriums' },
+      { label: 'Campus Book Stores', path: '/campus/campus-book-stores' },
+      { label: 'Wi-Fi Campus', path: '/campus/wifi-campus' },
+      { label: 'Campus Hostels', path: '/campus/campus-hostels' },
+      { label: 'Food Courts', path: '/campus/food-courts' },
+      { label: 'VISHNU Fitness Centre', path: '/campus/fitness-centre' },
+      { label: 'Staff Quarters', path: '/campus/staff-quarters' },
+      { label: 'Travel Desk', path: '/campus/travel-desk' },
+      { label: 'Temples', path: '/campus/temples' },
+      { label: 'Health Care', path: '/campus/health-care' },
+      { label: 'Swimming Pool', path: '/campus/swimming-pool' },
+      { label: 'Campus Security', path: '/campus/campus-security' },
+      { label: 'Radio Vishnu 90.4', path: '/differentiators/radio-vishnu-diff' },
+      { label: 'Vishnu TV Academy', path: '/vishnu-tv-academy' },
+      { label: 'Student Clubs', path: '/student-clubs' },
+      { label: 'Social Services', path: '/social-services' },
+      { label: 'Campus Magazines', path: '/campus-magazines' },
+      { label: 'Arts & Culture', path: '/arts-culture' },
+      { label: 'Sports & Games', path: '/sports-games' },
     ],
   },
   {
@@ -276,9 +251,11 @@ const navItems: NavItem[] = [
         groupLabel: 'News & Events',
         groupPath: '/news-awards',
         items: [
-          { label: 'News & Awards Overview', path: '/news-awards' },
           { label: 'Happenings at VWU', path: '/news-awards/happenings' },
-          { label: 'Accreditations & Awards', path: '/news-awards/accreditations-awards' },
+          { label: 'Social Media Handles', path: '/news-awards/social-media-handles' },
+          { label: 'Vishnu Era', path: 'https://www.srivishnu.edu.in/vishnu-era/', external: true },
+          { label: 'Accreditations', path: '/news-awards/accreditations-awards#accreditation' },
+          { label: 'Rankings & Awards', path: '/news-awards/accreditations-awards#ranking' },
           { label: 'Gallery', path: '/news-awards/gallery' },
           { label: 'News', path: '/news' },
           { label: 'Events', path: '/events' },
@@ -295,6 +272,13 @@ const navItems: NavItem[] = [
           { label: 'Success Stories', path: '/placements/success-stories' },
         ],
       },
+    ],
+  },
+  {
+    label: 'Contact',
+    children: [
+      { label: 'Contact Us', path: '/contact' },
+      { label: 'How to Reach', path: '/information#how-to-reach' },
     ],
   },
 ];
@@ -333,6 +317,8 @@ export default function Header() {
   const pgProgrammes = programs.filter((p) => p.category === 'mtech' || p.category === 'mba').map(programItem);
   const phdProgrammes = programs.filter((p) => p.category === 'phd').map(programItem);
 
+  const { docs: differentiatorItems } = useOrderedCollection<DifferentiatorItemDoc>('differentiatorItems', 'order');
+
   const renderedNavItems: NavItem[] = navItems.map((item) => {
     // Academics' UG/PG/Ph.D. Programmes groups are populated here from live
     // Firestore data since navItems itself is a module-level constant and
@@ -363,13 +349,29 @@ export default function Header() {
       );
       return { ...item, groups };
     }
+    // Category groups here are populated from live Firestore data since
+    // navItems itself is a module-level constant — see differentiatorItems
+    // above. The "Overview" group keeps its hardcoded "All Differentiators" link.
+    if (item.label === 'Differentiators' && item.groups) {
+      const groups = item.groups.map((group) => {
+        const cat = DIFFERENTIATOR_CATEGORIES.find((c) => c.label === group.groupLabel);
+        if (!cat) return group;
+        return {
+          ...group,
+          items: differentiatorItems
+            .filter((i) => i.category === cat.id)
+            .map((i): NavChild => ({ label: i.title, path: `/differentiators/${i.slug}` })),
+        };
+      });
+      return { ...item, groups };
+    }
     return item;
   });
 
   const renderNavItem = (item: NavItem) => (
     <li
       key={item.label}
-      className={`nav-item${openItem === item.label ? ' nav-item--open' : ''}${item.label === 'Placements' ? ' nav-item--placements' : ''}`}
+      className={`nav-item${openItem === item.label ? ' nav-item--open' : ''}${(item.children?.length ?? 0) >= 9 ? ' nav-item--wide-dropdown' : ''}`}
       onMouseEnter={() => setOpenItem(item.label)}
       onFocus={() => setOpenItem(item.label)}
       onMouseLeave={() => setOpenItem((prev) => (prev === item.label ? null : prev))}
