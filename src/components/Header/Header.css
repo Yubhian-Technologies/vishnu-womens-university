@@ -658,13 +658,8 @@ a.mega-group-label:hover {
   color: var(--color-accent);
 }
 
-/* ===== Responsive =====
-   1650px (not the more typical ~1024-1280px breakpoint) is deliberate:
-   the mega-menus (e.g. Academics' 5 columns of UG/PG/Ph.D. programme
-   names) need real horizontal room between the header's logo and
-   Visit/Give/Apply pods to lay out without cramming into misaligned
-   multi-line wraps, and that room only exists this wide. */
-@media (max-width: 1650px) {
+/* ===== Responsive ===== */
+@media (max-width: 1400px) {
   .nav {
     display: none;
   }
@@ -674,12 +669,12 @@ a.mega-group-label:hover {
 }
 
 /* Whenever the CTA pod is still visible (i.e. above the 640px width where
-   it gets hidden below) but .nav isn't (≤1650px), its own margin-left:auto
+   it gets hidden below) but .nav isn't (≤1400px), its own margin-left:auto
    above is already doing the job of pulling both it and the toggle over to
    the right together — a second margin-left:auto here as well would split
    the free space between the two gaps instead of collapsing it into one,
    stranding the CTA pod away from the toggle with its own empty gap. */
-@media (min-width: 641px) and (max-width: 1650px) {
+@media (min-width: 641px) and (max-width: 1400px) {
   .mobile-toggle {
     margin-left: 0;
   }
