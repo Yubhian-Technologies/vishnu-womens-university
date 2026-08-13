@@ -58,10 +58,11 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   {
-    // "Discover"'s old groups (Governance/Committees/IQAC/Information) now
-    // live here too, alongside About Us's own items — no longer its own
-    // top-level nav item. Committees (13 items) auto-splits into two
-    // sub-columns (see .mega-group-list.cols-2 in Header.css).
+    // "Discover"'s old groups (Governance/Committees/IQAC) now live here
+    // too, alongside About Us's own items — no longer its own top-level
+    // nav item. Committees (13 items) auto-splits into two sub-columns
+    // (see .mega-group-list.cols-2 in Header.css). Information dropped
+    // (2026-08-13) since it's now under Academics instead.
     label: 'About Us',
     groups: [
       {
@@ -118,18 +119,6 @@ const navItems: NavItem[] = [
           { label: 'Annual Reports & Reforms', path: '/governance/annual-reports' },
           { label: 'MHRD NIRF Reports', path: '/governance/nirf-reports' },
           { label: 'NBA – Data Capturing Points', path: '/governance/nba-data' },
-        ],
-      },
-      {
-        groupLabel: 'Information',
-        groupPath: '/information',
-        items: [
-          { label: 'Academic Calendar', path: '/information#academic-calendar' },
-          { label: 'List of Holidays', path: '/information#holidays' },
-          { label: 'How to Reach', path: '/information#how-to-reach' },
-          { label: 'Counselling Scheme', path: '/information#counselling' },
-          { label: 'ICT Platforms', path: '/information#ict-platforms' },
-          { label: 'Other Practices', path: '/information#other-practices' },
         ],
       },
     ],
@@ -539,15 +528,17 @@ export default function Header() {
   // grow leftward, so they can reach the logo pod instead. Most menus have
   // plenty of room and should keep their comfortable CSS min-width; only
   // when that natural size would actually overlap the relevant pod do we
-  // override both min- and max-width (min-width normally beats max-width,
-  // so max-width alone can't shrink a menu below the CSS floor) to the
-  // room actually available, so the menu wraps its columns taller instead
-  // of overlapping.
+  // override both min-width and width (min-width normally beats max-width,
+  // so max-width alone can't shrink a menu below the CSS floor — and an
+  // explicit width, rather than max-width, is what makes flex-wrap lay the
+  // columns out predictably at the constrained size instead of collapsing
+  // to a single narrow column) to the room actually available, so the menu
+  // wraps its columns onto more rows instead of overlapping.
   useEffect(() => {
     const el = openItem ? megaRefs.current[openItem] : null;
     if (!el) return;
     el.style.minWidth = '';
-    el.style.maxWidth = '';
+    el.style.width = '';
     const idx = renderedNavItems.findIndex((i) => i.label === openItem);
     const isRightAnchored = idx !== -1 && idx >= renderedNavItems.length - 2;
     const podEl = document.querySelector<HTMLElement>(isRightAnchored ? '.header-end--logo' : '.header-end--cta');
@@ -560,7 +551,7 @@ export default function Header() {
       : podRect.left - rect.left - margin;
     if (available > 0 && available < rect.width) {
       el.style.minWidth = '0';
-      el.style.maxWidth = `${available}px`;
+      el.style.width = `${available}px`;
     }
   }, [openItem, renderedNavItems]);
 

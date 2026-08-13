@@ -357,6 +357,7 @@
   left: 0;
   transform: translateX(0) translateY(-10px);
   display: flex;
+  flex-wrap: wrap;
   gap: 0;
   min-width: 680px;
   padding: 0;
@@ -373,11 +374,16 @@
 }
 
 
+/* min-width (rather than 0) is deliberate: combined with .dropdown-mega's
+   flex-wrap above, a group would otherwise just keep shrinking to stay on
+   one row, cramming every column too narrow to read comfortably once the
+   JS pod-overlap clamp (see Header.tsx) caps the menu's overall width.
+   Below that floor a group wraps onto its own row instead. */
 .mega-group {
-  flex: 1;
-  padding: var(--space-3) var(--space-2);
+  flex: 1 1 210px;
+  padding: var(--space-3) var(--space-4);
   border-right: 1px solid var(--color-light-gray);
-  min-width: 0;
+  min-width: 210px;
 }
 
 .mega-group:last-child {
@@ -389,7 +395,8 @@
    row, or its sub-columns end up far too narrow and every item wraps
    heavily. */
 .mega-group:has(.mega-group-list.cols-2) {
-  flex: 1.8;
+  flex: 1.8 1 340px;
+  min-width: 340px;
 }
 
 .mega-group-label {
