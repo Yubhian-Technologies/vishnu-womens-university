@@ -520,24 +520,28 @@ export default function Header() {
     };
   }, [openItem]);
 
-  // Mega-menus wide enough (many columns of real content) can run past one
-  // of the header's dark end-pods and get visually overlapped by it. The
-  // last two nav items' dropdowns are right-anchored (see the
-  // nth-last-child rule in Header.css) and grow leftward from their
-  // trigger, so they're clamped against the logo pod the same way the
-  // default left-anchored ones are clamped against the Visit/Give/Apply
-  // pod. Left-anchored ones are also *repositioned* (via --mega-shift) to
-  // start right after the logo pod rather than at their own trigger — the
-  // full gap between the two pods is real room a many-column menu (e.g.
-  // Academics, 2nd from the left) would otherwise never get to use just
-  // because its trigger happens to sit closer to the middle of the bar.
-  // Clamping sets an explicit width (not max-width): a shrink-to-fit auto
-  // width on this flex row doesn't reliably use all of a max-width budget
-  // once min-width is overridden down to 0, so max-width alone could still
-  // render narrower than the room actually available.
+  // Mega-menus are centered on their trigger by default (see .dropdown-mega
+  // in Header.css), same as a flat dropdown — the width/height of the menu
+  // and the position of the trigger that opened it don't otherwise matter.
+  // The only time that changes is when centering would run the menu into
+  // one of the header's dark end-pods (e.g. Research, mid-bar, opening a
+  // wide menu can reach the Visit/Give/Apply pod on the right): then it's
+  // nudged left/right via --mega-shift just enough to clear that pod,
+  // rather than always anchoring to one side — which was the previous
+  // approach, and is exactly what made a menu look like it opened
+  // "sometimes centered, sometimes off to a side" depending on viewport
+  // width. Right-anchored menus (the last two nav items — see the
+  // nth-last-child rule in Header.css) don't need centering since right:0
+  // already positions them consistently; they still get the same nudge
+  // against the logo pod. Width is only reduced (via an explicit width,
+  // not max-width — min-width otherwise wins the conflict, and a
+  // shrink-to-fit auto width doesn't reliably fill a max-width budget
+  // once min-width is overridden to 0) if the menu genuinely can't fit
+  // even using the full gap between both pods.
   useEffect(() => {
     const el = openItem ? megaRefs.current[openItem] : null;
-    if (!el) return;
+    const triggerEl = el?.parentElement;
+    if (!el || !triggerEl) return;
     el.style.minWidth = '';
     el.style.width = '';
     el.style.removeProperty('--mega-shift');
@@ -549,26 +553,52 @@ export default function Header() {
     const margin = 24;
     const logoRect = logoEl.getBoundingClientRect();
     const ctaRect = ctaEl.getBoundingClientRect();
-    const rect = el.getBoundingClientRect();
+    const safeLeft = logoRect.right + margin;
+    const safeRight = ctaRect.left - margin;
+    // Width is trustworthy to read off the dropdown itself (transform
+    // doesn't affect it), but its *position* can still be mid-transition
+    // right after the reset above (transform is a transitioned property),
+    // so the natural, unshifted position is computed from the trigger's
+    // own (never-transformed) geometry instead of trusting the dropdown's
+    // own rect.left/right.
+    const width = el.getBoundingClientRect().width;
+    const triggerRect = triggerEl.getBoundingClientRect();
 
     if (isRightAnchored) {
-      const available = rect.right - logoRect.right - margin;
-      if (available > 0 && available < rect.width) {
+      const available = triggerRect.right - logoRect.right - margin;
+      // Decide the final width *before* using it to judge whether a shift
+      // is needed — shifting to fit the natural width, only to separately
+      // clamp that width smaller afterward, leaves the (now too-large)
+      // shift wildly overshooting for the actually-rendered size.
+      const finalWidth = available > 0 && available < width ? available : width;
+      if (finalWidth < width) {
         el.style.minWidth = '0';
-        el.style.width = `${available}px`;
+        el.style.width = `${finalWidth}px`;
+      }
+      const naturalLeft = triggerRect.right - finalWidth;
+      if (naturalLeft < safeLeft) {
+        el.style.setProperty('--mega-shift', `${safeLeft - naturalLeft}px`);
       }
       return;
     }
 
-    const desiredLeft = logoRect.right + margin;
-    const shift = Math.min(0, desiredLeft - rect.left);
-    if (shift < 0) {
-      el.style.setProperty('--mega-shift', `${shift}px`);
-    }
-    const available = ctaRect.left - desiredLeft - margin;
-    if (available > 0 && available < rect.width) {
+    const available = safeRight - safeLeft;
+    const finalWidth = available > 0 && available < width ? available : width;
+    if (finalWidth < width) {
       el.style.minWidth = '0';
-      el.style.width = `${available}px`;
+      el.style.width = `${finalWidth}px`;
+    }
+    const naturalCenter = triggerRect.left + triggerRect.width / 2;
+    const naturalLeft = naturalCenter - finalWidth / 2;
+    const naturalRight = naturalCenter + finalWidth / 2;
+    let shift = 0;
+    if (naturalRight > safeRight) {
+      shift = safeRight - naturalRight;
+    } else if (naturalLeft < safeLeft) {
+      shift = safeLeft - naturalLeft;
+    }
+    if (shift !== 0) {
+      el.style.setProperty('--mega-shift', `${shift}px`);
     }
   }, [openItem, renderedNavItems]);
 

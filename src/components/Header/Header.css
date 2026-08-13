@@ -283,9 +283,17 @@
   transform: translateY(0);
 }
 
+/* Right-anchored: no centering transform needed (right:0 already
+   positions it), just the same optional --mega-shift pod-avoidance nudge
+   as the left-anchored translateX(-50% + shift) above. */
 .nav-item:nth-last-child(-n+2) .dropdown.dropdown-mega {
   left: auto;
   right: 0;
+  transform: translateX(var(--mega-shift, 0px)) translateY(-10px);
+}
+
+.nav-item--open:nth-last-child(-n+2) .dropdown.dropdown-mega {
+  transform: translateX(var(--mega-shift, 0px)) translateY(0);
 }
 
 .dropdown-list {
@@ -360,14 +368,15 @@
 
 /* ===== Mega Menu ===== */
 .dropdown.dropdown-mega {
-  left: 0;
-  /* --mega-shift (set from Header.tsx) slides a left-anchored mega-menu
-     off its trigger's position to start right after the logo pod instead
-     — the full gap between the two end-pods is meaningfully wider than
-     the room to the right of any one trigger, so this is what actually
-     lets a many-column menu (e.g. Academics) breathe instead of cramming
-     into whatever's left of wherever its trigger happens to sit. */
-  transform: translateX(var(--mega-shift, 0px)) translateY(-10px);
+  left: 50%;
+  /* Centered on the trigger by default, same as a flat dropdown — the
+     -50% keeps that true regardless of the menu's own width. --mega-shift
+     (set from Header.tsx) nudges it left or right only when centered
+     would overlap one of the header's end-pods; left at 0px the rest of
+     the time, so a menu doesn't inconsistently open dead-center in one
+     spot and hard against a pod in another depending on which trigger
+     opened it or how wide the viewport happens to be. */
+  transform: translateX(calc(-50% + var(--mega-shift, 0px))) translateY(-10px);
   display: flex;
   gap: 0;
   min-width: 680px;
@@ -381,7 +390,7 @@
 }
 
 .nav-item--open .dropdown.dropdown-mega {
-  transform: translateX(var(--mega-shift, 0px)) translateY(0);
+  transform: translateX(calc(-50% + var(--mega-shift, 0px))) translateY(0);
 }
 
 
