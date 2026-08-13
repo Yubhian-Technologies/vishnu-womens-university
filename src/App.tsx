@@ -48,6 +48,7 @@ const NewsAwards = lazy(() => import('./pages/NewsAwards/NewsAwards'));
 const Happenings = lazy(() => import('./pages/NewsAwards/Happenings'));
 const Accreditations = lazy(() => import('./pages/NewsAwards/Accreditations'));
 const GalleryPage = lazy(() => import('./pages/NewsAwards/Gallery'));
+const SocialMedia = lazy(() => import('./pages/NewsAwards/SocialMedia'));
 const Careers = lazy(() => import('./pages/Careers/Careers'));
 const Contact = lazy(() => import('./pages/Contact/Contact'));
 const UGCDisclosure = lazy(() => import('./pages/Disclosures/UGCDisclosure'));
@@ -127,6 +128,7 @@ function PublicApp() {
           <Route path="/news-awards/happenings" element={<Happenings />} />
           <Route path="/news-awards/accreditations-awards" element={<Accreditations />} />
           <Route path="/news-awards/gallery" element={<GalleryPage />} />
+          <Route path="/news-awards/social-media-handles" element={<SocialMedia />} />
           <Route path="/careers" element={<Careers />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/disclosures/ugc" element={<UGCDisclosure />} />
