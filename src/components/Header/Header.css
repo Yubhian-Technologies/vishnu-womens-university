@@ -42,11 +42,14 @@
   padding-left: var(--space-3);
 }
 
-/* Fixed width, sized to comfortably fit Visit + Give + Apply Now — not
+/* Fixed width, sized to comfortably fit just Apply Now — not
    content-sized, so it stays proportional to .header-end-wave's viewBox
-   (which would otherwise stretch/distort at an unpredictable width). */
+   (which would otherwise stretch/distort at an unpredictable width; the
+   viewBox/path themselves don't need to change since preserveAspectRatio
+   ="none" stretches them to whatever width this is, keeping the same
+   dark/cut/white proportions just at a smaller absolute size). */
 .header-end--cta {
-  width: 460px;
+  width: 260px;
   justify-content: flex-end;
   padding-right: var(--space-4);
   /* No-op at desktop widths (.nav's flex:1 already consumes all the free
@@ -119,19 +122,6 @@
   font-family: var(--font-sans);
 }
 
-.topbar-cta.visit,
-.topbar-cta.give {
-  background: transparent;
-  color: var(--color-white);
-  padding-left: 4px;
-  padding-right: 4px;
-}
-
-.topbar-cta.visit:hover,
-.topbar-cta.give:hover {
-  color: var(--color-accent-light);
-}
-
 .topbar-cta.apply {
   background: var(--color-accent);
   color: var(--color-primary-dark);
@@ -157,7 +147,7 @@
   align-items: center;
   height: 100%;
   gap: 2px;
-  transform: translateX(14px);
+  transform: translateX(6px);
 }
 
 .nav-item {
@@ -167,17 +157,13 @@
   align-items: center;
 }
 
-/* Icon-over-label nav buttons — a stacked column per item rather than a
-   single row of text. */
 .nav-link {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
-  padding: 7px 3px;
+  padding: 10px 12px;
   border-radius: var(--radius-lg);
-  font-size: 0.64rem;
+  font-size: 0.72rem;
   font-weight: 700;
   color: var(--color-text-light);
   font-family: var(--font-sans);
@@ -189,11 +175,6 @@
   background: none;
   border: none;
   position: relative;
-}
-
-.nav-link-icon {
-  color: var(--color-text-light);
-  transition: color var(--transition-fast);
 }
 
 .nav-link:hover {
@@ -226,8 +207,7 @@
    can each open/close things on their own, they inevitably disagree with
    each other (this used to be a real bug — see the .nav-item--open comment
    further down for the full story). */
-.nav-item--open .nav-link,
-.nav-item--open .nav-link-icon {
+.nav-item--open .nav-link {
   color: var(--color-primary);
 }
 
@@ -715,8 +695,8 @@ a.mega-group-label:hover {
 }
 
 @media (max-width: 640px) {
-  .header-end--cta {
-    display: none;
+  .topbar-cta.apply {
+    padding: 8px 12px;
   }
   .logo-icon {
     height: 40px;

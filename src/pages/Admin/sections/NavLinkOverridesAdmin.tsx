@@ -15,6 +15,11 @@ const NAV_LINK_OVERRIDES = [
     label: 'Alumni & Giving → Success Stories',
     defaultPath: '/alumni-giving#successstories',
   },
+  {
+    id: 'header-apply-now',
+    label: 'Header → Apply Now button',
+    defaultPath: '/admissions',
+  },
 ];
 
 function isValidTarget(url: string) {

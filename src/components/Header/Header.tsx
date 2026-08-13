@@ -1,25 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, GraduationCap, FileText, Briefcase, FlaskConical, Sparkles, Users, Calendar, MapPin, Heart, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useNavLinkOverride } from '../../hooks/useNavLinkOverride';
 import type { ProgramDoc } from '../../pages/Admin/sections/ProgramsAdmin';
 import SmoothCollapse from '../SmoothCollapse/SmoothCollapse';
 import './Header.css';
-
-// One icon per top-level nav label, matching the icon+label nav design.
-// Falls through to no icon for any label not listed here, so a future
-// nav restructure doesn't need to touch this to keep working.
-const NAV_ICONS: Record<string, typeof Home> = {
-  'About Us': Home,
-  'Academics': GraduationCap,
-  'Admissions': FileText,
-  'Placements': Briefcase,
-  'Research': FlaskConical,
-  'Differentiators': Sparkles,
-  'Campus Life': Users,
-  'News & Events': Calendar,
-};
 
 // Straight diagonal dividers for the header's two dark end-sections (logo
 // section on the left, Visit/Give/Apply section on the right — see
@@ -337,6 +323,9 @@ export default function Header() {
   // Decoupled from Placements' own "Success Stories" item, which stays hardcoded.
   // Default target is AlumniGiving.tsx's own "#successstories" section, not Placements.
   const alumniSuccessStories = useNavLinkOverride('alumni-success-stories', '/alumni-giving#successstories');
+  // Header's Apply Now button — admin can repoint it (e.g. to a specific
+  // admissions cycle or an external application portal) without a deploy.
+  const headerApplyNow = useNavLinkOverride('header-apply-now', '/admissions');
 
   const { docs: programs } = useOrderedCollection<ProgramDoc>('programs', 'order');
   const programItem = (p: ProgramDoc): NavChild => ({ label: p.name, path: `/academics/${p.slug}` });
@@ -377,9 +366,7 @@ export default function Header() {
     return item;
   });
 
-  const renderNavItem = (item: NavItem) => {
-    const Icon = NAV_ICONS[item.label];
-    return (
+  const renderNavItem = (item: NavItem) => (
     <li
       key={item.label}
       className={`nav-item${openItem === item.label ? ' nav-item--open' : ''}${item.label === 'Placements' ? ' nav-item--placements' : ''}`}
@@ -393,7 +380,6 @@ export default function Header() {
         aria-expanded={openItem === item.label}
         onClick={() => setOpenItem((prev) => (prev === item.label ? null : item.label))}
       >
-        {Icon && <Icon className="nav-link-icon" size={17} strokeWidth={1.75} aria-hidden="true" />}
         <span className="nav-link-label">{item.label}</span>
       </button>
 
@@ -485,8 +471,7 @@ export default function Header() {
         </div>
       )}
     </li>
-    );
-  };
+  );
 
   useEffect(() => {
     const handleScroll = () => {
@@ -641,23 +626,23 @@ export default function Header() {
             </ul>
           </nav>
 
-          {/* Visit/Give/Apply section — dark, wave-edged on the left
-              (mirrored), flush at the header's right edge. Visit/Give are
-              plain icon+text; Apply Now is styled as an actual button. */}
+          {/* Apply Now section — dark, wave-edged on the left (mirrored),
+              flush at the header's right edge. Its destination is
+              admin-editable (see headerApplyNow above). */}
           <div className="header-end header-end--cta">
             <svg className="header-end-wave header-end-wave--mirror" viewBox={END_WAVE_VIEWBOX} preserveAspectRatio="none" aria-hidden="true">
               <path d={CTA_WAVE_PATH} fill="var(--color-primary-dark)" stroke="var(--color-accent)" strokeWidth="2" />
             </svg>
             <div className="header-ctas">
-              <Link to="/admissions" className="topbar-cta visit">
-                <MapPin size={16} strokeWidth={2} aria-hidden="true" /> Visit
-              </Link>
-              <Link to="/alumni-giving" className="topbar-cta give">
-                <Heart size={16} strokeWidth={2} aria-hidden="true" /> Give
-              </Link>
-              <Link to="/admissions" className="topbar-cta apply">
-                Apply Now <ArrowRight size={16} strokeWidth={2.5} aria-hidden="true" />
-              </Link>
+              {headerApplyNow.external ? (
+                <a href={headerApplyNow.path} className="topbar-cta apply" target="_blank" rel="noopener noreferrer">
+                  Apply Now <ArrowRight size={16} strokeWidth={2.5} aria-hidden="true" />
+                </a>
+              ) : (
+                <Link to={headerApplyNow.path} className="topbar-cta apply">
+                  Apply Now <ArrowRight size={16} strokeWidth={2.5} aria-hidden="true" />
+                </Link>
+              )}
             </div>
           </div>
 
