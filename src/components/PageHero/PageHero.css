@@ -75,6 +75,22 @@
   padding-bottom: 3rem;
   width: 100%;
   max-width: 780px;
+  /* .container (shared with this element — see PageHero.tsx) sets
+     margin: 0 auto, which centers this narrower 780px column in the
+     middle of the banner instead of pinning it to the left edge like the
+     rest of the site's left-aligned content. Cancel that here so the
+     title/subtitle column starts flush at the container's left padding,
+     with only .container's own horizontal padding as the edge gap. */
+  margin-left: 0;
+  /* A second, older ".page-hero-content { padding: var(--space-20) 0 }"
+     rule in global.css (predates this component; still used directly by
+     a few hand-rolled detail-page heroes that share this class name)
+     zeroes out horizontal padding via that shorthand's "0" — since this
+     rule only sets padding-top/padding-bottom, the older rule's left/right
+     values otherwise win by load order. Set them explicitly here to match
+     .container's own edge padding instead of relying on the cascade. */
+  padding-left: var(--space-8);
+  padding-right: var(--space-8);
 }
 
 .page-hero__title {
@@ -135,7 +151,12 @@
   transform: translateY(-50%) scale(1.08);
 }
 
-.page-hero__arrow--prev { left: 1.25rem; }
+/* Both arrows cluster on the right rather than splitting left/right —
+   .page-hero-content now starts flush at the container's left edge (see
+   above), so a left-anchored prev arrow would sit on top of the title/
+   subtitle/CTA text instead of in empty space like it used to when that
+   column floated centered. */
+.page-hero__arrow--prev { right: 4.5rem; }
 .page-hero__arrow--next { right: 1.25rem; }
 
 /* ---- Dots ---- */
@@ -204,6 +225,11 @@
   .page-hero--small  { min-height: 260px; }
 
   .page-hero__arrow { width: 36px; height: 36px; font-size: 1.2rem; }
-  .page-hero__arrow--prev { left: 0.5rem; }
+  .page-hero__arrow--prev { right: 3rem; }
   .page-hero__arrow--next { right: 0.5rem; }
+
+  /* Match .container's own mobile padding reduction (global.css) — see
+     the padding-left/right override above for why this can't just fall
+     through from .container on its own. */
+  .page-hero-content { padding-left: var(--space-4); padding-right: var(--space-4); }
 }

@@ -13,7 +13,6 @@
   min-height: 340px;
   display: flex;
   align-items: center;
-  justify-content: center;
   background: linear-gradient(135deg, var(--color-primary) 0%, #0f2d5c 60%, #1a4a8a 100%);
   overflow: hidden;
 }
@@ -27,9 +26,8 @@
 
 .contact-hero__content {
   position: relative;
-  text-align: center;
   color: var(--color-white);
-  padding: 4rem 2rem;
+  padding: 4rem 0;
 }
 
 .contact-hero__eyebrow {
@@ -44,6 +42,11 @@
   font-family: var(--font-serif);
   font-size: clamp(2.2rem, 5vw, 3.5rem);
   font-weight: 800;
+  /* h1 { color: var(--color-text) } in global.css is an explicit rule, so
+     it wins over .contact-hero__content's inherited white — without this,
+     the title renders in the site's dark body-text color and disappears
+     against this section's own dark gradient background. */
+  color: var(--color-white);
   margin-bottom: 1rem;
 }
 
@@ -51,7 +54,7 @@
   font-size: 1.1rem;
   opacity: 0.85;
   max-width: 540px;
-  margin: 0 auto;
+  margin: 0;
   line-height: 1.6;
 }
 

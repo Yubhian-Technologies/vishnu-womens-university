@@ -132,7 +132,7 @@ export default function Contact() {
           className="contact-hero__overlay"
           style={banner?.imageUrl ? { backgroundImage: `url(${banner.imageUrl})` } : undefined}
         />
-        <div className="contact-hero__content">
+        <div className="container contact-hero__content">
           <p className="contact-hero__eyebrow">Get in Touch</p>
           <h1 className="contact-hero__title">{banner?.title || 'Contact Us'}</h1>
           <p className="contact-hero__sub">
