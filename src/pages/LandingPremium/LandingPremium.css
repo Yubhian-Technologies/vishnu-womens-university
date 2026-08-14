@@ -521,8 +521,6 @@
 .lph-campus-exp__link { display: inline-flex; align-items: center; gap: var(--space-2); font-weight: 700; color: var(--color-primary); }
 .lph-campus-exp__photo { position: relative; border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-xl); }
 .lph-campus-exp__photo img { width: 100%; height: 460px; object-fit: cover; }
-.lph-play-btn--lg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80px; height: 80px; }
-.lph-play-btn--lg:hover { transform: translate(-50%, -50%) scale(1.1); }
 
 /* ===== Campus tour ===== */
 .lph-tour { background: var(--color-accent); padding: var(--space-14) 0; }

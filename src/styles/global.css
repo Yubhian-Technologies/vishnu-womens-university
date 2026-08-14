@@ -482,7 +482,19 @@ h6 { font-size: var(--text-lg); }
 .page-hero-content {
   position: relative;
   z-index: 2;
-  padding: var(--space-20) 0;
+  padding-top: var(--space-20);
+  padding-bottom: var(--space-20);
+  /* This element also carries .container (see the five detail pages that
+     use these raw page-hero classes directly instead of <PageHero>) —
+     .container's own margin: 0 auto centers a max-width column instead of
+     pinning it to the left edge like the rest of the site's left-aligned
+     content, so cancel that here. Horizontal padding is likewise set
+     explicitly (not inherited from .container) since this shorthand used
+     to zero it out for both this rule and the shared PageHero.css version
+     of this class. */
+  margin-left: 0;
+  padding-left: var(--space-8);
+  padding-right: var(--space-8);
 }
 
 .page-hero-content h1 {
@@ -550,6 +562,7 @@ h6 { font-size: var(--text-lg); }
 
 @media (max-width: 768px) {
   .container { padding: 0 var(--space-4); }
+  .page-hero-content { padding-left: var(--space-4); padding-right: var(--space-4); }
   .section { padding: var(--space-12) 0; }
   .grid-2, .grid-3, .grid-4, .grid-img-text, .grid-1-2 {
     grid-template-columns: 1fr;
