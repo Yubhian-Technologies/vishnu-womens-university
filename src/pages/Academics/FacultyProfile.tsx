@@ -6,9 +6,11 @@ import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import { useCollection, useOrderedCollection } from '../../hooks/useCollection';
 import { linkify } from '../../lib/linkify';
 import { getSectionBlocks } from '../../lib/facultySections';
+import { getFacultyOverrideSections, isHiddenFacultyRecord } from './facultyContentOverrides.data';
 import FacultySectionContent from '../../components/FacultySectionContent/FacultySectionContent';
 import type { FacultyDoc } from './Faculty';
 import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
+import '../detail-layout.css';
 
 function getInitials(name: string) {
   const cleaned = name.replace(/\b(Dr|Sri|Prof|Mr|Mrs|Ms)\.?\s*/gi, '');
@@ -35,7 +37,8 @@ export default function FacultyProfile() {
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
   const person = allFaculty.find((f) => f.id === id);
-  const sections = person?.sections?.filter((s) => s.title) ?? [];
+  const overrideSections = person ? getFacultyOverrideSections(person.name, person.department) : null;
+  const sections = (overrideSections ?? person?.sections ?? []).filter((s) => s.title);
 
   useEffect(() => {
     if (sections.length > 0) setActiveSection((prev) => prev ?? sections[0].title);
@@ -47,6 +50,7 @@ export default function FacultyProfile() {
 
   if (!loading && !person) return <Navigate to="/faculty" replace />;
   if (!person) return null;
+  if (isHiddenFacultyRecord(person.name, person.department)) return <Navigate to="/faculty" replace />;
 
   const isHod = person.designation.toLowerCase().includes('hod') || person.designation.toLowerCase().includes('head');
   const program = programs.find((p) => p.department === person.department);
@@ -127,32 +131,37 @@ export default function FacultyProfile() {
           </div>
 
           {sections.length > 0 && (
-            <div className="detail-grid">
+            <div className="faculty-sections-grid">
+              <div className="faculty-sections-nav">
+                <div style={{ position: 'sticky', top: '110px' }}>
+                  <p style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--color-text-light)', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '0 0 var(--space-2) var(--space-1)' }}>
+                    Profile Sections
+                  </p>
+                  <div style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
+                    {sections.map((s) => {
+                      const isActive = active?.title === s.title;
+                      return (
+                        <button
+                          key={s.title}
+                          onClick={() => setActiveSection(s.title)}
+                          style={{
+                            display: 'block', width: '100%', textAlign: 'left',
+                            padding: 'var(--space-3) var(--space-5)', border: 'none',
+                            borderBottom: '1px solid var(--color-light-gray)',
+                            background: isActive ? 'var(--color-primary)' : 'transparent',
+                            color: isActive ? 'var(--color-white)' : 'var(--color-primary)',
+                            fontWeight: isActive ? 700 : 600, fontSize: 'var(--text-sm)', cursor: 'pointer',
+                          }}
+                        >
+                          {s.title}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
               <div>
                 {active && <FacultySectionContent blocks={getSectionBlocks(active)} />}
-              </div>
-              <div className="detail-sidebar">
-                <div style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', overflow: 'hidden', position: 'sticky', top: '110px' }}>
-                  {sections.map((s) => {
-                    const isActive = active?.title === s.title;
-                    return (
-                      <button
-                        key={s.title}
-                        onClick={() => setActiveSection(s.title)}
-                        style={{
-                          display: 'block', width: '100%', textAlign: 'left',
-                          padding: 'var(--space-3) var(--space-5)', border: 'none',
-                          borderBottom: '1px solid var(--color-light-gray)',
-                          background: isActive ? 'var(--color-primary)' : 'transparent',
-                          color: isActive ? 'var(--color-white)' : 'var(--color-primary)',
-                          fontWeight: isActive ? 700 : 600, fontSize: 'var(--text-sm)', cursor: 'pointer',
-                        }}
-                      >
-                        {s.title}
-                      </button>
-                    );
-                  })}
-                </div>
               </div>
             </div>
           )}
