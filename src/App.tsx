@@ -9,7 +9,9 @@ import { smoothScrollTo } from './lib/smoothScroll';
 
 const Academics = lazy(() => import('./pages/Academics/Academics'));
 const ProgramDetail = lazy(() => import('./pages/Academics/ProgramDetail'));
+const FreshmanEngineering = lazy(() => import('./pages/Academics/FreshmanEngineering'));
 const Faculty = lazy(() => import('./pages/Academics/Faculty'));
+const FacultyProfile = lazy(() => import('./pages/Academics/FacultyProfile'));
 const AcademicDownloads = lazy(() => import('./pages/Academics/Downloads'));
 const CurriculumMatrix = lazy(() => import('./pages/Academics/CurriculumMatrix'));
 const Admissions = lazy(() => import('./pages/Admissions/Admissions'));
@@ -90,8 +92,10 @@ function PublicApp() {
           <Route path="/academics" element={<Academics />} />
           <Route path="/academics/downloads" element={<AcademicDownloads />} />
           <Route path="/academics/curriculum" element={<CurriculumMatrix />} />
+          <Route path="/academics/freshman-engineering" element={<FreshmanEngineering />} />
           <Route path="/academics/:slug" element={<ProgramDetail />} />
           <Route path="/faculty" element={<Faculty />} />
+          <Route path="/faculty/:id" element={<FacultyProfile />} />
           <Route path="/admissions" element={<Admissions />} />
           <Route path="/student-life" element={<StudentLife />} />
           <Route path="/alumni-giving" element={<AlumniGiving />} />

@@ -6,8 +6,14 @@ import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
 import ImageUploader from '../../../components/ImageUploader/ImageUploader';
 import type { UploadResult } from '../../../lib/storage';
+import {
+  type FacultyFact, type FacultySection,
+  factsToText, textToFacts, sectionsToText, textToSections, getSectionBlocks,
+} from '../../../lib/facultySections';
 
-interface FacultyDoc {
+export type { FacultyFact, FacultySection };
+
+export interface FacultyDoc {
   id: string;
   name: string;
   designation: string;
@@ -18,19 +24,41 @@ interface FacultyDoc {
   imageUrl: string;
   storagePath: string;
   order: number;
+  /** Optional richer profile — shown on that person's own full profile
+   *  page (FacultyProfile.tsx) below the basic card fields above. Free-
+   *  form because different people (and different departments — a CSE
+   *  professor's profile looks nothing like a Mathematics HOD's) need
+   *  different sections; a fixed schema can't cover that. Both are
+   *  optional so existing simple faculty records (just name/designation/
+   *  qualification/photo) keep working unchanged. */
+  facts?: FacultyFact[];
+  sections?: FacultySection[];
 }
 
 const EMPTY: Omit<FacultyDoc, 'id'> = {
   name: '', designation: 'Assistant Professor', department: 'CSE',
   qualification: '', specialization: '', email: '', imageUrl: '', storagePath: '', order: 0,
+  facts: [], sections: [],
 };
 
-const DEPARTMENTS = ['CSE', 'AI&ML', 'AI&DS', 'Cyber Security', 'IT', 'ECE', 'EEE', 'Civil', 'Mechanical', 'MBA'];
-const DESIGNATIONS = ['Professor & HOD', 'Professor', 'Associate Professor', 'Assistant Professor'];
+// CSE…MBA are degree departments shown on the main Academics → Faculty
+// page; Mathematics/Physics/Chemistry/English are the first-year
+// foundation departments shown on the Freshman Engineering page instead
+// (src/pages/Academics/FreshmanEngineering.tsx) — both read from this same
+// collection, just filtered to a different department list per page.
+const DEPARTMENTS = ['CSE', 'AI&ML', 'AI&DS', 'Cyber Security', 'IT', 'ECE', 'EEE', 'Civil', 'Mechanical', 'MBA', 'Mathematics', 'Physics', 'Chemistry', 'English'];
+const DESIGNATIONS = ['Professor & HOD', 'Professor & Head', 'Professor', 'Associate Professor', 'Assoc. Professor', 'Assistant Professor', 'Asst. Professor'];
+
+interface FormState extends Omit<FacultyDoc, 'id' | 'facts' | 'sections'> {
+  factsText: string;
+  sectionsText: string;
+}
+
+const EMPTY_FORM: FormState = { ...EMPTY, factsText: '', sectionsText: '' };
 
 export default function FacultyAdmin() {
-  const { docs: faculty, loading } = useOrderedCollection<FacultyDoc>('faculty', 'name');
-  const [form, setForm] = useState<Omit<FacultyDoc, 'id'>>(EMPTY);
+  const { docs: faculty, loading } = useOrderedCollection<FacultyDoc>('faculty', 'order');
+  const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [editing, setEditing] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [filterDept, setFilterDept] = useState('All');
@@ -39,7 +67,7 @@ export default function FacultyAdmin() {
   const [bulkText, setBulkText] = useState('');
   const [bulkImporting, setBulkImporting] = useState(false);
 
-  const set = (k: string, v: string | number) => setForm((p) => ({ ...p, [k]: v }));
+  const set = (k: keyof FormState, v: string | number) => setForm((p) => ({ ...p, [k]: v }));
   const handleImage = (r: UploadResult) => setForm((p) => ({ ...p, imageUrl: r.url, storagePath: r.path }));
 
   // Pastes a whole roster at once — "Name | Designation | Qualification | Specialization | Email"
@@ -61,6 +89,7 @@ export default function FacultyAdmin() {
           specialization: specialization || '',
           email: email || '',
           imageUrl: '', storagePath: '',
+          facts: [], sections: [],
           order: order++,
           createdAt: serverTimestamp(),
         });
@@ -75,12 +104,19 @@ export default function FacultyAdmin() {
     if (!form.name) return alert('Name is required.');
     setSaving(true);
     try {
+      const payload = {
+        name: form.name, designation: form.designation, department: form.department,
+        qualification: form.qualification, specialization: form.specialization,
+        email: form.email, imageUrl: form.imageUrl, storagePath: form.storagePath, order: form.order,
+        facts: textToFacts(form.factsText),
+        sections: textToSections(form.sectionsText),
+      };
       if (editing) {
-        await updateDoc(doc(db, 'faculty', editing), { ...form });
+        await updateDoc(doc(db, 'faculty', editing), payload);
       } else {
-        await addDoc(collection(db, 'faculty'), { ...form, createdAt: serverTimestamp() });
+        await addDoc(collection(db, 'faculty'), { ...payload, createdAt: serverTimestamp() });
       }
-      setForm(EMPTY); setEditing(null);
+      setForm(EMPTY_FORM); setEditing(null);
     } catch (e) {
       alert(`Couldn't save: ${(e as Error).message}`);
     } finally { setSaving(false); }
@@ -88,9 +124,12 @@ export default function FacultyAdmin() {
 
   const startEdit = (f: FacultyDoc) => {
     setEditing(f.id);
-    setForm({ name: f.name, designation: f.designation, department: f.department,
-               qualification: f.qualification, specialization: f.specialization,
-               email: f.email, imageUrl: f.imageUrl, storagePath: f.storagePath, order: f.order });
+    setForm({
+      name: f.name, designation: f.designation, department: f.department,
+      qualification: f.qualification, specialization: f.specialization,
+      email: f.email, imageUrl: f.imageUrl, storagePath: f.storagePath, order: f.order,
+      factsText: factsToText(f.facts), sectionsText: sectionsToText(f.sections),
+    });
   };
 
   const remove = async (id: string) => {
@@ -167,9 +206,47 @@ export default function FacultyAdmin() {
             <label>Email</label>
             <input type="email" value={form.email} onChange={(e) => set('email', e.target.value)} placeholder="faculty@svecw.edu.in" />
           </div>
+          <div className="admin-field admin-field--full">
+            <label>Profile Facts</label>
+            <p className="admin-field__hint">
+              Optional. One per line, as "Label | Value" — shown at the top of this person's full profile page.
+              e.g. Ph.D, Teaching Experience, Employee ID, Contact Number, Website.
+            </p>
+            <textarea rows={5} value={form.factsText} onChange={(e) => set('factsText', e.target.value)} placeholder={'Ph.D | Andhra University, 1994\nTeaching Experience | 34 years\nContact Number | 9440240530'} />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label>Profile Sections</label>
+            <p className="admin-field__hint">
+              Optional. Give each section a title on its own line as "## Section Title" (e.g. Professional
+              Affiliations, Research Papers Published, Awards &amp; Recognitions — every person can have a different
+              set), then write the content underneath in whatever mix you need: plain paragraphs, bullet points
+              (start the line with "- "), and tables (start with a line "TABLE:", then one row per line as
+              "Column | Column | Column", the first row being the headers). A pasted URL becomes a clickable link
+              automatically. Leave a section's title with nothing underneath to show it as "coming soon" for now.
+            </p>
+            <textarea
+              rows={14}
+              value={form.sectionsText}
+              onChange={(e) => set('sectionsText', e.target.value)}
+              placeholder={[
+                '## Professional Affiliations',
+                'Life member of "The Indian Society for Technical Education (ISTE)", with LM-53969 in 2007.',
+                '',
+                '## Research Papers Published',
+                'TABLE:',
+                'Title | Journal | Year',
+                'Deep Learning for X | IEEE Access | 2023',
+                'A Study on Y | Springer | 2022',
+                '',
+                '## Awards & Recognitions',
+                '- Best Faculty Award, 2022',
+                '- Outstanding Reviewer, IEEE, 2021',
+              ].join('\n')}
+            />
+          </div>
         </div>
         <div className="admin-form-actions">
-          {editing && <button className="admin-btn admin-btn--ghost" onClick={() => { setEditing(null); setForm(EMPTY); }}>Cancel</button>}
+          {editing && <button className="admin-btn admin-btn--ghost" onClick={() => { setEditing(null); setForm(EMPTY_FORM); }}>Cancel</button>}
           <button className="admin-btn admin-btn--primary" onClick={save} disabled={saving}>
             {saving ? 'Saving…' : editing ? 'Update' : 'Add Faculty'}
           </button>
@@ -187,7 +264,7 @@ export default function FacultyAdmin() {
         {loading ? <p className="admin-loading">Loading…</p> : (
           <div className="admin-table-wrap">
             <table className="admin-table">
-              <thead><tr><th>Photo</th><th>Name</th><th>Designation</th><th>Department</th><th>Qualification</th><th>Actions</th></tr></thead>
+              <thead><tr><th>Photo</th><th>Name</th><th>Designation</th><th>Department</th><th>Qualification</th><th>Profile</th><th>Actions</th></tr></thead>
               <tbody>
                 {filtered.map((f) => (
                   <tr key={f.id}>
@@ -196,13 +273,14 @@ export default function FacultyAdmin() {
                     <td><span className="admin-badge admin-badge--sm">{f.designation}</span></td>
                     <td>{f.department}</td>
                     <td>{f.qualification}</td>
+                    <td>{(f.sections?.length ?? 0) > 0 ? `${f.sections!.filter((s) => getSectionBlocks(s).length > 0).length}/${f.sections!.length} sections` : '—'}</td>
                     <td>
                       <button className="admin-btn admin-btn--sm" onClick={() => startEdit(f)}>Edit</button>
                       <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(f.id)}>Delete</button>
                     </td>
                   </tr>
                 ))}
-                {filtered.length === 0 && <tr><td colSpan={6} className="admin-empty">No faculty records.</td></tr>}
+                {filtered.length === 0 && <tr><td colSpan={7} className="admin-empty">No faculty records.</td></tr>}
               </tbody>
             </table>
           </div>
