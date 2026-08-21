@@ -5,6 +5,39 @@
   align-items: start;
 }
 
+/* ===== Faculty profile — sections nav (left, fixed width) + content (right) =====
+   Deliberately its own class rather than reusing .detail-grid: that class puts
+   content first/1fr and sidebar second/360px, the opposite order needed here,
+   and a plain grid item stretches to its full track width by default — at the
+   single-column breakpoint that would otherwise blow the nav box out to the
+   page's full width instead of staying compact. */
+.faculty-sections-grid {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: var(--space-10);
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .faculty-sections-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .faculty-sections-nav {
+    max-width: 360px;
+  }
+
+  .faculty-sections-nav > div {
+    position: static !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .faculty-sections-grid {
+    gap: var(--space-6);
+  }
+}
+
 @media (max-width: 900px) {
   .detail-grid {
     grid-template-columns: 1fr;

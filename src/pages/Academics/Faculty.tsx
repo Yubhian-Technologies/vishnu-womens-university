@@ -5,6 +5,7 @@ import PageHero from '../../components/PageHero/PageHero';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import type { FacultyFact, FacultySection } from '../../lib/facultySections';
+import { isHiddenFacultyRecord } from './facultyContentOverrides.data';
 
 export type { FacultyFact, FacultySection };
 
@@ -36,8 +37,16 @@ function getInitials(name: string) {
 }
 
 export default function Faculty() {
-  const { docs: faculty, loading } = useOrderedCollection<FacultyDoc>('faculty', 'order');
+  const { docs: allFaculty, loading } = useOrderedCollection<FacultyDoc>('faculty', 'order');
   const [activeDept, setActiveDept] = useState('All');
+
+  // Duplicate records (same person under a differently-spelled/titled name)
+  // pending manual cleanup in /admin — hidden here so they don't show up
+  // twice on the public site in the meantime.
+  const faculty = useMemo(
+    () => allFaculty.filter((f) => !isHiddenFacultyRecord(f.name, f.department)),
+    [allFaculty]
+  );
 
   useEffect(() => {
     document.title = 'Faculty | Vishnu Womens University';
@@ -71,6 +80,15 @@ export default function Faculty() {
 
   const filtered = activeDept === 'All' ? faculty : faculty.filter((f) => f.department === activeDept);
 
+  // A handful of people are legitimately listed under two departments (e.g.
+  // AI&DS and AI&ML both credit the same faculty member) — that's fine for
+  // per-department browsing, but the headline count should reflect distinct
+  // people, not distinct department listings.
+  const uniqueFacultyCount = useMemo(
+    () => new Set(faculty.map((f) => f.name.trim().toLowerCase())).size,
+    [faculty]
+  );
+
   return (
     <main className="page-wrapper">
       <PageHero
@@ -84,7 +102,7 @@ export default function Faculty() {
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-10)' }}>
             <span className="section-label">Meet the Team</span>
-            <h2 className="section-title">{faculty.length > 0 ? `${faculty.length}+ Faculty Members` : 'Faculty'}</h2>
+            <h2 className="section-title">{uniqueFacultyCount > 0 ? `${uniqueFacultyCount}+ Faculty Members` : 'Faculty'}</h2>
             <p className="section-desc" style={{ margin: '0 auto' }}>
               Browse faculty by department, or view everyone across VWU.
             </p>
