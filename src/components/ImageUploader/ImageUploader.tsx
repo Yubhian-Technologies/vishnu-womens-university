@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import type { UploadResult } from '../../lib/storage';
 import { useImageCropModal } from './useImageCropModal';
 import './ImageUploader.css';
@@ -21,6 +21,13 @@ export default function ImageUploader({
   const inputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(currentUrl ?? null);
   const { openCrop, cropModal, uploading, error } = useImageCropModal(aspect ?? 16 / 9);
+
+  // currentUrl changes out from under this component whenever the caller
+  // switches which record it's editing (e.g. FacultyAdmin reuses one
+  // ImageUploader instance for both "Add" and every faculty member's
+  // "Edit") — without this, the preview stays stuck on whatever was shown
+  // before instead of that record's actual existing photo.
+  useEffect(() => { setPreview(currentUrl ?? null); }, [currentUrl]);
 
   const handleFile = (file: File) => {
     openCrop(file, folder, (result) => {
