@@ -229,7 +229,7 @@ export default function Academics() {
               );
             })}
             {/* Freshman Engineering: first-year foundation coursework, not a degree program of its own */}
-            <div className="dept-card">
+            <Link to="/academics/freshman-engineering" className="dept-card" style={{ textDecoration: 'none' }}>
               <div className="dept-card-top">
                 <span className="dept-icon"><PenTool size={30} strokeWidth={1.75} /></span>
                 <span className="dept-code">FE</span>
@@ -238,8 +238,9 @@ export default function Academics() {
               <p className="dept-desc">The first year of engineering lays the foundation for every student&apos;s academic journey — core principles, critical thinking, and problem-solving through classroom discussion, industry seminars, and hands-on training.</p>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto' }}>
                 <div className="dept-labs">Mathematics · Physics · Chemistry · English</div>
+                <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--color-accent)', fontFamily: 'var(--font-sans)' }}>View →</span>
               </div>
-            </div>
+            </Link>
           </div>
         </div>
       </section>

@@ -368,7 +368,9 @@ export default function ProgramDetail() {
                   {faculty.map((f, i) => (
                     <tr key={f.id} style={{ background: i % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)', borderBottom: '1px solid var(--color-light-gray)' }}>
                       <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text-light)', fontWeight: 600, width: 48 }}>{i + 1}</td>
-                      <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary)', fontWeight: 700 }}>{f.name}</td>
+                      <td style={{ padding: 'var(--space-3) var(--space-4)' }}>
+                        <Link to={`/faculty/${f.id}`} style={{ color: 'var(--color-primary)', fontWeight: 700, textDecoration: 'none' }}>{f.name}</Link>
+                      </td>
                       <td style={{ padding: 'var(--space-3) var(--space-4)' }}>
                         <span style={{
                           display: 'inline-block',

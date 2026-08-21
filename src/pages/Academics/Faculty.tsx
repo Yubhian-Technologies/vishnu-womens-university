@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import './Faculty.css';
 import PageHero from '../../components/PageHero/PageHero';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
-import FacultyModal from '../../components/FacultyModal/FacultyModal';
 import { useOrderedCollection } from '../../hooks/useCollection';
-import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
+import type { FacultyFact, FacultySection } from '../../lib/facultySections';
+
+export type { FacultyFact, FacultySection };
 
 export interface FacultyDoc {
   id: string;
@@ -17,6 +19,10 @@ export interface FacultyDoc {
   imageUrl: string;
   storagePath: string;
   order: number;
+  /** Set via /admin → Faculty; shown on this person's own full profile
+   *  page (FacultyProfile.tsx), not on this grid. */
+  facts?: FacultyFact[];
+  sections?: FacultySection[];
 }
 
 const DEPARTMENTS = ['CSE', 'AI&ML', 'AI&DS', 'Cyber Security', 'IT', 'ECE', 'EEE', 'Civil', 'Mechanical', 'MBA'];
@@ -31,9 +37,7 @@ function getInitials(name: string) {
 
 export default function Faculty() {
   const { docs: faculty, loading } = useOrderedCollection<FacultyDoc>('faculty', 'order');
-  const { docs: programs } = useOrderedCollection<ProgramDoc>('programs', 'name');
   const [activeDept, setActiveDept] = useState('All');
-  const [selected, setSelected] = useState<FacultyDoc | null>(null);
 
   useEffect(() => {
     document.title = 'Faculty | Vishnu Womens University';
@@ -66,10 +70,6 @@ export default function Faculty() {
   }, [faculty]);
 
   const filtered = activeDept === 'All' ? faculty : faculty.filter((f) => f.department === activeDept);
-
-  const selectedProgram = selected
-    ? programs.find((p) => p.department === selected.department)
-    : undefined;
 
   return (
     <main className="page-wrapper">
@@ -110,7 +110,7 @@ export default function Faculty() {
 
           <div className="faculty-grid">
             {filtered.map((f) => (
-              <button key={f.id} className="faculty-card" onClick={() => setSelected(f)}>
+              <Link key={f.id} to={`/faculty/${f.id}`} className="faculty-card">
                 {f.imageUrl ? (
                   <SmoothImage src={f.imageUrl} alt={f.name} className="faculty-card__photo" />
                 ) : (
@@ -121,7 +121,7 @@ export default function Faculty() {
                 {f.qualification && <p className="faculty-card__qualification">{f.qualification}</p>}
                 {f.department && <span className="faculty-card__dept">{f.department}</span>}
                 <span className="faculty-card__view-profile">View Details →</span>
-              </button>
+              </Link>
             ))}
             {!loading && filtered.length === 0 && (
               <p style={{ color: 'var(--color-text-light)', gridColumn: '1 / -1', textAlign: 'center' }}>
@@ -131,10 +131,6 @@ export default function Faculty() {
           </div>
         </div>
       </section>
-
-      {selected && (
-        <FacultyModal faculty={selected} program={selectedProgram} onClose={() => setSelected(null)} />
-      )}
     </main>
   );
 }
