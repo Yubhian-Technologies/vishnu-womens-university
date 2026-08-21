@@ -35,7 +35,7 @@ const staticSlides: Slide[] = [
   {
     id: 2,
     tag: 'Academics',
-    heading: '9 B.Tech Programs\nBuilt for Your\nSuccess',
+    heading: '10 B.Tech Programs\nBuilt for Your\nSuccess',
     description: 'From Computer Science to Civil Engineering — VWU offers undergraduate, postgraduate, and doctoral programs rooted in applied, industry-aligned learning.',
     primaryCta: { label: 'Explore Programs', path: '/academics' },
     secondaryCta: { label: 'Request Info', path: '/admissions' },
