@@ -35,12 +35,12 @@ function textToRows(text: string): PlacementRow[] {
   });
 }
 function offersToText(offers: BranchOfferCount[]): string {
-  return offers.map((o) => `${o.branch} | ${o.offers}`).join('\n');
+  return offers.map((o) => o.eligible != null ? `${o.branch} | ${o.offers} | ${o.eligible}` : `${o.branch} | ${o.offers}`).join('\n');
 }
 function textToOffers(text: string): BranchOfferCount[] {
   return text.split('\n').map((l) => l.trim()).filter(Boolean).map((line) => {
-    const [branch = '', offers = '0'] = line.split('|').map((p) => p.trim());
-    return { branch, offers: Number(offers) || 0 };
+    const [branch = '', offers = '0', eligible] = line.split('|').map((p) => p.trim());
+    return { branch, offers: Number(offers) || 0, ...(eligible ? { eligible: Number(eligible) || 0 } : {}) };
   });
 }
 
@@ -164,8 +164,8 @@ export default function PlacementYearsAdmin() {
             <input value={form.note} onChange={(e) => set('note', e.target.value)} placeholder="Shown in italics above the table, if set" />
           </div>
           <div className="admin-field admin-field--full">
-            <label>Branch-wise Offers (optional — one per line, "Branch | Offers")</label>
-            <textarea rows={4} value={form.branchOffersText} onChange={(e) => set('branchOffersText', e.target.value)} placeholder={'CSE Offers | 268\nECE Offers | 97'} />
+            <label>Branch-wise Offers (optional — one per line, "Branch | Offers | Eligible". Eligible is optional per line — when set, that branch's tile/donut label shows its own placement rate (offers ÷ eligible); when left off, it falls back to that branch's share of the batch total, same as before.)</label>
+            <textarea rows={4} value={form.branchOffersText} onChange={(e) => set('branchOffersText', e.target.value)} placeholder={'CSE Offers | 268 | 207\nECE Offers | 97 | 127'} />
           </div>
           <div className="admin-field admin-field--full">
             <label>Company Rows — one per line, "Company | Selects | Salary"</label>

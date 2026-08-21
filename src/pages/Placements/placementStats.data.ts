@@ -14,6 +14,13 @@ export interface PlacementRow {
 export interface BranchOfferCount {
   branch: string;
   offers: number;
+  /** No. of students eligible for placements in this branch — when set,
+   *  this becomes the denominator for that branch's placement-rate tile/
+   *  donut label (offers / eligible × 100) instead of the batch total.
+   *  Left unset where this figure isn't available, in which case that
+   *  branch falls back to the older "share of the batch's total offers"
+   *  reading (offers / batch total × 100). */
+  eligible?: number;
 }
 
 export interface StudentPlacementRow {
@@ -47,15 +54,25 @@ export const placementYearData: PlacementYear[] = [
     total: 1078,
     salaryLabel: 'Salary (₹)',
     companiesVisited: 102,
+    // Offer counts are unchanged from the original source; `eligible` is
+    // each branch's own eligible-student count, added separately (see the
+    // 2022–2026 branch-wise placement register) so the tiles/donut can show
+    // a genuine per-branch placement rate instead of a share of the total.
+    // AI&ML and Cyber Security are tracked as their own CSE sub-branches
+    // (not folded into the plain CSE row) since they're distinct programs.
+    // MBA has no eligible figure on record, so it keeps reading as its
+    // original share-of-total percentage (see branchPercentage's fallback).
     branchOffers: [
-      { branch: 'AI&DS Offers', offers: 193 },
-      { branch: 'Civil Offers', offers: 36 },
-      { branch: 'CSE Offers', offers: 268 },
-      { branch: 'ECE Offers', offers: 97 },
-      { branch: 'EEE Offers', offers: 78 },
-      { branch: 'IT Offers', offers: 191 },
+      { branch: 'AI&DS Offers', offers: 193, eligible: 137 },
+      { branch: 'Civil Offers', offers: 36, eligible: 45 },
+      { branch: 'CSE Offers', offers: 268, eligible: 207 },
+      { branch: 'CSE(AI&ML) Offers', offers: 137, eligible: 126 },
+      { branch: 'CSE(Cyber Security) Offers', offers: 66, eligible: 60 },
+      { branch: 'ECE Offers', offers: 97, eligible: 127 },
+      { branch: 'EEE Offers', offers: 78, eligible: 57 },
+      { branch: 'IT Offers', offers: 191, eligible: 193 },
       { branch: 'MBA Offers', offers: 16 },
-      { branch: 'Mech. Offers', offers: 60 },
+      { branch: 'Mech. Offers', offers: 60, eligible: 47 },
     ],
     students: [
       { regdNo: '22B01A4501', branch: 'CSE(AI&DS)', studentName: 'Addanki Nikhita', company: 'Capgemini', salary: '₹4,25,000', offers: 1 },
