@@ -66,7 +66,13 @@ export default function LandingEditorial() {
         spotlightPosterUrl={img('research-spotlight')}
         spotlightPosterAlt={alt('research-spotlight', 'VWU research spotlight')}
       />
-      <ResearchStory />
+      <ResearchStory
+        imageOverrides={[
+          { url: img('research-story-1'), alt: alt('research-story-1', 'VWU research') },
+          { url: img('research-story-2'), alt: alt('research-story-2', 'VWU research') },
+          { url: img('research-story-3'), alt: alt('research-story-3', 'VWU research') },
+        ]}
+      />
       <CampusLife images={campusLifeImages} />
       <Placements />
       <Events />
