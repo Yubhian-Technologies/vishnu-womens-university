@@ -13,9 +13,9 @@ const socialLinks = [
 ];
 
 const accreditations = [
-  'NBA Accredited',
-  'NAAC Approved',
-  'UGC Autonomous',
+  'NBA',
+  'NAAC',
+  'UGC',
   'AICTE Approved',
   'JNTUK Affiliated',
 ];
@@ -164,7 +164,6 @@ export default function Footer() {
           <div className="footer-bottom-inner">
             <p className="footer-copyright">
               &copy; {year} Vishnu Women's University. All rights reserved.
-              <span className="footer-credit">Developed by <strong>VISHNU TECH HUB</strong></span>
             </p>
             <nav className="footer-legal" aria-label="Legal links">
               <Link to="/policies-procedures">Policies & Procedures</Link>
@@ -172,6 +171,7 @@ export default function Footer() {
               <Link to="/disclosures/ugc">Disclosures – UGC</Link>
               <Link to="/contact">Contact Us</Link>
             </nav>
+            <span className="footer-credit">Developed by <strong>VISHNU TECH HUB</strong></span>
           </div>
         </div>
       </div>

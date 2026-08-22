@@ -298,7 +298,7 @@ export default function HeroSlider() {
         <div className="hero-recognition-inner">
           <div className="hero-recognition-track">
             {recognitions.map((r, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+              <div key={r.title} style={{ display: 'flex', alignItems: 'center', gap: '2rem', minWidth: 0, flexShrink: 1 }}>
                 <div className="recognition-item">
                   <div className="recognition-icon"><r.icon size={16} strokeWidth={2} color="var(--color-primary-dark)" /></div>
                   <div className="recognition-text">

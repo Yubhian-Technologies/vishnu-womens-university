@@ -296,15 +296,7 @@ export default function Home() {
                 <div key={i} className="activity-card activity-card--skeleton" aria-hidden="true" />
               ))
             ) : (
-              // Doubled so the loop point (translateX -50%) lands exactly on
-              // an identical copy of the start — the standard technique for
-              // a seamless CSS marquee. Every card, including the second
-              // copy, is going to scroll through within one 28s cycle, so
-              // all of them load eagerly: no `loading="lazy"` here — lazy
-              // images that only start decoding the instant they scroll
-              // into frame is what caused the visible stutter/freeze this
-              // strip used to have.
-              [...activityPhotos, ...activityPhotos].map((item, i) => (
+              activityPhotos.map((item, i) => (
                 <div key={i} className="activity-card">
                   <SmoothImage
                     src={item.src}
