@@ -293,13 +293,11 @@ export default function HeroSlider() {
 
 
 
-      {/* Recognition Bar — doubled list + CSS loop (translateX -50%) for a
-          seamless marquee, same technique as the activity strip below; more
-          items than fit a single screen otherwise get cut off at the edge. */}
+      {/* Recognition Bar — static row, evenly spaced across the width. */}
       <div className="hero-recognition" aria-label="Awards and recognitions">
         <div className="hero-recognition-inner">
           <div className="hero-recognition-track">
-            {[...recognitions, ...recognitions].map((r, i) => (
+            {recognitions.map((r, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
                 <div className="recognition-item">
                   <div className="recognition-icon"><r.icon size={16} strokeWidth={2} color="var(--color-primary-dark)" /></div>
@@ -308,7 +306,7 @@ export default function HeroSlider() {
                     <span>{r.source}</span>
                   </div>
                 </div>
-                <div className="recognition-divider" />
+                {i < recognitions.length - 1 && <div className="recognition-divider" />}
               </div>
             ))}
           </div>
