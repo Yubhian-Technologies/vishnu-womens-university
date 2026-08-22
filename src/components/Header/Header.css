@@ -693,10 +693,10 @@ a.mega-group-label:hover {
   .header-end--cta {
     width: auto;
     padding-right: var(--space-3);
-    /* The dark backdrop is normally just the SVG wave's fill — with the
-       wave hidden below, Visit/Give's white text/icons would otherwise
-       render invisible against the plain white header-bar. */
-    background: var(--color-primary-dark);
+    /* White at this breakpoint — Apply Now is the only thing left in this
+       pod (its own gold background/dark text already stand on their own),
+       so there's nothing here that still needs a dark backdrop for contrast. */
+    background: var(--color-white);
     border-top-left-radius: var(--radius-lg);
     border-bottom-left-radius: var(--radius-lg);
   }
