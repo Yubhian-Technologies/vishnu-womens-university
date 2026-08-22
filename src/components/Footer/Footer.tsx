@@ -86,7 +86,6 @@ export default function Footer() {
       {/* Compliance & Disclosures */}
       <div className="footer-compliance">
         <div className="container">
-          <h3 className="footer-col-title">Compliance &amp; Disclosures</h3>
           <div className="footer-compliance-grid">
             {/* Brand */}
             <div className="footer-brand">
@@ -99,7 +98,7 @@ export default function Footer() {
               </Link>
 
               <p className="footer-tagline">
-                Empowering women through knowledge and action. An autonomous institution
+                Empowering women through knowledge and action. A university
                 committed to excellence in engineering education, research, and innovation.
               </p>
 
@@ -165,6 +164,7 @@ export default function Footer() {
           <div className="footer-bottom-inner">
             <p className="footer-copyright">
               &copy; {year} Vishnu Womens University. All rights reserved.
+              <span className="footer-credit">Developed by <strong>VISHNU TECH HUB</strong></span>
             </p>
             <nav className="footer-legal" aria-label="Legal links">
               <Link to="/policies-procedures">Policies & Procedures</Link>
