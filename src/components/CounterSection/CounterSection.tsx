@@ -13,7 +13,7 @@ import './CounterSection.css';
 const defaultCounters: ContentBlockDoc[] = [
   { id: 'default-1', page: 'home', section: 'counters', value: '15000', title: 'Engineers Graduated', desc: 'Alumni strong', icon: 'GraduationCap', slug: '+', order: 0 },
   { id: 'default-2', page: 'home', section: 'counters', value: '250', title: 'Experienced Faculty', desc: 'Expert educators', icon: 'Presentation', slug: '+', order: 1 },
-  { id: 'default-3', page: 'home', section: 'counters', value: '1100', title: 'Placements', desc: '2025-26', icon: 'Briefcase', slug: '+', order: 2 },
+  { id: 'default-3', page: 'home', section: 'counters', value: '1100', title: 'Placements', desc: '2025-2026', icon: 'Briefcase', slug: '+', order: 2 },
   { id: 'default-4', page: 'home', section: 'counters', value: '2500', title: 'Research Publications', desc: 'International journals', icon: 'FileText', slug: '+', order: 3 },
   { id: 'default-5', page: 'home', section: 'counters', value: '90', title: 'Patents Filed', desc: 'Innovations & inventions', icon: 'Trophy', slug: '+', order: 4 },
   { id: 'default-7', page: 'home', section: 'counters', value: '500', title: 'Industry Partners', desc: 'Recruiting & collaborating', icon: 'Factory', slug: '+', order: 5 },

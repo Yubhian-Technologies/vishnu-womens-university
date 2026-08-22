@@ -63,7 +63,7 @@ export default function FacultySectionContent({ blocks }: { blocks: SectionBlock
               <tbody>
                 {block.rows.map((row, ri) => (
                   <tr key={ri} style={{ background: ri % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)' }}>
-                    {row.map((cell, ci) => <td key={ci} style={TABLE_TD_STYLE}>{linkify(cell)}</td>)}
+                    {row.cells.map((cell, ci) => <td key={ci} style={TABLE_TD_STYLE}>{linkify(cell)}</td>)}
                   </tr>
                 ))}
               </tbody>

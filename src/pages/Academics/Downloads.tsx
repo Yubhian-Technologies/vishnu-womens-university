@@ -10,7 +10,7 @@ export default function AcademicDownloads() {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    document.title = 'Academic Documents | Vishnu Womens University';
+    document.title = "Academic Documents | Vishnu Women's University";
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {

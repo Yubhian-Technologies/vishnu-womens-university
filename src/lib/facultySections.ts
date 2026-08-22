@@ -20,7 +20,10 @@ export interface FacultyFact {
 export type SectionBlock =
   | { type: 'paragraph'; text: string }
   | { type: 'bullets'; items: string[] }
-  | { type: 'table'; headers: string[]; rows: string[][] };
+  // `rows` wraps each row in an object (not a bare string[]) because
+  // Firestore rejects arrays nested directly inside arrays — a plain
+  // string[][] fails on save with "Nested arrays are not supported".
+  | { type: 'table'; headers: string[]; rows: { cells: string[] }[] };
 
 export interface FacultySection {
   title: string;
@@ -83,7 +86,7 @@ function parseSectionBody(text: string): SectionBlock[] {
       }
       if (rows.length > 0) {
         const [headers, ...body] = rows;
-        blocks.push({ type: 'table', headers, rows: body });
+        blocks.push({ type: 'table', headers, rows: body.map((cells) => ({ cells })) });
       }
       continue;
     }
@@ -109,7 +112,7 @@ function blocksToText(blocks: SectionBlock[]): string {
     .map((b) => {
       if (b.type === 'paragraph') return b.text;
       if (b.type === 'bullets') return b.items.map((it) => `- ${it}`).join('\n');
-      return ['TABLE:', b.headers.join(' | '), ...b.rows.map((r) => r.join(' | '))].join('\n');
+      return ['TABLE:', b.headers.join(' | '), ...b.rows.map((r) => r.cells.join(' | '))].join('\n');
     })
     .join('\n\n');
 }

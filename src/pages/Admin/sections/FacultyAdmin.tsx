@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp,
 } from 'firebase/firestore';
@@ -10,6 +10,7 @@ import {
   type FacultyFact, type FacultySection,
   factsToText, textToFacts, sectionsToText, textToSections, getSectionBlocks,
 } from '../../../lib/facultySections';
+import type { ProgramDoc } from './ProgramsAdmin';
 
 export type { FacultyFact, FacultySection };
 
@@ -41,13 +42,12 @@ const EMPTY: Omit<FacultyDoc, 'id'> = {
   facts: [], sections: [],
 };
 
-// CSE…MBA are degree departments shown on the main Academics → Faculty
-// page; Mathematics/Physics/Chemistry/English are the first-year
-// foundation departments shown on the Freshman Engineering page instead
-// (src/pages/Academics/FreshmanEngineering.tsx) — both read from this same
-// collection, just filtered to a different department list per page.
-const DEPARTMENTS = ['CSE', 'AI&ML', 'AI&DS', 'Cyber Security', 'IT', 'ECE', 'EEE', 'Civil', 'Mechanical', 'MBA', 'Mathematics', 'Physics', 'Chemistry', 'English'];
 const DESIGNATIONS = ['Professor & HOD', 'Professor & Head', 'Professor', 'Associate Professor', 'Assoc. Professor', 'Assistant Professor', 'Asst. Professor'];
+
+// First-year foundation subjects (Freshman Engineering page) have no
+// Program entry of their own — always offered here regardless of Program
+// or current-faculty data. Keep in sync with Faculty.tsx's matching set.
+const FOUNDATION_DEPARTMENTS = ['Mathematics', 'Physics', 'Chemistry', 'English'];
 
 interface FormState extends Omit<FacultyDoc, 'id' | 'facts' | 'sections'> {
   factsText: string;
@@ -58,6 +58,24 @@ const EMPTY_FORM: FormState = { ...EMPTY, factsText: '', sectionsText: '' };
 
 export default function FacultyAdmin() {
   const { docs: faculty, loading } = useOrderedCollection<FacultyDoc>('faculty', 'order');
+  // Departments aren't a separate managed list — this is the union of every
+  // Program's `department` field (/admin → Programs), every department
+  // that already has faculty tagged to it, and the fixed set of first-year
+  // foundation subjects (which have no Program of their own, so without
+  // this they'd vanish from the picker the moment their last faculty
+  // member was removed, making it impossible to add a replacement). A
+  // Program's department pointing elsewhere (e.g. a shared HOD across two
+  // programs) can never make an existing faculty department disappear.
+  const { docs: programs } = useOrderedCollection<ProgramDoc>('programs', 'order');
+  const departmentNames = useMemo(() => {
+    const seen = new Set<string>();
+    const names: string[] = [];
+    const add = (d: string) => { if (d && !seen.has(d)) { seen.add(d); names.push(d); } };
+    programs.forEach((p) => add(p.department));
+    faculty.forEach((f) => add(f.department));
+    FOUNDATION_DEPARTMENTS.forEach(add);
+    return names;
+  }, [programs, faculty]);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [editing, setEditing] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -66,6 +84,9 @@ export default function FacultyAdmin() {
   const [bulkDept, setBulkDept] = useState('CSE');
   const [bulkText, setBulkText] = useState('');
   const [bulkImporting, setBulkImporting] = useState(false);
+
+  const [importing, setImporting] = useState(false);
+  const [importResult, setImportResult] = useState<string | null>(null);
 
   const set = (k: keyof FormState, v: string | number) => setForm((p) => ({ ...p, [k]: v }));
   const handleImage = (r: UploadResult) => setForm((p) => ({ ...p, imageUrl: r.url, storagePath: r.path }));
@@ -98,6 +119,38 @@ export default function FacultyAdmin() {
     } catch (e) {
       alert(`Couldn't import: ${(e as Error).message}`);
     } finally { setBulkImporting(false); }
+  };
+
+  // Bulk-loads Profile Sections content for many existing faculty members at
+  // once from a JSON file ([{ name, department, sectionsText }]) — matches
+  // each entry to an existing record by name+department (case-insensitive)
+  // and fills in just its `sections` field, leaving everything else on that
+  // record untouched. Entries with no matching record are reported, not
+  // created — a base record (name/department/photo) has to exist first.
+  const importFile = async (file: File) => {
+    setImporting(true);
+    setImportResult(null);
+    try {
+      const text = await file.text();
+      const entries: { name: string; department: string; sectionsText: string }[] = JSON.parse(text);
+      let updated = 0;
+      const unmatched: string[] = [];
+      for (const entry of entries) {
+        const match = faculty.find(
+          (f) => f.name.trim().toLowerCase() === entry.name.trim().toLowerCase()
+            && f.department.trim().toLowerCase() === entry.department.trim().toLowerCase()
+        );
+        if (!match) { unmatched.push(`${entry.name} (${entry.department})`); continue; }
+        await updateDoc(doc(db, 'faculty', match.id), { sections: textToSections(entry.sectionsText) });
+        updated++;
+      }
+      setImportResult(
+        `Updated ${updated} of ${entries.length} record${entries.length === 1 ? '' : 's'}.`
+        + (unmatched.length ? ` No matching faculty record for ${unmatched.length}: ${unmatched.join('; ')}` : '')
+      );
+    } catch (e) {
+      setImportResult(`Couldn't import: ${(e as Error).message}`);
+    } finally { setImporting(false); }
   };
 
   const save = async () => {
@@ -146,12 +199,37 @@ export default function FacultyAdmin() {
   return (
     <div className="admin-section">
       <div className="admin-card">
+        <h2 className="admin-card__title">Import Faculty Profile Content</h2>
+        <p className="admin-lead" style={{ marginBottom: '1rem' }}>
+          Loads Profile Sections content for many existing faculty members at once from a JSON file
+          (an array of <code>{'{ name, department, sectionsText }'}</code>). Each entry is matched to an
+          existing record by name + department and only its Profile Sections field is filled in — nothing
+          is created, and nothing else on the record is touched. Entries with no matching record are
+          listed afterward so a base record can be added for them first.
+        </p>
+        <div className="admin-form-actions">
+          <input
+            type="file"
+            accept="application/json"
+            disabled={importing}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) importFile(file);
+              e.target.value = '';
+            }}
+          />
+        </div>
+        {importing && <p className="admin-loading">Importing…</p>}
+        {importResult && <p className="admin-field__hint">{importResult}</p>}
+      </div>
+
+      <div className="admin-card">
         <h2 className="admin-card__title">Bulk Import Faculty</h2>
         <div className="admin-form-grid">
           <div className="admin-field">
             <label>Department</label>
             <select value={bulkDept} onChange={(e) => setBulkDept(e.target.value)}>
-              {DEPARTMENTS.map((d) => <option key={d}>{d}</option>)}
+              {departmentNames.map((d) => <option key={d}>{d}</option>)}
             </select>
           </div>
           <div className="admin-field admin-field--full">
@@ -191,7 +269,7 @@ export default function FacultyAdmin() {
           <div className="admin-field">
             <label>Department</label>
             <select value={form.department} onChange={(e) => set('department', e.target.value)}>
-              {DEPARTMENTS.map((d) => <option key={d}>{d}</option>)}
+              {departmentNames.map((d) => <option key={d}>{d}</option>)}
             </select>
           </div>
           <div className="admin-field">
@@ -258,7 +336,7 @@ export default function FacultyAdmin() {
           <h2 className="admin-card__title">Faculty ({filtered.length})</h2>
           <select value={filterDept} onChange={(e) => setFilterDept(e.target.value)} className="admin-select-sm">
             <option value="All">All Departments</option>
-            {DEPARTMENTS.map((d) => <option key={d}>{d}</option>)}
+            {departmentNames.map((d) => <option key={d}>{d}</option>)}
           </select>
         </div>
         {loading ? <p className="admin-loading">Loading…</p> : (

@@ -21,7 +21,7 @@ export default function Research() {
   useHashScroll();
 
   useEffect(() => {
-    document.title = 'Research & Development | Vishnu Womens University';
+    document.title = "Research & Development | Vishnu Women's University";
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {

@@ -19,7 +19,7 @@ export default function Placements() {
   const { docs: placementItems } = useOrderedCollection<PlacementItemDoc>('placementItems', 'order');
 
   useEffect(() => {
-    document.title = 'Placements | Vishnu Womens University';
+    document.title = "Placements | Vishnu Women's University";
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {

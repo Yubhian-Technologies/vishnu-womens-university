@@ -37,7 +37,7 @@ export default function ProgramDetail() {
 
   useEffect(() => {
     if (program) {
-      document.title = `${program.shortName || program.name} | Vishnu Womens University`;
+      document.title = `${program.shortName || program.name} | Vishnu Women's University`;
     }
   }, [program]);
 
@@ -79,8 +79,8 @@ export default function ProgramDetail() {
 
   const hasSidebarContent = quickLinks.length > 1 || hasCareerOutcomes;
 
-  const programTitle = `${program.shortName || program.name} | Vishnu Womens University`;
-  const programDesc = program.about ? (program.about.length > 155 ? `${program.about.slice(0, 155)}...` : program.about) : `Study ${program.name} at Vishnu Womens University, Bhimavaram. Learn about department vision, syllabus, faculty, and research facilities.`;
+  const programTitle = `${program.shortName || program.name} | Vishnu Women's University`;
+  const programDesc = program.about ? (program.about.length > 155 ? `${program.about.slice(0, 155)}...` : program.about) : `Study ${program.name} at Vishnu Women's University, Bhimavaram. Learn about department vision, syllabus, faculty, and research facilities.`;
   const programUrl = `/academics/${program.slug}`;
   const programImage = program.heroImage || fallbackBanner?.imageUrl;
 

@@ -132,8 +132,8 @@ const FALLBACK_PAGES = new Set(['program-detail', 'governance-detail', 'placemen
 // (home's rotating marketing slides, and the "-detail" fallbacks shared by
 // many different items with their own titles) are intentionally omitted.
 const PAGE_TEXT_DEFAULTS: Record<string, { title: string; subtitle?: string }> = {
-  'about': { title: 'About Vishnu Womens University', subtitle: "Rooted in Bhimavaram since 2001, VWU has grown into Andhra Pradesh's foremost institution for women's technical education." },
-  'anti-ragging': { title: 'Anti Ragging', subtitle: 'Vishnu Womens University is committed to a safe, ragging-free campus for every student.' },
+  'about': { title: "About Vishnu Women's University", subtitle: "Rooted in Bhimavaram since 2001, VWU has grown into Andhra Pradesh's foremost institution for women's technical education." },
+  'anti-ragging': { title: 'Anti Ragging', subtitle: "Vishnu Women's University is committed to a safe, ragging-free campus for every student." },
   'alumni-giving': { title: 'Always a Vishnu Engineer', subtitle: 'Graduation is not the end of your VWU story. Stay engaged, give back, and help shape the next generation of women engineers.' },
   'admissions': { title: 'Your Journey Starts Here', subtitle: 'Choosing VWU sets you on a path to a fulfilling engineering career, a strong professional network, and a future built on real achievement.' },
   'disclosures-ugc': { title: 'UGC Public Self-Disclosure', subtitle: 'Shri Vishnu Engineering College for Women (Autonomous) — published as required by the University Grants Commission.' },
@@ -141,7 +141,7 @@ const PAGE_TEXT_DEFAULTS: Record<string, { title: string; subtitle?: string }> =
   'about-sves': { title: 'Sri Vishnu Educational Society', subtitle: 'More than 25 years of educational commitment, spanning 11 institutions across Andhra Pradesh and Telangana.' },
   'admission-procedure': { title: 'Admission Procedure', subtitle: 'A clear, step-by-step guide to joining VWU — covering eligibility, entrance examinations, and the enrollment process for all programmes.' },
   'careers': { title: 'Careers at VWU', subtitle: 'Build your career alongside a community of educators and professionals who are genuinely invested in advancing women in engineering and technology.' },
-  'vision-mission': { title: 'Vision, Mission & Values', subtitle: 'The principles, purpose, and commitments that inform every decision and action at Vishnu Womens University.' },
+  'vision-mission': { title: 'Vision, Mission & Values', subtitle: "The principles, purpose, and commitments that inform every decision and action at Vishnu Women's University." },
   'events': { title: 'Campus Events', subtitle: 'Technical symposia, sports tournaments, graduation ceremonies, and much more — the VWU calendar is always full.' },
   'academics': { title: 'You Will Excel.', subtitle: 'Rigorous, industry-aligned programs designed to build your technical expertise, sharpen your research instincts, and develop you as a professional.' },
   'faculty': { title: 'Our Faculty', subtitle: 'Experienced educators and researchers across every department, dedicated to academic excellence and student success.' },

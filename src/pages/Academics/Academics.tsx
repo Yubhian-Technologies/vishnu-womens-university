@@ -66,7 +66,7 @@ export default function Academics() {
   const careerOutcomeStats = useContentBlocks('academics', 'careerOutcomeStats');
 
   useEffect(() => {
-    document.title = 'Academics | Vishnu Womens University';
+    document.title = "Academics | Vishnu Women's University";
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {

@@ -55,7 +55,7 @@ export default function StudentLife() {
   const hasClubsFestivalsPhotos = useSectionHasPhotos('student-life', 'clubs-festivals');
 
   useEffect(() => {
-    document.title = 'Student Life | Vishnu Womens University';
+    document.title = "Student Life | Vishnu Women's University";
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {

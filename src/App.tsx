@@ -150,7 +150,7 @@ function PublicApp() {
 
 function MaintenancePage() {
   useEffect(() => {
-    document.title = 'Under Maintenance | Vishnu Womens University';
+    document.title = "Under Maintenance | Vishnu Women's University";
   }, []);
 
   return (
@@ -168,7 +168,7 @@ function MaintenancePage() {
     >
       <img
         src="/vwu-logo.png"
-        alt="Vishnu Womens University"
+        alt="Vishnu Women's University"
         style={{ height: 80, marginBottom: '2rem', objectFit: 'contain' }}
         onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
       />
@@ -234,7 +234,7 @@ function NotFound() {
   return (
     <main className="page-wrapper">
       <SEO
-        title="404 - Page Not Found | Vishnu Womens University"
+        title="404 - Page Not Found | Vishnu Women's University"
         description="The page you are looking for does not exist or has been moved."
         noindex={true}
       />

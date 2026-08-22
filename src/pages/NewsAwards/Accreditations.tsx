@@ -76,7 +76,7 @@ export default function Accreditations() {
   }, [location.hash]);
 
   useEffect(() => {
-    document.title = 'Accreditations & Awards | Vishnu Womens University';
+    document.title = "Accreditations & Awards | Vishnu Women's University";
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {

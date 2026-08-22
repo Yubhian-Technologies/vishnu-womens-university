@@ -6,7 +6,6 @@ import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import { useCollection, useOrderedCollection } from '../../hooks/useCollection';
 import { linkify } from '../../lib/linkify';
 import { getSectionBlocks } from '../../lib/facultySections';
-import { getFacultyOverrideSections, isHiddenFacultyRecord } from './facultyContentOverrides.data';
 import FacultySectionContent from '../../components/FacultySectionContent/FacultySectionContent';
 import type { FacultyDoc } from './Faculty';
 import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
@@ -39,20 +38,22 @@ export default function FacultyProfile() {
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
   const person = allFaculty.find((f) => f.id === id);
-  const overrideSections = person ? getFacultyOverrideSections(person.name, person.department) : null;
-  const sections = (overrideSections ?? person?.sections ?? []).filter((s) => s.title);
+  // Profile Sections content lives in Firestore, edited via /admin → Faculty
+  // (previously shadowed by a code-level override file during this site's
+  // faculty-CMS migration; that override has been retired now that its
+  // content has been imported into Firestore for real).
+  const sections = (person?.sections ?? []).filter((s) => s.title);
 
   useEffect(() => {
     if (sections.length > 0) setActiveSection((prev) => prev ?? sections[0].title);
   }, [sections.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (person) document.title = `${person.name} | Vishnu Womens University`;
+    if (person) document.title = `${person.name} | Vishnu Women's University`;
   }, [person]);
 
   if (!loading && !person) return <Navigate to="/faculty" replace />;
   if (!person) return null;
-  if (isHiddenFacultyRecord(person.name, person.department)) return <Navigate to="/faculty" replace />;
 
   const isHod = person.designation.toLowerCase().includes('hod') || person.designation.toLowerCase().includes('head');
   const program = programs.find((p) => p.department === person.department);
@@ -60,8 +61,8 @@ export default function FacultyProfile() {
 
   const active = sections.find((s) => s.title === activeSection) ?? sections[0];
 
-  const facultyTitle = `${person.name} | Faculty Profile | Vishnu Womens University`;
-  const facultyDesc = `${person.name} is ${person.designation}${person.department ? ` in the Department of ${person.department}` : ''} at Vishnu Womens University, Bhimavaram. ${person.qualification ? `Qualification: ${person.qualification}.` : ''}`;
+  const facultyTitle = `${person.name} | Faculty Profile | Vishnu Women's University`;
+  const facultyDesc = `${person.name} is ${person.designation}${person.department ? ` in the Department of ${person.department}` : ''} at Vishnu Women's University, Bhimavaram. ${person.qualification ? `Qualification: ${person.qualification}.` : ''}`;
   const facultyUrl = `/faculty/${person.id}`;
 
   const facultyJsonLd = [

@@ -29,10 +29,10 @@ Our technologically advanced classrooms create an environment where teaching and
 
 #### State-of-the-art laboratories are the back bone of any Engineering college. Practical exposure brings real value to an engineering degree.
 
-- Vishnu Womens University believes in imparting strong practical exposure to its students.
+- Vishnu Women's University believes in imparting strong practical exposure to its students.
 - Modern laboratories are an integral part of the various departments of the college.
 - Each department maintains its specialized labs, equipped with modern equipment of industry standards.
-- Vishnu Womens University keeps upgrading the facilities and equipment in the laboratories to the latest industry standards, from time to time.
+- Vishnu Women's University keeps upgrading the facilities and equipment in the laboratories to the latest industry standards, from time to time.
 
 #### Apart from regular experiments, all departments conduct additional experiments in all laboratories to train the students in the cutting edge technologies.
 
@@ -87,13 +87,13 @@ The Library contributes to the fulfillment of Our Institution’s mission by sel
     heroSubtitle: "VWU's auditoriums host seminars, conferences, cultural events, and convocations, providing a large, well-equipped venue for campus-wide gatherings.",
     body: `# Auditoriums
 
-Considering that a variety of events like cultural programmes, seminars, debates, plays and other programmes are conducted throughout the year, Vishnu Womens University houses an **Indoor Auditorium, Open-air-Auditorium, Mini-Auditorium** and numerous **Seminar Halls** which facilitate the students to carry on their activities smoothly and with ease. They attract students to flock together to share, discuss and explore knowledge in their areas of learning.
+Considering that a variety of events like cultural programmes, seminars, debates, plays and other programmes are conducted throughout the year, Vishnu Women's University houses an **Indoor Auditorium, Open-air-Auditorium, Mini-Auditorium** and numerous **Seminar Halls** which facilitate the students to carry on their activities smoothly and with ease. They attract students to flock together to share, discuss and explore knowledge in their areas of learning.
 
 **Smt. B. Seetha Indoor Auditorium** is centrally air-conditioned with a fully sound proof setup and equipped with latest technology for all types of audio/video presentations.
 
-In addition to the Indoor Auditorium, Vishnu Womens University has an Open-air-Auditorium and Mini-Auditorium, where a vast variety of student activities are regularly arranged.
+In addition to the Indoor Auditorium, Vishnu Women's University has an Open-air-Auditorium and Mini-Auditorium, where a vast variety of student activities are regularly arranged.
 
-Vishnu Womens University has well equipped **air conditioned Seminar Halls** which can accommodate 250 members each. They are centers for knowledge acquisition since right ambiance is created with a podium, a computer system with internet facility, an LCD projector and a sound system.`,
+Vishnu Women's University has well equipped **air conditioned Seminar Halls** which can accommodate 250 members each. They are centers for knowledge acquisition since right ambiance is created with a podium, a computer system with internet facility, an LCD projector and a sound system.`,
     desc: "VWU's auditoriums host seminars, conferences, cultural events, and convocations, providing a large, well-equipped venue for campus-wide gatherings.",
   },
   {
@@ -116,7 +116,7 @@ With all the right ambiance, the addition of a well-known book shop ‘Higginbot
     heroSubtitle: 'High-speed Wi-Fi connectivity spans the entire campus, keeping students and faculty connected for coursework, research, and communication at all times.',
     body: `# Wi-Fi Campus
 
-Vishnu Womens University is one of the few Colleges, which can boast of its state-of-the-art computing resources and network across the campus. It has IT Infrastructure that can support 3000+ computer terminals, probably one of the largest wi-fi infrastructure. Following are a few highlighting features:
+Vishnu Women's University is one of the few Colleges, which can boast of its state-of-the-art computing resources and network across the campus. It has IT Infrastructure that can support 3000+ computer terminals, probably one of the largest wi-fi infrastructure. Following are a few highlighting features:
 
 - Completely Wi-Fi Campus with 20+ access point, supported on the technology from RUCKUS
 - 86 Mbps of bandwidth for internet with dedicated leased line
@@ -205,7 +205,7 @@ This facility is designed to simplify travel and documentation needs for student
     slug: 'temples',
     title: 'Temples',
     heroSubtitle: 'On-campus temples provide a space for reflection and spiritual practice, reflecting the cultural values that are part of everyday campus life.',
-    body: `Worship is putting the spotlight on God. This whole idea is to engage our Vishnu Womens University students in an atmosphere and attitude of reverence and joy. Vishnu Womens University engage students from varied faith and religious traditions as well as students without religious affiliation. So, Vishnu Womens University holds a place for temple of gods in the campus. The temple is built on a high foundation covering an area of 25,000 square feet.`,
+    body: `Worship is putting the spotlight on God. This whole idea is to engage our Vishnu Women's University students in an atmosphere and attitude of reverence and joy. Vishnu Women's University engage students from varied faith and religious traditions as well as students without religious affiliation. So, Vishnu Women's University holds a place for temple of gods in the campus. The temple is built on a high foundation covering an area of 25,000 square feet.`,
     desc: 'On-campus temples provide a space for reflection and spiritual practice, reflecting the cultural values that are part of everyday campus life.',
   },
   {
@@ -221,7 +221,7 @@ This facility is designed to simplify travel and documentation needs for student
     heroSubtitle: "VWU's swimming pool facility supports student fitness and recreation as part of the university's broader sports and wellness offerings.",
     body: `Whether you want to relax after a long day at studies are maintain a healthy life style, the newly opened swimming pool, next the sports complex is the ideal place for swimming enthusiasts. A world class pool with 80 feet length 40 feet width six lanes containing 4,05,000 liters of water provides excellent opportunities.
 
-The latest technological features, round the clock water circulation and purification plants, life saving apparatus and pool side equipment is an superb facility that only Vishnu Womens University has. Individualized assistance in developing skills in all the four strokes by the coach is available. In addition the well equipped Eat Out provides the right ambiance for a pool side party.`,
+The latest technological features, round the clock water circulation and purification plants, life saving apparatus and pool side equipment is an superb facility that only Vishnu Women's University has. Individualized assistance in developing skills in all the four strokes by the coach is available. In addition the well equipped Eat Out provides the right ambiance for a pool side party.`,
     desc: "VWU's swimming pool facility supports student fitness and recreation as part of the university's broader sports and wellness offerings.",
   },
   {
@@ -237,7 +237,7 @@ The latest technological features, round the clock water circulation and purific
     heroSubtitle: 'Beyond the facilities listed here, VWU continues to invest in additional infrastructure and amenities that support a well-rounded campus experience.',
     body: `Bank services are very important for the modern society. Since the campus is huge and team with more than ten thousand students and employees, it need to meet lots of banking transactions.
 
-Indian Bank was exclusively runs for the students and employees of Vishnu Womens University.
+Indian Bank was exclusively runs for the students and employees of Vishnu Women's University.
 
 Apart from it, there are two ATMs. One of which is located at the entrance of the Main Gate of the campus and another near the Dental College in order to meet their banking needs hassle free.`,
     desc: 'Beyond the facilities listed here, VWU continues to invest in additional infrastructure and amenities that support a well-rounded campus experience.',
