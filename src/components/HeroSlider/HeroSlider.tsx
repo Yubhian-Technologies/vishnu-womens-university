@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Trophy, Star, ClipboardList, Briefcase, TrendingUp } from 'lucide-react';
+import { Trophy, Star, ClipboardList, Briefcase, TrendingUp, Landmark } from 'lucide-react';
 import { usePageBanners } from '../../hooks/usePageBanners';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
 import './HeroSlider.css';
@@ -38,7 +38,7 @@ function buildStaticSlides(btechCount: string): Slide[] {
       tag: 'Welcome to VWU',
       heading: 'Empowering.\nWomen.\nThrough Tech.',
       description: 'VWU equips women with rigorous engineering education, research opportunities, and the practical skills that top employers demand.',
-      primaryCta: { label: 'Schedule a Visit', path: '/admissions' },
+      primaryCta: { label: 'Schedule a Visit', path: '/contact' },
       secondaryCta: { label: 'Apply Now', path: '/admissions' },
     },
     {
@@ -47,7 +47,7 @@ function buildStaticSlides(btechCount: string): Slide[] {
       heading: `${btechCount} B.Tech Programs\nBuilt for Your\nSuccess`,
       description: 'From Computer Science to Civil Engineering — VWU offers undergraduate, postgraduate, and doctoral programs rooted in applied, industry-aligned learning.',
       primaryCta: { label: 'Explore Programs', path: '/academics' },
-      secondaryCta: { label: 'Request Info', path: '/admissions' },
+      secondaryCta: { label: 'Request Info', path: '/contact' },
     },
     {
       id: 3,
@@ -61,9 +61,17 @@ function buildStaticSlides(btechCount: string): Slide[] {
       id: 4,
       tag: 'Outstanding Placements',
       heading: '59.28 LPA\nHighest\nPlacement Package',
-      description: 'VWU recorded 1,400+ placements in 2024–25, with a highest offer of 59.28 LPA — graduates are now driving impact at companies across India and beyond.',
+      description: 'VWU recorded 1,100+ placements in 2025–26, with a highest offer of 59.28 LPA — graduates are now driving impact at companies across India and beyond.',
       primaryCta: { label: 'Placement Records', path: '/about' },
       secondaryCta: { label: 'Our Story', path: '/about' },
+    },
+    {
+      id: 5,
+      tag: 'A Historic First',
+      heading: "The First Private\nWomen's University\nin the Telugu States",
+      description: 'Vishnu Women\'s University is the first private university exclusively for women across the Telugu states — built to give women a dedicated space to lead in engineering, technology, and research.',
+      primaryCta: { label: 'Explore VWU', path: '/about' },
+      secondaryCta: { label: 'Apply Now', path: '/admissions' },
     },
   ];
 }
@@ -72,8 +80,9 @@ const recognitions = [
   { icon: Trophy, title: 'Top Engineering College', source: 'India Today Rankings' },
   { icon: Star, title: 'Best Engineering College', source: 'The Week Rankings' },
   { icon: ClipboardList, title: 'NBA Accredited', source: 'National Board of Accreditation' },
-  { icon: Briefcase, title: 'NIRF Ranked Institution', source: 'Ministry of Education' },
+  { icon: Briefcase, title: 'NAAC A+ Accredited', source: 'National Assessment and Accreditation Council' },
   { icon: TrendingUp, title: 'IEI Award for Excellence', source: 'Institution of Engineers India' },
+  { icon: Landmark, title: 'First Private University for Women', source: 'Across the Telugu States' },
 ];
 
 const SLIDE_DURATION = 6000;
@@ -284,21 +293,25 @@ export default function HeroSlider() {
 
 
 
-      {/* Recognition Bar */}
+      {/* Recognition Bar — doubled list + CSS loop (translateX -50%) for a
+          seamless marquee, same technique as the activity strip below; more
+          items than fit a single screen otherwise get cut off at the edge. */}
       <div className="hero-recognition" aria-label="Awards and recognitions">
         <div className="hero-recognition-inner">
-          {recognitions.map((r, i) => (
-            <div key={r.title} style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
-              <div className="recognition-item">
-                <div className="recognition-icon"><r.icon size={16} strokeWidth={2} color="var(--color-primary-dark)" /></div>
-                <div className="recognition-text">
-                  <strong>{r.title}</strong>
-                  <span>{r.source}</span>
+          <div className="hero-recognition-track">
+            {[...recognitions, ...recognitions].map((r, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+                <div className="recognition-item">
+                  <div className="recognition-icon"><r.icon size={16} strokeWidth={2} color="var(--color-primary-dark)" /></div>
+                  <div className="recognition-text">
+                    <strong>{r.title}</strong>
+                    <span>{r.source}</span>
+                  </div>
                 </div>
+                <div className="recognition-divider" />
               </div>
-              {i < recognitions.length - 1 && <div className="recognition-divider" />}
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </section>

@@ -5,6 +5,7 @@ import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
 import SmoothScroll from './components/SmoothScroll/SmoothScroll';
 import LandingPageLoader from './components/LandingPageLoader/LandingPageLoader';
+import SEO from './components/SEO/SEO';
 import { smoothScrollTo } from './lib/smoothScroll';
 
 const Academics = lazy(() => import('./pages/Academics/Academics'));
@@ -219,12 +220,13 @@ function RootRouter() {
 }
 
 function NotFound() {
-  useEffect(() => {
-    document.title = '404 | Vishnu Womens University';
-  }, []);
-
   return (
     <main className="page-wrapper">
+      <SEO
+        title="404 - Page Not Found | Vishnu Womens University"
+        description="The page you are looking for does not exist or has been moved."
+        noindex={true}
+      />
       <div
         style={{
           minHeight: '80vh',
