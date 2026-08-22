@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { DEFAULT_COMPLIANCE_DOCS, type ComplianceDocDoc } from '../Admin/sections/ComplianceDocsAdmin';
+import SEO from '../../components/SEO/SEO';
+import { getBreadcrumbSchema } from '../../lib/seo/schemas';
 import '../detail-layout.css';
 
 interface DisclosureLink {
@@ -186,6 +188,12 @@ export default function UGCDisclosure() {
 
   return (
     <main className="page-wrapper">
+      <SEO
+        title="UGC Public Self-Disclosure | Vishnu Womens University"
+        description="Official UGC Mandatory Public Self-Disclosure of Shri Vishnu Engineering College for Women / Vishnu Womens University, Bhimavaram."
+        canonicalPath="/disclosures/ugc"
+        jsonLd={getBreadcrumbSchema([{ name: 'UGC Public Self-Disclosure', url: '/disclosures/ugc' }])}
+      />
       <PageHero
         page="disclosures-ugc"
         defaultTitle="UGC Public Self-Disclosure"

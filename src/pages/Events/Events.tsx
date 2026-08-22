@@ -6,6 +6,8 @@ import PageHero from '../../components/PageHero/PageHero';
 import { useHashScroll } from '../../hooks/useHashScroll';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import type { EventDoc } from '../Admin/sections/EventsAdmin';
+import SEO from '../../components/SEO/SEO';
+import { getEventSchema, getBreadcrumbSchema } from '../../lib/seo/schemas';
 
 const categoryColors: Record<string, string> = {
   'Special Events': '#C9A84C',
@@ -51,8 +53,25 @@ export default function Events() {
 
   const featured = events.filter(e => e.featured);
 
+  const eventsJsonLd = [
+    getBreadcrumbSchema([{ name: 'Events', url: '/events' }]),
+    ...featured.map(e => getEventSchema({
+      name: e.title,
+      description: e.desc,
+      startDate: `${e.year}-${e.month}-${e.day}`,
+      location: e.location,
+      url: '/events',
+    }))
+  ];
+
   return (
     <main className="page-wrapper">
+      <SEO
+        title="Campus Events & Academic Calendar | Vishnu Womens University"
+        description="Explore upcoming technical symposia, sports tournaments, graduation ceremonies, workshops, and cultural events at Vishnu Womens University, Bhimavaram."
+        canonicalPath="/events"
+        jsonLd={eventsJsonLd}
+      />
       {/* Hero */}
       <PageHero
         page="events"
