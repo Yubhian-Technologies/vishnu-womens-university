@@ -61,6 +61,7 @@ const PoliciesProcedures = lazy(() => import('./pages/PoliciesProcedures/Policie
 // the public bundle entirely is the single biggest win here, since the vast
 // majority of visitors never touch /admin.
 const AdminLayout = lazy(() => import('./pages/Admin/AdminLayout'));
+const Launch = lazy(() => import('./pages/Launch/Launch'));
 
 function RouteFallback() {
   return (
@@ -211,6 +212,16 @@ function RootRouter() {
         element={
           <Suspense fallback={<RouteFallback />}>
             <AdminLayout />
+          </Suspense>
+        }
+      />
+      {/* Standalone, like /admin — no public Header/Footer, and stays
+          reachable even under VITE_MAINTENANCE_MODE. */}
+      <Route
+        path="/launch"
+        element={
+          <Suspense fallback={<RouteFallback />}>
+            <Launch />
           </Suspense>
         }
       />

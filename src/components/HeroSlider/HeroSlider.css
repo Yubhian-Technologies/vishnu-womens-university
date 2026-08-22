@@ -297,43 +297,16 @@
 
 .hero-recognition-inner {
   position: relative;
-  overflow: hidden;
-}
-
-.hero-recognition-inner::before,
-.hero-recognition-inner::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 60px;
-  z-index: 1;
-  pointer-events: none;
-}
-.hero-recognition-inner::before {
-  left: 0;
-  background: linear-gradient(to right, rgba(27,67,50,0.92), transparent);
-}
-.hero-recognition-inner::after {
-  right: 0;
-  background: linear-gradient(to left, rgba(27,67,50,0.92), transparent);
 }
 
 .hero-recognition-track {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  width: max-content;
+  justify-content: center;
   column-gap: var(--space-6);
+  row-gap: var(--space-3);
   padding: 0 var(--space-8);
-  animation: hero-recognition-scroll 26s linear infinite;
-  will-change: transform;
-}
-
-.hero-recognition-track:hover { animation-play-state: paused; }
-
-@keyframes hero-recognition-scroll {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
 }
 
 .recognition-item {
