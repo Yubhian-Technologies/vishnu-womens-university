@@ -90,7 +90,7 @@ export default function Footer() {
             {/* Brand */}
             <div className="footer-brand">
               <Link to="/" className="footer-logo" aria-label="Vishnu Womens University">
-                <img src="https://res.cloudinary.com/dljzfysft/image/upload/v1777358383/download_u6eeyl.jpg" alt="VWU Logo" className="footer-logo-icon" />
+                <img src="/images/square%20logo.png" alt="VWU Logo" className="footer-logo-icon" />
                 <div className="footer-logo-text">
                   <strong>Vishnu Womens</strong>
                   <span>University</span>
