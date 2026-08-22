@@ -58,9 +58,9 @@ const defaultCtaBannerPhoto = [
 // <section>). Shown until an admin adds real entries there — same fallback
 // pattern used throughout this codebase (e.g. defaultExecutives in About.tsx).
 const defaultStudyCards: ContentBlockDoc[] = [
-  { id: 'default-1', page: 'home', section: 'studyCards', value: 'Explore Programs', title: 'B.Tech Programs', desc: 'Choose from 9 B.Tech specializations — CSE, AI & ML, AI & DS, Cyber Security, IT, ECE, EEE, Civil, and Mechanical Engineering.', icon: 'Laptop', slug: '/academics', order: 0 },
-  { id: 'default-2', page: 'home', section: 'studyCards', value: 'PG Programs', title: 'M.Tech & MBA', desc: 'Elevate your qualifications with postgraduate programs in CSE, VLSI Design, Power Electronics, Software Engineering, and MBA.', icon: 'GraduationCap', slug: '/academics', order: 1 },
-  { id: 'default-3', page: 'home', section: 'studyCards', value: 'Research Programs', title: 'Research & Ph.D.', desc: 'Conduct doctoral research in CSE, ECE, and EEE — backed by 2,500+ publications, 90+ patents, and purpose-built research facilities.', icon: 'FlaskConical', slug: '/academics', order: 2 },
+  { id: 'default-1', page: 'home', section: 'studyCards', value: 'Explore Programs', title: 'B.Tech Programs', desc: 'Choose from 10+ B.Tech specializations — CSE, CSE[AI & ML], CSE[AI & DS], CSE[Cyber Security], IT, ECE, ECE[VLSI], ECE[EVT], EEE, Civil, and Mechanical Engineering.', icon: 'Laptop', slug: '/academics', order: 0 },
+  { id: 'default-2', page: 'home', section: 'studyCards', value: 'M.Tech & MBA Programs', title: 'M.Tech & MBA', desc: 'Elevate your qualifications with postgraduate programs in CSE, VLSI Design, Power Electronics, Software Engineering, and MBA.', icon: 'GraduationCap', slug: '/academics', order: 1 },
+  { id: 'default-3', page: 'home', section: 'studyCards', value: 'Ph.D. Programs', title: 'Research & Ph.D.', desc: 'Conduct doctoral research in CSE, ECE, and EEE — backed by 2,500+ publications, 90+ patents, and purpose-built research facilities.', icon: 'FlaskConical', slug: '/academics', order: 2 },
 ];
 
 // The real /academics/:slug values for each B.Tech program, exactly as used
@@ -92,7 +92,7 @@ const slugify = (title: string) =>
 // instead — but only when it's still the generic default, so an admin who
 // deliberately customizes the slug (e.g. to an external link) isn't overridden.
 function studyCardHref(card: ContentBlockDoc): string {
-  if (card.value === 'PG Programs' && (card.slug === '/academics' || !card.slug)) {
+  if (card.value === 'M.Tech & MBA Programs' && (card.slug === '/academics' || !card.slug)) {
     return '/academics?tab=mtech';
   }
   return card.slug || '/academics';
@@ -104,17 +104,18 @@ const defaultPopularPrograms: ContentBlockDoc[] = Object.keys(POPULAR_PROGRAM_SL
 }));
 
 const defaultCampusFeatures: ContentBlockDoc[] = [
-  'Student Clubs & Organizations', 'Radio Vishnu 90.4', 'Vishnu TV Academy', 'Sports & Games Facilities',
-  'Career Services Center', "Women's Hostels", 'AR/VR Studio', 'Technology Business Incubator',
+  'Technology Business Incubator', 'Student Clubs & Organizations', 'Radio Vishnu 90.4', 'Vishnu TV Academy',
+  'Sports & Games Facilities', 'Career Services Center', "Women's Hostels", 'AR/VR Studio',
 ].map((title, i) => ({ id: `default-${i}`, page: 'home', section: 'campusFeatures', value: '', title, desc: '', icon: '', slug: '', order: i }));
 
 const defaultRecognitions: ContentBlockDoc[] = [
   { id: 'default-1', page: 'home', section: 'recognitions', value: '', title: 'Top Engineering College', desc: 'India Today Rankings', icon: 'Trophy', slug: '', order: 0 },
   { id: 'default-2', page: 'home', section: 'recognitions', value: '', title: 'Best Engineering College', desc: 'The Week Rankings', icon: 'Star', slug: '', order: 1 },
   { id: 'default-3', page: 'home', section: 'recognitions', value: '', title: 'NBA Accreditation', desc: 'National Board of Accreditation', icon: 'ClipboardList', slug: '', order: 2 },
-  { id: 'default-4', page: 'home', section: 'recognitions', value: '', title: 'NIRF Ranked Institution', desc: 'Ministry of Education, India', icon: 'Briefcase', slug: '', order: 3 },
+  { id: 'default-4', page: 'home', section: 'recognitions', value: '', title: 'NAAC A+ Accredited', desc: 'National Assessment and Accreditation Council', icon: 'Briefcase', slug: '', order: 3 },
   { id: 'default-5', page: 'home', section: 'recognitions', value: '', title: 'IEI Award for Excellence', desc: 'Institution of Engineers India', icon: 'TrendingUp', slug: '', order: 4 },
   { id: 'default-6', page: 'home', section: 'recognitions', value: '', title: 'UGC Autonomous Status', desc: 'University Grants Commission', icon: 'Award', slug: '', order: 5 },
+  { id: 'default-7', page: 'home', section: 'recognitions', value: '', title: 'First Private University for Women', desc: 'Across the Telugu States', icon: 'Landmark', slug: '', order: 6 },
 ];
 
 const defaultTestimonials: ContentBlockDoc[] = [
@@ -257,7 +258,7 @@ export default function Home() {
   return (
     <main className="home-page">
       <SEO
-        title="Vishnu Womens University | Empowering Women Through Knowledge & Technology"
+        title="Vishnu Women's University | Empowering Women Through Knowledge & Technology"
         description="First private university for women in Telugu states located in Bhimavaram, Andhra Pradesh. Offering B.Tech, M.Tech, MBA, and Ph.D. programs with world-class infrastructure and top placements."
         canonicalPath="/"
         jsonLd={getUniversitySchema()}
@@ -413,11 +414,11 @@ export default function Home() {
               <span className="section-label">Our Purpose</span>
               <h2 className="section-title">Driven by<br /><span className="gradient-text">Excellence</span></h2>
               <div className="divider" />
-              <p>Vishnu Womens University is committed to providing women with rigorous technical education, cultivating a spirit of innovation, and producing graduates who contribute meaningfully to society and industry.</p>
+              <p>Vishnu Women's University is committed to providing women with rigorous technical education, cultivating a spirit of innovation, and producing graduates who contribute meaningfully to society and industry.</p>
               <p>Founded under the Sri Vishnu Educational Society and affiliated to JNTUK, VWU has been developing engineers, researchers, and leaders for over two decades from its campus in Bhimavaram, Andhra Pradesh.</p>
               <div className="mission-quote">
                 <blockquote>"VWU gave me the technical grounding and the self-belief to pursue my ambitions. The faculty are genuinely invested in your success — every step of the way."</blockquote>
-                <cite>— Priya, CSE Graduate, placed at Amazon</cite>
+                <cite>— D Prasanna, CSE Graduate, placed at Amazon</cite>
               </div>
               <MagneticBtn to="/about" className="btn btn-primary magnetic-btn">Learn More About VWU</MagneticBtn>
             </div>
@@ -575,9 +576,9 @@ export default function Home() {
             <h2>The best way to understand VWU<br />is to see it for yourself.</h2>
             <p>Arrange a campus tour, speak with our admissions team, or submit your application today. Your path to a purposeful engineering career starts here.</p>
             <div className="cta-actions">
-              <MagneticBtn to="/admissions" className="btn btn-accent btn-lg magnetic-btn pulse-btn">Schedule a Visit</MagneticBtn>
-              <MagneticBtn to="/admissions" className="btn btn-secondary btn-lg magnetic-btn">Request Information</MagneticBtn>
-              <MagneticBtn to="/admissions" className="btn btn-secondary btn-lg magnetic-btn">Apply via EAPCET</MagneticBtn>
+              <Link to="/admissions" className="btn btn-accent btn-lg">Schedule a Visit</Link>
+              <Link to="/admissions" className="btn btn-secondary btn-lg">Request Information</Link>
+              <Link to="/admissions" className="btn btn-secondary btn-lg">Apply via EAPCET</Link>
             </div>
           </div>
         </div>
