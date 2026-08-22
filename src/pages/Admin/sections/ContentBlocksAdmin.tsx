@@ -73,7 +73,11 @@ export const CONTENT_BLOCK_SECTIONS: { page: string; section: string; label: str
   { page: 'home', section: 'campusFeatures', label: 'Home — Campus Features' },
   { page: 'home', section: 'testimonials', label: 'Home — Testimonials' },
   { page: 'home', section: 'studyCards', label: 'Home — Study at VWU Cards' },
-  { page: 'home', section: 'popularPrograms', label: 'Home — Popular Programs Tags' },
+  // Home — Popular Programs Tags intentionally isn't here any more: that
+  // strip now derives directly from /admin → Programs (each B.Tech/MBA
+  // program becomes a tag automatically), so a separate manually-curated
+  // list here would just silently go stale again. Add/edit programs
+  // instead — see buildPopularProgramsFromPrograms in Home.tsx.
   { page: 'vision-mission', section: 'missionPoints', label: 'Vision & Mission — Mission Points' },
   { page: 'vision-mission', section: 'values', label: 'Vision & Mission — Core Values' },
   { page: 'vision-mission', section: 'qualityPolicy', label: 'Vision & Mission — Quality Policy' },

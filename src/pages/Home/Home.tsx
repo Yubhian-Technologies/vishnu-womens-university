@@ -13,6 +13,7 @@ import { resolveContentIcon } from '../../lib/contentIcons';
 import { type NewsDoc, newsDocToArticle } from '../../lib/news';
 import type { EventDoc } from '../Admin/sections/EventsAdmin';
 import type { ContentBlockDoc } from '../Admin/sections/ContentBlocksAdmin';
+import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
 import './Home.css';
 
 /* ── Data ─────────────────────────────────────────────────── */
@@ -61,13 +62,10 @@ const defaultStudyCards: ContentBlockDoc[] = [
   { id: 'default-3', page: 'home', section: 'studyCards', value: 'Research Programs', title: 'Research & Ph.D.', desc: 'Conduct doctoral research in CSE, ECE, and EEE — backed by 2,500+ publications, 90+ patents, and purpose-built research facilities.', icon: 'FlaskConical', slug: '/academics', order: 2 },
 ];
 
-// The real /academics/:slug values for each B.Tech program, exactly as used
-// by the live `programs` Firestore collection (department abbreviations, not
-// a generic slugified title — e.g. "AI & Machine Learning" is "ai-ml", not
-// "ai-machine-learning"). Recovered from programs.data.ts (the static file
-// these were migrated out of, see commit a0ddb39) and confirmed against the
-// live site. A generic slugify() can't derive these since they're
-// abbreviations, so each Popular Programs tag is matched by title here first.
+// Last-resort fallback only — used if the live `programs` collection (see
+// buildPopularProgramsFromPrograms below) is completely empty, e.g. Firestore
+// misconfigured. Under normal operation this strip is driven by the actual
+// Programs collection so it stays in sync with /admin → Programs automatically.
 const POPULAR_PROGRAM_SLUGS: Record<string, string> = {
   'CSE': 'cse',
   'AI & Machine Learning': 'ai-ml',
@@ -100,6 +98,25 @@ const defaultPopularPrograms: ContentBlockDoc[] = Object.keys(POPULAR_PROGRAM_SL
   id: `default-${i}`, page: 'home', section: 'popularPrograms', value: '', title, desc: '', icon: '',
   slug: POPULAR_PROGRAM_SLUGS[title], order: i,
 }));
+
+// One tag per B.Tech/MBA Program (/admin → Programs) — the same "this data
+// isn't managed separately, it's derived straight from Programs" pattern
+// used for Faculty's department tabs (see Faculty.tsx). This is what makes a
+// newly-added Program show up here automatically, no separate Content
+// Blocks entry required. Keyed by the program itself (not its `department`
+// field) since department isn't reliable for this: it's sometimes shared by
+// two distinct programs on purpose (e.g. AI&ML and AI&DS share an HOD) and
+// sometimes left blank on a freshly-added program — either of which would
+// silently drop a real, publicly-listed program from this strip.
+function buildPopularProgramsFromPrograms(programs: ProgramDoc[]): ContentBlockDoc[] {
+  return programs
+    .filter((p) => p.category === 'btech' || p.category === 'mba')
+    .map((p, i) => ({
+      id: `program-${p.id}`, page: 'home', section: 'popularPrograms', value: '',
+      title: p.name || p.shortName,
+      desc: '', icon: '', slug: p.slug, order: i,
+    }));
+}
 
 const defaultCampusFeatures: ContentBlockDoc[] = [
   'Student Clubs & Organizations', 'Radio Vishnu 90.4', 'Vishnu TV Academy', 'Sports & Games Facilities',
@@ -185,8 +202,9 @@ export default function Home() {
   const testimonials = liveTestimonials.length > 0 ? liveTestimonials : defaultTestimonials;
   const liveStudyCards = useContentBlocks('home', 'studyCards');
   const studyCards = liveStudyCards.length > 0 ? liveStudyCards : defaultStudyCards;
-  const livePopularPrograms = useContentBlocks('home', 'popularPrograms');
-  const popularPrograms = livePopularPrograms.length > 0 ? livePopularPrograms : defaultPopularPrograms;
+  const { docs: programsForTags } = useOrderedCollection<ProgramDoc>('programs', 'order');
+  const programsDerivedPopularPrograms = buildPopularProgramsFromPrograms(programsForTags);
+  const popularPrograms = programsDerivedPopularPrograms.length > 0 ? programsDerivedPopularPrograms : defaultPopularPrograms;
   const activityPhotos = useSitePhotos('home', 'activities', defaultActivityPhotos);
   // Gates the strip's first paint: until Firestore actually responds, we
   // don't yet know whether real activity photos exist, so a skeleton shows
