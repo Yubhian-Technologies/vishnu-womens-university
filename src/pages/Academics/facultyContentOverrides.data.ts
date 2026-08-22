@@ -1998,12 +1998,19 @@ Research Gate | https://www.researchgate.net/profile/V_Purushothama_Raju
 ORCID | https://orcid.org/my-orcid?orcid=0000-0003-0475-3918
 Scopus | https://www.scopus.com/authid/detail.uri?authorId=56405222900
 Publons | https://www.webofscience.com/wos/author/record/L-9817-2014
+
+
+## Identifiers & Contact
+- Email: praju@svecw.edu.in
+- SVECW Emp ID: 502
+- AICTE Unique ID: 1-457793037
 `;
 
 const CSE_MAHESWARA_RAO_TEXT = `
 ## Professional Summary
-- 22 years of teaching experience, 15 years in research, 5 years in industry
-- M.Tech from JNTUK; Ph.D from Acharya Nagarjuna University specializing in "Web Mining using Soft Computing Techniques"
+Dr. V. V. R. Maheswara Rao is a distinguished Professor in the Department of Computer Science and Engineering. He completed his M.Tech. from JNTUK and earned his Ph.D. from Acharya Nagarjuna University, specializing in Web Mining using Soft Computing Techniques. A prolific researcher, Dr. Rao has 95 Scopus and 81 Web of Science indexed publications, including 31 Journals article including 15 SCI, 27 book chapters, and 41 IEEE Xplore papers. His research focuses on Edge Computing, Cloud Computing, AI, Data Science, Machine Learning, and Deep Learning, and he has successfully guided 2 scholars to their Ph.D. degrees. In his administrative capacity, Dr. Rao serves as Dean, Statutory Bodies and IQAC Coordinator, provides strategic leadership to statutory bodies, ensures regulatory compliance, oversees quality benchmarks, coordinates IQAC initiatives to strengthen institutional governance and academic excellence.
+
+With an illustrious career encompassing 22 years of teaching, 15 years of research, and 5 years of industry experience, Dr. Rao stands as an accomplished academician and a dedicated mentor who continues to inspire students and researchers through his vision, expertise, and commitment to excellence.
 
 ## Research Metrics
 - Scopus Publications: 95
@@ -2162,8 +2169,16 @@ const CSE_MAHESWARA_RAO_TEXT = `
 ## Research Profiles
 TABLE:
 Profile | Link
-ORCID | https://orcid.org/0000-0002-0503-7211
-Vidwan-ID | 148183
+ORCID Profile | https://orcid.org/0000-0002-0503-7211
+Google Scholar Profile | https://scholar.google.co.in/citations?user=-BjqQ00AAAAJ&hl=en
+SCOPUS Profile | https://www.scopus.com/authid/detail.uri?authorId=57314360500
+Web of Science Profile | https://www.webofscience.com/wos/?mode=Nextgen&path=%2Fwos%2Fauthor%2Frecord%2FAAR-2806-2020&IsProductCode=Yes&Init=Yes&DestApp=UA&Func=Frame&action=transfer&SrcApp=CR&SID=EUW1ED0E84dlPqazYMUx7bi5rfMow
+ResearchGate | https://www.researchgate.net/profile/Maheswara-Rao-V-V-R?ev=hdr_xprf
+Vidwan-ID : 148183 | https://svecw.irins.org/profile/148183
+
+
+## Identifiers & Contact
+- Email: deansb@svecw.edu.in
 `;
 
 const CSE_KURADA_TEXT = `
@@ -2372,6 +2387,12 @@ Scopus | https://www.scopus.com/authid/detail.uri?authorId=56974356300
 
 ## YouTube Channel
 - CSE Core Subjects – Around 300+ Video Lectures (Data Science, Data Warehousing & Data Mining, R-Language, Operating Systems Theory & Lab, DBMS Theory & Lab, Microprocessors): https://www.youtube.com/channel/UCJ8jQFdgnfpMdwVRuVfOF2g
+
+
+## Identifiers & Contact
+- Email: kcrao@svecw.edu.in
+- SVECW Emp ID: 603
+- AICTE Unique ID: 1-456653757
 `;
 
 const CSE_Y_RAMU_TEXT = `
@@ -2516,6 +2537,12 @@ Vidwan | 148510
 Research Gate | https://www.researchgate.net/profile/Ramu_Y
 ORCID | 0000-0003-4336-005X
 Scopus | https://www.scopus.com/authid/detail.uri?authorId=57477665800
+
+
+## Identifiers & Contact
+- Email: yramu@svecw.edu.in
+- SVECW Emp ID: 504
+- AICTE Unique ID: 1-457776155
 `;
 
 const CSE_SHALEM_RAJU_TEXT = `
@@ -2590,6 +2617,12 @@ Vidwan | 148190
 Research Gate | https://www.researchgate.net/profile/Shalem-Raju/research
 ORCID | 0000-0002-5007-2016
 Scopus | https://www.scopus.com/authid/detail.uri?authorId=58668435400
+
+
+## Identifiers & Contact
+- Email: jesuratnashalemraju@svecw.edu.in
+- SVECW Emp ID: 509
+- AICTE Unique ID: 1-456553571
 `;
 
 const CSE_M_PRASAD_TEXT = `
@@ -2759,6 +2792,12 @@ Organized:
 ## Courses Taught
 - UG: Python Programming, Problem Solving Skills, Data Visualization through Tableau, Mobile Android Application Development, C & Data Structures, Embedded Systems, Computer Organization, Operating Systems, Human Computer Interaction, Internet Technologies, Object-Oriented Programming through JAVA, Computer Graphics, Information Retrieval Systems, Distributed Databases, Software Testing Methodologies, Software Project Management, Network Programming and Biometrics
 - PG: Network Project Management, Distributed Systems, Advanced Communication and Networking, Data Communications, Computer Networks
+
+
+## Identifiers & Contact
+- Email: drmprasadcse@svecw.edu.in
+- SVECW Emp ID: 504
+- AICTE Unique ID: 1-1597240743
 `;
 
 const CSE_SRIKANTH_TEXT = `
@@ -2806,6 +2845,12 @@ B.Tech | Sri Vasavi Engineering College | CSE | 2010
 - Web of Science: https://www.webofscience.com/wos/author/rid/A-9837-2019
 - ORCID: https://orcid.org/0000-0002-4914-8415
 - Scopus: http://www.scopus.com/authid/detail.url?authorId=58285019400
+
+
+## Identifiers & Contact
+- Email: Sreekanth.pala@svecw.edu.in
+- SVECW Emp ID: 567
+- AICTE Unique ID: 1-2642703039
 `;
 
 const CSE_RAJA_RAO_TEXT = `
@@ -2933,6 +2978,12 @@ Scopus | https://www.scopus.com/authid/detail.uri?authorId=57216160958
 
 ## Achievements
 - Received the Dr. APJ Abdul Kalam National Pratibha Award – 2025 from the Southern Private Lecturers Teachers Organisation (SPLTO), Guntur, on 26th October 2025
+
+
+## Identifiers & Contact
+- Email: drpbvrajaraocse@svecw.edu.in
+- SVECW Emp ID: SVECW00644
+- AICTE Unique ID: 1-490602742
 `;
 
 const CSE_VEERARAGHAVAN_TEXT = `
@@ -2998,6 +3049,11 @@ Platform | Link
 Google Scholar | https://scholar.google.com/citations?hl=en&user=k2dNVecAAAAJ
 Scopus | https://www.scopus.com/authid/detail.uri?authorId=56506778100
 ORCID | https://www.scopus.com/authid/detail.uri?authorId=56506778100
+
+
+## Identifiers & Contact
+- Email: drjveeraraghavancse@svecw.edu.in
+- SVECW Emp ID: 50008
 `;
 
 const CSE_SUNIL_PATTEM_TEXT = `
@@ -3090,6 +3146,12 @@ M.Sc (CS) | Akkineni Nageswarara Rao College, ANU, Guntur | Computer Science | 2
 - ResearchGate: https://www.researchgate.net/profile/Sunil-Satvik-2
 - ORCID: https://orcid.org/0000-0002-0095-0693
 - Scopus: https://www.scopus.com/authid/detail.uri?authorId=57477917300
+
+
+## Identifiers & Contact
+- Email: sunilp@svecw.edu.in
+- SVECW Emp ID: 605
+- AICTE Unique ID: 1-456553785
 `;
 
 const CSE_NARASIMHA_RAJU_TEXT = `
@@ -3223,6 +3285,12 @@ Publons | https://www.webofscience.com/wos/author/record/AAR-2894-2020
 
 ## Other Achievements
 - Completed SWAYAM-NPTEL Domain Certification in "Faculty Domain-Advanced" by NPTEL, IIT Madras (October 2022)
+
+
+## Identifiers & Contact
+- Email: mnarasimharajucse@svecw.edu.in
+- SVECW Emp ID: 533
+- AICTE Unique ID: 1-1507894772
 `;
 
 const CSE_GVSS_PRASAD_RAJU_TEXT = `
@@ -3361,6 +3429,12 @@ Vidwan | https://vidwan.inflibnet.ac.in/profile/328450
 Web of Science Researcher ID | https://www.webofscience.com/wos/author/record/32535264
 ORCID | https://orcid.org/0000-0002-2054-6567
 Scopus | https://www.scopus.com/authid/detail.uri?authorId=57216160958
+
+
+## Identifiers & Contact
+- Email: gvssprasadrajucse@svecw.edu.in
+- SVECW Emp ID: 538
+- AICTE Unique ID: 1-1507894784
 `;
 
 const CSE_P_RAJU_TEXT = `
@@ -3484,6 +3558,12 @@ Organized:
 - Placement Mentoring
 - Students Counselling
 - Mentor for "Braille Learning System" project in ATL
+
+
+## Identifiers & Contact
+- Email: rajupcse@svecw.edu.in
+- SVECW Emp ID: 535
+- AICTE Unique ID: 1-1507894792
 `;
 
 const CSE_ANUJ_RAPAKA_TEXT = `
@@ -3553,6 +3633,12 @@ B.Tech | Sir CRR College of Engineering, Andhra University | CSE | 2009
 ## Research Profiles
 - ORCID: 0000-0002-5240-0693
 - Scopus: Author ID 57219443843
+
+
+## Identifiers & Contact
+- Email: anujcse@svecw.edu.in
+- SVECW Emp ID: 542
+- AICTE Unique ID: 1-2196455391
 `;
 
 const CSE_VEERA_RAMA_RAO_TEXT = `
@@ -3622,6 +3708,12 @@ Google Scholar | https://scholar.google.com/citations?user=u03JY70AAAAJ&hl=en
 ResearchGate | https://www.researchgate.net/profile/Ramarao-Malisetty
 ORCID | https://orcid.org/0000-0002-7501-2538
 Scopus | https://www.scopus.com/authid/detail.uri?authorId=58484333600
+
+
+## Identifiers & Contact
+- Email: ramaraocse@svecw.edu.in
+- SVECW Emp ID: 545
+- AICTE Unique ID: 1-2197072483
 `;
 
 const CSE_RAMESH_BABU_MALLELA_TEXT = `
@@ -3692,6 +3784,11 @@ Google Scholar | 2mSFHYsAAAAJ
 Vidwan | 148166
 ORCID | 0000-0002-1212-1526
 Scopus | 57698766000
+
+
+## Identifiers & Contact
+- Email: rameshbabucse@svecw.edu.in
+- AICTE Unique ID: 1-2196141679
 `;
 
 const CSE_N_SILPA_TEXT = `
@@ -3764,6 +3861,13 @@ Profile | Link
 ORCID | 0000-0003-3411-0358
 Scopus ID | 57211574487
 Google Scholar | aDqm00MAAAAJ
+
+
+## Identifiers & Contact
+- Email: nrusimhadri.silpa@gmail.com
+- Orcid Profile: 0000-0003-34ff-0358
+- Scopus Profile: 57215574487
+- Google Scholar Profile: aDqm00MAAAAJ
 `;
 
 const CSE_RATNA_KUMARI_TEXT = `
@@ -3824,6 +3928,11 @@ Vidwan | https://svecw.irins.org/profile/148219
 ResearchGate | https://www.researchgate.net/profile/Ratna-Kanumuri
 ORCID | https://orcid.org/0000-0002-84724692
 Scopus | https://www.scopus.com/authid/detail.uri?authorId=57782306800
+
+
+## Identifiers & Contact
+- Email: kratnacse@svecw.edu.in
+- SVECW Emp ID: 564
 `;
 
 const CSE_RV_SWATHI_TEXT = `
@@ -3844,6 +3953,12 @@ B.Tech | JNTUK | CSE | 2005
 
 ## Roles and Responsibilities
 - Placement Coordinator
+
+
+## Identifiers & Contact
+- Email: venkataswathir@svecw.edu.in
+- SVECW Emp ID: 563
+- AICTE Unique ID: 1-2640224367
 `;
 
 const CSE_N_DURGA_TEXT = `
@@ -3885,6 +4000,12 @@ TABLE:
 Profile | Link
 ORCID | 0009-0008-2844-3096
 Scopus | 58671106500
+
+
+## Identifiers & Contact
+- Email: ndurgacse@svecw.edu.in
+- SVECW Emp ID: 572
+- AICTE Unique ID: 1-11318970803
 `;
 
 const CSE_M_ASMA_TEXT = `
@@ -3911,6 +4032,12 @@ B.Tech | JNTUK | CSE | 2015
 
 ## Courses Taught
 - UG: Compiler Design, Data Structures
+
+
+## Identifiers & Contact
+- Email: asmamdcse@svecw.edu.in
+- SVECW Emp ID: 582
+- AICTE Unique ID: 1-4486306495
 `;
 
 const CSE_K_SATHISH_KUMAR_TEXT = `
@@ -3927,6 +4054,11 @@ B.Tech | JNTUK | CSE | 2009
 ## NPTEL Courses
 - Python Programming
 - Deep Learning
+
+
+## Identifiers & Contact
+- Email: asathishkumarcse@svecw.edu.in
+- AICTE Unique ID: 1-7504301506
 `;
 
 const CSE_T_NEELIMA_TEXT = `
@@ -3953,6 +4085,12 @@ B.Tech | JNTUK | CSE | 2016
 ## Roles and Responsibilities
 - Project Guide
 - Student Mentor
+
+
+## Identifiers & Contact
+- Email: neelima.cse@svecw.edu.in
+- SVECW Emp ID: 587
+- AICTE Unique ID: 1-7505442672
 `;
 
 const CSE_K_JAYA_SRI_TEXT = `
@@ -3980,6 +4118,11 @@ B.Tech | JNTUK | CSE | 2015
 
 ## Roles and Responsibilities
 - Student Counselling / Mentor
+
+
+## Identifiers & Contact
+- Email: jayasri.cse@svecw.edu.in
+- AICTE Unique ID: 1-7586448861
 `;
 
 const CSE_NAGARAJU_PAMARTHI_TEXT = `
@@ -4074,6 +4217,12 @@ Scopus | http://www.scopus.com/authid/detail.url?authorId=57211443164
 - Member in Admissions Team
 - Member of NAAC & NBA works
 - Acted as Class-In charge
+
+
+## Identifiers & Contact
+- Email: pnagarajucse@svecw.edu.in
+- SVECW Emp ID: 588
+- AICTE Unique ID: 1-10646600111
 `;
 
 const CSE_G_RAMESH_BABU_TEXT = `
@@ -4121,6 +4270,12 @@ B.Tech | JNTUH | CSE | 2007
 ## Research Profiles
 - ORCID: https://orcid.org/0000-0002-4655-5496
 - Scopus: Author ID 58107337300
+
+
+## Identifiers & Contact
+- Email: grameshcse@svecw.edu.in
+- SVECW Emp ID: 589
+- AICTE Unique ID: 1-7587254855
 `;
 
 const CSE_PHANEENDRA_VARMA_TEXT = `
@@ -4190,6 +4345,12 @@ Vidwan | 328453
 Research Gate | HLP-3949-2023
 ORCID | 0000-0001-7243-8974
 Scopus | 58308275900
+
+
+## Identifiers & Contact
+- Email: chpvarmacse@svecw.edu.in
+- SVECW Emp ID: 50007
+- AICTE Unique ID: 1-3314367171
 `;
 
 const CSE_VENKATA_SRI_ASHA_TEXT = `
@@ -4233,6 +4394,12 @@ Vidwan | 328430
 Research Gate | http://www.researcherid.com/rid/IYL-4903-2023
 ORCID | http://www.orcid.org/0000-0002-7246-6526
 Scopus | http://www.scopus.com/authid/detail.url?authorId=57211387523
+
+
+## Identifiers & Contact
+- Email: avsashacse@svecw.edu.in
+- SVECW Emp ID: 590
+- AICTE Unique ID: 1-1832166859
 `;
 
 const CSE_SONI_SHARMILA_TEXT = `
@@ -4330,6 +4497,11 @@ Vidwan | 373469
 Research Gate | http://www.researcherid.com/rid/HLP-4102-2023
 ORCID | http://www.orcid.org/0000-0002-7386-0963
 Scopus | http://www.scopus.com/authid/detail.url?authorId=58092723600
+
+
+## Identifiers & Contact
+- Email: kssharmilacse@svecw.edu.in
+- SVECW Emp ID: 592
 `;
 
 const CSE_GRLM_TAYARU_TEXT = `
@@ -4397,6 +4569,12 @@ ORCID | http://www.orcid.org/0000-0002-5843-7366
 - NSS Programme Officer
 - Class teacher and student counselor
 - Year Coordinator for II CSE
+
+
+## Identifiers & Contact
+- Email: grlmayarucse@svecw.edu.in
+- SVECW Emp ID: 593
+- AICTE Unique ID: 1-4624033954
 `;
 
 const CSE_VENKATA_RAMANA_TEXT = `
@@ -4458,6 +4636,12 @@ Google Scholar | y0zUQCoAAAAJ
 Vidwan | 328508
 ORCID | 0009-0000-8558-5260
 Scopus | 58654251300
+
+
+## Identifiers & Contact
+- Email: chvramanacse@svecw.edu.in
+- SVECW Emp ID: 598
+- AICTE Unique ID: 1-4616145744
 `;
 
 const CSE_TARAKA_SATYANARAYANA_MURTHY_TEXT = `
@@ -4535,6 +4719,11 @@ Google Scholar | IbKLpngAAAAJ
 Vidwan | 288673
 ORCID | https://orcid.org/0000-0002-5943-9822
 Scopus | 58221107000
+
+
+## Identifiers & Contact
+- Email: ptsmurtycse@svecw.edu.in
+- SVECW Emp ID: 599
 `;
 
 const CSE_GOTTALA_SURENDRA_KUMAR_TEXT = `
@@ -4589,6 +4778,12 @@ Google Scholar | https://scholar.google.com/citations?user=5G52K2AAAAAJ&hl=en
 Vidwan | 328465
 ORCID | 0000-0001-6882-8160
 Scopus ID | 0000-0001-6882-8160
+
+
+## Identifiers & Contact
+- Email: gsurendrakumarcse@svecw.edu.in
+- SVECW Emp ID: 50001
+- AICTE Unique ID: 1-9508698770
 `;
 
 const CSE_G_SUJATHA_TEXT = `
@@ -4630,6 +4825,11 @@ Vidwan | 328521
 Research Gate | researcherid.com/rid/IYJ-7875-2023
 ORCID | orcid.org/0009-0000-8166-2142
 Scopus | scopus.com/authid/detail.url?authorId=57211914432
+
+
+## Identifiers & Contact
+- Email: gsujathacse@svecw.edu.in
+- SVECW Emp ID: 50003
 `;
 
 const CSE_NAGESWARA_RAO_TEXT = `
@@ -4691,6 +4891,12 @@ Google Scholar | https://scholar.google.co.in/citations?user=oBNhr8MAAAAJ
 Vidwan | https://svecw.irins.org/profile/328580
 ORCID | https://orcid.org/0000-0003-1336-1027
 Scopus | https://www.scopus.com/authid/detail.uri?authorId=57204727312
+
+
+## Identifiers & Contact
+- Email: anageswaraocse@svecw.edu.in
+- SVECW Emp ID: 50004
+- AICTE Unique ID: 1-3558155073
 `;
 
 const CSE_SATYA_MALLESH_TEXT = `
@@ -4800,6 +5006,11 @@ Vidwan | https://vidwan.inflibnet.ac.in/profile/410507
 Research Gate | JHT-3708-2023
 ORCID | 0009-0007-9109-002X
 Scopus | 58909349100
+
+
+## Identifiers & Contact
+- Email: asmalleshcse@svecw.edu.in
+- SVECW Emp ID: 50005
 `;
 
 const CSE_RAJESH_THAMMULURI_TEXT = `
@@ -4838,6 +5049,12 @@ B.Tech | Narasaraopeta Engineering College, Narasaraopet | CSE | 2012
 
 ## Research Profile
 - ORCID: 0009-0000-4693-1992
+
+
+## Identifiers & Contact
+- Email: trajeshcse@svecw.edu.in
+- SVECW Emp ID: 50006
+- AICTE Unique ID: 1-457001153
 `;
 
 const CSE_V_RAJESH_BABU_TEXT = `
@@ -4870,6 +5087,11 @@ MCA | AMACE, Vadamavandal | CS | 2001
 
 ## Courses Taught
 - UG: Full stack Development, Principles of Programming languages, Electronic Commerce, UML & DP, Embedded Systems, Software Engineering, OOAD and Secure Coding, Web Application Development, Microprocessors, C and Java languages, Computer Networks, Object Oriented Analysis and Design, Operating Systems, Advanced Java Web Technologies, Web Technologies, Ruby-on-Rails/php/perl, Hadoop and Big Data, Data Structures, Software Testing Methodologies, Python, Node js Express js
+
+
+## Identifiers & Contact
+- Email: vrajeshbabucse@svecw.edu.in
+- SVECW Emp ID: 50009
 `;
 
 const CSE_BELLAMGUBBA_ANOCH_TEXT = `
@@ -4904,6 +5126,11 @@ B.Tech | Narasaraopeta Engineering College | CSE | 2013
 
 ## Courses Taught
 - UG: OOAD, Computer Graphics, DBMS, Java Programming, Statistics with R Programming, Python, Unix, DAA, SA&DP, CN, UML & DP, Machine Learning
+
+
+## Identifiers & Contact
+- Email: banochcse@svecw.edu.in
+- SVECW Emp ID: 500011
 `;
 
 const CSE_UMA_MAHESWARA_RAO_TEXT = `
@@ -5000,6 +5227,11 @@ Google Scholar | https://scholar.google.com/citations?user=4p3OX60AAAAJ&hl=en
 Research Gate | https://www.researchgate.net/profile/Saka-Uma-Maheswara-Rao
 ORCID | https://orcid.org/0000-0003-3971-3924
 Scopus | https://www.scopus.com/authid/detail.uri?authorId=57767759500
+
+
+## Identifiers & Contact
+- Email: Saka.mahi@gmail.com
+- SVECW Emp ID: 500013
 `;
 
 const CSE_S_NAGARAJAN_TEXT = `
@@ -5064,6 +5296,11 @@ TABLE:
 Profile | Link
 Google Scholar | https://scholar.google.com/citations?user=RNNOHeQAAAAJ&hl=en&oi=sra
 ORCID | https://orcid.org/0009-0001-5299-8277?lang=en
+
+
+## Identifiers & Contact
+- Email: snagarajancse@svecw.edu.in
+- SVECW Emp ID: 50014
 `;
 
 const CSE_BRAHMA_RAMESH_TEXT = `
@@ -5121,6 +5358,11 @@ Google Scholar | https://scholar.google.com/citations?hl=en&user=cBVduyMAAAAJ
 Vidwan | https://vidwan.inflibnet.ac.in/profile/590549
 Research Gate | https://www.researchgate.net/profile/Kallakuri-N-V-P-S-Ramesh
 ORCID | 0009-0006-2654-0517
+
+
+## Identifiers & Contact
+- Email: knvpsbrameshcse@svecw.edu.in
+- SVECW Emp ID: 50016
 `;
 
 const CSE_PANTHANI_RAMESH_TEXT = `
@@ -5157,6 +5399,11 @@ B.Tech | B V C Engineering College Odalarevu | CSE | 2013
 
 ## Courses Taught
 - UG: Formal Languages and Automata Theory, Compiler Design, Secure Coding Techniques, Mathematical Foundation of Computer Science, JAVA, Digital Logic Design
+
+
+## Identifiers & Contact
+- Email: prameshcse@svecw.edu.in
+- SVECW Emp ID: 5020
 `;
 
 const CSE_SATYANARAYANA_REDDY_MARRI_TEXT = `
@@ -5211,6 +5458,11 @@ Profile | Link
 Google Scholar | https://scholar.google.com/citations?hl=en&user=b8W_mWYAAAAJ
 ORCID | https://orcid.org/0009-0005-1035-8238
 Scopus | https://www.scopus.com/authid/detail.uri?authorId=57226643096
+
+
+## Identifiers & Contact
+- Email: msreddycse@svecw.edu.in
+- SVECW Emp ID: 500021
 `;
 
 const CSE_ASHOK_KOUJALAGI_TEXT = `
@@ -5541,6 +5793,11 @@ Google Scholar | https://scholar.google.co.in/citations?user=Ad0QaCEAAAAJ&hl=en
 Vidwan | https://vidwan.inflibnet.ac.in/profile/367094
 ORCID | https://orcid.org/my-orcid?orcid=0000-0002-0195-3976
 Scopus | https://www.scopus.com/authid/detail.uri?authorId=57211543256
+
+
+## Identifiers & Contact
+- Email: drkashokcse@svecw.edu.in
+- SVECW Emp ID: 500022
 `;
 
 const AI_HOD_TEXT = `
@@ -5614,6 +5871,10 @@ Organized:
 ## NPTEL Courses Completed
 - Introduction to programming in C (8 weeks), 91.5% score, Elite tag
 - Programming, Data Structures and Algorithms using Python (8 weeks), 70% score, Elite tag
+
+
+## Identifiers & Contact
+- Email: hodai@svecw.edu.in
 `;
 
 const AI_SRICHARANI_TEXT = `
@@ -5715,6 +5976,12 @@ ORCID | 0000-0003-1036-9875
 - Workshops/FDPs/Conferences/Professional Development/Department Faculty Activities
 - NBA Works
 - GATE Classes
+
+
+## Identifiers & Contact
+- Email: cherani.yashu@svecw.edu.in
+- SVECW ID: 730
+- AICTE Registration ID: 1-1507894870
 `;
 
 const AI_DURGA_PRASAD_TEXT = `
@@ -5853,6 +6120,12 @@ ORCID | https://orcid.org/0000-0002-6972-7801
 
 ## Achievements
 - Best Paper Award
+
+
+## Identifiers & Contact
+- Email: durgaprasad_garapati@svecw.edu.in
+- SVECW ID: 227
+- AICTE Registration ID: 1-2379813184
 `;
 
 const AI_MADHAVI_THOTAKURA_TEXT = `
@@ -5887,6 +6160,12 @@ ORCID | 0000-0002-4596-7376
 - GATE Club Department coordinator
 - ECAP Coordinator
 - Vishnu LMS Department Coordinator
+
+
+## Identifiers & Contact
+- Email: madhavitv@svecw.edu.in
+- SVECW ID: 608
+- AICTE Registration ID: 1-761755827
 `;
 
 const AI_PRAVEEN_KUMAR_NALLI_TEXT = `
@@ -5958,6 +6237,11 @@ ORCID | https://orcid.org/0000-0002-7443-7841
 ## Roles and Responsibilities
 - Coordinator - NAAC Criteria I under New Framework (SVECW)
 - Department Level Web Master (SVECW)
+
+
+## Identifiers & Contact
+- Email: Praveenkumar.nalli@svecw.edu.in
+- SVECW ID: 232
 `;
 
 const AI_PRIYA_MADDIPATI_TEXT = `
@@ -5989,6 +6273,12 @@ ORCID | https://orcid.org/0009-0009-6691-2321
 ## Roles and Responsibilities
 - Department NAAC Criteria II Coordinator
 - Department Monthly Report Coordinator
+
+
+## Identifiers & Contact
+- Email: mlvapriyaai@svecw.edu.in
+- SVECW ID: 5411
+- AICTE Registration ID: 1-9507869972
 `;
 
 const AI_JANAKI_SIVA_RAMA_RAJU_TEXT = `
@@ -5999,12 +6289,21 @@ const AI_JANAKI_SIVA_RAMA_RAJU_TEXT = `
 - Windows Internals
 - Software Project Management
 - Software Testing
+
+
+## Identifiers & Contact
+- Email: kjsrrajuai@svecw.edu.in
+- SVECW ID: 5403
 `;
 
 const AI_CH_SRAVANI_TEXT = `
 ## Educational Qualifications
 - Postgraduate: B.Tech (Computer Science & Engineering), JNTUK, 09-2019
 - Undergraduate: B.Tech (Computer Science & Engineering), JNTUK, 05-2017
+
+
+## Identifiers & Contact
+- Email: chsravaniai@svecw.edu.in
 `;
 
 const AI_P_ARCHANA_TEXT = `
@@ -6019,6 +6318,11 @@ const AI_P_ARCHANA_TEXT = `
 - Windows Internals
 - Software Project Management
 - Software Testing
+
+
+## Identifiers & Contact
+- SVECW ID: 597
+- AICTE Registration ID: 1-7492315069
 `;
 
 const AI_K_RAJA_SEKHAR_TEXT = `
@@ -6070,6 +6374,11 @@ const AI_K_RAJA_SEKHAR_TEXT = `
 - AI Department IDEA LAB Coordinator
 - AI Department JnanaBhumi Coordinator
 - Class teacher and student counselor
+
+
+## Identifiers & Contact
+- Email: krajasekharai@svecw.edu.in
+- SVECW ID: 596
 `;
 
 const AI_P_VINOD_BABU_TEXT = `
@@ -6101,6 +6410,12 @@ Google Scholar | https://scholar.google.com/citations?hl=en&user=ywbgPJoAAAAJ
 Scopus ID | 57222982856
 ORCID | https://orcid.org/0000-0003-0875-8847
 Web of Science ID | HRB-6612-2023
+
+
+## Identifiers & Contact
+- Email: vinodbabup.ai@svecw.edu.in
+- SVECW ID: 5418
+- AICTE Registration ID: 1-7527847642
 `;
 
 const AI_K_SWETHA_TEXT = `
@@ -6114,6 +6429,11 @@ const AI_K_SWETHA_TEXT = `
 
 ## Areas of Specialization
 - Machine Learning
+
+
+## Identifiers & Contact
+- Email: kswethai@svecw.edu.in
+- SVECW ID: 5426
 `;
 
 const AI_PAVAN_KUMAR_HOTA_TEXT = `
@@ -6148,6 +6468,12 @@ ORCID | 0000-0002-7246-5443
 - Data Visualization, Data Warehousing & Data Mining (Theory)
 - Advance SQL & Data Mining Lab (AI&ML II year II Semester)
 - Placement Coordinator
+
+
+## Identifiers & Contact
+- Email: hotapavankumar@svecw.edu.in
+- SVECW ID: 1225
+- AICTE Registration ID: 1-43363004758
 `;
 
 const AI_R_SARADA_TEXT = `
@@ -6161,6 +6487,12 @@ const AI_R_SARADA_TEXT = `
 
 ## Research Interests
 - Field of Specialization: Mobile Computing
+
+
+## Identifiers & Contact
+- Email: rsarada.ai@svecw.edu.in
+- SVECW ID: 5421
+- AICTE Registration ID: 1-44421218891
 `;
 
 const AI_G_KALYANI_TEXT = `
@@ -6176,12 +6508,22 @@ const AI_G_KALYANI_TEXT = `
 - Windows Internals
 - Software Project Management
 - Software Testing
+
+
+## Identifiers & Contact
+- Email: gkalyaniai@svecw.edu.in
+- SVECW ID: 5422
 `;
 
 const AI_YANDAMURI_GAYATRI_TEXT = `
 ## Education
 - M.Tech in CST (2021)
 - B.Tech in CSE (2015)
+
+
+## Identifiers & Contact
+- Email: ygayatriai@svecw.edu.in
+- SVECW ID: 5423
 `;
 
 const AI_K_SRIKANTH_TEXT = `
@@ -6201,6 +6543,11 @@ const AI_K_SRIKANTH_TEXT = `
 
 ## Research Scholar IDs
 - Google Scholar ID: vvJGAv4AAAAJ
+
+
+## Identifiers & Contact
+- Email: ksrikanthai@svecw.edu.in
+- SVECW ID: 5428
 `;
 
 const AI_VEERENDRA_BETHINEEDI_TEXT = `
@@ -6227,6 +6574,11 @@ ResearchGate | https://www.researchgate.net/profile/VeerendraBethineedi
 
 ## Key Credentials
 Mr. Bethineedi holds 14 published research articles across journals like IJRAR and Journal of Engineering Sciences, attended 13+ faculty development programs, and completed NPTEL/SWAYAM courses in research methodology and ethics, plus multiple Coursera certifications in programming and cloud technologies.
+
+
+## Identifiers & Contact
+- Email: bveerendraai@svecw.edu.in
+- SVECW ID: 5429
 `;
 
 const AI_DVH_VENU_KUMAR_TEXT = `
@@ -6256,6 +6608,11 @@ const AI_DVH_VENU_KUMAR_TEXT = `
 ## Research Scholar IDs
 - Google Scholar: BPpkk8AAAAAJ
 - ORCID: 0009-0004-2425-7748
+
+
+## Identifiers & Contact
+- Email: dvhvenukumarai@svecw.edu.in
+- SVECW ID: 5431
 `;
 
 const AI_S_VENKATA_RAO_TEXT = `
@@ -6293,6 +6650,11 @@ Workshops/Seminars/Training:
 
 ## Certifications
 - Certified Intern, Virtusa Pvt. Ltd., 30/06/2020
+
+
+## Identifiers & Contact
+- Email: svenkatai@svecw.edu.in
+- SVECW ID: 5431
 `;
 
 const AI_SINDHUJA_TEXT = `
@@ -6327,6 +6689,11 @@ TABLE:
 Profile | Link
 Google Scholar | https://scholar.google.com/citations?user=L3L1CDUAAAAJ&hl=en
 ORCID | 0009-0005-8498-897X
+
+
+## Identifiers & Contact
+- Email: gsindhujaai@svecw.edu.in
+- SVECW ID: 5433
 `;
 
 const AI_R_DAVENCY_PRIYANKA_TEXT = `
@@ -6351,6 +6718,11 @@ Committee Roles:
 
 ## Research Identifiers
 - Google Scholar ID: https://scholar.google.com/citations?user=vZm3WcgAAAAJ&hl=en&authuser=3
+
+
+## Identifiers & Contact
+- Email: rdpriyankaai@svecw.edu.in
+- SVECW ID: 5434
 `;
 
 const AI_KALIDINDI_SOMARAJU_TEXT = `
@@ -6376,6 +6748,11 @@ Workshops/Training Attended:
 
 ## Research Identifiers
 - ORCID ID: 0009-0000-1880-4953
+
+
+## Identifiers & Contact
+- Email: ksrajuai@svecw.edu.in
+- SVECW ID: 5435
 `;
 
 const AI_HARSHAVARDHAN_TEXT = `
@@ -6395,6 +6772,11 @@ const AI_HARSHAVARDHAN_TEXT = `
 
 ## Current Role
 - Placement Coordinator
+
+
+## Identifiers & Contact
+- Email: tharshaai@svecw.edu.in
+- SVECW ID: 5436
 `;
 
 const AI_JULURI_PRADEEP_TEXT = `
@@ -6428,6 +6810,11 @@ const AI_JULURI_PRADEEP_TEXT = `
 - SCJP
 - FSD
 - Cloud Security and DevSecOps Automation (SANS)
+
+
+## Identifiers & Contact
+- Email: jpradeepai@svecw.edu.in
+- SVECW ID: 5437
 `;
 
 const AI_MHR_NALINI_TEXT = `
@@ -6450,6 +6837,11 @@ const AI_MHR_NALINI_TEXT = `
 
 ## Current Role and Responsibilities
 - Placement Coordinator
+
+
+## Identifiers & Contact
+- Email: mhrnaliniai@svecw.edu.in
+- SVECW ID: 5438
 `;
 
 const AI_N_ANUSHA_TEXT = `
@@ -6497,6 +6889,11 @@ const AI_N_ANUSHA_TEXT = `
 - Department LMS coordinator
 - NAAC criteria 2 coordinator
 - Placement coordinator
+
+
+## Identifiers & Contact
+- Email: sanushaai@svecw.edu.in
+- SVECW ID: 5424
 `;
 
 const AI_DEEPAK_PHANI_KRISHNA_TEXT = `
@@ -6513,6 +6910,11 @@ const AI_DEEPAK_PHANI_KRISHNA_TEXT = `
 - DevOps
 - AWS Services
 - Cyber Security Tools
+
+
+## Identifiers & Contact
+- Email: pdpkrishnaai@svecw.edu.in
+- SVECW ID: 5439
 `;
 
 const AI_J_SAI_DIVYA_TEXT = `
@@ -6527,6 +6929,11 @@ const AI_J_SAI_DIVYA_TEXT = `
 
 ## Fields of Specialization
 - Block Chain
+
+
+## Identifiers & Contact
+- Email: jsdivyaai@svecw.edu.in
+- SVECW ID: 5440
 `;
 
 const AI_S_P_SUDHA_TEXT = `
@@ -6543,6 +6950,11 @@ const AI_S_P_SUDHA_TEXT = `
 ## Fields of Specialization
 - Cloud Computing
 - Deep Learning
+
+
+## Identifiers & Contact
+- Email: spsudhaai@svecw.edu.in
+- SVECW ID: 5441
 `;
 
 const AI_M_P_PRAVEEN_KUMAR_TEXT = `
@@ -6557,6 +6969,11 @@ const AI_M_P_PRAVEEN_KUMAR_TEXT = `
 
 ## Fields of Specialization
 - Power BI, DAX, M Language
+
+
+## Identifiers & Contact
+- Email: mpkumarai@svecw.edu.in
+- SVECW ID: 5442
 `;
 
 const AI_LALITHA_RAJA_RAJESWARI_TEXT = `
@@ -6576,6 +6993,11 @@ const AI_LALITHA_RAJA_RAJESWARI_TEXT = `
 - Emerging Trends in Artificial Intelligence (May 25-31, 2022)
 - Internet of Things with Machine Learning and Artificial Intelligence, NIT Warangal (December 6-10, 2021)
 - Applications of Machine Learning, SVECW (June 2021)
+
+
+## Identifiers & Contact
+- Email: plalitharajarajeswariai@svecw.edu.in
+- SVECW ID: 5443
 `;
 
 const AI_TOWQEER_UL_HAQ_TEXT = `
@@ -6592,6 +7014,11 @@ const AI_TOWQEER_UL_HAQ_TEXT = `
 - Docker
 - AWS
 - Generative AI
+
+
+## Identifiers & Contact
+- Email: towqeerai@svecw.edu.in
+- SVECW ID: 5444
 `;
 
 const AI_SAMPARTHI_KUMAR_TEXT = `
@@ -6649,6 +7076,11 @@ TABLE:
 Profile | Link
 Google Scholar | https://ln.run/9xB6y
 Scopus | https://ln.run/2IC5_
+
+
+## Identifiers & Contact
+- Email: drsvskumarai@svecw.edu.in
+- SVECW ID: 5447
 `;
 
 const AI_LAKSHMI_SUNDARI_TEXT = `
@@ -6663,6 +7095,11 @@ const AI_LAKSHMI_SUNDARI_TEXT = `
 
 ## Fields of Specialization
 - Python, Machine Learning
+
+
+## Identifiers & Contact
+- Email: glakshmiai@svecw.edu.in
+- SVECW ID: 5445
 `;
 
 const AI_DARAM_ANAND_TEXT = `
@@ -6677,6 +7114,11 @@ const AI_DARAM_ANAND_TEXT = `
 
 ## Fields of Specialization
 - MongoDB, Spring Boot, JAVA
+
+
+## Identifiers & Contact
+- Email: danandai@svecw.edu.in
+- SVECW ID: 5446
 `;
 
 const AI_M_BHARGAVI_TEXT = `
@@ -6694,6 +7136,11 @@ const AI_M_BHARGAVI_TEXT = `
 
 ## FDPs/Workshops/Seminars/Training Programs Attended
 - FDP on Blockchain
+
+
+## Identifiers & Contact
+- Email: mbhargaviai@svecw.edu.in
+- SVECW ID: 5448
 `;
 
 const IT_HOD_TEXT = `
@@ -8267,6 +8714,10 @@ const MBA_RAMA_MURTHY_TEXT = `
 - "Financial Inclusion in India- A Review of Initiatives and Achievements," UGC Sponsored Two Day National Seminar, Department of Commerce, Pithapur Rajah's Government College, Kakinada, 23-24 September 2016
 - "Innovation Management - A Strategic Imperative For Growth," UGC Sponsored Two Day National Seminar, Department of Commerce and Business Administration, P.B.Siddhartha College of Arts and Science, Vijayawada, 22-23 August 2017
 - "Women Entrepreneurs: Problems and Challenges," UGC Sponsored Two Day National Seminar on Recent Innovations In Commerce, Management, Skill Development and E-Commerce, Department of Commerce, Pithapur Rajah's Government College, Kakinada, 5-6 December 2017
+
+
+## Identifiers & Contact
+- Email: kvrmurthymba@svecw.edu.in
 `;
 
 const MBA_KARTHIK_TEXT = `
@@ -8349,6 +8800,10 @@ const MBA_KARTHIK_TEXT = `
 - Faculty Development Programmes (FDP) Participated: 22
 - Programmes/Webinars Organized: 12
 - NPTEL/Swayam Courses Completed: 2
+
+
+## Identifiers & Contact
+- Email: mkarthikmba@svecw.edu.in
 `;
 
 const MBA_SWARNA_JYOTHI_TEXT = `
@@ -8413,6 +8868,10 @@ Teaching Experience: 31 years
 - Part-time faculty, IGNOU center, D.N.R. College, Bhimavaram
 - Visiting faculty for Acharya Nagarjuna University distant mode M.B.A program
 - Resource person at Community Network Center, Department of Social Work, D.N.R. College, Bhimavaram
+
+
+## Identifiers & Contact
+- Email: swarnajyothi@svecw.edu.in
 `;
 
 const MBA_ANUDEEP_TEXT = `
@@ -8457,6 +8916,10 @@ SCOPUS Journal Articles:
 - Business plan mentor for BAJA SAEINDIA teams (6+ years)
 - Mentor for VISHVA-Technology Business Innovation initiative
 - Managed Department of Management Studies at SVECW
+
+
+## Identifiers & Contact
+- Email: ch.anudeep@svecw.edu.in
 `;
 
 const MBA_HARSHITHA_KEERTHI_TEXT = `
@@ -8489,6 +8952,10 @@ Faculty Development Programmes:
 - SAP S4 HANA Certification
 - Freelance HR recruiter experience
 - Project management in SAP HANA
+
+
+## Identifiers & Contact
+- Email: mkeerthimba@svecw.edu.in
 `;
 
 const MBA_PRABHAVATHI_TEXT = `
@@ -8543,6 +9010,10 @@ const MBA_PRABHAVATHI_TEXT = `
 - Online webinar "Exploratory Factor Analysis using SPSS," Anant Education Foundation (August 29-30, 2020)
 - Online webinar "Qualitative Analysis using NVIVO software," Anant Education Foundation (August 14-16, 2020)
 - Workshop "Data Analysis using R Programme," Vijayanagara Sri Krishnadevaraya University (July 6-7, 2020)
+
+
+## Identifiers & Contact
+- Email: drkprabhavathimba@svecw.edu.in
 `;
 
 const MBA_SATISH_TEXT = `
@@ -8581,6 +9052,1051 @@ const MBA_SATISH_TEXT = `
 ## Achievements
 - UGC merit scholarship holder 2011-2016
 - First rank in intermediate at college level (2010)
+
+
+## Identifiers & Contact
+- Email: msatishmba@svecw.edu.in
+`;
+
+const MECH_HOD_TEXT = `
+## Educational Qualifications
+- Ph.D.: NIT Warangal, 2015
+- M.Tech: NIT Warangal, 2007
+- B.Tech: V.R. Siddhartha Engineering College, 2005
+
+## Professional Experience
+- Teaching: 15 years 5 months
+- Research: 9 years
+- Industry: 1 year
+
+## Research Specializations
+- Manufacturing-Metal forming, Friction stir welding, Additive manufacturing, Surface modification, Material characterization, Machine learning
+
+## Subjects Taught
+- Materials & Manufacturing, Robotics, Metrology, Operations Research, 3D printing, Python programming
+
+## Administrative Roles
+- Head of Department; NBA program coordinator; Manufacturing Technology Lab in charge; Applied Robotics Lab coordinator; Teaching-Learning Committee coordinator
+
+## Funded Research Projects
+- DST Project: "Ultrasonic nanocrystal surface modification of SS316 components manufactured through selective laser melting and assessment of fatigue characteristics" (TAR/2021/000118) - 18.3 lakhs, collaborating with Dr R. Vijay, Scientist-G, ARCI Hyderabad
+- AICTE Project: Additive Manufacturing for Medical and Aerospace applications (File NO: 34-66/I54/FDC/STTP/Policy-1/2019-20) - 4 lakhs
+- DST Project: 2-day seminar on Smart materials and structures (F.No: sB/ss/9L/15-16) - 75,000 rupees
+
+## Patents
+- Indian Patent Application No.201941036277 A: "EXHAUST" filed 10/09/2019
+
+## Professional Certifications
+- Yellow belt Six Sigma certification
+
+## Journal Reviewer Positions
+- Journal of Mechanical Science and Technology (Springer); Materials Design (Elsevier); Journal of Testing and Evaluation (ASTM); Part E: Journal of Process Mechanical Engineering (SAGE); Part B: Journal of Engineering Manufacture (SAGE); Part C: Journal of Mechanical Engineering Science (SAGE); Experimental Mechanics (Elsevier); Mechanics of Materials; Journal of Institution of Engineer India-C (Springer); Journal of Brazilian Society of Mechanical Sciences and Engineering; SN Applied Sciences (Springer); Advances in Civil Engineering (Hindawi); Journal of Magnesium and Alloys (Elsevier); Materials Today Proceedings (Elsevier)
+
+## Research Collaborators
+- Dr R. Vijay (ARCI); Dr U. Chandra Sekhar (Wipro 3D); Dr Chandan Mandal (DMRL); Taraknath De (ASL, DRDO); Dr MJ Davidson (NIT Warangal); Dr D Ravi Kumar (VNIT Nagpur); Dr B Anil Kumar (NIT Manipur); Dr Ch Nagaraju (V.R. Siddhartha Engineering College)
+
+## International Exposure
+- Visited NUS Singapore for international conference; attended training program on Applied Robotic Control in Germany
+
+## Student Mentoring Achievements
+- CATERPILLAR Manufacturing Challenge: 1st prize
+- HeroMotor Corp Challenge: 2nd prize
+- L&T TechGium Challenge: reached finals among 20,000 teams
+- Ferucia Novus Challenge: reached finals among 500+ teams
+- BAJA GoGreen Award: exhaust system design and development
+- BAJA lightweight component development mentoring
+
+
+## Identifiers & Contact
+- Email: hodmechanical@svecw.edu.in
+- SVECW ID: 328
+- Google Scholar Id: zTS7Z3sAAAAJ&hl
+- Scopus Id: 55681818700
+- ORCID Id: 0000-0002-3055-3314
+- Vidwan ID: 149710
+`;
+
+const MECH_P_SRINIVASA_RAJU_TEXT = `
+## Educational Qualifications
+- Ph.D.: Rayalaseema University, 2011
+- M.Tech: Machine Design, JNTU Kakinada, 2004
+- B.E.: Mechanical Engineering, Andhra University, 1997
+
+## Teaching Experience
+- 25 years
+
+## Specialization Areas
+- Design and fuel cell technologies
+
+## Courses Taught
+- Engineering Drawing, Basic Mechanical Engineering, Mechanics of Solids, Management Science, Design of Machine Members I & II, Power Plant Engineering, Fluid Mechanics and Hydraulic Machinery, Engineering Workshop, Production Technology Lab, Mechanics of Solids Lab
+
+## Key Administrative Roles
+- Director - Student Affairs (SVES); Department Head (2009-2020); Faculty Advisor for Team Ziba Racers (SAE BAJA); TEQIP-II Coordinator; Co-PI for Women Technology Park
+
+## Professional Memberships
+- Life Member, Indian Society for Technical Education (LM 37568)
+- Life Member, Computer Society of India (ID: 01120440)
+- Life Member, Institute of Engineers (MIE-M148573-8)
+- Fellow, Institution of Engineers (F-1214426)
+- Society of Automotive Engineers (7180410250)
+
+
+## Identifiers & Contact
+- Email: viceprincipal@svecw.edu.in
+- SVECW ID: 301
+- AICTE Registration ID: 1-459196329
+- Google Scholar Id: mfn4zxQAAAAJ
+- Scopus Id: 57208338507
+- ORCID Id: 0000-0002-1309-5796
+- Vidwan ID: 149711
+`;
+
+const MECH_G_SRINIVASA_RAO_TEXT = `
+## Educational Background
+- Ph.D.: VTU Belgaum, 2009
+- M.Tech: Manufacturing Technology, NIT Calicut, 1992
+- B.Tech: S.V. University College of Engineering, Tirupathi, 1990
+- Polytechnic: SV Government Polytechnic, Tirupati, 1986
+
+## Experience
+- Teaching: 32 years
+- Research: 15 years
+
+## Research Specializations
+- Fracture Mechanics, Mech. Engg - CAD/CAM, FEM, CFM, with expertise spanning mechanics of solids, design, and manufacturing processes
+
+## International Exposure
+- Countries visited for educational collaboration: Germany, France, Singapore, Dubai, Abu Dhabi
+
+## Key Institutional Contributions
+- Oversaw NBA accreditation cycles, directed UGC autonomous status achievement (2014, 2021), managed NAAC accreditation processes, and established the Institutional Innovation Council in 2018-19
+
+## Professional Memberships
+- Life Member ISTE (LM19646), Member SAE, Member ASEE (83698), Fellow Member Institute of Engineers India (F-1209384)
+
+
+## Identifiers & Contact
+- Email: principal@svecw.edu.in
+- SVECW ID: 888
+- AICTE Registration ID: 1-458702649
+- Google Scholar Id: vGAK4h4AAAAJ
+- Scopus Id: 56993036000
+- ORCID Id: 0000-0001-9523-9986
+- Vidwan ID: 45712
+`;
+
+const MECH_SURYA_PRAKASH_VARMA_TEXT = `
+## Educational Qualifications
+- Ph.D.: Pursuing from AU College of Engineering
+- M.Tech: Thermal Engineering (Graduated 2006)
+- B.E: Mechanical Engineering (Graduated 1997)
+
+## Professional Experience
+- Teaching Experience: 18 years
+- Industry Experience: 3 years
+
+## Specializations
+- Thermal engineering and internal combustion engines
+
+## Administrative Roles
+- Coordinator for GATE examinations in ME Department
+- Controller of Examinations (December 2017 to November 2021)
+
+## Professional Memberships
+- Member of The Institution of Engineers - India (MIE)
+- Member of Oracle Academy
+
+## Recent Publications
+Faculty has published peer-reviewed articles addressing biofuel sustainability and machining analysis in recognized journals including IOP Publishing and Canadian Science Publishing.
+
+
+## Identifiers & Contact
+- Email: spvarmap@svecw.edu.in
+- SVECW ID: 320
+- AICTE Registration ID: 1-2379929619
+- Google Scholar Id: MyB1KqEAAAAJ
+- Scopus Id: 57222353638
+- ORCID Id: 0000-0003-2101-0374
+- Vidwan ID: 149709
+`;
+
+const MECH_N_SRINIVASA_RAO_TEXT = `
+## Education
+- Ph.D.: Pursuing from Andhra University, Vizag
+- M.Tech: Automobile Engineering, NIT-W, 2010
+- B.Tech: Mechanical Engineering, 2008
+
+## Professional Details
+- Teaching Experience: 12 years
+
+## Specialization Areas
+- Heat Transfer
+- Refrigeration & Air-Conditioning
+
+## Courses Taught
+- Thermodynamics, Fluid Mechanics & Hydraulic Machines, Thermal Systems, Heat Transfer, Mechanics of Solids, Dynamics of Machinery, Mechanics of Machines, Refrigeration & Air Conditioning, Automotive Prime Movers, plus associated laboratory courses and BCME
+
+## Administrative Roles
+- Coordinator for NBA Criteria-4 and NAAC Criteria-2; Class Incharge-III; HT Lab supervision
+
+## Professional Development Programs
+- "Sustainable energy systems and applications" (one week) - Velagapudi Ramakrishna Siddhartha Engineering College, 11-16 December 2023
+- "Finite Element Methods - Theory and Practice (Ansys)" (five days) - IIT Tirupati, 19-23 June 2023
+- "Trends & Challenges in the Development of Electric Vehicles & Hybrid Electric Vehicles (SERIES-2)" (one week online) - Lendi Institute of Engineering & Technology, 14-18 November 2022
+- "Trends & Challenges in the Development of Electric Vehicles & Hybrid Electric Vehicles (SERIES-1)" (one week online) - Lendi Institute of Engineering & Technology, 26-30 September 2022
+- "Emerging Trends In Mechanical Engineering" (one week online) - Seshadri Rao Gudlavalleru Engineering College, 20-25 June 2022
+- "Artificial Intelligence/Machine Learning for Mechanical Engineering Problems" (one week online) - SVECW, 21-26 March 2022
+- "Learning through Virtual Labs for Technical Institutions" (one week online) - Lendi Institute, 18-22 October 2021
+- "Research Tools & Methodologies" (one week online) - Lendi Institute, 27 September-1 October 2021
+- "Emerging Research Opportunities for Mechanical Engineers" (one week online) - CMR Engineering College, 10-14 August 2020
+- "Recent Developments in Mechanical Engineering" (one week online) - PVP Siddhartha Engineering College, 10-14 August 2020
+- "Advanced Automation in Metal Industry" (three days online) - Raghu Engineering College, 21-23 July 2020
+- "Fuel Cell Technologies for Hybrid and Electric Vehicles" (one week online) - MVGR Engineering College, 17-22 August 2020
+
+## Professional Membership
+- AMIE (Associate Member, The Institution of Engineers India)
+
+## Research Publications
+Journal Publications:
+- "Performance Estimation of Self-Circulating Fluidized Bed Gasification with mixtures of Biomass" - Journal of Physics: Conference Series
+- "An investigation on the mechanical and corrosion characteristics of magnesium-zinc alloy nanocomposites manufactured via ultrasound-assisted stir squeeze casting" - Journal of Metallurgical Research & Technology
+- "Microstructure, mechanical properties of dissimilar friction stir welded AA6063/AA5052 alloys, and optimization of process parameters using Box Behnken-TOPSIS approach" - Kovove Materialy-Metallic Materials
+- K. Srividya, S. Ravichandran, M. Thirunavukkarasu, Itha Veeranjaneyulu, P. Satishkumar, K. Bharadwaja, N. Srinivasa Rao, Ram Subbiah, Javvadi Eswara Manikanta: "Examination of electrochemical machining parameters for AA6082/ZrSiO4/SiC composite using Taguchi-ANN approach" - International Journal on Interactive Design and Manufacturing (IJIDeM)
+- Gugulothu, B., Saminathan, R., Pradeep, A., Sharma, A., Vijayakumar, S., Paramasivam, P., Srinivasa Rao, N.: "Investigating the strength of butt-welded joints of AA6082 and AA5052 alloys through friction stir welding; the impact of tool tilt angle and feed rate" - Journal of Adhesion Science and Technology (2023)
+- Satish, G., Ashok Kumar, K. and Srinivasa Rao, N., 2019: "Fabrication and Characterization of CNT-Based Hybrid Composite" - Recent Advances in Material Sciences: Select Proceedings of ICLIET 2018, Springer Singapore
+
+Conference Proceedings:
+- Gugulothu, B., Kumar, P.S., Rao, N.S., Vijayakumar, S., Rajkumar, D.R., Rao, T.J. and Naga Swapna Sri, M., August 2023: "Friction Stir Welded Magnesium AZ31B Alloy Used to Evaluate Mechanical Properties at Various Rotational Speeds" - International Conference on Smart Sustainable Materials and Technologies
+- Mahesh, G., Domakonda, V.K., Farooq, S., Subbiah, R., Rajkumar, D.R., Rao, N.S. and Vijayakumar, S., August 2023: "Evaluation of Hardness Properties of Al7475/B4C/Fly Ash Hybrid Composites Using Friction Stir Process" - International Conference on Smart Sustainable Materials and Technologies
+
+
+## Identifiers & Contact
+- Email: srinivasaraon@svecw.edu.in
+- SVECW ID: 313
+- Google Scholar Id: P6Okj1sAAAAJ
+- ORCID Id: 0000-0003-0481-0943
+- Vidwan ID: 149702
+`;
+
+const MECH_JV_NARASIMHA_RAJU_TEXT = `
+## Educational Qualifications
+- Ph.D. from Centurion University, Visakhapatnam (Graduated 2024)
+- P.G. from SRKR Engineering College, Bhimavaram (Graduated 2012)
+- B. Tech (Graduated 2008)
+
+## Experience
+- Teaching Experience: 12 Years
+- Research Experience: 6 Years
+
+## Areas of Specialization
+- Manufacturing, Production Technology, Metal Cutting and Machine Tools, Unconventional Machining Processes, Non Destructive Evaluation, Basic Mechanical Engineering, Management Science
+
+## Roles and Responsibilities
+- SVECW Hostel In-charge Coordinator
+- Dean Administration Coordinator
+
+## Professional Development
+- FDPs Attended: 55
+- Coursera Certifications: 56
+- NPTEL: 1
+
+## Publications and Recognition
+- SCI: 2 publications
+- Scopus: 1 publication
+- UGC: 3 publications
+
+## Professional Membership
+- Institute of Engineers (INDIA)
+
+
+## Identifiers & Contact
+- Email: vnrajujampana@svecw.edu.in
+- SVECW ID: 3001
+- Google Scholar Id: http://scholar.google.co.in/citations?user=7jgJsThejAAAAJ
+- Scopus ID: 57273385600
+- ORCID: https://orcid.org/0000-0001-9231-6704
+- Vidwan ID: https://vidwan.inflibnet.ac.in/profile/149707
+`;
+
+const MECH_SATYA_KRISHNA_TEXT = `
+## Education
+- Diploma: Mechanical Engineering, SMVM Polytechnic, Tanuku
+- B.E.: Mechanical Engineering (2011)
+- M.E.: Automobile Engineering, Madras Institute of Technology, Anna University (2013)
+- Ph.D.: Pursuing from Andhra University, Visakhapatnam
+
+## Professional Information
+- Teaching Experience: 10 years
+
+## Specialization Areas
+- Automobile Engineering
+- Refrigeration and Air Conditioning
+
+## Subjects Taught
+- Automobile Engineering, Basic Mechanical Engineering, Engineering Drawing, Power Plant Engineering, Thermodynamics, IC Engines, Refrigeration & Air Conditioning, Machine Drawing, Kinematics of Machines, Thermal Engineering Lab, Machine Tools Lab, Production Lab, Heat Transfer Lab, Fluid Mechanics & Hydraulic Machinery Lab, Matlab Programming, Design Thinking
+
+## Key Roles
+- Thermal Engineering Lab In-charge
+- Tech Guru, AICTE IDEA Lab
+- Department Timetable Coordinator
+- Innovation Ambassador
+- IIC, ARIIA, NAAC and NBA Criteria-1 Coordinator
+
+## Professional Development Activities
+Faculty Development Programs:
+- "Artificial Intelligence/Machine Learning for Mechanical Engineering Problems" (one-week online FDP, organized)
+- "Design Thinking and Prototyping for Industry 4.0" (one-week ATAL Basic Idea Lab FDP, organized)
+- "CATIA Toolbox for Emerging Industrial Applications" (one-week student training, organized)
+- "Advances in Modeling using CATIA with Hands-on Experience" (2018)
+- "Additive Manufacturing (3D Printing)" (one-week, October 16-20, 2023)
+- "Basic FDP on IDEA Lab" (2022, AKGEC, New Delhi)
+
+Conferences & Seminars:
+- Young Scientist Conference - India International Science Festival 2018, Lucknow, U.P.
+- Hybrid Electric Vehicle Technology 2018, MVGR, Vizianagaram
+- Regional Research Symposium - Project Based Learning 2019, KLE Technological University, Hubli
+- "Recent Advances in Renewable Energy" (2020)
+- "Refrigerants Progression" (2020)
+- "Smart Manufacturing" (2022, Dr. D. Y. Patil University, Pune)
+
+Online Certifications:
+- "Introduction to IoT" (NASSCOM Future Skills - Cisco Networking Academy)
+- "Entrepreneurship Awareness Program" (AICTE Evaluated, 16-day, Turnip Innovations)
+- "Six Sigma Principles" (Coursera)
+- "Design Thinking - A Hands-on Course" (Udemy)
+- "Fundamentals of Macroscopic and Microscopic Thermodynamics" (Coursera)
+- "Introduction to Thermodynamics" (Coursera)
+- "Quantum Mechanics" (Coursera)
+- "Six Sigma" (Coursera)
+- "MATLAB onramp course" (Mathworks)
+- "Innovation Ambassador training Foundation Level" (MoE innovation cell & AICTE)
+
+## Research Publications
+- "Performance and Emission Characterization of Brown Gas Based Petrol Engine" - IJAER, Vol. 9, No. 23
+- "Random Vibration Analysis of Mechanical Hardware of Flight Data Recorder" - ARPN, Vol. 11, No. 8
+
+## Design Patents
+- Wheel Rim - Design patent no. 316255-001
+- Organic Waste Compost Machine for Home Purpose - Design patent no. 331815-001
+- Aero Solid Tyre for Motor Cycle - Design patent no. 332810-001
+- Airless Tyre for Motor Cycle - Design patent no. 332808-001
+- Integrated Airless Wheel - Design patent no. 348726-001
+- PILL BOTTLE - Design patent no. 341591-001
+
+
+## Identifiers & Contact
+- Email: satya.krishna02@svecw.edu.in
+- SVECW ID: 329
+- Google Scholar ID: nmorn8YAAAAJ
+- ORCID ID: 0000-0003-2035-989X
+- Vidwan ID: 153057
+`;
+
+const MECH_MANONEET_KUMAR_TEXT = `
+## Educational Qualifications
+- Ph.D.: Lithium Battery Thermal Management at JNTU - Ananthapuram
+- M.Tech: CAD/CAM from SRKR Engineering College (Graduated 2018)
+- B.Tech: Mechanical Engineering from LPU-Punjab (Graduated 2014)
+
+## Professional Details
+- Teaching Experience: 10 years
+
+## Specialization Areas
+- Automobile Engineering
+- Electric Vehicles
+- Autonomous Vehicles
+
+## Subjects Taught
+- Automobile Engineering
+- Hybrid Vehicles
+- Manufacturing Technology (Welding, Casting, Metal Cutting, Machining)
+- Metrology
+- Engineering Workshop
+- Production Technology Lab
+
+## Key Responsibilities
+- Incharge: Vehicle Design Lab
+- Incharge: Student Hub
+- Faculty advisor for SAE activities and events
+
+## Professional Development (Training/FDP)
+- 3-day training on Hybrid & Electric Vehicles, Devise Electronics-Pune (April 8-10, 2019)
+- 1-week ANSYS Workbench 14.0 training, Bhimavaram
+- 2-day Metal 3D printing additive technology training, Bangalore (December 20-21, 2019)
+- 5-day FDP on Electric and Hybrid Vehicle Design/Development, COEP Pune (SAE India)
+- 1-week EV Technology FDP, IIT-BHU
+
+## Professional Memberships
+- AMIE (Associate Member, Institution of Engineers India)
+- SAE Member
+
+## Publications
+- Research paper presented at 5th International Conference on Applied Science Engineering and Technology (ICASET-18): "Design, Analysis, Simulation and Fabrication of a High Torque & Light weight Gearbox for ATV"
+- "Hubless Rim Concept in Driven Wheels" published in International Journal of Science Technology & Engineering
+
+## Guest Lectures Delivered
+- 3-day lecture series on "Advancements, Current Trends of Automobile & EV Technology," Pimpri Chinchwad Polytechnic (August 28-30, 2019)
+- 2-day lecture on "Automobile Prototyping," KL University, Vijayawada (October 18-19, 2019)
+- Online lecture on "Future mobility & Vehicle Design" for SRMU-Lucknow (October 15, 2020)
+- Online lecture on "Motors in EV" for GITS-Udaipur (February 8, 2021)
+- 3-day workshop on "Product Development Strategies and concepts in Motorsport Engineering," Aditya Institute of Technology & Management-Tekkali (February 11-13, 2024)
+
+## Recognition and Achievements
+- Marshal for 1st and 4th Round of e-Formula F1 Race, Hyderabad (February 2023)
+- Best Team Advisor (Dronacharya) award, BAJA SAE-India (2019, 2022)
+- Recognition for introducing Electric Bike Race event at university
+- Certificate of Appreciation for judging National Gokart Championship
+- International recognition for designing and fabricating in-house Electric Smart Car with "Hubless Rim Concept" and "Low space parking Technology"
+
+## Events Organized
+- Organizing committee head and administrator for national events
+- Organizer: Electric Solar Vehicle Championship (2017, 2018)
+- Organizer: Vishnu Karting Championship (2016 with 21 teams; 2017 with 28 teams)
+- Organizer: Vishnu E-Motor Championship (2016 with 22 teams)
+- Organizing committee member: REEV (SAE India)
+- Co-Convener: e-BAJA2024
+
+
+## Identifiers & Contact
+- Email: manoneet.kumar@svecw.edu.in
+- SVECW ID: 326
+- AICTE Registration ID: 1-4489892499
+- Google Scholar ID: 2yPovi8AAAAJ
+- ORCID ID: 0000-0001-7334-0178
+- Vidwan ID: 149703
+`;
+
+const MECH_PRATHAP_VARMA_TEXT = `
+## Education Qualifications
+- Ph.D.: Pursuing from Anna University, Tamil Nadu
+- M.Tech: CAD/CAM from SRKR Engineering College (2018)
+- B.Tech: Mechanical Engineering (2014)
+- Teaching Experience: 5 years
+
+## Specialization
+- Design and Manufacturing
+
+## Courses Taught
+- Engineering Drawing, Computer Aided Design, Computer Aided Manufacturing, Automation in Manufacturing, Measurements and GD&T, Operations Research, Universal Human Values, Engineering Workshop Lab, Design Analysis Lab, CAM and 3D Printing Lab, Part Modeling and Assembly Lab, Surface Modeling and Sheet Metal Working Lab
+
+## Administrative Roles
+- Department-level Placement Coordinator, Internal Academic Audit Coordinator, Library Coordinator, CAM/3D Printing Lab In-charge, CAD Lab In-charge, MOUs Coordinator, IMTMA Coordinator
+
+## Professional Memberships
+- IAENG (International Association of Engineers)
+- IOV Registered Valuers Foundation
+
+## Peer-Reviewed Publications
+- "Enhancing Data Security Solutions for Smart Energy Systems in IoT-Enabled Cloud Computing Environments through Lightweight Cryptographic Techniques" - Uddarraju Dhana Satya Prathap Varma, Kantheti Prasadaraju, S Sugumaran
+- "Experimental investigations on coated copper wire and annealed copper wire electrodes in wire EDM machining through a comparative assessment employing the TOPSIS technique" - Uddarraju Dhana Satya Prathap Varma, Ippile Harish, N Mallappaswararao Battina, Kantheti Prasadaraju, S Chandu Prasad, Engineering Research Express
+- "Mechanical, water absorption, efflorescence, soundness and morphological analysis of hybrid brick composites" - Materia (Rio de Janeiro), 2024, Volume 29, N. 3
+- "Modeling and Finite Element Analysis on knee joint prosthesis" - Global Journal of Engineering Science and Researches, presented at ICESTM-2018
+
+## Conference Presentations
+- "Enhancing data security in IoT Enabled cloud computing environments through lightweight cryptographic techniques" - International Conference on Smart and Sustainable Energy Systems, Vishnu Institute of Technology, Andhra Pradesh, February 16-17, 2024
+- "IoT based remote access mechatronics lab platform for educational institutions with open API for A.R & ROS implementation" - International Conference on Contemporary Innovations in Engineering & Management in Data Sciences IoT and Computational Techniques, April 22-23, 2022
+- "Modeling and Finite Element Analysis on Knee joint prosthesis" - International Conference on Engineering, Science & Technology and Management, Vikas College of Engineering and Technology, Vijayawada, 2018
+
+
+## Identifiers & Contact
+- Email: prathap9varma@svecw.edu.in
+- SVECW ID: 336
+- Google Scholar ID: 9aeAKaQAAAAJ
+- ORCID ID: 0000-0003-3945-4803
+- Vidwan ID: 149700
+`;
+
+const MECH_MANIKANTA_TEXT = `
+## Education
+- Ph.D. Andhra University, Visakhapatnam (2025)
+- M.Tech Advanced Manufacturing Systems, BVC Engineering College, Odalarevu (2015)
+- B.Tech Mechanical Engineering, BVC Engineering College, Odalarevu (2012)
+
+## Experience
+- Teaching Experience: 7 years
+
+## Research Interests
+- Vegetable-based cutting fluids, nanofluids, tribology, machining, optimization
+
+## Courses Taught
+- Engineering Mechanics, Elements of Mechanical Engineering, Material Science and Metallurgy, Mechanics of Solids, Design of Machine Members, Metrology, Advanced Materials, Manufacturing Technology, Engineering Graphics
+
+## Administrative Roles
+- Coordinator for NBA Criteria 1, NAAC Criteria 1, and Feedback Coordination
+
+## FDPs/Workshops/Seminars/Training Programs Attended
+- Five-day offline workshop on "Sustainable Machining for Tomorrow: Machine Learning Based Approach" - Madanapalle Institute of Technology & Science (11-16 December 2023)
+- Five-day online workshop on "Smart Manufacturing & Industry 4.0" - IIT (BHU) Varanasi (11-15 October 2022)
+- One-week online FDP on "Artificial intelligence/Machine Learning for Mechanical Engineering problems" - SVECW (21-26 March 2022)
+- Seven-day hands-on training on "Integrative Research in various fields of Engineering" - SRKR in collaboration with Gitam (21-27 September 2022)
+- One-week online workshop on "Advance in Mechanical Engineering for Bio Medical Applications" - NIT Karnataka (11-15 July 2022)
+- One-week practical training on "Materials processing & Advanced material characterization techniques" - NIT Warangal (27 May - 2 June 2022)
+- Two-week online FDP on "Recent advances in materials and challenges in Manufacturing techniques" - JNTU K (22 March - 3 April 2021)
+- Two-week online FDP on "Frontier of 3D Printing Technology" - LBRCE (25 January - 6 February 2021)
+- Five-day National Workshop on Mechanical and Tribological behavior of Advanced Composites - NIT Warangal (21-25 January 2019)
+- ATAL one-week online FDP on "Global Warming and impacts of power electronics towards green technologies" - SRM (24-28 May 2021)
+- One-week short-term training on "Automated Manufacturing Systems" - NITTR (1-5 July 2019)
+- One-week AICTE-ISTE Sponsored Induction Program on "Research Methodology, Design and Analysis of Experiments" - RVR&JC College of Engineering (12-17 November 2018)
+- One-week faculty Quality Improvement Training Program on "Instructional Design and Delivery Systems" - NITTR at BVC Engineering College (6-11 November 2017)
+- One-week short-term training on "Effective Teaching" - NITTR (15-19 July 2019)
+- Five-day faculty development program on "Recent Developments in Sustainable Developments" - A J E T College of Engineering, Karnataka (12-16 July 2021)
+- One-week online short-term training on "Innovations and Challenges in Industry" - KHIT, Guntur (12-16 July 2021)
+- One-week online FDP on "Modern Industrial Technology in Mechanical Engineering" - Aditya Engineering College (2-8 July 2021)
+- One-week online program on "Recent Innovations Developments in Thermal Engineering" - National Institute of Foundry, Ranchi (25-29 September 2020)
+- One-week short-term course on "Advanced and Futuristic Manufacturing process" - Malla Reddy Engineering College, Karnataka (28 June - 3 July 2021)
+- One-week online FDP on "Emerging Technologies in Robotics" - Malla Reddy Engineering College (26-30 May 2020)
+- One-week online FDP on "Strategic methods for Product Development" - SRKR Engineering College (22-26 February 2020)
+
+## Patents Published
+- Fixture For Square Guided Apparatus
+- Guided Cutting Tool
+- Height Adjustable Fixture Table
+
+## Papers Published
+- "Machining performance of SS 304 steel with hybrid nanocutting fluids using Taguchi-based gray relational analysis" - Journal of Mechanical Engineering and Sciences, Vol. 18(4), pp. 10290-10302 (2024)
+- "Machine Learning and Artificial Intelligence Supported Machining: A Review and Insights for Future Research" - J. Inst. Eng. India Ser. C, Vol. 105, pp. 1653-1663 (2024)
+- "Development and Characterization of Novel Green Cutting Fluids with Nano-additives" - Periodica Polytechnica Mechanical Engineering, Vol. 68(4), pp. 304-311 (2024)
+- "Optimization of tribological behavior of Aluminium (A356) composites using TGRA technique" - Materia (Rio de Janeiro), Vol. 29(3), e20240129 (2024)
+- "Application of sustainable techniques in grinding process for enhanced machinability: a review" - J Braz. Soc. Mech. Sci. Eng., Vol. 46, p. 199 (2024)
+- "Performance Evaluation of Eco-friendly Cutting Fluid in Machining Process-An Approach towards Environmentally Friendly Production" - Journal of Polymer & Composites (2024)
+- "Examination of electrochemical machining parameters for AA6082/ZrSiO4/SiC composite using Taguchi-ANN approach" - Int J Interact Des Manuf (2024)
+- "Optimizing sustainable machining processes: a comparative study of multi-objective optimization techniques for minimum quantity lubrication with natural material derivatives in turning SS304" - International Journal on Interactive Design and Manufacturing (IJIDeM) (2024)
+- "Optimization parameters for electro discharge machining on Nimonic 80A alloy using grey relational analysis" - International Journal on Interactive Design and Manufacturing (IJIDeM) (2023)
+- "Machining performance on SS304 using nontoxic, biodegradable vegetable-based cutting fluids" - Chemical Data Collections, Vol. 42, 100961 (2022)
+- "Experimental and finite element investigations on formability of friction stir welded tailor welded blanks of AA6061 and AA2017" - Materials Today: Proceedings (2023)
+- "Hybrid polymer nano fillers on mechanical properties for current applications: An overview" - Materials Today: Proceedings (2023)
+- "A review on mechanical properties of hybrid polymer composites" - Materials Today: Proceedings (2023)
+- "An overview of mechanical properties of biodegradable polymers and natural fibre materials" - Materials Today: Proceedings (2023)
+- "Biodegradable polymer reinforced natural fiber composition for mechanical properties: A review" - Materials Today: Proceedings (2023)
+- "Performance Assessment of Nano Alumina Mixed Corn Oil in Stainless Steel Machining" - European Chemical Bulletin, Vol. 12(8), pp. 5723-5734 (2023)
+- "Enhancing Sustainability in Machining: Performance Evaluation of Graphene-Based Green Cutting Fluids in Minimum Quantity Lubrication (MQL) Turning" - Journal of Propulsion Technology, Vol. 44(4), pp. 3432-3440 (2023)
+- "Design of Solar Power Plant for One Megawatt Power with Central Cavity Receiver" - International Transaction Journal of Engineering, Management, & Applied Sciences & Technologies (February 2022)
+- "Nanoparticle enriched cutting fluids in Metal cutting operations: A Review" - Recent advances in Mechanical Engineering, Lecture notes in Mechanical Engineering, Springer (2022)
+- "Fabrication and Characterization of E-Glass/Chopped Strand Mat E450gsm/Sic Reinforced Polymer Composite" - Design Engineering (June 2021)
+- "Mechanical and Microstructural behavior of Aluminium /TiB2 composites fabricated through multi pass friction stir processing" - Materials Today Proceedings (September 2020)
+- "Conversion of waste plastic to fuel products" - Materials Today Proceedings (February 2020)
+- "The performance of alumina mixed coconut oil in turning of SS304 alloy" - International Journal of Mechanical and Production Engineering Research and Development, Vol. 9, Issue 4 (August 2019)
+- "Integrality Characterization of Machining with Nano cutting Fluids" - International Journal of Mechanical Engineering & Technology (IJMET), Vol. 9, Issue 10, pp. 1033-1042 (October 2018)
+- "Experimental investigation and optimization of process parameters in CNC milling of Aluminum 6082 alloy" - International Journal of Research and Analytical Reviews (IJRAR), Vol. 6, Issue 1 (March 2019)
+- "Fabrication and Characterization of rice husk ash aluminium composite" - International Journal of Emerging Technologies and Innovative Research (January 2019)
+- "Self-textured cutting tools in dry machining" - International Journal of Research and Analytical Reviews (IJRAR), Vol. 5, Issue 4 (December 2018)
+- "Analysis of Defects and Mechanical Properties of E-Glass/Chopped Stand mat Reinforced Polymer Composite" - International Journal of Emerging Technologies and Innovative Research (April 2019)
+- "Building Information Modelling and Analysis for MEP Services" - International Journal of Research and Analytical Reviews (IJRAR), Vol. 5, Issue 3 (July 2018)
+- "Effect of Nano Cutting Fluid & Process Parameters on Material Removal Rate and Surface Finish of SS304 Alloy on Turning Operation" - IJETER, Vol. 5, Issue 12 (December 2017)
+- "Effects of hybrid nano cutting fluid and process parameters on material removal rate and surface finish in turning of ss304 alloy" - IJIEMR, Vol. 8, Issue 8 (September 2019)
+
+## Conferences Attended
+- National conference on "Design Thinking: Trans-Displinary Challenges & Opportunities" (7-8 July 2023) - Presentation on "Review paper on Minimum Quantity Lubrication"
+- Conference on "Frontiers of Innovative Research in Smart materials for Tech. applications" (24-25 March 2023) - Presentation on "Review of sustainable lubrication in Metal Cutting Operations"
+- National conference (ETME 2019) - NIT Warangal, sponsored by TEQIP-III - Presentation on "Effect of turning parameters on material removal rate and surface finish of fly ash reinforced aluminium composite"
+- National conference (ETME 2019) - NIT Warangal, sponsored by TEQIP-III - Presentation on "Effect of Inlet air swirl generation on performance and emission characteristics of Diesel engine"
+- International conference (ICERTT 2021) - Bulehora University, Ethiopia (14-15 May 2021) - Presentation on "Investigation of Mechanical and Machining characteristics of Coconut shell reinforced Aluminium composites"
+- National conference (NCRTEBS 2020) - BVCEC, Odalarevu (16 July 2020) - Presentation on "Mechanical and Microstructural properties of AA 6061/ Baggase ash and rice husk ash composites fabricated by stir casting"
+- International conference (ICETEM 2020) - Sri Vasavi Engineering College (19-20 February 2021) - Presentation on "Investigation of Mechanical and Microstructural characteristics of Bagasse ash reinforced aluminium composites"
+- International conference (ICETEM 2020) - Sri Vasavi Engineering College, Tadepalligudem (19-20 February 2021) - Presentation on "Experimental Investigation on Mechanical properties of angle oriented natural & hybrid fiber reinforced epoxy composite"
+
+## Reviewer for Journals
+- Tribology International - Published by Elsevier (Indexed in SCI, SCOPUS)
+- International Journal on Interactive Design and Manufacturing (IJIDeM) - Published by Springer (Indexed in ESCI, SCOPUS)
+- Sustainable Manufacturing and Service Economics - Published by Elsevier (Indexed in SCI, SCOPUS)
+- International Journal of Engineering and Technology Innovation (SCOPUS)
+- International Conference on Recent Trends in Engineering and Technology - Reviewer in Vishwacon 2023
+
+
+## Identifiers & Contact
+- Email: manikantame@svecw.edu.in
+- SVECW ID: 338
+- Google Scholar: https://scholar.google.com/citations?user=TCA-5nYAAAAJ&hl=en
+- Scopus ID: 57223316697
+- ORCID: 0000-0002-0881-4899
+- Vidwan ID: 316541
+`;
+
+const MECH_ASV_PRASAD_TEXT = `
+## Education Qualifications
+- Ph.D.: Pursuing from JNTUK, Kakinada
+- M.Tech.: Thermal Engineering (Graduated 2017)
+- B.Tech.: Mechanical Engineering (Graduated 2013)
+
+## Professional Information
+- Teaching Experience: 07 years
+- Industry Experience: 06 months
+
+## Areas of Specialization
+- Alternate fuels, electric vehicles, heat transfer
+
+## Subjects Taught
+- Automobile Engineering, Heat Transfer, Power Plant Engineering, Thermal Engineering I & II, Design for Manufacturing, Fluid Mechanics & Hydraulic Machinery, Basic Mechanical Engineering
+
+## Current Roles
+- Coordinator for IIC, VEDIC, and MOODLE
+
+## Professional Development Programs & Training
+- ATAL FDP on Emerging Technologies in Optimizing Renewable Energy Systems with Smart Materials and Storage Solutions at University College of Engineering Kakinada (20/01/2025 to 25/01/2025)
+- ATAL FDP on AI & ML Empowerment in Energy Storage and Advanced Robotics at Aditya Engineering College (09/12/2024 to 14/12/2024)
+- One Week Online FDP on "Artificial intelligence and Machine learning for Mechanical Engineering Problems" at Shri Vishnu Engineering College for Women (21-03-2022 to 26-03-2022)
+- Online course on "Python Fundamentals for Beginners" from Great Learning Academy (September 2022)
+- Innovation Ambassador training - Foundation level by MOE's Innovation Cell & AICTE (13-08-2022)
+- One-week Short Term Training Programme on "Thesis and Research Paper Writing" at NITTTR (06-12-2021 to 10-12-2021)
+- One Week Faculty Development Programme on "Research Methodology: Design and Technology" by ATAL Academy at Banasthali Vidyapith (02-06-2021 to 06-06-2021)
+- One Week Faculty Development Programme on "Energy Engineering" by ATAL Academy (17-09-2020 to 21-09-2020)
+- Two Weeks Online FDP on "Python Programming" by APSSDC (24-08-2020 to 05-09-2020)
+- Two Weeks Online Training Programme on "Product Design and Drafting by CATIA" by APSSDC (17-08-2020 to 29-08-2020)
+- Two Day Faculty Development Programme on "Innovative Methods of Teaching in Mechanical Engineering" at Sri Vasavi Engineering College (4th & 5th June 2019)
+- One Week Faculty Development Programme on "Computational Fluid Dynamics" at B V C Engineering College (29-10-2018 to 03-10-2018)
+- One Week Training Programme on "INSTRUCTIONAL DESIGN AND DELIVERY SYSTEMS" at NITTTR (06-11-2017 to 11-11-2017)
+
+## Professional Memberships
+- SAE India member
+- International Association of Engineers (IAENG) lifetime member
+- Institute of Research Engineers and Doctors (IRED) associate member
+
+## Publications
+- "A Comprehensive Review of the Effect of Additives on Microalgae Biodiesel Performance and Emissions" by Adina Srinivasa Vara Prasad, K V Murali Krishnam Raju, Krishna Bhaskar K, and Tarun Kumar Kotteda - IOP Conference Series: Journal of Physics
+- "Analysis of Wear Behavior of AA5052 Alloy Composite by Addition of Alumina with Zirconium dioxide Using Taguchi-grey Relational Method" - Advances in Material Science and Engineering, Volume 2022, Article ID 4545531
+
+
+## Identifiers & Contact
+- Email: asvprasadme@svecw.edu.in
+- SVECW ID: 339
+- AICTE Registration ID: 1-2287273213
+- Google Scholar ID: RuOsp5QAAAAJ
+- Scopus ID: 57650539800
+- ORCID ID: 0000-0003-4210-9891
+- Vidwan ID: 316860
+`;
+
+const MECH_SHAIK_MADHAR_PASHA_TEXT = `
+## Educational Qualifications
+- Ph.D.: Pursuing from JNTUK, Kakinada
+- M.E.: CAD/CAM from SRKR Engineering College (2015)
+- B.E.: Mechanical Engineering (2007)
+
+## Experience
+- Teaching: 10 years
+- Industry: 3 years
+
+## Specialization
+- Design and Manufacturing
+
+## Subjects Taught
+- Engineering Drawing, Engineering Mechanics, Fluid Mechanics, Manufacturing Technology, Metrology, Engineering Workshop, Production Technology Lab, Metrology Lab, Fluid Mechanics and Hydraulic Machines Lab, C-Programming, Python Programming
+
+## Key Roles
+- Coordinator of Jnanabhumi, Department Website, Class Teacher, Magazine Data Provider, Newsletter Editor
+
+## Professional Memberships
+- AMIE (Associate Member, Institution of Engineers India)
+- Oracle Academy Member
+
+## Papers Published
+- "Design and Analysis of Thick Walled Cylinders with Holes" - International Journal of Scientific Research and Review, Volume 07, Issue 03, March 2019, pp. 1166-1172
+- "Design and Analysis of Brake Pads for Hydraulic Circuit" - International Journal of Scientific Research and Review, Volume 07, Issue 03, March 2019, pp. 1173-1178
+- "Fabrication of Coconut Dehusking Machine" - International Journal Of Mechanical Engineering & Computer Applications, Vol. 4, No. 3, May-June 2016, pp. 229-242
+- "Comparison of flow analysis of a sudden and gradual change of pipe diameter using fluent software" - IJRET: International Journal of Research in Engineering and Technology
+- "An Experimental Study on A CI Engine Fuelled With Soapnut Oil-Diesel Blend with Different Piston Bowl Geometries" - International Journal of Engineering Research & Technology (IJERT) Vol. 2 Issue 12, December 2013
+
+## Conferences Attended
+- 3rd International Conference on New Frontiers of Engineering, Management, Social Science and Humanities (March 16, 2019) - Osmania University, Hyderabad - presented two papers on thick-walled cylinders and brake pad design
+
+## Training & Development
+- FDP on "Lean Manufacturing & 7QC Tools" - Roots Industries India Limited, Coimbatore (November 15-17, 2018)
+- Five-Day FDP in "Engineering Drawing" - JNTUK, Kakinada
+- Five-Day FDP on "Advanced Vibration Analysis" - JNTUK, Kakinada
+- Three-Day Workshop on "Engineering Mechanics" - BVRIT, Hyderabad
+- Five-Day Workshop on "Autodesk Inventor & Fusion360" - SVECW, Bhimavaram
+- Five-Day Workshop on "Ansys Work bench" - SVECW, Bhimavaram
+- Five-Day Workshop on "Non Destructive Testing" - SVECW, Bhimavaram
+- One-Week Training on "Pedagogy" - B V Raju Institute Of Technology, Hyderabad
+- Three-Day Training on "Scientific Educational Practices" - VEDIC, Hyderabad
+
+## Certifications
+- Certificate course in Microsoft SQL from Simplilearn
+
+
+## Identifiers & Contact
+- Email: Pasha@svecw.edu.in
+- SVECW ID: 309
+- Google Scholar ID: YeY5Ce8AAAAJ
+- ORCID ID: 0000-0001-7962-231X
+- Vidwan ID: 328085
+`;
+
+const MECH_G_MOUNICA_TEXT = `
+## Education Qualification
+- Postgraduate: M.Tech in CAD/CAM, SRKR Engineering College (2022)
+- Undergraduate: B.Tech in Mechanical Engineering (2020)
+
+## Professional Background
+- Teaching Experience: 1 year
+
+## Areas of Specialization
+- Design and Manufacturing
+
+## Courses Taught
+- Engineering Drawing
+- Engineering Workshop Lab
+- CAM and 3D Printing Lab
+- Part Modeling and Assembly Lab
+
+## Professional Development
+Faculty Development Programs:
+- One-week ATAL program on "Design Thinking for Industry 4.0" (November 20-25, 2023)
+- Four-week NPTEL program on "Inspection and Quality Control in Manufacturing" (January-February 2024)
+
+## Certifications
+- Inspection and Quality Control in Manufacturing (NPTEL)
+
+
+## Identifiers & Contact
+- Email: gmounikame@svecw.edu.in
+- SVECW ID: 310
+`;
+
+const MECH_N_RAJA_SEKHAR_TEXT = `
+## Education Qualification
+- Ph.D.: Pursuing from Andhra University, Visakhapatnam
+- P.G: Graduated 2014
+- U.G (B. Tech): Graduated 2011
+
+## Experience
+- Teaching Experience: 7 years
+- Industry Experience: 2 years
+
+## Fields of Specialization / Areas of Interest
+- Multi-pass Friction stir welding
+- Metal additive manufacturing
+- Surface enhancement for structural materials
+
+## Subjects Handled
+- Basics of Civil and Mechanical Engineering
+- Engineering Mechanics
+- Biology for Engineers
+- Engineering Graphics
+- Computer Aided Engineering Graphics
+- Manufacturing Processes
+- Fluid mechanics and Hydraulic Machines
+- Metal cutting & Machine Tools
+- Advanced materials
+- Green Engineering Systems
+- Non Destructive Testing of Evaluation
+- Unconventional machining processes
+- IC Engines & Gas Turbines
+- Applied Thermodynamics
+
+## Roles and Responsibilities
+- Worked on Criteria 2 for Accreditation by the NBA
+- Class teacher
+- Lab in charge of Manufacturing Technology Lab
+- Coordinator - Project Coordinator
+- Department-level ATL Coordinator
+
+## FDPs / Workshops / Seminars / Training Programs Attended
+- Attended ATAL online FDP on "Smart materials" by NIT Meghalaya
+- Attended ATAL online FDP on "Additive Manufacturing in Industry 4.0 Strategy" by NIT AP, Tadepalligudem
+- Attended in AICTE sponsored Two-Week FDP on "Strategic Methods and Tools For Product Development" organized by Sagi Rama Krishna Raju Engineering College
+- Attended a six-day FDP on "Recent Innovations in Design & Manufacturing" organized by Malla Reddy Engineering College
+- Attended a one week FDP on Research Methodology & Design of Experiments at RVR&JC College of Engineering, Guntur
+- Attended a two-day workshop on OBE (Outcome Based Education) at NRIIT (A)
+- Attended a three-day FDP on Advances in Materials and Composites at ALIET
+- Attended a four-day FDP on Instructional Design & Development Systems (IDDS) at NRIIT by NITTTR, Chennai
+- Attended a one-week AICTE-approved FDP on TALE by NPTEL
+- Attended a one-week AICTE-approved FDP on Fundamentals of Manufacturing Process by NPTEL
+
+## Membership of Professional Bodies
+- The International Association of Engineers (IAENG) - 177750, 2016
+
+## Certifications
+- Certificate course in Computer Aided Engineering (CAE) from Central Institute of Tool Design (CITD), Hyderabad
+- NPTEL certification course on TALE with Elite certificate
+- NPTEL certification course on Fundamentals of Manufacturing Process with Elite certificate
+- NPTEL certification course on Fundamentals of Metal Additive Manufacturing with Elite certificate
+
+
+## Identifiers & Contact
+- Email: nrajasekharme@svecw.edu.in
+- SVECW ID: 340
+- Google Scholar: https://scholar.google.com/citations?view_op=new_articles&hl=en&imq=Rajasekhar+Nukathoti&authuser=5
+- Scopus: https://www.scopus.com/authid/detail.uri?authorId=58203969700
+- ORCID: https://orcid.org/0009-0004-2096-711X
+`;
+
+const MECH_MADDIPATI_RAJESH_TEXT = `
+## Education Qualifications
+- Ph.D: Pursuing from Andhra University, Visakhapatnam
+- M.E (Design for Manufacturing): Osmania University, Hyderabad (2019)
+- B.Tech: SITE, Tadepalligudem (2016)
+
+## Professional Experience
+- Teaching Experience: 2 years 11 months
+- Industry Experience: 1 year
+
+## Areas of Specialization
+- Additive Manufacturing, Manufacturing Technology, Material Science
+
+## Courses Taught
+- Basic and Manufacturing Engineering, Engineering Graphics, Design for Manufacturing, Engineering Mechanics, Material Science, Fluid Mechanics
+
+## Administrative Roles
+- Department Coordinator for VEDIC, IIC Department Coordinator, NAAC Criteria 6 coordinator
+
+## Professional Memberships
+- IAENG-272272, IFERP
+
+## Publications
+- Peer-reviewed article in International Journal on Interactive Design and Manufacturing (2023) on EDM optimization
+- Book chapter in Springer's Lecture Notes in Mechanical Engineering (2022) on cutting fluids
+
+## Certifications
+- PG-Diploma in Mechanical CAD, AutoCAD
+
+
+## Identifiers & Contact
+- Email: mrajeshme@svecw.edu.in
+- SVECW ID: 341
+- Google Scholar ID: p7TPQZMAAAAJ
+- Scopus ID: 58714379000
+`;
+
+const MECH_K_BENARJI_TEXT = `
+## Education
+- Ph.D. from NIT Warangal (2021)
+- M.Tech from NIT Rourkela (2015)
+- B.Tech from Avanthi Institute of Engineering and Technology (2011)
+
+## Experience
+- Teaching: 6 years
+- Research: 4 years
+- Industry: 1 year
+
+## Specialization Areas
+- Manufacturing-metal cutting, additive manufacturing, surface modification, material characterization, machine learning
+
+## Teaching Subjects
+- Materials & Manufacturing, Mechanics of Solids, Fluid Mechanics, Engineering Mechanics, Engineering Drawing, Java Programming, Metrology, Operations Research, 3D Printing
+
+## Peer-Reviewed Journal Articles
+- "Comparative evaluation of machinability characteristics of Nimonic C-263 using CVD and PVD coated tools" - B. Koyilada, S. Gangopadhyay, A. Thakur, Measurement, 2016, 85, 152-163 (SCI, IF: 5.6)
+- "Parametric Investigation and Characterization on SS316 built by Laser assisted Directed Energy Deposition" - K. Benarji, Y. Ravi Kumar, C. P. Paul, A. N. Jinoop, K. S. Bindra, Proceedings of the Institution of Mechanical Engineers, Part L, 2019, 234(3), 452-466 (SCI, IF: 2.311)
+- "Effect of Heat-Treatment on the Microstructure, Mechanical Properties and Corrosion Behaviour of SS 316 Structures Built by Laser melting deposition Based Additive Manufacturing" - K. Benarji, Y. Ravi Kumar, A. N. Jinoop, C. P. Paul, K. S. Bindra, Metals and Materials International, 2020, 27, 488-499 (SCI, IF: 3.6)
+- "Effect of WC composition on the Microstructure and Surface Properties of Laser Directed Energy Deposited SS 316-WC Composites" - K. Benarji, Y. Ravi Kumar, A. N. Jinoop, C. P. Paul, K. S. Bindra, Journal of Materials Engineering and Performance, 2021, 30, 6732-6742 (SCI, IF: 1.883)
+- "Understanding the Influence of Tool Coating and Cutting Environment on the Machinability of Nimonic C-263" - K. Benarji, S. Gangopadhyay, A. N. Jinoop, International Journal on Interactive Design and Manufacturing, 2023 (SCI, IF: 2.3)
+
+## Conference Proceedings
+- "Numerical Simulation and Experimental Study on SS316 by Laser Assisted Direct Metal Deposition (L-DMD)" - K. Benarji, Y. Ravi Kumar, P. Ashwin, Materials Today: Proceedings, 2021, 39, 1497-1502 (Scopus)
+- "Single Track Analysis of Additive Manufactured SS 316L Based Composites Using Powder Bed Fusion" - K. Benarji, Y. Ravi Kumar, A. N. Jinoop, C. P. Paul, Materials Today: Proceedings, 2023 (Scopus)
+
+## Additional Conference Presentations
+- "The microstructure evaluation and mechanical properties of aluminum metal matrix composite (AA2024+10% B4C)" - K. Benarji, Y. Ravi Kumar, International Conference on Advanced Functional Materials and Devices (ICAFMD), NIT Warangal, February 26-28, 2019
+- "Study on chip characteristics and tool wear of NIMONIC C-263" - K. Benarji, S. Gangopadhyay, A. Thakur, International Conference on Applied Engineering and Technology, April 13, 2015, Madurai Institute of Engineering and Technology
+- "Design and fabrication of strut stabilizer" - Sunil Gudala, Bheesetti Dinesh Kumar, Gedala Harith, Katila Yuvaraju Reddy, K. Benarji, 2nd Indian International Conference on Industrial Engineering and Operations Management, July 20, 2022, NIT Warangal
+
+
+## Identifiers & Contact
+- Email: drkbenarjime@svecw.edu.in
+- SVECW ID: 345
+- Google Scholar: https://scholar.google.com/citations?user=bcVlcW4AAAAJ&hl=en
+- ORCID: https://orcid.org/my-orcid?orcid=0000-0002-5667-3461
+`;
+
+const MECH_ASNIT_GANGWAR_TEXT = `
+## Education Qualification
+- Ph.D.: Department of Metallurgical Engineering, IIT(BHU) Varanasi, Uttar Pradesh (2020)
+- M.Tech.: Department of Metallurgical Engineering, IIT(BHU) Varanasi, Uttar Pradesh (2014)
+- B.Tech.: Mechanical Engineering from ITS Engineering College, Greater Noida, U.P. (2012)
+
+## Experience
+- Teaching Experience: 2 years
+- Research Experience: 4 years
+
+## Fields of Specialization / Areas of Interest
+- Materials science
+- Magnetic materials
+- Nanocomposites
+- Biomaterials
+- Battery & supercapacitors electrodes materials
+
+## Subjects Handled
+- Engineering Mechanics
+- Fluid Mechanics
+- Manufacturing Technology (Welding, Casting, Metal Cutting and Machining)
+- Metrology
+- Engineering Workshop
+- Production Technology Lab
+- Thermodynamics
+- Power Plant Engineering
+- Strength of materials
+
+## Roles and Responsibilities
+- Research Design
+- Data Collection and Analysis
+- Documentation and Reporting
+- National and international Collaboration
+- Professional Development
+- Reviewer of many materials and inorganic chemistry journals
+
+## FDPs / Workshops / Seminars / Training Programs Attended
+- Summer internship workshop on "Functional magnetic materials for biomedical applications" at Thapar Institute of Engineering and Technology, Patiala, Punjab (4-8 August 2016)
+
+## Membership of Professional Bodies
+- International society for materials chemistry (ISMC): Life time member (LM-1410)
+
+## Papers Published
+- Ankur Sharma, Asnit Gangwar, Santhosh K. Alla, "Nanofillers in electronics industries," Handbook of nanofillers, Springer Nature, 2024, 1-17
+- Asnit Gangwar, K. C. Barick, P. A. Hassan, "Fundamentals aspects of nanomagnetism and its versatile applications," Handbook of Materials Science, Springer Nature, 2024, 269-291
+- A. Gangwar, K. C. Barick, P. A. Hassan, "Growth of dendritic CuS nanostructures for Photoacoustic image guided chemo-photothermal therapy," J Photochem Photobiol A Chem., 459, 116084 (I.F. = 4.1)
+- S. Pradhan, N. S. Anuraag, S. K. Shaw, A. Gangwar, K. Sandeep Rao, A. Sharma, B. P. Mandal and N. K. Prasad, "MnNCN@C nanocomposite as an anode for Li-ion battery," Materials Sci. Engg. B, 298, 116894 (2023) (I.F = 3.7)
+- S. K. Shaw, Puja Kumari, A. Sharma, Neha Jatav, A. Gangwar, N. S. Anuraag, P. Rajput, S. Kavita, Sher Singh Meena, M. Vasundhara, Indrajit Sinha, N. K. Prasad, "Assessment of ionic site distributions in magnetic high entropy oxide of (Mn0.2Fe0.2Co0.2Ni0.2Zr0.2)3O4 and its catalytic behavior," Physica B: Condensed Matter, 652, 414653, (2023) (I.F. = 2.98)
+- M. Suthar, D. Khare, A. Gangwar, S. Banerjee, N.K. Prasad, A.K. Dubey, P. Roy, "Structural, magnetic, and biocompatibility evaluations of chromium substituted barium hexaferrite (Co2-Y) for hyperthermia application," Mater. Chem. Phys., 127348, (2023) (I.F= 4.8)
+- A. Gangwar, S. K. Shaw, A. Sharma, S. Kavita, V. Mutta, J. Gupta, K. C. Barick, P. A. Hassan, and N. K. Prasad, "Ferrimagnetic (a-Mn3O4/MnO)@rGO nanocomposite as a potential adsorbent for organic pollutant dye," Appl. Surf Sci., 612, 155778 (2022) (I.F = 7.4)
+- S. K. Alla, Pradeep V, A. Sharma, V. Muuta, A. Gangwar, S. K. Shaw, N. K. Prasad, "Synthesis and Characterization of FexCo3-xO4 Nanoparticles for Sensor Applications," Inorg. Chem. Commun. 142, 109698, (2022) (I.F = 3.43)
+- V. Kumar, V. S. Rai, M. K. Verma, S. Pandey, S. Singh, D. Prajapati, C. L. Prajapat, A. Gangwar, K. Mandal, "Observation of Microstructural and Magnetic properties of CaCu3Ti4-xMnxO12 (x = 0.0 and 0.1) ceramic synthesized through Semi-wet route," J. Aust. Ceram. Soc. (2022) (I.F = 1.9)
+- A. Gangwar, T. Das, S. K. Shaw, N. K. Prasad, "Nanocomposite (a-Mn3O4/MnO)@rGO as an excellent energy storage supercapacitors electrode material," Electrochem acta, 390, 138823 (2021) (I.F = 7.34)
+- S. K. Shaw, A. Gangwar, A. Sharma, S. K. Alla, S. Kavita, V. Mutta, S. S. Meena, P. Maiti, N.K. Prasad, "Structural and magnetic properties of nanocrystalline equi-atomic spinel high-entropy oxide (AlCoFeMnNi)3O4 synthesized by microwave assisted co-precipitation technique," J. Alloys Compd. 878:160269: (2021) (I.F = 6.4)
+- S. K. Shaw, J. Kailashiya, A. Gangwar, S. Alla, S. Gupta, C.L. Prajapat, S.S. Meena, D. Dash, P. Maiti, N. K. Prasad, "y-Fe2O3 Nanoflowers as exceptional Magnetic Hyperthermia and Photothermal agent," Appl. Surf Sci., 560, 150025 (2021) (I.F = 7.4)
+- Asnit Gangwar, S. K. Alla, N. K. Prasad, "RF induction heating and in-vitro efficacy of citrate capped ZrxFe3-xO4 nanoparticles for bioapplications," Physica B Condens. Matter. 611, 412970-412977 (2021) (I.F = 2.98)
+- A. Gangwar, A. Singh, S. Pal, I. Sinha, S. S. Meena, N. K. Prasad, "Magnetic nanocomposites of Fe3C or Ni-substituted (Fe3C/Fe3O4) with carbon for degradation of methylene orange and p-nitrophenol," J. clean. Prod. 309, 127372 (2021) (I.F = 11.1)
+- S. K. Alla, A. Gangwar, S. K. Shaw, M. K. Viswanadh, S. S. Meena, P. Kollu, R. K. Mandal, N. K. Prasad, "Physical and in-vitro evaluation of pure and substituted MxCe1-xO2 (M = Co, Fe or Ti and x = 0.05) magnetic nanoparticles," Ceramic Int. 47, 8812-8819 (2020) (I.F = 5.53)
+- A. Gangwar, A. Sharma, S. K. Shaw, S. S. Meena, N. K. Prasad, "Structural and Electrochemical studies of nanocomposites of Fe3C or Mn-Substituted (Fe3C/Fe3O4) with carbon as anode for Li-batteries," Appl. Surf Sci. 533 147474 (2020) (I.F = 7.4)
+- V. Kumar, S. Pandey, A. Kumar, M. K. Verma, S. Singh, V. S. Rai, D. Prajapati, T. Das, A. Sharma, C. L. Prajapat, A. Gangwar, K. D. Mandal, "Investigation of dielectric, magnetic and impedance spectroscopic properties of CaCu3-xMnxTi4-xMnxO12 (x =0.10) nano-ceramic synthesized through semi-wet route," J. Mater. Res. Technol 9, 12936-12945 (2020) (I.F = 6.3)
+- Asnit Gangwar, S. S. Varghese, A. sharma, S. S. Meena, C. L. Prajapat, M. K.Viswanadh, K. Neogi, M. S. Muthu and N. K. Prasad, "Physical and in-vitro evaluation of e-Fe3N@Fe3O4 nanoparticles for bioapplications," Ceramic Int. 46, 10952-10962 (2020) (I.F= 5.53)
+- Darson, Jaison, Asnit Gangwar, N. K. Prasad, G. Chandrasekaran, and M. Mothilal, "Effect of Gd3+ substitution on proton relaxation and magnetic hyperthermia efficiency of cobalt ferrite nanoparticle," Mat. R. Exp. 7 064009 (2020) (I.F = 2.02)
+- A. Gangwar, S. Kumar, S. S. Meena, A. Sharma M. K. Neogi, M. S. Muthu, N. K. Prasad, "Structural and in-vitro assessment of ZnxFe3-xC (0 <= x <= 1) nanoparticles as magnetic biomaterials," Appl Surf Sci, 509, 144891 (2020) (I.F = 7.4)
+- Asnit Gangwar, S. S. Varghese, M. K. Viswanadh, K. Neogi, M. S. Muthu, S. S. Meena, N. K. Prasad, "Physical and in-vitro evaluation of iron carbide (Fe3C) nanoparticles for bioapplications," J. Mater. Sci.: Mater. Electron, 31, 10772-10782 (2020) (I.F = 2.6)
+- K. Y. Salkar, R. B Tangsali, R. S. Gad, Asnit Gangwar, N. K. Prasad, "Electrical Properties of Zn(1-x)CoxO Dilute Magnetic Semiconductor Nanoparticles," J. Mater. Sci.: Mater. Electron 30, 18374-18383 (2019) (I.F = 2.6)
+- Pinki Singh, P. Bharti, Asnit Gangwar, N. K. Prasad, C. Upadhyay, "Janus shaped plasmonic magnetic silver magnetite nanostructures for multimodal Applications," JPN J APPL PHYS, 5 105001 (2019) (I.F = 2.5)
+- V. Ramya, A. Gangwar, S. K. Shaw, N. K. Mukhopadhyay, N. K. Prasad, "Fe/Fe3O4 Nanocomposite powders with giant magnetization values by high energy ball milling," Bull. Mater. Sci. 42:43, 1809-1816 (2019) (I.F = 2.7)
+- S. K. Shaw, A. Biswas, Asnit Gangwar, P. Maiti, S. S. Meena, C. L. Prajapat, N. K. Prasad, "Synthesis of exchange coupled nanoflowers for efficient magnetic hyperthermia," J. Magn. Magn. Mater. 484, 437-444 (2019) (I.F = 3.1)
+- A. Gangwar, Saby Varghese, S. S. Meena, C. L. Prajapat, Nidhi Gupta, N. K. Prasad, "Fe3C nanoparticles for magnetic hyperthermia application," J. Magn. Magn. Mater. 481, 251-256 (2019) (I.F = 3.1)
+- A. Gangwar, G. Singh, S. K. Shaw, R. K. Mandal, S. S. Meena, A. Sharma, C. L. Prajapat N. K. Prasad, "Synthesis and structural characterization of CoxFe3-xC (0 <= x <= 0.3) magnetic nanoparticles for biomedical applications," New J. Chem. 43, 3536-3544 (2019) (I.F = 3.93)
+- M. M. Kothawale, R. B. Tangsali, S. S. Meena, N. K. Prasad, Asnit Gangwar, "Mossbaur study and Curie temperature configuration on sintering nano Ni-Zn ferrite powder," J supercond Nov Magn. 018, 4935-4941 (2018) (I.F = 1.5)
+- A. Gangwar, S.K. Alla, M. Srivastava, S.S. Meena, E. V. Prasadarao, R. K. Mandal, S.M. Yusuf, N. K. Prasad, "Structural and magnetic characterization of Zr-Substituted magnetite (ZrxFe3-xO4, 0 <= x <= 1)," J. Magn. Magn. Mater. 401, 559-566 (2016) (I.F = 3.1)
+
+## Conferences Attended
+- A. Gangwar, Jagriti Gupta, K. C. Barick, International society for the materials chemistry, Department of Atomic Energy (DAE), Bhabha Atomic Research Center (BARC) Mumbai, 7-10/12/2022
+- A. Gangwar, S. K. Alla, N. K. Prasad, International Online Conference on Emerging Materials for Technological Applications (ICEMTA-2022), Vignan's Institute of Information Technology (A), Visakhapatnam
+- A. Gangwar, S. Kumar, S. S. Meena, A. Sharma M. K. Neogi, M. S. Muthu, N. K. Prasad, International Conference of magnetism and magnetic materials, Las Vegas, Nevada, U.S.A., 4-8/11/2019
+- A. Gangwar, G. singh, S. K. Shaw, R. K. Mandal, A. Sharma, S. S. Meena, C. L. Prajapat, N. K. Prasad, International conference on functional nanomaterials, Department of Physics IIT(BHU), Varanasi, 22-25/02/2019
+- Asnit Gangwar, S. S. Varghese, M. K. Viswanadh, K. Neogi, M. S. Muthu, Sher Singh Meena, N. K. Prasad, International conference on magnetic materials, NISER Bhubaneswar, Odisha, 12-14/11/2018
+- Asnit Gangwar, R. Jha, N. K. Prasad, International conference on Advances in Biological System and Materials Science in Nanoworld, Department of Physics IIT(BHU), Varanasi, 19-23/02/2017
+- A. Gangwar, National conference on Iron and Steel Technologies-Research and Application (ISTRA-2012), Department of Metallurgical Engineering IIT(BHU), Varanasi, 14-15/02/2012
+
+## Certifications
+- Data Analysis Software Certification: Versa studio, ImageJ, GATAN, eRing, Fullprof, Graphpadprism5, etc.
+
+
+## Identifiers & Contact
+- Email: asnitgme@svecw.edu.in
+- SVECW ID: 343
+- Google Scholar Id: a4u-v8AAAAJ
+- Scopus Id: 56926467100
+- ORCID Id: 0000-0001-5154-6140
+- Vidwan ID: 511932
+`;
+
+const MECH_K_HARI_KRISHNA_TEXT = `
+## Education Qualifications
+- Ph.D. National Institute of Technology, Warangal (2024)
+- P.G. (Manufacturing Engineering) National Institute of Technology, Warangal (2019)
+- B.Tech BV Raju Institute of Technology, Narsapur (2016)
+
+## Specialization Areas
+- Metal Forming
+- Powder Metallurgy
+- Machine Learning
+- Corrosion Science
+
+## Workshops & Training Programs Attended
+- "Recent Advances in Metal Forming: Microstructure, Modelling and Materials for Future Automotive Applications" (NIT Warangal, March 25-31, 2024)
+- "Advanced Composite Materials" (NIT Warangal, February 26 - March 1, 2024)
+- "High-End Research Training Programme on Current Trends and Future Aspects on Microwave Processing of Metallic Materials" (NIT Warangal, March 18-24, 2024)
+- "High-End Workshop on Artificial Intelligence for Robots" (IIITDM Kurnool, March 11-17, 2024)
+
+## Research Publications
+As Primary Author:
+- "Evaluation of Machine Learning Models for Predicting the Hot Deformation Flow Stress of Sintered Al-Zn-Mg Alloy" (SCI/Scopus indexed)
+- "Evaluation of constitutive equations for modeling and characterization of microstructure during hot deformation of sintered Al-Zn-Mg alloy" - Journal of Materials Research and Technology 28, 1523-1537 (2024)
+- "Characteristics of Work Hardening and Constitutive Models Comparisons of Powder Metallurgy Al-5.6%Zn-2%Mg Alloy During Hot Compression" - Journal of Central South University (2023/2024)
+- "Overcoming Optical Image Challenges in Automatic Grain Size Measurement Using a Novel Computer Vision Algorithm Applied to Hot Deformation of Al-Zn-Mg Powder Metallurgy Alloy" - Materials Letters 357, 135743 (2023)
+- "Unravelling the Hot working Behavior, Constitutive Modeling, and Processing Map for controlling the microstructure of sintered Al-Zn-Mg alloy" - Arabian Journal for Science and Engineering (2023)
+- "New Method for Microstructure Segmentation and Automatic Grain Size Determination Using Computer Vision Technology during the Hot Deformation of an Al-Zn-Mg Powder Metallurgy Alloy" - Journal of Materials Engineering and Performance (2023)
+- "Role of pre-strain on the corrosion behaviour of Al-Zn-Mg P/M alloy" - Proceedings of the Institution of Mechanical Engineers, Part L 237, 218-233 (2023)
+- "Investigating the effects of deformation-induced densification on the constitutive behavior and corrosion resistance of Al-Zn-Mg powder metallurgy alloy during hot deformation" - Proceedings of the Institution of Mechanical Engineers, Part L (2023)
+- "Influence of incremental pre-strain on corrosion behavior of Al-Zn-Mg powder metallurgy alloy during hot forging" - Proceedings of the Institution of Mechanical Engineers, Part C 237, 2990-3008 (2022)
+- "The effect of plastic strain and temperature on the corrosion resistance of the Al-5.6Zn-2Mg powder metallurgy alloy during hot upsetting" - Engineering Research Express 5, 045009 (2023)
+- "Decision-Making System for Accepting/Rejecting an Order in MTO Environment" - Advances in Simulation, Product Design and Development (Book chapter, Scopus indexed)
+
+As Co-Author:
+- "Corrosion Behavior Analysis and Characterization of AA7178 Matrix Alloy Reinforced with Nano TiO2 Particles" (Nikhil Bharat et al.) - Surface Topography: Metrology and Properties (2024)
+- "Optimization of wire-electric discharge machining process and metallurgical characteristics of Ti-16Al-14Nb (a/ss, ML-grade) alloy" (K. Veera Venkata Nagaraju et al.) - Journal of Materials Engineering and Performance (2023)
+- "Machinability and pulse characteristics of Ti-16Al-14Nb (a/ss) alloy in wire-electric discharge machining process: A surface integrity study" (K. Veera Venkata Nagaraju et al.) - Proceedings of the Institution of Mechanical Engineers, Part E (2024)
+- "Influence of Interlayer Material on Softening and Wear Behavior of Friction Stir Welded AA6061-T6 alloy" (Korra Nagu et al.) - Transactions of the Indian Institute of Metals (2023)
+
+## Conferences Attended
+- International Conference on Additive Manufacturing (ICAM 2024) - NIT Warangal, March 4-6, 2024
+- All India Manufacturing Technology, Design, and Research Conference (AIMTDR-2023) - IIT (BHU) Varanasi, December 8-10, 2023
+- International Conference on Recent Advances in Materials and Manufacturing Technologies (IMMT-2023) - BITS Pilani Dubai, November 20-23, 2023
+- All India Manufacturing Technology, Design, and Research Conference (AIMTDR-2019) - Anna University Chennai, December 13-15, 2019
+- International Conference on Materials and Manufacturing Methods (MMM-2019) - NIT Trichy, July 13-15, 2019
+
+## Journal Peer Review Activities
+- The Journal of The Minerals, Metals & Materials Society (JOM) - 2 reviews
+- Journal of Materials Engineering and Performance - 1 review
+- Materials Characterization - 1 review
+- Advanced Engineering Materials - 1 review
+- Cogent Engineering - 1 review
+
+
+## Identifiers & Contact
+- Email: kharikrishname@svecw.edu.in
+- SVECW ID: 344
+- Google Scholar: https://scholar.google.com/citations?user=7zKJ6T4AAAAJ&hl=en&authuser=6
+- Scopus ID: 57225802998
+- ORCID: 0000-0002-4624-396X
+- Personal website: https://sites.google.com/student.nitw.ac.in/katteharikrishna?usp=sharing
+`;
+
+const MECH_P_PHANI_KUMAR_TEXT = `
+## Education Qualification
+- Postgraduate: M.Tech. in CAD/CAM, VR Sidhartha Engineering College, Graduated 2011
+- Undergraduate: B.Tech in Mechanical Engineering, VEC, Graduated 2009
+
+## Experience
+- Teaching Experience: 11 Years
+
+## Areas of Specialization
+- Design & Analysis
+
+## Subjects Taught
+- Engineering Mechanics
+- Kinematics of Machinery
+- Dynamics of Machinery
+- CAD/CAM
+- Machine Drawing
+- Production Technology
+- MC & MT
+- BC & ME
+- CAEDP
+- Engineering Workshop
+- Production Technology Lab
+
+## Professional Development
+- "5 Day Workshop on 'Autodesk Inventor and Fusion 360'" (09-13 December 2015) at SVECW under TEQIP-II
+- "One Day Workshop on 'Improving the presentation Skills in Teaching'" (17-09-2016) at JNTUK
+- One-week program on "Advances in Manufacturing of Composite (AMC-2017)" (27 November - 2 December 2017) at Sasi Institute of Technology and Engineering, Tadepalligudem
+- One-week "Pedagogy" program (13-11-17 to 17-11-17) at Sasi Institute of Technology and Engineering under NITTTR
+- "5 days faculty development Program on 'Recent advancements in Thermal Energy Systems (Rates-2k19)'" (11-15 November 2019) at Sasi Institute of Technology and Engineering, Tadepalligudem
+- "One Week Online FDP on 'Research Opportunities and Challenges in Manufacturing Sector'" (01-06 June 2021) at SVERI's College of Engineering, Pandharpur, Maharashtra
+- "5Days Online FDP on 'Emerging Trends in Mechanical Engineering'" (02-06 June 2021) at St. Peter's Engineering College, Hyderabad
+
+## Professional Membership
+- IE (I) The Institution of Engineers (India)
+
+
+## Identifiers & Contact
+- Email: pphanikumarme@svecw.edu.in
+- SVECW ID: 342
 `;
 
 const FACULTY_CONTENT_OVERRIDES: Record<string, FacultySection[]> = {
@@ -8806,6 +10322,25 @@ const FACULTY_CONTENT_OVERRIDES: Record<string, FacultySection[]> = {
   'mrs. m. harshitha keerthi::mba': textToSections(MBA_HARSHITHA_KEERTHI_TEXT),
   'dr. k. prabhavathi::mba': textToSections(MBA_PRABHAVATHI_TEXT),
   'mr. mullapudi satish::mba': textToSections(MBA_SATISH_TEXT),
+  'dr. ch. hari krishna::mechanical': textToSections(MECH_HOD_TEXT),
+  'dr. p. srinivasa raju::mechanical': textToSections(MECH_P_SRINIVASA_RAJU_TEXT),
+  'dr. g. srinivasa rao::mechanical': textToSections(MECH_G_SRINIVASA_RAO_TEXT),
+  'mr. p. surya prakash varma::mechanical': textToSections(MECH_SURYA_PRAKASH_VARMA_TEXT),
+  'mr. n. srinivasa rao::mechanical': textToSections(MECH_N_SRINIVASA_RAO_TEXT),
+  'dr. j. v. narasimha raju::mechanical': textToSections(MECH_JV_NARASIMHA_RAJU_TEXT),
+  'mr. b. satya krishna::mechanical': textToSections(MECH_SATYA_KRISHNA_TEXT),
+  'mr. manoneet kumar::mechanical': textToSections(MECH_MANONEET_KUMAR_TEXT),
+  'mr. u.d.s. prathap varma::mechanical': textToSections(MECH_PRATHAP_VARMA_TEXT),
+  'mr. j e manikanta::mechanical': textToSections(MECH_MANIKANTA_TEXT),
+  'mr. a s v prasad::mechanical': textToSections(MECH_ASV_PRASAD_TEXT),
+  'mr. shaik madhar pasha::mechanical': textToSections(MECH_SHAIK_MADHAR_PASHA_TEXT),
+  'ms. g. mounica::mechanical': textToSections(MECH_G_MOUNICA_TEXT),
+  'mr. n. raja sekhar::mechanical': textToSections(MECH_N_RAJA_SEKHAR_TEXT),
+  'mr. maddipati rajesh::mechanical': textToSections(MECH_MADDIPATI_RAJESH_TEXT),
+  'dr. k. benarji::mechanical': textToSections(MECH_K_BENARJI_TEXT),
+  'dr. asnit gangwar::mechanical': textToSections(MECH_ASNIT_GANGWAR_TEXT),
+  'dr. k. hari krishna::mechanical': textToSections(MECH_K_HARI_KRISHNA_TEXT),
+  'mr. p. phani kumar::mechanical': textToSections(MECH_P_PHANI_KUMAR_TEXT),
 };
 
 function overrideKey(name: string, department: string): string {
@@ -8833,6 +10368,12 @@ const HIDDEN_FACULTY_RECORDS = new Set<string>([
   'mr. g a k s. rajeev kumar::it',
   'dr. r n d s s. kiran::it',
   'dr. g. subba raju::mba',
+  'mr. j. v. narasimha raju::mechanical',
+  'mr. j. e. manikanta::mechanical',
+  'mr. a. s. v. prasad::mechanical',
+  'ms. g. mounika::mechanical',
+  'dr. sivakumar krishnan::mechanical',
+  'dr. b. n. malleswara rao::mechanical',
 ]);
 
 export function isHiddenFacultyRecord(name: string, department: string): boolean {
