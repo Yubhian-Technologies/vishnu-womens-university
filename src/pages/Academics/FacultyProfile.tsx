@@ -9,6 +9,8 @@ import { getSectionBlocks } from '../../lib/facultySections';
 import FacultySectionContent from '../../components/FacultySectionContent/FacultySectionContent';
 import type { FacultyDoc } from './Faculty';
 import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
+import SEO from '../../components/SEO/SEO';
+import { getFacultySchema, getBreadcrumbSchema } from '../../lib/seo/schemas';
 import '../detail-layout.css';
 
 function getInitials(name: string) {
@@ -59,8 +61,35 @@ export default function FacultyProfile() {
 
   const active = sections.find((s) => s.title === activeSection) ?? sections[0];
 
+  const facultyTitle = `${person.name} | Faculty Profile | Vishnu Womens University`;
+  const facultyDesc = `${person.name} is ${person.designation}${person.department ? ` in the Department of ${person.department}` : ''} at Vishnu Womens University, Bhimavaram. ${person.qualification ? `Qualification: ${person.qualification}.` : ''}`;
+  const facultyUrl = `/faculty/${person.id}`;
+
+  const facultyJsonLd = [
+    getFacultySchema({
+      name: person.name,
+      designation: person.designation,
+      department: person.department,
+      email: person.email,
+      image: person.imageUrl,
+      url: facultyUrl,
+    }),
+    getBreadcrumbSchema([
+      { name: 'Academics', url: '/academics' },
+      { name: 'Faculty', url: '/faculty' },
+      { name: person.name, url: facultyUrl },
+    ]),
+  ];
+
   return (
     <main className="page-wrapper">
+      <SEO
+        title={facultyTitle}
+        description={facultyDesc}
+        canonicalPath={facultyUrl}
+        ogImage={person.imageUrl}
+        jsonLd={facultyJsonLd}
+      />
       <PageHero
         page="faculty-profile"
         defaultTitle={person.name}
