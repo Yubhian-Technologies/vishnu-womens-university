@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Private & Administrative Routes
+Disallow: /admin
+Disallow: /admin/
+Disallow: /admin/*
+
+# Sitemap
+Sitemap: https://www.vwu.edu.in/sitemap.xml

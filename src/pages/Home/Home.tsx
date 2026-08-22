@@ -13,6 +13,8 @@ import { resolveContentIcon } from '../../lib/contentIcons';
 import { type NewsDoc, newsDocToArticle } from '../../lib/news';
 import type { EventDoc } from '../Admin/sections/EventsAdmin';
 import type { ContentBlockDoc } from '../Admin/sections/ContentBlocksAdmin';
+import SEO from '../../components/SEO/SEO';
+import { getUniversitySchema } from '../../lib/seo/schemas';
 import './Home.css';
 
 /* ── Data ─────────────────────────────────────────────────── */
@@ -254,6 +256,12 @@ export default function Home() {
 
   return (
     <main className="home-page">
+      <SEO
+        title="Vishnu Womens University | Empowering Women Through Knowledge & Technology"
+        description="First private university for women in Telugu states located in Bhimavaram, Andhra Pradesh. Offering B.Tech, M.Tech, MBA, and Ph.D. programs with world-class infrastructure and top placements."
+        canonicalPath="/"
+        jsonLd={getUniversitySchema()}
+      />
 
       {/* ── Hero Slider ── */}
       <HeroSlider />
