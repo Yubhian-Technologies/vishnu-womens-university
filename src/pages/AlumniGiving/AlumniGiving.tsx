@@ -60,7 +60,7 @@ export default function AlumniGiving() {
   useHashScroll();
 
   useEffect(() => {
-    document.title = 'Alumni & Giving | Vishnu Womens University';
+    document.title = "Alumni & Giving | Vishnu Women's University";
   }, []);
 
   useEffect(() => {

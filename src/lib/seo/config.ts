@@ -1,5 +1,5 @@
 export const SITE_CONFIG = {
-  name: 'Vishnu Womens University',
+  name: "Vishnu Women's University",
   shortName: 'VWU',
   description: 'First private university for women in Telugu states. Empowering women through knowledge, innovation, and technology.',
   url: typeof window !== 'undefined'

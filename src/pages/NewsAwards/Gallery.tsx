@@ -43,7 +43,7 @@ export default function Gallery() {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   useEffect(() => {
-    document.title = 'Gallery | Vishnu Womens University';
+    document.title = "Gallery | Vishnu Women's University";
   }, []);
 
   // Picks up ?category=Sports (etc.) when arriving via a link from another

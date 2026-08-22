@@ -159,7 +159,7 @@ export default function Information() {
             <div>
               <h2 className="section-title" style={{ marginBottom: 'var(--space-4)' }}>How to Reach VWU</h2>
               <p style={{ color: 'var(--color-text-light)', marginBottom: 'var(--space-8)', maxWidth: 600 }}>
-                Vishnu Womens University is located in Vishnupur, Bhimavaram, West Godavari District, Andhra Pradesh – 534 202.
+                Vishnu Women's University is located in Vishnupur, Bhimavaram, West Godavari District, Andhra Pradesh – 534 202.
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', marginBottom: 'var(--space-10)' }}>
                 {howToReach.map((r) => {
@@ -177,7 +177,7 @@ export default function Information() {
               </div>
               <div style={{ background: 'var(--color-primary)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', color: 'rgba(255,255,255,0.8)', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', lineHeight: 1.8 }}>
                 <strong style={{ color: 'var(--color-accent)', display: 'flex', alignItems: 'center', gap: '0.35rem', marginBottom: 'var(--space-2)' }}><MapPin size={15} /> Address</strong>
-                Vishnu Womens University, Vishnupur, Bhimavaram – 534 202<br />
+                Vishnu Women's University, Vishnupur, Bhimavaram – 534 202<br />
                 West Godavari District, Andhra Pradesh, India<br />
                 <a href="tel:08816250864" style={{ color: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><Phone size={14} /> 08816-250864</a> &nbsp;|&nbsp;
                 <a href="mailto:info@svecw.edu.in" style={{ color: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><Mail size={14} /> info@svecw.edu.in</a>
@@ -267,7 +267,7 @@ export default function Information() {
             images={infoPhotos}
             label="Gallery"
             title="VWU in Pictures"
-            subtitle="A visual glimpse of the campus, facilities, and everyday life at Vishnu Womens University in Bhimavaram."
+            subtitle="A visual glimpse of the campus, facilities, and everyday life at Vishnu Women's University in Bhimavaram."
             highlights={[
               'Located in Vishnupur, 3 km from Bhimavaram',
               'Well connected by road, rail, and air',

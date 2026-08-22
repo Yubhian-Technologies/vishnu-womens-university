@@ -109,7 +109,7 @@ export default function GovernanceDetail() {
   // .reveal/IntersectionObserver setup would be racing async data on every
   // navigation (see the gotcha documented in CLAUDE.md).
   useEffect(() => {
-    if (item) document.title = `${item.title} | Vishnu Womens University`;
+    if (item) document.title = `${item.title} | Vishnu Women's University`;
   }, [item]);
 
   if (!item) {

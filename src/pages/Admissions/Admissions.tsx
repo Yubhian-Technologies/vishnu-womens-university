@@ -151,7 +151,7 @@ export default function Admissions() {
   };
 
   useEffect(() => {
-    document.title = 'Admissions | Vishnu Womens University';
+    document.title = "Admissions | Vishnu Women's University";
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {

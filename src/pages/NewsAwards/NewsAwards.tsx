@@ -34,7 +34,7 @@ export default function NewsAwards() {
   const highlights = useContentBlocks('news-awards', 'highlights');
 
   useEffect(() => {
-    document.title = 'News & Awards | Vishnu Womens University';
+    document.title = "News & Awards | Vishnu Women's University";
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {

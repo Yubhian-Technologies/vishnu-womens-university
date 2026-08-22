@@ -620,7 +620,7 @@ export default function Header() {
             <svg className="header-end-wave" viewBox={END_WAVE_VIEWBOX} preserveAspectRatio="none" aria-hidden="true">
               <path d={LOGO_WAVE_PATH} fill="var(--color-primary-dark)" stroke="var(--color-accent)" strokeWidth="2" />
             </svg>
-            <Link to="/" className="logo" aria-label="Vishnu Womens University Home">
+            <Link to="/" className="logo" aria-label="Vishnu Women's University Home">
               <img src="/images/logo.png" alt="VWU Logo" className="logo-icon" />
             </Link>
           </div>

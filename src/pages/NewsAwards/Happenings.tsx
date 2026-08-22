@@ -11,7 +11,7 @@ export default function Happenings() {
   const { docs: happenings } = useOrderedCollection<HappeningDoc>('happenings', 'order');
 
   useEffect(() => {
-    document.title = 'Happenings at VWU | Vishnu Womens University';
+    document.title = "Happenings at VWU | Vishnu Women's University";
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {

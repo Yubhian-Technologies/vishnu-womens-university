@@ -175,7 +175,7 @@ export function getEventSchema(props: EventSchemaProps) {
     eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
     location: {
       '@type': 'Place',
-      name: props.location || 'Vishnu Womens University Campus',
+      name: props.location || "Vishnu Women's University Campus",
       address: {
         '@type': 'PostalAddress',
         addressLocality: SITE_CONFIG.contact.address.city,

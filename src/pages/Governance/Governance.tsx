@@ -54,7 +54,7 @@ export default function Governance() {
   const hasAcademicCouncilPhotos = useSectionHasPhotos('governance', 'academic-council');
 
   useEffect(() => {
-    document.title = 'Governance | Vishnu Womens University';
+    document.title = "Governance | Vishnu Women's University";
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {

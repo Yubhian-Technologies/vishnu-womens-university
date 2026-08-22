@@ -27,7 +27,7 @@ export default function Events() {
   useHashScroll();
 
   useEffect(() => {
-    document.title = 'Events | Vishnu Womens University';
+    document.title = "Events | Vishnu Women's University";
     // Only the static section headers use .reveal here — the event cards
     // themselves render from Firestore data and don't use the scroll-reveal
     // animation (see the gotcha documented in CLAUDE.md).
@@ -67,8 +67,8 @@ export default function Events() {
   return (
     <main className="page-wrapper">
       <SEO
-        title="Campus Events & Academic Calendar | Vishnu Womens University"
-        description="Explore upcoming technical symposia, sports tournaments, graduation ceremonies, workshops, and cultural events at Vishnu Womens University, Bhimavaram."
+        title="Campus Events & Academic Calendar | Vishnu Women's University"
+        description="Explore upcoming technical symposia, sports tournaments, graduation ceremonies, workshops, and cultural events at Vishnu Women's University, Bhimavaram."
         canonicalPath="/events"
         jsonLd={eventsJsonLd}
       />

@@ -65,7 +65,7 @@ export default function Faculty() {
   }, [programs, faculty]);
 
   useEffect(() => {
-    document.title = 'Faculty | Vishnu Womens University';
+    document.title = "Faculty | Vishnu Women's University";
   }, []);
 
   // The intro heading above the department tabs uses .reveal (mount-only,
