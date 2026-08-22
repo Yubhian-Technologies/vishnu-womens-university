@@ -3719,7 +3719,7 @@ export default function DifferentiatorDetail() {
 
   useEffect(() => {
     if (item) {
-      document.title = `${item.title} | Vishnu Womens University`;
+      document.title = `${item.title} | Vishnu Women's University`;
     }
   }, [item]);
 

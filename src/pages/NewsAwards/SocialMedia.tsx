@@ -14,7 +14,7 @@ const socialHandles = [
 
 export default function SocialMedia() {
   useEffect(() => {
-    document.title = 'Social Media Handles | Vishnu Womens University';
+    document.title = "Social Media Handles | Vishnu Women's University";
   }, []);
 
   return (

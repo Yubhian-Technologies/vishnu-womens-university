@@ -170,7 +170,7 @@ Outcome:
 - Enlighten the women aspirants about the latest trends and methods in packaging of processed pickles.
 - Make the women community have a hands-on experience in promoting their business.
 
-### Science Technology and Innovation Hub at Vishnu Womens University
+### Science Technology and Innovation Hub at Vishnu Women's University
 PI: Dr. G Srinivasa Rao
 Co-PIs: Dr. K Padma Vasavi, M PremKumar, Dr. S Hanumath Rao, Dr. A Sri Krishna, Dr. K Jegadeesh, Mr. P Ravi Kumar
 Department: Mechanical Engineering, ECE, Artificial Intelligence, Basic Science
@@ -398,7 +398,7 @@ Outcome:
 - Understood designing and collecting valid datasets and using Python for classification and modeling.
 - Became familiar with various statistical, feature extraction, classification, and modeling techniques in the Data Science domain.
 
-### Fund for Improvement of Science and Technology Infrastructure – Vishnu Womens University
+### Fund for Improvement of Science and Technology Infrastructure – Vishnu Women's University
 PI: Dr. G Srinivasa Rao
 Department: Mechanical Engineering
 Status: Completed

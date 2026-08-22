@@ -22,7 +22,7 @@ export default function Differentiators() {
   })), [allItems]);
 
   useEffect(() => {
-    document.title = 'Differentiators | Vishnu Womens University';
+    document.title = "Differentiators | Vishnu Women's University";
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {

@@ -49,7 +49,7 @@ export default function FacultyProfile() {
   }, [sections.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (person) document.title = `${person.name} | Vishnu Womens University`;
+    if (person) document.title = `${person.name} | Vishnu Women's University`;
   }, [person]);
 
   if (!loading && !person) return <Navigate to="/faculty" replace />;
@@ -61,8 +61,8 @@ export default function FacultyProfile() {
 
   const active = sections.find((s) => s.title === activeSection) ?? sections[0];
 
-  const facultyTitle = `${person.name} | Faculty Profile | Vishnu Womens University`;
-  const facultyDesc = `${person.name} is ${person.designation}${person.department ? ` in the Department of ${person.department}` : ''} at Vishnu Womens University, Bhimavaram. ${person.qualification ? `Qualification: ${person.qualification}.` : ''}`;
+  const facultyTitle = `${person.name} | Faculty Profile | Vishnu Women's University`;
+  const facultyDesc = `${person.name} is ${person.designation}${person.department ? ` in the Department of ${person.department}` : ''} at Vishnu Women's University, Bhimavaram. ${person.qualification ? `Qualification: ${person.qualification}.` : ''}`;
   const facultyUrl = `/faculty/${person.id}`;
 
   const facultyJsonLd = [

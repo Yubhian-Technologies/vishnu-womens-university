@@ -65,7 +65,7 @@ export default function AdminLogin({ error, onAttempt }: Props) {
         <div className="admin-login__logo">
           <span>🎓</span>
           <h1>VWU Admin</h1>
-          <p>Vishnu Womens University — Content Management</p>
+          <p>Vishnu Women's University — Content Management</p>
         </div>
         <form onSubmit={handleSubmit} className="admin-login__form">
           <div className="admin-field">

@@ -21,7 +21,7 @@ export default function News() {
   useHashScroll();
 
   useEffect(() => {
-    document.title = 'News | Vishnu Womens University';
+    document.title = "News | Vishnu Women's University";
   }, []);
 
   useEffect(() => {
@@ -65,8 +65,8 @@ export default function News() {
   return (
     <main className="page-wrapper">
       <SEO
-        title="VWU News & Stories | Latest Campus Updates | Vishnu Womens University"
-        description="Stay up-to-date with the latest news, achievements, events, research breakthroughs, and campus developments at Vishnu Womens University, Bhimavaram."
+        title="VWU News & Stories | Latest Campus Updates | Vishnu Women's University"
+        description="Stay up-to-date with the latest news, achievements, events, research breakthroughs, and campus developments at Vishnu Women's University, Bhimavaram."
         canonicalPath="/news"
         ogImage={featuredItem?.imageUrl}
         jsonLd={newsJsonLd}

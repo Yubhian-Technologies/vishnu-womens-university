@@ -107,7 +107,7 @@ export default function About() {
   }, [diffItems]);
 
   useEffect(() => {
-    document.title = 'About VWU | Vishnu Womens University';
+    document.title = "About VWU | Vishnu Women's University";
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -129,7 +129,7 @@ export default function About() {
       {/* Hero */}
       <PageHero
         page="about"
-        defaultTitle="About Vishnu Womens University"
+        defaultTitle="About Vishnu Women's University"
   defaultSubtitle="Rooted in Bhimavaram since 2001, VWU has grown into Andhra Pradesh's foremost institution for women's technical education."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'About VWU' }]}
       />
@@ -157,7 +157,7 @@ export default function About() {
               <h2 className="section-title">First Private State University for Women in Telugu States</h2>
               <div className="divider" />
               <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-4)', color: 'var(--color-text-light)' }}>
-                Vishnu Womens University is set in Vishnupur, 3 km from Bhimavaram along Tadepalligudem Road
+                Vishnu Women's University is set in Vishnupur, 3 km from Bhimavaram along Tadepalligudem Road
                 in Coastal Andhra Pradesh. The campus stretches across approximately <strong> 100 acres</strong>,
                 offering an environment well-suited to focused, high-quality learning.
               </p>
@@ -279,7 +279,7 @@ export default function About() {
           <PhotoGrid
             images={galleryPhotos}
             label="Campus Life"
-            title="Life at Vishnu Womens University"
+            title="Life at Vishnu Women's University"
             subtitle="A glimpse of the people, spaces, and moments that make VWU a distinctive place to learn and grow."
             highlights={[
               '100-acre green campus in Bhimavaram',

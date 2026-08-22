@@ -3,7 +3,7 @@
 // this constant is used by ResearchDetail.tsx so the page renders the fuller
 // description from svecw.edu.in instead, taking priority over the existing
 // item.intro (see ResearchDetail.tsx).
-export const DEFAULT_SEED_MONEY_PROJECTS_INTRO = `In-House R&D Projects / Seed Money Projects: Seed money projects at Vishnu Womens University provide faculty and students with the chance to explore ideas, develop prototypes, and apply theoretical knowledge in practical settings. With initial funding and support, these projects empower faculty & students to embark on applying for external funding agencies, entrepreneurial ventures, fostering a culture of innovation and problem-solving.`;
+export const DEFAULT_SEED_MONEY_PROJECTS_INTRO = `In-House R&D Projects / Seed Money Projects: Seed money projects at Vishnu Women's University provide faculty and students with the chance to explore ideas, develop prototypes, and apply theoretical knowledge in practical settings. With initial funding and support, these projects empower faculty & students to embark on applying for external funding agencies, entrepreneurial ventures, fostering a culture of innovation and problem-solving.`;
 
 // Fallback content for the Seed Money Projects item, sourced from
 // https://svecw.edu.in/seed-money-projects/. Firestore's researchItems doc
@@ -48,7 +48,7 @@ Sl. No. | Faculty Name | Dept. | Project Title | Amount (₹)
 1 | Dr. J Rohith Balaji | EEE | Hybrid Drive Controller for Induction Machine and BLDC Motor (Phase -I) | 23,100
 2 | Dr. S M Padmaja | EEE | Voice Activated Autonomous Chess Board for Disable (Phase -I) | 34,969
 3 | Mr. B N Malleswara Rao | ME | Influence of pin profile on Mechanical, metallurgical and formability behaviors of friction stir welded aluminium tailor welded blanks | 72,500
-4 | Dr. P S Brhamanandham | Physics | Establishment of a low-cost Particulate Matter (PM) sensor in Vishnu Womens University campus, Bhimavaram | 25,000
+4 | Dr. P S Brhamanandham | Physics | Establishment of a low-cost Particulate Matter (PM) sensor in Vishnu Women's University campus, Bhimavaram | 25,000
 5 | Dr. J Rohith Balaji | EEE | Automatic Guided Robot for Floor Chess (Phase -I) | 41,864
 6 | Dr. P Gireesh Kumar | CE | Experimental Investigation of Sustainability of Pervious Concrete Pavement (PCP) with the Inclusion of GGBS w.r.t Alternative Mixes | 65,050
 Total | | | | 2,62,483`;

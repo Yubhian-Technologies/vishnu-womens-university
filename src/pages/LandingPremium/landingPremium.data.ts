@@ -7,11 +7,11 @@
 // caption underneath it, paired with the awarding body's name + a fuller
 // description on the right.
 export const RANKINGS = [
-  { big: 'A++', caption: 'NAAC Accreditation Grade — the highest grade awarded.', title: 'NAAC Accreditation', desc: 'Vishnu Womens University is accredited with an A++ grade by the National Assessment and Accreditation Council.' },
-  { big: '#1', caption: 'Among top engineering colleges in its category.', title: 'India Today Rankings', desc: 'Vishnu Womens University is recognized as a Top Engineering College by the India Today Rankings survey.' },
-  { big: '#1', caption: 'Among the best engineering colleges nationally.', title: 'The Week Rankings', desc: 'Vishnu Womens University is recognized as a Best Engineering College by The Week Rankings survey.' },
+  { big: 'A++', caption: 'NAAC Accreditation Grade — the highest grade awarded.', title: 'NAAC Accreditation', desc: "Vishnu Women's University is accredited with an A++ grade by the National Assessment and Accreditation Council." },
+  { big: '#1', caption: 'Among top engineering colleges in its category.', title: 'India Today Rankings', desc: "Vishnu Women's University is recognized as a Top Engineering College by the India Today Rankings survey." },
+  { big: '#1', caption: 'Among the best engineering colleges nationally.', title: 'The Week Rankings', desc: "Vishnu Women's University is recognized as a Best Engineering College by The Week Rankings survey." },
   { big: 'NBA', caption: 'Programs accredited for quality and outcomes.', title: 'NBA Accreditation', desc: "VWU's engineering programs hold accreditation from the National Board of Accreditation." },
-  { big: 'UGC', caption: 'Autonomous status granted for academic excellence.', title: 'UGC Autonomous Status', desc: 'Vishnu Womens University holds Autonomous Status granted by the University Grants Commission.' },
+  { big: 'UGC', caption: 'Autonomous status granted for academic excellence.', title: 'UGC Autonomous Status', desc: "Vishnu Women's University holds Autonomous Status granted by the University Grants Commission." },
 ];
 
 // Same 8 stats as CounterSection.tsx's defaultCounters — split by theme.

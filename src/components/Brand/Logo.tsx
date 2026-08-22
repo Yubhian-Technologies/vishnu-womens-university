@@ -38,7 +38,7 @@ export default function Logo({
         style={{ height: size, width: size * (100 / 120) }}
         viewBox="0 0 100 120"
         role="img"
-        aria-label="Vishnu Womens University crest"
+        aria-label="Vishnu Women's University crest"
       >
         {/* Shield body */}
         <path
@@ -87,7 +87,7 @@ export default function Logo({
 
       {variant === 'full' && (
         <div className="vwu-logo__wordmark">
-          <span className="vwu-logo__title">Vishnu Womens University</span>
+          <span className="vwu-logo__title">Vishnu Women's University</span>
           {tagline !== false && <span className="vwu-logo__tagline">{tagline}</span>}
         </div>
       )}

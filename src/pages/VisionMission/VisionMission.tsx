@@ -72,7 +72,7 @@ export default function VisionMission() {
       <PageHero
         page="vision-mission"
         defaultTitle="Vision, Mission & Values"
-  defaultSubtitle="The principles, purpose, and commitments that inform every decision and action at Vishnu Womens University."
+  defaultSubtitle="The principles, purpose, and commitments that inform every decision and action at Vishnu Women's University."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Discover', to: '/' }, { label: 'Vision, Mission & Values' }]}
       />
 

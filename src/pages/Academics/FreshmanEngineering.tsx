@@ -804,7 +804,7 @@ export default function FreshmanEngineering() {
     const title = activeTab === 'About Freshman Department'
       ? 'Department of Freshman Engineering'
       : subDept ? subDept.title : activeTab;
-    document.title = `${title} | Vishnu Womens University`;
+    document.title = `${title} | Vishnu Women's University`;
   }, [activeTab, subDept]);
 
   const pageTitle = activeTab === 'About Freshman Department'

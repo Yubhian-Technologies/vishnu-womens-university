@@ -89,10 +89,10 @@ export default function Footer() {
           <div className="footer-compliance-grid">
             {/* Brand */}
             <div className="footer-brand">
-              <Link to="/" className="footer-logo" aria-label="Vishnu Womens University">
+              <Link to="/" className="footer-logo" aria-label="Vishnu Women's University">
                 <img src="/images/square%20logo.png" alt="VWU Logo" className="footer-logo-icon" />
                 <div className="footer-logo-text">
-                  <strong>Vishnu Womens</strong>
+                  <strong>Vishnu Women's</strong>
                   <span>University</span>
                 </div>
               </Link>
@@ -163,7 +163,7 @@ export default function Footer() {
         <div className="container">
           <div className="footer-bottom-inner">
             <p className="footer-copyright">
-              &copy; {year} Vishnu Womens University. All rights reserved.
+              &copy; {year} Vishnu Women's University. All rights reserved.
               <span className="footer-credit">Developed by <strong>VISHNU TECH HUB</strong></span>
             </p>
             <nav className="footer-legal" aria-label="Legal links">
