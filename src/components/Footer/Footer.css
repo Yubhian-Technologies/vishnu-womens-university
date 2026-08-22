@@ -169,7 +169,6 @@
   display: inline-flex;
   align-items: center;
   gap: 0.3em;
-  margin-left: var(--space-3);
   padding: 0.2em 0.7em;
   border: 1px solid rgba(201,168,76,0.35);
   border-radius: 999px;
