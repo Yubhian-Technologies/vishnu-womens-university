@@ -5,7 +5,7 @@ import PageHero from '../../components/PageHero/PageHero';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import type { FacultyFact, FacultySection } from '../../lib/facultySections';
-import { isHiddenFacultyRecord } from './facultyContentOverrides.data';
+import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
 
 export type { FacultyFact, FacultySection };
 
@@ -26,7 +26,10 @@ export interface FacultyDoc {
   sections?: FacultySection[];
 }
 
-const DEPARTMENTS = ['CSE', 'AI&ML', 'AI&DS', 'Cyber Security', 'IT', 'ECE', 'EEE', 'Civil', 'Mechanical', 'MBA'];
+// First-year foundation subjects shown only on the Freshman Engineering
+// page (src/pages/Academics/FreshmanEngineering.tsx), not on this page —
+// keep in sync with that file's hardcoded SUB_DEPTS titles.
+const FRESHMAN_ENGINEERING_DEPARTMENTS = new Set(['Mathematics', 'Physics', 'Chemistry', 'English']);
 
 function getInitials(name: string) {
   const cleaned = name.replace(/\b(Dr|Sri|Prof|Mr|Mrs|Ms)\.?\s*/gi, '');
@@ -38,15 +41,28 @@ function getInitials(name: string) {
 
 export default function Faculty() {
   const { docs: allFaculty, loading } = useOrderedCollection<FacultyDoc>('faculty', 'order');
+  const { docs: programs } = useOrderedCollection<ProgramDoc>('programs', 'order');
   const [activeDept, setActiveDept] = useState('All');
 
-  // Duplicate records (same person under a differently-spelled/titled name)
-  // pending manual cleanup in /admin — hidden here so they don't show up
-  // twice on the public site in the meantime.
-  const faculty = useMemo(
-    () => allFaculty.filter((f) => !isHiddenFacultyRecord(f.name, f.department)),
-    [allFaculty]
-  );
+  const faculty = allFaculty;
+
+  // Departments aren't managed separately — this is the union of every
+  // Program's `department` field (/admin → Programs) and every department
+  // that already has faculty tagged to it. The union matters because a
+  // Program's department can legitimately point elsewhere (e.g. a shared
+  // HOD across AI&DS and AI&ML programs both pointing at "AI&ML"), which
+  // must never make a real faculty department's tab disappear. The first-
+  // year foundation subjects have their own tabs on the Freshman
+  // Engineering page (FreshmanEngineering.tsx's hardcoded SUB_DEPTS) and
+  // are excluded here so they don't also show up on this page.
+  const DEPARTMENTS = useMemo(() => {
+    const seen = new Set<string>();
+    const names: string[] = [];
+    const add = (d: string) => { if (d && !seen.has(d) && !FRESHMAN_ENGINEERING_DEPARTMENTS.has(d)) { seen.add(d); names.push(d); } };
+    programs.forEach((p) => add(p.department));
+    faculty.forEach((f) => add(f.department));
+    return names;
+  }, [programs, faculty]);
 
   useEffect(() => {
     document.title = 'Faculty | Vishnu Womens University';

@@ -4,7 +4,6 @@ import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { linkify } from '../../lib/linkify';
 import { getSectionBlocks } from '../../lib/facultySections';
-import { getFacultyOverrideSections } from './facultyContentOverrides.data';
 import FacultySectionContent from '../../components/FacultySectionContent/FacultySectionContent';
 import type { FacultyDoc } from './Faculty';
 import '../detail-layout.css';
@@ -235,8 +234,7 @@ function useDeptFaculty(department: string) {
 function FeAboutHodSection({ department }: { department: string }) {
   const { members, loading } = useDeptFaculty(department);
   const hod = members.find((f) => /head|hod/i.test(f.designation));
-  const overrideSections = hod ? getFacultyOverrideSections(hod.name, hod.department) : null;
-  const sections = (overrideSections ?? hod?.sections ?? []).filter((s) => s.title);
+  const sections = (hod?.sections ?? []).filter((s) => s.title);
   const [category, setCategory] = useState<string | null>(null);
   const active = sections.find((s) => s.title === category) ?? sections[0];
 
