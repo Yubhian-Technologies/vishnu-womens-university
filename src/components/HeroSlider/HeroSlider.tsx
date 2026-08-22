@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Trophy, Star, ClipboardList, Briefcase, TrendingUp } from 'lucide-react';
 import { usePageBanners } from '../../hooks/usePageBanners';
+import { useContentBlocks } from '../../hooks/useContentBlocks';
 import './HeroSlider.css';
 
 // Served from public/ (not imported as a JS module) so this ~27MB file never
@@ -23,40 +24,49 @@ interface Slide {
   image?: string;
 }
 
-const staticSlides: Slide[] = [
-  {
-    id: 1,
-    tag: 'Welcome to VWU',
-    heading: 'Empowering.\nWomen.\nThrough Tech.',
-    description: 'VWU equips women with rigorous engineering education, research opportunities, and the practical skills that top employers demand.',
-    primaryCta: { label: 'Schedule a Visit', path: '/admissions' },
-    secondaryCta: { label: 'Apply Now', path: '/admissions' },
-  },
-  {
-    id: 2,
-    tag: 'Academics',
-    heading: '10 B.Tech Programs\nBuilt for Your\nSuccess',
-    description: 'From Computer Science to Civil Engineering — VWU offers undergraduate, postgraduate, and doctoral programs rooted in applied, industry-aligned learning.',
-    primaryCta: { label: 'Explore Programs', path: '/academics' },
-    secondaryCta: { label: 'Request Info', path: '/admissions' },
-  },
-  {
-    id: 3,
-    tag: 'Campus Life',
-    heading: 'Learn, Grow\nand Excel',
-    description: "VWU is more than a degree — it is a community where you build real skills, lasting connections, and the confidence to lead in your chosen field.",
-    primaryCta: { label: 'Campus Life', path: '/student-life' },
-    secondaryCta: { label: 'Apply Now', path: '/admissions' },
-  },
-  {
-    id: 4,
-    tag: 'Outstanding Placements',
-    heading: '59.28 LPA\nHighest\nPlacement Package',
-    description: 'VWU recorded 1,400+ placements in 2024–25, with a highest offer of 59.28 LPA — graduates are now driving impact at companies across India and beyond.',
-    primaryCta: { label: 'Placement Records', path: '/about' },
-    secondaryCta: { label: 'Our Story', path: '/about' },
-  },
-];
+// The B.Tech program count in this heading is admin-editable, but not as
+// its own field — it reuses the "Departments" stat from About → Quick Stats
+// (page="about", section="quickStats"), since that's the number the admin
+// already maintains by hand for exactly this purpose. Falls back to the
+// last-known steady-state number if that stat is ever missing/renamed.
+const FALLBACK_BTECH_COUNT = '10';
+
+function buildStaticSlides(btechCount: string): Slide[] {
+  return [
+    {
+      id: 1,
+      tag: 'Welcome to VWU',
+      heading: 'Empowering.\nWomen.\nThrough Tech.',
+      description: 'VWU equips women with rigorous engineering education, research opportunities, and the practical skills that top employers demand.',
+      primaryCta: { label: 'Schedule a Visit', path: '/admissions' },
+      secondaryCta: { label: 'Apply Now', path: '/admissions' },
+    },
+    {
+      id: 2,
+      tag: 'Academics',
+      heading: `${btechCount} B.Tech Programs\nBuilt for Your\nSuccess`,
+      description: 'From Computer Science to Civil Engineering — VWU offers undergraduate, postgraduate, and doctoral programs rooted in applied, industry-aligned learning.',
+      primaryCta: { label: 'Explore Programs', path: '/academics' },
+      secondaryCta: { label: 'Request Info', path: '/admissions' },
+    },
+    {
+      id: 3,
+      tag: 'Campus Life',
+      heading: 'Learn, Grow\nand Excel',
+      description: "VWU is more than a degree — it is a community where you build real skills, lasting connections, and the confidence to lead in your chosen field.",
+      primaryCta: { label: 'Campus Life', path: '/student-life' },
+      secondaryCta: { label: 'Apply Now', path: '/admissions' },
+    },
+    {
+      id: 4,
+      tag: 'Outstanding Placements',
+      heading: '59.28 LPA\nHighest\nPlacement Package',
+      description: 'VWU recorded 1,400+ placements in 2024–25, with a highest offer of 59.28 LPA — graduates are now driving impact at companies across India and beyond.',
+      primaryCta: { label: 'Placement Records', path: '/about' },
+      secondaryCta: { label: 'Our Story', path: '/about' },
+    },
+  ];
+}
 
 const recognitions = [
   { icon: Trophy, title: 'Top Engineering College', source: 'India Today Rankings' },
@@ -100,8 +110,11 @@ export default function HeroSlider() {
   // marketing slides — the video keeps playing behind all of them, these
   // just add their photo alongside the slide's own text/CTA.
   const { slides: bannerSlides } = usePageBanners('home');
+  const aboutQuickStats = useContentBlocks('about', 'quickStats');
+  const departmentsStat = aboutQuickStats.find((s) => s.title === 'Departments');
+  const btechCount = departmentsStat?.value || FALLBACK_BTECH_COUNT;
   const slides: Slide[] = [
-    ...staticSlides,
+    ...buildStaticSlides(btechCount),
     ...bannerSlides.map((b) => ({
       id: b.id,
       tag: 'Announcement',
