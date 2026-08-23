@@ -296,7 +296,10 @@ export default function Home() {
                 <div key={i} className="activity-card activity-card--skeleton" aria-hidden="true" />
               ))
             ) : (
-              activityPhotos.map((item, i) => (
+              // Doubled so the loop point (translateX -50%) lands exactly on an
+              // identical copy of the start — the standard technique for a
+              // seamless CSS marquee.
+              [...activityPhotos, ...activityPhotos].map((item, i) => (
                 <div key={i} className="activity-card">
                   <SmoothImage
                     src={item.src}

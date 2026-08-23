@@ -114,13 +114,10 @@
 }
 .activity-track-wrap {
   flex: 1;
-  overflow-x: auto;
-  overflow-y: hidden;
+  overflow: hidden;
   min-width: 0;
   position: relative;
-  scrollbar-width: none;
 }
-.activity-track-wrap::-webkit-scrollbar { display: none; }
 .activity-track-wrap::before,
 .activity-track-wrap::after {
   content: '';
@@ -143,6 +140,19 @@
   gap: 3px;
   width: max-content;
   height: 100%;
+  animation: activity-scroll 28s linear infinite;
+  /* Promotes the track to its own compositor layer up front, so the browser
+     never has to repaint the rest of the strip (or the page) on each
+     animation frame — the transform is handled entirely off the main
+     thread, which is what keeps this from ever competing with scroll/input
+     handling. */
+  will-change: transform;
+}
+.activity-track:hover { animation-play-state: paused; }
+
+@keyframes activity-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
 }
 
 .activity-card {
