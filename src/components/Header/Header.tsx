@@ -55,7 +55,7 @@ const navItems: NavItem[] = [
         groupPath: '/about',
         items: [
           { label: 'About VWU', path: '/about' },
-          { label: 'Vision, Mission & Values', path: '/vision-mission' },
+          { label: 'Vision & Mission', path: '/vision-mission' },
           { label: 'Institutional Development Plan', path: '/governance/idp' },
           { label: 'Organizational Chart', path: '/downloads/SVECWOrganizationChart.jpg', download: true },
           { label: 'Core Executive Body', path: '/about#core-executive' },

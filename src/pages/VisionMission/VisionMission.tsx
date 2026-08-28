@@ -19,17 +19,6 @@ const defaultInspirationPhotos = [
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'VWU quality education', caption: '' },
 ];
 
-const valuesPolicyPoints = [
-  'We strive for excellence in all that we do in order to model success for our students',
-  'We focus on students’ success and satisfaction and meeting the needs of the community',
-  'We take pride in the quality of our organization and work, and we value, originality, integrity, consistency, and attention to detail',
-  'We stay abreast of ever-changing youth culture, emerging communication technologies and design trends',
-  'We set benchmarks and model high quality standards for students, faculty, staff, and community partners',
-  'We lay utmost importance on discipline, punctuality, personal values and healthy practices',
-  'We create an innovative environment for students and staff to develop an integrated personality',
-  'Inclusive community projects',
-];
-
 const defaultCoreValuesPhotos = [
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Empowering Women in Tech', caption: '' },
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Tech Innovation', caption: '' },
@@ -49,7 +38,7 @@ export default function VisionMission() {
   const hasCoreValuesPhotos = useSectionHasPhotos('vision-mission', 'core-values');
 
   useEffect(() => {
-    document.title = 'Vision, Mission & Values | VWU';
+    document.title = 'Vision & Mission | VWU';
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -71,9 +60,9 @@ export default function VisionMission() {
       {/* Hero */}
       <PageHero
         page="vision-mission"
-        defaultTitle="Vision, Mission & Values"
+        defaultTitle="Vision & Mission"
   defaultSubtitle="The principles, purpose, and commitments that inform every decision and action at Vishnu Womens University."
-        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Discover', to: '/' }, { label: 'Vision, Mission & Values' }]}
+        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Discover', to: '/' }, { label: 'Vision & Mission' }]}
       />
 
       {/* Vision */}
@@ -88,8 +77,10 @@ export default function VisionMission() {
               <div className="vm-vision-box">
                 <span className="vm-quote-icon">❝</span>
                 <p>
-                  Transform the society through excellence in Women's Education, Community empowerment
-                  and sustained Environmental protection.
+                  To emerge as a globally benchmarked, women-centric university that advances the
+                  Sustainable Development Goals (SDGs) through academic excellence, ethical leadership, and
+                  transformative innovation—empowering women to shape an equitable, sustainable, and
+                  resilient world.
                 </p>
               </div>
             </div>
@@ -111,28 +102,6 @@ export default function VisionMission() {
                   <li key={point.id} className="vm-mission-item">
                     <span className="vm-mission-num">{String(i + 1).padStart(2, '0')}</span>
                     <p>{point.title}</p>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Values (Quality Policy) */}
-      <section className="section bg-white">
-        <div className="container">
-          <div className="vm-section reveal">
-            <div className="vm-label">
-              <span className="vm-bar" />
-              <h2>Values</h2>
-            </div>
-            <div className="vm-content">
-              <ul className="vm-values-list">
-                {valuesPolicyPoints.map((point) => (
-                  <li key={point} className="vm-values-item">
-                    <Check size={17} strokeWidth={2.5} className="vm-values-icon" />
-                    <p>{point}</p>
                   </li>
                 ))}
               </ul>
