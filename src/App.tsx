@@ -16,6 +16,7 @@ const FacultyProfile = lazy(() => import('./pages/Academics/FacultyProfile'));
 const AcademicDownloads = lazy(() => import('./pages/Academics/Downloads'));
 const CurriculumMatrix = lazy(() => import('./pages/Academics/CurriculumMatrix'));
 const Admissions = lazy(() => import('./pages/Admissions/Admissions'));
+const CampusVisit = lazy(() => import('./pages/CampusVisit/CampusVisit'));
 const StudentLife = lazy(() => import('./pages/StudentLife/StudentLife'));
 const AlumniGiving = lazy(() => import('./pages/AlumniGiving/AlumniGiving'));
 const About = lazy(() => import('./pages/About/About'));
@@ -99,6 +100,7 @@ function PublicApp() {
           <Route path="/faculty" element={<Faculty />} />
           <Route path="/faculty/:id" element={<FacultyProfile />} />
           <Route path="/admissions" element={<Admissions />} />
+          <Route path="/campus-visit" element={<CampusVisit />} />
           <Route path="/student-life" element={<StudentLife />} />
           <Route path="/alumni-giving" element={<AlumniGiving />} />
           <Route path="/about" element={<About />} />

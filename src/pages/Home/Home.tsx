@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Laptop, Presentation, Check, Clock, MapPin } from 'lucide-react';
 import HeroSlider from '../../components/HeroSlider/HeroSlider';
 import CounterSection from '../../components/CounterSection/CounterSection';
+import ScrollTopButton from '../../components/ScrollTopButton/ScrollTopButton';
 import NewsCard from '../../components/NewsCard/NewsCard';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import { useOrderedCollection } from '../../hooks/useCollection';
@@ -597,6 +598,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <ScrollTopButton />
     </main>
   );
 }

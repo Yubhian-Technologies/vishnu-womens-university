@@ -242,13 +242,17 @@ export default function About() {
               <div className="exec-grid">
                 {members.map((exec) => (
                   <div key={exec.name} className="exec-card">
-                    {exec.photoUrl ? (
-                      <SmoothImage src={exec.photoUrl} alt={exec.name} className="exec-card__photo" />
-                    ) : (
-                      <div className="exec-card__avatar">{getInitials(exec.name)}</div>
-                    )}
-                    <h3 className="exec-card__name">{exec.name}</h3>
-                    <p className="exec-card__role">{exec.role}</p>
+                    <div className="exec-card__media">
+                      {exec.photoUrl ? (
+                        <SmoothImage src={exec.photoUrl} alt={exec.name} className="exec-card__photo" />
+                      ) : (
+                        <div className="exec-card__avatar">{getInitials(exec.name)}</div>
+                      )}
+                    </div>
+                    <div className="exec-card__info">
+                      <h3 className="exec-card__name">{exec.name}</h3>
+                      <p className="exec-card__role">{exec.role}</p>
+                    </div>
                   </div>
                 ))}
               </div>
