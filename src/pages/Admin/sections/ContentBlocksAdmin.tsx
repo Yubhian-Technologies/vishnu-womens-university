@@ -56,8 +56,6 @@ export const CONTENT_BLOCK_SECTIONS: { page: string; section: string; label: str
   { page: 'information', section: 'otherPractices', label: 'Information — Other Practices' },
   { page: 'campus', section: 'facilities', label: 'Campus — Facilities' },
   { page: 'governance', section: 'stats', label: 'Governance — Stats Bar' },
-  { page: 'result-analysis', section: 'highlights', label: 'Result Analysis — Highlights' },
-  { page: 'result-analysis', section: 'departmentStats', label: 'Result Analysis — Department Stats' },
   { page: 'result-analysis', section: 'factors', label: 'Result Analysis — Success Factors' },
   { page: 'student-clubs', section: 'stats', label: 'Student Clubs — Stats Bar' },
   { page: 'student-life', section: 'clubs', label: 'Student Life — Clubs & Orgs' },
