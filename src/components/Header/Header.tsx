@@ -58,9 +58,9 @@ const navItems: NavItem[] = [
         groupPath: '/about',
         items: [
           { label: 'About VWU', path: '/about' },
-          { label: 'Vision, Mission & Values', path: '/vision-mission' },
-          { label: 'Institutional Development Plan', path: '/governance/idp' },
-          { label: 'Organizational Chart', path: '/downloads/SVECWOrganizationChart.jpg', download: true },
+          { label: 'Vision & Mission', path: '/vision-mission' },
+          { label: 'Institutional Development Plan', path: '/governance/idp', disabled: true },
+          { label: 'Organizational Chart', path: '/downloads/SVECWOrganizationChart.jpg', download: true, disabled: true },
           { label: 'Core Executive Body', path: '/about#core-executive' },
           { label: 'About Society (SVES)', path: '/about-sves' },
         ],
@@ -69,44 +69,39 @@ const navItems: NavItem[] = [
         groupLabel: 'Governance',
         groupPath: '/governance',
         items: [
-          { label: 'Governing Body', path: '/governance/governing-body' },
-          { label: 'Academic Council', path: '/governance/academic-council' },
-          { label: 'Board of Studies', path: '/governance/board-of-studies' },
-          { label: 'Finance Committee', path: '/governance/finance-committee' },
-          { label: 'Institutional Development Plan', path: '/governance/idp' },
+          { label: 'Governing Body', path: '/governance/governing-body', disabled: true },
+          { label: 'Academic Council', path: '/governance/academic-council', disabled: true },
+          { label: 'Board of Studies', path: '/governance/board-of-studies', disabled: true },
+          { label: 'Finance Committee', path: '/governance/finance-committee', disabled: true },
         ],
       },
       {
         groupLabel: 'Committees',
         groupPath: '/governance#committees',
         items: [
-          { label: 'College Academic Committee', path: '/governance/college-academic-committee' },
-          { label: 'Internal Quality Assurance Cell', path: '/governance/internal-quality-assurance-cell' },
-          { label: 'Acad. & Admin. Audit Committee', path: '/governance/academic-administrative-audit' },
-          { label: 'Freshmen Committee', path: '/governance/freshmen-committee' },
-          { label: 'Infrastructure Management', path: '/governance/infrastructure-management' },
-          { label: 'Faculty Grievance Redressal', path: '/governance/faculty-grievance' },
-          { label: 'Student Grievance Redressal', path: '/governance/student-grievance' },
-          { label: 'Central Purchase Committee', path: '/governance/central-purchase' },
-          { label: 'Counselling & Monitoring', path: '/governance/counselling-monitoring' },
-          { label: 'Anti Ragging Committee', path: '/governance/anti-ragging' },
-          { label: 'Internal Committee (POSH)', path: '/governance/internal-committee' },
-          { label: 'SC/ST Cell', path: '/governance/sc-st-cell' },
-          { label: 'R&D Committee', path: '/governance/rd-committee' },
+          { label: 'College Academic Committee', path: '/governance/college-academic-committee', disabled: true },
+          { label: 'Acad. & Admin. Audit Committee', path: '/governance/academic-administrative-audit', disabled: true },
+          { label: 'Freshmen Committee', path: '/governance/freshmen-committee', disabled: true },
+          { label: 'Infrastructure Management', path: '/governance/infrastructure-management', disabled: true },
+          { label: 'Faculty Grievance Redressal', path: '/governance/faculty-grievance', disabled: true },
+          { label: 'Student Grievance Redressal', path: '/governance/student-grievance', disabled: true },
+          { label: 'Central Purchase Committee', path: '/governance/central-purchase', disabled: true },
+          { label: 'Counselling & Monitoring', path: '/governance/counselling-monitoring', disabled: true },
+          { label: 'Anti Ragging Committee', path: '/governance/anti-ragging', disabled: true },
+          { label: 'Internal Committee (POSH)', path: '/governance/internal-committee', disabled: true },
+          { label: 'SC/ST Cell', path: '/governance/sc-st-cell', disabled: true },
+          { label: 'R&D Committee', path: '/governance/rd-committee', disabled: true },
         ],
       },
       {
         groupLabel: 'IQAC',
         groupPath: '/governance#iqac',
         items: [
-          { label: 'About IQAC', path: '/governance/about-iqac' },
-          { label: 'IQAC Worksystem', path: '/governance/iqac-worksystem' },
-          { label: 'Quality Parameters', path: '/governance/quality-parameters' },
-          { label: 'IQAC Committee', path: '/governance/iqac-committee' },
-          { label: 'Policies & Procedures', path: '/governance/policies-procedures' },
-          { label: 'Annual Reports & Reforms', path: '/governance/annual-reports' },
-          { label: 'MHRD NIRF Reports', path: '/governance/nirf-reports' },
-          { label: 'NBA – Data Capturing Points', path: '/governance/nba-data' },
+          { label: 'About IQAC', path: '/governance/about-iqac', disabled: true },
+          { label: 'IQAC Worksystem', path: '/governance/iqac-worksystem', disabled: true },
+          { label: 'Quality Parameters', path: '/governance/quality-parameters', disabled: true },
+          { label: 'IQAC Committee', path: '/governance/iqac-committee', disabled: true },
+          { label: 'Policies & Procedures', path: '/governance/policies-procedures', disabled: true },
         ],
       },
     ],
@@ -453,7 +448,7 @@ export default function Header() {
                 {group.items.map((child) => (
                   <li key={child.label}>
                     {child.disabled ? (
-                      <span className="dropdown-item" style={{ opacity: 0.5, cursor: 'default' }}>
+                      <span className="dropdown-item">
                         {child.label}
                       </span>
                     ) : (child.external || child.download) ? (
@@ -780,7 +775,7 @@ export default function Header() {
                                 {group.items.map((child) => (
                                   <li key={child.label}>
                                     {child.disabled ? (
-                                      <span className="mobile-sub-item" style={{ opacity: 0.5 }}>{child.label}</span>
+                                      <span className="mobile-sub-item">{child.label}</span>
                                     ) : (child.external || child.download) ? (
                                       <a href={child.path} className="mobile-sub-item" download={child.download} target={child.download ? undefined : '_blank'} rel="noopener noreferrer">{child.label}</a>
                                     ) : (

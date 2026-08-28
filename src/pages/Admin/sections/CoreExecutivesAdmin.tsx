@@ -11,7 +11,7 @@ import type { CoreExecutiveMember } from '../../About/About';
 type CoreExecutiveDoc = CoreExecutiveMember & { storagePath?: string };
 
 const EMPTY: Omit<CoreExecutiveDoc, 'id'> = {
-  name: '', role: '', photoUrl: '', storagePath: '', order: 0,
+  name: '', role: '', photoUrl: '', storagePath: '', order: 0, level: 1,
 };
 
 export default function CoreExecutivesAdmin() {
@@ -34,6 +34,7 @@ export default function CoreExecutivesAdmin() {
         await addDoc(collection(db, 'coreExecutives'), {
           ...form,
           order: form.order || executives.length + 1,
+          level: form.level || 1,
           createdAt: serverTimestamp(),
         });
       }
@@ -45,7 +46,7 @@ export default function CoreExecutivesAdmin() {
 
   const startEdit = (m: CoreExecutiveDoc) => {
     setEditing(m.id);
-    setForm({ name: m.name, role: m.role, photoUrl: m.photoUrl || '', storagePath: m.storagePath || '', order: m.order });
+    setForm({ name: m.name, role: m.role, photoUrl: m.photoUrl || '', storagePath: m.storagePath || '', order: m.order, level: m.level || 1 });
   };
 
   const remove = async (id: string) => {
@@ -95,6 +96,14 @@ export default function CoreExecutivesAdmin() {
             <label>Display Order</label>
             <input type="number" value={form.order} onChange={(e) => set('order', Number(e.target.value))} />
           </div>
+          <div className="admin-field">
+            <label>Level (org-chart tier)</label>
+            <select value={form.level || 1} onChange={(e) => set('level', Number(e.target.value))}>
+              <option value={1}>Level 1</option>
+              <option value={2}>Level 2</option>
+              <option value={3}>Level 3</option>
+            </select>
+          </div>
         </div>
         <div className="admin-form-actions">
           {editing && <button className="admin-btn admin-btn--ghost" onClick={() => { setEditing(null); setForm(EMPTY); }}>Cancel</button>}
@@ -116,7 +125,7 @@ export default function CoreExecutivesAdmin() {
         {loading ? <p className="admin-loading">Loading…</p> : (
           <div className="admin-table-wrap">
             <table className="admin-table">
-              <thead><tr><th>Photo</th><th>Name</th><th>Role</th><th>Order</th><th>Actions</th></tr></thead>
+              <thead><tr><th>Photo</th><th>Name</th><th>Role</th><th>Order</th><th>Level</th><th>Actions</th></tr></thead>
               <tbody>
                 {executives.map((m) => (
                   <tr key={m.id}>
@@ -124,13 +133,14 @@ export default function CoreExecutivesAdmin() {
                     <td>{m.name}</td>
                     <td>{m.role}</td>
                     <td>{m.order}</td>
+                    <td>{m.level || 1}</td>
                     <td>
                       <button className="admin-btn admin-btn--sm" onClick={() => startEdit(m)}>Edit</button>
                       <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(m.id)}>Delete</button>
                     </td>
                   </tr>
                 ))}
-                {executives.length === 0 && <tr><td colSpan={5} className="admin-empty">No executives yet — add one using the form above.</td></tr>}
+                {executives.length === 0 && <tr><td colSpan={6} className="admin-empty">No executives yet — add one using the form above.</td></tr>}
               </tbody>
             </table>
           </div>
