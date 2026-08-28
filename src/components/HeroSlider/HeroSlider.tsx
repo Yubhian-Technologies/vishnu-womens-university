@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Trophy, Star, ClipboardList, Briefcase, TrendingUp } from 'lucide-react';
+import { Trophy, Star, ClipboardList, Briefcase, TrendingUp, Landmark } from 'lucide-react';
 import { usePageBanners } from '../../hooks/usePageBanners';
+import { useContentBlocks } from '../../hooks/useContentBlocks';
 import './HeroSlider.css';
 
 // Served from public/ (not imported as a JS module) so this ~27MB file never
@@ -23,47 +24,65 @@ interface Slide {
   image?: string;
 }
 
-const staticSlides: Slide[] = [
-  {
-    id: 1,
-    tag: 'Welcome to VWU',
-    heading: 'Empowering.\nWomen.\nThrough Tech.',
-    description: 'VWU equips women with rigorous engineering education, research opportunities, and the practical skills that top employers demand.',
-    primaryCta: { label: 'Schedule a Visit', path: '/admissions' },
-    secondaryCta: { label: 'Apply Now', path: '/admissions' },
-  },
-  {
-    id: 2,
-    tag: 'Academics',
-    heading: '9 B.Tech Programs\nBuilt for Your\nSuccess',
-    description: 'From Computer Science to Civil Engineering — VWU offers undergraduate, postgraduate, and doctoral programs rooted in applied, industry-aligned learning.',
-    primaryCta: { label: 'Explore Programs', path: '/academics' },
-    secondaryCta: { label: 'Request Info', path: '/admissions' },
-  },
-  {
-    id: 3,
-    tag: 'Campus Life',
-    heading: 'Learn, Grow\nand Excel',
-    description: "VWU is more than a degree — it is a community where you build real skills, lasting connections, and the confidence to lead in your chosen field.",
-    primaryCta: { label: 'Campus Life', path: '/student-life' },
-    secondaryCta: { label: 'Apply Now', path: '/admissions' },
-  },
-  {
-    id: 4,
-    tag: 'Outstanding Placements',
-    heading: '59.28 LPA\nHighest\nPlacement Package',
-    description: 'VWU recorded 1,400+ placements in 2024–25, with a highest offer of 59.28 LPA — graduates are now driving impact at companies across India and beyond.',
-    primaryCta: { label: 'Placement Records', path: '/about' },
-    secondaryCta: { label: 'Our Story', path: '/about' },
-  },
-];
+// The B.Tech program count in this heading is admin-editable, but not as
+// its own field — it reuses the "Departments" stat from About → Quick Stats
+// (page="about", section="quickStats"), since that's the number the admin
+// already maintains by hand for exactly this purpose. Falls back to the
+// last-known steady-state number if that stat is ever missing/renamed.
+const FALLBACK_BTECH_COUNT = '10';
+
+function buildStaticSlides(btechCount: string): Slide[] {
+  return [
+    {
+      id: 1,
+      tag: 'Welcome to VWU',
+      heading: 'Empowering.\nWomen.\nThrough Tech.',
+      description: 'VWU equips women with rigorous engineering education, research opportunities, and the practical skills that top employers demand.',
+      primaryCta: { label: 'Schedule a Visit', path: '/contact' },
+      secondaryCta: { label: 'Apply Now', path: '/admissions' },
+    },
+    {
+      id: 2,
+      tag: 'Academics',
+      heading: `${btechCount} B.Tech Programs\nBuilt for Your\nSuccess`,
+      description: 'From Computer Science to Civil Engineering — VWU offers undergraduate, postgraduate, and doctoral programs rooted in applied, industry-aligned learning.',
+      primaryCta: { label: 'Explore Programs', path: '/academics' },
+      secondaryCta: { label: 'Request Info', path: '/contact' },
+    },
+    {
+      id: 3,
+      tag: 'Campus Life',
+      heading: 'Learn, Grow\nand Excel',
+      description: "VWU is more than a degree — it is a community where you build real skills, lasting connections, and the confidence to lead in your chosen field.",
+      primaryCta: { label: 'Campus Life', path: '/student-life' },
+      secondaryCta: { label: 'Apply Now', path: '/admissions' },
+    },
+    {
+      id: 4,
+      tag: 'Outstanding Placements',
+      heading: '59.28 LPA\nHighest\nPlacement Package',
+      description: 'VWU recorded 1,100+ placements in 2025–26, with a highest offer of 59.28 LPA — graduates are now driving impact at companies across India and beyond.',
+      primaryCta: { label: 'Placement Records', path: '/about' },
+      secondaryCta: { label: 'Our Story', path: '/about' },
+    },
+    {
+      id: 5,
+      tag: 'A Historic First',
+      heading: "The First Private\nWomen's University\nin the Telugu States",
+      description: 'Vishnu Women\'s University is the first private university exclusively for women across the Telugu states — built to give women a dedicated space to lead in engineering, technology, and research.',
+      primaryCta: { label: 'Explore VWU', path: '/about' },
+      secondaryCta: { label: 'Apply Now', path: '/admissions' },
+    },
+  ];
+}
 
 const recognitions = [
   { icon: Trophy, title: 'Top Engineering College', source: 'India Today Rankings' },
   { icon: Star, title: 'Best Engineering College', source: 'The Week Rankings' },
   { icon: ClipboardList, title: 'NBA Accredited', source: 'National Board of Accreditation' },
-  { icon: Briefcase, title: 'NIRF Ranked Institution', source: 'Ministry of Education' },
+  { icon: Briefcase, title: 'NAAC A+ Accredited', source: 'National Assessment and Accreditation Council' },
   { icon: TrendingUp, title: 'IEI Award for Excellence', source: 'Institution of Engineers India' },
+  { icon: Landmark, title: 'First Private University for Women', source: 'Across the Telugu States' },
 ];
 
 const SLIDE_DURATION = 6000;
@@ -100,8 +119,11 @@ export default function HeroSlider() {
   // marketing slides — the video keeps playing behind all of them, these
   // just add their photo alongside the slide's own text/CTA.
   const { slides: bannerSlides } = usePageBanners('home');
+  const aboutQuickStats = useContentBlocks('about', 'quickStats');
+  const departmentsStat = aboutQuickStats.find((s) => s.title === 'Departments');
+  const btechCount = departmentsStat?.value || FALLBACK_BTECH_COUNT;
   const slides: Slide[] = [
-    ...staticSlides,
+    ...buildStaticSlides(btechCount),
     ...bannerSlides.map((b) => ({
       id: b.id,
       tag: 'Announcement',
@@ -271,21 +293,23 @@ export default function HeroSlider() {
 
 
 
-      {/* Recognition Bar */}
+      {/* Recognition Bar — static row, evenly spaced across the width. */}
       <div className="hero-recognition" aria-label="Awards and recognitions">
         <div className="hero-recognition-inner">
-          {recognitions.map((r, i) => (
-            <div key={r.title} style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
-              <div className="recognition-item">
-                <div className="recognition-icon"><r.icon size={16} strokeWidth={2} color="var(--color-primary-dark)" /></div>
-                <div className="recognition-text">
-                  <strong>{r.title}</strong>
-                  <span>{r.source}</span>
+          <div className="hero-recognition-track">
+            {recognitions.map((r, i) => (
+              <div key={r.title} className="recognition-pair">
+                <div className="recognition-item">
+                  <div className="recognition-icon"><r.icon size={16} strokeWidth={2} color="var(--color-primary-dark)" /></div>
+                  <div className="recognition-text">
+                    <strong>{r.title}</strong>
+                    <span>{r.source}</span>
+                  </div>
                 </div>
+                {i < recognitions.length - 1 && <div className="recognition-divider" />}
               </div>
-              {i < recognitions.length - 1 && <div className="recognition-divider" />}
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </section>

@@ -19,7 +19,7 @@ export default function Placements() {
   const { docs: placementItems } = useOrderedCollection<PlacementItemDoc>('placementItems', 'order');
 
   useEffect(() => {
-    document.title = 'Placements | Vishnu Womens University';
+    document.title = "Placements | Vishnu Women's University";
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -90,7 +90,7 @@ export default function Placements() {
             </p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 'var(--space-5)' }}>
+          <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 'var(--space-5)' }}>
             {placementItems.map((item) => {
               const Icon = resolveContentIcon(item.icon) || BarChart3;
               return (

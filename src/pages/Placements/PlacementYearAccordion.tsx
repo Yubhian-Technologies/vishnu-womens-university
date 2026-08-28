@@ -15,9 +15,17 @@ interface Props {
   enrichedYears?: string[];
 }
 
-// Each branch's share of the batch's total offers, e.g. 24.9% rather than
-// a raw offer count.
-function branchPercentage(offers: number, total: number): number {
+// A branch's own placement rate — offers against its own eligible-student
+// count, e.g. 81.6% — when that figure is on record. Falls back to the
+// older "share of the batch's total offers" reading (e.g. 24.9%) for any
+// branch/batch without an eligible count, so years that only ever had the
+// old data (and branches like MBA within an otherwise-updated batch) keep
+// showing exactly what they always did instead of reading 0%. This can
+// legitimately read over 100% under the eligible-based formula, where
+// students in a branch collectively earned more offers than the branch's
+// eligible headcount (multiple offers per student).
+function branchPercentage(offers: number, eligible: number | undefined, total: number): number {
+  if (eligible && eligible > 0) return (offers / eligible) * 100;
   return total > 0 ? (offers / total) * 100 : 0;
 }
 
@@ -32,6 +40,8 @@ const BRANCH_COLORS: Record<string, string> = {
   'AI&DS': '#1f8f5c',
   Civil: '#C9A84C',
   CSE: '#17a398',
+  'CSE(AI&ML)': '#5b4b9e',
+  'CSE(Cyber Security)': '#c23b7a',
   ECE: '#d97a3f',
   EEE: '#3d5a99',
   IT: '#c0463f',
@@ -76,12 +86,14 @@ const DONUT_CENTER = DONUT_SIZE / 2;
 const DONUT_OUTER_R = 105;
 const DONUT_INNER_R = 64;
 
-// Donut proportions are each branch's share *among the listed branches*
-// (so the arcs always complete a full circle); the printed percentage
-// alongside every slice stays the approved "share of the batch's total
-// offers" figure — the two agree on relative order and magnitude (same
-// underlying offers, just a different common denominator), so nothing
-// reads as contradictory.
+// Donut proportions are each branch's share of raw offers *among the
+// listed branches* (so the arcs always complete a full circle) — this can
+// be a different quantity from the printed percentage inside each slice,
+// which is that branch's own placement rate where available (see
+// branchPercentage). A branch can have a small arc but a printed rate
+// over 100%, or vice versa; the arc answers "how much of this batch's
+// hiring activity" while the number answers "how well did this branch's
+// own students do."
 function BranchOffersDonut({ data, total }: { data: BranchOfferCount[]; total: number }) {
   const [hovered, setHovered] = useState<string | null>(null);
   const sumOffers = data.reduce((s, d) => s + d.offers, 0) || 1;
@@ -91,7 +103,7 @@ function BranchOffersDonut({ data, total }: { data: BranchOfferCount[]; total: n
     const startAngle = cumulative;
     const endAngle = cumulative + sweep;
     cumulative = endAngle;
-    return { ...d, startAngle, endAngle, pct: branchPercentage(d.offers, total), color: branchColor(d.branch) };
+    return { ...d, startAngle, endAngle, pct: branchPercentage(d.offers, d.eligible, total), color: branchColor(d.branch) };
   });
   const topBranch = [...slices].sort((a, b) => b.offers - a.offers)[0];
 
@@ -318,7 +330,7 @@ export default function PlacementYearAccordion({ years, enrichedYears }: Props) 
                         >
                           <span style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, background: branchColor(b.branch) }} />
                           <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', fontWeight: 700 }}>{b.branch}</div>
-                          <div style={{ fontSize: '1.3rem', fontWeight: 900, color: 'var(--color-primary)' }}>{branchPercentage(b.offers, y.total ?? 0).toFixed(1)}%</div>
+                          <div style={{ fontSize: '1.3rem', fontWeight: 900, color: 'var(--color-primary)' }}>{branchPercentage(b.offers, b.eligible, y.total ?? 0).toFixed(1)}%</div>
                         </div>
                       ))}
                     </div>

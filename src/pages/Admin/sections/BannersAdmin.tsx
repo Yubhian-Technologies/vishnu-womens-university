@@ -132,8 +132,8 @@ const FALLBACK_PAGES = new Set(['program-detail', 'governance-detail', 'placemen
 // (home's rotating marketing slides, and the "-detail" fallbacks shared by
 // many different items with their own titles) are intentionally omitted.
 const PAGE_TEXT_DEFAULTS: Record<string, { title: string; subtitle?: string }> = {
-  'about': { title: 'About Vishnu Womens University', subtitle: "Rooted in Bhimavaram since 2001, VWU has grown into Andhra Pradesh's foremost institution for women's technical education." },
-  'anti-ragging': { title: 'Anti Ragging', subtitle: 'Vishnu Womens University is committed to a safe, ragging-free campus for every student.' },
+  'about': { title: "About Vishnu Women's University", subtitle: "Rooted in Bhimavaram since 2001, VWU has grown into Andhra Pradesh's foremost institution for women's technical education." },
+  'anti-ragging': { title: 'Anti Ragging', subtitle: "Vishnu Women's University is committed to a safe, ragging-free campus for every student." },
   'alumni-giving': { title: 'Always a Vishnu Engineer', subtitle: 'Graduation is not the end of your VWU story. Stay engaged, give back, and help shape the next generation of women engineers.' },
   'admissions': { title: 'Your Journey Starts Here', subtitle: 'Choosing VWU sets you on a path to a fulfilling engineering career, a strong professional network, and a future built on real achievement.' },
   'disclosures-ugc': { title: 'UGC Public Self-Disclosure', subtitle: 'Shri Vishnu Engineering College for Women (Autonomous) — published as required by the University Grants Commission.' },

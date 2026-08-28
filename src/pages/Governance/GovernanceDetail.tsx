@@ -109,7 +109,7 @@ export default function GovernanceDetail() {
   // .reveal/IntersectionObserver setup would be racing async data on every
   // navigation (see the gotcha documented in CLAUDE.md).
   useEffect(() => {
-    if (item) document.title = `${item.title} | Vishnu Womens University`;
+    if (item) document.title = `${item.title} | Vishnu Women's University`;
   }, [item]);
 
   if (!item) {
@@ -460,7 +460,7 @@ export default function GovernanceDetail() {
               <span className="section-label">Impact</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Outcomes & Achievements</h2>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 'var(--space-4)' }}>
+            <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 'var(--space-4)' }}>
               {item.outcomes.map((o) => (
                 <div key={o}
                   style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>

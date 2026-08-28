@@ -11,7 +11,7 @@ export default function Happenings() {
   const { docs: happenings } = useOrderedCollection<HappeningDoc>('happenings', 'order');
 
   useEffect(() => {
-    document.title = 'Happenings at VWU | Vishnu Womens University';
+    document.title = "Happenings at VWU | Vishnu Women's University";
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -50,7 +50,7 @@ export default function Happenings() {
               <span className="section-label">Mark Your Calendar</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Upcoming Events</h2>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 'var(--space-5)' }}>
+            <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 'var(--space-5)' }}>
               {upcoming.map((ev) => (
                 <div key={ev.id}
                   style={{ background: 'var(--color-primary)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', display: 'flex', gap: 'var(--space-4)', alignItems: 'flex-start' }}>

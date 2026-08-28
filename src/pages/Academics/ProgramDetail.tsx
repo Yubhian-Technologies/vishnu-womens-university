@@ -9,6 +9,8 @@ import { usePageBanner } from '../../hooks/usePageBanner';
 import { smoothScrollTo } from '../../lib/smoothScroll';
 import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
 import type { FacultyDoc } from './Faculty';
+import SEO from '../../components/SEO/SEO';
+import { getProgramSchema, getBreadcrumbSchema } from '../../lib/seo/schemas';
 import '../detail-layout.css';
 
 const NAV_OFFSET = 'calc(var(--topbar-height) + var(--header-height) + 1rem)';
@@ -35,7 +37,7 @@ export default function ProgramDetail() {
 
   useEffect(() => {
     if (program) {
-      document.title = `${program.shortName || program.name} | Vishnu Womens University`;
+      document.title = `${program.shortName || program.name} | Vishnu Women's University`;
     }
   }, [program]);
 
@@ -77,8 +79,34 @@ export default function ProgramDetail() {
 
   const hasSidebarContent = quickLinks.length > 1 || hasCareerOutcomes;
 
+  const programTitle = `${program.shortName || program.name} | Vishnu Women's University`;
+  const programDesc = program.about ? (program.about.length > 155 ? `${program.about.slice(0, 155)}...` : program.about) : `Study ${program.name} at Vishnu Women's University, Bhimavaram. Learn about department vision, syllabus, faculty, and research facilities.`;
+  const programUrl = `/academics/${program.slug}`;
+  const programImage = program.heroImage || fallbackBanner?.imageUrl;
+
+  const programJsonLd = [
+    getProgramSchema({
+      name: program.name,
+      description: programDesc,
+      department: program.department || program.shortName,
+      url: programUrl,
+      degreeName: categoryLabel[program.category] || 'Bachelor of Technology',
+    }),
+    getBreadcrumbSchema([
+      { name: 'Academics', url: '/academics' },
+      { name: program.shortName || program.name, url: programUrl },
+    ]),
+  ];
+
   return (
     <main className="page-wrapper">
+      <SEO
+        title={programTitle}
+        description={programDesc}
+        canonicalPath={programUrl}
+        ogImage={programImage}
+        jsonLd={programJsonLd}
+      />
       {/* Hero */}
       <section className="page-hero" style={{ minHeight: 380 }}>
         {(program.heroImage || fallbackBanner?.imageUrl) && (
@@ -368,7 +396,9 @@ export default function ProgramDetail() {
                   {faculty.map((f, i) => (
                     <tr key={f.id} style={{ background: i % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)', borderBottom: '1px solid var(--color-light-gray)' }}>
                       <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text-light)', fontWeight: 600, width: 48 }}>{i + 1}</td>
-                      <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary)', fontWeight: 700 }}>{f.name}</td>
+                      <td style={{ padding: 'var(--space-3) var(--space-4)' }}>
+                        <Link to={`/faculty/${f.id}`} style={{ color: 'var(--color-primary)', fontWeight: 700, textDecoration: 'none' }}>{f.name}</Link>
+                      </td>
                       <td style={{ padding: 'var(--space-3) var(--space-4)' }}>
                         <span style={{
                           display: 'inline-block',
@@ -446,7 +476,7 @@ export default function ProgramDetail() {
               <h2 className="section-title">Laboratories</h2>
               <p className="section-desc">State-of-the-art laboratory facilities that bring coursework to life with hands-on, industry-relevant experimentation.</p>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 'var(--space-4)' }}>
+            <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 'var(--space-4)' }}>
               {program.labs.map((lab) => (
                 <div key={lab} style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', display: 'flex', alignItems: 'center', gap: 'var(--space-4)', borderLeft: '4px solid var(--color-accent)' }}>
                   <Microscope size={22} strokeWidth={1.75} style={{ flexShrink: 0, color: 'var(--color-accent)' }} />

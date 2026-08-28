@@ -16,6 +16,17 @@ interface ResearchItemDoc {
 
 interface Story { title: string; desc: string; image: string; slug?: string; }
 
+interface ImageOverride { url: string; alt: string; }
+
+interface Props {
+  /** Admin-uploaded overrides for the 3 story images, keyed by position
+   *  (Landing Page 3 → Manage Images → "Featured Research — Story N Photo").
+   *  Each entry's `.url` is PHOTO_NEEDED_PLACEHOLDER until an admin uploads
+   *  one — in that case the research item's own heroImage (or the
+   *  placeholder) is used instead, so this never hides already-real data. */
+  imageOverrides?: ImageOverride[];
+}
+
 const PLACEHOLDER_STORIES: Story[] = [
   { title: '[Research story to be provided]', desc: '[Content to be provided by Admin — a featured research narrative will appear here.]', image: PHOTO_NEEDED_PLACEHOLDER },
   { title: '[Research story to be provided]', desc: '[Content to be provided by Admin — a featured research narrative will appear here.]', image: PHOTO_NEEDED_PLACEHOLDER },
@@ -28,7 +39,7 @@ const PLACEHOLDER_STORIES: Story[] = [
  * step rail. Matches how stanford.edu actually animates its content: simple
  * reveal-on-scroll, nothing scroll-linked or viewport-locked.
  */
-export default function ResearchStory() {
+export default function ResearchStory({ imageOverrides }: Props) {
   const { docs } = useOrderedCollection<ResearchItemDoc>('researchItems', 'order');
   const real = docs.filter((d) => d.category === 'output').slice(0, 3);
   const stories: Story[] = real.length >= 3
@@ -44,11 +55,16 @@ export default function ResearchStory() {
         </Reveal>
 
         <div className="lpe-research-stories">
-          {stories.map((story, i) => (
+          {stories.map((story, i) => {
+            const override = imageOverrides?.[i];
+            const hasOverride = !!override && override.url !== PHOTO_NEEDED_PLACEHOLDER;
+            const image = hasOverride ? override.url : story.image;
+            const imageAlt = hasOverride ? override.alt : story.title;
+            return (
             <div key={story.title + i} className={`lpe-feature lpe-research-story-row${i % 2 === 1 ? ' lpe-feature--reverse' : ''}`}>
               <Reveal index={0} variant="media" className="lpe-feature__media">
                 <ParallaxMedia strength={8}>
-                  <SmoothImage src={story.image} alt={story.title} loading="lazy" />
+                  <SmoothImage src={image} alt={imageAlt} loading="lazy" />
                 </ParallaxMedia>
               </Reveal>
               <Reveal index={1} className="lpe-feature__body">
@@ -59,7 +75,8 @@ export default function ResearchStory() {
                 )}
               </Reveal>
             </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>

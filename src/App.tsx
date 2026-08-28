@@ -5,11 +5,14 @@ import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
 import SmoothScroll from './components/SmoothScroll/SmoothScroll';
 import LandingPageLoader from './components/LandingPageLoader/LandingPageLoader';
+import SEO from './components/SEO/SEO';
 import { smoothScrollTo } from './lib/smoothScroll';
 
 const Academics = lazy(() => import('./pages/Academics/Academics'));
 const ProgramDetail = lazy(() => import('./pages/Academics/ProgramDetail'));
+const FreshmanEngineering = lazy(() => import('./pages/Academics/FreshmanEngineering'));
 const Faculty = lazy(() => import('./pages/Academics/Faculty'));
+const FacultyProfile = lazy(() => import('./pages/Academics/FacultyProfile'));
 const AcademicDownloads = lazy(() => import('./pages/Academics/Downloads'));
 const CurriculumMatrix = lazy(() => import('./pages/Academics/CurriculumMatrix'));
 const Admissions = lazy(() => import('./pages/Admissions/Admissions'));
@@ -48,6 +51,7 @@ const NewsAwards = lazy(() => import('./pages/NewsAwards/NewsAwards'));
 const Happenings = lazy(() => import('./pages/NewsAwards/Happenings'));
 const Accreditations = lazy(() => import('./pages/NewsAwards/Accreditations'));
 const GalleryPage = lazy(() => import('./pages/NewsAwards/Gallery'));
+const SocialMedia = lazy(() => import('./pages/NewsAwards/SocialMedia'));
 const Careers = lazy(() => import('./pages/Careers/Careers'));
 const Contact = lazy(() => import('./pages/Contact/Contact'));
 const UGCDisclosure = lazy(() => import('./pages/Disclosures/UGCDisclosure'));
@@ -57,6 +61,7 @@ const PoliciesProcedures = lazy(() => import('./pages/PoliciesProcedures/Policie
 // the public bundle entirely is the single biggest win here, since the vast
 // majority of visitors never touch /admin.
 const AdminLayout = lazy(() => import('./pages/Admin/AdminLayout'));
+const Launch = lazy(() => import('./pages/Launch/Launch'));
 
 function RouteFallback() {
   return (
@@ -89,8 +94,10 @@ function PublicApp() {
           <Route path="/academics" element={<Academics />} />
           <Route path="/academics/downloads" element={<AcademicDownloads />} />
           <Route path="/academics/curriculum" element={<CurriculumMatrix />} />
+          <Route path="/academics/freshman-engineering" element={<FreshmanEngineering />} />
           <Route path="/academics/:slug" element={<ProgramDetail />} />
           <Route path="/faculty" element={<Faculty />} />
+          <Route path="/faculty/:id" element={<FacultyProfile />} />
           <Route path="/admissions" element={<Admissions />} />
           <Route path="/student-life" element={<StudentLife />} />
           <Route path="/alumni-giving" element={<AlumniGiving />} />
@@ -127,6 +134,7 @@ function PublicApp() {
           <Route path="/news-awards/happenings" element={<Happenings />} />
           <Route path="/news-awards/accreditations-awards" element={<Accreditations />} />
           <Route path="/news-awards/gallery" element={<GalleryPage />} />
+          <Route path="/news-awards/social-media-handles" element={<SocialMedia />} />
           <Route path="/careers" element={<Careers />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/disclosures/ugc" element={<UGCDisclosure />} />
@@ -142,7 +150,7 @@ function PublicApp() {
 
 function MaintenancePage() {
   useEffect(() => {
-    document.title = 'Under Maintenance | Vishnu Womens University';
+    document.title = "Under Maintenance | Vishnu Women's University";
   }, []);
 
   return (
@@ -160,7 +168,7 @@ function MaintenancePage() {
     >
       <img
         src="/vwu-logo.png"
-        alt="Vishnu Womens University"
+        alt="Vishnu Women's University"
         style={{ height: 80, marginBottom: '2rem', objectFit: 'contain' }}
         onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
       />
@@ -207,18 +215,29 @@ function RootRouter() {
           </Suspense>
         }
       />
+      {/* Standalone, like /admin — no public Header/Footer, and stays
+          reachable even under VITE_MAINTENANCE_MODE. */}
+      <Route
+        path="/launch"
+        element={
+          <Suspense fallback={<RouteFallback />}>
+            <Launch />
+          </Suspense>
+        }
+      />
       <Route path="/*" element={IS_MAINTENANCE ? <MaintenancePage /> : <PublicApp />} />
     </Routes>
   );
 }
 
 function NotFound() {
-  useEffect(() => {
-    document.title = '404 | Vishnu Womens University';
-  }, []);
-
   return (
     <main className="page-wrapper">
+      <SEO
+        title="404 - Page Not Found | Vishnu Women's University"
+        description="The page you are looking for does not exist or has been moved."
+        noindex={true}
+      />
       <div
         style={{
           minHeight: '80vh',

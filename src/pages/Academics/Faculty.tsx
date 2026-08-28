@@ -1,10 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import './Faculty.css';
 import PageHero from '../../components/PageHero/PageHero';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
-import FacultyModal from '../../components/FacultyModal/FacultyModal';
 import { useOrderedCollection } from '../../hooks/useCollection';
+import type { FacultyFact, FacultySection } from '../../lib/facultySections';
 import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
+
+export type { FacultyFact, FacultySection };
 
 export interface FacultyDoc {
   id: string;
@@ -17,9 +20,16 @@ export interface FacultyDoc {
   imageUrl: string;
   storagePath: string;
   order: number;
+  /** Set via /admin → Faculty; shown on this person's own full profile
+   *  page (FacultyProfile.tsx), not on this grid. */
+  facts?: FacultyFact[];
+  sections?: FacultySection[];
 }
 
-const DEPARTMENTS = ['CSE', 'AI&ML', 'AI&DS', 'Cyber Security', 'IT', 'ECE', 'EEE', 'Civil', 'Mechanical', 'MBA'];
+// First-year foundation subjects shown only on the Freshman Engineering
+// page (src/pages/Academics/FreshmanEngineering.tsx), not on this page —
+// keep in sync with that file's hardcoded SUB_DEPTS titles.
+const FRESHMAN_ENGINEERING_DEPARTMENTS = new Set(['Mathematics', 'Physics', 'Chemistry', 'English']);
 
 function getInitials(name: string) {
   const cleaned = name.replace(/\b(Dr|Sri|Prof|Mr|Mrs|Ms)\.?\s*/gi, '');
@@ -30,13 +40,32 @@ function getInitials(name: string) {
 }
 
 export default function Faculty() {
-  const { docs: faculty, loading } = useOrderedCollection<FacultyDoc>('faculty', 'order');
-  const { docs: programs } = useOrderedCollection<ProgramDoc>('programs', 'name');
+  const { docs: allFaculty, loading } = useOrderedCollection<FacultyDoc>('faculty', 'order');
+  const { docs: programs } = useOrderedCollection<ProgramDoc>('programs', 'order');
   const [activeDept, setActiveDept] = useState('All');
-  const [selected, setSelected] = useState<FacultyDoc | null>(null);
+
+  const faculty = allFaculty;
+
+  // Departments aren't managed separately — this is the union of every
+  // Program's `department` field (/admin → Programs) and every department
+  // that already has faculty tagged to it. The union matters because a
+  // Program's department can legitimately point elsewhere (e.g. a shared
+  // HOD across AI&DS and AI&ML programs both pointing at "AI&ML"), which
+  // must never make a real faculty department's tab disappear. The first-
+  // year foundation subjects have their own tabs on the Freshman
+  // Engineering page (FreshmanEngineering.tsx's hardcoded SUB_DEPTS) and
+  // are excluded here so they don't also show up on this page.
+  const DEPARTMENTS = useMemo(() => {
+    const seen = new Set<string>();
+    const names: string[] = [];
+    const add = (d: string) => { if (d && !seen.has(d) && !FRESHMAN_ENGINEERING_DEPARTMENTS.has(d)) { seen.add(d); names.push(d); } };
+    programs.forEach((p) => add(p.department));
+    faculty.forEach((f) => add(f.department));
+    return names;
+  }, [programs, faculty]);
 
   useEffect(() => {
-    document.title = 'Faculty | Vishnu Womens University';
+    document.title = "Faculty | Vishnu Women's University";
   }, []);
 
   // The intro heading above the department tabs uses .reveal (mount-only,
@@ -67,9 +96,14 @@ export default function Faculty() {
 
   const filtered = activeDept === 'All' ? faculty : faculty.filter((f) => f.department === activeDept);
 
-  const selectedProgram = selected
-    ? programs.find((p) => p.department === selected.department)
-    : undefined;
+  // A handful of people are legitimately listed under two departments (e.g.
+  // AI&DS and AI&ML both credit the same faculty member) — that's fine for
+  // per-department browsing, but the headline count should reflect distinct
+  // people, not distinct department listings.
+  const uniqueFacultyCount = useMemo(
+    () => new Set(faculty.map((f) => f.name.trim().toLowerCase())).size,
+    [faculty]
+  );
 
   return (
     <main className="page-wrapper">
@@ -84,7 +118,7 @@ export default function Faculty() {
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-10)' }}>
             <span className="section-label">Meet the Team</span>
-            <h2 className="section-title">{faculty.length > 0 ? `${faculty.length}+ Faculty Members` : 'Faculty'}</h2>
+            <h2 className="section-title">{uniqueFacultyCount > 0 ? `${uniqueFacultyCount}+ Faculty Members` : 'Faculty'}</h2>
             <p className="section-desc" style={{ margin: '0 auto' }}>
               Browse faculty by department, or view everyone across VWU.
             </p>
@@ -110,7 +144,7 @@ export default function Faculty() {
 
           <div className="faculty-grid">
             {filtered.map((f) => (
-              <button key={f.id} className="faculty-card" onClick={() => setSelected(f)}>
+              <Link key={f.id} to={`/faculty/${f.id}`} className="faculty-card">
                 {f.imageUrl ? (
                   <SmoothImage src={f.imageUrl} alt={f.name} className="faculty-card__photo" />
                 ) : (
@@ -121,7 +155,7 @@ export default function Faculty() {
                 {f.qualification && <p className="faculty-card__qualification">{f.qualification}</p>}
                 {f.department && <span className="faculty-card__dept">{f.department}</span>}
                 <span className="faculty-card__view-profile">View Details →</span>
-              </button>
+              </Link>
             ))}
             {!loading && filtered.length === 0 && (
               <p style={{ color: 'var(--color-text-light)', gridColumn: '1 / -1', textAlign: 'center' }}>
@@ -131,10 +165,6 @@ export default function Faculty() {
           </div>
         </div>
       </section>
-
-      {selected && (
-        <FacultyModal faculty={selected} program={selectedProgram} onClose={() => setSelected(null)} />
-      )}
     </main>
   );
 }

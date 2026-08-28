@@ -47,9 +47,9 @@ type BodyBlock =
   | { type: 'list'; items: string[] };
 
 const BODY_OVERRIDES: Record<string, string> = {
-  'tpo-cell': `Vishnu Womens University has been consistently topping, during the last seven years in the list of campus placement records among private institutions in Andhra Pradesh. Students of Vishnu Womens University are highly regarded by employers from industry and the public sector.
+  'tpo-cell': `Vishnu Women's University has been consistently topping, during the last seven years in the list of campus placement records among private institutions in Andhra Pradesh. Students of Vishnu Women's University are highly regarded by employers from industry and the public sector.
 
-Facilitating students by way of offering information, advice, guidance and job-seeking support for students is considered as a primary responsibility at Vishnu Womens University. Career Advisors are available to discuss ideas & plans, and students are encouraged to attend the wide range of talks, information fairs and recruitment events.
+Facilitating students by way of offering information, advice, guidance and job-seeking support for students is considered as a primary responsibility at Vishnu Women's University. Career Advisors are available to discuss ideas & plans, and students are encouraged to attend the wide range of talks, information fairs and recruitment events.
 
 With this goal in mind, the Training & Placement Office (TPO) Cell:
 
@@ -549,7 +549,7 @@ export default function PlacementDetail() {
   // No scroll-reveal here — this page's content only renders once the
   // Firestore-backed `item` has loaded (see the gotcha documented in CLAUDE.md).
   useEffect(() => {
-    if (item) document.title = `${item.title} | Vishnu Womens University`;
+    if (item) document.title = `${item.title} | Vishnu Women's University`;
   }, [item]);
 
   if (!item) {

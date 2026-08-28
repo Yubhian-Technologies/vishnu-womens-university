@@ -14,7 +14,7 @@ export default function HeroSection({ imageUrl, imageAlt }: Props) {
     <section className="lph-hero">
       <div className="lph-hero__text">
         <motion.p className="lph-hero__eyebrow" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-          Vishnu Womens University
+          Vishnu Women's University
         </motion.p>
         <motion.h1 initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1 }}>
           Empowering women.<br />Engineering excellence.

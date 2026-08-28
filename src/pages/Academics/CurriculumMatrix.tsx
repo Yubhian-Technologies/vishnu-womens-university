@@ -77,7 +77,7 @@ export default function CurriculumMatrix() {
   useHashScroll();
 
   useEffect(() => {
-    document.title = 'Course Curriculum | Vishnu Womens University';
+    document.title = "Course Curriculum | Vishnu Women's University";
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {

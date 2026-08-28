@@ -8,6 +8,8 @@ import { type NewsDoc, NEWS_CATEGORIES, NEWS_FALLBACK_IMAGE, newsDocToArticle } 
 import './News.css';
 import PageHero from '../../components/PageHero/PageHero';
 import { useHashScroll } from '../../hooks/useHashScroll';
+import SEO from '../../components/SEO/SEO';
+import { getArticleSchema, getBreadcrumbSchema } from '../../lib/seo/schemas';
 
 const categories = ['All', ...NEWS_CATEGORIES];
 
@@ -19,7 +21,7 @@ export default function News() {
   useHashScroll();
 
   useEffect(() => {
-    document.title = 'News | Vishnu Womens University';
+    document.title = "News | Vishnu Women's University";
   }, []);
 
   useEffect(() => {
@@ -49,8 +51,26 @@ export default function News() {
     return matchCategory && matchSearch;
   });
 
+  const newsJsonLd = [
+    getBreadcrumbSchema([{ name: 'News', url: '/news' }]),
+    ...(featuredItem ? [getArticleSchema({
+      title: featuredItem.title,
+      description: featuredItem.summary,
+      publishedDate: featuredItem.date,
+      image: featuredItem.imageUrl,
+      url: '/news',
+    })] : [])
+  ];
+
   return (
     <main className="page-wrapper">
+      <SEO
+        title="VWU News & Stories | Latest Campus Updates | Vishnu Women's University"
+        description="Stay up-to-date with the latest news, achievements, events, research breakthroughs, and campus developments at Vishnu Women's University, Bhimavaram."
+        canonicalPath="/news"
+        ogImage={featuredItem?.imageUrl}
+        jsonLd={newsJsonLd}
+      />
       {/* Hero */}
       <PageHero
         page="news"

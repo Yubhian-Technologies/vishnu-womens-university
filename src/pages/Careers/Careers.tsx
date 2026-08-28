@@ -74,7 +74,7 @@ export default function Careers() {
   };
 
   useEffect(() => {
-    document.title = 'Careers | Vishnu Womens University';
+    document.title = "Careers | Vishnu Women's University";
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {

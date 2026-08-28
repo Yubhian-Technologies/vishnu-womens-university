@@ -34,7 +34,7 @@ export default function NewsAwards() {
   const highlights = useContentBlocks('news-awards', 'highlights');
 
   useEffect(() => {
-    document.title = 'News & Awards | Vishnu Womens University';
+    document.title = "News & Awards | Vishnu Women's University";
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -87,7 +87,7 @@ export default function NewsAwards() {
             </p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 'var(--space-6)' }}>
+          <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 'var(--space-6)' }}>
             {sections.map((s, i) => (
               <div
                 key={s.slug}

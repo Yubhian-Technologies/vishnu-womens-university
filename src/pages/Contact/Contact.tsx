@@ -63,7 +63,7 @@ export default function Contact() {
   const revealRefs = useRef<(HTMLElement | null)[]>([]);
 
   useEffect(() => {
-    document.title = 'Contact Us | Vishnu Womens University';
+    document.title = "Contact Us | Vishnu Women's University";
   }, []);
 
   useEffect(() => {
@@ -132,7 +132,7 @@ export default function Contact() {
           className="contact-hero__overlay"
           style={banner?.imageUrl ? { backgroundImage: `url(${banner.imageUrl})` } : undefined}
         />
-        <div className="contact-hero__content">
+        <div className="container contact-hero__content">
           <p className="contact-hero__eyebrow">Get in Touch</p>
           <h1 className="contact-hero__title">{banner?.title || 'Contact Us'}</h1>
           <p className="contact-hero__sub">
@@ -186,7 +186,7 @@ export default function Contact() {
               <h2 className="contact-section-title">Find Us</h2>
               <div className="contact-map-wrapper">
                 <iframe
-                  title="Vishnu Womens University Location"
+                  title="Vishnu Women's University Location"
                   src="https://maps.google.com/maps?q=16.568119,81.522098&z=15&output=embed"
                   width="100%"
                   height="400"

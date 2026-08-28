@@ -3,7 +3,9 @@ import { Link, useLocation } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useNavLinkOverride } from '../../hooks/useNavLinkOverride';
-import type { DownloadDoc } from '../../pages/Admin/sections/DownloadsAdmin';
+import type { ProgramDoc } from '../../pages/Admin/sections/ProgramsAdmin';
+import { DIFFERENTIATOR_CATEGORIES } from '../../pages/Admin/sections/DifferentiatorsAdmin';
+import type { DifferentiatorItemDoc } from '../../pages/Admin/sections/DifferentiatorsAdmin';
 import SmoothCollapse from '../SmoothCollapse/SmoothCollapse';
 import './Header.css';
 
@@ -44,10 +46,11 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   {
-    // "Discover"'s old groups (Governance/Committees/IQAC/Information) now
-    // live here too, alongside About Us's own items — no longer its own
-    // top-level nav item. Committees (13 items) auto-splits into two
-    // sub-columns (see .mega-group-list.cols-2 in Header.css).
+    // "Discover"'s old groups (Governance/Committees/IQAC) now live here
+    // too, alongside About Us's own items — no longer its own top-level
+    // nav item. Committees (13 items) auto-splits into two sub-columns
+    // (see .mega-group-list.cols-2 in Header.css). Information dropped
+    // (2026-08-13) since it's now under Academics instead.
     label: 'About Us',
     groups: [
       {
@@ -56,8 +59,8 @@ const navItems: NavItem[] = [
         items: [
           { label: 'About VWU', path: '/about' },
           { label: 'Vision & Mission', path: '/vision-mission' },
-          { label: 'Institutional Development Plan', path: '/governance/idp' },
-          { label: 'Organizational Chart', path: '/downloads/SVECWOrganizationChart.jpg', download: true },
+          { label: 'Institutional Development Plan', path: '/governance/idp', disabled: true },
+          { label: 'Organizational Chart', path: '/downloads/SVECWOrganizationChart.jpg', download: true, disabled: true },
           { label: 'Core Executive Body', path: '/about#core-executive' },
           { label: 'About Society (SVES)', path: '/about-sves' },
         ],
@@ -66,69 +69,75 @@ const navItems: NavItem[] = [
         groupLabel: 'Governance',
         groupPath: '/governance',
         items: [
-          { label: 'Governing Body', path: '/governance/governing-body' },
-          { label: 'Academic Council', path: '/governance/academic-council' },
-          { label: 'Board of Studies', path: '/governance/board-of-studies' },
-          { label: 'Finance Committee', path: '/governance/finance-committee' },
-          { label: 'Institutional Development Plan', path: '/governance/idp' },
+          { label: 'Governing Body', path: '/governance/governing-body', disabled: true },
+          { label: 'Academic Council', path: '/governance/academic-council', disabled: true },
+          { label: 'Board of Studies', path: '/governance/board-of-studies', disabled: true },
+          { label: 'Finance Committee', path: '/governance/finance-committee', disabled: true },
         ],
       },
       {
         groupLabel: 'Committees',
         groupPath: '/governance#committees',
         items: [
-          { label: 'College Academic Committee', path: '/governance/college-academic-committee' },
-          { label: 'Internal Quality Assurance Cell', path: '/governance/internal-quality-assurance-cell' },
-          { label: 'Acad. & Admin. Audit Committee', path: '/governance/academic-administrative-audit' },
-          { label: 'Freshmen Committee', path: '/governance/freshmen-committee' },
-          { label: 'Infrastructure Management', path: '/governance/infrastructure-management' },
-          { label: 'Faculty Grievance Redressal', path: '/governance/faculty-grievance' },
-          { label: 'Student Grievance Redressal', path: '/governance/student-grievance' },
-          { label: 'Central Purchase Committee', path: '/governance/central-purchase' },
-          { label: 'Counselling & Monitoring', path: '/governance/counselling-monitoring' },
-          { label: 'Anti Ragging Committee', path: '/governance/anti-ragging' },
-          { label: 'Internal Committee (POSH)', path: '/governance/internal-committee' },
-          { label: 'SC/ST Cell', path: '/governance/sc-st-cell' },
-          { label: 'R&D Committee', path: '/governance/rd-committee' },
+          { label: 'College Academic Committee', path: '/governance/college-academic-committee', disabled: true },
+          { label: 'Acad. & Admin. Audit Committee', path: '/governance/academic-administrative-audit', disabled: true },
+          { label: 'Freshmen Committee', path: '/governance/freshmen-committee', disabled: true },
+          { label: 'Infrastructure Management', path: '/governance/infrastructure-management', disabled: true },
+          { label: 'Faculty Grievance Redressal', path: '/governance/faculty-grievance', disabled: true },
+          { label: 'Student Grievance Redressal', path: '/governance/student-grievance', disabled: true },
+          { label: 'Central Purchase Committee', path: '/governance/central-purchase', disabled: true },
+          { label: 'Counselling & Monitoring', path: '/governance/counselling-monitoring', disabled: true },
+          { label: 'Anti Ragging Committee', path: '/governance/anti-ragging', disabled: true },
+          { label: 'Internal Committee (POSH)', path: '/governance/internal-committee', disabled: true },
+          { label: 'SC/ST Cell', path: '/governance/sc-st-cell', disabled: true },
+          { label: 'R&D Committee', path: '/governance/rd-committee', disabled: true },
         ],
       },
       {
         groupLabel: 'IQAC',
         groupPath: '/governance#iqac',
         items: [
-          { label: 'About IQAC', path: '/governance/about-iqac' },
-          { label: 'IQAC Worksystem', path: '/governance/iqac-worksystem' },
-          { label: 'Quality Parameters', path: '/governance/quality-parameters' },
-          { label: 'IQAC Committee', path: '/governance/iqac-committee' },
-          { label: 'Policies & Procedures', path: '/governance/policies-procedures' },
-          { label: 'Annual Reports & Reforms', path: '/governance/annual-reports' },
-          { label: 'MHRD NIRF Reports', path: '/governance/nirf-reports' },
-          { label: 'NBA – Data Capturing Points', path: '/governance/nba-data' },
+          { label: 'About IQAC', path: '/governance/about-iqac', disabled: true },
+          { label: 'IQAC Worksystem', path: '/governance/iqac-worksystem', disabled: true },
+          { label: 'Quality Parameters', path: '/governance/quality-parameters', disabled: true },
+          { label: 'IQAC Committee', path: '/governance/iqac-committee', disabled: true },
+          { label: 'Policies & Procedures', path: '/governance/policies-procedures', disabled: true },
         ],
       },
+    ],
+  },
+  {
+    // UG/PG/Ph.D. Programmes groups are spliced in at render time from live
+    // Firestore `programs` data — see renderedNavItems in Header() — so
+    // this menu always matches whatever's actually configured in the
+    // Programs admin section rather than a hardcoded, driftable list.
+    label: 'Academics',
+    groups: [
+      {
+        groupLabel: 'Overview',
+        groupPath: '/academics',
+        items: [
+          { label: 'Programs & Departments', path: '/academics' },
+          { label: 'Faculty', path: '/faculty' },
+          { label: 'Academic Documents', path: '/academics/downloads' },
+          { label: 'Result Analysis', path: '/result-analysis' },
+          { label: 'Examinations', path: 'https://www.svecwexams.in/', external: true },
+        ],
+      },
+      { groupLabel: 'UG Programmes', groupPath: '/academics?tab=btech', items: [] },
+      { groupLabel: 'PG Programmes', groupPath: '/academics?tab=mtech', items: [] },
+      { groupLabel: 'Ph.D. Programmes', groupPath: '/academics?tab=mba', items: [] },
       {
         groupLabel: 'Information',
         groupPath: '/information',
         items: [
           { label: 'Academic Calendar', path: '/information#academic-calendar' },
           { label: 'List of Holidays', path: '/information#holidays' },
-          { label: 'How to Reach', path: '/information#how-to-reach' },
           { label: 'Counselling Scheme', path: '/information#counselling' },
           { label: 'ICT Platforms', path: '/information#ict-platforms' },
           { label: 'Other Practices', path: '/information#other-practices' },
         ],
       },
-    ],
-  },
-  {
-    // Course Curriculum / Academic Documents items are spliced in at render
-    // time from live Firestore data — see renderedNavItems in Header().
-    label: 'Academics',
-    children: [
-      { label: 'Programs & Departments', path: '/academics' },
-      { label: 'Faculty', path: '/faculty' },
-      { label: 'Result Analysis', path: '/result-analysis' },
-      { label: 'Academic Calendar', path: '/information#academic-calendar' },
     ],
   },
   {
@@ -143,9 +152,24 @@ const navItems: NavItem[] = [
     ],
   },
   {
+    // Was a group inside Research's mega-menu — now its own top-level item.
+    // Category groups' items are spliced in at render time from live
+    // Firestore `differentiatorItems` data — see renderedNavItems in
+    // Header() — so the dropdown always lists the actual differentiators
+    // configured in the Differentiators admin section rather than a
+    // hardcoded, driftable list.
+    label: 'Differentiators',
+    groups: [
+      ...DIFFERENTIATOR_CATEGORIES.map((cat) => ({
+        groupLabel: cat.label,
+        groupPath: `/differentiators#${cat.id}`,
+        items: [],
+      })),
+    ],
+  },
+  {
     label: 'Placements',
     children: [
-      { label: 'Placements Overview', path: '/placements' },
       { label: 'Placement Details', path: '/placements/placement-details' },
       { label: 'Success Stories', path: '/placements/success-stories' },
       { label: 'TPO Cell', path: '/placements/tpo-cell' },
@@ -156,102 +180,60 @@ const navItems: NavItem[] = [
       { label: 'Our Recruiters', path: '/placements/our-recruiters' },
       { label: 'Employability Skills', path: '/placements/employability-skills' },
       { label: 'Mission R&D', path: '/placements/mission-rd' },
-      { label: 'Study Abroad – GSAC', path: '/placements/gsac' },
+      { label: 'Graduate Study Abroad Center – GSAC', path: '/placements/gsac' },
       { label: 'Higher Education', path: '/placements/higher-education' },
     ],
   },
   {
+    // Flat list (no sub-groups) — was a 3-group mega-menu, collapsed to
+    // match the flat dropdown style used by Placements/Admissions.
     label: 'Research',
-    groups: [
-      {
-        groupLabel: 'R&D Governance',
-        groupPath: '/research#governance',
-        items: [
-          { label: 'About R&D', path: '/research/about-rd' },
-          { label: 'Research Advisory Committee', path: '/research/research-advisory-committee' },
-          { label: 'Research Ethics Committee', path: '/research/research-ethics-committee' },
-          { label: 'IPR Committee', path: '/research/ipr-committee' },
-          { label: 'Research Centers', path: '/research/research-centers' },
-        ],
-      },
-      {
-        groupLabel: 'Research Output',
-        groupPath: '/research#output',
-        items: [
-          { label: 'Thrust Areas of Research', path: '/research/thrust-areas-of-research' },
-          { label: 'Funded Projects', path: '/research/funded-projects' },
-          { label: 'Seed Money Projects', path: '/research/seed-money-projects' },
-          { label: 'Research Publications', path: '/research/research-publications' },
-          { label: 'Patents', path: '/research/patents' },
-        ],
-      },
-      {
-        groupLabel: 'Industry & Professional Engagement',
-        groupPath: '/research#engagement',
-        items: [
-          { label: 'MoUs', path: '/research/mous' },
-          { label: 'Consultancy', path: '/research/consultancy' },
-          { label: 'Professional Bodies', path: '/research/professional-bodies' },
-        ],
-      },
-    ],
-  },
-  {
-    // Was a group inside Research's mega-menu — now its own top-level item.
-    label: 'Differentiators',
     children: [
-      { label: 'All Differentiators', path: '/differentiators' },
-      { label: 'Innovation & Entrepreneurship', path: '/differentiators#innovation' },
-      { label: 'Industry Centres of Excellence', path: '/differentiators#industry' },
-      { label: 'Research & Specialised Labs', path: '/differentiators#research' },
-      { label: 'International & Global Outreach', path: '/differentiators#global' },
-      { label: 'Student Development & Social Impact', path: '/differentiators#student' },
+      { label: 'About R&D', path: '/research/about-rd' },
+      { label: 'Research Advisory Committee', path: '/research/research-advisory-committee' },
+      { label: 'Research Ethics Committee', path: '/research/research-ethics-committee' },
+      { label: 'Intellectual Property Rights (IPR) Committee', path: '/research/ipr-committee' },
+      { label: 'Thrust Areas of Research', path: '/research/thrust-areas-of-research' },
+      { label: 'Research Centers', path: '/research/research-centers' },
+      { label: 'Funded Projects', path: '/research/funded-projects' },
+      { label: 'Seed Money Projects', path: '/research/seed-money-projects' },
+      { label: 'Research Publications', path: '/research/research-publications' },
+      { label: 'MoUs', path: '/research/mous' },
+      { label: 'Patents', path: '/research/patents' },
+      { label: 'Consultancy', path: '/research/consultancy' },
+      { label: 'Professional Bodies', path: '/research/professional-bodies' },
     ],
   },
   {
-    // Two groups instead of a flat 17-item list, now that Student Life's
-    // own items live here too — matches the Discover mega-menu pattern.
-    // Each group with >9 items auto-splits into two sub-columns (see
-    // .mega-group-list.cols-2 in Header.css), so Campus Facilities (17
-    // items) renders as two columns and Student Life (7) as one.
+    // Flat list (no sub-groups) — was a 2-group Campus Facilities/Student
+    // Life mega-menu, collapsed to match the flat dropdown style used by
+    // Placements/Admissions/Research. Radio Vishnu 90.4 has no page of its
+    // own — it reuses its existing Differentiators detail page rather than
+    // pointing at a route that doesn't exist.
     label: 'Campus Life',
-    groups: [
-      {
-        groupLabel: 'Campus Facilities',
-        groupPath: '/campus',
-        items: [
-          { label: 'Campus Life Overview', path: '/campus' },
-          { label: 'Smart Class Rooms', path: '/campus/smart-classrooms' },
-          { label: 'State-of-the-art Labs', path: '/campus/state-of-the-art-labs' },
-          { label: 'Central Library', path: '/campus/central-library' },
-          { label: 'Auditoriums', path: '/campus/auditoriums' },
-          { label: 'Campus Book Stores', path: '/campus/campus-book-stores' },
-          { label: 'Wi-Fi Campus', path: '/campus/wifi-campus' },
-          { label: 'Campus Hostels', path: '/campus/campus-hostels' },
-          { label: 'Food Courts', path: '/campus/food-courts' },
-          { label: 'VISHNU Fitness Centre', path: '/campus/fitness-centre' },
-          { label: 'Staff Quarters', path: '/campus/staff-quarters' },
-          { label: 'Travel Desk', path: '/campus/travel-desk' },
-          { label: 'Temples', path: '/campus/temples' },
-          { label: 'Health Care', path: '/campus/health-care' },
-          { label: 'Swimming Pool', path: '/campus/swimming-pool' },
-          { label: 'Campus Security', path: '/campus/campus-security' },
-          { label: 'Other Facilities', path: '/campus/other-facilities' },
-        ],
-      },
-      {
-        groupLabel: 'Student Life',
-        groupPath: '/student-life',
-        items: [
-          { label: 'Student Life Overview', path: '/student-life' },
-          { label: 'Student Clubs', path: '/student-clubs' },
-          { label: 'Sports & Games', path: '/sports-games' },
-          { label: 'Arts & Culture', path: '/arts-culture' },
-          { label: 'Social Services (NSS)', path: '/social-services' },
-          { label: 'Campus Magazines', path: '/campus-magazines' },
-          { label: 'Vishnu TV Academy', path: '/vishnu-tv-academy' },
-        ],
-      },
+    children: [
+      { label: 'Smart Class Rooms', path: '/campus/smart-classrooms' },
+      { label: 'State-of-the-art Labs', path: '/campus/state-of-the-art-labs' },
+      { label: 'Central Library', path: '/campus/central-library' },
+      { label: 'Auditoriums', path: '/campus/auditoriums' },
+      { label: 'Campus Book Stores', path: '/campus/campus-book-stores' },
+      { label: 'Wi-Fi Campus', path: '/campus/wifi-campus' },
+      { label: 'Campus Hostels', path: '/campus/campus-hostels' },
+      { label: 'Food Courts', path: '/campus/food-courts' },
+      { label: 'VISHNU Fitness Centre', path: '/campus/fitness-centre' },
+      { label: 'Staff Quarters', path: '/campus/staff-quarters' },
+      { label: 'Travel Desk', path: '/campus/travel-desk' },
+      { label: 'Temples', path: '/campus/temples' },
+      { label: 'Health Care', path: '/campus/health-care' },
+      { label: 'Swimming Pool', path: '/campus/swimming-pool' },
+      { label: 'Campus Security', path: '/campus/campus-security' },
+      { label: 'Radio Vishnu 90.4', path: '/differentiators/radio-vishnu-diff' },
+      { label: 'Vishnu TV Academy', path: '/vishnu-tv-academy' },
+      { label: 'Student Clubs', path: '/student-clubs' },
+      { label: 'Social Services', path: '/social-services' },
+      { label: 'Campus Magazines', path: '/campus-magazines' },
+      { label: 'Arts & Culture', path: '/arts-culture' },
+      { label: 'Sports & Games', path: '/sports-games' },
     ],
   },
   {
@@ -264,9 +246,11 @@ const navItems: NavItem[] = [
         groupLabel: 'News & Events',
         groupPath: '/news-awards',
         items: [
-          { label: 'News & Awards Overview', path: '/news-awards' },
           { label: 'Happenings at VWU', path: '/news-awards/happenings' },
-          { label: 'Accreditations & Awards', path: '/news-awards/accreditations-awards' },
+          { label: 'Social Media Handles', path: '/news-awards/social-media-handles' },
+          { label: 'Vishnu Era', path: 'https://www.srivishnu.edu.in/vishnu-era/', external: true },
+          { label: 'Accreditations', path: '/news-awards/accreditations-awards#accreditation' },
+          { label: 'Rankings & Awards', path: '/news-awards/accreditations-awards#ranking' },
           { label: 'Gallery', path: '/news-awards/gallery' },
           { label: 'News', path: '/news' },
           { label: 'Events', path: '/events' },
@@ -283,6 +267,13 @@ const navItems: NavItem[] = [
           { label: 'Success Stories', path: '/placements/success-stories' },
         ],
       },
+    ],
+  },
+  {
+    label: 'Contact',
+    children: [
+      { label: 'Contact Us', path: '/contact' },
+      { label: 'How to Reach', path: '/information#how-to-reach' },
     ],
   },
 ];
@@ -305,8 +296,8 @@ export default function Header() {
   const [expandedSubItem, setExpandedSubItem] = useState<string | null>(null);
   const location = useLocation();
   const navRef = useRef<HTMLElement>(null);
+  const megaRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  const { docs: downloadDocs, loading: downloadsLoading } = useOrderedCollection<DownloadDoc>('downloads', 'order');
   // Admin-editable via /admin → Navigation Link Redirects (NavLinkOverridesAdmin.tsx).
   // Decoupled from Placements' own "Success Stories" item, which stays hardcoded.
   // Default target is AlumniGiving.tsx's own "#successstories" section, not Placements.
@@ -315,27 +306,26 @@ export default function Header() {
   // admissions cycle or an external application portal) without a deploy.
   const headerApplyNow = useNavLinkOverride('header-apply-now', '/admissions');
 
-  const academicDocsChild: NavChild = {
-    label: 'Academic Documents',
-    path: '/academics/downloads',
-    subItems: downloadsLoading
-      ? [{ label: 'Loading…', path: '', disabled: true }]
-      : downloadDocs.length > 0
-        ? downloadDocs.map((d) => ({ label: d.title, path: d.fileUrl, external: true }))
-        : [{ label: 'No documents yet', path: '', disabled: true }],
-  };
+  const { docs: programs } = useOrderedCollection<ProgramDoc>('programs', 'order');
+  const programItem = (p: ProgramDoc): NavChild => ({ label: p.name, path: `/academics/${p.slug}` });
+  const ugProgrammes = programs.filter((p) => p.category === 'btech').map(programItem);
+  const pgProgrammes = programs.filter((p) => p.category === 'mtech' || p.category === 'mba').map(programItem);
+  const phdProgrammes = programs.filter((p) => p.category === 'phd').map(programItem);
 
-  // Academics' children are the static list + this live-Firestore-derived
-  // flyout item, spliced in after "Faculty" since navItems itself is a
-  // module-level constant and can't hold live data directly.
+  const { docs: differentiatorItems } = useOrderedCollection<DifferentiatorItemDoc>('differentiatorItems', 'order');
+
   const renderedNavItems: NavItem[] = navItems.map((item) => {
-    if (item.label === 'Academics' && item.children) {
-      const children: NavChild[] = [];
-      for (const child of item.children) {
-        children.push(child);
-        if (child.label === 'Faculty') children.push(academicDocsChild);
-      }
-      return { ...item, children };
+    // Academics' UG/PG/Ph.D. Programmes groups are populated here from live
+    // Firestore data since navItems itself is a module-level constant and
+    // can't hold live data directly — see the "Overview" comment above.
+    if (item.label === 'Academics' && item.groups) {
+      const groups = item.groups.map((group) => {
+        if (group.groupLabel === 'UG Programmes') return { ...group, items: ugProgrammes };
+        if (group.groupLabel === 'PG Programmes') return { ...group, items: pgProgrammes };
+        if (group.groupLabel === 'Ph.D. Programmes') return { ...group, items: phdProgrammes };
+        return group;
+      });
+      return { ...item, groups };
     }
     // "Success Stories" here is admin-redirectable independently of
     // Placements' own "Success Stories" item — see alumniSuccessStories above.
@@ -354,13 +344,29 @@ export default function Header() {
       );
       return { ...item, groups };
     }
+    // Category groups here are populated from live Firestore data since
+    // navItems itself is a module-level constant — see differentiatorItems
+    // above. The "Overview" group keeps its hardcoded "All Differentiators" link.
+    if (item.label === 'Differentiators' && item.groups) {
+      const groups = item.groups.map((group) => {
+        const cat = DIFFERENTIATOR_CATEGORIES.find((c) => c.label === group.groupLabel);
+        if (!cat) return group;
+        return {
+          ...group,
+          items: differentiatorItems
+            .filter((i) => i.category === cat.id)
+            .map((i): NavChild => ({ label: i.title, path: `/differentiators/${i.slug}` })),
+        };
+      });
+      return { ...item, groups };
+    }
     return item;
   });
 
   const renderNavItem = (item: NavItem) => (
     <li
       key={item.label}
-      className={`nav-item${openItem === item.label ? ' nav-item--open' : ''}${item.label === 'Placements' ? ' nav-item--placements' : ''}`}
+      className={`nav-item${openItem === item.label ? ' nav-item--open' : ''}${(item.children?.length ?? 0) >= 9 ? ' nav-item--wide-dropdown' : ''}`}
       onMouseEnter={() => setOpenItem(item.label)}
       onFocus={() => setOpenItem(item.label)}
       onMouseLeave={() => setOpenItem((prev) => (prev === item.label ? null : prev))}
@@ -424,7 +430,11 @@ export default function Header() {
 
       {/* Mega-menu dropdown */}
       {item.groups && (
-        <div className="dropdown dropdown-mega" role="menu">
+        <div
+          className="dropdown dropdown-mega"
+          role="menu"
+          ref={(el) => { megaRefs.current[item.label] = el; }}
+        >
           {item.groups.map((group) => (
             <div key={group.groupLabel} className="mega-group">
               {group.groupPath ? (
@@ -434,11 +444,11 @@ export default function Header() {
               ) : (
                 <span className="mega-group-label">{group.groupLabel}</span>
               )}
-              <ul className={`mega-group-list${group.items.length > 9 ? ' cols-2' : ''}`}>
+              <ul className={`mega-group-list${group.items.length >= 9 ? ' cols-2' : ''}`}>
                 {group.items.map((child) => (
                   <li key={child.label}>
                     {child.disabled ? (
-                      <span className="dropdown-item" style={{ opacity: 0.5, cursor: 'default' }}>
+                      <span className="dropdown-item">
                         {child.label}
                       </span>
                     ) : (child.external || child.download) ? (
@@ -492,6 +502,92 @@ export default function Header() {
     };
   }, [openItem]);
 
+  // Mega-menus are centered on their trigger by default (see .dropdown-mega
+  // in Header.css), same as a flat dropdown — the width/height of the menu
+  // and the position of the trigger that opened it don't otherwise matter.
+  // The only time that changes is when centering would run the menu into
+  // one of the header's dark end-pods (e.g. Research, mid-bar, opening a
+  // wide menu can reach the Visit/Give/Apply pod on the right): then it's
+  // nudged left/right via --mega-shift just enough to clear that pod,
+  // rather than always anchoring to one side — which was the previous
+  // approach, and is exactly what made a menu look like it opened
+  // "sometimes centered, sometimes off to a side" depending on viewport
+  // width. Right-anchored menus (the last two nav items — see the
+  // nth-last-child rule in Header.css) don't need centering since right:0
+  // already positions them consistently; they still get the same nudge
+  // against the logo pod. Width is only reduced (via an explicit width,
+  // not max-width — min-width otherwise wins the conflict, and a
+  // shrink-to-fit auto width doesn't reliably fill a max-width budget
+  // once min-width is overridden to 0) if the menu genuinely can't fit
+  // even using the full gap between both pods.
+  useEffect(() => {
+    const el = openItem ? megaRefs.current[openItem] : null;
+    const triggerEl = el?.parentElement;
+    if (!el || !triggerEl) return;
+    el.style.minWidth = '';
+    el.style.width = '';
+    el.style.removeProperty('--mega-shift');
+    const idx = renderedNavItems.findIndex((i) => i.label === openItem);
+    const isRightAnchored = idx !== -1 && idx >= renderedNavItems.length - 2;
+    const logoEl = document.querySelector<HTMLElement>('.header-end--logo');
+    const ctaEl = document.querySelector<HTMLElement>('.header-end--cta');
+    if (!logoEl || !ctaEl) return;
+    const margin = 24;
+    const logoRect = logoEl.getBoundingClientRect();
+    const ctaRect = ctaEl.getBoundingClientRect();
+    const safeLeft = logoRect.right + margin;
+    const safeRight = ctaRect.left - margin;
+    // Width is trustworthy to read off the dropdown itself (transform
+    // doesn't affect it), but its *position* can still be mid-transition
+    // right after the reset above (transform is a transitioned property),
+    // so the natural, unshifted position is computed from the trigger's
+    // own (never-transformed) geometry instead of trusting the dropdown's
+    // own rect.left/right.
+    const width = el.getBoundingClientRect().width;
+    const triggerRect = triggerEl.getBoundingClientRect();
+
+    // Left as shrink-to-fit, the menu only ever renders at its own
+    // content's natural width — on anything wider than a fairly narrow
+    // desktop window that leaves real, unused room between it and the pod
+    // sitting completely unused instead of giving the columns more
+    // breathing room. STRETCH_CAP just keeps it from growing absurdly
+    // wide on an ultra-wide monitor.
+    const STRETCH_CAP = 960;
+
+    if (isRightAnchored) {
+      const available = triggerRect.right - logoRect.right - margin;
+      const finalWidth = available > 0 ? Math.min(available, STRETCH_CAP) : width;
+      if (finalWidth !== width) {
+        el.style.minWidth = '0';
+        el.style.width = `${finalWidth}px`;
+      }
+      const naturalLeft = triggerRect.right - finalWidth;
+      if (naturalLeft < safeLeft) {
+        el.style.setProperty('--mega-shift', `${safeLeft - naturalLeft}px`);
+      }
+      return;
+    }
+
+    const available = safeRight - safeLeft;
+    const finalWidth = available > 0 ? Math.min(available, STRETCH_CAP) : width;
+    if (finalWidth !== width) {
+      el.style.minWidth = '0';
+      el.style.width = `${finalWidth}px`;
+    }
+    const naturalCenter = triggerRect.left + triggerRect.width / 2;
+    const naturalLeft = naturalCenter - finalWidth / 2;
+    const naturalRight = naturalCenter + finalWidth / 2;
+    let shift = 0;
+    if (naturalRight > safeRight) {
+      shift = safeRight - naturalRight;
+    } else if (naturalLeft < safeLeft) {
+      shift = safeLeft - naturalLeft;
+    }
+    if (shift !== 0) {
+      el.style.setProperty('--mega-shift', `${shift}px`);
+    }
+  }, [openItem, renderedNavItems]);
+
   useEffect(() => {
     setMobileOpen(false);
     setExpandedItem(null);
@@ -519,7 +615,7 @@ export default function Header() {
             <svg className="header-end-wave" viewBox={END_WAVE_VIEWBOX} preserveAspectRatio="none" aria-hidden="true">
               <path d={LOGO_WAVE_PATH} fill="var(--color-primary-dark)" stroke="var(--color-accent)" strokeWidth="2" />
             </svg>
-            <Link to="/" className="logo" aria-label="Vishnu Womens University Home">
+            <Link to="/" className="logo" aria-label="Vishnu Women's University Home">
               <img src="/images/logo.png" alt="VWU Logo" className="logo-icon" />
             </Link>
           </div>
@@ -649,6 +745,20 @@ export default function Header() {
                       {item.groups.map((group) => {
                         const groupKey = `${item.label}:${group.groupLabel}`;
                         const groupOpen = expandedGroup === groupKey;
+                        // A group with no items of its own has nothing to
+                        // expand into — render it as a plain link instead of
+                        // a dead-end accordion button. Mainly hit while a
+                        // live-data group (e.g. UG/PG/Ph.D. Programmes)
+                        // hasn't loaded any items yet.
+                        if (group.items.length === 0 && group.groupPath) {
+                          return (
+                            <li key={group.groupLabel} className="mobile-group">
+                              <Link to={group.groupPath} className="mobile-group-btn">
+                                {group.groupLabel}
+                              </Link>
+                            </li>
+                          );
+                        }
                         return (
                           <li key={group.groupLabel} className="mobile-group">
                             <button
@@ -665,7 +775,7 @@ export default function Header() {
                                 {group.items.map((child) => (
                                   <li key={child.label}>
                                     {child.disabled ? (
-                                      <span className="mobile-sub-item" style={{ opacity: 0.5 }}>{child.label}</span>
+                                      <span className="mobile-sub-item">{child.label}</span>
                                     ) : (child.external || child.download) ? (
                                       <a href={child.path} className="mobile-sub-item" download={child.download} target={child.download ? undefined : '_blank'} rel="noopener noreferrer">{child.label}</a>
                                     ) : (

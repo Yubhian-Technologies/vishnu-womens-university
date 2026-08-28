@@ -58,17 +58,20 @@ export interface CoreExecutiveMember {
   role: string;
   photoUrl?: string;
   order: number;
+  /** Org-chart tier: 1 (top) to 3. Docs saved before this field existed have
+   *  no value — treated as level 1 wherever this is read. */
+  level?: number;
 }
 
 export const defaultExecutives: Omit<CoreExecutiveMember, 'id'>[] = [
-  { name: 'Dr. G. Srinivasa Rao', role: 'Principal', order: 1 },
-  { name: 'Prof. P. Venkata Rama Raju', role: 'Vice-Principal', order: 2 },
-  { name: 'Dr. G.R.L.V.N. Srinivasa Raju', role: 'Dean – Research & Development', order: 3 },
-  { name: 'Dr. V. Purushothama Raju', role: 'Dean – Academics', order: 4 },
-  { name: 'Dr. V.V.R. Maheswara Rao', role: 'Dean – Statutory Bodies / IQAC Coordinator', order: 5 },
-  { name: 'Dr. K.S.N. Raju', role: 'Controller of Examinations', order: 6 },
-  { name: 'Mr. Md. Siddiq', role: 'Administrative Officer', order: 7 },
-  { name: 'Mr. S.S.S. Varma', role: 'Finance Manager', order: 8 },
+  { name: 'Dr. G. Srinivasa Rao', role: 'Principal', order: 1, level: 1 },
+  { name: 'Prof. P. Venkata Rama Raju', role: 'Vice-Principal', order: 2, level: 2 },
+  { name: 'Dr. G.R.L.V.N. Srinivasa Raju', role: 'Dean – Research & Development', order: 3, level: 2 },
+  { name: 'Dr. V. Purushothama Raju', role: 'Dean – Academics', order: 4, level: 2 },
+  { name: 'Dr. V.V.R. Maheswara Rao', role: 'Dean – Statutory Bodies / IQAC Coordinator', order: 5, level: 2 },
+  { name: 'Dr. K.S.N. Raju', role: 'Controller of Examinations', order: 6, level: 3 },
+  { name: 'Mr. Md. Siddiq', role: 'Administrative Officer', order: 7, level: 3 },
+  { name: 'Mr. S.S.S. Varma', role: 'Finance Manager', order: 8, level: 3 },
 ];
 
 export default function About() {
@@ -76,6 +79,15 @@ export default function About() {
 
   const { docs: execDocs, loading: execLoading } = useOrderedCollection<CoreExecutiveMember>('coreExecutives', 'order');
   const executives = !execLoading && execDocs.length > 0 ? execDocs : defaultExecutives;
+  const executivesByLevel = useMemo(() => {
+    const groups = new Map<number, typeof executives>();
+    executives.forEach((exec) => {
+      const level = exec.level || 1;
+      if (!groups.has(level)) groups.set(level, []);
+      groups.get(level)!.push(exec);
+    });
+    return [...groups.entries()].sort(([a], [b]) => a - b);
+  }, [executives]);
   const quickStats = useContentBlocks('about', 'quickStats');
   const campusPhotos = useSitePhotos('about', 'main', defaultCampusPhotos);
   const galleryPhotos = campusPhotos.slice(0, 5);
@@ -107,7 +119,7 @@ export default function About() {
   }, [diffItems]);
 
   useEffect(() => {
-    document.title = 'About VWU | Vishnu Womens University';
+    document.title = "About VWU | Vishnu Women's University";
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -129,7 +141,7 @@ export default function About() {
       {/* Hero */}
       <PageHero
         page="about"
-        defaultTitle="About Vishnu Womens University"
+        defaultTitle="About Vishnu Women's University"
   defaultSubtitle="Rooted in Bhimavaram since 2001, VWU has grown into Andhra Pradesh's foremost institution for women's technical education."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'About VWU' }]}
       />
@@ -157,7 +169,7 @@ export default function About() {
               <h2 className="section-title">First Private State University for Women in Telugu States</h2>
               <div className="divider" />
               <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-4)', color: 'var(--color-text-light)' }}>
-                Vishnu Womens University is set in Vishnupur, 3 km from Bhimavaram along Tadepalligudem Road
+                Vishnu Women's University is set in Vishnupur, 3 km from Bhimavaram along Tadepalligudem Road
                 in Coastal Andhra Pradesh. The campus stretches across approximately <strong> 100 acres</strong>,
                 offering an environment well-suited to focused, high-quality learning.
               </p>
@@ -225,19 +237,23 @@ export default function About() {
               The senior leadership team responsible for guiding VWU's academic direction and institutional development.
             </p>
           </div>
-          <div className="exec-grid">
-            {executives.map((exec) => (
-              <div key={exec.name} className="exec-card">
-                {exec.photoUrl ? (
-                  <SmoothImage src={exec.photoUrl} alt={exec.name} className="exec-card__photo" />
-                ) : (
-                  <div className="exec-card__avatar">{getInitials(exec.name)}</div>
-                )}
-                <h3 className="exec-card__name">{exec.name}</h3>
-                <p className="exec-card__role">{exec.role}</p>
+          {executivesByLevel.map(([level, members]) => (
+            <div key={level} className="exec-level">
+              <div className="exec-grid">
+                {members.map((exec) => (
+                  <div key={exec.name} className="exec-card">
+                    {exec.photoUrl ? (
+                      <SmoothImage src={exec.photoUrl} alt={exec.name} className="exec-card__photo" />
+                    ) : (
+                      <div className="exec-card__avatar">{getInitials(exec.name)}</div>
+                    )}
+                    <h3 className="exec-card__name">{exec.name}</h3>
+                    <p className="exec-card__role">{exec.role}</p>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -279,7 +295,7 @@ export default function About() {
           <PhotoGrid
             images={galleryPhotos}
             label="Campus Life"
-            title="Life at Vishnu Womens University"
+            title="Life at Vishnu Women's University"
             subtitle="A glimpse of the people, spaces, and moments that make VWU a distinctive place to learn and grow."
             highlights={[
               '100-acre green campus in Bhimavaram',
@@ -388,7 +404,7 @@ export default function About() {
             <span className="section-label">Discover More</span>
             <h2 className="section-title">Explore VWU in Detail</h2>
           </div>
-          <div className="about-discover-grid">
+          <div className="about-discover-grid card-grid">
             {discoverCards.map((item) => {
               const Icon = resolveContentIcon(item.icon) || Target;
               return (

@@ -11,14 +11,13 @@ import './CounterSection.css';
 // until an admin adds real entries there — same fallback pattern used
 // throughout the rest of this codebase (e.g. defaultExecutives in About.tsx).
 const defaultCounters: ContentBlockDoc[] = [
-  { id: 'default-1', page: 'home', section: 'counters', value: '13100', title: 'Engineers Graduated', desc: 'Alumni strong', icon: 'GraduationCap', slug: '+', order: 0 },
-  { id: 'default-2', page: 'home', section: 'counters', value: '230', title: 'Experienced Faculty', desc: 'Expert educators', icon: 'Presentation', slug: '+', order: 1 },
-  { id: 'default-3', page: 'home', section: 'counters', value: '1400', title: 'Annual Placements', desc: 'Every year', icon: 'Briefcase', slug: '+', order: 2 },
+  { id: 'default-1', page: 'home', section: 'counters', value: '15000', title: 'Engineers Graduated', desc: 'Alumni strong', icon: 'GraduationCap', slug: '+', order: 0 },
+  { id: 'default-2', page: 'home', section: 'counters', value: '250', title: 'Experienced Faculty', desc: 'Expert educators', icon: 'Presentation', slug: '+', order: 1 },
+  { id: 'default-3', page: 'home', section: 'counters', value: '1100', title: 'Placements', desc: '2025-2026', icon: 'Briefcase', slug: '+', order: 2 },
   { id: 'default-4', page: 'home', section: 'counters', value: '2500', title: 'Research Publications', desc: 'International journals', icon: 'FileText', slug: '+', order: 3 },
   { id: 'default-5', page: 'home', section: 'counters', value: '90', title: 'Patents Filed', desc: 'Innovations & inventions', icon: 'Trophy', slug: '+', order: 4 },
-  { id: 'default-6', page: 'home', section: 'counters', value: '300', title: 'Qualified Faculty', desc: 'Across all departments', icon: 'Award', slug: '+', order: 5 },
-  { id: 'default-7', page: 'home', section: 'counters', value: '500', title: 'Industry Partners', desc: 'Recruiting & collaborating', icon: 'Factory', slug: '+', order: 6 },
-  { id: 'default-8', page: 'home', section: 'counters', value: '25', title: 'Global MoUs', desc: 'International outreach', icon: 'Globe2', slug: '+', order: 7 },
+  { id: 'default-7', page: 'home', section: 'counters', value: '500', title: 'Industry Partners', desc: 'Recruiting & collaborating', icon: 'Factory', slug: '+', order: 5 },
+  { id: 'default-8', page: 'home', section: 'counters', value: '25', title: 'Global MoUs', desc: 'International outreach', icon: 'Globe2', slug: '+', order: 6 },
 ];
 
 function SingleCounter({ item, start, Icon }: { item: ContentBlockDoc; start: boolean; Icon: LucideIcon }) {

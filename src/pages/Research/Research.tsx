@@ -21,7 +21,7 @@ export default function Research() {
   useHashScroll();
 
   useEffect(() => {
-    document.title = 'Research & Development | Vishnu Womens University';
+    document.title = "Research & Development | Vishnu Women's University";
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -83,7 +83,7 @@ export default function Research() {
                 <p style={{ color: 'var(--color-text-light)', maxWidth: 600, lineHeight: 1.7 }}>{cat.desc}</p>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 'var(--space-5)' }}>
+              <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 'var(--space-5)' }}>
                 {items.map((item) => {
                   const Icon = resolveContentIcon(item.icon) || cat.icon;
                   return (
