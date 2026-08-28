@@ -21,6 +21,7 @@ import ContactsAdmin from './sections/ContactsAdmin';
 import ContactMessagesAdmin from './sections/ContactMessagesAdmin';
 import CareerApplicationsAdmin from './sections/CareerApplicationsAdmin';
 import AdmissionInquiriesAdmin from './sections/AdmissionInquiriesAdmin';
+import CampusVisitRequestsAdmin from './sections/CampusVisitRequestsAdmin';
 import SvesCampusesAdmin from './sections/SvesCampusesAdmin';
 import DownloadsAdmin from './sections/DownloadsAdmin';
 import CurriculumAdmin from './sections/CurriculumAdmin';
@@ -106,6 +107,7 @@ const SECTION_MAP: Record<string, React.ReactNode> = {
   'contact-messages': <ContactMessagesAdmin />,
   'career-applications': <CareerApplicationsAdmin />,
   'admission-inquiries': <AdmissionInquiriesAdmin />,
+  'campus-visit-requests': <CampusVisitRequestsAdmin />,
   'sves-campuses': <SvesCampusesAdmin />,
   downloads: <DownloadsAdmin />,
   curriculum: <CurriculumAdmin />,

@@ -63,6 +63,7 @@ export const PAGES = [
   { value: 'academics-downloads',     label: 'Academics: Documents' },
   { value: 'faculty',                 label: 'Faculty' },
   { value: 'admissions',              label: 'Admissions' },
+  { value: 'campus-visit',            label: 'Campus Visit' },
   { value: 'student-life',            label: 'Student Life' },
   { value: 'placements',              label: 'Placements' },
   { value: 'alumni-giving',           label: 'Alumni & Giving' },
@@ -108,7 +109,7 @@ export const PAGES = [
 // of hunting through one long undifferentiated button list. Every PAGES
 // value must appear in exactly one group here.
 const PAGE_GROUPS: { label: string; values: string[] }[] = [
-  { label: 'Main Pages', values: ['home', 'academics', 'admissions', 'student-life', 'placements', 'alumni-giving', 'about', 'information'] },
+  { label: 'Main Pages', values: ['home', 'academics', 'admissions', 'campus-visit', 'student-life', 'placements', 'alumni-giving', 'about', 'information'] },
   { label: 'About, Society & Governance', values: ['about-sves', 'vision-mission', 'governance', 'governing-body', 'governance-detail'] },
   { label: 'Academics', values: ['academics-curriculum', 'academics-downloads', 'faculty', 'program-detail', 'programmes-fee', 'admission-procedure', 'result-analysis'] },
   { label: 'Student Life', values: ['student-clubs', 'arts-culture', 'social-services', 'sports-games', 'vishnu-tv', 'campus-magazines'] },
@@ -136,6 +137,7 @@ const PAGE_TEXT_DEFAULTS: Record<string, { title: string; subtitle?: string }> =
   'anti-ragging': { title: 'Anti Ragging', subtitle: "Vishnu Women's University is committed to a safe, ragging-free campus for every student." },
   'alumni-giving': { title: 'Always a Vishnu Engineer', subtitle: 'Graduation is not the end of your VWU story. Stay engaged, give back, and help shape the next generation of women engineers.' },
   'admissions': { title: 'Your Journey Starts Here', subtitle: 'Choosing VWU sets you on a path to a fulfilling engineering career, a strong professional network, and a future built on real achievement.' },
+  'campus-visit': { title: 'Come See VWU for Yourself', subtitle: 'Seeing VWU in person is the best way to know if it is the right fit for you. Choose the visit format that suits you best.' },
   'disclosures-ugc': { title: 'UGC Public Self-Disclosure', subtitle: 'Shri Vishnu Engineering College for Women (Autonomous) — published as required by the University Grants Commission.' },
   'result-analysis': { title: 'Result Analysis', subtitle: 'VWU consistently ranks among the top 5 affiliated colleges of JNTU Kakinada with 90%+ annual pass rates.' },
   'about-sves': { title: 'Sri Vishnu Educational Society', subtitle: 'More than 25 years of educational commitment, spanning 11 institutions across Andhra Pradesh and Telangana.' },

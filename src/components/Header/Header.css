@@ -186,19 +186,6 @@
   padding-bottom: 3px;
 }
 
-.nav-link-label::after {
-  content: '';
-  position: absolute;
-  bottom: -1px;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: var(--color-accent);
-  transform: scaleX(0);
-  transition: transform var(--transition-base);
-  border-radius: 2px;
-}
-
 /* Dropdown visibility (and the link styling that goes with it) is driven
    entirely by the .nav-item--open class, which Header.tsx applies from a
    single `openItem` state — set by hover, focus, and click alike. There is
@@ -209,10 +196,6 @@
    further down for the full story). */
 .nav-item--open .nav-link {
   color: var(--color-primary);
-}
-
-.nav-item--open .nav-link-label::after {
-  transform: scaleX(1);
 }
 
 /* ===== Dropdown ===== */
@@ -230,13 +213,15 @@
   pointer-events: none;
   border-top: 3px solid var(--color-accent);
   z-index: 100;
-  /* Closing animates too (shorter + a touch snappier than opening), so
-     switching between nav items never leaves a dropdown just vanishing —
-     but it's still quick enough that the next item's dropdown opening
-     doesn't visibly overlap it mid-fade. visibility is delayed to the end
-     of the fade so the closed dropdown stays out of the layout/hit-testing
-     the instant it's not needed, without cutting the fade-out short. */
-  transition: opacity 140ms ease, transform 140ms ease, visibility 0s linear 140ms;
+  /* Open and close share the same duration/easing (rather than a snappier
+     close) so that switching straight from one item's open dropdown to
+     another's genuinely cross-fades — the old one dissolving out while the
+     new one dissolves in over the same window — instead of one outrunning
+     the other and reading as an instant swap. visibility is delayed to the
+     end of the fade so the closed dropdown stays out of the
+     layout/hit-testing the instant it's not needed, without cutting the
+     fade-out short. */
+  transition: opacity 200ms ease, transform 200ms ease, visibility 0s linear 200ms;
 }
 
 .nav-item--open .dropdown {
@@ -244,7 +229,7 @@
   visibility: visible;
   pointer-events: auto;
   transform: translateX(-50%) translateY(0);
-  transition: opacity 220ms ease, transform 220ms ease, visibility 0s linear 0s;
+  transition: opacity 200ms ease, transform 200ms ease, visibility 0s linear 0s;
 }
 
 /* The last couple of nav items sit close to the right edge of the bar,

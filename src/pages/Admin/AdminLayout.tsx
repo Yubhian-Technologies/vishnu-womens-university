@@ -31,6 +31,7 @@ export const SECTIONS = [
   { id: 'contact-messages', icon: '✉️', label: 'Contact Us Messages' },
   { id: 'career-applications', icon: '🧑‍💼', label: 'Career Applications' },
   { id: 'admission-inquiries', icon: '📝', label: 'Admission Inquiries' },
+  { id: 'campus-visit-requests', icon: '🚌', label: 'Campus Visit Requests' },
   { id: 'sves-campuses',  icon: '🏘️', label: 'SVES Campuses' },
   { id: 'downloads',      icon: '📄', label: 'Academic Documents' },
   { id: 'curriculum',     icon: '📚', label: 'Course Curriculum Matrix' },
@@ -72,7 +73,7 @@ export const SECTIONS = [
 // hunting through one long undifferentiated list.
 export const SECTION_GROUPS: { label: string; ids: string[] }[] = [
   { label: 'Overview', ids: ['overview'] },
-  { label: 'Form Submissions', ids: ['contact-messages', 'career-applications', 'admission-inquiries'] },
+  { label: 'Form Submissions', ids: ['contact-messages', 'career-applications', 'admission-inquiries', 'campus-visit-requests'] },
   { label: 'Site Appearance', ids: ['banners', 'landing-pages', 'site-photos', 'nav-links', 'content-blocks', 'compliance-docs'] },
   { label: 'About & Governance', ids: ['governing-body', 'governance-items', 'core-executives', 'sves-campuses', 'contacts', 'policies'] },
   { label: 'Academics', ids: ['programs', 'faculty', 'curriculum', 'downloads'] },

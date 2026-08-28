@@ -56,3 +56,19 @@ export function useContentBlocks(page: string, section: string): ContentBlockDoc
   const { docs } = useAllContentBlockDocs();
   return docs.filter((b) => b.page === page && b.section === section);
 }
+
+const DEFAULT_EAPCET_CODE = 'VISW';
+
+/**
+ * The EAPCET/EAMCET college code, quoted in several places across the site
+ * (Admissions, Academics, Program Detail, Information) that used to each
+ * hardcode "VISW" independently — so an admin editing the code in one place
+ * never updated the others. This reuses the one place it's already
+ * admin-editable: the "EAPCET Code" stat item under Content Blocks admin →
+ * Admission Procedure — Stats.
+ */
+export function useEapcetCode(): string {
+  const stats = useContentBlocks('admission-procedure', 'stats');
+  const item = stats.find((s) => s.title.toLowerCase().includes('eapcet'));
+  return item?.value || DEFAULT_EAPCET_CODE;
+}

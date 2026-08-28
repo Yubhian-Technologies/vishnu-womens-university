@@ -7,7 +7,7 @@ import { useOrderedCollection } from '../../hooks/useCollection';
 import { useSitePhotos, useSectionHasPhotos } from '../../hooks/useSitePhotos';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import { resolveProgramIcon } from '../../lib/programIcons';
-import { useContentBlocks } from '../../hooks/useContentBlocks';
+import { useContentBlocks, useEapcetCode } from '../../hooks/useContentBlocks';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
 import { PenTool, Radio } from 'lucide-react';
@@ -64,6 +64,7 @@ export default function Academics() {
   const quickStats = useContentBlocks('academics', 'quickStats');
   const studentActivities = useContentBlocks('academics', 'studentActivities');
   const careerOutcomeStats = useContentBlocks('academics', 'careerOutcomeStats');
+  const eapcetCode = useEapcetCode();
 
   useEffect(() => {
     document.title = "Academics | Vishnu Women's University";
@@ -377,7 +378,7 @@ export default function Academics() {
             <span className="section-label" style={{ color: 'var(--color-accent)' }}>Get Started</span>
             <h2 className="section-title" style={{ color: 'var(--color-white)' }}>Ready to Join VWU?</h2>
             <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 'var(--text-lg)', maxWidth: 560, margin: '0 auto var(--space-8)' }}>
-              Arrange a campus visit, request further information, or apply through EAPCET (Code: VISW) today.
+              Arrange a campus visit, request further information, or apply through EAPCET (Code: {eapcetCode}) today.
             </p>
             <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
               <Link to="/admissions" className="btn btn-accent btn-lg">Apply via EAPCET</Link>

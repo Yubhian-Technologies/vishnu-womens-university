@@ -7,7 +7,7 @@ import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
 import { db } from '../../lib/firebase';
 import { useOrderedCollection } from '../../hooks/useCollection';
-import { useContentBlocks } from '../../hooks/useContentBlocks';
+import { useContentBlocks, useEapcetCode } from '../../hooks/useContentBlocks';
 import { useSitePhotos, useSectionHasPhotos } from '../../hooks/useSitePhotos';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import type { FaqDoc } from '../Admin/sections/FaqAdmin';
@@ -84,11 +84,11 @@ const defaultPgPhotos = [
 export default function Admissions() {
   const { docs: allFaqs } = useOrderedCollection<FaqDoc>('faqs', 'order');
   const faqs = allFaqs.filter((f) => f.page === 'admissions');
-  const scholarships = useContentBlocks('admissions', 'scholarships');
   const tuitionData = useContentBlocks('admissions', 'tuitionData');
   const steps = useContentBlocks('admissions', 'steps');
   const admissionHub = useContentBlocks('admissions', 'admissionHub');
   const visitOptions = useContentBlocks('admissions', 'visitOptions');
+  const eapcetCode = useEapcetCode();
   const admissionsPhotos = useSitePhotos('admissions', 'main', defaultAdmissionsPhotos);
   const ugPhotos = useSitePhotos('admissions', 'ug', defaultUgPhotos);
   const hasUgPhotos = useSectionHasPhotos('admissions', 'ug');
@@ -253,41 +253,6 @@ export default function Admissions() {
         </div>
       </section>
 
-      {/* Scholarships */}
-      <section className="section bg-white">
-        <div className="container">
-          <div className="reveal" style={{ marginBottom: 'var(--space-10)' }}>
-            <span className="section-label">Financial Support</span>
-            <h2 className="section-title">Make VWU Accessible</h2>
-            <p className="section-desc">
-              VWU helps students access government scholarships, fee reimbursement schemes, and
-              merit-based awards so that quality engineering education is genuinely within reach.
-            </p>
-          </div>
-
-          <div className="adm-scholarship-grid">
-            {scholarships.map((s) => (
-              <div key={s.id} className="adm-scholarship-card">
-                <div className="adm-scholarship-header">
-                  <h3>{s.title}</h3>
-                  <div className="adm-scholarship-amount">{s.value}</div>
-                </div>
-                <p className="adm-scholarship-criteria">{s.desc}</p>
-              </div>
-            ))}
-          </div>
-
-          <div className="adm-fafsa-cta reveal" data-delay="200">
-            <div className="adm-fafsa-icon"><ClipboardList size={44} strokeWidth={1.75} /></div>
-            <div>
-              <h3>Apply for AP Scholarships</h3>
-              <p>Submit applications for AP government scholarships, SC/ST/BC fee reimbursement, and central government scholarship schemes through the National Scholarship Portal.</p>
-            </div>
-            <a href="https://scholarships.gov.in/" target="_blank" rel="noopener noreferrer" className="btn btn-accent">Check Scholarship Eligibility</a>
-          </div>
-        </div>
-      </section>
-
       {/* Tuition */}
       <section className="section" style={{ background: 'var(--color-primary)' }}>
         <div className="container">
@@ -332,7 +297,7 @@ export default function Admissions() {
                   <div className="adm-visit-icon"><Icon size={40} strokeWidth={1.75} /></div>
                   <h3>{v.title}</h3>
                   <p>{v.desc}</p>
-                  <Link to="/admissions" className="btn btn-outline" style={{ marginTop: 'auto' }}>Schedule Now</Link>
+                  <Link to="/campus-visit" className="btn btn-outline" style={{ marginTop: 'auto' }}>Schedule Now</Link>
                 </div>
               );
             })}
@@ -349,7 +314,7 @@ export default function Admissions() {
             title="Experience the VWU Difference"
             subtitle="From modern labs and smart classrooms to hostels, sports grounds, and a buzzing placement season — see what awaits you at VWU."
             highlights={[
-              'EAPCET college code: VISW',
+              `EAPCET college code: ${eapcetCode}`,
               '1,400+ placements in 2024–25 alone',
               'Highest package: ₹59.28 LPA',
               '100% scholarship coverage available for eligible students',

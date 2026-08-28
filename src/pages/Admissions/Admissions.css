@@ -143,88 +143,6 @@
   line-height: 1.5;
 }
 
-/* Scholarships */
-.adm-scholarship-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-5);
-  margin-bottom: var(--space-8);
-}
-
-.adm-scholarship-card {
-  background: var(--color-off-white);
-  border: 1.5px solid var(--color-light-gray);
-  border-radius: var(--radius-md);
-  padding: var(--space-5);
-  transition: all var(--transition-base);
-}
-
-.adm-scholarship-card:hover {
-  border-color: var(--color-accent);
-  box-shadow: var(--shadow-md);
-  transform: translateY(-3px);
-}
-
-.adm-scholarship-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: var(--space-3);
-  gap: var(--space-3);
-}
-
-.adm-scholarship-header h3 {
-  font-family: var(--font-sans);
-  font-size: var(--text-base);
-  font-weight: 700;
-  color: var(--color-primary);
-}
-
-.adm-scholarship-amount {
-  font-family: var(--font-serif);
-  font-size: var(--text-base);
-  font-weight: 900;
-  color: var(--color-accent);
-  white-space: nowrap;
-}
-
-.adm-scholarship-criteria {
-  font-size: var(--text-sm);
-  color: var(--color-text-light);
-}
-
-/* FAFSA CTA */
-.adm-fafsa-cta {
-  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
-  border-radius: var(--radius-lg);
-  padding: var(--space-6) var(--space-8);
-  display: flex;
-  align-items: center;
-  gap: var(--space-6);
-  color: var(--color-white);
-}
-
-.adm-fafsa-icon {
-  font-size: 3rem;
-  flex-shrink: 0;
-}
-
-.adm-fafsa-cta h3 {
-  color: var(--color-white);
-  font-size: var(--text-xl);
-  margin-bottom: var(--space-1);
-}
-
-.adm-fafsa-cta p {
-  color: rgba(255,255,255,0.75);
-  font-size: var(--text-sm);
-}
-
-.adm-fafsa-cta .btn {
-  flex-shrink: 0;
-  margin-left: auto;
-}
-
 /* Tuition */
 .adm-tuition-grid {
   display: grid;
@@ -438,9 +356,6 @@
     grid-template-columns: repeat(3, 1fr);
   }
   .adm-steps::before { display: none; }
-  .adm-scholarship-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
   .adm-visit-grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -460,18 +375,8 @@
   .adm-steps {
     grid-template-columns: 1fr;
   }
-  .adm-scholarship-grid {
-    grid-template-columns: 1fr;
-  }
   .adm-visit-grid {
     grid-template-columns: 1fr;
-  }
-  .adm-fafsa-cta {
-    flex-direction: column;
-    text-align: center;
-  }
-  .adm-fafsa-cta .btn {
-    margin-left: 0;
   }
   .adm-form-row {
     grid-template-columns: 1fr;

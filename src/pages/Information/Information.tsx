@@ -7,18 +7,15 @@ import { useSitePhotos, useSectionHasPhotos } from '../../hooks/useSitePhotos';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import type { CalendarEntry } from '../Admin/sections/AcademicCalendarAdmin';
 import type { HolidayEntry } from '../Admin/sections/HolidaysAdmin';
-import { Monitor, Plane, MapPin, Phone, Mail } from 'lucide-react';
-import { useContentBlocks } from '../../hooks/useContentBlocks';
+import { Monitor, Plane, MapPin, Phone, Mail, Navigation } from 'lucide-react';
+import { useContentBlocks, useEapcetCode } from '../../hooks/useContentBlocks';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import './Information.css';
 
-const defaultInfoPhotos = [
-  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Green campus environment', caption: 'Green Campus' },
-  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Campus aerial view', caption: 'Bhimavaram Campus' },
-  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Library resources', caption: 'e-Library' },
-  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Campus dining', caption: 'Food Courts' },
-  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Students at orientation', caption: 'Freshers Orientation' },
-];
+// Same coordinates as the embedded map on the Contact page. Omitting the
+// "origin" param makes Google Maps use the visitor's current location
+// (after they grant the browser permission prompt) as the route start.
+const GOOGLE_MAPS_DIRECTIONS_URL = 'https://www.google.com/maps/dir/?api=1&destination=16.568119,81.522098';
 
 const defaultPlacementsCareersPhotos = [
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Placement Drive', caption: '' },
@@ -57,7 +54,6 @@ export default function Information() {
 
   const { docs: academicCalendar } = useOrderedCollection<CalendarEntry>('academicCalendar', 'order');
   const { docs: holidays } = useOrderedCollection<HolidayEntry>('holidays', 'order');
-  const infoPhotos = useSitePhotos('information', 'main', defaultInfoPhotos);
   const placementsCareersPhotos = useSitePhotos('information', 'placements-careers', defaultPlacementsCareersPhotos);
   const hasPlacementsCareersPhotos = useSectionHasPhotos('information', 'placements-careers');
   const antiRaggingSafetyPhotos = useSitePhotos('information', 'anti-ragging-safety', defaultAntiRaggingSafetyPhotos);
@@ -66,6 +62,7 @@ export default function Information() {
   const howToReach = useContentBlocks('information', 'howToReach');
   const counsellingScheme = useContentBlocks('information', 'counsellingScheme');
   const otherPractices = useContentBlocks('information', 'otherPractices');
+  const eapcetCode = useEapcetCode();
 
   useEffect(() => {
     const tab = hashToTab[location.hash];
@@ -181,6 +178,11 @@ export default function Information() {
                 West Godavari District, Andhra Pradesh, India<br />
                 <a href="tel:08816250864" style={{ color: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><Phone size={14} /> 08816-250864</a> &nbsp;|&nbsp;
                 <a href="mailto:info@svecw.edu.in" style={{ color: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><Mail size={14} /> info@svecw.edu.in</a>
+                <div style={{ marginTop: 'var(--space-4)' }}>
+                  <a href={GOOGLE_MAPS_DIRECTIONS_URL} target="_blank" rel="noopener noreferrer" className="btn btn-accent">
+                    <Navigation size={16} strokeWidth={2} style={{ marginRight: '0.4rem' }} /> Get Route
+                  </a>
+                </div>
               </div>
             </div>
           )}
@@ -190,7 +192,7 @@ export default function Information() {
             <div>
               <h2 className="section-title" style={{ marginBottom: 'var(--space-4)' }}>AP EAPCET Counselling Scheme</h2>
               <p style={{ color: 'var(--color-text-light)', marginBottom: 'var(--space-8)', maxWidth: 680 }}>
-                Admissions to B.Tech programs at VWU are through AP EAPCET counselling. VWU College Code: <strong style={{ color: 'var(--color-primary)' }}>VISW</strong>. Follow the steps below to secure your seat.
+                Admissions to B.Tech programs at VWU are through AP EAPCET counselling. VWU College Code: <strong style={{ color: 'var(--color-primary)' }}>{eapcetCode}</strong>. Follow the steps below to secure your seat.
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
                 {counsellingScheme.map((s, i) => (
@@ -257,27 +259,6 @@ export default function Information() {
               </div>
             </div>
           )}
-        </div>
-      </section>
-
-      {/* Campus Photos */}
-      <section className="section bg-off-white">
-        <div className="container">
-          <PhotoGrid
-            images={infoPhotos}
-            label="Gallery"
-            title="VWU in Pictures"
-            subtitle="A visual glimpse of the campus, facilities, and everyday life at Vishnu Women's University in Bhimavaram."
-            highlights={[
-              'Located in Vishnupur, 3 km from Bhimavaram',
-              'Well connected by road, rail, and air',
-              'Academic calendar follows JNTUK schedule',
-              'Vishnu LMS, e-Library & ERP systems in use',
-              'NPTEL & SWAYAM MOOCs integrated into curriculum',
-            ]}
-            columns={2}
-            layout="side-text"
-          />
         </div>
       </section>
 
