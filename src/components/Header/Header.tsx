@@ -119,14 +119,13 @@ const navItems: NavItem[] = [
         items: [
           { label: 'Programs & Departments', path: '/academics' },
           { label: 'Faculty', path: '/faculty' },
-          { label: 'Academic Documents', path: '/academics/downloads' },
           { label: 'Result Analysis', path: '/result-analysis' },
           { label: 'Examinations', path: 'https://www.svecwexams.in/', external: true },
         ],
       },
       { groupLabel: 'UG Programmes', groupPath: '/academics?tab=btech', items: [] },
       { groupLabel: 'PG Programmes', groupPath: '/academics?tab=mtech', items: [] },
-      { groupLabel: 'Ph.D. Programmes', groupPath: '/academics?tab=phd', items: [] },
+      { groupLabel: 'Ph.D Programmes', groupPath: '/academics?tab=phd', items: [] },
       {
         groupLabel: 'Information',
         groupPath: '/information',
@@ -237,34 +236,27 @@ const navItems: NavItem[] = [
     ],
   },
   {
-    // Alumni & Giving's items live here as a second group (no longer its
-    // own top-level nav item) — see the "Success Stories" admin-redirect
-    // splice for this group in renderedNavItems below.
+    // Alumni & Giving used to live here as a second group — it now has its
+    // own place in the Footer (see Footer.tsx) instead of the header nav.
     label: 'News & Events',
     groups: [
       {
         groupLabel: 'News & Events',
         groupPath: '/news-awards',
         items: [
-          { label: 'Happenings at VWU', path: '/news-awards/happenings' },
-          { label: 'Social Media Handles', path: '/news-awards/social-media-handles' },
-          { label: 'Vishnu Era', path: 'https://www.srivishnu.edu.in/vishnu-era/', external: true },
-          { label: 'Accreditations', path: '/news-awards/accreditations-awards#accreditation' },
-          { label: 'Rankings & Awards', path: '/news-awards/accreditations-awards#ranking' },
+          { label: 'Upcoming Events', path: '/news-awards/happenings#upcoming-events' },
+          { label: 'Recent Events', path: '/news-awards/happenings#recent-events' },
           { label: 'Gallery', path: '/news-awards/gallery' },
-          { label: 'News', path: '/news' },
-          { label: 'Events', path: '/events' },
+          { label: 'Vishnu Era', path: 'https://www.srivishnu.edu.in/vishnu-era/', external: true },
+          { label: 'Prathibha Magazine', path: 'https://heyzine.com/flip-book/088b7b5629.html#page/54', external: true },
         ],
       },
       {
-        groupLabel: 'Alumni & Giving',
-        groupPath: '/alumni-giving',
+        groupLabel: 'Accreditations & Rankings',
+        groupPath: '/news-awards/accreditations-awards',
         items: [
-          { label: 'Alumni Network', path: '/alumni-giving#network' },
-          { label: 'Giving Opportunities', path: '/alumni-giving#give' },
-          { label: 'Alumni Events', path: '/alumni-giving#events' },
-          { label: 'Prathibha Magazine', path: '/alumni-giving#magazine' },
-          { label: 'Success Stories', path: '/placements/success-stories' },
+          { label: 'Accreditations', path: '/news-awards/accreditations-awards#accreditation' },
+          { label: 'Rankings & Awards', path: '/news-awards/accreditations-awards#ranking' },
         ],
       },
     ],
@@ -298,16 +290,24 @@ export default function Header() {
   const navRef = useRef<HTMLElement>(null);
   const megaRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  // Admin-editable via /admin → Navigation Link Redirects (NavLinkOverridesAdmin.tsx).
-  // Decoupled from Placements' own "Success Stories" item, which stays hardcoded.
-  // Default target is AlumniGiving.tsx's own "#successstories" section, not Placements.
-  const alumniSuccessStories = useNavLinkOverride('alumni-success-stories', '/alumni-giving#successstories');
   // Header's Apply Now button — admin can repoint it (e.g. to a specific
   // admissions cycle or an external application portal) without a deploy.
   const headerApplyNow = useNavLinkOverride('header-apply-now', '/admissions');
 
   const { docs: programs } = useOrderedCollection<ProgramDoc>('programs', 'order');
-  const programItem = (p: ProgramDoc): NavChild => ({ label: p.name, path: `/academics/${p.slug}` });
+  // Both VLSI programs (B.Tech "Electronics Engineering [VSLI Design &
+  // Technology]", slug EVT — note the name has a real typo, "VSLI" not
+  // "VLSI" — and M.Tech "VLSI Design") route to the ECE B.Tech page instead
+  // of their own program detail page — there's no separate VLSI page to
+  // link to, so the nav entry still needs to go somewhere useful. Matched
+  // on slug as well as name so the EVT typo can't cause this to silently
+  // stop working.
+  const isVlsiProgram = (p: ProgramDoc) =>
+    p.slug.toUpperCase() === 'EVT' || /VLSI|VSLI/.test(p.name.toUpperCase());
+  const programItem = (p: ProgramDoc): NavChild => ({
+    label: p.name,
+    path: isVlsiProgram(p) ? '/academics/ece' : `/academics/${p.slug}`,
+  });
   const ugProgrammes = programs.filter((p) => p.category === 'btech').map(programItem);
   const pgProgrammes = programs.filter((p) => p.category === 'mtech' || p.category === 'mba').map(programItem);
   const phdProgrammes = programs.filter((p) => p.category === 'phd').map(programItem);
@@ -322,26 +322,9 @@ export default function Header() {
       const groups = item.groups.map((group) => {
         if (group.groupLabel === 'UG Programmes') return { ...group, items: ugProgrammes };
         if (group.groupLabel === 'PG Programmes') return { ...group, items: pgProgrammes };
-        if (group.groupLabel === 'Ph.D. Programmes') return { ...group, items: phdProgrammes };
+        if (group.groupLabel === 'Ph.D Programmes') return { ...group, items: phdProgrammes };
         return group;
       });
-      return { ...item, groups };
-    }
-    // "Success Stories" here is admin-redirectable independently of
-    // Placements' own "Success Stories" item — see alumniSuccessStories above.
-    if (item.label === 'News & Events' && item.groups) {
-      const groups = item.groups.map((group) =>
-        group.groupLabel === 'Alumni & Giving'
-          ? {
-              ...group,
-              items: group.items.map((child) =>
-                child.label === 'Success Stories'
-                  ? { ...child, path: alumniSuccessStories.path, external: alumniSuccessStories.external }
-                  : child
-              ),
-            }
-          : group
-      );
       return { ...item, groups };
     }
     // Category groups here are populated from live Firestore data since

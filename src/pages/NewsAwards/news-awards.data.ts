@@ -12,6 +12,10 @@ export interface GalleryAlbum {
 
 export const galleryAlbums: GalleryAlbum[] = [
   // 2026
+  { title: "A New Era of Excellence – Inauguration Ceremony 2026 – Vishnu Women's University", date: 'August 23, 2026', year: 2026 },
+  { title: 'Celebrations of Remarkable Achievement in Admissions of EAPCET 2026', date: 'August 13, 2026', year: 2026 },
+  { title: 'Celebrations of International Yoga Day 2026', date: 'June 21, 2026', year: 2026 },
+  { title: 'Celebrations of World Environment Day 2026', date: 'June 5, 2026', year: 2026 },
   { title: 'Signed MoU with Mahindra & Mahindra', date: 'March 9, 2026', year: 2026 },
   { title: 'Annual Day 2026 – Celebrations', date: 'March 7, 2026', year: 2026 },
   { title: 'TECHNOVA 2026 – Valedictory', date: 'March 7, 2026', year: 2026 },
