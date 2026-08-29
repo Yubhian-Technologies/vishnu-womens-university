@@ -3,7 +3,8 @@ import { collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp } from '
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
 import { CONTENT_ICON_NAMES } from '../../../lib/contentIcons';
-import { deleteFile } from '../../../lib/storage';
+import { deleteFile, type UploadResult } from '../../../lib/storage';
+import FileUploader from '../../../components/FileUploader/FileUploader';
 
 export interface ResearchItemDoc {
   id: string;
@@ -20,12 +21,15 @@ export interface ResearchItemDoc {
   projectsText: string;
   heroImage: string;
   heroStoragePath: string;
+  policyPdfUrl: string;
+  policyPdfStoragePath: string;
   order: number;
 }
 
 const EMPTY: Omit<ResearchItemDoc, 'id'> = {
   slug: '', title: '', category: 'governance', icon: 'Microscope', desc: '', intro: '', about: '',
-  highlights: [], tableText: '', accordionText: '', projectsText: '', heroImage: '', heroStoragePath: '', order: 0,
+  highlights: [], tableText: '', accordionText: '', projectsText: '', heroImage: '', heroStoragePath: '',
+  policyPdfUrl: '', policyPdfStoragePath: '', order: 0,
 };
 
 const CATEGORIES: { value: ResearchItemDoc['category']; label: string }[] = [
@@ -49,6 +53,7 @@ export default function ResearchItemsAdmin() {
   const [filterCat, setFilterCat] = useState<string>('All');
 
   const set = (k: string, v: string | number | string[]) => setForm((p) => ({ ...p, [k]: v }));
+  const handlePolicyPdf = (r: UploadResult) => setForm((p) => ({ ...p, policyPdfUrl: r.url, policyPdfStoragePath: r.path }));
 
   const save = async () => {
     if (!form.slug || !form.title) return alert('Slug and title are required.');
@@ -71,14 +76,16 @@ export default function ResearchItemsAdmin() {
       slug: it.slug, title: it.title, category: it.category, icon: it.icon || 'Microscope',
       desc: it.desc || '', intro: it.intro || '', about: it.about || '',
       highlights: it.highlights || [], tableText: it.tableText || '', accordionText: it.accordionText || '',
-      projectsText: it.projectsText || '', heroImage: it.heroImage || '', heroStoragePath: it.heroStoragePath || '', order: it.order,
+      projectsText: it.projectsText || '', heroImage: it.heroImage || '', heroStoragePath: it.heroStoragePath || '',
+      policyPdfUrl: it.policyPdfUrl || '', policyPdfStoragePath: it.policyPdfStoragePath || '', order: it.order,
     });
   };
 
-  const remove = async (id: string, heroStoragePath?: string) => {
+  const remove = async (id: string, heroStoragePath?: string, policyPdfStoragePath?: string) => {
     if (!confirm('Delete this research item?')) return;
     try {
       if (heroStoragePath) await deleteFile(heroStoragePath);
+      if (policyPdfStoragePath) await deleteFile(policyPdfStoragePath);
       await deleteDoc(doc(db, 'researchItems', id));
     } catch (e) {
       alert(`Couldn't delete: ${(e as Error).message}`);
@@ -135,8 +142,15 @@ export default function ResearchItemsAdmin() {
             <textarea rows={3} value={form.intro} onChange={(e) => set('intro', e.target.value)} />
           </div>
           <div className="admin-field admin-field--full">
-            <label>About (longer detail paragraph — optional)</label>
-            <textarea rows={4} value={form.about} onChange={(e) => set('about', e.target.value)} />
+            <label>About (longer detail content — optional). Plain lines join into a paragraph. Start a
+              line with <code>## </code> for a bold sub-heading, or <code>- </code> for a checklist bullet
+              (use <code>- Label: rest</code> to bold just the label) — e.g. <code>## Key Objectives</code>{' '}
+              then <code>- Advise on Policy: Guidance on formulation and implementation.</code></label>
+            <textarea rows={6} value={form.about} onChange={(e) => set('about', e.target.value)} />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label>Policy PDF (optional — e.g. the "*** R&D Policy ***" download link on About R&D)</label>
+            <FileUploader folder="vwu/research-policies" currentUrl={form.policyPdfUrl} onUploaded={handlePolicyPdf} label="Upload PDF" />
           </div>
           <div className="admin-field admin-field--full">
             <label>Key Highlights (one per line — optional)</label>
@@ -201,7 +215,7 @@ export default function ResearchItemsAdmin() {
                     <td>{it.slug}</td>
                     <td>
                       <button className="admin-btn admin-btn--sm" onClick={() => startEdit(it)}>Edit</button>
-                      <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(it.id, it.heroStoragePath)}>Delete</button>
+                      <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(it.id, it.heroStoragePath, it.policyPdfStoragePath)}>Delete</button>
                     </td>
                   </tr>
                 ))}
