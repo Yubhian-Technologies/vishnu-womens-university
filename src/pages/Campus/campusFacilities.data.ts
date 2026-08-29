@@ -36,18 +36,16 @@ Our technologically advanced classrooms create an environment where teaching and
 
 #### Apart from regular experiments, all departments conduct additional experiments in all laboratories to train the students in the cutting edge technologies.
 
-- Electrical & Electronics
-- Engineering Labs
-- Electronics & Communication
-- Engineering Labs
-- Computer Science &
-- Engineering Labs
+- Electronics Engineering (VLSI Design & Technology) Labs
+- Electronics & Communication Engineering Labs
+- Electrical & Electronics Engineering Labs
+- Computer Science & Engineering Labs
 - Information Technology Labs
-- Mechanical Engineering Labs
+- Artificial Intelligence Labs
 - Civil Engineering Labs
-- Master of Business
-- Administration Labs
-- Basic Science Labs`,
+- Mechanical Engineering Labs
+- Basic Science Labs
+- Master of Business Administration Labs`,
     desc: 'Specialised laboratories across every department give students hands-on access to modern equipment and tools, supporting practical learning alongside classroom instruction.',
   },
   {
@@ -58,9 +56,9 @@ Our technologically advanced classrooms create an environment where teaching and
 
 # Central Library
 
-The Library of Shri Vishnu Engineering College for Women(Autonomous) was built to keep up International Standards. The air conditioned library has three floors with an area of 1083 Sq.m. and well-protected with security system. Specialized collections of Books, Journals & Non-book materials are available in Engineering & Technology, Basic Sciences, and Management Sciences. It is replete with 59721 volumes of books, 1380 Journal Back Volumes, 4000 CDs, and 250 audio cassettes.
+The Library of Vishnu Women's University (VWU) was built to keep up International Standards. The air conditioned library has three floors with an area of 1083 Sq.m. and well-protected with security system. Specialized collections of Books, Journals & Non-book materials are available in Engineering & Technology, Basic Sciences, and Management Sciences. It is replete with 59721 volumes of books, 1380 Journal Back Volumes, 4000 CDs, and 250 audio cassettes.
 
-The Library contributes to the fulfillment of Our Institution’s mission by selecting, acquiring, organizing, maintaining and making accessible a collection of printed and non-printed, primary and secondary materials that will support the educational, research and public service programmes of both students and faculty.
+The Library contributes to the fulfillment of Our University’s mission by selecting, acquiring, organizing, maintaining and making accessible a collection of printed and non-printed, primary and secondary materials that will support the educational, research and public service programmes of both students and faculty.
 
 - Responding to the varying needs of the academic community by involving the faculty, the students and the administration in the development and periodic assessment of the library services and resources.
 - Providing library users with point-of-use instruction, personal assistance in conducting literature research and other reference services.
