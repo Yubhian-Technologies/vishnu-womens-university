@@ -177,7 +177,7 @@ export default function Information() {
                 Vishnu Women's University, Vishnupur, Bhimavaram – 534 202<br />
                 West Godavari District, Andhra Pradesh, India<br />
                 <a href="tel:08816250864" style={{ color: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><Phone size={14} /> 08816-250864</a> &nbsp;|&nbsp;
-                <a href="mailto:info@svecw.edu.in" style={{ color: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><Mail size={14} /> info@svecw.edu.in</a>
+                <a href="mailto:info@vwu.edu.in" style={{ color: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><Mail size={14} /> info@vwu.edu.in</a>
                 <div style={{ marginTop: 'var(--space-4)' }}>
                   <a href={GOOGLE_MAPS_DIRECTIONS_URL} target="_blank" rel="noopener noreferrer" className="btn btn-accent">
                     <Navigation size={16} strokeWidth={2} style={{ marginRight: '0.4rem' }} /> Get Route

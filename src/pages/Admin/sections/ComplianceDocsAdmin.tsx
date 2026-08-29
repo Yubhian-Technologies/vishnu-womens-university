@@ -23,7 +23,7 @@ export interface ComplianceDocDoc {
 
 const EMPTY: Omit<ComplianceDocDoc, 'id'> = {
   group: 'Approvals & Accreditations', label: '', fileUrl: '', storagePath: '',
-  external: false, download: true, key: '', order: 0,
+  external: false, download: false, key: '', order: 0,
 };
 
 export const COMPLIANCE_GROUPS = [
@@ -37,17 +37,17 @@ export const COMPLIANCE_GROUPS = [
 // collection" fallback (so the footer never looks broken) and as the
 // one-click starting point for admins moving these into Firestore.
 export const DEFAULT_COMPLIANCE_DOCS: Omit<ComplianceDocDoc, 'id'>[] = [
-  { group: 'Approvals & Accreditations', label: 'AICTE Approvals', fileUrl: '/downloads/AICTEApprovals.pdf', storagePath: '', external: false, download: true, key: 'aicte-approvals', order: 1 },
-  { group: 'Approvals & Accreditations', label: 'UGC Autonomous Approvals', fileUrl: '/downloads/UGCAutonomousApprovals.pdf', storagePath: '', external: false, download: true, key: 'ugc-autonomous-approvals', order: 2 },
-  { group: 'Approvals & Accreditations', label: 'UGC - 12B 2f Letter', fileUrl: '/downloads/UGC12B2FLetter.pdf', storagePath: '', external: false, download: true, key: 'ugc-12b-2f', order: 3 },
-  { group: 'Approvals & Accreditations', label: 'JNTUK Affiliation Approvals', fileUrl: '/downloads/JNTUKAffiliationApprovals.pdf', storagePath: '', external: false, download: true, key: 'jntuk-affiliation-approvals', order: 4 },
-  { group: 'Approvals & Accreditations', label: 'JNTUK Autonomous Approvals', fileUrl: '/downloads/JNTUKAutonomousApprovals.pdf', storagePath: '', external: false, download: true, key: 'jntuk-autonomous-approvals', order: 5 },
-  { group: 'Approvals & Accreditations', label: 'NAAC Approvals', fileUrl: '/downloads/NAACApprovals.pdf', storagePath: '', external: false, download: true, key: 'naac-approvals', order: 6 },
-  { group: 'Approvals & Accreditations', label: 'NBA Approvals', fileUrl: '/downloads/NBAApprovals.pdf', storagePath: '', external: false, download: true, key: 'nba-approvals', order: 7 },
-  { group: 'Mandatory Disclosures', label: 'AICTE Mandatory Disclosures', fileUrl: '/downloads/AICTEMandatoryDisclosures.pdf', storagePath: '', external: false, download: true, key: 'aicte-mandatory-disclosures', order: 1 },
-  { group: 'Mandatory Disclosures', label: 'UGC Public Self Disclosure', fileUrl: '/downloads/UGCPublicSelfDisclosure.pdf', storagePath: '', external: false, download: true, key: 'ugc-public-self-disclosure', order: 2 },
-  { group: 'Mandatory Disclosures', label: 'JNTUK Mandatory Disclosure', fileUrl: '/downloads/JNTUKMandatoryDisclosure.pdf', storagePath: '', external: false, download: true, key: 'jntuk-mandatory-disclosure', order: 3 },
-  { group: 'Mandatory Disclosures', label: 'RTI-Undertaking', fileUrl: '/downloads/RTIUndertaking.pdf', storagePath: '', external: false, download: true, key: 'rti-undertaking', order: 4 },
+  { group: 'Approvals & Accreditations', label: 'AICTE Approvals', fileUrl: '/downloads/AICTEApprovals.pdf', storagePath: '', external: false, download: false, key: 'aicte-approvals', order: 1 },
+  { group: 'Approvals & Accreditations', label: 'UGC Autonomous Approvals', fileUrl: '/downloads/UGCAutonomousApprovals.pdf', storagePath: '', external: false, download: false, key: 'ugc-autonomous-approvals', order: 2 },
+  { group: 'Approvals & Accreditations', label: 'UGC - 12B 2f Letter', fileUrl: '/downloads/UGC12B2FLetter.pdf', storagePath: '', external: false, download: false, key: 'ugc-12b-2f', order: 3 },
+  { group: 'Approvals & Accreditations', label: 'JNTUK Affiliation Approvals', fileUrl: '/downloads/JNTUKAffiliationApprovals.pdf', storagePath: '', external: false, download: false, key: 'jntuk-affiliation-approvals', order: 4 },
+  { group: 'Approvals & Accreditations', label: 'JNTUK Autonomous Approvals', fileUrl: '/downloads/JNTUKAutonomousApprovals.pdf', storagePath: '', external: false, download: false, key: 'jntuk-autonomous-approvals', order: 5 },
+  { group: 'Approvals & Accreditations', label: 'NAAC Approvals', fileUrl: '/downloads/NAACApprovals.pdf', storagePath: '', external: false, download: false, key: 'naac-approvals', order: 6 },
+  { group: 'Approvals & Accreditations', label: 'NBA Approvals', fileUrl: '/downloads/NBAApprovals.pdf', storagePath: '', external: false, download: false, key: 'nba-approvals', order: 7 },
+  { group: 'Mandatory Disclosures', label: 'AICTE Mandatory Disclosures', fileUrl: '/downloads/AICTEMandatoryDisclosures.pdf', storagePath: '', external: false, download: false, key: 'aicte-mandatory-disclosures', order: 1 },
+  { group: 'Mandatory Disclosures', label: 'UGC Public Self Disclosure', fileUrl: '/downloads/UGCPublicSelfDisclosure.pdf', storagePath: '', external: false, download: false, key: 'ugc-public-self-disclosure', order: 2 },
+  { group: 'Mandatory Disclosures', label: 'JNTUK Mandatory Disclosure', fileUrl: '/downloads/JNTUKMandatoryDisclosure.pdf', storagePath: '', external: false, download: false, key: 'jntuk-mandatory-disclosure', order: 3 },
+  { group: 'Mandatory Disclosures', label: 'RTI-Undertaking', fileUrl: '/downloads/RTIUndertaking.pdf', storagePath: '', external: false, download: false, key: 'rti-undertaking', order: 4 },
   { group: 'Mandatory Disclosures', label: 'Anti Ragging Policies', fileUrl: '/anti-ragging', storagePath: '', external: true, download: false, key: 'anti-ragging-policies', order: 5 },
   { group: 'Mandatory Disclosures', label: 'Policies & Procedures', fileUrl: '/policies-procedures', storagePath: '', external: true, download: false, key: 'policies-procedures', order: 6 },
   { group: 'Infrastructure & Facilities', label: 'College Fee Payment', fileUrl: '/downloads/SVECWCollegeFeePayment.pdf', storagePath: '', external: false, download: false, key: 'college-fee-payment', order: 1 },
@@ -140,14 +140,14 @@ export default function ComplianceDocsAdmin() {
         </p>
         <div className="admin-form-grid">
           <div className="admin-field">
-            <label>Group *</label>
-            <select value={form.group} onChange={(e) => set('group', e.target.value)}>
+            <label htmlFor="field-group">Group *</label>
+            <select id="field-group" value={form.group} onChange={(e) => set('group', e.target.value)}>
               {COMPLIANCE_GROUPS.map((g) => <option key={g} value={g}>{g}</option>)}
             </select>
           </div>
           <div className="admin-field">
-            <label>Label *</label>
-            <input value={form.label} onChange={(e) => set('label', e.target.value)} placeholder="NAAC Approvals" />
+            <label htmlFor="field-label">Label *</label>
+            <input id="field-label" value={form.label} onChange={(e) => set('label', e.target.value)} placeholder="NAAC Approvals" />
           </div>
           <div className="admin-field">
             <label>
@@ -157,8 +157,8 @@ export default function ComplianceDocsAdmin() {
           </div>
           {form.external ? (
             <div className="admin-field">
-              <label>External URL *</label>
-              <input value={form.fileUrl} onChange={(e) => set('fileUrl', e.target.value)} placeholder="https://svecw.edu.in/policies-procedures/" />
+              <label htmlFor="field-external-url">External URL *</label>
+              <input id="field-external-url" value={form.fileUrl} onChange={(e) => set('fileUrl', e.target.value)} placeholder="https://svecw.edu.in/policies-procedures/" />
             </div>
           ) : (
             <>
@@ -175,12 +175,12 @@ export default function ComplianceDocsAdmin() {
             </>
           )}
           <div className="admin-field">
-            <label>Reference Key (optional — see note above; leave blank for a one-off document)</label>
-            <input value={form.key} onChange={(e) => set('key', e.target.value.trim().toLowerCase().replace(/\s+/g, '-'))} placeholder="naac-approvals" />
+            <label htmlFor="field-reference-key-optional-see-note">Reference Key (optional — see note above; leave blank for a one-off document)</label>
+            <input id="field-reference-key-optional-see-note" value={form.key} onChange={(e) => set('key', e.target.value.trim().toLowerCase().replace(/\s+/g, '-'))} placeholder="naac-approvals" />
           </div>
           <div className="admin-field">
-            <label>Display Order</label>
-            <input type="number" value={form.order} onChange={(e) => set('order', Number(e.target.value))} min={0} />
+            <label htmlFor="field-display-order">Display Order</label>
+            <input id="field-display-order" type="number" value={form.order} onChange={(e) => set('order', Number(e.target.value))} min={0} />
           </div>
         </div>
         <div className="admin-form-actions">

@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
-  collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp,
+  collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp, writeBatch,
 } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
@@ -139,7 +139,10 @@ const EMPTY: Omit<ProgramDoc, 'id'> = {
 };
 
 const CATEGORIES = ['btech', 'mtech', 'mba', 'phd'];
-const DEPARTMENTS = ['CSE', 'AI&ML', 'AI&DS', 'Cyber Security', 'IT', 'ECE', 'EEE', 'Civil', 'Mechanical', 'MBA'];
+// Display-only labels — the stored `category` value stays lowercase since
+// public pages (e.g. Academics.tsx) filter on it directly.
+const CATEGORY_LABELS: Record<string, string> = { btech: 'B.Tech', mtech: 'M.Tech', mba: 'MBA', phd: 'Ph.D.' };
+const DEPARTMENTS = ['CSE', 'AI', 'Cyber Security', 'IT', 'ECE', 'EEE', 'Civil', 'Mechanical', 'MBA'];
 
 function linesToArray(text: string): string[] {
   return text.split('\n').map((s) => s.trim()).filter(Boolean);
@@ -161,10 +164,50 @@ function textToLinks(text: string): ProgramLink[] {
 }
 
 export default function ProgramsAdmin() {
-  const { docs: programs, loading } = useOrderedCollection<ProgramDoc>('programs', 'name');
+  const { docs: programs, loading } = useOrderedCollection<ProgramDoc>('programs', 'order');
   const [form, setForm] = useState<Omit<ProgramDoc, 'id'>>(EMPTY);
   const [editing, setEditing] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+
+  // Drag-to-reorder for the programs table — grouped by category (B.Tech,
+  // M.Tech, MBA, Ph.D. each get their own list) since that's how the public
+  // Academics page's tabs filter and display them: `order` only needs to be
+  // consistent within a category, not across all four.
+  const [groupedOrdered, setGroupedOrdered] = useState<Record<string, ProgramDoc[]>>({});
+  const [drag, setDrag] = useState<{ cat: string; index: number } | null>(null);
+  useEffect(() => {
+    const groups: Record<string, ProgramDoc[]> = {};
+    CATEGORIES.forEach((c) => { groups[c] = []; });
+    programs.forEach((p) => { (groups[p.category] ??= []).push(p); });
+    setGroupedOrdered(groups);
+  }, [programs]);
+
+  const handleDragOver = (cat: string, i: number) => {
+    if (!drag || drag.cat !== cat || drag.index === i) return;
+    setGroupedOrdered((prev) => {
+      const list = [...(prev[cat] || [])];
+      const [moved] = list.splice(drag.index, 1);
+      list.splice(i, 0, moved);
+      return { ...prev, [cat]: list };
+    });
+    setDrag({ cat, index: i });
+  };
+  const handleDrop = async (cat: string) => {
+    setDrag(null);
+    const list = groupedOrdered[cat] || [];
+    const batch = writeBatch(db);
+    let changed = false;
+    list.forEach((p, i) => {
+      if (p.order !== i) { batch.update(doc(db, 'programs', p.id), { order: i }); changed = true; }
+    });
+    if (changed) {
+      try {
+        await batch.commit();
+      } catch (e) {
+        alert(`Couldn't save new order: ${(e as Error).message}`);
+      }
+    }
+  };
 
   const set = (k: string, v: string | number | string[] | ProgramSemester[] | ProgramLink[] | LibrarySection[] | NewsEventsYear[] | NewsletterYear[]) => setForm((p) => ({ ...p, [k]: v }));
   const handleHodImage = (r: UploadResult) => setForm((p) => ({ ...p, hodImage: r.url, hodImageStoragePath: r.path }));
@@ -390,7 +433,7 @@ export default function ProgramsAdmin() {
       if (editing) {
         await updateDoc(doc(db, 'programs', editing), { ...form });
       } else {
-        await addDoc(collection(db, 'programs'), { ...form, createdAt: serverTimestamp() });
+        await addDoc(collection(db, 'programs'), { ...form, order: form.order || programs.filter((p) => p.category === form.category).length, createdAt: serverTimestamp() });
       }
       setForm(EMPTY); setEditing(null);
     } catch (e) {
@@ -442,75 +485,75 @@ export default function ProgramsAdmin() {
         </p>
         <div className="admin-form-grid">
           <div className="admin-field">
-            <label>Full Name *</label>
-            <input value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="B.Tech Computer Science and Engineering" />
+            <label htmlFor="field-full-name">Full Name *</label>
+            <input id="field-full-name" value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="B.Tech Computer Science and Engineering" />
           </div>
           <div className="admin-field">
-            <label>Short Name</label>
-            <input value={form.shortName} onChange={(e) => set('shortName', e.target.value)} placeholder="B.Tech CSE" />
+            <label htmlFor="field-short-name">Short Name</label>
+            <input id="field-short-name" value={form.shortName} onChange={(e) => set('shortName', e.target.value)} placeholder="B.Tech CSE" />
           </div>
           <div className="admin-field">
-            <label>Slug (used in URL) *</label>
-            <input value={form.slug} onChange={(e) => set('slug', e.target.value)} placeholder="cse" />
+            <label htmlFor="field-slug-used-in-url">Slug (used in URL) *</label>
+            <input id="field-slug-used-in-url" value={form.slug} onChange={(e) => set('slug', e.target.value)} placeholder="cse" />
           </div>
           <div className="admin-field">
-            <label>Icon</label>
-            <select value={form.icon} onChange={(e) => set('icon', e.target.value)}>
+            <label htmlFor="field-icon">Icon</label>
+            <select id="field-icon" value={form.icon} onChange={(e) => set('icon', e.target.value)}>
               {PROGRAM_ICON_NAMES.map((n) => <option key={n} value={n}>{n}</option>)}
             </select>
           </div>
           <div className="admin-field">
-            <label>Category</label>
-            <select value={form.category} onChange={(e) => set('category', e.target.value)}>
-              {CATEGORIES.map((c) => <option key={c} value={c}>{c.toUpperCase()}</option>)}
+            <label htmlFor="field-category">Category</label>
+            <select id="field-category" value={form.category} onChange={(e) => set('category', e.target.value)}>
+              {CATEGORIES.map((c) => <option key={c} value={c}>{CATEGORY_LABELS[c]}</option>)}
             </select>
           </div>
           <div className="admin-field">
-            <label>Intake (seats)</label>
-            <input type="number" value={form.intake} onChange={(e) => set('intake', +e.target.value)} min={0} />
+            <label htmlFor="field-intake-seats">Intake (seats)</label>
+            <input id="field-intake-seats" type="number" value={form.intake} onChange={(e) => set('intake', +e.target.value)} min={0} />
           </div>
           <div className="admin-field">
-            <label>Established Year</label>
-            <input value={form.established} onChange={(e) => set('established', e.target.value)} placeholder="2000" />
+            <label htmlFor="field-established-year">Established Year</label>
+            <input id="field-established-year" value={form.established} onChange={(e) => set('established', e.target.value)} placeholder="2000" />
           </div>
           <div className="admin-field">
-            <label>Accreditation</label>
-            <input value={form.accreditation} onChange={(e) => set('accreditation', e.target.value)} placeholder="NBA Tier-I Accredited" />
+            <label htmlFor="field-accreditation">Accreditation</label>
+            <input id="field-accreditation" value={form.accreditation} onChange={(e) => set('accreditation', e.target.value)} placeholder="NBA Tier-I Accredited" />
           </div>
           <div className="admin-field">
-            <label>Annual Fee</label>
-            <input value={form.fee} onChange={(e) => set('fee', e.target.value)} placeholder="₹ 1,05,000" />
+            <label htmlFor="field-annual-fee">Annual Fee</label>
+            <input id="field-annual-fee" value={form.fee} onChange={(e) => set('fee', e.target.value)} placeholder="₹ 1,05,000" />
           </div>
           <div className="admin-field">
-            <label>Head of Department</label>
-            <input value={form.hod} onChange={(e) => set('hod', e.target.value)} placeholder="Dr. Name" />
+            <label htmlFor="field-head-of-department">Head of Department</label>
+            <input id="field-head-of-department" value={form.hod} onChange={(e) => set('hod', e.target.value)} placeholder="Dr. Name" />
           </div>
           <div className="admin-field">
-            <label>Department (links this program to the Faculty page)</label>
-            <input list="program-departments" value={form.department} onChange={(e) => set('department', e.target.value)} placeholder="CSE" />
+            <label htmlFor="field-department-links-this-program-to">Department (links this program to the Faculty page)</label>
+            <input id="field-department-links-this-program-to" list="program-departments" value={form.department} onChange={(e) => set('department', e.target.value)} placeholder="CSE" />
             <datalist id="program-departments">
               {DEPARTMENTS.map((d) => <option key={d} value={d} />)}
             </datalist>
           </div>
           <div className="admin-field">
-            <label>Display Order</label>
-            <input type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
+            <label htmlFor="field-display-order">Display Order</label>
+            <input id="field-display-order" type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
           </div>
           <div className="admin-field admin-field--full">
-            <label>About</label>
-            <textarea rows={4} value={form.about} onChange={(e) => set('about', e.target.value)} placeholder="Department overview…" />
+            <label htmlFor="field-about">About</label>
+            <textarea id="field-about" rows={4} value={form.about} onChange={(e) => set('about', e.target.value)} placeholder="Department overview…" />
           </div>
           <div className="admin-field admin-field--full">
-            <label>Highlights (one per line)</label>
-            <textarea rows={5} value={arrayToLines(form.highlights)} onChange={(e) => set('highlights', linesToArray(e.target.value))} placeholder="NBA Tier-I Accredited undergraduate programme" />
+            <label htmlFor="field-highlights-one-per-line">Highlights (one per line)</label>
+            <textarea id="field-highlights-one-per-line" rows={5} value={arrayToLines(form.highlights)} onChange={(e) => set('highlights', linesToArray(e.target.value))} placeholder="NBA Tier-I Accredited undergraduate programme" />
           </div>
           <div className="admin-field admin-field--full">
-            <label>Labs (one per line)</label>
-            <textarea rows={5} value={arrayToLines(form.labs)} onChange={(e) => set('labs', linesToArray(e.target.value))} placeholder="Advanced Computing Lab" />
+            <label htmlFor="field-labs-one-per-line">Labs (one per line)</label>
+            <textarea id="field-labs-one-per-line" rows={5} value={arrayToLines(form.labs)} onChange={(e) => set('labs', linesToArray(e.target.value))} placeholder="Advanced Computing Lab" />
           </div>
           <div className="admin-field admin-field--full">
-            <label>Career Outcomes (one per line)</label>
-            <textarea rows={5} value={arrayToLines(form.outcomes)} onChange={(e) => set('outcomes', linesToArray(e.target.value))} placeholder="Software Engineer / Developer" />
+            <label htmlFor="field-career-outcomes-one-per-line">Career Outcomes (one per line)</label>
+            <textarea id="field-career-outcomes-one-per-line" rows={5} value={arrayToLines(form.outcomes)} onChange={(e) => set('outcomes', linesToArray(e.target.value))} placeholder="Software Engineer / Developer" />
           </div>
           <div className="admin-field admin-field--full"><hr /><h3>Programme Structure (Semester-wise Curriculum)</h3></div>
           <div className="admin-field admin-field--full">
@@ -566,30 +609,30 @@ export default function ProgramsAdmin() {
 
           <div className="admin-field admin-field--full"><hr /><h3>Vision, Mission & Values</h3></div>
           <div className="admin-field admin-field--full">
-            <label>Vision</label>
-            <textarea rows={3} value={form.vision} onChange={(e) => set('vision', e.target.value)} placeholder="To be a centre of excellence in…" />
+            <label htmlFor="field-vision">Vision</label>
+            <textarea id="field-vision" rows={3} value={form.vision} onChange={(e) => set('vision', e.target.value)} placeholder="To be a centre of excellence in…" />
           </div>
           <div className="admin-field admin-field--full">
-            <label>Mission (one point per line)</label>
-            <textarea rows={4} value={arrayToLines(form.mission)} onChange={(e) => set('mission', linesToArray(e.target.value))} placeholder="To impart quality technical education…" />
+            <label htmlFor="field-mission-one-point-per-line">Mission (one point per line)</label>
+            <textarea id="field-mission-one-point-per-line" rows={4} value={arrayToLines(form.mission)} onChange={(e) => set('mission', linesToArray(e.target.value))} placeholder="To impart quality technical education…" />
           </div>
           <div className="admin-field admin-field--full">
-            <label>Core Values (one per line)</label>
-            <textarea rows={3} value={arrayToLines(form.coreValues)} onChange={(e) => set('coreValues', linesToArray(e.target.value))} placeholder="Integrity" />
+            <label htmlFor="field-core-values-one-per-line">Core Values (one per line)</label>
+            <textarea id="field-core-values-one-per-line" rows={3} value={arrayToLines(form.coreValues)} onChange={(e) => set('coreValues', linesToArray(e.target.value))} placeholder="Integrity" />
           </div>
 
           <div className="admin-field admin-field--full"><hr /><h3>PEOs, POs & PSOs</h3></div>
           <div className="admin-field admin-field--full">
-            <label>Programme Educational Objectives — PEOs (one per line)</label>
-            <textarea rows={4} value={arrayToLines(form.peos)} onChange={(e) => set('peos', linesToArray(e.target.value))} placeholder="Graduates will excel in…" />
+            <label htmlFor="field-programme-educational-objectives-peos-one">Programme Educational Objectives — PEOs (one per line)</label>
+            <textarea id="field-programme-educational-objectives-peos-one" rows={4} value={arrayToLines(form.peos)} onChange={(e) => set('peos', linesToArray(e.target.value))} placeholder="Graduates will excel in…" />
           </div>
           <div className="admin-field admin-field--full">
-            <label>Programme Outcomes — POs (one per line)</label>
-            <textarea rows={5} value={arrayToLines(form.pos)} onChange={(e) => set('pos', linesToArray(e.target.value))} placeholder="Engineering knowledge…" />
+            <label htmlFor="field-programme-outcomes-pos-one-per">Programme Outcomes — POs (one per line)</label>
+            <textarea id="field-programme-outcomes-pos-one-per" rows={5} value={arrayToLines(form.pos)} onChange={(e) => set('pos', linesToArray(e.target.value))} placeholder="Engineering knowledge…" />
           </div>
           <div className="admin-field admin-field--full">
-            <label>Programme Specific Outcomes — PSOs (one per line)</label>
-            <textarea rows={4} value={arrayToLines(form.psos)} onChange={(e) => set('psos', linesToArray(e.target.value))} placeholder="Ability to apply…" />
+            <label htmlFor="field-programme-specific-outcomes-psos-one">Programme Specific Outcomes — PSOs (one per line)</label>
+            <textarea id="field-programme-specific-outcomes-psos-one" rows={4} value={arrayToLines(form.psos)} onChange={(e) => set('psos', linesToArray(e.target.value))} placeholder="Ability to apply…" />
           </div>
 
           <div className="admin-field admin-field--full"><hr /><h3>About HOD</h3></div>
@@ -598,16 +641,16 @@ export default function ProgramsAdmin() {
             <ImageUploader folder="vwu/programs/hod" currentUrl={form.hodImage} onUploaded={handleHodImage} label="Upload HOD Photo" />
           </div>
           <div className="admin-field">
-            <label>HOD Email</label>
-            <input type="email" value={form.hodEmail} onChange={(e) => set('hodEmail', e.target.value)} placeholder="hodcse@vwu.ac.in" />
+            <label htmlFor="field-hod-email">HOD Email</label>
+            <input id="field-hod-email" type="email" value={form.hodEmail} onChange={(e) => set('hodEmail', e.target.value)} placeholder="hodcse@vwu.ac.in" />
           </div>
           <div className="admin-field admin-field--full">
-            <label>HOD Message / Profile</label>
-            <textarea rows={5} value={form.hodMessage} onChange={(e) => set('hodMessage', e.target.value)} placeholder="A brief message or profile from the Head of Department…" />
+            <label htmlFor="field-hod-message-profile">HOD Message / Profile</label>
+            <textarea id="field-hod-message-profile" rows={5} value={form.hodMessage} onChange={(e) => set('hodMessage', e.target.value)} placeholder="A brief message or profile from the Head of Department…" />
           </div>
           <div className="admin-field admin-field--full">
-            <label>HOD Research Profiles (one per line: "Google Scholar: https://…")</label>
-            <textarea rows={4} value={linksToText(form.hodResearchProfiles)} onChange={(e) => set('hodResearchProfiles', textToLinks(e.target.value))} placeholder="Google Scholar: https://scholar.google.com/citations?user=…" />
+            <label htmlFor="field-hod-research-profiles-one-per">HOD Research Profiles (one per line: "Google Scholar: https://…")</label>
+            <textarea id="field-hod-research-profiles-one-per" rows={4} value={linksToText(form.hodResearchProfiles)} onChange={(e) => set('hodResearchProfiles', textToLinks(e.target.value))} placeholder="Google Scholar: https://scholar.google.com/citations?user=…" />
           </div>
 
           <div className="admin-field admin-field--full"><hr /><h3>Mind Map</h3></div>
@@ -805,29 +848,47 @@ export default function ProgramsAdmin() {
 
       <div className="admin-card">
         <h2 className="admin-card__title">All Programs ({programs.length})</h2>
-        {loading ? <p className="admin-loading">Loading…</p> : (
-          <div className="admin-table-wrap">
-            <table className="admin-table">
-              <thead><tr><th>Name</th><th>Slug</th><th>Type</th><th>Intake</th><th>Accreditation</th><th>Actions</th></tr></thead>
-              <tbody>
-                {programs.map((p) => (
-                  <tr key={p.id}>
-                    <td><strong>{p.shortName || p.name}</strong><br /><small>{p.name}</small></td>
-                    <td><code>{p.slug}</code></td>
-                    <td><span className="admin-badge">{p.category.toUpperCase()}</span></td>
-                    <td>{p.intake}</td>
-                    <td>{p.accreditation || '—'}</td>
-                    <td>
-                      <button className="admin-btn admin-btn--sm" onClick={() => startEdit(p)}>Edit</button>
-                      <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(p.id)}>Delete</button>
-                    </td>
-                  </tr>
-                ))}
-                {programs.length === 0 && <tr><td colSpan={6} className="admin-empty">No programs yet.</td></tr>}
-              </tbody>
-            </table>
-          </div>
-        )}
+        <p className="admin-field__hint" style={{ marginBottom: '0.75rem' }}>
+          Programs are grouped by category, matching the tabs on the public Academics page. Drag rows by the ⠿ handle
+          within a category to change the order they appear in on that tab.
+        </p>
+        {loading ? <p className="admin-loading">Loading…</p> : CATEGORIES.map((cat) => {
+          const list = groupedOrdered[cat] || [];
+          return (
+            <div key={cat} style={{ marginBottom: '1.5rem' }}>
+              <h3 style={{ fontSize: '0.95rem', marginBottom: '0.5rem' }}>{CATEGORY_LABELS[cat]} ({list.length})</h3>
+              <div className="admin-table-wrap">
+                <table className="admin-table">
+                  <thead><tr><th></th><th>Name</th><th>Slug</th><th>Intake</th><th>Accreditation</th><th>Actions</th></tr></thead>
+                  <tbody>
+                    {list.map((p, i) => (
+                      <tr
+                        key={p.id}
+                        draggable
+                        onDragStart={() => setDrag({ cat, index: i })}
+                        onDragOver={(e) => { e.preventDefault(); handleDragOver(cat, i); }}
+                        onDrop={() => handleDrop(cat)}
+                        onDragEnd={() => setDrag(null)}
+                        style={{ opacity: drag?.cat === cat && drag.index === i ? 0.5 : 1, cursor: 'grab' }}
+                      >
+                        <td style={{ color: 'var(--color-text-light, #9ca3af)', fontSize: '1.1rem', userSelect: 'none' }}>⠿</td>
+                        <td><strong>{p.shortName || p.name}</strong><br /><small>{p.name}</small></td>
+                        <td><code>{p.slug}</code></td>
+                        <td>{p.intake}</td>
+                        <td>{p.accreditation || '—'}</td>
+                        <td>
+                          <button className="admin-btn admin-btn--sm" onClick={() => startEdit(p)}>Edit</button>
+                          <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(p.id)}>Delete</button>
+                        </td>
+                      </tr>
+                    ))}
+                    {list.length === 0 && <tr><td colSpan={6} className="admin-empty">No {CATEGORY_LABELS[cat]} programs yet.</td></tr>}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

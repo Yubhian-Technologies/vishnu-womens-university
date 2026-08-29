@@ -1,8 +1,54 @@
-import { useState } from 'react';
+import { useState, type ComponentType } from 'react';
 import { collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
 import { deleteFile } from '../../../lib/storage';
+import AicteIdeaLabTeamAdmin from './AicteIdeaLabTeamAdmin';
+import AicteIdeaLabAmbassadorsAdmin from './AicteIdeaLabAmbassadorsAdmin';
+import AicteIdeaLabFacilityPhotosAdmin from './AicteIdeaLabFacilityPhotosAdmin';
+import IicMemberPhotosAdmin from './IicMemberPhotosAdmin';
+import TedxPhotosAdmin from './TedxPhotosAdmin';
+import TiDspGalleryPhotosAdmin from './TiDspGalleryPhotosAdmin';
+import ChipsToStartupPhotosAdmin from './ChipsToStartupPhotosAdmin';
+import VsacGalleryPhotosAdmin from './VsacGalleryPhotosAdmin';
+import VdlFacilitiesPhotosAdmin from './VdlFacilitiesPhotosAdmin';
+import AssistiveTechLabPhotosAdmin from './AssistiveTechLabPhotosAdmin';
+import ConcreteCanoePhotosAdmin from './ConcreteCanoePhotosAdmin';
+import WisePlacementsAdmin from './WisePlacementsAdmin';
+import WiseTeamPhotosAdmin from './WiseTeamPhotosAdmin';
+import WiseEliteProjectPhotosAdmin from './WiseEliteProjectPhotosAdmin';
+import WiseTestimonialPhotosAdmin from './WiseTestimonialPhotosAdmin';
+import WiseNseClippingsAdmin from './WiseNseClippingsAdmin';
+import NirvahanaEventPhotosAdmin from './NirvahanaEventPhotosAdmin';
+
+// Some differentiator items have extra editable content beyond the base
+// fields below (a team roster, photo galleries, placement cards, ...) —
+// keyed by the item's slug, shown inline while editing that specific item
+// (see the "Extra Content" card below) instead of as separate top-level
+// sidebar sections.
+const ITEM_SUB_SECTIONS: Record<string, { key: string; label: string; Component: ComponentType }[]> = {
+  'aicte-idea-lab': [
+    { key: 'team', label: 'Team', Component: AicteIdeaLabTeamAdmin },
+    { key: 'ambassadors', label: 'Student Ambassadors', Component: AicteIdeaLabAmbassadorsAdmin },
+    { key: 'facility-photos', label: 'Facility Photos', Component: AicteIdeaLabFacilityPhotosAdmin },
+  ],
+  'institution-innovation-cell': [{ key: 'member-photos', label: 'Council Member Photos', Component: IicMemberPhotosAdmin }],
+  'tedxsvecw': [{ key: 'photos', label: 'Photos', Component: TedxPhotosAdmin }],
+  'ti-dsp-coe': [{ key: 'gallery-photos', label: 'Gallery Photos', Component: TiDspGalleryPhotosAdmin }],
+  'chips-to-startup': [{ key: 'photos', label: 'Photos', Component: ChipsToStartupPhotosAdmin }],
+  'vsac': [{ key: 'gallery-photos', label: 'Gallery Photos', Component: VsacGalleryPhotosAdmin }],
+  'vehicle-design-lab': [{ key: 'facilities-photos', label: 'Facilities Photos', Component: VdlFacilitiesPhotosAdmin }],
+  'assistive-tech-lab': [{ key: 'atl-photos', label: 'Photos', Component: AssistiveTechLabPhotosAdmin }],
+  'concrete-canoe-lab': [{ key: 'canoe-photos', label: 'Photos', Component: ConcreteCanoePhotosAdmin }],
+  'talentsprint-wise': [
+    { key: 'placement-cards', label: 'Placement Cards', Component: WisePlacementsAdmin },
+    { key: 'team-photos', label: 'Team Photos', Component: WiseTeamPhotosAdmin },
+    { key: 'elite-photos', label: 'WISE-ELITE Project Photos', Component: WiseEliteProjectPhotosAdmin },
+    { key: 'testimonial-photos', label: 'Testimonial Photos', Component: WiseTestimonialPhotosAdmin },
+    { key: 'nse-clippings', label: 'NSE Clippings', Component: WiseNseClippingsAdmin },
+  ],
+  'nirvahana': [{ key: 'event-photos', label: 'Event Photos', Component: NirvahanaEventPhotosAdmin }],
+};
 
 export interface DifferentiatorItemDoc {
   id: string;
@@ -50,6 +96,7 @@ export default function DifferentiatorsAdmin() {
   const [editing, setEditing] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [filterCat, setFilterCat] = useState('All');
+  const [activeSubKey, setActiveSubKey] = useState<string | null>(null);
 
   const set = (k: string, v: string | number | string[] | boolean) => setForm((p) => ({ ...p, [k]: v }));
 
@@ -62,7 +109,7 @@ export default function DifferentiatorsAdmin() {
       } else {
         await addDoc(collection(db, 'differentiatorItems'), { ...form, order: form.order || items.length + 1, createdAt: serverTimestamp() });
       }
-      setForm(EMPTY); setEditing(null);
+      setForm(EMPTY); setEditing(null); setActiveSubKey(null);
     } catch (e) {
       alert(`Couldn't save: ${(e as Error).message}`);
     } finally { setSaving(false); }
@@ -77,6 +124,7 @@ export default function DifferentiatorsAdmin() {
       outcomes: it.outcomes || [], partners: it.partners || [],
       heroImage: it.heroImage || '', heroStoragePath: it.heroStoragePath || '', order: it.order,
     });
+    setActiveSubKey(ITEM_SUB_SECTIONS[it.slug]?.[0]?.key ?? null);
   };
 
   const remove = async (id: string, heroStoragePath?: string) => {
@@ -100,22 +148,22 @@ export default function DifferentiatorsAdmin() {
         </p>
         <div className="admin-form-grid">
           <div className="admin-field">
-            <label>URL Slug * (e.g. vishnu-tbi)</label>
-            <input value={form.slug} onChange={(e) => set('slug', e.target.value.trim().toLowerCase().replace(/\s+/g, '-'))} placeholder="vishnu-tbi" />
+            <label htmlFor="field-url-slug-e-g-vishnu">URL Slug * (e.g. vishnu-tbi)</label>
+            <input id="field-url-slug-e-g-vishnu" value={form.slug} onChange={(e) => set('slug', e.target.value.trim().toLowerCase().replace(/\s+/g, '-'))} placeholder="vishnu-tbi" />
           </div>
           <div className="admin-field">
-            <label>Title *</label>
-            <input value={form.title} onChange={(e) => set('title', e.target.value)} placeholder="Vishnu Technology Business Incubator (TBI)" />
+            <label htmlFor="field-title">Title *</label>
+            <input id="field-title" value={form.title} onChange={(e) => set('title', e.target.value)} placeholder="Vishnu Technology Business Incubator (TBI)" />
           </div>
           <div className="admin-field">
-            <label>Category *</label>
-            <select value={form.category} onChange={(e) => set('category', e.target.value)}>
+            <label htmlFor="field-category">Category *</label>
+            <select id="field-category" value={form.category} onChange={(e) => set('category', e.target.value)}>
               {DIFFERENTIATOR_CATEGORIES.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
             </select>
           </div>
           <div className="admin-field">
-            <label>Display Order</label>
-            <input type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
+            <label htmlFor="field-display-order">Display Order</label>
+            <input id="field-display-order" type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
           </div>
           <div className="admin-field">
             <label>
@@ -124,43 +172,71 @@ export default function DifferentiatorsAdmin() {
             </label>
           </div>
           <div className="admin-field">
-            <label>External URL (only if the box above is checked)</label>
-            <input value={form.url} onChange={(e) => set('url', e.target.value)} placeholder="https://www.vishva.co/" />
+            <label htmlFor="field-external-url-only-if-the">External URL (only if the box above is checked)</label>
+            <input id="field-external-url-only-if-the" value={form.url} onChange={(e) => set('url', e.target.value)} placeholder="https://www.vishva.co/" />
           </div>
           <div className="admin-field admin-field--full">
-            <label>Short Description (shown on the listing card)</label>
-            <textarea rows={2} value={form.desc} onChange={(e) => set('desc', e.target.value)} />
+            <label htmlFor="field-short-description-shown-on-the">Short Description (shown on the listing card)</label>
+            <textarea id="field-short-description-shown-on-the" rows={2} value={form.desc} onChange={(e) => set('desc', e.target.value)} />
           </div>
           <div className="admin-field admin-field--full">
-            <label>Key Highlights (one per line)</label>
-            <textarea rows={4} value={arrayToLines(form.highlights)} onChange={(e) => set('highlights', linesToArray(e.target.value))} />
+            <label htmlFor="field-key-highlights-one-per-line">Key Highlights (one per line)</label>
+            <textarea id="field-key-highlights-one-per-line" rows={4} value={arrayToLines(form.highlights)} onChange={(e) => set('highlights', linesToArray(e.target.value))} />
           </div>
           <div className="admin-field admin-field--full">
-            <label>Intro (detail page — only used when not an external link)</label>
-            <textarea rows={3} value={form.intro} onChange={(e) => set('intro', e.target.value)} />
+            <label htmlFor="field-intro-detail-page-only-used">Intro (detail page — only used when not an external link)</label>
+            <textarea id="field-intro-detail-page-only-used" rows={3} value={form.intro} onChange={(e) => set('intro', e.target.value)} />
           </div>
           <div className="admin-field admin-field--full">
-            <label>About (detail page — longer paragraph)</label>
-            <textarea rows={4} value={form.about} onChange={(e) => set('about', e.target.value)} />
+            <label htmlFor="field-about-detail-page-longer-paragraph">About (detail page — longer paragraph)</label>
+            <textarea id="field-about-detail-page-longer-paragraph" rows={4} value={form.about} onChange={(e) => set('about', e.target.value)} />
           </div>
           <div className="admin-field admin-field--full">
-            <label>Facilities & Equipment (one per line — optional)</label>
-            <textarea rows={3} value={arrayToLines(form.facilities)} onChange={(e) => set('facilities', linesToArray(e.target.value))} />
+            <label htmlFor="field-facilities-equipment-one-per-line">Facilities & Equipment (one per line — optional)</label>
+            <textarea id="field-facilities-equipment-one-per-line" rows={3} value={arrayToLines(form.facilities)} onChange={(e) => set('facilities', linesToArray(e.target.value))} />
           </div>
           <div className="admin-field admin-field--full">
-            <label>Outcomes & Achievements (one per line — optional)</label>
-            <textarea rows={3} value={arrayToLines(form.outcomes)} onChange={(e) => set('outcomes', linesToArray(e.target.value))} />
+            <label htmlFor="field-outcomes-achievements-one-per-line">Outcomes & Achievements (one per line — optional)</label>
+            <textarea id="field-outcomes-achievements-one-per-line" rows={3} value={arrayToLines(form.outcomes)} onChange={(e) => set('outcomes', linesToArray(e.target.value))} />
           </div>
           <div className="admin-field admin-field--full">
-            <label>Partners (one per line — optional)</label>
-            <textarea rows={2} value={arrayToLines(form.partners)} onChange={(e) => set('partners', linesToArray(e.target.value))} />
+            <label htmlFor="field-partners-one-per-line-optional">Partners (one per line — optional)</label>
+            <textarea id="field-partners-one-per-line-optional" rows={2} value={arrayToLines(form.partners)} onChange={(e) => set('partners', linesToArray(e.target.value))} />
           </div>
         </div>
         <div className="admin-form-actions">
-          {editing && <button className="admin-btn admin-btn--ghost" onClick={() => { setEditing(null); setForm(EMPTY); }}>Cancel</button>}
+          {editing && <button className="admin-btn admin-btn--ghost" onClick={() => { setEditing(null); setForm(EMPTY); setActiveSubKey(null); }}>Cancel</button>}
           <button className="admin-btn admin-btn--primary" onClick={save} disabled={saving}>{saving ? 'Saving…' : editing ? 'Update' : 'Add Item'}</button>
         </div>
       </div>
+
+      {editing && ITEM_SUB_SECTIONS[form.slug] && (() => {
+        const subs = ITEM_SUB_SECTIONS[form.slug];
+        const active = subs.find((s) => s.key === activeSubKey) ?? subs[0];
+        const ActiveComponent = active.Component;
+        return (
+          <div className="admin-card">
+            <h2 className="admin-card__title">Extra Content — {form.title}</h2>
+            <p className="admin-field__hint" style={{ marginBottom: '1rem' }}>
+              This item has its own extra editable content, shown here while you're editing it.
+            </p>
+            {subs.length > 1 && (
+              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1.25rem' }}>
+                {subs.map((s) => (
+                  <button
+                    key={s.key}
+                    className={`admin-btn admin-btn--sm${active.key === s.key ? ' admin-btn--primary' : ''}`}
+                    onClick={() => setActiveSubKey(s.key)}
+                  >
+                    {s.label}
+                  </button>
+                ))}
+              </div>
+            )}
+            <ActiveComponent />
+          </div>
+        );
+      })()}
 
       <div className="admin-card">
         <div className="admin-card__toolbar">

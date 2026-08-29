@@ -54,24 +54,24 @@ export default function ContactsAdmin() {
         <h2 className="admin-card__title">{editing ? 'Edit Contact' : 'Add Department Contact'}</h2>
         <div className="admin-form-grid">
           <div className="admin-field">
-            <label>Department *</label>
-            <input value={form.dept} onChange={(e) => set('dept', e.target.value)} placeholder="CSE" />
+            <label htmlFor="field-department">Department *</label>
+            <input id="field-department" value={form.dept} onChange={(e) => set('dept', e.target.value)} placeholder="CSE" />
           </div>
           <div className="admin-field">
-            <label>Head of Department</label>
-            <input value={form.hod} onChange={(e) => set('hod', e.target.value)} placeholder="Dr. P. Kiran Sree" />
+            <label htmlFor="field-head-of-department">Head of Department</label>
+            <input id="field-head-of-department" value={form.hod} onChange={(e) => set('hod', e.target.value)} placeholder="Dr. P. Kiran Sree" />
           </div>
           <div className="admin-field">
-            <label>Phone</label>
-            <input value={form.phone} onChange={(e) => set('phone', e.target.value)} placeholder="08816-250864" />
+            <label htmlFor="field-phone">Phone</label>
+            <input id="field-phone" value={form.phone} onChange={(e) => set('phone', e.target.value)} placeholder="08816-250864" />
           </div>
           <div className="admin-field">
-            <label>Email</label>
-            <input value={form.email} onChange={(e) => set('email', e.target.value)} placeholder="hod.cse@svecw.edu.in" />
+            <label htmlFor="field-email">Email</label>
+            <input id="field-email" value={form.email} onChange={(e) => set('email', e.target.value)} placeholder="hod.cse@svecw.edu.in" />
           </div>
           <div className="admin-field">
-            <label>Display Order</label>
-            <input type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
+            <label htmlFor="field-display-order">Display Order</label>
+            <input id="field-display-order" type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
           </div>
         </div>
         <div className="admin-form-actions">

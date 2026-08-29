@@ -12,15 +12,15 @@ import type { ContentBlockDoc } from '../Admin/sections/ContentBlocksAdmin';
 import '../detail-layout.css';
 import './tabbed-section.css';
 
-// The SVECW Library's real holdings, grouped exactly as the library itself
+// The VWU Library's real holdings, grouped exactly as the library itself
 // categorises them (Books / Periodicals / e-Journals / Media Resources).
 const libraryResourceCategories: { title: string; items: { label: string; value: string }[] }[] = [
   {
     title: 'Books',
     items: [
-      { label: 'Total Number of Books', value: '59,721' },
-      { label: 'Total Number of Titles', value: '8,401' },
-      { label: 'Total Number of Journal Back Volumes', value: '1,380' },
+      { label: 'Total Number of Books', value: '59,751' },
+      { label: 'Total Number of Titles', value: '10,098' },
+      { label: 'Total Number of Journal Back Volumes', value: '5,200' },
     ],
   },
   {
@@ -596,10 +596,10 @@ export default function CentralLibrary() {
               <span className="section-label">Campus Life</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>About {facility.title}</h2>
               <p style={{ fontSize: 'var(--text-lg)', color: 'var(--color-text)', lineHeight: 1.75, maxWidth: 760, marginBottom: 'var(--space-5)' }}>
-                The Library of Shri Vishnu Engineering College for Women (Autonomous) was built to keep up international standards. The air-conditioned library has three floors with an area of 1,083 Sq.m. and is well-protected with a security system. Specialised collections of books, journals, and non-book materials are available in Engineering & Technology, Basic Sciences, and Management Sciences.
+                The Library of Vishnu Women's University was built to keep up international standards. The air-conditioned library has three floors with an area of 1,083 Sq.m. and is well-protected with a security system. Specialised collections of books, journals, and non-book materials are available in Engineering & Technology, Basic Sciences, and Management Sciences.
               </p>
               <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, maxWidth: 760, marginBottom: 'var(--space-6)' }}>
-                The Library contributes to the fulfilment of the Institution's mission by selecting, acquiring, organising, maintaining, and making accessible a collection of printed and non-printed, primary and secondary materials that support the educational, research, and public service programmes of both students and faculty:
+                The Library contributes to the fulfilment of the University's mission by selecting, acquiring, organising, maintaining, and making accessible a collection of printed and non-printed, primary and secondary materials that support the educational, research, and public service programmes of both students and faculty:
               </p>
               <ul style={{ maxWidth: 760, marginBottom: 'var(--space-8)', paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
                 {libraryResponsibilities.map((r) => (
@@ -627,7 +627,7 @@ export default function CentralLibrary() {
             <div>
               <h2 className="section-title" style={{ marginBottom: 'var(--space-4)' }}>Library Resource List</h2>
               <p style={{ color: 'var(--color-text-light)', marginBottom: 'var(--space-8)', maxWidth: 680 }}>
-                Specialized collections are available in Engineering & Technology, Basic Sciences, and Management courses. The SVECW Library comprises the following:
+                Specialized collections are available in Engineering & Technology, Basic Sciences, and Management courses. The VWU Library comprises the following:
               </p>
               <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-5)' }}>
                 {libraryResourceCategories.map((cat) => (

@@ -79,8 +79,8 @@ function NavLinkOverrideRow({ id, label, defaultPath }: { id: string; label: str
       </p>
       <div className="admin-form-grid">
         <div className="admin-field admin-field--full">
-          <label>Redirect URL</label>
-          <input
+          <label htmlFor="field-redirect-url">Redirect URL</label>
+          <input id="field-redirect-url"
             value={value}
             onChange={(e) => { setValue(e.target.value); setTouched(true); }}
             placeholder={`Leave blank to use the default: ${defaultPath}`}

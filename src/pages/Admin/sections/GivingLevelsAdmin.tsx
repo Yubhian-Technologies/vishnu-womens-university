@@ -79,16 +79,16 @@ export default function GivingLevelsAdmin() {
         <h2 className="admin-card__title">{editing ? 'Edit Giving Level' : 'Add Giving Level'}</h2>
         <div className="admin-form-grid">
           <div className="admin-field">
-            <label>Level Name *</label>
-            <input value={form.level} onChange={(e) => set('level', e.target.value)} placeholder="Gold Alumni Society" />
+            <label htmlFor="field-level-name">Level Name *</label>
+            <input id="field-level-name" value={form.level} onChange={(e) => set('level', e.target.value)} placeholder="Gold Alumni Society" />
           </div>
           <div className="admin-field">
-            <label>Amount *</label>
-            <input value={form.amount} onChange={(e) => set('amount', e.target.value)} placeholder="₹1,00,000–₹4,99,999" />
+            <label htmlFor="field-amount">Amount *</label>
+            <input id="field-amount" value={form.amount} onChange={(e) => set('amount', e.target.value)} placeholder="₹1,00,000–₹4,99,999" />
           </div>
           <div className="admin-field">
-            <label>Display Order</label>
-            <input type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
+            <label htmlFor="field-display-order">Display Order</label>
+            <input id="field-display-order" type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
           </div>
           <div className="admin-field">
             <label>Featured (shown as "Most Prestigious")</label>
@@ -98,8 +98,8 @@ export default function GivingLevelsAdmin() {
             </label>
           </div>
           <div className="admin-field admin-field--full">
-            <label>Perks (one per line)</label>
-            <textarea rows={5} value={form.perksText} onChange={(e) => set('perksText', e.target.value)}
+            <label htmlFor="field-perks-one-per-line">Perks (one per line)</label>
+            <textarea id="field-perks-one-per-line" rows={5} value={form.perksText} onChange={(e) => set('perksText', e.target.value)}
               placeholder={'Named scholarship opportunity\nInvitation to exclusive alumni events\nAnnual Principal\'s dinner'} />
           </div>
         </div>

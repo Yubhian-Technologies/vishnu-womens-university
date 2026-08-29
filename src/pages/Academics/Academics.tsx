@@ -10,7 +10,8 @@ import { resolveProgramIcon } from '../../lib/programIcons';
 import { useContentBlocks, useEapcetCode } from '../../hooks/useContentBlocks';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
-import { PenTool, Radio } from 'lucide-react';
+import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
+import { Radio } from 'lucide-react';
 
 const defaultAcademicsPhotos = [
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Smart lecture halls', caption: 'Smart Lecture Halls' },
@@ -39,7 +40,8 @@ const defaultResearchInnovationPhotos = [
 const TABS = [
   { id: 'btech', label: 'B.Tech' },
   { id: 'mtech', label: 'M.Tech' },
-  { id: 'mba', label: 'MBA & Ph.D.' },
+  { id: 'mba', label: 'MBA' },
+  { id: 'phd', label: 'Ph.D.' },
 ] as const;
 
 function truncate(text: string, max: number) {
@@ -56,6 +58,7 @@ export default function Academics() {
   const initialTab = TABS.some((t) => t.id === requestedTab) ? requestedTab! : 'btech';
   const [activeTab, setActiveTab] = useState<string>(initialTab);
   const { docs: programs, loading } = useOrderedCollection<ProgramDoc>('programs', 'order');
+  const { docs: departments } = useOrderedCollection<DepartmentDoc>('departments', 'order');
   const academicsPhotos = useSitePhotos('academics', 'main', defaultAcademicsPhotos);
   const classroomsLabsPhotos = useSitePhotos('academics', 'classrooms-labs', defaultClassroomsLabsPhotos);
   const hasClassroomsLabsPhotos = useSectionHasPhotos('academics', 'classrooms-labs');
@@ -91,22 +94,14 @@ export default function Academics() {
 
   const btechCount = programs.filter(p => p.category === 'btech').length;
 
-  const activePrograms = useMemo(() => {
-    if (activeTab === 'mba') return programs.filter(p => p.category === 'mba' || p.category === 'phd');
-    return programs.filter(p => p.category === activeTab);
-  }, [programs, activeTab]);
+  const activePrograms = useMemo(() => programs.filter(p => p.category === activeTab), [programs, activeTab]);
 
-  // One representative card per B.Tech department, derived live from the
-  // programs collection (department field set by whoever added the program).
-  // "Freshman Engineering" has no corresponding program — it's first-year
-  // foundation coursework, not a degree — so it stays a fixed entry.
-  const departmentCards = useMemo(() => {
-    const seen = new Map<string, ProgramDoc>();
-    programs
-      .filter(p => p.category === 'btech' && p.department)
-      .forEach(p => { if (!seen.has(p.department)) seen.set(p.department, p); });
-    return Array.from(seen.values());
-  }, [programs]);
+  const [expandedDepts, setExpandedDepts] = useState<Set<string>>(new Set());
+  const toggleDept = (id: string) => setExpandedDepts((prev) => {
+    const next = new Set(prev);
+    if (next.has(id)) next.delete(id); else next.add(id);
+    return next;
+  });
 
   return (
     <main className="page-wrapper">
@@ -212,36 +207,35 @@ export default function Academics() {
             </p>
           </div>
           <div className="dept-grid">
-            {departmentCards.map((program) => {
-              const Icon = resolveProgramIcon(program.icon);
+            {departments.map((dept) => {
+              const Icon = resolveProgramIcon(dept.icon);
+              const expanded = expandedDepts.has(dept.id);
+              const isTruncated = (dept.description || '').length > 130;
               return (
-                <Link key={program.department} to={`/academics/${program.slug}`} className="dept-card" style={{ textDecoration: 'none' }}>
+                <div key={dept.id} className="dept-card">
                   <div className="dept-card-top">
                     <span className="dept-icon"><Icon size={30} strokeWidth={1.75} /></span>
-                    <span className="dept-code">{program.department}</span>
+                    <span className="dept-code">{dept.shortCode}</span>
                   </div>
-                  <h3 className="dept-name">{program.name}</h3>
-                  <p className="dept-desc">{truncate(program.about, 130)}</p>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto' }}>
-                    <div className="dept-labs">{program.labs?.length || 0} Labs</div>
-                    <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--color-accent)', fontFamily: 'var(--font-sans)' }}>View →</span>
-                  </div>
-                </Link>
+                  <h3 className="dept-name">{dept.title}</h3>
+                  <p className="dept-desc">{expanded ? dept.description : truncate(dept.description, 130)}</p>
+                  {isTruncated && (
+                    <button
+                      type="button"
+                      onClick={() => toggleDept(dept.id)}
+                      style={{ alignSelf: 'flex-start', fontSize: '0.72rem', fontWeight: 700, color: 'var(--color-accent)', fontFamily: 'var(--font-sans)', background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+                    >
+                      {expanded ? '← Show less' : 'More →'}
+                    </button>
+                  )}
+                </div>
               );
             })}
-            {/* Freshman Engineering: first-year foundation coursework, not a degree program of its own */}
-            <Link to="/academics/freshman-engineering" className="dept-card" style={{ textDecoration: 'none' }}>
-              <div className="dept-card-top">
-                <span className="dept-icon"><PenTool size={30} strokeWidth={1.75} /></span>
-                <span className="dept-code">FE</span>
-              </div>
-              <h3 className="dept-name">Freshman Engineering</h3>
-              <p className="dept-desc">The first year of engineering lays the foundation for every student&apos;s academic journey — core principles, critical thinking, and problem-solving through classroom discussion, industry seminars, and hands-on training.</p>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto' }}>
-                <div className="dept-labs">Mathematics · Physics · Chemistry · English</div>
-                <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--color-accent)', fontFamily: 'var(--font-sans)' }}>View →</span>
-              </div>
-            </Link>
+            {departments.length === 0 && (
+              <p style={{ color: 'var(--color-text-light)', gridColumn: '1 / -1', textAlign: 'center' }}>
+                No departments added yet — add them from Admin → Academic Departments.
+              </p>
+            )}
           </div>
         </div>
       </section>
@@ -304,7 +298,7 @@ export default function Academics() {
               <p style={{ color: 'var(--color-text-light)', lineHeight: 1.8, marginBottom: 'var(--space-6)' }}>
                 The Training & Placement Cell maintains year-round engagement with India's leading employers — including Amazon, TCS, Infosys, Wipro, HCL, Cognizant, and 150+ other companies.
               </p>
-              <Link to="/result-analysis" className="btn btn-primary">View Result Analysis →</Link>
+              <Link to="/placements/placement-details" className="btn btn-primary">Explore →</Link>
             </div>
             <div className="reveal-right">
               <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
@@ -329,7 +323,7 @@ export default function Academics() {
             title="Learning, Research & Innovation"
             subtitle="Inside VWU's labs, classrooms, and events — where students are trained to think, build, and lead."
             highlights={[
-              '9 B.Tech specialisations with UGC Autonomous curriculum',
+              '10 B.Tech specialisations with UGC Autonomous curriculum',
               '50+ specialised labs across all departments',
               '200+ smart classrooms with interactive boards',
               'IEEE, Springer & NPTEL digital library access',
@@ -337,6 +331,7 @@ export default function Academics() {
             ]}
             columns={2}
             layout="side-text-reverse"
+            showGalleryLink={false}
           />
         </div>
       </section>
@@ -351,6 +346,7 @@ export default function Academics() {
               title="Where Theory Meets Practice"
               columns={3}
               layout="default"
+              showGalleryLink={false}
             />
           </div>
         </section>

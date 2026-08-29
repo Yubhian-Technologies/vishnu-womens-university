@@ -60,20 +60,20 @@ export default function SvesCampusesAdmin() {
         <h2 className="admin-card__title">{editing ? 'Edit Campus' : 'Add Campus'}</h2>
         <div className="admin-form-grid">
           <div className="admin-field">
-            <label>Campus Name *</label>
-            <input value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="Green Meadows Campus" />
+            <label htmlFor="field-campus-name">Campus Name *</label>
+            <input id="field-campus-name" value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="Green Meadows Campus" />
           </div>
           <div className="admin-field">
-            <label>Location</label>
-            <input value={form.location} onChange={(e) => set('location', e.target.value)} placeholder="Bhimavaram, West Godavari" />
+            <label htmlFor="field-location">Location</label>
+            <input id="field-location" value={form.location} onChange={(e) => set('location', e.target.value)} placeholder="Bhimavaram, West Godavari" />
           </div>
           <div className="admin-field">
-            <label>Display Order</label>
-            <input type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
+            <label htmlFor="field-display-order">Display Order</label>
+            <input id="field-display-order" type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
           </div>
           <div className="admin-field admin-field--full">
-            <label>Institutions (one per line)</label>
-            <textarea rows={5} value={arrayToLines(form.institutions)} onChange={(e) => set('institutions', linesToArray(e.target.value))} placeholder="Shri Vishnu Engineering College for Women (VWU)" />
+            <label htmlFor="field-institutions-one-per-line">Institutions (one per line)</label>
+            <textarea id="field-institutions-one-per-line" rows={5} value={arrayToLines(form.institutions)} onChange={(e) => set('institutions', linesToArray(e.target.value))} placeholder="Shri Vishnu Engineering College for Women (VWU)" />
           </div>
         </div>
         <div className="admin-form-actions">

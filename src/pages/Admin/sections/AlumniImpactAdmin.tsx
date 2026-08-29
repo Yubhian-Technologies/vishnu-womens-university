@@ -137,24 +137,24 @@ export default function AlumniImpactAdmin() {
         <h2 className="admin-card__title">{editingStat ? 'Edit Impact Stat' : 'Add Impact Stat'}</h2>
         <div className="admin-form-grid">
           <div className="admin-field">
-            <label>Icon (emoji)</label>
-            <input value={statForm.icon} onChange={(e) => setStat('icon', e.target.value)} placeholder="🎓" />
+            <label htmlFor="field-icon-emoji">Icon (emoji)</label>
+            <input id="field-icon-emoji" value={statForm.icon} onChange={(e) => setStat('icon', e.target.value)} placeholder="🎓" />
           </div>
           <div className="admin-field">
-            <label>Stat *</label>
-            <input value={statForm.stat} onChange={(e) => setStat('stat', e.target.value)} placeholder="13,100+" />
+            <label htmlFor="field-stat">Stat *</label>
+            <input id="field-stat" value={statForm.stat} onChange={(e) => setStat('stat', e.target.value)} placeholder="13,100+" />
           </div>
           <div className="admin-field">
-            <label>Label *</label>
-            <input value={statForm.label} onChange={(e) => setStat('label', e.target.value)} placeholder="Engineers Graduated" />
+            <label htmlFor="field-label">Label *</label>
+            <input id="field-label" value={statForm.label} onChange={(e) => setStat('label', e.target.value)} placeholder="Engineers Graduated" />
           </div>
           <div className="admin-field">
-            <label>Display Order</label>
-            <input type="number" value={statForm.order} onChange={(e) => setStat('order', +e.target.value)} min={0} />
+            <label htmlFor="field-display-order">Display Order</label>
+            <input id="field-display-order" type="number" value={statForm.order} onChange={(e) => setStat('order', +e.target.value)} min={0} />
           </div>
           <div className="admin-field admin-field--full">
-            <label>Description</label>
-            <textarea rows={2} value={statForm.desc} onChange={(e) => setStat('desc', e.target.value)} />
+            <label htmlFor="field-description">Description</label>
+            <textarea id="field-description" rows={2} value={statForm.desc} onChange={(e) => setStat('desc', e.target.value)} />
           </div>
         </div>
         <div className="admin-form-actions">
@@ -202,12 +202,12 @@ export default function AlumniImpactAdmin() {
         <h2 className="admin-card__title">{editingCompany ? 'Edit Company' : 'Add Recruiting Company'}</h2>
         <div className="admin-form-grid">
           <div className="admin-field">
-            <label>Company Name *</label>
-            <input value={companyForm.name} onChange={(e) => setCompany('name', e.target.value)} placeholder="Amazon" />
+            <label htmlFor="field-company-name">Company Name *</label>
+            <input id="field-company-name" value={companyForm.name} onChange={(e) => setCompany('name', e.target.value)} placeholder="Amazon" />
           </div>
           <div className="admin-field">
-            <label>Display Order</label>
-            <input type="number" value={companyForm.order} onChange={(e) => setCompany('order', +e.target.value)} min={0} />
+            <label htmlFor="field-display-order-2">Display Order</label>
+            <input id="field-display-order-2" type="number" value={companyForm.order} onChange={(e) => setCompany('order', +e.target.value)} min={0} />
           </div>
         </div>
         <div className="admin-form-actions">

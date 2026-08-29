@@ -145,7 +145,7 @@ export default function VisionMission() {
             subtitle="Every corner of VWU reflects the values we stand for — in classrooms, on the field, and in the community."
             highlights={[
               'Excellence in teaching, research & outcomes',
-              'Innovation through TBI, STI Hub & AICTE IDEA Lab',
+              'Innovation through TBI & AICTE IDEA Lab',
               'Community service via NSS & Dr. B.V. Raju Foundation',
               'Environmental stewardship — green campus initiative',
             ]}

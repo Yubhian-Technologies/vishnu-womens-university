@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useOrderedCollection } from '../../hooks/useCollection';
+import { useNavLinkOverride } from '../../hooks/useNavLinkOverride';
 import { COMPLIANCE_GROUPS, DEFAULT_COMPLIANCE_DOCS, type ComplianceDocDoc } from '../../pages/Admin/sections/ComplianceDocsAdmin';
 import { InstagramIcon, FacebookIcon, TwitterIcon, LinkedInIcon, YouTubeIcon } from './SocialIcons';
 import './Footer.css';
@@ -20,11 +21,22 @@ const accreditations = [
   'JNTUK Affiliated',
 ];
 
+// Moved out of the header nav's "News & Events" mega-menu (see Header.tsx)
+// into its own footer column. "Success Stories" is admin-editable via
+// /admin → Navigation Link Redirects (NavLinkOverridesAdmin.tsx), so its
+// path is resolved at render time via useNavLinkOverride below rather than
+// hardcoded here.
+const alumniGivingLinks = [
+  { label: 'Alumni Network', path: '/alumni-giving#network' },
+  { label: 'Giving Opportunities', path: '/alumni-giving#give' },
+  { label: 'Alumni Events', path: '/alumni-giving#events' },
+];
+
 const feedbackLinks = [
-  { label: "Students' Feedback", href: 'https://forms.gle/UuURnxKUZw7wW1NW9' },
-  { label: "Parents' Feedback", href: 'https://forms.gle/eT2QF3WNJZDwpEzj8' },
-  { label: "Faculty's Feedback", href: 'https://forms.gle/K89PMmjNbJNGSVEa9' },
-  { label: 'AICTE Feedback Facility', href: 'https://svecw.edu.in/aicte-feedback-facility/' },
+  { label: "Students' Feedback", href: 'https://forms.gle/UuURnxKUZw7wW1NW9', external: true },
+  { label: "Parents' Feedback", href: 'https://forms.gle/eT2QF3WNJZDwpEzj8', external: true },
+  { label: "Faculty's Feedback", href: 'https://forms.gle/K89PMmjNbJNGSVEa9', external: true },
+  { label: 'AICTE Feedback Facility', href: '/aicte-feedback-facility', external: false },
 ];
 
 // Mirrors the header nav's "Quick Links" dropdown (see navItems in
@@ -55,6 +67,8 @@ const pinnedDisclosuresLink = { label: 'Disclosures – UGC', href: '/disclosure
 
 export default function Footer() {
   const year = new Date().getFullYear();
+  // Default target is AlumniGiving.tsx's own "#successstories" section, not Placements' — see Header.tsx's former use of this same override id.
+  const alumniSuccessStories = useNavLinkOverride('alumni-success-stories', '/alumni-giving#successstories');
   const { docs: liveComplianceDocs } = useOrderedCollection<ComplianceDocDoc>('complianceDocs', 'order');
   const complianceDocs = liveComplianceDocs.length > 0 ? liveComplianceDocs : (DEFAULT_COMPLIANCE_DOCS as ComplianceDocDoc[]);
   const complianceGroups = COMPLIANCE_GROUPS.map((title) => ({
@@ -106,7 +120,7 @@ export default function Footer() {
                 Bhimavaram, West Godavari Dist.<br />
                 Andhra Pradesh – 534 202<br />
                 <a href="tel:08816250864">08816-250864</a><br />
-                <a href="mailto:info@svecw.edu.in">info@svecw.edu.in</a>
+                <a href="mailto:info@vwu.edu.in">info@vwu.edu.in</a>
               </address>
 
               <div className="footer-social" aria-label="Social Media">
@@ -133,10 +147,31 @@ export default function Footer() {
           </div>
 
           <div className="footer-feedback">
+            <span className="footer-feedback-label">Alumni & Giving:</span>
+            {alumniGivingLinks.map((l) => (
+              <span key={l.label}>
+                <Link to={l.path} className="footer-link">{l.label}</Link>
+                <span className="footer-feedback-sep">·</span>
+              </span>
+            ))}
+            <span>
+              {alumniSuccessStories.external ? (
+                <a href={alumniSuccessStories.path} target="_blank" rel="noopener noreferrer" className="footer-link">Success Stories</a>
+              ) : (
+                <Link to={alumniSuccessStories.path} className="footer-link">Success Stories</Link>
+              )}
+            </span>
+          </div>
+
+          <div className="footer-feedback">
             <span className="footer-feedback-label">Feedback Facility:</span>
             {feedbackLinks.map((l, i) => (
               <span key={l.label}>
-                <a href={l.href} target="_blank" rel="noopener noreferrer" className="footer-link">{l.label}</a>
+                {l.external ? (
+                  <a href={l.href} target="_blank" rel="noopener noreferrer" className="footer-link">{l.label}</a>
+                ) : (
+                  <Link to={l.href} className="footer-link">{l.label}</Link>
+                )}
                 {i < feedbackLinks.length - 1 && <span className="footer-feedback-sep">·</span>}
               </span>
             ))}
