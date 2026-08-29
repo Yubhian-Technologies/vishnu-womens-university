@@ -40,6 +40,7 @@ const AdmissionProcedure = lazy(() => import('./pages/Admissions/AdmissionProced
 const ResultAnalysis = lazy(() => import('./pages/Admissions/ResultAnalysis'));
 const VishnuTV = lazy(() => import('./pages/StudentActivities/VishnuTV'));
 const StudentClubs = lazy(() => import('./pages/StudentActivities/StudentClubs'));
+const StudentClubDetail = lazy(() => import('./pages/StudentActivities/StudentClubDetail'));
 const SocialServices = lazy(() => import('./pages/StudentActivities/SocialServices'));
 const CampusMagazines = lazy(() => import('./pages/StudentActivities/CampusMagazines'));
 const ArtsCulture = lazy(() => import('./pages/StudentActivities/ArtsCulture'));
@@ -122,6 +123,7 @@ function PublicApp() {
           <Route path="/result-analysis" element={<ResultAnalysis />} />
           <Route path="/vishnu-tv-academy" element={<VishnuTV />} />
           <Route path="/student-clubs" element={<StudentClubs />} />
+          <Route path="/student-clubs/:slug" element={<StudentClubDetail />} />
           <Route path="/social-services" element={<SocialServices />} />
           <Route path="/campus-magazines" element={<CampusMagazines />} />
           <Route path="/arts-culture" element={<ArtsCulture />} />
