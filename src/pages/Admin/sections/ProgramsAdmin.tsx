@@ -7,6 +7,7 @@ import { useOrderedCollection } from '../../../hooks/useCollection';
 import ImageUploader from '../../../components/ImageUploader/ImageUploader';
 import type { UploadResult } from '../../../lib/storage';
 import { PROGRAM_ICON_NAMES } from '../../../lib/programIcons';
+import DepartmentNewsManager from './DepartmentNewsManager';
 
 export interface ProgramSubject {
   title: string;
@@ -416,6 +417,15 @@ export default function ProgramsAdmin() {
           <div className="admin-field admin-field--full">
             <label>Curriculum Mind Map Image</label>
             <ImageUploader folder="vwu/programs/mindmap" currentUrl={form.mindMapImage} onUploaded={handleMindMapImage} label="Upload Mind Map Image" />
+          </div>
+
+          <div className="admin-field admin-field--full"><hr /><h3>News & Events</h3></div>
+          <div className="admin-field admin-field--full">
+            {editing ? (
+              <DepartmentNewsManager programSlug={form.slug} />
+            ) : (
+              <p className="admin-field__hint">Save this program first, then reopen it here to add News &amp; Events.</p>
+            )}
           </div>
         </div>
         <div className="admin-form-actions">

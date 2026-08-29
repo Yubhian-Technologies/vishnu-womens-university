@@ -4,11 +4,15 @@ import { where } from 'firebase/firestore';
 import { Check, Microscope, Compass, Target, Sparkles, Mail, ExternalLink } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import ProgrammeStructure from '../../components/ProgrammeStructure/ProgrammeStructure';
+import DepartmentNewsSection, { type DepartmentNewsDoc } from '../../components/DepartmentNews/DepartmentNewsSection';
+import DepartmentDetail from './DepartmentDetail';
+import { groupForProgramSlug } from '../../lib/departmentGroups';
 import { useCollection, useOrderedCollection } from '../../hooks/useCollection';
 import { usePageBanner } from '../../hooks/usePageBanner';
 import { useEapcetCode } from '../../hooks/useContentBlocks';
 import { smoothScrollTo } from '../../lib/smoothScroll';
 import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
+import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import type { FacultyDoc } from './Faculty';
 import SEO from '../../components/SEO/SEO';
 import { getProgramSchema, getBreadcrumbSchema } from '../../lib/seo/schemas';
@@ -24,6 +28,16 @@ const categoryLabel: Record<string, string> = {
 };
 
 export default function ProgramDetail() {
+  // AI / CSE / ECE are "grouped" departments whose sub-program slugs render a
+  // shared department page with a program toggle instead of this standalone
+  // view (see src/lib/departmentGroups.ts). Every other slug falls through.
+  const { slug } = useParams<{ slug: string }>();
+  const group = groupForProgramSlug(slug);
+  if (group) return <DepartmentDetail group={group} activeSlug={slug!} />;
+  return <SingleProgramDetail />;
+}
+
+function SingleProgramDetail() {
   const { slug } = useParams<{ slug: string }>();
   const location = useLocation();
   const { docs, loading } = useCollection<ProgramDoc>('programs', [where('slug', '==', slug || '')]);
@@ -31,6 +45,16 @@ export default function ProgramDetail() {
 
   const { docs: allFaculty } = useOrderedCollection<FacultyDoc>('faculty', 'order');
   const faculty = program?.department ? allFaculty.filter((f) => f.department === program.department) : [];
+  const { docs: deptNews } = useOrderedCollection<DepartmentNewsDoc>('departmentNews', 'date', 'desc');
+  const hasDeptNews = deptNews.some((n) => n.program === slug);
+  // Resolves the program's short `department` code (e.g. "IT") to the full
+  // department name from the Academic Departments admin, so the "About the
+  // Department" heading below reads the same way it does on the AI/CSE/ECE
+  // grouped department page — falling back to the raw code if no match.
+  const { docs: allDepartments } = useOrderedCollection<DepartmentDoc>('departments', 'order');
+  const deptTitle = allDepartments.find(
+    (d) => d.shortCode?.trim().toUpperCase() === (program?.department || '').trim().toUpperCase()
+  )?.title || program?.department;
   // Falls back to a shared "Program Pages" banner (Hero Banners admin) only
   // when this specific program hasn't had its own image uploaded yet via
   // the Programs admin section — that per-program image always wins.
@@ -77,6 +101,7 @@ export default function ProgramDetail() {
     hasMindMap && { id: 'mindmap', label: 'Mind Map' },
     { id: 'curriculum', label: 'Curriculum' },
     hasLabs && { id: 'labs', label: 'Laboratories' },
+    hasDeptNews && { id: 'news', label: 'News & Events' },
   ].filter(Boolean) as { id: string; label: string }[];
 
   const hasSidebarContent = quickLinks.length > 1 || hasCareerOutcomes;
@@ -167,8 +192,8 @@ export default function ProgramDetail() {
             {/* Main content */}
             <div>
               <div>
-                <span className="section-label">About the Programme</span>
-                <h2 className="section-title">{program.shortName || program.name}</h2>
+                <span className="section-label">About the Department</span>
+                <h2 className="section-title">The Department of {deptTitle || program.shortName || program.name}</h2>
                 <p style={{ color: 'var(--color-text-light)', lineHeight: 1.85, fontSize: 'var(--text-base)', marginBottom: 'var(--space-6)' }}>
                   {program.about}
                 </p>
@@ -489,6 +514,9 @@ export default function ProgramDetail() {
           </div>
         </section>
       )}
+
+      {/* News & Events — live from the departmentNews collection, tagged to this program */}
+      <DepartmentNewsSection programSlug={program.slug} background="var(--color-white)" />
 
       {/* CTA */}
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-14) 0' }}>
