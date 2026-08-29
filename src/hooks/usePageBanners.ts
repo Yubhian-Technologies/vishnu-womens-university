@@ -5,6 +5,7 @@ import { db } from '../lib/firebase';
 export interface BannerSlide {
   id: string;
   imageUrl: string;
+  videoUrl: string;
   title: string;
   subtitle: string;
   ctaLabel: string;
@@ -34,6 +35,7 @@ export function usePageBanners(page: string): { slides: BannerSlide[]; loading: 
           .map((d) => ({
             id:       d.id,
             imageUrl: d.data().imageUrl  ?? '',
+            videoUrl: d.data().videoUrl  ?? '',
             title:    d.data().title     ?? '',
             subtitle: d.data().subtitle  ?? '',
             ctaLabel: d.data().ctaLabel  ?? '',
