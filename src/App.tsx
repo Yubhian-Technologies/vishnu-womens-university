@@ -56,6 +56,7 @@ const SocialMedia = lazy(() => import('./pages/NewsAwards/SocialMedia'));
 const Careers = lazy(() => import('./pages/Careers/Careers'));
 const Contact = lazy(() => import('./pages/Contact/Contact'));
 const UGCDisclosure = lazy(() => import('./pages/Disclosures/UGCDisclosure'));
+const AicteFeedback = lazy(() => import('./pages/AicteFeedback/AicteFeedback'));
 const AntiRagging = lazy(() => import('./pages/AntiRagging/AntiRagging'));
 const PoliciesProcedures = lazy(() => import('./pages/PoliciesProcedures/PoliciesProcedures'));
 // The admin shell alone pulls in 20+ section components — keeping it out of
@@ -140,6 +141,7 @@ function PublicApp() {
           <Route path="/careers" element={<Careers />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/disclosures/ugc" element={<UGCDisclosure />} />
+          <Route path="/aicte-feedback-facility" element={<AicteFeedback />} />
           <Route path="/anti-ragging" element={<AntiRagging />} />
           <Route path="/policies-procedures" element={<PoliciesProcedures />} />
           <Route path="*" element={<NotFound />} />
