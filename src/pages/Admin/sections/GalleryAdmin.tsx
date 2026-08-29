@@ -60,8 +60,8 @@ export default function GalleryAdmin() {
       <div className="admin-card">
         <h2 className="admin-card__title">Upload Images</h2>
         <div className="admin-field" style={{ maxWidth: 260 }}>
-          <label>Category</label>
-          <select value={category} onChange={(e) => setCategory(e.target.value)}>
+          <label htmlFor="field-category">Category</label>
+          <select id="field-category" value={category} onChange={(e) => setCategory(e.target.value)}>
             {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
           </select>
         </div>

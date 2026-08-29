@@ -227,14 +227,14 @@ export default function FacultyAdmin() {
         <h2 className="admin-card__title">Bulk Import Faculty</h2>
         <div className="admin-form-grid">
           <div className="admin-field">
-            <label>Department</label>
-            <select value={bulkDept} onChange={(e) => setBulkDept(e.target.value)}>
+            <label htmlFor="field-department">Department</label>
+            <select id="field-department" value={bulkDept} onChange={(e) => setBulkDept(e.target.value)}>
               {departmentNames.map((d) => <option key={d}>{d}</option>)}
             </select>
           </div>
           <div className="admin-field admin-field--full">
-            <label>Paste one faculty member per line: "Name | Designation | Qualification | Specialization | Email" (last three optional)</label>
-            <textarea
+            <label htmlFor="field-paste-one-faculty-member-per">Paste one faculty member per line: "Name | Designation | Qualification | Specialization | Email" (last three optional)</label>
+            <textarea id="field-paste-one-faculty-member-per"
               rows={8}
               value={bulkText}
               onChange={(e) => setBulkText(e.target.value)}
@@ -257,32 +257,32 @@ export default function FacultyAdmin() {
             <ImageUploader folder="vwu/faculty" currentUrl={form.imageUrl} onUploaded={handleImage} label="Upload Photo" />
           </div>
           <div className="admin-field">
-            <label>Full Name *</label>
-            <input value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="Dr. Name" />
+            <label htmlFor="field-full-name">Full Name *</label>
+            <input id="field-full-name" value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="Dr. Name" />
           </div>
           <div className="admin-field">
-            <label>Designation</label>
-            <select value={form.designation} onChange={(e) => set('designation', e.target.value)}>
+            <label htmlFor="field-designation">Designation</label>
+            <select id="field-designation" value={form.designation} onChange={(e) => set('designation', e.target.value)}>
               {DESIGNATIONS.map((d) => <option key={d}>{d}</option>)}
             </select>
           </div>
           <div className="admin-field">
-            <label>Department</label>
-            <select value={form.department} onChange={(e) => set('department', e.target.value)}>
+            <label htmlFor="field-department-2">Department</label>
+            <select id="field-department-2" value={form.department} onChange={(e) => set('department', e.target.value)}>
               {departmentNames.map((d) => <option key={d}>{d}</option>)}
             </select>
           </div>
           <div className="admin-field">
-            <label>Qualification</label>
-            <input value={form.qualification} onChange={(e) => set('qualification', e.target.value)} placeholder="Ph.D., M.Tech" />
+            <label htmlFor="field-qualification">Qualification</label>
+            <input id="field-qualification" value={form.qualification} onChange={(e) => set('qualification', e.target.value)} placeholder="Ph.D., M.Tech" />
           </div>
           <div className="admin-field">
-            <label>Specialization</label>
-            <input value={form.specialization} onChange={(e) => set('specialization', e.target.value)} placeholder="Machine Learning" />
+            <label htmlFor="field-specialization">Specialization</label>
+            <input id="field-specialization" value={form.specialization} onChange={(e) => set('specialization', e.target.value)} placeholder="Machine Learning" />
           </div>
           <div className="admin-field">
-            <label>Email</label>
-            <input type="email" value={form.email} onChange={(e) => set('email', e.target.value)} placeholder="faculty@svecw.edu.in" />
+            <label htmlFor="field-email">Email</label>
+            <input id="field-email" type="email" value={form.email} onChange={(e) => set('email', e.target.value)} placeholder="faculty@svecw.edu.in" />
           </div>
           <div className="admin-field admin-field--full">
             <label>Profile Facts</label>

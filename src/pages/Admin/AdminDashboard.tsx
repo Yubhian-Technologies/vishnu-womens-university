@@ -5,6 +5,7 @@ import LandingPagesAdmin from './sections/LandingPagesAdmin';
 import NewsAdmin from './sections/NewsAdmin';
 import GalleryAdmin from './sections/GalleryAdmin';
 import ProgramsAdmin from './sections/ProgramsAdmin';
+import DepartmentsAdmin from './sections/DepartmentsAdmin';
 import FacultyAdmin from './sections/FacultyAdmin';
 import GoverningBodyAdmin from './sections/GoverningBodyAdmin';
 import CoreExecutivesAdmin from './sections/CoreExecutivesAdmin';
@@ -91,6 +92,7 @@ const SECTION_MAP: Record<string, React.ReactNode> = {
   news: <NewsAdmin />,
   gallery: <GalleryAdmin />,
   programs: <ProgramsAdmin />,
+  departments: <DepartmentsAdmin />,
   faculty: <FacultyAdmin />,
   'governing-body': <GoverningBodyAdmin />,
   'core-executives': <CoreExecutivesAdmin />,
@@ -151,8 +153,8 @@ export default function AdminDashboard({ activeSection, setActiveSection }: Prop
   return (
     <div className="admin-content">
       <div className="admin-content__header">
-        <h1>{current?.icon} {current?.label}</h1>
-        {readOnly && <span className="admin-badge admin-badge--gray">🔒 Read Only</span>}
+        <h1><span aria-hidden="true">{current?.icon}</span> {current?.label}</h1>
+        {readOnly && <span className="admin-badge admin-badge--gray"><span aria-hidden="true">🔒</span> Read Only</span>}
       </div>
       <div className="admin-content__body">
         <ReadOnlyGate readOnly={readOnly}>
@@ -160,17 +162,21 @@ export default function AdminDashboard({ activeSection, setActiveSection }: Prop
         </ReadOnlyGate>
       </div>
       {/* Mobile bottom nav */}
-      <nav className="admin-bottom-nav">
-        {SECTIONS.map((s) => (
-          <button
-            key={s.id}
-            className={`admin-bottom-nav__btn${activeSection === s.id ? ' active' : ''}`}
-            onClick={() => setActiveSection(s.id)}
-          >
-            <span>{s.icon}</span>
-            <span>{s.label}</span>
-          </button>
-        ))}
+      <nav className="admin-bottom-nav" aria-label="Admin sections">
+        {SECTIONS.map((s) => {
+          const isActive = activeSection === s.id;
+          return (
+            <button
+              key={s.id}
+              className={`admin-bottom-nav__btn${isActive ? ' active' : ''}`}
+              onClick={() => setActiveSection(s.id)}
+              aria-current={isActive ? 'page' : undefined}
+            >
+              <span aria-hidden="true">{s.icon}</span>
+              <span>{s.label}</span>
+            </button>
+          );
+        })}
       </nav>
     </div>
   );

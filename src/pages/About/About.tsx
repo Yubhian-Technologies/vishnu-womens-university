@@ -11,6 +11,7 @@ import { useSitePhotos, useSectionHasPhotos } from '../../hooks/useSitePhotos';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import { Rocket, Target } from 'lucide-react';
 import { resolveContentIcon } from '../../lib/contentIcons';
+import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
 
 function getInitials(name: string) {
   const cleaned = name.replace(/\b(Dr|Sri|Prof|Mr|Mrs|Ms)\.?\s*/gi, '');
@@ -99,6 +100,13 @@ export default function About() {
   const campusSnapshotImg = campusPhotos[6];
   const parentSocietyImg = campusPhotos[7];
   const academicSnapshotStats = useContentBlocks('about', 'academicSnapshotStats');
+  // Counts derived live from the `programs` collection (same source as the
+  // B.Tech count on Academics.tsx) so this sentence can't drift out of sync
+  // with what's actually in /admin → Programs.
+  const { docs: allPrograms } = useOrderedCollection<ProgramDoc>('programs', 'order');
+  const btechCount = allPrograms.filter(p => p.category === 'btech').length;
+  const mtechCount = allPrograms.filter(p => p.category === 'mtech').length;
+  const departmentCount = new Set(allPrograms.filter(p => p.department).map(p => p.department)).size;
   const diffItems = useContentBlocks('about', 'differentiators');
   const discoverCards = useContentBlocks('about', 'discoverCards');
 
@@ -174,12 +182,12 @@ export default function About() {
                 offering an environment well-suited to focused, high-quality learning.
               </p>
               <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-4)', color: 'var(--color-text-light)' }}>
-                Operating under the <strong>Sri Vishnu Educational Society</strong> and affiliated to JNTUK,
-                VWU carries UGC Autonomous status, NBA Accreditation, AICTE approval, and NAAC recognition.
+                Operating under the <strong>Sri Vishnu Educational Society</strong> 
+                VWU carries UGC, NBA Accreditation, AICTE approval, and NAAC recognition.
                 Its infrastructure includes fully equipped laboratories, smart classrooms, drawing halls, and seminar rooms.
               </p>
               <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-6)', color: 'var(--color-text-light)' }}>
-                Having graduated <strong>13,100+ engineers</strong> and achieved <strong>1,400+ annual placements</strong>,
+                Having graduated <strong>15,000 engineers</strong> and achieved <strong>1,100+ annual placements</strong>,
                 VWU stands as the leading destination for women's engineering education in the Telugu-speaking states.
               </p>
               <div style={{ display: 'flex', gap: 'var(--space-4)', flexWrap: 'wrap' }}>
@@ -208,8 +216,8 @@ export default function About() {
               <span className="section-label">Academic Excellence</span>
               <h2 className="section-title">Programs Across Engineering, Management & Research</h2>
               <p style={{ color: 'var(--color-text-light)', lineHeight: 1.8, marginBottom: 'var(--space-6)' }}>
-                VWU delivers 9 B.Tech specialisations, 4 M.Tech programs, MBA, and Ph.D. across 9 departments —
-                all affiliated to JNTUK and shaped by the curricular freedom that comes with full UGC Autonomous status.
+                VWU delivers {btechCount || 9} B.Tech specialisations, {mtechCount || 4} M.Tech programs, MBA, and Ph.D. across {departmentCount || 9} departments —
+                 shaped by the curricular freedom that comes with full UGC Guidelines.
               </p>
               <Link to="/academics" className="btn btn-primary">View All Programs & Departments →</Link>
             </div>
@@ -217,7 +225,7 @@ export default function About() {
               <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
                 {academicSnapshotStats.map(p => (
                   <div key={p.id} style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', borderLeft: '4px solid var(--color-accent)' }}>
-                    <div style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--color-accent)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 4 }}>{p.title}</div>
+                    <div style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--color-accent)', letterSpacing: '0.08em', marginBottom: 4 }}>{p.title}</div>
                     <div style={{ fontFamily: 'var(--font-sans)', fontWeight: 900, color: 'var(--color-primary)', fontSize: 'var(--text-base)' }}>{p.value}</div>
                   </div>
                 ))}

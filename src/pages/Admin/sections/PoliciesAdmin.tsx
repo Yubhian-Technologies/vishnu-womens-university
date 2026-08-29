@@ -97,16 +97,16 @@ export default function PoliciesAdmin() {
         </p>
         <div className="admin-form-grid">
           <div className="admin-field">
-            <label>Title *</label>
-            <input value={form.title} onChange={(e) => set('title', e.target.value)} placeholder="IT Policy" />
+            <label htmlFor="field-title">Title *</label>
+            <input id="field-title" value={form.title} onChange={(e) => set('title', e.target.value)} placeholder="IT Policy" />
           </div>
           <div className="admin-field">
-            <label>Display Order</label>
-            <input type="number" value={form.order} onChange={(e) => set('order', Number(e.target.value))} min={0} />
+            <label htmlFor="field-display-order">Display Order</label>
+            <input id="field-display-order" type="number" value={form.order} onChange={(e) => set('order', Number(e.target.value))} min={0} />
           </div>
           <div className="admin-field admin-field--full">
-            <label>Description (optional)</label>
-            <textarea value={form.description} onChange={(e) => set('description', e.target.value)} rows={2} placeholder="One-sentence summary shown under the policy title." />
+            <label htmlFor="field-description-optional">Description (optional)</label>
+            <textarea id="field-description-optional" value={form.description} onChange={(e) => set('description', e.target.value)} rows={2} placeholder="One-sentence summary shown under the policy title." />
           </div>
           <div className="admin-field admin-field--full">
             <label>PDF File (leave empty to hide the "View" link until it's ready)</label>

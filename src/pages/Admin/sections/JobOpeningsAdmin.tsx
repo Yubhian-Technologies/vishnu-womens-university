@@ -56,26 +56,26 @@ export default function JobOpeningsAdmin() {
         <h2 className="admin-card__title">{editing ? 'Edit Opening' : 'Add Job Opening'}</h2>
         <div className="admin-form-grid">
           <div className="admin-field">
-            <label>Department *</label>
-            <input value={form.department} onChange={(e) => set('department', e.target.value)} placeholder="Computer Science & Engineering" />
+            <label htmlFor="field-department">Department *</label>
+            <input id="field-department" value={form.department} onChange={(e) => set('department', e.target.value)} placeholder="Computer Science & Engineering" />
           </div>
           <div className="admin-field">
-            <label>Role Title *</label>
-            <input value={form.title} onChange={(e) => set('title', e.target.value)} placeholder="Assistant Professor" />
+            <label htmlFor="field-role-title">Role Title *</label>
+            <input id="field-role-title" value={form.title} onChange={(e) => set('title', e.target.value)} placeholder="Assistant Professor" />
           </div>
           <div className="admin-field">
-            <label>Type</label>
-            <select value={form.type} onChange={(e) => set('type', e.target.value)}>
+            <label htmlFor="field-type">Type</label>
+            <select id="field-type" value={form.type} onChange={(e) => set('type', e.target.value)}>
               {TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
             </select>
           </div>
           <div className="admin-field">
-            <label>Display Order</label>
-            <input type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
+            <label htmlFor="field-display-order">Display Order</label>
+            <input id="field-display-order" type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
           </div>
           <div className="admin-field admin-field--full">
-            <label>Qualification</label>
-            <input value={form.qualification} onChange={(e) => set('qualification', e.target.value)} placeholder="M.Tech. in CSE / IT / AI (Ph.D. pursuing preferred)" />
+            <label htmlFor="field-qualification">Qualification</label>
+            <input id="field-qualification" value={form.qualification} onChange={(e) => set('qualification', e.target.value)} placeholder="M.Tech. in CSE / IT / AI (Ph.D. pursuing preferred)" />
           </div>
         </div>
         <div className="admin-form-actions">

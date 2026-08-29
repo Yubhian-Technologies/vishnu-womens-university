@@ -15,6 +15,7 @@ export const SECTIONS = [
   { id: 'news',           icon: '📰', label: 'News & Events' },
   { id: 'gallery',        icon: '📷', label: 'Gallery' },
   { id: 'programs',       icon: '🎓', label: 'Programs' },
+  { id: 'departments',    icon: '🏫', label: 'Academic Departments' },
   { id: 'faculty',        icon: '👩‍🏫', label: 'Faculty' },
   { id: 'governing-body', icon: '🏛️', label: 'Governing Body' },
   { id: 'core-executives', icon: '🧑‍💼', label: 'Core Executives' },
@@ -76,7 +77,7 @@ export const SECTION_GROUPS: { label: string; ids: string[] }[] = [
   { label: 'Form Submissions', ids: ['contact-messages', 'career-applications', 'admission-inquiries', 'campus-visit-requests'] },
   { label: 'Site Appearance', ids: ['banners', 'landing-pages', 'site-photos', 'nav-links', 'content-blocks', 'compliance-docs'] },
   { label: 'About & Governance', ids: ['governing-body', 'governance-items', 'core-executives', 'sves-campuses', 'contacts', 'policies'] },
-  { label: 'Academics', ids: ['programs', 'faculty', 'curriculum', 'downloads'] },
+  { label: 'Academics', ids: ['programs', 'departments', 'faculty', 'curriculum', 'downloads'] },
   { label: 'Admissions & Campus Info', ids: ['information'] },
   { label: 'Student Life', ids: ['student-clubs', 'faqs', 'job-openings', 'events'] },
   { label: 'Placements & Careers', ids: ['placements', 'placement-items', 'tpo-team-photos', 'ilo-office-photos', 'gsac-photos'] },
@@ -188,23 +189,25 @@ function AdminShell({ email }: { email: string | null }) {
     <div className="admin-shell" data-lenis-prevent>
       <aside className="admin-sidebar">
         <div className="admin-sidebar__brand">
-          <span>🎓</span>
+          <span aria-hidden="true">🎓</span>
           <span>VWU Admin</span>
         </div>
-        <nav className="admin-sidebar__nav">
+        <nav className="admin-sidebar__nav" aria-label="Admin sections">
           {SECTION_GROUPS.map((group) => (
-            <div className="admin-sidebar__group" key={group.label}>
-              <p className="admin-sidebar__group-label">{group.label}</p>
+            <div className="admin-sidebar__group" key={group.label} role="group" aria-labelledby={`group-${group.label}`}>
+              <p className="admin-sidebar__group-label" id={`group-${group.label}`}>{group.label}</p>
               {group.ids.map((id) => {
                 const s = SECTIONS.find((sec) => sec.id === id);
                 if (!s) return null;
+                const isActive = activeSection === s.id;
                 return (
                   <button
                     key={s.id}
-                    className={`admin-sidebar__link${activeSection === s.id ? ' active' : ''}`}
+                    className={`admin-sidebar__link${isActive ? ' active' : ''}`}
                     onClick={() => setActiveSection(s.id)}
+                    aria-current={isActive ? 'page' : undefined}
                   >
-                    <span>{s.icon}</span>
+                    <span aria-hidden="true">{s.icon}</span>
                     {s.label}
                   </button>
                 );

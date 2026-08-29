@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp, writeBatch,
 } from 'firebase/firestore';
@@ -25,6 +25,38 @@ export default function GoverningBodyAdmin() {
   const [editing, setEditing] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [clearing, setClearing] = useState(false);
+
+  // Drag-to-reorder — the public page (GoverningBody.tsx) shows one flat
+  // list ordered by `order`, so no category grouping is needed here.
+  const [orderedMembers, setOrderedMembers] = useState<GoverningBodyDoc[]>([]);
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
+  useEffect(() => setOrderedMembers(members), [members]);
+
+  const handleDragOver = (i: number) => {
+    if (dragIndex === null || dragIndex === i) return;
+    setOrderedMembers((prev) => {
+      const next = [...prev];
+      const [moved] = next.splice(dragIndex, 1);
+      next.splice(i, 0, moved);
+      return next;
+    });
+    setDragIndex(i);
+  };
+  const handleDrop = async () => {
+    setDragIndex(null);
+    const batch = writeBatch(db);
+    let changed = false;
+    orderedMembers.forEach((m, i) => {
+      if (m.order !== i) { batch.update(doc(db, 'governingBody', m.id), { order: i }); changed = true; }
+    });
+    if (changed) {
+      try {
+        await batch.commit();
+      } catch (e) {
+        alert(`Couldn't save new order: ${(e as Error).message}`);
+      }
+    }
+  };
 
   const set = (k: string, v: string | number) => setForm((p) => ({ ...p, [k]: v }));
   const handleImage = (r: UploadResult) => setForm((p) => ({ ...p, photoUrl: r.url, storagePath: r.path }));
@@ -90,23 +122,23 @@ export default function GoverningBodyAdmin() {
             <ImageUploader folder="vwu/governing-body" currentUrl={form.photoUrl} onUploaded={handleImage} label="Upload Photo" />
           </div>
           <div className="admin-field">
-            <label>Full Name *</label>
-            <input value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="Sri K.V. Vishnu Raju" />
+            <label htmlFor="field-full-name">Full Name *</label>
+            <input id="field-full-name" value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="Sri K.V. Vishnu Raju" />
           </div>
           <div className="admin-field">
-            <label>Position</label>
-            <input value={form.position} onChange={(e) => set('position', e.target.value)} placeholder="Chairman, SVES" />
+            <label htmlFor="field-position">Position</label>
+            <input id="field-position" value={form.position} onChange={(e) => set('position', e.target.value)} placeholder="Chairman, SVES" />
           </div>
           <div className="admin-field">
-            <label>Category</label>
-            <input list="gb-categories" value={form.category} onChange={(e) => set('category', e.target.value)} placeholder="Management" />
+            <label htmlFor="field-category">Category</label>
+            <input id="field-category" list="gb-categories" value={form.category} onChange={(e) => set('category', e.target.value)} placeholder="Management" />
             <datalist id="gb-categories">
               {CATEGORIES.map((c) => <option key={c} value={c} />)}
             </datalist>
           </div>
           <div className="admin-field">
-            <label>Display Order</label>
-            <input type="number" value={form.order} onChange={(e) => set('order', Number(e.target.value))} />
+            <label htmlFor="field-display-order">Display Order</label>
+            <input id="field-display-order" type="number" value={form.order} onChange={(e) => set('order', Number(e.target.value))} />
           </div>
         </div>
         <div className="admin-form-actions">
@@ -126,18 +158,27 @@ export default function GoverningBodyAdmin() {
             </button>
           )}
         </div>
+        <p className="admin-field__hint" style={{ marginBottom: '0.75rem' }}>Drag rows by the ⠿ handle to change the order members appear in on the public site.</p>
         {loading ? <p className="admin-loading">Loading…</p> : (
           <div className="admin-table-wrap">
             <table className="admin-table">
-              <thead><tr><th>Photo</th><th>Name</th><th>Position</th><th>Category</th><th>Order</th><th>Actions</th></tr></thead>
+              <thead><tr><th></th><th>Photo</th><th>Name</th><th>Position</th><th>Category</th><th>Actions</th></tr></thead>
               <tbody>
-                {members.map((m) => (
-                  <tr key={m.id}>
+                {orderedMembers.map((m, i) => (
+                  <tr
+                    key={m.id}
+                    draggable
+                    onDragStart={() => setDragIndex(i)}
+                    onDragOver={(e) => { e.preventDefault(); handleDragOver(i); }}
+                    onDrop={handleDrop}
+                    onDragEnd={() => setDragIndex(null)}
+                    style={{ opacity: dragIndex === i ? 0.5 : 1, cursor: 'grab' }}
+                  >
+                    <td style={{ color: 'var(--color-text-light, #9ca3af)', fontSize: '1.1rem', userSelect: 'none' }}>⠿</td>
                     <td>{m.photoUrl ? <img src={m.photoUrl} alt="" className="admin-table__avatar" /> : '👤'}</td>
                     <td>{m.name}</td>
                     <td>{m.position}</td>
                     <td><span className="admin-badge admin-badge--sm">{m.category}</span></td>
-                    <td>{m.order}</td>
                     <td>
                       <button className="admin-btn admin-btn--sm" onClick={() => startEdit(m)}>Edit</button>
                       <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(m.id)}>Delete</button>

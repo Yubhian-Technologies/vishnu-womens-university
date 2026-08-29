@@ -80,27 +80,27 @@ function HappeningsPanel() {
         <h2 className="admin-card__title">{editing ? 'Edit Happening' : 'Add Happening'}</h2>
         <div className="admin-form-grid">
           <div className="admin-field admin-field--full">
-            <label>Title *</label>
-            <input value={form.title} onChange={(e) => set('title', e.target.value)} placeholder="Cyber Shield 2.1" />
+            <label htmlFor="field-title">Title *</label>
+            <input id="field-title" value={form.title} onChange={(e) => set('title', e.target.value)} placeholder="Cyber Shield 2.1" />
           </div>
           <div className="admin-field">
-            <label>Date * (as displayed, e.g. January 31, 2026)</label>
-            <input value={form.date} onChange={(e) => set('date', e.target.value)} placeholder="January 31, 2026" />
+            <label htmlFor="field-date-as-displayed-e-g">Date * (as displayed, e.g. January 31, 2026)</label>
+            <input id="field-date-as-displayed-e-g" value={form.date} onChange={(e) => set('date', e.target.value)} placeholder="January 31, 2026" />
           </div>
           <div className="admin-field">
-            <label>Type *</label>
-            <select value={form.type} onChange={(e) => set('type', e.target.value)}>
+            <label htmlFor="field-type">Type *</label>
+            <select id="field-type" value={form.type} onChange={(e) => set('type', e.target.value)}>
               <option value="recent">Recent</option>
               <option value="upcoming">Upcoming</option>
             </select>
           </div>
           <div className="admin-field">
-            <label>Department (optional)</label>
-            <input value={form.dept} onChange={(e) => set('dept', e.target.value)} placeholder="CSE Department" />
+            <label htmlFor="field-department-optional">Department (optional)</label>
+            <input id="field-department-optional" value={form.dept} onChange={(e) => set('dept', e.target.value)} placeholder="CSE Department" />
           </div>
           <div className="admin-field">
-            <label>Display Order</label>
-            <input type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
+            <label htmlFor="field-display-order">Display Order</label>
+            <input id="field-display-order" type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
           </div>
         </div>
         <div className="admin-form-actions">
@@ -173,32 +173,32 @@ function AwardsPanel() {
         <h2 className="admin-card__title">{editing ? 'Edit Award/Ranking/Accreditation' : 'Add Award/Ranking/Accreditation'}</h2>
         <div className="admin-form-grid">
           <div className="admin-field admin-field--full">
-            <label>Name *</label>
-            <input value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="NAAC Accreditation" />
+            <label htmlFor="field-name">Name *</label>
+            <input id="field-name" value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="NAAC Accreditation" />
           </div>
           <div className="admin-field">
-            <label>Issued By *</label>
-            <input value={form.issuedBy} onChange={(e) => set('issuedBy', e.target.value)} placeholder="National Assessment and Accreditation Council" />
+            <label htmlFor="field-issued-by">Issued By *</label>
+            <input id="field-issued-by" value={form.issuedBy} onChange={(e) => set('issuedBy', e.target.value)} placeholder="National Assessment and Accreditation Council" />
           </div>
           <div className="admin-field">
-            <label>Year (optional)</label>
-            <input value={form.year} onChange={(e) => set('year', e.target.value)} placeholder="2022" />
+            <label htmlFor="field-year-optional">Year (optional)</label>
+            <input id="field-year-optional" value={form.year} onChange={(e) => set('year', e.target.value)} placeholder="2022" />
           </div>
           <div className="admin-field">
-            <label>Category *</label>
-            <select value={form.category} onChange={(e) => set('category', e.target.value)}>
+            <label htmlFor="field-category">Category *</label>
+            <select id="field-category" value={form.category} onChange={(e) => set('category', e.target.value)}>
               <option value="ranking">Ranking</option>
               <option value="award">Award</option>
               <option value="accreditation">Accreditation</option>
             </select>
           </div>
           <div className="admin-field">
-            <label>Display Order</label>
-            <input type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
+            <label htmlFor="field-display-order-2">Display Order</label>
+            <input id="field-display-order-2" type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
           </div>
           <div className="admin-field admin-field--full">
-            <label>Details (optional)</label>
-            <textarea rows={2} value={form.details} onChange={(e) => set('details', e.target.value)} />
+            <label htmlFor="field-details-optional">Details (optional)</label>
+            <textarea id="field-details-optional" rows={2} value={form.details} onChange={(e) => set('details', e.target.value)} />
           </div>
         </div>
         <div className="admin-form-actions">
