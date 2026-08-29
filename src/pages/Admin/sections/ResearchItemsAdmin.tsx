@@ -6,6 +6,12 @@ import { CONTENT_ICON_NAMES } from '../../../lib/contentIcons';
 import { deleteFile, type UploadResult } from '../../../lib/storage';
 import FileUploader from '../../../components/FileUploader/FileUploader';
 
+export interface PublicationYearEntry {
+  year: string;
+  fileUrl: string;
+  storagePath: string;
+}
+
 export interface ResearchItemDoc {
   id: string;
   slug: string;
@@ -23,13 +29,14 @@ export interface ResearchItemDoc {
   heroStoragePath: string;
   policyPdfUrl: string;
   policyPdfStoragePath: string;
+  publicationYears: PublicationYearEntry[];
   order: number;
 }
 
 const EMPTY: Omit<ResearchItemDoc, 'id'> = {
   slug: '', title: '', category: 'governance', icon: 'Microscope', desc: '', intro: '', about: '',
   highlights: [], tableText: '', accordionText: '', projectsText: '', heroImage: '', heroStoragePath: '',
-  policyPdfUrl: '', policyPdfStoragePath: '', order: 0,
+  policyPdfUrl: '', policyPdfStoragePath: '', publicationYears: [], order: 0,
 };
 
 const CATEGORIES: { value: ResearchItemDoc['category']; label: string }[] = [
@@ -55,6 +62,15 @@ export default function ResearchItemsAdmin() {
   const set = (k: string, v: string | number | string[]) => setForm((p) => ({ ...p, [k]: v }));
   const handlePolicyPdf = (r: UploadResult) => setForm((p) => ({ ...p, policyPdfUrl: r.url, policyPdfStoragePath: r.path }));
 
+  const addPublicationYear = () => setForm((p) => ({ ...p, publicationYears: [...p.publicationYears, { year: '', fileUrl: '', storagePath: '' }] }));
+  const updatePublicationYear = (index: number, patch: Partial<PublicationYearEntry>) =>
+    setForm((p) => ({ ...p, publicationYears: p.publicationYears.map((entry, i) => (i === index ? { ...entry, ...patch } : entry)) }));
+  const removePublicationYear = async (index: number) => {
+    const entry = form.publicationYears[index];
+    if (entry.storagePath) await deleteFile(entry.storagePath);
+    setForm((p) => ({ ...p, publicationYears: p.publicationYears.filter((_, i) => i !== index) }));
+  };
+
   const save = async () => {
     if (!form.slug || !form.title) return alert('Slug and title are required.');
     setSaving(true);
@@ -77,15 +93,19 @@ export default function ResearchItemsAdmin() {
       desc: it.desc || '', intro: it.intro || '', about: it.about || '',
       highlights: it.highlights || [], tableText: it.tableText || '', accordionText: it.accordionText || '',
       projectsText: it.projectsText || '', heroImage: it.heroImage || '', heroStoragePath: it.heroStoragePath || '',
-      policyPdfUrl: it.policyPdfUrl || '', policyPdfStoragePath: it.policyPdfStoragePath || '', order: it.order,
+      policyPdfUrl: it.policyPdfUrl || '', policyPdfStoragePath: it.policyPdfStoragePath || '',
+      publicationYears: it.publicationYears || [], order: it.order,
     });
   };
 
-  const remove = async (id: string, heroStoragePath?: string, policyPdfStoragePath?: string) => {
+  const remove = async (id: string, heroStoragePath?: string, policyPdfStoragePath?: string, publicationYears?: PublicationYearEntry[]) => {
     if (!confirm('Delete this research item?')) return;
     try {
       if (heroStoragePath) await deleteFile(heroStoragePath);
       if (policyPdfStoragePath) await deleteFile(policyPdfStoragePath);
+      for (const entry of publicationYears || []) {
+        if (entry.storagePath) await deleteFile(entry.storagePath);
+      }
       await deleteDoc(doc(db, 'researchItems', id));
     } catch (e) {
       alert(`Couldn't delete: ${(e as Error).message}`);
@@ -153,6 +173,32 @@ export default function ResearchItemsAdmin() {
             <FileUploader folder="vwu/research-policies" currentUrl={form.policyPdfUrl} onUploaded={handlePolicyPdf} label="Upload PDF" />
           </div>
           <div className="admin-field admin-field--full">
+            <label>Publications by Year (optional — powers the Research Publications page's year-by-year
+              PDF list). Add a year, then upload that year's PDF — no code changes needed to add a new year.</label>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              {form.publicationYears.map((entry, i) => (
+                <div key={i} style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start', border: '1px solid var(--color-light-gray, #ddd)', borderRadius: 6, padding: '0.75rem' }}>
+                  <input
+                    value={entry.year}
+                    onChange={(e) => updatePublicationYear(i, { year: e.target.value })}
+                    placeholder="2026"
+                    style={{ maxWidth: 100 }}
+                  />
+                  <div style={{ flex: 1 }}>
+                    <FileUploader
+                      folder="vwu/research-publications"
+                      currentUrl={entry.fileUrl}
+                      onUploaded={(r) => updatePublicationYear(i, { fileUrl: r.url, storagePath: r.path })}
+                      label="Upload PDF"
+                    />
+                  </div>
+                  <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removePublicationYear(i)}>Remove</button>
+                </div>
+              ))}
+              <button type="button" className="admin-btn admin-btn--sm" onClick={addPublicationYear}>+ Add Year</button>
+            </div>
+          </div>
+          <div className="admin-field admin-field--full">
             <label>Key Highlights (one per line — optional)</label>
             <textarea rows={4} value={arrayToLines(form.highlights)} onChange={(e) => set('highlights', linesToArray(e.target.value))} />
           </div>
@@ -166,7 +212,11 @@ export default function ResearchItemsAdmin() {
               <code>## Category</code>, each expandable area within it with <code>### Area Name</code>, then list
               one item per line underneath (e.g. faculty names) — they'll render as a click-to-expand accordion.
               Add <code>| https://some-url</code> after an item to make it a clickable link (e.g. to a faculty
-              member's external IRINS profile) — leave it off for plain text.</label>
+              member's external IRINS profile) — leave it off for plain text. For an area that's really a group of
+              sub-departments (e.g. Basic Science containing Mathematics, Physics, ...), add{' '}
+              <code>#### Sub-area Name</code> lines right under its <code>### Area Name</code> line — each starts
+              its own nested expandable area of work with faculty listed underneath it, instead of listing faculty
+              directly under the <code>### </code> line.</label>
             <textarea
               rows={10}
               value={form.accordionText}
@@ -215,7 +265,7 @@ export default function ResearchItemsAdmin() {
                     <td>{it.slug}</td>
                     <td>
                       <button className="admin-btn admin-btn--sm" onClick={() => startEdit(it)}>Edit</button>
-                      <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(it.id, it.heroStoragePath, it.policyPdfStoragePath)}>Delete</button>
+                      <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(it.id, it.heroStoragePath, it.policyPdfStoragePath, it.publicationYears)}>Delete</button>
                     </td>
                   </tr>
                 ))}

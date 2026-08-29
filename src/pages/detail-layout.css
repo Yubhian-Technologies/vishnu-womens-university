@@ -374,6 +374,7 @@
 
 .thrust-area-card-head {
   width: 100%;
+  min-height: 4.75rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -449,6 +450,35 @@
   gap: var(--space-3);
   border-top: 1px solid var(--color-light-gray);
   padding-top: var(--space-4);
+}
+
+/* Sub-area cards nested inside an area that's really a sub-department group
+   (e.g. Basic Science's Mathematics, Physics, ...) */
+.thrust-subarea-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5) var(--space-4);
+  border-top: 1px solid var(--color-light-gray);
+}
+
+.thrust-subarea-card {
+  /* .thrust-area-card's align-self: start is meant for the outer CSS Grid
+     (so cards don't stretch to fill row height there) — reused here inside
+     a flex column, that same rule instead shrinks each card to its own text
+     width, so a short title like "Molecular Modelling" renders narrower
+     than its long-titled siblings. Stretch to the full row width instead. */
+  align-self: stretch;
+  background: var(--color-off-white);
+}
+
+.thrust-subarea-card .thrust-area-card-head {
+  min-height: 3.5rem;
+  padding: var(--space-3) var(--space-4);
+}
+
+.thrust-subarea-card .thrust-area-card-name {
+  font-size: var(--text-sm);
 }
 
 .thrust-faculty-list li {
