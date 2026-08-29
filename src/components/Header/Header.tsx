@@ -355,7 +355,11 @@ export default function Header() {
           ...group,
           items: differentiatorItems
             .filter((i) => i.category === cat.id)
-            .map((i): NavChild => ({ label: i.title, path: `/differentiators/${i.slug}` })),
+            .map((i): NavChild =>
+              i.external && i.url
+                ? { label: i.title, path: i.url, external: true }
+                : { label: i.title, path: `/differentiators/${i.slug}` }
+            ),
         };
       });
       return { ...item, groups };
