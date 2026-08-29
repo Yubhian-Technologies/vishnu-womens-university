@@ -78,20 +78,20 @@ export default function AlumniEventsAdmin() {
         <h2 className="admin-card__title">{editing ? 'Edit Event' : 'Add Alumni Event'}</h2>
         <div className="admin-form-grid">
           <div className="admin-field">
-            <label>Title *</label>
-            <input value={form.title} onChange={(e) => set('title', e.target.value)} placeholder="Annual Alumni Meet" />
+            <label htmlFor="field-title">Title *</label>
+            <input id="field-title" value={form.title} onChange={(e) => set('title', e.target.value)} placeholder="Annual Alumni Meet" />
           </div>
           <div className="admin-field">
-            <label>Date *</label>
-            <input value={form.date} onChange={(e) => set('date', e.target.value)} placeholder="January 2027" />
+            <label htmlFor="field-date">Date *</label>
+            <input id="field-date" value={form.date} onChange={(e) => set('date', e.target.value)} placeholder="January 2027" />
           </div>
           <div className="admin-field">
-            <label>Display Order</label>
-            <input type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
+            <label htmlFor="field-display-order">Display Order</label>
+            <input id="field-display-order" type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
           </div>
           <div className="admin-field admin-field--full">
-            <label>Description</label>
-            <textarea rows={3} value={form.desc} onChange={(e) => set('desc', e.target.value)} placeholder="Short description shown on the card…" />
+            <label htmlFor="field-description">Description</label>
+            <textarea id="field-description" rows={3} value={form.desc} onChange={(e) => set('desc', e.target.value)} placeholder="Short description shown on the card…" />
           </div>
         </div>
         <div className="admin-form-actions">

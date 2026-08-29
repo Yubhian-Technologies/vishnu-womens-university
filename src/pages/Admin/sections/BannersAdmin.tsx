@@ -351,28 +351,28 @@ function PageBannersAdmin() {
               />
             </div>
             <div className="admin-field">
-              <label>Heading *</label>
-              <input value={form.title} onChange={(e) => set('title', e.target.value)}
+              <label htmlFor="field-heading">Heading *</label>
+              <input id="field-heading" value={form.title} onChange={(e) => set('title', e.target.value)}
                 placeholder="e.g. You Will Excel." />
             </div>
             <div className="admin-field">
-              <label>Subheading</label>
-              <input value={form.subtitle} onChange={(e) => set('subtitle', e.target.value)}
+              <label htmlFor="field-subheading">Subheading</label>
+              <input id="field-subheading" value={form.subtitle} onChange={(e) => set('subtitle', e.target.value)}
                 placeholder="Supporting text shown below the heading" />
             </div>
             <div className="admin-field">
-              <label>Button Label</label>
-              <input value={form.ctaLabel} onChange={(e) => set('ctaLabel', e.target.value)}
+              <label htmlFor="field-button-label">Button Label</label>
+              <input id="field-button-label" value={form.ctaLabel} onChange={(e) => set('ctaLabel', e.target.value)}
                 placeholder="e.g. Explore Programs" />
             </div>
             <div className="admin-field">
-              <label>Button Link</label>
-              <input value={form.ctaLink} onChange={(e) => set('ctaLink', e.target.value)}
+              <label htmlFor="field-button-link">Button Link</label>
+              <input id="field-button-link" value={form.ctaLink} onChange={(e) => set('ctaLink', e.target.value)}
                 placeholder="/academics" />
             </div>
             <div className="admin-field">
-              <label>Order (for carousel)</label>
-              <input type="number" value={form.order}
+              <label htmlFor="field-order-for-carousel">Order (for carousel)</label>
+              <input id="field-order-for-carousel" type="number" value={form.order}
                 onChange={(e) => set('order', +e.target.value)} min={0} />
             </div>
           </div>

@@ -52,16 +52,16 @@ export default function AcademicCalendarAdmin() {
         <h2 className="admin-card__title">{editing ? 'Edit Entry' : 'Add Calendar Entry'}</h2>
         <div className="admin-form-grid">
           <div className="admin-field">
-            <label>Event / Activity *</label>
-            <input value={form.event} onChange={(e) => set('event', e.target.value)} placeholder="Odd Semester Commencement" />
+            <label htmlFor="field-event-activity">Event / Activity *</label>
+            <input id="field-event-activity" value={form.event} onChange={(e) => set('event', e.target.value)} placeholder="Odd Semester Commencement" />
           </div>
           <div className="admin-field">
-            <label>Date *</label>
-            <input value={form.date} onChange={(e) => set('date', e.target.value)} placeholder="July 15, 2026" />
+            <label htmlFor="field-date">Date *</label>
+            <input id="field-date" value={form.date} onChange={(e) => set('date', e.target.value)} placeholder="July 15, 2026" />
           </div>
           <div className="admin-field">
-            <label>Display Order</label>
-            <input type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
+            <label htmlFor="field-display-order">Display Order</label>
+            <input id="field-display-order" type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
           </div>
         </div>
         <div className="admin-form-actions">

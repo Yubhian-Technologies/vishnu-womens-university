@@ -170,8 +170,8 @@ export default function ContentBlocksAdmin() {
         </p>
         <div className="admin-form-grid">
           <div className="admin-field admin-field--full">
-            <label>Page / Section *</label>
-            <select value={`${form.page}::${form.section}`} onChange={(e) => {
+            <label htmlFor="field-page-section">Page / Section *</label>
+            <select id="field-page-section" value={`${form.page}::${form.section}`} onChange={(e) => {
               const [page, section] = e.target.value.split('::');
               setForm((p) => ({ ...p, page, section }));
             }}>
@@ -185,12 +185,12 @@ export default function ContentBlocksAdmin() {
               change the grid layout at all, only whether they're disabled. */}
           <ReadOnlyGate readOnly={!formEditable}>
             <div className="admin-field">
-              <label>Value (number/short value if a stat; a URL for Social Links; a meta line like a phone number for Contact Info Cards)</label>
-              <input value={form.value} onChange={(e) => set('value', e.target.value)} placeholder="100 Acres" />
+              <label htmlFor="field-value-number-short-value-if">Value (number/short value if a stat; a URL for Social Links; a meta line like a phone number for Contact Info Cards)</label>
+              <input id="field-value-number-short-value-if" value={form.value} onChange={(e) => set('value', e.target.value)} placeholder="100 Acres" />
             </div>
             <div className="admin-field">
-              <label>Icon (if this section uses icon cards)</label>
-              <select value={form.icon} onChange={(e) => set('icon', e.target.value)}>
+              <label htmlFor="field-icon-if-this-section-uses">Icon (if this section uses icon cards)</label>
+              <select id="field-icon-if-this-section-uses" value={form.icon} onChange={(e) => set('icon', e.target.value)}>
                 <option value="">None</option>
                 {CONTENT_ICON_NAMES.map((n) => <option key={n} value={n}>{n}</option>)}
               </select>
@@ -209,16 +209,16 @@ export default function ContentBlocksAdmin() {
               )}
             </div>
             <div className="admin-field">
-              <label>Display Order</label>
-              <input type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
+              <label htmlFor="field-display-order">Display Order</label>
+              <input id="field-display-order" type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
             </div>
             <div className="admin-field admin-field--full">
-              <label>Title *</label>
-              <input value={form.title} onChange={(e) => set('title', e.target.value)} placeholder="Campus Area" />
+              <label htmlFor="field-title">Title *</label>
+              <input id="field-title" value={form.title} onChange={(e) => set('title', e.target.value)} placeholder="Campus Area" />
             </div>
             <div className="admin-field admin-field--full">
-              <label>Description (if this item needs one — for Contact Info Cards, put each address line on its own line)</label>
-              <textarea rows={3} value={form.desc} onChange={(e) => set('desc', e.target.value)} placeholder="Optional longer text…" />
+              <label htmlFor="field-description-if-this-item-needs">Description (if this item needs one — for Contact Info Cards, put each address line on its own line)</label>
+              <textarea id="field-description-if-this-item-needs" rows={3} value={form.desc} onChange={(e) => set('desc', e.target.value)} placeholder="Optional longer text…" />
             </div>
           </ReadOnlyGate>
         </div>

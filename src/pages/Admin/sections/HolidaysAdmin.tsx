@@ -53,16 +53,16 @@ export default function HolidaysAdmin() {
         <p className="admin-lead" style={{ marginBottom: '1rem' }}>Date must be in "Month Day, Year" format (e.g. "March 30, 2026") — the public page parses the month and day out of this string.</p>
         <div className="admin-form-grid">
           <div className="admin-field">
-            <label>Holiday Name *</label>
-            <input value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="Ugadi (Telugu New Year)" />
+            <label htmlFor="field-holiday-name">Holiday Name *</label>
+            <input id="field-holiday-name" value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="Ugadi (Telugu New Year)" />
           </div>
           <div className="admin-field">
-            <label>Date *</label>
-            <input value={form.date} onChange={(e) => set('date', e.target.value)} placeholder="March 30, 2026" />
+            <label htmlFor="field-date">Date *</label>
+            <input id="field-date" value={form.date} onChange={(e) => set('date', e.target.value)} placeholder="March 30, 2026" />
           </div>
           <div className="admin-field">
-            <label>Display Order</label>
-            <input type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
+            <label htmlFor="field-display-order">Display Order</label>
+            <input id="field-display-order" type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
           </div>
         </div>
         <div className="admin-form-actions">

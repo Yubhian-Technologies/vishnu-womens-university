@@ -25,7 +25,6 @@
   border-bottom: 3px solid transparent;
   margin-bottom: -2px;
   transition: all var(--transition-fast);
-  text-transform: uppercase;
 }
 
 .prog-tab.active,

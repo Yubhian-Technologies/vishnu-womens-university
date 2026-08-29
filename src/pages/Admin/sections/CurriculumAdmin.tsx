@@ -84,22 +84,22 @@ export default function CurriculumAdmin() {
             <FileUploader folder="vwu/curriculum" currentUrl={form.fileUrl} onUploaded={handleFile} label="Upload PDF" />
           </div>
           <div className="admin-field">
-            <label>Program</label>
-            <select value={form.program} onChange={(e) => set('program', e.target.value)}>
+            <label htmlFor="field-program">Program</label>
+            <select id="field-program" value={form.program} onChange={(e) => set('program', e.target.value)}>
               {PROGRAMS.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}
             </select>
           </div>
           <div className="admin-field">
-            <label>Row Label *</label>
-            <input value={form.rowLabel} onChange={(e) => set('rowLabel', e.target.value)} placeholder="I B.Tech I Sem" />
+            <label htmlFor="field-row-label">Row Label *</label>
+            <input id="field-row-label" value={form.rowLabel} onChange={(e) => set('rowLabel', e.target.value)} placeholder="I B.Tech I Sem" />
           </div>
           <div className="admin-field">
-            <label>Row Order</label>
-            <input type="number" value={form.rowOrder} onChange={(e) => set('rowOrder', Number(e.target.value))} min={0} />
+            <label htmlFor="field-row-order">Row Order</label>
+            <input id="field-row-order" type="number" value={form.rowOrder} onChange={(e) => set('rowOrder', Number(e.target.value))} min={0} />
           </div>
           <div className="admin-field">
-            <label>Regulation *</label>
-            <input value={form.regulation} onChange={(e) => set('regulation', e.target.value)} placeholder="R19" />
+            <label htmlFor="field-regulation">Regulation *</label>
+            <input id="field-regulation" value={form.regulation} onChange={(e) => set('regulation', e.target.value)} placeholder="R19" />
           </div>
         </div>
         <div className="admin-form-actions">

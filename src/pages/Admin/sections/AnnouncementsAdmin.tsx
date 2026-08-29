@@ -69,16 +69,16 @@ export default function AnnouncementsAdmin() {
         </p>
         <div className="admin-form-grid">
           <div className="admin-field admin-field--full">
-            <label>Text *</label>
-            <input value={form.text} onChange={(e) => set('text', e.target.value)} placeholder="e.g. Admissions open for 2025-26 — Apply Now!" />
+            <label htmlFor="field-text">Text *</label>
+            <input id="field-text" value={form.text} onChange={(e) => set('text', e.target.value)} placeholder="e.g. Admissions open for 2025-26 — Apply Now!" />
           </div>
           <div className="admin-field">
-            <label>Link (optional)</label>
-            <input value={form.link} onChange={(e) => set('link', e.target.value)} placeholder="/admissions or https://…" />
+            <label htmlFor="field-link-optional">Link (optional)</label>
+            <input id="field-link-optional" value={form.link} onChange={(e) => set('link', e.target.value)} placeholder="/admissions or https://…" />
           </div>
           <div className="admin-field">
-            <label>Display Order</label>
-            <input type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
+            <label htmlFor="field-display-order">Display Order</label>
+            <input id="field-display-order" type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
           </div>
           <div className="admin-field">
             <label>Active</label>

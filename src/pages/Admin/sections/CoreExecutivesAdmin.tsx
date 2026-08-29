@@ -85,20 +85,20 @@ export default function CoreExecutivesAdmin() {
             <ImageUploader folder="vwu/core-executives" currentUrl={form.photoUrl} onUploaded={handleImage} label="Upload Photo" />
           </div>
           <div className="admin-field">
-            <label>Full Name *</label>
-            <input value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="Dr. G. Srinivasa Rao" />
+            <label htmlFor="field-full-name">Full Name *</label>
+            <input id="field-full-name" value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="Dr. G. Srinivasa Rao" />
           </div>
           <div className="admin-field">
-            <label>Role / Title</label>
-            <input value={form.role} onChange={(e) => set('role', e.target.value)} placeholder="Principal" />
+            <label htmlFor="field-role-title">Role / Title</label>
+            <input id="field-role-title" value={form.role} onChange={(e) => set('role', e.target.value)} placeholder="Principal" />
           </div>
           <div className="admin-field">
-            <label>Display Order</label>
-            <input type="number" value={form.order} onChange={(e) => set('order', Number(e.target.value))} />
+            <label htmlFor="field-display-order">Display Order</label>
+            <input id="field-display-order" type="number" value={form.order} onChange={(e) => set('order', Number(e.target.value))} />
           </div>
           <div className="admin-field">
-            <label>Level (org-chart tier)</label>
-            <select value={form.level || 1} onChange={(e) => set('level', Number(e.target.value))}>
+            <label htmlFor="field-level-org-chart-tier">Level (org-chart tier)</label>
+            <select id="field-level-org-chart-tier" value={form.level || 1} onChange={(e) => set('level', Number(e.target.value))}>
               <option value={1}>Level 1</option>
               <option value={2}>Level 2</option>
               <option value={3}>Level 3</option>

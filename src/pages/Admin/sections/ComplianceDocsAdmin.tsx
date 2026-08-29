@@ -140,14 +140,14 @@ export default function ComplianceDocsAdmin() {
         </p>
         <div className="admin-form-grid">
           <div className="admin-field">
-            <label>Group *</label>
-            <select value={form.group} onChange={(e) => set('group', e.target.value)}>
+            <label htmlFor="field-group">Group *</label>
+            <select id="field-group" value={form.group} onChange={(e) => set('group', e.target.value)}>
               {COMPLIANCE_GROUPS.map((g) => <option key={g} value={g}>{g}</option>)}
             </select>
           </div>
           <div className="admin-field">
-            <label>Label *</label>
-            <input value={form.label} onChange={(e) => set('label', e.target.value)} placeholder="NAAC Approvals" />
+            <label htmlFor="field-label">Label *</label>
+            <input id="field-label" value={form.label} onChange={(e) => set('label', e.target.value)} placeholder="NAAC Approvals" />
           </div>
           <div className="admin-field">
             <label>
@@ -157,8 +157,8 @@ export default function ComplianceDocsAdmin() {
           </div>
           {form.external ? (
             <div className="admin-field">
-              <label>External URL *</label>
-              <input value={form.fileUrl} onChange={(e) => set('fileUrl', e.target.value)} placeholder="https://svecw.edu.in/policies-procedures/" />
+              <label htmlFor="field-external-url">External URL *</label>
+              <input id="field-external-url" value={form.fileUrl} onChange={(e) => set('fileUrl', e.target.value)} placeholder="https://svecw.edu.in/policies-procedures/" />
             </div>
           ) : (
             <>
@@ -175,12 +175,12 @@ export default function ComplianceDocsAdmin() {
             </>
           )}
           <div className="admin-field">
-            <label>Reference Key (optional — see note above; leave blank for a one-off document)</label>
-            <input value={form.key} onChange={(e) => set('key', e.target.value.trim().toLowerCase().replace(/\s+/g, '-'))} placeholder="naac-approvals" />
+            <label htmlFor="field-reference-key-optional-see-note">Reference Key (optional — see note above; leave blank for a one-off document)</label>
+            <input id="field-reference-key-optional-see-note" value={form.key} onChange={(e) => set('key', e.target.value.trim().toLowerCase().replace(/\s+/g, '-'))} placeholder="naac-approvals" />
           </div>
           <div className="admin-field">
-            <label>Display Order</label>
-            <input type="number" value={form.order} onChange={(e) => set('order', Number(e.target.value))} min={0} />
+            <label htmlFor="field-display-order">Display Order</label>
+            <input id="field-display-order" type="number" value={form.order} onChange={(e) => set('order', Number(e.target.value))} min={0} />
           </div>
         </div>
         <div className="admin-form-actions">

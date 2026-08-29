@@ -126,7 +126,7 @@ const navItems: NavItem[] = [
       },
       { groupLabel: 'UG Programmes', groupPath: '/academics?tab=btech', items: [] },
       { groupLabel: 'PG Programmes', groupPath: '/academics?tab=mtech', items: [] },
-      { groupLabel: 'Ph.D. Programmes', groupPath: '/academics?tab=mba', items: [] },
+      { groupLabel: 'Ph.D. Programmes', groupPath: '/academics?tab=phd', items: [] },
       {
         groupLabel: 'Information',
         groupPath: '/information',

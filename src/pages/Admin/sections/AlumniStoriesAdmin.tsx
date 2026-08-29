@@ -101,24 +101,24 @@ export default function AlumniStoriesAdmin() {
             <ImageUploader folder="vwu/alumni" currentUrl={form.imageUrl} onUploaded={handleImage} label="Upload Photo" />
           </div>
           <div className="admin-field">
-            <label>Name *</label>
-            <input value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="Priya Reddy" />
+            <label htmlFor="field-name">Name *</label>
+            <input id="field-name" value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="Priya Reddy" />
           </div>
           <div className="admin-field">
-            <label>Batch Year</label>
-            <input value={form.year} onChange={(e) => set('year', e.target.value)} placeholder="Class of '18" />
+            <label htmlFor="field-batch-year">Batch Year</label>
+            <input id="field-batch-year" value={form.year} onChange={(e) => set('year', e.target.value)} placeholder="Class of '18" />
           </div>
           <div className="admin-field">
-            <label>Role & Company</label>
-            <input value={form.role} onChange={(e) => set('role', e.target.value)} placeholder="Senior Software Engineer, Amazon" />
+            <label htmlFor="field-role-company">Role & Company</label>
+            <input id="field-role-company" value={form.role} onChange={(e) => set('role', e.target.value)} placeholder="Senior Software Engineer, Amazon" />
           </div>
           <div className="admin-field">
-            <label>Display Order</label>
-            <input type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
+            <label htmlFor="field-display-order">Display Order</label>
+            <input id="field-display-order" type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
           </div>
           <div className="admin-field admin-field--full">
-            <label>Quote *</label>
-            <textarea rows={3} value={form.quote} onChange={(e) => set('quote', e.target.value)} placeholder="What this alumna has to say about VWU…" />
+            <label htmlFor="field-quote">Quote *</label>
+            <textarea id="field-quote" rows={3} value={form.quote} onChange={(e) => set('quote', e.target.value)} placeholder="What this alumna has to say about VWU…" />
           </div>
         </div>
         <div className="admin-form-actions">

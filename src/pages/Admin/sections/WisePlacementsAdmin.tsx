@@ -84,24 +84,24 @@ export default function WisePlacementsAdmin() {
             <ImageUploader folder="vwu/talentsprint-wise" currentUrl={form.imageUrl} onUploaded={handleImage} label="Upload Photo" aspect={1} />
           </div>
           <div className="admin-field">
-            <label>Name *</label>
-            <input value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="Busi Hema Sri" />
+            <label htmlFor="field-name">Name *</label>
+            <input id="field-name" value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="Busi Hema Sri" />
           </div>
           <div className="admin-field">
-            <label>Regd No</label>
-            <input value={form.regdNo} onChange={(e) => set('regdNo', e.target.value)} placeholder="16B01A0531" />
+            <label htmlFor="field-regd-no">Regd No</label>
+            <input id="field-regd-no" value={form.regdNo} onChange={(e) => set('regdNo', e.target.value)} placeholder="16B01A0531" />
           </div>
           <div className="admin-field">
-            <label>Company *</label>
-            <input value={form.company} onChange={(e) => set('company', e.target.value)} placeholder="Amazon" />
+            <label htmlFor="field-company">Company *</label>
+            <input id="field-company" value={form.company} onChange={(e) => set('company', e.target.value)} placeholder="Amazon" />
           </div>
           <div className="admin-field">
-            <label>Package</label>
-            <input value={form.package} onChange={(e) => set('package', e.target.value)} placeholder="27 LPA" />
+            <label htmlFor="field-package">Package</label>
+            <input id="field-package" value={form.package} onChange={(e) => set('package', e.target.value)} placeholder="27 LPA" />
           </div>
           <div className="admin-field">
-            <label>Display Order</label>
-            <input type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
+            <label htmlFor="field-display-order">Display Order</label>
+            <input id="field-display-order" type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
           </div>
         </div>
         <div className="admin-form-actions">

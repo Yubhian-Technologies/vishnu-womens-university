@@ -123,14 +123,16 @@
 
 .exec-card {
   background: var(--color-white);
-  border: 1px solid rgba(27, 67, 50, 0.08);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
+  border: 1px solid rgba(27, 67, 50, 0.06);
+  border-radius: 22px;
   box-shadow: var(--shadow-md);
   display: flex;
   flex-direction: column;
-  /* Rectangular card, portrait-oriented: media/info below split it 80/20. */
-  aspect-ratio: 3 / 4;
+  /* Padding wraps the whole card (photo included) instead of the photo
+     bleeding to the card's own edges — the photo gets its own, separate
+     corner radius rather than sharing the card's via overflow:hidden.
+     Bottom gets extra room so the name/role text isn't flush with the edge. */
+  padding: var(--space-3) var(--space-3) var(--space-5);
   transition: box-shadow var(--transition-base), border-color var(--transition-base), transform var(--transition-base);
 }
 
@@ -140,13 +142,12 @@
   transform: translateY(-4px);
 }
 
-/* flex-basis 0 with these ratios (4:1) gives an exact 80/20 height split
-   regardless of the card's actual rendered height. */
 .exec-card__media {
-  flex: 4 0 0;
   position: relative;
   overflow: hidden;
+  border-radius: 16px;
   background: var(--color-off-white);
+  aspect-ratio: 4 / 5;
 }
 
 .exec-card__avatar,
@@ -170,15 +171,12 @@
 }
 
 .exec-card__info {
-  flex: 1 0 0;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  gap: var(--space-1);
-  padding: var(--space-2) var(--space-3);
-  border-top: 3px solid var(--color-accent);
+  align-items: flex-start;
+  text-align: left;
+  gap: 2px;
+  padding: var(--space-3) var(--space-1) 0;
 }
 
 .exec-card__name {

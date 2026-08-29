@@ -100,22 +100,22 @@ export default function DifferentiatorsAdmin() {
         </p>
         <div className="admin-form-grid">
           <div className="admin-field">
-            <label>URL Slug * (e.g. vishnu-tbi)</label>
-            <input value={form.slug} onChange={(e) => set('slug', e.target.value.trim().toLowerCase().replace(/\s+/g, '-'))} placeholder="vishnu-tbi" />
+            <label htmlFor="field-url-slug-e-g-vishnu">URL Slug * (e.g. vishnu-tbi)</label>
+            <input id="field-url-slug-e-g-vishnu" value={form.slug} onChange={(e) => set('slug', e.target.value.trim().toLowerCase().replace(/\s+/g, '-'))} placeholder="vishnu-tbi" />
           </div>
           <div className="admin-field">
-            <label>Title *</label>
-            <input value={form.title} onChange={(e) => set('title', e.target.value)} placeholder="Vishnu Technology Business Incubator (TBI)" />
+            <label htmlFor="field-title">Title *</label>
+            <input id="field-title" value={form.title} onChange={(e) => set('title', e.target.value)} placeholder="Vishnu Technology Business Incubator (TBI)" />
           </div>
           <div className="admin-field">
-            <label>Category *</label>
-            <select value={form.category} onChange={(e) => set('category', e.target.value)}>
+            <label htmlFor="field-category">Category *</label>
+            <select id="field-category" value={form.category} onChange={(e) => set('category', e.target.value)}>
               {DIFFERENTIATOR_CATEGORIES.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
             </select>
           </div>
           <div className="admin-field">
-            <label>Display Order</label>
-            <input type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
+            <label htmlFor="field-display-order">Display Order</label>
+            <input id="field-display-order" type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
           </div>
           <div className="admin-field">
             <label>
@@ -124,36 +124,36 @@ export default function DifferentiatorsAdmin() {
             </label>
           </div>
           <div className="admin-field">
-            <label>External URL (only if the box above is checked)</label>
-            <input value={form.url} onChange={(e) => set('url', e.target.value)} placeholder="https://www.vishva.co/" />
+            <label htmlFor="field-external-url-only-if-the">External URL (only if the box above is checked)</label>
+            <input id="field-external-url-only-if-the" value={form.url} onChange={(e) => set('url', e.target.value)} placeholder="https://www.vishva.co/" />
           </div>
           <div className="admin-field admin-field--full">
-            <label>Short Description (shown on the listing card)</label>
-            <textarea rows={2} value={form.desc} onChange={(e) => set('desc', e.target.value)} />
+            <label htmlFor="field-short-description-shown-on-the">Short Description (shown on the listing card)</label>
+            <textarea id="field-short-description-shown-on-the" rows={2} value={form.desc} onChange={(e) => set('desc', e.target.value)} />
           </div>
           <div className="admin-field admin-field--full">
-            <label>Key Highlights (one per line)</label>
-            <textarea rows={4} value={arrayToLines(form.highlights)} onChange={(e) => set('highlights', linesToArray(e.target.value))} />
+            <label htmlFor="field-key-highlights-one-per-line">Key Highlights (one per line)</label>
+            <textarea id="field-key-highlights-one-per-line" rows={4} value={arrayToLines(form.highlights)} onChange={(e) => set('highlights', linesToArray(e.target.value))} />
           </div>
           <div className="admin-field admin-field--full">
-            <label>Intro (detail page — only used when not an external link)</label>
-            <textarea rows={3} value={form.intro} onChange={(e) => set('intro', e.target.value)} />
+            <label htmlFor="field-intro-detail-page-only-used">Intro (detail page — only used when not an external link)</label>
+            <textarea id="field-intro-detail-page-only-used" rows={3} value={form.intro} onChange={(e) => set('intro', e.target.value)} />
           </div>
           <div className="admin-field admin-field--full">
-            <label>About (detail page — longer paragraph)</label>
-            <textarea rows={4} value={form.about} onChange={(e) => set('about', e.target.value)} />
+            <label htmlFor="field-about-detail-page-longer-paragraph">About (detail page — longer paragraph)</label>
+            <textarea id="field-about-detail-page-longer-paragraph" rows={4} value={form.about} onChange={(e) => set('about', e.target.value)} />
           </div>
           <div className="admin-field admin-field--full">
-            <label>Facilities & Equipment (one per line — optional)</label>
-            <textarea rows={3} value={arrayToLines(form.facilities)} onChange={(e) => set('facilities', linesToArray(e.target.value))} />
+            <label htmlFor="field-facilities-equipment-one-per-line">Facilities & Equipment (one per line — optional)</label>
+            <textarea id="field-facilities-equipment-one-per-line" rows={3} value={arrayToLines(form.facilities)} onChange={(e) => set('facilities', linesToArray(e.target.value))} />
           </div>
           <div className="admin-field admin-field--full">
-            <label>Outcomes & Achievements (one per line — optional)</label>
-            <textarea rows={3} value={arrayToLines(form.outcomes)} onChange={(e) => set('outcomes', linesToArray(e.target.value))} />
+            <label htmlFor="field-outcomes-achievements-one-per-line">Outcomes & Achievements (one per line — optional)</label>
+            <textarea id="field-outcomes-achievements-one-per-line" rows={3} value={arrayToLines(form.outcomes)} onChange={(e) => set('outcomes', linesToArray(e.target.value))} />
           </div>
           <div className="admin-field admin-field--full">
-            <label>Partners (one per line — optional)</label>
-            <textarea rows={2} value={arrayToLines(form.partners)} onChange={(e) => set('partners', linesToArray(e.target.value))} />
+            <label htmlFor="field-partners-one-per-line-optional">Partners (one per line — optional)</label>
+            <textarea id="field-partners-one-per-line-optional" rows={2} value={arrayToLines(form.partners)} onChange={(e) => set('partners', linesToArray(e.target.value))} />
           </div>
         </div>
         <div className="admin-form-actions">

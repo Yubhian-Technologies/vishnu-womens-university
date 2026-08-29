@@ -144,32 +144,32 @@ export default function PlacementYearsAdmin() {
         </p>
         <div className="admin-form-grid">
           <div className="admin-field">
-            <label>Batch *</label>
-            <input value={form.batch} onChange={(e) => set('batch', e.target.value)} placeholder="2025–2026" disabled={!!editing} />
+            <label htmlFor="field-batch">Batch *</label>
+            <input id="field-batch" value={form.batch} onChange={(e) => set('batch', e.target.value)} placeholder="2025–2026" disabled={!!editing} />
           </div>
           <div className="admin-field">
-            <label>Total Placements</label>
-            <input type="number" value={form.total} onChange={(e) => set('total', e.target.value)} min={0} />
+            <label htmlFor="field-total-placements">Total Placements</label>
+            <input id="field-total-placements" type="number" value={form.total} onChange={(e) => set('total', e.target.value)} min={0} />
           </div>
           <div className="admin-field">
-            <label>Salary Column Label</label>
-            <input value={form.salaryLabel} onChange={(e) => set('salaryLabel', e.target.value)} placeholder="Salary (₹)" />
+            <label htmlFor="field-salary-column-label">Salary Column Label</label>
+            <input id="field-salary-column-label" value={form.salaryLabel} onChange={(e) => set('salaryLabel', e.target.value)} placeholder="Salary (₹)" />
           </div>
           <div className="admin-field">
-            <label>Companies Visited (optional)</label>
-            <input type="number" value={form.companiesVisited} onChange={(e) => set('companiesVisited', e.target.value)} min={0} />
+            <label htmlFor="field-companies-visited-optional">Companies Visited (optional)</label>
+            <input id="field-companies-visited-optional" type="number" value={form.companiesVisited} onChange={(e) => set('companiesVisited', e.target.value)} min={0} />
           </div>
           <div className="admin-field admin-field--full">
-            <label>Note (optional)</label>
-            <input value={form.note} onChange={(e) => set('note', e.target.value)} placeholder="Shown in italics above the table, if set" />
+            <label htmlFor="field-note-optional">Note (optional)</label>
+            <input id="field-note-optional" value={form.note} onChange={(e) => set('note', e.target.value)} placeholder="Shown in italics above the table, if set" />
           </div>
           <div className="admin-field admin-field--full">
-            <label>Branch-wise Offers (optional — one per line, "Branch | Offers | Eligible". Eligible is optional per line — when set, that branch's tile/donut label shows its own placement rate (offers ÷ eligible); when left off, it falls back to that branch's share of the batch total, same as before.)</label>
-            <textarea rows={4} value={form.branchOffersText} onChange={(e) => set('branchOffersText', e.target.value)} placeholder={'CSE Offers | 268 | 207\nECE Offers | 97 | 127'} />
+            <label htmlFor="field-branch-wise-offers-optional-one">Branch-wise Offers (optional — one per line, "Branch | Offers | Eligible". Eligible is optional per line — when set, that branch's tile/donut label shows its own placement rate (offers ÷ eligible); when left off, it falls back to that branch's share of the batch total, same as before.)</label>
+            <textarea id="field-branch-wise-offers-optional-one" rows={4} value={form.branchOffersText} onChange={(e) => set('branchOffersText', e.target.value)} placeholder={'CSE Offers | 268 | 207\nECE Offers | 97 | 127'} />
           </div>
           <div className="admin-field admin-field--full">
-            <label>Company Rows — one per line, "Company | Selects | Salary"</label>
-            <textarea rows={14} value={form.rowsText} onChange={(e) => set('rowsText', e.target.value)} placeholder={'Google | 3 | ₹59,14,620\nAdobe | 4 | ₹53,35,000'} />
+            <label htmlFor="field-company-rows-one-per-line">Company Rows — one per line, "Company | Selects | Salary"</label>
+            <textarea id="field-company-rows-one-per-line" rows={14} value={form.rowsText} onChange={(e) => set('rowsText', e.target.value)} placeholder={'Google | 3 | ₹59,14,620\nAdobe | 4 | ₹53,35,000'} />
           </div>
         </div>
         <div className="admin-form-actions">
