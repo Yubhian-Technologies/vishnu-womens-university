@@ -19,28 +19,53 @@ interface FormState {
   note: string;
   rowsText: string;
   branchOffersText: string;
+  averageSalaryLPA: string;
+  medianSalaryLPA: string;
+  highestPackageLPA: string;
+  offersAbove50LPA: string;
+  offersAbove30LPA: string;
+  offersAbove10LPA: string;
 }
 
 const EMPTY: FormState = {
-  batch: '', total: '', salaryLabel: 'Salary (₹)', companiesVisited: '', note: '', rowsText: '', branchOffersText: '',
+  batch: '', total: '', salaryLabel: 'CTC (LPA)', companiesVisited: '', note: '', rowsText: '', branchOffersText: '',
+  averageSalaryLPA: '', medianSalaryLPA: '', highestPackageLPA: '', offersAbove50LPA: '', offersAbove30LPA: '', offersAbove10LPA: '',
 };
 
 function rowsToText(rows: PlacementRow[]): string {
-  return rows.map((r) => `${r.company} | ${r.selects} | ${r.salary}`).join('\n');
+  return rows.map((r) => r.sector ? `${r.company} | ${r.selects} | ${r.salary} | ${r.sector}` : `${r.company} | ${r.selects} | ${r.salary}`).join('\n');
 }
 function textToRows(text: string): PlacementRow[] {
   return text.split('\n').map((l) => l.trim()).filter(Boolean).map((line) => {
-    const [company = '', selects = '0', salary = ''] = line.split('|').map((p) => p.trim());
-    return { company, selects: Number(selects) || 0, salary };
+    const [company = '', selects = '0', salary = '', sector] = line.split('|').map((p) => p.trim());
+    return { company, selects: Number(selects) || 0, salary, ...(sector ? { sector } : {}) };
   });
 }
+// Catches the #1 way this textarea silently corrupts data: a line typed
+// with spaces instead of "|" separators. Without this check, textToRows
+// happily accepts a line with no pipes at all — the whole line becomes the
+// company name, selects defaults to 0, and CTC/sector are silently dropped
+// (each field just shifts left by one for every missing pipe). Requiring at
+// least 2 pipes (3 fields: company | selects | CTC) turns that into an
+// up-front alert naming the bad line instead of a garbled row nobody
+// notices until the public page renders it wrong.
+function findMalformedRowLine(text: string): { lineNumber: number; content: string } | null {
+  const lines = text.split('\n');
+  for (let i = 0; i < lines.length; i++) {
+    const trimmed = lines[i].trim();
+    if (!trimmed) continue;
+    if (trimmed.split('|').length < 3) return { lineNumber: i + 1, content: trimmed };
+  }
+  return null;
+}
+
 function offersToText(offers: BranchOfferCount[]): string {
-  return offers.map((o) => o.eligible != null ? `${o.branch} | ${o.offers} | ${o.eligible}` : `${o.branch} | ${o.offers}`).join('\n');
+  return offers.map((o) => o.highestLPA != null ? `${o.branch} | ${o.offers} | ${o.highestLPA}` : `${o.branch} | ${o.offers}`).join('\n');
 }
 function textToOffers(text: string): BranchOfferCount[] {
   return text.split('\n').map((l) => l.trim()).filter(Boolean).map((line) => {
-    const [branch = '', offers = '0', eligible] = line.split('|').map((p) => p.trim());
-    return { branch, offers: Number(offers) || 0, ...(eligible ? { eligible: Number(eligible) || 0 } : {}) };
+    const [branch = '', offers = '0', highestLPA] = line.split('|').map((p) => p.trim());
+    return { branch, offers: Number(offers) || 0, ...(highestLPA ? { highestLPA: Number(highestLPA) || 0 } : {}) };
   });
 }
 
@@ -68,6 +93,12 @@ export default function PlacementYearsAdmin() {
   const save = async () => {
     const batch = form.batch.trim();
     if (!batch) return alert('Batch (e.g. 2025–2026) is required.');
+    const badRow = findMalformedRowLine(form.rowsText);
+    if (badRow) {
+      return alert(
+        `Line ${badRow.lineNumber} of Company Rows is missing its "|" separators, so it can't be split into Company / Selects / CTC:\n\n"${badRow.content}"\n\nFix that line (use "|" between each value, e.g. "Company | 4 | 53.35 | IT Sector") and save again. Nothing was saved.`
+      );
+    }
     setSaving(true);
     try {
       await setDoc(doc(db, 'placementYears', batch), {
@@ -78,6 +109,12 @@ export default function PlacementYearsAdmin() {
         branchOffers: textToOffers(form.branchOffersText),
         rows: textToRows(form.rowsText),
         note: form.note.trim() || null,
+        averageSalaryLPA: form.averageSalaryLPA ? Number(form.averageSalaryLPA) : null,
+        medianSalaryLPA: form.medianSalaryLPA ? Number(form.medianSalaryLPA) : null,
+        highestPackageLPA: form.highestPackageLPA ? Number(form.highestPackageLPA) : null,
+        offersAbove50LPA: form.offersAbove50LPA ? Number(form.offersAbove50LPA) : null,
+        offersAbove30LPA: form.offersAbove30LPA ? Number(form.offersAbove30LPA) : null,
+        offersAbove10LPA: form.offersAbove10LPA ? Number(form.offersAbove10LPA) : null,
         updatedAt: serverTimestamp(),
       });
       setForm(EMPTY);
@@ -99,6 +136,12 @@ export default function PlacementYearsAdmin() {
       note: y.note || '',
       rowsText: rowsToText(y.rows || []),
       branchOffersText: offersToText(y.branchOffers || []),
+      averageSalaryLPA: y.averageSalaryLPA != null ? String(y.averageSalaryLPA) : '',
+      medianSalaryLPA: y.medianSalaryLPA != null ? String(y.medianSalaryLPA) : '',
+      highestPackageLPA: y.highestPackageLPA != null ? String(y.highestPackageLPA) : '',
+      offersAbove50LPA: y.offersAbove50LPA != null ? String(y.offersAbove50LPA) : '',
+      offersAbove30LPA: y.offersAbove30LPA != null ? String(y.offersAbove30LPA) : '',
+      offersAbove10LPA: y.offersAbove10LPA != null ? String(y.offersAbove10LPA) : '',
     });
   };
 
@@ -124,6 +167,12 @@ export default function PlacementYearsAdmin() {
           branchOffers: y.branchOffers ?? [],
           rows: y.rows,
           note: y.note ?? null,
+          averageSalaryLPA: y.averageSalaryLPA ?? null,
+          medianSalaryLPA: y.medianSalaryLPA ?? null,
+          highestPackageLPA: y.highestPackageLPA ?? null,
+          offersAbove50LPA: y.offersAbove50LPA ?? null,
+          offersAbove30LPA: y.offersAbove30LPA ?? null,
+          offersAbove10LPA: y.offersAbove10LPA ?? null,
           updatedAt: serverTimestamp(),
         });
       }
@@ -140,7 +189,7 @@ export default function PlacementYearsAdmin() {
         <h2 className="admin-card__title">{editing ? `Edit ${editing}` : 'Add Placement Year'}</h2>
         <p className="admin-lead" style={{ marginBottom: '1rem' }}>
           Powers the "Placements, Year by Year" accordion on the Placements page and the Placement
-          Details sub-page. List each company one per line as <code>Company | Selects | Salary</code>.
+          Details sub-page. List each company one per line as <code>Company | Selects | CTC</code> (add a 4th <code>| Sector</code> if you want a Sector column).
         </p>
         <div className="admin-form-grid">
           <div className="admin-field">
@@ -152,24 +201,48 @@ export default function PlacementYearsAdmin() {
             <input id="field-total-placements" type="number" value={form.total} onChange={(e) => set('total', e.target.value)} min={0} />
           </div>
           <div className="admin-field">
-            <label htmlFor="field-salary-column-label">Salary Column Label</label>
-            <input id="field-salary-column-label" value={form.salaryLabel} onChange={(e) => set('salaryLabel', e.target.value)} placeholder="Salary (₹)" />
+            <label htmlFor="field-salary-column-label">CTC Column Label</label>
+            <input id="field-salary-column-label" value={form.salaryLabel} onChange={(e) => set('salaryLabel', e.target.value)} placeholder="CTC (LPA)" />
           </div>
           <div className="admin-field">
             <label htmlFor="field-companies-visited-optional">Companies Visited (optional)</label>
             <input id="field-companies-visited-optional" type="number" value={form.companiesVisited} onChange={(e) => set('companiesVisited', e.target.value)} min={0} />
+          </div>
+          <div className="admin-field">
+            <label htmlFor="field-average-salary-lpa">Average Salary — LPA (optional)</label>
+            <input id="field-average-salary-lpa" type="number" step="0.01" value={form.averageSalaryLPA} onChange={(e) => set('averageSalaryLPA', e.target.value)} min={0} placeholder="8.3" />
+          </div>
+          <div className="admin-field">
+            <label htmlFor="field-median-salary-lpa">Median Salary — LPA (optional)</label>
+            <input id="field-median-salary-lpa" type="number" step="0.01" value={form.medianSalaryLPA} onChange={(e) => set('medianSalaryLPA', e.target.value)} min={0} placeholder="5.5" />
+          </div>
+          <div className="admin-field">
+            <label htmlFor="field-highest-package-lpa">Highest Package — LPA (optional)</label>
+            <input id="field-highest-package-lpa" type="number" step="0.01" value={form.highestPackageLPA} onChange={(e) => set('highestPackageLPA', e.target.value)} min={0} placeholder="59.28" />
+          </div>
+          <div className="admin-field">
+            <label htmlFor="field-offers-above-50-lpa">Offers Above 50 LPA (optional)</label>
+            <input id="field-offers-above-50-lpa" type="number" value={form.offersAbove50LPA} onChange={(e) => set('offersAbove50LPA', e.target.value)} min={0} placeholder="9" />
+          </div>
+          <div className="admin-field">
+            <label htmlFor="field-offers-above-30-lpa">Offers Above 30 LPA (optional)</label>
+            <input id="field-offers-above-30-lpa" type="number" value={form.offersAbove30LPA} onChange={(e) => set('offersAbove30LPA', e.target.value)} min={0} placeholder="43" />
+          </div>
+          <div className="admin-field">
+            <label htmlFor="field-offers-above-10-lpa">Offers Above 10 LPA (optional)</label>
+            <input id="field-offers-above-10-lpa" type="number" value={form.offersAbove10LPA} onChange={(e) => set('offersAbove10LPA', e.target.value)} min={0} placeholder="93" />
           </div>
           <div className="admin-field admin-field--full">
             <label htmlFor="field-note-optional">Note (optional)</label>
             <input id="field-note-optional" value={form.note} onChange={(e) => set('note', e.target.value)} placeholder="Shown in italics above the table, if set" />
           </div>
           <div className="admin-field admin-field--full">
-            <label htmlFor="field-branch-wise-offers-optional-one">Branch-wise Offers (optional — one per line, "Branch | Offers | Eligible". Eligible is optional per line — when set, that branch's tile/donut label shows its own placement rate (offers ÷ eligible); when left off, it falls back to that branch's share of the batch total, same as before.)</label>
-            <textarea id="field-branch-wise-offers-optional-one" rows={4} value={form.branchOffersText} onChange={(e) => set('branchOffersText', e.target.value)} placeholder={'CSE Offers | 268 | 207\nECE Offers | 97 | 127'} />
+            <label htmlFor="field-branch-wise-offers-optional-one">Department-wise Offers (optional — one per line, "Department | Offers | Highest LPA". Highest LPA is optional per line — when set, that department's tile/donut also shows its highest package.)</label>
+            <textarea id="field-branch-wise-offers-optional-one" rows={4} value={form.branchOffersText} onChange={(e) => set('branchOffersText', e.target.value)} placeholder={'CSE Offers | 268 | 46.38\nECE Offers | 97 | 32.02'} />
           </div>
           <div className="admin-field admin-field--full">
-            <label htmlFor="field-company-rows-one-per-line">Company Rows — one per line, "Company | Selects | Salary"</label>
-            <textarea id="field-company-rows-one-per-line" rows={14} value={form.rowsText} onChange={(e) => set('rowsText', e.target.value)} placeholder={'Google | 3 | ₹59,14,620\nAdobe | 4 | ₹53,35,000'} />
+            <label htmlFor="field-company-rows-one-per-line">Company Rows — one per line, "Company | Selects | CTC | Sector". Sector is optional per line — when at least one row has it, the table shows a Sector column.</label>
+            <textarea id="field-company-rows-one-per-line" rows={14} value={form.rowsText} onChange={(e) => set('rowsText', e.target.value)} placeholder={'Google | 3 | 59.15 | IT Sector\nAdobe | 4 | 53.35 | IT Sector'} />
           </div>
         </div>
         <div className="admin-form-actions">
