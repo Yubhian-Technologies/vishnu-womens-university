@@ -1,17 +1,11 @@
 import { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Laptop, Handshake, Palette, type LucideIcon } from 'lucide-react';
 import PageHero from '../../components/PageHero/PageHero';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
+import { slugify } from '../../lib/slugify';
 import type { ClubDoc } from '../Admin/sections/StudentClubsAdmin';
-import { CLUB_CATEGORIES } from '../Admin/sections/StudentClubsAdmin';
-
-const CATEGORY_ICONS: Record<string, LucideIcon> = {
-  'Technical Clubs': Laptop,
-  'Social & Service Clubs': Handshake,
-  'Creative & Arts Clubs': Palette,
-};
+import { CLUB_CATEGORIES, CLUB_CATEGORY_ICONS } from '../Admin/sections/StudentClubsAdmin';
 
 export default function StudentClubs() {
   const { docs: allClubs } = useOrderedCollection<ClubDoc>('studentClubs', 'order');
@@ -19,7 +13,7 @@ export default function StudentClubs() {
 
   const clubCategories = useMemo(() => (
     CLUB_CATEGORIES
-      .map((label) => ({ label, icon: CATEGORY_ICONS[label], clubs: allClubs.filter((c) => c.category === label) }))
+      .map((label) => ({ label, icon: CLUB_CATEGORY_ICONS[label], clubs: allClubs.filter((c) => c.category === label) }))
       .filter((cat) => cat.clubs.length > 0)
   ), [allClubs]);
 
@@ -80,7 +74,7 @@ export default function StudentClubs() {
             </div>
             <div className="grid-4">
               {cat.clubs.map((club) => (
-                <Link key={club.id} to="/news-awards/gallery?category=Clubs#photo-gallery"
+                <Link key={club.id} to={`/student-clubs/${club.slug || slugify(club.name)}`}
                   style={{ display: 'block', background: ci % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', transition: 'all var(--transition-base)' }}
                   onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-accent)'; (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-md)'; }}
                   onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-light-gray)'; (e.currentTarget as HTMLElement).style.boxShadow = 'none'; }}

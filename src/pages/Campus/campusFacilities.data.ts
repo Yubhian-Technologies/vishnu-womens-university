@@ -36,18 +36,16 @@ Our technologically advanced classrooms create an environment where teaching and
 
 #### Apart from regular experiments, all departments conduct additional experiments in all laboratories to train the students in the cutting edge technologies.
 
-- Electrical & Electronics
-- Engineering Labs
-- Electronics & Communication
-- Engineering Labs
-- Computer Science &
-- Engineering Labs
+- Electronics Engineering (VLSI Design & Technology) Labs
+- Electronics & Communication Engineering Labs
+- Electrical & Electronics Engineering Labs
+- Computer Science & Engineering Labs
 - Information Technology Labs
-- Mechanical Engineering Labs
+- Artificial Intelligence Labs
 - Civil Engineering Labs
-- Master of Business
-- Administration Labs
-- Basic Science Labs`,
+- Mechanical Engineering Labs
+- Basic Science Labs
+- Master of Business Administration Labs`,
     desc: 'Specialised laboratories across every department give students hands-on access to modern equipment and tools, supporting practical learning alongside classroom instruction.',
   },
   {
@@ -58,9 +56,9 @@ Our technologically advanced classrooms create an environment where teaching and
 
 # Central Library
 
-The Library of Shri Vishnu Engineering College for Women(Autonomous) was built to keep up International Standards. The air conditioned library has three floors with an area of 1083 Sq.m. and well-protected with security system. Specialized collections of Books, Journals & Non-book materials are available in Engineering & Technology, Basic Sciences, and Management Sciences. It is replete with 59721 volumes of books, 1380 Journal Back Volumes, 4000 CDs, and 250 audio cassettes.
+The Library of Vishnu Women's University (VWU) was built to keep up International Standards. The air conditioned library has three floors with an area of 1083 Sq.m. and well-protected with security system. Specialized collections of Books, Journals & Non-book materials are available in Engineering & Technology, Basic Sciences, and Management Sciences. It is replete with 59721 volumes of books, 1380 Journal Back Volumes, 4000 CDs, and 250 audio cassettes.
 
-The Library contributes to the fulfillment of Our Institution’s mission by selecting, acquiring, organizing, maintaining and making accessible a collection of printed and non-printed, primary and secondary materials that will support the educational, research and public service programmes of both students and faculty.
+The Library contributes to the fulfillment of Our University’s mission by selecting, acquiring, organizing, maintaining and making accessible a collection of printed and non-printed, primary and secondary materials that will support the educational, research and public service programmes of both students and faculty.
 
 - Responding to the varying needs of the academic community by involving the faculty, the students and the administration in the development and periodic assessment of the library services and resources.
 - Providing library users with point-of-use instruction, personal assistance in conducting literature research and other reference services.
@@ -116,17 +114,17 @@ With all the right ambiance, the addition of a well-known book shop ‘Higginbot
     heroSubtitle: 'High-speed Wi-Fi connectivity spans the entire campus, keeping students and faculty connected for coursework, research, and communication at all times.',
     body: `# Wi-Fi Campus
 
-Vishnu Women's University is one of the few Colleges, which can boast of its state-of-the-art computing resources and network across the campus. It has IT Infrastructure that can support 3000+ computer terminals, probably one of the largest wi-fi infrastructure. Following are a few highlighting features:
+Vishnu Women's University is one of the few Universities, which can boast of its state-of-the-art computing resources and network across the campus. It has IT Infrastructure that can support 3000+ computer terminals, probably one of the largest wi-fi infrastructure. Following are a few highlighting features:
 
-- Completely Wi-Fi Campus with 20+ access point, supported on the technology from RUCKUS
-- 86 Mbps of bandwidth for internet with dedicated leased line
-- 1000 + workstations supported by Xeon based Rack Servers
-- Powerful servers from IBM for 100% redundancy and efficient data management
-- 10 Km fibre backbone for providing 1GB seamless connectivity
-- D-Link 3627G core switch to provide the needed scalability and traffic control
-- Cyberome High end firewall security featured network
+- Completely Wi-Fi Campus with 250+ access point, supported on the technology from RUCKUS
+- 1500 Mbps of bandwidth for internet with dedicated leased line
+- 1700 + workstations supported by Xeon based Rack Servers
+- Powerful servers from Lenovo for 100% redundancy and efficient data management
+- 20 Km fibre backbone for providing 10GB seamless connectivity
+- ARUNA 8320G core switch to provide the needed scalability and traffic control
+- SOPHOS High end firewall security featured network
 - 24hrs Power Back Up -320 KVA of online uninterrupted power supply(UPS)
-- 30+ CCTV cameras for 24 hours surveillance to ensure on campus safety and security
+- 700+ CCTV cameras for 24 hours surveillance to ensure on campus safety and security
 - High end Biometric systems for attendance`,
     desc: 'High-speed Wi-Fi connectivity spans the entire campus, keeping students and faculty connected for coursework, research, and communication at all times.',
   },
@@ -151,8 +149,12 @@ Indoor / outdoor games are provided in the hostel. Pictures are screened regular
     heroSubtitle: "VWU's food courts serve hygienic, freshly prepared meals throughout the day, offering a variety of options for students and staff.",
     body: `Eating a variety of healthy foods is the key to a well-balanced diet and good nutrition. It keeps our bodies working well and helps prevent diseases such as diabetes, cancer and cardiovascular disease. On the other hand, youth would like to have a variety of modern food items to satisfy their love for food.
 
-Food Courts offer both modern and traditional food items in the campus. The huge campus has got Food Courts at twelve different locations, occasionally alluring students and faculty for taste of food items. Thus, these places provide them an opportunity to eat out just to deviate from their monotonous routine. These food courts are open from 6.30a.m. to 8.30p.m. They are:
+Food Courts offer both modern and traditional food items in the campus. The huge campus has got Food Courts at seventeen different locations, occasionally alluring students and faculty for taste of food items. Thus, these places provide them an opportunity to eat out just to deviate from their monotonous routine. These food courts are open from 6.30a.m. to 8.30p.m. They are:
 
+- Canoe & Cusine
+- Brewista
+- Tea leaf
+- Central Square
 - Bakers Treat
 - Tasty Corner
 - Nescafe Coffee Shops

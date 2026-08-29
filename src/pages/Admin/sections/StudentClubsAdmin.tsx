@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { Laptop, Handshake, Palette, type LucideIcon } from 'lucide-react';
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
+import { slugify } from '../../../lib/slugify';
 
 export interface ClubDoc {
   id: string;
@@ -9,11 +11,20 @@ export interface ClubDoc {
   desc: string;
   category: string;
   order: number;
+  // Added after the first ~23 clubs were created, so older docs may not have
+  // one yet — the public pages fall back to slugify(name) when this is blank.
+  slug?: string;
 }
 
-const EMPTY: Omit<ClubDoc, 'id'> = { name: '', desc: '', category: 'Technical Clubs', order: 0 };
+const EMPTY: Omit<ClubDoc, 'id'> = { name: '', desc: '', category: 'Technical Clubs', order: 0, slug: '' };
 
 export const CLUB_CATEGORIES = ['Technical Clubs', 'Social & Service Clubs', 'Creative & Arts Clubs'];
+
+export const CLUB_CATEGORY_ICONS: Record<string, LucideIcon> = {
+  'Technical Clubs': Laptop,
+  'Social & Service Clubs': Handshake,
+  'Creative & Arts Clubs': Palette,
+};
 
 export default function StudentClubsAdmin() {
   const { docs: clubs, loading } = useOrderedCollection<ClubDoc>('studentClubs', 'order');
@@ -27,10 +38,11 @@ export default function StudentClubsAdmin() {
     if (!form.name) return alert('Club name is required.');
     setSaving(true);
     try {
+      const slug = form.slug ? slugify(form.slug) : slugify(form.name);
       if (editing) {
-        await updateDoc(doc(db, 'studentClubs', editing), { ...form });
+        await updateDoc(doc(db, 'studentClubs', editing), { ...form, slug });
       } else {
-        await addDoc(collection(db, 'studentClubs'), { ...form, order: form.order || clubs.length + 1, createdAt: serverTimestamp() });
+        await addDoc(collection(db, 'studentClubs'), { ...form, slug, order: form.order || clubs.length + 1, createdAt: serverTimestamp() });
       }
       setForm({ ...EMPTY, category: form.category }); setEditing(null);
     } catch (e) {
@@ -38,7 +50,7 @@ export default function StudentClubsAdmin() {
     } finally { setSaving(false); }
   };
 
-  const startEdit = (c: ClubDoc) => { setEditing(c.id); setForm({ name: c.name, desc: c.desc, category: c.category, order: c.order }); };
+  const startEdit = (c: ClubDoc) => { setEditing(c.id); setForm({ name: c.name, desc: c.desc, category: c.category, order: c.order, slug: c.slug || '' }); };
 
   const remove = async (id: string) => {
     if (!confirm('Delete this club?')) return;
@@ -68,6 +80,10 @@ export default function StudentClubsAdmin() {
             <label htmlFor="field-display-order">Display Order</label>
             <input id="field-display-order" type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
           </div>
+          <div className="admin-field">
+            <label>URL Slug (optional — auto-generated from name if left blank)</label>
+            <input value={form.slug} onChange={(e) => set('slug', e.target.value)} placeholder="codechef-svecw-chapter" />
+          </div>
           <div className="admin-field admin-field--full">
             <label htmlFor="field-description">Description</label>
             <textarea id="field-description" rows={3} value={form.desc} onChange={(e) => set('desc', e.target.value)} placeholder="What the club does…" />
@@ -84,20 +100,21 @@ export default function StudentClubsAdmin() {
         {loading ? <p className="admin-loading">Loading…</p> : (
           <div className="admin-table-wrap">
             <table className="admin-table">
-              <thead><tr><th>Name</th><th>Category</th><th>Order</th><th>Actions</th></tr></thead>
+              <thead><tr><th>Name</th><th>Category</th><th>Order</th><th>URL Slug</th><th>Actions</th></tr></thead>
               <tbody>
                 {clubs.map((c) => (
                   <tr key={c.id}>
                     <td>{c.name}</td>
                     <td><span className="admin-badge admin-badge--sm">{c.category}</span></td>
                     <td>{c.order}</td>
+                    <td><code>{c.slug || slugify(c.name)}</code></td>
                     <td>
                       <button className="admin-btn admin-btn--sm" onClick={() => startEdit(c)}>Edit</button>
                       <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(c.id)}>Delete</button>
                     </td>
                   </tr>
                 ))}
-                {clubs.length === 0 && <tr><td colSpan={4} className="admin-empty">No clubs yet.</td></tr>}
+                {clubs.length === 0 && <tr><td colSpan={5} className="admin-empty">No clubs yet.</td></tr>}
               </tbody>
             </table>
           </div>

@@ -236,34 +236,27 @@ const navItems: NavItem[] = [
     ],
   },
   {
-    // Alumni & Giving's items live here as a second group (no longer its
-    // own top-level nav item) — see the "Success Stories" admin-redirect
-    // splice for this group in renderedNavItems below.
+    // Alumni & Giving used to live here as a second group — it now has its
+    // own place in the Footer (see Footer.tsx) instead of the header nav.
     label: 'News & Events',
     groups: [
       {
         groupLabel: 'News & Events',
         groupPath: '/news-awards',
         items: [
-          { label: 'Happenings at VWU', path: '/news-awards/happenings' },
-          { label: 'Social Media Handles', path: '/news-awards/social-media-handles' },
-          { label: 'Vishnu Era', path: 'https://www.srivishnu.edu.in/vishnu-era/', external: true },
-          { label: 'Accreditations', path: '/news-awards/accreditations-awards#accreditation' },
-          { label: 'Rankings & Awards', path: '/news-awards/accreditations-awards#ranking' },
+          { label: 'Upcoming Events', path: '/news-awards/happenings#upcoming-events' },
+          { label: 'Recent Events', path: '/news-awards/happenings#recent-events' },
           { label: 'Gallery', path: '/news-awards/gallery' },
-          { label: 'News', path: '/news' },
-          { label: 'Events', path: '/events' },
+          { label: 'Vishnu Era', path: 'https://www.srivishnu.edu.in/vishnu-era/', external: true },
+          { label: 'Prathibha Magazine', path: 'https://heyzine.com/flip-book/088b7b5629.html#page/54', external: true },
         ],
       },
       {
-        groupLabel: 'Alumni & Giving',
-        groupPath: '/alumni-giving',
+        groupLabel: 'Accreditations & Rankings',
+        groupPath: '/news-awards/accreditations-awards',
         items: [
-          { label: 'Alumni Network', path: '/alumni-giving#network' },
-          { label: 'Giving Opportunities', path: '/alumni-giving#give' },
-          { label: 'Alumni Events', path: '/alumni-giving#events' },
-          { label: 'Prathibha Magazine', path: '/alumni-giving#magazine' },
-          { label: 'Success Stories', path: '/placements/success-stories' },
+          { label: 'Accreditations', path: '/news-awards/accreditations-awards#accreditation' },
+          { label: 'Rankings & Awards', path: '/news-awards/accreditations-awards#ranking' },
         ],
       },
     ],
@@ -297,10 +290,6 @@ export default function Header() {
   const navRef = useRef<HTMLElement>(null);
   const megaRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  // Admin-editable via /admin → Navigation Link Redirects (NavLinkOverridesAdmin.tsx).
-  // Decoupled from Placements' own "Success Stories" item, which stays hardcoded.
-  // Default target is AlumniGiving.tsx's own "#successstories" section, not Placements.
-  const alumniSuccessStories = useNavLinkOverride('alumni-success-stories', '/alumni-giving#successstories');
   // Header's Apply Now button — admin can repoint it (e.g. to a specific
   // admissions cycle or an external application portal) without a deploy.
   const headerApplyNow = useNavLinkOverride('header-apply-now', '/admissions');
@@ -336,23 +325,6 @@ export default function Header() {
         if (group.groupLabel === 'Ph.D Programmes') return { ...group, items: phdProgrammes };
         return group;
       });
-      return { ...item, groups };
-    }
-    // "Success Stories" here is admin-redirectable independently of
-    // Placements' own "Success Stories" item — see alumniSuccessStories above.
-    if (item.label === 'News & Events' && item.groups) {
-      const groups = item.groups.map((group) =>
-        group.groupLabel === 'Alumni & Giving'
-          ? {
-              ...group,
-              items: group.items.map((child) =>
-                child.label === 'Success Stories'
-                  ? { ...child, path: alumniSuccessStories.path, external: alumniSuccessStories.external }
-                  : child
-              ),
-            }
-          : group
-      );
       return { ...item, groups };
     }
     // Category groups here are populated from live Firestore data since
