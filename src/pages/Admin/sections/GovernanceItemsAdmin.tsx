@@ -141,8 +141,10 @@ export default function GovernanceItemsAdmin() {
             <textarea rows={3} value={form.intro} onChange={(e) => set('intro', e.target.value)} />
           </div>
           <div className="admin-field admin-field--full">
-            <label>About (longer detail paragraph)</label>
-            <textarea rows={4} value={form.about} onChange={(e) => set('about', e.target.value)} />
+            <label>About (longer detail content). Plain lines join into a paragraph. Start a line with{' '}
+              <code>## </code> for a bold sub-heading, or <code>- </code> for a checklist bullet (use{' '}
+              <code>- Label: rest</code> to bold just the label).</label>
+            <textarea rows={6} value={form.about} onChange={(e) => set('about', e.target.value)} />
           </div>
           <div className="admin-field admin-field--full">
             <label>Key Highlights (one per line)</label>

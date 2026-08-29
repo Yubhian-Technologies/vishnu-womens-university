@@ -45,21 +45,18 @@ const DEFAULT_ACCORDION_TEXT_BY_SLUG: Record<string, string> = {
   'consultancy': DEFAULT_CONSULTANCY_TEXT,
 };
 
-// Thrust Areas of Research already has an older/partial accordionText value
-// saved in Firestore (e.g. missing the department-category grouping) — so
-// (like the table-text map below) this one wins over item.accordionText
-// until an admin replaces it. Each faculty member links out to their
-// external IRINS profile (https://svecw.irins.org/profile/:id).
+// Fallback accordionText for Thrust Areas of Research, used only until an
+// admin fills in item.accordionText — item.accordionText always wins once
+// set (see below). Each faculty member links out to their external IRINS
+// profile (https://svecw.irins.org/profile/:id).
 const DEFAULT_ACCORDION_TEXT_OVERRIDE_BY_SLUG: Record<string, string> = {
   'thrust-areas-of-research': DEFAULT_THRUST_AREAS_TEXT,
 };
 
-// Research Centers, Seed Money Projects, About R&D, and MoUs all already
-// have an older/partial tableText value saved in Firestore that's missing
-// content added later (fuller detail tables, department coordinators, the
-// full MoU partner lists, etc.) — so unlike the other two maps above, this
-// one is checked *before* item.tableText (see below) and always wins for
-// these slugs until an admin removes it.
+// Fallback tableText for Research Centers, Seed Money Projects, About R&D,
+// and MoUs, used only until an admin fills in item.tableText from the
+// Research Items admin section — item.tableText always wins once set (see
+// below), so editing the Data Table field there fully controls this page.
 const DEFAULT_TABLE_TEXT_BY_SLUG: Record<string, string> = {
   'research-centers': DEFAULT_RESEARCH_CENTERS_TABLE_TEXT,
   'seed-money-projects': DEFAULT_SEED_MONEY_PROJECTS_TABLE_TEXT,
@@ -67,12 +64,10 @@ const DEFAULT_TABLE_TEXT_BY_SLUG: Record<string, string> = {
   mous: DEFAULT_MOUS_TABLE_TEXT,
 };
 
-// Research Advisory Committee, Research Ethics Committee, and IPR Committee
-// all already have a short one-line item.intro saved in Firestore that
-// predates the fuller committee description from svecw.edu.in — so like the
-// table map above, this one wins over item.intro for these slugs. item.about
-// is currently empty for all three, so it uses the normal (item value wins)
-// fallback further below.
+// Fallback intro for Research Advisory Committee, Research Ethics Committee,
+// IPR Committee, Seed Money Projects, Research Centers, and Thrust Areas of
+// Research, used only until an admin fills in item.intro — item.intro always
+// wins once set (see below).
 const DEFAULT_INTRO_BY_SLUG: Record<string, string> = {
   'research-advisory-committee': DEFAULT_RAC_INTRO,
   'research-ethics-committee': DEFAULT_REC_INTRO,
@@ -133,12 +128,12 @@ export default function ResearchDetail() {
   const Icon = resolveContentIcon(item.icon) || Microscope;
   const categoryLabel = CATEGORY_LABELS[item.category] || item.category;
   const heroImage = item.heroImage || heroSlides[0]?.imageUrl;
-  const intro = DEFAULT_INTRO_BY_SLUG[item.slug] || item.intro;
+  const intro = item.intro || DEFAULT_INTRO_BY_SLUG[item.slug] || '';
   const about = item.about || DEFAULT_ABOUT_BY_SLUG[item.slug] || '';
   const aboutBlocks = parseAboutContent(about);
-  const tableText = DEFAULT_TABLE_TEXT_BY_SLUG[item.slug] || item.tableText || '';
+  const tableText = item.tableText || DEFAULT_TABLE_TEXT_BY_SLUG[item.slug] || '';
   const tableSections = parseFlexibleTable(tableText).filter((s) => s.headers.length > 0);
-  const accordionText = DEFAULT_ACCORDION_TEXT_OVERRIDE_BY_SLUG[item.slug] || item.accordionText || DEFAULT_ACCORDION_TEXT_BY_SLUG[item.slug] || '';
+  const accordionText = item.accordionText || DEFAULT_ACCORDION_TEXT_OVERRIDE_BY_SLUG[item.slug] || DEFAULT_ACCORDION_TEXT_BY_SLUG[item.slug] || '';
   const accordionCategories = parseAccordionTable(accordionText).filter((c) => c.areas.length > 0);
   const projectsText = item.projectsText || DEFAULT_PROJECTS_TEXT_BY_SLUG[item.slug] || '';
   const projectCategories = parseProjectAccordion(projectsText).filter((c) => c.projects.length > 0);
@@ -243,6 +238,26 @@ export default function ResearchDetail() {
               </div>
             )}
           </div>
+
+          {item.slug === 'about-rd' && (
+            <div style={{ textAlign: 'center', marginTop: 'var(--space-6)' }}>
+              {item.policyPdfUrl ? (
+                <a
+                  href={item.policyPdfUrl}
+                  download
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: 'var(--color-accent)', fontWeight: 700, fontSize: 'var(--text-base)', textDecoration: 'none' }}
+                >
+                  *** R&D Policy ***
+                </a>
+              ) : (
+                <span style={{ color: 'var(--color-text-light)', fontWeight: 700, fontSize: 'var(--text-base)' }}>
+                  *** R&D Policy *** (coming soon)
+                </span>
+              )}
+            </div>
+          )}
         </div>
       </section>
 
@@ -271,7 +286,9 @@ export default function ResearchDetail() {
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
               <span className="section-label">Details</span>
-              <h2 className="section-title" style={{ fontSize: '1.75rem' }}>{item.title}</h2>
+              <h2 className="section-title" style={{ fontSize: '1.75rem' }}>
+                {item.slug === 'about-rd' ? "Research Team at Vishnu Women's University" : item.title}
+              </h2>
             </div>
             {tableSections.map((section, si) => (
               <div key={si} style={{ marginBottom: si < tableSections.length - 1 ? 'var(--space-10)' : 0 }}>
