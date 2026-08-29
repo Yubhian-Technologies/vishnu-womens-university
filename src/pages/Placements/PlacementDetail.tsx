@@ -715,9 +715,9 @@ export default function PlacementDetail() {
   const Icon = resolveContentIcon(item.icon) || BarChart3;
   const tableSections = parseStructuredTable(item.tableText);
   const tableRows = tableSections.flatMap((s) => s.rows);
-  const bodyText = BODY_OVERRIDES[item.slug] || item.intro || item.desc;
+  const hasBodyOverride = !item.intro && Boolean(BODY_OVERRIDES[item.slug]);
+  const bodyText = hasBodyOverride ? BODY_OVERRIDES[item.slug] : '';
   const bodyBlocks = parseBodyContent(bodyText);
-  const hasBodyOverride = Boolean(BODY_OVERRIDES[item.slug]);
 
   return (
     <main className="page-wrapper">

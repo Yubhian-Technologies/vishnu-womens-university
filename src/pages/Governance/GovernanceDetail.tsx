@@ -18,10 +18,9 @@ import NbaDataSection from './NbaDataSection';
 import type { GovernanceItemDoc } from '../Admin/sections/GovernanceItemsAdmin';
 import '../detail-layout.css';
 
-// About IQAC's item.intro/item.about in Firestore is currently a short
-// synthesized summary — much thinner than the source site's actual Vision/
-// Mission/Objectives/Functions structure — so this always wins over those
-// fields for this slug until an admin replaces it with the fuller content.
+// Fallback intro/about for About IQAC and Quality Parameters, used only
+// until an admin fills in item.intro/item.about from the Governance Items
+// admin section — the Firestore value always wins once set (see below).
 const DEFAULT_INTRO_BY_SLUG: Record<string, string> = {
   'about-iqac': DEFAULT_IQAC_INTRO,
   'quality-parameters': DEFAULT_QUALITY_PARAMETERS_INTRO,
@@ -123,8 +122,8 @@ export default function GovernanceDetail() {
     return <Navigate to="/governance" replace />;
   }
 
-  const intro = DEFAULT_INTRO_BY_SLUG[item.slug] || item.intro;
-  const about = SUPPRESS_ABOUT_SLUGS.has(item.slug) ? '' : DEFAULT_ABOUT_BY_SLUG[item.slug] || item.about || '';
+  const intro = item.intro || DEFAULT_INTRO_BY_SLUG[item.slug] || '';
+  const about = SUPPRESS_ABOUT_SLUGS.has(item.slug) ? '' : item.about || DEFAULT_ABOUT_BY_SLUG[item.slug] || '';
   const aboutBlocks = parseAboutContent(about);
   const highlights = SUPPRESS_HIGHLIGHTS_SLUGS.has(item.slug) ? [] : item.highlights || [];
 

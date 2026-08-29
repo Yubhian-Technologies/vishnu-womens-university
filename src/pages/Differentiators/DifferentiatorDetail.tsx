@@ -8,6 +8,8 @@ import { useCollection, useOrderedCollection, type WithId } from '../../hooks/us
 import { usePageBanners } from '../../hooks/usePageBanners';
 import { DIFFERENTIATOR_CATEGORIES } from '../Admin/sections/DifferentiatorsAdmin';
 import type { DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
+import type { AicteIdeaLabTeamMemberDoc } from '../Admin/sections/AicteIdeaLabTeamAdmin';
+import type { AicteIdeaLabAmbassadorDoc } from '../Admin/sections/AicteIdeaLabAmbassadorsAdmin';
 import { aicteIdeaLab } from './aicteIdeaLab.data';
 import { institutionInnovationCell } from './institutionInnovationCell.data';
 import { tedxSvecw } from './tedxSvecw.data';
@@ -112,6 +114,16 @@ const WISE_TABS = [
   'Beneficiaries – Placements',
   'Testimonials',
   'TalentSprint @ NSE',
+];
+
+// AICTE IDEA Lab's own sidebar sections — only "About AICTE IDEA Lab" has
+// real content so far; the rest show a coming-soon placeholder until that
+// content is provided.
+const IDEA_LAB_TABS = [
+  'About AICTE IDEA Lab',
+  'Team',
+  'Student Ambassadors',
+  'Facilities',
 ];
 
 function IicBulletList({ heading, items }: { heading: string; items: string[] }) {
@@ -3678,6 +3690,238 @@ function WisePage({ wise }: { wise: typeof talentSprintWise }) {
   );
 }
 
+const IDEA_LAB_TABLE_TH_STYLE: CSSProperties = {
+  textAlign: 'left',
+  padding: 'var(--space-3) var(--space-4)',
+  color: 'var(--color-primary-dark, var(--color-primary))',
+  fontWeight: 900,
+  whiteSpace: 'nowrap',
+};
+const IDEA_LAB_TABLE_TD_STYLE: CSSProperties = {
+  padding: 'var(--space-3) var(--space-4)',
+  color: 'var(--color-text)',
+  fontSize: 'var(--text-sm)',
+};
+
+function IdeaLabTeamTable({ team }: { team: AicteIdeaLabTeamMemberDoc[] }) {
+  if (team.length === 0) {
+    return (
+      <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text-light)' }}>
+        Content for this section is coming soon.
+      </p>
+    );
+  }
+  return (
+    <div style={{ overflowX: 'auto' }}>
+      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm)' }}>
+        <thead>
+          <tr style={{ background: 'var(--color-accent)' }}>
+            <th style={IDEA_LAB_TABLE_TH_STYLE}>S.No</th>
+            <th style={IDEA_LAB_TABLE_TH_STYLE}>Name of the Faculty</th>
+            <th style={IDEA_LAB_TABLE_TH_STYLE}>Designation</th>
+            <th style={IDEA_LAB_TABLE_TH_STYLE}>Role</th>
+          </tr>
+        </thead>
+        <tbody>
+          {team.map((m, i) => (
+            <tr key={m.id} style={{ background: i % 2 === 0 ? 'var(--color-off-white)' : 'transparent' }}>
+              <td style={IDEA_LAB_TABLE_TD_STYLE}>{m.order}</td>
+              <td style={IDEA_LAB_TABLE_TD_STYLE}>{m.name}</td>
+              <td style={IDEA_LAB_TABLE_TD_STYLE}>{m.designation}</td>
+              <td style={IDEA_LAB_TABLE_TD_STYLE}>{m.role}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function IdeaLabAmbassadorsTable({ ambassadors }: { ambassadors: AicteIdeaLabAmbassadorDoc[] }) {
+  if (ambassadors.length === 0) {
+    return (
+      <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text-light)' }}>
+        Content for this section is coming soon.
+      </p>
+    );
+  }
+  return (
+    <div style={{ overflowX: 'auto' }}>
+      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm)' }}>
+        <thead>
+          <tr style={{ background: 'var(--color-accent)' }}>
+            <th style={IDEA_LAB_TABLE_TH_STYLE}>S.No</th>
+            <th style={IDEA_LAB_TABLE_TH_STYLE}>Reg. Number</th>
+            <th style={IDEA_LAB_TABLE_TH_STYLE}>Name of the Student</th>
+            <th style={IDEA_LAB_TABLE_TH_STYLE}>Year</th>
+            <th style={IDEA_LAB_TABLE_TH_STYLE}>Branch</th>
+            <th style={IDEA_LAB_TABLE_TH_STYLE}>WhatsApp Number</th>
+            <th style={IDEA_LAB_TABLE_TH_STYLE}>E Mail Id</th>
+          </tr>
+        </thead>
+        <tbody>
+          {ambassadors.map((a, i) => (
+            <tr key={a.id} style={{ background: i % 2 === 0 ? 'var(--color-off-white)' : 'transparent' }}>
+              <td style={IDEA_LAB_TABLE_TD_STYLE}>{a.order}</td>
+              <td style={IDEA_LAB_TABLE_TD_STYLE}>{a.regNumber}</td>
+              <td style={IDEA_LAB_TABLE_TD_STYLE}>{a.name}</td>
+              <td style={IDEA_LAB_TABLE_TD_STYLE}>{a.year}</td>
+              <td style={IDEA_LAB_TABLE_TD_STYLE}>{a.branch}</td>
+              <td style={IDEA_LAB_TABLE_TD_STYLE}>{a.whatsapp}</td>
+              <td style={IDEA_LAB_TABLE_TD_STYLE}>
+                <a href={`mailto:${a.email}`} style={{ color: 'var(--color-primary)', fontWeight: 600 }}>{a.email}</a>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+// Shown until real photos are uploaded from the admin's "AICTE IDEA Lab
+// Facility Photos" section — a fixed bank of placeholder tiles rather than
+// an empty gap, so the tab reads as "content coming" rather than broken.
+const IDEA_LAB_FACILITY_PLACEHOLDER_COUNT = 6;
+
+function IdeaLabFacilitiesGrid({ photos }: { photos: (WithId & { imageUrl: string })[] }) {
+  const tiles = photos.length > 0
+    ? photos
+    : Array.from({ length: IDEA_LAB_FACILITY_PLACEHOLDER_COUNT }, (_, i) => ({ id: `placeholder-${i}`, imageUrl: PHOTO_NEEDED_PLACEHOLDER }));
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 'var(--space-4)' }}>
+      {tiles.map((p) => (
+        <img
+          key={p.id}
+          src={p.imageUrl}
+          alt="AICTE IDEA Lab facility"
+          style={{ width: '100%', height: 200, objectFit: 'cover', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-light-gray)' }}
+        />
+      ))}
+    </div>
+  );
+}
+
+function IdeaLabPage({ ideaLab }: { ideaLab: typeof aicteIdeaLab }) {
+  const [activeTab, setActiveTab] = useState(IDEA_LAB_TABS[0]);
+  const { docs: team } = useOrderedCollection<AicteIdeaLabTeamMemberDoc>('aicteIdeaLabTeam', 'order');
+  const { docs: ambassadors } = useOrderedCollection<AicteIdeaLabAmbassadorDoc>('aicteIdeaLabAmbassadors', 'order');
+  const { docs: facilityPhotos } = useOrderedCollection<WithId & { imageUrl: string }>('aicteIdeaLabFacilityPhotos', 'order');
+
+  return (
+    <section className="section bg-white">
+      <div className="container">
+        <div className="detail-grid">
+          <div>
+            {activeTab === 'About AICTE IDEA Lab' && (
+              <>
+                <span className="section-label">Overview</span>
+                <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-5)' }}>About AICTE IDEA Lab</h2>
+                <p style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-4)' }}>
+                  {ideaLab.tagline}
+                </p>
+                {ideaLab.paragraphs.map((para, i) => (
+                  <p key={i} style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-4)' }}>
+                    {para}
+                  </p>
+                ))}
+
+                <div style={{ marginTop: 'var(--space-6)' }}>
+                  <SectionHeading>Vision</SectionHeading>
+                  <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                    {ideaLab.vision.map((v, i) => (
+                      <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-3)' }}>
+                        <span style={{ width: 20, height: 20, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
+                          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                        </span>
+                        <span style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.6 }}>{v}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div style={{ marginTop: 'var(--space-6)' }}>
+                  <SectionHeading>Institute & Coordinator Details</SectionHeading>
+                  <div style={{ background: 'var(--color-off-white)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
+                    {ideaLab.fields.map((f, i) => (
+                      <div
+                        key={i}
+                        className="mobile-stack-grid"
+                        style={{ display: 'grid', gridTemplateColumns: '240px 1fr', gap: 'var(--space-4)', padding: 'var(--space-4) var(--space-5)', background: i % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)' }}
+                      >
+                        <span style={{ fontWeight: 700, color: 'var(--color-primary)', fontSize: 'var(--text-sm)' }}>{f.label}</span>
+                        <div>
+                          {f.value.map((line, li) => (
+                            <p key={li} style={{ margin: 0, fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6 }}>{line}</p>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+
+            {activeTab === 'Team' && (
+              <>
+                <span className="section-label">Team</span>
+                <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-5)' }}>SVECW AICTE IDEA LAB Team</h2>
+                <IdeaLabTeamTable team={team} />
+              </>
+            )}
+
+            {activeTab === 'Student Ambassadors' && (
+              <>
+                <span className="section-label">Student Ambassadors</span>
+                <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-5)' }}>Student Ambassadors</h2>
+                <IdeaLabAmbassadorsTable ambassadors={ambassadors} />
+              </>
+            )}
+
+            {activeTab === 'Facilities' && (
+              <>
+                <span className="section-label">Infrastructure</span>
+                <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-5)' }}>Facilities Available in AICTE – IDEA LAB</h2>
+                <IdeaLabFacilitiesGrid photos={facilityPhotos} />
+              </>
+            )}
+          </div>
+
+          {/* Section nav */}
+          <div className="detail-sidebar">
+            <div style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', overflow: 'hidden', position: 'sticky', top: '110px' }}>
+              {IDEA_LAB_TABS.map((tab) => {
+                const isActive = activeTab === tab;
+                return (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    style={{
+                      display: 'block',
+                      width: '100%',
+                      textAlign: 'left',
+                      padding: 'var(--space-3) var(--space-5)',
+                      border: 'none',
+                      borderBottom: '1px solid var(--color-light-gray)',
+                      background: isActive ? 'var(--color-primary)' : 'transparent',
+                      color: isActive ? 'var(--color-white)' : 'var(--color-primary)',
+                      fontWeight: isActive ? 700 : 600,
+                      fontSize: 'var(--text-sm)',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {tab}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 const CATEGORY_ICONS: Record<string, typeof Rocket> = {
   innovation: Rocket, industry: Factory, research: Microscope, global: Globe2, student: GraduationCap,
 };
@@ -3731,6 +3975,13 @@ export default function DifferentiatorDetail() {
         </main>
       );
     }
+    return <Navigate to="/differentiators" replace />;
+  }
+
+  // External items (TBI, VJOC, Vishnu Student Success Centre, Radio Vishnu, School of
+  // Music, ...) have no internal detail page — both the card grid and the nav dropdown
+  // send visitors straight to item.url, so this route should never render for them.
+  if (item.external && item.url) {
     return <Navigate to="/differentiators" replace />;
   }
 
@@ -3788,7 +4039,7 @@ export default function DifferentiatorDetail() {
           TalentSprint – WISE each get their own dedicated tabbed page below
           instead, since they have a persistent section nav sidebar rather
           than the generic Key Highlights sidebar. */}
-      {!iic && !vdl && !wise && (
+      {!iic && !vdl && !wise && !ideaLab && (
       <section className="section bg-white">
         <div className="container">
           <div className="detail-grid">
@@ -4496,17 +4747,6 @@ export default function DifferentiatorDetail() {
                     </p>
                   </div>
                 </>
-              ) : ideaLab ? (
-                <>
-                  <p style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-4)' }}>
-                    {ideaLab.tagline}
-                  </p>
-                  {ideaLab.paragraphs.map((para, i) => (
-                    <p key={i} style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-4)' }}>
-                      {para}
-                    </p>
-                  ))}
-                </>
               ) : (
                 <>
                   {item.intro && (
@@ -4571,55 +4811,9 @@ export default function DifferentiatorDetail() {
           Placements / and 7 more sections navigable from its sidebar). */}
       {wise && <WisePage wise={wise} />}
 
-      {/* Institute & Coordinator Details — only on the AICTE IDEA Lab page */}
-      {ideaLab && (
-        <section className="section bg-off-white">
-          <div className="container">
-            <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label">Application Details</span>
-              <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Institute & Coordinator Details</h2>
-            </div>
-            <div style={{ background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
-              {ideaLab.fields.map((f, i) => (
-                <div
-                  key={i}
-                  className="mobile-stack-grid"
-                  style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: 'var(--space-4)', padding: 'var(--space-4) var(--space-5)', background: i % 2 === 0 ? 'var(--color-off-white)' : 'var(--color-white)' }}
-                >
-                  <span style={{ fontWeight: 700, color: 'var(--color-primary)', fontSize: 'var(--text-sm)' }}>{f.label}</span>
-                  <div>
-                    {f.value.map((line, li) => (
-                      <p key={li} style={{ margin: 0, fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6 }}>{line}</p>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Vision — only on the AICTE IDEA Lab page */}
-      {ideaLab && (
-        <section className="section bg-white">
-          <div className="container">
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-6)' }}>
-              <div style={{ width: 4, height: 32, background: 'var(--color-accent)', borderRadius: 'var(--radius-full)' }} />
-              <h2 style={{ fontSize: '1.75rem', margin: 0 }}>Vision</h2>
-            </div>
-            <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-              {ideaLab.vision.map((v, i) => (
-                <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-3)' }}>
-                  <span style={{ width: 22, height: 22, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
-                    <svg width="11" height="11" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                  </span>
-                  <span style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.6 }}>{v}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
-      )}
+      {/* AICTE IDEA Lab's own tabbed page (About AICTE IDEA Lab / Team /
+          Student Ambassadors / Facilities navigable from its sidebar). */}
+      {ideaLab && <IdeaLabPage ideaLab={ideaLab} />}
 
       {/* Facilities */}
       {item.facilities && item.facilities.length > 0 && (

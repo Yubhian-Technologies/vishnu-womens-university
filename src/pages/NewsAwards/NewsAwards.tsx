@@ -8,7 +8,7 @@ import { useContentBlocks } from '../../hooks/useContentBlocks';
 const sections = [
   {
     slug: 'happenings',
-    anchor: 'happenings-content',
+    anchor: 'upcoming-events',
     title: 'Happenings at VWU',
     icon: Calendar,
     desc: 'Stay updated with the latest events, workshops, MoUs, competitions, and campus milestones — from recent achievements to upcoming programmes.',

@@ -40,6 +40,7 @@ const AdmissionProcedure = lazy(() => import('./pages/Admissions/AdmissionProced
 const ResultAnalysis = lazy(() => import('./pages/Admissions/ResultAnalysis'));
 const VishnuTV = lazy(() => import('./pages/StudentActivities/VishnuTV'));
 const StudentClubs = lazy(() => import('./pages/StudentActivities/StudentClubs'));
+const StudentClubDetail = lazy(() => import('./pages/StudentActivities/StudentClubDetail'));
 const SocialServices = lazy(() => import('./pages/StudentActivities/SocialServices'));
 const CampusMagazines = lazy(() => import('./pages/StudentActivities/CampusMagazines'));
 const ArtsCulture = lazy(() => import('./pages/StudentActivities/ArtsCulture'));
@@ -56,6 +57,7 @@ const SocialMedia = lazy(() => import('./pages/NewsAwards/SocialMedia'));
 const Careers = lazy(() => import('./pages/Careers/Careers'));
 const Contact = lazy(() => import('./pages/Contact/Contact'));
 const UGCDisclosure = lazy(() => import('./pages/Disclosures/UGCDisclosure'));
+const AicteFeedback = lazy(() => import('./pages/AicteFeedback/AicteFeedback'));
 const AntiRagging = lazy(() => import('./pages/AntiRagging/AntiRagging'));
 const PoliciesProcedures = lazy(() => import('./pages/PoliciesProcedures/PoliciesProcedures'));
 // The admin shell alone pulls in 20+ section components — keeping it out of
@@ -122,6 +124,7 @@ function PublicApp() {
           <Route path="/result-analysis" element={<ResultAnalysis />} />
           <Route path="/vishnu-tv-academy" element={<VishnuTV />} />
           <Route path="/student-clubs" element={<StudentClubs />} />
+          <Route path="/student-clubs/:slug" element={<StudentClubDetail />} />
           <Route path="/social-services" element={<SocialServices />} />
           <Route path="/campus-magazines" element={<CampusMagazines />} />
           <Route path="/arts-culture" element={<ArtsCulture />} />
@@ -140,6 +143,7 @@ function PublicApp() {
           <Route path="/careers" element={<Careers />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/disclosures/ugc" element={<UGCDisclosure />} />
+          <Route path="/aicte-feedback-facility" element={<AicteFeedback />} />
           <Route path="/anti-ragging" element={<AntiRagging />} />
           <Route path="/policies-procedures" element={<PoliciesProcedures />} />
           <Route path="*" element={<NotFound />} />

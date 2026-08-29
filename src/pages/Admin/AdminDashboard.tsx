@@ -38,20 +38,6 @@ import PoliciesAdmin from './sections/PoliciesAdmin';
 import TpoTeamPhotosAdmin from './sections/TpoTeamPhotosAdmin';
 import IloOfficePhotosAdmin from './sections/IloOfficePhotosAdmin';
 import GsacPhotosAdmin from './sections/GsacPhotosAdmin';
-import IicMemberPhotosAdmin from './sections/IicMemberPhotosAdmin';
-import TedxPhotosAdmin from './sections/TedxPhotosAdmin';
-import TiDspGalleryPhotosAdmin from './sections/TiDspGalleryPhotosAdmin';
-import ChipsToStartupPhotosAdmin from './sections/ChipsToStartupPhotosAdmin';
-import VsacGalleryPhotosAdmin from './sections/VsacGalleryPhotosAdmin';
-import VdlFacilitiesPhotosAdmin from './sections/VdlFacilitiesPhotosAdmin';
-import AssistiveTechLabPhotosAdmin from './sections/AssistiveTechLabPhotosAdmin';
-import ConcreteCanoePhotosAdmin from './sections/ConcreteCanoePhotosAdmin';
-import WisePlacementsAdmin from './sections/WisePlacementsAdmin';
-import WiseTeamPhotosAdmin from './sections/WiseTeamPhotosAdmin';
-import WiseEliteProjectPhotosAdmin from './sections/WiseEliteProjectPhotosAdmin';
-import WiseTestimonialPhotosAdmin from './sections/WiseTestimonialPhotosAdmin';
-import WiseNseClippingsAdmin from './sections/WiseNseClippingsAdmin';
-import NirvahanaEventPhotosAdmin from './sections/NirvahanaEventPhotosAdmin';
 import { useAdminSession } from './AdminSessionContext';
 import ReadOnlyGate from './ReadOnlyGate';
 import { canEdit, RESOURCES, type ResourceKey } from '../../lib/rbac';
@@ -121,20 +107,6 @@ const SECTION_MAP: Record<string, React.ReactNode> = {
   'tpo-team-photos': <TpoTeamPhotosAdmin />,
   'ilo-office-photos': <IloOfficePhotosAdmin />,
   'gsac-photos': <GsacPhotosAdmin />,
-  'iic-member-photos': <IicMemberPhotosAdmin />,
-  'tedx-photos': <TedxPhotosAdmin />,
-  'ti-dsp-gallery-photos': <TiDspGalleryPhotosAdmin />,
-  'chips-to-startup-photos': <ChipsToStartupPhotosAdmin />,
-  'vsac-gallery-photos': <VsacGalleryPhotosAdmin />,
-  'vdl-facilities-photos': <VdlFacilitiesPhotosAdmin />,
-  'atl-photos': <AssistiveTechLabPhotosAdmin />,
-  'concrete-canoe-photos': <ConcreteCanoePhotosAdmin />,
-  'wise-placements': <WisePlacementsAdmin />,
-  'wise-team-photos': <WiseTeamPhotosAdmin />,
-  'wise-elite-photos': <WiseEliteProjectPhotosAdmin />,
-  'wise-testimonial-photos': <WiseTestimonialPhotosAdmin />,
-  'wise-nse-clippings': <WiseNseClippingsAdmin />,
-  'nirvahana-photos': <NirvahanaEventPhotosAdmin />,
   'news-awards-data': <NewsAwardsDataAdmin />,
   'research-items': <ResearchItemsAdmin />,
   'compliance-docs': <ComplianceDocsAdmin />,

@@ -39,12 +39,12 @@ export default function Happenings() {
         defaultTitle="Happenings at VWU"
   defaultSubtitle="Workshops, MoUs, competitions, achievements, and institutional milestones — a running record of life at VWU."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'News & Awards', to: '/news-awards' }, { label: 'Happenings' }]}
-        scrollCtaTargetId="happenings-content"
+        scrollCtaTargetId={upcoming.length > 0 ? 'upcoming-events' : 'recent-events'}
       />
 
       {/* Upcoming Events */}
       {upcoming.length > 0 && (
-        <section id="happenings-content" className="section bg-white" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
+        <section id="upcoming-events" className="section bg-white" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
           <div className="container">
             <div className="reveal" style={{ marginBottom: 'var(--space-8)' }}>
               <span className="section-label">Mark Your Calendar</span>
@@ -74,7 +74,7 @@ export default function Happenings() {
       )}
 
       {/* Recent Events — Timeline */}
-      <section id={upcoming.length === 0 ? 'happenings-content' : undefined} className="section bg-off-white" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
+      <section id="recent-events" className="section bg-off-white" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
         <div className="container">
           <div className="reveal" style={{ marginBottom: 'var(--space-8)' }}>
             <span className="section-label">Latest Updates</span>
