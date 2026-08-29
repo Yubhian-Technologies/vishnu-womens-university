@@ -379,7 +379,7 @@ export default function Admissions() {
                   <Mail size={22} strokeWidth={1.75} />
                   <div>
                     <strong>Email</strong>
-                    <a href="mailto:info@svecw.edu.in">info@svecw.edu.in</a>
+                    <a href="mailto:info@vwu.edu.in">info@vwu.edu.in</a>
                   </div>
                 </div>
                 <div className="adm-contact-item">

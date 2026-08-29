@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Laptop, Presentation, Check, Clock, MapPin } from 'lucide-react';
+import { Laptop, Presentation, Check, Clock, MapPin, Sparkles } from 'lucide-react';
 import HeroSlider from '../../components/HeroSlider/HeroSlider';
 import CounterSection from '../../components/CounterSection/CounterSection';
 import ScrollTopButton from '../../components/ScrollTopButton/ScrollTopButton';
@@ -122,6 +122,13 @@ function buildPopularProgramsFromPrograms(programs: ProgramDoc[]): ContentBlockD
     }));
 }
 
+const defaultWhyChooseCards: ContentBlockDoc[] = [
+  { id: 'default-1', page: 'home', section: 'whyChoose', value: '', title: 'A Campus Built Exclusively for Women', desc: 'A focused, secure environment where every program, hostel, and support service is designed around women succeeding in engineering.', icon: 'Venus', slug: '/about', order: 0 },
+  { id: 'default-2', page: 'home', section: 'whyChoose', value: '', title: 'UGC Autonomous, Industry-Aligned Curriculum', desc: 'Full curricular freedom lets VWU update coursework with industry input every year — not once a decade.', icon: 'BadgeCheck', slug: '/academics', order: 1 },
+  { id: 'default-3', page: 'home', section: 'whyChoose', value: '', title: 'Research & Innovation at the Core', desc: 'Dedicated labs, incubation support, and 90+ patents put students inside real research from year one.', icon: 'Rocket', slug: '/differentiators', order: 2 },
+  { id: 'default-4', page: 'home', section: 'whyChoose', value: '', title: '1,100+ Placements Every Year', desc: 'Amazon, TCS, Infosys, Wipro, and 150+ other recruiters return to VWU year after year for its graduating engineers.', icon: 'Briefcase', slug: '/placements', order: 3 },
+];
+
 const defaultCampusFeatures: ContentBlockDoc[] = [
   'Technology Business Incubator', 'Student Clubs & Organizations', 'Radio Vishnu 90.4', 'Vishnu TV Academy',
   'Sports & Games Facilities', 'Career Services Center', "Women's Hostels", 'AR/VR Studio',
@@ -207,6 +214,8 @@ export default function Home() {
   const testimonials = liveTestimonials.length > 0 ? liveTestimonials : defaultTestimonials;
   const liveStudyCards = useContentBlocks('home', 'studyCards');
   const studyCards = liveStudyCards.length > 0 ? liveStudyCards : defaultStudyCards;
+  const liveWhyChooseCards = useContentBlocks('home', 'whyChoose');
+  const whyChooseCards = liveWhyChooseCards.length > 0 ? liveWhyChooseCards : defaultWhyChooseCards;
   const { docs: programsForTags } = useOrderedCollection<ProgramDoc>('programs', 'order');
   const programsDerivedPopularPrograms = buildPopularProgramsFromPrograms(programsForTags);
   const popularPrograms = programsDerivedPopularPrograms.length > 0 ? programsDerivedPopularPrograms : defaultPopularPrograms;
@@ -383,6 +392,36 @@ export default function Home() {
                 </Link>
               ))}
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Why Choose VWU ── */}
+      <section className="why-section section">
+        <div className="container">
+          <div className="why-header reveal">
+            <span className="section-label">The VWU Edge</span>
+            <h2 className="section-title gradient-text">What Sets VWU Apart</h2>
+          </div>
+          <div className="why-grid">
+            {whyChooseCards.map((card) => {
+              const Icon = resolveContentIcon(card.icon) || Sparkles;
+              return (
+                <Link key={card.id} to={card.slug || '/about'} className="why-card">
+                  <Icon className="why-card-icon-bg" strokeWidth={1.25} aria-hidden="true" />
+                  <div>
+                    <h3 className="why-card-title"><mark>{card.title}</mark></h3>
+                    <p className="why-card-desc">{card.desc}</p>
+                  </div>
+                  <span className="why-card-link">
+                    <span className="why-card-link-bubble">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    </span>
+                    Learn more
+                  </span>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>

@@ -298,7 +298,7 @@ export default function Academics() {
               <p style={{ color: 'var(--color-text-light)', lineHeight: 1.8, marginBottom: 'var(--space-6)' }}>
                 The Training & Placement Cell maintains year-round engagement with India's leading employers — including Amazon, TCS, Infosys, Wipro, HCL, Cognizant, and 150+ other companies.
               </p>
-              <Link to="/result-analysis" className="btn btn-primary">View Result Analysis →</Link>
+              <Link to="/placements/placement-details" className="btn btn-primary">Explore →</Link>
             </div>
             <div className="reveal-right">
               <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
@@ -323,7 +323,7 @@ export default function Academics() {
             title="Learning, Research & Innovation"
             subtitle="Inside VWU's labs, classrooms, and events — where students are trained to think, build, and lead."
             highlights={[
-              '9 B.Tech specialisations with UGC Autonomous curriculum',
+              '10 B.Tech specialisations with UGC Autonomous curriculum',
               '50+ specialised labs across all departments',
               '200+ smart classrooms with interactive boards',
               'IEEE, Springer & NPTEL digital library access',
@@ -331,6 +331,7 @@ export default function Academics() {
             ]}
             columns={2}
             layout="side-text-reverse"
+            showGalleryLink={false}
           />
         </div>
       </section>
@@ -345,6 +346,7 @@ export default function Academics() {
               title="Where Theory Meets Practice"
               columns={3}
               layout="default"
+              showGalleryLink={false}
             />
           </div>
         </section>

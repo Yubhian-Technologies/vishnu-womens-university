@@ -73,6 +73,7 @@ export const CONTENT_BLOCK_SECTIONS: { page: string; section: string; label: str
   { page: 'home', section: 'campusFeatures', label: 'Home — Campus Features' },
   { page: 'home', section: 'testimonials', label: 'Home — Testimonials' },
   { page: 'home', section: 'studyCards', label: 'Home — Study at VWU Cards' },
+  { page: 'home', section: 'whyChoose', label: 'Home — Why Choose VWU Cards (Slug field = link)' },
   // Home — Popular Programs Tags intentionally isn't here any more: that
   // strip now derives directly from /admin → Programs (each B.Tech/MBA
   // program becomes a tag automatically), so a separate manually-curated
