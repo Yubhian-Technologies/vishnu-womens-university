@@ -33,10 +33,10 @@ const alumniGivingLinks = [
 ];
 
 const feedbackLinks = [
-  { label: "Students' Feedback", href: 'https://forms.gle/UuURnxKUZw7wW1NW9' },
-  { label: "Parents' Feedback", href: 'https://forms.gle/eT2QF3WNJZDwpEzj8' },
-  { label: "Faculty's Feedback", href: 'https://forms.gle/K89PMmjNbJNGSVEa9' },
-  { label: 'AICTE Feedback Facility', href: 'https://svecw.edu.in/aicte-feedback-facility/' },
+  { label: "Students' Feedback", href: 'https://forms.gle/UuURnxKUZw7wW1NW9', external: true },
+  { label: "Parents' Feedback", href: 'https://forms.gle/eT2QF3WNJZDwpEzj8', external: true },
+  { label: "Faculty's Feedback", href: 'https://forms.gle/K89PMmjNbJNGSVEa9', external: true },
+  { label: 'AICTE Feedback Facility', href: '/aicte-feedback-facility', external: false },
 ];
 
 // Mirrors the header nav's "Quick Links" dropdown (see navItems in
@@ -120,7 +120,7 @@ export default function Footer() {
                 Bhimavaram, West Godavari Dist.<br />
                 Andhra Pradesh – 534 202<br />
                 <a href="tel:08816250864">08816-250864</a><br />
-                <a href="mailto:info@svecw.edu.in">info@svecw.edu.in</a>
+                <a href="mailto:info@vwu.edu.in">info@vwu.edu.in</a>
               </address>
 
               <div className="footer-social" aria-label="Social Media">
@@ -167,7 +167,11 @@ export default function Footer() {
             <span className="footer-feedback-label">Feedback Facility:</span>
             {feedbackLinks.map((l, i) => (
               <span key={l.label}>
-                <a href={l.href} target="_blank" rel="noopener noreferrer" className="footer-link">{l.label}</a>
+                {l.external ? (
+                  <a href={l.href} target="_blank" rel="noopener noreferrer" className="footer-link">{l.label}</a>
+                ) : (
+                  <Link to={l.href} className="footer-link">{l.label}</Link>
+                )}
                 {i < feedbackLinks.length - 1 && <span className="footer-feedback-sep">·</span>}
               </span>
             ))}

@@ -2,6 +2,18 @@
    VWU Admin Panel
    ========================================================= */
 
+/* ---- Focus visibility ---- */
+/* One consistent, on-brand keyboard-focus ring for every interactive
+   element in the admin, since several of these sit on a dark sidebar
+   background where the browser's default focus ring can be hard to see. */
+.admin-shell a:focus-visible,
+.admin-shell button:focus-visible,
+.admin-login a:focus-visible,
+.admin-login button:focus-visible {
+  outline: 2px solid #c8a03c;
+  outline-offset: 2px;
+}
+
 /* ---- Page Selector ---- */
 .admin-page-selector { margin-bottom: 0.25rem; }
 
@@ -150,7 +162,9 @@
   font-weight: 700;
   letter-spacing: 0.07em;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.38);
+  /* 0.38 opacity measured ~3.5:1 against the #081c15 background, below the
+     4.5:1 WCAG AA minimum for text this small — 0.55 clears ~5.7:1. */
+  color: rgba(255,255,255,0.55);
 }
 
 .admin-sidebar__link {

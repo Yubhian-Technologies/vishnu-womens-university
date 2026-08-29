@@ -67,26 +67,26 @@ export default function StudentClubsAdmin() {
         <h2 className="admin-card__title">{editing ? 'Edit Club' : 'Add Club'}</h2>
         <div className="admin-form-grid">
           <div className="admin-field">
-            <label>Club Name *</label>
-            <input value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="CodeChef Vishnu Women's University Chapter" />
+            <label htmlFor="field-club-name">Club Name *</label>
+            <input id="field-club-name" value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="CodeChef Vishnu Women's University Chapter" />
           </div>
           <div className="admin-field">
-            <label>Category</label>
-            <select value={form.category} onChange={(e) => set('category', e.target.value)}>
+            <label htmlFor="field-category">Category</label>
+            <select id="field-category" value={form.category} onChange={(e) => set('category', e.target.value)}>
               {CLUB_CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
           <div className="admin-field">
-            <label>Display Order</label>
-            <input type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
+            <label htmlFor="field-display-order">Display Order</label>
+            <input id="field-display-order" type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
           </div>
           <div className="admin-field">
             <label>URL Slug (optional — auto-generated from name if left blank)</label>
             <input value={form.slug} onChange={(e) => set('slug', e.target.value)} placeholder="codechef-svecw-chapter" />
           </div>
           <div className="admin-field admin-field--full">
-            <label>Description</label>
-            <textarea rows={3} value={form.desc} onChange={(e) => set('desc', e.target.value)} placeholder="What the club does…" />
+            <label htmlFor="field-description">Description</label>
+            <textarea id="field-description" rows={3} value={form.desc} onChange={(e) => set('desc', e.target.value)} placeholder="What the club does…" />
           </div>
         </div>
         <div className="admin-form-actions">

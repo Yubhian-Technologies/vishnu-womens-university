@@ -61,22 +61,22 @@ export default function FaqAdmin() {
         <h2 className="admin-card__title">{editing ? 'Edit FAQ' : 'Add FAQ'}</h2>
         <div className="admin-form-grid">
           <div className="admin-field">
-            <label>Page</label>
-            <select value={form.page} onChange={(e) => set('page', e.target.value)}>
+            <label htmlFor="field-page">Page</label>
+            <select id="field-page" value={form.page} onChange={(e) => set('page', e.target.value)}>
               {PAGES.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}
             </select>
           </div>
           <div className="admin-field">
-            <label>Display Order</label>
-            <input type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
+            <label htmlFor="field-display-order">Display Order</label>
+            <input id="field-display-order" type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
           </div>
           <div className="admin-field admin-field--full">
-            <label>Question *</label>
-            <input value={form.question} onChange={(e) => set('question', e.target.value)} placeholder="What is the VWU college code for EAPCET?" />
+            <label htmlFor="field-question">Question *</label>
+            <input id="field-question" value={form.question} onChange={(e) => set('question', e.target.value)} placeholder="What is the VWU college code for EAPCET?" />
           </div>
           <div className="admin-field admin-field--full">
-            <label>Answer *</label>
-            <textarea rows={3} value={form.answer} onChange={(e) => set('answer', e.target.value)} placeholder="The college code for VWU in AP EAPCET is VISW…" />
+            <label htmlFor="field-answer">Answer *</label>
+            <textarea id="field-answer" rows={3} value={form.answer} onChange={(e) => set('answer', e.target.value)} placeholder="The college code for VWU in AP EAPCET is VISW…" />
           </div>
         </div>
         <div className="admin-form-actions">

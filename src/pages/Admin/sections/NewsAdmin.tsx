@@ -76,18 +76,18 @@ export default function NewsAdmin() {
             <ImageUploader folder="vwu/news" currentUrl={form.imageUrl} onUploaded={handleImage} label="Upload News Image" />
           </div>
           <div className="admin-field">
-            <label>Title *</label>
-            <input value={form.title} onChange={(e) => set('title', e.target.value)} placeholder="Article title" />
+            <label htmlFor="field-title">Title *</label>
+            <input id="field-title" value={form.title} onChange={(e) => set('title', e.target.value)} placeholder="Article title" />
           </div>
           <div className="admin-field">
-            <label>Category</label>
-            <select value={form.category} onChange={(e) => set('category', e.target.value)}>
+            <label htmlFor="field-category">Category</label>
+            <select id="field-category" value={form.category} onChange={(e) => set('category', e.target.value)}>
               {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
             </select>
           </div>
           <div className="admin-field">
-            <label>Date *</label>
-            <input type="date" value={form.date} onChange={(e) => set('date', e.target.value)} />
+            <label htmlFor="field-date">Date *</label>
+            <input id="field-date" type="date" value={form.date} onChange={(e) => set('date', e.target.value)} />
           </div>
           <div className="admin-field">
             <label>Featured</label>
@@ -97,12 +97,12 @@ export default function NewsAdmin() {
             </label>
           </div>
           <div className="admin-field admin-field--full">
-            <label>Summary</label>
-            <input value={form.summary} onChange={(e) => set('summary', e.target.value)} placeholder="Short description (shown in cards)" />
+            <label htmlFor="field-summary">Summary</label>
+            <input id="field-summary" value={form.summary} onChange={(e) => set('summary', e.target.value)} placeholder="Short description (shown in cards)" />
           </div>
           <div className="admin-field admin-field--full">
-            <label>Full Body</label>
-            <textarea rows={5} value={form.body} onChange={(e) => set('body', e.target.value)} placeholder="Full article content…" />
+            <label htmlFor="field-full-body">Full Body</label>
+            <textarea id="field-full-body" rows={5} value={form.body} onChange={(e) => set('body', e.target.value)} placeholder="Full article content…" />
           </div>
         </div>
         <div className="admin-form-actions">

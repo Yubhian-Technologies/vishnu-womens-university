@@ -109,52 +109,52 @@ export default function GovernanceItemsAdmin() {
         </p>
         <div className="admin-form-grid">
           <div className="admin-field">
-            <label>URL Slug * (used in the page link, e.g. governing-body)</label>
-            <input value={form.slug} onChange={(e) => set('slug', e.target.value.trim().toLowerCase().replace(/\s+/g, '-'))} placeholder="governing-body" />
+            <label htmlFor="field-url-slug-used-in-the">URL Slug * (used in the page link, e.g. governing-body)</label>
+            <input id="field-url-slug-used-in-the" value={form.slug} onChange={(e) => set('slug', e.target.value.trim().toLowerCase().replace(/\s+/g, '-'))} placeholder="governing-body" />
           </div>
           <div className="admin-field">
-            <label>Title *</label>
-            <input value={form.title} onChange={(e) => set('title', e.target.value)} placeholder="Governing Body" />
+            <label htmlFor="field-title">Title *</label>
+            <input id="field-title" value={form.title} onChange={(e) => set('title', e.target.value)} placeholder="Governing Body" />
           </div>
           <div className="admin-field">
-            <label>Category *</label>
-            <select value={form.category} onChange={(e) => set('category', e.target.value)}>
+            <label htmlFor="field-category">Category *</label>
+            <select id="field-category" value={form.category} onChange={(e) => set('category', e.target.value)}>
               {CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
             </select>
           </div>
           <div className="admin-field">
-            <label>Icon</label>
-            <select value={form.icon} onChange={(e) => set('icon', e.target.value)}>
+            <label htmlFor="field-icon">Icon</label>
+            <select id="field-icon" value={form.icon} onChange={(e) => set('icon', e.target.value)}>
               {CONTENT_ICON_NAMES.map((n) => <option key={n} value={n}>{n}</option>)}
             </select>
           </div>
           <div className="admin-field">
-            <label>Display Order</label>
-            <input type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
+            <label htmlFor="field-display-order">Display Order</label>
+            <input id="field-display-order" type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
           </div>
           <div className="admin-field admin-field--full">
-            <label>Short Description (shown on the Governance listing card)</label>
-            <textarea rows={2} value={form.desc} onChange={(e) => set('desc', e.target.value)} placeholder="One or two sentences…" />
+            <label htmlFor="field-short-description-shown-on-the">Short Description (shown on the Governance listing card)</label>
+            <textarea id="field-short-description-shown-on-the" rows={2} value={form.desc} onChange={(e) => set('desc', e.target.value)} placeholder="One or two sentences…" />
           </div>
           <div className="admin-field admin-field--full">
-            <label>Intro (first paragraph on the detail page)</label>
-            <textarea rows={3} value={form.intro} onChange={(e) => set('intro', e.target.value)} />
+            <label htmlFor="field-intro-first-paragraph-on-the">Intro (first paragraph on the detail page)</label>
+            <textarea id="field-intro-first-paragraph-on-the" rows={3} value={form.intro} onChange={(e) => set('intro', e.target.value)} />
           </div>
           <div className="admin-field admin-field--full">
-            <label>About (longer detail paragraph)</label>
-            <textarea rows={4} value={form.about} onChange={(e) => set('about', e.target.value)} />
+            <label htmlFor="field-about-longer-detail-paragraph">About (longer detail paragraph)</label>
+            <textarea id="field-about-longer-detail-paragraph" rows={4} value={form.about} onChange={(e) => set('about', e.target.value)} />
           </div>
           <div className="admin-field admin-field--full">
-            <label>Key Highlights (one per line)</label>
-            <textarea rows={5} value={arrayToLines(form.highlights)} onChange={(e) => set('highlights', linesToArray(e.target.value))} />
+            <label htmlFor="field-key-highlights-one-per-line">Key Highlights (one per line)</label>
+            <textarea id="field-key-highlights-one-per-line" rows={5} value={arrayToLines(form.highlights)} onChange={(e) => set('highlights', linesToArray(e.target.value))} />
           </div>
           <div className="admin-field admin-field--full">
-            <label>Outcomes & Achievements (one per line — optional)</label>
-            <textarea rows={4} value={arrayToLines(form.outcomes)} onChange={(e) => set('outcomes', linesToArray(e.target.value))} />
+            <label htmlFor="field-outcomes-achievements-one-per-line">Outcomes & Achievements (one per line — optional)</label>
+            <textarea id="field-outcomes-achievements-one-per-line" rows={4} value={arrayToLines(form.outcomes)} onChange={(e) => set('outcomes', linesToArray(e.target.value))} />
           </div>
           <div className="admin-field admin-field--full">
-            <label>Members Table (optional — see format above)</label>
-            <textarea rows={8} value={form.tableText} onChange={(e) => set('tableText', e.target.value)} placeholder={'Dr. G. Srinivasa Rao | Principal (Chairman)\nProf. P. Venkata Rama Raju | Vice-Principal'} />
+            <label htmlFor="field-members-table-optional-see-format">Members Table (optional — see format above)</label>
+            <textarea id="field-members-table-optional-see-format" rows={8} value={form.tableText} onChange={(e) => set('tableText', e.target.value)} placeholder={'Dr. G. Srinivasa Rao | Principal (Chairman)\nProf. P. Venkata Rama Raju | Vice-Principal'} />
           </div>
         </div>
         <div className="admin-form-actions">

@@ -63,14 +63,14 @@ export default function AdminLogin({ error, onAttempt }: Props) {
     <div className="admin-login">
       <div className="admin-login__card">
         <div className="admin-login__logo">
-          <span>🎓</span>
+          <span aria-hidden="true">🎓</span>
           <h1>VWU Admin</h1>
           <p>Vishnu Women's University — Content Management</p>
         </div>
         <form onSubmit={handleSubmit} className="admin-login__form">
           <div className="admin-field">
-            <label>Department</label>
-            <select
+            <label htmlFor="field-department">Department</label>
+            <select id="field-department"
               value={department}
               onChange={(e) => setDepartment(e.target.value)}
               required
@@ -83,8 +83,8 @@ export default function AdminLogin({ error, onAttempt }: Props) {
             </select>
           </div>
           <div className="admin-field">
-            <label>Email</label>
-            <input
+            <label htmlFor="field-email">Email</label>
+            <input id="field-email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -94,8 +94,8 @@ export default function AdminLogin({ error, onAttempt }: Props) {
             />
           </div>
           <div className="admin-field">
-            <label>Password</label>
-            <input
+            <label htmlFor="field-password">Password</label>
+            <input id="field-password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -104,7 +104,7 @@ export default function AdminLogin({ error, onAttempt }: Props) {
               disabled={!fieldsEnabled}
             />
           </div>
-          {(localError || error) && <p className="admin-error">{localError || error}</p>}
+          {(localError || error) && <p className="admin-error" role="alert">{localError || error}</p>}
           <button type="submit" className="admin-btn admin-btn--primary" disabled={loading || !fieldsEnabled}>
             {loading ? 'Signing in…' : 'Sign In'}
           </button>

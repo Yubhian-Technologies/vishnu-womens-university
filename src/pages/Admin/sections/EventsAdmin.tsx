@@ -68,38 +68,38 @@ export default function EventsAdmin() {
         <p className="admin-lead" style={{ marginBottom: '1rem' }}>Featured events also show in the "Upcoming at VWU" strip on the Home page.</p>
         <div className="admin-form-grid">
           <div className="admin-field admin-field--full">
-            <label>Title *</label>
-            <input value={form.title} onChange={(e) => set('title', e.target.value)} placeholder="Technova2026 National Technical Symposium" />
+            <label htmlFor="field-title">Title *</label>
+            <input id="field-title" value={form.title} onChange={(e) => set('title', e.target.value)} placeholder="Technova2026 National Technical Symposium" />
           </div>
           <div className="admin-field">
-            <label>Month *</label>
-            <input value={form.month} onChange={(e) => set('month', e.target.value.toUpperCase())} placeholder="MAY" maxLength={3} />
+            <label htmlFor="field-month">Month *</label>
+            <input id="field-month" value={form.month} onChange={(e) => set('month', e.target.value.toUpperCase())} placeholder="MAY" maxLength={3} />
           </div>
           <div className="admin-field">
-            <label>Day *</label>
-            <input value={form.day} onChange={(e) => set('day', e.target.value)} placeholder="20" />
+            <label htmlFor="field-day">Day *</label>
+            <input id="field-day" value={form.day} onChange={(e) => set('day', e.target.value)} placeholder="20" />
           </div>
           <div className="admin-field">
-            <label>Year</label>
-            <input value={form.year} onChange={(e) => set('year', e.target.value)} placeholder="2026" />
+            <label htmlFor="field-year">Year</label>
+            <input id="field-year" value={form.year} onChange={(e) => set('year', e.target.value)} placeholder="2026" />
           </div>
           <div className="admin-field">
-            <label>Time</label>
-            <input value={form.time} onChange={(e) => set('time', e.target.value)} placeholder="9:00 AM IST" />
+            <label htmlFor="field-time">Time</label>
+            <input id="field-time" value={form.time} onChange={(e) => set('time', e.target.value)} placeholder="9:00 AM IST" />
           </div>
           <div className="admin-field">
-            <label>Location</label>
-            <input value={form.location} onChange={(e) => set('location', e.target.value)} placeholder="VWU Main Auditorium, Bhimavaram" />
+            <label htmlFor="field-location">Location</label>
+            <input id="field-location" value={form.location} onChange={(e) => set('location', e.target.value)} placeholder="VWU Main Auditorium, Bhimavaram" />
           </div>
           <div className="admin-field">
-            <label>Category</label>
-            <select value={form.category} onChange={(e) => set('category', e.target.value)}>
+            <label htmlFor="field-category">Category</label>
+            <select id="field-category" value={form.category} onChange={(e) => set('category', e.target.value)}>
               {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
           <div className="admin-field">
-            <label>Display Order</label>
-            <input type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
+            <label htmlFor="field-display-order">Display Order</label>
+            <input id="field-display-order" type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
           </div>
           <div className="admin-field">
             <label>Featured</label>
@@ -109,12 +109,12 @@ export default function EventsAdmin() {
             </label>
           </div>
           <div className="admin-field admin-field--full">
-            <label>Description</label>
-            <textarea rows={3} value={form.desc} onChange={(e) => set('desc', e.target.value)} placeholder="Event description…" />
+            <label htmlFor="field-description">Description</label>
+            <textarea id="field-description" rows={3} value={form.desc} onChange={(e) => set('desc', e.target.value)} placeholder="Event description…" />
           </div>
           <div className="admin-field admin-field--full">
-            <label>Registration / Details Link (optional — leave blank to hide the button on the public page)</label>
-            <input value={form.link} onChange={(e) => set('link', e.target.value)} placeholder="https://forms.gle/… or https://svecw.edu.in/…" />
+            <label htmlFor="field-registration-details-link-optional-leave">Registration / Details Link (optional — leave blank to hide the button on the public page)</label>
+            <input id="field-registration-details-link-optional-leave" value={form.link} onChange={(e) => set('link', e.target.value)} placeholder="https://forms.gle/… or https://svecw.edu.in/…" />
           </div>
         </div>
         <div className="admin-form-actions">

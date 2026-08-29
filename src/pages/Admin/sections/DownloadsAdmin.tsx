@@ -81,12 +81,12 @@ export default function DownloadsAdmin() {
             <FileUploader folder="vwu/downloads" currentUrl={form.fileUrl} onUploaded={handleFile} label="Upload PDF" />
           </div>
           <div className="admin-field">
-            <label>Title *</label>
-            <input value={form.title} onChange={(e) => set('title', e.target.value)} placeholder="Course Curriculum" />
+            <label htmlFor="field-title">Title *</label>
+            <input id="field-title" value={form.title} onChange={(e) => set('title', e.target.value)} placeholder="Course Curriculum" />
           </div>
           <div className="admin-field">
-            <label>Display Order</label>
-            <input type="number" value={form.order} onChange={(e) => set('order', Number(e.target.value))} min={0} />
+            <label htmlFor="field-display-order">Display Order</label>
+            <input id="field-display-order" type="number" value={form.order} onChange={(e) => set('order', Number(e.target.value))} min={0} />
           </div>
         </div>
         <div className="admin-form-actions">
