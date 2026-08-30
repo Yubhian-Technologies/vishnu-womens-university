@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useNavLinkOverride } from '../../hooks/useNavLinkOverride';
-import { COMPLIANCE_GROUPS, DEFAULT_COMPLIANCE_DOCS, type ComplianceDocDoc } from '../../pages/Admin/sections/ComplianceDocsAdmin';
+import { COMPLIANCE_GROUPS, type ComplianceDocDoc } from '../../pages/Admin/sections/ComplianceDocsAdmin';
 import { InstagramIcon, FacebookIcon, TwitterIcon, LinkedInIcon, YouTubeIcon } from './SocialIcons';
 import './Footer.css';
 
@@ -54,10 +54,9 @@ const quickLinks = [
 ];
 
 // Statutory/compliance documents an accredited institution is required to publish.
-// Admin-editable via /admin → Compliance Documents (ComplianceDocsAdmin.tsx);
-// DEFAULT_COMPLIANCE_DOCS below is both the "nothing uploaded yet" fallback
-// and the one-click starting point for moving these into Firestore, so the
-// footer never looks broken either way.
+// Admin-editable via /admin → Compliance Documents (ComplianceDocsAdmin.tsx) —
+// an empty group there simply doesn't render below, same as every other
+// Firestore-backed section on the site.
 //
 // "Disclosures – UGC" is the one fixed exception: it's an internal page
 // route (built from the same PDF, at /disclosures/ugc), not a document link,
@@ -69,8 +68,7 @@ export default function Footer() {
   const year = new Date().getFullYear();
   // Default target is AlumniGiving.tsx's own "#successstories" section, not Placements' — see Header.tsx's former use of this same override id.
   const alumniSuccessStories = useNavLinkOverride('alumni-success-stories', '/alumni-giving#successstories');
-  const { docs: liveComplianceDocs } = useOrderedCollection<ComplianceDocDoc>('complianceDocs', 'order');
-  const complianceDocs = liveComplianceDocs.length > 0 ? liveComplianceDocs : (DEFAULT_COMPLIANCE_DOCS as ComplianceDocDoc[]);
+  const { docs: complianceDocs } = useOrderedCollection<ComplianceDocDoc>('complianceDocs', 'order');
   const complianceGroups = COMPLIANCE_GROUPS.map((title) => ({
     title,
     links: [

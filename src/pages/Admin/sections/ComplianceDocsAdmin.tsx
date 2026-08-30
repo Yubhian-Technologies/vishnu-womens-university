@@ -3,7 +3,7 @@ import { collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp } from '
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
 import FileUploader from '../../../components/FileUploader/FileUploader';
-import { deleteFile, type UploadResult } from '../../../lib/storage';
+import { deleteFile, uploadFile, type UploadResult } from '../../../lib/storage';
 
 export interface ComplianceDocDoc {
   id: string;
@@ -33,48 +33,18 @@ export const COMPLIANCE_GROUPS = [
   'Institutional Data',
 ];
 
-// The footer's original hardcoded links — used both as the "empty
-// collection" fallback (so the footer never looks broken) and as the
-// one-click starting point for admins moving these into Firestore.
-export const DEFAULT_COMPLIANCE_DOCS: Omit<ComplianceDocDoc, 'id'>[] = [
-  { group: 'Approvals & Accreditations', label: 'AICTE Approvals', fileUrl: '/downloads/AICTEApprovals.pdf', storagePath: '', external: false, download: false, key: 'aicte-approvals', order: 1 },
-  { group: 'Approvals & Accreditations', label: 'UGC Autonomous Approvals', fileUrl: '/downloads/UGCAutonomousApprovals.pdf', storagePath: '', external: false, download: false, key: 'ugc-autonomous-approvals', order: 2 },
-  { group: 'Approvals & Accreditations', label: 'UGC - 12B 2f Letter', fileUrl: '/downloads/UGC12B2FLetter.pdf', storagePath: '', external: false, download: false, key: 'ugc-12b-2f', order: 3 },
-  { group: 'Approvals & Accreditations', label: 'JNTUK Affiliation Approvals', fileUrl: '/downloads/JNTUKAffiliationApprovals.pdf', storagePath: '', external: false, download: false, key: 'jntuk-affiliation-approvals', order: 4 },
-  { group: 'Approvals & Accreditations', label: 'JNTUK Autonomous Approvals', fileUrl: '/downloads/JNTUKAutonomousApprovals.pdf', storagePath: '', external: false, download: false, key: 'jntuk-autonomous-approvals', order: 5 },
-  { group: 'Approvals & Accreditations', label: 'NAAC Approvals', fileUrl: '/downloads/NAACApprovals.pdf', storagePath: '', external: false, download: false, key: 'naac-approvals', order: 6 },
-  { group: 'Approvals & Accreditations', label: 'NBA Approvals', fileUrl: '/downloads/NBAApprovals.pdf', storagePath: '', external: false, download: false, key: 'nba-approvals', order: 7 },
-  { group: 'Mandatory Disclosures', label: 'AICTE Mandatory Disclosures', fileUrl: '/downloads/AICTEMandatoryDisclosures.pdf', storagePath: '', external: false, download: false, key: 'aicte-mandatory-disclosures', order: 1 },
-  { group: 'Mandatory Disclosures', label: 'UGC Public Self Disclosure', fileUrl: '/downloads/UGCPublicSelfDisclosure.pdf', storagePath: '', external: false, download: false, key: 'ugc-public-self-disclosure', order: 2 },
-  { group: 'Mandatory Disclosures', label: 'JNTUK Mandatory Disclosure', fileUrl: '/downloads/JNTUKMandatoryDisclosure.pdf', storagePath: '', external: false, download: false, key: 'jntuk-mandatory-disclosure', order: 3 },
-  { group: 'Mandatory Disclosures', label: 'RTI-Undertaking', fileUrl: '/downloads/RTIUndertaking.pdf', storagePath: '', external: false, download: false, key: 'rti-undertaking', order: 4 },
-  { group: 'Mandatory Disclosures', label: 'Anti Ragging Policies', fileUrl: '/anti-ragging', storagePath: '', external: true, download: false, key: 'anti-ragging-policies', order: 5 },
-  { group: 'Mandatory Disclosures', label: 'Policies & Procedures', fileUrl: '/policies-procedures', storagePath: '', external: true, download: false, key: 'policies-procedures', order: 6 },
-  { group: 'Infrastructure & Facilities', label: 'College Fee Payment', fileUrl: '/downloads/SVECWCollegeFeePayment.pdf', storagePath: '', external: false, download: false, key: 'college-fee-payment', order: 1 },
-  { group: 'Infrastructure & Facilities', label: 'Hostel Fee Payment', fileUrl: '/downloads/SVECWHostelFeePayment.pdf', storagePath: '', external: false, download: false, key: 'hostel-fee-payment', order: 2 },
-  { group: 'Infrastructure & Facilities', label: 'Building Plans', fileUrl: '/downloads/SVECWBuildingPlans.pdf', storagePath: '', external: false, download: false, key: 'building-plans', order: 3 },
-  { group: 'Infrastructure & Facilities', label: 'Structural Stability', fileUrl: '/downloads/SVECWStructuralStability.pdf', storagePath: '', external: false, download: false, key: 'structural-stability', order: 4 },
-  { group: 'Infrastructure & Facilities', label: 'Land Use Certificate', fileUrl: '/downloads/SVECWLandUseCertificate.pdf', storagePath: '', external: false, download: false, key: 'land-use-certificate', order: 5 },
-  { group: 'Infrastructure & Facilities', label: 'Land Conversion Certificate', fileUrl: 'https://svecw.edu.in/wp-content/uploads/2024/07/SVECWLandConversion.pdf', storagePath: '', external: true, download: false, key: 'land-conversion-certificate', order: 6 },
-  { group: 'Infrastructure & Facilities', label: 'Fire NOC', fileUrl: '/downloads/SVECWFireSafety2026.pdf', storagePath: '', external: false, download: false, key: 'fire-noc', order: 7 },
-  { group: 'Infrastructure & Facilities', label: 'Online Verification System', fileUrl: '/downloads/SVECWOnlineVerification.pdf', storagePath: '', external: false, download: false, key: 'online-verification-system', order: 8 },
-  { group: 'Institutional Data', label: 'Audited Statements', fileUrl: '/downloads/SVECWAuditStatements.pdf', storagePath: '', external: false, download: false, key: 'audited-statements', order: 1 },
-  { group: 'Institutional Data', label: 'Student Details', fileUrl: '/downloads/SVECWStudentDetails.pdf', storagePath: '', external: false, download: false, key: 'student-details', order: 2 },
-  { group: 'Institutional Data', label: 'Faculty Details', fileUrl: '/downloads/SVECWFacultyDetails.pdf', storagePath: '', external: false, download: false, key: 'faculty-details', order: 3 },
-  { group: 'Institutional Data', label: 'Faculty Qualification Details', fileUrl: 'https://svecw.edu.in/wp-content/uploads/2026/02/SVECWFacultyQualifications.pdf', storagePath: '', external: true, download: false, key: 'faculty-qualification-details', order: 4 },
-  { group: 'Institutional Data', label: 'Faculty Ratification Details', fileUrl: '/downloads/SVECWRatifiedFaculty.pdf', storagePath: '', external: false, download: false, key: 'faculty-ratification-details', order: 5 },
-  { group: 'Institutional Data', label: 'Faculty Handbook', fileUrl: 'https://svecw.edu.in/wp-content/uploads/2026/04/FacultyHandbookSVECW.pdf', storagePath: '', external: true, download: false, key: 'faculty-handbook', order: 6 },
-  { group: 'Institutional Data', label: 'Students Handbook', fileUrl: 'https://svecw.edu.in/wp-content/uploads/2025/11/SVECWStudentHandbook.pdf', storagePath: '', external: true, download: false, key: 'students-handbook', order: 7 },
-  { group: 'Institutional Data', label: 'Facilities for Physically Challenged', fileUrl: '/downloads/SVECWPhysicallyChallengedFacilities.pdf', storagePath: '', external: false, download: false, key: 'facilities-physically-challenged', order: 8 },
-];
-
 export default function ComplianceDocsAdmin() {
   const { docs, loading } = useOrderedCollection<ComplianceDocDoc>('complianceDocs', 'order');
   const [form, setForm] = useState<Omit<ComplianceDocDoc, 'id'>>(EMPTY);
   const [editing, setEditing] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [filterGroup, setFilterGroup] = useState('All');
-  const [seeding, setSeeding] = useState(false);
+  const [migratingId, setMigratingId] = useState<string | null>(null);
+  const [migratingAll, setMigratingAll] = useState(false);
+  // Only non-external entries still pointing at a bundled /downloads/ file
+  // are migratable — external links (svecw.edu.in, /anti-ragging, ...) are
+  // deliberately not Firebase-hosted PDFs and can't be fetched cross-origin.
+  const unmigrated = docs.filter((d) => !d.external && !d.storagePath);
 
   const set = (k: string, v: string | number | boolean) => setForm((p) => ({ ...p, [k]: v }));
   const handleFile = (r: UploadResult) => setForm((p) => ({ ...p, fileUrl: r.url, storagePath: r.path }));
@@ -112,17 +82,32 @@ export default function ComplianceDocsAdmin() {
     }
   };
 
-  const seedDefaults = async () => {
-    if (!confirm(`Add all ${DEFAULT_COMPLIANCE_DOCS.length} current footer links as a starting point? You can edit or delete any of them afterwards.`)) return;
-    setSeeding(true);
+  // Pulls a doc's bundled /downloads/ PDF and re-uploads it to Firebase
+  // Storage, then repoints fileUrl/storagePath at that upload — same
+  // migration used for the Institution Innovation Cell documents.
+  const migrateDoc = async (d: ComplianceDocDoc) => {
+    setMigratingId(d.id);
     try {
-      for (const d of DEFAULT_COMPLIANCE_DOCS) {
-        await addDoc(collection(db, 'complianceDocs'), { ...d, createdAt: serverTimestamp() });
-      }
+      const res = await fetch(d.fileUrl);
+      if (!res.ok) throw new Error(`Couldn't fetch the existing PDF (${res.status}).`);
+      const blob = await res.blob();
+      const fileName = d.fileUrl.split('/').pop() || `${d.label}.pdf`;
+      const file = new File([blob], fileName, { type: 'application/pdf' });
+      const result = await uploadFile(file, 'vwu/compliance');
+      await updateDoc(doc(db, 'complianceDocs', d.id), { fileUrl: result.url, storagePath: result.path });
     } catch (e) {
-      alert(`Couldn't add starter documents: ${(e as Error).message}`);
+      alert(`Couldn't migrate "${d.label}": ${(e as Error).message}`);
     } finally {
-      setSeeding(false);
+      setMigratingId(null);
+    }
+  };
+
+  const migrateAll = async () => {
+    setMigratingAll(true);
+    try {
+      for (const d of unmigrated) await migrateDoc(d);
+    } finally {
+      setMigratingAll(false);
     }
   };
 
@@ -135,8 +120,9 @@ export default function ComplianceDocsAdmin() {
         <p className="admin-lead" style={{ marginBottom: '1rem' }}>
           Powers the "Compliance &amp; Disclosures" section in the site footer — upload a PDF here and its
           footer button will download that file. A few of these (NAAC, NBA, UGC 12B/2f, Audited Statements,
-          RTI, Facilities for Physically Challenged) are also linked from the UGC Public Self-Disclosure
-          page — keep their <strong>Reference Key</strong> unchanged so that page stays in sync automatically.
+          RTI, Facilities for Physically Challenged, and UGC Public Self Disclosure itself) are also linked
+          from the UGC Public Self-Disclosure page — keep their <strong>Reference Key</strong> unchanged so
+          that page stays in sync automatically.
         </p>
         <div className="admin-form-grid">
           <div className="admin-field">
@@ -199,6 +185,14 @@ export default function ComplianceDocsAdmin() {
             {COMPLIANCE_GROUPS.map((g) => <option key={g} value={g}>{g}</option>)}
           </select>
         </div>
+        {unmigrated.length > 0 && (
+          <p className="admin-field__hint" style={{ marginBottom: '1rem' }}>
+            {unmigrated.length} of these still point at a PDF bundled with the site rather than Firebase Storage.{' '}
+            <button className="admin-btn admin-btn--sm" onClick={migrateAll} disabled={migratingAll || migratingId !== null}>
+              {migratingAll ? 'Migrating…' : `Migrate all ${unmigrated.length} to Firebase Storage`}
+            </button>
+          </p>
+        )}
         {loading ? <p className="admin-loading">Loading…</p> : (
           <div className="admin-table-wrap">
             <table className="admin-table">
@@ -211,6 +205,15 @@ export default function ComplianceDocsAdmin() {
                     <td>{d.label}</td>
                     <td><a href={d.fileUrl} target="_blank" rel="noopener noreferrer">View</a></td>
                     <td>
+                      {!d.external && !d.storagePath && (
+                        <button
+                          className="admin-btn admin-btn--sm"
+                          onClick={() => migrateDoc(d)}
+                          disabled={migratingId === d.id || migratingAll}
+                        >
+                          {migratingId === d.id ? 'Migrating…' : 'Migrate to Storage'}
+                        </button>
+                      )}
                       <button className="admin-btn admin-btn--sm" onClick={() => startEdit(d)}>Edit</button>
                       <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(d.id, d.storagePath)}>Delete</button>
                     </td>
@@ -218,12 +221,7 @@ export default function ComplianceDocsAdmin() {
                 ))}
                 {docs.length === 0 && (
                   <tr>
-                    <td colSpan={5} className="admin-empty">
-                      No documents yet — the footer is showing its original hardcoded links.{' '}
-                      <button className="admin-btn admin-btn--sm" onClick={seedDefaults} disabled={seeding}>
-                        {seeding ? 'Adding…' : 'Add starter documents'}
-                      </button>
-                    </td>
+                    <td colSpan={5} className="admin-empty">No documents yet.</td>
                   </tr>
                 )}
               </tbody>
