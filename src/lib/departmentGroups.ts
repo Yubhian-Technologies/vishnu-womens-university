@@ -30,7 +30,7 @@ export interface DepartmentGroup {
 // Slugs verified against the live `programs` collection. Note EVT's slug is
 // uppercase. `facultyDepartments` verified against the `faculty` collection.
 export const DEPARTMENT_GROUPS: DepartmentGroup[] = [
-  { key: 'ai', deptShortCode: 'AI', programSlugs: ['ai-ml', 'ai-ds'], facultyDepartments: ['AI&ML', 'AI&DS'] },
+  { key: 'ai', deptShortCode: 'AI', programSlugs: ['ai-ds', 'ai-ml'], facultyDepartments: ['AI&DS', 'AI&ML'] },
   { key: 'cse', deptShortCode: 'CSE', programSlugs: ['cse', 'cyber-security'], facultyDepartments: ['CSE'] },
   { key: 'ece', deptShortCode: 'ECE', programSlugs: ['ece', 'EVT'], facultyDepartments: ['ECE'] },
 ];
