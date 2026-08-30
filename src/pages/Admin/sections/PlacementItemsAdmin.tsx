@@ -110,9 +110,11 @@ export default function PlacementItemsAdmin() {
         <p className="admin-lead" style={{ marginBottom: '1rem' }}>
           Powers the /placements sub-pages (Placement Details, TPO Cell, TPO Team, Industry Liaison Offices, etc.).
           For the Data table, put each row on its own line as <code>Column 1 | Column 2 | Column 3</code>. On
-          roster-style pages (TPO Cell, TPO Team, Industry Liaison Offices) that's <code>Name | Role | Notes</code> —
-          add a 4th <code>| Email</code> and/or 5th <code>| LinkedIn URL</code> to show that person's contact info
-          right under their name on the public page, without needing a separate admin section. The slug{' '}
+          roster-style pages (TPO Cell, TPO Team) that's <code>Name | Role | Notes</code> — add a 4th{' '}
+          <code>| Email</code> and/or 5th <code>| LinkedIn URL</code> to show that person's contact info right
+          under their name on the public page, without needing a separate admin section. Industry Liaison
+          Offices is just <code>City | Office Address</code> (2 columns, no Role) — each city's row expands to
+          show that address under an "Office Address" heading. The slug{' '}
           <code>placement-highlights</code> is special: its Data Table shows whatever columns your spreadsheet
           has, in that exact order, instead of a fixed shape — its Excel/CSV import button fills both the Table
           Column Headers field and Data Table from the same file in one click (row 1 of the file always becomes
