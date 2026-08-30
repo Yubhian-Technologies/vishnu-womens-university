@@ -159,6 +159,13 @@ const DEPARTMENTS = ['CSE', 'AI', 'Cyber Security', 'IT', 'ECE', 'EEE', 'Civil',
 function linesToArray(text: string): string[] {
   return text.split('\n').map((s) => s.trim()).filter(Boolean);
 }
+// `labs` is plain strings today, but a few programs' Firestore docs still
+// hold `{ name, pdfUrl, pdfStoragePath }` entries from a since-simplified
+// admin flow — loading one into the plain textarea below would show
+// "[object Object]" and silently drop the name on the next save.
+function normalizeLabs(labs: unknown[] = []): string[] {
+  return labs.map((l) => (typeof l === 'string' ? l : (l as { name?: string })?.name ?? '')).filter(Boolean);
+}
 function arrayToLines(arr: string[] = []): string {
   return arr.join('\n');
 }
@@ -486,7 +493,7 @@ export default function ProgramsAdmin() {
       slug: p.slug, name: p.name, shortName: p.shortName, icon: p.icon || 'GraduationCap',
       category: p.category, intake: p.intake, established: p.established, accreditation: p.accreditation,
       hod: p.hod, department: p.department || '', fee: p.fee || '', heroImage: p.heroImage, storagePath: p.storagePath, about: p.about,
-      highlights: p.highlights || [], labs: p.labs || [], outcomes: p.outcomes || [],
+      highlights: p.highlights || [], labs: normalizeLabs(p.labs), outcomes: p.outcomes || [],
       semesters: (p.semesters || []).map((s) => ({ label: s.label, subjects: (s.subjects || []).map(normalizeSubject) })),
       vision: p.vision || '', mission: p.mission || [], coreValues: p.coreValues || [],
       peos: p.peos || [], pos: p.pos || [], psos: p.psos || [],

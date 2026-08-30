@@ -27,6 +27,17 @@ const categoryLabel: Record<string, string> = {
   phd: 'Ph.D.',
 };
 
+// `ProgramDoc.labs` is typed as `string[]`, but some programs' Firestore
+// docs still hold older `{ name, pdfUrl, pdfStoragePath }` entries from a
+// since-simplified admin flow — rendering one of those directly crashes
+// React ("Objects are not valid as a React child"). This coerces either
+// shape into just what the Laboratories section actually needs.
+function labInfo(lab: unknown): { name: string; pdfUrl?: string } {
+  if (typeof lab === 'string') return { name: lab };
+  const obj = lab as { name?: string; pdfUrl?: string };
+  return { name: obj?.name ?? '', pdfUrl: obj?.pdfUrl || undefined };
+}
+
 export default function ProgramDetail() {
   // AI / CSE / ECE are "grouped" departments whose sub-program slugs render a
   // shared department page with a program toggle instead of this standalone
@@ -524,12 +535,20 @@ function SingleProgramDetail() {
               <p className="section-desc">State-of-the-art laboratory facilities that bring coursework to life with hands-on, industry-relevant experimentation.</p>
             </div>
             <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 'var(--space-4)' }}>
-              {program.labs.map((lab) => (
-                <div key={lab} style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', display: 'flex', alignItems: 'center', gap: 'var(--space-4)', borderLeft: '4px solid var(--color-accent)' }}>
-                  <Microscope size={22} strokeWidth={1.75} style={{ flexShrink: 0, color: 'var(--color-accent)' }} />
-                  <span style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-primary)', lineHeight: 1.4 }}>{lab}</span>
-                </div>
-              ))}
+              {program.labs.map((lab, i) => {
+                const { name, pdfUrl } = labInfo(lab);
+                return (
+                  <div key={i} style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', display: 'flex', alignItems: 'center', gap: 'var(--space-4)', borderLeft: '4px solid var(--color-accent)' }}>
+                    <Microscope size={22} strokeWidth={1.75} style={{ flexShrink: 0, color: 'var(--color-accent)' }} />
+                    <span style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-primary)', lineHeight: 1.4, flex: 1 }}>{name}</span>
+                    {pdfUrl && (
+                      <a href={pdfUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--color-accent)', whiteSpace: 'nowrap' }}>
+                        View PDF
+                      </a>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         </section>

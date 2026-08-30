@@ -12,7 +12,6 @@ import ProfessionalBodiesSection from './ProfessionalBodiesSection';
 import { DEFAULT_FUNDED_PROJECTS_TEXT } from './fundedProjectsDefault';
 import { DEFAULT_PATENTS_TEXT } from './patentsDefault';
 import { DEFAULT_THRUST_AREAS_INTRO, DEFAULT_THRUST_AREAS_TEXT } from './thrustAreasDefault';
-import { DEFAULT_RESEARCH_PUBLICATIONS_TEXT } from './researchPublicationsDefault';
 import { DEFAULT_CONSULTANCY_TEXT } from './consultancyDefault';
 import { DEFAULT_RESEARCH_CENTERS_INTRO, DEFAULT_RESEARCH_CENTERS_TABLE_TEXT } from './researchCentersDefault';
 import { DEFAULT_MOUS_TABLE_TEXT } from './mousDefault';
@@ -39,9 +38,10 @@ const DEFAULT_PROJECTS_TEXT_BY_SLUG: Record<string, string> = {
 };
 
 // Same fallback pattern as above, for the accordion (category -> area ->
-// faculty) content on Research Publications and Consultancy.
+// faculty) content on Consultancy. Research Publications has no hardcoded
+// fallback — its year list only ever comes from the admin-editable
+// Publications by Year field (see the `publicationYears` handling below).
 const DEFAULT_ACCORDION_TEXT_BY_SLUG: Record<string, string> = {
-  'research-publications': DEFAULT_RESEARCH_PUBLICATIONS_TEXT,
   'consultancy': DEFAULT_CONSULTANCY_TEXT,
 };
 

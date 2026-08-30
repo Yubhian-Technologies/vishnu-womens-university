@@ -17,6 +17,17 @@ import '../detail-layout.css';
 
 const NAV_OFFSET = 'calc(var(--topbar-height) + var(--header-height) + 1rem)';
 
+// `ProgramDoc.labs` is typed as `string[]`, but some programs' Firestore
+// docs still hold older `{ name, pdfUrl, pdfStoragePath }` entries from a
+// since-simplified admin flow — rendering one of those directly crashes
+// React ("Objects are not valid as a React child"). This coerces either
+// shape into just what the Laboratories section actually needs.
+function labInfo(lab: unknown): { name: string; pdfUrl?: string } {
+  if (typeof lab === 'string') return { name: lab };
+  const obj = lab as { name?: string; pdfUrl?: string };
+  return { name: obj?.name ?? '', pdfUrl: obj?.pdfUrl || undefined };
+}
+
 interface Props {
   group: DepartmentGroup;
   /** The currently-selected program slug (drives the toggle). */
@@ -95,7 +106,12 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   const clean = (v?: string) => (v && v !== '—' ? v : '');
   const shared = {
     heroImage: dept?.heroImage || primary?.heroImage || activeProgram.heroImage || '',
-    about: dept?.about || primary?.about || '',
+    // Department-only — never falls back to a programme's own About, which
+    // now shows per-programme in the toggle section instead (see
+    // "About the Programme" below). `description` is the same card blurb
+    // shown on the Academics page, reused here so this works with no extra
+    // data entry; the "Overview" field on the department admin overrides it.
+    about: dept?.about || dept?.description || '',
     established: clean(dept?.established) || clean(primary?.established),
     accreditation: clean(dept?.accreditation) || clean(primary?.accreditation),
     hod: dept?.hod || primary?.hod || '',
@@ -118,6 +134,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   const libraryTables = shared.librarySections.filter((sec) => sec.items && sec.items.length > 0);
   const hasLibrary = !!(shared.libraryIntro || shared.libraryInCharge || libraryTables.length > 0);
 
+  const hasProgrammeAbout = !!activeProgram.about;
   const hasHighlights = !!(activeProgram.highlights && activeProgram.highlights.length > 0);
   const hasOutcomeStatements = !!(activeProgram.peos?.length || activeProgram.pos?.length || activeProgram.psos?.length);
   const hasMindMap = !!activeProgram.mindMapImage;
@@ -144,6 +161,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     hasLabs && { id: 'labs', label: 'Laboratories' },
     hasLibrary && { id: 'library', label: 'Digital Library' },
     { id: 'program-toggle', label: 'Choose a Programme' },
+    hasProgrammeAbout && { id: 'programme-about', label: 'About the Programme' },
     hasHighlights && { id: 'highlights', label: 'Programme Highlights' },
     hasOutcomeStatements && { id: 'peos-pos-psos', label: 'PEOs, POs & PSOs' },
     hasMindMap && { id: 'mindmap', label: 'Mind Map' },
@@ -412,12 +430,20 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
               <h2 className="section-title">Laboratories</h2>
             </div>
             <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 'var(--space-4)' }}>
-              {shared.labs.map((lab) => (
-                <div key={lab} style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', display: 'flex', alignItems: 'center', gap: 'var(--space-4)', borderLeft: '4px solid var(--color-accent)' }}>
-                  <Microscope size={22} strokeWidth={1.75} style={{ flexShrink: 0, color: 'var(--color-accent)' }} />
-                  <span style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-primary)', lineHeight: 1.4 }}>{lab}</span>
-                </div>
-              ))}
+              {shared.labs.map((lab, i) => {
+                const { name, pdfUrl } = labInfo(lab);
+                return (
+                  <div key={i} style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', display: 'flex', alignItems: 'center', gap: 'var(--space-4)', borderLeft: '4px solid var(--color-accent)' }}>
+                    <Microscope size={22} strokeWidth={1.75} style={{ flexShrink: 0, color: 'var(--color-accent)' }} />
+                    <span style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-primary)', lineHeight: 1.4, flex: 1 }}>{name}</span>
+                    {pdfUrl && (
+                      <a href={pdfUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--color-accent)', whiteSpace: 'nowrap' }}>
+                        View PDF
+                      </a>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         </section>
@@ -492,6 +518,19 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
           </div>
         </div>
       </section>
+
+      {/* About the Programme (per programme) */}
+      {hasProgrammeAbout && (
+        <section id="programme-about" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
+          <div className="container">
+            <span className="section-label">{activeProgram.shortName || activeProgram.name}</span>
+            <h2 className="section-title">About the Programme</h2>
+            <p style={{ color: 'var(--color-text-light)', lineHeight: 1.85, fontSize: 'var(--text-base)', whiteSpace: 'pre-line' }}>
+              {activeProgram.about}
+            </p>
+          </div>
+        </section>
+      )}
 
       {/* Programme Highlights (per programme) */}
       {hasHighlights && (
