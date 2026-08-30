@@ -634,24 +634,35 @@ function TeamRosterRow({
   );
 }
 
-// TPO Team roster split into tiles by each row's own Group field (Data
-// Table's 6th "| Group" value) — the set of tiles and who's in each one
-// come entirely from whatever distinct Group names appear in the roster, in
-// the order they're first seen, rather than a fixed list/count defined here.
-// Typing a new Group name for someone creates a new tile automatically; a
-// row with no Group set lands in a catch-all "Team" tile instead of
-// disappearing. Clicking a tile shows just that group's roster rows as the
-// same accordion used elsewhere on this page.
-const UNGROUPED_LABEL = 'Team';
+// Parses the admin's "Team Groups" field — one "Label | Count" per line —
+// into the {label, count} shape TpoTeamTiles splits the roster by. Optional:
+// when empty, the roster below renders as a plain flat list instead of tiles.
+function parseTeamGroups(text: string): { label: string; count: number }[] {
+  return (text || '')
+    .split('\n')
+    .map((l) => l.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const [label = '', countStr = ''] = line.split('|').map((p) => p.trim());
+      return { label, count: Number(countStr) || 0 };
+    })
+    .filter((g) => g.label && g.count > 0);
+}
 
+// Roster split into tiles per the admin's Team Groups field (e.g. "Central
+// Placement Team | 4") — a fixed count split in roster order, not derived
+// from role text. Clicking a tile shows just that group's roster rows as
+// the same accordion used elsewhere on this page.
 function TpoTeamTiles({
   rows,
+  groups: groupDefs,
   tpoPhotoMap,
   tpoBiosMap,
   pageEmails,
   pageLinkedins,
 }: {
-  rows: { name: string; role: string; notes?: string; group?: string }[];
+  rows: { name: string; role: string; notes?: string }[];
+  groups: { label: string; count: number }[];
   tpoPhotoMap: Map<string, string>;
   tpoBiosMap: Map<string, TpoTeamBioDoc>;
   pageEmails?: string[];
@@ -661,11 +672,16 @@ function TpoTeamTiles({
   const [activeRow, setActiveRow] = useState<number | null>(null);
 
   const groups: { label: string; rows: typeof rows }[] = [];
-  for (const row of rows) {
-    const label = row.group || UNGROUPED_LABEL;
-    const existing = groups.find((g) => g.label === label);
-    if (existing) existing.rows.push(row);
-    else groups.push({ label, rows: [row] });
+  let offset = 0;
+  for (const g of groupDefs) {
+    groups.push({ label: g.label, rows: rows.slice(offset, offset + g.count) });
+    offset += g.count;
+  }
+  // Any rows beyond the defined groups' total count (e.g. the admin adds
+  // someone new without updating Team Groups) land in the last tile rather
+  // than silently disappearing.
+  if (offset < rows.length && groups.length > 0) {
+    groups[groups.length - 1] = { ...groups[groups.length - 1], rows: groups[groups.length - 1].rows.concat(rows.slice(offset)) };
   }
 
   const activeRows = groups[activeGroup]?.rows ?? [];
@@ -690,11 +706,8 @@ function TpoTeamTiles({
                 transition: 'all var(--transition-base)',
               }}
             >
-              <div style={{ fontFamily: 'var(--font-sans)', fontWeight: 800, fontSize: 'var(--text-base)', marginBottom: 'var(--space-2)' }}>
+              <div style={{ fontFamily: 'var(--font-sans)', fontWeight: 800, fontSize: 'var(--text-base)' }}>
                 {group.label}
-              </div>
-              <div style={{ fontSize: 'var(--text-xs)', fontWeight: 600, color: isActive ? 'var(--color-white)' : 'var(--color-text-light)' }}>
-                {group.rows.length} {group.rows.length === 1 ? 'Member' : 'Members'}
               </div>
             </button>
           );
@@ -804,6 +817,7 @@ export default function PlacementDetail() {
   const Icon = resolveContentIcon(item.icon) || BarChart3;
   const tableSections = parseStructuredTable(item.tableText);
   const tableRows = tableSections.flatMap((s) => s.rows);
+  const rosterGroups = parseTeamGroups(item.rosterGroupsText);
   const hasBodyOverride = !item.intro && Boolean(BODY_OVERRIDES[item.slug]);
   const bodyText = hasBodyOverride ? BODY_OVERRIDES[item.slug] : '';
   const bodyBlocks = parseBodyContent(bodyText);
@@ -1080,11 +1094,11 @@ export default function PlacementDetail() {
             <div style={{ marginBottom: 'var(--space-8)' }}>
               <span className="section-label">Data</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>
-                {item.slug === 'tpo-team' ? 'Team' : item.slug === 'industry-liaison-offices' ? 'Regional Offices' : item.slug === 'internships' ? 'Recruiting Companies' : 'Batch-wise Statistics'}
+                {rosterGroups.length > 0 ? 'Team' : item.slug === 'industry-liaison-offices' ? 'Regional Offices' : item.slug === 'internships' ? 'Recruiting Companies' : 'Batch-wise Statistics'}
               </h2>
             </div>
-            {item.slug === 'tpo-team' ? (
-              <TpoTeamTiles rows={tableRows} tpoPhotoMap={tpoPhotoMap} tpoBiosMap={tpoBiosMap} pageEmails={item.emails} pageLinkedins={item.linkedins} />
+            {rosterGroups.length > 0 ? (
+              <TpoTeamTiles rows={tableRows} groups={rosterGroups} tpoPhotoMap={tpoPhotoMap} tpoBiosMap={tpoBiosMap} pageEmails={item.emails} pageLinkedins={item.linkedins} />
             ) : item.slug === 'internships' ? (
               // Company/stipend/selects data reads best as a plain table (same
               // shape as the "Placements, Year by Year" company table) rather

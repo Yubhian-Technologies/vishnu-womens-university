@@ -3,25 +3,20 @@
 // department) from a single textarea instead of a spreadsheet-style UI.
 //
 // Format:
-//   ## Section Title                                    (optional — starts a new named section)
-//   Name | Role | Notes | Email | LinkedIn | Group       (Notes, Email, LinkedIn, Group are each optional per row)
+//   ## Section Title                          (optional — starts a new named section)
+//   Name | Role | Notes | Email | LinkedIn     (Notes, Email, LinkedIn are each optional per row)
 //
 // Rows before any "## " line go into a single unnamed section. Email/LinkedIn
 // only make sense for roster-style pages (TPO Team, TPO Cell, ILO) — when
 // set, PlacementDetail.tsx shows them as a compact "Contact: ... LinkedIn:
 // ..." line right under that row's name, so per-person contact info can be
-// managed in this same table instead of a separate admin section. Group is
-// used only on the TPO Team page, which splits its roster into named tiles
-// (e.g. "Central Placement Team") — the set of tiles and their membership
-// come entirely from whatever distinct Group values appear here, in the
-// order they're first seen, rather than a fixed list defined elsewhere.
+// managed in this same table instead of a separate admin section.
 export interface StructuredTableRow {
   name: string;
   role: string;
   notes: string;
   email?: string;
   linkedin?: string;
-  group?: string;
 }
 
 export interface StructuredTableSection {
@@ -45,7 +40,6 @@ export function parseStructuredTable(text: string): StructuredTableSection[] {
       name: parts[0] || '', role: parts[1] || '', notes: parts[2] || '',
       ...(parts[3] ? { email: parts[3] } : {}),
       ...(parts[4] ? { linkedin: parts[4] } : {}),
-      ...(parts[5] ? { group: parts[5] } : {}),
     };
     if (!current) {
       current = { title: '', rows: [] };

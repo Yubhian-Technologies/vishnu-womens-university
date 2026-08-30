@@ -5,7 +5,6 @@ import { useOrderedCollection } from '../../../hooks/useCollection';
 import { CONTENT_ICON_NAMES } from '../../../lib/contentIcons';
 import { deleteFile } from '../../../lib/storage';
 import TableImportButton from '../../../components/TableImportButton/TableImportButton';
-import { parseStructuredTable } from '../../../lib/structuredTable';
 
 export interface PlacementItemDoc {
   id: string;
@@ -21,6 +20,7 @@ export interface PlacementItemDoc {
   outcomes: string[];
   partners: string[];
   tableText: string;
+  rosterGroupsText: string;
   emails: string[];
   linkedins: string[];
   heroImage: string;
@@ -30,7 +30,7 @@ export interface PlacementItemDoc {
 
 const EMPTY: Omit<PlacementItemDoc, 'id'> = {
   slug: '', title: '', icon: 'BarChart3', desc: '', external: false, url: '',
-  intro: '', about: '', highlights: [], outcomes: [], partners: [], tableText: '',
+  intro: '', about: '', highlights: [], outcomes: [], partners: [], tableText: '', rosterGroupsText: '',
   emails: [], linkedins: [], heroImage: '', heroStoragePath: '', order: 0,
 };
 
@@ -70,7 +70,7 @@ export default function PlacementItemsAdmin() {
       slug: it.slug, title: it.title, icon: it.icon || 'BarChart3', desc: it.desc || '',
       external: !!it.external, url: it.url || '', intro: it.intro || '', about: it.about || '',
       highlights: it.highlights || [], outcomes: it.outcomes || [], partners: it.partners || [],
-      tableText: it.tableText || '', emails: it.emails || [], linkedins: it.linkedins || [],
+      tableText: it.tableText || '', rosterGroupsText: it.rosterGroupsText || '', emails: it.emails || [], linkedins: it.linkedins || [],
       heroImage: it.heroImage || '', heroStoragePath: it.heroStoragePath || '', order: it.order,
     });
   };
@@ -85,15 +85,6 @@ export default function PlacementItemsAdmin() {
     }
   };
 
-  // Live preview of the distinct Group names already used in this page's own
-  // Data Table (its 6th "| Group" field), in the order they appear — lets an
-  // admin reuse an exact existing name (e.g. on the TPO Team page) instead of
-  // accidentally creating a near-duplicate tile with a typo'd new one.
-  const currentGroups: string[] = [];
-  for (const row of parseStructuredTable(form.tableText).flatMap((s) => s.rows)) {
-    if (row.group && !currentGroups.includes(row.group)) currentGroups.push(row.group);
-  }
-
   return (
     <div className="admin-section">
       <div className="admin-card">
@@ -103,10 +94,7 @@ export default function PlacementItemsAdmin() {
           For the Data table, put each row on its own line as <code>Column 1 | Column 2 | Column 3</code>. On
           roster-style pages (TPO Cell, TPO Team, Industry Liaison Offices) that's <code>Name | Role | Notes</code> —
           add a 4th <code>| Email</code> and/or 5th <code>| LinkedIn URL</code> to show that person's contact info
-          right under their name on the public page, without needing a separate admin section. On the TPO Team
-          page specifically, a 6th <code>| Group</code> (e.g. <code>| Central Placement Team</code>) sorts that
-          person into a named tile — whatever Group names appear in the table become the tiles shown on the
-          public page, in the order they first appear, so typing a brand-new Group name creates a new tile.
+          right under their name on the public page, without needing a separate admin section.
           Not the same as the "Placements" section, which manages the recruiter logo list.
         </p>
         <p className="admin-field__hint" style={{ background: '#eef6ff', border: '1px solid #bcdcfd', borderRadius: 6, padding: '0.6rem 0.9rem', marginBottom: '1rem' }}>
@@ -171,12 +159,21 @@ export default function PlacementItemsAdmin() {
             <div style={{ marginTop: '0.4rem' }}>
               <TableImportButton onImport={(text) => set('tableText', text)} label="Import Data Table from Excel/CSV" />
             </div>
-            {currentGroups.length > 0 && (
-              <p className="admin-field__hint" style={{ marginTop: '0.4rem' }}>
-                Current groups in this table (reuse one of these exactly, on a new row's 6th <code>| Group</code> field, to add someone to it instead of creating a new tile):{' '}
-                {currentGroups.map((g) => <code key={g} style={{ marginRight: '0.4rem' }}>{g}</code>)}
-              </p>
-            )}
+          </div>
+          <div className="admin-field admin-field--full">
+            <label htmlFor="field-team-groups-one-per-line-optional">
+              Team Groups (one per line, "Group Label | Count" — optional). When set, the Data Table above
+              renders as clickable group tiles (e.g. "Central Placement Team") instead of a flat list — the
+              first <code>Count</code> rows go in the first group, the next <code>Count</code> rows in the
+              second group, and so on; any leftover rows land in the last group. Add as many lines as you need.
+            </label>
+            <textarea
+              id="field-team-groups-one-per-line-optional"
+              rows={3}
+              value={form.rosterGroupsText}
+              onChange={(e) => set('rosterGroupsText', e.target.value)}
+              placeholder={'Central Placement Team | 4\nUniversity Team (SVECW) | 3\nIndustry Liaison Officers | 4'}
+            />
           </div>
           <div className="admin-field admin-field--full">
             <label htmlFor="field-emails-one-per-line-optional">Emails (one per line — optional)</label>
