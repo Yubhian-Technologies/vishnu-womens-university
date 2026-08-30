@@ -177,7 +177,7 @@ export const assistiveTechLab = {
   trainingByYear: [
     {
       yearLabel: 'ATL Activities 2025-26',
-      pdfHref: '/downloads/atl-activities-2025-26.pdf',
+      pdfHref: 'https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2Fatl-activities-2025-26.pdf?alt=media&token=d224e2df-59ab-42e3-aab7-7b7a71030386',
       bridgeCourse: {
         headers: ['S. No.', 'Course', 'Facilitator', 'Department', 'Date', 'Venue'],
         rows: [
@@ -209,7 +209,7 @@ export const assistiveTechLab = {
     },
     {
       yearLabel: 'ATL Activities 2024-25',
-      pdfHref: '/downloads/atl-activities-2024-25.pdf',
+      pdfHref: 'https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2Fatl-activities-2024-25.pdf?alt=media&token=f4db4f0f-52eb-497c-bff7-467f9bcf3514',
       bridgeCourse: {
         headers: ['S. No.', 'Course', 'Facilitator', 'Department', 'Date', 'Venue'],
         rows: [

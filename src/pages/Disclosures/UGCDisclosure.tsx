@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
 import { useOrderedCollection } from '../../hooks/useCollection';
-import type { ComplianceDocDoc } from '../Admin/sections/ComplianceDocsAdmin';
+import { DEFAULT_COMPLIANCE_DOCS, type ComplianceDocDoc } from '../Admin/sections/ComplianceDocsAdmin';
 import SEO from '../../components/SEO/SEO';
 import { getBreadcrumbSchema } from '../../lib/seo/schemas';
 import '../detail-layout.css';
@@ -46,13 +46,13 @@ const sections: DisclosureSection[] = [
       { label: 'Institutional Development Plan', status: 'Available', links: [{ label: 'Institutional Development Plan', path: '/governance/idp' }] },
       { label: 'Constituent Units / Affiliated Colleges, Affiliating University (in case of Colleges), Off-campus / Off-shore campus / Learning Support Centres under ODL mode (wherever applicable)', status: 'Affiliated to JNTUK, Kakinada', links: [{ label: 'JNTUK Kakinada', path: 'https://www.jntuk.edu.in/', external: true }] },
       { label: 'Accreditation / Ranking status (NAAC, NBA, NIRF)', status: 'Available', links: [
-        { label: 'NAAC Approvals', path: '', download: true, key: 'naac-approvals' },
-        { label: 'NBA Approvals', path: '', download: true, key: 'nba-approvals' },
+        { label: 'NAAC Approvals', path: 'https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2FNAACApprovals.pdf?alt=media&token=74745fe4-2332-4338-9f13-b753372b42d7', download: true, key: 'naac-approvals' },
+        { label: 'NBA Approvals', path: 'https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2FNBAApprovals.pdf?alt=media&token=f25ad763-643d-4321-a36c-874029264996', download: true, key: 'nba-approvals' },
         { label: 'MHRD NIRF Reports', path: '/governance/nirf-reports' },
       ] },
-      { label: 'Recognition / Approval (2(f), 12B, etc. as applicable)', status: 'Available', links: [{ label: 'UGC 12B & 2f Letter', path: '', download: true, key: 'ugc-12b-2f' }] },
+      { label: 'Recognition / Approval (2(f), 12B, etc. as applicable)', status: 'Available', links: [{ label: 'UGC 12B & 2f Letter', path: 'https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2FUGC12B2FLetter.pdf?alt=media&token=1a8cb736-ddb9-46b6-a538-0d61085264ca', download: true, key: 'ugc-12b-2f' }] },
       { label: 'Annual Reports', status: 'Available', links: [{ label: 'Annual Reports & Reforms', path: '/governance/annual-reports' }] },
-      { label: 'Annual Accounts including Balance Sheet, Income and Expenditure Account, Receipts and Payments Account along with Audit Report', status: 'Available', links: [{ label: 'Audited Statements', path: '', download: true, key: 'audited-statements' }] },
+      { label: 'Annual Accounts including Balance Sheet, Income and Expenditure Account, Receipts and Payments Account along with Audit Report', status: 'Available', links: [{ label: 'Audited Statements', path: 'https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2FSVECWAuditStatements.pdf?alt=media&token=949e45f9-c171-404a-8578-9c5b0114f92f', download: true, key: 'audited-statements' }] },
       { label: 'Sponsoring body details, if any', status: 'Sri Vishnu Educational Society', links: [{ label: 'About SVES', path: '/about-sves' }] },
     ],
   },
@@ -117,7 +117,7 @@ const sections: DisclosureSection[] = [
       { label: 'Anti-Ragging Cell', status: 'Available', links: [{ label: 'Anti Ragging Committee', path: '/governance/anti-ragging' }] },
       { label: 'Equal Opportunity Cell', status: 'Available', links: [{ label: 'Governance', path: '/governance' }] },
       { label: 'Socio-Economically Disadvantaged Groups Cell (SEDG)', status: 'Available', links: [{ label: 'SC/ST Cell', path: '/governance/sc-st-cell' }] },
-      { label: 'Facilities for differently-abled (e.g. barrier-free environment)', status: 'Available', links: [{ label: 'Facilities for Physically Challenged', path: '', download: true, key: 'facilities-physically-challenged' }] },
+      { label: 'Facilities for differently-abled (e.g. barrier-free environment)', status: 'Available', links: [{ label: 'Facilities for Physically Challenged', path: 'https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2FSVECWPhysicallyChallengedFacilities.pdf?alt=media&token=168a11aa-9a64-4f19-94bc-8a022ce558bc', download: true, key: 'facilities-physically-challenged' }] },
     ],
   },
   {
@@ -129,7 +129,7 @@ const sections: DisclosureSection[] = [
   {
     title: 'h) Information Corner',
     items: [
-      { label: 'RTI: Details of Central Public Information Officer (CPIO) and Appellate Authority (wherever applicable)', status: 'Available', links: [{ label: 'RTI Undertaking', path: '', download: true, key: 'rti-undertaking' }] },
+      { label: 'RTI: Details of Central Public Information Officer (CPIO) and Appellate Authority (wherever applicable)', status: 'Available', links: [{ label: 'RTI Undertaking', path: 'https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2FRTIUndertaking.pdf?alt=media&token=7751fc00-5c24-4bfd-a28c-cde52bd5a27f', download: true, key: 'rti-undertaking' }] },
       { label: 'Circulars and Notices', status: 'Available in Flash News on the Home Page', links: [{ label: 'Home', path: '/' }] },
       { label: 'Announcements', status: 'Available under "Latest happenings" on the Home Page', links: [{ label: 'Home', path: '/' }] },
       { label: 'Newsletters', status: 'Available', links: [{ label: 'Campus Magazines', path: '/campus-magazines' }] },
@@ -183,7 +183,8 @@ export default function UGCDisclosure() {
     document.title = "UGC Public Self-Disclosure | Vishnu Women's University";
   }, []);
 
-  const { docs: complianceDocs } = useOrderedCollection<ComplianceDocDoc>('complianceDocs', 'order');
+  const { docs: liveComplianceDocs } = useOrderedCollection<ComplianceDocDoc>('complianceDocs', 'order');
+  const complianceDocs = liveComplianceDocs.length > 0 ? liveComplianceDocs : (DEFAULT_COMPLIANCE_DOCS as ComplianceDocDoc[]);
   const docsByKey = new Map(complianceDocs.filter((d) => d.key).map((d) => [d.key, d]));
 
   return (

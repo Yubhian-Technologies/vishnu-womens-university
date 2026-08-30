@@ -18,8 +18,8 @@ export interface DownloadDoc {
 const EMPTY: Omit<DownloadDoc, 'id'> = { title: '', fileUrl: '', storagePath: '', order: 0 };
 
 const DEFAULT_DOWNLOADS: Omit<DownloadDoc, 'id'>[] = [
-  { title: 'Academic Calendar', fileUrl: '/downloads/academic-calendar-placeholder.pdf', storagePath: '', order: 1 },
-  { title: 'Academic Regulations', fileUrl: '/downloads/academic-regulations-placeholder.pdf', storagePath: '', order: 2 },
+  { title: 'Academic Calendar', fileUrl: 'https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2Facademic-calendar-placeholder.pdf?alt=media&token=205008bf-3d61-4edc-8e6c-c2897d968b4f', storagePath: '', order: 1 },
+  { title: 'Academic Regulations', fileUrl: 'https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2Facademic-regulations-placeholder.pdf?alt=media&token=b3094aff-b7e2-4b93-b026-1ad0c2a7a6aa', storagePath: '', order: 2 },
 ];
 
 export default function DownloadsAdmin() {
