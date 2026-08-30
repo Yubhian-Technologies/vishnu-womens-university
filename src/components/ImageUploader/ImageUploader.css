@@ -81,6 +81,57 @@
 
 .cld-uploader__error { font-size: 0.82rem; color: #dc2626; margin: 0; }
 
+/* ── Compact variant (FileUploader `compact` prop) ────
+   Same upload behavior/markup as the default drop zone, just shrunk to a
+   single-line control for admin lists with many of these in a row (e.g.
+   Programs → Laboratories) where the full-size drop zone is too tall. */
+.cld-uploader--compact { gap: 0.2rem; }
+
+.cld-uploader--compact .cld-uploader__drop {
+  min-height: 0;
+  border-style: solid;
+  border-width: 1.5px;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.cld-uploader--compact .cld-uploader__icon,
+.cld-uploader--compact .cld-uploader__hint {
+  display: none;
+}
+
+.cld-uploader--compact .cld-uploader__placeholder {
+  padding: 0.35rem 0.65rem;
+  display: flex;
+  align-items: center;
+}
+
+.cld-uploader--compact .cld-uploader__placeholder p {
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
+
+.cld-uploader--compact .cld-uploader__overlay {
+  gap: 0.4rem;
+  font-size: 0.78rem;
+}
+
+.cld-uploader--compact .cld-uploader__spinner {
+  width: 20px;
+  height: 20px;
+  border-width: 2px;
+}
+
+.cld-uploader--compact .cld-uploader__change {
+  padding: 0.15rem 0.55rem;
+  font-size: 0.72rem;
+  align-self: auto;
+}
+
 /* ── Crop Modal ────────────────────────────────────── */
 .crop-modal-backdrop {
   position: fixed;
