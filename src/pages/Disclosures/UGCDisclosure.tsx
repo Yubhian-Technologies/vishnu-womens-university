@@ -13,10 +13,11 @@ interface DisclosureLink {
   external?: boolean;
   download?: boolean;
   // Matches a complianceDocs doc's `key` field — when present, this link's
-  // path/external/download are resolved from that Firestore doc instead
-  // (falling back to the hardcoded values above), so replacing the PDF via
-  // /admin's Compliance Documents section keeps this page in sync with the
-  // footer automatically.
+  // path/external/download are resolved from that Firestore doc instead, so
+  // replacing the PDF via /admin's Compliance Documents section keeps this
+  // page in sync with the footer automatically. `path` is left empty on
+  // these entries since a matching complianceDocs doc always exists — it's
+  // only a placeholder for the (should-never-happen) case that it doesn't.
   key?: string;
 }
 
@@ -32,10 +33,10 @@ interface DisclosureSection {
 }
 
 // Mirrors the UGC-mandated "Public Self-Disclosure" checklist VWU is
-// required to publish (see https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2FUGCPublicSelfDisclosure.pdf?alt=media&token=b47b4c4f-0b5c-4c3d-bc2d-813ef380d246 for the
-// signed original) — same categories and items, but pointing at VWU's own
-// live pages instead of the old svecw.edu.in site wherever an equivalent
-// already exists on this site.
+// required to publish (the signed original is the "UGC Public Self
+// Disclosure" document in /admin → Compliance Documents) — same categories
+// and items, but pointing at VWU's own live pages instead of the old
+// svecw.edu.in site wherever an equivalent already exists on this site.
 const sections: DisclosureSection[] = [
   {
     title: 'a) About HEI',
@@ -209,12 +210,14 @@ export default function UGCDisclosure() {
             College for Women (Autonomous), Bhimavaram, West Godavari District, Andhra Pradesh, from
             time to time.
           </p>
-          <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6, maxWidth: 820 }}>
-            The signed original of this disclosure is also available as a downloadable PDF —{' '}
-            <a href="https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2FUGCPublicSelfDisclosure.pdf?alt=media&token=b47b4c4f-0b5c-4c3d-bc2d-813ef380d246" download style={{ color: 'var(--color-primary)', fontWeight: 600 }}>
-              UGC Public Self Disclosure ↓
-            </a>.
-          </p>
+          {docsByKey.get('ugc-public-self-disclosure') && (
+            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6, maxWidth: 820 }}>
+              The signed original of this disclosure is also available as a downloadable PDF —{' '}
+              <a href={docsByKey.get('ugc-public-self-disclosure')!.fileUrl} download style={{ color: 'var(--color-primary)', fontWeight: 600 }}>
+                UGC Public Self Disclosure ↓
+              </a>.
+            </p>
+          )}
         </div>
       </section>
 

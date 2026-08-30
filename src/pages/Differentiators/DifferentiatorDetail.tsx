@@ -1520,12 +1520,15 @@ const ATL_ACTIVITY_PHOTO_KEYS = [
 function AtlTrainingResearchSection({
   years,
   projectPhotosByYear,
+  pdfOverrides,
 }: {
   years: AtlYearTraining[];
   projectPhotosByYear: (WithId & { imageUrl: string })[][];
+  pdfOverrides: Record<string, string>;
 }) {
   const [activeYear, setActiveYear] = useState(0);
   const year = years[activeYear];
+  const pdfHref = pdfOverrides[year.yearLabel];
   return (
     <div>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)', marginBottom: 'var(--space-5)' }}>
@@ -1551,10 +1554,10 @@ function AtlTrainingResearchSection({
           );
         })}
       </div>
-      {year.pdfHref && (
+      {pdfHref && (
         <p style={{ marginBottom: 'var(--space-5)' }}>
           <a
-            href={year.pdfHref}
+            href={pdfHref}
             download
             style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-primary)', background: 'var(--color-off-white)', padding: 'var(--space-2) var(--space-4)', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-light-gray)' }}
           >
@@ -1576,9 +1579,11 @@ function AtlTrainingResearchSection({
 function AtlAccordion({
   data,
   photoMap,
+  activityPdfOverrides,
 }: {
   data: typeof assistiveTechLab;
   photoMap: Record<string, (WithId & { imageUrl: string })[]>;
+  activityPdfOverrides: Record<string, string>;
 }) {
   const sections = [
     'Faculty Members',
@@ -1628,7 +1633,7 @@ function AtlAccordion({
                 {title === 'Faculty Members' && <AtlTeamSection team={data.team} />}
 
                 {title === 'Training/ Research or Academic Projects' && (
-                  <AtlTrainingResearchSection years={data.trainingByYear} projectPhotosByYear={trainingProjectPhotos} />
+                  <AtlTrainingResearchSection years={data.trainingByYear} projectPhotosByYear={trainingProjectPhotos} pdfOverrides={activityPdfOverrides} />
                 )}
 
                 {title === 'Students & Collaborations' && (
@@ -3923,6 +3928,8 @@ export default function DifferentiatorDetail() {
   const { docs: atlRegionalMeetPhotos } = useCollection<WithId & { imageUrl: string }>('atlGalleryRegionalMeetPhotos', [orderBy('order', 'asc')], { silent: true });
   const { docs: atlIitMadrasPhotos } = useCollection<WithId & { imageUrl: string }>('atlGalleryIitMadrasPhotos', [orderBy('order', 'asc')], { silent: true });
   const { docs: atlNewsPhotos } = useCollection<WithId & { imageUrl: string }>('atlGalleryNewsPhotos', [orderBy('order', 'asc')], { silent: true });
+  const { docs: atlActivityPdfDocs } = useCollection<WithId & { label: string; fileUrl: string }>('atlActivityPdfs', [], { silent: true });
+  const atlActivityPdfOverrides = Object.fromEntries(atlActivityPdfDocs.map((d) => [d.label, d.fileUrl]));
   const { docs: canoeAcademicProjectPhotos } = useCollection<WithId & { imageUrl: string }>('canoeAcademicProjectPhotos', [orderBy('order', 'asc')], { silent: true });
   const { docs: canoePreviousProjectPhotos } = useCollection<WithId & { imageUrl: string }>('canoePreviousProjectPhotos', [orderBy('order', 'asc')], { silent: true });
   const { docs: canoeTeamWakaPhotos } = useCollection<WithId & { imageUrl: string }>('canoeTeamWakaPhotos', [orderBy('order', 'asc')], { silent: true });
@@ -4066,6 +4073,7 @@ export default function DifferentiatorDetail() {
                       'outcomes-iit-madras-2023-24': atlIitMadrasPhotos,
                       'outcomes-news-2023-24': atlNewsPhotos,
                     }}
+                    activityPdfOverrides={atlActivityPdfOverrides}
                   />
                 </>
               ) : hpc ? (

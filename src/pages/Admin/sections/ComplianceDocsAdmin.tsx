@@ -3,7 +3,7 @@ import { collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp } from '
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
 import FileUploader from '../../../components/FileUploader/FileUploader';
-import { deleteFile, type UploadResult } from '../../../lib/storage';
+import { deleteFile, uploadFile, type UploadResult } from '../../../lib/storage';
 
 export interface ComplianceDocDoc {
   id: string;
@@ -34,8 +34,12 @@ export const COMPLIANCE_GROUPS = [
 ];
 
 // The footer's original hardcoded links — used both as the "empty
-// collection" fallback (so the footer never looks broken) and as the
-// one-click starting point for admins moving these into Firestore.
+// collection" fallback (so the footer never looks broken on a fresh
+// Firestore) and as the one-click starting point for admins moving these
+// into Firestore. Already pre-migrated to Firebase Storage URLs (see
+// scripts/migrate-downloads-to-storage.mjs) — the actual live complianceDocs
+// collection is what the footer/UGC Disclosure page render from once it has
+// any docs, so this only ever matters for a brand-new environment.
 export const DEFAULT_COMPLIANCE_DOCS: Omit<ComplianceDocDoc, 'id'>[] = [
   { group: 'Approvals & Accreditations', label: 'AICTE Approvals', fileUrl: 'https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2FAICTEApprovals.pdf?alt=media&token=7ed92945-cb93-4e5e-9ef2-05955dfdf22b', storagePath: '', external: false, download: false, key: 'aicte-approvals', order: 1 },
   { group: 'Approvals & Accreditations', label: 'UGC Autonomous Approvals', fileUrl: 'https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2FUGCAutonomousApprovals.pdf?alt=media&token=ff1f352c-1d7a-469a-a121-cab0bdd26582', storagePath: '', external: false, download: false, key: 'ugc-autonomous-approvals', order: 2 },
@@ -75,6 +79,12 @@ export default function ComplianceDocsAdmin() {
   const [saving, setSaving] = useState(false);
   const [filterGroup, setFilterGroup] = useState('All');
   const [seeding, setSeeding] = useState(false);
+  const [migratingId, setMigratingId] = useState<string | null>(null);
+  const [migratingAll, setMigratingAll] = useState(false);
+  // Only non-external entries still pointing at a bundled /downloads/ file
+  // are migratable — external links (svecw.edu.in, /anti-ragging, ...) are
+  // deliberately not Firebase-hosted PDFs and can't be fetched cross-origin.
+  const unmigrated = docs.filter((d) => !d.external && !d.storagePath);
 
   const set = (k: string, v: string | number | boolean) => setForm((p) => ({ ...p, [k]: v }));
   const handleFile = (r: UploadResult) => setForm((p) => ({ ...p, fileUrl: r.url, storagePath: r.path }));
@@ -126,6 +136,35 @@ export default function ComplianceDocsAdmin() {
     }
   };
 
+  // Pulls a doc's bundled /downloads/ PDF and re-uploads it to Firebase
+  // Storage, then repoints fileUrl/storagePath at that upload — same
+  // migration used for the Institution Innovation Cell documents.
+  const migrateDoc = async (d: ComplianceDocDoc) => {
+    setMigratingId(d.id);
+    try {
+      const res = await fetch(d.fileUrl);
+      if (!res.ok) throw new Error(`Couldn't fetch the existing PDF (${res.status}).`);
+      const blob = await res.blob();
+      const fileName = d.fileUrl.split('/').pop() || `${d.label}.pdf`;
+      const file = new File([blob], fileName, { type: 'application/pdf' });
+      const result = await uploadFile(file, 'vwu/compliance');
+      await updateDoc(doc(db, 'complianceDocs', d.id), { fileUrl: result.url, storagePath: result.path });
+    } catch (e) {
+      alert(`Couldn't migrate "${d.label}": ${(e as Error).message}`);
+    } finally {
+      setMigratingId(null);
+    }
+  };
+
+  const migrateAll = async () => {
+    setMigratingAll(true);
+    try {
+      for (const d of unmigrated) await migrateDoc(d);
+    } finally {
+      setMigratingAll(false);
+    }
+  };
+
   const filtered = filterGroup === 'All' ? docs : docs.filter((d) => d.group === filterGroup);
 
   return (
@@ -135,8 +174,9 @@ export default function ComplianceDocsAdmin() {
         <p className="admin-lead" style={{ marginBottom: '1rem' }}>
           Powers the "Compliance &amp; Disclosures" section in the site footer — upload a PDF here and its
           footer button will download that file. A few of these (NAAC, NBA, UGC 12B/2f, Audited Statements,
-          RTI, Facilities for Physically Challenged) are also linked from the UGC Public Self-Disclosure
-          page — keep their <strong>Reference Key</strong> unchanged so that page stays in sync automatically.
+          RTI, Facilities for Physically Challenged, and UGC Public Self Disclosure itself) are also linked
+          from the UGC Public Self-Disclosure page — keep their <strong>Reference Key</strong> unchanged so
+          that page stays in sync automatically.
         </p>
         <div className="admin-form-grid">
           <div className="admin-field">
@@ -199,6 +239,14 @@ export default function ComplianceDocsAdmin() {
             {COMPLIANCE_GROUPS.map((g) => <option key={g} value={g}>{g}</option>)}
           </select>
         </div>
+        {unmigrated.length > 0 && (
+          <p className="admin-field__hint" style={{ marginBottom: '1rem' }}>
+            {unmigrated.length} of these still point at a PDF bundled with the site rather than Firebase Storage.{' '}
+            <button className="admin-btn admin-btn--sm" onClick={migrateAll} disabled={migratingAll || migratingId !== null}>
+              {migratingAll ? 'Migrating…' : `Migrate all ${unmigrated.length} to Firebase Storage`}
+            </button>
+          </p>
+        )}
         {loading ? <p className="admin-loading">Loading…</p> : (
           <div className="admin-table-wrap">
             <table className="admin-table">
@@ -211,6 +259,15 @@ export default function ComplianceDocsAdmin() {
                     <td>{d.label}</td>
                     <td><a href={d.fileUrl} target="_blank" rel="noopener noreferrer">View</a></td>
                     <td>
+                      {!d.external && !d.storagePath && (
+                        <button
+                          className="admin-btn admin-btn--sm"
+                          onClick={() => migrateDoc(d)}
+                          disabled={migratingId === d.id || migratingAll}
+                        >
+                          {migratingId === d.id ? 'Migrating…' : 'Migrate to Storage'}
+                        </button>
+                      )}
                       <button className="admin-btn admin-btn--sm" onClick={() => startEdit(d)}>Edit</button>
                       <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(d.id, d.storagePath)}>Delete</button>
                     </td>

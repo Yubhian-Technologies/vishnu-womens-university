@@ -55,9 +55,9 @@ const quickLinks = [
 
 // Statutory/compliance documents an accredited institution is required to publish.
 // Admin-editable via /admin → Compliance Documents (ComplianceDocsAdmin.tsx);
-// DEFAULT_COMPLIANCE_DOCS below is both the "nothing uploaded yet" fallback
-// and the one-click starting point for moving these into Firestore, so the
-// footer never looks broken either way.
+// DEFAULT_COMPLIANCE_DOCS below is the "nothing uploaded yet" fallback (a
+// fresh Firestore project) — the live collection is already fully populated
+// in production, so this only matters for a brand-new environment.
 //
 // "Disclosures – UGC" is the one fixed exception: it's an internal page
 // route (built from the same PDF, at /disclosures/ugc), not a document link,

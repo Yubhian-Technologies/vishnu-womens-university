@@ -14,6 +14,7 @@ import ChipsToStartupPhotosAdmin from './ChipsToStartupPhotosAdmin';
 import VsacGalleryPhotosAdmin from './VsacGalleryPhotosAdmin';
 import VdlFacilitiesPhotosAdmin from './VdlFacilitiesPhotosAdmin';
 import AssistiveTechLabPhotosAdmin from './AssistiveTechLabPhotosAdmin';
+import AtlActivityPdfsAdmin from './AtlActivityPdfsAdmin';
 import ConcreteCanoePhotosAdmin from './ConcreteCanoePhotosAdmin';
 import WiseTeamPhotosAdmin from './WiseTeamPhotosAdmin';
 import WiseEliteProjectPhotosAdmin from './WiseEliteProjectPhotosAdmin';
@@ -41,7 +42,10 @@ const ITEM_SUB_SECTIONS: Record<string, { key: string; label: string; Component:
   'chips-to-startup': [{ key: 'photos', label: 'Photos', Component: ChipsToStartupPhotosAdmin }],
   'vsac': [{ key: 'gallery-photos', label: 'Gallery Photos', Component: VsacGalleryPhotosAdmin }],
   'vehicle-design-lab': [{ key: 'facilities-photos', label: 'Facilities Photos', Component: VdlFacilitiesPhotosAdmin }],
-  'assistive-tech-lab': [{ key: 'atl-photos', label: 'Photos', Component: AssistiveTechLabPhotosAdmin }],
+  'assistive-tech-lab': [
+    { key: 'atl-photos', label: 'Photos', Component: AssistiveTechLabPhotosAdmin },
+    { key: 'atl-activity-pdfs', label: 'Activity PDFs', Component: AtlActivityPdfsAdmin },
+  ],
   'concrete-canoe-lab': [{ key: 'canoe-photos', label: 'Photos', Component: ConcreteCanoePhotosAdmin }],
   'talentsprint-wise': [
     { key: 'team-photos', label: 'Team Photos', Component: WiseTeamPhotosAdmin },
