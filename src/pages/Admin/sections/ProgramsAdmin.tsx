@@ -6,7 +6,7 @@ import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
 import ImageUploader from '../../../components/ImageUploader/ImageUploader';
 import FileUploader from '../../../components/FileUploader/FileUploader';
-import type { UploadResult } from '../../../lib/storage';
+import { deleteFile, type UploadResult } from '../../../lib/storage';
 import { PROGRAM_ICON_NAMES } from '../../../lib/programIcons';
 import DepartmentNewsManager from './DepartmentNewsManager';
 
@@ -441,29 +441,67 @@ export default function ProgramsAdmin() {
 
   // Laboratories editing — each lab is independently backed by its own
   // uploaded PDF (same shape/pattern as Research & Development links above).
+  //
+  // These all update via the functional `setForm(p => ...)` form (reading
+  // `p.labs`), never the `labs` snapshot below — that snapshot is only for
+  // rendering. Uploading PDFs for several labs in quick succession fires
+  // several overlapping async `handleLabPdf` calls; if each one computed its
+  // next array from the same stale outer `labs` closure (as this used to),
+  // whichever upload's state write landed last would silently overwrite
+  // every other lab's just-uploaded pdfUrl with its own stale copy of the
+  // list — losing already-successful uploads without any error.
   const labs = form.labs || [];
   const addLab = () => {
-    set('labs', [...labs, { name: '' }]);
+    setForm((p) => ({ ...p, labs: [...(p.labs || []), { name: '' }] }));
   };
   const updateLabName = (li: number, name: string) => {
-    set('labs', labs.map((l, i) => (i === li ? { ...l, name } : l)));
+    setForm((p) => ({ ...p, labs: (p.labs || []).map((l, i) => (i === li ? { ...l, name } : l)) }));
   };
   const moveLab = (li: number, dir: -1 | 1) => {
-    const next = [...labs];
-    const target = li + dir;
-    if (target < 0 || target >= next.length) return;
-    [next[li], next[target]] = [next[target], next[li]];
-    set('labs', next);
+    setForm((p) => {
+      const next = [...(p.labs || [])];
+      const target = li + dir;
+      if (target < 0 || target >= next.length) return p;
+      [next[li], next[target]] = [next[target], next[li]];
+      return { ...p, labs: next };
+    });
   };
   const removeLab = (li: number) => {
     if (!confirm('Remove this laboratory?')) return;
-    set('labs', labs.filter((_, i) => i !== li));
+    setForm((p) => ({ ...p, labs: (p.labs || []).filter((_, i) => i !== li) }));
   };
   const handleLabPdf = (li: number, r: UploadResult) => {
-    set('labs', labs.map((l, i) => (i === li ? { ...l, pdfUrl: r.url, pdfStoragePath: r.path } : l)));
+    setForm((p) => ({ ...p, labs: (p.labs || []).map((l, i) => (i === li ? { ...l, pdfUrl: r.url, pdfStoragePath: r.path } : l)) }));
   };
-  const removeLabPdf = (li: number) => {
-    set('labs', labs.map((l, i) => (i === li ? { ...l, pdfUrl: '', pdfStoragePath: '' } : l)));
+  // Unlike every other field in this form (which only takes effect once
+  // "Update Program" is clicked), removing a lab's PDF acts immediately: it
+  // deletes the object from Firebase Storage right away and, if this
+  // programme already exists, patches just its `labs` field in Firestore on
+  // the spot — so there's no orphaned Storage file and no risk of the
+  // removal being lost if the admin navigates away before saving the rest
+  // of the form.
+  const removeLabPdf = async (li: number) => {
+    const lab = labs[li];
+    if (!lab?.pdfUrl) return;
+    if (!confirm('Remove this PDF? This cannot be undone.')) return;
+    try {
+      if (lab.pdfStoragePath) await deleteFile(lab.pdfStoragePath);
+    } catch (e) {
+      alert(`Couldn't delete the file from storage: ${(e as Error).message}`);
+      return;
+    }
+    let nextLabs: LabItem[] = [];
+    setForm((p) => {
+      nextLabs = (p.labs || []).map((l, i) => (i === li ? { ...l, pdfUrl: '', pdfStoragePath: '' } : l));
+      return { ...p, labs: nextLabs };
+    });
+    if (editing) {
+      try {
+        await updateDoc(doc(db, 'programs', editing), { labs: nextLabs });
+      } catch (e) {
+        alert(`The file was deleted from storage, but the saved record couldn't be updated: ${(e as Error).message}`);
+      }
+    }
   };
 
   // Programme Structure (semesters + subjects) editing — structured add /
@@ -639,36 +677,43 @@ export default function ProgramsAdmin() {
             just marked as unavailable.
           </p>
           <div className="admin-field admin-field--full">
-            {labs.map((lab, li) => (
-              <div key={li} style={{ border: '1.5px solid var(--color-light-gray)', borderRadius: 8, padding: '0.75rem', marginBottom: '0.75rem' }}>
-                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.6rem' }}>
-                  <input
-                    value={lab.name}
-                    onChange={(e) => updateLabName(li, e.target.value)}
-                    placeholder="Advanced Computing Lab"
-                    style={{ flex: 1, fontWeight: 700 }}
-                  />
-                  <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveLab(li, -1)} disabled={li === 0} title="Move up">↑</button>
-                  <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveLab(li, 1)} disabled={li === labs.length - 1} title="Move down">↓</button>
-                  <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeLab(li)}>Remove Lab</button>
-                </div>
-                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
-                  <div style={{ maxWidth: 260 }}>
-                    <FileUploader
-                      folder="vwu/programs/labs"
-                      currentUrl={lab.pdfUrl}
-                      onUploaded={(r) => handleLabPdf(li, r)}
-                      label="Upload PDF"
+            {labs.length > 0 && (
+              <div className="admin-compact-list" style={{ marginBottom: '0.75rem' }}>
+                {labs.map((lab, li) => (
+                  <div key={li} className="admin-compact-row">
+                    <input
+                      className="admin-compact-row__name"
+                      value={lab.name}
+                      onChange={(e) => updateLabName(li, e.target.value)}
+                      placeholder="Advanced Computing Lab"
                     />
+                    <div className="admin-compact-row__file">
+                      <FileUploader
+                        compact
+                        folder="vwu/programs/labs"
+                        currentUrl={lab.pdfUrl}
+                        onUploaded={(r) => handleLabPdf(li, r)}
+                        label="Upload PDF"
+                      />
+                    </div>
+                    <div className="admin-compact-row__actions">
+                      <button
+                        type="button"
+                        className="admin-btn admin-btn--ghost admin-btn--sm"
+                        onClick={() => removeLabPdf(li)}
+                        disabled={!lab.pdfUrl}
+                        title={lab.pdfUrl ? 'Remove PDF' : 'No PDF uploaded yet'}
+                      >
+                        Remove PDF
+                      </button>
+                      <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveLab(li, -1)} disabled={li === 0} title="Move up">↑</button>
+                      <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveLab(li, 1)} disabled={li === labs.length - 1} title="Move down">↓</button>
+                      <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeLab(li)} title="Remove laboratory">Remove</button>
+                    </div>
                   </div>
-                  {lab.pdfUrl && (
-                    <button type="button" className="admin-btn admin-btn--ghost admin-btn--sm" onClick={() => removeLabPdf(li)}>
-                      Remove PDF
-                    </button>
-                  )}
-                </div>
+                ))}
               </div>
-            ))}
+            )}
             <button type="button" className="admin-btn admin-btn--primary" onClick={addLab}>+ Add Lab</button>
             {labs.length === 0 && (
               <p className="admin-field__hint">No laboratories yet — click "Add Lab" to start building this programme's Laboratories list.</p>
