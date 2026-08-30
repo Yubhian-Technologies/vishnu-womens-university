@@ -39,6 +39,11 @@ function textToCommittee(text: string): ClubCommitteeMember[] {
   });
 }
 
+export interface ClubCustomField {
+  label: string;
+  content: string;
+}
+
 export interface ClubDoc {
   id: string;
   name: string;
@@ -53,6 +58,11 @@ export interface ClubDoc {
   // to "coming soon"/hides the section when blank.
   vision?: string;
   mission?: string;
+  // Admin-defined labeled text blocks (e.g. "Objectives", "Values") added
+  // via the "+ Add New Field" control — rendered on the public page the
+  // same way as Vision/Mission, so admins aren't limited to the fixed set
+  // of fields hardcoded here.
+  customFields?: ClubCustomField[];
   // Up to MAX_CLUB_IMAGES photos — the first doubles as the detail page's
   // hero image, the rest render in a small gallery beneath it.
   images?: ClubImage[];
@@ -69,7 +79,7 @@ interface FormState extends Omit<ClubDoc, 'id' | 'committee'> {
 
 const EMPTY: FormState = {
   name: '', desc: '', category: 'Technical Clubs', order: 0, slug: '',
-  vision: '', mission: '', images: [], pdfUrl: '', pdfStoragePath: '', committeeText: '',
+  vision: '', mission: '', customFields: [], images: [], pdfUrl: '', pdfStoragePath: '', committeeText: '',
 };
 
 export const CLUB_CATEGORIES = ['Technical Clubs', 'Social & Service Clubs', 'Creative & Arts Clubs'];
@@ -91,6 +101,18 @@ export default function StudentClubsAdmin() {
   const set = (k: string, v: string | number) => setForm((p) => ({ ...p, [k]: v }));
   const handlePdf = (r: UploadResult) => setForm((p) => ({ ...p, pdfUrl: r.url, pdfStoragePath: r.path }));
   const removePdf = () => setForm((p) => ({ ...p, pdfUrl: '', pdfStoragePath: '' }));
+
+  const addCustomField = () => setForm((p) => ({ ...p, customFields: [...(p.customFields || []), { label: '', content: '' }] }));
+  const setCustomField = (index: number, key: keyof ClubCustomField, value: string) => {
+    setForm((p) => {
+      const next = [...(p.customFields || [])];
+      next[index] = { ...next[index], [key]: value };
+      return { ...p, customFields: next };
+    });
+  };
+  const removeCustomField = (index: number) => {
+    setForm((p) => ({ ...p, customFields: (p.customFields || []).filter((_, i) => i !== index) }));
+  };
 
   const images = form.images || [];
 
@@ -125,7 +147,8 @@ export default function StudentClubsAdmin() {
       const slug = form.slug ? slugify(form.slug) : slugify(form.name);
       const original = editing ? clubs.find((c) => c.id === editing) : null;
       const { committeeText, ...rest } = form;
-      const payload = { ...rest, slug, committee: textToCommittee(committeeText) };
+      const customFields = (form.customFields || []).filter((f) => f.label.trim());
+      const payload = { ...rest, slug, committee: textToCommittee(committeeText), customFields };
       if (editing) {
         await updateDoc(doc(db, 'studentClubs', editing), payload);
       } else {
@@ -149,6 +172,7 @@ export default function StudentClubsAdmin() {
     setForm({
       name: c.name, desc: c.desc, category: c.category, order: c.order, slug: c.slug || '',
       vision: c.vision || '', mission: c.mission || '',
+      customFields: c.customFields || [],
       images: c.images || [],
       pdfUrl: c.pdfUrl || '', pdfStoragePath: c.pdfStoragePath || '',
       committeeText: committeeToText(c.committee),
@@ -246,6 +270,39 @@ export default function StudentClubsAdmin() {
           <div className="admin-field admin-field--full">
             <label>Mission</label>
             <textarea rows={3} value={form.mission} onChange={(e) => set('mission', e.target.value)} placeholder="How this club works toward that vision…" />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label>Additional Fields</label>
+            <p className="admin-field__hint">
+              Optional. Add any other labeled section this club needs — e.g. "Objectives", "Values" — the same
+              way Vision/Mission work. Each one renders on the public page alongside Vision/Mission, in the order
+              added.
+            </p>
+            <div className="admin-custom-fields">
+              {(form.customFields || []).map((f, i) => (
+                <div key={i} className="admin-custom-field-row">
+                  <input
+                    value={f.label}
+                    onChange={(e) => setCustomField(i, 'label', e.target.value)}
+                    placeholder="Field label, e.g. Objectives"
+                  />
+                  <textarea
+                    rows={3}
+                    value={f.content}
+                    onChange={(e) => setCustomField(i, 'content', e.target.value)}
+                    placeholder="Content for this field…"
+                  />
+                  <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeCustomField(i)}>
+                    Remove
+                  </button>
+                </div>
+              ))}
+            </div>
+            <div>
+              <button type="button" className="admin-btn admin-btn--ghost admin-btn--sm" onClick={addCustomField} style={{ marginTop: '0.5rem' }}>
+                + Add New Field
+              </button>
+            </div>
           </div>
           <div className="admin-field admin-field--full">
             <label>Committee Members</label>

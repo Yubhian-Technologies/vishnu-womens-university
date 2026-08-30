@@ -46,9 +46,20 @@ export default function ThrustAreasSection({ categories }: { categories: Accordi
   };
 
   const stats = useMemo(() => {
-    const areaCount = categories.reduce((n, c) => n + c.areas.length, 0);
+    // For an area that's really a sub-department group (e.g. Basic Science's
+    // Mathematics), count its sub-areas as the real areas of work rather
+    // than counting "Mathematics" itself as one area.
+    let areaCount = 0;
     const facultySet = new Set<string>();
-    categories.forEach((c) => c.areas.forEach((a) => a.items.forEach((it) => facultySet.add(it.href || it.label))));
+    categories.forEach((c) => c.areas.forEach((a) => {
+      if (a.subAreas && a.subAreas.length > 0) {
+        areaCount += a.subAreas.length;
+        a.subAreas.forEach((sub) => sub.items.forEach((it) => facultySet.add(it.href || it.label)));
+      } else {
+        areaCount += 1;
+        a.items.forEach((it) => facultySet.add(it.href || it.label));
+      }
+    }));
     return { deptCount: categories.length, areaCount, facultyCount: facultySet.size };
   }, [categories]);
 
@@ -115,6 +126,7 @@ export default function ThrustAreasSection({ categories }: { categories: Accordi
               {cat.areas.map((area, ai) => {
                 const key = `${catIndex}-${ai}`;
                 const isOpen = openKeys.has(key);
+                const hasSubAreas = Boolean(area.subAreas && area.subAreas.length > 0);
                 return (
                   <div key={ai} className={`thrust-area-card${isOpen ? ' open' : ''}`}>
                     <button
@@ -125,26 +137,69 @@ export default function ThrustAreasSection({ categories }: { categories: Accordi
                     >
                       <span className="thrust-area-card-name">{area.name}</span>
                       <span className="thrust-area-card-meta">
-                        <span className="thrust-area-card-count">{area.items.length}</span>
+                        <span className="thrust-area-card-count">{hasSubAreas ? area.subAreas!.length : area.items.length}</span>
                         <ChevronDown size={16} strokeWidth={2.25} className="thrust-area-card-chevron" />
                       </span>
                     </button>
                     <div className="thrust-area-card-body">
                       <div className="thrust-area-card-body-inner">
-                        <ul className="thrust-faculty-list">
-                          {area.items.map((it, ii) => (
-                            <li key={ii}>
-                              <span className="thrust-faculty-avatar">{initials(it.label)}</span>
-                              {it.href ? (
-                                <a href={it.href} target="_blank" rel="noopener noreferrer" className="thrust-faculty-link">
-                                  {it.label}
-                                </a>
-                              ) : (
-                                <span className="thrust-faculty-link">{it.label}</span>
-                              )}
-                            </li>
-                          ))}
-                        </ul>
+                        {hasSubAreas ? (
+                          <div className="thrust-subarea-list">
+                            {area.subAreas!.map((sub, si) => {
+                              const subKey = `${key}-${si}`;
+                              const subOpen = openKeys.has(subKey);
+                              return (
+                                <div key={si} className={`thrust-area-card thrust-subarea-card${subOpen ? ' open' : ''}`}>
+                                  <button
+                                    type="button"
+                                    className="thrust-area-card-head"
+                                    onClick={() => toggle(subKey)}
+                                    aria-expanded={subOpen}
+                                  >
+                                    <span className="thrust-area-card-name">{sub.name}</span>
+                                    <span className="thrust-area-card-meta">
+                                      <span className="thrust-area-card-count">{sub.items.length}</span>
+                                      <ChevronDown size={16} strokeWidth={2.25} className="thrust-area-card-chevron" />
+                                    </span>
+                                  </button>
+                                  <div className="thrust-area-card-body">
+                                    <div className="thrust-area-card-body-inner">
+                                      <ul className="thrust-faculty-list">
+                                        {sub.items.map((it, ii) => (
+                                          <li key={ii}>
+                                            <span className="thrust-faculty-avatar">{initials(it.label)}</span>
+                                            {it.href ? (
+                                              <a href={it.href} target="_blank" rel="noopener noreferrer" className="thrust-faculty-link">
+                                                {it.label}
+                                              </a>
+                                            ) : (
+                                              <span className="thrust-faculty-link">{it.label}</span>
+                                            )}
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        ) : (
+                          <ul className="thrust-faculty-list">
+                            {area.items.map((it, ii) => (
+                              <li key={ii}>
+                                <span className="thrust-faculty-avatar">{initials(it.label)}</span>
+                                {it.href ? (
+                                  <a href={it.href} target="_blank" rel="noopener noreferrer" className="thrust-faculty-link">
+                                    {it.label}
+                                  </a>
+                                ) : (
+                                  <span className="thrust-faculty-link">{it.label}</span>
+                                )}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
                       </div>
                     </div>
                   </div>
