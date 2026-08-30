@@ -954,7 +954,10 @@ function VdlIndustryCollaborationsSection({
   );
 }
 
-function VdlStudentsAchievementsSection({ data }: { data: typeof vehicleDesignLab.studentsAchievements }) {
+function VdlStudentsAchievementsSection({ data, achievementReports }: {
+  data: typeof vehicleDesignLab.studentsAchievements;
+  achievementReports: { label: string; href: string }[];
+}) {
   return (
     <div>
       <SectionHeading>Achievements</SectionHeading>
@@ -983,7 +986,7 @@ function VdlStudentsAchievementsSection({ data }: { data: typeof vehicleDesignLa
         Achievements:
       </h4>
       <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-        {data.achievementReports.map((report) => (
+        {achievementReports.map((report) => (
           <li key={report.label} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
             <span style={{ width: 20, height: 20, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
@@ -2952,6 +2955,7 @@ function VdlPage({ vdl }: { vdl: typeof vehicleDesignLab }) {
   // Doc id = the endowment's own id (see vehicleDesignLab.data.ts industryCollaborations.endowments), not an ordered list.
   const { docs: industryCollabPhotos } = useCollection<WithId & { imageUrl: string }>('vdlIndustryCollabPhotos', [], { silent: true });
   const industryCollabPhotoMap = new Map(industryCollabPhotos.map((p) => [p.id, p]));
+  const { docs: vdlAchievementReportDocs } = useOrderedCollection<WithId & { label: string; fileUrl: string }>('vdlAchievementReports', 'order');
   // Parallel to vdl.facilities.activitiesPrograms (Design / Fabrication / Testing / Motorsport).
   const phasePhotos = [designPhasePhotos, fabricationPhasePhotos, testingPhotos, motorsportPhotos];
 
@@ -3031,7 +3035,10 @@ function VdlPage({ vdl }: { vdl: typeof vehicleDesignLab }) {
               <>
                 <span className="section-label">Recognition</span>
                 <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-5)' }}>Students Achievements & Placements</h2>
-                <VdlStudentsAchievementsSection data={vdl.studentsAchievements} />
+                <VdlStudentsAchievementsSection
+                  data={vdl.studentsAchievements}
+                  achievementReports={vdlAchievementReportDocs.map((d) => ({ label: d.label, href: d.fileUrl }))}
+                />
               </>
             )}
 
@@ -3930,6 +3937,7 @@ export default function DifferentiatorDetail() {
   const { docs: atlNewsPhotos } = useCollection<WithId & { imageUrl: string }>('atlGalleryNewsPhotos', [orderBy('order', 'asc')], { silent: true });
   const { docs: atlActivityPdfDocs } = useCollection<WithId & { label: string; fileUrl: string }>('atlActivityPdfs', [], { silent: true });
   const atlActivityPdfOverrides = Object.fromEntries(atlActivityPdfDocs.map((d) => [d.label, d.fileUrl]));
+  const { docs: rwtpReportLinkDocs } = useOrderedCollection<WithId & { label: string; fileUrl: string }>('rwtpReportLinks', 'order');
   const { docs: canoeAcademicProjectPhotos } = useCollection<WithId & { imageUrl: string }>('canoeAcademicProjectPhotos', [orderBy('order', 'asc')], { silent: true });
   const { docs: canoePreviousProjectPhotos } = useCollection<WithId & { imageUrl: string }>('canoePreviousProjectPhotos', [orderBy('order', 'asc')], { silent: true });
   const { docs: canoeTeamWakaPhotos } = useCollection<WithId & { imageUrl: string }>('canoeTeamWakaPhotos', [orderBy('order', 'asc')], { silent: true });
@@ -4289,8 +4297,8 @@ export default function DifferentiatorDetail() {
                   </div>
 
                   <div style={{ marginTop: 'var(--space-6)', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-                    {rwtp.reportLinks.map((link) => (
-                      <a key={link.href} href={link.href} download style={{ color: 'var(--color-primary)', fontWeight: 700, fontSize: 'var(--text-base)' }}>
+                    {rwtpReportLinkDocs.map((link) => (
+                      <a key={link.id} href={link.fileUrl} download style={{ color: 'var(--color-primary)', fontWeight: 700, fontSize: 'var(--text-base)' }}>
                         {link.label} →
                       </a>
                     ))}

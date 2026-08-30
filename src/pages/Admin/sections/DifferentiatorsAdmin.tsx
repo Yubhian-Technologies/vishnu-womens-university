@@ -13,6 +13,8 @@ import TiDspGalleryPhotosAdmin from './TiDspGalleryPhotosAdmin';
 import ChipsToStartupPhotosAdmin from './ChipsToStartupPhotosAdmin';
 import VsacGalleryPhotosAdmin from './VsacGalleryPhotosAdmin';
 import VdlFacilitiesPhotosAdmin from './VdlFacilitiesPhotosAdmin';
+import VdlAchievementsAdmin from './VdlAchievementsAdmin';
+import RwtpReportsAdmin from './RwtpReportsAdmin';
 import AssistiveTechLabPhotosAdmin from './AssistiveTechLabPhotosAdmin';
 import AtlActivityPdfsAdmin from './AtlActivityPdfsAdmin';
 import ConcreteCanoePhotosAdmin from './ConcreteCanoePhotosAdmin';
@@ -41,7 +43,11 @@ const ITEM_SUB_SECTIONS: Record<string, { key: string; label: string; Component:
   'ti-dsp-coe': [{ key: 'gallery-photos', label: 'Gallery Photos', Component: TiDspGalleryPhotosAdmin }],
   'chips-to-startup': [{ key: 'photos', label: 'Photos', Component: ChipsToStartupPhotosAdmin }],
   'vsac': [{ key: 'gallery-photos', label: 'Gallery Photos', Component: VsacGalleryPhotosAdmin }],
-  'vehicle-design-lab': [{ key: 'facilities-photos', label: 'Facilities Photos', Component: VdlFacilitiesPhotosAdmin }],
+  'vehicle-design-lab': [
+    { key: 'facilities-photos', label: 'Facilities Photos', Component: VdlFacilitiesPhotosAdmin },
+    { key: 'achievement-reports', label: 'Achievement Reports', Component: VdlAchievementsAdmin },
+  ],
+  'rural-women-tech-park': [{ key: 'report-links', label: 'Report Links', Component: RwtpReportsAdmin }],
   'assistive-tech-lab': [
     { key: 'atl-photos', label: 'Photos', Component: AssistiveTechLabPhotosAdmin },
     { key: 'atl-activity-pdfs', label: 'Activity PDFs', Component: AtlActivityPdfsAdmin },

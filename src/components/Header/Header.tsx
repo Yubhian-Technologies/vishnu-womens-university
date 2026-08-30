@@ -293,6 +293,9 @@ export default function Header() {
   // Header's Apply Now button — admin can repoint it (e.g. to a specific
   // admissions cycle or an external application portal) without a deploy.
   const headerApplyNow = useNavLinkOverride('header-apply-now', '/admissions');
+  // About Us → Organizational Chart — admin can replace the chart image
+  // without a code deploy (see NavLinkOverridesAdmin's upload button).
+  const orgChart = useNavLinkOverride('header-organizational-chart', '/downloads/SVECWOrganizationChart.jpg');
 
   const { docs: programs } = useOrderedCollection<ProgramDoc>('programs', 'order');
   // Both VLSI programs (B.Tech "Electronics Engineering [VSLI Design &
@@ -315,6 +318,22 @@ export default function Header() {
   const { docs: differentiatorItems } = useOrderedCollection<DifferentiatorItemDoc>('differentiatorItems', 'order');
 
   const renderedNavItems: NavItem[] = navItems.map((item) => {
+    // About Us → Organizational Chart's target is admin-replaceable — see
+    // orgChart above.
+    if (item.label === 'About Us' && item.groups) {
+      const groups = item.groups.map((group) => {
+        if (group.groupLabel !== 'About Us') return group;
+        return {
+          ...group,
+          items: group.items.map((child) =>
+            child.label === 'Organizational Chart'
+              ? { ...child, path: orgChart.path }
+              : child
+          ),
+        };
+      });
+      return { ...item, groups };
+    }
     // Academics' UG/PG/Ph.D. Programmes groups are populated here from live
     // Firestore data since navItems itself is a module-level constant and
     // can't hold live data directly — see the "Overview" comment above.
