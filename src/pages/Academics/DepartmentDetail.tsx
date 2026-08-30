@@ -4,7 +4,6 @@ import { where } from 'firebase/firestore';
 import { Check, Microscope, Compass, Target, Sparkles, Mail } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import ProgrammeStructure from '../../components/ProgrammeStructure/ProgrammeStructure';
-import DepartmentNewsSection from '../../components/DepartmentNews/DepartmentNewsSection';
 import SEO from '../../components/SEO/SEO';
 import { useCollection, useOrderedCollection } from '../../hooks/useCollection';
 import { useEapcetCode } from '../../hooks/useContentBlocks';
@@ -117,6 +116,16 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   const hasHighlights = !!(activeProgram.highlights && activeProgram.highlights.length > 0);
   const hasOutcomeStatements = !!(activeProgram.peos?.length || activeProgram.pos?.length || activeProgram.psos?.length);
   const hasMindMap = !!activeProgram.mindMapImage;
+  // News & Events + Newsletter here use the teammate's per-academic-year
+  // fields on the programme doc (see ProgramsAdmin's "News & Events —
+  // Department Page" / "Newsletter" editors) — the plain departmentNews
+  // collection (<DepartmentNewsSection>) is only used on standalone program
+  // pages (ProgramDetail.tsx), so the two systems never both show up.
+  const newsEventsYears = (activeProgram.newsEventsYears || []).filter((y) => y.year && y.columns?.length > 0 && y.rows?.length > 0);
+  const hasNewsEvents = newsEventsYears.length > 0;
+  const newsletterYears = (activeProgram.newsletterYears || []).filter((y) => y.year && y.issues && y.issues.length > 0);
+  const hasNewsletter = newsletterYears.length > 0;
+  const newsletterMaxIssues = Math.max(0, ...newsletterYears.map((y) => y.issues.length));
 
   // Top stats bar. Head of Department is genuinely one person for the whole
   // department, shown once. Established/Accreditation are shown once too
@@ -464,8 +473,90 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
         </div>
       </section>
 
-      {/* News & Events (per programme) */}
-      <DepartmentNewsSection programSlug={activeProgram.slug} background="var(--color-white)" />
+      {/* News & Events (per programme, admin-defined academic-year tables) */}
+      {hasNewsEvents && (
+        <section id="news-events" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
+          <div className="container">
+            <div style={{ marginBottom: 'var(--space-8)' }}>
+              <span className="section-label">{activeProgram.shortName || activeProgram.name}</span>
+              <h2 className="section-title">News &amp; Events</h2>
+            </div>
+            {newsEventsYears.map((yr, yi) => (
+              <div key={yi} style={{ marginBottom: yi === newsEventsYears.length - 1 ? 0 : 'var(--space-8)' }}>
+                <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.1rem', color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>
+                  Academic Year :: {yr.year}
+                </h3>
+                <div className="pb-activities-scroll">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th className="pb-activities-num">S.No</th>
+                        {yr.columns.map((col, ci) => <th key={ci}>{col}</th>)}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {yr.rows.map((row, ri) => (
+                        <tr key={ri}>
+                          <td className="pb-activities-num">{ri + 1}</td>
+                          {yr.columns.map((_, ci) => <td key={ci}>{row.cells[ci] ?? ''}</td>)}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Newsletter (per programme) */}
+      {hasNewsletter && (
+        <section id="newsletter" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
+          <div className="container">
+            <div style={{ marginBottom: 'var(--space-8)' }}>
+              <span className="section-label">{activeProgram.shortName || activeProgram.name}</span>
+              <h2 className="section-title">Newsletter</h2>
+            </div>
+            <div className="pb-activities-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Academic Year</th>
+                    {Array.from({ length: newsletterMaxIssues }).map((_, ci) => (
+                      <th key={ci}>Issue – {ci + 1}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {newsletterYears.map((yr, yi) => (
+                    <tr key={yi}>
+                      <td>{yr.year}</td>
+                      {Array.from({ length: newsletterMaxIssues }).map((_, ci) => {
+                        const issue = yr.issues[ci];
+                        if (!issue) return <td key={ci} />;
+                        return (
+                          <td key={ci}>
+                            {issue.pdfUrl ? (
+                              <a href={issue.pdfUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-primary)', fontWeight: 600 }}>
+                                Issue – {ci + 1}
+                              </a>
+                            ) : (
+                              <span style={{ color: 'var(--color-text-light)', fontStyle: 'italic' }}>
+                                Issue – {ci + 1} (Unavailable)
+                              </span>
+                            )}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* CTA */}
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-14) 0' }}>

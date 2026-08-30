@@ -7,7 +7,7 @@ import { usePageBanners } from '../../hooks/usePageBanners';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import { parseStructuredTable } from '../../lib/structuredTable';
 import type { PlacementItemDoc } from '../Admin/sections/PlacementItemsAdmin';
-import PlacementYearAccordion from './PlacementYearAccordion';
+import PlacementYearAccordion, { BranchOffersBarChart } from './PlacementYearAccordion';
 import SmoothCollapse from '../../components/SmoothCollapse/SmoothCollapse';
 import { successStories } from './successStories.data';
 import { tpoTeamBios } from './tpoTeamBios.data';
@@ -46,49 +46,14 @@ type BodyBlock =
   | { type: 'paragraph'; text: string }
   | { type: 'list'; items: string[] };
 
+// Overrides the "About {title}" heading only — hero/breadcrumb still show
+// the CMS title as-is, so a slug here can read differently in the body
+// heading without renaming the page everywhere.
+const ABOUT_TITLE_OVERRIDES: Record<string, string> = {
+  'placement-details': 'Placement Cell',
+};
+
 const BODY_OVERRIDES: Record<string, string> = {
-  'tpo-cell': `Vishnu Women's University has been consistently topping, during the last seven years in the list of campus placement records among private institutions in Andhra Pradesh. Students of Vishnu Women's University are highly regarded by employers from industry and the public sector.
-
-Facilitating students by way of offering information, advice, guidance and job-seeking support for students is considered as a primary responsibility at Vishnu Women's University. Career Advisors are available to discuss ideas & plans, and students are encouraged to attend the wide range of talks, information fairs and recruitment events.
-
-With this goal in mind, the Training & Placement Office (TPO) Cell:
-
-- Arranges for in-plant industrial training for students during their summer and Intra semester break.
-- Encourages students to become entrepreneurs, through Entrepreneurship Development Programmes.
-- Promotes career guidance & counseling through lectures by senior corporate executives and visiting professors.
-- Training facilities for students to face competitive exams like GATE, GRE, GMAT, TOEFL and prepares them for the interviews.
-- Organizing campus interviews for pre-final and final year students with industrial and business houses of repute from all over India.
-
-The TRAINING AND PLACEMENT Cell is headed by a Dean and is assisted by the Placement Officers.
-
-TRAINING AND PLACEMENT Cell is now entrusted with the additional duty of interacting with the Industry to enhance the employment opportunities of the students and to get projects for staff to improve their “real world” awareness etc.`,
-  'industry-liaison-offices': `Colleges of Sri Vishnu Educational Society are exclusive partners for most of the companies in all sectors (IT, Core, R&D etc.,) and they hire more than 3000 students every year who graduate from SVES institutions. An exclusive Industry Relations Cell of SVES is instrumental in providing diversified career opportunities for the students graduating.
-
-The Industry Relations of SVES is one of its kind with multi-layered support system having its network of offices in Hyderabad, Chennai, Bengaluru, Pune, Vadodara will be in constant touch with diversified industries across the country to pursue them for placements, internships, industry – academia interaction, R&D collaborations etc.
-
-Since the majority of manufacturing industries located their plants in nooks and corners of different parts of the country, it is impossible to engage with them throughout the year from the college or a central location. By having network of offices at Chennai, Pune and Vadodara that are bases for many manufacturing industries, SVES is able to get both employment and internship opportunities for their students in diversified companies.
-
-Leadership is actively involved in promoting change in education and industry collaborations by taking active role in Industry Bodies such as NASSCOM, CII, and etc.
-
-Industry Relations Team promotes not only Industry Connect but also relationship with Universities across the world under Graduate Student Abroad Center (GSAC) Initiative for providing authenticating admission support for students wanting to pursue Higher Education Opportunities, helping them tap various scholarships and educational subsidies.
-
-SVES is uniquely created collaborations to promote mentoring of students by Industry Professionals directly such as with Microsoft – WISE, Amazon – ACMS, Flipkart and etc. All of these organizations started these initiatives with SVES, have taken them to benefit Institutions across India and Microsoft is now offering the program to students in Africa as well.
-
-SVES organized a prestigious Women in Data Science (WiDS-Hyderabad) Conference, an initiative of Stanford University at Amazon Hyderabad with participants from 60+ Organizations.
-
-SVES is supporting the Assistive Technology Conference being organized by Telangana State Innovation Cell.
-
-SVES is offering Industry sponsored curriculum by associating with Industry one such example is created Computer Science in Business Systems (CSBS) branch, an interdisciplinary course between Computer Science and Business Management offered by TCS.
-
-SVES also having MoUs with many companies (IT as well as core) in designing the industry specified curriculum, faculty development, certifications for students etc., these activities helps the students and faculty of SVES to stay ahead from their peers to be update with the latest technologies / skills.
-
-SVES Institutions work with organizations such as PEGA, Amazon, Service Now, SalesForce on specific Academic Programs to help students get the skillset before they graduate and be ready to be productive for hiring organizations from Day-1.
-
-Skill promotion has helped students perform consistently superior in many competitions organized by Industry which are Hackathons or coding or project competitions,
-
-SVES institutions are always among the top 10 or 20 institutions of such competition / hackathon based hiring events like Codevita (TCS), Hackwithinfy (Infosys), PEP (EPAM), NQT (TCS), InfyTQ (Infosys), NTH (Wipro), Codewars (NCR), Codediva (BNY) etc., in particular, SVES as a group produced 10% of results for TCS CodeVita from AP and Telangana regions.
-
-During the pandemic SVES promoted online learning by partnering with Coursera, Nasscom Future Skills and edX among Students and Faculty. Approximately 12000 students and faculty members have completed 50,000 + courses in varied areas of Future Skills, Computational Skills, Languages, Fundamental Sciences and etc.`,
   'career-guidance-cell': `Career guidance is not a new concept and its roots can be traced back to ancient times. However, career guidance in its present form, owes its origin to US and other developed countries. Career guidance encompasses information, guidance and counseling services to assist in making educational training and occupational choice.
 
 Career guidance and counseling programmes in SVECW aim to provide assistance and advice to students to make them more powerful and better informed so that they can become architects in building their own future. It helps the students realize their strengths and weaknesses by instilling self awareness, decision making skills, planning skills, personality development etc.
@@ -132,29 +97,15 @@ The college offers Career Development Program for all III B.Tech students which 
 For all the II B.Tech students of Circuit branches additional training in C-program was being offered by the college on continuous basis.
 
 [More Details …](/downloads/c-programming-timetable.pdf)`,
-  'mission-rd': `Mission R&D is an innovative initiative with a vision to “transform intelligent, hardworking, motivated students to realize their full potential” and prepare them for a great R&D career at major global corporations. The key objective of this endeavor is to significantly increase the number of women in R&D roles.
+  'placement-details': `The Training & Placement Cell of Vishnu Women's University (VWU) acts as a bridge between the University and industry. It supports students in achieving their career goals through placement, internship, training, and industry interaction programs.
 
-Initiated by people who have many years of global product development experience, Mission R&D aims to transform the students through a short duration summer program and put them on a path towards a rewarding R&D career. The program helps the students gain expertise in computer science fundamentals, professional software development tools and latest programming platforms giving them confidence and unleashing their inherent potential to become top R&D engineers. Some major multi-national and start-up companies have signed up to interview the students for R&D roles, immediately after they complete the program.
+The Cell focuses on improving employability, industry readiness, and overall professional development of students.
 
-**About Program**
+**Key Objectives:** The Cell provides placement opportunities for eligible students across all programs, builds and strengthens relationships with leading companies and industry partners, conducts regular training programs, workshops, aptitude tests, and placement preparation activities, facilitates internships and industry exposure for students, and maintains accurate and transparent placement and internship records.
 
-This course enhances the efficacy of the students and increases their job opportunities. Mission R&D offers a 6 week course and upon completion, students possess solid product development skills.
+**Scope of Activities:** The Cell organizes on-campus and off-campus recruitment drives, coordinates internships and industry interaction programs, conducts aptitude, technical, communication, soft-skills, and career guidance programs, organizes mock interviews, pre-placement talks, and placement preparation activities, and maintains and publishes placement statistics, reports, and recruitment trends.
 
-**What students learn?**
-
-**Computer Science Fundamentals –** Students will gain strong knowledge reading core CS concepts such as Data Structures, Algorithms, Computer Architecture, Layered Design, Operating Systems, Object Oriented Programming languages – This is an essential foundation for one's professional career.
-
-**Professional Software Development Tools –** Students will get trained in using Visual Studio or Eclipse, source control systems, debugging. – This skill is essential for being highly productive in developing quality software, and for being a valuable member of a real world, large scale product development teams.
-
-**Latest Platforms & Programming Paradigms –** Students will gain hands on experience with Cloud Computing, Touch interfaces, HTML5 with strong emphasis on user experience and visual appeal.
-
-Some major multi-national and startup companies have signed up to interview these students for R&D roles, immediately after they complete this program. The program is 40 day long, classroom oriented. On a typical day there will be 2 hrs of teaching/discussions on concepts and students will spend the remaining 6 hrs doing software development under the guidance of a teacher. The people who teach in this program are R&D professionals with 10+ years of experience, with passion for teaching and significant global experience; they are resourceful to the students to seek the best and the latest knowledge from them. Last 10 days of the program focuses on real world application development allowing students to apply everything that they learnt in the program.
-
-Students with interest in product development, good logical thinking abilities, perseverance and commitment will benefit greatly from the program. Based on this criteria students will be selected for this program. The main motto is to help the students realize their full potential.
-
-Around six students participated in Mission R & D Summer Training program-2012 at BVRIT HYDERABAD College of Engineering for Women, Nizampet, Hyderabad, and another batch of twelve students participated in the same program organized at IIIT-Hyderabad in 2013.
-
-[More Details …](https://www.hugedomains.com/domain_profile.cfm?d=missionrnd.com)`,
+**Stakeholders:** Students (UG and PG across all disciplines), Corporate Recruiters and Industry Partners, Parents and Guardians, Faculty and University Leadership, Alumni, and Regulatory and Accreditation Bodies.`,
   'gsac': `Students who aspire to travel abroad for higher studies usually approach consulting firms and spend a lot of their time and money in understanding the destinations, universities and courses abroad. In an attempt to support such students of SVES institutions, Graduate Study Abroad Center (GSAC) is formed. It guides and gives necessary support to the students and their parents to find the right destination, university and course to fulfil their dream of studying abroad.
 
 GSAC has been initiated to make the students self-reliant, after observing a segment of students who need that hand holding in terms of GRE/TOEFL/IELTS training and application processing. It also supports the students who receive their admit cards and Visa by connecting them with the alumni there so that they would have the confidence and someone whom they know before reaching.
@@ -295,58 +246,31 @@ function PartnerLogo({ name }: { name: string }) {
   );
 }
 
-// Year-by-year accordion for the Our Recruiters page — same accordion look
-// as PlacementYearAccordion, but each row opens to a Recruiting Partners
-// logo grid of that drive year's unique companies instead of a data table.
-function RecruitersByYear() {
+// Flat, deduplicated recruiter grid for the Our Recruiters page — every
+// company across every drive year (RECRUITER_DRIVE_YEARS), collapsed into
+// one logo grid instead of a year-by-year accordion.
+function AllRecruiters() {
   const placementYearData = usePlacementYears();
-  const [activeYear, setActiveYear] = useState(RECRUITER_DRIVE_YEARS[0]?.label ?? '');
+  const companies = [...new Set(
+    RECRUITER_DRIVE_YEARS.flatMap(({ batch }) => {
+      const year = placementYearData.find((y) => y.batch === batch);
+      return year ? year.rows.map((r) => r.company) : [];
+    })
+  )];
+
+  if (companies.length === 0) {
+    return (
+      <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)' }}>
+        Recruiter data will appear here once it's added from the admin.
+      </p>
+    );
+  }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-      {RECRUITER_DRIVE_YEARS.map(({ label, batch }) => {
-        const isOpen = activeYear === label;
-        const year = placementYearData.find((y) => y.batch === batch);
-        const companies = year ? [...new Set(year.rows.map((r) => r.company))] : [];
-        return (
-          <div key={label}>
-            <button
-              onClick={() => setActiveYear(isOpen ? '' : label)}
-              style={{
-                width: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                background: isOpen ? 'var(--color-primary)' : 'var(--color-off-white)',
-                border: 'none',
-                padding: 'var(--space-3) var(--space-5)',
-                cursor: 'pointer',
-                textAlign: 'left',
-                transition: 'background var(--transition-base)',
-              }}
-            >
-              <span style={{ fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-primary)', fontSize: 'var(--text-base)', transition: 'color var(--transition-base)' }}>{label}</span>
-              <span style={{ fontSize: '1.2rem', fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-text)', lineHeight: 1, transition: 'color var(--transition-base)' }}>{isOpen ? '−' : '+'}</span>
-            </button>
-
-            <SmoothCollapse open={isOpen}>
-              <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderTop: 'none' }}>
-                {companies.length > 0 ? (
-                  <div className="partner-logo-grid">
-                    {companies.map((company) => (
-                      <PartnerLogo key={company} name={company} />
-                    ))}
-                  </div>
-                ) : (
-                  <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)' }}>
-                    Recruiter data for {label} will appear here once it's added from the admin.
-                  </p>
-                )}
-              </div>
-            </SmoothCollapse>
-          </div>
-        );
-      })}
+    <div className="partner-logo-grid">
+      {companies.map((company) => (
+        <PartnerLogo key={company} name={company} />
+      ))}
     </div>
   );
 }
@@ -522,6 +446,220 @@ function HigherEducationAccordion() {
   );
 }
 
+// One roster row's accordion — expands to the TPO bio, the Industry Liaison
+// office details, or a plain Role/Notes view, whichever matches the name.
+// Shared by the flat roster list (Regional Offices, etc.) and the tile-
+// grouped Team view below.
+function TeamRosterRow({
+  row,
+  isOpen,
+  onToggle,
+  tpoPhotoMap,
+  iloPhotoMap,
+}: {
+  row: { name: string; role: string; notes?: string };
+  isOpen: boolean;
+  onToggle: () => void;
+  tpoPhotoMap: Map<string, string>;
+  iloPhotoMap?: Map<string, { url: string; path: string }[]>;
+}) {
+  return (
+    <div>
+      <button
+        onClick={onToggle}
+        style={{
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          background: isOpen ? 'var(--color-primary)' : 'var(--color-off-white)',
+          border: 'none',
+          padding: 'var(--space-3) var(--space-5)',
+          cursor: 'pointer',
+          textAlign: 'left',
+          gap: 'var(--space-4)',
+          transition: 'background var(--transition-base)',
+        }}
+      >
+        <span style={{ fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-primary)', fontSize: 'var(--text-base)', transition: 'color var(--transition-base)' }}>
+          {row.name} - {row.role}
+        </span>
+        <span style={{ fontSize: '1.2rem', fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-text)', lineHeight: 1, flexShrink: 0, transition: 'color var(--transition-base)' }}>
+          {isOpen ? '−' : '+'}
+        </span>
+      </button>
+
+      <SmoothCollapse open={isOpen}>
+        <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderTop: 'none' }}>
+          {tpoTeamBios[row.name] ? (
+            <div style={{ display: 'flex', gap: 'var(--space-5)', flexWrap: 'wrap' }}>
+              <img
+                src={tpoPhotoMap.get(row.name) || tpoTeamBios[row.name].photo || PHOTO_NEEDED_PLACEHOLDER}
+                alt={row.name}
+                style={{ width: 160, height: 190, objectFit: 'cover', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-light-gray)', flexShrink: 0 }}
+              />
+              <div style={{ flex: 1, minWidth: 260, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                {tpoTeamBios[row.name].paragraphs.map((para, pi) => (
+                  <p key={pi} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.7 }}>{para}</p>
+                ))}
+              </div>
+              {tpoTeamBios[row.name].accomplishments && tpoTeamBios[row.name].accomplishments!.length > 0 && (
+                <div style={{ width: '100%', marginTop: 'var(--space-2)' }}>
+                  {tpoTeamBios[row.name].accomplishmentsIntro && (
+                    <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', marginBottom: 'var(--space-3)' }}>
+                      {tpoTeamBios[row.name].accomplishmentsIntro}
+                    </p>
+                  )}
+                  <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                    {tpoTeamBios[row.name].accomplishments!.map((point, ai) => (
+                      <li key={ai} style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
+                        <Trophy size={16} strokeWidth={1.75} style={{ color: 'var(--color-accent)', flexShrink: 0, marginTop: 2 }} />
+                        <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.7 }}>{point}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {(tpoTeamBios[row.name].email || tpoTeamBios[row.name].phone) && (
+                <p style={{ width: '100%', fontSize: 'var(--text-sm)', color: 'var(--color-text)', marginTop: 'var(--space-2)' }}>
+                  {tpoTeamBios[row.name].email && (
+                    <>Email: <a href={`mailto:${tpoTeamBios[row.name].email}`} style={{ color: 'var(--color-primary)', fontWeight: 600 }}>{tpoTeamBios[row.name].email}</a></>
+                  )}
+                  {tpoTeamBios[row.name].email && tpoTeamBios[row.name].phone && ' & '}
+                  {tpoTeamBios[row.name].phone && (
+                    <>Mobile no: <a href={`tel:${tpoTeamBios[row.name].phone}`} style={{ color: 'var(--color-primary)', fontWeight: 600 }}>{tpoTeamBios[row.name].phone}</a></>
+                  )}
+                </p>
+              )}
+            </div>
+          ) : industryLiaisonOffices[row.name] ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
+              <div>
+                <p style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>
+                  <MapPin size={16} strokeWidth={2} /> Office Address:
+                </p>
+                {industryLiaisonOffices[row.name].address.map((line, li) => (
+                  <p key={li} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6 }}>{line}</p>
+                ))}
+              </div>
+              <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                {industryLiaisonOffices[row.name].bullets.map((point, bi) => (
+                  <li key={bi} style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
+                    <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--color-accent)', flexShrink: 0, marginTop: 8 }} />
+                    <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.7 }}>{point}</span>
+                  </li>
+                ))}
+              </ul>
+              {((iloPhotoMap?.get(row.name)) || []).length > 0 && (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 'var(--space-3)' }}>
+                  {((iloPhotoMap?.get(row.name)) || []).map((p, pi) => (
+                    <img
+                      key={p.path || pi}
+                      src={p.url}
+                      alt={`${row.name} office ${pi + 1}`}
+                      style={{ width: '100%', height: 160, objectFit: 'cover', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-light-gray)' }}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            <>
+              <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', marginBottom: row.notes ? 'var(--space-2)' : 0 }}>
+                <strong style={{ color: 'var(--color-primary)' }}>Role: </strong>{row.role}
+              </p>
+              {row.notes && (
+                <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6 }}>{row.notes}</p>
+              )}
+            </>
+          )}
+        </div>
+      </SmoothCollapse>
+    </div>
+  );
+}
+
+// TPO Team roster split into three tiles: Central Placement Team (first 4
+// rows), University Team / SVECW (next 3), Industry Liaison Officers (last
+// 4) — a fixed split per the roster order in tpoTeamBios/the admin table,
+// not derived from role text. Clicking a tile shows just that group's
+// roster rows as the same accordion used elsewhere on this page.
+const TPO_TEAM_GROUPS: { label: string; count: number }[] = [
+  { label: 'Central Placement Team', count: 4 },
+  { label: 'University Team (SVECW)', count: 3 },
+  { label: 'Industry Liaison Officers', count: 4 },
+];
+
+function TpoTeamTiles({
+  rows,
+  tpoPhotoMap,
+}: {
+  rows: { name: string; role: string; notes?: string }[];
+  tpoPhotoMap: Map<string, string>;
+}) {
+  const [activeGroup, setActiveGroup] = useState(0);
+  const [activeRow, setActiveRow] = useState<number | null>(null);
+
+  const groups: { label: string; rows: typeof rows }[] = [];
+  let offset = 0;
+  for (const g of TPO_TEAM_GROUPS) {
+    groups.push({ label: g.label, rows: rows.slice(offset, offset + g.count) });
+    offset += g.count;
+  }
+  // Any rows beyond the fixed 4/3/4 split (e.g. the admin adds someone new)
+  // land in the last tile rather than silently disappearing.
+  if (offset < rows.length && groups.length > 0) {
+    groups[groups.length - 1] = { ...groups[groups.length - 1], rows: groups[groups.length - 1].rows.concat(rows.slice(offset)) };
+  }
+
+  const activeRows = groups[activeGroup]?.rows ?? [];
+
+  return (
+    <div>
+      <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-5)', marginBottom: 'var(--space-8)' }}>
+        {groups.map((group, i) => {
+          const isActive = activeGroup === i;
+          return (
+            <button
+              key={group.label}
+              onClick={() => { setActiveGroup(i); setActiveRow(null); }}
+              style={{
+                padding: 'var(--space-6) var(--space-5)',
+                border: `1.5px solid ${isActive ? 'var(--color-primary)' : 'var(--color-light-gray)'}`,
+                borderRadius: 'var(--radius-md)',
+                background: isActive ? 'var(--color-primary)' : 'var(--color-off-white)',
+                color: isActive ? 'var(--color-white)' : 'var(--color-primary)',
+                cursor: 'pointer',
+                textAlign: 'center',
+                transition: 'all var(--transition-base)',
+              }}
+            >
+              <div style={{ fontFamily: 'var(--font-sans)', fontWeight: 800, fontSize: 'var(--text-base)', marginBottom: 'var(--space-2)' }}>
+                {group.label}
+              </div>
+              <div style={{ fontSize: 'var(--text-xs)', fontWeight: 600, color: isActive ? 'var(--color-white)' : 'var(--color-text-light)' }}>
+                {group.rows.length} {group.rows.length === 1 ? 'Member' : 'Members'}
+              </div>
+            </button>
+          );
+        })}
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        {activeRows.map((row, i) => (
+          <TeamRosterRow
+            key={row.name}
+            row={row}
+            isOpen={activeRow === i}
+            onToggle={() => setActiveRow(activeRow === i ? null : i)}
+            tpoPhotoMap={tpoPhotoMap}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function PlacementDetail() {
   const { slug } = useParams<{ slug: string }>();
   const { docs: allItems, loading } = useOrderedCollection<PlacementItemDoc>('placementItems', 'order');
@@ -545,6 +683,17 @@ export default function PlacementDetail() {
   // background color if neither is set yet.
   const { slides: heroSlides } = usePageBanners('placement-detail');
   const heroImage = item?.heroImage || heroSlides[0]?.imageUrl;
+  // The shared banner can carry a looping video instead of a still photo —
+  // only applies when the page is using that shared banner (an item's own
+  // heroImage override always wins and stays a still photo).
+  const heroVideo = !item?.heroImage ? heroSlides[0]?.videoUrl : undefined;
+  // Placement Cell's sidebar chart tracks whichever AY. pill is active in
+  // the "Placements, Year by Year" section further down the page (reported
+  // upward via PlacementYearAccordion's onActiveYearChange), so both stay
+  // in sync instead of showing two different batches at once.
+  const placementYearData = usePlacementYears();
+  const [sidebarChartBatch, setSidebarChartBatch] = useState('');
+  const sidebarChartYear = placementYearData.find((y) => y.batch === sidebarChartBatch);
 
   // No scroll-reveal here — this page's content only renders once the
   // Firestore-backed `item` has loaded (see the gotcha documented in CLAUDE.md).
@@ -566,15 +715,25 @@ export default function PlacementDetail() {
   const Icon = resolveContentIcon(item.icon) || BarChart3;
   const tableSections = parseStructuredTable(item.tableText);
   const tableRows = tableSections.flatMap((s) => s.rows);
-  const bodyText = BODY_OVERRIDES[item.slug] || item.intro || item.desc;
+  const hasBodyOverride = !item.intro && Boolean(BODY_OVERRIDES[item.slug]);
+  const bodyText = hasBodyOverride ? BODY_OVERRIDES[item.slug] : '';
   const bodyBlocks = parseBodyContent(bodyText);
-  const hasBodyOverride = Boolean(BODY_OVERRIDES[item.slug]);
 
   return (
     <main className="page-wrapper">
       {/* Hero */}
       <section className="page-hero" style={{ minHeight: 360 }}>
-        {heroImage && (
+        {heroVideo ? (
+          <video
+            src={heroVideo}
+            poster={heroImage || undefined}
+            className="page-hero-image"
+            autoPlay
+            muted
+            loop
+            playsInline
+          />
+        ) : heroImage && (
           <img
             src={heroImage}
             alt={item.title}
@@ -603,11 +762,11 @@ export default function PlacementDetail() {
       {/* Content */}
       <section className="section bg-white" style={{ paddingBottom: (item.outcomes && item.outcomes.length > 0) || item.slug === 'employability-skills' || item.slug === 'gsac' || item.slug === 'higher-education' ? 'var(--space-6)' : undefined }}>
         <div className="container">
-          <div className={item.highlights && item.highlights.length > 0 ? 'detail-grid' : ''}>
+          <div className={(item.highlights && item.highlights.length > 0) || item.slug === 'placement-details' ? 'detail-grid' : ''}>
             {/* Main */}
             <div>
               <span className="section-label">Overview</span>
-              <h2 className="section-title" style={{ fontSize: '1.75rem' }}>About {item.title}</h2>
+              <h2 className="section-title" style={{ fontSize: '1.75rem' }}>About {ABOUT_TITLE_OVERRIDES[item.slug] || item.title}</h2>
               {hasBodyOverride ? (
                 <div style={{ fontSize: 'var(--text-lg)', color: 'var(--color-text)', lineHeight: 1.75 }}>
                   {bodyBlocks.map((block, index) => {
@@ -647,8 +806,22 @@ export default function PlacementDetail() {
               )}
             </div>
 
-            {/* Sidebar: highlights */}
-            {item.highlights && item.highlights.length > 0 && (
+            {/* Sidebar: on Placement Cell, a branch-wise bar chart synced to
+                the AY. pill selected in the Placements, Year by Year section
+                below (replaces Key Highlights on this page specifically);
+                every other page keeps the plain Key Highlights list. */}
+            {item.slug === 'placement-details' ? (
+              sidebarChartYear?.branchOffers && sidebarChartYear.branchOffers.length > 0 && (
+                <div className="detail-sidebar">
+                  <div style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', position: 'sticky', top: '110px' }}>
+                    <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-5)' }}>
+                      Branch-wise Placement Distribution
+                    </h3>
+                    <BranchOffersBarChart data={sidebarChartYear.branchOffers} />
+                  </div>
+                </div>
+              )
+            ) : item.highlights && item.highlights.length > 0 && (
               <div className="detail-sidebar">
                 <div style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', position: 'sticky', top: '110px' }}>
                   <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-4)' }}>
@@ -778,7 +951,11 @@ export default function PlacementDetail() {
               <span className="section-label">Data</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Placements, Year by Year</h2>
             </div>
-            <PlacementYearAccordion years={['2022–2026', '2021–2025', '2020–2024', '2019–2023']} enrichedYears={['2022–2026', '2021–2025', '2020–2024', '2019–2023']} />
+            <PlacementYearAccordion
+              years={['2022–2026', '2021–2025', '2020–2024', '2019–2023']}
+              enrichedYears={['2022–2026', '2021–2025', '2020–2024', '2019–2023']}
+              onActiveYearChange={setSidebarChartBatch}
+            />
           </div>
         </section>
       )}
@@ -794,139 +971,36 @@ export default function PlacementDetail() {
                 {item.slug === 'tpo-team' ? 'Team' : item.slug === 'industry-liaison-offices' ? 'Regional Offices' : 'Batch-wise Statistics'}
               </h2>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              {tableRows.map((row, i) => {
-                const isOpen = activeTableRow === i;
-                return (
-                  <div key={i}>
-                    <button
-                      onClick={() => setActiveTableRow(isOpen ? null : i)}
-                      style={{
-                        width: '100%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        background: isOpen ? 'var(--color-primary)' : 'var(--color-off-white)',
-                        border: 'none',
-                        padding: 'var(--space-3) var(--space-5)',
-                        cursor: 'pointer',
-                        textAlign: 'left',
-                        gap: 'var(--space-4)',
-                        transition: 'background var(--transition-base)',
-                      }}
-                    >
-                      <span style={{ fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-primary)', fontSize: 'var(--text-base)', transition: 'color var(--transition-base)' }}>
-                        {row.name} - {row.role}
-                      </span>
-                      <span style={{ fontSize: '1.2rem', fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-text)', lineHeight: 1, flexShrink: 0, transition: 'color var(--transition-base)' }}>
-                        {isOpen ? '−' : '+'}
-                      </span>
-                    </button>
-
-                    <SmoothCollapse open={isOpen}>
-                      <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderTop: 'none' }}>
-                        {tpoTeamBios[row.name] ? (
-                          <div style={{ display: 'flex', gap: 'var(--space-5)', flexWrap: 'wrap' }}>
-                            <img
-                              src={tpoPhotoMap.get(row.name) || tpoTeamBios[row.name].photo || PHOTO_NEEDED_PLACEHOLDER}
-                              alt={row.name}
-                              style={{ width: 160, height: 190, objectFit: 'cover', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-light-gray)', flexShrink: 0 }}
-                            />
-                            <div style={{ flex: 1, minWidth: 260, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-                              {tpoTeamBios[row.name].paragraphs.map((para, pi) => (
-                                <p key={pi} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.7 }}>{para}</p>
-                              ))}
-                            </div>
-                            {tpoTeamBios[row.name].accomplishments && tpoTeamBios[row.name].accomplishments!.length > 0 && (
-                              <div style={{ width: '100%', marginTop: 'var(--space-2)' }}>
-                                {tpoTeamBios[row.name].accomplishmentsIntro && (
-                                  <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', marginBottom: 'var(--space-3)' }}>
-                                    {tpoTeamBios[row.name].accomplishmentsIntro}
-                                  </p>
-                                )}
-                                <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-                                  {tpoTeamBios[row.name].accomplishments!.map((point, ai) => (
-                                    <li key={ai} style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
-                                      <Trophy size={16} strokeWidth={1.75} style={{ color: 'var(--color-accent)', flexShrink: 0, marginTop: 2 }} />
-                                      <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.7 }}>{point}</span>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                            )}
-                            {(tpoTeamBios[row.name].email || tpoTeamBios[row.name].phone) && (
-                              <p style={{ width: '100%', fontSize: 'var(--text-sm)', color: 'var(--color-text)', marginTop: 'var(--space-2)' }}>
-                                {tpoTeamBios[row.name].email && (
-                                  <>Email: <a href={`mailto:${tpoTeamBios[row.name].email}`} style={{ color: 'var(--color-primary)', fontWeight: 600 }}>{tpoTeamBios[row.name].email}</a></>
-                                )}
-                                {tpoTeamBios[row.name].email && tpoTeamBios[row.name].phone && ' & '}
-                                {tpoTeamBios[row.name].phone && (
-                                  <>Mobile no: <a href={`tel:${tpoTeamBios[row.name].phone}`} style={{ color: 'var(--color-primary)', fontWeight: 600 }}>{tpoTeamBios[row.name].phone}</a></>
-                                )}
-                              </p>
-                            )}
-                          </div>
-                        ) : industryLiaisonOffices[row.name] ? (
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
-                            <div>
-                              <p style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>
-                                <MapPin size={16} strokeWidth={2} /> Office Address:
-                              </p>
-                              {industryLiaisonOffices[row.name].address.map((line, li) => (
-                                <p key={li} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6 }}>{line}</p>
-                              ))}
-                            </div>
-                            <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-                              {industryLiaisonOffices[row.name].bullets.map((point, bi) => (
-                                <li key={bi} style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
-                                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--color-accent)', flexShrink: 0, marginTop: 8 }} />
-                                  <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.7 }}>{point}</span>
-                                </li>
-                              ))}
-                            </ul>
-                            {(iloPhotoMap.get(row.name) || []).length > 0 && (
-                              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 'var(--space-3)' }}>
-                                {(iloPhotoMap.get(row.name) || []).map((p, pi) => (
-                                  <img
-                                    key={p.path || pi}
-                                    src={p.url}
-                                    alt={`${row.name} office ${pi + 1}`}
-                                    style={{ width: '100%', height: 160, objectFit: 'cover', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-light-gray)' }}
-                                  />
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        ) : (
-                          <>
-                            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', marginBottom: row.notes ? 'var(--space-2)' : 0 }}>
-                              <strong style={{ color: 'var(--color-primary)' }}>Role: </strong>{row.role}
-                            </p>
-                            {row.notes && (
-                              <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6 }}>{row.notes}</p>
-                            )}
-                          </>
-                        )}
-                      </div>
-                    </SmoothCollapse>
-                  </div>
-                );
-              })}
-            </div>
+            {item.slug === 'tpo-team' ? (
+              <TpoTeamTiles rows={tableRows} tpoPhotoMap={tpoPhotoMap} />
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                {tableRows.map((row, i) => (
+                  <TeamRosterRow
+                    key={i}
+                    row={row}
+                    isOpen={activeTableRow === i}
+                    onToggle={() => setActiveTableRow(activeTableRow === i ? null : i)}
+                    tpoPhotoMap={tpoPhotoMap}
+                    iloPhotoMap={iloPhotoMap}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </section>
       )}
 
-      {/* Our Recruiters gets its own year-by-year breakdown instead of one
-          flat grid, reusing the same batch data as Placements, Year by Year. */}
+      {/* Our Recruiters gets one flat, deduplicated logo grid across every
+          drive year, reusing the same batch data as Placements, Year by Year. */}
       {item.slug === 'our-recruiters' && (
         <section className="section bg-white">
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
               <span className="section-label">Network</span>
-              <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Recruiters, Year by Year</h2>
+              <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Our Recruiters</h2>
             </div>
-            <RecruitersByYear />
+            <AllRecruiters />
           </div>
         </section>
       )}

@@ -5,7 +5,8 @@ import {
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
 import ImageUploader from '../../../components/ImageUploader/ImageUploader';
-import type { UploadResult } from '../../../lib/storage';
+import VideoUploader from '../../../components/VideoUploader/VideoUploader';
+import { deleteFile, type UploadResult } from '../../../lib/storage';
 import { campusFacilities } from '../../Campus/campusFacilities.data';
 import { DIFFERENTIATOR_CATEGORIES } from './DifferentiatorsAdmin';
 import ItemHeroImagesAdmin from './ItemHeroImagesAdmin';
@@ -46,6 +47,8 @@ interface Banner {
   subtitle: string;
   imageUrl: string;
   storagePath: string;
+  videoUrl: string;
+  videoStoragePath: string;
   ctaLabel: string;
   ctaLink: string;
   order: number;
@@ -53,7 +56,7 @@ interface Banner {
 
 const EMPTY: Omit<Banner, 'id'> = {
   page: 'home', title: '', subtitle: '', imageUrl: '', storagePath: '',
-  ctaLabel: '', ctaLink: '', order: 0,
+  videoUrl: '', videoStoragePath: '', ctaLabel: '', ctaLink: '', order: 0,
 };
 
 export const PAGES = [
@@ -221,6 +224,15 @@ function PageBannersAdmin() {
     setForm((p) => ({ ...p, imageUrl: r.url, storagePath: r.path }));
   };
 
+  const handleVideoUploaded = (r: UploadResult) => {
+    setForm((p) => ({ ...p, videoUrl: r.url, videoStoragePath: r.path }));
+  };
+
+  const handleVideoRemoved = async () => {
+    if (form.videoStoragePath) await deleteFile(form.videoStoragePath).catch(() => {});
+    setForm((p) => ({ ...p, videoUrl: '', videoStoragePath: '' }));
+  };
+
   const save = async () => {
     if (!form.title || !form.imageUrl) return alert('Title and image are required.');
     setSaving(true);
@@ -244,7 +256,8 @@ function PageBannersAdmin() {
     setForm({
       page: b.page ?? 'home',
       title: b.title, subtitle: b.subtitle, imageUrl: b.imageUrl,
-      storagePath: b.storagePath, ctaLabel: b.ctaLabel, ctaLink: b.ctaLink, order: b.order,
+      storagePath: b.storagePath, videoUrl: b.videoUrl || '', videoStoragePath: b.videoStoragePath || '',
+      ctaLabel: b.ctaLabel, ctaLink: b.ctaLink, order: b.order,
     });
     setSelectedGroup(groupOfPage(b.page ?? 'home') ?? null);
     // The banner list (below the form) covers every page's banners, so the
@@ -350,6 +363,19 @@ function PageBannersAdmin() {
                 label="Upload Hero Image (recommended: 1920×600px)"
               />
             </div>
+            {PLACEMENTS_BANNER_PAGES.has(form.page) && (
+              <div className="admin-field admin-field--full">
+                <label>Hero Video (optional — plays instead of the image above, looping)</label>
+                <VideoUploader
+                  folder={`vwu/banners/${form.page}/video`}
+                  currentUrl={form.videoUrl}
+                  currentPath={form.videoStoragePath}
+                  onUploaded={handleVideoUploaded}
+                  onRemoved={handleVideoRemoved}
+                  label="Upload Hero Video (MP4, under 40MB)"
+                />
+              </div>
+            )}
             <div className="admin-field">
               <label htmlFor="field-heading">Heading *</label>
               <input id="field-heading" value={form.title} onChange={(e) => set('title', e.target.value)}

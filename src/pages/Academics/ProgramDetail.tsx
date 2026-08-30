@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Link, useParams, useLocation, Navigate } from 'react-router-dom';
 import { where } from 'firebase/firestore';
-import { Check, Microscope, Compass, Target, Sparkles, Mail, ExternalLink } from 'lucide-react';
+import { Check, Microscope, Compass, Target, Sparkles, Mail, ExternalLink, BookOpen } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import ProgrammeStructure from '../../components/ProgrammeStructure/ProgrammeStructure';
 import DepartmentNewsSection, { type DepartmentNewsDoc } from '../../components/DepartmentNews/DepartmentNewsSection';
@@ -91,6 +91,18 @@ function SingleProgramDetail() {
   const hasMindMap = !!program.mindMapImage;
   const hasLabs = !!(program.labs && program.labs.length > 0);
   const hasCareerOutcomes = !!(program.outcomes && program.outcomes.length > 0);
+  const hasCurriculum = !!(program.semesters && program.semesters.length > 0);
+  // Every section is entirely admin-defined — heading and items alike — so
+  // different programmes can show completely different Digital Library
+  // content. A section with no items yet just doesn't render a table for it.
+  const libraryTables = (program.librarySections || []).filter((sec) => sec.items && sec.items.length > 0);
+  const hasLibrary = !!(program.libraryIntro || program.libraryInCharge || libraryTables.length > 0);
+  // A year counts once it has a label and at least one issue slot (even an
+  // issue with no PDF yet still renders, just as "Unavailable" — this lets
+  // an admin scaffold a year's issues ahead of uploading each PDF).
+  const newsletterYears = (program.newsletterYears || []).filter((y) => y.year && y.issues && y.issues.length > 0);
+  const hasNewsletter = newsletterYears.length > 0;
+  const newsletterMaxIssues = Math.max(0, ...newsletterYears.map((y) => y.issues.length));
 
   const quickLinks = [
     { id: 'about', label: 'About the Department' },
@@ -99,9 +111,11 @@ function SingleProgramDetail() {
     hasHod && { id: 'hod', label: 'About HOD' },
     faculty.length > 0 && { id: 'faculty', label: 'Faculty' },
     hasMindMap && { id: 'mindmap', label: 'Mind Map' },
-    { id: 'curriculum', label: 'Curriculum' },
+    hasCurriculum && { id: 'curriculum', label: 'Curriculum' },
     hasLabs && { id: 'labs', label: 'Laboratories' },
+    hasLibrary && { id: 'library', label: 'Digital Library' },
     hasDeptNews && { id: 'news', label: 'News & Events' },
+    hasNewsletter && { id: 'newsletter', label: 'Newsletter' },
   ].filter(Boolean) as { id: string; label: string }[];
 
   const hasSidebarContent = quickLinks.length > 1 || hasCareerOutcomes;
@@ -479,20 +493,20 @@ function SingleProgramDetail() {
         </section>
       )}
 
-      {/* Curriculum — always rendered; ProgrammeStructure shows its own
-          empty state when a programme has no semesters yet, so admins can
-          see the section is there and waiting for content rather than it
-          silently disappearing. */}
-      <section id="curriculum" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
-        <div className="container">
-          <div style={{ marginBottom: 'var(--space-10)' }}>
-            <span className="section-label">Curriculum</span>
-            <h2 className="section-title">Programme Structure</h2>
-            <p className="section-desc">A well-structured curriculum blending core foundations with advanced specialisations and practical projects.</p>
+      {/* Curriculum — hidden entirely until a programme actually has
+          semesters added via Programs admin, same as Labs/Mind Map/etc. */}
+      {hasCurriculum && (
+        <section id="curriculum" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
+          <div className="container">
+            <div style={{ marginBottom: 'var(--space-10)' }}>
+              <span className="section-label">Curriculum</span>
+              <h2 className="section-title">Programme Structure</h2>
+              <p className="section-desc">A well-structured curriculum blending core foundations with advanced specialisations and practical projects.</p>
+            </div>
+            <ProgrammeStructure semesters={program.semesters} />
           </div>
-          <ProgrammeStructure semesters={program.semesters} />
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Laboratories */}
       {hasLabs && (
@@ -515,8 +529,113 @@ function SingleProgramDetail() {
         </section>
       )}
 
-      {/* News & Events — live from the departmentNews collection, tagged to this program */}
-      <DepartmentNewsSection programSlug={program.slug} background="var(--color-white)" />
+      {/* Digital Library */}
+      {hasLibrary && (
+        <section id="library" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
+          <div className="container">
+            <div style={{ marginBottom: 'var(--space-8)' }}>
+              <span className="section-label">Resources</span>
+              <h2 className="section-title">Digital Library</h2>
+            </div>
+            {program.libraryIntro && (
+              <p style={{ color: 'var(--color-text)', lineHeight: 1.85, fontSize: 'var(--text-base)', marginBottom: 'var(--space-4)' }}>
+                {program.libraryIntro}
+              </p>
+            )}
+            {program.libraryInCharge && (
+              <p style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', color: 'var(--color-text)', fontSize: 'var(--text-sm)', marginBottom: libraryTables.length > 0 ? 'var(--space-6)' : 0 }}>
+                <BookOpen size={16} strokeWidth={1.75} style={{ color: 'var(--color-accent)', flexShrink: 0 }} />
+                <strong style={{ color: 'var(--color-primary)' }}>In-charge of Department Library:</strong> {program.libraryInCharge}
+              </p>
+            )}
+            {libraryTables.map((sec, si) => (
+              <div key={si} style={{ marginBottom: si === libraryTables.length - 1 ? 0 : 'var(--space-8)' }}>
+                <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.1rem', color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>
+                  {sec.heading}
+                </h3>
+                <div className="pb-activities-scroll">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th className="pb-activities-num">S. No</th>
+                        <th>Item</th>
+                        <th>Count</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {sec.items.map((item, ii) => (
+                        <tr key={ii}>
+                          <td className="pb-activities-num">{ii + 1}</td>
+                          <td>{item.label}</td>
+                          <td>{item.value}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* News & Events — live from the departmentNews collection, tagged to
+          this program. (The AI/CSE/ECE grouped department page uses the
+          teammate's per-academic-year newsEventsYears table instead — see
+          DepartmentDetail.tsx — so the two systems don't both show up on the
+          same page: this one is for standalone programs.) */}
+      <DepartmentNewsSection programSlug={program.slug} background="var(--color-off-white)" />
+
+      {/* Newsletter — issues grouped by academic year; columns are however
+          many issues the "longest" year has, admin-uploaded PDFs open in a
+          new tab, and an issue slot with no PDF yet shows as unavailable
+          rather than a broken/empty-looking link. */}
+      {hasNewsletter && (
+        <section id="newsletter" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
+          <div className="container">
+            <div style={{ marginBottom: 'var(--space-8)' }}>
+              <span className="section-label">Publications</span>
+              <h2 className="section-title">Newsletter</h2>
+            </div>
+            <div className="pb-activities-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Academic Year</th>
+                    {Array.from({ length: newsletterMaxIssues }).map((_, ci) => (
+                      <th key={ci}>Issue – {ci + 1}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {newsletterYears.map((yr, yi) => (
+                    <tr key={yi}>
+                      <td>{yr.year}</td>
+                      {Array.from({ length: newsletterMaxIssues }).map((_, ci) => {
+                        const issue = yr.issues[ci];
+                        if (!issue) return <td key={ci} />;
+                        return (
+                          <td key={ci}>
+                            {issue.pdfUrl ? (
+                              <a href={issue.pdfUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-primary)', fontWeight: 600 }}>
+                                Issue – {ci + 1}
+                              </a>
+                            ) : (
+                              <span style={{ color: 'var(--color-text-light)', fontStyle: 'italic' }}>
+                                Issue – {ci + 1} (Unavailable)
+                              </span>
+                            )}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* CTA */}
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-14) 0' }}>

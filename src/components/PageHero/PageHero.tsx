@@ -49,7 +49,7 @@ export default function PageHero({
   // hero just shows its solid background until a banner exists.
   // Text: only render once Firestore has responded — prevents flashing the
   //       hardcoded title before the uploaded title appears.
-  const defaultSlide = { imageUrl: defaultImage ?? '', title: defaultTitle, subtitle: defaultSubtitle ?? '', ctaLabel: '', ctaLink: '' };
+  const defaultSlide = { imageUrl: defaultImage ?? '', videoUrl: '', title: defaultTitle, subtitle: defaultSubtitle ?? '', ctaLabel: '', ctaLink: '' };
   const allSlides: Omit<BannerSlide, 'id' | 'order'>[] =
     slides.length > 0 ? slides : [defaultSlide];
   const showText = !loading;

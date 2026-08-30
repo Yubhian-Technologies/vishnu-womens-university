@@ -170,15 +170,15 @@ const navItems: NavItem[] = [
     label: 'Placements',
     children: [
       { label: 'Placement Details', path: '/placements/placement-details' },
+      { label: 'Internships', path: '/placements/internships' },
       { label: 'Success Stories', path: '/placements/success-stories' },
       { label: 'TPO Cell', path: '/placements/tpo-cell' },
       { label: 'TPO Team', path: '/placements/tpo-team' },
-      { label: 'Industry Liaison Offices', path: '/placements/industry-liaison-offices' },
-      { label: 'Career Guidance Cell', path: '/placements/career-guidance-cell' },
-      { label: 'Campus Recruitment Training', path: '/placements/campus-recruitment-training' },
       { label: 'Our Recruiters', path: '/placements/our-recruiters' },
+      { label: 'Career Guidance Cell', path: '/placements/career-guidance-cell' },
+      { label: 'Industry Liaison Offices', path: '/placements/industry-liaison-offices' },
+      { label: 'Campus Recruitment Training', path: '/placements/campus-recruitment-training' },
       { label: 'Employability Skills', path: '/placements/employability-skills' },
-      { label: 'Mission R&D', path: '/placements/mission-rd' },
       { label: 'Graduate Study Abroad Center – GSAC', path: '/placements/gsac' },
       { label: 'Higher Education', path: '/placements/higher-education' },
     ],
@@ -338,7 +338,11 @@ export default function Header() {
           ...group,
           items: differentiatorItems
             .filter((i) => i.category === cat.id)
-            .map((i): NavChild => ({ label: i.title, path: `/differentiators/${i.slug}` })),
+            .map((i): NavChild =>
+              i.external && i.url
+                ? { label: i.title, path: i.url, external: true }
+                : { label: i.title, path: `/differentiators/${i.slug}` }
+            ),
         };
       });
       return { ...item, groups };
