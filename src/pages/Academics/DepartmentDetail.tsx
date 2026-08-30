@@ -1,11 +1,10 @@
 import { useEffect } from 'react';
 import { Link, useNavigate, useLocation, Navigate } from 'react-router-dom';
-import { where } from 'firebase/firestore';
 import { Check, Microscope, Compass, Target, Sparkles, Mail, BookOpen, FileText } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import ProgrammeStructure from '../../components/ProgrammeStructure/ProgrammeStructure';
 import SEO from '../../components/SEO/SEO';
-import { useCollection, useOrderedCollection } from '../../hooks/useCollection';
+import { useOrderedCollection } from '../../hooks/useCollection';
 import { useEapcetCode } from '../../hooks/useContentBlocks';
 import { smoothScrollTo } from '../../lib/smoothScroll';
 import { getProgramSchema, getBreadcrumbSchema } from '../../lib/seo/schemas';
@@ -35,11 +34,10 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { docs: deptDocs } = useCollection<DepartmentDoc>(
-    'departments',
-    [where('shortCode', '==', group.deptShortCode)]
+  const { docs: allDepartments, loading: deptLoading } = useOrderedCollection<DepartmentDoc>('departments', 'order');
+  const dept = allDepartments.find(
+    (d) => d.shortCode?.trim().toUpperCase() === group.deptShortCode.trim().toUpperCase()
   );
-  const dept = deptDocs[0];
 
   const { docs: allPrograms, loading: progLoading } = useOrderedCollection<ProgramDoc>('programs', 'order');
   const subPrograms = group.programSlugs
@@ -78,7 +76,11 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     );
   }
   if (!progLoading && !activeProgram) return <Navigate to="/academics" replace />;
-  if (!activeProgram) {
+  // Also wait on the department lookup: rendering before it resolves would
+  // show the short code (activeProgram.department / group.deptShortCode)
+  // as the page title/H1 and then flash to the full department title once
+  // `allDepartments` loads (e.g. "AI" -> "Artificial Intelligence").
+  if (!activeProgram || deptLoading) {
     return (
       <main className="route-fallback">
         <div className="route-fallback__spinner" />

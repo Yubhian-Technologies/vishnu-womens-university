@@ -654,6 +654,23 @@
   cursor: pointer;
 }
 
+.admin-order-input {
+  width: 56px;
+  padding: 0.35rem 0.5rem;
+  border: 1.5px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-family: inherit;
+  color: #374151;
+  text-align: center;
+}
+
+.admin-order-input:focus {
+  outline: none;
+  border-color: #c8a03c;
+  box-shadow: 0 0 0 3px rgba(200,160,60,0.15);
+}
+
 /* ---- Mobile bottom nav ---- */
 .admin-bottom-nav { display: none; }
 

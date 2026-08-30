@@ -1,13 +1,12 @@
 import { useEffect } from 'react';
 import { Link, useParams, useLocation, Navigate } from 'react-router-dom';
-import { where } from 'firebase/firestore';
 import { Check, Microscope, Compass, Target, Sparkles, Mail, ExternalLink, BookOpen, FileText } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import ProgrammeStructure from '../../components/ProgrammeStructure/ProgrammeStructure';
 import DepartmentNewsSection, { type DepartmentNewsDoc } from '../../components/DepartmentNews/DepartmentNewsSection';
 import DepartmentDetail from './DepartmentDetail';
 import { groupForProgramSlug } from '../../lib/departmentGroups';
-import { useCollection, useOrderedCollection } from '../../hooks/useCollection';
+import { useOrderedCollection } from '../../hooks/useCollection';
 import { usePageBanner } from '../../hooks/usePageBanner';
 import { useEapcetCode } from '../../hooks/useContentBlocks';
 import { smoothScrollTo } from '../../lib/smoothScroll';
@@ -40,8 +39,8 @@ export default function ProgramDetail() {
 function SingleProgramDetail() {
   const { slug } = useParams<{ slug: string }>();
   const location = useLocation();
-  const { docs, loading } = useCollection<ProgramDoc>('programs', [where('slug', '==', slug || '')]);
-  const program = docs[0];
+  const { docs: allPrograms, loading } = useOrderedCollection<ProgramDoc>('programs', 'order');
+  const program = allPrograms.find((p) => p.slug === slug);
 
   const { docs: allFaculty } = useOrderedCollection<FacultyDoc>('faculty', 'order');
   const faculty = program?.department ? allFaculty.filter((f) => f.department === program.department) : [];
@@ -51,7 +50,7 @@ function SingleProgramDetail() {
   // department name from the Academic Departments admin, so the "About the
   // Department" heading below reads the same way it does on the AI/CSE/ECE
   // grouped department page — falling back to the raw code if no match.
-  const { docs: allDepartments } = useOrderedCollection<DepartmentDoc>('departments', 'order');
+  const { docs: allDepartments, loading: deptLoading } = useOrderedCollection<DepartmentDoc>('departments', 'order');
   const deptTitle = allDepartments.find(
     (d) => d.shortCode?.trim().toUpperCase() === (program?.department || '').trim().toUpperCase()
   )?.title || program?.department;
@@ -76,7 +75,10 @@ function SingleProgramDetail() {
     if (el) smoothScrollTo(el);
   }, [program, location.hash]);
 
-  if (loading) {
+  // Also wait on the department lookup: rendering before it resolves would
+  // show the raw department code and then flash to the full title once
+  // `allDepartments` loads (e.g. "IT" -> "Information Technology").
+  if (loading || deptLoading) {
     return (
       <main className="route-fallback">
         <div className="route-fallback__spinner" />

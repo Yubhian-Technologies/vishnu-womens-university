@@ -22,7 +22,6 @@ export interface AtlProject {
 
 export interface AtlYearTraining {
   yearLabel: string;
-  pdfHref?: string;
   bridgeCourse: AtlSimpleTable;
   projects: AtlProject[];
 }
@@ -177,7 +176,6 @@ export const assistiveTechLab = {
   trainingByYear: [
     {
       yearLabel: 'ATL Activities 2025-26',
-      pdfHref: '/downloads/atl-activities-2025-26.pdf',
       bridgeCourse: {
         headers: ['S. No.', 'Course', 'Facilitator', 'Department', 'Date', 'Venue'],
         rows: [
@@ -209,7 +207,6 @@ export const assistiveTechLab = {
     },
     {
       yearLabel: 'ATL Activities 2024-25',
-      pdfHref: '/downloads/atl-activities-2024-25.pdf',
       bridgeCourse: {
         headers: ['S. No.', 'Course', 'Facilitator', 'Department', 'Date', 'Venue'],
         rows: [
