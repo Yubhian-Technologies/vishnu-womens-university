@@ -1,11 +1,11 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { orderBy } from 'firebase/firestore';
 import { Trophy, BarChart3, PlayCircle, MapPin } from 'lucide-react';
 import { useCollection, useOrderedCollection, type WithId } from '../../hooks/useCollection';
 import { usePageBanners } from '../../hooks/usePageBanners';
 import { resolveContentIcon } from '../../lib/contentIcons';
-import { parseStructuredTable } from '../../lib/structuredTable';
+import { parseStructuredTable, parseFlexibleTable } from '../../lib/structuredTable';
 import type { PlacementItemDoc } from '../Admin/sections/PlacementItemsAdmin';
 import type { TpoTeamBioDoc } from '../Admin/sections/TpoTeamInfoAdmin';
 import PlacementYearAccordion, { BranchOffersBarChart } from './PlacementYearAccordion';
@@ -15,32 +15,9 @@ import { industryLiaisonOffices } from './industryLiaisonOffices.data';
 import { employabilitySkillTabs } from './employabilitySkills.data';
 import { higherEducationSections } from './higherEducation.data';
 import { usePlacementYears } from './usePlacementYears';
+import PlacementAnnouncementsTicker from './PlacementAnnouncementsTicker';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import '../detail-layout.css';
-
-// Our Recruiters shows the same companies already captured in "Placements,
-// Year by Year" (placementStats.data.ts / the placementYears collection),
-// just re-labeled from a batch's 4-year cohort span to the single
-// recruitment-drive year it corresponds to (a batch ending in year Y
-// recruits during the "(Y-1)-Y" drive) — e.g. batch '2018–2022' drove
-// recruitment in '2021 - 22'. No separate data source, just a relabeling.
-const RECRUITER_DRIVE_YEARS: { label: string; batch: string }[] = [
-  { label: '2021 - 22', batch: '2018–2022' },
-  { label: '2020 - 21', batch: '2017–2021' },
-  { label: '2019 - 20', batch: '2016–2020' },
-  { label: '2018 - 19', batch: '2015–2019' },
-  { label: '2017 - 18', batch: '2014–2018' },
-  { label: '2016 - 17', batch: '2013–2017' },
-  { label: '2015 - 16', batch: '2012–2016' },
-  { label: '2014 - 15', batch: '2011–2015' },
-  { label: '2013 - 14', batch: '2010–2014' },
-  { label: '2012 - 13', batch: '2009–2013' },
-  { label: '2011 - 12', batch: '2008–2012' },
-  { label: '2010 - 11', batch: '2007–2011' },
-  { label: '2009 - 10', batch: '2006–2010' },
-  { label: '2008 - 09', batch: '2005–2009' },
-  { label: '2007 - 08', batch: '2004–2008' },
-];
 
 type BodyBlock =
   | { type: 'paragraph'; text: string }
@@ -128,17 +105,16 @@ USA, Canada, UK, China, Germany, Australia, Spain
 Mrs. P. Prasanthi, Asst. Professor — Email: [jprasanthi@svecw.edu.in](mailto:jprasanthi@svecw.edu.in) — Phone: [9440111470](tel:9440111470)`,
 };
 
+// Every plain line is its own paragraph — no blank-line-between-paragraphs
+// rule to get right (that convention proved too easy to get wrong in
+// practice: admins kept typing one point per line with no blank line,
+// expecting each to render separately, and instead got everything joined
+// into one block). A "- " prefix still groups consecutive lines into a
+// bullet list; blank lines are optional visual spacing only, no longer
+// required to separate paragraphs.
 function parseBodyContent(text: string): BodyBlock[] {
   const blocks: BodyBlock[] = [];
-  let paragraphLines: string[] = [];
   let listItems: string[] = [];
-
-  const flushParagraph = () => {
-    if (paragraphLines.length > 0) {
-      blocks.push({ type: 'paragraph', text: paragraphLines.join(' ') });
-      paragraphLines = [];
-    }
-  };
 
   const flushList = () => {
     if (listItems.length > 0) {
@@ -150,20 +126,17 @@ function parseBodyContent(text: string): BodyBlock[] {
   for (const rawLine of (text || '').split('\n')) {
     const line = rawLine.trim();
     if (!line) {
-      flushParagraph();
       flushList();
       continue;
     }
     if (line.startsWith('- ')) {
-      flushParagraph();
       listItems.push(line.slice(2).trim());
       continue;
     }
     flushList();
-    paragraphLines.push(line);
+    blocks.push({ type: 'paragraph', text: line });
   }
 
-  flushParagraph();
   flushList();
   return blocks;
 }
@@ -197,6 +170,35 @@ function renderInlineText(text: string) {
   });
 }
 
+// Renders parseBodyContent's blocks — shared by the hardcoded BODY_OVERRIDES
+// text and the admin-editable Intro/About fields, so both support the same
+// blank-line-separated paragraphs / "- " bullet lists / **bold** / [link](url)
+// syntax instead of Intro/About being dumped into one unbroken <p>.
+function BodyBlocks({ blocks, paragraphStyle }: { blocks: BodyBlock[]; paragraphStyle: CSSProperties }) {
+  return (
+    <>
+      {blocks.map((block, index) => {
+        if (block.type === 'list') {
+          return (
+            <ul key={index} style={{ paddingLeft: '1.25rem', margin: '0 0 1rem' }}>
+              {block.items.map((entry, itemIndex) => (
+                <li key={itemIndex} style={{ ...paragraphStyle, marginBottom: '0.7rem' }}>
+                  {renderInlineText(entry)}
+                </li>
+              ))}
+            </ul>
+          );
+        }
+        return (
+          <p key={index} style={{ ...paragraphStyle, margin: '0 0 1rem' }}>
+            {renderInlineText(block.text)}
+          </p>
+        );
+      })}
+    </>
+  );
+}
+
 const PARTNER_DOMAINS: Record<string, string> = {
   'Amazon': 'amazon.com', 'Adobe': 'adobe.com', 'Microsoft': 'microsoft.com',
   'Google': 'google.com', 'Flipkart': 'flipkart.com', 'PayPal': 'paypal.com',
@@ -222,15 +224,18 @@ const PARTNER_LOGO_OVERRIDES: Record<string, string> = {
   'IBM': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/IBM_logo.svg/250px-IBM_logo.svg.png',
 };
 
-function PartnerLogo({ name }: { name: string }) {
+// Logo only — no company name label beside it (per request). The name still
+// lives in alt text/title for accessibility and hover, just not rendered as
+// visible text.
+function PartnerLogo({ name, uploadedUrl }: { name: string; uploadedUrl?: string }) {
   const domain = PARTNER_DOMAINS[name];
-  const logoOverride = PARTNER_LOGO_OVERRIDES[name];
+  const logoOverride = uploadedUrl || PARTNER_LOGO_OVERRIDES[name];
   const [failed, setFailed] = useState(!domain && !logoOverride);
 
   return (
-    <div className="partner-logo-card">
+    <div className="partner-logo-card" title={name}>
       {failed ? (
-        <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', height: 28, width: 28, flexShrink: 0, fontSize: 'var(--text-xs)', fontWeight: 700, background: 'var(--color-off-white)', color: 'var(--color-primary)', borderRadius: 'var(--radius-sm)' }}>
+        <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', height: 44, width: 44, flexShrink: 0, fontSize: 'var(--text-lg)', fontWeight: 700, background: 'var(--color-off-white)', color: 'var(--color-primary)', borderRadius: 'var(--radius-sm)' }}>
           {name.charAt(0)}
         </span>
       ) : (
@@ -241,27 +246,21 @@ function PartnerLogo({ name }: { name: string }) {
           onError={() => setFailed(true)}
         />
       )}
-      <span className="partner-logo-name">{name}</span>
     </div>
   );
 }
 
-// Flat, deduplicated recruiter grid for the Our Recruiters page — every
-// company across every drive year (RECRUITER_DRIVE_YEARS), collapsed into
-// one logo grid instead of a year-by-year accordion.
-function AllRecruiters() {
-  const placementYearData = usePlacementYears();
-  const companies = [...new Set(
-    RECRUITER_DRIVE_YEARS.flatMap(({ batch }) => {
-      const year = placementYearData.find((y) => y.batch === batch);
-      return year ? year.rows.map((r) => r.company) : [];
-    })
-  )];
+// Logo grid for the Our Recruiters page.
+function AllRecruiters({ logoMap }: { logoMap: Map<string, string> }) {
+  // Driven entirely by Admin → Recruiter Logos now, not the batch/company-row
+  // data — whatever's been uploaded there (via the ZIP/RAR bulk import or
+  // one at a time) is exactly what shows here, nothing more.
+  const companies = [...logoMap.keys()].sort((a, b) => a.localeCompare(b));
 
   if (companies.length === 0) {
     return (
       <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)' }}>
-        Recruiter data will appear here once it's added from the admin.
+        Recruiter logos will appear here once they're uploaded from Admin → Recruiter Logos.
       </p>
     );
   }
@@ -269,7 +268,7 @@ function AllRecruiters() {
   return (
     <div className="partner-logo-grid">
       {companies.map((company) => (
-        <PartnerLogo key={company} name={company} />
+        <PartnerLogo key={company} name={company} uploadedUrl={logoMap.get(company)} />
       ))}
     </div>
   );
@@ -649,6 +648,71 @@ function parseTeamGroups(text: string): { label: string; count: number }[] {
     .filter((g) => g.label && g.count > 0);
 }
 
+// Slices rows across group labels by count, in order — the same mechanism
+// rosterGroupsText uses for Data Table, reused here for Department
+// Coordinator Groups against Department Coordinators' rows. Unlike the main
+// roster split, leftover rows past the defined counts are simply dropped
+// rather than dumped into the last group — Department Coordinators is an
+// additive extra, not the primary roster, so silently mis-sized counts
+// shouldn't inflate whichever group happens to be last.
+function sliceRowsByGroupLabel<T>(rows: T[], groupDefs: { label: string; count: number }[]): Map<string, T[]> {
+  const map = new Map<string, T[]>();
+  let offset = 0;
+  for (const g of groupDefs) {
+    map.set(g.label, rows.slice(offset, offset + g.count));
+    offset += g.count;
+  }
+  return map;
+}
+
+// One collapsible row, styled like TeamRosterRow, showing a plain
+// "Name — Department" list on expand — for the Department Coordinators
+// attached to one Team Group tile.
+function DeptCoordinatorsRow({ coordinators, isOpen, onToggle }: {
+  coordinators: { name: string; department: string }[];
+  isOpen: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <div>
+      <button
+        onClick={onToggle}
+        style={{
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          background: isOpen ? 'var(--color-primary)' : 'var(--color-off-white)',
+          border: 'none',
+          padding: 'var(--space-3) var(--space-5)',
+          cursor: 'pointer',
+          textAlign: 'left',
+          gap: 'var(--space-4)',
+          transition: 'background var(--transition-base)',
+        }}
+      >
+        <span style={{ fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-primary)', fontSize: 'var(--text-base)', transition: 'color var(--transition-base)' }}>
+          Department Coordinators
+        </span>
+        <span style={{ fontSize: '1.2rem', fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-text)', lineHeight: 1, flexShrink: 0, transition: 'color var(--transition-base)' }}>
+          {isOpen ? '−' : '+'}
+        </span>
+      </button>
+      <SmoothCollapse open={isOpen}>
+        <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderTop: 'none' }}>
+          <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+            {coordinators.map((c, i) => (
+              <li key={i} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)' }}>
+                <strong style={{ color: 'var(--color-primary)' }}>{c.name}</strong> — {c.department}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </SmoothCollapse>
+    </div>
+  );
+}
+
 // Roster split into tiles per the admin's Team Groups field (e.g. "Central
 // Placement Team | 4") — a fixed count split in roster order, not derived
 // from role text. Clicking a tile shows just that group's roster rows as
@@ -660,6 +724,7 @@ function TpoTeamTiles({
   tpoBiosMap,
   pageEmails,
   pageLinkedins,
+  deptCoordinatorsByGroup,
 }: {
   rows: { name: string; role: string; notes?: string }[];
   groups: { label: string; count: number }[];
@@ -667,9 +732,11 @@ function TpoTeamTiles({
   tpoBiosMap: Map<string, TpoTeamBioDoc>;
   pageEmails?: string[];
   pageLinkedins?: string[];
+  deptCoordinatorsByGroup?: Map<string, { name: string; department: string }[]>;
 }) {
   const [activeGroup, setActiveGroup] = useState(0);
   const [activeRow, setActiveRow] = useState<number | null>(null);
+  const [deptRowOpen, setDeptRowOpen] = useState(false);
 
   const groups: { label: string; rows: typeof rows }[] = [];
   let offset = 0;
@@ -685,6 +752,7 @@ function TpoTeamTiles({
   }
 
   const activeRows = groups[activeGroup]?.rows ?? [];
+  const activeDeptCoordinators = deptCoordinatorsByGroup?.get(groups[activeGroup]?.label ?? '') ?? [];
 
   return (
     <div>
@@ -694,7 +762,7 @@ function TpoTeamTiles({
           return (
             <button
               key={group.label}
-              onClick={() => { setActiveGroup(i); setActiveRow(null); }}
+              onClick={() => { setActiveGroup(i); setActiveRow(null); setDeptRowOpen(false); }}
               style={{
                 padding: 'var(--space-6) var(--space-5)',
                 border: `1.5px solid ${isActive ? 'var(--color-primary)' : 'var(--color-light-gray)'}`,
@@ -725,6 +793,13 @@ function TpoTeamTiles({
             tpoBiosMap={tpoBiosMap}
           />
         ))}
+        {activeDeptCoordinators.length > 0 && (
+          <DeptCoordinatorsRow
+            coordinators={activeDeptCoordinators}
+            isOpen={deptRowOpen}
+            onToggle={() => setDeptRowOpen((o) => !o)}
+          />
+        )}
       </div>
 
       <PageContactLine emails={pageEmails} linkedins={pageLinkedins} />
@@ -779,6 +854,12 @@ export default function PlacementDetail() {
   const iloPhotoMap = new Map(iloPhotoDocs.map((d) => [d.id, d.photos || []]));
   // Admin-uploaded gallery for the GSAC page.
   const { docs: gsacPhotos } = useCollection<WithId & { imageUrl: string }>('gsacPhotos', [orderBy('order', 'asc')], { silent: true });
+  // Admin-uploaded recruiter logos (Admin → Recruiter Logos), keyed by the
+  // exact company name string used in batch data / item.partners — shared
+  // by Our Recruiters (AllRecruiters) and the Recruiting Partners grid
+  // below, both of which render via PartnerLogo.
+  const { docs: recruiterLogoDocs } = useCollection<WithId & { imageUrl: string }>('recruiterLogos', [], { silent: true });
+  const recruiterLogoMap = new Map(recruiterLogoDocs.map((d) => [d.id, d.imageUrl]));
   // Each item can have its own hero image (set in the Placement Sub-pages
   // admin); falls back to the shared "Placement Detail" banner. No
   // hardcoded stock-photo fallback — the hero just shows its solid
@@ -817,10 +898,53 @@ export default function PlacementDetail() {
   const Icon = resolveContentIcon(item.icon) || BarChart3;
   const tableSections = parseStructuredTable(item.tableText);
   const tableRows = tableSections.flatMap((s) => s.rows);
+  // Placement Highlights uses a fully dynamic table (its own column headers
+  // straight from row 1 of the Data Table field, not a fixed shape like the
+  // roster/company tables above) — see the flexibleHeaders/flexibleRows
+  // branch further down.
+  // Headers come from their own admin field (dataTableHeadersText), kept
+  // separate from Data Table's rows — parseFlexibleTable normally takes row
+  // 1 as the header, so that header line is synthesized in front of
+  // tableText here rather than trusting tableText's own first line, which
+  // an Excel re-import could otherwise silently turn into a data row (or
+  // vice versa). Requiring dataTableHeadersText to actually be set (rather
+  // than falling back to treating tableText's own first row as the header
+  // when it's blank) means a not-yet-configured page just shows nothing,
+  // instead of quietly mistaking a real data row for the header again.
+  const flexibleSections = item.slug === 'placement-highlights' && item.dataTableHeadersText.trim()
+    ? parseFlexibleTable(`${item.dataTableHeadersText}\n${item.tableText}`)
+    : [];
+  const flexibleHeaders = flexibleSections[0]?.headers ?? [];
+  const flexibleRows = flexibleSections.flatMap((s) => s.rows);
   const rosterGroups = parseTeamGroups(item.rosterGroupsText);
+  // "Name | Department" rows sliced across Team Groups by
+  // deptCoordinatorGroupsText's counts — see DeptCoordinatorsRow.
+  const deptCoordinatorRows = parseStructuredTable(item.deptCoordinatorsText).flatMap((s) => s.rows);
+  const deptCoordinatorGroupDefs = parseTeamGroups(item.deptCoordinatorGroupsText);
+  const deptCoordinatorsByGroup = new Map(
+    Array.from(sliceRowsByGroupLabel(deptCoordinatorRows, deptCoordinatorGroupDefs), ([label, rs]) => [
+      label,
+      rs.map((r) => ({ name: r.name, department: r.role })),
+    ])
+  );
+  // Placement Highlights has its own "Highest individual package"/"Notable
+  // packages" style facts folded into the intro/highlights text instead —
+  // this generic Outcomes & Achievements block would just repeat them. Our
+  // Recruiters drops it per request — the recruiter logo grid below is the
+  // page's actual point, and Outcomes was just repeating the Overview text.
+  const showOutcomes = !!item.outcomes && item.outcomes.length > 0 && item.slug !== 'placement-highlights' && item.slug !== 'our-recruiters';
   const hasBodyOverride = !item.intro && Boolean(BODY_OVERRIDES[item.slug]);
   const bodyText = hasBodyOverride ? BODY_OVERRIDES[item.slug] : '';
   const bodyBlocks = parseBodyContent(bodyText);
+  // Employability Skills has no Overview copy and isn't getting any — rather
+  // than a two-column layout with an empty main column next to a much
+  // taller Key Highlights sidebar (the mismatch that caused a large dead
+  // gap), skip the Overview section for this page entirely and show
+  // Highlights as its own full-width grid, right above the skills tabs.
+  // Our Recruiters drops the whole Overview section per request instead —
+  // its Key Highlights/About text duplicated the logo grid below, which is
+  // the page's actual content — with no full-width-grid replacement.
+  const skipOverviewSection = (item.slug === 'employability-skills' && !hasBodyOverride && !item.intro && !item.desc) || item.slug === 'our-recruiters';
 
   return (
     <main className="page-wrapper">
@@ -863,7 +987,8 @@ export default function PlacementDetail() {
       </section>
 
       {/* Content */}
-      <section className="section bg-white" style={{ paddingBottom: (item.outcomes && item.outcomes.length > 0) || item.slug === 'employability-skills' || item.slug === 'gsac' || item.slug === 'higher-education' ? 'var(--space-6)' : undefined }}>
+      {!skipOverviewSection && (
+      <section className="section bg-white" style={{ paddingBottom: showOutcomes || item.slug === 'employability-skills' || item.slug === 'gsac' || item.slug === 'higher-education' || item.slug === 'placement-highlights' ? 'var(--space-6)' : undefined }}>
         <div className="container">
           <div className={(item.highlights && item.highlights.length > 0) || item.slug === 'placement-details' ? 'detail-grid' : ''}>
             {/* Main */}
@@ -872,34 +997,19 @@ export default function PlacementDetail() {
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>About {ABOUT_TITLE_OVERRIDES[item.slug] || item.title}</h2>
               {hasBodyOverride ? (
                 <div style={{ fontSize: 'var(--text-lg)', color: 'var(--color-text)', lineHeight: 1.75 }}>
-                  {bodyBlocks.map((block, index) => {
-                    if (block.type === 'list') {
-                      return (
-                        <ul key={index} style={{ paddingLeft: '1.25rem', margin: '0 0 1rem' }}>
-                          {block.items.map((entry, itemIndex) => (
-                            <li key={itemIndex} style={{ marginBottom: '0.7rem' }}>
-                              {renderInlineText(entry)}
-                            </li>
-                          ))}
-                        </ul>
-                      );
-                    }
-                    return (
-                      <p key={index} style={{ margin: '0 0 1rem' }}>
-                        {renderInlineText(block.text)}
-                      </p>
-                    );
-                  })}
+                  <BodyBlocks blocks={bodyBlocks} paragraphStyle={{}} />
                 </div>
               ) : item.intro ? (
                 <>
-                  <p style={{ fontSize: 'var(--text-lg)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-5)' }}>
-                    {item.intro}
-                  </p>
+                  <BodyBlocks
+                    blocks={parseBodyContent(item.intro)}
+                    paragraphStyle={{ fontSize: 'var(--text-lg)', color: 'var(--color-text)', lineHeight: 1.75 }}
+                  />
                   {item.about && (
-                    <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text-light)', lineHeight: 1.75 }}>
-                      {item.about}
-                    </p>
+                    <BodyBlocks
+                      blocks={parseBodyContent(item.about)}
+                      paragraphStyle={{ fontSize: 'var(--text-base)', color: 'var(--color-text-light)', lineHeight: 1.75 }}
+                    />
                   )}
                 </>
               ) : (
@@ -953,7 +1063,12 @@ export default function PlacementDetail() {
                   <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-4)' }}>
                     Key Highlights
                   </h3>
-                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                  {/* Capped + scrollable rather than growing forever — a long
+                      Highlights list would otherwise stretch this whole grid
+                      row (shared .detail-grid sizes both columns to the
+                      taller one) far past the About text next to it, leaving
+                      a large empty gap before the next section. */}
+                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', maxHeight: 420, overflowY: 'auto', paddingRight: item.highlights.length > 6 ? 'var(--space-2)' : undefined }}>
                     {item.highlights.map((h) => (
                       <li key={h} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-2)' }}>
                         <span style={{ width: 20, height: 20, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
@@ -969,6 +1084,27 @@ export default function PlacementDetail() {
           </div>
         </div>
       </section>
+      )}
+
+      {/* Full-width Key Highlights grid — replaces the sidebar version above,
+          but only for Employability Skills specifically; Our Recruiters
+          skips the Overview section with no Highlights replacement at all. */}
+      {skipOverviewSection && item.slug === 'employability-skills' && item.highlights && item.highlights.length > 0 && (
+        <section className="section bg-white" style={{ paddingBottom: 'var(--space-6)' }}>
+          <div className="container">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--space-4)' }}>
+              {item.highlights.map((h) => (
+                <div key={h} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-3)', background: 'var(--color-off-white)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4) var(--space-5)' }}>
+                  <span style={{ width: 22, height: 22, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
+                    <svg width="11" height="11" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  </span>
+                  <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.5 }}>{h}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* University list accordion — only on the Higher Education sub-page */}
       {item.slug === 'higher-education' && (
@@ -1048,7 +1184,7 @@ export default function PlacementDetail() {
       )}
 
       {/* Outcomes */}
-      {item.outcomes && item.outcomes.length > 0 && (
+      {showOutcomes && (
         <section className="section bg-off-white" style={{ paddingTop: 'var(--space-6)', paddingBottom: item.partners && item.partners.length > 0 && item.slug !== 'placement-details' ? 'var(--space-6)' : undefined }}>
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
@@ -1088,17 +1224,22 @@ export default function PlacementDetail() {
 
       {/* Table Data — not shown on Placement Details, which already has its
           own dedicated year-by-year statistics section above. */}
-      {tableRows.length > 0 && item.slug !== 'placement-details' && (
-        <section className="section bg-white">
+      {(tableRows.length > 0 || flexibleRows.length > 0) && item.slug !== 'placement-details' && (
+        <section className="section bg-white" style={{ paddingTop: item.slug === 'placement-highlights' ? 'var(--space-6)' : undefined }}>
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
               <span className="section-label">Data</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>
-                {rosterGroups.length > 0 ? 'Team' : item.slug === 'industry-liaison-offices' ? 'Regional Offices' : item.slug === 'internships' ? 'Recruiting Companies' : 'Batch-wise Statistics'}
+                {rosterGroups.length > 0 ? 'Team' : item.slug === 'industry-liaison-offices' ? 'Regional Offices' : item.slug === 'internships' ? 'Recruiting Companies' : item.slug === 'placement-highlights' ? 'Highlights' : 'Batch-wise Statistics'}
               </h2>
             </div>
             {rosterGroups.length > 0 ? (
-              <TpoTeamTiles rows={tableRows} groups={rosterGroups} tpoPhotoMap={tpoPhotoMap} tpoBiosMap={tpoBiosMap} pageEmails={item.emails} pageLinkedins={item.linkedins} />
+              <TpoTeamTiles rows={tableRows} groups={rosterGroups} tpoPhotoMap={tpoPhotoMap} tpoBiosMap={tpoBiosMap} pageEmails={item.emails} pageLinkedins={item.linkedins} deptCoordinatorsByGroup={deptCoordinatorsByGroup} />
+            ) : item.slug === 'placement-highlights' ? (
+              // No plain table here — just the sliding ticker, sourced from
+              // the same admin-imported Data Table (Name/Batch/Branch/
+              // Company/LPA columns auto-detected from Table Column Headers).
+              <PlacementAnnouncementsTicker headers={flexibleHeaders} rows={flexibleRows} />
             ) : item.slug === 'internships' ? (
               // Company/stipend/selects data reads best as a plain table (same
               // shape as the "Placements, Year by Year" company table) rather
@@ -1154,22 +1295,23 @@ export default function PlacementDetail() {
       {/* Our Recruiters gets one flat, deduplicated logo grid across every
           drive year, reusing the same batch data as Placements, Year by Year. */}
       {item.slug === 'our-recruiters' && (
-        <section className="section bg-white">
+        <section className="section bg-white" style={{ paddingTop: 'var(--space-6)' }}>
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
               <span className="section-label">Network</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Our Recruiters</h2>
             </div>
-            <AllRecruiters />
+            <AllRecruiters logoMap={recruiterLogoMap} />
           </div>
         </section>
       )}
 
       {/* Partners Grid — not shown on Placement Details, Campus
-          Recruitment Training, Success Stories, TPO Team, or Our Recruiters
-          (which gets the year-by-year breakdown above instead), per request. */}
-      {item.partners && item.partners.length > 0 && item.slug !== 'placement-details' && item.slug !== 'campus-recruitment-training' && item.slug !== 'success-stories' && item.slug !== 'tpo-team' && item.slug !== 'our-recruiters' && (
-        <section className="section bg-off-white" style={{ paddingTop: item.outcomes && item.outcomes.length > 0 ? 'var(--space-6)' : undefined }}>
+          Recruitment Training, Success Stories, TPO Team, Our Recruiters
+          (which gets the year-by-year breakdown above instead), or Placement
+          Highlights, per request. */}
+      {item.partners && item.partners.length > 0 && item.slug !== 'placement-details' && item.slug !== 'campus-recruitment-training' && item.slug !== 'success-stories' && item.slug !== 'tpo-team' && item.slug !== 'our-recruiters' && item.slug !== 'placement-highlights' && (
+        <section className="section bg-off-white" style={{ paddingTop: showOutcomes ? 'var(--space-6)' : undefined }}>
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
               <span className="section-label">Network</span>
@@ -1177,7 +1319,7 @@ export default function PlacementDetail() {
             </div>
             <div className="partner-logo-grid">
               {item.partners.map((p, i) => (
-                <PartnerLogo key={i} name={p} />
+                <PartnerLogo key={i} name={p} uploadedUrl={recruiterLogoMap.get(p)} />
               ))}
             </div>
           </div>

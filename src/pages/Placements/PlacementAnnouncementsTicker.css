@@ -1,0 +1,106 @@
+.pat {
+  margin-top: var(--space-8);
+  padding: var(--space-6);
+  background: var(--color-off-white);
+  border: 1px solid var(--color-light-gray);
+  border-radius: var(--radius-md);
+}
+
+.pat__title {
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  font-weight: 800;
+  color: var(--color-primary);
+  margin: 0 0 var(--space-5);
+}
+
+.pat__rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.pat__track-wrap {
+  overflow: hidden;
+}
+
+.pat__track {
+  display: flex;
+  gap: var(--space-4);
+  width: max-content;
+  animation: pat-scroll 35s linear infinite;
+}
+
+.pat__track--reverse {
+  animation-direction: reverse;
+}
+
+.pat__track-wrap:hover .pat__track {
+  animation-play-state: paused;
+}
+
+.pat-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  background: var(--color-white);
+  border: 1px solid var(--color-light-gray);
+  border-radius: var(--radius-md);
+  padding: var(--space-5) var(--space-6);
+  white-space: nowrap;
+  box-shadow: var(--shadow-sm);
+}
+
+.pat-card__logo {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  object-fit: contain;
+  background: var(--color-off-white);
+  border: 1px solid var(--color-light-gray);
+  flex-shrink: 0;
+}
+
+.pat-card__logo--fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.pat-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pat-card__lpa {
+  font-family: var(--font-serif);
+  font-size: var(--text-xl);
+  font-weight: 900;
+  color: var(--color-accent-dark, var(--color-accent));
+}
+
+.pat-card__name {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.pat-card__meta {
+  font-size: var(--text-sm);
+  color: var(--color-text-light);
+}
+
+@keyframes pat-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pat__track {
+    animation: none;
+  }
+}

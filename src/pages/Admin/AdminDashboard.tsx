@@ -38,6 +38,7 @@ import PoliciesAdmin from './sections/PoliciesAdmin';
 import TpoTeamInfoAdmin from './sections/TpoTeamInfoAdmin';
 import TpoTeamPhotosAdmin from './sections/TpoTeamPhotosAdmin';
 import IloOfficePhotosAdmin from './sections/IloOfficePhotosAdmin';
+import RecruiterLogosAdmin from './sections/RecruiterLogosAdmin';
 import GsacPhotosAdmin from './sections/GsacPhotosAdmin';
 import { useAdminSession } from './AdminSessionContext';
 import ReadOnlyGate from './ReadOnlyGate';
@@ -60,6 +61,7 @@ const SECTION_RESOURCE: Partial<Record<string, ResourceKey>> = {
   'tpo-team-info': RESOURCES.PLACEMENTS_PAGE_CONTENT,
   'tpo-team-photos': RESOURCES.PLACEMENTS_GALLERY,
   'ilo-office-photos': RESOURCES.PLACEMENTS_GALLERY,
+  'recruiter-logos': RESOURCES.PLACEMENTS_GALLERY,
   'gsac-photos': RESOURCES.PLACEMENTS_GALLERY,
 };
 
@@ -109,6 +111,7 @@ const SECTION_MAP: Record<string, React.ReactNode> = {
   'tpo-team-info': <TpoTeamInfoAdmin />,
   'tpo-team-photos': <TpoTeamPhotosAdmin />,
   'ilo-office-photos': <IloOfficePhotosAdmin />,
+  'recruiter-logos': <RecruiterLogosAdmin />,
   'gsac-photos': <GsacPhotosAdmin />,
   'news-awards-data': <NewsAwardsDataAdmin />,
   'research-items': <ResearchItemsAdmin />,

@@ -283,7 +283,7 @@ const COMPANY_FILTERS: { key: CompanyFilter; label: string }[] = [
   { key: 'all', label: 'All Companies' },
   { key: 'it', label: 'IT / Software' },
   { key: 'core', label: 'Core' },
-  { key: 'dream', label: 'Dream Package (≥₹20L)' },
+  { key: 'dream', label: 'Dream Package (≥₹10L)' },
 ];
 
 // Sector-based filters read the row's own `sector` field (only populated for
@@ -295,7 +295,7 @@ function matchesCompanyFilter(row: PlacementRow, filter: CompanyFilter): boolean
   if (filter === 'all') return true;
   if (filter === 'dream') {
     const lpa = parseFloat(formatSalary(row.salary));
-    return Number.isFinite(lpa) && lpa >= 20;
+    return Number.isFinite(lpa) && lpa >= 10;
   }
   const sector = (row.sector || '').toLowerCase();
   if (filter === 'it') return sector.includes('it');
