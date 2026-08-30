@@ -416,6 +416,22 @@
   gap: 0.4rem;
 }
 
+/* ---- Custom Fields (dynamic add-a-field lists) ---- */
+.admin-custom-fields { display: flex; flex-direction: column; gap: 0.75rem; }
+
+.admin-custom-field-row {
+  display: grid;
+  grid-template-columns: 200px 1fr auto;
+  gap: 0.6rem;
+  align-items: start;
+}
+
+.admin-custom-field-row textarea { min-height: 4.5rem; }
+
+@media (max-width: 640px) {
+  .admin-custom-field-row { grid-template-columns: 1fr; }
+}
+
 /* ---- Gallery Drop Zone ---- */
 .gallery-drop-zone {
   border: 2px dashed #d1d5db;
