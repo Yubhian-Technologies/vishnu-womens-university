@@ -8,6 +8,7 @@ import ImageUploader from '../../../components/ImageUploader/ImageUploader';
 import FileUploader from '../../../components/FileUploader/FileUploader';
 import type { UploadResult } from '../../../lib/storage';
 import { PROGRAM_ICON_NAMES } from '../../../lib/programIcons';
+import DepartmentNewsManager from './DepartmentNewsManager';
 
 export interface ProgramSubject {
   title: string;
@@ -838,11 +839,12 @@ export default function ProgramsAdmin() {
             )}
           </div>
 
-          <div className="admin-field admin-field--full"><hr /><h3>News &amp; Events</h3></div>
+          <div className="admin-field admin-field--full"><hr /><h3>News &amp; Events — Department Page (AI / CSE / ECE)</h3></div>
           <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>
-            Optional. Shown as a "News &amp; Events" section (and Quick Links entry) on this programme's page,
-            grouped by academic year. Each year has its own columns — define whatever this department needs
-            (e.g. "Title", "Date"); "S.No" is added automatically on the public page.
+            Only shown on the shared AI/CSE/ECE department page (see Academic Departments), under this
+            programme's side of the toggle — grouped by academic year, with columns you define per year (e.g.
+            "Title", "Date"); "S.No" is added automatically. For every other programme, use "News &amp; Events —
+            This Programme" below instead.
           </p>
           <div className="admin-field admin-field--full">
             {newsEventsYears.map((yr, yi) => (
@@ -906,6 +908,15 @@ export default function ProgramsAdmin() {
             <button type="button" className="admin-btn admin-btn--primary" onClick={addNewsYear}>+ Add Academic Year</button>
             {newsEventsYears.length === 0 && (
               <p className="admin-field__hint">No academic years yet — click "Add Academic Year" to start building this programme's News &amp; Events.</p>
+            )}
+          </div>
+
+          <div className="admin-field admin-field--full"><hr /><h3>News &amp; Events — This Programme</h3></div>
+          <div className="admin-field admin-field--full">
+            {editing ? (
+              <DepartmentNewsManager programSlug={form.slug} />
+            ) : (
+              <p className="admin-field__hint">Save this program first, then reopen it here to add News &amp; Events.</p>
             )}
           </div>
 

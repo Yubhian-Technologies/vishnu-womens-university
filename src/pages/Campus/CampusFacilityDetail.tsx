@@ -147,7 +147,7 @@ export default function CampusFacilityDetail() {
                   }
                   if (block.type === 'list') {
                     return (
-                      <ul key={index} style={{ paddingLeft: '1.25rem', margin: '0 0 1rem' }}>
+                      <ul key={index} style={{ paddingLeft: '1.25rem', margin: '0 0 1rem', listStyleType: 'disc', listStylePosition: 'outside' }}>
                         {block.items.map((item, itemIndex) => (
                           <li key={itemIndex} style={{ marginBottom: '0.6rem' }}>
                             {formatInlineText(item)}

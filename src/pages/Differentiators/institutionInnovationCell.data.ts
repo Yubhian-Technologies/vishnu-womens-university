@@ -34,8 +34,8 @@ export const institutionInnovationCell = {
       { name: 'Dr. G. Durga Prasad', role: 'NISP Coordinator' },
       { name: 'Mr. Ch. Anudeep', role: 'Startup Activity Coordinator' },
     ],
-    viewLinkText: 'Click here to view – IIC 8.0 Council Members :: 2025-26',
-    viewLinkHref: '/downloads/iic-council-members-2025-26.pdf',
+    // The "Click here to view" council members PDF link is now
+    // admin-editable — see IicDocumentsAdmin.tsx (iicCouncilMembersLinks).
   },
   innovationAmbassadors: {
     roleIntro: 'The role of an Innovation Ambassador is to:',
@@ -47,19 +47,13 @@ export const institutionInnovationCell = {
       'Act as an evaluator for Idea Competitions conducted at national level.',
     ],
     listIntro: 'The following are the Innovation Ambassador’s at SVECW',
-    links: [
-      { label: 'Faculty Innovation Ambassadors – Click here', href: '/downloads/iic-faculty-innovation-ambassadors.pdf' },
-      { label: 'Student Innovation Ambassadors – Click here', href: '/downloads/iic-student-innovation-ambassadors.pdf' },
-    ],
+    // Faculty/Student Innovation Ambassador PDF links are now admin-editable
+    // — see IicDocumentsAdmin.tsx (iicInnovationAmbassadorLinks).
   },
   activities: {
     intro: 'The Institute Innovation Council (IIC) plays a pivotal role in fostering an inclusive environment that actively engages faculty, students, and staff in a diverse array of innovation and entrepreneurship initiatives. These encompass ideation, problem-solving, proof of concept development, design thinking, intellectual property rights (IPR) considerations, and adept project handling and management, particularly during the critical pre-incubation and incubation stages. Through these multifaceted activities, the IIC cultivates a dynamic ecosystem conducive to the exploration and realization of innovative ideas within our college community.',
-    years: [
-      { label: 'IIC Activities :: 2024-25', href: '/downloads/iic-activities-2024-25.pdf' },
-      { label: 'IIC Activities :: 2023-24', href: '/downloads/iic-activities-2023-24.pdf' },
-      { label: 'IIC Activities :: 2022-23', href: '/downloads/iic-activities-2022-23.pdf' },
-      { label: 'IIC Activities :: 2021-22', href: '/downloads/iic-activities-2021-22.pdf' },
-    ],
+    // Year-by-year IIC Activities PDFs are now admin-editable — see
+    // IicDocumentsAdmin.tsx (iicActivities).
   },
   atalTinkeringSchools: {
     intro: 'We are proud to announce our partnership with Atal Tinkering Labs as part of the AICTE Institution Innovation Councils (IICs) initiative. Through this collaboration, we are dedicated to empowering and mentoring school student innovators. Atal Tinkering Labs serve as vibrant centers of creativity and innovation, where young minds are encouraged to explore, experiment, and create. By providing guidance, resources, and mentorship through our IICs, we aim to inspire and support the next generation of innovators. Together, we are fostering a culture of innovation and entrepreneurship, ensuring that students have the tools and support they need to transform their ideas into impactful solutions',
@@ -94,34 +88,12 @@ export const institutionInnovationCell = {
       },
     ],
   },
-  ratingCertificates: [
-    { label: 'Rating Certificate_2023-24', href: '/downloads/iic-rating-certificate-2023-24.pdf' },
-    { label: 'IIC_Appreciation_Letter_AY_2023_24', href: '/downloads/iic-appreciation-letter-2023-24.pdf' },
-    { label: 'Rating Certificate_2022-23', href: '/downloads/iic-rating-certificate-2022-23.pdf' },
-    { label: 'IIC_Appreciation_Letter_AY_2022_23', href: '/downloads/iic-appreciation-letter-2022-23.pdf' },
-    { label: 'Rating Certificate_2021-22', href: '/downloads/iic-rating-certificate-2021-22.pdf' },
-    { label: 'Rating Certificate_2020-21', href: '/downloads/iic-rating-certificate-2020-21.pdf' },
-    { label: 'Rating Certificate_2019-20', href: '/downloads/iic-rating-certificate-2019-20.pdf' },
-    { label: 'Rating Certificate 2018-19', href: '/downloads/iic-rating-certificate-2018-19.pdf' },
-    { label: 'Establishment Certificate', href: '/downloads/iic-establishment-certificate.pdf' },
-  ],
-  annualReports: [
-    { label: 'Annual Report :: 2024-25', href: '/downloads/iic-annual-report-2024-25.pdf' },
-    { label: 'Annual Report :: 2023-24', href: '/downloads/iic-annual-report-2023-24.pdf' },
-    { label: 'Annual Report :: 2022-23', href: '/downloads/iic-annual-report-2022-23.pdf' },
-  ],
-  sihHackathonReports: [
-    { label: 'Year :: 2025', href: '/downloads/sih-internal-hackathon-2025.pdf' },
-    { label: 'Year :: 2024', href: '/downloads/sih-internal-hackathon-2024.pdf' },
-    { label: 'Year :: 2023', href: '/downloads/sih-internal-hackathon-2023.pdf' },
-  ],
+  // Rating Certificates, IIC Annual Reports, SIH Internal Hackathon Reports,
+  // and NISP policy links are now admin-editable (label + PDF) — see
+  // IicDocumentsAdmin.tsx — rather than hardcoded here. Only the NISP tab's
+  // heading text remains static.
   nisp: {
     heading: 'NISP - National Innovation Start-Up Policy',
-    items: [
-      { label: 'SVECW Start-Up Policy', href: '/downloads/svecw-startup-policy.pdf' },
-      { label: 'Andhra Pradesh Start-Up Policy', href: '/downloads/andhra-pradesh-startup-policy.pdf' },
-      { label: 'NISP Start-Up Policy', href: '/downloads/nisp-startup-policy.pdf' },
-    ],
   },
 };
 
