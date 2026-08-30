@@ -8,7 +8,7 @@ import { useCollection, useOrderedCollection } from '../../hooks/useCollection';
 import { usePageBanner } from '../../hooks/usePageBanner';
 import { useEapcetCode } from '../../hooks/useContentBlocks';
 import { smoothScrollTo } from '../../lib/smoothScroll';
-import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
+import { normalizeLab, type ProgramDoc } from '../Admin/sections/ProgramsAdmin';
 import type { FacultyDoc } from './Faculty';
 import SEO from '../../components/SEO/SEO';
 import { getProgramSchema, getBreadcrumbSchema } from '../../lib/seo/schemas';
@@ -65,7 +65,10 @@ export default function ProgramDetail() {
   const hasOutcomeStatements = !!(program.peos?.length || program.pos?.length || program.psos?.length);
   const hasHod = !!(program.hodMessage || program.hodImage || program.hodEmail);
   const hasMindMap = !!program.mindMapImage;
-  const hasLabs = !!(program.labs && program.labs.length > 0);
+  // Legacy docs may still store labs as plain strings (no PDF) —
+  // normalizeLab() upgrades either shape so this page never has to care.
+  const labs = (program.labs || []).map(normalizeLab);
+  const hasLabs = labs.length > 0;
   const hasCareerOutcomes = !!(program.outcomes && program.outcomes.length > 0);
   const hasCurriculum = !!(program.semesters && program.semesters.length > 0);
   // Every section is entirely admin-defined — heading and items alike — so
@@ -504,12 +507,35 @@ export default function ProgramDetail() {
               <p className="section-desc">State-of-the-art laboratory facilities that bring coursework to life with hands-on, industry-relevant experimentation.</p>
             </div>
             <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 'var(--space-4)' }}>
-              {program.labs.map((lab) => (
-                <div key={lab} style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', display: 'flex', alignItems: 'center', gap: 'var(--space-4)', borderLeft: '4px solid var(--color-accent)' }}>
-                  <Microscope size={22} strokeWidth={1.75} style={{ flexShrink: 0, color: 'var(--color-accent)' }} />
-                  <span style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-primary)', lineHeight: 1.4 }}>{lab}</span>
-                </div>
-              ))}
+              {labs.map((lab, li) => {
+                const tileStyle = { background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', display: 'flex', alignItems: 'center', gap: 'var(--space-4)', borderLeft: '4px solid var(--color-accent)' };
+                const content = (
+                  <>
+                    <Microscope size={22} strokeWidth={1.75} style={{ flexShrink: 0, color: 'var(--color-accent)' }} />
+                    <span style={{ display: 'flex', flexDirection: 'column', gap: '0.15rem' }}>
+                      <span style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-primary)', lineHeight: 1.4 }}>{lab.name}</span>
+                      {/* Tile always stays visible even with no PDF yet — just marked
+                          unavailable, same convention as the Newsletter issues above. */}
+                      {!lab.pdfUrl && (
+                        <span style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', fontStyle: 'italic' }}>
+                          PDF not available
+                        </span>
+                      )}
+                    </span>
+                  </>
+                );
+                // Opens this lab's own PDF straight from Firebase Storage in a new
+                // tab — only when one has been uploaded via /admin → Programs.
+                return lab.pdfUrl ? (
+                  <a key={li} href={lab.pdfUrl} target="_blank" rel="noopener noreferrer" style={{ ...tileStyle, textDecoration: 'none' }}>
+                    {content}
+                  </a>
+                ) : (
+                  <div key={li} style={tileStyle}>
+                    {content}
+                  </div>
+                );
+              })}
             </div>
           </div>
         </section>
