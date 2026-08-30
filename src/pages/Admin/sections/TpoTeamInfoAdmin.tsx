@@ -8,14 +8,15 @@ export interface TpoTeamBioDoc extends WithId {
   paragraphs: string[];
   accomplishmentsIntro: string;
   accomplishments: string[];
-  email: string;
+  emails: string[];
   phone: string;
+  linkedins: string[];
   order: number;
 }
 
 const EMPTY = {
   name: '', paragraphs: [] as string[], accomplishmentsIntro: '', accomplishments: [] as string[],
-  email: '', phone: '', order: 0,
+  emails: [] as string[], phone: '', linkedins: [] as string[], order: 0,
 };
 
 function linesToArray(text: string): string[] {
@@ -29,7 +30,7 @@ function arrayToLines(arr: string[] = []): string {
 // starting point when this collection is still empty — see seedBios below.
 const DEFAULT_BIOS: Omit<TpoTeamBioDoc, 'id'>[] = [
   {
-    name: 'Mr. Satish Paruchuri', order: 1, accomplishmentsIntro: '', accomplishments: [], email: '', phone: '',
+    name: 'Mr. Satish Paruchuri', order: 1, accomplishmentsIntro: '', accomplishments: [], emails: [], phone: '', linkedins: [],
     paragraphs: [
       'Satish Paruchuri, is currently the Director (Industry Relations) at Sri Vishnu Educational Society.',
       'He, along with his team members, looks after Placements, Internships and Industry Interaction. Before his arrival to SVES, Mr. Paruchuri had been with Institute for Electronic Governance (IEG), Government of AP as Program Manager on a mission to enhance employability of young engineers. In this direction, he worked very hard in helping 20,000 students from 200 engineering colleges to get employment in more than 30 IT Companies. IBM, CSC, CA, Mahindra Satyam, TCS and Infosys are a few to name among them.',
@@ -37,7 +38,7 @@ const DEFAULT_BIOS: Omit<TpoTeamBioDoc, 'id'>[] = [
     ],
   },
   {
-    name: 'Mr. Ravikiran Saili', order: 2, email: '', phone: '',
+    name: 'Mr. Ravikiran Saili', order: 2, emails: [], phone: '', linkedins: [],
     paragraphs: [
       'Mr. Ravikiran Saili completed his Masters in Information Systems from Arts & Science College, Kakatiya University, Warangal in 2003. Upon completion of his masters, he joined Institute for Electronic Governance in the year 2004 as IT Trainer and held various positions such as IT Associate and Project Manager.',
       'At present he is Manager (Industry Relations) at Sri Vishnu Educational Society. He has over 8 years of experience in the areas of HR Functions, Operations, Process Management, Administration, Project Management, Data Management and Report Generation. With all this expertise, he is able to provide mentorship and coaching to team members for better results. During his tenure with JKC, he was responsible for overseeing the relations with the JKC registered institutions, coordinating the recruitment activities for JKC students, leading the team which is looking after the JKC portal, the backbone of all the JKC activities.',
@@ -59,11 +60,12 @@ const DEFAULT_BIOS: Omit<TpoTeamBioDoc, 'id'>[] = [
       'Worked in ECIL, NPTI, Access company LTD (Japan), Texas Instruments (Israel), Sasken communications, NEC Electronics, Samsung India, LG electronics, University of Tokyo, ST Microelectronics in various cutting edge technologies. Played Program manager, Principal Engineer, Architect, Business development, Center Head Roles in different organizations.',
       'Worked in G.Pullareddy & G.Narayanamma Engg colleges, MGIT Hyderabad as Head Training & Placements. Building Technical teams. Completed B.Tech(EEE) from S.V University Tirupati in 1998, M.Tech(Power Electronics) from JNTU A in 2013, PGDM(HR & GM) from MIT School Pune in 2016, Received Ph D(EEE) degree from Kalasalingam Academy of Research and Education in 2022.',
     ],
-    email: 'vamshivarma.k@srivishnu.edu.in',
+    emails: ['vamshivarma.k@srivishnu.edu.in'],
     phone: '9618274392',
+    linkedins: [],
   },
   {
-    name: 'Ms. D. Pushpa', order: 4, accomplishmentsIntro: '', accomplishments: [], email: '', phone: '',
+    name: 'Ms. D. Pushpa', order: 4, accomplishmentsIntro: '', accomplishments: [], emails: [], phone: '', linkedins: [],
     paragraphs: [
       'Pushpa Diddi has an overall experience of 7 Years in HR and Administration with qualified Masters Degree in Business Administration from Kakatiya University, Warangal. Experience span across important functions like Induction, HR Generalist role and Admin role.',
       'Prior to joining Sri Vishnu, Pushpa worked in Atlanta Systems Pvt Ltd as a HR Personnel, played an active role in Manpower Planning, Talent Acquisition, Induction, Training and Development areas. Then she joined IEG now called TASK, a society run by the State Government and worked for 4 years in the capacity of Team Lead.',
@@ -71,7 +73,7 @@ const DEFAULT_BIOS: Omit<TpoTeamBioDoc, 'id'>[] = [
     ],
   },
   {
-    name: 'Mr. Atul Kirdant', order: 5, accomplishmentsIntro: '', accomplishments: [], email: '', phone: '',
+    name: 'Mr. Atul Kirdant', order: 5, accomplishmentsIntro: '', accomplishments: [], emails: [], phone: '', linkedins: [],
     paragraphs: [
       'Mr. Atul Kirdant has been with Sri Vishnu Educational Society since 2012 as Industry Liaison Officer (Pune Region)',
       'He did his B.Sc. from BAMU, Pune and MBA in marketing from IIPM.',
@@ -80,7 +82,7 @@ const DEFAULT_BIOS: Omit<TpoTeamBioDoc, 'id'>[] = [
     ],
   },
   {
-    name: 'Mr. Arokiadoss', order: 6, accomplishmentsIntro: '', accomplishments: [], email: '', phone: '',
+    name: 'Mr. Arokiadoss', order: 6, accomplishmentsIntro: '', accomplishments: [], emails: [], phone: '', linkedins: [],
     paragraphs: [
       'Mr. Arokiadoss took the position of an Industry Liaison Officer for Tamil Nadu Region in 2013.',
       'Regarding his formal schooling, he succeeded in his Bachelor of Engineering from Annai Teresa college of Engineering, Madras University in 2003 and Master of Business Administration from Alagappa University in 2006.',
@@ -89,7 +91,7 @@ const DEFAULT_BIOS: Omit<TpoTeamBioDoc, 'id'>[] = [
     ],
   },
   {
-    name: 'Mr. Ramesh T.S', order: 7, accomplishmentsIntro: '', accomplishments: [], email: '', phone: '',
+    name: 'Mr. Ramesh T.S', order: 7, accomplishmentsIntro: '', accomplishments: [], emails: [], phone: '', linkedins: [],
     paragraphs: [
       'Mr. Ramesh T.S joined the SVES family as the Industry liaison officer at Bangalore. He holds a bachelor’s degree in Mechanical engineering and a P.G diploma in Business Administration.',
       'He brings to the table a vast experience from the Industry where he was involved in Brand building, business development and training activities among many others.',
@@ -97,28 +99,28 @@ const DEFAULT_BIOS: Omit<TpoTeamBioDoc, 'id'>[] = [
     ],
   },
   {
-    name: 'Mr. Saurabh Mishra', order: 8, accomplishmentsIntro: '', accomplishments: [], email: '', phone: '',
+    name: 'Mr. Saurabh Mishra', order: 8, accomplishmentsIntro: '', accomplishments: [], emails: [], phone: '', linkedins: [],
     paragraphs: [
       'MBA From welinker Inst. Mumbai and worked with Vodafone as HR, then Times of India, IPEM group, Sparsh Education Group, Sharda & Amity University',
       'Corporate Relations as a strategic business partner and meeting them by aligning and integrating human resource pillars with current and strategic business needs for a professionally managed company. Handling a wide range of assignments for campus Placement & recruitment & Corporate Relations, CSR, Job fairs, Outreach Activity, MOU, HR Conclave etc.',
     ],
   },
   {
-    name: 'Ms. Venkata Swathi R', order: 9, accomplishmentsIntro: '', accomplishments: [], email: '', phone: '',
+    name: 'Ms. Venkata Swathi R', order: 9, accomplishmentsIntro: '', accomplishments: [], emails: [], phone: '', linkedins: [],
     paragraphs: [
       'Ms. Venkata Swathi R, Training and Placement Officer (TPO) and Assistant Professor in the Department of Computer Science Engineering, is pursuing a Ph.D. in Computer Science and Engineering at JNTUK. She holds an M. Tech and a B. Tech in Computer Science disciplines, both from JNTUK, having 16 years of teaching experience.',
       'She oversees student training and placement activities, maintaining strong industry connections to facilitate placements. She collaborates with the industry-Institute Interaction Coordinator to organize guest lectures by industry experts. Additionally, she gathers feedback from recruiting companies and arranges soft skills and interview training programs using both institutional and external resources.',
     ],
   },
   {
-    name: 'Mr. K. P. Swaroop', order: 10, accomplishmentsIntro: '', accomplishments: [], email: '', phone: '',
+    name: 'Mr. K. P. Swaroop', order: 10, accomplishmentsIntro: '', accomplishments: [], emails: [], phone: '', linkedins: [],
     paragraphs: [
       'Mr. K. P. Swaroop is the Assistant Training and Placement Officer and an Assistant Professor in the Department of Electrical and Electronics Engineering. He is currently pursuing a Ph.D. from JNTUK Kakinada and holds an M. Tech. from JNTUH and a B.E. from Andhra University in the same field. With 15 years of teaching experience, he plays an active role in academics and student engagement.',
       'He is responsible for managing a range of training and placement activities, including coordinating placement drives, overseeing logistics, and conducting Campus Recruitment Training (CRT) by utilizing both institutional resources and external expertise. He actively tracks student performance and develops strategies to improve their career readiness.',
     ],
   },
   {
-    name: 'Dr. C. P. Pavan Kumar Hota', order: 11, accomplishmentsIntro: '', accomplishments: [], email: '', phone: '',
+    name: 'Dr. C. P. Pavan Kumar Hota', order: 11, accomplishmentsIntro: '', accomplishments: [], emails: [], phone: '', linkedins: [],
     paragraphs: [
       'Dr. C. P. Pavan Kumar Hota is an accomplished academician and researcher, currently serving as the Assistant Training and Placement Officer and Assistant Professor in the Department of Artificial Intelligence at Shri Vishnu Engineering College for Women, Andhra Pradesh. He holds a Ph.D. in Computer Science and Engineering from Annamalai University, an M. Tech in Computer Science and Engineering from JNTUK, and a B. Tech in Computer Science and Engineering from Andhra University.',
       'With over 10 years of teaching experience and a strong research background in Educational Data Mining, Learner Behaviour, Educational Psychology, and Cognition, Dr. Hota is committed to enhancing student learning outcomes through data-driven insights. His expertise lies in Data analytics, student performance evaluation, and cognitive ability prediction, helping to refine training and placement strategies for improved employability. As the Assistant Training and Placement Officer, he plays a pivotal role in Overseeing training and placement activities, continuous monitoring of student performance, to enhance student career readiness. His professional development includes certifications in Outcome-Based Education, NBA Accreditation, and Teaching-Learning in Engineering (NATE), along with expertise in Psychology and Machine Learning. Passionate about Educational research and continuous learning, Dr. Hota actively seeks collaborations to advance training initiatives.',
@@ -160,7 +162,7 @@ export default function TpoTeamInfoAdmin() {
     setEditing(b.id);
     setForm({
       name: b.name, paragraphs: b.paragraphs || [], accomplishmentsIntro: b.accomplishmentsIntro || '',
-      accomplishments: b.accomplishments || [], email: b.email || '', phone: b.phone || '', order: b.order,
+      accomplishments: b.accomplishments || [], emails: b.emails || [], phone: b.phone || '', linkedins: b.linkedins || [], order: b.order,
     });
   };
 
@@ -201,12 +203,16 @@ export default function TpoTeamInfoAdmin() {
             <input id="field-display-order" type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
           </div>
           <div className="admin-field">
-            <label htmlFor="field-email-optional">Email (optional)</label>
-            <input id="field-email-optional" value={form.email} onChange={(e) => set('email', e.target.value)} placeholder="name@srivishnu.edu.in" />
-          </div>
-          <div className="admin-field">
             <label htmlFor="field-phone-optional">Phone (optional)</label>
             <input id="field-phone-optional" value={form.phone} onChange={(e) => set('phone', e.target.value)} placeholder="9618274392" />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label htmlFor="field-emails-one-per-line-optional">Emails (one per line — optional)</label>
+            <textarea id="field-emails-one-per-line-optional" rows={2} value={arrayToLines(form.emails)} onChange={(e) => set('emails', linesToArray(e.target.value))} placeholder="name@srivishnu.edu.in" />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label htmlFor="field-linkedins-one-per-line-optional">LinkedIn URLs (one per line — optional)</label>
+            <textarea id="field-linkedins-one-per-line-optional" rows={2} value={arrayToLines(form.linkedins)} onChange={(e) => set('linkedins', linesToArray(e.target.value))} placeholder="https://www.linkedin.com/in/..." />
           </div>
           <div className="admin-field admin-field--full">
             <label htmlFor="field-bio-paragraphs-one-per-line">Bio Paragraphs (one per line) *</label>
@@ -238,7 +244,7 @@ export default function TpoTeamInfoAdmin() {
                   <tr key={b.id}>
                     <td>{b.order}</td>
                     <td>{b.name}</td>
-                    <td>{b.email}</td>
+                    <td>{(b.emails || []).join(', ')}</td>
                     <td>{b.phone}</td>
                     <td>
                       <button className="admin-btn admin-btn--sm" onClick={() => startEdit(b)}>Edit</button>

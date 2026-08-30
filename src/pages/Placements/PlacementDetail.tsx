@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { orderBy } from 'firebase/firestore';
 import { Trophy, BarChart3, PlayCircle, MapPin } from 'lucide-react';
@@ -523,17 +523,30 @@ function TeamRosterRow({
                   </ul>
                 </div>
               )}
-              {(bio.email || bio.phone) && (
-                <p style={{ width: '100%', fontSize: 'var(--text-sm)', color: 'var(--color-text)', marginTop: 'var(--space-2)' }}>
-                  {bio.email && (
-                    <>Email: <a href={`mailto:${bio.email}`} style={{ color: 'var(--color-primary)', fontWeight: 600 }}>{bio.email}</a></>
-                  )}
-                  {bio.email && bio.phone && ' & '}
-                  {bio.phone && (
-                    <>Mobile no: <a href={`tel:${bio.phone}`} style={{ color: 'var(--color-primary)', fontWeight: 600 }}>{bio.phone}</a></>
-                  )}
-                </p>
-              )}
+              {(() => {
+                const linkStyle = { color: 'var(--color-primary)', fontWeight: 600 };
+                const parts: { key: string; node: ReactNode }[] = [];
+                (bio.emails || []).forEach((email, ei) => parts.push({
+                  key: `email-${ei}`,
+                  node: <>Email: <a href={`mailto:${email}`} style={linkStyle}>{email}</a></>,
+                }));
+                if (bio.phone) parts.push({ key: 'phone', node: <>Mobile no: <a href={`tel:${bio.phone}`} style={linkStyle}>{bio.phone}</a></> });
+                (bio.linkedins || []).forEach((url, li) => parts.push({
+                  key: `linkedin-${li}`,
+                  node: <>LinkedIn: <a href={url} target="_blank" rel="noopener noreferrer" style={linkStyle}>{(bio.linkedins || []).length > 1 ? `Profile ${li + 1}` : 'View Profile'}</a></>,
+                }));
+                if (parts.length === 0) return null;
+                return (
+                  <p style={{ width: '100%', fontSize: 'var(--text-sm)', color: 'var(--color-text)', marginTop: 'var(--space-2)' }}>
+                    {parts.map((part, pi) => (
+                      <span key={part.key}>
+                        {pi > 0 && ' & '}
+                        {part.node}
+                      </span>
+                    ))}
+                  </p>
+                );
+              })()}
             </div>
           ) : industryLiaisonOffices[row.name] ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
@@ -592,6 +605,58 @@ const TPO_TEAM_GROUPS: { label: string; count: number }[] = [
   { label: 'University Team (SVECW)', count: 3 },
   { label: 'Industry Liaison Officers', count: 4 },
 ];
+
+// One combined "Contact" block listing every member of the currently active
+// tile group who has an email/phone/LinkedIn on their bio — sits below the
+// roster rows so the whole group's contact info is visible at once, rather
+// than only appearing one person at a time inside each row's own accordion.
+function TpoTeamGroupContact({
+  rows,
+  tpoBiosMap,
+}: {
+  rows: { name: string; role: string; notes?: string }[];
+  tpoBiosMap: Map<string, TpoTeamBioDoc>;
+}) {
+  const linkStyle = { color: 'var(--color-primary)', fontWeight: 600 };
+  const entries = rows
+    .map((row) => ({ row, bio: tpoBiosMap.get(row.name) }))
+    .filter((e): e is { row: typeof e.row; bio: TpoTeamBioDoc } =>
+      !!e.bio && ((e.bio.emails?.length ?? 0) > 0 || (e.bio.linkedins?.length ?? 0) > 0 || !!e.bio.phone)
+    );
+
+  if (entries.length === 0) return null;
+
+  return (
+    <div style={{ marginTop: 'var(--space-6)', background: 'var(--color-off-white)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)' }}>
+      <h3 style={{ fontFamily: 'var(--font-sans)', fontWeight: 800, fontSize: 'var(--text-base)', color: 'var(--color-primary)', marginBottom: 'var(--space-4)' }}>
+        Contact
+      </h3>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+        {entries.map(({ row, bio }) => {
+          const links: { key: string; node: ReactNode }[] = [
+            ...(bio.emails || []).map((email, ei) => ({ key: `email-${ei}`, node: <a key={`email-${ei}`} href={`mailto:${email}`} style={linkStyle}>{email}</a> })),
+            ...(bio.phone ? [{ key: 'phone', node: <a key="phone" href={`tel:${bio.phone}`} style={linkStyle}>{bio.phone}</a> }] : []),
+            ...(bio.linkedins || []).map((url, li) => ({
+              key: `linkedin-${li}`,
+              node: <a key={`linkedin-${li}`} href={url} target="_blank" rel="noopener noreferrer" style={linkStyle}>{(bio.linkedins || []).length > 1 ? `LinkedIn ${li + 1}` : 'LinkedIn'}</a>,
+            })),
+          ];
+          return (
+            <p key={row.name} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', margin: 0 }}>
+              <strong style={{ color: 'var(--color-primary)' }}>{row.name}:</strong>{' '}
+              {links.map((l, li) => (
+                <span key={l.key}>
+                  {li > 0 && ' · '}
+                  {l.node}
+                </span>
+              ))}
+            </p>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 function TpoTeamTiles({
   rows,
@@ -662,6 +727,8 @@ function TpoTeamTiles({
           />
         ))}
       </div>
+
+      <TpoTeamGroupContact rows={activeRows} tpoBiosMap={tpoBiosMap} />
     </div>
   );
 }
