@@ -824,11 +824,11 @@ function VdlSinglePhoto({ photos, alt }: { photos: (WithId & { imageUrl: string 
 
 function VdlFacilitiesSection({
   facilities,
-  testingPhotos,
+  phasePhotos,
   campusVehiclePhotos,
 }: {
   facilities: typeof vehicleDesignLab.facilities;
-  testingPhotos: (WithId & { imageUrl: string })[];
+  phasePhotos: (WithId & { imageUrl: string })[][];
   campusVehiclePhotos: (WithId & { imageUrl: string })[];
 }) {
   const [activeTab, setActiveTab] = useState<'Activities and Programs' | 'Campus Utility Vehicle Projects'>('Activities and Programs');
@@ -877,7 +877,7 @@ function VdlFacilitiesSection({
               {phase.mediaType === 'video' ? (
                 <VdlVideoEmbed url={phase.videoUrl} />
               ) : (
-                <VdlSinglePhoto photos={testingPhotos} alt={phase.title} />
+                <VdlSinglePhoto photos={phasePhotos[i] ?? []} alt={phase.title} />
               )}
             </div>
           ))}
@@ -914,10 +914,10 @@ function VdlFacilitiesSection({
 
 function VdlIndustryCollaborationsSection({
   data,
-  photos,
+  photoMap,
 }: {
   data: typeof vehicleDesignLab.industryCollaborations;
-  photos: (WithId & { imageUrl: string })[];
+  photoMap: Map<string, WithId & { imageUrl: string }>;
 }) {
   return (
     <div>
@@ -927,7 +927,7 @@ function VdlIndustryCollaborationsSection({
       <VsacInnerAccordion titles={data.endowments.map((e) => `${e.title}:`)}>
         {(i) => {
           const e = data.endowments[i];
-          const photo = photos[i];
+          const photo = photoMap.get(e.id);
           return (
             <>
               <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-2)' }}>
@@ -2370,52 +2370,6 @@ function FlLanguageTabs({ languages }: { languages: FlLanguage[] }) {
   );
 }
 
-interface WisePlacementDoc extends WithId {
-  name: string;
-  regdNo: string;
-  company: string;
-  package: string;
-  imageUrl: string;
-}
-
-function WisePlacementCard({ placement }: { placement: WisePlacementDoc }) {
-  return (
-    <div style={{ borderRadius: 0, overflow: 'hidden', border: '1px solid var(--color-light-gray)' }}>
-      <div style={{ position: 'relative', aspectRatio: '1', background: 'var(--color-primary-dark)' }}>
-        <img
-          src={placement.imageUrl}
-          alt={placement.name}
-          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-        />
-        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, padding: 'var(--space-2) var(--space-3)', background: 'linear-gradient(to bottom, rgba(0,0,0,0.6), transparent)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ fontSize: 'var(--text-sm)', fontWeight: 800, color: 'var(--color-white)' }}>{placement.company}</span>
-          {placement.package && (
-            <span style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--color-white)', background: 'var(--color-accent)', padding: '0.15rem 0.5rem', borderRadius: 'var(--radius-full)' }}>{placement.package}</span>
-          )}
-        </div>
-        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: 'var(--space-2) var(--space-3)', background: 'linear-gradient(to top, rgba(0,0,0,0.75), transparent)' }}>
-          <p style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-white)', margin: 0, lineHeight: 1.3 }}>{placement.name}</p>
-          {placement.regdNo && <p style={{ fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.85)', margin: 0 }}>{placement.regdNo}</p>}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Only entries an admin has actually added (with a photo) show up here at
-// all — no placeholder cards for entries that don't exist yet in Firestore.
-function WisePlacementGrid({ placements }: { placements: WisePlacementDoc[] }) {
-  const withPhotos = placements.filter((p) => p.imageUrl);
-  if (withPhotos.length === 0) return null;
-  return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 0, marginTop: 'var(--space-6)' }}>
-      {withPhotos.map((p) => (
-        <WisePlacementCard key={p.id} placement={p} />
-      ))}
-    </div>
-  );
-}
-
 function NirvahanaTeamSection({ team }: { team: typeof nirvahana.team }) {
   const [activeTab, setActiveTab] = useState<'In-Charge' | 'Faculty Members'>('In-Charge');
 
@@ -2672,10 +2626,25 @@ function TiDspAccordion({
   );
 }
 
+interface IicDocEntryDoc extends WithId {
+  label: string;
+  fileUrl: string;
+  order: number;
+}
+
 function IicPage({ iic }: { iic: typeof institutionInnovationCell }) {
   const [activeTab, setActiveTab] = useState(IIC_TABS[0]);
   const { docs: memberPhotos } = useCollection<WithId & { imageUrl: string }>('iicMemberPhotos', [], { silent: true });
   const memberPhotoMap = new Map(memberPhotos.map((p) => [p.id, p.imageUrl]));
+  // Admin-editable (label + PDF) — see IicDocumentsAdmin.tsx — rather than
+  // the hardcoded lists institutionInnovationCell.data.ts used to hold.
+  const { docs: councilMembersLinks } = useOrderedCollection<IicDocEntryDoc>('iicCouncilMembersLinks', 'order');
+  const { docs: innovationAmbassadorLinks } = useOrderedCollection<IicDocEntryDoc>('iicInnovationAmbassadorLinks', 'order');
+  const { docs: iicActivityYears } = useOrderedCollection<IicDocEntryDoc>('iicActivities', 'order');
+  const { docs: ratingCertificates } = useOrderedCollection<IicDocEntryDoc>('iicRatingCertificates', 'order');
+  const { docs: annualReports } = useOrderedCollection<IicDocEntryDoc>('iicAnnualReports', 'order');
+  const { docs: sihHackathonReports } = useOrderedCollection<IicDocEntryDoc>('iicSihHackathonReports', 'order');
+  const { docs: nispPolicies } = useOrderedCollection<IicDocEntryDoc>('iicNispPolicies', 'order');
 
   return (
     <section className="section bg-white">
@@ -2731,11 +2700,13 @@ function IicPage({ iic }: { iic: typeof institutionInnovationCell }) {
                   ))}
                 </div>
 
-                <p style={{ fontSize: 'var(--text-sm)' }}>
-                  <a href={iic.constitution.viewLinkHref} download style={{ color: 'var(--color-primary)', fontWeight: 700 }}>
-                    {iic.constitution.viewLinkText}
-                  </a>
-                </p>
+                {councilMembersLinks.length > 0 && (
+                  <p style={{ fontSize: 'var(--text-sm)' }}>
+                    <a href={councilMembersLinks[0].fileUrl} download style={{ color: 'var(--color-primary)', fontWeight: 700 }}>
+                      {councilMembersLinks[0].label}
+                    </a>
+                  </p>
+                )}
               </>
             )}
 
@@ -2759,17 +2730,17 @@ function IicPage({ iic }: { iic: typeof institutionInnovationCell }) {
                 <p style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>
                   {iic.innovationAmbassadors.listIntro}
                 </p>
-                <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-                  {iic.innovationAmbassadors.links.map((link, i) => (
-                    <li key={i} style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)' }}>
-                      * {link.href ? (
-                        <a href={link.href} download style={{ color: 'var(--color-primary)', fontWeight: 700 }}>{link.label}</a>
-                      ) : (
-                        link.label
-                      )}
-                    </li>
-                  ))}
-                </ul>
+                {innovationAmbassadorLinks.length === 0 ? (
+                  <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text-light)' }}>Content for this section is coming soon.</p>
+                ) : (
+                  <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                    {innovationAmbassadorLinks.map((link) => (
+                      <li key={link.id} style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)' }}>
+                        * <a href={link.fileUrl} download style={{ color: 'var(--color-primary)', fontWeight: 700 }}>{link.label}</a>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </>
             )}
 
@@ -2780,17 +2751,17 @@ function IicPage({ iic }: { iic: typeof institutionInnovationCell }) {
                 <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-6)' }}>
                   {iic.activities.intro}
                 </p>
-                <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-                  {iic.activities.years.map((year, i) => (
-                    <li key={i} style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)' }}>
-                      * {year.href ? (
-                        <a href={year.href} download style={{ color: 'var(--color-primary)', fontWeight: 700 }}>{year.label}</a>
-                      ) : (
-                        year.label
-                      )}
-                    </li>
-                  ))}
-                </ul>
+                {iicActivityYears.length === 0 ? (
+                  <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text-light)' }}>Content for this section is coming soon.</p>
+                ) : (
+                  <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                    {iicActivityYears.map((year) => (
+                      <li key={year.id} style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)' }}>
+                        * <a href={year.fileUrl} download style={{ color: 'var(--color-primary)', fontWeight: 700 }}>{year.label}</a>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </>
             )}
 
@@ -2839,20 +2810,20 @@ function IicPage({ iic }: { iic: typeof institutionInnovationCell }) {
               <>
                 <span className="section-label">Overview</span>
                 <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-5)' }}>Rating Certificates</h2>
-                <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-                  {iic.ratingCertificates.map((cert, i) => (
-                    <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-2)' }}>
-                      <span style={{ width: 20, height: 20, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
-                        <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                      </span>
-                      {cert.href ? (
-                        <a href={cert.href} download style={{ color: 'var(--color-primary)', fontWeight: 700, fontSize: 'var(--text-base)' }}>{cert.label}</a>
-                      ) : (
-                        <span style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)' }}>{cert.label}</span>
-                      )}
-                    </li>
-                  ))}
-                </ul>
+                {ratingCertificates.length === 0 ? (
+                  <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text-light)' }}>Content for this section is coming soon.</p>
+                ) : (
+                  <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                    {ratingCertificates.map((cert) => (
+                      <li key={cert.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-2)' }}>
+                        <span style={{ width: 20, height: 20, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
+                          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                        </span>
+                        <a href={cert.fileUrl} download style={{ color: 'var(--color-primary)', fontWeight: 700, fontSize: 'var(--text-base)' }}>{cert.label}</a>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </>
             )}
 
@@ -2860,20 +2831,20 @@ function IicPage({ iic }: { iic: typeof institutionInnovationCell }) {
               <>
                 <span className="section-label">Overview</span>
                 <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-5)' }}>IIC Annual Reports</h2>
-                <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-                  {iic.annualReports.map((report, i) => (
-                    <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-2)' }}>
-                      <span style={{ width: 20, height: 20, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
-                        <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                      </span>
-                      {report.href ? (
-                        <a href={report.href} download style={{ color: 'var(--color-primary)', fontWeight: 700, fontSize: 'var(--text-base)' }}>{report.label}</a>
-                      ) : (
-                        <span style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)' }}>{report.label}</span>
-                      )}
-                    </li>
-                  ))}
-                </ul>
+                {annualReports.length === 0 ? (
+                  <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text-light)' }}>Content for this section is coming soon.</p>
+                ) : (
+                  <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                    {annualReports.map((report) => (
+                      <li key={report.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-2)' }}>
+                        <span style={{ width: 20, height: 20, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
+                          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                        </span>
+                        <a href={report.fileUrl} download style={{ color: 'var(--color-primary)', fontWeight: 700, fontSize: 'var(--text-base)' }}>{report.label}</a>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </>
             )}
 
@@ -2881,20 +2852,20 @@ function IicPage({ iic }: { iic: typeof institutionInnovationCell }) {
               <>
                 <span className="section-label">Overview</span>
                 <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-5)' }}>SIH Internal Hackathon Reports</h2>
-                <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-                  {iic.sihHackathonReports.map((report, i) => (
-                    <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-2)' }}>
-                      <span style={{ width: 20, height: 20, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
-                        <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                      </span>
-                      {report.href ? (
-                        <a href={report.href} download style={{ color: 'var(--color-primary)', fontWeight: 700, fontSize: 'var(--text-base)' }}>{report.label}</a>
-                      ) : (
-                        <span style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)' }}>{report.label}</span>
-                      )}
-                    </li>
-                  ))}
-                </ul>
+                {sihHackathonReports.length === 0 ? (
+                  <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text-light)' }}>Content for this section is coming soon.</p>
+                ) : (
+                  <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                    {sihHackathonReports.map((report) => (
+                      <li key={report.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-2)' }}>
+                        <span style={{ width: 20, height: 20, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
+                          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                        </span>
+                        <a href={report.fileUrl} download style={{ color: 'var(--color-primary)', fontWeight: 700, fontSize: 'var(--text-base)' }}>{report.label}</a>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </>
             )}
 
@@ -2902,21 +2873,21 @@ function IicPage({ iic }: { iic: typeof institutionInnovationCell }) {
               <>
                 <span className="section-label">Overview</span>
                 <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-5)' }}>{iic.nisp.heading}</h2>
+                {nispPolicies.length === 0 ? (
+                  <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text-light)' }}>Content for this section is coming soon.</p>
+                ) : (
                 <div style={{ border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
-                  {iic.nisp.items.map((row, i) => (
+                  {nispPolicies.map((row, i) => (
                     <div
-                      key={i}
+                      key={row.id}
                       style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-4)', padding: 'var(--space-4) var(--space-5)', background: i % 2 === 0 ? 'var(--color-off-white)' : 'var(--color-white)' }}
                     >
                       <span style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)' }}>{row.label}</span>
-                      {row.href ? (
-                        <a href={row.href} download style={{ color: 'var(--color-accent)', fontWeight: 700, fontSize: 'var(--text-sm)', whiteSpace: 'nowrap' }}>Click here..</a>
-                      ) : (
-                        <span style={{ color: 'var(--color-accent)', fontWeight: 700, fontSize: 'var(--text-sm)', whiteSpace: 'nowrap' }}>Click here..</span>
-                      )}
+                      <a href={row.fileUrl} download style={{ color: 'var(--color-accent)', fontWeight: 700, fontSize: 'var(--text-sm)', whiteSpace: 'nowrap' }}>Click here..</a>
                     </div>
                   ))}
                 </div>
+                )}
               </>
             )}
 
@@ -2968,9 +2939,16 @@ function IicPage({ iic }: { iic: typeof institutionInnovationCell }) {
 
 function VdlPage({ vdl }: { vdl: typeof vehicleDesignLab }) {
   const [activeTab, setActiveTab] = useState(VDL_TABS[0]);
+  const { docs: designPhasePhotos } = useCollection<WithId & { imageUrl: string }>('vdlDesignPhasePhotos', [orderBy('order', 'asc')], { silent: true });
+  const { docs: fabricationPhasePhotos } = useCollection<WithId & { imageUrl: string }>('vdlFabricationPhasePhotos', [orderBy('order', 'asc')], { silent: true });
   const { docs: testingPhotos } = useCollection<WithId & { imageUrl: string }>('vdlTestingPhotos', [orderBy('order', 'asc')], { silent: true });
+  const { docs: motorsportPhotos } = useCollection<WithId & { imageUrl: string }>('vdlMotorsportPhotos', [orderBy('order', 'asc')], { silent: true });
   const { docs: campusVehiclePhotos } = useCollection<WithId & { imageUrl: string }>('vdlCampusVehiclePhotos', [orderBy('order', 'asc')], { silent: true });
-  const { docs: industryCollabPhotos } = useCollection<WithId & { imageUrl: string }>('vdlIndustryCollabPhotos', [orderBy('order', 'asc')], { silent: true });
+  // Doc id = the endowment's own id (see vehicleDesignLab.data.ts industryCollaborations.endowments), not an ordered list.
+  const { docs: industryCollabPhotos } = useCollection<WithId & { imageUrl: string }>('vdlIndustryCollabPhotos', [], { silent: true });
+  const industryCollabPhotoMap = new Map(industryCollabPhotos.map((p) => [p.id, p]));
+  // Parallel to vdl.facilities.activitiesPrograms (Design / Fabrication / Testing / Motorsport).
+  const phasePhotos = [designPhasePhotos, fabricationPhasePhotos, testingPhotos, motorsportPhotos];
 
   return (
     <section className="section bg-white">
@@ -3030,7 +3008,7 @@ function VdlPage({ vdl }: { vdl: typeof vehicleDesignLab }) {
                 <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-5)' }}>Facilities & Projects</h2>
                 <VdlFacilitiesSection
                   facilities={vdl.facilities}
-                  testingPhotos={testingPhotos}
+                  phasePhotos={phasePhotos}
                   campusVehiclePhotos={campusVehiclePhotos}
                 />
               </>
@@ -3040,7 +3018,7 @@ function VdlPage({ vdl }: { vdl: typeof vehicleDesignLab }) {
               <>
                 <span className="section-label">Partnerships</span>
                 <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-5)' }}>Industry Collaborations</h2>
-                <VdlIndustryCollaborationsSection data={vdl.industryCollaborations} photos={industryCollabPhotos} />
+                <VdlIndustryCollaborationsSection data={vdl.industryCollaborations} photoMap={industryCollabPhotoMap} />
               </>
             )}
 
@@ -3492,7 +3470,7 @@ function WiseNseClippingCard({ clipping, photoUrl }: { clipping: WiseNseClipping
         <img
           src={photoUrl || PHOTO_NEEDED_PLACEHOLDER}
           alt={clipping.caption}
-          style={{ width: '100%', height: 260, objectFit: 'cover' }}
+          style={{ width: '100%', height: 'auto', display: 'block' }}
         />
       </div>
       <p style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-primary)', textAlign: 'center', marginTop: 'var(--space-2)' }}>
@@ -3523,7 +3501,6 @@ function WiseNseSection({ paragraphs, clippings, photoMap }: { paragraphs: strin
 
 function WisePage({ wise }: { wise: typeof talentSprintWise }) {
   const [activeTab, setActiveTab] = useState(WISE_TABS[0]);
-  const { docs: wisePlacements } = useOrderedCollection<WisePlacementDoc>('wisePlacements', 'order');
   const { docs: wiseTeamPhotos } = useCollection<WithId & { imageUrl?: string }>('wiseTeamPhotos', [], { silent: true });
   const wiseTeamPhotoMap = Object.fromEntries(wiseTeamPhotos.map((p) => [p.id, p.imageUrl]));
   const { docs: wiseElitePhotos } = useCollection<WithId & { imageUrl?: string }>('wiseEliteProjectPhotos', [], { silent: true });
@@ -3631,16 +3608,6 @@ function WisePage({ wise }: { wise: typeof talentSprintWise }) {
                 <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-5)' }}>Beneficiaries – Placements</h2>
 
                 <WisePlacementStatsAccordion years={wise.beneficiaryStats} />
-
-                <div style={{ marginTop: 'var(--space-8)' }}>
-                  <SectionHeading>Placement Highlights</SectionHeading>
-                  <WisePlacementGrid placements={wisePlacements} />
-                  {wisePlacements.filter((p) => p.imageUrl).length === 0 && (
-                    <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text-light)' }}>
-                      Content for this section is coming soon.
-                    </p>
-                  )}
-                </div>
               </>
             )}
 
