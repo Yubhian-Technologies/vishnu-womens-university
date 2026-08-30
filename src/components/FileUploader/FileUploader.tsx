@@ -7,6 +7,13 @@ interface Props {
   currentUrl?: string;
   onUploaded: (result: UploadResult) => void;
   label?: string;
+  // Defaults to PDF-only (every existing call site relies on this). Pass
+  // accept="image/*" + isValidFile checking file.type.startsWith('image/')
+  // for a non-cropped image upload (e.g. a scanned chart/document image
+  // that shouldn't be cropped, unlike ImageUploader's cover-photo crop flow).
+  accept?: string;
+  isValidFile?: (file: File) => boolean;
+  invalidFileMessage?: string;
 }
 
 function fileNameFromUrl(url: string): string {
@@ -24,6 +31,9 @@ export default function FileUploader({
   currentUrl,
   onUploaded,
   label = 'Upload PDF',
+  accept = '.pdf,application/pdf',
+  isValidFile = (file) => file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf'),
+  invalidFileMessage = 'Please select a PDF file.',
 }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [fileName, setFileName] = useState<string | null>(currentUrl ? fileNameFromUrl(currentUrl) : null);
@@ -31,8 +41,7 @@ export default function FileUploader({
   const [error, setError] = useState<string | null>(null);
 
   const handleFile = async (file: File) => {
-    const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
-    if (!isPdf) { setError('Please select a PDF file.'); return; }
+    if (!isValidFile(file)) { setError(invalidFileMessage); return; }
     setError(null);
     setUploading(true);
     try {
@@ -85,7 +94,7 @@ export default function FileUploader({
       <input
         ref={inputRef}
         type="file"
-        accept=".pdf,application/pdf"
+        accept={accept}
         style={{ display: 'none' }}
         onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); e.target.value = ''; }}
       />

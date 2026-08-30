@@ -1,0 +1,112 @@
+import { useState } from 'react';
+import { collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from '../../../lib/firebase';
+import { useOrderedCollection } from '../../../hooks/useCollection';
+import FileUploader from '../../../components/FileUploader/FileUploader';
+import { deleteFile, type UploadResult } from '../../../lib/storage';
+
+export interface RwtpReportDoc {
+  id: string;
+  label: string;
+  fileUrl: string;
+  storagePath: string;
+  order: number;
+}
+
+const EMPTY: Omit<RwtpReportDoc, 'id'> = { label: '', fileUrl: '', storagePath: '', order: 0 };
+
+export default function RwtpReportsAdmin() {
+  const { docs, loading } = useOrderedCollection<RwtpReportDoc>('rwtpReportLinks', 'order');
+  const [form, setForm] = useState<Omit<RwtpReportDoc, 'id'>>(EMPTY);
+  const [editing, setEditing] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  const set = (k: string, v: string | number) => setForm((p) => ({ ...p, [k]: v }));
+  const handleFile = (r: UploadResult) => setForm((p) => ({ ...p, fileUrl: r.url, storagePath: r.path }));
+
+  const save = async () => {
+    if (!form.label || !form.fileUrl) return alert('Label and a PDF are required.');
+    setSaving(true);
+    try {
+      if (editing) {
+        await updateDoc(doc(db, 'rwtpReportLinks', editing), { ...form });
+      } else {
+        await addDoc(collection(db, 'rwtpReportLinks'), { ...form, order: form.order || docs.length + 1, createdAt: serverTimestamp() });
+      }
+      setForm(EMPTY); setEditing(null);
+    } catch (e) {
+      alert(`Couldn't save: ${(e as Error).message}`);
+    } finally { setSaving(false); }
+  };
+
+  const startEdit = (d: RwtpReportDoc) => {
+    setEditing(d.id);
+    setForm({ label: d.label, fileUrl: d.fileUrl, storagePath: d.storagePath || '', order: d.order });
+  };
+
+  const remove = async (id: string, storagePath?: string) => {
+    if (!confirm('Delete this report?')) return;
+    try {
+      if (storagePath) await deleteFile(storagePath);
+      await deleteDoc(doc(db, 'rwtpReportLinks', id));
+    } catch (e) {
+      alert(`Couldn't delete: ${(e as Error).message}`);
+    }
+  };
+
+  return (
+    <div className="admin-section">
+      <div className="admin-card">
+        <h2 className="admin-card__title">{editing ? 'Edit Report' : 'Add Report'}</h2>
+        <p className="admin-lead" style={{ marginBottom: '1rem' }}>
+          Powers the report links shown under Training Activities &amp; Impact on the Rural Women Tech Park page.
+        </p>
+        <div className="admin-form-grid">
+          <div className="admin-field">
+            <label htmlFor="field-label">Label *</label>
+            <input id="field-label" value={form.label} onChange={(e) => set('label', e.target.value)} placeholder="Click here for Detailed Report" />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label>PDF File *</label>
+            <FileUploader folder="vwu/rwtp" currentUrl={form.fileUrl} onUploaded={handleFile} label="Upload PDF" />
+          </div>
+          <div className="admin-field">
+            <label htmlFor="field-display-order">Display Order</label>
+            <input id="field-display-order" type="number" value={form.order} onChange={(e) => set('order', Number(e.target.value))} min={0} />
+          </div>
+        </div>
+        <div className="admin-form-actions">
+          {editing && <button className="admin-btn admin-btn--ghost" onClick={() => { setEditing(null); setForm(EMPTY); }}>Cancel</button>}
+          <button className="admin-btn admin-btn--primary" onClick={save} disabled={saving}>
+            {saving ? 'Saving…' : editing ? 'Update' : 'Add Report'}
+          </button>
+        </div>
+      </div>
+
+      <div className="admin-card">
+        <h2 className="admin-card__title">Reports ({docs.length})</h2>
+        {loading ? <p className="admin-loading">Loading…</p> : (
+          <div className="admin-table-wrap">
+            <table className="admin-table">
+              <thead><tr><th>Order</th><th>Label</th><th>File</th><th>Actions</th></tr></thead>
+              <tbody>
+                {docs.map((d) => (
+                  <tr key={d.id}>
+                    <td>{d.order}</td>
+                    <td>{d.label}</td>
+                    <td><a href={d.fileUrl} target="_blank" rel="noopener noreferrer">View</a></td>
+                    <td>
+                      <button className="admin-btn admin-btn--sm" onClick={() => startEdit(d)}>Edit</button>
+                      <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(d.id, d.storagePath)}>Delete</button>
+                    </td>
+                  </tr>
+                ))}
+                {docs.length === 0 && <tr><td colSpan={4} className="admin-empty">No reports yet.</td></tr>}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
