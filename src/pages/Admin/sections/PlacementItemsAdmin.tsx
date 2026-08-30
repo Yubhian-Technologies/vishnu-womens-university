@@ -5,6 +5,7 @@ import { useOrderedCollection } from '../../../hooks/useCollection';
 import { CONTENT_ICON_NAMES } from '../../../lib/contentIcons';
 import { deleteFile } from '../../../lib/storage';
 import TableImportButton from '../../../components/TableImportButton/TableImportButton';
+import { parseStructuredTable } from '../../../lib/structuredTable';
 
 export interface PlacementItemDoc {
   id: string;
@@ -84,13 +85,28 @@ export default function PlacementItemsAdmin() {
     }
   };
 
+  // Live preview of the distinct Group names already used in this page's own
+  // Data Table (its 6th "| Group" field), in the order they appear — lets an
+  // admin reuse an exact existing name (e.g. on the TPO Team page) instead of
+  // accidentally creating a near-duplicate tile with a typo'd new one.
+  const currentGroups: string[] = [];
+  for (const row of parseStructuredTable(form.tableText).flatMap((s) => s.rows)) {
+    if (row.group && !currentGroups.includes(row.group)) currentGroups.push(row.group);
+  }
+
   return (
     <div className="admin-section">
       <div className="admin-card">
         <h2 className="admin-card__title">{editing ? 'Edit Placement Page' : 'Add Placement Page'}</h2>
         <p className="admin-lead" style={{ marginBottom: '1rem' }}>
           Powers the /placements sub-pages (Placement Details, TPO Cell, TPO Team, Industry Liaison Offices, etc.).
-          For the Data table, put each row on its own line as <code>Column 1 | Column 2 | Column 3</code>.
+          For the Data table, put each row on its own line as <code>Column 1 | Column 2 | Column 3</code>. On
+          roster-style pages (TPO Cell, TPO Team, Industry Liaison Offices) that's <code>Name | Role | Notes</code> —
+          add a 4th <code>| Email</code> and/or 5th <code>| LinkedIn URL</code> to show that person's contact info
+          right under their name on the public page, without needing a separate admin section. On the TPO Team
+          page specifically, a 6th <code>| Group</code> (e.g. <code>| Central Placement Team</code>) sorts that
+          person into a named tile — whatever Group names appear in the table become the tiles shown on the
+          public page, in the order they first appear, so typing a brand-new Group name creates a new tile.
           Not the same as the "Placements" section, which manages the recruiter logo list.
         </p>
         <p className="admin-field__hint" style={{ background: '#eef6ff', border: '1px solid #bcdcfd', borderRadius: 6, padding: '0.6rem 0.9rem', marginBottom: '1rem' }}>
@@ -155,6 +171,12 @@ export default function PlacementItemsAdmin() {
             <div style={{ marginTop: '0.4rem' }}>
               <TableImportButton onImport={(text) => set('tableText', text)} label="Import Data Table from Excel/CSV" />
             </div>
+            {currentGroups.length > 0 && (
+              <p className="admin-field__hint" style={{ marginTop: '0.4rem' }}>
+                Current groups in this table (reuse one of these exactly, on a new row's 6th <code>| Group</code> field, to add someone to it instead of creating a new tile):{' '}
+                {currentGroups.map((g) => <code key={g} style={{ marginRight: '0.4rem' }}>{g}</code>)}
+              </p>
+            )}
           </div>
           <div className="admin-field admin-field--full">
             <label htmlFor="field-emails-one-per-line-optional">Emails (one per line — optional)</label>

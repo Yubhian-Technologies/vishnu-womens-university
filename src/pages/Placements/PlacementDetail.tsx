@@ -458,7 +458,7 @@ function TeamRosterRow({
   tpoBiosMap,
   iloPhotoMap,
 }: {
-  row: { name: string; role: string; notes?: string };
+  row: { name: string; role: string; notes?: string; email?: string; linkedin?: string };
   isOpen: boolean;
   onToggle: () => void;
   tpoPhotoMap: Map<string, string>;
@@ -466,6 +466,16 @@ function TeamRosterRow({
   iloPhotoMap?: Map<string, { url: string; path: string }[]>;
 }) {
   const bio = tpoBiosMap.get(row.name);
+  // Roster-row email/linkedin (Placement Sub-pages' Data Table, this row's
+  // own 4th/5th field) and TPO Team Info's bio emails/linkedins are two
+  // separate places an admin can set this — combine both rather than
+  // picking one, so either one alone is enough to show a name's contact line.
+  // Deliberately NOT falling back to the page's general Emails/LinkedIn here
+  // — that would repeat the same page-level contact under every row; it gets
+  // shown once instead, below the whole roster (see the single-line contact
+  // in TpoTeamTiles and the flat roster list further down).
+  const contactEmails = [...(row.email ? [row.email] : []), ...(bio?.emails || [])];
+  const contactLinkedins = [...(row.linkedin ? [row.linkedin] : []), ...(bio?.linkedins || [])];
   return (
     <div>
       <button
@@ -492,25 +502,27 @@ function TeamRosterRow({
         </span>
       </button>
 
-      {bio && ((bio.emails && bio.emails.length > 0) || bio.phone || (bio.linkedins && bio.linkedins.length > 0)) && (
+      {(contactEmails.length > 0 || contactLinkedins.length > 0) && (
         <div style={{ padding: '0 var(--space-5) var(--space-2)', background: 'var(--color-off-white)', fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', display: 'flex', flexWrap: 'wrap', gap: 'var(--space-1) var(--space-4)' }}>
-          {((bio.emails && bio.emails.length > 0) || bio.phone) && (
+          {contactEmails.length > 0 && (
             <span>
               Contact:{' '}
-              {[
-                ...(bio.emails || []).map((email, ei) => <a key={`e${ei}`} href={`mailto:${email}`} style={{ color: 'var(--color-primary)', fontWeight: 600 }}>{email}</a>),
-                ...(bio.phone ? [<a key="p" href={`tel:${bio.phone}`} style={{ color: 'var(--color-primary)', fontWeight: 600 }}>{bio.phone}</a>] : []),
-              ].map((node, i) => <span key={i}>{i > 0 && ', '}{node}</span>)}
+              {contactEmails.map((email, ei) => (
+                <span key={ei}>
+                  {ei > 0 && ', '}
+                  <a href={`mailto:${email}`} style={{ color: 'var(--color-primary)', fontWeight: 600 }}>{email}</a>
+                </span>
+              ))}
             </span>
           )}
-          {bio.linkedins && bio.linkedins.length > 0 && (
+          {contactLinkedins.length > 0 && (
             <span>
               LinkedIn:{' '}
-              {bio.linkedins.map((url, li) => (
+              {contactLinkedins.map((url, li) => (
                 <span key={li}>
                   {li > 0 && ', '}
                   <a href={url} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-primary)', fontWeight: 600 }}>
-                    {bio.linkedins!.length > 1 ? `Profile ${li + 1}` : 'View Profile'}
+                    {contactLinkedins.length > 1 ? `Profile ${li + 1}` : 'View Profile'}
                   </a>
                 </span>
               ))}
@@ -622,91 +634,38 @@ function TeamRosterRow({
   );
 }
 
-// TPO Team roster split into three tiles: Central Placement Team (first 4
-// rows), University Team / SVECW (next 3), Industry Liaison Officers (last
-// 4) — a fixed split per the roster order in tpoTeamBios/the admin table,
-// not derived from role text. Clicking a tile shows just that group's
-// roster rows as the same accordion used elsewhere on this page.
-const TPO_TEAM_GROUPS: { label: string; count: number }[] = [
-  { label: 'Central Placement Team', count: 4 },
-  { label: 'University Team (SVECW)', count: 3 },
-  { label: 'Industry Liaison Officers', count: 4 },
-];
-
-// One combined "Contact" block listing every member of the currently active
-// tile group who has an email/phone/LinkedIn on their bio — sits below the
-// roster rows so the whole group's contact info is visible at once, rather
-// than only appearing one person at a time inside each row's own accordion.
-function TpoTeamGroupContact({
-  rows,
-  tpoBiosMap,
-}: {
-  rows: { name: string; role: string; notes?: string }[];
-  tpoBiosMap: Map<string, TpoTeamBioDoc>;
-}) {
-  const linkStyle = { color: 'var(--color-primary)', fontWeight: 600 };
-  const entries = rows
-    .map((row) => ({ row, bio: tpoBiosMap.get(row.name) }))
-    .filter((e): e is { row: typeof e.row; bio: TpoTeamBioDoc } =>
-      !!e.bio && ((e.bio.emails?.length ?? 0) > 0 || (e.bio.linkedins?.length ?? 0) > 0 || !!e.bio.phone)
-    );
-
-  if (entries.length === 0) return null;
-
-  return (
-    <div style={{ marginTop: 'var(--space-6)', background: 'var(--color-off-white)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)' }}>
-      <h3 style={{ fontFamily: 'var(--font-sans)', fontWeight: 800, fontSize: 'var(--text-base)', color: 'var(--color-primary)', marginBottom: 'var(--space-4)' }}>
-        Contact
-      </h3>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-        {entries.map(({ row, bio }) => {
-          const links: { key: string; node: ReactNode }[] = [
-            ...(bio.emails || []).map((email, ei) => ({ key: `email-${ei}`, node: <a key={`email-${ei}`} href={`mailto:${email}`} style={linkStyle}>{email}</a> })),
-            ...(bio.phone ? [{ key: 'phone', node: <a key="phone" href={`tel:${bio.phone}`} style={linkStyle}>{bio.phone}</a> }] : []),
-            ...(bio.linkedins || []).map((url, li) => ({
-              key: `linkedin-${li}`,
-              node: <a key={`linkedin-${li}`} href={url} target="_blank" rel="noopener noreferrer" style={linkStyle}>{(bio.linkedins || []).length > 1 ? `LinkedIn ${li + 1}` : 'LinkedIn'}</a>,
-            })),
-          ];
-          return (
-            <p key={row.name} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', margin: 0 }}>
-              <strong style={{ color: 'var(--color-primary)' }}>{row.name}:</strong>{' '}
-              {links.map((l, li) => (
-                <span key={l.key}>
-                  {li > 0 && ' · '}
-                  {l.node}
-                </span>
-              ))}
-            </p>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
+// TPO Team roster split into tiles by each row's own Group field (Data
+// Table's 6th "| Group" value) — the set of tiles and who's in each one
+// come entirely from whatever distinct Group names appear in the roster, in
+// the order they're first seen, rather than a fixed list/count defined here.
+// Typing a new Group name for someone creates a new tile automatically; a
+// row with no Group set lands in a catch-all "Team" tile instead of
+// disappearing. Clicking a tile shows just that group's roster rows as the
+// same accordion used elsewhere on this page.
+const UNGROUPED_LABEL = 'Team';
 
 function TpoTeamTiles({
   rows,
   tpoPhotoMap,
   tpoBiosMap,
+  pageEmails,
+  pageLinkedins,
 }: {
-  rows: { name: string; role: string; notes?: string }[];
+  rows: { name: string; role: string; notes?: string; group?: string }[];
   tpoPhotoMap: Map<string, string>;
   tpoBiosMap: Map<string, TpoTeamBioDoc>;
+  pageEmails?: string[];
+  pageLinkedins?: string[];
 }) {
   const [activeGroup, setActiveGroup] = useState(0);
   const [activeRow, setActiveRow] = useState<number | null>(null);
 
   const groups: { label: string; rows: typeof rows }[] = [];
-  let offset = 0;
-  for (const g of TPO_TEAM_GROUPS) {
-    groups.push({ label: g.label, rows: rows.slice(offset, offset + g.count) });
-    offset += g.count;
-  }
-  // Any rows beyond the fixed 4/3/4 split (e.g. the admin adds someone new)
-  // land in the last tile rather than silently disappearing.
-  if (offset < rows.length && groups.length > 0) {
-    groups[groups.length - 1] = { ...groups[groups.length - 1], rows: groups[groups.length - 1].rows.concat(rows.slice(offset)) };
+  for (const row of rows) {
+    const label = row.group || UNGROUPED_LABEL;
+    const existing = groups.find((g) => g.label === label);
+    if (existing) existing.rows.push(row);
+    else groups.push({ label, rows: [row] });
   }
 
   const activeRows = groups[activeGroup]?.rows ?? [];
@@ -755,8 +714,35 @@ function TpoTeamTiles({
         ))}
       </div>
 
-      <TpoTeamGroupContact rows={activeRows} tpoBiosMap={tpoBiosMap} />
+      <PageContactLine emails={pageEmails} linkedins={pageLinkedins} />
     </div>
+  );
+}
+
+// The page's own Emails/LinkedIn URLs (Placement Sub-pages' page-level
+// fields — a shared department contact, not tied to any one person) shown
+// once, centered, below the whole roster — rather than repeating the same
+// line under every row.
+function PageContactLine({ emails, linkedins }: { emails?: string[]; linkedins?: string[] }) {
+  if ((!emails || emails.length === 0) && (!linkedins || linkedins.length === 0)) return null;
+  return (
+    <p style={{ textAlign: 'center', fontSize: 'var(--text-sm)', color: 'var(--color-text)', marginTop: 'var(--space-6)' }}>
+      {(emails || []).map((email, ei) => (
+        <span key={`e${ei}`}>
+          {ei > 0 && ' · '}
+          Contact: <a href={`mailto:${email}`} style={{ color: 'var(--color-primary)', fontWeight: 600 }}>{email}</a>
+        </span>
+      ))}
+      {(emails && emails.length > 0) && (linkedins && linkedins.length > 0) && '  '}
+      {(linkedins || []).map((url, li) => (
+        <span key={`l${li}`}>
+          {li > 0 && ' · '}
+          LinkedIn: <a href={url} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-primary)', fontWeight: 600 }}>
+            {(linkedins || []).length > 1 ? `Profile ${li + 1}` : 'View Profile'}
+          </a>
+        </span>
+      ))}
+    </p>
   );
 }
 
@@ -908,7 +894,10 @@ export default function PlacementDetail() {
                 </p>
               )}
 
-              {((item.emails && item.emails.length > 0) || (item.linkedins && item.linkedins.length > 0)) && (
+              {/* Only shown here when there's no roster below to show it instead
+                  (see PageContactLine after the Data Table/Team section) —
+                  avoids the same Email/LinkedIn appearing twice on one page. */}
+              {tableRows.length === 0 && ((item.emails && item.emails.length > 0) || (item.linkedins && item.linkedins.length > 0)) && (
                 <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', marginTop: 'var(--space-5)' }}>
                   {(item.emails || []).map((email, ei) => (
                     <span key={`email-${ei}`}>
@@ -1095,7 +1084,7 @@ export default function PlacementDetail() {
               </h2>
             </div>
             {item.slug === 'tpo-team' ? (
-              <TpoTeamTiles rows={tableRows} tpoPhotoMap={tpoPhotoMap} tpoBiosMap={tpoBiosMap} />
+              <TpoTeamTiles rows={tableRows} tpoPhotoMap={tpoPhotoMap} tpoBiosMap={tpoBiosMap} pageEmails={item.emails} pageLinkedins={item.linkedins} />
             ) : item.slug === 'internships' ? (
               // Company/stipend/selects data reads best as a plain table (same
               // shape as the "Placements, Year by Year" company table) rather
@@ -1103,28 +1092,31 @@ export default function PlacementDetail() {
               // people (TPO Cell, ILO offices). Admins enter it in the same
               // Data Table field, one "Company | Stipend/Month | No. of
               // Selects" per line.
-              <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm)' }}>
-                  <thead>
-                    <tr style={{ background: 'var(--color-accent)' }}>
-                      <th style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900, whiteSpace: 'nowrap' }}>S.No</th>
-                      <th style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900 }}>Company Name</th>
-                      <th style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900, whiteSpace: 'nowrap' }}>Stipend/Month</th>
-                      <th style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900, whiteSpace: 'nowrap' }}>No. of Selects</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {tableRows.map((row, i) => (
-                      <tr key={i} style={{ background: i % 2 === 0 ? 'var(--color-off-white)' : 'transparent' }}>
-                        <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)' }}>{i + 1}</td>
-                        <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)', fontWeight: 600 }}>{row.name}</td>
-                        <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)' }}>{row.role}</td>
-                        <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)' }}>{row.notes}</td>
+              <>
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm)' }}>
+                    <thead>
+                      <tr style={{ background: 'var(--color-accent)' }}>
+                        <th style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900, whiteSpace: 'nowrap' }}>S.No</th>
+                        <th style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900 }}>Company Name</th>
+                        <th style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900, whiteSpace: 'nowrap' }}>Stipend/Month</th>
+                        <th style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900, whiteSpace: 'nowrap' }}>No. of Selects</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody>
+                      {tableRows.map((row, i) => (
+                        <tr key={i} style={{ background: i % 2 === 0 ? 'var(--color-off-white)' : 'transparent' }}>
+                          <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)' }}>{i + 1}</td>
+                          <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)', fontWeight: 600 }}>{row.name}</td>
+                          <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)' }}>{row.role}</td>
+                          <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)' }}>{row.notes}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <PageContactLine emails={item.emails} linkedins={item.linkedins} />
+              </>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 {tableRows.map((row, i) => (
@@ -1138,6 +1130,7 @@ export default function PlacementDetail() {
                     iloPhotoMap={iloPhotoMap}
                   />
                 ))}
+                <PageContactLine emails={item.emails} linkedins={item.linkedins} />
               </div>
             )}
           </div>
