@@ -95,7 +95,12 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   const clean = (v?: string) => (v && v !== '—' ? v : '');
   const shared = {
     heroImage: dept?.heroImage || primary?.heroImage || activeProgram.heroImage || '',
-    about: dept?.about || primary?.about || '',
+    // Department-only — never falls back to a programme's own About, which
+    // now shows per-programme in the toggle section instead (see
+    // "About the Programme" below). `description` is the same card blurb
+    // shown on the Academics page, reused here so this works with no extra
+    // data entry; the "Overview" field on the department admin overrides it.
+    about: dept?.about || dept?.description || '',
     established: clean(dept?.established) || clean(primary?.established),
     accreditation: clean(dept?.accreditation) || clean(primary?.accreditation),
     hod: dept?.hod || primary?.hod || '',
@@ -118,6 +123,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   const libraryTables = shared.librarySections.filter((sec) => sec.items && sec.items.length > 0);
   const hasLibrary = !!(shared.libraryIntro || shared.libraryInCharge || libraryTables.length > 0);
 
+  const hasProgrammeAbout = !!activeProgram.about;
   const hasHighlights = !!(activeProgram.highlights && activeProgram.highlights.length > 0);
   const hasOutcomeStatements = !!(activeProgram.peos?.length || activeProgram.pos?.length || activeProgram.psos?.length);
   const hasMindMap = !!activeProgram.mindMapImage;
@@ -144,6 +150,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     hasLabs && { id: 'labs', label: 'Laboratories' },
     hasLibrary && { id: 'library', label: 'Digital Library' },
     { id: 'program-toggle', label: 'Choose a Programme' },
+    hasProgrammeAbout && { id: 'programme-about', label: 'About the Programme' },
     hasHighlights && { id: 'highlights', label: 'Programme Highlights' },
     hasOutcomeStatements && { id: 'peos-pos-psos', label: 'PEOs, POs & PSOs' },
     hasMindMap && { id: 'mindmap', label: 'Mind Map' },
@@ -492,6 +499,19 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
           </div>
         </div>
       </section>
+
+      {/* About the Programme (per programme) */}
+      {hasProgrammeAbout && (
+        <section id="programme-about" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
+          <div className="container">
+            <span className="section-label">{activeProgram.shortName || activeProgram.name}</span>
+            <h2 className="section-title">About the Programme</h2>
+            <p style={{ color: 'var(--color-text-light)', lineHeight: 1.85, fontSize: 'var(--text-base)', whiteSpace: 'pre-line' }}>
+              {activeProgram.about}
+            </p>
+          </div>
+        </section>
+      )}
 
       {/* Programme Highlights (per programme) */}
       {hasHighlights && (
