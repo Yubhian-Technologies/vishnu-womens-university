@@ -42,6 +42,23 @@
   gap: var(--space-6);
 }
 
+/* Marks the boundary between the 4 designation groups (leadership trio /
+   Professors / Associate Professors / Assistant Professors) — a short
+   centred accent line rather than blank space, so the break reads as
+   deliberate rather than an accidental gap. Reuses the site's existing
+   .divider accent-bar styling for visual consistency, just recentring it
+   under the card grid above/below and controlling its own spacing here
+   instead of .divider's default margin. */
+.faculty-group-divider {
+  display: flex;
+  justify-content: center;
+  margin: var(--space-8) 0;
+}
+
+.faculty-group-divider .divider {
+  margin: 0;
+}
+
 .faculty-card {
   background: var(--color-white);
   border: 1px solid rgba(27, 67, 50, 0.08);

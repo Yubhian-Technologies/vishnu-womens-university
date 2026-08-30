@@ -62,6 +62,12 @@ export interface NewsletterIssue {
   pdfStoragePath?: string;
 }
 
+export interface RndLink {
+  label: string;
+  pdfUrl?: string;
+  pdfStoragePath?: string;
+}
+
 export interface NewsletterYear {
   year: string;
   // Ordered — an issue's "Issue – N" label is always its 1-based position,
@@ -122,6 +128,10 @@ export interface ProgramDoc {
   // programme's page. Grouped by academic year like News & Events, but each
   // year holds an ordered list of issues, each with its own uploaded PDF.
   newsletterYears?: NewsletterYear[];
+  // Optional — shown as a "Research & Development (Funded Projects &
+  // Patents)" section + Quick Links entry on every programme's page. A flat,
+  // admin-named list of links, each backed by its own uploaded PDF.
+  rndLinks?: RndLink[];
   order: number;
 }
 
@@ -135,6 +145,7 @@ const EMPTY: Omit<ProgramDoc, 'id'> = {
   libraryIntro: '', libraryInCharge: '', librarySections: [],
   newsEventsYears: [],
   newsletterYears: [],
+  rndLinks: [],
   order: 0,
 };
 
@@ -209,7 +220,7 @@ export default function ProgramsAdmin() {
     }
   };
 
-  const set = (k: string, v: string | number | string[] | ProgramSemester[] | ProgramLink[] | LibrarySection[] | NewsEventsYear[] | NewsletterYear[]) => setForm((p) => ({ ...p, [k]: v }));
+  const set = (k: string, v: string | number | string[] | ProgramSemester[] | ProgramLink[] | LibrarySection[] | NewsEventsYear[] | NewsletterYear[] | RndLink[]) => setForm((p) => ({ ...p, [k]: v }));
   const handleHodImage = (r: UploadResult) => setForm((p) => ({ ...p, hodImage: r.url, hodImageStoragePath: r.path }));
   const handleMindMapImage = (r: UploadResult) => setForm((p) => ({ ...p, mindMapImage: r.url, mindMapImageStoragePath: r.path }));
 
@@ -384,6 +395,33 @@ export default function ProgramsAdmin() {
     set('newsletterYears', newsletterYears.map((y, i) => (i !== yi ? y : { ...y, issues: y.issues.filter((_, j) => j !== ii) })));
   };
 
+  // Research & Development (Funded Projects & Patents) editing — a flat
+  // admin-named list of links, each backed by its own uploaded PDF.
+  const rndLinks = form.rndLinks || [];
+  const addRndLink = () => {
+    set('rndLinks', [...rndLinks, { label: '' }]);
+  };
+  const updateRndLinkLabel = (li: number, label: string) => {
+    set('rndLinks', rndLinks.map((l, i) => (i === li ? { ...l, label } : l)));
+  };
+  const moveRndLink = (li: number, dir: -1 | 1) => {
+    const next = [...rndLinks];
+    const target = li + dir;
+    if (target < 0 || target >= next.length) return;
+    [next[li], next[target]] = [next[target], next[li]];
+    set('rndLinks', next);
+  };
+  const removeRndLink = (li: number) => {
+    if (!confirm('Remove this link?')) return;
+    set('rndLinks', rndLinks.filter((_, i) => i !== li));
+  };
+  const handleRndLinkPdf = (li: number, r: UploadResult) => {
+    set('rndLinks', rndLinks.map((l, i) => (i === li ? { ...l, pdfUrl: r.url, pdfStoragePath: r.path } : l)));
+  };
+  const removeRndLinkPdf = (li: number) => {
+    set('rndLinks', rndLinks.map((l, i) => (i === li ? { ...l, pdfUrl: '', pdfStoragePath: '' } : l)));
+  };
+
   // Programme Structure (semesters + subjects) editing — structured add /
   // remove / reorder, replacing the old free-text "Semester I: A, B" parser.
   const addSemester = () => {
@@ -463,6 +501,7 @@ export default function ProgramsAdmin() {
         year: y.year,
         issues: (y.issues || []).map((iss) => ({ pdfUrl: iss.pdfUrl || '', pdfStoragePath: iss.pdfStoragePath || '' })),
       })),
+      rndLinks: (p.rndLinks || []).map((l) => ({ label: l.label, pdfUrl: l.pdfUrl || '', pdfStoragePath: l.pdfStoragePath || '' })),
       order: p.order || 0,
     });
   };
@@ -835,6 +874,48 @@ export default function ProgramsAdmin() {
             <button type="button" className="admin-btn admin-btn--primary" onClick={addNewsletterYear}>+ Add Academic Year</button>
             {newsletterYears.length === 0 && (
               <p className="admin-field__hint">No academic years yet — click "Add Academic Year" to start building this programme's Newsletter.</p>
+            )}
+          </div>
+
+          <div className="admin-field admin-field--full"><hr /><h3>Research &amp; Development (Funded Projects &amp; Patents)</h3></div>
+          <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>
+            Optional. Shown as a "Research &amp; Development (Funded Projects &amp; Patents)" section (and Quick
+            Links entry) on this programme's page — a flat list of named links, each opening its own uploaded PDF.
+          </p>
+          <div className="admin-field admin-field--full">
+            {rndLinks.map((link, li) => (
+              <div key={li} style={{ border: '1.5px solid var(--color-light-gray)', borderRadius: 8, padding: '0.75rem', marginBottom: '0.75rem' }}>
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.6rem' }}>
+                  <input
+                    value={link.label}
+                    onChange={(e) => updateRndLinkLabel(li, e.target.value)}
+                    placeholder="Link name, e.g. Funded Project – AICTE RPS 2023"
+                    style={{ flex: 1, fontWeight: 700 }}
+                  />
+                  <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveRndLink(li, -1)} disabled={li === 0} title="Move up">↑</button>
+                  <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveRndLink(li, 1)} disabled={li === rndLinks.length - 1} title="Move down">↓</button>
+                  <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeRndLink(li)}>Remove Link</button>
+                </div>
+                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                  <div style={{ maxWidth: 260 }}>
+                    <FileUploader
+                      folder="vwu/programs/rnd"
+                      currentUrl={link.pdfUrl}
+                      onUploaded={(r) => handleRndLinkPdf(li, r)}
+                      label="Upload PDF"
+                    />
+                  </div>
+                  {link.pdfUrl && (
+                    <button type="button" className="admin-btn admin-btn--ghost admin-btn--sm" onClick={() => removeRndLinkPdf(li)}>
+                      Remove PDF
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+            <button type="button" className="admin-btn admin-btn--primary" onClick={addRndLink}>+ Add Link</button>
+            {rndLinks.length === 0 && (
+              <p className="admin-field__hint">No links yet — click "Add Link" to start building this programme's Research &amp; Development list.</p>
             )}
           </div>
         </div>
