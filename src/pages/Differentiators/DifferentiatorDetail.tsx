@@ -3755,14 +3755,19 @@ function IdeaLabFacilitiesGrid({ photos }: { photos: (WithId & { imageUrl: strin
   const tiles = photos.length > 0
     ? photos
     : Array.from({ length: IDEA_LAB_FACILITY_PLACEHOLDER_COUNT }, (_, i) => ({ id: `placeholder-${i}`, imageUrl: PHOTO_NEEDED_PLACEHOLDER }));
+  // A plain CSS grid forces every row to the height of its tallest photo,
+  // leaving ragged gaps under the shorter ones next to it whenever photos
+  // don't share an aspect ratio (masonry packs them tightly instead) — and
+  // unlike a fixed-height + object-fit:cover grid, this never re-crops a
+  // photo beyond however the admin already cropped it on upload.
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 'var(--space-4)' }}>
+    <div style={{ columns: '220px 3', columnGap: 'var(--space-4)' }}>
       {tiles.map((p) => (
         <img
           key={p.id}
           src={p.imageUrl}
           alt="AICTE IDEA Lab facility"
-          style={{ width: '100%', height: 200, objectFit: 'cover', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-light-gray)' }}
+          style={{ width: '100%', height: 'auto', display: 'block', marginBottom: 'var(--space-4)', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-light-gray)', breakInside: 'avoid' }}
         />
       ))}
     </div>

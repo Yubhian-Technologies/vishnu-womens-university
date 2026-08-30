@@ -112,9 +112,9 @@ export const PAGES = [
 // of hunting through one long undifferentiated button list. Every PAGES
 // value must appear in exactly one group here.
 const PAGE_GROUPS: { label: string; values: string[] }[] = [
-  { label: 'Main Pages', values: ['home', 'academics', 'admissions', 'campus-visit', 'student-life', 'placements', 'alumni-giving', 'about', 'information'] },
+  { label: 'Main Pages', values: ['home', 'academics', 'admissions', 'programmes-fee', 'admission-procedure', 'result-analysis', 'campus-visit', 'student-life', 'placements', 'alumni-giving', 'about', 'information'] },
   { label: 'About, Society & Governance', values: ['about-sves', 'vision-mission', 'governance', 'governing-body', 'governance-detail'] },
-  { label: 'Academics', values: ['academics-curriculum', 'academics-downloads', 'faculty', 'program-detail', 'programmes-fee', 'admission-procedure', 'result-analysis'] },
+  { label: 'Academics', values: ['academics-curriculum', 'academics-downloads', 'faculty', 'program-detail'] },
   { label: 'Student Life', values: ['student-clubs', 'arts-culture', 'social-services', 'sports-games', 'vishnu-tv', 'campus-magazines'] },
   { label: 'Placements, Careers & Research', values: ['placement-detail', 'careers', 'differentiators', 'differentiators-detail', 'research', 'research-detail'] },
   { label: 'News & Awards', values: ['news', 'events', 'news-awards', 'news-awards-happenings', 'news-awards-accreditations', 'news-awards-gallery'] },
