@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Link, useParams, useLocation, Navigate } from 'react-router-dom';
 import { where } from 'firebase/firestore';
-import { Check, Microscope, Compass, Target, Sparkles, Mail, ExternalLink, BookOpen } from 'lucide-react';
+import { Check, Microscope, Compass, Target, Sparkles, Mail, ExternalLink, BookOpen, FileText } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import ProgrammeStructure from '../../components/ProgrammeStructure/ProgrammeStructure';
 import { useCollection, useOrderedCollection } from '../../hooks/useCollection';
@@ -83,6 +83,11 @@ export default function ProgramDetail() {
   const newsletterYears = (program.newsletterYears || []).filter((y) => y.year && y.issues && y.issues.length > 0);
   const hasNewsletter = newsletterYears.length > 0;
   const newsletterMaxIssues = Math.max(0, ...newsletterYears.map((y) => y.issues.length));
+  // Only links with both a name and an uploaded PDF are shown — a link
+  // an admin has started naming but not yet uploaded a PDF for stays
+  // invisible rather than rendering a dead/empty link.
+  const rndLinks = (program.rndLinks || []).filter((l) => l.label && l.pdfUrl);
+  const hasRnd = rndLinks.length > 0;
 
   const quickLinks = [
     { id: 'about', label: 'About the Department' },
@@ -96,6 +101,7 @@ export default function ProgramDetail() {
     hasLibrary && { id: 'library', label: 'Digital Library' },
     hasNewsEvents && { id: 'news-events', label: 'News & Events' },
     hasNewsletter && { id: 'newsletter', label: 'Newsletter' },
+    hasRnd && { id: 'rnd', label: 'Research & Development (Funded Projects & Patents)' },
   ].filter(Boolean) as { id: string; label: string }[];
 
   const hasSidebarContent = quickLinks.length > 1 || hasCareerOutcomes;
@@ -644,6 +650,30 @@ export default function ProgramDetail() {
                 </tbody>
               </table>
             </div>
+          </div>
+        </section>
+      )}
+
+      {/* Research & Development (Funded Projects & Patents) — a flat,
+          admin-named list of links, each opening its own uploaded PDF in a
+          new tab. A link only appears once it has both a name and a PDF. */}
+      {hasRnd && (
+        <section id="rnd" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
+          <div className="container">
+            <div style={{ marginBottom: 'var(--space-8)' }}>
+              <span className="section-label">Research</span>
+              <h2 className="section-title">Research &amp; Development (Funded Projects &amp; Patents)</h2>
+            </div>
+            <ul className="annual-reports-list">
+              {rndLinks.map((link, li) => (
+                <li key={li}>
+                  <a href={link.pdfUrl} target="_blank" rel="noopener noreferrer" className="annual-reports-link">
+                    <FileText size={14} strokeWidth={2} className="annual-reports-icon" />
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
           </div>
         </section>
       )}
