@@ -120,6 +120,23 @@ export default function FacultyAdmin() {
     }
   };
 
+  // Lets someone type an exact order number directly in the table instead of
+  // dragging — handy for jumping a row far up/down a long department list.
+  // Held as text while being typed (so e.g. clearing the field to type a new
+  // number doesn't get coerced back to "0" mid-edit) and only written to
+  // Firestore on blur/Enter.
+  const [orderEdits, setOrderEdits] = useState<Record<string, string>>({});
+  const commitOrder = async (f: FacultyDoc, raw: string) => {
+    setOrderEdits((prev) => { const next = { ...prev }; delete next[f.id]; return next; });
+    const value = parseInt(raw, 10);
+    if (Number.isNaN(value) || value === f.order) return;
+    try {
+      await updateDoc(doc(db, 'faculty', f.id), { order: value });
+    } catch (e) {
+      alert(`Couldn't update order: ${(e as Error).message}`);
+    }
+  };
+
   const [bulkDept, setBulkDept] = useState('CSE');
   const [bulkText, setBulkText] = useState('');
   const [bulkImporting, setBulkImporting] = useState(false);
@@ -374,6 +391,20 @@ export default function FacultyAdmin() {
             <label htmlFor="field-email">Email</label>
             <input id="field-email" type="email" value={form.email} onChange={(e) => set('email', e.target.value)} placeholder="faculty@svecw.edu.in" />
           </div>
+          <div className="admin-field">
+            <label htmlFor="field-order">Display Order</label>
+            <input
+              id="field-order"
+              type="number"
+              value={form.order}
+              onChange={(e) => set('order', +e.target.value)}
+              min={0}
+            />
+            <p className="admin-field__hint">
+              Lower numbers come first within this person's department. Can also be changed later
+              directly in the table below, or by dragging rows.
+            </p>
+          </div>
           <div className="admin-field admin-field--full">
             <label>Profile Facts</label>
             <p className="admin-field__hint">
@@ -459,7 +490,7 @@ export default function FacultyAdmin() {
                   <h3 style={{ fontSize: '0.95rem', marginBottom: '0.5rem' }}>{dept} ({list.length})</h3>
                   <div className="admin-table-wrap">
                     <table className="admin-table">
-                      <thead><tr><th></th><th>Photo</th><th>Name</th><th>Designation</th><th>Qualification</th><th>Profile</th><th>Actions</th></tr></thead>
+                      <thead><tr><th></th><th>Order</th><th>Photo</th><th>Name</th><th>Designation</th><th>Qualification</th><th>Profile</th><th>Actions</th></tr></thead>
                       <tbody>
                         {list.map((f, i) => (
                           <tr
@@ -472,6 +503,18 @@ export default function FacultyAdmin() {
                             style={{ opacity: drag?.dept === dept && drag.index === i ? 0.5 : 1, cursor: 'grab' }}
                           >
                             <td style={{ color: 'var(--color-text-light, #9ca3af)', fontSize: '1.1rem', userSelect: 'none' }}>⠿</td>
+                            <td>
+                              <input
+                                type="number"
+                                className="admin-order-input"
+                                value={orderEdits[f.id] ?? f.order}
+                                onChange={(e) => setOrderEdits((prev) => ({ ...prev, [f.id]: e.target.value }))}
+                                onBlur={(e) => commitOrder(f, e.target.value)}
+                                onKeyDown={(e) => { if (e.key === 'Enter') (e.target as HTMLInputElement).blur(); }}
+                                onClick={(e) => e.stopPropagation()}
+                                onMouseDown={(e) => e.stopPropagation()}
+                              />
+                            </td>
                             <td>{f.imageUrl ? <img src={f.imageUrl} alt="" className="admin-table__avatar" /> : '👤'}</td>
                             <td>{f.name}</td>
                             <td><span className="admin-badge admin-badge--sm">{f.designation}</span></td>
@@ -483,7 +526,7 @@ export default function FacultyAdmin() {
                             </td>
                           </tr>
                         ))}
-                        {list.length === 0 && <tr><td colSpan={7} className="admin-empty">No faculty records.</td></tr>}
+                        {list.length === 0 && <tr><td colSpan={8} className="admin-empty">No faculty records.</td></tr>}
                       </tbody>
                     </table>
                   </div>
