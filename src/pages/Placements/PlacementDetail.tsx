@@ -492,6 +492,33 @@ function TeamRosterRow({
         </span>
       </button>
 
+      {bio && ((bio.emails && bio.emails.length > 0) || bio.phone || (bio.linkedins && bio.linkedins.length > 0)) && (
+        <div style={{ padding: '0 var(--space-5) var(--space-2)', background: 'var(--color-off-white)', fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', display: 'flex', flexWrap: 'wrap', gap: 'var(--space-1) var(--space-4)' }}>
+          {((bio.emails && bio.emails.length > 0) || bio.phone) && (
+            <span>
+              Contact:{' '}
+              {[
+                ...(bio.emails || []).map((email, ei) => <a key={`e${ei}`} href={`mailto:${email}`} style={{ color: 'var(--color-primary)', fontWeight: 600 }}>{email}</a>),
+                ...(bio.phone ? [<a key="p" href={`tel:${bio.phone}`} style={{ color: 'var(--color-primary)', fontWeight: 600 }}>{bio.phone}</a>] : []),
+              ].map((node, i) => <span key={i}>{i > 0 && ', '}{node}</span>)}
+            </span>
+          )}
+          {bio.linkedins && bio.linkedins.length > 0 && (
+            <span>
+              LinkedIn:{' '}
+              {bio.linkedins.map((url, li) => (
+                <span key={li}>
+                  {li > 0 && ', '}
+                  <a href={url} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-primary)', fontWeight: 600 }}>
+                    {bio.linkedins!.length > 1 ? `Profile ${li + 1}` : 'View Profile'}
+                  </a>
+                </span>
+              ))}
+            </span>
+          )}
+        </div>
+      )}
+
       <SmoothCollapse open={isOpen}>
         <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderTop: 'none' }}>
           {bio ? (
@@ -878,6 +905,26 @@ export default function PlacementDetail() {
               ) : (
                 <p style={{ fontSize: 'var(--text-lg)', color: 'var(--color-text)', lineHeight: 1.75 }}>
                   {item.desc}
+                </p>
+              )}
+
+              {((item.emails && item.emails.length > 0) || (item.linkedins && item.linkedins.length > 0)) && (
+                <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', marginTop: 'var(--space-5)' }}>
+                  {(item.emails || []).map((email, ei) => (
+                    <span key={`email-${ei}`}>
+                      {ei > 0 && ' · '}
+                      Email: <a href={`mailto:${email}`} style={{ color: 'var(--color-primary)', fontWeight: 600 }}>{email}</a>
+                    </span>
+                  ))}
+                  {(item.emails && item.emails.length > 0) && (item.linkedins && item.linkedins.length > 0) && ' · '}
+                  {(item.linkedins || []).map((url, li) => (
+                    <span key={`linkedin-${li}`}>
+                      {li > 0 && ' · '}
+                      LinkedIn: <a href={url} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-primary)', fontWeight: 600 }}>
+                        {(item.linkedins || []).length > 1 ? `Profile ${li + 1}` : 'View Profile'}
+                      </a>
+                    </span>
+                  ))}
                 </p>
               )}
             </div>

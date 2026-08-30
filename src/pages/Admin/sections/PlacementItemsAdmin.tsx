@@ -20,6 +20,8 @@ export interface PlacementItemDoc {
   outcomes: string[];
   partners: string[];
   tableText: string;
+  emails: string[];
+  linkedins: string[];
   heroImage: string;
   heroStoragePath: string;
   order: number;
@@ -28,7 +30,7 @@ export interface PlacementItemDoc {
 const EMPTY: Omit<PlacementItemDoc, 'id'> = {
   slug: '', title: '', icon: 'BarChart3', desc: '', external: false, url: '',
   intro: '', about: '', highlights: [], outcomes: [], partners: [], tableText: '',
-  heroImage: '', heroStoragePath: '', order: 0,
+  emails: [], linkedins: [], heroImage: '', heroStoragePath: '', order: 0,
 };
 
 function linesToArray(text: string): string[] {
@@ -67,7 +69,8 @@ export default function PlacementItemsAdmin() {
       slug: it.slug, title: it.title, icon: it.icon || 'BarChart3', desc: it.desc || '',
       external: !!it.external, url: it.url || '', intro: it.intro || '', about: it.about || '',
       highlights: it.highlights || [], outcomes: it.outcomes || [], partners: it.partners || [],
-      tableText: it.tableText || '', heroImage: it.heroImage || '', heroStoragePath: it.heroStoragePath || '', order: it.order,
+      tableText: it.tableText || '', emails: it.emails || [], linkedins: it.linkedins || [],
+      heroImage: it.heroImage || '', heroStoragePath: it.heroStoragePath || '', order: it.order,
     });
   };
 
@@ -152,6 +155,14 @@ export default function PlacementItemsAdmin() {
             <div style={{ marginTop: '0.4rem' }}>
               <TableImportButton onImport={(text) => set('tableText', text)} label="Import Data Table from Excel/CSV" />
             </div>
+          </div>
+          <div className="admin-field admin-field--full">
+            <label htmlFor="field-emails-one-per-line-optional">Emails (one per line — optional)</label>
+            <textarea id="field-emails-one-per-line-optional" rows={2} value={arrayToLines(form.emails)} onChange={(e) => set('emails', linesToArray(e.target.value))} placeholder="placements@srivishnu.edu.in" />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label htmlFor="field-linkedins-one-per-line-optional">LinkedIn URLs (one per line — optional)</label>
+            <textarea id="field-linkedins-one-per-line-optional" rows={2} value={arrayToLines(form.linkedins)} onChange={(e) => set('linkedins', linesToArray(e.target.value))} placeholder="https://www.linkedin.com/in/..." />
           </div>
         </div>
         <div className="admin-form-actions">
