@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
-  collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp,
+  collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp, writeBatch,
 } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
@@ -80,6 +80,45 @@ export default function FacultyAdmin() {
   const [editing, setEditing] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [filterDept, setFilterDept] = useState('All');
+
+  // Drag-to-reorder — grouped by department, since that's the unit both public
+  // pages (/faculty tabs and /academics/:slug#faculty) filter faculty by;
+  // `order` only needs to be consistent within a department, not across all
+  // of them. Same pattern as ProgramsAdmin's category-grouped reordering.
+  const [groupedOrdered, setGroupedOrdered] = useState<Record<string, FacultyDoc[]>>({});
+  const [drag, setDrag] = useState<{ dept: string; index: number } | null>(null);
+  useEffect(() => {
+    const groups: Record<string, FacultyDoc[]> = {};
+    faculty.forEach((f) => { (groups[f.department] ??= []).push(f); });
+    setGroupedOrdered(groups);
+  }, [faculty]);
+
+  const handleDragOver = (dept: string, i: number) => {
+    if (!drag || drag.dept !== dept || drag.index === i) return;
+    setGroupedOrdered((prev) => {
+      const list = [...(prev[dept] || [])];
+      const [moved] = list.splice(drag.index, 1);
+      list.splice(i, 0, moved);
+      return { ...prev, [dept]: list };
+    });
+    setDrag({ dept, index: i });
+  };
+  const handleDrop = async (dept: string) => {
+    setDrag(null);
+    const list = groupedOrdered[dept] || [];
+    const batch = writeBatch(db);
+    let changed = false;
+    list.forEach((f, i) => {
+      if (f.order !== i) { batch.update(doc(db, 'faculty', f.id), { order: i }); changed = true; }
+    });
+    if (changed) {
+      try {
+        await batch.commit();
+      } catch (e) {
+        alert(`Couldn't save new order: ${(e as Error).message}`);
+      }
+    }
+  };
 
   const [bulkDept, setBulkDept] = useState('CSE');
   const [bulkText, setBulkText] = useState('');
@@ -406,29 +445,51 @@ export default function FacultyAdmin() {
             </button>
           </p>
         )}
+        <p className="admin-field__hint" style={{ margin: '0 0 0.75rem' }}>
+          Drag rows by the ⠿ handle to change the order faculty appear in — on the /faculty page
+          (within their designation group) and on each department's /academics page (#faculty section).
+        </p>
         {loading ? <p className="admin-loading">Loading…</p> : (
-          <div className="admin-table-wrap">
-            <table className="admin-table">
-              <thead><tr><th>Photo</th><th>Name</th><th>Designation</th><th>Department</th><th>Qualification</th><th>Profile</th><th>Actions</th></tr></thead>
-              <tbody>
-                {filtered.map((f) => (
-                  <tr key={f.id}>
-                    <td>{f.imageUrl ? <img src={f.imageUrl} alt="" className="admin-table__avatar" /> : '👤'}</td>
-                    <td>{f.name}</td>
-                    <td><span className="admin-badge admin-badge--sm">{f.designation}</span></td>
-                    <td>{f.department}</td>
-                    <td>{f.qualification}</td>
-                    <td>{(f.sections?.length ?? 0) > 0 ? `${f.sections!.filter((s) => getSectionBlocks(s).length > 0).length}/${f.sections!.length} sections` : '—'}</td>
-                    <td>
-                      <button className="admin-btn admin-btn--sm" onClick={() => startEdit(f)}>Edit</button>
-                      <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(f.id)}>Delete</button>
-                    </td>
-                  </tr>
-                ))}
-                {filtered.length === 0 && <tr><td colSpan={7} className="admin-empty">No faculty records.</td></tr>}
-              </tbody>
-            </table>
-          </div>
+          (filterDept === 'All' ? departmentNames : [filterDept])
+            .filter((d) => filterDept !== 'All' || (groupedOrdered[d]?.length ?? 0) > 0)
+            .map((dept) => {
+              const list = groupedOrdered[dept] || [];
+              return (
+                <div key={dept} style={{ marginBottom: '1.5rem' }}>
+                  <h3 style={{ fontSize: '0.95rem', marginBottom: '0.5rem' }}>{dept} ({list.length})</h3>
+                  <div className="admin-table-wrap">
+                    <table className="admin-table">
+                      <thead><tr><th></th><th>Photo</th><th>Name</th><th>Designation</th><th>Qualification</th><th>Profile</th><th>Actions</th></tr></thead>
+                      <tbody>
+                        {list.map((f, i) => (
+                          <tr
+                            key={f.id}
+                            draggable
+                            onDragStart={() => setDrag({ dept, index: i })}
+                            onDragOver={(e) => { e.preventDefault(); handleDragOver(dept, i); }}
+                            onDrop={() => handleDrop(dept)}
+                            onDragEnd={() => setDrag(null)}
+                            style={{ opacity: drag?.dept === dept && drag.index === i ? 0.5 : 1, cursor: 'grab' }}
+                          >
+                            <td style={{ color: 'var(--color-text-light, #9ca3af)', fontSize: '1.1rem', userSelect: 'none' }}>⠿</td>
+                            <td>{f.imageUrl ? <img src={f.imageUrl} alt="" className="admin-table__avatar" /> : '👤'}</td>
+                            <td>{f.name}</td>
+                            <td><span className="admin-badge admin-badge--sm">{f.designation}</span></td>
+                            <td>{f.qualification}</td>
+                            <td>{(f.sections?.length ?? 0) > 0 ? `${f.sections!.filter((s) => getSectionBlocks(s).length > 0).length}/${f.sections!.length} sections` : '—'}</td>
+                            <td>
+                              <button className="admin-btn admin-btn--sm" onClick={() => startEdit(f)}>Edit</button>
+                              <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(f.id)}>Delete</button>
+                            </td>
+                          </tr>
+                        ))}
+                        {list.length === 0 && <tr><td colSpan={7} className="admin-empty">No faculty records.</td></tr>}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              );
+            })
         )}
       </div>
     </div>

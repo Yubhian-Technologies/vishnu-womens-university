@@ -124,9 +124,9 @@ function buildPopularProgramsFromPrograms(programs: ProgramDoc[]): ContentBlockD
 
 const defaultWhyChooseCards: ContentBlockDoc[] = [
   { id: 'default-1', page: 'home', section: 'whyChoose', value: '', title: 'A Campus Built Exclusively for Women', desc: 'A focused, secure environment where every program, hostel, and support service is designed around women succeeding in engineering.', icon: 'Venus', slug: '/about', order: 0 },
-  { id: 'default-2', page: 'home', section: 'whyChoose', value: '', title: 'UGC Autonomous, Industry-Aligned Curriculum', desc: 'Full curricular freedom lets VWU update coursework with industry input every year — not once a decade.', icon: 'BadgeCheck', slug: '/academics', order: 1 },
+  { id: 'default-2', page: 'home', section: 'whyChoose', value: '', title: 'Industry-Aligned Curriculum', desc: 'Coursework is refreshed with industry input every year, keeping graduates ready for what employers need today.', icon: 'BadgeCheck', slug: '/academics', order: 1 },
   { id: 'default-3', page: 'home', section: 'whyChoose', value: '', title: 'Research & Innovation at the Core', desc: 'Dedicated labs, incubation support, and 90+ patents put students inside real research from year one.', icon: 'Rocket', slug: '/differentiators', order: 2 },
-  { id: 'default-4', page: 'home', section: 'whyChoose', value: '', title: '1,100+ Placements Every Year', desc: 'Amazon, TCS, Infosys, Wipro, and 150+ other recruiters return to VWU year after year for its graduating engineers.', icon: 'Briefcase', slug: '/placements', order: 3 },
+  { id: 'default-4', page: 'home', section: 'whyChoose', value: '', title: '1100+ Placements in 2025-26', desc: 'Amazon, TCS, Infosys, Wipro, and 150+ other recruiters return to VWU year after year for its graduating engineers.', icon: 'Briefcase', slug: '/placements', order: 3 },
 ];
 
 const defaultCampusFeatures: ContentBlockDoc[] = [
