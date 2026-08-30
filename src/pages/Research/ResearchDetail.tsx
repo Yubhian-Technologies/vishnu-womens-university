@@ -10,9 +10,7 @@ import type { ResearchItemDoc } from '../Admin/sections/ResearchItemsAdmin';
 import ThrustAreasSection from './ThrustAreasSection';
 import ProfessionalBodiesSection from './ProfessionalBodiesSection';
 import { DEFAULT_FUNDED_PROJECTS_TEXT } from './fundedProjectsDefault';
-import { DEFAULT_PATENTS_TEXT } from './patentsDefault';
 import { DEFAULT_THRUST_AREAS_INTRO, DEFAULT_THRUST_AREAS_TEXT } from './thrustAreasDefault';
-import { DEFAULT_CONSULTANCY_TEXT } from './consultancyDefault';
 import { DEFAULT_RESEARCH_CENTERS_INTRO, DEFAULT_RESEARCH_CENTERS_TABLE_TEXT } from './researchCentersDefault';
 import { DEFAULT_MOUS_TABLE_TEXT } from './mousDefault';
 import { DEFAULT_SEED_MONEY_PROJECTS_TABLE_TEXT, DEFAULT_SEED_MONEY_PROJECTS_INTRO } from './seedMoneyProjectsDefault';
@@ -34,15 +32,6 @@ const CATEGORY_LABELS: Record<string, string> = {
 // fully rather than staying blank until someone pastes it in manually.
 const DEFAULT_PROJECTS_TEXT_BY_SLUG: Record<string, string> = {
   'funded-projects': DEFAULT_FUNDED_PROJECTS_TEXT,
-  'patents': DEFAULT_PATENTS_TEXT,
-};
-
-// Same fallback pattern as above, for the accordion (category -> area ->
-// faculty) content on Consultancy. Research Publications has no hardcoded
-// fallback — its year list only ever comes from the admin-editable
-// Publications by Year field (see the `publicationYears` handling below).
-const DEFAULT_ACCORDION_TEXT_BY_SLUG: Record<string, string> = {
-  'consultancy': DEFAULT_CONSULTANCY_TEXT,
 };
 
 // Fallback accordionText for Thrust Areas of Research, used only until an
@@ -133,7 +122,7 @@ export default function ResearchDetail() {
   const aboutBlocks = parseAboutContent(about);
   const tableText = item.tableText || DEFAULT_TABLE_TEXT_BY_SLUG[item.slug] || '';
   const tableSections = parseFlexibleTable(tableText).filter((s) => s.headers.length > 0);
-  const accordionText = item.accordionText || DEFAULT_ACCORDION_TEXT_OVERRIDE_BY_SLUG[item.slug] || DEFAULT_ACCORDION_TEXT_BY_SLUG[item.slug] || '';
+  const accordionText = item.accordionText || DEFAULT_ACCORDION_TEXT_OVERRIDE_BY_SLUG[item.slug] || '';
   // Thrust Areas of Research is built up incrementally from the admin (a
   // department shell added now, its research areas/faculty filled in later),
   // so a "## Department" with no "### Area" yet still gets a tab there.

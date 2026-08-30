@@ -7,6 +7,7 @@ import { usePageBanners } from '../../hooks/usePageBanners';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import { parseStructuredTable } from '../../lib/structuredTable';
 import type { PlacementItemDoc } from '../Admin/sections/PlacementItemsAdmin';
+import type { PlacementCrtDoc } from '../Admin/sections/PlacementCrtDocsAdmin';
 import PlacementYearAccordion, { BranchOffersBarChart } from './PlacementYearAccordion';
 import SmoothCollapse from '../../components/SmoothCollapse/SmoothCollapse';
 import { successStories } from './successStories.data';
@@ -90,13 +91,13 @@ We are sure that our training will certainly boost up the confidence levels of t
 
 The college offers Career Development Program for all III B.Tech students which comprises extensively the topics relating to Aptitude, Reasoning, English, C language, DBMS and all core subjects.
 
-[More Details …](https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2Fcdp-timetable.pdf?alt=media&token=302a85cc-06bf-4367-a6b0-06a9498752fe)
+[More Details …](__CDP_TIMETABLE_URL__)
 
 **C-Program**
 
 For all the II B.Tech students of Circuit branches additional training in C-program was being offered by the college on continuous basis.
 
-[More Details …](https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2Fc-programming-timetable.pdf?alt=media&token=180386cc-a568-44dd-8a35-f3de2265b0a7)`,
+[More Details …](__C_PROGRAM_TIMETABLE_URL__)`,
   'placement-details': `The Training & Placement Cell of Vishnu Women's University (VWU) acts as a bridge between the University and industry. It supports students in achieving their career goals through placement, internship, training, and industry interaction programs.
 
 The Cell focuses on improving employability, industry readiness, and overall professional development of students.
@@ -677,6 +678,11 @@ export default function PlacementDetail() {
   const iloPhotoMap = new Map(iloPhotoDocs.map((d) => [d.id, d.photos || []]));
   // Admin-uploaded gallery for the GSAC page.
   const { docs: gsacPhotos } = useCollection<WithId & { imageUrl: string }>('gsacPhotos', [orderBy('order', 'asc')], { silent: true });
+  // Admin-replaceable CDP/C-Program timetable PDFs for the Campus
+  // Recruitment & Training page's BODY_OVERRIDES text — see below.
+  const { docs: crtDocs } = useOrderedCollection<PlacementCrtDoc>('placementCrtDocsList', 'order');
+  const crtCdpDoc = crtDocs.find((d) => d.category === 'cdp');
+  const crtCProgramDoc = crtDocs.find((d) => d.category === 'c-program');
   // Each item can have its own hero image (set in the Placement Sub-pages
   // admin); falls back to the shared "Placement Detail" banner. No
   // hardcoded stock-photo fallback — the hero just shows its solid
@@ -716,7 +722,15 @@ export default function PlacementDetail() {
   const tableSections = parseStructuredTable(item.tableText);
   const tableRows = tableSections.flatMap((s) => s.rows);
   const hasBodyOverride = !item.intro && Boolean(BODY_OVERRIDES[item.slug]);
-  const bodyText = hasBodyOverride ? BODY_OVERRIDES[item.slug] : '';
+  let bodyText = hasBodyOverride ? BODY_OVERRIDES[item.slug] : '';
+  // The CDP/C-Program "More Details …" links point at bundled PDFs by
+  // default — swap in an admin-replaced PDF's live URL if one has been
+  // uploaded via /admin → CRT Timetables.
+  if (item.slug === 'campus-recruitment-training' && hasBodyOverride) {
+    bodyText = bodyText
+      .replace('__CDP_TIMETABLE_URL__', crtCdpDoc?.fileUrl || '#')
+      .replace('__C_PROGRAM_TIMETABLE_URL__', crtCProgramDoc?.fileUrl || '#');
+  }
   const bodyBlocks = parseBodyContent(bodyText);
 
   return (
