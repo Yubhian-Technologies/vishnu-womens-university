@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
-import type { BranchOfferCount } from './placementStats.data';
+import type { BranchOfferCount, PlacementRow } from './placementStats.data';
 import { usePlacementYears } from './usePlacementYears';
-import SmoothCollapse from '../../components/SmoothCollapse/SmoothCollapse';
 
 interface Props {
   /** Restrict to just these batch labels (e.g. only the 4 most recent) —
@@ -13,20 +12,24 @@ interface Props {
    *  records) instead of the plain company table — only for batches that
    *  actually have that data (`branchOffers`/`students` on the record). */
   enrichedYears?: string[];
+  /** Reports the currently active batch upward whenever it changes (initial
+   *  auto-pick included) — this component still owns the selection itself,
+   *  a parent can just use this to mirror the choice elsewhere on the page. */
+  onActiveYearChange?: (batch: string) => void;
 }
 
-// A branch's own placement rate — offers against its own eligible-student
-// count, e.g. 81.6% — when that figure is on record. Falls back to the
-// older "share of the batch's total offers" reading (e.g. 24.9%) for any
-// branch/batch without an eligible count, so years that only ever had the
-// old data (and branches like MBA within an otherwise-updated batch) keep
-// showing exactly what they always did instead of reading 0%. This can
-// legitimately read over 100% under the eligible-based formula, where
-// students in a branch collectively earned more offers than the branch's
-// eligible headcount (multiple offers per student).
-function branchPercentage(offers: number, eligible: number | undefined, total: number): number {
-  if (eligible && eligible > 0) return (offers / eligible) * 100;
-  return total > 0 ? (offers / total) * 100 : 0;
+// Every batch's salary column is meant to read as LPA (e.g. "59.15"), but
+// admins sometimes paste the raw rupee figure straight from a source sheet
+// (e.g. "₹59,14,620") instead of converting it by hand first. Auto-convert
+// that shape at display time so either input renders correctly, rather than
+// requiring admins to divide by 1,00,000 themselves before saving.
+function formatSalary(value: string): string {
+  const trimmed = (value || '').trim();
+  const match = trimmed.match(/^₹\s*([\d,]+(?:\.\d+)?)$/);
+  if (!match) return trimmed;
+  const rupees = parseFloat(match[1].replace(/,/g, ''));
+  if (!Number.isFinite(rupees)) return trimmed;
+  return (rupees / 100000).toFixed(2);
 }
 
 // A fixed categorical color per branch identity (not per array position —
@@ -37,7 +40,7 @@ function branchPercentage(offers: number, eligible: number | undefined, total: n
 // surface; the gold slot doubles as the site's own --color-accent so the
 // chart still reads as "on brand" rather than a generic palette drop-in.
 const BRANCH_COLORS: Record<string, string> = {
-  'AI&DS': '#1f8f5c',
+  'CSE(AI&DS)': '#1f8f5c',
   Civil: '#C9A84C',
   CSE: '#17a398',
   'CSE(AI&ML)': '#5b4b9e',
@@ -47,11 +50,12 @@ const BRANCH_COLORS: Record<string, string> = {
   IT: '#c0463f',
   MBA: '#7551a8',
   Mechanical: '#a8710a',
+  'M. Tech.': '#455a64',
 };
 
 function branchKey(label: string): string {
   const stripped = label.replace(/\s*Offers$/i, '').trim();
-  if (stripped === 'AIDS') return 'AI&DS';
+  if (stripped === 'AIDS' || stripped === 'AI&DS') return 'CSE(AI&DS)';
   if (stripped === 'Mech.') return 'Mechanical';
   return stripped;
 }
@@ -86,14 +90,8 @@ const DONUT_CENTER = DONUT_SIZE / 2;
 const DONUT_OUTER_R = 105;
 const DONUT_INNER_R = 64;
 
-// Donut proportions are each branch's share of raw offers *among the
-// listed branches* (so the arcs always complete a full circle) — this can
-// be a different quantity from the printed percentage inside each slice,
-// which is that branch's own placement rate where available (see
-// branchPercentage). A branch can have a small arc but a printed rate
-// over 100%, or vice versa; the arc answers "how much of this batch's
-// hiring activity" while the number answers "how well did this branch's
-// own students do."
+// Donut proportions are each department's share of raw offers *among the
+// listed departments* (so the arcs always complete a full circle).
 function BranchOffersDonut({ data, total }: { data: BranchOfferCount[]; total: number }) {
   const [hovered, setHovered] = useState<string | null>(null);
   const sumOffers = data.reduce((s, d) => s + d.offers, 0) || 1;
@@ -103,7 +101,7 @@ function BranchOffersDonut({ data, total }: { data: BranchOfferCount[]; total: n
     const startAngle = cumulative;
     const endAngle = cumulative + sweep;
     cumulative = endAngle;
-    return { ...d, startAngle, endAngle, pct: branchPercentage(d.offers, d.eligible, total), color: branchColor(d.branch) };
+    return { ...d, startAngle, endAngle, color: branchColor(d.branch) };
   });
   const topBranch = [...slices].sort((a, b) => b.offers - a.offers)[0];
 
@@ -142,7 +140,7 @@ function BranchOffersDonut({ data, total }: { data: BranchOfferCount[]; total: n
                 }}
                 tabIndex={0}
                 role="img"
-                aria-label={`${s.branch}: ${s.pct.toFixed(1)} percent, ${s.offers.toLocaleString('en-IN')} offers`}
+                aria-label={`${s.branch}: ${s.offers.toLocaleString('en-IN')} offers`}
                 onMouseEnter={() => setHovered(s.branch)}
                 onMouseLeave={() => setHovered(null)}
                 onFocus={() => setHovered(s.branch)}
@@ -156,12 +154,9 @@ function BranchOffersDonut({ data, total }: { data: BranchOfferCount[]; total: n
           {hovered ? (
             <>
               <div style={{ fontSize: 'var(--text-2xl)', fontWeight: 900, color: branchColor(hovered), lineHeight: 1 }}>
-                {slices.find((s) => s.branch === hovered)!.pct.toFixed(1)}%
+                {slices.find((s) => s.branch === hovered)!.offers.toLocaleString('en-IN')}
               </div>
               <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', marginTop: 'var(--space-1)', maxWidth: 120, lineHeight: 1.3 }}>{hovered}</div>
-              <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', marginTop: 2 }}>
-                {slices.find((s) => s.branch === hovered)!.offers.toLocaleString('en-IN')} offers
-              </div>
             </>
           ) : (
             <>
@@ -204,7 +199,9 @@ function BranchOffersDonut({ data, total }: { data: BranchOfferCount[]; total: n
             >
               <span style={{ width: 12, height: 12, borderRadius: 3, background: s.color, flexShrink: 0 }} />
               <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', flex: 1 }}>{s.branch}</span>
-              <span style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-primary)' }}>{s.pct.toFixed(1)}%</span>
+              <span style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-primary)' }}>
+                {s.offers.toLocaleString('en-IN')}
+              </span>
             </li>
           );
         })}
@@ -213,15 +210,105 @@ function BranchOffersDonut({ data, total }: { data: BranchOfferCount[]; total: n
   );
 }
 
+// Short axis label for the bar chart below — same branch identity as
+// branchKey(), abbreviated further so ~10 bars fit a narrow sidebar card
+// without wrapping.
+const SHORT_BRANCH_LABELS: Record<string, string> = {
+  'CSE(AI&DS)': 'AI&DS',
+  Civil: 'Civil',
+  CSE: 'CSE',
+  'CSE(AI&ML)': 'AI&ML',
+  'CSE(Cyber Security)': 'Cyber',
+  ECE: 'ECE',
+  EEE: 'EEE',
+  IT: 'IT',
+  MBA: 'MBA',
+  Mechanical: 'Mech',
+  'M. Tech.': 'M.Tech',
+};
+
+function shortBranchLabel(label: string): string {
+  const key = branchKey(label);
+  return SHORT_BRANCH_LABELS[key] ?? key;
+}
+
+// Uniform-color (site primary green, not per-branch categorical colors like
+// the donut above) bar chart for the Placement Cell sidebar.
+export function BranchOffersBarChart({ data }: { data: BranchOfferCount[] }) {
+  const CHART_HEIGHT = 340;
+  const rawMax = Math.max(1, ...data.map((d) => d.offers));
+  const chartMax = Math.max(10, Math.ceil(rawMax / 10) * 10);
+  const ticks = [1, 0.75, 0.5, 0.25, 0].map((f) => Math.round(chartMax * f));
+
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', columnGap: 'var(--space-2)' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: CHART_HEIGHT, fontSize: 'var(--text-xs)', color: 'var(--color-text-light)' }}>
+        {ticks.map((t) => <span key={t} style={{ lineHeight: 1 }}>{t}</span>)}
+      </div>
+      <div style={{ position: 'relative', height: CHART_HEIGHT }}>
+        {ticks.map((t) => (
+          <div key={t} style={{ position: 'absolute', left: 0, right: 0, bottom: `${(t / chartMax) * 100}%`, borderTop: '1px dashed var(--color-light-gray)' }} />
+        ))}
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'flex-end', gap: 4 }}>
+          {data.map((d) => (
+            <div key={d.branch} style={{ flex: 1, height: '100%', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
+              <div
+                role="img"
+                aria-label={`${branchKey(d.branch)}: ${d.offers} offers`}
+                title={`${branchKey(d.branch)}: ${d.offers} offers`}
+                style={{ width: '100%', maxWidth: 22, height: `${(d.offers / chartMax) * 100}%`, background: 'var(--color-primary)', borderRadius: '3px 3px 0 0' }}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+      <div />
+      <div style={{ display: 'flex', gap: 4, marginTop: 6 }}>
+        {data.map((d) => (
+          <span key={d.branch} style={{ flex: 1, textAlign: 'center', fontSize: '0.62rem', fontWeight: 700, color: 'var(--color-text)' }}>
+            {shortBranchLabel(d.branch)}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // Shared by the main Placements page and the "Placement Details" sub-page —
 // both show the exact same batch-wise accordion, so the state/markup lives
 // here once instead of being duplicated.
-export default function PlacementYearAccordion({ years, enrichedYears }: Props) {
+type CompanyFilter = 'all' | 'it' | 'core' | 'dream';
+
+const COMPANY_FILTERS: { key: CompanyFilter; label: string }[] = [
+  { key: 'all', label: 'All Companies' },
+  { key: 'it', label: 'IT / Software' },
+  { key: 'core', label: 'Core' },
+  { key: 'dream', label: 'Dream Package (≥₹20L)' },
+];
+
+// Sector-based filters read the row's own `sector` field (only populated for
+// some batches/companies so far — untagged rows simply won't appear under
+// "IT / Software" or "Core" until an admin/source adds that tag). Dream
+// Package is computed straight off the salary column instead, so it works
+// for every row regardless of sector tagging.
+function matchesCompanyFilter(row: PlacementRow, filter: CompanyFilter): boolean {
+  if (filter === 'all') return true;
+  if (filter === 'dream') {
+    const lpa = parseFloat(formatSalary(row.salary));
+    return Number.isFinite(lpa) && lpa >= 20;
+  }
+  const sector = (row.sector || '').toLowerCase();
+  if (filter === 'it') return sector.includes('it');
+  return sector.includes('core');
+}
+
+export default function PlacementYearAccordion({ years, enrichedYears, onActiveYearChange }: Props) {
   const placementYearData = usePlacementYears();
   const visibleYears = years ? placementYearData.filter((y) => years.includes(y.batch)) : placementYearData;
   const [activeStatsYear, setActiveStatsYear] = useState('');
   const [entriesPerPage, setEntriesPerPage] = useState(10);
   const [statsPage, setStatsPage] = useState(0);
+  const [companyFilter, setCompanyFilter] = useState<CompanyFilter>('all');
 
   // Opens the first batch by default, and re-picks one if the currently
   // open batch disappears from the list (e.g. the static fallback above
@@ -236,6 +323,11 @@ export default function PlacementYearAccordion({ years, enrichedYears }: Props) 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visibleBatchKey]);
 
+  useEffect(() => {
+    if (activeStatsYear) onActiveYearChange?.(activeStatsYear);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeStatsYear]);
+
   if (visibleYears.length === 0) {
     return (
       <p style={{ color: 'var(--color-text-light)' }}>
@@ -244,48 +336,44 @@ export default function PlacementYearAccordion({ years, enrichedYears }: Props) 
     );
   }
 
+  const activeYear = visibleYears.find((y) => y.batch === activeStatsYear) ?? visibleYears[0];
+  const filteredRows = companyFilter === 'all' ? activeYear.rows : activeYear.rows.filter((r) => matchesCompanyFilter(r, companyFilter));
+  const totalPages = Math.max(1, Math.ceil(filteredRows.length / entriesPerPage));
+  const page = Math.min(statsPage, totalPages - 1);
+  const pageRows = entriesPerPage >= filteredRows.length ? filteredRows : filteredRows.slice(page * entriesPerPage, page * entriesPerPage + entriesPerPage);
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-      {visibleYears.map((y) => {
-        const isOpen = activeStatsYear === y.batch;
-        const totalPages = Math.max(1, Math.ceil(y.rows.length / entriesPerPage));
-        const page = Math.min(statsPage, totalPages - 1);
-        const pageRows = entriesPerPage >= y.rows.length ? y.rows : y.rows.slice(page * entriesPerPage, page * entriesPerPage + entriesPerPage);
-        return (
-          <div key={y.batch}>
+    <div>
+      {/* Batch pills — pick which year's panel shows below */}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-3)', marginBottom: 'var(--space-6)' }}>
+        {visibleYears.map((y) => {
+          const isActive = activeYear.batch === y.batch;
+          return (
             <button
-              onClick={() => { setActiveStatsYear(isOpen ? '' : y.batch); setStatsPage(0); }}
+              key={y.batch}
+              onClick={() => { setActiveStatsYear(y.batch); setStatsPage(0); }}
               style={{
-                width: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                background: isOpen ? 'var(--color-primary)' : 'var(--color-off-white)',
-                border: 'none',
-                padding: 'var(--space-3) var(--space-5)',
+                padding: '0.6rem 1.5rem',
+                borderRadius: 'var(--radius-full)',
+                border: '1.5px solid var(--color-primary)',
+                background: isActive ? 'var(--color-primary)' : 'var(--color-white)',
+                color: isActive ? 'var(--color-white)' : 'var(--color-primary)',
+                fontWeight: 700,
+                fontSize: 'var(--text-sm)',
                 cursor: 'pointer',
-                textAlign: 'left',
-                transition: 'background var(--transition-base)',
+                transition: 'background var(--transition-base), color var(--transition-base)',
               }}
             >
-              <span style={{ fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-primary)', fontSize: 'var(--text-base)', transition: 'color var(--transition-base)' }}>{y.batch}</span>
-              <span
-                style={{
-                  fontSize: '1.2rem',
-                  fontWeight: 700,
-                  color: isOpen ? 'var(--color-white)' : 'var(--color-text)',
-                  lineHeight: 1,
-                  display: 'inline-block',
-                  transform: isOpen ? 'scale(1.1)' : 'scale(1)',
-                  transition: 'transform var(--transition-base), color var(--transition-base)',
-                }}
-              >
-                {isOpen ? '−' : '+'}
-              </span>
+              AY. {y.batch.replace('–', '-')}
             </button>
+          );
+        })}
+      </div>
 
-            <SmoothCollapse open={isOpen}>
-              <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderTop: 'none' }}>
+      {(() => {
+        const y = activeYear;
+        return (
+              <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)' }}>
                 <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', marginBottom: 'var(--space-5)' }}>
                   {y.batch} Placements as on date: <strong>{y.total !== null ? y.total.toLocaleString('en-IN') : '—'}</strong>
                 </p>
@@ -313,6 +401,25 @@ export default function PlacementYearAccordion({ years, enrichedYears }: Props) 
                       </div>
                     </div>
 
+                    {(y.averageSalaryLPA != null || y.medianSalaryLPA != null || y.highestPackageLPA != null
+                      || y.offersAbove50LPA != null || y.offersAbove30LPA != null || y.offersAbove10LPA != null) && (
+                      <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-4)', marginBottom: 'var(--space-5)' }}>
+                        {[
+                          { label: 'Average Salary', value: y.averageSalaryLPA != null ? `${y.averageSalaryLPA} LPA` : undefined },
+                          { label: 'Median Salary', value: y.medianSalaryLPA != null ? `${y.medianSalaryLPA} LPA` : undefined },
+                          { label: 'Highest Package', value: y.highestPackageLPA != null ? `${y.highestPackageLPA} LPA` : undefined },
+                          { label: 'Above 50 LPA+', value: y.offersAbove50LPA != null ? `${y.offersAbove50LPA} offers` : undefined },
+                          { label: 'Above 30 LPA+', value: y.offersAbove30LPA != null ? `${y.offersAbove30LPA} offers` : undefined },
+                          { label: 'Above 10 LPA+', value: y.offersAbove10LPA != null ? `${y.offersAbove10LPA} offers` : undefined },
+                        ].filter((tile) => tile.value).map((tile) => (
+                          <div key={tile.label} style={{ background: 'var(--color-off-white)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4)', textAlign: 'center' }}>
+                            <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.03em' }}>{tile.label}</div>
+                            <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.75rem', fontWeight: 900, color: 'var(--color-primary)' }}>{tile.value}</div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
                     <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-3)', marginBottom: 'var(--space-6)' }}>
                       {y.branchOffers.map((b) => (
                         <div
@@ -323,20 +430,29 @@ export default function PlacementYearAccordion({ years, enrichedYears }: Props) 
                             border: '1px solid var(--color-light-gray)',
                             borderRadius: 'var(--radius-md)',
                             padding: 'var(--space-3) var(--space-3) var(--space-3) calc(var(--space-3) + 4px)',
-                            textAlign: 'center',
                             overflow: 'hidden',
                             boxShadow: 'var(--shadow-sm)',
+                            display: 'flex',
+                            alignItems: 'stretch',
                           }}
                         >
                           <span style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, background: branchColor(b.branch) }} />
-                          <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', fontWeight: 700 }}>{b.branch}</div>
-                          <div style={{ fontSize: '1.3rem', fontWeight: 900, color: 'var(--color-primary)' }}>{branchPercentage(b.offers, b.eligible, y.total ?? 0).toFixed(1)}%</div>
+                          <div style={{ flex: 1, textAlign: 'center' }}>
+                            <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', fontWeight: 700 }}>{b.branch}</div>
+                            <div style={{ fontSize: '1.3rem', fontWeight: 900, color: 'var(--color-primary)' }}>{b.offers.toLocaleString('en-IN')}</div>
+                          </div>
+                          {b.highestLPA != null && (
+                            <div style={{ flex: 1, textAlign: 'center', borderLeft: '1px solid var(--color-light-gray)', marginLeft: 'var(--space-2)', paddingLeft: 'var(--space-2)' }}>
+                              <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', fontWeight: 700 }}>Highest Package</div>
+                              <div style={{ fontSize: '1.3rem', fontWeight: 900, color: 'var(--color-primary)' }}>{b.highestLPA} LPA</div>
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>
 
                     <h3 style={{ fontFamily: 'var(--font-sans)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 'var(--space-3)', fontSize: 'var(--text-base)' }}>
-                      Branch-wise Offers — {y.batch}
+                      Department-wise Offers — {y.batch}
                     </h3>
                     <BranchOffersDonut data={y.branchOffers} total={y.total ?? 0} />
                   </div>
@@ -344,19 +460,52 @@ export default function PlacementYearAccordion({ years, enrichedYears }: Props) 
 
                 {y.rows.length > 0 && (
                   <>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-4)', fontSize: 'var(--text-sm)', color: 'var(--color-text)' }}>
-                      <span>Show</span>
-                      <select
-                        value={entriesPerPage}
-                        onChange={(e) => { setEntriesPerPage(Number(e.target.value)); setStatsPage(0); }}
-                        style={{ border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-sm)', padding: '0.3rem 0.5rem', fontSize: 'var(--text-sm)' }}
-                      >
-                        {[10, 25, 50, 100].map((n) => <option key={n} value={n}>{n}</option>)}
-                        <option value={y.rows.length}>All</option>
-                      </select>
-                      <span>entries</span>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 'var(--text-sm)', color: 'var(--color-text)' }}>
+                        <span>Show</span>
+                        <select
+                          value={entriesPerPage}
+                          onChange={(e) => { setEntriesPerPage(Number(e.target.value)); setStatsPage(0); }}
+                          style={{ border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-sm)', padding: '0.3rem 0.5rem', fontSize: 'var(--text-sm)' }}
+                        >
+                          {[10, 25, 50, 100].map((n) => <option key={n} value={n}>{n}</option>)}
+                          <option value={filteredRows.length || 1}>All</option>
+                        </select>
+                        <span>entries</span>
+                      </div>
+
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+                        {COMPANY_FILTERS.map((f) => {
+                          const isActive = companyFilter === f.key;
+                          return (
+                            <button
+                              key={f.key}
+                              onClick={() => { setCompanyFilter(f.key); setStatsPage(0); }}
+                              style={{
+                                padding: '0.45rem 1rem',
+                                borderRadius: 'var(--radius-md)',
+                                border: `1.5px solid ${isActive ? 'var(--color-primary-dark)' : 'var(--color-light-gray)'}`,
+                                background: isActive ? 'var(--color-primary-dark)' : 'var(--color-white)',
+                                color: isActive ? 'var(--color-white)' : 'var(--color-text)',
+                                fontWeight: 600,
+                                fontSize: 'var(--text-sm)',
+                                cursor: 'pointer',
+                                whiteSpace: 'nowrap',
+                                transition: 'background var(--transition-base), color var(--transition-base)',
+                              }}
+                            >
+                              {f.label}
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
 
+                    {filteredRows.length === 0 ? (
+                      <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', padding: 'var(--space-4) 0' }}>
+                        No companies match this filter for this batch.
+                      </p>
+                    ) : (
                     <div style={{ overflowX: 'auto' }}>
                       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm)' }}>
                         <thead>
@@ -367,6 +516,9 @@ export default function PlacementYearAccordion({ years, enrichedYears }: Props) 
                             {y.salaryLabel && (
                               <th style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900 }}>{y.salaryLabel}</th>
                             )}
+                            {y.rows.some((r) => r.sector) && (
+                              <th style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900 }}>Sector</th>
+                            )}
                           </tr>
                         </thead>
                         <tbody>
@@ -376,18 +528,22 @@ export default function PlacementYearAccordion({ years, enrichedYears }: Props) 
                               <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)', fontWeight: 600 }}>{row.company}</td>
                               <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)' }}>{row.selects}</td>
                               {y.salaryLabel && (
-                                <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)' }}>{row.salary}</td>
+                                <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)' }}>{formatSalary(row.salary)}</td>
+                              )}
+                              {y.rows.some((r) => r.sector) && (
+                                <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)' }}>{row.sector}</td>
                               )}
                             </tr>
                           ))}
                         </tbody>
                       </table>
                     </div>
+                    )}
 
-                    {totalPages > 1 && (
+                    {totalPages > 1 && filteredRows.length > 0 && (
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'var(--space-4)', fontSize: 'var(--text-sm)', color: 'var(--color-text-light)' }}>
                         <span>
-                          Showing {page * entriesPerPage + 1} to {Math.min(page * entriesPerPage + entriesPerPage, y.rows.length)} of {y.rows.length} entries
+                          Showing {page * entriesPerPage + 1} to {Math.min(page * entriesPerPage + entriesPerPage, filteredRows.length)} of {filteredRows.length} entries
                         </span>
                         <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
                           <button
@@ -410,10 +566,8 @@ export default function PlacementYearAccordion({ years, enrichedYears }: Props) 
                   </>
                 )}
               </div>
-            </SmoothCollapse>
-          </div>
         );
-      })}
+      })()}
     </div>
   );
 }
