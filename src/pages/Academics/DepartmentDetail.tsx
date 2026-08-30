@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Link, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { where } from 'firebase/firestore';
-import { Check, Microscope, Compass, Target, Sparkles, Mail, BookOpen } from 'lucide-react';
+import { Check, Microscope, Compass, Target, Sparkles, Mail, BookOpen, FileText } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import ProgrammeStructure from '../../components/ProgrammeStructure/ProgrammeStructure';
 import SEO from '../../components/SEO/SEO';
@@ -141,6 +141,12 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   const newsletterYears = (activeProgram.newsletterYears || []).filter((y) => y.year && y.issues && y.issues.length > 0);
   const hasNewsletter = newsletterYears.length > 0;
   const newsletterMaxIssues = Math.max(0, ...newsletterYears.map((y) => y.issues.length));
+  // Research & Development (Funded Projects & Patents) — same per-programme
+  // field as the standalone ProgramDetail.tsx page (ProgramsAdmin's "Research
+  // & Development" editor); a link only appears once it has both a name and
+  // an uploaded PDF.
+  const rndLinks = (activeProgram.rndLinks || []).filter((l) => l.label && l.pdfUrl);
+  const hasRnd = rndLinks.length > 0;
 
   // Quick Links sidebar — shared sections first, then the per-programme ones
   // that live below the toggle (their target still exists on the page no
@@ -161,6 +167,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     { id: 'curriculum', label: 'Curriculum' },
     hasNewsEvents && { id: 'news-events', label: 'News & Events' },
     hasNewsletter && { id: 'newsletter', label: 'Newsletter' },
+    hasRnd && { id: 'rnd', label: 'Research & Development (Funded Projects & Patents)' },
   ].filter(Boolean) as { id: string; label: string }[];
 
   // Top stats bar. Head of Department is genuinely one person for the whole
@@ -695,6 +702,30 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                 </tbody>
               </table>
             </div>
+          </div>
+        </section>
+      )}
+
+      {/* Research & Development (Funded Projects & Patents) (per programme) —
+          same admin-named, PDF-backed link list as the standalone
+          ProgramDetail.tsx page's R&D section. */}
+      {hasRnd && (
+        <section id="rnd" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
+          <div className="container">
+            <div style={{ marginBottom: 'var(--space-8)' }}>
+              <span className="section-label">Research</span>
+              <h2 className="section-title">Research &amp; Development (Funded Projects &amp; Patents)</h2>
+            </div>
+            <ul className="annual-reports-list">
+              {rndLinks.map((link, li) => (
+                <li key={li}>
+                  <a href={link.pdfUrl} target="_blank" rel="noopener noreferrer" className="annual-reports-link">
+                    <FileText size={14} strokeWidth={2} className="annual-reports-icon" />
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
           </div>
         </section>
       )}
