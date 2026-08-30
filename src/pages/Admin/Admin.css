@@ -383,6 +383,58 @@
   border-radius: 50%;
 }
 
+/* ---- Compact editable list (Programs → Laboratories) ----
+   A single bordered list with one thin-bordered row per item, instead of
+   each item being its own bordered/padded card with a margin gap below it
+   — that's what was making the Laboratories editor so tall. */
+.admin-compact-list {
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.admin-compact-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  border-bottom: 1px solid #e5e7eb;
+  flex-wrap: wrap;
+}
+
+.admin-compact-row:last-child { border-bottom: none; }
+.admin-compact-row:hover { background: #fafafa; }
+
+.admin-compact-row__name {
+  flex: 1 1 160px;
+  min-width: 120px;
+  font-weight: 700;
+  padding: 0.35rem 0.55rem;
+  font-size: 0.88rem;
+}
+
+.admin-compact-row__file {
+  flex: 0 0 auto;
+  width: 150px;
+}
+
+.admin-compact-row__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+/* On narrow admin viewports, drop the row onto two lines (name+move/remove
+   on top, file control below) instead of squeezing everything sideways. */
+@media (max-width: 640px) {
+  .admin-compact-row { flex-wrap: wrap; }
+  .admin-compact-row__name { flex: 1 1 100%; }
+  .admin-compact-row__file { flex: 1 1 auto; width: auto; }
+  .admin-compact-row__actions { margin-left: 0; }
+}
+
 /* ---- Image Grid ---- */
 .admin-image-grid {
   display: grid;

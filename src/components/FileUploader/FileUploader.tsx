@@ -14,6 +14,10 @@ interface Props {
   accept?: string;
   isValidFile?: (file: File) => boolean;
   invalidFileMessage?: string;
+  /** Renders a single-line control instead of the full drop zone — same
+   *  upload behavior, just for admin lists where many of these sit in a
+   *  row (e.g. Programs → Laboratories) and the big drop zone is too tall. */
+  compact?: boolean;
 }
 
 function fileNameFromUrl(url: string): string {
@@ -34,6 +38,7 @@ export default function FileUploader({
   accept = '.pdf,application/pdf',
   isValidFile = (file) => file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf'),
   invalidFileMessage = 'Please select a PDF file.',
+  compact = false,
 }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [fileName, setFileName] = useState<string | null>(currentUrl ? fileNameFromUrl(currentUrl) : null);
@@ -56,7 +61,7 @@ export default function FileUploader({
   };
 
   return (
-    <div className="cld-uploader">
+    <div className={`cld-uploader${compact ? ' cld-uploader--compact' : ''}`}>
       <div
         className={`cld-uploader__drop ${uploading ? 'cld-uploader__drop--loading' : ''}`}
         onClick={() => !uploading && inputRef.current?.click()}
