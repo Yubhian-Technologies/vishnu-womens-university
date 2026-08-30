@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Link, useNavigate, useLocation, Navigate } from 'react-router-dom';
-import { Check, Microscope, Compass, Target, Sparkles, Mail, BookOpen } from 'lucide-react';
+import { Check, Microscope, Compass, Target, Sparkles, Mail, BookOpen, FileText } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import ProgrammeStructure from '../../components/ProgrammeStructure/ProgrammeStructure';
 import SEO from '../../components/SEO/SEO';
@@ -9,23 +9,12 @@ import { useEapcetCode } from '../../hooks/useContentBlocks';
 import { smoothScrollTo } from '../../lib/smoothScroll';
 import { getProgramSchema, getBreadcrumbSchema } from '../../lib/seo/schemas';
 import type { DepartmentGroup } from '../../lib/departmentGroups';
-import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
+import { normalizeLab, type ProgramDoc } from '../Admin/sections/ProgramsAdmin';
 import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import type { FacultyDoc } from './Faculty';
 import '../detail-layout.css';
 
 const NAV_OFFSET = 'calc(var(--topbar-height) + var(--header-height) + 1rem)';
-
-// `ProgramDoc.labs` is typed as `string[]`, but some programs' Firestore
-// docs still hold older `{ name, pdfUrl, pdfStoragePath }` entries from a
-// since-simplified admin flow — rendering one of those directly crashes
-// React ("Objects are not valid as a React child"). This coerces either
-// shape into just what the Laboratories section actually needs.
-function labInfo(lab: unknown): { name: string; pdfUrl?: string } {
-  if (typeof lab === 'string') return { name: lab };
-  const obj = lab as { name?: string; pdfUrl?: string };
-  return { name: obj?.name ?? '', pdfUrl: obj?.pdfUrl || undefined };
-}
 
 interface Props {
   group: DepartmentGroup;
@@ -123,7 +112,11 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     vision: dept?.vision || primary?.vision || '',
     mission: (dept?.mission?.length ? dept.mission : primary?.mission) || [],
     coreValues: (dept?.coreValues?.length ? dept.coreValues : primary?.coreValues) || [],
-    labs: (dept?.labs?.length ? dept.labs : primary?.labs) || [],
+    // dept.labs (Academic Departments admin) is plain strings with no PDF
+    // support; primary.labs (Programs admin) may hold richer { name, pdfUrl }
+    // entries — normalizeLab() upgrades either shape so this page never cares
+    // which source it came from.
+    labs: ((dept?.labs?.length ? dept.labs : primary?.labs) || []).map(normalizeLab),
     libraryIntro: dept?.libraryIntro || primary?.libraryIntro || '',
     libraryInCharge: dept?.libraryInCharge || primary?.libraryInCharge || '',
     librarySections: (dept?.librarySections?.length ? dept.librarySections : primary?.librarySections) || [],
@@ -150,6 +143,12 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   const newsletterYears = (activeProgram.newsletterYears || []).filter((y) => y.year && y.issues && y.issues.length > 0);
   const hasNewsletter = newsletterYears.length > 0;
   const newsletterMaxIssues = Math.max(0, ...newsletterYears.map((y) => y.issues.length));
+  // Research & Development (Funded Projects & Patents) — same per-programme
+  // field as the standalone ProgramDetail.tsx page (ProgramsAdmin's "Research
+  // & Development" editor); a link only appears once it has both a name and
+  // an uploaded PDF.
+  const rndLinks = (activeProgram.rndLinks || []).filter((l) => l.label && l.pdfUrl);
+  const hasRnd = rndLinks.length > 0;
 
   // Quick Links sidebar — shared sections first, then the per-programme ones
   // that live below the toggle (their target still exists on the page no
@@ -170,6 +169,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     { id: 'curriculum', label: 'Curriculum' },
     hasNewsEvents && { id: 'news-events', label: 'News & Events' },
     hasNewsletter && { id: 'newsletter', label: 'Newsletter' },
+    hasRnd && { id: 'rnd', label: 'Research & Development (Funded Projects & Patents)' },
   ].filter(Boolean) as { id: string; label: string }[];
 
   // Top stats bar. Head of Department is genuinely one person for the whole
@@ -432,17 +432,28 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
               <h2 className="section-title">Laboratories</h2>
             </div>
             <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 'var(--space-4)' }}>
-              {shared.labs.map((lab, i) => {
-                const { name, pdfUrl } = labInfo(lab);
-                return (
-                  <div key={i} style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', display: 'flex', alignItems: 'center', gap: 'var(--space-4)', borderLeft: '4px solid var(--color-accent)' }}>
+              {shared.labs.map((lab, li) => {
+                const tileStyle = { background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', display: 'flex', alignItems: 'center', gap: 'var(--space-4)', borderLeft: '4px solid var(--color-accent)' };
+                const content = (
+                  <>
                     <Microscope size={22} strokeWidth={1.75} style={{ flexShrink: 0, color: 'var(--color-accent)' }} />
-                    <span style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-primary)', lineHeight: 1.4, flex: 1 }}>{name}</span>
-                    {pdfUrl && (
-                      <a href={pdfUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--color-accent)', whiteSpace: 'nowrap' }}>
-                        View PDF
-                      </a>
-                    )}
+                    <span style={{ display: 'flex', flexDirection: 'column', gap: '0.15rem' }}>
+                      <span style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-primary)', lineHeight: 1.4 }}>{lab.name}</span>
+                      {!lab.pdfUrl && (
+                        <span style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', fontStyle: 'italic' }}>
+                          PDF not available
+                        </span>
+                      )}
+                    </span>
+                  </>
+                );
+                return lab.pdfUrl ? (
+                  <a key={li} href={lab.pdfUrl} target="_blank" rel="noopener noreferrer" style={{ ...tileStyle, textDecoration: 'none' }}>
+                    {content}
+                  </a>
+                ) : (
+                  <div key={li} style={tileStyle}>
+                    {content}
                   </div>
                 );
               })}
@@ -693,6 +704,30 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                 </tbody>
               </table>
             </div>
+          </div>
+        </section>
+      )}
+
+      {/* Research & Development (Funded Projects & Patents) (per programme) —
+          same admin-named, PDF-backed link list as the standalone
+          ProgramDetail.tsx page's R&D section. */}
+      {hasRnd && (
+        <section id="rnd" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
+          <div className="container">
+            <div style={{ marginBottom: 'var(--space-8)' }}>
+              <span className="section-label">Research</span>
+              <h2 className="section-title">Research &amp; Development (Funded Projects &amp; Patents)</h2>
+            </div>
+            <ul className="annual-reports-list">
+              {rndLinks.map((link, li) => (
+                <li key={li}>
+                  <a href={link.pdfUrl} target="_blank" rel="noopener noreferrer" className="annual-reports-link">
+                    <FileText size={14} strokeWidth={2} className="annual-reports-icon" />
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
           </div>
         </section>
       )}

@@ -10,7 +10,7 @@ import { useOrderedCollection } from '../../hooks/useCollection';
 import { usePageBanner } from '../../hooks/usePageBanner';
 import { useEapcetCode } from '../../hooks/useContentBlocks';
 import { smoothScrollTo } from '../../lib/smoothScroll';
-import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
+import { normalizeLab, type ProgramDoc } from '../Admin/sections/ProgramsAdmin';
 import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import type { FacultyDoc } from './Faculty';
 import SEO from '../../components/SEO/SEO';
@@ -25,17 +25,6 @@ const categoryLabel: Record<string, string> = {
   mba: 'MBA',
   phd: 'Ph.D.',
 };
-
-// `ProgramDoc.labs` is typed as `string[]`, but some programs' Firestore
-// docs still hold older `{ name, pdfUrl, pdfStoragePath }` entries from a
-// since-simplified admin flow — rendering one of those directly crashes
-// React ("Objects are not valid as a React child"). This coerces either
-// shape into just what the Laboratories section actually needs.
-function labInfo(lab: unknown): { name: string; pdfUrl?: string } {
-  if (typeof lab === 'string') return { name: lab };
-  const obj = lab as { name?: string; pdfUrl?: string };
-  return { name: obj?.name ?? '', pdfUrl: obj?.pdfUrl || undefined };
-}
 
 export default function ProgramDetail() {
   // AI / CSE / ECE are "grouped" departments whose sub-program slugs render a
@@ -102,7 +91,10 @@ function SingleProgramDetail() {
   const hasOutcomeStatements = !!(program.peos?.length || program.pos?.length || program.psos?.length);
   const hasHod = !!(program.hodMessage || program.hodImage || program.hodEmail);
   const hasMindMap = !!program.mindMapImage;
-  const hasLabs = !!(program.labs && program.labs.length > 0);
+  // Legacy docs may still store labs as plain strings (no PDF) —
+  // normalizeLab() upgrades either shape so this page never has to care.
+  const labs = (program.labs || []).map(normalizeLab);
+  const hasLabs = labs.length > 0;
   const hasCareerOutcomes = !!(program.outcomes && program.outcomes.length > 0);
   const hasCurriculum = !!(program.semesters && program.semesters.length > 0);
   // Every section is entirely admin-defined — heading and items alike — so
@@ -537,17 +529,32 @@ function SingleProgramDetail() {
               <p className="section-desc">State-of-the-art laboratory facilities that bring coursework to life with hands-on, industry-relevant experimentation.</p>
             </div>
             <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 'var(--space-4)' }}>
-              {program.labs.map((lab, i) => {
-                const { name, pdfUrl } = labInfo(lab);
-                return (
-                  <div key={i} style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', display: 'flex', alignItems: 'center', gap: 'var(--space-4)', borderLeft: '4px solid var(--color-accent)' }}>
+              {labs.map((lab, li) => {
+                const tileStyle = { background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', display: 'flex', alignItems: 'center', gap: 'var(--space-4)', borderLeft: '4px solid var(--color-accent)' };
+                const content = (
+                  <>
                     <Microscope size={22} strokeWidth={1.75} style={{ flexShrink: 0, color: 'var(--color-accent)' }} />
-                    <span style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-primary)', lineHeight: 1.4, flex: 1 }}>{name}</span>
-                    {pdfUrl && (
-                      <a href={pdfUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--color-accent)', whiteSpace: 'nowrap' }}>
-                        View PDF
-                      </a>
-                    )}
+                    <span style={{ display: 'flex', flexDirection: 'column', gap: '0.15rem' }}>
+                      <span style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-primary)', lineHeight: 1.4 }}>{lab.name}</span>
+                      {/* Tile always stays visible even with no PDF yet — just marked
+                          unavailable, same convention as the Newsletter issues above. */}
+                      {!lab.pdfUrl && (
+                        <span style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', fontStyle: 'italic' }}>
+                          PDF not available
+                        </span>
+                      )}
+                    </span>
+                  </>
+                );
+                // Opens this lab's own PDF straight from Firebase Storage in a new
+                // tab — only when one has been uploaded via /admin → Programs.
+                return lab.pdfUrl ? (
+                  <a key={li} href={lab.pdfUrl} target="_blank" rel="noopener noreferrer" style={{ ...tileStyle, textDecoration: 'none' }}>
+                    {content}
+                  </a>
+                ) : (
+                  <div key={li} style={tileStyle}>
+                    {content}
                   </div>
                 );
               })}

@@ -33,6 +33,19 @@ export interface ProgramLink {
   url: string;
 }
 
+export interface LabItem {
+  name: string;
+  pdfUrl?: string;
+  pdfStoragePath?: string;
+}
+
+// Older programme docs stored labs as plain strings (no PDF) — normalize
+// either shape to the richer one at read time so existing data keeps
+// rendering without a migration, same approach as normalizeSubject above.
+export function normalizeLab(l: string | LabItem): LabItem {
+  return typeof l === 'string' ? { name: l } : l;
+}
+
 export interface LibraryItem {
   label: string;
   value: string;
@@ -93,7 +106,10 @@ export interface ProgramDoc {
   storagePath: string;
   about: string;
   highlights: string[];
-  labs: string[];
+  // Each lab is independently backed by its own uploaded PDF (see LabItem) —
+  // legacy docs may still have this as a plain string[]; normalizeLab()
+  // upgrades either shape to LabItem at read time.
+  labs: LabItem[];
   outcomes: string[];
   semesters: ProgramSemester[];
   vision: string;
@@ -159,13 +175,6 @@ const DEPARTMENTS = ['CSE', 'AI', 'Cyber Security', 'IT', 'ECE', 'EEE', 'Civil',
 function linesToArray(text: string): string[] {
   return text.split('\n').map((s) => s.trim()).filter(Boolean);
 }
-// `labs` is plain strings today, but a few programs' Firestore docs still
-// hold `{ name, pdfUrl, pdfStoragePath }` entries from a since-simplified
-// admin flow — loading one into the plain textarea below would show
-// "[object Object]" and silently drop the name on the next save.
-function normalizeLabs(labs: unknown[] = []): string[] {
-  return labs.map((l) => (typeof l === 'string' ? l : (l as { name?: string })?.name ?? '')).filter(Boolean);
-}
 function arrayToLines(arr: string[] = []): string {
   return arr.join('\n');
 }
@@ -228,7 +237,7 @@ export default function ProgramsAdmin() {
     }
   };
 
-  const set = (k: string, v: string | number | string[] | ProgramSemester[] | ProgramLink[] | LibrarySection[] | NewsEventsYear[] | NewsletterYear[] | RndLink[]) => setForm((p) => ({ ...p, [k]: v }));
+  const set = (k: string, v: string | number | string[] | ProgramSemester[] | ProgramLink[] | LibrarySection[] | NewsEventsYear[] | NewsletterYear[] | RndLink[] | LabItem[]) => setForm((p) => ({ ...p, [k]: v }));
   const handleHodImage = (r: UploadResult) => setForm((p) => ({ ...p, hodImage: r.url, hodImageStoragePath: r.path }));
   const handleMindMapImage = (r: UploadResult) => setForm((p) => ({ ...p, mindMapImage: r.url, mindMapImageStoragePath: r.path }));
 
@@ -430,6 +439,33 @@ export default function ProgramsAdmin() {
     set('rndLinks', rndLinks.map((l, i) => (i === li ? { ...l, pdfUrl: '', pdfStoragePath: '' } : l)));
   };
 
+  // Laboratories editing — each lab is independently backed by its own
+  // uploaded PDF (same shape/pattern as Research & Development links above).
+  const labs = form.labs || [];
+  const addLab = () => {
+    set('labs', [...labs, { name: '' }]);
+  };
+  const updateLabName = (li: number, name: string) => {
+    set('labs', labs.map((l, i) => (i === li ? { ...l, name } : l)));
+  };
+  const moveLab = (li: number, dir: -1 | 1) => {
+    const next = [...labs];
+    const target = li + dir;
+    if (target < 0 || target >= next.length) return;
+    [next[li], next[target]] = [next[target], next[li]];
+    set('labs', next);
+  };
+  const removeLab = (li: number) => {
+    if (!confirm('Remove this laboratory?')) return;
+    set('labs', labs.filter((_, i) => i !== li));
+  };
+  const handleLabPdf = (li: number, r: UploadResult) => {
+    set('labs', labs.map((l, i) => (i === li ? { ...l, pdfUrl: r.url, pdfStoragePath: r.path } : l)));
+  };
+  const removeLabPdf = (li: number) => {
+    set('labs', labs.map((l, i) => (i === li ? { ...l, pdfUrl: '', pdfStoragePath: '' } : l)));
+  };
+
   // Programme Structure (semesters + subjects) editing — structured add /
   // remove / reorder, replacing the old free-text "Semester I: A, B" parser.
   const addSemester = () => {
@@ -493,7 +529,9 @@ export default function ProgramsAdmin() {
       slug: p.slug, name: p.name, shortName: p.shortName, icon: p.icon || 'GraduationCap',
       category: p.category, intake: p.intake, established: p.established, accreditation: p.accreditation,
       hod: p.hod, department: p.department || '', fee: p.fee || '', heroImage: p.heroImage, storagePath: p.storagePath, about: p.about,
-      highlights: p.highlights || [], labs: normalizeLabs(p.labs), outcomes: p.outcomes || [],
+      highlights: p.highlights || [],
+      labs: (p.labs || []).map(normalizeLab).map((l) => ({ name: l.name, pdfUrl: l.pdfUrl || '', pdfStoragePath: l.pdfStoragePath || '' })),
+      outcomes: p.outcomes || [],
       semesters: (p.semesters || []).map((s) => ({ label: s.label, subjects: (s.subjects || []).map(normalizeSubject) })),
       vision: p.vision || '', mission: p.mission || [], coreValues: p.coreValues || [],
       peos: p.peos || [], pos: p.pos || [], psos: p.psos || [],
@@ -594,9 +632,47 @@ export default function ProgramsAdmin() {
             <label htmlFor="field-highlights-one-per-line">Highlights (one per line)</label>
             <textarea id="field-highlights-one-per-line" rows={5} value={arrayToLines(form.highlights)} onChange={(e) => set('highlights', linesToArray(e.target.value))} placeholder="NBA Tier-I Accredited undergraduate programme" />
           </div>
+          <div className="admin-field admin-field--full"><hr /><h3>Laboratories</h3></div>
+          <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>
+            Each laboratory has its own name and its own uploaded PDF. On the public page, clicking a laboratory
+            tile opens that lab's PDF directly (in a new tab) — a lab with no PDF uploaded yet still shows its tile,
+            just marked as unavailable.
+          </p>
           <div className="admin-field admin-field--full">
-            <label htmlFor="field-labs-one-per-line">Labs (one per line)</label>
-            <textarea id="field-labs-one-per-line" rows={5} value={arrayToLines(form.labs)} onChange={(e) => set('labs', linesToArray(e.target.value))} placeholder="Advanced Computing Lab" />
+            {labs.map((lab, li) => (
+              <div key={li} style={{ border: '1.5px solid var(--color-light-gray)', borderRadius: 8, padding: '0.75rem', marginBottom: '0.75rem' }}>
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.6rem' }}>
+                  <input
+                    value={lab.name}
+                    onChange={(e) => updateLabName(li, e.target.value)}
+                    placeholder="Advanced Computing Lab"
+                    style={{ flex: 1, fontWeight: 700 }}
+                  />
+                  <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveLab(li, -1)} disabled={li === 0} title="Move up">↑</button>
+                  <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveLab(li, 1)} disabled={li === labs.length - 1} title="Move down">↓</button>
+                  <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeLab(li)}>Remove Lab</button>
+                </div>
+                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                  <div style={{ maxWidth: 260 }}>
+                    <FileUploader
+                      folder="vwu/programs/labs"
+                      currentUrl={lab.pdfUrl}
+                      onUploaded={(r) => handleLabPdf(li, r)}
+                      label="Upload PDF"
+                    />
+                  </div>
+                  {lab.pdfUrl && (
+                    <button type="button" className="admin-btn admin-btn--ghost admin-btn--sm" onClick={() => removeLabPdf(li)}>
+                      Remove PDF
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+            <button type="button" className="admin-btn admin-btn--primary" onClick={addLab}>+ Add Lab</button>
+            {labs.length === 0 && (
+              <p className="admin-field__hint">No laboratories yet — click "Add Lab" to start building this programme's Laboratories list.</p>
+            )}
           </div>
           <div className="admin-field admin-field--full">
             <label htmlFor="field-career-outcomes-one-per-line">Career Outcomes (one per line)</label>
