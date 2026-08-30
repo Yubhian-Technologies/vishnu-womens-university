@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import './PlacementAnnouncementsTicker.css';
 
 // Finds which column of a flexible (admin-defined header) table holds a
@@ -36,31 +35,11 @@ function parseAnnouncements(headers: string[], rows: string[][]): Announcement[]
     .filter((a) => a.name && a.company);
 }
 
-// Best-effort logo via a guessed domain (CompanyName -> companyname.com)
-// through Google's favicon service — no curated company list to maintain,
-// since this ticker's companies come from whatever an admin imports rather
-// than a fixed recruiter set. Falls back to an initial-letter badge.
-function CompanyLogo({ company }: { company: string }) {
-  const guessedDomain = `${company.toLowerCase().replace(/[^a-z0-9]/g, '')}.com`;
-  const [failed, setFailed] = useState(false);
-  return failed ? (
-    <span className="pat-card__logo pat-card__logo--fallback">{company.charAt(0)}</span>
-  ) : (
-    <img
-      className="pat-card__logo"
-      src={`https://www.google.com/s2/favicons?domain=${guessedDomain}&sz=64`}
-      alt={company}
-      onError={() => setFailed(true)}
-    />
-  );
-}
-
 function AnnouncementCard({ a }: { a: Announcement }) {
   return (
     <div className="pat-card">
-      <CompanyLogo company={a.company} />
       <div className="pat-card__body">
-        {a.lpa && <div className="pat-card__lpa">{a.lpa} LPA</div>}
+        <div className="pat-card__lpa">{a.company}{a.lpa ? ` | ${a.lpa} LPA` : ''}</div>
         <div className="pat-card__name">{a.name}</div>
         {(a.branch || a.batch) && (
           <div className="pat-card__meta">{[a.branch, a.batch].filter(Boolean).join(' · ')}</div>

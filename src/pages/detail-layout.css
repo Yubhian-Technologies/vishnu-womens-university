@@ -57,7 +57,8 @@
 .partner-logo-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-4);
+  row-gap: var(--space-2);
+  column-gap: var(--space-4);
   align-items: stretch;
   justify-items: stretch;
 }
@@ -73,7 +74,7 @@
   align-items: center;
   justify-content: center;
   padding: var(--space-2);
-  aspect-ratio: 1;
+  height: 100px;
   transition: transform 0.3s ease;
 }
 
