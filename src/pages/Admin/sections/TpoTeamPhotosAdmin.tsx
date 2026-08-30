@@ -4,22 +4,24 @@ import { db } from '../../../lib/firebase';
 import { useCollection, type WithId } from '../../../hooks/useCollection';
 import { useImageCropModal } from '../../../components/ImageUploader/useImageCropModal';
 import { deleteFile, type UploadResult } from '../../../lib/storage';
-import { tpoTeamBios } from '../../Placements/tpoTeamBios.data';
+import type { TpoTeamBioDoc } from './TpoTeamInfoAdmin';
 
 interface TpoPhotoDoc extends WithId {
   imageUrl: string;
   storagePath: string;
 }
 
-const TEAM_NAMES = Object.keys(tpoTeamBios);
-
 /**
- * Fixed-list photo grid for the TPO Team bios (src/pages/Placements/tpoTeamBios.data.ts),
- * whose 11 names are hardcoded rather than a Firestore collection. Photos are stored in
- * their own `tpoTeamPhotos` collection keyed by the exact bio name (setDoc upsert), and
- * PlacementDetail.tsx reads that collection to override each bio's placeholder photo.
+ * Photo grid for the TPO Team bios (Admin → TPO Team Info) — one card per
+ * bio's `name`, so this list stays in sync with whoever an admin has added
+ * a bio for (a photo is only ever shown alongside a matching bio, never on
+ * its own). Photos are stored in their own `tpoTeamPhotos` collection keyed
+ * by that same exact name (setDoc upsert), and PlacementDetail.tsx reads
+ * that collection to override each bio's placeholder photo.
  */
 export default function TpoTeamPhotosAdmin() {
+  const { docs: bios } = useCollection<TpoTeamBioDoc>('tpoTeamBios');
+  const TEAM_NAMES = bios.map((b) => b.name);
   const { docs: photos, loading } = useCollection<TpoPhotoDoc>('tpoTeamPhotos');
   const { openCrop, cropModal } = useImageCropModal(3 / 4);
   const [uploadingName, setUploadingName] = useState<string | null>(null);
@@ -56,6 +58,12 @@ export default function TpoTeamPhotosAdmin() {
         Upload the photo shown when a team member's row is expanded on the TPO Team page. Members
         without a photo here show a "Photo Needed" placeholder on the public site.
       </p>
+      {TEAM_NAMES.length === 0 && (
+        <p className="admin-field__hint" style={{ marginBottom: '1rem' }}>
+          No one to show yet — add a bio first from <strong>TPO Team Info</strong>; a photo card appears here
+          for each name added there.
+        </p>
+      )}
       <div className="admin-image-grid">
         {TEAM_NAMES.map((name) => {
           const imageUrl = photoMap.get(name)?.imageUrl;

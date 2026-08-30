@@ -39,8 +39,10 @@ import NewsAwardsDataAdmin from './sections/NewsAwardsDataAdmin';
 import ResearchItemsAdmin from './sections/ResearchItemsAdmin';
 import ComplianceDocsAdmin from './sections/ComplianceDocsAdmin';
 import PoliciesAdmin from './sections/PoliciesAdmin';
+import TpoTeamInfoAdmin from './sections/TpoTeamInfoAdmin';
 import TpoTeamPhotosAdmin from './sections/TpoTeamPhotosAdmin';
 import IloOfficePhotosAdmin from './sections/IloOfficePhotosAdmin';
+import RecruiterLogosAdmin from './sections/RecruiterLogosAdmin';
 import GsacPhotosAdmin from './sections/GsacPhotosAdmin';
 import { useAdminSession } from './AdminSessionContext';
 import ReadOnlyGate from './ReadOnlyGate';
@@ -60,9 +62,11 @@ interface Props {
 const SECTION_RESOURCE: Partial<Record<string, ResourceKey>> = {
   placements: RESOURCES.PLACEMENTS_PAGE_CONTENT,
   'placement-items': RESOURCES.PLACEMENTS_PAGE_CONTENT,
+  'tpo-team-info': RESOURCES.PLACEMENTS_PAGE_CONTENT,
   'placement-crt-docs': RESOURCES.PLACEMENTS_PAGE_CONTENT,
   'tpo-team-photos': RESOURCES.PLACEMENTS_GALLERY,
   'ilo-office-photos': RESOURCES.PLACEMENTS_GALLERY,
+  'recruiter-logos': RESOURCES.PLACEMENTS_GALLERY,
   'gsac-photos': RESOURCES.PLACEMENTS_GALLERY,
 };
 
@@ -112,9 +116,11 @@ const SECTION_MAP: Record<string, React.ReactNode> = {
   'nba-data': <NbaDataAdmin />,
   differentiators: <DifferentiatorsAdmin />,
   'placement-items': <PlacementItemsAdmin />,
+  'tpo-team-info': <TpoTeamInfoAdmin />,
   'placement-crt-docs': <PlacementCrtDocsAdmin />,
   'tpo-team-photos': <TpoTeamPhotosAdmin />,
   'ilo-office-photos': <IloOfficePhotosAdmin />,
+  'recruiter-logos': <RecruiterLogosAdmin />,
   'gsac-photos': <GsacPhotosAdmin />,
   'news-awards-data': <NewsAwardsDataAdmin />,
   'research-items': <ResearchItemsAdmin />,

@@ -4,6 +4,7 @@ import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
 import { CONTENT_ICON_NAMES } from '../../../lib/contentIcons';
 import { deleteFile } from '../../../lib/storage';
+import TableImportButton from '../../../components/TableImportButton/TableImportButton';
 
 export interface PlacementItemDoc {
   id: string;
@@ -19,6 +20,25 @@ export interface PlacementItemDoc {
   outcomes: string[];
   partners: string[];
   tableText: string;
+  /** Only used on the "placement-highlights" page — its single-line column
+   *  headers, e.g. "S.No | Regd No | Branch | Name | Company | LPA | Batch",
+   *  kept fully separate from Data Table (which holds only data rows there)
+   *  so an Excel/CSV re-import can never accidentally turn a real data row
+   *  into the header, or vice versa. Typed once, not part of the import. */
+  dataTableHeadersText: string;
+  rosterGroupsText: string;
+  /** One "Name | Department" per line — shown on the public site as a
+   *  single "Department Coordinators" row inside each Team Group tile
+   *  (rows sliced across groups by deptCoordinatorGroupsText, same
+   *  mechanism as rosterGroupsText slices Data Table). Import a raw list
+   *  here via the Excel/CSV button below, then set the counts. */
+  deptCoordinatorsText: string;
+  /** One "Group Label | Count" per line, same format/labels as
+   *  rosterGroupsText — assigns that many of deptCoordinatorsText's rows
+   *  (in order) to each Team Group. */
+  deptCoordinatorGroupsText: string;
+  emails: string[];
+  linkedins: string[];
   heroImage: string;
   heroStoragePath: string;
   order: number;
@@ -26,8 +46,8 @@ export interface PlacementItemDoc {
 
 const EMPTY: Omit<PlacementItemDoc, 'id'> = {
   slug: '', title: '', icon: 'BarChart3', desc: '', external: false, url: '',
-  intro: '', about: '', highlights: [], outcomes: [], partners: [], tableText: '',
-  heroImage: '', heroStoragePath: '', order: 0,
+  intro: '', about: '', highlights: [], outcomes: [], partners: [], tableText: '', dataTableHeadersText: '', rosterGroupsText: '',
+  deptCoordinatorsText: '', deptCoordinatorGroupsText: '', emails: [], linkedins: [], heroImage: '', heroStoragePath: '', order: 0,
 };
 
 function linesToArray(text: string): string[] {
@@ -66,7 +86,10 @@ export default function PlacementItemsAdmin() {
       slug: it.slug, title: it.title, icon: it.icon || 'BarChart3', desc: it.desc || '',
       external: !!it.external, url: it.url || '', intro: it.intro || '', about: it.about || '',
       highlights: it.highlights || [], outcomes: it.outcomes || [], partners: it.partners || [],
-      tableText: it.tableText || '', heroImage: it.heroImage || '', heroStoragePath: it.heroStoragePath || '', order: it.order,
+      tableText: it.tableText || '', dataTableHeadersText: it.dataTableHeadersText || '', rosterGroupsText: it.rosterGroupsText || '', deptCoordinatorsText: it.deptCoordinatorsText || '',
+      deptCoordinatorGroupsText: it.deptCoordinatorGroupsText || '',
+      emails: it.emails || [], linkedins: it.linkedins || [],
+      heroImage: it.heroImage || '', heroStoragePath: it.heroStoragePath || '', order: it.order,
     });
   };
 
@@ -86,7 +109,15 @@ export default function PlacementItemsAdmin() {
         <h2 className="admin-card__title">{editing ? 'Edit Placement Page' : 'Add Placement Page'}</h2>
         <p className="admin-lead" style={{ marginBottom: '1rem' }}>
           Powers the /placements sub-pages (Placement Details, TPO Cell, TPO Team, Industry Liaison Offices, etc.).
-          For the Data table, put each row on its own line as <code>Column 1 | Column 2 | Column 3</code>.
+          For the Data table, put each row on its own line as <code>Column 1 | Column 2 | Column 3</code>. On
+          roster-style pages (TPO Cell, TPO Team, Industry Liaison Offices) that's <code>Name | Role | Notes</code> —
+          add a 4th <code>| Email</code> and/or 5th <code>| LinkedIn URL</code> to show that person's contact info
+          right under their name on the public page, without needing a separate admin section. The slug{' '}
+          <code>placement-highlights</code> is special: its Data Table shows whatever columns your spreadsheet
+          has, in that exact order, instead of a fixed shape — its Excel/CSV import button fills both the Table
+          Column Headers field and Data Table from the same file in one click (row 1 of the file always becomes
+          the header), so re-importing a spreadsheet can never accidentally turn a real row of data into the
+          header row.
           Not the same as the "Placements" section, which manages the recruiter logo list.
         </p>
         <p className="admin-field__hint" style={{ background: '#eef6ff', border: '1px solid #bcdcfd', borderRadius: 6, padding: '0.6rem 0.9rem', marginBottom: '1rem' }}>
@@ -145,9 +176,94 @@ export default function PlacementItemsAdmin() {
             <label htmlFor="field-recruiting-partners-one-per-line">Recruiting Partners (one per line — optional)</label>
             <textarea id="field-recruiting-partners-one-per-line" rows={3} value={arrayToLines(form.partners)} onChange={(e) => set('partners', linesToArray(e.target.value))} />
           </div>
+          {form.slug === 'placement-highlights' && (
+            <div className="admin-field admin-field--full">
+              <label htmlFor="field-data-table-headers">
+                Table Column Headers (one line, pipe-separated) — sets the column names shown above Data Table.
+                Auto-filled from row 1 of the file when you use the Excel/CSV import below; edit by hand only if
+                you need to rename a column afterward.
+              </label>
+              <input
+                id="field-data-table-headers"
+                value={form.dataTableHeadersText}
+                onChange={(e) => set('dataTableHeadersText', e.target.value)}
+                placeholder="S.No | Regd No | Branch | Name | Company | LPA | Batch"
+              />
+            </div>
+          )}
           <div className="admin-field admin-field--full">
-            <label htmlFor="field-data-table-optional-see-format">Data Table (optional — see format above)</label>
-            <textarea id="field-data-table-optional-see-format" rows={6} value={form.tableText} onChange={(e) => set('tableText', e.target.value)} placeholder={'2021–2025 | 1156 | 46 LPA | Amazon\n2020–2024 | 818 | 41.54 LPA | Intuit'} />
+            <label htmlFor="field-data-table-optional-see-format">
+              Data Table (optional — see format above){form.slug === 'placement-highlights' ? ' — data rows only; headers come from the field above' : ''}
+            </label>
+            <textarea id="field-data-table-optional-see-format" rows={6} value={form.tableText} onChange={(e) => set('tableText', e.target.value)} placeholder={'Amazon | 110000 | 29\nFlipkart | 95000 | 12'} />
+            <div style={{ marginTop: '0.4rem' }}>
+              {form.slug === 'placement-highlights' ? (
+                <TableImportButton
+                  onImportSplit={(headerLine, dataText) => {
+                    set('dataTableHeadersText', headerLine);
+                    set('tableText', dataText);
+                  }}
+                  label="Import Data Table from Excel/CSV"
+                />
+              ) : (
+                <TableImportButton onImport={(text) => set('tableText', text)} label="Import Data Table from Excel/CSV" />
+              )}
+            </div>
+          </div>
+          <div className="admin-field admin-field--full">
+            <label htmlFor="field-team-groups-one-per-line-optional">
+              Team Groups (one per line, "Group Label | Count" — optional). When set, the Data Table above
+              renders as clickable group tiles (e.g. "Central Placement Team") instead of a flat list — the
+              first <code>Count</code> rows go in the first group, the next <code>Count</code> rows in the
+              second group, and so on; any leftover rows land in the last group. Add as many lines as you need.
+            </label>
+            <textarea
+              id="field-team-groups-one-per-line-optional"
+              rows={3}
+              value={form.rosterGroupsText}
+              onChange={(e) => set('rosterGroupsText', e.target.value)}
+              placeholder={'Central Placement Team | 4\nUniversity Team (SVECW) | 3\nIndustry Liaison Officers | 4'}
+            />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label htmlFor="field-dept-coordinators-staging-optional">
+              Department Coordinators (one per line, "Name | Department" — optional). Shown on the public site
+              as a single "Department Coordinators" row inside each Team Group tile below its regular members —
+              clicking it lists everyone's name and department. Which coordinators land in which group is set
+              by Department Coordinator Groups below.
+            </label>
+            <textarea
+              id="field-dept-coordinators-staging-optional"
+              rows={6}
+              value={form.deptCoordinatorsText}
+              onChange={(e) => set('deptCoordinatorsText', e.target.value)}
+              placeholder={'Dr. Jane Doe | CSE\nMr. John Smith | ECE'}
+            />
+            <div style={{ marginTop: '0.4rem' }}>
+              <TableImportButton onImport={(text) => set('deptCoordinatorsText', text)} label="Import Department Coordinators from Excel/CSV" />
+            </div>
+          </div>
+          <div className="admin-field admin-field--full">
+            <label htmlFor="field-dept-coordinator-groups-one-per-line-optional">
+              Department Coordinator Groups (one per line, "Group Label | Count" — optional). Same format and
+              labels as Team Groups above — assigns that many of Department Coordinators' rows (in order) to
+              each Team Group. A group with no line here (or count 0) shows no Department Coordinators row.
+            </label>
+            <textarea
+              id="field-dept-coordinator-groups-one-per-line-optional"
+              rows={3}
+              value={form.deptCoordinatorGroupsText}
+              onChange={(e) => set('deptCoordinatorGroupsText', e.target.value)}
+              placeholder={'Central Placement Team | 5\nTraining and Placement Team | 8\nIndustry Liaison Officers | 2'}
+            />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label htmlFor="field-emails-one-per-line-optional">Emails (one per line — optional)</label>
+            <textarea id="field-emails-one-per-line-optional" rows={2} value={arrayToLines(form.emails)} onChange={(e) => set('emails', linesToArray(e.target.value))} placeholder="placements@srivishnu.edu.in" />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label htmlFor="field-linkedins-one-per-line-optional">LinkedIn URLs (one per line — optional)</label>
+            <textarea id="field-linkedins-one-per-line-optional" rows={2} value={arrayToLines(form.linkedins)} onChange={(e) => set('linkedins', linesToArray(e.target.value))} placeholder="https://www.linkedin.com/in/..." />
           </div>
         </div>
         <div className="admin-form-actions">

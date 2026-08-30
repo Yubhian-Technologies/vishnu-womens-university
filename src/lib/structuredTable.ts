@@ -3,14 +3,20 @@
 // department) from a single textarea instead of a spreadsheet-style UI.
 //
 // Format:
-//   ## Section Title          (optional — starts a new named section)
-//   Name | Role | Notes       (Notes is optional per row)
+//   ## Section Title                          (optional — starts a new named section)
+//   Name | Role | Notes | Email | LinkedIn     (Notes, Email, LinkedIn are each optional per row)
 //
-// Rows before any "## " line go into a single unnamed section.
+// Rows before any "## " line go into a single unnamed section. Email/LinkedIn
+// only make sense for roster-style pages (TPO Team, TPO Cell, ILO) — when
+// set, PlacementDetail.tsx shows them as a compact "Contact: ... LinkedIn:
+// ..." line right under that row's name, so per-person contact info can be
+// managed in this same table instead of a separate admin section.
 export interface StructuredTableRow {
   name: string;
   role: string;
   notes: string;
+  email?: string;
+  linkedin?: string;
 }
 
 export interface StructuredTableSection {
@@ -30,7 +36,11 @@ export function parseStructuredTable(text: string): StructuredTableSection[] {
       continue;
     }
     const parts = line.split('|').map((p) => p.trim());
-    const row: StructuredTableRow = { name: parts[0] || '', role: parts[1] || '', notes: parts[2] || '' };
+    const row: StructuredTableRow = {
+      name: parts[0] || '', role: parts[1] || '', notes: parts[2] || '',
+      ...(parts[3] ? { email: parts[3] } : {}),
+      ...(parts[4] ? { linkedin: parts[4] } : {}),
+    };
     if (!current) {
       current = { title: '', rows: [] };
       sections.push(current);

@@ -8,6 +8,7 @@ import {
   type PlacementRow,
   type PlacementYear,
 } from '../../Placements/placementStats.data';
+import TableImportButton from '../../../components/TableImportButton/TableImportButton';
 
 type PlacementYearDoc = WithId & PlacementYear;
 
@@ -239,10 +240,16 @@ export default function PlacementYearsAdmin() {
           <div className="admin-field admin-field--full">
             <label htmlFor="field-branch-wise-offers-optional-one">Department-wise Offers (optional — one per line, "Department | Offers | Highest LPA". Highest LPA is optional per line — when set, that department's tile/donut also shows its highest package.)</label>
             <textarea id="field-branch-wise-offers-optional-one" rows={4} value={form.branchOffersText} onChange={(e) => set('branchOffersText', e.target.value)} placeholder={'CSE Offers | 268 | 46.38\nECE Offers | 97 | 32.02'} />
+            <div style={{ marginTop: '0.4rem' }}>
+              <TableImportButton onImport={(text) => set('branchOffersText', text)} label="Import Branch Offers from Excel/CSV" />
+            </div>
           </div>
           <div className="admin-field admin-field--full">
             <label htmlFor="field-company-rows-one-per-line">Company Rows — one per line, "Company | Selects | CTC | Sector". Sector is optional per line — when at least one row has it, the table shows a Sector column.</label>
             <textarea id="field-company-rows-one-per-line" rows={14} value={form.rowsText} onChange={(e) => set('rowsText', e.target.value)} placeholder={'Google | 3 | 59.15 | IT Sector\nAdobe | 4 | 53.35 | IT Sector'} />
+            <div style={{ marginTop: '0.4rem' }}>
+              <TableImportButton onImport={(text) => set('rowsText', text)} label="Import Company Rows from Excel/CSV" />
+            </div>
           </div>
         </div>
         <div className="admin-form-actions">

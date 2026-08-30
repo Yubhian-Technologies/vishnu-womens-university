@@ -6,6 +6,7 @@ import { useNavLinkOverride } from '../../hooks/useNavLinkOverride';
 import type { ProgramDoc } from '../../pages/Admin/sections/ProgramsAdmin';
 import { DIFFERENTIATOR_CATEGORIES } from '../../pages/Admin/sections/DifferentiatorsAdmin';
 import type { DifferentiatorItemDoc } from '../../pages/Admin/sections/DifferentiatorsAdmin';
+import type { PlacementItemDoc } from '../../pages/Admin/sections/PlacementItemsAdmin';
 import SmoothCollapse from '../SmoothCollapse/SmoothCollapse';
 import './Header.css';
 
@@ -167,21 +168,13 @@ const navItems: NavItem[] = [
     ],
   },
   {
+    // Children are spliced in at render time from live Firestore
+    // `placementItems` data (the same collection that drives the "Explore
+    // Placements at VWU" cards) — see renderedNavItems in Header() — so a
+    // sub-page added in the admin's Placement Sub-pages section shows up
+    // here automatically instead of needing a matching hardcoded entry.
     label: 'Placements',
-    children: [
-      { label: 'Placement Details', path: '/placements/placement-details' },
-      { label: 'Internships', path: '/placements/internships' },
-      { label: 'Success Stories', path: '/placements/success-stories' },
-      { label: 'TPO Cell', path: '/placements/tpo-cell' },
-      { label: 'TPO Team', path: '/placements/tpo-team' },
-      { label: 'Our Recruiters', path: '/placements/our-recruiters' },
-      { label: 'Career Guidance Cell', path: '/placements/career-guidance-cell' },
-      { label: 'Industry Liaison Offices', path: '/placements/industry-liaison-offices' },
-      { label: 'Campus Recruitment Training', path: '/placements/campus-recruitment-training' },
-      { label: 'Employability Skills', path: '/placements/employability-skills' },
-      { label: 'Graduate Study Abroad Center – GSAC', path: '/placements/gsac' },
-      { label: 'Higher Education', path: '/placements/higher-education' },
-    ],
+    children: [],
   },
   {
     // Flat list (no sub-groups) — was a 3-group mega-menu, collapsed to
@@ -316,6 +309,7 @@ export default function Header() {
   const phdProgrammes = programs.filter((p) => p.category === 'phd').map(programItem);
 
   const { docs: differentiatorItems } = useOrderedCollection<DifferentiatorItemDoc>('differentiatorItems', 'order');
+  const { docs: placementItems } = useOrderedCollection<PlacementItemDoc>('placementItems', 'order');
 
   const renderedNavItems: NavItem[] = navItems.map((item) => {
     // About Us → Organizational Chart's target is admin-replaceable — see
@@ -365,6 +359,18 @@ export default function Header() {
         };
       });
       return { ...item, groups };
+    }
+    // Placements' dropdown mirrors the "Explore Placements at VWU" cards on
+    // the Placements page one-for-one — see the "Overview" comment above.
+    if (item.label === 'Placements') {
+      return {
+        ...item,
+        children: placementItems.map((p): NavChild =>
+          p.external && p.url
+            ? { label: p.title, path: p.url, external: true }
+            : { label: p.title, path: `/placements/${p.slug}` }
+        ),
+      };
     }
     return item;
   });
