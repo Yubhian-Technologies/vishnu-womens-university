@@ -32,6 +32,10 @@ export function useCollection<T extends WithId>(
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!db) {
+      setLoading(false);
+      return;
+    }
     const q = query(collection(db, collectionName), ...constraints);
     const unsub = onSnapshot(
       q,
