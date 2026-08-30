@@ -5,6 +5,7 @@ import { useOrderedCollection } from '../../../hooks/useCollection';
 import ImageUploader from '../../../components/ImageUploader/ImageUploader';
 import type { UploadResult } from '../../../lib/storage';
 import { PROGRAM_ICON_NAMES } from '../../../lib/programIcons';
+import type { LibrarySection, LibraryItem } from './ProgramsAdmin';
 
 // Backs the "Academic Departments" card grid on Academics.tsx — independent
 // of the `programs` collection, so a department's card copy doesn't have to
@@ -37,6 +38,12 @@ export interface DepartmentDoc {
   mission?: string[];
   coreValues?: string[];
   labs?: string[];
+  // Digital Library — same shape as a programme's own (see ProgramsAdmin),
+  // shown as a shared section before the program toggle on the grouped
+  // department page.
+  libraryIntro?: string;
+  libraryInCharge?: string;
+  librarySections?: LibrarySection[];
 }
 
 const EMPTY: Omit<DepartmentDoc, 'id'> = {
@@ -44,6 +51,7 @@ const EMPTY: Omit<DepartmentDoc, 'id'> = {
   heroImage: '', storagePath: '', about: '', established: '', accreditation: '',
   hod: '', hodImage: '', hodImageStoragePath: '', hodEmail: '', hodMessage: '',
   vision: '', mission: [], coreValues: [], labs: [],
+  libraryIntro: '', libraryInCharge: '', librarySections: [],
 };
 
 function linesToArray(text: string): string[] {
@@ -59,9 +67,51 @@ export default function DepartmentsAdmin() {
   const [editing, setEditing] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
-  const set = (k: string, v: string | number | string[]) => setForm((p) => ({ ...p, [k]: v }));
+  const set = (k: string, v: string | number | string[] | LibrarySection[]) => setForm((p) => ({ ...p, [k]: v }));
   const handleHero = (r: UploadResult) => setForm((p) => ({ ...p, heroImage: r.url, storagePath: r.path }));
   const handleHodImage = (r: UploadResult) => setForm((p) => ({ ...p, hodImage: r.url, hodImageStoragePath: r.path }));
+
+  // Digital Library section editor — same add/reorder/remove pattern as the
+  // per-programme one in ProgramsAdmin.
+  const librarySections = form.librarySections || [];
+  const addLibrarySection = () => {
+    set('librarySections', [...librarySections, { heading: `Section ${librarySections.length + 1}`, items: [] }]);
+  };
+  const updateLibrarySectionHeading = (si: number, heading: string) => {
+    set('librarySections', librarySections.map((s, i) => (i === si ? { ...s, heading } : s)));
+  };
+  const moveLibrarySection = (si: number, dir: -1 | 1) => {
+    const next = [...librarySections];
+    const target = si + dir;
+    if (target < 0 || target >= next.length) return;
+    [next[si], next[target]] = [next[target], next[si]];
+    set('librarySections', next);
+  };
+  const removeLibrarySection = (si: number) => {
+    set('librarySections', librarySections.filter((_, i) => i !== si));
+  };
+  const addLibraryItem = (si: number) => {
+    set('librarySections', librarySections.map((s, i) => (i === si ? { ...s, items: [...s.items, { label: '', value: '' }] } : s)));
+  };
+  const updateLibraryItem = (si: number, ji: number, patch: Partial<LibraryItem>) => {
+    set('librarySections', librarySections.map((s, i) => (i !== si ? s : {
+      ...s,
+      items: s.items.map((it, j) => (j === ji ? { ...it, ...patch } : it)),
+    })));
+  };
+  const moveLibraryItem = (si: number, ji: number, dir: -1 | 1) => {
+    set('librarySections', librarySections.map((s, i) => {
+      if (i !== si) return s;
+      const items = [...s.items];
+      const target = ji + dir;
+      if (target < 0 || target >= items.length) return s;
+      [items[ji], items[target]] = [items[target], items[ji]];
+      return { ...s, items };
+    }));
+  };
+  const removeLibraryItem = (si: number, ji: number) => {
+    set('librarySections', librarySections.map((s, i) => (i === si ? { ...s, items: s.items.filter((_, j) => j !== ji) } : s)));
+  };
 
   const save = async () => {
     if (!form.title || !form.shortCode) return alert('Title and Short Code are required.');
@@ -88,6 +138,8 @@ export default function DepartmentsAdmin() {
       hod: d.hod || '', hodImage: d.hodImage || '', hodImageStoragePath: d.hodImageStoragePath || '',
       hodEmail: d.hodEmail || '', hodMessage: d.hodMessage || '',
       vision: d.vision || '', mission: d.mission || [], coreValues: d.coreValues || [], labs: d.labs || [],
+      libraryIntro: d.libraryIntro || '', libraryInCharge: d.libraryInCharge || '',
+      librarySections: (d.librarySections || []).map((s) => ({ heading: s.heading, items: s.items || [] })),
     });
   };
 
@@ -170,6 +222,63 @@ export default function DepartmentsAdmin() {
           <div className="admin-field admin-field--full">
             <label htmlFor="field-labs">Laboratories (one per line)</label>
             <textarea id="field-labs" rows={4} value={arrayToLines(form.labs)} onChange={(e) => set('labs', linesToArray(e.target.value))} />
+          </div>
+
+          <div className="admin-field admin-field--full"><hr /><h3>Department Page — Digital Library</h3>
+            <p className="admin-field__hint" style={{ marginTop: '0.25rem' }}>
+              Shown as a shared "Digital Library" section, before the program toggle. Each section below becomes
+              its own table on the public page.
+            </p>
+          </div>
+          <div className="admin-field admin-field--full">
+            <label htmlFor="field-library-intro">Library Overview</label>
+            <textarea id="field-library-intro" rows={3} value={form.libraryIntro} onChange={(e) => set('libraryIntro', e.target.value)} placeholder="The Department Library occupies a unique place in academic and research activities of the Department…" />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label htmlFor="field-library-in-charge">In-charge of Department Library</label>
+            <input id="field-library-in-charge" value={form.libraryInCharge} onChange={(e) => set('libraryInCharge', e.target.value)} placeholder="Dr. P. Ravi Kumar, Ph.D. Associate Professor" />
+          </div>
+          <div className="admin-field admin-field--full">
+            {librarySections.map((sec, si) => (
+              <div key={si} style={{ border: '1.5px solid var(--color-light-gray)', borderRadius: 8, padding: '0.75rem', marginBottom: '0.75rem' }}>
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.5rem' }}>
+                  <input
+                    value={sec.heading}
+                    onChange={(e) => updateLibrarySectionHeading(si, e.target.value)}
+                    placeholder="Number of Books"
+                    style={{ flex: 1, fontWeight: 700 }}
+                  />
+                  <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveLibrarySection(si, -1)} disabled={si === 0} title="Move up">↑</button>
+                  <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveLibrarySection(si, 1)} disabled={si === librarySections.length - 1} title="Move down">↓</button>
+                  <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeLibrarySection(si)}>Remove Section</button>
+                </div>
+
+                {sec.items.map((item, ji) => (
+                  <div key={ji} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.4rem' }}>
+                    <input
+                      value={item.label}
+                      onChange={(e) => updateLibraryItem(si, ji, { label: e.target.value })}
+                      placeholder="Item name"
+                      style={{ flex: 2 }}
+                    />
+                    <input
+                      value={item.value}
+                      onChange={(e) => updateLibraryItem(si, ji, { value: e.target.value })}
+                      placeholder="Count"
+                      style={{ flex: 1 }}
+                    />
+                    <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveLibraryItem(si, ji, -1)} disabled={ji === 0} title="Move up">↑</button>
+                    <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveLibraryItem(si, ji, 1)} disabled={ji === sec.items.length - 1} title="Move down">↓</button>
+                    <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeLibraryItem(si, ji)}>✕</button>
+                  </div>
+                ))}
+                <button type="button" className="admin-btn admin-btn--sm" onClick={() => addLibraryItem(si)}>+ Add Item</button>
+              </div>
+            ))}
+            <button type="button" className="admin-btn admin-btn--primary" onClick={addLibrarySection}>+ Add Section</button>
+            {librarySections.length === 0 && (
+              <p className="admin-field__hint">No sections yet — click "Add Section" to start building this department's Digital Library.</p>
+            )}
           </div>
 
           <div className="admin-field admin-field--full"><hr /><h3>Department Page — Head of Department</h3></div>

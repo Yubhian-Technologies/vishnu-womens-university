@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Link, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { where } from 'firebase/firestore';
-import { Check, Microscope, Compass, Target, Sparkles, Mail } from 'lucide-react';
+import { Check, Microscope, Compass, Target, Sparkles, Mail, BookOpen } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import ProgrammeStructure from '../../components/ProgrammeStructure/ProgrammeStructure';
 import SEO from '../../components/SEO/SEO';
@@ -106,12 +106,17 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     mission: (dept?.mission?.length ? dept.mission : primary?.mission) || [],
     coreValues: (dept?.coreValues?.length ? dept.coreValues : primary?.coreValues) || [],
     labs: (dept?.labs?.length ? dept.labs : primary?.labs) || [],
+    libraryIntro: dept?.libraryIntro || primary?.libraryIntro || '',
+    libraryInCharge: dept?.libraryInCharge || primary?.libraryInCharge || '',
+    librarySections: (dept?.librarySections?.length ? dept.librarySections : primary?.librarySections) || [],
   };
 
   const hasVisionMission = !!(shared.vision || shared.mission.length || shared.coreValues.length);
   const hasHod = !!(shared.hodMessage || shared.hodImage || shared.hodEmail || shared.hod);
   const hasLabs = shared.labs.length > 0;
   const hasAbout = !!shared.about;
+  const libraryTables = shared.librarySections.filter((sec) => sec.items && sec.items.length > 0);
+  const hasLibrary = !!(shared.libraryIntro || shared.libraryInCharge || libraryTables.length > 0);
 
   const hasHighlights = !!(activeProgram.highlights && activeProgram.highlights.length > 0);
   const hasOutcomeStatements = !!(activeProgram.peos?.length || activeProgram.pos?.length || activeProgram.psos?.length);
@@ -126,6 +131,26 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   const newsletterYears = (activeProgram.newsletterYears || []).filter((y) => y.year && y.issues && y.issues.length > 0);
   const hasNewsletter = newsletterYears.length > 0;
   const newsletterMaxIssues = Math.max(0, ...newsletterYears.map((y) => y.issues.length));
+
+  // Quick Links sidebar — shared sections first, then the per-programme ones
+  // that live below the toggle (their target still exists on the page no
+  // matter which side is active, since the id is reused by whichever
+  // section is currently rendered for activeProgram).
+  const quickLinks = [
+    hasAbout && { id: 'about', label: 'About the Department' },
+    hasVisionMission && { id: 'vision-mission', label: 'Vision, Mission & Values' },
+    hasHod && { id: 'hod', label: 'About HOD' },
+    faculty.length > 0 && { id: 'faculty', label: 'Faculty' },
+    hasLabs && { id: 'labs', label: 'Laboratories' },
+    hasLibrary && { id: 'library', label: 'Digital Library' },
+    { id: 'program-toggle', label: 'Choose a Programme' },
+    hasHighlights && { id: 'highlights', label: 'Programme Highlights' },
+    hasOutcomeStatements && { id: 'peos-pos-psos', label: 'PEOs, POs & PSOs' },
+    hasMindMap && { id: 'mindmap', label: 'Mind Map' },
+    { id: 'curriculum', label: 'Curriculum' },
+    hasNewsEvents && { id: 'news-events', label: 'News & Events' },
+    hasNewsletter && { id: 'newsletter', label: 'Newsletter' },
+  ].filter(Boolean) as { id: string; label: string }[];
 
   // Top stats bar. Head of Department is genuinely one person for the whole
   // department, shown once. Established/Accreditation are shown once too
@@ -215,15 +240,38 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
         </section>
       )}
 
-      {/* About the Department (shared) */}
+      {/* About the Department (shared) + Quick Links */}
       {hasAbout && (
         <section id="about" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
           <div className="container">
-            <span className="section-label">About the Department</span>
-            <h2 className="section-title">The Department of {deptName}</h2>
-            <p style={{ color: 'var(--color-text-light)', lineHeight: 1.85, fontSize: 'var(--text-base)', whiteSpace: 'pre-line' }}>
-              {shared.about}
-            </p>
+            <div className={quickLinks.length > 1 ? 'detail-grid' : ''}>
+              <div>
+                <span className="section-label">About the Department</span>
+                <h2 className="section-title">The Department of {deptName}</h2>
+                <p style={{ color: 'var(--color-text-light)', lineHeight: 1.85, fontSize: 'var(--text-base)', whiteSpace: 'pre-line' }}>
+                  {shared.about}
+                </p>
+              </div>
+
+              {quickLinks.length > 1 && (
+                <div className="detail-sidebar">
+                  <div style={{ position: 'sticky', top: 'calc(var(--topbar-height) + var(--header-height) + 1.5rem)', background: 'var(--color-primary)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)' }}>
+                    <h4 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 800, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 'var(--space-4)', paddingBottom: 'var(--space-3)', borderBottom: '1px solid rgba(255,255,255,0.15)' }}>
+                      Quick Links
+                    </h4>
+                    <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+                      {quickLinks.map((l) => (
+                        <li key={l.id}>
+                          <a href={`#${l.id}`} style={{ display: 'block', padding: 'var(--space-2) 0', color: 'rgba(255,255,255,0.85)', fontSize: 'var(--text-sm)', fontWeight: 600, textDecoration: 'none', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+                            {l.label}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </section>
       )}
@@ -375,6 +423,56 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
         </section>
       )}
 
+      {/* Digital Library (shared) */}
+      {hasLibrary && (
+        <section id="library" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
+          <div className="container">
+            <div style={{ marginBottom: 'var(--space-8)' }}>
+              <span className="section-label">Resources</span>
+              <h2 className="section-title">Digital Library</h2>
+            </div>
+            {shared.libraryIntro && (
+              <p style={{ color: 'var(--color-text)', lineHeight: 1.85, fontSize: 'var(--text-base)', marginBottom: 'var(--space-4)' }}>
+                {shared.libraryIntro}
+              </p>
+            )}
+            {shared.libraryInCharge && (
+              <p style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', color: 'var(--color-text)', fontSize: 'var(--text-sm)', marginBottom: libraryTables.length > 0 ? 'var(--space-6)' : 0 }}>
+                <BookOpen size={16} strokeWidth={1.75} style={{ color: 'var(--color-accent)', flexShrink: 0 }} />
+                <strong style={{ color: 'var(--color-primary)' }}>In-charge of Department Library:</strong> {shared.libraryInCharge}
+              </p>
+            )}
+            {libraryTables.map((sec, si) => (
+              <div key={si} style={{ marginBottom: si === libraryTables.length - 1 ? 0 : 'var(--space-8)' }}>
+                <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.1rem', color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>
+                  {sec.heading}
+                </h3>
+                <div className="pb-activities-scroll">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th className="pb-activities-num">S. No</th>
+                        <th>Item</th>
+                        <th>Count</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {sec.items.map((item, ii) => (
+                        <tr key={ii}>
+                          <td className="pb-activities-num">{ii + 1}</td>
+                          <td>{item.label}</td>
+                          <td>{item.value}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* ===== Program toggle ===== */}
       <section id="program-toggle" style={{ background: 'var(--color-primary)', padding: 'var(--space-8) 0', scrollMarginTop: NAV_OFFSET }}>
         <div className="container" style={{ textAlign: 'center' }}>
@@ -397,7 +495,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
 
       {/* Programme Highlights (per programme) */}
       {hasHighlights && (
-        <section className="section bg-white">
+        <section id="highlights" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
               <span className="section-label">{activeProgram.shortName || activeProgram.name}</span>
