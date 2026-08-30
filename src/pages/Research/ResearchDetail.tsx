@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { Sparkles, Microscope, Check } from 'lucide-react';
 import { useOrderedCollection } from '../../hooks/useCollection';
+import type { ConsultancyReportDoc } from '../Admin/sections/ConsultancyReportsAdmin';
+import type { PatentCertificateDoc } from '../Admin/sections/PatentCertificatesAdmin';
 import { usePageBanners } from '../../hooks/usePageBanners';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import { parseFlexibleTable, parseAccordionTable, parseProjectAccordion } from '../../lib/structuredTable';
@@ -9,7 +11,6 @@ import { parseAboutContent } from '../../lib/aboutContent';
 import type { ResearchItemDoc } from '../Admin/sections/ResearchItemsAdmin';
 import ThrustAreasSection from './ThrustAreasSection';
 import ProfessionalBodiesSection from './ProfessionalBodiesSection';
-import { DEFAULT_FUNDED_PROJECTS_TEXT } from './fundedProjectsDefault';
 import { DEFAULT_THRUST_AREAS_INTRO, DEFAULT_THRUST_AREAS_TEXT } from './thrustAreasDefault';
 import { DEFAULT_RESEARCH_CENTERS_INTRO, DEFAULT_RESEARCH_CENTERS_TABLE_TEXT } from './researchCentersDefault';
 import { DEFAULT_MOUS_TABLE_TEXT } from './mousDefault';
@@ -24,14 +25,6 @@ const CATEGORY_LABELS: Record<string, string> = {
   governance: 'R&D Governance',
   output: 'Research Output',
   engagement: 'Industry & Professional Engagement',
-};
-
-// Firestore's researchItems doc for these slugs may not have its
-// (newer) projectsText/accordionText field filled in yet from the admin
-// panel — fall back to the real source content so the page still renders
-// fully rather than staying blank until someone pastes it in manually.
-const DEFAULT_PROJECTS_TEXT_BY_SLUG: Record<string, string> = {
-  'funded-projects': DEFAULT_FUNDED_PROJECTS_TEXT,
 };
 
 // Fallback accordionText for Thrust Areas of Research, used only until an
@@ -74,6 +67,8 @@ const DEFAULT_ABOUT_BY_SLUG: Record<string, string> = {
 export default function ResearchDetail() {
   const { slug } = useParams<{ slug: string }>();
   const { docs: allItems, loading } = useOrderedCollection<ResearchItemDoc>('researchItems', 'order');
+  const { docs: consultancyReports } = useOrderedCollection<ConsultancyReportDoc>('consultancyReports', 'order');
+  const { docs: patentCertificates } = useOrderedCollection<PatentCertificateDoc>('patentCertificates', 'order');
   const { slides: heroSlides } = usePageBanners('research-detail');
   const item = allItems.find((i) => i.slug === slug) ?? null;
   const [openAreas, setOpenAreas] = useState<Set<string>>(new Set());
@@ -134,6 +129,9 @@ export default function ResearchDetail() {
   // accordion format every other page uses — a dedicated year + file upload
   // is a much better fit than hand-typing "### 2026\nClick Here | <url>".
   const publicationYears = (item.publicationYears || []).filter((e) => e.year && e.fileUrl);
+  // Consultancy's year list is managed the same way as Research
+  // Publications — structured data (Admin > Consultancy Reports: add a
+  // year, upload its PDF) instead of hand-typing "### 2026\nClick Here | <url>".
   const accordionCategories = item.slug === 'research-publications' && publicationYears.length > 0
     ? [{
         title: '',
@@ -141,11 +139,37 @@ export default function ResearchDetail() {
           .sort((a, b) => b.year.localeCompare(a.year))
           .map((e) => ({ name: e.year, items: [{ label: 'Click Here to download', href: e.fileUrl }] })),
       }]
+    : item.slug === 'consultancy' && consultancyReports.length > 0
+    ? [{
+        title: '',
+        areas: [...consultancyReports]
+          .sort((a, b) => b.label.localeCompare(a.label))
+          .map((d) => ({ name: d.label, items: [{ label: 'Click Here to download', href: d.fileUrl }] })),
+      }]
     : parseAccordionTable(accordionText).filter(
         (c) => (item.slug === 'thrust-areas-of-research' ? c.title : c.areas.length > 0),
       );
-  const projectsText = item.projectsText || DEFAULT_PROJECTS_TEXT_BY_SLUG[item.slug] || '';
-  const projectCategories = parseProjectAccordion(projectsText).filter((c) => c.projects.length > 0);
+  const projectsText = item.projectsText || '';
+  const parsedProjectCategories = parseProjectAccordion(projectsText).filter((c) => c.projects.length > 0);
+  // Patents' certificate PDFs are admin-managed separately (Research >
+  // Patent Certificates) rather than hand-typed as "| https://..." in the
+  // Project Accordion text — override any "Application Number" field's
+  // link with the live certificate for that exact application number, so
+  // an admin only ever needs to type the plain number in the text field.
+  const patentCertificateMap = new Map(patentCertificates.map((d) => [d.label.trim(), d.fileUrl]));
+  const projectCategories = item.slug === 'patents'
+    ? parsedProjectCategories.map((cat) => ({
+        ...cat,
+        projects: cat.projects.map((p) => ({
+          ...p,
+          fields: p.fields.map((f) =>
+            f.label === 'Application Number' && patentCertificateMap.has(f.value.trim())
+              ? { ...f, href: patentCertificateMap.get(f.value.trim()) }
+              : f
+          ),
+        })),
+      }))
+    : parsedProjectCategories;
 
   return (
     <main className="page-wrapper">
