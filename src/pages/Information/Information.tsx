@@ -53,6 +53,8 @@ export default function Information() {
   }, []);
 
   const { docs: academicCalendar } = useOrderedCollection<CalendarEntry>('academicCalendar', 'order');
+  const calendarColumns = CALENDAR_CATEGORIES.map((cat) => academicCalendar.filter((item) => item.category === cat.id));
+  const calendarRowCount = calendarColumns.reduce((max, items) => Math.max(max, items.length), 0);
   const { docs: holidays } = useOrderedCollection<HolidayEntry>('holidays', 'order');
   const placementsCareersPhotos = useSitePhotos('information', 'placements-careers', defaultPlacementsCareersPhotos);
   const hasPlacementsCareersPhotos = useSectionHasPhotos('information', 'placements-careers');
@@ -109,33 +111,41 @@ export default function Information() {
               <p style={{ color: 'var(--color-text-light)', marginBottom: 'var(--space-6)', maxWidth: 680 }}>
                 Each program/year publishes its own signed academic calendar as a PDF — pick one below to view or download it.
               </p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-                {CALENDAR_CATEGORIES.map((cat) => {
-                  const items = academicCalendar.filter((item) => item.category === cat.id);
-                  return (
-                    <div key={cat.id} style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'baseline', gap: 'var(--space-2) var(--space-6)', padding: 'var(--space-4) 0', borderBottom: '1px solid var(--color-light-gray)' }}>
-                      <span style={{ fontFamily: 'var(--font-sans)', fontWeight: 900, color: 'var(--color-primary)', fontSize: 'var(--text-sm)', textTransform: 'uppercase', letterSpacing: '0.05em', minWidth: 90 }}>
-                        {cat.label}
-                      </span>
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2) var(--space-6)' }}>
-                        {items.map((item) => (
-                          <a
-                            key={item.id}
-                            href={item.fileUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', color: 'var(--color-accent)', fontWeight: 700, fontSize: 'var(--text-sm)', textDecoration: 'none' }}
-                          >
-                            <FileText size={14} strokeWidth={2} /> {item.label}
-                          </a>
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', maxWidth: 720, borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr>
+                      {CALENDAR_CATEGORIES.map((cat) => (
+                        <th key={cat.id} style={{ textAlign: 'left', fontFamily: 'var(--font-sans)', fontWeight: 900, color: 'var(--color-primary)', fontSize: 'var(--text-sm)', textTransform: 'uppercase', letterSpacing: '0.05em', padding: 'var(--space-3) var(--space-5) var(--space-3) 0', borderBottom: '2px solid var(--color-accent)' }}>
+                          {cat.label}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {Array.from({ length: calendarRowCount }).map((_, row) => (
+                      <tr key={row}>
+                        {calendarColumns.map((items, col) => (
+                          <td key={CALENDAR_CATEGORIES[col].id} style={{ padding: 'var(--space-3) var(--space-5) var(--space-3) 0', borderBottom: '1px solid var(--color-light-gray)' }}>
+                            {items[row] && (
+                              <a
+                                href={items[row].fileUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', color: 'var(--color-accent)', fontWeight: 700, fontSize: 'var(--text-sm)', textDecoration: 'none' }}
+                              >
+                                <FileText size={14} strokeWidth={2} /> {items[row].label}
+                              </a>
+                            )}
+                          </td>
                         ))}
-                        {items.length === 0 && (
-                          <span style={{ color: 'var(--color-text-light)', fontSize: 'var(--text-sm)' }}>Not posted yet.</span>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
+                      </tr>
+                    ))}
+                    {calendarRowCount === 0 && (
+                      <tr><td colSpan={CALENDAR_CATEGORIES.length} style={{ padding: 'var(--space-4) 0', color: 'var(--color-text-light)', fontSize: 'var(--text-sm)' }}>Not posted yet.</td></tr>
+                    )}
+                  </tbody>
+                </table>
               </div>
             </div>
           )}

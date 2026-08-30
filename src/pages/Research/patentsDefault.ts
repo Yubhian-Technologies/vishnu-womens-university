@@ -56,28 +56,28 @@ Department: AI, EEE
 ## 2023 – Granted
 ### A Counting Bloom Filter (Patent)
 Applicant Names: Ramesh Babu Mallela
-Application Number: 202205074 | /downloads/Patent-202205074.pdf
+Application Number: 202205074 | https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2FPatent-202205074.pdf?alt=media&token=17e45efd-7269-453e-97df-e3264a2b1303
 Date of Filing: 25-01-2023
 Status: Republic of South Africa – Patent Granted (25-01-2023)
 Department: CSE
 
 ### Apparatus And Method For Single Motor Drive Testing For Electric Vehicle (Patent)
 Applicant Names: Shri Vishnu Engineering College for Women, Dr. J Rohith Balaji
-Application Number: 201941025873 | /downloads/Patent-201941025873.pdf
+Application Number: 201941025873 | https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2FPatent-201941025873.pdf?alt=media&token=32b9c936-a3ce-4cc9-8f7b-d2a814340d9b
 Date of Filing: 28-06-2019
 Status: Granted (23-11-2023)
 Department: EEE
 
 ### Paper Scanning Machine Based on Internet of Things (Design Patent)
 Applicant Names: Dr. P. Kiran Sree, Dr. M. Prasad, Mr. P Naga Raju, Mr. Ch. Phaneendra Varma, Mr. G Ramesh Babu, Mrs. K Soni Sharmila, Ms. A V S Asha, Mrs. P Archana
-Application Number: 367333-001 | /downloads/Patent-367333-001.pdf
+Application Number: 367333-001 | https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2FPatent-367333-001.pdf?alt=media&token=0f485711-753e-469e-be59-7dacb200dd80
 Date of Filing: 6-07-2022
 Status: Granted (23-11-2023)
 Department: CSE
 
 ### IoT Based Integrated Aquaculture Management System (Design Patent – German)
 Applicant Names: Ms. Padma Bellapukonda
-Application Number: 202023105674.1 | /downloads/Patent-202023105674.pdf
+Application Number: 202023105674.1 | https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2FPatent-202023105674.pdf?alt=media&token=f254c649-8dc8-4113-9429-d73200134c36
 Date of Filing: 2022
 Status: Granted
 Department: IT

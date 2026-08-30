@@ -74,7 +74,7 @@ export const ruralWomenTechPark = {
   ] as RwtpActivity[],
   activitiesTotalBeneficiaries: '1421',
   reportLinks: [
-    { label: 'Click here for Detailed Report', href: '/downloads/rwtp-project-completion-report.pdf' },
-    { label: 'Click here for Report on Printing Workshop', href: '/downloads/rwtp-screen-printing-workshop-report.pdf' },
+    { label: 'Click here for Detailed Report', href: 'https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2Frwtp-project-completion-report.pdf?alt=media&token=4774609e-cf26-4363-9c1b-8f8ce995129a' },
+    { label: 'Click here for Report on Printing Workshop', href: 'https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2Frwtp-screen-printing-workshop-report.pdf?alt=media&token=f0697eb5-2a7d-4d6a-b8a6-26f0625a7519' },
   ] as RwtpReportLink[],
 };

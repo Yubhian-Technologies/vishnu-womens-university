@@ -197,16 +197,20 @@ export default function Faculty() {
               <div className="faculty-grid">
                 {members.map((f) => (
                   <Link key={f.id} to={`/faculty/${f.id}`} className="faculty-card">
-                    {f.imageUrl ? (
-                      <SmoothImage src={f.imageUrl} alt={f.name} className="faculty-card__photo" />
-                    ) : (
-                      <div className="faculty-card__avatar">{getInitials(f.name)}</div>
-                    )}
+                    <div className="faculty-card__top">
+                      <span className="faculty-card__arch" aria-hidden="true" />
+                      {f.imageUrl ? (
+                        <SmoothImage src={f.imageUrl} alt={f.name} className="faculty-card__photo" />
+                      ) : (
+                        <div className="faculty-card__avatar">{getInitials(f.name)}</div>
+                      )}
+                    </div>
                     <h3 className="faculty-card__name">{f.name}</h3>
                     <p className="faculty-card__designation">{f.designation}</p>
                     {f.qualification && <p className="faculty-card__qualification">{f.qualification}</p>}
-                    {f.department && <span className="faculty-card__dept">{f.department}</span>}
-                    <span className="faculty-card__view-profile">View Details →</span>
+                    <div className="faculty-card__actions">
+                      <span className="faculty-card__btn faculty-card__btn--primary">View Profile</span>
+                    </div>
                   </Link>
                 ))}
               </div>

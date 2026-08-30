@@ -10,14 +10,14 @@
 // original svecw.edu.in URL) so clicking it downloads the file directly from
 // our own site instead of navigating elsewhere.
 export const DEFAULT_RESEARCH_PUBLICATIONS_TEXT = `### 2025
-Click Here to download | /downloads/ResearchPublications2025.pdf
+Click Here to download | https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2FResearchPublications2025.pdf?alt=media&token=9279ec3b-db19-475a-bdd9-0d71228f5ab1
 ### 2024
-Click Here to download | /downloads/ResearchPublications2024.pdf
+Click Here to download | https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2FResearchPublications2024.pdf?alt=media&token=0f30bc83-c733-4fc3-9aee-e0ecf9c6050e
 ### 2023
-Click Here to download | /downloads/ResearchPublications2023.pdf
+Click Here to download | https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2FResearchPublications2023.pdf?alt=media&token=eee41f5b-de38-4fa7-b353-0bd6dd7a79cd
 ### 2022
-Click Here to download | /downloads/ResearchPublications2022.pdf
+Click Here to download | https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2FResearchPublications2022.pdf?alt=media&token=35247590-f3d9-4559-b4ae-38abc0417789
 ### 2021
-Click Here to download | /downloads/ResearchPublications2021.pdf
+Click Here to download | https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2FResearchPublications2021.pdf?alt=media&token=5c4864a0-6f64-4f18-97a2-19a1e8df77d2
 ### 2020
-Click Here to download | /downloads/ResearchPublications2020.pdf`;
+Click Here to download | https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2FResearchPublications2020.pdf?alt=media&token=5a53a264-7edd-4ff5-8867-dcbf529fb851`;
