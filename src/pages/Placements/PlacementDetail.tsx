@@ -7,10 +7,10 @@ import { usePageBanners } from '../../hooks/usePageBanners';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import { parseStructuredTable } from '../../lib/structuredTable';
 import type { PlacementItemDoc } from '../Admin/sections/PlacementItemsAdmin';
+import type { TpoTeamBioDoc } from '../Admin/sections/TpoTeamInfoAdmin';
 import PlacementYearAccordion, { BranchOffersBarChart } from './PlacementYearAccordion';
 import SmoothCollapse from '../../components/SmoothCollapse/SmoothCollapse';
 import { successStories } from './successStories.data';
-import { tpoTeamBios } from './tpoTeamBios.data';
 import { industryLiaisonOffices } from './industryLiaisonOffices.data';
 import { employabilitySkillTabs } from './employabilitySkills.data';
 import { higherEducationSections } from './higherEducation.data';
@@ -455,14 +455,17 @@ function TeamRosterRow({
   isOpen,
   onToggle,
   tpoPhotoMap,
+  tpoBiosMap,
   iloPhotoMap,
 }: {
   row: { name: string; role: string; notes?: string };
   isOpen: boolean;
   onToggle: () => void;
   tpoPhotoMap: Map<string, string>;
+  tpoBiosMap: Map<string, TpoTeamBioDoc>;
   iloPhotoMap?: Map<string, { url: string; path: string }[]>;
 }) {
+  const bio = tpoBiosMap.get(row.name);
   return (
     <div>
       <button
@@ -491,27 +494,27 @@ function TeamRosterRow({
 
       <SmoothCollapse open={isOpen}>
         <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderTop: 'none' }}>
-          {tpoTeamBios[row.name] ? (
+          {bio ? (
             <div style={{ display: 'flex', gap: 'var(--space-5)', flexWrap: 'wrap' }}>
               <img
-                src={tpoPhotoMap.get(row.name) || tpoTeamBios[row.name].photo || PHOTO_NEEDED_PLACEHOLDER}
+                src={tpoPhotoMap.get(row.name) || PHOTO_NEEDED_PLACEHOLDER}
                 alt={row.name}
                 style={{ width: 160, height: 190, objectFit: 'cover', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-light-gray)', flexShrink: 0 }}
               />
               <div style={{ flex: 1, minWidth: 260, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-                {tpoTeamBios[row.name].paragraphs.map((para, pi) => (
+                {bio.paragraphs.map((para, pi) => (
                   <p key={pi} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.7 }}>{para}</p>
                 ))}
               </div>
-              {tpoTeamBios[row.name].accomplishments && tpoTeamBios[row.name].accomplishments!.length > 0 && (
+              {bio.accomplishments && bio.accomplishments.length > 0 && (
                 <div style={{ width: '100%', marginTop: 'var(--space-2)' }}>
-                  {tpoTeamBios[row.name].accomplishmentsIntro && (
+                  {bio.accomplishmentsIntro && (
                     <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', marginBottom: 'var(--space-3)' }}>
-                      {tpoTeamBios[row.name].accomplishmentsIntro}
+                      {bio.accomplishmentsIntro}
                     </p>
                   )}
                   <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-                    {tpoTeamBios[row.name].accomplishments!.map((point, ai) => (
+                    {bio.accomplishments.map((point, ai) => (
                       <li key={ai} style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
                         <Trophy size={16} strokeWidth={1.75} style={{ color: 'var(--color-accent)', flexShrink: 0, marginTop: 2 }} />
                         <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.7 }}>{point}</span>
@@ -520,14 +523,14 @@ function TeamRosterRow({
                   </ul>
                 </div>
               )}
-              {(tpoTeamBios[row.name].email || tpoTeamBios[row.name].phone) && (
+              {(bio.email || bio.phone) && (
                 <p style={{ width: '100%', fontSize: 'var(--text-sm)', color: 'var(--color-text)', marginTop: 'var(--space-2)' }}>
-                  {tpoTeamBios[row.name].email && (
-                    <>Email: <a href={`mailto:${tpoTeamBios[row.name].email}`} style={{ color: 'var(--color-primary)', fontWeight: 600 }}>{tpoTeamBios[row.name].email}</a></>
+                  {bio.email && (
+                    <>Email: <a href={`mailto:${bio.email}`} style={{ color: 'var(--color-primary)', fontWeight: 600 }}>{bio.email}</a></>
                   )}
-                  {tpoTeamBios[row.name].email && tpoTeamBios[row.name].phone && ' & '}
-                  {tpoTeamBios[row.name].phone && (
-                    <>Mobile no: <a href={`tel:${tpoTeamBios[row.name].phone}`} style={{ color: 'var(--color-primary)', fontWeight: 600 }}>{tpoTeamBios[row.name].phone}</a></>
+                  {bio.email && bio.phone && ' & '}
+                  {bio.phone && (
+                    <>Mobile no: <a href={`tel:${bio.phone}`} style={{ color: 'var(--color-primary)', fontWeight: 600 }}>{bio.phone}</a></>
                   )}
                 </p>
               )}
@@ -593,9 +596,11 @@ const TPO_TEAM_GROUPS: { label: string; count: number }[] = [
 function TpoTeamTiles({
   rows,
   tpoPhotoMap,
+  tpoBiosMap,
 }: {
   rows: { name: string; role: string; notes?: string }[];
   tpoPhotoMap: Map<string, string>;
+  tpoBiosMap: Map<string, TpoTeamBioDoc>;
 }) {
   const [activeGroup, setActiveGroup] = useState(0);
   const [activeRow, setActiveRow] = useState<number | null>(null);
@@ -653,6 +658,7 @@ function TpoTeamTiles({
             isOpen={activeRow === i}
             onToggle={() => setActiveRow(activeRow === i ? null : i)}
             tpoPhotoMap={tpoPhotoMap}
+            tpoBiosMap={tpoBiosMap}
           />
         ))}
       </div>
@@ -665,9 +671,12 @@ export default function PlacementDetail() {
   const { docs: allItems, loading } = useOrderedCollection<PlacementItemDoc>('placementItems', 'order');
   const item = allItems.find((i) => i.slug === slug) ?? null;
   const [activeTableRow, setActiveTableRow] = useState<number | null>(null);
-  // Admin-uploaded photos for the TPO Team bios (tpoTeamBios.data.ts), keyed
-  // by the same exact name string — overrides that data file's empty
-  // `photo` field once an admin uploads one from the TPO Team Photos section.
+  // Full bios (Admin → TPO Team Info) and photos (Admin → TPO Team Photos)
+  // for the TPO Team roster — both keyed by the same exact name string as it
+  // appears in the roster table, so a matching row's accordion expands to
+  // show them instead of just Role/Notes.
+  const { docs: tpoBios } = useCollection<TpoTeamBioDoc>('tpoTeamBios', [], { silent: true });
+  const tpoBiosMap = new Map(tpoBios.map((b) => [b.name, b]));
   const { docs: tpoPhotos } = useCollection<WithId & { imageUrl: string }>('tpoTeamPhotos', [], { silent: true });
   const tpoPhotoMap = new Map(tpoPhotos.map((p) => [p.id, p.imageUrl]));
   // Admin-uploaded photo galleries for the Regional Offices (Industry
@@ -968,11 +977,40 @@ export default function PlacementDetail() {
             <div style={{ marginBottom: 'var(--space-8)' }}>
               <span className="section-label">Data</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>
-                {item.slug === 'tpo-team' ? 'Team' : item.slug === 'industry-liaison-offices' ? 'Regional Offices' : 'Batch-wise Statistics'}
+                {item.slug === 'tpo-team' ? 'Team' : item.slug === 'industry-liaison-offices' ? 'Regional Offices' : item.slug === 'internships' ? 'Recruiting Companies' : 'Batch-wise Statistics'}
               </h2>
             </div>
             {item.slug === 'tpo-team' ? (
-              <TpoTeamTiles rows={tableRows} tpoPhotoMap={tpoPhotoMap} />
+              <TpoTeamTiles rows={tableRows} tpoPhotoMap={tpoPhotoMap} tpoBiosMap={tpoBiosMap} />
+            ) : item.slug === 'internships' ? (
+              // Company/stipend/selects data reads best as a plain table (same
+              // shape as the "Placements, Year by Year" company table) rather
+              // than the roster-style rows below, which are built for named
+              // people (TPO Cell, ILO offices). Admins enter it in the same
+              // Data Table field, one "Company | Stipend/Month | No. of
+              // Selects" per line.
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm)' }}>
+                  <thead>
+                    <tr style={{ background: 'var(--color-accent)' }}>
+                      <th style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900, whiteSpace: 'nowrap' }}>S.No</th>
+                      <th style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900 }}>Company Name</th>
+                      <th style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900, whiteSpace: 'nowrap' }}>Stipend/Month</th>
+                      <th style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900, whiteSpace: 'nowrap' }}>No. of Selects</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {tableRows.map((row, i) => (
+                      <tr key={i} style={{ background: i % 2 === 0 ? 'var(--color-off-white)' : 'transparent' }}>
+                        <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)' }}>{i + 1}</td>
+                        <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)', fontWeight: 600 }}>{row.name}</td>
+                        <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)' }}>{row.role}</td>
+                        <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)' }}>{row.notes}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 {tableRows.map((row, i) => (
@@ -982,6 +1020,7 @@ export default function PlacementDetail() {
                     isOpen={activeTableRow === i}
                     onToggle={() => setActiveTableRow(activeTableRow === i ? null : i)}
                     tpoPhotoMap={tpoPhotoMap}
+                    tpoBiosMap={tpoBiosMap}
                     iloPhotoMap={iloPhotoMap}
                   />
                 ))}

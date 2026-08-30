@@ -35,6 +35,7 @@ import NewsAwardsDataAdmin from './sections/NewsAwardsDataAdmin';
 import ResearchItemsAdmin from './sections/ResearchItemsAdmin';
 import ComplianceDocsAdmin from './sections/ComplianceDocsAdmin';
 import PoliciesAdmin from './sections/PoliciesAdmin';
+import TpoTeamInfoAdmin from './sections/TpoTeamInfoAdmin';
 import TpoTeamPhotosAdmin from './sections/TpoTeamPhotosAdmin';
 import IloOfficePhotosAdmin from './sections/IloOfficePhotosAdmin';
 import GsacPhotosAdmin from './sections/GsacPhotosAdmin';
@@ -56,6 +57,7 @@ interface Props {
 const SECTION_RESOURCE: Partial<Record<string, ResourceKey>> = {
   placements: RESOURCES.PLACEMENTS_PAGE_CONTENT,
   'placement-items': RESOURCES.PLACEMENTS_PAGE_CONTENT,
+  'tpo-team-info': RESOURCES.PLACEMENTS_PAGE_CONTENT,
   'tpo-team-photos': RESOURCES.PLACEMENTS_GALLERY,
   'ilo-office-photos': RESOURCES.PLACEMENTS_GALLERY,
   'gsac-photos': RESOURCES.PLACEMENTS_GALLERY,
@@ -104,6 +106,7 @@ const SECTION_MAP: Record<string, React.ReactNode> = {
   'governance-items': <GovernanceItemsAdmin />,
   differentiators: <DifferentiatorsAdmin />,
   'placement-items': <PlacementItemsAdmin />,
+  'tpo-team-info': <TpoTeamInfoAdmin />,
   'tpo-team-photos': <TpoTeamPhotosAdmin />,
   'ilo-office-photos': <IloOfficePhotosAdmin />,
   'gsac-photos': <GsacPhotosAdmin />,

@@ -4,6 +4,7 @@ import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
 import { CONTENT_ICON_NAMES } from '../../../lib/contentIcons';
 import { deleteFile } from '../../../lib/storage';
+import TableImportButton from '../../../components/TableImportButton/TableImportButton';
 
 export interface PlacementItemDoc {
   id: string;
@@ -147,7 +148,10 @@ export default function PlacementItemsAdmin() {
           </div>
           <div className="admin-field admin-field--full">
             <label htmlFor="field-data-table-optional-see-format">Data Table (optional — see format above)</label>
-            <textarea id="field-data-table-optional-see-format" rows={6} value={form.tableText} onChange={(e) => set('tableText', e.target.value)} placeholder={'2021–2025 | 1156 | 46 LPA | Amazon\n2020–2024 | 818 | 41.54 LPA | Intuit'} />
+            <textarea id="field-data-table-optional-see-format" rows={6} value={form.tableText} onChange={(e) => set('tableText', e.target.value)} placeholder={'Amazon | 110000 | 29\nFlipkart | 95000 | 12'} />
+            <div style={{ marginTop: '0.4rem' }}>
+              <TableImportButton onImport={(text) => set('tableText', text)} label="Import Data Table from Excel/CSV" />
+            </div>
           </div>
         </div>
         <div className="admin-form-actions">
