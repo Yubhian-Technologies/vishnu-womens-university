@@ -29,8 +29,12 @@ import CurriculumAdmin from './sections/CurriculumAdmin';
 import SitePhotosAdmin from './sections/SitePhotosAdmin';
 import NavLinkOverridesAdmin from './sections/NavLinkOverridesAdmin';
 import GovernanceItemsAdmin from './sections/GovernanceItemsAdmin';
+import AnnualReportsAdmin from './sections/AnnualReportsAdmin';
+import NirfReportsAdmin from './sections/NirfReportsAdmin';
+import NbaDataAdmin from './sections/NbaDataAdmin';
 import DifferentiatorsAdmin from './sections/DifferentiatorsAdmin';
 import PlacementItemsAdmin from './sections/PlacementItemsAdmin';
+import PlacementCrtDocsAdmin from './sections/PlacementCrtDocsAdmin';
 import NewsAwardsDataAdmin from './sections/NewsAwardsDataAdmin';
 import ResearchItemsAdmin from './sections/ResearchItemsAdmin';
 import ComplianceDocsAdmin from './sections/ComplianceDocsAdmin';
@@ -59,6 +63,7 @@ const SECTION_RESOURCE: Partial<Record<string, ResourceKey>> = {
   placements: RESOURCES.PLACEMENTS_PAGE_CONTENT,
   'placement-items': RESOURCES.PLACEMENTS_PAGE_CONTENT,
   'tpo-team-info': RESOURCES.PLACEMENTS_PAGE_CONTENT,
+  'placement-crt-docs': RESOURCES.PLACEMENTS_PAGE_CONTENT,
   'tpo-team-photos': RESOURCES.PLACEMENTS_GALLERY,
   'ilo-office-photos': RESOURCES.PLACEMENTS_GALLERY,
   'recruiter-logos': RESOURCES.PLACEMENTS_GALLERY,
@@ -106,9 +111,13 @@ const SECTION_MAP: Record<string, React.ReactNode> = {
   'site-photos': <SitePhotosAdmin />,
   'nav-links': <NavLinkOverridesAdmin />,
   'governance-items': <GovernanceItemsAdmin />,
+  'annual-reports': <AnnualReportsAdmin />,
+  'nirf-reports': <NirfReportsAdmin />,
+  'nba-data': <NbaDataAdmin />,
   differentiators: <DifferentiatorsAdmin />,
   'placement-items': <PlacementItemsAdmin />,
   'tpo-team-info': <TpoTeamInfoAdmin />,
+  'placement-crt-docs': <PlacementCrtDocsAdmin />,
   'tpo-team-photos': <TpoTeamPhotosAdmin />,
   'ilo-office-photos': <IloOfficePhotosAdmin />,
   'recruiter-logos': <RecruiterLogosAdmin />,

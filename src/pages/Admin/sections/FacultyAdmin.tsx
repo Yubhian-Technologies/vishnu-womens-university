@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
-  collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp,
+  collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp, writeBatch,
 } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
@@ -80,6 +80,62 @@ export default function FacultyAdmin() {
   const [editing, setEditing] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [filterDept, setFilterDept] = useState('All');
+
+  // Drag-to-reorder — grouped by department, since that's the unit both public
+  // pages (/faculty tabs and /academics/:slug#faculty) filter faculty by;
+  // `order` only needs to be consistent within a department, not across all
+  // of them. Same pattern as ProgramsAdmin's category-grouped reordering.
+  const [groupedOrdered, setGroupedOrdered] = useState<Record<string, FacultyDoc[]>>({});
+  const [drag, setDrag] = useState<{ dept: string; index: number } | null>(null);
+  useEffect(() => {
+    const groups: Record<string, FacultyDoc[]> = {};
+    faculty.forEach((f) => { (groups[f.department] ??= []).push(f); });
+    setGroupedOrdered(groups);
+  }, [faculty]);
+
+  const handleDragOver = (dept: string, i: number) => {
+    if (!drag || drag.dept !== dept || drag.index === i) return;
+    setGroupedOrdered((prev) => {
+      const list = [...(prev[dept] || [])];
+      const [moved] = list.splice(drag.index, 1);
+      list.splice(i, 0, moved);
+      return { ...prev, [dept]: list };
+    });
+    setDrag({ dept, index: i });
+  };
+  const handleDrop = async (dept: string) => {
+    setDrag(null);
+    const list = groupedOrdered[dept] || [];
+    const batch = writeBatch(db);
+    let changed = false;
+    list.forEach((f, i) => {
+      if (f.order !== i) { batch.update(doc(db, 'faculty', f.id), { order: i }); changed = true; }
+    });
+    if (changed) {
+      try {
+        await batch.commit();
+      } catch (e) {
+        alert(`Couldn't save new order: ${(e as Error).message}`);
+      }
+    }
+  };
+
+  // Lets someone type an exact order number directly in the table instead of
+  // dragging — handy for jumping a row far up/down a long department list.
+  // Held as text while being typed (so e.g. clearing the field to type a new
+  // number doesn't get coerced back to "0" mid-edit) and only written to
+  // Firestore on blur/Enter.
+  const [orderEdits, setOrderEdits] = useState<Record<string, string>>({});
+  const commitOrder = async (f: FacultyDoc, raw: string) => {
+    setOrderEdits((prev) => { const next = { ...prev }; delete next[f.id]; return next; });
+    const value = parseInt(raw, 10);
+    if (Number.isNaN(value) || value === f.order) return;
+    try {
+      await updateDoc(doc(db, 'faculty', f.id), { order: value });
+    } catch (e) {
+      alert(`Couldn't update order: ${(e as Error).message}`);
+    }
+  };
 
   const [bulkDept, setBulkDept] = useState('CSE');
   const [bulkText, setBulkText] = useState('');
@@ -196,6 +252,57 @@ export default function FacultyAdmin() {
 
   const filtered = filterDept === 'All' ? faculty : faculty.filter((f) => f.department === filterDept);
 
+  // One-time cleanup: AI&ML/AI&DS and EVT were separate department tags left
+  // over from before the grouped AI/ECE department pages existed; merge them
+  // into the single "AI" / "ECE" tag so editing one place updates everyone.
+  const LEGACY_MERGE: Record<string, string> = { 'AI&ML': 'AI', 'AI&DS': 'AI', EVT: 'ECE' };
+  const legacyCount = faculty.filter((f) => LEGACY_MERGE[f.department]).length;
+  const [merging, setMerging] = useState(false);
+  const mergeLegacyDepartments = async () => {
+    if (!confirm(`Retag ${legacyCount} faculty member(s) from AI&ML/AI&DS → AI and EVT → ECE?`)) return;
+    setMerging(true);
+    try {
+      for (const f of faculty) {
+        const target = LEGACY_MERGE[f.department];
+        if (target) await updateDoc(doc(db, 'faculty', f.id), { department: target });
+      }
+    } catch (e) {
+      alert(`Couldn't merge: ${(e as Error).message}`);
+    } finally { setMerging(false); }
+  };
+
+  // Merging AI&ML/AI&DS into "AI" above can surface literal duplicate rows —
+  // the same person was legitimately credited under both sub-departments
+  // before. Finds same-name pairs within the same department and keeps the
+  // "richer" record (HOD designation wins, then whichever has more filled-in
+  // fields), deleting the rest.
+  const duplicateGroups = useMemo(() => {
+    const groups: Record<string, FacultyDoc[]> = {};
+    faculty.forEach((f) => {
+      const key = `${f.department}::${f.name.trim().toLowerCase().replace(/\s+/g, ' ')}`;
+      (groups[key] ??= []).push(f);
+    });
+    return Object.values(groups).filter((g) => g.length > 1);
+  }, [faculty]);
+  const duplicateCount = duplicateGroups.reduce((n, g) => n + g.length - 1, 0);
+  const [dedupeRunning, setDedupeRunning] = useState(false);
+  const richness = (f: FacultyDoc) =>
+    (/hod|head/i.test(f.designation) ? 100 : 0)
+    + (f.imageUrl ? 1 : 0) + (f.qualification ? 1 : 0) + (f.specialization ? 1 : 0)
+    + (f.email ? 1 : 0) + (f.facts?.length ?? 0) + (f.sections?.length ?? 0);
+  const removeDuplicates = async () => {
+    if (!confirm(`Delete ${duplicateCount} duplicate faculty record(s), keeping the best copy of each?`)) return;
+    setDedupeRunning(true);
+    try {
+      for (const group of duplicateGroups) {
+        const [, ...rest] = [...group].sort((a, b) => richness(b) - richness(a));
+        for (const dup of rest) await deleteDoc(doc(db, 'faculty', dup.id));
+      }
+    } catch (e) {
+      alert(`Couldn't remove duplicates: ${(e as Error).message}`);
+    } finally { setDedupeRunning(false); }
+  };
+
   return (
     <div className="admin-section">
       <div className="admin-card">
@@ -284,6 +391,20 @@ export default function FacultyAdmin() {
             <label htmlFor="field-email">Email</label>
             <input id="field-email" type="email" value={form.email} onChange={(e) => set('email', e.target.value)} placeholder="faculty@svecw.edu.in" />
           </div>
+          <div className="admin-field">
+            <label htmlFor="field-order">Display Order</label>
+            <input
+              id="field-order"
+              type="number"
+              value={form.order}
+              onChange={(e) => set('order', +e.target.value)}
+              min={0}
+            />
+            <p className="admin-field__hint">
+              Lower numbers come first within this person's department. Can also be changed later
+              directly in the table below, or by dragging rows.
+            </p>
+          </div>
           <div className="admin-field admin-field--full">
             <label>Profile Facts</label>
             <p className="admin-field__hint">
@@ -339,29 +460,79 @@ export default function FacultyAdmin() {
             {departmentNames.map((d) => <option key={d}>{d}</option>)}
           </select>
         </div>
+        {legacyCount > 0 && (
+          <p className="admin-field__hint" style={{ margin: '0 0 0.5rem' }}>
+            {legacyCount} faculty still tagged AI&amp;ML / AI&amp;DS / EVT.{' '}
+            <button className="admin-btn admin-btn--sm" onClick={mergeLegacyDepartments} disabled={merging}>
+              {merging ? 'Merging…' : 'Merge into AI / ECE'}
+            </button>
+          </p>
+        )}
+        {duplicateCount > 0 && (
+          <p className="admin-field__hint" style={{ margin: '0 0 1rem' }}>
+            {duplicateCount} likely duplicate faculty record(s) found (same name, same department).{' '}
+            <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={removeDuplicates} disabled={dedupeRunning}>
+              {dedupeRunning ? 'Removing…' : 'Remove duplicates'}
+            </button>
+          </p>
+        )}
+        <p className="admin-field__hint" style={{ margin: '0 0 0.75rem' }}>
+          Drag rows by the ⠿ handle to change the order faculty appear in — on the /faculty page
+          (within their designation group) and on each department's /academics page (#faculty section).
+        </p>
         {loading ? <p className="admin-loading">Loading…</p> : (
-          <div className="admin-table-wrap">
-            <table className="admin-table">
-              <thead><tr><th>Photo</th><th>Name</th><th>Designation</th><th>Department</th><th>Qualification</th><th>Profile</th><th>Actions</th></tr></thead>
-              <tbody>
-                {filtered.map((f) => (
-                  <tr key={f.id}>
-                    <td>{f.imageUrl ? <img src={f.imageUrl} alt="" className="admin-table__avatar" /> : '👤'}</td>
-                    <td>{f.name}</td>
-                    <td><span className="admin-badge admin-badge--sm">{f.designation}</span></td>
-                    <td>{f.department}</td>
-                    <td>{f.qualification}</td>
-                    <td>{(f.sections?.length ?? 0) > 0 ? `${f.sections!.filter((s) => getSectionBlocks(s).length > 0).length}/${f.sections!.length} sections` : '—'}</td>
-                    <td>
-                      <button className="admin-btn admin-btn--sm" onClick={() => startEdit(f)}>Edit</button>
-                      <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(f.id)}>Delete</button>
-                    </td>
-                  </tr>
-                ))}
-                {filtered.length === 0 && <tr><td colSpan={7} className="admin-empty">No faculty records.</td></tr>}
-              </tbody>
-            </table>
-          </div>
+          (filterDept === 'All' ? departmentNames : [filterDept])
+            .filter((d) => filterDept !== 'All' || (groupedOrdered[d]?.length ?? 0) > 0)
+            .map((dept) => {
+              const list = groupedOrdered[dept] || [];
+              return (
+                <div key={dept} style={{ marginBottom: '1.5rem' }}>
+                  <h3 style={{ fontSize: '0.95rem', marginBottom: '0.5rem' }}>{dept} ({list.length})</h3>
+                  <div className="admin-table-wrap">
+                    <table className="admin-table">
+                      <thead><tr><th></th><th>Order</th><th>Photo</th><th>Name</th><th>Designation</th><th>Qualification</th><th>Profile</th><th>Actions</th></tr></thead>
+                      <tbody>
+                        {list.map((f, i) => (
+                          <tr
+                            key={f.id}
+                            draggable
+                            onDragStart={() => setDrag({ dept, index: i })}
+                            onDragOver={(e) => { e.preventDefault(); handleDragOver(dept, i); }}
+                            onDrop={() => handleDrop(dept)}
+                            onDragEnd={() => setDrag(null)}
+                            style={{ opacity: drag?.dept === dept && drag.index === i ? 0.5 : 1, cursor: 'grab' }}
+                          >
+                            <td style={{ color: 'var(--color-text-light, #9ca3af)', fontSize: '1.1rem', userSelect: 'none' }}>⠿</td>
+                            <td>
+                              <input
+                                type="number"
+                                className="admin-order-input"
+                                value={orderEdits[f.id] ?? f.order}
+                                onChange={(e) => setOrderEdits((prev) => ({ ...prev, [f.id]: e.target.value }))}
+                                onBlur={(e) => commitOrder(f, e.target.value)}
+                                onKeyDown={(e) => { if (e.key === 'Enter') (e.target as HTMLInputElement).blur(); }}
+                                onClick={(e) => e.stopPropagation()}
+                                onMouseDown={(e) => e.stopPropagation()}
+                              />
+                            </td>
+                            <td>{f.imageUrl ? <img src={f.imageUrl} alt="" className="admin-table__avatar" /> : '👤'}</td>
+                            <td>{f.name}</td>
+                            <td><span className="admin-badge admin-badge--sm">{f.designation}</span></td>
+                            <td>{f.qualification}</td>
+                            <td>{(f.sections?.length ?? 0) > 0 ? `${f.sections!.filter((s) => getSectionBlocks(s).length > 0).length}/${f.sections!.length} sections` : '—'}</td>
+                            <td>
+                              <button className="admin-btn admin-btn--sm" onClick={() => startEdit(f)}>Edit</button>
+                              <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(f.id)}>Delete</button>
+                            </td>
+                          </tr>
+                        ))}
+                        {list.length === 0 && <tr><td colSpan={8} className="admin-empty">No faculty records.</td></tr>}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              );
+            })
         )}
       </div>
     </div>

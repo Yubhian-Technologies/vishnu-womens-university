@@ -96,19 +96,37 @@ export function parseFlexibleTable(text: string): FlexibleTableSection[] {
 // items inside (e.g. Research's Thrust Areas: department -> research area ->
 // faculty names). Rendered as an accordion rather than a table.
 //
+// An area can optionally go one level deeper for a department that's really
+// a group of sub-departments (e.g. Basic Science containing Mathematics,
+// Physics, ...), each with their own areas of work and faculty: start a
+// "#### Sub-area Name" line right after the "### Area Name" line it belongs
+// under, and its own item lines follow. An area with no "#### " lines under
+// it keeps working exactly as before (its items are a flat faculty list).
+//
 // Format:
-//   ## Category Title      (starts a new category)
-//   ### Area Name          (starts a new expandable area within the category)
-//   Item one               (plain lines after "### " are that area's items)
-//   Item two | /some/path  (an optional "| link" makes the item clickable)
+//   ## Category Title        (starts a new category)
+//   ### Area Name            (starts a new expandable area within the category)
+//   Item one                 (plain lines after "### " are that area's items)
+//   Item two | /some/path    (an optional "| link" makes the item clickable)
+//   ### Sub-department Name  (an area that's really a group of sub-areas)
+//   #### Sub-area one        (starts a nested expandable sub-area)
+//   Item three
+//   #### Sub-area two
+//   Item four
 export interface AccordionItem {
   label: string;
   href?: string;
 }
 
+export interface AccordionSubArea {
+  name: string;
+  items: AccordionItem[];
+}
+
 export interface AccordionArea {
   name: string;
   items: AccordionItem[];
+  subAreas?: AccordionSubArea[];
 }
 
 export interface AccordionCategory {
@@ -121,12 +139,14 @@ export function parseAccordionTable(text: string): AccordionCategory[] {
   const categories: AccordionCategory[] = [];
   let currentCategory: AccordionCategory | null = null;
   let currentArea: AccordionArea | null = null;
+  let currentSubArea: AccordionSubArea | null = null;
 
   for (const line of lines) {
     if (line.startsWith('## ')) {
       currentCategory = { title: line.slice(3).trim(), areas: [] };
       categories.push(currentCategory);
       currentArea = null;
+      currentSubArea = null;
       continue;
     }
     if (line.startsWith('### ')) {
@@ -136,6 +156,21 @@ export function parseAccordionTable(text: string): AccordionCategory[] {
       }
       currentArea = { name: line.slice(4).trim(), items: [] };
       currentCategory.areas.push(currentArea);
+      currentSubArea = null;
+      continue;
+    }
+    if (line.startsWith('#### ')) {
+      if (!currentCategory) {
+        currentCategory = { title: '', areas: [] };
+        categories.push(currentCategory);
+      }
+      if (!currentArea) {
+        currentArea = { name: '', items: [] };
+        currentCategory.areas.push(currentArea);
+      }
+      currentSubArea = { name: line.slice(5).trim(), items: [] };
+      if (!currentArea.subAreas) currentArea.subAreas = [];
+      currentArea.subAreas.push(currentSubArea);
       continue;
     }
     if (!currentCategory) {
@@ -147,11 +182,10 @@ export function parseAccordionTable(text: string): AccordionCategory[] {
       currentCategory.areas.push(currentArea);
     }
     const pipeIndex = line.indexOf('|');
-    if (pipeIndex > -1) {
-      currentArea.items.push({ label: line.slice(0, pipeIndex).trim(), href: line.slice(pipeIndex + 1).trim() || undefined });
-    } else {
-      currentArea.items.push({ label: line });
-    }
+    const item: AccordionItem = pipeIndex > -1
+      ? { label: line.slice(0, pipeIndex).trim(), href: line.slice(pipeIndex + 1).trim() || undefined }
+      : { label: line };
+    (currentSubArea ?? currentArea).items.push(item);
   }
   return categories;
 }

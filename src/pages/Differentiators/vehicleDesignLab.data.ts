@@ -27,6 +27,7 @@ export interface VdlProjectBullet {
 }
 
 export interface VdlEndowment {
+  id: string;
   title: string;
   bestowedBy: string;
   contribution: string;
@@ -99,14 +100,12 @@ export const vehicleDesignLab = {
       {
         title: '1. Design Phase',
         paragraph: 'Students engage in conceptualizing and designing vehicles using Computer-Aided Design (CAD) software. They work on creating detailed 3D models that encompass aspects such as Driver Ergonomics, aerodynamics, structural integrity, and performance optimization by using the software like Solidworks, CATIA, Hypermesh, Ansys, Lotus shark, MATLAB-Simulink, Carmaker, etc.',
-        mediaType: 'video',
-        videoUrl: '',
+        mediaType: 'photo',
       },
       {
         title: '2. Fabrication Phase',
         paragraph: 'After finalizing the designs, students move on to the fabrication phase. The lab is equipped with machinery such as Pipe Notch making machine, 3D printers, welding stations, and assembly areas where students fabricate vehicle components and assemble prototypes.',
-        mediaType: 'video',
-        videoUrl: '',
+        mediaType: 'photo',
       },
       {
         title: '3. Testing Phase',
@@ -116,8 +115,7 @@ export const vehicleDesignLab = {
       {
         title: '4. Motorsport Vehicle Projects',
         paragraph: 'Students undertake projects focused on designing and fabricating motorsport vehicles such as Formula SAE cars, Baja off-road vehicles, Gokarts and electric race cars. These projects involve competition participation where students showcase their vehicles and compete with teams from other institutions like IITs, NITs, Private Universities etc. We have a record of being top team in SAEINDIA BAJA for last 05 continuous years.',
-        mediaType: 'video',
-        videoUrl: '',
+        mediaType: 'photo',
       },
     ] as VdlFacilityPhase[],
     campusUtilityIntro: 'In addition to motorsport vehicles, students also work on designing and fabricating campus utility vehicles. These projects focus on developing efficient and sustainable vehicles for campus transportation, maintenance, and logistics purposes.',
@@ -138,16 +136,19 @@ export const vehicleDesignLab = {
     intro: "In an exemplary demonstration of corporate collaboration and support for academic institutions, several esteemed automotive companies have bestowed valuable equipment and vehicles. These generous contributions serve to enhance the educational experience of students and facilitate hands-on learning opportunities in the field of automotive engineering. Here's a brief overview of the notable endowments received.",
     endowments: [
       {
+        id: 'ford-figo-vehicle',
         title: 'Ford Figo Vehicle',
         bestowedBy: 'Ford India Pvt Ltd',
         contribution: 'Ford India Pvt Ltd graciously gifted a Ford Figo vehicle. This vehicle serves as a valuable asset for students studying automotive engineering, providing them with a practical platform for learning about vehicle dynamics, systems integration, and performance analysis.',
       },
       {
+        id: 'volvo-powertrain-cut-section',
         title: 'Cut Section of Volvo Powertrain',
         bestowedBy: 'Volvo India Pvt Ltd',
         contribution: 'Volvo India Pvt Ltd generously provided a cut section of a Volvo powertrain. This specialized equipment offers students a unique opportunity to gain insights into the intricate workings of modern powertrain systems, including engines, transmissions, and drivetrain components.',
       },
       {
+        id: 'mg-hector-plus-vehicle',
         title: 'MG Hector Plus Vehicle and MG Powertrain Cut Section',
         bestowedBy: 'MG Motors',
         contribution: 'MG Motors, a leading automotive manufacturer, has bestowed both a MG Hector Plus vehicle and a cut section of an MG powertrain. These contributions are invaluable assets for students, enabling them to explore the latest automotive technologies and gain practical experience in vehicle design, analysis, and maintenance.',
@@ -178,17 +179,6 @@ export const vehicleDesignLab = {
       'Many graduates from the program have secured positions in leading automotive companies and research institutions like Caterpillar, Hero Motocorp, John Deere, Bosch, Renault Nissan, Eproc, Honda 2-Wheeler, Mercedes Benz, Daimler Trucks, Mahindra & Mahindra, Saint Gobain, Thermax Global, etc.',
       "The lab's activities contribute to the institution's reputation as a center for excellence in engineering education and research. It serves as a platform for showcasing students' talents and capabilities in the field of vehicle design and fabrication, several vehicle projects from the lab have received recognition in national and international competitions and also Vehicle Design Lab holds 02 patent applications in the field of Electric vehicle.",
     ],
-    achievementReports: [
-      { label: 'ME-VDL Achievements 2024-25', href: '/downloads/vdl-achievements-2024-25.pdf' },
-      { label: 'ME-VDL Achievements 2023-24', href: '/downloads/vdl-achievements-2023-24.pdf' },
-      { label: 'ME-VDL Achievements 2022-23', href: '/downloads/vdl-achievements-2022-23.pdf' },
-      { label: 'ME-VDL Achievements 2021-22', href: '/downloads/vdl-achievements-2021-22.pdf' },
-      { label: 'ME-VDL Achievements 2020-21', href: '/downloads/vdl-achievements-2020-21.pdf' },
-      { label: 'ME-VDL Achievements 2019-20', href: '/downloads/vdl-achievements-2019-20.pdf' },
-      { label: 'ME-VDL Achievements 2018-19', href: '/downloads/vdl-achievements-2018-19.pdf' },
-      { label: 'ME-VDL Achievements 2017-18', href: '/downloads/vdl-achievements-2017-18.pdf' },
-      { label: 'ME-VDL Achievements 2016-17', href: '/downloads/vdl-achievements-2016-17.pdf' },
-    ] as { label: string; href: string }[],
   },
   outcomes: [
     { title: '1. Job opportunities', text: 'Helps to develop practical engineering skills that are highly valuable in job market by enhancing practical experience and the ability to apply theoretical knowledge to real world problems.' },

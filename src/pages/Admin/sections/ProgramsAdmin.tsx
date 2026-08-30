@@ -8,6 +8,7 @@ import ImageUploader from '../../../components/ImageUploader/ImageUploader';
 import FileUploader from '../../../components/FileUploader/FileUploader';
 import type { UploadResult } from '../../../lib/storage';
 import { PROGRAM_ICON_NAMES } from '../../../lib/programIcons';
+import DepartmentNewsManager from './DepartmentNewsManager';
 
 export interface ProgramSubject {
   title: string;
@@ -30,6 +31,19 @@ export function normalizeSubject(s: string | ProgramSubject): ProgramSubject {
 export interface ProgramLink {
   label: string;
   url: string;
+}
+
+export interface LabItem {
+  name: string;
+  pdfUrl?: string;
+  pdfStoragePath?: string;
+}
+
+// Older programme docs stored labs as plain strings (no PDF) — normalize
+// either shape to the richer one at read time so existing data keeps
+// rendering without a migration, same approach as normalizeSubject above.
+export function normalizeLab(l: string | LabItem): LabItem {
+  return typeof l === 'string' ? { name: l } : l;
 }
 
 export interface LibraryItem {
@@ -62,6 +76,12 @@ export interface NewsletterIssue {
   pdfStoragePath?: string;
 }
 
+export interface RndLink {
+  label: string;
+  pdfUrl?: string;
+  pdfStoragePath?: string;
+}
+
 export interface NewsletterYear {
   year: string;
   // Ordered — an issue's "Issue – N" label is always its 1-based position,
@@ -86,7 +106,10 @@ export interface ProgramDoc {
   storagePath: string;
   about: string;
   highlights: string[];
-  labs: string[];
+  // Each lab is independently backed by its own uploaded PDF (see LabItem) —
+  // legacy docs may still have this as a plain string[]; normalizeLab()
+  // upgrades either shape to LabItem at read time.
+  labs: LabItem[];
   outcomes: string[];
   semesters: ProgramSemester[];
   vision: string;
@@ -122,6 +145,10 @@ export interface ProgramDoc {
   // programme's page. Grouped by academic year like News & Events, but each
   // year holds an ordered list of issues, each with its own uploaded PDF.
   newsletterYears?: NewsletterYear[];
+  // Optional — shown as a "Research & Development (Funded Projects &
+  // Patents)" section + Quick Links entry on every programme's page. A flat,
+  // admin-named list of links, each backed by its own uploaded PDF.
+  rndLinks?: RndLink[];
   order: number;
 }
 
@@ -135,6 +162,7 @@ const EMPTY: Omit<ProgramDoc, 'id'> = {
   libraryIntro: '', libraryInCharge: '', librarySections: [],
   newsEventsYears: [],
   newsletterYears: [],
+  rndLinks: [],
   order: 0,
 };
 
@@ -209,7 +237,7 @@ export default function ProgramsAdmin() {
     }
   };
 
-  const set = (k: string, v: string | number | string[] | ProgramSemester[] | ProgramLink[] | LibrarySection[] | NewsEventsYear[] | NewsletterYear[]) => setForm((p) => ({ ...p, [k]: v }));
+  const set = (k: string, v: string | number | string[] | ProgramSemester[] | ProgramLink[] | LibrarySection[] | NewsEventsYear[] | NewsletterYear[] | RndLink[] | LabItem[]) => setForm((p) => ({ ...p, [k]: v }));
   const handleHodImage = (r: UploadResult) => setForm((p) => ({ ...p, hodImage: r.url, hodImageStoragePath: r.path }));
   const handleMindMapImage = (r: UploadResult) => setForm((p) => ({ ...p, mindMapImage: r.url, mindMapImageStoragePath: r.path }));
 
@@ -384,6 +412,60 @@ export default function ProgramsAdmin() {
     set('newsletterYears', newsletterYears.map((y, i) => (i !== yi ? y : { ...y, issues: y.issues.filter((_, j) => j !== ii) })));
   };
 
+  // Research & Development (Funded Projects & Patents) editing — a flat
+  // admin-named list of links, each backed by its own uploaded PDF.
+  const rndLinks = form.rndLinks || [];
+  const addRndLink = () => {
+    set('rndLinks', [...rndLinks, { label: '' }]);
+  };
+  const updateRndLinkLabel = (li: number, label: string) => {
+    set('rndLinks', rndLinks.map((l, i) => (i === li ? { ...l, label } : l)));
+  };
+  const moveRndLink = (li: number, dir: -1 | 1) => {
+    const next = [...rndLinks];
+    const target = li + dir;
+    if (target < 0 || target >= next.length) return;
+    [next[li], next[target]] = [next[target], next[li]];
+    set('rndLinks', next);
+  };
+  const removeRndLink = (li: number) => {
+    if (!confirm('Remove this link?')) return;
+    set('rndLinks', rndLinks.filter((_, i) => i !== li));
+  };
+  const handleRndLinkPdf = (li: number, r: UploadResult) => {
+    set('rndLinks', rndLinks.map((l, i) => (i === li ? { ...l, pdfUrl: r.url, pdfStoragePath: r.path } : l)));
+  };
+  const removeRndLinkPdf = (li: number) => {
+    set('rndLinks', rndLinks.map((l, i) => (i === li ? { ...l, pdfUrl: '', pdfStoragePath: '' } : l)));
+  };
+
+  // Laboratories editing — each lab is independently backed by its own
+  // uploaded PDF (same shape/pattern as Research & Development links above).
+  const labs = form.labs || [];
+  const addLab = () => {
+    set('labs', [...labs, { name: '' }]);
+  };
+  const updateLabName = (li: number, name: string) => {
+    set('labs', labs.map((l, i) => (i === li ? { ...l, name } : l)));
+  };
+  const moveLab = (li: number, dir: -1 | 1) => {
+    const next = [...labs];
+    const target = li + dir;
+    if (target < 0 || target >= next.length) return;
+    [next[li], next[target]] = [next[target], next[li]];
+    set('labs', next);
+  };
+  const removeLab = (li: number) => {
+    if (!confirm('Remove this laboratory?')) return;
+    set('labs', labs.filter((_, i) => i !== li));
+  };
+  const handleLabPdf = (li: number, r: UploadResult) => {
+    set('labs', labs.map((l, i) => (i === li ? { ...l, pdfUrl: r.url, pdfStoragePath: r.path } : l)));
+  };
+  const removeLabPdf = (li: number) => {
+    set('labs', labs.map((l, i) => (i === li ? { ...l, pdfUrl: '', pdfStoragePath: '' } : l)));
+  };
+
   // Programme Structure (semesters + subjects) editing — structured add /
   // remove / reorder, replacing the old free-text "Semester I: A, B" parser.
   const addSemester = () => {
@@ -447,7 +529,9 @@ export default function ProgramsAdmin() {
       slug: p.slug, name: p.name, shortName: p.shortName, icon: p.icon || 'GraduationCap',
       category: p.category, intake: p.intake, established: p.established, accreditation: p.accreditation,
       hod: p.hod, department: p.department || '', fee: p.fee || '', heroImage: p.heroImage, storagePath: p.storagePath, about: p.about,
-      highlights: p.highlights || [], labs: p.labs || [], outcomes: p.outcomes || [],
+      highlights: p.highlights || [],
+      labs: (p.labs || []).map(normalizeLab).map((l) => ({ name: l.name, pdfUrl: l.pdfUrl || '', pdfStoragePath: l.pdfStoragePath || '' })),
+      outcomes: p.outcomes || [],
       semesters: (p.semesters || []).map((s) => ({ label: s.label, subjects: (s.subjects || []).map(normalizeSubject) })),
       vision: p.vision || '', mission: p.mission || [], coreValues: p.coreValues || [],
       peos: p.peos || [], pos: p.pos || [], psos: p.psos || [],
@@ -463,6 +547,7 @@ export default function ProgramsAdmin() {
         year: y.year,
         issues: (y.issues || []).map((iss) => ({ pdfUrl: iss.pdfUrl || '', pdfStoragePath: iss.pdfStoragePath || '' })),
       })),
+      rndLinks: (p.rndLinks || []).map((l) => ({ label: l.label, pdfUrl: l.pdfUrl || '', pdfStoragePath: l.pdfStoragePath || '' })),
       order: p.order || 0,
     });
   };
@@ -547,9 +632,47 @@ export default function ProgramsAdmin() {
             <label htmlFor="field-highlights-one-per-line">Highlights (one per line)</label>
             <textarea id="field-highlights-one-per-line" rows={5} value={arrayToLines(form.highlights)} onChange={(e) => set('highlights', linesToArray(e.target.value))} placeholder="NBA Tier-I Accredited undergraduate programme" />
           </div>
+          <div className="admin-field admin-field--full"><hr /><h3>Laboratories</h3></div>
+          <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>
+            Each laboratory has its own name and its own uploaded PDF. On the public page, clicking a laboratory
+            tile opens that lab's PDF directly (in a new tab) — a lab with no PDF uploaded yet still shows its tile,
+            just marked as unavailable.
+          </p>
           <div className="admin-field admin-field--full">
-            <label htmlFor="field-labs-one-per-line">Labs (one per line)</label>
-            <textarea id="field-labs-one-per-line" rows={5} value={arrayToLines(form.labs)} onChange={(e) => set('labs', linesToArray(e.target.value))} placeholder="Advanced Computing Lab" />
+            {labs.map((lab, li) => (
+              <div key={li} style={{ border: '1.5px solid var(--color-light-gray)', borderRadius: 8, padding: '0.75rem', marginBottom: '0.75rem' }}>
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.6rem' }}>
+                  <input
+                    value={lab.name}
+                    onChange={(e) => updateLabName(li, e.target.value)}
+                    placeholder="Advanced Computing Lab"
+                    style={{ flex: 1, fontWeight: 700 }}
+                  />
+                  <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveLab(li, -1)} disabled={li === 0} title="Move up">↑</button>
+                  <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveLab(li, 1)} disabled={li === labs.length - 1} title="Move down">↓</button>
+                  <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeLab(li)}>Remove Lab</button>
+                </div>
+                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                  <div style={{ maxWidth: 260 }}>
+                    <FileUploader
+                      folder="vwu/programs/labs"
+                      currentUrl={lab.pdfUrl}
+                      onUploaded={(r) => handleLabPdf(li, r)}
+                      label="Upload PDF"
+                    />
+                  </div>
+                  {lab.pdfUrl && (
+                    <button type="button" className="admin-btn admin-btn--ghost admin-btn--sm" onClick={() => removeLabPdf(li)}>
+                      Remove PDF
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+            <button type="button" className="admin-btn admin-btn--primary" onClick={addLab}>+ Add Lab</button>
+            {labs.length === 0 && (
+              <p className="admin-field__hint">No laboratories yet — click "Add Lab" to start building this programme's Laboratories list.</p>
+            )}
           </div>
           <div className="admin-field admin-field--full">
             <label htmlFor="field-career-outcomes-one-per-line">Career Outcomes (one per line)</label>
@@ -716,11 +839,12 @@ export default function ProgramsAdmin() {
             )}
           </div>
 
-          <div className="admin-field admin-field--full"><hr /><h3>News &amp; Events</h3></div>
+          <div className="admin-field admin-field--full"><hr /><h3>News &amp; Events — Department Page (AI / CSE / ECE)</h3></div>
           <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>
-            Optional. Shown as a "News &amp; Events" section (and Quick Links entry) on this programme's page,
-            grouped by academic year. Each year has its own columns — define whatever this department needs
-            (e.g. "Title", "Date"); "S.No" is added automatically on the public page.
+            Only shown on the shared AI/CSE/ECE department page (see Academic Departments), under this
+            programme's side of the toggle — grouped by academic year, with columns you define per year (e.g.
+            "Title", "Date"); "S.No" is added automatically. For every other programme, use "News &amp; Events —
+            This Programme" below instead.
           </p>
           <div className="admin-field admin-field--full">
             {newsEventsYears.map((yr, yi) => (
@@ -787,6 +911,15 @@ export default function ProgramsAdmin() {
             )}
           </div>
 
+          <div className="admin-field admin-field--full"><hr /><h3>News &amp; Events — This Programme</h3></div>
+          <div className="admin-field admin-field--full">
+            {editing ? (
+              <DepartmentNewsManager programSlug={form.slug} />
+            ) : (
+              <p className="admin-field__hint">Save this program first, then reopen it here to add News &amp; Events.</p>
+            )}
+          </div>
+
           <div className="admin-field admin-field--full"><hr /><h3>Newsletter</h3></div>
           <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>
             Optional. Shown as a "Newsletter" section (and Quick Links entry) on this programme's page. Add an
@@ -835,6 +968,48 @@ export default function ProgramsAdmin() {
             <button type="button" className="admin-btn admin-btn--primary" onClick={addNewsletterYear}>+ Add Academic Year</button>
             {newsletterYears.length === 0 && (
               <p className="admin-field__hint">No academic years yet — click "Add Academic Year" to start building this programme's Newsletter.</p>
+            )}
+          </div>
+
+          <div className="admin-field admin-field--full"><hr /><h3>Research &amp; Development (Funded Projects &amp; Patents)</h3></div>
+          <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>
+            Optional. Shown as a "Research &amp; Development (Funded Projects &amp; Patents)" section (and Quick
+            Links entry) on this programme's page — a flat list of named links, each opening its own uploaded PDF.
+          </p>
+          <div className="admin-field admin-field--full">
+            {rndLinks.map((link, li) => (
+              <div key={li} style={{ border: '1.5px solid var(--color-light-gray)', borderRadius: 8, padding: '0.75rem', marginBottom: '0.75rem' }}>
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.6rem' }}>
+                  <input
+                    value={link.label}
+                    onChange={(e) => updateRndLinkLabel(li, e.target.value)}
+                    placeholder="Link name, e.g. Funded Project – AICTE RPS 2023"
+                    style={{ flex: 1, fontWeight: 700 }}
+                  />
+                  <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveRndLink(li, -1)} disabled={li === 0} title="Move up">↑</button>
+                  <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveRndLink(li, 1)} disabled={li === rndLinks.length - 1} title="Move down">↓</button>
+                  <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeRndLink(li)}>Remove Link</button>
+                </div>
+                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                  <div style={{ maxWidth: 260 }}>
+                    <FileUploader
+                      folder="vwu/programs/rnd"
+                      currentUrl={link.pdfUrl}
+                      onUploaded={(r) => handleRndLinkPdf(li, r)}
+                      label="Upload PDF"
+                    />
+                  </div>
+                  {link.pdfUrl && (
+                    <button type="button" className="admin-btn admin-btn--ghost admin-btn--sm" onClick={() => removeRndLinkPdf(li)}>
+                      Remove PDF
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+            <button type="button" className="admin-btn admin-btn--primary" onClick={addRndLink}>+ Add Link</button>
+            {rndLinks.length === 0 && (
+              <p className="admin-field__hint">No links yet — click "Add Link" to start building this programme's Research &amp; Development list.</p>
             )}
           </div>
         </div>

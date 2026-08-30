@@ -1,14 +1,17 @@
 import { useEffect } from 'react';
 import { Link, useParams, useLocation, Navigate } from 'react-router-dom';
-import { where } from 'firebase/firestore';
-import { Check, Microscope, Compass, Target, Sparkles, Mail, ExternalLink, BookOpen } from 'lucide-react';
+import { Check, Microscope, Compass, Target, Sparkles, Mail, ExternalLink, BookOpen, FileText } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import ProgrammeStructure from '../../components/ProgrammeStructure/ProgrammeStructure';
-import { useCollection, useOrderedCollection } from '../../hooks/useCollection';
+import DepartmentNewsSection, { type DepartmentNewsDoc } from '../../components/DepartmentNews/DepartmentNewsSection';
+import DepartmentDetail from './DepartmentDetail';
+import { groupForProgramSlug } from '../../lib/departmentGroups';
+import { useOrderedCollection } from '../../hooks/useCollection';
 import { usePageBanner } from '../../hooks/usePageBanner';
 import { useEapcetCode } from '../../hooks/useContentBlocks';
 import { smoothScrollTo } from '../../lib/smoothScroll';
-import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
+import { normalizeLab, type ProgramDoc } from '../Admin/sections/ProgramsAdmin';
+import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import type { FacultyDoc } from './Faculty';
 import SEO from '../../components/SEO/SEO';
 import { getProgramSchema, getBreadcrumbSchema } from '../../lib/seo/schemas';
@@ -24,13 +27,33 @@ const categoryLabel: Record<string, string> = {
 };
 
 export default function ProgramDetail() {
+  // AI / CSE / ECE are "grouped" departments whose sub-program slugs render a
+  // shared department page with a program toggle instead of this standalone
+  // view (see src/lib/departmentGroups.ts). Every other slug falls through.
+  const { slug } = useParams<{ slug: string }>();
+  const group = groupForProgramSlug(slug);
+  if (group) return <DepartmentDetail group={group} activeSlug={slug!} />;
+  return <SingleProgramDetail />;
+}
+
+function SingleProgramDetail() {
   const { slug } = useParams<{ slug: string }>();
   const location = useLocation();
-  const { docs, loading } = useCollection<ProgramDoc>('programs', [where('slug', '==', slug || '')]);
-  const program = docs[0];
+  const { docs: allPrograms, loading } = useOrderedCollection<ProgramDoc>('programs', 'order');
+  const program = allPrograms.find((p) => p.slug === slug);
 
   const { docs: allFaculty } = useOrderedCollection<FacultyDoc>('faculty', 'order');
   const faculty = program?.department ? allFaculty.filter((f) => f.department === program.department) : [];
+  const { docs: deptNews } = useOrderedCollection<DepartmentNewsDoc>('departmentNews', 'date', 'desc');
+  const hasDeptNews = deptNews.some((n) => n.program === slug);
+  // Resolves the program's short `department` code (e.g. "IT") to the full
+  // department name from the Academic Departments admin, so the "About the
+  // Department" heading below reads the same way it does on the AI/CSE/ECE
+  // grouped department page — falling back to the raw code if no match.
+  const { docs: allDepartments, loading: deptLoading } = useOrderedCollection<DepartmentDoc>('departments', 'order');
+  const deptTitle = allDepartments.find(
+    (d) => d.shortCode?.trim().toUpperCase() === (program?.department || '').trim().toUpperCase()
+  )?.title || program?.department;
   // Falls back to a shared "Program Pages" banner (Hero Banners admin) only
   // when this specific program hasn't had its own image uploaded yet via
   // the Programs admin section — that per-program image always wins.
@@ -52,7 +75,10 @@ export default function ProgramDetail() {
     if (el) smoothScrollTo(el);
   }, [program, location.hash]);
 
-  if (loading) {
+  // Also wait on the department lookup: rendering before it resolves would
+  // show the raw department code and then flash to the full title once
+  // `allDepartments` loads (e.g. "IT" -> "Information Technology").
+  if (loading || deptLoading) {
     return (
       <main className="route-fallback">
         <div className="route-fallback__spinner" />
@@ -65,7 +91,10 @@ export default function ProgramDetail() {
   const hasOutcomeStatements = !!(program.peos?.length || program.pos?.length || program.psos?.length);
   const hasHod = !!(program.hodMessage || program.hodImage || program.hodEmail);
   const hasMindMap = !!program.mindMapImage;
-  const hasLabs = !!(program.labs && program.labs.length > 0);
+  // Legacy docs may still store labs as plain strings (no PDF) —
+  // normalizeLab() upgrades either shape so this page never has to care.
+  const labs = (program.labs || []).map(normalizeLab);
+  const hasLabs = labs.length > 0;
   const hasCareerOutcomes = !!(program.outcomes && program.outcomes.length > 0);
   const hasCurriculum = !!(program.semesters && program.semesters.length > 0);
   // Every section is entirely admin-defined — heading and items alike — so
@@ -73,16 +102,17 @@ export default function ProgramDetail() {
   // content. A section with no items yet just doesn't render a table for it.
   const libraryTables = (program.librarySections || []).filter((sec) => sec.items && sec.items.length > 0);
   const hasLibrary = !!(program.libraryIntro || program.libraryInCharge || libraryTables.length > 0);
-  // Same "entirely admin-defined, hide when empty" rule as Digital Library —
-  // a year only counts once it has both columns and at least one event row.
-  const newsEventsYears = (program.newsEventsYears || []).filter((y) => y.year && y.columns?.length > 0 && y.rows?.length > 0);
-  const hasNewsEvents = newsEventsYears.length > 0;
   // A year counts once it has a label and at least one issue slot (even an
   // issue with no PDF yet still renders, just as "Unavailable" — this lets
   // an admin scaffold a year's issues ahead of uploading each PDF).
   const newsletterYears = (program.newsletterYears || []).filter((y) => y.year && y.issues && y.issues.length > 0);
   const hasNewsletter = newsletterYears.length > 0;
   const newsletterMaxIssues = Math.max(0, ...newsletterYears.map((y) => y.issues.length));
+  // Only links with both a name and an uploaded PDF are shown — a link
+  // an admin has started naming but not yet uploaded a PDF for stays
+  // invisible rather than rendering a dead/empty link.
+  const rndLinks = (program.rndLinks || []).filter((l) => l.label && l.pdfUrl);
+  const hasRnd = rndLinks.length > 0;
 
   const quickLinks = [
     { id: 'about', label: 'About the Department' },
@@ -94,8 +124,9 @@ export default function ProgramDetail() {
     hasCurriculum && { id: 'curriculum', label: 'Curriculum' },
     hasLabs && { id: 'labs', label: 'Laboratories' },
     hasLibrary && { id: 'library', label: 'Digital Library' },
-    hasNewsEvents && { id: 'news-events', label: 'News & Events' },
+    hasDeptNews && { id: 'news', label: 'News & Events' },
     hasNewsletter && { id: 'newsletter', label: 'Newsletter' },
+    hasRnd && { id: 'rnd', label: 'Research & Development (Funded Projects & Patents)' },
   ].filter(Boolean) as { id: string; label: string }[];
 
   const hasSidebarContent = quickLinks.length > 1 || hasCareerOutcomes;
@@ -186,8 +217,8 @@ export default function ProgramDetail() {
             {/* Main content */}
             <div>
               <div>
-                <span className="section-label">About the Programme</span>
-                <h2 className="section-title">{program.shortName || program.name}</h2>
+                <span className="section-label">About the Department</span>
+                <h2 className="section-title">The Department of {deptTitle || program.shortName || program.name}</h2>
                 <p style={{ color: 'var(--color-text-light)', lineHeight: 1.85, fontSize: 'var(--text-base)', marginBottom: 'var(--space-6)' }}>
                   {program.about}
                 </p>
@@ -498,12 +529,35 @@ export default function ProgramDetail() {
               <p className="section-desc">State-of-the-art laboratory facilities that bring coursework to life with hands-on, industry-relevant experimentation.</p>
             </div>
             <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 'var(--space-4)' }}>
-              {program.labs.map((lab) => (
-                <div key={lab} style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', display: 'flex', alignItems: 'center', gap: 'var(--space-4)', borderLeft: '4px solid var(--color-accent)' }}>
-                  <Microscope size={22} strokeWidth={1.75} style={{ flexShrink: 0, color: 'var(--color-accent)' }} />
-                  <span style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-primary)', lineHeight: 1.4 }}>{lab}</span>
-                </div>
-              ))}
+              {labs.map((lab, li) => {
+                const tileStyle = { background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', display: 'flex', alignItems: 'center', gap: 'var(--space-4)', borderLeft: '4px solid var(--color-accent)' };
+                const content = (
+                  <>
+                    <Microscope size={22} strokeWidth={1.75} style={{ flexShrink: 0, color: 'var(--color-accent)' }} />
+                    <span style={{ display: 'flex', flexDirection: 'column', gap: '0.15rem' }}>
+                      <span style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-primary)', lineHeight: 1.4 }}>{lab.name}</span>
+                      {/* Tile always stays visible even with no PDF yet — just marked
+                          unavailable, same convention as the Newsletter issues above. */}
+                      {!lab.pdfUrl && (
+                        <span style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', fontStyle: 'italic' }}>
+                          PDF not available
+                        </span>
+                      )}
+                    </span>
+                  </>
+                );
+                // Opens this lab's own PDF straight from Firebase Storage in a new
+                // tab — only when one has been uploaded via /admin → Programs.
+                return lab.pdfUrl ? (
+                  <a key={li} href={lab.pdfUrl} target="_blank" rel="noopener noreferrer" style={{ ...tileStyle, textDecoration: 'none' }}>
+                    {content}
+                  </a>
+                ) : (
+                  <div key={li} style={tileStyle}>
+                    {content}
+                  </div>
+                );
+              })}
             </div>
           </div>
         </section>
@@ -559,43 +613,12 @@ export default function ProgramDetail() {
         </section>
       )}
 
-      {/* News & Events — grouped by academic year, each year's columns and
-          rows entirely admin-defined via Programs admin. */}
-      {hasNewsEvents && (
-        <section id="news-events" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
-          <div className="container">
-            <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label">Updates</span>
-              <h2 className="section-title">News &amp; Events</h2>
-            </div>
-            {newsEventsYears.map((yr, yi) => (
-              <div key={yi} style={{ marginBottom: yi === newsEventsYears.length - 1 ? 0 : 'var(--space-8)' }}>
-                <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.1rem', color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>
-                  Academic Year :: {yr.year}
-                </h3>
-                <div className="pb-activities-scroll">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th className="pb-activities-num">S.No</th>
-                        {yr.columns.map((col, ci) => <th key={ci}>{col}</th>)}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {yr.rows.map((row, ri) => (
-                        <tr key={ri}>
-                          <td className="pb-activities-num">{ri + 1}</td>
-                          {yr.columns.map((_, ci) => <td key={ci}>{row.cells[ci] ?? ''}</td>)}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+      {/* News & Events — live from the departmentNews collection, tagged to
+          this program. (The AI/CSE/ECE grouped department page uses the
+          teammate's per-academic-year newsEventsYears table instead — see
+          DepartmentDetail.tsx — so the two systems don't both show up on the
+          same page: this one is for standalone programs.) */}
+      <DepartmentNewsSection programSlug={program.slug} background="var(--color-off-white)" />
 
       {/* Newsletter — issues grouped by academic year; columns are however
           many issues the "longest" year has, admin-uploaded PDFs open in a
@@ -644,6 +667,30 @@ export default function ProgramDetail() {
                 </tbody>
               </table>
             </div>
+          </div>
+        </section>
+      )}
+
+      {/* Research & Development (Funded Projects & Patents) — a flat,
+          admin-named list of links, each opening its own uploaded PDF in a
+          new tab. A link only appears once it has both a name and a PDF. */}
+      {hasRnd && (
+        <section id="rnd" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
+          <div className="container">
+            <div style={{ marginBottom: 'var(--space-8)' }}>
+              <span className="section-label">Research</span>
+              <h2 className="section-title">Research &amp; Development (Funded Projects &amp; Patents)</h2>
+            </div>
+            <ul className="annual-reports-list">
+              {rndLinks.map((link, li) => (
+                <li key={li}>
+                  <a href={link.pdfUrl} target="_blank" rel="noopener noreferrer" className="annual-reports-link">
+                    <FileText size={14} strokeWidth={2} className="annual-reports-icon" />
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
           </div>
         </section>
       )}

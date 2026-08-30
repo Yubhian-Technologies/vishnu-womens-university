@@ -5,7 +5,50 @@ import PageHero from '../../components/PageHero/PageHero';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import type { FacultyFact, FacultySection } from '../../lib/facultySections';
-import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
+
+// Fixed department tab order (per design decision, not derived from data) —
+// each tab's `departments` lists every raw `department` field value (as
+// entered via /admin → Faculty/Programs) that should count toward it, since
+// real records use varying spellings (e.g. "Mechanical" not "ME", "AI&ML"/
+// "AI&DS" instead of a single "AI"). A tab simply doesn't render if none of
+// its departments currently have any faculty.
+const DEPARTMENT_GROUPS: { label: string; departments: string[] }[] = [
+  { label: 'CSE', departments: ['CSE'] },
+  { label: 'EEE', departments: ['EEE'] },
+  { label: 'IT', departments: ['IT'] },
+  { label: 'ECE', departments: ['ECE'] },
+  { label: 'ME', departments: ['Mechanical', 'ME'] },
+  { label: 'CE', departments: ['Civil', 'CE'] },
+  { label: 'AI', departments: ['AI', 'AI&ML', 'AI&DS'] },
+  { label: 'FRESHMAN ENGG.', departments: ['Mathematics', 'Physics', 'Chemistry', 'English'] },
+  { label: 'MBA', departments: ['MBA'] },
+];
+
+// Exactly 4 visual designation groups a department's faculty are always
+// sorted into, regardless of the order they were added in — data-driven off
+// each person's own `designation` text (via /admin → Faculty), never a
+// hardcoded per-person position. A new HOD, Dean, or Professor added later
+// automatically lands in the right group without anyone re-ordering by hand.
+// HOD/Dean Academics/Dean Statutory share one group (rank 0) — spacing is
+// only ever added between these 4 ranks, never within one.
+function designationGroupRank(designation: string): number {
+  const d = (designation || '').toLowerCase();
+  if (d.includes('hod') || d.includes('head') || d.includes('dean academic') || d.includes('dean statutory')) return 0;
+  if (d.includes('assistant') || d.includes('asst')) return 3;
+  if (d.includes('associate') || d.includes('assoc')) return 2;
+  if (d.includes('professor')) return 1;
+  return 4;
+}
+
+// Within the merged leadership group only, keeps HOD before Dean Academics
+// before Dean Statutory — same visual group, still a defined internal order.
+function leadershipSubRank(designation: string): number {
+  const d = (designation || '').toLowerCase();
+  if (d.includes('hod') || d.includes('head')) return 0;
+  if (d.includes('dean academic')) return 1;
+  if (d.includes('dean statutory')) return 2;
+  return 3;
+}
 
 export type { FacultyFact, FacultySection };
 
@@ -26,11 +69,6 @@ export interface FacultyDoc {
   sections?: FacultySection[];
 }
 
-// First-year foundation subjects shown only on the Freshman Engineering
-// page (src/pages/Academics/FreshmanEngineering.tsx), not on this page —
-// keep in sync with that file's hardcoded SUB_DEPTS titles.
-const FRESHMAN_ENGINEERING_DEPARTMENTS = new Set(['Mathematics', 'Physics', 'Chemistry', 'English']);
-
 function getInitials(name: string) {
   const cleaned = name.replace(/\b(Dr|Sri|Prof|Mr|Mrs|Ms)\.?\s*/gi, '');
   const parts = cleaned.trim().split(/\s+/).filter(Boolean);
@@ -41,28 +79,9 @@ function getInitials(name: string) {
 
 export default function Faculty() {
   const { docs: allFaculty, loading } = useOrderedCollection<FacultyDoc>('faculty', 'order');
-  const { docs: programs } = useOrderedCollection<ProgramDoc>('programs', 'order');
-  const [activeDept, setActiveDept] = useState('All');
+  const [activeDept, setActiveDept] = useState<string | null>(null);
 
   const faculty = allFaculty;
-
-  // Departments aren't managed separately — this is the union of every
-  // Program's `department` field (/admin → Programs) and every department
-  // that already has faculty tagged to it. The union matters because a
-  // Program's department can legitimately point elsewhere (e.g. a shared
-  // HOD across AI&DS and AI&ML programs both pointing at "AI&ML"), which
-  // must never make a real faculty department's tab disappear. The first-
-  // year foundation subjects have their own tabs on the Freshman
-  // Engineering page (FreshmanEngineering.tsx's hardcoded SUB_DEPTS) and
-  // are excluded here so they don't also show up on this page.
-  const DEPARTMENTS = useMemo(() => {
-    const seen = new Set<string>();
-    const names: string[] = [];
-    const add = (d: string) => { if (d && !seen.has(d) && !FRESHMAN_ENGINEERING_DEPARTMENTS.has(d)) { seen.add(d); names.push(d); } };
-    programs.forEach((p) => add(p.department));
-    faculty.forEach((f) => add(f.department));
-    return names;
-  }, [programs, faculty]);
 
   useEffect(() => {
     document.title = "Faculty | Vishnu Women's University";
@@ -89,12 +108,44 @@ export default function Faculty() {
     return () => observer.disconnect();
   }, []);
 
-  const availableDepts = useMemo(() => {
-    const present = new Set(faculty.map((f) => f.department).filter(Boolean));
-    return DEPARTMENTS.filter((d) => present.has(d));
-  }, [faculty]);
+  // Only a tab whose departments actually have at least one faculty member
+  // renders — an empty tab (e.g. a department with no one added yet) would
+  // just be a dead end. The order here is always DEPARTMENT_GROUPS' order.
+  const availableGroups = useMemo(
+    () => DEPARTMENT_GROUPS.filter((g) => faculty.some((f) => g.departments.includes(f.department))),
+    [faculty]
+  );
 
-  const filtered = activeDept === 'All' ? faculty : faculty.filter((f) => f.department === activeDept);
+  // Defaults to the first available tab once data loads, rather than
+  // requiring the visitor to pick one — there's no "All" view anymore.
+  const activeGroup = availableGroups.find((g) => g.label === activeDept) ?? availableGroups[0] ?? null;
+
+  const filtered = useMemo(
+    () => (activeGroup ? faculty.filter((f) => activeGroup.departments.includes(f.department)) : []),
+    [faculty, activeGroup]
+  );
+
+  // Grouped into exactly 4 visual groups: (HOD/Dean Academics/Dean
+  // Statutory) → Professors → Associate Professors → Assistant Professors.
+  // A group with no one in it is simply omitted, never rendered as an empty
+  // gap — spacing is only ever added between these 4, never within one.
+  // Faculty within the same group keep their existing relative order
+  // (Array.sort is stable), so /admin → Faculty's manual ordering still
+  // applies there — except the leadership group, which is always
+  // additionally sorted HOD → Dean Academics → Dean Statutory.
+  const designationGroups = useMemo(() => {
+    const buckets = new Map<number, FacultyDoc[]>();
+    for (const f of filtered) {
+      const rank = designationGroupRank(f.designation);
+      if (!buckets.has(rank)) buckets.set(rank, []);
+      buckets.get(rank)!.push(f);
+    }
+    const leadership = buckets.get(0);
+    if (leadership) {
+      buckets.set(0, [...leadership].sort((a, b) => leadershipSubRank(a.designation) - leadershipSubRank(b.designation)));
+    }
+    return [...buckets.entries()].sort(([a], [b]) => a - b).map(([, members]) => members);
+  }, [filtered]);
 
   // A handful of people are legitimately listed under two departments (e.g.
   // AI&DS and AI&ML both credit the same faculty member) — that's fine for
@@ -120,49 +171,58 @@ export default function Faculty() {
             <span className="section-label">Meet the Team</span>
             <h2 className="section-title">{uniqueFacultyCount > 0 ? `${uniqueFacultyCount}+ Faculty Members` : 'Faculty'}</h2>
             <p className="section-desc" style={{ margin: '0 auto' }}>
-              Browse faculty by department, or view everyone across VWU.
+              Browse faculty by department.
             </p>
           </div>
 
           <div className="faculty-tabs">
-            <button
-              className={`faculty-tab${activeDept === 'All' ? ' active' : ''}`}
-              onClick={() => setActiveDept('All')}
-            >
-              All Departments
-            </button>
-            {availableDepts.map((d) => (
+            {availableGroups.map((g) => (
               <button
-                key={d}
-                className={`faculty-tab${activeDept === d ? ' active' : ''}`}
-                onClick={() => setActiveDept(d)}
+                key={g.label}
+                className={`faculty-tab${activeGroup?.label === g.label ? ' active' : ''}`}
+                onClick={() => setActiveDept(g.label)}
               >
-                {d}
+                {g.label}
               </button>
             ))}
           </div>
 
-          <div className="faculty-grid">
-            {filtered.map((f) => (
-              <Link key={f.id} to={`/faculty/${f.id}`} className="faculty-card">
-                {f.imageUrl ? (
-                  <SmoothImage src={f.imageUrl} alt={f.name} className="faculty-card__photo" />
-                ) : (
-                  <div className="faculty-card__avatar">{getInitials(f.name)}</div>
-                )}
-                <h3 className="faculty-card__name">{f.name}</h3>
-                <p className="faculty-card__designation">{f.designation}</p>
-                {f.qualification && <p className="faculty-card__qualification">{f.qualification}</p>}
-                {f.department && <span className="faculty-card__dept">{f.department}</span>}
-                <span className="faculty-card__view-profile">View Details →</span>
-              </Link>
-            ))}
-            {!loading && filtered.length === 0 && (
-              <p style={{ color: 'var(--color-text-light)', gridColumn: '1 / -1', textAlign: 'center' }}>
-                No faculty members found for this department yet.
-              </p>
-            )}
-          </div>
+          {designationGroups.map((members, gi) => (
+            <div key={gi}>
+              {gi > 0 && (
+                <div className="faculty-group-divider" aria-hidden="true">
+                  <span className="divider" />
+                </div>
+              )}
+              <div className="faculty-grid">
+                {members.map((f) => (
+                  <Link key={f.id} to={`/faculty/${f.id}`} className="faculty-card">
+                    <div className="faculty-card__top">
+                      <span className="faculty-card__arch" aria-hidden="true" />
+                      {f.imageUrl ? (
+                        <SmoothImage src={f.imageUrl} alt={f.name} className="faculty-card__photo" />
+                      ) : (
+                        <div className="faculty-card__avatar">{getInitials(f.name)}</div>
+                      )}
+                    </div>
+                    <h3 className="faculty-card__name">{f.name}</h3>
+                    <p className="faculty-card__designation">{f.designation}</p>
+                    {f.qualification && <p className="faculty-card__qualification">{f.qualification}</p>}
+                    <div className="faculty-card__actions">
+                      <span className="faculty-card__btn faculty-card__btn--primary">View Profile</span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          ))}
+          {!loading && filtered.length === 0 && (
+            <p style={{ color: 'var(--color-text-light)', textAlign: 'center' }}>
+              {availableGroups.length === 0
+                ? 'No faculty members found yet.'
+                : 'No faculty members found for this department yet.'}
+            </p>
+          )}
         </div>
       </section>
     </main>

@@ -5,10 +5,10 @@ import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useSitePhotos, useSectionHasPhotos } from '../../hooks/useSitePhotos';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
-import type { CalendarEntry } from '../Admin/sections/AcademicCalendarAdmin';
+import { CALENDAR_CATEGORIES, type CalendarEntry } from '../Admin/sections/AcademicCalendarAdmin';
 import type { HolidayEntry } from '../Admin/sections/HolidaysAdmin';
-import { Monitor, Plane, MapPin, Phone, Mail, Navigation } from 'lucide-react';
-import { useContentBlocks, useEapcetCode } from '../../hooks/useContentBlocks';
+import { Monitor, Plane, MapPin, Phone, Mail, Navigation, FileText } from 'lucide-react';
+import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import './Information.css';
 
@@ -53,6 +53,8 @@ export default function Information() {
   }, []);
 
   const { docs: academicCalendar } = useOrderedCollection<CalendarEntry>('academicCalendar', 'order');
+  const calendarColumns = CALENDAR_CATEGORIES.map((cat) => academicCalendar.filter((item) => item.category === cat.id));
+  const calendarRowCount = calendarColumns.reduce((max, items) => Math.max(max, items.length), 0);
   const { docs: holidays } = useOrderedCollection<HolidayEntry>('holidays', 'order');
   const placementsCareersPhotos = useSitePhotos('information', 'placements-careers', defaultPlacementsCareersPhotos);
   const hasPlacementsCareersPhotos = useSectionHasPhotos('information', 'placements-careers');
@@ -62,7 +64,6 @@ export default function Information() {
   const howToReach = useContentBlocks('information', 'howToReach');
   const counsellingScheme = useContentBlocks('information', 'counsellingScheme');
   const otherPractices = useContentBlocks('information', 'otherPractices');
-  const eapcetCode = useEapcetCode();
 
   useEffect(() => {
     const tab = hashToTab[location.hash];
@@ -106,24 +107,43 @@ export default function Information() {
           {/* Academic Calendar */}
           {activeTab === 'calendar' && (
             <div>
-              <h2 className="section-title" style={{ marginBottom: 'var(--space-8)' }}>Academic Calendar 2026–27</h2>
-              <div style={{ background: 'var(--color-white)', borderRadius: 'var(--radius-md)', overflowX: 'auto', overflowY: 'hidden', boxShadow: 'var(--shadow-sm)', border: '1px solid var(--color-light-gray)' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)' }}>
+              <h2 className="section-title" style={{ marginBottom: 'var(--space-4)' }}>Academic Calendar</h2>
+              <p style={{ color: 'var(--color-text-light)', marginBottom: 'var(--space-6)', maxWidth: 680 }}>
+                Each program/year publishes its own signed academic calendar as a PDF — pick one below to view or download it.
+              </p>
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', maxWidth: 720, borderCollapse: 'collapse' }}>
                   <thead>
-                    <tr style={{ background: 'var(--color-primary)' }}>
-                      <th style={{ padding: '12px 16px', textAlign: 'left', color: 'var(--color-white)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: 'var(--text-xs)' }}>S.No</th>
-                      <th style={{ padding: '12px 16px', textAlign: 'left', color: 'var(--color-white)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: 'var(--text-xs)' }}>Event / Activity</th>
-                      <th style={{ padding: '12px 16px', textAlign: 'left', color: 'var(--color-white)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: 'var(--text-xs)' }}>Date</th>
+                    <tr>
+                      {CALENDAR_CATEGORIES.map((cat) => (
+                        <th key={cat.id} style={{ textAlign: 'left', fontFamily: 'var(--font-sans)', fontWeight: 900, color: 'var(--color-primary)', fontSize: 'var(--text-sm)', textTransform: 'uppercase', letterSpacing: '0.05em', padding: 'var(--space-3) var(--space-5) var(--space-3) 0', borderBottom: '2px solid var(--color-accent)' }}>
+                          {cat.label}
+                        </th>
+                      ))}
                     </tr>
                   </thead>
                   <tbody>
-                    {academicCalendar.map((item, i) => (
-                      <tr key={item.id} style={{ borderBottom: '1px solid rgba(27, 67, 50, 0.08)', background: i % 2 === 0 ? 'var(--color-white)' : 'rgba(27, 67, 50, 0.035)' }}>
-                        <td style={{ padding: '12px 16px', color: 'var(--color-accent)', fontWeight: 900 }}>{i + 1}</td>
-                        <td style={{ padding: '12px 16px', fontWeight: 600, color: 'var(--color-primary)' }}>{item.event}</td>
-                        <td style={{ padding: '12px 16px', color: 'var(--color-text-light)' }}>{item.date}</td>
+                    {Array.from({ length: calendarRowCount }).map((_, row) => (
+                      <tr key={row}>
+                        {calendarColumns.map((items, col) => (
+                          <td key={CALENDAR_CATEGORIES[col].id} style={{ padding: 'var(--space-3) var(--space-5) var(--space-3) 0', borderBottom: '1px solid var(--color-light-gray)' }}>
+                            {items[row] && (
+                              <a
+                                href={items[row].fileUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', color: 'var(--color-accent)', fontWeight: 700, fontSize: 'var(--text-sm)', textDecoration: 'none' }}
+                              >
+                                <FileText size={14} strokeWidth={2} /> {items[row].label}
+                              </a>
+                            )}
+                          </td>
+                        ))}
                       </tr>
                     ))}
+                    {calendarRowCount === 0 && (
+                      <tr><td colSpan={CALENDAR_CATEGORIES.length} style={{ padding: 'var(--space-4) 0', color: 'var(--color-text-light)', fontSize: 'var(--text-sm)' }}>Not posted yet.</td></tr>
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -190,21 +210,15 @@ export default function Information() {
           {/* Counselling */}
           {activeTab === 'counselling' && (
             <div>
-              <h2 className="section-title" style={{ marginBottom: 'var(--space-4)' }}>AP EAPCET Counselling Scheme</h2>
-              <p style={{ color: 'var(--color-text-light)', marginBottom: 'var(--space-8)', maxWidth: 680 }}>
-                Admissions to B.Tech programs at VWU are through AP EAPCET counselling. VWU College Code: <strong style={{ color: 'var(--color-primary)' }}>{eapcetCode}</strong>. Follow the steps below to secure your seat.
-              </p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-                {counsellingScheme.map((s, i) => (
-                  <div key={s.id} style={{ display: 'flex', gap: 'var(--space-6)', background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5) var(--space-6)', alignItems: 'flex-start', transition: 'all 0.2s' }}>
-                    <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', fontWeight: 900, color: 'var(--color-accent)', minWidth: 48, flexShrink: 0 }}>{String(i + 1).padStart(2, '0')}</div>
-                    <div>
-                      <h3 style={{ fontFamily: 'var(--font-sans)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>{s.title}</h3>
-                      <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.7 }}>{s.desc}</p>
-                    </div>
-                  </div>
+              <h2 className="section-title" style={{ marginBottom: 'var(--space-6)' }}>Counselling Scheme</h2>
+              <ul style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', listStyle: 'none', padding: 0, margin: 0, maxWidth: 820 }}>
+                {counsellingScheme.map((s) => (
+                  <li key={s.id} style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
+                    <span style={{ flexShrink: 0, width: 8, height: 8, borderRadius: '50% 50% 50% 0', background: 'var(--color-accent)', marginTop: '0.5em' }} />
+                    <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.7 }}>{s.desc || s.title}</p>
+                  </li>
                 ))}
-              </div>
+              </ul>
               <div style={{ textAlign: 'center', marginTop: 'var(--space-8)' }}>
                 <Link to="/admissions" className="btn btn-primary btn-lg">Learn More About Admissions</Link>
               </div>

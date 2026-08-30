@@ -11,6 +11,7 @@ import { useContentBlocks, useEapcetCode } from '../../hooks/useContentBlocks';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
 import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
+import { groupForDeptShortCode } from '../../lib/departmentGroups';
 import { Radio } from 'lucide-react';
 
 const defaultAcademicsPhotos = [
@@ -47,6 +48,31 @@ const TABS = [
 function truncate(text: string, max: number) {
   if (!text) return '';
   return text.length > max ? `${text.slice(0, max).trimEnd()}…` : text;
+}
+
+// Loose comparison key so "AI&ML", "AI & ML", "ai and ml" all collapse to the
+// same thing when matching a department card to a program.
+const matchKey = (s: string) =>
+  (s || '').toLowerCase().replace(/&/g, ' and ').replace(/[^a-z0-9]+/g, ' ').trim();
+
+// Resolves a department card to the program page it links to. Grouped
+// departments (AI / CSE / ECE) point at their first sub-program slug, which
+// renders the shared department page with that program's toggle active (see
+// src/lib/departmentGroups.ts). Everything else matches by name to its single
+// program, or returns null when there's no clear match.
+function findDeptProgramSlug(dept: DepartmentDoc, programs: ProgramDoc[]): string | null {
+  const grouped = groupForDeptShortCode(dept.shortCode);
+  if (grouped) return grouped.programSlugs[0];
+  const keys = [matchKey(dept.title), matchKey(dept.shortCode)].filter(Boolean);
+  const matches = programs.filter((p) =>
+    [p.department, p.name, p.shortName]
+      .map(matchKey)
+      .filter(Boolean)
+      .some((c) => keys.includes(c))
+  );
+  if (matches.length === 0) return null;
+  const preferred = matches.find((p) => p.category === 'btech') ?? matches[0];
+  return preferred.slug || null;
 }
 
 export default function Academics() {
@@ -102,6 +128,17 @@ export default function Academics() {
     if (next.has(id)) next.delete(id); else next.add(id);
     return next;
   });
+
+  // Which department cards link straight to a program page (all except the
+  // multi-program AI/CSE/ECE cards, and any that don't resolve to a program).
+  const deptProgramSlug = useMemo(() => {
+    const map: Record<string, string> = {};
+    departments.forEach((d) => {
+      const slug = findDeptProgramSlug(d, programs);
+      if (slug) map[d.id] = slug;
+    });
+    return map;
+  }, [departments, programs]);
 
   return (
     <main className="page-wrapper">
@@ -211,8 +248,9 @@ export default function Academics() {
               const Icon = resolveProgramIcon(dept.icon);
               const expanded = expandedDepts.has(dept.id);
               const isTruncated = (dept.description || '').length > 130;
-              return (
-                <div key={dept.id} className="dept-card">
+              const linkSlug = deptProgramSlug[dept.id];
+              const body = (
+                <>
                   <div className="dept-card-top">
                     <span className="dept-icon"><Icon size={30} strokeWidth={1.75} /></span>
                     <span className="dept-code">{dept.shortCode}</span>
@@ -222,13 +260,21 @@ export default function Academics() {
                   {isTruncated && (
                     <button
                       type="button"
-                      onClick={() => toggleDept(dept.id)}
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleDept(dept.id); }}
                       style={{ alignSelf: 'flex-start', fontSize: '0.72rem', fontWeight: 700, color: 'var(--color-accent)', fontFamily: 'var(--font-sans)', background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
                     >
                       {expanded ? '← Show less' : 'More →'}
                     </button>
                   )}
-                </div>
+                </>
+              );
+              return linkSlug ? (
+                <Link key={dept.id} to={`/academics/${linkSlug}`} className="dept-card dept-card--link">
+                  {body}
+                  <span className="dept-card-arrow" style={{ marginTop: 'auto' }}>Learn More →</span>
+                </Link>
+              ) : (
+                <div key={dept.id} className="dept-card">{body}</div>
               );
             })}
             {departments.length === 0 && (

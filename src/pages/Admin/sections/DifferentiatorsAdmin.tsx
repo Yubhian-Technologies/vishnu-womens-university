@@ -7,14 +7,17 @@ import AicteIdeaLabTeamAdmin from './AicteIdeaLabTeamAdmin';
 import AicteIdeaLabAmbassadorsAdmin from './AicteIdeaLabAmbassadorsAdmin';
 import AicteIdeaLabFacilityPhotosAdmin from './AicteIdeaLabFacilityPhotosAdmin';
 import IicMemberPhotosAdmin from './IicMemberPhotosAdmin';
+import IicDocumentsAdmin from './IicDocumentsAdmin';
 import TedxPhotosAdmin from './TedxPhotosAdmin';
 import TiDspGalleryPhotosAdmin from './TiDspGalleryPhotosAdmin';
 import ChipsToStartupPhotosAdmin from './ChipsToStartupPhotosAdmin';
 import VsacGalleryPhotosAdmin from './VsacGalleryPhotosAdmin';
 import VdlFacilitiesPhotosAdmin from './VdlFacilitiesPhotosAdmin';
+import VdlAchievementsAdmin from './VdlAchievementsAdmin';
+import RwtpReportsAdmin from './RwtpReportsAdmin';
 import AssistiveTechLabPhotosAdmin from './AssistiveTechLabPhotosAdmin';
+import AtlActivityPdfsAdmin from './AtlActivityPdfsAdmin';
 import ConcreteCanoePhotosAdmin from './ConcreteCanoePhotosAdmin';
-import WisePlacementsAdmin from './WisePlacementsAdmin';
 import WiseTeamPhotosAdmin from './WiseTeamPhotosAdmin';
 import WiseEliteProjectPhotosAdmin from './WiseEliteProjectPhotosAdmin';
 import WiseTestimonialPhotosAdmin from './WiseTestimonialPhotosAdmin';
@@ -32,16 +35,25 @@ const ITEM_SUB_SECTIONS: Record<string, { key: string; label: string; Component:
     { key: 'ambassadors', label: 'Student Ambassadors', Component: AicteIdeaLabAmbassadorsAdmin },
     { key: 'facility-photos', label: 'Facility Photos', Component: AicteIdeaLabFacilityPhotosAdmin },
   ],
-  'institution-innovation-cell': [{ key: 'member-photos', label: 'Council Member Photos', Component: IicMemberPhotosAdmin }],
+  'institution-innovation-cell': [
+    { key: 'member-photos', label: 'Council Member Photos', Component: IicMemberPhotosAdmin },
+    { key: 'documents', label: 'Documents', Component: IicDocumentsAdmin },
+  ],
   'tedxsvecw': [{ key: 'photos', label: 'Photos', Component: TedxPhotosAdmin }],
   'ti-dsp-coe': [{ key: 'gallery-photos', label: 'Gallery Photos', Component: TiDspGalleryPhotosAdmin }],
   'chips-to-startup': [{ key: 'photos', label: 'Photos', Component: ChipsToStartupPhotosAdmin }],
   'vsac': [{ key: 'gallery-photos', label: 'Gallery Photos', Component: VsacGalleryPhotosAdmin }],
-  'vehicle-design-lab': [{ key: 'facilities-photos', label: 'Facilities Photos', Component: VdlFacilitiesPhotosAdmin }],
-  'assistive-tech-lab': [{ key: 'atl-photos', label: 'Photos', Component: AssistiveTechLabPhotosAdmin }],
+  'vehicle-design-lab': [
+    { key: 'facilities-photos', label: 'Facilities Photos', Component: VdlFacilitiesPhotosAdmin },
+    { key: 'achievement-reports', label: 'Achievement Reports', Component: VdlAchievementsAdmin },
+  ],
+  'rural-women-tech-park': [{ key: 'report-links', label: 'Report Links', Component: RwtpReportsAdmin }],
+  'assistive-tech-lab': [
+    { key: 'atl-photos', label: 'Photos', Component: AssistiveTechLabPhotosAdmin },
+    { key: 'atl-activity-pdfs', label: 'Activity PDFs', Component: AtlActivityPdfsAdmin },
+  ],
   'concrete-canoe-lab': [{ key: 'canoe-photos', label: 'Photos', Component: ConcreteCanoePhotosAdmin }],
   'talentsprint-wise': [
-    { key: 'placement-cards', label: 'Placement Cards', Component: WisePlacementsAdmin },
     { key: 'team-photos', label: 'Team Photos', Component: WiseTeamPhotosAdmin },
     { key: 'elite-photos', label: 'WISE-ELITE Project Photos', Component: WiseEliteProjectPhotosAdmin },
     { key: 'testimonial-photos', label: 'Testimonial Photos', Component: WiseTestimonialPhotosAdmin },

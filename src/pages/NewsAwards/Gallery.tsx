@@ -261,11 +261,13 @@ export default function Gallery() {
           <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 'var(--space-4)' }}>
             {filtered.map((album, i) => {
               const color = yearColors[album.year] || 'var(--color-primary)';
+              const CardTag = album.link ? 'a' : 'div';
               return (
-                <div
+                <CardTag
                   key={i}
                   className="reveal"
                   data-delay={`${(i % 4) * 60}`}
+                  {...(album.link ? { href: album.link, target: '_blank', rel: 'noopener noreferrer' } : {})}
                   style={{
                     background: 'var(--color-white)',
                     border: '1.5px solid var(--color-light-gray)',
@@ -274,6 +276,8 @@ export default function Gallery() {
                     display: 'flex',
                     flexDirection: 'column',
                     transition: 'all var(--transition-base)',
+                    textDecoration: 'none',
+                    cursor: album.link ? 'pointer' : 'default',
                   }}
                   onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-md)'; (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; }}
                   onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = 'none'; (e.currentTarget as HTMLElement).style.transform = 'none'; }}
@@ -289,7 +293,7 @@ export default function Gallery() {
                     </h3>
                     <p style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)' }}>{album.date}</p>
                   </div>
-                </div>
+                </CardTag>
               );
             })}
           </div>

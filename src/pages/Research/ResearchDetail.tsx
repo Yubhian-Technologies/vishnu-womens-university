@@ -10,10 +10,7 @@ import type { ResearchItemDoc } from '../Admin/sections/ResearchItemsAdmin';
 import ThrustAreasSection from './ThrustAreasSection';
 import ProfessionalBodiesSection from './ProfessionalBodiesSection';
 import { DEFAULT_FUNDED_PROJECTS_TEXT } from './fundedProjectsDefault';
-import { DEFAULT_PATENTS_TEXT } from './patentsDefault';
 import { DEFAULT_THRUST_AREAS_INTRO, DEFAULT_THRUST_AREAS_TEXT } from './thrustAreasDefault';
-import { DEFAULT_RESEARCH_PUBLICATIONS_TEXT } from './researchPublicationsDefault';
-import { DEFAULT_CONSULTANCY_TEXT } from './consultancyDefault';
 import { DEFAULT_RESEARCH_CENTERS_INTRO, DEFAULT_RESEARCH_CENTERS_TABLE_TEXT } from './researchCentersDefault';
 import { DEFAULT_MOUS_TABLE_TEXT } from './mousDefault';
 import { DEFAULT_SEED_MONEY_PROJECTS_TABLE_TEXT, DEFAULT_SEED_MONEY_PROJECTS_INTRO } from './seedMoneyProjectsDefault';
@@ -35,14 +32,6 @@ const CATEGORY_LABELS: Record<string, string> = {
 // fully rather than staying blank until someone pastes it in manually.
 const DEFAULT_PROJECTS_TEXT_BY_SLUG: Record<string, string> = {
   'funded-projects': DEFAULT_FUNDED_PROJECTS_TEXT,
-  'patents': DEFAULT_PATENTS_TEXT,
-};
-
-// Same fallback pattern as above, for the accordion (category -> area ->
-// faculty) content on Research Publications and Consultancy.
-const DEFAULT_ACCORDION_TEXT_BY_SLUG: Record<string, string> = {
-  'research-publications': DEFAULT_RESEARCH_PUBLICATIONS_TEXT,
-  'consultancy': DEFAULT_CONSULTANCY_TEXT,
 };
 
 // Fallback accordionText for Thrust Areas of Research, used only until an
@@ -133,8 +122,28 @@ export default function ResearchDetail() {
   const aboutBlocks = parseAboutContent(about);
   const tableText = item.tableText || DEFAULT_TABLE_TEXT_BY_SLUG[item.slug] || '';
   const tableSections = parseFlexibleTable(tableText).filter((s) => s.headers.length > 0);
-  const accordionText = item.accordionText || DEFAULT_ACCORDION_TEXT_OVERRIDE_BY_SLUG[item.slug] || DEFAULT_ACCORDION_TEXT_BY_SLUG[item.slug] || '';
-  const accordionCategories = parseAccordionTable(accordionText).filter((c) => c.areas.length > 0);
+  const accordionText = item.accordionText || DEFAULT_ACCORDION_TEXT_OVERRIDE_BY_SLUG[item.slug] || '';
+  // Thrust Areas of Research is built up incrementally from the admin (a
+  // department shell added now, its research areas/faculty filled in later),
+  // so a "## Department" with no "### Area" yet still gets a tab there.
+  // Every other accordion-rendering page keeps the stricter areas.length > 0
+  // filter, since an empty category there would just be a dead heading.
+  // Research Publications' year list is managed as structured data (Admin >
+  // Research Items > Publications by Year: add a year, upload its PDF) once
+  // an admin has added at least one year that way, instead of the plain-text
+  // accordion format every other page uses — a dedicated year + file upload
+  // is a much better fit than hand-typing "### 2026\nClick Here | <url>".
+  const publicationYears = (item.publicationYears || []).filter((e) => e.year && e.fileUrl);
+  const accordionCategories = item.slug === 'research-publications' && publicationYears.length > 0
+    ? [{
+        title: '',
+        areas: [...publicationYears]
+          .sort((a, b) => b.year.localeCompare(a.year))
+          .map((e) => ({ name: e.year, items: [{ label: 'Click Here to download', href: e.fileUrl }] })),
+      }]
+    : parseAccordionTable(accordionText).filter(
+        (c) => (item.slug === 'thrust-areas-of-research' ? c.title : c.areas.length > 0),
+      );
   const projectsText = item.projectsText || DEFAULT_PROJECTS_TEXT_BY_SLUG[item.slug] || '';
   const projectCategories = parseProjectAccordion(projectsText).filter((c) => c.projects.length > 0);
 
