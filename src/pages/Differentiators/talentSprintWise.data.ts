@@ -1,10 +1,6 @@
 // Rich hardcoded content for the TalentSprint – WISE differentiator page
 // (slug: talentsprint-wise) — overrides that item's generic Firestore
-// intro/about text in DifferentiatorDetail.tsx. The placement highlight
-// cards below the objectives are fully admin-managed instead (see
-// WisePlacementsAdmin.tsx / the `wisePlacements` collection) since none were
-// available as static assets and each needs its own photo, name, company,
-// and package — a card only appears on the public page once an admin adds it.
+// intro/about text in DifferentiatorDetail.tsx.
 export interface WiseNseClipping {
   id: string;
   caption: string;
