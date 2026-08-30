@@ -601,7 +601,7 @@ export default function CentralLibrary() {
               <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, maxWidth: 760, marginBottom: 'var(--space-6)' }}>
                 The Library contributes to the fulfilment of the University's mission by selecting, acquiring, organising, maintaining, and making accessible a collection of printed and non-printed, primary and secondary materials that support the educational, research, and public service programmes of both students and faculty:
               </p>
-              <ul style={{ maxWidth: 760, marginBottom: 'var(--space-8)', paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+              <ul style={{ maxWidth: 760, marginBottom: 'var(--space-8)', paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', listStyleType: 'disc', listStylePosition: 'outside' }}>
                 {libraryResponsibilities.map((r) => (
                   <li key={r} style={{ color: 'var(--color-text-light)', lineHeight: 1.7 }}>{r}</li>
                 ))}

@@ -200,7 +200,7 @@ export default function CampusHostels() {
               <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-6)', maxWidth: 760 }}>
                 {admissionProcedureIntro}
               </p>
-              <ol style={{ margin: 0, paddingLeft: 'var(--space-6)', display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', maxWidth: 760 }}>
+              <ol style={{ margin: 0, paddingLeft: 'var(--space-6)', display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', maxWidth: 760, listStyleType: 'decimal', listStylePosition: 'outside' }}>
                 {admissionProcedureRules.map((rule) => (
                   <li key={rule} style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75 }}>{rule}</li>
                 ))}
@@ -212,7 +212,7 @@ export default function CampusHostels() {
           {activeTab === 'accommodation' && (
             <div>
               <h2 className="section-title" style={{ marginBottom: 'var(--space-6)' }}>Accommodation</h2>
-              <ol style={{ margin: 0, paddingLeft: 'var(--space-6)', display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', maxWidth: 760 }}>
+              <ol style={{ margin: 0, paddingLeft: 'var(--space-6)', display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', maxWidth: 760, listStyleType: 'decimal', listStylePosition: 'outside' }}>
                 {accommodationRules.map((rule) => (
                   <li key={rule} style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75 }}>{rule}</li>
                 ))}
@@ -224,7 +224,7 @@ export default function CampusHostels() {
           {activeTab === 'amenities' && (
             <div>
               <h2 className="section-title" style={{ marginBottom: 'var(--space-6)' }}>Amenities</h2>
-              <ol style={{ margin: 0, paddingLeft: 'var(--space-6)', display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', maxWidth: 760 }}>
+              <ol style={{ margin: 0, paddingLeft: 'var(--space-6)', display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', maxWidth: 760, listStyleType: 'decimal', listStylePosition: 'outside' }}>
                 {amenitiesRules.map((rule) => (
                   <li key={rule} style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75 }}>{rule}</li>
                 ))}
@@ -236,7 +236,7 @@ export default function CampusHostels() {
           {activeTab === 'discipline' && (
             <div>
               <h2 className="section-title" style={{ marginBottom: 'var(--space-6)' }}>Discipline Policies</h2>
-              <ol style={{ margin: 0, paddingLeft: 'var(--space-6)', display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', maxWidth: 760 }}>
+              <ol style={{ margin: 0, paddingLeft: 'var(--space-6)', display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', maxWidth: 760, listStyleType: 'decimal', listStylePosition: 'outside' }}>
                 {disciplinePolicyRules.map((rule) => (
                   <li key={rule} style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75 }}>{rule}</li>
                 ))}

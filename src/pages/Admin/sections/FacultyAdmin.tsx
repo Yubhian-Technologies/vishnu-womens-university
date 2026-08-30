@@ -196,6 +196,57 @@ export default function FacultyAdmin() {
 
   const filtered = filterDept === 'All' ? faculty : faculty.filter((f) => f.department === filterDept);
 
+  // One-time cleanup: AI&ML/AI&DS and EVT were separate department tags left
+  // over from before the grouped AI/ECE department pages existed; merge them
+  // into the single "AI" / "ECE" tag so editing one place updates everyone.
+  const LEGACY_MERGE: Record<string, string> = { 'AI&ML': 'AI', 'AI&DS': 'AI', EVT: 'ECE' };
+  const legacyCount = faculty.filter((f) => LEGACY_MERGE[f.department]).length;
+  const [merging, setMerging] = useState(false);
+  const mergeLegacyDepartments = async () => {
+    if (!confirm(`Retag ${legacyCount} faculty member(s) from AI&ML/AI&DS → AI and EVT → ECE?`)) return;
+    setMerging(true);
+    try {
+      for (const f of faculty) {
+        const target = LEGACY_MERGE[f.department];
+        if (target) await updateDoc(doc(db, 'faculty', f.id), { department: target });
+      }
+    } catch (e) {
+      alert(`Couldn't merge: ${(e as Error).message}`);
+    } finally { setMerging(false); }
+  };
+
+  // Merging AI&ML/AI&DS into "AI" above can surface literal duplicate rows —
+  // the same person was legitimately credited under both sub-departments
+  // before. Finds same-name pairs within the same department and keeps the
+  // "richer" record (HOD designation wins, then whichever has more filled-in
+  // fields), deleting the rest.
+  const duplicateGroups = useMemo(() => {
+    const groups: Record<string, FacultyDoc[]> = {};
+    faculty.forEach((f) => {
+      const key = `${f.department}::${f.name.trim().toLowerCase().replace(/\s+/g, ' ')}`;
+      (groups[key] ??= []).push(f);
+    });
+    return Object.values(groups).filter((g) => g.length > 1);
+  }, [faculty]);
+  const duplicateCount = duplicateGroups.reduce((n, g) => n + g.length - 1, 0);
+  const [dedupeRunning, setDedupeRunning] = useState(false);
+  const richness = (f: FacultyDoc) =>
+    (/hod|head/i.test(f.designation) ? 100 : 0)
+    + (f.imageUrl ? 1 : 0) + (f.qualification ? 1 : 0) + (f.specialization ? 1 : 0)
+    + (f.email ? 1 : 0) + (f.facts?.length ?? 0) + (f.sections?.length ?? 0);
+  const removeDuplicates = async () => {
+    if (!confirm(`Delete ${duplicateCount} duplicate faculty record(s), keeping the best copy of each?`)) return;
+    setDedupeRunning(true);
+    try {
+      for (const group of duplicateGroups) {
+        const [, ...rest] = [...group].sort((a, b) => richness(b) - richness(a));
+        for (const dup of rest) await deleteDoc(doc(db, 'faculty', dup.id));
+      }
+    } catch (e) {
+      alert(`Couldn't remove duplicates: ${(e as Error).message}`);
+    } finally { setDedupeRunning(false); }
+  };
+
   return (
     <div className="admin-section">
       <div className="admin-card">
@@ -339,6 +390,22 @@ export default function FacultyAdmin() {
             {departmentNames.map((d) => <option key={d}>{d}</option>)}
           </select>
         </div>
+        {legacyCount > 0 && (
+          <p className="admin-field__hint" style={{ margin: '0 0 0.5rem' }}>
+            {legacyCount} faculty still tagged AI&amp;ML / AI&amp;DS / EVT.{' '}
+            <button className="admin-btn admin-btn--sm" onClick={mergeLegacyDepartments} disabled={merging}>
+              {merging ? 'Merging…' : 'Merge into AI / ECE'}
+            </button>
+          </p>
+        )}
+        {duplicateCount > 0 && (
+          <p className="admin-field__hint" style={{ margin: '0 0 1rem' }}>
+            {duplicateCount} likely duplicate faculty record(s) found (same name, same department).{' '}
+            <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={removeDuplicates} disabled={dedupeRunning}>
+              {dedupeRunning ? 'Removing…' : 'Remove duplicates'}
+            </button>
+          </p>
+        )}
         {loading ? <p className="admin-loading">Loading…</p> : (
           <div className="admin-table-wrap">
             <table className="admin-table">

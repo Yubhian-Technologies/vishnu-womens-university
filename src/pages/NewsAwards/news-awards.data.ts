@@ -8,24 +8,25 @@ export interface GalleryAlbum {
   title: string;
   date: string;
   year: number;
+  link?: string;
 }
 
 export const galleryAlbums: GalleryAlbum[] = [
   // 2026
-  { title: "A New Era of Excellence – Inauguration Ceremony 2026 – Vishnu Women's University", date: 'August 23, 2026', year: 2026 },
-  { title: 'Celebrations of Remarkable Achievement in Admissions of EAPCET 2026', date: 'August 13, 2026', year: 2026 },
-  { title: 'Celebrations of International Yoga Day 2026', date: 'June 21, 2026', year: 2026 },
-  { title: 'Celebrations of World Environment Day 2026', date: 'June 5, 2026', year: 2026 },
-  { title: 'Signed MoU with Mahindra & Mahindra', date: 'March 9, 2026', year: 2026 },
-  { title: 'Annual Day 2026 – Celebrations', date: 'March 7, 2026', year: 2026 },
-  { title: 'TECHNOVA 2026 – Valedictory', date: 'March 7, 2026', year: 2026 },
-  { title: 'TECHNOVA 2026 – Culturals', date: 'March 6, 2026', year: 2026 },
-  { title: 'TECHNOVA 2026 – Events', date: 'March 6, 2026', year: 2026 },
-  { title: 'TECHNOVA 2026 – Inauguration', date: 'March 6, 2026', year: 2026 },
-  { title: 'Celebration of Ethnic Day @ VWU', date: 'March 2, 2026', year: 2026 },
-  { title: 'Congratulations to Awardees of the Aegis Graham Bell Awards', date: 'March 1, 2026', year: 2026 },
-  { title: 'Team Ziba Racers – Five Awards @ mBAJA SAEINDIA 2026', date: 'February 25, 2026', year: 2026 },
-  { title: 'Chart Presentation on "Drug Free Environment" @ EAGLE Club', date: 'February 11, 2026', year: 2026 },
+  { title: "A New Era of Excellence – Inauguration Ceremony 2026 – Vishnu Women's University", date: 'August 23, 2026', year: 2026, link: 'https://photos.google.com/share/AF1QipP0Ar72PZx_r1xt_Q28fSBLhCwl-ORbdn0qdcZe61YHOQn_tKH53VDukqx4E5G0PA?key=dVh2QXp4aVRxUmpleVJrWTBJTld1QXB0MzBNOFJB' },
+  { title: 'Celebrations of Remarkable Achievement in Admissions of EAPCET 2026', date: 'August 13, 2026', year: 2026, link: 'https://photos.google.com/share/AF1QipOau71Q74yxB1523N2s3o8frrKECBgweDZttE9jxvhl187xPv9CSrBQAVChN_je8w?key=TUw2OEJ6WVBmY21NNmVpZDg0cGVaYTZLeGdJSUx3' },
+  { title: 'Celebrations of International Yoga Day 2026', date: 'June 21, 2026', year: 2026, link: 'https://photos.google.com/share/AF1QipO7UiK_TwuZsP7lYi-hPH5hnVczktU4jPVvKJNSx7YG6qf8dDD4IIcTTqMJNSoVkg?key=ODJRRFhTc1h6MmFyT09TX3B0cFhmYWQzdndmVDBR' },
+  { title: 'Celebrations of World Environment Day 2026', date: 'June 5, 2026', year: 2026, link: 'https://photos.google.com/share/AF1QipNnZu9ZRjSeuXjfJlgklnIuj7ckGEf2GWMgWKol3MM1YKzAC1xh_c1TqevNeI3xsA?key=ZXlLSDZ0WjdhaGg3ZWtzQzRPcWU1cmlGQkFUeDBB' },
+  { title: 'Signed MoU with Mahindra & Mahindra', date: 'March 9, 2026', year: 2026, link: 'https://photos.google.com/share/AF1QipM3saryVvRfxS-HmZ-fT253Eono47Nd-pXkQ5m9aAlULmtBU6LjCloGdK1XkP5DPg?key=WFdQTXlxNmVlRHFOZnFFaWc2b1R1ekZKXzdYelNB' },
+  { title: 'Annual Day 2026 – Celebrations', date: 'March 7, 2026', year: 2026, link: 'https://photos.google.com/share/AF1QipNCSN5HovBKZFPZzJUoVvszrIh5rfsPz7_F3De65lti0FFOb2w5cdPwFP73zXPdEQ?key=QnR6eExmZHVyWGpTYkdnVk45cW5NRFFSMUpsWFpR' },
+  { title: 'TECHNOVA 2026 – Valedictory', date: 'March 7, 2026', year: 2026, link: 'https://photos.google.com/share/AF1QipObyzciMC4Jt3bBQsPHqyL9-O1LtBWKea6cMAeOz0ZeaqUP3dBOwgh0l9SJU5jzoQ?key=cGN3aGJGWXFldmZtcWdadGlET1Z1WEk0eHBtM3h3' },
+  { title: 'TECHNOVA 2026 – Culturals', date: 'March 6, 2026', year: 2026, link: 'https://photos.google.com/share/AF1QipMbhqnpiaWXZcdWjeh1oWCDvNzGV9_F76YNmCPiyCU4OBi7m6kcRB5I-CyXrE8pSQ?key=VU9sU2VqZ0d2Vlo1UzNjNHI3dzM5UW1abW9XVDFn' },
+  { title: 'TECHNOVA 2026 – Events', date: 'March 6, 2026', year: 2026, link: 'https://photos.google.com/share/AF1QipPMoA4uE1RPQ-XleJ_Pnz5QbwQD5-USbnXyIGxvLeqvQVOuB6-A2D4iJRy5x5-nqA?key=eTRBSm1BaWJTQmd3NTh5WURoM25STEdibk4wQTJn' },
+  { title: 'TECHNOVA 2026 – Inauguration', date: 'March 6, 2026', year: 2026, link: 'https://photos.google.com/share/AF1QipOXeVWodMh8grYXRuPryHvzVqzagLGsOcOe-llHm7TQZ9nwFSNiihYAwSPkznUDeQ?key=WUVRUkt1OUlZdDFmMzFEaVI1WThvdzhuTWQwRWF3' },
+  { title: 'Celebration of Ethnic Day @ VWU', date: 'March 2, 2026', year: 2026, link: 'https://photos.google.com/share/AF1QipOvdiK9iOcu14VHYKU42075EPXvVEXGRD4sUqFtJjbLkAF1HFATSVQZCL2xByY6dg?key=dXR6aEkwdzJVWUNCRkNjNXF1by16bFc3T01PTTBR' },
+  { title: 'Congratulations to Awardees of the Aegis Graham Bell Awards', date: 'March 1, 2026', year: 2026, link: 'https://photos.google.com/share/AF1QipMLbioZF-s__aUKvbqBy-swYpGZv6nzBh1C9dFspHwRbM4Iy2NcCvX0x6gXHWOgEg?key=dkQ3VmkyN0dyeFNMakQ2dUpWdWJodmJrWkpEcHNB' },
+  { title: 'Team Ziba Racers – Five Awards @ mBAJA SAEINDIA 2026', date: 'February 25, 2026', year: 2026, link: 'https://photos.google.com/share/AF1QipP9d5_dluQ5gLuL61LIcy0PAeYJ1hY-CwuzCIj8lXlw_LDP_MLT_ztmYy3u2YHxCQ?key=SmRqNC1PRGExOVZCeWdVcUd6LXlQOHhtTm1sZ29B' },
+  { title: 'Chart Presentation on "Drug Free Environment" @ EAGLE Club', date: 'February 11, 2026', year: 2026, link: 'https://photos.google.com/share/AF1QipNTG0aM4-CbP4BIHwg1bf-oESTrgS2zDoSUsPTnhqlfDjBAEhN8f-5LSwh4uJOP8Q?key=Y2dFcDBKMjNlUDgzLWFoV25CSkhLUnV2dWVfanFn' },
   // 2025
   { title: "Ramanujan's 138th Birth Anniversary – Treasure Hunt", date: 'December 12, 2025', year: 2025 },
   { title: "Ramanujan's 138th Birth Anniversary – Riddle Master", date: 'December 9, 2025', year: 2025 },
