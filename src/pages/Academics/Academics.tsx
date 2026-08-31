@@ -59,18 +59,49 @@ export function truncate(text: string, max: number) {
 const matchKey = (s: string) =>
   (s || '').toLowerCase().replace(/&/g, ' and ').replace(/[^a-z0-9]+/g, ' ').trim();
 
+// The 4 Freshman Engineering foundation subjects (see FOUNDATION_DEPARTMENTS
+// in FacultyAdmin.tsx) have no Program doc of their own — nothing for the
+// name-matching below to find — but each has its own standalone page at
+// /academics/<slug> (FreshmanSubDepartment.tsx, rendered via ProgramDetail's
+// /academics/:slug route — see the SUB_DEPTS check there), same URL shape
+// as every other department, so route each card straight there instead of
+// leaving it dead.
+const FOUNDATION_SUBJECT_TABS: Record<string, string> = {
+  mathematics: 'mathematics',
+  math: 'mathematics',
+  maths: 'mathematics',
+  physics: 'physics',
+  chemistry: 'chemistry',
+  english: 'english',
+};
+
+// Matches by whole word (not exact whole-string) against both title and
+// shortCode, so "Dept. of Mathematics", "Mathematics (H&S)", or a shortCode
+// like "MATH" all resolve — not just an exact "Mathematics".
+function foundationSubjectTab(dept: DepartmentDoc): string | null {
+  const words = new Set([...matchKey(dept.title).split(' '), ...matchKey(dept.shortCode).split(' ')]);
+  for (const key of Object.keys(FOUNDATION_SUBJECT_TABS)) {
+    if (words.has(key)) return FOUNDATION_SUBJECT_TABS[key];
+  }
+  return null;
+}
+
 // Resolves a department card to the program page it links to. Grouped
 // departments (AI / CSE / ECE) point at their first sub-program slug, which
 // renders the shared department page with that program's toggle active (see
 // src/lib/departmentGroups.ts). Freshman Engineering isn't a degree program
 // (nothing in the `programs` collection to match against) but does have its
 // own static page at /academics/freshman-engineering, so it's special-cased
-// the same way. Everything else matches by name to its single program, or
-// returns null when there's no clear match.
+// the same way — as are its 4 individual foundation-subject cards, if an
+// admin adds those instead of one combined "Freshman Engineering" card.
+// Everything else matches by name to its single program, or returns null
+// when there's no clear match.
 export function findDeptProgramSlug(dept: DepartmentDoc, programs: ProgramDoc[]): string | null {
   const grouped = groupForDeptShortCode(dept.shortCode);
   if (grouped) return grouped.programSlugs[0];
   if (matchKey(dept.title) === matchKey('Freshman Engineering')) return 'freshman-engineering';
+  const subjectTab = foundationSubjectTab(dept);
+  if (subjectTab) return subjectTab;
   const keys = [matchKey(dept.title), matchKey(dept.shortCode)].filter(Boolean);
   const matches = programs.filter((p) =>
     [p.department, p.name, p.shortName]
