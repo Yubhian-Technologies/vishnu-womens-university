@@ -7,6 +7,7 @@ import ProgrammeStructure from '../../components/ProgrammeStructure/ProgrammeStr
 import SmoothCollapse from '../../components/SmoothCollapse/SmoothCollapse';
 import SEO from '../../components/SEO/SEO';
 import { useOrderedCollection } from '../../hooks/useCollection';
+import { useDocument } from '../../hooks/useDocument';
 import { useEapcetCode } from '../../hooks/useContentBlocks';
 import { smoothScrollTo } from '../../lib/smoothScroll';
 import { getProgramSchema, getBreadcrumbSchema } from '../../lib/seo/schemas';
@@ -15,6 +16,7 @@ import { normalizeLab, type ProgramDoc } from '../Admin/sections/ProgramsAdmin';
 import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import type { FacultyDoc } from './Faculty';
 import { parseFlexibleTable, parseProjectAccordion } from '../../lib/structuredTable';
+import { placementRecordsDocId, sortPlacementRows, type PlacementRecordSet } from '../../lib/placementRecords';
 import '../detail-layout.css';
 import '../Campus/tabbed-section.css';
 
@@ -68,6 +70,12 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   subPrograms.forEach((p) => { if (p.department) deptKeys.add(p.department); });
   if (dept) { deptKeys.add(dept.title); deptKeys.add(dept.shortCode); }
   const faculty = allFaculty.filter((f) => f.department && deptKeys.has(f.department));
+
+  // Individual student Placement Records — admin-imported from Excel/CSV
+  // (see PlacementRecordsEditor in DepartmentsAdmin.tsx), one Firestore doc
+  // per department keyed by its lowercased Short Code, so this only ever
+  // shows this exact department's own records.
+  const { data: placementRecords } = useDocument<PlacementRecordSet>('placementRecords', placementRecordsDocId(group.deptShortCode));
 
   const eapcetCode = useEapcetCode();
 
@@ -163,7 +171,11 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   const hasProgramLevels = programLevels.length > 0;
   const libraryTables = shared.librarySections.filter((sec) => sec.items && sec.items.length > 0);
   const hasLibrary = !!(shared.libraryIntro || shared.libraryInCharge || libraryTables.length > 0);
-  const hasPlacements = !!(shared.placementIntro || shared.placementStats.length > 0 || shared.placementRecruiters.length > 0);
+  const placementColumns = placementRecords?.columns || [];
+  const placementRows = placementColumns.length > 0 && placementRecords
+    ? sortPlacementRows(placementColumns, placementRecords.rows || [])
+    : [];
+  const hasPlacements = !!(shared.placementIntro || shared.placementStats.length > 0 || shared.placementRecruiters.length > 0 || placementRows.length > 0);
 
   const hasProgrammeAbout = !!activeProgram.about;
   const hasHighlights = !!(activeProgram.highlights && activeProgram.highlights.length > 0);
@@ -627,7 +639,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
               </div>
             )}
             {shared.placementRecruiters.length > 0 && (
-              <div>
+              <div style={{ marginBottom: placementRows.length > 0 ? 'var(--space-8)' : 0 }}>
                 <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 800, color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 'var(--space-3)' }}>
                   Our Recruiters
                 </h3>
@@ -637,6 +649,36 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                       {r}
                     </span>
                   ))}
+                </div>
+              </div>
+            )}
+            {/* Individual student Placement Records — admin-imported from
+                Excel/CSV, every column shown exactly as uploaded. The top 10
+                highest-package rows are pulled to the front (see
+                sortPlacementRows); everyone else keeps their original
+                imported order. */}
+            {placementRows.length > 0 && (
+              <div>
+                <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 800, color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 'var(--space-3)' }}>
+                  Placement Records
+                </h3>
+                <div className="pb-activities-scroll">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th className="pb-activities-num">S.No</th>
+                        {placementColumns.map((col, ci) => <th key={ci}>{col}</th>)}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {placementRows.map((row, ri) => (
+                        <tr key={ri}>
+                          <td className="pb-activities-num">{ri + 1}</td>
+                          {placementColumns.map((_, ci) => <td key={ci}>{row.cells[ci] ?? ''}</td>)}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             )}

@@ -8,6 +8,7 @@ import DepartmentNewsSection, { type DepartmentNewsDoc } from '../../components/
 import DepartmentDetail from './DepartmentDetail';
 import { groupForProgramSlug } from '../../lib/departmentGroups';
 import { useOrderedCollection } from '../../hooks/useCollection';
+import { useDocument } from '../../hooks/useDocument';
 import { usePageBanner } from '../../hooks/usePageBanner';
 import { useEapcetCode } from '../../hooks/useContentBlocks';
 import { smoothScrollTo } from '../../lib/smoothScroll';
@@ -15,6 +16,7 @@ import { normalizeLab, type ProgramDoc } from '../Admin/sections/ProgramsAdmin';
 import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import type { FacultyDoc } from './Faculty';
 import { parseFlexibleTable, parseProjectAccordion } from '../../lib/structuredTable';
+import { placementRecordsDocId, sortPlacementRows, type PlacementRecordSet } from '../../lib/placementRecords';
 import SEO from '../../components/SEO/SEO';
 import { getProgramSchema, getBreadcrumbSchema } from '../../lib/seo/schemas';
 import '../detail-layout.css';
@@ -58,6 +60,11 @@ function SingleProgramDetail() {
 
   const { docs: allFaculty } = useOrderedCollection<FacultyDoc>('faculty', 'order');
   const faculty = program?.department ? allFaculty.filter((f) => f.department === program.department) : [];
+  // Individual student Placement Records — admin-imported from Excel/CSV
+  // (see PlacementRecordsEditor in DepartmentsAdmin.tsx), one Firestore doc
+  // per department keyed by its lowercased Short Code, so this only ever
+  // shows this exact department's own records.
+  const { data: placementRecords } = useDocument<PlacementRecordSet>('placementRecords', program?.department ? placementRecordsDocId(program.department) : undefined);
   const { docs: deptNews } = useOrderedCollection<DepartmentNewsDoc>('departmentNews', 'date', 'desc');
   const hasDeptNews = deptNews.some((n) => n.program === slug);
   // Resolves the program's short `department` code (e.g. "IT") to the full
@@ -148,6 +155,10 @@ function SingleProgramDetail() {
   const rndTableSections = parseFlexibleTable(program.rndTableText || '').filter((s) => s.headers.length > 0);
   const rndProjectCategories = parseProjectAccordion(program.rndProjectsText || '').filter((c) => c.projects.length > 0);
   const hasRnd = !!program.rndIntro || rndTableSections.length > 0 || rndProjectCategories.length > 0 || rndLinks.length > 0;
+  const placementColumns = placementRecords?.columns || [];
+  const placementRows = placementColumns.length > 0 && placementRecords
+    ? sortPlacementRows(placementColumns, placementRecords.rows || [])
+    : [];
 
   const quickLinks = [
     { id: 'about', label: 'About the Department' },
@@ -158,6 +169,7 @@ function SingleProgramDetail() {
     hasMindMap && { id: 'mindmap', label: 'Mind Map' },
     hasCurriculum && { id: 'curriculum', label: 'Curriculum' },
     hasLabs && { id: 'labs', label: 'Laboratories' },
+    placementRows.length > 0 && { id: 'placements', label: 'Placements' },
     hasLibrary && { id: 'library', label: 'Digital Library' },
     hasDeptNews && { id: 'news', label: 'News & Events' },
     hasNewsletter && { id: 'newsletter', label: 'Newsletter' },
@@ -622,6 +634,39 @@ function SingleProgramDetail() {
                   </div>
                 );
               })}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Placements — admin-imported from Excel/CSV (see PlacementRecordsEditor
+          in DepartmentsAdmin.tsx), every column shown exactly as uploaded. The
+          top 10 highest-package rows are pulled to the front (see
+          sortPlacementRows); everyone else keeps their original imported order. */}
+      {placementRows.length > 0 && (
+        <section id="placements" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
+          <div className="container">
+            <div style={{ marginBottom: 'var(--space-8)' }}>
+              <span className="section-label">Careers</span>
+              <h2 className="section-title">Placements</h2>
+            </div>
+            <div className="pb-activities-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th className="pb-activities-num">S.No</th>
+                    {placementColumns.map((col, ci) => <th key={ci}>{col}</th>)}
+                  </tr>
+                </thead>
+                <tbody>
+                  {placementRows.map((row, ri) => (
+                    <tr key={ri}>
+                      <td className="pb-activities-num">{ri + 1}</td>
+                      {placementColumns.map((_, ci) => <td key={ci}>{row.cells[ci] ?? ''}</td>)}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         </section>
