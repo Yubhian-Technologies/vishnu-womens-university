@@ -4,6 +4,7 @@ import { Check, Microscope, Compass, Target, Sparkles, Mail, BookOpen, FileText 
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import ImageLightbox from '../../components/ImageLightbox/ImageLightbox';
 import ProgrammeStructure from '../../components/ProgrammeStructure/ProgrammeStructure';
+import DepartmentNewsSection, { type DepartmentNewsDoc } from '../../components/DepartmentNews/DepartmentNewsSection';
 import BodyBlocks, { parseBodyContent } from '../../components/BodyBlocks/BodyBlocks';
 import SmoothCollapse from '../../components/SmoothCollapse/SmoothCollapse';
 import SEO from '../../components/SEO/SEO';
@@ -76,6 +77,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   const activeProgram = subPrograms.find((p) => p.slug === activeSlug);
 
   const { docs: allFaculty } = useOrderedCollection<FacultyDoc>('faculty', 'order');
+  const { docs: deptNewsDocs } = useOrderedCollection<DepartmentNewsDoc>('departmentNews', 'date', 'desc');
   const deptKeys = new Set<string>(group.facultyDepartments);
   subPrograms.forEach((p) => { if (p.department) deptKeys.add(p.department); });
   if (dept) { deptKeys.add(dept.title); deptKeys.add(dept.shortCode); }
@@ -153,11 +155,18 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     vision: dept?.vision || primary?.vision || '',
     mission: (dept?.mission?.length ? dept.mission : primary?.mission) || [],
     coreValues: (dept?.coreValues?.length ? dept.coreValues : primary?.coreValues) || [],
-    // dept.labs (Academic Departments admin) is plain strings with no PDF
-    // support; primary.labs (Programs admin) may hold richer { name, pdfUrl }
-    // entries — normalizeLab() upgrades either shape so this page never cares
-    // which source it came from.
-    labs: ((dept?.labs?.length ? dept.labs : primary?.labs) || []).map(normalizeLab),
+    // The program you're actually viewing wins first — same rule every
+    // other per-program section on this page already follows (News &
+    // Events, Newsletter, R&D, Curriculum) — so labs entered on THIS side
+    // of the toggle always show on THIS side, regardless of which sibling
+    // program happens to be `primary` (subPrograms[0], which is just group
+    // ordering and isn't tied to which side a visitor is looking at).
+    // primary.labs is next (covers a sibling program that was never given
+    // its own labs), and dept.labs (Academic Departments admin, plain
+    // strings only) is the legacy fallback if neither program has any.
+    // normalizeLab() upgrades either shape so this page never cares which
+    // source it came from.
+    labs: ((activeProgram.labs?.length ? activeProgram.labs : primary?.labs?.length ? primary.labs : dept?.labs) || []).map(normalizeLab),
     libraryIntro: dept?.libraryIntro || primary?.libraryIntro || '',
     libraryInCharge: dept?.libraryInCharge || primary?.libraryInCharge || '',
     librarySections: (dept?.librarySections?.length ? dept.librarySections : primary?.librarySections) || [],
@@ -207,13 +216,19 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   const hasOutcomeStatements = outcomeGroups.length > 0;
   const activeOutcome = outcomeGroups.find((g) => g.key === outcomeTab) ?? outcomeGroups[0];
   const hasMindMap = !!activeProgram.mindMapImage;
-  // News & Events + Newsletter here use the teammate's per-academic-year
-  // fields on the programme doc (see ProgramsAdmin's "News & Events —
-  // Department Page" / "Newsletter" editors) — the plain departmentNews
-  // collection (<DepartmentNewsSection>) is only used on standalone program
-  // pages (ProgramDetail.tsx), so the two systems never both show up.
-  const newsEventsYears = (activeProgram.newsEventsYears || []).filter((y) => y.year && y.columns?.length > 0 && y.rows?.length > 0);
+  // News & Events on the grouped department page is department-wide, not
+  // per-toggle-side: both sources aggregate across every programme in the
+  // group so an admin can enter it under whichever programme and it shows
+  // identically on every side of the toggle. Two independent sources — the
+  // per-academic-year table (ProgramsAdmin's "News & Events — Department
+  // Page" field) and the plain departmentNews collection cards ("News &
+  // Events — This Programme", rendered by <DepartmentNewsSection> below).
+  // Either, both, or neither can be present.
+  const newsEventsYears = (
+    subPrograms.map((p) => p.newsEventsYears).find((arr) => arr && arr.length > 0) || []
+  ).filter((y) => y.year && y.columns?.length > 0 && y.rows?.length > 0);
   const hasNewsEvents = newsEventsYears.length > 0;
+  const hasDeptNews = deptNewsDocs.some((n) => group.programSlugs.includes(n.program));
   const newsletterYears = (activeProgram.newsletterYears || []).filter((y) => y.year && y.issues && y.issues.length > 0);
   const hasNewsletter = newsletterYears.length > 0;
   const newsletterMaxIssues = Math.max(0, ...newsletterYears.map((y) => y.issues.length));
@@ -241,7 +256,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     { id: 'program-toggle', label: 'Choose a Programme' },
     hasRnd && { id: 'rnd', label: 'R & D' },
     hasPlacements && { id: 'placements', label: 'Placements' },
-    hasNewsEvents && { id: 'news-events', label: 'News & Events' },
+    (hasNewsEvents || hasDeptNews) && { id: hasNewsEvents ? 'news-events' : 'news', label: 'News & Events' },
   ].filter(Boolean) as { id: string; label: string }[];
   // Nested under the "Choose a Programme" row above as a collapsible
   // sub-list — same admin-driven presence checks as before, just grouped.
@@ -995,12 +1010,12 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
         </div>
       </section>
 
-      {/* News & Events (per programme, admin-defined academic-year tables) */}
+      {/* News & Events — department-wide admin-defined academic-year tables */}
       {hasNewsEvents && (
         <section id="news-events" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label">{activeProgram.shortName || activeProgram.name}</span>
+              <span className="section-label">{deptName}</span>
               <h2 className="section-title">News &amp; Events</h2>
             </div>
             {newsEventsYears.map((yr, yi) => (
@@ -1031,6 +1046,13 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
           </div>
         </section>
       )}
+
+      {/* News & Events — live from the departmentNews collection, tagged to
+          this programme (Programs admin's "News & Events — This Programme").
+          Both this and the admin-defined table above are available on this
+          programme's side of the toggle; each only appears once an admin has
+          actually filled it in, so having neither leaves no visible gap. */}
+      <DepartmentNewsSection programSlug={group.programSlugs} background="var(--color-off-white)" />
 
       {/* Newsletter (per programme) */}
       {hasNewsletter && (

@@ -23,20 +23,23 @@ export interface DepartmentNewsDoc {
 }
 
 interface Props {
-  /** Program slug to show News & Events for. */
-  programSlug: string;
+  /** Program slug(s) to show News & Events for. Pass an array on the shared
+   *  AI/CSE/ECE department page so items entered under any programme in the
+   *  group show on every side of the toggle. */
+  programSlug: string | string[];
   /** Wrapping <section> background — alternate with the section above it. */
   background?: string;
 }
 
 /**
- * News & Events feed for one program. Renders nothing until at least one
- * `departmentNews` doc is tagged to this slug, so program pages without any
- * entries are visually unchanged.
+ * News & Events feed for one program (or a whole grouped department). Renders
+ * nothing until at least one `departmentNews` doc is tagged to one of the
+ * given slug(s), so pages without any entries are visually unchanged.
  */
 export default function DepartmentNewsSection({ programSlug, background = 'var(--color-white)' }: Props) {
   const { docs } = useOrderedCollection<DepartmentNewsDoc>('departmentNews', 'date', 'desc');
-  const items = docs.filter((n) => n.program === programSlug);
+  const slugs = Array.isArray(programSlug) ? programSlug : [programSlug];
+  const items = docs.filter((n) => slugs.includes(n.program));
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
 
   if (items.length === 0) return null;
