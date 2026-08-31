@@ -24,7 +24,7 @@ type BodyBlock =
   | { type: 'paragraph'; text: string }
   | { type: 'list'; items: string[] };
 
-// Overrides the "About {title}" heading only — hero/breadcrumb still show
+// Overrides the body heading only — hero/breadcrumb still show
 // the CMS title as-is, so a slug here can read differently in the body
 // heading without renaming the page everywhere.
 const ABOUT_TITLE_OVERRIDES: Record<string, string> = {
@@ -181,10 +181,11 @@ function BodyBlocks({ blocks, paragraphStyle }: { blocks: BodyBlock[]; paragraph
       {blocks.map((block, index) => {
         if (block.type === 'list') {
           return (
-            <ul key={index} style={{ paddingLeft: '1.25rem', margin: '0 0 1rem' }}>
+            <ul key={index} style={{ listStyle: 'none', padding: 0, margin: '0 0 1rem' }}>
               {block.items.map((entry, itemIndex) => (
-                <li key={itemIndex} style={{ ...paragraphStyle, marginBottom: '0.7rem' }}>
-                  {renderInlineText(entry)}
+                <li key={itemIndex} style={{ display: 'flex', gap: '0.6rem', marginBottom: '0.7rem' }}>
+                  <span aria-hidden="true" style={{ fontSize: '1.4em', lineHeight: 1, flexShrink: 0 }}>•</span>
+                  <span style={paragraphStyle}>{renderInlineText(entry)}</span>
                 </li>
               ))}
             </ul>
@@ -457,6 +458,7 @@ function TeamRosterRow({
   tpoPhotoMap,
   tpoBiosMap,
   iloPhotoMap,
+  addressOnly,
 }: {
   row: { name: string; role: string; notes?: string; email?: string; linkedin?: string };
   isOpen: boolean;
@@ -464,6 +466,11 @@ function TeamRosterRow({
   tpoPhotoMap: Map<string, string>;
   tpoBiosMap: Map<string, TpoTeamBioDoc>;
   iloPhotoMap?: Map<string, { url: string; path: string }[]>;
+  // Industry Liaison Offices' Data Table is just "City | Office Address" now
+  // (the old "Role" middle column dropped) — so the row shows the city alone
+  // (no " - Role" suffix) and always expands straight to a plain Office
+  // Address block, never the Role/Notes or static-data-file fallbacks below.
+  addressOnly?: boolean;
 }) {
   const bio = tpoBiosMap.get(row.name);
   // Roster-row email/linkedin (Placement Sub-pages' Data Table, this row's
@@ -495,7 +502,7 @@ function TeamRosterRow({
         }}
       >
         <span style={{ fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-primary)', fontSize: 'var(--text-base)', transition: 'color var(--transition-base)' }}>
-          {row.name} - {row.role}
+          {addressOnly ? row.name : `${row.name} - ${row.role}`}
         </span>
         <span style={{ fontSize: '1.2rem', fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-text)', lineHeight: 1, flexShrink: 0, transition: 'color var(--transition-base)' }}>
           {isOpen ? '−' : '+'}
@@ -533,7 +540,16 @@ function TeamRosterRow({
 
       <SmoothCollapse open={isOpen}>
         <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderTop: 'none' }}>
-          {bio ? (
+          {addressOnly ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
+              <div>
+                <p style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>
+                  <MapPin size={16} strokeWidth={2} /> Office Address:
+                </p>
+                <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6 }}>{row.notes || row.role}</p>
+              </div>
+            </div>
+          ) : bio ? (
             <div style={{ display: 'flex', gap: 'var(--space-5)', flexWrap: 'wrap' }}>
               <img
                 src={tpoPhotoMap.get(row.name) || PHOTO_NEEDED_PLACEHOLDER}
@@ -958,7 +974,7 @@ export default function PlacementDetail() {
   // Our Recruiters drops the whole Overview section per request instead —
   // its Key Highlights/About text duplicated the logo grid below, which is
   // the page's actual content — with no full-width-grid replacement.
-  const skipOverviewSection = (item.slug === 'employability-skills' && !hasBodyOverride && !item.intro && !item.desc) || item.slug === 'our-recruiters';
+  const skipOverviewSection = (item.slug === 'employability-skills' && !hasBodyOverride && !item.intro && !item.desc) || item.slug === 'our-recruiters' || item.slug === 'internships';
 
   return (
     <main className="page-wrapper">
@@ -1008,7 +1024,7 @@ export default function PlacementDetail() {
             {/* Main */}
             <div>
               <span className="section-label">Overview</span>
-              <h2 className="section-title" style={{ fontSize: '1.75rem' }}>About {ABOUT_TITLE_OVERRIDES[item.slug] || item.title}</h2>
+              <h2 className="section-title" style={{ fontSize: '1.75rem' }}>{ABOUT_TITLE_OVERRIDES[item.slug] || item.title}</h2>
               {hasBodyOverride ? (
                 <div style={{ fontSize: 'var(--text-lg)', color: 'var(--color-text)', lineHeight: 1.75 }}>
                   <BodyBlocks blocks={bodyBlocks} paragraphStyle={{}} />
@@ -1242,9 +1258,9 @@ export default function PlacementDetail() {
         <section className="section bg-white" style={{ paddingTop: item.slug === 'placement-highlights' ? 'var(--space-6)' : undefined }}>
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label">Data</span>
+              {item.slug !== 'internships' && <span className="section-label">Data</span>}
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>
-                {rosterGroups.length > 0 ? 'Team' : item.slug === 'industry-liaison-offices' ? 'Regional Offices' : item.slug === 'internships' ? 'Recruiting Companies' : item.slug === 'placement-highlights' ? 'Highlights' : 'Batch-wise Statistics'}
+                {rosterGroups.length > 0 ? 'Team' : item.slug === 'industry-liaison-offices' ? 'Regional Offices' : item.slug === 'internships' ? 'List of Internships' : item.slug === 'placement-highlights' ? 'Highlights' : 'Batch-wise Statistics'}
               </h2>
             </div>
             {rosterGroups.length > 0 ? (
@@ -1297,6 +1313,7 @@ export default function PlacementDetail() {
                     tpoPhotoMap={tpoPhotoMap}
                     tpoBiosMap={tpoBiosMap}
                     iloPhotoMap={iloPhotoMap}
+                    addressOnly={item.slug === 'industry-liaison-offices'}
                   />
                 ))}
                 <PageContactLine emails={item.emails} linkedins={item.linkedins} />
@@ -1324,7 +1341,7 @@ export default function PlacementDetail() {
           Recruitment Training, Success Stories, TPO Team, Our Recruiters
           (which gets the year-by-year breakdown above instead), or Placement
           Highlights, per request. */}
-      {item.partners && item.partners.length > 0 && item.slug !== 'placement-details' && item.slug !== 'campus-recruitment-training' && item.slug !== 'success-stories' && item.slug !== 'tpo-team' && item.slug !== 'our-recruiters' && item.slug !== 'placement-highlights' && (
+      {item.partners && item.partners.length > 0 && item.slug !== 'placement-details' && item.slug !== 'campus-recruitment-training' && item.slug !== 'success-stories' && item.slug !== 'tpo-team' && item.slug !== 'our-recruiters' && item.slug !== 'placement-highlights' && item.slug !== 'industry-liaison-offices' && (
         <section className="section bg-off-white" style={{ paddingTop: showOutcomes ? 'var(--space-6)' : undefined }}>
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>

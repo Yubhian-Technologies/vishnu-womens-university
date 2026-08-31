@@ -396,8 +396,19 @@ export default function Header() {
       {item.children && (
         <div className="dropdown" role="menu">
           <ul className="dropdown-list">
-            {item.children.map((child) => (
-              <li key={child.label} className={child.subItems ? 'dropdown-item--flyout-parent' : undefined}>
+            {item.children.map((child, idx) => (
+              <li
+                key={child.label}
+                className={child.subItems ? 'dropdown-item--flyout-parent' : undefined}
+                // Placements' two-column split must land at an exact item
+                // (not wherever the browser's height-based column-balance
+                // happens to break it — a two-line label like "Graduate
+                // Study Abroad Center – GSAC" throws that off), so force
+                // the break explicitly rather than relying on column-count
+                // alone. Scoped to Placements only — every other wide
+                // dropdown keeps the default auto-balance behavior.
+                style={item.label === 'Placements' && item.children && idx === Math.ceil(item.children.length / 2) - 1 ? { breakAfter: 'column' } : undefined}
+              >
                 {child.disabled ? (
                   <span className="dropdown-item" style={{ opacity: 0.5, cursor: 'default' }}>
                     {child.label}
