@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import { useOrderedCollection } from '../../hooks/useCollection';
-import { useNavLinkOverride } from '../../hooks/useNavLinkOverride';
 import { COMPLIANCE_GROUPS, DEFAULT_COMPLIANCE_DOCS, type ComplianceDocDoc } from '../../pages/Admin/sections/ComplianceDocsAdmin';
 import { InstagramIcon, FacebookIcon, TwitterIcon, LinkedInIcon, YouTubeIcon } from './SocialIcons';
 import './Footer.css';
@@ -22,14 +21,9 @@ const accreditations = [
 ];
 
 // Moved out of the header nav's "News & Events" mega-menu (see Header.tsx)
-// into its own footer column. "Success Stories" is admin-editable via
-// /admin → Navigation Link Redirects (NavLinkOverridesAdmin.tsx), so its
-// path is resolved at render time via useNavLinkOverride below rather than
-// hardcoded here.
+// into its own footer column.
 const alumniGivingLinks = [
   { label: 'Alumni Network', path: '/alumni-giving#network' },
-  { label: 'Giving Opportunities', path: '/alumni-giving#give' },
-  { label: 'Alumni Events', path: '/alumni-giving#events' },
 ];
 
 const feedbackLinks = [
@@ -67,8 +61,6 @@ const pinnedDisclosuresLink = { label: 'Disclosures – UGC', href: '/disclosure
 
 export default function Footer() {
   const year = new Date().getFullYear();
-  // Default target is AlumniGiving.tsx's own "#successstories" section, not Placements' — see Header.tsx's former use of this same override id.
-  const alumniSuccessStories = useNavLinkOverride('alumni-success-stories', '/alumni-giving#successstories');
   const { docs: liveComplianceDocs } = useOrderedCollection<ComplianceDocDoc>('complianceDocs', 'order');
   const complianceDocs = liveComplianceDocs.length > 0 ? liveComplianceDocs : (DEFAULT_COMPLIANCE_DOCS as ComplianceDocDoc[]);
   const complianceGroups = COMPLIANCE_GROUPS.map((title) => ({
@@ -148,19 +140,12 @@ export default function Footer() {
 
           <div className="footer-feedback">
             <span className="footer-feedback-label">Alumni & Giving:</span>
-            {alumniGivingLinks.map((l) => (
+            {alumniGivingLinks.map((l, i) => (
               <span key={l.label}>
                 <Link to={l.path} className="footer-link">{l.label}</Link>
-                <span className="footer-feedback-sep">·</span>
+                {i < alumniGivingLinks.length - 1 && <span className="footer-feedback-sep">·</span>}
               </span>
             ))}
-            <span>
-              {alumniSuccessStories.external ? (
-                <a href={alumniSuccessStories.path} target="_blank" rel="noopener noreferrer" className="footer-link">Success Stories</a>
-              ) : (
-                <Link to={alumniSuccessStories.path} className="footer-link">Success Stories</Link>
-              )}
-            </span>
           </div>
 
           <div className="footer-feedback">

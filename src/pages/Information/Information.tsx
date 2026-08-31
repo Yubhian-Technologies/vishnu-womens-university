@@ -15,7 +15,7 @@ import './Information.css';
 // Same coordinates as the embedded map on the Contact page. Omitting the
 // "origin" param makes Google Maps use the visitor's current location
 // (after they grant the browser permission prompt) as the route start.
-const GOOGLE_MAPS_DIRECTIONS_URL = 'https://www.google.com/maps/dir/?api=1&destination=16.568119,81.522098';
+const GOOGLE_MAPS_DIRECTIONS_URL = 'https://www.google.com/maps/dir/?api=1&destination=16.5681279,81.5220952';
 
 const defaultPlacementsCareersPhotos = [
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Placement Drive', caption: '' },

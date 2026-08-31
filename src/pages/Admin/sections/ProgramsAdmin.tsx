@@ -122,6 +122,9 @@ export interface ProgramDoc {
   peos: string[];
   pos: string[];
   psos: string[];
+  // Knowledge Profile statements (WK1, WK2, …) — same shape/pattern as
+  // peos/pos/psos above, shown as a 4th tab alongside them.
+  wks: string[];
   hodMessage: string;
   hodImage: string;
   hodImageStoragePath: string;
@@ -160,7 +163,7 @@ const EMPTY: Omit<ProgramDoc, 'id'> = {
   slug: '', name: '', shortName: '', icon: 'GraduationCap', category: 'btech', intake: 60,
   established: '', accreditation: '', hod: '', department: '', fee: '', heroImage: '', storagePath: '', about: '',
   highlights: [], labs: [], outcomes: [], semesters: [],
-  vision: '', mission: [], coreValues: [], peos: [], pos: [], psos: [],
+  vision: '', mission: [], coreValues: [], peos: [], pos: [], psos: [], wks: [],
   hodMessage: '', hodImage: '', hodImageStoragePath: '', hodEmail: '', hodResearchProfiles: [],
   mindMapImage: '', mindMapImageStoragePath: '',
   libraryIntro: '', libraryInCharge: '', librarySections: [],
@@ -177,7 +180,7 @@ const CATEGORY_LABELS: Record<string, string> = { btech: 'B.Tech', mtech: 'M.Tec
 const DEPARTMENTS = ['CSE', 'AI', 'Cyber Security', 'IT', 'ECE', 'EEE', 'Civil', 'Mechanical', 'MBA'];
 
 function linesToArray(text: string): string[] {
-  return text.split('\n').map((s) => s.trim()).filter(Boolean);
+  return text.split('\n').map((s) => s.trim());
 }
 function arrayToLines(arr: string[] = []): string {
   return arr.join('\n');
@@ -584,10 +587,20 @@ export default function ProgramsAdmin() {
     if (!form.name || !form.slug) return alert('Program name and slug are required.');
     setSaving(true);
     try {
+      const payload = {
+        ...form,
+        highlights: form.highlights.filter(Boolean),
+        outcomes: form.outcomes.filter(Boolean),
+        mission: form.mission.filter(Boolean),
+        coreValues: form.coreValues.filter(Boolean),
+        peos: form.peos.filter(Boolean),
+        pos: form.pos.filter(Boolean),
+        psos: form.psos.filter(Boolean),
+      };
       if (editing) {
-        await updateDoc(doc(db, 'programs', editing), { ...form });
+        await updateDoc(doc(db, 'programs', editing), { ...payload });
       } else {
-        await addDoc(collection(db, 'programs'), { ...form, order: form.order || programs.filter((p) => p.category === form.category).length, createdAt: serverTimestamp() });
+        await addDoc(collection(db, 'programs'), { ...payload, order: form.order || programs.filter((p) => p.category === form.category).length, createdAt: serverTimestamp() });
       }
       setForm(EMPTY); setEditing(null);
     } catch (e) {
@@ -609,7 +622,7 @@ export default function ProgramsAdmin() {
         pdfUrl: s.pdfUrl || '', pdfStoragePath: s.pdfStoragePath || '',
       })),
       vision: p.vision || '', mission: p.mission || [], coreValues: p.coreValues || [],
-      peos: p.peos || [], pos: p.pos || [], psos: p.psos || [],
+      peos: p.peos || [], pos: p.pos || [], psos: p.psos || [], wks: p.wks || [],
       hodMessage: p.hodMessage || '', hodImage: p.hodImage || '', hodImageStoragePath: p.hodImageStoragePath || '',
       hodEmail: p.hodEmail || '', hodResearchProfiles: p.hodResearchProfiles || [],
       mindMapImage: p.mindMapImage || '', mindMapImageStoragePath: p.mindMapImageStoragePath || '',
@@ -849,7 +862,7 @@ export default function ProgramsAdmin() {
             <textarea id="field-core-values-one-per-line" rows={3} value={arrayToLines(form.coreValues)} onChange={(e) => set('coreValues', linesToArray(e.target.value))} placeholder="Integrity" />
           </div>
 
-          <div className="admin-field admin-field--full"><hr /><h3>PEOs, POs & PSOs</h3></div>
+          <div className="admin-field admin-field--full"><hr /><h3>PEOs, POs, PSOs & WKs</h3></div>
           <div className="admin-field admin-field--full">
             <label htmlFor="field-programme-educational-objectives-peos-one">Programme Educational Objectives — PEOs (one per line)</label>
             <textarea id="field-programme-educational-objectives-peos-one" rows={4} value={arrayToLines(form.peos)} onChange={(e) => set('peos', linesToArray(e.target.value))} placeholder="Graduates will excel in…" />
@@ -861,6 +874,10 @@ export default function ProgramsAdmin() {
           <div className="admin-field admin-field--full">
             <label htmlFor="field-programme-specific-outcomes-psos-one">Programme Specific Outcomes — PSOs (one per line)</label>
             <textarea id="field-programme-specific-outcomes-psos-one" rows={4} value={arrayToLines(form.psos)} onChange={(e) => set('psos', linesToArray(e.target.value))} placeholder="Ability to apply…" />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label htmlFor="field-knowledge-profile-wks-one-per-line">Knowledge Profile — WKs (one per line)</label>
+            <textarea id="field-knowledge-profile-wks-one-per-line" rows={4} value={arrayToLines(form.wks)} onChange={(e) => set('wks', linesToArray(e.target.value))} placeholder="Systematic, theory-based understanding of the natural sciences…" />
           </div>
 
           <div className="admin-field admin-field--full"><hr /><h3>About HOD</h3></div>

@@ -15,6 +15,9 @@ const Faculty = lazy(() => import('./pages/Academics/Faculty'));
 const FacultyProfile = lazy(() => import('./pages/Academics/FacultyProfile'));
 const AcademicDownloads = lazy(() => import('./pages/Academics/Downloads'));
 const CurriculumMatrix = lazy(() => import('./pages/Academics/CurriculumMatrix'));
+const Schools = lazy(() => import('./pages/Academics/Schools'));
+const Departments = lazy(() => import('./pages/Academics/Departments'));
+const Programs = lazy(() => import('./pages/Academics/Programs'));
 const Admissions = lazy(() => import('./pages/Admissions/Admissions'));
 const CampusVisit = lazy(() => import('./pages/CampusVisit/CampusVisit'));
 const StudentLife = lazy(() => import('./pages/StudentLife/StudentLife'));
@@ -98,6 +101,9 @@ function PublicApp() {
           <Route path="/academics/downloads" element={<AcademicDownloads />} />
           <Route path="/academics/curriculum" element={<CurriculumMatrix />} />
           <Route path="/academics/freshman-engineering" element={<FreshmanEngineering />} />
+          <Route path="/academics/schools" element={<Schools />} />
+          <Route path="/academics/departments" element={<Departments />} />
+          <Route path="/academics/programs" element={<Programs />} />
           <Route path="/academics/:slug" element={<ProgramDetail />} />
           <Route path="/faculty" element={<Faculty />} />
           <Route path="/faculty/:id" element={<FacultyProfile />} />

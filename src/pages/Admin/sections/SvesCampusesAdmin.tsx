@@ -14,7 +14,7 @@ export interface SvesCampusDoc {
 const EMPTY: Omit<SvesCampusDoc, 'id'> = { name: '', location: '', institutions: [], order: 0 };
 
 function linesToArray(text: string): string[] {
-  return text.split('\n').map((s) => s.trim()).filter(Boolean);
+  return text.split('\n').map((s) => s.trim());
 }
 function arrayToLines(arr: string[] = []): string {
   return arr.join('\n');
@@ -32,10 +32,11 @@ export default function SvesCampusesAdmin() {
     if (!form.name) return alert('Campus name is required.');
     setSaving(true);
     try {
+      const payload = { ...form, institutions: form.institutions.filter(Boolean) };
       if (editing) {
-        await updateDoc(doc(db, 'svesCampuses', editing), { ...form });
+        await updateDoc(doc(db, 'svesCampuses', editing), { ...payload });
       } else {
-        await addDoc(collection(db, 'svesCampuses'), { ...form, order: form.order || campuses.length + 1, createdAt: serverTimestamp() });
+        await addDoc(collection(db, 'svesCampuses'), { ...payload, order: form.order || campuses.length + 1, createdAt: serverTimestamp() });
       }
       setForm(EMPTY); setEditing(null);
     } catch (e) {
