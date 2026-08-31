@@ -19,6 +19,12 @@ interface SmoothImageProps extends ImgHTMLAttributes<HTMLImageElement> {
 export default function SmoothImage({ src, alt, className = '', onLoad, ...rest }: SmoothImageProps) {
   const [loaded, setLoaded] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
+  // React 18 DOM whitelist uses lowercase `fetchpriority`. Callers may pass
+  // camelCase `fetchPriority` (React 19 types) — map it to lowercase so the
+  // attribute still renders but the "React does not recognize `fetchPriority`"
+  // warning is eliminated on department / home pages.
+  const { fetchPriority, fetchpriority, ...cleanRest } = rest as Record<string, unknown>;
+  const fp = (fetchPriority ?? fetchpriority) as 'high' | 'low' | 'auto' | undefined;
 
   // Every time the src we're asked to show changes, go back to invisible
   // until *that* image reports it has loaded — except when the browser
@@ -37,11 +43,12 @@ export default function SmoothImage({ src, alt, className = '', onLoad, ...rest 
       src={src}
       alt={alt}
       className={`smooth-image${loaded ? ' smooth-image--loaded' : ''}${className ? ` ${className}` : ''}`}
+      {...(fp ? { fetchpriority: fp } : {})}
       onLoad={(e) => {
         setLoaded(true);
         onLoad?.(e);
       }}
-      {...rest}
+      {...cleanRest}
     />
   );
 }

@@ -21,9 +21,11 @@ const EMPTY: Omit<SchoolDoc, 'id'> = { title: '', description: '', order: 0, dep
 export default function SchoolsAdmin() {
   const { docs: schools, loading } = useOrderedCollection<SchoolDoc>('schools', 'order');
   const { docs: departments } = useOrderedCollection<DepartmentDoc>('departments', 'order');
+  const departmentById = new Map(departments.map((d) => [d.id, d]));
   const [form, setForm] = useState<Omit<SchoolDoc, 'id'>>(EMPTY);
   const [editing, setEditing] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
 
   const set = (k: string, v: string | number | string[]) => setForm((p) => ({ ...p, [k]: v }));
 
@@ -31,6 +33,18 @@ export default function SchoolsAdmin() {
     set('departmentIds', form.departmentIds.includes(id)
       ? form.departmentIds.filter((d) => d !== id)
       : [...form.departmentIds, id]);
+  };
+
+  // Reorders form.departmentIds live as the dragged row passes over another —
+  // purely local (no Firestore write) since it's just one field of the
+  // school doc, committed on Save like everything else in this form.
+  const handleDragOver = (i: number) => {
+    if (dragIndex === null || dragIndex === i) return;
+    const next = [...form.departmentIds];
+    const [moved] = next.splice(dragIndex, 1);
+    next.splice(i, 0, moved);
+    set('departmentIds', next);
+    setDragIndex(i);
   };
 
   const save = async () => {
@@ -99,6 +113,40 @@ export default function SchoolsAdmin() {
                     {d.title} <span className="admin-badge" style={{ textTransform: 'none' }}>{d.shortCode}</span>
                   </label>
                 ))}
+              </div>
+            )}
+          </div>
+          <div className="admin-field admin-field--full">
+            <label>Department order (drag ⠿ to reorder)</label>
+            <p className="admin-field__hint" style={{ marginTop: '0.25rem' }}>
+              Controls the order department cards appear under this school on the public page.
+            </p>
+            {form.departmentIds.length === 0 ? (
+              <p className="admin-field__hint">Check departments above to add them here.</p>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                {form.departmentIds.map((id, i) => {
+                  const d = departmentById.get(id);
+                  if (!d) return null;
+                  return (
+                    <div
+                      key={id}
+                      draggable
+                      onDragStart={() => setDragIndex(i)}
+                      onDragOver={(e) => { e.preventDefault(); handleDragOver(i); }}
+                      onDrop={(e) => e.preventDefault()}
+                      onDragEnd={() => setDragIndex(null)}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: '0.5rem',
+                        padding: '0.4rem 0.6rem', border: '1px solid var(--color-light-gray)',
+                        borderRadius: 6, cursor: 'grab', opacity: dragIndex === i ? 0.5 : 1,
+                      }}
+                    >
+                      <span style={{ color: 'var(--color-text-light, #9ca3af)', fontSize: '1.1rem', userSelect: 'none' }}>⠿</span>
+                      {d.title} <span className="admin-badge" style={{ textTransform: 'none' }}>{d.shortCode}</span>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>

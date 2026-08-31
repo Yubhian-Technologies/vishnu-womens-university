@@ -38,14 +38,18 @@ const defaultResearchInnovationPhotos = [
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Incubation Center', caption: '' },
 ];
 
-const TABS = [
+// Exported so the standalone /academics/programs and /academics/departments
+// pages can reuse the exact same tab list / truncation / dept-to-program
+// matching logic as this page's own Programs and Departments sections,
+// instead of duplicating it.
+export const TABS = [
   { id: 'btech', label: 'B.Tech' },
   { id: 'mtech', label: 'M.Tech' },
   { id: 'mba', label: 'MBA' },
   { id: 'phd', label: 'Ph.D.' },
 ] as const;
 
-function truncate(text: string, max: number) {
+export function truncate(text: string, max: number) {
   if (!text) return '';
   return text.length > max ? `${text.slice(0, max).trimEnd()}…` : text;
 }
@@ -63,7 +67,7 @@ const matchKey = (s: string) =>
 // own static page at /academics/freshman-engineering, so it's special-cased
 // the same way. Everything else matches by name to its single program, or
 // returns null when there's no clear match.
-function findDeptProgramSlug(dept: DepartmentDoc, programs: ProgramDoc[]): string | null {
+export function findDeptProgramSlug(dept: DepartmentDoc, programs: ProgramDoc[]): string | null {
   const grouped = groupForDeptShortCode(dept.shortCode);
   if (grouped) return grouped.programSlugs[0];
   if (matchKey(dept.title) === matchKey('Freshman Engineering')) return 'freshman-engineering';

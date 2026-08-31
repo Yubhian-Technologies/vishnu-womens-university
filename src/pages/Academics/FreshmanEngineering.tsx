@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { linkify } from '../../lib/linkify';
@@ -789,7 +789,14 @@ function LibrarySection() {
 }
 
 export default function FreshmanEngineering() {
-  const [activeTab, setActiveTab] = useState(FE_TABS[0]);
+  // Lets links elsewhere (e.g. the Mathematics/Physics/Chemistry/English
+  // "foundation department" cards, which have no Program of their own to
+  // redirect to) deep-link straight to their tab via ?tab=, instead of
+  // always landing on "About Freshman Department".
+  const [searchParams] = useSearchParams();
+  const requestedTab = searchParams.get('tab');
+  const initialTab = FE_TABS.includes(requestedTab || '') ? requestedTab! : FE_TABS[0];
+  const [activeTab, setActiveTab] = useState(initialTab);
   const subDept = SUB_DEPTS.find((d) => d.key === activeTab);
 
   useEffect(() => {
