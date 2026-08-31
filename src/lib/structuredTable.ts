@@ -270,3 +270,49 @@ export function parseProjectAccordion(text: string): ProjectAccordionCategory[] 
   }
   return categories;
 }
+
+export function serializeProjectAccordion(categories: ProjectAccordionCategory[]): string {
+  return categories.map((cat) => {
+    const lines: string[] = [];
+    if (cat.title) lines.push(`## ${cat.title}`);
+    cat.projects.forEach((p, i) => {
+      if (i > 0) lines.push('');
+      lines.push(`### ${p.title}`);
+      p.fields.forEach((f) => lines.push(f.href ? `${f.label}: ${f.value} | ${f.href}` : `${f.label}: ${f.value}`));
+      if (p.outcomes.length > 0) {
+        lines.push('Outcome:');
+        p.outcomes.forEach((o) => lines.push(`- ${o}`));
+      }
+    });
+    return lines.join('\n');
+  }).join('\n\n');
+}
+
+// Combines existing Project Accordion text with newly imported text, folding
+// any new project into an existing category of the exact same title (so
+// re-importing a year's file adds to that year's heading instead of creating
+// a duplicate one) and sorting categories with a year in their title (e.g.
+// "2024 – Granted") newest-first — categories without a year (e.g. "Ongoing
+// Projects") sort to the end, in their original relative order.
+export function mergeProjectAccordion(existingText: string, newText: string): string {
+  const byTitle = new Map<string, ProjectAccordionCategory>();
+  const order: string[] = [];
+  for (const cat of [...parseProjectAccordion(existingText), ...parseProjectAccordion(newText)]) {
+    const found = byTitle.get(cat.title);
+    if (found) {
+      found.projects.push(...cat.projects);
+    } else {
+      byTitle.set(cat.title, { title: cat.title, projects: [...cat.projects] });
+      order.push(cat.title);
+    }
+  }
+  const yearOf = (title: string) => {
+    const m = title.match(/\b(19|20)\d{2}\b/);
+    return m ? parseInt(m[0], 10) : -Infinity;
+  };
+  const merged = order
+    .map((title, i) => ({ cat: byTitle.get(title)!, i }))
+    .sort((a, b) => yearOf(b.cat.title) - yearOf(a.cat.title) || a.i - b.i)
+    .map(({ cat }) => cat);
+  return serializeProjectAccordion(merged);
+}

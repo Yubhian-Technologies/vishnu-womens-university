@@ -81,6 +81,7 @@ export default function ResearchDetail() {
     });
   };
   const [openProjects, setOpenProjects] = useState<Set<string>>(new Set());
+  const [activePatentYear, setActivePatentYear] = useState('');
   const toggleProject = (key: string) => {
     setOpenProjects((prev) => {
       const next = new Set(prev);
@@ -170,6 +171,22 @@ export default function ResearchDetail() {
         })),
       }))
     : parsedProjectCategories;
+  // Patents' categories are titled "<Year> – Granted"/"<Year> – Published"
+  // (see mergeProjectAccordion) — with several years' worth imported, a flat
+  // stacked list gets very long, so show a year-pill selector (matching the
+  // Placements "AY. 2022-2026" batch pills) and only render that year's
+  // Granted/Published groups below it instead of every year at once.
+  const yearFromCategoryTitle = (title: string) => title.match(/\b(19|20)\d{2}\b/)?.[0] ?? null;
+  const patentYears = item.slug === 'patents'
+    ? Array.from(new Set(projectCategories.map((c) => yearFromCategoryTitle(c.title)).filter((y): y is string => !!y)))
+    : [];
+  // Derived directly from render (no effect needed): defaults to the newest
+  // year, but keeps whatever the visitor already clicked as long as it's
+  // still a valid year for this item.
+  const effectivePatentYear = patentYears.includes(activePatentYear) ? activePatentYear : (patentYears[0] ?? '');
+  const visibleProjectCategories = item.slug === 'patents' && effectivePatentYear
+    ? projectCategories.filter((c) => yearFromCategoryTitle(c.title) === effectivePatentYear)
+    : projectCategories;
 
   return (
     <main className="page-wrapper">
@@ -457,8 +474,35 @@ export default function ResearchDetail() {
               <span className="section-label">Details</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>{item.title}</h2>
             </div>
-            {projectCategories.map((cat, ci) => (
-              <div key={ci} style={{ marginBottom: ci < projectCategories.length - 1 ? 'var(--space-10)' : 0 }}>
+            {patentYears.length > 1 && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-3)', marginBottom: 'var(--space-8)' }}>
+                {patentYears.map((y) => {
+                  const isActive = effectivePatentYear === y;
+                  return (
+                    <button
+                      key={y}
+                      type="button"
+                      onClick={() => setActivePatentYear(y)}
+                      style={{
+                        padding: '0.6rem 1.5rem',
+                        borderRadius: 'var(--radius-full)',
+                        border: '1.5px solid var(--color-primary)',
+                        background: isActive ? 'var(--color-primary)' : 'var(--color-white)',
+                        color: isActive ? 'var(--color-white)' : 'var(--color-primary)',
+                        fontWeight: 700,
+                        fontSize: 'var(--text-sm)',
+                        cursor: 'pointer',
+                        transition: 'background var(--transition-base), color var(--transition-base)',
+                      }}
+                    >
+                      {y}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+            {visibleProjectCategories.map((cat, ci) => (
+              <div key={cat.title || ci} style={{ marginBottom: ci < visibleProjectCategories.length - 1 ? 'var(--space-10)' : 0 }}>
                 {cat.title && (
                   <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>
                     {cat.title}
@@ -466,7 +510,7 @@ export default function ResearchDetail() {
                 )}
                 <div className="thrust-accordion">
                   {cat.projects.map((project, pi) => {
-                    const key = `${ci}-${pi}`;
+                    const key = `${cat.title || ci}-${pi}`;
                     const isOpen = openProjects.has(key);
                     return (
                       <div key={pi} className={`thrust-accordion-item${isOpen ? ' open' : ''}`}>
