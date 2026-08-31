@@ -11,6 +11,7 @@ import { useOrderedCollection } from '../../hooks/useCollection';
 import { usePageBanner } from '../../hooks/usePageBanner';
 import { useEapcetCode } from '../../hooks/useContentBlocks';
 import { smoothScrollTo } from '../../lib/smoothScroll';
+import { fetchPriorityAttr } from '../../lib/domAttrs';
 import { normalizeLab, type ProgramDoc } from '../Admin/sections/ProgramsAdmin';
 import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import type { FacultyDoc } from './Faculty';
@@ -190,7 +191,7 @@ function SingleProgramDetail() {
             className="page-hero-image"
             loading="eager"
             decoding="sync"
-            fetchPriority="high"
+            {...fetchPriorityAttr('high')}
           />
         )}
         <div className="page-hero-overlay" />

@@ -8,6 +8,7 @@ import SEO from '../../components/SEO/SEO';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useEapcetCode } from '../../hooks/useContentBlocks';
 import { smoothScrollTo } from '../../lib/smoothScroll';
+import { fetchPriorityAttr } from '../../lib/domAttrs';
 import { getProgramSchema, getBreadcrumbSchema } from '../../lib/seo/schemas';
 import type { DepartmentGroup } from '../../lib/departmentGroups';
 import { normalizeLab, type ProgramDoc } from '../Admin/sections/ProgramsAdmin';
@@ -249,7 +250,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
       {/* Hero */}
       <section className="page-hero" style={{ minHeight: 380 }}>
         {heroImage && (
-          <SmoothImage src={heroImage} alt={deptName} className="page-hero-image" loading="eager" decoding="sync" fetchPriority="high" />
+          <SmoothImage src={heroImage} alt={deptName} className="page-hero-image" loading="eager" decoding="sync" {...fetchPriorityAttr('high')} />
         )}
         <div className="page-hero-overlay" />
         <div className="container page-hero-content">

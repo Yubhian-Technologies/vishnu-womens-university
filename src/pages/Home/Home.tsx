@@ -7,6 +7,7 @@ import ScrollTopButton from '../../components/ScrollTopButton/ScrollTopButton';
 import NewsCard from '../../components/NewsCard/NewsCard';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import { useOrderedCollection } from '../../hooks/useCollection';
+import { fetchPriorityAttr } from '../../lib/domAttrs';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { useSitePhotos, useSitePhotosLoading } from '../../hooks/useSitePhotos';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
@@ -315,7 +316,7 @@ export default function Home() {
                     src={item.src}
                     alt={item.alt}
                     className="activity-card-img"
-                    {...(i < 3 ? { fetchPriority: 'high' as const } : {})}
+                    {...(i < 3 ? fetchPriorityAttr('high') : {})}
                   />
                   <div className="activity-card-label">{item.caption || item.alt}</div>
                 </div>

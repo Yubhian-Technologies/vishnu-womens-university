@@ -5,6 +5,7 @@ import { useOrderedCollection } from '../../hooks/useCollection';
 import type { ConsultancyReportDoc } from '../Admin/sections/ConsultancyReportsAdmin';
 import type { PatentCertificateDoc } from '../Admin/sections/PatentCertificatesAdmin';
 import { usePageBanners } from '../../hooks/usePageBanners';
+import { fetchPriorityAttr } from '../../lib/domAttrs';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import { parseFlexibleTable, parseAccordionTable, parseProjectAccordion } from '../../lib/structuredTable';
 import { parseAboutContent } from '../../lib/aboutContent';
@@ -193,7 +194,7 @@ export default function ResearchDetail() {
       {/* Hero */}
       <section className="page-hero" style={{ minHeight: 340 }}>
         {heroImage && (
-          <img src={heroImage} alt={item.title} className="page-hero-image" loading="eager" decoding="sync" fetchPriority="high" />
+          <img src={heroImage} alt={item.title} className="page-hero-image" loading="eager" decoding="sync" {...fetchPriorityAttr('high')} />
         )}
         <div className="page-hero-overlay" />
         <div className="container page-hero-content">
