@@ -20,6 +20,7 @@ import { usePlacementYears } from './usePlacementYears';
 import PlacementAnnouncementsTicker from './PlacementAnnouncementsTicker';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import BodyBlocks, { parseBodyContent } from '../../components/BodyBlocks/BodyBlocks';
+import PhotoCarousel from '../../components/PhotoCarousel/PhotoCarousel';
 import '../detail-layout.css';
 
 // Overrides the body heading only — hero/breadcrumb still show
@@ -759,6 +760,10 @@ export default function PlacementDetail() {
   const { docs: allItems, loading } = useOrderedCollection<PlacementItemDoc>('placementItems', 'order');
   const item = allItems.find((i) => i.slug === slug) ?? null;
   const [activeTableRow, setActiveTableRow] = useState<number | null>(null);
+  // Internships table year filter — the 4th pipe field ("Company | Stipend/
+  // Month | No. of Selects | Year") reuses StructuredTableRow's optional
+  // `email` slot, since this table never uses real email/LinkedIn data.
+  const [internYearFilter, setInternYearFilter] = useState<string>('All');
   // Full bios (Admin → TPO Team Info) and photos (Admin → TPO Team Photos)
   // for the TPO Team roster — both keyed by the same exact name string as it
   // appears in the roster table, so a matching row's accordion expands to
@@ -823,6 +828,15 @@ export default function PlacementDetail() {
   const Icon = resolveContentIcon(item.icon) || BarChart3;
   const tableSections = parseStructuredTable(item.tableText);
   const tableRows = tableSections.flatMap((s) => s.rows);
+  // Internships year filter — the 4th pipe field ("Company | Stipend/Month |
+  // No. of Selects | Year") reuses StructuredTableRow's optional `email`
+  // slot, since this table never uses real email/LinkedIn data. Computed up
+  // here (not inside the table's own render branch) so the filter pills can
+  // sit beside the "List of Internships" heading instead of above the table.
+  const internYears = [...new Set(tableRows.map((r) => r.email).filter((y): y is string => !!y))];
+  const filteredInternRows = internYearFilter === 'All'
+    ? tableRows
+    : tableRows.filter((r) => !r.email || r.email === internYearFilter);
   // Placement Highlights uses a fully dynamic table (its own column headers
   // straight from row 1 of the Data Table field, not a fixed shape like the
   // roster/company tables above) — see the flexibleHeaders/flexibleRows
@@ -857,7 +871,78 @@ export default function PlacementDetail() {
   // this generic Outcomes & Achievements block would just repeat them. Our
   // Recruiters drops it per request — the recruiter logo grid below is the
   // page's actual point, and Outcomes was just repeating the Overview text.
-  const showOutcomes = !!item.outcomes && item.outcomes.length > 0 && item.slug !== 'placement-highlights' && item.slug !== 'our-recruiters';
+  const showOutcomes = !!item.outcomes && item.outcomes.length > 0 && item.slug !== 'placement-highlights' && item.slug !== 'our-recruiters' && item.slug !== 'tpo-team' && item.slug !== 'industry-liaison-offices';
+  // Shared markup for the below-Overview spot every non-Placement-Cell page
+  // uses. Placement Cell renders its own combined Summary+chart block near
+  // the hero instead (see placementCellSummarySection below) — it needs the
+  // cards paired side-by-side with the branch chart, not this generic
+  // full-width layout.
+  const outcomesSection = (
+    <section className="section bg-off-white" style={{ paddingTop: 'var(--space-6)', paddingBottom: item.partners && item.partners.length > 0 ? 'var(--space-6)' : undefined }}>
+      <div className="container">
+        <div style={{ marginBottom: 'var(--space-8)' }}>
+          <span className="section-label">Impact</span>
+          <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Outcomes & Achievements</h2>
+        </div>
+        {/* Fixed 3-column grid, not auto-fit/minmax — auto-fit stretches a
+            partial last row's items wider than every other row's, instead
+            of leaving them at the same width (see the same fix on
+            placementCellSummarySection above). mobile-stack-grid still
+            collapses this to one column on small screens. */}
+        <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-4)' }}>
+          {item.outcomes!.map((o) => (
+            <div key={o}
+              style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', minHeight: 110, display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
+              <Trophy size={20} strokeWidth={1.75} style={{ flexShrink: 0, color: 'var(--color-accent)' }} />
+              <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6 }}>{o}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+  // Placement Cell's own combined Summary (batch cards) + Branch-wise
+  // Placement Distribution chart, side by side — replaces both the generic
+  // outcomesSection above and the standalone chart section that used to
+  // follow the (now-removed) Overview text.
+  const placementCellSummarySection = showOutcomes && item.slug === 'placement-details' && (
+    <section className="section bg-off-white">
+      <div className="container">
+        <div className={sidebarChartYear?.branchOffers && sidebarChartYear.branchOffers.length > 0 ? 'detail-grid' : ''}>
+          <div>
+            <div style={{ marginBottom: 'var(--space-8)' }}>
+              <span className="section-label">Impact</span>
+              <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Summary</h2>
+            </div>
+            {/* Fixed 3-column grid, not auto-fit/minmax — with 8 cards the
+                last row only has 2, and auto-fit stretches a partial row's
+                items to fill the leftover space instead of leaving them at
+                the same width as every other row. mobile-stack-grid still
+                collapses this to a single column on small screens. */}
+            <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-4)' }}>
+              {item.outcomes!.map((o) => (
+                <div key={o}
+                  style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', minHeight: 110, display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
+                  <Trophy size={20} strokeWidth={1.75} style={{ flexShrink: 0, color: 'var(--color-accent)' }} />
+                  <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6 }}>{o}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          {sidebarChartYear?.branchOffers && sidebarChartYear.branchOffers.length > 0 && (
+            <div className="detail-sidebar">
+              <div style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', position: 'sticky', top: '110px' }}>
+                <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-5)' }}>
+                  Branch-wise Placement Distribution
+                </h3>
+                <BranchOffersBarChart data={sidebarChartYear.branchOffers} />
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  );
   const hasBodyOverride = !item.intro && Boolean(BODY_OVERRIDES[item.slug]);
   let bodyText = hasBodyOverride ? BODY_OVERRIDES[item.slug] : '';
   // The CDP/C-Program "More Details …" links point at bundled PDFs by
@@ -877,7 +962,11 @@ export default function PlacementDetail() {
   // Our Recruiters drops the whole Overview section per request instead —
   // its Key Highlights/About text duplicated the logo grid below, which is
   // the page's actual content — with no full-width-grid replacement.
-  const skipOverviewSection = (item.slug === 'employability-skills' && !hasBodyOverride && !item.intro && !item.desc) || item.slug === 'our-recruiters' || item.slug === 'internships';
+  const galleryImages = item.galleryImages || [];
+  // Placement Highlights only skips Overview once photos are actually
+  // uploaded — with none yet, it falls back to the plain Overview text/Key
+  // Highlights sidebar rather than an empty gap where the carousel would go.
+  const skipOverviewSection = (item.slug === 'employability-skills' && !hasBodyOverride && !item.intro && !item.desc) || item.slug === 'our-recruiters' || item.slug === 'internships' || item.slug === 'placement-details' || (item.slug === 'placement-highlights' && galleryImages.length > 0);
 
   return (
     <main className="page-wrapper">
@@ -919,9 +1008,28 @@ export default function PlacementDetail() {
         </div>
       </section>
 
+      {/* Placement Cell's combined Summary + branch chart, shown at the very
+          top (right after the hero) — every other page keeps its Outcomes
+          block in its usual spot below Overview (see further down). */}
+      {placementCellSummarySection}
+
+      {/* Placement Highlights' photo carousel — replaces this page's
+          Overview text + Key Highlights sidebar once at least one photo is
+          uploaded (Admin → Placement Sub-pages → Placement Highlights →
+          Photo Carousel). */}
+      {item.slug === 'placement-highlights' && galleryImages.length > 0 && (
+        <section className="section bg-white" style={{ paddingBottom: 'var(--space-6)' }}>
+          {/* Deliberately outside .container — these are wide promotional
+              banners, so they run edge-to-edge of the viewport instead of
+              sitting inside the page's usual ~1400px/padded content column
+              like every other section. */}
+          <PhotoCarousel images={galleryImages} />
+        </section>
+      )}
+
       {/* Content */}
       {!skipOverviewSection && (
-      <section className="section bg-white" style={{ paddingBottom: showOutcomes || item.slug === 'employability-skills' || item.slug === 'gsac' || item.slug === 'higher-education' || item.slug === 'placement-highlights' ? 'var(--space-6)' : undefined }}>
+      <section className="section bg-white" style={{ paddingBottom: (showOutcomes && item.slug !== 'placement-details') || item.slug === 'employability-skills' || item.slug === 'gsac' || item.slug === 'higher-education' || item.slug === 'placement-highlights' || item.slug === 'tpo-team' || item.slug === 'industry-liaison-offices' ? 'var(--space-6)' : undefined }}>
         <div className="container">
           <div className={(item.highlights && item.highlights.length > 0) || item.slug === 'placement-details' ? 'detail-grid' : ''}>
             {/* Main */}
@@ -994,7 +1102,7 @@ export default function PlacementDetail() {
               <div className="detail-sidebar">
                 <div style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', position: 'sticky', top: '110px' }}>
                   <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-4)' }}>
-                    Key Highlights
+                    {item.slug === 'tpo-team' ? 'Key Activities' : 'Key Highlights'}
                   </h3>
                   {/* Capped + scrollable rather than growing forever — a long
                       Highlights list would otherwise stretch this whole grid
@@ -1116,26 +1224,10 @@ export default function PlacementDetail() {
         </section>
       )}
 
-      {/* Outcomes */}
-      {showOutcomes && (
-        <section className="section bg-off-white" style={{ paddingTop: 'var(--space-6)', paddingBottom: item.partners && item.partners.length > 0 && item.slug !== 'placement-details' ? 'var(--space-6)' : undefined }}>
-          <div className="container">
-            <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label">Impact</span>
-              <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Outcomes & Achievements</h2>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 'var(--space-4)' }}>
-              {item.outcomes.map((o) => (
-                <div key={o}
-                  style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
-                  <Trophy size={20} strokeWidth={1.75} style={{ flexShrink: 0, color: 'var(--color-accent)' }} />
-                  <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6 }}>{o}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
+      {/* Outcomes — every page except Placement Cell shows it here, in its
+          usual spot below Overview (Placement Cell renders outcomesSection
+          up near the hero instead — see above). */}
+      {showOutcomes && item.slug !== 'placement-details' && outcomesSection}
 
       {/* Placement Details gets the same batch-wise accordion as the main
           Placements page, instead of the generic Name/Role/Notes table. */}
@@ -1158,13 +1250,39 @@ export default function PlacementDetail() {
       {/* Table Data — not shown on Placement Details, which already has its
           own dedicated year-by-year statistics section above. */}
       {(tableRows.length > 0 || flexibleRows.length > 0) && item.slug !== 'placement-details' && (
-        <section className="section bg-white" style={{ paddingTop: item.slug === 'placement-highlights' ? 'var(--space-6)' : undefined }}>
+        <section className="section bg-white" style={{ paddingTop: item.slug === 'placement-highlights' || item.slug === 'tpo-team' || item.slug === 'industry-liaison-offices' ? 'var(--space-6)' : undefined }}>
           <div className="container">
-            <div style={{ marginBottom: 'var(--space-8)' }}>
-              {item.slug !== 'internships' && <span className="section-label">Data</span>}
-              <h2 className="section-title" style={{ fontSize: '1.75rem' }}>
-                {rosterGroups.length > 0 ? 'Team' : item.slug === 'industry-liaison-offices' ? 'Regional Offices' : item.slug === 'internships' ? 'List of Internships' : item.slug === 'placement-highlights' ? 'Highlights' : 'Batch-wise Statistics'}
-              </h2>
+            <div style={{ marginBottom: 'var(--space-8)', display: item.slug === 'internships' && internYears.length > 0 ? 'flex' : undefined, alignItems: item.slug === 'internships' && internYears.length > 0 ? 'center' : undefined, justifyContent: item.slug === 'internships' && internYears.length > 0 ? 'space-between' : undefined, flexWrap: 'wrap', gap: 'var(--space-4)' }}>
+              <div>
+                {item.slug !== 'internships' && <span className="section-label">Data</span>}
+                <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 0 }}>
+                  {rosterGroups.length > 0 ? 'Team' : item.slug === 'industry-liaison-offices' ? 'Regional Offices' : item.slug === 'internships' ? 'List of Internships' : item.slug === 'placement-highlights' ? 'Highlights' : 'Batch-wise Statistics'}
+                </h2>
+              </div>
+              {item.slug === 'internships' && internYears.length > 0 && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-3)' }}>
+                  {['All', ...internYears].map((yr) => (
+                    <button
+                      key={yr}
+                      type="button"
+                      onClick={() => setInternYearFilter(yr)}
+                      style={{
+                        padding: '0.6rem 1.5rem',
+                        borderRadius: 'var(--radius-full)',
+                        border: '1.5px solid var(--color-primary)',
+                        background: internYearFilter === yr ? 'var(--color-primary)' : 'var(--color-white)',
+                        color: internYearFilter === yr ? 'var(--color-white)' : 'var(--color-primary)',
+                        fontWeight: 700,
+                        fontSize: 'var(--text-sm)',
+                        cursor: 'pointer',
+                        transition: 'background var(--transition-base), color var(--transition-base)',
+                      }}
+                    >
+                      {yr}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
             {rosterGroups.length > 0 ? (
               <TpoTeamTiles rows={tableRows} groups={rosterGroups} tpoPhotoMap={tpoPhotoMap} tpoBiosMap={tpoBiosMap} pageEmails={item.emails} pageLinkedins={item.linkedins} deptCoordinatorsByGroup={deptCoordinatorsByGroup} />
@@ -1179,7 +1297,9 @@ export default function PlacementDetail() {
               // than the roster-style rows below, which are built for named
               // people (TPO Cell, ILO offices). Admins enter it in the same
               // Data Table field, one "Company | Stipend/Month | No. of
-              // Selects" per line.
+              // Selects | Year" per line — Year is optional; rows without one
+              // always show regardless of which filter pill is active (filter
+              // pills themselves render beside the heading above, not here).
               <>
                 <div style={{ overflowX: 'auto' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm)' }}>
@@ -1192,7 +1312,7 @@ export default function PlacementDetail() {
                       </tr>
                     </thead>
                     <tbody>
-                      {tableRows.map((row, i) => (
+                      {filteredInternRows.map((row, i) => (
                         <tr key={i} style={{ background: i % 2 === 0 ? 'var(--color-off-white)' : 'transparent' }}>
                           <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)' }}>{i + 1}</td>
                           <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)', fontWeight: 600 }}>{row.name}</td>
