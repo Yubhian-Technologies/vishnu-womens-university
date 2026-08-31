@@ -188,7 +188,7 @@ export default function About() {
               </p>
               <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-6)', color: 'var(--color-text-light)' }}>
                 Having graduated <strong>15,000 engineers</strong> and achieved <strong>1,100+ annual placements</strong>,
-                VWU stands as the leading destination for women's engineering education in the Telugu-speaking states.
+                VWU stands as the leading destination for women's education in the Telugu-speaking states.
               </p>
               <div style={{ display: 'flex', gap: 'var(--space-4)', flexWrap: 'wrap' }}>
                 <Link to="/vision-mission" className="btn btn-primary">Vision & Mission</Link>
