@@ -269,6 +269,7 @@ const navItems: NavItem[] = [
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
   // Single source of truth for which desktop dropdown is open — set by
   // hover, keyboard focus, and click alike. Previously hover (via CSS
   // :hover/:focus-within) and click (via a separate "force closed" flag)
@@ -627,6 +628,18 @@ export default function Header() {
     return () => { document.body.style.overflow = ''; };
   }, [mobileOpen]);
 
+  // aria-hidden gets set on .mobile-menu the instant it closes (below) —
+  // if a link inside it (e.g. a submenu item just clicked, or one reached
+  // via Tab) still holds focus at that moment, marking its ancestor
+  // aria-hidden while it's focused is invalid and logs a console warning
+  // ("Blocked aria-hidden on an element because its descendant retained
+  // focus"). Move focus out first so that never happens.
+  useEffect(() => {
+    if (!mobileOpen && mobileMenuRef.current?.contains(document.activeElement)) {
+      (document.activeElement as HTMLElement)?.blur();
+    }
+  }, [mobileOpen]);
+
   return (
     <>
       {/* Main Header — full-width edge-to-edge, no floating/inset look. One
@@ -688,7 +701,7 @@ export default function Header() {
       </header>
 
       {/* Mobile Menu */}
-      <div className={`mobile-menu${mobileOpen ? ' open' : ''}`} aria-hidden={!mobileOpen} data-lenis-prevent>
+      <div ref={mobileMenuRef} className={`mobile-menu${mobileOpen ? ' open' : ''}`} aria-hidden={!mobileOpen} data-lenis-prevent>
         <div className="mobile-menu-content">
           <ul className="mobile-nav-list">
             {renderedNavItems.map((item) => {

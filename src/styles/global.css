@@ -12,6 +12,15 @@ html {
      top of that would double-animate any native anchor jump it doesn't
      intercept, fighting Lenis's position updates every frame. */
   font-size: 16px;
+  /* Also needed on html, not just body below — an element that overflows
+     the true device width (a rounding error in a flex/grid child, a fixed-
+     width element, ...) can still widen the browser's own layout viewport
+     (window.innerWidth) even with body's overflow-x: hidden alone, which
+     then misaligns every position:fixed element (the header) that sizes
+     itself off that viewport, since body's overflow only contains ITS OWN
+     box, not the initial containing block fixed elements use. Both
+     together reliably clip the overflow at its source instead. */
+  overflow-x: hidden;
 }
 
 body {
@@ -569,15 +578,27 @@ h6 { font-size: var(--text-lg); }
     gap: var(--space-6);
   }
 
-  /* Escape hatch for inline `style={{ gridTemplateColumns: '...' }}` layouts
-     that have no responsive class of their own — inline styles can't be
-     overridden by a plain media-query rule, hence !important here. Using
-     minmax(0, 1fr) rather than plain 1fr also guards against a grid track
-     being forced wider than the viewport by an unshrinkable child (e.g. a
-     <select> with long option text), since grid items default to
-     min-width: auto instead of 0. */
+  /* Escape hatch for inline `style={{ display: 'grid', gridTemplateColumns:
+     '...' }}` layouts that have no responsive class of their own — inline
+     styles can't be overridden by a plain media-query rule, hence
+     !important here. Switched from a single-track CSS Grid (`minmax(0,
+     1fr)`) to Flexbox column-stacking: a two-column grid whose track width
+     depends on content this varied (a fixed-height image plus free-flowing
+     text/button) could still measure a hair wider than the viewport in some
+     browsers' grid track-sizing pass even with minmax(0, ...) guarding it —
+     narrow enough to be easy to miss on a quick check, but enough to push
+     window.innerWidth past the true device width and, downstream, misalign
+     any position:fixed element (like the header) that sizes off it. Flex
+     column-stacking doesn't have that two-pass sizing step, so it can't
+     reproduce the same overflow. align-items: stretch overrides the inline
+     style's `align-items: center` (a cross-axis *centering* value some of
+     these grids set for their normal 2-column desktop layout) so stacked
+     children still fill the full width instead of shrinking to content
+     size and centering. */
   .mobile-stack-grid {
-    grid-template-columns: minmax(0, 1fr) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
     gap: var(--space-6) !important;
   }
 
