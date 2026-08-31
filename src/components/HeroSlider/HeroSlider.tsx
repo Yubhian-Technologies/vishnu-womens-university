@@ -62,7 +62,7 @@ function buildStaticSlides(btechCount: string): Slide[] {
       tag: 'Outstanding Placements',
       heading: '59.28 LPA\nHighest\nPlacement Package',
       description: 'VWU recorded 1,100+ placements in 2025–26, with a highest offer of 59.28 LPA — graduates are now driving impact at companies across India and beyond.',
-      primaryCta: { label: 'Placement Records', path: '/about' },
+      primaryCta: { label: 'Placement Records', path: '/placements' },
       secondaryCta: { label: 'Our Story', path: '/about' },
     },
     {
