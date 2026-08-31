@@ -7,6 +7,9 @@ import SmoothCollapse from '../../components/SmoothCollapse/SmoothCollapse';
 import { useCollection, useOrderedCollection, type WithId } from '../../hooks/useCollection';
 import { usePageBanners } from '../../hooks/usePageBanners';
 import { fetchPriorityAttr } from '../../lib/domAttrs';
+import { CustomSectionsIntro, CustomSectionsAccordion, CustomSectionsPlain, CustomSectionsPills } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
+import CustomTabsPage, { type TabItem } from '../../components/CustomTabsPage/CustomTabsPage';
+import { hasTabContent, type CustomTab } from '../../lib/customTabs';
 import { DIFFERENTIATOR_CATEGORIES } from '../Admin/sections/DifferentiatorsAdmin';
 import type { DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
 import type { AicteIdeaLabTeamMemberDoc } from '../Admin/sections/AicteIdeaLabTeamAdmin';
@@ -19,11 +22,10 @@ import { nasscomEmbedded } from './nasscomEmbedded.data';
 import { hclVlsiTraining } from './hclVlsiTraining.data';
 import { microchipEmbedded, type TeamMember } from './microchipEmbedded.data';
 import { tiDspCoe, type TiDspFacultyMember, type ContentBlock } from './tiDspCoe.data';
-import { ultraTechCoe, type UltraTechInCharge, type StudentsBenefitedGroup } from './ultraTechCoe.data';
 import { chipsToStartup } from './chipsToStartup.data';
 import { vsac, type VsacMember, type SimpleTable, type TrainingResearchItem, type CollaborationItem } from './vsac.data';
 import { arVrStudio } from './arVrStudio.data';
-import { vehicleDesignLab, type VdlFacilityPhase } from './vehicleDesignLab.data';
+import { vehicleDesignLab } from './vehicleDesignLab.data';
 import {
   assistiveTechLab,
   type AtlMember,
@@ -36,26 +38,8 @@ import {
   type AtlYearTraining,
 } from './assistiveTechLab.data';
 import { highPerformanceComputingLab, type HpcMember } from './highPerformanceComputingLab.data';
-import {
-  concreteCanoeLab,
-  type CanoeSimpleTable,
-  type CanoeStudentTeam,
-  type CanoeCompetition,
-} from './concreteCanoeLab.data';
-import { dreamHouseConstructionLab, type DhclMember } from './dreamHouseConstructionLab.data';
 import { foreignLanguages, type FlCoordinator, type FlLanguage } from './foreignLanguages.data';
-import {
-  talentSprintWise,
-  type WiseModuleTab,
-  type WiseModuleSection,
-  type WiseProjectBatch,
-  type WiseTeamMember,
-  type WiseEliteProject,
-  type WiseMentoringBatch,
-  type WisePlacementStatsYear,
-  type WiseTestimonial,
-  type WiseNseClipping,
-} from './talentSprintWise.data';
+import { talentSprintWise } from './talentSprintWise.data';
 import { smartInterviews } from './smartInterviews.data';
 import { ruralWomenTechPark } from './ruralWomenTechPark.data';
 import { nirvahana, type NirvahanaEvent } from './nirvahana.data';
@@ -76,77 +60,6 @@ function IicMemberCard({ name, role, size = 96, photoUrl }: { name: string; role
   );
 }
 
-// Section nav for the Institution Innovation Cell page — only "About IIC"
-// and "IIC – Constitution" have real content so far; the rest show a
-// coming-soon placeholder until that content is provided.
-const IIC_TABS = [
-  'About IIC',
-  'IIC – Constitution',
-  'Innovation Ambassadors',
-  'IIC Activities',
-  'Atal Tinkering Schools',
-  'Rating Certificates',
-  'IIC Annual Reports',
-  'SIH Internal Hackathon Reports',
-  'National Innovation Start-Up Policy',
-];
-
-// Vehicle Design Lab's sidebar sections — only "About VDL" and "Facilities
-// & Projects" have real content so far; the rest show a coming-soon
-// placeholder until that content is provided.
-const VDL_TABS = [
-  'About VDL',
-  'Facilities & Projects',
-  'Industry Collaborations',
-  'Students Achievements & Placements',
-  'VDL Outcomes',
-];
-
-// TalentSprint – WISE's own sidebar sections — only "About WISE" and
-// "Beneficiaries – Placements" have real content so far; the rest show a
-// coming-soon placeholder until that content is provided.
-const WISE_TABS = [
-  'About WISE',
-  'Modules',
-  'Projects',
-  'WISE Team',
-  'ELITE Program',
-  'Microsoft Mentoring Program',
-  'Beneficiaries – Placements',
-  'Testimonials',
-  'TalentSprint @ NSE',
-];
-
-// AICTE IDEA Lab's own sidebar sections — only "About AICTE IDEA Lab" has
-// real content so far; the rest show a coming-soon placeholder until that
-// content is provided.
-const IDEA_LAB_TABS = [
-  'About AICTE IDEA Lab',
-  'Team',
-  'Student Ambassadors',
-  'Facilities',
-];
-
-function IicBulletList({ heading, items }: { heading: string; items: string[] }) {
-  return (
-    <div style={{ marginBottom: 'var(--space-8)' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-5)' }}>
-        <div style={{ width: 4, height: 28, background: 'var(--color-accent)', borderRadius: 'var(--radius-full)' }} />
-        <h2 style={{ fontSize: '1.5rem', margin: 0 }}>{heading}</h2>
-      </div>
-      <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-        {items.map((point, i) => (
-          <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-3)' }}>
-            <span style={{ width: 20, height: 20, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
-              <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-            </span>
-            <span style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.6 }}>{point}</span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
 
 function CheckBullets({ items }: { items: string[] }) {
   return (
@@ -748,271 +661,6 @@ function ChipsToStartupAccordion({
           </div>
         );
       })}
-    </div>
-  );
-}
-
-function VdlTeamSection({ team }: { team: typeof vehicleDesignLab.team }) {
-  const [activeTab, setActiveTab] = useState<'Lab Head' | 'Faculty Members'>('Lab Head');
-
-  return (
-    <div style={{ border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
-      <div style={{ display: 'flex' }}>
-        {(['Lab Head', 'Faculty Members'] as const).map((tab) => {
-          const isActive = activeTab === tab;
-          return (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              style={{
-                flex: 1,
-                padding: 'var(--space-3) var(--space-5)',
-                border: 'none',
-                background: isActive ? 'var(--color-primary)' : 'var(--color-off-white)',
-                color: isActive ? 'var(--color-white)' : 'var(--color-primary)',
-                fontWeight: 700,
-                fontSize: 'var(--text-sm)',
-                cursor: 'pointer',
-              }}
-            >
-              {tab === 'Lab Head' ? 'Lab Head:' : tab}
-            </button>
-          );
-        })}
-      </div>
-      <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)' }}>
-        {activeTab === 'Lab Head' ? (
-          <TiDspMemberCard member={team.labHead} />
-        ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--space-5)' }}>
-            {team.facultyMembers.map((m) => <TiDspMemberCard key={m.name} member={m} />)}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function VdlVideoEmbed({ url }: { url?: string }) {
-  if (!url) {
-    return null;
-  }
-  return (
-    <div style={{ position: 'relative', paddingTop: '56.25%', borderRadius: 'var(--radius-md)', overflow: 'hidden', border: '1px solid var(--color-light-gray)' }}>
-      <iframe
-        src={url}
-        title="Vehicle Design Lab video"
-        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 'none' }}
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowFullScreen
-      />
-    </div>
-  );
-}
-
-function VdlSinglePhoto({ photos, alt }: { photos: (WithId & { imageUrl: string })[]; alt: string }) {
-  if (photos.length === 0) {
-    return null;
-  }
-  return (
-    <img
-      src={photos[0].imageUrl}
-      alt={alt}
-      style={{ width: '100%', maxHeight: 420, objectFit: 'cover', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-light-gray)' }}
-    />
-  );
-}
-
-function VdlFacilitiesSection({
-  facilities,
-  phasePhotos,
-  campusVehiclePhotos,
-}: {
-  facilities: typeof vehicleDesignLab.facilities;
-  phasePhotos: (WithId & { imageUrl: string })[][];
-  campusVehiclePhotos: (WithId & { imageUrl: string })[];
-}) {
-  const [activeTab, setActiveTab] = useState<'Activities and Programs' | 'Campus Utility Vehicle Projects'>('Activities and Programs');
-
-  return (
-    <div>
-      <SectionHeading>Facility Overview</SectionHeading>
-      <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-6)' }}>
-        {facilities.overview}
-      </p>
-
-      <div style={{ display: 'flex', flexWrap: 'wrap', marginBottom: 'var(--space-6)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
-        {(['Activities and Programs', 'Campus Utility Vehicle Projects'] as const).map((tab) => {
-          const isActive = activeTab === tab;
-          return (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              style={{
-                flex: '1 1 240px',
-                padding: 'var(--space-3) var(--space-5)',
-                border: 'none',
-                background: isActive ? 'var(--color-primary)' : 'var(--color-off-white)',
-                color: isActive ? 'var(--color-white)' : 'var(--color-primary)',
-                fontWeight: 700,
-                fontSize: 'var(--text-sm)',
-                cursor: 'pointer',
-              }}
-            >
-              {tab}:
-            </button>
-          );
-        })}
-      </div>
-
-      {activeTab === 'Activities and Programs' ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-8)' }}>
-          {facilities.activitiesPrograms.map((phase: VdlFacilityPhase, i) => (
-            <div key={i}>
-              <h4 style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>
-                {phase.title}
-              </h4>
-              <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-4)' }}>
-                {phase.paragraph}
-              </p>
-              {phase.mediaType === 'video' ? (
-                <VdlVideoEmbed url={phase.videoUrl} />
-              ) : (
-                <VdlSinglePhoto photos={phasePhotos[i] ?? []} alt={phase.title} />
-              )}
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div>
-          <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-5)' }}>
-            {facilities.campusUtilityIntro}
-          </p>
-          <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 var(--space-6)', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-            {facilities.campusUtilityProjects.map((p, i) => (
-              <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-2)' }}>
-                <span style={{ width: 20, height: 20, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
-                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                </span>
-                <span style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.6 }}>
-                  <strong>{p.lead}</strong>{p.text}
-                </span>
-              </li>
-            ))}
-          </ul>
-          {campusVehiclePhotos.length > 0 ? (
-            <PhotoGrid photos={campusVehiclePhotos} alt="Campus Utility Vehicle Projects" />
-          ) : (
-            <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text-light)', margin: 0 }}>
-              Content for this section is coming soon.
-            </p>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function VdlIndustryCollaborationsSection({
-  data,
-  photoMap,
-}: {
-  data: typeof vehicleDesignLab.industryCollaborations;
-  photoMap: Map<string, WithId & { imageUrl: string }>;
-}) {
-  return (
-    <div>
-      <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-6)' }}>
-        {data.intro}
-      </p>
-      <VsacInnerAccordion titles={data.endowments.map((e) => `${e.title}:`)}>
-        {(i) => {
-          const e = data.endowments[i];
-          const photo = photoMap.get(e.id);
-          return (
-            <>
-              <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-2)' }}>
-                <strong>Bestowed By:</strong> {e.bestowedBy}
-              </p>
-              <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: photo ? 'var(--space-4)' : 0 }}>
-                <strong>Contribution:</strong> {e.contribution}
-              </p>
-              {photo && (
-                <img
-                  src={photo.imageUrl}
-                  alt={e.title}
-                  style={{ width: '100%', maxHeight: 420, objectFit: 'cover', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-light-gray)' }}
-                />
-              )}
-            </>
-          );
-        }}
-      </VsacInnerAccordion>
-      <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginTop: 'var(--space-6)' }}>
-        {data.closing}
-      </p>
-    </div>
-  );
-}
-
-function VdlStudentsAchievementsSection({ data, achievementReports }: {
-  data: typeof vehicleDesignLab.studentsAchievements;
-  achievementReports: { label: string; href: string }[];
-}) {
-  return (
-    <div>
-      <SectionHeading>Achievements</SectionHeading>
-      <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-6)' }}>
-        {data.intro}
-      </p>
-      <VsacInnerAccordion titles={data.competitions.map((c) => `${c.title}:`)}>
-        {(i) => (
-          <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, margin: 0 }}>
-            {data.competitions[i].text}
-          </p>
-        )}
-      </VsacInnerAccordion>
-      <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, margin: 'var(--space-6) 0' }}>
-        {data.closing}
-      </p>
-
-      <SectionHeading>Placements</SectionHeading>
-      {data.placementsParagraphs.map((para, i) => (
-        <p key={i} style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-4)' }}>
-          {para}
-        </p>
-      ))}
-
-      <h4 style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginTop: 'var(--space-4)', marginBottom: 'var(--space-3)' }}>
-        Achievements:
-      </h4>
-      <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-        {achievementReports.map((report) => (
-          <li key={report.label} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-            <span style={{ width: 20, height: 20, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-            </span>
-            <a href={report.href} download style={{ fontSize: 'var(--text-base)', color: 'var(--color-primary)', fontWeight: 600 }}>{report.label}</a>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-function VdlOutcomesSection({ outcomes }: { outcomes: typeof vehicleDesignLab.outcomes }) {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
-      {outcomes.map((o) => (
-        <div key={o.title}>
-          <h4 style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-1)' }}>
-            {o.title}
-          </h4>
-          <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, margin: 0 }}>
-            {o.text}
-          </p>
-        </div>
-      ))}
     </div>
   );
 }
@@ -1988,38 +1636,6 @@ function HpcAccordion({ data }: { data: typeof highPerformanceComputingLab }) {
   );
 }
 
-function CanoeSimpleTableView({ table }: { table: CanoeSimpleTable }) {
-  return (
-    <div style={{ overflowX: 'auto', marginBottom: 'var(--space-5)' }}>
-      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-        <thead>
-          <tr>
-            {table.headers.map((h) => (
-              <th key={h} style={TI_DSP_TABLE_TH_STYLE}>{h}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {table.rows.map((row, ri) => (
-            <tr key={ri} style={{ background: ri % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)' }}>
-              {row.map((cell, ci) => (
-                <td key={ci} style={TI_DSP_TABLE_TD_STYLE}>
-                  {cell.split('\n').map((line, li) => (
-                    <Fragment key={li}>
-                      {li > 0 && <br />}
-                      {line}
-                    </Fragment>
-                  ))}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
 function CanoePhotoGrid({ photos }: { photos: (WithId & { imageUrl: string })[] }) {
   if (photos.length === 0) {
     return (
@@ -2038,280 +1654,6 @@ function CanoePhotoGrid({ photos }: { photos: (WithId & { imageUrl: string })[] 
           style={{ width: '100%', height: 180, objectFit: 'cover', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-light-gray)' }}
         />
       ))}
-    </div>
-  );
-}
-
-function CanoeStudentTeamPhoto({ team, photos }: { team: CanoeStudentTeam; photos: (WithId & { imageUrl: string })[] }) {
-  return (
-    <div style={{ marginBottom: 'var(--space-6)' }}>
-      {photos.length > 0 ? (
-        <img
-          src={photos[0].imageUrl}
-          alt={team.label}
-          style={{ width: '100%', maxWidth: 480, borderRadius: 'var(--radius-md)', border: '1px solid var(--color-light-gray)', display: 'block', marginBottom: 'var(--space-2)' }}
-        />
-      ) : (
-        <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', margin: '0 0 var(--space-2)' }}>
-          Team photo coming soon.
-        </p>
-      )}
-      <p style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-primary)', margin: '0 0 var(--space-2)' }}>{team.label}</p>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
-        {team.students.map((s) => (
-          <span key={s} style={{ fontSize: 'var(--text-xs)', background: 'var(--color-off-white)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-full)', padding: '0.2rem 0.7rem', color: 'var(--color-text)' }}>
-            {s}
-          </span>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function CanoeCompetitionsTable({ competitions }: { competitions: CanoeCompetition[] }) {
-  return (
-    <div style={{ overflowX: 'auto' }}>
-      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-        <thead>
-          <tr>
-            <th style={TI_DSP_TABLE_TH_STYLE}>S.No</th>
-            <th style={TI_DSP_TABLE_TH_STYLE}>Name of the Competition</th>
-            <th style={TI_DSP_TABLE_TH_STYLE}>Date</th>
-            <th style={TI_DSP_TABLE_TH_STYLE}>List of Students Participated</th>
-            <th style={TI_DSP_TABLE_TH_STYLE}>Year</th>
-            <th style={TI_DSP_TABLE_TH_STYLE}>Remarks</th>
-          </tr>
-        </thead>
-        <tbody>
-          {competitions.map((c, i) => (
-            <tr key={i} style={{ background: i % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)' }}>
-              <td style={TI_DSP_TABLE_TD_STYLE}>{i + 1}</td>
-              <td style={TI_DSP_TABLE_TD_STYLE}>{c.name}</td>
-              <td style={TI_DSP_TABLE_TD_STYLE}>{c.date}</td>
-              <td style={TI_DSP_TABLE_TD_STYLE}>{c.students.join(', ')}</td>
-              <td style={TI_DSP_TABLE_TD_STYLE}>{c.year}</td>
-              <td style={TI_DSP_TABLE_TD_STYLE}>{c.remarks}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-const CANOE_SECTIONS = [
-  'In-charge',
-  'Academic Projects [Ongoing]',
-  'Previous Project Works',
-  'Students Benefited',
-  'Faculty Mentors',
-  'Outcomes',
-  'Competitions',
-  'Activities',
-];
-
-function CanoeAccordion({
-  data,
-  academicProjectPhotos,
-  previousProjectPhotos,
-  teamPhotos,
-}: {
-  data: typeof concreteCanoeLab;
-  academicProjectPhotos: (WithId & { imageUrl: string })[];
-  previousProjectPhotos: (WithId & { imageUrl: string })[];
-  teamPhotos: Record<string, (WithId & { imageUrl: string })[]>;
-}) {
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
-
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 2, marginTop: 'var(--space-6)' }}>
-      {CANOE_SECTIONS.map((title, i) => {
-        const isOpen = openIndex === i;
-        return (
-          <div key={title}>
-            <button
-              onClick={() => setOpenIndex(isOpen ? null : i)}
-              style={{
-                width: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                background: isOpen ? 'var(--color-primary)' : 'var(--color-off-white)',
-                border: 'none',
-                padding: 'var(--space-3) var(--space-5)',
-                cursor: 'pointer',
-                textAlign: 'left',
-              }}
-            >
-              <span style={{ fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-primary)', fontSize: 'var(--text-base)' }}>{title}</span>
-              <span style={{ fontSize: '1.2rem', fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-text)', lineHeight: 1 }}>{isOpen ? '−' : '+'}</span>
-            </button>
-            <SmoothCollapse open={isOpen}>
-              <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderTop: 'none' }}>
-                {title === 'In-charge' ? (
-                  <HpcMemberCard member={data.inCharge} />
-                ) : title === 'Academic Projects [Ongoing]' ? (
-                  <>
-                    <p style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-4)' }}>
-                      {data.academicProject.heading}
-                    </p>
-                    <CanoeSimpleTableView table={data.academicProject.team} />
-                    {data.academicProject.paragraphs.map((p, i) => (
-                      <p key={i} style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-4)' }}>
-                        {p}
-                      </p>
-                    ))}
-                    <CanoePhotoGrid photos={academicProjectPhotos} />
-                  </>
-                ) : title === 'Previous Project Works' ? (
-                  <>
-                    <CanoeSimpleTableView table={data.previousProjects.table} />
-                    <CanoePhotoGrid photos={previousProjectPhotos} />
-                  </>
-                ) : title === 'Students Benefited' ? (
-                  <>
-                    {data.studentsBenefited.map((team) => (
-                      <CanoeStudentTeamPhoto key={team.label} team={team} photos={teamPhotos[team.label] ?? []} />
-                    ))}
-                  </>
-                ) : title === 'Faculty Mentors' ? (
-                  <CheckBullets items={data.facultyMentors} />
-                ) : title === 'Outcomes' ? (
-                  <>
-                    <SectionHeading>{data.outcomes.heading}</SectionHeading>
-                    <p style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-text)', marginBottom: 'var(--space-3)' }}>
-                      {data.outcomes.subheading}
-                    </p>
-                    {data.outcomes.paragraphs.map((p, i) => (
-                      <p key={i} style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-4)' }}>
-                        {p}
-                      </p>
-                    ))}
-                    <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-4)' }}>
-                      <strong>Brief: </strong>{data.outcomes.brief}
-                    </p>
-                    <p style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>Team Members</p>
-                    <CanoeSimpleTableView table={data.outcomes.team} />
-                  </>
-                ) : title === 'Competitions' ? (
-                  <CanoeCompetitionsTable competitions={data.competitions} />
-                ) : (
-                  <CheckBullets items={data.activities} />
-                )}
-              </div>
-            </SmoothCollapse>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-function DhclMemberCard({ member }: { member?: DhclMember }) {
-  if (!member) {
-    return (
-      <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)' }}>
-        Content for this section is coming soon.
-      </p>
-    );
-  }
-  return (
-    <div style={{ border: '1.5px solid var(--color-accent)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4)', maxWidth: 360, display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
-      <span style={{ fontWeight: 700, color: 'var(--color-primary)', fontSize: 'var(--text-sm)' }}>{member.name}</span>
-      {member.designation && <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)' }}>{member.designation}</span>}
-      {member.email && (
-        <a href={`mailto:${member.email}`} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-primary)', fontWeight: 600 }}>{member.email}</a>
-      )}
-      {member.mobile && (
-        <a href={`tel:${member.mobile.replace(/\s+/g, '')}`} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-primary)', fontWeight: 600 }}>{member.mobile}</a>
-      )}
-      {member.interests && <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)' }}>{member.interests}</span>}
-      {member.website && (
-        <a href={`https://${member.website.replace(/^https?:\/\//, '')}`} target="_blank" rel="noopener noreferrer" style={{ fontSize: 'var(--text-sm)', color: 'var(--color-accent-dark, var(--color-accent))', fontWeight: 600, marginTop: 'var(--space-1)' }}>
-          {member.website}
-        </a>
-      )}
-    </div>
-  );
-}
-
-const DHCL_SECTIONS = [
-  'In-charge',
-  'Academic Projects [Ongoing]',
-  'Students Benefited',
-  'Outcomes',
-  'Activities',
-];
-
-function DhclAccordion({ data }: { data: typeof dreamHouseConstructionLab }) {
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
-
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 2, marginTop: 'var(--space-6)' }}>
-      {DHCL_SECTIONS.map((title, i) => {
-        const isOpen = openIndex === i;
-        return (
-          <div key={title}>
-            <button
-              onClick={() => setOpenIndex(isOpen ? null : i)}
-              style={{
-                width: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                background: isOpen ? 'var(--color-primary)' : 'var(--color-off-white)',
-                border: 'none',
-                padding: 'var(--space-3) var(--space-5)',
-                cursor: 'pointer',
-                textAlign: 'left',
-              }}
-            >
-              <span style={{ fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-primary)', fontSize: 'var(--text-base)' }}>{title}</span>
-              <span style={{ fontSize: '1.2rem', fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-text)', lineHeight: 1 }}>{isOpen ? '−' : '+'}</span>
-            </button>
-            <SmoothCollapse open={isOpen}>
-              <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderTop: 'none' }}>
-                {title === 'In-charge' ? (
-                  <DhclMemberCard member={data.inCharge} />
-                ) : title === 'Academic Projects [Ongoing]' ? (
-                  <>
-                    <p style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-4)' }}>
-                      {data.academicProject.heading}
-                    </p>
-                    <CanoeSimpleTableView table={data.academicProject.team} />
-                    {data.academicProject.paragraphs.map((p, i) => (
-                      <p key={i} style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-4)' }}>
-                        {p}
-                      </p>
-                    ))}
-                  </>
-                ) : title === 'Students Benefited' ? (
-                  <StudentsBenefitedTable groups={data.studentsBenefited} />
-                ) : title === 'Outcomes' ? (
-                  <>
-                    <SectionHeading>{data.outcomes.heading}</SectionHeading>
-                    <p style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-text)', marginBottom: 'var(--space-3)' }}>
-                      {data.outcomes.subheading}
-                    </p>
-                    {data.outcomes.paragraphs.map((p, i) => (
-                      <p key={i} style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-4)' }}>
-                        {p}
-                      </p>
-                    ))}
-                    <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-4)' }}>
-                      <strong>Brief: </strong>{data.outcomes.brief}
-                    </p>
-                    <p style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>Team Members</p>
-                    <CanoeSimpleTableView table={data.outcomes.team} />
-                  </>
-                ) : (
-                  <CheckBullets items={data.activities} />
-                )}
-              </div>
-            </SmoothCollapse>
-          </div>
-        );
-      })}
     </div>
   );
 }
@@ -2453,109 +1795,6 @@ function NirvahanaActivitiesList({ activities }: { activities: typeof nirvahana.
   );
 }
 
-function StudentsBenefitedTable({ groups }: { groups: StudentsBenefitedGroup[] }) {
-  return (
-    <div style={{ overflowX: 'auto' }}>
-      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-        <thead>
-          <tr>
-            <th style={TI_DSP_TABLE_TH_STYLE}>S. No</th>
-            <th style={TI_DSP_TABLE_TH_STYLE}>Regd No</th>
-            <th style={TI_DSP_TABLE_TH_STYLE}>Name of the Student</th>
-          </tr>
-        </thead>
-        <tbody>
-          {groups.map((group) => (
-            <Fragment key={group.yearLabel}>
-              <tr>
-                <td colSpan={3} style={{ ...TI_DSP_TABLE_TD_STYLE, fontWeight: 700, background: 'var(--color-off-white)' }}>
-                  {group.yearLabel}
-                </td>
-              </tr>
-              {group.students.map((s, i) => (
-                <tr key={s.regdNo} style={{ background: i % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)' }}>
-                  <td style={TI_DSP_TABLE_TD_STYLE}>{i + 1}.</td>
-                  <td style={TI_DSP_TABLE_TD_STYLE}>{s.regdNo}</td>
-                  <td style={TI_DSP_TABLE_TD_STYLE}>{s.name}</td>
-                </tr>
-              ))}
-            </Fragment>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-function UltraTechAccordion({
-  sections,
-  content,
-  inCharge,
-  studentsBenefited,
-}: {
-  sections: string[];
-  content: Record<string, string[]>;
-  inCharge: UltraTechInCharge;
-  studentsBenefited: StudentsBenefitedGroup[];
-}) {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const IN_CHARGE_TITLE = 'In-charge';
-  const STUDENTS_BENEFITED_TITLE = 'Students Benefited';
-
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 2, marginTop: 'var(--space-6)' }}>
-      {sections.map((title, i) => {
-        const isOpen = openIndex === i;
-        const isInCharge = title === IN_CHARGE_TITLE;
-        const isStudentsBenefited = title === STUDENTS_BENEFITED_TITLE;
-        const items = content[title] ?? [];
-        return (
-          <div key={title}>
-            <button
-              onClick={() => setOpenIndex(isOpen ? null : i)}
-              style={{
-                width: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                background: isOpen ? 'var(--color-primary)' : 'var(--color-off-white)',
-                border: 'none',
-                padding: 'var(--space-3) var(--space-5)',
-                cursor: 'pointer',
-                textAlign: 'left',
-              }}
-            >
-              <span style={{ fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-primary)', fontSize: 'var(--text-base)' }}>{title}</span>
-              <span style={{ fontSize: '1.2rem', fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-text)', lineHeight: 1 }}>{isOpen ? '−' : '+'}</span>
-            </button>
-            <SmoothCollapse open={isOpen}>
-              <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderTop: 'none' }}>
-                {isInCharge ? (
-                  <TiDspMemberCard member={inCharge} />
-                ) : isStudentsBenefited ? (
-                  studentsBenefited.length > 0 ? (
-                    <StudentsBenefitedTable groups={studentsBenefited} />
-                  ) : (
-                    <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text-light)', margin: 0 }}>
-                      Content for this section is coming soon.
-                    </p>
-                  )
-                ) : items.length > 0 ? (
-                  <CheckBullets items={items} />
-                ) : (
-                  <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text-light)', margin: 0 }}>
-                    Content for this section is coming soon.
-                  </p>
-                )}
-              </div>
-            </SmoothCollapse>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
 const TI_DSP_TRAINING_RESEARCH_TITLE = 'Training / Research or Academic Projects [Completed / Ongoing]';
 const TI_DSP_GALLERY_TITLE = 'Gallery';
 
@@ -2641,12 +1880,17 @@ interface IicDocEntryDoc extends WithId {
   order: number;
 }
 
-function IicPage({ iic }: { iic: typeof institutionInnovationCell }) {
-  const [activeTab, setActiveTab] = useState(IIC_TABS[0]);
+// "IIC – Constitution"'s member photos (name-keyed, IicMemberPhotosAdmin.tsx)
+// and single council-members PDF link, "Innovation Ambassadors"'s and "IIC
+// Activities"'s PDF-link lists, and the 4 fully Firestore-driven tabs
+// (Rating Certificates / IIC Annual Reports / SIH Internal Hackathon
+// Reports / National Innovation Start-Up Policy, all via
+// IicDocumentsAdmin.tsx) all stay exactly as they did before — rendered
+// alongside whatever dynamic tabs the admin has defined (see
+// legacyLabSeeds.ts's seedIicTabs for the one-time starter content).
+function IicPage({ iic, tabs }: { iic: typeof institutionInnovationCell; tabs: CustomTab[] }) {
   const { docs: memberPhotos } = useCollection<WithId & { imageUrl: string }>('iicMemberPhotos', [], { silent: true });
   const memberPhotoMap = new Map(memberPhotos.map((p) => [p.id, p.imageUrl]));
-  // Admin-editable (label + PDF) — see IicDocumentsAdmin.tsx — rather than
-  // the hardcoded lists institutionInnovationCell.data.ts used to hold.
   const { docs: councilMembersLinks } = useOrderedCollection<IicDocEntryDoc>('iicCouncilMembersLinks', 'order');
   const { docs: innovationAmbassadorLinks } = useOrderedCollection<IicDocEntryDoc>('iicInnovationAmbassadorLinks', 'order');
   const { docs: iicActivityYears } = useOrderedCollection<IicDocEntryDoc>('iicActivities', 'order');
@@ -2655,1019 +1899,165 @@ function IicPage({ iic }: { iic: typeof institutionInnovationCell }) {
   const { docs: sihHackathonReports } = useOrderedCollection<IicDocEntryDoc>('iicSihHackathonReports', 'order');
   const { docs: nispPolicies } = useOrderedCollection<IicDocEntryDoc>('iicNispPolicies', 'order');
 
-  return (
-    <section className="section bg-white">
-      <div className="container">
-        <div className="detail-grid">
-          <div>
-            {activeTab === 'About IIC' && (
-              <>
-                <span className="section-label">Overview</span>
-                <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-5)' }}>About IIC</h2>
-                <p style={{ fontSize: 'var(--text-lg)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-8)' }}>
-                  {iic.about}
-                </p>
-                <IicBulletList heading="Vision" items={iic.vision} />
-                <IicBulletList heading="Mission" items={iic.mission} />
-                <div>
-                  <span className="section-label">History</span>
-                  <h2 className="section-title" style={{ fontSize: '1.5rem' }}>{iic.journeyTitle}</h2>
-                  <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75 }}>
-                    {iic.journey}
-                  </p>
-                </div>
-              </>
-            )}
-
-            {activeTab === 'IIC – Constitution' && (
-              <>
-                <span className="section-label">Governance</span>
-                <h2 className="section-title" style={{ fontSize: '1.75rem' }}>IIC – Constitution</h2>
-                <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text-light)', lineHeight: 1.7, marginBottom: 'var(--space-6)' }}>
-                  {iic.constitution.intro}
-                </p>
-
-                <h3 style={{ textAlign: 'center', color: 'var(--color-primary)', fontWeight: 900, marginBottom: 'var(--space-8)', textTransform: 'uppercase', letterSpacing: '0.03em' }}>
-                  {iic.constitution.heading}
-                </h3>
-
-                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 'var(--space-6)' }}>
-                  <div style={{ maxWidth: 220 }}>
-                    <IicMemberCard name={iic.constitution.chairman.name} role={iic.constitution.chairman.role} size={100} photoUrl={memberPhotoMap.get(iic.constitution.chairman.name)} />
-                  </div>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 'var(--space-4)', marginBottom: 'var(--space-8)' }}>
-                  {iic.constitution.leadership.map((person) => (
-                    <IicMemberCard key={person.name} name={person.name} role={person.role} size={80} photoUrl={memberPhotoMap.get(person.name)} />
-                  ))}
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 'var(--space-3)', marginBottom: 'var(--space-6)' }}>
-                  {iic.constitution.coordinators.map((person) => (
-                    <IicMemberCard key={person.name} name={person.name} role={person.role} size={64} photoUrl={memberPhotoMap.get(person.name)} />
-                  ))}
-                </div>
-
-                {councilMembersLinks.length > 0 && (
-                  <p style={{ fontSize: 'var(--text-sm)' }}>
-                    <a href={councilMembersLinks[0].fileUrl} download style={{ color: 'var(--color-primary)', fontWeight: 700 }}>
-                      {councilMembersLinks[0].label}
-                    </a>
-                  </p>
-                )}
-              </>
-            )}
-
-            {activeTab === 'Innovation Ambassadors' && (
-              <>
-                <span className="section-label">Overview</span>
-                <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-5)' }}>Innovation Ambassadors</h2>
-                <p style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-4)' }}>
-                  {iic.innovationAmbassadors.roleIntro}
-                </p>
-                <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', marginBottom: 'var(--space-8)' }}>
-                  {iic.innovationAmbassadors.responsibilities.map((point, i) => (
-                    <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-3)' }}>
-                      <span style={{ width: 20, height: 20, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
-                        <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                      </span>
-                      <span style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.6 }}>{point}</span>
-                    </li>
-                  ))}
-                </ul>
-                <p style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>
-                  {iic.innovationAmbassadors.listIntro}
-                </p>
-                {innovationAmbassadorLinks.length === 0 ? (
-                  <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text-light)' }}>Content for this section is coming soon.</p>
-                ) : (
-                  <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-                    {innovationAmbassadorLinks.map((link) => (
-                      <li key={link.id} style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)' }}>
-                        * <a href={link.fileUrl} download style={{ color: 'var(--color-primary)', fontWeight: 700 }}>{link.label}</a>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </>
-            )}
-
-            {activeTab === 'IIC Activities' && (
-              <>
-                <span className="section-label">Overview</span>
-                <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-5)' }}>IIC Activities</h2>
-                <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-6)' }}>
-                  {iic.activities.intro}
-                </p>
-                {iicActivityYears.length === 0 ? (
-                  <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text-light)' }}>Content for this section is coming soon.</p>
-                ) : (
-                  <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-                    {iicActivityYears.map((year) => (
-                      <li key={year.id} style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)' }}>
-                        * <a href={year.fileUrl} download style={{ color: 'var(--color-primary)', fontWeight: 700 }}>{year.label}</a>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </>
-            )}
-
-            {activeTab === 'Atal Tinkering Schools' && (
-              <>
-                <span className="section-label">Overview</span>
-                <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-5)' }}>Atal Tinkering Schools</h2>
-                <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-6)' }}>
-                  {iic.atalTinkeringSchools.intro}
-                </p>
-                <h3 style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-4)' }}>
-                  {iic.atalTinkeringSchools.listHeading}
-                </h3>
-                <div style={{ overflowX: 'auto' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm)' }}>
-                    <thead>
-                      <tr style={{ background: 'var(--color-accent)' }}>
-                        <th style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900, whiteSpace: 'nowrap' }}>S.No</th>
-                        <th style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900, whiteSpace: 'nowrap' }}>School Code</th>
-                        <th style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900 }}>School Name</th>
-                        <th style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900 }}>Address</th>
-                        <th style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900 }}>Email</th>
-                        <th style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900, whiteSpace: 'nowrap' }}>Mobile</th>
-                        <th style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900 }}>IIC Coordinator</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {iic.atalTinkeringSchools.schools.map((school, i) => (
-                        <tr key={school.sno} style={{ background: i % 2 === 0 ? 'var(--color-off-white)' : 'transparent' }}>
-                          <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)' }}>{school.sno}</td>
-                          <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)' }}>{school.schoolCode}</td>
-                          <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)', fontWeight: 600 }}>{school.schoolName}</td>
-                          <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)' }}>{school.address}</td>
-                          <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)' }}>{school.email}</td>
-                          <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)' }}>{school.mobile}</td>
-                          <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)' }}>{school.coordinator}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </>
-            )}
-
-            {activeTab === 'Rating Certificates' && (
-              <>
-                <span className="section-label">Overview</span>
-                <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-5)' }}>Rating Certificates</h2>
-                {ratingCertificates.length === 0 ? (
-                  <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text-light)' }}>Content for this section is coming soon.</p>
-                ) : (
-                  <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-                    {ratingCertificates.map((cert) => (
-                      <li key={cert.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-2)' }}>
-                        <span style={{ width: 20, height: 20, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
-                          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                        </span>
-                        <a href={cert.fileUrl} download style={{ color: 'var(--color-primary)', fontWeight: 700, fontSize: 'var(--text-base)' }}>{cert.label}</a>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </>
-            )}
-
-            {activeTab === 'IIC Annual Reports' && (
-              <>
-                <span className="section-label">Overview</span>
-                <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-5)' }}>IIC Annual Reports</h2>
-                {annualReports.length === 0 ? (
-                  <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text-light)' }}>Content for this section is coming soon.</p>
-                ) : (
-                  <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-                    {annualReports.map((report) => (
-                      <li key={report.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-2)' }}>
-                        <span style={{ width: 20, height: 20, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
-                          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                        </span>
-                        <a href={report.fileUrl} download style={{ color: 'var(--color-primary)', fontWeight: 700, fontSize: 'var(--text-base)' }}>{report.label}</a>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </>
-            )}
-
-            {activeTab === 'SIH Internal Hackathon Reports' && (
-              <>
-                <span className="section-label">Overview</span>
-                <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-5)' }}>SIH Internal Hackathon Reports</h2>
-                {sihHackathonReports.length === 0 ? (
-                  <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text-light)' }}>Content for this section is coming soon.</p>
-                ) : (
-                  <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-                    {sihHackathonReports.map((report) => (
-                      <li key={report.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-2)' }}>
-                        <span style={{ width: 20, height: 20, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
-                          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                        </span>
-                        <a href={report.fileUrl} download style={{ color: 'var(--color-primary)', fontWeight: 700, fontSize: 'var(--text-base)' }}>{report.label}</a>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </>
-            )}
-
-            {activeTab === 'National Innovation Start-Up Policy' && (
-              <>
-                <span className="section-label">Overview</span>
-                <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-5)' }}>{iic.nisp.heading}</h2>
-                {nispPolicies.length === 0 ? (
-                  <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text-light)' }}>Content for this section is coming soon.</p>
-                ) : (
-                <div style={{ border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
-                  {nispPolicies.map((row, i) => (
-                    <div
-                      key={row.id}
-                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-4)', padding: 'var(--space-4) var(--space-5)', background: i % 2 === 0 ? 'var(--color-off-white)' : 'var(--color-white)' }}
-                    >
-                      <span style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)' }}>{row.label}</span>
-                      <a href={row.fileUrl} download style={{ color: 'var(--color-accent)', fontWeight: 700, fontSize: 'var(--text-sm)', whiteSpace: 'nowrap' }}>Click here..</a>
-                    </div>
-                  ))}
-                </div>
-                )}
-              </>
-            )}
-
-            {!['About IIC', 'IIC – Constitution', 'Innovation Ambassadors', 'IIC Activities', 'Atal Tinkering Schools', 'Rating Certificates', 'IIC Annual Reports', 'SIH Internal Hackathon Reports', 'National Innovation Start-Up Policy'].includes(activeTab) && (
-              <>
-                <span className="section-label">Overview</span>
-                <h2 className="section-title" style={{ fontSize: '1.75rem' }}>{activeTab}</h2>
-                <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text-light)' }}>
-                  Content for this section is coming soon.
-                </p>
-              </>
-            )}
-          </div>
-
-          {/* Section nav */}
-          <div className="detail-sidebar">
-            <div style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', overflow: 'hidden', position: 'sticky', top: '110px' }}>
-              {IIC_TABS.map((tab) => {
-                const isActive = activeTab === tab;
-                return (
-                  <button
-                    key={tab}
-                    onClick={() => setActiveTab(tab)}
-                    style={{
-                      display: 'block',
-                      width: '100%',
-                      textAlign: 'left',
-                      padding: 'var(--space-3) var(--space-5)',
-                      border: 'none',
-                      borderBottom: '1px solid var(--color-light-gray)',
-                      background: isActive ? 'var(--color-primary)' : 'transparent',
-                      color: isActive ? 'var(--color-white)' : 'var(--color-primary)',
-                      fontWeight: isActive ? 700 : 600,
-                      fontSize: 'var(--text-sm)',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    {tab}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function VdlPage({ vdl }: { vdl: typeof vehicleDesignLab }) {
-  const [activeTab, setActiveTab] = useState(VDL_TABS[0]);
-  const { docs: designPhasePhotos } = useCollection<WithId & { imageUrl: string }>('vdlDesignPhasePhotos', [orderBy('order', 'asc')], { silent: true });
-  const { docs: fabricationPhasePhotos } = useCollection<WithId & { imageUrl: string }>('vdlFabricationPhasePhotos', [orderBy('order', 'asc')], { silent: true });
-  const { docs: testingPhotos } = useCollection<WithId & { imageUrl: string }>('vdlTestingPhotos', [orderBy('order', 'asc')], { silent: true });
-  const { docs: motorsportPhotos } = useCollection<WithId & { imageUrl: string }>('vdlMotorsportPhotos', [orderBy('order', 'asc')], { silent: true });
-  const { docs: campusVehiclePhotos } = useCollection<WithId & { imageUrl: string }>('vdlCampusVehiclePhotos', [orderBy('order', 'asc')], { silent: true });
-  // Doc id = the endowment's own id (see vehicleDesignLab.data.ts industryCollaborations.endowments), not an ordered list.
-  const { docs: industryCollabPhotos } = useCollection<WithId & { imageUrl: string }>('vdlIndustryCollabPhotos', [], { silent: true });
-  const industryCollabPhotoMap = new Map(industryCollabPhotos.map((p) => [p.id, p]));
-  const { docs: vdlAchievementReportDocs } = useOrderedCollection<WithId & { label: string; fileUrl: string }>('vdlAchievementReports', 'order');
-  // Parallel to vdl.facilities.activitiesPrograms (Design / Fabrication / Testing / Motorsport).
-  const phasePhotos = [designPhasePhotos, fabricationPhasePhotos, testingPhotos, motorsportPhotos];
-
-  return (
-    <section className="section bg-white">
-      <div className="container">
-        <div className="detail-grid">
-          <div>
-            {activeTab === 'About VDL' && (
-              <>
-                <span className="section-label">Overview</span>
-                <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-5)' }}>About VDL</h2>
-                {vdl.paragraphs.map((para, i) => (
-                  <p key={i} style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-4)' }}>
-                    {para}
-                  </p>
-                ))}
-                <CheckBullets items={vdl.fundamentals} />
-
-                <div style={{ marginTop: 'var(--space-6)' }}>
-                  <SectionHeading>Vision</SectionHeading>
-                  <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75 }}>
-                    {vdl.vision}
-                  </p>
-                </div>
-
-                <div style={{ marginTop: 'var(--space-6)' }}>
-                  <SectionHeading>Mission</SectionHeading>
-                  <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75 }}>
-                    {vdl.mission}
-                  </p>
-                </div>
-
-                <div style={{ marginTop: 'var(--space-6)' }}>
-                  <SectionHeading>Objectives</SectionHeading>
-                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-                    {vdl.objectives.map((o, i) => (
-                      <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-2)' }}>
-                        <span style={{ width: 20, height: 20, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
-                          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                        </span>
-                        <span style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.6 }}>
-                          <strong>{o.lead}</strong>{o.text}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div style={{ marginTop: 'var(--space-6)' }}>
-                  <VdlTeamSection team={vdl.team} />
-                </div>
-              </>
-            )}
-
-            {activeTab === 'Facilities & Projects' && (
-              <>
-                <span className="section-label">Infrastructure</span>
-                <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-5)' }}>Facilities & Projects</h2>
-                <VdlFacilitiesSection
-                  facilities={vdl.facilities}
-                  phasePhotos={phasePhotos}
-                  campusVehiclePhotos={campusVehiclePhotos}
-                />
-              </>
-            )}
-
-            {activeTab === 'Industry Collaborations' && (
-              <>
-                <span className="section-label">Partnerships</span>
-                <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-5)' }}>Industry Collaborations</h2>
-                <VdlIndustryCollaborationsSection data={vdl.industryCollaborations} photoMap={industryCollabPhotoMap} />
-              </>
-            )}
-
-            {activeTab === 'Students Achievements & Placements' && (
-              <>
-                <span className="section-label">Recognition</span>
-                <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-5)' }}>Students Achievements & Placements</h2>
-                <VdlStudentsAchievementsSection
-                  data={vdl.studentsAchievements}
-                  achievementReports={vdlAchievementReportDocs.map((d) => ({ label: d.label, href: d.fileUrl }))}
-                />
-              </>
-            )}
-
-            {activeTab === 'VDL Outcomes' && (
-              <>
-                <span className="section-label">Impact</span>
-                <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-5)' }}>VDL Outcomes</h2>
-                <VdlOutcomesSection outcomes={vdl.outcomes} />
-              </>
-            )}
-          </div>
-
-          {/* Section nav */}
-          <div className="detail-sidebar">
-            <div style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', overflow: 'hidden', position: 'sticky', top: '110px' }}>
-              {VDL_TABS.map((tab) => {
-                const isActive = activeTab === tab;
-                return (
-                  <button
-                    key={tab}
-                    onClick={() => setActiveTab(tab)}
-                    style={{
-                      display: 'block',
-                      width: '100%',
-                      textAlign: 'left',
-                      padding: 'var(--space-3) var(--space-5)',
-                      border: 'none',
-                      borderBottom: '1px solid var(--color-light-gray)',
-                      background: isActive ? 'var(--color-primary)' : 'transparent',
-                      color: isActive ? 'var(--color-white)' : 'var(--color-primary)',
-                      fontWeight: isActive ? 700 : 600,
-                      fontSize: 'var(--text-sm)',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    {tab}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function WiseModuleItemList({ items }: { items: { number: string; text: string }[] }) {
-  return (
-    <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
-      {items.map((it) => (
-        <li key={it.number} style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'flex-start' }}>
-          <span style={{ color: 'var(--color-accent)', fontSize: 'var(--text-sm)', lineHeight: 1.6 }}>▸</span>
-          <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6 }}>{it.number} {it.text}</span>
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-function WiseModuleSectionView({ section }: { section: WiseModuleSection }) {
-  return (
-    <div style={{ marginBottom: 'var(--space-5)' }}>
-      <p style={{ fontWeight: 700, color: 'var(--color-primary)', fontSize: 'var(--text-base)', marginBottom: 'var(--space-2)' }}>
-        {section.number}. {section.title}
-      </p>
-      {section.items && <WiseModuleItemList items={section.items} />}
-      {section.subgroups && section.subgroups.map((sg) => (
-        <div key={sg.number} style={{ marginTop: 'var(--space-3)', marginLeft: 'var(--space-4)' }}>
-          <p style={{ fontWeight: 700, fontSize: 'var(--text-sm)', color: 'var(--color-text)', marginBottom: 'var(--space-1)' }}>
-            {sg.number} {sg.title}
-          </p>
-          <WiseModuleItemList items={sg.items} />
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function WiseModulesSection({ intro, modules }: { intro: string; modules: WiseModuleTab[] }) {
-  const [active, setActive] = useState(0);
-  const tab = modules[active];
-
-  return (
-    <>
-      <span className="section-label">Program Modules</span>
-      <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-4)' }}>Modules</h2>
-      <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-6)' }}>
-        {intro}
-      </p>
-      <VsacTabGroup labels={modules.map((m) => m.name)} activeIndex={active} onSelect={setActive} />
-      {tab.simpleList ? (
-        <CheckBullets items={tab.simpleList} />
-      ) : (
-        tab.sections?.map((s) => <WiseModuleSectionView key={s.number} section={s} />)
-      )}
-    </>
-  );
-}
-
-function WiseProjectsSection({ intro, batches }: { intro: string; batches: WiseProjectBatch[] }) {
-  const [active, setActive] = useState(0);
-  const batch = batches[active];
-
-  return (
-    <>
-      <span className="section-label">Beneficiaries</span>
-      <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-4)' }}>Projects</h2>
-      <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-6)' }}>
-        {intro}
-      </p>
-      <VsacTabGroup labels={batches.map((b) => b.year)} activeIndex={active} onSelect={setActive} />
-      {batch.modules.map((m) => (
-        <div key={m.heading} style={{ marginBottom: 'var(--space-6)' }}>
-          <p style={{ fontWeight: 700, color: 'var(--color-primary)', fontSize: 'var(--text-base)', marginBottom: 'var(--space-2)' }}>
-            {m.heading}
-          </p>
-          <CheckBullets items={m.projects} />
-        </div>
-      ))}
-    </>
-  );
-}
-
-function WiseTeamMemberCard({ member, photoUrl }: { member: WiseTeamMember; photoUrl?: string }) {
-  return (
-    <div style={{ display: 'flex', gap: 'var(--space-4)', alignItems: 'flex-start', flexWrap: 'wrap' }}>
-      <img
-        src={photoUrl || PHOTO_NEEDED_PLACEHOLDER}
-        alt={member.name}
-        style={{ width: 90, height: 90, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '1px solid var(--color-light-gray)' }}
-      />
-      <div style={{ flex: '1 1 260px' }}>
-        <p style={{ fontWeight: 700, fontSize: 'var(--text-lg)', color: 'var(--color-primary)', margin: 0 }}>{member.name}</p>
-        <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', margin: '0 0 var(--space-3)' }}>{member.designation}</p>
-        {member.bio.map((p, i) => (
-          <p key={i} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.7, marginBottom: 'var(--space-3)' }}>{p}</p>
+  const fixedList = (docs: IicDocEntryDoc[]) => (
+    docs.length === 0 ? (
+      <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text-light)' }}>Content for this section is coming soon.</p>
+    ) : (
+      <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+        {docs.map((d) => (
+          <li key={d.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-2)' }}>
+            <span style={{ width: 20, height: 20, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            </span>
+            <a href={d.fileUrl} download style={{ color: 'var(--color-primary)', fontWeight: 700, fontSize: 'var(--text-base)' }}>{d.label}</a>
+          </li>
         ))}
-      </div>
-    </div>
+      </ul>
+    )
   );
-}
 
-function WiseTeamAccordion({ team, photoMap }: { team: WiseTeamMember[]; photoMap: Record<string, string | undefined> }) {
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
-
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 2, marginTop: 'var(--space-4)' }}>
-      {team.map((member, i) => {
-        const isOpen = openIndex === i;
-        return (
-          <div key={member.id}>
-            <button
-              onClick={() => setOpenIndex(isOpen ? null : i)}
-              style={{
-                width: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                background: isOpen ? 'var(--color-primary)' : 'var(--color-off-white)',
-                border: 'none',
-                padding: 'var(--space-3) var(--space-5)',
-                cursor: 'pointer',
-                textAlign: 'left',
-              }}
-            >
-              <span style={{ fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-primary)', fontSize: 'var(--text-base)' }}>
-                {member.name}, {member.designation}
-              </span>
-              <span style={{ fontSize: '1.2rem', fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-text)', lineHeight: 1 }}>{isOpen ? '−' : '+'}</span>
-            </button>
-            <SmoothCollapse open={isOpen}>
-              <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderTop: 'none' }}>
-                <WiseTeamMemberCard member={member} photoUrl={photoMap[member.id]} />
-              </div>
-            </SmoothCollapse>
+  const dynamicTabItems: TabItem[] = tabs.map((tab): TabItem => {
+    let fixedExtra: ReactNode = null;
+    if (tab.label === 'IIC – Constitution') {
+      fixedExtra = (
+        <div style={{ marginTop: 'var(--space-6)' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 'var(--space-6)' }}>
+            <div style={{ maxWidth: 220 }}>
+              <IicMemberCard name={iic.constitution.chairman.name} role={iic.constitution.chairman.role} size={100} photoUrl={memberPhotoMap.get(iic.constitution.chairman.name)} />
+            </div>
           </div>
-        );
-      })}
-    </div>
-  );
-}
-
-function WiseEliteInfoCard({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div style={{ border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', overflow: 'hidden', background: 'var(--color-white)' }}>
-      <div style={{ background: 'var(--color-primary-dark)', color: 'var(--color-white)', padding: 'var(--space-3) var(--space-4)', fontWeight: 700, fontSize: 'var(--text-sm)' }}>
-        {title}
-      </div>
-      <div style={{ padding: 'var(--space-4)' }}>
-        {children}
-      </div>
-    </div>
-  );
-}
-
-function WiseEliteProjectView({ project, photoUrl }: { project: WiseEliteProject; photoUrl?: string }) {
-  return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--space-4)' }}>
-      <WiseEliteInfoCard title={`Project: ${project.name}`}>
-        <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.7, marginBottom: 'var(--space-4)' }}>
-          {project.description}
-        </p>
-        <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-          {project.students.map((s) => (
-            <li key={s.name} style={{ display: 'flex', justifyContent: 'space-between', gap: 'var(--space-3)', fontSize: 'var(--text-sm)', color: 'var(--color-text)' }}>
-              <span>• {s.name}</span>
-              <span style={{ color: 'var(--color-text-light)', whiteSpace: 'nowrap' }}>{s.college}</span>
-            </li>
-          ))}
-        </ul>
-      </WiseEliteInfoCard>
-      <WiseEliteInfoCard title={`Project: ${project.name}`}>
-        <img
-          src={photoUrl || PHOTO_NEEDED_PLACEHOLDER}
-          alt={project.name}
-          style={{ width: '100%', height: 220, objectFit: 'cover', borderRadius: 'var(--radius-sm)' }}
-        />
-      </WiseEliteInfoCard>
-    </div>
-  );
-}
-
-function WiseEliteProjectsSection({
-  intro,
-  projects,
-  photoMap,
-}: {
-  intro: string;
-  projects: WiseEliteProject[];
-  photoMap: Record<string, string | undefined>;
-}) {
-  const [active, setActive] = useState(0);
-  const project = projects[active];
-
-  return (
-    <>
-      <p style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-4)' }}>
-        {intro}
-      </p>
-      <VsacTabGroup labels={projects.map((p) => p.name)} activeIndex={active} onSelect={setActive} />
-      <WiseEliteProjectView project={project} photoUrl={photoMap[project.id]} />
-    </>
-  );
-}
-
-function WiseMentoringTable({ batch }: { batch: WiseMentoringBatch }) {
-  return (
-    <>
-      <p style={{ fontWeight: 700, color: 'var(--color-primary)', fontSize: 'var(--text-base)', marginBottom: 'var(--space-3)' }}>
-        {batch.heading}
-      </p>
-      <div style={{ overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr>
-              <th style={TI_DSP_TABLE_TH_STYLE}>S.No</th>
-              <th style={TI_DSP_TABLE_TH_STYLE}>Name of the Student</th>
-              <th style={TI_DSP_TABLE_TH_STYLE}>Regd No</th>
-              <th style={TI_DSP_TABLE_TH_STYLE}>Section</th>
-            </tr>
-          </thead>
-          <tbody>
-            {batch.students.map((s, i) => (
-              <tr key={s.regdNo} style={{ background: i % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)' }}>
-                <td style={TI_DSP_TABLE_TD_STYLE}>{i + 1}</td>
-                <td style={TI_DSP_TABLE_TD_STYLE}>{s.name}</td>
-                <td style={TI_DSP_TABLE_TD_STYLE}>{s.regdNo}</td>
-                <td style={TI_DSP_TABLE_TD_STYLE}>{s.section}</td>
-              </tr>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 'var(--space-4)', marginBottom: 'var(--space-8)' }}>
+            {iic.constitution.leadership.map((person) => (
+              <IicMemberCard key={person.name} name={person.name} role={person.role} size={80} photoUrl={memberPhotoMap.get(person.name)} />
             ))}
-          </tbody>
-        </table>
-      </div>
-    </>
-  );
-}
-
-function WiseMentoringSection({ paragraphs, batches }: { paragraphs: string[]; batches: WiseMentoringBatch[] }) {
-  const [active, setActive] = useState(0);
-  const batch = batches[active];
-
-  return (
-    <>
-      <span className="section-label">Advanced Track</span>
-      <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-5)' }}>Microsoft Mentoring Program</h2>
-      {paragraphs.map((para, i) => (
-        <p key={i} style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-4)' }}>
-          {para}
-        </p>
-      ))}
-      <div style={{ marginTop: 'var(--space-6)' }}>
-        <VsacTabGroup labels={batches.map((b) => b.tabLabel)} activeIndex={active} onSelect={setActive} />
-        <WiseMentoringTable batch={batch} />
-      </div>
-    </>
-  );
-}
-
-function WisePlacementStatsTable({ ranges }: { ranges: WisePlacementStatsYear['ranges'] }) {
-  return (
-    <div style={{ overflowX: 'auto' }}>
-      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-        <thead>
-          <tr>
-            <th style={TI_DSP_TABLE_TH_STYLE}>Range</th>
-            <th style={TI_DSP_TABLE_TH_STYLE}>Total Count</th>
-            <th style={TI_DSP_TABLE_TH_STYLE}>Company Selected</th>
-            <th style={TI_DSP_TABLE_TH_STYLE}>Package</th>
-            <th style={TI_DSP_TABLE_TH_STYLE}>No. of Students</th>
-          </tr>
-        </thead>
-        <tbody>
-          {ranges.map((r) => r.rows.map((row, i) => (
-            <tr key={`${r.range}-${i}`} style={{ background: i % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)' }}>
-              {i === 0 && (
-                <td rowSpan={r.rows.length} style={{ ...TI_DSP_TABLE_TD_STYLE, fontWeight: 700, verticalAlign: 'top', background: 'var(--color-off-white)' }}>
-                  {r.range}
-                </td>
-              )}
-              {i === 0 && (
-                <td rowSpan={r.rows.length} style={{ ...TI_DSP_TABLE_TD_STYLE, verticalAlign: 'top', background: 'var(--color-off-white)' }}>
-                  {r.totalCount}
-                </td>
-              )}
-              <td style={TI_DSP_TABLE_TD_STYLE}>{row.company}</td>
-              <td style={TI_DSP_TABLE_TD_STYLE}>{row.package}</td>
-              <td style={TI_DSP_TABLE_TD_STYLE}>{row.count}</td>
-            </tr>
-          )))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-function WisePlacementStatsAccordion({ years }: { years: WisePlacementStatsYear[] }) {
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
-
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-      {years.map((y, i) => {
-        const isOpen = openIndex === i;
-        return (
-          <div key={y.heading}>
-            <button
-              onClick={() => setOpenIndex(isOpen ? null : i)}
-              style={{
-                width: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                background: isOpen ? 'var(--color-primary)' : 'var(--color-off-white)',
-                border: 'none',
-                padding: 'var(--space-3) var(--space-5)',
-                cursor: 'pointer',
-                textAlign: 'left',
-              }}
-            >
-              <span style={{ fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-primary)', fontSize: 'var(--text-base)' }}>{y.heading}</span>
-              <span style={{ fontSize: '1.2rem', fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-text)', lineHeight: 1 }}>{isOpen ? '−' : '+'}</span>
-            </button>
-            <SmoothCollapse open={isOpen}>
-              <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderTop: 'none' }}>
-                <p style={{ fontWeight: 700, color: 'var(--color-primary)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-3)' }}>{y.heading}</p>
-                <WisePlacementStatsTable ranges={y.ranges} />
-              </div>
-            </SmoothCollapse>
           </div>
-        );
-      })}
-    </div>
-  );
-}
-
-function WiseTestimonialCard({ testimonial, photoUrl }: { testimonial: WiseTestimonial; photoUrl?: string }) {
-  return (
-    <div style={{ display: 'flex', gap: 'var(--space-4)', alignItems: 'flex-start', flexWrap: 'wrap' }}>
-      <img
-        src={photoUrl || PHOTO_NEEDED_PLACEHOLDER}
-        alt={testimonial.name}
-        style={{ width: 90, height: 90, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '1px solid var(--color-light-gray)' }}
-      />
-      <div style={{ flex: '1 1 260px' }}>
-        <p style={{ fontWeight: 700, fontSize: 'var(--text-lg)', color: 'var(--color-primary)', margin: 0 }}>{testimonial.name}</p>
-        <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', margin: '0 0 var(--space-3)' }}>
-          {testimonial.batch} | {testimonial.company}
-        </p>
-        {testimonial.quote.map((p, i) => (
-          <p key={i} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.7, marginBottom: 'var(--space-3)' }}>{p}</p>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function WiseTestimonialAccordion({ testimonials, photoMap }: { testimonials: WiseTestimonial[]; photoMap: Record<string, string | undefined> }) {
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
-
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 2, marginTop: 'var(--space-4)' }}>
-      {testimonials.map((t, i) => {
-        const isOpen = openIndex === i;
-        return (
-          <div key={t.id}>
-            <button
-              onClick={() => setOpenIndex(isOpen ? null : i)}
-              style={{
-                width: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                background: isOpen ? 'var(--color-primary)' : 'var(--color-off-white)',
-                border: 'none',
-                padding: 'var(--space-3) var(--space-5)',
-                cursor: 'pointer',
-                textAlign: 'left',
-              }}
-            >
-              <span style={{ fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-primary)', fontSize: 'var(--text-base)' }}>
-                {t.name} | {t.batch}.
-              </span>
-              <span style={{ fontSize: '1.2rem', fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-text)', lineHeight: 1 }}>{isOpen ? '−' : '+'}</span>
-            </button>
-            <SmoothCollapse open={isOpen}>
-              <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderTop: 'none' }}>
-                <WiseTestimonialCard testimonial={t} photoUrl={photoMap[t.id]} />
-              </div>
-            </SmoothCollapse>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 'var(--space-3)', marginBottom: 'var(--space-6)' }}>
+            {iic.constitution.coordinators.map((person) => (
+              <IicMemberCard key={person.name} name={person.name} role={person.role} size={64} photoUrl={memberPhotoMap.get(person.name)} />
+            ))}
           </div>
-        );
-      })}
-    </div>
-  );
-}
-
-function WiseNseClippingCard({ clipping, photoUrl }: { clipping: WiseNseClipping; photoUrl?: string }) {
-  return (
-    <div>
-      <div style={{ border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', overflow: 'hidden', background: 'var(--color-off-white)' }}>
-        <img
-          src={photoUrl || PHOTO_NEEDED_PLACEHOLDER}
-          alt={clipping.caption}
-          style={{ width: '100%', height: 'auto', display: 'block' }}
-        />
-      </div>
-      <p style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-primary)', textAlign: 'center', marginTop: 'var(--space-2)' }}>
-        {clipping.caption}
-      </p>
-    </div>
-  );
-}
-
-function WiseNseSection({ paragraphs, clippings, photoMap }: { paragraphs: string[]; clippings: WiseNseClipping[]; photoMap: Record<string, string | undefined> }) {
-  return (
-    <>
-      <span className="section-label">Partnership</span>
-      <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-5)' }}>TalentSprint @ NSE</h2>
-      {paragraphs.map((para, i) => (
-        <p key={i} style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-4)' }}>
-          {para}
-        </p>
-      ))}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 'var(--space-5)', marginTop: 'var(--space-6)' }}>
-        {clippings.map((c) => (
-          <WiseNseClippingCard key={c.id} clipping={c} photoUrl={photoMap[c.id]} />
-        ))}
-      </div>
-    </>
-  );
-}
-
-function WisePage({ wise }: { wise: typeof talentSprintWise }) {
-  const [activeTab, setActiveTab] = useState(WISE_TABS[0]);
-  const { docs: wiseTeamPhotos } = useCollection<WithId & { imageUrl?: string }>('wiseTeamPhotos', [], { silent: true });
-  const wiseTeamPhotoMap = Object.fromEntries(wiseTeamPhotos.map((p) => [p.id, p.imageUrl]));
-  const { docs: wiseElitePhotos } = useCollection<WithId & { imageUrl?: string }>('wiseEliteProjectPhotos', [], { silent: true });
-  const wiseElitePhotoMap = Object.fromEntries(wiseElitePhotos.map((p) => [p.id, p.imageUrl]));
-  const { docs: wiseTestimonialPhotos } = useCollection<WithId & { imageUrl?: string }>('wiseTestimonialPhotos', [], { silent: true });
-  const wiseTestimonialPhotoMap = Object.fromEntries(wiseTestimonialPhotos.map((p) => [p.id, p.imageUrl]));
-  const { docs: wiseNsePhotos } = useCollection<WithId & { imageUrl?: string }>('wiseNseClippings', [], { silent: true });
-  const wiseNsePhotoMap = Object.fromEntries(wiseNsePhotos.map((p) => [p.id, p.imageUrl]));
-
-  return (
-    <section className="section bg-white">
-      <div className="container">
-        <div className="detail-grid">
-          <div>
-            {activeTab === 'About WISE' && (
-              <>
-                <span className="section-label">Overview</span>
-                <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-5)' }}>About WISE</h2>
-                {wise.paragraphs.map((para, i) => (
-                  <p key={i} style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-4)' }}>
-                    {para}
-                  </p>
-                ))}
-                <div style={{ marginTop: 'var(--space-6)' }}>
-                  <SectionHeading>Program Objectives</SectionHeading>
-                  <CheckBullets items={wise.objectives} />
-                </div>
-              </>
-            )}
-
-            {activeTab === 'Modules' && (
-              <WiseModulesSection intro={wise.modulesIntro} modules={wise.modules} />
-            )}
-
-            {activeTab === 'Projects' && (
-              <WiseProjectsSection intro={wise.projectsIntro} batches={wise.projectBatches} />
-            )}
-
-            {activeTab === 'WISE Team' && (
-              <>
-                <span className="section-label">Team</span>
-                <h2 className="section-title" style={{ fontSize: '1.75rem' }}>WISE Team</h2>
-                <WiseTeamAccordion team={wise.team} photoMap={wiseTeamPhotoMap} />
-              </>
-            )}
-
-            {activeTab === 'ELITE Program' && (
-              <>
-                <span className="section-label">Advanced Track</span>
-                <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-5)' }}>ELITE Program</h2>
-                {wise.elite.intro.map((para, i) => (
-                  <p key={i} style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-4)' }}>
-                    {para}
-                  </p>
-                ))}
-
-                <div style={{ marginTop: 'var(--space-6)' }}>
-                  <SectionHeading>Level – 1 Selection Criteria</SectionHeading>
-                  <ol style={{ margin: 0, padding: '0 0 0 1.2rem', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-                    {wise.elite.level1.map((point, i) => (
-                      <li key={i} style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.6 }}>{point}</li>
-                    ))}
-                  </ol>
-                </div>
-
-                <div style={{ marginTop: 'var(--space-6)' }}>
-                  <SectionHeading>Level – 2 Selection Criteria</SectionHeading>
-                  <ol style={{ margin: 0, padding: '0 0 0 1.2rem', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-                    {wise.elite.level2.map((point, i) => (
-                      <li key={i} style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.6 }}>{point}</li>
-                    ))}
-                  </ol>
-                </div>
-
-                <div style={{ marginTop: 'var(--space-6)' }}>
-                  <SectionHeading>Benefits of WISE-ELITE Program</SectionHeading>
-                  <CheckBullets items={wise.elite.benefits} />
-                </div>
-
-                <div style={{ marginTop: 'var(--space-6)' }}>
-                  <WiseEliteProjectsSection intro={wise.elite.projectsIntro} projects={wise.elite.projects} photoMap={wiseElitePhotoMap} />
-                </div>
-              </>
-            )}
-
-            {activeTab === 'Microsoft Mentoring Program' && (
-              <WiseMentoringSection paragraphs={wise.mentoring.paragraphs} batches={wise.mentoring.batches} />
-            )}
-
-            {activeTab === 'Testimonials' && (
-              <>
-                <span className="section-label">Voices</span>
-                <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Testimonials</h2>
-                <WiseTestimonialAccordion testimonials={wise.testimonials} photoMap={wiseTestimonialPhotoMap} />
-              </>
-            )}
-
-            {activeTab === 'TalentSprint @ NSE' && (
-              <WiseNseSection paragraphs={wise.nse.paragraphs} clippings={wise.nse.clippings} photoMap={wiseNsePhotoMap} />
-            )}
-
-            {activeTab === 'Beneficiaries – Placements' && (
-              <>
-                <span className="section-label">Impact</span>
-                <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-5)' }}>Beneficiaries – Placements</h2>
-
-                <WisePlacementStatsAccordion years={wise.beneficiaryStats} />
-              </>
-            )}
-
-            {!['About WISE', 'Modules', 'Projects', 'WISE Team', 'ELITE Program', 'Microsoft Mentoring Program', 'Beneficiaries – Placements', 'Testimonials', 'TalentSprint @ NSE'].includes(activeTab) && (
-              <>
-                <span className="section-label">Overview</span>
-                <h2 className="section-title" style={{ fontSize: '1.75rem' }}>{activeTab}</h2>
-                <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text-light)' }}>
-                  Content for this section is coming soon.
-                </p>
-              </>
-            )}
-          </div>
-
-          {/* Section nav */}
-          <div className="detail-sidebar">
-            <div style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', overflow: 'hidden', position: 'sticky', top: '110px' }}>
-              {WISE_TABS.map((tab) => {
-                const isActive = activeTab === tab;
-                return (
-                  <button
-                    key={tab}
-                    onClick={() => setActiveTab(tab)}
-                    style={{
-                      display: 'block',
-                      width: '100%',
-                      textAlign: 'left',
-                      padding: 'var(--space-3) var(--space-5)',
-                      border: 'none',
-                      borderBottom: '1px solid var(--color-light-gray)',
-                      background: isActive ? 'var(--color-primary)' : 'transparent',
-                      color: isActive ? 'var(--color-white)' : 'var(--color-primary)',
-                      fontWeight: isActive ? 700 : 600,
-                      fontSize: 'var(--text-sm)',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    {tab}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+          {councilMembersLinks.length > 0 && (
+            <p style={{ fontSize: 'var(--text-sm)' }}>
+              <a href={councilMembersLinks[0].fileUrl} download style={{ color: 'var(--color-primary)', fontWeight: 700 }}>
+                {councilMembersLinks[0].label}
+              </a>
+            </p>
+          )}
         </div>
-      </div>
-    </section>
-  );
+      );
+    } else if (tab.label === 'Innovation Ambassadors') {
+      fixedExtra = (
+        <div style={{ marginTop: 'var(--space-6)' }}>
+          <p style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>
+            {iic.innovationAmbassadors.listIntro}
+          </p>
+          {fixedList(innovationAmbassadorLinks)}
+        </div>
+      );
+    } else if (tab.label === 'IIC Activities') {
+      fixedExtra = <div style={{ marginTop: 'var(--space-6)' }}>{fixedList(iicActivityYears)}</div>;
+    }
+    return {
+      id: tab.id,
+      label: tab.label,
+      content: (
+        <>
+          {tab.sectionsDisplay === 'pills' ? <CustomSectionsPills sections={tab.sections} /> : <CustomSectionsPlain sections={tab.sections} />}
+          {fixedExtra}
+        </>
+      ),
+    };
+  });
+
+  const mergedTabs: TabItem[] = [
+    ...dynamicTabItems,
+    { id: 'rating-certificates', label: 'Rating Certificates', content: fixedList(ratingCertificates) },
+    { id: 'iic-annual-reports', label: 'IIC Annual Reports', content: fixedList(annualReports) },
+    { id: 'sih-hackathon-reports', label: 'SIH Internal Hackathon Reports', content: fixedList(sihHackathonReports) },
+    {
+      id: 'nisp',
+      label: 'National Innovation Start-Up Policy',
+      heading: iic.nisp.heading,
+      content: nispPolicies.length === 0 ? (
+        <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text-light)' }}>Content for this section is coming soon.</p>
+      ) : (
+        <div style={{ border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
+          {nispPolicies.map((row, i) => (
+            <div
+              key={row.id}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-4)', padding: 'var(--space-4) var(--space-5)', background: i % 2 === 0 ? 'var(--color-off-white)' : 'var(--color-white)' }}
+            >
+              <span style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)' }}>{row.label}</span>
+              <a href={row.fileUrl} download style={{ color: 'var(--color-accent)', fontWeight: 700, fontSize: 'var(--text-sm)', whiteSpace: 'nowrap' }}>Click here..</a>
+            </div>
+          ))}
+        </div>
+      ),
+    },
+  ];
+
+  const defaultTabId = tabs.find(hasTabContent)?.id ?? mergedTabs[0]?.id;
+  return <CustomTabsPage tabs={mergedTabs} defaultTabId={defaultTabId} />;
+}
+
+// Facility-phase/industry-collab photos used to be matched to this content
+// by array position or endowment id (VdlFacilitiesPhotosAdmin.tsx) — that
+// panel is retired along with these tabs' conversion; a "Photos" files
+// section in each seeded tab lets the admin re-add them freely instead (see
+// legacyLabSeeds.ts's seedVdlTabs). The achievement-reports list
+// (VdlAchievementsAdmin.tsx, already freely-addable Firestore CRUD) stays
+// exactly as it did before, rendered directly below the "Students
+// Achievements & Placements" tab's dynamic content.
+function VdlPage({ tabs }: { tabs: CustomTab[] }) {
+  const { docs: vdlAchievementReportDocs } = useOrderedCollection<WithId & { label: string; fileUrl: string }>('vdlAchievementReports', 'order');
+
+  const dynamicTabItems: TabItem[] = tabs.map((tab): TabItem => {
+    let fixedExtra: ReactNode = null;
+    if (tab.label === 'Students Achievements & Placements' && vdlAchievementReportDocs.length > 0) {
+      fixedExtra = (
+        <div style={{ marginTop: 'var(--space-6)' }}>
+          <h4 style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>
+            Achievement Reports
+          </h4>
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+            {vdlAchievementReportDocs.map((d) => (
+              <li key={d.id} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                <span style={{ width: 20, height: 20, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                </span>
+                <a href={d.fileUrl} download style={{ fontSize: 'var(--text-base)', color: 'var(--color-primary)', fontWeight: 600 }}>{d.label}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      );
+    }
+    return {
+      id: tab.id,
+      label: tab.label,
+      content: (
+        <>
+          {tab.sectionsDisplay === 'pills' ? <CustomSectionsPills sections={tab.sections} /> : <CustomSectionsPlain sections={tab.sections} />}
+          {fixedExtra}
+        </>
+      ),
+    };
+  });
+
+  const defaultTabId = tabs.find(hasTabContent)?.id ?? dynamicTabItems[0]?.id;
+  return <CustomTabsPage tabs={dynamicTabItems} defaultTabId={defaultTabId} />;
+}
+
+// All 9 tabs are fully admin-defined now (see legacyLabSeeds.ts's
+// seedWiseTabs). Team/Testimonial/ELITE-project/NSE-clipping photos used to
+// be admin-uploaded per fixed hardcoded id (WiseTeamPhotosAdmin.tsx etc.) —
+// those panels are retired along with this page's conversion; a "Photos"
+// files section within the matching seeded tab lets the admin re-add them,
+// just without the old per-item fixed slot.
+function WisePage({ tabs }: { tabs: CustomTab[] }) {
+  const tabItems: TabItem[] = tabs.map((tab) => ({ id: tab.id, label: tab.label, content: tab.sectionsDisplay === 'pills' ? <CustomSectionsPills sections={tab.sections} /> : <CustomSectionsPlain sections={tab.sections} /> }));
+  const defaultTabId = tabs.find(hasTabContent)?.id ?? tabItems[0]?.id;
+  return <CustomTabsPage tabs={tabItems} defaultTabId={defaultTabId} />;
 }
 
 const IDEA_LAB_TABLE_TH_STYLE: CSSProperties = {
@@ -3787,124 +2177,26 @@ function IdeaLabFacilitiesGrid({ photos }: { photos: (WithId & { imageUrl: strin
   );
 }
 
-function IdeaLabPage({ ideaLab }: { ideaLab: typeof aicteIdeaLab }) {
-  const [activeTab, setActiveTab] = useState(IDEA_LAB_TABS[0]);
+// Team, Student Ambassadors, and Facilities are already fully
+// Firestore-driven, freely-addable CRUD (AicteIdeaLabTeamAdmin.tsx /
+// AicteIdeaLabAmbassadorsAdmin.tsx / AicteIdeaLabFacilityPhotosAdmin.tsx) —
+// those stay exactly as they did before, as fixed tabs alongside whatever
+// dynamic tabs the admin has defined (see legacyLabSeeds.ts's
+// seedIdeaLabTabs for the one-time starter content).
+function IdeaLabPage({ tabs }: { tabs: CustomTab[] }) {
   const { docs: team } = useOrderedCollection<AicteIdeaLabTeamMemberDoc>('aicteIdeaLabTeam', 'order');
   const { docs: ambassadors } = useOrderedCollection<AicteIdeaLabAmbassadorDoc>('aicteIdeaLabAmbassadors', 'order');
   const { docs: facilityPhotos } = useOrderedCollection<WithId & { imageUrl: string }>('aicteIdeaLabFacilityPhotos', 'order');
 
-  return (
-    <section className="section bg-white">
-      <div className="container">
-        <div className="detail-grid">
-          <div>
-            {activeTab === 'About AICTE IDEA Lab' && (
-              <>
-                <span className="section-label">Overview</span>
-                <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-5)' }}>About AICTE IDEA Lab</h2>
-                <p style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-4)' }}>
-                  {ideaLab.tagline}
-                </p>
-                {ideaLab.paragraphs.map((para, i) => (
-                  <p key={i} style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-4)' }}>
-                    {para}
-                  </p>
-                ))}
+  const mergedTabs: TabItem[] = [
+    ...tabs.map((tab): TabItem => ({ id: tab.id, label: tab.label, content: tab.sectionsDisplay === 'pills' ? <CustomSectionsPills sections={tab.sections} /> : <CustomSectionsPlain sections={tab.sections} /> })),
+    { id: 'team', label: 'Team', eyebrow: 'Team', heading: 'SVECW AICTE IDEA LAB Team', content: <IdeaLabTeamTable team={team} /> },
+    { id: 'student-ambassadors', label: 'Student Ambassadors', content: <IdeaLabAmbassadorsTable ambassadors={ambassadors} /> },
+    { id: 'facilities', label: 'Facilities', eyebrow: 'Infrastructure', heading: 'Facilities Available in AICTE – IDEA LAB', content: <IdeaLabFacilitiesGrid photos={facilityPhotos} /> },
+  ];
 
-                <div style={{ marginTop: 'var(--space-6)' }}>
-                  <SectionHeading>Vision</SectionHeading>
-                  <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-                    {ideaLab.vision.map((v, i) => (
-                      <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-3)' }}>
-                        <span style={{ width: 20, height: 20, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
-                          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                        </span>
-                        <span style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.6 }}>{v}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div style={{ marginTop: 'var(--space-6)' }}>
-                  <SectionHeading>Institute & Coordinator Details</SectionHeading>
-                  <div style={{ background: 'var(--color-off-white)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
-                    {ideaLab.fields.map((f, i) => (
-                      <div
-                        key={i}
-                        className="mobile-stack-grid"
-                        style={{ display: 'grid', gridTemplateColumns: '240px 1fr', gap: 'var(--space-4)', padding: 'var(--space-4) var(--space-5)', background: i % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)' }}
-                      >
-                        <span style={{ fontWeight: 700, color: 'var(--color-primary)', fontSize: 'var(--text-sm)' }}>{f.label}</span>
-                        <div>
-                          {f.value.map((line, li) => (
-                            <p key={li} style={{ margin: 0, fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6 }}>{line}</p>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </>
-            )}
-
-            {activeTab === 'Team' && (
-              <>
-                <span className="section-label">Team</span>
-                <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-5)' }}>SVECW AICTE IDEA LAB Team</h2>
-                <IdeaLabTeamTable team={team} />
-              </>
-            )}
-
-            {activeTab === 'Student Ambassadors' && (
-              <>
-                <span className="section-label">Student Ambassadors</span>
-                <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-5)' }}>Student Ambassadors</h2>
-                <IdeaLabAmbassadorsTable ambassadors={ambassadors} />
-              </>
-            )}
-
-            {activeTab === 'Facilities' && (
-              <>
-                <span className="section-label">Infrastructure</span>
-                <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-5)' }}>Facilities Available in AICTE – IDEA LAB</h2>
-                <IdeaLabFacilitiesGrid photos={facilityPhotos} />
-              </>
-            )}
-          </div>
-
-          {/* Section nav */}
-          <div className="detail-sidebar">
-            <div style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', overflow: 'hidden', position: 'sticky', top: '110px' }}>
-              {IDEA_LAB_TABS.map((tab) => {
-                const isActive = activeTab === tab;
-                return (
-                  <button
-                    key={tab}
-                    onClick={() => setActiveTab(tab)}
-                    style={{
-                      display: 'block',
-                      width: '100%',
-                      textAlign: 'left',
-                      padding: 'var(--space-3) var(--space-5)',
-                      border: 'none',
-                      borderBottom: '1px solid var(--color-light-gray)',
-                      background: isActive ? 'var(--color-primary)' : 'transparent',
-                      color: isActive ? 'var(--color-white)' : 'var(--color-primary)',
-                      fontWeight: isActive ? 700 : 600,
-                      fontSize: 'var(--text-sm)',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    {tab}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
+  const defaultTabId = tabs.find(hasTabContent)?.id ?? mergedTabs[0]?.id;
+  return <CustomTabsPage tabs={mergedTabs} defaultTabId={defaultTabId} />;
 }
 
 const CATEGORY_ICONS: Record<string, typeof Rocket> = {
@@ -3983,15 +2275,12 @@ export default function DifferentiatorDetail() {
   const hcl = item.slug === 'hcl-vlsi-training' ? hclVlsiTraining : null;
   const microchip = item.slug === 'microchip-embedded' ? microchipEmbedded : null;
   const tidsp = item.slug === 'ti-dsp-coe' ? tiDspCoe : null;
-  const ultraTech = item.slug === 'ultratech-coe' ? ultraTechCoe : null;
   const c2s = item.slug === 'chips-to-startup' ? chipsToStartup : null;
   const vsacPage = item.slug === 'vsac' ? vsac : null;
   const arVr = item.slug === 'ar-vr-studio' ? arVrStudio : null;
   const vdl = item.slug === 'vehicle-design-lab' ? vehicleDesignLab : null;
   const atl = item.slug === 'assistive-tech-lab' ? assistiveTechLab : null;
   const hpc = item.slug === 'hpc-lab' ? highPerformanceComputingLab : null;
-  const canoe = item.slug === 'concrete-canoe-lab' ? concreteCanoeLab : null;
-  const dhcl = item.slug === 'dream-house-lab' ? dreamHouseConstructionLab : null;
   const fl = item.slug === 'foreign-languages' ? foreignLanguages : null;
   const wise = item.slug === 'talentsprint-wise' ? talentSprintWise : null;
   const si = item.slug === 'smart-interviews' ? smartInterviews : null;
@@ -4034,7 +2323,7 @@ export default function DifferentiatorDetail() {
             {/* Main content */}
             <div>
               <span className="section-label">Overview</span>
-              <h2 className="section-title" style={{ fontSize: '1.75rem' }}>{ultraTech ? ultraTech.pageTitle : arVr ? arVr.pageTitle : `About ${item.title}`}</h2>
+              <h2 className="section-title" style={{ fontSize: '1.75rem' }}>{arVr ? arVr.pageTitle : `About ${item.title}`}</h2>
               {atl ? (
                 <>
                   {atl.paragraphs.map((para, i) => (
@@ -4111,69 +2400,6 @@ export default function DifferentiatorDetail() {
                   </div>
 
                   <HpcAccordion data={hpc} />
-                </>
-              ) : canoe ? (
-                <>
-                  {canoe.paragraphs.map((para, i) => (
-                    <p key={i} style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-4)' }}>
-                      {para}
-                    </p>
-                  ))}
-
-                  <div>
-                    <SectionHeading>Vision</SectionHeading>
-                    <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-6)' }}>
-                      {canoe.vision}
-                    </p>
-                  </div>
-
-                  <div>
-                    <SectionHeading>Mission</SectionHeading>
-                    <CheckBullets items={canoe.mission} />
-                  </div>
-
-                  <div>
-                    <SectionHeading>Objectives</SectionHeading>
-                    <CheckBullets items={canoe.objectives} />
-                  </div>
-
-                  <CanoeAccordion
-                    data={canoe}
-                    academicProjectPhotos={canoeAcademicProjectPhotos}
-                    previousProjectPhotos={canoePreviousProjectPhotos}
-                    teamPhotos={{
-                      'Team – WAKA (IV Year, 2020 Batch)': canoeTeamWakaPhotos,
-                      'Team – AIKYAM (III Year, 2021 Batch)': canoeTeamAikyamPhotos,
-                      'Team – KANU': canoeTeamKanuPhotos,
-                    }}
-                  />
-                </>
-              ) : dhcl ? (
-                <>
-                  {dhcl.paragraphs.map((para, i) => (
-                    <p key={i} style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-4)' }}>
-                      {para}
-                    </p>
-                  ))}
-
-                  <div>
-                    <SectionHeading>Vision</SectionHeading>
-                    <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-6)' }}>
-                      {dhcl.vision}
-                    </p>
-                  </div>
-
-                  <div>
-                    <SectionHeading>Mission</SectionHeading>
-                    <CheckBullets items={dhcl.mission} />
-                  </div>
-
-                  <div>
-                    <SectionHeading>Objectives</SectionHeading>
-                    <CheckBullets items={dhcl.objectives} />
-                  </div>
-
-                  <DhclAccordion data={dhcl} />
                 </>
               ) : fl ? (
                 <>
@@ -4511,38 +2737,6 @@ export default function DifferentiatorDetail() {
                     outcomePhotos={c2sOutcomePhotos}
                   />
                 </>
-              ) : ultraTech ? (
-                <>
-                  <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-6)' }}>
-                    {ultraTech.overview}
-                  </p>
-
-                  <div>
-                    <SectionHeading>Vision</SectionHeading>
-                    <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-6)' }}>
-                      {ultraTech.vision}
-                    </p>
-                  </div>
-
-                  <div>
-                    <SectionHeading>Mission</SectionHeading>
-                    <CheckBullets items={ultraTech.mission} />
-                  </div>
-
-                  <div>
-                    <SectionHeading>Objectives</SectionHeading>
-                    <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75 }}>
-                      {ultraTech.objectives}
-                    </p>
-                  </div>
-
-                  <UltraTechAccordion
-                    sections={ultraTech.accordionSections}
-                    content={ultraTech.accordionContent}
-                    inCharge={ultraTech.inCharge}
-                    studentsBenefited={ultraTech.studentsBenefited}
-                  />
-                </>
               ) : tidsp ? (
                 <>
                   <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-6)' }}>
@@ -4755,6 +2949,16 @@ export default function DifferentiatorDetail() {
                   )}
                 </>
               )}
+
+              {/* Admin-defined custom sections (see lib/customSections.ts) —
+                  used by items whose real content used to be hardcoded with
+                  no admin field at all (Ultra Tech CoE, Concrete Canoe Lab,
+                  Dream House Construction Lab), and available to any other
+                  item that adds its own. 'intro'-placed sections (e.g.
+                  Vision/Mission/Objectives) render compactly right here;
+                  everything else renders as a collapsible accordion below. */}
+              <CustomSectionsIntro sections={item.customSections || []} />
+              <CustomSectionsAccordion sections={item.customSections || []} />
             </div>
 
             {/* Sidebar: key highlights */}
@@ -4788,21 +2992,54 @@ export default function DifferentiatorDetail() {
       </section>
       )}
 
+      {/* Concrete Canoe Lab's photo galleries are admin-managed separately
+          (Admin > Differentiators > Concrete Canoe Lab > Photos) — shown as
+          their own labeled blocks here rather than woven into a specific
+          custom section, since a generic section has no way to know which
+          Firestore photo collection belongs to it. */}
+      {item.slug === 'concrete-canoe-lab' && (
+        canoeAcademicProjectPhotos.length > 0 || canoePreviousProjectPhotos.length > 0
+        || canoeTeamWakaPhotos.length > 0 || canoeTeamAikyamPhotos.length > 0 || canoeTeamKanuPhotos.length > 0
+      ) && (
+        <section className="section bg-off-white">
+          <div className="container">
+            <div style={{ marginBottom: 'var(--space-8)' }}>
+              <span className="section-label">Gallery</span>
+              <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Photos</h2>
+            </div>
+            {[
+              { label: 'Academic Project Photos', photos: canoeAcademicProjectPhotos },
+              { label: 'Previous Project Photos', photos: canoePreviousProjectPhotos },
+              { label: 'Team – WAKA Photos', photos: canoeTeamWakaPhotos },
+              { label: 'Team – AIKYAM Photos', photos: canoeTeamAikyamPhotos },
+              { label: 'Team – KANU Photos', photos: canoeTeamKanuPhotos },
+            ].filter((g) => g.photos.length > 0).map((g, gi, arr) => (
+              <div key={g.label} style={{ marginBottom: gi < arr.length - 1 ? 'var(--space-8)' : 0 }}>
+                <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>
+                  {g.label}
+                </h3>
+                <CanoePhotoGrid photos={g.photos} />
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Institution Innovation Cell's own tabbed page (About IIC / IIC –
           Constitution / and 7 more sections navigable from its sidebar). */}
-      {iic && <IicPage iic={iic} />}
+      {iic && <IicPage iic={iic} tabs={item.tabs || []} />}
 
       {/* Vehicle Design Lab's own tabbed page (About VDL / Facilities &
           Projects / and 3 more sections navigable from its sidebar). */}
-      {vdl && <VdlPage vdl={vdl} />}
+      {vdl && <VdlPage tabs={item.tabs || []} />}
 
       {/* TalentSprint – WISE's own tabbed page (About WISE / Beneficiaries –
           Placements / and 7 more sections navigable from its sidebar). */}
-      {wise && <WisePage wise={wise} />}
+      {wise && <WisePage tabs={item.tabs || []} />}
 
       {/* AICTE IDEA Lab's own tabbed page (About AICTE IDEA Lab / Team /
           Student Ambassadors / Facilities navigable from its sidebar). */}
-      {ideaLab && <IdeaLabPage ideaLab={ideaLab} />}
+      {ideaLab && <IdeaLabPage tabs={item.tabs || []} />}
 
       {/* Facilities */}
       {item.facilities && item.facilities.length > 0 && (
