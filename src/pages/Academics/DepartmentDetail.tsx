@@ -5,6 +5,7 @@ import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import ImageLightbox from '../../components/ImageLightbox/ImageLightbox';
 import ProgrammeStructure from '../../components/ProgrammeStructure/ProgrammeStructure';
 import DepartmentNewsSection, { type DepartmentNewsDoc } from '../../components/DepartmentNews/DepartmentNewsSection';
+import NewsEventsTabs from '../../components/NewsEventsTabs/NewsEventsTabs';
 import BodyBlocks, { parseBodyContent } from '../../components/BodyBlocks/BodyBlocks';
 import SmoothCollapse from '../../components/SmoothCollapse/SmoothCollapse';
 import SEO from '../../components/SEO/SEO';
@@ -218,17 +219,25 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   const activeOutcome = outcomeGroups.find((g) => g.key === outcomeTab) ?? outcomeGroups[0];
   const hasMindMap = !!activeProgram.mindMapImage;
   // News & Events on the grouped department page is department-wide, not
-  // per-toggle-side: both sources aggregate across every programme in the
-  // group so an admin can enter it under whichever programme and it shows
-  // identically on every side of the toggle. Two independent sources — the
-  // per-academic-year table (ProgramsAdmin's "News & Events — Department
-  // Page" field) and the plain departmentNews collection cards ("News &
-  // Events — This Programme", rendered by <DepartmentNewsSection> below).
-  // Either, both, or neither can be present.
-  const newsEventsYears = (
-    subPrograms.map((p) => p.newsEventsYears).find((arr) => arr && arr.length > 0) || []
-  ).filter((y) => y.year && y.columns?.length > 0 && y.rows?.length > 0);
-  const hasNewsEvents = newsEventsYears.length > 0;
+  // per-toggle-side, and split into three admin-defined categories (see
+  // NewsEventsTabs) — read from the department doc, same as Vision/Labs/
+  // Library. "News & Events" is the one category with legacy content that
+  // used to live on a programme doc (ProgramsAdmin's old "News & Events —
+  // Department Page" field); it falls back to whichever sub-program still
+  // has it (first non-empty) until DepartmentsAdmin's "Copy from Programs"
+  // moves it over — Student Awards / Others never existed per-programme, so
+  // they're department-only with no fallback. Independent of the plain
+  // departmentNews collection cards ("News & Events — This Programme",
+  // rendered by <DepartmentNewsSection> below) — either, both, or neither
+  // can be present.
+  const validYears = (arr?: { year: string; columns: string[]; rows: { cells: string[] }[] }[]) =>
+    (arr || []).filter((y) => y.year && y.columns?.length > 0 && y.rows?.length > 0);
+  const newsEventsCategories = [
+    { key: 'news', label: 'News & Events', years: validYears(dept?.newsEventsYears?.length ? dept.newsEventsYears : subPrograms.map((p) => p.newsEventsYears).find((arr) => arr && arr.length > 0)) },
+    { key: 'awards', label: 'Student Awards', years: validYears(dept?.studentAwardsYears) },
+    { key: 'others', label: 'Others', years: validYears(dept?.othersYears) },
+  ];
+  const hasNewsEvents = newsEventsCategories.some((c) => c.years.length > 0);
   const hasDeptNews = deptNewsDocs.some((n) => group.programSlugs.includes(n.program));
   const newsletterYears = (activeProgram.newsletterYears || []).filter((y) => y.year && y.issues && y.issues.length > 0);
   const hasNewsletter = newsletterYears.length > 0;
@@ -1011,42 +1020,9 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
         </div>
       </section>
 
-      {/* News & Events — department-wide admin-defined academic-year tables */}
-      {hasNewsEvents && (
-        <section id="news-events" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
-          <div className="container">
-            <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label">{deptName}</span>
-              <h2 className="section-title">News &amp; Events</h2>
-            </div>
-            {newsEventsYears.map((yr, yi) => (
-              <div key={yi} style={{ marginBottom: yi === newsEventsYears.length - 1 ? 0 : 'var(--space-8)' }}>
-                <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.1rem', color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>
-                  Academic Year :: {yr.year}
-                </h3>
-                <div className="pb-activities-scroll">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th className="pb-activities-num">S.No</th>
-                        {yr.columns.map((col, ci) => <th key={ci}>{col}</th>)}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {yr.rows.map((row, ri) => (
-                        <tr key={ri}>
-                          <td className="pb-activities-num">{ri + 1}</td>
-                          {yr.columns.map((_, ci) => <td key={ci}>{row.cells[ci] ?? ''}</td>)}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+      {/* News & Events — department-wide, tabbed across News & Events /
+          Student Awards / Others (see NewsEventsTabs). */}
+      <NewsEventsTabs categories={newsEventsCategories} eyebrow={deptName} navOffset={NAV_OFFSET} />
 
       {/* News & Events — live from the departmentNews collection, tagged to
           this programme (Programs admin's "News & Events — This Programme").

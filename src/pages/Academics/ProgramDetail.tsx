@@ -6,6 +6,7 @@ import ImageLightbox from '../../components/ImageLightbox/ImageLightbox';
 import ProgrammeStructure from '../../components/ProgrammeStructure/ProgrammeStructure';
 import BodyBlocks, { parseBodyContent } from '../../components/BodyBlocks/BodyBlocks';
 import DepartmentNewsSection, { type DepartmentNewsDoc } from '../../components/DepartmentNews/DepartmentNewsSection';
+import NewsEventsTabs from '../../components/NewsEventsTabs/NewsEventsTabs';
 import DepartmentDetail from './DepartmentDetail';
 import FreshmanSubDepartment from './FreshmanSubDepartment';
 import { SUB_DEPTS } from './FreshmanEngineering';
@@ -173,14 +174,24 @@ function SingleProgramDetail() {
   // A year counts once it has a label and at least one issue slot (even an
   // issue with no PDF yet still renders, just as "Unavailable" — this lets
   // an admin scaffold a year's issues ahead of uploading each PDF).
-  // Admin-defined academic-year table (Programs admin's "News & Events —
-  // Department Page") — originally AI/CSE/ECE-only (see DepartmentDetail.tsx),
-  // now available to every programme too, alongside the simpler
-  // departmentNews-collection-based section below. A programme only ends up
-  // with both showing if an admin fills in both; in practice each programme
-  // picks one.
-  const newsEventsYears = (program.newsEventsYears || []).filter((y) => y.year && y.columns?.length > 0 && y.rows?.length > 0);
-  const hasNewsEventsYears = newsEventsYears.length > 0;
+  // Admin-defined academic-year table, split into News & Events / Student
+  // Awards / Others tabs (see NewsEventsTabs) — department-wide like Vision/
+  // Labs/Library above, read from the same matching `dept`. "News & Events"
+  // is the one category with legacy content that used to live directly on
+  // this programme doc (ProgramsAdmin's old "News & Events — Department
+  // Page" field); it falls back to that until DepartmentsAdmin's "Copy from
+  // Programs" moves it over — Student Awards / Others never existed
+  // per-programme, so they're department-only. Independent of the simpler
+  // departmentNews-collection-based section below — a programme only ends up
+  // with both showing if an admin fills in both.
+  const validYears = (arr?: { year: string; columns: string[]; rows: { cells: string[] }[] }[]) =>
+    (arr || []).filter((y) => y.year && y.columns?.length > 0 && y.rows?.length > 0);
+  const newsEventsCategories = [
+    { key: 'news', label: 'News & Events', years: validYears(dept?.newsEventsYears?.length ? dept.newsEventsYears : program.newsEventsYears) },
+    { key: 'awards', label: 'Student Awards', years: validYears(dept?.studentAwardsYears) },
+    { key: 'others', label: 'Others', years: validYears(dept?.othersYears) },
+  ];
+  const hasNewsEventsYears = newsEventsCategories.some((c) => c.years.length > 0);
   const newsletterYears = (program.newsletterYears || []).filter((y) => y.year && y.issues && y.issues.length > 0);
   const hasNewsletter = newsletterYears.length > 0;
   const newsletterMaxIssues = Math.max(0, ...newsletterYears.map((y) => y.issues.length));
@@ -871,44 +882,9 @@ function SingleProgramDetail() {
         </section>
       )}
 
-      {/* News & Events — admin-defined academic-year tables (Programs admin's
-          "News & Events — Department Page"), same rendering as the AI/CSE/ECE
-          grouped department page. */}
-      {hasNewsEventsYears && (
-        <section id="news-events" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
-          <div className="container">
-            <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label">{program.shortName || program.name}</span>
-              <h2 className="section-title">News &amp; Events</h2>
-            </div>
-            {newsEventsYears.map((yr, yi) => (
-              <div key={yi} style={{ marginBottom: yi === newsEventsYears.length - 1 ? 0 : 'var(--space-8)' }}>
-                <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.1rem', color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>
-                  Academic Year :: {yr.year}
-                </h3>
-                <div className="pb-activities-scroll">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th className="pb-activities-num">S.No</th>
-                        {yr.columns.map((col, ci) => <th key={ci}>{col}</th>)}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {yr.rows.map((row, ri) => (
-                        <tr key={ri}>
-                          <td className="pb-activities-num">{ri + 1}</td>
-                          {yr.columns.map((_, ci) => <td key={ci}>{row.cells[ci] ?? ''}</td>)}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+      {/* News & Events — department-wide, tabbed across News & Events /
+          Student Awards / Others (see NewsEventsTabs). */}
+      <NewsEventsTabs categories={newsEventsCategories} eyebrow={deptTitle || program.shortName || program.name} navOffset={NAV_OFFSET} />
 
       {/* News & Events — live from the departmentNews collection, tagged to
           this program. Both this and the admin-defined table above are

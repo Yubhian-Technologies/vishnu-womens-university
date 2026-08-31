@@ -6,7 +6,8 @@ import ImageUploader from '../../../components/ImageUploader/ImageUploader';
 import FileUploader from '../../../components/FileUploader/FileUploader';
 import { deleteFile, type UploadResult } from '../../../lib/storage';
 import { PROGRAM_ICON_NAMES } from '../../../lib/programIcons';
-import { normalizeLab, type LabItem, type LibrarySection, type LibraryItem, type ProgramDoc } from './ProgramsAdmin';
+import { normalizeLab, type LabItem, type LibrarySection, type LibraryItem, type NewsEventsYear, type ProgramDoc } from './ProgramsAdmin';
+import NewsEventsYearsEditor from './NewsEventsYearsEditor';
 
 // Backs the "Academic Departments" card grid on Academics.tsx — independent
 // of the `programs` collection, so a department's card copy doesn't have to
@@ -68,6 +69,15 @@ export interface DepartmentDoc {
   placementIntro?: string;
   placementStats?: LibraryItem[];
   placementRecruiters?: string[];
+  // News & Events — department-wide, split into three admin-defined
+  // categories shown as tabs on the public page (see NewsEventsTabs). Each
+  // is the same academic-year table shape as everything else here. No
+  // per-programme editing exists for this anymore; `newsEventsYears` used to
+  // live on ProgramDoc — legacy content there is picked up by "Copy from
+  // Programs" below.
+  newsEventsYears?: NewsEventsYear[];
+  studentAwardsYears?: NewsEventsYear[];
+  othersYears?: NewsEventsYear[];
 }
 
 const EMPTY: Omit<DepartmentDoc, 'id'> = {
@@ -78,6 +88,7 @@ const EMPTY: Omit<DepartmentDoc, 'id'> = {
   libraryIntro: '', libraryInCharge: '', librarySections: [],
   programLevels: [],
   placementIntro: '', placementStats: [], placementRecruiters: [],
+  newsEventsYears: [], studentAwardsYears: [], othersYears: [],
 };
 
 function linesToArray(text: string): string[] {
@@ -114,7 +125,7 @@ export default function DepartmentsAdmin() {
   const [saving, setSaving] = useState(false);
   const [copying, setCopying] = useState(false);
 
-  const set = (k: string, v: string | number | string[] | LibrarySection[] | ProgramLevel[] | LibraryItem[] | LabItem[]) => setForm((p) => ({ ...p, [k]: v }));
+  const set = (k: string, v: string | number | string[] | LibrarySection[] | ProgramLevel[] | LibraryItem[] | LabItem[] | NewsEventsYear[]) => setForm((p) => ({ ...p, [k]: v }));
   const handleHero = (r: UploadResult) => setForm((p) => ({ ...p, heroImage: r.url, storagePath: r.path }));
   const handleHodImage = (r: UploadResult) => setForm((p) => ({ ...p, hodImage: r.url, hodImageStoragePath: r.path }));
 
@@ -125,37 +136,50 @@ export default function DepartmentsAdmin() {
   // has the most of it (see programRichness) — filling in only the fields a
   // department doc doesn't already have, so it never overwrites anything an
   // admin has already entered directly on the department.
-  const departmentsMissingContent = departments.filter((d) => {
+  const matchingPrograms = (d: DepartmentDoc) => {
     const code = d.shortCode.trim().toUpperCase();
-    const matches = allPrograms.filter((p) => (DEPT_PROGRAM_CODE_ALIASES[p.department] || p.department || '').trim().toUpperCase() === code);
+    return allPrograms.filter((p) => (DEPT_PROGRAM_CODE_ALIASES[p.department] || p.department || '').trim().toUpperCase() === code);
+  };
+  // News & Events isn't part of programRichness (it's a separate legacy
+  // field, not one of Vision/Mission/Values/Labs/Library) — found
+  // independently as whichever matching program still has it, same "first
+  // non-empty wins" rule the grouped department page itself already uses
+  // when pooling across AI&ML/AI&DS etc.
+  const legacyNewsEvents = (matches: ProgramDoc[]) => matches.map((p) => p.newsEventsYears).find((arr) => arr && arr.length > 0);
+  const departmentsMissingContent = departments.filter((d) => {
+    const matches = matchingPrograms(d);
     const richest = matches.reduce((best: ProgramDoc | null, p) => (!best || programRichness(p) > programRichness(best) ? p : best), null);
-    if (!richest || programRichness(richest) === 0) return false;
-    const missing = !d.vision && !!richest.vision
+    const news = legacyNewsEvents(matches);
+    const missing = (richest && programRichness(richest) > 0 && (
+      !d.vision && !!richest.vision
       || !(d.mission?.length) && !!richest.mission?.length
       || !(d.coreValues?.length) && !!richest.coreValues?.length
       || !(d.labs?.length) && !!richest.labs?.length
       || !d.libraryIntro && !!richest.libraryIntro
       || !d.libraryInCharge && !!richest.libraryInCharge
-      || !(d.librarySections?.length) && !!richest.librarySections?.length;
+      || !(d.librarySections?.length) && !!richest.librarySections?.length
+    )) || (!(d.newsEventsYears?.length) && !!news?.length);
     return missing;
   });
   const copyFromPrograms = async () => {
-    if (!confirm(`Copy Vision/Mission/Values, Laboratories, and Department Library from each department's richest programme into ${departmentsMissingContent.length} department(s) that don't already have it? This never overwrites content already entered directly on a department.`)) return;
+    if (!confirm(`Copy Vision/Mission/Values, Laboratories, Department Library, and News & Events from each department's programme(s) into ${departmentsMissingContent.length} department(s) that don't already have it? This never overwrites content already entered directly on a department.`)) return;
     setCopying(true);
     try {
       for (const d of departmentsMissingContent) {
-        const code = d.shortCode.trim().toUpperCase();
-        const matches = allPrograms.filter((p) => (DEPT_PROGRAM_CODE_ALIASES[p.department] || p.department || '').trim().toUpperCase() === code);
+        const matches = matchingPrograms(d);
         const richest = matches.reduce((best: ProgramDoc | null, p) => (!best || programRichness(p) > programRichness(best) ? p : best), null);
-        if (!richest) continue;
+        const news = legacyNewsEvents(matches);
         const patch: Record<string, unknown> = {};
-        if (!d.vision && richest.vision) patch.vision = richest.vision;
-        if (!(d.mission?.length) && richest.mission?.length) patch.mission = richest.mission;
-        if (!(d.coreValues?.length) && richest.coreValues?.length) patch.coreValues = richest.coreValues;
-        if (!(d.labs?.length) && richest.labs?.length) patch.labs = richest.labs;
-        if (!d.libraryIntro && richest.libraryIntro) patch.libraryIntro = richest.libraryIntro;
-        if (!d.libraryInCharge && richest.libraryInCharge) patch.libraryInCharge = richest.libraryInCharge;
-        if (!(d.librarySections?.length) && richest.librarySections?.length) patch.librarySections = richest.librarySections;
+        if (richest) {
+          if (!d.vision && richest.vision) patch.vision = richest.vision;
+          if (!(d.mission?.length) && richest.mission?.length) patch.mission = richest.mission;
+          if (!(d.coreValues?.length) && richest.coreValues?.length) patch.coreValues = richest.coreValues;
+          if (!(d.labs?.length) && richest.labs?.length) patch.labs = richest.labs;
+          if (!d.libraryIntro && richest.libraryIntro) patch.libraryIntro = richest.libraryIntro;
+          if (!d.libraryInCharge && richest.libraryInCharge) patch.libraryInCharge = richest.libraryInCharge;
+          if (!(d.librarySections?.length) && richest.librarySections?.length) patch.librarySections = richest.librarySections;
+        }
+        if (!(d.newsEventsYears?.length) && news?.length) patch.newsEventsYears = news;
         if (Object.keys(patch).length > 0) await updateDoc(doc(db, 'departments', d.id), patch);
       }
       alert(`Copied into ${departmentsMissingContent.length} department(s).`);
@@ -352,6 +376,7 @@ export default function DepartmentsAdmin() {
       librarySections: (d.librarySections || []).map((s) => ({ heading: s.heading, items: s.items || [] })),
       programLevels: (d.programLevels || []).map((l) => ({ title: l.title, intro: l.intro || '', rows: l.rows || [] })),
       placementIntro: d.placementIntro || '', placementStats: d.placementStats || [], placementRecruiters: d.placementRecruiters || [],
+      newsEventsYears: d.newsEventsYears || [], studentAwardsYears: d.studentAwardsYears || [], othersYears: d.othersYears || [],
     });
   };
 
@@ -633,6 +658,27 @@ export default function DepartmentsAdmin() {
             )}
           </div>
 
+          <div className="admin-field admin-field--full"><hr /><h3>Department Page — News &amp; Events</h3>
+            <p className="admin-field__hint" style={{ marginTop: '0.25rem' }}>
+              Shown as a shared "News &amp; Events" section, with a tab to switch between the three lists below —
+              same academic-year table shape for each, with columns you define per year (e.g. "Date", "Seminars /
+              Workshop"); "S.No" is added automatically. A tab with nothing in it still shows, so leaving one empty
+              for now is fine.
+            </p>
+          </div>
+          <div className="admin-field admin-field--full">
+            <label>News &amp; Events</label>
+            <NewsEventsYearsEditor years={form.newsEventsYears || []} onChange={(years) => set('newsEventsYears', years)} />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label>Student Awards</label>
+            <NewsEventsYearsEditor years={form.studentAwardsYears || []} onChange={(years) => set('studentAwardsYears', years)} />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label>Others</label>
+            <NewsEventsYearsEditor years={form.othersYears || []} onChange={(years) => set('othersYears', years)} />
+          </div>
+
           <div className="admin-field admin-field--full"><hr /><h3>Department Page — Head of Department</h3></div>
           <div className="admin-field admin-field--full">
             <label>HOD Photo</label>
@@ -664,8 +710,8 @@ export default function DepartmentsAdmin() {
         <h2 className="admin-card__title">Departments ({departments.length})</h2>
         {departmentsMissingContent.length > 0 && (
           <p className="admin-field__hint" style={{ margin: '0 0 1rem' }}>
-            {departmentsMissingContent.length} department(s) are missing Vision/Mission/Values, Laboratories, or
-            Department Library that already exist on one of their programmes.{' '}
+            {departmentsMissingContent.length} department(s) are missing Vision/Mission/Values, Laboratories,
+            Department Library, or News &amp; Events that already exist on one of their programmes.{' '}
             <button className="admin-btn admin-btn--sm" onClick={copyFromPrograms} disabled={copying}>
               {copying ? 'Copying…' : 'Copy from Programs'}
             </button>
