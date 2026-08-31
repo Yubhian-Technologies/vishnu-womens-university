@@ -382,7 +382,7 @@ export default function FacultyAdmin() {
         <div className="admin-form-grid">
           <div className="admin-field" style={{ gridColumn: '1 / -1', maxWidth: 200 }}>
             <label>Photo</label>
-            <ImageUploader folder="vwu/faculty" currentUrl={form.imageUrl} onUploaded={handleImage} label="Upload Photo" />
+            <ImageUploader folder="vwu/faculty" currentUrl={form.imageUrl} onUploaded={handleImage} label="Upload Photo" aspect={1} />
           </div>
           <div className="admin-field">
             <label htmlFor="field-full-name">Full Name *</label>

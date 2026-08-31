@@ -137,7 +137,7 @@ export interface ProgramDoc {
   hodResearchProfiles: ProgramLink[];
   mindMapImage: string;
   mindMapImageStoragePath: string;
-  // Optional — shown as a "Digital Library" section + Quick Links entry on
+  // Optional — shown as a "Department Library" section + Quick Links entry on
   // every programme's page (same shared template, not per-branch content,
   // and stored on this programme's own doc so each branch's library data is
   // completely independent of every other's).
@@ -145,7 +145,7 @@ export interface ProgramDoc {
   libraryInCharge?: string;
   // Fully admin-defined: any number of sections, each with any number of
   // items — nothing about headings or item names is fixed, so different
-  // programmes can have entirely different Digital Library content. Each
+  // programmes can have entirely different Department Library content. Each
   // section renders as its own table on the public page.
   librarySections?: LibrarySection[];
   // Optional — shown as a "News & Events" section + Quick Links entry on
@@ -275,7 +275,7 @@ export default function ProgramsAdmin() {
   const handleHodImage = (r: UploadResult) => setForm((p) => ({ ...p, hodImage: r.url, hodImageStoragePath: r.path }));
   const handleMindMapImage = (r: UploadResult) => setForm((p) => ({ ...p, mindMapImage: r.url, mindMapImageStoragePath: r.path }));
 
-  // Digital Library (sections + items) editing — same structured add /
+  // Department Library (sections + items) editing — same structured add /
   // remove / reorder shape as Programme Structure above, just for an
   // arbitrary set of "heading + item rows" tables instead of semesters.
   const librarySections = form.librarySections || [];
@@ -970,15 +970,20 @@ export default function ProgramsAdmin() {
             <ImageUploader folder="vwu/programs/mindmap" currentUrl={form.mindMapImage} onUploaded={handleMindMapImage} label="Upload Mind Map Image" />
           </div>
 
-          <div className="admin-field admin-field--full"><hr /><h3>Digital Library</h3></div>
+          <div className="admin-field admin-field--full"><hr /><h3>Department Library</h3></div>
           <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>
-            Optional. Shown as a "Digital Library" section (and Quick Links entry) on this programme's page, right
-            after Laboratories. Each section below becomes its own table on the public page — headings and items
-            are entirely up to you, so different programmes can have completely different Digital Library content.
+            Optional. Shown as a "Department Library" section (and Quick Links entry) on this programme's page,
+            right after Laboratories. Each section below becomes its own table on the public page — headings and
+            items are entirely up to you, so different programmes can have completely different Department Library
+            content.
           </p>
           <div className="admin-field admin-field--full">
             <label>Library Overview</label>
-            <textarea rows={3} value={form.libraryIntro} onChange={(e) => set('libraryIntro', e.target.value)} placeholder="The Department Library occupies a unique place in academic and research activities of the Department…" />
+            <p className="admin-field__hint" style={{ marginTop: 0 }}>
+              One point per line starting with "- " renders as a bullet list; a line with no "- " is its own
+              paragraph. Wrap text in **double asterisks** for bold.
+            </p>
+            <textarea rows={5} value={form.libraryIntro} onChange={(e) => set('libraryIntro', e.target.value)} placeholder={'The Department Library occupies a unique place in academic and research activities of the Department…\n\n- The library is open from 8.00 a.m. to 5.00 p.m. on all days.\n- CDs of full series of lectures on specific subjects and text books are available to students for reference.'} />
           </div>
           <div className="admin-field admin-field--full">
             <label>In-charge of Department Library</label>
@@ -1023,7 +1028,7 @@ export default function ProgramsAdmin() {
             ))}
             <button type="button" className="admin-btn admin-btn--primary" onClick={addLibrarySection}>+ Add Section</button>
             {librarySections.length === 0 && (
-              <p className="admin-field__hint">No sections yet — click "Add Section" to start building this programme's Digital Library.</p>
+              <p className="admin-field__hint">No sections yet — click "Add Section" to start building this programme's Department Library.</p>
             )}
           </div>
 
