@@ -3,9 +3,10 @@ import { collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp } from '
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
 import ImageUploader from '../../../components/ImageUploader/ImageUploader';
-import type { UploadResult } from '../../../lib/storage';
+import FileUploader from '../../../components/FileUploader/FileUploader';
+import { deleteFile, type UploadResult } from '../../../lib/storage';
 import { PROGRAM_ICON_NAMES } from '../../../lib/programIcons';
-import type { LibrarySection, LibraryItem } from './ProgramsAdmin';
+import { normalizeLab, type LabItem, type LibrarySection, type LibraryItem, type ProgramDoc } from './ProgramsAdmin';
 
 // Backs the "Academic Departments" card grid on Academics.tsx — independent
 // of the `programs` collection, so a department's card copy doesn't have to
@@ -48,7 +49,11 @@ export interface DepartmentDoc {
   vision?: string;
   mission?: string[];
   coreValues?: string[];
-  labs?: string[];
+  // Same shape as a programme's own (see ProgramsAdmin) — a department's
+  // labs are no longer editable per-programme, so this is the only place
+  // they're entered. Legacy docs may still hold plain strings; normalizeLab()
+  // upgrades either shape at read time.
+  labs?: (string | LabItem)[];
   // Digital Library — same shape as a programme's own (see ProgramsAdmin),
   // shown as a shared section before the program toggle on the grouped
   // department page.
@@ -82,15 +87,122 @@ function arrayToLines(arr: string[] = []): string {
   return arr.join('\n');
 }
 
+// A couple of legacy `programs` docs spell out their department in prose
+// ("Civil", "Mechanical") rather than the Academic Departments admin's short
+// code ("CE", "ME") — this is the only place that mismatch needs correcting
+// for the copy-from-programs match below; every other department's programs
+// already use its short code exactly.
+const DEPT_PROGRAM_CODE_ALIASES: Record<string, string> = { Civil: 'CE', Mechanical: 'ME' };
+
+// How much Vision/Mission/Values/Labs/Library content a program actually
+// has — used to pick which of a department's programs to copy from when it
+// has more than one (e.g. CSE also has M.Tech./Ph.D. programs alongside the
+// B.Tech. one that actually carries this content).
+function programRichness(p: ProgramDoc): number {
+  return (p.vision ? 100 : 0)
+    + (p.mission?.length || 0) * 10
+    + (p.coreValues?.length || 0) * 5
+    + (p.labs?.length || 0) * 3
+    + (p.libraryIntro || p.libraryInCharge || p.librarySections?.length ? 50 : 0);
+}
+
 export default function DepartmentsAdmin() {
   const { docs: departments, loading } = useOrderedCollection<DepartmentDoc>('departments', 'order');
+  const { docs: allPrograms } = useOrderedCollection<ProgramDoc>('programs', 'order');
   const [form, setForm] = useState<Omit<DepartmentDoc, 'id'>>(EMPTY);
   const [editing, setEditing] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [copying, setCopying] = useState(false);
 
-  const set = (k: string, v: string | number | string[] | LibrarySection[] | ProgramLevel[] | LibraryItem[]) => setForm((p) => ({ ...p, [k]: v }));
+  const set = (k: string, v: string | number | string[] | LibrarySection[] | ProgramLevel[] | LibraryItem[] | LabItem[]) => setForm((p) => ({ ...p, [k]: v }));
   const handleHero = (r: UploadResult) => setForm((p) => ({ ...p, heroImage: r.url, storagePath: r.path }));
   const handleHodImage = (r: UploadResult) => setForm((p) => ({ ...p, hodImage: r.url, hodImageStoragePath: r.path }));
+
+  // Vision/Mission/Values, Laboratories, and the Department Library used to
+  // be edited per-programme; a lot of departments already have this content
+  // sitting on their programme(s) from before that changed. This one-click
+  // action copies it over — per department, from whichever of its programs
+  // has the most of it (see programRichness) — filling in only the fields a
+  // department doc doesn't already have, so it never overwrites anything an
+  // admin has already entered directly on the department.
+  const departmentsMissingContent = departments.filter((d) => {
+    const code = d.shortCode.trim().toUpperCase();
+    const matches = allPrograms.filter((p) => (DEPT_PROGRAM_CODE_ALIASES[p.department] || p.department || '').trim().toUpperCase() === code);
+    const richest = matches.reduce((best: ProgramDoc | null, p) => (!best || programRichness(p) > programRichness(best) ? p : best), null);
+    if (!richest || programRichness(richest) === 0) return false;
+    const missing = !d.vision && !!richest.vision
+      || !(d.mission?.length) && !!richest.mission?.length
+      || !(d.coreValues?.length) && !!richest.coreValues?.length
+      || !(d.labs?.length) && !!richest.labs?.length
+      || !d.libraryIntro && !!richest.libraryIntro
+      || !d.libraryInCharge && !!richest.libraryInCharge
+      || !(d.librarySections?.length) && !!richest.librarySections?.length;
+    return missing;
+  });
+  const copyFromPrograms = async () => {
+    if (!confirm(`Copy Vision/Mission/Values, Laboratories, and Department Library from each department's richest programme into ${departmentsMissingContent.length} department(s) that don't already have it? This never overwrites content already entered directly on a department.`)) return;
+    setCopying(true);
+    try {
+      for (const d of departmentsMissingContent) {
+        const code = d.shortCode.trim().toUpperCase();
+        const matches = allPrograms.filter((p) => (DEPT_PROGRAM_CODE_ALIASES[p.department] || p.department || '').trim().toUpperCase() === code);
+        const richest = matches.reduce((best: ProgramDoc | null, p) => (!best || programRichness(p) > programRichness(best) ? p : best), null);
+        if (!richest) continue;
+        const patch: Record<string, unknown> = {};
+        if (!d.vision && richest.vision) patch.vision = richest.vision;
+        if (!(d.mission?.length) && richest.mission?.length) patch.mission = richest.mission;
+        if (!(d.coreValues?.length) && richest.coreValues?.length) patch.coreValues = richest.coreValues;
+        if (!(d.labs?.length) && richest.labs?.length) patch.labs = richest.labs;
+        if (!d.libraryIntro && richest.libraryIntro) patch.libraryIntro = richest.libraryIntro;
+        if (!d.libraryInCharge && richest.libraryInCharge) patch.libraryInCharge = richest.libraryInCharge;
+        if (!(d.librarySections?.length) && richest.librarySections?.length) patch.librarySections = richest.librarySections;
+        if (Object.keys(patch).length > 0) await updateDoc(doc(db, 'departments', d.id), patch);
+      }
+      alert(`Copied into ${departmentsMissingContent.length} department(s).`);
+    } catch (e) {
+      alert(`Couldn't finish copying: ${(e as Error).message}`);
+    } finally {
+      setCopying(false);
+    }
+  };
+
+  // Laboratories editor — same shape/pattern as the old per-programme one in
+  // ProgramsAdmin (each lab independently backed by its own uploaded PDF),
+  // just simpler: removing a PDF only clears it in local state here, since
+  // (unlike a programme) a department doc has no other page reading `labs`
+  // mid-edit that a delayed Firestore patch would need to race against.
+  const labs = (form.labs || []).map(normalizeLab);
+  const addLab = () => {
+    set('labs', [...labs, { name: '' }]);
+  };
+  const updateLabName = (li: number, name: string) => {
+    set('labs', labs.map((l, i) => (i === li ? { ...l, name } : l)));
+  };
+  const moveLab = (li: number, dir: -1 | 1) => {
+    const next = [...labs];
+    const target = li + dir;
+    if (target < 0 || target >= next.length) return;
+    [next[li], next[target]] = [next[target], next[li]];
+    set('labs', next);
+  };
+  const removeLab = (li: number) => {
+    set('labs', labs.filter((_, i) => i !== li));
+  };
+  const handleLabPdf = (li: number, r: UploadResult) => {
+    set('labs', labs.map((l, i) => (i === li ? { ...l, pdfUrl: r.url, pdfStoragePath: r.path } : l)));
+  };
+  const removeLabPdf = async (li: number) => {
+    const lab = labs[li];
+    if (!lab?.pdfUrl) return;
+    if (!confirm('Remove this PDF? This cannot be undone.')) return;
+    try {
+      if (lab.pdfStoragePath) await deleteFile(lab.pdfStoragePath);
+    } catch (e) {
+      alert(`Couldn't delete the file from storage: ${(e as Error).message}`);
+      return;
+    }
+    set('labs', labs.map((l, i) => (i === li ? { ...l, pdfUrl: '', pdfStoragePath: '' } : l)));
+  };
 
   // Digital Library section editor — same add/reorder/remove pattern as the
   // per-programme one in ProgramsAdmin.
@@ -204,7 +316,7 @@ export default function DepartmentsAdmin() {
         ...form,
         mission: (form.mission || []).filter(Boolean),
         coreValues: (form.coreValues || []).filter(Boolean),
-        labs: (form.labs || []).filter(Boolean),
+        labs: labs.filter((l) => l.name),
       };
       if (editing) {
         await updateDoc(doc(db, 'departments', editing), { ...payload });
@@ -226,7 +338,8 @@ export default function DepartmentsAdmin() {
       about: d.about || '', established: d.established || '', accreditation: d.accreditation || '',
       hod: d.hod || '', hodImage: d.hodImage || '', hodImageStoragePath: d.hodImageStoragePath || '',
       hodEmail: d.hodEmail || '', hodMessage: d.hodMessage || '',
-      vision: d.vision || '', mission: d.mission || [], coreValues: d.coreValues || [], labs: d.labs || [],
+      vision: d.vision || '', mission: d.mission || [], coreValues: d.coreValues || [],
+      labs: (d.labs || []).map(normalizeLab).map((l) => ({ name: l.name, pdfUrl: l.pdfUrl || '', pdfStoragePath: l.pdfStoragePath || '' })),
       libraryIntro: d.libraryIntro || '', libraryInCharge: d.libraryInCharge || '',
       librarySections: (d.librarySections || []).map((s) => ({ heading: s.heading, items: s.items || [] })),
       programLevels: (d.programLevels || []).map((l) => ({ title: l.title, intro: l.intro || '', rows: l.rows || [] })),
@@ -367,8 +480,53 @@ export default function DepartmentsAdmin() {
             <textarea id="field-core-values" rows={3} value={arrayToLines(form.coreValues)} onChange={(e) => set('coreValues', linesToArray(e.target.value))} />
           </div>
           <div className="admin-field admin-field--full">
-            <label htmlFor="field-labs">Laboratories (one per line)</label>
-            <textarea id="field-labs" rows={4} value={arrayToLines(form.labs)} onChange={(e) => set('labs', linesToArray(e.target.value))} />
+            <label>Laboratories</label>
+            <p className="admin-field__hint" style={{ marginTop: 0 }}>
+              Each laboratory has its own name and its own uploaded PDF. On the public page, clicking a laboratory
+              tile opens that lab's PDF directly — a lab with no PDF uploaded yet still shows its tile, just marked
+              as unavailable.
+            </p>
+            {labs.length > 0 && (
+              <div className="admin-compact-list" style={{ marginBottom: '0.75rem' }}>
+                {labs.map((lab, li) => (
+                  <div key={li} className="admin-compact-row">
+                    <input
+                      className="admin-compact-row__name"
+                      value={lab.name}
+                      onChange={(e) => updateLabName(li, e.target.value)}
+                      placeholder="Advanced Computing Lab"
+                    />
+                    <div className="admin-compact-row__file">
+                      <FileUploader
+                        compact
+                        folder="vwu/departments/labs"
+                        currentUrl={lab.pdfUrl}
+                        onUploaded={(r) => handleLabPdf(li, r)}
+                        label="Upload PDF"
+                      />
+                    </div>
+                    <div className="admin-compact-row__actions">
+                      <button
+                        type="button"
+                        className="admin-btn admin-btn--ghost admin-btn--sm"
+                        onClick={() => removeLabPdf(li)}
+                        disabled={!lab.pdfUrl}
+                        title={lab.pdfUrl ? 'Remove PDF' : 'No PDF uploaded yet'}
+                      >
+                        Remove PDF
+                      </button>
+                      <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveLab(li, -1)} disabled={li === 0} title="Move up">↑</button>
+                      <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveLab(li, 1)} disabled={li === labs.length - 1} title="Move down">↓</button>
+                      <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeLab(li)} title="Remove laboratory">Remove</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            <button type="button" className="admin-btn admin-btn--primary" onClick={addLab}>+ Add Lab</button>
+            {labs.length === 0 && (
+              <p className="admin-field__hint">No laboratories yet — click "Add Lab" to start building this department's Laboratories list.</p>
+            )}
           </div>
 
           <div className="admin-field admin-field--full"><hr /><h3>Department Page — Placements</h3>
@@ -496,6 +654,15 @@ export default function DepartmentsAdmin() {
 
       <div className="admin-card">
         <h2 className="admin-card__title">Departments ({departments.length})</h2>
+        {departmentsMissingContent.length > 0 && (
+          <p className="admin-field__hint" style={{ margin: '0 0 1rem' }}>
+            {departmentsMissingContent.length} department(s) are missing Vision/Mission/Values, Laboratories, or
+            Department Library that already exist on one of their programmes.{' '}
+            <button className="admin-btn admin-btn--sm" onClick={copyFromPrograms} disabled={copying}>
+              {copying ? 'Copying…' : 'Copy from Programs'}
+            </button>
+          </p>
+        )}
         {loading ? <p className="admin-loading">Loading…</p> : (
           <div className="admin-table-wrap">
             <table className="admin-table">

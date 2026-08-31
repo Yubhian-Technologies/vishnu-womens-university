@@ -75,14 +75,19 @@ function SingleProgramDetail() {
   const faculty = program?.department ? allFaculty.filter((f) => f.department === program.department) : [];
   const { docs: deptNews } = useOrderedCollection<DepartmentNewsDoc>('departmentNews', 'date', 'desc');
   const hasDeptNews = deptNews.some((n) => n.program === slug);
-  // Resolves the program's short `department` code (e.g. "IT") to the full
-  // department name from the Academic Departments admin, so the "About the
-  // Department" heading below reads the same way it does on the AI/CSE/ECE
-  // grouped department page — falling back to the raw code if no match.
+  // Resolves the program's short `department` code (e.g. "IT") to its full
+  // Academic Departments admin record — used for the "About the Department"
+  // heading below (reading the same way it does on the AI/CSE/ECE grouped
+  // page) and, further down, as the source for Vision/Mission/Values,
+  // Laboratories, and the Department Library (see `shared` below). A couple
+  // of legacy programs spell their department out in prose ("Civil",
+  // "Mechanical") rather than the admin's short code ("CE", "ME") — this
+  // alias table is the only place that mismatch needs correcting.
+  const DEPT_CODE_ALIASES: Record<string, string> = { Civil: 'CE', Mechanical: 'ME' };
   const { docs: allDepartments, loading: deptLoading } = useOrderedCollection<DepartmentDoc>('departments', 'order');
-  const deptTitle = allDepartments.find(
-    (d) => d.shortCode?.trim().toUpperCase() === (program?.department || '').trim().toUpperCase()
-  )?.title || program?.department;
+  const deptCode = DEPT_CODE_ALIASES[program?.department || ''] || program?.department || '';
+  const dept = allDepartments.find((d) => d.shortCode?.trim().toUpperCase() === deptCode.trim().toUpperCase());
+  const deptTitle = dept?.title || program?.department;
   // Falls back to a shared "Program Pages" banner (Hero Banners admin) only
   // when this specific program hasn't had its own image uploaded yet via
   // the Programs admin section — that per-program image always wins.
@@ -125,7 +130,24 @@ function SingleProgramDetail() {
   }
   if (!program) return <Navigate to="/academics" replace />;
 
-  const hasVisionMission = !!(program.vision || program.mission?.length || program.coreValues?.length);
+  // Vision/Mission/Values, Laboratories, and the Department Library describe
+  // the whole department, not one specific programme — they're no longer
+  // editable on the Programs admin, only on the matching Academic
+  // Departments card (see DepartmentsAdmin.tsx). Falls back to this
+  // programme's own (now admin-hidden, but still intact) field so nothing
+  // goes blank for a department that hasn't had this copied over yet — see
+  // DepartmentsAdmin's "Copy from Programs" action.
+  const shared = {
+    vision: dept?.vision || program.vision || '',
+    mission: (dept?.mission?.length ? dept.mission : program.mission) || [],
+    coreValues: (dept?.coreValues?.length ? dept.coreValues : program.coreValues) || [],
+    labs: ((dept?.labs?.length ? dept.labs : program.labs) || []).map(normalizeLab),
+    libraryIntro: dept?.libraryIntro || program.libraryIntro || '',
+    libraryInCharge: dept?.libraryInCharge || program.libraryInCharge || '',
+    librarySections: (dept?.librarySections?.length ? dept.librarySections : program.librarySections) || [],
+  };
+
+  const hasVisionMission = !!(shared.vision || shared.mission.length || shared.coreValues.length);
   // Tabbed PEOs / POs / PSOs — only whichever of the three an admin has
   // actually filled in (via /admin → Programs) becomes a tab; entirely
   // data-driven, nothing hardcoded here beyond the three possible labels.
@@ -139,17 +161,15 @@ function SingleProgramDetail() {
   const activeOutcome = outcomeGroups.find((g) => g.key === outcomeTab) ?? outcomeGroups[0];
   const hasHod = !!(program.hodMessage || program.hodImage || program.hodEmail);
   const hasMindMap = !!program.mindMapImage;
-  // Legacy docs may still store labs as plain strings (no PDF) —
-  // normalizeLab() upgrades either shape so this page never has to care.
-  const labs = (program.labs || []).map(normalizeLab);
+  const labs = shared.labs;
   const hasLabs = labs.length > 0;
   const hasCareerOutcomes = !!(program.outcomes && program.outcomes.length > 0);
   const hasCurriculum = !!(program.semesters && program.semesters.length > 0);
   // Every section is entirely admin-defined — heading and items alike — so
-  // different programmes can show completely different Digital Library
+  // different departments can show completely different Digital Library
   // content. A section with no items yet just doesn't render a table for it.
-  const libraryTables = (program.librarySections || []).filter((sec) => sec.items && sec.items.length > 0);
-  const hasLibrary = !!(program.libraryIntro || program.libraryInCharge || libraryTables.length > 0);
+  const libraryTables = shared.librarySections.filter((sec) => sec.items && sec.items.length > 0);
+  const hasLibrary = !!(shared.libraryIntro || shared.libraryInCharge || libraryTables.length > 0);
   // A year counts once it has a label and at least one issue slot (even an
   // issue with no PDF yet still renders, just as "Unavailable" — this lets
   // an admin scaffold a year's issues ahead of uploading each PDF).
@@ -372,23 +392,23 @@ function SingleProgramDetail() {
               <h2 className="section-title">Vision, Mission &amp; Values</h2>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--space-6)' }}>
-              {program.vision && (
+              {shared.vision && (
                 <div style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderTop: '4px solid var(--color-accent)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-3)' }}>
                     <Compass size={20} strokeWidth={1.75} style={{ color: 'var(--color-accent)' }} />
                     <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 800, color: 'var(--color-primary)' }}>Vision</h3>
                   </div>
-                  <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.75 }}>{program.vision}</p>
+                  <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.75 }}>{shared.vision}</p>
                 </div>
               )}
-              {program.mission && program.mission.length > 0 && (
+              {shared.mission.length > 0 && (
                 <div style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderTop: '4px solid var(--color-accent)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-3)' }}>
                     <Target size={20} strokeWidth={1.75} style={{ color: 'var(--color-accent)' }} />
                     <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 800, color: 'var(--color-primary)' }}>Mission</h3>
                   </div>
                   <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-                    {program.mission.map((m) => (
+                    {shared.mission.map((m) => (
                       <li key={m} style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'flex-start', fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6 }}>
                         <Check size={14} strokeWidth={2.5} style={{ color: 'var(--color-accent)', flexShrink: 0, marginTop: 3 }} />
                         {m}
@@ -397,14 +417,14 @@ function SingleProgramDetail() {
                   </ul>
                 </div>
               )}
-              {program.coreValues && program.coreValues.length > 0 && (
+              {shared.coreValues.length > 0 && (
                 <div style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderTop: '4px solid var(--color-accent)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-3)' }}>
                     <Sparkles size={20} strokeWidth={1.75} style={{ color: 'var(--color-accent)' }} />
                     <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 800, color: 'var(--color-primary)' }}>Core Values</h3>
                   </div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
-                    {program.coreValues.map((v) => (
+                    {shared.coreValues.map((v) => (
                       <span key={v} style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--color-primary)', background: 'var(--color-off-white)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-full)', padding: '0.35rem 0.9rem' }}>
                         {v}
                       </span>
@@ -808,16 +828,16 @@ function SingleProgramDetail() {
               <span className="section-label">Resources</span>
               <h2 className="section-title">Department Library</h2>
             </div>
-            {program.libraryIntro && (
+            {shared.libraryIntro && (
               <BodyBlocks
-                blocks={parseBodyContent(program.libraryIntro)}
+                blocks={parseBodyContent(shared.libraryIntro)}
                 paragraphStyle={{ color: 'var(--color-text)', lineHeight: 1.85, fontSize: 'var(--text-base)' }}
               />
             )}
-            {program.libraryInCharge && (
+            {shared.libraryInCharge && (
               <p style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', color: 'var(--color-text)', fontSize: 'var(--text-sm)', marginBottom: libraryTables.length > 0 ? 'var(--space-6)' : 0 }}>
                 <BookOpen size={16} strokeWidth={1.75} style={{ color: 'var(--color-accent)', flexShrink: 0 }} />
-                <strong style={{ color: 'var(--color-primary)' }}>In-charge of Department Library:</strong> {program.libraryInCharge}
+                <strong style={{ color: 'var(--color-primary)' }}>In-charge of Department Library:</strong> {shared.libraryInCharge}
               </p>
             )}
             {libraryTables.map((sec, si) => (

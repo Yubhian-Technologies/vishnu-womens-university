@@ -155,18 +155,19 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     vision: dept?.vision || primary?.vision || '',
     mission: (dept?.mission?.length ? dept.mission : primary?.mission) || [],
     coreValues: (dept?.coreValues?.length ? dept.coreValues : primary?.coreValues) || [],
-    // The program you're actually viewing wins first — same rule every
-    // other per-program section on this page already follows (News &
-    // Events, Newsletter, R&D, Curriculum) — so labs entered on THIS side
-    // of the toggle always show on THIS side, regardless of which sibling
-    // program happens to be `primary` (subPrograms[0], which is just group
-    // ordering and isn't tied to which side a visitor is looking at).
-    // primary.labs is next (covers a sibling program that was never given
-    // its own labs), and dept.labs (Academic Departments admin, plain
-    // strings only) is the legacy fallback if neither program has any.
-    // normalizeLab() upgrades either shape so this page never cares which
+    // Laboratories are the department's, not any one programme's — AI&ML
+    // and AI&DS share the same labs, so this is department-first, same as
+    // Vision/Mission/Values/Library above (no per-programme editing exists
+    // for this anymore; see ProgramsAdmin/DepartmentsAdmin). Falls back to
+    // whichever sub-program still carries its own legacy labs data if the
+    // department doc hasn't had it copied over yet (see DepartmentsAdmin's
+    // "Copy from Programs" action). normalizeLab() upgrades either shape
+    // (plain string or {name, pdfUrl}) so this page never cares which
     // source it came from.
-    labs: ((activeProgram.labs?.length ? activeProgram.labs : primary?.labs?.length ? primary.labs : dept?.labs) || []).map(normalizeLab),
+    labs: (
+      dept?.labs?.length ? dept.labs
+        : subPrograms.map((p) => p.labs).find((arr) => arr && arr.length > 0) || []
+    ).map(normalizeLab),
     libraryIntro: dept?.libraryIntro || primary?.libraryIntro || '',
     libraryInCharge: dept?.libraryInCharge || primary?.libraryInCharge || '',
     librarySections: (dept?.librarySections?.length ? dept.librarySections : primary?.librarySections) || [],
