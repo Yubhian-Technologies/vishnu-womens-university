@@ -76,7 +76,7 @@ const EMPTY: Omit<DepartmentDoc, 'id'> = {
 };
 
 function linesToArray(text: string): string[] {
-  return text.split('\n').map((s) => s.trim()).filter(Boolean);
+  return text.split('\n').map((s) => s.trim());
 }
 function arrayToLines(arr: string[] = []): string {
   return arr.join('\n');
@@ -200,10 +200,16 @@ export default function DepartmentsAdmin() {
     if (!form.title || !form.shortCode) return alert('Title and Short Code are required.');
     setSaving(true);
     try {
+      const payload = {
+        ...form,
+        mission: (form.mission || []).filter(Boolean),
+        coreValues: (form.coreValues || []).filter(Boolean),
+        labs: (form.labs || []).filter(Boolean),
+      };
       if (editing) {
-        await updateDoc(doc(db, 'departments', editing), { ...form });
+        await updateDoc(doc(db, 'departments', editing), { ...payload });
       } else {
-        await addDoc(collection(db, 'departments'), { ...form, order: form.order || departments.length, createdAt: serverTimestamp() });
+        await addDoc(collection(db, 'departments'), { ...payload, order: form.order || departments.length, createdAt: serverTimestamp() });
       }
       setForm(EMPTY); setEditing(null);
     } catch (e) {

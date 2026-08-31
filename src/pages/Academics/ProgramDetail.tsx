@@ -84,9 +84,9 @@ function SingleProgramDetail() {
   // first available, don't fight a deliberate selection" pattern as
   // FacultyProfile's Profile Sections tabs.
   useEffect(() => {
-    const firstAvailable = program?.peos?.length ? 'peos' : program?.pos?.length ? 'pos' : program?.psos?.length ? 'psos' : null;
+    const firstAvailable = program?.peos?.length ? 'peos' : program?.pos?.length ? 'pos' : program?.psos?.length ? 'psos' : program?.wks?.length ? 'wks' : null;
     if (firstAvailable) setOutcomeTab((prev) => prev ?? firstAvailable);
-  }, [program?.peos?.length, program?.pos?.length, program?.psos?.length]);
+  }, [program?.peos?.length, program?.pos?.length, program?.psos?.length, program?.wks?.length]);
 
   // Also wait on the department lookup: rendering before it resolves would
   // show the raw department code and then flash to the full title once
@@ -108,6 +108,7 @@ function SingleProgramDetail() {
     { key: 'peos', short: 'PEOs', title: 'Programme Educational Objectives (PEOs)', items: program.peos },
     { key: 'pos', short: 'POs', title: 'Programme Outcomes (POs)', items: program.pos },
     { key: 'psos', short: 'PSOs', title: 'Programme Specific Outcomes (PSOs)', items: program.psos },
+    { key: 'wks', short: 'WKs', title: 'Knowledge Profile (WKs)', items: program.wks },
   ].filter((g) => g.items && g.items.length > 0);
   const hasOutcomeStatements = outcomeGroups.length > 0;
   const activeOutcome = outcomeGroups.find((g) => g.key === outcomeTab) ?? outcomeGroups[0];
@@ -139,7 +140,7 @@ function SingleProgramDetail() {
   const quickLinks = [
     { id: 'about', label: 'About the Department' },
     hasVisionMission && { id: 'vision-mission', label: 'Vision, Mission & Values' },
-    hasOutcomeStatements && { id: 'peos-pos-psos', label: 'PEOs, POs & PSOs' },
+    hasOutcomeStatements && { id: 'peos-pos-psos', label: 'PEOs, POs, PSOs & WKs' },
     hasHod && { id: 'hod', label: 'About HOD' },
     faculty.length > 0 && { id: 'faculty', label: 'Faculty' },
     hasMindMap && { id: 'mindmap', label: 'Mind Map' },
@@ -369,7 +370,7 @@ function SingleProgramDetail() {
           <div className="container">
             <div style={{ marginBottom: 'var(--space-10)' }}>
               <span className="section-label">Outcome-Based Education</span>
-              <h2 className="section-title">PEOs, POs &amp; PSOs</h2>
+              <h2 className="section-title">PEOs, POs, PSOs &amp; WKs</h2>
               <p className="section-desc">The programme&apos;s educational objectives and outcomes, aligned to national accreditation frameworks.</p>
             </div>
             <div className="section-tabs">

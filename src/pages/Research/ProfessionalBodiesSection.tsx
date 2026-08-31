@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { ChevronDown, Check, User } from 'lucide-react';
-import { PROFESSIONAL_BODIES } from './professionalBodiesDefault';
+import { useOrderedCollection } from '../../hooks/useCollection';
+import { parseProfessionalBodyContent } from '../../lib/professionalBodyContent';
+import { type ProfessionalBodyDoc } from '../Admin/sections/ProfessionalBodiesAdmin';
 
 // A dedicated redesign of the Professional Bodies list: each body (ISTE,
 // IEEE, IETE, ...) carries a different mix of content — plain paragraphs,
@@ -8,24 +10,31 @@ import { PROFESSIONAL_BODIES } from './professionalBodiesDefault';
 // contact details), a small chapter-info panel, and/or a dated activity log
 // — which is more structure than the shared tableText/accordionText/
 // projectsText parsers in ResearchDetail.tsx support in one collapsible
-// item, so this renders the richer PROFESSIONAL_BODIES data directly.
+// item, so each body's `contentText` is parsed with its own small mini-
+// language instead (see professionalBodyContent.ts). Admin-editable via
+// /admin → Research → edit "Professional Bodies" → Extra Content.
 export default function ProfessionalBodiesSection() {
-  const [openKey, setOpenKey] = useState<string | null>(PROFESSIONAL_BODIES[0]?.key ?? null);
+  const { docs: liveDocs } = useOrderedCollection<ProfessionalBodyDoc>('professionalBodies', 'order');
+  const bodies = liveDocs.map((d) => ({ key: d.key, shortName: d.shortName, fullName: d.fullName, ...parseProfessionalBodyContent(d.contentText) }));
 
-  const toggle = (key: string) => {
-    setOpenKey((prev) => (prev === key ? null : key));
-  };
+  // undefined = nothing explicitly toggled yet (the first body opens by
+  // default once `bodies` arrives from Firestore — that data loads
+  // asynchronously, unlike the old hardcoded array, so this can't just be
+  // the useState initializer, which only ever sees the empty first render).
+  // null = explicitly closed everything, distinct from "untouched" so
+  // closing that default-open first item actually stays closed.
+  const [openKey, setOpenKey] = useState<string | null | undefined>(undefined);
 
   return (
     <div className="pb-list">
-      {PROFESSIONAL_BODIES.map((body) => {
-        const isOpen = openKey === body.key;
+      {bodies.map((body, i) => {
+        const isOpen = openKey === undefined ? i === 0 : openKey === body.key;
         return (
           <div key={body.key} className={`pb-item${isOpen ? ' open' : ''}`}>
             <button
               type="button"
               className="pb-item-head"
-              onClick={() => toggle(body.key)}
+              onClick={() => setOpenKey(isOpen ? null : body.key)}
               aria-expanded={isOpen}
             >
               <span className="pb-item-head-text">

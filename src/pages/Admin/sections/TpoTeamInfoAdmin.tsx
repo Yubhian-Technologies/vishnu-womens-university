@@ -20,7 +20,7 @@ const EMPTY = {
 };
 
 function linesToArray(text: string): string[] {
-  return text.split('\n').map((s) => s.trim()).filter(Boolean);
+  return text.split('\n').map((s) => s.trim());
 }
 function arrayToLines(arr: string[] = []): string {
   return arr.join('\n');
@@ -144,10 +144,17 @@ export default function TpoTeamInfoAdmin() {
     if (!form.name || form.paragraphs.length === 0) return alert('Name and at least one bio paragraph are required.');
     setSaving(true);
     try {
+      const payload = {
+        ...form,
+        paragraphs: form.paragraphs.filter(Boolean),
+        accomplishments: form.accomplishments.filter(Boolean),
+        emails: form.emails.filter(Boolean),
+        linkedins: form.linkedins.filter(Boolean),
+      };
       if (editing) {
-        await updateDoc(doc(db, 'tpoTeamBios', editing), { ...form });
+        await updateDoc(doc(db, 'tpoTeamBios', editing), { ...payload });
       } else {
-        await addDoc(collection(db, 'tpoTeamBios'), { ...form, order: form.order || bios.length + 1, createdAt: serverTimestamp() });
+        await addDoc(collection(db, 'tpoTeamBios'), { ...payload, order: form.order || bios.length + 1, createdAt: serverTimestamp() });
       }
       setForm(EMPTY);
       setEditing(null);
