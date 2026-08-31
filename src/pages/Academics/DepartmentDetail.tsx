@@ -698,7 +698,10 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
       <section id="program-toggle" style={{ background: 'var(--color-primary)', padding: 'var(--space-8) 0', scrollMarginTop: NAV_OFFSET }}>
         <div className="container" style={{ textAlign: 'center' }}>
           <span className="section-label" style={{ color: 'var(--color-accent)' }}>Choose a Programme</span>
-          <div className="iqac-cell-tabs" style={{ maxWidth: 520, margin: 'var(--space-4) auto 0', background: 'var(--color-white)' }}>
+          {/* maxWidth scales with the number of programmes so extra options
+              (e.g. ECE's third, M.Tech VLSI) get equal, uncramped room
+              rather than being squeezed into a width tuned for two. */}
+          <div className="iqac-cell-tabs" style={{ maxWidth: Math.max(520, subPrograms.length * 200), margin: 'var(--space-4) auto 0', background: 'var(--color-white)' }}>
             {subPrograms.map((p) => (
               <button
                 key={p.slug}
