@@ -4,6 +4,7 @@ import { orderBy } from 'firebase/firestore';
 import { Trophy, BarChart3, PlayCircle, MapPin } from 'lucide-react';
 import { useCollection, useOrderedCollection, type WithId } from '../../hooks/useCollection';
 import { usePageBanners } from '../../hooks/usePageBanners';
+import { fetchPriorityAttr } from '../../lib/domAttrs';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import { parseStructuredTable, parseFlexibleTable } from '../../lib/structuredTable';
 import type { PlacementItemDoc } from '../Admin/sections/PlacementItemsAdmin';
@@ -899,7 +900,7 @@ export default function PlacementDetail() {
             className="page-hero-image"
             loading="eager"
             decoding="sync"
-            fetchPriority="high"
+            {...fetchPriorityAttr('high')}
           />
         )}
         <div className="page-hero-overlay" />

@@ -16,6 +16,17 @@ import type { LibrarySection, LibraryItem } from './ProgramsAdmin';
 // department pages (AI, CSE, ECE — see src/lib/departmentGroups.ts): the
 // shared top of /academics/<grouped-slug> reads from this doc, matched by
 // `shortCode`. They're all optional — a plain department card ignores them.
+export interface ProgramLevelRow {
+  program: string;
+  intake: string;
+}
+
+export interface ProgramLevel {
+  title: string;
+  intro: string;
+  rows: ProgramLevelRow[];
+}
+
 export interface DepartmentDoc {
   id: string;
   title: string;
@@ -44,6 +55,14 @@ export interface DepartmentDoc {
   libraryIntro?: string;
   libraryInCharge?: string;
   librarySections?: LibrarySection[];
+  // Programme Levels (e.g. "B.Tech.", "M.Tech.") — each a heading + intro
+  // paragraph + an intake table, shown right below "About the Department".
+  programLevels?: ProgramLevel[];
+  // Placements — shared across the department's programmes. placementStats
+  // reuses the { label, value } shape (e.g. "Highest Package" / "₹12 LPA").
+  placementIntro?: string;
+  placementStats?: LibraryItem[];
+  placementRecruiters?: string[];
 }
 
 const EMPTY: Omit<DepartmentDoc, 'id'> = {
@@ -52,6 +71,8 @@ const EMPTY: Omit<DepartmentDoc, 'id'> = {
   hod: '', hodImage: '', hodImageStoragePath: '', hodEmail: '', hodMessage: '',
   vision: '', mission: [], coreValues: [], labs: [],
   libraryIntro: '', libraryInCharge: '', librarySections: [],
+  programLevels: [],
+  placementIntro: '', placementStats: [], placementRecruiters: [],
 };
 
 function linesToArray(text: string): string[] {
@@ -67,7 +88,7 @@ export default function DepartmentsAdmin() {
   const [editing, setEditing] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
-  const set = (k: string, v: string | number | string[] | LibrarySection[]) => setForm((p) => ({ ...p, [k]: v }));
+  const set = (k: string, v: string | number | string[] | LibrarySection[] | ProgramLevel[] | LibraryItem[]) => setForm((p) => ({ ...p, [k]: v }));
   const handleHero = (r: UploadResult) => setForm((p) => ({ ...p, heroImage: r.url, storagePath: r.path }));
   const handleHodImage = (r: UploadResult) => setForm((p) => ({ ...p, hodImage: r.url, hodImageStoragePath: r.path }));
 
@@ -113,6 +134,68 @@ export default function DepartmentsAdmin() {
     set('librarySections', librarySections.map((s, i) => (i === si ? { ...s, items: s.items.filter((_, j) => j !== ji) } : s)));
   };
 
+  // Programme Levels editor (B.Tech / M.Tech) — same add/reorder/remove
+  // pattern as the Digital Library sections above.
+  const programLevels = form.programLevels || [];
+  const addProgramLevel = () => {
+    set('programLevels', [...programLevels, { title: `Level ${programLevels.length + 1}`, intro: '', rows: [] }]);
+  };
+  const updateProgramLevel = (li: number, patch: Partial<ProgramLevel>) => {
+    set('programLevels', programLevels.map((l, i) => (i === li ? { ...l, ...patch } : l)));
+  };
+  const moveProgramLevel = (li: number, dir: -1 | 1) => {
+    const next = [...programLevels];
+    const target = li + dir;
+    if (target < 0 || target >= next.length) return;
+    [next[li], next[target]] = [next[target], next[li]];
+    set('programLevels', next);
+  };
+  const removeProgramLevel = (li: number) => {
+    set('programLevels', programLevels.filter((_, i) => i !== li));
+  };
+  const addProgramLevelRow = (li: number) => {
+    set('programLevels', programLevels.map((l, i) => (i === li ? { ...l, rows: [...l.rows, { program: '', intake: '' }] } : l)));
+  };
+  const updateProgramLevelRow = (li: number, ri: number, patch: Partial<ProgramLevelRow>) => {
+    set('programLevels', programLevels.map((l, i) => (i !== li ? l : {
+      ...l,
+      rows: l.rows.map((r, j) => (j === ri ? { ...r, ...patch } : r)),
+    })));
+  };
+  const moveProgramLevelRow = (li: number, ri: number, dir: -1 | 1) => {
+    set('programLevels', programLevels.map((l, i) => {
+      if (i !== li) return l;
+      const rows = [...l.rows];
+      const target = ri + dir;
+      if (target < 0 || target >= rows.length) return l;
+      [rows[ri], rows[target]] = [rows[target], rows[ri]];
+      return { ...l, rows };
+    }));
+  };
+  const removeProgramLevelRow = (li: number, ri: number) => {
+    set('programLevels', programLevels.map((l, i) => (i === li ? { ...l, rows: l.rows.filter((_, j) => j !== ri) } : l)));
+  };
+
+  // Placement Stats editor — a flat list of { label, value } tiles (e.g.
+  // "Highest Package" / "₹12 LPA").
+  const placementStats = form.placementStats || [];
+  const addPlacementStat = () => {
+    set('placementStats', [...placementStats, { label: '', value: '' }]);
+  };
+  const updatePlacementStat = (si: number, patch: Partial<LibraryItem>) => {
+    set('placementStats', placementStats.map((s, i) => (i === si ? { ...s, ...patch } : s)));
+  };
+  const movePlacementStat = (si: number, dir: -1 | 1) => {
+    const next = [...placementStats];
+    const target = si + dir;
+    if (target < 0 || target >= next.length) return;
+    [next[si], next[target]] = [next[target], next[si]];
+    set('placementStats', next);
+  };
+  const removePlacementStat = (si: number) => {
+    set('placementStats', placementStats.filter((_, i) => i !== si));
+  };
+
   const save = async () => {
     if (!form.title || !form.shortCode) return alert('Title and Short Code are required.');
     setSaving(true);
@@ -146,6 +229,8 @@ export default function DepartmentsAdmin() {
       vision: d.vision || '', mission: d.mission || [], coreValues: d.coreValues || [], labs: d.labs || [],
       libraryIntro: d.libraryIntro || '', libraryInCharge: d.libraryInCharge || '',
       librarySections: (d.librarySections || []).map((s) => ({ heading: s.heading, items: s.items || [] })),
+      programLevels: (d.programLevels || []).map((l) => ({ title: l.title, intro: l.intro || '', rows: l.rows || [] })),
+      placementIntro: d.placementIntro || '', placementStats: d.placementStats || [], placementRecruiters: d.placementRecruiters || [],
     });
   };
 
@@ -213,6 +298,62 @@ export default function DepartmentsAdmin() {
             <label htmlFor="field-about">Overview</label>
             <textarea id="field-about" rows={5} value={form.about} onChange={(e) => set('about', e.target.value)} placeholder="About the department…" />
           </div>
+
+          <div className="admin-field admin-field--full"><hr /><h3>Department Page — Programme Levels (B.Tech / M.Tech)</h3>
+            <p className="admin-field__hint" style={{ marginTop: '0.25rem' }}>
+              Shown right below "About the Department" as headed subsections, each with its own intro paragraph
+              and an intake table (e.g. a "B.Tech." block listing each B.Tech programme's intake).
+            </p>
+          </div>
+          <div className="admin-field admin-field--full">
+            {programLevels.map((level, li) => (
+              <div key={li} style={{ border: '1.5px solid var(--color-light-gray)', borderRadius: 8, padding: '0.75rem', marginBottom: '0.75rem' }}>
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.5rem' }}>
+                  <input
+                    value={level.title}
+                    onChange={(e) => updateProgramLevel(li, { title: e.target.value })}
+                    placeholder="B.Tech."
+                    style={{ flex: 1, fontWeight: 700 }}
+                  />
+                  <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveProgramLevel(li, -1)} disabled={li === 0} title="Move up">↑</button>
+                  <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveProgramLevel(li, 1)} disabled={li === programLevels.length - 1} title="Move down">↓</button>
+                  <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeProgramLevel(li)}>Remove Level</button>
+                </div>
+                <textarea
+                  rows={3}
+                  value={level.intro}
+                  onChange={(e) => updateProgramLevel(li, { intro: e.target.value })}
+                  placeholder="B.Tech. in Computer Science & Allied courses includes study of…"
+                  style={{ width: '100%', marginBottom: '0.5rem' }}
+                />
+                {level.rows.map((row, ri) => (
+                  <div key={ri} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.4rem' }}>
+                    <input
+                      value={row.program}
+                      onChange={(e) => updateProgramLevelRow(li, ri, { program: e.target.value })}
+                      placeholder="Computer Science & Engineering"
+                      style={{ flex: 2 }}
+                    />
+                    <input
+                      value={row.intake}
+                      onChange={(e) => updateProgramLevelRow(li, ri, { intake: e.target.value })}
+                      placeholder="180"
+                      style={{ flex: 1 }}
+                    />
+                    <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveProgramLevelRow(li, ri, -1)} disabled={ri === 0} title="Move up">↑</button>
+                    <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveProgramLevelRow(li, ri, 1)} disabled={ri === level.rows.length - 1} title="Move down">↓</button>
+                    <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeProgramLevelRow(li, ri)}>✕</button>
+                  </div>
+                ))}
+                <button type="button" className="admin-btn admin-btn--sm" onClick={() => addProgramLevelRow(li)}>+ Add Row</button>
+              </div>
+            ))}
+            <button type="button" className="admin-btn admin-btn--primary" onClick={addProgramLevel}>+ Add Level</button>
+            {programLevels.length === 0 && (
+              <p className="admin-field__hint">No levels yet — click "Add Level" to add a B.Tech./M.Tech. block.</p>
+            )}
+          </div>
+
           <div className="admin-field admin-field--full">
             <label htmlFor="field-vision">Vision</label>
             <textarea id="field-vision" rows={3} value={form.vision} onChange={(e) => set('vision', e.target.value)} />
@@ -228,6 +369,45 @@ export default function DepartmentsAdmin() {
           <div className="admin-field admin-field--full">
             <label htmlFor="field-labs">Laboratories (one per line)</label>
             <textarea id="field-labs" rows={4} value={arrayToLines(form.labs)} onChange={(e) => set('labs', linesToArray(e.target.value))} />
+          </div>
+
+          <div className="admin-field admin-field--full"><hr /><h3>Department Page — Placements</h3>
+            <p className="admin-field__hint" style={{ marginTop: '0.25rem' }}>
+              Shown as a shared "Placements" section, before the program toggle. The individual student placement
+              records table is managed separately — see the "Placement Records" card under <strong>Programs</strong>,
+              in any program that belongs to this department.
+            </p>
+          </div>
+          <div className="admin-field admin-field--full">
+            <label htmlFor="field-placement-intro">Placements Overview</label>
+            <textarea id="field-placement-intro" rows={3} value={form.placementIntro} onChange={(e) => set('placementIntro', e.target.value)} placeholder="Graduates of the department are placed in leading IT and core engineering companies…" />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label>Placement Stats</label>
+            {placementStats.map((stat, si) => (
+              <div key={si} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.4rem' }}>
+                <input
+                  value={stat.label}
+                  onChange={(e) => updatePlacementStat(si, { label: e.target.value })}
+                  placeholder="Highest Package"
+                  style={{ flex: 2 }}
+                />
+                <input
+                  value={stat.value}
+                  onChange={(e) => updatePlacementStat(si, { value: e.target.value })}
+                  placeholder="₹12 LPA"
+                  style={{ flex: 1 }}
+                />
+                <button type="button" className="admin-btn admin-btn--sm" onClick={() => movePlacementStat(si, -1)} disabled={si === 0} title="Move up">↑</button>
+                <button type="button" className="admin-btn admin-btn--sm" onClick={() => movePlacementStat(si, 1)} disabled={si === placementStats.length - 1} title="Move down">↓</button>
+                <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removePlacementStat(si)}>✕</button>
+              </div>
+            ))}
+            <button type="button" className="admin-btn admin-btn--sm" onClick={addPlacementStat}>+ Add Stat</button>
+          </div>
+          <div className="admin-field admin-field--full">
+            <label htmlFor="field-placement-recruiters">Recruiters (one per line)</label>
+            <textarea id="field-placement-recruiters" rows={4} value={arrayToLines(form.placementRecruiters)} onChange={(e) => set('placementRecruiters', linesToArray(e.target.value))} placeholder="TCS&#10;Infosys&#10;Wipro" />
           </div>
 
           <div className="admin-field admin-field--full"><hr /><h3>Department Page — Digital Library</h3>

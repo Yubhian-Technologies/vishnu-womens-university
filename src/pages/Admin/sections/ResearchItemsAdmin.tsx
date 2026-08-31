@@ -10,6 +10,7 @@ import PatentCertificatesAdmin from './PatentCertificatesAdmin';
 import ProfessionalBodiesAdmin from './ProfessionalBodiesAdmin';
 import { parseFundedProjectsWorkbook } from '../../../lib/fundedProjectsImport';
 import { parsePatentsWorkbook } from '../../../lib/patentsImport';
+import { mergeProjectAccordion } from '../../../lib/structuredTable';
 
 // Some research items have extra editable content beyond the base fields
 // below (a year-by-year PDF list, patent certificate PDFs, ...) — keyed by
@@ -88,8 +89,8 @@ export default function ResearchItemsAdmin() {
         alert("Couldn't find any projects in that file — check it has a \"Name of the Project\" column and at least one filled-in row.");
         return;
       }
-      if (form.projectsText && !confirm(`Found ${projectCount} project(s) across ${sheetsUsed.length} sheet(s) (${sheetsUsed.join(', ')}). Replace the current text with these?`)) return;
-      set('projectsText', text);
+      set('projectsText', mergeProjectAccordion(form.projectsText, text));
+      alert(`Added ${projectCount} project(s) across ${sheetsUsed.length} sheet(s) (${sheetsUsed.join(', ')}) to the text below.`);
     } catch (e) {
       alert(`Couldn't read that file: ${(e as Error).message}`);
     } finally {
@@ -105,8 +106,8 @@ export default function ResearchItemsAdmin() {
         alert("Couldn't find any patents in that file — check it has a \"Title of Invention\" column and at least one filled-in row.");
         return;
       }
-      if (form.projectsText && !confirm(`Found ${patentCount} patent(s) across ${sheetsUsed.length} sheet(s) (${sheetsUsed.join(', ')}). Replace the current text with these?`)) return;
-      set('projectsText', text);
+      set('projectsText', mergeProjectAccordion(form.projectsText, text));
+      alert(`Added ${patentCount} patent(s) across ${sheetsUsed.length} sheet(s) (${sheetsUsed.join(', ')}) to the text below.`);
     } catch (e) {
       alert(`Couldn't read that file: ${(e as Error).message}`);
     } finally {
@@ -296,7 +297,8 @@ export default function ResearchItemsAdmin() {
                 Title of Invention, Inventor Name, Status)? Import it below instead of typing all this by hand —
                 a workbook with one tab per year (e.g. a tab named "2024") groups that tab's rows under "2024 –
                 Granted" / "2024 – Published" headings automatically; a single-sheet file falls back to the file
-                name for the year.
+                name for the year. Importing adds to whatever's already in the text below rather than replacing it,
+                so you can import one year's file at a time and keep every year's patents.
                 <br />
                 <label className="admin-btn admin-btn--sm" style={{ display: 'inline-block', marginTop: '0.5rem', cursor: importing ? 'default' : 'pointer', opacity: importing ? 0.6 : 1 }}>
                   {importing ? 'Reading file…' : 'Import from Excel/CSV'}
@@ -320,6 +322,7 @@ export default function ResearchItemsAdmin() {
                 Staff, Dept., Status, Start Date, Year of Sanctioned, Total Amount Sanctioned, Outcomes)? Import it
                 below instead of typing all this by hand — separate "Ongoing"/"Completed" tabs in one workbook are
                 both picked up automatically. Multiple outcomes in one cell: press Alt+Enter between them.
+                Importing adds to whatever's already in the text below rather than replacing it.
                 <br />
                 <label className="admin-btn admin-btn--sm" style={{ display: 'inline-block', marginTop: '0.5rem', cursor: importing ? 'default' : 'pointer', opacity: importing ? 0.6 : 1 }}>
                   {importing ? 'Reading file…' : 'Import from Excel/CSV'}

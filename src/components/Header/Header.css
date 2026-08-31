@@ -453,7 +453,7 @@ a.mega-group-label:hover {
   padding: 4px;
   border-radius: var(--radius-sm);
   transition: background var(--transition-fast);
-  /* With .nav hidden below 1400px, nothing else in .header-bar grows to
+  /* With .nav hidden below 1150px, nothing else in .header-bar grows to
      fill the freed space, so without this the toggle sits wherever it
      falls in flex order instead of at the header's right edge. */
   margin-left: auto;
@@ -644,22 +644,52 @@ a.mega-group-label:hover {
 }
 
 /* ===== Responsive ===== */
-@media (max-width: 1400px) {
+
+/* Compact desktop nav — 9 top-level items plus the fixed logo/Apply Now
+   pods need real room at full size, and there isn't quite enough below
+   1400px. Rather than dropping straight to the mobile hamburger there
+   (which used to happen at 1400px — well above common laptop widths like
+   1366px/1280px, so most laptop visitors never saw the real desktop nav
+   at all), tighten padding/font and shrink the end pods just enough to
+   keep it as actual desktop nav down through those widths; only below
+   1150px does it truly stop fitting. */
+@media (min-width: 1151px) and (max-width: 1400px) {
+  .nav-link {
+    padding: 8px 7px;
+    font-size: 0.64rem;
+    letter-spacing: 0.01em;
+  }
+  .nav-list {
+    gap: 0;
+  }
+  .header-end--logo {
+    width: 220px;
+  }
+  .header-end--cta {
+    width: 190px;
+  }
+  .logo-icon {
+    height: 50px;
+  }
+}
+
+@media (max-width: 1150px) {
   .nav {
     display: none;
   }
   .mobile-toggle {
     display: flex;
   }
-}
 
-/* Whenever the CTA pod is still visible (i.e. above the 640px width where
-   it gets hidden below) but .nav isn't (≤1400px), its own margin-left:auto
-   above is already doing the job of pulling both it and the toggle over to
-   the right together — a second margin-left:auto here as well would split
-   the free space between the two gaps instead of collapsing it into one,
-   stranding the CTA pod away from the toggle with its own empty gap. */
-@media (min-width: 641px) and (max-width: 1400px) {
+  /* The CTA pod (Apply Now) stays visible at every width down to the
+     smallest phones — its own margin-left:auto above already pulls both
+     it and the toggle over to the right together, so the toggle's own
+     default margin-left:auto (needed when .nav is showing and pushes
+     nothing itself) has to be zeroed everywhere .nav is hidden. Without
+     this, both auto margins compete for the same free space and split it
+     into two separate gaps instead of one, which forces .header-bar wider
+     than the viewport at narrow widths (visible as page-wide horizontal
+     scroll cutting off content on the right edge). */
   .mobile-toggle {
     margin-left: 0;
   }
