@@ -14,6 +14,7 @@ import type { DepartmentGroup } from '../../lib/departmentGroups';
 import { normalizeLab, type ProgramDoc } from '../Admin/sections/ProgramsAdmin';
 import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import type { FacultyDoc } from './Faculty';
+import { parseFlexibleTable, parseProjectAccordion } from '../../lib/structuredTable';
 import '../detail-layout.css';
 import '../Campus/tabbed-section.css';
 
@@ -41,6 +42,15 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   // "Choose a Programme" Quick Links accordion — starts open so the sub-links
   // remain visible by default (unchanged from before this was collapsible).
   const [programmeLinksOpen, setProgrammeLinksOpen] = useState(true);
+  const [openRndProjects, setOpenRndProjects] = useState<Set<string>>(new Set());
+  const toggleRndProject = (key: string) => {
+    setOpenRndProjects((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
 
   const { docs: allDepartments, loading: deptLoading } = useOrderedCollection<DepartmentDoc>('departments', 'order');
   const dept = allDepartments.find(
@@ -183,7 +193,9 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   // & Development" editor); a link only appears once it has both a name and
   // an uploaded PDF.
   const rndLinks = (activeProgram.rndLinks || []).filter((l) => l.label && l.pdfUrl);
-  const hasRnd = rndLinks.length > 0;
+  const rndTableSections = parseFlexibleTable(activeProgram.rndTableText || '').filter((s) => s.headers.length > 0);
+  const rndProjectCategories = parseProjectAccordion(activeProgram.rndProjectsText || '').filter((c) => c.projects.length > 0);
+  const hasRnd = !!activeProgram.rndIntro || rndTableSections.length > 0 || rndProjectCategories.length > 0 || rndLinks.length > 0;
 
   // Quick Links sidebar — deliberately trimmed to one anchor per major
   // section rather than every sub-section (e.g. "Choose a Programme" covers
@@ -910,8 +922,11 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
       )}
 
       {/* Research & Development (Funded Projects & Patents) (per programme) —
-          same admin-named, PDF-backed link list as the standalone
-          ProgramDetail.tsx page's R&D section. */}
+          real department R&D pages vary a lot in shape, so this renders
+          whichever of the four admin fields are filled in: an overview
+          paragraph, table(s), detailed project/patent cards, and/or a flat
+          PDF link list — same three-format system as the site-wide Research
+          pages (see ResearchDetail.tsx / ResearchItemsAdmin.tsx). */}
       {hasRnd && (
         <section id="rnd" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
           <div className="container">
@@ -919,16 +934,119 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
               <span className="section-label">Research</span>
               <h2 className="section-title">Research &amp; Development (Funded Projects &amp; Patents)</h2>
             </div>
-            <ul className="annual-reports-list">
-              {rndLinks.map((link, li) => (
-                <li key={li}>
-                  <a href={link.pdfUrl} target="_blank" rel="noopener noreferrer" className="annual-reports-link">
-                    <FileText size={14} strokeWidth={2} className="annual-reports-icon" />
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
+            {activeProgram.rndIntro && (
+              <p style={{ color: 'var(--color-text)', lineHeight: 1.85, fontSize: 'var(--text-base)', marginBottom: 'var(--space-6)', maxWidth: 760, whiteSpace: 'pre-line' }}>
+                {activeProgram.rndIntro}
+              </p>
+            )}
+            {rndTableSections.map((section, si) => (
+              <div key={si} style={{ marginBottom: 'var(--space-8)' }}>
+                {section.title && (
+                  <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>
+                    {section.title}
+                  </h3>
+                )}
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm)' }}>
+                    <thead>
+                      <tr style={{ background: 'var(--color-primary)' }}>
+                        {section.headers.map((col, ci) => (
+                          <th key={ci} style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'left', color: 'var(--color-white)', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                            {col}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {section.rows.map((row, ri) => (
+                        <tr key={ri} style={{ background: ri % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)', borderBottom: '1px solid var(--color-light-gray)' }}>
+                          {row.map((val, ci) => (
+                            <td key={ci} style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)', lineHeight: 1.5 }}>
+                              {/^https?:\/\//i.test(val) ? <a href={val} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-primary)', fontWeight: 600 }}>View</a> : val}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ))}
+            {rndProjectCategories.map((cat, ci) => (
+              <div key={ci} style={{ marginBottom: ci < rndProjectCategories.length - 1 ? 'var(--space-10)' : (rndLinks.length > 0 ? 'var(--space-8)' : 0) }}>
+                {cat.title && (
+                  <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>
+                    {cat.title}
+                  </h3>
+                )}
+                <div className="thrust-accordion">
+                  {cat.projects.map((project, pi) => {
+                    const key = `${ci}-${pi}`;
+                    const isOpen = openRndProjects.has(key);
+                    return (
+                      <div key={pi} className={`thrust-accordion-item${isOpen ? ' open' : ''}`}>
+                        <button
+                          type="button"
+                          className="thrust-accordion-header"
+                          onClick={() => toggleRndProject(key)}
+                          aria-expanded={isOpen}
+                        >
+                          <span>{project.title}</span>
+                          <span className="thrust-accordion-icon">{isOpen ? '−' : '+'}</span>
+                        </button>
+                        <div className="thrust-accordion-collapse">
+                          <div className="thrust-accordion-collapse-inner">
+                            <div style={{ padding: 'var(--space-4) var(--space-5)' }}>
+                              {project.fields.length > 0 && (
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 'var(--space-2) var(--space-5)', marginBottom: project.outcomes.length > 0 ? 'var(--space-4)' : 0 }}>
+                                  {project.fields.map((f, fi) => (
+                                    <div key={fi} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.5 }}>
+                                      <strong style={{ color: 'var(--color-primary)' }}>{f.label}:</strong>{' '}
+                                      {f.href ? (
+                                        <a href={f.href} download target="_blank" rel="noopener noreferrer" className="thrust-accordion-link">{f.value}</a>
+                                      ) : (
+                                        f.value
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                              {project.outcomes.length > 0 && (
+                                <div>
+                                  <strong style={{ fontSize: 'var(--text-sm)', color: 'var(--color-primary)', display: 'block', marginBottom: 'var(--space-2)' }}>
+                                    Outcome
+                                  </strong>
+                                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                                    {project.outcomes.map((o, oi) => (
+                                      <li key={oi} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-2)' }}>
+                                        <Check size={13} strokeWidth={2.5} style={{ color: 'var(--color-accent)', flexShrink: 0, marginTop: 3 }} />
+                                        <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.5 }}>{o}</span>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+            {rndLinks.length > 0 && (
+              <ul className="annual-reports-list">
+                {rndLinks.map((link, li) => (
+                  <li key={li}>
+                    <a href={link.pdfUrl} target="_blank" rel="noopener noreferrer" className="annual-reports-link">
+                      <FileText size={14} strokeWidth={2} className="annual-reports-icon" />
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </section>
       )}
