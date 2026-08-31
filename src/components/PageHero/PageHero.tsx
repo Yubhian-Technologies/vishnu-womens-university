@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { usePageBanners, type BannerSlide } from '../../hooks/usePageBanners';
 import SmoothImage from '../SmoothImage/SmoothImage';
 import { smoothScrollTo } from '../../lib/smoothScroll';
+import { fetchPriorityAttr } from '../../lib/domAttrs';
 import './PageHero.css';
 
 export interface BreadcrumbItem {
@@ -130,7 +131,7 @@ export default function PageHero({
               className="page-hero-image"
               loading="eager"
               decoding={i === current ? 'sync' : 'async'}
-              {...(i === current ? { fetchPriority: 'high' as const } : { fetchPriority: 'low' as const })}
+              {...fetchPriorityAttr(i === current ? 'high' : 'low')}
             />
           )}
         </div>

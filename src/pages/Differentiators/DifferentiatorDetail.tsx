@@ -6,6 +6,7 @@ import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import SmoothCollapse from '../../components/SmoothCollapse/SmoothCollapse';
 import { useCollection, useOrderedCollection, type WithId } from '../../hooks/useCollection';
 import { usePageBanners } from '../../hooks/usePageBanners';
+import { fetchPriorityAttr } from '../../lib/domAttrs';
 import { DIFFERENTIATOR_CATEGORIES } from '../Admin/sections/DifferentiatorsAdmin';
 import type { DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
 import type { AicteIdeaLabTeamMemberDoc } from '../Admin/sections/AicteIdeaLabTeamAdmin';
@@ -4002,7 +4003,7 @@ export default function DifferentiatorDetail() {
       {/* Hero */}
       <section className="page-hero" style={{ minHeight: 380 }}>
         {heroImage && (
-          <SmoothImage src={heroImage} alt={item.title} className="page-hero-image" loading="eager" decoding="sync" fetchPriority="high" />
+          <SmoothImage src={heroImage} alt={item.title} className="page-hero-image" loading="eager" decoding="sync" {...fetchPriorityAttr('high')} />
         )}
         <div className="page-hero-overlay" />
         <div className="container page-hero-content">

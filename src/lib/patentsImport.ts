@@ -40,6 +40,17 @@ function yearFromName(name: string): string | null {
   return match ? match[0] : null;
 }
 
+// A "Status" cell often carries more than just the status word — a grant
+// date in parens, "on <date>", a filing round, etc. Grouping/headings should
+// only ever split patents into "Granted" / "Published" (the raw cell value,
+// dates included, still shows in the per-patent Status field line further
+// down) — so pull out just the leading status word for that purpose.
+function normalizeStatus(raw: string): string {
+  const word = raw.match(/[A-Za-z]+/)?.[0];
+  if (!word) return 'Uncategorized';
+  return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+}
+
 function buildYearBlock(rows: unknown[][], year: string | null): { text: string; count: number } {
   // Find the header row — the sheet may have a couple of title rows above it
   // before the real column headers.
@@ -79,7 +90,8 @@ function buildYearBlock(rows: unknown[][], year: string | null): { text: string;
     count++;
 
     const category = !Number.isNaN(categoryCol) ? String(row[categoryCol] ?? '').trim() : '';
-    const status = (!Number.isNaN(statusCol) ? String(row[statusCol] ?? '').trim() : '') || 'Uncategorized';
+    const rawStatus = !Number.isNaN(statusCol) ? String(row[statusCol] ?? '').trim() : '';
+    const status = normalizeStatus(rawStatus);
     if (!groups.has(status)) { groups.set(status, []); groupOrder.push(status); }
     const lines = groups.get(status)!;
 
