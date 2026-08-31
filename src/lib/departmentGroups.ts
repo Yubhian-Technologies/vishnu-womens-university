@@ -33,7 +33,7 @@ export interface DepartmentGroup {
 // uppercase. `facultyDepartments` verified against the `faculty` collection.
 export const DEPARTMENT_GROUPS: DepartmentGroup[] = [
   { key: 'ai', deptShortCode: 'AI', programSlugs: ['ai-ds', 'ai-ml'], facultyDepartments: ['AI&DS', 'AI&ML'] },
-  { key: 'cse', deptShortCode: 'CSE', programSlugs: ['cse', 'cyber-security'], facultyDepartments: ['CSE'] },
+  { key: 'cse', deptShortCode: 'CSE', programSlugs: ['cse', 'cyber-security', 'mtech-cse', 'mtech-software-engineering'], facultyDepartments: ['CSE'] },
   { key: 'ece', deptShortCode: 'ECE', programSlugs: ['ece', 'EVT', 'mtech-vlsi'], facultyDepartments: ['ECE'] },
 ];
 
