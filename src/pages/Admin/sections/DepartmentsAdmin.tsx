@@ -167,29 +167,37 @@ export default function DepartmentsAdmin() {
   };
 
   // Laboratories editor — same shape/pattern as the old per-programme one in
-  // ProgramsAdmin (each lab independently backed by its own uploaded PDF),
-  // just simpler: removing a PDF only clears it in local state here, since
-  // (unlike a programme) a department doc has no other page reading `labs`
-  // mid-edit that a delayed Firestore patch would need to race against.
+  // ProgramsAdmin, each lab independently backed by its own uploaded PDF.
+  //
+  // These all update via the functional `setForm(p => ...)` form (reading
+  // `p.labs`), never the `labs` snapshot below — that snapshot is only for
+  // rendering. Uploading PDFs for several labs in quick succession fires
+  // several overlapping async `handleLabPdf` calls; if each one computed its
+  // next array from the same stale outer `labs` closure, whichever upload's
+  // state write landed last would silently overwrite every other lab's
+  // just-uploaded pdfUrl with its own stale copy of the list — losing
+  // already-successful uploads without any error.
   const labs = (form.labs || []).map(normalizeLab);
   const addLab = () => {
-    set('labs', [...labs, { name: '' }]);
+    setForm((p) => ({ ...p, labs: [...(p.labs || []).map(normalizeLab), { name: '' }] }));
   };
   const updateLabName = (li: number, name: string) => {
-    set('labs', labs.map((l, i) => (i === li ? { ...l, name } : l)));
+    setForm((p) => ({ ...p, labs: (p.labs || []).map(normalizeLab).map((l, i) => (i === li ? { ...l, name } : l)) }));
   };
   const moveLab = (li: number, dir: -1 | 1) => {
-    const next = [...labs];
-    const target = li + dir;
-    if (target < 0 || target >= next.length) return;
-    [next[li], next[target]] = [next[target], next[li]];
-    set('labs', next);
+    setForm((p) => {
+      const next = (p.labs || []).map(normalizeLab);
+      const target = li + dir;
+      if (target < 0 || target >= next.length) return p;
+      [next[li], next[target]] = [next[target], next[li]];
+      return { ...p, labs: next };
+    });
   };
   const removeLab = (li: number) => {
-    set('labs', labs.filter((_, i) => i !== li));
+    setForm((p) => ({ ...p, labs: (p.labs || []).map(normalizeLab).filter((_, i) => i !== li) }));
   };
   const handleLabPdf = (li: number, r: UploadResult) => {
-    set('labs', labs.map((l, i) => (i === li ? { ...l, pdfUrl: r.url, pdfStoragePath: r.path } : l)));
+    setForm((p) => ({ ...p, labs: (p.labs || []).map(normalizeLab).map((l, i) => (i === li ? { ...l, pdfUrl: r.url, pdfStoragePath: r.path } : l)) }));
   };
   const removeLabPdf = async (li: number) => {
     const lab = labs[li];
@@ -201,7 +209,7 @@ export default function DepartmentsAdmin() {
       alert(`Couldn't delete the file from storage: ${(e as Error).message}`);
       return;
     }
-    set('labs', labs.map((l, i) => (i === li ? { ...l, pdfUrl: '', pdfStoragePath: '' } : l)));
+    setForm((p) => ({ ...p, labs: (p.labs || []).map(normalizeLab).map((l, i) => (i === li ? { ...l, pdfUrl: '', pdfStoragePath: '' } : l)) }));
   };
 
   // Digital Library section editor — same add/reorder/remove pattern as the
