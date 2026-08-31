@@ -1032,12 +1032,13 @@ export default function ProgramsAdmin() {
             )}
           </div>
 
-          <div className="admin-field admin-field--full"><hr /><h3>News &amp; Events — Department Page (AI / CSE / ECE)</h3></div>
+          <div className="admin-field admin-field--full"><hr /><h3>News &amp; Events — Academic Year Table</h3></div>
           <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>
-            Only shown on the shared AI/CSE/ECE department page (see Academic Departments), under this
-            programme's side of the toggle — grouped by academic year, with columns you define per year (e.g.
-            "Title", "Date"); "S.No" is added automatically. For every other programme, use "News &amp; Events —
-            This Programme" below instead.
+            Shown on this programme's page (and, for AI/CSE/ECE, under this programme's side of the shared
+            department page toggle too) — grouped by academic year, with columns you define per year (e.g.
+            "Title", "Date"); "S.No" is added automatically. This is separate from "News &amp; Events — This
+            Programme" below, which pulls from individually-added News &amp; Events items instead — use whichever
+            fits how you want to manage this programme's news, or both.
           </p>
           <div className="admin-field admin-field--full">
             {newsEventsYears.map((yr, yi) => (
