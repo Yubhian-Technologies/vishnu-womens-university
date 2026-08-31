@@ -282,20 +282,20 @@ function SingleProgramDetail() {
       {/* Stats bar */}
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-5) 0' }}>
         <div className="container">
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-12)', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', flexWrap: 'nowrap', gap: 'var(--space-12)', overflowX: 'auto', paddingBottom: 4, scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.3) transparent' }}>
             {[
               ...(program.intake ? [{ label: 'Annual Intake', value: `${program.intake} Seats` }] : []),
               ...(program.established ? [{ label: 'Established', value: program.established }] : []),
               ...(program.accreditation ? [{ label: 'Accreditation', value: program.accreditation }] : []),
               ...(program.hod ? [{ label: 'Head of Department', value: program.hod }] : []),
             ].map((s) => (
-              <div key={s.label} style={{ textAlign: 'center' }}>
+              <div key={s.label} style={{ textAlign: 'center', flexShrink: 0 }}>
                 {s.label === 'Head of Department' && hasHod ? (
                   <a href="#hod" style={{ fontFamily: 'var(--font-serif)', fontSize: '1.15rem', fontWeight: 900, color: 'var(--color-accent)', whiteSpace: 'nowrap', textDecoration: 'underline', textUnderlineOffset: 3 }}>{s.value}</a>
                 ) : (
                   <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.15rem', fontWeight: 900, color: 'var(--color-accent)', whiteSpace: 'nowrap' }}>{s.value}</div>
                 )}
-                <div style={{ fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.65)', fontFamily: 'var(--font-sans)', marginTop: 2, textTransform: 'uppercase', letterSpacing: '0.07em' }}>{s.label}</div>
+                <div style={{ fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.65)', fontFamily: 'var(--font-sans)', marginTop: 2, textTransform: 'uppercase', letterSpacing: '0.07em', whiteSpace: 'nowrap' }}>{s.label}</div>
               </div>
             ))}
           </div>

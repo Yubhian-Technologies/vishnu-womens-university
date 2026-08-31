@@ -3,9 +3,8 @@ import { collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp } from '
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
 import { CONTENT_ICON_NAMES } from '../../../lib/contentIcons';
-import { deleteFile, type UploadResult } from '../../../lib/storage';
+import { deleteFile } from '../../../lib/storage';
 import TableImportButton from '../../../components/TableImportButton/TableImportButton';
-import { useImageCropModal } from '../../../components/ImageUploader/useImageCropModal';
 
 export interface PlacementItemDoc {
   id: string;
@@ -42,18 +41,17 @@ export interface PlacementItemDoc {
   linkedins: string[];
   heroImage: string;
   heroStoragePath: string;
-  /** Auto-advancing photo carousel — currently only rendered on the
-   *  "placement-highlights" page (replaces its Overview text + Key
-   *  Highlights sidebar), but stored generically in case another page
-   *  wants the same treatment later. Order here is display order. */
-  galleryImages?: { url: string; path: string }[];
   order: number;
+  /** Only used on the "placement-highlights" page — rotating promotional
+   *  banner photos shown via PhotoCarousel in place of the Overview text
+   *  once at least one is uploaded. Optional: most items never set this. */
+  galleryImages?: { url: string; path: string }[];
 }
 
 const EMPTY: Omit<PlacementItemDoc, 'id'> = {
   slug: '', title: '', icon: 'BarChart3', desc: '', external: false, url: '',
   intro: '', about: '', highlights: [], outcomes: [], partners: [], tableText: '', dataTableHeadersText: '', rosterGroupsText: '',
-  deptCoordinatorsText: '', deptCoordinatorGroupsText: '', emails: [], linkedins: [], heroImage: '', heroStoragePath: '', galleryImages: [], order: 0,
+  deptCoordinatorsText: '', deptCoordinatorGroupsText: '', emails: [], linkedins: [], heroImage: '', heroStoragePath: '', order: 0,
 };
 
 function linesToArray(text: string): string[] {
@@ -68,24 +66,6 @@ export default function PlacementItemsAdmin() {
   const [form, setForm] = useState<Omit<PlacementItemDoc, 'id'>>(EMPTY);
   const [editing, setEditing] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-  // Internships-only: the yearly Excel/CSV file itself never has a Year
-  // column (each file just IS one year's data) — so instead of requiring
-  // admins to add one by hand before every import, they type the year once
-  // here and each import appends it as every row's 4th field, then appends
-  // those rows to whatever's already in the table (so re-importing a new
-  // year's file adds to the running list instead of wiping past years out).
-  const [internImportYear, setInternImportYear] = useState('');
-  // Photo Carousel — useImageCropModal directly (not the full ImageUploader
-  // component), same as GsacPhotosAdmin/IloOfficePhotosAdmin: ImageUploader
-  // keeps a "last uploaded" preview and swaps its button to "Change Image"
-  // after the first photo, which reads as "replace this one" rather than
-  // "add another" — the wrong affordance for a repeatable add-to-list field.
-  // Free-form (no fixed aspect) — these banner graphics vary in shape and
-  // some have their own white margins baked in around the actual content,
-  // so a locked ratio (e.g. 16:9) can't crop that padding out. Free lets an
-  // admin drag the crop box to exactly the colorful content area.
-  const { openCrop: openGalleryCrop, cropModal: galleryCropModal } = useImageCropModal(undefined);
-  const [galleryUploading, setGalleryUploading] = useState(false);
 
   const set = (k: string, v: string | number | string[] | boolean) => setForm((p) => ({ ...p, [k]: v }));
 
@@ -121,59 +101,8 @@ export default function PlacementItemsAdmin() {
       tableText: it.tableText || '', dataTableHeadersText: it.dataTableHeadersText || '', rosterGroupsText: it.rosterGroupsText || '', deptCoordinatorsText: it.deptCoordinatorsText || '',
       deptCoordinatorGroupsText: it.deptCoordinatorGroupsText || '',
       emails: it.emails || [], linkedins: it.linkedins || [],
-      heroImage: it.heroImage || '', heroStoragePath: it.heroStoragePath || '',
-      galleryImages: it.galleryImages || [], order: it.order,
+      heroImage: it.heroImage || '', heroStoragePath: it.heroStoragePath || '', order: it.order,
     });
-  };
-
-  // Gallery images — added one at a time via ImageUploader, each
-  // independently uploaded/removed (same pattern as ProgramsAdmin's Lab
-  // PDFs): functional setForm reads p.galleryImages, never a stale outer
-  // snapshot, so uploading several in quick succession can't clobber one
-  // another. Order in the array is display order — move buttons reorder it.
-  const galleryImages = form.galleryImages || [];
-  const addGalleryImage = (file: File) => {
-    setGalleryUploading(true);
-    openGalleryCrop(file, 'vwu/placements/highlights-carousel', (r: UploadResult) => {
-      setForm((p) => ({ ...p, galleryImages: [...(p.galleryImages || []), { url: r.url, path: r.path }] }));
-      setGalleryUploading(false);
-    });
-  };
-  const moveGalleryImage = (i: number, dir: -1 | 1) => {
-    setForm((p) => {
-      const next = [...(p.galleryImages || [])];
-      const target = i + dir;
-      if (target < 0 || target >= next.length) return p;
-      [next[i], next[target]] = [next[target], next[i]];
-      return { ...p, galleryImages: next };
-    });
-  };
-  // Removes immediately (deletes from Storage + patches Firestore on the
-  // spot if this item already exists), same reasoning as removeLabPdf in
-  // ProgramsAdmin — no orphaned Storage file, no risk of losing the removal
-  // if the admin navigates away before saving the rest of the form.
-  const removeGalleryImage = async (i: number) => {
-    const img = galleryImages[i];
-    if (!img) return;
-    if (!confirm('Remove this photo from the carousel? This cannot be undone.')) return;
-    try {
-      if (img.path) await deleteFile(img.path);
-    } catch (e) {
-      alert(`Couldn't delete the file from storage: ${(e as Error).message}`);
-      return;
-    }
-    let next: { url: string; path: string }[] = [];
-    setForm((p) => {
-      next = (p.galleryImages || []).filter((_, gi) => gi !== i);
-      return { ...p, galleryImages: next };
-    });
-    if (editing) {
-      try {
-        await updateDoc(doc(db, 'placementItems', editing), { galleryImages: next });
-      } catch (e) {
-        alert(`The file was deleted from storage, but the saved record couldn't be updated: ${(e as Error).message}`);
-      }
-    }
   };
 
   const remove = async (id: string, heroStoragePath?: string) => {
@@ -197,10 +126,7 @@ export default function PlacementItemsAdmin() {
           <code>| Email</code> and/or 5th <code>| LinkedIn URL</code> to show that person's contact info right
           under their name on the public page, without needing a separate admin section. Industry Liaison
           Offices is just <code>City | Office Address</code> (2 columns, no Role) — each city's row expands to
-          show that address under an "Office Address" heading. Internships is{' '}
-          <code>Company | Stipend/Month | No. of Selects</code>, with an optional 4th{' '}
-          <code>| Year</code> column (e.g. <code>2024-25</code>) — set it on some or all rows to get filter pills
-          above the table; a row left blank always shows no matter which pill is active. The slug{' '}
+          show that address under an "Office Address" heading. The slug{' '}
           <code>placement-highlights</code> is special: its Data Table shows whatever columns your spreadsheet
           has, in that exact order, instead of a fixed shape — its Excel/CSV import button fills both the Table
           Column Headers field and Data Table from the same file in one click (row 1 of the file always becomes
@@ -293,82 +219,11 @@ export default function PlacementItemsAdmin() {
                   }}
                   label="Import Data Table from Excel/CSV"
                 />
-              ) : form.slug === 'internships' ? (
-                <>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap', marginBottom: '0.5rem' }}>
-                    <label htmlFor="field-intern-import-year" style={{ fontSize: '0.85rem', fontWeight: 600 }}>Academic Year for this import:</label>
-                    <input
-                      id="field-intern-import-year"
-                      value={internImportYear}
-                      onChange={(e) => setInternImportYear(e.target.value)}
-                      placeholder="2024-25"
-                      style={{ width: 140 }}
-                    />
-                  </div>
-                  <TableImportButton
-                    onImport={(text) => {
-                      const tagged = text
-                        .split('\n')
-                        .map((line) => (internImportYear.trim() ? `${line} | ${internImportYear.trim()}` : line))
-                        .join('\n');
-                      set('tableText', form.tableText ? `${form.tableText}\n${tagged}` : tagged);
-                    }}
-                    label="Import This Year's Internships from Excel/CSV"
-                  />
-                  <p className="admin-field__hint" style={{ marginTop: '0.4rem' }}>
-                    Your Excel/CSV file itself only needs Company/Stipend/Selects columns — no Year column required.
-                    Type the academic year above (e.g. "2024-25") before each import; it gets added to every row
-                    from that file automatically, and the new rows are added to the table below rather than
-                    replacing it, so each year's file builds up the full list instead of wiping past years out.
-                  </p>
-                </>
               ) : (
                 <TableImportButton onImport={(text) => set('tableText', text)} label="Import Data Table from Excel/CSV" />
               )}
             </div>
           </div>
-          {form.slug === 'placement-highlights' && (
-            <div className="admin-field admin-field--full">
-              <label>Photo Carousel</label>
-              <p className="admin-field__hint" style={{ marginTop: 0 }}>
-                Replaces this page's Overview text and Key Highlights sidebar with an auto-advancing photo
-                carousel — add each image below (any order; use ↑/↓ to reorder). Leave it empty to keep showing
-                the plain Overview text/Key Highlights instead. Each photo shows on the public site exactly as
-                cropped here — if your source image has empty/white margins around the actual banner, drag the
-                crop box (it's free-form, no fixed shape) to just the colorful content before clicking "Crop &
-                Upload" so that margin doesn't show on the site.
-              </p>
-              {galleryImages.length > 0 && (
-                <div className="admin-image-grid" style={{ marginBottom: '0.75rem' }}>
-                  {galleryImages.map((img, i) => (
-                    <div key={img.path || i} className="admin-image-card">
-                      <img src={img.url} alt={`Carousel photo ${i + 1}`} />
-                      <div className="admin-image-card__actions">
-                        <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveGalleryImage(i, -1)} disabled={i === 0} title="Move earlier">↑</button>
-                        <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveGalleryImage(i, 1)} disabled={i === galleryImages.length - 1} title="Move later">↓</button>
-                        <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeGalleryImage(i)}>Remove</button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-              <label className="admin-btn admin-btn--sm" style={{ opacity: galleryUploading ? 0.5 : 1 }}>
-                {galleryUploading ? 'Uploading…' : '+ Add Photo'}
-                <input
-                  type="file"
-                  accept="image/*"
-                  hidden
-                  disabled={galleryUploading}
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) addGalleryImage(file);
-                    e.target.value = '';
-                  }}
-                />
-              </label>
-              {galleryCropModal}
-            </div>
-          )}
           <div className="admin-field admin-field--full">
             <label htmlFor="field-team-groups-one-per-line-optional">
               Team Groups (one per line, "Group Label | Count" — optional). When set, the Data Table above
