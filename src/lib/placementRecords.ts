@@ -41,11 +41,44 @@ export function findPackageColumnIndex(columns: string[]): number {
 
 // Pulls the first number out of a package cell — handles values like
 // "₹12 LPA", "12,00,000", "8.5", "Rs. 6 LPA" by stripping thousands commas
-// and grabbing the leading digits/decimal.
+// and grabbing the leading digits/decimal. Some departments' source sheets
+// record the raw annual rupee figure ("12,00,000") instead of LPA ("12") —
+// nothing in the cell text distinguishes the two once commas are stripped,
+// so anything past what any real placement offer could plausibly be in LPA
+// (the highest on record here is under 60) is treated as rupees and
+// converted down; a genuine LPA figure is always well under that and passes
+// through unchanged.
+const IMPLAUSIBLE_LPA_THRESHOLD = 1000;
 function parsePackageValue(raw: string): number {
   const cleaned = (raw || '').replace(/,/g, '');
-  const match = cleaned.match(/[\d.]+/);
-  return match ? parseFloat(match[0]) : NaN;
+  // Must start on an actual digit — a plain [\d.]+ can match a bare "."
+  // inside e.g. "Rs. 6 LPA" (the period right after "Rs") before ever
+  // reaching the real "6", parsing to NaN instead of 6.
+  const match = cleaned.match(/\d[\d.]*/);
+  if (!match) return NaN;
+  const value = parseFloat(match[0]);
+  return value >= IMPLAUSIBLE_LPA_THRESHOLD ? value / 100000 : value;
+}
+
+// Formats a package/CTC cell for display in the placement records table —
+// reuses parsePackageValue's rupee-vs-LPA disambiguation so a raw annual
+// rupee figure like "45,00,000" displays as the plain LPA figure "45"
+// instead of the imported rupee text. Falls back to the original cell text
+// when it doesn't parse as a number (e.g. "N/A", a blank cell).
+export function formatPackageCell(raw: string): string {
+  const value = parsePackageValue(raw);
+  return Number.isNaN(value) ? raw : `${Number(value.toFixed(2))}`;
+}
+
+// Finds whichever imported column is just a serial number ("S.No", "Sl.No",
+// "SNo", "Serial No") so it can be hidden from the rendered table — the
+// public page already numbers rows itself (1, 2, 3…) using their current
+// (post-sort) display position, so keeping an imported S.No column too both
+// duplicates that first column and shows stale numbers once rows get
+// reordered by sortPlacementRows. Returns -1 if no column looks like one.
+export function findSerialColumnIndex(columns: string[]): number {
+  const normalized = columns.map((c) => c.toLowerCase().replace(/[^a-z]/g, ''));
+  return normalized.findIndex((c) => c === 'sno' || c === 'slno' || c === 'serialno' || c === 'serialnumber');
 }
 
 // Finds whichever column looks like it holds the recruiting company's name —

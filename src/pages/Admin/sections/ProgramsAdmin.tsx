@@ -1577,6 +1577,14 @@ function PlacementYearsEditor({ program }: { program: ProgramDoc }) {
                 <p className="admin-field__hint">
                   {displayed.rows.length} record{displayed.rows.length === 1 ? '' : 's'}{preview ? ' — not yet saved' : ' saved'}.
                 </p>
+                {preview?.warning && (
+                  <p
+                    className="admin-field__hint"
+                    style={{ background: '#fff8e6', border: '1px solid #f5d78e', borderRadius: 6, padding: '0.6rem 0.9rem', marginBottom: '0.75rem' }}
+                  >
+                    ℹ️ {preview.warning}
+                  </p>
+                )}
                 <div className="admin-table-wrap" style={{ maxHeight: 320, overflow: 'auto' }}>
                   <table className="admin-table">
                     <thead>

@@ -18,7 +18,7 @@ import { normalizeLab, type ProgramDoc } from '../Admin/sections/ProgramsAdmin';
 import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import type { FacultyDoc } from './Faculty';
 import { parseFlexibleTable, parseProjectAccordion } from '../../lib/structuredTable';
-import { sortPlacementRows, computePlacementStats } from '../../lib/placementRecords';
+import { sortPlacementRows, computePlacementStats, findPackageColumnIndex, findSerialColumnIndex, formatPackageCell } from '../../lib/placementRecords';
 import { hasCustomSectionContent } from '../../lib/customSections';
 import CustomSectionsRenderer from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import '../detail-layout.css';
@@ -197,6 +197,14 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   const placementRows = placementColumns.length > 0 && activePlacementYear
     ? sortPlacementRows(placementColumns, activePlacementYear.rows || [])
     : [];
+  // Displays the package/CTC column as a plain LPA figure ("45" instead of
+  // an imported raw rupee value like "45,00,000") — same column detection
+  // computePlacementStats already uses for the stat tiles.
+  const placementPkgIdx = findPackageColumnIndex(placementColumns);
+  // Hides an imported S.No column — the table already numbers rows itself
+  // (see the S.No <th>/<td> below), so showing both duplicated the column.
+  const placementSnoIdx = findSerialColumnIndex(placementColumns);
+  const visiblePlacementColumnIndices = placementColumns.map((_, i) => i).filter((i) => i !== placementSnoIdx);
   // Computed live from the active year's raw rows — every tile below reads
   // straight from this, nothing here is admin-entered.
   const placementYearStats = activePlacementYear ? computePlacementStats(placementColumns, activePlacementYear.rows || []) : null;
@@ -215,6 +223,14 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   ].filter((g) => g.items && g.items.length > 0);
   const hasOutcomeStatements = outcomeGroups.length > 0;
   const activeOutcome = outcomeGroups.find((g) => g.key === outcomeTab) ?? outcomeGroups[0];
+  // Section heading + sidebar label list only whichever of PEOs/POs/PSOs/WKs
+  // this programme actually has content for (e.g. "PEOs, POs & PSOs" when
+  // there's no WKs data yet), instead of a fixed "...& WKs" that would claim
+  // content the programme doesn't have.
+  const outcomeShortLabels = outcomeGroups.map((g) => g.short);
+  const outcomeHeading = outcomeShortLabels.length > 1
+    ? `${outcomeShortLabels.slice(0, -1).join(', ')} & ${outcomeShortLabels[outcomeShortLabels.length - 1]}`
+    : outcomeShortLabels[0] || '';
   const hasMindMap = !!activeProgram.mindMapImage;
   // News & Events on the grouped department page is department-wide, not
   // per-toggle-side: both sources aggregate across every programme in the
@@ -263,7 +279,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   const programmeLinks = [
     hasProgrammeAbout && { id: 'programme-about', label: 'About the Programme' },
     hasHighlights && { id: 'highlights', label: 'Programme Highlights' },
-    hasOutcomeStatements && { id: 'peos-pos-psos', label: 'PEOs, POs, PSOs & WKs' },
+    hasOutcomeStatements && { id: 'peos-pos-psos', label: outcomeHeading },
     hasMindMap && { id: 'mindmap', label: 'Mind Map' },
     { id: 'curriculum', label: 'Curriculum' },
     ...visibleCustomSections.map((s) => ({ id: s.id, label: s.label })),
@@ -787,14 +803,16 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                           <thead>
                             <tr>
                               <th className="pb-activities-num">S.No</th>
-                              {placementColumns.map((col, ci) => <th key={ci}>{col}</th>)}
+                              {visiblePlacementColumnIndices.map((ci) => <th key={ci}>{placementColumns[ci]}</th>)}
                             </tr>
                           </thead>
                           <tbody>
                             {visiblePlacementRows.map((row, ri) => (
                               <tr key={ri}>
                                 <td className="pb-activities-num">{ri + 1}</td>
-                                {placementColumns.map((_, ci) => <td key={ci}>{row.cells[ci] ?? ''}</td>)}
+                                {visiblePlacementColumnIndices.map((ci) => (
+                                  <td key={ci}>{ci === placementPkgIdx ? formatPackageCell(row.cells[ci] ?? '') : (row.cells[ci] ?? '')}</td>
+                                ))}
                               </tr>
                             ))}
                           </tbody>
@@ -929,7 +947,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
           <div className="container">
             <div style={{ marginBottom: 'var(--space-10)' }}>
               <span className="section-label">Outcome-Based Education</span>
-              <h2 className="section-title">PEOs, POs, PSOs &amp; WKs</h2>
+              <h2 className="section-title">{outcomeHeading}</h2>
             </div>
             <div className="section-tabs">
               {outcomeGroups.map((g) => (

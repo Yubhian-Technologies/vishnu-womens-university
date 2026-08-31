@@ -788,8 +788,12 @@
 }
 
 .pb-activities-num {
-  color: var(--color-text-light) !important;
   text-align: center;
+}
+
+td.pb-activities-num {
+  color: var(--color-text) !important;
+  font-weight: 700;
 }
 
 @media (max-width: 640px) {
