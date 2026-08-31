@@ -242,7 +242,7 @@ function SingleProgramDetail() {
               <div>
                 <span className="section-label">About the Department</span>
                 <h2 className="section-title">The Department of {deptTitle || program.shortName || program.name}</h2>
-                <p style={{ color: 'var(--color-text-light)', lineHeight: 1.85, fontSize: 'var(--text-base)', marginBottom: 'var(--space-6)' }}>
+                <p style={{ color: 'var(--color-text-light)', lineHeight: 1.85, fontSize: 'var(--text-base)', marginBottom: 'var(--space-6)', whiteSpace: 'pre-line' }}>
                   {program.about}
                 </p>
               </div>

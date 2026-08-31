@@ -19,6 +19,10 @@ export interface ProgramSubject {
 export interface ProgramSemester {
   label: string;
   subjects: ProgramSubject[];
+  // Each semester can have its own uploaded PDF (syllabus) — same
+  // independent-upload pattern as LabItem/RndLink/NewsletterIssue above.
+  pdfUrl?: string;
+  pdfStoragePath?: string;
 }
 
 // Older programme docs stored subjects as plain strings — normalize either
@@ -526,6 +530,36 @@ export default function ProgramsAdmin() {
     if (!confirm('Remove this semester and all its subjects?')) return;
     set('semesters', form.semesters.filter((_, i) => i !== si));
   };
+  // Semester PDF upload/remove — same functional-setForm + immediate-Storage-
+  // delete pattern as handleLabPdf/removeLabPdf above (see that comment for
+  // why: several uploads firing in quick succession must each read the
+  // latest `p.semesters`, never a stale outer-scope snapshot).
+  const handleSemesterPdf = (si: number, r: UploadResult) => {
+    setForm((p) => ({ ...p, semesters: p.semesters.map((s, i) => (i === si ? { ...s, pdfUrl: r.url, pdfStoragePath: r.path } : s)) }));
+  };
+  const removeSemesterPdf = async (si: number) => {
+    const sem = form.semesters[si];
+    if (!sem?.pdfUrl) return;
+    if (!confirm('Remove this semester\'s PDF? This cannot be undone.')) return;
+    try {
+      if (sem.pdfStoragePath) await deleteFile(sem.pdfStoragePath);
+    } catch (e) {
+      alert(`Couldn't delete the file from storage: ${(e as Error).message}`);
+      return;
+    }
+    let nextSemesters: ProgramSemester[] = [];
+    setForm((p) => {
+      nextSemesters = p.semesters.map((s, i) => (i === si ? { ...s, pdfUrl: '', pdfStoragePath: '' } : s));
+      return { ...p, semesters: nextSemesters };
+    });
+    if (editing) {
+      try {
+        await updateDoc(doc(db, 'programs', editing), { semesters: nextSemesters });
+      } catch (e) {
+        alert(`The file was deleted from storage, but the saved record couldn't be updated: ${(e as Error).message}`);
+      }
+    }
+  };
   const addSubject = (si: number) => {
     set('semesters', form.semesters.map((s, i) => (i === si ? { ...s, subjects: [...s.subjects, { title: '' }] } : s)));
   };
@@ -583,7 +617,10 @@ export default function ProgramsAdmin() {
       highlights: p.highlights || [],
       labs: (p.labs || []).map(normalizeLab).map((l) => ({ name: l.name, pdfUrl: l.pdfUrl || '', pdfStoragePath: l.pdfStoragePath || '' })),
       outcomes: p.outcomes || [],
-      semesters: (p.semesters || []).map((s) => ({ label: s.label, subjects: (s.subjects || []).map(normalizeSubject) })),
+      semesters: (p.semesters || []).map((s) => ({
+        label: s.label, subjects: (s.subjects || []).map(normalizeSubject),
+        pdfUrl: s.pdfUrl || '', pdfStoragePath: s.pdfStoragePath || '',
+      })),
       vision: p.vision || '', mission: p.mission || [], coreValues: p.coreValues || [],
       peos: p.peos || [], pos: p.pos || [], psos: p.psos || [], wks: p.wks || [],
       hodMessage: p.hodMessage || '', hodImage: p.hodImage || '', hodImageStoragePath: p.hodImageStoragePath || '',
@@ -737,6 +774,11 @@ export default function ProgramsAdmin() {
             <textarea id="field-career-outcomes-one-per-line" rows={5} value={arrayToLines(form.outcomes)} onChange={(e) => set('outcomes', linesToArray(e.target.value))} placeholder="Software Engineer / Developer" />
           </div>
           <div className="admin-field admin-field--full"><hr /><h3>Programme Structure (Semester-wise Curriculum)</h3></div>
+          <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>
+            Each semester can have its own uploaded PDF (e.g. the full syllabus). On the public page, clicking that
+            semester's PDF link downloads it directly — a semester with no PDF uploaded just shows its subject list
+            with no download link.
+          </p>
           <div className="admin-field admin-field--full">
             {form.semesters.map((sem, si) => (
               <div key={si} style={{ border: '1.5px solid var(--color-light-gray)', borderRadius: 8, padding: '0.75rem', marginBottom: '0.75rem' }}>
@@ -750,6 +792,24 @@ export default function ProgramsAdmin() {
                   <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveSemester(si, -1)} disabled={si === 0} title="Move up">↑</button>
                   <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveSemester(si, 1)} disabled={si === form.semesters.length - 1} title="Move down">↓</button>
                   <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeSemester(si)}>Remove Semester</button>
+                </div>
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.5rem' }}>
+                  <FileUploader
+                    compact
+                    folder="vwu/programs/semesters"
+                    currentUrl={sem.pdfUrl}
+                    onUploaded={(r) => handleSemesterPdf(si, r)}
+                    label="Upload Semester PDF"
+                  />
+                  <button
+                    type="button"
+                    className="admin-btn admin-btn--ghost admin-btn--sm"
+                    onClick={() => removeSemesterPdf(si)}
+                    disabled={!sem.pdfUrl}
+                    title={sem.pdfUrl ? 'Remove PDF' : 'No PDF uploaded yet'}
+                  >
+                    Remove PDF
+                  </button>
                 </div>
 
                 {sem.subjects.map((subj, ji) => (

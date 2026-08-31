@@ -54,15 +54,31 @@ export default function ProgrammeStructure({ semesters, loading }: Props) {
         const isOpen = openSemesters.has(sem.label);
         return (
           <div key={sem.label} className={`thrust-accordion-item${isOpen ? ' open' : ''}`}>
-            <button
-              type="button"
-              className="thrust-accordion-header"
-              onClick={() => toggleSemester(sem.label)}
-              aria-expanded={isOpen}
-            >
-              <span>{sem.label}</span>
-              <span className="thrust-accordion-icon">{isOpen ? '−' : '+'}</span>
-            </button>
+            <div className="thrust-accordion-header" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', padding: 0 }}>
+              <button
+                type="button"
+                onClick={() => toggleSemester(sem.label)}
+                aria-expanded={isOpen}
+                style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-4)', background: 'none', border: 'none', padding: 'var(--space-3) var(--space-5)', font: 'inherit', color: 'inherit', cursor: 'pointer', textAlign: 'left' }}
+              >
+                <span>{sem.label}</span>
+                <span className="thrust-accordion-icon">{isOpen ? '−' : '+'}</span>
+              </button>
+              {/* Downloads straight from Firebase Storage — no page navigation,
+                  no need to expand the accordion first. Hidden until an admin
+                  uploads one via /admin → Programs, same convention as the
+                  Laboratories tiles' "PDF not available" fallback. */}
+              {sem.pdfUrl && (
+                <a
+                  href={sem.pdfUrl}
+                  download={`${sem.label}.pdf`}
+                  onClick={(e) => e.stopPropagation()}
+                  style={{ flexShrink: 0, marginRight: 'var(--space-4)', fontSize: '0.72rem', fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-primary)', textDecoration: 'underline', textUnderlineOffset: 2, whiteSpace: 'nowrap' }}
+                >
+                  Core Structure & Syllabus
+                </a>
+              )}
+            </div>
             <div className="thrust-accordion-collapse">
               <div className="thrust-accordion-collapse-inner">
                 <ul style={{ listStyle: 'none', padding: 'var(--space-4) var(--space-5)', margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
