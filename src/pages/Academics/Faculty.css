@@ -145,6 +145,13 @@
 
 .faculty-card__photo {
   object-fit: cover;
+  /* Uploads were previously cropped to a 16:9 rectangle (the uploader's old
+     default) before being squeezed into this circular 1:1 frame — a plain
+     center crop on that mismatch could slice into the top of the head.
+     Anchoring to the top keeps the face in frame; newly (re-)uploaded
+     photos now crop to 1:1 at upload time so this is a safety net, not the
+     primary fix. */
+  object-position: center top;
 }
 
 .faculty-card__name {

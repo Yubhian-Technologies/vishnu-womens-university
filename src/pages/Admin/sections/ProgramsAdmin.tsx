@@ -1,14 +1,19 @@
 import { useEffect, useState } from 'react';
 import {
-  collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp, writeBatch,
+  collection, addDoc, deleteDoc, doc, setDoc, updateDoc, serverTimestamp, writeBatch,
 } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
+import { useDocument } from '../../../hooks/useDocument';
 import ImageUploader from '../../../components/ImageUploader/ImageUploader';
 import FileUploader from '../../../components/FileUploader/FileUploader';
 import { deleteFile, type UploadResult } from '../../../lib/storage';
 import { PROGRAM_ICON_NAMES } from '../../../lib/programIcons';
 import DepartmentNewsManager from './DepartmentNewsManager';
+import { placementRecordsDocId, type PlacementRecordSet } from '../../../lib/placementRecords';
+import { parsePlacementsWorkbook, type PlacementImportResult } from '../../../lib/placementsImport';
+import CustomSectionEditor from './CustomSectionEditor';
+import { replaceAtPath, getAtPath, type CustomSection } from '../../../lib/customSections';
 
 export interface ProgramSubject {
   title: string;
@@ -19,6 +24,10 @@ export interface ProgramSubject {
 export interface ProgramSemester {
   label: string;
   subjects: ProgramSubject[];
+  // Each semester can have its own uploaded PDF (syllabus) — same
+  // independent-upload pattern as LabItem/RndLink/NewsletterIssue above.
+  pdfUrl?: string;
+  pdfStoragePath?: string;
 }
 
 // Older programme docs stored subjects as plain strings — normalize either
@@ -118,6 +127,9 @@ export interface ProgramDoc {
   peos: string[];
   pos: string[];
   psos: string[];
+  // Knowledge Profile statements (WK1, WK2, …) — same shape/pattern as
+  // peos/pos/psos above, shown as a 4th tab alongside them.
+  wks: string[];
   hodMessage: string;
   hodImage: string;
   hodImageStoragePath: string;
@@ -125,7 +137,7 @@ export interface ProgramDoc {
   hodResearchProfiles: ProgramLink[];
   mindMapImage: string;
   mindMapImageStoragePath: string;
-  // Optional — shown as a "Digital Library" section + Quick Links entry on
+  // Optional — shown as a "Department Library" section + Quick Links entry on
   // every programme's page (same shared template, not per-branch content,
   // and stored on this programme's own doc so each branch's library data is
   // completely independent of every other's).
@@ -133,7 +145,7 @@ export interface ProgramDoc {
   libraryInCharge?: string;
   // Fully admin-defined: any number of sections, each with any number of
   // items — nothing about headings or item names is fixed, so different
-  // programmes can have entirely different Digital Library content. Each
+  // programmes can have entirely different Department Library content. Each
   // section renders as its own table on the public page.
   librarySections?: LibrarySection[];
   // Optional — shown as a "News & Events" section + Quick Links entry on
@@ -146,9 +158,30 @@ export interface ProgramDoc {
   // year holds an ordered list of issues, each with its own uploaded PDF.
   newsletterYears?: NewsletterYear[];
   // Optional — shown as a "Research & Development (Funded Projects &
-  // Patents)" section + Quick Links entry on every programme's page. A flat,
-  // admin-named list of links, each backed by its own uploaded PDF.
+  // Patents)" section + Quick Links entry on every programme's page. Real
+  // department R&D pages turn out to differ a lot in shape (a department
+  // might just want an intro paragraph, a simple table, detailed per-patent
+  // cards, or plain PDF links — any combination), so this reuses the same
+  // three free-text formats already used site-wide on the Research pages
+  // (see ResearchItemsAdmin.tsx) instead of forcing one fixed layout:
+  rndIntro?: string;
+  // "## Section" / "Header | Header | ..." / "Value | Value | ..." — parsed
+  // by parseFlexibleTable(). Good for a flat table (e.g. Patents: Application
+  // No. | Title | Proof).
+  rndTableText?: string;
+  // "## Category" / "### Project Title" / "Label: value" / "- bullet" —
+  // parsed by parseProjectAccordion(). Good for detailed per-entry cards
+  // (e.g. a granted patent's invention title, patent no., grant date...).
+  rndProjectsText?: string;
+  // A flat, admin-named list of links, each backed by its own uploaded PDF —
+  // still the simplest option for a department that just wants to link out
+  // to a couple of PDFs (e.g. "Funded R&D Projects", "In-house R&D Projects").
   rndLinks?: RndLink[];
+  // Admin-defined sections beyond the fixed set above — any name, any number
+  // of sub-sections, and a choice of plain text / table / links / files per
+  // section (see lib/customSections.ts). Fully additive: a program with no
+  // customSections renders exactly as it did before this field existed.
+  customSections?: CustomSection[];
   order: number;
 }
 
@@ -156,13 +189,14 @@ const EMPTY: Omit<ProgramDoc, 'id'> = {
   slug: '', name: '', shortName: '', icon: 'GraduationCap', category: 'btech', intake: 60,
   established: '', accreditation: '', hod: '', department: '', fee: '', heroImage: '', storagePath: '', about: '',
   highlights: [], labs: [], outcomes: [], semesters: [],
-  vision: '', mission: [], coreValues: [], peos: [], pos: [], psos: [],
+  vision: '', mission: [], coreValues: [], peos: [], pos: [], psos: [], wks: [],
   hodMessage: '', hodImage: '', hodImageStoragePath: '', hodEmail: '', hodResearchProfiles: [],
   mindMapImage: '', mindMapImageStoragePath: '',
   libraryIntro: '', libraryInCharge: '', librarySections: [],
   newsEventsYears: [],
   newsletterYears: [],
-  rndLinks: [],
+  rndIntro: '', rndTableText: '', rndProjectsText: '', rndLinks: [],
+  customSections: [],
   order: 0,
 };
 
@@ -173,7 +207,7 @@ const CATEGORY_LABELS: Record<string, string> = { btech: 'B.Tech', mtech: 'M.Tec
 const DEPARTMENTS = ['CSE', 'AI', 'Cyber Security', 'IT', 'ECE', 'EEE', 'Civil', 'Mechanical', 'MBA'];
 
 function linesToArray(text: string): string[] {
-  return text.split('\n').map((s) => s.trim()).filter(Boolean);
+  return text.split('\n').map((s) => s.trim());
 }
 function arrayToLines(arr: string[] = []): string {
   return arr.join('\n');
@@ -237,11 +271,11 @@ export default function ProgramsAdmin() {
     }
   };
 
-  const set = (k: string, v: string | number | string[] | ProgramSemester[] | ProgramLink[] | LibrarySection[] | NewsEventsYear[] | NewsletterYear[] | RndLink[] | LabItem[]) => setForm((p) => ({ ...p, [k]: v }));
+  const set = (k: string, v: string | number | string[] | ProgramSemester[] | ProgramLink[] | LibrarySection[] | NewsEventsYear[] | NewsletterYear[] | RndLink[] | LabItem[] | CustomSection[]) => setForm((p) => ({ ...p, [k]: v }));
   const handleHodImage = (r: UploadResult) => setForm((p) => ({ ...p, hodImage: r.url, hodImageStoragePath: r.path }));
   const handleMindMapImage = (r: UploadResult) => setForm((p) => ({ ...p, mindMapImage: r.url, mindMapImageStoragePath: r.path }));
 
-  // Digital Library (sections + items) editing — same structured add /
+  // Department Library (sections + items) editing — same structured add /
   // remove / reorder shape as Programme Structure above, just for an
   // arbitrary set of "heading + item rows" tables instead of semesters.
   const librarySections = form.librarySections || [];
@@ -439,6 +473,43 @@ export default function ProgramsAdmin() {
     set('rndLinks', rndLinks.map((l, i) => (i === li ? { ...l, pdfUrl: '', pdfStoragePath: '' } : l)));
   };
 
+  // Custom Sections — file uploads route through the functional `setForm(p
+  // => ...)` form via replaceAtPath, recomputing from `p.customSections` at
+  // call time (never a closed-over snapshot), for the same reason
+  // handleLabPdf above does: several file uploads across different sections
+  // can resolve in quick succession, and each must land on top of whatever
+  // the others already saved, not silently overwrite it.
+  const handleCustomSectionFileUploaded = (sectionPath: number[], fileIndex: number, r: UploadResult) => {
+    setForm((p) => ({
+      ...p,
+      customSections: replaceAtPath(p.customSections || [], sectionPath, (s) => ({
+        ...s,
+        files: (s.files || []).map((f, i) => (i === fileIndex ? { ...f, fileUrl: r.url, storagePath: r.path } : f)),
+      })),
+    }));
+  };
+  // Unlike the rest of this form (which only takes effect once "Update
+  // Program" is clicked), removing a custom section's file acts immediately
+  // — same as removeLabPdf above — so there's no orphaned Storage file.
+  const handleCustomSectionFileRemoved = async (sectionPath: number[], fileIndex: number) => {
+    const file = getAtPath(form.customSections || [], sectionPath)?.files?.[fileIndex];
+    if (!file?.fileUrl) return;
+    if (!confirm('Remove this file? This cannot be undone.')) return;
+    try {
+      if (file.storagePath) await deleteFile(file.storagePath);
+    } catch (e) {
+      alert(`Couldn't delete the file from storage: ${(e as Error).message}`);
+      return;
+    }
+    setForm((p) => ({
+      ...p,
+      customSections: replaceAtPath(p.customSections || [], sectionPath, (s) => ({
+        ...s,
+        files: (s.files || []).filter((_, i) => i !== fileIndex),
+      })),
+    }));
+  };
+
   // Laboratories editing — each lab is independently backed by its own
   // uploaded PDF (same shape/pattern as Research & Development links above).
   //
@@ -523,6 +594,36 @@ export default function ProgramsAdmin() {
     if (!confirm('Remove this semester and all its subjects?')) return;
     set('semesters', form.semesters.filter((_, i) => i !== si));
   };
+  // Semester PDF upload/remove — same functional-setForm + immediate-Storage-
+  // delete pattern as handleLabPdf/removeLabPdf above (see that comment for
+  // why: several uploads firing in quick succession must each read the
+  // latest `p.semesters`, never a stale outer-scope snapshot).
+  const handleSemesterPdf = (si: number, r: UploadResult) => {
+    setForm((p) => ({ ...p, semesters: p.semesters.map((s, i) => (i === si ? { ...s, pdfUrl: r.url, pdfStoragePath: r.path } : s)) }));
+  };
+  const removeSemesterPdf = async (si: number) => {
+    const sem = form.semesters[si];
+    if (!sem?.pdfUrl) return;
+    if (!confirm('Remove this semester\'s PDF? This cannot be undone.')) return;
+    try {
+      if (sem.pdfStoragePath) await deleteFile(sem.pdfStoragePath);
+    } catch (e) {
+      alert(`Couldn't delete the file from storage: ${(e as Error).message}`);
+      return;
+    }
+    let nextSemesters: ProgramSemester[] = [];
+    setForm((p) => {
+      nextSemesters = p.semesters.map((s, i) => (i === si ? { ...s, pdfUrl: '', pdfStoragePath: '' } : s));
+      return { ...p, semesters: nextSemesters };
+    });
+    if (editing) {
+      try {
+        await updateDoc(doc(db, 'programs', editing), { semesters: nextSemesters });
+      } catch (e) {
+        alert(`The file was deleted from storage, but the saved record couldn't be updated: ${(e as Error).message}`);
+      }
+    }
+  };
   const addSubject = (si: number) => {
     set('semesters', form.semesters.map((s, i) => (i === si ? { ...s, subjects: [...s.subjects, { title: '' }] } : s)));
   };
@@ -550,10 +651,20 @@ export default function ProgramsAdmin() {
     if (!form.name || !form.slug) return alert('Program name and slug are required.');
     setSaving(true);
     try {
+      const payload = {
+        ...form,
+        highlights: form.highlights.filter(Boolean),
+        outcomes: form.outcomes.filter(Boolean),
+        mission: form.mission.filter(Boolean),
+        coreValues: form.coreValues.filter(Boolean),
+        peos: form.peos.filter(Boolean),
+        pos: form.pos.filter(Boolean),
+        psos: form.psos.filter(Boolean),
+      };
       if (editing) {
-        await updateDoc(doc(db, 'programs', editing), { ...form });
+        await updateDoc(doc(db, 'programs', editing), { ...payload });
       } else {
-        await addDoc(collection(db, 'programs'), { ...form, order: form.order || programs.filter((p) => p.category === form.category).length, createdAt: serverTimestamp() });
+        await addDoc(collection(db, 'programs'), { ...payload, order: form.order || programs.filter((p) => p.category === form.category).length, createdAt: serverTimestamp() });
       }
       setForm(EMPTY); setEditing(null);
     } catch (e) {
@@ -570,9 +681,12 @@ export default function ProgramsAdmin() {
       highlights: p.highlights || [],
       labs: (p.labs || []).map(normalizeLab).map((l) => ({ name: l.name, pdfUrl: l.pdfUrl || '', pdfStoragePath: l.pdfStoragePath || '' })),
       outcomes: p.outcomes || [],
-      semesters: (p.semesters || []).map((s) => ({ label: s.label, subjects: (s.subjects || []).map(normalizeSubject) })),
+      semesters: (p.semesters || []).map((s) => ({
+        label: s.label, subjects: (s.subjects || []).map(normalizeSubject),
+        pdfUrl: s.pdfUrl || '', pdfStoragePath: s.pdfStoragePath || '',
+      })),
       vision: p.vision || '', mission: p.mission || [], coreValues: p.coreValues || [],
-      peos: p.peos || [], pos: p.pos || [], psos: p.psos || [],
+      peos: p.peos || [], pos: p.pos || [], psos: p.psos || [], wks: p.wks || [],
       hodMessage: p.hodMessage || '', hodImage: p.hodImage || '', hodImageStoragePath: p.hodImageStoragePath || '',
       hodEmail: p.hodEmail || '', hodResearchProfiles: p.hodResearchProfiles || [],
       mindMapImage: p.mindMapImage || '', mindMapImageStoragePath: p.mindMapImageStoragePath || '',
@@ -585,7 +699,9 @@ export default function ProgramsAdmin() {
         year: y.year,
         issues: (y.issues || []).map((iss) => ({ pdfUrl: iss.pdfUrl || '', pdfStoragePath: iss.pdfStoragePath || '' })),
       })),
+      rndIntro: p.rndIntro || '', rndTableText: p.rndTableText || '', rndProjectsText: p.rndProjectsText || '',
       rndLinks: (p.rndLinks || []).map((l) => ({ label: l.label, pdfUrl: l.pdfUrl || '', pdfStoragePath: l.pdfStoragePath || '' })),
+      customSections: p.customSections || [],
       order: p.order || 0,
     });
   };
@@ -724,6 +840,11 @@ export default function ProgramsAdmin() {
             <textarea id="field-career-outcomes-one-per-line" rows={5} value={arrayToLines(form.outcomes)} onChange={(e) => set('outcomes', linesToArray(e.target.value))} placeholder="Software Engineer / Developer" />
           </div>
           <div className="admin-field admin-field--full"><hr /><h3>Programme Structure (Semester-wise Curriculum)</h3></div>
+          <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>
+            Each semester can have its own uploaded PDF (e.g. the full syllabus). On the public page, clicking that
+            semester's PDF link downloads it directly — a semester with no PDF uploaded just shows its subject list
+            with no download link.
+          </p>
           <div className="admin-field admin-field--full">
             {form.semesters.map((sem, si) => (
               <div key={si} style={{ border: '1.5px solid var(--color-light-gray)', borderRadius: 8, padding: '0.75rem', marginBottom: '0.75rem' }}>
@@ -737,6 +858,24 @@ export default function ProgramsAdmin() {
                   <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveSemester(si, -1)} disabled={si === 0} title="Move up">↑</button>
                   <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveSemester(si, 1)} disabled={si === form.semesters.length - 1} title="Move down">↓</button>
                   <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeSemester(si)}>Remove Semester</button>
+                </div>
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.5rem' }}>
+                  <FileUploader
+                    compact
+                    folder="vwu/programs/semesters"
+                    currentUrl={sem.pdfUrl}
+                    onUploaded={(r) => handleSemesterPdf(si, r)}
+                    label="Upload Semester PDF"
+                  />
+                  <button
+                    type="button"
+                    className="admin-btn admin-btn--ghost admin-btn--sm"
+                    onClick={() => removeSemesterPdf(si)}
+                    disabled={!sem.pdfUrl}
+                    title={sem.pdfUrl ? 'Remove PDF' : 'No PDF uploaded yet'}
+                  >
+                    Remove PDF
+                  </button>
                 </div>
 
                 {sem.subjects.map((subj, ji) => (
@@ -789,7 +928,7 @@ export default function ProgramsAdmin() {
             <textarea id="field-core-values-one-per-line" rows={3} value={arrayToLines(form.coreValues)} onChange={(e) => set('coreValues', linesToArray(e.target.value))} placeholder="Integrity" />
           </div>
 
-          <div className="admin-field admin-field--full"><hr /><h3>PEOs, POs & PSOs</h3></div>
+          <div className="admin-field admin-field--full"><hr /><h3>PEOs, POs, PSOs & WKs</h3></div>
           <div className="admin-field admin-field--full">
             <label htmlFor="field-programme-educational-objectives-peos-one">Programme Educational Objectives — PEOs (one per line)</label>
             <textarea id="field-programme-educational-objectives-peos-one" rows={4} value={arrayToLines(form.peos)} onChange={(e) => set('peos', linesToArray(e.target.value))} placeholder="Graduates will excel in…" />
@@ -801,6 +940,10 @@ export default function ProgramsAdmin() {
           <div className="admin-field admin-field--full">
             <label htmlFor="field-programme-specific-outcomes-psos-one">Programme Specific Outcomes — PSOs (one per line)</label>
             <textarea id="field-programme-specific-outcomes-psos-one" rows={4} value={arrayToLines(form.psos)} onChange={(e) => set('psos', linesToArray(e.target.value))} placeholder="Ability to apply…" />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label htmlFor="field-knowledge-profile-wks-one-per-line">Knowledge Profile — WKs (one per line)</label>
+            <textarea id="field-knowledge-profile-wks-one-per-line" rows={4} value={arrayToLines(form.wks)} onChange={(e) => set('wks', linesToArray(e.target.value))} placeholder="Systematic, theory-based understanding of the natural sciences…" />
           </div>
 
           <div className="admin-field admin-field--full"><hr /><h3>About HOD</h3></div>
@@ -827,15 +970,20 @@ export default function ProgramsAdmin() {
             <ImageUploader folder="vwu/programs/mindmap" currentUrl={form.mindMapImage} onUploaded={handleMindMapImage} label="Upload Mind Map Image" />
           </div>
 
-          <div className="admin-field admin-field--full"><hr /><h3>Digital Library</h3></div>
+          <div className="admin-field admin-field--full"><hr /><h3>Department Library</h3></div>
           <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>
-            Optional. Shown as a "Digital Library" section (and Quick Links entry) on this programme's page, right
-            after Laboratories. Each section below becomes its own table on the public page — headings and items
-            are entirely up to you, so different programmes can have completely different Digital Library content.
+            Optional. Shown as a "Department Library" section (and Quick Links entry) on this programme's page,
+            right after Laboratories. Each section below becomes its own table on the public page — headings and
+            items are entirely up to you, so different programmes can have completely different Department Library
+            content.
           </p>
           <div className="admin-field admin-field--full">
             <label>Library Overview</label>
-            <textarea rows={3} value={form.libraryIntro} onChange={(e) => set('libraryIntro', e.target.value)} placeholder="The Department Library occupies a unique place in academic and research activities of the Department…" />
+            <p className="admin-field__hint" style={{ marginTop: 0 }}>
+              One point per line starting with "- " renders as a bullet list; a line with no "- " is its own
+              paragraph. Wrap text in **double asterisks** for bold.
+            </p>
+            <textarea rows={5} value={form.libraryIntro} onChange={(e) => set('libraryIntro', e.target.value)} placeholder={'The Department Library occupies a unique place in academic and research activities of the Department…\n\n- The library is open from 8.00 a.m. to 5.00 p.m. on all days.\n- CDs of full series of lectures on specific subjects and text books are available to students for reference.'} />
           </div>
           <div className="admin-field admin-field--full">
             <label>In-charge of Department Library</label>
@@ -880,7 +1028,7 @@ export default function ProgramsAdmin() {
             ))}
             <button type="button" className="admin-btn admin-btn--primary" onClick={addLibrarySection}>+ Add Section</button>
             {librarySections.length === 0 && (
-              <p className="admin-field__hint">No sections yet — click "Add Section" to start building this programme's Digital Library.</p>
+              <p className="admin-field__hint">No sections yet — click "Add Section" to start building this programme's Department Library.</p>
             )}
           </div>
 
@@ -1019,9 +1167,39 @@ export default function ProgramsAdmin() {
           <div className="admin-field admin-field--full"><hr /><h3>Research &amp; Development (Funded Projects &amp; Patents)</h3></div>
           <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>
             Optional. Shown as a "Research &amp; Development (Funded Projects &amp; Patents)" section (and Quick
-            Links entry) on this programme's page — a flat list of named links, each opening its own uploaded PDF.
+            Links entry) on this programme's page. Real department R&amp;D pages vary a lot — use whichever of the
+            four fields below fit this department's actual content; only the ones you fill in will show.
           </p>
           <div className="admin-field admin-field--full">
+            <label htmlFor="field-rnd-intro">Overview (optional)</label>
+            <textarea id="field-rnd-intro" rows={3} value={form.rndIntro} onChange={(e) => set('rndIntro', e.target.value)} placeholder="An introductory paragraph, e.g. project background, campus context, or a general statement about the department's research focus." />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label>Table (optional — for a flat table like Patents: Application No. | Title | Proof). Start a
+              section with <code>## Section Title</code> (optional if there's only one table), then a header row and
+              data rows, all pipe-separated — the first line under a section becomes the column headers.</label>
+            <textarea
+              rows={6}
+              value={form.rndTableText}
+              onChange={(e) => set('rndTableText', e.target.value)}
+              placeholder={'## Patents\nApplication No. | Title | Proof\n202441093677 | Home safety and guidance system... | https://...\n6335941 | Novel Display Design for Immersive VR | https://...'}
+            />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label>Detailed Project / Patent Cards (optional — for entries with several labeled fields, e.g. a
+              granted patent's invention title, patent number, grant date, inventor). Start each category with{' '}
+              <code>## Category</code> (e.g. <code>## Patents Granted</code>), each entry with{' '}
+              <code>### Title</code>, then <code>Label: value</code> lines for its fields, and{' '}
+              <code>- bullet text</code> lines for an optional Outcome list.</label>
+            <textarea
+              rows={8}
+              value={form.rndProjectsText}
+              onChange={(e) => set('rndProjectsText', e.target.value)}
+              placeholder={'## Funds from AICTE\n### Dictated Note Printer in Braille for Blind with Cyber Physical System\nReference: DST/SEED/TIDE/2023/1131 (C)\nAmount: Rs. 34,24,523/- (2025)\n\n## Patents Granted\n### Machine Learning Based DC-DC Converter\nPatent Number: 202441093677\nApplication Number: 202441093677\nGrant Date: 12-03-2025\nInventor: Dr. G Srinivasa Rao'}
+            />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label className="admin-field__hint" style={{ display: 'block', marginBottom: '0.5rem' }}>PDF-only Links (optional — for a department that just wants to link out to a couple of PDFs, e.g. "Funded R&amp;D Projects" / "In-house R&amp;D Projects").</label>
             {rndLinks.map((link, li) => (
               <div key={li} style={{ border: '1.5px solid var(--color-light-gray)', borderRadius: 8, padding: '0.75rem', marginBottom: '0.75rem' }}>
                 <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.6rem' }}>
@@ -1057,6 +1235,23 @@ export default function ProgramsAdmin() {
               <p className="admin-field__hint">No links yet — click "Add Link" to start building this programme's Research &amp; Development list.</p>
             )}
           </div>
+
+          <div className="admin-field admin-field--full"><hr /><h3>Custom Sections</h3></div>
+          <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>
+            Optional. Add any section this programme needs beyond the fixed ones above — any name, any number of
+            sub-sections, and a choice of plain text, a table, a list of links, or uploaded files per section. Each
+            one automatically gets its own Quick Links entry and shows up on the public page once it has content.
+          </p>
+          <div className="admin-field admin-field--full">
+            <CustomSectionEditor
+              sections={form.customSections || []}
+              onChange={(next) => set('customSections', next)}
+              rootSections={form.customSections || []}
+              parentPath={[]}
+              onFileUploaded={handleCustomSectionFileUploaded}
+              onFileRemoved={handleCustomSectionFileRemoved}
+            />
+          </div>
         </div>
         <div className="admin-form-actions">
           {editing && <button className="admin-btn admin-btn--ghost" onClick={() => { setEditing(null); setForm(EMPTY); }}>Cancel</button>}
@@ -1065,6 +1260,10 @@ export default function ProgramsAdmin() {
           </button>
         </div>
       </div>
+
+      {editing && form.department && (
+        <PlacementRecordsEditor department={form.department} />
+      )}
 
       <div className="admin-card">
         <h2 className="admin-card__title">All Programs ({programs.length})</h2>
@@ -1110,6 +1309,149 @@ export default function ProgramsAdmin() {
           );
         })}
       </div>
+    </div>
+  );
+}
+
+// Individual student Placement Records for one department — kept separate
+// from the main programme form/doc above since it's a much bigger, purely
+// tabular dataset (one Firestore doc per department, id = its lowercased
+// department code — see placementRecordsDocId). Keyed by this programme's
+// own `department` field, so e.g. both "CSE" and "CSE [Cyber Security]"
+// (which share department "CSE") manage — and see — the exact same
+// department-wide dataset. An admin imports an Excel/CSV file, reviews the
+// detected columns + a preview of the parsed rows, then saves; re-importing
+// later fully replaces the previous dataset. Columns are never assumed or
+// hardcoded — whatever the uploaded file's header row contains is exactly
+// what gets stored and shown.
+function PlacementRecordsEditor({ department }: { department: string }) {
+  const docId = placementRecordsDocId(department);
+  const { data: existing, loading } = useDocument<PlacementRecordSet>('placementRecords', docId);
+  const [importing, setImporting] = useState(false);
+  const [preview, setPreview] = useState<PlacementImportResult | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  const handleFile = async (file: File) => {
+    setImporting(true);
+    try {
+      const result = await parsePlacementsWorkbook(file);
+      if (result.columns.length === 0 || result.rows.length === 0) {
+        alert("Couldn't find any data in that file — make sure the first row has column headers.");
+        return;
+      }
+      setPreview(result);
+    } catch (e) {
+      alert(`Couldn't read that file: ${(e as Error).message}`);
+    } finally {
+      setImporting(false);
+    }
+  };
+
+  const savePreview = async () => {
+    if (!preview) return;
+    setSaving(true);
+    try {
+      await setDoc(doc(db, 'placementRecords', docId), {
+        department,
+        columns: preview.columns,
+        rows: preview.rows.map((cells) => ({ cells })),
+        updatedAt: serverTimestamp(),
+      });
+      setPreview(null);
+    } catch (e) {
+      alert(`Couldn't save: ${(e as Error).message}`);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const clearSaved = async () => {
+    if (!confirm(`Delete all saved placement records for ${department}? This cannot be undone.`)) return;
+    try {
+      await deleteDoc(doc(db, 'placementRecords', docId));
+    } catch (e) {
+      alert(`Couldn't delete: ${(e as Error).message}`);
+    }
+  };
+
+  // The preview (just imported, not yet saved) always wins over whatever's
+  // already saved, so the admin reviews exactly what they're about to save.
+  const displayed = preview
+    ? preview
+    : existing
+      ? { columns: existing.columns, rows: existing.rows.map((r) => r.cells) }
+      : null;
+
+  return (
+    <div className="admin-card">
+      <h2 className="admin-card__title">Placement Records — {department}</h2>
+      <p className="admin-field__hint" style={{ marginBottom: '1rem' }}>
+        Upload an Excel/CSV file of student placement records for this department. The first row is treated as
+        column headers — whatever columns the file actually has are used as-is, nothing is assumed or hardcoded.
+        On the public page, the 10 highest values in whichever column looks like "Package"/"Highest Package"/"CTC"
+        show first, then everyone else in the order they were imported. Re-importing replaces the previous dataset.
+        Shared across every programme with this same Department code.
+      </p>
+
+      <label className="admin-btn admin-btn--primary" style={{ display: 'inline-block', cursor: importing ? 'default' : 'pointer', opacity: importing ? 0.6 : 1 }}>
+        {importing ? 'Reading file…' : 'Import from Excel/CSV'}
+        <input
+          type="file"
+          accept=".xlsx,.xls,.csv"
+          hidden
+          disabled={importing}
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) handleFile(file);
+            e.target.value = '';
+          }}
+        />
+      </label>
+
+      {loading && <p className="admin-loading">Loading…</p>}
+
+      {displayed && displayed.columns.length > 0 ? (
+        <>
+          <div style={{ margin: '1rem 0' }}>
+            <strong>Detected columns:</strong>{' '}
+            {displayed.columns.map((c) => (
+              <span key={c} className="admin-badge" style={{ marginRight: '0.4rem', textTransform: 'none' }}>{c}</span>
+            ))}
+          </div>
+          <p className="admin-field__hint">
+            {displayed.rows.length} record{displayed.rows.length === 1 ? '' : 's'}{preview ? ' — not yet saved' : ' saved'}.
+          </p>
+          <div className="admin-table-wrap" style={{ maxHeight: 360, overflow: 'auto' }}>
+            <table className="admin-table">
+              <thead>
+                <tr>{displayed.columns.map((c) => <th key={c}>{c}</th>)}</tr>
+              </thead>
+              <tbody>
+                {displayed.rows.slice(0, 25).map((row, ri) => (
+                  <tr key={ri}>{row.map((cell, ci) => <td key={ci}>{cell}</td>)}</tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {displayed.rows.length > 25 && (
+            <p className="admin-field__hint">Showing the first 25 of {displayed.rows.length} rows.</p>
+          )}
+          {preview ? (
+            <div className="admin-form-actions">
+              <button className="admin-btn admin-btn--ghost" onClick={() => setPreview(null)}>Discard</button>
+              <button className="admin-btn admin-btn--primary" onClick={savePreview} disabled={saving}>
+                {saving ? 'Saving…' : 'Save Placement Records'}
+              </button>
+            </div>
+          ) : (
+            <div className="admin-form-actions">
+              <button className="admin-btn admin-btn--danger" onClick={clearSaved}>Delete Saved Records</button>
+            </div>
+          )}
+        </>
+      ) : (
+        !loading && <p className="admin-field__hint">No placement records saved yet for this department.</p>
+      )}
     </div>
   );
 }

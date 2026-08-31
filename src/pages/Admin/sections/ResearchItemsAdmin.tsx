@@ -7,7 +7,10 @@ import { deleteFile, type UploadResult } from '../../../lib/storage';
 import FileUploader from '../../../components/FileUploader/FileUploader';
 import ConsultancyReportsAdmin from './ConsultancyReportsAdmin';
 import PatentCertificatesAdmin from './PatentCertificatesAdmin';
+import ProfessionalBodiesAdmin from './ProfessionalBodiesAdmin';
 import { parseFundedProjectsWorkbook } from '../../../lib/fundedProjectsImport';
+import { parsePatentsWorkbook } from '../../../lib/patentsImport';
+import { mergeProjectAccordion } from '../../../lib/structuredTable';
 
 // Some research items have extra editable content beyond the base fields
 // below (a year-by-year PDF list, patent certificate PDFs, ...) — keyed by
@@ -17,6 +20,7 @@ import { parseFundedProjectsWorkbook } from '../../../lib/fundedProjectsImport';
 const ITEM_SUB_SECTIONS: Record<string, { key: string; label: string; Component: ComponentType }[]> = {
   'consultancy': [{ key: 'reports', label: 'Consultancy Reports', Component: ConsultancyReportsAdmin }],
   'patents': [{ key: 'certificates', label: 'Patent Certificates', Component: PatentCertificatesAdmin }],
+  'professional-bodies': [{ key: 'bodies', label: 'Professional Bodies', Component: ProfessionalBodiesAdmin }],
 };
 
 export interface PublicationYearEntry {
@@ -59,7 +63,7 @@ const CATEGORIES: { value: ResearchItemDoc['category']; label: string }[] = [
 ];
 
 function linesToArray(text: string): string[] {
-  return text.split('\n').map((s) => s.trim()).filter(Boolean);
+  return text.split('\n').map((s) => s.trim());
 }
 function arrayToLines(arr: string[] = []): string {
   return arr.join('\n');
@@ -85,8 +89,25 @@ export default function ResearchItemsAdmin() {
         alert("Couldn't find any projects in that file — check it has a \"Name of the Project\" column and at least one filled-in row.");
         return;
       }
-      if (form.projectsText && !confirm(`Found ${projectCount} project(s) across ${sheetsUsed.length} sheet(s) (${sheetsUsed.join(', ')}). Replace the current text with these?`)) return;
-      set('projectsText', text);
+      set('projectsText', mergeProjectAccordion(form.projectsText, text));
+      alert(`Added ${projectCount} project(s) across ${sheetsUsed.length} sheet(s) (${sheetsUsed.join(', ')}) to the text below.`);
+    } catch (e) {
+      alert(`Couldn't read that file: ${(e as Error).message}`);
+    } finally {
+      setImporting(false);
+    }
+  };
+
+  const handleImportPatentsFile = async (file: File) => {
+    setImporting(true);
+    try {
+      const { text, sheetsUsed, patentCount } = await parsePatentsWorkbook(file);
+      if (patentCount === 0) {
+        alert("Couldn't find any patents in that file — check it has a \"Title of Invention\" column and at least one filled-in row.");
+        return;
+      }
+      set('projectsText', mergeProjectAccordion(form.projectsText, text));
+      alert(`Added ${patentCount} patent(s) across ${sheetsUsed.length} sheet(s) (${sheetsUsed.join(', ')}) to the text below.`);
     } catch (e) {
       alert(`Couldn't read that file: ${(e as Error).message}`);
     } finally {
@@ -107,10 +128,11 @@ export default function ResearchItemsAdmin() {
     if (!form.slug || !form.title) return alert('Slug and title are required.');
     setSaving(true);
     try {
+      const payload = { ...form, highlights: form.highlights.filter(Boolean) };
       if (editing) {
-        await updateDoc(doc(db, 'researchItems', editing), { ...form });
+        await updateDoc(doc(db, 'researchItems', editing), { ...payload });
       } else {
-        await addDoc(collection(db, 'researchItems'), { ...form, order: form.order || items.length + 1, createdAt: serverTimestamp() });
+        await addDoc(collection(db, 'researchItems'), { ...payload, order: form.order || items.length + 1, createdAt: serverTimestamp() });
       }
       setForm(EMPTY); setEditing(null); setActiveSubKey(null);
     } catch (e) {
@@ -270,6 +292,28 @@ export default function ResearchItemsAdmin() {
                 For a patent's certificate PDF, just type <code>Application Number: 202205074</code> here (no{' '}
                 <code>| https://...</code> needed) — attach the actual PDF from the{' '}
                 <strong>Extra Content</strong> card below using that exact same number.
+                <br />
+                Have an Excel/CSV sheet of patents (Category, Application, Applicant Name, Dept., Date of Filing,
+                Title of Invention, Inventor Name, Status)? Import it below instead of typing all this by hand —
+                a workbook with one tab per year (e.g. a tab named "2024") groups that tab's rows under "2024 –
+                Granted" / "2024 – Published" headings automatically; a single-sheet file falls back to the file
+                name for the year. Importing adds to whatever's already in the text below rather than replacing it,
+                so you can import one year's file at a time and keep every year's patents.
+                <br />
+                <label className="admin-btn admin-btn--sm" style={{ display: 'inline-block', marginTop: '0.5rem', cursor: importing ? 'default' : 'pointer', opacity: importing ? 0.6 : 1 }}>
+                  {importing ? 'Reading file…' : 'Import from Excel/CSV'}
+                  <input
+                    type="file"
+                    accept=".xlsx,.xls,.csv"
+                    hidden
+                    disabled={importing}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleImportPatentsFile(file);
+                      e.target.value = '';
+                    }}
+                  />
+                </label>
               </p>
             )}
             {form.slug === 'funded-projects' && (
@@ -278,6 +322,7 @@ export default function ResearchItemsAdmin() {
                 Staff, Dept., Status, Start Date, Year of Sanctioned, Total Amount Sanctioned, Outcomes)? Import it
                 below instead of typing all this by hand — separate "Ongoing"/"Completed" tabs in one workbook are
                 both picked up automatically. Multiple outcomes in one cell: press Alt+Enter between them.
+                Importing adds to whatever's already in the text below rather than replacing it.
                 <br />
                 <label className="admin-btn admin-btn--sm" style={{ display: 'inline-block', marginTop: '0.5rem', cursor: importing ? 'default' : 'pointer', opacity: importing ? 0.6 : 1 }}>
                   {importing ? 'Reading file…' : 'Import from Excel/CSV'}

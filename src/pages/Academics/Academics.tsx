@@ -62,11 +62,15 @@ const matchKey = (s: string) =>
 // Resolves a department card to the program page it links to. Grouped
 // departments (AI / CSE / ECE) point at their first sub-program slug, which
 // renders the shared department page with that program's toggle active (see
-// src/lib/departmentGroups.ts). Everything else matches by name to its single
-// program, or returns null when there's no clear match.
+// src/lib/departmentGroups.ts). Freshman Engineering isn't a degree program
+// (nothing in the `programs` collection to match against) but does have its
+// own static page at /academics/freshman-engineering, so it's special-cased
+// the same way. Everything else matches by name to its single program, or
+// returns null when there's no clear match.
 export function findDeptProgramSlug(dept: DepartmentDoc, programs: ProgramDoc[]): string | null {
   const grouped = groupForDeptShortCode(dept.shortCode);
   if (grouped) return grouped.programSlugs[0];
+  if (matchKey(dept.title) === matchKey('Freshman Engineering')) return 'freshman-engineering';
   const keys = [matchKey(dept.title), matchKey(dept.shortCode)].filter(Boolean);
   const matches = programs.filter((p) =>
     [p.department, p.name, p.shortName]

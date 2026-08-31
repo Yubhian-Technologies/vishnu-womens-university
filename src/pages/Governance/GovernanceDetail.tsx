@@ -4,6 +4,7 @@ import { Trophy, Landmark } from 'lucide-react';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { usePageBanners } from '../../hooks/usePageBanners';
 import { resolveContentIcon } from '../../lib/contentIcons';
+import { fetchPriorityAttr } from '../../lib/domAttrs';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import { parseStructuredTable } from '../../lib/structuredTable';
 import { parseAboutContent } from '../../lib/aboutContent';
@@ -156,7 +157,7 @@ export default function GovernanceDetail() {
             className="page-hero-image"
             loading="eager"
             decoding="sync"
-            {...({ fetchpriority: 'high' } as any)}
+            {...fetchPriorityAttr('high')}
           />
         )}
         <div className="page-hero-overlay" />

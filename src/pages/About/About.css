@@ -259,6 +259,22 @@
 }
 
 @media (max-width: 640px) {
-  .about-fact { min-width: 76px; padding: var(--space-2); }
+  /* Wrap onto two rows instead of the desktop single-row-with-horizontal-
+     scroll — a stat cut off at the screen edge with no visual "swipeable"
+     affordance (no partial peek, no fade edge) just reads as broken on a
+     phone, not scrollable. Wrapping guarantees every stat is visible with
+     no scrolling at all, matching however many quickStats are configured
+     (not just today's 5). */
+  .about-facts-bar {
+    flex-wrap: wrap;
+    overflow-x: visible;
+    justify-content: center;
+  }
+  .about-fact {
+    flex: 0 1 30%;
+    min-width: 0;
+    padding: var(--space-2);
+    border-right: none;
+  }
   .about-discover-grid { grid-template-columns: 1fr; }
 }

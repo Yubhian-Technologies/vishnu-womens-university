@@ -303,6 +303,27 @@ export default function FacultyAdmin() {
     } finally { setDedupeRunning(false); }
   };
 
+  // One-time cleanup: some records have a "Qualification" Profile Fact
+  // (shown on that person's own full profile page) but a blank flat
+  // Qualification field (used by list/table views, e.g. the Freshman
+  // Engineering department pages) — copies the fact's value into the field
+  // wherever the field is empty, so both places agree.
+  const qualificationFact = (f: FacultyDoc) => (f.facts ?? []).find((x) => /qualification/i.test(x.label))?.value;
+  const missingQualCount = faculty.filter((f) => !f.qualification && qualificationFact(f)).length;
+  const [fillingQual, setFillingQual] = useState(false);
+  const fillMissingQualifications = async () => {
+    if (!confirm(`Fill in the Qualification field for ${missingQualCount} faculty member(s) from their own Profile Facts?`)) return;
+    setFillingQual(true);
+    try {
+      for (const f of faculty) {
+        const value = !f.qualification ? qualificationFact(f) : undefined;
+        if (value) await updateDoc(doc(db, 'faculty', f.id), { qualification: value });
+      }
+    } catch (e) {
+      alert(`Couldn't fill in qualifications: ${(e as Error).message}`);
+    } finally { setFillingQual(false); }
+  };
+
   return (
     <div className="admin-section">
       <div className="admin-card">
@@ -361,7 +382,7 @@ export default function FacultyAdmin() {
         <div className="admin-form-grid">
           <div className="admin-field" style={{ gridColumn: '1 / -1', maxWidth: 200 }}>
             <label>Photo</label>
-            <ImageUploader folder="vwu/faculty" currentUrl={form.imageUrl} onUploaded={handleImage} label="Upload Photo" />
+            <ImageUploader folder="vwu/faculty" currentUrl={form.imageUrl} onUploaded={handleImage} label="Upload Photo" aspect={1} />
           </div>
           <div className="admin-field">
             <label htmlFor="field-full-name">Full Name *</label>
@@ -473,6 +494,15 @@ export default function FacultyAdmin() {
             {duplicateCount} likely duplicate faculty record(s) found (same name, same department).{' '}
             <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={removeDuplicates} disabled={dedupeRunning}>
               {dedupeRunning ? 'Removing…' : 'Remove duplicates'}
+            </button>
+          </p>
+        )}
+        {missingQualCount > 0 && (
+          <p className="admin-field__hint" style={{ margin: '0 0 1rem' }}>
+            {missingQualCount} faculty member(s) have a Qualification listed on their own profile but a blank
+            Qualification field (used on list/table views like the Freshman Engineering pages).{' '}
+            <button className="admin-btn admin-btn--sm" onClick={fillMissingQualifications} disabled={fillingQual}>
+              {fillingQual ? 'Filling in…' : `Fill in ${missingQualCount} Qualification${missingQualCount === 1 ? '' : 's'} from profile`}
             </button>
           </p>
         )}

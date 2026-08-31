@@ -116,16 +116,22 @@
 }
 
 /* ---- Sidebar ---- */
+/* position: fixed (not sticky) so the sidebar is pinned to the viewport and
+   never scrolls with the page — sticky only stays put while its scroll
+   container is the viewport itself, and here the page can scroll as a whole,
+   which was dragging the sidebar along with the main content. */
 .admin-sidebar {
   width: 230px;
   flex-shrink: 0;
   background: #081c15;
   display: flex;
   flex-direction: column;
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
   height: 100vh;
   overflow-y: auto;
+  z-index: 20;
 }
 
 .admin-sidebar__brand {
@@ -204,7 +210,12 @@
 }
 
 /* ---- Main ---- */
-.admin-main { flex: 1; overflow-y: auto; }
+/* min-width: 0 overrides the flex-item default of min-width: auto, which
+   otherwise refuses to shrink this column below the intrinsic width of its
+   widest descendant (e.g. a long field label or the upload drop zone),
+   pushing the whole admin-shell wider than the viewport and clipping
+   content on the right instead of wrapping/scrolling it. */
+.admin-main { flex: 1; min-width: 0; margin-left: 230px; overflow-y: auto; }
 
 .admin-content { display: flex; flex-direction: column; min-height: 100vh; }
 
@@ -263,13 +274,15 @@
 .admin-card__toolbar .admin-card__title { margin: 0; padding: 0; border: none; }
 
 /* ---- Forms ---- */
+/* minmax(0, 1fr) (not plain 1fr) so a track can shrink below the min-content
+   width of its widest field instead of growing the whole grid past 100%. */
 .admin-form-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 1rem;
 }
 
-.admin-field { display: flex; flex-direction: column; gap: 0.35rem; }
+.admin-field { display: flex; flex-direction: column; gap: 0.35rem; min-width: 0; }
 .admin-field--full { grid-column: 1 / -1; }
 .admin-field__hint { color: #9ca3af; font-size: 0.82rem; margin: -0.15rem 0 0.15rem; }
 
@@ -728,6 +741,8 @@
 
 @media (max-width: 768px) {
   .admin-sidebar { display: none; }
+
+  .admin-main { margin-left: 0; }
 
   .admin-content__body { padding: 1rem; }
 

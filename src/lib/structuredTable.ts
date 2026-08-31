@@ -91,6 +91,37 @@ export function parseFlexibleTable(text: string): FlexibleTableSection[] {
   return sections;
 }
 
+export function serializeFlexibleTable(sections: FlexibleTableSection[]): string {
+  return sections.map((s) => {
+    const lines: string[] = [];
+    if (s.title) lines.push(`## ${s.title}`);
+    if (s.headers.length > 0) lines.push(s.headers.join(' | '));
+    s.rows.forEach((row) => lines.push(row.join(' | ')));
+    return lines.join('\n');
+  }).join('\n\n');
+}
+
+// Combines existing table text with newly imported text, folding new rows
+// into an existing section of the exact same title (so re-importing a sheet
+// adds rows instead of creating a duplicate section) — used by the generic
+// custom-section table importer so "import" always means "append", never
+// "replace" (see genericSectionImport.ts).
+export function mergeFlexibleTable(existingText: string, newText: string): string {
+  const byTitle = new Map<string, FlexibleTableSection>();
+  const order: string[] = [];
+  for (const section of [...parseFlexibleTable(existingText), ...parseFlexibleTable(newText)]) {
+    const found = byTitle.get(section.title);
+    if (found) {
+      if (found.headers.length === 0) found.headers = section.headers;
+      found.rows.push(...section.rows);
+    } else {
+      byTitle.set(section.title, { title: section.title, headers: section.headers, rows: [...section.rows] });
+      order.push(section.title);
+    }
+  }
+  return serializeFlexibleTable(order.map((title) => byTitle.get(title)!));
+}
+
 // A two-level collapsible format for content that groups into named
 // categories, each containing several expandable areas with a flat list of
 // items inside (e.g. Research's Thrust Areas: department -> research area ->
@@ -269,4 +300,122 @@ export function parseProjectAccordion(text: string): ProjectAccordionCategory[] 
     }
   }
   return categories;
+}
+
+export function serializeProjectAccordion(categories: ProjectAccordionCategory[]): string {
+  return categories.map((cat) => {
+    const lines: string[] = [];
+    if (cat.title) lines.push(`## ${cat.title}`);
+    cat.projects.forEach((p, i) => {
+      if (i > 0) lines.push('');
+      lines.push(`### ${p.title}`);
+      p.fields.forEach((f) => lines.push(f.href ? `${f.label}: ${f.value} | ${f.href}` : `${f.label}: ${f.value}`));
+      if (p.outcomes.length > 0) {
+        lines.push('Outcome:');
+        p.outcomes.forEach((o) => lines.push(`- ${o}`));
+      }
+    });
+    return lines.join('\n');
+  }).join('\n\n');
+}
+
+// Combines existing Project Accordion text with newly imported text, folding
+// any new project into an existing category of the exact same title (so
+// re-importing a year's file adds to that year's heading instead of creating
+// a duplicate one) and sorting categories with a year in their title (e.g.
+// "2024 – Granted") newest-first — categories without a year (e.g. "Ongoing
+// Projects") sort to the end, in their original relative order.
+export function mergeProjectAccordion(existingText: string, newText: string): string {
+  const byTitle = new Map<string, ProjectAccordionCategory>();
+  const order: string[] = [];
+  for (const cat of [...parseProjectAccordion(existingText), ...parseProjectAccordion(newText)]) {
+    const found = byTitle.get(cat.title);
+    if (found) {
+      found.projects.push(...cat.projects);
+    } else {
+      byTitle.set(cat.title, { title: cat.title, projects: [...cat.projects] });
+      order.push(cat.title);
+    }
+  }
+  const yearOf = (title: string) => {
+    const m = title.match(/\b(19|20)\d{2}\b/);
+    return m ? parseInt(m[0], 10) : -Infinity;
+  };
+  const merged = order
+    .map((title, i) => ({ cat: byTitle.get(title)!, i }))
+    .sort((a, b) => yearOf(b.cat.title) - yearOf(a.cat.title) || a.i - b.i)
+    .map(({ cat }) => cat);
+  return serializeProjectAccordion(merged);
+}
+
+// A flat, optionally-grouped list of named links — for custom sections that
+// just need "Label -> URL" (e.g. a list of people's profile links, external
+// resources). Deliberately not the richer parseAccordionTable format (that
+// one has category -> area -> sub-area nesting this doesn't need) nor
+// ProgramsAdmin.tsx's colon-separated hodResearchProfiles mini-format (that
+// one has no grouping and no merge function) — this follows the same
+// pipe-cell convention as every other format in this file instead.
+//
+// Format:
+//   ## Optional Group Heading   (optional — starts a new named group)
+//   Label one | https://example.com/one
+//   Label two | https://example.com/two
+export interface LinkListItem {
+  label: string;
+  url: string;
+}
+
+export interface LinkListGroup {
+  title: string;
+  links: LinkListItem[];
+}
+
+export function parseLinkList(text: string): LinkListGroup[] {
+  const lines = (text || '').split('\n').map((l) => l.trim()).filter(Boolean);
+  const groups: LinkListGroup[] = [];
+  let current: LinkListGroup | null = null;
+
+  for (const line of lines) {
+    if (line.startsWith('## ')) {
+      current = { title: line.slice(3).trim(), links: [] };
+      groups.push(current);
+      continue;
+    }
+    if (!current) {
+      current = { title: '', links: [] };
+      groups.push(current);
+    }
+    const pipeIndex = line.indexOf('|');
+    const label = (pipeIndex > -1 ? line.slice(0, pipeIndex) : line).trim();
+    const url = (pipeIndex > -1 ? line.slice(pipeIndex + 1) : '').trim();
+    if (label && url) current.links.push({ label, url });
+  }
+  return groups;
+}
+
+export function serializeLinkList(groups: LinkListGroup[]): string {
+  return groups.map((g) => {
+    const lines: string[] = [];
+    if (g.title) lines.push(`## ${g.title}`);
+    g.links.forEach((l) => lines.push(`${l.label} | ${l.url}`));
+    return lines.join('\n');
+  }).join('\n\n');
+}
+
+// Same "import appends, never replaces" merge as mergeFlexibleTable /
+// mergeProjectAccordion above — folds new links into an existing group of
+// the exact same title instead of duplicating the heading.
+export function mergeLinkList(existingText: string, newText: string): string {
+  const byTitle = new Map<string, LinkListGroup>();
+  const order: string[] = [];
+  for (const group of [...parseLinkList(existingText), ...parseLinkList(newText)]) {
+    const found = byTitle.get(group.title);
+    if (found) {
+      found.links.push(...group.links);
+    } else {
+      byTitle.set(group.title, { title: group.title, links: [...group.links] });
+      order.push(group.title);
+    }
+  }
+  return serializeLinkList(order.map((title) => byTitle.get(title)!));
 }

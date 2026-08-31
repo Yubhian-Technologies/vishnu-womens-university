@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { resolveProgramIcon } from '../../lib/programIcons';
@@ -7,6 +8,19 @@ import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import '../Academics/Academics.css';
 import '../detail-layout.css';
 import './Schools.css';
+
+// The 4 "foundation" departments (Freshman Engineering subjects — see
+// FOUNDATION_DEPARTMENTS in FacultyAdmin.tsx) have no Program of their own,
+// so there's no program page to redirect to. FreshmanEngineering.tsx's own
+// tabs are titled "Department of <Name>" and support deep-linking via
+// ?tab=, so hardcode these 4 straight to their tab instead of leaving them
+// as dead cards.
+const FOUNDATION_DEPARTMENT_LINKS: Record<string, string> = {
+  mathematics: '/academics/freshman-engineering?tab=Department%20of%20Mathematics',
+  physics: '/academics/freshman-engineering?tab=Department%20of%20Physics',
+  chemistry: '/academics/freshman-engineering?tab=Department%20of%20Chemistry',
+  english: '/academics/freshman-engineering?tab=Department%20of%20English',
+};
 
 export default function Schools() {
   const { docs: schools, loading } = useOrderedCollection<SchoolDoc>('schools', 'order');
@@ -54,15 +68,24 @@ export default function Schools() {
                   .filter((d): d is DepartmentDoc => Boolean(d))
                   .map((dept) => {
                     const Icon = resolveProgramIcon(dept.icon);
-                    return (
-                      <div key={dept.id} className="dept-card">
+                    const foundationLink = FOUNDATION_DEPARTMENT_LINKS[dept.title.trim().toLowerCase()];
+                    const body = (
+                      <>
                         <div className="dept-card-top">
                           <span className="dept-icon"><Icon size={30} strokeWidth={1.75} /></span>
                           <span className="dept-code">{dept.shortCode}</span>
                         </div>
                         <h3 className="dept-name">{dept.title}</h3>
                         <p className="dept-desc">{dept.description}</p>
-                      </div>
+                      </>
+                    );
+                    return foundationLink ? (
+                      <Link key={dept.id} to={foundationLink} className="dept-card dept-card--link">
+                        {body}
+                        <span className="dept-card-arrow" style={{ marginTop: 'auto' }}>Learn More →</span>
+                      </Link>
+                    ) : (
+                      <div key={dept.id} className="dept-card">{body}</div>
                     );
                   })}
                 {(school.departmentIds || []).length === 0 && (
