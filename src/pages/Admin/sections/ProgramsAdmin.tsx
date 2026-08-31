@@ -173,7 +173,7 @@ const CATEGORY_LABELS: Record<string, string> = { btech: 'B.Tech', mtech: 'M.Tec
 const DEPARTMENTS = ['CSE', 'AI', 'Cyber Security', 'IT', 'ECE', 'EEE', 'Civil', 'Mechanical', 'MBA'];
 
 function linesToArray(text: string): string[] {
-  return text.split('\n').map((s) => s.trim()).filter(Boolean);
+  return text.split('\n').map((s) => s.trim());
 }
 function arrayToLines(arr: string[] = []): string {
   return arr.join('\n');
@@ -550,10 +550,20 @@ export default function ProgramsAdmin() {
     if (!form.name || !form.slug) return alert('Program name and slug are required.');
     setSaving(true);
     try {
+      const payload = {
+        ...form,
+        highlights: form.highlights.filter(Boolean),
+        outcomes: form.outcomes.filter(Boolean),
+        mission: form.mission.filter(Boolean),
+        coreValues: form.coreValues.filter(Boolean),
+        peos: form.peos.filter(Boolean),
+        pos: form.pos.filter(Boolean),
+        psos: form.psos.filter(Boolean),
+      };
       if (editing) {
-        await updateDoc(doc(db, 'programs', editing), { ...form });
+        await updateDoc(doc(db, 'programs', editing), { ...payload });
       } else {
-        await addDoc(collection(db, 'programs'), { ...form, order: form.order || programs.filter((p) => p.category === form.category).length, createdAt: serverTimestamp() });
+        await addDoc(collection(db, 'programs'), { ...payload, order: form.order || programs.filter((p) => p.category === form.category).length, createdAt: serverTimestamp() });
       }
       setForm(EMPTY); setEditing(null);
     } catch (e) {
