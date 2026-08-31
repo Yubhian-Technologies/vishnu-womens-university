@@ -6,7 +6,7 @@ import ImageUploader from '../../../components/ImageUploader/ImageUploader';
 import FileUploader from '../../../components/FileUploader/FileUploader';
 import { deleteFile, type UploadResult } from '../../../lib/storage';
 import { PROGRAM_ICON_NAMES } from '../../../lib/programIcons';
-import { normalizeLab, type LabItem, type LibrarySection, type LibraryItem, type NewsEventsYear, type ProgramDoc } from './ProgramsAdmin';
+import { normalizeLab, type LabItem, type LibrarySection, type LibraryItem, type NewsEventsYear, type ProgramLink, type ProgramDoc } from './ProgramsAdmin';
 import NewsEventsYearsEditor from './NewsEventsYearsEditor';
 
 // Backs the "Academic Departments" card grid on Academics.tsx — independent
@@ -47,6 +47,7 @@ export interface DepartmentDoc {
   hodImageStoragePath?: string;
   hodEmail?: string;
   hodMessage?: string;
+  hodResearchProfiles?: ProgramLink[];
   vision?: string;
   mission?: string[];
   coreValues?: string[];
@@ -83,7 +84,7 @@ export interface DepartmentDoc {
 const EMPTY: Omit<DepartmentDoc, 'id'> = {
   title: '', shortCode: '', description: '', icon: 'GraduationCap', order: 0,
   heroImage: '', storagePath: '', about: '', established: '', accreditation: '',
-  hod: '', hodImage: '', hodImageStoragePath: '', hodEmail: '', hodMessage: '',
+  hod: '', hodImage: '', hodImageStoragePath: '', hodEmail: '', hodMessage: '', hodResearchProfiles: [],
   vision: '', mission: [], coreValues: [], labs: [],
   libraryIntro: '', libraryInCharge: '', librarySections: [],
   programLevels: [],
@@ -96,6 +97,18 @@ function linesToArray(text: string): string[] {
 }
 function arrayToLines(arr: string[] = []): string {
   return arr.join('\n');
+}
+function linksToText(links: ProgramLink[] = []): string {
+  return links.map((l) => `${l.label}: ${l.url}`).join('\n');
+}
+function textToLinks(text: string): ProgramLink[] {
+  return linesToArray(text).map((line) => {
+    const idx = line.indexOf(':');
+    return {
+      label: (idx === -1 ? line : line.slice(0, idx)).trim(),
+      url: (idx === -1 ? '' : line.slice(idx + 1)).trim(),
+    };
+  }).filter((l) => l.label && l.url);
 }
 
 // A couple of legacy `programs` docs spell out their department in prose
@@ -125,7 +138,7 @@ export default function DepartmentsAdmin() {
   const [saving, setSaving] = useState(false);
   const [copying, setCopying] = useState(false);
 
-  const set = (k: string, v: string | number | string[] | LibrarySection[] | ProgramLevel[] | LibraryItem[] | LabItem[] | NewsEventsYear[]) => setForm((p) => ({ ...p, [k]: v }));
+  const set = (k: string, v: string | number | string[] | LibrarySection[] | ProgramLevel[] | LibraryItem[] | LabItem[] | NewsEventsYear[] | ProgramLink[]) => setForm((p) => ({ ...p, [k]: v }));
   const handleHero = (r: UploadResult) => setForm((p) => ({ ...p, heroImage: r.url, storagePath: r.path }));
   const handleHodImage = (r: UploadResult) => setForm((p) => ({ ...p, hodImage: r.url, hodImageStoragePath: r.path }));
 
@@ -140,16 +153,23 @@ export default function DepartmentsAdmin() {
     const code = d.shortCode.trim().toUpperCase();
     return allPrograms.filter((p) => (DEPT_PROGRAM_CODE_ALIASES[p.department] || p.department || '').trim().toUpperCase() === code);
   };
-  // News & Events isn't part of programRichness (it's a separate legacy
-  // field, not one of Vision/Mission/Values/Labs/Library) — found
-  // independently as whichever matching program still has it, same "first
-  // non-empty wins" rule the grouped department page itself already uses
-  // when pooling across AI&ML/AI&DS etc.
+  // News & Events and the HOD fields aren't part of programRichness (they're
+  // separate legacy fields, not one of Vision/Mission/Values/Labs/Library) —
+  // each found independently as whichever matching program still has it,
+  // same "first non-empty wins" rule the grouped department page itself
+  // already uses when pooling across AI&ML/AI&DS etc. A department's HOD is
+  // one person, not a blend, so this picks one whole program's set of HOD
+  // fields together rather than mixing, say, one program's photo with
+  // another's message.
   const legacyNewsEvents = (matches: ProgramDoc[]) => matches.map((p) => p.newsEventsYears).find((arr) => arr && arr.length > 0);
+  const hasHodInfo = (p: ProgramDoc) => !!(p.hod || p.hodImage || p.hodEmail || p.hodMessage || p.hodResearchProfiles?.length);
+  const legacyHod = (matches: ProgramDoc[]) => matches.find(hasHodInfo);
   const departmentsMissingContent = departments.filter((d) => {
     const matches = matchingPrograms(d);
     const richest = matches.reduce((best: ProgramDoc | null, p) => (!best || programRichness(p) > programRichness(best) ? p : best), null);
     const news = legacyNewsEvents(matches);
+    const hodSource = legacyHod(matches);
+    const hasOwnHod = !!(d.hod || d.hodImage || d.hodEmail || d.hodMessage || d.hodResearchProfiles?.length);
     const missing = (richest && programRichness(richest) > 0 && (
       !d.vision && !!richest.vision
       || !(d.mission?.length) && !!richest.mission?.length
@@ -158,17 +178,19 @@ export default function DepartmentsAdmin() {
       || !d.libraryIntro && !!richest.libraryIntro
       || !d.libraryInCharge && !!richest.libraryInCharge
       || !(d.librarySections?.length) && !!richest.librarySections?.length
-    )) || (!(d.newsEventsYears?.length) && !!news?.length);
+    )) || (!(d.newsEventsYears?.length) && !!news?.length) || (!hasOwnHod && !!hodSource);
     return missing;
   });
   const copyFromPrograms = async () => {
-    if (!confirm(`Copy Vision/Mission/Values, Laboratories, Department Library, and News & Events from each department's programme(s) into ${departmentsMissingContent.length} department(s) that don't already have it? This never overwrites content already entered directly on a department.`)) return;
+    if (!confirm(`Copy Vision/Mission/Values, Laboratories, Department Library, News & Events, and Head of Department from each department's programme(s) into ${departmentsMissingContent.length} department(s) that don't already have it? This never overwrites content already entered directly on a department.`)) return;
     setCopying(true);
     try {
       for (const d of departmentsMissingContent) {
         const matches = matchingPrograms(d);
         const richest = matches.reduce((best: ProgramDoc | null, p) => (!best || programRichness(p) > programRichness(best) ? p : best), null);
         const news = legacyNewsEvents(matches);
+        const hodSource = legacyHod(matches);
+        const hasOwnHod = !!(d.hod || d.hodImage || d.hodEmail || d.hodMessage || d.hodResearchProfiles?.length);
         const patch: Record<string, unknown> = {};
         if (richest) {
           if (!d.vision && richest.vision) patch.vision = richest.vision;
@@ -180,6 +202,13 @@ export default function DepartmentsAdmin() {
           if (!(d.librarySections?.length) && richest.librarySections?.length) patch.librarySections = richest.librarySections;
         }
         if (!(d.newsEventsYears?.length) && news?.length) patch.newsEventsYears = news;
+        if (!hasOwnHod && hodSource) {
+          if (hodSource.hod) patch.hod = hodSource.hod;
+          if (hodSource.hodImage) { patch.hodImage = hodSource.hodImage; patch.hodImageStoragePath = hodSource.hodImageStoragePath || ''; }
+          if (hodSource.hodEmail) patch.hodEmail = hodSource.hodEmail;
+          if (hodSource.hodMessage) patch.hodMessage = hodSource.hodMessage;
+          if (hodSource.hodResearchProfiles?.length) patch.hodResearchProfiles = hodSource.hodResearchProfiles;
+        }
         if (Object.keys(patch).length > 0) await updateDoc(doc(db, 'departments', d.id), patch);
       }
       alert(`Copied into ${departmentsMissingContent.length} department(s).`);
@@ -369,7 +398,7 @@ export default function DepartmentsAdmin() {
       heroImage: d.heroImage || '', storagePath: d.storagePath || '',
       about: d.about || '', established: d.established || '', accreditation: d.accreditation || '',
       hod: d.hod || '', hodImage: d.hodImage || '', hodImageStoragePath: d.hodImageStoragePath || '',
-      hodEmail: d.hodEmail || '', hodMessage: d.hodMessage || '',
+      hodEmail: d.hodEmail || '', hodMessage: d.hodMessage || '', hodResearchProfiles: d.hodResearchProfiles || [],
       vision: d.vision || '', mission: d.mission || [], coreValues: d.coreValues || [],
       labs: (d.labs || []).map(normalizeLab).map((l) => ({ name: l.name, pdfUrl: l.pdfUrl || '', pdfStoragePath: l.pdfStoragePath || '' })),
       libraryIntro: d.libraryIntro || '', libraryInCharge: d.libraryInCharge || '',
@@ -696,6 +725,10 @@ export default function DepartmentsAdmin() {
             <label htmlFor="field-hod-message">HOD Message</label>
             <textarea id="field-hod-message" rows={5} value={form.hodMessage} onChange={(e) => set('hodMessage', e.target.value)} />
           </div>
+          <div className="admin-field admin-field--full">
+            <label htmlFor="field-hod-research-profiles">HOD Research Profiles (one per line: "Google Scholar: https://…")</label>
+            <textarea id="field-hod-research-profiles" rows={4} value={linksToText(form.hodResearchProfiles)} onChange={(e) => set('hodResearchProfiles', textToLinks(e.target.value))} placeholder="Google Scholar: https://scholar.google.com/citations?user=…" />
+          </div>
         </div>
 
         <div className="admin-form-actions">
@@ -711,7 +744,8 @@ export default function DepartmentsAdmin() {
         {departmentsMissingContent.length > 0 && (
           <p className="admin-field__hint" style={{ margin: '0 0 1rem' }}>
             {departmentsMissingContent.length} department(s) are missing Vision/Mission/Values, Laboratories,
-            Department Library, or News &amp; Events that already exist on one of their programmes.{' '}
+            Department Library, News &amp; Events, or Head of Department info that already exist on one of their
+            programmes.{' '}
             <button className="admin-btn admin-btn--sm" onClick={copyFromPrograms} disabled={copying}>
               {copying ? 'Copying…' : 'Copy from Programs'}
             </button>

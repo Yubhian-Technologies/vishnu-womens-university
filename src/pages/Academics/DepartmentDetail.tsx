@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation, Navigate } from 'react-router-dom';
-import { Check, Microscope, Compass, Target, Sparkles, Mail, BookOpen, FileText } from 'lucide-react';
+import { Check, Microscope, Compass, Target, Sparkles, Mail, BookOpen, FileText, ExternalLink } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import ImageLightbox from '../../components/ImageLightbox/ImageLightbox';
 import ProgrammeStructure from '../../components/ProgrammeStructure/ProgrammeStructure';
@@ -153,6 +153,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     hodImage: dept?.hodImage || primary?.hodImage || '',
     hodEmail: dept?.hodEmail || primary?.hodEmail || '',
     hodMessage: dept?.hodMessage || primary?.hodMessage || '',
+    hodResearchProfiles: (dept?.hodResearchProfiles?.length ? dept.hodResearchProfiles : primary?.hodResearchProfiles) || [],
     vision: dept?.vision || primary?.vision || '',
     mission: (dept?.mission?.length ? dept.mission : primary?.mission) || [],
     coreValues: (dept?.coreValues?.length ? dept.coreValues : primary?.coreValues) || [],
@@ -579,6 +580,17 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                   )}
                 </div>
               </div>
+              {shared.hodResearchProfiles.length > 0 && (
+                <div style={{ background: 'var(--color-primary)', padding: 'var(--space-4) var(--space-8)', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-5)' }}>
+                  <span style={{ fontSize: 'var(--text-xs)', fontWeight: 800, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Research Profiles</span>
+                  {shared.hodResearchProfiles.map((link) => (
+                    <a key={link.label} href={link.url} target="_blank" rel="noopener noreferrer"
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1)', fontSize: 'var(--text-sm)', color: 'var(--color-white)', fontWeight: 600, textDecoration: 'none' }}>
+                      {link.label} <ExternalLink size={12} strokeWidth={2} />
+                    </a>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </section>

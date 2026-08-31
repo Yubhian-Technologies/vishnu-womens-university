@@ -146,6 +146,13 @@ function SingleProgramDetail() {
     libraryIntro: dept?.libraryIntro || program.libraryIntro || '',
     libraryInCharge: dept?.libraryInCharge || program.libraryInCharge || '',
     librarySections: (dept?.librarySections?.length ? dept.librarySections : program.librarySections) || [],
+    // A department has one Head of Department, not one per programme — same
+    // department-first, programme-fallback rule as everything else above.
+    hod: dept?.hod || program.hod || '',
+    hodImage: dept?.hodImage || program.hodImage || '',
+    hodEmail: dept?.hodEmail || program.hodEmail || '',
+    hodMessage: dept?.hodMessage || program.hodMessage || '',
+    hodResearchProfiles: (dept?.hodResearchProfiles?.length ? dept.hodResearchProfiles : program.hodResearchProfiles) || [],
   };
 
   const hasVisionMission = !!(shared.vision || shared.mission.length || shared.coreValues.length);
@@ -160,7 +167,7 @@ function SingleProgramDetail() {
   ].filter((g) => g.items && g.items.length > 0);
   const hasOutcomeStatements = outcomeGroups.length > 0;
   const activeOutcome = outcomeGroups.find((g) => g.key === outcomeTab) ?? outcomeGroups[0];
-  const hasHod = !!(program.hodMessage || program.hodImage || program.hodEmail);
+  const hasHod = !!(shared.hodMessage || shared.hodImage || shared.hodEmail || shared.hod);
   const hasMindMap = !!program.mindMapImage;
   const labs = shared.labs;
   const hasLabs = labs.length > 0;
@@ -302,7 +309,7 @@ function SingleProgramDetail() {
               ...(program.intake ? [{ label: 'Annual Intake', value: `${program.intake} Seats` }] : []),
               ...(program.established ? [{ label: 'Established', value: program.established }] : []),
               ...(program.accreditation ? [{ label: 'Accreditation', value: program.accreditation }] : []),
-              ...(program.hod ? [{ label: 'Head of Department', value: program.hod }] : []),
+              ...(shared.hod ? [{ label: 'Head of Department', value: shared.hod }] : []),
             ].map((s) => (
               <div key={s.label} style={{ textAlign: 'center' }}>
                 {s.label === 'Head of Department' && hasHod ? (
@@ -496,36 +503,36 @@ function SingleProgramDetail() {
             </div>
             <div style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
               <div style={{ display: 'flex', gap: 'var(--space-8)', flexWrap: 'wrap', alignItems: 'flex-start', padding: 'var(--space-8)' }}>
-                {program.hodImage && (
+                {shared.hodImage && (
                   <SmoothImage
-                    src={program.hodImage}
-                    alt={program.hod || 'Head of Department'}
+                    src={shared.hodImage}
+                    alt={shared.hod || 'Head of Department'}
                     style={{ width: 180, height: 180, objectFit: 'cover', borderRadius: 'var(--radius-md)', flexShrink: 0 }}
                   />
                 )}
                 <div style={{ flex: '1 1 260px', minWidth: 0 }}>
-                  {program.hod && (
-                    <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.35rem', color: 'var(--color-primary)', marginBottom: 'var(--space-1)' }}>{program.hod}</h3>
+                  {shared.hod && (
+                    <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.35rem', color: 'var(--color-primary)', marginBottom: 'var(--space-1)' }}>{shared.hod}</h3>
                   )}
                   <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
                     <span style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>
-                      Head of Department, {program.shortName || program.name}
+                      Head of Department, {deptTitle || program.shortName || program.name}
                     </span>
-                    {program.hodEmail && (
-                      <a href={`mailto:${program.hodEmail}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1)', fontSize: 'var(--text-sm)', color: 'var(--color-primary)', fontWeight: 600, textDecoration: 'none' }}>
-                        <Mail size={14} strokeWidth={1.75} /> {program.hodEmail}
+                    {shared.hodEmail && (
+                      <a href={`mailto:${shared.hodEmail}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1)', fontSize: 'var(--text-sm)', color: 'var(--color-primary)', fontWeight: 600, textDecoration: 'none' }}>
+                        <Mail size={14} strokeWidth={1.75} /> {shared.hodEmail}
                       </a>
                     )}
                   </div>
-                  {program.hodMessage && (
-                    <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.85, whiteSpace: 'pre-line' }}>{program.hodMessage}</p>
+                  {shared.hodMessage && (
+                    <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.85, whiteSpace: 'pre-line' }}>{shared.hodMessage}</p>
                   )}
                 </div>
               </div>
-              {program.hodResearchProfiles && program.hodResearchProfiles.length > 0 && (
+              {shared.hodResearchProfiles.length > 0 && (
                 <div style={{ background: 'var(--color-primary)', padding: 'var(--space-4) var(--space-8)', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-5)' }}>
                   <span style={{ fontSize: 'var(--text-xs)', fontWeight: 800, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Research Profiles</span>
-                  {program.hodResearchProfiles.map((link) => (
+                  {shared.hodResearchProfiles.map((link) => (
                     <a key={link.label} href={link.url} target="_blank" rel="noopener noreferrer"
                       style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1)', fontSize: 'var(--text-sm)', color: 'var(--color-white)', fontWeight: 600, textDecoration: 'none' }}>
                       {link.label} <ExternalLink size={12} strokeWidth={2} />

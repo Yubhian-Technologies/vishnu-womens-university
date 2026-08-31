@@ -247,19 +247,6 @@ function linesToArray(text: string): string[] {
 function arrayToLines(arr: string[] = []): string {
   return arr.join('\n');
 }
-function linksToText(links: ProgramLink[] = []): string {
-  return links.map((l) => `${l.label}: ${l.url}`).join('\n');
-}
-function textToLinks(text: string): ProgramLink[] {
-  return linesToArray(text).map((line) => {
-    const idx = line.indexOf(':');
-    return {
-      label: (idx === -1 ? line : line.slice(0, idx)).trim(),
-      url: (idx === -1 ? '' : line.slice(idx + 1)).trim(),
-    };
-  }).filter((l) => l.label && l.url);
-}
-
 export default function ProgramsAdmin() {
   const { docs: programs, loading } = useOrderedCollection<ProgramDoc>('programs', 'order');
   const [form, setForm] = useState<Omit<ProgramDoc, 'id'>>(EMPTY);
@@ -307,7 +294,6 @@ export default function ProgramsAdmin() {
   };
 
   const set = (k: string, v: string | number | string[] | ProgramSemester[] | ProgramLink[] | LibrarySection[] | NewsEventsYear[] | NewsletterYear[] | RndLink[] | LabItem[] | CustomSection[]) => setForm((p) => ({ ...p, [k]: v }));
-  const handleHodImage = (r: UploadResult) => setForm((p) => ({ ...p, hodImage: r.url, hodImageStoragePath: r.path }));
   const handleMindMapImage = (r: UploadResult) => setForm((p) => ({ ...p, mindMapImage: r.url, mindMapImageStoragePath: r.path }));
 
   // Newsletter (academic years, each with an ordered list of PDF-backed
@@ -613,10 +599,6 @@ export default function ProgramsAdmin() {
             <input id="field-annual-fee" value={form.fee} onChange={(e) => set('fee', e.target.value)} placeholder="₹ 1,05,000" />
           </div>
           <div className="admin-field">
-            <label htmlFor="field-head-of-department">Head of Department</label>
-            <input id="field-head-of-department" value={form.hod} onChange={(e) => set('hod', e.target.value)} placeholder="Dr. Name" />
-          </div>
-          <div className="admin-field">
             <label htmlFor="field-department-links-this-program-to">Department (links this program to the Faculty page)</label>
             <input id="field-department-links-this-program-to" list="program-departments" value={form.department} onChange={(e) => set('department', e.target.value)} placeholder="CSE" />
             <datalist id="program-departments">
@@ -739,22 +721,12 @@ export default function ProgramsAdmin() {
             <textarea id="field-knowledge-profile-wks-one-per-line" rows={4} value={arrayToLines(form.wks)} onChange={(e) => set('wks', linesToArray(e.target.value))} placeholder="Systematic, theory-based understanding of the natural sciences…" />
           </div>
 
-          <div className="admin-field admin-field--full"><hr /><h3>About HOD</h3></div>
           <div className="admin-field admin-field--full">
-            <label>HOD Photo</label>
-            <ImageUploader folder="vwu/programs/hod" currentUrl={form.hodImage} onUploaded={handleHodImage} label="Upload HOD Photo" />
-          </div>
-          <div className="admin-field">
-            <label htmlFor="field-hod-email">HOD Email</label>
-            <input id="field-hod-email" type="email" value={form.hodEmail} onChange={(e) => set('hodEmail', e.target.value)} placeholder="hodcse@vwu.ac.in" />
-          </div>
-          <div className="admin-field admin-field--full">
-            <label htmlFor="field-hod-message-profile">HOD Message / Profile</label>
-            <textarea id="field-hod-message-profile" rows={5} value={form.hodMessage} onChange={(e) => set('hodMessage', e.target.value)} placeholder="A brief message or profile from the Head of Department…" />
-          </div>
-          <div className="admin-field admin-field--full">
-            <label htmlFor="field-hod-research-profiles-one-per">HOD Research Profiles (one per line: "Google Scholar: https://…")</label>
-            <textarea id="field-hod-research-profiles-one-per" rows={4} value={linksToText(form.hodResearchProfiles)} onChange={(e) => set('hodResearchProfiles', textToLinks(e.target.value))} placeholder="Google Scholar: https://scholar.google.com/citations?user=…" />
+            <p className="admin-field__hint">
+              About HOD (name, photo, email, message, research profiles) isn't edited per-programme anymore — a
+              department has one Head of Department, not one per programme, so it now lives on the matching card in
+              <strong> Admin → Academic Departments</strong> instead.
+            </p>
           </div>
 
           <div className="admin-field admin-field--full"><hr /><h3>Mind Map</h3></div>
