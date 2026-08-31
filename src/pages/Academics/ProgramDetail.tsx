@@ -52,6 +52,10 @@ function SingleProgramDetail() {
   // Which Academic Year's placement records are shown — falls back to this
   // programme's first available year (see placementYears below).
   const [placementYear, setPlacementYear] = useState<string | null>(null);
+  // How many rows of the Placement Records table are visible at once —
+  // 'all' shows every row, otherwise a fixed page size (DataTables-style
+  // "Show N entries" control, matching the reference design).
+  const [placementPageSize, setPlacementPageSize] = useState<number | 'all'>(10);
   const [openRndProjects, setOpenRndProjects] = useState<Set<string>>(new Set());
   const toggleRndProject = (key: string) => {
     setOpenRndProjects((prev) => {
@@ -177,6 +181,7 @@ function SingleProgramDetail() {
   // Computed live from the active year's raw rows — every tile below reads
   // straight from this, nothing here is admin-entered.
   const placementYearStats = activePlacementYear ? computePlacementStats(placementColumns, activePlacementYear.rows || []) : null;
+  const visiblePlacementRows = placementPageSize === 'all' ? placementRows : placementRows.slice(0, placementPageSize);
   const visibleCustomSections = (program.customSections || []).filter(hasCustomSectionContent);
 
   const quickLinks = [
@@ -721,14 +726,18 @@ function SingleProgramDetail() {
                     <div className="placement-stat-tile__label">Highest Package</div>
                     <div className="placement-stat-tile__value">{placementYearStats.highestPackage ?? '—'}</div>
                   </div>
-                  <div className="placement-stat-tile">
-                    <div className="placement-stat-tile__label">Above 50 LPA+</div>
-                    <div className="placement-stat-tile__value">{placementYearStats.above50Lpa} offers</div>
-                  </div>
-                  <div className="placement-stat-tile">
-                    <div className="placement-stat-tile__label">Above 30 LPA+</div>
-                    <div className="placement-stat-tile__value">{placementYearStats.above30Lpa} offers</div>
-                  </div>
+                  {placementYearStats.above50Lpa > 0 && (
+                    <div className="placement-stat-tile">
+                      <div className="placement-stat-tile__label">Above 50 LPA+</div>
+                      <div className="placement-stat-tile__value">{placementYearStats.above50Lpa} offers</div>
+                    </div>
+                  )}
+                  {placementYearStats.above30Lpa > 0 && (
+                    <div className="placement-stat-tile">
+                      <div className="placement-stat-tile__label">Above 30 LPA+</div>
+                      <div className="placement-stat-tile__value">{placementYearStats.above30Lpa} offers</div>
+                    </div>
+                  )}
                   <div className="placement-stat-tile">
                     <div className="placement-stat-tile__label">Above 10 LPA+</div>
                     <div className="placement-stat-tile__value">{placementYearStats.above10Lpa} offers</div>
@@ -741,24 +750,43 @@ function SingleProgramDetail() {
                 Placement Records
               </h3>
               {placementRows.length > 0 ? (
-                <div className="pb-activities-scroll">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th className="pb-activities-num">S.No</th>
-                        {placementColumns.map((col, ci) => <th key={ci}>{col}</th>)}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {placementRows.map((row, ri) => (
-                        <tr key={ri}>
-                          <td className="pb-activities-num">{ri + 1}</td>
-                          {placementColumns.map((_, ci) => <td key={ci}>{row.cells[ci] ?? ''}</td>)}
+                <>
+                  <div className="placement-page-size">
+                    Show
+                    <select
+                      value={placementPageSize}
+                      onChange={(e) => setPlacementPageSize(e.target.value === 'all' ? 'all' : Number(e.target.value))}
+                    >
+                      <option value={10}>10</option>
+                      <option value={25}>25</option>
+                      <option value={50}>50</option>
+                      <option value={100}>100</option>
+                      <option value="all">All</option>
+                    </select>
+                    entries
+                  </div>
+                  <div className="pb-activities-scroll">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th className="pb-activities-num">S.No</th>
+                          {placementColumns.map((col, ci) => <th key={ci}>{col}</th>)}
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                      </thead>
+                      <tbody>
+                        {visiblePlacementRows.map((row, ri) => (
+                          <tr key={ri}>
+                            <td className="pb-activities-num">{ri + 1}</td>
+                            {placementColumns.map((_, ci) => <td key={ci}>{row.cells[ci] ?? ''}</td>)}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <p className="placement-page-info">
+                    Showing 1 to {visiblePlacementRows.length} of {placementRows.length} entries
+                  </p>
+                </>
               ) : (
                 <p style={{ color: 'var(--color-text-light)', fontStyle: 'italic' }}>
                   No placement records uploaded yet for {activePlacementYear?.year}.

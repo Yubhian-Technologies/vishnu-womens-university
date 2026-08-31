@@ -10,7 +10,7 @@ import { deleteFile, type UploadResult } from '../../../lib/storage';
 import { PROGRAM_ICON_NAMES } from '../../../lib/programIcons';
 import DepartmentNewsManager from './DepartmentNewsManager';
 import type { PlacementYearRecord } from '../../../lib/placementRecords';
-import { parsePlacementsWorkbook, type PlacementImportResult } from '../../../lib/placementsImport';
+import { parsePlacementsFile, type PlacementImportResult } from '../../../lib/placementsImport';
 import CustomSectionEditor from './CustomSectionEditor';
 import { replaceAtPath, getAtPath, type CustomSection } from '../../../lib/customSections';
 
@@ -1459,9 +1459,12 @@ function PlacementYearsEditor({ program }: { program: ProgramDoc }) {
   const handleFile = async (yi: number, file: File) => {
     setImportingYear(yi);
     try {
-      const result = await parsePlacementsWorkbook(file);
+      const result = await parsePlacementsFile(file);
       if (result.columns.length === 0 || result.rows.length === 0) {
-        alert("Couldn't find any data in that file — make sure the first row has column headers.");
+        alert(
+          "Couldn't find any data in that file — for Excel/CSV make sure the first row has column headers, " +
+          'for Word make sure the records are in an actual table, and for PDF make sure it has selectable text (not a scanned image).'
+        );
         return;
       }
       setPreviews((p) => ({ ...p, [yi]: result }));
@@ -1505,12 +1508,13 @@ function PlacementYearsEditor({ program }: { program: ProgramDoc }) {
     <div className="admin-card">
       <h2 className="admin-card__title">Placements — {program.shortName || program.name}</h2>
       <p className="admin-field__hint" style={{ marginBottom: '1rem' }}>
-        Add an Academic Year, then upload an Excel/CSV file of student placement records for that year. The first
-        row is treated as column headers — whatever columns the file actually has are used as-is, nothing is
-        assumed or hardcoded. On the public page, the 10 highest values in whichever column looks like
-        "Package"/"Highest Package"/"CTC" show first for that year, then everyone else in the order they were
-        imported. Re-importing a year replaces its previous dataset. Scoped to this exact programme only — other
-        programmes in the same department manage their own Academic Years independently.
+        Add an Academic Year, then upload a file of student placement records for that year — Excel (.xlsx/.xls),
+        CSV, Word (.docx, records must be in an actual table), or PDF (records must be selectable text, not a
+        scanned image) are all accepted. The first row is treated as column headers — whatever columns the file
+        actually has are used as-is, nothing is assumed or hardcoded. On the public page, the 10 highest values in
+        whichever column looks like "Package"/"Highest Package"/"CTC" show first for that year, then everyone else
+        in the order they were imported. Re-importing a year replaces its previous dataset. Scoped to this exact
+        programme only — other programmes in the same department manage their own Academic Years independently.
       </p>
 
       <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '1.25rem' }}>
@@ -1548,10 +1552,10 @@ function PlacementYearsEditor({ program }: { program: ProgramDoc }) {
             </div>
 
             <label className="admin-btn admin-btn--primary" style={{ display: 'inline-block', cursor: importing ? 'default' : 'pointer', opacity: importing ? 0.6 : 1 }}>
-              {importing ? 'Reading file…' : 'Import from Excel/CSV'}
+              {importing ? 'Reading file…' : 'Import from Excel / CSV / Word / PDF'}
               <input
                 type="file"
-                accept=".xlsx,.xls,.csv"
+                accept=".xlsx,.xls,.csv,.docx,.pdf"
                 hidden
                 disabled={importing}
                 onChange={(e) => {
