@@ -349,7 +349,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
             <div className={quickLinks.length > 1 ? 'detail-grid' : ''}>
               <div>
                 <span className="section-label">About the Department</span>
-                <h2 className="section-title">The Department of {deptName}</h2>
+                <h2 className="section-title">{deptName}</h2>
                 <p style={{ color: 'var(--color-text-light)', lineHeight: 1.85, fontSize: 'var(--text-base)', whiteSpace: 'pre-line' }}>
                   {shared.about}
                 </p>

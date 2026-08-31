@@ -476,8 +476,13 @@ function LabSection({ labs }: { labs: LabInfo[] }) {
 }
 
 // ---- Sub-departments (Mathematics / Physics / Chemistry / English) ----
+// Each of these also has its own standalone page at
+// /academics/freshman-engineering/<slug> (FreshmanSubDepartment.tsx), which
+// renders this exact same data via the exported SubDeptSection below —
+// `slug` is that page's URL segment.
 interface SubDept {
   key: string;
+  slug: string;
   title: string;
   tabs: string[];
   about: ContentBlock[];
@@ -486,9 +491,10 @@ interface SubDept {
   awards?: AwardsInfo;
 }
 
-const SUB_DEPTS: SubDept[] = [
+export const SUB_DEPTS: SubDept[] = [
   {
     key: 'Department of Mathematics',
+    slug: 'mathematics',
     title: 'Department of Mathematics',
     tabs: ['About Department', 'About HOD', 'Faculty', 'Research & Development', 'Awards & Recognitions'],
     about: [
@@ -535,6 +541,7 @@ const SUB_DEPTS: SubDept[] = [
   },
   {
     key: 'Department of Physics',
+    slug: 'physics',
     title: 'Department of Physics',
     tabs: ['About Department', 'About HOD', 'Faculty', 'Laboratories', 'Research & Development', 'Awards'],
     about: [
@@ -588,6 +595,7 @@ const SUB_DEPTS: SubDept[] = [
   },
   {
     key: 'Department of Chemistry',
+    slug: 'chemistry',
     title: 'Department of Chemistry',
     tabs: ['About Department', 'About HOD', 'Faculty', 'Laboratories', 'Research & Development', 'Awards & Recognitions'],
     about: [
@@ -660,6 +668,7 @@ const SUB_DEPTS: SubDept[] = [
   },
   {
     key: 'Department of English',
+    slug: 'english',
     title: 'Department of English',
     tabs: ['About Department', 'About HOD', 'Faculty', 'Laboratories', 'Research & Development', 'Awards'],
     about: [
@@ -704,7 +713,7 @@ const SUB_DEPTS: SubDept[] = [
   },
 ];
 
-function SubDeptSection({ dept }: { dept: SubDept }) {
+export function SubDeptSection({ dept }: { dept: SubDept }) {
   const [innerTab, setInnerTab] = useState(dept.tabs[0]);
   // "Department of Mathematics" -> "Mathematics" — matches the plain
   // department values used in the shared `faculty` collection (see
@@ -788,15 +797,60 @@ function LibrarySection() {
   );
 }
 
+// Shared right-rail nav, shown here and on each of the 4 standalone
+// sub-department pages (FreshmanSubDepartment.tsx) — all link back to this
+// page with a specific tab pre-selected. `activeHref` highlights whichever
+// one matches the page currently being viewed.
+export const FE_SIDEBAR_ITEMS: { label: string; href: string }[] = [
+  { label: FE_TABS[0], href: '/academics/freshman-engineering' },
+  ...FE_TABS.slice(1, 4).map((tab) => ({ label: tab, href: `/academics/freshman-engineering?tab=${encodeURIComponent(tab)}` })),
+  { label: 'Department Library', href: `/academics/freshman-engineering?tab=${encodeURIComponent('Department Library')}` },
+];
+
+export function FreshmanSidebarNav({ activeHref }: { activeHref: string }) {
+  return (
+    <div className="detail-sidebar">
+      <div style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', overflow: 'hidden', position: 'sticky', top: '110px' }}>
+        {FE_SIDEBAR_ITEMS.map((item) => {
+          const isActive = item.href === activeHref;
+          const itemStyle = {
+            display: 'block', width: '100%', textAlign: 'left' as const,
+            padding: 'var(--space-3) var(--space-5)', border: 'none',
+            borderBottom: '1px solid var(--color-light-gray)',
+            background: isActive ? 'var(--color-primary)' : 'transparent',
+            color: isActive ? 'var(--color-white)' : 'var(--color-primary)',
+            fontWeight: isActive ? 700 : 600, fontSize: 'var(--text-sm)',
+            textDecoration: 'none',
+          };
+          return isActive ? (
+            <div key={item.href} style={itemStyle}>{item.label}</div>
+          ) : (
+            <Link key={item.href} to={item.href} style={itemStyle}>{item.label}</Link>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 export default function FreshmanEngineering() {
-  // Lets links elsewhere (e.g. the Mathematics/Physics/Chemistry/English
-  // "foundation department" cards, which have no Program of their own to
-  // redirect to) deep-link straight to their tab via ?tab=, instead of
-  // always landing on "About Freshman Department".
+  // Lets links elsewhere (e.g. the FreshmanSidebarNav above, and the
+  // Mathematics/Physics/Chemistry/English "foundation department" cards on
+  // /academics) deep-link straight to a tab via ?tab=, instead of always
+  // landing on "About Freshman Department".
   const [searchParams] = useSearchParams();
   const requestedTab = searchParams.get('tab');
   const initialTab = FE_TABS.includes(requestedTab || '') ? requestedTab! : FE_TABS[0];
   const [activeTab, setActiveTab] = useState(initialTab);
+  // Re-syncs if a FreshmanSidebarNav link changes ?tab= while already on
+  // this route (same pathname doesn't remount, so the useState initializer
+  // above only fires once) — without this, clicking between the 4 in-page
+  // tabs while already on /academics/freshman-engineering would silently
+  // no-op.
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    setActiveTab(tab && FE_TABS.includes(tab) ? tab : FE_TABS[0]);
+  }, [searchParams]);
   const subDept = SUB_DEPTS.find((d) => d.key === activeTab);
 
   useEffect(() => {
@@ -851,34 +905,9 @@ export default function FreshmanEngineering() {
             </div>
 
             {/* Section nav */}
-            <div className="detail-sidebar">
-              <div style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', overflow: 'hidden', position: 'sticky', top: '110px' }}>
-                {FE_TABS.map((tab) => {
-                  const isActive = activeTab === tab;
-                  return (
-                    <button
-                      key={tab}
-                      onClick={() => setActiveTab(tab)}
-                      style={{
-                        display: 'block',
-                        width: '100%',
-                        textAlign: 'left',
-                        padding: 'var(--space-3) var(--space-5)',
-                        border: 'none',
-                        borderBottom: '1px solid var(--color-light-gray)',
-                        background: isActive ? 'var(--color-primary)' : 'transparent',
-                        color: isActive ? 'var(--color-white)' : 'var(--color-primary)',
-                        fontWeight: isActive ? 700 : 600,
-                        fontSize: 'var(--text-sm)',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      {tab}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
+            <FreshmanSidebarNav
+              activeHref={activeTab === FE_TABS[0] ? '/academics/freshman-engineering' : `/academics/freshman-engineering?tab=${encodeURIComponent(activeTab)}`}
+            />
           </div>
         </div>
       </section>
