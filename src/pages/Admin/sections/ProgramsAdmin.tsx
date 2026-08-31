@@ -19,6 +19,10 @@ export interface ProgramSubject {
 export interface ProgramSemester {
   label: string;
   subjects: ProgramSubject[];
+  // Each semester can have its own uploaded PDF (syllabus) — same
+  // independent-upload pattern as LabItem/RndLink/NewsletterIssue above.
+  pdfUrl?: string;
+  pdfStoragePath?: string;
 }
 
 // Older programme docs stored subjects as plain strings — normalize either
@@ -118,6 +122,9 @@ export interface ProgramDoc {
   peos: string[];
   pos: string[];
   psos: string[];
+  // Knowledge Profile statements (WK1, WK2, …) — same shape/pattern as
+  // peos/pos/psos above, shown as a 4th tab alongside them.
+  wks: string[];
   hodMessage: string;
   hodImage: string;
   hodImageStoragePath: string;
@@ -146,8 +153,24 @@ export interface ProgramDoc {
   // year holds an ordered list of issues, each with its own uploaded PDF.
   newsletterYears?: NewsletterYear[];
   // Optional — shown as a "Research & Development (Funded Projects &
-  // Patents)" section + Quick Links entry on every programme's page. A flat,
-  // admin-named list of links, each backed by its own uploaded PDF.
+  // Patents)" section + Quick Links entry on every programme's page. Real
+  // department R&D pages turn out to differ a lot in shape (a department
+  // might just want an intro paragraph, a simple table, detailed per-patent
+  // cards, or plain PDF links — any combination), so this reuses the same
+  // three free-text formats already used site-wide on the Research pages
+  // (see ResearchItemsAdmin.tsx) instead of forcing one fixed layout:
+  rndIntro?: string;
+  // "## Section" / "Header | Header | ..." / "Value | Value | ..." — parsed
+  // by parseFlexibleTable(). Good for a flat table (e.g. Patents: Application
+  // No. | Title | Proof).
+  rndTableText?: string;
+  // "## Category" / "### Project Title" / "Label: value" / "- bullet" —
+  // parsed by parseProjectAccordion(). Good for detailed per-entry cards
+  // (e.g. a granted patent's invention title, patent no., grant date...).
+  rndProjectsText?: string;
+  // A flat, admin-named list of links, each backed by its own uploaded PDF —
+  // still the simplest option for a department that just wants to link out
+  // to a couple of PDFs (e.g. "Funded R&D Projects", "In-house R&D Projects").
   rndLinks?: RndLink[];
   order: number;
 }
@@ -156,13 +179,13 @@ const EMPTY: Omit<ProgramDoc, 'id'> = {
   slug: '', name: '', shortName: '', icon: 'GraduationCap', category: 'btech', intake: 60,
   established: '', accreditation: '', hod: '', department: '', fee: '', heroImage: '', storagePath: '', about: '',
   highlights: [], labs: [], outcomes: [], semesters: [],
-  vision: '', mission: [], coreValues: [], peos: [], pos: [], psos: [],
+  vision: '', mission: [], coreValues: [], peos: [], pos: [], psos: [], wks: [],
   hodMessage: '', hodImage: '', hodImageStoragePath: '', hodEmail: '', hodResearchProfiles: [],
   mindMapImage: '', mindMapImageStoragePath: '',
   libraryIntro: '', libraryInCharge: '', librarySections: [],
   newsEventsYears: [],
   newsletterYears: [],
-  rndLinks: [],
+  rndIntro: '', rndTableText: '', rndProjectsText: '', rndLinks: [],
   order: 0,
 };
 
@@ -523,6 +546,36 @@ export default function ProgramsAdmin() {
     if (!confirm('Remove this semester and all its subjects?')) return;
     set('semesters', form.semesters.filter((_, i) => i !== si));
   };
+  // Semester PDF upload/remove — same functional-setForm + immediate-Storage-
+  // delete pattern as handleLabPdf/removeLabPdf above (see that comment for
+  // why: several uploads firing in quick succession must each read the
+  // latest `p.semesters`, never a stale outer-scope snapshot).
+  const handleSemesterPdf = (si: number, r: UploadResult) => {
+    setForm((p) => ({ ...p, semesters: p.semesters.map((s, i) => (i === si ? { ...s, pdfUrl: r.url, pdfStoragePath: r.path } : s)) }));
+  };
+  const removeSemesterPdf = async (si: number) => {
+    const sem = form.semesters[si];
+    if (!sem?.pdfUrl) return;
+    if (!confirm('Remove this semester\'s PDF? This cannot be undone.')) return;
+    try {
+      if (sem.pdfStoragePath) await deleteFile(sem.pdfStoragePath);
+    } catch (e) {
+      alert(`Couldn't delete the file from storage: ${(e as Error).message}`);
+      return;
+    }
+    let nextSemesters: ProgramSemester[] = [];
+    setForm((p) => {
+      nextSemesters = p.semesters.map((s, i) => (i === si ? { ...s, pdfUrl: '', pdfStoragePath: '' } : s));
+      return { ...p, semesters: nextSemesters };
+    });
+    if (editing) {
+      try {
+        await updateDoc(doc(db, 'programs', editing), { semesters: nextSemesters });
+      } catch (e) {
+        alert(`The file was deleted from storage, but the saved record couldn't be updated: ${(e as Error).message}`);
+      }
+    }
+  };
   const addSubject = (si: number) => {
     set('semesters', form.semesters.map((s, i) => (i === si ? { ...s, subjects: [...s.subjects, { title: '' }] } : s)));
   };
@@ -580,9 +633,12 @@ export default function ProgramsAdmin() {
       highlights: p.highlights || [],
       labs: (p.labs || []).map(normalizeLab).map((l) => ({ name: l.name, pdfUrl: l.pdfUrl || '', pdfStoragePath: l.pdfStoragePath || '' })),
       outcomes: p.outcomes || [],
-      semesters: (p.semesters || []).map((s) => ({ label: s.label, subjects: (s.subjects || []).map(normalizeSubject) })),
+      semesters: (p.semesters || []).map((s) => ({
+        label: s.label, subjects: (s.subjects || []).map(normalizeSubject),
+        pdfUrl: s.pdfUrl || '', pdfStoragePath: s.pdfStoragePath || '',
+      })),
       vision: p.vision || '', mission: p.mission || [], coreValues: p.coreValues || [],
-      peos: p.peos || [], pos: p.pos || [], psos: p.psos || [],
+      peos: p.peos || [], pos: p.pos || [], psos: p.psos || [], wks: p.wks || [],
       hodMessage: p.hodMessage || '', hodImage: p.hodImage || '', hodImageStoragePath: p.hodImageStoragePath || '',
       hodEmail: p.hodEmail || '', hodResearchProfiles: p.hodResearchProfiles || [],
       mindMapImage: p.mindMapImage || '', mindMapImageStoragePath: p.mindMapImageStoragePath || '',
@@ -595,6 +651,7 @@ export default function ProgramsAdmin() {
         year: y.year,
         issues: (y.issues || []).map((iss) => ({ pdfUrl: iss.pdfUrl || '', pdfStoragePath: iss.pdfStoragePath || '' })),
       })),
+      rndIntro: p.rndIntro || '', rndTableText: p.rndTableText || '', rndProjectsText: p.rndProjectsText || '',
       rndLinks: (p.rndLinks || []).map((l) => ({ label: l.label, pdfUrl: l.pdfUrl || '', pdfStoragePath: l.pdfStoragePath || '' })),
       order: p.order || 0,
     });
@@ -734,6 +791,11 @@ export default function ProgramsAdmin() {
             <textarea id="field-career-outcomes-one-per-line" rows={5} value={arrayToLines(form.outcomes)} onChange={(e) => set('outcomes', linesToArray(e.target.value))} placeholder="Software Engineer / Developer" />
           </div>
           <div className="admin-field admin-field--full"><hr /><h3>Programme Structure (Semester-wise Curriculum)</h3></div>
+          <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>
+            Each semester can have its own uploaded PDF (e.g. the full syllabus). On the public page, clicking that
+            semester's PDF link downloads it directly — a semester with no PDF uploaded just shows its subject list
+            with no download link.
+          </p>
           <div className="admin-field admin-field--full">
             {form.semesters.map((sem, si) => (
               <div key={si} style={{ border: '1.5px solid var(--color-light-gray)', borderRadius: 8, padding: '0.75rem', marginBottom: '0.75rem' }}>
@@ -747,6 +809,24 @@ export default function ProgramsAdmin() {
                   <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveSemester(si, -1)} disabled={si === 0} title="Move up">↑</button>
                   <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveSemester(si, 1)} disabled={si === form.semesters.length - 1} title="Move down">↓</button>
                   <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeSemester(si)}>Remove Semester</button>
+                </div>
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.5rem' }}>
+                  <FileUploader
+                    compact
+                    folder="vwu/programs/semesters"
+                    currentUrl={sem.pdfUrl}
+                    onUploaded={(r) => handleSemesterPdf(si, r)}
+                    label="Upload Semester PDF"
+                  />
+                  <button
+                    type="button"
+                    className="admin-btn admin-btn--ghost admin-btn--sm"
+                    onClick={() => removeSemesterPdf(si)}
+                    disabled={!sem.pdfUrl}
+                    title={sem.pdfUrl ? 'Remove PDF' : 'No PDF uploaded yet'}
+                  >
+                    Remove PDF
+                  </button>
                 </div>
 
                 {sem.subjects.map((subj, ji) => (
@@ -799,7 +879,7 @@ export default function ProgramsAdmin() {
             <textarea id="field-core-values-one-per-line" rows={3} value={arrayToLines(form.coreValues)} onChange={(e) => set('coreValues', linesToArray(e.target.value))} placeholder="Integrity" />
           </div>
 
-          <div className="admin-field admin-field--full"><hr /><h3>PEOs, POs & PSOs</h3></div>
+          <div className="admin-field admin-field--full"><hr /><h3>PEOs, POs, PSOs & WKs</h3></div>
           <div className="admin-field admin-field--full">
             <label htmlFor="field-programme-educational-objectives-peos-one">Programme Educational Objectives — PEOs (one per line)</label>
             <textarea id="field-programme-educational-objectives-peos-one" rows={4} value={arrayToLines(form.peos)} onChange={(e) => set('peos', linesToArray(e.target.value))} placeholder="Graduates will excel in…" />
@@ -811,6 +891,10 @@ export default function ProgramsAdmin() {
           <div className="admin-field admin-field--full">
             <label htmlFor="field-programme-specific-outcomes-psos-one">Programme Specific Outcomes — PSOs (one per line)</label>
             <textarea id="field-programme-specific-outcomes-psos-one" rows={4} value={arrayToLines(form.psos)} onChange={(e) => set('psos', linesToArray(e.target.value))} placeholder="Ability to apply…" />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label htmlFor="field-knowledge-profile-wks-one-per-line">Knowledge Profile — WKs (one per line)</label>
+            <textarea id="field-knowledge-profile-wks-one-per-line" rows={4} value={arrayToLines(form.wks)} onChange={(e) => set('wks', linesToArray(e.target.value))} placeholder="Systematic, theory-based understanding of the natural sciences…" />
           </div>
 
           <div className="admin-field admin-field--full"><hr /><h3>About HOD</h3></div>
@@ -1029,9 +1113,39 @@ export default function ProgramsAdmin() {
           <div className="admin-field admin-field--full"><hr /><h3>Research &amp; Development (Funded Projects &amp; Patents)</h3></div>
           <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>
             Optional. Shown as a "Research &amp; Development (Funded Projects &amp; Patents)" section (and Quick
-            Links entry) on this programme's page — a flat list of named links, each opening its own uploaded PDF.
+            Links entry) on this programme's page. Real department R&amp;D pages vary a lot — use whichever of the
+            four fields below fit this department's actual content; only the ones you fill in will show.
           </p>
           <div className="admin-field admin-field--full">
+            <label htmlFor="field-rnd-intro">Overview (optional)</label>
+            <textarea id="field-rnd-intro" rows={3} value={form.rndIntro} onChange={(e) => set('rndIntro', e.target.value)} placeholder="An introductory paragraph, e.g. project background, campus context, or a general statement about the department's research focus." />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label>Table (optional — for a flat table like Patents: Application No. | Title | Proof). Start a
+              section with <code>## Section Title</code> (optional if there's only one table), then a header row and
+              data rows, all pipe-separated — the first line under a section becomes the column headers.</label>
+            <textarea
+              rows={6}
+              value={form.rndTableText}
+              onChange={(e) => set('rndTableText', e.target.value)}
+              placeholder={'## Patents\nApplication No. | Title | Proof\n202441093677 | Home safety and guidance system... | https://...\n6335941 | Novel Display Design for Immersive VR | https://...'}
+            />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label>Detailed Project / Patent Cards (optional — for entries with several labeled fields, e.g. a
+              granted patent's invention title, patent number, grant date, inventor). Start each category with{' '}
+              <code>## Category</code> (e.g. <code>## Patents Granted</code>), each entry with{' '}
+              <code>### Title</code>, then <code>Label: value</code> lines for its fields, and{' '}
+              <code>- bullet text</code> lines for an optional Outcome list.</label>
+            <textarea
+              rows={8}
+              value={form.rndProjectsText}
+              onChange={(e) => set('rndProjectsText', e.target.value)}
+              placeholder={'## Funds from AICTE\n### Dictated Note Printer in Braille for Blind with Cyber Physical System\nReference: DST/SEED/TIDE/2023/1131 (C)\nAmount: Rs. 34,24,523/- (2025)\n\n## Patents Granted\n### Machine Learning Based DC-DC Converter\nPatent Number: 202441093677\nApplication Number: 202441093677\nGrant Date: 12-03-2025\nInventor: Dr. G Srinivasa Rao'}
+            />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label className="admin-field__hint" style={{ display: 'block', marginBottom: '0.5rem' }}>PDF-only Links (optional — for a department that just wants to link out to a couple of PDFs, e.g. "Funded R&amp;D Projects" / "In-house R&amp;D Projects").</label>
             {rndLinks.map((link, li) => (
               <div key={li} style={{ border: '1.5px solid var(--color-light-gray)', borderRadius: 8, padding: '0.75rem', marginBottom: '0.75rem' }}>
                 <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.6rem' }}>

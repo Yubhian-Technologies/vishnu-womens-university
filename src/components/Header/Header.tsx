@@ -119,6 +119,9 @@ const navItems: NavItem[] = [
         groupPath: '/academics',
         items: [
           { label: 'Programs & Departments', path: '/academics' },
+          { label: 'Schools', path: '/academics/schools' },
+          { label: 'Departments', path: '/academics/departments' },
+          { label: 'Programs', path: '/academics/programs' },
           { label: 'Faculty', path: '/faculty' },
           { label: 'Result Analysis', path: '/result-analysis' },
           { label: 'Examinations', path: 'https://www.svecwexams.in/', external: true },

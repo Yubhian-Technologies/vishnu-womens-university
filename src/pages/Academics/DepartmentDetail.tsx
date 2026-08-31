@@ -4,6 +4,7 @@ import { Check, Microscope, Compass, Target, Sparkles, Mail, BookOpen, FileText 
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import ImageLightbox from '../../components/ImageLightbox/ImageLightbox';
 import ProgrammeStructure from '../../components/ProgrammeStructure/ProgrammeStructure';
+import SmoothCollapse from '../../components/SmoothCollapse/SmoothCollapse';
 import SEO from '../../components/SEO/SEO';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useEapcetCode } from '../../hooks/useContentBlocks';
@@ -14,6 +15,7 @@ import type { DepartmentGroup } from '../../lib/departmentGroups';
 import { normalizeLab, type ProgramDoc } from '../Admin/sections/ProgramsAdmin';
 import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import type { FacultyDoc } from './Faculty';
+import { parseFlexibleTable, parseProjectAccordion } from '../../lib/structuredTable';
 import '../detail-layout.css';
 import '../Campus/tabbed-section.css';
 
@@ -38,6 +40,18 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   const location = useLocation();
   const [mindMapOpen, setMindMapOpen] = useState(false);
   const [outcomeTab, setOutcomeTab] = useState<string | null>(null);
+  // "Choose a Programme" Quick Links accordion — starts open so the sub-links
+  // remain visible by default (unchanged from before this was collapsible).
+  const [programmeLinksOpen, setProgrammeLinksOpen] = useState(true);
+  const [openRndProjects, setOpenRndProjects] = useState<Set<string>>(new Set());
+  const toggleRndProject = (key: string) => {
+    setOpenRndProjects((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
 
   const { docs: allDepartments, loading: deptLoading } = useOrderedCollection<DepartmentDoc>('departments', 'order');
   const dept = allDepartments.find(
@@ -76,9 +90,9 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   // Defaults the PEOs/POs/PSOs tab bar to whichever of the three actually
   // has admin-entered content for the active programme, once loaded.
   useEffect(() => {
-    const firstAvailable = activeProgram?.peos?.length ? 'peos' : activeProgram?.pos?.length ? 'pos' : activeProgram?.psos?.length ? 'psos' : null;
+    const firstAvailable = activeProgram?.peos?.length ? 'peos' : activeProgram?.pos?.length ? 'pos' : activeProgram?.psos?.length ? 'psos' : activeProgram?.wks?.length ? 'wks' : null;
     if (firstAvailable) setOutcomeTab((prev) => prev ?? firstAvailable);
-  }, [activeProgram?.peos?.length, activeProgram?.pos?.length, activeProgram?.psos?.length]);
+  }, [activeProgram?.peos?.length, activeProgram?.pos?.length, activeProgram?.psos?.length, activeProgram?.wks?.length]);
 
   if (progLoading && subPrograms.length === 0) {
     return (
@@ -115,6 +129,10 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     // shown on the Academics page, reused here so this works with no extra
     // data entry; the "Overview" field on the department admin overrides it.
     about: dept?.about || dept?.description || '',
+    // Department-only, no per-programme fallback — a new structural block
+    // (B.Tech./M.Tech. headings + intake tables) shown right after "About
+    // the Department".
+    programLevels: dept?.programLevels || [],
     established: clean(dept?.established) || clean(primary?.established),
     accreditation: clean(dept?.accreditation) || clean(primary?.accreditation),
     hod: dept?.hod || primary?.hod || '',
@@ -132,14 +150,21 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     libraryIntro: dept?.libraryIntro || primary?.libraryIntro || '',
     libraryInCharge: dept?.libraryInCharge || primary?.libraryInCharge || '',
     librarySections: (dept?.librarySections?.length ? dept.librarySections : primary?.librarySections) || [],
+    // Placements — department-only, shared across all of its programmes.
+    placementIntro: dept?.placementIntro || '',
+    placementStats: dept?.placementStats || [],
+    placementRecruiters: dept?.placementRecruiters || [],
   };
 
   const hasVisionMission = !!(shared.vision || shared.mission.length || shared.coreValues.length);
   const hasHod = !!(shared.hodMessage || shared.hodImage || shared.hodEmail || shared.hod);
   const hasLabs = shared.labs.length > 0;
   const hasAbout = !!shared.about;
+  const programLevels = shared.programLevels.filter((l) => l.title && (l.intro || l.rows?.length > 0));
+  const hasProgramLevels = programLevels.length > 0;
   const libraryTables = shared.librarySections.filter((sec) => sec.items && sec.items.length > 0);
   const hasLibrary = !!(shared.libraryIntro || shared.libraryInCharge || libraryTables.length > 0);
+  const hasPlacements = !!(shared.placementIntro || shared.placementStats.length > 0 || shared.placementRecruiters.length > 0);
 
   const hasProgrammeAbout = !!activeProgram.about;
   const hasHighlights = !!(activeProgram.highlights && activeProgram.highlights.length > 0);
@@ -149,6 +174,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     { key: 'peos', short: 'PEOs', title: 'Programme Educational Objectives (PEOs)', items: activeProgram.peos },
     { key: 'pos', short: 'POs', title: 'Programme Outcomes (POs)', items: activeProgram.pos },
     { key: 'psos', short: 'PSOs', title: 'Programme Specific Outcomes (PSOs)', items: activeProgram.psos },
+    { key: 'wks', short: 'WKs', title: 'Knowledge Profile (WKs)', items: activeProgram.wks },
   ].filter((g) => g.items && g.items.length > 0);
   const hasOutcomeStatements = outcomeGroups.length > 0;
   const activeOutcome = outcomeGroups.find((g) => g.key === outcomeTab) ?? outcomeGroups[0];
@@ -168,28 +194,34 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   // & Development" editor); a link only appears once it has both a name and
   // an uploaded PDF.
   const rndLinks = (activeProgram.rndLinks || []).filter((l) => l.label && l.pdfUrl);
-  const hasRnd = rndLinks.length > 0;
+  const rndTableSections = parseFlexibleTable(activeProgram.rndTableText || '').filter((s) => s.headers.length > 0);
+  const rndProjectCategories = parseProjectAccordion(activeProgram.rndProjectsText || '').filter((c) => c.projects.length > 0);
+  const hasRnd = !!activeProgram.rndIntro || rndTableSections.length > 0 || rndProjectCategories.length > 0 || rndLinks.length > 0;
 
-  // Quick Links sidebar — shared sections first, then the per-programme ones
-  // that live below the toggle (their target still exists on the page no
-  // matter which side is active, since the id is reused by whichever
-  // section is currently rendered for activeProgram).
+  // Quick Links sidebar — deliberately trimmed to one anchor per major
+  // section rather than every sub-section (e.g. "Choose a Programme" covers
+  // About the Programme / Highlights / PEOs,POs&PSOs / Mind Map / Curriculum,
+  // which still render below the toggle for whichever programme is active —
+  // they just don't each get their own sidebar entry).
   const quickLinks = [
     hasAbout && { id: 'about', label: 'About the Department' },
-    hasVisionMission && { id: 'vision-mission', label: 'Vision, Mission & Values' },
+    hasVisionMission && { id: 'vision-mission', label: 'Vision & Mission' },
     hasHod && { id: 'hod', label: 'About HOD' },
     faculty.length > 0 && { id: 'faculty', label: 'Faculty' },
     hasLabs && { id: 'labs', label: 'Laboratories' },
-    hasLibrary && { id: 'library', label: 'Digital Library' },
     { id: 'program-toggle', label: 'Choose a Programme' },
+    hasRnd && { id: 'rnd', label: 'R & D' },
+    hasPlacements && { id: 'placements', label: 'Placements' },
+    hasNewsEvents && { id: 'news-events', label: 'News & Events' },
+  ].filter(Boolean) as { id: string; label: string }[];
+  // Nested under the "Choose a Programme" row above as a collapsible
+  // sub-list — same admin-driven presence checks as before, just grouped.
+  const programmeLinks = [
     hasProgrammeAbout && { id: 'programme-about', label: 'About the Programme' },
     hasHighlights && { id: 'highlights', label: 'Programme Highlights' },
-    hasOutcomeStatements && { id: 'peos-pos-psos', label: 'PEOs, POs & PSOs' },
+    hasOutcomeStatements && { id: 'peos-pos-psos', label: 'PEOs, POs, PSOs & WKs' },
     hasMindMap && { id: 'mindmap', label: 'Mind Map' },
     { id: 'curriculum', label: 'Curriculum' },
-    hasNewsEvents && { id: 'news-events', label: 'News & Events' },
-    hasNewsletter && { id: 'newsletter', label: 'Newsletter' },
-    hasRnd && { id: 'rnd', label: 'Research & Development (Funded Projects & Patents)' },
   ].filter(Boolean) as { id: string; label: string }[];
 
   // Top stats bar, laid out as stacked rows: Head of Department gets its own
@@ -314,17 +346,94 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                     </h4>
                     <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
                       {quickLinks.map((l) => (
-                        <li key={l.id}>
-                          <a href={`#${l.id}`} style={{ display: 'block', padding: 'var(--space-2) 0', color: 'rgba(255,255,255,0.85)', fontSize: 'var(--text-sm)', fontWeight: 600, textDecoration: 'none', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-                            {l.label}
-                          </a>
-                        </li>
+                        l.id === 'program-toggle' ? (
+                          <li key={l.id}>
+                            <button
+                              type="button"
+                              onClick={() => setProgrammeLinksOpen((v) => !v)}
+                              aria-expanded={programmeLinksOpen}
+                              style={{
+                                display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%',
+                                background: 'none', border: 'none', padding: 'var(--space-2) 0', color: 'rgba(255,255,255,0.85)',
+                                fontSize: 'var(--text-sm)', fontWeight: 600, fontFamily: 'inherit', textAlign: 'left', cursor: 'pointer',
+                                borderBottom: '1px solid rgba(255,255,255,0.08)',
+                              }}
+                            >
+                              {l.label}
+                              <svg
+                                width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true"
+                                style={{ flexShrink: 0, marginLeft: 'var(--space-2)', opacity: 0.75, transition: 'transform var(--transition-base)', transform: programmeLinksOpen ? 'rotate(180deg)' : 'none' }}
+                              >
+                                <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                              </svg>
+                            </button>
+                            <SmoothCollapse open={programmeLinksOpen}>
+                              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+                                {programmeLinks.map((c) => (
+                                  <li key={c.id}>
+                                    <a href={`#${c.id}`} style={{ display: 'block', padding: 'var(--space-2) 0 var(--space-2) var(--space-4)', color: 'rgba(255,255,255,0.7)', fontSize: 'var(--text-sm)', fontWeight: 600, textDecoration: 'none', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+                                      {c.label}
+                                    </a>
+                                  </li>
+                                ))}
+                              </ul>
+                            </SmoothCollapse>
+                          </li>
+                        ) : (
+                          <li key={l.id}>
+                            <a href={`#${l.id}`} style={{ display: 'block', padding: 'var(--space-2) 0', color: 'rgba(255,255,255,0.85)', fontSize: 'var(--text-sm)', fontWeight: 600, textDecoration: 'none', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+                              {l.label}
+                            </a>
+                          </li>
+                        )
                       ))}
                     </ul>
                   </div>
                 </div>
               )}
             </div>
+          </div>
+        </section>
+      )}
+
+      {/* Programmes Offered (shared) — B.Tech./M.Tech. headed blocks, each
+          with an intro paragraph and an intake table. */}
+      {hasProgramLevels && (
+        <section id="program-levels" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
+          <div className="container">
+            {programLevels.map((level, li) => (
+              <div key={li} style={{ marginBottom: li === programLevels.length - 1 ? 0 : 'var(--space-10)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', marginBottom: 'var(--space-3)' }}>
+                  <span style={{ width: 4, height: '1.6em', background: 'var(--color-accent)', borderRadius: 2, flexShrink: 0 }} />
+                  <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: '1.4rem', fontWeight: 800, color: 'var(--color-primary)' }}>{level.title}</h3>
+                </div>
+                {level.intro && (
+                  <p style={{ color: 'var(--color-text-light)', lineHeight: 1.85, fontSize: 'var(--text-base)', whiteSpace: 'pre-line', marginBottom: level.rows?.length > 0 ? 'var(--space-5)' : 0, maxWidth: 760 }}>
+                    {level.intro}
+                  </p>
+                )}
+                {level.rows && level.rows.length > 0 && (
+                  <div className="pb-activities-scroll" style={{ maxWidth: 600 }}>
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>{level.title}</th>
+                          <th>Intake</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {level.rows.map((row, ri) => (
+                          <tr key={ri}>
+                            <td>{row.program}</td>
+                            <td>{row.intake}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         </section>
       )}
@@ -495,6 +604,47 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
         </section>
       )}
 
+      {/* Placements (shared) */}
+      {hasPlacements && (
+        <section id="placements" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
+          <div className="container">
+            <div style={{ marginBottom: 'var(--space-8)' }}>
+              <span className="section-label">Careers</span>
+              <h2 className="section-title">Placements</h2>
+            </div>
+            {shared.placementIntro && (
+              <p style={{ color: 'var(--color-text)', lineHeight: 1.85, fontSize: 'var(--text-base)', marginBottom: 'var(--space-6)', maxWidth: 760 }}>
+                {shared.placementIntro}
+              </p>
+            )}
+            {shared.placementStats.length > 0 && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-8)', marginBottom: shared.placementRecruiters.length > 0 ? 'var(--space-8)' : 0 }}>
+                {shared.placementStats.map((s) => (
+                  <div key={s.label} style={{ textAlign: 'center' }}>
+                    <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.5rem', fontWeight: 900, color: 'var(--color-accent)' }}>{s.value}</div>
+                    <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', fontFamily: 'var(--font-sans)', marginTop: 2, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{s.label}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+            {shared.placementRecruiters.length > 0 && (
+              <div>
+                <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 800, color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 'var(--space-3)' }}>
+                  Our Recruiters
+                </h3>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+                  {shared.placementRecruiters.map((r) => (
+                    <span key={r} style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--color-primary)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-full)', padding: '0.35rem 0.9rem' }}>
+                      {r}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
       {/* Digital Library (shared) */}
       {hasLibrary && (
         <section id="library" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
@@ -604,7 +754,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
           <div className="container">
             <div style={{ marginBottom: 'var(--space-10)' }}>
               <span className="section-label">Outcome-Based Education</span>
-              <h2 className="section-title">PEOs, POs &amp; PSOs</h2>
+              <h2 className="section-title">PEOs, POs, PSOs &amp; WKs</h2>
             </div>
             <div className="section-tabs">
               {outcomeGroups.map((g) => (
@@ -773,8 +923,11 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
       )}
 
       {/* Research & Development (Funded Projects & Patents) (per programme) —
-          same admin-named, PDF-backed link list as the standalone
-          ProgramDetail.tsx page's R&D section. */}
+          real department R&D pages vary a lot in shape, so this renders
+          whichever of the four admin fields are filled in: an overview
+          paragraph, table(s), detailed project/patent cards, and/or a flat
+          PDF link list — same three-format system as the site-wide Research
+          pages (see ResearchDetail.tsx / ResearchItemsAdmin.tsx). */}
       {hasRnd && (
         <section id="rnd" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
           <div className="container">
@@ -782,16 +935,119 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
               <span className="section-label">Research</span>
               <h2 className="section-title">Research &amp; Development (Funded Projects &amp; Patents)</h2>
             </div>
-            <ul className="annual-reports-list">
-              {rndLinks.map((link, li) => (
-                <li key={li}>
-                  <a href={link.pdfUrl} target="_blank" rel="noopener noreferrer" className="annual-reports-link">
-                    <FileText size={14} strokeWidth={2} className="annual-reports-icon" />
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
+            {activeProgram.rndIntro && (
+              <p style={{ color: 'var(--color-text)', lineHeight: 1.85, fontSize: 'var(--text-base)', marginBottom: 'var(--space-6)', maxWidth: 760, whiteSpace: 'pre-line' }}>
+                {activeProgram.rndIntro}
+              </p>
+            )}
+            {rndTableSections.map((section, si) => (
+              <div key={si} style={{ marginBottom: 'var(--space-8)' }}>
+                {section.title && (
+                  <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>
+                    {section.title}
+                  </h3>
+                )}
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm)' }}>
+                    <thead>
+                      <tr style={{ background: 'var(--color-primary)' }}>
+                        {section.headers.map((col, ci) => (
+                          <th key={ci} style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'left', color: 'var(--color-white)', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                            {col}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {section.rows.map((row, ri) => (
+                        <tr key={ri} style={{ background: ri % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)', borderBottom: '1px solid var(--color-light-gray)' }}>
+                          {row.map((val, ci) => (
+                            <td key={ci} style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)', lineHeight: 1.5 }}>
+                              {/^https?:\/\//i.test(val) ? <a href={val} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-primary)', fontWeight: 600 }}>View</a> : val}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ))}
+            {rndProjectCategories.map((cat, ci) => (
+              <div key={ci} style={{ marginBottom: ci < rndProjectCategories.length - 1 ? 'var(--space-10)' : (rndLinks.length > 0 ? 'var(--space-8)' : 0) }}>
+                {cat.title && (
+                  <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>
+                    {cat.title}
+                  </h3>
+                )}
+                <div className="thrust-accordion">
+                  {cat.projects.map((project, pi) => {
+                    const key = `${ci}-${pi}`;
+                    const isOpen = openRndProjects.has(key);
+                    return (
+                      <div key={pi} className={`thrust-accordion-item${isOpen ? ' open' : ''}`}>
+                        <button
+                          type="button"
+                          className="thrust-accordion-header"
+                          onClick={() => toggleRndProject(key)}
+                          aria-expanded={isOpen}
+                        >
+                          <span>{project.title}</span>
+                          <span className="thrust-accordion-icon">{isOpen ? '−' : '+'}</span>
+                        </button>
+                        <div className="thrust-accordion-collapse">
+                          <div className="thrust-accordion-collapse-inner">
+                            <div style={{ padding: 'var(--space-4) var(--space-5)' }}>
+                              {project.fields.length > 0 && (
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 'var(--space-2) var(--space-5)', marginBottom: project.outcomes.length > 0 ? 'var(--space-4)' : 0 }}>
+                                  {project.fields.map((f, fi) => (
+                                    <div key={fi} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.5 }}>
+                                      <strong style={{ color: 'var(--color-primary)' }}>{f.label}:</strong>{' '}
+                                      {f.href ? (
+                                        <a href={f.href} download target="_blank" rel="noopener noreferrer" className="thrust-accordion-link">{f.value}</a>
+                                      ) : (
+                                        f.value
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                              {project.outcomes.length > 0 && (
+                                <div>
+                                  <strong style={{ fontSize: 'var(--text-sm)', color: 'var(--color-primary)', display: 'block', marginBottom: 'var(--space-2)' }}>
+                                    Outcome
+                                  </strong>
+                                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                                    {project.outcomes.map((o, oi) => (
+                                      <li key={oi} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-2)' }}>
+                                        <Check size={13} strokeWidth={2.5} style={{ color: 'var(--color-accent)', flexShrink: 0, marginTop: 3 }} />
+                                        <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.5 }}>{o}</span>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+            {rndLinks.length > 0 && (
+              <ul className="annual-reports-list">
+                {rndLinks.map((link, li) => (
+                  <li key={li}>
+                    <a href={link.pdfUrl} target="_blank" rel="noopener noreferrer" className="annual-reports-link">
+                      <FileText size={14} strokeWidth={2} className="annual-reports-icon" />
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </section>
       )}
