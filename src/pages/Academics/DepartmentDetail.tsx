@@ -135,6 +135,10 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     libraryIntro: dept?.libraryIntro || primary?.libraryIntro || '',
     libraryInCharge: dept?.libraryInCharge || primary?.libraryInCharge || '',
     librarySections: (dept?.librarySections?.length ? dept.librarySections : primary?.librarySections) || [],
+    // Placements — department-only, shared across all of its programmes.
+    placementIntro: dept?.placementIntro || '',
+    placementStats: dept?.placementStats || [],
+    placementRecruiters: dept?.placementRecruiters || [],
   };
 
   const hasVisionMission = !!(shared.vision || shared.mission.length || shared.coreValues.length);
@@ -145,6 +149,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   const hasProgramLevels = programLevels.length > 0;
   const libraryTables = shared.librarySections.filter((sec) => sec.items && sec.items.length > 0);
   const hasLibrary = !!(shared.libraryIntro || shared.libraryInCharge || libraryTables.length > 0);
+  const hasPlacements = !!(shared.placementIntro || shared.placementStats.length > 0 || shared.placementRecruiters.length > 0);
 
   const hasProgrammeAbout = !!activeProgram.about;
   const hasHighlights = !!(activeProgram.highlights && activeProgram.highlights.length > 0);
@@ -175,27 +180,21 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   const rndLinks = (activeProgram.rndLinks || []).filter((l) => l.label && l.pdfUrl);
   const hasRnd = rndLinks.length > 0;
 
-  // Quick Links sidebar — shared sections first, then the per-programme ones
-  // that live below the toggle (their target still exists on the page no
-  // matter which side is active, since the id is reused by whichever
-  // section is currently rendered for activeProgram).
+  // Quick Links sidebar — deliberately trimmed to one anchor per major
+  // section rather than every sub-section (e.g. "Choose a Programme" covers
+  // About the Programme / Highlights / PEOs,POs&PSOs / Mind Map / Curriculum,
+  // which still render below the toggle for whichever programme is active —
+  // they just don't each get their own sidebar entry).
   const quickLinks = [
     hasAbout && { id: 'about', label: 'About the Department' },
-    hasProgramLevels && { id: 'program-levels', label: 'Programmes Offered' },
-    hasVisionMission && { id: 'vision-mission', label: 'Vision, Mission & Values' },
+    hasVisionMission && { id: 'vision-mission', label: 'Vision & Mission' },
     hasHod && { id: 'hod', label: 'About HOD' },
     faculty.length > 0 && { id: 'faculty', label: 'Faculty' },
     hasLabs && { id: 'labs', label: 'Laboratories' },
-    hasLibrary && { id: 'library', label: 'Digital Library' },
     { id: 'program-toggle', label: 'Choose a Programme' },
-    hasProgrammeAbout && { id: 'programme-about', label: 'About the Programme' },
-    hasHighlights && { id: 'highlights', label: 'Programme Highlights' },
-    hasOutcomeStatements && { id: 'peos-pos-psos', label: 'PEOs, POs & PSOs' },
-    hasMindMap && { id: 'mindmap', label: 'Mind Map' },
-    { id: 'curriculum', label: 'Curriculum' },
+    hasRnd && { id: 'rnd', label: 'R & D' },
+    hasPlacements && { id: 'placements', label: 'Placements' },
     hasNewsEvents && { id: 'news-events', label: 'News & Events' },
-    hasNewsletter && { id: 'newsletter', label: 'Newsletter' },
-    hasRnd && { id: 'rnd', label: 'Research & Development (Funded Projects & Patents)' },
   ].filter(Boolean) as { id: string; label: string }[];
 
   // Top stats bar, laid out as stacked rows: Head of Department gets its own
@@ -539,6 +538,47 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                 );
               })}
             </div>
+          </div>
+        </section>
+      )}
+
+      {/* Placements (shared) */}
+      {hasPlacements && (
+        <section id="placements" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
+          <div className="container">
+            <div style={{ marginBottom: 'var(--space-8)' }}>
+              <span className="section-label">Careers</span>
+              <h2 className="section-title">Placements</h2>
+            </div>
+            {shared.placementIntro && (
+              <p style={{ color: 'var(--color-text)', lineHeight: 1.85, fontSize: 'var(--text-base)', marginBottom: 'var(--space-6)', maxWidth: 760 }}>
+                {shared.placementIntro}
+              </p>
+            )}
+            {shared.placementStats.length > 0 && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-8)', marginBottom: shared.placementRecruiters.length > 0 ? 'var(--space-8)' : 0 }}>
+                {shared.placementStats.map((s) => (
+                  <div key={s.label} style={{ textAlign: 'center' }}>
+                    <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.5rem', fontWeight: 900, color: 'var(--color-accent)' }}>{s.value}</div>
+                    <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', fontFamily: 'var(--font-sans)', marginTop: 2, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{s.label}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+            {shared.placementRecruiters.length > 0 && (
+              <div>
+                <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 800, color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 'var(--space-3)' }}>
+                  Our Recruiters
+                </h3>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+                  {shared.placementRecruiters.map((r) => (
+                    <span key={r} style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--color-primary)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-full)', padding: '0.35rem 0.9rem' }}>
+                      {r}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </section>
       )}

@@ -58,6 +58,11 @@ export interface DepartmentDoc {
   // Programme Levels (e.g. "B.Tech.", "M.Tech.") — each a heading + intro
   // paragraph + an intake table, shown right below "About the Department".
   programLevels?: ProgramLevel[];
+  // Placements — shared across the department's programmes. placementStats
+  // reuses the { label, value } shape (e.g. "Highest Package" / "₹12 LPA").
+  placementIntro?: string;
+  placementStats?: LibraryItem[];
+  placementRecruiters?: string[];
 }
 
 const EMPTY: Omit<DepartmentDoc, 'id'> = {
@@ -67,6 +72,7 @@ const EMPTY: Omit<DepartmentDoc, 'id'> = {
   vision: '', mission: [], coreValues: [], labs: [],
   libraryIntro: '', libraryInCharge: '', librarySections: [],
   programLevels: [],
+  placementIntro: '', placementStats: [], placementRecruiters: [],
 };
 
 function linesToArray(text: string): string[] {
@@ -82,7 +88,7 @@ export default function DepartmentsAdmin() {
   const [editing, setEditing] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
-  const set = (k: string, v: string | number | string[] | LibrarySection[] | ProgramLevel[]) => setForm((p) => ({ ...p, [k]: v }));
+  const set = (k: string, v: string | number | string[] | LibrarySection[] | ProgramLevel[] | LibraryItem[]) => setForm((p) => ({ ...p, [k]: v }));
   const handleHero = (r: UploadResult) => setForm((p) => ({ ...p, heroImage: r.url, storagePath: r.path }));
   const handleHodImage = (r: UploadResult) => setForm((p) => ({ ...p, hodImage: r.url, hodImageStoragePath: r.path }));
 
@@ -170,6 +176,26 @@ export default function DepartmentsAdmin() {
     set('programLevels', programLevels.map((l, i) => (i === li ? { ...l, rows: l.rows.filter((_, j) => j !== ri) } : l)));
   };
 
+  // Placement Stats editor — a flat list of { label, value } tiles (e.g.
+  // "Highest Package" / "₹12 LPA").
+  const placementStats = form.placementStats || [];
+  const addPlacementStat = () => {
+    set('placementStats', [...placementStats, { label: '', value: '' }]);
+  };
+  const updatePlacementStat = (si: number, patch: Partial<LibraryItem>) => {
+    set('placementStats', placementStats.map((s, i) => (i === si ? { ...s, ...patch } : s)));
+  };
+  const movePlacementStat = (si: number, dir: -1 | 1) => {
+    const next = [...placementStats];
+    const target = si + dir;
+    if (target < 0 || target >= next.length) return;
+    [next[si], next[target]] = [next[target], next[si]];
+    set('placementStats', next);
+  };
+  const removePlacementStat = (si: number) => {
+    set('placementStats', placementStats.filter((_, i) => i !== si));
+  };
+
   const save = async () => {
     if (!form.title || !form.shortCode) return alert('Title and Short Code are required.');
     setSaving(true);
@@ -198,6 +224,7 @@ export default function DepartmentsAdmin() {
       libraryIntro: d.libraryIntro || '', libraryInCharge: d.libraryInCharge || '',
       librarySections: (d.librarySections || []).map((s) => ({ heading: s.heading, items: s.items || [] })),
       programLevels: (d.programLevels || []).map((l) => ({ title: l.title, intro: l.intro || '', rows: l.rows || [] })),
+      placementIntro: d.placementIntro || '', placementStats: d.placementStats || [], placementRecruiters: d.placementRecruiters || [],
     });
   };
 
@@ -336,6 +363,43 @@ export default function DepartmentsAdmin() {
           <div className="admin-field admin-field--full">
             <label htmlFor="field-labs">Laboratories (one per line)</label>
             <textarea id="field-labs" rows={4} value={arrayToLines(form.labs)} onChange={(e) => set('labs', linesToArray(e.target.value))} />
+          </div>
+
+          <div className="admin-field admin-field--full"><hr /><h3>Department Page — Placements</h3>
+            <p className="admin-field__hint" style={{ marginTop: '0.25rem' }}>
+              Shown as a shared "Placements" section, before the program toggle.
+            </p>
+          </div>
+          <div className="admin-field admin-field--full">
+            <label htmlFor="field-placement-intro">Placements Overview</label>
+            <textarea id="field-placement-intro" rows={3} value={form.placementIntro} onChange={(e) => set('placementIntro', e.target.value)} placeholder="Graduates of the department are placed in leading IT and core engineering companies…" />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label>Placement Stats</label>
+            {placementStats.map((stat, si) => (
+              <div key={si} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.4rem' }}>
+                <input
+                  value={stat.label}
+                  onChange={(e) => updatePlacementStat(si, { label: e.target.value })}
+                  placeholder="Highest Package"
+                  style={{ flex: 2 }}
+                />
+                <input
+                  value={stat.value}
+                  onChange={(e) => updatePlacementStat(si, { value: e.target.value })}
+                  placeholder="₹12 LPA"
+                  style={{ flex: 1 }}
+                />
+                <button type="button" className="admin-btn admin-btn--sm" onClick={() => movePlacementStat(si, -1)} disabled={si === 0} title="Move up">↑</button>
+                <button type="button" className="admin-btn admin-btn--sm" onClick={() => movePlacementStat(si, 1)} disabled={si === placementStats.length - 1} title="Move down">↓</button>
+                <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removePlacementStat(si)}>✕</button>
+              </div>
+            ))}
+            <button type="button" className="admin-btn admin-btn--sm" onClick={addPlacementStat}>+ Add Stat</button>
+          </div>
+          <div className="admin-field admin-field--full">
+            <label htmlFor="field-placement-recruiters">Recruiters (one per line)</label>
+            <textarea id="field-placement-recruiters" rows={4} value={arrayToLines(form.placementRecruiters)} onChange={(e) => set('placementRecruiters', linesToArray(e.target.value))} placeholder="TCS&#10;Infosys&#10;Wipro" />
           </div>
 
           <div className="admin-field admin-field--full"><hr /><h3>Department Page — Digital Library</h3>
