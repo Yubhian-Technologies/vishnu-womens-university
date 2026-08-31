@@ -1,7 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useParams, useLocation, Navigate } from 'react-router-dom';
 import { Check, Microscope, Compass, Target, Sparkles, Mail, ExternalLink, BookOpen, FileText } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
+import ImageLightbox from '../../components/ImageLightbox/ImageLightbox';
 import ProgrammeStructure from '../../components/ProgrammeStructure/ProgrammeStructure';
 import DepartmentNewsSection, { type DepartmentNewsDoc } from '../../components/DepartmentNews/DepartmentNewsSection';
 import DepartmentDetail from './DepartmentDetail';
@@ -16,6 +17,7 @@ import type { FacultyDoc } from './Faculty';
 import SEO from '../../components/SEO/SEO';
 import { getProgramSchema, getBreadcrumbSchema } from '../../lib/seo/schemas';
 import '../detail-layout.css';
+import '../Campus/tabbed-section.css';
 
 const NAV_OFFSET = 'calc(var(--topbar-height) + var(--header-height) + 1rem)';
 
@@ -39,6 +41,8 @@ export default function ProgramDetail() {
 function SingleProgramDetail() {
   const { slug } = useParams<{ slug: string }>();
   const location = useLocation();
+  const [mindMapOpen, setMindMapOpen] = useState(false);
+  const [outcomeTab, setOutcomeTab] = useState<string | null>(null);
   const { docs: allPrograms, loading } = useOrderedCollection<ProgramDoc>('programs', 'order');
   const program = allPrograms.find((p) => p.slug === slug);
 
@@ -75,6 +79,15 @@ function SingleProgramDetail() {
     if (el) smoothScrollTo(el);
   }, [program, location.hash]);
 
+  // Defaults the PEOs/POs/PSOs tab bar to whichever of the three actually
+  // has admin-entered content, once the data has loaded — same "default to
+  // first available, don't fight a deliberate selection" pattern as
+  // FacultyProfile's Profile Sections tabs.
+  useEffect(() => {
+    const firstAvailable = program?.peos?.length ? 'peos' : program?.pos?.length ? 'pos' : program?.psos?.length ? 'psos' : null;
+    if (firstAvailable) setOutcomeTab((prev) => prev ?? firstAvailable);
+  }, [program?.peos?.length, program?.pos?.length, program?.psos?.length]);
+
   // Also wait on the department lookup: rendering before it resolves would
   // show the raw department code and then flash to the full title once
   // `allDepartments` loads (e.g. "IT" -> "Information Technology").
@@ -88,7 +101,16 @@ function SingleProgramDetail() {
   if (!program) return <Navigate to="/academics" replace />;
 
   const hasVisionMission = !!(program.vision || program.mission?.length || program.coreValues?.length);
-  const hasOutcomeStatements = !!(program.peos?.length || program.pos?.length || program.psos?.length);
+  // Tabbed PEOs / POs / PSOs — only whichever of the three an admin has
+  // actually filled in (via /admin → Programs) becomes a tab; entirely
+  // data-driven, nothing hardcoded here beyond the three possible labels.
+  const outcomeGroups = [
+    { key: 'peos', short: 'PEOs', title: 'Programme Educational Objectives (PEOs)', items: program.peos },
+    { key: 'pos', short: 'POs', title: 'Programme Outcomes (POs)', items: program.pos },
+    { key: 'psos', short: 'PSOs', title: 'Programme Specific Outcomes (PSOs)', items: program.psos },
+  ].filter((g) => g.items && g.items.length > 0);
+  const hasOutcomeStatements = outcomeGroups.length > 0;
+  const activeOutcome = outcomeGroups.find((g) => g.key === outcomeTab) ?? outcomeGroups[0];
   const hasHod = !!(program.hodMessage || program.hodImage || program.hodEmail);
   const hasMindMap = !!program.mindMapImage;
   // Legacy docs may still store labs as plain strings (no PDF) —
@@ -350,26 +372,31 @@ function SingleProgramDetail() {
               <h2 className="section-title">PEOs, POs &amp; PSOs</h2>
               <p className="section-desc">The programme&apos;s educational objectives and outcomes, aligned to national accreditation frameworks.</p>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 'var(--space-6)' }}>
-              {[
-                { key: 'peos', title: 'Programme Educational Objectives (PEOs)', items: program.peos },
-                { key: 'pos', title: 'Programme Outcomes (POs)', items: program.pos },
-                { key: 'psos', title: 'Programme Specific Outcomes (PSOs)', items: program.psos },
-              ].filter((g) => g.items && g.items.length > 0).map((g) => (
-                <div key={g.key} style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)' }}>
-                  <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 800, color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 'var(--space-4)', paddingBottom: 'var(--space-3)', borderBottom: '2px solid var(--color-accent)' }}>
-                    {g.title}
-                  </h3>
-                  <ol style={{ padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', listStylePosition: 'inside' }}>
-                    {g.items!.map((item, i) => (
-                      <li key={item} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.65 }}>
-                        <strong style={{ color: 'var(--color-accent)' }}>{g.key.slice(0, -1).toUpperCase()}{i + 1}:</strong> {item}
-                      </li>
-                    ))}
-                  </ol>
-                </div>
+            <div className="section-tabs">
+              {outcomeGroups.map((g) => (
+                <button
+                  key={g.key}
+                  onClick={() => setOutcomeTab(g.key)}
+                  className={`section-tab-btn${activeOutcome?.key === g.key ? ' active' : ''}`}
+                >
+                  {g.short}
+                </button>
               ))}
             </div>
+            {activeOutcome && (
+              <div style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)' }}>
+                <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 800, color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 'var(--space-4)', paddingBottom: 'var(--space-3)', borderBottom: '2px solid var(--color-accent)' }}>
+                  {activeOutcome.title}
+                </h3>
+                <ol style={{ padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', listStylePosition: 'inside' }}>
+                  {activeOutcome.items!.map((item, i) => (
+                    <li key={item} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.65 }}>
+                      <strong style={{ color: 'var(--color-accent)' }}>{activeOutcome.key.slice(0, -1).toUpperCase()}{i + 1}:</strong> {item}
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            )}
           </div>
         </section>
       )}
@@ -497,11 +524,35 @@ function SingleProgramDetail() {
               <h2 className="section-title">Mind Map</h2>
               <p className="section-desc">A visual overview of how the programme&apos;s courses and specialisations connect together.</p>
             </div>
-            <div style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4)', textAlign: 'center' }}>
-              <SmoothImage src={program.mindMapImage} alt={`${program.shortName || program.name} curriculum mind map`} style={{ maxWidth: '100%', height: 'auto', borderRadius: 'var(--radius-sm)' }} />
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <button
+                type="button"
+                onClick={() => setMindMapOpen(true)}
+                aria-label="Open Mind Map in full size"
+                style={{
+                  display: 'inline-block', background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)',
+                  borderRadius: 'var(--radius-md)', padding: 'var(--space-3)', cursor: 'zoom-in', maxWidth: '100%',
+                  transition: 'box-shadow var(--transition-base), border-color var(--transition-base)',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-md)'; e.currentTarget.style.borderColor = 'var(--color-accent)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.borderColor = 'var(--color-light-gray)'; }}
+              >
+                <SmoothImage
+                  src={program.mindMapImage}
+                  alt={`${program.shortName || program.name} curriculum mind map`}
+                  style={{ display: 'block', maxWidth: '100%', maxHeight: '70vh', width: 'auto', height: 'auto', borderRadius: 'var(--radius-sm)' }}
+                />
+              </button>
             </div>
           </div>
         </section>
+      )}
+      {mindMapOpen && (
+        <ImageLightbox
+          src={program.mindMapImage}
+          alt={`${program.shortName || program.name} curriculum mind map`}
+          onClose={() => setMindMapOpen(false)}
+        />
       )}
 
       {/* Curriculum — hidden entirely until a programme actually has
@@ -636,8 +687,10 @@ function SingleProgramDetail() {
                 <thead>
                   <tr>
                     <th>Academic Year</th>
+                    {/* Per-issue "Issue – N" column headings intentionally removed — the
+                        clickable issue links themselves still render below, unaffected. */}
                     {Array.from({ length: newsletterMaxIssues }).map((_, ci) => (
-                      <th key={ci}>Issue – {ci + 1}</th>
+                      <th key={ci} />
                     ))}
                   </tr>
                 </thead>
