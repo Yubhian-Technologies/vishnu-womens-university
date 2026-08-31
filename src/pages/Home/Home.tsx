@@ -123,9 +123,9 @@ function buildPopularProgramsFromPrograms(programs: ProgramDoc[]): ContentBlockD
 }
 
 const defaultWhyChooseCards: ContentBlockDoc[] = [
-  { id: 'default-1', page: 'home', section: 'whyChoose', value: '', title: 'A Campus Built Exclusively for Women', desc: 'A focused, secure environment where every program, hostel, and support service is designed around women succeeding in engineering.', icon: 'Venus', slug: '/about', order: 0 },
+  { id: 'default-1', page: 'home', section: 'whyChoose', value: '', title: 'A Campus Built Exclusively for Women', desc: 'A focused, secure environment where every program, hostel, and support service is designed around women succeeding in engineering.', icon: 'ShieldCheck', slug: '/about', order: 0 },
   { id: 'default-2', page: 'home', section: 'whyChoose', value: '', title: 'Industry-Aligned Curriculum', desc: 'Coursework is refreshed with industry input every year, keeping graduates ready for what employers need today.', icon: 'BadgeCheck', slug: '/academics', order: 1 },
-  { id: 'default-3', page: 'home', section: 'whyChoose', value: '', title: 'Research & Innovation at the Core', desc: 'Dedicated labs, incubation support, and 90+ patents put students inside real research from year one.', icon: 'Rocket', slug: '/differentiators', order: 2 },
+  { id: 'default-3', page: 'home', section: 'whyChoose', value: '', title: 'Research & Innovation at the Core', desc: 'Dedicated labs, incubation support, and 150+ patents put students inside real research from year one.', icon: 'Rocket', slug: '/differentiators', order: 2 },
   { id: 'default-4', page: 'home', section: 'whyChoose', value: '', title: '1100+ Placements in 2025-26', desc: 'Amazon, TCS, Infosys, Wipro, and 150+ other recruiters return to VWU year after year for its graduating engineers.', icon: 'Briefcase', slug: '/placements', order: 3 },
 ];
 
@@ -469,7 +469,7 @@ export default function Home() {
               <h2 className="section-title">Driven by<br /><span className="gradient-text">Excellence</span></h2>
               <div className="divider" />
               <p>Vishnu Women's University is committed to providing women with rigorous technical education, cultivating a spirit of innovation, and producing graduates who contribute meaningfully to society and industry.</p>
-              <p>Founded under the Sri Vishnu Educational Society and affiliated to JNTUK, VWU has been developing engineers, researchers, and leaders for over two decades from its campus in Bhimavaram, Andhra Pradesh.</p>
+              <p>Founded under the Sri Vishnu Educational Society, VWU has been developing engineers, researchers, and leaders for over two decades from its campus in Bhimavaram, Andhra Pradesh.</p>
               <div className="mission-quote">
                 <blockquote>"VWU gave me the technical grounding and the self-belief to pursue my ambitions. The faculty are genuinely invested in your success — every step of the way."</blockquote>
                 <cite>— D Prasanna, CSE Graduate, placed at Amazon</cite>
