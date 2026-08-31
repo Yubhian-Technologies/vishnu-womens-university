@@ -373,7 +373,9 @@ export default function DepartmentsAdmin() {
 
           <div className="admin-field admin-field--full"><hr /><h3>Department Page — Placements</h3>
             <p className="admin-field__hint" style={{ marginTop: '0.25rem' }}>
-              Shown as a shared "Placements" section, before the program toggle.
+              Shown as a shared "Placements" section, before the program toggle. The individual student placement
+              records table is managed separately — see the "Placement Records" card under <strong>Programs</strong>,
+              in any program that belongs to this department.
             </p>
           </div>
           <div className="admin-field admin-field--full">

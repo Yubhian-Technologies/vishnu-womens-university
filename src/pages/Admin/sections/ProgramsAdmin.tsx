@@ -1,14 +1,17 @@
 import { useEffect, useState } from 'react';
 import {
-  collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp, writeBatch,
+  collection, addDoc, deleteDoc, doc, setDoc, updateDoc, serverTimestamp, writeBatch,
 } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
+import { useDocument } from '../../../hooks/useDocument';
 import ImageUploader from '../../../components/ImageUploader/ImageUploader';
 import FileUploader from '../../../components/FileUploader/FileUploader';
 import { deleteFile, type UploadResult } from '../../../lib/storage';
 import { PROGRAM_ICON_NAMES } from '../../../lib/programIcons';
 import DepartmentNewsManager from './DepartmentNewsManager';
+import { placementRecordsDocId, type PlacementRecordSet } from '../../../lib/placementRecords';
+import { parsePlacementsWorkbook, type PlacementImportResult } from '../../../lib/placementsImport';
 import CustomSectionEditor from './CustomSectionEditor';
 import { replaceAtPath, getAtPath, type CustomSection } from '../../../lib/customSections';
 
@@ -1253,6 +1256,10 @@ export default function ProgramsAdmin() {
         </div>
       </div>
 
+      {editing && form.department && (
+        <PlacementRecordsEditor department={form.department} />
+      )}
+
       <div className="admin-card">
         <h2 className="admin-card__title">All Programs ({programs.length})</h2>
         <p className="admin-field__hint" style={{ marginBottom: '0.75rem' }}>
@@ -1297,6 +1304,149 @@ export default function ProgramsAdmin() {
           );
         })}
       </div>
+    </div>
+  );
+}
+
+// Individual student Placement Records for one department — kept separate
+// from the main programme form/doc above since it's a much bigger, purely
+// tabular dataset (one Firestore doc per department, id = its lowercased
+// department code — see placementRecordsDocId). Keyed by this programme's
+// own `department` field, so e.g. both "CSE" and "CSE [Cyber Security]"
+// (which share department "CSE") manage — and see — the exact same
+// department-wide dataset. An admin imports an Excel/CSV file, reviews the
+// detected columns + a preview of the parsed rows, then saves; re-importing
+// later fully replaces the previous dataset. Columns are never assumed or
+// hardcoded — whatever the uploaded file's header row contains is exactly
+// what gets stored and shown.
+function PlacementRecordsEditor({ department }: { department: string }) {
+  const docId = placementRecordsDocId(department);
+  const { data: existing, loading } = useDocument<PlacementRecordSet>('placementRecords', docId);
+  const [importing, setImporting] = useState(false);
+  const [preview, setPreview] = useState<PlacementImportResult | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  const handleFile = async (file: File) => {
+    setImporting(true);
+    try {
+      const result = await parsePlacementsWorkbook(file);
+      if (result.columns.length === 0 || result.rows.length === 0) {
+        alert("Couldn't find any data in that file — make sure the first row has column headers.");
+        return;
+      }
+      setPreview(result);
+    } catch (e) {
+      alert(`Couldn't read that file: ${(e as Error).message}`);
+    } finally {
+      setImporting(false);
+    }
+  };
+
+  const savePreview = async () => {
+    if (!preview) return;
+    setSaving(true);
+    try {
+      await setDoc(doc(db, 'placementRecords', docId), {
+        department,
+        columns: preview.columns,
+        rows: preview.rows.map((cells) => ({ cells })),
+        updatedAt: serverTimestamp(),
+      });
+      setPreview(null);
+    } catch (e) {
+      alert(`Couldn't save: ${(e as Error).message}`);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const clearSaved = async () => {
+    if (!confirm(`Delete all saved placement records for ${department}? This cannot be undone.`)) return;
+    try {
+      await deleteDoc(doc(db, 'placementRecords', docId));
+    } catch (e) {
+      alert(`Couldn't delete: ${(e as Error).message}`);
+    }
+  };
+
+  // The preview (just imported, not yet saved) always wins over whatever's
+  // already saved, so the admin reviews exactly what they're about to save.
+  const displayed = preview
+    ? preview
+    : existing
+      ? { columns: existing.columns, rows: existing.rows.map((r) => r.cells) }
+      : null;
+
+  return (
+    <div className="admin-card">
+      <h2 className="admin-card__title">Placement Records — {department}</h2>
+      <p className="admin-field__hint" style={{ marginBottom: '1rem' }}>
+        Upload an Excel/CSV file of student placement records for this department. The first row is treated as
+        column headers — whatever columns the file actually has are used as-is, nothing is assumed or hardcoded.
+        On the public page, the 10 highest values in whichever column looks like "Package"/"Highest Package"/"CTC"
+        show first, then everyone else in the order they were imported. Re-importing replaces the previous dataset.
+        Shared across every programme with this same Department code.
+      </p>
+
+      <label className="admin-btn admin-btn--primary" style={{ display: 'inline-block', cursor: importing ? 'default' : 'pointer', opacity: importing ? 0.6 : 1 }}>
+        {importing ? 'Reading file…' : 'Import from Excel/CSV'}
+        <input
+          type="file"
+          accept=".xlsx,.xls,.csv"
+          hidden
+          disabled={importing}
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) handleFile(file);
+            e.target.value = '';
+          }}
+        />
+      </label>
+
+      {loading && <p className="admin-loading">Loading…</p>}
+
+      {displayed && displayed.columns.length > 0 ? (
+        <>
+          <div style={{ margin: '1rem 0' }}>
+            <strong>Detected columns:</strong>{' '}
+            {displayed.columns.map((c) => (
+              <span key={c} className="admin-badge" style={{ marginRight: '0.4rem', textTransform: 'none' }}>{c}</span>
+            ))}
+          </div>
+          <p className="admin-field__hint">
+            {displayed.rows.length} record{displayed.rows.length === 1 ? '' : 's'}{preview ? ' — not yet saved' : ' saved'}.
+          </p>
+          <div className="admin-table-wrap" style={{ maxHeight: 360, overflow: 'auto' }}>
+            <table className="admin-table">
+              <thead>
+                <tr>{displayed.columns.map((c) => <th key={c}>{c}</th>)}</tr>
+              </thead>
+              <tbody>
+                {displayed.rows.slice(0, 25).map((row, ri) => (
+                  <tr key={ri}>{row.map((cell, ci) => <td key={ci}>{cell}</td>)}</tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {displayed.rows.length > 25 && (
+            <p className="admin-field__hint">Showing the first 25 of {displayed.rows.length} rows.</p>
+          )}
+          {preview ? (
+            <div className="admin-form-actions">
+              <button className="admin-btn admin-btn--ghost" onClick={() => setPreview(null)}>Discard</button>
+              <button className="admin-btn admin-btn--primary" onClick={savePreview} disabled={saving}>
+                {saving ? 'Saving…' : 'Save Placement Records'}
+              </button>
+            </div>
+          ) : (
+            <div className="admin-form-actions">
+              <button className="admin-btn admin-btn--danger" onClick={clearSaved}>Delete Saved Records</button>
+            </div>
+          )}
+        </>
+      ) : (
+        !loading && <p className="admin-field__hint">No placement records saved yet for this department.</p>
+      )}
     </div>
   );
 }
