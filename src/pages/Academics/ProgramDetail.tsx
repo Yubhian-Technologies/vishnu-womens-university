@@ -3,6 +3,7 @@ import { Link, useParams, useLocation, Navigate } from 'react-router-dom';
 import { Check, Microscope, Compass, Target, Sparkles, Mail, ExternalLink, BookOpen, FileText } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import ProgrammeStructure from '../../components/ProgrammeStructure/ProgrammeStructure';
+import OutcomeTabs from '../../components/OutcomeTabs/OutcomeTabs';
 import DepartmentNewsSection, { type DepartmentNewsDoc } from '../../components/DepartmentNews/DepartmentNewsSection';
 import DepartmentDetail from './DepartmentDetail';
 import { groupForProgramSlug } from '../../lib/departmentGroups';
@@ -219,7 +220,7 @@ function SingleProgramDetail() {
               <div>
                 <span className="section-label">About the Department</span>
                 <h2 className="section-title">The Department of {deptTitle || program.shortName || program.name}</h2>
-                <p style={{ color: 'var(--color-text-light)', lineHeight: 1.85, fontSize: 'var(--text-base)', marginBottom: 'var(--space-6)' }}>
+                <p style={{ color: 'var(--color-text-light)', lineHeight: 1.85, fontSize: 'var(--text-base)', marginBottom: 'var(--space-6)', whiteSpace: 'pre-line' }}>
                   {program.about}
                 </p>
               </div>
@@ -350,26 +351,11 @@ function SingleProgramDetail() {
               <h2 className="section-title">PEOs, POs &amp; PSOs</h2>
               <p className="section-desc">The programme&apos;s educational objectives and outcomes, aligned to national accreditation frameworks.</p>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 'var(--space-6)' }}>
-              {[
-                { key: 'peos', title: 'Programme Educational Objectives (PEOs)', items: program.peos },
-                { key: 'pos', title: 'Programme Outcomes (POs)', items: program.pos },
-                { key: 'psos', title: 'Programme Specific Outcomes (PSOs)', items: program.psos },
-              ].filter((g) => g.items && g.items.length > 0).map((g) => (
-                <div key={g.key} style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)' }}>
-                  <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 800, color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 'var(--space-4)', paddingBottom: 'var(--space-3)', borderBottom: '2px solid var(--color-accent)' }}>
-                    {g.title}
-                  </h3>
-                  <ol style={{ padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', listStylePosition: 'inside' }}>
-                    {g.items!.map((item, i) => (
-                      <li key={item} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.65 }}>
-                        <strong style={{ color: 'var(--color-accent)' }}>{g.key.slice(0, -1).toUpperCase()}{i + 1}:</strong> {item}
-                      </li>
-                    ))}
-                  </ol>
-                </div>
-              ))}
-            </div>
+            <OutcomeTabs groups={[
+              { key: 'peos', tabLabel: 'PEOs', title: 'Programme Educational Objectives (PEOs)', items: program.peos },
+              { key: 'pos', tabLabel: 'POs', title: 'Programme Outcomes (POs)', items: program.pos },
+              { key: 'psos', tabLabel: 'PSOs', title: 'Programme Specific Outcomes (PSOs)', items: program.psos },
+            ]} />
           </div>
         </section>
       )}
