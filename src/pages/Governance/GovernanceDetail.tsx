@@ -156,7 +156,7 @@ export default function GovernanceDetail() {
             className="page-hero-image"
             loading="eager"
             decoding="sync"
-            fetchPriority="high"
+            {...({ fetchpriority: 'high' } as any)}
           />
         )}
         <div className="page-hero-overlay" />

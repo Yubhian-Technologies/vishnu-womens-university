@@ -176,7 +176,7 @@ export default function ResearchDetail() {
       {/* Hero */}
       <section className="page-hero" style={{ minHeight: 340 }}>
         {heroImage && (
-          <img src={heroImage} alt={item.title} className="page-hero-image" loading="eager" decoding="sync" fetchPriority="high" />
+          <img src={heroImage} alt={item.title} className="page-hero-image" loading="eager" decoding="sync" {...({ fetchpriority: 'high' } as any)} />
         )}
         <div className="page-hero-overlay" />
         <div className="container page-hero-content">

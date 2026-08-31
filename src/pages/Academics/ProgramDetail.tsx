@@ -168,7 +168,7 @@ function SingleProgramDetail() {
             className="page-hero-image"
             loading="eager"
             decoding="sync"
-            fetchPriority="high"
+            {...({ fetchpriority: 'high' } as any)}
           />
         )}
         <div className="page-hero-overlay" />
@@ -218,7 +218,7 @@ function SingleProgramDetail() {
             <div>
               <div>
                 <span className="section-label">About the Department</span>
-                <h2 className="section-title">The Department of {deptTitle || program.shortName || program.name}</h2>
+                <h2 className="section-title">{deptTitle || program.shortName || program.name}</h2>
                 <p style={{ color: 'var(--color-text-light)', lineHeight: 1.85, fontSize: 'var(--text-base)', marginBottom: 'var(--space-6)' }}>
                   {program.about}
                 </p>

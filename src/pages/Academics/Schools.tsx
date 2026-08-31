@@ -41,11 +41,11 @@ export default function Schools() {
         schools.map((school, i) => (
           <section key={school.id} className={`section ${i % 2 === 0 ? 'bg-white' : 'bg-off-white'}`}>
             <div className="container">
-              <div style={{ textAlign: 'center', marginBottom: 'var(--space-10)' }}>
-                <span className="section-label">School</span>
+              <div style={{ textAlign: 'left', marginBottom: 'var(--space-10)' }}>
+                <span className="section-label">Schools</span>
                 <h2 className="section-title">{school.title}</h2>
                 {school.description && (
-                  <p className="section-desc" style={{ margin: '0 auto' }}>{school.description}</p>
+                  <p className="section-desc">{school.description}</p>
                 )}
               </div>
               <div className="dept-grid">
