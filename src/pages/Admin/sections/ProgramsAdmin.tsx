@@ -1,17 +1,16 @@
 import { useEffect, useState } from 'react';
 import {
-  collection, addDoc, deleteDoc, doc, setDoc, updateDoc, serverTimestamp, writeBatch,
+  collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp, writeBatch,
 } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
-import { useDocument } from '../../../hooks/useDocument';
 import ImageUploader from '../../../components/ImageUploader/ImageUploader';
 import FileUploader from '../../../components/FileUploader/FileUploader';
 import { deleteFile, type UploadResult } from '../../../lib/storage';
 import { PROGRAM_ICON_NAMES } from '../../../lib/programIcons';
 import DepartmentNewsManager from './DepartmentNewsManager';
-import { placementRecordsDocId, type PlacementRecordSet } from '../../../lib/placementRecords';
-import { parsePlacementsWorkbook, type PlacementImportResult } from '../../../lib/placementsImport';
+import type { PlacementYearRecord } from '../../../lib/placementRecords';
+import { parsePlacementsFile, type PlacementImportResult } from '../../../lib/placementsImport';
 import CustomSectionEditor from './CustomSectionEditor';
 import { replaceAtPath, getAtPath, type CustomSection } from '../../../lib/customSections';
 
@@ -177,6 +176,13 @@ export interface ProgramDoc {
   // still the simplest option for a department that just wants to link out
   // to a couple of PDFs (e.g. "Funded R&D Projects", "In-house R&D Projects").
   rndLinks?: RndLink[];
+  // Optional — shown as the "Placements" section's records table + Quick
+  // Links entry on every programme's page. Grouped by academic year like
+  // News & Events/Newsletter, but each year holds its own admin-imported
+  // Excel/CSV dataset (columns + rows exactly as uploaded) — scoped to
+  // exactly one Academic Year + Department + Programme, since it lives on
+  // this specific programme's own doc.
+  placementYears?: PlacementYearRecord[];
   // Admin-defined sections beyond the fixed set above — any name, any number
   // of sub-sections, and a choice of plain text / table / links / files per
   // section (see lib/customSections.ts). Fully additive: a program with no
@@ -196,6 +202,13 @@ const EMPTY: Omit<ProgramDoc, 'id'> = {
   newsEventsYears: [],
   newsletterYears: [],
   rndIntro: '', rndTableText: '', rndProjectsText: '', rndLinks: [],
+  // placementYears is intentionally NOT part of this form/EMPTY: it's
+  // managed entirely by <PlacementYearsEditor> below via its own immediate
+  // Firestore writes (same reason the old department-wide placement editor
+  // was kept separate — see that component's own comment). Leaving it out
+  // of `form` means `save()`'s `{...form}` spread never touches this field,
+  // so clicking "Update Program" can never clobber it with a stale/empty
+  // array.
   customSections: [],
   order: 0,
 };
@@ -1328,9 +1341,10 @@ export default function ProgramsAdmin() {
         </div>
       </div>
 
-      {editing && form.department && (
-        <PlacementRecordsEditor department={form.department} />
-      )}
+      {editing && (() => {
+        const liveProgram = programs.find((p) => p.id === editing);
+        return liveProgram ? <PlacementYearsEditor program={liveProgram} /> : null;
+      })()}
 
       <div className="admin-card">
         <h2 className="admin-card__title">All Programs ({programs.length})</h2>
@@ -1380,145 +1394,225 @@ export default function ProgramsAdmin() {
   );
 }
 
-// Individual student Placement Records for one department — kept separate
-// from the main programme form/doc above since it's a much bigger, purely
-// tabular dataset (one Firestore doc per department, id = its lowercased
-// department code — see placementRecordsDocId). Keyed by this programme's
-// own `department` field, so e.g. both "CSE" and "CSE [Cyber Security]"
-// (which share department "CSE") manage — and see — the exact same
-// department-wide dataset. An admin imports an Excel/CSV file, reviews the
-// detected columns + a preview of the parsed rows, then saves; re-importing
-// later fully replaces the previous dataset. Columns are never assumed or
-// hardcoded — whatever the uploaded file's header row contains is exactly
-// what gets stored and shown.
-function PlacementRecordsEditor({ department }: { department: string }) {
-  const docId = placementRecordsDocId(department);
-  const { data: existing, loading } = useDocument<PlacementRecordSet>('placementRecords', docId);
-  const [importing, setImporting] = useState(false);
-  const [preview, setPreview] = useState<PlacementImportResult | null>(null);
-  const [saving, setSaving] = useState(false);
+// Individual student Placement Records for one programme, grouped by
+// Academic Year — kept separate from the main programme form/doc's "Update
+// Program" save (like the department-wide version this replaces) since
+// it's a much bigger, purely tabular dataset per year; every action here
+// writes straight to Firestore immediately instead of staging in `form`.
+// Scoped to exactly one Academic Year + Department + Programme: the
+// programme doc already carries its own `department`, and `placementYears`
+// lives on this specific programme's own doc, so B.Tech ECE / B.Tech EVT /
+// M.Tech VLSI (all department "ECE") each keep fully independent data. An
+// admin adds an Academic Year, imports an Excel/CSV file for it, reviews
+// the detected columns + a preview of the parsed rows, then saves;
+// re-importing a year later fully replaces that year's previous dataset.
+// Columns are never assumed or hardcoded — whatever the uploaded file's
+// header row contains is exactly what gets stored and shown.
+function PlacementYearsEditor({ program }: { program: ProgramDoc }) {
+  const years = program.placementYears || [];
+  const [newYearLabel, setNewYearLabel] = useState('');
+  const [previews, setPreviews] = useState<Record<number, PlacementImportResult>>({});
+  const [importingYear, setImportingYear] = useState<number | null>(null);
+  const [busyYear, setBusyYear] = useState<number | null>(null);
 
-  const handleFile = async (file: File) => {
-    setImporting(true);
+  const persistYears = (next: PlacementYearRecord[]) => updateDoc(doc(db, 'programs', program.id), { placementYears: next });
+
+  const addYear = async () => {
+    const label = newYearLabel.trim();
+    if (!label) return;
+    if (years.some((y) => y.year.trim().toLowerCase() === label.toLowerCase())) {
+      alert('That Academic Year already exists for this programme.');
+      return;
+    }
     try {
-      const result = await parsePlacementsWorkbook(file);
+      await persistYears([...years, { year: label, columns: [], rows: [] }]);
+      setNewYearLabel('');
+    } catch (e) {
+      alert(`Couldn't add Academic Year: ${(e as Error).message}`);
+    }
+  };
+
+  const removeYear = async (yi: number) => {
+    if (!confirm(`Remove Academic Year "${years[yi].year}" and all its placement records? This cannot be undone.`)) return;
+    setBusyYear(yi);
+    try {
+      await persistYears(years.filter((_, i) => i !== yi));
+    } catch (e) {
+      alert(`Couldn't remove Academic Year: ${(e as Error).message}`);
+    } finally {
+      setBusyYear(null);
+    }
+  };
+
+  const moveYear = async (yi: number, dir: -1 | 1) => {
+    const target = yi + dir;
+    if (target < 0 || target >= years.length) return;
+    const next = [...years];
+    [next[yi], next[target]] = [next[target], next[yi]];
+    try {
+      await persistYears(next);
+    } catch (e) {
+      alert(`Couldn't reorder: ${(e as Error).message}`);
+    }
+  };
+
+  const handleFile = async (yi: number, file: File) => {
+    setImportingYear(yi);
+    try {
+      const result = await parsePlacementsFile(file);
       if (result.columns.length === 0 || result.rows.length === 0) {
-        alert("Couldn't find any data in that file — make sure the first row has column headers.");
+        alert(
+          "Couldn't find any data in that file — for Excel/CSV make sure the first row has column headers, " +
+          'for Word make sure the records are in an actual table, and for PDF make sure it has selectable text (not a scanned image).'
+        );
         return;
       }
-      setPreview(result);
+      setPreviews((p) => ({ ...p, [yi]: result }));
     } catch (e) {
       alert(`Couldn't read that file: ${(e as Error).message}`);
     } finally {
-      setImporting(false);
+      setImportingYear(null);
     }
   };
 
-  const savePreview = async () => {
+  const discardPreview = (yi: number) => setPreviews((p) => { const next = { ...p }; delete next[yi]; return next; });
+
+  const savePreview = async (yi: number) => {
+    const preview = previews[yi];
     if (!preview) return;
-    setSaving(true);
+    setBusyYear(yi);
     try {
-      await setDoc(doc(db, 'placementRecords', docId), {
-        department,
-        columns: preview.columns,
-        rows: preview.rows.map((cells) => ({ cells })),
-        updatedAt: serverTimestamp(),
-      });
-      setPreview(null);
+      const next = years.map((y, i) => (i === yi ? { ...y, columns: preview.columns, rows: preview.rows.map((cells) => ({ cells })) } : y));
+      await persistYears(next);
+      discardPreview(yi);
     } catch (e) {
       alert(`Couldn't save: ${(e as Error).message}`);
     } finally {
-      setSaving(false);
+      setBusyYear(null);
     }
   };
 
-  const clearSaved = async () => {
-    if (!confirm(`Delete all saved placement records for ${department}? This cannot be undone.`)) return;
+  const clearRecords = async (yi: number) => {
+    if (!confirm(`Delete the saved placement records for "${years[yi].year}"? The Academic Year itself stays, just empty. This cannot be undone.`)) return;
+    setBusyYear(yi);
     try {
-      await deleteDoc(doc(db, 'placementRecords', docId));
+      await persistYears(years.map((y, i) => (i === yi ? { ...y, columns: [], rows: [] } : y)));
     } catch (e) {
       alert(`Couldn't delete: ${(e as Error).message}`);
+    } finally {
+      setBusyYear(null);
     }
   };
-
-  // The preview (just imported, not yet saved) always wins over whatever's
-  // already saved, so the admin reviews exactly what they're about to save.
-  const displayed = preview
-    ? preview
-    : existing
-      ? { columns: existing.columns, rows: existing.rows.map((r) => r.cells) }
-      : null;
 
   return (
     <div className="admin-card">
-      <h2 className="admin-card__title">Placement Records — {department}</h2>
+      <h2 className="admin-card__title">Placements — {program.shortName || program.name}</h2>
       <p className="admin-field__hint" style={{ marginBottom: '1rem' }}>
-        Upload an Excel/CSV file of student placement records for this department. The first row is treated as
-        column headers — whatever columns the file actually has are used as-is, nothing is assumed or hardcoded.
-        On the public page, the 10 highest values in whichever column looks like "Package"/"Highest Package"/"CTC"
-        show first, then everyone else in the order they were imported. Re-importing replaces the previous dataset.
-        Shared across every programme with this same Department code.
+        Add an Academic Year, then upload a file of student placement records for that year — Excel (.xlsx/.xls),
+        CSV, Word (.docx, records must be in an actual table), or PDF (records must be selectable text, not a
+        scanned image) are all accepted. The first row is treated as column headers — whatever columns the file
+        actually has are used as-is, nothing is assumed or hardcoded. On the public page, the 10 highest values in
+        whichever column looks like "Package"/"Highest Package"/"CTC" show first for that year, then everyone else
+        in the order they were imported. Re-importing a year replaces its previous dataset. Scoped to this exact
+        programme only — other programmes in the same department manage their own Academic Years independently.
       </p>
 
-      <label className="admin-btn admin-btn--primary" style={{ display: 'inline-block', cursor: importing ? 'default' : 'pointer', opacity: importing ? 0.6 : 1 }}>
-        {importing ? 'Reading file…' : 'Import from Excel/CSV'}
+      <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '1.25rem' }}>
         <input
-          type="file"
-          accept=".xlsx,.xls,.csv"
-          hidden
-          disabled={importing}
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file) handleFile(file);
-            e.target.value = '';
-          }}
+          value={newYearLabel}
+          onChange={(e) => setNewYearLabel(e.target.value)}
+          onKeyDown={(e) => { if (e.key === 'Enter') addYear(); }}
+          placeholder="e.g. 2025-26"
+          style={{ maxWidth: 220 }}
         />
-      </label>
+        <button type="button" className="admin-btn admin-btn--primary" onClick={addYear}>+ Add Academic Year</button>
+      </div>
 
-      {loading && <p className="admin-loading">Loading…</p>}
-
-      {displayed && displayed.columns.length > 0 ? (
-        <>
-          <div style={{ margin: '1rem 0' }}>
-            <strong>Detected columns:</strong>{' '}
-            {displayed.columns.map((c) => (
-              <span key={c} className="admin-badge" style={{ marginRight: '0.4rem', textTransform: 'none' }}>{c}</span>
-            ))}
-          </div>
-          <p className="admin-field__hint">
-            {displayed.rows.length} record{displayed.rows.length === 1 ? '' : 's'}{preview ? ' — not yet saved' : ' saved'}.
-          </p>
-          <div className="admin-table-wrap" style={{ maxHeight: 360, overflow: 'auto' }}>
-            <table className="admin-table">
-              <thead>
-                <tr>{displayed.columns.map((c) => <th key={c}>{c}</th>)}</tr>
-              </thead>
-              <tbody>
-                {displayed.rows.slice(0, 25).map((row, ri) => (
-                  <tr key={ri}>{row.map((cell, ci) => <td key={ci}>{cell}</td>)}</tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          {displayed.rows.length > 25 && (
-            <p className="admin-field__hint">Showing the first 25 of {displayed.rows.length} rows.</p>
-          )}
-          {preview ? (
-            <div className="admin-form-actions">
-              <button className="admin-btn admin-btn--ghost" onClick={() => setPreview(null)}>Discard</button>
-              <button className="admin-btn admin-btn--primary" onClick={savePreview} disabled={saving}>
-                {saving ? 'Saving…' : 'Save Placement Records'}
-              </button>
-            </div>
-          ) : (
-            <div className="admin-form-actions">
-              <button className="admin-btn admin-btn--danger" onClick={clearSaved}>Delete Saved Records</button>
-            </div>
-          )}
-        </>
-      ) : (
-        !loading && <p className="admin-field__hint">No placement records saved yet for this department.</p>
+      {years.length === 0 && (
+        <p className="admin-field__hint">No Academic Years yet — add one above to start importing placement records.</p>
       )}
+
+      {years.map((y, yi) => {
+        const preview = previews[yi];
+        const displayed = preview
+          ? preview
+          : y.columns.length > 0
+            ? { columns: y.columns, rows: y.rows.map((r) => r.cells) }
+            : null;
+        const importing = importingYear === yi;
+        const busy = busyYear === yi;
+
+        return (
+          <div key={yi} style={{ border: '1.5px solid var(--color-light-gray)', borderRadius: 8, padding: '1rem', marginBottom: '1rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
+              <strong style={{ flex: 1, fontSize: '1rem' }}>{y.year}</strong>
+              <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveYear(yi, -1)} disabled={yi === 0} title="Move up">↑</button>
+              <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveYear(yi, 1)} disabled={yi === years.length - 1} title="Move down">↓</button>
+              <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeYear(yi)} disabled={busy}>Remove Year</button>
+            </div>
+
+            <label className="admin-btn admin-btn--primary" style={{ display: 'inline-block', cursor: importing ? 'default' : 'pointer', opacity: importing ? 0.6 : 1 }}>
+              {importing ? 'Reading file…' : 'Import from Excel / CSV / Word / PDF'}
+              <input
+                type="file"
+                accept=".xlsx,.xls,.csv,.docx,.pdf"
+                hidden
+                disabled={importing}
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handleFile(yi, file);
+                  e.target.value = '';
+                }}
+              />
+            </label>
+
+            {displayed && displayed.columns.length > 0 ? (
+              <>
+                <div style={{ margin: '1rem 0' }}>
+                  <strong>Detected columns:</strong>{' '}
+                  {displayed.columns.map((c, ci) => (
+                    <span key={ci} className="admin-badge" style={{ marginRight: '0.4rem', textTransform: 'none' }}>{c}</span>
+                  ))}
+                </div>
+                <p className="admin-field__hint">
+                  {displayed.rows.length} record{displayed.rows.length === 1 ? '' : 's'}{preview ? ' — not yet saved' : ' saved'}.
+                </p>
+                <div className="admin-table-wrap" style={{ maxHeight: 320, overflow: 'auto' }}>
+                  <table className="admin-table">
+                    <thead>
+                      <tr>{displayed.columns.map((c, ci) => <th key={ci}>{c}</th>)}</tr>
+                    </thead>
+                    <tbody>
+                      {displayed.rows.slice(0, 25).map((row, ri) => (
+                        <tr key={ri}>{row.map((cell, ci) => <td key={ci}>{cell}</td>)}</tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                {displayed.rows.length > 25 && (
+                  <p className="admin-field__hint">Showing the first 25 of {displayed.rows.length} rows.</p>
+                )}
+                {preview ? (
+                  <div className="admin-form-actions">
+                    <button className="admin-btn admin-btn--ghost" onClick={() => discardPreview(yi)}>Discard</button>
+                    <button className="admin-btn admin-btn--primary" onClick={() => savePreview(yi)} disabled={busy}>
+                      {busy ? 'Saving…' : 'Save Placement Records'}
+                    </button>
+                  </div>
+                ) : (
+                  <div className="admin-form-actions">
+                    <button className="admin-btn admin-btn--danger" onClick={() => clearRecords(yi)} disabled={busy}>
+                      {busy ? 'Deleting…' : 'Delete Records'}
+                    </button>
+                  </div>
+                )}
+              </>
+            ) : (
+              <p className="admin-field__hint" style={{ marginTop: '0.75rem' }}>No placement records imported yet for {y.year}.</p>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }
