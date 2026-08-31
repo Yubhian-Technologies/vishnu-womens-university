@@ -103,6 +103,10 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     // shown on the Academics page, reused here so this works with no extra
     // data entry; the "Overview" field on the department admin overrides it.
     about: dept?.about || dept?.description || '',
+    // Department-only, no per-programme fallback — a new structural block
+    // (B.Tech./M.Tech. headings + intake tables) shown right after "About
+    // the Department".
+    programLevels: dept?.programLevels || [],
     established: clean(dept?.established) || clean(primary?.established),
     accreditation: clean(dept?.accreditation) || clean(primary?.accreditation),
     hod: dept?.hod || primary?.hod || '',
@@ -126,6 +130,8 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   const hasHod = !!(shared.hodMessage || shared.hodImage || shared.hodEmail || shared.hod);
   const hasLabs = shared.labs.length > 0;
   const hasAbout = !!shared.about;
+  const programLevels = shared.programLevels.filter((l) => l.title && (l.intro || l.rows?.length > 0));
+  const hasProgramLevels = programLevels.length > 0;
   const libraryTables = shared.librarySections.filter((sec) => sec.items && sec.items.length > 0);
   const hasLibrary = !!(shared.libraryIntro || shared.libraryInCharge || libraryTables.length > 0);
 
@@ -156,6 +162,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   // section is currently rendered for activeProgram).
   const quickLinks = [
     hasAbout && { id: 'about', label: 'About the Department' },
+    hasProgramLevels && { id: 'program-levels', label: 'Programmes Offered' },
     hasVisionMission && { id: 'vision-mission', label: 'Vision, Mission & Values' },
     hasHod && { id: 'hod', label: 'About HOD' },
     faculty.length > 0 && { id: 'faculty', label: 'Faculty' },
@@ -292,6 +299,48 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                 </div>
               )}
             </div>
+          </div>
+        </section>
+      )}
+
+      {/* Programmes Offered (shared) — B.Tech./M.Tech. headed blocks, each
+          with an intro paragraph and an intake table. */}
+      {hasProgramLevels && (
+        <section id="program-levels" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
+          <div className="container">
+            {programLevels.map((level, li) => (
+              <div key={li} style={{ marginBottom: li === programLevels.length - 1 ? 0 : 'var(--space-10)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', marginBottom: 'var(--space-3)' }}>
+                  <span style={{ width: 4, height: '1.6em', background: 'var(--color-accent)', borderRadius: 2, flexShrink: 0 }} />
+                  <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: '1.4rem', fontWeight: 800, color: 'var(--color-primary)' }}>{level.title}</h3>
+                </div>
+                {level.intro && (
+                  <p style={{ color: 'var(--color-text-light)', lineHeight: 1.85, fontSize: 'var(--text-base)', whiteSpace: 'pre-line', marginBottom: level.rows?.length > 0 ? 'var(--space-5)' : 0, maxWidth: 760 }}>
+                    {level.intro}
+                  </p>
+                )}
+                {level.rows && level.rows.length > 0 && (
+                  <div className="pb-activities-scroll" style={{ maxWidth: 600 }}>
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>{level.title}</th>
+                          <th>Intake</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {level.rows.map((row, ri) => (
+                          <tr key={ri}>
+                            <td>{row.program}</td>
+                            <td>{row.intake}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         </section>
       )}
