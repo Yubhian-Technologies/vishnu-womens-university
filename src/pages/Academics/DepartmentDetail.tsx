@@ -1,7 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { Check, Microscope, Compass, Target, Sparkles, Mail, BookOpen, FileText } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
+import ImageLightbox from '../../components/ImageLightbox/ImageLightbox';
 import ProgrammeStructure from '../../components/ProgrammeStructure/ProgrammeStructure';
 import SEO from '../../components/SEO/SEO';
 import { useOrderedCollection } from '../../hooks/useCollection';
@@ -13,6 +14,7 @@ import { normalizeLab, type ProgramDoc } from '../Admin/sections/ProgramsAdmin';
 import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import type { FacultyDoc } from './Faculty';
 import '../detail-layout.css';
+import '../Campus/tabbed-section.css';
 
 const NAV_OFFSET = 'calc(var(--topbar-height) + var(--header-height) + 1rem)';
 
@@ -33,6 +35,8 @@ interface Props {
 export default function DepartmentDetail({ group, activeSlug }: Props) {
   const navigate = useNavigate();
   const location = useLocation();
+  const [mindMapOpen, setMindMapOpen] = useState(false);
+  const [outcomeTab, setOutcomeTab] = useState<string | null>(null);
 
   const { docs: allDepartments, loading: deptLoading } = useOrderedCollection<DepartmentDoc>('departments', 'order');
   const dept = allDepartments.find(
@@ -67,6 +71,13 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     const el = document.getElementById(location.hash.slice(1));
     if (el) smoothScrollTo(el);
   }, [location.key, location.hash, activeSlug, progLoading]);
+
+  // Defaults the PEOs/POs/PSOs tab bar to whichever of the three actually
+  // has admin-entered content for the active programme, once loaded.
+  useEffect(() => {
+    const firstAvailable = activeProgram?.peos?.length ? 'peos' : activeProgram?.pos?.length ? 'pos' : activeProgram?.psos?.length ? 'psos' : null;
+    if (firstAvailable) setOutcomeTab((prev) => prev ?? firstAvailable);
+  }, [activeProgram?.peos?.length, activeProgram?.pos?.length, activeProgram?.psos?.length]);
 
   if (progLoading && subPrograms.length === 0) {
     return (
@@ -137,7 +148,15 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
 
   const hasProgrammeAbout = !!activeProgram.about;
   const hasHighlights = !!(activeProgram.highlights && activeProgram.highlights.length > 0);
-  const hasOutcomeStatements = !!(activeProgram.peos?.length || activeProgram.pos?.length || activeProgram.psos?.length);
+  // Tabbed PEOs / POs / PSOs — only whichever of the three an admin has
+  // actually filled in (via /admin → Programs) becomes a tab.
+  const outcomeGroups = [
+    { key: 'peos', short: 'PEOs', title: 'Programme Educational Objectives (PEOs)', items: activeProgram.peos },
+    { key: 'pos', short: 'POs', title: 'Programme Outcomes (POs)', items: activeProgram.pos },
+    { key: 'psos', short: 'PSOs', title: 'Programme Specific Outcomes (PSOs)', items: activeProgram.psos },
+  ].filter((g) => g.items && g.items.length > 0);
+  const hasOutcomeStatements = outcomeGroups.length > 0;
+  const activeOutcome = outcomeGroups.find((g) => g.key === outcomeTab) ?? outcomeGroups[0];
   const hasMindMap = !!activeProgram.mindMapImage;
   // News & Events + Newsletter here use the teammate's per-academic-year
   // fields on the programme doc (see ProgramsAdmin's "News & Events —
@@ -179,28 +198,36 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     hasRnd && { id: 'rnd', label: 'Research & Development (Funded Projects & Patents)' },
   ].filter(Boolean) as { id: string; label: string }[];
 
-  // Top stats bar. Head of Department is genuinely one person for the whole
-  // department, shown once. Established/Accreditation are shown once too
-  // when an admin has set them directly on the department doc — but when
-  // that's empty, each program's own figure is shown instead (labelled),
-  // since those routinely differ between the two programs (e.g. CSE is NBA
+  // Top stats bar, laid out as stacked rows: Head of Department gets its own
+  // line (one person for the whole department). Established/Accreditation
+  // show once, on their own line, when an admin has set them directly on the
+  // department doc — but when that's empty, each program gets its own line
+  // with its own Established / Accreditation / Intake grouped together
+  // (since those routinely differ between the two programs, e.g. CSE is NBA
   // accredited while Cyber Security isn't yet). Intake always differs per
-  // program, so it's always broken out per program.
-  const stats: { label: string; value: string }[] = [];
-  if (shared.hod) stats.push({ label: 'Head of Department', value: shared.hod });
-  if (clean(dept?.established) || clean(dept?.accreditation)) {
-    if (clean(dept?.established)) stats.push({ label: 'Established', value: clean(dept?.established) });
-    if (clean(dept?.accreditation)) stats.push({ label: 'Accreditation', value: clean(dept?.accreditation) });
+  // program, so in the shared-Established case each program still gets its
+  // own Intake line.
+  const statRows: { label: string; value: string }[][] = [];
+  if (shared.hod) statRows.push([{ label: 'Head of Department', value: shared.hod }]);
+  const hasSharedEstAccred = clean(dept?.established) || clean(dept?.accreditation);
+  if (hasSharedEstAccred) {
+    const sharedRow: { label: string; value: string }[] = [];
+    if (clean(dept?.established)) sharedRow.push({ label: 'Established', value: clean(dept?.established) });
+    if (clean(dept?.accreditation)) sharedRow.push({ label: 'Accreditation', value: clean(dept?.accreditation) });
+    if (sharedRow.length) statRows.push(sharedRow);
+    subPrograms.forEach((p) => {
+      if (p.intake) statRows.push([{ label: `${p.shortName || p.name} — Intake`, value: `${p.intake} Seats` }]);
+    });
   } else {
     subPrograms.forEach((p) => {
       const label = p.shortName || p.name;
-      if (clean(p.established)) stats.push({ label: `${label} — Established`, value: clean(p.established) });
-      if (clean(p.accreditation)) stats.push({ label: `${label} — Accreditation`, value: clean(p.accreditation) });
+      const row: { label: string; value: string }[] = [];
+      if (clean(p.established)) row.push({ label: `${label} — Established`, value: clean(p.established) });
+      if (clean(p.accreditation)) row.push({ label: `${label} — Accreditation`, value: clean(p.accreditation) });
+      if (p.intake) row.push({ label: `${label} — Intake`, value: `${p.intake} Seats` });
+      if (row.length) statRows.push(row);
     });
   }
-  subPrograms.forEach((p) => {
-    if (p.intake) stats.push({ label: `${p.shortName || p.name} — Intake`, value: `${p.intake} Seats` });
-  });
 
   const heroImage = shared.heroImage;
   const pageUrl = `/academics/${activeProgram.slug}`;
@@ -247,19 +274,24 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
         </div>
       </section>
 
-      {/* Stats bar */}
-      {stats.length > 0 && (
-        <section style={{ background: 'var(--color-primary)', padding: 'var(--space-5) 0' }}>
+      {/* Stats bar — one row per group (HOD alone, then each program's own
+          Established/Accreditation/Intake together on their own line) */}
+      {statRows.length > 0 && (
+        <section style={{ background: 'var(--color-primary)', padding: 'var(--space-4) 0' }}>
           <div className="container">
-            <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-12)', rowGap: 'var(--space-4)', flexWrap: 'wrap' }}>
-              {stats.map((s) => (
-                <div key={s.label} style={{ textAlign: 'center' }}>
-                  {s.label === 'Head of Department' && hasHod ? (
-                    <a href="#hod" style={{ fontFamily: 'var(--font-serif)', fontSize: '1.15rem', fontWeight: 900, color: 'var(--color-accent)', whiteSpace: 'nowrap', textDecoration: 'underline', textUnderlineOffset: 3 }}>{s.value}</a>
-                  ) : (
-                    <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.15rem', fontWeight: 900, color: 'var(--color-accent)', whiteSpace: 'nowrap' }}>{s.value}</div>
-                  )}
-                  <div style={{ fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.65)', fontFamily: 'var(--font-sans)', marginTop: 2, textTransform: 'uppercase', letterSpacing: '0.07em' }}>{s.label}</div>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-2)' }}>
+              {statRows.map((row, ri) => (
+                <div key={ri} style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-10)', rowGap: 'var(--space-2)', flexWrap: 'wrap' }}>
+                  {row.map((s) => (
+                    <div key={s.label} style={{ textAlign: 'center' }}>
+                      {s.label === 'Head of Department' && hasHod ? (
+                        <a href="#hod" style={{ fontFamily: 'var(--font-serif)', fontSize: '0.92rem', fontWeight: 900, color: 'var(--color-accent)', whiteSpace: 'nowrap', textDecoration: 'underline', textUnderlineOffset: 3 }}>{s.value}</a>
+                      ) : (
+                        <div style={{ fontFamily: 'var(--font-serif)', fontSize: '0.92rem', fontWeight: 900, color: 'var(--color-accent)', whiteSpace: 'nowrap' }}>{s.value}</div>
+                      )}
+                      <div style={{ fontSize: '0.62rem', color: 'rgba(255,255,255,0.65)', fontFamily: 'var(--font-sans)', marginTop: 1, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{s.label}</div>
+                    </div>
+                  ))}
                 </div>
               ))}
             </div>
@@ -622,26 +654,31 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
               <span className="section-label">Outcome-Based Education</span>
               <h2 className="section-title">PEOs, POs &amp; PSOs</h2>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 'var(--space-6)' }}>
-              {[
-                { key: 'peos', title: 'Programme Educational Objectives (PEOs)', items: activeProgram.peos },
-                { key: 'pos', title: 'Programme Outcomes (POs)', items: activeProgram.pos },
-                { key: 'psos', title: 'Programme Specific Outcomes (PSOs)', items: activeProgram.psos },
-              ].filter((g) => g.items && g.items.length > 0).map((g) => (
-                <div key={g.key} style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)' }}>
-                  <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 800, color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 'var(--space-4)', paddingBottom: 'var(--space-3)', borderBottom: '2px solid var(--color-accent)' }}>
-                    {g.title}
-                  </h3>
-                  <ol style={{ padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', listStylePosition: 'inside' }}>
-                    {g.items!.map((item, i) => (
-                      <li key={item} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.65 }}>
-                        <strong style={{ color: 'var(--color-accent)' }}>{g.key.slice(0, -1).toUpperCase()}{i + 1}:</strong> {item}
-                      </li>
-                    ))}
-                  </ol>
-                </div>
+            <div className="section-tabs">
+              {outcomeGroups.map((g) => (
+                <button
+                  key={g.key}
+                  onClick={() => setOutcomeTab(g.key)}
+                  className={`section-tab-btn${activeOutcome?.key === g.key ? ' active' : ''}`}
+                >
+                  {g.short}
+                </button>
               ))}
             </div>
+            {activeOutcome && (
+              <div style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)' }}>
+                <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 800, color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 'var(--space-4)', paddingBottom: 'var(--space-3)', borderBottom: '2px solid var(--color-accent)' }}>
+                  {activeOutcome.title}
+                </h3>
+                <ol style={{ padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', listStylePosition: 'inside' }}>
+                  {activeOutcome.items!.map((item, i) => (
+                    <li key={item} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.65 }}>
+                      <strong style={{ color: 'var(--color-accent)' }}>{activeOutcome.key.slice(0, -1).toUpperCase()}{i + 1}:</strong> {item}
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            )}
           </div>
         </section>
       )}
@@ -654,11 +691,35 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
               <span className="section-label">Curriculum Overview</span>
               <h2 className="section-title">Mind Map</h2>
             </div>
-            <div style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4)', textAlign: 'center' }}>
-              <SmoothImage src={activeProgram.mindMapImage} alt={`${activeProgram.shortName || activeProgram.name} curriculum mind map`} style={{ maxWidth: '100%', height: 'auto', borderRadius: 'var(--radius-sm)' }} />
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <button
+                type="button"
+                onClick={() => setMindMapOpen(true)}
+                aria-label="Open Mind Map in full size"
+                style={{
+                  display: 'inline-block', background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)',
+                  borderRadius: 'var(--radius-md)', padding: 'var(--space-3)', cursor: 'zoom-in', maxWidth: '100%',
+                  transition: 'box-shadow var(--transition-base), border-color var(--transition-base)',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-md)'; e.currentTarget.style.borderColor = 'var(--color-accent)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.borderColor = 'var(--color-light-gray)'; }}
+              >
+                <SmoothImage
+                  src={activeProgram.mindMapImage}
+                  alt={`${activeProgram.shortName || activeProgram.name} curriculum mind map`}
+                  style={{ display: 'block', maxWidth: '100%', maxHeight: '70vh', width: 'auto', height: 'auto', borderRadius: 'var(--radius-sm)' }}
+                />
+              </button>
             </div>
           </div>
         </section>
+      )}
+      {mindMapOpen && (
+        <ImageLightbox
+          src={activeProgram.mindMapImage}
+          alt={`${activeProgram.shortName || activeProgram.name} curriculum mind map`}
+          onClose={() => setMindMapOpen(false)}
+        />
       )}
 
       {/* Curriculum (per programme) */}
@@ -722,8 +783,10 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                 <thead>
                   <tr>
                     <th>Academic Year</th>
+                    {/* Per-issue "Issue – N" column headings intentionally removed — the
+                        clickable issue links themselves still render below, unaffected. */}
                     {Array.from({ length: newsletterMaxIssues }).map((_, ci) => (
-                      <th key={ci}>Issue – {ci + 1}</th>
+                      <th key={ci} />
                     ))}
                   </tr>
                 </thead>

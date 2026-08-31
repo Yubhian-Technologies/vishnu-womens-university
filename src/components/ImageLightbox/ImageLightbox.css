@@ -1,0 +1,56 @@
+/* Same dark backdrop / fade-in / close-button language as PhotoGrid's
+   multi-image lightbox (src/components/PhotoGrid/PhotoGrid.css) — kept
+   visually consistent across the site rather than inventing a new look. */
+.img-lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 18, 13, 0.96);
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
+  animation: fadeIn 0.2s ease;
+}
+
+.img-lightbox__wrap {
+  max-width: min(92vw, 1200px);
+  max-height: 88vh;
+  display: flex;
+}
+
+.img-lightbox__wrap img {
+  max-width: 100%;
+  max-height: 88vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 48px rgba(0, 0, 0, 0.7);
+  background: var(--color-white);
+}
+
+.img-lightbox__close {
+  position: absolute;
+  top: var(--space-5);
+  right: var(--space-5);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--color-white);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition-fast);
+  z-index: 1;
+}
+
+.img-lightbox__close:hover { background: rgba(255, 255, 255, 0.2); }
+
+@media (max-width: 640px) {
+  .img-lightbox { padding: var(--space-4); }
+  .img-lightbox__close { top: var(--space-3); right: var(--space-3); width: 36px; height: 36px; }
+}
