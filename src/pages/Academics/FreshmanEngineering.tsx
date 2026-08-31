@@ -316,14 +316,6 @@ function FeAboutHodSection({ department }: { department: string }) {
   );
 }
 
-function getInitials(name: string) {
-  const cleaned = name.replace(/\b(Dr|Sri|Prof|Mr|Mrs|Ms)\.?\s*/gi, '');
-  const parts = cleaned.trim().split(/\s+/).filter(Boolean);
-  if (parts.length === 0) return '';
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-}
-
 function FeFacultyGridSection({ department }: { department: string }) {
   const { members, loading } = useDeptFaculty(department);
 
@@ -336,31 +328,31 @@ function FeFacultyGridSection({ department }: { department: string }) {
   }
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(170px, 1fr))', gap: 'var(--space-5)' }}>
-      {members.map((f) => (
-        <Link
-          key={f.id}
-          to={`/faculty/${f.id}`}
-          style={{
-            display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center',
-            gap: 'var(--space-2)', padding: 'var(--space-4)', borderRadius: 'var(--radius-md)',
-            border: '1px solid var(--color-light-gray)', background: 'var(--color-white)',
-            textDecoration: 'none', transition: 'all var(--transition-base)',
-          }}
-          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-accent)'; (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-md)'; }}
-          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-light-gray)'; (e.currentTarget as HTMLElement).style.boxShadow = 'none'; }}
-        >
-          {f.imageUrl ? (
-            <img src={f.imageUrl} alt={f.name} style={{ width: 84, height: 84, borderRadius: '50%', objectFit: 'cover' }} />
-          ) : (
-            <div style={{ width: 84, height: 84, borderRadius: '50%', background: 'var(--color-off-white)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.3rem', fontWeight: 800, color: 'var(--color-primary)' }}>
-              {getInitials(f.name)}
-            </div>
-          )}
-          <span style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-primary)' }}>{f.name}</span>
-          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)' }}>{f.designation}</span>
-        </Link>
-      ))}
+    <div style={{ overflowX: 'auto', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)' }}>
+      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <thead>
+          <tr>
+            <th style={TABLE_TH_STYLE}>S.No</th>
+            <th style={TABLE_TH_STYLE}>Name</th>
+            <th style={TABLE_TH_STYLE}>Designation</th>
+            <th style={TABLE_TH_STYLE}>Qualification</th>
+          </tr>
+        </thead>
+        <tbody>
+          {members.map((f, i) => (
+            <tr key={f.id} style={{ background: i % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)' }}>
+              <td style={TABLE_TD_STYLE}>{i + 1}</td>
+              <td style={TABLE_TD_STYLE}>
+                <Link to={`/faculty/${f.id}`} style={{ color: 'var(--color-primary)', fontWeight: 700, textDecoration: 'none' }}>
+                  {f.name}
+                </Link>
+              </td>
+              <td style={TABLE_TD_STYLE}>{f.designation}</td>
+              <td style={TABLE_TD_STYLE}>{f.qualification}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }

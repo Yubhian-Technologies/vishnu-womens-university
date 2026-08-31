@@ -96,7 +96,7 @@ export const DIFFERENTIATOR_CATEGORIES = [
 ];
 
 function linesToArray(text: string): string[] {
-  return text.split('\n').map((s) => s.trim()).filter(Boolean);
+  return text.split('\n').map((s) => s.trim());
 }
 function arrayToLines(arr: string[] = []): string {
   return arr.join('\n');
@@ -116,10 +116,17 @@ export default function DifferentiatorsAdmin() {
     if (!form.slug || !form.title) return alert('Slug and title are required.');
     setSaving(true);
     try {
+      const payload = {
+        ...form,
+        highlights: form.highlights.filter(Boolean),
+        facilities: form.facilities.filter(Boolean),
+        outcomes: form.outcomes.filter(Boolean),
+        partners: form.partners.filter(Boolean),
+      };
       if (editing) {
-        await updateDoc(doc(db, 'differentiatorItems', editing), { ...form });
+        await updateDoc(doc(db, 'differentiatorItems', editing), { ...payload });
       } else {
-        await addDoc(collection(db, 'differentiatorItems'), { ...form, order: form.order || items.length + 1, createdAt: serverTimestamp() });
+        await addDoc(collection(db, 'differentiatorItems'), { ...payload, order: form.order || items.length + 1, createdAt: serverTimestamp() });
       }
       setForm(EMPTY); setEditing(null); setActiveSubKey(null);
     } catch (e) {

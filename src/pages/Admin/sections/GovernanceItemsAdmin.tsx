@@ -34,7 +34,7 @@ const CATEGORIES: { value: GovernanceItemDoc['category']; label: string }[] = [
 ];
 
 function linesToArray(text: string): string[] {
-  return text.split('\n').map((s) => s.trim()).filter(Boolean);
+  return text.split('\n').map((s) => s.trim());
 }
 function arrayToLines(arr: string[] = []): string {
   return arr.join('\n');
@@ -53,10 +53,11 @@ export default function GovernanceItemsAdmin() {
     if (!form.slug || !form.title) return alert('Slug and title are required.');
     setSaving(true);
     try {
+      const payload = { ...form, highlights: form.highlights.filter(Boolean), outcomes: form.outcomes.filter(Boolean) };
       if (editing) {
-        await updateDoc(doc(db, 'governanceItems', editing), { ...form });
+        await updateDoc(doc(db, 'governanceItems', editing), { ...payload });
       } else {
-        await addDoc(collection(db, 'governanceItems'), { ...form, order: form.order || items.length + 1, createdAt: serverTimestamp() });
+        await addDoc(collection(db, 'governanceItems'), { ...payload, order: form.order || items.length + 1, createdAt: serverTimestamp() });
       }
       setForm(EMPTY); setEditing(null);
     } catch (e) {
