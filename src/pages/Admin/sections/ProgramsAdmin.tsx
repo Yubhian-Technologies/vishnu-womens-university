@@ -136,7 +136,7 @@ export interface ProgramDoc {
   hodResearchProfiles: ProgramLink[];
   mindMapImage: string;
   mindMapImageStoragePath: string;
-  // Optional — shown as a "Digital Library" section + Quick Links entry on
+  // Optional — shown as a "Department Library" section + Quick Links entry on
   // every programme's page (same shared template, not per-branch content,
   // and stored on this programme's own doc so each branch's library data is
   // completely independent of every other's).
@@ -144,7 +144,7 @@ export interface ProgramDoc {
   libraryInCharge?: string;
   // Fully admin-defined: any number of sections, each with any number of
   // items — nothing about headings or item names is fixed, so different
-  // programmes can have entirely different Digital Library content. Each
+  // programmes can have entirely different Department Library content. Each
   // section renders as its own table on the public page.
   librarySections?: LibrarySection[];
   // Optional — shown as a "News & Events" section + Quick Links entry on
@@ -212,6 +212,28 @@ const EMPTY: Omit<ProgramDoc, 'id'> = {
   customSections: [],
   order: 0,
 };
+
+// A subject's Code/Credits fields are cleared to a literal `undefined`
+// (see updateSubject's onChange handlers below) to represent "not set" in
+// local state — but Firestore's updateDoc/addDoc reject any field whose
+// value is `undefined` anywhere in the payload (nested arrays/objects
+// included), throwing "Unsupported field value: undefined". This strips
+// every such undefined leaf right before saving, so a program with an
+// empty subject Code/Credits (or any other optional field left blank)
+// always saves successfully.
+function stripUndefined<T>(value: T): T {
+  if (Array.isArray(value)) {
+    return value.map((v) => stripUndefined(v)) as unknown as T;
+  }
+  if (value !== null && typeof value === 'object') {
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+      if (v !== undefined) out[k] = stripUndefined(v);
+    }
+    return out as T;
+  }
+  return value;
+}
 
 const CATEGORIES = ['btech', 'mtech', 'mba', 'phd'];
 // Display-only labels — the stored `category` value stays lowercase since
@@ -288,7 +310,7 @@ export default function ProgramsAdmin() {
   const handleHodImage = (r: UploadResult) => setForm((p) => ({ ...p, hodImage: r.url, hodImageStoragePath: r.path }));
   const handleMindMapImage = (r: UploadResult) => setForm((p) => ({ ...p, mindMapImage: r.url, mindMapImageStoragePath: r.path }));
 
-  // Digital Library (sections + items) editing — same structured add /
+  // Department Library (sections + items) editing — same structured add /
   // remove / reorder shape as Programme Structure above, just for an
   // arbitrary set of "heading + item rows" tables instead of semesters.
   const librarySections = form.librarySections || [];
@@ -407,6 +429,31 @@ export default function ProgramsAdmin() {
   };
   const removeNewsRow = (yi: number, ri: number) => {
     set('newsEventsYears', newsEventsYears.map((y, i) => (i !== yi ? y : { ...y, rows: y.rows.filter((_, j) => j !== ri) })));
+  };
+  // Drag-to-reorder for academic years and, within a year, its events — same
+  // ⠿-handle drag pattern as the All Programs table below, just reordering
+  // local form state instead of writing straight to Firestore. Kept
+  // alongside the ↑/↓ buttons above rather than replacing them.
+  const [newsYearDrag, setNewsYearDrag] = useState<number | null>(null);
+  const handleNewsYearDragOver = (overIndex: number) => {
+    if (newsYearDrag === null || newsYearDrag === overIndex) return;
+    const next = [...newsEventsYears];
+    const [moved] = next.splice(newsYearDrag, 1);
+    next.splice(overIndex, 0, moved);
+    set('newsEventsYears', next);
+    setNewsYearDrag(overIndex);
+  };
+  const [newsRowDrag, setNewsRowDrag] = useState<{ yi: number; ri: number } | null>(null);
+  const handleNewsRowDragOver = (yi: number, overIndex: number) => {
+    if (!newsRowDrag || newsRowDrag.yi !== yi || newsRowDrag.ri === overIndex) return;
+    set('newsEventsYears', newsEventsYears.map((y, i) => {
+      if (i !== yi) return y;
+      const rows = [...y.rows];
+      const [moved] = rows.splice(newsRowDrag.ri, 1);
+      rows.splice(overIndex, 0, moved);
+      return { ...y, rows };
+    }));
+    setNewsRowDrag({ yi, ri: overIndex });
   };
 
   // Newsletter (academic years, each with an ordered list of PDF-backed
@@ -664,7 +711,7 @@ export default function ProgramsAdmin() {
     if (!form.name || !form.slug) return alert('Program name and slug are required.');
     setSaving(true);
     try {
-      const payload = {
+      const payload = stripUndefined({
         ...form,
         highlights: form.highlights.filter(Boolean),
         outcomes: form.outcomes.filter(Boolean),
@@ -673,7 +720,7 @@ export default function ProgramsAdmin() {
         peos: form.peos.filter(Boolean),
         pos: form.pos.filter(Boolean),
         psos: form.psos.filter(Boolean),
-      };
+      });
       if (editing) {
         await updateDoc(doc(db, 'programs', editing), { ...payload });
       } else {
@@ -983,15 +1030,20 @@ export default function ProgramsAdmin() {
             <ImageUploader folder="vwu/programs/mindmap" currentUrl={form.mindMapImage} onUploaded={handleMindMapImage} label="Upload Mind Map Image" />
           </div>
 
-          <div className="admin-field admin-field--full"><hr /><h3>Digital Library</h3></div>
+          <div className="admin-field admin-field--full"><hr /><h3>Department Library</h3></div>
           <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>
-            Optional. Shown as a "Digital Library" section (and Quick Links entry) on this programme's page, right
-            after Laboratories. Each section below becomes its own table on the public page — headings and items
-            are entirely up to you, so different programmes can have completely different Digital Library content.
+            Optional. Shown as a "Department Library" section (and Quick Links entry) on this programme's page,
+            right after Laboratories. Each section below becomes its own table on the public page — headings and
+            items are entirely up to you, so different programmes can have completely different Department Library
+            content.
           </p>
           <div className="admin-field admin-field--full">
             <label>Library Overview</label>
-            <textarea rows={3} value={form.libraryIntro} onChange={(e) => set('libraryIntro', e.target.value)} placeholder="The Department Library occupies a unique place in academic and research activities of the Department…" />
+            <p className="admin-field__hint" style={{ marginTop: 0 }}>
+              One point per line starting with "- " renders as a bullet list; a line with no "- " is its own
+              paragraph. Wrap text in **double asterisks** for bold.
+            </p>
+            <textarea rows={5} value={form.libraryIntro} onChange={(e) => set('libraryIntro', e.target.value)} placeholder={'The Department Library occupies a unique place in academic and research activities of the Department…\n\n- The library is open from 8.00 a.m. to 5.00 p.m. on all days.\n- CDs of full series of lectures on specific subjects and text books are available to students for reference.'} />
           </div>
           <div className="admin-field admin-field--full">
             <label>In-charge of Department Library</label>
@@ -1036,21 +1088,32 @@ export default function ProgramsAdmin() {
             ))}
             <button type="button" className="admin-btn admin-btn--primary" onClick={addLibrarySection}>+ Add Section</button>
             {librarySections.length === 0 && (
-              <p className="admin-field__hint">No sections yet — click "Add Section" to start building this programme's Digital Library.</p>
+              <p className="admin-field__hint">No sections yet — click "Add Section" to start building this programme's Department Library.</p>
             )}
           </div>
 
-          <div className="admin-field admin-field--full"><hr /><h3>News &amp; Events — Department Page (AI / CSE / ECE)</h3></div>
+          <div className="admin-field admin-field--full"><hr /><h3>News &amp; Events — Academic Year Table</h3></div>
           <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>
-            Only shown on the shared AI/CSE/ECE department page (see Academic Departments), under this
-            programme's side of the toggle — grouped by academic year, with columns you define per year (e.g.
-            "Title", "Date"); "S.No" is added automatically. For every other programme, use "News &amp; Events —
-            This Programme" below instead.
+            Shown on this programme's page (and, for AI/CSE/ECE, under this programme's side of the shared
+            department page toggle too) — grouped by academic year, with columns you define per year (e.g.
+            "Title", "Date"); "S.No" is added automatically. This is separate from "News &amp; Events — This
+            Programme" below, which pulls from individually-added News &amp; Events items instead — use whichever
+            fits how you want to manage this programme's news, or both. Drag a year or event by its ⠿ handle to
+            reorder, or use the ↑/↓ buttons.
           </p>
           <div className="admin-field admin-field--full">
             {newsEventsYears.map((yr, yi) => (
-              <div key={yi} style={{ border: '1.5px solid var(--color-light-gray)', borderRadius: 8, padding: '0.75rem', marginBottom: '0.75rem' }}>
+              <div
+                key={yi}
+                draggable
+                onDragStart={() => setNewsYearDrag(yi)}
+                onDragOver={(e) => { e.preventDefault(); handleNewsYearDragOver(yi); }}
+                onDrop={() => setNewsYearDrag(null)}
+                onDragEnd={() => setNewsYearDrag(null)}
+                style={{ border: '1.5px solid var(--color-light-gray)', borderRadius: 8, padding: '0.75rem', marginBottom: '0.75rem', opacity: newsYearDrag === yi ? 0.5 : 1 }}
+              >
                 <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.75rem' }}>
+                  <span style={{ cursor: 'grab', color: 'var(--color-text-light, #9ca3af)', fontSize: '1.1rem', userSelect: 'none' }} title="Drag to reorder">⠿</span>
                   <input
                     value={yr.year}
                     onChange={(e) => updateNewsYearLabel(yi, e.target.value)}
@@ -1086,7 +1149,16 @@ export default function ProgramsAdmin() {
                   <>
                     <label style={{ fontSize: '0.78rem', fontWeight: 700, display: 'block', marginBottom: '0.3rem' }}>Events</label>
                     {yr.rows.map((row, ri) => (
-                      <div key={ri} style={{ display: 'flex', gap: '0.4rem', marginBottom: '0.4rem', alignItems: 'center' }}>
+                      <div
+                        key={ri}
+                        draggable
+                        onDragStart={(e) => { e.stopPropagation(); setNewsRowDrag({ yi, ri }); }}
+                        onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); handleNewsRowDragOver(yi, ri); }}
+                        onDrop={(e) => { e.stopPropagation(); setNewsRowDrag(null); }}
+                        onDragEnd={(e) => { e.stopPropagation(); setNewsRowDrag(null); }}
+                        style={{ display: 'flex', gap: '0.4rem', marginBottom: '0.4rem', alignItems: 'center', opacity: newsRowDrag?.yi === yi && newsRowDrag.ri === ri ? 0.5 : 1 }}
+                      >
+                        <span style={{ cursor: 'grab', color: 'var(--color-text-light, #9ca3af)', fontSize: '1rem', userSelect: 'none' }} title="Drag to reorder">⠿</span>
                         {yr.columns.map((col, ci) => (
                           <input
                             key={ci}

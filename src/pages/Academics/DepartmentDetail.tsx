@@ -4,6 +4,7 @@ import { Check, Microscope, Compass, Target, Sparkles, Mail, BookOpen, FileText 
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import ImageLightbox from '../../components/ImageLightbox/ImageLightbox';
 import ProgrammeStructure from '../../components/ProgrammeStructure/ProgrammeStructure';
+import BodyBlocks, { parseBodyContent } from '../../components/BodyBlocks/BodyBlocks';
 import SmoothCollapse from '../../components/SmoothCollapse/SmoothCollapse';
 import SEO from '../../components/SEO/SEO';
 import { useOrderedCollection } from '../../hooks/useCollection';
@@ -772,18 +773,19 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
         </section>
       )}
 
-      {/* Digital Library (shared) */}
+      {/* Department Library (shared) */}
       {hasLibrary && (
         <section id="library" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
               <span className="section-label">Resources</span>
-              <h2 className="section-title">Digital Library</h2>
+              <h2 className="section-title">Department Library</h2>
             </div>
             {shared.libraryIntro && (
-              <p style={{ color: 'var(--color-text)', lineHeight: 1.85, fontSize: 'var(--text-base)', marginBottom: 'var(--space-4)' }}>
-                {shared.libraryIntro}
-              </p>
+              <BodyBlocks
+                blocks={parseBodyContent(shared.libraryIntro)}
+                paragraphStyle={{ color: 'var(--color-text)', lineHeight: 1.85, fontSize: 'var(--text-base)' }}
+              />
             )}
             {shared.libraryInCharge && (
               <p style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', color: 'var(--color-text)', fontSize: 'var(--text-sm)', marginBottom: libraryTables.length > 0 ? 'var(--space-6)' : 0 }}>

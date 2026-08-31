@@ -102,7 +102,7 @@ export default function FacultyProfile() {
         <div className="container">
           <div style={{ display: 'flex', gap: 'var(--space-8)', flexWrap: 'wrap', marginBottom: 'var(--space-10)' }}>
             {person.imageUrl ? (
-              <SmoothImage src={person.imageUrl} alt={person.name} style={{ width: 200, height: 240, objectFit: 'cover', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-light-gray)', flexShrink: 0 }} />
+              <SmoothImage src={person.imageUrl} alt={person.name} style={{ width: 200, height: 240, objectFit: 'cover', objectPosition: 'center top', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-light-gray)', flexShrink: 0 }} />
             ) : (
               <div style={{ width: 200, height: 240, borderRadius: 'var(--radius-md)', background: 'var(--color-off-white)', border: '1px solid var(--color-light-gray)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2.5rem', fontWeight: 800, color: 'var(--color-primary)', flexShrink: 0 }}>
                 {getInitials(person.name)}

@@ -4,6 +4,7 @@ import { Check, Microscope, Compass, Target, Sparkles, Mail, ExternalLink, BookO
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import ImageLightbox from '../../components/ImageLightbox/ImageLightbox';
 import ProgrammeStructure from '../../components/ProgrammeStructure/ProgrammeStructure';
+import BodyBlocks, { parseBodyContent } from '../../components/BodyBlocks/BodyBlocks';
 import DepartmentNewsSection, { type DepartmentNewsDoc } from '../../components/DepartmentNews/DepartmentNewsSection';
 import DepartmentDetail from './DepartmentDetail';
 import { groupForProgramSlug } from '../../lib/departmentGroups';
@@ -145,6 +146,14 @@ function SingleProgramDetail() {
   // A year counts once it has a label and at least one issue slot (even an
   // issue with no PDF yet still renders, just as "Unavailable" — this lets
   // an admin scaffold a year's issues ahead of uploading each PDF).
+  // Admin-defined academic-year table (Programs admin's "News & Events —
+  // Department Page") — originally AI/CSE/ECE-only (see DepartmentDetail.tsx),
+  // now available to every programme too, alongside the simpler
+  // departmentNews-collection-based section below. A programme only ends up
+  // with both showing if an admin fills in both; in practice each programme
+  // picks one.
+  const newsEventsYears = (program.newsEventsYears || []).filter((y) => y.year && y.columns?.length > 0 && y.rows?.length > 0);
+  const hasNewsEventsYears = newsEventsYears.length > 0;
   const newsletterYears = (program.newsletterYears || []).filter((y) => y.year && y.issues && y.issues.length > 0);
   const hasNewsletter = newsletterYears.length > 0;
   const newsletterMaxIssues = Math.max(0, ...newsletterYears.map((y) => y.issues.length));
@@ -180,8 +189,9 @@ function SingleProgramDetail() {
     hasCurriculum && { id: 'curriculum', label: 'Curriculum' },
     hasLabs && { id: 'labs', label: 'Laboratories' },
     placementYears.length > 0 && { id: 'placements', label: 'Placements' },
-    hasLibrary && { id: 'library', label: 'Digital Library' },
+    hasLibrary && { id: 'library', label: 'Department Library' },
     hasDeptNews && { id: 'news', label: 'News & Events' },
+    hasNewsEventsYears && { id: 'news-events', label: 'News & Events' },
     hasNewsletter && { id: 'newsletter', label: 'Newsletter' },
     hasRnd && { id: 'rnd', label: 'Research & Development (Funded Projects & Patents)' },
     ...visibleCustomSections.map((s) => ({ id: s.id, label: s.label })),
@@ -759,18 +769,19 @@ function SingleProgramDetail() {
         </section>
       )}
 
-      {/* Digital Library */}
+      {/* Department Library */}
       {hasLibrary && (
         <section id="library" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
               <span className="section-label">Resources</span>
-              <h2 className="section-title">Digital Library</h2>
+              <h2 className="section-title">Department Library</h2>
             </div>
             {program.libraryIntro && (
-              <p style={{ color: 'var(--color-text)', lineHeight: 1.85, fontSize: 'var(--text-base)', marginBottom: 'var(--space-4)' }}>
-                {program.libraryIntro}
-              </p>
+              <BodyBlocks
+                blocks={parseBodyContent(program.libraryIntro)}
+                paragraphStyle={{ color: 'var(--color-text)', lineHeight: 1.85, fontSize: 'var(--text-base)' }}
+              />
             )}
             {program.libraryInCharge && (
               <p style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', color: 'var(--color-text)', fontSize: 'var(--text-sm)', marginBottom: libraryTables.length > 0 ? 'var(--space-6)' : 0 }}>
@@ -809,11 +820,49 @@ function SingleProgramDetail() {
         </section>
       )}
 
+      {/* News & Events — admin-defined academic-year tables (Programs admin's
+          "News & Events — Department Page"), same rendering as the AI/CSE/ECE
+          grouped department page. */}
+      {hasNewsEventsYears && (
+        <section id="news-events" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
+          <div className="container">
+            <div style={{ marginBottom: 'var(--space-8)' }}>
+              <span className="section-label">{program.shortName || program.name}</span>
+              <h2 className="section-title">News &amp; Events</h2>
+            </div>
+            {newsEventsYears.map((yr, yi) => (
+              <div key={yi} style={{ marginBottom: yi === newsEventsYears.length - 1 ? 0 : 'var(--space-8)' }}>
+                <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.1rem', color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>
+                  Academic Year :: {yr.year}
+                </h3>
+                <div className="pb-activities-scroll">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th className="pb-activities-num">S.No</th>
+                        {yr.columns.map((col, ci) => <th key={ci}>{col}</th>)}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {yr.rows.map((row, ri) => (
+                        <tr key={ri}>
+                          <td className="pb-activities-num">{ri + 1}</td>
+                          {yr.columns.map((_, ci) => <td key={ci}>{row.cells[ci] ?? ''}</td>)}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* News & Events — live from the departmentNews collection, tagged to
-          this program. (The AI/CSE/ECE grouped department page uses the
-          teammate's per-academic-year newsEventsYears table instead — see
-          DepartmentDetail.tsx — so the two systems don't both show up on the
-          same page: this one is for standalone programs.) */}
+          this program. Both this and the admin-defined table above are
+          available to every programme now; each one only appears once an
+          admin has actually filled it in. */}
       <DepartmentNewsSection programSlug={program.slug} background="var(--color-off-white)" />
 
       {/* Newsletter — issues grouped by academic year; columns are however
