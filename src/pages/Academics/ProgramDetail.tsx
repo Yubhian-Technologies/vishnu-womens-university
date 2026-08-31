@@ -16,6 +16,8 @@ import { normalizeLab, type ProgramDoc } from '../Admin/sections/ProgramsAdmin';
 import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import type { FacultyDoc } from './Faculty';
 import { parseFlexibleTable, parseProjectAccordion } from '../../lib/structuredTable';
+import { hasCustomSectionContent } from '../../lib/customSections';
+import CustomSectionsRenderer from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import SEO from '../../components/SEO/SEO';
 import { getProgramSchema, getBreadcrumbSchema } from '../../lib/seo/schemas';
 import '../detail-layout.css';
@@ -149,6 +151,7 @@ function SingleProgramDetail() {
   const rndTableSections = parseFlexibleTable(program.rndTableText || '').filter((s) => s.headers.length > 0);
   const rndProjectCategories = parseProjectAccordion(program.rndProjectsText || '').filter((c) => c.projects.length > 0);
   const hasRnd = !!program.rndIntro || rndTableSections.length > 0 || rndProjectCategories.length > 0 || rndLinks.length > 0;
+  const visibleCustomSections = (program.customSections || []).filter(hasCustomSectionContent);
 
   const quickLinks = [
     { id: 'about', label: 'About the Department' },
@@ -163,6 +166,7 @@ function SingleProgramDetail() {
     hasDeptNews && { id: 'news', label: 'News & Events' },
     hasNewsletter && { id: 'newsletter', label: 'Newsletter' },
     hasRnd && { id: 'rnd', label: 'Research & Development (Funded Projects & Patents)' },
+    ...visibleCustomSections.map((s) => ({ id: s.id, label: s.label })),
   ].filter(Boolean) as { id: string; label: string }[];
 
   const hasSidebarContent = quickLinks.length > 1 || hasCareerOutcomes;
@@ -867,6 +871,8 @@ function SingleProgramDetail() {
           </div>
         </section>
       )}
+
+      <CustomSectionsRenderer sections={visibleCustomSections} navOffset={NAV_OFFSET} />
 
       {/* CTA */}
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-14) 0' }}>

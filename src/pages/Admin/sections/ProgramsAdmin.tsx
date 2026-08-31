@@ -9,6 +9,8 @@ import FileUploader from '../../../components/FileUploader/FileUploader';
 import { deleteFile, type UploadResult } from '../../../lib/storage';
 import { PROGRAM_ICON_NAMES } from '../../../lib/programIcons';
 import DepartmentNewsManager from './DepartmentNewsManager';
+import CustomSectionEditor from './CustomSectionEditor';
+import { replaceAtPath, getAtPath, type CustomSection } from '../../../lib/customSections';
 
 export interface ProgramSubject {
   title: string;
@@ -172,6 +174,11 @@ export interface ProgramDoc {
   // still the simplest option for a department that just wants to link out
   // to a couple of PDFs (e.g. "Funded R&D Projects", "In-house R&D Projects").
   rndLinks?: RndLink[];
+  // Admin-defined sections beyond the fixed set above — any name, any number
+  // of sub-sections, and a choice of plain text / table / links / files per
+  // section (see lib/customSections.ts). Fully additive: a program with no
+  // customSections renders exactly as it did before this field existed.
+  customSections?: CustomSection[];
   order: number;
 }
 
@@ -186,6 +193,7 @@ const EMPTY: Omit<ProgramDoc, 'id'> = {
   newsEventsYears: [],
   newsletterYears: [],
   rndIntro: '', rndTableText: '', rndProjectsText: '', rndLinks: [],
+  customSections: [],
   order: 0,
 };
 
@@ -260,7 +268,7 @@ export default function ProgramsAdmin() {
     }
   };
 
-  const set = (k: string, v: string | number | string[] | ProgramSemester[] | ProgramLink[] | LibrarySection[] | NewsEventsYear[] | NewsletterYear[] | RndLink[] | LabItem[]) => setForm((p) => ({ ...p, [k]: v }));
+  const set = (k: string, v: string | number | string[] | ProgramSemester[] | ProgramLink[] | LibrarySection[] | NewsEventsYear[] | NewsletterYear[] | RndLink[] | LabItem[] | CustomSection[]) => setForm((p) => ({ ...p, [k]: v }));
   const handleHodImage = (r: UploadResult) => setForm((p) => ({ ...p, hodImage: r.url, hodImageStoragePath: r.path }));
   const handleMindMapImage = (r: UploadResult) => setForm((p) => ({ ...p, mindMapImage: r.url, mindMapImageStoragePath: r.path }));
 
@@ -462,6 +470,43 @@ export default function ProgramsAdmin() {
     set('rndLinks', rndLinks.map((l, i) => (i === li ? { ...l, pdfUrl: '', pdfStoragePath: '' } : l)));
   };
 
+  // Custom Sections — file uploads route through the functional `setForm(p
+  // => ...)` form via replaceAtPath, recomputing from `p.customSections` at
+  // call time (never a closed-over snapshot), for the same reason
+  // handleLabPdf above does: several file uploads across different sections
+  // can resolve in quick succession, and each must land on top of whatever
+  // the others already saved, not silently overwrite it.
+  const handleCustomSectionFileUploaded = (sectionPath: number[], fileIndex: number, r: UploadResult) => {
+    setForm((p) => ({
+      ...p,
+      customSections: replaceAtPath(p.customSections || [], sectionPath, (s) => ({
+        ...s,
+        files: (s.files || []).map((f, i) => (i === fileIndex ? { ...f, fileUrl: r.url, storagePath: r.path } : f)),
+      })),
+    }));
+  };
+  // Unlike the rest of this form (which only takes effect once "Update
+  // Program" is clicked), removing a custom section's file acts immediately
+  // — same as removeLabPdf above — so there's no orphaned Storage file.
+  const handleCustomSectionFileRemoved = async (sectionPath: number[], fileIndex: number) => {
+    const file = getAtPath(form.customSections || [], sectionPath)?.files?.[fileIndex];
+    if (!file?.fileUrl) return;
+    if (!confirm('Remove this file? This cannot be undone.')) return;
+    try {
+      if (file.storagePath) await deleteFile(file.storagePath);
+    } catch (e) {
+      alert(`Couldn't delete the file from storage: ${(e as Error).message}`);
+      return;
+    }
+    setForm((p) => ({
+      ...p,
+      customSections: replaceAtPath(p.customSections || [], sectionPath, (s) => ({
+        ...s,
+        files: (s.files || []).filter((_, i) => i !== fileIndex),
+      })),
+    }));
+  };
+
   // Laboratories editing — each lab is independently backed by its own
   // uploaded PDF (same shape/pattern as Research & Development links above).
   //
@@ -653,6 +698,7 @@ export default function ProgramsAdmin() {
       })),
       rndIntro: p.rndIntro || '', rndTableText: p.rndTableText || '', rndProjectsText: p.rndProjectsText || '',
       rndLinks: (p.rndLinks || []).map((l) => ({ label: l.label, pdfUrl: l.pdfUrl || '', pdfStoragePath: l.pdfStoragePath || '' })),
+      customSections: p.customSections || [],
       order: p.order || 0,
     });
   };
@@ -1180,6 +1226,23 @@ export default function ProgramsAdmin() {
             {rndLinks.length === 0 && (
               <p className="admin-field__hint">No links yet — click "Add Link" to start building this programme's Research &amp; Development list.</p>
             )}
+          </div>
+
+          <div className="admin-field admin-field--full"><hr /><h3>Custom Sections</h3></div>
+          <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>
+            Optional. Add any section this programme needs beyond the fixed ones above — any name, any number of
+            sub-sections, and a choice of plain text, a table, a list of links, or uploaded files per section. Each
+            one automatically gets its own Quick Links entry and shows up on the public page once it has content.
+          </p>
+          <div className="admin-field admin-field--full">
+            <CustomSectionEditor
+              sections={form.customSections || []}
+              onChange={(next) => set('customSections', next)}
+              rootSections={form.customSections || []}
+              parentPath={[]}
+              onFileUploaded={handleCustomSectionFileUploaded}
+              onFileRemoved={handleCustomSectionFileRemoved}
+            />
           </div>
         </div>
         <div className="admin-form-actions">

@@ -16,6 +16,8 @@ import { normalizeLab, type ProgramDoc } from '../Admin/sections/ProgramsAdmin';
 import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import type { FacultyDoc } from './Faculty';
 import { parseFlexibleTable, parseProjectAccordion } from '../../lib/structuredTable';
+import { hasCustomSectionContent } from '../../lib/customSections';
+import CustomSectionsRenderer from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import '../detail-layout.css';
 import '../Campus/tabbed-section.css';
 
@@ -197,6 +199,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   const rndTableSections = parseFlexibleTable(activeProgram.rndTableText || '').filter((s) => s.headers.length > 0);
   const rndProjectCategories = parseProjectAccordion(activeProgram.rndProjectsText || '').filter((c) => c.projects.length > 0);
   const hasRnd = !!activeProgram.rndIntro || rndTableSections.length > 0 || rndProjectCategories.length > 0 || rndLinks.length > 0;
+  const visibleCustomSections = (activeProgram.customSections || []).filter(hasCustomSectionContent);
 
   // Quick Links sidebar — deliberately trimmed to one anchor per major
   // section rather than every sub-section (e.g. "Choose a Programme" covers
@@ -222,6 +225,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     hasOutcomeStatements && { id: 'peos-pos-psos', label: 'PEOs, POs, PSOs & WKs' },
     hasMindMap && { id: 'mindmap', label: 'Mind Map' },
     { id: 'curriculum', label: 'Curriculum' },
+    ...visibleCustomSections.map((s) => ({ id: s.id, label: s.label })),
   ].filter(Boolean) as { id: string; label: string }[];
 
   // Top stats bar, laid out as stacked rows: Head of Department gets its own
@@ -1054,6 +1058,8 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
           </div>
         </section>
       )}
+
+      <CustomSectionsRenderer sections={visibleCustomSections} navOffset={NAV_OFFSET} />
 
       {/* CTA */}
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-14) 0' }}>
