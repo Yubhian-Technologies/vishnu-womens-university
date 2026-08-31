@@ -7,6 +7,8 @@ import ProgrammeStructure from '../../components/ProgrammeStructure/ProgrammeStr
 import BodyBlocks, { parseBodyContent } from '../../components/BodyBlocks/BodyBlocks';
 import DepartmentNewsSection, { type DepartmentNewsDoc } from '../../components/DepartmentNews/DepartmentNewsSection';
 import DepartmentDetail from './DepartmentDetail';
+import FreshmanSubDepartment from './FreshmanSubDepartment';
+import { SUB_DEPTS } from './FreshmanEngineering';
 import { groupForProgramSlug } from '../../lib/departmentGroups';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { usePageBanner } from '../../hooks/usePageBanner';
@@ -41,6 +43,7 @@ export default function ProgramDetail() {
   const { slug } = useParams<{ slug: string }>();
   const group = groupForProgramSlug(slug);
   if (group) return <DepartmentDetail group={group} activeSlug={slug!} />;
+  if (SUB_DEPTS.some((d) => d.slug === slug)) return <FreshmanSubDepartment slug={slug!} />;
   return <SingleProgramDetail />;
 }
 
@@ -286,7 +289,7 @@ function SingleProgramDetail() {
             <div>
               <div>
                 <span className="section-label">About the Department</span>
-                <h2 className="section-title">The Department of {deptTitle || program.shortName || program.name}</h2>
+                <h2 className="section-title">{deptTitle || program.shortName || program.name}</h2>
                 <p style={{ color: 'var(--color-text-light)', lineHeight: 1.85, fontSize: 'var(--text-base)', marginBottom: 'var(--space-6)', whiteSpace: 'pre-line' }}>
                   {program.about}
                 </p>
