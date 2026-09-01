@@ -41,9 +41,17 @@ export interface CustomSection {
   // between the name and the bio (textContent, reused for the bio here) on
   // a person's card — see PersonCard in CustomSectionsRenderer.tsx.
   personPosition?: string;
-  // One level of nesting is all the admin UI exposes (CustomSectionEditor
-  // only recurses to depth 1) even though the shape itself is recursive.
+  // Subsections can themselves have subsections, arbitrarily deep — lets a
+  // section hold several distinct pieces together (e.g. a description plus
+  // two separate tables) by giving each its own nested section instead of
+  // cramming them into one contentType.
   subSections?: CustomSection[];
+  // How THIS section's own subSections display — 'stacked' (default) shows
+  // each one below the previous; 'pills' shows a horizontal pill switcher
+  // (one subsection's content at a time), same mechanism as a tab's
+  // sectionsDisplay but one level down — e.g. a "Training / Research"
+  // section whose subsections are academic years.
+  subSectionsDisplay?: 'stacked' | 'pills';
   // Where this section renders on the Differentiators detail page — 'intro'
   // sections show compactly inline in the page's intro column (next to
   // About, matching the old Vision/Mission/Objectives styling); everything
