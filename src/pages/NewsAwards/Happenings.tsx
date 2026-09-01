@@ -46,7 +46,7 @@ export default function Happenings() {
       {upcoming.length > 0 && (
         <section id="upcoming-events" className="section bg-white" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
           <div className="container">
-            <div className="reveal" style={{ marginBottom: 'var(--space-8)' }}>
+            <div style={{ marginBottom: 'var(--space-8)' }}>
               <span className="section-label">Mark Your Calendar</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Upcoming Events</h2>
             </div>
