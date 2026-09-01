@@ -29,15 +29,7 @@ export default function CustomSectionsRenderer({ sections, navOffset = DEFAULT_N
               <span className="section-label">Details</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem', fontWeight: section.boldHeading ? 800 : undefined }}>{section.label}</h2>
             </div>
-            <CustomSectionBody section={section} />
-            {(section.subSections || []).filter(hasCustomSectionContent).map((sub) => (
-              <div key={sub.id} style={{ marginTop: 'var(--space-8)' }}>
-                <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: '1.1rem', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>
-                  {sub.label}
-                </h3>
-                <CustomSectionBody section={sub} />
-              </div>
-            ))}
+            <SectionSubtree section={section} />
           </div>
         </section>
       ))}
@@ -59,15 +51,7 @@ export function CustomSectionsIntro({ sections }: { sections: CustomSection[] })
             <div style={{ width: 4, height: 24, background: 'var(--color-accent)', borderRadius: 'var(--radius-full)' }} />
             <h3 style={{ fontSize: '1.25rem', margin: 0, fontWeight: section.boldHeading ? 800 : undefined }}>{section.label}</h3>
           </div>
-          <CustomSectionBody section={section} />
-          {(section.subSections || []).filter(hasCustomSectionContent).map((sub) => (
-            <div key={sub.id} style={{ marginTop: 'var(--space-4)' }}>
-              <h4 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>
-                {sub.label}
-              </h4>
-              <CustomSectionBody section={sub} />
-            </div>
-          ))}
+          <SectionSubtree section={section} />
         </div>
       ))}
     </>
@@ -120,15 +104,7 @@ export function CustomSectionsPlain({ sections }: { sections: CustomSection[] })
               <div style={{ width: 4, height: 24, background: 'var(--color-accent)', borderRadius: 'var(--radius-full)' }} />
               <h3 style={{ fontSize: '1.25rem', margin: 0, fontWeight: section.boldHeading ? 800 : undefined }}>{section.label}</h3>
             </div>
-            <CustomSectionBody section={section} />
-            {(section.subSections || []).filter(hasCustomSectionContent).map((sub) => (
-              <div key={sub.id} style={{ marginTop: 'var(--space-4)' }}>
-                <h4 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>
-                  {sub.label}
-                </h4>
-                <CustomSectionBody section={sub} />
-              </div>
-            ))}
+            <SectionSubtree section={section} />
           </div>
         );
       })}
@@ -194,65 +170,12 @@ function PersonPanelList({ people }: { people: CustomSection[] }) {
   );
 }
 
-// Alternate display for a tab whose `sectionsDisplay` is 'pills' instead of
-// the default 'stacked' (CustomSectionsPlain above) — a horizontal row of
-// pill buttons, one per top-level section, with only the selected section's
-// content shown below. Matches the old WISE Modules tab's own internal tab
-// strip (Python Programming / Java / Weaving the Web / Angular JS / Machine
-// Learning / Projects), which the generic stacked renderer couldn't
-// reproduce since it always showed every section at once.
+// Top-level entry point for a tab whose `sectionsDisplay` is 'pills' instead
+// of the default 'stacked' (CustomSectionsPlain above) — see PillSwitcher.
 export function CustomSectionsPills({ sections }: { sections: CustomSection[] }) {
   const visible = sections.filter(hasCustomSectionContent);
-  const [activeId, setActiveId] = useState<string | null>(null);
-  const active = visible.find((s) => s.id === activeId) ?? visible[0];
   if (visible.length === 0) return null;
-
-  return (
-    <div>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)', marginBottom: 'var(--space-6)' }}>
-        {visible.map((s) => {
-          const isActive = active?.id === s.id;
-          return (
-            <button
-              key={s.id}
-              type="button"
-              onClick={() => setActiveId(s.id)}
-              style={{
-                padding: '0.6rem 1.25rem',
-                borderRadius: 'var(--radius-full)',
-                border: 'none',
-                background: isActive ? 'var(--color-primary)' : 'var(--color-off-white)',
-                color: isActive ? 'var(--color-white)' : 'var(--color-primary)',
-                fontWeight: 700,
-                fontSize: 'var(--text-sm)',
-                cursor: 'pointer',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {s.label}
-            </button>
-          );
-        })}
-      </div>
-      {active && (
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-3)' }}>
-            <div style={{ width: 4, height: 24, background: 'var(--color-accent)', borderRadius: 'var(--radius-full)' }} />
-            <h3 style={{ fontSize: '1.25rem', margin: 0, fontWeight: active.boldHeading ? 800 : undefined }}>{active.label}</h3>
-          </div>
-          <CustomSectionBody section={active} />
-          {(active.subSections || []).filter(hasCustomSectionContent).map((sub) => (
-            <div key={sub.id} style={{ marginTop: 'var(--space-4)' }}>
-              <h4 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>
-                {sub.label}
-              </h4>
-              <CustomSectionBody section={sub} />
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
+  return <PillSwitcher sections={visible} />;
 }
 
 // Differentiators detail page — every section WITHOUT placement:'intro'
@@ -268,7 +191,6 @@ export function CustomSectionsAccordion({ sections }: { sections: CustomSection[
     <div style={{ display: 'flex', flexDirection: 'column', gap: 2, marginTop: 'var(--space-6)' }}>
       {visible.map((section, i) => {
         const isOpen = openIndex === i;
-        const visibleSubs = (section.subSections || []).filter(hasCustomSectionContent);
         return (
           <div key={section.id}>
             <button
@@ -291,20 +213,104 @@ export function CustomSectionsAccordion({ sections }: { sections: CustomSection[
             </button>
             <SmoothCollapse open={isOpen}>
               <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderTop: 'none' }}>
-                <CustomSectionBody section={section} />
-                {visibleSubs.map((sub) => (
-                  <div key={sub.id} style={{ marginTop: 'var(--space-5)' }}>
-                    <h4 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>
-                      {sub.label}
-                    </h4>
-                    <CustomSectionBody section={sub} />
-                  </div>
-                ))}
+                <SectionSubtree section={section} />
               </div>
             </SmoothCollapse>
           </div>
         );
       })}
+    </div>
+  );
+}
+
+// Renders a section's own content, then its subsections — recursively, so a
+// subsection can itself hold further subsections instead of being limited
+// to one contentType. Handles two cases:
+//   - stacked (default): each subsection below the previous, its own
+//     heading, then its own body+subsections (recursing again).
+//   - pills (subSectionsDisplay: 'pills'): subsections render as a
+//     horizontal pill switcher — see PillSwitcher — so e.g. a "Training /
+//     Research" section's academic-year subsections can be selected one at
+//     a time instead of stacking every year on the page at once. A pill's
+//     own content can still mix a description with one or more tables by
+//     giving IT subsections in turn (PillSwitcher renders the active pill
+//     through this same function).
+function SectionSubtree({ section, depth = 0 }: { section: CustomSection; depth?: number }) {
+  const body = <CustomSectionBody section={section} />;
+  const visibleSubs = (section.subSections || []).filter(hasCustomSectionContent);
+  if (visibleSubs.length === 0) return body;
+
+  if (section.subSectionsDisplay === 'pills') {
+    return (
+      <div>
+        {body}
+        <div style={{ marginTop: 'var(--space-5)' }}>
+          <PillSwitcher sections={visibleSubs} depth={depth + 1} />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      {body}
+      {visibleSubs.map((sub) => (
+        <div key={sub.id} style={{ marginTop: depth === 0 ? 'var(--space-6)' : 'var(--space-4)' }}>
+          <h4 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: sub.boldHeading ? 800 : 700, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>
+            {sub.label}
+          </h4>
+          <SectionSubtree section={sub} depth={depth + 1} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// Horizontal pill switcher shared by a tab's own top-level sections
+// (CustomSectionsPills) and any section's subSections when
+// subSectionsDisplay is 'pills' — one pill per section, only the selected
+// one's content shown below, rendered through SectionSubtree so further
+// nesting (a pill whose own content is itself split into pieces) keeps
+// working at any depth.
+function PillSwitcher({ sections, depth = 0 }: { sections: CustomSection[]; depth?: number }) {
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const active = sections.find((s) => s.id === activeId) ?? sections[0];
+  if (!active) return null;
+
+  return (
+    <div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)', marginBottom: 'var(--space-6)' }}>
+        {sections.map((s) => {
+          const isActive = active.id === s.id;
+          return (
+            <button
+              key={s.id}
+              type="button"
+              onClick={() => setActiveId(s.id)}
+              style={{
+                padding: '0.6rem 1.25rem',
+                borderRadius: 'var(--radius-full)',
+                border: 'none',
+                background: isActive ? 'var(--color-primary)' : 'var(--color-off-white)',
+                color: isActive ? 'var(--color-white)' : 'var(--color-primary)',
+                fontWeight: 700,
+                fontSize: 'var(--text-sm)',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {s.label}
+            </button>
+          );
+        })}
+      </div>
+      <div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-3)' }}>
+          <div style={{ width: 4, height: 24, background: 'var(--color-accent)', borderRadius: 'var(--radius-full)' }} />
+          <h3 style={{ fontSize: '1.25rem', margin: 0, fontWeight: active.boldHeading ? 800 : undefined }}>{active.label}</h3>
+        </div>
+        <SectionSubtree section={active} depth={depth} />
+      </div>
     </div>
   );
 }
