@@ -13,6 +13,7 @@ import type { PlacementYearRecord } from '../../../lib/placementRecords';
 import { parsePlacementsFile, type PlacementImportResult } from '../../../lib/placementsImport';
 import CustomSectionEditor from './CustomSectionEditor';
 import { replaceAtPath, getAtPath, type CustomSection } from '../../../lib/customSections';
+import RndTableEditor, { type RndStructuredTable } from './RndTableEditor';
 
 export interface ProgramSubject {
   title: string;
@@ -43,6 +44,7 @@ export interface ProgramLink {
 
 export interface LabItem {
   name: string;
+  description?: string;
   pdfUrl?: string;
   pdfStoragePath?: string;
 }
@@ -71,12 +73,33 @@ export interface NewsEventRow {
   cells: string[];
 }
 
+// One event shown as an image + a short write-up instead of (or alongside)
+// a table row — for entries a plain table cell doesn't do justice to (e.g.
+// a single notable achievement with a photo), same image/description shape
+// used by Happenings (see lib/happenings.ts).
+export interface NewsEventCard {
+  imageUrl?: string;
+  storagePath?: string;
+  title: string;
+  description: string;
+}
+
 export interface NewsEventsYear {
   year: string;
+  // How this year's content is displayed. Optional and defaults to 'table'
+  // — every year created before this field existed only ever had
+  // columns/rows, so treating a missing mode as 'table' keeps that content
+  // showing exactly as it always has.
+  mode?: 'table' | 'cards' | 'text' | 'both';
   // Admin-defined, in display order — "S.No" is never stored here, it's
   // always generated on the public page.
   columns: string[];
   rows: NewsEventRow[];
+  // Only shown when `mode` is 'cards' or 'both'.
+  cards?: NewsEventCard[];
+  // Only shown when `mode` is 'text' — a plain paragraph for a year that's
+  // neither a table nor image cards.
+  text?: string;
 }
 
 export interface NewsletterIssue {
@@ -176,6 +199,12 @@ export interface ProgramDoc {
   // still the simplest option for a department that just wants to link out
   // to a couple of PDFs (e.g. "Funded R&D Projects", "In-house R&D Projects").
   rndLinks?: RndLink[];
+  // Admin-defined columns (added/reordered/removed dynamically, same as
+  // NewsEventsYearsEditor's), but — unlike rndTableText above — each row
+  // also carries its own uploaded PDF (e.g. the actual paper/patent for
+  // that row), retrieved from Firebase Storage the same way every other
+  // per-item PDF in this codebase is (rndLinks, labs, semesters…).
+  rndStructuredTable?: RndStructuredTable;
   // Optional — shown as the "Placements" section's records table + Quick
   // Links entry on every programme's page. Grouped by academic year like
   // News & Events/Newsletter, but each year holds its own admin-imported
@@ -202,6 +231,7 @@ const EMPTY: Omit<ProgramDoc, 'id'> = {
   newsEventsYears: [],
   newsletterYears: [],
   rndIntro: '', rndTableText: '', rndProjectsText: '', rndLinks: [],
+  rndStructuredTable: { columns: [], rows: [] },
   // placementYears is intentionally NOT part of this form/EMPTY: it's
   // managed entirely by <PlacementYearsEditor> below via its own immediate
   // Firestore writes (same reason the old department-wide placement editor
@@ -293,7 +323,7 @@ export default function ProgramsAdmin() {
     }
   };
 
-  const set = (k: string, v: string | number | string[] | ProgramSemester[] | ProgramLink[] | LibrarySection[] | NewsEventsYear[] | NewsletterYear[] | RndLink[] | LabItem[] | CustomSection[]) => setForm((p) => ({ ...p, [k]: v }));
+  const set = (k: string, v: string | number | string[] | ProgramSemester[] | ProgramLink[] | LibrarySection[] | NewsEventsYear[] | NewsletterYear[] | RndLink[] | RndStructuredTable | LabItem[] | CustomSection[]) => setForm((p) => ({ ...p, [k]: v }));
   const handleMindMapImage = (r: UploadResult) => setForm((p) => ({ ...p, mindMapImage: r.url, mindMapImageStoragePath: r.path }));
 
   // Newsletter (academic years, each with an ordered list of PDF-backed
@@ -546,7 +576,7 @@ export default function ProgramsAdmin() {
       category: p.category, intake: p.intake, established: p.established, accreditation: p.accreditation,
       hod: p.hod, department: p.department || '', fee: p.fee || '', heroImage: p.heroImage, storagePath: p.storagePath, about: p.about,
       highlights: p.highlights || [],
-      labs: (p.labs || []).map(normalizeLab).map((l) => ({ name: l.name, pdfUrl: l.pdfUrl || '', pdfStoragePath: l.pdfStoragePath || '' })),
+      labs: (p.labs || []).map(normalizeLab).map((l) => ({ name: l.name, description: l.description || '', pdfUrl: l.pdfUrl || '', pdfStoragePath: l.pdfStoragePath || '' })),
       outcomes: p.outcomes || [],
       semesters: (p.semesters || []).map((s) => ({
         label: s.label, subjects: (s.subjects || []).map(normalizeSubject),
@@ -568,6 +598,10 @@ export default function ProgramsAdmin() {
       })),
       rndIntro: p.rndIntro || '', rndTableText: p.rndTableText || '', rndProjectsText: p.rndProjectsText || '',
       rndLinks: (p.rndLinks || []).map((l) => ({ label: l.label, pdfUrl: l.pdfUrl || '', pdfStoragePath: l.pdfStoragePath || '' })),
+      rndStructuredTable: {
+        columns: p.rndStructuredTable?.columns || [],
+        rows: (p.rndStructuredTable?.rows || []).map((r) => ({ cells: r.cells || [], pdfUrl: r.pdfUrl || '', pdfStoragePath: r.pdfStoragePath || '' })),
+      },
       customSections: p.customSections || [],
       order: p.order || 0,
     });
@@ -839,7 +873,7 @@ export default function ProgramsAdmin() {
           <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>
             Optional. Shown as a "Research &amp; Development (Funded Projects &amp; Patents)" section (and Quick
             Links entry) on this programme's page. Real department R&amp;D pages vary a lot — use whichever of the
-            four fields below fit this department's actual content; only the ones you fill in will show.
+            five fields below fit this department's actual content; only the ones you fill in will show.
           </p>
           <div className="admin-field admin-field--full">
             <label htmlFor="field-rnd-intro">Overview (optional)</label>
@@ -905,6 +939,16 @@ export default function ProgramsAdmin() {
             {rndLinks.length === 0 && (
               <p className="admin-field__hint">No links yet — click "Add Link" to start building this programme's Research &amp; Development list.</p>
             )}
+          </div>
+          <div className="admin-field admin-field--full">
+            <label className="admin-field__hint" style={{ display: 'block', marginBottom: '0.5rem' }}>
+              Structured Table (optional — a table with columns you add yourself, where each row also has its own
+              uploaded PDF, e.g. a Patents table where every row links to that patent's own document).
+            </label>
+            <RndTableEditor
+              table={form.rndStructuredTable || { columns: [], rows: [] }}
+              onChange={(t) => set('rndStructuredTable', t)}
+            />
           </div>
 
           <div className="admin-field admin-field--full"><hr /><h3>Custom Sections</h3></div>

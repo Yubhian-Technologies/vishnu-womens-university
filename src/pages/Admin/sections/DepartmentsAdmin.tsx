@@ -40,6 +40,11 @@ export interface DepartmentDoc {
   heroImage?: string;
   storagePath?: string;
   about?: string;
+  // Same shape/purpose as a programme's own (see ProgramsAdmin) — shown
+  // right below "About the Department" on the grouped department page,
+  // filling the space that used to be empty next to the Quick Links sidebar
+  // whenever "About" itself was short.
+  highlights?: string[];
   established?: string;
   accreditation?: string;
   hod?: string;
@@ -83,7 +88,7 @@ export interface DepartmentDoc {
 
 const EMPTY: Omit<DepartmentDoc, 'id'> = {
   title: '', shortCode: '', description: '', icon: 'GraduationCap', order: 0,
-  heroImage: '', storagePath: '', about: '', established: '', accreditation: '',
+  heroImage: '', storagePath: '', about: '', highlights: [], established: '', accreditation: '',
   hod: '', hodImage: '', hodImageStoragePath: '', hodEmail: '', hodMessage: '', hodResearchProfiles: [],
   vision: '', mission: [], coreValues: [], labs: [],
   libraryIntro: '', libraryInCharge: '', librarySections: [],
@@ -237,6 +242,9 @@ export default function DepartmentsAdmin() {
   const updateLabName = (li: number, name: string) => {
     setForm((p) => ({ ...p, labs: (p.labs || []).map(normalizeLab).map((l, i) => (i === li ? { ...l, name } : l)) }));
   };
+  const updateLabDescription = (li: number, description: string) => {
+    setForm((p) => ({ ...p, labs: (p.labs || []).map(normalizeLab).map((l, i) => (i === li ? { ...l, description } : l)) }));
+  };
   const moveLab = (li: number, dir: -1 | 1) => {
     setForm((p) => {
       const next = (p.labs || []).map(normalizeLab);
@@ -375,6 +383,7 @@ export default function DepartmentsAdmin() {
     try {
       const payload = {
         ...form,
+        highlights: (form.highlights || []).filter(Boolean),
         mission: (form.mission || []).filter(Boolean),
         coreValues: (form.coreValues || []).filter(Boolean),
         labs: labs.filter((l) => l.name),
@@ -396,11 +405,11 @@ export default function DepartmentsAdmin() {
       title: d.title, shortCode: d.shortCode, description: d.description || '',
       icon: d.icon || 'GraduationCap', order: d.order,
       heroImage: d.heroImage || '', storagePath: d.storagePath || '',
-      about: d.about || '', established: d.established || '', accreditation: d.accreditation || '',
+      about: d.about || '', highlights: d.highlights || [], established: d.established || '', accreditation: d.accreditation || '',
       hod: d.hod || '', hodImage: d.hodImage || '', hodImageStoragePath: d.hodImageStoragePath || '',
       hodEmail: d.hodEmail || '', hodMessage: d.hodMessage || '', hodResearchProfiles: d.hodResearchProfiles || [],
       vision: d.vision || '', mission: d.mission || [], coreValues: d.coreValues || [],
-      labs: (d.labs || []).map(normalizeLab).map((l) => ({ name: l.name, pdfUrl: l.pdfUrl || '', pdfStoragePath: l.pdfStoragePath || '' })),
+      labs: (d.labs || []).map(normalizeLab).map((l) => ({ name: l.name, description: l.description || '', pdfUrl: l.pdfUrl || '', pdfStoragePath: l.pdfStoragePath || '' })),
       libraryIntro: d.libraryIntro || '', libraryInCharge: d.libraryInCharge || '',
       librarySections: (d.librarySections || []).map((s) => ({ heading: s.heading, items: s.items || [] })),
       programLevels: (d.programLevels || []).map((l) => ({ title: l.title, intro: l.intro || '', rows: l.rows || [] })),
@@ -473,6 +482,13 @@ export default function DepartmentsAdmin() {
             <label htmlFor="field-about">Overview</label>
             <textarea id="field-about" rows={5} value={form.about} onChange={(e) => set('about', e.target.value)} placeholder="About the department…" />
           </div>
+          <div className="admin-field admin-field--full">
+            <label htmlFor="field-highlights-one-per-line">Department Highlights (one per line)</label>
+            <p className="admin-field__hint" style={{ marginTop: '-0.25rem', marginBottom: '0.5rem' }}>
+              Shown right below "About the Department" — same layout as a programme's own Highlights.
+            </p>
+            <textarea id="field-highlights-one-per-line" rows={5} value={arrayToLines(form.highlights)} onChange={(e) => set('highlights', linesToArray(e.target.value))} placeholder="NAAC A+ Accredited undergraduate programmes" />
+          </div>
 
           <div className="admin-field admin-field--full"><hr /><h3>Department Page — Programme Levels (B.Tech / M.Tech)</h3>
             <p className="admin-field__hint" style={{ marginTop: '0.25rem' }}>
@@ -529,6 +545,7 @@ export default function DepartmentsAdmin() {
             )}
           </div>
 
+          <div className="admin-field admin-field--full"><hr /><h3>Department Page — Vision, Mission &amp; Values</h3></div>
           <div className="admin-field admin-field--full">
             <label htmlFor="field-vision">Vision</label>
             <textarea id="field-vision" rows={3} value={form.vision} onChange={(e) => set('vision', e.target.value)} />
@@ -541,12 +558,13 @@ export default function DepartmentsAdmin() {
             <label htmlFor="field-core-values">Core Values (one per line)</label>
             <textarea id="field-core-values" rows={3} value={arrayToLines(form.coreValues)} onChange={(e) => set('coreValues', linesToArray(e.target.value))} />
           </div>
+          <div className="admin-field admin-field--full"><hr /><h3>Department Page — Laboratories</h3></div>
           <div className="admin-field admin-field--full">
             <label>Laboratories</label>
             <p className="admin-field__hint" style={{ marginTop: 0 }}>
-              Each laboratory has its own name and its own uploaded PDF. On the public page, clicking a laboratory
-              tile opens that lab's PDF directly — a lab with no PDF uploaded yet still shows its tile, just marked
-              as unavailable.
+              Each laboratory has its own name, an optional short description, and its own uploaded PDF. On the
+              public page, clicking a laboratory tile opens that lab's PDF directly — a lab with no PDF uploaded yet
+              still shows its tile, just marked as unavailable.
             </p>
             {labs.length > 0 && (
               <div className="admin-compact-list" style={{ marginBottom: '0.75rem' }}>
@@ -557,6 +575,12 @@ export default function DepartmentsAdmin() {
                       value={lab.name}
                       onChange={(e) => updateLabName(li, e.target.value)}
                       placeholder="Advanced Computing Lab"
+                    />
+                    <input
+                      className="admin-compact-row__desc"
+                      value={lab.description || ''}
+                      onChange={(e) => updateLabDescription(li, e.target.value)}
+                      placeholder="Description (optional)"
                     />
                     <div className="admin-compact-row__file">
                       <FileUploader

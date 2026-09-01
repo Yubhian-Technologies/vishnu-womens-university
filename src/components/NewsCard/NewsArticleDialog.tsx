@@ -39,9 +39,7 @@ export default function NewsArticleDialog({ article, onClose }: Props) {
         <div className="news-article-dialog-body">
           <time className="news-article-dialog-date">{article.date}</time>
           <h3 className="news-article-dialog-title">{article.title}</h3>
-          {article.excerpt
-            ? <p className="news-article-dialog-desc">{article.excerpt}</p>
-            : <p className="news-article-dialog-desc news-article-dialog-desc--empty">More details coming soon.</p>}
+          {article.excerpt && <p className="news-article-dialog-desc">{article.excerpt}</p>}
         </div>
       </div>
     </div>

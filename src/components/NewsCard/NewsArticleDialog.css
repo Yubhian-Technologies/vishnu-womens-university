@@ -102,10 +102,6 @@
   margin: 0;
   white-space: pre-line;
 }
-.news-article-dialog-desc--empty {
-  font-style: italic;
-  color: var(--color-mid-gray);
-}
 
 @media (max-width: 480px) {
   .news-article-dialog-body { padding: var(--space-5); }
