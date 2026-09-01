@@ -39,7 +39,7 @@ function formatSalary(value: string): string {
 // dataviz skill's validate_palette.js against this page's white card
 // surface; the gold slot doubles as the site's own --color-accent so the
 // chart still reads as "on brand" rather than a generic palette drop-in.
-const BRANCH_COLORS: Record<string, string> = {
+export const BRANCH_COLORS: Record<string, string> = {
   'CSE(AI&DS)': '#1f8f5c',
   Civil: '#C9A84C',
   CSE: '#17a398',

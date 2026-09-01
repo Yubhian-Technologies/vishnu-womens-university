@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { PLACEMENT_HIGHLIGHTS_CAROUSEL_RATIO } from '../../lib/placementHighlightsCarousel';
 
 interface Props {
   images: { url: string; path: string }[];
@@ -11,18 +12,14 @@ interface Props {
 // set of admin-uploaded promotional banner photos (Admin -> Placement
 // Sub-pages -> Placement Highlights -> Photo Carousel).
 //
-// Deliberately a single <img> whose `src` swaps on an interval, sized by
-// `height: auto` at a fixed max width, rather than the more common
-// absolutely-positioned-stack-of-images crossfade: these banner photos can
-// be any aspect ratio (promotional graphics, not uniform headshots), and a
-// fixed aspect-ratio box would either crop them (object-fit: cover) or
-// leave mismatched empty padding around them (object-fit: contain) unless
-// it happened to exactly match each image's own ratio. Sizing the box to
-// whatever the current image actually is avoids guessing that ratio
-// entirely — every image displays at its own true proportions, uncropped,
-// with no wasted space. The trade-off is a plain fade-in on each swap
-// instead of a true crossfade (which needs two images overlaid, and thus a
-// fixed-height container — the exact thing being avoided here).
+// A fixed-ratio box (PLACEMENT_HIGHLIGHTS_CAROUSEL_RATIO, matching what the
+// admin crop step now enforces on upload) with object-fit: cover, rather
+// than sizing the box to each image's own natural dimensions — the admin
+// crop step is what's actually responsible for each photo already being
+// that shape, but forcing it again here too means the carousel still holds
+// a steady height (and any older photo uploaded before that crop step
+// existed still displays at the right ratio) instead of visibly resizing
+// on every swap.
 export default function PhotoCarousel({ images, intervalSeconds = 3 }: Props) {
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -58,17 +55,27 @@ export default function PhotoCarousel({ images, intervalSeconds = 3 }: Props) {
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      <img
-        key={current.path || active}
-        src={current.url}
-        alt={`Placement highlight photo ${active + 1}`}
-        style={{
-          display: 'block',
-          width: '100%',
-          height: 'auto',
-          animation: 'photo-carousel-fade-in 0.6s ease',
-        }}
-      />
+      <div style={{ width: '100%', aspectRatio: `${PLACEMENT_HIGHLIGHTS_CAROUSEL_RATIO}`, overflow: 'hidden' }}>
+        <img
+          key={current.path || active}
+          src={current.url}
+          alt={`Placement highlight photo ${active + 1}`}
+          style={{
+            display: 'block',
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            // These banner graphics tend to carry a blank/whitespace margin
+            // above the actual content (title bleed, logo padding) rather
+            // than below it — anchoring the crop to the bottom trims that
+            // top margin off first instead of splitting the crop evenly
+            // above and below (the default 'center'), which otherwise left
+            // a visible gap of empty space at the top of the slide.
+            objectPosition: 'bottom',
+            animation: 'photo-carousel-fade-in 0.6s ease',
+          }}
+        />
+      </div>
       {images.length > 1 && (
         <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginTop: 'var(--space-3)', padding: '0 var(--space-4)' }}>
           {images.map((img, i) => (
