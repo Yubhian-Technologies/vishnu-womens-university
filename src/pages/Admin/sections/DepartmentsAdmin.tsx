@@ -474,9 +474,12 @@ export default function DepartmentsAdmin() {
 
           <div className="admin-field admin-field--full"><hr /><h3>Department Page — Shared Content</h3>
             <p className="admin-field__hint" style={{ marginTop: '0.25rem' }}>
-              Only used for the grouped departments <strong>AI</strong>, <strong>CSE</strong> and <strong>ECE</strong>,
-              whose <code>/academics/&lt;program&gt;</code> pages show this at the top (above the program toggle),
-              matched to this card by <strong>Short Code</strong>. Leave blank for every other department.
+              Shown on every department's page at <code>/academics/&lt;program&gt;</code> — above the programme
+              toggle for the grouped departments (<strong>AI</strong>, <strong>CSE</strong>, <strong>ECE</strong>),
+              or as that programme's own "About the Department" section for every other (single-programme)
+              department — matched to this card by <strong>Short Code</strong>. Overview specifically feeds
+              "About the Department"; a programme's own "About the Programme" text stays a separate field on that
+              programme itself (Admin → Programs → About the Programme).
             </p>
           </div>
           <div className="admin-field admin-field--full">

@@ -756,8 +756,13 @@ export default function ProgramsAdmin() {
             <input id="field-display-order" type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
           </div>
           <div className="admin-field admin-field--full">
-            <label htmlFor="field-about">About</label>
-            <textarea id="field-about" rows={4} value={form.about} onChange={(e) => set('about', e.target.value)} placeholder="Department overview…" />
+            <label htmlFor="field-about">About the Programme</label>
+            <p className="admin-field__hint" style={{ marginTop: 0 }}>
+              For this specific programme's own page. Shown as "About the Programme". Department-wide text
+              ("About the Department") is a separate field, edited on the matching record in{' '}
+              <strong>Admin → Academic Departments → Overview</strong>.
+            </p>
+            <textarea id="field-about" rows={4} value={form.about} onChange={(e) => set('about', e.target.value)} placeholder="Programme overview…" />
           </div>
           <div className="admin-field admin-field--full">
             <label htmlFor="field-highlights-one-per-line">Highlights (one per line)</label>

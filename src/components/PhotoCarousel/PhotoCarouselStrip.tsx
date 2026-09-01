@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import ImageLightbox from '../ImageLightbox/ImageLightbox';
 
 interface PhotoCarouselCard {
   name: string;
@@ -31,6 +32,7 @@ export default function PhotoCarouselStrip({ cards, pixelsPerSecond = 60 }: Prop
   const trackRef = useRef<HTMLDivElement>(null);
   const [duration, setDuration] = useState(20);
   const [paused, setPaused] = useState(false);
+  const [zoomed, setZoomed] = useState<{ url: string; alt: string } | null>(null);
 
   useEffect(() => {
     const track = trackRef.current;
@@ -49,7 +51,8 @@ export default function PhotoCarouselStrip({ cards, pixelsPerSecond = 60 }: Prop
       <img
         src={card.imageUrl}
         alt={card.name || 'Photo'}
-        style={{ display: 'block', width: '100%', height: 'auto', borderRadius: 'var(--radius-md)' }}
+        onClick={() => setZoomed({ url: card.imageUrl, alt: card.name || 'Photo' })}
+        style={{ display: 'block', width: '100%', height: 'auto', borderRadius: 'var(--radius-md)', cursor: 'zoom-in' }}
       />
       {(card.name || card.subtitle) && (
         <>
@@ -76,7 +79,7 @@ export default function PhotoCarouselStrip({ cards, pixelsPerSecond = 60 }: Prop
           display: 'flex',
           width: 'max-content',
           animation: `photo-carousel-marquee ${duration}s linear infinite`,
-          animationPlayState: paused ? 'paused' : 'running',
+          animationPlayState: paused || zoomed ? 'paused' : 'running',
         }}
       >
         {cards.map((card, i) => renderCard(card, `a-${card.storagePath || i}`))}
@@ -88,6 +91,7 @@ export default function PhotoCarouselStrip({ cards, pixelsPerSecond = 60 }: Prop
           to { transform: translateX(-50%); }
         }
       `}</style>
+      {zoomed && <ImageLightbox src={zoomed.url} alt={zoomed.alt} onClose={() => setZoomed(null)} />}
     </div>
   );
 }
