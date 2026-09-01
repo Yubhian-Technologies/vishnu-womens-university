@@ -426,14 +426,6 @@
   font-size: 0.88rem;
 }
 
-.admin-compact-row__desc {
-  flex: 1 1 220px;
-  min-width: 160px;
-  padding: 0.35rem 0.55rem;
-  font-size: 0.85rem;
-  color: #4b5563;
-}
-
 .admin-compact-row__file {
   flex: 0 0 auto;
   width: 150px;
