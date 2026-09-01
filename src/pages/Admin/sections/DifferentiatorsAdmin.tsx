@@ -193,6 +193,36 @@ export default function DifferentiatorsAdmin() {
     }));
   };
 
+  // contentType 'gallery' — same shape as the file handlers above, but each
+  // photo is addressed by its index within that section's galleryPhotos.
+  const handleCustomSectionGalleryPhotoUploaded = (sectionPath: number[], photoIndex: number, r: UploadResult) => {
+    setForm((p) => ({
+      ...p,
+      customSections: replaceAtPath(p.customSections || [], sectionPath, (s) => ({
+        ...s,
+        galleryPhotos: (s.galleryPhotos || []).map((ph, i) => (i === photoIndex ? { imageUrl: r.url, storagePath: r.path } : ph)),
+      })),
+    }));
+  };
+  const handleCustomSectionGalleryPhotoRemoved = async (sectionPath: number[], photoIndex: number) => {
+    const photo = getAtPath(form.customSections || [], sectionPath)?.galleryPhotos?.[photoIndex];
+    if (!photo) return;
+    if (photo.imageUrl && !confirm('Remove this photo? This cannot be undone.')) return;
+    try {
+      if (photo.storagePath) await deleteFile(photo.storagePath);
+    } catch (e) {
+      alert(`Couldn't delete the photo from storage: ${(e as Error).message}`);
+      return;
+    }
+    setForm((p) => ({
+      ...p,
+      customSections: replaceAtPath(p.customSections || [], sectionPath, (s) => ({
+        ...s,
+        galleryPhotos: (s.galleryPhotos || []).filter((_, i) => i !== photoIndex),
+      })),
+    }));
+  };
+
   // Custom Tabs — used only by the 4 items with a sidebar-tab layout
   // instead of the intro/accordion one. Same shape as Custom Sections above,
   // one level deeper (tab -> its own section tree).
@@ -261,6 +291,39 @@ export default function DifferentiatorsAdmin() {
           delete next.photo;
           return next;
         }),
+      })),
+    }));
+  };
+  const handleTabGalleryPhotoUploaded = (tabIndex: number, sectionPath: number[], photoIndex: number, r: UploadResult) => {
+    setForm((p) => ({
+      ...p,
+      tabs: (p.tabs || []).map((tab, ti) => (ti !== tabIndex ? tab : {
+        ...tab,
+        sections: replaceAtPath(tab.sections, sectionPath, (s) => ({
+          ...s,
+          galleryPhotos: (s.galleryPhotos || []).map((ph, i) => (i === photoIndex ? { imageUrl: r.url, storagePath: r.path } : ph)),
+        })),
+      })),
+    }));
+  };
+  const handleTabGalleryPhotoRemoved = async (tabIndex: number, sectionPath: number[], photoIndex: number) => {
+    const photo = getAtPath((form.tabs || [])[tabIndex]?.sections || [], sectionPath)?.galleryPhotos?.[photoIndex];
+    if (!photo) return;
+    if (photo.imageUrl && !confirm('Remove this photo? This cannot be undone.')) return;
+    try {
+      if (photo.storagePath) await deleteFile(photo.storagePath);
+    } catch (e) {
+      alert(`Couldn't delete the photo from storage: ${(e as Error).message}`);
+      return;
+    }
+    setForm((p) => ({
+      ...p,
+      tabs: (p.tabs || []).map((tab, ti) => (ti !== tabIndex ? tab : {
+        ...tab,
+        sections: replaceAtPath(tab.sections, sectionPath, (s) => ({
+          ...s,
+          galleryPhotos: (s.galleryPhotos || []).filter((_, i) => i !== photoIndex),
+        })),
       })),
     }));
   };
@@ -404,6 +467,8 @@ export default function DifferentiatorsAdmin() {
                   onFileRemoved={handleCustomSectionFileRemoved}
                   onPhotoUploaded={handleCustomSectionPhotoUploaded}
                   onPhotoRemoved={handleCustomSectionPhotoRemoved}
+                  onGalleryPhotoUploaded={handleCustomSectionGalleryPhotoUploaded}
+                  onGalleryPhotoRemoved={handleCustomSectionGalleryPhotoRemoved}
                   showPlacementToggle
                 />
               </div>
@@ -426,6 +491,8 @@ export default function DifferentiatorsAdmin() {
                   onFileRemoved={handleTabFileRemoved}
                   onPhotoUploaded={handleTabPhotoUploaded}
                   onPhotoRemoved={handleTabPhotoRemoved}
+                  onGalleryPhotoUploaded={handleTabGalleryPhotoUploaded}
+                  onGalleryPhotoRemoved={handleTabGalleryPhotoRemoved}
                 />
               </div>
             </>

@@ -531,6 +531,36 @@ export default function ProgramsAdmin() {
     }));
   };
 
+  // contentType 'gallery' — same shape as the file handlers above, but each
+  // photo is addressed by its index within that section's galleryPhotos.
+  const handleCustomSectionGalleryPhotoUploaded = (sectionPath: number[], photoIndex: number, r: UploadResult) => {
+    setForm((p) => ({
+      ...p,
+      customSections: replaceAtPath(p.customSections || [], sectionPath, (s) => ({
+        ...s,
+        galleryPhotos: (s.galleryPhotos || []).map((ph, i) => (i === photoIndex ? { imageUrl: r.url, storagePath: r.path } : ph)),
+      })),
+    }));
+  };
+  const handleCustomSectionGalleryPhotoRemoved = async (sectionPath: number[], photoIndex: number) => {
+    const photo = getAtPath(form.customSections || [], sectionPath)?.galleryPhotos?.[photoIndex];
+    if (!photo) return;
+    if (photo.imageUrl && !confirm('Remove this photo? This cannot be undone.')) return;
+    try {
+      if (photo.storagePath) await deleteFile(photo.storagePath);
+    } catch (e) {
+      alert(`Couldn't delete the photo from storage: ${(e as Error).message}`);
+      return;
+    }
+    setForm((p) => ({
+      ...p,
+      customSections: replaceAtPath(p.customSections || [], sectionPath, (s) => ({
+        ...s,
+        galleryPhotos: (s.galleryPhotos || []).filter((_, i) => i !== photoIndex),
+      })),
+    }));
+  };
+
   // Programme Structure (semesters + subjects) editing — structured add /
   // remove / reorder, replacing the old free-text "Semester I: A, B" parser.
   const addSemester = () => {
@@ -1101,6 +1131,8 @@ export default function ProgramsAdmin() {
               onFileRemoved={handleCustomSectionFileRemoved}
               onPhotoUploaded={handleCustomSectionPhotoUploaded}
               onPhotoRemoved={handleCustomSectionPhotoRemoved}
+              onGalleryPhotoUploaded={handleCustomSectionGalleryPhotoUploaded}
+              onGalleryPhotoRemoved={handleCustomSectionGalleryPhotoRemoved}
             />
           </div>
         </div>
