@@ -6,6 +6,7 @@ import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
 import { useDocument } from '../../../hooks/useDocument';
 import ImageUploader from '../../../components/ImageUploader/ImageUploader';
+import { useImageCropModal } from '../../../components/ImageUploader/useImageCropModal';
 import FileUploader from '../../../components/FileUploader/FileUploader';
 import { deleteFile, type UploadResult } from '../../../lib/storage';
 import { PROGRAM_ICON_NAMES } from '../../../lib/programIcons';
@@ -53,6 +54,25 @@ export interface LabItem {
 // rendering without a migration, same approach as normalizeSubject above.
 export function normalizeLab(l: string | LabItem): LabItem {
   return typeof l === 'string' ? { name: l } : l;
+}
+
+export interface MindMapImage {
+  url: string;
+  storagePath?: string;
+}
+
+// Older programme docs stored a single Mind Map image (mindMapImage /
+// mindMapImageStoragePath) — normalize to the new multi-image array shape at
+// read time so existing data keeps rendering without a migration, same
+// approach as normalizeLab/normalizeSubject above.
+export function normalizeMindMapImages(p: {
+  mindMapImages?: MindMapImage[];
+  mindMapImage?: string;
+  mindMapImageStoragePath?: string;
+}): MindMapImage[] {
+  if (p.mindMapImages && p.mindMapImages.length > 0) return p.mindMapImages;
+  if (p.mindMapImage) return [{ url: p.mindMapImage, storagePath: p.mindMapImageStoragePath || '' }];
+  return [];
 }
 
 export interface LibraryItem {
@@ -135,8 +155,15 @@ export interface ProgramDoc {
   hodImageStoragePath: string;
   hodEmail: string;
   hodResearchProfiles: ProgramLink[];
-  mindMapImage: string;
-  mindMapImageStoragePath: string;
+  // Legacy single-image fields — normalizeMindMapImages() upgrades these to
+  // the array below at read time; new saves only ever write mindMapImages.
+  mindMapImage?: string;
+  mindMapImageStoragePath?: string;
+  // Curriculum Mind Map — any number of admin-uploaded images (shown as a
+  // gallery on the public page) plus an optional PDF download.
+  mindMapImages?: MindMapImage[];
+  mindMapPdfUrl?: string;
+  mindMapPdfStoragePath?: string;
   // Optional — shown as a "Department Library" section + Quick Links entry on
   // every programme's page (same shared template, not per-branch content,
   // and stored on this programme's own doc so each branch's library data is
@@ -191,7 +218,7 @@ const EMPTY: Omit<ProgramDoc, 'id'> = {
   highlights: [], labs: [], outcomes: [], semesters: [],
   vision: '', mission: [], coreValues: [], peos: [], pos: [], psos: [], wks: [],
   hodMessage: '', hodImage: '', hodImageStoragePath: '', hodEmail: '', hodResearchProfiles: [],
-  mindMapImage: '', mindMapImageStoragePath: '',
+  mindMapImages: [], mindMapPdfUrl: '', mindMapPdfStoragePath: '',
   libraryIntro: '', libraryInCharge: '', librarySections: [],
   newsEventsYears: [],
   newsletterYears: [],
@@ -293,9 +320,33 @@ export default function ProgramsAdmin() {
     }
   };
 
-  const set = (k: string, v: string | number | string[] | ProgramSemester[] | ProgramLink[] | LibrarySection[] | NewsEventsYear[] | NewsletterYear[] | RndLink[] | LabItem[] | CustomSection[]) => setForm((p) => ({ ...p, [k]: v }));
+  const set = (k: string, v: string | number | string[] | ProgramSemester[] | ProgramLink[] | LibrarySection[] | NewsEventsYear[] | NewsletterYear[] | RndLink[] | LabItem[] | CustomSection[] | MindMapImage[]) => setForm((p) => ({ ...p, [k]: v }));
   const handleHodImage = (r: UploadResult) => setForm((p) => ({ ...p, hodImage: r.url, hodImageStoragePath: r.path }));
-  const handleMindMapImage = (r: UploadResult) => setForm((p) => ({ ...p, mindMapImage: r.url, mindMapImageStoragePath: r.path }));
+  // Mind Map — any number of admin-uploaded images (shown as a gallery on
+  // the public page) plus an optional PDF download. Adding uses a functional
+  // setForm update (not the plain `set` helper) so uploading several images
+  // in quick succession never has one upload's completion silently overwrite
+  // another's — same race avoided by handleLabPdf above.
+  const { openCrop: openMindMapCrop, cropModal: mindMapCropModal, uploading: mindMapUploading } = useImageCropModal();
+  const mindMapImages = form.mindMapImages || [];
+  const addMindMapImage = (file: File) => {
+    openMindMapCrop(file, 'vwu/programs/mindmap', (result) => {
+      setForm((p) => ({ ...p, mindMapImages: [...(p.mindMapImages || []), { url: result.url, storagePath: result.path }] }));
+    });
+  };
+  const removeMindMapImage = (mi: number) => {
+    if (!confirm('Remove this Mind Map image?')) return;
+    set('mindMapImages', mindMapImages.filter((_, i) => i !== mi));
+  };
+  const moveMindMapImage = (mi: number, dir: -1 | 1) => {
+    const next = [...mindMapImages];
+    const target = mi + dir;
+    if (target < 0 || target >= next.length) return;
+    [next[mi], next[target]] = [next[target], next[mi]];
+    set('mindMapImages', next);
+  };
+  const handleMindMapPdf = (r: UploadResult) => setForm((p) => ({ ...p, mindMapPdfUrl: r.url, mindMapPdfStoragePath: r.path }));
+  const removeMindMapPdf = () => setForm((p) => ({ ...p, mindMapPdfUrl: '', mindMapPdfStoragePath: '' }));
 
   // Department Library (sections + items) editing — same structured add /
   // remove / reorder shape as Programme Structure above, just for an
@@ -736,7 +787,8 @@ export default function ProgramsAdmin() {
       peos: p.peos || [], pos: p.pos || [], psos: p.psos || [], wks: p.wks || [],
       hodMessage: p.hodMessage || '', hodImage: p.hodImage || '', hodImageStoragePath: p.hodImageStoragePath || '',
       hodEmail: p.hodEmail || '', hodResearchProfiles: p.hodResearchProfiles || [],
-      mindMapImage: p.mindMapImage || '', mindMapImageStoragePath: p.mindMapImageStoragePath || '',
+      mindMapImages: normalizeMindMapImages(p),
+      mindMapPdfUrl: p.mindMapPdfUrl || '', mindMapPdfStoragePath: p.mindMapPdfStoragePath || '',
       libraryIntro: p.libraryIntro || '', libraryInCharge: p.libraryInCharge || '',
       librarySections: (p.librarySections || []).map((s) => ({ heading: s.heading, items: s.items || [] })),
       newsEventsYears: (p.newsEventsYears || []).map((y) => ({
@@ -1012,9 +1064,45 @@ export default function ProgramsAdmin() {
           </div>
 
           <div className="admin-field admin-field--full"><hr /><h3>Mind Map</h3></div>
+          <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>
+            Upload one or more Mind Map images — shown as a gallery on the public page — plus, optionally, a PDF version visitors can download.
+          </p>
           <div className="admin-field admin-field--full">
-            <label>Curriculum Mind Map Image</label>
-            <ImageUploader folder="vwu/programs/mindmap" currentUrl={form.mindMapImage} onUploaded={handleMindMapImage} label="Upload Mind Map Image" />
+            <label>Mind Map Images</label>
+            {mindMapImages.length > 0 && (
+              <div className="admin-image-grid" style={{ marginBottom: '0.75rem' }}>
+                {mindMapImages.map((img, mi) => (
+                  <div key={mi} className="admin-image-card">
+                    <img src={img.url} alt="" />
+                    <div className="admin-image-card__actions">
+                      <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveMindMapImage(mi, -1)} disabled={mi === 0} title="Move up">↑</button>
+                      <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveMindMapImage(mi, 1)} disabled={mi === mindMapImages.length - 1} title="Move down">↓</button>
+                      <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeMindMapImage(mi)}>Remove</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            <label className="admin-btn admin-btn--primary" style={{ opacity: mindMapUploading ? 0.5 : 1, display: 'inline-block', cursor: 'pointer' }}>
+              {mindMapUploading ? 'Uploading…' : '+ Add Mind Map Image'}
+              <input
+                type="file"
+                accept="image/*"
+                hidden
+                disabled={mindMapUploading}
+                onChange={(e) => { const f = e.target.files?.[0]; if (f) addMindMapImage(f); e.target.value = ''; }}
+              />
+            </label>
+            {mindMapImages.length === 0 && (
+              <p className="admin-field__hint">No Mind Map images yet — click "Add Mind Map Image" to upload one (add more to build a gallery).</p>
+            )}
+          </div>
+          <div className="admin-field admin-field--full">
+            <label>Mind Map PDF (optional)</label>
+            <FileUploader folder="vwu/programs/mindmap-pdf" currentUrl={form.mindMapPdfUrl} onUploaded={handleMindMapPdf} label="Upload Mind Map PDF" />
+            {form.mindMapPdfUrl && (
+              <button type="button" className="admin-btn admin-btn--ghost admin-btn--sm" style={{ marginTop: '0.5rem' }} onClick={removeMindMapPdf}>Remove PDF</button>
+            )}
           </div>
 
           <div className="admin-field admin-field--full"><hr /><h3>Department Library</h3></div>
@@ -1327,6 +1415,7 @@ export default function ProgramsAdmin() {
           </button>
         </div>
       </div>
+      {mindMapCropModal}
 
       {editing && form.department && (
         <PlacementRecordsEditor department={form.department} />

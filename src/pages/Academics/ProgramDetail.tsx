@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { Link, useParams, useLocation, Navigate } from 'react-router-dom';
 import { Check, Microscope, Compass, Target, Sparkles, Mail, ExternalLink, BookOpen, FileText } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
-import ImageLightbox from '../../components/ImageLightbox/ImageLightbox';
 import ProgrammeStructure from '../../components/ProgrammeStructure/ProgrammeStructure';
 import BodyBlocks, { parseBodyContent } from '../../components/BodyBlocks/BodyBlocks';
 import DepartmentNewsSection, { type DepartmentNewsDoc } from '../../components/DepartmentNews/DepartmentNewsSection';
@@ -14,7 +13,7 @@ import { usePageBanner } from '../../hooks/usePageBanner';
 import { useEapcetCode } from '../../hooks/useContentBlocks';
 import { smoothScrollTo } from '../../lib/smoothScroll';
 import { fetchPriorityAttr } from '../../lib/domAttrs';
-import { normalizeLab, type ProgramDoc } from '../Admin/sections/ProgramsAdmin';
+import { normalizeLab, normalizeMindMapImages, type ProgramDoc } from '../Admin/sections/ProgramsAdmin';
 import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import type { FacultyDoc } from './Faculty';
 import { parseFlexibleTable, parseProjectAccordion } from '../../lib/structuredTable';
@@ -48,7 +47,6 @@ export default function ProgramDetail() {
 function SingleProgramDetail() {
   const { slug } = useParams<{ slug: string }>();
   const location = useLocation();
-  const [mindMapOpen, setMindMapOpen] = useState(false);
   const [outcomeTab, setOutcomeTab] = useState<string | null>(null);
   const [openRndProjects, setOpenRndProjects] = useState<Set<string>>(new Set());
   const toggleRndProject = (key: string) => {
@@ -134,7 +132,10 @@ function SingleProgramDetail() {
   const hasOutcomeStatements = outcomeGroups.length > 0;
   const activeOutcome = outcomeGroups.find((g) => g.key === outcomeTab) ?? outcomeGroups[0];
   const hasHod = !!(program.hodMessage || program.hodImage || program.hodEmail);
-  const hasMindMap = !!program.mindMapImage;
+  // Legacy docs may still store a single mindMapImage — normalizeMindMapImages()
+  // upgrades either shape to the gallery array so this page never has to care.
+  const mindMapImages = normalizeMindMapImages(program);
+  const hasMindMap = mindMapImages.length > 0 || !!program.mindMapPdfUrl;
   // Legacy docs may still store labs as plain strings (no PDF) —
   // normalizeLab() upgrades either shape so this page never has to care.
   const labs = (program.labs || []).map(normalizeLab);
@@ -564,35 +565,30 @@ function SingleProgramDetail() {
               <h2 className="section-title">Mind Map</h2>
               <p className="section-desc">A visual overview of how the programme&apos;s courses and specialisations connect together.</p>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <button
-                type="button"
-                onClick={() => setMindMapOpen(true)}
-                aria-label="Open Mind Map in full size"
-                style={{
-                  display: 'inline-block', background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)',
-                  borderRadius: 'var(--radius-md)', padding: 'var(--space-3)', cursor: 'zoom-in', maxWidth: '100%',
-                  transition: 'box-shadow var(--transition-base), border-color var(--transition-base)',
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-md)'; e.currentTarget.style.borderColor = 'var(--color-accent)'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.borderColor = 'var(--color-light-gray)'; }}
-              >
-                <SmoothImage
-                  src={program.mindMapImage}
-                  alt={`${program.shortName || program.name} curriculum mind map`}
-                  style={{ display: 'block', maxWidth: '100%', maxHeight: '70vh', width: 'auto', height: 'auto', borderRadius: 'var(--radius-sm)' }}
-                />
-              </button>
-            </div>
+            {/* Plain vertical stack, in upload order — every image full-width
+                and on its own line, no carousel/slider/side-by-side, so the
+                page just scrolls normally from Image 1 down to the last. */}
+            {mindMapImages.length > 0 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+                {mindMapImages.map((img, i) => (
+                  <SmoothImage
+                    key={img.url}
+                    src={img.url}
+                    alt={`${program.shortName || program.name} curriculum mind map${mindMapImages.length > 1 ? ` (${i + 1} of ${mindMapImages.length})` : ''}`}
+                    style={{ display: 'block', width: '100%', maxWidth: 700, height: 'auto', margin: '0 auto', borderRadius: 'var(--radius-md)', border: '1.5px solid var(--color-light-gray)' }}
+                  />
+                ))}
+              </div>
+            )}
+            {program.mindMapPdfUrl && (
+              <div style={{ display: 'flex', justifyContent: 'center', marginTop: mindMapImages.length > 0 ? 'var(--space-6)' : 0 }}>
+                <a href={program.mindMapPdfUrl} target="_blank" rel="noopener noreferrer" className="btn btn-outline">
+                  Download Mind Map PDF
+                </a>
+              </div>
+            )}
           </div>
         </section>
-      )}
-      {mindMapOpen && (
-        <ImageLightbox
-          src={program.mindMapImage}
-          alt={`${program.shortName || program.name} curriculum mind map`}
-          onClose={() => setMindMapOpen(false)}
-        />
       )}
 
       {/* Curriculum — hidden entirely until a programme actually has

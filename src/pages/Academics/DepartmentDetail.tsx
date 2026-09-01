@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation, Navigate } from 'react-router-dom';
-import { Check, Microscope, Compass, Target, Sparkles, Mail, BookOpen, FileText } from 'lucide-react';
+import { Check, Microscope, Compass, Target, Sparkles, Mail, BookOpen, FileText, ExternalLink } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
-import ImageLightbox from '../../components/ImageLightbox/ImageLightbox';
 import ProgrammeStructure from '../../components/ProgrammeStructure/ProgrammeStructure';
 import BodyBlocks, { parseBodyContent } from '../../components/BodyBlocks/BodyBlocks';
 import SmoothCollapse from '../../components/SmoothCollapse/SmoothCollapse';
@@ -14,7 +13,7 @@ import { smoothScrollTo } from '../../lib/smoothScroll';
 import { fetchPriorityAttr } from '../../lib/domAttrs';
 import { getProgramSchema, getBreadcrumbSchema } from '../../lib/seo/schemas';
 import type { DepartmentGroup } from '../../lib/departmentGroups';
-import { normalizeLab, type ProgramDoc } from '../Admin/sections/ProgramsAdmin';
+import { normalizeLab, normalizeMindMapImages, type ProgramDoc } from '../Admin/sections/ProgramsAdmin';
 import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import type { FacultyDoc } from './Faculty';
 import { parseFlexibleTable, parseProjectAccordion } from '../../lib/structuredTable';
@@ -43,7 +42,6 @@ interface Props {
 export default function DepartmentDetail({ group, activeSlug }: Props) {
   const navigate = useNavigate();
   const location = useLocation();
-  const [mindMapOpen, setMindMapOpen] = useState(false);
   const [outcomeTab, setOutcomeTab] = useState<string | null>(null);
   // "Choose a Programme" Quick Links accordion — starts open so the sub-links
   // remain visible by default (unchanged from before this was collapsible).
@@ -150,6 +148,10 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     hodImage: dept?.hodImage || primary?.hodImage || '',
     hodEmail: dept?.hodEmail || primary?.hodEmail || '',
     hodMessage: dept?.hodMessage || primary?.hodMessage || '',
+    // No department-level equivalent field exists (yet) — HOD research links
+    // are entered on the first sub-program's own admin entry, same as the
+    // standalone ProgramDetail.tsx page reads them.
+    hodResearchProfiles: primary?.hodResearchProfiles || [],
     vision: dept?.vision || primary?.vision || '',
     mission: (dept?.mission?.length ? dept.mission : primary?.mission) || [],
     coreValues: (dept?.coreValues?.length ? dept.coreValues : primary?.coreValues) || [],
@@ -193,7 +195,10 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   ].filter((g) => g.items && g.items.length > 0);
   const hasOutcomeStatements = outcomeGroups.length > 0;
   const activeOutcome = outcomeGroups.find((g) => g.key === outcomeTab) ?? outcomeGroups[0];
-  const hasMindMap = !!activeProgram.mindMapImage;
+  // Legacy docs may still store a single mindMapImage — normalizeMindMapImages()
+  // upgrades either shape to the gallery array so this page never has to care.
+  const mindMapImages = normalizeMindMapImages(activeProgram);
+  const hasMindMap = mindMapImages.length > 0 || !!activeProgram.mindMapPdfUrl;
   // News & Events + Newsletter here use the teammate's per-academic-year
   // fields on the programme doc (see ProgramsAdmin's "News & Events —
   // Department Page" / "Newsletter" editors) — the plain departmentNews
@@ -541,6 +546,17 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                   )}
                 </div>
               </div>
+              {shared.hodResearchProfiles.length > 0 && (
+                <div style={{ background: 'var(--color-primary)', padding: 'var(--space-4) var(--space-8)', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-5)' }}>
+                  <span style={{ fontSize: 'var(--text-xs)', fontWeight: 800, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Research Profiles</span>
+                  {shared.hodResearchProfiles.map((link) => (
+                    <a key={link.label} href={link.url} target="_blank" rel="noopener noreferrer"
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1)', fontSize: 'var(--text-sm)', color: 'var(--color-white)', fontWeight: 600, textDecoration: 'none' }}>
+                      {link.label} <ExternalLink size={12} strokeWidth={2} />
+                    </a>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </section>
@@ -844,35 +860,30 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
               <span className="section-label">Curriculum Overview</span>
               <h2 className="section-title">Mind Map</h2>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <button
-                type="button"
-                onClick={() => setMindMapOpen(true)}
-                aria-label="Open Mind Map in full size"
-                style={{
-                  display: 'inline-block', background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)',
-                  borderRadius: 'var(--radius-md)', padding: 'var(--space-3)', cursor: 'zoom-in', maxWidth: '100%',
-                  transition: 'box-shadow var(--transition-base), border-color var(--transition-base)',
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-md)'; e.currentTarget.style.borderColor = 'var(--color-accent)'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.borderColor = 'var(--color-light-gray)'; }}
-              >
-                <SmoothImage
-                  src={activeProgram.mindMapImage}
-                  alt={`${activeProgram.shortName || activeProgram.name} curriculum mind map`}
-                  style={{ display: 'block', maxWidth: '100%', maxHeight: '70vh', width: 'auto', height: 'auto', borderRadius: 'var(--radius-sm)' }}
-                />
-              </button>
-            </div>
+            {/* Plain vertical stack, in upload order — every image full-width
+                and on its own line, no carousel/slider/side-by-side, so the
+                page just scrolls normally from Image 1 down to the last. */}
+            {mindMapImages.length > 0 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+                {mindMapImages.map((img, i) => (
+                  <SmoothImage
+                    key={img.url}
+                    src={img.url}
+                    alt={`${activeProgram.shortName || activeProgram.name} curriculum mind map${mindMapImages.length > 1 ? ` (${i + 1} of ${mindMapImages.length})` : ''}`}
+                    style={{ display: 'block', width: '100%', maxWidth: 700, height: 'auto', margin: '0 auto', borderRadius: 'var(--radius-md)', border: '1.5px solid var(--color-light-gray)' }}
+                  />
+                ))}
+              </div>
+            )}
+            {activeProgram.mindMapPdfUrl && (
+              <div style={{ display: 'flex', justifyContent: 'center', marginTop: mindMapImages.length > 0 ? 'var(--space-6)' : 0 }}>
+                <a href={activeProgram.mindMapPdfUrl} target="_blank" rel="noopener noreferrer" className="btn btn-outline">
+                  Download Mind Map PDF
+                </a>
+              </div>
+            )}
           </div>
         </section>
-      )}
-      {mindMapOpen && (
-        <ImageLightbox
-          src={activeProgram.mindMapImage}
-          alt={`${activeProgram.shortName || activeProgram.name} curriculum mind map`}
-          onClose={() => setMindMapOpen(false)}
-        />
       )}
 
       {/* Curriculum (per programme) */}
