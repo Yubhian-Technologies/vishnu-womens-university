@@ -35,8 +35,9 @@ interface Props {
   // CustomSection.photo) — independent of contentType.
   onPhotoUploaded: (sectionPath: number[], r: UploadResult) => void;
   onPhotoRemoved: (sectionPath: number[]) => void;
-  // 0 = top-level list (shows "+ Add Section" and, per item, "+ Add
-  // Sub-section"); 1 = a subSections list (no further nesting offered).
+  // 0 = top-level list (shows "+ Add Section"); >0 = a subSections list —
+  // nesting is unlimited, so every level gets its own "+ Add Sub-section"
+  // per item too.
   depth?: number;
   // Shows the "Placement" selector (intro vs. accordion) — only meaningful
   // on Differentiators detail pages, which have both a compact intro column
@@ -165,6 +166,18 @@ export default function CustomSectionEditor({
                 />
                 Bold heading
               </label>
+              {(s.subSections?.length ?? 0) > 0 && (
+                <div className="admin-field" style={{ flex: 1, minWidth: 190 }}>
+                  <select
+                    value={s.subSectionsDisplay === 'pills' ? 'pills' : 'stacked'}
+                    onChange={(e) => updateSection(si, { subSectionsDisplay: e.target.value === 'pills' ? 'pills' : 'stacked' })}
+                    title="How this section's own sub-sections display"
+                  >
+                    <option value="stacked">Sub-sections shown stacked</option>
+                    <option value="pills">Sub-sections shown as pill switcher</option>
+                  </select>
+                </div>
+              )}
               <div style={{ display: 'flex', gap: '0.5rem', alignSelf: 'center' }}>
                 <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveSection(si, -1)} disabled={si === 0} title="Move up">↑</button>
                 <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveSection(si, 1)} disabled={si === sections.length - 1} title="Move down">↓</button>
@@ -318,27 +331,25 @@ export default function CustomSectionEditor({
               </div>
             )}
 
-            {depth === 0 && (
-              <div style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px dashed var(--color-light-gray)' }}>
-                {(s.subSections?.length ?? 0) > 0 && (
-                  <div style={{ marginBottom: '0.5rem', paddingLeft: '1rem', borderLeft: '2px solid var(--color-light-gray)' }}>
-                    <CustomSectionEditor
-                      sections={s.subSections || []}
-                      onChange={(next) => updateSection(si, { subSections: next })}
-                      rootSections={rootSections}
-                      parentPath={path}
-                      onFileUploaded={onFileUploaded}
-                      onFileRemoved={onFileRemoved}
-                      onPhotoUploaded={onPhotoUploaded}
-                      onPhotoRemoved={onPhotoRemoved}
-                      depth={1}
-                      showPlacementToggle={showPlacementToggle}
-                    />
-                  </div>
-                )}
-                <button type="button" className="admin-btn admin-btn--sm" onClick={() => addSubSection(si)}>+ Add Sub-section</button>
-              </div>
-            )}
+            <div style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px dashed var(--color-light-gray)' }}>
+              {(s.subSections?.length ?? 0) > 0 && (
+                <div style={{ marginBottom: '0.5rem', paddingLeft: '1rem', borderLeft: '2px solid var(--color-light-gray)' }}>
+                  <CustomSectionEditor
+                    sections={s.subSections || []}
+                    onChange={(next) => updateSection(si, { subSections: next })}
+                    rootSections={rootSections}
+                    parentPath={path}
+                    onFileUploaded={onFileUploaded}
+                    onFileRemoved={onFileRemoved}
+                    onPhotoUploaded={onPhotoUploaded}
+                    onPhotoRemoved={onPhotoRemoved}
+                    depth={depth + 1}
+                    showPlacementToggle={showPlacementToggle}
+                  />
+                </div>
+              )}
+              <button type="button" className="admin-btn admin-btn--sm" onClick={() => addSubSection(si)}>+ Add Sub-section</button>
+            </div>
           </div>
         );
       })}

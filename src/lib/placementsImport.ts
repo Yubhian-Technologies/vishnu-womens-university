@@ -81,9 +81,19 @@ export function parsePlacementsBuffer(buf: ArrayBuffer): PlacementImportResult {
   const raw: unknown[][] = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: false, defval: '' });
   if (raw.length === 0) return { columns: [], rows: [] };
 
-  const columns = raw[0].map((c, i) => String(c ?? '').trim() || `Column ${i + 1}`);
+  // Same reasoning as the Word/PDF parsers below: a title/caption row (e.g.
+  // "CSE (2019-2023) Batch Placement Details") often sits above the real
+  // header row in an exported sheet, and — being one long string typed into
+  // a single cell — has at most one non-empty cell, unlike a genuine header
+  // row. Skip any leading rows like that so the first real multi-cell row
+  // becomes the header instead of locking `columns` to generic "Column N"
+  // fallbacks and silently demoting the true header into a data row.
+  const headerIdx = raw.findIndex((row) => row.filter((c) => String(c ?? '').trim() !== '').length > 1);
+  const headerRowIndex = headerIdx === -1 ? 0 : headerIdx;
+
+  const columns = raw[headerRowIndex].map((c, i) => String(c ?? '').trim() || `Column ${i + 1}`);
   const rows = raw
-    .slice(1)
+    .slice(headerRowIndex + 1)
     .map((row) => columns.map((_, i) => String(row[i] ?? '').trim()))
     .filter((row) => row.some((cell) => cell !== ''));
 
@@ -126,16 +136,38 @@ async function parsePlacementsDocx(buf: ArrayBuffer): Promise<PlacementImportRes
   const perTableCounts: number[] = [];
   tableTrs.forEach((trs, tableIdx) => {
     const expanded = tableIdx === 0 ? expandedFirst : expandTableRows(trs);
-    // Only the first table has title rows to skip past; a continuation
-    // table (page 2 onward) starts straight into data — except it may
-    // repeat the header row itself (Word's "repeat header row" setting),
-    // which the headerKey check below filters back out either way.
-    const from = tableIdx === 0 ? startIdx + 1 : 0;
+    // Every table can have its own leading caption line(s) above its real
+    // data ("Shri Vishnu Engineering College for Women(A):: Bhimavaram" /
+    // "Department of Information Technology" / "Placements :: 2020-21") —
+    // not just the first one. Word repeats that block at the top of each
+    // page's table when a long list was built as several separate tables,
+    // so every table gets the same leading-caption skip table 0 already
+    // used (only table 0 additionally treats its first genuine multi-column
+    // row as the header).
+    const ownHeaderIdx = trs.findIndex((tr) => tr.querySelectorAll('th, td').length > 1);
+    const ownStart = ownHeaderIdx === -1 ? 0 : ownHeaderIdx;
+    const from = tableIdx === 0 ? startIdx + 1 : ownStart;
     let kept = 0;
     for (let i = from; i < expanded.length; i++) {
       const cells = toCells(expanded[i]);
       if (!cells.some((c) => c !== '')) continue;
       if (cells.join('|').toLowerCase() === headerKey) continue;
+      // A caption cell spanning several columns (colspan) fills all of them
+      // with the same identical text once expanded — real placement data
+      // never repeats the exact same value across two different columns
+      // (a name is never also a company), so treat that as leftover caption
+      // bleed rather than a genuine row, even when it sits elsewhere in the
+      // table (see expandTableRows above) and slipped past the leading-row
+      // skip because of an odd column laid out next to it (e.g. a real S.No
+      // cell that isn't part of the merge).
+      const seen = new Set<string>();
+      const hasDuplicateCell = cells.some((c) => {
+        if (!c) return false;
+        if (seen.has(c)) return true;
+        seen.add(c);
+        return false;
+      });
+      if (hasDuplicateCell) continue;
       rows.push(cells);
       kept++;
     }
