@@ -19,7 +19,7 @@ import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import type { FacultyDoc } from './Faculty';
 import { parseFlexibleTable, parseProjectAccordion } from '../../lib/structuredTable';
 import { sortPlacementRows, computePlacementStats, findPackageColumnIndex, findSerialColumnIndex, formatPackageCell } from '../../lib/placementRecords';
-import { hasCustomSectionContent } from '../../lib/customSections';
+import { hasCustomSectionContent, toQuickLinkItems } from '../../lib/customSections';
 import CustomSectionsRenderer from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import '../detail-layout.css';
 import '../Campus/tabbed-section.css';
@@ -47,6 +47,19 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   // "Choose a Programme" Quick Links accordion — starts open so the sub-links
   // remain visible by default (unchanged from before this was collapsible).
   const [programmeLinksOpen, setProgrammeLinksOpen] = useState(true);
+  // Same collapsible treatment, one level deeper — a programmeLinks entry
+  // with its own children (e.g. "Research & Development" built from
+  // Publications/Patents/Funded Projects sub-sections) starts open, toggled
+  // per id.
+  const [collapsedQuickLinks, setCollapsedQuickLinks] = useState<Set<string>>(new Set());
+  const toggleQuickLink = (id: string) => {
+    setCollapsedQuickLinks((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
   // Which Academic Year's placement records are shown — falls back to the
   // active programme's first available year (see placementYears below).
   const [placementYear, setPlacementYear] = useState<string | null>(null);
@@ -303,8 +316,8 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     hasOutcomeStatements && { id: 'peos-pos-psos', label: outcomeHeading },
     hasMindMap && { id: 'mindmap', label: 'Mind Map' },
     { id: 'curriculum', label: 'Curriculum' },
-    ...visibleCustomSections.map((s) => ({ id: s.id, label: s.label })),
-  ].filter(Boolean) as { id: string; label: string }[];
+    ...toQuickLinkItems(visibleCustomSections),
+  ].filter(Boolean) as { id: string; label: string; children?: { id: string; label: string }[] }[];
 
   // Top stats bar, flowing as a single horizontal row (matching every other
   // detail page). Head of Department comes first, then Established/
@@ -464,13 +477,52 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                             </button>
                             <SmoothCollapse open={programmeLinksOpen}>
                               <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
-                                {programmeLinks.map((c) => (
-                                  <li key={c.id}>
-                                    <a href={`#${c.id}`} style={{ display: 'block', padding: 'var(--space-2) 0 var(--space-2) var(--space-4)', color: 'rgba(255,255,255,0.7)', fontSize: 'var(--text-sm)', fontWeight: 600, textDecoration: 'none', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-                                      {c.label}
-                                    </a>
-                                  </li>
-                                ))}
+                                {programmeLinks.map((c) => {
+                                  const hasKids = !!c.children?.length;
+                                  const isSubOpen = !collapsedQuickLinks.has(c.id);
+                                  return (
+                                    <li key={c.id}>
+                                      {hasKids ? (
+                                        <button
+                                          type="button"
+                                          onClick={() => toggleQuickLink(c.id)}
+                                          aria-expanded={isSubOpen}
+                                          style={{
+                                            display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%',
+                                            background: 'none', border: 'none', padding: 'var(--space-2) 0 var(--space-2) var(--space-4)', color: 'rgba(255,255,255,0.7)',
+                                            fontSize: 'var(--text-sm)', fontWeight: 600, fontFamily: 'inherit', textAlign: 'left', cursor: 'pointer',
+                                            borderBottom: '1px solid rgba(255,255,255,0.08)',
+                                          }}
+                                        >
+                                          {c.label}
+                                          <svg
+                                            width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true"
+                                            style={{ flexShrink: 0, marginLeft: 'var(--space-2)', opacity: 0.75, transition: 'transform var(--transition-base)', transform: isSubOpen ? 'rotate(180deg)' : 'none' }}
+                                          >
+                                            <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                          </svg>
+                                        </button>
+                                      ) : (
+                                        <a href={`#${c.id}`} style={{ display: 'block', padding: 'var(--space-2) 0 var(--space-2) var(--space-4)', color: 'rgba(255,255,255,0.7)', fontSize: 'var(--text-sm)', fontWeight: 600, textDecoration: 'none', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+                                          {c.label}
+                                        </a>
+                                      )}
+                                      {hasKids && (
+                                        <SmoothCollapse open={isSubOpen}>
+                                          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+                                            {c.children!.map((gc) => (
+                                              <li key={gc.id}>
+                                                <a href={`#${gc.id}`} style={{ display: 'block', padding: 'var(--space-2) 0 var(--space-2) var(--space-8)', color: 'rgba(255,255,255,0.55)', fontSize: 'var(--text-sm)', fontWeight: 600, textDecoration: 'none', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+                                                  {gc.label}
+                                                </a>
+                                              </li>
+                                            ))}
+                                          </ul>
+                                        </SmoothCollapse>
+                                      )}
+                                    </li>
+                                  );
+                                })}
                               </ul>
                             </SmoothCollapse>
                           </li>

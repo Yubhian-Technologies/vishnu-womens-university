@@ -159,3 +159,28 @@ export function getAtPath(sections: CustomSection[], path: number[]): CustomSect
   if (!section) return undefined;
   return rest.length === 0 ? section : getAtPath(section.subSections || [], rest);
 }
+
+// Quick Links sidebar entry for a top-level custom section (ProgramDetail.tsx
+// / DepartmentDetail.tsx) — one entry per section, plus (one level only, not
+// full recursion — Quick Links is deliberately "one anchor per major piece",
+// not a full outline) its own direct subSections, so e.g. a "Research &
+// Development" section built with Publications/Patents/Funded Projects pills
+// shows all three as sub-links instead of just the parent. Deep-linking to a
+// pill-displayed child works because PillSwitcher (CustomSectionsRenderer.tsx)
+// watches the URL hash and switches to the matching pill itself — a plain
+// anchor can't reach it, since only the active pill's content is ever in the
+// DOM.
+export interface QuickLinkItem {
+  id: string;
+  label: string;
+  children?: { id: string; label: string }[];
+}
+
+export function toQuickLinkItems(sections: CustomSection[]): QuickLinkItem[] {
+  return sections.filter(hasCustomSectionContent).map((s) => {
+    const children = (s.subSections || [])
+      .filter(hasCustomSectionContent)
+      .map((sub) => ({ id: sub.id, label: sub.label }));
+    return children.length > 0 ? { id: s.id, label: s.label, children } : { id: s.id, label: s.label };
+  });
+}

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { FileText, Link2 } from 'lucide-react';
 import { hasCustomSectionContent, type CustomSection } from '../../lib/customSections';
 import { parseFlexibleTable, parseLinkList } from '../../lib/structuredTable';
@@ -29,7 +29,7 @@ export default function CustomSectionsRenderer({ sections, navOffset = DEFAULT_N
               <span className="section-label">Details</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem', fontWeight: section.boldHeading ? 800 : undefined }}>{section.label}</h2>
             </div>
-            <SectionSubtree section={section} />
+            <SectionSubtree section={section} navOffset={navOffset} />
           </div>
         </section>
       ))}
@@ -235,7 +235,7 @@ export function CustomSectionsAccordion({ sections }: { sections: CustomSection[
 //     own content can still mix a description with one or more tables by
 //     giving IT subsections in turn (PillSwitcher renders the active pill
 //     through this same function).
-function SectionSubtree({ section, depth = 0 }: { section: CustomSection; depth?: number }) {
+function SectionSubtree({ section, depth = 0, navOffset = DEFAULT_NAV_OFFSET }: { section: CustomSection; depth?: number; navOffset?: string }) {
   const body = <CustomSectionBody section={section} />;
   const visibleSubs = (section.subSections || []).filter(hasCustomSectionContent);
   if (visibleSubs.length === 0) return body;
@@ -245,7 +245,7 @@ function SectionSubtree({ section, depth = 0 }: { section: CustomSection; depth?
       <div>
         {body}
         <div style={{ marginTop: 'var(--space-5)' }}>
-          <PillSwitcher sections={visibleSubs} depth={depth + 1} />
+          <PillSwitcher sections={visibleSubs} depth={depth + 1} navOffset={navOffset} />
         </div>
       </div>
     );
@@ -255,11 +255,15 @@ function SectionSubtree({ section, depth = 0 }: { section: CustomSection; depth?
     <div>
       {body}
       {visibleSubs.map((sub) => (
-        <div key={sub.id} style={{ marginTop: depth === 0 ? 'var(--space-6)' : 'var(--space-4)' }}>
+        // id+scrollMarginTop lets a Quick Links entry for this subsection
+        // (see toQuickLinkItems in lib/customSections.ts) jump straight to
+        // it with a plain anchor — every stacked subsection is always in the
+        // DOM, unlike a pill's, which needs PillSwitcher's hash-sync below.
+        <div key={sub.id} id={sub.id} style={{ marginTop: depth === 0 ? 'var(--space-6)' : 'var(--space-4)', scrollMarginTop: navOffset }}>
           <h4 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: sub.boldHeading ? 800 : 700, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>
             {sub.label}
           </h4>
-          <SectionSubtree section={sub} depth={depth + 1} />
+          <SectionSubtree section={sub} depth={depth + 1} navOffset={navOffset} />
         </div>
       ))}
     </div>
@@ -272,13 +276,41 @@ function SectionSubtree({ section, depth = 0 }: { section: CustomSection; depth?
 // one's content shown below, rendered through SectionSubtree so further
 // nesting (a pill whose own content is itself split into pieces) keeps
 // working at any depth.
-function PillSwitcher({ sections, depth = 0 }: { sections: CustomSection[]; depth?: number }) {
+function PillSwitcher({ sections, depth = 0, navOffset = DEFAULT_NAV_OFFSET }: { sections: CustomSection[]; depth?: number; navOffset?: string }) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const active = sections.find((s) => s.id === activeId) ?? sections[0];
+  const scrollPendingRef = useRef(false);
+
+  // Deep-linking from Quick Links: a sidebar link may point straight at one
+  // of these pills (e.g. "Publications" under "Research & Development").
+  // A plain anchor can't reach it — only the active pill's content is ever
+  // in the DOM — so on mount and on every same-page hash change we check the
+  // hash ourselves, switch to the matching pill, and scroll to it once its
+  // content has rendered. Manual pill clicks below don't go through this, so
+  // they don't cause an unwanted scroll jump.
+  useEffect(() => {
+    const syncFromHash = () => {
+      const hash = window.location.hash.slice(1);
+      const match = sections.find((s) => s.id === hash);
+      if (!match) return;
+      scrollPendingRef.current = true;
+      setActiveId(match.id);
+    };
+    syncFromHash();
+    window.addEventListener('hashchange', syncFromHash);
+    return () => window.removeEventListener('hashchange', syncFromHash);
+  }, [sections]);
+
+  useEffect(() => {
+    if (!scrollPendingRef.current || !activeId) return;
+    scrollPendingRef.current = false;
+    document.getElementById(activeId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [activeId]);
+
   if (!active) return null;
 
   return (
-    <div>
+    <div id={active.id} style={{ scrollMarginTop: navOffset }}>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)', marginBottom: 'var(--space-6)' }}>
         {sections.map((s) => {
           const isActive = active.id === s.id;
@@ -309,7 +341,7 @@ function PillSwitcher({ sections, depth = 0 }: { sections: CustomSection[]; dept
           <div style={{ width: 4, height: 24, background: 'var(--color-accent)', borderRadius: 'var(--radius-full)' }} />
           <h3 style={{ fontSize: '1.25rem', margin: 0, fontWeight: active.boldHeading ? 800 : undefined }}>{active.label}</h3>
         </div>
-        <SectionSubtree section={active} depth={depth} />
+        <SectionSubtree section={active} depth={depth} navOffset={navOffset} />
       </div>
     </div>
   );
