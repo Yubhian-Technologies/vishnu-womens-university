@@ -1,15 +1,17 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams, useLocation, Navigate } from 'react-router-dom';
-import { Check, Microscope, Compass, Target, Sparkles, Mail, ExternalLink, BookOpen, FileText } from 'lucide-react';
+import { Check, Microscope, Compass, Target, Sparkles, Mail, ExternalLink, BookOpen, FileText, ChevronRight, ChevronDown, GraduationCap, Calendar, Award, Users, ArrowRight, BookMarked, Bookmark, Library } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import ImageLightbox from '../../components/ImageLightbox/ImageLightbox';
 import ProgrammeStructure from '../../components/ProgrammeStructure/ProgrammeStructure';
 import BodyBlocks, { parseBodyContent } from '../../components/BodyBlocks/BodyBlocks';
-import DepartmentNewsSection, { type DepartmentNewsDoc } from '../../components/DepartmentNews/DepartmentNewsSection';
+import SmoothCollapse from '../../components/SmoothCollapse/SmoothCollapse';
 import DepartmentDetail from './DepartmentDetail';
 import FreshmanSubDepartment from './FreshmanSubDepartment';
 import { SUB_DEPTS } from './FreshmanEngineering';
 import { groupForProgramSlug } from '../../lib/departmentGroups';
+import FacultyCarousel from '../../components/FacultyCarousel/FacultyCarousel';
+import TestimonialMarquee, { type PlacementItem } from '../../components/ui/marquee-01';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { usePageBanner } from '../../hooks/usePageBanner';
 import { useEapcetCode } from '../../hooks/useContentBlocks';
@@ -19,7 +21,7 @@ import { normalizeLab, type ProgramDoc } from '../Admin/sections/ProgramsAdmin';
 import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import type { FacultyDoc } from './Faculty';
 import { parseFlexibleTable, parseProjectAccordion } from '../../lib/structuredTable';
-import { sortPlacementRows, computePlacementStats, findPackageColumnIndex, findSerialColumnIndex, formatPackageCell } from '../../lib/placementRecords';
+import { sortPlacementRows, computePlacementStats, findPackageColumnIndex, formatPackageCell } from '../../lib/placementRecords';
 import { hasCustomSectionContent } from '../../lib/customSections';
 import CustomSectionsRenderer from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import SEO from '../../components/SEO/SEO';
@@ -52,13 +54,16 @@ function SingleProgramDetail() {
   const location = useLocation();
   const [mindMapOpen, setMindMapOpen] = useState(false);
   const [outcomeTab, setOutcomeTab] = useState<string | null>(null);
-  // Which Academic Year's placement records are shown — falls back to this
-  // programme's first available year (see placementYears below).
   const [placementYear, setPlacementYear] = useState<string | null>(null);
-  // How many rows of the Placement Records table are visible at once —
-  // 'all' shows every row, otherwise a fixed page size (DataTables-style
-  // "Show N entries" control, matching the reference design).
-  const [placementPageSize, setPlacementPageSize] = useState<number | 'all'>(10);
+  const [openNewsYears, setOpenNewsYears] = useState<Set<string>>(new Set());
+  const toggleNewsYear = (year: string) => {
+    setOpenNewsYears((prev) => {
+      const next = new Set(prev);
+      if (next.has(year)) next.delete(year);
+      else next.add(year);
+      return next;
+    });
+  };
   const [openRndProjects, setOpenRndProjects] = useState<Set<string>>(new Set());
   const toggleRndProject = (key: string) => {
     setOpenRndProjects((prev) => {
@@ -73,8 +78,6 @@ function SingleProgramDetail() {
 
   const { docs: allFaculty } = useOrderedCollection<FacultyDoc>('faculty', 'order');
   const faculty = program?.department ? allFaculty.filter((f) => f.department === program.department) : [];
-  const { docs: deptNews } = useOrderedCollection<DepartmentNewsDoc>('departmentNews', 'date', 'desc');
-  const hasDeptNews = deptNews.some((n) => n.program === slug);
   // Resolves the program's short `department` code (e.g. "IT") to the full
   // department name from the Academic Departments admin, so the "About the
   // Department" heading below reads the same way it does on the AI/CSE/ECE
@@ -193,14 +196,20 @@ function SingleProgramDetail() {
   // an imported raw rupee value like "45,00,000") — same column detection
   // computePlacementStats already uses for the stat tiles.
   const placementPkgIdx = findPackageColumnIndex(placementColumns);
-  // Hides an imported S.No column — the table already numbers rows itself
-  // (see the S.No <th>/<td> below), so showing both duplicated the column.
-  const placementSnoIdx = findSerialColumnIndex(placementColumns);
-  const visiblePlacementColumnIndices = placementColumns.map((_, i) => i).filter((i) => i !== placementSnoIdx);
-  // Computed live from the active year's raw rows — every tile below reads
-  // straight from this, nothing here is admin-entered.
   const placementYearStats = activePlacementYear ? computePlacementStats(placementColumns, activePlacementYear.rows || []) : null;
-  const visiblePlacementRows = placementPageSize === 'all' ? placementRows : placementRows.slice(0, placementPageSize);
+
+  const placementNameIdx = placementColumns.findIndex((c) => /name|student|candidate/i.test(c));
+  const placementCompIdx = placementColumns.findIndex((c) => /company|organization|employer|recruiter/i.test(c));
+  const placementMarqueeItems: PlacementItem[] = placementRows.map((row) => {
+    const rawName = placementNameIdx >= 0 ? row.cells[placementNameIdx] : (row.cells[1] || row.cells[0]);
+    const rawComp = placementCompIdx >= 0 ? row.cells[placementCompIdx] : (row.cells[2] || 'Leading Recruiter');
+    const rawPkg = placementPkgIdx >= 0 ? formatPackageCell(row.cells[placementPkgIdx] ?? '') : (row.cells[3] || '');
+    return {
+      name: rawName?.trim() || 'Student Scholar',
+      company: rawComp?.trim() || 'Top Corporation',
+      package: rawPkg ? (rawPkg.toLowerCase().includes('lpa') ? rawPkg : `${rawPkg} LPA`) : 'High Impact CTC',
+    };
+  });
   const visibleCustomSections = (program.customSections || []).filter(hasCustomSectionContent);
 
   const quickLinks = [
@@ -216,7 +225,6 @@ function SingleProgramDetail() {
     hasRnd && { id: 'rnd', label: 'Research & Development (Funded Projects & Patents)' },
     placementYears.length > 0 && { id: 'placements', label: 'Placements' },
     hasNewsletter && { id: 'newsletter', label: 'Newsletter' },
-    hasDeptNews && { id: 'news', label: 'News & Events' },
     hasNewsEventsYears && { id: 'news-events', label: 'News & Events' },
     ...visibleCustomSections.map((s) => ({ id: s.id, label: s.label })),
   ].filter(Boolean) as { id: string; label: string }[];
@@ -279,39 +287,136 @@ function SingleProgramDetail() {
         </div>
       </section>
 
-      {/* Stats bar */}
-      <section style={{ background: 'var(--color-primary)', padding: 'var(--space-5) 0' }}>
-        <div className="container">
-          <div style={{ display: 'flex', flexWrap: 'nowrap', gap: 'var(--space-12)', overflowX: 'auto', paddingBottom: 4, scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.3) transparent' }}>
-            {[
-              ...(program.intake ? [{ label: 'Annual Intake', value: `${program.intake} Seats` }] : []),
-              ...(program.established ? [{ label: 'Established', value: program.established }] : []),
-              ...(program.accreditation ? [{ label: 'Accreditation', value: program.accreditation }] : []),
-              ...(program.hod ? [{ label: 'Head of Department', value: program.hod }] : []),
-            ].map((s) => (
-              <div key={s.label} style={{ textAlign: 'center', flexShrink: 0 }}>
-                {s.label === 'Head of Department' && hasHod ? (
-                  <a href="#hod" style={{ fontFamily: 'var(--font-serif)', fontSize: '1.15rem', fontWeight: 900, color: 'var(--color-accent)', whiteSpace: 'nowrap', textDecoration: 'underline', textUnderlineOffset: 3 }}>{s.value}</a>
-                ) : (
-                  <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.15rem', fontWeight: 900, color: 'var(--color-accent)', whiteSpace: 'nowrap' }}>{s.value}</div>
-                )}
-                <div style={{ fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.65)', fontFamily: 'var(--font-sans)', marginTop: 2, textTransform: 'uppercase', letterSpacing: '0.07em', whiteSpace: 'nowrap' }}>{s.label}</div>
-              </div>
-            ))}
+      {/* Key Facts Grid */}
+      {(program.intake || program.established || program.accreditation || program.hod) && (
+        <section className="dept-facts-section" aria-label={`${program.name} key facts`}>
+          <div className="container">
+            <div className="dept-facts-grid cols-4">
+              {program.hod && (
+                <div className="dept-fact-card is-hod-card">
+                  <div className="dept-fact-header">
+                    <div className="dept-fact-icon-badge">
+                      <GraduationCap size={14} strokeWidth={2.4} />
+                    </div>
+                    <span className="dept-fact-col-title">Head of Department</span>
+                  </div>
+                  <div className="dept-fact-items-window">
+                    <div className="dept-fact-static-list">
+                      {hasHod ? (
+                        <a href="#hod" className="dept-fact-chip-link" aria-label={`View ${program.hod} details`}>
+                          <div className="dept-fact-chip-entry">
+                            <span className="dept-fact-chip-sub">Professor & HOD</span>
+                            <span className="dept-fact-chip-val">{program.hod}</span>
+                          </div>
+                        </a>
+                      ) : (
+                        <div className="dept-fact-chip-entry">
+                          <span className="dept-fact-chip-sub">Professor & HOD</span>
+                          <span className="dept-fact-chip-val">{program.hod}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {program.established && (
+                <div className="dept-fact-card">
+                  <div className="dept-fact-header">
+                    <div className="dept-fact-icon-badge">
+                      <Calendar size={14} strokeWidth={2.4} />
+                    </div>
+                    <span className="dept-fact-col-title">Established</span>
+                  </div>
+                  <div className="dept-fact-items-window">
+                    <div className="dept-fact-static-list">
+                      <div className="dept-fact-chip-entry">
+                        <span className="dept-fact-chip-sub">Programme Established</span>
+                        <span className="dept-fact-chip-val">{program.established}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {program.accreditation && (
+                <div className="dept-fact-card">
+                  <div className="dept-fact-header">
+                    <div className="dept-fact-icon-badge">
+                      <Award size={14} strokeWidth={2.4} />
+                    </div>
+                    <span className="dept-fact-col-title">Accreditations</span>
+                  </div>
+                  <div className="dept-fact-items-window">
+                    <div className="dept-fact-static-list">
+                      <div className="dept-fact-chip-entry">
+                        <span className="dept-fact-chip-sub">Accreditation Status</span>
+                        <span className="dept-fact-chip-val">{program.accreditation}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {program.intake && (
+                <div className="dept-fact-card">
+                  <div className="dept-fact-header">
+                    <div className="dept-fact-icon-badge">
+                      <Users size={14} strokeWidth={2.4} />
+                    </div>
+                    <span className="dept-fact-col-title">Annual Intake</span>
+                  </div>
+                  <div className="dept-fact-items-window">
+                    <div className="dept-fact-static-list">
+                      <div className="dept-fact-chip-entry">
+                        <span className="dept-fact-chip-sub">Approved Seats</span>
+                        <span className="dept-fact-chip-val">{program.intake} Seats</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
+
+      {/* Mobile Jump Bar */}
+      {quickLinks.length > 1 && (
+        <nav className="dept-mobile-jump-bar-root" aria-label="Section Quick Jump">
+          <div className="container">
+            <div className="dept-mobile-jump-bar" role="navigation">
+              <span className="dept-mobile-jump-label">
+                <Compass size={13} strokeWidth={2.4} />
+                <span>Jump to:</span>
+              </span>
+              {quickLinks.map((l) => (
+                <a
+                  key={l.id}
+                  href={`#${l.id}`}
+                  className="dept-mobile-jump-chip"
+                >
+                  {l.label}
+                </a>
+              ))}
+            </div>
+          </div>
+        </nav>
+      )}
 
       {/* About + Highlights */}
-      <section id="about" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
+      <section id="about" className="section bg-white dept-about-section" style={{ scrollMarginTop: NAV_OFFSET }}>
         <div className="container">
           <div className={hasSidebarContent ? 'detail-grid' : ''}>
             {/* Main content */}
-            <div>
-              <div>
-                <span className="section-label">About the Department</span>
+            <div className="dept-about-main">
+              <div className="dept-about-header">
+                <span className="section-label dept-section-label">Department Overview</span>
                 <h2 className="section-title">{deptTitle || program.shortName || program.name}</h2>
-                <p style={{ color: 'var(--color-text-light)', lineHeight: 1.85, fontSize: 'var(--text-base)', marginBottom: 'var(--space-6)', whiteSpace: 'pre-line' }}>
+              </div>
+
+              <div className="dept-about-card">
+                <p className="dept-about-lead-text">
                   {program.about}
                 </p>
               </div>
@@ -319,110 +424,136 @@ function SingleProgramDetail() {
               {/* Programme Highlights */}
               {program.highlights && program.highlights.length > 0 && (
                 <div style={{ marginTop: 'var(--space-8)' }}>
-                  <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.35rem', color: 'var(--color-primary)', marginBottom: 'var(--space-5)', paddingBottom: 'var(--space-3)', borderBottom: '2px solid var(--color-accent)' }}>
-                    Programme Highlights
-                  </h3>
-                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: 'var(--space-3)' }}>
-                    {program.highlights.map((h) => (
-                      <li key={h} style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start', color: 'var(--color-text)', fontSize: 'var(--text-sm)', lineHeight: 1.6 }}>
-                        <Check size={16} strokeWidth={2.5} style={{ color: 'var(--color-accent)', flexShrink: 0, marginTop: 2 }} />
-                        {h}
-                      </li>
+                  <div style={{ marginBottom: 'var(--space-5)' }}>
+                    <span className="section-label dept-section-label">Key Strengths</span>
+                    <h3 className="section-title" style={{ fontSize: '1.4rem' }}>
+                      Programme Highlights
+                    </h3>
+                  </div>
+                  <div className="dept-highlights-grid">
+                    {program.highlights.map((h, i) => (
+                      <div key={i} className="dept-highlight-card">
+                        <div className="dept-highlight-icon-wrap">
+                          <Check size={14} strokeWidth={3} />
+                        </div>
+                        <span className="dept-highlight-text">{h}</span>
+                      </div>
                     ))}
-                  </ul>
+                  </div>
                 </div>
               )}
             </div>
 
             {/* Sidebar */}
             {hasSidebarContent && (
-            <div className="detail-sidebar">
-              <div style={{ position: 'sticky', top: 'calc(var(--topbar-height) + var(--header-height) + 1.5rem)', display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
-                {/* Quick Links */}
-                {quickLinks.length > 1 && (
-                  <div style={{ background: 'var(--color-primary)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)' }}>
-                    <h4 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 800, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 'var(--space-4)', paddingBottom: 'var(--space-3)', borderBottom: '1px solid rgba(255,255,255,0.15)' }}>
-                      Quick Links
-                    </h4>
-                    <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
-                      {quickLinks.map((l) => (
-                        <li key={l.id}>
-                          <a href={`#${l.id}`} style={{ display: 'block', padding: 'var(--space-2) 0', color: 'rgba(255,255,255,0.85)', fontSize: 'var(--text-sm)', fontWeight: 600, textDecoration: 'none', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-                            {l.label}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+              <aside className="detail-sidebar" aria-label="Page Navigation Sidebar">
+                <div style={{ position: 'sticky', top: 'calc(var(--topbar-height) + var(--header-height) + 1.5rem)', display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
+                  {/* Quick Links */}
+                  {quickLinks.length > 1 && (
+                    <nav className="dept-quick-nav-card" aria-label="Quick Links">
+                      <div className="dept-quick-nav-header">
+                        <div className="dept-quick-nav-icon">
+                          <Compass size={15} strokeWidth={2.4} />
+                        </div>
+                        <div className="dept-quick-nav-title-wrap">
+                          <h4 className="dept-quick-nav-title">Quick Navigation</h4>
+                          <span className="dept-quick-nav-subtitle">{quickLinks.length} Sections</span>
+                        </div>
+                      </div>
 
-                {/* Career Outcomes */}
-                {program.outcomes && program.outcomes.length > 0 && (
-                  <div style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)' }}>
-                    <h4 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 800, color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 'var(--space-4)', paddingBottom: 'var(--space-3)', borderBottom: '2px solid var(--color-accent)' }}>
-                      Career Outcomes
-                    </h4>
-                    <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-                      {program.outcomes.map((o) => (
-                        <li key={o} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', padding: 'var(--space-2) 0', borderBottom: '1px solid var(--color-light-gray)', display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                          <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--color-accent)', flexShrink: 0, display: 'inline-block' }} />
-                          {o}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-            </div>
+                      <ul className="dept-quick-nav-list" role="list">
+                        {quickLinks.map((l) => (
+                          <li key={l.id} className="dept-quick-nav-item">
+                            <a href={`#${l.id}`} className="dept-quick-nav-link">
+                              <span className="dept-quick-nav-text">{l.label}</span>
+                              <span className="dept-btn-arrow-circle">
+                                <ChevronRight size={13} strokeWidth={2.4} className="dept-quick-nav-arrow" aria-hidden="true" />
+                              </span>
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </nav>
+                  )}
+
+                  {/* Career Outcomes */}
+                  {program.outcomes && program.outcomes.length > 0 && (
+                    <div style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)' }}>
+                      <h4 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 800, color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 'var(--space-4)', paddingBottom: 'var(--space-3)', borderBottom: '2px solid var(--color-accent)' }}>
+                        Career Outcomes
+                      </h4>
+                      <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                        {program.outcomes.map((o) => (
+                          <li key={o} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', padding: 'var(--space-2) 0', borderBottom: '1px solid var(--color-light-gray)', display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                            <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--color-accent)', flexShrink: 0, display: 'inline-block' }} />
+                            {o}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              </aside>
             )}
           </div>
         </div>
       </section>
 
-      {/* Vision, Mission & Values */}
+      {/* Vision, Mission & Values (Italian-Inspired Sleek Showcase) */}
       {hasVisionMission && (
         <section id="vision-mission" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
           <div className="container">
             <div style={{ marginBottom: 'var(--space-10)' }}>
-              <span className="section-label">Our Foundation</span>
+              <span className="section-label dept-section-label">Our Guiding Pillars</span>
               <h2 className="section-title">Vision, Mission &amp; Values</h2>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--space-6)' }}>
+            <div className="dept-vm-grid">
               {program.vision && (
-                <div style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderTop: '4px solid var(--color-accent)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-3)' }}>
-                    <Compass size={20} strokeWidth={1.75} style={{ color: 'var(--color-accent)' }} />
-                    <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 800, color: 'var(--color-primary)' }}>Vision</h3>
+                <div className="dept-vm-card">
+                  <div className="dept-vm-card-top">
+                    <span className="dept-vm-num-badge">01 · VISION</span>
+                    <div className="dept-vm-icon-badge">
+                      <Compass size={20} strokeWidth={2.2} />
+                    </div>
                   </div>
-                  <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.75 }}>{program.vision}</p>
+                  <h3 className="dept-vm-title">Programme Vision</h3>
+                  <p className="dept-vm-body-text">{program.vision}</p>
                 </div>
               )}
+
               {program.mission && program.mission.length > 0 && (
-                <div style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderTop: '4px solid var(--color-accent)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-3)' }}>
-                    <Target size={20} strokeWidth={1.75} style={{ color: 'var(--color-accent)' }} />
-                    <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 800, color: 'var(--color-primary)' }}>Mission</h3>
+                <div className="dept-vm-card">
+                  <div className="dept-vm-card-top">
+                    <span className="dept-vm-num-badge">02 · MISSION</span>
+                    <div className="dept-vm-icon-badge">
+                      <Target size={20} strokeWidth={2.2} />
+                    </div>
                   </div>
-                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-                    {program.mission.map((m) => (
-                      <li key={m} style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'flex-start', fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6 }}>
-                        <Check size={14} strokeWidth={2.5} style={{ color: 'var(--color-accent)', flexShrink: 0, marginTop: 3 }} />
-                        {m}
+                  <h3 className="dept-vm-title">Mission Statements</h3>
+                  <ul className="dept-vm-mission-list">
+                    {program.mission.map((m, mi) => (
+                      <li key={mi} className="dept-vm-mission-item">
+                        <span className="dept-vm-bullet-circle">
+                          <Check size={12} strokeWidth={3} />
+                        </span>
+                        <span>{m}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
               )}
+
               {program.coreValues && program.coreValues.length > 0 && (
-                <div style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderTop: '4px solid var(--color-accent)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-3)' }}>
-                    <Sparkles size={20} strokeWidth={1.75} style={{ color: 'var(--color-accent)' }} />
-                    <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 800, color: 'var(--color-primary)' }}>Core Values</h3>
+                <div className="dept-values-card">
+                  <div className="dept-values-header">
+                    <Sparkles size={22} strokeWidth={2} style={{ color: 'var(--color-accent)' }} />
+                    <h3 className="dept-values-title">Institutional Core Values</h3>
                   </div>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+                  <div className="dept-values-chips-wrap">
                     {program.coreValues.map((v) => (
-                      <span key={v} style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--color-primary)', background: 'var(--color-off-white)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-full)', padding: '0.35rem 0.9rem' }}>
-                        {v}
+                      <span key={v} className="dept-value-pill">
+                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-block' }} />
+                        <span>{v}</span>
                       </span>
                     ))}
                   </div>
@@ -433,19 +564,26 @@ function SingleProgramDetail() {
         </section>
       )}
 
-      {/* PEOs, POs & PSOs */}
+      {/* PEOs, POs & PSOs (Outcome-Based Education Showcase) */}
       {hasOutcomeStatements && (
         <section id="peos-pos-psos" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
           <div className="container">
             <div style={{ marginBottom: 'var(--space-10)' }}>
-              <span className="section-label">Outcome-Based Education</span>
+              <span className="section-label dept-section-label">Outcome-Based Education</span>
               <h2 className="section-title">{outcomeHeading}</h2>
-              <p className="section-desc">The programme&apos;s educational objectives and outcomes, aligned to national accreditation frameworks.</p>
+              <p className="section-desc" style={{ margin: '0.5rem 0 0 0' }}>
+                Structured educational objectives and measurable competencies defined in accordance with NBA & Washington Accord frameworks.
+              </p>
             </div>
-            <div className="section-tabs">
+            <div className="section-tabs" role="tablist" aria-label={outcomeHeading}>
               {outcomeGroups.map((g) => (
                 <button
                   key={g.key}
+                  id={`outcome-tab-${g.key}`}
+                  role="tab"
+                  aria-selected={activeOutcome?.key === g.key}
+                  aria-controls={`outcome-panel-${g.key}`}
+                  tabIndex={activeOutcome?.key === g.key ? 0 : -1}
                   onClick={() => setOutcomeTab(g.key)}
                   className={`section-tab-btn${activeOutcome?.key === g.key ? ' active' : ''}`}
                 >
@@ -454,135 +592,115 @@ function SingleProgramDetail() {
               ))}
             </div>
             {activeOutcome && (
-              <div style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)' }}>
-                <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 800, color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 'var(--space-4)', paddingBottom: 'var(--space-3)', borderBottom: '2px solid var(--color-accent)' }}>
-                  {activeOutcome.title}
-                </h3>
-                <ol style={{ padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', listStylePosition: 'inside' }}>
+              <div
+                id={`outcome-panel-${activeOutcome.key}`}
+                role="tabpanel"
+                aria-labelledby={`outcome-tab-${activeOutcome.key}`}
+                tabIndex={0}
+                className="dept-outcomes-container"
+              >
+                <div className="dept-outcomes-header-bar">
+                  <h3 className="dept-outcomes-header-title">
+                    {activeOutcome.title}
+                  </h3>
+                  <span style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                    {activeOutcome.items!.length} Statements Defined
+                  </span>
+                </div>
+                <ul className="dept-outcomes-list">
                   {activeOutcome.items!.map((item, i) => (
-                    <li key={item} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.65 }}>
-                      <strong style={{ color: 'var(--color-accent)' }}>{activeOutcome.key.slice(0, -1).toUpperCase()}{i + 1}:</strong> {item}
+                    <li key={item} className="dept-outcome-row">
+                      <span className="dept-outcome-code-badge">
+                        {activeOutcome.key.slice(0, -1).toUpperCase()}{i + 1}
+                      </span>
+                      <p className="dept-outcome-desc">{item}</p>
                     </li>
                   ))}
-                </ol>
+                </ul>
               </div>
             )}
           </div>
         </section>
       )}
 
-      {/* About HOD */}
+      {/* About HOD (Executive Italian Editorial Layout) */}
       {hasHod && (
-        <section id="hod" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
+        <section id="hod" className="dept-hod-section" style={{ scrollMarginTop: NAV_OFFSET }}>
           <div className="container">
             <div style={{ marginBottom: 'var(--space-10)' }}>
-              <span className="section-label">Leadership</span>
-              <h2 className="section-title">About HOD</h2>
+              <span className="section-label dept-section-label">Academic Leadership</span>
+              <h2 className="section-title">Head of Department</h2>
             </div>
-            <div style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
-              <div style={{ display: 'flex', gap: 'var(--space-8)', flexWrap: 'wrap', alignItems: 'flex-start', padding: 'var(--space-8)' }}>
-                {program.hodImage && (
+            
+            <div className="dept-hod-editorial-card">
+              {program.hodImage && (
+                <div className="dept-hod-media-frame">
                   <SmoothImage
                     src={program.hodImage}
                     alt={program.hod || 'Head of Department'}
-                    style={{ width: 180, height: 180, objectFit: 'cover', borderRadius: 'var(--radius-md)', flexShrink: 0 }}
+                    className="dept-hod-photo"
                   />
-                )}
-                <div style={{ flex: '1 1 260px', minWidth: 0 }}>
-                  {program.hod && (
-                    <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.35rem', color: 'var(--color-primary)', marginBottom: 'var(--space-1)' }}>{program.hod}</h3>
-                  )}
-                  <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
-                    <span style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>
-                      Head of Department, {program.shortName || program.name}
-                    </span>
-                    {program.hodEmail && (
-                      <a href={`mailto:${program.hodEmail}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1)', fontSize: 'var(--text-sm)', color: 'var(--color-primary)', fontWeight: 600, textDecoration: 'none' }}>
-                        <Mail size={14} strokeWidth={1.75} /> {program.hodEmail}
-                      </a>
-                    )}
-                  </div>
-                  {program.hodMessage && (
-                    <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.85, whiteSpace: 'pre-line' }}>{program.hodMessage}</p>
-                  )}
-                </div>
-              </div>
-              {program.hodResearchProfiles && program.hodResearchProfiles.length > 0 && (
-                <div style={{ background: 'var(--color-primary)', padding: 'var(--space-4) var(--space-8)', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-5)' }}>
-                  <span style={{ fontSize: 'var(--text-xs)', fontWeight: 800, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Research Profiles</span>
-                  {program.hodResearchProfiles.map((link) => (
-                    <a key={link.label} href={link.url} target="_blank" rel="noopener noreferrer"
-                      style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1)', fontSize: 'var(--text-sm)', color: 'var(--color-white)', fontWeight: 600, textDecoration: 'none' }}>
-                      {link.label} <ExternalLink size={12} strokeWidth={2} />
-                    </a>
-                  ))}
                 </div>
               )}
+              
+              <div className="dept-hod-content">
+                <div className="dept-hod-badge-wrap">
+                  <span className="dept-hod-role-badge">Department Leadership</span>
+                  <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>•</span>
+                  <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>{program.shortName || program.name}</span>
+                </div>
+
+                {program.hod && (
+                  <h3 className="dept-hod-name">{program.hod}</h3>
+                )}
+
+                <div className="dept-hod-meta">
+                  <span>Head of the Department & Senior Faculty</span>
+                </div>
+
+                {program.hodMessage && (
+                  <div className="dept-hod-message-box">
+                    <p className="dept-hod-message-text">{program.hodMessage}</p>
+                  </div>
+                )}
+
+                {program.hodEmail && (
+                  <div className="dept-hod-actions">
+                    <a href={`mailto:${program.hodEmail}`} className="dept-hod-mail-btn">
+                      <Mail size={15} strokeWidth={2.2} />
+                      <span>Contact HOD: {program.hodEmail}</span>
+                    </a>
+                  </div>
+                )}
+
+                {program.hodResearchProfiles && program.hodResearchProfiles.length > 0 && (
+                  <div style={{ marginTop: '1.25rem', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.65rem' }}>
+                    <span style={{ fontSize: '0.74rem', fontWeight: 800, color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Research Profiles:</span>
+                    {program.hodResearchProfiles.map((link) => (
+                      <a key={link.label} href={link.url} target="_blank" rel="noopener noreferrer"
+                        className="dept-value-pill" style={{ color: 'var(--color-primary-dark)', background: '#f1f5f9', borderColor: '#e2e8f0' }}>
+                        <span>{link.label}</span>
+                        <ExternalLink size={11} strokeWidth={2.4} />
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </section>
       )}
 
-      {/* Faculty — live from the faculty collection, filtered to this program's department */}
+      {/* Faculty Carousel (matching Google UI reference design) */}
       {faculty.length > 0 && (
-        <section id="faculty" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
-          <div className="container">
-            <div style={{ marginBottom: 'var(--space-10)' }}>
-              <span className="section-label">Our Team</span>
-              <h2 className="section-title">Faculty</h2>
-              <p className="section-desc">{faculty.length} dedicated faculty members bringing academic excellence and industry expertise to every classroom.</p>
-            </div>
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)' }}>
-                <thead>
-                  <tr style={{ background: 'var(--color-primary)' }}>
-                    {['S.No', 'Name', 'Designation', 'Qualification'].map(h => (
-                      <th key={h} style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-white)', fontWeight: 700, textAlign: 'left', fontSize: '0.72rem', letterSpacing: '0.07em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {faculty.map((f, i) => (
-                    <tr key={f.id} style={{ background: i % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)', borderBottom: '1px solid var(--color-light-gray)' }}>
-                      <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text-light)', fontWeight: 600, width: 48 }}>{i + 1}</td>
-                      <td style={{ padding: 'var(--space-3) var(--space-4)' }}>
-                        <Link to={`/faculty/${f.id}`} style={{ color: 'var(--color-primary)', fontWeight: 700, textDecoration: 'none' }}>{f.name}</Link>
-                      </td>
-                      <td style={{ padding: 'var(--space-3) var(--space-4)' }}>
-                        <span style={{
-                          display: 'inline-block',
-                          fontSize: '0.68rem',
-                          fontWeight: 700,
-                          padding: '2px 10px',
-                          borderRadius: 'var(--radius-full)',
-                          whiteSpace: 'nowrap',
-                          background: f.designation.includes('HOD') || f.designation === 'Professor'
-                            ? 'rgba(10,35,81,0.1)'
-                            : f.designation.includes('Associate')
-                              ? 'rgba(201,168,76,0.15)'
-                              : 'rgba(0,0,0,0.05)',
-                          color: f.designation.includes('HOD') || f.designation === 'Professor'
-                            ? 'var(--color-primary)'
-                            : f.designation.includes('Associate')
-                              ? 'var(--color-accent)'
-                              : 'var(--color-text-light)',
-                          border: `1px solid ${f.designation.includes('HOD') || f.designation === 'Professor'
-                            ? 'rgba(10,35,81,0.2)'
-                            : f.designation.includes('Associate')
-                              ? 'rgba(201,168,76,0.3)'
-                              : 'rgba(0,0,0,0.1)'}`,
-                        }}>
-                          {f.designation}
-                        </span>
-                      </td>
-                      <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text-light)' }}>{f.qualification}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </section>
+        <div id="faculty" style={{ scrollMarginTop: NAV_OFFSET }}>
+          <FacultyCarousel
+            faculty={faculty}
+            departmentName={deptTitle || program.name}
+            title="Learn from our impactful faculty"
+            viewMoreLink="/faculty"
+          />
+        </div>
       )}
 
       {/* Mind Map */}
@@ -640,42 +758,71 @@ function SingleProgramDetail() {
         </section>
       )}
 
-      {/* Laboratories */}
+      {/* Laboratories (Italian-Inspired Sleek Showcase) */}
       {hasLabs && (
-        <section id="labs" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
+        <section id="labs" className="dept-labs-section" style={{ scrollMarginTop: NAV_OFFSET }}>
           <div className="container">
-            <div style={{ marginBottom: 'var(--space-10)' }}>
-              <span className="section-label">Infrastructure</span>
-              <h2 className="section-title">Laboratories</h2>
-              <p className="section-desc">State-of-the-art laboratory facilities that bring coursework to life with hands-on, industry-relevant experimentation.</p>
+            <div className="dept-labs-header">
+              <div className="dept-labs-title-wrap">
+                <span className="section-label dept-section-label">State-of-the-Art Infrastructure</span>
+                <h2 className="section-title">Specialized Laboratories</h2>
+                <p className="section-desc" style={{ margin: '0.5rem 0 0 0' }}>
+                  Industry-aligned experimental facilities engineered for hands-on technical immersion, advanced computing, and multidisciplinary project incubation.
+                </p>
+              </div>
+              <div className="dept-labs-count-pill">
+                <span className="dept-labs-count-dot" />
+                <span>{labs.length} Active Facilities</span>
+              </div>
             </div>
-            <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 'var(--space-4)' }}>
+
+            <div className="dept-labs-grid">
               {labs.map((lab, li) => {
-                const tileStyle = { background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', display: 'flex', alignItems: 'center', gap: 'var(--space-4)', borderLeft: '4px solid var(--color-accent)' };
-                const content = (
-                  <>
-                    <Microscope size={22} strokeWidth={1.75} style={{ flexShrink: 0, color: 'var(--color-accent)' }} />
-                    <span style={{ display: 'flex', flexDirection: 'column', gap: '0.15rem' }}>
-                      <span style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-primary)', lineHeight: 1.4 }}>{lab.name}</span>
-                      {/* Tile always stays visible even with no PDF yet — just marked
-                          unavailable, same convention as the Newsletter issues above. */}
-                      {!lab.pdfUrl && (
-                        <span style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', fontStyle: 'italic' }}>
-                          PDF not available
+                const indexNum = String(li + 1).padStart(2, '0');
+
+                return (
+                  <div key={li} className="dept-lab-card">
+                    <div>
+                      <div className="dept-lab-card-top">
+                        <span className="dept-lab-index-tag">{indexNum}</span>
+                        <div className="dept-lab-icon-wrap">
+                          <Microscope size={18} strokeWidth={2.2} />
+                        </div>
+                      </div>
+
+                      <div className="dept-lab-body">
+                        <span className="dept-lab-overline">Practical & Research Facility</span>
+                        <h3 className="dept-lab-title">{lab.name}</h3>
+                        <p className="dept-lab-spec-desc">
+                          Equipped with high-performance workstations, licensed toolsets, and dedicated experimental apparatus.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="dept-lab-footer">
+                      {lab.pdfUrl ? (
+                        <a
+                          href={lab.pdfUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="dept-lab-pdf-btn"
+                          aria-label={`View ${lab.name} manual`}
+                        >
+                          <span className="dept-lab-pdf-btn-label">
+                            <FileText size={13} strokeWidth={2.4} />
+                            <span>Lab Manual & Specs</span>
+                          </span>
+                          <span className="dept-btn-arrow-circle">
+                            <ArrowRight size={12} strokeWidth={2.5} />
+                          </span>
+                        </a>
+                      ) : (
+                        <span className="dept-lab-status-tag">
+                          <span className="dept-lab-live-dot" />
+                          <span>Active Department Lab</span>
                         </span>
                       )}
-                    </span>
-                  </>
-                );
-                // Opens this lab's own PDF straight from Firebase Storage in a new
-                // tab — only when one has been uploaded via /admin → Programs.
-                return lab.pdfUrl ? (
-                  <a key={li} href={lab.pdfUrl} target="_blank" rel="noopener noreferrer" style={{ ...tileStyle, textDecoration: 'none' }}>
-                    {content}
-                  </a>
-                ) : (
-                  <div key={li} style={tileStyle}>
-                    {content}
+                    </div>
                   </div>
                 );
               })}
@@ -764,52 +911,23 @@ function SingleProgramDetail() {
                 </div>
               </>
             )}
-            <div id="placement-records-table">
-              <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 800, color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 'var(--space-3)' }}>
-                Placement Records
-              </h3>
-              {placementRows.length > 0 ? (
-                <>
-                  <div className="placement-page-size">
-                    Show
-                    <select
-                      value={placementPageSize}
-                      onChange={(e) => setPlacementPageSize(e.target.value === 'all' ? 'all' : Number(e.target.value))}
-                    >
-                      <option value={10}>10</option>
-                      <option value={25}>25</option>
-                      <option value={50}>50</option>
-                      <option value={100}>100</option>
-                      <option value="all">All</option>
-                    </select>
-                    entries
-                  </div>
-                  <div className="pb-activities-scroll">
-                    <table>
-                      <thead>
-                        <tr>
-                          <th className="pb-activities-num">S.No</th>
-                          {visiblePlacementColumnIndices.map((ci) => <th key={ci}>{placementColumns[ci]}</th>)}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {visiblePlacementRows.map((row, ri) => (
-                          <tr key={ri}>
-                            <td className="pb-activities-num">{ri + 1}</td>
-                            {visiblePlacementColumnIndices.map((ci) => (
-                              <td key={ci}>{ci === placementPkgIdx ? formatPackageCell(row.cells[ci] ?? '') : (row.cells[ci] ?? '')}</td>
-                            ))}
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                  <p className="placement-page-info">
-                    Showing 1 to {visiblePlacementRows.length} of {placementRows.length} entries
-                  </p>
-                </>
+            <div id="placement-records-table" style={{ marginTop: 'var(--space-8)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-4)', flexWrap: 'wrap', gap: '0.75rem' }}>
+                <div>
+                  <span className="section-label dept-section-label">Student Success</span>
+                  <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: '1.2rem', fontWeight: 800, color: 'var(--color-primary-dark)', margin: '0.2rem 0 0 0' }}>
+                    Career Offers &amp; Recruiters ({activePlacementYear?.year})
+                  </h3>
+                </div>
+                <span style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--color-accent)', background: 'rgba(201, 168, 76, 0.12)', border: '1px solid rgba(201, 168, 76, 0.3)', borderRadius: '9999px', padding: '0.3rem 0.85rem' }}>
+                  {placementRows.length} Verified Offers
+                </span>
+              </div>
+
+              {placementMarqueeItems.length > 0 ? (
+                <TestimonialMarquee records={placementMarqueeItems} />
               ) : (
-                <p style={{ color: 'var(--color-text-light)', fontStyle: 'italic' }}>
+                <p style={{ color: 'var(--color-text-light)', fontStyle: 'italic', padding: '1.5rem 0' }}>
                   No placement records uploaded yet for {activePlacementYear?.year}.
                 </p>
               )}
@@ -818,101 +936,140 @@ function SingleProgramDetail() {
         </section>
       )}
 
-      {/* Department Library */}
+      {/* Department Library (Italian-Inspired 3-Column Grid Showcase) */}
       {hasLibrary && (
         <section id="library" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label">Resources</span>
+              <span className="section-label dept-section-label">Academic Repository</span>
               <h2 className="section-title">Department Library</h2>
             </div>
-            {program.libraryIntro && (
-              <BodyBlocks
-                blocks={parseBodyContent(program.libraryIntro)}
-                paragraphStyle={{ color: 'var(--color-text)', lineHeight: 1.85, fontSize: 'var(--text-base)' }}
-              />
-            )}
-            {program.libraryInCharge && (
-              <p style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', color: 'var(--color-text)', fontSize: 'var(--text-sm)', marginBottom: libraryTables.length > 0 ? 'var(--space-6)' : 0 }}>
-                <BookOpen size={16} strokeWidth={1.75} style={{ color: 'var(--color-accent)', flexShrink: 0 }} />
-                <strong style={{ color: 'var(--color-primary)' }}>In-charge of Department Library:</strong> {program.libraryInCharge}
-              </p>
-            )}
-            {libraryTables.map((sec, si) => (
-              <div key={si} style={{ marginBottom: si === libraryTables.length - 1 ? 0 : 'var(--space-8)' }}>
-                <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.1rem', color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>
-                  {sec.heading}
-                </h3>
-                <div className="pb-activities-scroll">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th className="pb-activities-num">S. No</th>
-                        <th>Item</th>
-                        <th>Count</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {sec.items.map((item, ii) => (
-                        <tr key={ii}>
-                          <td className="pb-activities-num">{ii + 1}</td>
-                          <td>{item.label}</td>
-                          <td>{item.value}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+
+            <div className="dept-library-container">
+              {program.libraryIntro && (
+                <div style={{ maxWidth: 840 }}>
+                  <BodyBlocks
+                    blocks={parseBodyContent(program.libraryIntro)}
+                    paragraphStyle={{ color: 'var(--color-text)', lineHeight: 1.85, fontSize: 'var(--text-base)' }}
+                  />
                 </div>
-              </div>
-            ))}
+              )}
+
+              {program.libraryInCharge && (
+                <div className="dept-library-incharge-card">
+                  <div className="dept-library-incharge-icon-wrap">
+                    <BookOpen size={22} strokeWidth={2.2} />
+                  </div>
+                  <div>
+                    <div className="dept-library-incharge-label">In-Charge of Department Library</div>
+                    <h3 className="dept-library-incharge-name">{program.libraryInCharge}</h3>
+                  </div>
+                </div>
+              )}
+
+              {libraryTables.map((sec, si) => (
+                <div key={si} className="dept-library-tables-group">
+                  <div className="dept-library-group-header">
+                    <h3 className="dept-library-group-title">
+                      {sec.heading}
+                    </h3>
+                    <span style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--color-accent)', background: 'rgba(201, 168, 76, 0.12)', border: '1px solid rgba(201, 168, 76, 0.25)', borderRadius: '9999px', padding: '0.25rem 0.75rem' }}>
+                      {sec.items.length} Resource Categories
+                    </span>
+                  </div>
+
+                  <div className="dept-library-grid-3">
+                    {sec.items.map((item, ii) => {
+                      const icons = [BookMarked, Bookmark, Library, FileText, BookOpen];
+                      const IconComp = icons[ii % icons.length];
+                      const numStr = String(ii + 1).padStart(2, '0');
+                      return (
+                        <div key={ii} className="dept-library-card">
+                          <div className="dept-library-card-top">
+                            <span className="dept-library-num-badge">{numStr}</span>
+                            <div className="dept-library-icon-badge">
+                              <IconComp size={18} strokeWidth={2.2} />
+                            </div>
+                          </div>
+                          <div>
+                            <div className="dept-library-value">{item.value}</div>
+                            <div className="dept-library-label">{item.label}</div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
       )}
 
-      {/* News & Events — admin-defined academic-year tables (Programs admin's
-          "News & Events — Department Page"), same rendering as the AI/CSE/ECE
-          grouped department page. */}
+      {/* News & Events — Collapsible / Expandable Academic Year Tables */}
       {hasNewsEventsYears && (
         <section id="news-events" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label">{program.shortName || program.name}</span>
+              <span className="section-label dept-section-label">{program.shortName || program.name}</span>
               <h2 className="section-title">News &amp; Events</h2>
             </div>
-            {newsEventsYears.map((yr, yi) => (
-              <div key={yi} style={{ marginBottom: yi === newsEventsYears.length - 1 ? 0 : 'var(--space-8)' }}>
-                <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.1rem', color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>
-                  Academic Year :: {yr.year}
-                </h3>
-                <div className="pb-activities-scroll">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th className="pb-activities-num">S.No</th>
-                        {yr.columns.map((col, ci) => <th key={ci}>{col}</th>)}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {yr.rows.map((row, ri) => (
-                        <tr key={ri}>
-                          <td className="pb-activities-num">{ri + 1}</td>
-                          {yr.columns.map((_, ci) => <td key={ci}>{row.cells[ci] ?? ''}</td>)}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            ))}
+
+            <div className="dept-news-accordion">
+              {newsEventsYears.map((yr, yi) => {
+                const isOpen = openNewsYears.size === 0 && yi === 0 ? true : openNewsYears.has(yr.year);
+                return (
+                  <div key={yr.year || yi} className={`dept-news-accordion-item${isOpen ? ' open' : ''}`}>
+                    <button
+                      type="button"
+                      className="dept-news-accordion-header"
+                      onClick={() => toggleNewsYear(yr.year)}
+                      aria-expanded={isOpen}
+                      aria-controls={`news-table-${yi}`}
+                    >
+                      <div className="dept-news-accordion-header-left">
+                        <div className="dept-news-year-pill">
+                          <Calendar size={18} strokeWidth={2.2} style={{ color: 'var(--color-accent)' }} />
+                          <span>Academic Year :: {yr.year}</span>
+                        </div>
+                        <span className="dept-news-count-badge">
+                          {yr.rows.length} Activities &amp; Events
+                        </span>
+                      </div>
+                      <div className="dept-news-chevron-circle" aria-hidden="true">
+                        <ChevronDown size={18} strokeWidth={2.4} />
+                      </div>
+                    </button>
+
+                    <SmoothCollapse open={isOpen}>
+                      <div id={`news-table-${yi}`} className="dept-news-accordion-content">
+                        <div className="pb-activities-scroll" role="region" aria-label={`News and events for academic year ${yr.year}`} tabIndex={0}>
+                          <table>
+                            <thead>
+                              <tr>
+                                <th className="pb-activities-num" scope="col">S.No</th>
+                                {yr.columns.map((col, ci) => <th key={ci} scope="col">{col}</th>)}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {yr.rows.map((row, ri) => (
+                                <tr key={ri}>
+                                  <td className="pb-activities-num">{ri + 1}</td>
+                                  {yr.columns.map((_, ci) => <td key={ci}>{row.cells[ci] ?? ''}</td>)}
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </SmoothCollapse>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </section>
       )}
-
-      {/* News & Events — live from the departmentNews collection, tagged to
-          this program. Both this and the admin-defined table above are
-          available to every programme now; each one only appears once an
-          admin has actually filled it in. */}
-      <DepartmentNewsSection programSlug={program.slug} background="var(--color-off-white)" />
 
       {/* Newsletter — issues grouped by academic year; columns are however
           many issues the "longest" year has, admin-uploaded PDFs open in a

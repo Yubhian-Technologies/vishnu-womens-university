@@ -29,7 +29,9 @@ export default function NewsCard({ article, className = '' }: NewsCardProps) {
         <span className="news-card-category">{article.category}</span>
       </div>
       <div className="news-card-body">
-        <time className="news-card-date" dateTime={article.date}>{article.date}</time>
+        <time className="news-card-date" dateTime={article.date}>
+          <i className="fa-solid fa-calendar-days" aria-hidden="true" /> {article.date}
+        </time>
         <Link to={article.path} className="news-card-title">
           {article.title}
         </Link>
@@ -37,9 +39,7 @@ export default function NewsCard({ article, className = '' }: NewsCardProps) {
         <div className="news-card-footer">
           <Link to={article.path} className="news-card-link">
             Read More
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-              <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+            <i className="fa-solid fa-arrow-right" aria-hidden="true" />
           </Link>
         </div>
       </div>

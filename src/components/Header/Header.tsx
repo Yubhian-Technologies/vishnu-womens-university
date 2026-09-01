@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ChevronDown, ExternalLink, ArrowUpRight } from 'lucide-react';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useNavLinkOverride } from '../../hooks/useNavLinkOverride';
 import type { ProgramDoc } from '../../pages/Admin/sections/ProgramsAdmin';
@@ -9,19 +9,6 @@ import type { DifferentiatorItemDoc } from '../../pages/Admin/sections/Different
 import type { PlacementItemDoc } from '../../pages/Admin/sections/PlacementItemsAdmin';
 import SmoothCollapse from '../SmoothCollapse/SmoothCollapse';
 import './Header.css';
-
-// Straight diagonal dividers for the header's two dark end-sections (logo
-// section on the left, Visit/Give/Apply section on the right — see
-// .header-end/.header-end-wave in Header.css). Each is a plain slanted cut
-// tracing the boundary where the dark section meets the white nav area in
-// the middle; drawn as a dark shape on top of the header's own white base,
-// so the straight top/bottom/outer edges need no explicit drawing.
-// The logo end uses its own (wider, opposite-direction) slant so the
-// diagonal clears the logo instead of cutting across it; the CTA end keeps
-// the original slant, mirrored via the --mirror CSS transform.
-const END_WAVE_VIEWBOX = '0 0 220 64';
-const LOGO_WAVE_PATH = 'M0,0 H195 L155,64 H0 Z';
-const CTA_WAVE_PATH = 'M0,0 H140 L180,64 H0 Z';
 
 interface NavChild {
   label: string;
@@ -43,16 +30,25 @@ interface NavItem {
   path?: string;
   children?: NavChild[];
   groups?: NavGroup[];
+  highlight?: {
+    title: string;
+    description: string;
+    badge?: string;
+    linkText?: string;
+    linkPath?: string;
+  };
 }
 
-const navItems: NavItem[] = [
+const navItemsData: NavItem[] = [
   {
-    // "Discover"'s old groups (Governance/Committees/IQAC) now live here
-    // too, alongside About Us's own items — no longer its own top-level
-    // nav item. Committees (13 items) auto-splits into two sub-columns
-    // (see .mega-group-list.cols-2 in Header.css). Information dropped
-    // (2026-08-13) since it's now under Academics instead.
     label: 'About Us',
+    highlight: {
+      title: 'Vishnu Women\'s University',
+      badge: 'About SVES',
+      description: 'Pioneering women\'s engineering education under Sri Vishnu Educational Society with world-class infrastructure and values.',
+      linkText: 'Explore Campus',
+      linkPath: '/about',
+    },
     groups: [
       {
         groupLabel: 'About Us',
@@ -87,7 +83,6 @@ const navItems: NavItem[] = [
           { label: 'Faculty Grievance Redressal', path: '/governance/faculty-grievance' },
           { label: 'Student Grievance Redressal', path: '/governance/student-grievance' },
           { label: 'Central Purchase Committee', path: '/governance/central-purchase' },
-          { label: 'Counselling & Monitoring', path: '/governance/counselling-monitoring' },
           { label: 'Anti Ragging Committee', path: '/governance/anti-ragging' },
           { label: 'Internal Committee (POSH)', path: '/governance/internal-committee' },
           { label: 'SC/ST Cell', path: '/governance/sc-st-cell' },
@@ -108,11 +103,14 @@ const navItems: NavItem[] = [
     ],
   },
   {
-    // UG/PG/Ph.D. Programmes groups are spliced in at render time from live
-    // Firestore `programs` data — see renderedNavItems in Header() — so
-    // this menu always matches whatever's actually configured in the
-    // Programs admin section rather than a hardcoded, driftable list.
     label: 'Academics',
+    highlight: {
+      title: 'Academic Excellence',
+      badge: 'Autonomous',
+      description: 'Industry-aligned curriculum, multidisciplinary research, distinguished faculty, and hands-on laboratory learning.',
+      linkText: 'All Programs',
+      linkPath: '/academics',
+    },
     groups: [
       {
         groupLabel: 'Overview',
@@ -122,9 +120,9 @@ const navItems: NavItem[] = [
           { label: 'Schools', path: '/academics/schools' },
           { label: 'Departments', path: '/academics/departments' },
           { label: 'Programs', path: '/academics/programs' },
-          { label: 'Faculty', path: '/faculty' },
+          { label: 'Faculty Directory', path: '/faculty' },
           { label: 'Result Analysis', path: '/result-analysis' },
-          { label: 'Examinations', path: 'https://www.svecwexams.in/', external: true },
+          { label: 'Examinations Portal', path: 'https://www.svecwexams.in/', external: true },
         ],
       },
       { groupLabel: 'UG Programmes', groupPath: '/academics?tab=btech', items: [] },
@@ -145,23 +143,31 @@ const navItems: NavItem[] = [
   },
   {
     label: 'Admissions',
+    highlight: {
+      title: 'Join VWU',
+      badge: 'Admissions 2026-27',
+      description: 'Empowering future women engineers, researchers, and innovators. Transparent admission process and merit scholarships.',
+      linkText: 'Fee Structure',
+      linkPath: '/programmes-fee-structure',
+    },
     children: [
       { label: 'Admissions Overview', path: '/admissions' },
       { label: 'Programmes & Fee Structure', path: '/programmes-fee-structure' },
       { label: 'Admission Procedure', path: '/admission-procedure' },
       { label: 'Result Analysis', path: '/result-analysis' },
       { label: 'Fee Payment Portal', path: 'https://svecw.ac.in/Default.aspx?ReturnUrl=%2f', external: true },
-      { label: 'How to Reach', path: '/information#how-to-reach' },
+      { label: 'How to Reach Campus', path: '/information#how-to-reach' },
     ],
   },
   {
-    // Was a group inside Research's mega-menu — now its own top-level item.
-    // Category groups' items are spliced in at render time from live
-    // Firestore `differentiatorItems` data — see renderedNavItems in
-    // Header() — so the dropdown always lists the actual differentiators
-    // configured in the Differentiators admin section rather than a
-    // hardcoded, driftable list.
     label: 'Differentiators',
+    highlight: {
+      title: 'Distinctive Edge',
+      badge: 'Unique Initiatives',
+      description: 'From assistive technology labs and micro-manufacturing to student radio and innovation ecosystems.',
+      linkText: 'View All Initiatives',
+      linkPath: '/differentiators',
+    },
     groups: [
       ...DIFFERENTIATOR_CATEGORIES.map((cat) => ({
         groupLabel: cat.label,
@@ -171,70 +177,78 @@ const navItems: NavItem[] = [
     ],
   },
   {
-    // Children are spliced in at render time from live Firestore
-    // `placementItems` data (the same collection that drives the "Explore
-    // Placements at VWU" cards) — see renderedNavItems in Header() — so a
-    // sub-page added in the admin's Placement Sub-pages section shows up
-    // here automatically instead of needing a matching hardcoded entry.
     label: 'Placements',
+    highlight: {
+      title: 'Top Tier Placements',
+      badge: '90%+ Track Record',
+      description: 'Leading global recruiters, career development training, and exceptional internship opportunities.',
+      linkText: 'Placement Insights',
+      linkPath: '/placements',
+    },
     children: [],
   },
   {
-    // Flat list (no sub-groups) — was a 3-group mega-menu, collapsed to
-    // match the flat dropdown style used by Placements/Admissions.
     label: 'Research',
+    highlight: {
+      title: 'Innovation & Patents',
+      badge: '50+ Patents Filed',
+      description: 'DST & AICTE funded projects, collaborative research centers, and cutting-edge publications.',
+      linkText: 'R&D Overview',
+      linkPath: '/research/about-rd',
+    },
     children: [
       { label: 'About R&D', path: '/research/about-rd' },
       { label: 'Research Advisory Committee', path: '/research/research-advisory-committee' },
       { label: 'Research Ethics Committee', path: '/research/research-ethics-committee' },
-      { label: 'Intellectual Property Rights (IPR) Committee', path: '/research/ipr-committee' },
+      { label: 'Intellectual Property Rights (IPR)', path: '/research/ipr-committee' },
       { label: 'Thrust Areas of Research', path: '/research/thrust-areas-of-research' },
       { label: 'Research Centers', path: '/research/research-centers' },
       { label: 'Funded Projects', path: '/research/funded-projects' },
       { label: 'Seed Money Projects', path: '/research/seed-money-projects' },
       { label: 'Research Publications', path: '/research/research-publications' },
-      { label: 'MoUs', path: '/research/mous' },
+      { label: 'MoUs & Collaborations', path: '/research/mous' },
       { label: 'Patents', path: '/research/patents' },
       { label: 'Consultancy', path: '/research/consultancy' },
       { label: 'Professional Bodies', path: '/research/professional-bodies' },
     ],
   },
   {
-    // Flat list (no sub-groups) — was a 2-group Campus Facilities/Student
-    // Life mega-menu, collapsed to match the flat dropdown style used by
-    // Placements/Admissions/Research. Radio Vishnu 90.4 has no page of its
-    // own — it reuses its existing Differentiators detail page rather than
-    // pointing at a route that doesn't exist.
     label: 'Campus Life',
+    highlight: {
+      title: 'Vibrant Green Campus',
+      badge: 'Life at VWU',
+      description: 'Lush green residential campus with modern sports facilities, amphitheaters, radio station, and student clubs.',
+      linkText: 'Explore Facilities',
+      linkPath: '/campus/central-library',
+    },
     children: [
       { label: 'Smart Class Rooms', path: '/campus/smart-classrooms' },
       { label: 'State-of-the-art Labs', path: '/campus/state-of-the-art-labs' },
       { label: 'Central Library', path: '/campus/central-library' },
-      { label: 'Auditoriums', path: '/campus/auditoriums' },
+      { label: 'Auditoriums & Amphitheaters', path: '/campus/auditoriums' },
       { label: 'Campus Book Stores', path: '/campus/campus-book-stores' },
       { label: 'Wi-Fi Campus', path: '/campus/wifi-campus' },
       { label: 'Campus Hostels', path: '/campus/campus-hostels' },
-      { label: 'Food Courts', path: '/campus/food-courts' },
+      { label: 'Food Courts & Cafeterias', path: '/campus/food-courts' },
       { label: 'VISHNU Fitness Centre', path: '/campus/fitness-centre' },
-      { label: 'Staff Quarters', path: '/campus/staff-quarters' },
-      { label: 'Travel Desk', path: '/campus/travel-desk' },
-      { label: 'Temples', path: '/campus/temples' },
-      { label: 'Health Care', path: '/campus/health-care' },
-      { label: 'Swimming Pool', path: '/campus/swimming-pool' },
-      { label: 'Campus Security', path: '/campus/campus-security' },
+      { label: 'Health Care Centre', path: '/campus/health-care' },
+      { label: 'Swimming Pool & Sports', path: '/campus/swimming-pool' },
       { label: 'Radio Vishnu 90.4', path: '/differentiators/radio-vishnu-diff' },
       { label: 'Vishnu TV Academy', path: '/vishnu-tv-academy' },
       { label: 'Student Clubs', path: '/student-clubs' },
-      { label: 'Social Services', path: '/social-services' },
-      { label: 'Campus Magazines', path: '/campus-magazines' },
       { label: 'Arts & Culture', path: '/arts-culture' },
       { label: 'Sports & Games', path: '/sports-games' },
     ],
   },
   {
-    // Alumni & Giving used to live here as a second group — it now has its
-    // own place in the Footer (see Footer.tsx) instead of the header nav.
     label: 'News & Events',
+    highlight: {
+      title: 'Happenings & Accolades',
+      badge: 'NAAC A+ & NBA',
+      description: 'Stay updated with upcoming conferences, hackathons, guest lectures, and institutional recognitions.',
+      linkText: 'View Gallery',
+      linkPath: '/news-awards/gallery',
+    },
     groups: [
       {
         groupLabel: 'News & Events',
@@ -242,8 +256,8 @@ const navItems: NavItem[] = [
         items: [
           { label: 'Upcoming Events', path: '/news-awards/happenings#upcoming-events' },
           { label: 'Recent Events', path: '/news-awards/happenings#recent-events' },
-          { label: 'Gallery', path: '/news-awards/gallery' },
-          { label: 'Vishnu Era', path: 'https://www.srivishnu.edu.in/vishnu-era/', external: true },
+          { label: 'Photo & Video Gallery', path: '/news-awards/gallery' },
+          { label: 'Vishnu Era Newsletter', path: 'https://www.srivishnu.edu.in/vishnu-era/', external: true },
           { label: 'Prathibha Magazine', path: 'https://heyzine.com/flip-book/088b7b5629.html#page/54', external: true },
         ],
       },
@@ -251,7 +265,7 @@ const navItems: NavItem[] = [
         groupLabel: 'Accreditations & Rankings',
         groupPath: '/news-awards/accreditations-awards',
         items: [
-          { label: 'Accreditations', path: '/news-awards/accreditations-awards#accreditation' },
+          { label: 'Accreditations (NAAC, NBA)', path: '/news-awards/accreditations-awards#accreditation' },
           { label: 'Rankings & Awards', path: '/news-awards/accreditations-awards#ranking' },
         ],
       },
@@ -259,49 +273,53 @@ const navItems: NavItem[] = [
   },
   {
     label: 'Contact',
+    highlight: {
+      title: 'Get in Touch',
+      badge: 'Bhimavaram Campus',
+      description: 'Vishnupur, Bhimavaram, West Godavari District, Andhra Pradesh - 534202. We are here to help.',
+      linkText: 'Contact Details',
+      linkPath: '/contact',
+    },
     children: [
       { label: 'Contact Us', path: '/contact' },
-      { label: 'How to Reach', path: '/information#how-to-reach' },
+      { label: 'How to Reach Campus', path: '/information#how-to-reach' },
     ],
   },
 ];
 
 export default function Header() {
+  const [mounted, setMounted] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const mobileMenuRef = useRef<HTMLDivElement>(null);
-  // Single source of truth for which desktop dropdown is open — set by
-  // hover, keyboard focus, and click alike. Previously hover (via CSS
-  // :hover/:focus-within) and click (via a separate "force closed" flag)
-  // were two independent mechanisms layered on top of each other, and the
-  // force-closed flag got cleared on mouseleave — so so much as jiggling the
-  // mouse off and back onto an item you'd just clicked closed would let
-  // hover silently reopen it. Routing both through one state means the most
-  // recent interaction (of either kind) is simply what's true; there's
-  // nothing left for them to disagree about.
   const [openItem, setOpenItem] = useState<string | null>(null);
+  const [hoverPillStyle, setHoverPillStyle] = useState<{
+    left: number;
+    top: number;
+    width: number;
+    height: number;
+    opacity: number;
+  }>({
+    left: 0,
+    top: 0,
+    width: 0,
+    height: 0,
+    opacity: 0,
+  });
+
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
   const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
-  const [expandedSubItem, setExpandedSubItem] = useState<string | null>(null);
-  const location = useLocation();
-  const navRef = useRef<HTMLElement>(null);
-  const megaRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  // Header's Apply Now button — admin can repoint it (e.g. to a specific
-  // admissions cycle or an external application portal) without a deploy.
+  const location = useLocation();
+  const navContainerRef = useRef<HTMLDivElement>(null);
+  const navListRef = useRef<HTMLUListElement>(null);
+  const navItemRefs = useRef<Record<string, HTMLLIElement | null>>({});
+  const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Dynamic overrides and data hooks
   const headerApplyNow = useNavLinkOverride('header-apply-now', '/admissions');
-  // About Us → Organizational Chart — admin can replace the chart image
-  // without a code deploy (see NavLinkOverridesAdmin's upload button).
   const orgChart = useNavLinkOverride('header-organizational-chart', '/downloads/SVECWOrganizationChart.jpg');
 
   const { docs: programs } = useOrderedCollection<ProgramDoc>('programs', 'order');
-  // Both VLSI programs (B.Tech "Electronics Engineering [VSLI Design &
-  // Technology]", slug EVT — note the name has a real typo, "VSLI" not
-  // "VLSI" — and M.Tech "VLSI Design") route to the ECE B.Tech page instead
-  // of their own program detail page — there's no separate VLSI page to
-  // link to, so the nav entry still needs to go somewhere useful. Matched
-  // on slug as well as name so the EVT typo can't cause this to silently
-  // stop working.
   const isVlsiProgram = (p: ProgramDoc) =>
     p.slug.toUpperCase() === 'EVT' || /VLSI|VSLI/.test(p.name.toUpperCase());
   const programItem = (p: ProgramDoc): NavChild => ({
@@ -315,9 +333,61 @@ export default function Header() {
   const { docs: differentiatorItems } = useOrderedCollection<DifferentiatorItemDoc>('differentiatorItems', 'order');
   const { docs: placementItems } = useOrderedCollection<PlacementItemDoc>('placementItems', 'order');
 
-  const renderedNavItems: NavItem[] = navItems.map((item) => {
-    // About Us → Organizational Chart's target is admin-replaceable — see
-    // orgChart above.
+  // Entrance transition trigger (150ms after load)
+  useEffect(() => {
+    const timer = setTimeout(() => setMounted(true), 150);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Scroll detection
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 24);
+      setOpenItem(null);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Route change reset
+  useEffect(() => {
+    setMobileOpen(false);
+    setExpandedItem(null);
+    setExpandedGroup(null);
+    setOpenItem(null);
+    setHoverPillStyle((prev) => ({ ...prev, opacity: 0 }));
+  }, [location]);
+
+  // Lock body scroll when mobile drawer is open
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [mobileOpen]);
+
+  // Click outside to dismiss mega menu
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (navContainerRef.current && !navContainerRef.current.contains(e.target as Node)) {
+        setOpenItem(null);
+        setHoverPillStyle((prev) => ({ ...prev, opacity: 0 }));
+      }
+    };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setOpenItem(null);
+        setHoverPillStyle((prev) => ({ ...prev, opacity: 0 }));
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
+  // Build rendered items with dynamic Firestore data
+  const renderedNavItems: NavItem[] = navItemsData.map((item) => {
     if (item.label === 'About Us' && item.groups) {
       const groups = item.groups.map((group) => {
         if (group.groupLabel !== 'About Us') return group;
@@ -332,9 +402,6 @@ export default function Header() {
       });
       return { ...item, groups };
     }
-    // Academics' UG/PG/Ph.D. Programmes groups are populated here from live
-    // Firestore data since navItems itself is a module-level constant and
-    // can't hold live data directly — see the "Overview" comment above.
     if (item.label === 'Academics' && item.groups) {
       const groups = item.groups.map((group) => {
         if (group.groupLabel === 'UG Programmes') return { ...group, items: ugProgrammes };
@@ -344,9 +411,6 @@ export default function Header() {
       });
       return { ...item, groups };
     }
-    // Category groups here are populated from live Firestore data since
-    // navItems itself is a module-level constant — see differentiatorItems
-    // above. The "Overview" group keeps its hardcoded "All Differentiators" link.
     if (item.label === 'Differentiators' && item.groups) {
       const groups = item.groups.map((group) => {
         const cat = DIFFERENTIATOR_CATEGORIES.find((c) => c.label === group.groupLabel);
@@ -364,8 +428,6 @@ export default function Header() {
       });
       return { ...item, groups };
     }
-    // Placements' dropdown mirrors the "Explore Placements at VWU" cards on
-    // the Placements page one-for-one — see the "Overview" comment above.
     if (item.label === 'Placements') {
       return {
         ...item,
@@ -379,475 +441,539 @@ export default function Header() {
     return item;
   });
 
-  const renderNavItem = (item: NavItem) => (
-    <li
-      key={item.label}
-      className={`nav-item${openItem === item.label ? ' nav-item--open' : ''}${(item.children?.length ?? 0) >= 9 ? ' nav-item--wide-dropdown' : ''}`}
-      onMouseEnter={() => setOpenItem(item.label)}
-      onFocus={() => setOpenItem(item.label)}
-      onMouseLeave={() => setOpenItem((prev) => (prev === item.label ? null : prev))}
-    >
-      <button
-        className="nav-link"
-        aria-haspopup="true"
-        aria-expanded={openItem === item.label}
-        onClick={() => setOpenItem((prev) => (prev === item.label ? null : item.label))}
-      >
-        <span className="nav-link-label">{item.label}</span>
-      </button>
-
-      {/* Flat dropdown */}
-      {item.children && (
-        <div className="dropdown" role="menu">
-          <ul className="dropdown-list">
-            {item.children.map((child, idx) => (
-              <li
-                key={child.label}
-                className={child.subItems ? 'dropdown-item--flyout-parent' : undefined}
-                // Placements' two-column split must land at an exact item
-                // (not wherever the browser's height-based column-balance
-                // happens to break it — a two-line label like "Graduate
-                // Study Abroad Center – GSAC" throws that off), so force
-                // the break explicitly rather than relying on column-count
-                // alone. Scoped to Placements only — every other wide
-                // dropdown keeps the default auto-balance behavior.
-                style={item.label === 'Placements' && item.children && idx === Math.ceil(item.children.length / 2) - 1 ? { breakAfter: 'column' } : undefined}
-              >
-                {child.disabled ? (
-                  <span className="dropdown-item" style={{ opacity: 0.5, cursor: 'default' }}>
-                    {child.label}
-                  </span>
-                ) : (child.external || child.download) ? (
-                  <a href={child.path} className="dropdown-item" role="menuitem" download={child.download} target={child.download ? undefined : '_blank'} rel="noopener noreferrer">
-                    {child.label}
-                    {!child.download && <span style={{ fontSize: '0.6rem', opacity: 0.5, marginLeft: 4 }}>↗</span>}
-                  </a>
-                ) : (
-                  <Link to={child.path} className="dropdown-item" role="menuitem">
-                    {child.label}
-                    {child.subItems && <span className="dropdown-item__chevron">›</span>}
-                  </Link>
-                )}
-                {child.subItems && (
-                  <ul className="dropdown-flyout" role="menu">
-                    {child.subItems.map((sub) => (
-                      <li key={sub.label}>
-                        {sub.disabled ? (
-                          <span className="dropdown-item" style={{ opacity: 0.5, cursor: 'default' }}>
-                            {sub.label}
-                          </span>
-                        ) : (sub.external || sub.download) ? (
-                          <a href={sub.path} className="dropdown-item" role="menuitem" download={sub.download} target={sub.download ? undefined : '_blank'} rel="noopener noreferrer">
-                            {sub.label}
-                          </a>
-                        ) : (
-                          <Link to={sub.path} className="dropdown-item" role="menuitem">
-                            {sub.label}
-                          </Link>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {/* Mega-menu dropdown */}
-      {item.groups && (
-        <div
-          className="dropdown dropdown-mega"
-          role="menu"
-          ref={(el) => { megaRefs.current[item.label] = el; }}
-        >
-          {item.groups.map((group) => (
-            <div key={group.groupLabel} className="mega-group">
-              {group.groupPath ? (
-                <Link to={group.groupPath} className="mega-group-label">
-                  {group.groupLabel}
-                </Link>
-              ) : (
-                <span className="mega-group-label">{group.groupLabel}</span>
-              )}
-              <ul className={`mega-group-list${group.items.length >= 9 ? ' cols-2' : ''}`}>
-                {group.items.map((child) => (
-                  <li key={child.label}>
-                    {child.disabled ? (
-                      <span className="dropdown-item" style={{ opacity: 0.5, cursor: 'default' }}>
-                        {child.label}
-                      </span>
-                    ) : (child.external || child.download) ? (
-                      <a href={child.path} className="dropdown-item" role="menuitem" download={child.download} target={child.download ? undefined : '_blank'} rel="noopener noreferrer">
-                        {child.label}
-                      </a>
-                    ) : (
-                      <Link to={child.path} className="dropdown-item" role="menuitem">
-                        {child.label}
-                      </Link>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-      )}
-    </li>
-  );
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-      // The header is sticky, so scrolling under a stationary cursor would
-      // otherwise leave a dropdown open while the page moves underneath it.
-      setOpenItem(null);
-      (document.activeElement as HTMLElement | null)?.blur();
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  // The two standard ways users expect to dismiss an open menu: clicking
-  // anywhere outside it, or pressing Escape.
-  useEffect(() => {
-    if (!openItem) return;
-    const handleClickOutside = (e: MouseEvent) => {
-      if (navRef.current && !navRef.current.contains(e.target as Node)) {
-        setOpenItem(null);
-      }
-    };
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpenItem(null);
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [openItem]);
-
-  // Mega-menus are centered on their trigger by default (see .dropdown-mega
-  // in Header.css), same as a flat dropdown — the width/height of the menu
-  // and the position of the trigger that opened it don't otherwise matter.
-  // The only time that changes is when centering would run the menu into
-  // one of the header's dark end-pods (e.g. Research, mid-bar, opening a
-  // wide menu can reach the Visit/Give/Apply pod on the right): then it's
-  // nudged left/right via --mega-shift just enough to clear that pod,
-  // rather than always anchoring to one side — which was the previous
-  // approach, and is exactly what made a menu look like it opened
-  // "sometimes centered, sometimes off to a side" depending on viewport
-  // width. Right-anchored menus (the last two nav items — see the
-  // nth-last-child rule in Header.css) don't need centering since right:0
-  // already positions them consistently; they still get the same nudge
-  // against the logo pod. Width is only reduced (via an explicit width,
-  // not max-width — min-width otherwise wins the conflict, and a
-  // shrink-to-fit auto width doesn't reliably fill a max-width budget
-  // once min-width is overridden to 0) if the menu genuinely can't fit
-  // even using the full gap between both pods.
-  useEffect(() => {
-    const el = openItem ? megaRefs.current[openItem] : null;
-    const triggerEl = el?.parentElement;
-    if (!el || !triggerEl) return;
-    el.style.minWidth = '';
-    el.style.width = '';
-    el.style.removeProperty('--mega-shift');
-    const idx = renderedNavItems.findIndex((i) => i.label === openItem);
-    const isRightAnchored = idx !== -1 && idx >= renderedNavItems.length - 2;
-    const logoEl = document.querySelector<HTMLElement>('.header-end--logo');
-    const ctaEl = document.querySelector<HTMLElement>('.header-end--cta');
-    if (!logoEl || !ctaEl) return;
-    const margin = 24;
-    const logoRect = logoEl.getBoundingClientRect();
-    const ctaRect = ctaEl.getBoundingClientRect();
-    const safeLeft = logoRect.right + margin;
-    const safeRight = ctaRect.left - margin;
-    // Width is trustworthy to read off the dropdown itself (transform
-    // doesn't affect it), but its *position* can still be mid-transition
-    // right after the reset above (transform is a transitioned property),
-    // so the natural, unshifted position is computed from the trigger's
-    // own (never-transformed) geometry instead of trusting the dropdown's
-    // own rect.left/right.
-    const width = el.getBoundingClientRect().width;
-    const triggerRect = triggerEl.getBoundingClientRect();
-
-    // Left as shrink-to-fit, the menu only ever renders at its own
-    // content's natural width — on anything wider than a fairly narrow
-    // desktop window that leaves real, unused room between it and the pod
-    // sitting completely unused instead of giving the columns more
-    // breathing room. STRETCH_CAP just keeps it from growing absurdly
-    // wide on an ultra-wide monitor.
-    const STRETCH_CAP = 960;
-
-    if (isRightAnchored) {
-      const available = triggerRect.right - logoRect.right - margin;
-      const finalWidth = available > 0 ? Math.min(available, STRETCH_CAP) : width;
-      if (finalWidth !== width) {
-        el.style.minWidth = '0';
-        el.style.width = `${finalWidth}px`;
-      }
-      const naturalLeft = triggerRect.right - finalWidth;
-      if (naturalLeft < safeLeft) {
-        el.style.setProperty('--mega-shift', `${safeLeft - naturalLeft}px`);
-      }
+  // Track hover pill capsule position directly targeting the button
+  const updateHoverPill = (label: string | null) => {
+    if (!label || !navListRef.current) {
+      setHoverPillStyle((prev) => ({ ...prev, opacity: 0 }));
       return;
     }
-
-    const available = safeRight - safeLeft;
-    const finalWidth = available > 0 ? Math.min(available, STRETCH_CAP) : width;
-    if (finalWidth !== width) {
-      el.style.minWidth = '0';
-      el.style.width = `${finalWidth}px`;
+    const li = navItemRefs.current[label];
+    if (!li) {
+      setHoverPillStyle((prev) => ({ ...prev, opacity: 0 }));
+      return;
     }
-    const naturalCenter = triggerRect.left + triggerRect.width / 2;
-    const naturalLeft = naturalCenter - finalWidth / 2;
-    const naturalRight = naturalCenter + finalWidth / 2;
-    let shift = 0;
-    if (naturalRight > safeRight) {
-      shift = safeRight - naturalRight;
-    } else if (naturalLeft < safeLeft) {
-      shift = safeLeft - naturalLeft;
-    }
-    if (shift !== 0) {
-      el.style.setProperty('--mega-shift', `${shift}px`);
-    }
-  }, [openItem, renderedNavItems]);
+    const btn = (li.querySelector('.nav-tab-btn') as HTMLElement) || li;
+    const listRect = navListRef.current.getBoundingClientRect();
+    const btnRect = btn.getBoundingClientRect();
 
-  useEffect(() => {
-    setMobileOpen(false);
-    setExpandedItem(null);
-    setExpandedGroup(null);
-    setExpandedSubItem(null);
-    setOpenItem(null);
-  }, [location]);
+    setHoverPillStyle({
+      left: btnRect.left - listRect.left,
+      top: btnRect.top - listRect.top,
+      width: btnRect.width,
+      height: btnRect.height,
+      opacity: 1,
+    });
+  };
 
-  useEffect(() => {
-    document.body.style.overflow = mobileOpen ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
-  }, [mobileOpen]);
-
-  // aria-hidden gets set on .mobile-menu the instant it closes (below) —
-  // if a link inside it (e.g. a submenu item just clicked, or one reached
-  // via Tab) still holds focus at that moment, marking its ancestor
-  // aria-hidden while it's focused is invalid and logs a console warning
-  // ("Blocked aria-hidden on an element because its descendant retained
-  // focus"). Move focus out first so that never happens.
-  useEffect(() => {
-    if (!mobileOpen && mobileMenuRef.current?.contains(document.activeElement)) {
-      (document.activeElement as HTMLElement)?.blur();
+  const handleNavHover = (label: string) => {
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
     }
-  }, [mobileOpen]);
+    setOpenItem(label);
+    updateHoverPill(label);
+  };
+
+  const handleNavLeave = () => {
+    closeTimeoutRef.current = setTimeout(() => {
+      setOpenItem(null);
+      setHoverPillStyle((prev) => ({ ...prev, opacity: 0 }));
+    }, 180);
+  };
+
+  const activeItemData = openItem ? renderedNavItems.find((item) => item.label === openItem) : null;
+  const isDropdownActive = Boolean(activeItemData && (activeItemData.groups || activeItemData.children));
+
+  const handleLogoClick = (e: React.MouseEvent) => {
+    if (location.pathname === '/') {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
 
   return (
-    <>
-      {/* Main Header — full-width edge-to-edge, no floating/inset look. One
-          continuous white strip with two dark end-sections (logo on the
-          left, Visit/Give/Apply on the right), each with a wavy inner
-          edge cut into the white — not a detached rounded pill. */}
-      <header className={`header${scrolled ? ' scrolled' : ''}`}>
-        <div className="header-bar">
-          {/* Logo section — dark, wave-edged on the right, flush at the
-              header's left edge. */}
-          <div className="header-end header-end--logo">
-            <svg className="header-end-wave" viewBox={END_WAVE_VIEWBOX} preserveAspectRatio="none" aria-hidden="true">
-              <path d={LOGO_WAVE_PATH} fill="var(--color-primary-dark)" stroke="var(--color-accent)" strokeWidth="2" />
-            </svg>
-            <Link to="/" className="logo" aria-label="Vishnu Women's University Home">
-              <img src="/images/logo.png" alt="VWU Logo" className="logo-icon" />
-            </Link>
-          </div>
+    <header className={`floating-navbar-root${mounted ? ' is-mounted' : ''}`}>
+      <div
+        ref={navContainerRef}
+        className={`floating-navbar-container${scrolled ? ' is-scrolled' : ''}${isDropdownActive ? ' is-expanded' : ''}${mobileOpen ? ' is-mobile-open' : ''}`}
+        onMouseEnter={() => {
+          if (closeTimeoutRef.current) {
+            clearTimeout(closeTimeoutRef.current);
+            closeTimeoutRef.current = null;
+          }
+        }}
+        onMouseLeave={handleNavLeave}
+      >
+        {/* Main Pill Island */}
+        <div className="navbar-pill">
+          {/* Left Brand Identity: Responsive Desktop Logo / Mobile Square Logo */}
+          <Link
+            to="/"
+            onClick={handleLogoClick}
+            className="navbar-brand-link"
+            aria-label="Vishnu Women's University - Home"
+          >
+            {/* Desktop Rectangular Full Logo */}
+            <img
+              src="/images/logo.png"
+              alt="Vishnu Women's University"
+              className="navbar-logo-img navbar-logo-desktop"
+            />
+            {/* Mobile Square Logo from Footer with typography */}
+            <div className="navbar-brand-mobile">
+              <img
+                src="/images/square%20logo.png"
+                alt="Vishnu Women's University Logo"
+                className="navbar-logo-square"
+              />
+              <div className="navbar-brand-mobile-text">
+                <span className="navbar-brand-m-name">Vishnu Women's</span>
+                <span className="navbar-brand-m-sub">University</span>
+              </div>
+            </div>
+          </Link>
 
-          {/* Desktop Nav — centered in the white middle section. */}
-          <nav className="nav" aria-label="Main navigation" ref={navRef}>
-            <ul className="nav-list">
-              {renderedNavItems.map(renderNavItem)}
+          {/* Center Navigation Tabs with Clean Labels & Sliding Hover Capsule */}
+          <nav className="navbar-nav" aria-label="Main Navigation">
+            <ul ref={navListRef} className="navbar-nav-list">
+              {/* GPU-accelerated Sliding Hover Capsule */}
+              <div
+                className="nav-sliding-pill"
+                style={{
+                  transform: `translate3d(${hoverPillStyle.left}px, ${hoverPillStyle.top}px, 0)`,
+                  width: `${hoverPillStyle.width}px`,
+                  height: `${hoverPillStyle.height}px`,
+                  opacity: hoverPillStyle.opacity,
+                }}
+              />
+
+              {renderedNavItems.map((item) => {
+                const isOpen = openItem === item.label;
+                return (
+                  <li
+                    key={item.label}
+                    ref={(el) => { navItemRefs.current[item.label] = el; }}
+                    className={`nav-tab-item${isOpen ? ' is-active' : ''}`}
+                    onMouseEnter={() => handleNavHover(item.label)}
+                    onFocus={() => handleNavHover(item.label)}
+                  >
+                    <button
+                      type="button"
+                      className="nav-tab-btn"
+                      aria-haspopup="true"
+                      aria-expanded={isOpen}
+                      onClick={() => {
+                        if (isOpen) {
+                          setOpenItem(null);
+                          setHoverPillStyle((prev) => ({ ...prev, opacity: 0 }));
+                        } else {
+                          handleNavHover(item.label);
+                        }
+                      }}
+                    >
+                      <span className="nav-tab-label">{item.label}</span>
+                    </button>
+                  </li>
+                );
+              })}
             </ul>
           </nav>
 
-          {/* Apply Now section — dark, wave-edged on the left (mirrored),
-              flush at the header's right edge. Its destination is
-              admin-editable (see headerApplyNow above). */}
-          <div className="header-end header-end--cta">
-            <svg className="header-end-wave header-end-wave--mirror" viewBox={END_WAVE_VIEWBOX} preserveAspectRatio="none" aria-hidden="true">
-              <path d={CTA_WAVE_PATH} fill="var(--color-primary-dark)" stroke="var(--color-accent)" strokeWidth="2" />
-            </svg>
-            <div className="header-ctas">
-              {headerApplyNow.external ? (
-                <a href={headerApplyNow.path} className="topbar-cta apply" target="_blank" rel="noopener noreferrer">
-                  Apply Now <ArrowRight size={16} strokeWidth={2.5} aria-hidden="true" />
-                </a>
-              ) : (
-                <Link to={headerApplyNow.path} className="topbar-cta apply">
-                  Apply Now <ArrowRight size={16} strokeWidth={2.5} aria-hidden="true" />
-                </Link>
+          {/* Right Action & Mobile Trigger */}
+          <div className="navbar-actions">
+            {/* Desktop CTA Pill */}
+            {headerApplyNow.external ? (
+              <a
+                href={headerApplyNow.path}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="navbar-cta-btn"
+              >
+                <span>Apply Now</span>
+                <span className="navbar-cta-icon-wrap">
+                  <ArrowRight size={13} strokeWidth={2.5} aria-hidden="true" />
+                </span>
+              </a>
+            ) : (
+              <Link to={headerApplyNow.path} className="navbar-cta-btn">
+                <span>Apply Now</span>
+                <span className="navbar-cta-icon-wrap">
+                  <ArrowRight size={13} strokeWidth={2.5} aria-hidden="true" />
+                </span>
+              </Link>
+            )}
+
+            {/* Mobile 2-Bar Animated Toggle */}
+            <button
+              type="button"
+              className={`navbar-mobile-toggle${mobileOpen ? ' is-open' : ''}`}
+              onClick={() => {
+                setMobileOpen(!mobileOpen);
+                setOpenItem(null);
+              }}
+              aria-label={mobileOpen ? 'Close Menu' : 'Open Navigation Menu'}
+              aria-expanded={mobileOpen}
+            >
+              <span className="mobile-toggle-bar bar-1" />
+              <span className="mobile-toggle-bar bar-2" />
+            </button>
+          </div>
+        </div>
+
+        {/* Desktop Attached Mega-Dropdown Menu */}
+        {activeItemData && isDropdownActive && (
+          <div
+            className="navbar-mega-dropdown"
+            role="region"
+            aria-label={`${activeItemData.label} Submenu`}
+          >
+            <div className="mega-dropdown-grid">
+              {/* If categorized groups exist */}
+              {activeItemData.groups && (
+                <div className="mega-groups-container">
+                  {activeItemData.groups.map((group, gIdx) => {
+                    const isCol2 = group.items.length >= 8;
+                    return (
+                      <div
+                        key={group.groupLabel}
+                        className={`mega-group-col${isCol2 ? ' is-col-wide' : ''}`}
+                        style={{ animationDelay: `${gIdx * 45}ms` }}
+                      >
+                        <div className="mega-group-header">
+                          {group.groupPath ? (
+                            <Link
+                              to={group.groupPath}
+                              className="mega-group-title-link"
+                              onClick={() => setOpenItem(null)}
+                            >
+                              <span>{group.groupLabel}</span>
+                              <ArrowUpRight size={12} className="mega-title-arrow" />
+                            </Link>
+                          ) : (
+                            <span className="mega-group-title">{group.groupLabel}</span>
+                          )}
+                        </div>
+
+                        {group.items.length > 0 && (
+                          <ul className={`mega-sublinks-list${isCol2 ? ' is-two-column' : ''}`}>
+                            {group.items.map((child) => (
+                              <li key={child.label} className="mega-sublink-item">
+                                {child.disabled ? (
+                                  <span className="mega-link-disabled">{child.label}</span>
+                                ) : (child.external || child.download) ? (
+                                  <a
+                                    href={child.path}
+                                    className="mega-sublink"
+                                    download={child.download}
+                                    target={child.download ? undefined : '_blank'}
+                                    rel="noopener noreferrer"
+                                    onClick={() => setOpenItem(null)}
+                                  >
+                                    <span className="mega-link-text">{child.label}</span>
+                                    {!child.download && <ExternalLink size={11} className="mega-ext-icon" />}
+                                  </a>
+                                ) : (
+                                  <Link
+                                    to={child.path}
+                                    className="mega-sublink"
+                                    onClick={() => setOpenItem(null)}
+                                  >
+                                    <span className="mega-link-text">{child.label}</span>
+                                  </Link>
+                                )}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* If flat list children exist (e.g. Campus Life, Placements, Admissions, Research) */}
+              {activeItemData.children && (
+                <div className="mega-children-container">
+                  {(() => {
+                    const items = activeItemData.children;
+                    const itemsPerCol = Math.ceil(items.length / (items.length > 10 ? 3 : 2));
+                    const cols: NavChild[][] = [];
+                    for (let i = 0; i < items.length; i += itemsPerCol) {
+                      cols.push(items.slice(i, i + itemsPerCol));
+                    }
+                    return cols.map((colItems, cIdx) => (
+                      <div
+                        key={`col-${cIdx}`}
+                        className="mega-group-col"
+                        style={{ animationDelay: `${cIdx * 50}ms` }}
+                      >
+                        <div className="mega-group-header">
+                          <span className="mega-group-title">
+                            {cIdx === 0 ? 'Explore Directory' : cIdx === 1 ? 'Quick Access' : 'Key Facilities'}
+                          </span>
+                        </div>
+                        <ul className="mega-sublinks-list">
+                          {colItems.map((child) => (
+                            <li key={child.label} className="mega-sublink-item">
+                              {child.disabled ? (
+                                <span className="mega-link-disabled">{child.label}</span>
+                              ) : (child.external || child.download) ? (
+                                <a
+                                  href={child.path}
+                                  className="mega-sublink"
+                                  download={child.download}
+                                  target={child.download ? undefined : '_blank'}
+                                  rel="noopener noreferrer"
+                                  onClick={() => setOpenItem(null)}
+                                >
+                                  <span className="mega-link-text">{child.label}</span>
+                                  {!child.download && <ExternalLink size={11} className="mega-ext-icon" />}
+                                </a>
+                              ) : (
+                                <Link
+                                  to={child.path}
+                                  className="mega-sublink"
+                                  onClick={() => setOpenItem(null)}
+                                >
+                                  <span className="mega-link-text">{child.label}</span>
+                                </Link>
+                              )}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ));
+                  })()}
+                </div>
+              )}
+
+              {/* 4th Column: Context / Highlight Overview Card */}
+              {activeItemData.highlight && (
+                <div className="mega-highlight-col" style={{ animationDelay: '150ms' }}>
+                  <div className="mega-highlight-card">
+                    {activeItemData.highlight.badge && (
+                      <span className="mega-highlight-badge">
+                        {activeItemData.highlight.badge}
+                      </span>
+                    )}
+                    <h4 className="mega-highlight-title">
+                      {activeItemData.highlight.title}
+                    </h4>
+                    <p className="mega-highlight-desc">
+                      {activeItemData.highlight.description}
+                    </p>
+                    {activeItemData.highlight.linkPath && (
+                      <Link
+                        to={activeItemData.highlight.linkPath}
+                        className="mega-highlight-cta"
+                        onClick={() => setOpenItem(null)}
+                      >
+                        <span>{activeItemData.highlight.linkText || 'Learn More'}</span>
+                        <span className="navbar-cta-icon-wrap">
+                          <ArrowRight size={13} strokeWidth={2.5} />
+                        </span>
+                      </Link>
+                    )}
+                  </div>
+                </div>
               )}
             </div>
           </div>
+        )}
 
-          {/* Mobile Toggle */}
-          <button
-            className={`mobile-toggle${mobileOpen ? ' open' : ''}`}
-            onClick={() => setMobileOpen(!mobileOpen)}
-            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
-            aria-expanded={mobileOpen}
-          >
-            <span />
-            <span />
-            <span />
-          </button>
-        </div>
-      </header>
+        {/* Mobile Accordion Drawer (Attached Inline Below Pill) */}
+        {mobileOpen && (
+          <div className="navbar-mobile-drawer" data-lenis-prevent>
+            <div className="mobile-drawer-inner">
+              <ul className="mobile-nav-list">
+                {renderedNavItems.map((item) => {
+                  const isExpanded = expandedItem === item.label;
+                  return (
+                    <li key={item.label} className="mobile-nav-item">
+                      <button
+                        type="button"
+                        className={`mobile-nav-link-btn${isExpanded ? ' is-active' : ''}`}
+                        onClick={() => {
+                          setExpandedItem(isExpanded ? null : item.label);
+                          setExpandedGroup(null);
+                        }}
+                      >
+                        <span className="mobile-nav-text">{item.label}</span>
+                        <span className={`mobile-accordion-icon${isExpanded ? ' is-open' : ''}`}>
+                          {isExpanded ? '−' : '+'}
+                        </span>
+                      </button>
 
-      {/* Mobile Menu */}
-      <div ref={mobileMenuRef} className={`mobile-menu${mobileOpen ? ' open' : ''}`} aria-hidden={!mobileOpen} data-lenis-prevent>
-        <div className="mobile-menu-content">
-          <ul className="mobile-nav-list">
-            {renderedNavItems.map((item) => {
-              const isExpanded = expandedItem === item.label;
-              return (
-                <li key={item.label} className="mobile-nav-item">
-                  <button
-                    className={`mobile-nav-link${isExpanded ? ' active' : ''}`}
-                    onClick={() => {
-                      setExpandedItem(isExpanded ? null : item.label);
-                      setExpandedGroup(null);
-                      setExpandedSubItem(null);
-                    }}
-                  >
-                    {item.label}
-                    <svg className={`mobile-nav-arrow${isExpanded ? ' rotated' : ''}`} viewBox="0 0 12 12" width="14" height="14" fill="none">
-                      <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </button>
+                      {/* Flat list for children */}
+                      {item.children && (
+                        <SmoothCollapse open={isExpanded}>
+                          <ul className="mobile-sublinks-list">
+                            {item.children.map((child) => (
+                              <li key={child.label} className="mobile-sublink-entry">
+                                {child.disabled ? (
+                                  <span className="mobile-sublink is-disabled">{child.label}</span>
+                                ) : (child.external || child.download) ? (
+                                  <a
+                                    href={child.path}
+                                    className="mobile-sublink"
+                                    download={child.download}
+                                    target={child.download ? undefined : '_blank'}
+                                    rel="noopener noreferrer"
+                                    onClick={() => setMobileOpen(false)}
+                                  >
+                                    <span>{child.label}</span>
+                                    <ExternalLink size={12} />
+                                  </a>
+                                ) : (
+                                  <Link
+                                    to={child.path}
+                                    className="mobile-sublink"
+                                    onClick={() => setMobileOpen(false)}
+                                  >
+                                    <span>{child.label}</span>
+                                  </Link>
+                                )}
+                              </li>
+                            ))}
+                          </ul>
+                        </SmoothCollapse>
+                      )}
 
-                  {/* Flat submenu */}
-                  {item.children && (
-                    <SmoothCollapse open={isExpanded}>
-                    <ul className="mobile-submenu">
-                      {item.children.map((child) => {
-                        if (child.subItems) {
-                          const subKey = `${item.label}:${child.label}`;
-                          const subOpen = expandedSubItem === subKey;
-                          return (
-                            <li key={child.label} className="mobile-group">
-                              <button
-                                className={`mobile-group-btn${subOpen ? ' active' : ''}`}
-                                onClick={() => setExpandedSubItem(subOpen ? null : subKey)}
-                              >
-                                {child.label}
-                                <svg className={`mobile-nav-arrow${subOpen ? ' rotated' : ''}`} viewBox="0 0 12 12" width="12" height="12" fill="none">
-                                  <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                                </svg>
-                              </button>
-                              <SmoothCollapse open={subOpen}>
-                                <ul className="mobile-group-items">
-                                  {child.subItems.map((sub) => (
-                                    <li key={sub.label}>
-                                      {sub.disabled ? (
-                                        <span className="mobile-sub-item" style={{ opacity: 0.5 }}>{sub.label}</span>
-                                      ) : (sub.external || sub.download) ? (
-                                        <a href={sub.path} className="mobile-sub-item" download={sub.download} target={sub.download ? undefined : '_blank'} rel="noopener noreferrer">{sub.label}</a>
-                                      ) : (
-                                        <Link to={sub.path} className="mobile-sub-item">{sub.label}</Link>
-                                      )}
-                                    </li>
-                                  ))}
-                                </ul>
-                              </SmoothCollapse>
-                            </li>
-                          );
-                        }
-                        return (
-                          <li key={child.label}>
-                            {child.disabled ? (
-                              <span className="mobile-sub-item" style={{ opacity: 0.5 }}>{child.label}</span>
-                            ) : (child.external || child.download) ? (
-                              <a href={child.path} className="mobile-sub-item" download={child.download} target={child.download ? undefined : '_blank'} rel="noopener noreferrer">
-                                {child.label} {!child.download && <span style={{ fontSize: '0.6rem', opacity: 0.5 }}>↗</span>}
-                              </a>
-                            ) : (
-                              <Link to={child.path} className="mobile-sub-item">{child.label}</Link>
-                            )}
-                          </li>
-                        );
-                      })}
-                    </ul>
-                    </SmoothCollapse>
-                  )}
-
-                  {/* Grouped submenu — each group is its own accordion */}
-                  {item.groups && (
-                    <SmoothCollapse open={isExpanded}>
-                    <ul className="mobile-submenu mobile-submenu-groups">
-                      {item.groups.map((group) => {
-                        const groupKey = `${item.label}:${group.groupLabel}`;
-                        const groupOpen = expandedGroup === groupKey;
-                        // A group with no items of its own has nothing to
-                        // expand into — render it as a plain link instead of
-                        // a dead-end accordion button. Mainly hit while a
-                        // live-data group (e.g. UG/PG/Ph.D. Programmes)
-                        // hasn't loaded any items yet.
-                        if (group.items.length === 0 && group.groupPath) {
-                          return (
-                            <li key={group.groupLabel} className="mobile-group">
-                              <Link to={group.groupPath} className="mobile-group-btn">
-                                {group.groupLabel}
-                              </Link>
-                            </li>
-                          );
-                        }
-                        return (
-                          <li key={group.groupLabel} className="mobile-group">
-                            <button
-                              className={`mobile-group-btn${groupOpen ? ' active' : ''}`}
-                              onClick={() => setExpandedGroup(groupOpen ? null : groupKey)}
-                            >
-                              {group.groupLabel}
-                              <svg className={`mobile-nav-arrow${groupOpen ? ' rotated' : ''}`} viewBox="0 0 12 12" width="12" height="12" fill="none">
-                                <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                              </svg>
-                            </button>
-                            <SmoothCollapse open={groupOpen}>
-                              <ul className="mobile-group-items">
-                                {group.items.map((child) => (
-                                  <li key={child.label}>
-                                    {child.disabled ? (
-                                      <span className="mobile-sub-item" style={{ opacity: 0.5 }}>{child.label}</span>
-                                    ) : (child.external || child.download) ? (
-                                      <a href={child.path} className="mobile-sub-item" download={child.download} target={child.download ? undefined : '_blank'} rel="noopener noreferrer">{child.label}</a>
-                                    ) : (
-                                      <Link to={child.path} className="mobile-sub-item">{child.label}</Link>
-                                    )}
+                      {/* Nested groups for group items */}
+                      {item.groups && (
+                        <SmoothCollapse open={isExpanded}>
+                          <ul className="mobile-groups-list">
+                            {item.groups.map((group) => {
+                              const groupKey = `${item.label}:${group.groupLabel}`;
+                              const groupOpen = expandedGroup === groupKey;
+                              if (group.items.length === 0 && group.groupPath) {
+                                return (
+                                  <li key={group.groupLabel} className="mobile-group-item">
+                                    <Link
+                                      to={group.groupPath}
+                                      className="mobile-group-direct-link"
+                                      onClick={() => setMobileOpen(false)}
+                                    >
+                                      <span>{group.groupLabel}</span>
+                                      <ArrowUpRight size={13} />
+                                    </Link>
                                   </li>
-                                ))}
-                              </ul>
-                            </SmoothCollapse>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                    </SmoothCollapse>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
+                                );
+                              }
+                              return (
+                                <li key={group.groupLabel} className="mobile-group-item">
+                                  <button
+                                    type="button"
+                                    className={`mobile-group-toggle-btn${groupOpen ? ' is-active' : ''}`}
+                                    onClick={() => setExpandedGroup(groupOpen ? null : groupKey)}
+                                  >
+                                    <span>{group.groupLabel}</span>
+                                    <ChevronDown
+                                      size={13}
+                                      className={`mobile-group-chevron${groupOpen ? ' is-rotated' : ''}`}
+                                    />
+                                  </button>
+                                  <SmoothCollapse open={groupOpen}>
+                                    <ul className="mobile-sublinks-list nested">
+                                      {group.items.map((child) => (
+                                        <li key={child.label} className="mobile-sublink-entry">
+                                          {child.disabled ? (
+                                            <span className="mobile-sublink is-disabled">{child.label}</span>
+                                          ) : (child.external || child.download) ? (
+                                            <a
+                                              href={child.path}
+                                              className="mobile-sublink"
+                                              download={child.download}
+                                              target={child.download ? undefined : '_blank'}
+                                              rel="noopener noreferrer"
+                                              onClick={() => setMobileOpen(false)}
+                                            >
+                                              <span>{child.label}</span>
+                                              <ExternalLink size={12} />
+                                            </a>
+                                          ) : (
+                                            <Link
+                                              to={child.path}
+                                              className="mobile-sublink"
+                                              onClick={() => setMobileOpen(false)}
+                                            >
+                                              <span>{child.label}</span>
+                                            </Link>
+                                          )}
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </SmoothCollapse>
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        </SmoothCollapse>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
 
-          <div className="mobile-social">
-            {[
-              { label: 'Instagram', href: 'http://instagram.com/vishnu_svecw/' },
-              { label: 'Facebook', href: 'https://www.facebook.com/svecwcollege' },
-              { label: 'Twitter', href: 'https://twitter.com/svecw2' },
-              { label: 'LinkedIn', href: 'https://www.linkedin.com/school/vishnusvecw/' },
-              { label: 'YouTube', href: 'https://www.youtube.com/@SVECW-B0' },
-            ].map(s => (
-              <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label}>{s.label}</a>
-            ))}
+              {/* Mobile CTA */}
+              <div className="mobile-drawer-cta-wrap">
+                {headerApplyNow.external ? (
+                  <a
+                    href={headerApplyNow.path}
+                    className="mobile-drawer-cta"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    <span>Apply Now for Admissions</span>
+                    <span className="navbar-cta-icon-wrap">
+                      <ArrowRight size={15} strokeWidth={2.5} />
+                    </span>
+                  </a>
+                ) : (
+                  <Link
+                    to={headerApplyNow.path}
+                    className="mobile-drawer-cta"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    <span>Apply Now for Admissions</span>
+                    <span className="navbar-cta-icon-wrap">
+                      <ArrowRight size={15} strokeWidth={2.5} />
+                    </span>
+                  </Link>
+                )}
+              </div>
+
+              {/* Mobile Social & Quick Contact */}
+              <div className="mobile-drawer-footer">
+                <div className="mobile-footer-text">
+                  <span>Sri Vishnu Educational Society</span>
+                  <span className="footer-bullet">•</span>
+                  <span>Bhimavaram</span>
+                </div>
+                <div className="mobile-social-pills">
+                  {[
+                    { label: 'Instagram', href: 'http://instagram.com/vishnu_svecw/' },
+                    { label: 'LinkedIn', href: 'https://www.linkedin.com/school/vishnusvecw/' },
+                    { label: 'YouTube', href: 'https://www.youtube.com/@SVECW-B0' },
+                    { label: 'Facebook', href: 'https://www.facebook.com/svecwcollege' },
+                  ].map((s) => (
+                    <a
+                      key={s.label}
+                      href={s.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mobile-social-pill"
+                    >
+                      {s.label}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+        )}
       </div>
-    </>
+    </header>
   );
 }
