@@ -178,7 +178,7 @@ export default function About() {
               <div className="divider" />
               <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-4)', color: 'var(--color-text-light)' }}>
                 Vishnu Women's University is set in Vishnupur, 3 km from Bhimavaram along Tadepalligudem Road
-                in Coastal Andhra Pradesh. The campus stretches across approximately <strong> 100 acres</strong>,
+                in Coastal Andhra Pradesh. The campus stretches across approximately <strong> 80 acres</strong>,
                 offering an environment well-suited to focused, high-quality learning.
               </p>
               <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-4)', color: 'var(--color-text-light)' }}>
@@ -310,7 +310,7 @@ export default function About() {
             title="Life at Vishnu Women's University"
             subtitle="A glimpse of the people, spaces, and moments that make VWU a distinctive place to learn and grow."
             highlights={[
-              '100-acre green campus in Bhimavaram',
+              '80-acre green campus in Bhimavaram',
               '200+ smart classrooms & 50+ research labs',
               'Olympic-standard sports & fitness facilities',
               'Secure on-campus hostels with 1 Gbps Wi-Fi',
@@ -369,7 +369,7 @@ export default function About() {
               <span className="section-label">Campus Life</span>
               <h2 className="section-title">Purpose-Built Infrastructure</h2>
               <p style={{ color: 'var(--color-text-light)', lineHeight: 1.8, marginBottom: 'var(--space-5)' }}>
-                A 100-acre campus housing 200+ smart classrooms, 50+ laboratories, an Olympic-standard swimming pool,
+                An 80+ acre campus housing 200+ smart classrooms, 50+ laboratories, an Olympic-standard swimming pool,
                 a fitness centre, 1 Gbps campus Wi-Fi, hostels, food courts, a health centre, and on-campus temples.
               </p>
               <Link to="/campus" className="btn btn-primary">Explore Campus Facilities →</Link>

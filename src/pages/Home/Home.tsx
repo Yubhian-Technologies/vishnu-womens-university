@@ -466,7 +466,7 @@ export default function Home() {
           {campusLifePhoto && <SmoothImage src={campusLifePhoto.src} alt={campusLifePhoto.alt} className="campus-image" />}
           <div className="campus-image-overlay" />
           <div className="campus-image-badge reveal-scale" data-delay="300">
-            <span className="campus-badge-num">100+</span>
+            <span className="campus-badge-num">80+</span>
             <span className="campus-badge-lbl">Acre Campus</span>
           </div>
         </div>
