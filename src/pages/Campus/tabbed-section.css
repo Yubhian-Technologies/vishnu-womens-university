@@ -9,31 +9,37 @@
 .section-tabs {
   display: flex;
   flex-wrap: wrap;
-  gap: 3px;
+  gap: 6px;
   margin-bottom: var(--space-10);
+  background: var(--color-off-white);
+  padding: 6px;
+  border-radius: 9999px;
+  border: 1px solid var(--color-light-gray);
 }
 
 .section-tab-btn {
-  flex: 1 1 180px;
-  padding: var(--space-4) var(--space-5);
-  background: var(--color-off-white);
+  flex: 1 1 160px;
+  padding: 0.6rem 1.25rem;
+  background: transparent;
   border: none;
+  border-radius: 9999px;
   font-family: var(--font-sans);
   font-size: var(--text-sm);
   font-weight: 700;
   color: var(--color-primary-dark);
   cursor: pointer;
-  transition: background var(--transition-fast), color var(--transition-fast);
+  transition: all var(--transition-fast);
   text-align: center;
 }
 
 .section-tab-btn:hover {
-  background: var(--color-light-gray);
+  background: rgba(0, 0, 0, 0.05);
 }
 
 .section-tab-btn.active {
   background: var(--color-primary);
   color: var(--color-white);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 }
 
 .section-tab-btn.active:hover {
@@ -43,9 +49,12 @@
 @media (max-width: 640px) {
   .section-tabs {
     flex-direction: column;
+    border-radius: 20px;
+    padding: 6px;
   }
   .section-tab-btn {
     flex: 1 1 auto;
+    border-radius: 9999px;
   }
 }
 

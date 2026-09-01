@@ -1,515 +1,655 @@
-/* ===== Main Header =====
-   Full-width, edge-to-edge — not a detached/floating pill. One continuous
-   white bar: a dark logo section flush at the left edge, a dark
-   Visit/Give/Apply section flush at the right edge, and white nav in
-   between. The dark sections are drawn as shaped SVG paths on top of the
-   bar's own white background rather than given their own background-color,
-   so each can have a wavy inner edge facing the nav instead of a plain
-   straight one (see .header-end-wave). */
-.header {
+/* ==========================================================================
+   VWU Floating Glass Pill Mega-Navbar (Apple Dynamic Island Archetype)
+   Theme: Vishnu Women's University (Forest Green #1b4332 & Gold #C9A84C)
+   ========================================================================== */
+
+/* ===== Root Wrapper ===== */
+.floating-navbar-root {
   position: fixed;
-  top: 0;
+  top: 0.75rem;
   left: 0;
   right: 0;
+  width: 100%;
   z-index: 1000;
-  transition: all var(--transition-base);
-}
-
-.header-bar {
-  width: 100%;
-  height: 80px;
-  background: var(--color-white);
-  box-shadow: 0 4px 24px rgba(0,0,0,0.25);
-  display: flex;
-  align-items: center;
-}
-
-.header.scrolled .header-bar {
-  box-shadow: 0 6px 32px rgba(0,0,0,0.35);
-}
-
-.header-end {
-  position: relative;
-  flex-shrink: 0;
-  height: 100%;
-  display: flex;
-  align-items: center;
-}
-
-.header-end--logo {
-  width: 300px;
-  justify-content: flex-start;
-  padding-left: var(--space-3);
-}
-
-/* Fixed width, sized to comfortably fit just Apply Now — not
-   content-sized, so it stays proportional to .header-end-wave's viewBox
-   (which would otherwise stretch/distort at an unpredictable width; the
-   viewBox/path themselves don't need to change since preserveAspectRatio
-   ="none" stretches them to whatever width this is, keeping the same
-   dark/cut/white proportions just at a smaller absolute size). */
-.header-end--cta {
-  width: 260px;
-  justify-content: flex-end;
-  padding-right: var(--space-4);
-  /* No-op at desktop widths (.nav's flex:1 already consumes all the free
-     space first) — but below the .nav breakpoint, with .nav gone, this is
-     what pulls the CTA pod over to sit flush against the mobile-toggle
-     instead of leaving it stranded next to the logo with a large empty
-     gap before the (also margin-left:auto) toggle button. */
-  margin-left: auto;
-}
-
-.header-end-wave {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 0;
-}
-
-.header-end-wave--mirror {
-  transform: scaleX(-1);
-}
-
-/* ===== Logo ===== */
-.logo {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  text-decoration: none;
-}
-
-.logo-icon {
-  /* The logo file is a wide lockup (founder mark + wordmark) with its own
-     dark background baked in — size by height so it keeps its native
-     aspect ratio. */
-  height: 64px;
-  width: auto;
-  border-radius: var(--radius-sm);
-  object-fit: contain;
-  flex-shrink: 0;
-  transition: transform var(--transition-fast);
-}
-
-.logo:hover .logo-icon {
-  transform: scale(1.04);
-}
-
-/* ===== Visit/Give/Apply (right end section) =====
-   Sit on the dark .header-end--cta section — light text/icons to stay
-   legible there. Visit/Give are plain icon+text; Apply Now alone is
-   styled as an actual button. */
-.header-ctas {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-}
-
-.topbar-cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 9px 12px;
-  font-size: var(--text-sm);
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  border-radius: var(--radius-full);
-  transition: all var(--transition-fast);
-  font-family: var(--font-sans);
-}
-
-.topbar-cta.apply {
-  background: var(--color-accent);
-  color: var(--color-primary-dark);
-  padding: 11px 18px;
-}
-
-.topbar-cta.apply:hover {
-  background: var(--color-accent-light);
-}
-
-/* ===== Navigation ===== */
-.nav {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 1 1 auto;
-  min-height: 0;
-  min-width: 0;
-}
-
-.nav-list {
-  display: flex;
-  align-items: center;
-  height: 100%;
-  gap: 2px;
-  transform: translateX(6px);
-}
-
-.nav-item {
-  position: relative;
-  height: 100%;
-  display: flex;
-  align-items: center;
-}
-
-.nav-link {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 12px;
-  border-radius: var(--radius-lg);
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: var(--color-text-light);
-  font-family: var(--font-sans);
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  transition: color var(--transition-fast), background var(--transition-fast);
-  white-space: nowrap;
-  cursor: pointer;
-  background: none;
-  border: none;
-  position: relative;
-}
-
-.nav-link:hover {
-  background: var(--color-off-white);
-}
-
-.nav-link-label {
-  position: relative;
-  padding-bottom: 3px;
-}
-
-/* Dropdown visibility (and the link styling that goes with it) is driven
-   entirely by the .nav-item--open class, which Header.tsx applies from a
-   single `openItem` state — set by hover, focus, and click alike. There is
-   deliberately no plain CSS :hover/:focus-within rule here: those would
-   show the dropdown independently of that state, and once click and hover
-   can each open/close things on their own, they inevitably disagree with
-   each other (this used to be a real bug — see the .nav-item--open comment
-   further down for the full story). */
-.nav-item--open .nav-link {
-  color: var(--color-primary);
-}
-
-/* ===== Dropdown ===== */
-.dropdown {
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%) translateY(-10px);
-  background: var(--color-white);
-  min-width: 240px;
-  border-radius: 0 0 var(--radius-md) var(--radius-md);
-  box-shadow: var(--shadow-xl);
-  opacity: 0;
-  visibility: hidden;
+  padding: 0 0.75rem;
   pointer-events: none;
-  border-top: 3px solid var(--color-accent);
-  z-index: 100;
-  /* Open and close share the same duration/easing (rather than a snappier
-     close) so that switching straight from one item's open dropdown to
-     another's genuinely cross-fades — the old one dissolving out while the
-     new one dissolves in over the same window — instead of one outrunning
-     the other and reading as an instant swap. visibility is delayed to the
-     end of the fade so the closed dropdown stays out of the
-     layout/hit-testing the instant it's not needed, without cutting the
-     fade-out short. */
-  transition: opacity 200ms ease, transform 200ms ease, visibility 0s linear 200ms;
-}
-
-.nav-item--open .dropdown {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-  transform: translateX(-50%) translateY(0);
-  transition: opacity 200ms ease, transform 200ms ease, visibility 0s linear 0s;
-}
-
-/* The last couple of nav items sit close to the right edge of the bar,
-   whichever items those happen to be as the nav gets restructured. A
-   dropdown centered on its trigger would overflow past 100vw there, and
-   body has overflow-x:hidden — which clips that overflow so the menu
-   becomes invisible and unclickable. Right-anchor those instead of
-   centering. */
-.nav-item:nth-last-child(-n+2) .dropdown:not(.dropdown-mega) {
-  left: auto;
-  right: 0;
-  transform: translateY(-10px);
-}
-
-.nav-item--open:nth-last-child(-n+2) .dropdown:not(.dropdown-mega) {
-  transform: translateY(0);
-}
-
-/* Right-anchored: no centering transform needed (right:0 already
-   positions it), just the same optional --mega-shift pod-avoidance nudge
-   as the left-anchored translateX(-50% + shift) above. */
-.nav-item:nth-last-child(-n+2) .dropdown.dropdown-mega {
-  left: auto;
-  right: 0;
-  transform: translateX(var(--mega-shift, 0px)) translateY(-10px);
-}
-
-.nav-item--open:nth-last-child(-n+2) .dropdown.dropdown-mega {
-  transform: translateX(var(--mega-shift, 0px)) translateY(0);
-}
-
-.dropdown-list {
-  padding: var(--space-3) 0;
-}
-
-.dropdown-item {
-  display: block;
-  padding: var(--space-3) var(--space-5);
-  font-size: var(--text-sm);
-  font-weight: 500;
-  color: var(--color-text);
-  font-family: var(--font-sans);
-  transition: all var(--transition-fast);
-  border-left: 3px solid transparent;
-}
-
-.dropdown-item:hover {
-  background: var(--color-off-white);
-  color: var(--color-primary);
-  border-left-color: var(--color-accent);
-  padding-left: calc(var(--space-5) + 4px);
-}
-
-/* Any flat dropdown with too many items (Placements, Research, Campus
-   Life, …) runs past the viewport height in a single column — split it
-   into two instead. Applied via nav-item--wide-dropdown whenever a nav
-   item's children list is long (see Header.tsx), not hardcoded per label. */
-.nav-item--wide-dropdown .dropdown {
-  min-width: 480px;
-}
-
-.nav-item--wide-dropdown .dropdown-list {
-  column-count: 2;
-  column-gap: 0;
-  column-rule: 1px solid var(--color-light-gray);
-}
-
-.nav-item--wide-dropdown .dropdown-list li {
-  break-inside: avoid;
-}
-
-/* Safety net for the longest lists (e.g. Campus Life) so they scroll
-   internally instead of running off the bottom of the page on shorter
-   viewports, even split across two columns — mirrors .dropdown-mega's
-   own max-height/overflow rule below. */
-.dropdown:not(.dropdown-mega) {
-  max-height: calc(100vh - var(--header-height) - 24px);
-  overflow-y: auto;
-}
-
-/* ===== Flyout (nested dropdown items, e.g. Academics > Course Curriculum) ===== */
-.dropdown-item--flyout-parent {
-  position: relative;
-}
-
-.dropdown-item__chevron {
-  float: right;
-  margin-left: var(--space-4);
-  opacity: 0.5;
-}
-
-.dropdown-flyout {
-  position: absolute;
-  left: 100%;
-  top: -3px;
-  min-width: 220px;
-  background: var(--color-white);
-  border-radius: 0 var(--radius-md) var(--radius-md) var(--radius-md);
-  box-shadow: var(--shadow-xl);
-  border-top: 3px solid var(--color-accent);
-  padding: var(--space-3) 0;
   opacity: 0;
-  visibility: hidden;
-  transition: all var(--transition-base);
-  z-index: 101;
+  transform: translate3d(0, -18px, 0) scale(0.96);
+  transition: opacity 300ms cubic-bezier(0.16, 1, 0.3, 1),
+              transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.dropdown-item--flyout-parent:hover .dropdown-flyout {
+@media (min-width: 768px) {
+  .floating-navbar-root {
+    top: 1.1rem;
+    padding: 0 1.25rem;
+  }
+}
+
+@media (min-width: 1440px) {
+  .floating-navbar-root {
+    top: 1.25rem;
+    padding: 0 1.75rem;
+  }
+}
+
+.floating-navbar-root.is-mounted {
   opacity: 1;
-  visibility: visible;
+  transform: translate3d(0, 0, 0) scale(1);
 }
 
-/* ===== Mega Menu ===== */
-.dropdown.dropdown-mega {
-  left: 50%;
-  /* Centered on the trigger by default, same as a flat dropdown — the
-     -50% keeps that true regardless of the menu's own width. --mega-shift
-     (set from Header.tsx) nudges it left or right only when centered
-     would overlap one of the header's end-pods; left at 0px the rest of
-     the time, so a menu doesn't inconsistently open dead-center in one
-     spot and hard against a pod in another depending on which trigger
-     opened it or how wide the viewport happens to be. */
-  transform: translateX(calc(-50% + var(--mega-shift, 0px))) translateY(-10px);
+/* ===== Floating Container (Full Generous Width) ===== */
+.floating-navbar-container {
+  max-width: min(1680px, calc(100vw - 2rem));
+  margin: 0 auto;
+  pointer-events: auto;
+  position: relative;
+  transition: all 280ms cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+/* ===== Main Glass Pill ===== */
+.navbar-pill {
+  height: 84px;
   display: flex;
-  gap: 0;
-  min-width: 680px;
-  padding: 0;
-  /* Safety net for the tallest menus (e.g. Campus Life's 17-item Campus
-     Facilities group) so they scroll internally instead of running off
-     the bottom of the page on shorter viewports — independent of how
-     many columns a group ends up with. */
-  max-height: calc(100vh - var(--header-height) - 24px);
-  overflow-y: auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0 1.25rem 0 1.5rem;
+  background: rgba(255, 255, 255, 0.68);
+  backdrop-filter: blur(28px) saturate(190%) brightness(1.04);
+  -webkit-backdrop-filter: blur(28px) saturate(190%) brightness(1.04);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  border-radius: 44px;
+  box-shadow: 0 16px 44px -8px rgba(8, 28, 21, 0.14),
+              0 3px 10px rgba(0, 0, 0, 0.04),
+              inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.95);
+  transition: border-radius 240ms cubic-bezier(0.2, 0.9, 0.3, 1),
+              background-color 240ms ease,
+              box-shadow 240ms ease,
+              border-color 240ms ease,
+              height 200ms ease;
+  position: relative;
+  z-index: 20;
 }
 
-.nav-item--open .dropdown.dropdown-mega {
-  transform: translateX(calc(-50% + var(--mega-shift, 0px))) translateY(0);
+.floating-navbar-container.is-scrolled .navbar-pill {
+  background: rgba(255, 255, 255, 0.78);
+  border-color: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 20px 48px -8px rgba(8, 28, 21, 0.18),
+              0 4px 16px rgba(0, 0, 0, 0.05),
+              inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.95);
 }
 
-
-.mega-group {
-  flex: 1;
-  padding: var(--space-3) var(--space-4);
-  border-right: 1px solid var(--color-light-gray);
-  min-width: 0;
+/* Dynamic Morphing: Seamless attachment to mega dropdown / mobile drawer */
+.floating-navbar-container.is-expanded .navbar-pill,
+.floating-navbar-container.is-mobile-open .navbar-pill {
+  border-radius: 34px 34px 0 0;
+  border-bottom-color: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 12px 30px -6px rgba(8, 28, 21, 0.12),
+              inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.95);
 }
 
-.mega-group:last-child {
-  border-right: none;
-}
-
-/* A group with a two-column item list needs meaningfully more than the
-   flex:1 equal share the other (single-column) groups get in the same
-   row, or its sub-columns end up far too narrow and every item wraps
-   heavily. */
-.mega-group:has(.mega-group-list.cols-2) {
-  flex: 1.8;
-}
-
-.mega-group-label {
-  display: block;
-  font-size: 0.62rem;
-  font-weight: 800;
-  color: var(--color-primary);
-  text-transform: uppercase;
-  letter-spacing: 0.09em;
-  margin-bottom: var(--space-2);
-  padding-bottom: var(--space-2);
-  border-bottom: 2px solid var(--color-accent);
+/* ===== Left: Brand Identity (Rectangular Logo) ===== */
+.navbar-brand-link {
+  display: flex;
+  align-items: center;
   text-decoration: none;
-  transition: color var(--transition-fast);
+  flex-shrink: 0;
+  padding: 4px 6px;
+  border-radius: 12px;
+  transition: background-color 200ms ease, transform 200ms ease;
 }
 
-a.mega-group-label:hover {
+.navbar-brand-link:hover {
+  background: rgba(27, 67, 50, 0.05);
+}
+
+.navbar-logo-desktop {
+  display: none;
+  height: 54px;
+  width: auto;
+  max-width: 240px;
+  object-fit: contain;
+  border-radius: 4px;
+  transition: transform 200ms ease;
+}
+
+@media (min-width: 1024px) {
+  .navbar-logo-desktop {
+    display: block;
+  }
+}
+
+.navbar-brand-link:hover .navbar-logo-desktop {
+  transform: scale(1.02);
+}
+
+/* Mobile Square Logo Branding */
+.navbar-brand-mobile {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+@media (min-width: 1024px) {
+  .navbar-brand-mobile {
+    display: none;
+  }
+}
+
+.navbar-logo-square {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 2px;
+  object-fit: contain;
+  box-shadow: 0 2px 8px rgba(8, 28, 21, 0.14);
+  border: 1px solid rgba(27, 67, 50, 0.12);
+  flex-shrink: 0;
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+
+.navbar-brand-link:hover .navbar-logo-square {
+  transform: scale(1.04);
+  box-shadow: 0 4px 12px rgba(201, 168, 76, 0.3);
+}
+
+.navbar-brand-mobile-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.navbar-brand-m-name {
+  font-family: var(--font-serif, Georgia, serif);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-primary-dark);
+  letter-spacing: -0.01em;
+}
+
+.navbar-brand-m-sub {
+  font-family: var(--font-sans);
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   color: var(--color-accent);
 }
 
-.mega-group-list {
-  list-style: none;
-  padding: var(--space-1) 0 0;
-  margin: 0;
-}
-
-/* CSS multi-column (not grid) so items flow top-to-bottom through column 1
-   before continuing into column 2 — preserving the list's natural reading
-   order. A grid with auto-flow:row instead pairs items 1&2, 3&4, 5&6... into
-   rows left-to-right, which scrambles that order and, since row height is
-   the tallest of each mismatched pair, produces uneven, misaligned-looking
-   rows whenever paired items wrap to different lengths. */
-.mega-group-list.cols-2 {
-  column-count: 2;
-  column-gap: var(--space-4);
-}
-
-.mega-group-list.cols-2 li {
-  break-inside: avoid;
-}
-
-.mega-group-list .dropdown-item {
-  padding: var(--space-3) var(--space-2);
-  font-size: 0.8rem;
-}
-
-.mega-group-list .dropdown-item:hover {
-  padding-left: calc(var(--space-2) + 4px);
-}
-
-/* ===== Mobile Toggle ===== */
-.mobile-toggle {
+/* ===== Center: Desktop Navigation Tabs ===== */
+.navbar-nav {
   display: none;
+  align-items: center;
+  justify-content: center;
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0 0.5rem;
+}
+
+@media (min-width: 1200px) {
+  .navbar-nav {
+    display: flex;
+  }
+}
+
+.navbar-nav-list {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  list-style: none;
+  margin: 0;
+  padding: 4px;
+  position: relative;
+  gap: 3px;
+  flex-wrap: nowrap;
+}
+
+/* GPU-accelerated Sliding Hover Capsule Pill (Full Padding Coverage) */
+.nav-sliding-pill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: rgba(27, 67, 50, 0.08);
+  border: 1px solid rgba(27, 67, 50, 0.08);
+  border-radius: 9999px;
+  pointer-events: none;
+  will-change: transform, width, height, opacity;
+  transition: transform 240ms cubic-bezier(0.2, 0.9, 0.3, 1),
+              width 240ms cubic-bezier(0.2, 0.9, 0.3, 1),
+              height 240ms cubic-bezier(0.2, 0.9, 0.3, 1),
+              opacity 180ms ease;
+  z-index: 0;
+}
+
+.nav-tab-item {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+}
+
+/* Nav Tab Button with Proper Internal Breathing Room */
+.nav-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 10px 14px;
+  border-radius: 9999px;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-primary-dark);
+  white-space: nowrap;
+  transition: color 180ms ease;
+}
+
+.nav-tab-btn:hover,
+.nav-tab-item.is-active .nav-tab-btn {
+  color: var(--color-primary);
+}
+
+.nav-tab-chevron {
+  opacity: 0.45;
+  transition: transform 220ms ease, opacity 220ms ease;
+}
+
+.nav-tab-chevron.is-rotated {
+  transform: rotate(180deg);
+  opacity: 0.95;
+  color: var(--color-accent);
+}
+
+/* ===== Right: Action & Mobile Toggle (No Overlap) ===== */
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+  margin-left: auto;
+  z-index: 2;
+}
+
+.navbar-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 9999px;
+  background: var(--color-accent);
+  color: var(--color-primary-dark);
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border: 1px solid rgba(201, 168, 76, 0.6);
+  box-shadow: 0 4px 12px rgba(201, 168, 76, 0.3);
+  transition: all 220ms ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.navbar-cta-btn:hover {
+  background: var(--color-primary);
+  color: #ffffff;
+  border-color: var(--color-primary);
+  box-shadow: 0 6px 20px rgba(27, 67, 50, 0.35);
+  transform: translateY(-1px);
+}
+
+.navbar-cta-icon-wrap {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(27, 67, 50, 0.14);
+  color: var(--color-primary-dark);
+  margin-left: 2px;
+  flex-shrink: 0;
+  transition: background-color 180ms cubic-bezier(0.16, 1, 0.3, 1),
+              color 180ms cubic-bezier(0.16, 1, 0.3, 1),
+              transform 180ms cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.navbar-cta-btn:hover .navbar-cta-icon-wrap {
+  background: #ffffff;
+  color: var(--color-primary-dark);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transform: translateX(3px);
+}
+
+.mobile-drawer-cta:hover .navbar-cta-icon-wrap {
+  background: #ffffff;
+  color: var(--color-primary-dark);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transform: translateX(3px);
+}
+
+.mega-highlight-cta:hover .navbar-cta-icon-wrap {
+  background: #ffffff;
+  color: var(--color-primary-dark);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16);
+  transform: translateX(3px);
+}
+
+/* Mobile 2-Bar Animated Toggle Button */
+.navbar-mobile-toggle {
+  display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  align-self: center;
-  gap: 5px;
-  width: 40px;
-  height: 40px;
+  gap: 6px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(27, 67, 50, 0.05);
+  border: 1px solid rgba(27, 67, 50, 0.08);
   cursor: pointer;
-  background: none;
-  border: none;
-  padding: 4px;
-  border-radius: var(--radius-sm);
-  transition: background var(--transition-fast);
-  /* With .nav hidden below 1150px, nothing else in .header-bar grows to
-     fill the freed space, so without this the toggle sits wherever it
-     falls in flex order instead of at the header's right edge. */
-  margin-left: auto;
+  padding: 0;
+  transition: background-color 200ms ease, transform 150ms ease;
+  flex-shrink: 0;
 }
 
-.mobile-toggle:hover {
-  background: var(--color-off-white);
+@media (min-width: 1200px) {
+  .navbar-mobile-toggle {
+    display: none;
+  }
 }
 
-.mobile-toggle span {
-  width: 24px;
-  height: 2px;
+.navbar-mobile-toggle:hover {
+  background: rgba(27, 67, 50, 0.1);
+}
+
+.mobile-toggle-bar {
+  width: 22px;
+  height: 2.2px;
   background: var(--color-primary-dark);
   border-radius: 2px;
-  transition: all var(--transition-base);
-  display: block;
+  transition: transform 240ms cubic-bezier(0.2, 0.9, 0.3, 1),
+              opacity 180ms ease,
+              background-color 200ms ease;
+  transform-origin: center;
 }
 
-.mobile-toggle.open span:nth-child(1) {
-  transform: translateY(7px) rotate(45deg);
+.navbar-mobile-toggle.is-open .bar-1 {
+  transform: translateY(4px) rotate(45deg);
+  background: var(--color-accent);
 }
 
-.mobile-toggle.open span:nth-child(2) {
-  opacity: 0;
-  transform: scaleX(0);
+.navbar-mobile-toggle.is-open .bar-2 {
+  transform: translateY(-4px) rotate(-45deg);
+  background: var(--color-accent);
 }
 
-.mobile-toggle.open span:nth-child(3) {
-  transform: translateY(-7px) rotate(-45deg);
-}
-
-/* ===== Mobile Menu ===== */
-.mobile-menu {
-  position: fixed;
-  top: calc(var(--topbar-height) + var(--header-height));
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: var(--color-primary-dark);
-  transform: translateX(-100%);
-  transition: transform var(--transition-smooth);
+/* ==========================================================================
+   Desktop Attached Mega-Dropdown Menu (Glassmorphic)
+   ========================================================================== */
+.navbar-mega-dropdown {
+  position: relative;
+  background: rgba(255, 255, 255, 0.76);
+  backdrop-filter: blur(36px) saturate(190%) brightness(1.03);
+  -webkit-backdrop-filter: blur(36px) saturate(190%) brightness(1.03);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  border-top: none;
+  border-radius: 0 0 38px 38px;
+  box-shadow: 0 32px 70px -10px rgba(8, 28, 21, 0.2),
+              0 10px 24px rgba(0, 0, 0, 0.04),
+              inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  padding: 2.25rem 2.75rem 2.5rem;
+  max-height: calc(100vh - 130px);
   overflow-y: auto;
-  overflow-x: hidden;
-  z-index: 999;
-  -webkit-overflow-scrolling: touch;
+  animation: navColSlideIn 240ms cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+  z-index: 10;
 }
 
-.mobile-menu.open {
-  transform: translateX(0);
+@keyframes navColSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.mobile-menu-content {
-  padding: var(--space-5) var(--space-5) var(--space-16);
+.mega-dropdown-grid {
+  display: flex;
+  gap: 2.5rem;
+  align-items: stretch;
 }
 
-/* ── Nav list ── */
+.mega-groups-container,
+.mega-children-container {
+  display: flex;
+  flex: 1;
+  gap: 2.25rem;
+  min-width: 0;
+}
+
+/* Column Structure */
+.mega-group-col {
+  flex: 1;
+  min-width: 0;
+  opacity: 0;
+  animation: navColFadeIn 280ms cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+}
+
+.mega-group-col.is-col-wide {
+  flex: 1.85;
+}
+
+@keyframes navColFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mega-group-header {
+  margin-bottom: 1rem;
+  padding-bottom: 0.55rem;
+  border-bottom: 2px solid var(--color-accent);
+}
+
+.mega-group-title,
+.mega-group-title-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color 180ms ease;
+}
+
+.mega-group-title-link:hover {
+  color: var(--color-accent);
+}
+
+.mega-title-arrow {
+  opacity: 0.6;
+  transition: transform 180ms ease, opacity 180ms ease;
+}
+
+.mega-group-title-link:hover .mega-title-arrow {
+  opacity: 1;
+  transform: translate(2px, -2px);
+}
+
+/* Sublinks List with Proper Padding and Pill Hover */
+.mega-sublinks-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mega-sublinks-list.is-two-column {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 1.5rem;
+  row-gap: 4px;
+}
+
+.mega-sublink-item {
+  min-width: 0;
+}
+
+.mega-sublink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 9px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--color-text);
+  text-decoration: none;
+  line-height: 1.4;
+  border-left: 3px solid transparent;
+  transition: all 160ms ease;
+}
+
+.mega-sublink:hover {
+  color: var(--color-primary-dark);
+  background: rgba(27, 67, 50, 0.06);
+  border-left-color: var(--color-accent);
+  padding-left: 16px;
+}
+
+.mega-link-text {
+  white-space: normal;
+  word-break: break-word;
+}
+
+.mega-ext-icon {
+  margin-left: 6px;
+  opacity: 0.45;
+  flex-shrink: 0;
+}
+
+.mega-link-disabled {
+  display: block;
+  padding: 8px 12px;
+  font-size: 0.88rem;
+  color: var(--color-mid-gray);
+  cursor: default;
+}
+
+/* 4th Column: Context / Highlight Overview Card */
+.mega-highlight-col {
+  width: 300px;
+  flex-shrink: 0;
+  display: flex;
+  opacity: 0;
+  animation: navColFadeIn 280ms cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+}
+
+.mega-highlight-card {
+  width: 100%;
+  background: linear-gradient(145deg, rgba(27, 67, 50, 0.06) 0%, rgba(201, 168, 76, 0.12) 100%);
+  border: 1px solid rgba(201, 168, 76, 0.35);
+  border-radius: 24px;
+  padding: 1.85rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.03);
+}
+
+.mega-highlight-badge {
+  display: inline-block;
+  align-self: flex-start;
+  padding: 5px 12px;
+  background: var(--color-primary);
+  color: #ffffff;
+  border-radius: 9999px;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  margin-bottom: 0.85rem;
+}
+
+.mega-highlight-title {
+  font-family: var(--font-sans);
+  font-size: 1.18rem;
+  font-weight: 800;
+  color: var(--color-primary-dark);
+  line-height: 1.3;
+  margin-bottom: 0.5rem;
+}
+
+.mega-highlight-desc {
+  font-size: 0.86rem;
+  color: var(--color-dark-gray);
+  line-height: 1.55;
+  margin-bottom: 1.5rem;
+}
+
+.mega-highlight-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: gap 180ms ease, color 180ms ease;
+}
+
+.mega-highlight-cta:hover {
+  color: var(--color-accent);
+  gap: 12px;
+}
+
+/* ==========================================================================
+   Mobile Accordion Drawer (Glassmorphic Attached)
+   ========================================================================== */
+.navbar-mobile-drawer {
+  position: relative;
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(36px) saturate(190%) brightness(1.03);
+  -webkit-backdrop-filter: blur(36px) saturate(190%) brightness(1.03);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  border-top: none;
+  border-radius: 0 0 34px 34px;
+  box-shadow: 0 28px 60px rgba(8, 28, 21, 0.22),
+              inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+  animation: navColSlideIn 240ms cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+  z-index: 10;
+}
+
+.mobile-drawer-inner {
+  padding: 1.5rem 1.5rem 2.25rem;
+}
+
 .mobile-nav-list {
   list-style: none;
   margin: 0;
@@ -517,214 +657,325 @@ a.mega-group-label:hover {
 }
 
 .mobile-nav-item {
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+  border-bottom: 1px solid rgba(27, 67, 50, 0.08);
 }
 
-.mobile-nav-link {
+.mobile-nav-item:last-child {
+  border-bottom: none;
+}
+
+.mobile-nav-link-btn {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-4) 0;
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: rgba(255,255,255,0.92);
-  font-family: var(--font-sans);
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  cursor: pointer;
-  background: none;
-  border: none;
   width: 100%;
+  padding: 1.1rem 0.35rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
   text-align: left;
-  transition: color var(--transition-fast);
+  font-family: var(--font-sans);
+  font-size: 0.94rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-primary-dark);
+  transition: color 160ms ease;
 }
 
-.mobile-nav-link.active,
-.mobile-nav-link:hover {
+.mobile-nav-link-btn.is-active,
+.mobile-nav-link-btn:hover {
   color: var(--color-accent);
 }
 
-.mobile-nav-arrow {
-  flex-shrink: 0;
-  transition: transform var(--transition-base);
+.mobile-accordion-icon {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  line-height: 1;
+  transition: transform 180ms ease, color 180ms ease;
+}
+
+.mobile-accordion-icon.is-open {
+  color: var(--color-accent);
+}
+
+/* Mobile Submenu Items */
+.mobile-sublinks-list {
+  list-style: none;
+  margin: 0 0 0.75rem 0.75rem;
+  padding: 0 0 0.75rem 0.75rem;
+  border-left: 2px solid rgba(201, 168, 76, 0.4);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.mobile-sublinks-list.nested {
+  border-left-color: rgba(27, 67, 50, 0.2);
+  margin-top: 0.45rem;
+  margin-left: 0.75rem;
+}
+
+.mobile-sublink-entry {
+  min-width: 0;
+}
+
+.mobile-sublink {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-text);
+  text-decoration: none;
+  border-radius: 8px;
+  transition: all 150ms ease;
+}
+
+.mobile-sublink:hover {
+  color: var(--color-primary);
+  background: rgba(27, 67, 50, 0.06);
+  padding-left: 16px;
+}
+
+.mobile-sublink.is-disabled {
+  color: var(--color-mid-gray);
+  cursor: default;
+}
+
+/* Mobile Nested Groups */
+.mobile-groups-list {
+  list-style: none;
+  margin: 0 0 0.75rem 0.75rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.mobile-group-item {
+  min-width: 0;
+}
+
+.mobile-group-toggle-btn,
+.mobile-group-direct-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 9px 12px;
+  background: rgba(27, 67, 50, 0.04);
+  border: 1px solid rgba(27, 67, 50, 0.08);
+  border-radius: 9px;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 160ms ease;
+}
+
+.mobile-group-toggle-btn.is-active,
+.mobile-group-toggle-btn:hover,
+.mobile-group-direct-link:hover {
+  background: rgba(201, 168, 76, 0.14);
+  border-color: var(--color-accent);
+  color: var(--color-primary-dark);
+}
+
+.mobile-group-chevron {
+  transition: transform 180ms ease;
   opacity: 0.7;
 }
 
-.mobile-nav-arrow.rotated {
+.mobile-group-chevron.is-rotated {
   transform: rotate(180deg);
   opacity: 1;
 }
 
-/* ── Flat submenu ── */
-.mobile-submenu {
-  padding: 0 0 var(--space-3) var(--space-2);
-  list-style: none;
-  margin: 0;
+/* Mobile Drawer CTA */
+.mobile-drawer-cta-wrap {
+  margin-top: 1.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(27, 67, 50, 0.08);
 }
 
-.mobile-sub-item {
-  display: block;
-  padding: var(--space-2) var(--space-3);
-  font-size: var(--text-sm);
-  color: rgba(255,255,255,0.7);
-  font-family: var(--font-sans);
-  border-left: 2px solid rgba(201,168,76,0.3);
-  margin-bottom: 2px;
-  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-  transition: all var(--transition-fast);
-}
-
-.mobile-sub-item:hover {
-  color: var(--color-accent);
-  border-left-color: var(--color-accent);
-  background: rgba(255,255,255,0.04);
-}
-
-/* ── Grouped submenu (mega) ── */
-.mobile-submenu-groups {
-  list-style: none;
-  margin: 0;
-  padding: 0 0 var(--space-3) 0;
-}
-
-.mobile-group {
-  margin-bottom: 2px;
-}
-
-.mobile-group-btn {
+.mobile-drawer-cta {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  gap: 10px;
   width: 100%;
-  padding: var(--space-3) var(--space-3);
-  font-size: 0.72rem;
+  padding: 13px 24px;
+  background: var(--color-accent);
+  color: var(--color-primary-dark);
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
   font-weight: 800;
-  color: var(--color-accent);
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  letter-spacing: 0.09em;
-  background: rgba(255,255,255,0.04);
-  border: none;
-  border-left: 3px solid rgba(201,168,76,0.5);
-  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-  cursor: pointer;
-  text-align: left;
-  transition: all var(--transition-fast);
-  margin-bottom: 2px;
+  text-decoration: none;
+  border-radius: 9999px;
+  box-shadow: 0 4px 16px rgba(201, 168, 76, 0.32);
+  transition: all 200ms ease;
 }
 
-.mobile-group-btn.active,
-.mobile-group-btn:hover {
-  background: rgba(201,168,76,0.1);
-  border-left-color: var(--color-accent);
+.mobile-drawer-cta:hover {
+  background: var(--color-primary);
+  color: #ffffff;
 }
 
-.mobile-group-items {
-  list-style: none;
-  margin: 0;
-  padding: 0 0 var(--space-2) var(--space-4);
-}
-
-.mobile-social {
+/* Mobile Drawer Footer */
+.mobile-drawer-footer {
+  margin-top: 1.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(27, 67, 50, 0.06);
   display: flex;
-  gap: var(--space-4);
-  margin-top: var(--space-8);
-  padding-top: var(--space-6);
-  border-top: 1px solid rgba(255,255,255,0.08);
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 0.85rem;
 }
 
-.mobile-social a {
-  color: rgba(255,255,255,0.5);
-  font-size: var(--text-sm);
-  transition: color var(--transition-fast);
+.mobile-footer-text {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  color: var(--color-text-light);
+  font-weight: 600;
 }
 
-.mobile-social a:hover {
+.footer-bullet {
   color: var(--color-accent);
 }
 
-/* ===== Responsive ===== */
+.mobile-social-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
 
-/* Compact desktop nav — 9 top-level items plus the fixed logo/Apply Now
-   pods need real room at full size, and there isn't quite enough below
-   1400px. Rather than dropping straight to the mobile hamburger there
-   (which used to happen at 1400px — well above common laptop widths like
-   1366px/1280px, so most laptop visitors never saw the real desktop nav
-   at all), tighten padding/font and shrink the end pods just enough to
-   keep it as actual desktop nav down through those widths; only below
-   1150px does it truly stop fitting. */
-@media (min-width: 1151px) and (max-width: 1400px) {
-  .nav-link {
-    padding: 8px 7px;
-    font-size: 0.64rem;
-    letter-spacing: 0.01em;
+.mobile-social-pill {
+  padding: 6px 14px;
+  background: rgba(27, 67, 50, 0.05);
+  border: 1px solid rgba(27, 67, 50, 0.08);
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-primary-dark);
+  text-decoration: none;
+  transition: all 160ms ease;
+}
+
+.mobile-social-pill:hover {
+  background: var(--color-primary);
+  color: #ffffff;
+  border-color: var(--color-primary);
+}
+
+/* ==========================================================================
+   Responsive Adaptations for Intermediate Viewports (1200px - 1460px)
+   ========================================================================== */
+@media (min-width: 1200px) and (max-width: 1460px) {
+  .navbar-pill {
+    height: 78px;
+    padding: 0 1rem;
+    gap: 0.5rem;
   }
-  .nav-list {
-    gap: 0;
+  .navbar-logo-desktop {
+    height: 46px;
+    max-width: 200px;
   }
-  .header-end--logo {
-    width: 220px;
+  .navbar-nav {
+    padding: 0 0.25rem;
   }
-  .header-end--cta {
-    width: 190px;
+  .navbar-nav-list {
+    gap: 2px;
+    padding: 2px;
   }
-  .logo-icon {
-    height: 50px;
+  .nav-tab-btn {
+    padding: 7px 8px;
+    font-size: 0.71rem;
+    letter-spacing: 0.02em;
+  }
+  .navbar-cta-btn {
+    padding: 8px 14px;
+    font-size: 0.72rem;
+  }
+  .mega-dropdown-grid {
+    gap: 1.75rem;
+  }
+  .mega-highlight-col {
+    width: 260px;
   }
 }
 
-@media (max-width: 1150px) {
-  .nav {
-    display: none;
-  }
-  .mobile-toggle {
-    display: flex;
+/* ==========================================================================
+   Responsive Adaptations for Tablet & Mobile (< 1024px)
+   ========================================================================== */
+@media (max-width: 1023px) {
+  .navbar-pill {
+    height: 68px;
+    padding: 0 0.85rem 0 1rem;
+    border-radius: 34px;
+    background: rgba(255, 255, 255, 0.58);
+    backdrop-filter: blur(24px) saturate(180%) brightness(1.05);
+    -webkit-backdrop-filter: blur(24px) saturate(180%) brightness(1.05);
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    box-shadow: 0 8px 32px -6px rgba(8, 28, 21, 0.22),
+                inset 0 1px 0 rgba(255, 255, 255, 0.55);
   }
 
-  /* The CTA pod (Apply Now) stays visible at every width down to the
-     smallest phones — its own margin-left:auto above already pulls both
-     it and the toggle over to the right together, so the toggle's own
-     default margin-left:auto (needed when .nav is showing and pushes
-     nothing itself) has to be zeroed everywhere .nav is hidden. Without
-     this, both auto margins compete for the same free space and split it
-     into two separate gaps instead of one, which forces .header-bar wider
-     than the viewport at narrow widths (visible as page-wide horizontal
-     scroll cutting off content on the right edge). */
-  .mobile-toggle {
-    margin-left: 0;
+  .floating-navbar-container.is-scrolled .navbar-pill {
+    background: rgba(255, 255, 255, 0.72);
   }
-}
 
-/* Below this width the fixed-width dark end-sections (sized to fit the
-   full desktop nav + CTAs comfortably) no longer make sense — .nav is
-   already hidden, so simplify both ends to their content's natural size
-   and drop the wave shapes, which would otherwise stretch/distort badly
-   at a width far narrower than their viewBox assumes. */
-@media (max-width: 900px) {
-  .header-end--logo {
-    width: auto;
-    padding-left: var(--space-2);
+  .floating-navbar-container.is-mobile-open .navbar-pill {
+    border-radius: 28px 28px 0 0;
+    background: rgba(255, 255, 255, 0.75);
+    border-bottom-color: rgba(255, 255, 255, 0.2);
   }
-  .header-end--cta {
-    width: auto;
-    padding-right: var(--space-3);
-    /* White at this breakpoint — Apply Now is the only thing left in this
-       pod (its own gold background/dark text already stand on their own),
-       so there's nothing here that still needs a dark backdrop for contrast. */
-    background: var(--color-white);
-    border-top-left-radius: var(--radius-lg);
-    border-bottom-left-radius: var(--radius-lg);
+
+  .navbar-mobile-drawer {
+    background: rgba(255, 255, 255, 0.68);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-top: none;
+    box-shadow: 0 24px 56px -8px rgba(8, 28, 21, 0.28),
+                inset 0 1px 0 rgba(255, 255, 255, 0.4);
   }
-  .header-end-wave {
-    display: none;
+
+  .navbar-actions {
+    gap: 0.6rem;
   }
 }
 
 @media (max-width: 640px) {
-  .topbar-cta.apply {
-    padding: 8px 12px;
+  .navbar-pill {
+    height: 64px;
+    padding: 0 0.65rem 0 0.85rem;
   }
-  .logo-icon {
-    height: 40px;
+
+  .navbar-logo-square {
+    width: 38px;
+    height: 38px;
+  }
+
+  .navbar-brand-m-name {
+    font-size: 0.96rem;
+  }
+
+  .navbar-brand-m-sub {
+    font-size: 0.6rem;
+  }
+
+  .navbar-cta-btn {
+    display: none;
   }
 }
+

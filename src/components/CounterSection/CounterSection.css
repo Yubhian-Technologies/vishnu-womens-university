@@ -1,119 +1,185 @@
+/* ===== Counter Section — Alternating Card Backgrounds ===== */
+
 .counter-section {
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
-  padding: var(--space-16) 0;
-  position: relative;
-  overflow: hidden;
+  width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
 }
 
-.counter-section::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  right: -10%;
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 60%);
-  border-radius: 50%;
-}
-
-.counter-section::after {
-  content: '';
-  position: absolute;
-  bottom: -30%;
-  left: -5%;
-  width: 400px;
-  height: 400px;
-  background: radial-gradient(circle, rgba(201,168,76,0.1) 0%, transparent 60%);
-  border-radius: 50%;
+.counter-section::-webkit-scrollbar {
+  display: none;
 }
 
 .counter-grid {
-  position: relative;
-  z-index: 1;
   display: flex;
   flex-wrap: nowrap;
   align-items: stretch;
-  gap: var(--space-2);
-  overflow-x: auto;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255,255,255,0.3) transparent;
+  min-width: max-content;
+  width: 100%;
 }
 
+/* ── Each Counter Card ── */
 .counter-item {
   flex: 1 1 0;
-  min-width: 130px;
+  min-width: 150px;
   text-align: center;
-  padding: var(--space-6) var(--space-4);
-  border-right: 1px solid rgba(255,255,255,0.1);
+  padding: clamp(1.75rem, 3vw, 2.75rem) clamp(1rem, 2.5vw, 2rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--space-2);
+  transition: filter 0.2s ease, transform 0.2s ease;
   position: relative;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .counter-item:last-child {
   border-right: none;
 }
 
-.counter-icon {
-  width: 48px;
-  height: 48px;
+.counter-item:hover {
+  filter: brightness(1.05);
+}
+
+/* ── Alternating Theme A: Deep Forest Green ── */
+.counter-theme--forest {
+  background: linear-gradient(160deg, #1b4332 0%, #133226 50%, #0d2218 100%);
+}
+
+/* ── Alternating Theme B: Clean White ── */
+.counter-theme--white {
+  background: #ffffff;
+  border-right: 1px solid rgba(27, 67, 50, 0.09);
+}
+
+/* ── FA Icon Circle ── */
+.counter-icon-wrap {
+  width: 54px;
+  height: 54px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.1);
-  border: 2px solid rgba(201,168,76,0.4);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto var(--space-4);
-  color: var(--color-accent);
-  transition: all var(--transition-base);
+  margin-bottom: var(--space-2);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.counter-item:hover .counter-icon {
-  color: var(--color-primary);
+.counter-item:hover .counter-icon-wrap {
+  transform: scale(1.12) rotate(6deg);
 }
 
-.counter-item:hover .counter-icon {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
-  transform: scale(1.1) rotate(5deg);
+.counter-theme--forest .counter-icon-wrap {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1.5px solid rgba(200, 169, 106, 0.45);
 }
 
+.counter-theme--white .counter-icon-wrap {
+  background: rgba(27, 67, 50, 0.07);
+  border: 1.5px solid rgba(27, 67, 50, 0.18);
+}
+
+.counter-fa-icon {
+  font-size: 1.25rem;
+  transition: color 0.2s ease;
+}
+
+.counter-theme--forest .counter-fa-icon {
+  color: var(--color-accent, #c9a84c);
+}
+
+.counter-theme--white .counter-fa-icon {
+  color: var(--color-primary, #1b4332);
+}
+
+/* ── Number ── */
 .counter-number {
   font-family: var(--font-serif);
-  font-size: clamp(2rem, 3.5vw, 3rem);
+  font-size: clamp(2rem, 3vw, 2.85rem);
   font-weight: 900;
-  color: var(--color-white);
   line-height: 1;
-  margin-bottom: var(--space-2);
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  gap: 2px;
+  gap: 1px;
+  letter-spacing: -0.02em;
+}
+
+.counter-theme--forest .counter-number {
+  color: #ffffff;
+}
+
+.counter-theme--white .counter-number {
+  color: var(--color-primary-dark, #0b1f16);
 }
 
 .counter-suffix {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: 900;
-  color: var(--color-accent);
-  margin-top: 4px;
+  margin-top: 3px;
 }
 
+.counter-theme--forest .counter-suffix {
+  color: var(--color-accent, #c9a84c);
+}
+
+.counter-theme--white .counter-suffix {
+  color: var(--color-primary, #1b4332);
+}
+
+/* ── Label & Sub ── */
 .counter-label {
   font-family: var(--font-sans);
-  font-size: var(--text-sm);
-  color: rgba(255,255,255,0.75);
+  font-size: clamp(0.82rem, 1.1vw, 0.92rem);
+  font-weight: 700;
   line-height: 1.4;
-  max-width: 140px;
+  max-width: 150px;
   margin: 0 auto;
 }
 
-.counter-sub {
-  font-size: var(--text-xs);
-  color: rgba(255,255,255,0.4);
-  margin-top: var(--space-1);
+.counter-theme--forest .counter-label {
+  color: rgba(255, 255, 255, 0.88);
 }
 
-@media (max-width: 640px) {
+.counter-theme--white .counter-label {
+  color: var(--color-primary-dark, #0b1f16);
+}
+
+.counter-sub {
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+.counter-theme--forest .counter-sub {
+  color: rgba(255, 255, 255, 0.42);
+}
+
+.counter-theme--white .counter-sub {
+  color: #6b7280;
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .counter-grid {
+    flex-wrap: wrap;
+  }
+
   .counter-item {
-    min-width: 110px;
-    padding: var(--space-5) var(--space-3);
+    flex: 1 1 calc(33.333% - 2px);
+    min-width: 0;
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .counter-theme--white {
+    border-bottom: 1px solid rgba(27, 67, 50, 0.09);
+  }
+}
+
+@media (max-width: 540px) {
+  .counter-item {
+    flex: 1 1 calc(50% - 2px);
+    padding: 1.5rem 1rem;
   }
 }
