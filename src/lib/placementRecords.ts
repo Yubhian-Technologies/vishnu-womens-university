@@ -112,21 +112,6 @@ export function findSerialColumnIndex(columns: string[]): number {
   return normalized.findIndex((c) => c === 'sno' || c === 'slno' || c === 'serialno' || c === 'serialnumber');
 }
 
-// Different admins' Excel files record the package column differently —
-// some already in LPA ("8.5", "12"), others as the full rupee amount
-// ("12,00,000" / 1200000, i.e. 12 lakhs = 12 LPA). No real placement
-// package is ever quoted as "1000 LPA" (that's ₹10 crore/year), but full
-// rupee figures for engineering placements routinely run into the hundreds
-// of thousands — so anything >= 1000 is safely a rupee amount and gets
-// divided down to LPA (1 lakh = ₹100,000); anything smaller is assumed to
-// already be in LPA. Used everywhere a package value needs to be a real LPA
-// number (average/median/highest, the above-N-LPA thresholds); the top-10
-// ranking in sortPlacementRows doesn't need it since dividing every value
-// by the same constant never changes their relative order.
-function normalizeToLpa(value: number): number {
-  return value >= 1000 ? value / 100000 : value;
-}
-
 // Finds whichever column looks like it holds the recruiting company's name —
 // prefers "company", then "organisation"/"organization", then "recruiter",
 // then "employer". Returns -1 if nothing matches (No. of Companies Visited
@@ -181,12 +166,11 @@ export function computePlacementStats(columns: string[], rows: PlacementRecordRo
       ).size;
 
   const pkgIdx = findPackageColumnIndex(columns);
+  // parsePackageValue already normalizes rupee-scale figures down to LPA,
+  // so nothing further is needed here.
   const packages = pkgIdx === -1
     ? []
-    : rows
-        .map((r) => parsePackageValue(r.cells[pkgIdx] || ''))
-        .filter((v) => !Number.isNaN(v))
-        .map(normalizeToLpa);
+    : rows.map((r) => parsePackageValue(r.cells[pkgIdx] || '')).filter((v) => !Number.isNaN(v));
 
   const hasPackages = packages.length > 0;
   return {

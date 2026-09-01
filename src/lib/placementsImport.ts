@@ -81,9 +81,19 @@ export function parsePlacementsBuffer(buf: ArrayBuffer): PlacementImportResult {
   const raw: unknown[][] = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: false, defval: '' });
   if (raw.length === 0) return { columns: [], rows: [] };
 
-  const columns = raw[0].map((c, i) => String(c ?? '').trim() || `Column ${i + 1}`);
+  // Same reasoning as the Word/PDF parsers below: a title/caption row (e.g.
+  // "CSE (2019-2023) Batch Placement Details") often sits above the real
+  // header row in an exported sheet, and — being one long string typed into
+  // a single cell — has at most one non-empty cell, unlike a genuine header
+  // row. Skip any leading rows like that so the first real multi-cell row
+  // becomes the header instead of locking `columns` to generic "Column N"
+  // fallbacks and silently demoting the true header into a data row.
+  const headerIdx = raw.findIndex((row) => row.filter((c) => String(c ?? '').trim() !== '').length > 1);
+  const headerRowIndex = headerIdx === -1 ? 0 : headerIdx;
+
+  const columns = raw[headerRowIndex].map((c, i) => String(c ?? '').trim() || `Column ${i + 1}`);
   const rows = raw
-    .slice(1)
+    .slice(headerRowIndex + 1)
     .map((row) => columns.map((_, i) => String(row[i] ?? '').trim()))
     .filter((row) => row.some((cell) => cell !== ''));
 
