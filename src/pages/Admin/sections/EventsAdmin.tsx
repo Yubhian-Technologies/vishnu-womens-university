@@ -65,7 +65,7 @@ export default function EventsAdmin() {
     <div className="admin-section">
       <div className="admin-card">
         <h2 className="admin-card__title">{editing ? 'Edit Event' : 'Add Event'}</h2>
-        <p className="admin-lead" style={{ marginBottom: '1rem' }}>Featured events also show in the "Upcoming at VWU" strip on the Home page.</p>
+        <p className="admin-lead" style={{ marginBottom: '1rem' }}>Only feeds the standalone Events page (/events) — the Home page's "Upcoming at VWU" strip is edited from "Happenings & Awards" → Happenings instead.</p>
         <div className="admin-form-grid">
           <div className="admin-field admin-field--full">
             <label htmlFor="field-title">Title *</label>
@@ -105,7 +105,7 @@ export default function EventsAdmin() {
             <label>Featured</label>
             <label className="admin-toggle">
               <input type="checkbox" checked={form.featured} onChange={(e) => set('featured', e.target.checked)} />
-              <span>Show on Home page</span>
+              <span>Shown in the featured events grid on the Events page</span>
             </label>
           </div>
           <div className="admin-field admin-field--full">

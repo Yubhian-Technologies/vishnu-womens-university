@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation, Navigate } from 'react-router-dom';
-import { Check, Microscope, Compass, Target, Sparkles, Mail, BookOpen, FileText } from 'lucide-react';
+import { Check, Microscope, Compass, Target, Sparkles, Mail, BookOpen, FileText, ExternalLink } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
-import ImageLightbox from '../../components/ImageLightbox/ImageLightbox';
 import ProgrammeStructure from '../../components/ProgrammeStructure/ProgrammeStructure';
 import DepartmentNewsSection, { type DepartmentNewsDoc } from '../../components/DepartmentNews/DepartmentNewsSection';
+import NewsEventsTabs from '../../components/NewsEventsTabs/NewsEventsTabs';
 import BodyBlocks, { parseBodyContent } from '../../components/BodyBlocks/BodyBlocks';
 import SmoothCollapse from '../../components/SmoothCollapse/SmoothCollapse';
 import SEO from '../../components/SEO/SEO';
@@ -14,12 +14,13 @@ import { smoothScrollTo } from '../../lib/smoothScroll';
 import { fetchPriorityAttr } from '../../lib/domAttrs';
 import { getProgramSchema, getBreadcrumbSchema } from '../../lib/seo/schemas';
 import type { DepartmentGroup } from '../../lib/departmentGroups';
-import { normalizeLab, type ProgramDoc } from '../Admin/sections/ProgramsAdmin';
+import { normalizeLab, normalizeMindMapImages, type ProgramDoc, type NewsEventsYear, type LabItem } from '../Admin/sections/ProgramsAdmin';
+import LabDialog from '../../components/LabDialog/LabDialog';
 import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import type { FacultyDoc } from './Faculty';
 import { parseFlexibleTable, parseProjectAccordion } from '../../lib/structuredTable';
 import { sortPlacementRows, computePlacementStats, findPackageColumnIndex, findSerialColumnIndex, formatPackageCell } from '../../lib/placementRecords';
-import { hasCustomSectionContent } from '../../lib/customSections';
+import { hasCustomSectionContent, toQuickLinkItems } from '../../lib/customSections';
 import CustomSectionsRenderer from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import '../detail-layout.css';
 import '../Campus/tabbed-section.css';
@@ -43,11 +44,23 @@ interface Props {
 export default function DepartmentDetail({ group, activeSlug }: Props) {
   const navigate = useNavigate();
   const location = useLocation();
-  const [mindMapOpen, setMindMapOpen] = useState(false);
   const [outcomeTab, setOutcomeTab] = useState<string | null>(null);
   // "Choose a Programme" Quick Links accordion — starts open so the sub-links
   // remain visible by default (unchanged from before this was collapsible).
   const [programmeLinksOpen, setProgrammeLinksOpen] = useState(true);
+  // Same collapsible treatment, one level deeper — a programmeLinks entry
+  // with its own children (e.g. "Research & Development" built from
+  // Publications/Patents/Funded Projects sub-sections) starts open, toggled
+  // per id.
+  const [collapsedQuickLinks, setCollapsedQuickLinks] = useState<Set<string>>(new Set());
+  const toggleQuickLink = (id: string) => {
+    setCollapsedQuickLinks((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
   // Which Academic Year's placement records are shown — falls back to the
   // active programme's first available year (see placementYears below).
   const [placementYear, setPlacementYear] = useState<string | null>(null);
@@ -55,6 +68,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   // 'all' shows every row, otherwise a fixed page size (DataTables-style
   // "Show N entries" control, matching the reference design).
   const [placementPageSize, setPlacementPageSize] = useState<number | 'all'>(10);
+  const [activeLab, setActiveLab] = useState<LabItem | null>(null);
   const [openRndProjects, setOpenRndProjects] = useState<Set<string>>(new Set());
   const toggleRndProject = (key: string) => {
     setOpenRndProjects((prev) => {
@@ -142,6 +156,11 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     // shown on the Academics page, reused here so this works with no extra
     // data entry; the "Overview" field on the department admin overrides it.
     about: dept?.about || dept?.description || '',
+    // Department-only — no per-programme fallback (unlike most fields
+    // above, a programme's own Highlights covers a different, more
+    // specific thing — see "Programme Highlights" further down — so there's
+    // nothing sensible to fall back to here).
+    highlights: dept?.highlights || [],
     // Department-only, no per-programme fallback — a new structural block
     // (B.Tech./M.Tech. headings + intake tables) shown right after "About
     // the Department".
@@ -152,21 +171,23 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     hodImage: dept?.hodImage || primary?.hodImage || '',
     hodEmail: dept?.hodEmail || primary?.hodEmail || '',
     hodMessage: dept?.hodMessage || primary?.hodMessage || '',
+    hodResearchProfiles: (dept?.hodResearchProfiles?.length ? dept.hodResearchProfiles : primary?.hodResearchProfiles) || [],
     vision: dept?.vision || primary?.vision || '',
     mission: (dept?.mission?.length ? dept.mission : primary?.mission) || [],
     coreValues: (dept?.coreValues?.length ? dept.coreValues : primary?.coreValues) || [],
-    // The program you're actually viewing wins first — same rule every
-    // other per-program section on this page already follows (News &
-    // Events, Newsletter, R&D, Curriculum) — so labs entered on THIS side
-    // of the toggle always show on THIS side, regardless of which sibling
-    // program happens to be `primary` (subPrograms[0], which is just group
-    // ordering and isn't tied to which side a visitor is looking at).
-    // primary.labs is next (covers a sibling program that was never given
-    // its own labs), and dept.labs (Academic Departments admin, plain
-    // strings only) is the legacy fallback if neither program has any.
-    // normalizeLab() upgrades either shape so this page never cares which
+    // Laboratories are the department's, not any one programme's — AI&ML
+    // and AI&DS share the same labs, so this is department-first, same as
+    // Vision/Mission/Values/Library above (no per-programme editing exists
+    // for this anymore; see ProgramsAdmin/DepartmentsAdmin). Falls back to
+    // whichever sub-program still carries its own legacy labs data if the
+    // department doc hasn't had it copied over yet (see DepartmentsAdmin's
+    // "Copy from Programs" action). normalizeLab() upgrades either shape
+    // (plain string or {name, pdfUrl}) so this page never cares which
     // source it came from.
-    labs: ((activeProgram.labs?.length ? activeProgram.labs : primary?.labs?.length ? primary.labs : dept?.labs) || []).map(normalizeLab),
+    labs: (
+      dept?.labs?.length ? dept.labs
+        : subPrograms.map((p) => p.labs).find((arr) => arr && arr.length > 0) || []
+    ).map(normalizeLab),
     libraryIntro: dept?.libraryIntro || primary?.libraryIntro || '',
     libraryInCharge: dept?.libraryInCharge || primary?.libraryInCharge || '',
     librarySections: (dept?.librarySections?.length ? dept.librarySections : primary?.librarySections) || [],
@@ -180,6 +201,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   const hasHod = !!(shared.hodMessage || shared.hodImage || shared.hodEmail || shared.hod);
   const hasLabs = shared.labs.length > 0;
   const hasAbout = !!shared.about;
+  const hasDeptHighlights = shared.highlights.length > 0;
   const programLevels = shared.programLevels.filter((l) => l.title && (l.intro || l.rows?.length > 0));
   const hasProgramLevels = programLevels.length > 0;
   const libraryTables = shared.librarySections.filter((sec) => sec.items && sec.items.length > 0);
@@ -223,6 +245,10 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   ].filter((g) => g.items && g.items.length > 0);
   const hasOutcomeStatements = outcomeGroups.length > 0;
   const activeOutcome = outcomeGroups.find((g) => g.key === outcomeTab) ?? outcomeGroups[0];
+  // Legacy docs may still store a single mindMapImage — normalizeMindMapImages()
+  // upgrades either shape to the gallery array so this page never has to care.
+  const mindMapImages = normalizeMindMapImages(activeProgram);
+  const hasMindMap = mindMapImages.length > 0 || !!activeProgram.mindMapPdfUrl;
   // Section heading + sidebar label list only whichever of PEOs/POs/PSOs/WKs
   // this programme actually has content for (e.g. "PEOs, POs & PSOs" when
   // there's no WKs data yet), instead of a fixed "...& WKs" that would claim
@@ -231,19 +257,26 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   const outcomeHeading = outcomeShortLabels.length > 1
     ? `${outcomeShortLabels.slice(0, -1).join(', ')} & ${outcomeShortLabels[outcomeShortLabels.length - 1]}`
     : outcomeShortLabels[0] || '';
-  const hasMindMap = !!activeProgram.mindMapImage;
   // News & Events on the grouped department page is department-wide, not
-  // per-toggle-side: both sources aggregate across every programme in the
-  // group so an admin can enter it under whichever programme and it shows
-  // identically on every side of the toggle. Two independent sources — the
-  // per-academic-year table (ProgramsAdmin's "News & Events — Department
-  // Page" field) and the plain departmentNews collection cards ("News &
-  // Events — This Programme", rendered by <DepartmentNewsSection> below).
-  // Either, both, or neither can be present.
-  const newsEventsYears = (
-    subPrograms.map((p) => p.newsEventsYears).find((arr) => arr && arr.length > 0) || []
-  ).filter((y) => y.year && y.columns?.length > 0 && y.rows?.length > 0);
-  const hasNewsEvents = newsEventsYears.length > 0;
+  // per-toggle-side, and split into three admin-defined categories (see
+  // NewsEventsTabs) — read from the department doc, same as Vision/Labs/
+  // Library. "News & Events" is the one category with legacy content that
+  // used to live on a programme doc (ProgramsAdmin's old "News & Events —
+  // Department Page" field); it falls back to whichever sub-program still
+  // has it (first non-empty) until DepartmentsAdmin's "Copy from Programs"
+  // moves it over — Student Awards / Others never existed per-programme, so
+  // they're department-only with no fallback. Independent of the plain
+  // departmentNews collection cards ("News & Events — This Programme",
+  // rendered by <DepartmentNewsSection> below) — either, both, or neither
+  // can be present.
+  const validYears = (arr?: NewsEventsYear[]) =>
+    (arr || []).filter((y) => y.year && ((y.columns?.length > 0 && y.rows?.length > 0) || (y.cards?.length ?? 0) > 0 || !!y.text));
+  const newsEventsCategories = [
+    { key: 'news', label: 'News & Events', years: validYears(dept?.newsEventsYears?.length ? dept.newsEventsYears : subPrograms.map((p) => p.newsEventsYears).find((arr) => arr && arr.length > 0)) },
+    { key: 'awards', label: 'Student Awards', years: validYears(dept?.studentAwardsYears) },
+    { key: 'others', label: 'Others', years: validYears(dept?.othersYears) },
+  ];
+  const hasNewsEvents = newsEventsCategories.some((c) => c.years.length > 0);
   const hasDeptNews = deptNewsDocs.some((n) => group.programSlugs.includes(n.program));
   const newsletterYears = (activeProgram.newsletterYears || []).filter((y) => y.year && y.issues && y.issues.length > 0);
   const hasNewsletter = newsletterYears.length > 0;
@@ -255,7 +288,10 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   const rndLinks = (activeProgram.rndLinks || []).filter((l) => l.label && l.pdfUrl);
   const rndTableSections = parseFlexibleTable(activeProgram.rndTableText || '').filter((s) => s.headers.length > 0);
   const rndProjectCategories = parseProjectAccordion(activeProgram.rndProjectsText || '').filter((c) => c.projects.length > 0);
-  const hasRnd = !!activeProgram.rndIntro || rndTableSections.length > 0 || rndProjectCategories.length > 0 || rndLinks.length > 0;
+  const rndStructuredColumns = activeProgram.rndStructuredTable?.columns || [];
+  const rndStructuredRows = activeProgram.rndStructuredTable?.rows || [];
+  const hasRndStructuredTable = rndStructuredColumns.length > 0 && rndStructuredRows.length > 0;
+  const hasRnd = !!activeProgram.rndIntro || rndTableSections.length > 0 || rndProjectCategories.length > 0 || rndLinks.length > 0 || hasRndStructuredTable;
   const visibleCustomSections = (activeProgram.customSections || []).filter(hasCustomSectionContent);
 
   // Quick Links sidebar — deliberately trimmed to one anchor per major
@@ -284,8 +320,8 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     hasOutcomeStatements && { id: 'peos-pos-psos', label: outcomeHeading },
     hasMindMap && { id: 'mindmap', label: 'Mind Map' },
     { id: 'curriculum', label: 'Curriculum' },
-    ...visibleCustomSections.map((s) => ({ id: s.id, label: s.label })),
-  ].filter(Boolean) as { id: string; label: string }[];
+    ...toQuickLinkItems(visibleCustomSections),
+  ].filter(Boolean) as { id: string; label: string; children?: { id: string; label: string }[] }[];
 
   // Top stats bar, flowing as a single horizontal row (matching every other
   // detail page). Head of Department comes first, then Established/
@@ -385,11 +421,33 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
           <div className="container">
             <div className={quickLinks.length > 1 ? 'detail-grid' : ''}>
               <div>
-                <span className="section-label">About the Department</span>
-                <h2 className="section-title">{deptName}</h2>
-                <p style={{ color: 'var(--color-text-light)', lineHeight: 1.85, fontSize: 'var(--text-base)', whiteSpace: 'pre-line' }}>
-                  {shared.about}
-                </p>
+                <div>
+                  <span className="section-label">About the Department</span>
+                  <h2 className="section-title">{deptName}</h2>
+                  <p style={{ color: 'var(--color-text-light)', lineHeight: 1.85, fontSize: 'var(--text-base)', marginBottom: hasDeptHighlights ? 'var(--space-6)' : 0, whiteSpace: 'pre-line' }}>
+                    {shared.about}
+                  </p>
+                </div>
+
+                {/* Department Highlights — same layout as a programme's own
+                    Highlights (see "Programme Highlights" further down),
+                    filling the space next to the Quick Links sidebar that
+                    otherwise sat empty whenever "About" alone was short. */}
+                {hasDeptHighlights && (
+                  <div style={{ marginTop: 'var(--space-8)' }}>
+                    <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.35rem', color: 'var(--color-primary)', marginBottom: 'var(--space-5)', paddingBottom: 'var(--space-3)', borderBottom: '2px solid var(--color-accent)' }}>
+                      Department Highlights
+                    </h3>
+                    <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: 'var(--space-3)' }}>
+                      {shared.highlights.map((h) => (
+                        <li key={h} style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start', color: 'var(--color-text)', fontSize: 'var(--text-sm)', lineHeight: 1.6 }}>
+                          <Check size={16} strokeWidth={2.5} style={{ color: 'var(--color-accent)', flexShrink: 0, marginTop: 2 }} />
+                          {h}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
 
               {quickLinks.length > 1 && (
@@ -423,13 +481,52 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                             </button>
                             <SmoothCollapse open={programmeLinksOpen}>
                               <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
-                                {programmeLinks.map((c) => (
-                                  <li key={c.id}>
-                                    <a href={`#${c.id}`} style={{ display: 'block', padding: 'var(--space-2) 0 var(--space-2) var(--space-4)', color: 'rgba(255,255,255,0.7)', fontSize: 'var(--text-sm)', fontWeight: 600, textDecoration: 'none', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-                                      {c.label}
-                                    </a>
-                                  </li>
-                                ))}
+                                {programmeLinks.map((c) => {
+                                  const hasKids = !!c.children?.length;
+                                  const isSubOpen = !collapsedQuickLinks.has(c.id);
+                                  return (
+                                    <li key={c.id}>
+                                      {hasKids ? (
+                                        <button
+                                          type="button"
+                                          onClick={() => toggleQuickLink(c.id)}
+                                          aria-expanded={isSubOpen}
+                                          style={{
+                                            display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%',
+                                            background: 'none', border: 'none', padding: 'var(--space-2) 0 var(--space-2) var(--space-4)', color: 'rgba(255,255,255,0.7)',
+                                            fontSize: 'var(--text-sm)', fontWeight: 600, fontFamily: 'inherit', textAlign: 'left', cursor: 'pointer',
+                                            borderBottom: '1px solid rgba(255,255,255,0.08)',
+                                          }}
+                                        >
+                                          {c.label}
+                                          <svg
+                                            width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true"
+                                            style={{ flexShrink: 0, marginLeft: 'var(--space-2)', opacity: 0.75, transition: 'transform var(--transition-base)', transform: isSubOpen ? 'rotate(180deg)' : 'none' }}
+                                          >
+                                            <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                          </svg>
+                                        </button>
+                                      ) : (
+                                        <a href={`#${c.id}`} style={{ display: 'block', padding: 'var(--space-2) 0 var(--space-2) var(--space-4)', color: 'rgba(255,255,255,0.7)', fontSize: 'var(--text-sm)', fontWeight: 600, textDecoration: 'none', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+                                          {c.label}
+                                        </a>
+                                      )}
+                                      {hasKids && (
+                                        <SmoothCollapse open={isSubOpen}>
+                                          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+                                            {c.children!.map((gc) => (
+                                              <li key={gc.id}>
+                                                <a href={`#${gc.id}`} style={{ display: 'block', padding: 'var(--space-2) 0 var(--space-2) var(--space-8)', color: 'rgba(255,255,255,0.55)', fontSize: 'var(--text-sm)', fontWeight: 600, textDecoration: 'none', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+                                                  {gc.label}
+                                                </a>
+                                              </li>
+                                            ))}
+                                          </ul>
+                                        </SmoothCollapse>
+                                      )}
+                                    </li>
+                                  );
+                                })}
                               </ul>
                             </SmoothCollapse>
                           </li>
@@ -578,6 +675,17 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                   )}
                 </div>
               </div>
+              {shared.hodResearchProfiles.length > 0 && (
+                <div style={{ background: 'var(--color-primary)', padding: 'var(--space-4) var(--space-8)', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-5)' }}>
+                  <span style={{ fontSize: 'var(--text-xs)', fontWeight: 800, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Research Profiles</span>
+                  {shared.hodResearchProfiles.map((link) => (
+                    <a key={link.label} href={link.url} target="_blank" rel="noopener noreferrer"
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1)', fontSize: 'var(--text-sm)', color: 'var(--color-white)', fontWeight: 600, textDecoration: 'none' }}>
+                      {link.label} <ExternalLink size={12} strokeWidth={2} />
+                    </a>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </section>
@@ -628,35 +736,30 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
               <h2 className="section-title">Laboratories</h2>
             </div>
             <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 'var(--space-4)' }}>
-              {shared.labs.map((lab, li) => {
-                const tileStyle = { background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', display: 'flex', alignItems: 'center', gap: 'var(--space-4)', borderLeft: '4px solid var(--color-accent)' };
-                const content = (
-                  <>
-                    <Microscope size={22} strokeWidth={1.75} style={{ flexShrink: 0, color: 'var(--color-accent)' }} />
-                    <span style={{ display: 'flex', flexDirection: 'column', gap: '0.15rem' }}>
-                      <span style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-primary)', lineHeight: 1.4 }}>{lab.name}</span>
-                      {!lab.pdfUrl && (
-                        <span style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', fontStyle: 'italic' }}>
-                          PDF not available
-                        </span>
-                      )}
-                    </span>
-                  </>
-                );
-                return lab.pdfUrl ? (
-                  <a key={li} href={lab.pdfUrl} target="_blank" rel="noopener noreferrer" style={{ ...tileStyle, textDecoration: 'none' }}>
-                    {content}
-                  </a>
-                ) : (
-                  <div key={li} style={tileStyle}>
-                    {content}
-                  </div>
-                );
-              })}
+              {shared.labs.map((lab, li) => (
+                <button
+                  key={li}
+                  type="button"
+                  onClick={() => setActiveLab(lab)}
+                  style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', display: 'flex', alignItems: 'center', gap: 'var(--space-4)', borderLeft: '4px solid var(--color-accent)', textAlign: 'left', cursor: 'pointer', font: 'inherit', width: '100%' }}
+                >
+                  <Microscope size={22} strokeWidth={1.75} style={{ flexShrink: 0, color: 'var(--color-accent)' }} />
+                  <span style={{ display: 'flex', flexDirection: 'column', gap: '0.15rem' }}>
+                    <span style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-primary)', lineHeight: 1.4 }}>{lab.name}</span>
+                    {!lab.pdfUrl && (
+                      <span style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', fontStyle: 'italic' }}>
+                        PDF not available
+                      </span>
+                    )}
+                  </span>
+                </button>
+              ))}
             </div>
           </div>
         </section>
       )}
+
+      <LabDialog lab={activeLab} onClose={() => setActiveLab(null)} />
 
       {/* Placements (shared) */}
       {hasPlacements && (
@@ -979,35 +1082,30 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
               <span className="section-label">Curriculum Overview</span>
               <h2 className="section-title">Mind Map</h2>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <button
-                type="button"
-                onClick={() => setMindMapOpen(true)}
-                aria-label="Open Mind Map in full size"
-                style={{
-                  display: 'inline-block', background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)',
-                  borderRadius: 'var(--radius-md)', padding: 'var(--space-3)', cursor: 'zoom-in', maxWidth: '100%',
-                  transition: 'box-shadow var(--transition-base), border-color var(--transition-base)',
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-md)'; e.currentTarget.style.borderColor = 'var(--color-accent)'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.borderColor = 'var(--color-light-gray)'; }}
-              >
-                <SmoothImage
-                  src={activeProgram.mindMapImage}
-                  alt={`${activeProgram.shortName || activeProgram.name} curriculum mind map`}
-                  style={{ display: 'block', maxWidth: '100%', maxHeight: '70vh', width: 'auto', height: 'auto', borderRadius: 'var(--radius-sm)' }}
-                />
-              </button>
-            </div>
+            {/* Plain vertical stack, in upload order — every image full-width
+                and on its own line, no carousel/slider/side-by-side, so the
+                page just scrolls normally from Image 1 down to the last. */}
+            {mindMapImages.length > 0 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+                {mindMapImages.map((img, i) => (
+                  <SmoothImage
+                    key={img.url}
+                    src={img.url}
+                    alt={`${activeProgram.shortName || activeProgram.name} curriculum mind map${mindMapImages.length > 1 ? ` (${i + 1} of ${mindMapImages.length})` : ''}`}
+                    style={{ display: 'block', width: '100%', maxWidth: 700, height: 'auto', margin: '0 auto', borderRadius: 'var(--radius-md)', border: '1.5px solid var(--color-light-gray)' }}
+                  />
+                ))}
+              </div>
+            )}
+            {activeProgram.mindMapPdfUrl && (
+              <div style={{ display: 'flex', justifyContent: 'center', marginTop: mindMapImages.length > 0 ? 'var(--space-6)' : 0 }}>
+                <a href={activeProgram.mindMapPdfUrl} target="_blank" rel="noopener noreferrer" className="btn btn-outline">
+                  Download Mind Map PDF
+                </a>
+              </div>
+            )}
           </div>
         </section>
-      )}
-      {mindMapOpen && (
-        <ImageLightbox
-          src={activeProgram.mindMapImage}
-          alt={`${activeProgram.shortName || activeProgram.name} curriculum mind map`}
-          onClose={() => setMindMapOpen(false)}
-        />
       )}
 
       {/* Curriculum (per programme) */}
@@ -1021,42 +1119,9 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
         </div>
       </section>
 
-      {/* News & Events — department-wide admin-defined academic-year tables */}
-      {hasNewsEvents && (
-        <section id="news-events" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
-          <div className="container">
-            <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label">{deptName}</span>
-              <h2 className="section-title">News &amp; Events</h2>
-            </div>
-            {newsEventsYears.map((yr, yi) => (
-              <div key={yi} style={{ marginBottom: yi === newsEventsYears.length - 1 ? 0 : 'var(--space-8)' }}>
-                <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.1rem', color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>
-                  Academic Year :: {yr.year}
-                </h3>
-                <div className="pb-activities-scroll">
-                  <table className="news-events-table">
-                    <thead>
-                      <tr>
-                        <th className="pb-activities-num">S.No</th>
-                        {yr.columns.map((col, ci) => <th key={ci}>{col}</th>)}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {yr.rows.map((row, ri) => (
-                        <tr key={ri}>
-                          <td className="pb-activities-num">{ri + 1}</td>
-                          {yr.columns.map((_, ci) => <td key={ci}>{row.cells[ci] ?? ''}</td>)}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+      {/* News & Events — department-wide, tabbed across News & Events /
+          Student Awards / Others (see NewsEventsTabs). */}
+      <NewsEventsTabs categories={newsEventsCategories} eyebrow={deptName} navOffset={NAV_OFFSET} />
 
       {/* News & Events — live from the departmentNews collection, tagged to
           this programme (Programs admin's "News & Events — This Programme").
@@ -1166,6 +1231,40 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                 </div>
               </div>
             ))}
+            {hasRndStructuredTable && (
+              <div style={{ marginBottom: 'var(--space-8)', overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm)' }}>
+                  <thead>
+                    <tr style={{ background: 'var(--color-primary)' }}>
+                      {rndStructuredColumns.map((col, ci) => (
+                        <th key={ci} style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'left', color: 'var(--color-white)', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                          {col}
+                        </th>
+                      ))}
+                      <th style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'left', color: 'var(--color-white)', fontWeight: 700, whiteSpace: 'nowrap' }}>PDF</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rndStructuredRows.map((row, ri) => (
+                      <tr key={ri} style={{ background: ri % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)', borderBottom: '1px solid var(--color-light-gray)' }}>
+                        {rndStructuredColumns.map((_, ci) => (
+                          <td key={ci} style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)', lineHeight: 1.5 }}>
+                            {row.cells[ci] ?? ''}
+                          </td>
+                        ))}
+                        <td style={{ padding: 'var(--space-3) var(--space-4)' }}>
+                          {row.pdfUrl ? (
+                            <a href={row.pdfUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-primary)', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                              <FileText size={14} strokeWidth={2} /> View
+                            </a>
+                          ) : '—'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
             {rndProjectCategories.map((cat, ci) => (
               <div key={ci} style={{ marginBottom: ci < rndProjectCategories.length - 1 ? 'var(--space-10)' : (rndLinks.length > 0 ? 'var(--space-8)' : 0) }}>
                 {cat.title && (

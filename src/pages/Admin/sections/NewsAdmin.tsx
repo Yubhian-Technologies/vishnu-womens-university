@@ -70,6 +70,7 @@ export default function NewsAdmin() {
     <div className="admin-section">
       <div className="admin-card">
         <h2 className="admin-card__title">{editing ? 'Edit Item' : 'Add News / Event'}</h2>
+        <p className="admin-lead" style={{ marginBottom: '1rem' }}>Only feeds the standalone News page (/news) — the Home page's "Latest from VWU" strip is edited from "Happenings & Awards" → Happenings instead.</p>
         <div className="admin-form-grid">
           <div className="admin-field admin-field--full">
             <label>Image</label>
@@ -93,7 +94,7 @@ export default function NewsAdmin() {
             <label>Featured</label>
             <label className="admin-toggle">
               <input type="checkbox" checked={form.featured} onChange={(e) => set('featured', e.target.checked)} />
-              <span>Show on homepage</span>
+              <span>Shown as the featured story at the top of the News page</span>
             </label>
           </div>
           <div className="admin-field admin-field--full">

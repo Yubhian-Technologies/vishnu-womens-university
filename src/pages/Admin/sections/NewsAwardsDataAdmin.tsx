@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
+import ImageUploader from '../../../components/ImageUploader/ImageUploader';
+import type { UploadResult } from '../../../lib/storage';
 
 export interface HappeningDoc {
   id: string;
@@ -10,6 +12,13 @@ export interface HappeningDoc {
   type: 'recent' | 'upcoming';
   dept: string;
   order: number;
+  // Optional — power the Home page card/row this happening feeds (see
+  // Home.tsx's "Latest from VWU" / "Upcoming at VWU"). A happening with
+  // neither still renders fine there, just with a fallback image / no
+  // excerpt.
+  imageUrl?: string;
+  storagePath?: string;
+  description?: string;
 }
 
 export interface AwardDoc {
@@ -22,7 +31,7 @@ export interface AwardDoc {
   order: number;
 }
 
-const EMPTY_HAPPENING: Omit<HappeningDoc, 'id'> = { title: '', date: '', type: 'recent', dept: '', order: 0 };
+const EMPTY_HAPPENING: Omit<HappeningDoc, 'id'> = { title: '', date: '', type: 'recent', dept: '', order: 0, imageUrl: '', storagePath: '', description: '' };
 const EMPTY_AWARD: Omit<AwardDoc, 'id'> = { name: '', issuedBy: '', year: '', details: '', category: 'ranking', order: 0 };
 
 export default function NewsAwardsDataAdmin() {
@@ -48,6 +57,7 @@ function HappeningsPanel() {
   const [saving, setSaving] = useState(false);
 
   const set = (k: string, v: string | number) => setForm((p) => ({ ...p, [k]: v }));
+  const handleImage = (r: UploadResult) => setForm((p) => ({ ...p, imageUrl: r.url, storagePath: r.path }));
 
   const save = async () => {
     if (!form.title || !form.date) return alert('Title and date are required.');
@@ -66,7 +76,10 @@ function HappeningsPanel() {
 
   const startEdit = (it: HappeningDoc) => {
     setEditing(it.id);
-    setForm({ title: it.title, date: it.date, type: it.type, dept: it.dept || '', order: it.order });
+    setForm({
+      title: it.title, date: it.date, type: it.type, dept: it.dept || '', order: it.order,
+      imageUrl: it.imageUrl || '', storagePath: it.storagePath || '', description: it.description || '',
+    });
   };
 
   const remove = async (id: string) => {
@@ -78,6 +91,7 @@ function HappeningsPanel() {
     <>
       <div className="admin-card">
         <h2 className="admin-card__title">{editing ? 'Edit Happening' : 'Add Happening'}</h2>
+        <p className="admin-lead" style={{ marginBottom: '1rem' }}>Also shown on the Home page — Recent under "Latest from VWU", Upcoming under "Upcoming at VWU".</p>
         <div className="admin-form-grid">
           <div className="admin-field admin-field--full">
             <label htmlFor="field-title">Title *</label>
@@ -101,6 +115,14 @@ function HappeningsPanel() {
           <div className="admin-field">
             <label htmlFor="field-display-order">Display Order</label>
             <input id="field-display-order" type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label>Image (optional)</label>
+            <ImageUploader folder="vwu/happenings" currentUrl={form.imageUrl} onUploaded={handleImage} label="Upload Happening Image" />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label htmlFor="field-description-optional">Description (optional)</label>
+            <textarea id="field-description-optional" rows={4} value={form.description} onChange={(e) => set('description', e.target.value)} placeholder="What happened / what to expect…" />
           </div>
         </div>
         <div className="admin-form-actions">

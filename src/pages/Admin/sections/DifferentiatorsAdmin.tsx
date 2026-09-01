@@ -7,25 +7,14 @@ import CustomSectionEditor from './CustomSectionEditor';
 import CustomTabsEditor from './CustomTabsEditor';
 import { replaceAtPath, getAtPath, type CustomSection } from '../../../lib/customSections';
 import { type CustomTab } from '../../../lib/customTabs';
-import {
-  seedUltraTechCoeSections, seedConcreteCanoeLabSections, seedDreamHouseLabSections, type LegacyLabSeed,
-  seedWiseTabs, seedIicTabs, seedVdlTabs, seedIdeaLabTabs,
-} from '../../Differentiators/legacyLabSeeds';
 import AicteIdeaLabTeamAdmin from './AicteIdeaLabTeamAdmin';
 import AicteIdeaLabAmbassadorsAdmin from './AicteIdeaLabAmbassadorsAdmin';
 import AicteIdeaLabFacilityPhotosAdmin from './AicteIdeaLabFacilityPhotosAdmin';
 import IicMemberPhotosAdmin from './IicMemberPhotosAdmin';
 import IicDocumentsAdmin from './IicDocumentsAdmin';
-import TedxPhotosAdmin from './TedxPhotosAdmin';
-import TiDspGalleryPhotosAdmin from './TiDspGalleryPhotosAdmin';
-import ChipsToStartupPhotosAdmin from './ChipsToStartupPhotosAdmin';
-import VsacGalleryPhotosAdmin from './VsacGalleryPhotosAdmin';
 import VdlAchievementsAdmin from './VdlAchievementsAdmin';
 import RwtpReportsAdmin from './RwtpReportsAdmin';
-import AssistiveTechLabPhotosAdmin from './AssistiveTechLabPhotosAdmin';
-import AtlActivityPdfsAdmin from './AtlActivityPdfsAdmin';
 import ConcreteCanoePhotosAdmin from './ConcreteCanoePhotosAdmin';
-import NirvahanaEventPhotosAdmin from './NirvahanaEventPhotosAdmin';
 
 // Some differentiator items have extra editable content beyond the base
 // fields below (a team roster, photo galleries, placement cards, ...) —
@@ -42,29 +31,29 @@ const ITEM_SUB_SECTIONS: Record<string, { key: string; label: string; Component:
     { key: 'member-photos', label: 'Council Member Photos', Component: IicMemberPhotosAdmin },
     { key: 'documents', label: 'Documents', Component: IicDocumentsAdmin },
   ],
-  'tedxsvecw': [{ key: 'photos', label: 'Photos', Component: TedxPhotosAdmin }],
-  'ti-dsp-coe': [{ key: 'gallery-photos', label: 'Gallery Photos', Component: TiDspGalleryPhotosAdmin }],
-  'chips-to-startup': [{ key: 'photos', label: 'Photos', Component: ChipsToStartupPhotosAdmin }],
-  'vsac': [{ key: 'gallery-photos', label: 'Gallery Photos', Component: VsacGalleryPhotosAdmin }],
+  // TEDxSVECW's Photos, TI-DSP CoE's Gallery Photos, Chips to Startup's
+  // Activities/Outcomes photos, and VSAC's Gallery Photos all moved to
+  // generic "files"-type Custom Sections — their old dedicated panels have
+  // no live target to manage anymore.
   // Facility-phase/campus-vehicle/industry-collab photos moved to generic
-  // "files"-type sections within the Tabs editor below (see
-  // legacyLabSeeds.ts's seedVdlTabs) — VdlFacilitiesPhotosAdmin's old
-  // fixed-slot photo panel has no live target to manage anymore. Achievement
-  // Reports stays: it's still rendered as-is on the public page.
+  // "files"-type sections within the Tabs editor below —
+  // VdlFacilitiesPhotosAdmin's old fixed-slot photo panel has no live
+  // target to manage anymore. Achievement Reports stays: it's still
+  // rendered as-is on the public page.
   'vehicle-design-lab': [
     { key: 'achievement-reports', label: 'Achievement Reports', Component: VdlAchievementsAdmin },
   ],
   'rural-women-tech-park': [{ key: 'report-links', label: 'Report Links', Component: RwtpReportsAdmin }],
-  'assistive-tech-lab': [
-    { key: 'atl-photos', label: 'Photos', Component: AssistiveTechLabPhotosAdmin },
-    { key: 'atl-activity-pdfs', label: 'Activity PDFs', Component: AtlActivityPdfsAdmin },
-  ],
+  // ATL's Photos and Activity PDFs moved to generic "files"-type Custom
+  // Sections — AssistiveTechLabPhotosAdmin/AtlActivityPdfsAdmin have no
+  // live target to manage anymore.
   'concrete-canoe-lab': [{ key: 'canoe-photos', label: 'Photos', Component: ConcreteCanoePhotosAdmin }],
   // WISE's old per-item photo panels (team/elite-project/testimonial/NSE
   // clipping) had no live target anymore once every tab moved to generic
-  // "files"-type sections in the Tabs editor below (see legacyLabSeeds.ts's
-  // seedWiseTabs) — removed rather than left pointing at nothing.
-  'nirvahana': [{ key: 'event-photos', label: 'Event Photos', Component: NirvahanaEventPhotosAdmin }],
+  // "files"-type sections in the Tabs editor below — removed rather than
+  // left pointing at nothing. Nirvahana's Event Photos moved to generic
+  // photo-carrying sections the same way — NirvahanaEventPhotosAdmin has no
+  // live target to manage anymore either.
 };
 
 export interface DifferentiatorItemDoc {
@@ -198,24 +187,6 @@ export default function DifferentiatorsAdmin() {
     }));
   };
 
-  // Ultra Tech CoE / Concrete Canoe Lab / Dream House Construction Lab used
-  // to have their real content (Mission, Objectives, In-charge, project
-  // details, ...) hardcoded in .data.ts files with no admin field at all —
-  // this seeds that same content into customSections as a starting point an
-  // admin can then freely edit, so nothing is lost in the move to Firestore.
-  const LEGACY_SEEDS: Record<string, () => LegacyLabSeed> = {
-    'ultratech-coe': seedUltraTechCoeSections,
-    'concrete-canoe-lab': seedConcreteCanoeLabSections,
-    'dream-house-lab': seedDreamHouseLabSections,
-  };
-  const seedCustomSections = () => {
-    const seed = LEGACY_SEEDS[form.slug];
-    if (!seed) return;
-    if (!confirm('Add the original hardcoded content as a starting point? You can edit or remove any of it afterward.')) return;
-    const { sections, about } = seed();
-    setForm((p) => ({ ...p, customSections: sections, about: p.about || about }));
-  };
-
   // Custom Tabs — used only by the 4 items with a sidebar-tab layout
   // instead of the intro/accordion one. Same shape as Custom Sections above,
   // one level deeper (tab -> its own section tree).
@@ -286,25 +257,6 @@ export default function DifferentiatorsAdmin() {
         }),
       })),
     }));
-  };
-
-  // TalentSprint-WISE / IIC / Vehicle Design Lab / AICTE Idea Lab used to
-  // have most of their content hardcoded with no admin field at all — this
-  // seeds their old tab structure into `tabs` as a starting point. Tabs that
-  // are already fully Firestore-editable elsewhere (e.g. IIC's PDF-link
-  // tabs, Idea Lab's Team/Ambassadors/Facilities) aren't included here —
-  // they keep working exactly as they do today, independent of this field.
-  const TAB_SEEDS: Record<string, () => Promise<CustomTab[]>> = {
-    'talentsprint-wise': seedWiseTabs,
-    'institution-innovation-cell': seedIicTabs,
-    'vehicle-design-lab': seedVdlTabs,
-    'aicte-idea-lab': seedIdeaLabTabs,
-  };
-  const seedTabs = async () => {
-    const seed = TAB_SEEDS[form.slug];
-    if (!seed) return;
-    if (!confirm('Add the original hardcoded content as a starting point? You can edit or remove any of it afterward.')) return;
-    set('tabs', await seed());
   };
 
   const save = async () => {
@@ -429,13 +381,6 @@ export default function DifferentiatorsAdmin() {
                 section to choose "In the intro area above" (short items like Vision/Mission/Objectives, shown inline
                 near About) vs. "In the accordion below" (the default — everything else, shown as a click-to-expand panel).
               </p>
-              {LEGACY_SEEDS[form.slug] && (form.customSections || []).length === 0 && (
-                <p className="admin-field__hint" style={{ background: '#eef6ff', border: '1px solid #bcdcfd', borderRadius: 6, padding: '0.6rem 0.9rem' }}>
-                  This item's Mission/Objectives/accordion content used to be hardcoded in the site's code, with no
-                  admin field for it.{' '}
-                  <button type="button" className="admin-btn admin-btn--sm" onClick={seedCustomSections}>Add starter content</button>
-                </p>
-              )}
               <div className="admin-field admin-field--full">
                 <CustomSectionEditor
                   sections={form.customSections || []}
@@ -460,12 +405,6 @@ export default function DifferentiatorsAdmin() {
                 reorder, or remove tabs below — click "Edit Content" on a tab to add sections to it (same plain
                 text / checklist / table / links / files editor as everywhere else).
               </p>
-              {TAB_SEEDS[form.slug] && (form.tabs || []).length === 0 && (
-                <p className="admin-field__hint" style={{ background: '#eef6ff', border: '1px solid #bcdcfd', borderRadius: 6, padding: '0.6rem 0.9rem' }}>
-                  This item's tab content used to be hardcoded in the site's code, with no admin field for it.{' '}
-                  <button type="button" className="admin-btn admin-btn--sm" onClick={seedTabs}>Add starter content</button>
-                </p>
-              )}
               <div className="admin-field admin-field--full">
                 <CustomTabsEditor
                   tabs={form.tabs || []}
