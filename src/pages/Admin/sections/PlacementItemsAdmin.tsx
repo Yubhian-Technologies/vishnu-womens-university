@@ -3,8 +3,10 @@ import { collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp } from '
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
 import { CONTENT_ICON_NAMES } from '../../../lib/contentIcons';
-import { deleteFile } from '../../../lib/storage';
+import { deleteFile, type UploadResult } from '../../../lib/storage';
 import TableImportButton from '../../../components/TableImportButton/TableImportButton';
+import { useImageCropModal } from '../../../components/ImageUploader/useImageCropModal';
+import { PLACEMENT_HIGHLIGHTS_CAROUSEL_RATIO } from '../../../lib/placementHighlightsCarousel';
 
 export interface PlacementItemDoc {
   id: string;
@@ -51,7 +53,7 @@ export interface PlacementItemDoc {
 const EMPTY: Omit<PlacementItemDoc, 'id'> = {
   slug: '', title: '', icon: 'BarChart3', desc: '', external: false, url: '',
   intro: '', about: '', highlights: [], outcomes: [], partners: [], tableText: '', dataTableHeadersText: '', rosterGroupsText: '',
-  deptCoordinatorsText: '', deptCoordinatorGroupsText: '', emails: [], linkedins: [], heroImage: '', heroStoragePath: '', order: 0,
+  deptCoordinatorsText: '', deptCoordinatorGroupsText: '', emails: [], linkedins: [], heroImage: '', heroStoragePath: '', galleryImages: [], order: 0,
 };
 
 function linesToArray(text: string): string[] {
@@ -66,6 +68,13 @@ export default function PlacementItemsAdmin() {
   const [form, setForm] = useState<Omit<PlacementItemDoc, 'id'>>(EMPTY);
   const [editing, setEditing] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  // Photo Carousel — useImageCropModal directly (not the full ImageUploader
+  // component), same as GsacPhotosAdmin/IloOfficePhotosAdmin: ImageUploader
+  // keeps a "last uploaded" preview and swaps its button to "Change Image"
+  // after the first photo, which reads as "replace this one" rather than
+  // "add another" — the wrong affordance for a repeatable add-to-list field.
+  const { openCrop: openGalleryCrop, cropModal: galleryCropModal } = useImageCropModal(PLACEMENT_HIGHLIGHTS_CAROUSEL_RATIO);
+  const [galleryUploading, setGalleryUploading] = useState(false);
 
   const set = (k: string, v: string | number | string[] | boolean) => setForm((p) => ({ ...p, [k]: v }));
 
@@ -101,8 +110,59 @@ export default function PlacementItemsAdmin() {
       tableText: it.tableText || '', dataTableHeadersText: it.dataTableHeadersText || '', rosterGroupsText: it.rosterGroupsText || '', deptCoordinatorsText: it.deptCoordinatorsText || '',
       deptCoordinatorGroupsText: it.deptCoordinatorGroupsText || '',
       emails: it.emails || [], linkedins: it.linkedins || [],
-      heroImage: it.heroImage || '', heroStoragePath: it.heroStoragePath || '', order: it.order,
+      heroImage: it.heroImage || '', heroStoragePath: it.heroStoragePath || '',
+      galleryImages: it.galleryImages || [], order: it.order,
     });
+  };
+
+  // Gallery images — added one at a time via the crop modal, each
+  // independently uploaded/removed (same pattern as ProgramsAdmin's Lab
+  // PDFs): functional setForm reads p.galleryImages, never a stale outer
+  // snapshot, so uploading several in quick succession can't clobber one
+  // another. Order in the array is display order — move buttons reorder it.
+  const galleryImages = form.galleryImages || [];
+  const addGalleryImage = (file: File) => {
+    setGalleryUploading(true);
+    openGalleryCrop(file, 'vwu/placements/highlights-carousel', (r: UploadResult) => {
+      setForm((p) => ({ ...p, galleryImages: [...(p.galleryImages || []), { url: r.url, path: r.path }] }));
+      setGalleryUploading(false);
+    });
+  };
+  const moveGalleryImage = (i: number, dir: -1 | 1) => {
+    setForm((p) => {
+      const next = [...(p.galleryImages || [])];
+      const target = i + dir;
+      if (target < 0 || target >= next.length) return p;
+      [next[i], next[target]] = [next[target], next[i]];
+      return { ...p, galleryImages: next };
+    });
+  };
+  // Removes immediately (deletes from Storage + patches Firestore on the
+  // spot if this item already exists), same reasoning as removeLabPdf in
+  // ProgramsAdmin — no orphaned Storage file, no risk of losing the removal
+  // if the admin navigates away before saving the rest of the form.
+  const removeGalleryImage = async (i: number) => {
+    const img = galleryImages[i];
+    if (!img) return;
+    if (!confirm('Remove this photo from the carousel? This cannot be undone.')) return;
+    try {
+      if (img.path) await deleteFile(img.path);
+    } catch (e) {
+      alert(`Couldn't delete the file from storage: ${(e as Error).message}`);
+      return;
+    }
+    let next: { url: string; path: string }[] = [];
+    setForm((p) => {
+      next = (p.galleryImages || []).filter((_, gi) => gi !== i);
+      return { ...p, galleryImages: next };
+    });
+    if (editing) {
+      try {
+        await updateDoc(doc(db, 'placementItems', editing), { galleryImages: next });
+      } catch (e) {
+        alert(`The file was deleted from storage, but the saved record couldn't be updated: ${(e as Error).message}`);
+      }
+    }
   };
 
   const remove = async (id: string, heroStoragePath?: string) => {
@@ -224,6 +284,48 @@ export default function PlacementItemsAdmin() {
               )}
             </div>
           </div>
+          {form.slug === 'placement-highlights' && (
+            <div className="admin-field admin-field--full">
+              <label>Photo Carousel</label>
+              <p className="admin-field__hint" style={{ marginTop: 0 }}>
+                Replaces this page's Overview text and Key Highlights sidebar with an auto-advancing photo
+                carousel — add each image below (any order; use ↑/↓ to reorder). Leave it empty to keep showing
+                the plain Overview text/Key Highlights instead. Every photo is cropped to the same fixed shape on
+                upload (matching the reference banner) so images don't vary in size from one another — the
+                carousel would otherwise visibly resize on every swap. Drag the crop box to the part of your
+                source image you want kept before clicking "Crop & Upload".
+              </p>
+              {galleryImages.length > 0 && (
+                <div className="admin-image-grid" style={{ marginBottom: '0.75rem' }}>
+                  {galleryImages.map((img, i) => (
+                    <div key={img.path || i} className="admin-image-card">
+                      <img src={img.url} alt={`Carousel photo ${i + 1}`} />
+                      <div className="admin-image-card__actions">
+                        <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveGalleryImage(i, -1)} disabled={i === 0} title="Move earlier">↑</button>
+                        <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveGalleryImage(i, 1)} disabled={i === galleryImages.length - 1} title="Move later">↓</button>
+                        <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeGalleryImage(i)}>Remove</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <label className="admin-btn admin-btn--ghost" style={{ display: 'inline-block', cursor: galleryUploading ? 'default' : 'pointer', opacity: galleryUploading ? 0.6 : 1 }}>
+                {galleryUploading ? 'Uploading…' : '+ Add Photo'}
+                <input
+                  type="file"
+                  accept="image/*"
+                  hidden
+                  disabled={galleryUploading}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) addGalleryImage(file);
+                    e.target.value = '';
+                  }}
+                />
+              </label>
+              {galleryCropModal}
+            </div>
+          )}
           <div className="admin-field admin-field--full">
             <label htmlFor="field-team-groups-one-per-line-optional">
               Team Groups (one per line, "Group Label | Count" — optional). When set, the Data Table above

@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Newspaper, Search } from 'lucide-react';
-import NewsCard from '../../components/NewsCard/NewsCard';
+import NewsCard, { type NewsArticle } from '../../components/NewsCard/NewsCard';
+import NewsArticleDialog from '../../components/NewsCard/NewsArticleDialog';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { formatDate } from '../../lib/formatDate';
 import { type NewsDoc, NEWS_CATEGORIES, NEWS_FALLBACK_IMAGE, newsDocToArticle } from '../../lib/news';
+import { happeningToArticle } from '../../lib/happenings';
+import type { HappeningDoc } from '../Admin/sections/NewsAwardsDataAdmin';
 import './News.css';
 import PageHero from '../../components/PageHero/PageHero';
 import { useHashScroll } from '../../hooks/useHashScroll';
@@ -15,8 +18,14 @@ const categories = ['All', ...NEWS_CATEGORIES];
 
 export default function News() {
   const { docs: items, loading, error } = useOrderedCollection<NewsDoc>('news', 'date', 'desc');
+  // "Event" articles are sourced from the Happenings admin (see
+  // NewsAwardsDataAdmin.tsx) rather than the `news` collection — everything
+  // else (News/Achievement/Award/Announcement/Research) still comes from
+  // the News & Events admin, same as always.
+  const { docs: happenings } = useOrderedCollection<HappeningDoc>('happenings', 'order');
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeArticle, setActiveArticle] = useState<NewsArticle | null>(null);
 
   useHashScroll();
 
@@ -39,15 +48,27 @@ export default function News() {
     );
     document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => observer.observe(el));
     return () => observer.disconnect();
-  }, [items]);
+  }, [items, happenings]);
 
+  // The featured hero banner below only ever picks from real news articles
+  // — it shows a `body` and an ISO-formatted `date` neither of which a
+  // happening has, so a happening is never eligible to become it.
   const featuredItem = items.find(i => i.featured) ?? items[0];
   const rest = items.filter(i => i.id !== featuredItem?.id);
 
-  const filtered = rest.filter(article => {
+  // Grid articles below merge both sources: real news articles (any
+  // category) plus every happening, tagged "Event" regardless of whether
+  // it's Recent or Upcoming — that distinction lives on the Happenings page
+  // itself, not here.
+  const combined: NewsArticle[] = [
+    ...rest.map(newsDocToArticle),
+    ...happenings.map((h) => ({ ...happeningToArticle(h), category: 'Event' })),
+  ];
+
+  const filtered = combined.filter(article => {
     const matchCategory = activeCategory === 'All' || article.category === activeCategory;
     const matchSearch = article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      article.summary.toLowerCase().includes(searchQuery.toLowerCase());
+      article.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
     return matchCategory && matchSearch;
   });
 
@@ -151,12 +172,12 @@ export default function News() {
               <div className="news-articles-grid">
                 {filtered.map((item, i) => (
                   <div key={item.id} className="reveal" data-delay={`${(i % 3) * 100}`}>
-                    <NewsCard article={newsDocToArticle(item)} />
+                    <NewsCard article={item} onReadMore={() => setActiveArticle(item)} />
                   </div>
                 ))}
               </div>
             </>
-          ) : items.length === 0 ? (
+          ) : items.length === 0 && happenings.length === 0 ? (
             <div className="news-empty">
               <div className="news-empty-icon" style={{ display: 'flex', justifyContent: 'center' }}><Newspaper size={56} strokeWidth={1.5} color="var(--color-light-gray)" /></div>
               <h3>No news yet</h3>
@@ -177,6 +198,8 @@ export default function News() {
           )}
         </div>
       </section>
+
+      <NewsArticleDialog article={activeArticle} onClose={() => setActiveArticle(null)} />
 
       {/* Newsletter CTA */}
       <section className="section" style={{ background: 'var(--color-primary)' }}>
