@@ -5,6 +5,7 @@ import PageHero from '../../components/PageHero/PageHero';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import type { FacultyFact, FacultySection } from '../../lib/facultySections';
+import type { CustomSection } from '../../lib/customSections';
 
 // Fixed department tab order (per design decision, not derived from data) —
 // each tab's `departments` lists every raw `department` field value (as
@@ -67,6 +68,7 @@ export interface FacultyDoc {
    *  page (FacultyProfile.tsx), not on this grid. */
   facts?: FacultyFact[];
   sections?: FacultySection[];
+  customSections?: CustomSection[];
 }
 
 function getInitials(name: string) {

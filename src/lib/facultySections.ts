@@ -12,6 +12,9 @@
 //   - a "TABLE:" line starts a table: the next line is the header row, every
 //     following pipe-separated line is a data row, until a blank line
 
+import { generateSectionId, type CustomSection } from './customSections';
+import { serializeFlexibleTable } from './structuredTable';
+
 export interface FacultyFact {
   label: string;
   value: string;
@@ -124,6 +127,61 @@ export function sectionsToText(sections: FacultySection[] = []): string {
       return body ? `## ${s.title}\n${body}` : `## ${s.title}`;
     })
     .join('\n\n');
+}
+
+// One-time upgrade path: turns a faculty member's old plain-text-authored
+// `sections` (blocks parsed from the "## Title / TABLE: / - bullet" format
+// above) into the richer, structured `CustomSection[]` shape used everywhere
+// else in the admin (Programs, Differentiators — see lib/customSections.ts
+// and CustomSectionEditor.tsx). Run once, automatically, by FacultyAdmin's
+// startEdit() whenever a record has old-format `sections` but no
+// `customSections` yet, so opening a faculty member for editing upgrades
+// their profile to the same editor everyone else gets — sub-sections, real
+// tables, lists of links, uploaded files — without losing any existing
+// content. The common case (a section holding exactly one block) maps
+// directly to the matching content type; a section mixing multiple blocks
+// (rare — most profiles use one kind of content per section) keeps its
+// first text/list block as the section's own content and pushes every other
+// block in as its own labeled sub-section, so nothing is dropped either way.
+export function facultySectionsToCustomSections(sections: FacultySection[]): CustomSection[] {
+  const out: CustomSection[] = [];
+  const tableText = (b: Extract<SectionBlock, { type: 'table' }>) =>
+    serializeFlexibleTable([{ title: '', headers: b.headers, rows: b.rows.map((r) => r.cells) }]);
+
+  sections.forEach((s) => {
+    const blocks = getSectionBlocks(s);
+    const id = generateSectionId(s.title, out);
+
+    if (blocks.length <= 1) {
+      const b = blocks[0];
+      const base: CustomSection = { id, label: s.title, contentType: 'text', textContent: '' };
+      if (!b) { out.push(base); return; }
+      if (b.type === 'table') out.push({ ...base, contentType: 'table', tableText: tableText(b) });
+      else if (b.type === 'bullets') out.push({ ...base, contentType: 'list', listText: b.items.join('\n') });
+      else out.push({ ...base, contentType: 'text', textContent: b.text });
+      return;
+    }
+
+    const parent: CustomSection = { id, label: s.title, contentType: 'text', textContent: '' };
+    const subs: CustomSection[] = [];
+    let ownContentUsed = false;
+    blocks.forEach((b) => {
+      if (!ownContentUsed && b.type !== 'table') {
+        if (b.type === 'bullets') { parent.contentType = 'list'; parent.listText = b.items.join('\n'); }
+        else { parent.contentType = 'text'; parent.textContent = b.text; }
+        ownContentUsed = true;
+        return;
+      }
+      const subId = generateSectionId(b.type === 'table' ? 'Table' : b.type === 'bullets' ? 'List' : 'Text', [...out, parent, ...subs]);
+      if (b.type === 'table') subs.push({ id: subId, label: 'Table', contentType: 'table', tableText: tableText(b) });
+      else if (b.type === 'bullets') subs.push({ id: subId, label: 'List', contentType: 'list', listText: b.items.join('\n') });
+      else subs.push({ id: subId, label: 'Text', contentType: 'text', textContent: b.text });
+    });
+    if (subs.length > 0) parent.subSections = subs;
+    out.push(parent);
+  });
+
+  return out;
 }
 
 export function textToSections(text: string): FacultySection[] {
