@@ -26,16 +26,47 @@ export interface PlacementYearRecord {
   rows: PlacementRecordRow[];
 }
 
+// Plain Levenshtein edit distance — backs fuzzyColumnIndex below.
+function levenshtein(a: string, b: string): number {
+  const dp: number[][] = Array.from({ length: a.length + 1 }, () => new Array(b.length + 1).fill(0));
+  for (let i = 0; i <= a.length; i++) dp[i][0] = i;
+  for (let j = 0; j <= b.length; j++) dp[0][j] = j;
+  for (let i = 1; i <= a.length; i++) {
+    for (let j = 1; j <= b.length; j++) {
+      dp[i][j] = a[i - 1] === b[j - 1]
+        ? dp[i - 1][j - 1]
+        : 1 + Math.min(dp[i - 1][j - 1], dp[i - 1][j], dp[i][j - 1]);
+    }
+  }
+  return dp[a.length][b.length];
+}
+
+// Last-resort fallback for the exact substring checks above: catches a
+// near-miss spelling of `keyword` (e.g. a real production header typo'd as
+// "Pacakage" instead of "Package") within any one word of a column header.
+// Only real admin-typed typos of an otherwise-recognizable word should
+// match here — short words and anything more than 2 edits away don't.
+function fuzzyColumnIndex(columns: string[], keyword: string): number {
+  const normalized = columns.map((c) => c.toLowerCase());
+  return normalized.findIndex((header) =>
+    header.split(/[^a-z0-9]+/).some((word) => word.length >= 4 && levenshtein(word, keyword) <= 2)
+  );
+}
+
 // Finds whichever column looks like it holds the placement package/CTC —
 // prefers a header containing both "highest" and "package", then any
-// "package", then "ctc", then "salary". Returns -1 if nothing matches (the
-// public page then just shows rows in their original imported order).
+// "package", then "ctc", then "salary", then a near-miss spelling of
+// "package"/"salary" (typo tolerance, see fuzzyColumnIndex). Returns -1 if
+// nothing matches (the public page then just shows rows in their original
+// imported order).
 export function findPackageColumnIndex(columns: string[]): number {
   const normalized = columns.map((c) => c.toLowerCase());
   let idx = normalized.findIndex((c) => c.includes('highest') && c.includes('package'));
   if (idx === -1) idx = normalized.findIndex((c) => c.includes('package'));
   if (idx === -1) idx = normalized.findIndex((c) => c.includes('ctc'));
   if (idx === -1) idx = normalized.findIndex((c) => c.includes('salary'));
+  if (idx === -1) idx = fuzzyColumnIndex(columns, 'package');
+  if (idx === -1) idx = fuzzyColumnIndex(columns, 'salary');
   return idx;
 }
 
@@ -48,6 +79,21 @@ function parsePackageValue(raw: string): number {
   return match ? parseFloat(match[0]) : NaN;
 }
 
+// Different admins' Excel files record the package column differently —
+// some already in LPA ("8.5", "12"), others as the full rupee amount
+// ("12,00,000" / 1200000, i.e. 12 lakhs = 12 LPA). No real placement
+// package is ever quoted as "1000 LPA" (that's ₹10 crore/year), but full
+// rupee figures for engineering placements routinely run into the hundreds
+// of thousands — so anything >= 1000 is safely a rupee amount and gets
+// divided down to LPA (1 lakh = ₹100,000); anything smaller is assumed to
+// already be in LPA. Used everywhere a package value needs to be a real LPA
+// number (average/median/highest, the above-N-LPA thresholds); the top-10
+// ranking in sortPlacementRows doesn't need it since dividing every value
+// by the same constant never changes their relative order.
+function normalizeToLpa(value: number): number {
+  return value >= 1000 ? value / 100000 : value;
+}
+
 // Finds whichever column looks like it holds the recruiting company's name —
 // prefers "company", then "organisation"/"organization", then "recruiter",
 // then "employer". Returns -1 if nothing matches (No. of Companies Visited
@@ -58,6 +104,7 @@ function findCompanyColumnIndex(columns: string[]): number {
   if (idx === -1) idx = normalized.findIndex((c) => c.includes('organis') || c.includes('organiz'));
   if (idx === -1) idx = normalized.findIndex((c) => c.includes('recruiter'));
   if (idx === -1) idx = normalized.findIndex((c) => c.includes('employer'));
+  if (idx === -1) idx = fuzzyColumnIndex(columns, 'company');
   return idx;
 }
 
@@ -103,7 +150,10 @@ export function computePlacementStats(columns: string[], rows: PlacementRecordRo
   const pkgIdx = findPackageColumnIndex(columns);
   const packages = pkgIdx === -1
     ? []
-    : rows.map((r) => parsePackageValue(r.cells[pkgIdx] || '')).filter((v) => !Number.isNaN(v));
+    : rows
+        .map((r) => parsePackageValue(r.cells[pkgIdx] || ''))
+        .filter((v) => !Number.isNaN(v))
+        .map(normalizeToLpa);
 
   const hasPackages = packages.length > 0;
   return {
