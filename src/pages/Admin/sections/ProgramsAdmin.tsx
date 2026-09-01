@@ -10,7 +10,7 @@ import { deleteFile, type UploadResult } from '../../../lib/storage';
 import { PROGRAM_ICON_NAMES } from '../../../lib/programIcons';
 import DepartmentNewsManager from './DepartmentNewsManager';
 import type { PlacementYearRecord } from '../../../lib/placementRecords';
-import { parsePlacementsFile, type PlacementImportResult } from '../../../lib/placementsImport';
+import { parsePlacementsFile, dedupePlacementRows, downloadPlacementsTemplate, type PlacementImportResult } from '../../../lib/placementsImport';
 import CustomSectionEditor from './CustomSectionEditor';
 import { replaceAtPath, getAtPath, type CustomSection } from '../../../lib/customSections';
 import RndTableEditor, { type RndStructuredTable } from './RndTableEditor';
@@ -670,6 +670,17 @@ export default function ProgramsAdmin() {
   return (
     <div className="admin-section">
       <div className="admin-card">
+        <h2 className="admin-card__title">Placements — Import Template</h2>
+        <p className="admin-field__hint" style={{ marginBottom: '0.75rem' }}>
+          For the "S.No / Registration Number / Student Name / Company / Package" file each programme's Placements
+          section (below, once you Edit a programme) accepts — grab this before you start filling one in.
+        </p>
+        <button type="button" className="admin-btn admin-btn--ghost admin-btn--sm" onClick={downloadPlacementsTemplate}>
+          ⬇ Download Excel Template
+        </button>
+      </div>
+
+      <div className="admin-card">
         <h2 className="admin-card__title">{editing ? 'Edit Program' : 'Add Program'}</h2>
         <p className="admin-field__hint" style={{ background: '#eef6ff', border: '1px solid #bcdcfd', borderRadius: 6, padding: '0.6rem 0.9rem', marginBottom: '1rem' }}>
           This program's hero image is now edited from <strong>Hero Banners → Programs</strong>, not here.
@@ -894,6 +905,19 @@ export default function ProgramsAdmin() {
               edited per-programme anymore — it's shared across a department's programmes, so it now lives on the
               matching card in <strong>Admin → Academic Departments</strong> instead.
             </p>
+          </div>
+
+          <div className="admin-field admin-field--full"><hr /><h3>Placements</h3></div>
+          <div className="admin-field admin-field--full">
+            {editing ? (
+              <p className="admin-field__hint">Import from Excel/CSV/Word/PDF in the "Placements" card below, once your changes here are saved.</p>
+            ) : (
+              <p className="admin-field__hint">
+                Save this program first, then reopen it here (Edit) to import Placements — a "Placements" card will
+                appear below with the file upload. You can download the import template from the button at the top
+                of this page any time before that.
+              </p>
+            )}
           </div>
 
           <div className="admin-field admin-field--full"><hr /><h3>News &amp; Events — This Programme</h3></div>
@@ -1192,7 +1216,16 @@ function PlacementYearsEditor({ program }: { program: ProgramDoc }) {
         );
         return;
       }
-      setPreviews((p) => ({ ...p, [yi]: result }));
+      // Only an exact whole-row duplicate (every column the same) is
+      // dropped — a repeated name, registration number, company, etc. on
+      // its own is a normal, expected occurrence (e.g. one student with
+      // multiple offers) and is left alone.
+      const { rows: dedupedRows, removed } = dedupePlacementRows(result.rows);
+      const dupWarning = removed > 0
+        ? `Skipped ${removed} exact duplicate row${removed === 1 ? '' : 's'} (every column matched another row already in the file).`
+        : '';
+      const warning = [result.warning, dupWarning].filter(Boolean).join(' ') || undefined;
+      setPreviews((p) => ({ ...p, [yi]: { ...result, rows: dedupedRows, warning } }));
     } catch (e) {
       alert(`Couldn't read that file: ${(e as Error).message}`);
     } finally {
@@ -1240,7 +1273,14 @@ function PlacementYearsEditor({ program }: { program: ProgramDoc }) {
         whichever column looks like "Package"/"Highest Package"/"CTC" show first for that year, then everyone else
         in the order they were imported. Re-importing a year replaces its previous dataset. Scoped to this exact
         programme only — other programmes in the same department manage their own Academic Years independently.
+        A row that's an exact duplicate of another (every column matches) is skipped automatically on import — a
+        single column repeating on its own, like a student's name against two different companies, is fine.
       </p>
+      <div style={{ marginBottom: '1rem' }}>
+        <button type="button" className="admin-btn admin-btn--ghost admin-btn--sm" onClick={downloadPlacementsTemplate}>
+          ⬇ Download Excel Template
+        </button>
+      </div>
 
       <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '1.25rem' }}>
         <input

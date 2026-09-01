@@ -75,6 +75,55 @@ function expandTableRows(trs: Element[]): string[][] {
   return rows;
 }
 
+// Drops rows that are exact duplicates of an earlier row — every column
+// matching (case/whitespace-insensitive, so "TCS" and "tcs " collapse
+// together same as computePlacementStats' company matching does) — while
+// leaving a *partial* repeat alone (e.g. the same student appearing twice
+// for two different companies, or two students both placed at the same
+// company). Used right after parsing, before a file's rows ever reach the
+// admin preview or get saved.
+export function dedupePlacementRows(rows: string[][]): { rows: string[][]; removed: number } {
+  const seen = new Set<string>();
+  const deduped: string[][] = [];
+  let removed = 0;
+  for (const row of rows) {
+    const key = row.map((c) => (c || '').trim().toLowerCase()).join('\u0001');
+    if (seen.has(key)) { removed++; continue; }
+    seen.add(key);
+    deduped.push(row);
+  }
+  return { rows: deduped, removed };
+}
+
+// Column names chosen to match the auto-detection heuristics in
+// placementRecords.ts: "S.No" (findSerialColumnIndex — hidden from the
+// public table, which numbers rows itself), "Company" and "Package (LPA)"
+// (findPackageColumnIndex/findCompanyColumnIndex, used for the stat tiles
+// and the "10 highest" sort). "Registration Number" and "Student Name" have
+// no special handling — they just display as-is.
+const PLACEMENT_TEMPLATE_HEADERS = ['S.No', 'Registration Number', 'Student Name', 'Company', 'Package (LPA)'];
+
+// Two rows for the same student ("A. Priya") to make the whole-row-only
+// duplicate rule concrete in the template itself, rather than just in
+// admin copy: repeating a name/company/etc. is fine, only an exact
+// duplicate row (every column the same) gets rejected on import.
+const PLACEMENT_TEMPLATE_EXAMPLE_ROWS = [
+  ['1', '21A91A0501', 'A. Priya', 'TCS', '3.5'],
+  ['2', '21A91A0502', 'B. Swathi', 'Infosys', '4.2'],
+  ['3', '21A91A0501', 'A. Priya', 'Wipro', '4.5'],
+];
+
+/** Downloads a blank Placements import template (.xlsx) with the expected
+ *  columns and a couple of example rows — see PlacementYearsEditor's
+ *  "Download Template" button in ProgramsAdmin.tsx. */
+export function downloadPlacementsTemplate() {
+  const ws = XLSX.utils.aoa_to_sheet([PLACEMENT_TEMPLATE_HEADERS, ...PLACEMENT_TEMPLATE_EXAMPLE_ROWS]);
+  ws['!cols'] = PLACEMENT_TEMPLATE_HEADERS.map((h) => ({ wch: Math.max(h.length, 16) }));
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Placements');
+  XLSX.writeFile(wb, 'placement-records-template.xlsx');
+}
+
 export function parsePlacementsBuffer(buf: ArrayBuffer): PlacementImportResult {
   const wb = XLSX.read(buf, { type: 'array' });
   const sheet = wb.Sheets[wb.SheetNames[0]];

@@ -562,49 +562,53 @@ export default function DepartmentsAdmin() {
           <div className="admin-field admin-field--full">
             <label>Laboratories</label>
             <p className="admin-field__hint" style={{ marginTop: 0 }}>
-              Each laboratory has its own name, an optional short description, and its own uploaded PDF. On the
-              public page, clicking a laboratory tile opens that lab's PDF directly — a lab with no PDF uploaded yet
-              still shows its tile, just marked as unavailable.
+              Each laboratory has its own name, an optional description (a paragraph, or points — one per line, however
+              you write it), and its own uploaded PDF. On the public page, tapping a laboratory tile opens a dialog
+              with its description and a link to its PDF — a lab with no PDF uploaded yet still shows its tile and
+              dialog, just marked as unavailable there.
             </p>
             {labs.length > 0 && (
               <div className="admin-compact-list" style={{ marginBottom: '0.75rem' }}>
                 {labs.map((lab, li) => (
-                  <div key={li} className="admin-compact-row">
-                    <input
-                      className="admin-compact-row__name"
-                      value={lab.name}
-                      onChange={(e) => updateLabName(li, e.target.value)}
-                      placeholder="Advanced Computing Lab"
-                    />
-                    <input
-                      className="admin-compact-row__desc"
+                  <div key={li} style={{ padding: '0.4rem 0.6rem', borderBottom: li < labs.length - 1 ? '1px solid #e5e7eb' : 'none' }}>
+                    <div className="admin-compact-row" style={{ padding: 0, border: 'none' }}>
+                      <input
+                        className="admin-compact-row__name"
+                        value={lab.name}
+                        onChange={(e) => updateLabName(li, e.target.value)}
+                        placeholder="Advanced Computing Lab"
+                      />
+                      <div className="admin-compact-row__file">
+                        <FileUploader
+                          compact
+                          folder="vwu/departments/labs"
+                          currentUrl={lab.pdfUrl}
+                          onUploaded={(r) => handleLabPdf(li, r)}
+                          label="Upload PDF"
+                        />
+                      </div>
+                      <div className="admin-compact-row__actions">
+                        <button
+                          type="button"
+                          className="admin-btn admin-btn--ghost admin-btn--sm"
+                          onClick={() => removeLabPdf(li)}
+                          disabled={!lab.pdfUrl}
+                          title={lab.pdfUrl ? 'Remove PDF' : 'No PDF uploaded yet'}
+                        >
+                          Remove PDF
+                        </button>
+                        <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveLab(li, -1)} disabled={li === 0} title="Move up">↑</button>
+                        <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveLab(li, 1)} disabled={li === labs.length - 1} title="Move down">↓</button>
+                        <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeLab(li)} title="Remove laboratory">Remove</button>
+                      </div>
+                    </div>
+                    <textarea
                       value={lab.description || ''}
                       onChange={(e) => updateLabDescription(li, e.target.value)}
-                      placeholder="Description (optional)"
+                      placeholder="Description (optional) — a paragraph, or one point per line…"
+                      rows={2}
+                      style={{ width: '100%', marginTop: '0.4rem' }}
                     />
-                    <div className="admin-compact-row__file">
-                      <FileUploader
-                        compact
-                        folder="vwu/departments/labs"
-                        currentUrl={lab.pdfUrl}
-                        onUploaded={(r) => handleLabPdf(li, r)}
-                        label="Upload PDF"
-                      />
-                    </div>
-                    <div className="admin-compact-row__actions">
-                      <button
-                        type="button"
-                        className="admin-btn admin-btn--ghost admin-btn--sm"
-                        onClick={() => removeLabPdf(li)}
-                        disabled={!lab.pdfUrl}
-                        title={lab.pdfUrl ? 'Remove PDF' : 'No PDF uploaded yet'}
-                      >
-                        Remove PDF
-                      </button>
-                      <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveLab(li, -1)} disabled={li === 0} title="Move up">↑</button>
-                      <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveLab(li, 1)} disabled={li === labs.length - 1} title="Move down">↓</button>
-                      <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeLab(li)} title="Remove laboratory">Remove</button>
-                    </div>
                   </div>
                 ))}
               </div>

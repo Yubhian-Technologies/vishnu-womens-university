@@ -16,7 +16,8 @@ import { usePageBanner } from '../../hooks/usePageBanner';
 import { useEapcetCode } from '../../hooks/useContentBlocks';
 import { smoothScrollTo } from '../../lib/smoothScroll';
 import { fetchPriorityAttr } from '../../lib/domAttrs';
-import { normalizeLab, normalizeMindMapImages, type ProgramDoc, type NewsEventsYear } from '../Admin/sections/ProgramsAdmin';
+import { normalizeLab, normalizeMindMapImages, type ProgramDoc, type NewsEventsYear, type LabItem } from '../Admin/sections/ProgramsAdmin';
+import LabDialog from '../../components/LabDialog/LabDialog';
 import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import type { FacultyDoc } from './Faculty';
 import { parseFlexibleTable, parseProjectAccordion } from '../../lib/structuredTable';
@@ -59,6 +60,7 @@ function SingleProgramDetail() {
   // 'all' shows every row, otherwise a fixed page size (DataTables-style
   // "Show N entries" control, matching the reference design).
   const [placementPageSize, setPlacementPageSize] = useState<number | 'all'>(10);
+  const [activeLab, setActiveLab] = useState<LabItem | null>(null);
   const [openRndProjects, setOpenRndProjects] = useState<Set<string>>(new Set());
   const toggleRndProject = (key: string) => {
     setOpenRndProjects((prev) => {
@@ -740,44 +742,36 @@ function SingleProgramDetail() {
               <p className="section-desc">State-of-the-art laboratory facilities that bring coursework to life with hands-on, industry-relevant experimentation.</p>
             </div>
             <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 'var(--space-4)' }}>
-              {labs.map((lab, li) => {
-                const tileStyle = { background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', display: 'flex', alignItems: 'center', gap: 'var(--space-4)', borderLeft: '4px solid var(--color-accent)' };
-                const content = (
-                  <>
-                    <Microscope size={22} strokeWidth={1.75} style={{ flexShrink: 0, color: 'var(--color-accent)' }} />
-                    <span style={{ display: 'flex', flexDirection: 'column', gap: '0.15rem' }}>
-                      <span style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-primary)', lineHeight: 1.4 }}>{lab.name}</span>
-                      {lab.description && (
-                        <span style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', lineHeight: 1.4 }}>
-                          {lab.description}
-                        </span>
-                      )}
-                      {/* Tile always stays visible even with no PDF yet — just marked
-                          unavailable, same convention as the Newsletter issues above. */}
-                      {!lab.pdfUrl && (
-                        <span style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', fontStyle: 'italic' }}>
-                          PDF not available
-                        </span>
-                      )}
-                    </span>
-                  </>
-                );
-                // Opens this lab's own PDF straight from Firebase Storage in a new
-                // tab — only when one has been uploaded via /admin → Programs.
-                return lab.pdfUrl ? (
-                  <a key={li} href={lab.pdfUrl} target="_blank" rel="noopener noreferrer" style={{ ...tileStyle, textDecoration: 'none' }}>
-                    {content}
-                  </a>
-                ) : (
-                  <div key={li} style={tileStyle}>
-                    {content}
-                  </div>
-                );
-              })}
+              {/* Tile always stays visible even with no PDF yet — just marked
+                  unavailable in the dialog, same convention as the Newsletter
+                  issues above. Tapping opens LabDialog (description + PDF
+                  link) rather than jumping straight to the PDF, since a lab
+                  with a description but no PDF would otherwise have nothing
+                  to tap through to. */}
+              {labs.map((lab, li) => (
+                <button
+                  key={li}
+                  type="button"
+                  onClick={() => setActiveLab(lab)}
+                  style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', display: 'flex', alignItems: 'center', gap: 'var(--space-4)', borderLeft: '4px solid var(--color-accent)', textAlign: 'left', cursor: 'pointer', font: 'inherit', width: '100%' }}
+                >
+                  <Microscope size={22} strokeWidth={1.75} style={{ flexShrink: 0, color: 'var(--color-accent)' }} />
+                  <span style={{ display: 'flex', flexDirection: 'column', gap: '0.15rem' }}>
+                    <span style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-primary)', lineHeight: 1.4 }}>{lab.name}</span>
+                    {!lab.pdfUrl && (
+                      <span style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', fontStyle: 'italic' }}>
+                        PDF not available
+                      </span>
+                    )}
+                  </span>
+                </button>
+              ))}
             </div>
           </div>
         </section>
       )}
+
+      <LabDialog lab={activeLab} onClose={() => setActiveLab(null)} />
 
       {/* Placements — admin-imported from Excel/CSV per Academic Year (see
           PlacementYearsEditor in ProgramsAdmin.tsx), every column shown
