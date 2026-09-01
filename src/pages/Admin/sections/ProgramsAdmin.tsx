@@ -247,19 +247,6 @@ function linesToArray(text: string): string[] {
 function arrayToLines(arr: string[] = []): string {
   return arr.join('\n');
 }
-function linksToText(links: ProgramLink[] = []): string {
-  return links.map((l) => `${l.label}: ${l.url}`).join('\n');
-}
-function textToLinks(text: string): ProgramLink[] {
-  return linesToArray(text).map((line) => {
-    const idx = line.indexOf(':');
-    return {
-      label: (idx === -1 ? line : line.slice(0, idx)).trim(),
-      url: (idx === -1 ? '' : line.slice(idx + 1)).trim(),
-    };
-  }).filter((l) => l.label && l.url);
-}
-
 export default function ProgramsAdmin() {
   const { docs: programs, loading } = useOrderedCollection<ProgramDoc>('programs', 'order');
   const [form, setForm] = useState<Omit<ProgramDoc, 'id'>>(EMPTY);
@@ -307,154 +294,7 @@ export default function ProgramsAdmin() {
   };
 
   const set = (k: string, v: string | number | string[] | ProgramSemester[] | ProgramLink[] | LibrarySection[] | NewsEventsYear[] | NewsletterYear[] | RndLink[] | LabItem[] | CustomSection[]) => setForm((p) => ({ ...p, [k]: v }));
-  const handleHodImage = (r: UploadResult) => setForm((p) => ({ ...p, hodImage: r.url, hodImageStoragePath: r.path }));
   const handleMindMapImage = (r: UploadResult) => setForm((p) => ({ ...p, mindMapImage: r.url, mindMapImageStoragePath: r.path }));
-
-  // Department Library (sections + items) editing — same structured add /
-  // remove / reorder shape as Programme Structure above, just for an
-  // arbitrary set of "heading + item rows" tables instead of semesters.
-  const librarySections = form.librarySections || [];
-  const addLibrarySection = () => {
-    set('librarySections', [...librarySections, { heading: `Section ${librarySections.length + 1}`, items: [] }]);
-  };
-  const updateLibrarySectionHeading = (si: number, heading: string) => {
-    set('librarySections', librarySections.map((s, i) => (i === si ? { ...s, heading } : s)));
-  };
-  const moveLibrarySection = (si: number, dir: -1 | 1) => {
-    const next = [...librarySections];
-    const target = si + dir;
-    if (target < 0 || target >= next.length) return;
-    [next[si], next[target]] = [next[target], next[si]];
-    set('librarySections', next);
-  };
-  const removeLibrarySection = (si: number) => {
-    if (!confirm('Remove this section and all its items?')) return;
-    set('librarySections', librarySections.filter((_, i) => i !== si));
-  };
-  const addLibraryItem = (si: number) => {
-    set('librarySections', librarySections.map((s, i) => (i === si ? { ...s, items: [...s.items, { label: '', value: '' }] } : s)));
-  };
-  const updateLibraryItem = (si: number, ji: number, patch: Partial<LibraryItem>) => {
-    set('librarySections', librarySections.map((s, i) => (i !== si ? s : {
-      ...s,
-      items: s.items.map((it, j) => (j === ji ? { ...it, ...patch } : it)),
-    })));
-  };
-  const moveLibraryItem = (si: number, ji: number, dir: -1 | 1) => {
-    set('librarySections', librarySections.map((s, i) => {
-      if (i !== si) return s;
-      const items = [...s.items];
-      const target = ji + dir;
-      if (target < 0 || target >= items.length) return s;
-      [items[ji], items[target]] = [items[target], items[ji]];
-      return { ...s, items };
-    }));
-  };
-  const removeLibraryItem = (si: number, ji: number) => {
-    set('librarySections', librarySections.map((s, i) => (i === si ? { ...s, items: s.items.filter((_, j) => j !== ji) } : s)));
-  };
-
-  // News & Events (academic years, each with its own admin-defined columns
-  // + event rows) editing. Columns and rows are kept in sync positionally:
-  // adding/removing/reordering a column does the same to every row's cells
-  // so a cell always lines up with its column.
-  const newsEventsYears = form.newsEventsYears || [];
-  const addNewsYear = () => {
-    set('newsEventsYears', [...newsEventsYears, { year: '', columns: [], rows: [] }]);
-  };
-  const updateNewsYearLabel = (yi: number, year: string) => {
-    set('newsEventsYears', newsEventsYears.map((y, i) => (i === yi ? { ...y, year } : y)));
-  };
-  const moveNewsYear = (yi: number, dir: -1 | 1) => {
-    const next = [...newsEventsYears];
-    const target = yi + dir;
-    if (target < 0 || target >= next.length) return;
-    [next[yi], next[target]] = [next[target], next[yi]];
-    set('newsEventsYears', next);
-  };
-  const removeNewsYear = (yi: number) => {
-    if (!confirm('Remove this academic year and all its events?')) return;
-    set('newsEventsYears', newsEventsYears.filter((_, i) => i !== yi));
-  };
-  const addNewsColumn = (yi: number) => {
-    set('newsEventsYears', newsEventsYears.map((y, i) => (i !== yi ? y : {
-      ...y,
-      columns: [...y.columns, `Column ${y.columns.length + 1}`],
-      rows: y.rows.map((r) => ({ cells: [...r.cells, ''] })),
-    })));
-  };
-  const updateNewsColumnLabel = (yi: number, ci: number, label: string) => {
-    set('newsEventsYears', newsEventsYears.map((y, i) => (i !== yi ? y : { ...y, columns: y.columns.map((c, j) => (j === ci ? label : c)) })));
-  };
-  const moveNewsColumn = (yi: number, ci: number, dir: -1 | 1) => {
-    set('newsEventsYears', newsEventsYears.map((y, i) => {
-      if (i !== yi) return y;
-      const target = ci + dir;
-      if (target < 0 || target >= y.columns.length) return y;
-      const columns = [...y.columns];
-      [columns[ci], columns[target]] = [columns[target], columns[ci]];
-      const rows = y.rows.map((r) => {
-        const cells = [...r.cells];
-        [cells[ci], cells[target]] = [cells[target], cells[ci]];
-        return { cells };
-      });
-      return { ...y, columns, rows };
-    }));
-  };
-  const removeNewsColumn = (yi: number, ci: number) => {
-    set('newsEventsYears', newsEventsYears.map((y, i) => (i !== yi ? y : {
-      ...y,
-      columns: y.columns.filter((_, j) => j !== ci),
-      rows: y.rows.map((r) => ({ cells: r.cells.filter((_, j) => j !== ci) })),
-    })));
-  };
-  const addNewsRow = (yi: number) => {
-    set('newsEventsYears', newsEventsYears.map((y, i) => (i !== yi ? y : { ...y, rows: [...y.rows, { cells: y.columns.map(() => '') }] })));
-  };
-  const updateNewsCell = (yi: number, ri: number, ci: number, value: string) => {
-    set('newsEventsYears', newsEventsYears.map((y, i) => (i !== yi ? y : {
-      ...y,
-      rows: y.rows.map((r, j) => (j !== ri ? r : { cells: r.cells.map((c, k) => (k === ci ? value : c)) })),
-    })));
-  };
-  const moveNewsRow = (yi: number, ri: number, dir: -1 | 1) => {
-    set('newsEventsYears', newsEventsYears.map((y, i) => {
-      if (i !== yi) return y;
-      const target = ri + dir;
-      if (target < 0 || target >= y.rows.length) return y;
-      const rows = [...y.rows];
-      [rows[ri], rows[target]] = [rows[target], rows[ri]];
-      return { ...y, rows };
-    }));
-  };
-  const removeNewsRow = (yi: number, ri: number) => {
-    set('newsEventsYears', newsEventsYears.map((y, i) => (i !== yi ? y : { ...y, rows: y.rows.filter((_, j) => j !== ri) })));
-  };
-  // Drag-to-reorder for academic years and, within a year, its events — same
-  // ⠿-handle drag pattern as the All Programs table below, just reordering
-  // local form state instead of writing straight to Firestore. Kept
-  // alongside the ↑/↓ buttons above rather than replacing them.
-  const [newsYearDrag, setNewsYearDrag] = useState<number | null>(null);
-  const handleNewsYearDragOver = (overIndex: number) => {
-    if (newsYearDrag === null || newsYearDrag === overIndex) return;
-    const next = [...newsEventsYears];
-    const [moved] = next.splice(newsYearDrag, 1);
-    next.splice(overIndex, 0, moved);
-    set('newsEventsYears', next);
-    setNewsYearDrag(overIndex);
-  };
-  const [newsRowDrag, setNewsRowDrag] = useState<{ yi: number; ri: number } | null>(null);
-  const handleNewsRowDragOver = (yi: number, overIndex: number) => {
-    if (!newsRowDrag || newsRowDrag.yi !== yi || newsRowDrag.ri === overIndex) return;
-    set('newsEventsYears', newsEventsYears.map((y, i) => {
-      if (i !== yi) return y;
-      const rows = [...y.rows];
-      const [moved] = rows.splice(newsRowDrag.ri, 1);
-      rows.splice(overIndex, 0, moved);
-      return { ...y, rows };
-    }));
-    setNewsRowDrag({ yi, ri: overIndex });
-  };
 
   // Newsletter (academic years, each with an ordered list of PDF-backed
   // issues) editing. An issue's "Issue – N" label is always its position,
@@ -600,71 +440,6 @@ export default function ProgramsAdmin() {
         return next;
       }),
     }));
-  };
-
-  // Laboratories editing — each lab is independently backed by its own
-  // uploaded PDF (same shape/pattern as Research & Development links above).
-  //
-  // These all update via the functional `setForm(p => ...)` form (reading
-  // `p.labs`), never the `labs` snapshot below — that snapshot is only for
-  // rendering. Uploading PDFs for several labs in quick succession fires
-  // several overlapping async `handleLabPdf` calls; if each one computed its
-  // next array from the same stale outer `labs` closure (as this used to),
-  // whichever upload's state write landed last would silently overwrite
-  // every other lab's just-uploaded pdfUrl with its own stale copy of the
-  // list — losing already-successful uploads without any error.
-  const labs = form.labs || [];
-  const addLab = () => {
-    setForm((p) => ({ ...p, labs: [...(p.labs || []), { name: '' }] }));
-  };
-  const updateLabName = (li: number, name: string) => {
-    setForm((p) => ({ ...p, labs: (p.labs || []).map((l, i) => (i === li ? { ...l, name } : l)) }));
-  };
-  const moveLab = (li: number, dir: -1 | 1) => {
-    setForm((p) => {
-      const next = [...(p.labs || [])];
-      const target = li + dir;
-      if (target < 0 || target >= next.length) return p;
-      [next[li], next[target]] = [next[target], next[li]];
-      return { ...p, labs: next };
-    });
-  };
-  const removeLab = (li: number) => {
-    if (!confirm('Remove this laboratory?')) return;
-    setForm((p) => ({ ...p, labs: (p.labs || []).filter((_, i) => i !== li) }));
-  };
-  const handleLabPdf = (li: number, r: UploadResult) => {
-    setForm((p) => ({ ...p, labs: (p.labs || []).map((l, i) => (i === li ? { ...l, pdfUrl: r.url, pdfStoragePath: r.path } : l)) }));
-  };
-  // Unlike every other field in this form (which only takes effect once
-  // "Update Program" is clicked), removing a lab's PDF acts immediately: it
-  // deletes the object from Firebase Storage right away and, if this
-  // programme already exists, patches just its `labs` field in Firestore on
-  // the spot — so there's no orphaned Storage file and no risk of the
-  // removal being lost if the admin navigates away before saving the rest
-  // of the form.
-  const removeLabPdf = async (li: number) => {
-    const lab = labs[li];
-    if (!lab?.pdfUrl) return;
-    if (!confirm('Remove this PDF? This cannot be undone.')) return;
-    try {
-      if (lab.pdfStoragePath) await deleteFile(lab.pdfStoragePath);
-    } catch (e) {
-      alert(`Couldn't delete the file from storage: ${(e as Error).message}`);
-      return;
-    }
-    let nextLabs: LabItem[] = [];
-    setForm((p) => {
-      nextLabs = (p.labs || []).map((l, i) => (i === li ? { ...l, pdfUrl: '', pdfStoragePath: '' } : l));
-      return { ...p, labs: nextLabs };
-    });
-    if (editing) {
-      try {
-        await updateDoc(doc(db, 'programs', editing), { labs: nextLabs });
-      } catch (e) {
-        alert(`The file was deleted from storage, but the saved record couldn't be updated: ${(e as Error).message}`);
-      }
-    }
   };
 
   // Programme Structure (semesters + subjects) editing — structured add /
@@ -856,10 +631,6 @@ export default function ProgramsAdmin() {
             <input id="field-annual-fee" value={form.fee} onChange={(e) => set('fee', e.target.value)} placeholder="₹ 1,05,000" />
           </div>
           <div className="admin-field">
-            <label htmlFor="field-head-of-department">Head of Department</label>
-            <input id="field-head-of-department" value={form.hod} onChange={(e) => set('hod', e.target.value)} placeholder="Dr. Name" />
-          </div>
-          <div className="admin-field">
             <label htmlFor="field-department-links-this-program-to">Department (links this program to the Faculty page)</label>
             <input id="field-department-links-this-program-to" list="program-departments" value={form.department} onChange={(e) => set('department', e.target.value)} placeholder="CSE" />
             <datalist id="program-departments">
@@ -878,54 +649,12 @@ export default function ProgramsAdmin() {
             <label htmlFor="field-highlights-one-per-line">Highlights (one per line)</label>
             <textarea id="field-highlights-one-per-line" rows={5} value={arrayToLines(form.highlights)} onChange={(e) => set('highlights', linesToArray(e.target.value))} placeholder="NBA Tier-I Accredited undergraduate programme" />
           </div>
-          <div className="admin-field admin-field--full"><hr /><h3>Laboratories</h3></div>
-          <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>
-            Each laboratory has its own name and its own uploaded PDF. On the public page, clicking a laboratory
-            tile opens that lab's PDF directly (in a new tab) — a lab with no PDF uploaded yet still shows its tile,
-            just marked as unavailable.
-          </p>
           <div className="admin-field admin-field--full">
-            {labs.length > 0 && (
-              <div className="admin-compact-list" style={{ marginBottom: '0.75rem' }}>
-                {labs.map((lab, li) => (
-                  <div key={li} className="admin-compact-row">
-                    <input
-                      className="admin-compact-row__name"
-                      value={lab.name}
-                      onChange={(e) => updateLabName(li, e.target.value)}
-                      placeholder="Advanced Computing Lab"
-                    />
-                    <div className="admin-compact-row__file">
-                      <FileUploader
-                        compact
-                        folder="vwu/programs/labs"
-                        currentUrl={lab.pdfUrl}
-                        onUploaded={(r) => handleLabPdf(li, r)}
-                        label="Upload PDF"
-                      />
-                    </div>
-                    <div className="admin-compact-row__actions">
-                      <button
-                        type="button"
-                        className="admin-btn admin-btn--ghost admin-btn--sm"
-                        onClick={() => removeLabPdf(li)}
-                        disabled={!lab.pdfUrl}
-                        title={lab.pdfUrl ? 'Remove PDF' : 'No PDF uploaded yet'}
-                      >
-                        Remove PDF
-                      </button>
-                      <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveLab(li, -1)} disabled={li === 0} title="Move up">↑</button>
-                      <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveLab(li, 1)} disabled={li === labs.length - 1} title="Move down">↓</button>
-                      <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeLab(li)} title="Remove laboratory">Remove</button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-            <button type="button" className="admin-btn admin-btn--primary" onClick={addLab}>+ Add Lab</button>
-            {labs.length === 0 && (
-              <p className="admin-field__hint">No laboratories yet — click "Add Lab" to start building this programme's Laboratories list.</p>
-            )}
+            <p className="admin-field__hint">
+              Vision, Mission &amp; Values, Laboratories, and the Department Library aren't edited per-programme
+              anymore — they're the same across a department's programmes, so they now live on the matching card in
+              <strong> Admin → Academic Departments</strong> instead.
+            </p>
           </div>
           <div className="admin-field admin-field--full">
             <label htmlFor="field-career-outcomes-one-per-line">Career Outcomes (one per line)</label>
@@ -1006,20 +735,6 @@ export default function ProgramsAdmin() {
             )}
           </div>
 
-          <div className="admin-field admin-field--full"><hr /><h3>Vision, Mission & Values</h3></div>
-          <div className="admin-field admin-field--full">
-            <label htmlFor="field-vision">Vision</label>
-            <textarea id="field-vision" rows={3} value={form.vision} onChange={(e) => set('vision', e.target.value)} placeholder="To be a centre of excellence in…" />
-          </div>
-          <div className="admin-field admin-field--full">
-            <label htmlFor="field-mission-one-point-per-line">Mission (one point per line)</label>
-            <textarea id="field-mission-one-point-per-line" rows={4} value={arrayToLines(form.mission)} onChange={(e) => set('mission', linesToArray(e.target.value))} placeholder="To impart quality technical education…" />
-          </div>
-          <div className="admin-field admin-field--full">
-            <label htmlFor="field-core-values-one-per-line">Core Values (one per line)</label>
-            <textarea id="field-core-values-one-per-line" rows={3} value={arrayToLines(form.coreValues)} onChange={(e) => set('coreValues', linesToArray(e.target.value))} placeholder="Integrity" />
-          </div>
-
           <div className="admin-field admin-field--full"><hr /><h3>PEOs, POs, PSOs & WKs</h3></div>
           <div className="admin-field admin-field--full">
             <label htmlFor="field-programme-educational-objectives-peos-one">Programme Educational Objectives — PEOs (one per line)</label>
@@ -1038,22 +753,12 @@ export default function ProgramsAdmin() {
             <textarea id="field-knowledge-profile-wks-one-per-line" rows={4} value={arrayToLines(form.wks)} onChange={(e) => set('wks', linesToArray(e.target.value))} placeholder="Systematic, theory-based understanding of the natural sciences…" />
           </div>
 
-          <div className="admin-field admin-field--full"><hr /><h3>About HOD</h3></div>
           <div className="admin-field admin-field--full">
-            <label>HOD Photo</label>
-            <ImageUploader folder="vwu/programs/hod" currentUrl={form.hodImage} onUploaded={handleHodImage} label="Upload HOD Photo" />
-          </div>
-          <div className="admin-field">
-            <label htmlFor="field-hod-email">HOD Email</label>
-            <input id="field-hod-email" type="email" value={form.hodEmail} onChange={(e) => set('hodEmail', e.target.value)} placeholder="hodcse@vwu.ac.in" />
-          </div>
-          <div className="admin-field admin-field--full">
-            <label htmlFor="field-hod-message-profile">HOD Message / Profile</label>
-            <textarea id="field-hod-message-profile" rows={5} value={form.hodMessage} onChange={(e) => set('hodMessage', e.target.value)} placeholder="A brief message or profile from the Head of Department…" />
-          </div>
-          <div className="admin-field admin-field--full">
-            <label htmlFor="field-hod-research-profiles-one-per">HOD Research Profiles (one per line: "Google Scholar: https://…")</label>
-            <textarea id="field-hod-research-profiles-one-per" rows={4} value={linksToText(form.hodResearchProfiles)} onChange={(e) => set('hodResearchProfiles', textToLinks(e.target.value))} placeholder="Google Scholar: https://scholar.google.com/citations?user=…" />
+            <p className="admin-field__hint">
+              About HOD (name, photo, email, message, research profiles) isn't edited per-programme anymore — a
+              department has one Head of Department, not one per programme, so it now lives on the matching card in
+              <strong> Admin → Academic Departments</strong> instead.
+            </p>
           </div>
 
           <div className="admin-field admin-field--full"><hr /><h3>Mind Map</h3></div>
@@ -1062,158 +767,12 @@ export default function ProgramsAdmin() {
             <ImageUploader folder="vwu/programs/mindmap" currentUrl={form.mindMapImage} onUploaded={handleMindMapImage} label="Upload Mind Map Image" />
           </div>
 
-          <div className="admin-field admin-field--full"><hr /><h3>Department Library</h3></div>
-          <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>
-            Optional. Shown as a "Department Library" section (and Quick Links entry) on this programme's page,
-            right after Laboratories. Each section below becomes its own table on the public page — headings and
-            items are entirely up to you, so different programmes can have completely different Department Library
-            content.
-          </p>
           <div className="admin-field admin-field--full">
-            <label>Library Overview</label>
-            <p className="admin-field__hint" style={{ marginTop: 0 }}>
-              One point per line starting with "- " renders as a bullet list; a line with no "- " is its own
-              paragraph. Wrap text in **double asterisks** for bold.
+            <p className="admin-field__hint">
+              The academic-year "News &amp; Events" table (News &amp; Events / Student Awards / Others tabs) isn't
+              edited per-programme anymore — it's shared across a department's programmes, so it now lives on the
+              matching card in <strong>Admin → Academic Departments</strong> instead.
             </p>
-            <textarea rows={5} value={form.libraryIntro} onChange={(e) => set('libraryIntro', e.target.value)} placeholder={'The Department Library occupies a unique place in academic and research activities of the Department…\n\n- The library is open from 8.00 a.m. to 5.00 p.m. on all days.\n- CDs of full series of lectures on specific subjects and text books are available to students for reference.'} />
-          </div>
-          <div className="admin-field admin-field--full">
-            <label>In-charge of Department Library</label>
-            <input value={form.libraryInCharge} onChange={(e) => set('libraryInCharge', e.target.value)} placeholder="Dr. P. Ravi Kumar, Ph.D. Associate Professor" />
-          </div>
-          <div className="admin-field admin-field--full">
-            {librarySections.map((sec, si) => (
-              <div key={si} style={{ border: '1.5px solid var(--color-light-gray)', borderRadius: 8, padding: '0.75rem', marginBottom: '0.75rem' }}>
-                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.5rem' }}>
-                  <input
-                    value={sec.heading}
-                    onChange={(e) => updateLibrarySectionHeading(si, e.target.value)}
-                    placeholder="Number of Books"
-                    style={{ flex: 1, fontWeight: 700 }}
-                  />
-                  <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveLibrarySection(si, -1)} disabled={si === 0} title="Move up">↑</button>
-                  <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveLibrarySection(si, 1)} disabled={si === librarySections.length - 1} title="Move down">↓</button>
-                  <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeLibrarySection(si)}>Remove Section</button>
-                </div>
-
-                {sec.items.map((item, ji) => (
-                  <div key={ji} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.4rem' }}>
-                    <input
-                      value={item.label}
-                      onChange={(e) => updateLibraryItem(si, ji, { label: e.target.value })}
-                      placeholder="Item name"
-                      style={{ flex: 2 }}
-                    />
-                    <input
-                      value={item.value}
-                      onChange={(e) => updateLibraryItem(si, ji, { value: e.target.value })}
-                      placeholder="Count"
-                      style={{ flex: 1 }}
-                    />
-                    <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveLibraryItem(si, ji, -1)} disabled={ji === 0} title="Move up">↑</button>
-                    <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveLibraryItem(si, ji, 1)} disabled={ji === sec.items.length - 1} title="Move down">↓</button>
-                    <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeLibraryItem(si, ji)}>✕</button>
-                  </div>
-                ))}
-                <button type="button" className="admin-btn admin-btn--sm" onClick={() => addLibraryItem(si)}>+ Add Item</button>
-              </div>
-            ))}
-            <button type="button" className="admin-btn admin-btn--primary" onClick={addLibrarySection}>+ Add Section</button>
-            {librarySections.length === 0 && (
-              <p className="admin-field__hint">No sections yet — click "Add Section" to start building this programme's Department Library.</p>
-            )}
-          </div>
-
-          <div className="admin-field admin-field--full"><hr /><h3>News &amp; Events — Academic Year Table</h3></div>
-          <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>
-            Shown on this programme's page (and, for AI/CSE/ECE, under this programme's side of the shared
-            department page toggle too) — grouped by academic year, with columns you define per year (e.g.
-            "Title", "Date"); "S.No" is added automatically. This is separate from "News &amp; Events — This
-            Programme" below, which pulls from individually-added News &amp; Events items instead — use whichever
-            fits how you want to manage this programme's news, or both. Drag a year or event by its ⠿ handle to
-            reorder, or use the ↑/↓ buttons.
-          </p>
-          <div className="admin-field admin-field--full">
-            {newsEventsYears.map((yr, yi) => (
-              <div
-                key={yi}
-                draggable
-                onDragStart={() => setNewsYearDrag(yi)}
-                onDragOver={(e) => { e.preventDefault(); handleNewsYearDragOver(yi); }}
-                onDrop={() => setNewsYearDrag(null)}
-                onDragEnd={() => setNewsYearDrag(null)}
-                style={{ border: '1.5px solid var(--color-light-gray)', borderRadius: 8, padding: '0.75rem', marginBottom: '0.75rem', opacity: newsYearDrag === yi ? 0.5 : 1 }}
-              >
-                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.75rem' }}>
-                  <span style={{ cursor: 'grab', color: 'var(--color-text-light, #9ca3af)', fontSize: '1.1rem', userSelect: 'none' }} title="Drag to reorder">⠿</span>
-                  <input
-                    value={yr.year}
-                    onChange={(e) => updateNewsYearLabel(yi, e.target.value)}
-                    placeholder="2025-26"
-                    style={{ flex: 1, fontWeight: 700 }}
-                  />
-                  <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveNewsYear(yi, -1)} disabled={yi === 0} title="Move up">↑</button>
-                  <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveNewsYear(yi, 1)} disabled={yi === newsEventsYears.length - 1} title="Move down">↓</button>
-                  <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeNewsYear(yi)}>Remove Year</button>
-                </div>
-
-                <label style={{ fontSize: '0.78rem', fontWeight: 700, display: 'block', marginBottom: '0.3rem' }}>Columns</label>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.75rem' }}>
-                  {yr.columns.map((col, ci) => (
-                    <div key={ci} style={{ display: 'flex', gap: '0.25rem', alignItems: 'center' }}>
-                      <input
-                        value={col}
-                        onChange={(e) => updateNewsColumnLabel(yi, ci, e.target.value)}
-                        placeholder="Column name"
-                        style={{ width: 140 }}
-                      />
-                      <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveNewsColumn(yi, ci, -1)} disabled={ci === 0} title="Move left">←</button>
-                      <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveNewsColumn(yi, ci, 1)} disabled={ci === yr.columns.length - 1} title="Move right">→</button>
-                      <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeNewsColumn(yi, ci)}>✕</button>
-                    </div>
-                  ))}
-                  <button type="button" className="admin-btn admin-btn--sm" onClick={() => addNewsColumn(yi)}>+ Add Column</button>
-                </div>
-
-                {yr.columns.length === 0 ? (
-                  <p className="admin-field__hint">Add at least one column before adding events.</p>
-                ) : (
-                  <>
-                    <label style={{ fontSize: '0.78rem', fontWeight: 700, display: 'block', marginBottom: '0.3rem' }}>Events</label>
-                    {yr.rows.map((row, ri) => (
-                      <div
-                        key={ri}
-                        draggable
-                        onDragStart={(e) => { e.stopPropagation(); setNewsRowDrag({ yi, ri }); }}
-                        onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); handleNewsRowDragOver(yi, ri); }}
-                        onDrop={(e) => { e.stopPropagation(); setNewsRowDrag(null); }}
-                        onDragEnd={(e) => { e.stopPropagation(); setNewsRowDrag(null); }}
-                        style={{ display: 'flex', gap: '0.4rem', marginBottom: '0.4rem', alignItems: 'center', opacity: newsRowDrag?.yi === yi && newsRowDrag.ri === ri ? 0.5 : 1 }}
-                      >
-                        <span style={{ cursor: 'grab', color: 'var(--color-text-light, #9ca3af)', fontSize: '1rem', userSelect: 'none' }} title="Drag to reorder">⠿</span>
-                        {yr.columns.map((col, ci) => (
-                          <input
-                            key={ci}
-                            value={row.cells[ci] ?? ''}
-                            onChange={(e) => updateNewsCell(yi, ri, ci, e.target.value)}
-                            placeholder={col || `Column ${ci + 1}`}
-                            style={{ flex: 1 }}
-                          />
-                        ))}
-                        <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveNewsRow(yi, ri, -1)} disabled={ri === 0} title="Move up">↑</button>
-                        <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveNewsRow(yi, ri, 1)} disabled={ri === yr.rows.length - 1} title="Move down">↓</button>
-                        <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeNewsRow(yi, ri)}>✕</button>
-                      </div>
-                    ))}
-                    <button type="button" className="admin-btn admin-btn--sm" onClick={() => addNewsRow(yi)}>+ Add Event</button>
-                  </>
-                )}
-              </div>
-            ))}
-            <button type="button" className="admin-btn admin-btn--primary" onClick={addNewsYear}>+ Add Academic Year</button>
-            {newsEventsYears.length === 0 && (
-              <p className="admin-field__hint">No academic years yet — click "Add Academic Year" to start building this programme's News &amp; Events.</p>
-            )}
           </div>
 
           <div className="admin-field admin-field--full"><hr /><h3>News &amp; Events — This Programme</h3></div>
