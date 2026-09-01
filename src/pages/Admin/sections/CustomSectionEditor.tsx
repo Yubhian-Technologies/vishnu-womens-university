@@ -12,7 +12,7 @@ const CONTENT_TYPE_LABELS: Record<CustomSectionContentType, string> = {
   links: 'List of links',
   files: 'Uploaded files',
   list: 'Checklist (bullet points)',
-  person: 'Panel View (Person)',
+  person: 'Panel View',
 };
 
 interface Props {
