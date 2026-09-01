@@ -60,7 +60,7 @@ export default function NewsEventsTabs({ categories, eyebrow, navOffset }: Props
               </h3>
               {showTable && (
                 <div className="pb-activities-scroll">
-                  <table>
+                  <table className="news-events-table">
                     <thead>
                       <tr>
                         <th className="pb-activities-num">S.No</th>

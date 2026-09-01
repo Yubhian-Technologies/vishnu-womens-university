@@ -261,14 +261,26 @@ function SingleProgramDetail() {
   const visiblePlacementRows = placementPageSize === 'all' ? placementRows : placementRows.slice(0, placementPageSize);
   const visibleCustomSections = (program.customSections || []).filter(hasCustomSectionContent);
 
+  const hasProgrammeHighlights = !!(program.highlights && program.highlights.length > 0);
+  // "Choose a Programme" — same collapsible group DepartmentDetail.tsx uses
+  // for its grouped departments, replicated here purely for a consistent
+  // sidebar shape across every department page; a standalone programme has
+  // nothing to actually switch between, so this never renders the toggle
+  // row DepartmentDetail.tsx shows above its own version of this group.
+  const programmeLinks = [
+    { id: 'about', label: 'About the Programme' },
+    hasProgrammeHighlights && { id: 'highlights', label: 'Programme Highlights' },
+    hasOutcomeStatements && { id: 'peos-pos-psos', label: outcomeHeading },
+    hasMindMap && { id: 'mindmap', label: 'Mind Map' },
+    hasCurriculum && { id: 'curriculum', label: 'Curriculum' },
+  ].filter(Boolean) as { id: string; label: string }[];
+
   const quickLinks = [
     { id: 'about', label: 'About the Department' },
     hasVisionMission && { id: 'vision-mission', label: 'Vision, Mission & Values' },
-    hasOutcomeStatements && { id: 'peos-pos-psos', label: outcomeHeading },
     hasHod && { id: 'hod', label: 'About HOD' },
     faculty.length > 0 && { id: 'faculty', label: 'Faculty' },
-    hasMindMap && { id: 'mindmap', label: 'Mind Map' },
-    hasCurriculum && { id: 'curriculum', label: 'Curriculum' },
+    { id: 'program-toggle', label: 'Choose a Programme', children: programmeLinks },
     hasLabs && { id: 'labs', label: 'Laboratories' },
     hasLibrary && { id: 'library', label: 'Department Library' },
     hasRnd && { id: 'rnd', label: 'Research & Development (Funded Projects & Patents)' },
@@ -376,7 +388,7 @@ function SingleProgramDetail() {
 
               {/* Programme Highlights */}
               {program.highlights && program.highlights.length > 0 && (
-                <div style={{ marginTop: 'var(--space-8)' }}>
+                <div id="highlights" style={{ marginTop: 'var(--space-8)', scrollMarginTop: NAV_OFFSET }}>
                   <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.35rem', color: 'var(--color-primary)', marginBottom: 'var(--space-5)', paddingBottom: 'var(--space-3)', borderBottom: '2px solid var(--color-accent)' }}>
                     Programme Highlights
                   </h3>

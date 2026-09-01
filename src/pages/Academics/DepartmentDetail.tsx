@@ -304,10 +304,12 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     hasVisionMission && { id: 'vision-mission', label: 'Vision & Mission' },
     hasHod && { id: 'hod', label: 'About HOD' },
     faculty.length > 0 && { id: 'faculty', label: 'Faculty' },
-    hasLabs && { id: 'labs', label: 'Laboratories' },
     { id: 'program-toggle', label: 'Choose a Programme' },
+    hasLabs && { id: 'labs', label: 'Laboratories' },
+    hasLibrary && { id: 'library', label: 'Department Library' },
     hasRnd && { id: 'rnd', label: 'R & D' },
     hasPlacements && { id: 'placements', label: 'Placements' },
+    hasNewsletter && { id: 'newsletter', label: 'Newsletter' },
     (hasNewsEvents || hasDeptNews) && { id: hasNewsEvents ? 'news-events' : 'news', label: 'News & Events' },
   ].filter(Boolean) as { id: string; label: string }[];
   // Nested under the "Choose a Programme" row above as a collapsible
