@@ -193,7 +193,7 @@ export default function Academics() {
       {/* Quick Stats */}
       <section id="academics-content" style={{ background: 'var(--color-primary)', padding: 'var(--space-6) 0', scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
         <div className="container">
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-12)', flexWrap: 'wrap' }}>
+          <div className="academics-quick-stats-row">
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', fontWeight: 900, color: 'var(--color-accent)' }}>{btechCount || '—'}</div>
               <div style={{ fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)', fontFamily: 'var(--font-sans)' }}>B.Tech Programs</div>
