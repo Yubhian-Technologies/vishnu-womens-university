@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useParams, useLocation, Navigate } from 'react-router-dom';
 import { Check, Microscope, Compass, Target, Sparkles, Mail, ExternalLink, BookOpen, FileText } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
+import SmoothCollapse from '../../components/SmoothCollapse/SmoothCollapse';
 import ProgrammeStructure from '../../components/ProgrammeStructure/ProgrammeStructure';
 import BodyBlocks, { parseBodyContent } from '../../components/BodyBlocks/BodyBlocks';
 import DepartmentNewsSection, { type DepartmentNewsDoc } from '../../components/DepartmentNews/DepartmentNewsSection';
@@ -20,7 +21,7 @@ import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import type { FacultyDoc } from './Faculty';
 import { parseFlexibleTable, parseProjectAccordion } from '../../lib/structuredTable';
 import { sortPlacementRows, computePlacementStats, findPackageColumnIndex, findSerialColumnIndex, formatPackageCell } from '../../lib/placementRecords';
-import { hasCustomSectionContent } from '../../lib/customSections';
+import { hasCustomSectionContent, toQuickLinkItems } from '../../lib/customSections';
 import CustomSectionsRenderer from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import SEO from '../../components/SEO/SEO';
 import { getProgramSchema, getBreadcrumbSchema } from '../../lib/seo/schemas';
@@ -64,6 +65,19 @@ function SingleProgramDetail() {
       const next = new Set(prev);
       if (next.has(key)) next.delete(key);
       else next.add(key);
+      return next;
+    });
+  };
+  // Quick Links entries with children (an admin section built from
+  // sub-sections, e.g. Publications/Patents/Funded Projects under "Research
+  // & Development") collapse the same way "Choose a Programme" does on the
+  // Department page — starts open, toggled per id.
+  const [collapsedQuickLinks, setCollapsedQuickLinks] = useState<Set<string>>(new Set());
+  const toggleQuickLink = (id: string) => {
+    setCollapsedQuickLinks((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
       return next;
     });
   };
@@ -260,8 +274,8 @@ function SingleProgramDetail() {
     hasNewsletter && { id: 'newsletter', label: 'Newsletter' },
     hasDeptNews && { id: 'news', label: 'News & Events' },
     hasNewsEventsYears && { id: 'news-events', label: 'News & Events' },
-    ...visibleCustomSections.map((s) => ({ id: s.id, label: s.label })),
-  ].filter(Boolean) as { id: string; label: string }[];
+    ...toQuickLinkItems(visibleCustomSections),
+  ].filter(Boolean) as { id: string; label: string; children?: { id: string; label: string }[] }[];
 
   const hasSidebarContent = quickLinks.length > 1 || hasCareerOutcomes;
 
@@ -387,13 +401,52 @@ function SingleProgramDetail() {
                       Quick Links
                     </h4>
                     <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
-                      {quickLinks.map((l) => (
-                        <li key={l.id}>
-                          <a href={`#${l.id}`} style={{ display: 'block', padding: 'var(--space-2) 0', color: 'rgba(255,255,255,0.85)', fontSize: 'var(--text-sm)', fontWeight: 600, textDecoration: 'none', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-                            {l.label}
-                          </a>
-                        </li>
-                      ))}
+                      {quickLinks.map((l) => {
+                        const hasKids = !!l.children?.length;
+                        const isOpen = !collapsedQuickLinks.has(l.id);
+                        return (
+                          <li key={l.id}>
+                            {hasKids ? (
+                              <button
+                                type="button"
+                                onClick={() => toggleQuickLink(l.id)}
+                                aria-expanded={isOpen}
+                                style={{
+                                  display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%',
+                                  background: 'none', border: 'none', padding: 'var(--space-2) 0', color: 'rgba(255,255,255,0.85)',
+                                  fontSize: 'var(--text-sm)', fontWeight: 600, fontFamily: 'inherit', textAlign: 'left', cursor: 'pointer',
+                                  borderBottom: '1px solid rgba(255,255,255,0.08)',
+                                }}
+                              >
+                                {l.label}
+                                <svg
+                                  width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true"
+                                  style={{ flexShrink: 0, marginLeft: 'var(--space-2)', opacity: 0.75, transition: 'transform var(--transition-base)', transform: isOpen ? 'rotate(180deg)' : 'none' }}
+                                >
+                                  <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                              </button>
+                            ) : (
+                              <a href={`#${l.id}`} style={{ display: 'block', padding: 'var(--space-2) 0', color: 'rgba(255,255,255,0.85)', fontSize: 'var(--text-sm)', fontWeight: 600, textDecoration: 'none', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+                                {l.label}
+                              </a>
+                            )}
+                            {hasKids && (
+                              <SmoothCollapse open={isOpen}>
+                                <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+                                  {l.children!.map((c) => (
+                                    <li key={c.id}>
+                                      <a href={`#${c.id}`} style={{ display: 'block', padding: 'var(--space-2) 0 var(--space-2) var(--space-4)', color: 'rgba(255,255,255,0.7)', fontSize: 'var(--text-sm)', fontWeight: 600, textDecoration: 'none', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+                                        {c.label}
+                                      </a>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </SmoothCollapse>
+                            )}
+                          </li>
+                        );
+                      })}
                     </ul>
                   </div>
                 )}
