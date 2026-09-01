@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useParams, useLocation, Navigate } from 'react-router-dom';
 import { Check, Microscope, Compass, Target, Sparkles, Mail, ExternalLink, BookOpen, FileText } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
+import SmoothCollapse from '../../components/SmoothCollapse/SmoothCollapse';
 import ImageLightbox from '../../components/ImageLightbox/ImageLightbox';
 import ProgrammeStructure from '../../components/ProgrammeStructure/ProgrammeStructure';
 import BodyBlocks, { parseBodyContent } from '../../components/BodyBlocks/BodyBlocks';
@@ -52,6 +53,11 @@ function SingleProgramDetail() {
   const location = useLocation();
   const [mindMapOpen, setMindMapOpen] = useState(false);
   const [outcomeTab, setOutcomeTab] = useState<string | null>(null);
+  // "Choose a Programme" Quick Links group — matches the collapsible
+  // sub-list DepartmentDetail.tsx uses for its grouped departments (CSE/AI/
+  // ECE), even though a standalone programme has nothing to actually choose
+  // between; this keeps the sidebar's visual shape consistent everywhere.
+  const [programmeLinksOpen, setProgrammeLinksOpen] = useState(true);
   // Which Academic Year's placement records are shown — falls back to this
   // programme's first available year (see placementYears below).
   const [placementYear, setPlacementYear] = useState<string | null>(null);
@@ -203,14 +209,26 @@ function SingleProgramDetail() {
   const visiblePlacementRows = placementPageSize === 'all' ? placementRows : placementRows.slice(0, placementPageSize);
   const visibleCustomSections = (program.customSections || []).filter(hasCustomSectionContent);
 
+  const hasProgrammeHighlights = !!(program.highlights && program.highlights.length > 0);
+  // "Choose a Programme" — same collapsible group DepartmentDetail.tsx uses
+  // for its grouped departments, replicated here purely for a consistent
+  // sidebar shape across every department page; a standalone programme has
+  // nothing to actually switch between, so this never renders the toggle
+  // row DepartmentDetail.tsx shows above its own version of this group.
+  const programmeLinks = [
+    { id: 'about', label: 'About the Programme' },
+    hasProgrammeHighlights && { id: 'highlights', label: 'Programme Highlights' },
+    hasOutcomeStatements && { id: 'peos-pos-psos', label: outcomeHeading },
+    hasMindMap && { id: 'mindmap', label: 'Mind Map' },
+    hasCurriculum && { id: 'curriculum', label: 'Curriculum' },
+  ].filter(Boolean) as { id: string; label: string }[];
+
   const quickLinks = [
     { id: 'about', label: 'About the Department' },
     hasVisionMission && { id: 'vision-mission', label: 'Vision, Mission & Values' },
-    hasOutcomeStatements && { id: 'peos-pos-psos', label: outcomeHeading },
     hasHod && { id: 'hod', label: 'About HOD' },
     faculty.length > 0 && { id: 'faculty', label: 'Faculty' },
-    hasMindMap && { id: 'mindmap', label: 'Mind Map' },
-    hasCurriculum && { id: 'curriculum', label: 'Curriculum' },
+    { id: 'program-toggle', label: 'Choose a Programme' },
     hasLabs && { id: 'labs', label: 'Laboratories' },
     hasLibrary && { id: 'library', label: 'Department Library' },
     hasRnd && { id: 'rnd', label: 'Research & Development (Funded Projects & Patents)' },
@@ -318,7 +336,7 @@ function SingleProgramDetail() {
 
               {/* Programme Highlights */}
               {program.highlights && program.highlights.length > 0 && (
-                <div style={{ marginTop: 'var(--space-8)' }}>
+                <div id="highlights" style={{ marginTop: 'var(--space-8)', scrollMarginTop: NAV_OFFSET }}>
                   <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.35rem', color: 'var(--color-primary)', marginBottom: 'var(--space-5)', paddingBottom: 'var(--space-3)', borderBottom: '2px solid var(--color-accent)' }}>
                     Programme Highlights
                   </h3>
@@ -346,11 +364,46 @@ function SingleProgramDetail() {
                     </h4>
                     <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
                       {quickLinks.map((l) => (
-                        <li key={l.id}>
-                          <a href={`#${l.id}`} style={{ display: 'block', padding: 'var(--space-2) 0', color: 'rgba(255,255,255,0.85)', fontSize: 'var(--text-sm)', fontWeight: 600, textDecoration: 'none', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-                            {l.label}
-                          </a>
-                        </li>
+                        l.id === 'program-toggle' ? (
+                          <li key={l.id}>
+                            <button
+                              type="button"
+                              onClick={() => setProgrammeLinksOpen((v) => !v)}
+                              aria-expanded={programmeLinksOpen}
+                              style={{
+                                display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%',
+                                background: 'none', border: 'none', padding: 'var(--space-2) 0', color: 'rgba(255,255,255,0.85)',
+                                fontSize: 'var(--text-sm)', fontWeight: 600, fontFamily: 'inherit', textAlign: 'left', cursor: 'pointer',
+                                borderBottom: '1px solid rgba(255,255,255,0.08)',
+                              }}
+                            >
+                              {l.label}
+                              <svg
+                                width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true"
+                                style={{ flexShrink: 0, marginLeft: 'var(--space-2)', opacity: 0.75, transition: 'transform var(--transition-base)', transform: programmeLinksOpen ? 'rotate(180deg)' : 'none' }}
+                              >
+                                <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                              </svg>
+                            </button>
+                            <SmoothCollapse open={programmeLinksOpen}>
+                              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+                                {programmeLinks.map((c) => (
+                                  <li key={c.id}>
+                                    <a href={`#${c.id}`} style={{ display: 'block', padding: 'var(--space-2) 0 var(--space-2) var(--space-4)', color: 'rgba(255,255,255,0.7)', fontSize: 'var(--text-sm)', fontWeight: 600, textDecoration: 'none', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+                                      {c.label}
+                                    </a>
+                                  </li>
+                                ))}
+                              </ul>
+                            </SmoothCollapse>
+                          </li>
+                        ) : (
+                          <li key={l.id}>
+                            <a href={`#${l.id}`} style={{ display: 'block', padding: 'var(--space-2) 0', color: 'rgba(255,255,255,0.85)', fontSize: 'var(--text-sm)', fontWeight: 600, textDecoration: 'none', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+                              {l.label}
+                            </a>
+                          </li>
+                        )
                       ))}
                     </ul>
                   </div>
@@ -885,7 +938,7 @@ function SingleProgramDetail() {
                   Academic Year :: {yr.year}
                 </h3>
                 <div className="pb-activities-scroll">
-                  <table>
+                  <table className="news-events-table">
                     <thead>
                       <tr>
                         <th className="pb-activities-num">S.No</th>
