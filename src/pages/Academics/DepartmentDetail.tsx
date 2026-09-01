@@ -1029,7 +1029,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
               {activeProgram.highlights.map((h) => (
                 <li key={h} style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start', color: 'var(--color-text)', fontSize: 'var(--text-sm)', lineHeight: 1.6 }}>
                   <Check size={16} strokeWidth={2.5} style={{ color: 'var(--color-accent)', flexShrink: 0, marginTop: 2 }} />
-                  {h}
+                  <span>{h.includes(':') ? <><strong style={{ fontWeight: 800, color: 'var(--color-primary)' }}>{h.slice(0, h.indexOf(':') + 1)}</strong>{h.slice(h.indexOf(':') + 1)}</> : h}</span>
                 </li>
               ))}
             </ul>

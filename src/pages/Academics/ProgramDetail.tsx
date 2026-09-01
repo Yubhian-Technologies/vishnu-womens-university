@@ -261,14 +261,23 @@ function SingleProgramDetail() {
   const visiblePlacementRows = placementPageSize === 'all' ? placementRows : placementRows.slice(0, placementPageSize);
   const visibleCustomSections = (program.customSections || []).filter(hasCustomSectionContent);
 
+  // "About the Department" and "About the Programme" are two separate
+  // pieces of content, same as on the grouped CSE/AI/ECE department page —
+  // department-wide text lives on the matching Academic Departments record
+  // (dept.about, edited at Admin → Academic Departments → Overview), while
+  // program.about (Admin → Programs → About) is specific to this one
+  // programme. Each only renders once an admin has actually filled it in.
+  const hasDeptAbout = !!dept?.about;
+  const hasProgrammeAbout = !!program.about;
   const hasProgrammeHighlights = !!(program.highlights && program.highlights.length > 0);
+  const hasAboutSection = hasDeptAbout || hasProgrammeAbout || hasProgrammeHighlights;
   // "Choose a Programme" — same collapsible group DepartmentDetail.tsx uses
   // for its grouped departments, replicated here purely for a consistent
   // sidebar shape across every department page; a standalone programme has
   // nothing to actually switch between, so this never renders the toggle
   // row DepartmentDetail.tsx shows above its own version of this group.
   const programmeLinks = [
-    { id: 'about', label: 'About the Programme' },
+    hasProgrammeAbout && { id: 'programme-about', label: 'About the Programme' },
     hasProgrammeHighlights && { id: 'highlights', label: 'Programme Highlights' },
     hasOutcomeStatements && { id: 'peos-pos-psos', label: outcomeHeading },
     hasMindMap && { id: 'mindmap', label: 'Mind Map' },
@@ -276,7 +285,7 @@ function SingleProgramDetail() {
   ].filter(Boolean) as { id: string; label: string }[];
 
   const quickLinks = [
-    { id: 'about', label: 'About the Department' },
+    hasDeptAbout && { id: 'about', label: 'About the Department' },
     hasVisionMission && { id: 'vision-mission', label: 'Vision, Mission & Values' },
     hasHod && { id: 'hod', label: 'About HOD' },
     faculty.length > 0 && { id: 'faculty', label: 'Faculty' },
@@ -372,23 +381,35 @@ function SingleProgramDetail() {
         </div>
       </section>
 
-      {/* About + Highlights */}
+      {/* About the Department + About the Programme + Highlights */}
+      {hasAboutSection && (
       <section id="about" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
         <div className="container">
           <div className={hasSidebarContent ? 'detail-grid' : ''}>
             {/* Main content */}
             <div>
-              <div>
-                <span className="section-label">About the Department</span>
-                <h2 className="section-title">{deptTitle || program.shortName || program.name}</h2>
-                <p style={{ color: 'var(--color-text-light)', lineHeight: 1.85, fontSize: 'var(--text-base)', marginBottom: 'var(--space-6)', whiteSpace: 'pre-line' }}>
-                  {program.about}
-                </p>
-              </div>
+              {hasDeptAbout && (
+                <div>
+                  <span className="section-label">About the Department</span>
+                  <h2 className="section-title">{deptTitle || program.shortName || program.name}</h2>
+                  <p style={{ color: 'var(--color-text-light)', lineHeight: 1.85, fontSize: 'var(--text-base)', whiteSpace: 'pre-line' }}>
+                    {dept?.about}
+                  </p>
+                </div>
+              )}
+
+              {hasProgrammeAbout && (
+                <div id="programme-about" style={{ marginTop: hasDeptAbout ? 'var(--space-8)' : 0, scrollMarginTop: NAV_OFFSET }}>
+                  <span className="section-label">About the Programme</span>
+                  <p style={{ color: 'var(--color-text-light)', lineHeight: 1.85, fontSize: 'var(--text-base)', whiteSpace: 'pre-line' }}>
+                    {program.about}
+                  </p>
+                </div>
+              )}
 
               {/* Programme Highlights */}
               {program.highlights && program.highlights.length > 0 && (
-                <div id="highlights" style={{ marginTop: 'var(--space-8)', scrollMarginTop: NAV_OFFSET }}>
+                <div id="highlights" style={{ marginTop: (hasDeptAbout || hasProgrammeAbout) ? 'var(--space-8)' : 0, scrollMarginTop: NAV_OFFSET }}>
                   <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.35rem', color: 'var(--color-primary)', marginBottom: 'var(--space-5)', paddingBottom: 'var(--space-3)', borderBottom: '2px solid var(--color-accent)' }}>
                     Programme Highlights
                   </h3>
@@ -396,7 +417,7 @@ function SingleProgramDetail() {
                     {program.highlights.map((h) => (
                       <li key={h} style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start', color: 'var(--color-text)', fontSize: 'var(--text-sm)', lineHeight: 1.6 }}>
                         <Check size={16} strokeWidth={2.5} style={{ color: 'var(--color-accent)', flexShrink: 0, marginTop: 2 }} />
-                        {h}
+                        <span>{h.includes(':') ? <><strong style={{ fontWeight: 800, color: 'var(--color-primary)' }}>{h.slice(0, h.indexOf(':') + 1)}</strong>{h.slice(h.indexOf(':') + 1)}</> : h}</span>
                       </li>
                     ))}
                   </ul>
@@ -487,6 +508,7 @@ function SingleProgramDetail() {
           </div>
         </div>
       </section>
+      )}
 
       {/* Vision, Mission & Values */}
       {hasVisionMission && (
