@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import FileUploader from '../../../components/FileUploader/FileUploader';
+import ImageUploader from '../../../components/ImageUploader/ImageUploader';
 import type { UploadResult } from '../../../lib/storage';
 import { mergeFlexibleTable, mergeLinkList } from '../../../lib/structuredTable';
 import { parseGenericTableWorkbook, parseGenericLinksWorkbook } from '../../../lib/genericSectionImport';
@@ -10,6 +11,8 @@ const CONTENT_TYPE_LABELS: Record<CustomSectionContentType, string> = {
   table: 'Table',
   links: 'List of links',
   files: 'Uploaded files',
+  list: 'Checklist (bullet points)',
+  person: 'Panel View (Person)',
 };
 
 interface Props {
@@ -28,13 +31,22 @@ interface Props {
   parentPath: number[];
   onFileUploaded: (sectionPath: number[], fileIndex: number, r: UploadResult) => void;
   onFileRemoved: (sectionPath: number[], fileIndex: number) => void;
+  // A single photo any section can carry alongside its content (see
+  // CustomSection.photo) — independent of contentType.
+  onPhotoUploaded: (sectionPath: number[], r: UploadResult) => void;
+  onPhotoRemoved: (sectionPath: number[]) => void;
   // 0 = top-level list (shows "+ Add Section" and, per item, "+ Add
   // Sub-section"); 1 = a subSections list (no further nesting offered).
   depth?: number;
+  // Shows the "Placement" selector (intro vs. accordion) — only meaningful
+  // on Differentiators detail pages, which have both a compact intro column
+  // and a collapsible accordion below it; Programs pages always render every
+  // custom section as its own full section, so ProgramsAdmin.tsx omits this.
+  showPlacementToggle?: boolean;
 }
 
 export default function CustomSectionEditor({
-  sections, onChange, rootSections, parentPath, onFileUploaded, onFileRemoved, depth = 0,
+  sections, onChange, rootSections, parentPath, onFileUploaded, onFileRemoved, onPhotoUploaded, onPhotoRemoved, depth = 0, showPlacementToggle = false,
 }: Props) {
   const [importingKey, setImportingKey] = useState<string | null>(null);
 
@@ -114,44 +126,124 @@ export default function CustomSectionEditor({
         const importing = importingKey === `table-${si}` || importingKey === `links-${si}`;
         return (
           <div key={s.id} style={{ border: '1.5px solid var(--color-light-gray)', borderRadius: 8, padding: '0.75rem', marginBottom: '0.75rem' }}>
-            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
-              <input
-                value={s.label}
-                onChange={(e) => updateSection(si, { label: e.target.value })}
-                placeholder="Section name"
-                style={{ flex: 2, minWidth: 160, fontWeight: 700 }}
-              />
-              <select
-                value={s.contentType}
-                onChange={(e) => updateSection(si, { contentType: e.target.value as CustomSectionContentType })}
-                style={{ flex: 1, minWidth: 140 }}
-              >
-                {(Object.keys(CONTENT_TYPE_LABELS) as CustomSectionContentType[]).map((ct) => (
-                  <option key={ct} value={ct}>{CONTENT_TYPE_LABELS[ct]}</option>
-                ))}
-              </select>
-              <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveSection(si, -1)} disabled={si === 0} title="Move up">↑</button>
-              <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveSection(si, 1)} disabled={si === sections.length - 1} title="Move down">↓</button>
-              <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeSection(si)}>Remove</button>
+            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
+              <div className="admin-field" style={{ flex: 2, minWidth: 160 }}>
+                <input
+                  value={s.label}
+                  onChange={(e) => updateSection(si, { label: e.target.value })}
+                  placeholder="Section name"
+                  style={{ fontWeight: 700 }}
+                />
+              </div>
+              <div className="admin-field" style={{ flex: 1, minWidth: 140 }}>
+                <select
+                  value={s.contentType}
+                  onChange={(e) => updateSection(si, { contentType: e.target.value as CustomSectionContentType })}
+                >
+                  {(Object.keys(CONTENT_TYPE_LABELS) as CustomSectionContentType[]).map((ct) => (
+                    <option key={ct} value={ct}>{CONTENT_TYPE_LABELS[ct]}</option>
+                  ))}
+                </select>
+              </div>
+              {showPlacementToggle && depth === 0 && (
+                <div className="admin-field" style={{ flex: 1, minWidth: 170 }}>
+                  <select
+                    value={s.placement === 'intro' ? 'intro' : 'accordion'}
+                    onChange={(e) => updateSection(si, { placement: e.target.value === 'intro' ? 'intro' : 'accordion' })}
+                    title="Where this section shows on the public page"
+                  >
+                    <option value="accordion">In the accordion below</option>
+                    <option value="intro">In the intro area above</option>
+                  </select>
+                </div>
+              )}
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', alignSelf: 'center', fontSize: 'var(--text-sm)', whiteSpace: 'nowrap' }}>
+                <input
+                  type="checkbox"
+                  checked={!!s.boldHeading}
+                  onChange={(e) => updateSection(si, { boldHeading: e.target.checked })}
+                />
+                Bold heading
+              </label>
+              <div style={{ display: 'flex', gap: '0.5rem', alignSelf: 'center' }}>
+                <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveSection(si, -1)} disabled={si === 0} title="Move up">↑</button>
+                <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveSection(si, 1)} disabled={si === sections.length - 1} title="Move down">↓</button>
+                <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeSection(si)}>Remove</button>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', marginBottom: '0.75rem' }}>
+              <div style={{ width: 140 }}>
+                <ImageUploader
+                  folder="vwu/custom-sections/photos"
+                  currentUrl={s.photo?.imageUrl}
+                  aspect={1}
+                  label="+ Add Photo"
+                  onUploaded={(r) => onPhotoUploaded(path, r)}
+                />
+              </div>
+              {s.photo?.imageUrl && (
+                <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => onPhotoRemoved(path)}>
+                  Remove Photo
+                </button>
+              )}
             </div>
 
             {s.contentType === 'text' && (
-              <textarea
-                rows={4}
-                value={s.textContent || ''}
-                onChange={(e) => updateSection(si, { textContent: e.target.value })}
-                placeholder="Section content…"
-              />
+              <div className="admin-field">
+                <textarea
+                  rows={4}
+                  value={s.textContent || ''}
+                  onChange={(e) => updateSection(si, { textContent: e.target.value })}
+                  placeholder="Section content…"
+                />
+              </div>
+            )}
+
+            {s.contentType === 'person' && (
+              <>
+                <div className="admin-field">
+                  <input
+                    value={s.personPosition || ''}
+                    onChange={(e) => updateSection(si, { personPosition: e.target.value })}
+                    placeholder="Position / Designation (e.g. Dean · WISE)"
+                  />
+                </div>
+                <div className="admin-field">
+                  <textarea
+                    rows={4}
+                    value={s.textContent || ''}
+                    onChange={(e) => updateSection(si, { textContent: e.target.value })}
+                    placeholder="Bio / details — shown when this person's card is hovered (or tapped on mobile)…"
+                  />
+                </div>
+                <p className="admin-field__hint">
+                  The section name above is this person's name. Group several people together and they'll show as a click-to-expand panel list on the public page.
+                </p>
+              </>
+            )}
+
+            {s.contentType === 'list' && (
+              <div className="admin-field">
+                <textarea
+                  rows={4}
+                  value={s.listText || ''}
+                  onChange={(e) => updateSection(si, { listText: e.target.value })}
+                  placeholder={'One point per line…'}
+                />
+              </div>
             )}
 
             {s.contentType === 'table' && (
               <>
-                <textarea
-                  rows={5}
-                  value={s.tableText || ''}
-                  onChange={(e) => updateSection(si, { tableText: e.target.value })}
-                  placeholder={'Header 1 | Header 2\nValue 1 | Value 2'}
-                />
+                <div className="admin-field">
+                  <textarea
+                    rows={5}
+                    value={s.tableText || ''}
+                    onChange={(e) => updateSection(si, { tableText: e.target.value })}
+                    placeholder={'Header 1 | Header 2\nValue 1 | Value 2'}
+                  />
+                </div>
                 <label className="admin-btn admin-btn--sm" style={{ display: 'inline-block', marginTop: '0.5rem', cursor: importing ? 'default' : 'pointer', opacity: importing ? 0.6 : 1 }}>
                   {importingKey === `table-${si}` ? 'Reading file…' : 'Import from Excel/CSV'}
                   <input
@@ -172,12 +264,14 @@ export default function CustomSectionEditor({
 
             {s.contentType === 'links' && (
               <>
-                <textarea
-                  rows={5}
-                  value={s.linksText || ''}
-                  onChange={(e) => updateSection(si, { linksText: e.target.value })}
-                  placeholder={'Label one | https://example.com/one\nLabel two | https://example.com/two'}
-                />
+                <div className="admin-field">
+                  <textarea
+                    rows={5}
+                    value={s.linksText || ''}
+                    onChange={(e) => updateSection(si, { linksText: e.target.value })}
+                    placeholder={'Label one | https://example.com/one\nLabel two | https://example.com/two'}
+                  />
+                </div>
                 <label className="admin-btn admin-btn--sm" style={{ display: 'inline-block', marginTop: '0.5rem', cursor: importing ? 'default' : 'pointer', opacity: importing ? 0.6 : 1 }}>
                   {importingKey === `links-${si}` ? 'Reading file…' : 'Import from Excel/CSV'}
                   <input
@@ -202,12 +296,13 @@ export default function CustomSectionEditor({
               <div>
                 {(s.files || []).map((f, fi) => (
                   <div key={fi} style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
-                    <input
-                      value={f.label}
-                      onChange={(e) => updateFileLabel(si, fi, e.target.value)}
-                      placeholder="File label"
-                      style={{ flex: 1, minWidth: 140 }}
-                    />
+                    <div className="admin-field" style={{ flex: 1, minWidth: 140 }}>
+                      <input
+                        value={f.label}
+                        onChange={(e) => updateFileLabel(si, fi, e.target.value)}
+                        placeholder="File label"
+                      />
+                    </div>
                     <FileUploader
                       compact
                       folder="vwu/programs/custom-sections"
@@ -234,7 +329,10 @@ export default function CustomSectionEditor({
                       parentPath={path}
                       onFileUploaded={onFileUploaded}
                       onFileRemoved={onFileRemoved}
+                      onPhotoUploaded={onPhotoUploaded}
+                      onPhotoRemoved={onPhotoRemoved}
                       depth={1}
+                      showPlacementToggle={showPlacementToggle}
                     />
                   </div>
                 )}

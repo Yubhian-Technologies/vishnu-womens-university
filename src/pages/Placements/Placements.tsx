@@ -3,20 +3,14 @@ import { Link } from 'react-router-dom';
 import { BarChart3 } from 'lucide-react';
 import PageHero from '../../components/PageHero/PageHero';
 import { useOrderedCollection } from '../../hooks/useCollection';
+import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import type { PlacementItemDoc } from '../Admin/sections/PlacementItemsAdmin';
 import PlacementYearAccordion from './PlacementYearAccordion';
 
-const stats = [
-  { num: '1400+', label: 'Placements (2024–25)' },
-  { num: '150+', label: 'Recruiting Companies' },
-  { num: '59.28 LPA', label: 'Highest Package' },
-  { num: '95%+', label: 'Placement Rate' },
-];
-
-
 export default function Placements() {
   const { docs: placementItems } = useOrderedCollection<PlacementItemDoc>('placementItems', 'order');
+  const stats = useContentBlocks('placements', 'stats');
 
   useEffect(() => {
     document.title = "Placements | Vishnu Women's University";
@@ -55,9 +49,9 @@ export default function Placements() {
         <div className="container">
           <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-14)', flexWrap: 'wrap' }}>
             {stats.map((s) => (
-              <div key={s.label} style={{ textAlign: 'center' }}>
-                <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', fontWeight: 900, color: 'var(--color-accent)' }}>{s.num}</div>
-                <div style={{ fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)' }}>{s.label}</div>
+              <div key={s.id} style={{ textAlign: 'center' }}>
+                <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', fontWeight: 900, color: 'var(--color-accent)' }}>{s.value}</div>
+                <div style={{ fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)' }}>{s.title}</div>
               </div>
             ))}
           </div>

@@ -20,7 +20,7 @@ import { normalizeLab, type ProgramDoc } from '../Admin/sections/ProgramsAdmin';
 import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import type { FacultyDoc } from './Faculty';
 import { parseFlexibleTable, parseProjectAccordion } from '../../lib/structuredTable';
-import { sortPlacementRows, computePlacementStats } from '../../lib/placementRecords';
+import { sortPlacementRows, computePlacementStats, findPackageColumnIndex, findSerialColumnIndex, formatPackageCell } from '../../lib/placementRecords';
 import { hasCustomSectionContent } from '../../lib/customSections';
 import CustomSectionsRenderer from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import SEO from '../../components/SEO/SEO';
@@ -167,6 +167,14 @@ function SingleProgramDetail() {
   ].filter((g) => g.items && g.items.length > 0);
   const hasOutcomeStatements = outcomeGroups.length > 0;
   const activeOutcome = outcomeGroups.find((g) => g.key === outcomeTab) ?? outcomeGroups[0];
+  // Section heading + sidebar label list only whichever of PEOs/POs/PSOs/WKs
+  // this programme actually has content for (e.g. "PEOs, POs & PSOs" when
+  // there's no WKs data yet), instead of a fixed "...& WKs" that would claim
+  // content the programme doesn't have.
+  const outcomeShortLabels = outcomeGroups.map((g) => g.short);
+  const outcomeHeading = outcomeShortLabels.length > 1
+    ? `${outcomeShortLabels.slice(0, -1).join(', ')} & ${outcomeShortLabels[outcomeShortLabels.length - 1]}`
+    : outcomeShortLabels[0] || '';
   const hasHod = !!(shared.hodMessage || shared.hodImage || shared.hodEmail || shared.hod);
   const hasMindMap = !!program.mindMapImage;
   const labs = shared.labs;
@@ -219,6 +227,14 @@ function SingleProgramDetail() {
   const placementRows = placementColumns.length > 0 && activePlacementYear
     ? sortPlacementRows(placementColumns, activePlacementYear.rows || [])
     : [];
+  // Displays the package/CTC column as a plain LPA figure ("45" instead of
+  // an imported raw rupee value like "45,00,000") — same column detection
+  // computePlacementStats already uses for the stat tiles.
+  const placementPkgIdx = findPackageColumnIndex(placementColumns);
+  // Hides an imported S.No column — the table already numbers rows itself
+  // (see the S.No <th>/<td> below), so showing both duplicated the column.
+  const placementSnoIdx = findSerialColumnIndex(placementColumns);
+  const visiblePlacementColumnIndices = placementColumns.map((_, i) => i).filter((i) => i !== placementSnoIdx);
   // Computed live from the active year's raw rows — every tile below reads
   // straight from this, nothing here is admin-entered.
   const placementYearStats = activePlacementYear ? computePlacementStats(placementColumns, activePlacementYear.rows || []) : null;
@@ -228,18 +244,18 @@ function SingleProgramDetail() {
   const quickLinks = [
     { id: 'about', label: 'About the Department' },
     hasVisionMission && { id: 'vision-mission', label: 'Vision, Mission & Values' },
-    hasOutcomeStatements && { id: 'peos-pos-psos', label: 'PEOs, POs, PSOs & WKs' },
+    hasOutcomeStatements && { id: 'peos-pos-psos', label: outcomeHeading },
     hasHod && { id: 'hod', label: 'About HOD' },
     faculty.length > 0 && { id: 'faculty', label: 'Faculty' },
     hasMindMap && { id: 'mindmap', label: 'Mind Map' },
     hasCurriculum && { id: 'curriculum', label: 'Curriculum' },
     hasLabs && { id: 'labs', label: 'Laboratories' },
-    placementYears.length > 0 && { id: 'placements', label: 'Placements' },
     hasLibrary && { id: 'library', label: 'Department Library' },
+    hasRnd && { id: 'rnd', label: 'Research & Development (Funded Projects & Patents)' },
+    placementYears.length > 0 && { id: 'placements', label: 'Placements' },
+    hasNewsletter && { id: 'newsletter', label: 'Newsletter' },
     hasDeptNews && { id: 'news', label: 'News & Events' },
     hasNewsEventsYears && { id: 'news-events', label: 'News & Events' },
-    hasNewsletter && { id: 'newsletter', label: 'Newsletter' },
-    hasRnd && { id: 'rnd', label: 'Research & Development (Funded Projects & Patents)' },
     ...visibleCustomSections.map((s) => ({ id: s.id, label: s.label })),
   ].filter(Boolean) as { id: string; label: string }[];
 
@@ -304,20 +320,20 @@ function SingleProgramDetail() {
       {/* Stats bar */}
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-5) 0' }}>
         <div className="container">
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-12)', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', flexWrap: 'nowrap', gap: 'var(--space-12)', overflowX: 'auto', paddingBottom: 4, scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.3) transparent' }}>
             {[
               ...(program.intake ? [{ label: 'Annual Intake', value: `${program.intake} Seats` }] : []),
               ...(program.established ? [{ label: 'Established', value: program.established }] : []),
               ...(program.accreditation ? [{ label: 'Accreditation', value: program.accreditation }] : []),
               ...(shared.hod ? [{ label: 'Head of Department', value: shared.hod }] : []),
             ].map((s) => (
-              <div key={s.label} style={{ textAlign: 'center' }}>
+              <div key={s.label} style={{ textAlign: 'center', flexShrink: 0 }}>
                 {s.label === 'Head of Department' && hasHod ? (
                   <a href="#hod" style={{ fontFamily: 'var(--font-serif)', fontSize: '1.15rem', fontWeight: 900, color: 'var(--color-accent)', whiteSpace: 'nowrap', textDecoration: 'underline', textUnderlineOffset: 3 }}>{s.value}</a>
                 ) : (
                   <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.15rem', fontWeight: 900, color: 'var(--color-accent)', whiteSpace: 'nowrap' }}>{s.value}</div>
                 )}
-                <div style={{ fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.65)', fontFamily: 'var(--font-sans)', marginTop: 2, textTransform: 'uppercase', letterSpacing: '0.07em' }}>{s.label}</div>
+                <div style={{ fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.65)', fontFamily: 'var(--font-sans)', marginTop: 2, textTransform: 'uppercase', letterSpacing: '0.07em', whiteSpace: 'nowrap' }}>{s.label}</div>
               </div>
             ))}
           </div>
@@ -461,7 +477,7 @@ function SingleProgramDetail() {
           <div className="container">
             <div style={{ marginBottom: 'var(--space-10)' }}>
               <span className="section-label">Outcome-Based Education</span>
-              <h2 className="section-title">PEOs, POs, PSOs &amp; WKs</h2>
+              <h2 className="section-title">{outcomeHeading}</h2>
               <p className="section-desc">The programme&apos;s educational objectives and outcomes, aligned to national accreditation frameworks.</p>
             </div>
             <div className="section-tabs">
@@ -811,14 +827,16 @@ function SingleProgramDetail() {
                       <thead>
                         <tr>
                           <th className="pb-activities-num">S.No</th>
-                          {placementColumns.map((col, ci) => <th key={ci}>{col}</th>)}
+                          {visiblePlacementColumnIndices.map((ci) => <th key={ci}>{placementColumns[ci]}</th>)}
                         </tr>
                       </thead>
                       <tbody>
                         {visiblePlacementRows.map((row, ri) => (
                           <tr key={ri}>
                             <td className="pb-activities-num">{ri + 1}</td>
-                            {placementColumns.map((_, ci) => <td key={ci}>{row.cells[ci] ?? ''}</td>)}
+                            {visiblePlacementColumnIndices.map((ci) => (
+                              <td key={ci}>{ci === placementPkgIdx ? formatPackageCell(row.cells[ci] ?? '') : (row.cells[ci] ?? '')}</td>
+                            ))}
                           </tr>
                         ))}
                       </tbody>
