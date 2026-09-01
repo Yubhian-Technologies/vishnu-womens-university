@@ -9,6 +9,7 @@ import { getSectionBlocks } from '../../lib/facultySections';
 import FacultySectionContent from '../../components/FacultySectionContent/FacultySectionContent';
 import type { FacultyDoc } from './Faculty';
 import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
+import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import SEO from '../../components/SEO/SEO';
 import { getFacultySchema, getBreadcrumbSchema } from '../../lib/seo/schemas';
 import '../detail-layout.css';
@@ -35,6 +36,7 @@ export default function FacultyProfile() {
   const { id } = useParams<{ id: string }>();
   const { docs: allFaculty, loading } = useOrderedCollection<FacultyDoc>('faculty', 'order');
   const { docs: programs } = useCollection<ProgramDoc>('programs');
+  const { docs: departments } = useCollection<DepartmentDoc>('departments');
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
   const person = allFaculty.find((f) => f.id === id);
@@ -57,7 +59,20 @@ export default function FacultyProfile() {
 
   const isHod = person.designation.toLowerCase().includes('hod') || person.designation.toLowerCase().includes('head');
   const program = programs.find((p) => p.department === person.department);
-  const hodMatches = isHod && program && program.hod?.trim() === person.name.trim();
+  // Head of Department name/message/research-profiles live on the
+  // `departments` doc now, not per-programme (see DepartmentsAdmin.tsx) —
+  // matched the same way ProgramDetail/DepartmentDetail do, with a fallback
+  // to the programme's own (now admin-hidden, but still intact) field for a
+  // department that hasn't had this copied over yet. A couple of legacy
+  // programs spell their department out in prose ("Civil", "Mechanical")
+  // rather than the admin's short code ("CE", "ME").
+  const DEPT_CODE_ALIASES: Record<string, string> = { Civil: 'CE', Mechanical: 'ME' };
+  const deptCode = DEPT_CODE_ALIASES[person.department || ''] || person.department || '';
+  const dept = departments.find((d) => d.shortCode?.trim().toUpperCase() === deptCode.trim().toUpperCase());
+  const hodName = dept?.hod || program?.hod || '';
+  const hodMessage = dept?.hodMessage || program?.hodMessage || '';
+  const hodResearchProfiles = (dept?.hodResearchProfiles?.length ? dept.hodResearchProfiles : program?.hodResearchProfiles) || [];
+  const hodMatches = isHod && !!hodName && hodName.trim() === person.name.trim();
 
   const active = sections.find((s) => s.title === activeSection) ?? sections[0];
 
@@ -138,14 +153,14 @@ export default function FacultyProfile() {
                 </div>
               )}
 
-              {hodMatches && program?.hodMessage && (
+              {hodMatches && hodMessage && (
                 <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.7, marginTop: 'var(--space-4)', paddingTop: 'var(--space-4)', borderTop: '1px solid var(--color-light-gray)' }}>
-                  {program.hodMessage}
+                  {hodMessage}
                 </p>
               )}
-              {hodMatches && program?.hodResearchProfiles && program.hodResearchProfiles.length > 0 && (
+              {hodMatches && hodResearchProfiles.length > 0 && (
                 <div style={{ marginTop: 'var(--space-3)', display: 'flex', flexWrap: 'wrap', gap: 'var(--space-3)' }}>
-                  {program.hodResearchProfiles.map((link) => (
+                  {hodResearchProfiles.map((link) => (
                     <a key={link.label} href={link.url} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', fontSize: 'var(--text-sm)', color: 'var(--color-primary)', fontWeight: 700 }}>
                       {link.label} <ExternalLink size={13} strokeWidth={2} />
                     </a>

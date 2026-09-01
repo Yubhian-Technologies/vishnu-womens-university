@@ -256,6 +256,7 @@ const navItemsData: NavItem[] = [
         items: [
           { label: 'Upcoming Events', path: '/news-awards/happenings#upcoming-events' },
           { label: 'Recent Events', path: '/news-awards/happenings#recent-events' },
+          { label: 'News & Events', path: '/news' },
           { label: 'Photo & Video Gallery', path: '/news-awards/gallery' },
           { label: 'Vishnu Era Newsletter', path: 'https://www.srivishnu.edu.in/vishnu-era/', external: true },
           { label: 'Prathibha Magazine', path: 'https://heyzine.com/flip-book/088b7b5629.html#page/54', external: true },

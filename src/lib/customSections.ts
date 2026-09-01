@@ -41,9 +41,17 @@ export interface CustomSection {
   // between the name and the bio (textContent, reused for the bio here) on
   // a person's card — see PersonCard in CustomSectionsRenderer.tsx.
   personPosition?: string;
-  // One level of nesting is all the admin UI exposes (CustomSectionEditor
-  // only recurses to depth 1) even though the shape itself is recursive.
+  // Subsections can themselves have subsections, arbitrarily deep — lets a
+  // section hold several distinct pieces together (e.g. a description plus
+  // two separate tables) by giving each its own nested section instead of
+  // cramming them into one contentType.
   subSections?: CustomSection[];
+  // How THIS section's own subSections display — 'stacked' (default) shows
+  // each one below the previous; 'pills' shows a horizontal pill switcher
+  // (one subsection's content at a time), same mechanism as a tab's
+  // sectionsDisplay but one level down — e.g. a "Training / Research"
+  // section whose subsections are academic years.
+  subSectionsDisplay?: 'stacked' | 'pills';
   // Where this section renders on the Differentiators detail page — 'intro'
   // sections show compactly inline in the page's intro column (next to
   // About, matching the old Vision/Mission/Objectives styling); everything
@@ -150,4 +158,29 @@ export function getAtPath(sections: CustomSection[], path: number[]): CustomSect
   const section = sections[index];
   if (!section) return undefined;
   return rest.length === 0 ? section : getAtPath(section.subSections || [], rest);
+}
+
+// Quick Links sidebar entry for a top-level custom section (ProgramDetail.tsx
+// / DepartmentDetail.tsx) — one entry per section, plus (one level only, not
+// full recursion — Quick Links is deliberately "one anchor per major piece",
+// not a full outline) its own direct subSections, so e.g. a "Research &
+// Development" section built with Publications/Patents/Funded Projects pills
+// shows all three as sub-links instead of just the parent. Deep-linking to a
+// pill-displayed child works because PillSwitcher (CustomSectionsRenderer.tsx)
+// watches the URL hash and switches to the matching pill itself — a plain
+// anchor can't reach it, since only the active pill's content is ever in the
+// DOM.
+export interface QuickLinkItem {
+  id: string;
+  label: string;
+  children?: { id: string; label: string }[];
+}
+
+export function toQuickLinkItems(sections: CustomSection[]): QuickLinkItem[] {
+  return sections.filter(hasCustomSectionContent).map((s) => {
+    const children = (s.subSections || [])
+      .filter(hasCustomSectionContent)
+      .map((sub) => ({ id: sub.id, label: sub.label }));
+    return children.length > 0 ? { id: s.id, label: s.label, children } : { id: s.id, label: s.label };
+  });
 }

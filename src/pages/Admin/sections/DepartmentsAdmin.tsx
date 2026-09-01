@@ -3,9 +3,11 @@ import { collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp } from '
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
 import ImageUploader from '../../../components/ImageUploader/ImageUploader';
-import type { UploadResult } from '../../../lib/storage';
+import FileUploader from '../../../components/FileUploader/FileUploader';
+import { deleteFile, type UploadResult } from '../../../lib/storage';
 import { PROGRAM_ICON_NAMES } from '../../../lib/programIcons';
-import type { LibrarySection, LibraryItem } from './ProgramsAdmin';
+import { normalizeLab, type LabItem, type LibrarySection, type LibraryItem, type NewsEventsYear, type ProgramLink, type ProgramDoc } from './ProgramsAdmin';
+import NewsEventsYearsEditor from './NewsEventsYearsEditor';
 
 // Backs the "Academic Departments" card grid on Academics.tsx — independent
 // of the `programs` collection, so a department's card copy doesn't have to
@@ -38,6 +40,11 @@ export interface DepartmentDoc {
   heroImage?: string;
   storagePath?: string;
   about?: string;
+  // Same shape/purpose as a programme's own (see ProgramsAdmin) — shown
+  // right below "About the Department" on the grouped department page,
+  // filling the space that used to be empty next to the Quick Links sidebar
+  // whenever "About" itself was short.
+  highlights?: string[];
   established?: string;
   accreditation?: string;
   hod?: string;
@@ -45,10 +52,15 @@ export interface DepartmentDoc {
   hodImageStoragePath?: string;
   hodEmail?: string;
   hodMessage?: string;
+  hodResearchProfiles?: ProgramLink[];
   vision?: string;
   mission?: string[];
   coreValues?: string[];
-  labs?: string[];
+  // Same shape as a programme's own (see ProgramsAdmin) — a department's
+  // labs are no longer editable per-programme, so this is the only place
+  // they're entered. Legacy docs may still hold plain strings; normalizeLab()
+  // upgrades either shape at read time.
+  labs?: (string | LabItem)[];
   // Digital Library — same shape as a programme's own (see ProgramsAdmin),
   // shown as a shared section before the program toggle on the grouped
   // department page.
@@ -63,16 +75,26 @@ export interface DepartmentDoc {
   placementIntro?: string;
   placementStats?: LibraryItem[];
   placementRecruiters?: string[];
+  // News & Events — department-wide, split into three admin-defined
+  // categories shown as tabs on the public page (see NewsEventsTabs). Each
+  // is the same academic-year table shape as everything else here. No
+  // per-programme editing exists for this anymore; `newsEventsYears` used to
+  // live on ProgramDoc — legacy content there is picked up by "Copy from
+  // Programs" below.
+  newsEventsYears?: NewsEventsYear[];
+  studentAwardsYears?: NewsEventsYear[];
+  othersYears?: NewsEventsYear[];
 }
 
 const EMPTY: Omit<DepartmentDoc, 'id'> = {
   title: '', shortCode: '', description: '', icon: 'GraduationCap', order: 0,
-  heroImage: '', storagePath: '', about: '', established: '', accreditation: '',
-  hod: '', hodImage: '', hodImageStoragePath: '', hodEmail: '', hodMessage: '',
+  heroImage: '', storagePath: '', about: '', highlights: [], established: '', accreditation: '',
+  hod: '', hodImage: '', hodImageStoragePath: '', hodEmail: '', hodMessage: '', hodResearchProfiles: [],
   vision: '', mission: [], coreValues: [], labs: [],
   libraryIntro: '', libraryInCharge: '', librarySections: [],
   programLevels: [],
   placementIntro: '', placementStats: [], placementRecruiters: [],
+  newsEventsYears: [], studentAwardsYears: [], othersYears: [],
 };
 
 function linesToArray(text: string): string[] {
@@ -81,16 +103,175 @@ function linesToArray(text: string): string[] {
 function arrayToLines(arr: string[] = []): string {
   return arr.join('\n');
 }
+function linksToText(links: ProgramLink[] = []): string {
+  return links.map((l) => `${l.label}: ${l.url}`).join('\n');
+}
+function textToLinks(text: string): ProgramLink[] {
+  return linesToArray(text).map((line) => {
+    const idx = line.indexOf(':');
+    return {
+      label: (idx === -1 ? line : line.slice(0, idx)).trim(),
+      url: (idx === -1 ? '' : line.slice(idx + 1)).trim(),
+    };
+  }).filter((l) => l.label && l.url);
+}
+
+// A couple of legacy `programs` docs spell out their department in prose
+// ("Civil", "Mechanical") rather than the Academic Departments admin's short
+// code ("CE", "ME") — this is the only place that mismatch needs correcting
+// for the copy-from-programs match below; every other department's programs
+// already use its short code exactly.
+const DEPT_PROGRAM_CODE_ALIASES: Record<string, string> = { Civil: 'CE', Mechanical: 'ME' };
+
+// How much Vision/Mission/Values/Labs/Library content a program actually
+// has — used to pick which of a department's programs to copy from when it
+// has more than one (e.g. CSE also has M.Tech./Ph.D. programs alongside the
+// B.Tech. one that actually carries this content).
+function programRichness(p: ProgramDoc): number {
+  return (p.vision ? 100 : 0)
+    + (p.mission?.length || 0) * 10
+    + (p.coreValues?.length || 0) * 5
+    + (p.labs?.length || 0) * 3
+    + (p.libraryIntro || p.libraryInCharge || p.librarySections?.length ? 50 : 0);
+}
 
 export default function DepartmentsAdmin() {
   const { docs: departments, loading } = useOrderedCollection<DepartmentDoc>('departments', 'order');
+  const { docs: allPrograms } = useOrderedCollection<ProgramDoc>('programs', 'order');
   const [form, setForm] = useState<Omit<DepartmentDoc, 'id'>>(EMPTY);
   const [editing, setEditing] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [copying, setCopying] = useState(false);
 
-  const set = (k: string, v: string | number | string[] | LibrarySection[] | ProgramLevel[] | LibraryItem[]) => setForm((p) => ({ ...p, [k]: v }));
+  const set = (k: string, v: string | number | string[] | LibrarySection[] | ProgramLevel[] | LibraryItem[] | LabItem[] | NewsEventsYear[] | ProgramLink[]) => setForm((p) => ({ ...p, [k]: v }));
   const handleHero = (r: UploadResult) => setForm((p) => ({ ...p, heroImage: r.url, storagePath: r.path }));
   const handleHodImage = (r: UploadResult) => setForm((p) => ({ ...p, hodImage: r.url, hodImageStoragePath: r.path }));
+
+  // Vision/Mission/Values, Laboratories, and the Department Library used to
+  // be edited per-programme; a lot of departments already have this content
+  // sitting on their programme(s) from before that changed. This one-click
+  // action copies it over — per department, from whichever of its programs
+  // has the most of it (see programRichness) — filling in only the fields a
+  // department doc doesn't already have, so it never overwrites anything an
+  // admin has already entered directly on the department.
+  const matchingPrograms = (d: DepartmentDoc) => {
+    const code = d.shortCode.trim().toUpperCase();
+    return allPrograms.filter((p) => (DEPT_PROGRAM_CODE_ALIASES[p.department] || p.department || '').trim().toUpperCase() === code);
+  };
+  // News & Events and the HOD fields aren't part of programRichness (they're
+  // separate legacy fields, not one of Vision/Mission/Values/Labs/Library) —
+  // each found independently as whichever matching program still has it,
+  // same "first non-empty wins" rule the grouped department page itself
+  // already uses when pooling across AI&ML/AI&DS etc. A department's HOD is
+  // one person, not a blend, so this picks one whole program's set of HOD
+  // fields together rather than mixing, say, one program's photo with
+  // another's message.
+  const legacyNewsEvents = (matches: ProgramDoc[]) => matches.map((p) => p.newsEventsYears).find((arr) => arr && arr.length > 0);
+  const hasHodInfo = (p: ProgramDoc) => !!(p.hod || p.hodImage || p.hodEmail || p.hodMessage || p.hodResearchProfiles?.length);
+  const legacyHod = (matches: ProgramDoc[]) => matches.find(hasHodInfo);
+  const departmentsMissingContent = departments.filter((d) => {
+    const matches = matchingPrograms(d);
+    const richest = matches.reduce((best: ProgramDoc | null, p) => (!best || programRichness(p) > programRichness(best) ? p : best), null);
+    const news = legacyNewsEvents(matches);
+    const hodSource = legacyHod(matches);
+    const hasOwnHod = !!(d.hod || d.hodImage || d.hodEmail || d.hodMessage || d.hodResearchProfiles?.length);
+    const missing = (richest && programRichness(richest) > 0 && (
+      !d.vision && !!richest.vision
+      || !(d.mission?.length) && !!richest.mission?.length
+      || !(d.coreValues?.length) && !!richest.coreValues?.length
+      || !(d.labs?.length) && !!richest.labs?.length
+      || !d.libraryIntro && !!richest.libraryIntro
+      || !d.libraryInCharge && !!richest.libraryInCharge
+      || !(d.librarySections?.length) && !!richest.librarySections?.length
+    )) || (!(d.newsEventsYears?.length) && !!news?.length) || (!hasOwnHod && !!hodSource);
+    return missing;
+  });
+  const copyFromPrograms = async () => {
+    if (!confirm(`Copy Vision/Mission/Values, Laboratories, Department Library, News & Events, and Head of Department from each department's programme(s) into ${departmentsMissingContent.length} department(s) that don't already have it? This never overwrites content already entered directly on a department.`)) return;
+    setCopying(true);
+    try {
+      for (const d of departmentsMissingContent) {
+        const matches = matchingPrograms(d);
+        const richest = matches.reduce((best: ProgramDoc | null, p) => (!best || programRichness(p) > programRichness(best) ? p : best), null);
+        const news = legacyNewsEvents(matches);
+        const hodSource = legacyHod(matches);
+        const hasOwnHod = !!(d.hod || d.hodImage || d.hodEmail || d.hodMessage || d.hodResearchProfiles?.length);
+        const patch: Record<string, unknown> = {};
+        if (richest) {
+          if (!d.vision && richest.vision) patch.vision = richest.vision;
+          if (!(d.mission?.length) && richest.mission?.length) patch.mission = richest.mission;
+          if (!(d.coreValues?.length) && richest.coreValues?.length) patch.coreValues = richest.coreValues;
+          if (!(d.labs?.length) && richest.labs?.length) patch.labs = richest.labs;
+          if (!d.libraryIntro && richest.libraryIntro) patch.libraryIntro = richest.libraryIntro;
+          if (!d.libraryInCharge && richest.libraryInCharge) patch.libraryInCharge = richest.libraryInCharge;
+          if (!(d.librarySections?.length) && richest.librarySections?.length) patch.librarySections = richest.librarySections;
+        }
+        if (!(d.newsEventsYears?.length) && news?.length) patch.newsEventsYears = news;
+        if (!hasOwnHod && hodSource) {
+          if (hodSource.hod) patch.hod = hodSource.hod;
+          if (hodSource.hodImage) { patch.hodImage = hodSource.hodImage; patch.hodImageStoragePath = hodSource.hodImageStoragePath || ''; }
+          if (hodSource.hodEmail) patch.hodEmail = hodSource.hodEmail;
+          if (hodSource.hodMessage) patch.hodMessage = hodSource.hodMessage;
+          if (hodSource.hodResearchProfiles?.length) patch.hodResearchProfiles = hodSource.hodResearchProfiles;
+        }
+        if (Object.keys(patch).length > 0) await updateDoc(doc(db, 'departments', d.id), patch);
+      }
+      alert(`Copied into ${departmentsMissingContent.length} department(s).`);
+    } catch (e) {
+      alert(`Couldn't finish copying: ${(e as Error).message}`);
+    } finally {
+      setCopying(false);
+    }
+  };
+
+  // Laboratories editor — same shape/pattern as the old per-programme one in
+  // ProgramsAdmin, each lab independently backed by its own uploaded PDF.
+  //
+  // These all update via the functional `setForm(p => ...)` form (reading
+  // `p.labs`), never the `labs` snapshot below — that snapshot is only for
+  // rendering. Uploading PDFs for several labs in quick succession fires
+  // several overlapping async `handleLabPdf` calls; if each one computed its
+  // next array from the same stale outer `labs` closure, whichever upload's
+  // state write landed last would silently overwrite every other lab's
+  // just-uploaded pdfUrl with its own stale copy of the list — losing
+  // already-successful uploads without any error.
+  const labs = (form.labs || []).map(normalizeLab);
+  const addLab = () => {
+    setForm((p) => ({ ...p, labs: [...(p.labs || []).map(normalizeLab), { name: '' }] }));
+  };
+  const updateLabName = (li: number, name: string) => {
+    setForm((p) => ({ ...p, labs: (p.labs || []).map(normalizeLab).map((l, i) => (i === li ? { ...l, name } : l)) }));
+  };
+  const updateLabDescription = (li: number, description: string) => {
+    setForm((p) => ({ ...p, labs: (p.labs || []).map(normalizeLab).map((l, i) => (i === li ? { ...l, description } : l)) }));
+  };
+  const moveLab = (li: number, dir: -1 | 1) => {
+    setForm((p) => {
+      const next = (p.labs || []).map(normalizeLab);
+      const target = li + dir;
+      if (target < 0 || target >= next.length) return p;
+      [next[li], next[target]] = [next[target], next[li]];
+      return { ...p, labs: next };
+    });
+  };
+  const removeLab = (li: number) => {
+    setForm((p) => ({ ...p, labs: (p.labs || []).map(normalizeLab).filter((_, i) => i !== li) }));
+  };
+  const handleLabPdf = (li: number, r: UploadResult) => {
+    setForm((p) => ({ ...p, labs: (p.labs || []).map(normalizeLab).map((l, i) => (i === li ? { ...l, pdfUrl: r.url, pdfStoragePath: r.path } : l)) }));
+  };
+  const removeLabPdf = async (li: number) => {
+    const lab = labs[li];
+    if (!lab?.pdfUrl) return;
+    if (!confirm('Remove this PDF? This cannot be undone.')) return;
+    try {
+      if (lab.pdfStoragePath) await deleteFile(lab.pdfStoragePath);
+    } catch (e) {
+      alert(`Couldn't delete the file from storage: ${(e as Error).message}`);
+      return;
+    }
+    setForm((p) => ({ ...p, labs: (p.labs || []).map(normalizeLab).map((l, i) => (i === li ? { ...l, pdfUrl: '', pdfStoragePath: '' } : l)) }));
+  };
 
   // Digital Library section editor — same add/reorder/remove pattern as the
   // per-programme one in ProgramsAdmin.
@@ -202,9 +383,10 @@ export default function DepartmentsAdmin() {
     try {
       const payload = {
         ...form,
+        highlights: (form.highlights || []).filter(Boolean),
         mission: (form.mission || []).filter(Boolean),
         coreValues: (form.coreValues || []).filter(Boolean),
-        labs: (form.labs || []).filter(Boolean),
+        labs: labs.filter((l) => l.name),
       };
       if (editing) {
         await updateDoc(doc(db, 'departments', editing), { ...payload });
@@ -223,14 +405,16 @@ export default function DepartmentsAdmin() {
       title: d.title, shortCode: d.shortCode, description: d.description || '',
       icon: d.icon || 'GraduationCap', order: d.order,
       heroImage: d.heroImage || '', storagePath: d.storagePath || '',
-      about: d.about || '', established: d.established || '', accreditation: d.accreditation || '',
+      about: d.about || '', highlights: d.highlights || [], established: d.established || '', accreditation: d.accreditation || '',
       hod: d.hod || '', hodImage: d.hodImage || '', hodImageStoragePath: d.hodImageStoragePath || '',
-      hodEmail: d.hodEmail || '', hodMessage: d.hodMessage || '',
-      vision: d.vision || '', mission: d.mission || [], coreValues: d.coreValues || [], labs: d.labs || [],
+      hodEmail: d.hodEmail || '', hodMessage: d.hodMessage || '', hodResearchProfiles: d.hodResearchProfiles || [],
+      vision: d.vision || '', mission: d.mission || [], coreValues: d.coreValues || [],
+      labs: (d.labs || []).map(normalizeLab).map((l) => ({ name: l.name, description: l.description || '', pdfUrl: l.pdfUrl || '', pdfStoragePath: l.pdfStoragePath || '' })),
       libraryIntro: d.libraryIntro || '', libraryInCharge: d.libraryInCharge || '',
       librarySections: (d.librarySections || []).map((s) => ({ heading: s.heading, items: s.items || [] })),
       programLevels: (d.programLevels || []).map((l) => ({ title: l.title, intro: l.intro || '', rows: l.rows || [] })),
       placementIntro: d.placementIntro || '', placementStats: d.placementStats || [], placementRecruiters: d.placementRecruiters || [],
+      newsEventsYears: d.newsEventsYears || [], studentAwardsYears: d.studentAwardsYears || [], othersYears: d.othersYears || [],
     });
   };
 
@@ -277,9 +461,12 @@ export default function DepartmentsAdmin() {
 
           <div className="admin-field admin-field--full"><hr /><h3>Department Page — Shared Content</h3>
             <p className="admin-field__hint" style={{ marginTop: '0.25rem' }}>
-              Only used for the grouped departments <strong>AI</strong>, <strong>CSE</strong> and <strong>ECE</strong>,
-              whose <code>/academics/&lt;program&gt;</code> pages show this at the top (above the program toggle),
-              matched to this card by <strong>Short Code</strong>. Leave blank for every other department.
+              Shown on every department's page at <code>/academics/&lt;program&gt;</code> — above the programme
+              toggle for the grouped departments (<strong>AI</strong>, <strong>CSE</strong>, <strong>ECE</strong>),
+              or as that programme's own "About the Department" section for every other (single-programme)
+              department — matched to this card by <strong>Short Code</strong>. Overview specifically feeds
+              "About the Department"; a programme's own "About the Programme" text stays a separate field on that
+              programme itself (Admin → Programs → About the Programme).
             </p>
           </div>
           <div className="admin-field admin-field--full">
@@ -297,6 +484,13 @@ export default function DepartmentsAdmin() {
           <div className="admin-field admin-field--full">
             <label htmlFor="field-about">Overview</label>
             <textarea id="field-about" rows={5} value={form.about} onChange={(e) => set('about', e.target.value)} placeholder="About the department…" />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label htmlFor="field-highlights-one-per-line">Department Highlights (one per line)</label>
+            <p className="admin-field__hint" style={{ marginTop: '-0.25rem', marginBottom: '0.5rem' }}>
+              Shown right below "About the Department" — same layout as a programme's own Highlights.
+            </p>
+            <textarea id="field-highlights-one-per-line" rows={5} value={arrayToLines(form.highlights)} onChange={(e) => set('highlights', linesToArray(e.target.value))} placeholder="NAAC A+ Accredited undergraduate programmes" />
           </div>
 
           <div className="admin-field admin-field--full"><hr /><h3>Department Page — Programme Levels (B.Tech / M.Tech)</h3>
@@ -354,6 +548,7 @@ export default function DepartmentsAdmin() {
             )}
           </div>
 
+          <div className="admin-field admin-field--full"><hr /><h3>Department Page — Vision, Mission &amp; Values</h3></div>
           <div className="admin-field admin-field--full">
             <label htmlFor="field-vision">Vision</label>
             <textarea id="field-vision" rows={3} value={form.vision} onChange={(e) => set('vision', e.target.value)} />
@@ -366,9 +561,65 @@ export default function DepartmentsAdmin() {
             <label htmlFor="field-core-values">Core Values (one per line)</label>
             <textarea id="field-core-values" rows={3} value={arrayToLines(form.coreValues)} onChange={(e) => set('coreValues', linesToArray(e.target.value))} />
           </div>
+          <div className="admin-field admin-field--full"><hr /><h3>Department Page — Laboratories</h3></div>
           <div className="admin-field admin-field--full">
-            <label htmlFor="field-labs">Laboratories (one per line)</label>
-            <textarea id="field-labs" rows={4} value={arrayToLines(form.labs)} onChange={(e) => set('labs', linesToArray(e.target.value))} />
+            <label>Laboratories</label>
+            <p className="admin-field__hint" style={{ marginTop: 0 }}>
+              Each laboratory has its own name, an optional description (a paragraph, or points — one per line, however
+              you write it), and its own uploaded PDF. On the public page, tapping a laboratory tile opens a dialog
+              with its description and a link to its PDF — a lab with no PDF uploaded yet still shows its tile and
+              dialog, just marked as unavailable there.
+            </p>
+            {labs.length > 0 && (
+              <div className="admin-compact-list" style={{ marginBottom: '0.75rem' }}>
+                {labs.map((lab, li) => (
+                  <div key={li} style={{ padding: '0.4rem 0.6rem', borderBottom: li < labs.length - 1 ? '1px solid #e5e7eb' : 'none' }}>
+                    <div className="admin-compact-row" style={{ padding: 0, border: 'none' }}>
+                      <input
+                        className="admin-compact-row__name"
+                        value={lab.name}
+                        onChange={(e) => updateLabName(li, e.target.value)}
+                        placeholder="Advanced Computing Lab"
+                      />
+                      <div className="admin-compact-row__file">
+                        <FileUploader
+                          compact
+                          folder="vwu/departments/labs"
+                          currentUrl={lab.pdfUrl}
+                          onUploaded={(r) => handleLabPdf(li, r)}
+                          label="Upload PDF"
+                        />
+                      </div>
+                      <div className="admin-compact-row__actions">
+                        <button
+                          type="button"
+                          className="admin-btn admin-btn--ghost admin-btn--sm"
+                          onClick={() => removeLabPdf(li)}
+                          disabled={!lab.pdfUrl}
+                          title={lab.pdfUrl ? 'Remove PDF' : 'No PDF uploaded yet'}
+                        >
+                          Remove PDF
+                        </button>
+                        <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveLab(li, -1)} disabled={li === 0} title="Move up">↑</button>
+                        <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveLab(li, 1)} disabled={li === labs.length - 1} title="Move down">↓</button>
+                        <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeLab(li)} title="Remove laboratory">Remove</button>
+                      </div>
+                    </div>
+                    <textarea
+                      value={lab.description || ''}
+                      onChange={(e) => updateLabDescription(li, e.target.value)}
+                      placeholder="Description (optional) — a paragraph, or one point per line…"
+                      rows={2}
+                      style={{ width: '100%', marginTop: '0.4rem' }}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+            <button type="button" className="admin-btn admin-btn--primary" onClick={addLab}>+ Add Lab</button>
+            {labs.length === 0 && (
+              <p className="admin-field__hint">No laboratories yet — click "Add Lab" to start building this department's Laboratories list.</p>
+            )}
           </div>
 
           <div className="admin-field admin-field--full"><hr /><h3>Department Page — Placements</h3>
@@ -467,6 +718,27 @@ export default function DepartmentsAdmin() {
             )}
           </div>
 
+          <div className="admin-field admin-field--full"><hr /><h3>Department Page — News &amp; Events</h3>
+            <p className="admin-field__hint" style={{ marginTop: '0.25rem' }}>
+              Shown as a shared "News &amp; Events" section, with a tab to switch between the three lists below —
+              same academic-year table shape for each, with columns you define per year (e.g. "Date", "Seminars /
+              Workshop"); "S.No" is added automatically. A tab with nothing in it still shows, so leaving one empty
+              for now is fine.
+            </p>
+          </div>
+          <div className="admin-field admin-field--full">
+            <label>News &amp; Events</label>
+            <NewsEventsYearsEditor years={form.newsEventsYears || []} onChange={(years) => set('newsEventsYears', years)} />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label>Student Awards</label>
+            <NewsEventsYearsEditor years={form.studentAwardsYears || []} onChange={(years) => set('studentAwardsYears', years)} />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label>Others</label>
+            <NewsEventsYearsEditor years={form.othersYears || []} onChange={(years) => set('othersYears', years)} />
+          </div>
+
           <div className="admin-field admin-field--full"><hr /><h3>Department Page — Head of Department</h3></div>
           <div className="admin-field admin-field--full">
             <label>HOD Photo</label>
@@ -484,6 +756,10 @@ export default function DepartmentsAdmin() {
             <label htmlFor="field-hod-message">HOD Message</label>
             <textarea id="field-hod-message" rows={5} value={form.hodMessage} onChange={(e) => set('hodMessage', e.target.value)} />
           </div>
+          <div className="admin-field admin-field--full">
+            <label htmlFor="field-hod-research-profiles">HOD Research Profiles (one per line: "Google Scholar: https://…")</label>
+            <textarea id="field-hod-research-profiles" rows={4} value={linksToText(form.hodResearchProfiles)} onChange={(e) => set('hodResearchProfiles', textToLinks(e.target.value))} placeholder="Google Scholar: https://scholar.google.com/citations?user=…" />
+          </div>
         </div>
 
         <div className="admin-form-actions">
@@ -496,6 +772,16 @@ export default function DepartmentsAdmin() {
 
       <div className="admin-card">
         <h2 className="admin-card__title">Departments ({departments.length})</h2>
+        {departmentsMissingContent.length > 0 && (
+          <p className="admin-field__hint" style={{ margin: '0 0 1rem' }}>
+            {departmentsMissingContent.length} department(s) are missing Vision/Mission/Values, Laboratories,
+            Department Library, News &amp; Events, or Head of Department info that already exist on one of their
+            programmes.{' '}
+            <button className="admin-btn admin-btn--sm" onClick={copyFromPrograms} disabled={copying}>
+              {copying ? 'Copying…' : 'Copy from Programs'}
+            </button>
+          </p>
+        )}
         {loading ? <p className="admin-loading">Loading…</p> : (
           <div className="admin-table-wrap">
             <table className="admin-table">

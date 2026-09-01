@@ -2,11 +2,12 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Laptop } from 'lucide-react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faClock, faLocationDot, faTrophy, faGlobe, faFlask, faGraduationCap } from '@fortawesome/free-solid-svg-icons';
+import { faTrophy, faGlobe, faFlask, faGraduationCap } from '@fortawesome/free-solid-svg-icons';
 import HeroSlider from '../../components/HeroSlider/HeroSlider';
 import CounterSection from '../../components/CounterSection/CounterSection';
 import ScrollTopButton from '../../components/ScrollTopButton/ScrollTopButton';
-import NewsCard from '../../components/NewsCard/NewsCard';
+import NewsCard, { type NewsArticle } from '../../components/NewsCard/NewsCard';
+import NewsArticleDialog from '../../components/NewsCard/NewsArticleDialog';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import TestimonialSlider from '../../components/TestimonialSlider/TestimonialSlider';
 import RecruitersSection from '../../components/RecruitersMarquee/RecruitersSection';
@@ -16,9 +17,9 @@ import { fetchPriorityAttr } from '../../lib/domAttrs';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { useSitePhotos, useSitePhotosLoading } from '../../hooks/useSitePhotos';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
+import { happeningToArticle } from '../../lib/happenings';
 import { resolveContentIcon } from '../../lib/contentIcons';
-import { type NewsDoc, newsDocToArticle } from '../../lib/news';
-import type { EventDoc } from '../Admin/sections/EventsAdmin';
+import type { HappeningDoc } from '../Admin/sections/NewsAwardsDataAdmin';
 import type { ContentBlockDoc } from '../Admin/sections/ContentBlocksAdmin';
 import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
 
@@ -141,6 +142,25 @@ function useTilt(strength = 12) {
   return { ref, onMouseMove: onMove, onMouseLeave: onLeave };
 }
 
+/* ── Happenings → Home widgets ────────────────────────────── */
+// "Latest from VWU" and "Upcoming at VWU" both read the `happenings`
+// collection (see Home() below) instead of the separate `news`/`events`
+// collections, but keep their original look — a NewsCard grid (via
+// happeningToArticle, shared with Happenings.tsx's own Recent Events grid —
+// see lib/happenings.ts) and a date-badge row list.
+
+// The event-date-badge (month + day) expects two separate fields, but a
+// happening only has one free-text `date` string (admin-entered, e.g.
+// "January 31, 2026" — see NewsAwardsDataAdmin's Happenings form). Best-
+// effort split for that common "Month D[, YYYY]" shape; anything that
+// doesn't match that pattern still renders, just as a single-line date
+// instead of the split badge.
+function splitHappeningDate(date: string): { month: string; day: string } | null {
+  const match = date.trim().match(/^([A-Za-z]+)\s+(\d{1,2})\b/);
+  if (!match) return null;
+  return { month: match[1].slice(0, 3).toUpperCase(), day: match[2] };
+}
+
 /* ── Wave Divider ─────────────────────────────────────────── */
 function Wave({ flip = false, fill = '#f7f8fb' }: { flip?: boolean; fill?: string }) {
   return (
@@ -155,10 +175,21 @@ function Wave({ flip = false, fill = '#f7f8fb' }: { flip?: boolean; fill?: strin
 /* ── Component ────────────────────────────────────────────── */
 export default function Home() {
   const [tagHovered, setTagHovered] = useState<number | null>(null);
-  const { docs: newsItems } = useOrderedCollection<NewsDoc>('news', 'date', 'desc');
-  const featuredNews = newsItems.filter(n => n.featured).slice(0, 3);
-  const { docs: allEvents } = useOrderedCollection<EventDoc>('events', 'order');
-  const featuredEvents = allEvents.filter(e => e.featured).slice(0, 4);
+  // "Latest from VWU" / "Upcoming at VWU" below are driven by the same
+  // Happenings collection the admin's "Happenings & Awards" → Happenings
+  // editor writes to (see NewsAwardsDataAdmin.tsx) and the /news-awards/
+  // happenings page reads — not by the separate `news`/`events` collections
+  // — so marking something Recent/Upcoming there is what shows it here.
+  // "Latest from VWU" caps to 3, matching the original news-grid's size —
+  // "View All News" links to /news-awards/happenings for the rest. Ordered
+  // by the admin's Display Order field, same as the Happenings admin table
+  // itself, so a newly-added item needs a lower order to appear in the top 3
+  // (see the Happenings form's "Display Order" field).
+  const { docs: happenings } = useOrderedCollection<HappeningDoc>('happenings', 'order');
+  const recentHappenings = happenings.filter(h => h.type === 'recent');
+  const upcomingHappenings = happenings.filter(h => h.type === 'upcoming');
+  const featuredNews = recentHappenings.slice(0, 3).map(happeningToArticle);
+  const [activeArticle, setActiveArticle] = useState<NewsArticle | null>(null);
   const liveTestimonials = useContentBlocks('home', 'testimonials');
   const testimonials = liveTestimonials.length > 0 ? liveTestimonials : defaultTestimonials;
   const liveStudyCards = useContentBlocks('home', 'studyCards');
@@ -365,7 +396,7 @@ export default function Home() {
 
       <Wave flip fill="var(--color-white)" />
 
-      {/* ── News ── */}
+      {/* ── News (Recent Happenings) ── */}
       <section className="news-section">
         <div className="container">
           <div className="news-section-header">
@@ -373,22 +404,24 @@ export default function Home() {
               <span className="section-label">Stay Informed</span>
               <h2 className="section-title">Latest from VWU</h2>
             </div>
-            <Link to="/news" className="btn btn-outline reveal-right">View All News →</Link>
+            <Link to="/news-awards/happenings" className="btn btn-outline reveal-right">View All News →</Link>
           </div>
           <div className="news-grid">
             {featuredNews.map((item, i) => (
               <div key={item.id} className="reveal-bounce" data-delay={`${i * 110}`}>
-                <NewsCard article={newsDocToArticle(item)} />
+                <NewsCard article={item} onReadMore={() => setActiveArticle(item)} />
               </div>
             ))}
             {featuredNews.length === 0 && (
-              <p style={{ color: 'var(--color-text-light)' }}>No featured news yet — check back soon.</p>
+              <p style={{ color: 'var(--color-text-light)' }}>No recent happenings yet — check back soon.</p>
             )}
           </div>
         </div>
       </section>
 
-      {/* ── Events ── */}
+      <NewsArticleDialog article={activeArticle} onClose={() => setActiveArticle(null)} />
+
+      {/* ── Events (Upcoming Happenings) ── */}
       <section className="events-section">
         <div className="container">
           <div className="events-header">
@@ -396,28 +429,41 @@ export default function Home() {
               <span className="section-label">What's Happening</span>
               <h2 className="section-title">Upcoming at VWU</h2>
             </div>
-            <Link to="/events" className="btn btn-outline reveal-right">All Events →</Link>
+            <Link to="/news-awards/happenings" className="btn btn-outline reveal-right">All Events →</Link>
           </div>
           <div className="events-list">
-            {featuredEvents.map((event) => (
-              <Link key={event.id} to="/events" className="event-item">
-                <div className="event-date-badge">
-                  <span className="month">{event.month}</span>
-                  <span className="day">{event.day}</span>
-                </div>
-                <div className="event-line" />
-                <div className="event-content">
-                  <div className="event-title">{event.title}</div>
-                  <div className="event-meta">
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><FontAwesomeIcon icon={faClock} style={{ fontSize: 14 }} /> {event.time}</span>
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><FontAwesomeIcon icon={faLocationDot} style={{ fontSize: 14 }} /> {event.location}</span>
+            {upcomingHappenings.map((item) => {
+              const split = splitHappeningDate(item.date);
+              return (
+                <Link key={item.id} to="/news-awards/happenings" className="event-item">
+                  <div className="event-date-badge">
+                    {split ? (
+                      <>
+                        <span className="month">{split.month}</span>
+                        <span className="day">{split.day}</span>
+                      </>
+                    ) : (
+                      <span className="day" style={{ fontSize: 'var(--text-sm)' }}>{item.date}</span>
+                    )}
                   </div>
-                </div>
-                <svg className="event-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none">
-                  <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </Link>
-            ))}
+                  <div className="event-line" />
+                  <div className="event-content">
+                    <div className="event-title">{item.title}</div>
+                    {item.dept && (
+                      <div className="event-meta">
+                        <span>{item.dept}</span>
+                      </div>
+                    )}
+                  </div>
+                  <svg className="event-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </Link>
+              );
+            })}
+            {upcomingHappenings.length === 0 && (
+              <p style={{ color: 'var(--color-text-light)' }}>No upcoming happenings yet — check back soon.</p>
+            )}
           </div>
         </div>
       </section>

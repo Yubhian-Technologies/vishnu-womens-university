@@ -938,9 +938,41 @@
   text-align: center;
 }
 
+/* .pb-activities-scroll th's own text-align: left is more specific than the
+   plain .pb-activities-num rule above, so it was winning on the S.No header
+   cell while the S.No data cells (only matched by the rule above) stayed
+   centered — the header text sat flush left while every number under it
+   was centered, visibly out of line with its own column. Matching th's
+   specificity here keeps both header and data centered together. */
+th.pb-activities-num {
+  text-align: center;
+}
+
 td.pb-activities-num {
   color: var(--color-text) !important;
   font-weight: 700;
+}
+
+/* News & Events' academic-year tables (Period + Title of the Event) render
+   as one independent <table> per year, so plain content-based auto-layout
+   sized each year's "Period"/"Title of the Event" columns differently
+   depending on how long that year's own date strings happened to be —
+   e.g. "Title of the Event" started further right on a year whose Period
+   values were wider. Fixed widths for S.No/Period force every year's table
+   to line up at the same points regardless of its own content, and the
+   last (Title) column absorbs whatever space is left. */
+.news-events-table {
+  table-layout: fixed;
+}
+
+.news-events-table th:first-child,
+.news-events-table td:first-child {
+  width: 70px;
+}
+
+.news-events-table th:nth-child(2),
+.news-events-table td:nth-child(2) {
+  width: 220px;
 }
 
 @media (max-width: 640px) {
