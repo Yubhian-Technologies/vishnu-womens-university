@@ -5,6 +5,7 @@ import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import ProgrammeStructure from '../../components/ProgrammeStructure/ProgrammeStructure';
 import BodyBlocks, { parseBodyContent } from '../../components/BodyBlocks/BodyBlocks';
 import DepartmentNewsSection, { type DepartmentNewsDoc } from '../../components/DepartmentNews/DepartmentNewsSection';
+import NewsEventsTabs from '../../components/NewsEventsTabs/NewsEventsTabs';
 import DepartmentDetail from './DepartmentDetail';
 import FreshmanSubDepartment from './FreshmanSubDepartment';
 import { SUB_DEPTS } from './FreshmanEngineering';
@@ -14,7 +15,7 @@ import { usePageBanner } from '../../hooks/usePageBanner';
 import { useEapcetCode } from '../../hooks/useContentBlocks';
 import { smoothScrollTo } from '../../lib/smoothScroll';
 import { fetchPriorityAttr } from '../../lib/domAttrs';
-import { normalizeLab, normalizeMindMapImages, type ProgramDoc } from '../Admin/sections/ProgramsAdmin';
+import { normalizeLab, normalizeMindMapImages, type ProgramDoc, type NewsEventsYear } from '../Admin/sections/ProgramsAdmin';
 import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import type { FacultyDoc } from './Faculty';
 import { parseFlexibleTable, parseProjectAccordion } from '../../lib/structuredTable';
@@ -73,14 +74,19 @@ function SingleProgramDetail() {
   const faculty = program?.department ? allFaculty.filter((f) => f.department === program.department) : [];
   const { docs: deptNews } = useOrderedCollection<DepartmentNewsDoc>('departmentNews', 'date', 'desc');
   const hasDeptNews = deptNews.some((n) => n.program === slug);
-  // Resolves the program's short `department` code (e.g. "IT") to the full
-  // department name from the Academic Departments admin, so the "About the
-  // Department" heading below reads the same way it does on the AI/CSE/ECE
-  // grouped department page — falling back to the raw code if no match.
+  // Resolves the program's short `department` code (e.g. "IT") to its full
+  // Academic Departments admin record — used for the "About the Department"
+  // heading below (reading the same way it does on the AI/CSE/ECE grouped
+  // page) and, further down, as the source for Vision/Mission/Values,
+  // Laboratories, and the Department Library (see `shared` below). A couple
+  // of legacy programs spell their department out in prose ("Civil",
+  // "Mechanical") rather than the admin's short code ("CE", "ME") — this
+  // alias table is the only place that mismatch needs correcting.
+  const DEPT_CODE_ALIASES: Record<string, string> = { Civil: 'CE', Mechanical: 'ME' };
   const { docs: allDepartments, loading: deptLoading } = useOrderedCollection<DepartmentDoc>('departments', 'order');
-  const deptTitle = allDepartments.find(
-    (d) => d.shortCode?.trim().toUpperCase() === (program?.department || '').trim().toUpperCase()
-  )?.title || program?.department;
+  const deptCode = DEPT_CODE_ALIASES[program?.department || ''] || program?.department || '';
+  const dept = allDepartments.find((d) => d.shortCode?.trim().toUpperCase() === deptCode.trim().toUpperCase());
+  const deptTitle = dept?.title || program?.department;
   // Falls back to a shared "Program Pages" banner (Hero Banners admin) only
   // when this specific program hasn't had its own image uploaded yet via
   // the Programs admin section — that per-program image always wins.
@@ -123,7 +129,31 @@ function SingleProgramDetail() {
   }
   if (!program) return <Navigate to="/academics" replace />;
 
-  const hasVisionMission = !!(program.vision || program.mission?.length || program.coreValues?.length);
+  // Vision/Mission/Values, Laboratories, and the Department Library describe
+  // the whole department, not one specific programme — they're no longer
+  // editable on the Programs admin, only on the matching Academic
+  // Departments card (see DepartmentsAdmin.tsx). Falls back to this
+  // programme's own (now admin-hidden, but still intact) field so nothing
+  // goes blank for a department that hasn't had this copied over yet — see
+  // DepartmentsAdmin's "Copy from Programs" action.
+  const shared = {
+    vision: dept?.vision || program.vision || '',
+    mission: (dept?.mission?.length ? dept.mission : program.mission) || [],
+    coreValues: (dept?.coreValues?.length ? dept.coreValues : program.coreValues) || [],
+    labs: ((dept?.labs?.length ? dept.labs : program.labs) || []).map(normalizeLab),
+    libraryIntro: dept?.libraryIntro || program.libraryIntro || '',
+    libraryInCharge: dept?.libraryInCharge || program.libraryInCharge || '',
+    librarySections: (dept?.librarySections?.length ? dept.librarySections : program.librarySections) || [],
+    // A department has one Head of Department, not one per programme — same
+    // department-first, programme-fallback rule as everything else above.
+    hod: dept?.hod || program.hod || '',
+    hodImage: dept?.hodImage || program.hodImage || '',
+    hodEmail: dept?.hodEmail || program.hodEmail || '',
+    hodMessage: dept?.hodMessage || program.hodMessage || '',
+    hodResearchProfiles: (dept?.hodResearchProfiles?.length ? dept.hodResearchProfiles : program.hodResearchProfiles) || [],
+  };
+
+  const hasVisionMission = !!(shared.vision || shared.mission.length || shared.coreValues.length);
   // Tabbed PEOs / POs / PSOs — only whichever of the three an admin has
   // actually filled in (via /admin → Programs) becomes a tab; entirely
   // data-driven, nothing hardcoded here beyond the three possible labels.
@@ -143,33 +173,41 @@ function SingleProgramDetail() {
   const outcomeHeading = outcomeShortLabels.length > 1
     ? `${outcomeShortLabels.slice(0, -1).join(', ')} & ${outcomeShortLabels[outcomeShortLabels.length - 1]}`
     : outcomeShortLabels[0] || '';
-  const hasHod = !!(program.hodMessage || program.hodImage || program.hodEmail);
+  const hasHod = !!(shared.hodMessage || shared.hodImage || shared.hodEmail || shared.hod);
   // Legacy docs may still store a single mindMapImage — normalizeMindMapImages()
   // upgrades either shape to the gallery array so this page never has to care.
   const mindMapImages = normalizeMindMapImages(program);
   const hasMindMap = mindMapImages.length > 0 || !!program.mindMapPdfUrl;
-  // Legacy docs may still store labs as plain strings (no PDF) —
-  // normalizeLab() upgrades either shape so this page never has to care.
-  const labs = (program.labs || []).map(normalizeLab);
+  const labs = shared.labs;
   const hasLabs = labs.length > 0;
   const hasCareerOutcomes = !!(program.outcomes && program.outcomes.length > 0);
   const hasCurriculum = !!(program.semesters && program.semesters.length > 0);
   // Every section is entirely admin-defined — heading and items alike — so
-  // different programmes can show completely different Digital Library
+  // different departments can show completely different Digital Library
   // content. A section with no items yet just doesn't render a table for it.
-  const libraryTables = (program.librarySections || []).filter((sec) => sec.items && sec.items.length > 0);
-  const hasLibrary = !!(program.libraryIntro || program.libraryInCharge || libraryTables.length > 0);
+  const libraryTables = shared.librarySections.filter((sec) => sec.items && sec.items.length > 0);
+  const hasLibrary = !!(shared.libraryIntro || shared.libraryInCharge || libraryTables.length > 0);
   // A year counts once it has a label and at least one issue slot (even an
   // issue with no PDF yet still renders, just as "Unavailable" — this lets
   // an admin scaffold a year's issues ahead of uploading each PDF).
-  // Admin-defined academic-year table (Programs admin's "News & Events —
-  // Department Page") — originally AI/CSE/ECE-only (see DepartmentDetail.tsx),
-  // now available to every programme too, alongside the simpler
-  // departmentNews-collection-based section below. A programme only ends up
-  // with both showing if an admin fills in both; in practice each programme
-  // picks one.
-  const newsEventsYears = (program.newsEventsYears || []).filter((y) => y.year && y.columns?.length > 0 && y.rows?.length > 0);
-  const hasNewsEventsYears = newsEventsYears.length > 0;
+  // Admin-defined academic-year table, split into News & Events / Student
+  // Awards / Others tabs (see NewsEventsTabs) — department-wide like Vision/
+  // Labs/Library above, read from the same matching `dept`. "News & Events"
+  // is the one category with legacy content that used to live directly on
+  // this programme doc (ProgramsAdmin's old "News & Events — Department
+  // Page" field); it falls back to that until DepartmentsAdmin's "Copy from
+  // Programs" moves it over — Student Awards / Others never existed
+  // per-programme, so they're department-only. Independent of the simpler
+  // departmentNews-collection-based section below — a programme only ends up
+  // with both showing if an admin fills in both.
+  const validYears = (arr?: NewsEventsYear[]) =>
+    (arr || []).filter((y) => y.year && ((y.columns?.length > 0 && y.rows?.length > 0) || (y.cards?.length ?? 0) > 0 || !!y.text));
+  const newsEventsCategories = [
+    { key: 'news', label: 'News & Events', years: validYears(dept?.newsEventsYears?.length ? dept.newsEventsYears : program.newsEventsYears) },
+    { key: 'awards', label: 'Student Awards', years: validYears(dept?.studentAwardsYears) },
+    { key: 'others', label: 'Others', years: validYears(dept?.othersYears) },
+  ];
+  const hasNewsEventsYears = newsEventsCategories.some((c) => c.years.length > 0);
   const newsletterYears = (program.newsletterYears || []).filter((y) => y.year && y.issues && y.issues.length > 0);
   const hasNewsletter = newsletterYears.length > 0;
   const newsletterMaxIssues = Math.max(0, ...newsletterYears.map((y) => y.issues.length));
@@ -179,7 +217,10 @@ function SingleProgramDetail() {
   const rndLinks = (program.rndLinks || []).filter((l) => l.label && l.pdfUrl);
   const rndTableSections = parseFlexibleTable(program.rndTableText || '').filter((s) => s.headers.length > 0);
   const rndProjectCategories = parseProjectAccordion(program.rndProjectsText || '').filter((c) => c.projects.length > 0);
-  const hasRnd = !!program.rndIntro || rndTableSections.length > 0 || rndProjectCategories.length > 0 || rndLinks.length > 0;
+  const rndStructuredColumns = program.rndStructuredTable?.columns || [];
+  const rndStructuredRows = program.rndStructuredTable?.rows || [];
+  const hasRndStructuredTable = rndStructuredColumns.length > 0 && rndStructuredRows.length > 0;
+  const hasRnd = !!program.rndIntro || rndTableSections.length > 0 || rndProjectCategories.length > 0 || rndLinks.length > 0 || hasRndStructuredTable;
   // Individual student Placement Records — admin-imported from Excel/CSV per
   // Academic Year (see PlacementYearsEditor in ProgramsAdmin.tsx), stored
   // directly on this programme's own doc. Falls back to the first available
@@ -288,7 +329,7 @@ function SingleProgramDetail() {
               ...(program.intake ? [{ label: 'Annual Intake', value: `${program.intake} Seats` }] : []),
               ...(program.established ? [{ label: 'Established', value: program.established }] : []),
               ...(program.accreditation ? [{ label: 'Accreditation', value: program.accreditation }] : []),
-              ...(program.hod ? [{ label: 'Head of Department', value: program.hod }] : []),
+              ...(shared.hod ? [{ label: 'Head of Department', value: shared.hod }] : []),
             ].map((s) => (
               <div key={s.label} style={{ textAlign: 'center', flexShrink: 0 }}>
                 {s.label === 'Head of Department' && hasHod ? (
@@ -389,23 +430,23 @@ function SingleProgramDetail() {
               <h2 className="section-title">Vision, Mission &amp; Values</h2>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--space-6)' }}>
-              {program.vision && (
+              {shared.vision && (
                 <div style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderTop: '4px solid var(--color-accent)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-3)' }}>
                     <Compass size={20} strokeWidth={1.75} style={{ color: 'var(--color-accent)' }} />
                     <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 800, color: 'var(--color-primary)' }}>Vision</h3>
                   </div>
-                  <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.75 }}>{program.vision}</p>
+                  <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.75 }}>{shared.vision}</p>
                 </div>
               )}
-              {program.mission && program.mission.length > 0 && (
+              {shared.mission.length > 0 && (
                 <div style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderTop: '4px solid var(--color-accent)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-3)' }}>
                     <Target size={20} strokeWidth={1.75} style={{ color: 'var(--color-accent)' }} />
                     <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 800, color: 'var(--color-primary)' }}>Mission</h3>
                   </div>
                   <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-                    {program.mission.map((m) => (
+                    {shared.mission.map((m) => (
                       <li key={m} style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'flex-start', fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6 }}>
                         <Check size={14} strokeWidth={2.5} style={{ color: 'var(--color-accent)', flexShrink: 0, marginTop: 3 }} />
                         {m}
@@ -414,14 +455,14 @@ function SingleProgramDetail() {
                   </ul>
                 </div>
               )}
-              {program.coreValues && program.coreValues.length > 0 && (
+              {shared.coreValues.length > 0 && (
                 <div style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderTop: '4px solid var(--color-accent)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-3)' }}>
                     <Sparkles size={20} strokeWidth={1.75} style={{ color: 'var(--color-accent)' }} />
                     <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 800, color: 'var(--color-primary)' }}>Core Values</h3>
                   </div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
-                    {program.coreValues.map((v) => (
+                    {shared.coreValues.map((v) => (
                       <span key={v} style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--color-primary)', background: 'var(--color-off-white)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-full)', padding: '0.35rem 0.9rem' }}>
                         {v}
                       </span>
@@ -482,36 +523,36 @@ function SingleProgramDetail() {
             </div>
             <div style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
               <div style={{ display: 'flex', gap: 'var(--space-8)', flexWrap: 'wrap', alignItems: 'flex-start', padding: 'var(--space-8)' }}>
-                {program.hodImage && (
+                {shared.hodImage && (
                   <SmoothImage
-                    src={program.hodImage}
-                    alt={program.hod || 'Head of Department'}
+                    src={shared.hodImage}
+                    alt={shared.hod || 'Head of Department'}
                     style={{ width: 180, height: 180, objectFit: 'cover', borderRadius: 'var(--radius-md)', flexShrink: 0 }}
                   />
                 )}
                 <div style={{ flex: '1 1 260px', minWidth: 0 }}>
-                  {program.hod && (
-                    <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.35rem', color: 'var(--color-primary)', marginBottom: 'var(--space-1)' }}>{program.hod}</h3>
+                  {shared.hod && (
+                    <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.35rem', color: 'var(--color-primary)', marginBottom: 'var(--space-1)' }}>{shared.hod}</h3>
                   )}
                   <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
                     <span style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>
-                      Head of Department, {program.shortName || program.name}
+                      Head of Department, {deptTitle || program.shortName || program.name}
                     </span>
-                    {program.hodEmail && (
-                      <a href={`mailto:${program.hodEmail}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1)', fontSize: 'var(--text-sm)', color: 'var(--color-primary)', fontWeight: 600, textDecoration: 'none' }}>
-                        <Mail size={14} strokeWidth={1.75} /> {program.hodEmail}
+                    {shared.hodEmail && (
+                      <a href={`mailto:${shared.hodEmail}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1)', fontSize: 'var(--text-sm)', color: 'var(--color-primary)', fontWeight: 600, textDecoration: 'none' }}>
+                        <Mail size={14} strokeWidth={1.75} /> {shared.hodEmail}
                       </a>
                     )}
                   </div>
-                  {program.hodMessage && (
-                    <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.85, whiteSpace: 'pre-line' }}>{program.hodMessage}</p>
+                  {shared.hodMessage && (
+                    <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.85, whiteSpace: 'pre-line' }}>{shared.hodMessage}</p>
                   )}
                 </div>
               </div>
-              {program.hodResearchProfiles && program.hodResearchProfiles.length > 0 && (
+              {shared.hodResearchProfiles.length > 0 && (
                 <div style={{ background: 'var(--color-primary)', padding: 'var(--space-4) var(--space-8)', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-5)' }}>
                   <span style={{ fontSize: 'var(--text-xs)', fontWeight: 800, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Research Profiles</span>
-                  {program.hodResearchProfiles.map((link) => (
+                  {shared.hodResearchProfiles.map((link) => (
                     <a key={link.label} href={link.url} target="_blank" rel="noopener noreferrer"
                       style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1)', fontSize: 'var(--text-sm)', color: 'var(--color-white)', fontWeight: 600, textDecoration: 'none' }}>
                       {link.label} <ExternalLink size={12} strokeWidth={2} />
@@ -653,6 +694,11 @@ function SingleProgramDetail() {
                     <Microscope size={22} strokeWidth={1.75} style={{ flexShrink: 0, color: 'var(--color-accent)' }} />
                     <span style={{ display: 'flex', flexDirection: 'column', gap: '0.15rem' }}>
                       <span style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-primary)', lineHeight: 1.4 }}>{lab.name}</span>
+                      {lab.description && (
+                        <span style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', lineHeight: 1.4 }}>
+                          {lab.description}
+                        </span>
+                      )}
                       {/* Tile always stays visible even with no PDF yet — just marked
                           unavailable, same convention as the Newsletter issues above. */}
                       {!lab.pdfUrl && (
@@ -822,16 +868,16 @@ function SingleProgramDetail() {
               <span className="section-label">Resources</span>
               <h2 className="section-title">Department Library</h2>
             </div>
-            {program.libraryIntro && (
+            {shared.libraryIntro && (
               <BodyBlocks
-                blocks={parseBodyContent(program.libraryIntro)}
+                blocks={parseBodyContent(shared.libraryIntro)}
                 paragraphStyle={{ color: 'var(--color-text)', lineHeight: 1.85, fontSize: 'var(--text-base)' }}
               />
             )}
-            {program.libraryInCharge && (
+            {shared.libraryInCharge && (
               <p style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', color: 'var(--color-text)', fontSize: 'var(--text-sm)', marginBottom: libraryTables.length > 0 ? 'var(--space-6)' : 0 }}>
                 <BookOpen size={16} strokeWidth={1.75} style={{ color: 'var(--color-accent)', flexShrink: 0 }} />
-                <strong style={{ color: 'var(--color-primary)' }}>In-charge of Department Library:</strong> {program.libraryInCharge}
+                <strong style={{ color: 'var(--color-primary)' }}>In-charge of Department Library:</strong> {shared.libraryInCharge}
               </p>
             )}
             {libraryTables.map((sec, si) => (
@@ -865,44 +911,9 @@ function SingleProgramDetail() {
         </section>
       )}
 
-      {/* News & Events — admin-defined academic-year tables (Programs admin's
-          "News & Events — Department Page"), same rendering as the AI/CSE/ECE
-          grouped department page. */}
-      {hasNewsEventsYears && (
-        <section id="news-events" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
-          <div className="container">
-            <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label">{program.shortName || program.name}</span>
-              <h2 className="section-title">News &amp; Events</h2>
-            </div>
-            {newsEventsYears.map((yr, yi) => (
-              <div key={yi} style={{ marginBottom: yi === newsEventsYears.length - 1 ? 0 : 'var(--space-8)' }}>
-                <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.1rem', color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>
-                  Academic Year :: {yr.year}
-                </h3>
-                <div className="pb-activities-scroll">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th className="pb-activities-num">S.No</th>
-                        {yr.columns.map((col, ci) => <th key={ci}>{col}</th>)}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {yr.rows.map((row, ri) => (
-                        <tr key={ri}>
-                          <td className="pb-activities-num">{ri + 1}</td>
-                          {yr.columns.map((_, ci) => <td key={ci}>{row.cells[ci] ?? ''}</td>)}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+      {/* News & Events — department-wide, tabbed across News & Events /
+          Student Awards / Others (see NewsEventsTabs). */}
+      <NewsEventsTabs categories={newsEventsCategories} eyebrow={deptTitle || program.shortName || program.name} navOffset={NAV_OFFSET} />
 
       {/* News & Events — live from the departmentNews collection, tagged to
           this program. Both this and the admin-defined table above are
@@ -1014,6 +1025,40 @@ function SingleProgramDetail() {
                 </div>
               </div>
             ))}
+            {hasRndStructuredTable && (
+              <div style={{ marginBottom: 'var(--space-8)', overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm)' }}>
+                  <thead>
+                    <tr style={{ background: 'var(--color-primary)' }}>
+                      {rndStructuredColumns.map((col, ci) => (
+                        <th key={ci} style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'left', color: 'var(--color-white)', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                          {col}
+                        </th>
+                      ))}
+                      <th style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'left', color: 'var(--color-white)', fontWeight: 700, whiteSpace: 'nowrap' }}>PDF</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rndStructuredRows.map((row, ri) => (
+                      <tr key={ri} style={{ background: ri % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)', borderBottom: '1px solid var(--color-light-gray)' }}>
+                        {rndStructuredColumns.map((_, ci) => (
+                          <td key={ci} style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)', lineHeight: 1.5 }}>
+                            {row.cells[ci] ?? ''}
+                          </td>
+                        ))}
+                        <td style={{ padding: 'var(--space-3) var(--space-4)' }}>
+                          {row.pdfUrl ? (
+                            <a href={row.pdfUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-primary)', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                              <FileText size={14} strokeWidth={2} /> View
+                            </a>
+                          ) : '—'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
             {rndProjectCategories.map((cat, ci) => (
               <div key={ci} style={{ marginBottom: ci < rndProjectCategories.length - 1 ? 'var(--space-10)' : (rndLinks.length > 0 ? 'var(--space-8)' : 0) }}>
                 {cat.title && (

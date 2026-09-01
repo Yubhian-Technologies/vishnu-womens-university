@@ -4,6 +4,7 @@ import { Check, Microscope, Compass, Target, Sparkles, Mail, BookOpen, FileText,
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import ProgrammeStructure from '../../components/ProgrammeStructure/ProgrammeStructure';
 import DepartmentNewsSection, { type DepartmentNewsDoc } from '../../components/DepartmentNews/DepartmentNewsSection';
+import NewsEventsTabs from '../../components/NewsEventsTabs/NewsEventsTabs';
 import BodyBlocks, { parseBodyContent } from '../../components/BodyBlocks/BodyBlocks';
 import SmoothCollapse from '../../components/SmoothCollapse/SmoothCollapse';
 import SEO from '../../components/SEO/SEO';
@@ -13,7 +14,7 @@ import { smoothScrollTo } from '../../lib/smoothScroll';
 import { fetchPriorityAttr } from '../../lib/domAttrs';
 import { getProgramSchema, getBreadcrumbSchema } from '../../lib/seo/schemas';
 import type { DepartmentGroup } from '../../lib/departmentGroups';
-import { normalizeLab, normalizeMindMapImages, type ProgramDoc } from '../Admin/sections/ProgramsAdmin';
+import { normalizeLab, normalizeMindMapImages, type ProgramDoc, type NewsEventsYear } from '../Admin/sections/ProgramsAdmin';
 import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import type { FacultyDoc } from './Faculty';
 import { parseFlexibleTable, parseProjectAccordion } from '../../lib/structuredTable';
@@ -140,6 +141,11 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     // shown on the Academics page, reused here so this works with no extra
     // data entry; the "Overview" field on the department admin overrides it.
     about: dept?.about || dept?.description || '',
+    // Department-only — no per-programme fallback (unlike most fields
+    // above, a programme's own Highlights covers a different, more
+    // specific thing — see "Programme Highlights" further down — so there's
+    // nothing sensible to fall back to here).
+    highlights: dept?.highlights || [],
     // Department-only, no per-programme fallback — a new structural block
     // (B.Tech./M.Tech. headings + intake tables) shown right after "About
     // the Department".
@@ -150,25 +156,23 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     hodImage: dept?.hodImage || primary?.hodImage || '',
     hodEmail: dept?.hodEmail || primary?.hodEmail || '',
     hodMessage: dept?.hodMessage || primary?.hodMessage || '',
-    // No department-level equivalent field exists (yet) — HOD research links
-    // are entered on the first sub-program's own admin entry, same as the
-    // standalone ProgramDetail.tsx page reads them.
-    hodResearchProfiles: primary?.hodResearchProfiles || [],
+    hodResearchProfiles: (dept?.hodResearchProfiles?.length ? dept.hodResearchProfiles : primary?.hodResearchProfiles) || [],
     vision: dept?.vision || primary?.vision || '',
     mission: (dept?.mission?.length ? dept.mission : primary?.mission) || [],
     coreValues: (dept?.coreValues?.length ? dept.coreValues : primary?.coreValues) || [],
-    // The program you're actually viewing wins first — same rule every
-    // other per-program section on this page already follows (News &
-    // Events, Newsletter, R&D, Curriculum) — so labs entered on THIS side
-    // of the toggle always show on THIS side, regardless of which sibling
-    // program happens to be `primary` (subPrograms[0], which is just group
-    // ordering and isn't tied to which side a visitor is looking at).
-    // primary.labs is next (covers a sibling program that was never given
-    // its own labs), and dept.labs (Academic Departments admin, plain
-    // strings only) is the legacy fallback if neither program has any.
-    // normalizeLab() upgrades either shape so this page never cares which
+    // Laboratories are the department's, not any one programme's — AI&ML
+    // and AI&DS share the same labs, so this is department-first, same as
+    // Vision/Mission/Values/Library above (no per-programme editing exists
+    // for this anymore; see ProgramsAdmin/DepartmentsAdmin). Falls back to
+    // whichever sub-program still carries its own legacy labs data if the
+    // department doc hasn't had it copied over yet (see DepartmentsAdmin's
+    // "Copy from Programs" action). normalizeLab() upgrades either shape
+    // (plain string or {name, pdfUrl}) so this page never cares which
     // source it came from.
-    labs: ((activeProgram.labs?.length ? activeProgram.labs : primary?.labs?.length ? primary.labs : dept?.labs) || []).map(normalizeLab),
+    labs: (
+      dept?.labs?.length ? dept.labs
+        : subPrograms.map((p) => p.labs).find((arr) => arr && arr.length > 0) || []
+    ).map(normalizeLab),
     libraryIntro: dept?.libraryIntro || primary?.libraryIntro || '',
     libraryInCharge: dept?.libraryInCharge || primary?.libraryInCharge || '',
     librarySections: (dept?.librarySections?.length ? dept.librarySections : primary?.librarySections) || [],
@@ -182,6 +186,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   const hasHod = !!(shared.hodMessage || shared.hodImage || shared.hodEmail || shared.hod);
   const hasLabs = shared.labs.length > 0;
   const hasAbout = !!shared.about;
+  const hasDeptHighlights = shared.highlights.length > 0;
   const programLevels = shared.programLevels.filter((l) => l.title && (l.intro || l.rows?.length > 0));
   const hasProgramLevels = programLevels.length > 0;
   const libraryTables = shared.librarySections.filter((sec) => sec.items && sec.items.length > 0);
@@ -238,17 +243,25 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     ? `${outcomeShortLabels.slice(0, -1).join(', ')} & ${outcomeShortLabels[outcomeShortLabels.length - 1]}`
     : outcomeShortLabels[0] || '';
   // News & Events on the grouped department page is department-wide, not
-  // per-toggle-side: both sources aggregate across every programme in the
-  // group so an admin can enter it under whichever programme and it shows
-  // identically on every side of the toggle. Two independent sources — the
-  // per-academic-year table (ProgramsAdmin's "News & Events — Department
-  // Page" field) and the plain departmentNews collection cards ("News &
-  // Events — This Programme", rendered by <DepartmentNewsSection> below).
-  // Either, both, or neither can be present.
-  const newsEventsYears = (
-    subPrograms.map((p) => p.newsEventsYears).find((arr) => arr && arr.length > 0) || []
-  ).filter((y) => y.year && y.columns?.length > 0 && y.rows?.length > 0);
-  const hasNewsEvents = newsEventsYears.length > 0;
+  // per-toggle-side, and split into three admin-defined categories (see
+  // NewsEventsTabs) — read from the department doc, same as Vision/Labs/
+  // Library. "News & Events" is the one category with legacy content that
+  // used to live on a programme doc (ProgramsAdmin's old "News & Events —
+  // Department Page" field); it falls back to whichever sub-program still
+  // has it (first non-empty) until DepartmentsAdmin's "Copy from Programs"
+  // moves it over — Student Awards / Others never existed per-programme, so
+  // they're department-only with no fallback. Independent of the plain
+  // departmentNews collection cards ("News & Events — This Programme",
+  // rendered by <DepartmentNewsSection> below) — either, both, or neither
+  // can be present.
+  const validYears = (arr?: NewsEventsYear[]) =>
+    (arr || []).filter((y) => y.year && ((y.columns?.length > 0 && y.rows?.length > 0) || (y.cards?.length ?? 0) > 0 || !!y.text));
+  const newsEventsCategories = [
+    { key: 'news', label: 'News & Events', years: validYears(dept?.newsEventsYears?.length ? dept.newsEventsYears : subPrograms.map((p) => p.newsEventsYears).find((arr) => arr && arr.length > 0)) },
+    { key: 'awards', label: 'Student Awards', years: validYears(dept?.studentAwardsYears) },
+    { key: 'others', label: 'Others', years: validYears(dept?.othersYears) },
+  ];
+  const hasNewsEvents = newsEventsCategories.some((c) => c.years.length > 0);
   const hasDeptNews = deptNewsDocs.some((n) => group.programSlugs.includes(n.program));
   const newsletterYears = (activeProgram.newsletterYears || []).filter((y) => y.year && y.issues && y.issues.length > 0);
   const hasNewsletter = newsletterYears.length > 0;
@@ -260,7 +273,10 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   const rndLinks = (activeProgram.rndLinks || []).filter((l) => l.label && l.pdfUrl);
   const rndTableSections = parseFlexibleTable(activeProgram.rndTableText || '').filter((s) => s.headers.length > 0);
   const rndProjectCategories = parseProjectAccordion(activeProgram.rndProjectsText || '').filter((c) => c.projects.length > 0);
-  const hasRnd = !!activeProgram.rndIntro || rndTableSections.length > 0 || rndProjectCategories.length > 0 || rndLinks.length > 0;
+  const rndStructuredColumns = activeProgram.rndStructuredTable?.columns || [];
+  const rndStructuredRows = activeProgram.rndStructuredTable?.rows || [];
+  const hasRndStructuredTable = rndStructuredColumns.length > 0 && rndStructuredRows.length > 0;
+  const hasRnd = !!activeProgram.rndIntro || rndTableSections.length > 0 || rndProjectCategories.length > 0 || rndLinks.length > 0 || hasRndStructuredTable;
   const visibleCustomSections = (activeProgram.customSections || []).filter(hasCustomSectionContent);
 
   // Quick Links sidebar — deliberately trimmed to one anchor per major
@@ -388,11 +404,33 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
           <div className="container">
             <div className={quickLinks.length > 1 ? 'detail-grid' : ''}>
               <div>
-                <span className="section-label">About the Department</span>
-                <h2 className="section-title">{deptName}</h2>
-                <p style={{ color: 'var(--color-text-light)', lineHeight: 1.85, fontSize: 'var(--text-base)', whiteSpace: 'pre-line' }}>
-                  {shared.about}
-                </p>
+                <div>
+                  <span className="section-label">About the Department</span>
+                  <h2 className="section-title">{deptName}</h2>
+                  <p style={{ color: 'var(--color-text-light)', lineHeight: 1.85, fontSize: 'var(--text-base)', marginBottom: hasDeptHighlights ? 'var(--space-6)' : 0, whiteSpace: 'pre-line' }}>
+                    {shared.about}
+                  </p>
+                </div>
+
+                {/* Department Highlights — same layout as a programme's own
+                    Highlights (see "Programme Highlights" further down),
+                    filling the space next to the Quick Links sidebar that
+                    otherwise sat empty whenever "About" alone was short. */}
+                {hasDeptHighlights && (
+                  <div style={{ marginTop: 'var(--space-8)' }}>
+                    <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.35rem', color: 'var(--color-primary)', marginBottom: 'var(--space-5)', paddingBottom: 'var(--space-3)', borderBottom: '2px solid var(--color-accent)' }}>
+                      Department Highlights
+                    </h3>
+                    <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: 'var(--space-3)' }}>
+                      {shared.highlights.map((h) => (
+                        <li key={h} style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start', color: 'var(--color-text)', fontSize: 'var(--text-sm)', lineHeight: 1.6 }}>
+                          <Check size={16} strokeWidth={2.5} style={{ color: 'var(--color-accent)', flexShrink: 0, marginTop: 2 }} />
+                          {h}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
 
               {quickLinks.length > 1 && (
@@ -649,6 +687,11 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                     <Microscope size={22} strokeWidth={1.75} style={{ flexShrink: 0, color: 'var(--color-accent)' }} />
                     <span style={{ display: 'flex', flexDirection: 'column', gap: '0.15rem' }}>
                       <span style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-primary)', lineHeight: 1.4 }}>{lab.name}</span>
+                      {lab.description && (
+                        <span style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', lineHeight: 1.4 }}>
+                          {lab.description}
+                        </span>
+                      )}
                       {!lab.pdfUrl && (
                         <span style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', fontStyle: 'italic' }}>
                           PDF not available
@@ -1030,42 +1073,9 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
         </div>
       </section>
 
-      {/* News & Events — department-wide admin-defined academic-year tables */}
-      {hasNewsEvents && (
-        <section id="news-events" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
-          <div className="container">
-            <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label">{deptName}</span>
-              <h2 className="section-title">News &amp; Events</h2>
-            </div>
-            {newsEventsYears.map((yr, yi) => (
-              <div key={yi} style={{ marginBottom: yi === newsEventsYears.length - 1 ? 0 : 'var(--space-8)' }}>
-                <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.1rem', color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>
-                  Academic Year :: {yr.year}
-                </h3>
-                <div className="pb-activities-scroll">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th className="pb-activities-num">S.No</th>
-                        {yr.columns.map((col, ci) => <th key={ci}>{col}</th>)}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {yr.rows.map((row, ri) => (
-                        <tr key={ri}>
-                          <td className="pb-activities-num">{ri + 1}</td>
-                          {yr.columns.map((_, ci) => <td key={ci}>{row.cells[ci] ?? ''}</td>)}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+      {/* News & Events — department-wide, tabbed across News & Events /
+          Student Awards / Others (see NewsEventsTabs). */}
+      <NewsEventsTabs categories={newsEventsCategories} eyebrow={deptName} navOffset={NAV_OFFSET} />
 
       {/* News & Events — live from the departmentNews collection, tagged to
           this programme (Programs admin's "News & Events — This Programme").
@@ -1175,6 +1185,40 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                 </div>
               </div>
             ))}
+            {hasRndStructuredTable && (
+              <div style={{ marginBottom: 'var(--space-8)', overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm)' }}>
+                  <thead>
+                    <tr style={{ background: 'var(--color-primary)' }}>
+                      {rndStructuredColumns.map((col, ci) => (
+                        <th key={ci} style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'left', color: 'var(--color-white)', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                          {col}
+                        </th>
+                      ))}
+                      <th style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'left', color: 'var(--color-white)', fontWeight: 700, whiteSpace: 'nowrap' }}>PDF</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rndStructuredRows.map((row, ri) => (
+                      <tr key={ri} style={{ background: ri % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)', borderBottom: '1px solid var(--color-light-gray)' }}>
+                        {rndStructuredColumns.map((_, ci) => (
+                          <td key={ci} style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)', lineHeight: 1.5 }}>
+                            {row.cells[ci] ?? ''}
+                          </td>
+                        ))}
+                        <td style={{ padding: 'var(--space-3) var(--space-4)' }}>
+                          {row.pdfUrl ? (
+                            <a href={row.pdfUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-primary)', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                              <FileText size={14} strokeWidth={2} /> View
+                            </a>
+                          ) : '—'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
             {rndProjectCategories.map((cat, ci) => (
               <div key={ci} style={{ marginBottom: ci < rndProjectCategories.length - 1 ? 'var(--space-10)' : (rndLinks.length > 0 ? 'var(--space-8)' : 0) }}>
                 {cat.title && (
