@@ -570,6 +570,38 @@ export default function ProgramsAdmin() {
     }));
   };
 
+  const handleCustomSectionPhotoUploaded = (sectionPath: number[], r: UploadResult) => {
+    setForm((p) => ({
+      ...p,
+      customSections: replaceAtPath(p.customSections || [], sectionPath, (s) => ({
+        ...s,
+        photo: { imageUrl: r.url, storagePath: r.path },
+      })),
+    }));
+  };
+  const handleCustomSectionPhotoRemoved = async (sectionPath: number[]) => {
+    const photo = getAtPath(form.customSections || [], sectionPath)?.photo;
+    if (!photo?.imageUrl) return;
+    if (!confirm('Remove this photo? This cannot be undone.')) return;
+    try {
+      if (photo.storagePath) await deleteFile(photo.storagePath);
+    } catch (e) {
+      alert(`Couldn't delete the photo from storage: ${(e as Error).message}`);
+      return;
+    }
+    setForm((p) => ({
+      ...p,
+      customSections: replaceAtPath(p.customSections || [], sectionPath, (s) => {
+        // Firestore's updateDoc rejects an explicit `undefined` value
+        // anywhere in the document, including nested — the key must be
+        // dropped entirely, not set to undefined.
+        const next = { ...s };
+        delete next.photo;
+        return next;
+      }),
+    }));
+  };
+
   // Laboratories editing — each lab is independently backed by its own
   // uploaded PDF (same shape/pattern as Research & Development links above).
   //
@@ -1330,6 +1362,8 @@ export default function ProgramsAdmin() {
               parentPath={[]}
               onFileUploaded={handleCustomSectionFileUploaded}
               onFileRemoved={handleCustomSectionFileRemoved}
+              onPhotoUploaded={handleCustomSectionPhotoUploaded}
+              onPhotoRemoved={handleCustomSectionPhotoRemoved}
             />
           </div>
         </div>
@@ -1577,6 +1611,14 @@ function PlacementYearsEditor({ program }: { program: ProgramDoc }) {
                 <p className="admin-field__hint">
                   {displayed.rows.length} record{displayed.rows.length === 1 ? '' : 's'}{preview ? ' — not yet saved' : ' saved'}.
                 </p>
+                {preview?.warning && (
+                  <p
+                    className="admin-field__hint"
+                    style={{ background: '#fff8e6', border: '1px solid #f5d78e', borderRadius: 6, padding: '0.6rem 0.9rem', marginBottom: '0.75rem' }}
+                  >
+                    ℹ️ {preview.warning}
+                  </p>
+                )}
                 <div className="admin-table-wrap" style={{ maxHeight: 320, overflow: 'auto' }}>
                   <table className="admin-table">
                     <thead>

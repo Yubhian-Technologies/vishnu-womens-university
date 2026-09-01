@@ -42,6 +42,10 @@ export interface PlacementItemDoc {
   heroImage: string;
   heroStoragePath: string;
   order: number;
+  /** Only used on the "placement-highlights" page — rotating promotional
+   *  banner photos shown via PhotoCarousel in place of the Overview text
+   *  once at least one is uploaded. Optional: most items never set this. */
+  galleryImages?: { url: string; path: string }[];
 }
 
 const EMPTY: Omit<PlacementItemDoc, 'id'> = {

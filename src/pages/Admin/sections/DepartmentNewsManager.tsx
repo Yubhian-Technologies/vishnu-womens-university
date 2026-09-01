@@ -69,8 +69,10 @@ export default function DepartmentNewsManager({ programSlug }: Props) {
   return (
     <div style={{ border: '1.5px solid var(--color-light-gray)', borderRadius: 8, padding: '0.75rem' }}>
       <p className="admin-field__hint" style={{ marginBottom: '0.75rem' }}>
-        Shown in the "News &amp; Events" section of this program's public page
-        (for AI, CSE and ECE, that's under this program's side of the toggle).
+        Shown in the "News &amp; Events" section of this program's public page. For AI,
+        CSE and ECE these appear on the shared department page and are pooled across
+        every programme in the group, so they show on both sides of the toggle no
+        matter which programme you add them under.
       </p>
       <div className="admin-form-grid">
         <div className="admin-field admin-field--full">

@@ -48,7 +48,15 @@ const DOWNLOADABLE_FILE_PATTERN = /\.(pdf|docx?|xlsx?|pptx?|zip)$/i;
 function renderInlineText(text: string) {
   return text.split(/(\*\*[^*]+\*\*|\[[^\]]+\]\([^)]+\))/g).map((part, index) => {
     if (part.startsWith('**') && part.endsWith('**')) {
-      return <strong key={index}>{part.slice(2, -2)}</strong>;
+      // Matches .section-title (the real <h2> heading style) exactly — these
+      // ** markers are used throughout Intro/About text as informal
+      // sub-headings ("Objectives:", "Placement & Industry Relations Team:"),
+      // so they should read as real headings, not just bolded body text.
+      return (
+        <strong key={index} style={{ fontFamily: 'var(--font-serif)', color: 'var(--color-primary)', fontWeight: 700 }}>
+          {part.slice(2, -2)}
+        </strong>
+      );
     }
     const linkMatch = part.match(LINK_PATTERN);
     if (linkMatch) {
