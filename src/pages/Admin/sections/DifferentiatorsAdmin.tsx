@@ -7,6 +7,7 @@ import CustomSectionEditor from './CustomSectionEditor';
 import CustomTabsEditor from './CustomTabsEditor';
 import { replaceAtPath, getAtPath, type CustomSection } from '../../../lib/customSections';
 import { type CustomTab } from '../../../lib/customTabs';
+import { diffChangedFields } from '../../../lib/formDiff';
 import AicteIdeaLabTeamAdmin from './AicteIdeaLabTeamAdmin';
 import AicteIdeaLabAmbassadorsAdmin from './AicteIdeaLabAmbassadorsAdmin';
 import AicteIdeaLabFacilityPhotosAdmin from './AicteIdeaLabFacilityPhotosAdmin';
@@ -111,6 +112,11 @@ function arrayToLines(arr: string[] = []): string {
 export default function DifferentiatorsAdmin() {
   const { docs: items, loading } = useOrderedCollection<DifferentiatorItemDoc>('differentiatorItems', 'order');
   const [form, setForm] = useState<Omit<DifferentiatorItemDoc, 'id'>>(EMPTY);
+  // Snapshot of `form` taken when "Edit" was clicked (see startEdit) — save()
+  // diffs against this so Update only writes fields actually changed in this
+  // session, instead of blindly overwriting the whole doc with a possibly
+  // stale copy (see lib/formDiff.ts). null while adding a new item.
+  const [originalForm, setOriginalForm] = useState<Omit<DifferentiatorItemDoc, 'id'> | null>(null);
   const [editing, setEditing] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [filterCat, setFilterCat] = useState('All');
@@ -271,11 +277,16 @@ export default function DifferentiatorsAdmin() {
         partners: form.partners.filter(Boolean),
       };
       if (editing) {
-        await updateDoc(doc(db, 'differentiatorItems', editing), { ...payload });
+        // Only send fields that actually changed in this editing session —
+        // see originalForm/diffChangedFields above.
+        const changed = originalForm ? diffChangedFields(payload, originalForm) : payload;
+        if (Object.keys(changed).length > 0) {
+          await updateDoc(doc(db, 'differentiatorItems', editing), changed);
+        }
       } else {
         await addDoc(collection(db, 'differentiatorItems'), { ...payload, order: form.order || items.length + 1, createdAt: serverTimestamp() });
       }
-      setForm(EMPTY); setEditing(null); setActiveSubKey(null);
+      setForm(EMPTY); setEditing(null); setActiveSubKey(null); setOriginalForm(null);
     } catch (e) {
       alert(`Couldn't save: ${(e as Error).message}`);
     } finally { setSaving(false); }
@@ -283,14 +294,16 @@ export default function DifferentiatorsAdmin() {
 
   const startEdit = (it: DifferentiatorItemDoc) => {
     setEditing(it.id);
-    setForm({
+    const next: Omit<DifferentiatorItemDoc, 'id'> = {
       slug: it.slug, title: it.title, category: it.category, desc: it.desc || '',
       external: !!it.external, url: it.url || '', highlights: it.highlights || [],
       intro: it.intro || '', about: it.about || '', facilities: it.facilities || [],
       outcomes: it.outcomes || [], partners: it.partners || [],
       customSections: it.customSections || [], tabs: it.tabs || [],
       heroImage: it.heroImage || '', heroStoragePath: it.heroStoragePath || '', order: it.order,
-    });
+    };
+    setForm(next);
+    setOriginalForm(next);
     setActiveSubKey(ITEM_SUB_SECTIONS[it.slug]?.[0]?.key ?? null);
   };
 
@@ -419,7 +432,7 @@ export default function DifferentiatorsAdmin() {
           )}
         </div>
         <div className="admin-form-actions">
-          {editing && <button className="admin-btn admin-btn--ghost" onClick={() => { setEditing(null); setForm(EMPTY); setActiveSubKey(null); }}>Cancel</button>}
+          {editing && <button className="admin-btn admin-btn--ghost" onClick={() => { setEditing(null); setForm(EMPTY); setActiveSubKey(null); setOriginalForm(null); }}>Cancel</button>}
           <button className="admin-btn admin-btn--primary" onClick={save} disabled={saving}>{saving ? 'Saving…' : editing ? 'Update' : 'Add Item'}</button>
         </div>
       </div>

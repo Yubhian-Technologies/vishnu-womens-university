@@ -235,7 +235,12 @@ export function CustomSectionsAccordion({ sections }: { sections: CustomSection[
 //     own content can still mix a description with one or more tables by
 //     giving IT subsections in turn (PillSwitcher renders the active pill
 //     through this same function).
-function SectionSubtree({ section, depth = 0, navOffset = DEFAULT_NAV_OFFSET }: { section: CustomSection; depth?: number; navOffset?: string }) {
+// Exported so a page with its own bespoke section-switcher UI (e.g.
+// FacultyProfile.tsx's sticky left nav list, FreshmanEngineering.tsx's About
+// HOD tab) can render one admin-picked CustomSection's body — including its
+// sub-sections, tables, and pill switcher — without pulling in one of the
+// full layout wrappers above (which each impose their own heading/spacing).
+export function SectionSubtree({ section, depth = 0, navOffset = DEFAULT_NAV_OFFSET }: { section: CustomSection; depth?: number; navOffset?: string }) {
   const body = <CustomSectionBody section={section} />;
   const visibleSubs = (section.subSections || []).filter(hasCustomSectionContent);
   if (visibleSubs.length === 0) return body;
