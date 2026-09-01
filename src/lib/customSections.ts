@@ -8,11 +8,16 @@ import { parseFlexibleTable, parseLinkList } from './structuredTable';
 // Purely additive: every existing hardcoded section on those pages is
 // untouched by this.
 
-export type CustomSectionContentType = 'text' | 'table' | 'links' | 'files';
+export type CustomSectionContentType = 'text' | 'table' | 'links' | 'files' | 'list' | 'person';
 
 export interface CustomSectionFile {
   label: string;
   fileUrl: string;
+  storagePath: string;
+}
+
+export interface CustomSectionPhoto {
+  imageUrl: string;
   storagePath: string;
 }
 
@@ -27,9 +32,42 @@ export interface CustomSection {
   tableText?: string;
   linksText?: string;
   files?: CustomSectionFile[];
-  // One level of nesting is all the admin UI exposes (CustomSectionEditor
-  // only recurses to depth 1) even though the shape itself is recursive.
+  // 'list' — a short checkmark-bullet list (one item per line), the same
+  // shape/convention as every other one-per-line field in this codebase
+  // (Programs' mission/highlights, Key Highlights, ...) — a plain paragraph
+  // ('text') doesn't fit a bulleted Mission/Objectives/Activities list.
+  listText?: string;
+  // 'person' — a short role/designation line (e.g. "Dean · WISE"), shown
+  // between the name and the bio (textContent, reused for the bio here) on
+  // a person's card — see PersonCard in CustomSectionsRenderer.tsx.
+  personPosition?: string;
+  // Subsections can themselves have subsections, arbitrarily deep — lets a
+  // section hold several distinct pieces together (e.g. a description plus
+  // two separate tables) by giving each its own nested section instead of
+  // cramming them into one contentType.
   subSections?: CustomSection[];
+  // How THIS section's own subSections display — 'stacked' (default) shows
+  // each one below the previous; 'pills' shows a horizontal pill switcher
+  // (one subsection's content at a time), same mechanism as a tab's
+  // sectionsDisplay but one level down — e.g. a "Training / Research"
+  // section whose subsections are academic years.
+  subSectionsDisplay?: 'stacked' | 'pills';
+  // Where this section renders on the Differentiators detail page — 'intro'
+  // sections show compactly inline in the page's intro column (next to
+  // About, matching the old Vision/Mission/Objectives styling); everything
+  // else (the default, undefined counts as 'accordion') renders as a
+  // collapsible accordion panel below, matching the old
+  // In-charge/Academic Projects/... accordions. Ignored on Programs pages,
+  // which always render every custom section as its own full section.
+  placement?: 'intro' | 'accordion';
+  // Optional heavier heading weight for this section's label, admin-toggled
+  // per section — off by default (matches the current look everywhere).
+  boldHeading?: boolean;
+  // Optional single photo shown beside this section's content (round avatar
+  // treatment — see CustomSectionBody in CustomSectionsRenderer.tsx).
+  // Independent of contentType — a section can have a photo alongside text,
+  // a table, a list, etc.
+  photo?: CustomSectionPhoto;
 }
 
 // Every anchor id already hardcoded in ProgramDetail.tsx/DepartmentDetail.tsx
@@ -68,6 +106,7 @@ export function generateSectionId(label: string, allSections: CustomSection[]): 
 // get a Quick Links entry or render an empty block. A parent section with
 // no content of its own still counts as visible if any subsection does.
 export function hasCustomSectionContent(section: CustomSection): boolean {
+  if (section.photo?.imageUrl) return true;
   const ownContent = (() => {
     switch (section.contentType) {
       case 'text':
@@ -78,6 +117,10 @@ export function hasCustomSectionContent(section: CustomSection): boolean {
         return parseLinkList(section.linksText || '').some((g) => g.links.length > 0);
       case 'files':
         return (section.files || []).some((f) => !!f.fileUrl);
+      case 'list':
+        return (section.listText || '').split('\n').map((s) => s.trim()).filter(Boolean).length > 0;
+      case 'person':
+        return !!section.textContent?.trim() || !!section.personPosition?.trim();
       default:
         return false;
     }

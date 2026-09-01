@@ -3,11 +3,11 @@ import { Link, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { Check, Microscope, Compass, Target, Sparkles, Mail, BookOpen, FileText, ExternalLink } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import ProgrammeStructure from '../../components/ProgrammeStructure/ProgrammeStructure';
+import DepartmentNewsSection, { type DepartmentNewsDoc } from '../../components/DepartmentNews/DepartmentNewsSection';
 import BodyBlocks, { parseBodyContent } from '../../components/BodyBlocks/BodyBlocks';
 import SmoothCollapse from '../../components/SmoothCollapse/SmoothCollapse';
 import SEO from '../../components/SEO/SEO';
 import { useOrderedCollection } from '../../hooks/useCollection';
-import { useDocument } from '../../hooks/useDocument';
 import { useEapcetCode } from '../../hooks/useContentBlocks';
 import { smoothScrollTo } from '../../lib/smoothScroll';
 import { fetchPriorityAttr } from '../../lib/domAttrs';
@@ -17,7 +17,7 @@ import { normalizeLab, normalizeMindMapImages, type ProgramDoc } from '../Admin/
 import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import type { FacultyDoc } from './Faculty';
 import { parseFlexibleTable, parseProjectAccordion } from '../../lib/structuredTable';
-import { placementRecordsDocId, sortPlacementRows, type PlacementRecordSet } from '../../lib/placementRecords';
+import { sortPlacementRows, computePlacementStats, findPackageColumnIndex, findSerialColumnIndex, formatPackageCell } from '../../lib/placementRecords';
 import { hasCustomSectionContent } from '../../lib/customSections';
 import CustomSectionsRenderer from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import '../detail-layout.css';
@@ -46,6 +46,13 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   // "Choose a Programme" Quick Links accordion — starts open so the sub-links
   // remain visible by default (unchanged from before this was collapsible).
   const [programmeLinksOpen, setProgrammeLinksOpen] = useState(true);
+  // Which Academic Year's placement records are shown — falls back to the
+  // active programme's first available year (see placementYears below).
+  const [placementYear, setPlacementYear] = useState<string | null>(null);
+  // How many rows of the Placement Records table are visible at once —
+  // 'all' shows every row, otherwise a fixed page size (DataTables-style
+  // "Show N entries" control, matching the reference design).
+  const [placementPageSize, setPlacementPageSize] = useState<number | 'all'>(10);
   const [openRndProjects, setOpenRndProjects] = useState<Set<string>>(new Set());
   const toggleRndProject = (key: string) => {
     setOpenRndProjects((prev) => {
@@ -68,16 +75,11 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   const activeProgram = subPrograms.find((p) => p.slug === activeSlug);
 
   const { docs: allFaculty } = useOrderedCollection<FacultyDoc>('faculty', 'order');
+  const { docs: deptNewsDocs } = useOrderedCollection<DepartmentNewsDoc>('departmentNews', 'date', 'desc');
   const deptKeys = new Set<string>(group.facultyDepartments);
   subPrograms.forEach((p) => { if (p.department) deptKeys.add(p.department); });
   if (dept) { deptKeys.add(dept.title); deptKeys.add(dept.shortCode); }
   const faculty = allFaculty.filter((f) => f.department && deptKeys.has(f.department));
-
-  // Individual student Placement Records — admin-imported from Excel/CSV
-  // (see PlacementRecordsEditor in DepartmentsAdmin.tsx), one Firestore doc
-  // per department keyed by its lowercased Short Code, so this only ever
-  // shows this exact department's own records.
-  const { data: placementRecords } = useDocument<PlacementRecordSet>('placementRecords', placementRecordsDocId(group.deptShortCode));
 
   const eapcetCode = useEapcetCode();
 
@@ -155,11 +157,18 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     vision: dept?.vision || primary?.vision || '',
     mission: (dept?.mission?.length ? dept.mission : primary?.mission) || [],
     coreValues: (dept?.coreValues?.length ? dept.coreValues : primary?.coreValues) || [],
-    // dept.labs (Academic Departments admin) is plain strings with no PDF
-    // support; primary.labs (Programs admin) may hold richer { name, pdfUrl }
-    // entries — normalizeLab() upgrades either shape so this page never cares
-    // which source it came from.
-    labs: ((dept?.labs?.length ? dept.labs : primary?.labs) || []).map(normalizeLab),
+    // The program you're actually viewing wins first — same rule every
+    // other per-program section on this page already follows (News &
+    // Events, Newsletter, R&D, Curriculum) — so labs entered on THIS side
+    // of the toggle always show on THIS side, regardless of which sibling
+    // program happens to be `primary` (subPrograms[0], which is just group
+    // ordering and isn't tied to which side a visitor is looking at).
+    // primary.labs is next (covers a sibling program that was never given
+    // its own labs), and dept.labs (Academic Departments admin, plain
+    // strings only) is the legacy fallback if neither program has any.
+    // normalizeLab() upgrades either shape so this page never cares which
+    // source it came from.
+    labs: ((activeProgram.labs?.length ? activeProgram.labs : primary?.labs?.length ? primary.labs : dept?.labs) || []).map(normalizeLab),
     libraryIntro: dept?.libraryIntro || primary?.libraryIntro || '',
     libraryInCharge: dept?.libraryInCharge || primary?.libraryInCharge || '',
     librarySections: (dept?.librarySections?.length ? dept.librarySections : primary?.librarySections) || [],
@@ -177,11 +186,32 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   const hasProgramLevels = programLevels.length > 0;
   const libraryTables = shared.librarySections.filter((sec) => sec.items && sec.items.length > 0);
   const hasLibrary = !!(shared.libraryIntro || shared.libraryInCharge || libraryTables.length > 0);
-  const placementColumns = placementRecords?.columns || [];
-  const placementRows = placementColumns.length > 0 && placementRecords
-    ? sortPlacementRows(placementColumns, placementRecords.rows || [])
+  // Individual student Placement Records — admin-imported from Excel/CSV per
+  // Academic Year (see PlacementYearsEditor in ProgramsAdmin.tsx), stored
+  // directly on this specific programme's own doc (`activeProgram`), so
+  // switching the toggle above shows that programme's own years, never
+  // another programme's or the whole department's. Falls back to the first
+  // available year whenever nothing's been explicitly picked yet, or the
+  // previously-picked year doesn't exist for whichever programme is active.
+  const placementYears = activeProgram.placementYears || [];
+  const activePlacementYear = placementYears.find((y) => y.year === placementYear) ?? placementYears[0];
+  const placementColumns = activePlacementYear?.columns || [];
+  const placementRows = placementColumns.length > 0 && activePlacementYear
+    ? sortPlacementRows(placementColumns, activePlacementYear.rows || [])
     : [];
-  const hasPlacements = !!(shared.placementIntro || shared.placementStats.length > 0 || shared.placementRecruiters.length > 0 || placementRows.length > 0);
+  // Displays the package/CTC column as a plain LPA figure ("45" instead of
+  // an imported raw rupee value like "45,00,000") — same column detection
+  // computePlacementStats already uses for the stat tiles.
+  const placementPkgIdx = findPackageColumnIndex(placementColumns);
+  // Hides an imported S.No column — the table already numbers rows itself
+  // (see the S.No <th>/<td> below), so showing both duplicated the column.
+  const placementSnoIdx = findSerialColumnIndex(placementColumns);
+  const visiblePlacementColumnIndices = placementColumns.map((_, i) => i).filter((i) => i !== placementSnoIdx);
+  // Computed live from the active year's raw rows — every tile below reads
+  // straight from this, nothing here is admin-entered.
+  const placementYearStats = activePlacementYear ? computePlacementStats(placementColumns, activePlacementYear.rows || []) : null;
+  const hasPlacements = !!(shared.placementIntro || shared.placementStats.length > 0 || shared.placementRecruiters.length > 0 || placementYears.length > 0);
+  const visiblePlacementRows = placementPageSize === 'all' ? placementRows : placementRows.slice(0, placementPageSize);
 
   const hasProgrammeAbout = !!activeProgram.about;
   const hasHighlights = !!(activeProgram.highlights && activeProgram.highlights.length > 0);
@@ -199,13 +229,27 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   // upgrades either shape to the gallery array so this page never has to care.
   const mindMapImages = normalizeMindMapImages(activeProgram);
   const hasMindMap = mindMapImages.length > 0 || !!activeProgram.mindMapPdfUrl;
-  // News & Events + Newsletter here use the teammate's per-academic-year
-  // fields on the programme doc (see ProgramsAdmin's "News & Events —
-  // Department Page" / "Newsletter" editors) — the plain departmentNews
-  // collection (<DepartmentNewsSection>) is only used on standalone program
-  // pages (ProgramDetail.tsx), so the two systems never both show up.
-  const newsEventsYears = (activeProgram.newsEventsYears || []).filter((y) => y.year && y.columns?.length > 0 && y.rows?.length > 0);
+  // Section heading + sidebar label list only whichever of PEOs/POs/PSOs/WKs
+  // this programme actually has content for (e.g. "PEOs, POs & PSOs" when
+  // there's no WKs data yet), instead of a fixed "...& WKs" that would claim
+  // content the programme doesn't have.
+  const outcomeShortLabels = outcomeGroups.map((g) => g.short);
+  const outcomeHeading = outcomeShortLabels.length > 1
+    ? `${outcomeShortLabels.slice(0, -1).join(', ')} & ${outcomeShortLabels[outcomeShortLabels.length - 1]}`
+    : outcomeShortLabels[0] || '';
+  // News & Events on the grouped department page is department-wide, not
+  // per-toggle-side: both sources aggregate across every programme in the
+  // group so an admin can enter it under whichever programme and it shows
+  // identically on every side of the toggle. Two independent sources — the
+  // per-academic-year table (ProgramsAdmin's "News & Events — Department
+  // Page" field) and the plain departmentNews collection cards ("News &
+  // Events — This Programme", rendered by <DepartmentNewsSection> below).
+  // Either, both, or neither can be present.
+  const newsEventsYears = (
+    subPrograms.map((p) => p.newsEventsYears).find((arr) => arr && arr.length > 0) || []
+  ).filter((y) => y.year && y.columns?.length > 0 && y.rows?.length > 0);
   const hasNewsEvents = newsEventsYears.length > 0;
+  const hasDeptNews = deptNewsDocs.some((n) => group.programSlugs.includes(n.program));
   const newsletterYears = (activeProgram.newsletterYears || []).filter((y) => y.year && y.issues && y.issues.length > 0);
   const hasNewsletter = newsletterYears.length > 0;
   const newsletterMaxIssues = Math.max(0, ...newsletterYears.map((y) => y.issues.length));
@@ -233,47 +277,43 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     { id: 'program-toggle', label: 'Choose a Programme' },
     hasRnd && { id: 'rnd', label: 'R & D' },
     hasPlacements && { id: 'placements', label: 'Placements' },
-    hasNewsEvents && { id: 'news-events', label: 'News & Events' },
+    (hasNewsEvents || hasDeptNews) && { id: hasNewsEvents ? 'news-events' : 'news', label: 'News & Events' },
   ].filter(Boolean) as { id: string; label: string }[];
   // Nested under the "Choose a Programme" row above as a collapsible
   // sub-list — same admin-driven presence checks as before, just grouped.
   const programmeLinks = [
     hasProgrammeAbout && { id: 'programme-about', label: 'About the Programme' },
     hasHighlights && { id: 'highlights', label: 'Programme Highlights' },
-    hasOutcomeStatements && { id: 'peos-pos-psos', label: 'PEOs, POs, PSOs & WKs' },
+    hasOutcomeStatements && { id: 'peos-pos-psos', label: outcomeHeading },
     hasMindMap && { id: 'mindmap', label: 'Mind Map' },
     { id: 'curriculum', label: 'Curriculum' },
     ...visibleCustomSections.map((s) => ({ id: s.id, label: s.label })),
   ].filter(Boolean) as { id: string; label: string }[];
 
-  // Top stats bar, laid out as stacked rows: Head of Department gets its own
-  // line (one person for the whole department). Established/Accreditation
-  // show once, on their own line, when an admin has set them directly on the
-  // department doc — but when that's empty, each program gets its own line
-  // with its own Established / Accreditation / Intake grouped together
-  // (since those routinely differ between the two programs, e.g. CSE is NBA
+  // Top stats bar, flowing as a single horizontal row (matching every other
+  // detail page). Head of Department comes first, then Established/
+  // Accreditation once when an admin has set them directly on the
+  // department doc — but when that's empty, each program contributes its
+  // own Established / Accreditation / Intake, prefixed with its short name
+  // (since those routinely differ between programs, e.g. CSE is NBA
   // accredited while Cyber Security isn't yet). Intake always differs per
   // program, so in the shared-Established case each program still gets its
-  // own Intake line.
-  const statRows: { label: string; value: string }[][] = [];
-  if (shared.hod) statRows.push([{ label: 'Head of Department', value: shared.hod }]);
+  // own Intake item.
+  const statItems: { label: string; value: string }[] = [];
+  if (shared.hod) statItems.push({ label: 'Head of Department', value: shared.hod });
   const hasSharedEstAccred = clean(dept?.established) || clean(dept?.accreditation);
   if (hasSharedEstAccred) {
-    const sharedRow: { label: string; value: string }[] = [];
-    if (clean(dept?.established)) sharedRow.push({ label: 'Established', value: clean(dept?.established) });
-    if (clean(dept?.accreditation)) sharedRow.push({ label: 'Accreditation', value: clean(dept?.accreditation) });
-    if (sharedRow.length) statRows.push(sharedRow);
+    if (clean(dept?.established)) statItems.push({ label: 'Established', value: clean(dept?.established) });
+    if (clean(dept?.accreditation)) statItems.push({ label: 'Accreditation', value: clean(dept?.accreditation) });
     subPrograms.forEach((p) => {
-      if (p.intake) statRows.push([{ label: `${p.shortName || p.name} — Intake`, value: `${p.intake} Seats` }]);
+      if (p.intake) statItems.push({ label: `${p.shortName || p.name} — Intake`, value: `${p.intake} Seats` });
     });
   } else {
     subPrograms.forEach((p) => {
       const label = p.shortName || p.name;
-      const row: { label: string; value: string }[] = [];
-      if (clean(p.established)) row.push({ label: `${label} — Established`, value: clean(p.established) });
-      if (clean(p.accreditation)) row.push({ label: `${label} — Accreditation`, value: clean(p.accreditation) });
-      if (p.intake) row.push({ label: `${label} — Intake`, value: `${p.intake} Seats` });
-      if (row.length) statRows.push(row);
+      if (clean(p.established)) statItems.push({ label: `${label} — Established`, value: clean(p.established) });
+      if (clean(p.accreditation)) statItems.push({ label: `${label} — Accreditation`, value: clean(p.accreditation) });
+      if (p.intake) statItems.push({ label: `${label} — Intake`, value: `${p.intake} Seats` });
     });
   }
 
@@ -322,24 +362,19 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
         </div>
       </section>
 
-      {/* Stats bar — one row per group (HOD alone, then each program's own
-          Established/Accreditation/Intake together on their own line) */}
-      {statRows.length > 0 && (
+      {/* Stats bar — a single flowing row, matching every other detail page */}
+      {statItems.length > 0 && (
         <section style={{ background: 'var(--color-primary)', padding: 'var(--space-4) 0' }}>
           <div className="container">
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-2)' }}>
-              {statRows.map((row, ri) => (
-                <div key={ri} style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-10)', rowGap: 'var(--space-2)', flexWrap: 'wrap' }}>
-                  {row.map((s) => (
-                    <div key={s.label} style={{ textAlign: 'center' }}>
-                      {s.label === 'Head of Department' && hasHod ? (
-                        <a href="#hod" style={{ fontFamily: 'var(--font-serif)', fontSize: '0.92rem', fontWeight: 900, color: 'var(--color-accent)', whiteSpace: 'nowrap', textDecoration: 'underline', textUnderlineOffset: 3 }}>{s.value}</a>
-                      ) : (
-                        <div style={{ fontFamily: 'var(--font-serif)', fontSize: '0.92rem', fontWeight: 900, color: 'var(--color-accent)', whiteSpace: 'nowrap' }}>{s.value}</div>
-                      )}
-                      <div style={{ fontSize: '0.62rem', color: 'rgba(255,255,255,0.65)', fontFamily: 'var(--font-sans)', marginTop: 1, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{s.label}</div>
-                    </div>
-                  ))}
+            <div style={{ display: 'flex', flexWrap: 'nowrap', gap: 'var(--space-10)', overflowX: 'auto', paddingBottom: 4, scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.3) transparent' }}>
+              {statItems.map((s) => (
+                <div key={s.label} style={{ textAlign: 'center', flexShrink: 0 }}>
+                  {s.label === 'Head of Department' && hasHod ? (
+                    <a href="#hod" style={{ fontFamily: 'var(--font-serif)', fontSize: '0.92rem', fontWeight: 900, color: 'var(--color-accent)', whiteSpace: 'nowrap', textDecoration: 'underline', textUnderlineOffset: 3 }}>{s.value}</a>
+                  ) : (
+                    <div style={{ fontFamily: 'var(--font-serif)', fontSize: '0.92rem', fontWeight: 900, color: 'var(--color-accent)', whiteSpace: 'nowrap' }}>{s.value}</div>
+                  )}
+                  <div style={{ fontSize: '0.62rem', color: 'rgba(255,255,255,0.65)', fontFamily: 'var(--font-sans)', marginTop: 1, textTransform: 'uppercase', letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>{s.label}</div>
                 </div>
               ))}
             </div>
@@ -354,7 +389,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
             <div className={quickLinks.length > 1 ? 'detail-grid' : ''}>
               <div>
                 <span className="section-label">About the Department</span>
-                <h2 className="section-title">The Department of {deptName}</h2>
+                <h2 className="section-title">{deptName}</h2>
                 <p style={{ color: 'var(--color-text-light)', lineHeight: 1.85, fontSize: 'var(--text-base)', whiteSpace: 'pre-line' }}>
                   {shared.about}
                 </p>
@@ -674,33 +709,131 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                 </div>
               </div>
             )}
-            {/* Individual student Placement Records — admin-imported from
-                Excel/CSV, every column shown exactly as uploaded. The top 10
-                highest-package rows are pulled to the front (see
-                sortPlacementRows); everyone else keeps their original
-                imported order. */}
-            {placementRows.length > 0 && (
+            {/* Academic Year pill selector + computed stat tiles — Academic
+                Years come entirely from activeProgram.placementYears
+                (admin-managed via /admin → Programs), and every tile value
+                below is computed live from that year's imported rows (see
+                computePlacementStats). The detailed records table further
+                down still shows every column exactly as uploaded, with the
+                top 10 highest-package rows pulled to the front. */}
+            {placementYears.length > 0 && (
               <div>
-                <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 800, color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 'var(--space-3)' }}>
-                  Placement Records
-                </h3>
-                <div className="pb-activities-scroll">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th className="pb-activities-num">S.No</th>
-                        {placementColumns.map((col, ci) => <th key={ci}>{col}</th>)}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {placementRows.map((row, ri) => (
-                        <tr key={ri}>
-                          <td className="pb-activities-num">{ri + 1}</td>
-                          {placementColumns.map((_, ci) => <td key={ci}>{row.cells[ci] ?? ''}</td>)}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                <div className="placement-year-pills">
+                  {placementYears.map((y) => (
+                    <button
+                      key={y.year}
+                      type="button"
+                      onClick={() => setPlacementYear(y.year)}
+                      className={`placement-year-pill${activePlacementYear?.year === y.year ? ' active' : ''}`}
+                    >
+                      AY. {y.year}
+                    </button>
+                  ))}
+                </div>
+                {activePlacementYear && placementYearStats && (
+                  <>
+                    <p className="placement-stat-summary">
+                      {activePlacementYear.year} Placements as on date: <strong>{placementYearStats.totalOffers.toLocaleString()}</strong>
+                    </p>
+                    <div className="placement-stat-grid">
+                      <div className="placement-stat-tile">
+                        <div className="placement-stat-tile__label">No. of Companies Visited</div>
+                        <div className="placement-stat-tile__value">{placementYearStats.companiesVisited}</div>
+                      </div>
+                      <div className="placement-stat-tile">
+                        <div className="placement-stat-tile__label">Total No. of Offers</div>
+                        <div className="placement-stat-tile__value">{placementYearStats.totalOffers}</div>
+                      </div>
+                      <div className="placement-stat-tile">
+                        <div className="placement-stat-tile__label">Top 10 Companies List</div>
+                        <button
+                          type="button"
+                          className="placement-stat-tile__value--link"
+                          onClick={() => document.getElementById('placement-records-table')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                        >
+                          Package wise
+                        </button>
+                      </div>
+                      <div className="placement-stat-tile">
+                        <div className="placement-stat-tile__label">Average Salary</div>
+                        <div className="placement-stat-tile__value">{placementYearStats.averageSalary ?? '—'}</div>
+                      </div>
+                      <div className="placement-stat-tile">
+                        <div className="placement-stat-tile__label">Median Salary</div>
+                        <div className="placement-stat-tile__value">{placementYearStats.medianSalary ?? '—'}</div>
+                      </div>
+                      <div className="placement-stat-tile">
+                        <div className="placement-stat-tile__label">Highest Package</div>
+                        <div className="placement-stat-tile__value">{placementYearStats.highestPackage ?? '—'}</div>
+                      </div>
+                      {placementYearStats.above50Lpa > 0 && (
+                        <div className="placement-stat-tile">
+                          <div className="placement-stat-tile__label">Above 50 LPA+</div>
+                          <div className="placement-stat-tile__value">{placementYearStats.above50Lpa} offers</div>
+                        </div>
+                      )}
+                      {placementYearStats.above30Lpa > 0 && (
+                        <div className="placement-stat-tile">
+                          <div className="placement-stat-tile__label">Above 30 LPA+</div>
+                          <div className="placement-stat-tile__value">{placementYearStats.above30Lpa} offers</div>
+                        </div>
+                      )}
+                      <div className="placement-stat-tile">
+                        <div className="placement-stat-tile__label">Above 10 LPA+</div>
+                        <div className="placement-stat-tile__value">{placementYearStats.above10Lpa} offers</div>
+                      </div>
+                    </div>
+                  </>
+                )}
+                <div id="placement-records-table">
+                  <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 800, color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 'var(--space-3)' }}>
+                    Placement Records
+                  </h3>
+                  {placementRows.length > 0 ? (
+                    <>
+                      <div className="placement-page-size">
+                        Show
+                        <select
+                          value={placementPageSize}
+                          onChange={(e) => setPlacementPageSize(e.target.value === 'all' ? 'all' : Number(e.target.value))}
+                        >
+                          <option value={10}>10</option>
+                          <option value={25}>25</option>
+                          <option value={50}>50</option>
+                          <option value={100}>100</option>
+                          <option value="all">All</option>
+                        </select>
+                        entries
+                      </div>
+                      <div className="pb-activities-scroll">
+                        <table>
+                          <thead>
+                            <tr>
+                              <th className="pb-activities-num">S.No</th>
+                              {visiblePlacementColumnIndices.map((ci) => <th key={ci}>{placementColumns[ci]}</th>)}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {visiblePlacementRows.map((row, ri) => (
+                              <tr key={ri}>
+                                <td className="pb-activities-num">{ri + 1}</td>
+                                {visiblePlacementColumnIndices.map((ci) => (
+                                  <td key={ci}>{ci === placementPkgIdx ? formatPackageCell(row.cells[ci] ?? '') : (row.cells[ci] ?? '')}</td>
+                                ))}
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                      <p className="placement-page-info">
+                        Showing 1 to {visiblePlacementRows.length} of {placementRows.length} entries
+                      </p>
+                    </>
+                  ) : (
+                    <p style={{ color: 'var(--color-text-light)', fontStyle: 'italic' }}>
+                      No placement records uploaded yet for {activePlacementYear?.year}.
+                    </p>
+                  )}
                 </div>
               </div>
             )}
@@ -821,7 +954,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
           <div className="container">
             <div style={{ marginBottom: 'var(--space-10)' }}>
               <span className="section-label">Outcome-Based Education</span>
-              <h2 className="section-title">PEOs, POs, PSOs &amp; WKs</h2>
+              <h2 className="section-title">{outcomeHeading}</h2>
             </div>
             <div className="section-tabs">
               {outcomeGroups.map((g) => (
@@ -897,12 +1030,12 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
         </div>
       </section>
 
-      {/* News & Events (per programme, admin-defined academic-year tables) */}
+      {/* News & Events — department-wide admin-defined academic-year tables */}
       {hasNewsEvents && (
         <section id="news-events" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label">{activeProgram.shortName || activeProgram.name}</span>
+              <span className="section-label">{deptName}</span>
               <h2 className="section-title">News &amp; Events</h2>
             </div>
             {newsEventsYears.map((yr, yi) => (
@@ -933,6 +1066,13 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
           </div>
         </section>
       )}
+
+      {/* News & Events — live from the departmentNews collection, tagged to
+          this programme (Programs admin's "News & Events — This Programme").
+          Both this and the admin-defined table above are available on this
+          programme's side of the toggle; each only appears once an admin has
+          actually filled it in, so having neither leaves no visible gap. */}
+      <DepartmentNewsSection programSlug={group.programSlugs} background="var(--color-off-white)" />
 
       {/* Newsletter (per programme) */}
       {hasNewsletter && (

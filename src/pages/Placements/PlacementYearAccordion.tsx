@@ -39,7 +39,7 @@ function formatSalary(value: string): string {
 // dataviz skill's validate_palette.js against this page's white card
 // surface; the gold slot doubles as the site's own --color-accent so the
 // chart still reads as "on brand" rather than a generic palette drop-in.
-const BRANCH_COLORS: Record<string, string> = {
+export const BRANCH_COLORS: Record<string, string> = {
   'CSE(AI&DS)': '#1f8f5c',
   Civil: '#C9A84C',
   CSE: '#17a398',
@@ -386,7 +386,7 @@ export default function PlacementYearAccordion({ years, enrichedYears, onActiveY
 
                 {enrichedYears?.includes(y.batch) && y.branchOffers && (
                   <div style={{ marginBottom: 'var(--space-8)' }}>
-                    <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-4)', marginBottom: 'var(--space-5)' }}>
+                    <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-4)', marginBottom: 'var(--space-5)' }}>
                       <div style={{ background: 'var(--color-off-white)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4)', textAlign: 'center' }}>
                         <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.03em' }}>No. of Companies Visited</div>
                         <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.75rem', fontWeight: 900, color: 'var(--color-primary)' }}>{y.companiesVisited}</div>
@@ -394,10 +394,6 @@ export default function PlacementYearAccordion({ years, enrichedYears, onActiveY
                       <div style={{ background: 'var(--color-off-white)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4)', textAlign: 'center' }}>
                         <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.03em' }}>Total no. of Offers</div>
                         <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.75rem', fontWeight: 900, color: 'var(--color-primary)' }}>{y.total?.toLocaleString('en-IN')}</div>
-                      </div>
-                      <div style={{ background: 'var(--color-off-white)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4)', textAlign: 'center' }}>
-                        <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.03em' }}>Top 10 Companies List</div>
-                        <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.1rem', fontWeight: 900, color: 'var(--color-accent)' }}>Package wise</div>
                       </div>
                     </div>
 

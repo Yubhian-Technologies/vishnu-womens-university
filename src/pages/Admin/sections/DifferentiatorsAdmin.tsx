@@ -2,27 +2,19 @@ import { useState, type ComponentType } from 'react';
 import { collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
-import { deleteFile } from '../../../lib/storage';
+import { deleteFile, type UploadResult } from '../../../lib/storage';
+import CustomSectionEditor from './CustomSectionEditor';
+import CustomTabsEditor from './CustomTabsEditor';
+import { replaceAtPath, getAtPath, type CustomSection } from '../../../lib/customSections';
+import { type CustomTab } from '../../../lib/customTabs';
 import AicteIdeaLabTeamAdmin from './AicteIdeaLabTeamAdmin';
 import AicteIdeaLabAmbassadorsAdmin from './AicteIdeaLabAmbassadorsAdmin';
 import AicteIdeaLabFacilityPhotosAdmin from './AicteIdeaLabFacilityPhotosAdmin';
 import IicMemberPhotosAdmin from './IicMemberPhotosAdmin';
 import IicDocumentsAdmin from './IicDocumentsAdmin';
-import TedxPhotosAdmin from './TedxPhotosAdmin';
-import TiDspGalleryPhotosAdmin from './TiDspGalleryPhotosAdmin';
-import ChipsToStartupPhotosAdmin from './ChipsToStartupPhotosAdmin';
-import VsacGalleryPhotosAdmin from './VsacGalleryPhotosAdmin';
-import VdlFacilitiesPhotosAdmin from './VdlFacilitiesPhotosAdmin';
 import VdlAchievementsAdmin from './VdlAchievementsAdmin';
 import RwtpReportsAdmin from './RwtpReportsAdmin';
-import AssistiveTechLabPhotosAdmin from './AssistiveTechLabPhotosAdmin';
-import AtlActivityPdfsAdmin from './AtlActivityPdfsAdmin';
 import ConcreteCanoePhotosAdmin from './ConcreteCanoePhotosAdmin';
-import WiseTeamPhotosAdmin from './WiseTeamPhotosAdmin';
-import WiseEliteProjectPhotosAdmin from './WiseEliteProjectPhotosAdmin';
-import WiseTestimonialPhotosAdmin from './WiseTestimonialPhotosAdmin';
-import WiseNseClippingsAdmin from './WiseNseClippingsAdmin';
-import NirvahanaEventPhotosAdmin from './NirvahanaEventPhotosAdmin';
 
 // Some differentiator items have extra editable content beyond the base
 // fields below (a team roster, photo galleries, placement cards, ...) —
@@ -39,27 +31,29 @@ const ITEM_SUB_SECTIONS: Record<string, { key: string; label: string; Component:
     { key: 'member-photos', label: 'Council Member Photos', Component: IicMemberPhotosAdmin },
     { key: 'documents', label: 'Documents', Component: IicDocumentsAdmin },
   ],
-  'tedxsvecw': [{ key: 'photos', label: 'Photos', Component: TedxPhotosAdmin }],
-  'ti-dsp-coe': [{ key: 'gallery-photos', label: 'Gallery Photos', Component: TiDspGalleryPhotosAdmin }],
-  'chips-to-startup': [{ key: 'photos', label: 'Photos', Component: ChipsToStartupPhotosAdmin }],
-  'vsac': [{ key: 'gallery-photos', label: 'Gallery Photos', Component: VsacGalleryPhotosAdmin }],
+  // TEDxSVECW's Photos, TI-DSP CoE's Gallery Photos, Chips to Startup's
+  // Activities/Outcomes photos, and VSAC's Gallery Photos all moved to
+  // generic "files"-type Custom Sections — their old dedicated panels have
+  // no live target to manage anymore.
+  // Facility-phase/campus-vehicle/industry-collab photos moved to generic
+  // "files"-type sections within the Tabs editor below —
+  // VdlFacilitiesPhotosAdmin's old fixed-slot photo panel has no live
+  // target to manage anymore. Achievement Reports stays: it's still
+  // rendered as-is on the public page.
   'vehicle-design-lab': [
-    { key: 'facilities-photos', label: 'Facilities Photos', Component: VdlFacilitiesPhotosAdmin },
     { key: 'achievement-reports', label: 'Achievement Reports', Component: VdlAchievementsAdmin },
   ],
   'rural-women-tech-park': [{ key: 'report-links', label: 'Report Links', Component: RwtpReportsAdmin }],
-  'assistive-tech-lab': [
-    { key: 'atl-photos', label: 'Photos', Component: AssistiveTechLabPhotosAdmin },
-    { key: 'atl-activity-pdfs', label: 'Activity PDFs', Component: AtlActivityPdfsAdmin },
-  ],
+  // ATL's Photos and Activity PDFs moved to generic "files"-type Custom
+  // Sections — AssistiveTechLabPhotosAdmin/AtlActivityPdfsAdmin have no
+  // live target to manage anymore.
   'concrete-canoe-lab': [{ key: 'canoe-photos', label: 'Photos', Component: ConcreteCanoePhotosAdmin }],
-  'talentsprint-wise': [
-    { key: 'team-photos', label: 'Team Photos', Component: WiseTeamPhotosAdmin },
-    { key: 'elite-photos', label: 'WISE-ELITE Project Photos', Component: WiseEliteProjectPhotosAdmin },
-    { key: 'testimonial-photos', label: 'Testimonial Photos', Component: WiseTestimonialPhotosAdmin },
-    { key: 'nse-clippings', label: 'NSE Clippings', Component: WiseNseClippingsAdmin },
-  ],
-  'nirvahana': [{ key: 'event-photos', label: 'Event Photos', Component: NirvahanaEventPhotosAdmin }],
+  // WISE's old per-item photo panels (team/elite-project/testimonial/NSE
+  // clipping) had no live target anymore once every tab moved to generic
+  // "files"-type sections in the Tabs editor below — removed rather than
+  // left pointing at nothing. Nirvahana's Event Photos moved to generic
+  // photo-carrying sections the same way — NirvahanaEventPhotosAdmin has no
+  // live target to manage anymore either.
 };
 
 export interface DifferentiatorItemDoc {
@@ -76,6 +70,17 @@ export interface DifferentiatorItemDoc {
   facilities: string[];
   outcomes: string[];
   partners: string[];
+  // Admin-defined sections beyond the fixed fields above — any name, any
+  // number of sub-sections, and a choice of plain text / checklist / table /
+  // links / files per section (see lib/customSections.ts). Fully additive:
+  // an item with no customSections renders exactly as it did before this
+  // field existed.
+  customSections?: CustomSection[];
+  // Admin-managed sidebar tabs — only used by the 4 items that render a
+  // persistent tab layout instead of the intro/accordion one (WISE, IIC,
+  // Vehicle Design Lab, AICTE Idea Lab; see lib/customTabs.ts). Independent
+  // of customSections above — a page never uses both.
+  tabs?: CustomTab[];
   heroImage: string;
   heroStoragePath: string;
   order: number;
@@ -84,6 +89,7 @@ export interface DifferentiatorItemDoc {
 const EMPTY: Omit<DifferentiatorItemDoc, 'id'> = {
   slug: '', title: '', category: 'innovation', desc: '', external: false, url: '',
   highlights: [], intro: '', about: '', facilities: [], outcomes: [], partners: [],
+  customSections: [], tabs: [],
   heroImage: '', heroStoragePath: '', order: 0,
 };
 
@@ -110,7 +116,148 @@ export default function DifferentiatorsAdmin() {
   const [filterCat, setFilterCat] = useState('All');
   const [activeSubKey, setActiveSubKey] = useState<string | null>(null);
 
-  const set = (k: string, v: string | number | string[] | boolean) => setForm((p) => ({ ...p, [k]: v }));
+  const set = (k: string, v: string | number | string[] | boolean | CustomSection[] | CustomTab[]) => setForm((p) => ({ ...p, [k]: v }));
+
+  // Custom Sections — file uploads route through the functional `setForm(p
+  // => ...)` form via replaceAtPath, recomputing from `p.customSections` at
+  // call time (never a closed-over snapshot). Several file uploads across
+  // different sections can resolve in quick succession, and each must land
+  // on top of whatever the others already saved, not silently overwrite it
+  // (same reasoning as ProgramsAdmin.tsx's handleLabPdf/handleCustomSectionFileUploaded).
+  const handleCustomSectionFileUploaded = (sectionPath: number[], fileIndex: number, r: UploadResult) => {
+    setForm((p) => ({
+      ...p,
+      customSections: replaceAtPath(p.customSections || [], sectionPath, (s) => ({
+        ...s,
+        files: (s.files || []).map((f, i) => (i === fileIndex ? { ...f, fileUrl: r.url, storagePath: r.path } : f)),
+      })),
+    }));
+  };
+  // Unlike the rest of this form (which only takes effect once "Update" is
+  // clicked), removing a custom section's file acts immediately, so there's
+  // no orphaned Storage file.
+  const handleCustomSectionFileRemoved = async (sectionPath: number[], fileIndex: number) => {
+    const file = getAtPath(form.customSections || [], sectionPath)?.files?.[fileIndex];
+    if (!file?.fileUrl) return;
+    if (!confirm('Remove this file? This cannot be undone.')) return;
+    try {
+      if (file.storagePath) await deleteFile(file.storagePath);
+    } catch (e) {
+      alert(`Couldn't delete the file from storage: ${(e as Error).message}`);
+      return;
+    }
+    setForm((p) => ({
+      ...p,
+      customSections: replaceAtPath(p.customSections || [], sectionPath, (s) => ({
+        ...s,
+        files: (s.files || []).filter((_, i) => i !== fileIndex),
+      })),
+    }));
+  };
+
+  const handleCustomSectionPhotoUploaded = (sectionPath: number[], r: UploadResult) => {
+    setForm((p) => ({
+      ...p,
+      customSections: replaceAtPath(p.customSections || [], sectionPath, (s) => ({
+        ...s,
+        photo: { imageUrl: r.url, storagePath: r.path },
+      })),
+    }));
+  };
+  const handleCustomSectionPhotoRemoved = async (sectionPath: number[]) => {
+    const photo = getAtPath(form.customSections || [], sectionPath)?.photo;
+    if (!photo?.imageUrl) return;
+    if (!confirm('Remove this photo? This cannot be undone.')) return;
+    try {
+      if (photo.storagePath) await deleteFile(photo.storagePath);
+    } catch (e) {
+      alert(`Couldn't delete the photo from storage: ${(e as Error).message}`);
+      return;
+    }
+    setForm((p) => ({
+      ...p,
+      customSections: replaceAtPath(p.customSections || [], sectionPath, (s) => {
+        // Firestore's updateDoc rejects an explicit `undefined` value
+        // anywhere in the document, including nested — the key must be
+        // dropped entirely, not set to undefined.
+        const next = { ...s };
+        delete next.photo;
+        return next;
+      }),
+    }));
+  };
+
+  // Custom Tabs — used only by the 4 items with a sidebar-tab layout
+  // instead of the intro/accordion one. Same shape as Custom Sections above,
+  // one level deeper (tab -> its own section tree).
+  const TABS_SLUGS = new Set(['talentsprint-wise', 'institution-innovation-cell', 'vehicle-design-lab', 'aicte-idea-lab']);
+  const handleTabFileUploaded = (tabIndex: number, sectionPath: number[], fileIndex: number, r: UploadResult) => {
+    setForm((p) => ({
+      ...p,
+      tabs: (p.tabs || []).map((tab, ti) => (ti !== tabIndex ? tab : {
+        ...tab,
+        sections: replaceAtPath(tab.sections, sectionPath, (s) => ({
+          ...s,
+          files: (s.files || []).map((f, i) => (i === fileIndex ? { ...f, fileUrl: r.url, storagePath: r.path } : f)),
+        })),
+      })),
+    }));
+  };
+  const handleTabFileRemoved = async (tabIndex: number, sectionPath: number[], fileIndex: number) => {
+    const file = getAtPath((form.tabs || [])[tabIndex]?.sections || [], sectionPath)?.files?.[fileIndex];
+    if (!file?.fileUrl) return;
+    if (!confirm('Remove this file? This cannot be undone.')) return;
+    try {
+      if (file.storagePath) await deleteFile(file.storagePath);
+    } catch (e) {
+      alert(`Couldn't delete the file from storage: ${(e as Error).message}`);
+      return;
+    }
+    setForm((p) => ({
+      ...p,
+      tabs: (p.tabs || []).map((tab, ti) => (ti !== tabIndex ? tab : {
+        ...tab,
+        sections: replaceAtPath(tab.sections, sectionPath, (s) => ({
+          ...s,
+          files: (s.files || []).filter((_, i) => i !== fileIndex),
+        })),
+      })),
+    }));
+  };
+  const handleTabPhotoUploaded = (tabIndex: number, sectionPath: number[], r: UploadResult) => {
+    setForm((p) => ({
+      ...p,
+      tabs: (p.tabs || []).map((tab, ti) => (ti !== tabIndex ? tab : {
+        ...tab,
+        sections: replaceAtPath(tab.sections, sectionPath, (s) => ({
+          ...s,
+          photo: { imageUrl: r.url, storagePath: r.path },
+        })),
+      })),
+    }));
+  };
+  const handleTabPhotoRemoved = async (tabIndex: number, sectionPath: number[]) => {
+    const photo = getAtPath((form.tabs || [])[tabIndex]?.sections || [], sectionPath)?.photo;
+    if (!photo?.imageUrl) return;
+    if (!confirm('Remove this photo? This cannot be undone.')) return;
+    try {
+      if (photo.storagePath) await deleteFile(photo.storagePath);
+    } catch (e) {
+      alert(`Couldn't delete the photo from storage: ${(e as Error).message}`);
+      return;
+    }
+    setForm((p) => ({
+      ...p,
+      tabs: (p.tabs || []).map((tab, ti) => (ti !== tabIndex ? tab : {
+        ...tab,
+        sections: replaceAtPath(tab.sections, sectionPath, (s) => {
+          const next = { ...s };
+          delete next.photo;
+          return next;
+        }),
+      })),
+    }));
+  };
 
   const save = async () => {
     if (!form.slug || !form.title) return alert('Slug and title are required.');
@@ -141,6 +288,7 @@ export default function DifferentiatorsAdmin() {
       external: !!it.external, url: it.url || '', highlights: it.highlights || [],
       intro: it.intro || '', about: it.about || '', facilities: it.facilities || [],
       outcomes: it.outcomes || [], partners: it.partners || [],
+      customSections: it.customSections || [], tabs: it.tabs || [],
       heroImage: it.heroImage || '', heroStoragePath: it.heroStoragePath || '', order: it.order,
     });
     setActiveSubKey(ITEM_SUB_SECTIONS[it.slug]?.[0]?.key ?? null);
@@ -222,6 +370,53 @@ export default function DifferentiatorsAdmin() {
             <label htmlFor="field-partners-one-per-line-optional">Partners (one per line — optional)</label>
             <textarea id="field-partners-one-per-line-optional" rows={2} value={arrayToLines(form.partners)} onChange={(e) => set('partners', linesToArray(e.target.value))} />
           </div>
+
+          {!TABS_SLUGS.has(form.slug) && (
+            <>
+              <div className="admin-field admin-field--full"><hr /><h3>Custom Sections</h3></div>
+              <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>
+                Optional. Add any section this item needs beyond the fixed fields above — any name, any number of
+                sub-sections, and a choice of plain text, a checklist, a table, a list of links, or uploaded files per
+                section. Each one shows up on the public page once it has content. Use the Placement dropdown per
+                section to choose "In the intro area above" (short items like Vision/Mission/Objectives, shown inline
+                near About) vs. "In the accordion below" (the default — everything else, shown as a click-to-expand panel).
+              </p>
+              <div className="admin-field admin-field--full">
+                <CustomSectionEditor
+                  sections={form.customSections || []}
+                  onChange={(next) => set('customSections', next)}
+                  rootSections={form.customSections || []}
+                  parentPath={[]}
+                  onFileUploaded={handleCustomSectionFileUploaded}
+                  onFileRemoved={handleCustomSectionFileRemoved}
+                  onPhotoUploaded={handleCustomSectionPhotoUploaded}
+                  onPhotoRemoved={handleCustomSectionPhotoRemoved}
+                  showPlacementToggle
+                />
+              </div>
+            </>
+          )}
+
+          {TABS_SLUGS.has(form.slug) && (
+            <>
+              <div className="admin-field admin-field--full"><hr /><h3>Tabs</h3></div>
+              <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>
+                This item shows a sidebar of tabs on the public page instead of a single scrolling page. Add, rename,
+                reorder, or remove tabs below — click "Edit Content" on a tab to add sections to it (same plain
+                text / checklist / table / links / files editor as everywhere else).
+              </p>
+              <div className="admin-field admin-field--full">
+                <CustomTabsEditor
+                  tabs={form.tabs || []}
+                  onChange={(next) => set('tabs', next)}
+                  onFileUploaded={handleTabFileUploaded}
+                  onFileRemoved={handleTabFileRemoved}
+                  onPhotoUploaded={handleTabPhotoUploaded}
+                  onPhotoRemoved={handleTabPhotoRemoved}
+                />
+              </div>
+            </>
+          )}
         </div>
         <div className="admin-form-actions">
           {editing && <button className="admin-btn admin-btn--ghost" onClick={() => { setEditing(null); setForm(EMPTY); setActiveSubKey(null); }}>Cancel</button>}
