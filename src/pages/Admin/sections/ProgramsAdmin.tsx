@@ -1163,6 +1163,17 @@ function PlacementYearsEditor({ program }: { program: ProgramDoc }) {
   const [previews, setPreviews] = useState<Record<number, PlacementImportResult>>({});
   const [importingYear, setImportingYear] = useState<number | null>(null);
   const [busyYear, setBusyYear] = useState<number | null>(null);
+  // Edit Table mode: `editRows` is a working copy of just the one year being
+  // edited (`editingYear`'s index) — cell edits/row add/delete only ever
+  // touch this local copy until "Save Changes" persists it back onto that
+  // same year's `rows`, leaving every other year and this year's `columns`
+  // untouched. Nothing here re-runs the Excel/CSV/Word/PDF import path, so a
+  // one-cell fix never requires re-uploading the source file.
+  const [editingYear, setEditingYear] = useState<number | null>(null);
+  const [editRows, setEditRows] = useState<string[][]>([]);
+  // Row drag-to-reorder while in Edit Table mode — index of the row currently
+  // being dragged, or null when nothing is being dragged.
+  const [dragRow, setDragRow] = useState<number | null>(null);
 
   const persistYears = (next: PlacementYearRecord[]) => updateDoc(doc(db, 'programs', program.id), { placementYears: next });
 
@@ -1262,6 +1273,56 @@ function PlacementYearsEditor({ program }: { program: ProgramDoc }) {
     }
   };
 
+  const startEditTable = (yi: number) => {
+    setEditingYear(yi);
+    setEditRows(years[yi].rows.map((r) => [...r.cells]));
+  };
+
+  const cancelEditTable = () => {
+    setEditingYear(null);
+    setEditRows([]);
+  };
+
+  const editCell = (ri: number, ci: number, value: string) => {
+    setEditRows((rows) => rows.map((row, i) => (i === ri ? row.map((c, j) => (j === ci ? value : c)) : row)));
+  };
+
+  const deleteEditRow = (ri: number) => {
+    if (!confirm('Delete this row? This cannot be undone once you save changes.')) return;
+    setEditRows((rows) => rows.filter((_, i) => i !== ri));
+  };
+
+  const addEditRow = () => {
+    if (editingYear === null) return;
+    setEditRows((rows) => [...rows, years[editingYear].columns.map(() => '')]);
+  };
+
+  const reorderEditRow = (from: number, to: number) => {
+    if (from === to) return;
+    setEditRows((rows) => {
+      const next = [...rows];
+      const [moved] = next.splice(from, 1);
+      next.splice(to, 0, moved);
+      return next;
+    });
+  };
+
+  const saveEditTable = async () => {
+    if (editingYear === null) return;
+    const yi = editingYear;
+    setBusyYear(yi);
+    try {
+      const next = years.map((y, i) => (i === yi ? { ...y, rows: editRows.map((cells) => ({ cells })) } : y));
+      await persistYears(next);
+      setEditingYear(null);
+      setEditRows([]);
+    } catch (e) {
+      alert(`Couldn't save changes: ${(e as Error).message}`);
+    } finally {
+      setBusyYear(null);
+    }
+  };
+
   return (
     <div className="admin-card">
       <h2 className="admin-card__title">Placements — {program.shortName || program.name}</h2>
@@ -1306,32 +1367,112 @@ function PlacementYearsEditor({ program }: { program: ProgramDoc }) {
             : null;
         const importing = importingYear === yi;
         const busy = busyYear === yi;
+        const isEditing = editingYear === yi;
 
         return (
           <div key={yi} style={{ border: '1.5px solid var(--color-light-gray)', borderRadius: 8, padding: '1rem', marginBottom: '1rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
               <strong style={{ flex: 1, fontSize: '1rem' }}>{y.year}</strong>
-              <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveYear(yi, -1)} disabled={yi === 0} title="Move up">↑</button>
-              <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveYear(yi, 1)} disabled={yi === years.length - 1} title="Move down">↓</button>
-              <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeYear(yi)} disabled={busy}>Remove Year</button>
+              <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveYear(yi, -1)} disabled={yi === 0 || isEditing} title="Move up">↑</button>
+              <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveYear(yi, 1)} disabled={yi === years.length - 1 || isEditing} title="Move down">↓</button>
+              <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeYear(yi)} disabled={busy || isEditing}>Remove Year</button>
             </div>
 
-            <label className="admin-btn admin-btn--primary" style={{ display: 'inline-block', cursor: importing ? 'default' : 'pointer', opacity: importing ? 0.6 : 1 }}>
-              {importing ? 'Reading file…' : 'Import from Excel / CSV / Word / PDF'}
-              <input
-                type="file"
-                accept=".xlsx,.xls,.csv,.docx,.pdf"
-                hidden
-                disabled={importing}
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) handleFile(yi, file);
-                  e.target.value = '';
-                }}
-              />
-            </label>
+            {!isEditing && (
+              <label className="admin-btn admin-btn--primary" style={{ display: 'inline-block', cursor: importing ? 'default' : 'pointer', opacity: importing ? 0.6 : 1 }}>
+                {importing ? 'Reading file…' : 'Import'}
+                <input
+                  type="file"
+                  accept=".xlsx,.xls,.csv,.docx,.pdf"
+                  hidden
+                  disabled={importing}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleFile(yi, file);
+                    e.target.value = '';
+                  }}
+                />
+              </label>
+            )}
 
-            {displayed && displayed.columns.length > 0 ? (
+            {isEditing ? (
+              <>
+                <div style={{ margin: '1rem 0' }}>
+                  <strong>Detected columns:</strong>{' '}
+                  {y.columns.map((c, ci) => (
+                    <span key={ci} className="admin-badge" style={{ marginRight: '0.4rem', textTransform: 'none' }}>{c}</span>
+                  ))}
+                </div>
+                <p className="admin-field__hint">
+                  Editing {editRows.length} record{editRows.length === 1 ? '' : 's'} — drag <strong>⠿</strong> to
+                  reorder rows. Nothing is saved until you click "Save Changes".
+                </p>
+                <div className="admin-table-wrap" style={{ maxHeight: 420, overflow: 'auto' }}>
+                  <table className="admin-table admin-table--editing">
+                    <thead>
+                      <tr>
+                        <th style={{ width: 32 }} />
+                        {y.columns.map((c, ci) => <th key={ci}>{c}</th>)}
+                        <th style={{ width: 40 }} />
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {editRows.map((row, ri) => (
+                        <tr
+                          key={ri}
+                          onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }}
+                          onDrop={(e) => { e.preventDefault(); if (dragRow !== null) reorderEditRow(dragRow, ri); setDragRow(null); }}
+                          style={dragRow === ri ? { opacity: 0.4 } : undefined}
+                        >
+                          <td
+                            className="admin-table__drag-handle"
+                            draggable
+                            title="Drag to reorder"
+                            aria-label="Drag to reorder row"
+                            onDragStart={(e) => { e.dataTransfer.effectAllowed = 'move'; setDragRow(ri); }}
+                            onDragEnd={() => setDragRow(null)}
+                          >
+                            ⠿
+                          </td>
+                          {row.map((cell, ci) => (
+                            <td key={ci}>
+                              <input
+                                className="admin-table__cell-input"
+                                value={cell}
+                                onChange={(e) => editCell(ri, ci, e.target.value)}
+                              />
+                            </td>
+                          ))}
+                          <td>
+                            <button
+                              type="button"
+                              className="admin-table__row-delete"
+                              title="Delete row"
+                              aria-label="Delete row"
+                              onClick={() => deleteEditRow(ri)}
+                            >
+                              ✕
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                      {editRows.length === 0 && (
+                        <tr><td colSpan={y.columns.length + 2} className="admin-field__hint">No rows left — add one below or Cancel to discard.</td></tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+                <div className="admin-form-actions" style={{ justifyContent: 'space-between' }}>
+                  <button type="button" className="admin-btn admin-btn--ghost" onClick={addEditRow}>+ Add Row</button>
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <button type="button" className="admin-btn admin-btn--ghost" onClick={cancelEditTable} disabled={busy}>Cancel</button>
+                    <button type="button" className="admin-btn admin-btn--primary" onClick={saveEditTable} disabled={busy}>
+                      {busy ? 'Saving…' : 'Save Changes'}
+                    </button>
+                  </div>
+                </div>
+              </>
+            ) : displayed && displayed.columns.length > 0 ? (
               <>
                 <div style={{ margin: '1rem 0' }}>
                   <strong>Detected columns:</strong>{' '}
@@ -1374,6 +1515,7 @@ function PlacementYearsEditor({ program }: { program: ProgramDoc }) {
                   </div>
                 ) : (
                   <div className="admin-form-actions">
+                    <button className="admin-btn admin-btn--ghost" onClick={() => startEditTable(yi)} disabled={busy}>Edit Table</button>
                     <button className="admin-btn admin-btn--danger" onClick={() => clearRecords(yi)} disabled={busy}>
                       {busy ? 'Deleting…' : 'Delete Records'}
                     </button>
