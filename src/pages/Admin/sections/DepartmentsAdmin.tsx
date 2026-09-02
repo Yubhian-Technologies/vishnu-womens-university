@@ -9,6 +9,9 @@ import { PROGRAM_ICON_NAMES } from '../../../lib/programIcons';
 import { normalizeLab, type LabItem, type LibrarySection, type LibraryItem, type NewsEventsYear, type ProgramLink, type ProgramDoc } from './ProgramsAdmin';
 import NewsEventsYearsEditor from './NewsEventsYearsEditor';
 import { diffChangedFields } from '../../../lib/formDiff';
+import CustomSectionEditor from './CustomSectionEditor';
+import { replaceAtPath, getAtPath, type CustomSection } from '../../../lib/customSections';
+import { FRESHMAN_DEPARTMENT_SEEDS } from '../../Academics/freshmanDepartmentSeeds';
 
 // Backs the "Academic Departments" card grid on Academics.tsx — independent
 // of the `programs` collection, so a department's card copy doesn't have to
@@ -85,6 +88,18 @@ export interface DepartmentDoc {
   newsEventsYears?: NewsEventsYear[];
   studentAwardsYears?: NewsEventsYear[];
   othersYears?: NewsEventsYear[];
+  // Any name, any number of sub-sections, any content type (text/table/
+  // list/links/files/gallery/panel view) — same system as Programs/
+  // Differentiators/Faculty/Campus Life. Exists specifically so a
+  // standalone department with no linked programme (e.g. Freshman
+  // Engineering's Mathematics/Physics/Chemistry/English — see
+  // StandaloneDepartmentDetail.tsx) can still have Research & Development,
+  // Awards & Recognitions, and Laboratories-with-real-photos, none of
+  // which have another home when there's no programme doc to carry them.
+  // Additive for every other department too, not just standalone ones —
+  // rendered alongside (not instead of) the grouped department page's
+  // existing Program-sourced customSections.
+  customSections?: CustomSection[];
 }
 
 const EMPTY: Omit<DepartmentDoc, 'id'> = {
@@ -96,6 +111,7 @@ const EMPTY: Omit<DepartmentDoc, 'id'> = {
   programLevels: [],
   placementIntro: '', placementStats: [], placementRecruiters: [],
   newsEventsYears: [], studentAwardsYears: [], othersYears: [],
+  customSections: [],
 };
 
 function linesToArray(text: string): string[] {
@@ -149,9 +165,110 @@ export default function DepartmentsAdmin() {
   const [saving, setSaving] = useState(false);
   const [copying, setCopying] = useState(false);
 
-  const set = (k: string, v: string | number | string[] | LibrarySection[] | ProgramLevel[] | LibraryItem[] | LabItem[] | NewsEventsYear[] | ProgramLink[]) => setForm((p) => ({ ...p, [k]: v }));
+  const set = (k: string, v: string | number | string[] | LibrarySection[] | ProgramLevel[] | LibraryItem[] | LabItem[] | NewsEventsYear[] | ProgramLink[] | CustomSection[]) => setForm((p) => ({ ...p, [k]: v }));
   const handleHero = (r: UploadResult) => setForm((p) => ({ ...p, heroImage: r.url, storagePath: r.path }));
   const handleHodImage = (r: UploadResult) => setForm((p) => ({ ...p, hodImage: r.url, hodImageStoragePath: r.path }));
+
+  // Custom Sections — same wiring as ProgramsAdmin.tsx/DifferentiatorsAdmin.tsx/
+  // FacultyAdmin.tsx/CampusLifeAdmin.tsx.
+  const handleCustomSectionFileUploaded = (sectionPath: number[], fileIndex: number, r: UploadResult) => {
+    setForm((p) => ({
+      ...p,
+      customSections: replaceAtPath(p.customSections || [], sectionPath, (s) => ({
+        ...s,
+        files: (s.files || []).map((f, i) => (i === fileIndex ? { ...f, fileUrl: r.url, storagePath: r.path } : f)),
+      })),
+    }));
+  };
+  const handleCustomSectionFileRemoved = async (sectionPath: number[], fileIndex: number) => {
+    const file = getAtPath(form.customSections || [], sectionPath)?.files?.[fileIndex];
+    if (!file?.fileUrl) return;
+    if (!confirm('Remove this file? This cannot be undone.')) return;
+    try {
+      if (file.storagePath) await deleteFile(file.storagePath);
+    } catch (e) {
+      alert(`Couldn't delete the file from storage: ${(e as Error).message}`);
+      return;
+    }
+    setForm((p) => ({
+      ...p,
+      customSections: replaceAtPath(p.customSections || [], sectionPath, (s) => ({
+        ...s,
+        files: (s.files || []).filter((_, i) => i !== fileIndex),
+      })),
+    }));
+  };
+  const handleCustomSectionPhotoUploaded = (sectionPath: number[], r: UploadResult) => {
+    setForm((p) => ({
+      ...p,
+      customSections: replaceAtPath(p.customSections || [], sectionPath, (s) => ({
+        ...s,
+        photo: { imageUrl: r.url, storagePath: r.path },
+      })),
+    }));
+  };
+  const handleCustomSectionPhotoRemoved = async (sectionPath: number[]) => {
+    const photo = getAtPath(form.customSections || [], sectionPath)?.photo;
+    if (!photo?.imageUrl) return;
+    if (!confirm('Remove this photo? This cannot be undone.')) return;
+    try {
+      if (photo.storagePath) await deleteFile(photo.storagePath);
+    } catch (e) {
+      alert(`Couldn't delete the photo from storage: ${(e as Error).message}`);
+      return;
+    }
+    setForm((p) => ({
+      ...p,
+      customSections: replaceAtPath(p.customSections || [], sectionPath, (s) => {
+        const next = { ...s };
+        delete next.photo;
+        return next;
+      }),
+    }));
+  };
+  const handleCustomSectionGalleryPhotoUploaded = (sectionPath: number[], photoIndex: number, r: UploadResult) => {
+    setForm((p) => ({
+      ...p,
+      customSections: replaceAtPath(p.customSections || [], sectionPath, (s) => ({
+        ...s,
+        galleryPhotos: (s.galleryPhotos || []).map((ph, i) => (i === photoIndex ? { imageUrl: r.url, storagePath: r.path } : ph)),
+      })),
+    }));
+  };
+  const handleCustomSectionGalleryPhotoRemoved = async (sectionPath: number[], photoIndex: number) => {
+    const photo = getAtPath(form.customSections || [], sectionPath)?.galleryPhotos?.[photoIndex];
+    if (!photo) return;
+    if (photo.imageUrl && !confirm('Remove this photo? This cannot be undone.')) return;
+    try {
+      if (photo.storagePath) await deleteFile(photo.storagePath);
+    } catch (e) {
+      alert(`Couldn't delete the photo from storage: ${(e as Error).message}`);
+      return;
+    }
+    setForm((p) => ({
+      ...p,
+      customSections: replaceAtPath(p.customSections || [], sectionPath, (s) => ({
+        ...s,
+        galleryPhotos: (s.galleryPhotos || []).filter((_, i) => i !== photoIndex),
+      })),
+    }));
+  };
+
+  // One-time starter content for the 4 standalone Freshman Engineering
+  // departments (Mathematics/Physics/Chemistry/English) — pre-fills the
+  // whole Add form (title/shortCode/about/customSections for Laboratories/
+  // Research & Development/Awards & Recognitions) from the content that
+  // used to be hardcoded in FreshmanEngineering.tsx, so nothing is lost in
+  // moving them to real Department records. Only offered for a shortCode
+  // that's both known and not already created.
+  const quickAddFreshman = (shortCode: string) => {
+    const seed = FRESHMAN_DEPARTMENT_SEEDS[shortCode];
+    if (!seed) return;
+    setEditing(null);
+    setForm({ ...EMPTY, ...seed() });
+  };
+  const freshmanNotYetCreated = Object.keys(FRESHMAN_DEPARTMENT_SEEDS)
+    .filter((code) => !departments.some((d) => d.shortCode === code));
 
   // Vision/Mission/Values, Laboratories, and the Department Library used to
   // be edited per-programme; a lot of departments already have this content
@@ -426,6 +543,7 @@ export default function DepartmentsAdmin() {
       programLevels: (d.programLevels || []).map((l) => ({ title: l.title, intro: l.intro || '', rows: l.rows || [] })),
       placementIntro: d.placementIntro || '', placementStats: d.placementStats || [], placementRecruiters: d.placementRecruiters || [],
       newsEventsYears: d.newsEventsYears || [], studentAwardsYears: d.studentAwardsYears || [], othersYears: d.othersYears || [],
+      customSections: d.customSections || [],
     };
     setForm(next);
     setOriginalForm(next);
@@ -442,6 +560,26 @@ export default function DepartmentsAdmin() {
 
   return (
     <div className="admin-section">
+      {freshmanNotYetCreated.length > 0 && (
+        <div className="admin-card">
+          <h2 className="admin-card__title">Freshman Engineering — Quick Add</h2>
+          <p className="admin-field__hint">
+            Mathematics, Physics, Chemistry, and English were previously hardcoded on the Freshman Engineering page
+            with no admin path (only About HOD/Faculty were ever dynamic, via /admin → Faculty). Each is its own
+            standalone department here, same as CSE/ECE — click one to load its correct title/short code and
+            original content (Laboratories, Research &amp; Development, Awards &amp; Recognitions) into the form
+            below, review it, then click "Add Department".
+          </p>
+          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+            {freshmanNotYetCreated.map((code) => (
+              <button key={code} type="button" className="admin-btn admin-btn--sm" onClick={() => quickAddFreshman(code)}>
+                + {code}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="admin-card">
         <h2 className="admin-card__title">{editing ? 'Edit Department' : 'Add Department'}</h2>
         <p className="admin-field__hint" style={{ marginBottom: '1rem' }}>
@@ -772,6 +910,31 @@ export default function DepartmentsAdmin() {
           <div className="admin-field admin-field--full">
             <label htmlFor="field-hod-research-profiles">HOD Research Profiles (one per line: "Google Scholar: https://…")</label>
             <textarea id="field-hod-research-profiles" rows={4} value={linksToText(form.hodResearchProfiles)} onChange={(e) => set('hodResearchProfiles', textToLinks(e.target.value))} placeholder="Google Scholar: https://scholar.google.com/citations?user=…" />
+          </div>
+
+          <div className="admin-field admin-field--full"><hr /><h3>Department Page — Custom Sections</h3>
+            <p className="admin-field__hint" style={{ marginTop: '0.25rem' }}>
+              Optional. Add any section this department needs beyond the fixed fields above — Research &amp;
+              Development, Awards &amp; Recognitions, or anything else — any name, any number of sub-sections, and a
+              choice of plain text, a table, a checklist, a list of links, uploaded files, a photo gallery, or panel
+              view per section. Shown on this department's page after Laboratories. For a standalone department with
+              no linked programme (e.g. Mathematics/Physics/Chemistry/English), this is also the only place to add
+              real Laboratory photos — one section per lab, each with its own Photo Gallery.
+            </p>
+          </div>
+          <div className="admin-field admin-field--full">
+            <CustomSectionEditor
+              sections={form.customSections || []}
+              onChange={(next) => set('customSections', next)}
+              rootSections={form.customSections || []}
+              parentPath={[]}
+              onFileUploaded={handleCustomSectionFileUploaded}
+              onFileRemoved={handleCustomSectionFileRemoved}
+              onPhotoUploaded={handleCustomSectionPhotoUploaded}
+              onPhotoRemoved={handleCustomSectionPhotoRemoved}
+              onGalleryPhotoUploaded={handleCustomSectionGalleryPhotoUploaded}
+              onGalleryPhotoRemoved={handleCustomSectionGalleryPhotoRemoved}
+            />
           </div>
         </div>
 
