@@ -8,9 +8,8 @@ import BodyBlocks, { parseBodyContent } from '../../components/BodyBlocks/BodyBl
 import DepartmentNewsSection, { type DepartmentNewsDoc } from '../../components/DepartmentNews/DepartmentNewsSection';
 import NewsEventsTabs from '../../components/NewsEventsTabs/NewsEventsTabs';
 import DepartmentDetail from './DepartmentDetail';
-import FreshmanSubDepartment from './FreshmanSubDepartment';
-import { SUB_DEPTS } from './FreshmanEngineering';
-import { groupForProgramSlug } from '../../lib/departmentGroups';
+import StandaloneDepartmentDetail from './StandaloneDepartmentDetail';
+import { groupForProgramSlug, standaloneDepartmentForSlug } from '../../lib/departmentGroups';
 import FacultyCarousel from '../../components/FacultyCarousel/FacultyCarousel';
 import TestimonialMarquee, { type PlacementItem } from '../../components/ui/marquee-01';
 import { useOrderedCollection } from '../../hooks/useCollection';
@@ -48,7 +47,8 @@ export default function ProgramDetail() {
   const { slug } = useParams<{ slug: string }>();
   const group = groupForProgramSlug(slug);
   if (group) return <DepartmentDetail group={group} activeSlug={slug!} />;
-  if (SUB_DEPTS.some((d) => d.slug === slug)) return <FreshmanSubDepartment slug={slug!} />;
+  const standalone = standaloneDepartmentForSlug(slug);
+  if (standalone) return <StandaloneDepartmentDetail dept={standalone} />;
   return <SingleProgramDetail />;
 }
 

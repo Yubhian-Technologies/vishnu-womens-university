@@ -34,8 +34,8 @@ export default function CustomSectionsRenderer({ sections, navOffset = DEFAULT_N
 
   return (
     <>
-      {visible.map((section) => (
-        <section key={section.id} id={section.id} className="section bg-white" style={{ scrollMarginTop: navOffset }}>
+      {visible.map((section, index) => (
+        <section key={section.id} id={section.id} className={`section ${index % 2 === 0 ? 'bg-white' : 'bg-off-white'}`} style={{ scrollMarginTop: navOffset }}>
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
               <span className="section-label">Details</span>
