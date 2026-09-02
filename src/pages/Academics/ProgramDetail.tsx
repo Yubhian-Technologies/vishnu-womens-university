@@ -22,6 +22,7 @@ import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import type { FacultyDoc } from './Faculty';
 import { parseFlexibleTable, parseProjectAccordion } from '../../lib/structuredTable';
 import { sortPlacementRows, computePlacementStats, findPackageColumnIndex, findSerialColumnIndex, formatPackageCell } from '../../lib/placementRecords';
+import { sortInternshipRows, computeInternshipStats, findStipendColumnIndex, findInternshipSerialColumnIndex, formatStipendCell } from '../../lib/internshipRecords';
 import { hasCustomSectionContent, toQuickLinkItems } from '../../lib/customSections';
 import CustomSectionsRenderer from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import SEO from '../../components/SEO/SEO';
@@ -60,6 +61,9 @@ function SingleProgramDetail() {
   // 'all' shows every row, otherwise a fixed page size (DataTables-style
   // "Show N entries" control, matching the reference design).
   const [placementPageSize, setPlacementPageSize] = useState<number | 'all'>(10);
+  // Same pair, for the Internships section below.
+  const [internshipYear, setInternshipYear] = useState<string | null>(null);
+  const [internshipPageSize, setInternshipPageSize] = useState<number | 'all'>(10);
   const [activeLab, setActiveLab] = useState<LabItem | null>(null);
   const [openRndProjects, setOpenRndProjects] = useState<Set<string>>(new Set());
   const toggleRndProject = (key: string) => {
@@ -259,6 +263,20 @@ function SingleProgramDetail() {
   // straight from this, nothing here is admin-entered.
   const placementYearStats = activePlacementYear ? computePlacementStats(placementColumns, activePlacementYear.rows || []) : null;
   const visiblePlacementRows = placementPageSize === 'all' ? placementRows : placementRows.slice(0, placementPageSize);
+  // Individual student Internship Records — same shape/pattern as the
+  // Placement Records above (see InternshipYearsEditor in ProgramsAdmin.tsx),
+  // just for internships instead of placements.
+  const internshipYears = program.internshipYears || [];
+  const activeInternshipYear = internshipYears.find((y) => y.year === internshipYear) ?? internshipYears[0];
+  const internshipColumns = activeInternshipYear?.columns || [];
+  const internshipRows = internshipColumns.length > 0 && activeInternshipYear
+    ? sortInternshipRows(internshipColumns, activeInternshipYear.rows || [])
+    : [];
+  const internshipStipendIdx = findStipendColumnIndex(internshipColumns);
+  const internshipSnoIdx = findInternshipSerialColumnIndex(internshipColumns);
+  const visibleInternshipColumnIndices = internshipColumns.map((_, i) => i).filter((i) => i !== internshipSnoIdx);
+  const internshipYearStats = activeInternshipYear ? computeInternshipStats(internshipColumns, activeInternshipYear.rows || []) : null;
+  const visibleInternshipRows = internshipPageSize === 'all' ? internshipRows : internshipRows.slice(0, internshipPageSize);
   const visibleCustomSections = (program.customSections || []).filter(hasCustomSectionContent);
 
   const quickLinks = [
@@ -273,6 +291,7 @@ function SingleProgramDetail() {
     hasLibrary && { id: 'library', label: 'Department Library' },
     hasRnd && { id: 'rnd', label: 'Research & Development (Funded Projects & Patents)' },
     placementYears.length > 0 && { id: 'placements', label: 'Placements' },
+    internshipYears.length > 0 && { id: 'internships', label: 'Internships' },
     hasNewsletter && { id: 'newsletter', label: 'Newsletter' },
     hasDeptNews && { id: 'news', label: 'News & Events' },
     hasNewsEventsYears && { id: 'news-events', label: 'News & Events' },
@@ -900,6 +919,110 @@ function SingleProgramDetail() {
               ) : (
                 <p style={{ color: 'var(--color-text-light)', fontStyle: 'italic' }}>
                   No placement records uploaded yet for {activePlacementYear?.year}.
+                </p>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Internships — same shape/pattern as Placements above (see
+          InternshipYearsEditor in ProgramsAdmin.tsx). */}
+      {internshipYears.length > 0 && (
+        <section id="internships" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
+          <div className="container">
+            <div style={{ marginBottom: 'var(--space-8)' }}>
+              <span className="section-label">Careers</span>
+              <h2 className="section-title">Internships</h2>
+            </div>
+            <div className="placement-year-pills">
+              {internshipYears.map((y) => (
+                <button
+                  key={y.year}
+                  type="button"
+                  onClick={() => setInternshipYear(y.year)}
+                  className={`placement-year-pill${activeInternshipYear?.year === y.year ? ' active' : ''}`}
+                >
+                  AY. {y.year}
+                </button>
+              ))}
+            </div>
+            {activeInternshipYear && internshipYearStats && (
+              <>
+                <p className="placement-stat-summary">
+                  {activeInternshipYear.year} Internships as on date: <strong>{internshipYearStats.totalInternships.toLocaleString()}</strong>
+                </p>
+                <div className="placement-stat-grid">
+                  <div className="placement-stat-tile">
+                    <div className="placement-stat-tile__label">No. of Companies</div>
+                    <div className="placement-stat-tile__value">{internshipYearStats.companiesVisited}</div>
+                  </div>
+                  <div className="placement-stat-tile">
+                    <div className="placement-stat-tile__label">Total No. of Internships</div>
+                    <div className="placement-stat-tile__value">{internshipYearStats.totalInternships}</div>
+                  </div>
+                  <div className="placement-stat-tile">
+                    <div className="placement-stat-tile__label">Average Stipend</div>
+                    <div className="placement-stat-tile__value">{internshipYearStats.averageStipend ?? '—'}</div>
+                  </div>
+                  <div className="placement-stat-tile">
+                    <div className="placement-stat-tile__label">Median Stipend</div>
+                    <div className="placement-stat-tile__value">{internshipYearStats.medianStipend ?? '—'}</div>
+                  </div>
+                  <div className="placement-stat-tile">
+                    <div className="placement-stat-tile__label">Highest Stipend</div>
+                    <div className="placement-stat-tile__value">{internshipYearStats.highestStipend ?? '—'}</div>
+                  </div>
+                </div>
+              </>
+            )}
+            <div id="internship-records-table">
+              <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 800, color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 'var(--space-3)' }}>
+                Internship Records
+              </h3>
+              {internshipRows.length > 0 ? (
+                <>
+                  <div className="placement-page-size">
+                    Show
+                    <select
+                      value={internshipPageSize}
+                      onChange={(e) => setInternshipPageSize(e.target.value === 'all' ? 'all' : Number(e.target.value))}
+                    >
+                      <option value={10}>10</option>
+                      <option value={25}>25</option>
+                      <option value={50}>50</option>
+                      <option value={100}>100</option>
+                      <option value="all">All</option>
+                    </select>
+                    entries
+                  </div>
+                  <div className="pb-activities-scroll">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th className="pb-activities-num">S.No</th>
+                          {visibleInternshipColumnIndices.map((ci) => <th key={ci}>{internshipColumns[ci]}</th>)}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {visibleInternshipRows.map((row, ri) => (
+                          <tr key={ri}>
+                            <td className="pb-activities-num">{ri + 1}</td>
+                            {visibleInternshipColumnIndices.map((ci) => (
+                              <td key={ci}>{ci === internshipStipendIdx ? formatStipendCell(row.cells[ci] ?? '') : (row.cells[ci] ?? '')}</td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <p className="placement-page-info">
+                    Showing 1 to {visibleInternshipRows.length} of {internshipRows.length} entries
+                  </p>
+                </>
+              ) : (
+                <p style={{ color: 'var(--color-text-light)', fontStyle: 'italic' }}>
+                  No internship records uploaded yet for {activeInternshipYear?.year}.
                 </p>
               )}
             </div>
