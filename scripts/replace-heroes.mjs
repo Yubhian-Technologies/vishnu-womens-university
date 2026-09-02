@@ -79,7 +79,7 @@ const PAGES = [
     page: 'campus',
     image: 'https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=1920&q=80',
     title: 'Campus Life at VWU',
-    subtitle: 'A 100-acre campus in Bhimavaram designed to inspire learning, wellness, and community.',
+    subtitle: 'An 80-acre campus in Bhimavaram designed to inspire learning, wellness, and community.',
     breadcrumb: [{ label: 'Home', to: '/' }, { label: 'Campus Life' }],
   },
   {

@@ -3,8 +3,16 @@ import { collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp } from '
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
 import { CONTENT_ICON_NAMES } from '../../../lib/contentIcons';
-import { deleteFile } from '../../../lib/storage';
+import { deleteFile, type UploadResult } from '../../../lib/storage';
 import TableImportButton from '../../../components/TableImportButton/TableImportButton';
+import { useImageCropModal } from '../../../components/ImageUploader/useImageCropModal';
+
+export interface NotablePerson {
+  name: string;
+  subtitle: string;
+  imageUrl: string;
+  storagePath: string;
+}
 
 export interface PlacementItemDoc {
   id: string;
@@ -42,16 +50,20 @@ export interface PlacementItemDoc {
   heroImage: string;
   heroStoragePath: string;
   order: number;
-  /** Only used on the "placement-highlights" page — rotating promotional
-   *  banner photos shown via PhotoCarousel in place of the Overview text
-   *  once at least one is uploaded. Optional: most items never set this. */
-  galleryImages?: { url: string; path: string }[];
+  /** Only used on the "placement-highlights" page — the "Photo Carousel":
+   *  a horizontally scrolling strip of photo cards (name + subtitle under
+   *  each), shown below the Data Table. Free-form crop, not a fixed ratio —
+   *  these can be full posters/banners (e.g. an individual student's
+   *  placement-congratulations graphic) that already carry their own
+   *  baked-in text/photo, so forcing one ratio would cut into that content.
+   *  Optional: most items never set this. */
+  notablePeople?: NotablePerson[];
 }
 
 const EMPTY: Omit<PlacementItemDoc, 'id'> = {
   slug: '', title: '', icon: 'BarChart3', desc: '', external: false, url: '',
   intro: '', about: '', highlights: [], outcomes: [], partners: [], tableText: '', dataTableHeadersText: '', rosterGroupsText: '',
-  deptCoordinatorsText: '', deptCoordinatorGroupsText: '', emails: [], linkedins: [], heroImage: '', heroStoragePath: '', order: 0,
+  deptCoordinatorsText: '', deptCoordinatorGroupsText: '', emails: [], linkedins: [], heroImage: '', heroStoragePath: '', notablePeople: [], order: 0,
 };
 
 function linesToArray(text: string): string[] {
@@ -66,6 +78,14 @@ export default function PlacementItemsAdmin() {
   const [form, setForm] = useState<Omit<PlacementItemDoc, 'id'>>(EMPTY);
   const [editing, setEditing] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  // Photo Carousel — same useImageCropModal-direct pattern as other
+  // repeatable add-to-list photo fields (e.g. TpoTeamPhotosAdmin). Free-form
+  // (no fixed ratio) — these can be whole promotional posters/banners with
+  // their own baked-in text and photo, not uniform headshots, so a locked
+  // ratio would cut into that content; an admin drags the crop box to
+  // exactly the source image's own edges instead.
+  const { openCrop: openPersonCrop, cropModal: personCropModal } = useImageCropModal(undefined);
+  const [personUploading, setPersonUploading] = useState(false);
 
   const set = (k: string, v: string | number | string[] | boolean) => setForm((p) => ({ ...p, [k]: v }));
 
@@ -101,8 +121,68 @@ export default function PlacementItemsAdmin() {
       tableText: it.tableText || '', dataTableHeadersText: it.dataTableHeadersText || '', rosterGroupsText: it.rosterGroupsText || '', deptCoordinatorsText: it.deptCoordinatorsText || '',
       deptCoordinatorGroupsText: it.deptCoordinatorGroupsText || '',
       emails: it.emails || [], linkedins: it.linkedins || [],
-      heroImage: it.heroImage || '', heroStoragePath: it.heroStoragePath || '', order: it.order,
+      heroImage: it.heroImage || '', heroStoragePath: it.heroStoragePath || '',
+      notablePeople: it.notablePeople || [], order: it.order,
     });
+  };
+
+  // Photo Carousel — added one at a time via the crop modal (photo first,
+  // then the admin optionally fills in name/subtitle inline on the card),
+  // same functional-setForm-reads-p pattern as other repeatable list fields
+  // so uploading several in quick succession can't clobber one another.
+  const notablePeople = form.notablePeople || [];
+  const addPerson = (file: File) => {
+    setPersonUploading(true);
+    openPersonCrop(file, 'vwu/placements/highlights-people', (r: UploadResult) => {
+      setForm((p) => ({
+        ...p,
+        notablePeople: [...(p.notablePeople || []), { name: '', subtitle: '', imageUrl: r.url, storagePath: r.path }],
+      }));
+      setPersonUploading(false);
+    });
+  };
+  const updatePerson = (i: number, field: 'name' | 'subtitle', value: string) => {
+    setForm((p) => {
+      const next = [...(p.notablePeople || [])];
+      next[i] = { ...next[i], [field]: value };
+      return { ...p, notablePeople: next };
+    });
+  };
+  const movePerson = (i: number, dir: -1 | 1) => {
+    setForm((p) => {
+      const next = [...(p.notablePeople || [])];
+      const target = i + dir;
+      if (target < 0 || target >= next.length) return p;
+      [next[i], next[target]] = [next[target], next[i]];
+      return { ...p, notablePeople: next };
+    });
+  };
+  // Removes immediately (deletes from Storage + patches Firestore on the
+  // spot if this item already exists) — same reasoning as removeGalleryImage
+  // used to have: no orphaned Storage file, no risk of losing the removal if
+  // the admin navigates away before saving the rest of the form.
+  const removePerson = async (i: number) => {
+    const person = notablePeople[i];
+    if (!person) return;
+    if (!confirm('Remove this person? This cannot be undone.')) return;
+    try {
+      if (person.storagePath) await deleteFile(person.storagePath);
+    } catch (e) {
+      alert(`Couldn't delete the file from storage: ${(e as Error).message}`);
+      return;
+    }
+    let next: NotablePerson[] = [];
+    setForm((p) => {
+      next = (p.notablePeople || []).filter((_, pi) => pi !== i);
+      return { ...p, notablePeople: next };
+    });
+    if (editing) {
+      try {
+        await updateDoc(doc(db, 'placementItems', editing), { notablePeople: next });
+      } catch (e) {
+        alert(`The file was deleted from storage, but the saved record couldn't be updated: ${(e as Error).message}`);
+      }
+    }
   };
 
   const remove = async (id: string, heroStoragePath?: string) => {
@@ -224,6 +304,59 @@ export default function PlacementItemsAdmin() {
               )}
             </div>
           </div>
+          {form.slug === 'placement-highlights' && (
+            <div className="admin-field admin-field--full">
+              <label>Photo Carousel (optional)</label>
+              <p className="admin-field__hint" style={{ marginTop: 0 }}>
+                Shown as a horizontally scrolling row of photo cards below the Data Table — add each photo below,
+                then optionally fill in a name and subtitle right on the card (e.g. "Nobel Laureate", or leave
+                both blank for a poster/banner that already carries its own text). Free-form crop, no fixed
+                shape — drag the crop box to exactly the source image's own edges so it displays uncropped at its
+                own true proportions. Leave this empty to skip the section entirely.
+              </p>
+              {notablePeople.length > 0 && (
+                <div className="admin-image-grid" style={{ marginBottom: '0.75rem' }}>
+                  {notablePeople.map((person, i) => (
+                    <div key={person.storagePath || i} className="admin-image-card">
+                      <img src={person.imageUrl} alt={person.name || `Person ${i + 1}`} />
+                      <input
+                        value={person.name}
+                        onChange={(e) => updatePerson(i, 'name', e.target.value)}
+                        placeholder="Full name"
+                        style={{ marginTop: '0.4rem' }}
+                      />
+                      <input
+                        value={person.subtitle}
+                        onChange={(e) => updatePerson(i, 'subtitle', e.target.value)}
+                        placeholder="Subtitle, e.g. Nobel Laureate"
+                        style={{ marginTop: '0.3rem' }}
+                      />
+                      <div className="admin-image-card__actions">
+                        <button type="button" className="admin-btn admin-btn--sm" onClick={() => movePerson(i, -1)} disabled={i === 0} title="Move earlier">↑</button>
+                        <button type="button" className="admin-btn admin-btn--sm" onClick={() => movePerson(i, 1)} disabled={i === notablePeople.length - 1} title="Move later">↓</button>
+                        <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removePerson(i)}>Remove</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <label className="admin-btn admin-btn--ghost" style={{ display: 'inline-block', cursor: personUploading ? 'default' : 'pointer', opacity: personUploading ? 0.6 : 1 }}>
+                {personUploading ? 'Uploading…' : '+ Add Person'}
+                <input
+                  type="file"
+                  accept="image/*"
+                  hidden
+                  disabled={personUploading}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) addPerson(file);
+                    e.target.value = '';
+                  }}
+                />
+              </label>
+              {personCropModal}
+            </div>
+          )}
           <div className="admin-field admin-field--full">
             <label htmlFor="field-team-groups-one-per-line-optional">
               Team Groups (one per line, "Group Label | Count" — optional). When set, the Data Table above

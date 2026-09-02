@@ -169,7 +169,7 @@ const PAGE_TEXT_DEFAULTS: Record<string, { title: string; subtitle?: string }> =
   'news-awards-accreditations': { title: 'Accreditations & Awards', subtitle: "Endorsed by India's foremost regulatory and ranking bodies — a record of recognised quality and consistent academic achievement." },
   'information': { title: 'Information', subtitle: 'Academic calendar, holidays, how to reach us, counselling, ICT platforms, and more.' },
   'news-awards': { title: 'News & Awards', subtitle: "Celebrating VWU's achievements, events, and milestones — from national accreditations and rankings to campus happenings and visual memories." },
-  'campus': { title: 'Campus Life at VWU', subtitle: 'A 100-acre campus in Bhimavaram where learning, wellness, and community life come together.' },
+  'campus': { title: 'Campus Life at VWU', subtitle: 'An 80-acre campus in Bhimavaram where learning, wellness, and community life come together.' },
   'news-awards-happenings': { title: 'Happenings at VWU', subtitle: 'Workshops, MoUs, competitions, achievements, and institutional milestones — a running record of life at VWU.' },
   'news-awards-gallery': { title: 'Gallery', subtitle: 'A visual archive of campus life at VWU — from national competitions and graduation days to cultural festivals and industry events.' },
   'news': { title: 'VWU News & Stories', subtitle: 'Stay up-to-date with the latest happenings, achievements, and stories from the VWU community.' },

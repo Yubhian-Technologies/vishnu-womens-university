@@ -1,9 +1,13 @@
-// The single source of truth for the three "grouped" academic departments —
-// AI, CSE and ECE — each of which contains two or more programs that share
-// their overview, HOD, faculty and laboratories, and differ only in
-// curriculum and their News & Events feed. (ECE has three: B.Tech ECE,
-// B.Tech EVT, and M.Tech VLSI — the toggle and every per-programme section
-// below it already render generically for any number of programSlugs.)
+// The single source of truth for the "grouped" academic departments — AI,
+// CSE, ECE and Mechanical — each of which shares its overview, HOD, faculty
+// and laboratories across its program(s), differing only in curriculum and
+// News & Events. (ECE has three: B.Tech ECE, B.Tech EVT, and M.Tech VLSI —
+// the toggle and every per-programme section below it already render
+// generically for any number of programSlugs. Mechanical currently has just
+// one program, so the toggle collapses to a single entry — it's grouped
+// anyway so its department page matches the same "About / Vision & Mission /
+// About HOD / Faculty / Laboratories / Choose a Programme / R & D /
+// Placements / News & Events" quick-links layout as the others.)
 //
 // A program slug listed here makes /academics/<slug> render the grouped
 // DepartmentDetail view (with that slug as the active toggle) instead of the
@@ -35,6 +39,7 @@ export const DEPARTMENT_GROUPS: DepartmentGroup[] = [
   { key: 'ai', deptShortCode: 'AI', programSlugs: ['ai-ds', 'ai-ml'], facultyDepartments: ['AI&DS', 'AI&ML'] },
   { key: 'cse', deptShortCode: 'CSE', programSlugs: ['cse', 'cyber-security', 'mtech-cse', 'mtech-software-engineering'], facultyDepartments: ['CSE'] },
   { key: 'ece', deptShortCode: 'ECE', programSlugs: ['ece', 'EVT', 'mtech-vlsi'], facultyDepartments: ['ECE'] },
+  { key: 'mechanical', deptShortCode: 'ME', programSlugs: ['me'], facultyDepartments: ['Mechanical', 'ME'] },
 ];
 
 /** Every program slug that belongs to a grouped department. */

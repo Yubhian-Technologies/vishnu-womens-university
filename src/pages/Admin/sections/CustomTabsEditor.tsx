@@ -10,13 +10,17 @@ interface Props {
   onFileRemoved: (tabIndex: number, sectionPath: number[], fileIndex: number) => void;
   onPhotoUploaded: (tabIndex: number, sectionPath: number[], r: UploadResult) => void;
   onPhotoRemoved: (tabIndex: number, sectionPath: number[]) => void;
+  onGalleryPhotoUploaded: (tabIndex: number, sectionPath: number[], photoIndex: number, r: UploadResult) => void;
+  onGalleryPhotoRemoved: (tabIndex: number, sectionPath: number[], photoIndex: number) => void;
 }
 
 // The NIRF-Reports-style list: add a named tab, reorder/remove it, and
 // toggle "Edit Content" to reveal that one tab's own CustomSectionEditor
 // tree right below it — the same editor already used for Programs/
 // Differentiators custom sections, just scoped to this tab's own sections.
-export default function CustomTabsEditor({ tabs, onChange, onFileUploaded, onFileRemoved, onPhotoUploaded, onPhotoRemoved }: Props) {
+export default function CustomTabsEditor({
+  tabs, onChange, onFileUploaded, onFileRemoved, onPhotoUploaded, onPhotoRemoved, onGalleryPhotoUploaded, onGalleryPhotoRemoved,
+}: Props) {
   const [newTabLabel, setNewTabLabel] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -87,6 +91,8 @@ export default function CustomTabsEditor({ tabs, onChange, onFileUploaded, onFil
                   onFileRemoved={(sectionPath, fileIndex) => onFileRemoved(ti, sectionPath, fileIndex)}
                   onPhotoUploaded={(sectionPath, r) => onPhotoUploaded(ti, sectionPath, r)}
                   onPhotoRemoved={(sectionPath) => onPhotoRemoved(ti, sectionPath)}
+                  onGalleryPhotoUploaded={(sectionPath, photoIndex, r) => onGalleryPhotoUploaded(ti, sectionPath, photoIndex, r)}
+                  onGalleryPhotoRemoved={(sectionPath, photoIndex) => onGalleryPhotoRemoved(ti, sectionPath, photoIndex)}
                 />
               </div>
             )}

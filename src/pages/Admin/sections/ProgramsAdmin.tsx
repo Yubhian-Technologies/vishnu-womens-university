@@ -4,15 +4,17 @@ import {
 } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
-import ImageUploader from '../../../components/ImageUploader/ImageUploader';
+import { useImageCropModal } from '../../../components/ImageUploader/useImageCropModal';
 import FileUploader from '../../../components/FileUploader/FileUploader';
 import { deleteFile, type UploadResult } from '../../../lib/storage';
 import { PROGRAM_ICON_NAMES } from '../../../lib/programIcons';
 import DepartmentNewsManager from './DepartmentNewsManager';
 import type { PlacementYearRecord } from '../../../lib/placementRecords';
-import { parsePlacementsFile, type PlacementImportResult } from '../../../lib/placementsImport';
+import { parsePlacementsFile, dedupePlacementRows, downloadPlacementsTemplate, type PlacementImportResult } from '../../../lib/placementsImport';
 import CustomSectionEditor from './CustomSectionEditor';
 import { replaceAtPath, getAtPath, type CustomSection } from '../../../lib/customSections';
+import RndTableEditor, { type RndStructuredTable } from './RndTableEditor';
+import { diffChangedFields } from '../../../lib/formDiff';
 
 export interface ProgramSubject {
   title: string;
@@ -43,6 +45,7 @@ export interface ProgramLink {
 
 export interface LabItem {
   name: string;
+  description?: string;
   pdfUrl?: string;
   pdfStoragePath?: string;
 }
@@ -52,6 +55,25 @@ export interface LabItem {
 // rendering without a migration, same approach as normalizeSubject above.
 export function normalizeLab(l: string | LabItem): LabItem {
   return typeof l === 'string' ? { name: l } : l;
+}
+
+export interface MindMapImage {
+  url: string;
+  storagePath?: string;
+}
+
+// Older programme docs stored a single Mind Map image (mindMapImage /
+// mindMapImageStoragePath) — normalize to the new multi-image array shape at
+// read time so existing data keeps rendering without a migration, same
+// approach as normalizeLab/normalizeSubject above.
+export function normalizeMindMapImages(p: {
+  mindMapImages?: MindMapImage[];
+  mindMapImage?: string;
+  mindMapImageStoragePath?: string;
+}): MindMapImage[] {
+  if (p.mindMapImages && p.mindMapImages.length > 0) return p.mindMapImages;
+  if (p.mindMapImage) return [{ url: p.mindMapImage, storagePath: p.mindMapImageStoragePath || '' }];
+  return [];
 }
 
 export interface LibraryItem {
@@ -71,12 +93,33 @@ export interface NewsEventRow {
   cells: string[];
 }
 
+// One event shown as an image + a short write-up instead of (or alongside)
+// a table row — for entries a plain table cell doesn't do justice to (e.g.
+// a single notable achievement with a photo), same image/description shape
+// used by Happenings (see lib/happenings.ts).
+export interface NewsEventCard {
+  imageUrl?: string;
+  storagePath?: string;
+  title: string;
+  description: string;
+}
+
 export interface NewsEventsYear {
   year: string;
+  // How this year's content is displayed. Optional and defaults to 'table'
+  // — every year created before this field existed only ever had
+  // columns/rows, so treating a missing mode as 'table' keeps that content
+  // showing exactly as it always has.
+  mode?: 'table' | 'cards' | 'text' | 'both';
   // Admin-defined, in display order — "S.No" is never stored here, it's
   // always generated on the public page.
   columns: string[];
   rows: NewsEventRow[];
+  // Only shown when `mode` is 'cards' or 'both'.
+  cards?: NewsEventCard[];
+  // Only shown when `mode` is 'text' — a plain paragraph for a year that's
+  // neither a table nor image cards.
+  text?: string;
 }
 
 export interface NewsletterIssue {
@@ -134,8 +177,15 @@ export interface ProgramDoc {
   hodImageStoragePath: string;
   hodEmail: string;
   hodResearchProfiles: ProgramLink[];
-  mindMapImage: string;
-  mindMapImageStoragePath: string;
+  // Legacy single-image fields — normalizeMindMapImages() upgrades these to
+  // the array below at read time; new saves only ever write mindMapImages.
+  mindMapImage?: string;
+  mindMapImageStoragePath?: string;
+  // Curriculum Mind Map — any number of admin-uploaded images (shown as a
+  // gallery on the public page) plus an optional PDF download.
+  mindMapImages?: MindMapImage[];
+  mindMapPdfUrl?: string;
+  mindMapPdfStoragePath?: string;
   // Optional — shown as a "Department Library" section + Quick Links entry on
   // every programme's page (same shared template, not per-branch content,
   // and stored on this programme's own doc so each branch's library data is
@@ -176,6 +226,12 @@ export interface ProgramDoc {
   // still the simplest option for a department that just wants to link out
   // to a couple of PDFs (e.g. "Funded R&D Projects", "In-house R&D Projects").
   rndLinks?: RndLink[];
+  // Admin-defined columns (added/reordered/removed dynamically, same as
+  // NewsEventsYearsEditor's), but — unlike rndTableText above — each row
+  // also carries its own uploaded PDF (e.g. the actual paper/patent for
+  // that row), retrieved from Firebase Storage the same way every other
+  // per-item PDF in this codebase is (rndLinks, labs, semesters…).
+  rndStructuredTable?: RndStructuredTable;
   // Optional — shown as the "Placements" section's records table + Quick
   // Links entry on every programme's page. Grouped by academic year like
   // News & Events/Newsletter, but each year holds its own admin-imported
@@ -197,11 +253,12 @@ const EMPTY: Omit<ProgramDoc, 'id'> = {
   highlights: [], labs: [], outcomes: [], semesters: [],
   vision: '', mission: [], coreValues: [], peos: [], pos: [], psos: [], wks: [],
   hodMessage: '', hodImage: '', hodImageStoragePath: '', hodEmail: '', hodResearchProfiles: [],
-  mindMapImage: '', mindMapImageStoragePath: '',
+  mindMapImages: [], mindMapPdfUrl: '', mindMapPdfStoragePath: '',
   libraryIntro: '', libraryInCharge: '', librarySections: [],
   newsEventsYears: [],
   newsletterYears: [],
   rndIntro: '', rndTableText: '', rndProjectsText: '', rndLinks: [],
+  rndStructuredTable: { columns: [], rows: [] },
   // placementYears is intentionally NOT part of this form/EMPTY: it's
   // managed entirely by <PlacementYearsEditor> below via its own immediate
   // Firestore writes (same reason the old department-wide placement editor
@@ -250,6 +307,14 @@ function arrayToLines(arr: string[] = []): string {
 export default function ProgramsAdmin() {
   const { docs: programs, loading } = useOrderedCollection<ProgramDoc>('programs', 'order');
   const [form, setForm] = useState<Omit<ProgramDoc, 'id'>>(EMPTY);
+  // Snapshot of `form` taken at the moment "Edit" was clicked (see
+  // startEdit) — save() diffs against this so Update only writes fields you
+  // actually changed in this session. Without it, `updateDoc(doc, {...form})`
+  // blindly overwrites every field with this tab's stale copy, silently
+  // reverting whatever anyone else (or you, in another tab) saved on this
+  // program in the meantime. null while adding a new program (nothing to
+  // diff against — always writes the full form then).
+  const [originalForm, setOriginalForm] = useState<Omit<ProgramDoc, 'id'> | null>(null);
   const [editing, setEditing] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -293,8 +358,32 @@ export default function ProgramsAdmin() {
     }
   };
 
-  const set = (k: string, v: string | number | string[] | ProgramSemester[] | ProgramLink[] | LibrarySection[] | NewsEventsYear[] | NewsletterYear[] | RndLink[] | LabItem[] | CustomSection[]) => setForm((p) => ({ ...p, [k]: v }));
-  const handleMindMapImage = (r: UploadResult) => setForm((p) => ({ ...p, mindMapImage: r.url, mindMapImageStoragePath: r.path }));
+  const set = (k: string, v: string | number | string[] | ProgramSemester[] | ProgramLink[] | LibrarySection[] | NewsEventsYear[] | NewsletterYear[] | RndLink[] | RndStructuredTable | LabItem[] | CustomSection[] | MindMapImage[]) => setForm((p) => ({ ...p, [k]: v }));
+  // Mind Map — any number of admin-uploaded images (shown as a gallery on
+  // the public page) plus an optional PDF download. Adding uses a functional
+  // setForm update (not the plain `set` helper) so uploading several images
+  // in quick succession never has one upload's completion silently overwrite
+  // another's — same race avoided by handleLabPdf above.
+  const { openCrop: openMindMapCrop, cropModal: mindMapCropModal, uploading: mindMapUploading } = useImageCropModal();
+  const mindMapImages = form.mindMapImages || [];
+  const addMindMapImage = (file: File) => {
+    openMindMapCrop(file, 'vwu/programs/mindmap', (result) => {
+      setForm((p) => ({ ...p, mindMapImages: [...(p.mindMapImages || []), { url: result.url, storagePath: result.path }] }));
+    });
+  };
+  const removeMindMapImage = (mi: number) => {
+    if (!confirm('Remove this Mind Map image?')) return;
+    set('mindMapImages', mindMapImages.filter((_, i) => i !== mi));
+  };
+  const moveMindMapImage = (mi: number, dir: -1 | 1) => {
+    const next = [...mindMapImages];
+    const target = mi + dir;
+    if (target < 0 || target >= next.length) return;
+    [next[mi], next[target]] = [next[target], next[mi]];
+    set('mindMapImages', next);
+  };
+  const handleMindMapPdf = (r: UploadResult) => setForm((p) => ({ ...p, mindMapPdfUrl: r.url, mindMapPdfStoragePath: r.path }));
+  const removeMindMapPdf = () => setForm((p) => ({ ...p, mindMapPdfUrl: '', mindMapPdfStoragePath: '' }));
 
   // Newsletter (academic years, each with an ordered list of PDF-backed
   // issues) editing. An issue's "Issue – N" label is always its position,
@@ -442,6 +531,36 @@ export default function ProgramsAdmin() {
     }));
   };
 
+  // contentType 'gallery' — same shape as the file handlers above, but each
+  // photo is addressed by its index within that section's galleryPhotos.
+  const handleCustomSectionGalleryPhotoUploaded = (sectionPath: number[], photoIndex: number, r: UploadResult) => {
+    setForm((p) => ({
+      ...p,
+      customSections: replaceAtPath(p.customSections || [], sectionPath, (s) => ({
+        ...s,
+        galleryPhotos: (s.galleryPhotos || []).map((ph, i) => (i === photoIndex ? { imageUrl: r.url, storagePath: r.path } : ph)),
+      })),
+    }));
+  };
+  const handleCustomSectionGalleryPhotoRemoved = async (sectionPath: number[], photoIndex: number) => {
+    const photo = getAtPath(form.customSections || [], sectionPath)?.galleryPhotos?.[photoIndex];
+    if (!photo) return;
+    if (photo.imageUrl && !confirm('Remove this photo? This cannot be undone.')) return;
+    try {
+      if (photo.storagePath) await deleteFile(photo.storagePath);
+    } catch (e) {
+      alert(`Couldn't delete the photo from storage: ${(e as Error).message}`);
+      return;
+    }
+    setForm((p) => ({
+      ...p,
+      customSections: replaceAtPath(p.customSections || [], sectionPath, (s) => ({
+        ...s,
+        galleryPhotos: (s.galleryPhotos || []).filter((_, i) => i !== photoIndex),
+      })),
+    }));
+  };
+
   // Programme Structure (semesters + subjects) editing — structured add /
   // remove / reorder, replacing the old free-text "Semester I: A, B" parser.
   const addSemester = () => {
@@ -529,11 +648,18 @@ export default function ProgramsAdmin() {
         psos: form.psos.filter(Boolean),
       });
       if (editing) {
-        await updateDoc(doc(db, 'programs', editing), { ...payload });
+        // Only send fields that actually changed since this edit session
+        // started — see diffChangedFields/originalForm above. Skips the
+        // network call entirely if nothing did (e.g. Edit then Update with
+        // no changes).
+        const changed = originalForm ? diffChangedFields(payload, stripUndefined(originalForm)) : payload;
+        if (Object.keys(changed).length > 0) {
+          await updateDoc(doc(db, 'programs', editing), changed);
+        }
       } else {
         await addDoc(collection(db, 'programs'), { ...payload, order: form.order || programs.filter((p) => p.category === form.category).length, createdAt: serverTimestamp() });
       }
-      setForm(EMPTY); setEditing(null);
+      setForm(EMPTY); setEditing(null); setOriginalForm(null);
     } catch (e) {
       alert(`Couldn't save: ${(e as Error).message}`);
     } finally { setSaving(false); }
@@ -541,12 +667,12 @@ export default function ProgramsAdmin() {
 
   const startEdit = (p: ProgramDoc) => {
     setEditing(p.id);
-    setForm({
+    const next: Omit<ProgramDoc, 'id'> = {
       slug: p.slug, name: p.name, shortName: p.shortName, icon: p.icon || 'GraduationCap',
       category: p.category, intake: p.intake, established: p.established, accreditation: p.accreditation,
       hod: p.hod, department: p.department || '', fee: p.fee || '', heroImage: p.heroImage, storagePath: p.storagePath, about: p.about,
       highlights: p.highlights || [],
-      labs: (p.labs || []).map(normalizeLab).map((l) => ({ name: l.name, pdfUrl: l.pdfUrl || '', pdfStoragePath: l.pdfStoragePath || '' })),
+      labs: (p.labs || []).map(normalizeLab).map((l) => ({ name: l.name, description: l.description || '', pdfUrl: l.pdfUrl || '', pdfStoragePath: l.pdfStoragePath || '' })),
       outcomes: p.outcomes || [],
       semesters: (p.semesters || []).map((s) => ({
         label: s.label, subjects: (s.subjects || []).map(normalizeSubject),
@@ -556,7 +682,8 @@ export default function ProgramsAdmin() {
       peos: p.peos || [], pos: p.pos || [], psos: p.psos || [], wks: p.wks || [],
       hodMessage: p.hodMessage || '', hodImage: p.hodImage || '', hodImageStoragePath: p.hodImageStoragePath || '',
       hodEmail: p.hodEmail || '', hodResearchProfiles: p.hodResearchProfiles || [],
-      mindMapImage: p.mindMapImage || '', mindMapImageStoragePath: p.mindMapImageStoragePath || '',
+      mindMapImages: normalizeMindMapImages(p),
+      mindMapPdfUrl: p.mindMapPdfUrl || '', mindMapPdfStoragePath: p.mindMapPdfStoragePath || '',
       libraryIntro: p.libraryIntro || '', libraryInCharge: p.libraryInCharge || '',
       librarySections: (p.librarySections || []).map((s) => ({ heading: s.heading, items: s.items || [] })),
       newsEventsYears: (p.newsEventsYears || []).map((y) => ({
@@ -568,9 +695,15 @@ export default function ProgramsAdmin() {
       })),
       rndIntro: p.rndIntro || '', rndTableText: p.rndTableText || '', rndProjectsText: p.rndProjectsText || '',
       rndLinks: (p.rndLinks || []).map((l) => ({ label: l.label, pdfUrl: l.pdfUrl || '', pdfStoragePath: l.pdfStoragePath || '' })),
+      rndStructuredTable: {
+        columns: p.rndStructuredTable?.columns || [],
+        rows: (p.rndStructuredTable?.rows || []).map((r) => ({ cells: r.cells || [], pdfUrl: r.pdfUrl || '', pdfStoragePath: r.pdfStoragePath || '' })),
+      },
       customSections: p.customSections || [],
       order: p.order || 0,
-    });
+    };
+    setForm(next);
+    setOriginalForm(next);
   };
 
   const remove = async (id: string) => {
@@ -584,6 +717,17 @@ export default function ProgramsAdmin() {
 
   return (
     <div className="admin-section">
+      <div className="admin-card">
+        <h2 className="admin-card__title">Placements — Import Template</h2>
+        <p className="admin-field__hint" style={{ marginBottom: '0.75rem' }}>
+          For the "S.No / Registration Number / Student Name / Company / Package" file each programme's Placements
+          section (below, once you Edit a programme) accepts — grab this before you start filling one in.
+        </p>
+        <button type="button" className="admin-btn admin-btn--ghost admin-btn--sm" onClick={downloadPlacementsTemplate}>
+          ⬇ Download Excel Template
+        </button>
+      </div>
+
       <div className="admin-card">
         <h2 className="admin-card__title">{editing ? 'Edit Program' : 'Add Program'}</h2>
         <p className="admin-field__hint" style={{ background: '#eef6ff', border: '1px solid #bcdcfd', borderRadius: 6, padding: '0.6rem 0.9rem', marginBottom: '1rem' }}>
@@ -642,8 +786,13 @@ export default function ProgramsAdmin() {
             <input id="field-display-order" type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
           </div>
           <div className="admin-field admin-field--full">
-            <label htmlFor="field-about">About</label>
-            <textarea id="field-about" rows={4} value={form.about} onChange={(e) => set('about', e.target.value)} placeholder="Department overview…" />
+            <label htmlFor="field-about">About the Programme</label>
+            <p className="admin-field__hint" style={{ marginTop: 0 }}>
+              For this specific programme's own page. Shown as "About the Programme". Department-wide text
+              ("About the Department") is a separate field, edited on the matching record in{' '}
+              <strong>Admin → Academic Departments → Overview</strong>.
+            </p>
+            <textarea id="field-about" rows={4} value={form.about} onChange={(e) => set('about', e.target.value)} placeholder="Programme overview…" />
           </div>
           <div className="admin-field admin-field--full">
             <label htmlFor="field-highlights-one-per-line">Highlights (one per line)</label>
@@ -762,9 +911,45 @@ export default function ProgramsAdmin() {
           </div>
 
           <div className="admin-field admin-field--full"><hr /><h3>Mind Map</h3></div>
+          <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>
+            Upload one or more Mind Map images — shown as a gallery on the public page — plus, optionally, a PDF version visitors can download.
+          </p>
           <div className="admin-field admin-field--full">
-            <label>Curriculum Mind Map Image</label>
-            <ImageUploader folder="vwu/programs/mindmap" currentUrl={form.mindMapImage} onUploaded={handleMindMapImage} label="Upload Mind Map Image" />
+            <label>Mind Map Images</label>
+            {mindMapImages.length > 0 && (
+              <div className="admin-image-grid" style={{ marginBottom: '0.75rem' }}>
+                {mindMapImages.map((img, mi) => (
+                  <div key={mi} className="admin-image-card">
+                    <img src={img.url} alt="" />
+                    <div className="admin-image-card__actions">
+                      <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveMindMapImage(mi, -1)} disabled={mi === 0} title="Move up">↑</button>
+                      <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveMindMapImage(mi, 1)} disabled={mi === mindMapImages.length - 1} title="Move down">↓</button>
+                      <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeMindMapImage(mi)}>Remove</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            <label className="admin-btn admin-btn--primary" style={{ opacity: mindMapUploading ? 0.5 : 1, display: 'inline-block', cursor: 'pointer' }}>
+              {mindMapUploading ? 'Uploading…' : '+ Add Mind Map Image'}
+              <input
+                type="file"
+                accept="image/*"
+                hidden
+                disabled={mindMapUploading}
+                onChange={(e) => { const f = e.target.files?.[0]; if (f) addMindMapImage(f); e.target.value = ''; }}
+              />
+            </label>
+            {mindMapImages.length === 0 && (
+              <p className="admin-field__hint">No Mind Map images yet — click "Add Mind Map Image" to upload one (add more to build a gallery).</p>
+            )}
+          </div>
+          <div className="admin-field admin-field--full">
+            <label>Mind Map PDF (optional)</label>
+            <FileUploader folder="vwu/programs/mindmap-pdf" currentUrl={form.mindMapPdfUrl} onUploaded={handleMindMapPdf} label="Upload Mind Map PDF" />
+            {form.mindMapPdfUrl && (
+              <button type="button" className="admin-btn admin-btn--ghost admin-btn--sm" style={{ marginTop: '0.5rem' }} onClick={removeMindMapPdf}>Remove PDF</button>
+            )}
           </div>
 
           <div className="admin-field admin-field--full">
@@ -773,6 +958,19 @@ export default function ProgramsAdmin() {
               edited per-programme anymore — it's shared across a department's programmes, so it now lives on the
               matching card in <strong>Admin → Academic Departments</strong> instead.
             </p>
+          </div>
+
+          <div className="admin-field admin-field--full"><hr /><h3>Placements</h3></div>
+          <div className="admin-field admin-field--full">
+            {editing ? (
+              <p className="admin-field__hint">Import from Excel/CSV/Word/PDF in the "Placements" card below, once your changes here are saved.</p>
+            ) : (
+              <p className="admin-field__hint">
+                Save this program first, then reopen it here (Edit) to import Placements — a "Placements" card will
+                appear below with the file upload. You can download the import template from the button at the top
+                of this page any time before that.
+              </p>
+            )}
           </div>
 
           <div className="admin-field admin-field--full"><hr /><h3>News &amp; Events — This Programme</h3></div>
@@ -839,7 +1037,7 @@ export default function ProgramsAdmin() {
           <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>
             Optional. Shown as a "Research &amp; Development (Funded Projects &amp; Patents)" section (and Quick
             Links entry) on this programme's page. Real department R&amp;D pages vary a lot — use whichever of the
-            four fields below fit this department's actual content; only the ones you fill in will show.
+            five fields below fit this department's actual content; only the ones you fill in will show.
           </p>
           <div className="admin-field admin-field--full">
             <label htmlFor="field-rnd-intro">Overview (optional)</label>
@@ -906,6 +1104,16 @@ export default function ProgramsAdmin() {
               <p className="admin-field__hint">No links yet — click "Add Link" to start building this programme's Research &amp; Development list.</p>
             )}
           </div>
+          <div className="admin-field admin-field--full">
+            <label className="admin-field__hint" style={{ display: 'block', marginBottom: '0.5rem' }}>
+              Structured Table (optional — a table with columns you add yourself, where each row also has its own
+              uploaded PDF, e.g. a Patents table where every row links to that patent's own document).
+            </label>
+            <RndTableEditor
+              table={form.rndStructuredTable || { columns: [], rows: [] }}
+              onChange={(t) => set('rndStructuredTable', t)}
+            />
+          </div>
 
           <div className="admin-field admin-field--full"><hr /><h3>Custom Sections</h3></div>
           <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>
@@ -923,16 +1131,19 @@ export default function ProgramsAdmin() {
               onFileRemoved={handleCustomSectionFileRemoved}
               onPhotoUploaded={handleCustomSectionPhotoUploaded}
               onPhotoRemoved={handleCustomSectionPhotoRemoved}
+              onGalleryPhotoUploaded={handleCustomSectionGalleryPhotoUploaded}
+              onGalleryPhotoRemoved={handleCustomSectionGalleryPhotoRemoved}
             />
           </div>
         </div>
         <div className="admin-form-actions">
-          {editing && <button className="admin-btn admin-btn--ghost" onClick={() => { setEditing(null); setForm(EMPTY); }}>Cancel</button>}
+          {editing && <button className="admin-btn admin-btn--ghost" onClick={() => { setEditing(null); setForm(EMPTY); setOriginalForm(null); }}>Cancel</button>}
           <button className="admin-btn admin-btn--primary" onClick={save} disabled={saving}>
             {saving ? 'Saving…' : editing ? 'Update Program' : 'Add Program'}
           </button>
         </div>
       </div>
+      {mindMapCropModal}
 
       {editing && (() => {
         const liveProgram = programs.find((p) => p.id === editing);
@@ -1060,7 +1271,16 @@ function PlacementYearsEditor({ program }: { program: ProgramDoc }) {
         );
         return;
       }
-      setPreviews((p) => ({ ...p, [yi]: result }));
+      // Only an exact whole-row duplicate (every column the same) is
+      // dropped — a repeated name, registration number, company, etc. on
+      // its own is a normal, expected occurrence (e.g. one student with
+      // multiple offers) and is left alone.
+      const { rows: dedupedRows, removed } = dedupePlacementRows(result.rows);
+      const dupWarning = removed > 0
+        ? `Skipped ${removed} exact duplicate row${removed === 1 ? '' : 's'} (every column matched another row already in the file).`
+        : '';
+      const warning = [result.warning, dupWarning].filter(Boolean).join(' ') || undefined;
+      setPreviews((p) => ({ ...p, [yi]: { ...result, rows: dedupedRows, warning } }));
     } catch (e) {
       alert(`Couldn't read that file: ${(e as Error).message}`);
     } finally {
@@ -1108,7 +1328,14 @@ function PlacementYearsEditor({ program }: { program: ProgramDoc }) {
         whichever column looks like "Package"/"Highest Package"/"CTC" show first for that year, then everyone else
         in the order they were imported. Re-importing a year replaces its previous dataset. Scoped to this exact
         programme only — other programmes in the same department manage their own Academic Years independently.
+        A row that's an exact duplicate of another (every column matches) is skipped automatically on import — a
+        single column repeating on its own, like a student's name against two different companies, is fine.
       </p>
+      <div style={{ marginBottom: '1rem' }}>
+        <button type="button" className="admin-btn admin-btn--ghost admin-btn--sm" onClick={downloadPlacementsTemplate}>
+          ⬇ Download Excel Template
+        </button>
+      </div>
 
       <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '1.25rem' }}>
         <input

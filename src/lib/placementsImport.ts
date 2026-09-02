@@ -75,15 +75,74 @@ function expandTableRows(trs: Element[]): string[][] {
   return rows;
 }
 
+// Drops rows that are exact duplicates of an earlier row — every column
+// matching (case/whitespace-insensitive, so "TCS" and "tcs " collapse
+// together same as computePlacementStats' company matching does) — while
+// leaving a *partial* repeat alone (e.g. the same student appearing twice
+// for two different companies, or two students both placed at the same
+// company). Used right after parsing, before a file's rows ever reach the
+// admin preview or get saved.
+export function dedupePlacementRows(rows: string[][]): { rows: string[][]; removed: number } {
+  const seen = new Set<string>();
+  const deduped: string[][] = [];
+  let removed = 0;
+  for (const row of rows) {
+    const key = row.map((c) => (c || '').trim().toLowerCase()).join('\u0001');
+    if (seen.has(key)) { removed++; continue; }
+    seen.add(key);
+    deduped.push(row);
+  }
+  return { rows: deduped, removed };
+}
+
+// Column names chosen to match the auto-detection heuristics in
+// placementRecords.ts: "S.No" (findSerialColumnIndex — hidden from the
+// public table, which numbers rows itself), "Company" and "Package (LPA)"
+// (findPackageColumnIndex/findCompanyColumnIndex, used for the stat tiles
+// and the "10 highest" sort). "Registration Number", "Student Name", and
+// "Industry Type" have no special handling — they just display as-is.
+const PLACEMENT_TEMPLATE_HEADERS = ['S.No', 'Registration Number', 'Student Name', 'Company', 'Industry Type', 'Package (LPA)'];
+
+// Two rows for the same student ("A. Priya") to make the whole-row-only
+// duplicate rule concrete in the template itself, rather than just in
+// admin copy: repeating a name/company/etc. is fine, only an exact
+// duplicate row (every column the same) gets rejected on import.
+const PLACEMENT_TEMPLATE_EXAMPLE_ROWS = [
+  ['1', '21A91A0501', 'A. Priya', 'TCS', 'IT Services', '3.5'],
+  ['2', '21A91A0502', 'B. Swathi', 'Infosys', 'IT Services', '4.2'],
+  ['3', '21A91A0501', 'A. Priya', 'Wipro', 'IT Services', '4.5'],
+];
+
+/** Downloads a blank Placements import template (.xlsx) with the expected
+ *  columns and a couple of example rows — see PlacementYearsEditor's
+ *  "Download Template" button in ProgramsAdmin.tsx. */
+export function downloadPlacementsTemplate() {
+  const ws = XLSX.utils.aoa_to_sheet([PLACEMENT_TEMPLATE_HEADERS, ...PLACEMENT_TEMPLATE_EXAMPLE_ROWS]);
+  ws['!cols'] = PLACEMENT_TEMPLATE_HEADERS.map((h) => ({ wch: Math.max(h.length, 16) }));
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Placements');
+  XLSX.writeFile(wb, 'placement-records-template.xlsx');
+}
+
 export function parsePlacementsBuffer(buf: ArrayBuffer): PlacementImportResult {
   const wb = XLSX.read(buf, { type: 'array' });
   const sheet = wb.Sheets[wb.SheetNames[0]];
   const raw: unknown[][] = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: false, defval: '' });
   if (raw.length === 0) return { columns: [], rows: [] };
 
-  const columns = raw[0].map((c, i) => String(c ?? '').trim() || `Column ${i + 1}`);
+  // Same reasoning as the Word/PDF parsers below: a title/caption row (e.g.
+  // "CSE (2019-2023) Batch Placement Details") often sits above the real
+  // header row in an exported sheet, and — being one long string typed into
+  // a single cell — has at most one non-empty cell, unlike a genuine header
+  // row. Skip any leading rows like that so the first real multi-cell row
+  // becomes the header instead of locking `columns` to generic "Column N"
+  // fallbacks and silently demoting the true header into a data row.
+  const headerIdx = raw.findIndex((row) => row.filter((c) => String(c ?? '').trim() !== '').length > 1);
+  const headerRowIndex = headerIdx === -1 ? 0 : headerIdx;
+
+  const columns = raw[headerRowIndex].map((c, i) => String(c ?? '').trim() || `Column ${i + 1}`);
   const rows = raw
-    .slice(1)
+    .slice(headerRowIndex + 1)
     .map((row) => columns.map((_, i) => String(row[i] ?? '').trim()))
     .filter((row) => row.some((cell) => cell !== ''));
 
@@ -126,16 +185,38 @@ async function parsePlacementsDocx(buf: ArrayBuffer): Promise<PlacementImportRes
   const perTableCounts: number[] = [];
   tableTrs.forEach((trs, tableIdx) => {
     const expanded = tableIdx === 0 ? expandedFirst : expandTableRows(trs);
-    // Only the first table has title rows to skip past; a continuation
-    // table (page 2 onward) starts straight into data — except it may
-    // repeat the header row itself (Word's "repeat header row" setting),
-    // which the headerKey check below filters back out either way.
-    const from = tableIdx === 0 ? startIdx + 1 : 0;
+    // Every table can have its own leading caption line(s) above its real
+    // data ("Shri Vishnu Engineering College for Women(A):: Bhimavaram" /
+    // "Department of Information Technology" / "Placements :: 2020-21") —
+    // not just the first one. Word repeats that block at the top of each
+    // page's table when a long list was built as several separate tables,
+    // so every table gets the same leading-caption skip table 0 already
+    // used (only table 0 additionally treats its first genuine multi-column
+    // row as the header).
+    const ownHeaderIdx = trs.findIndex((tr) => tr.querySelectorAll('th, td').length > 1);
+    const ownStart = ownHeaderIdx === -1 ? 0 : ownHeaderIdx;
+    const from = tableIdx === 0 ? startIdx + 1 : ownStart;
     let kept = 0;
     for (let i = from; i < expanded.length; i++) {
       const cells = toCells(expanded[i]);
       if (!cells.some((c) => c !== '')) continue;
       if (cells.join('|').toLowerCase() === headerKey) continue;
+      // A caption cell spanning several columns (colspan) fills all of them
+      // with the same identical text once expanded — real placement data
+      // never repeats the exact same value across two different columns
+      // (a name is never also a company), so treat that as leftover caption
+      // bleed rather than a genuine row, even when it sits elsewhere in the
+      // table (see expandTableRows above) and slipped past the leading-row
+      // skip because of an odd column laid out next to it (e.g. a real S.No
+      // cell that isn't part of the merge).
+      const seen = new Set<string>();
+      const hasDuplicateCell = cells.some((c) => {
+        if (!c) return false;
+        if (seen.has(c)) return true;
+        seen.add(c);
+        return false;
+      });
+      if (hasDuplicateCell) continue;
       rows.push(cells);
       kept++;
     }

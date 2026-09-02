@@ -1,6 +1,4 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Link } from 'react-router-dom';
-import { Trophy, Star, ClipboardList, Briefcase, TrendingUp, Landmark } from 'lucide-react';
 import { usePageBanners } from '../../hooks/usePageBanners';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
 import './HeroSlider.css';
@@ -75,15 +73,6 @@ function buildStaticSlides(btechCount: string): Slide[] {
     },
   ];
 }
-
-const recognitions = [
-  { icon: Trophy, title: 'Top Engineering College', source: 'India Today Rankings' },
-  { icon: Star, title: 'Best Engineering College', source: 'The Week Rankings' },
-  { icon: ClipboardList, title: 'NBA Accredited', source: 'National Board of Accreditation' },
-  { icon: Briefcase, title: 'NAAC A+ Accredited', source: 'National Assessment and Accreditation Council' },
-  { icon: TrendingUp, title: 'IEI Award for Excellence', source: 'Institution of Engineers India' },
-  { icon: Landmark, title: 'First Private University for Women', source: 'Across the Telugu States' },
-];
 
 const SLIDE_DURATION = 6000;
 
@@ -192,8 +181,15 @@ export default function HeroSlider() {
       )}
       <div className="hero-video-overlay" />
 
+      {/* Centered Brand Mark — two-row "Vishnu Women's / University" overlay */}
+      <div className="hero-brand-mark" aria-hidden="true">
+        <span className="hero-brand-mark-row hero-brand-mark-row--top">Vishnu Women's</span>
+        <span className="hero-brand-mark-divider" />
+        <span className="hero-brand-mark-row hero-brand-mark-row--bottom">University</span>
+      </div>
+
       {/* Slide content layers */}
-      {slides.map((slide, i) => (
+      {slides.some(s => s.image) && slides.map((slide, i) => (
         <div
           key={slide.id}
           className={`slide${i === current ? ' active' : ''}`}
@@ -201,25 +197,6 @@ export default function HeroSlider() {
         >
           <div className="slide-content">
             <div className={`slide-inner${slide.image ? ' slide-inner--with-image' : ''}`}>
-              <div className="slide-text">
-                <span className="slide-tag">{slide.tag}</span>
-                <h1 className="slide-heading">
-                  {slide.heading.split('\n').map((line, j) => (
-                    <span key={j}>{line}<br /></span>
-                  ))}
-                </h1>
-                <p className="slide-desc">{slide.description}</p>
-                <div className="slide-actions">
-                  <Link to={slide.primaryCta.path} className="btn btn-accent btn-lg">
-                    {slide.primaryCta.label}
-                  </Link>
-                  {slide.secondaryCta && (
-                    <Link to={slide.secondaryCta.path} className="btn btn-secondary btn-lg">
-                      {slide.secondaryCta.label}
-                    </Link>
-                  )}
-                </div>
-              </div>
               {slide.image && (
                 <div className="slide-photo-wrap">
                   {visited.has(i) && <img src={slide.image} alt={slide.heading} className="slide-photo" />}
@@ -252,38 +229,42 @@ export default function HeroSlider() {
       </button>
 
       {/* Controls */}
-      <div className="hero-controls">
-        <button className="hero-nav-btn" onClick={prev} aria-label="Previous slide">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </button>
-        <div className="hero-dots" role="tablist" aria-label="Slide navigation">
-          {slides.map((_, i) => (
-            <button
-              key={i}
-              className={`hero-dot${i === current ? ' active' : ''}`}
-              onClick={() => goTo(i)}
-              role="tab"
-              aria-selected={i === current}
-              aria-label={`Go to slide ${i + 1}`}
-            />
-          ))}
+      {slides.some(s => s.image) && slides.length > 1 && (
+        <div className="hero-controls">
+          <button className="hero-nav-btn" onClick={prev} aria-label="Previous slide">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+          <div className="hero-dots" role="tablist" aria-label="Slide navigation">
+            {slides.map((_, i) => (
+              <button
+                key={i}
+                className={`hero-dot${i === current ? ' active' : ''}`}
+                onClick={() => goTo(i)}
+                role="tab"
+                aria-selected={i === current}
+                aria-label={`Go to slide ${i + 1}`}
+              />
+            ))}
+          </div>
+          <button className="hero-nav-btn" onClick={next} aria-label="Next slide">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
         </div>
-        <button className="hero-nav-btn" onClick={next} aria-label="Next slide">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </button>
-      </div>
+      )}
 
       {/* Progress Bar */}
-      <div className="hero-progress" aria-hidden="true">
-        <div
-          className="hero-progress-fill"
-          style={{ width: `${progressWidth}%` }}
-        />
-      </div>
+      {slides.some(s => s.image) && slides.length > 1 && (
+        <div className="hero-progress" aria-hidden="true">
+          <div
+            className="hero-progress-fill"
+            style={{ width: `${progressWidth}%` }}
+          />
+        </div>
+      )}
 
       {/* Scroll Indicator */}
       <div className="scroll-indicator" aria-hidden="true">
@@ -293,25 +274,6 @@ export default function HeroSlider() {
 
 
 
-      {/* Recognition Bar — static row, evenly spaced across the width. */}
-      <div className="hero-recognition" aria-label="Awards and recognitions">
-        <div className="hero-recognition-inner">
-          <div className="hero-recognition-track">
-            {recognitions.map((r, i) => (
-              <div key={r.title} className="recognition-pair">
-                <div className="recognition-item">
-                  <div className="recognition-icon"><r.icon size={16} strokeWidth={2} color="var(--color-primary-dark)" /></div>
-                  <div className="recognition-text">
-                    <strong>{r.title}</strong>
-                    <span>{r.source}</span>
-                  </div>
-                </div>
-                {i < recognitions.length - 1 && <div className="recognition-divider" />}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
     </section>
   );
 }

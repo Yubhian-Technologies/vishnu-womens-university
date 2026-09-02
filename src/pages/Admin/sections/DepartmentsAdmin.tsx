@@ -8,6 +8,7 @@ import { deleteFile, type UploadResult } from '../../../lib/storage';
 import { PROGRAM_ICON_NAMES } from '../../../lib/programIcons';
 import { normalizeLab, type LabItem, type LibrarySection, type LibraryItem, type NewsEventsYear, type ProgramLink, type ProgramDoc } from './ProgramsAdmin';
 import NewsEventsYearsEditor from './NewsEventsYearsEditor';
+import { diffChangedFields } from '../../../lib/formDiff';
 
 // Backs the "Academic Departments" card grid on Academics.tsx — independent
 // of the `programs` collection, so a department's card copy doesn't have to
@@ -40,6 +41,11 @@ export interface DepartmentDoc {
   heroImage?: string;
   storagePath?: string;
   about?: string;
+  // Same shape/purpose as a programme's own (see ProgramsAdmin) — shown
+  // right below "About the Department" on the grouped department page,
+  // filling the space that used to be empty next to the Quick Links sidebar
+  // whenever "About" itself was short.
+  highlights?: string[];
   established?: string;
   accreditation?: string;
   hod?: string;
@@ -83,7 +89,7 @@ export interface DepartmentDoc {
 
 const EMPTY: Omit<DepartmentDoc, 'id'> = {
   title: '', shortCode: '', description: '', icon: 'GraduationCap', order: 0,
-  heroImage: '', storagePath: '', about: '', established: '', accreditation: '',
+  heroImage: '', storagePath: '', about: '', highlights: [], established: '', accreditation: '',
   hod: '', hodImage: '', hodImageStoragePath: '', hodEmail: '', hodMessage: '', hodResearchProfiles: [],
   vision: '', mission: [], coreValues: [], labs: [],
   libraryIntro: '', libraryInCharge: '', librarySections: [],
@@ -134,6 +140,11 @@ export default function DepartmentsAdmin() {
   const { docs: departments, loading } = useOrderedCollection<DepartmentDoc>('departments', 'order');
   const { docs: allPrograms } = useOrderedCollection<ProgramDoc>('programs', 'order');
   const [form, setForm] = useState<Omit<DepartmentDoc, 'id'>>(EMPTY);
+  // Snapshot of `form` taken when "Edit" was clicked (see startEdit) — save()
+  // diffs against this so Update only writes fields actually changed in this
+  // session, instead of blindly overwriting the whole doc with a possibly
+  // stale copy (see lib/formDiff.ts). null while adding a new department.
+  const [originalForm, setOriginalForm] = useState<Omit<DepartmentDoc, 'id'> | null>(null);
   const [editing, setEditing] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [copying, setCopying] = useState(false);
@@ -236,6 +247,9 @@ export default function DepartmentsAdmin() {
   };
   const updateLabName = (li: number, name: string) => {
     setForm((p) => ({ ...p, labs: (p.labs || []).map(normalizeLab).map((l, i) => (i === li ? { ...l, name } : l)) }));
+  };
+  const updateLabDescription = (li: number, description: string) => {
+    setForm((p) => ({ ...p, labs: (p.labs || []).map(normalizeLab).map((l, i) => (i === li ? { ...l, description } : l)) }));
   };
   const moveLab = (li: number, dir: -1 | 1) => {
     setForm((p) => {
@@ -375,16 +389,22 @@ export default function DepartmentsAdmin() {
     try {
       const payload = {
         ...form,
+        highlights: (form.highlights || []).filter(Boolean),
         mission: (form.mission || []).filter(Boolean),
         coreValues: (form.coreValues || []).filter(Boolean),
         labs: labs.filter((l) => l.name),
       };
       if (editing) {
-        await updateDoc(doc(db, 'departments', editing), { ...payload });
+        // Only send fields that actually changed in this editing session —
+        // see originalForm/diffChangedFields above.
+        const changed = originalForm ? diffChangedFields(payload, originalForm) : payload;
+        if (Object.keys(changed).length > 0) {
+          await updateDoc(doc(db, 'departments', editing), changed);
+        }
       } else {
         await addDoc(collection(db, 'departments'), { ...payload, order: form.order || departments.length, createdAt: serverTimestamp() });
       }
-      setForm(EMPTY); setEditing(null);
+      setForm(EMPTY); setEditing(null); setOriginalForm(null);
     } catch (e) {
       alert(`Couldn't save: ${(e as Error).message}`);
     } finally { setSaving(false); }
@@ -392,21 +412,23 @@ export default function DepartmentsAdmin() {
 
   const startEdit = (d: DepartmentDoc) => {
     setEditing(d.id);
-    setForm({
+    const next: Omit<DepartmentDoc, 'id'> = {
       title: d.title, shortCode: d.shortCode, description: d.description || '',
       icon: d.icon || 'GraduationCap', order: d.order,
       heroImage: d.heroImage || '', storagePath: d.storagePath || '',
-      about: d.about || '', established: d.established || '', accreditation: d.accreditation || '',
+      about: d.about || '', highlights: d.highlights || [], established: d.established || '', accreditation: d.accreditation || '',
       hod: d.hod || '', hodImage: d.hodImage || '', hodImageStoragePath: d.hodImageStoragePath || '',
       hodEmail: d.hodEmail || '', hodMessage: d.hodMessage || '', hodResearchProfiles: d.hodResearchProfiles || [],
       vision: d.vision || '', mission: d.mission || [], coreValues: d.coreValues || [],
-      labs: (d.labs || []).map(normalizeLab).map((l) => ({ name: l.name, pdfUrl: l.pdfUrl || '', pdfStoragePath: l.pdfStoragePath || '' })),
+      labs: (d.labs || []).map(normalizeLab).map((l) => ({ name: l.name, description: l.description || '', pdfUrl: l.pdfUrl || '', pdfStoragePath: l.pdfStoragePath || '' })),
       libraryIntro: d.libraryIntro || '', libraryInCharge: d.libraryInCharge || '',
       librarySections: (d.librarySections || []).map((s) => ({ heading: s.heading, items: s.items || [] })),
       programLevels: (d.programLevels || []).map((l) => ({ title: l.title, intro: l.intro || '', rows: l.rows || [] })),
       placementIntro: d.placementIntro || '', placementStats: d.placementStats || [], placementRecruiters: d.placementRecruiters || [],
       newsEventsYears: d.newsEventsYears || [], studentAwardsYears: d.studentAwardsYears || [], othersYears: d.othersYears || [],
-    });
+    };
+    setForm(next);
+    setOriginalForm(next);
   };
 
   const remove = async (id: string) => {
@@ -452,9 +474,12 @@ export default function DepartmentsAdmin() {
 
           <div className="admin-field admin-field--full"><hr /><h3>Department Page — Shared Content</h3>
             <p className="admin-field__hint" style={{ marginTop: '0.25rem' }}>
-              Only used for the grouped departments <strong>AI</strong>, <strong>CSE</strong> and <strong>ECE</strong>,
-              whose <code>/academics/&lt;program&gt;</code> pages show this at the top (above the program toggle),
-              matched to this card by <strong>Short Code</strong>. Leave blank for every other department.
+              Shown on every department's page at <code>/academics/&lt;program&gt;</code> — above the programme
+              toggle for the grouped departments (<strong>AI</strong>, <strong>CSE</strong>, <strong>ECE</strong>),
+              or as that programme's own "About the Department" section for every other (single-programme)
+              department — matched to this card by <strong>Short Code</strong>. Overview specifically feeds
+              "About the Department"; a programme's own "About the Programme" text stays a separate field on that
+              programme itself (Admin → Programs → About the Programme).
             </p>
           </div>
           <div className="admin-field admin-field--full">
@@ -472,6 +497,13 @@ export default function DepartmentsAdmin() {
           <div className="admin-field admin-field--full">
             <label htmlFor="field-about">Overview</label>
             <textarea id="field-about" rows={5} value={form.about} onChange={(e) => set('about', e.target.value)} placeholder="About the department…" />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label htmlFor="field-highlights-one-per-line">Department Highlights (one per line)</label>
+            <p className="admin-field__hint" style={{ marginTop: '-0.25rem', marginBottom: '0.5rem' }}>
+              Shown right below "About the Department" — same layout as a programme's own Highlights.
+            </p>
+            <textarea id="field-highlights-one-per-line" rows={5} value={arrayToLines(form.highlights)} onChange={(e) => set('highlights', linesToArray(e.target.value))} placeholder="NAAC A+ Accredited undergraduate programmes" />
           </div>
 
           <div className="admin-field admin-field--full"><hr /><h3>Department Page — Programme Levels (B.Tech / M.Tech)</h3>
@@ -529,6 +561,7 @@ export default function DepartmentsAdmin() {
             )}
           </div>
 
+          <div className="admin-field admin-field--full"><hr /><h3>Department Page — Vision, Mission &amp; Values</h3></div>
           <div className="admin-field admin-field--full">
             <label htmlFor="field-vision">Vision</label>
             <textarea id="field-vision" rows={3} value={form.vision} onChange={(e) => set('vision', e.target.value)} />
@@ -541,46 +574,57 @@ export default function DepartmentsAdmin() {
             <label htmlFor="field-core-values">Core Values (one per line)</label>
             <textarea id="field-core-values" rows={3} value={arrayToLines(form.coreValues)} onChange={(e) => set('coreValues', linesToArray(e.target.value))} />
           </div>
+          <div className="admin-field admin-field--full"><hr /><h3>Department Page — Laboratories</h3></div>
           <div className="admin-field admin-field--full">
             <label>Laboratories</label>
             <p className="admin-field__hint" style={{ marginTop: 0 }}>
-              Each laboratory has its own name and its own uploaded PDF. On the public page, clicking a laboratory
-              tile opens that lab's PDF directly — a lab with no PDF uploaded yet still shows its tile, just marked
-              as unavailable.
+              Each laboratory has its own name, an optional description (a paragraph, or points — one per line, however
+              you write it), and its own uploaded PDF. On the public page, tapping a laboratory tile opens a dialog
+              with its description and a link to its PDF — a lab with no PDF uploaded yet still shows its tile and
+              dialog, just marked as unavailable there.
             </p>
             {labs.length > 0 && (
               <div className="admin-compact-list" style={{ marginBottom: '0.75rem' }}>
                 {labs.map((lab, li) => (
-                  <div key={li} className="admin-compact-row">
-                    <input
-                      className="admin-compact-row__name"
-                      value={lab.name}
-                      onChange={(e) => updateLabName(li, e.target.value)}
-                      placeholder="Advanced Computing Lab"
-                    />
-                    <div className="admin-compact-row__file">
-                      <FileUploader
-                        compact
-                        folder="vwu/departments/labs"
-                        currentUrl={lab.pdfUrl}
-                        onUploaded={(r) => handleLabPdf(li, r)}
-                        label="Upload PDF"
+                  <div key={li} style={{ padding: '0.4rem 0.6rem', borderBottom: li < labs.length - 1 ? '1px solid #e5e7eb' : 'none' }}>
+                    <div className="admin-compact-row" style={{ padding: 0, border: 'none' }}>
+                      <input
+                        className="admin-compact-row__name"
+                        value={lab.name}
+                        onChange={(e) => updateLabName(li, e.target.value)}
+                        placeholder="Advanced Computing Lab"
                       />
+                      <div className="admin-compact-row__file">
+                        <FileUploader
+                          compact
+                          folder="vwu/departments/labs"
+                          currentUrl={lab.pdfUrl}
+                          onUploaded={(r) => handleLabPdf(li, r)}
+                          label="Upload PDF"
+                        />
+                      </div>
+                      <div className="admin-compact-row__actions">
+                        <button
+                          type="button"
+                          className="admin-btn admin-btn--ghost admin-btn--sm"
+                          onClick={() => removeLabPdf(li)}
+                          disabled={!lab.pdfUrl}
+                          title={lab.pdfUrl ? 'Remove PDF' : 'No PDF uploaded yet'}
+                        >
+                          Remove PDF
+                        </button>
+                        <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveLab(li, -1)} disabled={li === 0} title="Move up">↑</button>
+                        <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveLab(li, 1)} disabled={li === labs.length - 1} title="Move down">↓</button>
+                        <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeLab(li)} title="Remove laboratory">Remove</button>
+                      </div>
                     </div>
-                    <div className="admin-compact-row__actions">
-                      <button
-                        type="button"
-                        className="admin-btn admin-btn--ghost admin-btn--sm"
-                        onClick={() => removeLabPdf(li)}
-                        disabled={!lab.pdfUrl}
-                        title={lab.pdfUrl ? 'Remove PDF' : 'No PDF uploaded yet'}
-                      >
-                        Remove PDF
-                      </button>
-                      <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveLab(li, -1)} disabled={li === 0} title="Move up">↑</button>
-                      <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveLab(li, 1)} disabled={li === labs.length - 1} title="Move down">↓</button>
-                      <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeLab(li)} title="Remove laboratory">Remove</button>
-                    </div>
+                    <textarea
+                      value={lab.description || ''}
+                      onChange={(e) => updateLabDescription(li, e.target.value)}
+                      placeholder="Description (optional) — a paragraph, or one point per line…"
+                      rows={2}
+                      style={{ width: '100%', marginTop: '0.4rem' }}
+                    />
                   </div>
                 ))}
               </div>
@@ -732,7 +776,7 @@ export default function DepartmentsAdmin() {
         </div>
 
         <div className="admin-form-actions">
-          {editing && <button className="admin-btn admin-btn--ghost" onClick={() => { setEditing(null); setForm(EMPTY); }}>Cancel</button>}
+          {editing && <button className="admin-btn admin-btn--ghost" onClick={() => { setEditing(null); setForm(EMPTY); setOriginalForm(null); }}>Cancel</button>}
           <button className="admin-btn admin-btn--primary" onClick={save} disabled={saving}>
             {saving ? 'Saving…' : editing ? 'Update' : 'Add Department'}
           </button>

@@ -1,0 +1,229 @@
+/* ===== Our Recruiters Section ===== */
+
+.recruiters-home-section {
+  position: relative;
+  padding: clamp(3.5rem, 6vw, 5.5rem) 0 clamp(4rem, 7vw, 6rem);
+  background: var(--color-background, #fbfbfd);
+  overflow: hidden;
+}
+
+.recruiters-home-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-6);
+  margin-bottom: clamp(2rem, 4vw, 3rem);
+  flex-wrap: wrap;
+}
+
+.recruiters-header-text {
+  max-width: 680px;
+}
+
+.recruiters-view-all-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  white-space: nowrap;
+  font-weight: 700;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.recruiters-view-all-btn:hover {
+  transform: translateX(4px);
+}
+
+/* Marquee Container (No Gap between rows) */
+.recruiters-marquee-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: 100%;
+  overflow: hidden;
+  padding: 0;
+}
+
+/* ==========================================================================
+   White Rectangular Portal Slits with Shimmer/Pulse Animation on Left & Right
+   ========================================================================== */
+@keyframes slit-aperture-pulse {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scaleY(0.88);
+    box-shadow: 0 0 8px rgba(200, 169, 106, 0.5), 0 0 16px rgba(45, 106, 79, 0.25);
+  }
+  50% {
+    opacity: 1;
+    transform: scaleY(1);
+    box-shadow: 0 0 16px rgba(200, 169, 106, 0.9), 0 0 28px rgba(45, 106, 79, 0.4);
+  }
+}
+
+@keyframes slit-beam-scan {
+  0% {
+    transform: translateY(-120%);
+  }
+  100% {
+    transform: translateY(120%);
+  }
+}
+
+.recruiter-slit {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: clamp(55px, 8vw, 105px);
+  z-index: 25;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+}
+
+.recruiter-slit--left {
+  left: 0;
+  background: linear-gradient(
+    to right,
+    #ffffff 0%,
+    #ffffff 45%,
+    rgba(255, 255, 255, 0.92) 70%,
+    rgba(255, 255, 255, 0.45) 88%,
+    transparent 100%
+  );
+  border-right: 1.5px solid rgba(27, 67, 50, 0.08);
+  box-shadow: 12px 0 24px -4px rgba(0, 0, 0, 0.04);
+}
+
+.recruiter-slit--right {
+  right: 0;
+  background: linear-gradient(
+    to left,
+    #ffffff 0%,
+    #ffffff 45%,
+    rgba(255, 255, 255, 0.92) 70%,
+    rgba(255, 255, 255, 0.45) 88%,
+    transparent 100%
+  );
+  border-left: 1.5px solid rgba(27, 67, 50, 0.08);
+  box-shadow: -12px 0 24px -4px rgba(0, 0, 0, 0.04);
+}
+
+.slit-inner-aperture {
+  width: 4px;
+  height: 75%;
+  background: linear-gradient(to bottom, transparent, var(--color-accent, #c9a84c), transparent);
+  border-radius: 99px;
+  animation: slit-aperture-pulse 2.6s ease-in-out infinite;
+  position: relative;
+  overflow: hidden;
+}
+
+.slit-inner-aperture::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 20%, #ffffff 50%, transparent 80%);
+  animation: slit-beam-scan 2.2s ease-in-out infinite;
+}
+
+.recruiter-slit--left .slit-inner-aperture {
+  margin-left: clamp(10px, 1.8vw, 20px);
+}
+
+.recruiter-slit--right .slit-inner-aperture {
+  margin-left: auto;
+  margin-right: clamp(10px, 1.8vw, 20px);
+}
+
+/* ==========================================================================
+   Row & Logo Cards (Flush 0 Gap Styling)
+   ========================================================================== */
+.recruiters-marquee-row {
+  padding: 0 !important;
+  margin: 0 !important;
+  display: flex !important;
+  border-top: 1px solid rgba(27, 67, 50, 0.05);
+}
+
+.recruiters-marquee-row:last-child {
+  border-bottom: 1px solid rgba(27, 67, 50, 0.05);
+}
+
+/* Logo Badge Card */
+.recruiter-logo-badge {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(135px, 12vw, 175px);
+  height: clamp(62px, 5.5vw, 74px);
+  background: #ffffff;
+  border-right: 1px solid rgba(27, 67, 50, 0.07);
+  border-left: 1px solid rgba(27, 67, 50, 0.07);
+  border-radius: 0px;
+  padding: 0.6rem 1.1rem;
+  box-shadow: none;
+  transition: background 0.2s ease, transform 0.2s ease;
+  user-select: none;
+  cursor: default;
+  flex-shrink: 0;
+}
+
+.recruiter-logo-badge:hover {
+  background: #f4f7f5;
+}
+
+.recruiter-logo-img-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.recruiter-logo-img {
+  max-width: 100%;
+  max-height: 38px;
+  object-fit: contain;
+  filter: grayscale(20%) contrast(105%);
+  transition: filter 0.2s ease, transform 0.2s ease;
+}
+
+.recruiter-logo-badge:hover .recruiter-logo-img {
+  filter: grayscale(0%) contrast(115%);
+  transform: scale(1.06);
+}
+
+.recruiter-logo-fallback {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-primary);
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  max-width: 100%;
+}
+
+.recruiter-logo-name-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 768px) {
+  .recruiters-home-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .recruiters-view-all-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .recruiter-slit {
+    width: 42px;
+  }
+}

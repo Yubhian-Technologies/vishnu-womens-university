@@ -10,7 +10,7 @@ import { parseStructuredTable, parseFlexibleTable } from '../../lib/structuredTa
 import type { PlacementItemDoc } from '../Admin/sections/PlacementItemsAdmin';
 import type { TpoTeamBioDoc } from '../Admin/sections/TpoTeamInfoAdmin';
 import type { PlacementCrtDoc } from '../Admin/sections/PlacementCrtDocsAdmin';
-import PlacementYearAccordion, { BranchOffersBarChart } from './PlacementYearAccordion';
+import PlacementYearAccordion, { BranchOffersBarChart, BRANCH_COLORS } from './PlacementYearAccordion';
 import SmoothCollapse from '../../components/SmoothCollapse/SmoothCollapse';
 import { successStories } from './successStories.data';
 import { industryLiaisonOffices } from './industryLiaisonOffices.data';
@@ -20,7 +20,7 @@ import { usePlacementYears } from './usePlacementYears';
 import PlacementAnnouncementsTicker from './PlacementAnnouncementsTicker';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import BodyBlocks, { parseBodyContent } from '../../components/BodyBlocks/BodyBlocks';
-import PhotoCarousel from '../../components/PhotoCarousel/PhotoCarousel';
+import PhotoCarouselStrip from '../../components/PhotoCarousel/PhotoCarouselStrip';
 import '../detail-layout.css';
 
 // Overrides the body heading only — hero/breadcrumb still show
@@ -129,6 +129,27 @@ const PARTNER_DOMAINS: Record<string, string> = {
 const PARTNER_LOGO_OVERRIDES: Record<string, string> = {
   'IBM': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/IBM_logo.svg/250px-IBM_logo.svg.png',
 };
+
+// Placement Cell's Summary tiles are a single free-text line per batch (e.g.
+// "2022-2026 batch: 1103 placements, highest 59.28 LPA(Google)") — this
+// breaks that one line into three ("2022-2026 batch" / "1103 placements" /
+// "Highest Package: 59.28 LPA(Google)") when it matches the usual shape a
+// batch summary is entered in, so the tile always reads as three distinct
+// facts instead of a wrapped run-on sentence. Any outcome text that doesn't
+// match (a different sub-page's plain achievement bullet, say) renders as-is.
+const OUTCOME_BATCH_SUMMARY_RE = /^(.+?)\s+batch:\s*([\d,]+)\s*placements,\s*highest\s+(.+)$/i;
+function OutcomeTileText({ text }: { text: string }) {
+  const m = text.match(OUTCOME_BATCH_SUMMARY_RE);
+  if (!m) return <>{text}</>;
+  const [, batch, count, highest] = m;
+  return (
+    <>
+      <span style={{ display: 'block', textAlign: 'center' }}>{batch} batch</span>
+      <span style={{ display: 'block', textAlign: 'center' }}>{count} placements</span>
+      Highest Package: {highest}
+    </>
+  );
+}
 
 // Logo only — no company name label beside it (per request). The name still
 // lives in alt text/title for accessibility and hover, just not rendered as
@@ -901,44 +922,31 @@ export default function PlacementDetail() {
       </div>
     </section>
   );
-  // Placement Cell's own combined Summary (batch cards) + Branch-wise
-  // Placement Distribution chart, side by side — replaces both the generic
-  // outcomesSection above and the standalone chart section that used to
-  // follow the (now-removed) Overview text.
+  // Placement Cell's own combined Summary (batch cards) — full width, no
+  // longer paired with the Branch-wise Placement Distribution chart (that
+  // now only appears further down, in the Placements/Year-by-Year section).
+  const outcomeAccentColors = Object.values(BRANCH_COLORS);
   const placementCellSummarySection = showOutcomes && item.slug === 'placement-details' && (
     <section className="section bg-off-white">
       <div className="container">
-        <div className={sidebarChartYear?.branchOffers && sidebarChartYear.branchOffers.length > 0 ? 'detail-grid' : ''}>
-          <div>
-            <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label">Impact</span>
-              <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Summary</h2>
+        <div style={{ marginBottom: 'var(--space-8)' }}>
+          <span className="section-label">Impact</span>
+          <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Summary</h2>
+        </div>
+        {/* Fixed 4-column grid (2 rows of 4 for the usual 8 cards), not
+            auto-fit/minmax — auto-fit would stretch a partial last row's
+            items to fill the leftover space instead of leaving them at the
+            same width as every other row. mobile-stack-grid still collapses
+            this to a single column on small screens. */}
+        <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-4)' }}>
+          {item.outcomes!.map((o, i) => (
+            <div key={o}
+              style={{ position: 'relative', overflow: 'hidden', background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5) var(--space-5) var(--space-5) calc(var(--space-5) + 4px)', minHeight: 110, display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
+              <span style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, background: outcomeAccentColors[i % outcomeAccentColors.length] }} />
+              <Trophy size={20} strokeWidth={1.75} style={{ flexShrink: 0, color: outcomeAccentColors[i % outcomeAccentColors.length] }} />
+              <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6, fontWeight: 700 }}><OutcomeTileText text={o} /></span>
             </div>
-            {/* Fixed 3-column grid, not auto-fit/minmax — with 8 cards the
-                last row only has 2, and auto-fit stretches a partial row's
-                items to fill the leftover space instead of leaving them at
-                the same width as every other row. mobile-stack-grid still
-                collapses this to a single column on small screens. */}
-            <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-4)' }}>
-              {item.outcomes!.map((o) => (
-                <div key={o}
-                  style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', minHeight: 110, display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
-                  <Trophy size={20} strokeWidth={1.75} style={{ flexShrink: 0, color: 'var(--color-accent)' }} />
-                  <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6 }}>{o}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-          {sidebarChartYear?.branchOffers && sidebarChartYear.branchOffers.length > 0 && (
-            <div className="detail-sidebar">
-              <div style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', position: 'sticky', top: '110px' }}>
-                <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-5)' }}>
-                  Branch-wise Placement Distribution
-                </h3>
-                <BranchOffersBarChart data={sidebarChartYear.branchOffers} />
-              </div>
-            </div>
-          )}
+          ))}
         </div>
       </div>
     </section>
@@ -962,11 +970,7 @@ export default function PlacementDetail() {
   // Our Recruiters drops the whole Overview section per request instead —
   // its Key Highlights/About text duplicated the logo grid below, which is
   // the page's actual content — with no full-width-grid replacement.
-  const galleryImages = item.galleryImages || [];
-  // Placement Highlights only skips Overview once photos are actually
-  // uploaded — with none yet, it falls back to the plain Overview text/Key
-  // Highlights sidebar rather than an empty gap where the carousel would go.
-  const skipOverviewSection = (item.slug === 'employability-skills' && !hasBodyOverride && !item.intro && !item.desc) || item.slug === 'our-recruiters' || item.slug === 'internships' || item.slug === 'placement-details' || (item.slug === 'placement-highlights' && galleryImages.length > 0);
+  const skipOverviewSection = (item.slug === 'employability-skills' && !hasBodyOverride && !item.intro && !item.desc) || item.slug === 'our-recruiters' || item.slug === 'internships' || item.slug === 'placement-details';
 
   return (
     <main className="page-wrapper">
@@ -1013,20 +1017,6 @@ export default function PlacementDetail() {
           block in its usual spot below Overview (see further down). */}
       {placementCellSummarySection}
 
-      {/* Placement Highlights' photo carousel — replaces this page's
-          Overview text + Key Highlights sidebar once at least one photo is
-          uploaded (Admin → Placement Sub-pages → Placement Highlights →
-          Photo Carousel). */}
-      {item.slug === 'placement-highlights' && galleryImages.length > 0 && (
-        <section className="section bg-white" style={{ paddingBottom: 'var(--space-6)' }}>
-          {/* Deliberately outside .container — these are wide promotional
-              banners, so they run edge-to-edge of the viewport instead of
-              sitting inside the page's usual ~1400px/padded content column
-              like every other section. */}
-          <PhotoCarousel images={galleryImages} />
-        </section>
-      )}
-
       {/* Content */}
       {!skipOverviewSection && (
       <section className="section bg-white" style={{ paddingBottom: (showOutcomes && item.slug !== 'placement-details') || item.slug === 'employability-skills' || item.slug === 'gsac' || item.slug === 'higher-education' || item.slug === 'placement-highlights' || item.slug === 'tpo-team' || item.slug === 'industry-liaison-offices' ? 'var(--space-6)' : undefined }}>
@@ -1034,8 +1024,10 @@ export default function PlacementDetail() {
           <div className={(item.highlights && item.highlights.length > 0) || item.slug === 'placement-details' ? 'detail-grid' : ''}>
             {/* Main */}
             <div>
-              <span className="section-label">Overview</span>
-              <h2 className="section-title" style={{ fontSize: '1.75rem' }}>{ABOUT_TITLE_OVERRIDES[item.slug] || item.title}</h2>
+              {item.slug !== 'tpo-team' && <span className="section-label">Overview</span>}
+              {item.slug !== 'tpo-team' && (
+                <h2 className="section-title" style={{ fontSize: '1.75rem' }}>{ABOUT_TITLE_OVERRIDES[item.slug] || item.title}</h2>
+              )}
               {hasBodyOverride ? (
                 <div style={{ fontSize: 'var(--text-lg)', color: 'var(--color-text)', lineHeight: 1.75 }}>
                   <BodyBlocks blocks={bodyBlocks} paragraphStyle={{}} />
@@ -1356,6 +1348,16 @@ export default function PlacementDetail() {
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Our Recruiters</h2>
             </div>
             <AllRecruiters logoMap={recruiterLogoMap} />
+          </div>
+        </section>
+      )}
+
+      {/* Photo Carousel — Placement Highlights only. See PhotoCarouselStrip
+          for the free-form-crop/auto-advance behavior. */}
+      {item.slug === 'placement-highlights' && item.notablePeople && item.notablePeople.length > 0 && (
+        <section className="section bg-white" style={{ paddingTop: 'var(--space-6)' }}>
+          <div className="container">
+            <PhotoCarouselStrip cards={item.notablePeople} />
           </div>
         </section>
       )}
