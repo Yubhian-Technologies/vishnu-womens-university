@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams, useLocation, Navigate } from 'react-router-dom';
-import { Check, Microscope, Compass, Target, Sparkles, Mail, ExternalLink, BookOpen, FileText } from 'lucide-react';
+import { Check, Microscope, Compass, Target, Sparkles, Mail, ExternalLink, BookOpen, FileText, ChevronRight, ChevronDown, GraduationCap, Calendar, Award, Users, ArrowRight, BookMarked, Bookmark, Library } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import SmoothCollapse from '../../components/SmoothCollapse/SmoothCollapse';
 import ProgrammeStructure from '../../components/ProgrammeStructure/ProgrammeStructure';
@@ -11,6 +11,8 @@ import DepartmentDetail from './DepartmentDetail';
 import FreshmanSubDepartment from './FreshmanSubDepartment';
 import { SUB_DEPTS } from './FreshmanEngineering';
 import { groupForProgramSlug } from '../../lib/departmentGroups';
+import FacultyCarousel from '../../components/FacultyCarousel/FacultyCarousel';
+import TestimonialMarquee, { type PlacementItem } from '../../components/ui/marquee-01';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { usePageBanner } from '../../hooks/usePageBanner';
 import { useEapcetCode } from '../../hooks/useContentBlocks';
@@ -21,7 +23,8 @@ import LabDialog from '../../components/LabDialog/LabDialog';
 import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import type { FacultyDoc } from './Faculty';
 import { parseFlexibleTable, parseProjectAccordion } from '../../lib/structuredTable';
-import { sortPlacementRows, computePlacementStats, findPackageColumnIndex, findSerialColumnIndex, formatPackageCell } from '../../lib/placementRecords';
+import { sortPlacementRows, computePlacementStats, findPackageColumnIndex, formatPackageCell } from '../../lib/placementRecords';
+import { sortInternshipRows, computeInternshipStats, findStipendColumnIndex, formatStipendCell } from '../../lib/internshipRecords';
 import { hasCustomSectionContent, toQuickLinkItems } from '../../lib/customSections';
 import CustomSectionsRenderer from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import SEO from '../../components/SEO/SEO';
@@ -53,13 +56,10 @@ function SingleProgramDetail() {
   const { slug } = useParams<{ slug: string }>();
   const location = useLocation();
   const [outcomeTab, setOutcomeTab] = useState<string | null>(null);
-  // Which Academic Year's placement records are shown — falls back to this
-  // programme's first available year (see placementYears below).
   const [placementYear, setPlacementYear] = useState<string | null>(null);
-  // How many rows of the Placement Records table are visible at once —
-  // 'all' shows every row, otherwise a fixed page size (DataTables-style
-  // "Show N entries" control, matching the reference design).
-  const [placementPageSize, setPlacementPageSize] = useState<number | 'all'>(10);
+  // Which Academic Year's internship records are shown — same pattern as
+  // the Placements pair above.
+  const [internshipYear, setInternshipYear] = useState<string | null>(null);
   const [activeLab, setActiveLab] = useState<LabItem | null>(null);
   const [openRndProjects, setOpenRndProjects] = useState<Set<string>>(new Set());
   const toggleRndProject = (key: string) => {
@@ -251,31 +251,83 @@ function SingleProgramDetail() {
   // an imported raw rupee value like "45,00,000") — same column detection
   // computePlacementStats already uses for the stat tiles.
   const placementPkgIdx = findPackageColumnIndex(placementColumns);
-  // Hides an imported S.No column — the table already numbers rows itself
-  // (see the S.No <th>/<td> below), so showing both duplicated the column.
-  const placementSnoIdx = findSerialColumnIndex(placementColumns);
-  const visiblePlacementColumnIndices = placementColumns.map((_, i) => i).filter((i) => i !== placementSnoIdx);
-  // Computed live from the active year's raw rows — every tile below reads
-  // straight from this, nothing here is admin-entered.
   const placementYearStats = activePlacementYear ? computePlacementStats(placementColumns, activePlacementYear.rows || []) : null;
-  const visiblePlacementRows = placementPageSize === 'all' ? placementRows : placementRows.slice(0, placementPageSize);
+
+  const placementNameIdx = placementColumns.findIndex((c) => /name|student|candidate/i.test(c));
+  const placementCompIdx = placementColumns.findIndex((c) => /company|organization|employer|recruiter/i.test(c));
+  const placementMarqueeItems: PlacementItem[] = placementRows.map((row) => {
+    const rawName = placementNameIdx >= 0 ? row.cells[placementNameIdx] : (row.cells[1] || row.cells[0]);
+    const rawComp = placementCompIdx >= 0 ? row.cells[placementCompIdx] : (row.cells[2] || 'Leading Recruiter');
+    const rawPkg = placementPkgIdx >= 0 ? formatPackageCell(row.cells[placementPkgIdx] ?? '') : (row.cells[3] || '');
+    return {
+      name: rawName?.trim() || 'Student Scholar',
+      company: rawComp?.trim() || 'Top Corporation',
+      package: rawPkg ? (rawPkg.toLowerCase().includes('lpa') ? rawPkg : `${rawPkg} LPA`) : 'High Impact CTC',
+    };
+  });
+  // Individual student Internship Records — same shape/pattern as the
+  // Placement Records above (see InternshipYearsEditor in ProgramsAdmin.tsx),
+  // just for internships instead of placements.
+  const internshipYears = program.internshipYears || [];
+  const activeInternshipYear = internshipYears.find((y) => y.year === internshipYear) ?? internshipYears[0];
+  const internshipColumns = activeInternshipYear?.columns || [];
+  const internshipRows = internshipColumns.length > 0 && activeInternshipYear
+    ? sortInternshipRows(internshipColumns, activeInternshipYear.rows || [])
+    : [];
+  const internshipStipendIdx = findStipendColumnIndex(internshipColumns);
+  const internshipYearStats = activeInternshipYear ? computeInternshipStats(internshipColumns, activeInternshipYear.rows || []) : null;
+
+  const internshipNameIdx = internshipColumns.findIndex((c) => /name|student|candidate/i.test(c));
+  const internshipCompIdx = internshipColumns.findIndex((c) => /company|organization|employer|recruiter/i.test(c));
+  const internshipMarqueeItems: PlacementItem[] = internshipRows.map((row) => {
+    const rawName = internshipNameIdx >= 0 ? row.cells[internshipNameIdx] : (row.cells[1] || row.cells[0]);
+    const rawComp = internshipCompIdx >= 0 ? row.cells[internshipCompIdx] : (row.cells[2] || 'Leading Organization');
+    const rawStipend = internshipStipendIdx >= 0 ? formatStipendCell(row.cells[internshipStipendIdx] ?? '') : (row.cells[3] || '');
+    return {
+      name: rawName?.trim() || 'Student Scholar',
+      company: rawComp?.trim() || 'Top Organization',
+      package: rawStipend ? `₹${rawStipend}` : 'Paid Internship',
+    };
+  });
   const visibleCustomSections = (program.customSections || []).filter(hasCustomSectionContent);
 
-  const quickLinks = [
-    { id: 'about', label: 'About the Department' },
-    hasVisionMission && { id: 'vision-mission', label: 'Vision, Mission & Values' },
+  // "About the Department" and "About the Programme" are two separate
+  // pieces of content, same as on the grouped CSE/AI/ECE department page —
+  // department-wide text lives on the matching Academic Departments record
+  // (dept.about, edited at Admin → Academic Departments → Overview), while
+  // program.about (Admin → Programs → About) is specific to this one
+  // programme. Each only renders once an admin has actually filled it in.
+  const hasDeptAbout = !!dept?.about;
+  const hasProgrammeAbout = !!program.about;
+  const hasProgrammeHighlights = !!(program.highlights && program.highlights.length > 0);
+  const hasAboutSection = hasDeptAbout || hasProgrammeAbout || hasProgrammeHighlights;
+  // "Choose a Programme" — same collapsible group DepartmentDetail.tsx uses
+  // for its grouped departments, replicated here purely for a consistent
+  // sidebar shape across every department page; a standalone programme has
+  // nothing to actually switch between, so this never renders the toggle
+  // row DepartmentDetail.tsx shows above its own version of this group.
+  const programmeLinks = [
+    hasProgrammeAbout && { id: 'programme-about', label: 'About the Programme' },
+    hasProgrammeHighlights && { id: 'highlights', label: 'Programme Highlights' },
     hasOutcomeStatements && { id: 'peos-pos-psos', label: outcomeHeading },
-    hasHod && { id: 'hod', label: 'About HOD' },
-    faculty.length > 0 && { id: 'faculty', label: 'Faculty' },
     hasMindMap && { id: 'mindmap', label: 'Mind Map' },
     hasCurriculum && { id: 'curriculum', label: 'Curriculum' },
+  ].filter(Boolean) as { id: string; label: string }[];
+
+  const quickLinks = [
+    hasDeptAbout && { id: 'about', label: 'About the Department' },
+    hasVisionMission && { id: 'vision-mission', label: 'Vision, Mission & Values' },
+    hasHod && { id: 'hod', label: 'About HOD' },
+    faculty.length > 0 && { id: 'faculty', label: 'Faculty' },
+    { id: 'program-toggle', label: 'Choose a Programme', children: programmeLinks },
     hasLabs && { id: 'labs', label: 'Laboratories' },
     hasLibrary && { id: 'library', label: 'Department Library' },
     hasRnd && { id: 'rnd', label: 'Research & Development (Funded Projects & Patents)' },
     placementYears.length > 0 && { id: 'placements', label: 'Placements' },
+    internshipYears.length > 0 && { id: 'internships', label: 'Internships' },
     hasNewsletter && { id: 'newsletter', label: 'Newsletter' },
-    hasDeptNews && { id: 'news', label: 'News & Events' },
     hasNewsEventsYears && { id: 'news-events', label: 'News & Events' },
+    hasDeptNews && { id: 'news', label: 'News & Events' },
     ...toQuickLinkItems(visibleCustomSections),
   ].filter(Boolean) as { id: string; label: string; children?: { id: string; label: string }[] }[];
 
@@ -337,189 +389,333 @@ function SingleProgramDetail() {
         </div>
       </section>
 
-      {/* Stats bar */}
-      <section style={{ background: 'var(--color-primary)', padding: 'var(--space-5) 0' }}>
-        <div className="container">
-          <div style={{ display: 'flex', flexWrap: 'nowrap', gap: 'var(--space-12)', overflowX: 'auto', paddingBottom: 4, scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.3) transparent' }}>
-            {[
-              ...(program.intake ? [{ label: 'Annual Intake', value: `${program.intake} Seats` }] : []),
-              ...(program.established ? [{ label: 'Established', value: program.established }] : []),
-              ...(program.accreditation ? [{ label: 'Accreditation', value: program.accreditation }] : []),
-              ...(shared.hod ? [{ label: 'Head of Department', value: shared.hod }] : []),
-            ].map((s) => (
-              <div key={s.label} style={{ textAlign: 'center', flexShrink: 0 }}>
-                {s.label === 'Head of Department' && hasHod ? (
-                  <a href="#hod" style={{ fontFamily: 'var(--font-serif)', fontSize: '1.15rem', fontWeight: 900, color: 'var(--color-accent)', whiteSpace: 'nowrap', textDecoration: 'underline', textUnderlineOffset: 3 }}>{s.value}</a>
-                ) : (
-                  <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.15rem', fontWeight: 900, color: 'var(--color-accent)', whiteSpace: 'nowrap' }}>{s.value}</div>
-                )}
-                <div style={{ fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.65)', fontFamily: 'var(--font-sans)', marginTop: 2, textTransform: 'uppercase', letterSpacing: '0.07em', whiteSpace: 'nowrap' }}>{s.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* Key Facts Grid */}
+      {(program.intake || program.established || program.accreditation || shared.hod) && (
+        <section className="dept-facts-section" aria-label={`${program.name} key facts`}>
+          <div className="container">
+            <div className="dept-facts-grid cols-4">
+              {shared.hod && (
+                <div className="dept-fact-card is-hod-card">
+                  <div className="dept-fact-header">
+                    <div className="dept-fact-icon-badge">
+                      <GraduationCap size={14} strokeWidth={2.4} />
+                    </div>
+                    <span className="dept-fact-col-title">Head of Department</span>
+                  </div>
+                  <div className="dept-fact-items-window">
+                    <div className="dept-fact-static-list">
+                      {hasHod ? (
+                        <a href="#hod" className="dept-fact-chip-link" aria-label={`View ${shared.hod} details`}>
+                          <div className="dept-fact-chip-entry">
+                            <span className="dept-fact-chip-sub">Professor & HOD</span>
+                            <span className="dept-fact-chip-val">{shared.hod}</span>
+                          </div>
+                        </a>
+                      ) : (
+                        <div className="dept-fact-chip-entry">
+                          <span className="dept-fact-chip-sub">Professor & HOD</span>
+                          <span className="dept-fact-chip-val">{shared.hod}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
 
-      {/* About + Highlights */}
-      <section id="about" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
+              {program.established && (
+                <div className="dept-fact-card">
+                  <div className="dept-fact-header">
+                    <div className="dept-fact-icon-badge">
+                      <Calendar size={14} strokeWidth={2.4} />
+                    </div>
+                    <span className="dept-fact-col-title">Established</span>
+                  </div>
+                  <div className="dept-fact-items-window">
+                    <div className="dept-fact-static-list">
+                      <div className="dept-fact-chip-entry">
+                        <span className="dept-fact-chip-sub">Programme Established</span>
+                        <span className="dept-fact-chip-val">{program.established}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {program.accreditation && (
+                <div className="dept-fact-card">
+                  <div className="dept-fact-header">
+                    <div className="dept-fact-icon-badge">
+                      <Award size={14} strokeWidth={2.4} />
+                    </div>
+                    <span className="dept-fact-col-title">Accreditations</span>
+                  </div>
+                  <div className="dept-fact-items-window">
+                    <div className="dept-fact-static-list">
+                      <div className="dept-fact-chip-entry">
+                        <span className="dept-fact-chip-sub">Accreditation Status</span>
+                        <span className="dept-fact-chip-val">{program.accreditation}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {program.intake && (
+                <div className="dept-fact-card">
+                  <div className="dept-fact-header">
+                    <div className="dept-fact-icon-badge">
+                      <Users size={14} strokeWidth={2.4} />
+                    </div>
+                    <span className="dept-fact-col-title">Annual Intake</span>
+                  </div>
+                  <div className="dept-fact-items-window">
+                    <div className="dept-fact-static-list">
+                      <div className="dept-fact-chip-entry">
+                        <span className="dept-fact-chip-sub">Approved Seats</span>
+                        <span className="dept-fact-chip-val">{program.intake} Seats</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Mobile Jump Bar */}
+      {quickLinks.length > 1 && (
+        <nav className="dept-mobile-jump-bar-root" aria-label="Section Quick Jump">
+          <div className="container">
+            <div className="dept-mobile-jump-bar" role="navigation">
+              <span className="dept-mobile-jump-label">
+                <Compass size={13} strokeWidth={2.4} />
+                <span>Jump to:</span>
+              </span>
+              {quickLinks.map((l) => (
+                <a
+                  key={l.id}
+                  href={`#${l.id}`}
+                  className="dept-mobile-jump-chip"
+                >
+                  {l.label}
+                </a>
+              ))}
+            </div>
+          </div>
+        </nav>
+      )}
+
+      {/* About the Department + About the Programme + Highlights */}
+      {hasAboutSection && (
+      <section id="about" className="section bg-white dept-about-section" style={{ scrollMarginTop: NAV_OFFSET }}>
         <div className="container">
           <div className={hasSidebarContent ? 'detail-grid' : ''}>
             {/* Main content */}
-            <div>
-              <div>
-                <span className="section-label">About the Department</span>
-                <h2 className="section-title">{deptTitle || program.shortName || program.name}</h2>
-                <p style={{ color: 'var(--color-text-light)', lineHeight: 1.85, fontSize: 'var(--text-base)', marginBottom: 'var(--space-6)', whiteSpace: 'pre-line' }}>
-                  {program.about}
-                </p>
-              </div>
+            <div className="dept-about-main">
+              {hasDeptAbout && (
+                <>
+                  <div className="dept-about-header">
+                    <span className="section-label dept-section-label">Department Overview</span>
+                    <h2 className="section-title">{deptTitle || program.shortName || program.name}</h2>
+                  </div>
+
+                  <div className="dept-about-card">
+                    <p className="dept-about-lead-text">
+                      {dept?.about}
+                    </p>
+                  </div>
+                </>
+              )}
+
+              {hasProgrammeAbout && (
+                <div id="programme-about" style={{ marginTop: hasDeptAbout ? 'var(--space-8)' : 0, scrollMarginTop: NAV_OFFSET }}>
+                  {!hasDeptAbout && (
+                    <div className="dept-about-header">
+                      <span className="section-label dept-section-label">About the Programme</span>
+                      <h2 className="section-title">{deptTitle || program.shortName || program.name}</h2>
+                    </div>
+                  )}
+                  {hasDeptAbout && <span className="section-label dept-section-label">About the Programme</span>}
+                  <div className="dept-about-card">
+                    <p className="dept-about-lead-text">
+                      {program.about}
+                    </p>
+                  </div>
+                </div>
+              )}
 
               {/* Programme Highlights */}
               {program.highlights && program.highlights.length > 0 && (
-                <div style={{ marginTop: 'var(--space-8)' }}>
-                  <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.35rem', color: 'var(--color-primary)', marginBottom: 'var(--space-5)', paddingBottom: 'var(--space-3)', borderBottom: '2px solid var(--color-accent)' }}>
-                    Programme Highlights
-                  </h3>
-                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: 'var(--space-3)' }}>
-                    {program.highlights.map((h) => (
-                      <li key={h} style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start', color: 'var(--color-text)', fontSize: 'var(--text-sm)', lineHeight: 1.6 }}>
-                        <Check size={16} strokeWidth={2.5} style={{ color: 'var(--color-accent)', flexShrink: 0, marginTop: 2 }} />
-                        {h}
-                      </li>
+                <div id="highlights" style={{ marginTop: (hasDeptAbout || hasProgrammeAbout) ? 'var(--space-8)' : 0, scrollMarginTop: NAV_OFFSET }}>
+                  <div style={{ marginBottom: 'var(--space-5)' }}>
+                    <span className="section-label dept-section-label">Key Strengths</span>
+                    <h3 className="section-title" style={{ fontSize: '1.4rem' }}>
+                      Programme Highlights
+                    </h3>
+                  </div>
+                  <div className="dept-highlights-grid">
+                    {program.highlights.map((h, i) => (
+                      <div key={i} className="dept-highlight-card">
+                        <div className="dept-highlight-icon-wrap">
+                          <Check size={14} strokeWidth={3} />
+                        </div>
+                        <span className="dept-highlight-text">{h.includes(':') ? <><strong>{h.slice(0, h.indexOf(':') + 1)}</strong>{h.slice(h.indexOf(':') + 1)}</> : h}</span>
+                      </div>
                     ))}
-                  </ul>
+                  </div>
                 </div>
               )}
             </div>
 
             {/* Sidebar */}
             {hasSidebarContent && (
-            <div className="detail-sidebar">
-              <div style={{ position: 'sticky', top: 'calc(var(--topbar-height) + var(--header-height) + 1.5rem)', display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
-                {/* Quick Links */}
-                {quickLinks.length > 1 && (
-                  <div style={{ background: 'var(--color-primary)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)' }}>
-                    <h4 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 800, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 'var(--space-4)', paddingBottom: 'var(--space-3)', borderBottom: '1px solid rgba(255,255,255,0.15)' }}>
-                      Quick Links
-                    </h4>
-                    <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
-                      {quickLinks.map((l) => {
-                        const hasKids = !!l.children?.length;
-                        const isOpen = !collapsedQuickLinks.has(l.id);
-                        return (
-                          <li key={l.id}>
-                            {hasKids ? (
-                              <button
-                                type="button"
-                                onClick={() => toggleQuickLink(l.id)}
-                                aria-expanded={isOpen}
-                                style={{
-                                  display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%',
-                                  background: 'none', border: 'none', padding: 'var(--space-2) 0', color: 'rgba(255,255,255,0.85)',
-                                  fontSize: 'var(--text-sm)', fontWeight: 600, fontFamily: 'inherit', textAlign: 'left', cursor: 'pointer',
-                                  borderBottom: '1px solid rgba(255,255,255,0.08)',
-                                }}
-                              >
-                                {l.label}
-                                <svg
-                                  width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true"
-                                  style={{ flexShrink: 0, marginLeft: 'var(--space-2)', opacity: 0.75, transition: 'transform var(--transition-base)', transform: isOpen ? 'rotate(180deg)' : 'none' }}
-                                >
-                                  <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                </svg>
-                              </button>
-                            ) : (
-                              <a href={`#${l.id}`} style={{ display: 'block', padding: 'var(--space-2) 0', color: 'rgba(255,255,255,0.85)', fontSize: 'var(--text-sm)', fontWeight: 600, textDecoration: 'none', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-                                {l.label}
-                              </a>
-                            )}
-                            {hasKids && (
-                              <SmoothCollapse open={isOpen}>
-                                <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
-                                  {l.children!.map((c) => (
-                                    <li key={c.id}>
-                                      <a href={`#${c.id}`} style={{ display: 'block', padding: 'var(--space-2) 0 var(--space-2) var(--space-4)', color: 'rgba(255,255,255,0.7)', fontSize: 'var(--text-sm)', fontWeight: 600, textDecoration: 'none', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-                                        {c.label}
-                                      </a>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </SmoothCollapse>
-                            )}
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  </div>
-                )}
+              <aside className="detail-sidebar" aria-label="Page Navigation Sidebar">
+                <div style={{ position: 'sticky', top: 'calc(var(--topbar-height) + var(--header-height) + 1.5rem)', display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
+                  {/* Quick Links */}
+                  {quickLinks.length > 1 && (
+                    <nav className="dept-quick-nav-card" aria-label="Quick Links">
+                      <div className="dept-quick-nav-header">
+                        <div className="dept-quick-nav-icon">
+                          <Compass size={15} strokeWidth={2.4} />
+                        </div>
+                        <div className="dept-quick-nav-title-wrap">
+                          <h4 className="dept-quick-nav-title">Quick Navigation</h4>
+                          <span className="dept-quick-nav-subtitle">{quickLinks.length} Sections</span>
+                        </div>
+                      </div>
 
-                {/* Career Outcomes */}
-                {program.outcomes && program.outcomes.length > 0 && (
-                  <div style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)' }}>
-                    <h4 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 800, color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 'var(--space-4)', paddingBottom: 'var(--space-3)', borderBottom: '2px solid var(--color-accent)' }}>
-                      Career Outcomes
-                    </h4>
-                    <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-                      {program.outcomes.map((o) => (
-                        <li key={o} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', padding: 'var(--space-2) 0', borderBottom: '1px solid var(--color-light-gray)', display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                          <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--color-accent)', flexShrink: 0, display: 'inline-block' }} />
-                          {o}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-            </div>
+                      <ul className="dept-quick-nav-list" role="list">
+                        {quickLinks.map((l) => {
+                          const hasKids = !!l.children?.length;
+                          const isOpen = !collapsedQuickLinks.has(l.id);
+                          return (
+                            <li key={l.id} className="dept-quick-nav-item">
+                              {hasKids ? (
+                                <button
+                                  type="button"
+                                  onClick={() => toggleQuickLink(l.id)}
+                                  aria-expanded={isOpen}
+                                  className="dept-quick-nav-toggle-btn"
+                                >
+                                  <span className="dept-quick-nav-text">{l.label}</span>
+                                  <ChevronDown
+                                    size={12}
+                                    strokeWidth={2.4}
+                                    className={`dept-quick-nav-chevron${isOpen ? ' is-open' : ''}`}
+                                    aria-hidden="true"
+                                  />
+                                </button>
+                              ) : (
+                                <a href={`#${l.id}`} className="dept-quick-nav-link">
+                                  <span className="dept-quick-nav-text">{l.label}</span>
+                                  <span className="dept-btn-arrow-circle">
+                                    <ChevronRight size={13} strokeWidth={2.4} className="dept-quick-nav-arrow" aria-hidden="true" />
+                                  </span>
+                                </a>
+                              )}
+                              {hasKids && (
+                                <SmoothCollapse open={isOpen}>
+                                  <ul className="dept-quick-sublinks-list" role="list">
+                                    {l.children!.map((c) => (
+                                      <li key={c.id}>
+                                        <a href={`#${c.id}`} className="dept-quick-sublink">
+                                          <span className="dept-btn-arrow-circle mini">
+                                            <ChevronRight size={10} strokeWidth={2.8} className="dept-quick-sublink-bullet" />
+                                          </span>
+                                          <span>{c.label}</span>
+                                        </a>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </SmoothCollapse>
+                              )}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </nav>
+                  )}
+
+                  {/* Career Outcomes */}
+                  {program.outcomes && program.outcomes.length > 0 && (
+                    <div style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)' }}>
+                      <h4 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 800, color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 'var(--space-4)', paddingBottom: 'var(--space-3)', borderBottom: '2px solid var(--color-accent)' }}>
+                        Career Outcomes
+                      </h4>
+                      <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                        {program.outcomes.map((o) => (
+                          <li key={o} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', padding: 'var(--space-2) 0', borderBottom: '1px solid var(--color-light-gray)', display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                            <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--color-accent)', flexShrink: 0, display: 'inline-block' }} />
+                            {o}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              </aside>
             )}
           </div>
         </div>
       </section>
+      )}
 
-      {/* Vision, Mission & Values */}
+      {/* Vision, Mission & Values (Italian-Inspired Sleek Showcase) */}
       {hasVisionMission && (
         <section id="vision-mission" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
           <div className="container">
             <div style={{ marginBottom: 'var(--space-10)' }}>
-              <span className="section-label">Our Foundation</span>
+              <span className="section-label dept-section-label">Our Guiding Pillars</span>
               <h2 className="section-title">Vision, Mission &amp; Values</h2>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--space-6)' }}>
+            <div className="dept-vm-grid">
               {shared.vision && (
-                <div style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderTop: '4px solid var(--color-accent)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-3)' }}>
-                    <Compass size={20} strokeWidth={1.75} style={{ color: 'var(--color-accent)' }} />
-                    <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 800, color: 'var(--color-primary)' }}>Vision</h3>
+                <div className="dept-vm-card">
+                  <div className="dept-vm-card-top">
+                    <span className="dept-vm-num-badge">01 · VISION</span>
+                    <div className="dept-vm-icon-badge">
+                      <Compass size={20} strokeWidth={2.2} />
+                    </div>
                   </div>
-                  <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.75 }}>{shared.vision}</p>
+                  <h3 className="dept-vm-title">Programme Vision</h3>
+                  <p className="dept-vm-body-text">{shared.vision}</p>
                 </div>
               )}
+
               {shared.mission.length > 0 && (
-                <div style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderTop: '4px solid var(--color-accent)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-3)' }}>
-                    <Target size={20} strokeWidth={1.75} style={{ color: 'var(--color-accent)' }} />
-                    <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 800, color: 'var(--color-primary)' }}>Mission</h3>
+                <div className="dept-vm-card">
+                  <div className="dept-vm-card-top">
+                    <span className="dept-vm-num-badge">02 · MISSION</span>
+                    <div className="dept-vm-icon-badge">
+                      <Target size={20} strokeWidth={2.2} />
+                    </div>
                   </div>
-                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-                    {shared.mission.map((m) => (
-                      <li key={m} style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'flex-start', fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6 }}>
-                        <Check size={14} strokeWidth={2.5} style={{ color: 'var(--color-accent)', flexShrink: 0, marginTop: 3 }} />
-                        {m}
+                  <h3 className="dept-vm-title">Mission Statements</h3>
+                  <ul className="dept-vm-mission-list">
+                    {shared.mission.map((m, mi) => (
+                      <li key={mi} className="dept-vm-mission-item">
+                        <span className="dept-vm-bullet-circle">
+                          <Check size={12} strokeWidth={3} />
+                        </span>
+                        <span>{m}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
               )}
+
               {shared.coreValues.length > 0 && (
-                <div style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderTop: '4px solid var(--color-accent)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-3)' }}>
-                    <Sparkles size={20} strokeWidth={1.75} style={{ color: 'var(--color-accent)' }} />
-                    <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 800, color: 'var(--color-primary)' }}>Core Values</h3>
+                <div className="dept-values-card">
+                  <div className="dept-values-header">
+                    <Sparkles size={22} strokeWidth={2} style={{ color: 'var(--color-accent)' }} />
+                    <h3 className="dept-values-title">Institutional Core Values</h3>
                   </div>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+                  <div className="dept-values-chips-wrap">
                     {shared.coreValues.map((v) => (
-                      <span key={v} style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--color-primary)', background: 'var(--color-off-white)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-full)', padding: '0.35rem 0.9rem' }}>
-                        {v}
+                      <span key={v} className="dept-value-pill">
+                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-block' }} />
+                        <span>{v}</span>
                       </span>
                     ))}
                   </div>
@@ -530,19 +726,26 @@ function SingleProgramDetail() {
         </section>
       )}
 
-      {/* PEOs, POs & PSOs */}
+      {/* PEOs, POs & PSOs (Outcome-Based Education Showcase) */}
       {hasOutcomeStatements && (
         <section id="peos-pos-psos" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
           <div className="container">
             <div style={{ marginBottom: 'var(--space-10)' }}>
-              <span className="section-label">Outcome-Based Education</span>
+              <span className="section-label dept-section-label">Outcome-Based Education</span>
               <h2 className="section-title">{outcomeHeading}</h2>
-              <p className="section-desc">The programme&apos;s educational objectives and outcomes, aligned to national accreditation frameworks.</p>
+              <p className="section-desc" style={{ margin: '0.5rem 0 0 0' }}>
+                Structured educational objectives and measurable competencies defined in accordance with NBA & Washington Accord frameworks.
+              </p>
             </div>
-            <div className="section-tabs">
+            <div className="section-tabs" role="tablist" aria-label={outcomeHeading}>
               {outcomeGroups.map((g) => (
                 <button
                   key={g.key}
+                  id={`outcome-tab-${g.key}`}
+                  role="tab"
+                  aria-selected={activeOutcome?.key === g.key}
+                  aria-controls={`outcome-panel-${g.key}`}
+                  tabIndex={activeOutcome?.key === g.key ? 0 : -1}
                   onClick={() => setOutcomeTab(g.key)}
                   className={`section-tab-btn${activeOutcome?.key === g.key ? ' active' : ''}`}
                 >
@@ -551,135 +754,114 @@ function SingleProgramDetail() {
               ))}
             </div>
             {activeOutcome && (
-              <div style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)' }}>
-                <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 800, color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 'var(--space-4)', paddingBottom: 'var(--space-3)', borderBottom: '2px solid var(--color-accent)' }}>
-                  {activeOutcome.title}
-                </h3>
-                <ol style={{ padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', listStylePosition: 'inside' }}>
+              <div
+                id={`outcome-panel-${activeOutcome.key}`}
+                role="tabpanel"
+                aria-labelledby={`outcome-tab-${activeOutcome.key}`}
+                tabIndex={0}
+                className="dept-outcomes-container"
+              >
+                <div className="dept-outcomes-header-bar">
+                  <h3 className="dept-outcomes-header-title">
+                    {activeOutcome.title}
+                  </h3>
+                  <span style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                    {activeOutcome.items!.length} Statements Defined
+                  </span>
+                </div>
+                <ul className="dept-outcomes-list">
                   {activeOutcome.items!.map((item, i) => (
-                    <li key={item} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.65 }}>
-                      <strong style={{ color: 'var(--color-accent)' }}>{activeOutcome.key.slice(0, -1).toUpperCase()}{i + 1}:</strong> {item}
+                    <li key={item} className="dept-outcome-row">
+                      <span className="dept-outcome-code-badge">
+                        {activeOutcome.key.slice(0, -1).toUpperCase()}{i + 1}
+                      </span>
+                      <p className="dept-outcome-desc">{item}</p>
                     </li>
                   ))}
-                </ol>
+                </ul>
               </div>
             )}
           </div>
         </section>
       )}
 
-      {/* About HOD */}
+      {/* About HOD (Executive Italian Editorial Layout) */}
       {hasHod && (
-        <section id="hod" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
+        <section id="hod" className="dept-hod-section" style={{ scrollMarginTop: NAV_OFFSET }}>
           <div className="container">
             <div style={{ marginBottom: 'var(--space-10)' }}>
-              <span className="section-label">Leadership</span>
-              <h2 className="section-title">About HOD</h2>
+              <span className="section-label dept-section-label">Academic Leadership</span>
+              <h2 className="section-title">Head of Department</h2>
             </div>
-            <div style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
-              <div style={{ display: 'flex', gap: 'var(--space-8)', flexWrap: 'wrap', alignItems: 'flex-start', padding: 'var(--space-8)' }}>
-                {shared.hodImage && (
+            <div className="dept-hod-editorial-card">
+              {shared.hodImage && (
+                <div className="dept-hod-media-frame">
                   <SmoothImage
                     src={shared.hodImage}
                     alt={shared.hod || 'Head of Department'}
-                    style={{ width: 180, height: 180, objectFit: 'cover', borderRadius: 'var(--radius-md)', flexShrink: 0 }}
+                    className="dept-hod-photo"
                   />
-                )}
-                <div style={{ flex: '1 1 260px', minWidth: 0 }}>
-                  {shared.hod && (
-                    <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.35rem', color: 'var(--color-primary)', marginBottom: 'var(--space-1)' }}>{shared.hod}</h3>
-                  )}
-                  <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
-                    <span style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>
-                      Head of Department, {deptTitle || program.shortName || program.name}
-                    </span>
-                    {shared.hodEmail && (
-                      <a href={`mailto:${shared.hodEmail}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1)', fontSize: 'var(--text-sm)', color: 'var(--color-primary)', fontWeight: 600, textDecoration: 'none' }}>
-                        <Mail size={14} strokeWidth={1.75} /> {shared.hodEmail}
-                      </a>
-                    )}
-                  </div>
-                  {shared.hodMessage && (
-                    <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.85, whiteSpace: 'pre-line' }}>{shared.hodMessage}</p>
-                  )}
-                </div>
-              </div>
-              {shared.hodResearchProfiles.length > 0 && (
-                <div style={{ background: 'var(--color-primary)', padding: 'var(--space-4) var(--space-8)', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-5)' }}>
-                  <span style={{ fontSize: 'var(--text-xs)', fontWeight: 800, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Research Profiles</span>
-                  {shared.hodResearchProfiles.map((link) => (
-                    <a key={link.label} href={link.url} target="_blank" rel="noopener noreferrer"
-                      style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1)', fontSize: 'var(--text-sm)', color: 'var(--color-white)', fontWeight: 600, textDecoration: 'none' }}>
-                      {link.label} <ExternalLink size={12} strokeWidth={2} />
-                    </a>
-                  ))}
                 </div>
               )}
+
+              <div className="dept-hod-content">
+                <div className="dept-hod-badge-wrap">
+                  <span className="dept-hod-role-badge">Department Leadership</span>
+                  <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>•</span>
+                  <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>{program.shortName || program.name}</span>
+                </div>
+
+                {shared.hod && (
+                  <h3 className="dept-hod-name">{shared.hod}</h3>
+                )}
+
+                <div className="dept-hod-meta">
+                  <span>Head of the Department & Senior Faculty</span>
+                </div>
+
+                {shared.hodMessage && (
+                  <div className="dept-hod-message-box">
+                    <p className="dept-hod-message-text">{shared.hodMessage}</p>
+                  </div>
+                )}
+
+                {shared.hodEmail && (
+                  <div className="dept-hod-actions">
+                    <a href={`mailto:${shared.hodEmail}`} className="dept-hod-mail-btn">
+                      <Mail size={15} strokeWidth={2.2} />
+                      <span>Contact HOD: {shared.hodEmail}</span>
+                    </a>
+                  </div>
+                )}
+
+                {shared.hodResearchProfiles.length > 0 && (
+                  <div style={{ marginTop: '1.25rem', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.65rem' }}>
+                    <span style={{ fontSize: '0.74rem', fontWeight: 800, color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Research Profiles:</span>
+                    {shared.hodResearchProfiles.map((link) => (
+                      <a key={link.label} href={link.url} target="_blank" rel="noopener noreferrer"
+                        className="dept-value-pill" style={{ color: 'var(--color-primary-dark)', background: '#f1f5f9', borderColor: '#e2e8f0' }}>
+                        <span>{link.label}</span>
+                        <ExternalLink size={11} strokeWidth={2.4} />
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </section>
       )}
 
-      {/* Faculty — live from the faculty collection, filtered to this program's department */}
+      {/* Faculty Carousel (matching Google UI reference design) */}
       {faculty.length > 0 && (
-        <section id="faculty" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
-          <div className="container">
-            <div style={{ marginBottom: 'var(--space-10)' }}>
-              <span className="section-label">Our Team</span>
-              <h2 className="section-title">Faculty</h2>
-              <p className="section-desc">{faculty.length} dedicated faculty members bringing academic excellence and industry expertise to every classroom.</p>
-            </div>
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)' }}>
-                <thead>
-                  <tr style={{ background: 'var(--color-primary)' }}>
-                    {['S.No', 'Name', 'Designation', 'Qualification'].map(h => (
-                      <th key={h} style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-white)', fontWeight: 700, textAlign: 'left', fontSize: '0.72rem', letterSpacing: '0.07em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {faculty.map((f, i) => (
-                    <tr key={f.id} style={{ background: i % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)', borderBottom: '1px solid var(--color-light-gray)' }}>
-                      <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text-light)', fontWeight: 600, width: 48 }}>{i + 1}</td>
-                      <td style={{ padding: 'var(--space-3) var(--space-4)' }}>
-                        <Link to={`/faculty/${f.id}`} style={{ color: 'var(--color-primary)', fontWeight: 700, textDecoration: 'none' }}>{f.name}</Link>
-                      </td>
-                      <td style={{ padding: 'var(--space-3) var(--space-4)' }}>
-                        <span style={{
-                          display: 'inline-block',
-                          fontSize: '0.68rem',
-                          fontWeight: 700,
-                          padding: '2px 10px',
-                          borderRadius: 'var(--radius-full)',
-                          whiteSpace: 'nowrap',
-                          background: f.designation.includes('HOD') || f.designation === 'Professor'
-                            ? 'rgba(10,35,81,0.1)'
-                            : f.designation.includes('Associate')
-                              ? 'rgba(201,168,76,0.15)'
-                              : 'rgba(0,0,0,0.05)',
-                          color: f.designation.includes('HOD') || f.designation === 'Professor'
-                            ? 'var(--color-primary)'
-                            : f.designation.includes('Associate')
-                              ? 'var(--color-accent)'
-                              : 'var(--color-text-light)',
-                          border: `1px solid ${f.designation.includes('HOD') || f.designation === 'Professor'
-                            ? 'rgba(10,35,81,0.2)'
-                            : f.designation.includes('Associate')
-                              ? 'rgba(201,168,76,0.3)'
-                              : 'rgba(0,0,0,0.1)'}`,
-                        }}>
-                          {f.designation}
-                        </span>
-                      </td>
-                      <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text-light)' }}>{f.qualification}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </section>
+        <div id="faculty" style={{ scrollMarginTop: NAV_OFFSET }}>
+          <FacultyCarousel
+            faculty={faculty}
+            departmentName={deptTitle || program.name}
+            title="Learn from our impactful faculty"
+            viewMoreLink="/faculty"
+          />
+        </div>
       )}
 
       {/* Mind Map */}
@@ -732,40 +914,72 @@ function SingleProgramDetail() {
         </section>
       )}
 
-      {/* Laboratories */}
+      {/* Laboratories (Italian-Inspired Sleek Showcase) */}
       {hasLabs && (
-        <section id="labs" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
+        <section id="labs" className="dept-labs-section" style={{ scrollMarginTop: NAV_OFFSET }}>
           <div className="container">
-            <div style={{ marginBottom: 'var(--space-10)' }}>
-              <span className="section-label">Infrastructure</span>
-              <h2 className="section-title">Laboratories</h2>
-              <p className="section-desc">State-of-the-art laboratory facilities that bring coursework to life with hands-on, industry-relevant experimentation.</p>
+            <div className="dept-labs-header">
+              <div className="dept-labs-title-wrap">
+                <span className="section-label dept-section-label">State-of-the-Art Infrastructure</span>
+                <h2 className="section-title">Specialized Laboratories</h2>
+                <p className="section-desc" style={{ margin: '0.5rem 0 0 0' }}>
+                  Industry-aligned experimental facilities engineered for hands-on technical immersion, advanced computing, and multidisciplinary project incubation.
+                </p>
+              </div>
+              <div className="dept-labs-count-pill">
+                <span className="dept-labs-count-dot" />
+                <span>{labs.length} Active Facilities</span>
+              </div>
             </div>
-            <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 'var(--space-4)' }}>
-              {/* Tile always stays visible even with no PDF yet — just marked
-                  unavailable in the dialog, same convention as the Newsletter
-                  issues above. Tapping opens LabDialog (description + PDF
-                  link) rather than jumping straight to the PDF, since a lab
-                  with a description but no PDF would otherwise have nothing
-                  to tap through to. */}
-              {labs.map((lab, li) => (
-                <button
-                  key={li}
-                  type="button"
-                  onClick={() => setActiveLab(lab)}
-                  style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', display: 'flex', alignItems: 'center', gap: 'var(--space-4)', borderLeft: '4px solid var(--color-accent)', textAlign: 'left', cursor: 'pointer', font: 'inherit', width: '100%' }}
-                >
-                  <Microscope size={22} strokeWidth={1.75} style={{ flexShrink: 0, color: 'var(--color-accent)' }} />
-                  <span style={{ display: 'flex', flexDirection: 'column', gap: '0.15rem' }}>
-                    <span style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-primary)', lineHeight: 1.4 }}>{lab.name}</span>
-                    {!lab.pdfUrl && (
-                      <span style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', fontStyle: 'italic' }}>
-                        PDF not available
+
+            {/* Tile always stays visible even with no PDF yet — just marked
+                unavailable in the dialog, same convention as the Newsletter
+                issues above. Tapping opens LabDialog (description + PDF
+                link) rather than jumping straight to the PDF, since a lab
+                with a description but no PDF would otherwise have nothing
+                to tap through to. */}
+            <div className="dept-labs-grid">
+              {labs.map((lab, li) => {
+                const indexNum = String(li + 1).padStart(2, '0');
+
+                return (
+                  <button
+                    key={li}
+                    type="button"
+                    onClick={() => setActiveLab(lab)}
+                    className="dept-lab-card"
+                    style={{ font: 'inherit', textAlign: 'left', cursor: 'pointer', width: '100%' }}
+                    aria-label={`View ${lab.name} details`}
+                  >
+                    <div>
+                      <div className="dept-lab-card-top">
+                        <span className="dept-lab-index-tag">{indexNum}</span>
+                        <div className="dept-lab-icon-wrap">
+                          <Microscope size={18} strokeWidth={2.2} />
+                        </div>
+                      </div>
+
+                      <div className="dept-lab-body">
+                        <span className="dept-lab-overline">Practical & Research Facility</span>
+                        <h3 className="dept-lab-title">{lab.name}</h3>
+                        <p className="dept-lab-spec-desc">
+                          Equipped with high-performance workstations, licensed toolsets, and dedicated experimental apparatus.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="dept-lab-footer">
+                      <span className="dept-lab-pdf-btn-label">
+                        <FileText size={13} strokeWidth={2.4} />
+                        <span>{lab.pdfUrl ? 'Lab Manual & Specs' : 'View Details'}</span>
                       </span>
-                    )}
-                  </span>
-                </button>
-              ))}
+                      <span className="dept-btn-arrow-circle">
+                        <ArrowRight size={12} strokeWidth={2.5} />
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
         </section>
@@ -853,52 +1067,23 @@ function SingleProgramDetail() {
                 </div>
               </>
             )}
-            <div id="placement-records-table">
-              <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 800, color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 'var(--space-3)' }}>
-                Placement Records
-              </h3>
-              {placementRows.length > 0 ? (
-                <>
-                  <div className="placement-page-size">
-                    Show
-                    <select
-                      value={placementPageSize}
-                      onChange={(e) => setPlacementPageSize(e.target.value === 'all' ? 'all' : Number(e.target.value))}
-                    >
-                      <option value={10}>10</option>
-                      <option value={25}>25</option>
-                      <option value={50}>50</option>
-                      <option value={100}>100</option>
-                      <option value="all">All</option>
-                    </select>
-                    entries
-                  </div>
-                  <div className="pb-activities-scroll">
-                    <table>
-                      <thead>
-                        <tr>
-                          <th className="pb-activities-num">S.No</th>
-                          {visiblePlacementColumnIndices.map((ci) => <th key={ci}>{placementColumns[ci]}</th>)}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {visiblePlacementRows.map((row, ri) => (
-                          <tr key={ri}>
-                            <td className="pb-activities-num">{ri + 1}</td>
-                            {visiblePlacementColumnIndices.map((ci) => (
-                              <td key={ci}>{ci === placementPkgIdx ? formatPackageCell(row.cells[ci] ?? '') : (row.cells[ci] ?? '')}</td>
-                            ))}
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                  <p className="placement-page-info">
-                    Showing 1 to {visiblePlacementRows.length} of {placementRows.length} entries
-                  </p>
-                </>
+            <div id="placement-records-table" style={{ marginTop: 'var(--space-8)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-4)', flexWrap: 'wrap', gap: '0.75rem' }}>
+                <div>
+                  <span className="section-label dept-section-label">Student Success</span>
+                  <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: '1.2rem', fontWeight: 800, color: 'var(--color-primary-dark)', margin: '0.2rem 0 0 0' }}>
+                    Career Offers &amp; Recruiters ({activePlacementYear?.year})
+                  </h3>
+                </div>
+                <span style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--color-accent)', background: 'rgba(201, 168, 76, 0.12)', border: '1px solid rgba(201, 168, 76, 0.3)', borderRadius: '9999px', padding: '0.3rem 0.85rem' }}>
+                  {placementRows.length} Verified Offers
+                </span>
+              </div>
+
+              {placementMarqueeItems.length > 0 ? (
+                <TestimonialMarquee records={placementMarqueeItems} />
               ) : (
-                <p style={{ color: 'var(--color-text-light)', fontStyle: 'italic' }}>
+                <p style={{ color: 'var(--color-text-light)', fontStyle: 'italic', padding: '1.5rem 0' }}>
                   No placement records uploaded yet for {activePlacementYear?.year}.
                 </p>
               )}
@@ -907,53 +1092,158 @@ function SingleProgramDetail() {
         </section>
       )}
 
-      {/* Department Library */}
+      {/* Internships — same shape/pattern as Placements above (see
+          InternshipYearsEditor in ProgramsAdmin.tsx), including the
+          scrolling-marquee records display. */}
+      {internshipYears.length > 0 && (
+        <section id="internships" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
+          <div className="container">
+            <div style={{ marginBottom: 'var(--space-8)' }}>
+              <span className="section-label">Careers</span>
+              <h2 className="section-title">Internships</h2>
+            </div>
+            <div className="placement-year-pills">
+              {internshipYears.map((y) => (
+                <button
+                  key={y.year}
+                  type="button"
+                  onClick={() => setInternshipYear(y.year)}
+                  className={`placement-year-pill${activeInternshipYear?.year === y.year ? ' active' : ''}`}
+                >
+                  AY. {y.year}
+                </button>
+              ))}
+            </div>
+            {activeInternshipYear && internshipYearStats && (
+              <>
+                <p className="placement-stat-summary">
+                  {activeInternshipYear.year} Internships as on date: <strong>{internshipYearStats.totalInternships.toLocaleString()}</strong>
+                </p>
+                <div className="placement-stat-grid">
+                  <div className="placement-stat-tile">
+                    <div className="placement-stat-tile__label">No. of Companies</div>
+                    <div className="placement-stat-tile__value">{internshipYearStats.companiesVisited}</div>
+                  </div>
+                  <div className="placement-stat-tile">
+                    <div className="placement-stat-tile__label">Total No. of Internships</div>
+                    <div className="placement-stat-tile__value">{internshipYearStats.totalInternships}</div>
+                  </div>
+                  <div className="placement-stat-tile">
+                    <div className="placement-stat-tile__label">Top Interns List</div>
+                    <button
+                      type="button"
+                      className="placement-stat-tile__value--link"
+                      onClick={() => document.getElementById('internship-records-table')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                    >
+                      Stipend wise
+                    </button>
+                  </div>
+                  <div className="placement-stat-tile">
+                    <div className="placement-stat-tile__label">Average Stipend</div>
+                    <div className="placement-stat-tile__value">{internshipYearStats.averageStipend ?? '—'}</div>
+                  </div>
+                  <div className="placement-stat-tile">
+                    <div className="placement-stat-tile__label">Median Stipend</div>
+                    <div className="placement-stat-tile__value">{internshipYearStats.medianStipend ?? '—'}</div>
+                  </div>
+                  <div className="placement-stat-tile">
+                    <div className="placement-stat-tile__label">Highest Stipend</div>
+                    <div className="placement-stat-tile__value">{internshipYearStats.highestStipend ?? '—'}</div>
+                  </div>
+                </div>
+              </>
+            )}
+            <div id="internship-records-table" style={{ marginTop: 'var(--space-8)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-4)', flexWrap: 'wrap', gap: '0.75rem' }}>
+                <div>
+                  <span className="section-label dept-section-label">Student Success</span>
+                  <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: '1.2rem', fontWeight: 800, color: 'var(--color-primary-dark)', margin: '0.2rem 0 0 0' }}>
+                    Internship Offers &amp; Organizations ({activeInternshipYear?.year})
+                  </h3>
+                </div>
+                <span style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--color-accent)', background: 'rgba(201, 168, 76, 0.12)', border: '1px solid rgba(201, 168, 76, 0.3)', borderRadius: '9999px', padding: '0.3rem 0.85rem' }}>
+                  {internshipRows.length} Verified Internships
+                </span>
+              </div>
+
+              {internshipMarqueeItems.length > 0 ? (
+                <TestimonialMarquee records={internshipMarqueeItems} />
+              ) : (
+                <p style={{ color: 'var(--color-text-light)', fontStyle: 'italic', padding: '1.5rem 0' }}>
+                  No internship records uploaded yet for {activeInternshipYear?.year}.
+                </p>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Department Library (Italian-Inspired 3-Column Grid Showcase) */}
       {hasLibrary && (
         <section id="library" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label">Resources</span>
+              <span className="section-label dept-section-label">Academic Repository</span>
               <h2 className="section-title">Department Library</h2>
             </div>
-            {shared.libraryIntro && (
-              <BodyBlocks
-                blocks={parseBodyContent(shared.libraryIntro)}
-                paragraphStyle={{ color: 'var(--color-text)', lineHeight: 1.85, fontSize: 'var(--text-base)' }}
-              />
-            )}
-            {shared.libraryInCharge && (
-              <p style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', color: 'var(--color-text)', fontSize: 'var(--text-sm)', marginBottom: libraryTables.length > 0 ? 'var(--space-6)' : 0 }}>
-                <BookOpen size={16} strokeWidth={1.75} style={{ color: 'var(--color-accent)', flexShrink: 0 }} />
-                <strong style={{ color: 'var(--color-primary)' }}>In-charge of Department Library:</strong> {shared.libraryInCharge}
-              </p>
-            )}
-            {libraryTables.map((sec, si) => (
-              <div key={si} style={{ marginBottom: si === libraryTables.length - 1 ? 0 : 'var(--space-8)' }}>
-                <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.1rem', color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>
-                  {sec.heading}
-                </h3>
-                <div className="pb-activities-scroll">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th className="pb-activities-num">S. No</th>
-                        <th>Item</th>
-                        <th>Count</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {sec.items.map((item, ii) => (
-                        <tr key={ii}>
-                          <td className="pb-activities-num">{ii + 1}</td>
-                          <td>{item.label}</td>
-                          <td>{item.value}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+
+            <div className="dept-library-container">
+              {shared.libraryIntro && (
+                <div style={{ maxWidth: 840 }}>
+                  <BodyBlocks
+                    blocks={parseBodyContent(shared.libraryIntro)}
+                    paragraphStyle={{ color: 'var(--color-text)', lineHeight: 1.85, fontSize: 'var(--text-base)' }}
+                  />
                 </div>
-              </div>
-            ))}
+              )}
+
+              {shared.libraryInCharge && (
+                <div className="dept-library-incharge-card">
+                  <div className="dept-library-incharge-icon-wrap">
+                    <BookOpen size={22} strokeWidth={2.2} />
+                  </div>
+                  <div>
+                    <div className="dept-library-incharge-label">In-Charge of Department Library</div>
+                    <h3 className="dept-library-incharge-name">{shared.libraryInCharge}</h3>
+                  </div>
+                </div>
+              )}
+
+              {libraryTables.map((sec, si) => (
+                <div key={si} className="dept-library-tables-group">
+                  <div className="dept-library-group-header">
+                    <h3 className="dept-library-group-title">
+                      {sec.heading}
+                    </h3>
+                    <span style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--color-accent)', background: 'rgba(201, 168, 76, 0.12)', border: '1px solid rgba(201, 168, 76, 0.25)', borderRadius: '9999px', padding: '0.25rem 0.75rem' }}>
+                      {sec.items.length} Resource Categories
+                    </span>
+                  </div>
+
+                  <div className="dept-library-grid-3">
+                    {sec.items.map((item, ii) => {
+                      const icons = [BookMarked, Bookmark, Library, FileText, BookOpen];
+                      const IconComp = icons[ii % icons.length];
+                      const numStr = String(ii + 1).padStart(2, '0');
+                      return (
+                        <div key={ii} className="dept-library-card">
+                          <div className="dept-library-card-top">
+                            <span className="dept-library-num-badge">{numStr}</span>
+                            <div className="dept-library-icon-badge">
+                              <IconComp size={18} strokeWidth={2.2} />
+                            </div>
+                          </div>
+                          <div>
+                            <div className="dept-library-value">{item.value}</div>
+                            <div className="dept-library-label">{item.label}</div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
       )}
@@ -963,9 +1253,9 @@ function SingleProgramDetail() {
       <NewsEventsTabs categories={newsEventsCategories} eyebrow={deptTitle || program.shortName || program.name} navOffset={NAV_OFFSET} />
 
       {/* News & Events — live from the departmentNews collection, tagged to
-          this program. Both this and the admin-defined table above are
-          available to every programme now; each one only appears once an
-          admin has actually filled it in. */}
+          this programme. Both this and the admin-defined table above are
+          available; each only appears once an admin has actually filled it
+          in, so having neither leaves no visible gap. */}
       <DepartmentNewsSection programSlug={program.slug} background="var(--color-off-white)" />
 
       {/* Newsletter — issues grouped by academic year; columns are however

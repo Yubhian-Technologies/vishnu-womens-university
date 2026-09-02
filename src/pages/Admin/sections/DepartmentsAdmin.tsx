@@ -8,6 +8,7 @@ import { deleteFile, type UploadResult } from '../../../lib/storage';
 import { PROGRAM_ICON_NAMES } from '../../../lib/programIcons';
 import { normalizeLab, type LabItem, type LibrarySection, type LibraryItem, type NewsEventsYear, type ProgramLink, type ProgramDoc } from './ProgramsAdmin';
 import NewsEventsYearsEditor from './NewsEventsYearsEditor';
+import { diffChangedFields } from '../../../lib/formDiff';
 
 // Backs the "Academic Departments" card grid on Academics.tsx — independent
 // of the `programs` collection, so a department's card copy doesn't have to
@@ -139,6 +140,11 @@ export default function DepartmentsAdmin() {
   const { docs: departments, loading } = useOrderedCollection<DepartmentDoc>('departments', 'order');
   const { docs: allPrograms } = useOrderedCollection<ProgramDoc>('programs', 'order');
   const [form, setForm] = useState<Omit<DepartmentDoc, 'id'>>(EMPTY);
+  // Snapshot of `form` taken when "Edit" was clicked (see startEdit) — save()
+  // diffs against this so Update only writes fields actually changed in this
+  // session, instead of blindly overwriting the whole doc with a possibly
+  // stale copy (see lib/formDiff.ts). null while adding a new department.
+  const [originalForm, setOriginalForm] = useState<Omit<DepartmentDoc, 'id'> | null>(null);
   const [editing, setEditing] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [copying, setCopying] = useState(false);
@@ -389,11 +395,16 @@ export default function DepartmentsAdmin() {
         labs: labs.filter((l) => l.name),
       };
       if (editing) {
-        await updateDoc(doc(db, 'departments', editing), { ...payload });
+        // Only send fields that actually changed in this editing session —
+        // see originalForm/diffChangedFields above.
+        const changed = originalForm ? diffChangedFields(payload, originalForm) : payload;
+        if (Object.keys(changed).length > 0) {
+          await updateDoc(doc(db, 'departments', editing), changed);
+        }
       } else {
         await addDoc(collection(db, 'departments'), { ...payload, order: form.order || departments.length, createdAt: serverTimestamp() });
       }
-      setForm(EMPTY); setEditing(null);
+      setForm(EMPTY); setEditing(null); setOriginalForm(null);
     } catch (e) {
       alert(`Couldn't save: ${(e as Error).message}`);
     } finally { setSaving(false); }
@@ -401,7 +412,7 @@ export default function DepartmentsAdmin() {
 
   const startEdit = (d: DepartmentDoc) => {
     setEditing(d.id);
-    setForm({
+    const next: Omit<DepartmentDoc, 'id'> = {
       title: d.title, shortCode: d.shortCode, description: d.description || '',
       icon: d.icon || 'GraduationCap', order: d.order,
       heroImage: d.heroImage || '', storagePath: d.storagePath || '',
@@ -415,7 +426,9 @@ export default function DepartmentsAdmin() {
       programLevels: (d.programLevels || []).map((l) => ({ title: l.title, intro: l.intro || '', rows: l.rows || [] })),
       placementIntro: d.placementIntro || '', placementStats: d.placementStats || [], placementRecruiters: d.placementRecruiters || [],
       newsEventsYears: d.newsEventsYears || [], studentAwardsYears: d.studentAwardsYears || [], othersYears: d.othersYears || [],
-    });
+    };
+    setForm(next);
+    setOriginalForm(next);
   };
 
   const remove = async (id: string) => {
@@ -461,9 +474,12 @@ export default function DepartmentsAdmin() {
 
           <div className="admin-field admin-field--full"><hr /><h3>Department Page — Shared Content</h3>
             <p className="admin-field__hint" style={{ marginTop: '0.25rem' }}>
-              Only used for the grouped departments <strong>AI</strong>, <strong>CSE</strong> and <strong>ECE</strong>,
-              whose <code>/academics/&lt;program&gt;</code> pages show this at the top (above the program toggle),
-              matched to this card by <strong>Short Code</strong>. Leave blank for every other department.
+              Shown on every department's page at <code>/academics/&lt;program&gt;</code> — above the programme
+              toggle for the grouped departments (<strong>AI</strong>, <strong>CSE</strong>, <strong>ECE</strong>),
+              or as that programme's own "About the Department" section for every other (single-programme)
+              department — matched to this card by <strong>Short Code</strong>. Overview specifically feeds
+              "About the Department"; a programme's own "About the Programme" text stays a separate field on that
+              programme itself (Admin → Programs → About the Programme).
             </p>
           </div>
           <div className="admin-field admin-field--full">
@@ -760,7 +776,7 @@ export default function DepartmentsAdmin() {
         </div>
 
         <div className="admin-form-actions">
-          {editing && <button className="admin-btn admin-btn--ghost" onClick={() => { setEditing(null); setForm(EMPTY); }}>Cancel</button>}
+          {editing && <button className="admin-btn admin-btn--ghost" onClick={() => { setEditing(null); setForm(EMPTY); setOriginalForm(null); }}>Cancel</button>}
           <button className="admin-btn admin-btn--primary" onClick={save} disabled={saving}>
             {saving ? 'Saving…' : editing ? 'Update' : 'Add Department'}
           </button>

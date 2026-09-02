@@ -99,18 +99,18 @@ export function dedupePlacementRows(rows: string[][]): { rows: string[][]; remov
 // placementRecords.ts: "S.No" (findSerialColumnIndex — hidden from the
 // public table, which numbers rows itself), "Company" and "Package (LPA)"
 // (findPackageColumnIndex/findCompanyColumnIndex, used for the stat tiles
-// and the "10 highest" sort). "Registration Number" and "Student Name" have
-// no special handling — they just display as-is.
-const PLACEMENT_TEMPLATE_HEADERS = ['S.No', 'Registration Number', 'Student Name', 'Company', 'Package (LPA)'];
+// and the "10 highest" sort). "Registration Number", "Student Name", and
+// "Industry Type" have no special handling — they just display as-is.
+const PLACEMENT_TEMPLATE_HEADERS = ['S.No', 'Registration Number', 'Student Name', 'Company', 'Industry Type', 'Package (LPA)'];
 
 // Two rows for the same student ("A. Priya") to make the whole-row-only
 // duplicate rule concrete in the template itself, rather than just in
 // admin copy: repeating a name/company/etc. is fine, only an exact
 // duplicate row (every column the same) gets rejected on import.
 const PLACEMENT_TEMPLATE_EXAMPLE_ROWS = [
-  ['1', '21A91A0501', 'A. Priya', 'TCS', '3.5'],
-  ['2', '21A91A0502', 'B. Swathi', 'Infosys', '4.2'],
-  ['3', '21A91A0501', 'A. Priya', 'Wipro', '4.5'],
+  ['1', '21A91A0501', 'A. Priya', 'TCS', 'IT Services', '3.5'],
+  ['2', '21A91A0502', 'B. Swathi', 'Infosys', 'IT Services', '4.2'],
+  ['3', '21A91A0501', 'A. Priya', 'Wipro', 'IT Services', '4.5'],
 ];
 
 /** Downloads a blank Placements import template (.xlsx) with the expected

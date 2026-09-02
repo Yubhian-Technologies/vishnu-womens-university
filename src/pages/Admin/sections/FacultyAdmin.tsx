@@ -5,12 +5,16 @@ import {
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
 import ImageUploader from '../../../components/ImageUploader/ImageUploader';
-import type { UploadResult } from '../../../lib/storage';
+import { deleteFile, type UploadResult } from '../../../lib/storage';
 import {
   type FacultyFact, type FacultySection,
-  factsToText, textToFacts, sectionsToText, textToSections, getSectionBlocks,
+  factsToText, textToFacts, textToSections, getSectionBlocks,
+  facultySectionsToCustomSections,
 } from '../../../lib/facultySections';
 import type { ProgramDoc } from './ProgramsAdmin';
+import CustomSectionEditor from './CustomSectionEditor';
+import { replaceAtPath, getAtPath, hasCustomSectionContent, type CustomSection } from '../../../lib/customSections';
+import { diffChangedFields } from '../../../lib/formDiff';
 
 export type { FacultyFact, FacultySection };
 
@@ -33,14 +37,21 @@ export interface FacultyDoc {
    *  optional so existing simple faculty records (just name/designation/
    *  qualification/photo) keep working unchanged. */
   facts?: FacultyFact[];
+  /** Legacy plain-text-authored Profile Sections (see lib/facultySections.ts)
+   *  — superseded by customSections below for anyone edited since that
+   *  moved to the Custom Sections editor, but left untouched on records
+   *  that haven't been re-saved yet, and still rendered as a fallback (see
+   *  FacultyProfile.tsx). Still populated by the "Import Faculty Profile
+   *  Content" JSON bulk-import tool below. */
   sections?: FacultySection[];
+  /** Same Custom Sections system as Programs/Differentiators (any number of
+   *  sections, each a choice of plain text / table / list of links /
+   *  uploaded files / checklist / panel view, with sub-sections) — replaces
+   *  the old `sections` textarea as the primary way to edit a Profile
+   *  Sections page. startEdit() auto-converts an old-format `sections` on
+   *  first edit if this is still empty, so nothing is lost in the move. */
+  customSections?: CustomSection[];
 }
-
-const EMPTY: Omit<FacultyDoc, 'id'> = {
-  name: '', designation: 'Assistant Professor', department: 'CSE',
-  qualification: '', specialization: '', email: '', imageUrl: '', storagePath: '', order: 0,
-  facts: [], sections: [],
-};
 
 const DESIGNATIONS = ['Professor & HOD', 'Professor & Head', 'Professor', 'Associate Professor', 'Assoc. Professor', 'Assistant Professor', 'Asst. Professor'];
 
@@ -49,12 +60,23 @@ const DESIGNATIONS = ['Professor & HOD', 'Professor & Head', 'Professor', 'Assoc
 // or current-faculty data. Keep in sync with Faculty.tsx's matching set.
 const FOUNDATION_DEPARTMENTS = ['Mathematics', 'Physics', 'Chemistry', 'English'];
 
-interface FormState extends Omit<FacultyDoc, 'id' | 'facts' | 'sections'> {
+// `sections` (the old plain-text Profile Sections field) is deliberately
+// left out of the form entirely — it's no longer edited here, only
+// converted once (see startEdit) into customSections below. Never including
+// it in `form` means save()'s payload never touches it either, so an
+// existing record's legacy `sections` value is left exactly as-is on the
+// doc (harmless, unused once customSections has content) rather than being
+// blanked out.
+interface FormState extends Omit<FacultyDoc, 'id' | 'facts' | 'sections' | 'customSections'> {
   factsText: string;
-  sectionsText: string;
+  customSections: CustomSection[];
 }
 
-const EMPTY_FORM: FormState = { ...EMPTY, factsText: '', sectionsText: '' };
+const EMPTY_FORM: FormState = {
+  name: '', designation: 'Assistant Professor', department: 'CSE',
+  qualification: '', specialization: '', email: '', imageUrl: '', storagePath: '', order: 0,
+  factsText: '', customSections: [],
+};
 
 export default function FacultyAdmin() {
   const { docs: faculty, loading } = useOrderedCollection<FacultyDoc>('faculty', 'order');
@@ -77,6 +99,11 @@ export default function FacultyAdmin() {
     return names;
   }, [programs, faculty]);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
+  // Snapshot of `form` taken when "Edit" was clicked (see startEdit) —
+  // save() diffs against this so Update only writes fields actually changed
+  // in this session, instead of blindly overwriting the whole doc with a
+  // possibly stale copy (see lib/formDiff.ts). null while adding new.
+  const [originalForm, setOriginalForm] = useState<FormState | null>(null);
   const [editing, setEditing] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [filterDept, setFilterDept] = useState('All');
@@ -144,8 +171,99 @@ export default function FacultyAdmin() {
   const [importing, setImporting] = useState(false);
   const [importResult, setImportResult] = useState<string | null>(null);
 
-  const set = (k: keyof FormState, v: string | number) => setForm((p) => ({ ...p, [k]: v }));
+  const set = (k: keyof FormState, v: string | number | CustomSection[]) => setForm((p) => ({ ...p, [k]: v }));
   const handleImage = (r: UploadResult) => setForm((p) => ({ ...p, imageUrl: r.url, storagePath: r.path }));
+
+  // Custom Sections (Profile Sections) — same wiring as ProgramsAdmin.tsx /
+  // DifferentiatorsAdmin.tsx: file uploads route through the functional
+  // `setForm(p => ...)` form via replaceAtPath, recomputing from
+  // `p.customSections` at call time so several uploads resolving in quick
+  // succession each land on top of whatever the others already saved.
+  const handleCustomSectionFileUploaded = (sectionPath: number[], fileIndex: number, r: UploadResult) => {
+    setForm((p) => ({
+      ...p,
+      customSections: replaceAtPath(p.customSections, sectionPath, (s) => ({
+        ...s,
+        files: (s.files || []).map((f, i) => (i === fileIndex ? { ...f, fileUrl: r.url, storagePath: r.path } : f)),
+      })),
+    }));
+  };
+  const handleCustomSectionFileRemoved = async (sectionPath: number[], fileIndex: number) => {
+    const file = getAtPath(form.customSections, sectionPath)?.files?.[fileIndex];
+    if (!file?.fileUrl) return;
+    if (!confirm('Remove this file? This cannot be undone.')) return;
+    try {
+      if (file.storagePath) await deleteFile(file.storagePath);
+    } catch (e) {
+      alert(`Couldn't delete the file from storage: ${(e as Error).message}`);
+      return;
+    }
+    setForm((p) => ({
+      ...p,
+      customSections: replaceAtPath(p.customSections, sectionPath, (s) => ({
+        ...s,
+        files: (s.files || []).filter((_, i) => i !== fileIndex),
+      })),
+    }));
+  };
+  const handleCustomSectionPhotoUploaded = (sectionPath: number[], r: UploadResult) => {
+    setForm((p) => ({
+      ...p,
+      customSections: replaceAtPath(p.customSections, sectionPath, (s) => ({
+        ...s,
+        photo: { imageUrl: r.url, storagePath: r.path },
+      })),
+    }));
+  };
+  const handleCustomSectionPhotoRemoved = async (sectionPath: number[]) => {
+    const photo = getAtPath(form.customSections, sectionPath)?.photo;
+    if (!photo?.imageUrl) return;
+    if (!confirm('Remove this photo? This cannot be undone.')) return;
+    try {
+      if (photo.storagePath) await deleteFile(photo.storagePath);
+    } catch (e) {
+      alert(`Couldn't delete the photo from storage: ${(e as Error).message}`);
+      return;
+    }
+    setForm((p) => ({
+      ...p,
+      customSections: replaceAtPath(p.customSections, sectionPath, (s) => {
+        const next = { ...s };
+        delete next.photo;
+        return next;
+      }),
+    }));
+  };
+
+  // contentType 'gallery' — same shape as the file handlers above, but each
+  // photo is addressed by its index within that section's galleryPhotos.
+  const handleCustomSectionGalleryPhotoUploaded = (sectionPath: number[], photoIndex: number, r: UploadResult) => {
+    setForm((p) => ({
+      ...p,
+      customSections: replaceAtPath(p.customSections, sectionPath, (s) => ({
+        ...s,
+        galleryPhotos: (s.galleryPhotos || []).map((ph, i) => (i === photoIndex ? { imageUrl: r.url, storagePath: r.path } : ph)),
+      })),
+    }));
+  };
+  const handleCustomSectionGalleryPhotoRemoved = async (sectionPath: number[], photoIndex: number) => {
+    const photo = getAtPath(form.customSections, sectionPath)?.galleryPhotos?.[photoIndex];
+    if (!photo) return;
+    if (photo.imageUrl && !confirm('Remove this photo? This cannot be undone.')) return;
+    try {
+      if (photo.storagePath) await deleteFile(photo.storagePath);
+    } catch (e) {
+      alert(`Couldn't delete the photo from storage: ${(e as Error).message}`);
+      return;
+    }
+    setForm((p) => ({
+      ...p,
+      customSections: replaceAtPath(p.customSections, sectionPath, (s) => ({
+        ...s,
+        galleryPhotos: (s.galleryPhotos || []).filter((_, i) => i !== photoIndex),
+      })),
+    }));
+  };
 
   // Pastes a whole roster at once — "Name | Designation | Qualification | Specialization | Email"
   // per line (trailing fields optional) — instead of one add-doc round trip per person.
@@ -209,23 +327,32 @@ export default function FacultyAdmin() {
     } finally { setImporting(false); }
   };
 
+  // Shared between save() and its diff against originalForm — the legacy
+  // `sections` field is deliberately not part of this (see FormState above).
+  const toPayload = (f: FormState) => ({
+    name: f.name, designation: f.designation, department: f.department,
+    qualification: f.qualification, specialization: f.specialization,
+    email: f.email, imageUrl: f.imageUrl, storagePath: f.storagePath, order: f.order,
+    facts: textToFacts(f.factsText),
+    customSections: f.customSections,
+  });
+
   const save = async () => {
     if (!form.name) return alert('Name is required.');
     setSaving(true);
     try {
-      const payload = {
-        name: form.name, designation: form.designation, department: form.department,
-        qualification: form.qualification, specialization: form.specialization,
-        email: form.email, imageUrl: form.imageUrl, storagePath: form.storagePath, order: form.order,
-        facts: textToFacts(form.factsText),
-        sections: textToSections(form.sectionsText),
-      };
+      const payload = toPayload(form);
       if (editing) {
-        await updateDoc(doc(db, 'faculty', editing), payload);
+        // Only send fields that actually changed in this editing session —
+        // see originalForm/diffChangedFields above.
+        const changed = originalForm ? diffChangedFields(payload, toPayload(originalForm)) : payload;
+        if (Object.keys(changed).length > 0) {
+          await updateDoc(doc(db, 'faculty', editing), changed);
+        }
       } else {
         await addDoc(collection(db, 'faculty'), { ...payload, createdAt: serverTimestamp() });
       }
-      setForm(EMPTY_FORM); setEditing(null);
+      setForm(EMPTY_FORM); setEditing(null); setOriginalForm(null);
     } catch (e) {
       alert(`Couldn't save: ${(e as Error).message}`);
     } finally { setSaving(false); }
@@ -233,12 +360,19 @@ export default function FacultyAdmin() {
 
   const startEdit = (f: FacultyDoc) => {
     setEditing(f.id);
-    setForm({
+    // Auto-upgrade: a record with old-format `sections` but no
+    // customSections yet gets converted once, right here, so opening it for
+    // editing moves it straight to the Custom Sections editor — nothing is
+    // lost, and it only actually writes back once "Update" is clicked.
+    const customSections = f.customSections?.length ? f.customSections : facultySectionsToCustomSections(f.sections || []);
+    const next: FormState = {
       name: f.name, designation: f.designation, department: f.department,
       qualification: f.qualification, specialization: f.specialization,
       email: f.email, imageUrl: f.imageUrl, storagePath: f.storagePath, order: f.order,
-      factsText: factsToText(f.facts), sectionsText: sectionsToText(f.sections),
-    });
+      factsText: factsToText(f.facts), customSections,
+    };
+    setForm(next);
+    setOriginalForm(next);
   };
 
   const remove = async (id: string) => {
@@ -289,7 +423,7 @@ export default function FacultyAdmin() {
   const richness = (f: FacultyDoc) =>
     (/hod|head/i.test(f.designation) ? 100 : 0)
     + (f.imageUrl ? 1 : 0) + (f.qualification ? 1 : 0) + (f.specialization ? 1 : 0)
-    + (f.email ? 1 : 0) + (f.facts?.length ?? 0) + (f.sections?.length ?? 0);
+    + (f.email ? 1 : 0) + (f.facts?.length ?? 0) + (f.sections?.length ?? 0) + (f.customSections?.length ?? 0);
   const removeDuplicates = async () => {
     if (!confirm(`Delete ${duplicateCount} duplicate faculty record(s), keeping the best copy of each?`)) return;
     setDedupeRunning(true);
@@ -434,39 +568,30 @@ export default function FacultyAdmin() {
             </p>
             <textarea rows={5} value={form.factsText} onChange={(e) => set('factsText', e.target.value)} placeholder={'Ph.D | Andhra University, 1994\nTeaching Experience | 34 years\nContact Number | 9440240530'} />
           </div>
+          <div className="admin-field admin-field--full"><hr /><h3>Profile Sections</h3></div>
+          <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>
+            Optional. Add any section this person's profile needs (e.g. Professional Affiliations, Research Papers
+            Published, Awards &amp; Recognitions — every person can have a different set) — any name, any number of
+            sub-sections, and a choice of plain text, a checklist, a table, a list of links, or uploaded files per
+            section. Shown on this person's full profile page as a side switcher, one section at a time.
+          </p>
           <div className="admin-field admin-field--full">
-            <label>Profile Sections</label>
-            <p className="admin-field__hint">
-              Optional. Give each section a title on its own line as "## Section Title" (e.g. Professional
-              Affiliations, Research Papers Published, Awards &amp; Recognitions — every person can have a different
-              set), then write the content underneath in whatever mix you need: plain paragraphs, bullet points
-              (start the line with "- "), and tables (start with a line "TABLE:", then one row per line as
-              "Column | Column | Column", the first row being the headers). A pasted URL becomes a clickable link
-              automatically. Leave a section's title with nothing underneath to show it as "coming soon" for now.
-            </p>
-            <textarea
-              rows={14}
-              value={form.sectionsText}
-              onChange={(e) => set('sectionsText', e.target.value)}
-              placeholder={[
-                '## Professional Affiliations',
-                'Life member of "The Indian Society for Technical Education (ISTE)", with LM-53969 in 2007.',
-                '',
-                '## Research Papers Published',
-                'TABLE:',
-                'Title | Journal | Year',
-                'Deep Learning for X | IEEE Access | 2023',
-                'A Study on Y | Springer | 2022',
-                '',
-                '## Awards & Recognitions',
-                '- Best Faculty Award, 2022',
-                '- Outstanding Reviewer, IEEE, 2021',
-              ].join('\n')}
+            <CustomSectionEditor
+              sections={form.customSections}
+              onChange={(next) => set('customSections', next)}
+              rootSections={form.customSections}
+              parentPath={[]}
+              onFileUploaded={handleCustomSectionFileUploaded}
+              onFileRemoved={handleCustomSectionFileRemoved}
+              onPhotoUploaded={handleCustomSectionPhotoUploaded}
+              onPhotoRemoved={handleCustomSectionPhotoRemoved}
+              onGalleryPhotoUploaded={handleCustomSectionGalleryPhotoUploaded}
+              onGalleryPhotoRemoved={handleCustomSectionGalleryPhotoRemoved}
             />
           </div>
         </div>
         <div className="admin-form-actions">
-          {editing && <button className="admin-btn admin-btn--ghost" onClick={() => { setEditing(null); setForm(EMPTY_FORM); }}>Cancel</button>}
+          {editing && <button className="admin-btn admin-btn--ghost" onClick={() => { setEditing(null); setForm(EMPTY_FORM); setOriginalForm(null); }}>Cancel</button>}
           <button className="admin-btn admin-btn--primary" onClick={save} disabled={saving}>
             {saving ? 'Saving…' : editing ? 'Update' : 'Add Faculty'}
           </button>
@@ -549,7 +674,13 @@ export default function FacultyAdmin() {
                             <td>{f.name}</td>
                             <td><span className="admin-badge admin-badge--sm">{f.designation}</span></td>
                             <td>{f.qualification}</td>
-                            <td>{(f.sections?.length ?? 0) > 0 ? `${f.sections!.filter((s) => getSectionBlocks(s).length > 0).length}/${f.sections!.length} sections` : '—'}</td>
+                            <td>
+                              {(f.customSections ?? []).filter(hasCustomSectionContent).length > 0
+                                ? `${(f.customSections ?? []).filter(hasCustomSectionContent).length}/${f.customSections!.length} sections`
+                                : (f.sections?.length ?? 0) > 0
+                                  ? `${f.sections!.filter((s) => getSectionBlocks(s).length > 0).length}/${f.sections!.length} sections (legacy)`
+                                  : '—'}
+                            </td>
                             <td>
                               <button className="admin-btn admin-btn--sm" onClick={() => startEdit(f)}>Edit</button>
                               <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(f.id)}>Delete</button>

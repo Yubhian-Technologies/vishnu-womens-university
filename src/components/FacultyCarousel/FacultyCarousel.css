@@ -1,0 +1,388 @@
+/* ==========================================================================
+   Faculty Impact Carousel — Google Material 3 & Editorial Design
+   ========================================================================== */
+
+.faculty-impact-section {
+  background: #f4ba2f;
+  background: linear-gradient(135deg, #f6c035 0%, #ebb024 100%);
+  padding: clamp(3rem, 6vw, 4.5rem) 0;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.faculty-impact-container {
+  width: 100%;
+  max-width: var(--max-width, 1360px);
+  margin: 0 auto;
+  padding: 0 clamp(1rem, 3vw, 2rem);
+  box-sizing: border-box;
+}
+
+/* Header Area */
+.faculty-impact-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: clamp(1.75rem, 3.5vw, 2.5rem);
+  flex-wrap: wrap;
+}
+
+.faculty-impact-title {
+  font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+  font-size: clamp(1.75rem, 3.2vw, 2.45rem);
+  font-weight: 800;
+  color: #0b0e14;
+  letter-spacing: -0.025em;
+  margin: 0;
+  line-height: 1.15;
+}
+
+/* Header Action Controls */
+.faculty-impact-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.faculty-impact-view-more {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.65rem 1.45rem;
+  background: #000000;
+  color: #ffffff;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  border-radius: 9999px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
+
+.faculty-impact-view-more:hover,
+.faculty-impact-view-more:focus-visible {
+  background: #1f2937;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.28);
+  outline: none;
+}
+
+.faculty-impact-arrows {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.faculty-impact-arrow-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #000000;
+  color: #ffffff;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.16);
+  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  flex-shrink: 0;
+}
+
+.faculty-impact-arrow-btn:hover:not(:disabled),
+.faculty-impact-arrow-btn:focus-visible:not(:disabled) {
+  background: #ffffff;
+  color: #000000;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  transform: scale(1.06);
+  outline: none;
+}
+
+.faculty-impact-arrow-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Horizontal Track */
+.faculty-impact-track {
+  display: flex;
+  gap: 1.25rem;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  scroll-snap-type: x mandatory;
+  padding: 0.5rem 0 2rem 0;
+  margin: 0;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.faculty-impact-track::-webkit-scrollbar {
+  display: none;
+}
+
+/* Faculty Card Wrapper — Exactly 4 full cards on desktop with no cutting */
+.faculty-impact-card-wrapper {
+  flex: 0 0 calc((100% - (3 * 1.25rem)) / 4);
+  max-width: calc((100% - (3 * 1.25rem)) / 4);
+  scroll-snap-align: start;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+@media (max-width: 1200px) {
+  .faculty-impact-card-wrapper {
+    flex: 0 0 calc((100% - (2 * 1.25rem)) / 3);
+    max-width: calc((100% - (2 * 1.25rem)) / 3);
+  }
+}
+
+@media (max-width: 860px) {
+  .faculty-impact-card-wrapper {
+    flex: 0 0 calc((100% - 1rem) / 2);
+    max-width: calc((100% - 1rem) / 2);
+  }
+  .faculty-impact-track {
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 580px) {
+  .faculty-impact-card-wrapper {
+    flex: 0 0 86%;
+    max-width: 86%;
+  }
+}
+
+/* Entire Card in Circular White Background */
+.faculty-impact-card {
+  background: #ffffff;
+  border-radius: 28px;
+  padding: 1.2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-sizing: border-box;
+  transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 220ms ease;
+}
+
+.faculty-impact-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.14);
+}
+
+/* Photo Frame */
+.faculty-impact-photo-frame {
+  width: 100%;
+  height: 250px;
+  border-radius: 20px;
+  overflow: hidden;
+  background: #f8fafc;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  position: relative;
+  display: block;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.faculty-impact-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.faculty-impact-card:hover .faculty-impact-photo {
+  transform: scale(1.04);
+}
+
+/* Avatar Fallback */
+.faculty-impact-avatar-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(145deg, #ffffff 0%, #f1f5f9 100%);
+  position: relative;
+}
+
+.faculty-impact-initials {
+  font-family: var(--font-sans);
+  font-size: 2.75rem;
+  font-weight: 900;
+  color: var(--color-primary, #1b4332);
+  letter-spacing: 0.04em;
+}
+
+/* Info Section inside White Card */
+.faculty-impact-info {
+  padding-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.faculty-impact-heading-group {
+  margin-bottom: 0.5rem;
+}
+
+.faculty-impact-name {
+  font-family: var(--font-sans);
+  font-size: 1.08rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 0.15rem 0;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+.faculty-impact-name-link {
+  text-decoration: none;
+  color: inherit;
+  transition: color 150ms ease;
+}
+
+.faculty-impact-name-link:hover {
+  color: var(--color-primary, #1b4332);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.faculty-impact-meta {
+  font-family: var(--font-sans);
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.35;
+}
+
+/* Professional Credential Badges */
+.faculty-impact-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+}
+
+.faculty-impact-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.faculty-impact-badge.qual-badge {
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid #e2e8f0;
+}
+
+.faculty-impact-badge.exp-badge {
+  background: rgba(201, 168, 76, 0.12);
+  color: #856404;
+  border: 1px solid rgba(201, 168, 76, 0.3);
+}
+
+/* Summary / Specialization Area */
+.faculty-impact-summary-wrap {
+  margin-bottom: 1rem;
+  flex: 1;
+}
+
+.faculty-impact-summary-label {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: 0.64rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #94a3b8;
+  margin-bottom: 0.25rem;
+}
+
+.faculty-impact-bio {
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: #334155;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-weight: 500;
+}
+
+/* View Full Profile Action Button */
+.faculty-impact-footer {
+  margin-top: auto;
+  padding-top: 0.5rem;
+  border-top: 1px solid #f1f5f9;
+}
+
+.faculty-card-profile-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.55rem 0.95rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 9999px;
+  color: #0f172a;
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 180ms ease;
+  box-sizing: border-box;
+}
+
+.faculty-card-profile-btn:hover,
+.faculty-card-profile-btn:focus-visible {
+  background: var(--color-primary, #1b4332);
+  color: #ffffff;
+  border-color: var(--color-primary, #1b4332);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(27, 67, 50, 0.2);
+  outline: none;
+}
+
+.faculty-btn-arrow-circle {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.06);
+  color: #0f172a;
+  flex-shrink: 0;
+  transition: all 180ms ease;
+}
+
+.faculty-card-profile-btn:hover .faculty-btn-arrow-circle {
+  background: #ffffff;
+  color: var(--color-primary, #1b4332);
+  transform: translateX(2px);
+}

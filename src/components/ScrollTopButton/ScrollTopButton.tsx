@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { ArrowUp } from 'lucide-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowUp } from '@fortawesome/free-solid-svg-icons';
 import './ScrollTopButton.css';
 
 const RADIUS = 20;
@@ -39,7 +40,7 @@ export default function ScrollTopButton() {
           strokeDashoffset={CIRCUMFERENCE * (1 - progress)}
         />
       </svg>
-      <ArrowUp size={18} strokeWidth={2.5} className="scroll-top-btn__icon" />
+      <FontAwesomeIcon icon={faArrowUp} className="scroll-top-btn__icon" style={{ fontSize: 18 }} />
     </button>
   );
 }

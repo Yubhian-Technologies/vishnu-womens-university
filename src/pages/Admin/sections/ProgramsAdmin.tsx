@@ -11,9 +11,12 @@ import { PROGRAM_ICON_NAMES } from '../../../lib/programIcons';
 import DepartmentNewsManager from './DepartmentNewsManager';
 import type { PlacementYearRecord } from '../../../lib/placementRecords';
 import { parsePlacementsFile, dedupePlacementRows, downloadPlacementsTemplate, type PlacementImportResult } from '../../../lib/placementsImport';
+import type { InternshipYearRecord } from '../../../lib/internshipRecords';
+import { parseInternshipsFile, dedupeInternshipRows, downloadInternshipsTemplate, type InternshipImportResult } from '../../../lib/internshipsImport';
 import CustomSectionEditor from './CustomSectionEditor';
 import { replaceAtPath, getAtPath, type CustomSection } from '../../../lib/customSections';
 import RndTableEditor, { type RndStructuredTable } from './RndTableEditor';
+import { diffChangedFields } from '../../../lib/formDiff';
 
 export interface ProgramSubject {
   title: string;
@@ -238,6 +241,10 @@ export interface ProgramDoc {
   // exactly one Academic Year + Department + Programme, since it lives on
   // this specific programme's own doc.
   placementYears?: PlacementYearRecord[];
+  // Same shape/pattern as placementYears above, for internships instead of
+  // placements — shown as the "Internships" section's records table + Quick
+  // Links entry.
+  internshipYears?: InternshipYearRecord[];
   // Admin-defined sections beyond the fixed set above — any name, any number
   // of sub-sections, and a choice of plain text / table / links / files per
   // section (see lib/customSections.ts). Fully additive: a program with no
@@ -258,12 +265,13 @@ const EMPTY: Omit<ProgramDoc, 'id'> = {
   newsletterYears: [],
   rndIntro: '', rndTableText: '', rndProjectsText: '', rndLinks: [],
   rndStructuredTable: { columns: [], rows: [] },
-  // placementYears is intentionally NOT part of this form/EMPTY: it's
-  // managed entirely by <PlacementYearsEditor> below via its own immediate
-  // Firestore writes (same reason the old department-wide placement editor
-  // was kept separate — see that component's own comment). Leaving it out
-  // of `form` means `save()`'s `{...form}` spread never touches this field,
-  // so clicking "Update Program" can never clobber it with a stale/empty
+  // placementYears/internshipYears are intentionally NOT part of this
+  // form/EMPTY: they're each managed entirely by their own editor below
+  // (<PlacementYearsEditor>/<InternshipYearsEditor>) via immediate Firestore
+  // writes (same reason the old department-wide placement editor was kept
+  // separate — see that component's own comment). Leaving them out of
+  // `form` means `save()`'s `{...form}` spread never touches either field,
+  // so clicking "Update Program" can never clobber them with a stale/empty
   // array.
   customSections: [],
   order: 0,
@@ -306,6 +314,14 @@ function arrayToLines(arr: string[] = []): string {
 export default function ProgramsAdmin() {
   const { docs: programs, loading } = useOrderedCollection<ProgramDoc>('programs', 'order');
   const [form, setForm] = useState<Omit<ProgramDoc, 'id'>>(EMPTY);
+  // Snapshot of `form` taken at the moment "Edit" was clicked (see
+  // startEdit) — save() diffs against this so Update only writes fields you
+  // actually changed in this session. Without it, `updateDoc(doc, {...form})`
+  // blindly overwrites every field with this tab's stale copy, silently
+  // reverting whatever anyone else (or you, in another tab) saved on this
+  // program in the meantime. null while adding a new program (nothing to
+  // diff against — always writes the full form then).
+  const [originalForm, setOriginalForm] = useState<Omit<ProgramDoc, 'id'> | null>(null);
   const [editing, setEditing] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -522,6 +538,36 @@ export default function ProgramsAdmin() {
     }));
   };
 
+  // contentType 'gallery' — same shape as the file handlers above, but each
+  // photo is addressed by its index within that section's galleryPhotos.
+  const handleCustomSectionGalleryPhotoUploaded = (sectionPath: number[], photoIndex: number, r: UploadResult) => {
+    setForm((p) => ({
+      ...p,
+      customSections: replaceAtPath(p.customSections || [], sectionPath, (s) => ({
+        ...s,
+        galleryPhotos: (s.galleryPhotos || []).map((ph, i) => (i === photoIndex ? { imageUrl: r.url, storagePath: r.path } : ph)),
+      })),
+    }));
+  };
+  const handleCustomSectionGalleryPhotoRemoved = async (sectionPath: number[], photoIndex: number) => {
+    const photo = getAtPath(form.customSections || [], sectionPath)?.galleryPhotos?.[photoIndex];
+    if (!photo) return;
+    if (photo.imageUrl && !confirm('Remove this photo? This cannot be undone.')) return;
+    try {
+      if (photo.storagePath) await deleteFile(photo.storagePath);
+    } catch (e) {
+      alert(`Couldn't delete the photo from storage: ${(e as Error).message}`);
+      return;
+    }
+    setForm((p) => ({
+      ...p,
+      customSections: replaceAtPath(p.customSections || [], sectionPath, (s) => ({
+        ...s,
+        galleryPhotos: (s.galleryPhotos || []).filter((_, i) => i !== photoIndex),
+      })),
+    }));
+  };
+
   // Programme Structure (semesters + subjects) editing — structured add /
   // remove / reorder, replacing the old free-text "Semester I: A, B" parser.
   const addSemester = () => {
@@ -609,11 +655,18 @@ export default function ProgramsAdmin() {
         psos: form.psos.filter(Boolean),
       });
       if (editing) {
-        await updateDoc(doc(db, 'programs', editing), { ...payload });
+        // Only send fields that actually changed since this edit session
+        // started — see diffChangedFields/originalForm above. Skips the
+        // network call entirely if nothing did (e.g. Edit then Update with
+        // no changes).
+        const changed = originalForm ? diffChangedFields(payload, stripUndefined(originalForm)) : payload;
+        if (Object.keys(changed).length > 0) {
+          await updateDoc(doc(db, 'programs', editing), changed);
+        }
       } else {
         await addDoc(collection(db, 'programs'), { ...payload, order: form.order || programs.filter((p) => p.category === form.category).length, createdAt: serverTimestamp() });
       }
-      setForm(EMPTY); setEditing(null);
+      setForm(EMPTY); setEditing(null); setOriginalForm(null);
     } catch (e) {
       alert(`Couldn't save: ${(e as Error).message}`);
     } finally { setSaving(false); }
@@ -621,7 +674,7 @@ export default function ProgramsAdmin() {
 
   const startEdit = (p: ProgramDoc) => {
     setEditing(p.id);
-    setForm({
+    const next: Omit<ProgramDoc, 'id'> = {
       slug: p.slug, name: p.name, shortName: p.shortName, icon: p.icon || 'GraduationCap',
       category: p.category, intake: p.intake, established: p.established, accreditation: p.accreditation,
       hod: p.hod, department: p.department || '', fee: p.fee || '', heroImage: p.heroImage, storagePath: p.storagePath, about: p.about,
@@ -655,7 +708,9 @@ export default function ProgramsAdmin() {
       },
       customSections: p.customSections || [],
       order: p.order || 0,
-    });
+    };
+    setForm(next);
+    setOriginalForm(next);
   };
 
   const remove = async (id: string) => {
@@ -670,14 +725,19 @@ export default function ProgramsAdmin() {
   return (
     <div className="admin-section">
       <div className="admin-card">
-        <h2 className="admin-card__title">Placements — Import Template</h2>
+        <h2 className="admin-card__title">Placements &amp; Internships — Import Templates</h2>
         <p className="admin-field__hint" style={{ marginBottom: '0.75rem' }}>
-          For the "S.No / Registration Number / Student Name / Company / Package" file each programme's Placements
-          section (below, once you Edit a programme) accepts — grab this before you start filling one in.
+          For the files each programme's Placements/Internships section (below, once you Edit a programme) accepts —
+          grab whichever one you need before you start filling it in.
         </p>
-        <button type="button" className="admin-btn admin-btn--ghost admin-btn--sm" onClick={downloadPlacementsTemplate}>
-          ⬇ Download Excel Template
-        </button>
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+          <button type="button" className="admin-btn admin-btn--ghost admin-btn--sm" onClick={downloadPlacementsTemplate}>
+            ⬇ Download Placements Template
+          </button>
+          <button type="button" className="admin-btn admin-btn--ghost admin-btn--sm" onClick={downloadInternshipsTemplate}>
+            ⬇ Download Internships Template
+          </button>
+        </div>
       </div>
 
       <div className="admin-card">
@@ -738,8 +798,13 @@ export default function ProgramsAdmin() {
             <input id="field-display-order" type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
           </div>
           <div className="admin-field admin-field--full">
-            <label htmlFor="field-about">About</label>
-            <textarea id="field-about" rows={4} value={form.about} onChange={(e) => set('about', e.target.value)} placeholder="Department overview…" />
+            <label htmlFor="field-about">About the Programme</label>
+            <p className="admin-field__hint" style={{ marginTop: 0 }}>
+              For this specific programme's own page. Shown as "About the Programme". Department-wide text
+              ("About the Department") is a separate field, edited on the matching record in{' '}
+              <strong>Admin → Academic Departments → Overview</strong>.
+            </p>
+            <textarea id="field-about" rows={4} value={form.about} onChange={(e) => set('about', e.target.value)} placeholder="Programme overview…" />
           </div>
           <div className="admin-field admin-field--full">
             <label htmlFor="field-highlights-one-per-line">Highlights (one per line)</label>
@@ -920,6 +985,19 @@ export default function ProgramsAdmin() {
             )}
           </div>
 
+          <div className="admin-field admin-field--full"><hr /><h3>Internships</h3></div>
+          <div className="admin-field admin-field--full">
+            {editing ? (
+              <p className="admin-field__hint">Import from Excel/CSV/Word/PDF in the "Internships" card below, once your changes here are saved.</p>
+            ) : (
+              <p className="admin-field__hint">
+                Save this program first, then reopen it here (Edit) to import Internships — an "Internships" card
+                will appear below with the file upload. You can download the import template from the button at the
+                top of this page any time before that.
+              </p>
+            )}
+          </div>
+
           <div className="admin-field admin-field--full"><hr /><h3>News &amp; Events — This Programme</h3></div>
           <div className="admin-field admin-field--full">
             {editing ? (
@@ -1078,11 +1156,13 @@ export default function ProgramsAdmin() {
               onFileRemoved={handleCustomSectionFileRemoved}
               onPhotoUploaded={handleCustomSectionPhotoUploaded}
               onPhotoRemoved={handleCustomSectionPhotoRemoved}
+              onGalleryPhotoUploaded={handleCustomSectionGalleryPhotoUploaded}
+              onGalleryPhotoRemoved={handleCustomSectionGalleryPhotoRemoved}
             />
           </div>
         </div>
         <div className="admin-form-actions">
-          {editing && <button className="admin-btn admin-btn--ghost" onClick={() => { setEditing(null); setForm(EMPTY); }}>Cancel</button>}
+          {editing && <button className="admin-btn admin-btn--ghost" onClick={() => { setEditing(null); setForm(EMPTY); setOriginalForm(null); }}>Cancel</button>}
           <button className="admin-btn admin-btn--primary" onClick={save} disabled={saving}>
             {saving ? 'Saving…' : editing ? 'Update Program' : 'Add Program'}
           </button>
@@ -1092,7 +1172,12 @@ export default function ProgramsAdmin() {
 
       {editing && (() => {
         const liveProgram = programs.find((p) => p.id === editing);
-        return liveProgram ? <PlacementYearsEditor program={liveProgram} /> : null;
+        return liveProgram ? (
+          <>
+            <PlacementYearsEditor program={liveProgram} />
+            <InternshipYearsEditor program={liveProgram} />
+          </>
+        ) : null;
       })()}
 
       <div className="admin-card">
@@ -1524,6 +1609,243 @@ function PlacementYearsEditor({ program }: { program: ProgramDoc }) {
               </>
             ) : (
               <p className="admin-field__hint" style={{ marginTop: '0.75rem' }}>No placement records imported yet for {y.year}.</p>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// Individual student Internship Records for one programme, grouped by
+// Academic Year — the exact same shape/pattern as PlacementYearsEditor
+// above (see its comment for the full reasoning), just writing to
+// `internshipYears` instead of `placementYears`.
+function InternshipYearsEditor({ program }: { program: ProgramDoc }) {
+  const years = program.internshipYears || [];
+  const [newYearLabel, setNewYearLabel] = useState('');
+  const [previews, setPreviews] = useState<Record<number, InternshipImportResult>>({});
+  const [importingYear, setImportingYear] = useState<number | null>(null);
+  const [busyYear, setBusyYear] = useState<number | null>(null);
+
+  const persistYears = (next: InternshipYearRecord[]) => updateDoc(doc(db, 'programs', program.id), { internshipYears: next });
+
+  const addYear = async () => {
+    const label = newYearLabel.trim();
+    if (!label) return;
+    if (years.some((y) => y.year.trim().toLowerCase() === label.toLowerCase())) {
+      alert('That Academic Year already exists for this programme.');
+      return;
+    }
+    try {
+      await persistYears([...years, { year: label, columns: [], rows: [] }]);
+      setNewYearLabel('');
+    } catch (e) {
+      alert(`Couldn't add Academic Year: ${(e as Error).message}`);
+    }
+  };
+
+  const removeYear = async (yi: number) => {
+    if (!confirm(`Remove Academic Year "${years[yi].year}" and all its internship records? This cannot be undone.`)) return;
+    setBusyYear(yi);
+    try {
+      await persistYears(years.filter((_, i) => i !== yi));
+    } catch (e) {
+      alert(`Couldn't remove Academic Year: ${(e as Error).message}`);
+    } finally {
+      setBusyYear(null);
+    }
+  };
+
+  const moveYear = async (yi: number, dir: -1 | 1) => {
+    const target = yi + dir;
+    if (target < 0 || target >= years.length) return;
+    const next = [...years];
+    [next[yi], next[target]] = [next[target], next[yi]];
+    try {
+      await persistYears(next);
+    } catch (e) {
+      alert(`Couldn't reorder: ${(e as Error).message}`);
+    }
+  };
+
+  const handleFile = async (yi: number, file: File) => {
+    setImportingYear(yi);
+    try {
+      const result = await parseInternshipsFile(file);
+      if (result.columns.length === 0 || result.rows.length === 0) {
+        alert(
+          "Couldn't find any data in that file — for Excel/CSV make sure the first row has column headers, " +
+          'for Word make sure the records are in an actual table, and for PDF make sure it has selectable text (not a scanned image).'
+        );
+        return;
+      }
+      // Only an exact whole-row duplicate (every column the same) is
+      // dropped — a repeated name, registration number, company, etc. on
+      // its own is a normal, expected occurrence (e.g. one student with
+      // multiple internships) and is left alone.
+      const { rows: dedupedRows, removed } = dedupeInternshipRows(result.rows);
+      const dupWarning = removed > 0
+        ? `Skipped ${removed} exact duplicate row${removed === 1 ? '' : 's'} (every column matched another row already in the file).`
+        : '';
+      const warning = [result.warning, dupWarning].filter(Boolean).join(' ') || undefined;
+      setPreviews((p) => ({ ...p, [yi]: { ...result, rows: dedupedRows, warning } }));
+    } catch (e) {
+      alert(`Couldn't read that file: ${(e as Error).message}`);
+    } finally {
+      setImportingYear(null);
+    }
+  };
+
+  const discardPreview = (yi: number) => setPreviews((p) => { const next = { ...p }; delete next[yi]; return next; });
+
+  const savePreview = async (yi: number) => {
+    const preview = previews[yi];
+    if (!preview) return;
+    setBusyYear(yi);
+    try {
+      const next = years.map((y, i) => (i === yi ? { ...y, columns: preview.columns, rows: preview.rows.map((cells) => ({ cells })) } : y));
+      await persistYears(next);
+      discardPreview(yi);
+    } catch (e) {
+      alert(`Couldn't save: ${(e as Error).message}`);
+    } finally {
+      setBusyYear(null);
+    }
+  };
+
+  const clearRecords = async (yi: number) => {
+    if (!confirm(`Delete the saved internship records for "${years[yi].year}"? The Academic Year itself stays, just empty. This cannot be undone.`)) return;
+    setBusyYear(yi);
+    try {
+      await persistYears(years.map((y, i) => (i === yi ? { ...y, columns: [], rows: [] } : y)));
+    } catch (e) {
+      alert(`Couldn't delete: ${(e as Error).message}`);
+    } finally {
+      setBusyYear(null);
+    }
+  };
+
+  return (
+    <div className="admin-card">
+      <h2 className="admin-card__title">Internships — {program.shortName || program.name}</h2>
+      <p className="admin-field__hint" style={{ marginBottom: '1rem' }}>
+        Add an Academic Year, then upload a file of student internship records for that year — Excel (.xlsx/.xls),
+        CSV, Word (.docx, records must be in an actual table), or PDF (records must be selectable text, not a
+        scanned image) are all accepted. The first row is treated as column headers — whatever columns the file
+        actually has are used as-is, nothing is assumed or hardcoded. On the public page, the 10 highest values in
+        whichever column looks like "Stipend" show first for that year, then everyone else in the order they were
+        imported. Re-importing a year replaces its previous dataset. Scoped to this exact programme only — other
+        programmes in the same department manage their own Academic Years independently.
+        A row that's an exact duplicate of another (every column matches) is skipped automatically on import — a
+        single column repeating on its own, like a student's name against two different companies, is fine.
+      </p>
+      <div style={{ marginBottom: '1rem' }}>
+        <button type="button" className="admin-btn admin-btn--ghost admin-btn--sm" onClick={downloadInternshipsTemplate}>
+          ⬇ Download Excel Template
+        </button>
+      </div>
+
+      <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '1.25rem' }}>
+        <input
+          value={newYearLabel}
+          onChange={(e) => setNewYearLabel(e.target.value)}
+          onKeyDown={(e) => { if (e.key === 'Enter') addYear(); }}
+          placeholder="e.g. 2025-26"
+          style={{ maxWidth: 220 }}
+        />
+        <button type="button" className="admin-btn admin-btn--primary" onClick={addYear}>+ Add Academic Year</button>
+      </div>
+
+      {years.length === 0 && (
+        <p className="admin-field__hint">No Academic Years yet — add one above to start importing internship records.</p>
+      )}
+
+      {years.map((y, yi) => {
+        const preview = previews[yi];
+        const displayed = preview
+          ? preview
+          : y.columns.length > 0
+            ? { columns: y.columns, rows: y.rows.map((r) => r.cells) }
+            : null;
+        const importing = importingYear === yi;
+        const busy = busyYear === yi;
+
+        return (
+          <div key={yi} style={{ border: '1.5px solid var(--color-light-gray)', borderRadius: 8, padding: '1rem', marginBottom: '1rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
+              <strong style={{ flex: 1, fontSize: '1rem' }}>{y.year}</strong>
+              <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveYear(yi, -1)} disabled={yi === 0} title="Move up">↑</button>
+              <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveYear(yi, 1)} disabled={yi === years.length - 1} title="Move down">↓</button>
+              <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeYear(yi)} disabled={busy}>Remove Year</button>
+            </div>
+
+            <label className="admin-btn admin-btn--primary" style={{ display: 'inline-block', cursor: importing ? 'default' : 'pointer', opacity: importing ? 0.6 : 1 }}>
+              {importing ? 'Reading file…' : 'Import from Excel / CSV / Word / PDF'}
+              <input
+                type="file"
+                accept=".xlsx,.xls,.csv,.docx,.pdf"
+                hidden
+                disabled={importing}
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handleFile(yi, file);
+                  e.target.value = '';
+                }}
+              />
+            </label>
+
+            {displayed && displayed.columns.length > 0 ? (
+              <>
+                <div style={{ margin: '1rem 0' }}>
+                  <strong>Detected columns:</strong>{' '}
+                  {displayed.columns.map((c, ci) => (
+                    <span key={ci} className="admin-badge" style={{ marginRight: '0.4rem', textTransform: 'none' }}>{c}</span>
+                  ))}
+                </div>
+                <p className="admin-field__hint">
+                  {displayed.rows.length} record{displayed.rows.length === 1 ? '' : 's'}{preview ? ' — not yet saved' : ' saved'}.
+                </p>
+                {preview?.warning && (
+                  <p
+                    className="admin-field__hint"
+                    style={{ background: '#fff8e6', border: '1px solid #f5d78e', borderRadius: 6, padding: '0.6rem 0.9rem', marginBottom: '0.75rem' }}
+                  >
+                    ℹ️ {preview.warning}
+                  </p>
+                )}
+                <div className="admin-table-wrap" style={{ maxHeight: 320, overflow: 'auto' }}>
+                  <table className="admin-table">
+                    <thead>
+                      <tr>{displayed.columns.map((c, ci) => <th key={ci}>{c}</th>)}</tr>
+                    </thead>
+                    <tbody>
+                      {displayed.rows.slice(0, 25).map((row, ri) => (
+                        <tr key={ri}>{row.map((cell, ci) => <td key={ci}>{cell}</td>)}</tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                {displayed.rows.length > 25 && (
+                  <p className="admin-field__hint">Showing the first 25 of {displayed.rows.length} rows.</p>
+                )}
+                {preview ? (
+                  <div className="admin-form-actions">
+                    <button className="admin-btn admin-btn--ghost" onClick={() => discardPreview(yi)}>Discard</button>
+                    <button className="admin-btn admin-btn--primary" onClick={() => savePreview(yi)} disabled={busy}>
+                      {busy ? 'Saving…' : 'Save Internship Records'}
+                    </button>
+                  </div>
+                ) : (
+                  <div className="admin-form-actions">
+                    <button className="admin-btn admin-btn--danger" onClick={() => clearRecords(yi)} disabled={busy}>
+                      {busy ? 'Deleting…' : 'Delete Records'}
+                    </button>
+                  </div>
+                )}
+              </>
+            ) : (
+              <p className="admin-field__hint" style={{ marginTop: '0.75rem' }}>No internship records imported yet for {y.year}.</p>
             )}
           </div>
         );
