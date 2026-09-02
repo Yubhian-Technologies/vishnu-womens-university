@@ -627,6 +627,50 @@
   white-space: pre-wrap;
 }
 
+/* ---- Editable data table (Placement Records "Edit Table" mode) ---- */
+.admin-table--editing td { padding: 0.4rem 0.5rem; }
+
+.admin-table__cell-input {
+  width: 100%;
+  min-width: 110px;
+  padding: 0.4rem 0.55rem;
+  border: 1.5px solid #d1d5db;
+  border-radius: 5px;
+  font-size: 0.85rem;
+  color: #111827;
+  background: #fff;
+}
+
+.admin-table__cell-input:focus {
+  outline: none;
+  border-color: #081c15;
+}
+
+.admin-table__drag-handle {
+  cursor: grab;
+  text-align: center;
+  color: #9ca3af;
+  font-size: 1rem;
+  user-select: none;
+}
+
+.admin-table__drag-handle:active { cursor: grabbing; }
+
+.admin-table__row-delete {
+  background: #fee2e2;
+  color: #dc2626;
+  border: none;
+  border-radius: 5px;
+  width: 28px;
+  height: 28px;
+  font-size: 0.9rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.admin-table__row-delete:hover { opacity: 0.8; }
+
 /* ---- Misc ---- */
 .admin-lead { color: #6b7280; font-size: 0.95rem; margin-bottom: 1.5rem; }
 .admin-empty { text-align: center; color: #9ca3af; font-size: 0.9rem; padding: 1.5rem; }
