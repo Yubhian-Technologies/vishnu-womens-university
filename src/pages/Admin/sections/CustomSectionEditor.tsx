@@ -153,6 +153,13 @@ export default function CustomSectionEditor({
                   style={{ fontWeight: 700 }}
                 />
               </div>
+              <div className="admin-field" style={{ flex: 2, minWidth: 160 }}>
+                <input
+                  value={s.subtitle || ''}
+                  onChange={(e) => updateSection(si, { subtitle: e.target.value })}
+                  placeholder="Subtitle (optional) — shown under the section name"
+                />
+              </div>
               <div className="admin-field" style={{ flex: 1, minWidth: 140 }}>
                 <select
                   value={s.contentType}

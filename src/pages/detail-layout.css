@@ -1962,6 +1962,21 @@ td.pb-activities-num {
   outline: none;
 }
 
+/* "You are here" state — for a quick-nav list of separate pages (e.g.
+   CampusFacilitiesNav) rather than same-page anchors, which have no
+   equivalent persistent state. Same visual treatment as the hover state
+   above, just not requiring the pointer to stay there. */
+.dept-quick-nav-link.is-active {
+  background: rgba(201, 168, 76, 0.18);
+  border-color: rgba(201, 168, 76, 0.35);
+  border-left-color: var(--color-accent);
+  color: #ffffff;
+}
+.dept-quick-nav-link.is-active .dept-btn-arrow-circle {
+  background: #ffffff;
+  color: var(--color-primary-dark, #1b4332);
+}
+
 /* Circular Background over Button Arrows */
 .dept-btn-arrow-circle {
   width: 24px;
