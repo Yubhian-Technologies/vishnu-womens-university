@@ -12,6 +12,7 @@ import { diffChangedFields } from '../../../lib/formDiff';
 import CustomSectionEditor from './CustomSectionEditor';
 import { replaceAtPath, getAtPath, type CustomSection } from '../../../lib/customSections';
 import { FRESHMAN_DEPARTMENT_SEEDS } from '../../Academics/freshmanDepartmentSeeds';
+import { STANDALONE_DEPARTMENTS } from '../../../lib/departmentGroups';
 
 // Backs the "Academic Departments" card grid on Academics.tsx — independent
 // of the `programs` collection, so a department's card copy doesn't have to
@@ -912,30 +913,43 @@ export default function DepartmentsAdmin() {
             <textarea id="field-hod-research-profiles" rows={4} value={linksToText(form.hodResearchProfiles)} onChange={(e) => set('hodResearchProfiles', textToLinks(e.target.value))} placeholder="Google Scholar: https://scholar.google.com/citations?user=…" />
           </div>
 
-          <div className="admin-field admin-field--full"><hr /><h3>Department Page — Custom Sections</h3>
-            <p className="admin-field__hint" style={{ marginTop: '0.25rem' }}>
-              Optional. Add any section this department needs beyond the fixed fields above — Research &amp;
-              Development, Awards &amp; Recognitions, or anything else — any name, any number of sub-sections, and a
-              choice of plain text, a table, a checklist, a list of links, uploaded files, a photo gallery, or panel
-              view per section. Shown on this department's page after Laboratories. For a standalone department with
-              no linked programme (e.g. Mathematics/Physics/Chemistry/English), this is also the only place to add
-              real Laboratory photos — one section per lab, each with its own Photo Gallery.
-            </p>
-          </div>
-          <div className="admin-field admin-field--full">
-            <CustomSectionEditor
-              sections={form.customSections || []}
-              onChange={(next) => set('customSections', next)}
-              rootSections={form.customSections || []}
-              parentPath={[]}
-              onFileUploaded={handleCustomSectionFileUploaded}
-              onFileRemoved={handleCustomSectionFileRemoved}
-              onPhotoUploaded={handleCustomSectionPhotoUploaded}
-              onPhotoRemoved={handleCustomSectionPhotoRemoved}
-              onGalleryPhotoUploaded={handleCustomSectionGalleryPhotoUploaded}
-              onGalleryPhotoRemoved={handleCustomSectionGalleryPhotoRemoved}
-            />
-          </div>
+          {STANDALONE_DEPARTMENTS.some((d) => d.deptShortCode.trim().toLowerCase() === form.shortCode.trim().toLowerCase()) ? (
+            <>
+              <div className="admin-field admin-field--full"><hr /><h3>Department Page — Custom Sections</h3>
+                <p className="admin-field__hint" style={{ marginTop: '0.25rem' }}>
+                  Optional. Add any section this department needs beyond the fixed fields above — Research &amp;
+                  Development, Awards &amp; Recognitions, or anything else — any name, any number of sub-sections, and
+                  a choice of plain text, a table, a checklist, a list of links, uploaded files, a photo gallery, or
+                  panel view per section. This department has no linked programme, so this is the only place to add
+                  its page content — shown after Laboratories, and it's also the only place to add real Laboratory
+                  photos (one section per lab, each with its own Photo Gallery).
+                </p>
+              </div>
+              <div className="admin-field admin-field--full">
+                <CustomSectionEditor
+                  sections={form.customSections || []}
+                  onChange={(next) => set('customSections', next)}
+                  rootSections={form.customSections || []}
+                  parentPath={[]}
+                  onFileUploaded={handleCustomSectionFileUploaded}
+                  onFileRemoved={handleCustomSectionFileRemoved}
+                  onPhotoUploaded={handleCustomSectionPhotoUploaded}
+                  onPhotoRemoved={handleCustomSectionPhotoRemoved}
+                  onGalleryPhotoUploaded={handleCustomSectionGalleryPhotoUploaded}
+                  onGalleryPhotoRemoved={handleCustomSectionGalleryPhotoRemoved}
+                />
+              </div>
+            </>
+          ) : (
+            <div className="admin-field admin-field--full">
+              <hr />
+              <p className="admin-field__hint">
+                This department's public page is driven by its linked programme(s) — add Custom Sections from{' '}
+                <strong>Programs</strong> (edit the relevant programme) instead of here; anything added on this form
+                would never be shown, since this department's page doesn't read it.
+              </p>
+            </div>
+          )}
         </div>
 
         <div className="admin-form-actions">
