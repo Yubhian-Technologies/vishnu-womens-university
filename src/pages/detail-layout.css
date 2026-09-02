@@ -1182,65 +1182,11 @@ td.pb-activities-num {
   margin-bottom: var(--space-5);
 }
 
-.placement-stat-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-4);
-  margin-bottom: var(--space-8);
-}
-
-.placement-stat-tile {
-  background: var(--color-off-white);
-  border: 1.5px solid var(--color-light-gray);
-  border-radius: var(--radius-md);
-  padding: var(--space-6) var(--space-4);
-  text-align: center;
-}
-
-.placement-stat-tile__label {
-  font-family: var(--font-sans);
-  font-size: var(--text-xs);
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--color-text-light);
-  margin-bottom: var(--space-2);
-}
-
-.placement-stat-tile__value {
-  font-family: var(--font-serif);
-  font-size: 1.6rem;
-  font-weight: 900;
-  color: var(--color-primary);
-}
-
-.placement-stat-tile__value--link {
-  background: none;
-  border: none;
-  font-family: var(--font-serif);
-  font-size: 1.4rem;
-  font-weight: 900;
-  color: var(--color-accent);
-  cursor: pointer;
-  padding: 0;
-}
-
-.placement-stat-tile__value--link:hover {
-  text-decoration: underline;
-}
-
-@media (max-width: 768px) {
-  .placement-stat-grid { grid-template-columns: repeat(2, 1fr); }
-}
-
-@media (max-width: 480px) {
-  .placement-stat-grid { grid-template-columns: 1fr; }
-}
-
-/* ===== Department page — circular placement stat counters =====
-   Scoped to DepartmentDetail.tsx (uses its own dept-stat-* class names) so
-   the flat .placement-stat-tile boxes above stay exactly as they are for
-   ProgramDetail.tsx, which shares that class. */
+/* ===== Placements/Internships circular stat counters =====
+   Shared by ProgramDetail.tsx and DepartmentDetail.tsx so the "basic
+   details" tiles above the Placements/Internships records look identical
+   everywhere, regardless of whether the programme is standalone or part of
+   a grouped department. */
 .dept-stat-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
