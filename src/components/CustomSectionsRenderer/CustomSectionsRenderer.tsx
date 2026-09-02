@@ -11,6 +11,18 @@ import SmoothCollapse from '../SmoothCollapse/SmoothCollapse';
 // section on these pages avoids it (see the gotcha documented in CLAUDE.md).
 const DEFAULT_NAV_OFFSET = 'calc(var(--topbar-height) + var(--header-height) + 1rem)';
 
+// A section's optional subtitle (see CustomSection.subtitle) — one shared
+// small-print line under a section's title, used everywhere a title renders
+// below so every layout shows it the same way.
+function SectionSubtitle({ subtitle }: { subtitle?: string }) {
+  if (!subtitle?.trim()) return null;
+  return (
+    <p style={{ margin: '0.3rem 0 0', color: 'var(--color-text-light)', fontSize: 'var(--text-sm)', fontWeight: 600 }}>
+      {subtitle}
+    </p>
+  );
+}
+
 // Default export — used by ProgramDetail.tsx/DepartmentDetail.tsx, where
 // every custom section renders as its own full-width section before the CTA
 // (Programs pages don't have the intro-column/accordion split Differentiators
@@ -28,6 +40,7 @@ export default function CustomSectionsRenderer({ sections, navOffset = DEFAULT_N
             <div style={{ marginBottom: 'var(--space-8)' }}>
               <span className="section-label">Details</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem', fontWeight: section.boldHeading ? 800 : undefined }}>{section.label}</h2>
+              <SectionSubtitle subtitle={section.subtitle} />
             </div>
             <SectionSubtree section={section} navOffset={navOffset} />
           </div>
@@ -48,8 +61,11 @@ export function CustomSectionsIntro({ sections }: { sections: CustomSection[] })
       {visible.map((section) => (
         <div key={section.id} style={{ marginTop: 'var(--space-6)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-3)' }}>
-            <div style={{ width: 4, height: 24, background: 'var(--color-accent)', borderRadius: 'var(--radius-full)' }} />
-            <h3 style={{ fontSize: '1.25rem', margin: 0, fontWeight: section.boldHeading ? 800 : undefined }}>{section.label}</h3>
+            <div style={{ width: 4, height: 24, background: 'var(--color-accent)', borderRadius: 'var(--radius-full)', flexShrink: 0, alignSelf: 'flex-start', marginTop: 2 }} />
+            <div>
+              <h3 style={{ fontSize: '1.25rem', margin: 0, fontWeight: section.boldHeading ? 800 : undefined }}>{section.label}</h3>
+              <SectionSubtitle subtitle={section.subtitle} />
+            </div>
           </div>
           <SectionSubtree section={section} />
         </div>
@@ -101,8 +117,11 @@ export function CustomSectionsPlain({ sections }: { sections: CustomSection[] })
         return (
           <div key={section.id} style={{ marginTop: i === 0 ? 0 : 'var(--space-6)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-3)' }}>
-              <div style={{ width: 4, height: 24, background: 'var(--color-accent)', borderRadius: 'var(--radius-full)' }} />
-              <h3 style={{ fontSize: '1.25rem', margin: 0, fontWeight: section.boldHeading ? 800 : undefined }}>{section.label}</h3>
+              <div style={{ width: 4, height: 24, background: 'var(--color-accent)', borderRadius: 'var(--radius-full)', flexShrink: 0, alignSelf: 'flex-start', marginTop: 2 }} />
+              <div>
+                <h3 style={{ fontSize: '1.25rem', margin: 0, fontWeight: section.boldHeading ? 800 : undefined }}>{section.label}</h3>
+                <SectionSubtitle subtitle={section.subtitle} />
+              </div>
             </div>
             <SectionSubtree section={section} />
           </div>
@@ -268,6 +287,7 @@ export function SectionSubtree({ section, depth = 0, navOffset = DEFAULT_NAV_OFF
           <h4 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: sub.boldHeading ? 800 : 700, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>
             {sub.label}
           </h4>
+          <SectionSubtitle subtitle={sub.subtitle} />
           <SectionSubtree section={sub} depth={depth + 1} navOffset={navOffset} />
         </div>
       ))}
@@ -343,8 +363,11 @@ function PillSwitcher({ sections, depth = 0, navOffset = DEFAULT_NAV_OFFSET }: {
       </div>
       <div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-3)' }}>
-          <div style={{ width: 4, height: 24, background: 'var(--color-accent)', borderRadius: 'var(--radius-full)' }} />
-          <h3 style={{ fontSize: '1.25rem', margin: 0, fontWeight: active.boldHeading ? 800 : undefined }}>{active.label}</h3>
+          <div style={{ width: 4, height: 24, background: 'var(--color-accent)', borderRadius: 'var(--radius-full)', flexShrink: 0, alignSelf: 'flex-start', marginTop: 2 }} />
+          <div>
+            <h3 style={{ fontSize: '1.25rem', margin: 0, fontWeight: active.boldHeading ? 800 : undefined }}>{active.label}</h3>
+            <SectionSubtitle subtitle={active.subtitle} />
+          </div>
         </div>
         <SectionSubtree section={active} depth={depth} navOffset={navOffset} />
       </div>

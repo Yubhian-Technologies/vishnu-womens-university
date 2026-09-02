@@ -33,21 +33,13 @@ const Research = lazy(() => import('./pages/Research/Research'));
 const ResearchDetail = lazy(() => import('./pages/Research/ResearchDetail'));
 const AboutSVES = lazy(() => import('./pages/AboutSVES/AboutSVES'));
 const Campus = lazy(() => import('./pages/Campus/Campus'));
-const CentralLibrary = lazy(() => import('./pages/Campus/CentralLibrary'));
-const CampusHostels = lazy(() => import('./pages/Campus/CampusHostels'));
-const OtherFacilities = lazy(() => import('./pages/Campus/OtherFacilities'));
-const CampusFacilityDetail = lazy(() => import('./pages/Campus/CampusFacilityDetail'));
+const CampusLifeDetail = lazy(() => import('./pages/CampusLife/CampusLifeDetail'));
 const Information = lazy(() => import('./pages/Information/Information'));
 const ProgrammesFee = lazy(() => import('./pages/Admissions/ProgrammesFee'));
 const AdmissionProcedure = lazy(() => import('./pages/Admissions/AdmissionProcedure'));
 const ResultAnalysis = lazy(() => import('./pages/Admissions/ResultAnalysis'));
-const VishnuTV = lazy(() => import('./pages/StudentActivities/VishnuTV'));
 const StudentClubs = lazy(() => import('./pages/StudentActivities/StudentClubs'));
 const StudentClubDetail = lazy(() => import('./pages/StudentActivities/StudentClubDetail'));
-const SocialServices = lazy(() => import('./pages/StudentActivities/SocialServices'));
-const CampusMagazines = lazy(() => import('./pages/StudentActivities/CampusMagazines'));
-const ArtsCulture = lazy(() => import('./pages/StudentActivities/ArtsCulture'));
-const SportsGames = lazy(() => import('./pages/StudentActivities/SportsGames'));
 const Differentiators = lazy(() => import('./pages/Differentiators/Differentiators'));
 const DifferentiatorDetail = lazy(() => import('./pages/Differentiators/DifferentiatorDetail'));
 const Placements = lazy(() => import('./pages/Placements/Placements'));
@@ -120,21 +112,18 @@ function PublicApp() {
           <Route path="/research/:slug" element={<ResearchDetail />} />
           <Route path="/about-sves" element={<AboutSVES />} />
           <Route path="/campus" element={<Campus />} />
-          <Route path="/campus/central-library" element={<CentralLibrary />} />
-          <Route path="/campus/campus-hostels" element={<CampusHostels />} />
-          <Route path="/campus/other-facilities" element={<OtherFacilities />} />
-          <Route path="/campus/:slug" element={<CampusFacilityDetail />} />
+          <Route path="/campus/:slug" element={<CampusLifeDetail />} />
           <Route path="/information" element={<Information />} />
           <Route path="/programmes-fee-structure" element={<ProgrammesFee />} />
           <Route path="/admission-procedure" element={<AdmissionProcedure />} />
           <Route path="/result-analysis" element={<ResultAnalysis />} />
-          <Route path="/vishnu-tv-academy" element={<VishnuTV />} />
+          <Route path="/vishnu-tv-academy" element={<CampusLifeDetail slug="vishnu-tv-academy" />} />
           <Route path="/student-clubs" element={<StudentClubs />} />
           <Route path="/student-clubs/:slug" element={<StudentClubDetail />} />
-          <Route path="/social-services" element={<SocialServices />} />
-          <Route path="/campus-magazines" element={<CampusMagazines />} />
-          <Route path="/arts-culture" element={<ArtsCulture />} />
-          <Route path="/sports-games" element={<SportsGames />} />
+          <Route path="/social-services" element={<CampusLifeDetail slug="social-services" />} />
+          <Route path="/campus-magazines" element={<CampusLifeDetail slug="campus-magazines" />} />
+          <Route path="/arts-culture" element={<CampusLifeDetail slug="arts-culture" />} />
+          <Route path="/sports-games" element={<CampusLifeDetail slug="sports-games" />} />
           <Route path="/differentiators" element={<Differentiators />} />
           <Route path="/differentiators/:slug" element={<DifferentiatorDetail />} />
           <Route path="/placements" element={<Placements />} />
