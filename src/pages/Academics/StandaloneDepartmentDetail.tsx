@@ -107,11 +107,15 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
         </div>
       </section>
 
-      {/* About the Department */}
-      {hasAbout && (
+      {/* About the Department — kept independent of Quick Navigation below:
+          gating on hasAbout alone used to hide the whole block (nav
+          included) whenever About was empty, silently dropping Quick Links
+          for every other section too. */}
+      {(hasAbout || quickLinks.length > 1) && (
         <section id="about" className="section bg-white dept-about-section" style={{ scrollMarginTop: NAV_OFFSET }}>
           <div className="container">
             <div className={quickLinks.length > 1 ? 'detail-grid' : ''}>
+              {hasAbout && (
               <div className="dept-about-main">
                 <div className="dept-about-header">
                   <span className="section-label dept-section-label">Department Overview</span>
@@ -141,6 +145,7 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
                   </div>
                 )}
               </div>
+              )}
 
               {quickLinks.length > 1 && (
                 <div className="detail-sidebar">
