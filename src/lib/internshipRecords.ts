@@ -64,6 +64,7 @@ export function findPeriodColumnIndex(columns: string[]): number {
   const normalized = columns.map((c) => c.toLowerCase());
   let idx = normalized.findIndex((c) => c.includes('period'));
   if (idx === -1) idx = normalized.findIndex((c) => c.includes('duration'));
+  if (idx === -1) idx = normalized.findIndex((c) => c.includes('date'));
   if (idx === -1) idx = fuzzyColumnIndex(columns, 'period');
   return idx;
 }
