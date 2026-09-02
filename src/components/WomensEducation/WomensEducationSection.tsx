@@ -8,6 +8,7 @@ import {
   faLightbulb,
   faHandshakeAngle,
   faUsers,
+  faBriefcase,
   faArrowRight,
   faStar,
   faAward,
@@ -21,7 +22,6 @@ const PILLARS = [
   {
     icon: faRocket,
     iconColor: '#2d6a4f',
-    image: '/images/girl on graduation-rafiki.svg',
     title: "Fearless Innovation",
     desc: "Breaking glass ceilings in AI, VLSI, Cyber Security, and Automotive Engineering with purpose-built research labs.",
     tag: "Next-Gen Tech",
@@ -29,7 +29,6 @@ const PILLARS = [
   {
     icon: faShieldHalved,
     iconColor: '#1b4332',
-    image: '/images/girl on graduation-pana.svg',
     title: "100% Safe & Inspiring Campus",
     desc: "A vibrant, world-class residential campus built entirely to nurture women's personal, academic, and professional growth.",
     tag: "Secure Campus",
@@ -37,7 +36,6 @@ const PILLARS = [
   {
     icon: faTrophy,
     iconColor: '#92400e',
-    image: '/images/girl on graduation-cuate.svg',
     title: "Global Leadership Launchpad",
     desc: "1,100+ placements annually with top tech giants like Amazon, Microsoft, Adobe, Google, and Fortune 500 recruiters.",
     tag: "Career Ready",
@@ -45,7 +43,6 @@ const PILLARS = [
   {
     icon: faLightbulb,
     iconColor: '#7c3aed',
-    image: '/images/girl on graduation-amico.svg',
     title: "Incubation & Entrepreneurship",
     desc: "Empowering student founders with seed funding, 150+ patents, and dedicated incubation at Sri Vishnu TBI.",
     tag: "Women Founders",
@@ -60,10 +57,12 @@ const TAGS: { icon: IconDefinition; text: string }[] = [
   { icon: faShieldHalved, text: "Highest Safety & Mentorship" },
 ];
 
+// name/salary/logo are placeholders — swap in the real per-graduate data
+// (see .we-info-card, which crossfades these alongside the photo above).
 const PLACEMENT_PHOTOS = [
-  { src: '/images/placements/1.png', alt: 'VWU graduate placement success story 1' },
-  { src: '/images/placements/2.png', alt: 'VWU graduate placement success story 2' },
-  { src: '/images/placements/3.png', alt: 'VWU graduate placement success story 3' },
+  { src: '/images/placements/1.png', alt: 'VWU graduate placement success story 1', name: 'Graduate Name', salary: '₹00 LPA', logo: '' },
+  { src: '/images/placements/2.png', alt: 'VWU graduate placement success story 2', name: 'Graduate Name', salary: '₹00 LPA', logo: '' },
+  { src: '/images/placements/3.png', alt: 'VWU graduate placement success story 3', name: 'Graduate Name', salary: '₹00 LPA', logo: '' },
 ];
 
 const CAROUSEL_INTERVAL = 3500;
@@ -153,6 +152,28 @@ export default function WomensEducationSection() {
                 ))}
               </div>
 
+              {/* Rectangular info box originating from the circle's right
+                  edge: logo, name, salary — crossfades in sync with
+                  whichever placement photo is currently active. */}
+              <div className="we-info-connector" aria-hidden="true" />
+              <div className="we-info-card" aria-live="polite">
+                {PLACEMENT_PHOTOS.map((photo, i) => (
+                  <div key={photo.src} className={`we-info-entry${i === activePhoto ? ' is-active' : ''}`}>
+                    <div className="we-info-logo">
+                      {photo.logo ? (
+                        <img src={photo.logo} alt="" />
+                      ) : (
+                        <FontAwesomeIcon icon={faBriefcase} />
+                      )}
+                    </div>
+                    <div className="we-info-text">
+                      <strong className="we-info-name">{photo.name}</strong>
+                      <span className="we-info-salary">{photo.salary}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
               {/* Floating Badge 1: Top Left */}
               <div className="we-float-card we-float-card--top">
                 <div className="we-float-icon">
@@ -182,20 +203,16 @@ export default function WomensEducationSection() {
         <div className="we-pillars-grid">
           {PILLARS.map((p, idx) => (
             <div key={idx} className="we-pillar-card reveal-bounce" data-delay={`${idx * 80}`}>
-              {/* Card illustration */}
+              {/* Hero icon tile — matches the glass/glow language used by
+                  .we-halo-ring and .we-float-card above, instead of clip-art */}
               <div className="we-pillar-illustration-wrap">
-                <img
-                  src={p.image}
-                  alt={p.title}
-                  className="we-pillar-illustration"
-                  loading="lazy"
-                />
+                <div className="we-pillar-hero-glow" style={{ '--pillar-color': p.iconColor } as React.CSSProperties} aria-hidden="true" />
+                <div className="we-pillar-hero-icon" style={{ '--pillar-color': p.iconColor } as React.CSSProperties}>
+                  <FontAwesomeIcon icon={p.icon} />
+                </div>
               </div>
 
               <div className="we-pillar-header">
-                <div className="we-pillar-icon-box" style={{ color: p.iconColor }}>
-                  <FontAwesomeIcon icon={p.icon} style={{ fontSize: '1.15rem' }} />
-                </div>
                 <span className="we-pillar-tag">{p.tag}</span>
               </div>
 

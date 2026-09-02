@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Laptop } from 'lucide-react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrophy, faGlobe, faFlask, faGraduationCap } from '@fortawesome/free-solid-svg-icons';
 import HeroSlider from '../../components/HeroSlider/HeroSlider';
 import CounterSection from '../../components/CounterSection/CounterSection';
 import ScrollTopButton from '../../components/ScrollTopButton/ScrollTopButton';
@@ -12,6 +10,8 @@ import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import TestimonialSlider from '../../components/TestimonialSlider/TestimonialSlider';
 import RecruitersSection from '../../components/RecruitersMarquee/RecruitersSection';
 import WomensEducationSection from '../../components/WomensEducation/WomensEducationSection';
+import CampusLifeShowcase from '../../components/CampusLifeShowcase/CampusLifeShowcase';
+import ProgramsShowcase from '../../components/ProgramsShowcase/ProgramsShowcase';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { fetchPriorityAttr } from '../../lib/domAttrs';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
@@ -21,7 +21,6 @@ import { happeningToArticle } from '../../lib/happenings';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import type { HappeningDoc } from '../Admin/sections/NewsAwardsDataAdmin';
 import type { ContentBlockDoc } from '../Admin/sections/ContentBlocksAdmin';
-import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
 
 import SEO from '../../components/SEO/SEO';
 import { getUniversitySchema } from '../../lib/seo/schemas';
@@ -63,26 +62,6 @@ const defaultStudyCards: ContentBlockDoc[] = [
   { id: 'default-3', page: 'home', section: 'studyCards', value: 'Ph.D. Programs', title: 'Research & Ph.D.', desc: 'Conduct doctoral research in CSE, ECE, and EEE — backed by 2,500+ publications, 90+ patents, and purpose-built research facilities.', icon: 'FlaskConical', slug: '/academics', order: 2 },
 ];
 
-// Last-resort fallback only — used if the live `programs` collection (see
-// buildPopularProgramsFromPrograms below) is completely empty, e.g. Firestore
-// misconfigured. Under normal operation this strip is driven by the actual
-// Programs collection so it stays in sync with /admin → Programs automatically.
-const POPULAR_PROGRAM_SLUGS: Record<string, string> = {
-  'CSE': 'cse',
-  'AI & Machine Learning': 'ai-ml',
-  'AI & Data Science': 'ai-ds',
-  'Cyber Security': 'cyber-security',
-  'Information Technology': 'it',
-  'Electronics & Communication': 'ece',
-  'Electrical & Electronics': 'eee',
-  'Civil Engineering': 'ce',
-  'Mechanical Engineering': 'me',
-  'MBA': 'mba',
-};
-
-const slugify = (title: string) =>
-  title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-
 // The "M.Tech & MBA" study card's slug is admin-editable in Firestore and
 // currently just points at the plain "/academics" page, which lands on its
 // default B.Tech tab. Route that specific card straight to the M.Tech tab
@@ -93,30 +72,6 @@ function studyCardHref(card: ContentBlockDoc): string {
     return '/academics?tab=mtech';
   }
   return card.slug || '/academics';
-}
-
-const defaultPopularPrograms: ContentBlockDoc[] = Object.keys(POPULAR_PROGRAM_SLUGS).map((title, i) => ({
-  id: `default-${i}`, page: 'home', section: 'popularPrograms', value: '', title, desc: '', icon: '',
-  slug: POPULAR_PROGRAM_SLUGS[title], order: i,
-}));
-
-// One tag per B.Tech/MBA Program (/admin → Programs) — the same "this data
-// isn't managed separately, it's derived straight from Programs" pattern
-// used for Faculty's department tabs (see Faculty.tsx). This is what makes a
-// newly-added Program show up here automatically, no separate Content
-// Blocks entry required. Keyed by the program itself (not its `department`
-// field) since department isn't reliable for this: it's sometimes shared by
-// two distinct programs on purpose (e.g. AI&ML and AI&DS share an HOD) and
-// sometimes left blank on a freshly-added program — either of which would
-// silently drop a real, publicly-listed program from this strip.
-function buildPopularProgramsFromPrograms(programs: ProgramDoc[]): ContentBlockDoc[] {
-  return programs
-    .filter((p) => p.category === 'btech' || p.category === 'mba')
-    .map((p, i) => ({
-      id: `program-${p.id}`, page: 'home', section: 'popularPrograms', value: '',
-      title: p.name || p.shortName,
-      desc: '', icon: '', slug: p.slug, order: i,
-    }));
 }
 
 const defaultTestimonials: ContentBlockDoc[] = [
@@ -161,20 +116,8 @@ function splitHappeningDate(date: string): { month: string; day: string } | null
   return { month: match[1].slice(0, 3).toUpperCase(), day: match[2] };
 }
 
-/* ── Wave Divider ─────────────────────────────────────────── */
-function Wave({ flip = false, fill = '#f7f8fb' }: { flip?: boolean; fill?: string }) {
-  return (
-    <div className={`wave-divider${flip ? ' wave-divider--flip' : ''}`}>
-      <svg viewBox="0 0 1440 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M0,30 C360,60 1080,0 1440,30 L1440,60 L0,60 Z" fill={fill} />
-      </svg>
-    </div>
-  );
-}
-
 /* ── Component ────────────────────────────────────────────── */
 export default function Home() {
-  const [tagHovered, setTagHovered] = useState<number | null>(null);
   // "Latest from VWU" / "Upcoming at VWU" below are driven by the same
   // Happenings collection the admin's "Happenings & Awards" → Happenings
   // editor writes to (see NewsAwardsDataAdmin.tsx) and the /news-awards/
@@ -194,9 +137,6 @@ export default function Home() {
   const testimonials = liveTestimonials.length > 0 ? liveTestimonials : defaultTestimonials;
   const liveStudyCards = useContentBlocks('home', 'studyCards');
   const studyCards = liveStudyCards.length > 0 ? liveStudyCards : defaultStudyCards;
-  const { docs: programsForTags } = useOrderedCollection<ProgramDoc>('programs', 'order');
-  const programsDerivedPopularPrograms = buildPopularProgramsFromPrograms(programsForTags);
-  const popularPrograms = programsDerivedPopularPrograms.length > 0 ? programsDerivedPopularPrograms : defaultPopularPrograms;
   const activityPhotos = useSitePhotos('home', 'activities', defaultActivityPhotos);
   // Gates the strip's first paint: until Firestore actually responds, we
   // don't yet know whether real activity photos exist, so a skeleton shows
@@ -277,12 +217,7 @@ export default function Home() {
                 From mBAJA racing championships to NASA-level internships — VWU students lead, build, and inspire at every stage.
               </p>
             </div>
-            <div className="activity-section-chips">
-              <span className="activity-chip activity-chip--green"><FontAwesomeIcon icon={faTrophy} /> Achievements</span>
-              <span className="activity-chip activity-chip--gold"><FontAwesomeIcon icon={faGlobe} /> Internships</span>
-              <span className="activity-chip activity-chip--blue"><FontAwesomeIcon icon={faFlask} /> Research</span>
-              <span className="activity-chip activity-chip--pink"><FontAwesomeIcon icon={faGraduationCap} /> Milestones</span>
-            </div>
+            <Link to="/news-awards/gallery" className="btn btn-outline reveal-right">View Gallery →</Link>
           </div>
         </div>
 
@@ -359,29 +294,14 @@ export default function Home() {
               );
             })}
           </div>
-
-          <div>
-            <p className="program-label">Popular Programs</p>
-            <div className="study-programs">
-              {popularPrograms.map((p, i) => (
-                <Link
-                  to={(() => {
-                    const slug = p.slug || POPULAR_PROGRAM_SLUGS[p.title] || slugify(p.title);
-                    return slug ? `/academics/${slug}` : '/academics';
-                  })()}
-                  key={p.id}
-                  className={`program-tag${tagHovered === i ? ' program-tag--active' : ''}`}
-                  onMouseEnter={() => setTagHovered(i)}
-                  onMouseLeave={() => setTagHovered(null)}
-                  style={{ transitionDelay: `${i * 30}ms` } as React.CSSProperties}
-                >
-                  {p.title}
-                </Link>
-              ))}
-            </div>
-          </div>
         </div>
       </section>
+
+      {/* ── Campus Life Showcase (A vibrant campus. A memorable journey.) ── */}
+      <CampusLifeShowcase />
+
+      {/* ── Programs & Schools Showcase (Future-focused education across disciplines) ── */}
+      <ProgramsShowcase />
 
       {/* ── Women's Education & Empowerment ── */}
       <WomensEducationSection />
@@ -389,12 +309,8 @@ export default function Home() {
       {/* ── Our Recruiters (3-Row Auto-Scrolling Marquee) ── */}
       <RecruitersSection />
 
-      <Wave fill="#09130f" />
-
       {/* ── Modern Testimonials Slider ── */}
       <TestimonialSlider testimonials={testimonials} />
-
-      <Wave flip fill="var(--color-white)" />
 
       {/* ── News (Recent Happenings) ── */}
       <section className="news-section">

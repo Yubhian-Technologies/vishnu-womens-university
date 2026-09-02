@@ -27,32 +27,18 @@ const defaultCounters: ContentBlockDoc[] = [
   { id: 'default-7', page: 'home', section: 'counters', value: '25',    title: 'Global MoUs',            desc: 'International outreach',      icon: 'Globe2',        slug: '+', order: 6 },
 ];
 
-// Alternating colour themes for the cards
-const CARD_THEMES = [
-  'counter-theme--forest',   // dark green
-  'counter-theme--white',    // white / light
-  'counter-theme--forest',
-  'counter-theme--white',
-  'counter-theme--forest',
-  'counter-theme--white',
-  'counter-theme--forest',
-];
-
 function SingleCounter({
   item,
   start,
-  index,
 }: {
   item: ContentBlockDoc;
   start: boolean;
-  index: number;
 }) {
   const count = useCounter(parseInt(item.value, 10) || 0, 2200, start);
   const faClass = FA_ICON_MAP[item.icon] || FA_ICON_MAP.default;
-  const theme = CARD_THEMES[index % CARD_THEMES.length];
 
   return (
-    <div className={`counter-item ${theme}`}>
+    <div className="counter-item">
       <div className="counter-icon-wrap">
         <i className={`${faClass} counter-fa-icon`} aria-hidden="true" />
       </div>
@@ -91,8 +77,8 @@ export default function CounterSection() {
   return (
     <section className="counter-section" ref={sectionRef} aria-label="VWU key statistics">
       <div className="counter-grid">
-        {counters.map((item, idx) => (
-          <SingleCounter key={item.id} item={item} start={started} index={idx} />
+        {counters.map((item) => (
+          <SingleCounter key={item.id} item={item} start={started} />
         ))}
       </div>
     </section>

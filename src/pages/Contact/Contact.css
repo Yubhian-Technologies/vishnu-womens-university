@@ -179,25 +179,27 @@
 
 .contact-social-links {
   display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
   flex-wrap: wrap;
-  gap: 0.6rem;
 }
 
 .contact-social-link {
-  display: inline-flex;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-full);
+  display: flex;
   align-items: center;
-  gap: 0.35rem;
-  padding: 0.45rem 0.9rem;
-  border-radius: 6px;
-  font-size: 0.85rem;
-  font-weight: 600;
+  justify-content: center;
   text-decoration: none;
-  transition: opacity 0.2s, transform 0.2s;
+  font-size: 1rem;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
 }
 
 .contact-social-link:hover {
-  opacity: 0.85;
   transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 .contact-social-link--yt { background: #ff0000; color: #fff; }
@@ -208,9 +210,11 @@
 
 /* Contact Form */
 .contact-form-col {
-  background: var(--color-off-white);
-  border-radius: 16px;
+  background: var(--color-white);
+  border-radius: 24px;
   padding: 2.5rem;
+  border: 1px solid rgba(27, 67, 50, 0.08);
+  box-shadow: var(--shadow-sm);
 }
 
 .contact-form {
@@ -238,24 +242,24 @@
 }
 
 .contact-form-group label {
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: 0.82rem;
+  font-weight: 700;
   color: var(--color-primary);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
 }
 
 .contact-form-group input,
 .contact-form-group select,
 .contact-form-group textarea {
-  padding: 0.75rem 1rem;
-  border: 1.5px solid #dde1e7;
-  border-radius: 8px;
+  padding: 0.8rem 1.15rem;
+  border: 1.5px solid var(--color-light-gray);
+  border-radius: 14px;
   font-size: 0.95rem;
   font-family: var(--font-sans);
   color: var(--color-text);
-  background: var(--color-white);
-  transition: border-color 0.2s, box-shadow 0.2s;
+  background: var(--color-off-white);
+  transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
   resize: vertical;
 }
 
@@ -263,8 +267,9 @@
 .contact-form-group select:focus,
 .contact-form-group textarea:focus {
   outline: none;
+  background: var(--color-white);
   border-color: var(--color-accent);
-  box-shadow: 0 0 0 3px rgba(200, 160, 60, 0.15);
+  box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.2);
 }
 
 .contact-form-group input.has-error,

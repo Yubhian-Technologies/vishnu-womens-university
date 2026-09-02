@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronUp, faChevronDown, faCircleCheck } from '@fortawesome/free-solid-svg-icons';
-import { motion, AnimatePresence } from 'framer-motion';
+import { faChevronLeft, faChevronRight, faQuoteRight } from '@fortawesome/free-solid-svg-icons';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import type { ContentBlockDoc } from '../../pages/Admin/sections/ContentBlocksAdmin';
 import './TestimonialSlider.css';
 
@@ -21,7 +21,9 @@ export default function TestimonialSlider({
   const [current, setCurrent] = useState(0);
   const [direction, setDirection] = useState(1);
   const [isPaused, setIsPaused] = useState(false);
+  const [imgFailed, setImgFailed] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const prefersReducedMotion = useReducedMotion();
 
   const count = testimonials.length;
 
@@ -51,6 +53,12 @@ export default function TestimonialSlider({
     };
   }, [isPaused, count, autoPlayInterval, nextSlide]);
 
+  // A broken photo URL on one slide shouldn't blank out every slide after
+  // it — reset the failure flag each time the visible testimonial changes.
+  useEffect(() => {
+    setImgFailed(false);
+  }, [current]);
+
   if (!testimonials || testimonials.length === 0) return null;
 
   const item = testimonials[current];
@@ -66,45 +74,46 @@ export default function TestimonialSlider({
     .join('')
     .toUpperCase();
 
+  // Skip the blur/travel motion for prefers-reduced-motion users — same
+  // "plain crossfade" fallback the rest of the site already reaches for
+  // (see .btn::after's reduced-motion guard in global.css).
   const slideVariants = {
     enter: (dir: number) => ({
       opacity: 0,
-      y: dir > 0 ? 16 : -16,
-      filter: 'blur(4px)',
+      y: prefersReducedMotion ? 0 : (dir > 0 ? 16 : -16),
+      filter: prefersReducedMotion ? 'none' : 'blur(4px)',
     }),
     center: {
       opacity: 1,
       y: 0,
       filter: 'blur(0px)',
-      transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] as const },
+      transition: { duration: prefersReducedMotion ? 0.15 : 0.4, ease: [0.22, 1, 0.36, 1] as const },
     },
     exit: (dir: number) => ({
       opacity: 0,
-      y: dir > 0 ? -16 : 16,
-      filter: 'blur(4px)',
-      transition: { duration: 0.25, ease: 'easeIn' as const },
+      y: prefersReducedMotion ? 0 : (dir > 0 ? -16 : 16),
+      filter: prefersReducedMotion ? 'none' : 'blur(4px)',
+      transition: { duration: prefersReducedMotion ? 0.1 : 0.25, ease: 'easeIn' as const },
     }),
   };
 
   return (
-    <section className="testimonial-modern-section" aria-label="Testimonials">
-      <div className="testimonial-modern-glow" aria-hidden="true" />
-
+    <section className="testimonial-light-section" aria-label="Testimonials">
       <div className="container">
         {/* Section Header */}
-        <div className="testimonial-modern-header">
+        <div className="testimonial-light-header">
           {subtitle && <span className="section-label">{subtitle}</span>}
-          {title && <h2 className="testimonial-modern-title">{title}</h2>}
+          {title && <h2 className="testimonial-light-title">{title}</h2>}
         </div>
 
         {/* Carousel Wrapper */}
         <div
-          className="testimonial-modern-wrapper"
+          className="testimonial-light-wrapper"
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
         >
           {/* Main Testimonial Card */}
-          <div className="testimonial-modern-card">
+          <div className="testimonial-light-card">
             <AnimatePresence custom={direction} mode="wait">
               <motion.div
                 key={item.id || current}
@@ -113,65 +122,47 @@ export default function TestimonialSlider({
                 initial="enter"
                 animate="center"
                 exit="exit"
-                className="testimonial-card-split"
+                className="testimonial-light-split"
               >
-                {/* Left Side: Full-Height Image Panel */}
-                <div className="testimonial-image-panel">
-                  {avatarUrl ? (
-                    <img
-                      src={avatarUrl}
-                      alt={authorName}
-                      className="testimonial-panel-img"
-                      onError={(e) => {
-                        (e.target as HTMLElement).style.display = 'none';
-                      }}
-                    />
-                  ) : (
+                {/* Left Side: Padded Photo on a Grey Panel (50%). The
+                    initials fallback renders underneath the photo, not
+                    instead of it — a slow or dead image URL then never
+                    leaves a blank gap: the photo only ever covers the
+                    fallback once it has actually decoded, and stays absent
+                    (not blank) if it never does. */}
+                <div className="testimonial-light-image-panel">
+                  <div className="testimonial-light-image-frame">
                     <div className="testimonial-panel-fallback">
                       <span className="testimonial-fallback-initials">{initials}</span>
-                      <span className="testimonial-fallback-badge">Alumna</span>
                     </div>
-                  )}
-                  <div className="testimonial-image-overlay" />
+                    {avatarUrl && !imgFailed && (
+                      <img
+                        src={avatarUrl}
+                        alt={authorName}
+                        className="testimonial-panel-img"
+                        onError={() => setImgFailed(true)}
+                      />
+                    )}
+                  </div>
                 </div>
 
-                {/* Right Side: Content Details */}
-                <div className="testimonial-content-panel">
-                  {/* Author Header */}
-                  <div className="testimonial-author-row">
-                    <div className="testimonial-author-meta">
-                      <h4 className="testimonial-author-name">{authorName}</h4>
-                      <p className="testimonial-author-role">{authorRole}</p>
-                    </div>
+                {/* Right Side: Quote & Author (50%) */}
+                <div className="testimonial-light-content">
+                  <FontAwesomeIcon icon={faQuoteRight} className="testimonial-light-quote-icon" aria-hidden="true" />
 
-                    {/* Top Right Subtle Verified Pill */}
-                    <div className="testimonial-verified-badge">
-                      <FontAwesomeIcon icon={faCircleCheck} style={{ fontSize: 13 }} />
-                      <span>Verified Alumna</span>
-                    </div>
-                  </div>
+                  <p className="testimonial-light-quote-text">{item.desc}</p>
 
-                  {/* Divider Line */}
-                  <div className="testimonial-card-divider" />
-
-                  {/* Quote Content */}
-                  <p className="testimonial-card-quote">
-                    "{item.desc}"
+                  <p className="testimonial-light-footer">
+                    <span className="testimonial-light-author-name">{authorName}</span>
+                    {' '}<span className="testimonial-light-author-role">- {authorRole}</span>
                   </p>
-
-                  {/* Bottom Footer Tag */}
-                  <div className="testimonial-card-footer">
-                    <span className="testimonial-verified-text">
-                      Vishnu Women's University
-                    </span>
-                  </div>
                 </div>
               </motion.div>
             </AnimatePresence>
           </div>
 
-          {/* Side Controls (Prev, Vertical Dots, Next) */}
-          <div className="testimonial-side-controls">
+          {/* Horizontal Navigation: Prev, Dots, Next */}
+          <div className="testimonial-light-nav">
             <button
               type="button"
               className="testimonial-nav-btn"
@@ -179,15 +170,15 @@ export default function TestimonialSlider({
               aria-label="Previous testimonial"
               title="Previous"
             >
-              <FontAwesomeIcon icon={faChevronUp} style={{ fontSize: 18 }} />
+              <FontAwesomeIcon icon={faChevronLeft} style={{ fontSize: 16 }} />
             </button>
 
-            <div className="testimonial-vertical-dots" role="tablist">
+            <div className="testimonial-horizontal-dots" role="tablist">
               {testimonials.map((_, idx) => (
                 <button
                   key={idx}
                   type="button"
-                  className={`testimonial-vdot ${idx === current ? 'active' : ''}`}
+                  className={`testimonial-hdot ${idx === current ? 'active' : ''}`}
                   onClick={() => goToSlide(idx)}
                   role="tab"
                   aria-selected={idx === current}
@@ -203,7 +194,7 @@ export default function TestimonialSlider({
               aria-label="Next testimonial"
               title="Next"
             >
-              <FontAwesomeIcon icon={faChevronDown} style={{ fontSize: 18 }} />
+              <FontAwesomeIcon icon={faChevronRight} style={{ fontSize: 16 }} />
             </button>
           </div>
         </div>

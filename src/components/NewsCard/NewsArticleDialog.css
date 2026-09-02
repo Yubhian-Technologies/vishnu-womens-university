@@ -14,12 +14,12 @@
 .news-article-dialog {
   position: relative;
   width: 100%;
-  max-width: 520px;
+  max-width: 540px;
   max-height: 88vh;
   overflow-y: auto;
   background: var(--color-white);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+  border-radius: 28px;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.35);
   animation: newsArticleDialogIn 0.25s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -33,29 +33,36 @@
   top: var(--space-4);
   right: var(--space-4);
   z-index: 1;
-  background: rgba(255,255,255,0.9);
-  border: 1px solid var(--color-light-gray);
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(27, 67, 50, 0.1);
   color: var(--color-primary);
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-full);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background var(--transition-fast), transform var(--transition-fast);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-fast);
 }
-.news-article-dialog-close:hover { background: var(--color-white); transform: rotate(90deg); }
+.news-article-dialog-close:hover {
+  background: var(--color-white);
+  color: var(--color-accent);
+  transform: rotate(90deg) scale(1.05);
+  box-shadow: var(--shadow-md);
+}
 
 .news-article-dialog-image {
   position: relative;
-  height: 220px;
+  height: 230px;
 }
 .news-article-dialog-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  border-radius: 28px 28px 0 0;
   display: block;
 }
 .news-article-dialog-category {
@@ -65,11 +72,12 @@
   background: var(--color-accent);
   color: var(--color-primary-dark);
   font-size: var(--text-xs);
-  font-weight: 900;
-  letter-spacing: 0.1em;
+  font-weight: 800;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  padding: 4px 10px;
-  border-radius: var(--radius-sm);
+  padding: 0.3rem 0.85rem;
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-sm);
 }
 
 .news-article-dialog-body {

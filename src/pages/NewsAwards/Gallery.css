@@ -1,17 +1,25 @@
 .pg-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--space-5);
 }
 
 .pg-tile {
   position: relative;
-  border-radius: var(--radius-md);
+  border-radius: 20px;
   overflow: hidden;
   aspect-ratio: 4 / 3;
   cursor: pointer;
   background: var(--color-off-white);
-  border: 1.5px solid var(--color-light-gray);
+  border: 1px solid rgba(27, 67, 50, 0.08);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-base);
+}
+
+.pg-tile:hover {
+  box-shadow: var(--shadow-xl);
+  border-color: var(--color-accent);
+  transform: translateY(-4px);
 }
 
 .pg-tile img {
@@ -31,7 +39,7 @@
   inset: 0;
   display: flex;
   align-items: flex-end;
-  padding: var(--space-3);
+  padding: var(--space-4);
   background: linear-gradient(to top, rgba(8, 28, 21, 0.85) 0%, rgba(8, 28, 21, 0) 55%);
   opacity: 0;
   transition: opacity var(--transition-base);
@@ -42,7 +50,7 @@
 .pg-tile__caption {
   color: var(--color-white);
   font-size: var(--text-sm);
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.35;
 }
 
@@ -51,6 +59,7 @@
   inset: 0;
   z-index: 9999;
   background: rgba(8, 28, 21, 0.92);
+  backdrop-filter: blur(12px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -72,7 +81,8 @@
   max-width: 100%;
   max-height: 72vh;
   object-fit: contain;
-  border-radius: var(--radius-sm);
+  border-radius: 20px;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.5);
 }
 
 .pg-lightbox__caption {

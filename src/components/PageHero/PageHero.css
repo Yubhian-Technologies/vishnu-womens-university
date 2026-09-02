@@ -130,32 +130,30 @@
   top: 50%;
   transform: translateY(-50%);
   z-index: 10;
-  background: rgba(255, 255, 255, 0.15);
-  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.35);
   color: #fff;
   width: 44px;
   height: 44px;
-  border-radius: 50%;
-  font-size: 1.5rem;
+  border-radius: var(--radius-full);
+  font-size: 1.4rem;
   line-height: 1;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s, transform 0.2s;
-  backdrop-filter: blur(4px);
+  transition: all 0.2s ease;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
 }
 
 .page-hero__arrow:hover {
-  background: rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.35);
   transform: translateY(-50%) scale(1.08);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
 }
 
-/* Both arrows cluster on the right rather than splitting left/right —
-   .page-hero-content now starts flush at the container's left edge (see
-   above), so a left-anchored prev arrow would sit on top of the title/
-   subtitle/CTA text instead of in empty space like it used to when that
-   column floated centered. */
+/* Both arrows cluster on the right */
 .page-hero__arrow--prev { right: 4.5rem; }
 .page-hero__arrow--next { right: 1.25rem; }
 
@@ -169,22 +167,27 @@
   display: flex;
   gap: 0.5rem;
   align-items: center;
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(8px);
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
 }
 
 .page-hero__dot {
   width: 8px;
   height: 8px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.4);
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.5);
   border: none;
   cursor: pointer;
   padding: 0;
-  transition: background 0.25s, transform 0.25s;
+  transition: all 0.25s ease;
 }
 
 .page-hero__dot--active {
-  background: var(--color-accent-light);
-  transform: scale(1.4);
+  background: var(--color-accent);
+  width: 22px;
+  box-shadow: 0 0 8px rgba(201, 168, 76, 0.6);
 }
 
 /* ---- Counter ---- */
@@ -194,27 +197,39 @@
   right: 1.5rem;
   z-index: 10;
   font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.6);
-  font-weight: 600;
+  color: rgba(255, 255, 255, 0.75);
+  font-weight: 700;
   letter-spacing: 0.05em;
+  background: rgba(0,0,0,0.3);
+  backdrop-filter: blur(8px);
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
 }
 
-/* ---- Breadcrumb (existing global styles, kept for reference) ---- */
+/* ---- Breadcrumb ---- */
 .breadcrumb {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.45rem;
   flex-wrap: wrap;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.6rem;
+  background: rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(8px);
+  padding: 0.3rem 0.85rem;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  width: fit-content;
 }
 
 .breadcrumb-item {
-  font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.8);
   text-decoration: none;
+  font-weight: 500;
+  transition: color 0.15s ease;
 }
 
-.breadcrumb-item.active { color: var(--color-accent, #c8a03c); font-weight: 600; }
+.breadcrumb-item.active { color: var(--color-accent, #c8a03c); font-weight: 700; }
 .breadcrumb-item:not(.active):hover { color: #fff; }
 .breadcrumb-sep { color: rgba(255, 255, 255, 0.4); font-size: 0.75rem; }
 

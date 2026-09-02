@@ -307,6 +307,101 @@
   font-weight: 500;
 }
 
+/* Info box "originating" from the circle's right edge — a short connector
+   line plus a glass rectangle showing logo / name / salary for whichever
+   placement photo is currently active in .we-photo-carousel. Positioned
+   off the card's center (the circle is capped at 340px, see
+   .we-photo-carousel), not off the carousel element itself, since the
+   carousel's own overflow:hidden + circular mask would clip anything
+   placed outside its circular bounds. */
+.we-info-connector {
+  position: absolute;
+  top: 50%;
+  left: calc(50% + 170px);
+  width: 12px;
+  height: 2px;
+  background: linear-gradient(to right, var(--color-accent, #c9a84c), rgba(200, 169, 106, 0.25));
+  z-index: 2;
+  pointer-events: none;
+}
+
+.we-info-card {
+  position: absolute;
+  top: 50%;
+  left: calc(50% + 170px + 12px);
+  transform: translateY(-50%);
+  z-index: 3;
+  width: 96px;
+  height: 64px;
+}
+
+.we-info-entry {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(27, 67, 50, 0.12);
+  border-radius: 12px;
+  padding: 8px 10px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity 500ms ease, transform 500ms ease;
+  pointer-events: none;
+}
+
+.we-info-entry.is-active {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.we-info-logo {
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  background: rgba(27, 67, 50, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  color: var(--color-primary, #1b4332);
+  font-size: 0.75rem;
+}
+
+.we-info-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.we-info-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.we-info-name {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: var(--color-primary-dark, #0b1f16);
+  line-height: 1.2;
+}
+
+.we-info-salary {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--color-accent, #c9a84c);
+}
+
 /* ==========================================================================
    Bottom Four Impact Pillars Grid
    ========================================================================== */
@@ -338,10 +433,13 @@
   box-shadow: 0 16px 36px rgba(27, 67, 50, 0.09);
 }
 
-/* Illustration at top of pillar card */
+/* Hero icon tile at top of pillar card — a glowing glass icon badge,
+   matching .we-halo-ring / .we-float-card's frosted-glass language, in
+   place of the mismatched clip-art illustrations this replaced. */
 .we-pillar-illustration-wrap {
+  position: relative;
   width: 100%;
-  height: 180px;
+  height: 150px;
   background: linear-gradient(135deg, #f0faf4 0%, #e8f5ec 100%);
   display: flex;
   align-items: center;
@@ -355,40 +453,52 @@
   background: linear-gradient(135deg, #e6f4ec 0%, #d4edda 100%);
 }
 
-.we-pillar-illustration {
-  height: 155px;
-  width: auto;
-  object-fit: contain;
+.we-pillar-hero-glow {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--pillar-color) 35%, transparent) 0%, transparent 70%);
+  filter: blur(20px);
+  pointer-events: none;
   transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.we-pillar-card:hover .we-pillar-illustration {
-  transform: scale(1.06) translateY(-3px);
+.we-pillar-card:hover .we-pillar-hero-glow {
+  transform: scale(1.15);
 }
 
-/* Card body below illustration */
-.we-pillar-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: var(--space-3);
-  padding: 1.25rem 1.35rem 0;
-}
-
-.we-pillar-icon-box {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: rgba(27, 67, 50, 0.07);
+.we-pillar-hero-icon {
+  position: relative;
+  z-index: 1;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
-  transition: background 0.2s ease;
+  font-size: 1.7rem;
+  color: var(--pillar-color);
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(10px) saturate(160%);
+  -webkit-backdrop-filter: blur(10px) saturate(160%);
+  border: 1.5px solid color-mix(in srgb, var(--pillar-color) 35%, white 65%);
+  box-shadow: 0 10px 24px -8px color-mix(in srgb, var(--pillar-color) 45%, transparent), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
 }
 
-.we-pillar-card:hover .we-pillar-icon-box {
-  background: rgba(27, 67, 50, 0.14);
+.we-pillar-card:hover .we-pillar-hero-icon {
+  transform: scale(1.08) translateY(-3px);
+  box-shadow: 0 14px 30px -8px color-mix(in srgb, var(--pillar-color) 55%, transparent), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+/* Card body below the icon tile */
+.we-pillar-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-bottom: var(--space-3);
+  padding: 1.25rem 1.35rem 0;
 }
 
 .we-pillar-tag {
@@ -442,6 +552,14 @@
 
   .we-pillars-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* The circle re-centers in the now-stacked, narrower column — the info
+     card's fixed 170px offset from center no longer lines up with its
+     edge, so hide rather than show it misaligned. */
+  .we-info-connector,
+  .we-info-card {
+    display: none;
   }
 }
 
