@@ -355,7 +355,6 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     hasLibrary && { id: 'library', label: 'Department Library' },
     hasRnd && { id: 'rnd', label: 'R & D' },
     hasPlacements && { id: 'placements', label: 'Placements' },
-    hasInternships && { id: 'internships', label: 'Internships' },
     hasNewsletter && { id: 'newsletter', label: 'Newsletter' },
     (hasNewsEvents || hasDeptNews) && { id: hasNewsEvents ? 'news-events' : 'news', label: 'News & Events' },
   ].filter(Boolean) as { id: string; label: string }[];

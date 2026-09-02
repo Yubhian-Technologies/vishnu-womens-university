@@ -324,7 +324,6 @@ function SingleProgramDetail() {
     hasLibrary && { id: 'library', label: 'Department Library' },
     hasRnd && { id: 'rnd', label: 'Research & Development (Funded Projects & Patents)' },
     placementYears.length > 0 && { id: 'placements', label: 'Placements' },
-    internshipYears.length > 0 && { id: 'internships', label: 'Internships' },
     hasNewsletter && { id: 'newsletter', label: 'Newsletter' },
     hasNewsEventsYears && { id: 'news-events', label: 'News & Events' },
     hasDeptNews && { id: 'news', label: 'News & Events' },
