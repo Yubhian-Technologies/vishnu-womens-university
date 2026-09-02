@@ -7,6 +7,8 @@ import { useCollection, useOrderedCollection } from '../../hooks/useCollection';
 import { linkify } from '../../lib/linkify';
 import { getSectionBlocks } from '../../lib/facultySections';
 import FacultySectionContent from '../../components/FacultySectionContent/FacultySectionContent';
+import { hasCustomSectionContent } from '../../lib/customSections';
+import { SectionSubtree } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import type { FacultyDoc } from './Faculty';
 import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
 import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
@@ -37,18 +39,25 @@ export default function FacultyProfile() {
   const { docs: allFaculty, loading } = useOrderedCollection<FacultyDoc>('faculty', 'order');
   const { docs: programs } = useCollection<ProgramDoc>('programs');
   const { docs: departments } = useCollection<DepartmentDoc>('departments');
-  const [activeSection, setActiveSection] = useState<string | null>(null);
+  const [activeKey, setActiveKey] = useState<string | null>(null);
 
   const person = allFaculty.find((f) => f.id === id);
   // Profile Sections content lives in Firestore, edited via /admin → Faculty
-  // (previously shadowed by a code-level override file during this site's
-  // faculty-CMS migration; that override has been retired now that its
-  // content has been imported into Firestore for real).
-  const sections = (person?.sections ?? []).filter((s) => s.title);
+  // as admin-defined Custom Sections (same system as Programs/Differentiators
+  // — see lib/customSections.ts) — `sections` below is the older plain-text
+  // format it replaced, kept only as a fallback for a record that hasn't
+  // been re-saved through the new editor yet (see FacultyAdmin.tsx's
+  // startEdit, which auto-converts it the moment someone edits that record).
+  const customSections = (person?.customSections ?? []).filter(hasCustomSectionContent);
+  const legacySections = (person?.sections ?? []).filter((s) => s.title);
+  const usingCustomSections = customSections.length > 0;
+  const navItems = usingCustomSections
+    ? customSections.map((s) => ({ key: s.id, label: s.label }))
+    : legacySections.map((s) => ({ key: s.title, label: s.title }));
 
   useEffect(() => {
-    if (sections.length > 0) setActiveSection((prev) => prev ?? sections[0].title);
-  }, [sections.length]); // eslint-disable-line react-hooks/exhaustive-deps
+    if (navItems.length > 0) setActiveKey((prev) => prev ?? navItems[0].key);
+  }, [navItems.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (person) document.title = `${person.name} | Vishnu Women's University`;
@@ -74,7 +83,8 @@ export default function FacultyProfile() {
   const hodResearchProfiles = (dept?.hodResearchProfiles?.length ? dept.hodResearchProfiles : program?.hodResearchProfiles) || [];
   const hodMatches = isHod && !!hodName && hodName.trim() === person.name.trim();
 
-  const active = sections.find((s) => s.title === activeSection) ?? sections[0];
+  const activeCustom = usingCustomSections ? (customSections.find((s) => s.id === activeKey) ?? customSections[0]) : null;
+  const activeLegacy = !usingCustomSections ? (legacySections.find((s) => s.title === activeKey) ?? legacySections[0]) : null;
 
   const facultyTitle = `${person.name} | Faculty Profile | Vishnu Women's University`;
   const facultyDesc = `${person.name} is ${person.designation}${person.department ? ` in the Department of ${person.department}` : ''} at Vishnu Women's University, Bhimavaram. ${person.qualification ? `Qualification: ${person.qualification}.` : ''}`;
@@ -175,7 +185,7 @@ export default function FacultyProfile() {
             </div>
           </div>
 
-          {sections.length > 0 && (
+          {navItems.length > 0 && (
             <div className="faculty-sections-grid">
               <div className="faculty-sections-nav">
                 <div style={{ position: 'sticky', top: '110px' }}>
@@ -183,12 +193,12 @@ export default function FacultyProfile() {
                     Profile Sections
                   </p>
                   <div style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
-                    {sections.map((s) => {
-                      const isActive = active?.title === s.title;
+                    {navItems.map((item) => {
+                      const isActive = activeKey === item.key || (activeKey === null && item === navItems[0]);
                       return (
                         <button
-                          key={s.title}
-                          onClick={() => setActiveSection(s.title)}
+                          key={item.key}
+                          onClick={() => setActiveKey(item.key)}
                           style={{
                             display: 'block', width: '100%', textAlign: 'left',
                             padding: 'var(--space-3) var(--space-5)', border: 'none',
@@ -198,7 +208,7 @@ export default function FacultyProfile() {
                             fontWeight: isActive ? 700 : 600, fontSize: 'var(--text-sm)', cursor: 'pointer',
                           }}
                         >
-                          {s.title}
+                          {item.label}
                         </button>
                       );
                     })}
@@ -206,12 +216,14 @@ export default function FacultyProfile() {
                 </div>
               </div>
               <div>
-                {active && <FacultySectionContent blocks={getSectionBlocks(active)} />}
+                {usingCustomSections
+                  ? activeCustom && <SectionSubtree section={activeCustom} />
+                  : activeLegacy && <FacultySectionContent blocks={getSectionBlocks(activeLegacy)} />}
               </div>
             </div>
           )}
 
-          {!person.imageUrl && !person.qualification && !person.specialization && !person.email && (person.facts ?? []).length === 0 && sections.length === 0 && !hodMatches && (
+          {!person.imageUrl && !person.qualification && !person.specialization && !person.email && (person.facts ?? []).length === 0 && navItems.length === 0 && !hodMatches && (
             <p style={{ color: 'var(--color-text-light)' }}>No further details have been added for this faculty member yet.</p>
           )}
         </div>

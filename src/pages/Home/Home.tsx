@@ -1,12 +1,17 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Laptop, Presentation, Check, Sparkles } from 'lucide-react';
+import { Laptop } from 'lucide-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrophy, faGlobe, faFlask, faGraduationCap } from '@fortawesome/free-solid-svg-icons';
 import HeroSlider from '../../components/HeroSlider/HeroSlider';
 import CounterSection from '../../components/CounterSection/CounterSection';
 import ScrollTopButton from '../../components/ScrollTopButton/ScrollTopButton';
 import NewsCard, { type NewsArticle } from '../../components/NewsCard/NewsCard';
 import NewsArticleDialog from '../../components/NewsCard/NewsArticleDialog';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
+import TestimonialSlider from '../../components/TestimonialSlider/TestimonialSlider';
+import RecruitersSection from '../../components/RecruitersMarquee/RecruitersSection';
+import WomensEducationSection from '../../components/WomensEducation/WomensEducationSection';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { fetchPriorityAttr } from '../../lib/domAttrs';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
@@ -43,16 +48,6 @@ const defaultStudyCardPhotos = [
 // Study card accent colours aren't a "photo" — kept as a parallel,
 // index-matched, non-admin-editable array (matches by position).
 const STUDY_CARD_COLORS = ['#1b4332', '#2d6a4f', '#40916c'];
-
-const defaultCampusLifePhoto = [
-  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'VWU campus life', caption: '' },
-];
-
-const defaultMissionPhotos = [
-  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'VWU campus', caption: '' },
-  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'VWU campus', caption: '' },
-  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'VWU campus', caption: '' },
-];
 
 const defaultCtaBannerPhoto = [
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'VWU campus', caption: '' },
@@ -124,28 +119,6 @@ function buildPopularProgramsFromPrograms(programs: ProgramDoc[]): ContentBlockD
     }));
 }
 
-const defaultWhyChooseCards: ContentBlockDoc[] = [
-  { id: 'default-1', page: 'home', section: 'whyChoose', value: '', title: 'A Campus Built Exclusively for Women', desc: 'A focused, secure environment where every program, hostel, and support service is designed around women succeeding in engineering.', icon: 'ShieldCheck', slug: '/about', order: 0 },
-  { id: 'default-2', page: 'home', section: 'whyChoose', value: '', title: 'Industry-Aligned Curriculum', desc: 'Coursework is refreshed with industry input every year, keeping graduates ready for what employers need today.', icon: 'BadgeCheck', slug: '/academics', order: 1 },
-  { id: 'default-3', page: 'home', section: 'whyChoose', value: '', title: 'Research & Innovation at the Core', desc: 'Dedicated labs, incubation support, and 150+ patents put students inside real research from year one.', icon: 'Rocket', slug: '/differentiators', order: 2 },
-  { id: 'default-4', page: 'home', section: 'whyChoose', value: '', title: '1100+ Placements in 2025-26', desc: 'Amazon, TCS, Infosys, Wipro, and 150+ other recruiters return to VWU year after year for its graduating engineers.', icon: 'Briefcase', slug: '/placements', order: 3 },
-];
-
-const defaultCampusFeatures: ContentBlockDoc[] = [
-  'Technology Business Incubator', 'Student Clubs & Organizations', 'Radio Vishnu 90.4', 'Vishnu TV Academy',
-  'Sports & Games Facilities', 'Career Services Center', "Women's Hostels", 'AR/VR Studio',
-].map((title, i) => ({ id: `default-${i}`, page: 'home', section: 'campusFeatures', value: '', title, desc: '', icon: '', slug: '', order: i }));
-
-const defaultRecognitions: ContentBlockDoc[] = [
-  { id: 'default-1', page: 'home', section: 'recognitions', value: '', title: 'Top Engineering College', desc: 'India Today Rankings', icon: 'Trophy', slug: '', order: 0 },
-  { id: 'default-2', page: 'home', section: 'recognitions', value: '', title: 'Best Engineering College', desc: 'The Week Rankings', icon: 'Star', slug: '', order: 1 },
-  { id: 'default-3', page: 'home', section: 'recognitions', value: '', title: 'NBA Accreditation', desc: 'National Board of Accreditation', icon: 'ClipboardList', slug: '', order: 2 },
-  { id: 'default-4', page: 'home', section: 'recognitions', value: '', title: 'NAAC A+ Accredited', desc: 'National Assessment and Accreditation Council', icon: 'Briefcase', slug: '', order: 3 },
-  { id: 'default-5', page: 'home', section: 'recognitions', value: '', title: 'IEI Award for Excellence', desc: 'Institution of Engineers India', icon: 'TrendingUp', slug: '', order: 4 },
-  { id: 'default-6', page: 'home', section: 'recognitions', value: '', title: 'UGC Autonomous Status', desc: 'University Grants Commission', icon: 'Award', slug: '', order: 5 },
-  { id: 'default-7', page: 'home', section: 'recognitions', value: '', title: 'First Private University for Women', desc: 'Across the Telugu States', icon: 'Landmark', slug: '', order: 6 },
-];
-
 const defaultTestimonials: ContentBlockDoc[] = [
   { id: 'default-1', page: 'home', section: 'testimonials', value: 'Computer Science Engineering — Software Engineer at Google', title: 'Lakshmi R., Class of 2024', desc: 'VWU faculty genuinely invest in each student — they know your name, your ambitions, and they hold you to a high standard. The skills and confidence I gained here led directly to my placement at Google.', icon: '', slug: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=200&q=80', order: 0 },
   { id: 'default-2', page: 'home', section: 'testimonials', value: 'M.Tech ECE — Research Scholar at IIT Hyderabad', title: 'Anusha P., Class of 2022', desc: 'VWU is a true launchpad. The research infrastructure, the labs, and the guidance I received here built the academic foundation that made my Ph.D. at IIT Hyderabad possible.', icon: '', slug: 'https://images.unsplash.com/photo-1607746882042-944635dfe10e?w=200&q=80', order: 1 },
@@ -167,25 +140,6 @@ function useTilt(strength = 12) {
     if (ref.current) ref.current.style.transform = '';
   };
   return { ref, onMouseMove: onMove, onMouseLeave: onLeave };
-}
-
-/* ── Magnetic Button ──────────────────────────────────────── */
-function MagneticBtn({ children, to, className }: { children: React.ReactNode; to: string; className: string }) {
-  const ref = useRef<HTMLAnchorElement>(null);
-  const onMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    const el = ref.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const x = (e.clientX - rect.left - rect.width  / 2) * 0.35;
-    const y = (e.clientY - rect.top  - rect.height / 2) * 0.35;
-    el.style.transform = `translate(${x}px, ${y}px)`;
-  };
-  const onLeave = () => { if (ref.current) ref.current.style.transform = ''; };
-  return (
-    <Link ref={ref} to={to} className={className} onMouseMove={onMove} onMouseLeave={onLeave}>
-      {children}
-    </Link>
-  );
 }
 
 /* ── Happenings → Home widgets ────────────────────────────── */
@@ -220,9 +174,7 @@ function Wave({ flip = false, fill = '#f7f8fb' }: { flip?: boolean; fill?: strin
 
 /* ── Component ────────────────────────────────────────────── */
 export default function Home() {
-  const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [tagHovered, setTagHovered] = useState<number | null>(null);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   // "Latest from VWU" / "Upcoming at VWU" below are driven by the same
   // Happenings collection the admin's "Happenings & Awards" → Happenings
   // editor writes to (see NewsAwardsDataAdmin.tsx) and the /news-awards/
@@ -238,16 +190,10 @@ export default function Home() {
   const upcomingHappenings = happenings.filter(h => h.type === 'upcoming');
   const featuredNews = recentHappenings.slice(0, 3).map(happeningToArticle);
   const [activeArticle, setActiveArticle] = useState<NewsArticle | null>(null);
-  const liveRecognitions = useContentBlocks('home', 'recognitions');
-  const recognitions = liveRecognitions.length > 0 ? liveRecognitions : defaultRecognitions;
-  const liveCampusFeatures = useContentBlocks('home', 'campusFeatures');
-  const campusFeatures = liveCampusFeatures.length > 0 ? liveCampusFeatures : defaultCampusFeatures;
   const liveTestimonials = useContentBlocks('home', 'testimonials');
   const testimonials = liveTestimonials.length > 0 ? liveTestimonials : defaultTestimonials;
   const liveStudyCards = useContentBlocks('home', 'studyCards');
   const studyCards = liveStudyCards.length > 0 ? liveStudyCards : defaultStudyCards;
-  const liveWhyChooseCards = useContentBlocks('home', 'whyChoose');
-  const whyChooseCards = liveWhyChooseCards.length > 0 ? liveWhyChooseCards : defaultWhyChooseCards;
   const { docs: programsForTags } = useOrderedCollection<ProgramDoc>('programs', 'order');
   const programsDerivedPopularPrograms = buildPopularProgramsFromPrograms(programsForTags);
   const popularPrograms = programsDerivedPopularPrograms.length > 0 ? programsDerivedPopularPrograms : defaultPopularPrograms;
@@ -260,8 +206,6 @@ export default function Home() {
   // this always resolves at the exact same moment as activityPhotos itself.
   const activitiesLoading = useSitePhotosLoading();
   const studyCardPhotos = useSitePhotos('home', 'study-cards', defaultStudyCardPhotos);
-  const campusLifePhoto = useSitePhotos('home', 'campus-life', defaultCampusLifePhoto)[0];
-  const missionPhotos = useSitePhotos('home', 'mission', defaultMissionPhotos);
   const ctaBannerPhoto = useSitePhotos('home', 'cta-banner', defaultCtaBannerPhoto)[0];
 
   useEffect(() => {
@@ -304,13 +248,6 @@ export default function Home() {
     return () => observer.disconnect();
   }, [featuredNews]);
 
-  // Testimonial auto-advance (re-armed once Firestore testimonials arrive)
-  useEffect(() => {
-    if (testimonials.length === 0) return;
-    timerRef.current = setInterval(() => setActiveTestimonial(p => (p + 1) % testimonials.length), 5000);
-    return () => { if (timerRef.current) clearInterval(timerRef.current); };
-  }, [testimonials.length]);
-
   const tilt1 = useTilt(10);
   const tilt2 = useTilt(10);
   const tilt3 = useTilt(10);
@@ -328,34 +265,52 @@ export default function Home() {
       {/* ── Hero Slider ── */}
       <HeroSlider />
 
-      {/* ── Activity Scroll Strip ── */}
-      <div className="activity-strip">
-        <div className="activity-strip-label">Recent<br />Activities</div>
-        <div className="activity-track-wrap">
-          <div className="activity-track">
-            {activitiesLoading ? (
-              Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="activity-card activity-card--skeleton" aria-hidden="true" />
-              ))
-            ) : (
-              // Doubled so the loop point (translateX -50%) lands exactly on an
-              // identical copy of the start — the standard technique for a
-              // seamless CSS marquee.
-              [...activityPhotos, ...activityPhotos].map((item, i) => (
-                <div key={i} className="activity-card">
-                  <SmoothImage
-                    src={item.src}
-                    alt={item.alt}
-                    className="activity-card-img"
-                    {...(i < 3 ? fetchPriorityAttr('high') : {})}
-                  />
-                  <div className="activity-card-label">{item.caption || item.alt}</div>
-                </div>
-              ))
-            )}
+      {/* ── Recent Activities Section ── */}
+      <section className="activity-section" aria-label="Recent Activities">
+        {/* Section Header */}
+        <div className="container">
+          <div className="activity-section-header reveal">
+            <div className="activity-section-meta">
+              <span className="section-label">Campus Life</span>
+              <h2 className="section-title">Recent Activities</h2>
+              <p className="activity-section-desc">
+                From mBAJA racing championships to NASA-level internships — VWU students lead, build, and inspire at every stage.
+              </p>
+            </div>
+            <div className="activity-section-chips">
+              <span className="activity-chip activity-chip--green"><FontAwesomeIcon icon={faTrophy} /> Achievements</span>
+              <span className="activity-chip activity-chip--gold"><FontAwesomeIcon icon={faGlobe} /> Internships</span>
+              <span className="activity-chip activity-chip--blue"><FontAwesomeIcon icon={faFlask} /> Research</span>
+              <span className="activity-chip activity-chip--pink"><FontAwesomeIcon icon={faGraduationCap} /> Milestones</span>
+            </div>
           </div>
         </div>
-      </div>
+
+        {/* Photo Marquee */}
+        <div className="activity-strip">
+          <div className="activity-track-wrap">
+            <div className="activity-track">
+              {activitiesLoading ? (
+                Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="activity-card activity-card--skeleton" aria-hidden="true" />
+                ))
+              ) : (
+                [...activityPhotos, ...activityPhotos].map((item, i) => (
+                  <div key={i} className="activity-card">
+                    <SmoothImage
+                      src={item.src}
+                      alt={item.alt}
+                      className="activity-card-img"
+                      {...(i < 3 ? fetchPriorityAttr('high') : {})}
+                    />
+                    <div className="activity-card-label">{item.caption || item.alt}</div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* ── Counter Stats ── */}
       <CounterSection />
@@ -428,165 +383,16 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Why Choose VWU ── */}
-      <section className="why-section section">
-        <div className="container">
-          <div className="why-header reveal">
-            <span className="section-label">The VWU Edge</span>
-            <h2 className="section-title gradient-text">What Sets VWU Apart</h2>
-          </div>
-          <div className="why-grid">
-            {whyChooseCards.map((card) => {
-              const Icon = resolveContentIcon(card.icon) || Sparkles;
-              return (
-                <Link key={card.id} to={card.slug || '/about'} className="why-card">
-                  <Icon className="why-card-icon-bg" strokeWidth={1.25} aria-hidden="true" />
-                  <div>
-                    <h3 className="why-card-title"><mark>{card.title}</mark></h3>
-                    <p className="why-card-desc">{card.desc}</p>
-                  </div>
-                  <span className="why-card-link">
-                    <span className="why-card-link-bubble">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                    </span>
-                    Learn more
-                  </span>
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      </section>
+      {/* ── Women's Education & Empowerment ── */}
+      <WomensEducationSection />
 
-      <Wave fill="var(--color-primary)" />
+      {/* ── Our Recruiters (3-Row Auto-Scrolling Marquee) ── */}
+      <RecruitersSection />
 
-      {/* ── Campus Life ── */}
-      <section className="campus-section" aria-label="Campus Life">
-        <div className="campus-image-side reveal-left">
-          {campusLifePhoto && <SmoothImage src={campusLifePhoto.src} alt={campusLifePhoto.alt} className="campus-image" />}
-          <div className="campus-image-overlay" />
-          <div className="campus-image-badge reveal-scale" data-delay="300">
-            <span className="campus-badge-num">80+</span>
-            <span className="campus-badge-lbl">Acre Campus</span>
-          </div>
-        </div>
-        <div className="campus-content-side">
-          <div className="reveal-right">
-            <span className="section-label">Student Life</span>
-            <h2>Learn, Grow<br /><span className="text-accent">and Excel</span></h2>
-            <p>Belonging matters. At VWU, every student finds her footing in a community that genuinely supports her growth — academically, personally, and professionally.</p>
-            <div className="campus-features">
-              {campusFeatures.map((f, i) => (
-                <div key={f.id} className="campus-feature" style={{ animationDelay: `${i * 60}ms` }}>
-                  <span className="campus-feature-check"><Check size={14} strokeWidth={2.5} /></span>
-                  {f.title}
-                </div>
-              ))}
-            </div>
-            <MagneticBtn to="/student-life" className="btn btn-accent btn-lg magnetic-btn">
-              Explore Campus Life ↗
-            </MagneticBtn>
-          </div>
-        </div>
-      </section>
+      <Wave fill="#09130f" />
 
-      <Wave flip fill="var(--color-white)" />
-
-      {/* ── Mission ── */}
-      <section className="mission-section section">
-        <div className="container">
-          <div className="mission-grid">
-            <div className="mission-content reveal-left">
-              <span className="section-label">Our Purpose</span>
-              <h2 className="section-title">Driven by<br /><span className="gradient-text">Excellence</span></h2>
-              <div className="divider" />
-              <p>Vishnu Women's University is committed to providing women with rigorous technical education, cultivating a spirit of innovation, and producing graduates who contribute meaningfully to society and industry.</p>
-              <p>Founded under the Sri Vishnu Educational Society, VWU has been developing engineers, researchers, and leaders for over two decades from its campus in Bhimavaram, Andhra Pradesh.</p>
-              <div className="mission-quote">
-                <blockquote>"VWU gave me the technical grounding and the self-belief to pursue my ambitions. The faculty are genuinely invested in your success — every step of the way."</blockquote>
-                <cite>— D Prasanna, CSE Graduate, placed at Amazon</cite>
-              </div>
-              <MagneticBtn to="/about" className="btn btn-primary magnetic-btn">Learn More About VWU</MagneticBtn>
-            </div>
-            <div className="mission-image-grid reveal-right">
-              {missionPhotos.map((photo, i) => (
-                <div key={i} className={`mission-img mission-img--${i}`}>
-                  <SmoothImage src={photo.src} alt={photo.alt} />
-                  <div className="mission-img-overlay" />
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Recognition ── */}
-      <section className="recognition-section">
-        <div className="container">
-          <div className="recognition-header reveal">
-            <span className="section-label">Nationally Recognized</span>
-            <h2 className="section-title gradient-text">VWU's Commitment to Excellence</h2>
-          </div>
-          <div className="recognition-grid">
-            {recognitions.map((r) => {
-              const Icon = resolveContentIcon(r.icon) || Presentation;
-              return (
-                <div key={r.id} className="rec-card">
-                  <div className="rec-badge-wrap">
-                    <div className="rec-badge"><Icon size={24} strokeWidth={1.75} /></div>
-                    <div className="rec-badge-ring" />
-                  </div>
-                  <div className="rec-body">
-                    <strong>{r.title}</strong>
-                    <span>{r.desc}</span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      <Wave fill="var(--color-primary)" />
-
-      {/* ── Testimonials Carousel ── */}
-      <section className="testimonial-section">
-        <div className="testimonial-bg-shapes" aria-hidden="true">
-          <div className="ts-shape ts-shape--1" />
-          <div className="ts-shape ts-shape--2" />
-        </div>
-        <div className="container">
-          <div className="testimonial-header reveal">
-            <span className="section-label" style={{ color: 'var(--color-accent)' }}>Alumni Voices</span>
-            <h2 style={{ color: '#fff' }}>What Our Graduates Say</h2>
-          </div>
-          <div className="testimonial-carousel">
-            {testimonials.map((t, i) => (
-              <div key={t.id} className={`testimonial-slide${i === activeTestimonial ? ' active' : ''}${i === (activeTestimonial - 1 + testimonials.length) % testimonials.length ? ' prev' : ''}`}>
-                <div className="testimonial-quote-mark">"</div>
-                <p className="testimonial-quote">{t.desc}</p>
-                <div className="testimonial-author">
-                  {t.slug && <img src={t.slug} alt={t.title} className="testimonial-avatar" />}
-                  <div className="testimonial-info">
-                    <strong>{t.title}</strong>
-                    <span>{t.value}</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="testimonial-dots">
-            {testimonials.map((_, i) => (
-              <button
-                key={i}
-                className={`testimonial-dot${i === activeTestimonial ? ' active' : ''}`}
-                onClick={() => { setActiveTestimonial(i); if (timerRef.current) clearInterval(timerRef.current); }}
-                aria-label={`Testimonial ${i + 1}`}
-              />
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* ── Modern Testimonials Slider ── */}
+      <TestimonialSlider testimonials={testimonials} />
 
       <Wave flip fill="var(--color-white)" />
 
@@ -674,7 +480,7 @@ export default function Home() {
         <div className="container">
           <div className="cta-banner-content reveal">
             <span className="section-label" style={{ color: 'var(--color-accent)' }}>Take the Next Step</span>
-            <h2>The best way to understand VWU<br />is to see it for yourself.</h2>
+            <h2>The best way to understand VWU is to see it for yourself.</h2>
             <p>Arrange a campus tour, speak with our admissions team, or submit your application today. Your path to a purposeful engineering career starts here.</p>
             <div className="cta-actions">
               <Link to="/admissions" className="btn btn-accent btn-lg">Schedule a Visit</Link>

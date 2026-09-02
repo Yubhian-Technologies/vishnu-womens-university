@@ -13,6 +13,7 @@ const CONTENT_TYPE_LABELS: Record<CustomSectionContentType, string> = {
   files: 'Uploaded files',
   list: 'Checklist (bullet points)',
   person: 'Panel View',
+  gallery: 'Photo Gallery',
 };
 
 interface Props {
@@ -35,6 +36,11 @@ interface Props {
   // CustomSection.photo) — independent of contentType.
   onPhotoUploaded: (sectionPath: number[], r: UploadResult) => void;
   onPhotoRemoved: (sectionPath: number[]) => void;
+  // contentType 'gallery' only — any number of photos (see
+  // CustomSection.galleryPhotos), each addressed by its own index within
+  // that section's galleryPhotos array, same pattern as onFileUploaded above.
+  onGalleryPhotoUploaded: (sectionPath: number[], photoIndex: number, r: UploadResult) => void;
+  onGalleryPhotoRemoved: (sectionPath: number[], photoIndex: number) => void;
   // 0 = top-level list (shows "+ Add Section"); >0 = a subSections list —
   // nesting is unlimited, so every level gets its own "+ Add Sub-section"
   // per item too.
@@ -47,9 +53,15 @@ interface Props {
 }
 
 export default function CustomSectionEditor({
-  sections, onChange, rootSections, parentPath, onFileUploaded, onFileRemoved, onPhotoUploaded, onPhotoRemoved, depth = 0, showPlacementToggle = false,
+  sections, onChange, rootSections, parentPath, onFileUploaded, onFileRemoved, onPhotoUploaded, onPhotoRemoved,
+  onGalleryPhotoUploaded, onGalleryPhotoRemoved, depth = 0, showPlacementToggle = false,
 }: Props) {
   const [importingKey, setImportingKey] = useState<string | null>(null);
+  // Most sections never get a photo (see CustomSection.photo — optional,
+  // independent of contentType), so the full drop-zone only shows once you
+  // ask for it; a section that already has one always shows the drop-zone
+  // (so it can be changed/removed), never the collapsed button.
+  const [photoRevealed, setPhotoRevealed] = useState<Set<string>>(new Set());
 
   const updateSection = (si: number, patch: Partial<CustomSection>) => {
     onChange(sections.map((s, i) => (i === si ? { ...s, ...patch } : s)));
@@ -82,6 +94,11 @@ export default function CustomSectionEditor({
   const updateFileLabel = (si: number, fi: number, label: string) => {
     const files = (sections[si].files || []).map((f, i) => (i === fi ? { ...f, label } : f));
     updateSection(si, { files });
+  };
+
+  const addGalleryPhoto = (si: number) => {
+    const photos = sections[si].galleryPhotos || [];
+    updateSection(si, { galleryPhotos: [...photos, { imageUrl: '', storagePath: '' }] });
   };
 
   const handleTableImport = async (si: number, file: File) => {
@@ -186,18 +203,30 @@ export default function CustomSectionEditor({
             </div>
 
             <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', marginBottom: '0.75rem' }}>
-              <div style={{ width: 140 }}>
-                <ImageUploader
-                  folder="vwu/custom-sections/photos"
-                  currentUrl={s.photo?.imageUrl}
-                  aspect={1}
-                  label="+ Add Photo"
-                  onUploaded={(r) => onPhotoUploaded(path, r)}
-                />
-              </div>
-              {s.photo?.imageUrl && (
-                <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => onPhotoRemoved(path)}>
-                  Remove Photo
+              {s.photo?.imageUrl || photoRevealed.has(s.id) ? (
+                <>
+                  <div style={{ width: 140 }}>
+                    <ImageUploader
+                      folder="vwu/custom-sections/photos"
+                      currentUrl={s.photo?.imageUrl}
+                      aspect={1}
+                      label="+ Add Photo"
+                      onUploaded={(r) => onPhotoUploaded(path, r)}
+                    />
+                  </div>
+                  {s.photo?.imageUrl && (
+                    <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => onPhotoRemoved(path)}>
+                      Remove Photo
+                    </button>
+                  )}
+                </>
+              ) : (
+                <button
+                  type="button"
+                  className="admin-btn admin-btn--sm"
+                  onClick={() => setPhotoRevealed((prev) => new Set(prev).add(s.id))}
+                >
+                  + Add Photo
                 </button>
               )}
             </div>
@@ -331,6 +360,37 @@ export default function CustomSectionEditor({
               </div>
             )}
 
+            {s.contentType === 'gallery' && (
+              <div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '0.5rem' }}>
+                  {(s.galleryPhotos || []).map((p, pi) => (
+                    <div key={pi} style={{ width: 140 }}>
+                      <ImageUploader
+                        folder="vwu/custom-sections/gallery"
+                        currentUrl={p.imageUrl}
+                        aspect={4 / 3}
+                        label="Choose Photo"
+                        onUploaded={(r) => onGalleryPhotoUploaded(path, pi, r)}
+                      />
+                      <button
+                        type="button"
+                        className="admin-btn admin-btn--sm admin-btn--danger"
+                        style={{ width: '100%', marginTop: '0.35rem' }}
+                        onClick={() => onGalleryPhotoRemoved(path, pi)}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <button type="button" className="admin-btn admin-btn--sm" onClick={() => addGalleryPhoto(si)}>+ Add Photo</button>
+                <p className="admin-field__hint">
+                  Any number of photos, shown on the public page as a grid you can click through — each one still gets
+                  the crop step (pick "Free" in there for an uncropped fit, or any of the other ratios).
+                </p>
+              </div>
+            )}
+
             <div style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px dashed var(--color-light-gray)' }}>
               {(s.subSections?.length ?? 0) > 0 && (
                 <div style={{ marginBottom: '0.5rem', paddingLeft: '1rem', borderLeft: '2px solid var(--color-light-gray)' }}>
@@ -343,6 +403,8 @@ export default function CustomSectionEditor({
                     onFileRemoved={onFileRemoved}
                     onPhotoUploaded={onPhotoUploaded}
                     onPhotoRemoved={onPhotoRemoved}
+                    onGalleryPhotoUploaded={onGalleryPhotoUploaded}
+                    onGalleryPhotoRemoved={onGalleryPhotoRemoved}
                     depth={depth + 1}
                     showPlacementToggle={showPlacementToggle}
                   />

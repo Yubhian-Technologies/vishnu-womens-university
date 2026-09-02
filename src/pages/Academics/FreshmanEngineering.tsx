@@ -5,6 +5,8 @@ import { useOrderedCollection } from '../../hooks/useCollection';
 import { linkify } from '../../lib/linkify';
 import { getSectionBlocks } from '../../lib/facultySections';
 import FacultySectionContent from '../../components/FacultySectionContent/FacultySectionContent';
+import { hasCustomSectionContent } from '../../lib/customSections';
+import { SectionSubtree } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import type { FacultyDoc } from './Faculty';
 import '../detail-layout.css';
 
@@ -234,9 +236,17 @@ function useDeptFaculty(department: string) {
 function FeAboutHodSection({ department }: { department: string }) {
   const { members, loading } = useDeptFaculty(department);
   const hod = members.find((f) => /head|hod/i.test(f.designation));
-  const sections = (hod?.sections ?? []).filter((s) => s.title);
+  // Same Custom Sections / legacy-fallback split as FacultyProfile.tsx — see
+  // that file's comment.
+  const customSections = (hod?.customSections ?? []).filter(hasCustomSectionContent);
+  const legacySections = (hod?.sections ?? []).filter((s) => s.title);
+  const usingCustomSections = customSections.length > 0;
+  const navItems = usingCustomSections
+    ? customSections.map((s) => ({ key: s.id, label: s.label }))
+    : legacySections.map((s) => ({ key: s.title, label: s.title }));
   const [category, setCategory] = useState<string | null>(null);
-  const active = sections.find((s) => s.title === category) ?? sections[0];
+  const activeCustom = usingCustomSections ? (customSections.find((s) => s.id === category) ?? customSections[0]) : null;
+  const activeLegacy = !usingCustomSections ? (legacySections.find((s) => s.title === category) ?? legacySections[0]) : null;
 
   useEffect(() => {
     setCategory(null);
@@ -278,18 +288,18 @@ function FeAboutHodSection({ department }: { department: string }) {
         </div>
       </div>
 
-      {sections.length > 0 && (
+      {navItems.length > 0 && (
         <div style={{ display: 'flex', gap: 'var(--space-6)', flexWrap: 'wrap' }}>
           <div style={{ minWidth: 220, display: 'flex', flexDirection: 'column', gap: 2 }}>
             <span style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--color-text-light)', textTransform: 'uppercase', letterSpacing: '0.05em', padding: 'var(--space-1) var(--space-4)', marginBottom: 'var(--space-1)' }}>
               Profile Sections
             </span>
-            {sections.map((s) => {
-              const isActive = active?.title === s.title;
+            {navItems.map((item) => {
+              const isActive = category === item.key || (category === null && item === navItems[0]);
               return (
                 <button
-                  key={s.title}
-                  onClick={() => setCategory(s.title)}
+                  key={item.key}
+                  onClick={() => setCategory(item.key)}
                   style={{
                     textAlign: 'left',
                     padding: 'var(--space-2) var(--space-4)',
@@ -302,13 +312,15 @@ function FeAboutHodSection({ department }: { department: string }) {
                     cursor: 'pointer',
                   }}
                 >
-                  {s.title}
+                  {item.label}
                 </button>
               );
             })}
           </div>
           <div style={{ flex: 1, minWidth: 260 }}>
-            {active && <FacultySectionContent blocks={getSectionBlocks(active)} />}
+            {usingCustomSections
+              ? activeCustom && <SectionSubtree section={activeCustom} />
+              : activeLegacy && <FacultySectionContent blocks={getSectionBlocks(activeLegacy)} />}
           </div>
         </div>
       )}

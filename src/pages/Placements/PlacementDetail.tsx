@@ -20,7 +20,7 @@ import { usePlacementYears } from './usePlacementYears';
 import PlacementAnnouncementsTicker from './PlacementAnnouncementsTicker';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import BodyBlocks, { parseBodyContent } from '../../components/BodyBlocks/BodyBlocks';
-import PhotoCarousel from '../../components/PhotoCarousel/PhotoCarousel';
+import PhotoCarouselStrip from '../../components/PhotoCarousel/PhotoCarouselStrip';
 import '../detail-layout.css';
 
 // Overrides the body heading only — hero/breadcrumb still show
@@ -970,11 +970,7 @@ export default function PlacementDetail() {
   // Our Recruiters drops the whole Overview section per request instead —
   // its Key Highlights/About text duplicated the logo grid below, which is
   // the page's actual content — with no full-width-grid replacement.
-  const galleryImages = item.galleryImages || [];
-  // Placement Highlights only skips Overview once photos are actually
-  // uploaded — with none yet, it falls back to the plain Overview text/Key
-  // Highlights sidebar rather than an empty gap where the carousel would go.
-  const skipOverviewSection = (item.slug === 'employability-skills' && !hasBodyOverride && !item.intro && !item.desc) || item.slug === 'our-recruiters' || item.slug === 'internships' || item.slug === 'placement-details' || (item.slug === 'placement-highlights' && galleryImages.length > 0);
+  const skipOverviewSection = (item.slug === 'employability-skills' && !hasBodyOverride && !item.intro && !item.desc) || item.slug === 'our-recruiters' || item.slug === 'internships' || item.slug === 'placement-details';
 
   return (
     <main className="page-wrapper">
@@ -1020,20 +1016,6 @@ export default function PlacementDetail() {
           top (right after the hero) — every other page keeps its Outcomes
           block in its usual spot below Overview (see further down). */}
       {placementCellSummarySection}
-
-      {/* Placement Highlights' photo carousel — replaces this page's
-          Overview text + Key Highlights sidebar once at least one photo is
-          uploaded (Admin → Placement Sub-pages → Placement Highlights →
-          Photo Carousel). */}
-      {item.slug === 'placement-highlights' && galleryImages.length > 0 && (
-        <section className="section bg-white" style={{ paddingTop: 0, paddingBottom: 'var(--space-6)' }}>
-          {/* Deliberately outside .container — these are wide promotional
-              banners, so they run edge-to-edge of the viewport instead of
-              sitting inside the page's usual ~1400px/padded content column
-              like every other section. */}
-          <PhotoCarousel images={galleryImages} />
-        </section>
-      )}
 
       {/* Content */}
       {!skipOverviewSection && (
@@ -1366,6 +1348,16 @@ export default function PlacementDetail() {
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Our Recruiters</h2>
             </div>
             <AllRecruiters logoMap={recruiterLogoMap} />
+          </div>
+        </section>
+      )}
+
+      {/* Photo Carousel — Placement Highlights only. See PhotoCarouselStrip
+          for the free-form-crop/auto-advance behavior. */}
+      {item.slug === 'placement-highlights' && item.notablePeople && item.notablePeople.length > 0 && (
+        <section className="section bg-white" style={{ paddingTop: 'var(--space-6)' }}>
+          <div className="container">
+            <PhotoCarouselStrip cards={item.notablePeople} />
           </div>
         </section>
       )}

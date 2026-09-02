@@ -32,6 +32,86 @@
   z-index: 1;
 }
 
+/* ===== Centered Brand Mark ===== */
+.hero-brand-mark {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.65rem, 1.8vw, 1.35rem);
+  padding: 0 var(--space-6);
+  text-align: center;
+  pointer-events: none;
+}
+
+.hero-brand-mark-row {
+  display: block;
+  font-family: var(--font-serif);
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 1;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(24px);
+  animation: heroBrandReveal 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.hero-brand-mark-row--top {
+  font-size: clamp(1.35rem, 4.4vw, 3rem);
+  letter-spacing: clamp(0.08em, 1vw, 0.28em);
+  color: var(--color-white);
+  text-shadow: 0 4px 32px rgba(0, 0, 0, 0.45);
+  animation-delay: 0.25s;
+}
+
+.hero-brand-mark-row--bottom {
+  font-size: clamp(2.1rem, 7.5vw, 5.5rem);
+  letter-spacing: clamp(0.02em, 0.6vw, 0.1em);
+  background: linear-gradient(120deg, var(--color-accent-light) 0%, var(--color-accent) 55%, #fff6dd 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: var(--color-accent);
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 6px 30px rgba(0, 0, 0, 0.4));
+  animation-delay: 0.45s;
+}
+
+.hero-brand-mark-divider {
+  width: 56px;
+  height: 3px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(90deg, transparent, var(--color-accent), transparent);
+  opacity: 0;
+  transform: scaleX(0);
+  animation: heroBrandDividerReveal 0.7s ease 0.55s forwards;
+}
+
+@keyframes heroBrandReveal {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes heroBrandDividerReveal {
+  to {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-brand-mark {
+    gap: 0.6rem;
+  }
+  .hero-brand-mark-divider {
+    width: 40px;
+  }
+}
+
 /* ===== Slides (content only — no image) ===== */
 .slide {
   position: absolute;
@@ -282,93 +362,6 @@
   background: linear-gradient(to bottom, rgba(255,255,255,0.5), transparent);
 }
 
-/* ===== Recognition Bar at bottom of hero ===== */
-.hero-recognition {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: rgba(27,67,50,0.92);
-  backdrop-filter: blur(10px);
-  z-index: 5;
-  padding: var(--space-4) 0;
-  border-top: 1px solid rgba(255,255,255,0.08);
-}
-
-.hero-recognition-inner {
-  position: relative;
-}
-
-.hero-recognition-track {
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  justify-content: space-between;
-  column-gap: clamp(0.4rem, -0.29rem + 1.07vw, var(--space-4));
-  padding: 0 var(--space-8);
-  overflow: hidden;
-}
-
-.recognition-pair {
-  display: flex;
-  align-items: center;
-  gap: clamp(0.5rem, -1.21rem + 2.68vw, 2rem);
-  min-width: 0;
-  flex-shrink: 1;
-}
-
-.recognition-item {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  min-width: 0;
-  flex-shrink: 1;
-}
-
-.recognition-icon {
-  width: clamp(22px, 10.57px + 1.12vw, 32px);
-  height: clamp(22px, 10.57px + 1.12vw, 32px);
-  background: var(--color-accent);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.75rem;
-  color: var(--color-primary-dark);
-  font-weight: 900;
-  flex-shrink: 0;
-}
-
-.recognition-text {
-  min-width: 0;
-}
-
-.recognition-text strong {
-  display: block;
-  font-size: clamp(0.55rem, 0.32rem + 0.36vw, var(--text-xs));
-  font-weight: 700;
-  color: var(--color-white);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.recognition-text span {
-  display: block;
-  font-size: clamp(0.5rem, 0.27rem + 0.36vw, 0.7rem);
-  color: rgba(255,255,255,0.5);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.recognition-divider {
-  width: 1px;
-  height: 32px;
-  background: rgba(255,255,255,0.12);
-  flex-shrink: 0;
-}
-
 /* ===== Mute Button ===== */
 
 .hero-mute-btn {
@@ -526,9 +519,6 @@
     font-size: clamp(1.8rem, 7vw, 2.8rem);
   }
   .scroll-indicator {
-    display: none;
-  }
-  .hero-recognition {
     display: none;
   }
   .hero-controls {

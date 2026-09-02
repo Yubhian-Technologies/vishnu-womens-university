@@ -6,3 +6,10 @@
 .schools-page .dept-desc {
   text-align: justify;
 }
+
+@media (max-width: 640px) {
+  .schools-page .section-desc,
+  .schools-page .dept-desc {
+    text-align: left;
+  }
+}

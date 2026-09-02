@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { FileText, Link2 } from 'lucide-react';
-import { hasCustomSectionContent, type CustomSection } from '../../lib/customSections';
+import { FileText, Link2, X } from 'lucide-react';
+import { hasCustomSectionContent, type CustomSection, type CustomSectionPhoto } from '../../lib/customSections';
 import { parseFlexibleTable, parseLinkList } from '../../lib/structuredTable';
 import FlexibleTable from '../FlexibleTable/FlexibleTable';
 import SmoothCollapse from '../SmoothCollapse/SmoothCollapse';
@@ -235,7 +235,12 @@ export function CustomSectionsAccordion({ sections }: { sections: CustomSection[
 //     own content can still mix a description with one or more tables by
 //     giving IT subsections in turn (PillSwitcher renders the active pill
 //     through this same function).
-function SectionSubtree({ section, depth = 0, navOffset = DEFAULT_NAV_OFFSET }: { section: CustomSection; depth?: number; navOffset?: string }) {
+// Exported so a page with its own bespoke section-switcher UI (e.g.
+// FacultyProfile.tsx's sticky left nav list, FreshmanEngineering.tsx's About
+// HOD tab) can render one admin-picked CustomSection's body — including its
+// sub-sections, tables, and pill switcher — without pulling in one of the
+// full layout wrappers above (which each impose their own heading/spacing).
+export function SectionSubtree({ section, depth = 0, navOffset = DEFAULT_NAV_OFFSET }: { section: CustomSection; depth?: number; navOffset?: string }) {
   const body = <CustomSectionBody section={section} />;
   const visibleSubs = (section.subSections || []).filter(hasCustomSectionContent);
   if (visibleSubs.length === 0) return body;
@@ -347,6 +352,83 @@ function PillSwitcher({ sections, depth = 0, navOffset = DEFAULT_NAV_OFFSET }: {
   );
 }
 
+// contentType 'gallery' — any number of photos as a grid of normal
+// (non-circular) tiles, `object-fit: cover` so each fills its tile properly
+// regardless of its own aspect ratio, with a click-to-enlarge lightbox.
+// Distinct from CustomSectionBody's single round `photo` below, which is a
+// small accent image any OTHER content type can carry alongside it.
+function GalleryGrid({ photos }: { photos: CustomSectionPhoto[] }) {
+  const [lightbox, setLightbox] = useState<number | null>(null);
+  const valid = photos.filter((p) => p.imageUrl);
+  if (valid.length === 0) return null;
+
+  return (
+    <>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 'var(--space-3)' }}>
+        {valid.map((p, i) => (
+          <button
+            key={p.imageUrl}
+            type="button"
+            onClick={() => setLightbox(i)}
+            aria-label={`View photo ${i + 1}`}
+            style={{
+              padding: 0, border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)',
+              overflow: 'hidden', cursor: 'zoom-in', aspectRatio: '4 / 3', background: 'var(--color-off-white)',
+            }}
+          >
+            <img src={p.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+          </button>
+        ))}
+      </div>
+
+      {lightbox !== null && (
+        <div
+          onClick={() => setLightbox(null)}
+          style={{
+            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 1000,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'var(--space-6)', cursor: 'zoom-out',
+          }}
+        >
+          <button
+            type="button"
+            onClick={() => setLightbox(null)}
+            aria-label="Close"
+            style={{ position: 'absolute', top: 'var(--space-4)', right: 'var(--space-4)', background: 'rgba(255,255,255,0.12)', border: 'none', borderRadius: '50%', width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-white)', cursor: 'pointer' }}
+          >
+            <X size={20} strokeWidth={2} />
+          </button>
+          {valid.length > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); setLightbox((i) => (i! - 1 + valid.length) % valid.length); }}
+                aria-label="Previous photo"
+                style={{ position: 'absolute', left: 'var(--space-4)', top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.12)', border: 'none', borderRadius: '50%', width: 44, height: 44, fontSize: '1.5rem', color: 'var(--color-white)', cursor: 'pointer' }}
+              >
+                ‹
+              </button>
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); setLightbox((i) => (i! + 1) % valid.length); }}
+                aria-label="Next photo"
+                style={{ position: 'absolute', right: 'var(--space-4)', top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.12)', border: 'none', borderRadius: '50%', width: 44, height: 44, fontSize: '1.5rem', color: 'var(--color-white)', cursor: 'pointer' }}
+              >
+                ›
+              </button>
+            </>
+          )}
+          <img
+            src={valid[lightbox].imageUrl}
+            alt=""
+            onClick={(e) => e.stopPropagation()}
+            style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', borderRadius: 'var(--radius-md)', cursor: 'default' }}
+          />
+        </div>
+      )}
+    </>
+  );
+}
+
 function CustomSectionBody({ section }: { section: CustomSection }) {
   const body = <CustomSectionBodyContent section={section} />;
   if (!section.photo?.imageUrl) return body;
@@ -431,6 +513,9 @@ function CustomSectionBodyContent({ section }: { section: CustomSection }) {
         ))}
       </ul>
     );
+  }
+  if (section.contentType === 'gallery') {
+    return <GalleryGrid photos={section.galleryPhotos || []} />;
   }
   // files
   const files = (section.files || []).filter((f) => f.fileUrl);

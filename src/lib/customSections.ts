@@ -8,7 +8,7 @@ import { parseFlexibleTable, parseLinkList } from './structuredTable';
 // Purely additive: every existing hardcoded section on those pages is
 // untouched by this.
 
-export type CustomSectionContentType = 'text' | 'table' | 'links' | 'files' | 'list' | 'person';
+export type CustomSectionContentType = 'text' | 'table' | 'links' | 'files' | 'list' | 'person' | 'gallery';
 
 export interface CustomSectionFile {
   label: string;
@@ -68,6 +68,11 @@ export interface CustomSection {
   // Independent of contentType — a section can have a photo alongside text,
   // a table, a list, etc.
   photo?: CustomSectionPhoto;
+  // contentType 'gallery' only — any number of photos, shown as a grid of
+  // normal (non-circular) tiles with a click-to-enlarge lightbox, unlike the
+  // single `photo` above (a small round accent image any OTHER content type
+  // can also carry). See GalleryGrid in CustomSectionsRenderer.tsx.
+  galleryPhotos?: CustomSectionPhoto[];
 }
 
 // Every anchor id already hardcoded in ProgramDetail.tsx/DepartmentDetail.tsx
@@ -121,6 +126,8 @@ export function hasCustomSectionContent(section: CustomSection): boolean {
         return (section.listText || '').split('\n').map((s) => s.trim()).filter(Boolean).length > 0;
       case 'person':
         return !!section.textContent?.trim() || !!section.personPosition?.trim();
+      case 'gallery':
+        return (section.galleryPhotos || []).some((p) => !!p.imageUrl);
       default:
         return false;
     }

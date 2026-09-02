@@ -3,6 +3,14 @@
   background: var(--color-off-white);
 }
 
+.academics-quick-stats-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(var(--space-4), 5vw, var(--space-12));
+  flex-wrap: wrap;
+}
+
 .programs-tabs {
   display: flex;
   gap: var(--space-2);
@@ -24,6 +32,7 @@
   background: none;
   border-bottom: 3px solid transparent;
   margin-bottom: -2px;
+  white-space: nowrap;
   transition: all var(--transition-fast);
 }
 
@@ -230,6 +239,26 @@
   .programs-grid { grid-template-columns: repeat(2, 1fr); }
   .dept-grid { grid-template-columns: repeat(2, 1fr); }
   .activities-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 640px) {
+  .programs-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: var(--space-1);
+    gap: var(--space-1);
+  }
+  .programs-tabs::-webkit-scrollbar {
+    display: none;
+  }
+  .dept-card {
+    padding: clamp(1.1rem, 3.5vw, 1.4rem);
+  }
+  .dept-name {
+    font-size: clamp(1rem, 2.5vw, 1.15rem);
+  }
 }
 
 @media (max-width: 480px) {

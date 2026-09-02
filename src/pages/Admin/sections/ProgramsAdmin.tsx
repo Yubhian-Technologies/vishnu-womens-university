@@ -16,6 +16,7 @@ import { parseInternshipsFile, dedupeInternshipRows, downloadInternshipsTemplate
 import CustomSectionEditor from './CustomSectionEditor';
 import { replaceAtPath, getAtPath, type CustomSection } from '../../../lib/customSections';
 import RndTableEditor, { type RndStructuredTable } from './RndTableEditor';
+import { diffChangedFields } from '../../../lib/formDiff';
 
 export interface ProgramSubject {
   title: string;
@@ -313,6 +314,14 @@ function arrayToLines(arr: string[] = []): string {
 export default function ProgramsAdmin() {
   const { docs: programs, loading } = useOrderedCollection<ProgramDoc>('programs', 'order');
   const [form, setForm] = useState<Omit<ProgramDoc, 'id'>>(EMPTY);
+  // Snapshot of `form` taken at the moment "Edit" was clicked (see
+  // startEdit) — save() diffs against this so Update only writes fields you
+  // actually changed in this session. Without it, `updateDoc(doc, {...form})`
+  // blindly overwrites every field with this tab's stale copy, silently
+  // reverting whatever anyone else (or you, in another tab) saved on this
+  // program in the meantime. null while adding a new program (nothing to
+  // diff against — always writes the full form then).
+  const [originalForm, setOriginalForm] = useState<Omit<ProgramDoc, 'id'> | null>(null);
   const [editing, setEditing] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -529,6 +538,36 @@ export default function ProgramsAdmin() {
     }));
   };
 
+  // contentType 'gallery' — same shape as the file handlers above, but each
+  // photo is addressed by its index within that section's galleryPhotos.
+  const handleCustomSectionGalleryPhotoUploaded = (sectionPath: number[], photoIndex: number, r: UploadResult) => {
+    setForm((p) => ({
+      ...p,
+      customSections: replaceAtPath(p.customSections || [], sectionPath, (s) => ({
+        ...s,
+        galleryPhotos: (s.galleryPhotos || []).map((ph, i) => (i === photoIndex ? { imageUrl: r.url, storagePath: r.path } : ph)),
+      })),
+    }));
+  };
+  const handleCustomSectionGalleryPhotoRemoved = async (sectionPath: number[], photoIndex: number) => {
+    const photo = getAtPath(form.customSections || [], sectionPath)?.galleryPhotos?.[photoIndex];
+    if (!photo) return;
+    if (photo.imageUrl && !confirm('Remove this photo? This cannot be undone.')) return;
+    try {
+      if (photo.storagePath) await deleteFile(photo.storagePath);
+    } catch (e) {
+      alert(`Couldn't delete the photo from storage: ${(e as Error).message}`);
+      return;
+    }
+    setForm((p) => ({
+      ...p,
+      customSections: replaceAtPath(p.customSections || [], sectionPath, (s) => ({
+        ...s,
+        galleryPhotos: (s.galleryPhotos || []).filter((_, i) => i !== photoIndex),
+      })),
+    }));
+  };
+
   // Programme Structure (semesters + subjects) editing — structured add /
   // remove / reorder, replacing the old free-text "Semester I: A, B" parser.
   const addSemester = () => {
@@ -616,11 +655,18 @@ export default function ProgramsAdmin() {
         psos: form.psos.filter(Boolean),
       });
       if (editing) {
-        await updateDoc(doc(db, 'programs', editing), { ...payload });
+        // Only send fields that actually changed since this edit session
+        // started — see diffChangedFields/originalForm above. Skips the
+        // network call entirely if nothing did (e.g. Edit then Update with
+        // no changes).
+        const changed = originalForm ? diffChangedFields(payload, stripUndefined(originalForm)) : payload;
+        if (Object.keys(changed).length > 0) {
+          await updateDoc(doc(db, 'programs', editing), changed);
+        }
       } else {
         await addDoc(collection(db, 'programs'), { ...payload, order: form.order || programs.filter((p) => p.category === form.category).length, createdAt: serverTimestamp() });
       }
-      setForm(EMPTY); setEditing(null);
+      setForm(EMPTY); setEditing(null); setOriginalForm(null);
     } catch (e) {
       alert(`Couldn't save: ${(e as Error).message}`);
     } finally { setSaving(false); }
@@ -628,7 +674,7 @@ export default function ProgramsAdmin() {
 
   const startEdit = (p: ProgramDoc) => {
     setEditing(p.id);
-    setForm({
+    const next: Omit<ProgramDoc, 'id'> = {
       slug: p.slug, name: p.name, shortName: p.shortName, icon: p.icon || 'GraduationCap',
       category: p.category, intake: p.intake, established: p.established, accreditation: p.accreditation,
       hod: p.hod, department: p.department || '', fee: p.fee || '', heroImage: p.heroImage, storagePath: p.storagePath, about: p.about,
@@ -662,7 +708,9 @@ export default function ProgramsAdmin() {
       },
       customSections: p.customSections || [],
       order: p.order || 0,
-    });
+    };
+    setForm(next);
+    setOriginalForm(next);
   };
 
   const remove = async (id: string) => {
@@ -750,8 +798,13 @@ export default function ProgramsAdmin() {
             <input id="field-display-order" type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
           </div>
           <div className="admin-field admin-field--full">
-            <label htmlFor="field-about">About</label>
-            <textarea id="field-about" rows={4} value={form.about} onChange={(e) => set('about', e.target.value)} placeholder="Department overview…" />
+            <label htmlFor="field-about">About the Programme</label>
+            <p className="admin-field__hint" style={{ marginTop: 0 }}>
+              For this specific programme's own page. Shown as "About the Programme". Department-wide text
+              ("About the Department") is a separate field, edited on the matching record in{' '}
+              <strong>Admin → Academic Departments → Overview</strong>.
+            </p>
+            <textarea id="field-about" rows={4} value={form.about} onChange={(e) => set('about', e.target.value)} placeholder="Programme overview…" />
           </div>
           <div className="admin-field admin-field--full">
             <label htmlFor="field-highlights-one-per-line">Highlights (one per line)</label>
@@ -1103,11 +1156,13 @@ export default function ProgramsAdmin() {
               onFileRemoved={handleCustomSectionFileRemoved}
               onPhotoUploaded={handleCustomSectionPhotoUploaded}
               onPhotoRemoved={handleCustomSectionPhotoRemoved}
+              onGalleryPhotoUploaded={handleCustomSectionGalleryPhotoUploaded}
+              onGalleryPhotoRemoved={handleCustomSectionGalleryPhotoRemoved}
             />
           </div>
         </div>
         <div className="admin-form-actions">
-          {editing && <button className="admin-btn admin-btn--ghost" onClick={() => { setEditing(null); setForm(EMPTY); }}>Cancel</button>}
+          {editing && <button className="admin-btn admin-btn--ghost" onClick={() => { setEditing(null); setForm(EMPTY); setOriginalForm(null); }}>Cancel</button>}
           <button className="admin-btn admin-btn--primary" onClick={save} disabled={saving}>
             {saving ? 'Saving…' : editing ? 'Update Program' : 'Add Program'}
           </button>
