@@ -24,7 +24,7 @@ import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import type { FacultyDoc } from './Faculty';
 import { parseFlexibleTable, parseProjectAccordion } from '../../lib/structuredTable';
 import { sortPlacementRows, computePlacementStats, findPackageColumnIndex, formatPackageCell } from '../../lib/placementRecords';
-import { sortInternshipRows, computeInternshipStats, findStipendColumnIndex, formatStipendCell } from '../../lib/internshipRecords';
+import { computeInternshipStats, findPeriodColumnIndex } from '../../lib/internshipRecords';
 import { hasCustomSectionContent, toQuickLinkItems } from '../../lib/customSections';
 import CustomSectionsRenderer from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import SEO from '../../components/SEO/SEO';
@@ -271,10 +271,8 @@ function SingleProgramDetail() {
   const internshipYears = program.internshipYears || [];
   const activeInternshipYear = internshipYears.find((y) => y.year === internshipYear) ?? internshipYears[0];
   const internshipColumns = activeInternshipYear?.columns || [];
-  const internshipRows = internshipColumns.length > 0 && activeInternshipYear
-    ? sortInternshipRows(internshipColumns, activeInternshipYear.rows || [])
-    : [];
-  const internshipStipendIdx = findStipendColumnIndex(internshipColumns);
+  const internshipRows = internshipColumns.length > 0 && activeInternshipYear ? activeInternshipYear.rows || [] : [];
+  const internshipPeriodIdx = findPeriodColumnIndex(internshipColumns);
   const internshipYearStats = activeInternshipYear ? computeInternshipStats(internshipColumns, activeInternshipYear.rows || []) : null;
 
   const internshipNameIdx = internshipColumns.findIndex((c) => /name|student|candidate/i.test(c));
@@ -282,11 +280,11 @@ function SingleProgramDetail() {
   const internshipMarqueeItems: PlacementItem[] = internshipRows.map((row) => {
     const rawName = internshipNameIdx >= 0 ? row.cells[internshipNameIdx] : (row.cells[1] || row.cells[0]);
     const rawComp = internshipCompIdx >= 0 ? row.cells[internshipCompIdx] : (row.cells[2] || 'Leading Organization');
-    const rawStipend = internshipStipendIdx >= 0 ? formatStipendCell(row.cells[internshipStipendIdx] ?? '') : (row.cells[3] || '');
+    const rawPeriod = internshipPeriodIdx >= 0 ? row.cells[internshipPeriodIdx] : '';
     return {
       name: rawName?.trim() || 'Student Scholar',
       company: rawComp?.trim() || 'Top Organization',
-      package: rawStipend ? `₹${rawStipend}` : 'Paid Internship',
+      package: rawPeriod?.trim() || 'Internship',
     };
   });
   const visibleCustomSections = (program.customSections || []).filter(hasCustomSectionContent);
@@ -1128,26 +1126,14 @@ function SingleProgramDetail() {
                     <div className="placement-stat-tile__value">{internshipYearStats.totalInternships}</div>
                   </div>
                   <div className="placement-stat-tile">
-                    <div className="placement-stat-tile__label">Top Interns List</div>
+                    <div className="placement-stat-tile__label">Internship Records</div>
                     <button
                       type="button"
                       className="placement-stat-tile__value--link"
                       onClick={() => document.getElementById('internship-records-table')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
                     >
-                      Stipend wise
+                      View All
                     </button>
-                  </div>
-                  <div className="placement-stat-tile">
-                    <div className="placement-stat-tile__label">Average Stipend</div>
-                    <div className="placement-stat-tile__value">{internshipYearStats.averageStipend ?? '—'}</div>
-                  </div>
-                  <div className="placement-stat-tile">
-                    <div className="placement-stat-tile__label">Median Stipend</div>
-                    <div className="placement-stat-tile__value">{internshipYearStats.medianStipend ?? '—'}</div>
-                  </div>
-                  <div className="placement-stat-tile">
-                    <div className="placement-stat-tile__label">Highest Stipend</div>
-                    <div className="placement-stat-tile__value">{internshipYearStats.highestStipend ?? '—'}</div>
                   </div>
                 </div>
               </>

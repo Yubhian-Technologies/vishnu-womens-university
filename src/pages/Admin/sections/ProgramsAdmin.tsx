@@ -1771,9 +1771,8 @@ function InternshipYearsEditor({ program }: { program: ProgramDoc }) {
         Add an Academic Year, then upload a file of student internship records for that year — Excel (.xlsx/.xls),
         CSV, Word (.docx, records must be in an actual table), or PDF (records must be selectable text, not a
         scanned image) are all accepted. The first row is treated as column headers — whatever columns the file
-        actually has are used as-is, nothing is assumed or hardcoded. On the public page, the 10 highest values in
-        whichever column looks like "Stipend" show first for that year, then everyone else in the order they were
-        imported. Re-importing a year replaces its previous dataset. Scoped to this exact programme only — other
+        actually has are used as-is, nothing is assumed or hardcoded. Records show on the public page in the order
+        they were imported. Re-importing a year replaces its previous dataset. Scoped to this exact programme only — other
         programmes in the same department manage their own Academic Years independently.
         A row that's an exact duplicate of another (every column matches) is skipped automatically on import — a
         single column repeating on its own, like a student's name against two different companies, is fine.
