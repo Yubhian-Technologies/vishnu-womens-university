@@ -22,7 +22,7 @@ import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import type { FacultyDoc } from './Faculty';
 import { parseFlexibleTable, parseProjectAccordion } from '../../lib/structuredTable';
 import { sortPlacementRows, computePlacementStats, findPackageColumnIndex, formatPackageCell } from '../../lib/placementRecords';
-import { sortInternshipRows, computeInternshipStats, findStipendColumnIndex, findInternshipSerialColumnIndex, formatStipendCell } from '../../lib/internshipRecords';
+import { sortInternshipRows, computeInternshipStats, findStipendColumnIndex, formatStipendCell } from '../../lib/internshipRecords';
 import { hasCustomSectionContent, toQuickLinkItems } from '../../lib/customSections';
 import CustomSectionsRenderer from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import '../detail-layout.css';
@@ -67,11 +67,9 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   // Which Academic Year's placement records are shown — falls back to the
   // active programme's first available year (see placementYears below).
   const [placementYear, setPlacementYear] = useState<string | null>(null);
-  // Which Academic Year's internship records are shown, and how many rows
-  // of its table are visible at once — same pattern as the Placements pair
-  // above ('all' shows every row, otherwise a fixed page size).
+  // Which Academic Year's internship records are shown — same pattern as
+  // the Placements pair above.
   const [internshipYear, setInternshipYear] = useState<string | null>(null);
-  const [internshipPageSize, setInternshipPageSize] = useState<number | 'all'>(10);
   const [activeLab, setActiveLab] = useState<LabItem | null>(null);
   const [openRndProjects, setOpenRndProjects] = useState<Set<string>>(new Set());
   const toggleRndProject = (key: string) => {
@@ -265,11 +263,21 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     ? sortInternshipRows(internshipColumns, activeInternshipYear.rows || [])
     : [];
   const internshipStipendIdx = findStipendColumnIndex(internshipColumns);
-  const internshipSnoIdx = findInternshipSerialColumnIndex(internshipColumns);
-  const visibleInternshipColumnIndices = internshipColumns.map((_, i) => i).filter((i) => i !== internshipSnoIdx);
   const internshipYearStats = activeInternshipYear ? computeInternshipStats(internshipColumns, activeInternshipYear.rows || []) : null;
   const hasInternships = internshipYears.length > 0;
-  const visibleInternshipRows = internshipPageSize === 'all' ? internshipRows : internshipRows.slice(0, internshipPageSize);
+
+  const internshipNameIdx = internshipColumns.findIndex((c) => /name|student|candidate/i.test(c));
+  const internshipCompIdx = internshipColumns.findIndex((c) => /company|organization|employer|recruiter/i.test(c));
+  const internshipMarqueeItems: PlacementItem[] = internshipRows.map((row) => {
+    const rawName = internshipNameIdx >= 0 ? row.cells[internshipNameIdx] : (row.cells[1] || row.cells[0]);
+    const rawComp = internshipCompIdx >= 0 ? row.cells[internshipCompIdx] : (row.cells[2] || 'Leading Organization');
+    const rawStipend = internshipStipendIdx >= 0 ? formatStipendCell(row.cells[internshipStipendIdx] ?? '') : (row.cells[3] || '');
+    return {
+      name: rawName?.trim() || 'Student Scholar',
+      company: rawComp?.trim() || 'Top Organization',
+      package: rawStipend ? `₹${rawStipend}` : 'Paid Internship',
+    };
+  });
 
   const hasProgrammeAbout = !!activeProgram.about;
   const hasHighlights = !!(activeProgram.highlights && activeProgram.highlights.length > 0);
@@ -1136,22 +1144,24 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
 
       {/* Internships — same shape/pattern as Placements above, per programme,
           Academic Years come entirely from activeProgram.internshipYears
-          (admin-managed via /admin → Programs). */}
+          (admin-managed via /admin → Programs), including the
+          scrolling-marquee records display. */}
       {hasInternships && (
         <section id="internships" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label">Careers</span>
+              <span className="section-label dept-section-label">Careers</span>
               <h2 className="section-title">Internships</h2>
             </div>
             <div>
-              <div className="placement-year-pills">
+              <div className="placement-year-pills" role="group" aria-label="Select academic year">
                 {internshipYears.map((y) => (
                   <button
                     key={y.year}
                     type="button"
                     onClick={() => setInternshipYear(y.year)}
                     className={`placement-year-pill${activeInternshipYear?.year === y.year ? ' active' : ''}`}
+                    aria-pressed={activeInternshipYear?.year === y.year}
                   >
                     AY. {y.year}
                   </button>
@@ -1162,76 +1172,58 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                   <p className="placement-stat-summary">
                     {activeInternshipYear.year} Internships as on date: <strong>{internshipYearStats.totalInternships.toLocaleString()}</strong>
                   </p>
-                  <div className="placement-stat-grid">
-                    <div className="placement-stat-tile">
-                      <div className="placement-stat-tile__label">No. of Companies</div>
-                      <div className="placement-stat-tile__value">{internshipYearStats.companiesVisited}</div>
+                  <div className="dept-stat-grid">
+                    <div className="dept-stat-tile">
+                      <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{internshipYearStats.companiesVisited}</span></div>
+                      <div className="dept-stat-tile__label">No. of Companies</div>
                     </div>
-                    <div className="placement-stat-tile">
-                      <div className="placement-stat-tile__label">Total No. of Internships</div>
-                      <div className="placement-stat-tile__value">{internshipYearStats.totalInternships}</div>
+                    <div className="dept-stat-tile">
+                      <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{internshipYearStats.totalInternships}</span></div>
+                      <div className="dept-stat-tile__label">Total No. of Internships</div>
                     </div>
-                    <div className="placement-stat-tile">
-                      <div className="placement-stat-tile__label">Average Stipend</div>
-                      <div className="placement-stat-tile__value">{internshipYearStats.averageStipend ?? '—'}</div>
+                    <div className="dept-stat-tile">
+                      <button
+                        type="button"
+                        className="dept-stat-tile__circle dept-stat-tile__circle--link"
+                        onClick={() => document.getElementById('internship-records-table')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                      >
+                        <span className="dept-stat-tile__value">Stipend wise</span>
+                      </button>
+                      <div className="dept-stat-tile__label">Top Interns List</div>
                     </div>
-                    <div className="placement-stat-tile">
-                      <div className="placement-stat-tile__label">Median Stipend</div>
-                      <div className="placement-stat-tile__value">{internshipYearStats.medianStipend ?? '—'}</div>
+                    <div className="dept-stat-tile">
+                      <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{internshipYearStats.averageStipend ?? '—'}</span></div>
+                      <div className="dept-stat-tile__label">Average Stipend</div>
                     </div>
-                    <div className="placement-stat-tile">
-                      <div className="placement-stat-tile__label">Highest Stipend</div>
-                      <div className="placement-stat-tile__value">{internshipYearStats.highestStipend ?? '—'}</div>
+                    <div className="dept-stat-tile">
+                      <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{internshipYearStats.medianStipend ?? '—'}</span></div>
+                      <div className="dept-stat-tile__label">Median Stipend</div>
+                    </div>
+                    <div className="dept-stat-tile">
+                      <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{internshipYearStats.highestStipend ?? '—'}</span></div>
+                      <div className="dept-stat-tile__label">Highest Stipend</div>
                     </div>
                   </div>
                 </>
               )}
-              <div id="internship-records-table">
-                <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 800, color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 'var(--space-3)' }}>
-                  Internship Records
-                </h3>
-                {internshipRows.length > 0 ? (
-                  <>
-                    <div className="placement-page-size">
-                      Show
-                      <select
-                        value={internshipPageSize}
-                        onChange={(e) => setInternshipPageSize(e.target.value === 'all' ? 'all' : Number(e.target.value))}
-                      >
-                        <option value={10}>10</option>
-                        <option value={25}>25</option>
-                        <option value={50}>50</option>
-                        <option value={100}>100</option>
-                        <option value="all">All</option>
-                      </select>
-                      entries
-                    </div>
-                    <div className="pb-activities-scroll">
-                      <table>
-                        <thead>
-                          <tr>
-                            <th className="pb-activities-num">S.No</th>
-                            {visibleInternshipColumnIndices.map((ci) => <th key={ci}>{internshipColumns[ci]}</th>)}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {visibleInternshipRows.map((row, ri) => (
-                            <tr key={ri}>
-                              <td className="pb-activities-num">{ri + 1}</td>
-                              {visibleInternshipColumnIndices.map((ci) => (
-                                <td key={ci}>{ci === internshipStipendIdx ? formatStipendCell(row.cells[ci] ?? '') : (row.cells[ci] ?? '')}</td>
-                              ))}
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                    <p className="placement-page-info">
-                      Showing 1 to {visibleInternshipRows.length} of {internshipRows.length} entries
-                    </p>
-                  </>
+
+              <div id="internship-records-table" style={{ marginTop: 'var(--space-8)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-4)', flexWrap: 'wrap', gap: '0.75rem' }}>
+                  <div>
+                    <span className="section-label dept-section-label">Student Success</span>
+                    <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: '1.2rem', fontWeight: 800, color: 'var(--color-primary-dark)', margin: '0.2rem 0 0 0' }}>
+                      Internship Offers &amp; Organizations ({activeInternshipYear?.year})
+                    </h3>
+                  </div>
+                  <span style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--color-accent)', background: 'rgba(201, 168, 76, 0.12)', border: '1px solid rgba(201, 168, 76, 0.3)', borderRadius: '9999px', padding: '0.3rem 0.85rem' }}>
+                    {internshipRows.length} Verified Internships
+                  </span>
+                </div>
+
+                {internshipMarqueeItems.length > 0 ? (
+                  <TestimonialMarquee records={internshipMarqueeItems} />
                 ) : (
-                  <p style={{ color: 'var(--color-text-light)', fontStyle: 'italic' }}>
+                  <p style={{ color: 'var(--color-text-light)', fontStyle: 'italic', padding: '1.5rem 0' }}>
                     No internship records uploaded yet for {activeInternshipYear?.year}.
                   </p>
                 )}
