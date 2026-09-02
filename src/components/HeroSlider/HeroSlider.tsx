@@ -5,13 +5,36 @@ import { usePageBanners } from '../../hooks/usePageBanners';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
 import './HeroSlider.css';
 
-// Served from public/ (not imported as a JS module) so this ~27MB file never
-// enters Vite's module graph or gets processed/hashed on every build. It's
-// still a genuinely large download — re-encoding it to a smaller bitrate
-// with an external tool (ffmpeg/HandBrake) would help more than anything
-// done here — but deferring the fetch (below) at least keeps it from
-// competing with the JS bundle for bandwidth during initial page load.
-const HERO_VIDEO_SRC = '/hero-video.mp4';
+// Background is a YouTube-hosted video (replaces the old self-hosted
+// hero-video.mp4) — id from https://youtu.be/xv3BlJJ0MYw. playerVars below
+// strip every native YouTube control (play/pause, next-video, captions,
+// fullscreen, title/share overlay) so the only interactive element is our
+// own .hero-mute-btn; loop:1 + playlist:<same id> is the documented way to
+// make the IFrame API loop a single video indefinitely.
+const HERO_YOUTUBE_VIDEO_ID = 'xv3BlJJ0MYw';
+const HERO_YOUTUBE_CONTAINER_ID = 'hero-youtube-player';
+
+interface YTPlayerInstance {
+  mute: () => void;
+  unMute: () => void;
+}
+
+// Minimal ad-hoc shape for the bits of the YouTube IFrame API this component
+// actually touches — same "cast window, don't augment the global type"
+// approach already used for requestIdleCallback below.
+type YTWindow = Window & {
+  YT?: {
+    Player: new (
+      elementId: string,
+      options: {
+        videoId: string;
+        playerVars?: Record<string, number | string>;
+        events?: { onReady?: (event: { target: YTPlayerInstance }) => void };
+      }
+    ) => YTPlayerInstance;
+  };
+  onYouTubeIframeAPIReady?: () => void;
+};
 
 
 interface Slide {
@@ -105,7 +128,7 @@ export default function HeroSlider() {
   // slides, so without this every one of them would load on first paint
   // even though the carousel only shows one at a time.
   const [visited, setVisited] = useState<Set<number>>(new Set([0]));
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const ytPlayerRef = useRef<YTPlayerInstance | null>(null);
 
   // Defer the video fetch until the browser is idle (or a short timeout, on
   // browsers without requestIdleCallback) so it doesn't compete with the JS
@@ -121,6 +144,59 @@ export default function HeroSlider() {
       else window.clearTimeout(handle as number);
     };
   }, []);
+
+  // Loads the YouTube IFrame API (once, shared across mounts via the
+  // youtube-iframe-api script id) and builds the background player once the
+  // idle-deferred videoReady flag flips. controls:0 + disablekb:1 + fs:0
+  // remove every native YouTube control; loop:1 + playlist:<id> loops the
+  // single video indefinitely; the iframe itself gets pointer-events:none
+  // in CSS so nothing (not even a click-to-pause) can reach it — the only
+  // way to affect playback is the custom .hero-mute-btn below.
+  useEffect(() => {
+    if (!videoReady) return;
+
+    const win = window as YTWindow;
+
+    const createPlayer = () => {
+      if (!win.YT) return;
+      ytPlayerRef.current = new win.YT.Player(HERO_YOUTUBE_CONTAINER_ID, {
+        videoId: HERO_YOUTUBE_VIDEO_ID,
+        playerVars: {
+          autoplay: 1,
+          mute: 1,
+          controls: 0,
+          disablekb: 1,
+          fs: 0,
+          iv_load_policy: 3,
+          loop: 1,
+          modestbranding: 1,
+          playlist: HERO_YOUTUBE_VIDEO_ID,
+          playsinline: 1,
+          rel: 0,
+          showinfo: 0,
+        },
+        events: {
+          onReady: (e) => e.target.mute(),
+        },
+      });
+    };
+
+    if (win.YT) {
+      createPlayer();
+    } else {
+      const previousCallback = win.onYouTubeIframeAPIReady;
+      win.onYouTubeIframeAPIReady = () => {
+        previousCallback?.();
+        createPlayer();
+      };
+      if (!document.getElementById('youtube-iframe-api')) {
+        const script = document.createElement('script');
+        script.id = 'youtube-iframe-api';
+        script.src = 'https://www.youtube.com/iframe_api';
+        document.body.appendChild(script);
+      }
+    }
+  }, [videoReady]);
 
   // Admin-uploaded Hero Banners (page="home") are appended after the fixed
   // marketing slides — the video keeps playing behind all of them, these
@@ -184,10 +260,11 @@ export default function HeroSlider() {
   }, []);
 
   const toggleMute = () => {
-    if (videoRef.current) {
-      videoRef.current.muted = !isMuted;
-      setIsMuted(m => !m);
-    }
+    const player = ytPlayerRef.current;
+    if (!player) return;
+    if (isMuted) player.unMute();
+    else player.mute();
+    setIsMuted(m => !m);
   };
 
   const handleSearch = (e: React.FormEvent) => {
@@ -202,20 +279,15 @@ export default function HeroSlider() {
   return (
     <section className="hero-slider" aria-label="Featured content">
 
-      {/* Background video — src only set once idle (see effect above), so the
-          browser doesn't fetch it until the rest of the page is usable */}
+      {/* Background video — YouTube player only created once idle (see effect
+          above), so the browser doesn't fetch the IFrame API/video until the
+          rest of the page is usable. Wrapper has pointer-events:none (CSS) so
+          the video itself can't be clicked/paused — the mute button below is
+          the only control. */}
       {videoReady && (
-        <video
-          ref={videoRef}
-          className="hero-video"
-          src={HERO_VIDEO_SRC}
-          preload="metadata"
-          autoPlay
-          muted
-          loop
-          playsInline
-          aria-hidden="true"
-        />
+        <div className="hero-youtube-bg" aria-hidden="true">
+          <div id={HERO_YOUTUBE_CONTAINER_ID} />
+        </div>
       )}
       <div className="hero-video-overlay" />
 

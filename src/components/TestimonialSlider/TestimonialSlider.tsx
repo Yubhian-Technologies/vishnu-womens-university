@@ -1,7 +1,16 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons';
+import { 
+  Quote, 
+  ChevronLeft, 
+  ChevronRight, 
+  Sparkles, 
+  BadgeCheck, 
+  Building2, 
+  GraduationCap, 
+  ArrowRight
+} from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import type { ContentBlockDoc } from '../../pages/Admin/sections/ContentBlocksAdmin';
 import './TestimonialSlider.css';
 
@@ -11,56 +20,79 @@ interface TestimonialSliderProps {
   autoPlayInterval?: number;
 }
 
+const FALLBACK_AVATARS = [
+  'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&q=80',
+  'https://images.unsplash.com/photo-1607746882042-944635dfe10e?w=400&q=80',
+  'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400&q=80',
+  'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&q=80',
+];
+
 export default function TestimonialSlider({
   testimonials,
-  title = "Alumni Voices",
-  autoPlayInterval = 6000,
+  title = "Alumni Voices & Stories",
+  autoPlayInterval = 6500,
 }: TestimonialSliderProps) {
   const [current, setCurrent] = useState(0);
   const [direction, setDirection] = useState(1);
   const [isPaused, setIsPaused] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [progress, setProgress] = useState(0);
 
   const count = testimonials.length;
+  const progressIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const nextSlide = useCallback(() => {
     if (count === 0) return;
     setDirection(1);
     setCurrent((prev) => (prev + 1) % count);
+    setProgress(0);
   }, [count]);
 
   const prevSlide = useCallback(() => {
     if (count === 0) return;
     setDirection(-1);
     setCurrent((prev) => (prev - 1 + count) % count);
+    setProgress(0);
   }, [count]);
 
   const goToSlide = (idx: number) => {
     if (idx === current) return;
     setDirection(idx > current ? 1 : -1);
     setCurrent(idx);
+    setProgress(0);
   };
 
+  // Smooth animated linear progress bar timer
   useEffect(() => {
-    if (isPaused || count <= 1) return;
-    timerRef.current = setInterval(nextSlide, autoPlayInterval);
+    if (isPaused || count <= 1) {
+      if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+      return;
+    }
+
+    const stepMs = 50;
+    const increment = (stepMs / autoPlayInterval) * 100;
+
+    progressIntervalRef.current = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 100) {
+          nextSlide();
+          return 0;
+        }
+        return prev + increment;
+      });
+    }, stepMs);
+
     return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
+      if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
     };
   }, [isPaused, count, autoPlayInterval, nextSlide]);
 
-  // Each slide's <img> only starts fetching once it becomes the active
-  // slide (AnimatePresence unmounts/remounts it per slide), so every photo
-  // was a cold fetch-and-decode the moment its slide appeared — visible as
-  // a lag/flash of the fallback before the real photo popped in. Warming
-  // the browser's cache for every photo up front means the <img> that
-  // mounts later almost always just paints from cache instead of loading
-  // cold.
+  // Preload avatar images
   useEffect(() => {
-    testimonials.forEach((t) => {
-      if (t.slug && t.slug.startsWith('http')) {
+    testimonials.forEach((t, i) => {
+      const src = (t.slug && t.slug.startsWith('http')) ? t.slug : FALLBACK_AVATARS[i % FALLBACK_AVATARS.length];
+      if (src) {
         const preload = new Image();
-        preload.src = t.slug;
+        preload.src = src;
       }
     });
   }, [testimonials]);
@@ -68,11 +100,10 @@ export default function TestimonialSlider({
   if (!testimonials || testimonials.length === 0) return null;
 
   const item = testimonials[current];
-
-  // Helper to extract clean name and class
   const authorName = item.title || "VWU Alumna";
   const authorRole = item.value || "Engineering Graduate";
-  const avatarUrl = item.slug && item.slug.startsWith('http') ? item.slug : undefined;
+  const avatarUrl = (item.slug && item.slug.startsWith('http')) ? item.slug : FALLBACK_AVATARS[current % FALLBACK_AVATARS.length];
+  
   const initials = authorName
     .split(' ')
     .slice(0, 2)
@@ -80,44 +111,72 @@ export default function TestimonialSlider({
     .join('')
     .toUpperCase();
 
+  // Highlight company/outcome if present (e.g. Google, Amazon, IIT Hyderabad)
+  const roleParts = authorRole.split(/—|-|\|/);
+  const deptPart = roleParts[0]?.trim() || "Engineering";
+  const outcomePart = roleParts[1]?.trim() || "Alumna";
+
   const slideVariants = {
     enter: (dir: number) => ({
       opacity: 0,
-      y: dir > 0 ? 16 : -16,
-      filter: 'blur(4px)',
+      x: dir > 0 ? 30 : -30,
+      filter: 'blur(6px)',
     }),
     center: {
       opacity: 1,
-      y: 0,
+      x: 0,
       filter: 'blur(0px)',
-      transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] as const },
+      transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] as const },
     },
     exit: (dir: number) => ({
       opacity: 0,
-      y: dir > 0 ? -16 : 16,
-      filter: 'blur(4px)',
-      transition: { duration: 0.25, ease: 'easeIn' as const },
+      x: dir > 0 ? -30 : 30,
+      filter: 'blur(6px)',
+      transition: { duration: 0.3, ease: 'easeIn' as const },
     }),
   };
 
   return (
-    <section className="testimonial-modern-section" aria-label="Testimonials">
-      <div className="testimonial-modern-glow" aria-hidden="true" />
+    <section className="m3-testimonial-section" aria-label="Alumni Testimonials">
+      {/* Dynamic Ambient Glows */}
+      <div className="m3-testi-glow-left" aria-hidden="true" />
+      <div className="m3-testi-glow-right" aria-hidden="true" />
 
       <div className="container">
-        {/* Section Header */}
-        <div className="testimonial-modern-header">
-          {title && <h2 className="testimonial-modern-title">{title}</h2>}
+        {/* Section Header with Google M3 Pill */}
+        <div className="m3-testi-header">
+          <div className="m3-testi-eyebrow">
+            <Sparkles size={14} className="m3-testi-sparkle" />
+            <span>Transformations &amp; Real Outcomes</span>
+          </div>
+          <h2 className="m3-testi-title">{title}</h2>
+          <p className="m3-testi-subtitle">
+            From premier campus placements to trailblazing startups and global academic research—hear how VWU shapes empowered women leaders.
+          </p>
         </div>
 
-        {/* Carousel Wrapper */}
-        <div
-          className="testimonial-modern-wrapper"
+        {/* Carousel Outer Stage */}
+        <div 
+          className="m3-testi-stage"
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+          }}
+          aria-roledescription="carousel"
         >
-          {/* Main Testimonial Card */}
-          <div className="testimonial-modern-card">
+          {/* Main Card Surface */}
+          <div className="m3-testi-card">
+            {/* Auto-play Linear Progress Bar */}
+            <div className="m3-testi-progress-track">
+              <div 
+                className="m3-testi-progress-bar" 
+                style={{ width: `${progress}%` }} 
+              />
+            </div>
+
             <AnimatePresence custom={direction} mode="wait">
               <motion.div
                 key={item.id || current}
@@ -126,92 +185,123 @@ export default function TestimonialSlider({
                 initial="enter"
                 animate="center"
                 exit="exit"
-                className="testimonial-card-split"
+                className="m3-testi-card-inner"
               >
-                {/* Left Side: Full-Height Image Panel */}
-                <div className="testimonial-image-panel">
-                  {avatarUrl ? (
-                    <img
-                      src={avatarUrl}
-                      alt={authorName}
-                      className="testimonial-panel-img"
-                      onError={(e) => {
-                        (e.target as HTMLElement).style.display = 'none';
-                      }}
-                    />
-                  ) : (
-                    <div className="testimonial-panel-fallback">
-                      <span className="testimonial-fallback-initials">{initials}</span>
-                      <span className="testimonial-fallback-badge">Alumna</span>
-                    </div>
-                  )}
-                  <div className="testimonial-image-overlay" />
-                </div>
+                {/* Left Visual Avatar Showcase */}
+                <div className="m3-testi-portrait-col">
+                  <div className="m3-testi-img-frame">
+                    {avatarUrl ? (
+                      <img
+                        src={avatarUrl}
+                        alt={authorName}
+                        className="m3-testi-avatar"
+                        onError={(e) => {
+                          (e.target as HTMLElement).style.display = 'none';
+                        }}
+                      />
+                    ) : (
+                      <div className="m3-testi-initials-box">
+                        <span>{initials}</span>
+                      </div>
+                    )}
+                    <div className="m3-testi-img-overlay" />
 
-                {/* Right Side: Content Details */}
-                <div className="testimonial-content-panel">
-                  {/* Author Header */}
-                  <div className="testimonial-author-row">
-                    <div className="testimonial-author-meta">
-                      <h4 className="testimonial-author-name">{authorName}</h4>
-                      <p className="testimonial-author-role">{authorRole}</p>
+                    {/* Verified Alumna Badge */}
+                    <div className="m3-verified-badge">
+                      <BadgeCheck size={16} className="m3-verified-icon" />
+                      <span>Verified Alumna</span>
                     </div>
                   </div>
 
-                  {/* Divider Line */}
-                  <div className="testimonial-card-divider" />
+                  {/* Quick Highlight Metric */}
+                  <div className="m3-testi-outcome-pill">
+                    <Building2 size={13} />
+                    <span>{outcomePart}</span>
+                  </div>
+                </div>
 
-                  {/* Quote Content */}
-                  <p className="testimonial-card-quote">
+                {/* Right Content Column */}
+                <div className="m3-testi-content-col">
+                  <div className="m3-testi-top-bar">
+                    <Quote size={42} className="m3-quote-symbol" />
+                  </div>
+
+                  {/* Main Quote */}
+                  <blockquote className="m3-testi-quote-text">
                     "{item.desc}"
-                  </p>
+                  </blockquote>
 
-                  {/* Bottom Footer Tag */}
-                  <div className="testimonial-card-footer">
-                    <span className="testimonial-verified-text">
-                      Vishnu Women's University
-                    </span>
+                  {/* Author Meta Details */}
+                  <div className="m3-testi-author-block">
+                    <div className="m3-author-details">
+                      <h3 className="m3-author-name">{authorName}</h3>
+                      <div className="m3-author-role-row">
+                        <span className="m3-dept-badge">
+                          <GraduationCap size={13} />
+                          <span>{deptPart}</span>
+                        </span>
+                        <span className="m3-inst-text">Vishnu Women's University</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </motion.div>
             </AnimatePresence>
           </div>
 
-          {/* Side Controls (Prev, Vertical Dots, Next) */}
-          <div className="testimonial-side-controls">
+          {/* Interactive Navigation & Controls Bar */}
+          <div className="m3-testi-controls-bar">
+            {/* Prev Button */}
             <button
               type="button"
-              className="testimonial-nav-btn"
+              className="m3-testi-nav-arrow"
               onClick={prevSlide}
-              aria-label="Previous testimonial"
-              title="Previous"
+              aria-label="Previous story"
+              title="Previous Story"
             >
-              <FontAwesomeIcon icon={faChevronUp} style={{ fontSize: 18 }} />
+              <ChevronLeft size={20} />
             </button>
 
-            <div className="testimonial-vertical-dots" role="tablist">
-              {testimonials.map((_, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  className={`testimonial-vdot ${idx === current ? 'active' : ''}`}
-                  onClick={() => goToSlide(idx)}
-                  role="tab"
-                  aria-selected={idx === current}
-                  aria-label={`Go to slide ${idx + 1}`}
-                />
-              ))}
+            {/* Thumbnail / Avatar Switcher Dots */}
+            <div className="m3-testi-thumbs-bar" role="tablist">
+              {testimonials.map((t, idx) => {
+                const thumbImg = (t.slug && t.slug.startsWith('http')) ? t.slug : FALLBACK_AVATARS[idx % FALLBACK_AVATARS.length];
+                const isActive = idx === current;
+                return (
+                  <button
+                    key={t.id || idx}
+                    type="button"
+                    className={`m3-thumb-btn ${isActive ? 'm3-thumb-btn--active' : ''}`}
+                    onClick={() => goToSlide(idx)}
+                    role="tab"
+                    aria-selected={isActive}
+                    aria-label={`View story of ${t.title || `Alumna ${idx + 1}`}`}
+                  >
+                    <img src={thumbImg} alt="" className="m3-thumb-img" />
+                    {isActive && <div className="m3-thumb-active-ring" />}
+                  </button>
+                );
+              })}
             </div>
 
+            {/* Next Button */}
             <button
               type="button"
-              className="testimonial-nav-btn"
+              className="m3-testi-nav-arrow"
               onClick={nextSlide}
-              aria-label="Next testimonial"
-              title="Next"
+              aria-label="Next story"
+              title="Next Story"
             >
-              <FontAwesomeIcon icon={faChevronDown} style={{ fontSize: 18 }} />
+              <ChevronRight size={20} />
             </button>
+          </div>
+
+          {/* Footer Sub-Link */}
+          <div className="m3-testi-footer-link-wrap">
+            <Link to="/alumni" className="m3-testi-alumni-link">
+              <span>Explore More Alumni Journeys &amp; Giving</span>
+              <ArrowRight size={14} />
+            </Link>
           </div>
         </div>
       </div>

@@ -2983,6 +2983,64 @@ td.pb-activities-num {
   padding: 1.5rem;
 }
 
+/* ==========================================================================
+   Comprehensive Mobile Responsive Overrides for Department & Detail Layouts
+   ========================================================================== */
+
+@media (max-width: 992px) {
+  .detail-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+  }
+}
+
+@media (max-width: 768px) {
+  .dept-level-grid,
+  .dept-vm-grid,
+  .dept-highlights-grid,
+  .dept-labs-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.25rem;
+  }
+
+  .dept-vm-card,
+  .dept-lab-card,
+  .dept-level-card,
+  .dept-highlight-item-card {
+    border-radius: 18px;
+    padding: 1.25rem;
+  }
+
+  .dept-news-accordion-header {
+    padding: 1rem 1.2rem;
+  }
+
+  .dept-news-accordion-content {
+    padding: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .dept-news-accordion-header-left {
+    gap: 0.5rem;
+  }
+
+  .dept-news-year-pill {
+    font-size: 0.95rem;
+  }
+
+  .dept-news-count-badge {
+    font-size: 0.7rem;
+    padding: 0.15rem 0.5rem;
+  }
+
+  .dept-news-chevron-circle {
+    width: 30px;
+    height: 30px;
+  }
+}
+
+
 
 
 

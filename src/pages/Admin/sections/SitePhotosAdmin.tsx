@@ -114,6 +114,13 @@ const DEFAULT_SECTIONS: Record<string, Record<string, SectionDef>> = {
         { imageUrl: '/images/vibrant-campus.png', alt: 'Campus Life & Cultural Showcase', caption: 'Campus Life at VWU' },
       ],
     },
+    // The full-width background photo behind the "Smart Infrastructure & Living Campus" section.
+    'infrastructure-showcase': {
+      label: 'Smart Infrastructure Showcase Banner Photo',
+      slots: [
+        { imageUrl: 'https://images.unsplash.com/photo-1541829070764-84a7d30dd3f3?w=1920&q=85', alt: 'Smart Campus Infrastructure at VWU', caption: 'Smart Campus Infrastructure' },
+      ],
+    },
     // The grid of school cards in the "Future-focused education across disciplines" section.
     'schools-showcase': {
       label: 'Schools Showcase Cards (5 Slots)',

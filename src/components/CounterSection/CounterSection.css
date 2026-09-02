@@ -1,123 +1,199 @@
-/* ===== Counter Section — Glassmorphism Cards ===== */
+/* ==========================================================================
+   Google Material 3 (M3) Key Statistics & Counter Design System
+   Icon-Free, Pure Typography & Glassmorphism Metric Tiles
+   ========================================================================== */
 
-.counter-section {
+.counter-section-m3 {
+  position: relative;
   width: 100%;
-  background: linear-gradient(160deg, #1b4332 0%, #133226 55%, #0d2218 100%);
-  padding: clamp(2.75rem, 5vw, 4rem) 0;
+  background: #081a12;
+  background: radial-gradient(circle at 50% 50%, #133324 0%, #091a12 60%, #050e0a 100%);
+  padding: clamp(3rem, 5.5vw, 4.75rem) 0;
+  overflow: hidden;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.counter-grid {
+/* Ambient Radial Glow */
+.counter-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 700px;
+  height: 250px;
+  background: radial-gradient(circle, rgba(201, 168, 76, 0.12) 0%, rgba(27, 67, 50, 0.05) 50%, transparent 80%);
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(50px);
+  z-index: 1;
+}
+
+/* Container & Grid Layout */
+.counter-grid-m3 {
+  position: relative;
+  z-index: 2;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: clamp(0.85rem, 1.6vw, 1.25rem);
-  max-width: 1320px;
-  margin: 0 auto;
-  padding: 0 clamp(1rem, 3vw, var(--space-6));
+  grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+  gap: clamp(0.75rem, 1.4vw, 1.25rem);
+  align-items: stretch;
 }
 
-/* ── Each Counter Card — frosted glass, matches .hero-search-box / .hero-mute-btn ── */
-.counter-item {
+@media (min-width: 1200px) {
+  .counter-grid-m3 {
+    grid-template-columns: repeat(7, 1fr);
+  }
+}
+
+/* ==========================================================================
+   M3 Metric Card
+   ========================================================================== */
+
+.counter-item-m3 {
+  position: relative;
   text-align: center;
-  padding: clamp(1.5rem, 2.4vw, 2.1rem) clamp(0.9rem, 2vw, 1.4rem);
+  padding: clamp(1.4rem, 2.2vw, 1.85rem) clamp(0.75rem, 1.5vw, 1.2rem);
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  gap: var(--space-2);
-  border-radius: var(--radius-lg, 20px);
-  background: rgba(255, 255, 255, 0.1);
+  justify-content: center;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.06);
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 8px 22px -6px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.14);
-  transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 10px 28px -8px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transition: all 260ms cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  cursor: default;
 }
 
-.counter-item:hover {
-  background: rgba(255, 255, 255, 0.16);
-  border-color: rgba(255, 255, 255, 0.32);
-  box-shadow: 0 14px 32px -6px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  transform: translateY(-4px);
+.counter-item-state-layer {
+  position: absolute;
+  inset: 0;
+  background: var(--color-accent);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms ease;
+  z-index: 0;
 }
 
-/* ── FA Icon Circle ── */
-.counter-icon-wrap {
-  width: 54px;
-  height: 54px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: var(--space-2);
-  background: rgba(255, 255, 255, 0.1);
-  border: 1.5px solid rgba(200, 169, 106, 0.45);
-  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background 0.25s ease;
+.counter-item-m3:hover {
+  transform: translateY(-5px);
+  background: rgba(255, 255, 255, 0.11);
+  border-color: rgba(201, 168, 76, 0.45);
+  box-shadow: 0 16px 36px -6px rgba(0, 0, 0, 0.65), 0 0 20px rgba(201, 168, 76, 0.15);
 }
 
-.counter-item:hover .counter-icon-wrap {
-  transform: scale(1.12) rotate(6deg);
-  background: rgba(255, 255, 255, 0.16);
+.counter-item-m3:hover .counter-item-state-layer {
+  opacity: 0.04;
 }
 
-.counter-fa-icon {
-  font-size: 1.25rem;
-  color: var(--color-accent, #c9a84c);
-}
-
-/* ── Number ── */
-.counter-number {
-  font-family: var(--font-serif);
-  font-size: clamp(1.9rem, 2.8vw, 2.7rem);
+/* ── Number & Suffix ── */
+.counter-number-m3 {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-sans);
+  font-size: clamp(2rem, 2.6vw, 2.75rem);
   font-weight: 900;
   line-height: 1;
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  gap: 1px;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
   color: #ffffff;
+  margin-bottom: var(--space-2);
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
 }
 
-.counter-suffix {
+.counter-value {
+  display: inline-block;
+}
+
+.counter-suffix-m3 {
   font-size: 1.35rem;
-  font-weight: 900;
-  margin-top: 3px;
-  color: var(--color-accent, #c9a84c);
+  font-weight: 800;
+  color: var(--color-accent);
+  margin-left: 1px;
+  line-height: 1;
+  margin-top: 1px;
+  text-shadow: 0 0 12px rgba(201, 168, 76, 0.6);
 }
 
-/* ── Label & Sub ── */
-.counter-label {
+/* ── Metric Label ── */
+.counter-label-m3 {
+  position: relative;
+  z-index: 1;
   font-family: var(--font-sans);
-  font-size: clamp(0.82rem, 1.1vw, 0.92rem);
+  font-size: clamp(0.82rem, 1.05vw, 0.92rem);
   font-weight: 700;
-  line-height: 1.4;
-  max-width: 150px;
-  margin: 0 auto;
-  color: rgba(255, 255, 255, 0.92);
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.95);
+  margin: 0 0 8px 0;
+  letter-spacing: -0.01em;
 }
 
-.counter-sub {
-  font-size: var(--text-xs, 0.75rem);
-  font-weight: 500;
-  margin-top: 2px;
-  color: rgba(255, 255, 255, 0.55);
+/* ── Subtitle / Micro Pill Tag ── */
+.counter-sub-pill {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-full);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 200ms ease;
+  white-space: nowrap;
 }
 
-/* ── Responsive ── */
-@media (max-width: 540px) {
-  .counter-grid {
-    grid-template-columns: repeat(2, 1fr);
+.counter-item-m3:hover .counter-sub-pill {
+  background: rgba(201, 168, 76, 0.16);
+  border-color: rgba(201, 168, 76, 0.3);
+  color: var(--color-accent-light);
+}
+
+/* ==========================================================================
+   Responsive Breakpoints
+   ========================================================================== */
+
+@media (max-width: 992px) {
+  .counter-grid-m3 {
+    grid-template-columns: repeat(4, 1fr);
   }
 
-  .counter-item {
-    padding: 1.35rem 0.9rem;
-  }
-
-  /* An odd item count leaves the last card alone in the row, left-aligned
-     with empty space beside it — span both columns so it centers instead. */
-  .counter-item:last-child:nth-child(odd) {
-    grid-column: span 2;
-    max-width: 220px;
+  .counter-item-m3:last-child {
+    grid-column: span 4;
+    max-width: 260px;
     margin: 0 auto;
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .counter-grid-m3 {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .counter-item-m3 {
+    padding: 1.25rem 0.75rem;
+    border-radius: 16px;
+  }
+
+  .counter-item-m3:last-child {
+    grid-column: span 2;
+    max-width: 100%;
+  }
+
+  .counter-sub-pill {
+    white-space: normal;
   }
 }

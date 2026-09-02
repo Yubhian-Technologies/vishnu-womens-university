@@ -23,6 +23,8 @@ import type { HappeningDoc } from '../Admin/sections/NewsAwardsDataAdmin';
 import type { ContentBlockDoc } from '../Admin/sections/ContentBlocksAdmin';
 
 import SEO from '../../components/SEO/SEO';
+import UpcomingEvents from '../../components/UpcomingEvents/UpcomingEvents';
+import SmartInfrastructureShowcase from '../../components/SmartInfrastructureShowcase/SmartInfrastructureShowcase';
 import { getUniversitySchema } from '../../lib/seo/schemas';
 import './Home.css';
 
@@ -75,9 +77,10 @@ function studyCardHref(card: ContentBlockDoc): string {
 }
 
 const defaultTestimonials: ContentBlockDoc[] = [
-  { id: 'default-1', page: 'home', section: 'testimonials', value: 'Computer Science Engineering — Software Engineer at Google', title: 'Lakshmi R., Class of 2024', desc: 'VWU faculty genuinely invest in each student — they know your name, your ambitions, and they hold you to a high standard. The skills and confidence I gained here led directly to my placement at Google.', icon: '', slug: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=200&q=80', order: 0 },
-  { id: 'default-2', page: 'home', section: 'testimonials', value: 'M.Tech ECE — Research Scholar at IIT Hyderabad', title: 'Anusha P., Class of 2022', desc: 'VWU is a true launchpad. The research infrastructure, the labs, and the guidance I received here built the academic foundation that made my Ph.D. at IIT Hyderabad possible.', icon: '', slug: 'https://images.unsplash.com/photo-1607746882042-944635dfe10e?w=200&q=80', order: 1 },
-  { id: 'default-3', page: 'home', section: 'testimonials', value: 'CSE — Co-founder at TechFemme Startup', title: 'Divya K., Class of 2023', desc: 'Studying in an all-women environment gave me real confidence in my abilities. I led several national-level projects at VWU — and that leadership mindset is what drives my startup today.', icon: '', slug: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&q=80', order: 2 },
+  { id: 'default-1', page: 'home', section: 'testimonials', value: 'B.Tech CSE — Software Engineer at Google', title: 'Lakshmi R., Class of 2024', desc: 'VWU faculty genuinely invest in each student — they know your name, your ambitions, and they hold you to a high standard. The skills and confidence I gained here led directly to my placement at Google.', icon: '', slug: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=500&q=80', order: 0 },
+  { id: 'default-2', page: 'home', section: 'testimonials', value: 'M.Tech ECE — Research Scholar at IIT Hyderabad', title: 'Anusha P., Class of 2022', desc: 'VWU is a true launchpad. The research infrastructure, the labs, and the guidance I received here built the academic foundation that made my Ph.D. at IIT Hyderabad possible.', icon: '', slug: 'https://images.unsplash.com/photo-1607746882042-944635dfe10e?w=500&q=80', order: 1 },
+  { id: 'default-3', page: 'home', section: 'testimonials', value: 'AI & Data Science — Applied Scientist at Amazon', title: 'Sowmya K., Class of 2023', desc: 'The specialized AI labs and machine learning faculty mentorship gave me the competitive edge to secure an Amazon AFE fellowship, which converted into a full-time Applied Scientist role.', icon: '', slug: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=500&q=80', order: 2 },
+  { id: 'default-4', page: 'home', section: 'testimonials', value: 'CSE — Co-founder at TechFemme Startup', title: 'Divya K., Class of 2023', desc: 'Studying in an all-women environment gave me real confidence in my abilities. I led several national-level projects at VWU — and that leadership mindset is what drives my startup today.', icon: '', slug: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=500&q=80', order: 3 },
 ];
 
 /* ── Tilt Hook ────────────────────────────────────────────── */
@@ -106,25 +109,6 @@ function Wave({ flip = false, fill = '#f7f8fb' }: { flip?: boolean; fill?: strin
       </svg>
     </div>
   );
-}
-
-/* ── Happenings → Home widgets ────────────────────────────── */
-// "Latest from VWU" and "Upcoming at VWU" both read the `happenings`
-// collection (see Home() below) instead of the separate `news`/`events`
-// collections, but keep their original look — a NewsCard grid (via
-// happeningToArticle, shared with Happenings.tsx's own Recent Events grid —
-// see lib/happenings.ts) and a date-badge row list.
-
-// The event-date-badge (month + day) expects two separate fields, but a
-// happening only has one free-text `date` string (admin-entered, e.g.
-// "January 31, 2026" — see NewsAwardsDataAdmin's Happenings form). Best-
-// effort split for that common "Month D[, YYYY]" shape; anything that
-// doesn't match that pattern still renders, just as a single-line date
-// instead of the split badge.
-function splitHappeningDate(date: string): { month: string; day: string } | null {
-  const match = date.trim().match(/^([A-Za-z]+)\s+(\d{1,2})\b/);
-  if (!match) return null;
-  return { month: match[1].slice(0, 3).toUpperCase(), day: match[2] };
 }
 
 /* ── Component ────────────────────────────────────────────── */
@@ -319,6 +303,9 @@ export default function Home() {
       {/* ── Women's Education & Empowerment ── */}
       <WomensEducationSection />
 
+      {/* ── Smart Infrastructure & Campus Showcase (Engineered for Discovery. Built for Living.) ── */}
+      <SmartInfrastructureShowcase />
+
       {/* ── Our Recruiters (3-Row Auto-Scrolling Marquee) ── */}
       <RecruitersSection />
 
@@ -355,51 +342,7 @@ export default function Home() {
       <NewsArticleDialog article={activeArticle} onClose={() => setActiveArticle(null)} />
 
       {/* ── Events (Upcoming Happenings) ── */}
-      <section className="events-section">
-        <div className="container">
-          <div className="events-header">
-            <div className="reveal-left">
-              <span className="section-label">What's Happening</span>
-              <h2 className="section-title">Upcoming at VWU</h2>
-            </div>
-            <Link to="/news-awards/happenings" className="btn btn-outline reveal-right">All Events →</Link>
-          </div>
-          <div className="events-list">
-            {upcomingHappenings.map((item) => {
-              const split = splitHappeningDate(item.date);
-              return (
-                <Link key={item.id} to="/news-awards/happenings" className="event-item">
-                  <div className="event-date-badge">
-                    {split ? (
-                      <>
-                        <span className="month">{split.month}</span>
-                        <span className="day">{split.day}</span>
-                      </>
-                    ) : (
-                      <span className="day" style={{ fontSize: 'var(--text-sm)' }}>{item.date}</span>
-                    )}
-                  </div>
-                  <div className="event-line" />
-                  <div className="event-content">
-                    <div className="event-title">{item.title}</div>
-                    {item.dept && (
-                      <div className="event-meta">
-                        <span>{item.dept}</span>
-                      </div>
-                    )}
-                  </div>
-                  <svg className="event-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </Link>
-              );
-            })}
-            {upcomingHappenings.length === 0 && (
-              <p style={{ color: 'var(--color-text-light)' }}>No upcoming happenings yet — check back soon.</p>
-            )}
-          </div>
-        </div>
-      </section>
+      <UpcomingEvents happenings={upcomingHappenings} />
 
       {/* ── CTA Banner ── */}
       <section className="cta-banner">
