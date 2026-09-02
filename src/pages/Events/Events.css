@@ -121,6 +121,11 @@
 
 .ev-view-btn {
   padding: var(--space-2) var(--space-3);
+  /* Meets the 48x48dp minimum tap target even though the icon itself is
+     small — .ev-view-toggle has no fixed height, so this grows the real
+     button box rather than relying on an overflow-clipped pseudo-element. */
+  min-width: 44px;
+  min-height: 44px;
   background: transparent;
   border: none;
   color: var(--color-mid-gray);
@@ -128,6 +133,7 @@
   transition: all var(--transition-fast);
   display: flex;
   align-items: center;
+  justify-content: center;
 }
 
 .ev-view-btn.active {

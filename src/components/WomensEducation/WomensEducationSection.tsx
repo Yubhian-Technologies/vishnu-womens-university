@@ -1,14 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faRocket,
   faShieldHalved,
   faTrophy,
   faLightbulb,
-  faHandshakeAngle,
-  faUsers,
-  faBriefcase,
   faArrowRight,
   faStar,
   faAward,
@@ -16,38 +12,9 @@ import {
   faGlobe,
   type IconDefinition,
 } from '@fortawesome/free-solid-svg-icons';
+import { useOrderedCollection } from '../../hooks/useCollection';
+import type { PlacementHighlightDoc } from '../../pages/Admin/sections/PlacementHighlightsAdmin';
 import './WomensEducationSection.css';
-
-const PILLARS = [
-  {
-    icon: faRocket,
-    iconColor: '#2d6a4f',
-    title: "Fearless Innovation",
-    desc: "Breaking glass ceilings in AI, VLSI, Cyber Security, and Automotive Engineering with purpose-built research labs.",
-    tag: "Next-Gen Tech",
-  },
-  {
-    icon: faShieldHalved,
-    iconColor: '#1b4332',
-    title: "100% Safe & Inspiring Campus",
-    desc: "A vibrant, world-class residential campus built entirely to nurture women's personal, academic, and professional growth.",
-    tag: "Secure Campus",
-  },
-  {
-    icon: faTrophy,
-    iconColor: '#92400e',
-    title: "Global Leadership Launchpad",
-    desc: "1,100+ placements annually with top tech giants like Amazon, Microsoft, Adobe, Google, and Fortune 500 recruiters.",
-    tag: "Career Ready",
-  },
-  {
-    icon: faLightbulb,
-    iconColor: '#7c3aed',
-    title: "Incubation & Entrepreneurship",
-    desc: "Empowering student founders with seed funding, 150+ patents, and dedicated incubation at Sri Vishnu TBI.",
-    tag: "Women Founders",
-  },
-];
 
 const TAGS: { icon: IconDefinition; text: string }[] = [
   { icon: faAward, text: "First Private University for Women in Telugu States" },
@@ -57,12 +24,33 @@ const TAGS: { icon: IconDefinition; text: string }[] = [
   { icon: faShieldHalved, text: "Highest Safety & Mentorship" },
 ];
 
-// name/salary/logo are placeholders — swap in the real per-graduate data
-// (see .we-info-card, which crossfades these alongside the photo above).
-const PLACEMENT_PHOTOS = [
-  { src: '/images/placements/1.png', alt: 'VWU graduate placement success story 1', name: 'Graduate Name', salary: '₹00 LPA', logo: '' },
-  { src: '/images/placements/2.png', alt: 'VWU graduate placement success story 2', name: 'Graduate Name', salary: '₹00 LPA', logo: '' },
-  { src: '/images/placements/3.png', alt: 'VWU graduate placement success story 3', name: 'Graduate Name', salary: '₹00 LPA', logo: '' },
+interface PlacementHighlight {
+  src: string;
+  alt: string;
+  /** Name/package/company are optional — a slot with none of them set
+   *  falls back to just the photo (see PlacementHighlightCard) instead of
+   *  showing an empty/fabricated info panel. */
+  name?: string;
+  package?: string;
+  company?: string;
+  /** An uploaded recruiter logo (from /admin → Home — Placement Highlights)
+   *  renders instead of the plain-text company name when present. */
+  logoUrl?: string;
+}
+
+// Shown until an admin adds at least one real highlight via
+// /admin → Home — Placement Highlights (see PlacementHighlightsAdmin.tsx) —
+// same static-default-until-replaced pattern used throughout this codebase.
+const PLACEMENT_PHOTOS: PlacementHighlight[] = [
+  {
+    src: '/images/placements/1.png',
+    alt: 'Reddi Sree Nithya, VWU graduate placed at Amazon with a 59.29 LPA package',
+    name: 'Reddi Sree Nithya',
+    package: '59.29 LPA',
+    company: 'amazon',
+  },
+  { src: '/images/placements/2.png', alt: 'VWU graduate placement success story 2' },
+  { src: '/images/placements/3.png', alt: 'VWU graduate placement success story 3' },
 ];
 
 const CAROUSEL_INTERVAL = 3500;
@@ -70,12 +58,47 @@ const CAROUSEL_INTERVAL = 3500;
 export default function WomensEducationSection() {
   const [activePhoto, setActivePhoto] = useState(0);
 
+  const { docs: liveHighlights } = useOrderedCollection<PlacementHighlightDoc>('placementHighlights', 'order');
+  // Memoized so this array's identity only changes when the underlying
+  // Firestore data actually does — otherwise it's a fresh array every
+  // render (including every 3.5s carousel tick), which would also refire
+  // the image-preload effect below on every tick for no reason.
+  const placementItems: PlacementHighlight[] = useMemo(() => (
+    liveHighlights.length > 0
+      ? liveHighlights.map((h) => ({
+          src: h.photoUrl,
+          alt: `${h.name}, VWU graduate${h.companyName ? ` placed at ${h.companyName}` : ''}${h.package ? ` with a ${h.package} package` : ''}`,
+          name: h.name,
+          package: h.package,
+          company: h.companyName,
+          logoUrl: h.logoUrl,
+        }))
+      : PLACEMENT_PHOTOS
+  ), [liveHighlights]);
+
+  // Reset to slide 0 whenever the source data changes (e.g. Firestore's
+  // live highlights replace the static defaults) — a stale index from the
+  // old array could otherwise point past the end of a shorter new one.
+  useEffect(() => { setActivePhoto(0); }, [placementItems.length]);
+
   useEffect(() => {
+    if (placementItems.length <= 1) return;
     const interval = setInterval(() => {
-      setActivePhoto((i) => (i + 1) % PLACEMENT_PHOTOS.length);
+      setActivePhoto((i) => (i + 1) % placementItems.length);
     }, CAROUSEL_INTERVAL);
     return () => clearInterval(interval);
-  }, []);
+  }, [placementItems.length]);
+
+  // Each slide's photo/logo only starts fetching once it becomes active
+  // (same root cause as the testimonial carousel's — see TestimonialSlider),
+  // so without this every rotation briefly shows a blank circle instead of
+  // the photo. Warm the cache for every slide up front instead.
+  useEffect(() => {
+    placementItems.forEach((item) => {
+      if (item.src) { const img = new Image(); img.src = item.src; }
+      if (item.logoUrl) { const img = new Image(); img.src = item.logoUrl; }
+    });
+  }, [placementItems]);
 
   return (
     <section className="we-section" aria-label="Women's Education at VWU">
@@ -139,87 +162,41 @@ export default function WomensEducationSection() {
               {/* Decorative Circular Halo */}
               <div className="we-halo-ring" aria-hidden="true" />
 
-              {/* Circular auto-rotating placement photo carousel */}
-              <div className="we-photo-carousel" aria-label="VWU graduate placement highlights">
-                {PLACEMENT_PHOTOS.map((photo, i) => (
-                  <img
-                    key={photo.src}
-                    src={photo.src}
-                    alt={photo.alt}
-                    className={`we-photo-carousel-img${i === activePhoto ? ' is-active' : ''}`}
-                    loading="lazy"
-                  />
-                ))}
-              </div>
-
-              {/* Rectangular info box originating from the circle's right
-                  edge: logo, name, salary — crossfades in sync with
-                  whichever placement photo is currently active. */}
-              <div className="we-info-connector" aria-hidden="true" />
-              <div className="we-info-card" aria-live="polite">
-                {PLACEMENT_PHOTOS.map((photo, i) => (
-                  <div key={photo.src} className={`we-info-entry${i === activePhoto ? ' is-active' : ''}`}>
-                    <div className="we-info-logo">
-                      {photo.logo ? (
-                        <img src={photo.logo} alt="" />
-                      ) : (
-                        <FontAwesomeIcon icon={faBriefcase} />
-                      )}
+              {/* Auto-rotating placement highlight carousel — photo, name,
+                  package, and recruiter, matching a real placement
+                  announcement graphic instead of a bare headshot. */}
+              <div className="we-placement-highlight" aria-label="VWU graduate placement highlights">
+                {placementItems.map((item, i) => (
+                  <div
+                    key={item.src + i}
+                    className={`we-placement-card${i === activePhoto ? ' is-active' : ''}`}
+                  >
+                    <div className="we-placement-photo-wrap">
+                      <img src={item.src} alt={item.alt} className="we-placement-photo" loading="lazy" />
                     </div>
-                    <div className="we-info-text">
-                      <strong className="we-info-name">{photo.name}</strong>
-                      <span className="we-info-salary">{photo.salary}</span>
-                    </div>
+                    {item.name && item.package ? (
+                      <div className="we-placement-info">
+                        <FontAwesomeIcon icon={faTrophy} className="we-placement-badge-icon" aria-hidden="true" />
+                        <div className="we-placement-text">
+                          <h4 className="we-placement-name">{item.name}</h4>
+                          <p className="we-placement-package">{item.package}</p>
+                          {item.logoUrl ? (
+                            <img src={item.logoUrl} alt={item.company || ''} className="we-placement-logo" loading="lazy" />
+                          ) : item.company ? (
+                            <p className="we-placement-company">{item.company}</p>
+                          ) : null}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="we-placement-info we-placement-info--pending">
+                        <p className="we-placement-pending-note">VWU Graduate</p>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
-
-              {/* Floating Badge 1: Top Left */}
-              <div className="we-float-card we-float-card--top">
-                <div className="we-float-icon">
-                  <FontAwesomeIcon icon={faHandshakeAngle} style={{ fontSize: '1.1rem', color: 'var(--color-primary-dark)' }} />
-                </div>
-                <div>
-                  <strong className="we-float-title">100% Women-Centric</strong>
-                  <span className="we-float-subtitle">Empowered Sisterhood</span>
-                </div>
-              </div>
-
-              {/* Floating Badge 2: Bottom Right */}
-              <div className="we-float-card we-float-card--bottom">
-                <div className="we-float-icon we-float-icon--gold">
-                  <FontAwesomeIcon icon={faUsers} style={{ fontSize: '1.1rem', color: '#78350f' }} />
-                </div>
-                <div>
-                  <strong className="we-float-title">59.28 LPA Peak Offer</strong>
-                  <span className="we-float-subtitle">Proven Career Success</span>
-                </div>
-              </div>
             </div>
           </div>
-        </div>
-
-        {/* Bottom Four Impact Pillars — each with a girl illustration */}
-        <div className="we-pillars-grid">
-          {PILLARS.map((p, idx) => (
-            <div key={idx} className="we-pillar-card reveal-bounce" data-delay={`${idx * 80}`}>
-              {/* Hero icon tile — matches the glass/glow language used by
-                  .we-halo-ring and .we-float-card above, instead of clip-art */}
-              <div className="we-pillar-illustration-wrap">
-                <div className="we-pillar-hero-glow" style={{ '--pillar-color': p.iconColor } as React.CSSProperties} aria-hidden="true" />
-                <div className="we-pillar-hero-icon" style={{ '--pillar-color': p.iconColor } as React.CSSProperties}>
-                  <FontAwesomeIcon icon={p.icon} />
-                </div>
-              </div>
-
-              <div className="we-pillar-header">
-                <span className="we-pillar-tag">{p.tag}</span>
-              </div>
-
-              <h3 className="we-pillar-title">{p.title}</h3>
-              <p className="we-pillar-desc">{p.desc}</p>
-            </div>
-          ))}
         </div>
       </div>
     </section>

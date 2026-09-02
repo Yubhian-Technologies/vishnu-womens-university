@@ -97,6 +97,17 @@ function useTilt(strength = 12) {
   return { ref, onMouseMove: onMove, onMouseLeave: onLeave };
 }
 
+/* ── Wave Divider ─────────────────────────────────────────── */
+function Wave({ flip = false, fill = '#f7f8fb' }: { flip?: boolean; fill?: string }) {
+  return (
+    <div className={`wave-divider${flip ? ' wave-divider--flip' : ''}`}>
+      <svg viewBox="0 0 1440 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,30 C360,60 1080,0 1440,30 L1440,60 L0,60 Z" fill={fill} />
+      </svg>
+    </div>
+  );
+}
+
 /* ── Happenings → Home widgets ────────────────────────────── */
 // "Latest from VWU" and "Upcoming at VWU" both read the `happenings`
 // collection (see Home() below) instead of the separate `news`/`events`
@@ -210,9 +221,11 @@ export default function Home() {
         {/* Section Header */}
         <div className="container">
           <div className="activity-section-header reveal">
-            <div className="activity-section-meta">
-              <span className="section-label">Campus Life</span>
-              <h2 className="section-title">Recent Activities</h2>
+            <div className="activity-section-titlebar">
+              <div className="activity-section-meta">
+                <span className="section-label">Campus Life</span>
+                <h2 className="section-title">Recent Activities</h2>
+              </div>
               <p className="activity-section-desc">
                 From mBAJA racing championships to NASA-level internships — VWU students lead, build, and inspire at every stage.
               </p>
@@ -309,8 +322,12 @@ export default function Home() {
       {/* ── Our Recruiters (3-Row Auto-Scrolling Marquee) ── */}
       <RecruitersSection />
 
+      <Wave fill="#09130f" />
+
       {/* ── Modern Testimonials Slider ── */}
       <TestimonialSlider testimonials={testimonials} />
+
+      <Wave flip fill="var(--color-white)" />
 
       {/* ── News (Recent Happenings) ── */}
       <section className="news-section">

@@ -157,11 +157,6 @@
 .ag-story-card:hover {
   border-color: var(--color-accent);
   box-shadow: var(--shadow-xl);
-  transform: translateY(-4px);
-}
-
-.ag-story-card:hover {
-  box-shadow: var(--shadow-lg);
   transform: translateY(-6px);
 }
 

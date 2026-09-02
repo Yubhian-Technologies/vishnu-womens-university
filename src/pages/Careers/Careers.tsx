@@ -249,14 +249,14 @@ export default function Careers() {
                     <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                       <label style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-primary)', fontFamily: 'var(--font-sans)' }}>{label} *</label>
                       <input type={type} value={form[key]} onChange={e => setField(key, e.target.value)}
-                        style={{ padding: 'var(--space-3) var(--space-4)', border: `1.5px solid ${errors[key] ? '#dc2626' : 'var(--color-light-gray)'}`, borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-sans)', outline: 'none', color: 'var(--color-text)' }} />
+                        style={{ padding: 'var(--space-3) var(--space-4)', border: `1.5px solid ${errors[key] ? '#dc2626' : 'var(--color-light-gray)'}`, borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-sans)', color: 'var(--color-text)' }} />
                       {errors[key] && <span style={{ fontSize: 'var(--text-xs)', color: '#dc2626' }}>{errors[key]}</span>}
                     </div>
                   ))}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                     <label style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-primary)', fontFamily: 'var(--font-sans)' }}>Years of Experience *</label>
                     <select value={form.experience} onChange={e => setField('experience', e.target.value)}
-                      style={{ padding: 'var(--space-3) var(--space-4)', border: `1.5px solid ${errors.experience ? '#dc2626' : 'var(--color-light-gray)'}`, borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-sans)', outline: 'none', color: 'var(--color-text)', background: 'var(--color-white)' }}>
+                      style={{ padding: 'var(--space-3) var(--space-4)', border: `1.5px solid ${errors.experience ? '#dc2626' : 'var(--color-light-gray)'}`, borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-sans)', color: 'var(--color-text)', background: 'var(--color-white)' }}>
                       <option value="">Select</option>
                       {['Fresher', '1–3 years', '3–5 years', '5–10 years', '10+ years'].map(o => <option key={o} value={o}>{o}</option>)}
                     </select>
@@ -267,7 +267,7 @@ export default function Careers() {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                     <label style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-primary)', fontFamily: 'var(--font-sans)' }}>Department *</label>
                     <select value={form.dept} onChange={e => setField('dept', e.target.value)}
-                      style={{ padding: 'var(--space-3) var(--space-4)', border: `1.5px solid ${errors.dept ? '#dc2626' : 'var(--color-light-gray)'}`, borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-sans)', outline: 'none', color: 'var(--color-text)', background: 'var(--color-white)' }}>
+                      style={{ padding: 'var(--space-3) var(--space-4)', border: `1.5px solid ${errors.dept ? '#dc2626' : 'var(--color-light-gray)'}`, borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-sans)', color: 'var(--color-text)', background: 'var(--color-white)' }}>
                       <option value="">Select Department</option>
                       {positions.map(d => <option key={d.dept} value={d.dept}>{d.dept}</option>)}
                     </select>
@@ -276,7 +276,7 @@ export default function Careers() {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                     <label style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-primary)', fontFamily: 'var(--font-sans)' }}>Position Applied For *</label>
                     <select value={form.position} onChange={e => setField('position', e.target.value)}
-                      style={{ padding: 'var(--space-3) var(--space-4)', border: `1.5px solid ${errors.position ? '#dc2626' : 'var(--color-light-gray)'}`, borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-sans)', outline: 'none', color: 'var(--color-text)', background: 'var(--color-white)' }}>
+                      style={{ padding: 'var(--space-3) var(--space-4)', border: `1.5px solid ${errors.position ? '#dc2626' : 'var(--color-light-gray)'}`, borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-sans)', color: 'var(--color-text)', background: 'var(--color-white)' }}>
                       <option value="">Select Position</option>
                       {['Professor', 'Associate Professor', 'Assistant Professor', 'Lab Technician', 'Administrative Staff', 'Other'].map(o => <option key={o} value={o}>{o}</option>)}
                     </select>
@@ -287,7 +287,7 @@ export default function Careers() {
                   <label style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-primary)', fontFamily: 'var(--font-sans)' }}>Cover Letter / Message</label>
                   <textarea rows={4} value={form.message} onChange={e => setField('message', e.target.value)}
                     placeholder="Briefly describe your qualifications, research interests, and why you'd like to join VWU..."
-                    style={{ padding: 'var(--space-3) var(--space-4)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-sans)', outline: 'none', color: 'var(--color-text)', resize: 'vertical' }} />
+                    style={{ padding: 'var(--space-3) var(--space-4)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-sans)', color: 'var(--color-text)', resize: 'vertical' }} />
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                   <label style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-primary)', fontFamily: 'var(--font-sans)' }}>Upload CV / Resume (PDF)</label>

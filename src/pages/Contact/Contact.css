@@ -185,8 +185,10 @@
 }
 
 .contact-social-link {
-  width: 42px;
-  height: 42px;
+  /* 48px matches the M3 minimum tap target and the 48px social-icon circles
+     used on the Social Media Handles page (SocialMedia.tsx). */
+  width: 48px;
+  height: 48px;
   border-radius: var(--radius-full);
   display: flex;
   align-items: center;

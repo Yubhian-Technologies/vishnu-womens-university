@@ -194,7 +194,6 @@ function BranchOffersDonut({ data, total }: { data: BranchOfferCount[]; total: n
                 background: isHovered ? 'var(--color-off-white)' : 'transparent',
                 transition: 'background var(--transition-fast)',
                 cursor: 'pointer',
-                outline: 'none',
               }}
             >
               <span style={{ width: 12, height: 12, borderRadius: 3, background: s.color, flexShrink: 0 }} />

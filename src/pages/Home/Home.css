@@ -89,26 +89,43 @@
   overflow: hidden;
 }
 
-/* Section Header */
+/* Section Header. No flex-wrap here on desktop (see the 768px override
+   below for the mobile stack) — flexbox decides line-breaks using each
+   item's *unshrunk* hypothetical width, not its final shrunk width, so
+   with wrap enabled the description's natural one-line length alone was
+   enough to push "View Gallery" onto its own row even though there was
+   plenty of actual space once the description wrapped to two lines. */
 .activity-section-header {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
   gap: var(--space-6);
   margin-bottom: clamp(1.5rem, 3vw, 2.25rem);
-  flex-wrap: wrap;
+}
+
+/* Title + description side by side, bottom-aligned, instead of stacked —
+   .activity-section-meta on its own left a wide empty gap between the
+   (max-width: 520px) text block and the "View Gallery" link on the right. */
+.activity-section-titlebar {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-6);
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .activity-section-meta {
-  max-width: 520px;
+  flex-shrink: 0;
 }
 
 .activity-section-desc {
+  flex: 1 1 320px;
+  min-width: 0;
+  max-width: 620px;
   font-size: clamp(0.9rem, 1.3vw, 1rem);
   color: #6b7280;
   line-height: 1.65;
-  margin-top: var(--space-2);
-  margin-bottom: 0;
+  margin: 0;
 }
 
 /* Category Chips */
@@ -1021,6 +1038,8 @@
   gap: var(--space-4);
 }
 .event-item {
+  position: relative;
+  overflow: hidden;
   background: var(--color-white);
   border-radius: var(--radius-lg);
   padding: var(--space-5) var(--space-6);
@@ -1032,12 +1051,32 @@
   transition: box-shadow 220ms cubic-bezier(0.4, 0, 0.2, 1), transform 220ms cubic-bezier(0.4, 0, 0.2, 1), border-color 220ms cubic-bezier(0.4, 0, 0.2, 1);
   text-decoration: none;
 }
+/* M3 state layer: a tonal overlay on the surface itself, not just a shadow/lift,
+   so hover reads as "this row is interactive" independent of motion. */
+.event-item::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--color-primary);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-fast);
+}
+.event-item:hover::before,
+.event-item:focus-visible::before {
+  opacity: 0.08;
+}
+.event-item:active::before {
+  opacity: 0.12;
+}
 .event-item:hover {
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-md);
   border-color: var(--color-primary);
   transform: translateY(-3px);
 }
 .event-date-badge {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1056,6 +1095,16 @@
   color: var(--color-accent);
   font-family: var(--font-sans);
 }
+/* Nearest upcoming event (list is admin-ordered chronologically) gets the
+   tonal-container accent treatment so it reads as the highest-priority row
+   at a glance, per M3's tonal-emphasis-over-decoration pattern. */
+.event-item:first-child .event-date-badge {
+  background: var(--color-accent);
+}
+.event-item:first-child .event-date-badge .month,
+.event-item:first-child .event-date-badge .day {
+  color: var(--color-primary-dark);
+}
 .event-date-badge .day {
   font-family: var(--font-serif);
   font-size: var(--text-3xl);
@@ -1068,7 +1117,7 @@
   background: var(--color-light-gray);
   flex-shrink: 0;
 }
-.event-content { flex: 1; }
+.event-content { position: relative; z-index: 1; flex: 1; }
 .event-title {
   font-family: var(--font-serif);
   font-size: var(--text-lg);
@@ -1089,6 +1138,8 @@
   gap: 4px;
 }
 .event-arrow {
+  position: relative;
+  z-index: 1;
   color: var(--color-mid-gray);
   transition: all var(--transition-fast);
   flex-shrink: 0;
@@ -1183,12 +1234,21 @@
   .event-content { min-width: 0; }
   .event-meta { flex-wrap: wrap; row-gap: var(--space-1); }
 
+  /* .activity-section-desc's "flex: 1 1 320px" sizes its WIDTH in the
+     desktop row layout (see .activity-section-titlebar above). Once the
+     titlebar switches to a column stack here, that same flex-basis lands on
+     the main axis instead and forces a 320px-tall paragraph box, stranding
+     the "View Gallery" button far below the visible text. */
+  .activity-section-desc { flex: none; }
+
   .study-grid         { grid-template-columns: 1fr; }
   .recognition-grid   { grid-template-columns: 1fr; }
   .news-grid          { grid-template-columns: 1fr; }
   .campus-features    { grid-template-columns: 1fr; }
   .news-section-header,
-  .events-header      { flex-direction: column; align-items: flex-start; }
+  .events-header,
+  .activity-section-header { flex-direction: column; align-items: flex-start; }
+  .activity-section-titlebar { flex-direction: column; align-items: flex-start; }
   .mission-image-grid { grid-template-rows: 150px 150px; }
   .activity-strip     { height: 140px; }
   .activity-strip-label{ width: 80px; font-size: 0.55rem; }

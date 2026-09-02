@@ -829,7 +829,7 @@ function SingleProgramDetail() {
           <FacultyCarousel
             faculty={faculty}
             departmentName={deptTitle || program.name}
-            title="Learn from our impactful faculty"
+            title="Meet Our Faculty"
             viewMoreLink="/faculty"
           />
         </div>
@@ -988,52 +988,52 @@ function SingleProgramDetail() {
                 <p className="placement-stat-summary">
                   {activePlacementYear.year} Placements as on date: <strong>{placementYearStats.totalOffers.toLocaleString()}</strong>
                 </p>
-                <div className="placement-stat-grid">
-                  <div className="placement-stat-tile">
-                    <div className="placement-stat-tile__label">No. of Companies Visited</div>
-                    <div className="placement-stat-tile__value">{placementYearStats.companiesVisited}</div>
+                <div className="dept-stat-grid">
+                  <div className="dept-stat-tile">
+                    <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.companiesVisited}</span></div>
+                    <div className="dept-stat-tile__label">No. of Companies Visited</div>
                   </div>
-                  <div className="placement-stat-tile">
-                    <div className="placement-stat-tile__label">Total No. of Offers</div>
-                    <div className="placement-stat-tile__value">{placementYearStats.totalOffers}</div>
+                  <div className="dept-stat-tile">
+                    <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.totalOffers}</span></div>
+                    <div className="dept-stat-tile__label">Total No. of Offers</div>
                   </div>
-                  <div className="placement-stat-tile">
-                    <div className="placement-stat-tile__label">Top 10 Companies List</div>
+                  <div className="dept-stat-tile">
                     <button
                       type="button"
-                      className="placement-stat-tile__value--link"
+                      className="dept-stat-tile__circle dept-stat-tile__circle--link"
                       onClick={() => document.getElementById('placement-records-table')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
                     >
-                      Package wise
+                      <span className="dept-stat-tile__value">Package wise</span>
                     </button>
+                    <div className="dept-stat-tile__label">Top 10 Companies List</div>
                   </div>
-                  <div className="placement-stat-tile">
-                    <div className="placement-stat-tile__label">Average Salary</div>
-                    <div className="placement-stat-tile__value">{placementYearStats.averageSalary ?? '—'}</div>
+                  <div className="dept-stat-tile">
+                    <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.averageSalary ?? '—'}</span></div>
+                    <div className="dept-stat-tile__label">Average Salary</div>
                   </div>
-                  <div className="placement-stat-tile">
-                    <div className="placement-stat-tile__label">Median Salary</div>
-                    <div className="placement-stat-tile__value">{placementYearStats.medianSalary ?? '—'}</div>
+                  <div className="dept-stat-tile">
+                    <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.medianSalary ?? '—'}</span></div>
+                    <div className="dept-stat-tile__label">Median Salary</div>
                   </div>
-                  <div className="placement-stat-tile">
-                    <div className="placement-stat-tile__label">Highest Package</div>
-                    <div className="placement-stat-tile__value">{placementYearStats.highestPackage ?? '—'}</div>
+                  <div className="dept-stat-tile">
+                    <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.highestPackage ?? '—'}</span></div>
+                    <div className="dept-stat-tile__label">Highest Package</div>
                   </div>
                   {placementYearStats.above50Lpa > 0 && (
-                    <div className="placement-stat-tile">
-                      <div className="placement-stat-tile__label">Above 50 LPA+</div>
-                      <div className="placement-stat-tile__value">{placementYearStats.above50Lpa} offers</div>
+                    <div className="dept-stat-tile">
+                      <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.above50Lpa} offers</span></div>
+                      <div className="dept-stat-tile__label">Above 50 LPA+</div>
                     </div>
                   )}
                   {placementYearStats.above30Lpa > 0 && (
-                    <div className="placement-stat-tile">
-                      <div className="placement-stat-tile__label">Above 30 LPA+</div>
-                      <div className="placement-stat-tile__value">{placementYearStats.above30Lpa} offers</div>
+                    <div className="dept-stat-tile">
+                      <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.above30Lpa} offers</span></div>
+                      <div className="dept-stat-tile__label">Above 30 LPA+</div>
                     </div>
                   )}
-                  <div className="placement-stat-tile">
-                    <div className="placement-stat-tile__label">Above 10 LPA+</div>
-                    <div className="placement-stat-tile__value">{placementYearStats.above10Lpa} offers</div>
+                  <div className="dept-stat-tile">
+                    <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.above10Lpa} offers</span></div>
+                    <div className="dept-stat-tile__label">Above 10 LPA+</div>
                   </div>
                 </div>
               </>

@@ -112,4 +112,12 @@
   .counter-item {
     padding: 1.35rem 0.9rem;
   }
+
+  /* An odd item count leaves the last card alone in the row, left-aligned
+     with empty space beside it — span both columns so it centers instead. */
+  .counter-item:last-child:nth-child(odd) {
+    grid-column: span 2;
+    max-width: 220px;
+    margin: 0 auto;
+  }
 }

@@ -122,6 +122,15 @@
   cursor: pointer;
 }
 
+/* Invisible hit-area expansion — the visible 34px circle stays put (it
+   sits above the image, not over content), but the 48x48dp minimum tap
+   target from the M3 spec is met via a transparent, larger click area. */
+.pg-lightbox__close::before {
+  content: '';
+  position: absolute;
+  inset: -7px;
+}
+
 .pg-lightbox__close:hover { background: rgba(255,255,255,0.22); }
 
 @media (max-width: 600px) {
