@@ -1,4 +1,6 @@
 import { useState, type ReactNode } from 'react';
+import { MapPin, ChevronRight } from 'lucide-react';
+import MarqueeText from '../MarqueeText/MarqueeText';
 import '../../pages/detail-layout.css';
 
 export interface TabItem {
@@ -38,31 +40,39 @@ export default function CustomTabsPage({ tabs, defaultTabId }: { tabs: TabItem[]
           </div>
 
           <div className="detail-sidebar">
-            <div style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', overflow: 'hidden', position: 'sticky', top: '110px' }}>
-              {tabs.map((tab) => {
-                const isActive = active.id === tab.id;
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveId(tab.id)}
-                    style={{
-                      display: 'block',
-                      width: '100%',
-                      textAlign: 'left',
-                      padding: 'var(--space-3) var(--space-5)',
-                      border: 'none',
-                      borderBottom: '1px solid var(--color-light-gray)',
-                      background: isActive ? 'var(--color-primary)' : 'transparent',
-                      color: isActive ? 'var(--color-white)' : 'var(--color-primary)',
-                      fontWeight: isActive ? 700 : 600,
-                      fontSize: 'var(--text-sm)',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    {tab.label}
-                  </button>
-                );
-              })}
+            <div style={{ position: 'sticky', top: '110px' }}>
+              <nav className="dept-quick-nav-card" aria-label="Sections">
+                <div className="dept-quick-nav-header">
+                  <div className="dept-quick-nav-icon">
+                    <MapPin size={15} strokeWidth={2.4} />
+                  </div>
+                  <div className="dept-quick-nav-title-wrap">
+                    <h4 className="dept-quick-nav-title">Quick Navigation</h4>
+                    <span className="dept-quick-nav-subtitle">{tabs.length} Section{tabs.length === 1 ? '' : 's'}</span>
+                  </div>
+                </div>
+                <ul className="dept-quick-nav-list" role="list">
+                  {tabs.map((tab) => {
+                    const isActive = active.id === tab.id;
+                    return (
+                      <li key={tab.id} className="dept-quick-nav-item">
+                        <button
+                          type="button"
+                          onClick={() => setActiveId(tab.id)}
+                          aria-current={isActive ? 'true' : undefined}
+                          className={`dept-quick-nav-link${isActive ? ' is-active' : ''}`}
+                          style={{ width: '100%', font: 'inherit', cursor: 'pointer' }}
+                        >
+                          <MarqueeText text={tab.label} className="dept-quick-nav-text" />
+                          <span className="dept-btn-arrow-circle">
+                            <ChevronRight size={13} strokeWidth={2.4} className="dept-quick-nav-arrow" aria-hidden="true" />
+                          </span>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </nav>
             </div>
           </div>
         </div>

@@ -3,7 +3,7 @@ import { Link, useParams, Navigate } from 'react-router-dom';
 import { Trophy, Rocket, Factory, Microscope, Globe2, GraduationCap } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import RouteFallback from '../../components/RouteFallback/RouteFallback';
-import { useCollection, useOrderedCollection, type WithId } from '../../hooks/useCollection';
+import { useOrderedCollection, type WithId } from '../../hooks/useCollection';
 import { usePageBanners } from '../../hooks/usePageBanners';
 import { fetchPriorityAttr } from '../../lib/domAttrs';
 import { CustomSectionsIntro, CustomSectionsAccordion, CustomSectionsPlain, CustomSectionsPills } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
@@ -41,16 +41,24 @@ interface IicDocEntryDoc extends WithId {
   order: number;
 }
 
-// "IIC – Constitution"'s member photos (name-keyed, IicMemberPhotosAdmin.tsx)
-// and single council-members PDF link, "Innovation Ambassadors"'s and "IIC
-// Activities"'s PDF-link lists, and the 4 fully Firestore-driven tabs
-// (Rating Certificates / IIC Annual Reports / SIH Internal Hackathon
-// Reports / National Innovation Start-Up Policy, all via
-// IicDocumentsAdmin.tsx) all stay exactly as they did before — rendered
+interface IicCouncilMemberDoc extends WithId {
+  name: string;
+  role: string;
+  tier: 'chairman' | 'leadership' | 'coordinator';
+  imageUrl: string;
+  order: number;
+}
+
+// "IIC – Constitution"'s council roster (add/edit/remove/reorder,
+// IicCouncilMembersAdmin.tsx) and single council-members PDF link,
+// "Innovation Ambassadors"'s and "IIC Activities"'s PDF-link lists, and the
+// 4 fully Firestore-driven tabs (Rating Certificates / IIC Annual Reports /
+// SIH Internal Hackathon Reports / National Innovation Start-Up Policy, all
+// via IicDocumentsAdmin.tsx) all stay exactly as they did before — rendered
 // alongside whatever dynamic tabs the admin has defined.
 function IicPage({ iic, tabs }: { iic: typeof institutionInnovationCell; tabs: CustomTab[] }) {
-  const { docs: memberPhotos } = useCollection<WithId & { imageUrl: string }>('iicMemberPhotos', [], { silent: true });
-  const memberPhotoMap = new Map(memberPhotos.map((p) => [p.id, p.imageUrl]));
+  const { docs: councilMembers } = useOrderedCollection<IicCouncilMemberDoc>('iicCouncilMembers', 'order');
+  const byTier = (tier: IicCouncilMemberDoc['tier']) => councilMembers.filter((m) => m.tier === tier);
   const { docs: councilMembersLinks } = useOrderedCollection<IicDocEntryDoc>('iicCouncilMembersLinks', 'order');
   const { docs: innovationAmbassadorLinks } = useOrderedCollection<IicDocEntryDoc>('iicInnovationAmbassadorLinks', 'order');
   const { docs: iicActivityYears } = useOrderedCollection<IicDocEntryDoc>('iicActivities', 'order');
@@ -79,23 +87,20 @@ function IicPage({ iic, tabs }: { iic: typeof institutionInnovationCell; tabs: C
   const dynamicTabItems: TabItem[] = tabs.map((tab): TabItem => {
     let fixedExtra: ReactNode = null;
     if (tab.label === 'IIC – Constitution') {
+      // One flat, uniform grid — Chairman/Leadership/Coordinator are still
+      // shown as each person's own role text, but no longer get a visually
+      // distinct tier (different card size / centered row / etc.); every
+      // card is the same size, fixed at 3 per row (see .iic-council-grid).
+      const allMembers = [...byTier('chairman'), ...byTier('leadership'), ...byTier('coordinator')];
       fixedExtra = (
         <div style={{ marginTop: 'var(--space-6)' }}>
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 'var(--space-6)' }}>
-            <div style={{ maxWidth: 220 }}>
-              <IicMemberCard name={iic.constitution.chairman.name} role={iic.constitution.chairman.role} size={100} photoUrl={memberPhotoMap.get(iic.constitution.chairman.name)} />
+          {allMembers.length > 0 && (
+            <div className="iic-council-grid" style={{ marginBottom: 'var(--space-6)' }}>
+              {allMembers.map((person) => (
+                <IicMemberCard key={person.id} name={person.name} role={person.role} size={84} photoUrl={person.imageUrl} />
+              ))}
             </div>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 'var(--space-4)', marginBottom: 'var(--space-8)' }}>
-            {iic.constitution.leadership.map((person) => (
-              <IicMemberCard key={person.name} name={person.name} role={person.role} size={80} photoUrl={memberPhotoMap.get(person.name)} />
-            ))}
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 'var(--space-3)', marginBottom: 'var(--space-6)' }}>
-            {iic.constitution.coordinators.map((person) => (
-              <IicMemberCard key={person.name} name={person.name} role={person.role} size={64} photoUrl={memberPhotoMap.get(person.name)} />
-            ))}
-          </div>
+          )}
           {councilMembersLinks.length > 0 && (
             <p style={{ fontSize: 'var(--text-sm)' }}>
               <a href={councilMembersLinks[0].fileUrl} download style={{ color: 'var(--color-primary)', fontWeight: 700 }}>
@@ -106,11 +111,13 @@ function IicPage({ iic, tabs }: { iic: typeof institutionInnovationCell; tabs: C
         </div>
       );
     } else if (tab.label === 'Innovation Ambassadors') {
+      // The role-description paragraph, responsibilities, and the caption
+      // above the PDF links are this tab's own admin-editable Custom
+      // Sections content ("About Innovation Ambassadors" / "Ambassador
+      // List") — only the PDF links list itself stays fixed, same hybrid
+      // pattern as "IIC – Constitution" above.
       fixedExtra = (
         <div style={{ marginTop: 'var(--space-6)' }}>
-          <p style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>
-            {iic.innovationAmbassadors.listIntro}
-          </p>
           {fixedList(innovationAmbassadorLinks)}
         </div>
       );

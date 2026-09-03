@@ -11,7 +11,7 @@ import { diffChangedFields } from '../../../lib/formDiff';
 import AicteIdeaLabTeamAdmin from './AicteIdeaLabTeamAdmin';
 import AicteIdeaLabAmbassadorsAdmin from './AicteIdeaLabAmbassadorsAdmin';
 import AicteIdeaLabFacilityPhotosAdmin from './AicteIdeaLabFacilityPhotosAdmin';
-import IicMemberPhotosAdmin from './IicMemberPhotosAdmin';
+import IicCouncilMembersAdmin from './IicCouncilMembersAdmin';
 import IicDocumentsAdmin from './IicDocumentsAdmin';
 import VdlAchievementsAdmin from './VdlAchievementsAdmin';
 import RwtpReportsAdmin from './RwtpReportsAdmin';
@@ -28,7 +28,7 @@ const ITEM_SUB_SECTIONS: Record<string, { key: string; label: string; Component:
     { key: 'facility-photos', label: 'Facility Photos', Component: AicteIdeaLabFacilityPhotosAdmin },
   ],
   'institution-innovation-cell': [
-    { key: 'member-photos', label: 'Council Member Photos', Component: IicMemberPhotosAdmin },
+    { key: 'council-members', label: 'Council Members', Component: IicCouncilMembersAdmin },
     { key: 'documents', label: 'Documents', Component: IicDocumentsAdmin },
   ],
   // TEDxSVECW's Photos, TI-DSP CoE's Gallery Photos, Chips to Startup's
@@ -228,6 +228,7 @@ export default function DifferentiatorsAdmin() {
   // instead of the intro/accordion one. Same shape as Custom Sections above,
   // one level deeper (tab -> its own section tree).
   const TABS_SLUGS = new Set(['talentsprint-wise', 'institution-innovation-cell', 'vehicle-design-lab', 'aicte-idea-lab']);
+
   const handleTabFileUploaded = (tabIndex: number, sectionPath: number[], fileIndex: number, r: UploadResult) => {
     setForm((p) => ({
       ...p,
