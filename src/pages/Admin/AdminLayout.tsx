@@ -21,6 +21,7 @@ export const SECTIONS = [
   { id: 'governing-body', icon: '🏛️', label: 'Governing Body' },
   { id: 'core-executives', icon: '🧑‍💼', label: 'Core Executives' },
   { id: 'placements',     icon: '💼', label: 'Placement Year Data' },
+  { id: 'placement-highlights', icon: '🏅', label: 'Home — Placement Highlights' },
   { id: 'alumni',         icon: '🎓', label: 'Alumni & Giving' },
   { id: 'announcements',  icon: '📢', label: 'Announcements' },
   { id: 'information',    icon: '📅', label: 'Information Page' },

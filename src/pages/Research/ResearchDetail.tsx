@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { Sparkles, Microscope, Check } from 'lucide-react';
 import { useOrderedCollection } from '../../hooks/useCollection';
+import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import type { ConsultancyReportDoc } from '../Admin/sections/ConsultancyReportsAdmin';
 import type { PatentCertificateDoc } from '../Admin/sections/PatentCertificatesAdmin';
 import { usePageBanners } from '../../hooks/usePageBanners';
@@ -104,9 +105,7 @@ export default function ResearchDetail() {
   if (!item) {
     if (loading) {
       return (
-        <main className="route-fallback">
-          <div className="route-fallback__spinner" />
-        </main>
+        <RouteFallback />
       );
     }
     return <Navigate to="/research" replace />;

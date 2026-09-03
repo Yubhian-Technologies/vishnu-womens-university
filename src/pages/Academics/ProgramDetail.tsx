@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useParams, useLocation, Navigate } from 'react-router-dom';
 import { Check, Microscope, Compass, Target, Sparkles, Mail, ExternalLink, BookOpen, FileText, ChevronRight, ChevronDown, GraduationCap, Calendar, Award, Users, ArrowRight, BookMarked, Bookmark, Library } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
+import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import SmoothCollapse from '../../components/SmoothCollapse/SmoothCollapse';
 import ProgrammeStructure from '../../components/ProgrammeStructure/ProgrammeStructure';
 import BodyBlocks, { parseBodyContent } from '../../components/BodyBlocks/BodyBlocks';
@@ -138,9 +139,7 @@ function SingleProgramDetail() {
   // `allDepartments` loads (e.g. "IT" -> "Information Technology").
   if (loading || deptLoading) {
     return (
-      <main className="route-fallback">
-        <div className="route-fallback__spinner" />
-      </main>
+      <RouteFallback />
     );
   }
   if (!program) return <Navigate to="/academics" replace />;
@@ -874,7 +873,7 @@ function SingleProgramDetail() {
           <FacultyCarousel
             faculty={faculty}
             departmentName={deptTitle || program.name}
-            title="Learn from our impactful faculty"
+            title="Meet Our Faculty"
             viewMoreLink="/faculty"
           />
         </div>

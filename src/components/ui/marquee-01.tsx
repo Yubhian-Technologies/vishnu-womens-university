@@ -37,6 +37,14 @@ export const PlacementRecordCard = ({
   );
 };
 
+// The marquee animation always translates 100% of one row's width over
+// --duration, so a fixed duration meant the scroll visibly sped up on any
+// department/program with more placement records (same time, wider track).
+// A per-card pace keeps it at the same readable speed regardless of count.
+const SECONDS_PER_CARD = 5;
+const MIN_DURATION_S = 45;
+const rowDuration = (cardCount: number) => `${Math.max(MIN_DURATION_S, cardCount * SECONDS_PER_CARD)}s`;
+
 export default function TestimonialMarquee({ records = [] }: PlacementMarqueeProps) {
   if (!records || records.length === 0) return null;
 
@@ -49,14 +57,14 @@ export default function TestimonialMarquee({ records = [] }: PlacementMarqueePro
   return (
     <div className="marquee-container">
       {/* Row 1: Left to Right / Normal */}
-      <Marquee pauseOnHover style={{ ['--duration' as string]: '65s' }}>
+      <Marquee pauseOnHover style={{ ['--duration' as string]: rowDuration(firstRow.length) }}>
         {firstRow.map((rec, idx) => (
           <PlacementRecordCard key={`row1-${idx}-${rec.name}`} {...rec} />
         ))}
       </Marquee>
 
       {/* Row 2: Reverse Direction */}
-      <Marquee reverse pauseOnHover style={{ ['--duration' as string]: '65s' }}>
+      <Marquee reverse pauseOnHover style={{ ['--duration' as string]: rowDuration(secondRow.length) }}>
         {secondRow.map((rec, idx) => (
           <PlacementRecordCard key={`row2-${idx}-${rec.name}`} {...rec} />
         ))}
