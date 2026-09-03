@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
-import { Mail, ExternalLink } from 'lucide-react';
+import { Mail, ExternalLink, FileText, ChevronRight } from 'lucide-react';
 import PageHero from '../../components/PageHero/PageHero';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import { useCollection, useOrderedCollection } from '../../hooks/useCollection';
@@ -9,6 +9,7 @@ import { getSectionBlocks } from '../../lib/facultySections';
 import FacultySectionContent from '../../components/FacultySectionContent/FacultySectionContent';
 import { hasCustomSectionContent } from '../../lib/customSections';
 import { SectionSubtree } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
+import MarqueeText from '../../components/MarqueeText/MarqueeText';
 import type { FacultyDoc } from './Faculty';
 import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
 import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
@@ -189,30 +190,38 @@ export default function FacultyProfile() {
             <div className="faculty-sections-grid">
               <div className="faculty-sections-nav">
                 <div style={{ position: 'sticky', top: '110px' }}>
-                  <p style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--color-text-light)', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '0 0 var(--space-2) var(--space-1)' }}>
-                    Profile Sections
-                  </p>
-                  <div style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
-                    {navItems.map((item) => {
-                      const isActive = activeKey === item.key || (activeKey === null && item === navItems[0]);
-                      return (
-                        <button
-                          key={item.key}
-                          onClick={() => setActiveKey(item.key)}
-                          style={{
-                            display: 'block', width: '100%', textAlign: 'left',
-                            padding: 'var(--space-3) var(--space-5)', border: 'none',
-                            borderBottom: '1px solid var(--color-light-gray)',
-                            background: isActive ? 'var(--color-primary)' : 'transparent',
-                            color: isActive ? 'var(--color-white)' : 'var(--color-primary)',
-                            fontWeight: isActive ? 700 : 600, fontSize: 'var(--text-sm)', cursor: 'pointer',
-                          }}
-                        >
-                          {item.label}
-                        </button>
-                      );
-                    })}
-                  </div>
+                  <nav className="dept-quick-nav-card" aria-label="Profile Sections">
+                    <div className="dept-quick-nav-header">
+                      <div className="dept-quick-nav-icon">
+                        <FileText size={15} strokeWidth={2.4} />
+                      </div>
+                      <div className="dept-quick-nav-title-wrap">
+                        <h4 className="dept-quick-nav-title">Profile Sections</h4>
+                        <span className="dept-quick-nav-subtitle">{navItems.length} Section{navItems.length === 1 ? '' : 's'}</span>
+                      </div>
+                    </div>
+                    <ul className="dept-quick-nav-list" role="list">
+                      {navItems.map((item) => {
+                        const isActive = activeKey === item.key || (activeKey === null && item === navItems[0]);
+                        return (
+                          <li key={item.key} className="dept-quick-nav-item">
+                            <button
+                              type="button"
+                              onClick={() => setActiveKey(item.key)}
+                              aria-current={isActive ? 'true' : undefined}
+                              className={`dept-quick-nav-link${isActive ? ' is-active' : ''}`}
+                              style={{ width: '100%', font: 'inherit', cursor: 'pointer' }}
+                            >
+                              <MarqueeText text={item.label} className="dept-quick-nav-text" />
+                              <span className="dept-btn-arrow-circle">
+                                <ChevronRight size={13} strokeWidth={2.4} className="dept-quick-nav-arrow" aria-hidden="true" />
+                              </span>
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </nav>
                 </div>
               </div>
               <div>

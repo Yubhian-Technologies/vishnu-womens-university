@@ -894,7 +894,7 @@ export default function DepartmentsAdmin() {
           <div className="admin-field admin-field--full"><hr /><h3>Department Page — Head of Department</h3></div>
           <div className="admin-field admin-field--full">
             <label>HOD Photo</label>
-            <ImageUploader folder="vwu/departments" currentUrl={form.hodImage} onUploaded={handleHodImage} label="Upload HOD Photo" />
+            <ImageUploader folder="vwu/departments" currentUrl={form.hodImage} onUploaded={handleHodImage} label="Upload HOD Photo" aspect={1} />
           </div>
           <div className="admin-field">
             <label htmlFor="field-hod">HOD Name</label>
