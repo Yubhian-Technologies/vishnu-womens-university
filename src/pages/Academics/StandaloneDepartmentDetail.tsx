@@ -10,7 +10,7 @@ import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import type { FacultyDoc } from './Faculty';
 import type { StandaloneDepartment } from '../../lib/departmentGroups';
 import { hasCustomSectionContent, toQuickLinkItems } from '../../lib/customSections';
-import CustomSectionsRenderer from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
+import CustomSectionsRenderer, { SectionSubtree } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import LabDialog from '../../components/LabDialog/LabDialog';
 import '../detail-layout.css';
 
@@ -72,6 +72,14 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
   const hasLabs = labs.length > 0;
   const visibleCustomSections = (dept.customSections || []).filter(hasCustomSectionContent);
   const hasLibrary = !!(dept.libraryIntro || dept.libraryInCharge || dept.librarySections?.length);
+  // News & Events — same fixed-heading/dynamic-contents pattern as
+  // DepartmentDetail.tsx/ProgramDetail.tsx: the "News & Events" heading
+  // itself is fixed, what's under it is dept.newsEventsSections' fully
+  // admin-defined list of named sections. No legacy fallback needed here —
+  // a standalone department (Freshman Engineering's Mathematics/Physics/
+  // Chemistry/English) never had a News & Events block before this.
+  const newsEventsSubSections = (dept.newsEventsSections || []).filter(hasCustomSectionContent);
+  const hasNewsEvents = newsEventsSubSections.length > 0;
 
   const quickLinks = [
     hasAbout && { id: 'about', label: 'About the Department' },
@@ -80,6 +88,7 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
     faculty.length > 0 && { id: 'faculty', label: 'Faculty' },
     hasLabs && { id: 'labs', label: 'Laboratories' },
     ...toQuickLinkItems(visibleCustomSections),
+    hasNewsEvents && { id: 'news-events', label: 'News & Events' },
     hasLibrary && { id: 'library', label: 'Department Library' },
   ].filter(Boolean) as { id: string; label: string; children?: { id: string; label: string }[] }[];
 
@@ -392,6 +401,24 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
       <LabDialog lab={activeLab} onClose={() => setActiveLab(null)} />
 
       <CustomSectionsRenderer sections={visibleCustomSections} navOffset={NAV_OFFSET} />
+
+      {/* News & Events — the heading is fixed; what's under it is the
+          admin-defined dynamic section list (see newsEventsSubSections
+          above). */}
+      {hasNewsEvents && (
+        <section id="news-events" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
+          <div className="container">
+            <div style={{ marginBottom: 'var(--space-8)' }}>
+              <span className="section-label dept-section-label">{deptName}</span>
+              <h2 className="section-title">News &amp; Events</h2>
+            </div>
+            <SectionSubtree
+              section={{ id: 'news-events-root', label: 'News & Events', contentType: 'text', textContent: '', subSections: newsEventsSubSections }}
+              navOffset={NAV_OFFSET}
+            />
+          </div>
+        </section>
+      )}
 
       {/* Department Library */}
       {hasLibrary && (

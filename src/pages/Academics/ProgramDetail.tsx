@@ -25,7 +25,7 @@ import { parseFlexibleTable, parseProjectAccordion } from '../../lib/structuredT
 import { sortPlacementRows, computePlacementStats, findPackageColumnIndex, formatPackageCell } from '../../lib/placementRecords';
 import { computeInternshipStats, findPeriodColumnIndex } from '../../lib/internshipRecords';
 import { hasCustomSectionContent, toQuickLinkItems } from '../../lib/customSections';
-import CustomSectionsRenderer from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
+import CustomSectionsRenderer, { SectionSubtree } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import SEO from '../../components/SEO/SEO';
 import { getProgramSchema, getBreadcrumbSchema } from '../../lib/seo/schemas';
 import '../detail-layout.css';
@@ -206,16 +206,21 @@ function SingleProgramDetail() {
   // A year counts once it has a label and at least one issue slot (even an
   // issue with no PDF yet still renders, just as "Unavailable" — this lets
   // an admin scaffold a year's issues ahead of uploading each PDF).
-  // Admin-defined academic-year table, split into News & Events / Student
-  // Awards / Others tabs (see NewsEventsTabs) — department-wide like Vision/
-  // Labs/Library above, read from the same matching `dept`. "News & Events"
-  // is the one category with legacy content that used to live directly on
-  // this programme doc (ProgramsAdmin's old "News & Events — Department
-  // Page" field); it falls back to that until DepartmentsAdmin's "Copy from
-  // Programs" moves it over — Student Awards / Others never existed
-  // per-programme, so they're department-only. Independent of the simpler
-  // departmentNews-collection-based section below — a programme only ends up
-  // with both showing if an admin fills in both.
+  // News & Events — department-wide like Vision/Labs/Library above, read
+  // from the same matching `dept`. The "News & Events" heading itself is
+  // fixed (see NewsEventsSubtree below); what's under it is a dynamic,
+  // admin-defined list of named sections (dept.newsEventsSections — any
+  // number, any content type — see DepartmentsAdmin.tsx), since a
+  // programme like MBA has entirely different categories (Events, Budget
+  // Sessions, …) than an engineering department's old fixed "News & Events
+  // / Student Awards / Others". A department not yet opened in the new
+  // Admin falls back to those old fixed arrays instead, rendered the same
+  // way they always were, so nothing already published goes blank.
+  // Independent of the simpler departmentNews-collection-based section
+  // below — a programme only ends up with both showing if an admin fills
+  // in both.
+  const newsEventsSubSections = (dept?.newsEventsSections || []).filter(hasCustomSectionContent);
+  const hasNewsEventsDynamic = newsEventsSubSections.length > 0;
   const validYears = (arr?: NewsEventsYear[]) =>
     (arr || []).filter((y) => y.year && ((y.columns?.length > 0 && y.rows?.length > 0) || (y.cards?.length ?? 0) > 0 || !!y.text));
   const newsEventsCategories = [
@@ -223,7 +228,8 @@ function SingleProgramDetail() {
     { key: 'awards', label: 'Student Awards', years: validYears(dept?.studentAwardsYears) },
     { key: 'others', label: 'Others', years: validYears(dept?.othersYears) },
   ];
-  const hasNewsEventsYears = newsEventsCategories.some((c) => c.years.length > 0);
+  const hasLegacyNewsEvents = !hasNewsEventsDynamic && newsEventsCategories.some((c) => c.years.length > 0);
+  const hasNewsEventsYears = hasNewsEventsDynamic || hasLegacyNewsEvents;
   const newsletterYears = (program.newsletterYears || []).filter((y) => y.year && y.issues && y.issues.length > 0);
   const hasNewsletter = newsletterYears.length > 0;
   const newsletterMaxIssues = Math.max(0, ...newsletterYears.map((y) => y.issues.length));
@@ -1246,9 +1252,27 @@ function SingleProgramDetail() {
         </section>
       )}
 
-      {/* News & Events — department-wide, tabbed across News & Events /
-          Student Awards / Others (see NewsEventsTabs). */}
-      <NewsEventsTabs categories={newsEventsCategories} eyebrow={deptTitle || program.shortName || program.name} navOffset={NAV_OFFSET} />
+      {/* News & Events — the heading is fixed; what's under it is the
+          admin-defined dynamic section list (see newsEventsSubSections
+          above), or, for a department not yet opened in the new Admin, the
+          old fixed News & Events / Student Awards / Others tabs. */}
+      {hasNewsEventsDynamic && (
+        <section id="news-events" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
+          <div className="container">
+            <div style={{ marginBottom: 'var(--space-8)' }}>
+              <span className="section-label">{deptTitle || program.shortName || program.name}</span>
+              <h2 className="section-title">News &amp; Events</h2>
+            </div>
+            <SectionSubtree
+              section={{ id: 'news-events-root', label: 'News & Events', contentType: 'text', textContent: '', subSections: newsEventsSubSections }}
+              navOffset={NAV_OFFSET}
+            />
+          </div>
+        </section>
+      )}
+      {hasLegacyNewsEvents && (
+        <NewsEventsTabs categories={newsEventsCategories} eyebrow={deptTitle || program.shortName || program.name} navOffset={NAV_OFFSET} />
+      )}
 
       {/* News & Events — live from the departmentNews collection, tagged to
           this programme. Both this and the admin-defined table above are

@@ -7,13 +7,13 @@ import FileUploader from '../../../components/FileUploader/FileUploader';
 import { deleteFile, type UploadResult } from '../../../lib/storage';
 import { PROGRAM_ICON_NAMES } from '../../../lib/programIcons';
 import { normalizeLab, type LabItem, type LibrarySection, type LibraryItem, type NewsEventsYear, type ProgramLink, type ProgramDoc } from './ProgramsAdmin';
-import NewsEventsYearsEditor from './NewsEventsYearsEditor';
 import { diffChangedFields } from '../../../lib/formDiff';
 import { PlacementYearsEditor, InternshipYearsEditor, RndEditor, NewsletterYearsEditor } from './ProgramCareerEditors';
 import { downloadPlacementsTemplate } from '../../../lib/placementsImport';
 import { downloadInternshipsTemplate } from '../../../lib/internshipsImport';
 import CustomSectionEditor from './CustomSectionEditor';
-import { replaceAtPath, getAtPath, type CustomSection } from '../../../lib/customSections';
+import { replaceAtPath, getAtPath, RESERVED_SECTION_IDS, type CustomSection } from '../../../lib/customSections';
+import { slugify } from '../../../lib/slugify';
 import { FRESHMAN_DEPARTMENT_SEEDS } from '../../Academics/freshmanDepartmentSeeds';
 import { STANDALONE_DEPARTMENTS } from '../../../lib/departmentGroups';
 
@@ -83,15 +83,35 @@ export interface DepartmentDoc {
   placementIntro?: string;
   placementStats?: LibraryItem[];
   placementRecruiters?: string[];
-  // News & Events — department-wide, split into three admin-defined
-  // categories shown as tabs on the public page (see NewsEventsTabs). Each
-  // is the same academic-year table shape as everything else here. No
-  // per-programme editing exists for this anymore; `newsEventsYears` used to
-  // live on ProgramDoc — legacy content there is picked up by "Copy from
-  // Programs" below.
+  // News & Events — legacy fixed shape (exactly three categories: News &
+  // Events / Student Awards / Others, each one academic-year table/cards/
+  // text block). Superseded by `newsEventsSections` below but kept so a
+  // department that hasn't opened Admin since the switchover still renders
+  // exactly as before via NewsEventsTabs on the public page.
   newsEventsYears?: NewsEventsYear[];
   studentAwardsYears?: NewsEventsYear[];
   othersYears?: NewsEventsYear[];
+  // News & Events — current shape. The "News & Events" heading/page area
+  // itself is fixed (always shown under that name, same as every other
+  // named section on the page — not admin-renameable or removable), but
+  // what's shown under it is a fully dynamic, admin-defined list: any
+  // number of named sub-sections (e.g. "Student Awards", "Others", or
+  // anything else), each with its own content-type dropdown (table/
+  // checklist/text/images/gallery/…) — same building block as the general
+  // Custom Sections system (see CustomSectionEditor/CustomSectionsRenderer),
+  // just always rendered under the fixed "News & Events" title rather than
+  // each getting its own independent page section. See NewsEventsSubtree in
+  // DepartmentDetail.tsx.
+  newsEventsSections?: CustomSection[];
+  // Set once (on save, after the department is opened in Admin) when
+  // newsEventsYears/studentAwardsYears/othersYears above have been
+  // one-time-converted into starter entries in `newsEventsSections` — see
+  // the migration in `startEdit()` below. Once `newsEventsSections` itself
+  // has content the public page always prefers it over the legacy fields
+  // regardless of this flag; it exists purely so `startEdit` doesn't
+  // re-run (and duplicate) the conversion on a second open before the
+  // first migration was ever saved.
+  newsEventsMigrated?: boolean;
   // Any name, any number of sub-sections, any content type (text/table/
   // list/links/files/gallery/panel view) — same system as Programs/
   // Differentiators/Faculty/Campus Life. Exists specifically so a
@@ -115,6 +135,7 @@ const EMPTY: Omit<DepartmentDoc, 'id'> = {
   programLevels: [],
   placementIntro: '', placementStats: [], placementRecruiters: [],
   newsEventsYears: [], studentAwardsYears: [], othersYears: [],
+  newsEventsSections: [],
   customSections: [],
 };
 
@@ -174,90 +195,121 @@ export default function DepartmentsAdmin() {
   const handleHodImage = (r: UploadResult) => setForm((p) => ({ ...p, hodImage: r.url, hodImageStoragePath: r.path }));
 
   // Custom Sections — same wiring as ProgramsAdmin.tsx/DifferentiatorsAdmin.tsx/
-  // FacultyAdmin.tsx/CampusLifeAdmin.tsx.
-  const handleCustomSectionFileUploaded = (sectionPath: number[], fileIndex: number, r: UploadResult) => {
-    setForm((p) => ({
-      ...p,
-      customSections: replaceAtPath(p.customSections || [], sectionPath, (s) => ({
-        ...s,
-        files: (s.files || []).map((f, i) => (i === fileIndex ? { ...f, fileUrl: r.url, storagePath: r.path } : f)),
-      })),
-    }));
-  };
-  const handleCustomSectionFileRemoved = async (sectionPath: number[], fileIndex: number) => {
-    const file = getAtPath(form.customSections || [], sectionPath)?.files?.[fileIndex];
-    if (!file?.fileUrl) return;
-    if (!confirm('Remove this file? This cannot be undone.')) return;
-    try {
-      if (file.storagePath) await deleteFile(file.storagePath);
-    } catch (e) {
-      alert(`Couldn't delete the file from storage: ${(e as Error).message}`);
-      return;
-    }
-    setForm((p) => ({
-      ...p,
-      customSections: replaceAtPath(p.customSections || [], sectionPath, (s) => ({
-        ...s,
-        files: (s.files || []).filter((_, i) => i !== fileIndex),
-      })),
-    }));
-  };
-  const handleCustomSectionPhotoUploaded = (sectionPath: number[], r: UploadResult) => {
-    setForm((p) => ({
-      ...p,
-      customSections: replaceAtPath(p.customSections || [], sectionPath, (s) => ({
-        ...s,
-        photo: { imageUrl: r.url, storagePath: r.path },
-      })),
-    }));
-  };
-  const handleCustomSectionPhotoRemoved = async (sectionPath: number[]) => {
-    const photo = getAtPath(form.customSections || [], sectionPath)?.photo;
-    if (!photo?.imageUrl) return;
-    if (!confirm('Remove this photo? This cannot be undone.')) return;
-    try {
-      if (photo.storagePath) await deleteFile(photo.storagePath);
-    } catch (e) {
-      alert(`Couldn't delete the photo from storage: ${(e as Error).message}`);
-      return;
-    }
-    setForm((p) => ({
-      ...p,
-      customSections: replaceAtPath(p.customSections || [], sectionPath, (s) => {
-        const next = { ...s };
-        delete next.photo;
-        return next;
-      }),
-    }));
-  };
-  const handleCustomSectionGalleryPhotoUploaded = (sectionPath: number[], photoIndex: number, r: UploadResult) => {
-    setForm((p) => ({
-      ...p,
-      customSections: replaceAtPath(p.customSections || [], sectionPath, (s) => ({
-        ...s,
-        galleryPhotos: (s.galleryPhotos || []).map((ph, i) => (i === photoIndex ? { imageUrl: r.url, storagePath: r.path } : ph)),
-      })),
-    }));
-  };
-  const handleCustomSectionGalleryPhotoRemoved = async (sectionPath: number[], photoIndex: number) => {
-    const photo = getAtPath(form.customSections || [], sectionPath)?.galleryPhotos?.[photoIndex];
-    if (!photo) return;
-    if (photo.imageUrl && !confirm('Remove this photo? This cannot be undone.')) return;
-    try {
-      if (photo.storagePath) await deleteFile(photo.storagePath);
-    } catch (e) {
-      alert(`Couldn't delete the photo from storage: ${(e as Error).message}`);
-      return;
-    }
-    setForm((p) => ({
-      ...p,
-      customSections: replaceAtPath(p.customSections || [], sectionPath, (s) => ({
-        ...s,
-        galleryPhotos: (s.galleryPhotos || []).filter((_, i) => i !== photoIndex),
-      })),
-    }));
-  };
-
+  // FacultyAdmin.tsx/CampusLifeAdmin.tsx, factored into one parameterized
+  // builder since this department has TWO independent CustomSection trees
+  // (the general `customSections` below, and `newsEventsSections` under the
+  // fixed "News & Events" heading) each needing the full set of file/photo/
+  // gallery/image-card upload+remove handlers.
+  const makeSectionHandlers = (field: 'customSections' | 'newsEventsSections') => ({
+    onFileUploaded: (sectionPath: number[], fileIndex: number, r: UploadResult) => {
+      setForm((p) => ({
+        ...p,
+        [field]: replaceAtPath(p[field] || [], sectionPath, (s) => ({
+          ...s,
+          files: (s.files || []).map((f, i) => (i === fileIndex ? { ...f, fileUrl: r.url, storagePath: r.path } : f)),
+        })),
+      }));
+    },
+    onFileRemoved: async (sectionPath: number[], fileIndex: number) => {
+      const file = getAtPath(form[field] || [], sectionPath)?.files?.[fileIndex];
+      if (!file?.fileUrl) return;
+      if (!confirm('Remove this file? This cannot be undone.')) return;
+      try {
+        if (file.storagePath) await deleteFile(file.storagePath);
+      } catch (e) {
+        alert(`Couldn't delete the file from storage: ${(e as Error).message}`);
+        return;
+      }
+      setForm((p) => ({
+        ...p,
+        [field]: replaceAtPath(p[field] || [], sectionPath, (s) => ({
+          ...s,
+          files: (s.files || []).filter((_, i) => i !== fileIndex),
+        })),
+      }));
+    },
+    onPhotoUploaded: (sectionPath: number[], r: UploadResult) => {
+      setForm((p) => ({
+        ...p,
+        [field]: replaceAtPath(p[field] || [], sectionPath, (s) => ({ ...s, photo: { imageUrl: r.url, storagePath: r.path } })),
+      }));
+    },
+    onPhotoRemoved: async (sectionPath: number[]) => {
+      const photo = getAtPath(form[field] || [], sectionPath)?.photo;
+      if (!photo?.imageUrl) return;
+      if (!confirm('Remove this photo? This cannot be undone.')) return;
+      try {
+        if (photo.storagePath) await deleteFile(photo.storagePath);
+      } catch (e) {
+        alert(`Couldn't delete the photo from storage: ${(e as Error).message}`);
+        return;
+      }
+      setForm((p) => ({
+        ...p,
+        [field]: replaceAtPath(p[field] || [], sectionPath, (s) => {
+          const next = { ...s };
+          delete next.photo;
+          return next;
+        }),
+      }));
+    },
+    onGalleryPhotoUploaded: (sectionPath: number[], photoIndex: number, r: UploadResult) => {
+      setForm((p) => ({
+        ...p,
+        [field]: replaceAtPath(p[field] || [], sectionPath, (s) => ({
+          ...s,
+          galleryPhotos: (s.galleryPhotos || []).map((ph, i) => (i === photoIndex ? { imageUrl: r.url, storagePath: r.path } : ph)),
+        })),
+      }));
+    },
+    onGalleryPhotoRemoved: async (sectionPath: number[], photoIndex: number) => {
+      const photo = getAtPath(form[field] || [], sectionPath)?.galleryPhotos?.[photoIndex];
+      if (!photo) return;
+      if (photo.imageUrl && !confirm('Remove this photo? This cannot be undone.')) return;
+      try {
+        if (photo.storagePath) await deleteFile(photo.storagePath);
+      } catch (e) {
+        alert(`Couldn't delete the photo from storage: ${(e as Error).message}`);
+        return;
+      }
+      setForm((p) => ({
+        ...p,
+        [field]: replaceAtPath(p[field] || [], sectionPath, (s) => ({
+          ...s,
+          galleryPhotos: (s.galleryPhotos || []).filter((_, i) => i !== photoIndex),
+        })),
+      }));
+    },
+    onImageCardPhotoUploaded: (sectionPath: number[], cardIndex: number, r: UploadResult) => {
+      setForm((p) => ({
+        ...p,
+        [field]: replaceAtPath(p[field] || [], sectionPath, (s) => ({
+          ...s,
+          imageCards: (s.imageCards || []).map((c, i) => (i === cardIndex ? { ...c, imageUrl: r.url, storagePath: r.path } : c)),
+        })),
+      }));
+    },
+    onImageCardPhotoRemoved: async (sectionPath: number[], cardIndex: number) => {
+      const card = getAtPath(form[field] || [], sectionPath)?.imageCards?.[cardIndex];
+      if (!card) return;
+      if (!confirm('Remove this image? This cannot be undone.')) return;
+      try {
+        if (card.storagePath) await deleteFile(card.storagePath);
+      } catch (e) {
+        alert(`Couldn't delete the image from storage: ${(e as Error).message}`);
+        return;
+      }
+      setForm((p) => ({
+        ...p,
+        [field]: replaceAtPath(p[field] || [], sectionPath, (s) => ({
+          ...s,
+          imageCards: (s.imageCards || []).filter((_, i) => i !== cardIndex),
+        })),
+      }));
+    },
+  });
+  const customSectionHandlers = makeSectionHandlers('customSections');
+  const newsEventsSectionHandlers = makeSectionHandlers('newsEventsSections');
   // One-time starter content for the 4 standalone Freshman Engineering
   // departments (Mathematics/Physics/Chemistry/English) — pre-fills the
   // whole Add form (title/shortCode/about/customSections for Laboratories/
@@ -545,8 +597,71 @@ export default function DepartmentsAdmin() {
     } finally { setSaving(false); }
   };
 
+  // One-time conversion of the legacy fixed News & Events / Student Awards /
+  // Others arrays (see DepartmentDoc.newsEventsMigrated) into entries of
+  // `newsEventsSections` — the three old fixed categories become three
+  // starter sections an admin can freely rename, retype, add to, or remove
+  // from here on; the "News & Events" heading itself stays fixed at the
+  // page level (see NewsEventsSubtree in DepartmentDetail.tsx), only its
+  // contents were ever fixed before. Ids are generated locally (rather than
+  // via generateSectionId, which only dedupes against a single snapshot of
+  // the tree) so that several ids minted in the same pass — e.g. two
+  // different years both getting a "Table" sub-section — can't collide.
+  const migrateNewsEventsToSections = (d: DepartmentDoc): CustomSection[] => {
+    const existing = d.newsEventsSections || [];
+    const taken = new Set(RESERVED_SECTION_IDS);
+    const collectIds = (list: CustomSection[]) => list.forEach((s) => { if (s.id) taken.add(s.id); if (s.subSections) collectIds(s.subSections); });
+    collectIds(existing);
+    const makeId = (label: string) => {
+      const base = slugify(label) || 'section';
+      let id = base;
+      let i = 2;
+      while (taken.has(id)) { id = `${base}-${i}`; i++; }
+      taken.add(id);
+      return id;
+    };
+    const isValidYear = (y: NewsEventsYear) => !!y.year && (((y.columns?.length ?? 0) > 0 && (y.rows?.length ?? 0) > 0) || (y.cards?.length ?? 0) > 0 || !!y.text);
+
+    const convertCategory = (label: string, years: NewsEventsYear[] | undefined): CustomSection | null => {
+      const validYears = (years || []).filter(isValidYear);
+      if (validYears.length === 0) return null;
+      const yearSections: CustomSection[] = validYears.map((y) => {
+        const mode = y.mode || 'table';
+        const blocks: CustomSection[] = [];
+        if ((mode === 'table' || mode === 'both') && y.columns.length > 0 && y.rows.length > 0) {
+          const tableText = [y.columns.join(' | '), ...y.rows.map((r) => r.cells.join(' | '))].join('\n');
+          blocks.push({ id: makeId(`${label} ${y.year} Table`), label: 'Table', contentType: 'table', tableText });
+        }
+        if ((mode === 'cards' || mode === 'both') && (y.cards?.length ?? 0) > 0) {
+          blocks.push({
+            id: makeId(`${label} ${y.year} Images`),
+            label: 'Images',
+            contentType: 'imageCards',
+            imageCards: (y.cards || []).map((c) => ({ imageUrl: c.imageUrl || '', storagePath: c.storagePath || '', title: c.title, description: c.description })),
+          });
+        }
+        if (mode === 'text' && y.text) {
+          blocks.push({ id: makeId(`${label} ${y.year} Text`), label: 'Text', contentType: 'text', textContent: y.text });
+        }
+        const yearId = makeId(`${label} ${y.year}`);
+        return blocks.length === 1
+          ? { ...blocks[0], id: yearId, label: y.year }
+          : { id: yearId, label: y.year, contentType: 'text' as const, textContent: '', subSections: blocks };
+      });
+      return { id: makeId(label), label, contentType: 'text', textContent: '', subSections: yearSections };
+    };
+
+    const migrated = [
+      convertCategory('News & Events', d.newsEventsYears),
+      convertCategory('Student Awards', d.studentAwardsYears),
+      convertCategory('Others', d.othersYears),
+    ].filter((s): s is CustomSection => s !== null);
+    return [...migrated, ...existing];
+  };
+
   const startEdit = (d: DepartmentDoc) => {
     setEditing(d.id);
+    const needsMigration = !d.newsEventsMigrated && !!(d.newsEventsYears?.length || d.studentAwardsYears?.length || d.othersYears?.length);
     const next: Omit<DepartmentDoc, 'id'> = {
       title: d.title, shortCode: d.shortCode, description: d.description || '',
       icon: d.icon || 'GraduationCap', order: d.order,
@@ -561,10 +676,18 @@ export default function DepartmentsAdmin() {
       programLevels: (d.programLevels || []).map((l) => ({ title: l.title, intro: l.intro || '', rows: l.rows || [] })),
       placementIntro: d.placementIntro || '', placementStats: d.placementStats || [], placementRecruiters: d.placementRecruiters || [],
       newsEventsYears: d.newsEventsYears || [], studentAwardsYears: d.studentAwardsYears || [], othersYears: d.othersYears || [],
+      newsEventsSections: needsMigration ? migrateNewsEventsToSections(d) : (d.newsEventsSections || []),
+      newsEventsMigrated: needsMigration ? true : (d.newsEventsMigrated || false),
       customSections: d.customSections || [],
     };
     setForm(next);
-    setOriginalForm(next);
+    // Deliberately NOT `next` here when a migration just ran — originalForm
+    // must mirror what's actually still in Firestore (newsEventsSections
+    // without the migrated entries, newsEventsMigrated still false) so the
+    // diff-based save() below sees the migration as a real change and
+    // actually persists it, instead of silently no-op'ing because form and
+    // originalForm already agree.
+    setOriginalForm(needsMigration ? { ...next, newsEventsSections: d.newsEventsSections || [], newsEventsMigrated: d.newsEventsMigrated || false } : next);
   };
 
   const remove = async (id: string) => {
@@ -887,27 +1010,6 @@ export default function DepartmentsAdmin() {
             )}
           </div>
 
-          <div className="admin-field admin-field--full"><hr /><h3>Department Page — News &amp; Events</h3>
-            <p className="admin-field__hint" style={{ marginTop: '0.25rem' }}>
-              Shown as a shared "News &amp; Events" section, with a tab to switch between the three lists below —
-              same academic-year table shape for each, with columns you define per year (e.g. "Date", "Seminars /
-              Workshop"); "S.No" is added automatically. A tab with nothing in it still shows, so leaving one empty
-              for now is fine.
-            </p>
-          </div>
-          <div className="admin-field admin-field--full">
-            <label>News &amp; Events</label>
-            <NewsEventsYearsEditor years={form.newsEventsYears || []} onChange={(years) => set('newsEventsYears', years)} />
-          </div>
-          <div className="admin-field admin-field--full">
-            <label>Student Awards</label>
-            <NewsEventsYearsEditor years={form.studentAwardsYears || []} onChange={(years) => set('studentAwardsYears', years)} />
-          </div>
-          <div className="admin-field admin-field--full">
-            <label>Others</label>
-            <NewsEventsYearsEditor years={form.othersYears || []} onChange={(years) => set('othersYears', years)} />
-          </div>
-
           <div className="admin-field admin-field--full"><hr /><h3>Department Page — Head of Department</h3></div>
           <div className="admin-field admin-field--full">
             <label>HOD Photo</label>
@@ -930,16 +1032,46 @@ export default function DepartmentsAdmin() {
             <textarea id="field-hod-research-profiles" rows={4} value={linksToText(form.hodResearchProfiles)} onChange={(e) => set('hodResearchProfiles', textToLinks(e.target.value))} placeholder="Google Scholar: https://scholar.google.com/citations?user=…" />
           </div>
 
+          <div className="admin-field admin-field--full"><hr /><h3>Department Page — News &amp; Events</h3>
+            <p className="admin-field__hint" style={{ marginTop: '0.25rem' }}>
+              Always shown on the public page under the fixed heading "News &amp; Events" — that heading itself
+              can't be renamed or removed. What's inside it is fully up to you: add any number of sections (e.g.
+              "Student Awards", "Others", or anything else), each with its own name and a choice of plain text, a
+              table, a checklist, a list of links, uploaded files, a photo gallery, or images with their own caption.
+              Applies to every department, grouped or standalone.
+              {(form.newsEventsYears?.length || form.studentAwardsYears?.length || form.othersYears?.length) ? (
+                <> This department's old fixed News &amp; Events / Student Awards / Others were converted into
+                  starter sections below the first time this page was opened after that switchover — edit them here
+                  now.</>
+              ) : null}
+            </p>
+          </div>
+          <div className="admin-field admin-field--full">
+            <CustomSectionEditor
+              sections={form.newsEventsSections || []}
+              onChange={(next) => set('newsEventsSections', next)}
+              rootSections={form.newsEventsSections || []}
+              parentPath={[]}
+              onFileUploaded={newsEventsSectionHandlers.onFileUploaded}
+              onFileRemoved={newsEventsSectionHandlers.onFileRemoved}
+              onPhotoUploaded={newsEventsSectionHandlers.onPhotoUploaded}
+              onPhotoRemoved={newsEventsSectionHandlers.onPhotoRemoved}
+              onGalleryPhotoUploaded={newsEventsSectionHandlers.onGalleryPhotoUploaded}
+              onGalleryPhotoRemoved={newsEventsSectionHandlers.onGalleryPhotoRemoved}
+              onImageCardPhotoUploaded={newsEventsSectionHandlers.onImageCardPhotoUploaded}
+              onImageCardPhotoRemoved={newsEventsSectionHandlers.onImageCardPhotoRemoved}
+            />
+          </div>
+
           {STANDALONE_DEPARTMENTS.some((d) => d.deptShortCode.trim().toLowerCase() === form.shortCode.trim().toLowerCase()) ? (
             <>
               <div className="admin-field admin-field--full"><hr /><h3>Department Page — Custom Sections</h3>
                 <p className="admin-field__hint" style={{ marginTop: '0.25rem' }}>
-                  Optional. Add any section this department needs beyond the fixed fields above — Research &amp;
-                  Development, Awards &amp; Recognitions, or anything else — any name, any number of sub-sections, and
-                  a choice of plain text, a table, a checklist, a list of links, uploaded files, a photo gallery, or
-                  panel view per section. This department has no linked programme, so this is the only place to add
-                  its page content — shown after Laboratories, and it's also the only place to add real Laboratory
-                  photos (one section per lab, each with its own Photo Gallery).
+                  Optional. Add any OTHER section this department needs beyond News &amp; Events above — Research
+                  &amp; Development, Awards &amp; Recognitions, or anything else — any name, any number of
+                  sub-sections, and the same choice of content types. This department has no linked programme, so
+                  this is the only place to add its page content — shown after Laboratories, and it's also the only
+                  place to add real Laboratory photos (one section per lab, each with its own Photo Gallery).
                 </p>
               </div>
               <div className="admin-field admin-field--full">
@@ -948,12 +1080,14 @@ export default function DepartmentsAdmin() {
                   onChange={(next) => set('customSections', next)}
                   rootSections={form.customSections || []}
                   parentPath={[]}
-                  onFileUploaded={handleCustomSectionFileUploaded}
-                  onFileRemoved={handleCustomSectionFileRemoved}
-                  onPhotoUploaded={handleCustomSectionPhotoUploaded}
-                  onPhotoRemoved={handleCustomSectionPhotoRemoved}
-                  onGalleryPhotoUploaded={handleCustomSectionGalleryPhotoUploaded}
-                  onGalleryPhotoRemoved={handleCustomSectionGalleryPhotoRemoved}
+                  onFileUploaded={customSectionHandlers.onFileUploaded}
+                  onFileRemoved={customSectionHandlers.onFileRemoved}
+                  onPhotoUploaded={customSectionHandlers.onPhotoUploaded}
+                  onPhotoRemoved={customSectionHandlers.onPhotoRemoved}
+                  onGalleryPhotoUploaded={customSectionHandlers.onGalleryPhotoUploaded}
+                  onGalleryPhotoRemoved={customSectionHandlers.onGalleryPhotoRemoved}
+                  onImageCardPhotoUploaded={customSectionHandlers.onImageCardPhotoUploaded}
+                  onImageCardPhotoRemoved={customSectionHandlers.onImageCardPhotoRemoved}
                 />
               </div>
             </>
@@ -963,7 +1097,8 @@ export default function DepartmentsAdmin() {
               <p className="admin-field__hint">
                 This department's public page is driven by its linked programme(s) — add Custom Sections from{' '}
                 <strong>Programs</strong> (edit the relevant programme) instead of here; anything added on this form
-                would never be shown, since this department's page doesn't read it.
+                would never be shown, since this department's page doesn't read it. News &amp; Events above is the
+                exception — it always applies here regardless.
               </p>
             </div>
           )}
