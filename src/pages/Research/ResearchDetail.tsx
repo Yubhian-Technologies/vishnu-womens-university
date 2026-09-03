@@ -10,6 +10,7 @@ import { fetchPriorityAttr } from '../../lib/domAttrs';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import { parseFlexibleTable, parseAccordionTable, parseProjectAccordion } from '../../lib/structuredTable';
 import { parseAboutContent } from '../../lib/aboutContent';
+import { linkify } from '../../lib/linkify';
 import type { ResearchItemDoc } from '../Admin/sections/ResearchItemsAdmin';
 import ThrustAreasSection from './ThrustAreasSection';
 import ProfessionalBodiesSection from './ProfessionalBodiesSection';
@@ -534,7 +535,11 @@ export default function ResearchDetail() {
                                       {f.href ? (
                                         <a href={f.href} download target="_blank" rel="noopener noreferrer" className="thrust-accordion-link">{f.value}</a>
                                       ) : (
-                                        f.value
+                                        // A field like "Proof" is often a raw pasted URL (e.g. from the
+                                        // Patents Excel import — see patentsImport.ts) rather than the
+                                        // "value | https://..." href syntax above — linkify catches that
+                                        // case too instead of showing it as inert plain text.
+                                        linkify(f.value)
                                       )}
                                     </div>
                                   ))}

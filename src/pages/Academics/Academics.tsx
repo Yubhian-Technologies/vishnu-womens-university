@@ -61,11 +61,12 @@ const matchKey = (s: string) =>
 
 // The 4 Freshman Engineering foundation subjects (see FOUNDATION_DEPARTMENTS
 // in FacultyAdmin.tsx) have no Program doc of their own — nothing for the
-// name-matching below to find — but each has its own standalone page at
-// /academics/<slug> (FreshmanSubDepartment.tsx, rendered via ProgramDetail's
-// /academics/:slug route — see the SUB_DEPTS check there), same URL shape
-// as every other department, so route each card straight there instead of
-// leaving it dead.
+// name-matching below to find — but each has its own standalone,
+// admin-editable Department page at /academics/<slug>
+// (StandaloneDepartmentDetail.tsx, rendered via ProgramDetail's
+// /academics/:slug route — see STANDALONE_DEPARTMENTS in
+// departmentGroups.ts), same URL shape as every other department, so route
+// each card straight there instead of leaving it dead.
 const FOUNDATION_SUBJECT_TABS: Record<string, string> = {
   mathematics: 'mathematics',
   math: 'mathematics',

@@ -14,6 +14,7 @@ const CONTENT_TYPE_LABELS: Record<CustomSectionContentType, string> = {
   list: 'Checklist (bullet points)',
   person: 'Panel View',
   gallery: 'Photo Gallery',
+  imageCards: 'Images (photo + caption each)',
 };
 
 interface Props {
@@ -41,6 +42,15 @@ interface Props {
   // that section's galleryPhotos array, same pattern as onFileUploaded above.
   onGalleryPhotoUploaded: (sectionPath: number[], photoIndex: number, r: UploadResult) => void;
   onGalleryPhotoRemoved: (sectionPath: number[], photoIndex: number) => void;
+  // contentType 'imageCards' only — same path-addressed shape as the gallery
+  // handlers above. Optional: callers that don't pass these (most existing
+  // ones) fall back to updating the card's imageUrl through the ordinary
+  // `updateSection` closure below instead — functionally fine (this is the
+  // same simpler pattern NewsEventsYearsEditor's card images already use in
+  // production), just without the path-addressed handlers' extra protection
+  // against a stale closure when several uploads resolve concurrently.
+  onImageCardPhotoUploaded?: (sectionPath: number[], cardIndex: number, r: UploadResult) => void;
+  onImageCardPhotoRemoved?: (sectionPath: number[], cardIndex: number) => void;
   // 0 = top-level list (shows "+ Add Section"); >0 = a subSections list —
   // nesting is unlimited, so every level gets its own "+ Add Sub-section"
   // per item too.
@@ -54,7 +64,8 @@ interface Props {
 
 export default function CustomSectionEditor({
   sections, onChange, rootSections, parentPath, onFileUploaded, onFileRemoved, onPhotoUploaded, onPhotoRemoved,
-  onGalleryPhotoUploaded, onGalleryPhotoRemoved, depth = 0, showPlacementToggle = false,
+  onGalleryPhotoUploaded, onGalleryPhotoRemoved, onImageCardPhotoUploaded, onImageCardPhotoRemoved,
+  depth = 0, showPlacementToggle = false,
 }: Props) {
   const [importingKey, setImportingKey] = useState<string | null>(null);
   // Most sections never get a photo (see CustomSection.photo — optional,
@@ -99,6 +110,36 @@ export default function CustomSectionEditor({
   const addGalleryPhoto = (si: number) => {
     const photos = sections[si].galleryPhotos || [];
     updateSection(si, { galleryPhotos: [...photos, { imageUrl: '', storagePath: '' }] });
+  };
+
+  const addImageCard = (si: number) => {
+    const cards = sections[si].imageCards || [];
+    updateSection(si, { imageCards: [...cards, { imageUrl: '', storagePath: '', title: '', description: '' }] });
+  };
+  const updateImageCardField = (si: number, ci: number, field: 'title' | 'description', value: string) => {
+    const cards = (sections[si].imageCards || []).map((c, i) => (i === ci ? { ...c, [field]: value } : c));
+    updateSection(si, { imageCards: cards });
+  };
+  const moveImageCard = (si: number, ci: number, dir: -1 | 1) => {
+    const cards = [...(sections[si].imageCards || [])];
+    const target = ci + dir;
+    if (target < 0 || target >= cards.length) return;
+    [cards[ci], cards[target]] = [cards[target], cards[ci]];
+    updateSection(si, { imageCards: cards });
+  };
+  const handleImageCardPhoto = (si: number, ci: number, path: number[], r: UploadResult) => {
+    if (onImageCardPhotoUploaded) { onImageCardPhotoUploaded(path, ci, r); return; }
+    const cards = (sections[si].imageCards || []).map((c, i) => (i === ci ? { ...c, imageUrl: r.url, storagePath: r.path } : c));
+    updateSection(si, { imageCards: cards });
+  };
+  // When a path-addressed handler is supplied it owns the confirm-dialog +
+  // storage-delete + state update entirely (see DepartmentsAdmin.tsx) — must
+  // NOT also update local state here, or removal would go through even after
+  // the user cancels that handler's confirm dialog.
+  const removeImageCard = (si: number, ci: number, path: number[]) => {
+    if (onImageCardPhotoRemoved) { onImageCardPhotoRemoved(path, ci); return; }
+    if (!confirm('Remove this image? This cannot be undone.')) return;
+    updateSection(si, { imageCards: (sections[si].imageCards || []).filter((_, i) => i !== ci) });
   };
 
   const handleTableImport = async (si: number, file: File) => {
@@ -151,6 +192,13 @@ export default function CustomSectionEditor({
                   onChange={(e) => updateSection(si, { label: e.target.value })}
                   placeholder="Section name"
                   style={{ fontWeight: 700 }}
+                />
+              </div>
+              <div className="admin-field" style={{ flex: 2, minWidth: 160 }}>
+                <input
+                  value={s.subtitle || ''}
+                  onChange={(e) => updateSection(si, { subtitle: e.target.value })}
+                  placeholder="Subtitle (optional) — shown under the section name"
                 />
               </div>
               <div className="admin-field" style={{ flex: 1, minWidth: 140 }}>
@@ -391,6 +439,43 @@ export default function CustomSectionEditor({
               </div>
             )}
 
+            {s.contentType === 'imageCards' && (
+              <div>
+                {(s.imageCards || []).map((card, ci) => (
+                  <div key={ci} style={{ border: '1px solid var(--color-light-gray)', borderRadius: 6, padding: '0.6rem', marginBottom: '0.5rem' }}>
+                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.5rem' }}>
+                      <input
+                        value={card.title}
+                        onChange={(e) => updateImageCardField(si, ci, 'title', e.target.value)}
+                        placeholder="Title"
+                        style={{ flex: 1, fontWeight: 700 }}
+                      />
+                      <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveImageCard(si, ci, -1)} disabled={ci === 0} title="Move up">↑</button>
+                      <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveImageCard(si, ci, 1)} disabled={ci === (s.imageCards?.length || 0) - 1} title="Move down">↓</button>
+                      <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeImageCard(si, ci, path)}>✕</button>
+                    </div>
+                    <textarea
+                      value={card.description}
+                      onChange={(e) => updateImageCardField(si, ci, 'description', e.target.value)}
+                      placeholder="Details…"
+                      rows={2}
+                      style={{ width: '100%', marginBottom: '0.5rem' }}
+                    />
+                    <div style={{ width: 140 }}>
+                      <ImageUploader
+                        folder="vwu/custom-sections/image-cards"
+                        currentUrl={card.imageUrl}
+                        aspect={4 / 3}
+                        label="Upload Image"
+                        onUploaded={(r) => handleImageCardPhoto(si, ci, path, r)}
+                      />
+                    </div>
+                  </div>
+                ))}
+                <button type="button" className="admin-btn admin-btn--sm" onClick={() => addImageCard(si)}>+ Add Image</button>
+              </div>
+            )}
+
             <div style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px dashed var(--color-light-gray)' }}>
               {(s.subSections?.length ?? 0) > 0 && (
                 <div style={{ marginBottom: '0.5rem', paddingLeft: '1rem', borderLeft: '2px solid var(--color-light-gray)' }}>
@@ -405,6 +490,8 @@ export default function CustomSectionEditor({
                     onPhotoRemoved={onPhotoRemoved}
                     onGalleryPhotoUploaded={onGalleryPhotoUploaded}
                     onGalleryPhotoRemoved={onGalleryPhotoRemoved}
+                    onImageCardPhotoUploaded={onImageCardPhotoUploaded}
+                    onImageCardPhotoRemoved={onImageCardPhotoRemoved}
                     depth={depth + 1}
                     showPlacementToggle={showPlacementToggle}
                   />

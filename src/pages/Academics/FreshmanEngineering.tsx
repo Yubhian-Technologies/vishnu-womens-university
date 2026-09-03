@@ -233,7 +233,7 @@ function useDeptFaculty(department: string) {
   return { members, loading };
 }
 
-function FeAboutHodSection({ department }: { department: string }) {
+export function FeAboutHodSection({ department }: { department: string }) {
   const { members, loading } = useDeptFaculty(department);
   const hod = members.find((f) => /head|hod/i.test(f.designation));
   // Same Custom Sections / legacy-fallback split as FacultyProfile.tsx — see
@@ -328,7 +328,7 @@ function FeAboutHodSection({ department }: { department: string }) {
   );
 }
 
-function FeFacultyGridSection({ department }: { department: string }) {
+export function FeFacultyGridSection({ department }: { department: string }) {
   const { members, loading } = useDeptFaculty(department);
 
   if (!loading && members.length === 0) {
@@ -488,10 +488,14 @@ function LabSection({ labs }: { labs: LabInfo[] }) {
 }
 
 // ---- Sub-departments (Mathematics / Physics / Chemistry / English) ----
-// Each of these also has its own standalone page at
-// /academics/freshman-engineering/<slug> (FreshmanSubDepartment.tsx), which
-// renders this exact same data via the exported SubDeptSection below —
-// `slug` is that page's URL segment.
+// Each of these ALSO exists as its own real, admin-editable Department
+// record now — see StandaloneDepartmentDetail.tsx, reached directly at
+// /academics/<slug> via departmentGroups.ts's STANDALONE_DEPARTMENTS
+// (which is what /academics/mathematics etc. actually render — this
+// combined page's own "Department of X" tabs below are no longer linked to
+// from anywhere, kept only because the hardcoded data here is exactly what
+// DepartmentsAdmin.tsx's "Quick Add" seeds those 4 records from — see
+// freshmanDepartmentSeeds.ts).
 interface SubDept {
   key: string;
   slug: string;
@@ -809,10 +813,11 @@ function LibrarySection() {
   );
 }
 
-// Shared right-rail nav, shown here and on each of the 4 standalone
-// sub-department pages (FreshmanSubDepartment.tsx) — all link back to this
-// page with a specific tab pre-selected. `activeHref` highlights whichever
-// one matches the page currently being viewed.
+// Right-rail nav for this combined page's own in-page tabs (About Freshman
+// Department / Vision & Mission / POs / Course structure / Department
+// Library) — the 4 subject tabs are no longer among these (see the
+// SUB_DEPTS comment above), so this only ever links back to this same page
+// with a different ?tab=.
 export const FE_SIDEBAR_ITEMS: { label: string; href: string }[] = [
   { label: FE_TABS[0], href: '/academics/freshman-engineering' },
   ...FE_TABS.slice(1, 4).map((tab) => ({ label: tab, href: `/academics/freshman-engineering?tab=${encodeURIComponent(tab)}` })),
