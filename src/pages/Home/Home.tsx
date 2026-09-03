@@ -47,8 +47,10 @@ const defaultStudyCardPhotos = [
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Research laboratory', caption: '' },
 ];
 // Study card accent colours aren't a "photo" — kept as a parallel,
-// index-matched, non-admin-editable array (matches by position).
-const STUDY_CARD_COLORS = ['#1b4332', '#2d6a4f', '#40916c'];
+// index-matched, non-admin-editable array (matches by position). CSS var()
+// references (not literal hex) so these follow the admin Color Theme like
+// everywhere else, instead of being frozen to the original brand greens.
+const STUDY_CARD_COLORS = ['var(--color-primary)', 'var(--color-primary-light)', 'var(--color-secondary)'];
 
 const defaultCtaBannerPhoto = [
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'VWU campus', caption: '' },
@@ -275,7 +277,7 @@ export default function Home() {
                 >
                   <div className="study-card-image-wrap">
                     {photo && <SmoothImage src={photo.src} alt={photo.alt} className="study-card-image" />}
-                    <div className="study-card-overlay" style={{ background: `linear-gradient(to top, ${color}cc 0%, transparent 65%)` }} />
+                    <div className="study-card-overlay" style={{ background: `linear-gradient(to top, color-mix(in srgb, ${color} 80%, transparent) 0%, transparent 65%)` }} />
                     <div className="study-card-icon"><Icon size={24} strokeWidth={1.75} color="var(--color-primary-dark)" /></div>
                     <div className="study-card-shine" />
                   </div>

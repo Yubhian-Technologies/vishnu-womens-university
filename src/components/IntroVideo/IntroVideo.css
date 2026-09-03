@@ -35,7 +35,7 @@
   padding: 0 var(--space-6, 1.5rem);
   border: 1px solid rgba(255, 255, 255, 0.6);
   border-radius: var(--radius-full, 9999px);
-  background: rgba(8, 28, 21, 0.35);
+  background: color-mix(in srgb, var(--color-primary-dark, #081c15) 35%, transparent);
   backdrop-filter: blur(6px);
   color: #ffffff;
   font-family: var(--font-sans, sans-serif);
@@ -49,7 +49,7 @@
 
 .intro-video__skip:hover,
 .intro-video__skip:focus-visible {
-  background: rgba(8, 28, 21, 0.6);
+  background: color-mix(in srgb, var(--color-primary-dark, #081c15) 60%, transparent);
   outline: none;
 }
 

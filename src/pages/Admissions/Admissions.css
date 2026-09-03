@@ -8,7 +8,7 @@
 
 .adm-hub-card {
   background: var(--color-white);
-  border: 1px solid rgba(27, 67, 50, 0.08);
+  border: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 8%, transparent);
   border-radius: 20px;
   padding: var(--space-6);
   display: flex;
@@ -31,8 +31,8 @@
 
 .adm-hub-highlight {
   display: inline-block;
-  background: rgba(201,168,76,0.15);
-  border: 1px solid rgba(201,168,76,0.35);
+  background: color-mix(in srgb, var(--color-accent, #c9a84c) 15%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-accent, #c9a84c) 35%, transparent);
   border-radius: var(--radius-full);
   padding: 3px 12px;
   font-family: var(--font-sans);
@@ -95,7 +95,7 @@
   border-radius: 20px;
   padding: var(--space-6);
   text-align: center;
-  border: 1px solid rgba(27, 67, 50, 0.08);
+  border: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 8%, transparent);
   box-shadow: var(--shadow-sm);
   position: relative;
   z-index: 1;
@@ -334,7 +334,7 @@
 .adm-form-group input:focus,
 .adm-form-group select:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(27,67,50,0.1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary, #1b4332) 10%, transparent);
 }
 
 .adm-form-group input.has-error,

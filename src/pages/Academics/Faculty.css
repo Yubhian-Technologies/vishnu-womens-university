@@ -68,7 +68,7 @@
 
 .faculty-card {
   background: var(--color-white);
-  border: 1px solid rgba(27, 67, 50, 0.08);
+  border: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 8%, transparent);
   border-radius: var(--radius-xl);
   padding: 0 var(--space-5) var(--space-6);
   box-shadow: var(--shadow-md);
@@ -129,7 +129,7 @@
   height: 140px;
   border-radius: 50%;
   border: 5px solid var(--color-white);
-  box-shadow: 0 8px 24px rgba(27, 67, 50, 0.25);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--color-primary, #1b4332) 25%, transparent);
 }
 
 .faculty-card__avatar {

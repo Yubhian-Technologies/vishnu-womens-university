@@ -22,9 +22,9 @@
 }
 
 @keyframes pulse-ring {
-  0%  { box-shadow: 0 0 0 0 rgba(201,168,76,0.55); }
-  70% { box-shadow: 0 0 0 16px rgba(201,168,76,0); }
-  100%{ box-shadow: 0 0 0 0 rgba(201,168,76,0); }
+  0%  { box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-accent, #c9a84c) 55%, transparent); }
+  70% { box-shadow: 0 0 0 16px color-mix(in srgb, var(--color-accent, #c9a84c) 0%, transparent); }
+  100%{ box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-accent, #c9a84c) 0%, transparent); }
 }
 
 /* ===== Reveal Extensions (not in global.css) ===== */
@@ -157,9 +157,9 @@
 }
 
 .activity-chip--green {
-  background: rgba(27, 67, 50, 0.07);
-  border-color: rgba(27, 67, 50, 0.18);
-  color: #1b4332;
+  background: color-mix(in srgb, var(--color-primary, #1b4332) 7%, transparent);
+  border-color: color-mix(in srgb, var(--color-primary, #1b4332) 18%, transparent);
+  color: var(--color-primary, #1b4332);
 }
 
 .activity-chip--gold {
@@ -184,8 +184,8 @@
 .activity-strip {
   overflow: hidden;
   height: 220px;
-  border-top: 2px solid rgba(27, 67, 50, 0.08);
-  border-bottom: 2px solid rgba(27, 67, 50, 0.08);
+  border-top: 2px solid color-mix(in srgb, var(--color-primary, #1b4332) 8%, transparent);
+  border-bottom: 2px solid color-mix(in srgb, var(--color-primary, #1b4332) 8%, transparent);
   margin: 0;
   contain: content;
 }
@@ -354,7 +354,7 @@
   box-shadow: var(--shadow-sm);
   transition: all var(--transition-base);
   position: relative;
-  border: 1px solid rgba(27, 67, 50, 0.08);
+  border: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 8%, transparent);
   will-change: transform;
 }
 .study-card:hover {
@@ -471,9 +471,9 @@
 .program-tag--active {
   border-color: var(--color-primary);
   color: var(--color-primary);
-  background: rgba(27,67,50,0.05);
+  background: color-mix(in srgb, var(--color-primary, #1b4332) 5%, transparent);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(27,67,50,0.12);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--color-primary, #1b4332) 12%, transparent);
 }
 
 /* ===== Why Choose VWU Section ===== */
@@ -512,7 +512,7 @@
 }
 .why-card:hover {
   transform: translateY(-6px);
-  box-shadow: var(--shadow-lg), 0 0 0 3px rgba(201, 168, 76, 0.35);
+  box-shadow: var(--shadow-lg), 0 0 0 3px color-mix(in srgb, var(--color-accent, #c9a84c) 35%, transparent);
   border-color: var(--color-accent-light);
 }
 
@@ -639,13 +639,13 @@
 .campus-image-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(27,67,50,0.25) 0%, transparent 60%);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--color-primary, #1b4332) 25%, transparent) 0%, transparent 60%);
 }
 .campus-image-badge {
   position: absolute;
   bottom: var(--space-8);
   right: var(--space-8);
-  background: rgba(27,67,50,0.88);
+  background: color-mix(in srgb, var(--color-primary, #1b4332) 88%, transparent);
   backdrop-filter: blur(10px);
   border: 2px solid var(--color-accent);
   border-radius: var(--radius-md);
@@ -709,7 +709,7 @@
   font-size: 0.7rem;
   width: 18px;
   height: 18px;
-  background: rgba(201,168,76,0.18);
+  background: color-mix(in srgb, var(--color-accent, #c9a84c) 18%, transparent);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -800,7 +800,7 @@
 .mission-img-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(27,67,50,0.32) 0%, transparent 55%);
+  background: linear-gradient(to top, color-mix(in srgb, var(--color-primary, #1b4332) 32%, transparent) 0%, transparent 55%);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -827,7 +827,7 @@
   background: var(--color-white);
   border-radius: 20px;
   padding: var(--space-6);
-  border: 1px solid rgba(27, 67, 50, 0.08);
+  border: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 8%, transparent);
   display: flex;
   gap: var(--space-4);
   align-items: flex-start;
@@ -1025,7 +1025,7 @@
   left: -80px;
   width: 420px;
   height: 420px;
-  background: radial-gradient(circle, rgba(27, 67, 50, 0.07) 0%, rgba(27, 67, 50, 0) 70%);
+  background: radial-gradient(circle, color-mix(in srgb, var(--color-primary, #1b4332) 7%, transparent) 0%, color-mix(in srgb, var(--color-primary, #1b4332) 0%, transparent) 70%);
   border-radius: 50%;
   pointer-events: none;
   z-index: 0;
@@ -1037,7 +1037,7 @@
   right: -80px;
   width: 380px;
   height: 380px;
-  background: radial-gradient(circle, rgba(201, 168, 76, 0.08) 0%, rgba(201, 168, 76, 0) 70%);
+  background: radial-gradient(circle, color-mix(in srgb, var(--color-accent, #c9a84c) 8%, transparent) 0%, color-mix(in srgb, var(--color-accent, #c9a84c) 0%, transparent) 70%);
   border-radius: 50%;
   pointer-events: none;
   z-index: 0;
@@ -1065,9 +1065,9 @@
   letter-spacing: 0.04em;
   text-transform: uppercase;
   margin-bottom: var(--space-3);
-  background: rgba(27, 67, 50, 0.08);
+  background: color-mix(in srgb, var(--color-primary, #1b4332) 8%, transparent);
   color: var(--color-primary);
-  border: 1px solid rgba(27, 67, 50, 0.12);
+  border: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 12%, transparent);
 }
 
 .news-chip-icon {
@@ -1121,8 +1121,12 @@
   overflow: hidden;
   padding: var(--space-24) 0;
   /* Fallback behind .cta-banner-overlay's gradient for when no background
-     photo has been uploaded yet (see cta-banner-bg's conditional render). */
-  background: var(--color-primary-dark);
+     photo has been uploaded yet (see cta-banner-bg's conditional render).
+     Matches the footer's own resolved color (not just --color-primary-dark
+     directly) so this section — the last thing before the footer — never
+     shows a visible seam against it, even when an admin has set a Footer
+     Background that differs from the main theme's Primary Dark. */
+  background: var(--footer-bg, var(--color-primary-dark, #0d251a));
 }
 .cta-banner-bg {
   position: absolute;
@@ -1134,7 +1138,19 @@
 .cta-banner-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(27,67,50,0.92) 0%, rgba(64,145,108,0.82) 100%);
+  background:
+    /* Bottom-edge fade toward the footer's actual color, layered on top of
+       the diagonal tint below — without this, the diagonal alone can end
+       on a much lighter Secondary-heavy corner right where it meets a
+       solid, much darker footer, reading as a mismatched seam rather than
+       an intentional transition. */
+    linear-gradient(to bottom,
+      transparent 0%,
+      transparent 65%,
+      color-mix(in srgb, var(--footer-bg, var(--color-primary-dark, #0d251a)) 70%, transparent) 100%),
+    linear-gradient(135deg,
+      color-mix(in srgb, var(--color-primary) 92%, transparent) 0%,
+      color-mix(in srgb, var(--color-secondary) 82%, transparent) 100%);
 }
 .cta-particles {
   position: absolute;
@@ -1146,7 +1162,7 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: rgba(201,168,76,0.55);
+  background: color-mix(in srgb, var(--color-accent) 55%, transparent);
   left: calc(var(--i, 0) * 8.5%);
   top: 35%;
   animation: particle-float 5s ease-in-out infinite;
