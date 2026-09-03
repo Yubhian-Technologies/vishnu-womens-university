@@ -107,6 +107,31 @@ const DEFAULT_SECTIONS: Record<string, Record<string, SectionDef>> = {
         { imageUrl: 'https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=1000&q=80', alt: 'VWU campus life', caption: '' },
       ],
     },
+    // The full-width background photo behind the "Campus Life Showcase" (A vibrant campus. A memorable journey.) section.
+    'campus-life-showcase': {
+      label: 'Campus Life Showcase Banner Photo',
+      slots: [
+        { imageUrl: '/images/vibrant-campus.png', alt: 'Campus Life & Cultural Showcase', caption: 'Campus Life at VWU' },
+      ],
+    },
+    // The full-width background photo behind the "Smart Infrastructure & Living Campus" section.
+    'infrastructure-showcase': {
+      label: 'Smart Infrastructure Showcase Banner Photo',
+      slots: [
+        { imageUrl: 'https://images.unsplash.com/photo-1541829070764-84a7d30dd3f3?w=1920&q=85', alt: 'Smart Campus Infrastructure at VWU', caption: 'Smart Campus Infrastructure' },
+      ],
+    },
+    // The grid of school cards in the "Future-focused education across disciplines" section.
+    'schools-showcase': {
+      label: 'Schools Showcase Cards (5 Slots)',
+      slots: [
+        { imageUrl: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?w=600&q=80', alt: 'School of Engineering', caption: '', label: 'School of Engineering' },
+        { imageUrl: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=600&q=80', alt: 'School of Computing', caption: '', label: 'School of Computing' },
+        { imageUrl: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600&q=80', alt: 'School of Business', caption: '', label: 'School of Business' },
+        { imageUrl: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=600&q=80', alt: 'School of Sciences', caption: '', label: 'School of Sciences' },
+        { imageUrl: 'https://images.unsplash.com/photo-1579154204601-01588f351e67?w=600&q=80', alt: 'School of Pharmacy', caption: '', label: 'School of Pharmacy' },
+      ],
+    },
     // The 3-photo grid in the "Driven by Excellence" mission section.
     mission: {
       label: 'Mission Section Photos',

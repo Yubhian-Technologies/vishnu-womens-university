@@ -5,7 +5,10 @@ import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
 import SmoothScroll from './components/SmoothScroll/SmoothScroll';
 import LandingPageLoader from './components/LandingPageLoader/LandingPageLoader';
+import IntroVideo from './components/IntroVideo/IntroVideo';
+import RouteFallback from './components/RouteFallback/RouteFallback';
 import SEO from './components/SEO/SEO';
+import ThemeOverrides from './components/ThemeOverrides/ThemeOverrides';
 import { smoothScrollTo } from './lib/smoothScroll';
 
 const Academics = lazy(() => import('./pages/Academics/Academics'));
@@ -33,21 +36,13 @@ const Research = lazy(() => import('./pages/Research/Research'));
 const ResearchDetail = lazy(() => import('./pages/Research/ResearchDetail'));
 const AboutSVES = lazy(() => import('./pages/AboutSVES/AboutSVES'));
 const Campus = lazy(() => import('./pages/Campus/Campus'));
-const CentralLibrary = lazy(() => import('./pages/Campus/CentralLibrary'));
-const CampusHostels = lazy(() => import('./pages/Campus/CampusHostels'));
-const OtherFacilities = lazy(() => import('./pages/Campus/OtherFacilities'));
-const CampusFacilityDetail = lazy(() => import('./pages/Campus/CampusFacilityDetail'));
+const CampusLifeDetail = lazy(() => import('./pages/CampusLife/CampusLifeDetail'));
 const Information = lazy(() => import('./pages/Information/Information'));
 const ProgrammesFee = lazy(() => import('./pages/Admissions/ProgrammesFee'));
 const AdmissionProcedure = lazy(() => import('./pages/Admissions/AdmissionProcedure'));
 const ResultAnalysis = lazy(() => import('./pages/Admissions/ResultAnalysis'));
-const VishnuTV = lazy(() => import('./pages/StudentActivities/VishnuTV'));
 const StudentClubs = lazy(() => import('./pages/StudentActivities/StudentClubs'));
 const StudentClubDetail = lazy(() => import('./pages/StudentActivities/StudentClubDetail'));
-const SocialServices = lazy(() => import('./pages/StudentActivities/SocialServices'));
-const CampusMagazines = lazy(() => import('./pages/StudentActivities/CampusMagazines'));
-const ArtsCulture = lazy(() => import('./pages/StudentActivities/ArtsCulture'));
-const SportsGames = lazy(() => import('./pages/StudentActivities/SportsGames'));
 const Differentiators = lazy(() => import('./pages/Differentiators/Differentiators'));
 const DifferentiatorDetail = lazy(() => import('./pages/Differentiators/DifferentiatorDetail'));
 const Placements = lazy(() => import('./pages/Placements/Placements'));
@@ -69,14 +64,6 @@ const PoliciesProcedures = lazy(() => import('./pages/PoliciesProcedures/Policie
 const AdminLayout = lazy(() => import('./pages/Admin/AdminLayout'));
 const Launch = lazy(() => import('./pages/Launch/Launch'));
 
-function RouteFallback() {
-  return (
-    <div className="route-fallback">
-      <div className="route-fallback__spinner" />
-    </div>
-  );
-}
-
 function ScrollToTop() {
   const { pathname, hash } = useLocation();
   useEffect(() => {
@@ -93,6 +80,11 @@ function PublicApp() {
   return (
     <>
       <ScrollToTop />
+      {/* Full-screen intro video (once per session). Rendered on top of — but
+          not gating — the rest of PublicApp, so the Header, Footer, and the
+          lazy-loaded page all download and render in parallel beneath it.
+          No lag, no second loading screen behind the video. */}
+      <IntroVideo />
       <Header />
       <Suspense fallback={<RouteFallback />}>
         <Routes>
@@ -120,21 +112,18 @@ function PublicApp() {
           <Route path="/research/:slug" element={<ResearchDetail />} />
           <Route path="/about-sves" element={<AboutSVES />} />
           <Route path="/campus" element={<Campus />} />
-          <Route path="/campus/central-library" element={<CentralLibrary />} />
-          <Route path="/campus/campus-hostels" element={<CampusHostels />} />
-          <Route path="/campus/other-facilities" element={<OtherFacilities />} />
-          <Route path="/campus/:slug" element={<CampusFacilityDetail />} />
+          <Route path="/campus/:slug" element={<CampusLifeDetail />} />
           <Route path="/information" element={<Information />} />
           <Route path="/programmes-fee-structure" element={<ProgrammesFee />} />
           <Route path="/admission-procedure" element={<AdmissionProcedure />} />
           <Route path="/result-analysis" element={<ResultAnalysis />} />
-          <Route path="/vishnu-tv-academy" element={<VishnuTV />} />
+          <Route path="/vishnu-tv-academy" element={<CampusLifeDetail slug="vishnu-tv-academy" />} />
           <Route path="/student-clubs" element={<StudentClubs />} />
           <Route path="/student-clubs/:slug" element={<StudentClubDetail />} />
-          <Route path="/social-services" element={<SocialServices />} />
-          <Route path="/campus-magazines" element={<CampusMagazines />} />
-          <Route path="/arts-culture" element={<ArtsCulture />} />
-          <Route path="/sports-games" element={<SportsGames />} />
+          <Route path="/social-services" element={<CampusLifeDetail slug="social-services" />} />
+          <Route path="/campus-magazines" element={<CampusLifeDetail slug="campus-magazines" />} />
+          <Route path="/arts-culture" element={<CampusLifeDetail slug="arts-culture" />} />
+          <Route path="/sports-games" element={<CampusLifeDetail slug="sports-games" />} />
           <Route path="/differentiators" element={<Differentiators />} />
           <Route path="/differentiators/:slug" element={<DifferentiatorDetail />} />
           <Route path="/placements" element={<Placements />} />
@@ -213,32 +202,39 @@ const IS_MAINTENANCE = import.meta.env.VITE_MAINTENANCE_MODE === 'true';
 
 function RootRouter() {
   return (
-    <Routes>
-      {/* Admin shell is matched by react-router's own segment-aware routing
-          (not a manual pathname.startsWith check, which would also match
-          unrelated public routes like "/administration"). Everything under
-          /admin/* renders only AdminLayout — no public Header/Footer, no
-          maintenance gate. */}
-      <Route
-        path="/admin/*"
-        element={
-          <Suspense fallback={<RouteFallback />}>
-            <AdminLayout />
-          </Suspense>
-        }
-      />
-      {/* Standalone, like /admin — no public Header/Footer, and stays
-          reachable even under VITE_MAINTENANCE_MODE. */}
-      <Route
-        path="/launch"
-        element={
-          <Suspense fallback={<RouteFallback />}>
-            <Launch />
-          </Suspense>
-        }
-      />
-      <Route path="/*" element={IS_MAINTENANCE ? <MaintenancePage /> : <PublicApp />} />
-    </Routes>
+    <>
+      {/* Applies any admin-saved color overrides (/admin → Color Theme) to
+          :root before the rest of the tree paints. Harmless on /admin itself
+          — Admin.css never reads these variables, it's a separate hardcoded
+          design system (see CLAUDE.md). */}
+      <ThemeOverrides />
+      <Routes>
+        {/* Admin shell is matched by react-router's own segment-aware routing
+            (not a manual pathname.startsWith check, which would also match
+            unrelated public routes like "/administration"). Everything under
+            /admin/* renders only AdminLayout — no public Header/Footer, no
+            maintenance gate. */}
+        <Route
+          path="/admin/*"
+          element={
+            <Suspense fallback={<RouteFallback />}>
+              <AdminLayout />
+            </Suspense>
+          }
+        />
+        {/* Standalone, like /admin — no public Header/Footer, and stays
+            reachable even under VITE_MAINTENANCE_MODE. */}
+        <Route
+          path="/launch"
+          element={
+            <Suspense fallback={<RouteFallback />}>
+              <Launch />
+            </Suspense>
+          }
+        />
+        <Route path="/*" element={IS_MAINTENANCE ? <MaintenancePage /> : <PublicApp />} />
+      </Routes>
+    </>
   );
 }
 

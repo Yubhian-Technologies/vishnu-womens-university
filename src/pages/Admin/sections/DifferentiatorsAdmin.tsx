@@ -11,11 +11,10 @@ import { diffChangedFields } from '../../../lib/formDiff';
 import AicteIdeaLabTeamAdmin from './AicteIdeaLabTeamAdmin';
 import AicteIdeaLabAmbassadorsAdmin from './AicteIdeaLabAmbassadorsAdmin';
 import AicteIdeaLabFacilityPhotosAdmin from './AicteIdeaLabFacilityPhotosAdmin';
-import IicMemberPhotosAdmin from './IicMemberPhotosAdmin';
+import IicCouncilMembersAdmin from './IicCouncilMembersAdmin';
 import IicDocumentsAdmin from './IicDocumentsAdmin';
 import VdlAchievementsAdmin from './VdlAchievementsAdmin';
 import RwtpReportsAdmin from './RwtpReportsAdmin';
-import ConcreteCanoePhotosAdmin from './ConcreteCanoePhotosAdmin';
 
 // Some differentiator items have extra editable content beyond the base
 // fields below (a team roster, photo galleries, placement cards, ...) —
@@ -29,7 +28,7 @@ const ITEM_SUB_SECTIONS: Record<string, { key: string; label: string; Component:
     { key: 'facility-photos', label: 'Facility Photos', Component: AicteIdeaLabFacilityPhotosAdmin },
   ],
   'institution-innovation-cell': [
-    { key: 'member-photos', label: 'Council Member Photos', Component: IicMemberPhotosAdmin },
+    { key: 'council-members', label: 'Council Members', Component: IicCouncilMembersAdmin },
     { key: 'documents', label: 'Documents', Component: IicDocumentsAdmin },
   ],
   // TEDxSVECW's Photos, TI-DSP CoE's Gallery Photos, Chips to Startup's
@@ -47,8 +46,10 @@ const ITEM_SUB_SECTIONS: Record<string, { key: string; label: string; Component:
   'rural-women-tech-park': [{ key: 'report-links', label: 'Report Links', Component: RwtpReportsAdmin }],
   // ATL's Photos and Activity PDFs moved to generic "files"-type Custom
   // Sections — AssistiveTechLabPhotosAdmin/AtlActivityPdfsAdmin have no
-  // live target to manage anymore.
-  'concrete-canoe-lab': [{ key: 'canoe-photos', label: 'Photos', Component: ConcreteCanoePhotosAdmin }],
+  // live target to manage anymore. Concrete Canoe Lab's 5 fixed photo
+  // groups were migrated into a "Photo Galleries" Custom Section the same
+  // way — ConcreteCanoePhotosAdmin's one-time migration tool has no live
+  // target to manage anymore either.
   // WISE's old per-item photo panels (team/elite-project/testimonial/NSE
   // clipping) had no live target anymore once every tab moved to generic
   // "files"-type sections in the Tabs editor below — removed rather than
@@ -227,6 +228,7 @@ export default function DifferentiatorsAdmin() {
   // instead of the intro/accordion one. Same shape as Custom Sections above,
   // one level deeper (tab -> its own section tree).
   const TABS_SLUGS = new Set(['talentsprint-wise', 'institution-innovation-cell', 'vehicle-design-lab', 'aicte-idea-lab']);
+
   const handleTabFileUploaded = (tabIndex: number, sectionPath: number[], fileIndex: number, r: UploadResult) => {
     setForm((p) => ({
       ...p,

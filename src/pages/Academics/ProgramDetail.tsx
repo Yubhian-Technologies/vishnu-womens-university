@@ -2,15 +2,15 @@ import { useEffect, useState } from 'react';
 import { Link, useParams, useLocation, Navigate } from 'react-router-dom';
 import { Check, Microscope, Compass, Target, Sparkles, Mail, ExternalLink, BookOpen, FileText, ChevronRight, ChevronDown, GraduationCap, Calendar, Award, Users, ArrowRight, BookMarked, Bookmark, Library } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
+import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import SmoothCollapse from '../../components/SmoothCollapse/SmoothCollapse';
 import ProgrammeStructure from '../../components/ProgrammeStructure/ProgrammeStructure';
 import BodyBlocks, { parseBodyContent } from '../../components/BodyBlocks/BodyBlocks';
 import DepartmentNewsSection, { type DepartmentNewsDoc } from '../../components/DepartmentNews/DepartmentNewsSection';
 import NewsEventsTabs from '../../components/NewsEventsTabs/NewsEventsTabs';
 import DepartmentDetail from './DepartmentDetail';
-import FreshmanSubDepartment from './FreshmanSubDepartment';
-import { SUB_DEPTS } from './FreshmanEngineering';
-import { groupForProgramSlug } from '../../lib/departmentGroups';
+import StandaloneDepartmentDetail from './StandaloneDepartmentDetail';
+import { groupForProgramSlug, standaloneDepartmentForSlug } from '../../lib/departmentGroups';
 import FacultyCarousel from '../../components/FacultyCarousel/FacultyCarousel';
 import TestimonialMarquee, { type PlacementItem } from '../../components/ui/marquee-01';
 import { useOrderedCollection } from '../../hooks/useCollection';
@@ -24,8 +24,9 @@ import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import type { FacultyDoc } from './Faculty';
 import { parseFlexibleTable, parseProjectAccordion } from '../../lib/structuredTable';
 import { sortPlacementRows, computePlacementStats, findPackageColumnIndex, formatPackageCell } from '../../lib/placementRecords';
+import { computeInternshipStats, findPeriodColumnIndex } from '../../lib/internshipRecords';
 import { hasCustomSectionContent, toQuickLinkItems } from '../../lib/customSections';
-import CustomSectionsRenderer from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
+import CustomSectionsRenderer, { SectionSubtree } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import SEO from '../../components/SEO/SEO';
 import { getProgramSchema, getBreadcrumbSchema } from '../../lib/seo/schemas';
 import '../detail-layout.css';
@@ -47,7 +48,8 @@ export default function ProgramDetail() {
   const { slug } = useParams<{ slug: string }>();
   const group = groupForProgramSlug(slug);
   if (group) return <DepartmentDetail group={group} activeSlug={slug!} />;
-  if (SUB_DEPTS.some((d) => d.slug === slug)) return <FreshmanSubDepartment slug={slug!} />;
+  const standalone = standaloneDepartmentForSlug(slug);
+  if (standalone) return <StandaloneDepartmentDetail dept={standalone} />;
   return <SingleProgramDetail />;
 }
 
@@ -56,6 +58,9 @@ function SingleProgramDetail() {
   const location = useLocation();
   const [outcomeTab, setOutcomeTab] = useState<string | null>(null);
   const [placementYear, setPlacementYear] = useState<string | null>(null);
+  // Which Academic Year's internship records are shown — same pattern as
+  // the Placements pair above.
+  const [internshipYear, setInternshipYear] = useState<string | null>(null);
   const [activeLab, setActiveLab] = useState<LabItem | null>(null);
   const [openRndProjects, setOpenRndProjects] = useState<Set<string>>(new Set());
   const toggleRndProject = (key: string) => {
@@ -134,9 +139,7 @@ function SingleProgramDetail() {
   // `allDepartments` loads (e.g. "IT" -> "Information Technology").
   if (loading || deptLoading) {
     return (
-      <main className="route-fallback">
-        <div className="route-fallback__spinner" />
-      </main>
+      <RouteFallback />
     );
   }
   if (!program) return <Navigate to="/academics" replace />;
@@ -202,16 +205,21 @@ function SingleProgramDetail() {
   // A year counts once it has a label and at least one issue slot (even an
   // issue with no PDF yet still renders, just as "Unavailable" — this lets
   // an admin scaffold a year's issues ahead of uploading each PDF).
-  // Admin-defined academic-year table, split into News & Events / Student
-  // Awards / Others tabs (see NewsEventsTabs) — department-wide like Vision/
-  // Labs/Library above, read from the same matching `dept`. "News & Events"
-  // is the one category with legacy content that used to live directly on
-  // this programme doc (ProgramsAdmin's old "News & Events — Department
-  // Page" field); it falls back to that until DepartmentsAdmin's "Copy from
-  // Programs" moves it over — Student Awards / Others never existed
-  // per-programme, so they're department-only. Independent of the simpler
-  // departmentNews-collection-based section below — a programme only ends up
-  // with both showing if an admin fills in both.
+  // News & Events — department-wide like Vision/Labs/Library above, read
+  // from the same matching `dept`. The "News & Events" heading itself is
+  // fixed (see NewsEventsSubtree below); what's under it is a dynamic,
+  // admin-defined list of named sections (dept.newsEventsSections — any
+  // number, any content type — see DepartmentsAdmin.tsx), since a
+  // programme like MBA has entirely different categories (Events, Budget
+  // Sessions, …) than an engineering department's old fixed "News & Events
+  // / Student Awards / Others". A department not yet opened in the new
+  // Admin falls back to those old fixed arrays instead, rendered the same
+  // way they always were, so nothing already published goes blank.
+  // Independent of the simpler departmentNews-collection-based section
+  // below — a programme only ends up with both showing if an admin fills
+  // in both.
+  const newsEventsSubSections = (dept?.newsEventsSections || []).filter(hasCustomSectionContent);
+  const hasNewsEventsDynamic = newsEventsSubSections.length > 0;
   const validYears = (arr?: NewsEventsYear[]) =>
     (arr || []).filter((y) => y.year && ((y.columns?.length > 0 && y.rows?.length > 0) || (y.cards?.length ?? 0) > 0 || !!y.text));
   const newsEventsCategories = [
@@ -219,7 +227,8 @@ function SingleProgramDetail() {
     { key: 'awards', label: 'Student Awards', years: validYears(dept?.studentAwardsYears) },
     { key: 'others', label: 'Others', years: validYears(dept?.othersYears) },
   ];
-  const hasNewsEventsYears = newsEventsCategories.some((c) => c.years.length > 0);
+  const hasLegacyNewsEvents = !hasNewsEventsDynamic && newsEventsCategories.some((c) => c.years.length > 0);
+  const hasNewsEventsYears = hasNewsEventsDynamic || hasLegacyNewsEvents;
   const newsletterYears = (program.newsletterYears || []).filter((y) => y.year && y.issues && y.issues.length > 0);
   const hasNewsletter = newsletterYears.length > 0;
   const newsletterMaxIssues = Math.max(0, ...newsletterYears.map((y) => y.issues.length));
@@ -261,6 +270,28 @@ function SingleProgramDetail() {
       package: rawPkg ? (rawPkg.toLowerCase().includes('lpa') ? rawPkg : `${rawPkg} LPA`) : 'High Impact CTC',
     };
   });
+  // Individual student Internship Records — same shape/pattern as the
+  // Placement Records above (see InternshipYearsEditor in ProgramsAdmin.tsx),
+  // just for internships instead of placements.
+  const internshipYears = program.internshipYears || [];
+  const activeInternshipYear = internshipYears.find((y) => y.year === internshipYear) ?? internshipYears[0];
+  const internshipColumns = activeInternshipYear?.columns || [];
+  const internshipRows = internshipColumns.length > 0 && activeInternshipYear ? activeInternshipYear.rows || [] : [];
+  const internshipPeriodIdx = findPeriodColumnIndex(internshipColumns);
+  const internshipYearStats = activeInternshipYear ? computeInternshipStats(internshipColumns, activeInternshipYear.rows || []) : null;
+
+  const internshipNameIdx = internshipColumns.findIndex((c) => /name|student|candidate/i.test(c));
+  const internshipCompIdx = internshipColumns.findIndex((c) => /company|organization|employer|recruiter/i.test(c));
+  const internshipMarqueeItems: PlacementItem[] = internshipRows.map((row) => {
+    const rawName = internshipNameIdx >= 0 ? row.cells[internshipNameIdx] : (row.cells[1] || row.cells[0]);
+    const rawComp = internshipCompIdx >= 0 ? row.cells[internshipCompIdx] : (row.cells[2] || 'Leading Organization');
+    const rawPeriod = internshipPeriodIdx >= 0 ? row.cells[internshipPeriodIdx] : '';
+    return {
+      name: rawName?.trim() || 'Student Scholar',
+      company: rawComp?.trim() || 'Top Organization',
+      package: rawPeriod?.trim() || 'Internship',
+    };
+  });
   const visibleCustomSections = (program.customSections || []).filter(hasCustomSectionContent);
 
   // "About the Department" and "About the Programme" are two separate
@@ -286,6 +317,19 @@ function SingleProgramDetail() {
     hasCurriculum && { id: 'curriculum', label: 'Curriculum' },
   ].filter(Boolean) as { id: string; label: string }[];
 
+  // "Placements" quick link doubles as the Internships entry (Internships
+  // has no quick link of its own — it renders directly below Placements on
+  // the page, see the Internships section further down) — its label reads
+  // "Placements & Internships" once this programme has both, "Internships"
+  // alone if only internship records exist yet, and plain "Placements"
+  // otherwise, so the sidebar reflects exactly what's actually been
+  // uploaded instead of always assuming both exist.
+  const hasPlacementRecords = placementYears.length > 0;
+  const hasInternshipRecords = internshipYears.length > 0;
+  const placementsLinkLabel = hasPlacementRecords && hasInternshipRecords
+    ? 'Placements & Internships'
+    : hasInternshipRecords ? 'Internships' : 'Placements';
+
   const quickLinks = [
     hasDeptAbout && { id: 'about', label: 'About the Department' },
     hasVisionMission && { id: 'vision-mission', label: 'Vision, Mission & Values' },
@@ -295,7 +339,7 @@ function SingleProgramDetail() {
     hasLabs && { id: 'labs', label: 'Laboratories' },
     hasLibrary && { id: 'library', label: 'Department Library' },
     hasRnd && { id: 'rnd', label: 'Research & Development (Funded Projects & Patents)' },
-    placementYears.length > 0 && { id: 'placements', label: 'Placements' },
+    (hasPlacementRecords || hasInternshipRecords) && { id: 'placements', label: placementsLinkLabel },
     hasNewsletter && { id: 'newsletter', label: 'Newsletter' },
     hasNewsEventsYears && { id: 'news-events', label: 'News & Events' },
     hasDeptNews && { id: 'news', label: 'News & Events' },
@@ -788,7 +832,7 @@ function SingleProgramDetail() {
           <FacultyCarousel
             faculty={faculty}
             departmentName={deptTitle || program.name}
-            title="Learn from our impactful faculty"
+            title="Meet Our Faculty"
             viewMoreLink="/faculty"
           />
         </div>
@@ -1050,52 +1094,52 @@ function SingleProgramDetail() {
                 <p className="placement-stat-summary">
                   {activePlacementYear.year} Placements as on date: <strong>{placementYearStats.totalOffers.toLocaleString()}</strong>
                 </p>
-                <div className="placement-stat-grid">
-                  <div className="placement-stat-tile">
-                    <div className="placement-stat-tile__label">No. of Companies Visited</div>
-                    <div className="placement-stat-tile__value">{placementYearStats.companiesVisited}</div>
+                <div className="dept-stat-grid">
+                  <div className="dept-stat-tile">
+                    <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.companiesVisited}</span></div>
+                    <div className="dept-stat-tile__label">No. of Companies Visited</div>
                   </div>
-                  <div className="placement-stat-tile">
-                    <div className="placement-stat-tile__label">Total No. of Offers</div>
-                    <div className="placement-stat-tile__value">{placementYearStats.totalOffers}</div>
+                  <div className="dept-stat-tile">
+                    <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.totalOffers}</span></div>
+                    <div className="dept-stat-tile__label">Total No. of Offers</div>
                   </div>
-                  <div className="placement-stat-tile">
-                    <div className="placement-stat-tile__label">Top 10 Companies List</div>
+                  <div className="dept-stat-tile">
                     <button
                       type="button"
-                      className="placement-stat-tile__value--link"
+                      className="dept-stat-tile__circle dept-stat-tile__circle--link"
                       onClick={() => document.getElementById('placement-records-table')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
                     >
-                      Package wise
+                      <span className="dept-stat-tile__value">Package wise</span>
                     </button>
+                    <div className="dept-stat-tile__label">Top 10 Companies List</div>
                   </div>
-                  <div className="placement-stat-tile">
-                    <div className="placement-stat-tile__label">Average Salary</div>
-                    <div className="placement-stat-tile__value">{placementYearStats.averageSalary ?? '—'}</div>
+                  <div className="dept-stat-tile">
+                    <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.averageSalary ?? '—'}</span></div>
+                    <div className="dept-stat-tile__label">Average Salary</div>
                   </div>
-                  <div className="placement-stat-tile">
-                    <div className="placement-stat-tile__label">Median Salary</div>
-                    <div className="placement-stat-tile__value">{placementYearStats.medianSalary ?? '—'}</div>
+                  <div className="dept-stat-tile">
+                    <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.medianSalary ?? '—'}</span></div>
+                    <div className="dept-stat-tile__label">Median Salary</div>
                   </div>
-                  <div className="placement-stat-tile">
-                    <div className="placement-stat-tile__label">Highest Package</div>
-                    <div className="placement-stat-tile__value">{placementYearStats.highestPackage ?? '—'}</div>
+                  <div className="dept-stat-tile">
+                    <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.highestPackage ?? '—'}</span></div>
+                    <div className="dept-stat-tile__label">Highest Package</div>
                   </div>
                   {placementYearStats.above50Lpa > 0 && (
-                    <div className="placement-stat-tile">
-                      <div className="placement-stat-tile__label">Above 50 LPA+</div>
-                      <div className="placement-stat-tile__value">{placementYearStats.above50Lpa} offers</div>
+                    <div className="dept-stat-tile">
+                      <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.above50Lpa} offers</span></div>
+                      <div className="dept-stat-tile__label">Above 50 LPA+</div>
                     </div>
                   )}
                   {placementYearStats.above30Lpa > 0 && (
-                    <div className="placement-stat-tile">
-                      <div className="placement-stat-tile__label">Above 30 LPA+</div>
-                      <div className="placement-stat-tile__value">{placementYearStats.above30Lpa} offers</div>
+                    <div className="dept-stat-tile">
+                      <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.above30Lpa} offers</span></div>
+                      <div className="dept-stat-tile__label">Above 30 LPA+</div>
                     </div>
                   )}
-                  <div className="placement-stat-tile">
-                    <div className="placement-stat-tile__label">Above 10 LPA+</div>
-                    <div className="placement-stat-tile__value">{placementYearStats.above10Lpa} offers</div>
+                  <div className="dept-stat-tile">
+                    <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.above10Lpa} offers</span></div>
+                    <div className="dept-stat-tile__label">Above 10 LPA+</div>
                   </div>
                 </div>
               </>
@@ -1118,6 +1162,80 @@ function SingleProgramDetail() {
               ) : (
                 <p style={{ color: 'var(--color-text-light)', fontStyle: 'italic', padding: '1.5rem 0' }}>
                   No placement records uploaded yet for {activePlacementYear?.year}.
+                </p>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Internships — same shape/pattern as Placements above (see
+          InternshipYearsEditor in ProgramsAdmin.tsx), including the
+          scrolling-marquee records display. */}
+      {internshipYears.length > 0 && (
+        <section id="internships" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
+          <div className="container">
+            <div style={{ marginBottom: 'var(--space-8)' }}>
+              <span className="section-label">Careers</span>
+              <h2 className="section-title">Internships</h2>
+            </div>
+            <div className="placement-year-pills">
+              {internshipYears.map((y) => (
+                <button
+                  key={y.year}
+                  type="button"
+                  onClick={() => setInternshipYear(y.year)}
+                  className={`placement-year-pill${activeInternshipYear?.year === y.year ? ' active' : ''}`}
+                >
+                  AY. {y.year}
+                </button>
+              ))}
+            </div>
+            {activeInternshipYear && internshipYearStats && (
+              <>
+                <p className="placement-stat-summary">
+                  {activeInternshipYear.year} Internships as on date: <strong>{internshipYearStats.totalInternships.toLocaleString()}</strong>
+                </p>
+                <div className="dept-stat-grid">
+                  <div className="dept-stat-tile">
+                    <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{internshipYearStats.companiesVisited}</span></div>
+                    <div className="dept-stat-tile__label">No. of Companies</div>
+                  </div>
+                  <div className="dept-stat-tile">
+                    <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{internshipYearStats.totalInternships}</span></div>
+                    <div className="dept-stat-tile__label">Total No. of Internships</div>
+                  </div>
+                  <div className="dept-stat-tile">
+                    <button
+                      type="button"
+                      className="dept-stat-tile__circle dept-stat-tile__circle--link"
+                      onClick={() => document.getElementById('internship-records-table')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                    >
+                      <span className="dept-stat-tile__value">View All</span>
+                    </button>
+                    <div className="dept-stat-tile__label">Internship Records</div>
+                  </div>
+                </div>
+              </>
+            )}
+            <div id="internship-records-table" style={{ marginTop: 'var(--space-8)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-4)', flexWrap: 'wrap', gap: '0.75rem' }}>
+                <div>
+                  <span className="section-label dept-section-label">Student Success</span>
+                  <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: '1.2rem', fontWeight: 800, color: 'var(--color-primary-dark)', margin: '0.2rem 0 0 0' }}>
+                    Internship Offers &amp; Organizations ({activeInternshipYear?.year})
+                  </h3>
+                </div>
+                <span style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--color-accent)', background: 'rgba(201, 168, 76, 0.12)', border: '1px solid rgba(201, 168, 76, 0.3)', borderRadius: '9999px', padding: '0.3rem 0.85rem' }}>
+                  {internshipRows.length} Verified Internships
+                </span>
+              </div>
+
+              {internshipMarqueeItems.length > 0 ? (
+                <TestimonialMarquee records={internshipMarqueeItems} />
+              ) : (
+                <p style={{ color: 'var(--color-text-light)', fontStyle: 'italic', padding: '1.5rem 0' }}>
+                  No internship records uploaded yet for {activeInternshipYear?.year}.
                 </p>
               )}
             </div>
@@ -1195,9 +1313,27 @@ function SingleProgramDetail() {
         </section>
       )}
 
-      {/* News & Events — department-wide, tabbed across News & Events /
-          Student Awards / Others (see NewsEventsTabs). */}
-      <NewsEventsTabs categories={newsEventsCategories} eyebrow={deptTitle || program.shortName || program.name} navOffset={NAV_OFFSET} />
+      {/* News & Events — the heading is fixed; what's under it is the
+          admin-defined dynamic section list (see newsEventsSubSections
+          above), or, for a department not yet opened in the new Admin, the
+          old fixed News & Events / Student Awards / Others tabs. */}
+      {hasNewsEventsDynamic && (
+        <section id="news-events" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
+          <div className="container">
+            <div style={{ marginBottom: 'var(--space-8)' }}>
+              <span className="section-label">{deptTitle || program.shortName || program.name}</span>
+              <h2 className="section-title">News &amp; Events</h2>
+            </div>
+            <SectionSubtree
+              section={{ id: 'news-events-root', label: 'News & Events', contentType: 'text', textContent: '', subSections: newsEventsSubSections }}
+              navOffset={NAV_OFFSET}
+            />
+          </div>
+        </section>
+      )}
+      {hasLegacyNewsEvents && (
+        <NewsEventsTabs categories={newsEventsCategories} eyebrow={deptTitle || program.shortName || program.name} navOffset={NAV_OFFSET} />
+      )}
 
       {/* News & Events — live from the departmentNews collection, tagged to
           this programme. Both this and the admin-defined table above are

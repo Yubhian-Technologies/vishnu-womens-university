@@ -1,4 +1,4 @@
-import { FileText } from 'lucide-react';
+import { FileText, ExternalLink } from 'lucide-react';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { DEFAULT_POLICIES, type PolicyDoc } from '../Admin/sections/PoliciesAdmin';
 
@@ -12,26 +12,58 @@ export default function PoliciesListSection() {
   const policies = livePolicies.length > 0 ? livePolicies : (DEFAULT_POLICIES as PolicyDoc[]);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
       {policies.map((p) => (
-        <div key={p.title} style={{ display: 'flex', gap: 'var(--space-3)', paddingBottom: 'var(--space-5)', borderBottom: '1px solid var(--color-light-gray)' }}>
-          <span style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--color-off-white)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
-            <FileText size={15} strokeWidth={1.75} style={{ color: 'var(--color-accent)' }} />
+        <div
+          key={p.title}
+          style={{
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: 'var(--space-4)',
+            padding: 'var(--space-5) var(--space-6)',
+            background: 'var(--color-white)',
+            border: '1px solid rgba(27, 67, 50, 0.08)',
+            borderRadius: '18px',
+            boxShadow: 'var(--shadow-sm)',
+            transition: 'all var(--transition-fast)'
+          }}
+        >
+          <span style={{
+            width: 42,
+            height: 42,
+            borderRadius: 'var(--radius-full)',
+            background: 'var(--color-off-white)',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+            color: 'var(--color-primary)'
+          }}>
+            <FileText size={20} strokeWidth={1.75} style={{ color: 'var(--color-accent)' }} />
           </span>
-          <div>
-            <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-primary)', fontWeight: 700, marginBottom: p.description ? 'var(--space-2)' : 0 }}>
-              {p.title}
-              {' — '}
+          <div style={{ flex: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 'var(--space-2)', marginBottom: p.description ? 'var(--space-2)' : 0 }}>
+              <h4 style={{ fontSize: 'var(--text-base)', color: 'var(--color-primary)', fontWeight: 800, margin: 0 }}>
+                {p.title}
+              </h4>
               {p.fileUrl ? (
-                <a href={p.fileUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-accent)', textDecoration: 'underline' }}>
-                  View
+                <a
+                  href={p.fileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-sm btn-outline btn-pill"
+                  style={{ textTransform: 'none', letterSpacing: 'normal' }}
+                >
+                  View Policy <ExternalLink size={12} />
                 </a>
               ) : (
-                <span style={{ color: 'var(--color-text-light)', fontWeight: 400 }}>View</span>
+                <span className="m3-chip" style={{ opacity: 0.6 }}>
+                  Reference Only
+                </span>
               )}
-            </p>
+            </div>
             {p.description && (
-              <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.65 }}>
+              <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.65, margin: 0 }}>
                 {p.description}
               </p>
             )}
@@ -41,3 +73,4 @@ export default function PoliciesListSection() {
     </div>
   );
 }
+

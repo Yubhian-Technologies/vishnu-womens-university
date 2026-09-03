@@ -8,7 +8,7 @@ import { parseFlexibleTable, parseLinkList } from './structuredTable';
 // Purely additive: every existing hardcoded section on those pages is
 // untouched by this.
 
-export type CustomSectionContentType = 'text' | 'table' | 'links' | 'files' | 'list' | 'person' | 'gallery';
+export type CustomSectionContentType = 'text' | 'table' | 'links' | 'files' | 'list' | 'person' | 'gallery' | 'imageCards';
 
 export interface CustomSectionFile {
   label: string;
@@ -21,12 +21,27 @@ export interface CustomSectionPhoto {
   storagePath: string;
 }
 
+// contentType 'imageCards' — an item is a photo plus its own title/
+// description, unlike 'gallery' (bare photos in a grid, no caption) — see
+// News & Events-style "Student Achievers" spotlights.
+export interface CustomSectionImageCard {
+  imageUrl: string;
+  storagePath: string;
+  title: string;
+  description: string;
+}
+
 export interface CustomSection {
   // Slugified from the label once, at creation time, then frozen — renaming
   // the section later must NOT change this, or every bookmarked/shared
   // #anchor and the Quick Links entry pointing at it would break.
   id: string;
   label: string;
+  // Optional second line shown directly under the label, before the
+  // content — same idea as 'person' contentType's personPosition (a role
+  // line under the name), generalized to every content type instead of
+  // just Panel View.
+  subtitle?: string;
   contentType: CustomSectionContentType;
   textContent?: string;
   tableText?: string;
@@ -73,6 +88,8 @@ export interface CustomSection {
   // single `photo` above (a small round accent image any OTHER content type
   // can also carry). See GalleryGrid in CustomSectionsRenderer.tsx.
   galleryPhotos?: CustomSectionPhoto[];
+  // contentType 'imageCards' only — see CustomSectionImageCard above.
+  imageCards?: CustomSectionImageCard[];
 }
 
 // Every anchor id already hardcoded in ProgramDetail.tsx/DepartmentDetail.tsx
@@ -128,6 +145,8 @@ export function hasCustomSectionContent(section: CustomSection): boolean {
         return !!section.textContent?.trim() || !!section.personPosition?.trim();
       case 'gallery':
         return (section.galleryPhotos || []).some((p) => !!p.imageUrl);
+      case 'imageCards':
+        return (section.imageCards || []).some((c) => !!c.imageUrl || !!c.title.trim() || !!c.description.trim());
       default:
         return false;
     }

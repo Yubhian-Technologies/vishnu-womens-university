@@ -61,11 +61,12 @@ const matchKey = (s: string) =>
 
 // The 4 Freshman Engineering foundation subjects (see FOUNDATION_DEPARTMENTS
 // in FacultyAdmin.tsx) have no Program doc of their own — nothing for the
-// name-matching below to find — but each has its own standalone page at
-// /academics/<slug> (FreshmanSubDepartment.tsx, rendered via ProgramDetail's
-// /academics/:slug route — see the SUB_DEPTS check there), same URL shape
-// as every other department, so route each card straight there instead of
-// leaving it dead.
+// name-matching below to find — but each has its own standalone,
+// admin-editable Department page at /academics/<slug>
+// (StandaloneDepartmentDetail.tsx, rendered via ProgramDetail's
+// /academics/:slug route — see STANDALONE_DEPARTMENTS in
+// departmentGroups.ts), same URL shape as every other department, so route
+// each card straight there instead of leaving it dead.
 const FOUNDATION_SUBJECT_TABS: Record<string, string> = {
   mathematics: 'mathematics',
   math: 'mathematics',
@@ -159,7 +160,20 @@ export default function Academics() {
 
   const btechCount = programs.filter(p => p.category === 'btech').length;
 
-  const activePrograms = useMemo(() => programs.filter(p => p.category === activeTab), [programs, activeTab]);
+  const searchQuery = (searchParams.get('search') || '').toLowerCase().trim();
+
+  const activePrograms = useMemo(() => {
+    if (searchQuery) {
+      const matching = programs.filter(p =>
+        (p.name && p.name.toLowerCase().includes(searchQuery)) ||
+        (p.shortName && p.shortName.toLowerCase().includes(searchQuery)) ||
+        (p.department && p.department.toLowerCase().includes(searchQuery)) ||
+        (p.category && p.category.toLowerCase().includes(searchQuery))
+      );
+      if (matching.length > 0) return matching;
+    }
+    return programs.filter(p => p.category === activeTab);
+  }, [programs, activeTab, searchQuery]);
 
   const [expandedDepts, setExpandedDepts] = useState<Set<string>>(new Set());
   const toggleDept = (id: string) => setExpandedDepts((prev) => {
