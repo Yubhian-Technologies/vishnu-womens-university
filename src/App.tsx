@@ -8,6 +8,7 @@ import LandingPageLoader from './components/LandingPageLoader/LandingPageLoader'
 import IntroVideo from './components/IntroVideo/IntroVideo';
 import RouteFallback from './components/RouteFallback/RouteFallback';
 import SEO from './components/SEO/SEO';
+import ThemeOverrides from './components/ThemeOverrides/ThemeOverrides';
 import { smoothScrollTo } from './lib/smoothScroll';
 
 const Academics = lazy(() => import('./pages/Academics/Academics'));
@@ -201,32 +202,39 @@ const IS_MAINTENANCE = import.meta.env.VITE_MAINTENANCE_MODE === 'true';
 
 function RootRouter() {
   return (
-    <Routes>
-      {/* Admin shell is matched by react-router's own segment-aware routing
-          (not a manual pathname.startsWith check, which would also match
-          unrelated public routes like "/administration"). Everything under
-          /admin/* renders only AdminLayout — no public Header/Footer, no
-          maintenance gate. */}
-      <Route
-        path="/admin/*"
-        element={
-          <Suspense fallback={<RouteFallback />}>
-            <AdminLayout />
-          </Suspense>
-        }
-      />
-      {/* Standalone, like /admin — no public Header/Footer, and stays
-          reachable even under VITE_MAINTENANCE_MODE. */}
-      <Route
-        path="/launch"
-        element={
-          <Suspense fallback={<RouteFallback />}>
-            <Launch />
-          </Suspense>
-        }
-      />
-      <Route path="/*" element={IS_MAINTENANCE ? <MaintenancePage /> : <PublicApp />} />
-    </Routes>
+    <>
+      {/* Applies any admin-saved color overrides (/admin → Color Theme) to
+          :root before the rest of the tree paints. Harmless on /admin itself
+          — Admin.css never reads these variables, it's a separate hardcoded
+          design system (see CLAUDE.md). */}
+      <ThemeOverrides />
+      <Routes>
+        {/* Admin shell is matched by react-router's own segment-aware routing
+            (not a manual pathname.startsWith check, which would also match
+            unrelated public routes like "/administration"). Everything under
+            /admin/* renders only AdminLayout — no public Header/Footer, no
+            maintenance gate. */}
+        <Route
+          path="/admin/*"
+          element={
+            <Suspense fallback={<RouteFallback />}>
+              <AdminLayout />
+            </Suspense>
+          }
+        />
+        {/* Standalone, like /admin — no public Header/Footer, and stays
+            reachable even under VITE_MAINTENANCE_MODE. */}
+        <Route
+          path="/launch"
+          element={
+            <Suspense fallback={<RouteFallback />}>
+              <Launch />
+            </Suspense>
+          }
+        />
+        <Route path="/*" element={IS_MAINTENANCE ? <MaintenancePage /> : <PublicApp />} />
+      </Routes>
+    </>
   );
 }
 
