@@ -56,7 +56,6 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
   const facultyDeptNames = new Set(group.facultyDepartments);
   const { docs: allFaculty } = useOrderedCollection<FacultyDoc>('faculty', 'order');
   const faculty = allFaculty.filter((f) => f.department && facultyDeptNames.has(f.department));
-  const hod = faculty.find((f) => /head|hod/i.test(f.designation));
 
   useEffect(() => {
     if (dept) document.title = `${dept.title} | Vishnu Women's University`;
@@ -68,7 +67,7 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
   const deptName = dept.title;
   const hasAbout = !!dept.about;
   const hasVisionMission = !!(dept.vision || dept.mission?.length || dept.coreValues?.length);
-  const hasHod = !!hod;
+  const hasHod = !!(dept.hodMessage || dept.hodImage || dept.hodEmail || dept.hod);
   const labs = (dept.labs || []).map(normalizeLab).filter((l) => l.name);
   const hasLabs = labs.length > 0;
   const visibleCustomSections = (dept.customSections || []).filter(hasCustomSectionContent);
@@ -107,11 +106,15 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
         </div>
       </section>
 
-      {/* About the Department */}
-      {hasAbout && (
+      {/* About the Department — kept independent of Quick Navigation below:
+          gating on hasAbout alone used to hide the whole block (nav
+          included) whenever About was empty, silently dropping Quick Links
+          for every other section too. */}
+      {(hasAbout || quickLinks.length > 1) && (
         <section id="about" className="section bg-white dept-about-section" style={{ scrollMarginTop: NAV_OFFSET }}>
           <div className="container">
             <div className={quickLinks.length > 1 ? 'detail-grid' : ''}>
+              {hasAbout && (
               <div className="dept-about-main">
                 <div className="dept-about-header">
                   <span className="section-label dept-section-label">Department Overview</span>
@@ -141,6 +144,7 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
                   </div>
                 )}
               </div>
+              )}
 
               {quickLinks.length > 1 && (
                 <div className="detail-sidebar">
@@ -260,10 +264,13 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
         </section>
       )}
 
-      {/* About HOD — sourced from the shared Faculty collection (matching by
-          designation), not typed-in dept.hod* fields, so there's no
-          duplicate data entry with /admin → Faculty. */}
-      {hasHod && hod && (
+      {/* About HOD — sourced from the department doc's own hod* fields
+          (Admin → Academic Departments → Head of Department), exactly like
+          the grouped CSE/AI/ECE/Mechanical pages, instead of matching a
+          Faculty record by designation — that Faculty-derived approach
+          meant the admin's HOD Photo/Name/Email/Message fields silently did
+          nothing on these 4 pages. */}
+      {hasHod && (
         <section id="hod" className="dept-hod-section" style={{ scrollMarginTop: NAV_OFFSET }}>
           <div className="container">
             <div style={{ marginBottom: 'var(--space-10)' }}>
@@ -271,9 +278,9 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
               <h2 className="section-title">Head of Department</h2>
             </div>
             <div className="dept-hod-editorial-card">
-              {hod.imageUrl && (
+              {dept.hodImage && (
                 <div className="dept-hod-media-frame">
-                  <SmoothImage src={hod.imageUrl} alt={hod.name} className="dept-hod-photo" />
+                  <SmoothImage src={dept.hodImage} alt={dept.hod || 'Head of Department'} className="dept-hod-photo" />
                 </div>
               )}
               <div className="dept-hod-content">
@@ -282,32 +289,37 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
                   <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>•</span>
                   <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>{deptName}</span>
                 </div>
-                <h3 className="dept-hod-name">{hod.name}</h3>
+                {dept.hod && (
+                  <h3 className="dept-hod-name">{dept.hod}</h3>
+                )}
                 <div className="dept-hod-meta">
-                  <span>{hod.designation}</span>
+                  <span>Head of the Department &amp; Senior Faculty</span>
                 </div>
-                {hod.facts?.some((f) => f.value) && (
+                {dept.hodMessage && (
                   <div className="dept-hod-message-box">
-                    <p className="dept-hod-message-text">
-                      {hod.facts!.filter((f) => f.value).map((f) => `${f.label}: ${f.value}`).join(' · ')}
-                    </p>
+                    <p className="dept-hod-message-text">{dept.hodMessage}</p>
                   </div>
                 )}
-                {hod.email && (
+                {dept.hodEmail && (
                   <div className="dept-hod-actions">
-                    <a href={`mailto:${hod.email}`} className="dept-hod-mail-btn">
+                    <a href={`mailto:${dept.hodEmail}`} className="dept-hod-mail-btn">
                       <Mail size={15} strokeWidth={2.2} />
-                      <span>Contact HOD: {hod.email}</span>
+                      <span>Contact HOD: {dept.hodEmail}</span>
                     </a>
                   </div>
                 )}
               </div>
-              <div style={{ background: 'var(--color-primary)', padding: 'var(--space-4) var(--space-8)', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-5)' }}>
-                <span style={{ fontSize: 'var(--text-xs)', fontWeight: 800, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Full Profile</span>
-                <Link to={`/faculty/${hod.id}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1)', fontSize: 'var(--text-sm)', color: 'var(--color-white)', fontWeight: 600, textDecoration: 'none' }}>
-                  View Profile <ExternalLink size={12} strokeWidth={2} />
-                </Link>
-              </div>
+              {(dept.hodResearchProfiles?.length ?? 0) > 0 && (
+                <div style={{ background: 'var(--color-primary)', padding: 'var(--space-4) var(--space-8)', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-5)' }}>
+                  <span style={{ fontSize: 'var(--text-xs)', fontWeight: 800, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Research Profiles</span>
+                  {dept.hodResearchProfiles!.map((link) => (
+                    <a key={link.label} href={link.url} target="_blank" rel="noopener noreferrer"
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1)', fontSize: 'var(--text-sm)', color: 'var(--color-white)', fontWeight: 600, textDecoration: 'none' }}>
+                      {link.label} <ExternalLink size={12} strokeWidth={2} />
+                    </a>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </section>

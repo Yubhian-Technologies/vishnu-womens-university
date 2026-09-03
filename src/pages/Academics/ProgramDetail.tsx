@@ -312,6 +312,19 @@ function SingleProgramDetail() {
     hasCurriculum && { id: 'curriculum', label: 'Curriculum' },
   ].filter(Boolean) as { id: string; label: string }[];
 
+  // "Placements" quick link doubles as the Internships entry (Internships
+  // has no quick link of its own — it renders directly below Placements on
+  // the page, see the Internships section further down) — its label reads
+  // "Placements & Internships" once this programme has both, "Internships"
+  // alone if only internship records exist yet, and plain "Placements"
+  // otherwise, so the sidebar reflects exactly what's actually been
+  // uploaded instead of always assuming both exist.
+  const hasPlacementRecords = placementYears.length > 0;
+  const hasInternshipRecords = internshipYears.length > 0;
+  const placementsLinkLabel = hasPlacementRecords && hasInternshipRecords
+    ? 'Placements & Internships'
+    : hasInternshipRecords ? 'Internships' : 'Placements';
+
   const quickLinks = [
     hasDeptAbout && { id: 'about', label: 'About the Department' },
     hasVisionMission && { id: 'vision-mission', label: 'Vision, Mission & Values' },
@@ -321,7 +334,7 @@ function SingleProgramDetail() {
     hasLabs && { id: 'labs', label: 'Laboratories' },
     hasLibrary && { id: 'library', label: 'Department Library' },
     hasRnd && { id: 'rnd', label: 'Research & Development (Funded Projects & Patents)' },
-    placementYears.length > 0 && { id: 'placements', label: 'Placements' },
+    (hasPlacementRecords || hasInternshipRecords) && { id: 'placements', label: placementsLinkLabel },
     hasNewsletter && { id: 'newsletter', label: 'Newsletter' },
     hasNewsEventsYears && { id: 'news-events', label: 'News & Events' },
     hasDeptNews && { id: 'news', label: 'News & Events' },

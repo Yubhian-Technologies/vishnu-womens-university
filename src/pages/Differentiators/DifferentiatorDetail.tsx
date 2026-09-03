@@ -1,6 +1,5 @@
 import { useEffect, type CSSProperties, type ReactNode } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
-import { orderBy } from 'firebase/firestore';
 import { Trophy, Rocket, Factory, Microscope, Globe2, GraduationCap } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import { useCollection, useOrderedCollection, type WithId } from '../../hooks/useCollection';
@@ -30,29 +29,6 @@ function IicMemberCard({ name, role, size = 96, photoUrl }: { name: string; role
       />
       <span style={{ fontWeight: 700, color: 'var(--color-primary)', fontSize: 'var(--text-sm)' }}>{name}</span>
       <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', textTransform: 'uppercase', letterSpacing: '0.02em' }}>{role}</span>
-    </div>
-  );
-}
-
-
-function CanoePhotoGrid({ photos }: { photos: (WithId & { imageUrl: string })[] }) {
-  if (photos.length === 0) {
-    return (
-      <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', margin: 0 }}>
-        Photos coming soon.
-      </p>
-    );
-  }
-  return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 'var(--space-3)' }}>
-      {photos.map((p) => (
-        <img
-          key={p.id}
-          src={p.imageUrl}
-          alt="Concrete Canoe Laboratory"
-          style={{ width: '100%', height: 180, objectFit: 'cover', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-light-gray)' }}
-        />
-      ))}
     </div>
   );
 }
@@ -389,11 +365,6 @@ export default function DifferentiatorDetail() {
   const { docs: allItems, loading } = useOrderedCollection<DifferentiatorItemDoc>('differentiatorItems', 'order');
   const { slides: heroSlides } = usePageBanners('differentiators-detail');
   const { docs: rwtpReportLinkDocs } = useOrderedCollection<WithId & { label: string; fileUrl: string }>('rwtpReportLinks', 'order');
-  const { docs: canoeAcademicProjectPhotos } = useCollection<WithId & { imageUrl: string }>('canoeAcademicProjectPhotos', [orderBy('order', 'asc')], { silent: true });
-  const { docs: canoePreviousProjectPhotos } = useCollection<WithId & { imageUrl: string }>('canoePreviousProjectPhotos', [orderBy('order', 'asc')], { silent: true });
-  const { docs: canoeTeamWakaPhotos } = useCollection<WithId & { imageUrl: string }>('canoeTeamWakaPhotos', [orderBy('order', 'asc')], { silent: true });
-  const { docs: canoeTeamAikyamPhotos } = useCollection<WithId & { imageUrl: string }>('canoeTeamAikyamPhotos', [orderBy('order', 'asc')], { silent: true });
-  const { docs: canoeTeamKanuPhotos } = useCollection<WithId & { imageUrl: string }>('canoeTeamKanuPhotos', [orderBy('order', 'asc')], { silent: true });
   const item = allItems.find((i) => i.slug === slug) ?? null;
   const category = item ? DIFFERENTIATOR_CATEGORIES.find((c) => c.id === item.category) : null;
 
@@ -521,39 +492,6 @@ export default function DifferentiatorDetail() {
           </div>
         </div>
       </section>
-      )}
-
-      {/* Concrete Canoe Lab's photo galleries are admin-managed separately
-          (Admin > Differentiators > Concrete Canoe Lab > Photos) — shown as
-          their own labeled blocks here rather than woven into a specific
-          custom section, since a generic section has no way to know which
-          Firestore photo collection belongs to it. */}
-      {item.slug === 'concrete-canoe-lab' && (
-        canoeAcademicProjectPhotos.length > 0 || canoePreviousProjectPhotos.length > 0
-        || canoeTeamWakaPhotos.length > 0 || canoeTeamAikyamPhotos.length > 0 || canoeTeamKanuPhotos.length > 0
-      ) && (
-        <section className="section bg-off-white">
-          <div className="container">
-            <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label">Gallery</span>
-              <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Photos</h2>
-            </div>
-            {[
-              { label: 'Academic Project Photos', photos: canoeAcademicProjectPhotos },
-              { label: 'Previous Project Photos', photos: canoePreviousProjectPhotos },
-              { label: 'Team – WAKA Photos', photos: canoeTeamWakaPhotos },
-              { label: 'Team – AIKYAM Photos', photos: canoeTeamAikyamPhotos },
-              { label: 'Team – KANU Photos', photos: canoeTeamKanuPhotos },
-            ].filter((g) => g.photos.length > 0).map((g, gi, arr) => (
-              <div key={g.label} style={{ marginBottom: gi < arr.length - 1 ? 'var(--space-8)' : 0 }}>
-                <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>
-                  {g.label}
-                </h3>
-                <CanoePhotoGrid photos={g.photos} />
-              </div>
-            ))}
-          </div>
-        </section>
       )}
 
       {/* Rural Women Tech Park's Report Links are admin-managed separately
