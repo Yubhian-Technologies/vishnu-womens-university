@@ -1885,6 +1885,7 @@ td.pb-activities-num {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 0.75rem;
   padding: 0.65rem 1rem;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.06);
@@ -1896,6 +1897,17 @@ td.pb-activities-num {
   font-weight: 600;
   text-decoration: none;
   transition: all 160ms ease;
+}
+
+/* A long pill label (e.g. "Journal Publications in National/International
+   Conferences") would otherwise wrap and blow out the pill's height —
+   min-width: 0 lets this flex child actually shrink so MarqueeText's own
+   overflow:hidden + single-line marquee (see components/MarqueeText) can
+   take over instead. */
+.dept-quick-nav-text {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
 }
 
 .dept-quick-nav-link:hover,

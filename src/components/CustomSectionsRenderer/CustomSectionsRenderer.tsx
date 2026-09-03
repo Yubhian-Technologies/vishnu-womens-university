@@ -4,6 +4,7 @@ import { hasCustomSectionContent, type CustomSection, type CustomSectionPhoto } 
 import { parseFlexibleTable, parseLinkList } from '../../lib/structuredTable';
 import FlexibleTable from '../FlexibleTable/FlexibleTable';
 import SmoothCollapse from '../SmoothCollapse/SmoothCollapse';
+import { linkify } from '../../lib/linkify';
 
 // Renders admin-defined custom sections (see lib/customSections.ts).
 // No .reveal/scroll-reveal classes anywhere here — gated behind
@@ -178,7 +179,7 @@ function PersonPanelList({ people }: { people: CustomSection[] }) {
                       style={{ width: 70, height: 70, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '1px solid var(--color-light-gray)' }}
                     />
                   )}
-                  <p style={{ flex: '1 1 240px', color: 'var(--color-text)', lineHeight: 1.8, whiteSpace: 'pre-line', margin: 0 }}>{person.textContent}</p>
+                  <p style={{ flex: '1 1 240px', color: 'var(--color-text)', lineHeight: 1.8, whiteSpace: 'pre-line', margin: 0 }}>{linkify(person.textContent || '')}</p>
                 </div>
               </SmoothCollapse>
             )}
@@ -472,7 +473,7 @@ function CustomSectionBodyContent({ section }: { section: CustomSection }) {
     if (!section.textContent?.trim()) return null;
     return (
       <p style={{ color: 'var(--color-text)', lineHeight: 1.8, whiteSpace: 'pre-line' }}>
-        {section.textContent}
+        {linkify(section.textContent)}
       </p>
     );
   }
@@ -487,7 +488,7 @@ function CustomSectionBodyContent({ section }: { section: CustomSection }) {
         )}
         {section.textContent?.trim() && (
           <p style={{ color: 'var(--color-text)', lineHeight: 1.8, whiteSpace: 'pre-line' }}>
-            {section.textContent}
+            {linkify(section.textContent)}
           </p>
         )}
       </>
@@ -531,7 +532,7 @@ function CustomSectionBodyContent({ section }: { section: CustomSection }) {
             <span style={{ width: 18, height: 18, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
               <svg width="9" height="9" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
             </span>
-            <span style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.6 }}>{point}</span>
+            <span style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.6 }}>{linkify(point)}</span>
           </li>
         ))}
       </ul>
