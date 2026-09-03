@@ -1,11 +1,81 @@
 import { useEffect, useRef, useState } from 'react';
-import ImageLightbox from '../ImageLightbox/ImageLightbox';
+import { X } from 'lucide-react';
 
 interface PhotoCarouselCard {
   name: string;
   subtitle: string;
   imageUrl: string;
   storagePath: string;
+}
+
+const CARD_WIDTH = 200;
+
+// A 2x-size preview, not the shared <ImageLightbox> full-screen modal — this
+// strip's cards are 200px thumbnails, so "click to zoom" here means showing
+// the photo at 400px (capped to the viewport on small screens), not blowing
+// it up to fill the whole screen.
+function ZoomPreview({ url, alt, onClose }: { url: string; alt: string; onClose: () => void }) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', onKey);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      document.body.style.overflow = '';
+    };
+  }, [onClose]);
+
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 9000,
+        background: 'rgba(5, 18, 13, 0.75)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 'var(--space-6)',
+      }}
+    >
+      <button
+        onClick={onClose}
+        aria-label="Close"
+        style={{
+          position: 'absolute',
+          top: 'var(--space-5)',
+          right: 'var(--space-5)',
+          width: 40,
+          height: 40,
+          borderRadius: '50%',
+          background: 'rgba(255, 255, 255, 0.14)',
+          border: '1px solid rgba(255, 255, 255, 0.3)',
+          color: '#fff',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: 'pointer',
+        }}
+      >
+        <X size={18} />
+      </button>
+      <img
+        src={url}
+        alt={alt}
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          width: CARD_WIDTH * 2,
+          maxWidth: '90vw',
+          maxHeight: '85vh',
+          height: 'auto',
+          borderRadius: 'var(--radius-md)',
+          boxShadow: '0 24px 60px rgba(0, 0, 0, 0.5)',
+          objectFit: 'contain',
+        }}
+      />
+    </div>
+  );
 }
 
 interface Props {
@@ -47,7 +117,7 @@ export default function PhotoCarouselStrip({ cards, pixelsPerSecond = 60 }: Prop
   if (cards.length === 0) return null;
 
   const renderCard = (card: PhotoCarouselCard, key: string) => (
-    <div key={key} style={{ flex: '0 0 200px', marginRight: 'var(--space-5)' }}>
+    <div key={key} style={{ flex: `0 0 ${CARD_WIDTH}px`, marginRight: 'var(--space-5)' }}>
       <img
         src={card.imageUrl}
         alt={card.name || 'Photo'}
@@ -91,7 +161,7 @@ export default function PhotoCarouselStrip({ cards, pixelsPerSecond = 60 }: Prop
           to { transform: translateX(-50%); }
         }
       `}</style>
-      {zoomed && <ImageLightbox src={zoomed.url} alt={zoomed.alt} onClose={() => setZoomed(null)} />}
+      {zoomed && <ZoomPreview url={zoomed.url} alt={zoomed.alt} onClose={() => setZoomed(null)} />}
     </div>
   );
 }

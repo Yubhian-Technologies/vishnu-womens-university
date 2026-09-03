@@ -2,27 +2,13 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faShieldHalved,
   faTrophy,
-  faLightbulb,
   faArrowRight,
   faStar,
-  faAward,
-  faFlagCheckered,
-  faGlobe,
-  type IconDefinition,
 } from '@fortawesome/free-solid-svg-icons';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import type { PlacementHighlightDoc } from '../../pages/Admin/sections/PlacementHighlightsAdmin';
 import './WomensEducationSection.css';
-
-const TAGS: { icon: IconDefinition; text: string }[] = [
-  { icon: faAward, text: "First Private University for Women in Telugu States" },
-  { icon: faFlagCheckered, text: "All-Women mBAJA Racing Champions" },
-  { icon: faGlobe, text: "150+ Global Recruiting Partners" },
-  { icon: faLightbulb, text: "100% Women-Led Campus Culture" },
-  { icon: faShieldHalved, text: "Highest Safety & Mentorship" },
-];
 
 interface PlacementHighlight {
   src: string;
@@ -133,16 +119,6 @@ export default function WomensEducationSection() {
               we cultivate critical thinkers, bold leaders, and visionary innovators who lead multinational corporations,
               publish cutting-edge research, and launch impactful startups.
             </p>
-
-            {/* Quick Interactive Tags */}
-            <div className="we-tags-wrap">
-              {TAGS.map((tag, idx) => (
-                <span key={idx} className="we-tag-chip">
-                  <FontAwesomeIcon icon={tag.icon} className="we-tag-chip-icon" />
-                  {tag.text}
-                </span>
-              ))}
-            </div>
 
             {/* Action Buttons */}
             <div className="we-actions">

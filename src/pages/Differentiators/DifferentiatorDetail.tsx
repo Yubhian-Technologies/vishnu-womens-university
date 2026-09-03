@@ -3,6 +3,7 @@ import { Link, useParams, Navigate } from 'react-router-dom';
 import { orderBy } from 'firebase/firestore';
 import { Trophy, Rocket, Factory, Microscope, Globe2, GraduationCap } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
+import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import { useCollection, useOrderedCollection, type WithId } from '../../hooks/useCollection';
 import { usePageBanners } from '../../hooks/usePageBanners';
 import { fetchPriorityAttr } from '../../lib/domAttrs';
@@ -406,9 +407,7 @@ export default function DifferentiatorDetail() {
   if (!item || !category) {
     if (loading) {
       return (
-        <main className="route-fallback">
-          <div className="route-fallback__spinner" />
-        </main>
+        <RouteFallback />
       );
     }
     return <Navigate to="/differentiators" replace />;

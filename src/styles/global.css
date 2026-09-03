@@ -477,32 +477,8 @@ h6 { font-size: var(--text-lg); }
   100% { transform: scale(1.08); }
 }
 
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-/* Shown by the router's Suspense boundary while a page's JS chunk is still
-   downloading (code-split per route) — a plain empty div here used to leave
-   a jarring blank-white gap where a colourful hero/photos are about to
-   appear, which on a slow connection reads as "the page loaded broken
-   photos, then swapped in the real ones" rather than what it actually was:
-   nothing had rendered yet. */
-.route-fallback {
-  min-height: 60vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.route-fallback__spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid var(--color-light-gray);
-  border-top-color: var(--color-primary);
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-}
+/* Full-screen loading takeover for the router's Suspense boundary — see
+   src/components/RouteFallback/RouteFallback.tsx for the markup/styles. */
 
 .animate-fade-in { animation: fadeIn 0.6s ease forwards; }
 .animate-fade-in-up { animation: fadeInUp 0.7s ease forwards; }

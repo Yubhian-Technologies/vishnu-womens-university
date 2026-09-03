@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Laptop } from 'lucide-react';
+import { Laptop, Newspaper, ArrowRight } from 'lucide-react';
 import HeroSlider from '../../components/HeroSlider/HeroSlider';
 import CounterSection from '../../components/CounterSection/CounterSection';
 import ScrollTopButton from '../../components/ScrollTopButton/ScrollTopButton';
@@ -318,13 +318,21 @@ export default function Home() {
 
       {/* ── News (Recent Happenings) ── */}
       <section className="news-section">
+        <div className="news-glow-1" aria-hidden="true" />
+        <div className="news-glow-2" aria-hidden="true" />
         <div className="container">
           <div className="news-section-header">
             <div className="reveal-left">
-              <span className="section-label">Stay Informed</span>
+              <span className="news-chip">
+                <Newspaper size={14} className="news-chip-icon" />
+                <span>Stay Informed</span>
+              </span>
               <h2 className="section-title">Latest from VWU</h2>
             </div>
-            <Link to="/news-awards/happenings" className="btn btn-outline reveal-right">View All News →</Link>
+            <Link to="/news-awards/happenings" className="news-btn-tonal reveal-right">
+              <span>View All News</span>
+              <ArrowRight size={16} className="news-btn-arrow" />
+            </Link>
           </div>
           <div className="news-grid">
             {featuredNews.map((item, i) => (

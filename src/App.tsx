@@ -5,6 +5,8 @@ import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
 import SmoothScroll from './components/SmoothScroll/SmoothScroll';
 import LandingPageLoader from './components/LandingPageLoader/LandingPageLoader';
+import IntroVideo from './components/IntroVideo/IntroVideo';
+import RouteFallback from './components/RouteFallback/RouteFallback';
 import SEO from './components/SEO/SEO';
 import { smoothScrollTo } from './lib/smoothScroll';
 
@@ -69,14 +71,6 @@ const PoliciesProcedures = lazy(() => import('./pages/PoliciesProcedures/Policie
 const AdminLayout = lazy(() => import('./pages/Admin/AdminLayout'));
 const Launch = lazy(() => import('./pages/Launch/Launch'));
 
-function RouteFallback() {
-  return (
-    <div className="route-fallback">
-      <div className="route-fallback__spinner" />
-    </div>
-  );
-}
-
 function ScrollToTop() {
   const { pathname, hash } = useLocation();
   useEffect(() => {
@@ -93,6 +87,11 @@ function PublicApp() {
   return (
     <>
       <ScrollToTop />
+      {/* Full-screen intro video (once per session). Rendered on top of — but
+          not gating — the rest of PublicApp, so the Header, Footer, and the
+          lazy-loaded page all download and render in parallel beneath it.
+          No lag, no second loading screen behind the video. */}
+      <IntroVideo />
       <Header />
       <Suspense fallback={<RouteFallback />}>
         <Routes>

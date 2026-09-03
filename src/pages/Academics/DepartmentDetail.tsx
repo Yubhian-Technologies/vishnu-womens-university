@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { Check, Microscope, Compass, Target, Sparkles, Mail, BookOpen, FileText, ChevronDown, GraduationCap, Calendar, Award, Users, ChevronRight, ArrowRight, BookMarked, Bookmark, Library, ExternalLink } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
+import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import ProgrammeStructure from '../../components/ProgrammeStructure/ProgrammeStructure';
 import DepartmentNewsSection, { type DepartmentNewsDoc } from '../../components/DepartmentNews/DepartmentNewsSection';
 import NewsEventsTabs from '../../components/NewsEventsTabs/NewsEventsTabs';
@@ -133,9 +134,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
 
   if (progLoading && subPrograms.length === 0) {
     return (
-      <main className="route-fallback">
-        <div className="route-fallback__spinner" />
-      </main>
+      <RouteFallback />
     );
   }
   if (!progLoading && !activeProgram) return <Navigate to="/academics" replace />;
@@ -145,9 +144,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   // `allDepartments` loads (e.g. "AI" -> "Artificial Intelligence").
   if (!activeProgram || deptLoading) {
     return (
-      <main className="route-fallback">
-        <div className="route-fallback__spinner" />
-      </main>
+      <RouteFallback />
     );
   }
 

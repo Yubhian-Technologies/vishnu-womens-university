@@ -4,12 +4,23 @@
    ========================================================================== */
 
 .m3-testimonial-section {
+  /* VWU premium theme — scoped locally so it only affects this component;
+     the site-wide tokens in styles/variables.css are untouched. */
+  --home-teal: #04384B;
+  --home-teal-deep: #022530;
+  --home-white: #FFFFFF;
+  --home-ivory: #F5F0C6;
+  --home-orange: #FF7A00;
+  --home-orange-dark: #E56E00;
+  --home-green: #78C900;
+  --home-violet: #B85BC8;
+
   position: relative;
-  background: #06110b;
-  background: radial-gradient(circle at 50% 15%, #0f271d 0%, #08150f 65%, #040906 100%);
+  background: var(--home-teal-deep);
+  background: radial-gradient(circle at 50% 15%, var(--home-teal) 0%, var(--home-teal-deep) 65%, #011820 100%);
   padding: clamp(5rem, 8vw, 7.5rem) 0;
   overflow: hidden;
-  color: #ffffff;
+  color: var(--home-white);
 }
 
 /* Ambient Radial Glows */
@@ -19,7 +30,7 @@
   left: -80px;
   width: 520px;
   height: 520px;
-  background: radial-gradient(circle, rgba(201, 168, 76, 0.12) 0%, rgba(27, 67, 50, 0) 70%);
+  background: radial-gradient(circle, rgba(120, 201, 0, 0.10) 0%, rgba(4, 56, 75, 0) 70%);
   border-radius: 50%;
   pointer-events: none;
   z-index: 1;
@@ -31,7 +42,7 @@
   right: -80px;
   width: 500px;
   height: 500px;
-  background: radial-gradient(circle, rgba(64, 145, 108, 0.16) 0%, rgba(8, 28, 21, 0) 70%);
+  background: radial-gradient(circle, rgba(184, 91, 200, 0.12) 0%, rgba(4, 56, 75, 0) 70%);
   border-radius: 50%;
   pointer-events: none;
   z-index: 1;
@@ -58,14 +69,14 @@
   border-radius: var(--radius-full);
   font-size: var(--text-xs);
   font-weight: 700;
-  color: var(--color-accent-light);
+  color: var(--home-ivory);
   letter-spacing: 0.05em;
   text-transform: uppercase;
   margin-bottom: var(--space-3);
 }
 
 .m3-testi-sparkle {
-  color: var(--color-accent);
+  color: var(--home-green);
 }
 
 .m3-testi-title {
@@ -99,7 +110,7 @@
 
 .m3-testi-card {
   position: relative;
-  background: rgba(18, 36, 28, 0.72);
+  background: rgba(4, 56, 75, 0.72);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -111,8 +122,8 @@
 }
 
 .m3-testi-card:hover {
-  border-color: rgba(201, 168, 76, 0.4);
-  box-shadow: 0 32px 80px -12px rgba(0, 0, 0, 0.8), 0 0 30px rgba(201, 168, 76, 0.08);
+  border-color: rgba(120, 201, 0, 0.4);
+  box-shadow: 0 32px 80px -12px rgba(0, 0, 0, 0.8), 0 0 30px rgba(120, 201, 0, 0.1);
 }
 
 /* Auto-play Progress Bar */
@@ -125,9 +136,9 @@
 
 .m3-testi-progress-bar {
   height: 100%;
-  background: linear-gradient(90deg, var(--color-secondary) 0%, var(--color-accent) 100%);
+  background: var(--home-green);
   transition: width 50ms linear;
-  box-shadow: 0 0 8px rgba(201, 168, 76, 0.6);
+  box-shadow: 0 0 8px rgba(120, 201, 0, 0.5);
 }
 
 /* Split Card Inner Layout */
@@ -146,7 +157,7 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  background: #0d2217;
+  background: var(--home-teal-deep);
   overflow: hidden;
 }
 
@@ -175,18 +186,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #1b4332 0%, #091a11 100%);
+  background: linear-gradient(135deg, var(--home-teal) 0%, var(--home-teal-deep) 100%);
   font-size: 3.5rem;
   font-weight: 900;
-  color: var(--color-accent);
+  color: var(--home-ivory);
 }
 
 .m3-testi-img-overlay {
   position: absolute;
   inset: 0;
-  background: 
-    linear-gradient(to right, transparent 60%, rgba(18, 36, 28, 0.95) 100%),
-    linear-gradient(to top, rgba(6, 17, 11, 0.75) 0%, transparent 45%);
+  background:
+    linear-gradient(to right, transparent 60%, rgba(4, 56, 75, 0.95) 100%),
+    linear-gradient(to top, rgba(2, 37, 48, 0.75) 0%, transparent 45%);
   pointer-events: none;
 }
 
@@ -199,7 +210,7 @@
   gap: 6px;
   padding: 5px 12px;
   border-radius: var(--radius-full);
-  background: rgba(8, 28, 21, 0.75);
+  background: rgba(2, 37, 48, 0.75);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.18);
@@ -210,7 +221,7 @@
 }
 
 .m3-verified-icon {
-  color: var(--color-accent-light);
+  color: var(--home-green);
 }
 
 .m3-testi-outcome-pill {
@@ -222,10 +233,10 @@
   gap: 6px;
   padding: 7px 14px;
   border-radius: 12px;
-  background: rgba(201, 168, 76, 0.2);
+  background: rgba(184, 91, 200, 0.22);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(201, 168, 76, 0.45);
+  border: 1px solid rgba(184, 91, 200, 0.5);
   font-size: var(--text-xs);
   font-weight: 700;
   color: #ffffff;
@@ -249,8 +260,8 @@
 }
 
 .m3-quote-symbol {
-  color: var(--color-accent);
-  opacity: 0.8;
+  color: var(--home-ivory);
+  opacity: 0.85;
 }
 
 .m3-testi-quote-text {
@@ -300,7 +311,7 @@
   gap: 6px;
   font-size: 0.78rem;
   font-weight: 700;
-  color: var(--color-accent-light);
+  color: var(--home-green);
 }
 
 .m3-inst-text {
@@ -338,11 +349,11 @@
 }
 
 .m3-testi-nav-arrow:hover {
-  background: var(--color-accent);
-  color: var(--color-primary-dark);
-  border-color: var(--color-accent);
+  background: var(--home-green);
+  color: var(--home-teal-deep);
+  border-color: var(--home-green);
   transform: scale(1.1);
-  box-shadow: 0 4px 16px rgba(201, 168, 76, 0.4);
+  box-shadow: 0 4px 16px rgba(120, 201, 0, 0.4);
 }
 
 .m3-testi-thumbs-bar {
@@ -379,8 +390,8 @@
 .m3-thumb-btn--active {
   opacity: 1;
   transform: scale(1.18);
-  border-color: var(--color-accent);
-  box-shadow: 0 0 12px rgba(201, 168, 76, 0.6);
+  border-color: var(--home-green);
+  box-shadow: 0 0 12px rgba(120, 201, 0, 0.5);
 }
 
 .m3-thumb-img {
@@ -395,7 +406,7 @@
   position: absolute;
   inset: -3px;
   border-radius: 50%;
-  border: 2px solid var(--color-accent);
+  border: 2px solid var(--home-green);
   pointer-events: none;
 }
 
@@ -410,7 +421,7 @@
   gap: 8px;
   font-size: var(--text-sm);
   font-weight: 700;
-  color: var(--color-accent-light);
+  color: var(--home-ivory);
   text-decoration: none;
   padding: 8px 18px;
   border-radius: var(--radius-full);
@@ -420,8 +431,8 @@
 }
 
 .m3-testi-alumni-link:hover {
-  background: rgba(201, 168, 76, 0.18);
-  border-color: var(--color-accent);
+  background: rgba(120, 201, 0, 0.18);
+  border-color: var(--home-green);
   color: #ffffff;
   transform: translateY(-2px);
 }

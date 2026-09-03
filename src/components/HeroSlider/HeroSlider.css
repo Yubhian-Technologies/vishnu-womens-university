@@ -1,52 +1,45 @@
 .hero-slider {
+  /* VWU premium hero theme — scoped locally so it only affects this
+     component; the site-wide tokens in styles/variables.css are untouched. */
+  --hero-teal: #04384B;
+  --hero-teal-deep: #022530;
+  --hero-white: #FFFFFF;
+  --hero-ivory: #F5F0C6;
+  --hero-orange: #FF7A00;
+  --hero-orange-dark: #E56E00;
+  --hero-green: #78C900;
+  --hero-violet: #B85BC8;
+
   position: relative;
   width: 100%;
   height: 100vh;
   min-height: 700px;
   max-height: 1100px;
   overflow: hidden;
-  background: var(--color-primary-dark);
+  background: var(--hero-teal);
 }
 
-/* ===== Background Video (YouTube) =====
-   Standard "16:9 overscan" technique for filling an arbitrary-aspect-ratio
-   container with a YouTube iframe (object-fit doesn't reliably apply to
-   iframes cross-browser): the iframe is always sized/centered as a 16:9 box
-   large enough that its shorter edge still covers the container, then
-   clipped by the wrapper's overflow:hidden. pointer-events:none blocks any
-   interaction with the video itself — see the mute-button-only note in
-   HeroSlider.tsx. */
-.hero-youtube-bg {
+/* ===== Background Video ===== */
+
+.hero-video {
   position: absolute;
   inset: 0;
-  overflow: hidden;
-  pointer-events: none;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   z-index: 0;
-}
-
-.hero-youtube-bg iframe {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 100vw;
-  height: 56.25vw; /* 16:9 */
-  min-height: 100vh;
-  min-width: 177.78vh; /* 16:9 */
-  transform: translate(-50%, -50%);
-  border: 0;
-  pointer-events: none;
 }
 
 .hero-video-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    105deg,
-    rgba(8,28,21,0.82) 0%,
-    rgba(27,67,50,0.68) 40%,
-    rgba(45,106,79,0.3) 75%,
-    transparent 100%
-  );
+  /* Deep teal is the dominant hero tone even with the video preserved
+     underneath; two faint corner glows (green/violet, ~10% opacity, no
+     motion) nod to the VWU logo's mark without competing with the text. */
+  background:
+    linear-gradient(165deg, rgba(4,56,75,0.88) 0%, rgba(4,56,75,0.74) 45%, rgba(4,56,75,0.86) 100%),
+    radial-gradient(42% 42% at 6% 12%, rgba(120,201,0,0.10) 0%, transparent 70%),
+    radial-gradient(38% 38% at 94% 88%, rgba(184,91,200,0.12) 0%, transparent 70%);
   z-index: 1;
 }
 
@@ -68,14 +61,14 @@
 
 .hero-center-tagline {
   font-family: var(--font-sans);
-  font-size: clamp(1.15rem, 2.7vw, 2.25rem);
-  font-weight: 500;
-  color: #ffffff;
+  font-size: clamp(1.2rem, 2.8vw, 2.4rem);
+  font-weight: 600;
+  color: var(--hero-white);
   line-height: 1;
   letter-spacing: -0.015em;
-  margin: 0 0 var(--space-6) 0;
+  margin: 0 0 var(--space-7) 0;
   text-align: center;
-  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.6);
+  text-shadow: 0 2px 20px rgba(2, 37, 48, 0.55);
   /* Locked height ensures the search bar underneath never shifts position */
   height: 3.2rem;
   display: flex;
@@ -108,15 +101,15 @@
   white-space: nowrap;
 }
 
-/* Italian Editorial Italic Accent */
+/* Editorial italic accent — carries the headline's emphasis word in Warm Ivory */
 .hero-title-italic {
   font-family: 'Playfair Display', 'Didot', 'Bodoni MT', Georgia, serif;
   font-style: italic;
   font-weight: 500;
-  color: #f7e6b8; /* Refined champagne gold */
+  color: var(--hero-ivory);
   letter-spacing: 0.01em;
   white-space: nowrap;
-  text-shadow: 0 2px 12px rgba(201, 168, 76, 0.25), 0 2px 10px rgba(0, 0, 0, 0.6);
+  text-shadow: 0 2px 16px rgba(245, 240, 198, 0.2), 0 2px 12px rgba(2, 37, 48, 0.55);
 }
 
 .hero-center-search {
@@ -124,29 +117,31 @@
   max-width: 500px;
 }
 
+/* Clean Material-style surface — a near-solid white pill instead of heavy
+   glassmorphism, so the search field reads as a clear, tappable affordance
+   against the deep teal hero rather than another translucent layer. */
 .hero-search-box {
   display: flex;
   align-items: center;
-  background: rgba(255, 255, 255, 0.16);
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  background: var(--hero-white);
   border-radius: var(--radius-full, 9999px);
-  padding: 6px 6px 6px 18px;
-  box-shadow: 0 10px 25px -4px rgba(0, 0, 0, 0.35), 0 4px 10px -2px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.25);
-  border: 1px solid rgba(255, 255, 255, 0.35);
+  padding: 6px 6px 6px 20px;
+  box-shadow: 0 8px 24px -6px rgba(2, 37, 48, 0.35);
+  border: 1px solid rgba(4, 56, 75, 0.08);
   outline: none !important;
-  transition: box-shadow 0.2s ease, transform 0.2s ease, background 0.2s ease;
+  transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
 }
 
 .hero-search-box:focus-within {
-  background: rgba(255, 255, 255, 0.24);
-  box-shadow: 0 14px 32px -4px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  box-shadow: 0 10px 28px -6px rgba(2, 37, 48, 0.4), 0 0 0 3px rgba(4, 56, 75, 0.12);
+  border-color: rgba(4, 56, 75, 0.18);
   transform: translateY(-1px);
   outline: none !important;
 }
 
 .hero-search-icon {
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--hero-teal);
+  opacity: 0.7;
   flex-shrink: 0;
   margin-right: 10px;
   pointer-events: none;
@@ -155,12 +150,13 @@
 .hero-search-input {
   flex: 1;
   min-width: 0;
+  min-height: 36px;
   border: none !important;
   outline: none !important;
   box-shadow: none !important;
   background: transparent;
   font-size: var(--text-base, 1rem);
-  color: #ffffff;
+  color: var(--hero-teal);
   font-family: inherit;
   padding: 6px 0;
   -webkit-appearance: none;
@@ -176,20 +172,24 @@
 }
 
 .hero-search-input::placeholder {
-  color: rgba(255, 255, 255, 0.75);
+  color: rgba(4, 56, 75, 0.5);
   font-weight: 400;
 }
 
+/* The hero's one and only primary CTA — orange fill per the VWU theme, with
+   dark teal (not white) label text: white-on-#FF7A00 falls short of WCAG AA
+   text contrast, teal-on-orange clears it comfortably while staying on-brand. */
 .hero-search-submit {
-  background: var(--color-primary, #1b4332);
-  color: #ffffff;
+  background: var(--hero-orange);
+  color: var(--hero-teal);
   border: none !important;
   outline: none !important;
   box-shadow: none !important;
   border-radius: var(--radius-full, 9999px);
-  padding: 0.65rem 1.4rem;
+  min-height: 48px;
+  padding: 0.65rem 1.6rem;
   font-size: var(--text-sm, 0.875rem);
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.02em;
   cursor: pointer;
   transition: background-color 0.2s ease, transform 0.15s ease;
@@ -206,7 +206,7 @@
 }
 
 .hero-search-submit:hover {
-  background: var(--color-primary-dark, #0d281e);
+  background: var(--hero-orange-dark);
 }
 
 .hero-search-submit:active {
@@ -218,18 +218,19 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.65rem;
-  margin-top: var(--space-4);
+  gap: 0.7rem;
+  margin-top: var(--space-5);
   font-size: var(--text-xs, 0.75rem);
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.9);
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+  color: rgba(255, 255, 255, 0.92);
+  text-shadow: 0 1px 6px rgba(2, 37, 48, 0.5);
 }
 
 .hero-tag-dot {
-  color: var(--color-accent, #c9a84c);
+  color: var(--hero-ivory);
+  opacity: 0.85;
   font-size: 0.75rem;
   line-height: 1;
 }
@@ -409,9 +410,10 @@
   padding: 0;
 }
 
+/* Decorative accent — green, inspired by the VWU mark, used only here */
 .hero-dot.active {
   width: 28px;
-  background: var(--color-accent);
+  background: var(--hero-green);
 }
 
 .hero-dot:hover:not(.active) {
@@ -419,12 +421,12 @@
 }
 
 .hero-nav-btn {
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   background: rgba(255,255,255,0.12);
   border: 1px solid rgba(255,255,255,0.2);
-  color: var(--color-white);
+  color: var(--hero-white);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -433,11 +435,12 @@
   flex-shrink: 0;
 }
 
+/* Decorative accent — violet, inspired by the VWU mark, used only here */
 .hero-nav-btn:hover {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
-  color: var(--color-primary-dark);
-  transform: scale(1.1);
+  background: var(--hero-violet);
+  border-color: var(--hero-violet);
+  color: var(--hero-white);
+  transform: scale(1.08);
 }
 
 /* ===== Progress Bar ===== */
@@ -453,7 +456,7 @@
 
 .hero-progress-fill {
   height: 100%;
-  background: var(--color-accent);
+  background: var(--hero-green);
   transition: width 5s linear;
   border-radius: 0 2px 2px 0;
 }
@@ -494,19 +497,19 @@
   bottom: calc(72px + var(--space-8));
   right: var(--space-8);
   z-index: 10;
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.14);
   border: 1px solid rgba(255, 255, 255, 0.32);
-  box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3);
-  color: var(--color-white);
+  box-shadow: 0 6px 16px -4px rgba(2, 37, 48, 0.4);
+  color: var(--hero-white);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  backdrop-filter: blur(14px) saturate(180%);
-  -webkit-backdrop-filter: blur(14px) saturate(180%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 

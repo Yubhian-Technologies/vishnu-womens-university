@@ -11,7 +11,7 @@ import { useSitePhotos } from '../../hooks/useSitePhotos';
 import SmoothImage from '../SmoothImage/SmoothImage';
 import './SmartInfrastructureShowcase.css';
 
-const DEFAULT_INFRA_IMAGE = 'https://images.unsplash.com/photo-1541829070764-84a7d30dd3f3?w=1920&q=85';
+const DEFAULT_INFRA_IMAGE = '/images/ENGINEERED-SECION.jpeg';
 
 const defaultInfraPhoto = [
   {

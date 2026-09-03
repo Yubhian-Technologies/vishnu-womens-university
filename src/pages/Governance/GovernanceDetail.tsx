@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { Trophy, Landmark } from 'lucide-react';
 import { useOrderedCollection } from '../../hooks/useCollection';
+import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import { usePageBanners } from '../../hooks/usePageBanners';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import { fetchPriorityAttr } from '../../lib/domAttrs';
@@ -115,9 +116,7 @@ export default function GovernanceDetail() {
   if (!item) {
     if (govLoading) {
       return (
-        <main className="route-fallback">
-          <div className="route-fallback__spinner" />
-        </main>
+        <RouteFallback />
       );
     }
     return <Navigate to="/governance" replace />;
