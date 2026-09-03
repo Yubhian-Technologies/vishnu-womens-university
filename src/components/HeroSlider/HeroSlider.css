@@ -30,19 +30,6 @@
   z-index: 0;
 }
 
-.hero-video-overlay {
-  position: absolute;
-  inset: 0;
-  /* Deep teal is the dominant hero tone even with the video preserved
-     underneath; two faint corner glows (green/violet, ~10% opacity, no
-     motion) nod to the VWU logo's mark without competing with the text. */
-  background:
-    linear-gradient(165deg, rgba(4,56,75,0.88) 0%, rgba(4,56,75,0.74) 45%, rgba(4,56,75,0.86) 100%),
-    radial-gradient(42% 42% at 6% 12%, rgba(120,201,0,0.10) 0%, transparent 70%),
-    radial-gradient(38% 38% at 94% 88%, rgba(184,91,200,0.12) 0%, transparent 70%);
-  z-index: 1;
-}
-
 /* ===== Center Tagline & Clean Sleek Search ===== */
 .hero-center-panel {
   position: absolute;

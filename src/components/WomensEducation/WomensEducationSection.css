@@ -22,7 +22,7 @@
   right: -5%;
   width: 450px;
   height: 450px;
-  background: radial-gradient(circle, rgba(200, 169, 106, 0.22) 0%, rgba(45, 106, 79, 0.1) 60%, transparent 80%);
+  background: radial-gradient(circle, rgba(200, 169, 106, 0.22) 0%, color-mix(in srgb, var(--color-primary-light, #2d6a4f) 10%, transparent) 60%, transparent 80%);
 }
 
 .we-glow--2 {
@@ -30,7 +30,7 @@
   left: -5%;
   width: 400px;
   height: 400px;
-  background: radial-gradient(circle, rgba(45, 106, 79, 0.15) 0%, rgba(200, 169, 106, 0.08) 60%, transparent 80%);
+  background: radial-gradient(circle, color-mix(in srgb, var(--color-primary-light, #2d6a4f) 15%, transparent) 0%, rgba(200, 169, 106, 0.08) 60%, transparent 80%);
 }
 
 /* Main Split Grid. The placement card already fills 100% of its own
@@ -61,8 +61,8 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(27, 67, 50, 0.08);
-  border: 1px solid rgba(27, 67, 50, 0.18);
+  background: color-mix(in srgb, var(--color-primary, #1b4332) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 18%, transparent);
   color: var(--color-primary-dark, #0b1f16);
   padding: 6px 14px;
   border-radius: 9999px;
@@ -138,7 +138,7 @@
 }
 
 .we-tag-chip:hover {
-  background: rgba(27, 67, 50, 0.08);
+  background: color-mix(in srgb, var(--color-primary, #1b4332) 8%, transparent);
   border-color: var(--color-accent, #c9a84c);
   color: var(--color-primary, #1b4332);
   transform: translateY(-2px);
@@ -188,7 +188,7 @@
   width: 340px;
   height: 340px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(200, 169, 106, 0.18) 0%, rgba(45, 106, 79, 0.08) 55%, transparent 75%);
+  background: radial-gradient(circle, rgba(200, 169, 106, 0.18) 0%, color-mix(in srgb, var(--color-primary-light, #2d6a4f) 8%, transparent) 55%, transparent 75%);
   animation: we-halo-breathe 4s ease-in-out infinite;
   z-index: 1;
   pointer-events: none;
@@ -251,7 +251,7 @@
   border-radius: 50%;
   overflow: hidden;
   border: 5px solid #ffffff;
-  box-shadow: 0 8px 20px rgba(8, 28, 21, 0.22);
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--color-primary-dark, #081c15) 22%, transparent);
   background: #ffffff;
 }
 
@@ -280,7 +280,7 @@
   -webkit-backdrop-filter: blur(16px) saturate(140%);
   border: 1px solid rgba(255, 255, 255, 0.55);
   border-left: none;
-  box-shadow: 0 16px 40px rgba(8, 28, 21, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  box-shadow: 0 16px 40px color-mix(in srgb, var(--color-primary-dark, #081c15) 8%, transparent), inset 0 1px 0 rgba(255, 255, 255, 0.5);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -343,7 +343,7 @@
   top: 50%;
   transform: translateY(-50%);
   font-size: clamp(3.5rem, 9vw, 7rem);
-  color: rgba(27, 67, 50, 0.1);
+  color: color-mix(in srgb, var(--color-primary, #1b4332) 10%, transparent);
   pointer-events: none;
 }
 

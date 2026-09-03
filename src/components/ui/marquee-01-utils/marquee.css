@@ -90,7 +90,7 @@
   position: relative;
   width: 300px;
   background: #ffffff;
-  border: 1.5px solid rgba(27, 67, 50, 0.09);
+  border: 1.5px solid color-mix(in srgb, var(--color-primary, #1b4332) 9%, transparent);
   border-radius: 22px;
   padding: 1.15rem 1.35rem;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
@@ -126,7 +126,7 @@
   font-size: 0.76rem;
   font-weight: 700;
   color: var(--color-primary, #1b4332);
-  background: rgba(27, 67, 50, 0.06);
+  background: color-mix(in srgb, var(--color-primary, #1b4332) 6%, transparent);
   padding: 0.25rem 0.65rem;
   border-radius: 9999px;
   max-width: 145px;
@@ -144,7 +144,7 @@
   font-weight: 800;
   color: #92400e;
   background: linear-gradient(135deg, rgba(254, 240, 138, 0.45) 0%, rgba(253, 230, 138, 0.7) 100%);
-  border: 1px solid rgba(201, 168, 76, 0.4);
+  border: 1px solid color-mix(in srgb, var(--color-accent, #c9a84c) 40%, transparent);
   padding: 0.25rem 0.65rem;
   border-radius: 9999px;
   letter-spacing: 0.02em;

@@ -8,7 +8,26 @@ export interface ColorVarDef {
   label: string;
   hint: string;
   default: string;
+  // When set, leaving this field blank in the admin means "inherit this
+  // other CSS variable" rather than "use `default`" — ThemeAdmin.tsx omits
+  // the key from Firestore entirely in that case, so Footer.css's own
+  // var(--footer-bg, var(--color-primary-dark, ...)) fallback chain is what
+  // actually resolves it, live, instead of a value getting pinned in place.
+  inheritsFrom?: string;
 }
+
+// Footer-specific overrides — separate from COLOR_VARS because the footer
+// intentionally stays dark even when the rest of the site is light, so its
+// colors can't just reuse the main palette directly. --footer-bg and
+// --footer-accent inherit from the main theme until an admin explicitly sets
+// one, so changing Primary Dark or Accent above still re-colors the footer
+// without needing to touch this section at all.
+export const FOOTER_COLOR_VARS: ColorVarDef[] = [
+  { key: '--footer-bg', label: 'Footer Background', hint: 'Blank inherits Primary Dark from the theme above.', default: '#0d251a', inheritsFrom: '--color-primary-dark' },
+  { key: '--footer-text', label: 'Footer Text', hint: 'Body text and muted details in the footer.', default: '#e2e8f0' },
+  { key: '--footer-heading', label: 'Footer Heading', hint: 'Headings, brand name, and brightest text in the footer.', default: '#ffffff' },
+  { key: '--footer-accent', label: 'Footer Accent', hint: 'Blank inherits Accent from the theme above.', default: '#c9a84c', inheritsFrom: '--color-accent' },
+];
 
 export const COLOR_VARS: ColorVarDef[] = [
   { key: '--color-primary', label: 'Primary', hint: 'Main brand color — headings, primary buttons, nav.', default: '#1b4332' },

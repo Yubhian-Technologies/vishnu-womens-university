@@ -217,7 +217,6 @@ export default function HeroSlider() {
           aria-hidden="true"
         />
       )}
-      <div className="hero-video-overlay" />
 
       {/* Center Tagline & Clean Sleek Search */}
       <div className="hero-center-panel">

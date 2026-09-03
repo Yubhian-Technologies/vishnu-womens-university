@@ -10,7 +10,7 @@
   align-items: center;
   overflow: hidden;
   padding: clamp(5rem, 8vw, 7.5rem) 0;
-  background: #081c15;
+  background: var(--color-primary-dark, #081c15);
   color: #ffffff;
 }
 
@@ -41,17 +41,17 @@
   background: 
     linear-gradient(
       90deg, 
-      rgba(8, 28, 21, 0.97) 0%, 
-      rgba(8, 28, 21, 0.92) 48%, 
-      rgba(8, 28, 21, 0.65) 75%, 
-      rgba(8, 28, 21, 0.30) 100%
+      color-mix(in srgb, var(--color-primary-dark, #081c15) 97%, transparent) 0%, 
+      color-mix(in srgb, var(--color-primary-dark, #081c15) 92%, transparent) 48%, 
+      color-mix(in srgb, var(--color-primary-dark, #081c15) 65%, transparent) 75%, 
+      color-mix(in srgb, var(--color-primary-dark, #081c15) 30%, transparent) 100%
     ),
     linear-gradient(
       180deg,
-      rgba(8, 28, 21, 0.6) 0%,
+      color-mix(in srgb, var(--color-primary-dark, #081c15) 60%, transparent) 0%,
       transparent 30%,
       transparent 70%,
-      rgba(8, 28, 21, 0.85) 100%
+      color-mix(in srgb, var(--color-primary-dark, #081c15) 85%, transparent) 100%
     );
 }
 
@@ -62,7 +62,7 @@
   left: 10%;
   width: 550px;
   height: 550px;
-  background: radial-gradient(circle, rgba(201, 168, 76, 0.14) 0%, rgba(27, 67, 50, 0) 70%);
+  background: radial-gradient(circle, color-mix(in srgb, var(--color-accent, #c9a84c) 14%, transparent) 0%, color-mix(in srgb, var(--color-primary, #1b4332) 0%, transparent) 70%);
   border-radius: 50%;
   pointer-events: none;
   z-index: 1;
@@ -131,8 +131,8 @@
 .infra-pillar-card:hover {
   transform: translateY(-6px);
   background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(201, 168, 76, 0.55);
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35), 0 0 20px rgba(201, 168, 76, 0.15);
+  border-color: color-mix(in srgb, var(--color-accent, #c9a84c) 55%, transparent);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35), 0 0 20px color-mix(in srgb, var(--color-accent, #c9a84c) 15%, transparent);
 }
 
 .infra-pillar-top {
@@ -150,9 +150,9 @@
   width: 48px;
   height: 48px;
   border-radius: 12px;
-  background: rgba(201, 168, 76, 0.18);
+  background: color-mix(in srgb, var(--color-accent, #c9a84c) 18%, transparent);
   color: var(--color-accent-light);
-  border: 1px solid rgba(201, 168, 76, 0.35);
+  border: 1px solid color-mix(in srgb, var(--color-accent, #c9a84c) 35%, transparent);
   transition: all 220ms ease;
 }
 
@@ -287,14 +287,14 @@
   background: var(--color-accent);
   color: var(--color-primary-dark);
   border: 1px solid var(--color-accent);
-  box-shadow: 0 4px 16px rgba(201, 168, 76, 0.3);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--color-accent, #c9a84c) 30%, transparent);
 }
 
 .m3-infra-btn--primary:hover {
   background: var(--color-accent-light);
   color: var(--color-primary-dark);
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(201, 168, 76, 0.45);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--color-accent, #c9a84c) 45%, transparent);
 }
 
 .m3-infra-btn--glass {

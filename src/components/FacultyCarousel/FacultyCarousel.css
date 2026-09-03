@@ -298,9 +298,9 @@
 }
 
 .faculty-impact-badge.exp-badge {
-  background: rgba(201, 168, 76, 0.12);
+  background: color-mix(in srgb, var(--color-accent, #c9a84c) 12%, transparent);
   color: #856404;
-  border: 1px solid rgba(201, 168, 76, 0.3);
+  border: 1px solid color-mix(in srgb, var(--color-accent, #c9a84c) 30%, transparent);
 }
 
 /* Summary / Specialization Area */
@@ -364,7 +364,7 @@
   color: #ffffff;
   border-color: var(--color-primary, #1b4332);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(27, 67, 50, 0.2);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--color-primary, #1b4332) 20%, transparent);
   outline: none;
 }
 
