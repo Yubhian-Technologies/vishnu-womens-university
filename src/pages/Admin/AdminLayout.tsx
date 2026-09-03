@@ -10,6 +10,7 @@ import './Admin.css';
 
 export const SECTIONS = [
   { id: 'overview',       icon: '📊', label: 'Overview' },
+  { id: 'theme',          icon: '🎨', label: 'Color Theme' },
   { id: 'banners',        icon: '🖼️', label: 'Hero Banners' },
   { id: 'landing-pages',  icon: '🏠', label: 'Landing Pages' },
   { id: 'news',           icon: '📰', label: 'News & Events' },
@@ -70,7 +71,7 @@ export const SECTIONS = [
 export const SECTION_GROUPS: { label: string; ids: string[] }[] = [
   { label: 'Overview', ids: ['overview'] },
   { label: 'Form Submissions', ids: ['contact-messages', 'career-applications', 'admission-inquiries', 'campus-visit-requests'] },
-  { label: 'Site Appearance', ids: ['banners', 'landing-pages', 'site-photos', 'nav-links', 'content-blocks', 'compliance-docs'] },
+  { label: 'Site Appearance', ids: ['theme', 'banners', 'landing-pages', 'site-photos', 'nav-links', 'content-blocks', 'compliance-docs'] },
   { label: 'About & Governance', ids: ['governing-body', 'governance-items', 'annual-reports', 'nirf-reports', 'nba-data', 'core-executives', 'sves-campuses', 'contacts', 'policies'] },
   { label: 'Academics', ids: ['programs', 'schools', 'departments', 'faculty', 'curriculum', 'downloads'] },
   { label: 'Admissions & Campus Info', ids: ['information'] },
