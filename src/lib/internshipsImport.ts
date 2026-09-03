@@ -11,21 +11,21 @@ export {
 } from './placementsImport';
 
 // Column names chosen to match the auto-detection heuristics in
-// internshipRecords.ts: "S.No" (findInternshipSerialColumnIndex — hidden
-// from the public table, which numbers rows itself), "Company" and
-// "Stipend" (used for the stat tiles and the "10 highest" sort).
-// "Registration Number", "Student Name", and "Industry Type" have no
-// special handling — they just display as-is.
-const INTERNSHIP_TEMPLATE_HEADERS = ['S.No', 'Registration Number', 'Student Name', 'Company', 'Industry Type', 'Stipend'];
+// internshipRecords.ts: "S. No." (findInternshipSerialColumnIndex — hidden
+// from the public table, which numbers rows itself), "Name of Company"
+// (used for the "No. of Companies" stat tile) and "Period" (shown as the
+// card badge on the public page). "Name of the Student" and "Skill" have
+// no special handling — they just display as-is.
+const INTERNSHIP_TEMPLATE_HEADERS = ['S. No.', 'Name of the Student', 'Skill', 'Name of Company', 'Period'];
 
 // Two rows for the same student ("A. Priya") to make the whole-row-only
 // duplicate rule concrete in the template itself, rather than just in
 // admin copy: repeating a name/company/etc. is fine, only an exact
 // duplicate row (every column the same) gets rejected on import.
 const INTERNSHIP_TEMPLATE_EXAMPLE_ROWS = [
-  ['1', '21A91A0501', 'A. Priya', 'TCS', 'IT Services', '15000'],
-  ['2', '21A91A0502', 'B. Swathi', 'Infosys', 'IT Services', '20000'],
-  ['3', '21A91A0501', 'A. Priya', 'Wipro', 'IT Services', '18000'],
+  ['1', 'A. Priya', 'Web Development', 'TCS', '6 Weeks'],
+  ['2', 'B. Swathi', 'Data Analytics', 'Infosys', '2 Months'],
+  ['3', 'A. Priya', 'Cloud Computing', 'Wipro', '4 Weeks'],
 ];
 
 /** Downloads a blank Internships import template (.xlsx) with the expected

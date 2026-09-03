@@ -541,6 +541,31 @@ function CustomSectionBodyContent({ section }: { section: CustomSection }) {
   if (section.contentType === 'gallery') {
     return <GalleryGrid photos={section.galleryPhotos || []} />;
   }
+  if (section.contentType === 'imageCards') {
+    const cards = (section.imageCards || []).filter((c) => c.imageUrl || c.title.trim() || c.description.trim());
+    if (cards.length === 0) return null;
+    return (
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 'var(--space-5)' }}>
+        {cards.map((card, ci) => (
+          <div key={ci} style={{ border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', overflow: 'hidden', background: 'var(--color-white)' }}>
+            {card.imageUrl && (
+              <img src={card.imageUrl} alt={card.title} style={{ width: '100%', aspectRatio: '4 / 3', objectFit: 'cover', display: 'block' }} />
+            )}
+            <div style={{ padding: 'var(--space-3) var(--space-4)' }}>
+              {card.title && (
+                <h4 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary-dark)', margin: '0 0 var(--space-1)' }}>
+                  {card.title}
+                </h4>
+              )}
+              {card.description && (
+                <p style={{ color: 'var(--color-text)', lineHeight: 1.6, margin: 0, whiteSpace: 'pre-line' }}>{card.description}</p>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
   // files
   const files = (section.files || []).filter((f) => f.fileUrl);
   return (
