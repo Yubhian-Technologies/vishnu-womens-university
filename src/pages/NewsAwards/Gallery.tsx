@@ -164,6 +164,8 @@ export default function Gallery() {
             ))}
           </div>
 
+          {/* Rendered from Firestore, so no scroll-reveal animation here
+              (see the gotcha documented in CLAUDE.md). */}
           {photosLoading ? (
             <p style={{ color: 'var(--color-text-light)' }}>Loading photos…</p>
           ) : filteredPhotos.length > 0 ? (
@@ -171,8 +173,7 @@ export default function Gallery() {
               {filteredPhotos.map((photo, i) => (
                 <div
                   key={photo.id}
-                  className="pg-tile reveal"
-                  data-delay={`${(i % 4) * 60}`}
+                  className="pg-tile"
                   onClick={() => setLightboxIndex(i)}
                 >
                   <img src={photo.imageUrl} alt={photo.title} />

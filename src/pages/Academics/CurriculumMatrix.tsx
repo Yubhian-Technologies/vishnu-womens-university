@@ -176,9 +176,16 @@ export default function CurriculumMatrix() {
                                             rel="noopener noreferrer"
                                             download
                                             aria-label={`Download ${row.rowLabel} ${reg} curriculum`}
-                                            style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: '50%', background: 'var(--color-accent)', color: 'var(--color-primary-dark)' }}
+                                            /* Visual circle stays 28px (fits the dense matrix), but the
+                                               actual link box is expanded to a 44px hit area — negative
+                                               margin absorbs the extra into the existing cell padding so
+                                               the table layout doesn't shift. See the 48dp minimum
+                                               touch-target rule in docs/google-ui-design-principles.md. */
+                                            style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 44, height: 44, margin: '-8px', borderRadius: '50%' }}
                                           >
-                                            <Download size={15} strokeWidth={2.25} />
+                                            <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: '50%', background: 'var(--color-accent)', color: 'var(--color-primary-dark)' }}>
+                                              <Download size={15} strokeWidth={2.25} />
+                                            </span>
                                           </a>
                                         ) : (
                                           <span style={{ color: 'var(--color-text-light)' }}>--</span>

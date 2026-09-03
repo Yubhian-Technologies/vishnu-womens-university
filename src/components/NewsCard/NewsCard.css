@@ -1,18 +1,19 @@
 .news-card {
   background: var(--color-white);
-  border-radius: var(--radius-md);
+  border-radius: 22px;
   overflow: hidden;
   box-shadow: var(--shadow-sm);
   transition: all var(--transition-base);
   display: flex;
   flex-direction: column;
   height: 100%;
-  border: 1px solid var(--color-light-gray);
+  border: 1px solid rgba(27, 67, 50, 0.08);
 }
 
 .news-card:hover {
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-6px);
+  box-shadow: var(--shadow-xl);
+  border-color: var(--color-accent);
+  transform: translateY(-4px);
 }
 
 .news-card-image-wrap {
@@ -30,7 +31,7 @@
 }
 
 .news-card:hover .news-card-image {
-  transform: scale(1.07);
+  transform: scale(1.06);
 }
 
 .news-card-category {
@@ -40,11 +41,12 @@
   background: var(--color-accent);
   color: var(--color-primary-dark);
   font-size: var(--text-xs);
-  font-weight: 900;
-  letter-spacing: 0.1em;
+  font-weight: 800;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  padding: 4px 10px;
-  border-radius: var(--radius-sm);
+  padding: 0.3rem 0.85rem;
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-sm);
 }
 
 .news-card-body {

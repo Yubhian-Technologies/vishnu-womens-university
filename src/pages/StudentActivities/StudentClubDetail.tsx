@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { Users, FileText } from 'lucide-react';
 import { useOrderedCollection } from '../../hooks/useCollection';
+import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import { slugify } from '../../lib/slugify';
 import type { ClubDoc } from '../Admin/sections/StudentClubsAdmin';
 import { CLUB_CATEGORY_ICONS } from '../Admin/sections/StudentClubsAdmin';
@@ -25,9 +26,7 @@ export default function StudentClubDetail() {
   if (!club) {
     if (loading) {
       return (
-        <main className="route-fallback">
-          <div className="route-fallback__spinner" />
-        </main>
+        <RouteFallback />
       );
     }
     return <Navigate to="/student-clubs" replace />;

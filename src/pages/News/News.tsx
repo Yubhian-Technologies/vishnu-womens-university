@@ -101,11 +101,12 @@ export default function News() {
         scrollCtaTargetId="news-content"
       />
 
-      {/* Featured Article */}
+      {/* Featured Article — rendered from Firestore, so no scroll-reveal
+          animation here (see the gotcha documented in CLAUDE.md). */}
       {featuredItem && (
         <section className="news-featured">
           <div className="container">
-            <div className="news-featured-card reveal">
+            <div className="news-featured-card">
               <div className="news-featured-image">
                 <SmoothImage
                   src={featuredItem.imageUrl || NEWS_FALLBACK_IMAGE}
@@ -169,9 +170,12 @@ export default function News() {
                 Showing {filtered.length} {filtered.length === 1 ? 'article' : 'articles'}
                 {activeCategory !== 'All' && ` in ${activeCategory}`}
               </div>
+              {/* Firestore-derived (news + happenings), so no scroll-reveal
+                  animation on the cards themselves (see the gotcha
+                  documented in CLAUDE.md). */}
               <div className="news-articles-grid">
-                {filtered.map((item, i) => (
-                  <div key={item.id} className="reveal" data-delay={`${(i % 3) * 100}`}>
+                {filtered.map((item) => (
+                  <div key={item.id}>
                     <NewsCard article={item} onReadMore={() => setActiveArticle(item)} />
                   </div>
                 ))}

@@ -37,19 +37,12 @@ export const institutionInnovationCell = {
     // The "Click here to view" council members PDF link is now
     // admin-editable — see IicDocumentsAdmin.tsx (iicCouncilMembersLinks).
   },
-  innovationAmbassadors: {
-    roleIntro: 'The role of an Innovation Ambassador is to:',
-    responsibilities: [
-      'Help in creating the culture of Innovation.',
-      'Mentor the Faculty and students.',
-      'Provide support to other IICs as resource person.',
-      'Spread the message of innovation and start-ups among the students and faculties.',
-      'Act as an evaluator for Idea Competitions conducted at national level.',
-    ],
-    listIntro: 'The following are the Innovation Ambassador’s at SVECW',
-    // Faculty/Student Innovation Ambassador PDF links are now admin-editable
-    // — see IicDocumentsAdmin.tsx (iicInnovationAmbassadorLinks).
-  },
+  // Innovation Ambassadors' role description, responsibilities, and the
+  // caption above the PDF links are now admin-editable Custom Sections on
+  // that tab (Admin -> Differentiators -> Institution Innovation Cell ->
+  // Tabs -> Innovation Ambassadors) — the Faculty/Student PDF links
+  // themselves were already admin-editable, see IicDocumentsAdmin.tsx
+  // (iicInnovationAmbassadorLinks).
   activities: {
     intro: 'The Institute Innovation Council (IIC) plays a pivotal role in fostering an inclusive environment that actively engages faculty, students, and staff in a diverse array of innovation and entrepreneurship initiatives. These encompass ideation, problem-solving, proof of concept development, design thinking, intellectual property rights (IPR) considerations, and adept project handling and management, particularly during the critical pre-incubation and incubation stages. Through these multifaceted activities, the IIC cultivates a dynamic ecosystem conducive to the exploration and realization of innovative ideas within our college community.',
     // Year-by-year IIC Activities PDFs are now admin-editable — see

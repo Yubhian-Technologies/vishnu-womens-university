@@ -149,14 +149,19 @@ export default function About() {
       {/* Hero */}
       <PageHero
         page="about"
-        defaultTitle="About Vishnu Women's University"
-  defaultSubtitle="Rooted in Bhimavaram since 2001, VWU has grown into Andhra Pradesh's foremost institution for women's technical education."
+        defaultTitle="Vishnu Women's University"
+        defaultSubtitle="The First Private State University for Women in the Telugu States — Empowering Women. Inspiring Excellence. Shaping the Future."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'About VWU' }]}
       />
 
       {/* Quick Stats */}
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-8) 0' }}>
         <div className="container">
+          <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-6)' }}>
+            <h2 style={{ color: 'var(--color-white)', fontSize: 'clamp(1.5rem, 3vw, 2rem)', marginBottom: 'var(--space-2)' }}>
+              A Legacy of Excellence. A Future of Possibilities.
+            </h2>
+          </div>
           <div className="about-facts-bar">
             {quickStats.map(s => (
               <div key={s.id} className="about-fact">
@@ -165,6 +170,9 @@ export default function About() {
               </div>
             ))}
           </div>
+          <p style={{ textAlign: 'center', color: 'rgba(255,255,255,0.75)', marginTop: 'var(--space-6)' }}>
+            Building on decades of experience in women's education and professional learning.
+          </p>
         </div>
       </section>
 
@@ -176,19 +184,12 @@ export default function About() {
               <span className="section-label">Who We Are</span>
               <h2 className="section-title">First Private State University for Women in Telugu States</h2>
               <div className="divider" />
-              <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-4)', color: 'var(--color-text-light)' }}>
-                Vishnu Women's University is set in Vishnupur, 3 km from Bhimavaram along Tadepalligudem Road
-                in Coastal Andhra Pradesh. The campus stretches across approximately <strong> 80 acres</strong>,
-                offering an environment well-suited to focused, high-quality learning.
-              </p>
-              <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-4)', color: 'var(--color-text-light)' }}>
-                Operating under the <strong>Sri Vishnu Educational Society</strong> 
-                VWU carries UGC, NBA Accreditation, AICTE approval, and NAAC recognition.
-                Its infrastructure includes fully equipped laboratories, smart classrooms, drawing halls, and seminar rooms.
-              </p>
               <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-6)', color: 'var(--color-text-light)' }}>
-                Having graduated <strong>15,000 engineers</strong> and achieved <strong>1,100+ annual placements</strong>,
-                VWU stands as the leading destination for women's education in the Telugu-speaking states.
+                Vishnu Women's University (VWU), located at Vishnupur, Bhimavaram, Andhra Pradesh, is a pioneering
+                institution dedicated to women's higher education. Established under the{' '}
+                <strong>Andhra Pradesh Private Universities Act, 2016</strong>, VWU carries forward the rich
+                educational legacy of the <strong>Sri Vishnu Educational Society</strong>, with a vision to empower
+                women through excellence in education, innovation, leadership, and entrepreneurship.
               </p>
               <div style={{ display: 'flex', gap: 'var(--space-4)', flexWrap: 'wrap' }}>
                 <Link to="/vision-mission" className="btn btn-primary">Vision & Mission</Link>
@@ -208,8 +209,57 @@ export default function About() {
         </div>
       </section>
 
-      {/* Academic Snapshot */}
+      {/* Where Women Learn, Lead & Transform */}
       <section className="section bg-white">
+        <div className="container">
+          <div className="reveal" style={{ textAlign: 'center', maxWidth: 820, margin: '0 auto var(--space-10)' }}>
+            <span className="section-label">Our Campus & Approach</span>
+            <h2 className="section-title">Where Women Learn, Lead & Transform</h2>
+            <p style={{ color: 'var(--color-text-light)', lineHeight: 1.8, marginBottom: 'var(--space-4)' }}>
+              Set across an approximately 80-acre campus at Vishnupur, just 3 km from Bhimavaram on the
+              Tadepalligudem Road, Vishnu Women's University offers an inspiring environment for learning,
+              discovery, and personal growth.
+            </p>
+            <p style={{ color: 'var(--color-text-light)', lineHeight: 1.8 }}>
+              Under the guidance of the Sri Vishnu Educational Society, VWU brings together academic excellence,
+              modern infrastructure, industry engagement, innovation, and student-centric learning.
+            </p>
+          </div>
+          <div
+            className="reveal-scale"
+            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 'var(--space-5)' }}
+          >
+            {[
+              { title: 'Academic Excellence', desc: 'Future-focused programmes designed to develop strong academic foundations, professional competence, and lifelong learning.' },
+              { title: 'Innovation & Research', desc: 'An ecosystem that encourages curiosity, creativity, research, problem-solving, and entrepreneurship.' },
+              { title: 'Industry & Careers', desc: 'Strong industry connect and career-oriented learning that prepare students for emerging opportunities and global careers.' },
+              { title: 'Holistic Development', desc: 'Beyond academics, students are encouraged to develop leadership, communication, confidence, creativity, and social responsibility.' },
+              { title: 'World-Class Learning Environment', desc: 'Advanced laboratories, smart classrooms, drawing halls, seminar halls, and modern academic facilities create an engaging learning experience.' },
+            ].map((pillar) => (
+              <div
+                key={pillar.title}
+                style={{
+                  background: 'var(--color-off-white)',
+                  border: '1.5px solid var(--color-light-gray)',
+                  borderRadius: 'var(--radius-md)',
+                  borderTop: '4px solid var(--color-accent)',
+                  padding: 'var(--space-6)',
+                }}
+              >
+                <h3 style={{ fontSize: 'var(--text-lg)', color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>
+                  {pillar.title}
+                </h3>
+                <p style={{ color: 'var(--color-text-light)', lineHeight: 1.7, fontSize: 'var(--text-sm)' }}>
+                  {pillar.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Academic Snapshot */}
+      <section className="section bg-off-white">
         <div className="container">
           <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-12)', alignItems: 'center' }}>
             <div className="reveal-left">
@@ -428,6 +478,30 @@ export default function About() {
                 </Link>
               );
             })}
+          </div>
+        </div>
+      </section>
+
+      {/* A University Built for Her Ambition */}
+      <section className="section bg-white">
+        <div className="container" style={{ textAlign: 'center' }}>
+          <div className="reveal" style={{ maxWidth: 780, margin: '0 auto' }}>
+            <span className="section-label">Our Commitment</span>
+            <h2 className="section-title">A University Built for Her Ambition</h2>
+            <p style={{ color: 'var(--color-text-light)', lineHeight: 1.8, marginBottom: 'var(--space-4)' }}>
+              At Vishnu Women's University, education goes beyond classrooms. We create opportunities for young
+              women to discover their potential, pursue their passions, build meaningful careers, and lead with
+              confidence.
+            </p>
+            <p style={{ color: 'var(--color-text-light)', lineHeight: 1.8, marginBottom: 'var(--space-6)' }}>
+              With a strong foundation in education and a forward-looking approach to learning, VWU is committed
+              to shaping women who are ready to make a difference — in industry, research, entrepreneurship,
+              society, and the world.
+            </p>
+            <p style={{ fontFamily: 'var(--font-serif)', fontWeight: 700, fontSize: 'var(--text-xl)', color: 'var(--color-primary)' }}>
+              Her Education. Her Confidence. Her Future.<br />
+              Her University — Vishnu Women's University.
+            </p>
           </div>
         </div>
       </section>

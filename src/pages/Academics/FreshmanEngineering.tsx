@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { MapPin, ChevronRight } from 'lucide-react';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { linkify } from '../../lib/linkify';
@@ -7,6 +8,7 @@ import { getSectionBlocks } from '../../lib/facultySections';
 import FacultySectionContent from '../../components/FacultySectionContent/FacultySectionContent';
 import { hasCustomSectionContent } from '../../lib/customSections';
 import { SectionSubtree } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
+import MarqueeText from '../../components/MarqueeText/MarqueeText';
 import type { FacultyDoc } from './Faculty';
 import '../detail-layout.css';
 
@@ -233,7 +235,7 @@ function useDeptFaculty(department: string) {
   return { members, loading };
 }
 
-function FeAboutHodSection({ department }: { department: string }) {
+export function FeAboutHodSection({ department }: { department: string }) {
   const { members, loading } = useDeptFaculty(department);
   const hod = members.find((f) => /head|hod/i.test(f.designation));
   // Same Custom Sections / legacy-fallback split as FacultyProfile.tsx — see
@@ -328,7 +330,7 @@ function FeAboutHodSection({ department }: { department: string }) {
   );
 }
 
-function FeFacultyGridSection({ department }: { department: string }) {
+export function FeFacultyGridSection({ department }: { department: string }) {
   const { members, loading } = useDeptFaculty(department);
 
   if (!loading && members.length === 0) {
@@ -488,10 +490,14 @@ function LabSection({ labs }: { labs: LabInfo[] }) {
 }
 
 // ---- Sub-departments (Mathematics / Physics / Chemistry / English) ----
-// Each of these also has its own standalone page at
-// /academics/freshman-engineering/<slug> (FreshmanSubDepartment.tsx), which
-// renders this exact same data via the exported SubDeptSection below —
-// `slug` is that page's URL segment.
+// Each of these ALSO exists as its own real, admin-editable Department
+// record now — see StandaloneDepartmentDetail.tsx, reached directly at
+// /academics/<slug> via departmentGroups.ts's STANDALONE_DEPARTMENTS
+// (which is what /academics/mathematics etc. actually render — this
+// combined page's own "Department of X" tabs below are no longer linked to
+// from anywhere, kept only because the hardcoded data here is exactly what
+// DepartmentsAdmin.tsx's "Quick Add" seeds those 4 records from — see
+// freshmanDepartmentSeeds.ts).
 interface SubDept {
   key: string;
   slug: string;
@@ -809,10 +815,11 @@ function LibrarySection() {
   );
 }
 
-// Shared right-rail nav, shown here and on each of the 4 standalone
-// sub-department pages (FreshmanSubDepartment.tsx) — all link back to this
-// page with a specific tab pre-selected. `activeHref` highlights whichever
-// one matches the page currently being viewed.
+// Right-rail nav for this combined page's own in-page tabs (About Freshman
+// Department / Vision & Mission / POs / Course structure / Department
+// Library) — the 4 subject tabs are no longer among these (see the
+// SUB_DEPTS comment above), so this only ever links back to this same page
+// with a different ?tab=.
 export const FE_SIDEBAR_ITEMS: { label: string; href: string }[] = [
   { label: FE_TABS[0], href: '/academics/freshman-engineering' },
   ...FE_TABS.slice(1, 4).map((tab) => ({ label: tab, href: `/academics/freshman-engineering?tab=${encodeURIComponent(tab)}` })),
@@ -822,24 +829,37 @@ export const FE_SIDEBAR_ITEMS: { label: string; href: string }[] = [
 export function FreshmanSidebarNav({ activeHref }: { activeHref: string }) {
   return (
     <div className="detail-sidebar">
-      <div style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', overflow: 'hidden', position: 'sticky', top: '110px' }}>
-        {FE_SIDEBAR_ITEMS.map((item) => {
-          const isActive = item.href === activeHref;
-          const itemStyle = {
-            display: 'block', width: '100%', textAlign: 'left' as const,
-            padding: 'var(--space-3) var(--space-5)', border: 'none',
-            borderBottom: '1px solid var(--color-light-gray)',
-            background: isActive ? 'var(--color-primary)' : 'transparent',
-            color: isActive ? 'var(--color-white)' : 'var(--color-primary)',
-            fontWeight: isActive ? 700 : 600, fontSize: 'var(--text-sm)',
-            textDecoration: 'none',
-          };
-          return isActive ? (
-            <div key={item.href} style={itemStyle}>{item.label}</div>
-          ) : (
-            <Link key={item.href} to={item.href} style={itemStyle}>{item.label}</Link>
-          );
-        })}
+      <div style={{ position: 'sticky', top: '110px' }}>
+        <nav className="dept-quick-nav-card" aria-label="Quick Links">
+          <div className="dept-quick-nav-header">
+            <div className="dept-quick-nav-icon">
+              <MapPin size={15} strokeWidth={2.4} />
+            </div>
+            <div className="dept-quick-nav-title-wrap">
+              <h4 className="dept-quick-nav-title">Quick Navigation</h4>
+              <span className="dept-quick-nav-subtitle">{FE_SIDEBAR_ITEMS.length} Sections</span>
+            </div>
+          </div>
+          <ul className="dept-quick-nav-list" role="list">
+            {FE_SIDEBAR_ITEMS.map((item) => {
+              const isActive = item.href === activeHref;
+              return (
+                <li key={item.href} className="dept-quick-nav-item">
+                  <Link
+                    to={item.href}
+                    aria-current={isActive ? 'true' : undefined}
+                    className={`dept-quick-nav-link${isActive ? ' is-active' : ''}`}
+                  >
+                    <MarqueeText text={item.label} className="dept-quick-nav-text" />
+                    <span className="dept-btn-arrow-circle">
+                      <ChevronRight size={13} strokeWidth={2.4} className="dept-quick-nav-arrow" aria-hidden="true" />
+                    </span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
       </div>
     </div>
   );

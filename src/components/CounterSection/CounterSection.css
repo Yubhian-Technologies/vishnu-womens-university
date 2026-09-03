@@ -1,185 +1,213 @@
-/* ===== Counter Section — Alternating Card Backgrounds ===== */
+/* ==========================================================================
+   Google Material 3 (M3) Key Statistics & Counter Design System
+   Icon-Free, Pure Typography & Glassmorphism Metric Tiles
+   ========================================================================== */
 
-.counter-section {
+.counter-section-m3 {
+  /* VWU premium theme — scoped locally so it only affects this component;
+     the site-wide tokens in styles/variables.css are untouched. */
+  --home-teal: #04384B;
+  --home-teal-deep: #022530;
+  --home-white: #FFFFFF;
+  --home-ivory: #F5F0C6;
+  --home-orange: #FF7A00;
+  --home-orange-dark: #E56E00;
+  --home-green: #78C900;
+  --home-violet: #B85BC8;
+
+  position: relative;
   width: 100%;
-  overflow-x: auto;
-  scrollbar-width: none;
+  background: var(--home-teal-deep);
+  background: radial-gradient(circle at 50% 50%, var(--home-teal) 0%, var(--home-teal-deep) 60%, #011820 100%);
+  padding: clamp(3rem, 5.5vw, 4.75rem) 0;
+  overflow: hidden;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.counter-section::-webkit-scrollbar {
-  display: none;
+/* Ambient Radial Glow */
+.counter-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 700px;
+  height: 250px;
+  /* Faint green/violet nod to the VWU mark, same restrained ambient-glow
+     treatment as the Hero's corner glows — no dominant color fill. */
+  background: radial-gradient(circle, rgba(120, 201, 0, 0.10) 0%, rgba(184, 91, 200, 0.08) 50%, transparent 80%);
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(50px);
+  z-index: 1;
 }
 
-.counter-grid {
-  display: flex;
-  flex-wrap: nowrap;
+/* Container & Grid Layout */
+.counter-grid-m3 {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+  gap: clamp(0.75rem, 1.4vw, 1.25rem);
   align-items: stretch;
-  min-width: max-content;
-  width: 100%;
 }
 
-/* ── Each Counter Card ── */
-.counter-item {
-  flex: 1 1 0;
-  min-width: 150px;
+@media (min-width: 1200px) {
+  .counter-grid-m3 {
+    grid-template-columns: repeat(7, 1fr);
+  }
+}
+
+/* ==========================================================================
+   M3 Metric Card
+   ========================================================================== */
+
+.counter-item-m3 {
+  position: relative;
   text-align: center;
-  padding: clamp(1.75rem, 3vw, 2.75rem) clamp(1rem, 2.5vw, 2rem);
+  padding: clamp(1.4rem, 2.2vw, 1.85rem) clamp(0.75rem, 1.5vw, 1.2rem);
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  gap: var(--space-2);
-  transition: filter 0.2s ease, transform 0.2s ease;
-  position: relative;
-  border-right: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.counter-item:last-child {
-  border-right: none;
-}
-
-.counter-item:hover {
-  filter: brightness(1.05);
-}
-
-/* ── Alternating Theme A: Deep Forest Green ── */
-.counter-theme--forest {
-  background: linear-gradient(160deg, #1b4332 0%, #133226 50%, #0d2218 100%);
-}
-
-/* ── Alternating Theme B: Clean White ── */
-.counter-theme--white {
-  background: #ffffff;
-  border-right: 1px solid rgba(27, 67, 50, 0.09);
-}
-
-/* ── FA Icon Circle ── */
-.counter-icon-wrap {
-  width: 54px;
-  height: 54px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
   justify-content: center;
-  margin-bottom: var(--space-2);
-  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 10px 28px -8px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transition: all 260ms cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  cursor: default;
 }
 
-.counter-item:hover .counter-icon-wrap {
-  transform: scale(1.12) rotate(6deg);
+/* Decorative hover state-layer — green accent, inspired by the VWU mark */
+.counter-item-state-layer {
+  position: absolute;
+  inset: 0;
+  background: var(--home-green);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms ease;
+  z-index: 0;
 }
 
-.counter-theme--forest .counter-icon-wrap {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1.5px solid rgba(200, 169, 106, 0.45);
+.counter-item-m3:hover {
+  transform: translateY(-5px);
+  background: rgba(255, 255, 255, 0.11);
+  border-color: rgba(120, 201, 0, 0.45);
+  box-shadow: 0 16px 36px -6px rgba(0, 0, 0, 0.65), 0 0 20px rgba(120, 201, 0, 0.15);
 }
 
-.counter-theme--white .counter-icon-wrap {
-  background: rgba(27, 67, 50, 0.07);
-  border: 1.5px solid rgba(27, 67, 50, 0.18);
+.counter-item-m3:hover .counter-item-state-layer {
+  opacity: 0.04;
 }
 
-.counter-fa-icon {
-  font-size: 1.25rem;
-  transition: color 0.2s ease;
-}
-
-.counter-theme--forest .counter-fa-icon {
-  color: var(--color-accent, #c9a84c);
-}
-
-.counter-theme--white .counter-fa-icon {
-  color: var(--color-primary, #1b4332);
-}
-
-/* ── Number ── */
-.counter-number {
-  font-family: var(--font-serif);
-  font-size: clamp(2rem, 3vw, 2.85rem);
+/* ── Number & Suffix ── */
+.counter-number-m3 {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-sans);
+  font-size: clamp(2rem, 2.6vw, 2.75rem);
   font-weight: 900;
   line-height: 1;
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  gap: 1px;
-  letter-spacing: -0.02em;
-}
-
-.counter-theme--forest .counter-number {
+  letter-spacing: -0.03em;
   color: #ffffff;
+  margin-bottom: var(--space-2);
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
 }
 
-.counter-theme--white .counter-number {
-  color: var(--color-primary-dark, #0b1f16);
+.counter-value {
+  display: inline-block;
 }
 
-.counter-suffix {
-  font-size: 1.4rem;
-  font-weight: 900;
-  margin-top: 3px;
+.counter-suffix-m3 {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--home-ivory);
+  margin-left: 1px;
+  line-height: 1;
+  margin-top: 1px;
+  text-shadow: 0 0 12px rgba(245, 240, 198, 0.5);
 }
 
-.counter-theme--forest .counter-suffix {
-  color: var(--color-accent, #c9a84c);
-}
-
-.counter-theme--white .counter-suffix {
-  color: var(--color-primary, #1b4332);
-}
-
-/* ── Label & Sub ── */
-.counter-label {
+/* ── Metric Label ── */
+.counter-label-m3 {
+  position: relative;
+  z-index: 1;
   font-family: var(--font-sans);
-  font-size: clamp(0.82rem, 1.1vw, 0.92rem);
+  font-size: clamp(0.82rem, 1.05vw, 0.92rem);
   font-weight: 700;
-  line-height: 1.4;
-  max-width: 150px;
-  margin: 0 auto;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.95);
+  margin: 0 0 8px 0;
+  letter-spacing: -0.01em;
 }
 
-.counter-theme--forest .counter-label {
-  color: rgba(255, 255, 255, 0.88);
+/* ── Subtitle / Micro Pill Tag ── */
+.counter-sub-pill {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-full);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 200ms ease;
+  white-space: nowrap;
 }
 
-.counter-theme--white .counter-label {
-  color: var(--color-primary-dark, #0b1f16);
+.counter-item-m3:hover .counter-sub-pill {
+  background: rgba(120, 201, 0, 0.16);
+  border-color: rgba(120, 201, 0, 0.35);
+  color: var(--home-white);
 }
 
-.counter-sub {
-  font-size: var(--text-xs, 0.75rem);
-  font-weight: 500;
-  margin-top: 2px;
-}
+/* ==========================================================================
+   Responsive Breakpoints
+   ========================================================================== */
 
-.counter-theme--forest .counter-sub {
-  color: rgba(255, 255, 255, 0.42);
-}
-
-.counter-theme--white .counter-sub {
-  color: #6b7280;
-}
-
-/* ── Responsive ── */
-@media (max-width: 900px) {
-  .counter-grid {
-    flex-wrap: wrap;
+@media (max-width: 992px) {
+  .counter-grid-m3 {
+    grid-template-columns: repeat(4, 1fr);
   }
 
-  .counter-item {
-    flex: 1 1 calc(33.333% - 2px);
-    min-width: 0;
-    border-right: none;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  }
-
-  .counter-theme--white {
-    border-bottom: 1px solid rgba(27, 67, 50, 0.09);
+  .counter-item-m3:last-child {
+    grid-column: span 4;
+    max-width: 260px;
+    margin: 0 auto;
+    width: 100%;
   }
 }
 
-@media (max-width: 540px) {
-  .counter-item {
-    flex: 1 1 calc(50% - 2px);
-    padding: 1.5rem 1rem;
+@media (max-width: 640px) {
+  .counter-grid-m3 {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .counter-item-m3 {
+    padding: 1.25rem 0.75rem;
+    border-radius: 16px;
+  }
+
+  .counter-item-m3:last-child {
+    grid-column: span 2;
+    max-width: 100%;
+  }
+
+  .counter-sub-pill {
+    white-space: normal;
   }
 }

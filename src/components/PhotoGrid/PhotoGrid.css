@@ -354,6 +354,14 @@
 
 .photo-lightbox-close:hover { background: rgba(255,255,255,0.2); }
 
+/* The visible circle stays compact by design; expand the tappable area
+   invisibly to meet the 48x48dp minimum touch target instead of growing it. */
+.photo-lightbox-close::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+}
+
 .photo-lightbox-prev,
 .photo-lightbox-next {
   position: absolute;

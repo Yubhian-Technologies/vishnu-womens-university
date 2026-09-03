@@ -33,14 +33,17 @@
   background: radial-gradient(circle, rgba(45, 106, 79, 0.15) 0%, rgba(200, 169, 106, 0.08) 60%, transparent 80%);
 }
 
-/* Main Split Grid */
+/* Main Split Grid. The placement card already fills 100% of its own
+   column — the leftover space to its right was the column itself being
+   the minority share (0.85fr) of the row. Right column now dominant so
+   the card actually reads as using the right side of the section. */
 .we-grid {
   position: relative;
   z-index: 2;
   display: grid;
-  grid-template-columns: 1.15fr 0.85fr;
+  grid-template-columns: 0.9fr 1.4fr;
   align-items: center;
-  gap: clamp(2rem, 5vw, 4.5rem);
+  gap: clamp(1.5rem, 4vw, 3.5rem);
   margin-bottom: clamp(3rem, 6vw, 4.5rem);
 }
 
@@ -170,11 +173,13 @@
 .we-illustration-card {
   position: relative;
   width: 100%;
-  max-width: 440px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: clamp(1.5rem, 3vw, 2.5rem);
+  /* Vertical padding only — horizontal padding here was eating into the
+     rectangle's own width for no reason, since the card already fills the
+     column. */
+  padding: clamp(1rem, 2vw, 1.5rem) 0;
 }
 
 /* Halo Ring */
@@ -200,34 +205,166 @@
   }
 }
 
-/* Circular auto-rotating placement photo carousel — no controls, pure
-   timed crossfade (see CAROUSEL_INTERVAL in the component). */
-.we-photo-carousel {
+/* Auto-rotating placement highlight card — no controls, pure timed
+   crossfade (see CAROUSEL_INTERVAL in the component). One continuous
+   silhouette, not two boxes with a gap: a circular photo whose right half
+   is overlapped by a rectangle of the *same height as the circle's
+   diameter*, so the rectangle visually originates from the circle's own
+   center line instead of sitting beside it. --we-photo-d is the single
+   source of truth both the circle's size and the rectangle's overlap math
+   are derived from, so they always stay in sync at every breakpoint. */
+.we-placement-highlight {
   position: relative;
   z-index: 2;
-  width: min(340px, 78vw);
-  aspect-ratio: 1 / 1;
-  border-radius: 50%;
-  overflow: hidden;
-  border: 6px solid #ffffff;
-  box-shadow: 0 20px 46px rgba(27, 67, 50, 0.22);
+  width: 100%;
+  height: clamp(230px, 30vw, 380px);
   animation: we-float-gentle 5s ease-in-out infinite;
 }
 
-.we-photo-carousel-img {
+.we-placement-card {
+  --we-photo-d: clamp(200px, 34vw, 340px);
   position: absolute;
   inset: 0;
+  display: flex;
+  align-items: center;
+  height: var(--we-photo-d);
+  opacity: 0;
+  transform: scale(0.98);
+  transition: opacity 700ms ease, transform 700ms ease;
+  pointer-events: none;
+}
+
+.we-placement-card.is-active {
+  opacity: 1;
+  transform: scale(1);
+  z-index: 1;
+}
+
+/* The circle — full diameter, painted above the rectangle so their shared
+   edge reads as one shape instead of a visible seam. */
+.we-placement-photo-wrap {
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
+  width: var(--we-photo-d);
+  height: var(--we-photo-d);
+  border-radius: 50%;
+  overflow: hidden;
+  border: 5px solid #ffffff;
+  box-shadow: 0 8px 20px rgba(8, 28, 21, 0.22);
+  background: #ffffff;
+}
+
+.we-placement-photo {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0;
-  transform: scale(1.04);
-  transition: opacity 900ms ease, transform 4.4s ease;
+  display: block;
 }
 
-.we-photo-carousel-img.is-active {
-  opacity: 1;
-  transform: scale(1);
+/* The rectangle — pulled left by half the circle's diameter so its own
+   left edge starts exactly at the circle's center, then padded back out
+   by the same amount so the text never sits underneath the photo. Plain
+   white glass — no color tint at all — just blur + a soft edge. */
+.we-placement-info {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  margin-left: calc(var(--we-photo-d) / -2);
+  padding: 0.5rem clamp(0.9rem, 2.4vw, 1.35rem) 0.5rem calc(var(--we-photo-d) / 2 + clamp(0.85rem, 2vw, 1.2rem));
+  border-radius: 0 22px 22px 0;
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-left: none;
+  box-shadow: 0 16px 40px rgba(8, 28, 21, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.we-placement-name {
+  font-family: var(--font-sans);
+  font-size: clamp(1.15rem, 2.8vw, 1.65rem);
+  font-weight: 900;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: #0f1f17;
+  line-height: 1.15;
+  margin: 0;
+}
+
+.we-placement-package {
+  font-family: var(--font-sans);
+  font-size: clamp(1.4rem, 3.4vw, 2rem);
+  font-weight: 900;
+  color: var(--color-primary, #1b4332);
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  margin: 0.15rem 0 0;
+}
+
+.we-placement-company {
+  font-family: var(--font-sans);
+  font-size: clamp(1.05rem, 2.3vw, 1.35rem);
+  font-weight: 800;
+  color: #374151;
+  text-transform: lowercase;
+  margin: 0.3rem 0 0;
+}
+
+/* Uploaded recruiter logo (admin) — shown instead of .we-placement-company
+   when a logo image is set. Height-capped, natural width, so a wide
+   wordmark and a square icon-mark both sit at a consistent visual size. */
+.we-placement-logo {
+  height: clamp(48px, 7.5vw, 78px);
+  width: auto;
+  max-width: 75%;
+  object-fit: contain;
+  object-position: left center;
+  margin-top: 0.5rem;
+  display: block;
+}
+
+/* Large, softly-tinted trophy watermark — fills the empty right portion
+   of the now much-wider glass panel with something that actually means
+   "placement achievement" instead of leaving it blank or padding it with
+   generic decoration. Absolutely-positioned elements with z-index:auto/0
+   actually paint *above* normal-flow siblings, not below — .we-placement-
+   text below is what forces the real content on top regardless. */
+.we-placement-badge-icon {
+  position: absolute;
+  z-index: 0;
+  right: clamp(0.75rem, 3vw, 2.25rem);
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: clamp(3.5rem, 9vw, 7rem);
+  color: rgba(27, 67, 50, 0.1);
+  pointer-events: none;
+}
+
+.we-placement-text {
+  position: relative;
+  z-index: 1;
+}
+
+/* A slot without real name/package/company data yet — plain photo, just
+   a neutral "VWU Graduate" caption instead of fabricated placement info. */
+.we-placement-info--pending {
+  align-items: center;
+  justify-content: center;
+}
+
+.we-placement-pending-note {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-primary, #1b4332);
+  text-align: center;
+  margin: 0;
 }
 
 @keyframes we-float-gentle {
@@ -237,188 +374,6 @@
   50% {
     transform: translateY(-8px);
   }
-}
-
-/* Floating Badges */
-.we-float-card {
-  position: absolute;
-  z-index: 3;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(27, 67, 50, 0.12);
-  border-radius: 14px;
-  padding: 10px 16px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
-  animation: we-float-badge 4s ease-in-out infinite;
-}
-
-.we-float-card--top {
-  top: 10px;
-  left: -20px;
-  animation-delay: 0s;
-}
-
-.we-float-card--bottom {
-  bottom: 20px;
-  right: -20px;
-  animation-delay: 2s;
-}
-
-@keyframes we-float-badge {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-6px);
-  }
-}
-
-.we-float-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: rgba(27, 67, 50, 0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.we-float-icon--gold {
-  background: rgba(200, 169, 106, 0.2);
-}
-
-.we-float-title {
-  display: block;
-  font-size: 0.85rem;
-  font-weight: 800;
-  color: var(--color-primary-dark, #0b1f16);
-  line-height: 1.2;
-}
-
-.we-float-subtitle {
-  display: block;
-  font-size: 0.72rem;
-  color: #6b7280;
-  font-weight: 500;
-}
-
-/* ==========================================================================
-   Bottom Four Impact Pillars Grid
-   ========================================================================== */
-.we-pillars-grid {
-  position: relative;
-  z-index: 2;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: clamp(1rem, 2vw, 1.5rem);
-}
-
-.we-pillar-card {
-  background: #ffffff;
-  border: 1px solid rgba(27, 67, 50, 0.09);
-  border-radius: 16px;
-  padding: 0;
-  overflow: hidden;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.03);
-  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.24s ease,
-              border-color 0.24s ease;
-  display: flex;
-  flex-direction: column;
-}
-
-.we-pillar-card:hover {
-  transform: translateY(-5px);
-  border-color: var(--color-accent, #c9a84c);
-  box-shadow: 0 16px 36px rgba(27, 67, 50, 0.09);
-}
-
-/* Illustration at top of pillar card */
-.we-pillar-illustration-wrap {
-  width: 100%;
-  height: 180px;
-  background: linear-gradient(135deg, #f0faf4 0%, #e8f5ec 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  border-bottom: 1px solid rgba(27, 67, 50, 0.06);
-  transition: background 0.3s ease;
-}
-
-.we-pillar-card:hover .we-pillar-illustration-wrap {
-  background: linear-gradient(135deg, #e6f4ec 0%, #d4edda 100%);
-}
-
-.we-pillar-illustration {
-  height: 155px;
-  width: auto;
-  object-fit: contain;
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.we-pillar-card:hover .we-pillar-illustration {
-  transform: scale(1.06) translateY(-3px);
-}
-
-/* Card body below illustration */
-.we-pillar-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: var(--space-3);
-  padding: 1.25rem 1.35rem 0;
-}
-
-.we-pillar-icon-box {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: rgba(27, 67, 50, 0.07);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  transition: background 0.2s ease;
-}
-
-.we-pillar-card:hover .we-pillar-icon-box {
-  background: rgba(27, 67, 50, 0.14);
-}
-
-.we-pillar-tag {
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #92400e;
-  background: rgba(254, 240, 138, 0.5);
-  border: 1px solid rgba(200, 169, 106, 0.3);
-  padding: 3px 8px;
-  border-radius: 6px;
-}
-
-.we-pillar-title {
-  font-family: var(--font-sans);
-  font-size: 1rem;
-  font-weight: 800;
-  color: var(--color-primary-dark, #0b1f16);
-  margin-bottom: 0.4rem;
-  line-height: 1.35;
-  padding: 0 1.35rem;
-}
-
-.we-pillar-desc {
-  font-size: 0.85rem;
-  line-height: 1.55;
-  color: #4b5563;
-  margin: 0;
-  padding: 0 1.35rem 1.35rem;
 }
 
 /* Responsive adjustments */
@@ -438,23 +393,5 @@
 
   .we-actions {
     justify-content: center;
-  }
-
-  .we-pillars-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 640px) {
-  .we-pillars-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .we-float-card--top {
-    left: 0;
-  }
-
-  .we-float-card--bottom {
-    right: 0;
   }
 }

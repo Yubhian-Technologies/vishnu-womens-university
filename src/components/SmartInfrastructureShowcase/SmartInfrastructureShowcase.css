@@ -1,0 +1,352 @@
+/* ==========================================================================
+   Smart Infrastructure & Living Campus Showcase Section
+   Cinematic Editorial Visuals with Google Material 3 Glassmorphism Cards
+   ========================================================================== */
+
+.infra-showcase-section {
+  position: relative;
+  min-height: 680px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  padding: clamp(5rem, 8vw, 7.5rem) 0;
+  background: #081c15;
+  color: #ffffff;
+}
+
+/* Background Image Wrap */
+.infra-showcase-bg-wrap {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.infra-showcase-bg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center right;
+  transform: scale(1.02);
+  transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.infra-showcase-section:hover .infra-showcase-bg {
+  transform: scale(1.05);
+}
+
+/* Multi-layered Cinematic Gradient Scrim */
+.infra-showcase-scrim {
+  position: absolute;
+  inset: 0;
+  background: 
+    linear-gradient(
+      90deg, 
+      rgba(8, 28, 21, 0.97) 0%, 
+      rgba(8, 28, 21, 0.92) 48%, 
+      rgba(8, 28, 21, 0.65) 75%, 
+      rgba(8, 28, 21, 0.30) 100%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(8, 28, 21, 0.6) 0%,
+      transparent 30%,
+      transparent 70%,
+      rgba(8, 28, 21, 0.85) 100%
+    );
+}
+
+/* Ambient Radial Glow */
+.infra-showcase-glow {
+  position: absolute;
+  top: -100px;
+  left: 10%;
+  width: 550px;
+  height: 550px;
+  background: radial-gradient(circle, rgba(201, 168, 76, 0.14) 0%, rgba(27, 67, 50, 0) 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Content Container */
+.infra-showcase-content {
+  position: relative;
+  z-index: 2;
+  max-width: 1100px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Main Heading */
+.infra-showcase-title {
+  font-family: var(--font-sans);
+  font-size: clamp(2.4rem, 4.5vw, 3.8rem);
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.15;
+  margin: 0 0 var(--space-4) 0;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.5);
+}
+
+/* Description paragraph */
+.infra-showcase-desc {
+  font-size: clamp(0.95rem, 1.2vw, 1.06rem);
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.68;
+  margin: 0 0 var(--space-10) 0;
+  max-width: 780px;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
+}
+
+/* ==========================================================================
+   3 Glassmorphism Pillar Cards
+   ========================================================================== */
+
+.infra-showcase-pillars {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-6);
+  margin-bottom: var(--space-8);
+}
+
+.infra-pillar-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--space-6);
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  text-decoration: none;
+  color: #ffffff;
+  transition: all 260ms cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.infra-pillar-card:hover {
+  transform: translateY(-6px);
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(201, 168, 76, 0.55);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35), 0 0 20px rgba(201, 168, 76, 0.15);
+}
+
+.infra-pillar-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+  gap: var(--space-2);
+}
+
+.infra-pillar-icon-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: rgba(201, 168, 76, 0.18);
+  color: var(--color-accent-light);
+  border: 1px solid rgba(201, 168, 76, 0.35);
+  transition: all 220ms ease;
+}
+
+.infra-pillar-card:hover .infra-pillar-icon-box {
+  background: var(--color-accent);
+  color: var(--color-primary-dark);
+  transform: scale(1.06);
+}
+
+.infra-pillar-tag {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.infra-pillar-body {
+  flex: 1;
+  margin-bottom: var(--space-4);
+}
+
+.infra-pillar-title {
+  font-family: var(--font-sans);
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.35;
+  margin: 0 0 var(--space-2) 0;
+  transition: color 200ms ease;
+}
+
+.infra-pillar-card:hover .infra-pillar-title {
+  color: var(--color-accent-light);
+}
+
+.infra-pillar-sub {
+  font-size: var(--text-xs);
+  color: rgba(255, 255, 255, 0.78);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.infra-pillar-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: var(--space-3);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  gap: var(--space-2);
+}
+
+.infra-pillar-link-text {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: 0.02em;
+}
+
+.infra-pillar-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  transition: all 200ms ease;
+}
+
+.infra-pillar-card:hover .infra-pillar-arrow {
+  background: var(--color-accent);
+  color: var(--color-primary-dark);
+  transform: translateX(3px);
+}
+
+/* ==========================================================================
+   Bottom Tagline & Actions
+   ========================================================================== */
+
+.infra-showcase-bottom-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+  flex-wrap: wrap;
+  padding-top: var(--space-4);
+}
+
+.infra-showcase-tagline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: var(--text-sm);
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0;
+  max-width: 560px;
+  line-height: 1.5;
+}
+
+.infra-tagline-icon {
+  color: var(--color-accent);
+  flex-shrink: 0;
+}
+
+.infra-showcase-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.m3-infra-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: var(--radius-full);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 220ms cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+}
+
+.m3-infra-btn--primary {
+  background: var(--color-accent);
+  color: var(--color-primary-dark);
+  border: 1px solid var(--color-accent);
+  box-shadow: 0 4px 16px rgba(201, 168, 76, 0.3);
+}
+
+.m3-infra-btn--primary:hover {
+  background: var(--color-accent-light);
+  color: var(--color-primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(201, 168, 76, 0.45);
+}
+
+.m3-infra-btn--glass {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
+
+.m3-infra-btn--glass:hover {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: #ffffff;
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   Responsive Breakpoints
+   ========================================================================== */
+
+@media (max-width: 992px) {
+  .infra-showcase-pillars {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  .infra-showcase-bottom-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .infra-showcase-actions {
+    width: 100%;
+  }
+
+  .m3-infra-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .infra-showcase-section {
+    padding: 4rem 0;
+  }
+
+  .infra-showcase-title {
+    font-size: 2.2rem;
+  }
+
+  .infra-pillar-card {
+    padding: var(--space-5);
+  }
+}

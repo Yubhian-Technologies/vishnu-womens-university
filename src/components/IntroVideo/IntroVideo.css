@@ -1,0 +1,58 @@
+.intro-video {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: var(--color-primary-dark, #081c15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: opacity var(--transition-smooth, 600ms cubic-bezier(0.4, 0, 0.2, 1));
+  opacity: 1;
+}
+
+.intro-video--fading {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Full-screen pulled-straight video — no controls, no chrome. */
+.intro-video__media {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Subtle, on-brand skip affordance — a 48px+ tap target safe for mobile,
+   sitting quietly in the corner so it never fights the video for attention.
+   Fades in just after playback starts. */
+.intro-video__skip {
+  position: absolute;
+  right: var(--space-5, 1.25rem);
+  bottom: var(--space-5, 1.25rem);
+  min-height: 48px;
+  padding: 0 var(--space-6, 1.5rem);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: var(--radius-full, 9999px);
+  background: rgba(8, 28, 21, 0.35);
+  backdrop-filter: blur(6px);
+  color: #ffffff;
+  font-family: var(--font-sans, sans-serif);
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background var(--transition-base, 250ms ease),
+    transform var(--transition-base, 250ms ease);
+}
+
+.intro-video__skip:hover,
+.intro-video__skip:focus-visible {
+  background: rgba(8, 28, 21, 0.6);
+  outline: none;
+}
+
+.intro-video__skip:active {
+  transform: scale(0.96);
+}

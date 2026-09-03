@@ -96,17 +96,46 @@ export default function Governance() {
       </section>
 
       {/* Quick-jump nav */}
-      <div style={{ background: 'var(--color-off-white)', borderBottom: '1px solid var(--color-light-gray)', position: 'sticky', top: 'calc(var(--topbar-height) + var(--header-height))', zIndex: 10 }}>
-        <div className="container" style={{ display: 'flex', gap: 0, overflowX: 'auto' }}>
+      <div style={{ background: 'rgba(232, 245, 237, 0.85)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', borderBottom: '1px solid var(--color-light-gray)', position: 'sticky', top: 'calc(var(--topbar-height) + var(--header-height))', zIndex: 10, padding: 'var(--space-2) 0' }}>
+        <div className="container" style={{ display: 'flex', gap: 'var(--space-2)', overflowX: 'auto', paddingBottom: '2px' }}>
           {govCategories.map(cat => (
             <a
               key={cat.key}
               href={`#${cat.key}`}
-              style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: 'var(--space-3) var(--space-5)', fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-text)', textDecoration: 'none', whiteSpace: 'nowrap', borderBottom: '3px solid transparent', transition: 'all var(--transition-fast)' }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'var(--color-primary)'; (e.currentTarget as HTMLElement).style.borderBottomColor = 'var(--color-accent)'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'var(--color-text)'; (e.currentTarget as HTMLElement).style.borderBottomColor = 'transparent'; }}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.45rem',
+                padding: '0.45rem 1.25rem',
+                fontSize: 'var(--text-xs)',
+                fontWeight: 800,
+                letterSpacing: '0.04em',
+                textTransform: 'uppercase',
+                color: 'var(--color-primary)',
+                background: 'var(--color-white)',
+                border: '1px solid rgba(27, 67, 50, 0.1)',
+                borderRadius: 'var(--radius-full)',
+                textDecoration: 'none',
+                whiteSpace: 'nowrap',
+                boxShadow: 'var(--shadow-sm)',
+                transition: 'all var(--transition-fast)'
+              }}
+              onMouseEnter={e => {
+                const el = e.currentTarget as HTMLElement;
+                el.style.background = 'var(--color-primary)';
+                el.style.color = '#ffffff';
+                el.style.borderColor = 'var(--color-primary)';
+                el.style.transform = 'translateY(-1px)';
+              }}
+              onMouseLeave={e => {
+                const el = e.currentTarget as HTMLElement;
+                el.style.background = 'var(--color-white)';
+                el.style.color = 'var(--color-primary)';
+                el.style.borderColor = 'rgba(27, 67, 50, 0.1)';
+                el.style.transform = 'none';
+              }}
             >
-              <cat.icon size={14} /> {cat.label}
+              <cat.icon size={15} /> {cat.label}
             </a>
           ))}
         </div>
@@ -120,41 +149,93 @@ export default function Governance() {
             key={cat.key}
             id={cat.key}
             className={`section ${ci % 2 === 0 ? 'bg-off-white' : 'bg-white'}`}
-            style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 3.5rem)' }}
+            style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 4.5rem)' }}
           >
             <div className="container">
               <div className="reveal" style={{ marginBottom: 'var(--space-10)' }}>
-                <span className="section-label" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}><cat.icon size={14} /> {cat.label}</span>
+                <span className="section-label" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', background: 'rgba(201, 168, 76, 0.15)', padding: '0.3rem 0.85rem', borderRadius: 'var(--radius-full)' }}><cat.icon size={14} /> {cat.label}</span>
                 <h2 className="section-title">{cat.label}</h2>
                 <p style={{ color: 'var(--color-text-light)', maxWidth: 600, lineHeight: 1.7 }}>{cat.desc}</p>
               </div>
 
-              <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 'var(--space-5)' }}>
+              <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 'var(--space-6)' }}>
                 {items.map((item) => {
                   const Icon = resolveContentIcon(item.icon) || Landmark;
                   return (
                     <div
                       key={item.slug}
-                      style={{ background: ci % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', display: 'flex', flexDirection: 'column', transition: 'all var(--transition-base)' }}
-                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-accent)'; (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-md)'; (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; }}
-                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-light-gray)'; (e.currentTarget as HTMLElement).style.boxShadow = 'none'; (e.currentTarget as HTMLElement).style.transform = 'none'; }}
+                      style={{
+                        background: 'var(--color-white)',
+                        border: '1px solid rgba(27, 67, 50, 0.08)',
+                        borderRadius: '20px',
+                        padding: 'var(--space-6)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        boxShadow: 'var(--shadow-sm)',
+                        transition: 'all var(--transition-base)'
+                      }}
+                      onMouseEnter={e => {
+                        const el = e.currentTarget as HTMLElement;
+                        el.style.borderColor = 'var(--color-accent)';
+                        el.style.boxShadow = 'var(--shadow-xl)';
+                        el.style.transform = 'translateY(-4px)';
+                      }}
+                      onMouseLeave={e => {
+                        const el = e.currentTarget as HTMLElement;
+                        el.style.borderColor = 'rgba(27, 67, 50, 0.08)';
+                        el.style.boxShadow = 'var(--shadow-sm)';
+                        el.style.transform = 'none';
+                      }}
                     >
-                      <div style={{ marginBottom: 'var(--space-3)' }}><Icon size={32} strokeWidth={1.75} /></div>
-                      <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-2)', lineHeight: 1.35 }}>
+                      <div style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '52px',
+                        height: '52px',
+                        borderRadius: 'var(--radius-full)',
+                        background: 'var(--color-off-white)',
+                        color: 'var(--color-primary)',
+                        marginBottom: 'var(--space-4)'
+                      }}>
+                        <Icon size={26} strokeWidth={1.8} />
+                      </div>
+                      <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 800, color: 'var(--color-primary)', marginBottom: 'var(--space-2)', lineHeight: 1.35 }}>
                         {item.title}
                       </h3>
-                      <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.65, flex: 1, marginBottom: 'var(--space-4)' }}>
+                      <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.65, flex: 1, marginBottom: 'var(--space-5)' }}>
                         {item.desc}
                       </p>
                       <Link
                         to={`/governance/${item.slug}`}
-                        style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-primary)', textDecoration: 'none', paddingTop: 'var(--space-3)', borderTop: '1px solid var(--color-light-gray)', marginTop: 'auto' }}
-                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'var(--color-accent)'; }}
-                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'var(--color-primary)'; }}
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          padding: '0.45rem 1rem',
+                          borderRadius: 'var(--radius-full)',
+                          background: 'var(--color-off-white)',
+                          fontSize: 'var(--text-xs)',
+                          fontWeight: 800,
+                          color: 'var(--color-primary)',
+                          textDecoration: 'none',
+                          marginTop: 'auto',
+                          transition: 'all var(--transition-fast)'
+                        }}
+                        onMouseEnter={e => {
+                          const el = e.currentTarget as HTMLElement;
+                          el.style.background = 'var(--color-primary)';
+                          el.style.color = '#ffffff';
+                        }}
+                        onMouseLeave={e => {
+                          const el = e.currentTarget as HTMLElement;
+                          el.style.background = 'var(--color-off-white)';
+                          el.style.color = 'var(--color-primary)';
+                        }}
                       >
-                        Learn More
+                        <span>Learn More</span>
                         <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-                          <path d="M2 6h8M6 2l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M2 6h8M6 2l4 4-4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
                       </Link>
                     </div>
