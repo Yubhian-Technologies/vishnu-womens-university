@@ -858,14 +858,6 @@ export default function ProgramsAdmin() {
             )}
           </div>
 
-          <div className="admin-field admin-field--full">
-            <p className="admin-field__hint">
-              The academic-year "News &amp; Events" table (News &amp; Events / Student Awards / Others tabs) isn't
-              edited per-programme anymore — it's shared across a department's programmes, so it now lives on the
-              matching card in <strong>Admin → Academic Departments</strong> instead.
-            </p>
-          </div>
-
           <div className="admin-field admin-field--full"><hr /><h3>News &amp; Events — This Programme</h3></div>
           <div className="admin-field admin-field--full">
             {editing ? (
