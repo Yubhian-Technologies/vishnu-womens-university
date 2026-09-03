@@ -4,12 +4,25 @@ import { hasCustomSectionContent, type CustomSection, type CustomSectionPhoto } 
 import { parseFlexibleTable, parseLinkList } from '../../lib/structuredTable';
 import FlexibleTable from '../FlexibleTable/FlexibleTable';
 import SmoothCollapse from '../SmoothCollapse/SmoothCollapse';
+import { linkify } from '../../lib/linkify';
 
 // Renders admin-defined custom sections (see lib/customSections.ts).
 // No .reveal/scroll-reveal classes anywhere here — gated behind
 // Firestore-loaded data, same reason every other conditionally-rendered
 // section on these pages avoids it (see the gotcha documented in CLAUDE.md).
 const DEFAULT_NAV_OFFSET = 'calc(var(--topbar-height) + var(--header-height) + 1rem)';
+
+// A section's optional subtitle (see CustomSection.subtitle) — one shared
+// small-print line under a section's title, used everywhere a title renders
+// below so every layout shows it the same way.
+function SectionSubtitle({ subtitle }: { subtitle?: string }) {
+  if (!subtitle?.trim()) return null;
+  return (
+    <p style={{ margin: '0.3rem 0 0', color: 'var(--color-text-light)', fontSize: 'var(--text-sm)', fontWeight: 600 }}>
+      {subtitle}
+    </p>
+  );
+}
 
 // Default export — used by ProgramDetail.tsx/DepartmentDetail.tsx, where
 // every custom section renders as its own full-width section before the CTA
@@ -22,12 +35,13 @@ export default function CustomSectionsRenderer({ sections, navOffset = DEFAULT_N
 
   return (
     <>
-      {visible.map((section) => (
-        <section key={section.id} id={section.id} className="section bg-white" style={{ scrollMarginTop: navOffset }}>
+      {visible.map((section, index) => (
+        <section key={section.id} id={section.id} className={`section ${index % 2 === 0 ? 'bg-white' : 'bg-off-white'}`} style={{ scrollMarginTop: navOffset }}>
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
               <span className="section-label">Details</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem', fontWeight: section.boldHeading ? 800 : undefined }}>{section.label}</h2>
+              <SectionSubtitle subtitle={section.subtitle} />
             </div>
             <SectionSubtree section={section} navOffset={navOffset} />
           </div>
@@ -48,8 +62,11 @@ export function CustomSectionsIntro({ sections }: { sections: CustomSection[] })
       {visible.map((section) => (
         <div key={section.id} style={{ marginTop: 'var(--space-6)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-3)' }}>
-            <div style={{ width: 4, height: 24, background: 'var(--color-accent)', borderRadius: 'var(--radius-full)' }} />
-            <h3 style={{ fontSize: '1.25rem', margin: 0, fontWeight: section.boldHeading ? 800 : undefined }}>{section.label}</h3>
+            <div style={{ width: 4, height: 24, background: 'var(--color-accent)', borderRadius: 'var(--radius-full)', flexShrink: 0, alignSelf: 'flex-start', marginTop: 2 }} />
+            <div>
+              <h3 style={{ fontSize: '1.25rem', margin: 0, fontWeight: section.boldHeading ? 800 : undefined }}>{section.label}</h3>
+              <SectionSubtitle subtitle={section.subtitle} />
+            </div>
           </div>
           <SectionSubtree section={section} />
         </div>
@@ -101,8 +118,11 @@ export function CustomSectionsPlain({ sections }: { sections: CustomSection[] })
         return (
           <div key={section.id} style={{ marginTop: i === 0 ? 0 : 'var(--space-6)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-3)' }}>
-              <div style={{ width: 4, height: 24, background: 'var(--color-accent)', borderRadius: 'var(--radius-full)' }} />
-              <h3 style={{ fontSize: '1.25rem', margin: 0, fontWeight: section.boldHeading ? 800 : undefined }}>{section.label}</h3>
+              <div style={{ width: 4, height: 24, background: 'var(--color-accent)', borderRadius: 'var(--radius-full)', flexShrink: 0, alignSelf: 'flex-start', marginTop: 2 }} />
+              <div>
+                <h3 style={{ fontSize: '1.25rem', margin: 0, fontWeight: section.boldHeading ? 800 : undefined }}>{section.label}</h3>
+                <SectionSubtitle subtitle={section.subtitle} />
+              </div>
             </div>
             <SectionSubtree section={section} />
           </div>
@@ -159,7 +179,7 @@ function PersonPanelList({ people }: { people: CustomSection[] }) {
                       style={{ width: 70, height: 70, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '1px solid var(--color-light-gray)' }}
                     />
                   )}
-                  <p style={{ flex: '1 1 240px', color: 'var(--color-text)', lineHeight: 1.8, whiteSpace: 'pre-line', margin: 0 }}>{person.textContent}</p>
+                  <p style={{ flex: '1 1 240px', color: 'var(--color-text)', lineHeight: 1.8, whiteSpace: 'pre-line', margin: 0 }}>{linkify(person.textContent || '')}</p>
                 </div>
               </SmoothCollapse>
             )}
@@ -268,6 +288,7 @@ export function SectionSubtree({ section, depth = 0, navOffset = DEFAULT_NAV_OFF
           <h4 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: sub.boldHeading ? 800 : 700, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>
             {sub.label}
           </h4>
+          <SectionSubtitle subtitle={sub.subtitle} />
           <SectionSubtree section={sub} depth={depth + 1} navOffset={navOffset} />
         </div>
       ))}
@@ -343,8 +364,11 @@ function PillSwitcher({ sections, depth = 0, navOffset = DEFAULT_NAV_OFFSET }: {
       </div>
       <div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-3)' }}>
-          <div style={{ width: 4, height: 24, background: 'var(--color-accent)', borderRadius: 'var(--radius-full)' }} />
-          <h3 style={{ fontSize: '1.25rem', margin: 0, fontWeight: active.boldHeading ? 800 : undefined }}>{active.label}</h3>
+          <div style={{ width: 4, height: 24, background: 'var(--color-accent)', borderRadius: 'var(--radius-full)', flexShrink: 0, alignSelf: 'flex-start', marginTop: 2 }} />
+          <div>
+            <h3 style={{ fontSize: '1.25rem', margin: 0, fontWeight: active.boldHeading ? 800 : undefined }}>{active.label}</h3>
+            <SectionSubtitle subtitle={active.subtitle} />
+          </div>
         </div>
         <SectionSubtree section={active} depth={depth} navOffset={navOffset} />
       </div>
@@ -449,7 +473,7 @@ function CustomSectionBodyContent({ section }: { section: CustomSection }) {
     if (!section.textContent?.trim()) return null;
     return (
       <p style={{ color: 'var(--color-text)', lineHeight: 1.8, whiteSpace: 'pre-line' }}>
-        {section.textContent}
+        {linkify(section.textContent)}
       </p>
     );
   }
@@ -464,7 +488,7 @@ function CustomSectionBodyContent({ section }: { section: CustomSection }) {
         )}
         {section.textContent?.trim() && (
           <p style={{ color: 'var(--color-text)', lineHeight: 1.8, whiteSpace: 'pre-line' }}>
-            {section.textContent}
+            {linkify(section.textContent)}
           </p>
         )}
       </>
@@ -508,7 +532,7 @@ function CustomSectionBodyContent({ section }: { section: CustomSection }) {
             <span style={{ width: 18, height: 18, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
               <svg width="9" height="9" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
             </span>
-            <span style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.6 }}>{point}</span>
+            <span style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.6 }}>{linkify(point)}</span>
           </li>
         ))}
       </ul>

@@ -15,7 +15,6 @@ import IicMemberPhotosAdmin from './IicMemberPhotosAdmin';
 import IicDocumentsAdmin from './IicDocumentsAdmin';
 import VdlAchievementsAdmin from './VdlAchievementsAdmin';
 import RwtpReportsAdmin from './RwtpReportsAdmin';
-import ConcreteCanoePhotosAdmin from './ConcreteCanoePhotosAdmin';
 
 // Some differentiator items have extra editable content beyond the base
 // fields below (a team roster, photo galleries, placement cards, ...) —
@@ -47,8 +46,10 @@ const ITEM_SUB_SECTIONS: Record<string, { key: string; label: string; Component:
   'rural-women-tech-park': [{ key: 'report-links', label: 'Report Links', Component: RwtpReportsAdmin }],
   // ATL's Photos and Activity PDFs moved to generic "files"-type Custom
   // Sections — AssistiveTechLabPhotosAdmin/AtlActivityPdfsAdmin have no
-  // live target to manage anymore.
-  'concrete-canoe-lab': [{ key: 'canoe-photos', label: 'Photos', Component: ConcreteCanoePhotosAdmin }],
+  // live target to manage anymore. Concrete Canoe Lab's 5 fixed photo
+  // groups were migrated into a "Photo Galleries" Custom Section the same
+  // way — ConcreteCanoePhotosAdmin's one-time migration tool has no live
+  // target to manage anymore either.
   // WISE's old per-item photo panels (team/elite-project/testimonial/NSE
   // clipping) had no live target anymore once every tab moved to generic
   // "files"-type sections in the Tabs editor below — removed rather than

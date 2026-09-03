@@ -27,6 +27,11 @@ export interface CustomSection {
   // #anchor and the Quick Links entry pointing at it would break.
   id: string;
   label: string;
+  // Optional second line shown directly under the label, before the
+  // content — same idea as 'person' contentType's personPosition (a role
+  // line under the name), generalized to every content type instead of
+  // just Panel View.
+  subtitle?: string;
   contentType: CustomSectionContentType;
   textContent?: string;
   tableText?: string;

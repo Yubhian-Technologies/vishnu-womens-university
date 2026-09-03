@@ -1885,6 +1885,7 @@ td.pb-activities-num {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 0.75rem;
   padding: 0.65rem 1rem;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.06);
@@ -1898,6 +1899,17 @@ td.pb-activities-num {
   transition: all 160ms ease;
 }
 
+/* A long pill label (e.g. "Journal Publications in National/International
+   Conferences") would otherwise wrap and blow out the pill's height —
+   min-width: 0 lets this flex child actually shrink so MarqueeText's own
+   overflow:hidden + single-line marquee (see components/MarqueeText) can
+   take over instead. */
+.dept-quick-nav-text {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+}
+
 .dept-quick-nav-link:hover,
 .dept-quick-nav-link:focus-visible {
   background: rgba(201, 168, 76, 0.18);
@@ -1906,6 +1918,21 @@ td.pb-activities-num {
   color: #ffffff;
   transform: translateX(3px);
   outline: none;
+}
+
+/* "You are here" state — for a quick-nav list of separate pages (e.g.
+   CampusFacilitiesNav) rather than same-page anchors, which have no
+   equivalent persistent state. Same visual treatment as the hover state
+   above, just not requiring the pointer to stay there. */
+.dept-quick-nav-link.is-active {
+  background: rgba(201, 168, 76, 0.18);
+  border-color: rgba(201, 168, 76, 0.35);
+  border-left-color: var(--color-accent);
+  color: #ffffff;
+}
+.dept-quick-nav-link.is-active .dept-btn-arrow-circle {
+  background: #ffffff;
+  color: var(--color-primary-dark, #1b4332);
 }
 
 /* Circular Background over Button Arrows */

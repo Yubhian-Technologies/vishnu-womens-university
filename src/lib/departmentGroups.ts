@@ -33,6 +33,37 @@ export interface DepartmentGroup {
   facultyDepartments: string[];
 }
 
+/**
+ * A department with NO programs of its own (e.g. Freshman Engineering's
+ * Mathematics/Physics/Chemistry/English — foundation subjects every
+ * engineering student takes, not a degree any one of them grants). There's
+ * no program slug to route through the way DEPARTMENT_GROUPS above does, so
+ * `slug` is the literal /academics/<slug> segment that opens
+ * StandaloneDepartmentDetail.tsx directly for this department instead.
+ */
+export interface StandaloneDepartment {
+  key: string;
+  /** Matches the `shortCode` of the department's `departments` doc. */
+  deptShortCode: string;
+  /** The /academics/<slug> URL segment. */
+  slug: string;
+  /** Same purpose as DepartmentGroup.facultyDepartments above. */
+  facultyDepartments: string[];
+}
+
+export const STANDALONE_DEPARTMENTS: StandaloneDepartment[] = [
+  { key: 'fe-mathematics', deptShortCode: 'Mathematics', slug: 'mathematics', facultyDepartments: ['Mathematics'] },
+  { key: 'fe-physics', deptShortCode: 'Physics', slug: 'physics', facultyDepartments: ['Physics'] },
+  { key: 'fe-chemistry', deptShortCode: 'Chemistry', slug: 'chemistry', facultyDepartments: ['Chemistry'] },
+  { key: 'fe-english', deptShortCode: 'English', slug: 'english', facultyDepartments: ['English'] },
+];
+
+/** The standalone department a given /academics/<slug> URL segment opens, or undefined for a normal program/grouped-department slug. */
+export function standaloneDepartmentForSlug(slug?: string): StandaloneDepartment | undefined {
+  if (!slug) return undefined;
+  return STANDALONE_DEPARTMENTS.find((d) => d.slug === slug);
+}
+
 // Slugs verified against the live `programs` collection. Note EVT's slug is
 // uppercase. `facultyDepartments` verified against the `faculty` collection.
 export const DEPARTMENT_GROUPS: DepartmentGroup[] = [
