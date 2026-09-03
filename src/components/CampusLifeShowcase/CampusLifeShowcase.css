@@ -1,0 +1,275 @@
+/* ==========================================================================
+   Campus Life Showcase — Visual Banner Section
+   Matching Exact Editorial Reference Design with Vibrant Scrim
+   ========================================================================== */
+
+.campus-showcase-section {
+  position: relative;
+  min-height: 640px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  padding: clamp(4.5rem, 7.5vw, 6.5rem) 0;
+  background: #04101a;
+  color: #ffffff;
+}
+
+/* Background image & gradient overlay */
+.campus-showcase-bg-wrap {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.campus-showcase-bg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center right;
+  transform: scale(1.02);
+  transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.campus-showcase-section:hover .campus-showcase-bg {
+  transform: scale(1.04);
+}
+
+/* Multi-layered cinematic gradient scrim for high vibrancy with crisp text legibility */
+.campus-showcase-scrim {
+  position: absolute;
+  inset: 0;
+  background: 
+    linear-gradient(
+      90deg, 
+      rgba(4, 16, 26, 0.94) 0%, 
+      rgba(4, 16, 26, 0.88) 45%, 
+      rgba(4, 16, 26, 0.45) 75%, 
+      rgba(4, 16, 26, 0.15) 100%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(4, 16, 26, 0.45) 0%,
+      transparent 25%,
+      transparent 75%,
+      rgba(4, 16, 26, 0.70) 100%
+    );
+}
+
+/* Content Container */
+.campus-showcase-content {
+  position: relative;
+  z-index: 2;
+  max-width: 720px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Eyebrow */
+.campus-showcase-eyebrow {
+  font-family: var(--font-sans, system-ui, -apple-system, sans-serif);
+  font-size: clamp(1rem, 1.3vw, 1.15rem);
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.95);
+  margin: 0 0 1rem 0;
+  letter-spacing: 0.01em;
+}
+
+/* Main Heading */
+.campus-showcase-title {
+  font-family: var(--font-sans, system-ui, -apple-system, sans-serif);
+  font-size: clamp(2.4rem, 4.5vw, 3.8rem);
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.14;
+  margin: 0 0 1.5rem 0;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.4);
+}
+
+/* Description paragraph */
+.campus-showcase-desc {
+  font-family: var(--font-sans, system-ui, -apple-system, sans-serif);
+  font-size: clamp(0.95rem, 1.2vw, 1.05rem);
+  color: rgba(255, 255, 255, 0.92);
+  line-height: 1.65;
+  margin: 0 0 3.25rem 0;
+  max-width: 660px;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.35);
+}
+
+/* 3 Pillars Clean Horizontal Underline Grid */
+.campus-showcase-pillars {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(1.25rem, 3vw, 2.5rem);
+  margin-bottom: 2.75rem;
+  max-width: 700px;
+}
+
+/* Single Pillar Column Item */
+.campus-showcase-pillar-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  text-decoration: none;
+  color: #ffffff;
+  position: relative;
+  transition: transform 0.25s ease;
+}
+
+.campus-showcase-pillar-item:hover {
+  transform: translateY(-3px);
+}
+
+.campus-showcase-pillar-icon {
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  height: 48px;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+}
+
+.campus-showcase-pillar-icon svg {
+  display: block;
+}
+
+.campus-showcase-pillar-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.35);
+  transition: border-bottom-color 0.25s ease;
+}
+
+.campus-showcase-pillar-item:hover .campus-showcase-pillar-bottom {
+  border-bottom-color: rgba(255, 255, 255, 0.85);
+}
+
+.campus-showcase-pillar-label {
+  font-family: var(--font-sans, system-ui, -apple-system, sans-serif);
+  font-size: clamp(0.92rem, 1.15vw, 1.02rem);
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+/* Square Arrow Button */
+.campus-showcase-pillar-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  background: #09375e;
+  border-radius: 4px;
+  color: #ffffff;
+  flex-shrink: 0;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.campus-showcase-pillar-item:hover .campus-showcase-pillar-arrow {
+  background: #0f5b9e;
+  transform: translateX(3px);
+  box-shadow: 0 4px 14px rgba(15, 91, 158, 0.5);
+}
+
+/* Sub-tagline Statement */
+.campus-showcase-tagline {
+  font-family: var(--font-sans, system-ui, -apple-system, sans-serif);
+  font-size: clamp(1rem, 1.25vw, 1.14rem);
+  font-weight: 500;
+  color: #ffffff;
+  margin: 0 0 1.75rem 0;
+  letter-spacing: 0.01em;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Primary CTA Button */
+.campus-showcase-action {
+  display: flex;
+  align-items: center;
+}
+
+.campus-showcase-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.85rem 1.65rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: var(--font-sans, system-ui, -apple-system, sans-serif);
+  color: #ffffff;
+  background: #0f5b9e;
+  border: none;
+  border-radius: 4px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.campus-showcase-cta:hover {
+  background: #146fc0;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(15, 91, 158, 0.45);
+  color: #ffffff;
+}
+
+.campus-showcase-cta:active {
+  transform: translateY(0);
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 900px) {
+  .campus-showcase-pillars {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+
+  .campus-showcase-pillar-arrow {
+    width: 30px;
+    height: 30px;
+  }
+}
+
+@media (max-width: 768px) {
+  .campus-showcase-section {
+    min-height: auto;
+    padding: 4rem 0;
+  }
+
+  .campus-showcase-scrim {
+    background: linear-gradient(
+      180deg,
+      rgba(4, 16, 26, 0.92) 0%,
+      rgba(4, 16, 26, 0.82) 55%,
+      rgba(4, 16, 26, 0.94) 100%
+    );
+  }
+
+  .campus-showcase-content {
+    max-width: 100%;
+  }
+
+  .campus-showcase-pillars {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .campus-showcase-pillar-bottom {
+    padding-bottom: 0.75rem;
+  }
+
+  .campus-showcase-action {
+    width: 100%;
+  }
+
+  .campus-showcase-cta {
+    width: 100%;
+  }
+}

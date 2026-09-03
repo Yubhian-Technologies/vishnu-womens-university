@@ -160,7 +160,20 @@ export default function Academics() {
 
   const btechCount = programs.filter(p => p.category === 'btech').length;
 
-  const activePrograms = useMemo(() => programs.filter(p => p.category === activeTab), [programs, activeTab]);
+  const searchQuery = (searchParams.get('search') || '').toLowerCase().trim();
+
+  const activePrograms = useMemo(() => {
+    if (searchQuery) {
+      const matching = programs.filter(p =>
+        (p.name && p.name.toLowerCase().includes(searchQuery)) ||
+        (p.shortName && p.shortName.toLowerCase().includes(searchQuery)) ||
+        (p.department && p.department.toLowerCase().includes(searchQuery)) ||
+        (p.category && p.category.toLowerCase().includes(searchQuery))
+      );
+      if (matching.length > 0) return matching;
+    }
+    return programs.filter(p => p.category === activeTab);
+  }, [programs, activeTab, searchQuery]);
 
   const [expandedDepts, setExpandedDepts] = useState<Set<string>>(new Set());
   const toggleDept = (id: string) => setExpandedDepts((prev) => {

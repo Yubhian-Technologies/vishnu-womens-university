@@ -45,9 +45,17 @@ Each section component (e.g. [src/pages/Admin/sections/NewsAdmin.tsx](src/pages/
 
 `ImageUploader` ([src/components/ImageUploader/ImageUploader.tsx](src/components/ImageUploader/ImageUploader.tsx)) crops the selected image client-side, then uploads the resulting blob to Firebase Storage via `uploadImage` in [src/lib/storage.ts](src/lib/storage.ts), which writes to the `VITE_FIREBASE_STORAGE_BUCKET` bucket (configured in [src/lib/firebase.ts](src/lib/firebase.ts)) and returns the `getDownloadURL()` result plus the storage path (saved as `imageUrl`/`storagePath` on the Firestore doc).
 
-### Styling
+### Styling & Google UI Design Principles
 
 No CSS framework — each component/page has a co-located `.css` file (e.g. `Header.css` next to `Header.tsx`) plus shared tokens in `src/styles/variables.css` and global rules in `src/styles/global.css`. Detail pages (program/governance/differentiator/placement detail) share `src/pages/detail-layout.css`.
+
+All UI components and layouts must follow **Google UI Design Principles** and **Material Design 3 (M3)** patterns:
+1. **Visual Hierarchy & Scannability**: Use structured type scales (`Display`, `Headline`, `Title`, `Body`, `Label` via `Product Sans` / `sans-serif`) and clear contrast.
+2. **Tonal Elevation over Harsh Drop Shadows**: Layer surfaces using CSS variables (`--color-white`, `--color-off-white`, `--color-light-gray`) paired with standard elevation tokens (`--shadow-sm`, `--shadow-md`, `--shadow-lg`).
+3. **Interactive State Layers**: Apply subtle hover (8% tint), focus ring (12%), and active press feedback to all buttons, cards, and interactive elements.
+4. **Motion & Feedback**: Employ physics-informed transitions (`--transition-smooth: 600ms cubic-bezier(0.4, 0, 0.2, 1)`) for drawers, modals, and hover states. Never gate animations in a way that risks dropped frames on dynamic Firestore content (see Firestore Gotcha above).
+5. **Accessibility & Tap Targets**: Ensure minimum 48×48px touch targets for mobile interactive items and meet WCAG AA contrast standards.
+6. **Detailed Specification**: Refer to `docs/google-ui-design-principles.md` for full design tokens and component specifications.
 
 ### One-off scripts
 
@@ -56,3 +64,4 @@ No CSS framework — each component/page has a co-located `.css` file (e.g. `Hea
 ### Deployment
 
 Deploys to Vercel; [vercel.json](vercel.json) rewrites all paths to `/index.html` for client-side routing.
+

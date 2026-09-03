@@ -3,6 +3,7 @@ import { Link, useParams, Navigate } from 'react-router-dom';
 import { orderBy } from 'firebase/firestore';
 import { Trophy, BarChart3, PlayCircle, MapPin } from 'lucide-react';
 import { useCollection, useOrderedCollection, type WithId } from '../../hooks/useCollection';
+import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import { usePageBanners } from '../../hooks/usePageBanners';
 import { fetchPriorityAttr } from '../../lib/domAttrs';
 import { resolveContentIcon } from '../../lib/contentIcons';
@@ -838,9 +839,7 @@ export default function PlacementDetail() {
   if (!item) {
     if (loading) {
       return (
-        <main className="route-fallback">
-          <div className="route-fallback__spinner" />
-        </main>
+        <RouteFallback />
       );
     }
     return <Navigate to="/placements" replace />;

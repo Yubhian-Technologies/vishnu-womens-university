@@ -39,18 +39,18 @@
 
 .dept-level-card {
   background: var(--color-white);
-  border: 1.5px solid var(--color-light-gray);
-  border-radius: var(--radius-lg);
+  border: 1px solid rgba(27, 67, 50, 0.08);
+  border-radius: 22px;
   box-shadow: var(--shadow-sm);
   overflow: hidden;
-  transition: box-shadow var(--transition-base), border-color var(--transition-base), transform var(--transition-base);
+  transition: all var(--transition-base);
 }
 
 .dept-level-card:hover,
 .dept-level-card.open {
   border-color: var(--color-accent);
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-2px);
+  box-shadow: var(--shadow-xl);
+  transform: translateY(-3px);
 }
 
 .dept-level-card-trigger {
@@ -1048,22 +1048,25 @@ td.pb-activities-num {
 
 /* ===== Governance sidebar quick-nav (Statutory Committees list) ===== */
 .gov-sidenav {
-  background: var(--color-off-white);
-  border: 1.5px solid var(--color-light-gray);
-  border-left: 3px solid var(--color-accent);
-  border-radius: var(--radius-md);
-  padding: var(--space-5);
+  background: var(--color-white);
+  border: 1px solid rgba(27, 67, 50, 0.08);
+  border-radius: 20px;
+  padding: var(--space-6);
+  box-shadow: var(--shadow-sm);
 }
 
 .gov-sidenav-label {
-  display: block;
+  display: inline-block;
   font-family: var(--font-sans);
   font-size: var(--text-xs);
   font-weight: 800;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--color-text-light);
-  margin-bottom: var(--space-3);
+  color: var(--color-primary);
+  background: var(--color-off-white);
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-full);
+  margin-bottom: var(--space-4);
 }
 
 .gov-sidenav ul {
@@ -1077,25 +1080,28 @@ td.pb-activities-num {
 
 .gov-sidenav-link {
   display: block;
-  padding: 0.55rem 0.75rem;
-  border-radius: var(--radius-sm);
+  padding: 0.55rem 0.9rem;
+  border-radius: var(--radius-full);
   font-family: var(--font-sans);
   font-size: var(--text-sm);
   font-weight: 600;
-  color: var(--color-primary);
+  color: var(--color-text);
   text-decoration: none;
   line-height: 1.4;
-  transition: background var(--transition-fast), color var(--transition-fast);
+  transition: all var(--transition-fast);
 }
 
 .gov-sidenav-link:hover {
-  background: var(--color-light-gray);
+  background: var(--color-off-white);
+  color: var(--color-primary);
+  transform: translateX(3px);
 }
 
 .gov-sidenav-link.active {
-  background: var(--color-accent);
+  background: var(--color-primary);
   color: var(--color-white);
   font-weight: 700;
+  box-shadow: var(--shadow-sm);
 }
 
 /* ===== Annual Reports & Reforms — year chip list ===== */
@@ -1112,22 +1118,25 @@ td.pb-activities-num {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  padding: 0.5rem 1.1rem;
+  padding: 0.55rem 1.25rem;
   background: var(--color-white);
-  border: 1.5px solid var(--color-light-gray);
+  border: 1px solid rgba(27, 67, 50, 0.12);
   border-radius: var(--radius-full);
   font-family: var(--font-sans);
   font-size: var(--text-sm);
   font-weight: 600;
   color: var(--color-primary);
   text-decoration: none;
-  transition: border-color var(--transition-fast), background var(--transition-fast), color var(--transition-fast);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-fast);
 }
 
 .annual-reports-link:hover {
-  border-color: var(--color-accent);
-  background: var(--color-off-white);
-  color: var(--color-accent);
+  background: var(--color-primary);
+  color: var(--color-white);
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
 }
 
 .annual-reports-icon {
@@ -3020,6 +3029,64 @@ td.pb-activities-num {
 .dept-news-accordion-content {
   padding: 1.5rem;
 }
+
+/* ==========================================================================
+   Comprehensive Mobile Responsive Overrides for Department & Detail Layouts
+   ========================================================================== */
+
+@media (max-width: 992px) {
+  .detail-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+  }
+}
+
+@media (max-width: 768px) {
+  .dept-level-grid,
+  .dept-vm-grid,
+  .dept-highlights-grid,
+  .dept-labs-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.25rem;
+  }
+
+  .dept-vm-card,
+  .dept-lab-card,
+  .dept-level-card,
+  .dept-highlight-item-card {
+    border-radius: 18px;
+    padding: 1.25rem;
+  }
+
+  .dept-news-accordion-header {
+    padding: 1rem 1.2rem;
+  }
+
+  .dept-news-accordion-content {
+    padding: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .dept-news-accordion-header-left {
+    gap: 0.5rem;
+  }
+
+  .dept-news-year-pill {
+    font-size: 0.95rem;
+  }
+
+  .dept-news-count-badge {
+    font-size: 0.7rem;
+    padding: 0.15rem 0.5rem;
+  }
+
+  .dept-news-chevron-circle {
+    width: 30px;
+    height: 30px;
+  }
+}
+
 
 
 
