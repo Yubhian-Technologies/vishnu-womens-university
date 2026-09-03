@@ -2807,6 +2807,27 @@ td.pb-activities-num {
   width: 100%;
 }
 
+/* IIC Constitution org chart — one flat grid, every card the same size,
+   fixed at 3 per row (not the responsive auto-fit/auto-fill column count
+   used elsewhere) so a short last row never looks stretched or uneven. */
+.iic-council-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+@media (max-width: 720px) {
+  .iic-council-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .iic-council-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .dept-library-card {
   position: relative;
   background: #ffffff;

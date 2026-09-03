@@ -209,34 +209,40 @@ export default function CustomSectionEditor({
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', marginBottom: '0.75rem' }}>
-              {s.photo?.imageUrl || photoRevealed.has(s.id) ? (
-                <>
-                  <div style={{ width: 140 }}>
-                    <ImageUploader
-                      folder="vwu/custom-sections/photos"
-                      currentUrl={s.photo?.imageUrl}
-                      aspect={1}
-                      label="+ Add Photo"
-                      onUploaded={(r) => onPhotoUploaded(path, r)}
-                    />
-                  </div>
-                  {s.photo?.imageUrl && (
-                    <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => onPhotoRemoved(path)}>
-                      Remove Photo
-                    </button>
-                  )}
-                </>
-              ) : (
-                <button
-                  type="button"
-                  className="admin-btn admin-btn--sm"
-                  onClick={() => setPhotoRevealed((prev) => new Set(prev).add(s.id))}
-                >
-                  + Add Photo
-                </button>
-              )}
-            </div>
+            {/* The section's own single accent photo — independent of
+                contentType elsewhere, but redundant (and confusing next to
+                the Gallery's own "+ Add Photo" below) specifically when
+                contentType is already 'gallery', so it's hidden there. */}
+            {s.contentType !== 'gallery' && (
+              <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', marginBottom: '0.75rem' }}>
+                {s.photo?.imageUrl || photoRevealed.has(s.id) ? (
+                  <>
+                    <div style={{ width: 140 }}>
+                      <ImageUploader
+                        folder="vwu/custom-sections/photos"
+                        currentUrl={s.photo?.imageUrl}
+                        aspect={1}
+                        label="+ Add Photo"
+                        onUploaded={(r) => onPhotoUploaded(path, r)}
+                      />
+                    </div>
+                    {s.photo?.imageUrl && (
+                      <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => onPhotoRemoved(path)}>
+                        Remove Photo
+                      </button>
+                    )}
+                  </>
+                ) : (
+                  <button
+                    type="button"
+                    className="admin-btn admin-btn--sm"
+                    onClick={() => setPhotoRevealed((prev) => new Set(prev).add(s.id))}
+                  >
+                    + Add Photo
+                  </button>
+                )}
+              </div>
+            )}
 
             {s.contentType === 'text' && (
               <div className="admin-field">
