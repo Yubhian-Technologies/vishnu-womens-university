@@ -340,6 +340,16 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   const hasRnd = !!activeProgram.rndIntro || rndTableSections.length > 0 || rndProjectCategories.length > 0 || rndLinks.length > 0 || hasRndStructuredTable;
   const visibleCustomSections = (activeProgram.customSections || []).filter(hasCustomSectionContent);
 
+  // "Placements" quick link doubles as the Internships entry (Internships
+  // has no quick link of its own — it renders directly below Placements on
+  // the page) — its label reads "Placements & Internships" once this
+  // programme has both, "Internships" alone if only internship records
+  // exist yet, and plain "Placements" otherwise, so the sidebar reflects
+  // exactly what's actually been uploaded rather than always assuming both.
+  const placementsLinkLabel = placementYears.length > 0 && hasInternships
+    ? 'Placements & Internships'
+    : hasInternships && placementYears.length === 0 ? 'Internships' : 'Placements';
+
   // Quick Links sidebar — deliberately trimmed to one anchor per major
   // section rather than every sub-section (e.g. "Choose a Programme" covers
   // About the Programme / Highlights / PEOs,POs&PSOs / Mind Map / Curriculum,
@@ -354,7 +364,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     hasLabs && { id: 'labs', label: 'Laboratories' },
     hasLibrary && { id: 'library', label: 'Department Library' },
     hasRnd && { id: 'rnd', label: 'R & D' },
-    hasPlacements && { id: 'placements', label: 'Placements' },
+    (hasPlacements || hasInternships) && { id: 'placements', label: placementsLinkLabel },
     hasNewsletter && { id: 'newsletter', label: 'Newsletter' },
     (hasNewsEvents || hasDeptNews) && { id: hasNewsEvents ? 'news-events' : 'news', label: 'News & Events' },
   ].filter(Boolean) as { id: string; label: string }[];

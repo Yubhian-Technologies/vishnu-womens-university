@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
@@ -9,6 +9,9 @@ import { PROGRAM_ICON_NAMES } from '../../../lib/programIcons';
 import { normalizeLab, type LabItem, type LibrarySection, type LibraryItem, type NewsEventsYear, type ProgramLink, type ProgramDoc } from './ProgramsAdmin';
 import NewsEventsYearsEditor from './NewsEventsYearsEditor';
 import { diffChangedFields } from '../../../lib/formDiff';
+import { PlacementYearsEditor, InternshipYearsEditor, RndEditor, NewsletterYearsEditor } from './ProgramCareerEditors';
+import { downloadPlacementsTemplate } from '../../../lib/placementsImport';
+import { downloadInternshipsTemplate } from '../../../lib/internshipsImport';
 
 // Backs the "Academic Departments" card grid on Academics.tsx — independent
 // of the `programs` collection, so a department's card copy doesn't have to
@@ -164,6 +167,20 @@ export default function DepartmentsAdmin() {
     const code = d.shortCode.trim().toUpperCase();
     return allPrograms.filter((p) => (DEPT_PROGRAM_CODE_ALIASES[p.department] || p.department || '').trim().toUpperCase() === code);
   };
+
+  // Placements/Internships/R&D/Newsletter — moved here from Admin → Programs
+  // (per-programme data still lives on each programme's own `programs/{id}`
+  // doc, completely unchanged; only where it's edited moved). A department
+  // that groups more than one programme (AI/CSE/ECE) needs a picker to say
+  // which programme's data these four cards below are currently showing —
+  // `matchingPrograms` above already finds them by department Short Code.
+  const editingDept = editing ? departments.find((d) => d.id === editing) || null : null;
+  const careerPrograms = editingDept ? matchingPrograms(editingDept) : [];
+  const [selectedProgramId, setSelectedProgramId] = useState('');
+  useEffect(() => {
+    setSelectedProgramId('');
+  }, [editing]);
+  const selectedProgram = careerPrograms.find((p) => p.id === selectedProgramId) || careerPrograms[0] || null;
   // News & Events and the HOD fields aren't part of programRichness (they're
   // separate legacy fields, not one of Vision/Mission/Values/Labs/Library) —
   // each found independently as whichever matching program still has it,
@@ -638,8 +655,8 @@ export default function DepartmentsAdmin() {
           <div className="admin-field admin-field--full"><hr /><h3>Department Page — Placements</h3>
             <p className="admin-field__hint" style={{ marginTop: '0.25rem' }}>
               Shown as a shared "Placements" section, before the program toggle. The individual student placement
-              records table is managed separately — see the "Placement Records" card under <strong>Programs</strong>,
-              in any program that belongs to this department.
+              records table is managed separately, per programme — see "Placements, Internships, Research &amp;
+              Development &amp; Newsletter" further down this page, once you've saved this department.
             </p>
           </div>
           <div className="admin-field admin-field--full">
@@ -782,6 +799,74 @@ export default function DepartmentsAdmin() {
           </button>
         </div>
       </div>
+
+      {editingDept && (
+        <div className="admin-card">
+          <h2 className="admin-card__title">Placements, Internships, Research &amp; Development &amp; Newsletter — {editingDept.title}</h2>
+          <p className="admin-field__hint" style={{ marginBottom: '1rem' }}>
+            Per-programme, not shared across the department — each programme keeps its own independent Academic
+            Years/records, exactly as it always has. Pick a programme below to manage its Placements, Internships,
+            Research &amp; Development, and Newsletter.
+          </p>
+          <div style={{ marginBottom: '1rem' }}>
+            <button type="button" className="admin-btn admin-btn--ghost admin-btn--sm" onClick={downloadPlacementsTemplate}>
+              ⬇ Download Placements Template
+            </button>{' '}
+            <button type="button" className="admin-btn admin-btn--ghost admin-btn--sm" onClick={downloadInternshipsTemplate}>
+              ⬇ Download Internships Template
+            </button>
+          </div>
+          {careerPrograms.length === 0 ? (
+            <p className="admin-field__hint">
+              No programme's Department code matches this department's Short Code ({editingDept.shortCode}) yet —
+              add/edit a programme under <strong>Admin → Programs</strong> with that Department code to manage its
+              Placements, Internships, R&amp;D, and Newsletter here.
+            </p>
+          ) : (
+            <>
+              {careerPrograms.length > 1 && (
+                <div className="admin-field" style={{ maxWidth: 360 }}>
+                  <label htmlFor="field-select-programme">Programme</label>
+                  <select
+                    id="field-select-programme"
+                    value={selectedProgram?.id || ''}
+                    onChange={(e) => setSelectedProgramId(e.target.value)}
+                  >
+                    {careerPrograms.map((p) => (
+                      <option key={p.id} value={p.id}>{p.shortName || p.name}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
+
+      {selectedProgram && (
+        <>
+          <PlacementYearsEditor program={selectedProgram} />
+          <InternshipYearsEditor program={selectedProgram} />
+          <RndEditor program={selectedProgram} />
+          <NewsletterYearsEditor program={selectedProgram} />
+        </>
+      )}
+
+      {editingDept && (
+        <div className="admin-card">
+          <p className="admin-field__hint" style={{ marginBottom: '0.75rem' }}>
+            Placements, Internships, Research &amp; Development, and Newsletter above each save on their own
+            ("Save Changes" / "Save Research &amp; Development" / "Save Newsletter"). Once you're done editing this
+            department, use Update below to save the department fields themselves.
+          </p>
+          <div className="admin-form-actions">
+            <button className="admin-btn admin-btn--ghost" onClick={() => { setEditing(null); setForm(EMPTY); setOriginalForm(null); }}>Cancel</button>
+            <button className="admin-btn admin-btn--primary" onClick={save} disabled={saving}>
+              {saving ? 'Saving…' : 'Update'}
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="admin-card">
         <h2 className="admin-card__title">Departments ({departments.length})</h2>
