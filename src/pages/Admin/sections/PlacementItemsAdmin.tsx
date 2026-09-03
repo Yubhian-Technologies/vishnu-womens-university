@@ -1,9 +1,10 @@
 import { useState } from 'react';
+import JSZip from 'jszip';
 import { collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
 import { CONTENT_ICON_NAMES } from '../../../lib/contentIcons';
-import { deleteFile, type UploadResult } from '../../../lib/storage';
+import { deleteFile, uploadImage, type UploadResult } from '../../../lib/storage';
 import TableImportButton from '../../../components/TableImportButton/TableImportButton';
 import { useImageCropModal } from '../../../components/ImageUploader/useImageCropModal';
 
@@ -12,6 +13,56 @@ export interface NotablePerson {
   subtitle: string;
   imageUrl: string;
   storagePath: string;
+}
+
+interface ExtractedImage {
+  name: string;
+  blob: Blob;
+}
+
+// Every raster format a browser can actually render directly in an <img>
+// (so every card in the grid/public carousel shows correctly right away) —
+// deliberately excludes exotic ones like .heic/.tiff/.raw that browsers
+// can't display natively, which would otherwise silently add a broken-image
+// card instead of a useful one.
+// "pnj" included alongside "png" — a handful of export/screenshot tools (and
+// simple typos) produce that exact misspelling; it's still a real PNG file
+// underneath, just misnamed, so it's treated as one rather than silently
+// skipped.
+const IMAGE_EXTENSIONS = new Set(['png', 'pnj', 'jpg', 'jpeg', 'jfif', 'webp', 'gif', 'bmp', 'avif', 'svg']);
+
+function isImageEntry(entryName: string): boolean {
+  const ext = entryName.split('.').pop()?.toLowerCase();
+  return ext ? IMAGE_EXTENSIONS.has(ext) : false;
+}
+
+
+// "P_Lekha_Ravali.jpg" -> "P Lekha Ravali" — same convention as
+// RecruiterLogosAdmin's company-name-from-filename: strips any folder path
+// the archive entry carries, drops the extension, and turns underscores/
+// hyphens into spaces. Just a starting guess for the Full Name field — the
+// admin can edit or clear it right on the card afterward (many Photo
+// Carousel images are full posters with no real "name" at all).
+function nameFromFilename(entryName: string): string {
+  const base = entryName.split('/').pop()?.split('\\').pop() || entryName;
+  const withoutExt = base.replace(/\.[^./]+$/, '');
+  return withoutExt.replace(/[_-]+/g, ' ').trim();
+}
+
+// JSZip's extracted blobs rarely carry a real MIME type (ZIP entries don't
+// store one), so uploadImage would otherwise get a blank `type` for every
+// image — this covers the couple of extensions whose correct MIME isn't
+// just "image/<ext>" (jpg/jfif -> jpeg, svg -> svg+xml).
+const EXTENSION_MIME_OVERRIDES: Record<string, string> = { jpg: 'image/jpeg', jfif: 'image/jpeg', svg: 'image/svg+xml', pnj: 'image/png' };
+
+async function extractZipImages(file: File): Promise<ExtractedImage[]> {
+  const zip = await JSZip.loadAsync(file);
+  const entries = Object.values(zip.files).filter((f) => !f.dir && isImageEntry(f.name));
+  const images: ExtractedImage[] = [];
+  for (const entry of entries) {
+    images.push({ name: entry.name, blob: await entry.async('blob') });
+  }
+  return images;
 }
 
 export interface PlacementItemDoc {
@@ -86,6 +137,16 @@ export default function PlacementItemsAdmin() {
   // exactly the source image's own edges instead.
   const { openCrop: openPersonCrop, cropModal: personCropModal } = useImageCropModal(undefined);
   const [personUploading, setPersonUploading] = useState(false);
+  const [zipUploading, setZipUploading] = useState(false);
+  // Live "N of total" while a large batch uploads — each photo uploads one
+  // at a time (not in parallel, to avoid hammering Storage/Firestore with
+  // dozens of simultaneous writes), which can take a while for a big batch;
+  // without this the button just says "Uploading…" the whole time with no
+  // sign of progress, which reads as stuck once there are more than a
+  // handful of photos.
+  const [zipProgress, setZipProgress] = useState<{ done: number; total: number } | null>(null);
+  const [zipStatus, setZipStatus] = useState<string | null>(null);
+  const [zipError, setZipError] = useState<string | null>(null);
 
   const set = (k: string, v: string | number | string[] | boolean) => setForm((p) => ({ ...p, [k]: v }));
 
@@ -141,6 +202,112 @@ export default function PlacementItemsAdmin() {
       setPersonUploading(false);
     });
   };
+  // Shared by both bulk paths below — uploads one file as-is (no crop step:
+  // Photo Carousel is deliberately free-form/uncropped already, so a batch
+  // of a dozen images doesn't force a dozen manual crop confirmations) and
+  // appends it as a new card, name guessed from the filename. An admin who
+  // does need a specific crop on one photo can remove that card and re-add
+  // it individually via "+ Add Person" instead.
+  const uploadAsPerson = async (imgFile: File, displayName: string) => {
+    // A file whose extension the browser doesn't recognize (e.g. ".pnj")
+    // comes through with an empty `type` from a plain <input type="file">
+    // picker — re-wrap it with the correct MIME type (guessed from the
+    // extension) before uploading so Storage stores a real Content-Type
+    // instead of none.
+    let toUpload = imgFile;
+    if (!imgFile.type) {
+      const ext = (imgFile.name.split('.').pop() || '').toLowerCase();
+      const guessedType = EXTENSION_MIME_OVERRIDES[ext] || (ext ? `image/${ext}` : '');
+      if (guessedType) toUpload = new File([imgFile], imgFile.name, { type: guessedType });
+    }
+    const result = await uploadImage(toUpload, 'vwu/placements/highlights-people');
+    setForm((p) => ({
+      ...p,
+      notablePeople: [...(p.notablePeople || []), { name: nameFromFilename(displayName), subtitle: '', imageUrl: result.url, storagePath: result.path }],
+    }));
+  };
+
+  // Uploads a whole batch concurrently (not one-by-one) — every photo starts
+  // uploading at once instead of waiting for the previous one to finish, so
+  // a big batch finishes in roughly the time one upload takes rather than
+  // N of them back to back. One failed photo doesn't stop the rest: each
+  // upload's own success/failure is tracked independently, and the summary
+  // at the end reports how many of each. `done` increments as uploads
+  // finish (not in file order, since they're racing each other), which is
+  // what drives the button's live "N of total" progress label.
+  const uploadBatch = async (items: { name: string; makeFile: () => File }[]) => {
+    setZipProgress({ done: 0, total: items.length });
+    let done = 0;
+    let failed = 0;
+    await Promise.all(items.map(async ({ name, makeFile }) => {
+      try {
+        await uploadAsPerson(makeFile(), name);
+      } catch {
+        failed++;
+      } finally {
+        done++;
+        setZipProgress({ done, total: items.length });
+      }
+    }));
+    return { succeeded: items.length - failed, failed };
+  };
+
+  // Bulk add from a ZIP.
+  const handleZip = async (file: File) => {
+    setZipError(null);
+    setZipStatus(null);
+    setZipUploading(true);
+    try {
+      const images = await extractZipImages(file);
+      if (images.length === 0) {
+        setZipError('No image files found inside that ZIP.');
+        return;
+      }
+      const { succeeded, failed } = await uploadBatch(images.map(({ name, blob }) => ({
+        name,
+        makeFile: () => {
+          const ext = (name.split('.').pop() || 'png').toLowerCase();
+          return new File([blob], name, { type: blob.type || EXTENSION_MIME_OVERRIDES[ext] || `image/${ext}` });
+        },
+      })));
+      setZipStatus(`Added ${succeeded} photo${succeeded === 1 ? '' : 's'} from the ZIP${failed ? ` (${failed} failed to upload)` : ''} — click ${editing ? 'Update' : 'Add Page'} below to save.`);
+    } catch (e) {
+      setZipError(`Couldn't process that ZIP: ${(e as Error).message}`);
+    } finally {
+      setZipUploading(false);
+      setZipProgress(null);
+    }
+  };
+
+  // Bulk add from a plain multi-file picker — for a folder of loose images
+  // that were never zipped, this skips the extra "zip it first" step: pick
+  // every file in the folder at once (Cmd/Ctrl/Shift-click, or Select All)
+  // and each becomes its own card, same as the ZIP path.
+  const handleMultipleFiles = async (files: FileList) => {
+    setZipError(null);
+    setZipStatus(null);
+    setZipUploading(true);
+    try {
+      // Checks the file extension too, not just the browser-inferred MIME
+      // type — a file with an extension the OS doesn't recognize (e.g.
+      // ".pnj") comes through from the picker with an empty `type`, which
+      // would otherwise get it silently filtered out here even though it's
+      // a real, uploadable image.
+      const imageFiles = Array.from(files).filter((f) => f.type.startsWith('image/') || isImageEntry(f.name));
+      if (imageFiles.length === 0) {
+        setZipError('No image files were in that selection.');
+        return;
+      }
+      const { succeeded, failed } = await uploadBatch(imageFiles.map((f) => ({ name: f.name, makeFile: () => f })));
+      setZipStatus(`Added ${succeeded} photo${succeeded === 1 ? '' : 's'}${failed ? ` (${failed} failed to upload)` : ''} — click ${editing ? 'Update' : 'Add Page'} below to save.`);
+    } catch (e) {
+      setZipError(`Couldn't upload those files: ${(e as Error).message}`);
+    } finally {
+      setZipUploading(false);
+      setZipProgress(null);
+    }
+  };
+
   const updatePerson = (i: number, field: 'name' | 'subtitle', value: string) => {
     setForm((p) => {
       const next = [...(p.notablePeople || [])];
@@ -194,6 +361,8 @@ export default function PlacementItemsAdmin() {
       alert(`Couldn't delete: ${(e as Error).message}`);
     }
   };
+
+  const zipUploadingLabel = zipProgress ? `Uploading ${zipProgress.done} of ${zipProgress.total}…` : 'Uploading…';
 
   return (
     <div className="admin-section">
@@ -314,6 +483,54 @@ export default function PlacementItemsAdmin() {
                 shape — drag the crop box to exactly the source image's own edges so it displays uncropped at its
                 own true proportions. Leave this empty to skip the section entirely.
               </p>
+              <div style={{ background: '#eef6ff', border: '1px solid #bcdcfd', borderRadius: 6, padding: '0.75rem 0.9rem', marginBottom: '0.9rem' }}>
+                <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+                  <label className="admin-btn admin-btn--primary" style={{ display: 'inline-block', cursor: zipUploading ? 'default' : 'pointer', opacity: zipUploading ? 0.6 : 1 }}>
+                    {zipUploading ? zipUploadingLabel : '📦 Add Photos from ZIP'}
+                    <input
+                      type="file"
+                      accept=".zip"
+                      hidden
+                      disabled={zipUploading}
+                      onChange={(e) => {
+                        const f = e.target.files?.[0];
+                        if (f) handleZip(f);
+                        e.target.value = '';
+                      }}
+                    />
+                  </label>
+                  <label className="admin-btn admin-btn--ghost" style={{ display: 'inline-block', cursor: zipUploading ? 'default' : 'pointer', opacity: zipUploading ? 0.6 : 1 }}>
+                    {zipUploading ? zipUploadingLabel : '🖼️ Add Photos from Folder (no zip needed)'}
+                    {/* Deliberately no `accept` — combining "image/*" with a
+                        long list of extensions (needed for one like ".pnj"
+                        the OS doesn't recognize) triggers a real macOS file
+                        dialog bug that grays out files instead of showing
+                        them. Every file type is selectable here; handleMultipleFiles
+                        filters to actual images afterward. */}
+                    <input
+                      type="file"
+                      multiple
+                      hidden
+                      disabled={zipUploading}
+                      onChange={(e) => {
+                        const files = e.target.files;
+                        if (files && files.length > 0) handleMultipleFiles(files);
+                        e.target.value = '';
+                      }}
+                    />
+                  </label>
+                </div>
+                <p style={{ fontSize: '0.8rem', color: '#6b7280', marginTop: '0.5rem' }}>
+                  Either way, every selected image becomes its own card, uploaded uncropped — no crop step per
+                  photo, so this is the fast way to add many at once. "From Folder" opens your regular file picker
+                  where you can select every image at once (Cmd/Ctrl/Shift-click, or Select All) without zipping
+                  them first. Each card's name is guessed from that image's filename (edit or clear it on the card
+                  afterward); subtitle is always left blank. For a specific crop on one photo, use "+ Add Person"
+                  below instead.
+                </p>
+                {zipStatus && <p style={{ fontSize: '0.85rem', color: '#16a34a', marginTop: '0.5rem' }}>{zipStatus}</p>}
+                {zipError && <p style={{ fontSize: '0.85rem', color: '#dc2626', marginTop: '0.5rem' }}>{zipError}</p>}
+              </div>
               {notablePeople.length > 0 && (
                 <div className="admin-image-grid" style={{ marginBottom: '0.75rem' }}>
                   {notablePeople.map((person, i) => (
@@ -344,7 +561,6 @@ export default function PlacementItemsAdmin() {
                 {personUploading ? 'Uploading…' : '+ Add Person'}
                 <input
                   type="file"
-                  accept="image/*"
                   hidden
                   disabled={personUploading}
                   onChange={(e) => {
