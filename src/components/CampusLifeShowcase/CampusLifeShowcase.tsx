@@ -67,7 +67,7 @@ export default function CampusLifeShowcase() {
               </div>
               <div className="campus-showcase-pillar-bottom">
                 <span className="campus-showcase-pillar-label">
-                  Cultural fests &amp;<br />tech hackathons
+                  Cultural fests &amp;<br />hackathons
                 </span>
                 <span className="campus-showcase-pillar-arrow" aria-hidden="true">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

@@ -10,7 +10,6 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link } from 'react-router-dom';
 import type { ContentBlockDoc } from '../../pages/Admin/sections/ContentBlocksAdmin';
 import './TestimonialSlider.css';
 
@@ -298,10 +297,15 @@ export default function TestimonialSlider({
 
           {/* Footer Sub-Link */}
           <div className="m3-testi-footer-link-wrap">
-            <Link to="/alumni" className="m3-testi-alumni-link">
+            <a
+              href="https://alumni.srivishnu.edu.in/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="m3-testi-alumni-link"
+            >
               <span>Explore More Alumni Journeys &amp; Giving</span>
               <ArrowRight size={14} />
-            </Link>
+            </a>
           </div>
         </div>
       </div>

@@ -1,14 +1,28 @@
 import { Link } from 'react-router-dom';
-import { 
-  ArrowRight, 
-  MapPin, 
-  ShieldCheck 
+import {
+  ArrowRight,
+  MapPin,
+  ShieldCheck,
+  Rocket,
+  Factory,
+  Microscope,
+  Globe2,
+  GraduationCap
 } from 'lucide-react';
 import { useSitePhotos } from '../../hooks/useSitePhotos';
 import SmoothImage from '../SmoothImage/SmoothImage';
 import './SmartInfrastructureShowcase.css';
 
 const DEFAULT_INFRA_IMAGE = '/images/ENGINEERED-SECION.jpeg';
+
+// Mirrors DIFFERENTIATOR_CATEGORIES in DifferentiatorsAdmin — links to each anchor on /differentiators
+const DIFF_TABS = [
+  { id: 'innovation', label: 'Innovation & Entrepreneurship', icon: Rocket },
+  { id: 'industry', label: 'Industry Centres of Excellence', icon: Factory },
+  { id: 'research', label: 'Research & Specialised Labs', icon: Microscope },
+  { id: 'global', label: 'International & Global Outreach', icon: Globe2 },
+  { id: 'student', label: 'Student Development & Social Impact', icon: GraduationCap },
+];
 
 const defaultInfraPhoto = [
   {
@@ -49,6 +63,21 @@ export default function SmartInfrastructureShowcase() {
           <p className="infra-showcase-desc">
             VWU combines architectural elegance with next-generation technological infrastructure. From AI-accelerated high-performance computing clusters and semiconductor cleanrooms to our 1,00,000+ volume automated Central Digital Library, multi-cuisine dining, and 24x7 secure smart residences—every facility is crafted to inspire academic mastery and holistic growth.
           </p>
+
+          {/* Differentiator category cards */}
+          <nav className="infra-diff-cards" aria-label="Explore what sets VWU apart">
+            {DIFF_TABS.map((tab) => (
+              <Link key={tab.id} to={`/differentiators#${tab.id}`} className="infra-diff-card">
+                <span className="infra-diff-card-icon" aria-hidden="true">
+                  <tab.icon size={22} strokeWidth={1.9} />
+                </span>
+                <span className="infra-diff-card-label">{tab.label}</span>
+                <span className="infra-diff-card-arrow" aria-hidden="true">
+                  <ArrowRight size={16} />
+                </span>
+              </Link>
+            ))}
+          </nav>
 
           {/* Tagline & Action Row */}
           <div className="infra-showcase-bottom-row">
