@@ -200,20 +200,34 @@ const navItemsData: NavItem[] = [
       linkText: 'R&D Overview',
       linkPath: '/research/about-rd',
     },
-    children: [
-      { label: 'About R&D', path: '/research/about-rd' },
-      { label: 'Research Advisory Committee', path: '/research/research-advisory-committee' },
-      { label: 'Research Ethics Committee', path: '/research/research-ethics-committee' },
-      { label: 'Intellectual Property Rights (IPR)', path: '/research/ipr-committee' },
-      { label: 'Thrust Areas of Research', path: '/research/thrust-areas-of-research' },
-      { label: 'Research Centers', path: '/research/research-centers' },
-      { label: 'Funded Projects', path: '/research/funded-projects' },
-      { label: 'Seed Money Projects', path: '/research/seed-money-projects' },
-      { label: 'Research Publications', path: '/research/research-publications' },
-      { label: 'MoUs & Collaborations', path: '/research/mous' },
-      { label: 'Patents', path: '/research/patents' },
-      { label: 'Consultancy', path: '/research/consultancy' },
-      { label: 'Professional Bodies', path: '/research/professional-bodies' },
+    groups: [
+      {
+        groupLabel: 'Research Info',
+        items: [
+          { label: 'About R&D', path: '/research/about-rd' },
+          { label: 'Research Advisory Committee', path: '/research/research-advisory-committee' },
+          { label: 'Research Ethics Committee', path: '/research/research-ethics-committee' },
+          { label: 'Intellectual Property Rights (IPR)', path: '/research/ipr-committee' },
+          { label: 'Thrust Areas of Research', path: '/research/thrust-areas-of-research' },
+        ],
+      },
+      {
+        groupLabel: 'Research Outcomes',
+        items: [
+          { label: 'Research Centers', path: '/research/research-centers' },
+          { label: 'Funded Projects', path: '/research/funded-projects' },
+          { label: 'Research Publications', path: '/research/research-publications' },
+          { label: 'MoUs & Collaborations', path: '/research/mous' },
+        ],
+      },
+      {
+        groupLabel: 'Innovations',
+        items: [
+          { label: 'Patents', path: '/research/patents' },
+          { label: 'Consultancy', path: '/research/consultancy' },
+          { label: 'Professional Bodies', path: '/research/professional-bodies' },
+        ],
+      },
     ],
   },
   {
@@ -237,7 +251,7 @@ const navItemsData: NavItem[] = [
       { label: 'VISHNU Fitness Centre', path: '/campus/fitness-centre' },
       { label: 'Health Care Centre', path: '/campus/health-care' },
       { label: 'Swimming Pool & Sports', path: '/campus/swimming-pool' },
-      { label: 'Radio Vishnu 90.4', path: '/differentiators/radio-vishnu-diff' },
+      { label: 'Radio Vishnu 90.4', path: 'http://radiovishnu.com/', external: true },
       { label: 'Vishnu TV Academy', path: '/vishnu-tv-academy' },
       { label: 'Student Clubs', path: '/student-clubs' },
       { label: 'Arts & Culture', path: '/arts-culture' },
@@ -260,7 +274,6 @@ const navItemsData: NavItem[] = [
         items: [
           { label: 'Upcoming Events', path: '/news-awards/happenings#upcoming-events' },
           { label: 'Recent Events', path: '/news-awards/happenings#recent-events' },
-          { label: 'News & Events', path: '/news' },
           { label: 'Photo & Video Gallery', path: '/news-awards/gallery' },
           { label: 'Vishnu Era Newsletter', path: 'https://www.srivishnu.edu.in/vishnu-era/', external: true },
           { label: 'Prathibha Magazine', path: 'https://heyzine.com/flip-book/088b7b5629.html#page/54', external: true },
