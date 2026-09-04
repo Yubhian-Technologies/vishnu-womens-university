@@ -55,13 +55,6 @@ const LEGAL_LINKS = [
   { label: 'Contact Us', href: '/contact' },
 ];
 
-const PINNED_UGC_DISCLOSURE = {
-  label: 'Disclosures – UGC (Public Self-Disclosure)',
-  href: '/disclosures/ugc',
-  download: false,
-  external: false,
-};
-
 /* -------------------------------------------------------------------------- */
 /* Main Redesigned Footer Component                                           */
 /* -------------------------------------------------------------------------- */
@@ -73,7 +66,8 @@ export default function Footer() {
   // Mobile accordion state (all closed by default for compact mobile viewport)
   const [openMobileSections, setOpenMobileSections] = useState<Set<string>>(new Set());
   // Compliance group toggle state on desktop/mobile
-  const [activeComplianceGroup, setActiveComplianceGroup] = useState<string>(COMPLIANCE_GROUPS[0]);
+  const initialGroup = COMPLIANCE_GROUPS.find((g) => g !== 'Mandatory Disclosures') || COMPLIANCE_GROUPS[0];
+  const [activeComplianceGroup, setActiveComplianceGroup] = useState<string>(initialGroup);
 
   const toggleMobileSection = (sectionKey: string) => {
     setOpenMobileSections((prev) => {
@@ -91,20 +85,19 @@ export default function Footer() {
   const { docs: liveDocs } = useOrderedCollection<ComplianceDocDoc>('complianceDocs', 'order');
   const complianceDocs = liveDocs.length > 0 ? liveDocs : (DEFAULT_COMPLIANCE_DOCS as ComplianceDocDoc[]);
 
-  const complianceGroups = COMPLIANCE_GROUPS.map((title) => {
-    const isMandatory = title === 'Mandatory Disclosures';
-    const groupItems = complianceDocs.filter((d) => d.group === title);
-    const links = [
-      ...(isMandatory ? [PINNED_UGC_DISCLOSURE] : []),
-      ...groupItems.map((d) => ({
+  const complianceGroups = COMPLIANCE_GROUPS
+    .filter((title) => title !== 'Mandatory Disclosures')
+    .map((title) => {
+      const groupItems = complianceDocs.filter((d) => d.group === title);
+      const links = groupItems.map((d) => ({
         label: d.label,
         href: d.fileUrl,
         download: d.external ? false : d.download !== false,
         external: !!d.external,
-      })),
-    ];
-    return { title, links };
-  }).filter((g) => g.links.length > 0);
+      }));
+      return { title, links };
+    })
+    .filter((g) => g.links.length > 0);
 
   const selectedComplianceLinks = complianceGroups.find((g) => g.title === activeComplianceGroup)?.links || complianceGroups[0]?.links || [];
 
