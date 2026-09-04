@@ -215,19 +215,6 @@ export default function ResultAnalysis() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section style={{ background: 'var(--color-primary)', padding: 'var(--space-12) 0' }}>
-        <div className="container" style={{ textAlign: 'center' }}>
-          <div className="reveal">
-            <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>Join a College That Delivers Results</h2>
-            <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Link to="/admission-procedure" className="btn btn-accent">How to Apply</Link>
-              <Link to="/programmes-fee-structure" className="btn btn-secondary">Fee Structure</Link>
-              <Link to="/admissions" className="btn btn-secondary">Admissions Home</Link>
-            </div>
-          </div>
-        </div>
-      </section>
     </main>
   );
 }
