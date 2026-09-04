@@ -44,7 +44,7 @@ const sections: DisclosureSection[] = [
       { label: 'About us: Overview', status: 'Available', links: [{ label: 'About VWU', path: '/about' }] },
       { label: 'Act and Statutes or MoA', status: 'Not Applicable' },
       { label: 'Institutional Development Plan', status: 'Available', links: [{ label: 'Institutional Development Plan', path: '/governance/idp' }] },
-      { label: 'Constituent Units / Affiliated Colleges, Affiliating University (in case of Colleges), Off-campus / Off-shore campus / Learning Support Centres under ODL mode (wherever applicable)', status: 'Affiliated to JNTUK, Kakinada', links: [{ label: 'JNTUK Kakinada', path: 'https://www.jntuk.edu.in/', external: true }] },
+      { label: 'Constituent Units / Affiliated Colleges, Affiliating University (in case of Colleges), Off-campus / Off-shore campus / Learning Support Centres under ODL mode (wherever applicable)', status: 'UGC Approved Private State University', links: [{ label: 'UGC Approved', path: '/disclosures-ugc' }] },
       { label: 'Accreditation / Ranking status (NAAC, NBA, NIRF)', status: 'Available', links: [
         { label: 'NAAC Approvals', path: 'https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2FNAACApprovals.pdf?alt=media&token=74745fe4-2332-4338-9f13-b753372b42d7', download: true, key: 'naac-approvals' },
         { label: 'NBA Approvals', path: 'https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2FNBAApprovals.pdf?alt=media&token=f25ad763-643d-4321-a36c-874029264996', download: true, key: 'nba-approvals' },

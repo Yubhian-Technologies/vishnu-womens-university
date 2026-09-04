@@ -226,7 +226,7 @@ export default function About() {
               { title: 'Innovation & Research', desc: 'An ecosystem that encourages curiosity, creativity, research, problem-solving, and entrepreneurship.' },
               { title: 'Industry & Careers', desc: 'Strong industry connect and career-oriented learning that prepare students for emerging opportunities and global careers.' },
               { title: 'Holistic Development', desc: 'Beyond academics, students are encouraged to develop leadership, communication, confidence, creativity, and social responsibility.' },
-              { title: 'World-Class Learning Environment', desc: 'Advanced laboratories, smart classrooms, drawing halls, seminar halls, and modern academic facilities create an engaging learning experience.' },
+              { title: 'World-Class Learning Engagement', desc: 'Advanced laboratories, smart classrooms, ICT Tools, seminar halls, and modern academic facilities create an engaging learning experience.' },
             ].map((pillar) => (
               <div
                 key={pillar.title}

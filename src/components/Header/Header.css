@@ -566,8 +566,11 @@
   display: block;
   padding: 8px 12px;
   font-size: 0.88rem;
-  color: var(--color-mid-gray);
+  font-weight: 600;
+  color: var(--color-text);
+  line-height: 1.4;
   cursor: default;
+  user-select: none;
 }
 
 /* 4th Column: Context / Highlight Overview Card */
@@ -752,8 +755,10 @@
 }
 
 .mobile-sublink.is-disabled {
-  color: var(--color-mid-gray);
+  color: var(--color-text);
+  font-weight: 500;
   cursor: default;
+  user-select: none;
 }
 
 /* Mobile Nested Groups */
