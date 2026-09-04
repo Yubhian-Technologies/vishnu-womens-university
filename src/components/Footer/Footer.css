@@ -32,18 +32,17 @@
 }
 
 /* ==========================================================================
-   TIER 1: University Identity & Accreditations Header
+   TIER 1: Identity & Navigation — brand on the left, link columns on the right
    ========================================================================== */
 
-.vwu-footer-identity-tier {
-  padding: 3.5rem 0 2.5rem;
-  border-bottom: 1px solid color-mix(in srgb, var(--footer-heading, #ffffff) 8%, transparent);
+.vwu-footer-main-tier {
+  padding: 3.5rem 0 3rem;
   background: rgba(0, 0, 0, 0.12);
 }
 
-.vwu-footer-identity-inner {
+.vwu-footer-main-inner {
   display: grid;
-  grid-template-columns: 1.2fr 1fr;
+  grid-template-columns: minmax(280px, 340px) 1fr;
   gap: 3.5rem;
   align-items: start;
 }
@@ -163,76 +162,9 @@
   color: color-mix(in srgb, var(--footer-heading, #ffffff) 30%, transparent);
 }
 
-/* Accreditations Block */
-.vwu-footer-accreditation-block {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.vwu-footer-accreditation-header {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.vwu-footer-acc-shield {
-  color: var(--footer-accent, var(--color-accent, #c9a84c));
-}
-
-.vwu-footer-acc-heading {
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: color-mix(in srgb, var(--footer-heading, #ffffff) 70%, transparent);
-}
-
-.vwu-footer-accreditation-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-  gap: 0.75rem;
-}
-
-.vwu-footer-acc-card {
-  background: color-mix(in srgb, var(--footer-heading, #ffffff) 4%, transparent);
-  border: 1px solid color-mix(in srgb, var(--footer-heading, #ffffff) 10%, transparent);
-  border-radius: 16px;
-  padding: 0.85rem 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  transition: all 200ms ease;
-}
-
-.vwu-footer-acc-card:hover {
-  background: color-mix(in srgb, var(--footer-heading, #ffffff) 8%, transparent);
-  border-color: var(--footer-accent, var(--color-accent, #c9a84c));
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
-}
-
-.vwu-footer-acc-code {
-  font-size: 0.92rem;
-  font-weight: 800;
-  color: var(--footer-accent, var(--color-accent, #c9a84c));
-  letter-spacing: 0.02em;
-}
-
-.vwu-footer-acc-title {
-  font-size: 0.72rem;
-  color: color-mix(in srgb, var(--footer-text, #e2e8f0) 70%, transparent);
-  line-height: 1.35;
-}
-
 /* ==========================================================================
-   TIER 2: Categorized Navigation Grid (Desktop)
+   Categorized Navigation Grid (Desktop) — right side of the main tier
    ========================================================================== */
-
-.vwu-footer-nav-tier {
-  padding: 3.5rem 0 3rem;
-}
 
 .vwu-footer-nav-grid {
   display: grid;
@@ -504,10 +436,11 @@
    ========================================================================== */
 
 @media (max-width: 1024px) {
-  .vwu-footer-identity-inner {
+  .vwu-footer-main-inner {
     grid-template-columns: 1fr;
-    gap: 2rem;
+    gap: 2.5rem;
   }
+
   .vwu-footer-nav-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 2.5rem;
@@ -515,12 +448,8 @@
 }
 
 @media (max-width: 768px) {
-  .vwu-footer-identity-tier {
+  .vwu-footer-main-tier {
     padding: 2.5rem 0 2rem;
-  }
-
-  .vwu-footer-nav-tier {
-    padding: 1.5rem 0 2rem;
   }
 
   /* Switch desktop grid to mobile accordions */

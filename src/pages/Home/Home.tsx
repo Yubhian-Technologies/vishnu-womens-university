@@ -11,7 +11,9 @@ import TestimonialSlider from '../../components/TestimonialSlider/TestimonialSli
 import RecruitersSection from '../../components/RecruitersMarquee/RecruitersSection';
 import WomensEducationSection from '../../components/WomensEducation/WomensEducationSection';
 import CampusLifeShowcase from '../../components/CampusLifeShowcase/CampusLifeShowcase';
+import AccreditationsStrip from '../../components/AccreditationsStrip/AccreditationsStrip';
 import ProgramsShowcase from '../../components/ProgramsShowcase/ProgramsShowcase';
+import LatestGraduatesShowcase from '../../components/LatestGraduatesShowcase/LatestGraduatesShowcase';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { fetchPriorityAttr } from '../../lib/domAttrs';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
@@ -299,8 +301,14 @@ export default function Home() {
       {/* ── Campus Life Showcase (A vibrant campus. A memorable journey.) ── */}
       <CampusLifeShowcase />
 
+      {/* ── Accreditations & Affiliations ── */}
+      <AccreditationsStrip />
+
       {/* ── Programs & Schools Showcase (Future-focused education across disciplines) ── */}
       <ProgramsShowcase />
+
+      {/* ── Latest Graduates Placement Showcase (hidden until an admin adds one) ── */}
+      <LatestGraduatesShowcase />
 
       {/* ── Women's Education & Empowerment ── */}
       <WomensEducationSection />
