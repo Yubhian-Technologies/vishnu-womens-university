@@ -11,7 +11,7 @@ import './HeroSlider.css';
 // with an external tool (ffmpeg/HandBrake) would help more than anything
 // done here — but deferring the fetch (below) at least keeps it from
 // competing with the JS bundle for bandwidth during initial page load.
-const HERO_VIDEO_SRC = '/hero-video.mp4';
+const HERO_VIDEO_SRC = '/HERO-VIDEO.mp4';
 
 
 interface Slide {

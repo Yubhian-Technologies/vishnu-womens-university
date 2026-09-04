@@ -9,7 +9,7 @@
 export const IMPACT_STATS = [
   { value: 13100, suffix: '+', label: 'Engineers graduated' },
   { value: 1400, suffix: '+', label: 'Students placed annually' },
-  { value: 230, suffix: '+', label: 'Experienced faculty' },
+  { value: 0, suffix: '', label: 'Expert Faculty' },
   { value: 500, suffix: '+', label: 'Recruiting industry partners' },
 ];
 

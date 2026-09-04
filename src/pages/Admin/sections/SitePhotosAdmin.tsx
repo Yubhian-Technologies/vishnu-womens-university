@@ -40,7 +40,7 @@ export const SITE_PHOTO_PAGES = [
   { value: 'sports-games', label: 'Sports & Games' },
   { value: 'social-services', label: 'Social Services (NSS)' },
   { value: 'iqac', label: 'IQAC' },
-  { value: 'anti-ragging', label: 'Anti Ragging' },
+  { value: 'anti-ragging', label: 'Anti-Ragging' },
 ];
 
 interface SlotDefault { imageUrl: string; alt: string; caption: string; label?: string; }
@@ -395,9 +395,9 @@ const DEFAULT_SECTIONS: Record<string, Record<string, SectionDef>> = {
   },
   'anti-ragging': {
     main: {
-      label: 'Anti Ragging Page Photo',
+      label: 'Anti-Ragging Page Photo',
       slots: [
-        { imageUrl: PHOTO_NEEDED_PLACEHOLDER, alt: 'Anti Ragging', caption: '' },
+        { imageUrl: PHOTO_NEEDED_PLACEHOLDER, alt: 'Anti-Ragging', caption: '' },
       ],
     },
   },

@@ -129,6 +129,8 @@ const PARTNER_DOMAINS: Record<string, string> = {
 // their actual logo) — checked before falling back to that lookup.
 const PARTNER_LOGO_OVERRIDES: Record<string, string> = {
   'IBM': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/IBM_logo.svg/250px-IBM_logo.svg.png',
+  // Google's favicon service has nothing for providence.org, so the lookup 404s
+  'Providence': 'https://upload.wikimedia.org/wikipedia/en/thumb/7/79/Providence_Health_logo.svg/250px-Providence_Health_logo.svg.png',
 };
 
 // Placement Cell's Summary tiles are a single free-text line per batch (e.g.
@@ -143,10 +145,14 @@ function OutcomeTileText({ text }: { text: string }) {
   const m = text.match(OUTCOME_BATCH_SUMMARY_RE);
   if (!m) return <>{text}</>;
   const [, batch, count, highest] = m;
+  // The raw admin-entered count sometimes has a thousands comma baked in
+  // (e.g. "1,156") and sometimes doesn't (e.g. "1103") — strip it so every
+  // tile reads the same way regardless of how it was typed.
+  const countDigitsOnly = count.replace(/,/g, '');
   return (
     <>
       <span style={{ display: 'block', textAlign: 'center' }}>{batch} batch</span>
-      <span style={{ display: 'block', textAlign: 'center' }}>{count} placements</span>
+      <span style={{ display: 'block', textAlign: 'center' }}>{countDigitsOnly} placements</span>
       Highest Package: {highest}
     </>
   );

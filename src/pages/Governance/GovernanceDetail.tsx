@@ -64,7 +64,7 @@ const IQAC_COMMITTEE_SIDEBAR_ITEMS: { label: string; path: string }[] = [
   { label: 'Student Grievance Redressal', path: '/governance/student-grievance' },
   { label: 'Central Purchase Committee', path: '/governance/central-purchase' },
   { label: 'Counselling & Monitoring', path: '/governance/counselling-monitoring' },
-  { label: 'Anti Ragging Committee', path: '/governance/anti-ragging' },
+  { label: 'Anti-Ragging Committee', path: '/governance/anti-ragging' },
   { label: 'Internal Committee (POSH)', path: '/governance/internal-committee' },
   { label: 'SC/ST Cell', path: '/governance/sc-st-cell' },
   { label: 'R&D Committee', path: '/governance/rd-committee' },

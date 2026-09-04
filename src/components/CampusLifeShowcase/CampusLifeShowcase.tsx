@@ -1,3 +1,4 @@
+
 import { Link } from 'react-router-dom';
 import { useSitePhotos } from '../../hooks/useSitePhotos';
 import SmoothImage from '../SmoothImage/SmoothImage';

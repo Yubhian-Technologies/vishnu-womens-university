@@ -6,7 +6,8 @@ import { useNavLinkOverride } from '../../hooks/useNavLinkOverride';
 import type { ProgramDoc } from '../../pages/Admin/sections/ProgramsAdmin';
 import { DIFFERENTIATOR_CATEGORIES } from '../../pages/Admin/sections/DifferentiatorsAdmin';
 import type { DifferentiatorItemDoc } from '../../pages/Admin/sections/DifferentiatorsAdmin';
-import type { PlacementItemDoc } from '../../pages/Admin/sections/PlacementItemsAdmin';
+import type { PlacementItemDoc, PlacementMenuColumn } from '../../pages/Admin/sections/PlacementItemsAdmin';
+import { PLACEMENT_MENU_COLUMNS } from '../../pages/Admin/sections/PlacementItemsAdmin';
 import SmoothCollapse from '../SmoothCollapse/SmoothCollapse';
 import './Header.css';
 
@@ -80,8 +81,8 @@ const navItemsData: NavItem[] = [
           { label: 'Infrastructure Management', path: '/governance/infrastructure-management', disabled: true },
           { label: 'Faculty Grievance Redressal', path: '/governance/faculty-grievance', disabled: true },
           { label: 'Student Grievance Redressal', path: '/governance/student-grievance', disabled: true },
-          { label: 'Central Purchase Committee', path: '/governance/central-purchase', disabled: true },
-          { label: 'Anti Ragging Committee', path: '/governance/anti-ragging', disabled: true },
+          {label: 'Central Purchase Committee', path: '/governance/central-purchase', disabled: true },
+          { label: 'Anti-Ragging Committee', path: '/governance/anti-ragging', disabled: true },
           { label: 'Internal Committee (POSH)', path: '/governance/internal-committee', disabled: true },
           { label: 'SC/ST Cell', path: '/governance/sc-st-cell', disabled: true },
           { label: 'R&D Committee', path: '/governance/rd-committee', disabled: true },
@@ -103,7 +104,6 @@ const navItemsData: NavItem[] = [
     label: 'Academics',
     highlight: {
       title: 'Academic Excellence',
-      badge: 'Autonomous',
       description: 'Industry-aligned curriculum, multidisciplinary research, distinguished faculty, and hands-on laboratory learning.',
       linkText: 'All Programs',
       linkPath: '/academics',
@@ -113,12 +113,10 @@ const navItemsData: NavItem[] = [
         groupLabel: 'Overview',
         groupPath: '/academics',
         items: [
-          { label: 'Programs & Departments', path: '/academics' },
-          { label: 'Schools', path: '/academics/schools' },
           { label: 'Departments', path: '/academics/departments' },
           { label: 'Programs', path: '/academics/programs' },
           { label: 'Faculty Directory', path: '/faculty' },
-          { label: 'Result Analysis', path: '/result-analysis' },
+          { label: 'Results Analysis', path: '/result-analysis' },
           { label: 'Examinations Portal', path: 'https://www.svecwexams.in/', external: true },
         ],
       },
@@ -151,9 +149,9 @@ const navItemsData: NavItem[] = [
       { label: 'Admissions Overview', path: '/admissions' },
       { label: 'Programmes & Fee Structure', path: '/programmes-fee-structure' },
       { label: 'Admission Procedure', path: '/admission-procedure' },
-      { label: 'Result Analysis', path: '/result-analysis' },
+      { label: 'Results Analysis', path: '/result-analysis' },
       { label: 'Fee Payment Portal', path: 'https://svecw.ac.in/Default.aspx?ReturnUrl=%2f', external: true },
-      { label: 'How to Reach Campus', path: '/information#how-to-reach' },
+      { label: 'How to Reach Campus', path: '/contact' },
     ],
   },
   {
@@ -182,7 +180,9 @@ const navItemsData: NavItem[] = [
       linkText: 'Placement Insights',
       linkPath: '/placements',
     },
-    children: [],
+    // Populated below from the live `placementItems` collection, grouped by
+    // each item's admin-set menuColumn (see renderedNavItems).
+    groups: [],
   },
   {
     label: 'Research',
@@ -280,7 +280,7 @@ const navItemsData: NavItem[] = [
     },
     children: [
       { label: 'Contact Us', path: '/contact' },
-      { label: 'How to Reach Campus', path: '/information#how-to-reach' },
+      { label: 'How to Reach Campus', path: '/contact' },
     ],
   },
 ];
@@ -427,13 +427,34 @@ export default function Header() {
       return { ...item, groups };
     }
     if (item.label === 'Placements') {
+      const toChild = (p: PlacementItemDoc): NavChild =>
+        p.external && p.url
+          ? { label: p.title, path: p.url, external: true }
+          : { label: p.title, path: `/placements/${p.slug}` };
+
+      // Items with an explicit menuColumn (set in Admin → Placements → Menu
+      // Column) go straight into that column. Items saved before this field
+      // existed have no menuColumn yet — those fall back to the same
+      // balanced-thirds split the menu used previously, computed only over
+      // the leftover items, so nothing visibly moves until an admin picks a
+      // column for it.
+      const buckets: Record<PlacementMenuColumn, PlacementItemDoc[]> = { explore: [], quick: [], facilities: [] };
+      const unassigned: PlacementItemDoc[] = [];
+      placementItems.forEach((p) => {
+        if (p.menuColumn) buckets[p.menuColumn].push(p);
+        else unassigned.push(p);
+      });
+      const perCol = Math.ceil(unassigned.length / 3) || 1;
+      unassigned.forEach((p, i) => {
+        const col: PlacementMenuColumn = i < perCol ? 'explore' : i < perCol * 2 ? 'quick' : 'facilities';
+        buckets[col].push(p);
+      });
+
       return {
         ...item,
-        children: placementItems.map((p): NavChild =>
-          p.external && p.url
-            ? { label: p.title, path: p.url, external: true }
-            : { label: p.title, path: `/placements/${p.slug}` }
-        ),
+        groups: PLACEMENT_MENU_COLUMNS
+          .map((c) => ({ groupLabel: c.label, items: buckets[c.value].map(toChild) }))
+          .filter((g) => g.items.length > 0),
       };
     }
     return item;

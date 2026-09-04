@@ -165,7 +165,6 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
                         </div>
                         <div className="dept-quick-nav-title-wrap">
                           <h4 className="dept-quick-nav-title">Quick Navigation</h4>
-                          <span className="dept-quick-nav-subtitle">{quickLinks.length} Sections</span>
                         </div>
                       </div>
                       <ul className="dept-quick-nav-list" role="list">
