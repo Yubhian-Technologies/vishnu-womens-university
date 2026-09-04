@@ -38,13 +38,16 @@ export default function CampusLifeShowcase() {
 
           {/* Main Title */}
           <h2 className="campus-showcase-title">
-            A vibrant campus. An<br />empowering journey.
+            Where Every Day Becomes Part of Your Journey
           </h2>
 
           {/* Lead Paragraph */}
-          <p className="campus-showcase-desc">
-            Life at Vishnu Women's University is dynamic, inclusive, and enriching. From national hackathons and all-women mBAJA racing championships to grand cultural festivals, technical societies, and championship sports—every day at VWU is designed to build confidence, creativity, and leadership.
-          </p>
+          <div className="campus-showcase-desc">
+            <p>At Vishnu Women&rsquo;s University, campus life is an experience in becoming&mdash;finding your voice, discovering your strengths, and building the confidence to shape what comes next.</p>
+            <p>Here, classrooms extend into innovation labs, racing tracks, sports arenas, cultural stages, and student-led communities by celebrating culture, pursuing technology, excelling in sport, and creating lasting friendships, every experience opens a new possibility.</p>
+            <p>It is a campus where curiosity becomes courage, ideas become action, and ambition finds its purpose.</p>
+            <p>Discover. Create. Connect. Lead.<br />Your journey begins here.</p>
+          </div>
 
           {/* 3 Pillars Clean Horizontal Underline Grid */}
           <div className="campus-showcase-pillars">

@@ -227,7 +227,11 @@ function SingleProgramDetail() {
     { key: 'awards', label: 'Student Awards', years: validYears(dept?.studentAwardsYears) },
     { key: 'others', label: 'Others', years: validYears(dept?.othersYears) },
   ];
-  const hasLegacyNewsEvents = !hasNewsEventsDynamic && newsEventsCategories.some((c) => c.years.length > 0);
+  // Once a department has gone through the new Admin flow at least once
+  // (dept.newsEventsMigrated), the old arrays are frozen leftovers, not the
+  // live source of truth — an admin who then deletes everything in the new
+  // editor must actually see it gone, not have this stale data resurface.
+  const hasLegacyNewsEvents = !hasNewsEventsDynamic && !dept?.newsEventsMigrated && newsEventsCategories.some((c) => c.years.length > 0);
   const hasNewsEventsYears = hasNewsEventsDynamic || hasLegacyNewsEvents;
   const newsletterYears = (program.newsletterYears || []).filter((y) => y.year && y.issues && y.issues.length > 0);
   const hasNewsletter = newsletterYears.length > 0;

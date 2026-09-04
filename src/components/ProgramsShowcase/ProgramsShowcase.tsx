@@ -69,8 +69,12 @@ export default function ProgramsShowcase() {
           <div className="programs-showcase-left">
             <span className="programs-showcase-eyebrow">Programs</span>
             <h2 className="programs-showcase-heading">
-              Future-focused education across disciplines
+              A Spectrum of Programmes. A World of Possibilities.
             </h2>
+            <div className="programs-showcase-desc">
+              <p>VWU offers a diverse portfolio of academic programmes that bring together rigorous learning, research, global perspectives, and meaningful industry engagement. From undergraduate to doctoral study, every programme is designed to nurture curiosity, build future-ready capabilities, and empower students to transform ideas into innovation and impact.</p>
+              <p>With opportunities to learn across disciplines, engage in research, gain global exposure, and connect with industry, students are prepared not just for successful careers, but to become confident leaders, thoughtful innovators, and lifelong learners in an ever-evolving world.</p>
+            </div>
 
             {/* Interactive Live Search Bar */}
             <div ref={searchWrapRef} className="programs-showcase-search-container">

@@ -262,7 +262,7 @@ export default function Home() {
           <div className="study-intro reveal">
             <span className="section-label">Academics</span>
             <h2 className="section-title gradient-text">Study at VWU</h2>
-            <p className="section-desc">Your education at VWU is personalized, industry-focused, and structured to develop your technical depth, leadership capacity, and innovative thinking.</p>
+            <p className="section-desc"><strong>Learn. Lead. Innovate.</strong><br />At VWU, education goes beyond the classroom. Experience personalized, industry-focused learning that builds technical expertise, leadership confidence, creativity, and the skills to shape your future.</p>
           </div>
           <div className="study-grid">
             {studyCards.map((card, i) => {
