@@ -16,7 +16,7 @@ export default function ResearchStatsSection() {
               viewport={{ once: true, amount: 0.4 }}
               transition={{ duration: 0.5, delay: i * 0.08 }}
             >
-              <div className="lph-research-stats__big">{s.big}</div>
+              {s.big ? <div className="lph-research-stats__big">{s.big}</div> : null}
               <p>{s.label}</p>
             </motion.div>
           ))}

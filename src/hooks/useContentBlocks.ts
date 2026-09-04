@@ -57,7 +57,7 @@ export function useContentBlocks(page: string, section: string): ContentBlockDoc
   return docs.filter((b) => b.page === page && b.section === section);
 }
 
-const DEFAULT_EAPCET_CODE = 'VISW';
+const DEFAULT_EAPCET_CODE = 'VISW, VISWPU';
 
 /**
  * The EAPCET/EAMCET college code, quoted in several places across the site

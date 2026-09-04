@@ -19,10 +19,13 @@ const SOCIAL_LINKS = [
   { label: 'YouTube', href: 'https://www.youtube.com/@SVECW-B0', Icon: YouTubeIcon },
 ];
 
-const UNIVERSITY_LINKS = [
+// `disabled` items render as greyed, non-clickable text — mirroring the
+// navbar, where the corresponding pages (Governance sub-pages, Campus
+// Facilities) aren't live yet.
+const UNIVERSITY_LINKS: { label: string; href: string; disabled?: boolean }[] = [
   { label: 'About VWU', href: '/about' },
-  { label: 'Governance & Leadership', href: '/governance' },
-  { label: 'Campus Facilities', href: '/campus-facilities' },
+  { label: 'Governance & Leadership', href: '/governance', disabled: true },
+  { label: 'Campus Facilities', href: '/campus-facilities', disabled: true },
   { label: 'Careers at VWU', href: '/careers' },
   { label: 'Alumni Network', href: '/alumni-giving#network' },
   { label: 'Contact Us', href: '/contact' },
@@ -50,17 +53,10 @@ const STUDENT_SERVICE_LINKS = [
 
 const LEGAL_LINKS = [
   { label: 'Policies & Procedures', href: '/policies-procedures' },
-  { label: 'Anti Ragging Policy', href: '/anti-ragging' },
+  { label: 'Anti-Ragging Policy', href: '/anti-ragging' },
   { label: 'Disclosures – UGC', href: '/disclosures/ugc' },
   { label: 'Contact Us', href: '/contact' },
 ];
-
-const PINNED_UGC_DISCLOSURE = {
-  label: 'Disclosures – UGC (Public Self-Disclosure)',
-  href: '/disclosures/ugc',
-  download: false,
-  external: false,
-};
 
 /* -------------------------------------------------------------------------- */
 /* Main Redesigned Footer Component                                           */
@@ -73,7 +69,8 @@ export default function Footer() {
   // Mobile accordion state (all closed by default for compact mobile viewport)
   const [openMobileSections, setOpenMobileSections] = useState<Set<string>>(new Set());
   // Compliance group toggle state on desktop/mobile
-  const [activeComplianceGroup, setActiveComplianceGroup] = useState<string>(COMPLIANCE_GROUPS[0]);
+  const initialGroup = COMPLIANCE_GROUPS.find((g) => g !== 'Mandatory Disclosures') || COMPLIANCE_GROUPS[0];
+  const [activeComplianceGroup, setActiveComplianceGroup] = useState<string>(initialGroup);
 
   const toggleMobileSection = (sectionKey: string) => {
     setOpenMobileSections((prev) => {
@@ -91,20 +88,19 @@ export default function Footer() {
   const { docs: liveDocs } = useOrderedCollection<ComplianceDocDoc>('complianceDocs', 'order');
   const complianceDocs = liveDocs.length > 0 ? liveDocs : (DEFAULT_COMPLIANCE_DOCS as ComplianceDocDoc[]);
 
-  const complianceGroups = COMPLIANCE_GROUPS.map((title) => {
-    const isMandatory = title === 'Mandatory Disclosures';
-    const groupItems = complianceDocs.filter((d) => d.group === title);
-    const links = [
-      ...(isMandatory ? [PINNED_UGC_DISCLOSURE] : []),
-      ...groupItems.map((d) => ({
+  const complianceGroups = COMPLIANCE_GROUPS
+    .filter((title) => title !== 'Mandatory Disclosures')
+    .map((title) => {
+      const groupItems = complianceDocs.filter((d) => d.group === title);
+      const links = groupItems.map((d) => ({
         label: d.label,
         href: d.fileUrl,
         download: d.external ? false : d.download !== false,
         external: !!d.external,
-      })),
-    ];
-    return { title, links };
-  }).filter((g) => g.links.length > 0);
+      }));
+      return { title, links };
+    })
+    .filter((g) => g.links.length > 0);
 
   const selectedComplianceLinks = complianceGroups.find((g) => g.title === activeComplianceGroup)?.links || complianceGroups[0]?.links || [];
 
@@ -165,9 +161,15 @@ export default function Footer() {
             <ul className="vwu-footer-nav-list" role="list">
               {UNIVERSITY_LINKS.map((item) => (
                 <li key={item.label}>
-                  <Link to={item.href} className="vwu-footer-nav-link">
-                    {item.label}
-                  </Link>
+                  {item.disabled ? (
+                    <span className="vwu-footer-nav-link is-disabled" aria-disabled="true">
+                      {item.label}
+                    </span>
+                  ) : (
+                    <Link to={item.href} className="vwu-footer-nav-link">
+                      {item.label}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>

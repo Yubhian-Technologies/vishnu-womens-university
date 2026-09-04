@@ -114,10 +114,10 @@ const sections: DisclosureSection[] = [
       { label: 'Details of Student Grievance Redressal Committee (SGRC) and Ombudsperson', status: 'Available', links: [{ label: 'Student Grievance Redressal Committee', path: '/governance/student-grievance' }] },
       { label: 'Health facilities', status: 'Available', links: [{ label: 'Health Care', path: '/campus/health-care' }] },
       { label: 'Internal Complaint Committee', status: 'Available', links: [{ label: 'Internal Committee (POSH)', path: '/governance/internal-committee' }] },
-      { label: 'Anti-Ragging Cell', status: 'Available', links: [{ label: 'Anti Ragging Committee', path: '/governance/anti-ragging' }] },
+      { label: 'Anti-Ragging Cell', status: 'Available', links: [{ label: 'Anti-Ragging Committee', path: '/governance/anti-ragging' }] },
       { label: 'Equal Opportunity Cell', status: 'Available', links: [{ label: 'Governance', path: '/governance' }] },
       { label: 'Socio-Economically Disadvantaged Groups Cell (SEDG)', status: 'Available', links: [{ label: 'SC/ST Cell', path: '/governance/sc-st-cell' }] },
-      { label: 'Facilities for differently-abled (e.g. barrier-free environment)', status: 'Available', links: [{ label: 'Facilities for Physically Challenged', path: 'https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2FSVECWPhysicallyChallengedFacilities.pdf?alt=media&token=168a11aa-9a64-4f19-94bc-8a022ce558bc', download: true, key: 'facilities-physically-challenged' }] },
+      { label: 'Facilities for differently-abled (e.g. barrier-free environment)', status: 'Available', links: [{ label: 'Facilities for Persons with Disabilities', path: 'https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2FSVECWPhysicallyChallengedFacilities.pdf?alt=media&token=168a11aa-9a64-4f19-94bc-8a022ce558bc', download: true, key: 'facilities-physically-challenged' }] },
     ],
   },
   {
@@ -214,7 +214,7 @@ export default function UGCDisclosure() {
             <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6, maxWidth: 820 }}>
               The signed original of this disclosure is also available as a downloadable PDF —{' '}
               <a href={docsByKey.get('ugc-public-self-disclosure')!.fileUrl} download style={{ color: 'var(--color-primary)', fontWeight: 600 }}>
-                UGC Public Self Disclosure ↓
+                UGC Public Self-Disclosure ↓
               </a>.
             </p>
           )}

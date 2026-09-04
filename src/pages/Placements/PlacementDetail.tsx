@@ -129,6 +129,8 @@ const PARTNER_DOMAINS: Record<string, string> = {
 // their actual logo) — checked before falling back to that lookup.
 const PARTNER_LOGO_OVERRIDES: Record<string, string> = {
   'IBM': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/IBM_logo.svg/250px-IBM_logo.svg.png',
+  // Google's favicon service has nothing for providence.org, so the lookup 404s
+  'Providence': 'https://upload.wikimedia.org/wikipedia/en/thumb/7/79/Providence_Health_logo.svg/250px-Providence_Health_logo.svg.png',
 };
 
 // Placement Cell's Summary tiles are a single free-text line per batch (e.g.

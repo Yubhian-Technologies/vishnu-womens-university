@@ -215,6 +215,12 @@
   transform: translateX(3px);
 }
 
+.vwu-footer-nav-link.is-disabled {
+  color: color-mix(in srgb, var(--footer-text, #e2e8f0) 38%, transparent);
+  cursor: default;
+  pointer-events: none;
+}
+
 .vwu-footer-nav-link:focus-visible {
   outline: 2px solid var(--footer-accent, var(--color-accent, #c9a84c));
   outline-offset: 2px;

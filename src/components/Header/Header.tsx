@@ -80,8 +80,8 @@ const navItemsData: NavItem[] = [
           { label: 'Infrastructure Management', path: '/governance/infrastructure-management', disabled: true },
           { label: 'Faculty Grievance Redressal', path: '/governance/faculty-grievance', disabled: true },
           { label: 'Student Grievance Redressal', path: '/governance/student-grievance', disabled: true },
-          { label: 'Central Purchase Committee', path: '/governance/central-purchase', disabled: true },
-          { label: 'Anti Ragging Committee', path: '/governance/anti-ragging', disabled: true },
+          {label: 'Central Purchase Committee', path: '/governance/central-purchase', disabled: true },
+          { label: 'Anti-Ragging Committee', path: '/governance/anti-ragging', disabled: true },
           { label: 'Internal Committee (POSH)', path: '/governance/internal-committee', disabled: true },
           { label: 'SC/ST Cell', path: '/governance/sc-st-cell', disabled: true },
           { label: 'R&D Committee', path: '/governance/rd-committee', disabled: true },
@@ -103,7 +103,6 @@ const navItemsData: NavItem[] = [
     label: 'Academics',
     highlight: {
       title: 'Academic Excellence',
-      badge: 'Autonomous',
       description: 'Industry-aligned curriculum, multidisciplinary research, distinguished faculty, and hands-on laboratory learning.',
       linkText: 'All Programs',
       linkPath: '/academics',
@@ -113,12 +112,10 @@ const navItemsData: NavItem[] = [
         groupLabel: 'Overview',
         groupPath: '/academics',
         items: [
-          { label: 'Programs & Departments', path: '/academics' },
-          { label: 'Schools', path: '/academics/schools' },
           { label: 'Departments', path: '/academics/departments' },
           { label: 'Programs', path: '/academics/programs' },
           { label: 'Faculty Directory', path: '/faculty' },
-          { label: 'Result Analysis', path: '/result-analysis' },
+          { label: 'Results Analysis', path: '/result-analysis' },
           { label: 'Examinations Portal', path: 'https://www.svecwexams.in/', external: true },
         ],
       },
@@ -151,9 +148,9 @@ const navItemsData: NavItem[] = [
       { label: 'Admissions Overview', path: '/admissions' },
       { label: 'Programmes & Fee Structure', path: '/programmes-fee-structure' },
       { label: 'Admission Procedure', path: '/admission-procedure' },
-      { label: 'Result Analysis', path: '/result-analysis' },
+      { label: 'Results Analysis', path: '/result-analysis' },
       { label: 'Fee Payment Portal', path: 'https://svecw.ac.in/Default.aspx?ReturnUrl=%2f', external: true },
-      { label: 'How to Reach Campus', path: '/information#how-to-reach' },
+      { label: 'How to Reach Campus', path: '/contact' },
     ],
   },
   {
@@ -280,7 +277,7 @@ const navItemsData: NavItem[] = [
     },
     children: [
       { label: 'Contact Us', path: '/contact' },
-      { label: 'How to Reach Campus', path: '/information#how-to-reach' },
+      { label: 'How to Reach Campus', path: '/contact' },
     ],
   },
 ];
