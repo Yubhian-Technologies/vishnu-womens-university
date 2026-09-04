@@ -43,7 +43,7 @@ export default function CampusLifeShowcase() {
 
           {/* Lead Paragraph */}
           <div className="campus-showcase-desc">
-            <p>At Vishnu Women&rsquo;s University, campus life is an experience in becoming&mdash;finding your voice, discovering your strengths, and building the confidence to shape what comes next.</p>
+            <p>At Vishnu Women&rsquo;s University, campus life is an experience in becoming finding your voice, discovering your strengths, and building the confidence to shape what comes next.</p>
             <p>Here, classrooms extend into innovation labs, racing tracks, sports arenas, cultural stages, and student-led communities by celebrating culture, pursuing technology, excelling in sport, and creating lasting friendships, every experience opens a new possibility.</p>
             <p>It is a campus where curiosity becomes courage, ideas become action, and ambition finds its purpose.</p>
             <p>Discover. Create. Connect. Lead.<br />Your journey begins here.</p>

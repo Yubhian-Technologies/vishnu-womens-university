@@ -11,7 +11,6 @@ import { useSitePhotos, useSectionHasPhotos } from '../../hooks/useSitePhotos';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import { Rocket, Target } from 'lucide-react';
 import { resolveContentIcon } from '../../lib/contentIcons';
-import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
 
 function getInitials(name: string) {
   const cleaned = name.replace(/\b(Dr|Sri|Prof|Mr|Mrs|Ms)\.?\s*/gi, '');
@@ -100,13 +99,6 @@ export default function About() {
   const campusSnapshotImg = campusPhotos[6];
   const parentSocietyImg = campusPhotos[7];
   const academicSnapshotStats = useContentBlocks('about', 'academicSnapshotStats');
-  // Counts derived live from the `programs` collection (same source as the
-  // B.Tech count on Academics.tsx) so this sentence can't drift out of sync
-  // with what's actually in /admin → Programs.
-  const { docs: allPrograms } = useOrderedCollection<ProgramDoc>('programs', 'order');
-  const btechCount = allPrograms.filter(p => p.category === 'btech').length;
-  const mtechCount = allPrograms.filter(p => p.category === 'mtech').length;
-  const departmentCount = new Set(allPrograms.filter(p => p.department).map(p => p.department)).size;
   const diffItems = useContentBlocks('about', 'differentiators');
   const discoverCards = useContentBlocks('about', 'discoverCards');
 
@@ -288,10 +280,9 @@ export default function About() {
           <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-12)', alignItems: 'center' }}>
             <div className="reveal-left">
               <span className="section-label">Academic Excellence</span>
-              <h2 className="section-title">Programs Across Engineering, Management & Research</h2>
+              <h2 className="section-title">Where Ambition Meets Opportunity.</h2>
               <p style={{ color: 'var(--color-text-light)', lineHeight: 1.8, marginBottom: 'var(--space-6)' }}>
-                VWU delivers {btechCount || 9} B.Tech specialisations, {mtechCount || 4} M.Tech programs, MBA, and Ph.D. across {departmentCount || 9} departments —
-                 shaped by the curricular freedom that comes with full UGC Guidelines.
+                Explore a diverse academic ecosystem spanning Engineering, Management &amp; Research&mdash;designed to develop knowledge, innovation, leadership, and future-ready capabilities.
               </p>
               <Link to="/academics" className="btn btn-primary">View All Programs & Departments →</Link>
             </div>
@@ -382,14 +373,15 @@ export default function About() {
             images={galleryPhotos}
             label="Campus Life"
             title="Life at Vishnu Women's University"
-            subtitle="A glimpse of the people, spaces, and moments that make VWU a distinctive place to learn and grow."
-            highlights={[
-              '80-acre green campus in Bhimavaram',
-              '200+ smart classrooms & 50+ research labs',
-              'Olympic-standard sports & fitness facilities',
-              'Secure on-campus hostels with 1 Gbps Wi-Fi',
-              '1,400+ placements recorded in 2024–25',
-            ]}
+            subtitle={(
+              <>
+                <strong>More Than a Campus.<br />A Place to Become.</strong>
+                <br /><br />
+                A place where ideas take flight, friendships become lifelong, talent finds its stage, and every student is encouraged to dream bigger, discover more and lead with confidence.
+                <br /><br />
+                Explore. Experience. Excel.
+              </>
+            )}
             columns={2}
             layout="side-text"
           />
@@ -441,10 +433,12 @@ export default function About() {
             )}
             <div className="reveal-right">
               <span className="section-label">Campus Life</span>
-              <h2 className="section-title">Purpose-Built Infrastructure</h2>
+              <h2 className="section-title">
+                <span style={{ display: 'block', fontSize: '0.55em', fontWeight: 600, opacity: 0.75 }}>Purpose-Built Infrastructure</span>
+                Everything You Need to Learn, Live &amp; Lead.
+              </h2>
               <p style={{ color: 'var(--color-text-light)', lineHeight: 1.8, marginBottom: 'var(--space-5)' }}>
-                An 80+ acre campus housing 200+ smart classrooms, 50+ laboratories, an Olympic-standard swimming pool,
-                a fitness centre, 1 Gbps campus Wi-Fi, hostels, food courts, a health centre, and on-campus temples.
+                From advanced learning spaces and high-speed connectivity to sports, wellness, residential, dining, and spiritual facilities&mdash;VWU offers an ecosystem designed around the complete student experience.
               </p>
               <Link to="/campus" className="btn btn-primary">Explore Campus Facilities →</Link>
             </div>
@@ -460,13 +454,18 @@ export default function About() {
               <span className="section-label" style={{ color: 'var(--color-accent)' }}>Our Parent Society</span>
               <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>Sri Vishnu Educational Society (SVES)</h2>
               <p style={{ color: 'rgba(255,255,255,0.75)', lineHeight: 1.8, marginBottom: 'var(--space-4)' }}>
-                Established by Padma Bhushan Dr. B. V. Raju, SVES runs <strong style={{ color: 'var(--color-accent)' }}>11 institutions</strong> across
-                4 campuses in Bhimavaram, Narsapur, Hyderabad, and Medak — reaching more than
-                <strong style={{ color: 'var(--color-accent)' }}> 50,000 students</strong> each year.
+                Founded by Padma Bhushan Dr. B. V. Raju, Sri Vishnu Educational Society (SVES) is a distinguished
+                educational institution committed to excellence, innovation, and social impact.
+              </p>
+              <p style={{ color: 'rgba(255,255,255,0.75)', lineHeight: 1.8, marginBottom: 'var(--space-4)' }}>
+                With <strong style={{ color: 'var(--color-accent)' }}>11 institutions</strong> across four campuses in across two Telugu States with
+                <strong style={{ color: 'var(--color-accent)' }}> 25,000+ students</strong> every year, creating opportunities across education,
+                technology, healthcare, and professional learning.
               </p>
               <p style={{ color: 'rgba(255,255,255,0.7)', lineHeight: 1.8, marginBottom: 'var(--space-6)' }}>
-                VWU is the principal women's institution within this distinguished society, reflecting its founding
-                commitment to advancing women through rigorous technical education.
+                Vishnu Women's University is the flagship women's institution of SVES, carrying forward its enduring
+                vision of empowering women through quality education, technical excellence, research, leadership,
+                and innovation.
               </p>
               <Link to="/about-sves" className="btn btn-accent">Learn About SVES →</Link>
             </div>
@@ -512,11 +511,22 @@ export default function About() {
           <div className="reveal">
             <span className="section-label" style={{ color: 'var(--color-accent)' }}>Join the VWU Family</span>
             <h2 style={{ color: 'var(--color-white)', fontSize: 'clamp(1.75rem, 4vw, 2.75rem)', marginBottom: 'var(--space-4)' }}>
-              Be Part of the VWU Story
+              Where Ambition Finds Its Purpose
             </h2>
-            <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 'var(--text-lg)', maxWidth: 560, margin: '0 auto var(--space-8)' }}>
-              Whether you are a prospective student, an employer, or a community partner — VWU has a place for you.
-            </p>
+            <div style={{ maxWidth: 720, margin: '0 auto var(--space-8)' }}>
+              <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 'var(--text-lg)', marginBottom: 'var(--space-4)' }}>
+                Vishnu Women's University is more than a place to study. It is a community of curious minds, bold ideas, and women shaping the future.
+              </p>
+              <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 'var(--text-lg)', marginBottom: 'var(--space-4)' }}>
+                Whether you are here to learn, lead, innovate, recruit exceptional talent, or build partnerships that create lasting impact, you become part of a community connected by a shared belief: when women are empowered, possibilities are limitless.
+              </p>
+              <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 'var(--text-lg)', marginBottom: 'var(--space-4)' }}>
+                Find your place. Discover your purpose. Shape what comes next.
+              </p>
+              <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: 'var(--text-lg)', fontWeight: 700, marginBottom: 0 }}>
+                Join VWU.
+              </p>
+            </div>
             <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
               <Link to="/admissions" className="btn btn-accent btn-lg">Apply Now</Link>
               <Link to="/campus" className="btn btn-secondary btn-lg">Visit Campus</Link>
