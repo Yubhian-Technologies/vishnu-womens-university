@@ -258,6 +258,30 @@ export default function About() {
         </div>
       </section>
 
+      {/* A University Built for Her Ambition */}
+      <section className="section bg-white">
+        <div className="container" style={{ textAlign: 'center' }}>
+          <div className="reveal" style={{ maxWidth: 780, margin: '0 auto' }}>
+            <span className="section-label">Our Commitment</span>
+            <h2 className="section-title">A University Built for Her Ambition</h2>
+            <p style={{ color: 'var(--color-text-light)', lineHeight: 1.8, marginBottom: 'var(--space-4)' }}>
+              At Vishnu Women's University, education goes beyond classrooms. We create opportunities for young
+              women to discover their potential, pursue their passions, build meaningful careers, and lead with
+              confidence.
+            </p>
+            <p style={{ color: 'var(--color-text-light)', lineHeight: 1.8, marginBottom: 'var(--space-6)' }}>
+              With a strong foundation in education and a forward-looking approach to learning, VWU is committed
+              to shaping women who are ready to make a difference — in industry, research, entrepreneurship,
+              society, and the world.
+            </p>
+            <p style={{ fontFamily: 'var(--font-serif)', fontWeight: 700, fontSize: 'var(--text-xl)', color: 'var(--color-primary)' }}>
+              Her Education. Her Confidence. Her Future.<br />
+              Her University — Vishnu Women's University.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Academic Snapshot */}
       <section className="section bg-off-white">
         <div className="container">
@@ -478,30 +502,6 @@ export default function About() {
                 </Link>
               );
             })}
-          </div>
-        </div>
-      </section>
-
-      {/* A University Built for Her Ambition */}
-      <section className="section bg-white">
-        <div className="container" style={{ textAlign: 'center' }}>
-          <div className="reveal" style={{ maxWidth: 780, margin: '0 auto' }}>
-            <span className="section-label">Our Commitment</span>
-            <h2 className="section-title">A University Built for Her Ambition</h2>
-            <p style={{ color: 'var(--color-text-light)', lineHeight: 1.8, marginBottom: 'var(--space-4)' }}>
-              At Vishnu Women's University, education goes beyond classrooms. We create opportunities for young
-              women to discover their potential, pursue their passions, build meaningful careers, and lead with
-              confidence.
-            </p>
-            <p style={{ color: 'var(--color-text-light)', lineHeight: 1.8, marginBottom: 'var(--space-6)' }}>
-              With a strong foundation in education and a forward-looking approach to learning, VWU is committed
-              to shaping women who are ready to make a difference — in industry, research, entrepreneurship,
-              society, and the world.
-            </p>
-            <p style={{ fontFamily: 'var(--font-serif)', fontWeight: 700, fontSize: 'var(--text-xl)', color: 'var(--color-primary)' }}>
-              Her Education. Her Confidence. Her Future.<br />
-              Her University — Vishnu Women's University.
-            </p>
           </div>
         </div>
       </section>
