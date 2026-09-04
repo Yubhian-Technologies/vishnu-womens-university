@@ -6,7 +6,7 @@ import './CounterSection.css';
 
 const defaultCounters: ContentBlockDoc[] = [
   { id: 'default-1', page: 'home', section: 'counters', value: '15000', title: 'Engineers Graduated',   desc: 'Alumni strong',              icon: '', slug: '+', order: 0 },
-  { id: 'default-2', page: 'home', section: 'counters', value: '250',   title: 'Experienced Faculty',   desc: 'Expert educators',           icon: '', slug: '+', order: 1 },
+  { id: 'default-2', page: 'home', section: 'counters', value: '',      title: 'Expert Faculty',        desc: 'Expert educators',           icon: '', slug: '',  order: 1 },
   { id: 'default-3', page: 'home', section: 'counters', value: '1100',  title: 'Placements',            desc: '2025-2026',                  icon: '', slug: '+', order: 2 },
   { id: 'default-4', page: 'home', section: 'counters', value: '2500',  title: 'Research Publications', desc: 'International journals',     icon: '', slug: '+', order: 3 },
   { id: 'default-5', page: 'home', section: 'counters', value: '150',   title: 'Patents Filed',         desc: 'Innovations & inventions',   icon: '', slug: '+', order: 4 },
@@ -28,10 +28,12 @@ function SingleCounter({
       <div className="counter-item-state-layer" />
       
       {/* Big Bold Stat Value */}
-      <div className="counter-number-m3">
-        <span className="counter-value">{count.toLocaleString()}</span>
-        <span className="counter-suffix-m3">{item.slug || '+'}</span>
-      </div>
+      {item.value ? (
+        <div className="counter-number-m3">
+          <span className="counter-value">{count.toLocaleString()}</span>
+          <span className="counter-suffix-m3">{item.slug || '+'}</span>
+        </div>
+      ) : null}
 
       {/* Metric Label */}
       <h3 className="counter-label-m3">{item.title}</h3>

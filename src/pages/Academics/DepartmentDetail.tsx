@@ -132,7 +132,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   // Defaults the PEOs/POs/PSOs tab bar to whichever of the three actually
   // has admin-entered content for the active programme, once loaded.
   useEffect(() => {
-    const firstAvailable = activeProgram?.peos?.length ? 'peos' : activeProgram?.pos?.length ? 'pos' : activeProgram?.psos?.length ? 'psos' : activeProgram?.wks?.length ? 'wks' : null;
+    const firstAvailable = activeProgram?.peos?.length ? 'peos' : activeProgram?.wks?.length ? 'wks' : activeProgram?.pos?.length ? 'pos' : activeProgram?.psos?.length ? 'psos' : null;
     if (firstAvailable) setOutcomeTab((prev) => prev ?? firstAvailable);
   }, [activeProgram?.peos?.length, activeProgram?.pos?.length, activeProgram?.psos?.length, activeProgram?.wks?.length]);
 
@@ -280,9 +280,9 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   // actually filled in (via /admin → Programs) becomes a tab.
   const outcomeGroups = [
     { key: 'peos', short: 'PEOs', title: 'Programme Educational Objectives (PEOs)', items: activeProgram.peos },
+    { key: 'wks', short: 'WKs', title: 'Knowledge Profile (WKs)', items: activeProgram.wks },
     { key: 'pos', short: 'POs', title: 'Programme Outcomes (POs)', items: activeProgram.pos },
     { key: 'psos', short: 'PSOs', title: 'Programme Specific Outcomes (PSOs)', items: activeProgram.psos },
-    { key: 'wks', short: 'WKs', title: 'Knowledge Profile (WKs)', items: activeProgram.wks },
   ].filter((g) => g.items && g.items.length > 0);
   const hasOutcomeStatements = outcomeGroups.length > 0;
   const activeOutcome = outcomeGroups.find((g) => g.key === outcomeTab) ?? outcomeGroups[0];
@@ -651,7 +651,6 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                       </div>
                       <div className="dept-quick-nav-title-wrap">
                         <h4 className="dept-quick-nav-title">Quick Navigation</h4>
-                        <span className="dept-quick-nav-subtitle">{quickLinks.length} Sections</span>
                       </div>
                     </div>
 

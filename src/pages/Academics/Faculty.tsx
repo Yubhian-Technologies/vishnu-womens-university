@@ -15,13 +15,16 @@ import type { CustomSection } from '../../lib/customSections';
 // its departments currently have any faculty.
 const DEPARTMENT_GROUPS: { label: string; departments: string[] }[] = [
   { label: 'CSE', departments: ['CSE'] },
-  { label: 'EEE', departments: ['EEE'] },
+  { label: 'AI', departments: ['AI', 'AI&ML', 'AI&DS'] },
   { label: 'IT', departments: ['IT'] },
   { label: 'ECE', departments: ['ECE'] },
-  { label: 'ME', departments: ['Mechanical', 'ME'] },
+  { label: 'EEE', departments: ['EEE'] },
   { label: 'CE', departments: ['Civil', 'CE'] },
-  { label: 'AI', departments: ['AI', 'AI&ML', 'AI&DS'] },
-  { label: 'FRESHMAN ENGG.', departments: ['Mathematics', 'Physics', 'Chemistry', 'English'] },
+  { label: 'ME', departments: ['Mechanical', 'ME'] },
+  { label: 'Maths', departments: ['Mathematics'] },
+  { label: 'Physics', departments: ['Physics'] },
+  { label: 'Chemistry', departments: ['Chemistry'] },
+  { label: 'English', departments: ['English'] },
   { label: 'MBA', departments: ['MBA'] },
 ];
 

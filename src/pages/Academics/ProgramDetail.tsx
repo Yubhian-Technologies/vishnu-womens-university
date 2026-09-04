@@ -130,7 +130,7 @@ function SingleProgramDetail() {
   // first available, don't fight a deliberate selection" pattern as
   // FacultyProfile's Profile Sections tabs.
   useEffect(() => {
-    const firstAvailable = program?.peos?.length ? 'peos' : program?.pos?.length ? 'pos' : program?.psos?.length ? 'psos' : program?.wks?.length ? 'wks' : null;
+    const firstAvailable = program?.peos?.length ? 'peos' : program?.wks?.length ? 'wks' : program?.pos?.length ? 'pos' : program?.psos?.length ? 'psos' : null;
     if (firstAvailable) setOutcomeTab((prev) => prev ?? firstAvailable);
   }, [program?.peos?.length, program?.pos?.length, program?.psos?.length, program?.wks?.length]);
 
@@ -174,9 +174,9 @@ function SingleProgramDetail() {
   // data-driven, nothing hardcoded here beyond the three possible labels.
   const outcomeGroups = [
     { key: 'peos', short: 'PEOs', title: 'Programme Educational Objectives (PEOs)', items: program.peos },
+    { key: 'wks', short: 'WKs', title: 'Knowledge Profile (WKs)', items: program.wks },
     { key: 'pos', short: 'POs', title: 'Programme Outcomes (POs)', items: program.pos },
     { key: 'psos', short: 'PSOs', title: 'Programme Specific Outcomes (PSOs)', items: program.psos },
-    { key: 'wks', short: 'WKs', title: 'Knowledge Profile (WKs)', items: program.wks },
   ].filter((g) => g.items && g.items.length > 0);
   const hasOutcomeStatements = outcomeGroups.length > 0;
   const activeOutcome = outcomeGroups.find((g) => g.key === outcomeTab) ?? outcomeGroups[0];
@@ -401,7 +401,6 @@ function SingleProgramDetail() {
               </div>
               <div className="dept-quick-nav-title-wrap">
                 <h4 className="dept-quick-nav-title">Quick Navigation</h4>
-                <span className="dept-quick-nav-subtitle">{quickLinks.length} Sections</span>
               </div>
             </div>
 

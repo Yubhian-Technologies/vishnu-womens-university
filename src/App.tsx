@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { Suspense, lazy, useEffect } from 'react';
+import type { ComponentType } from 'react';
 import { GraduationCap } from 'lucide-react';
 import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
@@ -11,58 +12,87 @@ import SEO from './components/SEO/SEO';
 import ThemeOverrides from './components/ThemeOverrides/ThemeOverrides';
 import { smoothScrollTo } from './lib/smoothScroll';
 
-const Academics = lazy(() => import('./pages/Academics/Academics'));
-const ProgramDetail = lazy(() => import('./pages/Academics/ProgramDetail'));
-const FreshmanEngineering = lazy(() => import('./pages/Academics/FreshmanEngineering'));
-const Faculty = lazy(() => import('./pages/Academics/Faculty'));
-const FacultyProfile = lazy(() => import('./pages/Academics/FacultyProfile'));
-const AcademicDownloads = lazy(() => import('./pages/Academics/Downloads'));
-const CurriculumMatrix = lazy(() => import('./pages/Academics/CurriculumMatrix'));
-const Schools = lazy(() => import('./pages/Academics/Schools'));
-const Departments = lazy(() => import('./pages/Academics/Departments'));
-const Programs = lazy(() => import('./pages/Academics/Programs'));
-const Admissions = lazy(() => import('./pages/Admissions/Admissions'));
-const CampusVisit = lazy(() => import('./pages/CampusVisit/CampusVisit'));
-const StudentLife = lazy(() => import('./pages/StudentLife/StudentLife'));
-const AlumniGiving = lazy(() => import('./pages/AlumniGiving/AlumniGiving'));
-const About = lazy(() => import('./pages/About/About'));
-const News = lazy(() => import('./pages/News/News'));
-const Events = lazy(() => import('./pages/Events/Events'));
-const VisionMission = lazy(() => import('./pages/VisionMission/VisionMission'));
-const Governance = lazy(() => import('./pages/Governance/Governance'));
-const GovernanceDetail = lazy(() => import('./pages/Governance/GovernanceDetail'));
-const GoverningBody = lazy(() => import('./pages/Governance/GoverningBody'));
-const Research = lazy(() => import('./pages/Research/Research'));
-const ResearchDetail = lazy(() => import('./pages/Research/ResearchDetail'));
-const AboutSVES = lazy(() => import('./pages/AboutSVES/AboutSVES'));
-const Campus = lazy(() => import('./pages/Campus/Campus'));
-const CampusLifeDetail = lazy(() => import('./pages/CampusLife/CampusLifeDetail'));
-const Information = lazy(() => import('./pages/Information/Information'));
-const ProgrammesFee = lazy(() => import('./pages/Admissions/ProgrammesFee'));
-const AdmissionProcedure = lazy(() => import('./pages/Admissions/AdmissionProcedure'));
-const ResultAnalysis = lazy(() => import('./pages/Admissions/ResultAnalysis'));
-const StudentClubs = lazy(() => import('./pages/StudentActivities/StudentClubs'));
-const StudentClubDetail = lazy(() => import('./pages/StudentActivities/StudentClubDetail'));
-const Differentiators = lazy(() => import('./pages/Differentiators/Differentiators'));
-const DifferentiatorDetail = lazy(() => import('./pages/Differentiators/DifferentiatorDetail'));
-const Placements = lazy(() => import('./pages/Placements/Placements'));
-const PlacementDetail = lazy(() => import('./pages/Placements/PlacementDetail'));
-const NewsAwards = lazy(() => import('./pages/NewsAwards/NewsAwards'));
-const Happenings = lazy(() => import('./pages/NewsAwards/Happenings'));
-const Accreditations = lazy(() => import('./pages/NewsAwards/Accreditations'));
-const GalleryPage = lazy(() => import('./pages/NewsAwards/Gallery'));
-const SocialMedia = lazy(() => import('./pages/NewsAwards/SocialMedia'));
-const Careers = lazy(() => import('./pages/Careers/Careers'));
-const Contact = lazy(() => import('./pages/Contact/Contact'));
-const UGCDisclosure = lazy(() => import('./pages/Disclosures/UGCDisclosure'));
-const AicteFeedback = lazy(() => import('./pages/AicteFeedback/AicteFeedback'));
-const AntiRagging = lazy(() => import('./pages/AntiRagging/AntiRagging'));
-const PoliciesProcedures = lazy(() => import('./pages/PoliciesProcedures/PoliciesProcedures'));
+// A failed dynamic import() is almost always a stale chunk after a new deploy:
+// the previous build's hashed filenames 404, and React surfaces that inside
+// <Suspense> as a blank white page that only a manual refresh clears. Here we
+// do that refresh automatically — one hard reload pulls a fresh index.html
+// with current hashes. The sessionStorage guard stops a reload loop if the
+// import keeps failing for some other reason (then the error propagates).
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function lazyWithRetry<T extends ComponentType<any>>(factory: () => Promise<{ default: T }>) {
+  const KEY = 'chunk-reload';
+  return lazy(async () => {
+    try {
+      const mod = await factory();
+      try { sessionStorage.removeItem(KEY); } catch { /* private mode */ }
+      return mod;
+    } catch (err) {
+      let retried = true;
+      try {
+        retried = sessionStorage.getItem(KEY) === '1';
+        if (!retried) sessionStorage.setItem(KEY, '1');
+      } catch { retried = true; }
+      if (!retried) {
+        window.location.reload();
+        return new Promise<{ default: T }>(() => {}); // hold until the reload
+      }
+      throw err;
+    }
+  });
+}
+
+const Academics = lazyWithRetry(() => import('./pages/Academics/Academics'));
+const ProgramDetail = lazyWithRetry(() => import('./pages/Academics/ProgramDetail'));
+const FreshmanEngineering = lazyWithRetry(() => import('./pages/Academics/FreshmanEngineering'));
+const Faculty = lazyWithRetry(() => import('./pages/Academics/Faculty'));
+const FacultyProfile = lazyWithRetry(() => import('./pages/Academics/FacultyProfile'));
+const AcademicDownloads = lazyWithRetry(() => import('./pages/Academics/Downloads'));
+const CurriculumMatrix = lazyWithRetry(() => import('./pages/Academics/CurriculumMatrix'));
+const Schools = lazyWithRetry(() => import('./pages/Academics/Schools'));
+const Departments = lazyWithRetry(() => import('./pages/Academics/Departments'));
+const Programs = lazyWithRetry(() => import('./pages/Academics/Programs'));
+const Admissions = lazyWithRetry(() => import('./pages/Admissions/Admissions'));
+const CampusVisit = lazyWithRetry(() => import('./pages/CampusVisit/CampusVisit'));
+const StudentLife = lazyWithRetry(() => import('./pages/StudentLife/StudentLife'));
+const AlumniGiving = lazyWithRetry(() => import('./pages/AlumniGiving/AlumniGiving'));
+const About = lazyWithRetry(() => import('./pages/About/About'));
+const News = lazyWithRetry(() => import('./pages/News/News'));
+const Events = lazyWithRetry(() => import('./pages/Events/Events'));
+const VisionMission = lazyWithRetry(() => import('./pages/VisionMission/VisionMission'));
+const Governance = lazyWithRetry(() => import('./pages/Governance/Governance'));
+const GovernanceDetail = lazyWithRetry(() => import('./pages/Governance/GovernanceDetail'));
+const GoverningBody = lazyWithRetry(() => import('./pages/Governance/GoverningBody'));
+const Research = lazyWithRetry(() => import('./pages/Research/Research'));
+const ResearchDetail = lazyWithRetry(() => import('./pages/Research/ResearchDetail'));
+const AboutSVES = lazyWithRetry(() => import('./pages/AboutSVES/AboutSVES'));
+const Campus = lazyWithRetry(() => import('./pages/Campus/Campus'));
+const CampusLifeDetail = lazyWithRetry(() => import('./pages/CampusLife/CampusLifeDetail'));
+const Information = lazyWithRetry(() => import('./pages/Information/Information'));
+const ProgrammesFee = lazyWithRetry(() => import('./pages/Admissions/ProgrammesFee'));
+const AdmissionProcedure = lazyWithRetry(() => import('./pages/Admissions/AdmissionProcedure'));
+const ResultAnalysis = lazyWithRetry(() => import('./pages/Admissions/ResultAnalysis'));
+const StudentClubs = lazyWithRetry(() => import('./pages/StudentActivities/StudentClubs'));
+const StudentClubDetail = lazyWithRetry(() => import('./pages/StudentActivities/StudentClubDetail'));
+const Differentiators = lazyWithRetry(() => import('./pages/Differentiators/Differentiators'));
+const DifferentiatorDetail = lazyWithRetry(() => import('./pages/Differentiators/DifferentiatorDetail'));
+const Placements = lazyWithRetry(() => import('./pages/Placements/Placements'));
+const PlacementDetail = lazyWithRetry(() => import('./pages/Placements/PlacementDetail'));
+const NewsAwards = lazyWithRetry(() => import('./pages/NewsAwards/NewsAwards'));
+const Happenings = lazyWithRetry(() => import('./pages/NewsAwards/Happenings'));
+const Accreditations = lazyWithRetry(() => import('./pages/NewsAwards/Accreditations'));
+const GalleryPage = lazyWithRetry(() => import('./pages/NewsAwards/Gallery'));
+const SocialMedia = lazyWithRetry(() => import('./pages/NewsAwards/SocialMedia'));
+const Careers = lazyWithRetry(() => import('./pages/Careers/Careers'));
+const Contact = lazyWithRetry(() => import('./pages/Contact/Contact'));
+const UGCDisclosure = lazyWithRetry(() => import('./pages/Disclosures/UGCDisclosure'));
+const AicteFeedback = lazyWithRetry(() => import('./pages/AicteFeedback/AicteFeedback'));
+const AntiRagging = lazyWithRetry(() => import('./pages/AntiRagging/AntiRagging'));
+const PoliciesProcedures = lazyWithRetry(() => import('./pages/PoliciesProcedures/PoliciesProcedures'));
 // The admin shell alone pulls in 20+ section components — keeping it out of
 // the public bundle entirely is the single biggest win here, since the vast
 // majority of visitors never touch /admin.
-const AdminLayout = lazy(() => import('./pages/Admin/AdminLayout'));
-const Launch = lazy(() => import('./pages/Launch/Launch'));
+const AdminLayout = lazyWithRetry(() => import('./pages/Admin/AdminLayout'));
+const Launch = lazyWithRetry(() => import('./pages/Launch/Launch'));
 
 function ScrollToTop() {
   const { pathname, hash } = useLocation();

@@ -103,7 +103,6 @@ const navItemsData: NavItem[] = [
     label: 'Academics',
     highlight: {
       title: 'Academic Excellence',
-      badge: 'Autonomous',
       description: 'Industry-aligned curriculum, multidisciplinary research, distinguished faculty, and hands-on laboratory learning.',
       linkText: 'All Programs',
       linkPath: '/academics',
@@ -113,8 +112,6 @@ const navItemsData: NavItem[] = [
         groupLabel: 'Overview',
         groupPath: '/academics',
         items: [
-          { label: 'Programs & Departments', path: '/academics' },
-          { label: 'Schools', path: '/academics/schools' },
           { label: 'Departments', path: '/academics/departments' },
           { label: 'Programs', path: '/academics/programs' },
           { label: 'Faculty Directory', path: '/faculty' },
