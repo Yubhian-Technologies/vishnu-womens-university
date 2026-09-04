@@ -54,9 +54,9 @@ export default function ProgramsShowcase() {
   };
 
   const categories = [
-    { id: 'ug', label: `UG\nPrograms${btechCount > 0 ? ` (${btechCount})` : ''}`, link: '/academics?tab=btech' },
-    { id: 'pg', label: `PG\nPrograms${pgCount > 0 ? ` (${pgCount})` : ''}`, link: '/academics?tab=mtech' },
-    { id: 'phd', label: `Ph.D\nPrograms${phdCount > 0 ? ` (${phdCount})` : ''}`, link: '/academics?tab=phd' },
+    { id: 'ug', label: `UG${btechCount > 0 ? ` (${btechCount})` : ''}`, link: '/academics?tab=btech' },
+    { id: 'pg', label: `PG${pgCount > 0 ? ` (${pgCount})` : ''}`, link: '/academics?tab=mtech' },
+    { id: 'phd', label: `Ph.D${phdCount > 0 ? ` (${phdCount})` : ''}`, link: '/academics?tab=phd' },
   ];
 
   return (
