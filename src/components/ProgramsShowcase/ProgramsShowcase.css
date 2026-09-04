@@ -9,8 +9,8 @@
   padding: 0;
   position: relative;
   overflow: hidden;
-  border-top: 1px solid rgba(27, 67, 50, 0.08);
-  border-bottom: 1px solid rgba(27, 67, 50, 0.08);
+  border-top: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 8%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 8%, transparent);
 }
 
 .programs-showcase-split-wrapper {
@@ -92,7 +92,7 @@
   display: flex;
   align-items: center;
   background: #ffffff;
-  border: 1.5px solid rgba(27, 67, 50, 0.15);
+  border: 1.5px solid color-mix(in srgb, var(--color-primary, #1b4332) 15%, transparent);
   border-radius: var(--radius-full, 9999px);
   padding: 0.35rem 0.5rem 0.35rem 1.4rem;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
@@ -129,13 +129,13 @@
   height: 38px;
   border-radius: var(--radius-full, 9999px);
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(27, 67, 50, 0.25);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--color-primary, #1b4332) 25%, transparent);
   transition: all 0.2s ease;
 }
 
 .programs-showcase-search-btn:hover {
   background: var(--color-accent, #c9a84c);
-  color: #081c15;
+  color: var(--color-primary-dark, #081c15);
   transform: scale(1.05);
 }
 
@@ -148,7 +148,7 @@
   background: #ffffff;
   border-radius: 18px;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
-  border: 1px solid rgba(27, 67, 50, 0.1);
+  border: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 10%, transparent);
   overflow: hidden;
   z-index: 100;
   animation: programsDropdownIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
@@ -193,7 +193,7 @@
 }
 
 .programs-showcase-dropdown-item:hover {
-  background: rgba(201, 168, 76, 0.08);
+  background: color-mix(in srgb, var(--color-accent, #c9a84c) 8%, transparent);
 }
 
 .programs-showcase-dropdown-item-title {
@@ -209,9 +209,9 @@
   letter-spacing: 0.05em;
   padding: 2px 8px;
   border-radius: var(--radius-full, 9999px);
-  background: rgba(27, 67, 50, 0.08);
-  color: #1b4332;
-  border: 1px solid rgba(27, 67, 50, 0.18);
+  background: color-mix(in srgb, var(--color-primary, #1b4332) 8%, transparent);
+  color: var(--color-primary, #1b4332);
+  border: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 18%, transparent);
 }
 
 /* Nav Links Grid */
@@ -239,7 +239,7 @@
   font-weight: 700;
   line-height: 1.35;
   color: #334155;
-  white-space: pre-line;
+  white-space: nowrap;
   transition: color 0.2s ease;
 }
 
@@ -247,7 +247,7 @@
   display: block;
   width: 100%;
   height: 2.5px;
-  background: rgba(27, 67, 50, 0.12);
+  background: color-mix(in srgb, var(--color-primary, #1b4332) 12%, transparent);
   border-radius: 2px;
   position: relative;
   transition: all 0.25s ease;
@@ -261,7 +261,7 @@
 .programs-showcase-nav-item:hover .programs-showcase-nav-line,
 .programs-showcase-nav-item.active .programs-showcase-nav-line {
   background: var(--color-accent, #c9a84c);
-  box-shadow: 0 0 8px rgba(201, 168, 76, 0.4);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--color-accent, #c9a84c) 40%, transparent);
 }
 
 /* Action Button */
@@ -280,19 +280,19 @@
   font-family: var(--font-sans, system-ui, sans-serif);
   letter-spacing: 0.02em;
   color: #ffffff;
-  background: linear-gradient(135deg, #1b4332 0%, #2d6a4f 100%);
+  background: linear-gradient(135deg, var(--color-primary, #1b4332) 0%, var(--color-primary-light, #2d6a4f) 100%);
   border: none;
   border-radius: var(--radius-full, 9999px);
-  box-shadow: 0 4px 16px rgba(27, 67, 50, 0.25);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--color-primary, #1b4332) 25%, transparent);
   text-decoration: none;
   cursor: pointer;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .programs-showcase-action-btn:hover {
-  background: linear-gradient(135deg, #0d251a 0%, #1b4332 100%);
+  background: linear-gradient(135deg, #0d251a 0%, var(--color-primary, #1b4332) 100%);
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(27, 67, 50, 0.35);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--color-primary, #1b4332) 35%, transparent);
   color: #ffffff;
 }
 
@@ -302,8 +302,8 @@
 .programs-showcase-right {
   position: relative;
   overflow: hidden;
-  border-left: 1px solid rgba(27, 67, 50, 0.08);
-  box-shadow: -8px 0 32px rgba(8, 28, 21, 0.03);
+  border-left: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 8%, transparent);
+  box-shadow: -8px 0 32px color-mix(in srgb, var(--color-primary-dark, #081c15) 3%, transparent);
   min-height: 420px;
 }
 
@@ -335,7 +335,7 @@
 
   .programs-showcase-right {
     border-left: none;
-    border-top: 1px solid rgba(27, 67, 50, 0.08);
+    border-top: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 8%, transparent);
     box-shadow: none;
     min-height: 280px;
   }

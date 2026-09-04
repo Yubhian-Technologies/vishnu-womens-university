@@ -34,7 +34,7 @@
   max-width: var(--max-width);
   margin: 0 auto;
   background:
-    radial-gradient(circle at 15% 20%, rgba(201,168,76,0.12), transparent 45%),
+    radial-gradient(circle at 15% 20%, color-mix(in srgb, var(--color-accent, #c9a84c) 12%, transparent), transparent 45%),
     linear-gradient(180deg, var(--color-off-white) 0%, var(--color-white) 100%);
 }
 .lph-hero__eyebrow {
@@ -221,7 +221,7 @@
 .lph-highlight-main img { width: 100%; height: 420px; object-fit: cover; }
 .lph-highlight-main__overlay {
   position: absolute; inset: 0;
-  background: linear-gradient(0deg, rgba(8,28,21,0.75) 0%, transparent 55%);
+  background: linear-gradient(0deg, color-mix(in srgb, var(--color-primary-dark, #081c15) 75%, transparent) 0%, transparent 55%);
   display: flex; align-items: flex-end; justify-content: space-between;
   padding: var(--space-8);
 }
@@ -241,7 +241,7 @@
 .lph-highlight-card img { width: 100%; height: 220px; object-fit: cover; }
 .lph-highlight-card span {
   position: absolute; left: 0; right: 0; bottom: 0;
-  background: rgba(8,28,21,0.85);
+  background: color-mix(in srgb, var(--color-primary-dark, #081c15) 85%, transparent);
   color: var(--color-white);
   font-weight: 700;
   font-size: var(--text-sm);
@@ -425,7 +425,7 @@
   margin-bottom: var(--space-2);
 }
 .lph-leadership__tile strong { color: var(--color-primary-dark); font-size: var(--text-sm); }
-.lph-leadership__tile span { color: rgba(8,28,21,0.7); font-size: var(--text-xs); }
+.lph-leadership__tile span { color: color-mix(in srgb, var(--color-primary-dark, #081c15) 70%, transparent); font-size: var(--text-xs); }
 
 /* ===== Research stats ===== */
 .lph-research-stats { padding: var(--space-20) 0; background: var(--color-white); }
@@ -526,7 +526,7 @@
 .lph-tour { background: var(--color-accent); padding: var(--space-14) 0; }
 .lph-tour__row { display: flex; justify-content: space-between; align-items: center; gap: var(--space-8); flex-wrap: wrap; }
 .lph-tour h2 { color: var(--color-primary-dark); font-size: clamp(1.5rem, 3vw, 2rem); margin-bottom: var(--space-2); }
-.lph-tour p { color: rgba(8,28,21,0.75); max-width: 520px; }
+.lph-tour p { color: color-mix(in srgb, var(--color-primary-dark, #081c15) 75%, transparent); max-width: 520px; }
 .lph-tour__pills { display: flex; gap: var(--space-3); flex-wrap: wrap; }
 .lph-tour__pill {
   padding: 0.75rem 1.5rem;

@@ -15,7 +15,7 @@
 .launch-glow {
   position: absolute;
   inset: 0;
-  background: radial-gradient(900px 500px at 50% 20%, rgba(201,168,76,0.14), transparent 65%);
+  background: radial-gradient(900px 500px at 50% 20%, color-mix(in srgb, var(--color-accent, #c9a84c) 14%, transparent), transparent 65%);
   pointer-events: none;
 }
 
@@ -86,9 +86,9 @@
 }
 
 @keyframes launch-pulse {
-  0%   { box-shadow: 0 0 0 0 rgba(201,168,76,0.55); }
-  70%  { box-shadow: 0 0 0 22px rgba(201,168,76,0); }
-  100% { box-shadow: 0 0 0 0 rgba(201,168,76,0); }
+  0%   { box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-accent, #c9a84c) 55%, transparent); }
+  70%  { box-shadow: 0 0 0 22px color-mix(in srgb, var(--color-accent, #c9a84c) 0%, transparent); }
+  100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-accent, #c9a84c) 0%, transparent); }
 }
 
 /* Ignition / countdown labels */
@@ -113,7 +113,7 @@
   font-size: clamp(6rem, 22vw, 11rem);
   line-height: 1;
   color: var(--color-accent-light);
-  text-shadow: 0 0 40px rgba(232,201,106,0.35);
+  text-shadow: 0 0 40px color-mix(in srgb, var(--color-accent-light, #e8c96a) 35%, transparent);
   font-variant-numeric: tabular-nums;
 }
 

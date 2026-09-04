@@ -8,7 +8,48 @@ export interface ColorVarDef {
   label: string;
   hint: string;
   default: string;
+  // When set, leaving this field blank in the admin means "inherit this
+  // other CSS variable" rather than "use `default`" — ThemeAdmin.tsx omits
+  // the key from Firestore entirely in that case, so Footer.css's own
+  // var(--footer-bg, var(--color-primary-dark, ...)) fallback chain is what
+  // actually resolves it, live, instead of a value getting pinned in place.
+  inheritsFrom?: string;
 }
+
+// Footer-specific overrides — separate from COLOR_VARS because the footer
+// intentionally stays dark even when the rest of the site is light, so its
+// colors can't just reuse the main palette directly. --footer-bg and
+// --footer-accent inherit from the main theme until an admin explicitly sets
+// one, so changing Primary Dark or Accent above still re-colors the footer
+// without needing to touch this section at all.
+export const FOOTER_COLOR_VARS: ColorVarDef[] = [
+  { key: '--footer-bg', label: 'Footer Background', hint: 'Blank inherits Primary Dark from the theme above.', default: '#0d251a', inheritsFrom: '--color-primary-dark' },
+  { key: '--footer-text', label: 'Footer Text', hint: 'Body text and muted details in the footer.', default: '#e2e8f0' },
+  { key: '--footer-heading', label: 'Footer Heading', hint: 'Headings, brand name, and brightest text in the footer.', default: '#ffffff' },
+  { key: '--footer-accent', label: 'Footer Accent', hint: 'Blank inherits Accent from the theme above.', default: '#c9a84c', inheritsFrom: '--color-accent' },
+];
+
+// "Meet Our Faculty" carousel section background (on program detail pages)
+// — separate from Accent because that section wants a bold standalone block
+// color of its own, distinct from every button/badge/link on the site that
+// also reads Accent. Inherits Accent/Accent Light until explicitly set.
+export const FACULTY_COLOR_VARS: ColorVarDef[] = [
+  { key: '--faculty-bg', label: 'Faculty Section Background', hint: 'Blank inherits Accent from the theme above.', default: '#ebb024', inheritsFrom: '--color-accent' },
+  { key: '--faculty-bg-light', label: 'Faculty Section Background Light', hint: 'Gradient highlight tone. Blank inherits Accent Light from the theme above.', default: '#f6c035', inheritsFrom: '--color-accent-light' },
+];
+
+// "Alumni Voices & Stories" testimonial section — this component ships its
+// own bespoke dark-teal + lime palette (see TestimonialSlider.css), deliber-
+// ately scoped local to it and never tied to the main site tokens (its own
+// code comment says so). Unlike Footer/Faculty above, these do NOT inherit
+// from the main theme — this section is meant to keep its own signature
+// look regardless of whatever Primary/Accent are set to, and only change
+// when an admin explicitly edits this section.
+export const TESTIMONIAL_COLOR_VARS: ColorVarDef[] = [
+  { key: '--testimonial-bg', label: 'Alumni Section Background', hint: 'The deep background tone.', default: '#022530' },
+  { key: '--testimonial-bg-light', label: 'Alumni Section Background Light', hint: 'Radial highlight tone.', default: '#04384b' },
+  { key: '--testimonial-accent', label: 'Alumni Section Accent', hint: 'Sparkle icon, verified badge, progress bar.', default: '#78c900' },
+];
 
 export const COLOR_VARS: ColorVarDef[] = [
   { key: '--color-primary', label: 'Primary', hint: 'Main brand color — headings, primary buttons, nav.', default: '#1b4332' },

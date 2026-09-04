@@ -140,7 +140,7 @@
 .cv-form-group select:focus,
 .cv-form-group textarea:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(27,67,50,0.1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary, #1b4332) 10%, transparent);
 }
 
 .cv-form-group select:disabled {
