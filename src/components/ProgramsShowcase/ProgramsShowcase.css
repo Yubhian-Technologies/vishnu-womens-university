@@ -53,8 +53,25 @@
   color: var(--color-primary-dark, #081c15);
   line-height: 1.18;
   letter-spacing: -0.01em;
+  margin: 0 0 1.25rem 0;
+  max-width: 560px;
+}
+
+.programs-showcase-desc {
+  max-width: 580px;
   margin: 0 0 2rem 0;
-  max-width: 520px;
+}
+
+.programs-showcase-desc p {
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: 1rem;
+  line-height: 1.65;
+  color: #64748b;
+  margin: 0 0 1rem 0;
+}
+
+.programs-showcase-desc p:last-child {
+  margin-bottom: 0;
 }
 
 /* Search Bar Container & Predictive Dropdown */
