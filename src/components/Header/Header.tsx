@@ -230,7 +230,7 @@ const navItemsData: NavItem[] = [
       { label: 'VISHNU Fitness Centre', path: '/campus/fitness-centre' },
       { label: 'Health Care Centre', path: '/campus/health-care' },
       { label: 'Swimming Pool & Sports', path: '/campus/swimming-pool' },
-      { label: 'Radio Vishnu 90.4', path: '/differentiators/radio-vishnu-diff' },
+      { label: 'Radio Vishnu 90.4', path: 'http://radiovishnu.com/', external: true },
       { label: 'Vishnu TV Academy', path: '/vishnu-tv-academy' },
       { label: 'Student Clubs', path: '/student-clubs' },
       { label: 'Arts & Culture', path: '/arts-culture' },

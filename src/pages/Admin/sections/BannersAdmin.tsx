@@ -256,8 +256,8 @@ function PageBannersAdmin() {
     setForm({
       page: b.page ?? 'home',
       title: b.title, subtitle: b.subtitle, imageUrl: b.imageUrl,
-      storagePath: b.storagePath, videoUrl: b.videoUrl || '', videoStoragePath: b.videoStoragePath || '',
-      ctaLabel: b.ctaLabel, ctaLink: b.ctaLink, order: b.order,
+      storagePath: b.storagePath || '', videoUrl: b.videoUrl || '', videoStoragePath: b.videoStoragePath || '',
+      ctaLabel: b.ctaLabel || '', ctaLink: b.ctaLink || '', order: b.order,
     });
     setSelectedGroup(groupOfPage(b.page ?? 'home') ?? null);
     // The banner list (below the form) covers every page's banners, so the
