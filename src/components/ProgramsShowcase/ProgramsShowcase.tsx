@@ -57,8 +57,6 @@ export default function ProgramsShowcase() {
     { id: 'ug', label: `UG\nPrograms${btechCount > 0 ? ` (${btechCount})` : ''}`, link: '/academics?tab=btech' },
     { id: 'pg', label: `PG\nPrograms${pgCount > 0 ? ` (${pgCount})` : ''}`, link: '/academics?tab=mtech' },
     { id: 'phd', label: `Ph.D\nPrograms${phdCount > 0 ? ` (${phdCount})` : ''}`, link: '/academics?tab=phd' },
-    { id: 'diploma', label: 'Corporate PG Diploma\nPrograms', link: '/academics' },
-    { id: 'executive', label: 'Executive Education\nPrograms', link: '/academics' },
   ];
 
   return (
