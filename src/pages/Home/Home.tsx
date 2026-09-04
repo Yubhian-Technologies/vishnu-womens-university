@@ -13,7 +13,6 @@ import WomensEducationSection from '../../components/WomensEducation/WomensEduca
 import CampusLifeShowcase from '../../components/CampusLifeShowcase/CampusLifeShowcase';
 import AccreditationsStrip from '../../components/AccreditationsStrip/AccreditationsStrip';
 import ProgramsShowcase from '../../components/ProgramsShowcase/ProgramsShowcase';
-import LatestGraduatesShowcase from '../../components/LatestGraduatesShowcase/LatestGraduatesShowcase';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { fetchPriorityAttr } from '../../lib/domAttrs';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
@@ -306,9 +305,6 @@ export default function Home() {
 
       {/* ── Programs & Schools Showcase (Future-focused education across disciplines) ── */}
       <ProgramsShowcase />
-
-      {/* ── Latest Graduates Placement Showcase (hidden until an admin adds one) ── */}
-      <LatestGraduatesShowcase />
 
       {/* ── Women's Education & Empowerment ── */}
       <WomensEducationSection />
