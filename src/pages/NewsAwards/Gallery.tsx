@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { X } from 'lucide-react';
 import { galleryAlbums, galleryYears } from './news-awards.data';
 import { useOrderedCollection } from '../../hooks/useCollection';
@@ -16,8 +16,6 @@ interface GalleryPhoto {
   order: number;
 }
 
-const PHOTO_CATEGORIES = ['Campus', 'Events', 'Academics', 'Sports', 'Clubs', 'Cultural', 'Placements', 'Infrastructure'];
-
 const yearColors: Record<number, string> = {
   2026: '#003087',
   2025: '#0057B8',
@@ -33,27 +31,13 @@ const yearColors: Record<number, string> = {
 
 export default function Gallery() {
   useHashScroll();
-  const [searchParams] = useSearchParams();
   const [activeYear, setActiveYear] = useState<number | 'all'>('all');
   const { docs: photos, loading: photosLoading } = useOrderedCollection<GalleryPhoto>('gallery', 'order');
-  const categoryParam = searchParams.get('category');
-  const [activeCategory, setActiveCategory] = useState<string>(
-    categoryParam && PHOTO_CATEGORIES.includes(categoryParam) ? categoryParam : 'all'
-  );
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   useEffect(() => {
     document.title = "Gallery | Vishnu Women's University";
   }, []);
-
-  // Picks up ?category=Sports (etc.) when arriving via a link from another
-  // page (e.g. Student Life's sports cards) — re-checked on navigation since
-  // the component instance persists across query-only route changes.
-  useEffect(() => {
-    if (categoryParam && PHOTO_CATEGORIES.includes(categoryParam)) {
-      setActiveCategory(categoryParam);
-    }
-  }, [categoryParam]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -70,7 +54,7 @@ export default function Gallery() {
     );
     document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
     return () => observer.disconnect();
-  }, [activeYear, activeCategory, photos]);
+  }, [activeYear, photos]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setLightboxIndex(null); };
@@ -79,7 +63,6 @@ export default function Gallery() {
   }, []);
 
   const filtered = activeYear === 'all' ? galleryAlbums : galleryAlbums.filter(a => a.year === activeYear);
-  const filteredPhotos = activeCategory === 'all' ? photos : photos.filter((p) => p.category === activeCategory);
 
   return (
     <main className="page-wrapper">
@@ -123,54 +106,13 @@ export default function Gallery() {
             </p>
           </div>
 
-          {/* Category pills */}
-          <div style={{ display: 'flex', gap: 'var(--space-2)', marginBottom: 'var(--space-6)', flexWrap: 'wrap' }}>
-            <button
-              onClick={() => setActiveCategory('all')}
-              style={{
-                padding: '0.5rem 1.1rem',
-                borderRadius: 'var(--radius-full)',
-                border: '1.5px solid',
-                fontSize: 'var(--text-sm)',
-                fontWeight: 600,
-                cursor: 'pointer',
-                transition: 'all var(--transition-base)',
-                background: activeCategory === 'all' ? 'var(--color-primary)' : 'var(--color-white)',
-                borderColor: activeCategory === 'all' ? 'var(--color-primary)' : 'var(--color-light-gray)',
-                color: activeCategory === 'all' ? 'var(--color-white)' : 'var(--color-text)',
-              }}
-            >
-              All Photos
-            </button>
-            {PHOTO_CATEGORIES.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                style={{
-                  padding: '0.5rem 1.1rem',
-                  borderRadius: 'var(--radius-full)',
-                  border: '1.5px solid',
-                  fontSize: 'var(--text-sm)',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  transition: 'all var(--transition-base)',
-                  background: activeCategory === cat ? 'var(--color-primary)' : 'var(--color-white)',
-                  borderColor: activeCategory === cat ? 'var(--color-primary)' : 'var(--color-light-gray)',
-                  color: activeCategory === cat ? 'var(--color-white)' : 'var(--color-text)',
-                }}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-
           {/* Rendered from Firestore, so no scroll-reveal animation here
               (see the gotcha documented in CLAUDE.md). */}
           {photosLoading ? (
             <p style={{ color: 'var(--color-text-light)' }}>Loading photos…</p>
-          ) : filteredPhotos.length > 0 ? (
+          ) : photos.length > 0 ? (
             <div className="pg-grid">
-              {filteredPhotos.map((photo, i) => (
+              {photos.map((photo, i) => (
                 <div
                   key={photo.id}
                   className="pg-tile"
@@ -184,19 +126,19 @@ export default function Gallery() {
               ))}
             </div>
           ) : (
-            <p style={{ color: 'var(--color-text-light)' }}>No photos in this category yet — check back soon.</p>
+            <p style={{ color: 'var(--color-text-light)' }}>No photos yet — check back soon.</p>
           )}
         </div>
       </section>
 
-      {lightboxIndex !== null && filteredPhotos[lightboxIndex] && (
+      {lightboxIndex !== null && photos[lightboxIndex] && (
         <div className="pg-lightbox" onClick={(e) => e.target === e.currentTarget && setLightboxIndex(null)}>
           <div className="pg-lightbox__inner">
             <button className="pg-lightbox__close" onClick={() => setLightboxIndex(null)} aria-label="Close"><X size={16} /></button>
-            <SmoothImage src={filteredPhotos[lightboxIndex].imageUrl} alt={filteredPhotos[lightboxIndex].title} />
+            <SmoothImage src={photos[lightboxIndex].imageUrl} alt={photos[lightboxIndex].title} />
             <div className="pg-lightbox__caption">
-              <strong>{filteredPhotos[lightboxIndex].title}</strong>
-              <span>{filteredPhotos[lightboxIndex].category}</span>
+              <strong>{photos[lightboxIndex].title}</strong>
+              <span>{photos[lightboxIndex].category}</span>
             </div>
           </div>
         </div>

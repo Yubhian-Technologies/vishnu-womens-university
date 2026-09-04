@@ -223,7 +223,7 @@ export default function StudentClubDetail() {
               See {club.name} in Action
             </h2>
             <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Link to="/news-awards/gallery?category=Clubs#photo-gallery" className="btn btn-accent">Photo Gallery</Link>
+              <Link to="/news-awards/gallery#photo-gallery" className="btn btn-accent">Photo Gallery</Link>
               <Link to="/student-clubs" className="btn btn-secondary">Back to Student Clubs</Link>
             </div>
           </div>

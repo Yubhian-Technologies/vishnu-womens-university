@@ -67,6 +67,15 @@ const DEFAULT_ABOUT_BY_SLUG: Record<string, string> = {
   'ipr-committee': DEFAULT_IPR_ABOUT,
 };
 
+// These committee pages show their descriptive text only — any member
+// table pasted into the admin's Data Table field is intentionally not
+// rendered here (content decision).
+const TABLE_SUPPRESSED_SLUGS = new Set([
+  'research-advisory-committee',
+  'research-ethics-committee',
+  'ipr-committee',
+]);
+
 export default function ResearchDetail() {
   const { slug } = useParams<{ slug: string }>();
   const { docs: allItems, loading } = useOrderedCollection<ResearchItemDoc>('researchItems', 'order');
@@ -332,13 +341,13 @@ export default function ResearchDetail() {
       {/* Data table(s) — a single unnamed section renders as one table under
           the item's own title; multiple named sections (e.g. Patents grouped
           by year) each get their own sub-heading. */}
-      {item.slug !== 'professional-bodies' && tableSections.length > 0 && projectCategories.length === 0 && accordionCategories.length === 0 && (
+      {item.slug !== 'professional-bodies' && !TABLE_SUPPRESSED_SLUGS.has(item.slug) && tableSections.length > 0 && projectCategories.length === 0 && accordionCategories.length === 0 && (
         <section className="section bg-off-white">
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
               <span className="section-label">Details</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>
-                {item.slug === 'about-rd' ? "Research Team at Vishnu Women's University" : item.title}
+                {item.slug === 'about-rd' ? 'Research Team' : item.title}
               </h2>
             </div>
             {tableSections.map((section, si) => (
