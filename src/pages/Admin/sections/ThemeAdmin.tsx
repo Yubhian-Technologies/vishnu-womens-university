@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react';
 import { doc, setDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useDocument } from '../../../hooks/useDocument';
-import { COLOR_VARS, FOOTER_COLOR_VARS, THEME_DOC, type ColorVarDef } from '../../../lib/theme';
+import { COLOR_VARS, FOOTER_COLOR_VARS, FACULTY_COLOR_VARS, TESTIMONIAL_COLOR_VARS, THEME_DOC, type ColorVarDef } from '../../../lib/theme';
 
 type ThemeDoc = Record<string, string>;
 
-const ALL_VARS = [...COLOR_VARS, ...FOOTER_COLOR_VARS];
+const ALL_VARS = [...COLOR_VARS, ...FOOTER_COLOR_VARS, ...FACULTY_COLOR_VARS, ...TESTIMONIAL_COLOR_VARS];
 // A var with `inheritsFrom` starts blank ("inherit"), not its literal
 // default — see the save()/ColorGroup handling below for why that matters.
 const DEFAULTS: ThemeDoc = Object.fromEntries(ALL_VARS.map((c) => [c.key, c.inheritsFrom ? '' : c.default]));
@@ -176,6 +176,26 @@ export default function ThemeAdmin() {
           accent follows Accent, from the theme above.
         </p>
         {loading ? <p className="admin-loading">Loading…</p> : <ColorGroup vars={FOOTER_COLOR_VARS} form={form} setColor={setColor} />}
+      </div>
+
+      <div className="admin-card">
+        <h2 className="admin-card__title">Faculty Section Colors</h2>
+        <p className="admin-lead" style={{ marginBottom: '1.25rem' }}>
+          The "Meet Our Faculty" block on each program page (/academics/&lt;program&gt;) is its own bold
+          color block, separate from every button/badge elsewhere that uses Accent. Until you save a
+          value here, it quietly follows Accent and Accent Light from the theme above.
+        </p>
+        {loading ? <p className="admin-loading">Loading…</p> : <ColorGroup vars={FACULTY_COLOR_VARS} form={form} setColor={setColor} />}
+      </div>
+
+      <div className="admin-card">
+        <h2 className="admin-card__title">Alumni Section Colors</h2>
+        <p className="admin-lead" style={{ marginBottom: '1.25rem' }}>
+          The "Alumni Voices &amp; Stories" testimonial section ships its own dark teal + lime look,
+          separate from the rest of the site. Until you save a value here, it quietly follows Primary
+          Dark, Primary, and Accent from the theme above.
+        </p>
+        {loading ? <p className="admin-loading">Loading…</p> : <ColorGroup vars={TESTIMONIAL_COLOR_VARS} form={form} setColor={setColor} />}
       </div>
 
       <div className="admin-card">

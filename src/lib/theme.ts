@@ -29,6 +29,28 @@ export const FOOTER_COLOR_VARS: ColorVarDef[] = [
   { key: '--footer-accent', label: 'Footer Accent', hint: 'Blank inherits Accent from the theme above.', default: '#c9a84c', inheritsFrom: '--color-accent' },
 ];
 
+// "Meet Our Faculty" carousel section background (on program detail pages)
+// — separate from Accent because that section wants a bold standalone block
+// color of its own, distinct from every button/badge/link on the site that
+// also reads Accent. Inherits Accent/Accent Light until explicitly set.
+export const FACULTY_COLOR_VARS: ColorVarDef[] = [
+  { key: '--faculty-bg', label: 'Faculty Section Background', hint: 'Blank inherits Accent from the theme above.', default: '#ebb024', inheritsFrom: '--color-accent' },
+  { key: '--faculty-bg-light', label: 'Faculty Section Background Light', hint: 'Gradient highlight tone. Blank inherits Accent Light from the theme above.', default: '#f6c035', inheritsFrom: '--color-accent-light' },
+];
+
+// "Alumni Voices & Stories" testimonial section — this component ships its
+// own bespoke dark-teal + lime palette (see TestimonialSlider.css), deliber-
+// ately scoped local to it and never tied to the main site tokens (its own
+// code comment says so). Unlike Footer/Faculty above, these do NOT inherit
+// from the main theme — this section is meant to keep its own signature
+// look regardless of whatever Primary/Accent are set to, and only change
+// when an admin explicitly edits this section.
+export const TESTIMONIAL_COLOR_VARS: ColorVarDef[] = [
+  { key: '--testimonial-bg', label: 'Alumni Section Background', hint: 'The deep background tone.', default: '#022530' },
+  { key: '--testimonial-bg-light', label: 'Alumni Section Background Light', hint: 'Radial highlight tone.', default: '#04384b' },
+  { key: '--testimonial-accent', label: 'Alumni Section Accent', hint: 'Sparkle icon, verified badge, progress bar.', default: '#78c900' },
+];
+
 export const COLOR_VARS: ColorVarDef[] = [
   { key: '--color-primary', label: 'Primary', hint: 'Main brand color — headings, primary buttons, nav.', default: '#1b4332' },
   { key: '--color-primary-dark', label: 'Primary Dark', hint: 'Hero overlays, footer background.', default: '#081c15' },

@@ -4,15 +4,17 @@
    ========================================================================== */
 
 .m3-testimonial-section {
-  /* VWU premium theme — scoped locally so it only affects this component;
-     the site-wide tokens in styles/variables.css are untouched. */
-  --home-teal: #04384B;
-  --home-teal-deep: #022530;
+  /* VWU premium theme — deliberately scoped local to this component, not
+     tied to the main site tokens (see admin → Color Theme → Alumni Section
+     Colors), so this section keeps its own signature look by default
+     regardless of whatever Primary/Accent are set to elsewhere. */
+  --home-teal: var(--testimonial-bg-light, #04384B);
+  --home-teal-deep: var(--testimonial-bg, #022530);
   --home-white: #FFFFFF;
   --home-ivory: #F5F0C6;
   --home-orange: #FF7A00;
   --home-orange-dark: #E56E00;
-  --home-green: #78C900;
+  --home-green: var(--testimonial-accent, #78C900);
   --home-violet: #B85BC8;
 
   position: relative;
@@ -30,7 +32,7 @@
   left: -80px;
   width: 520px;
   height: 520px;
-  background: radial-gradient(circle, rgba(120, 201, 0, 0.10) 0%, rgba(4, 56, 75, 0) 70%);
+  background: radial-gradient(circle, color-mix(in srgb, var(--home-green) 10%, transparent) 0%, color-mix(in srgb, var(--home-teal) 0%, transparent) 70%);
   border-radius: 50%;
   pointer-events: none;
   z-index: 1;
@@ -42,7 +44,7 @@
   right: -80px;
   width: 500px;
   height: 500px;
-  background: radial-gradient(circle, rgba(184, 91, 200, 0.12) 0%, rgba(4, 56, 75, 0) 70%);
+  background: radial-gradient(circle, rgba(184, 91, 200, 0.12) 0%, color-mix(in srgb, var(--home-teal) 0%, transparent) 70%);
   border-radius: 50%;
   pointer-events: none;
   z-index: 1;
@@ -110,7 +112,7 @@
 
 .m3-testi-card {
   position: relative;
-  background: rgba(4, 56, 75, 0.72);
+  background: color-mix(in srgb, var(--home-teal) 72%, transparent);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -122,8 +124,8 @@
 }
 
 .m3-testi-card:hover {
-  border-color: rgba(120, 201, 0, 0.4);
-  box-shadow: 0 32px 80px -12px rgba(0, 0, 0, 0.8), 0 0 30px rgba(120, 201, 0, 0.1);
+  border-color: color-mix(in srgb, var(--home-green) 40%, transparent);
+  box-shadow: 0 32px 80px -12px rgba(0, 0, 0, 0.8), 0 0 30px color-mix(in srgb, var(--home-green) 10%, transparent);
 }
 
 /* Auto-play Progress Bar */
@@ -138,7 +140,7 @@
   height: 100%;
   background: var(--home-green);
   transition: width 50ms linear;
-  box-shadow: 0 0 8px rgba(120, 201, 0, 0.5);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--home-green) 50%, transparent);
 }
 
 /* Split Card Inner Layout */
@@ -196,8 +198,8 @@
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(to right, transparent 60%, rgba(4, 56, 75, 0.95) 100%),
-    linear-gradient(to top, rgba(2, 37, 48, 0.75) 0%, transparent 45%);
+    linear-gradient(to right, transparent 60%, color-mix(in srgb, var(--home-teal) 95%, transparent) 100%),
+    linear-gradient(to top, color-mix(in srgb, var(--home-teal-deep) 75%, transparent) 0%, transparent 45%);
   pointer-events: none;
 }
 
@@ -210,7 +212,7 @@
   gap: 6px;
   padding: 5px 12px;
   border-radius: var(--radius-full);
-  background: rgba(2, 37, 48, 0.75);
+  background: color-mix(in srgb, var(--home-teal-deep) 75%, transparent);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.18);
@@ -353,7 +355,7 @@
   color: var(--home-teal-deep);
   border-color: var(--home-green);
   transform: scale(1.1);
-  box-shadow: 0 4px 16px rgba(120, 201, 0, 0.4);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--home-green) 40%, transparent);
 }
 
 .m3-testi-thumbs-bar {
@@ -391,7 +393,7 @@
   opacity: 1;
   transform: scale(1.18);
   border-color: var(--home-green);
-  box-shadow: 0 0 12px rgba(120, 201, 0, 0.5);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--home-green) 50%, transparent);
 }
 
 .m3-thumb-img {
@@ -431,7 +433,7 @@
 }
 
 .m3-testi-alumni-link:hover {
-  background: rgba(120, 201, 0, 0.18);
+  background: color-mix(in srgb, var(--home-green) 18%, transparent);
   border-color: var(--home-green);
   color: #ffffff;
   transform: translateY(-2px);
