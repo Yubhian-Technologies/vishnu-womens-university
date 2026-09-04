@@ -1,17 +1,25 @@
 .pg-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--space-5);
 }
 
 .pg-tile {
   position: relative;
-  border-radius: var(--radius-md);
+  border-radius: 20px;
   overflow: hidden;
   aspect-ratio: 4 / 3;
   cursor: pointer;
   background: var(--color-off-white);
-  border: 1.5px solid var(--color-light-gray);
+  border: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 8%, transparent);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-base);
+}
+
+.pg-tile:hover {
+  box-shadow: var(--shadow-xl);
+  border-color: var(--color-accent);
+  transform: translateY(-4px);
 }
 
 .pg-tile img {
@@ -31,8 +39,8 @@
   inset: 0;
   display: flex;
   align-items: flex-end;
-  padding: var(--space-3);
-  background: linear-gradient(to top, rgba(8, 28, 21, 0.85) 0%, rgba(8, 28, 21, 0) 55%);
+  padding: var(--space-4);
+  background: linear-gradient(to top, color-mix(in srgb, var(--color-primary-dark, #081c15) 85%, transparent) 0%, color-mix(in srgb, var(--color-primary-dark, #081c15) 0%, transparent) 55%);
   opacity: 0;
   transition: opacity var(--transition-base);
 }
@@ -42,7 +50,7 @@
 .pg-tile__caption {
   color: var(--color-white);
   font-size: var(--text-sm);
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.35;
 }
 
@@ -50,7 +58,8 @@
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: rgba(8, 28, 21, 0.92);
+  background: color-mix(in srgb, var(--color-primary-dark, #081c15) 92%, transparent);
+  backdrop-filter: blur(12px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -72,7 +81,8 @@
   max-width: 100%;
   max-height: 72vh;
   object-fit: contain;
-  border-radius: var(--radius-sm);
+  border-radius: 20px;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.5);
 }
 
 .pg-lightbox__caption {
@@ -110,6 +120,15 @@
   justify-content: center;
   font-size: 1rem;
   cursor: pointer;
+}
+
+/* Invisible hit-area expansion — the visible 34px circle stays put (it
+   sits above the image, not over content), but the 48x48dp minimum tap
+   target from the M3 spec is met via a transparent, larger click area. */
+.pg-lightbox__close::before {
+  content: '';
+  position: absolute;
+  inset: -7px;
 }
 
 .pg-lightbox__close:hover { background: rgba(255,255,255,0.22); }

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { X } from 'lucide-react';
 import SmoothImage from '../SmoothImage/SmoothImage';
@@ -14,7 +14,7 @@ interface PhotoGridProps {
   images: PhotoItem[];
   label?: string;
   title?: string;
-  subtitle?: string;
+  subtitle?: ReactNode;
   highlights?: string[];
   columns?: 2 | 3 | 4;
   variant?: 'collage' | 'grid';

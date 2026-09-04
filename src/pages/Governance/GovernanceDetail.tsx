@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { Trophy, Landmark } from 'lucide-react';
 import { useOrderedCollection } from '../../hooks/useCollection';
+import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import { usePageBanners } from '../../hooks/usePageBanners';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import { fetchPriorityAttr } from '../../lib/domAttrs';
@@ -63,7 +64,7 @@ const IQAC_COMMITTEE_SIDEBAR_ITEMS: { label: string; path: string }[] = [
   { label: 'Student Grievance Redressal', path: '/governance/student-grievance' },
   { label: 'Central Purchase Committee', path: '/governance/central-purchase' },
   { label: 'Counselling & Monitoring', path: '/governance/counselling-monitoring' },
-  { label: 'Anti Ragging Committee', path: '/governance/anti-ragging' },
+  { label: 'Anti-Ragging Committee', path: '/governance/anti-ragging' },
   { label: 'Internal Committee (POSH)', path: '/governance/internal-committee' },
   { label: 'SC/ST Cell', path: '/governance/sc-st-cell' },
   { label: 'R&D Committee', path: '/governance/rd-committee' },
@@ -115,9 +116,7 @@ export default function GovernanceDetail() {
   if (!item) {
     if (govLoading) {
       return (
-        <main className="route-fallback">
-          <div className="route-fallback__spinner" />
-        </main>
+        <RouteFallback />
       );
     }
     return <Navigate to="/governance" replace />;

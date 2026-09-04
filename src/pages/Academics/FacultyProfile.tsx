@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { Mail, ExternalLink, FileText, ChevronRight } from 'lucide-react';
 import PageHero from '../../components/PageHero/PageHero';
+import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import { useCollection, useOrderedCollection } from '../../hooks/useCollection';
 import { linkify } from '../../lib/linkify';
@@ -64,8 +65,10 @@ export default function FacultyProfile() {
     if (person) document.title = `${person.name} | Vishnu Women's University`;
   }, [person]);
 
-  if (!loading && !person) return <Navigate to="/faculty" replace />;
-  if (!person) return null;
+  if (!person) {
+    if (loading) return <RouteFallback />;
+    return <Navigate to="/faculty" replace />;
+  }
 
   const isHod = person.designation.toLowerCase().includes('hod') || person.designation.toLowerCase().includes('head');
   const program = programs.find((p) => p.department === person.department);

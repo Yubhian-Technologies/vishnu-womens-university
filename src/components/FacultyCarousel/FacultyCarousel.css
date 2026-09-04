@@ -3,8 +3,15 @@
    ========================================================================== */
 
 .faculty-impact-section {
-  background: #f4ba2f;
-  background: linear-gradient(135deg, #f6c035 0%, #ebb024 100%);
+  /* Its own dedicated theme tokens (admin → Color Theme → Faculty Section
+     Colors) rather than reading Accent directly — this block wants to be
+     recolorable independently of every button/badge elsewhere that also
+     uses Accent. Each falls back to Accent/Accent Light until explicitly
+     set (see --faculty-bg's inheritsFrom in theme.ts). */
+  background: var(--faculty-bg, var(--color-accent, #ebb024));
+  background: linear-gradient(135deg,
+    var(--faculty-bg-light, var(--color-accent-light, #f6c035)) 0%,
+    var(--faculty-bg, var(--color-accent, #ebb024)) 100%);
   padding: clamp(3rem, 6vw, 4.5rem) 0;
   width: 100%;
   position: relative;
@@ -298,9 +305,9 @@
 }
 
 .faculty-impact-badge.exp-badge {
-  background: rgba(201, 168, 76, 0.12);
+  background: color-mix(in srgb, var(--color-accent, #c9a84c) 12%, transparent);
   color: #856404;
-  border: 1px solid rgba(201, 168, 76, 0.3);
+  border: 1px solid color-mix(in srgb, var(--color-accent, #c9a84c) 30%, transparent);
 }
 
 /* Summary / Specialization Area */
@@ -364,7 +371,7 @@
   color: #ffffff;
   border-color: var(--color-primary, #1b4332);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(27, 67, 50, 0.2);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--color-primary, #1b4332) 20%, transparent);
   outline: none;
 }
 

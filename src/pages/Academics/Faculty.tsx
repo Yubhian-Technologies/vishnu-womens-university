@@ -15,13 +15,16 @@ import type { CustomSection } from '../../lib/customSections';
 // its departments currently have any faculty.
 const DEPARTMENT_GROUPS: { label: string; departments: string[] }[] = [
   { label: 'CSE', departments: ['CSE'] },
-  { label: 'EEE', departments: ['EEE'] },
+  { label: 'AI', departments: ['AI', 'AI&ML', 'AI&DS'] },
   { label: 'IT', departments: ['IT'] },
   { label: 'ECE', departments: ['ECE'] },
-  { label: 'ME', departments: ['Mechanical', 'ME'] },
+  { label: 'EEE', departments: ['EEE'] },
   { label: 'CE', departments: ['Civil', 'CE'] },
-  { label: 'AI', departments: ['AI', 'AI&ML', 'AI&DS'] },
-  { label: 'FRESHMAN ENGG.', departments: ['Mathematics', 'Physics', 'Chemistry', 'English'] },
+  { label: 'ME', departments: ['Mechanical', 'ME'] },
+  { label: 'Maths', departments: ['Mathematics'] },
+  { label: 'Physics', departments: ['Physics'] },
+  { label: 'Chemistry', departments: ['Chemistry'] },
+  { label: 'English', departments: ['English'] },
   { label: 'MBA', departments: ['MBA'] },
 ];
 
@@ -34,7 +37,11 @@ const DEPARTMENT_GROUPS: { label: string; departments: string[] }[] = [
 // only ever added between these 4 ranks, never within one.
 function designationGroupRank(designation: string): number {
   const d = (designation || '').toLowerCase();
-  if (d.includes('hod') || d.includes('head') || d.includes('dean academic') || d.includes('dean statutory')) return 0;
+  // strip dots/spaces so "H.O.D." / "H O D" still register as HOD (some
+  // records — CSE, MBA — were entered that way and fell through to the
+  // Professors group instead of leadership).
+  const compact = d.replace(/[.\s]/g, '');
+  if (compact.includes('hod') || d.includes('head') || d.includes('dean academic') || d.includes('dean statutory')) return 0;
   if (d.includes('assistant') || d.includes('asst')) return 3;
   if (d.includes('associate') || d.includes('assoc')) return 2;
   if (d.includes('professor')) return 1;
@@ -45,7 +52,7 @@ function designationGroupRank(designation: string): number {
 // before Dean Statutory — same visual group, still a defined internal order.
 function leadershipSubRank(designation: string): number {
   const d = (designation || '').toLowerCase();
-  if (d.includes('hod') || d.includes('head')) return 0;
+  if (d.replace(/[.\s]/g, '').includes('hod') || d.includes('head')) return 0;
   if (d.includes('dean academic')) return 1;
   if (d.includes('dean statutory')) return 2;
   return 3;

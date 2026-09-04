@@ -4,10 +4,10 @@
    ========================================================================== */
 
 .vwu-footer {
-  background: #0d251a;
-  color: #e2e8f0;
+  background: var(--footer-bg, var(--color-primary-dark, #0d251a));
+  color: var(--footer-text, #e2e8f0);
   font-family: var(--font-sans, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
-  border-top: 1px solid rgba(201, 168, 76, 0.25);
+  border-top: 1px solid color-mix(in srgb, var(--footer-accent, var(--color-accent, #c9a84c)) 25%, transparent);
   position: relative;
   overflow: hidden;
   line-height: 1.5;
@@ -32,18 +32,17 @@
 }
 
 /* ==========================================================================
-   TIER 1: University Identity & Accreditations Header
+   TIER 1: Identity & Navigation — brand on the left, link columns on the right
    ========================================================================== */
 
-.vwu-footer-identity-tier {
-  padding: 3.5rem 0 2.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+.vwu-footer-main-tier {
+  padding: 3.5rem 0 3rem;
   background: rgba(0, 0, 0, 0.12);
 }
 
-.vwu-footer-identity-inner {
+.vwu-footer-main-inner {
   display: grid;
-  grid-template-columns: 1.2fr 1fr;
+  grid-template-columns: minmax(280px, 340px) 1fr;
   gap: 3.5rem;
   align-items: start;
 }
@@ -64,7 +63,7 @@
 }
 
 .vwu-footer-logo-wrap:focus-visible {
-  outline: 2px solid var(--color-accent, #c9a84c);
+  outline: 2px solid var(--footer-accent, var(--color-accent, #c9a84c));
   outline-offset: 4px;
   border-radius: 6px;
 }
@@ -88,7 +87,7 @@
   font-family: var(--font-serif, Georgia, serif);
   font-size: 1.25rem;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--footer-heading, #ffffff);
   letter-spacing: -0.01em;
 }
 
@@ -98,12 +97,12 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: var(--color-accent, #c9a84c);
+  color: var(--footer-accent, var(--color-accent, #c9a84c));
 }
 
 .vwu-footer-mission-text {
   font-size: 0.9rem;
-  color: rgba(226, 232, 240, 0.78);
+  color: color-mix(in srgb, var(--footer-text, #e2e8f0) 78%, transparent);
   line-height: 1.65;
   margin: 0;
   max-width: 520px;
@@ -116,7 +115,7 @@
   flex-direction: column;
   gap: 0.6rem;
   font-size: 0.86rem;
-  color: rgba(226, 232, 240, 0.82);
+  color: color-mix(in srgb, var(--footer-text, #e2e8f0) 82%, transparent);
   margin-top: 0.3rem;
 }
 
@@ -127,7 +126,7 @@
 }
 
 .vwu-footer-contact-icon {
-  color: var(--color-accent, #c9a84c);
+  color: var(--footer-accent, var(--color-accent, #c9a84c));
   flex-shrink: 0;
 }
 
@@ -142,94 +141,30 @@
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  color: #ffffff;
+  color: var(--footer-heading, #ffffff);
   text-decoration: none;
   font-weight: 500;
   transition: color 150ms ease;
 }
 
 .vwu-footer-contact-action:hover {
-  color: var(--color-accent, #c9a84c);
+  color: var(--footer-accent, var(--color-accent, #c9a84c));
   text-decoration: underline;
 }
 
 .vwu-footer-contact-action:focus-visible {
-  outline: 2px solid var(--color-accent, #c9a84c);
+  outline: 2px solid var(--footer-accent, var(--color-accent, #c9a84c));
   outline-offset: 2px;
   border-radius: 4px;
 }
 
 .vwu-footer-contact-sep {
-  color: rgba(255, 255, 255, 0.3);
-}
-
-/* Accreditations Block */
-.vwu-footer-accreditation-block {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.vwu-footer-accreditation-header {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.vwu-footer-acc-shield {
-  color: var(--color-accent, #c9a84c);
-}
-
-.vwu-footer-acc-heading {
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.vwu-footer-accreditation-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-  gap: 0.75rem;
-}
-
-.vwu-footer-acc-card {
-  background: rgba(255, 255, 255, 0.035);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
-  padding: 0.75rem 0.9rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  transition: background 200ms ease, border-color 200ms ease;
-}
-
-.vwu-footer-acc-card:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(201, 168, 76, 0.4);
-}
-
-.vwu-footer-acc-code {
-  font-size: 0.92rem;
-  font-weight: 700;
-  color: var(--color-accent, #c9a84c);
-  letter-spacing: 0.02em;
-}
-
-.vwu-footer-acc-title {
-  font-size: 0.72rem;
-  color: rgba(226, 232, 240, 0.65);
-  line-height: 1.35;
+  color: color-mix(in srgb, var(--footer-heading, #ffffff) 30%, transparent);
 }
 
 /* ==========================================================================
-   TIER 2: Categorized Navigation Grid (Desktop)
+   Categorized Navigation Grid (Desktop) — right side of the main tier
    ========================================================================== */
-
-.vwu-footer-nav-tier {
-  padding: 3.5rem 0 3rem;
-}
 
 .vwu-footer-nav-grid {
   display: grid;
@@ -248,10 +183,10 @@
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #ffffff;
+  color: var(--footer-heading, #ffffff);
   margin: 0 0 1.25rem 0;
   padding-bottom: 0.6rem;
-  border-bottom: 2px solid rgba(201, 168, 76, 0.5);
+  border-bottom: 2px solid color-mix(in srgb, var(--footer-accent, var(--color-accent, #c9a84c)) 50%, transparent);
   width: fit-content;
 }
 
@@ -266,39 +201,44 @@
 
 .vwu-footer-nav-link {
   font-size: 0.88rem;
-  color: rgba(226, 232, 240, 0.72);
+  color: color-mix(in srgb, var(--footer-text, #e2e8f0) 72%, transparent);
   text-decoration: none;
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
   width: fit-content;
-  transition: color 150ms ease;
+  transition: all 150ms ease;
 }
 
 .vwu-footer-nav-link:hover {
-  color: #ffffff;
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  color: var(--footer-heading, #ffffff);
+  transform: translateX(3px);
+}
+
+.vwu-footer-nav-link.is-disabled {
+  color: color-mix(in srgb, var(--footer-text, #e2e8f0) 38%, transparent);
+  cursor: default;
+  pointer-events: none;
 }
 
 .vwu-footer-nav-link:focus-visible {
-  outline: 2px solid var(--color-accent, #c9a84c);
+  outline: 2px solid var(--footer-accent, var(--color-accent, #c9a84c));
   outline-offset: 2px;
   border-radius: 4px;
-  color: #ffffff;
+  color: var(--footer-heading, #ffffff);
 }
 
 .vwu-external-glyph {
-  color: rgba(255, 255, 255, 0.4);
+  color: color-mix(in srgb, var(--footer-heading, #ffffff) 40%, transparent);
   flex-shrink: 0;
 }
 
 .vwu-footer-nav-link:hover .vwu-external-glyph {
-  color: var(--color-accent, #c9a84c);
+  color: var(--footer-accent, var(--color-accent, #c9a84c));
 }
 
 .vwu-doc-icon {
-  color: var(--color-accent, #c9a84c);
+  color: var(--footer-accent, var(--color-accent, #c9a84c));
   flex-shrink: 0;
 }
 
@@ -306,37 +246,40 @@
 .vwu-footer-compliance-tabs {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.35rem;
+  gap: 0.4rem;
   margin-bottom: 1.1rem;
 }
 
 .vwu-footer-comp-tab-btn {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: rgba(226, 232, 240, 0.75);
+  background: color-mix(in srgb, var(--footer-heading, #ffffff) 6%, transparent);
+  border: 1px solid color-mix(in srgb, var(--footer-heading, #ffffff) 12%, transparent);
+  color: color-mix(in srgb, var(--footer-text, #e2e8f0) 80%, transparent);
   font-family: inherit;
-  font-size: 0.7rem;
-  font-weight: 600;
-  padding: 0.3rem 0.55rem;
-  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.35rem 0.8rem;
+  border-radius: var(--radius-full);
   cursor: pointer;
-  transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  transition: all 150ms ease;
 }
 
 .vwu-footer-comp-tab-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
+  background: color-mix(in srgb, var(--footer-heading, #ffffff) 15%, transparent);
+  color: var(--footer-heading, #ffffff);
+  transform: translateY(-1px);
 }
 
 .vwu-footer-comp-tab-btn.active {
-  background: var(--color-accent, #c9a84c);
-  color: #0d251a;
-  border-color: var(--color-accent, #c9a84c);
-  font-weight: 700;
+  background: var(--footer-accent, var(--color-accent, #c9a84c));
+  color: var(--footer-bg, var(--color-primary-dark, #0d251a));
+  border-color: var(--footer-accent, var(--color-accent, #c9a84c));
+  font-weight: 800;
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--footer-accent, var(--color-accent, #c9a84c)) 30%, transparent);
 }
 
 .vwu-footer-comp-tab-btn:focus-visible {
-  outline: 2px solid #ffffff;
+  outline: 2px solid var(--footer-heading, #ffffff);
   outline-offset: 2px;
 }
 
@@ -350,19 +293,19 @@
   gap: 0.3rem;
   font-size: 0.8rem;
   font-weight: 700;
-  color: var(--color-accent, #c9a84c);
+  color: var(--footer-accent, var(--color-accent, #c9a84c));
   text-decoration: none;
   margin-top: 1rem;
   transition: color 150ms ease;
 }
 
 .vwu-footer-comp-view-all:hover {
-  color: #ffffff;
+  color: var(--footer-heading, #ffffff);
   text-decoration: underline;
 }
 
 .vwu-footer-comp-view-all:focus-visible {
-  outline: 2px solid var(--color-accent, #c9a84c);
+  outline: 2px solid var(--footer-accent, var(--color-accent, #c9a84c));
   outline-offset: 2px;
   border-radius: 4px;
 }
@@ -382,8 +325,8 @@
 .vwu-footer-social-tier {
   padding: 1.5rem 0;
   background: rgba(0, 0, 0, 0.16);
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid color-mix(in srgb, var(--footer-heading, #ffffff) 8%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--footer-heading, #ffffff) 8%, transparent);
 }
 
 .vwu-footer-social-inner {
@@ -397,7 +340,7 @@
 .vwu-footer-social-label {
   font-size: 0.88rem;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--footer-heading, #ffffff);
   letter-spacing: 0.02em;
 }
 
@@ -414,22 +357,22 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  color: rgba(255, 255, 255, 0.85);
+  background: color-mix(in srgb, var(--footer-heading, #ffffff) 6%, transparent);
+  border: 1px solid color-mix(in srgb, var(--footer-heading, #ffffff) 14%, transparent);
+  color: color-mix(in srgb, var(--footer-heading, #ffffff) 85%, transparent);
   text-decoration: none;
   transition: background 180ms ease, color 180ms ease, border-color 180ms ease, transform 180ms ease;
 }
 
 .vwu-social-btn:hover {
-  background: var(--color-accent, #c9a84c);
-  color: #0d251a;
-  border-color: var(--color-accent, #c9a84c);
+  background: var(--footer-accent, var(--color-accent, #c9a84c));
+  color: var(--footer-bg, var(--color-primary-dark, #0d251a));
+  border-color: var(--footer-accent, var(--color-accent, #c9a84c));
   transform: translateY(-2px);
 }
 
 .vwu-social-btn:focus-visible {
-  outline: 2px solid #ffffff;
+  outline: 2px solid var(--footer-heading, #ffffff);
   outline-offset: 2px;
 }
 
@@ -452,7 +395,7 @@
 }
 
 .vwu-footer-copyright {
-  color: rgba(226, 232, 240, 0.6);
+  color: color-mix(in srgb, var(--footer-text, #e2e8f0) 60%, transparent);
   margin: 0;
 }
 
@@ -464,19 +407,19 @@
 }
 
 .vwu-footer-legal-link {
-  color: rgba(226, 232, 240, 0.65);
+  color: color-mix(in srgb, var(--footer-text, #e2e8f0) 65%, transparent);
   text-decoration: none;
   transition: color 150ms ease;
 }
 
 .vwu-footer-legal-link:hover {
-  color: #ffffff;
+  color: var(--footer-heading, #ffffff);
   text-decoration: underline;
   text-underline-offset: 2px;
 }
 
 .vwu-footer-legal-link:focus-visible {
-  outline: 2px solid var(--color-accent, #c9a84c);
+  outline: 2px solid var(--footer-accent, var(--color-accent, #c9a84c));
   outline-offset: 2px;
   border-radius: 2px;
 }
@@ -485,11 +428,11 @@
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  color: rgba(226, 232, 240, 0.55);
+  color: color-mix(in srgb, var(--footer-text, #e2e8f0) 55%, transparent);
 }
 
 .vwu-tech-hub-badge {
-  color: var(--color-accent, #c9a84c);
+  color: var(--footer-accent, var(--color-accent, #c9a84c));
   font-weight: 700;
   letter-spacing: 0.04em;
 }
@@ -499,10 +442,11 @@
    ========================================================================== */
 
 @media (max-width: 1024px) {
-  .vwu-footer-identity-inner {
+  .vwu-footer-main-inner {
     grid-template-columns: 1fr;
-    gap: 2rem;
+    gap: 2.5rem;
   }
+
   .vwu-footer-nav-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 2.5rem;
@@ -510,12 +454,8 @@
 }
 
 @media (max-width: 768px) {
-  .vwu-footer-identity-tier {
+  .vwu-footer-main-tier {
     padding: 2.5rem 0 2rem;
-  }
-
-  .vwu-footer-nav-tier {
-    padding: 1.5rem 0 2rem;
   }
 
   /* Switch desktop grid to mobile accordions */
@@ -530,7 +470,7 @@
   }
 
   .vwu-footer-m-acc-item {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid color-mix(in srgb, var(--footer-heading, #ffffff) 8%, transparent);
   }
 
   .vwu-footer-m-acc-btn {
@@ -542,7 +482,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    color: #ffffff;
+    color: var(--footer-heading, #ffffff);
     font-family: inherit;
     font-size: 0.95rem;
     font-weight: 700;
@@ -551,12 +491,12 @@
   }
 
   .vwu-footer-m-acc-btn:focus-visible {
-    outline: 2px solid var(--color-accent, #c9a84c);
+    outline: 2px solid var(--footer-accent, var(--color-accent, #c9a84c));
     outline-offset: 2px;
   }
 
   .vwu-m-acc-chevron {
-    color: var(--color-accent, #c9a84c);
+    color: var(--footer-accent, var(--color-accent, #c9a84c));
     transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1);
   }
 
@@ -577,7 +517,7 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: var(--color-accent, #c9a84c);
+    color: var(--footer-accent, var(--color-accent, #c9a84c));
     margin: 0 0 0.5rem 0;
   }
 

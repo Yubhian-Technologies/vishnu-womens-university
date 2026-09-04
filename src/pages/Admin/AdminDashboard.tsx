@@ -1,5 +1,6 @@
 import { SECTIONS } from './AdminLayout';
 import Overview from './sections/Overview';
+import ThemeAdmin from './sections/ThemeAdmin';
 import BannersAdmin from './sections/BannersAdmin';
 import LandingPagesAdmin from './sections/LandingPagesAdmin';
 import NewsAdmin from './sections/NewsAdmin';
@@ -11,6 +12,7 @@ import FacultyAdmin from './sections/FacultyAdmin';
 import GoverningBodyAdmin from './sections/GoverningBodyAdmin';
 import CoreExecutivesAdmin from './sections/CoreExecutivesAdmin';
 import PlacementYearsAdmin from './sections/PlacementYearsAdmin';
+import PlacementHighlightsAdmin from './sections/PlacementHighlightsAdmin';
 import AlumniAdmin from './sections/AlumniAdmin';
 import AnnouncementsAdmin from './sections/AnnouncementsAdmin';
 import InformationAdmin from './sections/InformationAdmin';
@@ -84,6 +86,7 @@ const UNGATED_SECTIONS = new Set(['overview']);
 
 const SECTION_MAP: Record<string, React.ReactNode> = {
   overview: <Overview />,
+  theme: <ThemeAdmin />,
   banners: <BannersAdmin />,
   'landing-pages': <LandingPagesAdmin />,
   news: <NewsAdmin />,
@@ -95,6 +98,7 @@ const SECTION_MAP: Record<string, React.ReactNode> = {
   'governing-body': <GoverningBodyAdmin />,
   'core-executives': <CoreExecutivesAdmin />,
   placements: <PlacementYearsAdmin />,
+  'placement-highlights': <PlacementHighlightsAdmin />,
   alumni: <AlumniAdmin />,
   announcements: <AnnouncementsAdmin />,
   information: <InformationAdmin />,

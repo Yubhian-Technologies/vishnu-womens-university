@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { Check, Microscope, Compass, Target, Sparkles, Mail, BookOpen, FileText, ChevronDown, GraduationCap, Calendar, Award, Users, ChevronRight, ArrowRight, BookMarked, Bookmark, Library, ExternalLink } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
+import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import ProgrammeStructure from '../../components/ProgrammeStructure/ProgrammeStructure';
 import DepartmentNewsSection, { type DepartmentNewsDoc } from '../../components/DepartmentNews/DepartmentNewsSection';
 import NewsEventsTabs from '../../components/NewsEventsTabs/NewsEventsTabs';
@@ -22,9 +23,9 @@ import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import type { FacultyDoc } from './Faculty';
 import { parseFlexibleTable, parseProjectAccordion } from '../../lib/structuredTable';
 import { sortPlacementRows, computePlacementStats, findPackageColumnIndex, formatPackageCell } from '../../lib/placementRecords';
-import { sortInternshipRows, computeInternshipStats, findStipendColumnIndex, formatStipendCell } from '../../lib/internshipRecords';
+import { computeInternshipStats, findPeriodColumnIndex } from '../../lib/internshipRecords';
 import { hasCustomSectionContent, toQuickLinkItems } from '../../lib/customSections';
-import CustomSectionsRenderer from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
+import CustomSectionsRenderer, { SectionSubtree } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import '../detail-layout.css';
 import '../Campus/tabbed-section.css';
 
@@ -131,15 +132,13 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   // Defaults the PEOs/POs/PSOs tab bar to whichever of the three actually
   // has admin-entered content for the active programme, once loaded.
   useEffect(() => {
-    const firstAvailable = activeProgram?.peos?.length ? 'peos' : activeProgram?.pos?.length ? 'pos' : activeProgram?.psos?.length ? 'psos' : activeProgram?.wks?.length ? 'wks' : null;
+    const firstAvailable = activeProgram?.peos?.length ? 'peos' : activeProgram?.wks?.length ? 'wks' : activeProgram?.pos?.length ? 'pos' : activeProgram?.psos?.length ? 'psos' : null;
     if (firstAvailable) setOutcomeTab((prev) => prev ?? firstAvailable);
   }, [activeProgram?.peos?.length, activeProgram?.pos?.length, activeProgram?.psos?.length, activeProgram?.wks?.length]);
 
   if (progLoading && subPrograms.length === 0) {
     return (
-      <main className="route-fallback">
-        <div className="route-fallback__spinner" />
-      </main>
+      <RouteFallback />
     );
   }
   if (!progLoading && !activeProgram) return <Navigate to="/academics" replace />;
@@ -149,9 +148,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   // `allDepartments` loads (e.g. "AI" -> "Artificial Intelligence").
   if (!activeProgram || deptLoading) {
     return (
-      <main className="route-fallback">
-        <div className="route-fallback__spinner" />
-      </main>
+      <RouteFallback />
     );
   }
 
@@ -259,10 +256,8 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   const internshipYears = activeProgram.internshipYears || [];
   const activeInternshipYear = internshipYears.find((y) => y.year === internshipYear) ?? internshipYears[0];
   const internshipColumns = activeInternshipYear?.columns || [];
-  const internshipRows = internshipColumns.length > 0 && activeInternshipYear
-    ? sortInternshipRows(internshipColumns, activeInternshipYear.rows || [])
-    : [];
-  const internshipStipendIdx = findStipendColumnIndex(internshipColumns);
+  const internshipRows = internshipColumns.length > 0 && activeInternshipYear ? activeInternshipYear.rows || [] : [];
+  const internshipPeriodIdx = findPeriodColumnIndex(internshipColumns);
   const internshipYearStats = activeInternshipYear ? computeInternshipStats(internshipColumns, activeInternshipYear.rows || []) : null;
   const hasInternships = internshipYears.length > 0;
 
@@ -271,11 +266,11 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   const internshipMarqueeItems: PlacementItem[] = internshipRows.map((row) => {
     const rawName = internshipNameIdx >= 0 ? row.cells[internshipNameIdx] : (row.cells[1] || row.cells[0]);
     const rawComp = internshipCompIdx >= 0 ? row.cells[internshipCompIdx] : (row.cells[2] || 'Leading Organization');
-    const rawStipend = internshipStipendIdx >= 0 ? formatStipendCell(row.cells[internshipStipendIdx] ?? '') : (row.cells[3] || '');
+    const rawPeriod = internshipPeriodIdx >= 0 ? row.cells[internshipPeriodIdx] : '';
     return {
       name: rawName?.trim() || 'Student Scholar',
       company: rawComp?.trim() || 'Top Organization',
-      package: rawStipend ? `₹${rawStipend}` : 'Paid Internship',
+      package: rawPeriod?.trim() || 'Internship',
     };
   });
 
@@ -285,9 +280,9 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   // actually filled in (via /admin → Programs) becomes a tab.
   const outcomeGroups = [
     { key: 'peos', short: 'PEOs', title: 'Programme Educational Objectives (PEOs)', items: activeProgram.peos },
+    { key: 'wks', short: 'WKs', title: 'Knowledge Profile (WKs)', items: activeProgram.wks },
     { key: 'pos', short: 'POs', title: 'Programme Outcomes (POs)', items: activeProgram.pos },
     { key: 'psos', short: 'PSOs', title: 'Programme Specific Outcomes (PSOs)', items: activeProgram.psos },
-    { key: 'wks', short: 'WKs', title: 'Knowledge Profile (WKs)', items: activeProgram.wks },
   ].filter((g) => g.items && g.items.length > 0);
   const hasOutcomeStatements = outcomeGroups.length > 0;
   const activeOutcome = outcomeGroups.find((g) => g.key === outcomeTab) ?? outcomeGroups[0];
@@ -304,17 +299,20 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     ? `${outcomeShortLabels.slice(0, -1).join(', ')} & ${outcomeShortLabels[outcomeShortLabels.length - 1]}`
     : outcomeShortLabels[0] || '';
   // News & Events on the grouped department page is department-wide, not
-  // per-toggle-side, and split into three admin-defined categories (see
-  // NewsEventsTabs) — read from the department doc, same as Vision/Labs/
-  // Library. "News & Events" is the one category with legacy content that
-  // used to live on a programme doc (ProgramsAdmin's old "News & Events —
-  // Department Page" field); it falls back to whichever sub-program still
-  // has it (first non-empty) until DepartmentsAdmin's "Copy from Programs"
-  // moves it over — Student Awards / Others never existed per-programme, so
-  // they're department-only with no fallback. Independent of the plain
-  // departmentNews collection cards ("News & Events — This Programme",
-  // rendered by <DepartmentNewsSection> below) — either, both, or neither
-  // can be present.
+  // per-toggle-side — read from the department doc, same as Vision/Labs/
+  // Library. The "News & Events" heading itself is fixed (see
+  // NewsEventsSubtree below); what's under it is a dynamic, admin-defined
+  // list of named sections (dept.newsEventsSections — any number, any
+  // content type, e.g. "Student Awards", "Others", or anything else — see
+  // DepartmentsAdmin.tsx). A department that hasn't been opened in Admin
+  // since that switchover falls back to the old fixed News & Events /
+  // Student Awards / Others arrays instead, rendered the same way they
+  // always were, so nothing already published goes blank. Independent of
+  // the plain departmentNews collection cards ("News & Events — This
+  // Programme", rendered by <DepartmentNewsSection> below) — either, both,
+  // or neither can be present.
+  const newsEventsSubSections = (dept?.newsEventsSections || []).filter(hasCustomSectionContent);
+  const hasNewsEventsDynamic = newsEventsSubSections.length > 0;
   const validYears = (arr?: NewsEventsYear[]) =>
     (arr || []).filter((y) => y.year && ((y.columns?.length > 0 && y.rows?.length > 0) || (y.cards?.length ?? 0) > 0 || !!y.text));
   const newsEventsCategories = [
@@ -322,7 +320,12 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     { key: 'awards', label: 'Student Awards', years: validYears(dept?.studentAwardsYears) },
     { key: 'others', label: 'Others', years: validYears(dept?.othersYears) },
   ];
-  const hasNewsEvents = newsEventsCategories.some((c) => c.years.length > 0);
+  // Once a department has gone through the new Admin flow at least once
+  // (dept.newsEventsMigrated), the old arrays are frozen leftovers, not the
+  // live source of truth — an admin who then deletes everything in the new
+  // editor must actually see it gone, not have this stale data resurface.
+  const hasLegacyNewsEvents = !hasNewsEventsDynamic && !dept?.newsEventsMigrated && newsEventsCategories.some((c) => c.years.length > 0);
+  const hasNewsEvents = hasNewsEventsDynamic || hasLegacyNewsEvents;
   const hasDeptNews = deptNewsDocs.some((n) => group.programSlugs.includes(n.program));
   const newsletterYears = (activeProgram.newsletterYears || []).filter((y) => y.year && y.issues && y.issues.length > 0);
   const hasNewsletter = newsletterYears.length > 0;
@@ -338,6 +341,12 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   const rndStructuredRows = activeProgram.rndStructuredTable?.rows || [];
   const hasRndStructuredTable = rndStructuredColumns.length > 0 && rndStructuredRows.length > 0;
   const hasRnd = !!activeProgram.rndIntro || rndTableSections.length > 0 || rndProjectCategories.length > 0 || rndLinks.length > 0 || hasRndStructuredTable;
+  // Deliberately program-level only, not dept.customSections — a grouped
+  // department's Custom Sections editor is gated off in DepartmentsAdmin.tsx
+  // (Custom Sections live on the linked programme(s) instead; only a
+  // standalone department with no programme uses dept.customSections
+  // directly — see StandaloneDepartmentDetail.tsx). News & Events is the
+  // one dept-level exception — see newsEventsSubSections below.
   const visibleCustomSections = (activeProgram.customSections || []).filter(hasCustomSectionContent);
 
   // "Placements" quick link doubles as the Internships entry (Internships
@@ -642,7 +651,6 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                       </div>
                       <div className="dept-quick-nav-title-wrap">
                         <h4 className="dept-quick-nav-title">Quick Navigation</h4>
-                        <span className="dept-quick-nav-subtitle">{quickLinks.length} Sections</span>
                       </div>
                     </div>
 
@@ -1196,21 +1204,9 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                         className="dept-stat-tile__circle dept-stat-tile__circle--link"
                         onClick={() => document.getElementById('internship-records-table')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
                       >
-                        <span className="dept-stat-tile__value">Stipend wise</span>
+                        <span className="dept-stat-tile__value">View All</span>
                       </button>
-                      <div className="dept-stat-tile__label">Top Interns List</div>
-                    </div>
-                    <div className="dept-stat-tile">
-                      <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{internshipYearStats.averageStipend ?? '—'}</span></div>
-                      <div className="dept-stat-tile__label">Average Stipend</div>
-                    </div>
-                    <div className="dept-stat-tile">
-                      <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{internshipYearStats.medianStipend ?? '—'}</span></div>
-                      <div className="dept-stat-tile__label">Median Stipend</div>
-                    </div>
-                    <div className="dept-stat-tile">
-                      <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{internshipYearStats.highestStipend ?? '—'}</span></div>
-                      <div className="dept-stat-tile__label">Highest Stipend</div>
+                      <div className="dept-stat-tile__label">Internship Records</div>
                     </div>
                   </div>
                 </>
@@ -1477,9 +1473,25 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
         </div>
       </section>
 
-      {/* News & Events — department-wide, tabbed across News & Events /
-          Student Awards / Others (see NewsEventsTabs). */}
-      <NewsEventsTabs categories={newsEventsCategories} eyebrow={deptName} navOffset={NAV_OFFSET} />
+      {/* News & Events — the heading is fixed; what's under it is the
+          admin-defined dynamic section list (see newsEventsSubSections
+          above), or, for a department not yet opened in the new Admin, the
+          old fixed News & Events / Student Awards / Others tabs. */}
+      {hasNewsEventsDynamic && (
+        <section id="news-events" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
+          <div className="container">
+            <div style={{ marginBottom: 'var(--space-8)' }}>
+              <span className="section-label dept-section-label">{deptName}</span>
+              <h2 className="section-title">News &amp; Events</h2>
+            </div>
+            <SectionSubtree
+              section={{ id: 'news-events-root', label: 'News & Events', contentType: 'text', textContent: '', subSections: newsEventsSubSections }}
+              navOffset={NAV_OFFSET}
+            />
+          </div>
+        </section>
+      )}
+      {hasLegacyNewsEvents && <NewsEventsTabs categories={newsEventsCategories} eyebrow={deptName} navOffset={NAV_OFFSET} />}
 
       {/* News & Events — live from the departmentNews collection, tagged to
           this programme (Programs admin's "News & Events — This Programme").

@@ -1,0 +1,424 @@
+/* ==========================================================================
+   Programs & Schools Showcase Section — Light Theme
+   Clean institutional Google Material 3 Design Tokens
+   ========================================================================== */
+
+.programs-showcase-section.programs-showcase--light {
+  background: var(--color-off-white, #f7f9f8);
+  color: var(--color-text, #1f2937);
+  padding: 0;
+  position: relative;
+  overflow: hidden;
+  border-top: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 8%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 8%, transparent);
+}
+
+.programs-showcase-split-wrapper {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  width: 100%;
+  min-height: 100%;
+  align-items: stretch;
+}
+
+/* ── Left Column Container: Programs ── */
+.programs-showcase-left-container {
+  display: flex;
+  justify-content: flex-end;
+  padding: clamp(3.5rem, 5vw, 5.5rem) clamp(2rem, 3.5vw, 4rem) clamp(3.5rem, 5vw, 5.5rem) max(var(--space-6), calc((100vw - 1400px) / 2 + var(--space-6)));
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.programs-showcase-left {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 580px;
+  min-width: 0;
+}
+
+.programs-showcase-eyebrow {
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-accent, #c9a84c);
+  margin-bottom: 0.85rem;
+}
+
+.programs-showcase-heading {
+  font-family: var(--font-serif, Georgia, serif);
+  font-size: clamp(1.75rem, 4vw, 3.2rem);
+  font-weight: 800;
+  color: var(--color-primary-dark, #081c15);
+  line-height: 1.18;
+  letter-spacing: -0.01em;
+  margin: 0 0 1.25rem 0;
+  max-width: 560px;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.programs-showcase-desc {
+  max-width: 580px;
+  margin: 0 0 2rem 0;
+}
+
+.programs-showcase-desc p {
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: clamp(0.92rem, 1.5vw, 1rem);
+  line-height: 1.65;
+  color: #64748b;
+  margin: 0 0 1rem 0;
+  overflow-wrap: break-word;
+}
+
+.programs-showcase-desc p:last-child {
+  margin-bottom: 0;
+}
+
+/* Search Bar Container & Predictive Dropdown */
+.programs-showcase-search-container {
+  position: relative;
+  margin-bottom: 2.75rem;
+  max-width: 480px;
+  width: 100%;
+  z-index: 50;
+  box-sizing: border-box;
+}
+
+.programs-showcase-search-form {
+  width: 100%;
+}
+
+.programs-showcase-search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border: 1.5px solid color-mix(in srgb, var(--color-primary, #1b4332) 15%, transparent);
+  border-radius: var(--radius-full, 9999px);
+  padding: 0.35rem 0.5rem 0.35rem 1.2rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.programs-showcase-search-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: 0.95rem;
+  color: #0f172a;
+  outline: none;
+  padding: 0.55rem 0;
+  text-overflow: ellipsis;
+}
+
+.programs-showcase-search-input:focus-visible {
+  outline: none;
+}
+
+.programs-showcase-search-input::placeholder {
+  color: #94a3b8;
+}
+
+.programs-showcase-search-btn {
+  background: var(--color-primary, #1b4332);
+  border: none;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-full, 9999px);
+  cursor: pointer;
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--color-primary, #1b4332) 25%, transparent);
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.programs-showcase-search-btn:hover {
+  background: var(--color-accent, #c9a84c);
+  color: var(--color-primary-dark, #081c15);
+  transform: scale(1.05);
+}
+
+/* Predictive Live Search Dropdown */
+.programs-showcase-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border-radius: var(--radius-lg, 16px);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04);
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  z-index: 100;
+  animation: programsDropdownIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes programsDropdownIn {
+  from { opacity: 0; transform: translateY(-8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.programs-showcase-dropdown-header {
+  padding: 0.65rem 1.25rem;
+  background: #f8fafc;
+  border-bottom: 1px solid #edf2f7;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.programs-showcase-dropdown-list {
+  display: flex;
+  flex-direction: column;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.programs-showcase-dropdown-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.8rem 1.25rem;
+  text-decoration: none;
+  border-bottom: 1px solid #f1f5f9;
+  transition: background 0.15s ease;
+}
+
+.programs-showcase-dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.programs-showcase-dropdown-item:hover {
+  background: color-mix(in srgb, var(--color-accent, #c9a84c) 8%, transparent);
+}
+
+.programs-showcase-dropdown-item-title {
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.programs-showcase-dropdown-item-badge {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  padding: 2px 8px;
+  border-radius: var(--radius-full, 9999px);
+  background: color-mix(in srgb, var(--color-primary, #1b4332) 8%, transparent);
+  color: var(--color-primary, #1b4332);
+  border: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 18%, transparent);
+}
+
+/* Nav Links Grid */
+.programs-showcase-nav-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2rem 1.5rem;
+  margin-bottom: 3rem;
+  max-width: 520px;
+  width: 100%;
+}
+
+.programs-showcase-nav-item {
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-bottom: 0.25rem;
+  transition: all 0.2s ease;
+  min-width: 0;
+}
+
+.programs-showcase-nav-text {
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: #334155;
+  white-space: nowrap;
+  transition: color 0.2s ease;
+  overflow-wrap: break-word;
+}
+
+.programs-showcase-nav-line {
+  display: block;
+  width: 100%;
+  height: 2.5px;
+  background: color-mix(in srgb, var(--color-primary, #1b4332) 12%, transparent);
+  border-radius: 2px;
+  position: relative;
+  transition: all 0.25s ease;
+}
+
+.programs-showcase-nav-item:hover .programs-showcase-nav-text,
+.programs-showcase-nav-item.active .programs-showcase-nav-text {
+  color: var(--color-primary, #1b4332);
+}
+
+.programs-showcase-nav-item:hover .programs-showcase-nav-line,
+.programs-showcase-nav-item.active .programs-showcase-nav-line {
+  background: var(--color-accent, #c9a84c);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--color-accent, #c9a84c) 40%, transparent);
+}
+
+/* Action Button */
+.programs-showcase-cta-wrap {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.programs-showcase-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.85rem 2.2rem;
+  font-size: 0.92rem;
+  font-weight: 800;
+  font-family: var(--font-sans, system-ui, sans-serif);
+  letter-spacing: 0.02em;
+  color: #ffffff;
+  background: linear-gradient(135deg, var(--color-primary, #1b4332) 0%, var(--color-primary-light, #2d6a4f) 100%);
+  border: none;
+  border-radius: var(--radius-full, 9999px);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--color-primary, #1b4332) 25%, transparent);
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.programs-showcase-action-btn:hover {
+  background: linear-gradient(135deg, #0d251a 0%, var(--color-primary, #1b4332) 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--color-primary, #1b4332) 35%, transparent);
+  color: #ffffff;
+}
+
+/* Right Column: full-bleed campus photo */
+.programs-showcase-right {
+  position: relative;
+  overflow: hidden;
+  border-left: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 8%, transparent);
+  box-shadow: -8px 0 32px color-mix(in srgb, var(--color-primary-dark, #081c15) 3%, transparent);
+  min-height: 420px;
+}
+
+.programs-showcase-right-bg-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transform: scale(1.02);
+  transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.programs-showcase-right:hover .programs-showcase-right-bg-img {
+  transform: scale(1.05);
+}
+
+/* ── Responsive Adaptations ── */
+@media (max-width: 1024px) {
+  .programs-showcase-split-wrapper {
+    grid-template-columns: 1fr;
+  }
+
+  .programs-showcase-left-container {
+    padding: 3.5rem var(--space-6) 2.5rem var(--space-6);
+    justify-content: center;
+  }
+
+  .programs-showcase-right {
+    border-left: none;
+    border-top: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 8%, transparent);
+    box-shadow: none;
+    min-height: 280px;
+  }
+
+  .programs-showcase-heading {
+    max-width: 100%;
+  }
+
+  .programs-showcase-nav-grid {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .programs-showcase-left-container {
+    padding: 2.5rem 1rem 2rem 1rem;
+  }
+
+  .programs-showcase-heading {
+    font-size: 1.6rem;
+    line-height: 1.22;
+  }
+
+  .programs-showcase-desc p {
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  .programs-showcase-search-container {
+    margin-bottom: 2rem;
+  }
+
+  .programs-showcase-search-wrap {
+    padding: 0.3rem 0.4rem 0.3rem 1rem;
+  }
+
+  .programs-showcase-search-input {
+    font-size: 0.84rem;
+  }
+
+  .programs-showcase-search-input::placeholder {
+    font-size: 0.8rem;
+  }
+
+  .programs-showcase-nav-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.25rem 0.5rem;
+    margin-bottom: 2.25rem;
+  }
+
+  .programs-showcase-nav-text {
+    font-size: 0.78rem;
+    white-space: normal;
+    word-break: break-word;
+  }
+
+  .programs-showcase-action-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 400px) {
+  .programs-showcase-nav-grid {
+    grid-template-columns: repeat(1, 1fr);
+    gap: 1rem;
+  }
+
+  .programs-showcase-nav-text {
+    font-size: 0.85rem;
+  }
+}

@@ -1,14 +1,14 @@
 .ev-featured-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-5);
+  gap: var(--space-6);
 }
 
 .ev-featured-card {
   background: var(--color-white);
-  border-radius: var(--radius-lg);
+  border-radius: 22px;
   overflow: hidden;
-  border: 1.5px solid var(--color-light-gray);
+  border: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 8%, transparent);
   box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
@@ -16,12 +16,13 @@
 }
 
 .ev-featured-card:hover {
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-6px);
+  box-shadow: var(--shadow-xl);
+  border-color: var(--color-accent);
+  transform: translateY(-4px);
 }
 
 .ev-featured-date {
-  background: var(--color-primary);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
   padding: var(--space-5);
   display: flex;
   flex-direction: column;
@@ -31,7 +32,7 @@
 
 .ev-month {
   font-size: var(--text-xs);
-  font-weight: 900;
+  font-weight: 800;
   letter-spacing: 0.15em;
   text-transform: uppercase;
   color: var(--color-accent);
@@ -40,20 +41,20 @@
 
 .ev-day {
   font-family: var(--font-serif);
-  font-size: 3rem;
+  font-size: 2.8rem;
   font-weight: 900;
   color: var(--color-white);
   line-height: 1;
 }
 
 .ev-year {
-  font-size: var(--text-sm);
-  color: rgba(255,255,255,0.5);
+  font-size: var(--text-xs);
+  color: rgba(255,255,255,0.7);
   font-family: var(--font-sans);
 }
 
 .ev-featured-body {
-  padding: var(--space-5);
+  padding: var(--space-6);
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -64,13 +65,14 @@
   display: inline-block;
   color: var(--color-white);
   font-size: var(--text-xs);
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  font-weight: 800;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  padding: 3px 10px;
-  border-radius: var(--radius-sm);
+  padding: 3px 12px;
+  border-radius: var(--radius-full);
   font-family: var(--font-sans);
   align-self: flex-start;
+  box-shadow: var(--shadow-sm);
 }
 
 .ev-featured-card h3 {
@@ -119,6 +121,11 @@
 
 .ev-view-btn {
   padding: var(--space-2) var(--space-3);
+  /* Meets the 48x48dp minimum tap target even though the icon itself is
+     small — .ev-view-toggle has no fixed height, so this grows the real
+     button box rather than relying on an overflow-clipped pseudo-element. */
+  min-width: 44px;
+  min-height: 44px;
   background: transparent;
   border: none;
   color: var(--color-mid-gray);
@@ -126,6 +133,7 @@
   transition: all var(--transition-fast);
   display: flex;
   align-items: center;
+  justify-content: center;
 }
 
 .ev-view-btn.active {

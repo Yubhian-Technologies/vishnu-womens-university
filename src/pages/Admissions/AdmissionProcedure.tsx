@@ -149,7 +149,7 @@ export default function AdmissionProcedure() {
             <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>Ready to Apply?</h2>
             <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
               <Link to="/programmes-fee-structure" className="btn btn-accent">View Fee Structure</Link>
-              <Link to="/result-analysis" className="btn btn-secondary">Result Analysis</Link>
+              <Link to="/result-analysis" className="btn btn-secondary">Results Analysis</Link>
               <Link to="/admissions" className="btn btn-secondary">Admissions Home</Link>
             </div>
           </div>

@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Laptop } from 'lucide-react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrophy, faGlobe, faFlask, faGraduationCap } from '@fortawesome/free-solid-svg-icons';
+import { Laptop, Newspaper, ArrowRight } from 'lucide-react';
 import HeroSlider from '../../components/HeroSlider/HeroSlider';
 import CounterSection from '../../components/CounterSection/CounterSection';
 import ScrollTopButton from '../../components/ScrollTopButton/ScrollTopButton';
@@ -12,6 +10,9 @@ import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import TestimonialSlider from '../../components/TestimonialSlider/TestimonialSlider';
 import RecruitersSection from '../../components/RecruitersMarquee/RecruitersSection';
 import WomensEducationSection from '../../components/WomensEducation/WomensEducationSection';
+import CampusLifeShowcase from '../../components/CampusLifeShowcase/CampusLifeShowcase';
+import AccreditationsStrip from '../../components/AccreditationsStrip/AccreditationsStrip';
+import ProgramsShowcase from '../../components/ProgramsShowcase/ProgramsShowcase';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { fetchPriorityAttr } from '../../lib/domAttrs';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
@@ -21,9 +22,10 @@ import { happeningToArticle } from '../../lib/happenings';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import type { HappeningDoc } from '../Admin/sections/NewsAwardsDataAdmin';
 import type { ContentBlockDoc } from '../Admin/sections/ContentBlocksAdmin';
-import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
 
 import SEO from '../../components/SEO/SEO';
+import UpcomingEvents from '../../components/UpcomingEvents/UpcomingEvents';
+import SmartInfrastructureShowcase from '../../components/SmartInfrastructureShowcase/SmartInfrastructureShowcase';
 import { getUniversitySchema } from '../../lib/seo/schemas';
 import './Home.css';
 
@@ -46,8 +48,10 @@ const defaultStudyCardPhotos = [
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Research laboratory', caption: '' },
 ];
 // Study card accent colours aren't a "photo" — kept as a parallel,
-// index-matched, non-admin-editable array (matches by position).
-const STUDY_CARD_COLORS = ['#1b4332', '#2d6a4f', '#40916c'];
+// index-matched, non-admin-editable array (matches by position). CSS var()
+// references (not literal hex) so these follow the admin Color Theme like
+// everywhere else, instead of being frozen to the original brand greens.
+const STUDY_CARD_COLORS = ['var(--color-primary)', 'var(--color-primary-light)', 'var(--color-secondary)'];
 
 const defaultCtaBannerPhoto = [
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'VWU campus', caption: '' },
@@ -63,26 +67,6 @@ const defaultStudyCards: ContentBlockDoc[] = [
   { id: 'default-3', page: 'home', section: 'studyCards', value: 'Ph.D. Programs', title: 'Research & Ph.D.', desc: 'Conduct doctoral research in CSE, ECE, and EEE — backed by 2,500+ publications, 90+ patents, and purpose-built research facilities.', icon: 'FlaskConical', slug: '/academics', order: 2 },
 ];
 
-// Last-resort fallback only — used if the live `programs` collection (see
-// buildPopularProgramsFromPrograms below) is completely empty, e.g. Firestore
-// misconfigured. Under normal operation this strip is driven by the actual
-// Programs collection so it stays in sync with /admin → Programs automatically.
-const POPULAR_PROGRAM_SLUGS: Record<string, string> = {
-  'CSE': 'cse',
-  'AI & Machine Learning': 'ai-ml',
-  'AI & Data Science': 'ai-ds',
-  'Cyber Security': 'cyber-security',
-  'Information Technology': 'it',
-  'Electronics & Communication': 'ece',
-  'Electrical & Electronics': 'eee',
-  'Civil Engineering': 'ce',
-  'Mechanical Engineering': 'me',
-  'MBA': 'mba',
-};
-
-const slugify = (title: string) =>
-  title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-
 // The "M.Tech & MBA" study card's slug is admin-editable in Firestore and
 // currently just points at the plain "/academics" page, which lands on its
 // default B.Tech tab. Route that specific card straight to the M.Tech tab
@@ -95,34 +79,11 @@ function studyCardHref(card: ContentBlockDoc): string {
   return card.slug || '/academics';
 }
 
-const defaultPopularPrograms: ContentBlockDoc[] = Object.keys(POPULAR_PROGRAM_SLUGS).map((title, i) => ({
-  id: `default-${i}`, page: 'home', section: 'popularPrograms', value: '', title, desc: '', icon: '',
-  slug: POPULAR_PROGRAM_SLUGS[title], order: i,
-}));
-
-// One tag per B.Tech/MBA Program (/admin → Programs) — the same "this data
-// isn't managed separately, it's derived straight from Programs" pattern
-// used for Faculty's department tabs (see Faculty.tsx). This is what makes a
-// newly-added Program show up here automatically, no separate Content
-// Blocks entry required. Keyed by the program itself (not its `department`
-// field) since department isn't reliable for this: it's sometimes shared by
-// two distinct programs on purpose (e.g. AI&ML and AI&DS share an HOD) and
-// sometimes left blank on a freshly-added program — either of which would
-// silently drop a real, publicly-listed program from this strip.
-function buildPopularProgramsFromPrograms(programs: ProgramDoc[]): ContentBlockDoc[] {
-  return programs
-    .filter((p) => p.category === 'btech' || p.category === 'mba')
-    .map((p, i) => ({
-      id: `program-${p.id}`, page: 'home', section: 'popularPrograms', value: '',
-      title: p.name || p.shortName,
-      desc: '', icon: '', slug: p.slug, order: i,
-    }));
-}
-
 const defaultTestimonials: ContentBlockDoc[] = [
-  { id: 'default-1', page: 'home', section: 'testimonials', value: 'Computer Science Engineering — Software Engineer at Google', title: 'Lakshmi R., Class of 2024', desc: 'VWU faculty genuinely invest in each student — they know your name, your ambitions, and they hold you to a high standard. The skills and confidence I gained here led directly to my placement at Google.', icon: '', slug: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=200&q=80', order: 0 },
-  { id: 'default-2', page: 'home', section: 'testimonials', value: 'M.Tech ECE — Research Scholar at IIT Hyderabad', title: 'Anusha P., Class of 2022', desc: 'VWU is a true launchpad. The research infrastructure, the labs, and the guidance I received here built the academic foundation that made my Ph.D. at IIT Hyderabad possible.', icon: '', slug: 'https://images.unsplash.com/photo-1607746882042-944635dfe10e?w=200&q=80', order: 1 },
-  { id: 'default-3', page: 'home', section: 'testimonials', value: 'CSE — Co-founder at TechFemme Startup', title: 'Divya K., Class of 2023', desc: 'Studying in an all-women environment gave me real confidence in my abilities. I led several national-level projects at VWU — and that leadership mindset is what drives my startup today.', icon: '', slug: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&q=80', order: 2 },
+  { id: 'default-1', page: 'home', section: 'testimonials', value: 'B.Tech CSE — Software Engineer at Google', title: 'Lakshmi R., Class of 2024', desc: 'VWU faculty genuinely invest in each student — they know your name, your ambitions, and they hold you to a high standard. The skills and confidence I gained here led directly to my placement at Google.', icon: '', slug: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=500&q=80', order: 0 },
+  { id: 'default-2', page: 'home', section: 'testimonials', value: 'M.Tech ECE — Research Scholar at IIT Hyderabad', title: 'Anusha P., Class of 2022', desc: 'VWU is a true launchpad. The research infrastructure, the labs, and the guidance I received here built the academic foundation that made my Ph.D. at IIT Hyderabad possible.', icon: '', slug: 'https://images.unsplash.com/photo-1607746882042-944635dfe10e?w=500&q=80', order: 1 },
+  { id: 'default-3', page: 'home', section: 'testimonials', value: 'AI & Data Science — Applied Scientist at Amazon', title: 'Sowmya K., Class of 2023', desc: 'The specialized AI labs and machine learning faculty mentorship gave me the competitive edge to secure an Amazon AFE fellowship, which converted into a full-time Applied Scientist role.', icon: '', slug: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=500&q=80', order: 2 },
+  { id: 'default-4', page: 'home', section: 'testimonials', value: 'CSE — Co-founder at TechFemme Startup', title: 'Divya K., Class of 2023', desc: 'Studying in an all-women environment gave me real confidence in my abilities. I led several national-level projects at VWU — and that leadership mindset is what drives my startup today.', icon: '', slug: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=500&q=80', order: 3 },
 ];
 
 /* ── Tilt Hook ────────────────────────────────────────────── */
@@ -142,25 +103,6 @@ function useTilt(strength = 12) {
   return { ref, onMouseMove: onMove, onMouseLeave: onLeave };
 }
 
-/* ── Happenings → Home widgets ────────────────────────────── */
-// "Latest from VWU" and "Upcoming at VWU" both read the `happenings`
-// collection (see Home() below) instead of the separate `news`/`events`
-// collections, but keep their original look — a NewsCard grid (via
-// happeningToArticle, shared with Happenings.tsx's own Recent Events grid —
-// see lib/happenings.ts) and a date-badge row list.
-
-// The event-date-badge (month + day) expects two separate fields, but a
-// happening only has one free-text `date` string (admin-entered, e.g.
-// "January 31, 2026" — see NewsAwardsDataAdmin's Happenings form). Best-
-// effort split for that common "Month D[, YYYY]" shape; anything that
-// doesn't match that pattern still renders, just as a single-line date
-// instead of the split badge.
-function splitHappeningDate(date: string): { month: string; day: string } | null {
-  const match = date.trim().match(/^([A-Za-z]+)\s+(\d{1,2})\b/);
-  if (!match) return null;
-  return { month: match[1].slice(0, 3).toUpperCase(), day: match[2] };
-}
-
 /* ── Wave Divider ─────────────────────────────────────────── */
 function Wave({ flip = false, fill = '#f7f8fb' }: { flip?: boolean; fill?: string }) {
   return (
@@ -174,7 +116,6 @@ function Wave({ flip = false, fill = '#f7f8fb' }: { flip?: boolean; fill?: strin
 
 /* ── Component ────────────────────────────────────────────── */
 export default function Home() {
-  const [tagHovered, setTagHovered] = useState<number | null>(null);
   // "Latest from VWU" / "Upcoming at VWU" below are driven by the same
   // Happenings collection the admin's "Happenings & Awards" → Happenings
   // editor writes to (see NewsAwardsDataAdmin.tsx) and the /news-awards/
@@ -194,9 +135,6 @@ export default function Home() {
   const testimonials = liveTestimonials.length > 0 ? liveTestimonials : defaultTestimonials;
   const liveStudyCards = useContentBlocks('home', 'studyCards');
   const studyCards = liveStudyCards.length > 0 ? liveStudyCards : defaultStudyCards;
-  const { docs: programsForTags } = useOrderedCollection<ProgramDoc>('programs', 'order');
-  const programsDerivedPopularPrograms = buildPopularProgramsFromPrograms(programsForTags);
-  const popularPrograms = programsDerivedPopularPrograms.length > 0 ? programsDerivedPopularPrograms : defaultPopularPrograms;
   const activityPhotos = useSitePhotos('home', 'activities', defaultActivityPhotos);
   // Gates the strip's first paint: until Firestore actually responds, we
   // don't yet know whether real activity photos exist, so a skeleton shows
@@ -270,19 +208,16 @@ export default function Home() {
         {/* Section Header */}
         <div className="container">
           <div className="activity-section-header reveal">
-            <div className="activity-section-meta">
-              <span className="section-label">Campus Life</span>
-              <h2 className="section-title">Recent Activities</h2>
+            <div className="activity-section-titlebar">
+              <div className="activity-section-meta">
+                <span className="section-label">Campus Life</span>
+                <h2 className="section-title">Recent Activities</h2>
+              </div>
               <p className="activity-section-desc">
                 From mBAJA racing championships to NASA-level internships — VWU students lead, build, and inspire at every stage.
               </p>
             </div>
-            <div className="activity-section-chips">
-              <span className="activity-chip activity-chip--green"><FontAwesomeIcon icon={faTrophy} /> Achievements</span>
-              <span className="activity-chip activity-chip--gold"><FontAwesomeIcon icon={faGlobe} /> Internships</span>
-              <span className="activity-chip activity-chip--blue"><FontAwesomeIcon icon={faFlask} /> Research</span>
-              <span className="activity-chip activity-chip--pink"><FontAwesomeIcon icon={faGraduationCap} /> Milestones</span>
-            </div>
+            <Link to="/news-awards/gallery" className="btn btn-outline reveal-right">View Gallery →</Link>
           </div>
         </div>
 
@@ -327,7 +262,7 @@ export default function Home() {
           <div className="study-intro reveal">
             <span className="section-label">Academics</span>
             <h2 className="section-title gradient-text">Study at VWU</h2>
-            <p className="section-desc">Your education at VWU is personalized, industry-focused, and structured to develop your technical depth, leadership capacity, and innovative thinking.</p>
+            <p className="section-desc"><strong>Learn. Lead. Innovate.</strong><br />At VWU, education goes beyond the classroom. Experience personalized, industry-focused learning that builds technical expertise, leadership confidence, creativity, and the skills to shape your future.</p>
           </div>
           <div className="study-grid">
             {studyCards.map((card, i) => {
@@ -343,7 +278,7 @@ export default function Home() {
                 >
                   <div className="study-card-image-wrap">
                     {photo && <SmoothImage src={photo.src} alt={photo.alt} className="study-card-image" />}
-                    <div className="study-card-overlay" style={{ background: `linear-gradient(to top, ${color}cc 0%, transparent 65%)` }} />
+                    <div className="study-card-overlay" style={{ background: `linear-gradient(to top, color-mix(in srgb, ${color} 80%, transparent) 0%, transparent 65%)` }} />
                     <div className="study-card-icon"><Icon size={24} strokeWidth={1.75} color="var(--color-primary-dark)" /></div>
                     <div className="study-card-shine" />
                   </div>
@@ -359,32 +294,23 @@ export default function Home() {
               );
             })}
           </div>
-
-          <div>
-            <p className="program-label">Popular Programs</p>
-            <div className="study-programs">
-              {popularPrograms.map((p, i) => (
-                <Link
-                  to={(() => {
-                    const slug = p.slug || POPULAR_PROGRAM_SLUGS[p.title] || slugify(p.title);
-                    return slug ? `/academics/${slug}` : '/academics';
-                  })()}
-                  key={p.id}
-                  className={`program-tag${tagHovered === i ? ' program-tag--active' : ''}`}
-                  onMouseEnter={() => setTagHovered(i)}
-                  onMouseLeave={() => setTagHovered(null)}
-                  style={{ transitionDelay: `${i * 30}ms` } as React.CSSProperties}
-                >
-                  {p.title}
-                </Link>
-              ))}
-            </div>
-          </div>
         </div>
       </section>
 
+      {/* ── Campus Life Showcase (A vibrant campus. A memorable journey.) ── */}
+      <CampusLifeShowcase />
+
+      {/* ── Accreditations & Affiliations ── */}
+      <AccreditationsStrip />
+
+      {/* ── Programs & Schools Showcase (Future-focused education across disciplines) ── */}
+      <ProgramsShowcase />
+
       {/* ── Women's Education & Empowerment ── */}
       <WomensEducationSection />
+
+      {/* ── Smart Infrastructure & Campus Showcase (Engineered for Discovery. Built for Living.) ── */}
+      <SmartInfrastructureShowcase />
 
       {/* ── Our Recruiters (3-Row Auto-Scrolling Marquee) ── */}
       <RecruitersSection />
@@ -398,13 +324,21 @@ export default function Home() {
 
       {/* ── News (Recent Happenings) ── */}
       <section className="news-section">
+        <div className="news-glow-1" aria-hidden="true" />
+        <div className="news-glow-2" aria-hidden="true" />
         <div className="container">
           <div className="news-section-header">
             <div className="reveal-left">
-              <span className="section-label">Stay Informed</span>
+              <span className="news-chip">
+                <Newspaper size={14} className="news-chip-icon" />
+                <span>Stay Informed</span>
+              </span>
               <h2 className="section-title">Latest from VWU</h2>
             </div>
-            <Link to="/news-awards/happenings" className="btn btn-outline reveal-right">View All News →</Link>
+            <Link to="/news-awards/happenings" className="news-btn-tonal reveal-right">
+              <span>View All News</span>
+              <ArrowRight size={16} className="news-btn-arrow" />
+            </Link>
           </div>
           <div className="news-grid">
             {featuredNews.map((item, i) => (
@@ -422,51 +356,7 @@ export default function Home() {
       <NewsArticleDialog article={activeArticle} onClose={() => setActiveArticle(null)} />
 
       {/* ── Events (Upcoming Happenings) ── */}
-      <section className="events-section">
-        <div className="container">
-          <div className="events-header">
-            <div className="reveal-left">
-              <span className="section-label">What's Happening</span>
-              <h2 className="section-title">Upcoming at VWU</h2>
-            </div>
-            <Link to="/news-awards/happenings" className="btn btn-outline reveal-right">All Events →</Link>
-          </div>
-          <div className="events-list">
-            {upcomingHappenings.map((item) => {
-              const split = splitHappeningDate(item.date);
-              return (
-                <Link key={item.id} to="/news-awards/happenings" className="event-item">
-                  <div className="event-date-badge">
-                    {split ? (
-                      <>
-                        <span className="month">{split.month}</span>
-                        <span className="day">{split.day}</span>
-                      </>
-                    ) : (
-                      <span className="day" style={{ fontSize: 'var(--text-sm)' }}>{item.date}</span>
-                    )}
-                  </div>
-                  <div className="event-line" />
-                  <div className="event-content">
-                    <div className="event-title">{item.title}</div>
-                    {item.dept && (
-                      <div className="event-meta">
-                        <span>{item.dept}</span>
-                      </div>
-                    )}
-                  </div>
-                  <svg className="event-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </Link>
-              );
-            })}
-            {upcomingHappenings.length === 0 && (
-              <p style={{ color: 'var(--color-text-light)' }}>No upcoming happenings yet — check back soon.</p>
-            )}
-          </div>
-        </div>
-      </section>
+      <UpcomingEvents happenings={upcomingHappenings} />
 
       {/* ── CTA Banner ── */}
       <section className="cta-banner">

@@ -1,6 +1,6 @@
 /* ==========================================================================
    VWU Floating Glass Pill Mega-Navbar (Apple Dynamic Island Archetype)
-   Theme: Vishnu Women's University (Forest Green #1b4332 & Gold #C9A84C)
+   Theme: Vishnu Women's University (Forest Green var(--color-primary, #1b4332) & Gold var(--color-accent, #C9A84C))
    ========================================================================== */
 
 /* ===== Root Wrapper ===== */
@@ -47,7 +47,7 @@
   transition: all 280ms cubic-bezier(0.2, 0.9, 0.3, 1);
 }
 
-/* ===== Main Glass Pill ===== */
+/* ===== Main Glass Pill (Hero Search Bar Glassmorphism Archetype) ===== */
 .navbar-pill {
   height: 84px;
   display: flex;
@@ -55,29 +55,36 @@
   justify-content: space-between;
   gap: 1rem;
   padding: 0 1.25rem 0 1.5rem;
-  background: rgba(255, 255, 255, 0.68);
-  backdrop-filter: blur(28px) saturate(190%) brightness(1.04);
-  -webkit-backdrop-filter: blur(28px) saturate(190%) brightness(1.04);
-  border: 1px solid rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.35);
   border-radius: 44px;
-  box-shadow: 0 16px 44px -8px rgba(8, 28, 21, 0.14),
-              0 3px 10px rgba(0, 0, 0, 0.04),
-              inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.95);
-  transition: border-radius 240ms cubic-bezier(0.2, 0.9, 0.3, 1),
-              background-color 240ms ease,
-              box-shadow 240ms ease,
-              border-color 240ms ease,
-              height 200ms ease;
+  box-shadow: 0 10px 25px -4px rgba(0, 0, 0, 0.35), 
+              0 4px 10px -2px rgba(0, 0, 0, 0.2), 
+              inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transition: border-radius 320ms cubic-bezier(0.16, 1, 0.3, 1),
+              background-color 320ms cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 320ms cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 320ms cubic-bezier(0.16, 1, 0.3, 1),
+              height 260ms cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
   z-index: 20;
 }
 
+.floating-navbar-container:hover .navbar-pill {
+  border-color: rgba(255, 255, 255, 0.45);
+  box-shadow: 0 14px 32px -4px rgba(0, 0, 0, 0.42), 
+              0 6px 12px -2px rgba(0, 0, 0, 0.22), 
+              inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
 .floating-navbar-container.is-scrolled .navbar-pill {
-  background: rgba(255, 255, 255, 0.78);
-  border-color: rgba(255, 255, 255, 0.85);
-  box-shadow: 0 20px 48px -8px rgba(8, 28, 21, 0.18),
-              0 4px 16px rgba(0, 0, 0, 0.05),
-              inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 16px 36px -6px color-mix(in srgb, var(--color-primary-dark, #081c15) 18%, transparent),
+              0 4px 14px rgba(0, 0, 0, 0.06),
+              inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
 /* Dynamic Morphing: Seamless attachment to mega dropdown / mobile drawer */
@@ -85,9 +92,9 @@
 .floating-navbar-container.is-mobile-open .navbar-pill {
   border-radius: 34px 34px 0 0;
   border-bottom-color: rgba(255, 255, 255, 0.25);
-  background: rgba(255, 255, 255, 0.82);
-  box-shadow: 0 12px 30px -6px rgba(8, 28, 21, 0.12),
-              inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 14px 32px -4px rgba(0, 0, 0, 0.35),
+              inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 
 /* ===== Left: Brand Identity (Rectangular Logo) ===== */
@@ -98,11 +105,11 @@
   flex-shrink: 0;
   padding: 4px 6px;
   border-radius: 12px;
-  transition: background-color 200ms ease, transform 200ms ease;
+  transition: background-color 240ms cubic-bezier(0.16, 1, 0.3, 1), transform 240ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .navbar-brand-link:hover {
-  background: rgba(27, 67, 50, 0.05);
+  background: color-mix(in srgb, var(--color-primary, #1b4332) 5%, transparent);
 }
 
 .navbar-logo-desktop {
@@ -112,7 +119,7 @@
   max-width: 240px;
   object-fit: contain;
   border-radius: 4px;
-  transition: transform 200ms ease;
+  transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @media (min-width: 1024px) {
@@ -122,7 +129,7 @@
 }
 
 .navbar-brand-link:hover .navbar-logo-desktop {
-  transform: scale(1.02);
+  transform: scale(1.025);
 }
 
 /* Mobile Square Logo Branding */
@@ -145,38 +152,41 @@
   background: #ffffff;
   padding: 2px;
   object-fit: contain;
-  box-shadow: 0 2px 8px rgba(8, 28, 21, 0.14);
-  border: 1px solid rgba(27, 67, 50, 0.12);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--color-primary-dark, #081c15) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 12%, transparent);
   flex-shrink: 0;
-  transition: transform 200ms ease, box-shadow 200ms ease;
+  transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 240ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .navbar-brand-link:hover .navbar-logo-square {
   transform: scale(1.04);
-  box-shadow: 0 4px 12px rgba(201, 168, 76, 0.3);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--color-primary, #1b4332) 25%, transparent);
 }
 
 .navbar-brand-mobile-text {
   display: flex;
   flex-direction: column;
-  line-height: 1.15;
+  line-height: 1.1;
+  gap: 1px;
 }
 
 .navbar-brand-m-name {
-  font-family: var(--font-serif, Georgia, serif);
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--color-primary-dark);
+  font-family: var(--font-sans);
+  font-size: 0.98rem;
+  font-weight: 800;
+  color: var(--color-primary-dark, #081c15);
   letter-spacing: -0.01em;
+  transition: color 200ms ease;
 }
 
 .navbar-brand-m-sub {
   font-family: var(--font-sans);
-  font-size: 0.65rem;
+  font-size: 0.66rem;
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--color-accent);
+  color: var(--color-primary, #1b4332);
+  transition: color 200ms ease;
 }
 
 /* ===== Center: Desktop Navigation Tabs ===== */
@@ -207,20 +217,21 @@
   flex-wrap: nowrap;
 }
 
-/* GPU-accelerated Sliding Hover Capsule Pill (Full Padding Coverage) */
+/* GPU-accelerated Sliding Hover Capsule Pill */
 .nav-sliding-pill {
   position: absolute;
   top: 0;
   left: 0;
-  background: rgba(27, 67, 50, 0.08);
-  border: 1px solid rgba(27, 67, 50, 0.08);
+  background: color-mix(in srgb, var(--color-primary, #1b4332) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 10%, transparent);
   border-radius: 9999px;
   pointer-events: none;
   will-change: transform, width, height, opacity;
-  transition: transform 240ms cubic-bezier(0.2, 0.9, 0.3, 1),
-              width 240ms cubic-bezier(0.2, 0.9, 0.3, 1),
-              height 240ms cubic-bezier(0.2, 0.9, 0.3, 1),
-              opacity 180ms ease;
+  transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1),
+              width 280ms cubic-bezier(0.16, 1, 0.3, 1),
+              height 280ms cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 10px color-mix(in srgb, var(--color-primary, #1b4332) 6%, transparent);
   z-index: 0;
 }
 
@@ -247,7 +258,7 @@
   text-transform: uppercase;
   color: var(--color-primary-dark);
   white-space: nowrap;
-  transition: color 180ms ease;
+  transition: color 200ms cubic-bezier(0.16, 1, 0.3, 1), transform 200ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .nav-tab-btn:hover,
@@ -257,7 +268,7 @@
 
 .nav-tab-chevron {
   opacity: 0.45;
-  transition: transform 220ms ease, opacity 220ms ease;
+  transition: transform 260ms cubic-bezier(0.16, 1, 0.3, 1), opacity 200ms ease, color 200ms ease;
 }
 
 .nav-tab-chevron.is-rotated {
@@ -290,8 +301,8 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   text-decoration: none;
-  border: 1px solid rgba(201, 168, 76, 0.6);
-  box-shadow: 0 4px 12px rgba(201, 168, 76, 0.3);
+  border: 1px solid color-mix(in srgb, var(--color-accent, #c9a84c) 60%, transparent);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--color-accent, #c9a84c) 30%, transparent);
   transition: all 220ms ease;
   white-space: nowrap;
   flex-shrink: 0;
@@ -301,7 +312,7 @@
   background: var(--color-primary);
   color: #ffffff;
   border-color: var(--color-primary);
-  box-shadow: 0 6px 20px rgba(27, 67, 50, 0.35);
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--color-primary, #1b4332) 35%, transparent);
   transform: translateY(-1px);
 }
 
@@ -312,7 +323,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: rgba(27, 67, 50, 0.14);
+  background: color-mix(in srgb, var(--color-primary, #1b4332) 14%, transparent);
   color: var(--color-primary-dark);
   margin-left: 2px;
   flex-shrink: 0;
@@ -353,8 +364,8 @@
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: rgba(27, 67, 50, 0.05);
-  border: 1px solid rgba(27, 67, 50, 0.08);
+  background: color-mix(in srgb, var(--color-primary, #1b4332) 5%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 8%, transparent);
   cursor: pointer;
   padding: 0;
   transition: background-color 200ms ease, transform 150ms ease;
@@ -368,7 +379,7 @@
 }
 
 .navbar-mobile-toggle:hover {
-  background: rgba(27, 67, 50, 0.1);
+  background: color-mix(in srgb, var(--color-primary, #1b4332) 10%, transparent);
 }
 
 .mobile-toggle-bar {
@@ -403,7 +414,7 @@
   border: 1px solid rgba(255, 255, 255, 0.75);
   border-top: none;
   border-radius: 0 0 38px 38px;
-  box-shadow: 0 32px 70px -10px rgba(8, 28, 21, 0.2),
+  box-shadow: 0 32px 70px -10px color-mix(in srgb, var(--color-primary-dark, #081c15) 20%, transparent),
               0 10px 24px rgba(0, 0, 0, 0.04),
               inset 0 1px 0 rgba(255, 255, 255, 0.85);
   padding: 2.25rem 2.75rem 2.5rem;
@@ -535,7 +546,7 @@
 
 .mega-sublink:hover {
   color: var(--color-primary-dark);
-  background: rgba(27, 67, 50, 0.06);
+  background: color-mix(in srgb, var(--color-primary, #1b4332) 6%, transparent);
   border-left-color: var(--color-accent);
   padding-left: 16px;
 }
@@ -555,8 +566,11 @@
   display: block;
   padding: 8px 12px;
   font-size: 0.88rem;
-  color: var(--color-mid-gray);
+  font-weight: 600;
+  color: var(--color-text);
+  line-height: 1.4;
   cursor: default;
+  user-select: none;
 }
 
 /* 4th Column: Context / Highlight Overview Card */
@@ -570,8 +584,8 @@
 
 .mega-highlight-card {
   width: 100%;
-  background: linear-gradient(145deg, rgba(27, 67, 50, 0.06) 0%, rgba(201, 168, 76, 0.12) 100%);
-  border: 1px solid rgba(201, 168, 76, 0.35);
+  background: linear-gradient(145deg, color-mix(in srgb, var(--color-primary, #1b4332) 6%, transparent) 0%, color-mix(in srgb, var(--color-accent, #c9a84c) 12%, transparent) 100%);
+  border: 1px solid color-mix(in srgb, var(--color-accent, #c9a84c) 35%, transparent);
   border-radius: 24px;
   padding: 1.85rem;
   display: flex;
@@ -638,7 +652,7 @@
   border: 1px solid rgba(255, 255, 255, 0.75);
   border-top: none;
   border-radius: 0 0 34px 34px;
-  box-shadow: 0 28px 60px rgba(8, 28, 21, 0.22),
+  box-shadow: 0 28px 60px color-mix(in srgb, var(--color-primary-dark, #081c15) 22%, transparent),
               inset 0 1px 0 rgba(255, 255, 255, 0.85);
   max-height: calc(100vh - 120px);
   overflow-y: auto;
@@ -657,7 +671,7 @@
 }
 
 .mobile-nav-item {
-  border-bottom: 1px solid rgba(27, 67, 50, 0.08);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 8%, transparent);
 }
 
 .mobile-nav-item:last-child {
@@ -705,14 +719,14 @@
   list-style: none;
   margin: 0 0 0.75rem 0.75rem;
   padding: 0 0 0.75rem 0.75rem;
-  border-left: 2px solid rgba(201, 168, 76, 0.4);
+  border-left: 2px solid color-mix(in srgb, var(--color-accent, #c9a84c) 40%, transparent);
   display: flex;
   flex-direction: column;
   gap: 3px;
 }
 
 .mobile-sublinks-list.nested {
-  border-left-color: rgba(27, 67, 50, 0.2);
+  border-left-color: color-mix(in srgb, var(--color-primary, #1b4332) 20%, transparent);
   margin-top: 0.45rem;
   margin-left: 0.75rem;
 }
@@ -736,13 +750,15 @@
 
 .mobile-sublink:hover {
   color: var(--color-primary);
-  background: rgba(27, 67, 50, 0.06);
+  background: color-mix(in srgb, var(--color-primary, #1b4332) 6%, transparent);
   padding-left: 16px;
 }
 
 .mobile-sublink.is-disabled {
-  color: var(--color-mid-gray);
+  color: var(--color-text);
+  font-weight: 500;
   cursor: default;
+  user-select: none;
 }
 
 /* Mobile Nested Groups */
@@ -766,8 +782,8 @@
   justify-content: space-between;
   width: 100%;
   padding: 9px 12px;
-  background: rgba(27, 67, 50, 0.04);
-  border: 1px solid rgba(27, 67, 50, 0.08);
+  background: color-mix(in srgb, var(--color-primary, #1b4332) 4%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 8%, transparent);
   border-radius: 9px;
   font-family: var(--font-sans);
   font-size: 0.8rem;
@@ -783,7 +799,7 @@
 .mobile-group-toggle-btn.is-active,
 .mobile-group-toggle-btn:hover,
 .mobile-group-direct-link:hover {
-  background: rgba(201, 168, 76, 0.14);
+  background: color-mix(in srgb, var(--color-accent, #c9a84c) 14%, transparent);
   border-color: var(--color-accent);
   color: var(--color-primary-dark);
 }
@@ -802,7 +818,7 @@
 .mobile-drawer-cta-wrap {
   margin-top: 1.75rem;
   padding-top: 1.25rem;
-  border-top: 1px solid rgba(27, 67, 50, 0.08);
+  border-top: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 8%, transparent);
 }
 
 .mobile-drawer-cta {
@@ -821,7 +837,7 @@
   text-transform: uppercase;
   text-decoration: none;
   border-radius: 9999px;
-  box-shadow: 0 4px 16px rgba(201, 168, 76, 0.32);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--color-accent, #c9a84c) 32%, transparent);
   transition: all 200ms ease;
 }
 
@@ -834,7 +850,7 @@
 .mobile-drawer-footer {
   margin-top: 1.75rem;
   padding-top: 1.25rem;
-  border-top: 1px solid rgba(27, 67, 50, 0.06);
+  border-top: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 6%, transparent);
   display: flex;
   flex-direction: column;
   gap: 0.85rem;
@@ -861,8 +877,8 @@
 
 .mobile-social-pill {
   padding: 6px 14px;
-  background: rgba(27, 67, 50, 0.05);
-  border: 1px solid rgba(27, 67, 50, 0.08);
+  background: color-mix(in srgb, var(--color-primary, #1b4332) 5%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 8%, transparent);
   border-radius: 9999px;
   font-size: 0.75rem;
   font-weight: 600;
@@ -922,31 +938,35 @@
     height: 68px;
     padding: 0 0.85rem 0 1rem;
     border-radius: 34px;
-    background: rgba(255, 255, 255, 0.58);
-    backdrop-filter: blur(24px) saturate(180%) brightness(1.05);
-    -webkit-backdrop-filter: blur(24px) saturate(180%) brightness(1.05);
-    border: 1px solid rgba(255, 255, 255, 0.45);
-    box-shadow: 0 8px 32px -6px rgba(8, 28, 21, 0.22),
-                inset 0 1px 0 rgba(255, 255, 255, 0.55);
+    background: rgba(255, 255, 255, 0.22);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    box-shadow: 0 10px 25px -4px rgba(0, 0, 0, 0.35),
+                0 4px 10px -2px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.25);
   }
 
   .floating-navbar-container.is-scrolled .navbar-pill {
-    background: rgba(255, 255, 255, 0.72);
+    background: rgba(255, 255, 255, 0.88);
+    border-color: rgba(255, 255, 255, 0.85);
+    box-shadow: 0 16px 36px -6px color-mix(in srgb, var(--color-primary-dark, #081c15) 18%, transparent),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
   }
 
   .floating-navbar-container.is-mobile-open .navbar-pill {
     border-radius: 28px 28px 0 0;
-    background: rgba(255, 255, 255, 0.75);
-    border-bottom-color: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.88);
+    border-bottom-color: rgba(255, 255, 255, 0.25);
   }
 
   .navbar-mobile-drawer {
-    background: rgba(255, 255, 255, 0.68);
+    background: rgba(255, 255, 255, 0.88);
     backdrop-filter: blur(28px) saturate(180%);
     -webkit-backdrop-filter: blur(28px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.45);
     border-top: none;
-    box-shadow: 0 24px 56px -8px rgba(8, 28, 21, 0.28),
+    box-shadow: 0 24px 56px -8px color-mix(in srgb, var(--color-primary-dark, #081c15) 28%, transparent),
                 inset 0 1px 0 rgba(255, 255, 255, 0.4);
   }
 
@@ -967,11 +987,13 @@
   }
 
   .navbar-brand-m-name {
-    font-size: 0.96rem;
+    font-size: 0.92rem;
+    font-weight: 800;
   }
 
   .navbar-brand-m-sub {
-    font-size: 0.6rem;
+    font-size: 0.62rem;
+    font-weight: 800;
   }
 
   .navbar-cta-btn {

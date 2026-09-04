@@ -1,21 +1,23 @@
 .ag-impact-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: var(--space-5);
+  gap: var(--space-6);
 }
 
 .ag-impact-card {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: var(--radius-md);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 20px;
   padding: var(--space-6);
   text-align: center;
+  box-shadow: var(--shadow-sm);
   transition: all var(--transition-base);
 }
 
 .ag-impact-card:hover {
-  background: rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.12);
   border-color: var(--color-accent);
+  box-shadow: var(--shadow-md);
   transform: translateY(-4px);
 }
 
@@ -36,45 +38,46 @@
 .ag-impact-label {
   font-family: var(--font-sans);
   font-size: var(--text-base);
-  font-weight: 700;
+  font-weight: 800;
   color: var(--color-white);
   margin-bottom: var(--space-2);
 }
 
 .ag-impact-desc {
   font-size: var(--text-sm);
-  color: rgba(255,255,255,0.55);
-  line-height: 1.5;
+  color: rgba(255,255,255,0.75);
+  line-height: 1.6;
 }
 
 /* Giving Grid */
 .ag-giving-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: var(--space-5);
+  gap: var(--space-6);
 }
 
 .ag-giving-card {
   background: var(--color-white);
-  border: 2px solid var(--color-light-gray);
-  border-radius: var(--radius-lg);
-  padding: var(--space-6);
+  border: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 8%, transparent);
+  border-radius: 24px;
+  padding: var(--space-7) var(--space-6);
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
+  box-shadow: var(--shadow-sm);
   transition: all var(--transition-base);
   position: relative;
 }
 
 .ag-giving-card:hover {
-  border-color: var(--color-primary);
-  box-shadow: var(--shadow-lg);
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-xl);
   transform: translateY(-6px);
 }
 
 .ag-giving-card--featured {
   border-color: var(--color-accent);
-  background: linear-gradient(135deg, rgba(27,67,50,0.04) 0%, rgba(201,168,76,0.06) 100%);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--color-primary, #1b4332) 4%, transparent) 0%, color-mix(in srgb, var(--color-accent, #c9a84c) 8%, transparent) 100%);
 }
 
 .ag-giving-badge {
@@ -88,16 +91,17 @@
   font-weight: 900;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  padding: 4px 14px;
+  padding: 4px 16px;
   border-radius: var(--radius-full);
   white-space: nowrap;
   font-family: var(--font-sans);
+  box-shadow: var(--shadow-sm);
 }
 
 .ag-giving-card h3 {
   font-family: var(--font-sans);
   font-size: var(--text-xl);
-  font-weight: 900;
+  font-weight: 800;
   color: var(--color-primary);
 }
 
@@ -142,15 +146,17 @@
   display: flex;
   flex-direction: column;
   height: 640px;
-  background: var(--color-off-white);
-  border-radius: var(--radius-lg);
+  background: var(--color-white);
+  border-radius: 24px;
   overflow: hidden;
-  border: 1px solid var(--color-light-gray);
+  border: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 8%, transparent);
+  box-shadow: var(--shadow-sm);
   transition: all var(--transition-base);
 }
 
 .ag-story-card:hover {
-  box-shadow: var(--shadow-lg);
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-xl);
   transform: translateY(-6px);
 }
 

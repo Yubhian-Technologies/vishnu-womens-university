@@ -8,7 +8,6 @@ import { useImageCropModal } from '../../../components/ImageUploader/useImageCro
 import FileUploader from '../../../components/FileUploader/FileUploader';
 import { deleteFile, type UploadResult } from '../../../lib/storage';
 import { PROGRAM_ICON_NAMES } from '../../../lib/programIcons';
-import DepartmentNewsManager from './DepartmentNewsManager';
 import type { PlacementYearRecord } from '../../../lib/placementRecords';
 import type { InternshipYearRecord } from '../../../lib/internshipRecords';
 import CustomSectionEditor from './CustomSectionEditor';
@@ -855,23 +854,6 @@ export default function ProgramsAdmin() {
             <FileUploader folder="vwu/programs/mindmap-pdf" currentUrl={form.mindMapPdfUrl} onUploaded={handleMindMapPdf} label="Upload Mind Map PDF" />
             {form.mindMapPdfUrl && (
               <button type="button" className="admin-btn admin-btn--ghost admin-btn--sm" style={{ marginTop: '0.5rem' }} onClick={removeMindMapPdf}>Remove PDF</button>
-            )}
-          </div>
-
-          <div className="admin-field admin-field--full">
-            <p className="admin-field__hint">
-              The academic-year "News &amp; Events" table (News &amp; Events / Student Awards / Others tabs) isn't
-              edited per-programme anymore — it's shared across a department's programmes, so it now lives on the
-              matching card in <strong>Admin → Academic Departments</strong> instead.
-            </p>
-          </div>
-
-          <div className="admin-field admin-field--full"><hr /><h3>News &amp; Events — This Programme</h3></div>
-          <div className="admin-field admin-field--full">
-            {editing ? (
-              <DepartmentNewsManager programSlug={form.slug} />
-            ) : (
-              <p className="admin-field__hint">Save this program first, then reopen it here to add News &amp; Events.</p>
             )}
           </div>
 

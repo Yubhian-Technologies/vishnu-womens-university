@@ -84,7 +84,7 @@ export default function AboutSVES() {
       {/* About */}
       <section className="section bg-off-white">
         <div className="container">
-          <div className="about-mission-grid">
+          <div className="grid-img-text">
             <div className="reveal-left">
               <span className="section-label">Our Parent Society</span>
               <h2 className="section-title">About Sri Vishnu Educational Society</h2>

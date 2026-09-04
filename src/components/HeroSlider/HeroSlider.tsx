@@ -1,4 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Search } from 'lucide-react';
 import { usePageBanners } from '../../hooks/usePageBanners';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
 import './HeroSlider.css';
@@ -9,7 +11,7 @@ import './HeroSlider.css';
 // with an external tool (ffmpeg/HandBrake) would help more than anything
 // done here — but deferring the fetch (below) at least keeps it from
 // competing with the JS bundle for bandwidth during initial page load.
-const HERO_VIDEO_SRC = '/hero-video.mp4';
+const HERO_VIDEO_SRC = '/HERO-VIDEO.mp4';
 
 
 interface Slide {
@@ -74,9 +76,25 @@ function buildStaticSlides(btechCount: string): Slide[] {
   ];
 }
 
+interface HeroTitle {
+  lead: string;
+  italic: string;
+}
+
+const HERO_TITLES: HeroTitle[] = [
+  { lead: 'Pioneering', italic: 'Women in Engineering.' },
+  { lead: 'Where Ambition Meets', italic: 'Excellence.' },
+  { lead: 'Engineering the', italic: 'Future of Tech.' },
+  { lead: 'Inspiring Brilliance,', italic: 'Leading Change.' },
+];
+
 const SLIDE_DURATION = 6000;
 
 export default function HeroSlider() {
+  const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [titleIndex, setTitleIndex] = useState(0);
+  const [isFadingTitle, setIsFadingTitle] = useState(false);
   const [current, setCurrent] = useState(0);
   const [progressWidth, setProgressWidth] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -154,10 +172,30 @@ export default function HeroSlider() {
     return () => clearInterval(interval);
   }, [next]);
 
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setIsFadingTitle(true);
+      setTimeout(() => {
+        setTitleIndex((prev) => (prev + 1) % HERO_TITLES.length);
+        setIsFadingTitle(false);
+      }, 450);
+    }, 4200);
+    return () => clearInterval(timer);
+  }, []);
+
   const toggleMute = () => {
     if (videoRef.current) {
       videoRef.current.muted = !isMuted;
       setIsMuted(m => !m);
+    }
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/academics/programs?search=${encodeURIComponent(searchQuery.trim())}`);
+    } else {
+      navigate('/academics/programs');
     }
   };
 
@@ -179,16 +217,41 @@ export default function HeroSlider() {
           aria-hidden="true"
         />
       )}
-      <div className="hero-video-overlay" />
 
-      {/* Centered Brand Mark — two-row "Vishnu Women's / University" overlay */}
-      <div className="hero-brand-mark" aria-hidden="true">
-        <span className="hero-brand-mark-row hero-brand-mark-row--top">Vishnu Women's</span>
-        <span className="hero-brand-mark-divider" />
-        <span className="hero-brand-mark-row hero-brand-mark-row--bottom">University</span>
+      {/* Center Tagline & Clean Sleek Search */}
+      <div className="hero-center-panel">
+        <h1 className={`hero-center-tagline ${isFadingTitle ? 'title-exit' : 'title-enter'}`}>
+          <span className="hero-title-lead">{HERO_TITLES[titleIndex].lead}</span>
+          {' '}
+          <span className="hero-title-italic">{HERO_TITLES[titleIndex].italic}</span>
+        </h1>
+        <form className="hero-center-search" onSubmit={handleSearch} role="search">
+          <div className="hero-search-box">
+            <Search className="hero-search-icon" size={19} strokeWidth={2} />
+            <input
+              type="text"
+              className="hero-search-input"
+              placeholder="Explore courses"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              aria-label="Explore courses"
+            />
+            <button type="submit" className="hero-search-submit">
+              Search
+            </button>
+          </div>
+        </form>
+        <div className="hero-tag-words" aria-label="Values">
+          <span>Empower</span>
+          <span className="hero-tag-dot">•</span>
+          <span>Innovate</span>
+          <span className="hero-tag-dot">•</span>
+          <span>Lead</span>
+        </div>
       </div>
 
-      {/* Slide content layers */}
+      {/* Slide layer — carries only the optional admin-uploaded Hero Banner
+          photo now; the title/description card has been removed. */}
       {slides.some(s => s.image) && slides.map((slide, i) => (
         <div
           key={slide.id}
@@ -265,12 +328,6 @@ export default function HeroSlider() {
           />
         </div>
       )}
-
-      {/* Scroll Indicator */}
-      <div className="scroll-indicator" aria-hidden="true">
-        <div className="scroll-indicator-line" />
-        <span>Scroll</span>
-      </div>
 
 
 
