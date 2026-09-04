@@ -5,11 +5,11 @@ import { useSitePhotos } from '../../hooks/useSitePhotos';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import '../detail-layout.css';
 
-const defaultPhoto = [{ src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Anti Ragging', caption: '' }];
+const defaultPhoto = [{ src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Anti-Ragging', caption: '' }];
 
 export default function AntiRagging() {
   useEffect(() => {
-    document.title = "Anti Ragging | Vishnu Women's University";
+    document.title = "Anti-Ragging | Vishnu Women's University";
   }, []);
 
   const [photo] = useSitePhotos('anti-ragging', 'main', defaultPhoto);
@@ -18,9 +18,9 @@ export default function AntiRagging() {
     <main className="page-wrapper">
       <PageHero
         page="anti-ragging"
-        defaultTitle="Anti Ragging"
+        defaultTitle="Anti-Ragging"
         defaultSubtitle="Vishnu Women's University is committed to a safe, ragging-free campus for every student."
-        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Anti Ragging' }]}
+        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Anti-Ragging' }]}
       />
 
       <section className="section bg-white">
@@ -62,7 +62,7 @@ export default function AntiRagging() {
                 PRINCIPAL
               </p>
               <div style={{ display: 'flex', gap: 'var(--space-4)', flexWrap: 'wrap' }}>
-                <Link to="/governance/anti-ragging" className="btn btn-primary">Anti Ragging Committee</Link>
+                <Link to="/governance/anti-ragging" className="btn btn-primary">Anti-Ragging Committee</Link>
                 <Link to="/contact" className="btn btn-secondary">Contact Us</Link>
               </div>
             </div>

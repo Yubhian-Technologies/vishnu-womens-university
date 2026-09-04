@@ -1,5 +1,4 @@
 import { useEffect, type CSSProperties } from 'react';
-import { Link } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { resolveContentIcon } from '../../lib/contentIcons';
@@ -54,7 +53,7 @@ export default function ResultAnalysis() {
   const factors = useContentBlocks('result-analysis', 'factors');
 
   useEffect(() => {
-    document.title = 'Result Analysis | VWU';
+    document.title = 'Results Analysis | VWU';
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -76,9 +75,9 @@ export default function ResultAnalysis() {
       {/* Hero */}
       <PageHero
         page="result-analysis"
-        defaultTitle="Result Analysis"
+        defaultTitle="Results Analysis"
         defaultSubtitle="Consistent, top-tier academic outcomes with 90%+ annual pass rates across 22+ graduating batches."
-        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Admissions', to: '/admissions' }, { label: 'Result Analysis' }]}
+        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Admissions', to: '/admissions' }, { label: 'Results Analysis' }]}
         scrollCtaTargetId="result-analysis-content"
       />
 

@@ -19,10 +19,13 @@ const SOCIAL_LINKS = [
   { label: 'YouTube', href: 'https://www.youtube.com/@SVECW-B0', Icon: YouTubeIcon },
 ];
 
-const UNIVERSITY_LINKS = [
+// `disabled` items render as greyed, non-clickable text — mirroring the
+// navbar, where the corresponding pages (Governance sub-pages, Campus
+// Facilities) aren't live yet.
+const UNIVERSITY_LINKS: { label: string; href: string; disabled?: boolean }[] = [
   { label: 'About VWU', href: '/about' },
-  { label: 'Governance & Leadership', href: '/governance' },
-  { label: 'Campus Facilities', href: '/campus-facilities' },
+  { label: 'Governance & Leadership', href: '/governance', disabled: true },
+  { label: 'Campus Facilities', href: '/campus-facilities', disabled: true },
   { label: 'Careers at VWU', href: '/careers' },
   { label: 'Alumni Network', href: '/alumni-giving#network' },
   { label: 'Contact Us', href: '/contact' },
@@ -50,7 +53,7 @@ const STUDENT_SERVICE_LINKS = [
 
 const LEGAL_LINKS = [
   { label: 'Policies & Procedures', href: '/policies-procedures' },
-  { label: 'Anti Ragging Policy', href: '/anti-ragging' },
+  { label: 'Anti-Ragging Policy', href: '/anti-ragging' },
   { label: 'Disclosures – UGC', href: '/disclosures/ugc' },
   { label: 'Contact Us', href: '/contact' },
 ];
@@ -158,9 +161,15 @@ export default function Footer() {
             <ul className="vwu-footer-nav-list" role="list">
               {UNIVERSITY_LINKS.map((item) => (
                 <li key={item.label}>
-                  <Link to={item.href} className="vwu-footer-nav-link">
-                    {item.label}
-                  </Link>
+                  {item.disabled ? (
+                    <span className="vwu-footer-nav-link is-disabled" aria-disabled="true">
+                      {item.label}
+                    </span>
+                  ) : (
+                    <Link to={item.href} className="vwu-footer-nav-link">
+                      {item.label}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>

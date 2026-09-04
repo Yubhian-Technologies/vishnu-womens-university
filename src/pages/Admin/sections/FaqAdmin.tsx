@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { useState, type ChangeEvent } from 'react';
+import { collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp, writeBatch } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
 
@@ -25,9 +25,64 @@ export default function FaqAdmin() {
   const [editing, setEditing] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [filterPage, setFilterPage] = useState('admissions');
+  const [importText, setImportText] = useState('');
+  const [importing, setImporting] = useState(false);
 
   const set = (k: string, v: string | number) => setForm((p) => ({ ...p, [k]: v }));
   const filtered = faqs.filter((f) => f.page === filterPage);
+
+  const exportJson = () => {
+    const data = faqs.map(({ id, page, question, answer, order }) => ({ id, page, question, answer, order }));
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'faqs.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const loadFile = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) file.text().then(setImportText);
+    e.target.value = '';
+  };
+
+  const importJson = async () => {
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(importText);
+    } catch {
+      return alert('That is not valid JSON.');
+    }
+    if (!Array.isArray(parsed)) return alert('Expected a JSON array of FAQ objects.');
+    const rows = parsed as Array<Partial<FaqDoc>>;
+    const bad = rows.findIndex((r) => !r || typeof r.question !== 'string' || typeof r.answer !== 'string');
+    if (bad !== -1) return alert(`Entry ${bad + 1} is missing a "question" or "answer" string.`);
+    // ponytail: single writeBatch caps at 500 rows; FAQs won't approach that.
+    if (!confirm(`Import ${rows.length} FAQ(s)? Rows with an existing "id" overwrite that entry; the rest are added. Nothing is deleted.`)) return;
+    setImporting(true);
+    try {
+      const batch = writeBatch(db);
+      rows.forEach((r, i) => {
+        const ref = r.id ? doc(db, 'faqs', r.id) : doc(collection(db, 'faqs'));
+        batch.set(ref, {
+          page: r.page || filterPage,
+          question: r.question,
+          answer: r.answer,
+          order: typeof r.order === 'number' ? r.order : i + 1,
+          createdAt: serverTimestamp(),
+        });
+      });
+      await batch.commit();
+      setImportText('');
+      alert('Import complete.');
+    } catch (e) {
+      alert(`Import failed: ${(e as Error).message}`);
+    } finally {
+      setImporting(false);
+    }
+  };
 
   const save = async () => {
     if (!form.question || !form.answer) return alert('Question and answer are required.');
@@ -82,6 +137,34 @@ export default function FaqAdmin() {
         <div className="admin-form-actions">
           {editing && <button className="admin-btn admin-btn--ghost" onClick={() => { setEditing(null); setForm(EMPTY); }}>Cancel</button>}
           <button className="admin-btn admin-btn--primary" onClick={save} disabled={saving}>{saving ? 'Saving…' : editing ? 'Update' : 'Add FAQ'}</button>
+        </div>
+      </div>
+
+      <div className="admin-card">
+        <h2 className="admin-card__title">Bulk Import / Export (JSON)</h2>
+        <div className="admin-form-grid">
+          <div className="admin-field admin-field--full">
+            <label>Export</label>
+            <button className="admin-btn admin-btn--ghost" type="button" onClick={exportJson}>
+              Download all FAQs as JSON ({faqs.length})
+            </button>
+          </div>
+          <div className="admin-field admin-field--full">
+            <label htmlFor="field-faq-import">Import — paste a JSON array, or choose a file</label>
+            <input id="field-faq-import-file" type="file" accept="application/json,.json" onChange={loadFile} />
+            <textarea
+              id="field-faq-import"
+              rows={6}
+              value={importText}
+              onChange={(e) => setImportText(e.target.value)}
+              placeholder={'[{ "page": "admissions", "question": "…", "answer": "…", "order": 1 }]'}
+            />
+          </div>
+        </div>
+        <div className="admin-form-actions">
+          <button className="admin-btn admin-btn--primary" type="button" onClick={importJson} disabled={importing || !importText.trim()}>
+            {importing ? 'Importing…' : 'Import'}
+          </button>
         </div>
       </div>
 
