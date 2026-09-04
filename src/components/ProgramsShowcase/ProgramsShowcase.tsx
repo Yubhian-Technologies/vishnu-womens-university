@@ -54,9 +54,10 @@ export default function ProgramsShowcase() {
   };
 
   const categories = [
-    { id: 'ug', label: `UG${btechCount > 0 ? ` (${btechCount})` : ''}`, link: '/academics?tab=btech' },
-    { id: 'pg', label: `PG${pgCount > 0 ? ` (${pgCount})` : ''}`, link: '/academics?tab=mtech' },
-    { id: 'phd', label: `Ph.D${phdCount > 0 ? ` (${phdCount})` : ''}`, link: '/academics?tab=phd' },
+    // ‌ (ZWNJ) after "(" stops fonts substituting "(5)"/"(3)" with a circled-digit ligature
+    { id: 'ug', label: `Undergraduate Programs${btechCount > 0 ? ` (‌${btechCount})` : ''}`, link: '/academics?tab=btech' },
+    { id: 'pg', label: `Postgraduate Programs${pgCount > 0 ? ` (‌${pgCount})` : ''}`, link: '/academics?tab=mtech' },
+    { id: 'phd', label: `Ph.D Programs${phdCount > 0 ? ` (‌${phdCount})` : ''}`, link: '/academics?tab=phd' },
   ];
 
   return (

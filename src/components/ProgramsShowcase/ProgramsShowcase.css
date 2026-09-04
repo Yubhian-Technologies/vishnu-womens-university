@@ -223,8 +223,6 @@
   line-height: 1.35;
   color: #334155;
   white-space: nowrap;
-  font-variant-numeric: normal;
-  font-feature-settings: normal;
   transition: color 0.2s ease;
 }
 
