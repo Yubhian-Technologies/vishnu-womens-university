@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { useEffect, useState } from 'react';
+import { collection, addDoc, deleteDoc, doc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
 import { CONTENT_ICON_NAMES } from '../../../lib/contentIcons';
@@ -14,16 +14,25 @@ export interface NotablePerson {
   storagePath: string;
 }
 
-/** Which column of the header's Placements mega-menu this item appears in.
- *  Read by Header.tsx; items without this set yet (existing rows saved
- *  before this field existed) fall back to the old balanced-thirds split
- *  there, so nothing moves until an admin explicitly picks a column. */
-export type PlacementMenuColumn = 'explore' | 'quick' | 'facilities';
+/** A named column of the header's Placements mega-menu — fully admin-
+ *  managed (add/rename/reorder/delete below), read live by Header.tsx.
+ *  `id` is the Firestore doc id; placement items reference it by id via
+ *  their own `menuColumn` field so renaming a column never requires
+ *  touching every item assigned to it. */
+export interface PlacementMenuColumnDoc {
+  id: string;
+  label: string;
+  order: number;
+}
 
-export const PLACEMENT_MENU_COLUMNS: { value: PlacementMenuColumn; label: string }[] = [
-  { value: 'explore', label: 'Explore Directory' },
-  { value: 'quick', label: 'Quick Access' },
-  { value: 'facilities', label: 'Key Facilities' },
+/** Seeded once, automatically, the first time this admin section loads and
+ *  finds the collection empty — using these exact ids so any items already
+ *  carrying the old fixed-column values ('explore'/'quick'/'facilities')
+ *  keep showing under the matching column with no migration step. */
+export const DEFAULT_PLACEMENT_MENU_COLUMNS: { id: string; label: string; order: number }[] = [
+  { id: 'explore', label: 'Explore Directory', order: 0 },
+  { id: 'quick', label: 'Quick Access', order: 1 },
+  { id: 'facilities', label: 'Key Facilities', order: 2 },
 ];
 
 export interface PlacementItemDoc {
@@ -62,9 +71,10 @@ export interface PlacementItemDoc {
   heroImage: string;
   heroStoragePath: string;
   order: number;
-  /** Which column this item shows in on the header's Placements mega-menu —
-   *  see PlacementMenuColumn above. */
-  menuColumn?: PlacementMenuColumn;
+  /** Id of the PlacementMenuColumnDoc this item shows under in the header's
+   *  Placements mega-menu. Items without a match (unset, or referencing a
+   *  since-deleted column) fall back to the first column in Header.tsx. */
+  menuColumn?: string;
   /** Only used on the "placement-highlights" page — the "Photo Carousel":
    *  a horizontally scrolling strip of photo cards (name + subtitle under
    *  each), shown below the Data Table. Free-form crop, not a fixed ratio —
@@ -94,6 +104,82 @@ export default function PlacementItemsAdmin() {
   const [form, setForm] = useState<Omit<PlacementItemDoc, 'id'>>(EMPTY);
   const [editing, setEditing] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+
+  // Navbar Menu Columns — auto-provisioned the same way LandingPagesAdmin
+  // seeds registry entries: if the collection is empty on first load, write
+  // the 3 default columns so this feature works immediately with no manual
+  // Firestore setup, and existing items' 'explore'/'quick'/'facilities'
+  // values keep resolving to the right column.
+  const { docs: menuColumns, loading: columnsLoading } = useOrderedCollection<PlacementMenuColumnDoc>('placementMenuColumns', 'order');
+  const [columnsSeeded, setColumnsSeeded] = useState(false);
+  useEffect(() => {
+    if (columnsLoading || columnsSeeded || menuColumns.length > 0) return;
+    setColumnsSeeded(true);
+    DEFAULT_PLACEMENT_MENU_COLUMNS.forEach(({ id, ...rest }) => {
+      setDoc(doc(db, 'placementMenuColumns', id), rest);
+    });
+  }, [columnsLoading, columnsSeeded, menuColumns]);
+
+  const [editingColumnId, setEditingColumnId] = useState<string | null>(null);
+  const [editColumnLabel, setEditColumnLabel] = useState('');
+  const [newColumnLabel, setNewColumnLabel] = useState('');
+  const [columnSaving, setColumnSaving] = useState(false);
+
+  const startEditColumn = (col: PlacementMenuColumnDoc) => {
+    setEditingColumnId(col.id);
+    setEditColumnLabel(col.label);
+  };
+  const saveColumnLabel = async () => {
+    if (!editingColumnId) return;
+    const label = editColumnLabel.trim();
+    if (!label) return alert('Column name cannot be empty.');
+    try {
+      await updateDoc(doc(db, 'placementMenuColumns', editingColumnId), { label });
+      setEditingColumnId(null);
+    } catch (e) {
+      alert(`Couldn't rename: ${(e as Error).message}`);
+    }
+  };
+  const addColumn = async () => {
+    const label = newColumnLabel.trim();
+    if (!label) return;
+    setColumnSaving(true);
+    try {
+      const nextOrder = menuColumns.reduce((max, c) => Math.max(max, c.order), -1) + 1;
+      await addDoc(collection(db, 'placementMenuColumns'), { label, order: nextOrder });
+      setNewColumnLabel('');
+    } catch (e) {
+      alert(`Couldn't add column: ${(e as Error).message}`);
+    } finally {
+      setColumnSaving(false);
+    }
+  };
+  const moveColumn = async (index: number, dir: -1 | 1) => {
+    const target = index + dir;
+    if (target < 0 || target >= menuColumns.length) return;
+    const a = menuColumns[index];
+    const b = menuColumns[target];
+    try {
+      await Promise.all([
+        updateDoc(doc(db, 'placementMenuColumns', a.id), { order: b.order }),
+        updateDoc(doc(db, 'placementMenuColumns', b.id), { order: a.order }),
+      ]);
+    } catch (e) {
+      alert(`Couldn't reorder: ${(e as Error).message}`);
+    }
+  };
+  const deleteColumn = async (col: PlacementMenuColumnDoc) => {
+    const inUse = items.filter((it) => it.menuColumn === col.id).length;
+    if (inUse > 0) {
+      return alert(`"${col.label}" is still used by ${inUse} placement page${inUse === 1 ? '' : 's'} — reassign ${inUse === 1 ? 'it' : 'them'} to a different column first.`);
+    }
+    if (!confirm(`Delete the "${col.label}" column?`)) return;
+    try {
+      await deleteDoc(doc(db, 'placementMenuColumns', col.id));
+    } catch (e) {
+      alert(`Couldn't delete: ${(e as Error).message}`);
+    }
+  };
   // Photo Carousel — same useImageCropModal-direct pattern as other
   // repeatable add-to-list photo fields (e.g. TpoTeamPhotosAdmin). Free-form
   // (no fixed ratio) — these can be whole promotional posters/banners with
@@ -139,7 +225,7 @@ export default function PlacementItemsAdmin() {
       emails: it.emails || [], linkedins: it.linkedins || [],
       heroImage: it.heroImage || '', heroStoragePath: it.heroStoragePath || '',
       notablePeople: it.notablePeople || [], order: it.order,
-      menuColumn: it.menuColumn || 'explore',
+      menuColumn: it.menuColumn || menuColumns[0]?.id || 'explore',
     });
   };
 
@@ -255,10 +341,11 @@ export default function PlacementItemsAdmin() {
           </div>
           <div className="admin-field">
             <label htmlFor="field-menu-column">
-              Navbar Menu Column — which of the 3 columns this item shows under in the header's Placements dropdown
+              Navbar Menu Column — which column this item shows under in the header's Placements dropdown
+              (manage the columns themselves below)
             </label>
-            <select id="field-menu-column" value={form.menuColumn || 'explore'} onChange={(e) => set('menuColumn', e.target.value)}>
-              {PLACEMENT_MENU_COLUMNS.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
+            <select id="field-menu-column" value={form.menuColumn || menuColumns[0]?.id || ''} onChange={(e) => set('menuColumn', e.target.value)}>
+              {menuColumns.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
             </select>
           </div>
           <div className="admin-field">
@@ -445,6 +532,75 @@ export default function PlacementItemsAdmin() {
       </div>
 
       <div className="admin-card">
+        <h2 className="admin-card__title">Navbar Menu Columns ({menuColumns.length})</h2>
+        <p className="admin-lead" style={{ marginBottom: '1rem' }}>
+          The named columns shown in the header's Placements dropdown (Explore Directory / Quick Access /
+          Key Facilities by default) — rename, reorder, add, or delete them here. Each placement page above
+          picks one of these via its "Navbar Menu Column" field. A column can't be deleted while any page
+          is still assigned to it.
+        </p>
+        {columnsLoading ? <p className="admin-loading">Loading…</p> : (
+          <>
+            {menuColumns.length > 0 && (
+              <div className="admin-table-wrap" style={{ marginBottom: '1rem' }}>
+                <table className="admin-table">
+                  <thead><tr><th>Order</th><th>Column Name</th><th>Pages</th><th>Actions</th></tr></thead>
+                  <tbody>
+                    {menuColumns.map((col, i) => (
+                      <tr key={col.id}>
+                        <td>{i + 1}</td>
+                        <td>
+                          {editingColumnId === col.id ? (
+                            <input
+                              value={editColumnLabel}
+                              onChange={(e) => setEditColumnLabel(e.target.value)}
+                              autoFocus
+                              style={{ minWidth: 200 }}
+                            />
+                          ) : col.label}
+                        </td>
+                        <td>{items.filter((it) => (it.menuColumn || menuColumns[0]?.id) === col.id).length}</td>
+                        <td>
+                          {editingColumnId === col.id ? (
+                            <>
+                              <button className="admin-btn admin-btn--sm admin-btn--primary" onClick={saveColumnLabel}>Save</button>
+                              <button className="admin-btn admin-btn--sm admin-btn--ghost" onClick={() => setEditingColumnId(null)}>Cancel</button>
+                            </>
+                          ) : (
+                            <>
+                              <button className="admin-btn admin-btn--sm" onClick={() => startEditColumn(col)}>Rename</button>
+                              <button className="admin-btn admin-btn--sm" onClick={() => moveColumn(i, -1)} disabled={i === 0} title="Move earlier">↑</button>
+                              <button className="admin-btn admin-btn--sm" onClick={() => moveColumn(i, 1)} disabled={i === menuColumns.length - 1} title="Move later">↓</button>
+                              <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => deleteColumn(col)}>Delete</button>
+                            </>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+            <div className="admin-field" style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-end', maxWidth: 420 }}>
+              <div style={{ flex: 1 }}>
+                <label htmlFor="field-new-column-label">Add a new column</label>
+                <input
+                  id="field-new-column-label"
+                  value={newColumnLabel}
+                  onChange={(e) => setNewColumnLabel(e.target.value)}
+                  placeholder="e.g. Alumni Success"
+                  onKeyDown={(e) => { if (e.key === 'Enter') addColumn(); }}
+                />
+              </div>
+              <button className="admin-btn admin-btn--primary admin-btn--sm" onClick={addColumn} disabled={columnSaving || !newColumnLabel.trim()}>
+                {columnSaving ? 'Adding…' : '+ Add Column'}
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+
+      <div className="admin-card">
         <h2 className="admin-card__title">Pages ({items.length})</h2>
         {loading ? <p className="admin-loading">Loading…</p> : (
           <div className="admin-table-wrap">
@@ -456,7 +612,7 @@ export default function PlacementItemsAdmin() {
                     <td>{it.order}</td>
                     <td>{it.title}</td>
                     <td>{it.slug}</td>
-                    <td>{PLACEMENT_MENU_COLUMNS.find((c) => c.value === (it.menuColumn || 'explore'))?.label}</td>
+                    <td>{menuColumns.find((c) => c.id === (it.menuColumn || menuColumns[0]?.id))?.label || '—'}</td>
                     <td>
                       <button className="admin-btn admin-btn--sm" onClick={() => startEdit(it)}>Edit</button>
                       <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(it.id, it.heroStoragePath)}>Delete</button>
