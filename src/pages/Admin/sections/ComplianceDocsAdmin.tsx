@@ -22,12 +22,11 @@ export interface ComplianceDocDoc {
 }
 
 const EMPTY: Omit<ComplianceDocDoc, 'id'> = {
-  group: 'Approvals & Accreditations', label: '', fileUrl: '', storagePath: '',
+  group: 'Mandatory Disclosures', label: '', fileUrl: '', storagePath: '',
   external: false, download: false, key: '', order: 0,
 };
 
 export const COMPLIANCE_GROUPS = [
-  'Approvals & Accreditations',
   'Mandatory Disclosures',
   'Infrastructure & Facilities',
   'Institutional Data',

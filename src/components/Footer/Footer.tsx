@@ -1,6 +1,6 @@
 import { useState, useId } from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, Phone, Mail, ExternalLink, ChevronDown, ShieldCheck, FileText, ChevronRight } from 'lucide-react';
+import { MapPin, Phone, Mail, ExternalLink, ChevronDown, FileText, ChevronRight } from 'lucide-react';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { COMPLIANCE_GROUPS, DEFAULT_COMPLIANCE_DOCS, type ComplianceDocDoc } from '../../pages/Admin/sections/ComplianceDocsAdmin';
 import { InstagramIcon, FacebookIcon, TwitterIcon, LinkedInIcon, YouTubeIcon } from './SocialIcons';
@@ -17,14 +17,6 @@ const SOCIAL_LINKS = [
   { label: 'Twitter / X', href: 'https://twitter.com/svecw2', Icon: TwitterIcon },
   { label: 'LinkedIn', href: 'https://www.linkedin.com/school/vishnusvecw/', Icon: LinkedInIcon },
   { label: 'YouTube', href: 'https://www.youtube.com/@SVECW-B0', Icon: YouTubeIcon },
-];
-
-const ACCREDITATIONS = [
-  { code: 'NBA', title: 'National Board of Accreditation' },
-  { code: 'NAAC', title: 'Quality Assurance Grade' },
-  { code: 'UGC', title: 'University Grants Commission' },
-  { code: 'AICTE Approved', title: 'All India Council for Tech Education' },
-  { code: 'JNTUK Affiliated', title: 'Jawaharlal Nehru Tech University' },
 ];
 
 const UNIVERSITY_LINKS = [
@@ -119,10 +111,10 @@ export default function Footer() {
   return (
     <footer className="vwu-footer" role="contentinfo">
       {/* ------------------------------------------------------------------ */}
-      {/* TIER 1: Identity & Institutional Accreditations Header             */}
+      {/* TIER 1: Identity (left) & Structured Navigation / Compliance (right) */}
       {/* ------------------------------------------------------------------ */}
-      <div className="vwu-footer-identity-tier">
-        <div className="container vwu-footer-identity-inner">
+      <div className="vwu-footer-main-tier">
+        <div className="container vwu-footer-main-inner">
           {/* Brand Anchor */}
           <div className="vwu-footer-brand-block">
             <Link to="/" className="vwu-footer-logo-wrap" aria-label="Vishnu Women's University Home">
@@ -165,29 +157,8 @@ export default function Footer() {
             </address>
           </div>
 
-          {/* Institutional Accreditations Panel */}
-          <div className="vwu-footer-accreditation-block">
-            <div className="vwu-footer-accreditation-header">
-              <ShieldCheck size={16} className="vwu-footer-acc-shield" aria-hidden="true" />
-              <span className="vwu-footer-acc-heading">Accreditations &amp; Affiliations</span>
-            </div>
-            <div className="vwu-footer-accreditation-grid">
-              {ACCREDITATIONS.map((acc) => (
-                <div key={acc.code} className="vwu-footer-acc-card" title={acc.title}>
-                  <strong className="vwu-footer-acc-code">{acc.code}</strong>
-                  <span className="vwu-footer-acc-title">{acc.title}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ------------------------------------------------------------------ */}
-      {/* TIER 2: Structured Navigation & Compliance Matrix                   */}
-      {/* ------------------------------------------------------------------ */}
-      <div className="vwu-footer-nav-tier">
-        <div className="container vwu-footer-nav-grid">
+          {/* Navigation Columns */}
+          <div className="vwu-footer-nav-grid">
           {/* Column 1: University */}
           <div className="vwu-footer-nav-col">
             <h3 className="vwu-footer-nav-title">University</h3>
@@ -314,6 +285,7 @@ export default function Footer() {
                 <ChevronRight size={14} aria-hidden="true" />
               </Link>
             )}
+          </div>
           </div>
         </div>
 
