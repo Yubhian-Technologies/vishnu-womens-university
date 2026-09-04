@@ -324,7 +324,7 @@ export default function Header() {
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Dynamic overrides and data hooks
-  const headerApplyNow = useNavLinkOverride('header-apply-now', '/admissions');
+  const headerApplyNow = useNavLinkOverride('header-apply-now', '/admissions#admissions-contact');
   const orgChart = useNavLinkOverride('header-organizational-chart', '/downloads/SVECWOrganizationChart.jpg');
 
   const { docs: programs } = useOrderedCollection<ProgramDoc>('programs', 'order');

@@ -14,6 +14,7 @@ import type { FaqDoc } from '../Admin/sections/FaqAdmin';
 import { NotebookPen, ClipboardList, Users, Phone, Mail, MapPin, Sparkles, BarChart2 } from 'lucide-react';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import { smoothScrollTo } from '../../lib/smoothScroll';
+import { useHashScroll } from '../../hooks/useHashScroll';
 
 interface RequestInfoForm {
   firstName: string;
@@ -133,6 +134,7 @@ const DEFAULT_ADMISSIONS_FAQS: FaqDoc[] = [
 ];
 
 export default function Admissions() {
+  useHashScroll();
   const { docs: allFaqs } = useOrderedCollection<FaqDoc>('faqs', 'order');
   const liveFaqs = allFaqs.filter((f) => f.page === 'admissions');
   const faqs = liveFaqs.length > 0 ? liveFaqs : DEFAULT_ADMISSIONS_FAQS;
@@ -500,7 +502,7 @@ export default function Admissions() {
       )}
 
       {/* Contact Admissions */}
-      <section id="admissions-contact" className="section bg-white">
+      <section id="admissions-contact" className="section bg-white" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
         <div className="container">
           <div className="adm-contact-grid">
             <div className="reveal-left">
