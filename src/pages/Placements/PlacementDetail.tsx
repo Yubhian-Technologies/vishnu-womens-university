@@ -145,10 +145,14 @@ function OutcomeTileText({ text }: { text: string }) {
   const m = text.match(OUTCOME_BATCH_SUMMARY_RE);
   if (!m) return <>{text}</>;
   const [, batch, count, highest] = m;
+  // The raw admin-entered count sometimes has a thousands comma baked in
+  // (e.g. "1,156") and sometimes doesn't (e.g. "1103") — strip it so every
+  // tile reads the same way regardless of how it was typed.
+  const countDigitsOnly = count.replace(/,/g, '');
   return (
     <>
       <span style={{ display: 'block', textAlign: 'center' }}>{batch} batch</span>
-      <span style={{ display: 'block', textAlign: 'center' }}>{count} placements</span>
+      <span style={{ display: 'block', textAlign: 'center' }}>{countDigitsOnly} placements</span>
       Highest Package: {highest}
     </>
   );

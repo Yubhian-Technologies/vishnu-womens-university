@@ -14,6 +14,18 @@ export interface NotablePerson {
   storagePath: string;
 }
 
+/** Which column of the header's Placements mega-menu this item appears in.
+ *  Read by Header.tsx; items without this set yet (existing rows saved
+ *  before this field existed) fall back to the old balanced-thirds split
+ *  there, so nothing moves until an admin explicitly picks a column. */
+export type PlacementMenuColumn = 'explore' | 'quick' | 'facilities';
+
+export const PLACEMENT_MENU_COLUMNS: { value: PlacementMenuColumn; label: string }[] = [
+  { value: 'explore', label: 'Explore Directory' },
+  { value: 'quick', label: 'Quick Access' },
+  { value: 'facilities', label: 'Key Facilities' },
+];
+
 export interface PlacementItemDoc {
   id: string;
   slug: string;
@@ -50,6 +62,9 @@ export interface PlacementItemDoc {
   heroImage: string;
   heroStoragePath: string;
   order: number;
+  /** Which column this item shows in on the header's Placements mega-menu —
+   *  see PlacementMenuColumn above. */
+  menuColumn?: PlacementMenuColumn;
   /** Only used on the "placement-highlights" page — the "Photo Carousel":
    *  a horizontally scrolling strip of photo cards (name + subtitle under
    *  each), shown below the Data Table. Free-form crop, not a fixed ratio —
@@ -64,6 +79,7 @@ const EMPTY: Omit<PlacementItemDoc, 'id'> = {
   slug: '', title: '', icon: 'BarChart3', desc: '', external: false, url: '',
   intro: '', about: '', highlights: [], outcomes: [], partners: [], tableText: '', dataTableHeadersText: '', rosterGroupsText: '',
   deptCoordinatorsText: '', deptCoordinatorGroupsText: '', emails: [], linkedins: [], heroImage: '', heroStoragePath: '', notablePeople: [], order: 0,
+  menuColumn: 'explore',
 };
 
 function linesToArray(text: string): string[] {
@@ -123,6 +139,7 @@ export default function PlacementItemsAdmin() {
       emails: it.emails || [], linkedins: it.linkedins || [],
       heroImage: it.heroImage || '', heroStoragePath: it.heroStoragePath || '',
       notablePeople: it.notablePeople || [], order: it.order,
+      menuColumn: it.menuColumn || 'explore',
     });
   };
 
@@ -235,6 +252,14 @@ export default function PlacementItemsAdmin() {
           <div className="admin-field">
             <label htmlFor="field-display-order">Display Order</label>
             <input id="field-display-order" type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
+          </div>
+          <div className="admin-field">
+            <label htmlFor="field-menu-column">
+              Navbar Menu Column — which of the 3 columns this item shows under in the header's Placements dropdown
+            </label>
+            <select id="field-menu-column" value={form.menuColumn || 'explore'} onChange={(e) => set('menuColumn', e.target.value)}>
+              {PLACEMENT_MENU_COLUMNS.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
+            </select>
           </div>
           <div className="admin-field">
             <label>
@@ -424,20 +449,21 @@ export default function PlacementItemsAdmin() {
         {loading ? <p className="admin-loading">Loading…</p> : (
           <div className="admin-table-wrap">
             <table className="admin-table">
-              <thead><tr><th>Order</th><th>Title</th><th>Slug</th><th>Actions</th></tr></thead>
+              <thead><tr><th>Order</th><th>Title</th><th>Slug</th><th>Menu Column</th><th>Actions</th></tr></thead>
               <tbody>
                 {items.map((it) => (
                   <tr key={it.id}>
                     <td>{it.order}</td>
                     <td>{it.title}</td>
                     <td>{it.slug}</td>
+                    <td>{PLACEMENT_MENU_COLUMNS.find((c) => c.value === (it.menuColumn || 'explore'))?.label}</td>
                     <td>
                       <button className="admin-btn admin-btn--sm" onClick={() => startEdit(it)}>Edit</button>
                       <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(it.id, it.heroStoragePath)}>Delete</button>
                     </td>
                   </tr>
                 ))}
-                {items.length === 0 && <tr><td colSpan={4} className="admin-empty">No placement pages yet.</td></tr>}
+                {items.length === 0 && <tr><td colSpan={5} className="admin-empty">No placement pages yet.</td></tr>}
               </tbody>
             </table>
           </div>
