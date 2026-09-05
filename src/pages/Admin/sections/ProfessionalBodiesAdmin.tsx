@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
+import ImageUploader from '../../../components/ImageUploader/ImageUploader';
+import { deleteFile, type UploadResult } from '../../../lib/storage';
 
 export interface ProfessionalBodyDoc {
   id: string;
@@ -10,9 +12,14 @@ export interface ProfessionalBodyDoc {
   fullName: string;
   contentText: string;
   order: number;
+  // Circular logo shown on the Professional Bodies grid — links through to
+  // this body's own detail page. Optional: a body without one yet just
+  // shows its short name instead of an image (see ProfessionalBodiesSection).
+  imageUrl?: string;
+  storagePath?: string;
 }
 
-const EMPTY: Omit<ProfessionalBodyDoc, 'id'> = { key: '', shortName: '', fullName: '', contentText: '', order: 0 };
+const EMPTY: Omit<ProfessionalBodyDoc, 'id'> = { key: '', shortName: '', fullName: '', contentText: '', order: 0, imageUrl: '', storagePath: '' };
 
 // The Professional Bodies page's original per-body content — used both as
 // the "empty collection" fallback and as the one-click starting point for
@@ -57,12 +64,13 @@ export default function ProfessionalBodiesAdmin() {
 
   const startEdit = (d: ProfessionalBodyDoc) => {
     setEditing(d.id);
-    setForm({ key: d.key, shortName: d.shortName, fullName: d.fullName, contentText: d.contentText || '', order: d.order });
+    setForm({ key: d.key, shortName: d.shortName, fullName: d.fullName, contentText: d.contentText || '', order: d.order, imageUrl: d.imageUrl || '', storagePath: d.storagePath || '' });
   };
 
-  const remove = async (id: string) => {
+  const remove = async (id: string, storagePath?: string) => {
     if (!confirm('Delete this professional body?')) return;
     try {
+      if (storagePath) await deleteFile(storagePath);
       await deleteDoc(doc(db, 'professionalBodies', id));
     } catch (e) {
       alert(`Couldn't delete: ${(e as Error).message}`);
@@ -88,7 +96,8 @@ export default function ProfessionalBodiesAdmin() {
       <div className="admin-card">
         <h2 className="admin-card__title">{editing ? 'Edit Professional Body' : 'Add Professional Body'}</h2>
         <p className="admin-lead" style={{ marginBottom: '1rem' }}>
-          Powers the collapsible list on the Professional Bodies research page.
+          Powers the logo grid on the Professional Bodies research page — each logo links through to that body's
+          own page, which shows the Content below.
         </p>
         <div className="admin-form-grid">
           <div className="admin-field">
@@ -106,6 +115,16 @@ export default function ProfessionalBodiesAdmin() {
           <div className="admin-field">
             <label htmlFor="field-display-order">Display Order</label>
             <input id="field-display-order" type="number" value={form.order} onChange={(e) => set('order', Number(e.target.value))} min={0} />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label>Logo (shown as a circle on the Professional Bodies grid)</label>
+            <ImageUploader
+              folder="vwu/research/professional-bodies"
+              currentUrl={form.imageUrl}
+              aspect={1}
+              label="Upload Logo"
+              onUploaded={(r: UploadResult) => setForm((p) => ({ ...p, imageUrl: r.url, storagePath: r.path }))}
+            />
           </div>
           <div className="admin-field admin-field--full">
             <label htmlFor="field-content">Content — a plain line is a paragraph; blank lines are just for
@@ -138,22 +157,29 @@ export default function ProfessionalBodiesAdmin() {
         {loading ? <p className="admin-loading">Loading…</p> : (
           <div className="admin-table-wrap">
             <table className="admin-table">
-              <thead><tr><th>Order</th><th>Short Name</th><th>Full Name</th><th>Actions</th></tr></thead>
+              <thead><tr><th>Logo</th><th>Order</th><th>Short Name</th><th>Full Name</th><th>Actions</th></tr></thead>
               <tbody>
                 {docs.map((d) => (
                   <tr key={d.id}>
+                    <td>
+                      {d.imageUrl ? (
+                        <img src={d.imageUrl} alt={d.shortName} style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover', border: '1px solid var(--color-light-gray, #d1d5db)' }} />
+                      ) : (
+                        <span className="admin-field__hint" style={{ margin: 0 }}>None</span>
+                      )}
+                    </td>
                     <td>{d.order}</td>
                     <td>{d.shortName}</td>
                     <td>{d.fullName}</td>
                     <td>
                       <button className="admin-btn admin-btn--sm" onClick={() => startEdit(d)}>Edit</button>
-                      <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(d.id)}>Delete</button>
+                      <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(d.id, d.storagePath)}>Delete</button>
                     </td>
                   </tr>
                 ))}
                 {docs.length === 0 && (
                   <tr>
-                    <td colSpan={4} className="admin-empty">
+                    <td colSpan={5} className="admin-empty">
                       No professional bodies yet — the page is showing its original hardcoded content.{' '}
                       <button className="admin-btn admin-btn--sm" onClick={seedDefaults} disabled={seeding}>
                         {seeding ? 'Adding…' : 'Add starter bodies'}

@@ -664,109 +664,103 @@
 }
 
 /* ===== Professional Bodies ===== */
-.pb-list {
+
+/* Logo grid on /research/professional-bodies — 5 per row on desktop,
+   narrowing as the viewport shrinks so tiles never squeeze below a
+   comfortable tap target. */
+.pb-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--space-6) var(--space-4);
+}
+
+@media (max-width: 900px) {
+  .pb-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 520px) {
+  .pb-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.pb-grid-item {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: var(--space-3);
+  text-decoration: none;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  transition: background var(--transition-base);
 }
 
-.pb-item {
+.pb-grid-item:hover,
+.pb-grid-item:focus-visible {
+  background: rgba(27, 67, 50, 0.06);
+}
+
+.pb-grid-item:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.pb-grid-logo {
+  width: 88px;
+  height: 88px;
+  min-width: 48px;
+  min-height: 48px;
+  border-radius: 50%;
   background: var(--color-white);
   border: 1.5px solid var(--color-light-gray);
-  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
-  transition: border-color var(--transition-fast);
+  flex-shrink: 0;
+  transition: box-shadow var(--transition-base), border-color var(--transition-base);
 }
 
-.pb-item.open {
+.pb-grid-item:hover .pb-grid-logo,
+.pb-grid-item:focus-visible .pb-grid-logo {
+  box-shadow: var(--shadow-md);
   border-color: var(--color-primary);
 }
 
-.pb-item-head {
+.pb-grid-logo img {
   width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
-  padding: var(--space-4) var(--space-5);
-  background: var(--color-off-white);
-  border: none;
-  cursor: pointer;
-  text-align: left;
-  transition: background var(--transition-fast);
+  height: 100%;
+  object-fit: contain;
+  padding: var(--space-2);
 }
 
-.pb-item.open .pb-item-head {
-  background: var(--color-primary);
-}
-
-.pb-item-head:hover {
-  background: var(--color-light-gray);
-}
-
-.pb-item.open .pb-item-head:hover {
-  background: var(--color-primary);
-}
-
-.pb-item-head-text {
-  display: flex;
-  align-items: baseline;
-  gap: var(--space-3);
-  flex-wrap: wrap;
-}
-
-.pb-item-short {
+.pb-grid-logo-fallback {
   font-family: var(--font-sans);
-  font-size: var(--text-base);
   font-weight: 800;
+  font-size: var(--text-xs);
   color: var(--color-primary);
+  text-align: center;
+  line-height: 1.2;
+  padding: 0 var(--space-1);
 }
 
-.pb-item.open .pb-item-short {
-  color: var(--color-accent-light);
-}
-
-.pb-item-full {
+.pb-grid-name {
   font-family: var(--font-sans);
+  font-weight: 700;
   font-size: var(--text-sm);
-  font-weight: 500;
-  color: var(--color-text-light);
+  color: var(--color-text);
+  text-align: center;
 }
 
-.pb-item.open .pb-item-full {
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.pb-item-chevron {
-  flex-shrink: 0;
-  color: var(--color-text-light);
-  transition: transform var(--transition-fast), color var(--transition-fast);
-}
-
-.pb-item.open .pb-item-chevron {
-  color: var(--color-white);
-  transform: rotate(180deg);
-}
-
-.pb-item-body {
-  display: grid;
-  grid-template-rows: 0fr;
-  opacity: 0;
-  transition: grid-template-rows 0.3s ease, opacity 0.25s ease;
-}
-
-.pb-item.open .pb-item-body {
-  grid-template-rows: 1fr;
-  opacity: 1;
-}
-
-.pb-item-body-inner {
-  overflow: hidden;
-  min-height: 0;
-}
-
+/* Content blocks (paragraphs/bullets/people/chapter-info/activities) — now
+   rendered on each body's own page (ProfessionalBodyDetail.tsx) via
+   ProfessionalBodyContentBlocks, not inside a collapsible accordion item
+   anymore, so this no longer needs the accordion shell's own padding. */
 .pb-item-content {
-  padding: var(--space-5) var(--space-6) var(--space-6);
+  padding: 0;
 }
 
 .pb-paragraph {
@@ -976,10 +970,6 @@ td.pb-activities-num {
 }
 
 @media (max-width: 640px) {
-  .pb-item-content {
-    padding: var(--space-4) var(--space-4) var(--space-5);
-  }
-
   .pb-person-card {
     min-width: 0;
     flex: 1 1 100%;
