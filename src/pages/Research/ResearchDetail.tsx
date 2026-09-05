@@ -96,6 +96,10 @@ export default function ResearchDetail() {
   };
   const [openProjects, setOpenProjects] = useState<Set<string>>(new Set());
   const [activePatentYear, setActivePatentYear] = useState('');
+  // MoUs only: each group (e.g. "Foreign Universities") shows only its
+  // first 10 partners inline; "+ More" links out to that group's own page
+  // (MousGroupDetail.tsx) with the full list.
+  const MOUS_GROUP_PREVIEW_COUNT = 10;
   const toggleProject = (key: string) => {
     setOpenProjects((prev) => {
       const next = new Set(prev);
@@ -194,6 +198,9 @@ export default function ResearchDetail() {
   // certificates above. A partner with no logo added there just renders
   // without one, nothing else about its row changes.
   const mousPartnerLogoMap = new Map(mousPartnerLogos.map((d) => [d.label.trim(), d.imageUrl]));
+  // A partner's MoU PDF (optional) — when set, clicking their logo opens it
+  // in a new tab; otherwise the tile just isn't a link.
+  const mousPartnerPdfMap = new Map(mousPartnerLogos.map((d) => [d.label.trim(), d.pdfUrl]));
   const projectCategories = item.slug === 'patents'
     ? parsedProjectCategories.map((cat) => ({
         ...cat,
@@ -391,24 +398,43 @@ export default function ResearchDetail() {
                   // > Partners has one for this exact partner, otherwise the
                   // circle just shows the partner's name, same fallback
                   // Professional Bodies uses for a body with no logo yet.
-                  <div className="pb-grid">
-                    {section.rows.map((row, i) => {
-                      const name = (row[0] || '').trim();
-                      const logoUrl = mousPartnerLogoMap.get(name);
-                      return (
-                        <div key={i} className="pb-grid-item">
-                          <span className="pb-grid-logo">
-                            {logoUrl ? (
-                              <img src={logoUrl} alt={name} />
-                            ) : (
-                              <span className="pb-grid-logo-fallback">{name}</span>
-                            )}
-                          </span>
-                          <span className="pb-grid-name">{name}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
+                  <>
+                    <div className="pb-grid pb-grid--mous">
+                      {section.rows.slice(0, MOUS_GROUP_PREVIEW_COUNT).map((row, i) => {
+                        const name = (row[0] || '').trim();
+                        const logoUrl = mousPartnerLogoMap.get(name);
+                        const pdfUrl = mousPartnerPdfMap.get(name);
+                        const content = (
+                          <>
+                            <span className="pb-grid-logo">
+                              {logoUrl ? (
+                                <img src={logoUrl} alt={name} />
+                              ) : (
+                                <span className="pb-grid-logo-fallback">{name}</span>
+                              )}
+                            </span>
+                            <span className="pb-grid-name">{name}</span>
+                          </>
+                        );
+                        return pdfUrl ? (
+                          <a key={i} href={pdfUrl} target="_blank" rel="noopener noreferrer" className="pb-grid-item">
+                            {content}
+                          </a>
+                        ) : (
+                          <div key={i} className="pb-grid-item">
+                            {content}
+                          </div>
+                        );
+                      })}
+                    </div>
+                    {section.rows.length > MOUS_GROUP_PREVIEW_COUNT && (
+                      <div style={{ textAlign: 'center', marginTop: 'var(--space-6)' }}>
+                        <Link to={`/research/mous/${encodeURIComponent(section.title)}`} className="btn btn-outline">
+                          {`+ More (${section.rows.length - MOUS_GROUP_PREVIEW_COUNT})`}
+                        </Link>
+                      </div>
+                    )}
+                  </>
                 ) : (
                 <div style={{ overflowX: 'auto' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm)' }}>
