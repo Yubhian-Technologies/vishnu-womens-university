@@ -50,7 +50,12 @@ const INITIAL_FORM: ContactForm = {
   name: '',
   email: '',
   phone: '',
-  subject: '',
+  // Matches the "Admissions Enquiry" category below, which starts pre-selected
+  // (see the chip grid's `form.category === cat` check) — so the Subject
+  // Summary is in sync with the selected category from the very first render,
+  // not just after a chip is clicked (same subjectForCategory() text, inlined
+  // here since it's declared further down and this runs at module-load time).
+  subject: 'Admissions Enquiry',
   category: 'Admissions Enquiry',
   message: '',
 };
@@ -79,7 +84,13 @@ const CATEGORY_OPTIONS = [
   'Examinations & Transcripts',
   'Research & Collaboration',
   'General Enquiry',
+  'Others',
 ];
+
+// Avoids a doubled-up "Admissions Enquiry Enquiry" for the categories that
+// already end in "Enquiry" — every other category gets " Enquiry" appended
+// so the Subject Summary always reads as a full sentence-like subject line.
+const subjectForCategory = (category: string) => (/enquiry$/i.test(category) ? category : `${category} Enquiry`);
 
 const DEFAULT_INFO_CARDS = [
   {
@@ -181,7 +192,7 @@ export default function Contact() {
   };
 
   const handleCategorySelect = (category: string) => {
-    setForm((prev) => ({ ...prev, category, subject: prev.subject || `${category} Enquiry` }));
+    setForm((prev) => ({ ...prev, category, subject: subjectForCategory(category) }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
