@@ -257,10 +257,18 @@ export default function ResearchItemsAdmin() {
             <label htmlFor="field-key-highlights-one-per-line">Key Highlights (one per line — optional)</label>
             <textarea id="field-key-highlights-one-per-line" rows={4} value={arrayToLines(form.highlights)} onChange={(e) => set('highlights', linesToArray(e.target.value))} />
           </div>
-          <div className="admin-field admin-field--full">
-            <label htmlFor="field-data-table-optional-see-format">Data Table (optional — see format above)</label>
-            <textarea id="field-data-table-optional-see-format" rows={8} value={form.tableText} onChange={(e) => set('tableText', e.target.value)} placeholder={'Name | Role\nDr. G. Srinivasa Rao | Chairman\nProf. P. Venkata Rama Raju | Member'} />
-          </div>
+          {/* Professional Bodies renders its own logo grid + per-body pages
+              (see ProfessionalBodiesSection.tsx / ProfessionalBodyDetail.tsx,
+              fed by the "Professional Bodies" Extra Content sub-section
+              below) instead of this generic table — ResearchDetail.tsx
+              explicitly skips tableText for this slug, so the field would
+              just be dead text with no effect on the public page. */}
+          {form.slug !== 'professional-bodies' && (
+            <div className="admin-field admin-field--full">
+              <label htmlFor="field-data-table-optional-see-format">Data Table (optional — see format above)</label>
+              <textarea id="field-data-table-optional-see-format" rows={8} value={form.tableText} onChange={(e) => set('tableText', e.target.value)} placeholder={'Name | Role\nDr. G. Srinivasa Rao | Chairman\nProf. P. Venkata Rama Raju | Member'} />
+            </div>
+          )}
           {form.slug !== 'consultancy' && (
             <div className="admin-field admin-field--full">
               <label>Expandable Areas (optional — for pages like Thrust Areas of Research that group into
@@ -360,7 +368,7 @@ export default function ResearchItemsAdmin() {
         const ActiveComponent = active.Component;
         return (
           <div className="admin-card">
-            <h2 className="admin-card__title">Extra Content — {form.title}</h2>
+            <h2 className="admin-card__title">{form.title} — Content</h2>
             <p className="admin-field__hint" style={{ marginBottom: '1rem' }}>
               This item has its own extra editable content, shown here while you're editing it.
             </p>
