@@ -61,7 +61,7 @@ export default function SmartInfrastructureShowcase() {
 
           {/* Description */}
           <p className="infra-showcase-desc">
-            VWU combines architectural elegance with next-generation technological infrastructure. From AI-accelerated high-performance computing clusters and semiconductor cleanrooms to our 1,00,000+ volume automated Central Digital Library, multi-cuisine dining, and 24x7 secure smart residences—every facility is crafted to inspire academic mastery and holistic growth.
+            VWU combines architectural elegance with next-generation technological infrastructure. From AI-accelerated high-performance computing clusters and semiconductor Laboratories to our 1,00,000+ volume automated Central Digital Library, multi-cuisine dining, and 24x7 secure smart residences—every facility is crafted to inspire academic mastery and holistic growth.
           </p>
 
           {/* Differentiator category cards */}
