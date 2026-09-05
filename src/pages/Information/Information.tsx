@@ -7,7 +7,7 @@ import { useSitePhotos, useSectionHasPhotos } from '../../hooks/useSitePhotos';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import { CALENDAR_CATEGORIES, type CalendarEntry } from '../Admin/sections/AcademicCalendarAdmin';
 import type { HolidayEntry } from '../Admin/sections/HolidaysAdmin';
-import { Monitor, FileText } from 'lucide-react';
+import { CalendarOff, Monitor, FileText } from 'lucide-react';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import { ICT_RESOURCE_GROUPS } from './ictResources.data';
@@ -149,18 +149,23 @@ export default function Information() {
             <div>
               <h2 className="section-title" style={{ marginBottom: 'var(--space-8)' }}>List of Holidays 2026</h2>
               <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-4)' }}>
-                {holidays.map((h) => (
+                {holidays.length > 0 ? holidays.map((h) => (
                   <div key={h.id} style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
                     <div style={{ background: 'var(--color-primary)', color: 'var(--color-accent)', fontFamily: 'var(--font-serif)', fontWeight: 900, fontSize: '1.3rem', borderRadius: 'var(--radius-sm)', padding: 'var(--space-3)', minWidth: 52, textAlign: 'center', lineHeight: 1 }}>
-                      {h.date.split(' ')[1].replace(',', '')}
-                      <div style={{ fontSize: '0.55rem', color: 'rgba(255,255,255,0.6)', fontFamily: 'var(--font-sans)', fontWeight: 400, letterSpacing: '0.05em', textTransform: 'uppercase' }}>{h.date.split(' ')[0].toUpperCase()}</div>
+                      {h.date ? h.date.split(' ')[1]?.replace(',', '') ?? '' : ''}
+                      <div style={{ fontSize: '0.55rem', color: 'rgba(255,255,255,0.6)', fontFamily: 'var(--font-sans)', fontWeight: 400, letterSpacing: '0.05em', textTransform: 'uppercase' }}>{h.date ? (h.date.split(' ')[0] || '').toUpperCase() : ''}</div>
                     </div>
                     <div>
                       <div style={{ fontFamily: 'var(--font-sans)', fontWeight: 700, color: 'var(--color-primary)', fontSize: 'var(--text-sm)' }}>{h.name}</div>
                       <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)' }}>{h.date}</div>
                     </div>
                   </div>
-                ))}
+                )) : (
+                  <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: 'var(--space-8) 1rem', color: 'var(--color-text-light)' }}>
+                    <CalendarOff size={28} style={{ marginBottom: 'var(--space-3)', opacity: 0.5 }} />
+                    <p style={{ fontSize: 'var(--text-sm)' }}>The holiday list for this year hasn&apos;t been published yet.</p>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -170,12 +175,16 @@ export default function Information() {
             <div>
               <h2 className="section-title" style={{ marginBottom: 'var(--space-6)' }}>Counselling Scheme</h2>
               <ul style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', listStyle: 'none', padding: 0, margin: 0, maxWidth: 820 }}>
-                {counsellingScheme.map((s) => (
+                {counsellingScheme.length > 0 ? counsellingScheme.map((s) => (
                   <li key={s.id} style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
                     <span style={{ flexShrink: 0, width: 8, height: 8, borderRadius: '50% 50% 50% 0', background: 'var(--color-accent)', marginTop: '0.5em' }} />
                     <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.7 }}>{s.desc || s.title}</p>
                   </li>
-                ))}
+                )) : (
+                  <li style={{ textAlign: 'center', padding: 'var(--space-8) 1rem', color: 'var(--color-text-light)' }}>
+                    <p style={{ fontSize: 'var(--text-sm)' }}>The counselling scheme details haven&apos;t been published yet. Please contact the admissions office for assistance.</p>
+                  </li>
+                )}
               </ul>
               <div style={{ textAlign: 'center', marginTop: 'var(--space-8)' }}>
                 <Link to="/admissions" className="btn btn-primary btn-lg">Learn More About Admissions</Link>

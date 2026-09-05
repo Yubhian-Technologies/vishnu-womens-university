@@ -625,6 +625,24 @@
   transform: translateY(-5px);
 }
 
+/* Card whose target isn't an enabled nav destination — shown as static
+   info, so no pointer, lift, or accent-border affordance. */
+.about-discover-card--static {
+  cursor: default;
+}
+
+.about-discover-card--static:hover {
+  border-color: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.03);
+  transform: none;
+}
+
+.about-discover-card--static:hover .about-discover-icon {
+  background: color-mix(in srgb, var(--color-primary) 8%, var(--color-off-white));
+  color: var(--color-primary);
+  transform: none;
+}
+
 .about-discover-icon {
   display: inline-flex;
   align-items: center;

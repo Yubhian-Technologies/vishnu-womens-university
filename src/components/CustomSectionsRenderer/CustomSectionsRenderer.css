@@ -1,0 +1,132 @@
+/* ===== CustomSectionsAccordion — Differentiators detail pages (and any
+   other page reusing this component) =====
+   Google M3-style card: tonal elevation + accent border on open/hover, a
+   rotating chevron instead of the old +/- glyph swap, same collapse timing
+   as the site's other accordions (.thrust-accordion-item / .vm-card). */
+.cs-accordion-item {
+  background: var(--color-white);
+  border: 1.5px solid var(--color-light-gray);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: border-color var(--transition-base), box-shadow var(--transition-base);
+}
+
+.cs-accordion-item:hover {
+  border-color: color-mix(in srgb, var(--color-accent, #c9a84c) 45%, transparent);
+}
+
+.cs-accordion-item.is-open {
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-sm);
+}
+
+.cs-accordion-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  background: none;
+  border: none;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.cs-accordion-trigger:hover,
+.cs-accordion-item.is-open .cs-accordion-trigger {
+  background: var(--color-off-white);
+}
+
+.cs-accordion-trigger:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: -3px;
+}
+
+.cs-accordion-title {
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.cs-accordion-chevron {
+  flex-shrink: 0;
+  color: var(--color-text-light);
+  transition: transform var(--transition-base), color var(--transition-base);
+}
+
+.cs-accordion-item.is-open .cs-accordion-chevron {
+  color: var(--color-accent);
+  transform: rotate(180deg);
+}
+
+.cs-accordion-body {
+  padding: 0 var(--space-5) var(--space-5);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cs-accordion-item,
+  .cs-accordion-chevron {
+    transition: none;
+  }
+}
+
+/* ===== Numeral prefix on each accordion trigger (Team / In-charge /
+   Activities / …) — the same outlined-serif "index" motif as the
+   Differentiators Key Highlights list (see DifferentiatorDetail.css). ===== */
+.cs-accordion-num {
+  font-family: var(--font-serif, Georgia, serif);
+  font-size: 1.15rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--color-accent);
+  flex-shrink: 0;
+}
+
+@supports (-webkit-text-stroke: 1px black) {
+  .cs-accordion-num {
+    color: transparent;
+    -webkit-text-stroke: 1px var(--color-accent);
+  }
+}
+
+.cs-accordion-trigger .cs-accordion-title {
+  flex: 1;
+}
+
+/* ===== Intro "brief" cards — Mission / Vision / Objectives
+   (CustomSectionsIntro). Boxed light cards with an uppercase kicker over a
+   short gold rule, replacing the old thin accent-bar heading. ===== */
+.dh-brief-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-4);
+}
+
+.dh-brief {
+  background: var(--color-off-white);
+  border: 1px solid var(--color-light-gray);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+}
+
+.dh-brief__label {
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  padding-bottom: var(--space-2);
+  margin-bottom: var(--space-3);
+  border-bottom: 2px solid var(--color-accent);
+}
+
+.dh-brief__body {
+  font-size: var(--text-sm);
+  line-height: 1.7;
+  color: var(--color-text);
+}

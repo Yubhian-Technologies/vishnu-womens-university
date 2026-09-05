@@ -69,6 +69,6 @@ const DEFAULT_EAPCET_CODE = 'VISW, VISWPU';
  */
 export function useEapcetCode(): string {
   const stats = useContentBlocks('admission-procedure', 'stats');
-  const item = stats.find((s) => s.title.toLowerCase().includes('eapcet'));
+  const item = stats.find((s) => (s.title || '').toLowerCase().includes('eapcet'));
   return item?.value || DEFAULT_EAPCET_CODE;
 }

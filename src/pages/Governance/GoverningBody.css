@@ -1,8 +1,8 @@
 .governing-body-page {
-  --gb-primary: #002500;
-  --gb-primary-soft: rgba(0, 37, 0, 0.85);
-  --gb-secondary: #F3FFC6;
-  --gb-accent: #FFC594;
+  --gb-primary: #0b1e42;
+  --gb-primary-soft: rgba(11, 30, 66, 0.85);
+  --gb-secondary: #f8fafc;
+  --gb-accent: #C9A84C;
 }
 
 /* ---- Hero ---- */

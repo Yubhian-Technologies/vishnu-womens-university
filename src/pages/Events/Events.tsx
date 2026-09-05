@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Clock, MapPin } from 'lucide-react';
+import { CalendarX2, Clock, MapPin } from 'lucide-react';
 import './Events.css';
 import PageHero from '../../components/PageHero/PageHero';
 import { useHashScroll } from '../../hooks/useHashScroll';
@@ -11,11 +11,11 @@ import { getEventSchema, getBreadcrumbSchema } from '../../lib/seo/schemas';
 
 const categoryColors: Record<string, string> = {
   'Special Events': '#C9A84C',
-  'Academic Events': '#1b4332',
-  'Placements': '#2d6a4f',
-  'Admissions': '#40916c',
-  'Alumni Events': '#081c15',
-  'Sports': '#52b788',
+  'Academic Events': '#0b1e42',
+  'Placements': '#162f5d',
+  'Admissions': '#1e3a8a',
+  'Alumni Events': '#07142c',
+  'Sports': '#0b1e42',
 };
 
 export default function Events() {
@@ -118,6 +118,12 @@ export default function Events() {
               </div>
             ))}
           </div>
+          {featured.length === 0 && (
+            <div style={{ textAlign: 'center', padding: 'var(--space-10) 1rem', color: 'var(--color-text-light)' }}>
+              <CalendarX2 size={28} style={{ marginBottom: 'var(--space-3)', opacity: 0.5 }} />
+              <p style={{ fontSize: 'var(--text-sm)' }}>No featured events have been added yet — check back soon.</p>
+            </div>
+          )}
         </div>
       </section>
 
@@ -208,6 +214,14 @@ export default function Events() {
                   </div>
                 </div>
               ))}
+            </div>
+          )}
+          {filtered.length === 0 && (
+            <div style={{ textAlign: 'center', padding: 'var(--space-10) 1rem', color: 'var(--color-text-light)' }}>
+              <CalendarX2 size={28} style={{ marginBottom: 'var(--space-3)', opacity: 0.5 }} />
+              <p style={{ fontSize: 'var(--text-sm)' }}>
+                {activeCategory === 'All' ? 'No events have been added yet — check back soon.' : `No ${activeCategory} events right now.`}
+              </p>
             </div>
           )}
         </div>

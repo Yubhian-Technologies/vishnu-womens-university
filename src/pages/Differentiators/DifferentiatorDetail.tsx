@@ -1,6 +1,6 @@
 import { useEffect, type CSSProperties, type ReactNode } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
-import { Trophy, Rocket, Factory, Microscope, Globe2, GraduationCap } from 'lucide-react';
+import { Rocket, Factory, Microscope, Globe2, GraduationCap } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import { useOrderedCollection, type WithId } from '../../hooks/useCollection';
@@ -8,9 +8,11 @@ import { usePageBanners } from '../../hooks/usePageBanners';
 import { fetchPriorityAttr } from '../../lib/domAttrs';
 import { CustomSectionsIntro, CustomSectionsAccordion, CustomSectionsPlain, CustomSectionsPills } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import CustomTabsPage, { type TabItem } from '../../components/CustomTabsPage/CustomTabsPage';
+import FacultyCarousel from '../../components/FacultyCarousel/FacultyCarousel';
 import { hasTabContent, type CustomTab } from '../../lib/customTabs';
 import { DIFFERENTIATOR_CATEGORIES } from '../Admin/sections/DifferentiatorsAdmin';
 import type { DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
+import type { FacultyDoc } from '../Academics/Faculty';
 import type { AicteIdeaLabTeamMemberDoc } from '../Admin/sections/AicteIdeaLabTeamAdmin';
 import type { AicteIdeaLabAmbassadorDoc } from '../Admin/sections/AicteIdeaLabAmbassadorsAdmin';
 import { aicteIdeaLab } from './aicteIdeaLab.data';
@@ -19,6 +21,7 @@ import { vehicleDesignLab } from './vehicleDesignLab.data';
 import { talentSprintWise } from './talentSprintWise.data';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import '../detail-layout.css';
+import './DifferentiatorDetail.css';
 
 function IicMemberCard({ name, role, size = 96, photoUrl }: { name: string; role: string; size?: number; photoUrl?: string }) {
   return (
@@ -373,6 +376,7 @@ export default function DifferentiatorDetail() {
   const { docs: allItems, loading } = useOrderedCollection<DifferentiatorItemDoc>('differentiatorItems', 'order');
   const { slides: heroSlides } = usePageBanners('differentiators-detail');
   const { docs: rwtpReportLinkDocs } = useOrderedCollection<WithId & { label: string; fileUrl: string }>('rwtpReportLinks', 'order');
+  const { docs: allFaculty } = useOrderedCollection<FacultyDoc>('faculty', 'order');
   const item = allItems.find((i) => i.slug === slug) ?? null;
   const category = item ? DIFFERENTIATOR_CATEGORIES.find((c) => c.id === item.category) : null;
 
@@ -399,6 +403,7 @@ export default function DifferentiatorDetail() {
   }
 
   const CategoryIcon = CATEGORY_ICONS[category.id] || Rocket;
+  const faculty = item.department ? allFaculty.filter((f) => f.department === item.department) : [];
   const heroImage = item.heroImage || heroSlides[0]?.imageUrl;
   const ideaLab = item.slug === 'aicte-idea-lab' ? aicteIdeaLab : null;
   const iic = item.slug === 'institution-innovation-cell' ? institutionInnovationCell : null;
@@ -448,25 +453,31 @@ export default function DifferentiatorDetail() {
       <section className="section bg-white">
         <div className="container">
           <div className="detail-grid">
-            {/* Main content */}
-            <div>
-              <span className="section-label">Overview</span>
-              <h2 className="section-title" style={{ fontSize: '1.75rem' }}>{`About ${item.title}`}</h2>
-              {item.intro && (
-                <p style={{ fontSize: 'var(--text-lg)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-5)' }}>
-                  {item.intro}
-                </p>
-              )}
-              {item.about && (
-                <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text-light)', lineHeight: 1.75 }}>
-                  {item.about}
-                </p>
-              )}
-              {!item.intro && !item.about && (
-                <p style={{ fontSize: 'var(--text-lg)', color: 'var(--color-text)', lineHeight: 1.75 }}>
-                  {item.desc}
-                </p>
-              )}
+            {/* Main content — same "About the Department" card treatment as
+                the academic department pages (see .dept-about-* in
+                detail-layout.css): accent-bordered gradient card, section
+                label + title header above it. */}
+            <div className="dept-about-main">
+              <div className="dept-about-header">
+                <span className="section-label dept-section-label">Overview</span>
+                <h2 className="section-title">
+                  <span style={{ fontWeight: 400 }}>About </span>
+                  <span style={{ fontWeight: 800 }}>{item.title}</span>
+                </h2>
+              </div>
+
+              <div className="dept-about-card">
+                {item.intro && <p className="dept-about-lead-text">{item.intro}</p>}
+                {item.about && (
+                  <p
+                    className="dept-about-lead-text"
+                    style={{ marginTop: item.intro ? 'var(--space-4)' : 0, color: 'var(--color-text-light)' }}
+                  >
+                    {item.about}
+                  </p>
+                )}
+                {!item.intro && !item.about && <p className="dept-about-lead-text">{item.desc}</p>}
+              </div>
 
               {/* Admin-defined custom sections (see lib/customSections.ts) —
                   used by items whose real content used to be hardcoded with
@@ -479,31 +490,34 @@ export default function DifferentiatorDetail() {
               <CustomSectionsAccordion sections={item.customSections || []} />
             </div>
 
-            {/* Sidebar: key highlights */}
+            {/* Sidebar: key highlights — editorial "spec sheet" card */}
             <div className="detail-sidebar">
-              <div style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', position: 'sticky', top: '110px' }}>
-                <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-4)' }}>
-                  Key Highlights
-                </h3>
-                <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-                  {item.highlights.map((h) => (
-                    <li key={h} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-2)' }}>
-                      <span style={{ width: 20, height: 20, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
-                        <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                      </span>
-                      <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.5 }}>{h}</span>
+              <aside className="dh-card">
+                <div className="dh-card__head">
+                  <h3 className="dh-card__title">Key Highlights</h3>
+                  {(item.highlights || []).length > 0 && (
+                    <span className="dh-card__count">{(item.highlights || []).length}</span>
+                  )}
+                </div>
+                <ol className="dh-list">
+                  {(item.highlights || []).map((h, i) => (
+                    <li key={h} className="dh-list__row">
+                      <span className="dh-list__num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+                      <span className="dh-list__text">{h}</span>
                     </li>
                   ))}
-                </ul>
+                </ol>
                 {item.partners && item.partners.length > 0 && (
-                  <div style={{ marginTop: 'var(--space-5)', paddingTop: 'var(--space-4)', borderTop: '1px solid var(--color-light-gray)' }}>
-                    <p style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--color-text-light)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 'var(--space-2)' }}>Partners</p>
-                    {item.partners.map((p) => (
-                      <span key={p} style={{ display: 'inline-block', fontSize: 'var(--text-xs)', background: 'var(--color-primary)', color: 'var(--color-white)', padding: '0.2rem 0.6rem', borderRadius: 'var(--radius-sm)', marginRight: 'var(--space-1)', marginBottom: 'var(--space-1)' }}>{p}</span>
-                    ))}
+                  <div className="dh-card__foot">
+                    <p className="dh-card__foot-label">In partnership with</p>
+                    <div className="dh-chips">
+                      {item.partners.map((p) => (
+                        <span key={p} className="dh-chip">{p}</span>
+                      ))}
+                    </div>
                   </div>
                 )}
-              </div>
+              </aside>
             </div>
           </div>
         </div>
@@ -548,6 +562,16 @@ export default function DifferentiatorDetail() {
           Student Ambassadors / Facilities navigable from its sidebar). */}
       {ideaLab && <IdeaLabPage tabs={item.tabs || []} />}
 
+      {/* Faculty — shown only when this differentiator is linked to a
+          teaching department (item.department). Reuses the Academics faculty
+          grid + the shared `faculty` collection, so the roster is never
+          re-entered here. No .reveal (Firestore-gated — see CLAUDE.md). */}
+      {faculty.length > 0 && (
+        <div id="faculty" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
+          <FacultyCarousel faculty={faculty} title="Faculty" viewMoreLink="/faculty" />
+        </div>
+      )}
+
       {/* Facilities */}
       {item.facilities && item.facilities.length > 0 && (
         <section className="section bg-off-white">
@@ -556,12 +580,11 @@ export default function DifferentiatorDetail() {
               <span className="section-label">Infrastructure</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Facilities & Equipment</h2>
             </div>
-            <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 'var(--space-4)' }}>
+            <div className="diff-detail-card-grid diff-detail-card-grid--facilities">
               {item.facilities.map((f) => (
-                <div key={f}
-                  style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4)', display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--color-accent)', flexShrink: 0 }} />
-                  <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', fontWeight: 500 }}>{f}</span>
+                <div key={f} className="diff-detail-card">
+                  <div className="diff-detail-card-dot" />
+                  <span className="diff-detail-card-text" style={{ fontWeight: 500 }}>{f}</span>
                 </div>
               ))}
             </div>
@@ -582,12 +605,11 @@ export default function DifferentiatorDetail() {
               <span className="section-label">Impact</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Outcomes & Achievements</h2>
             </div>
-            <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 'var(--space-4)' }}>
-              {item.outcomes.map((o) => (
-                <div key={o}
-                  style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
-                  <Trophy size={20} strokeWidth={1.75} style={{ flexShrink: 0, color: 'var(--color-accent)' }} />
-                  <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6 }}>{o}</span>
+            <div className="dh-outcome-grid">
+              {item.outcomes.map((o, i) => (
+                <div key={o} className="dh-outcome">
+                  <span className="dh-outcome__num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+                  <p className="dh-outcome__text">{o}</p>
                 </div>
               ))}
             </div>

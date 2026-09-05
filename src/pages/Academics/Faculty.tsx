@@ -161,7 +161,7 @@ export default function Faculty() {
   // per-department browsing, but the headline count should reflect distinct
   // people, not distinct department listings.
   const uniqueFacultyCount = useMemo(
-    () => new Set(faculty.map((f) => f.name.trim().toLowerCase())).size,
+    () => new Set(faculty.map((f) => (f.name || '').trim().toLowerCase())).size,
     [faculty]
   );
 
@@ -209,9 +209,9 @@ export default function Faculty() {
                     <div className="faculty-card__top">
                       <span className="faculty-card__arch" aria-hidden="true" />
                       {f.imageUrl ? (
-                        <SmoothImage src={f.imageUrl} alt={f.name} className="faculty-card__photo" />
+                        <SmoothImage src={f.imageUrl} alt={f.name || f.id} className="faculty-card__photo" />
                       ) : (
-                        <div className="faculty-card__avatar">{getInitials(f.name)}</div>
+                        <div className="faculty-card__avatar">{getInitials(f.name || '')}</div>
                       )}
                     </div>
                     <h3 className="faculty-card__name">{f.name}</h3>

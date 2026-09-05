@@ -7,6 +7,7 @@ import { db } from '../../lib/firebase';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { useSiteContact } from '../../hooks/useSiteContact';
+import { uploadFile } from '../../lib/storage';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import type { JobOpeningDoc } from '../Admin/sections/JobOpeningsAdmin';
 
@@ -116,12 +117,24 @@ export default function Careers() {
     setSubmitting(true);
     setSubmitError('');
     try {
+      let resumeUpload: { url: string; path: string } | null = null;
+      if (resume) {
+        try {
+          resumeUpload = await uploadFile(resume, 'vwu/career-applications');
+        } catch {
+          setSubmitError(`Your resume could not be uploaded. Please try again, or email it to ${email} directly.`);
+          return;
+        }
+      }
+
       // Firestore is the system of record for applications — this must
       // succeed for the submission to count. Emailing HR (below) is a
       // best-effort convenience on top of it, not a requirement.
       await addDoc(collection(db, 'careerApplications'), {
         ...form,
         resumeFileName: resume?.name || '',
+        resumeUrl: resumeUpload?.url || '',
+        resumeStoragePath: resumeUpload?.path || '',
         status: 'new',
         createdAt: serverTimestamp(),
       });

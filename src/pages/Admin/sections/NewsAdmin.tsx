@@ -5,7 +5,7 @@ import {
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
 import ImageUploader from '../../../components/ImageUploader/ImageUploader';
-import type { UploadResult } from '../../../lib/storage';
+import { deleteFile, type UploadResult } from '../../../lib/storage';
 
 interface NewsItem {
   id: string;
@@ -40,6 +40,10 @@ export default function NewsAdmin() {
     setSaving(true);
     try {
       if (editing) {
+        const prev = items.find((i) => i.id === editing);
+        if (prev?.storagePath && prev.storagePath !== form.storagePath) {
+          await deleteFile(prev.storagePath).catch(() => {});
+        }
         await updateDoc(doc(db, 'news', editing), { ...form });
       } else {
         await addDoc(collection(db, 'news'), { ...form, createdAt: serverTimestamp() });
@@ -60,7 +64,9 @@ export default function NewsAdmin() {
   const remove = async (id: string) => {
     if (!confirm('Delete this item?')) return;
     try {
+      const item = items.find((i) => i.id === id);
       await deleteDoc(doc(db, 'news', id));
+      if (item?.storagePath) await deleteFile(item.storagePath).catch(() => {});
     } catch (e) {
       alert(`Couldn't delete: ${(e as Error).message}`);
     }

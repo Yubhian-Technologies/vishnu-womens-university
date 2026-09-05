@@ -296,7 +296,15 @@
   margin: 0 1.25rem !important;
 }
 
-@media (min-width: 1024px) {
+/* 1200px, not 1024px — matches where .navbar-mobile-toggle (hamburger)
+   below switches off, and where the "Intermediate Viewports" tightened
+   nav-tab-btn sizing further down already assumes this nav is the one
+   showing. Below 1200px (tablets in landscape, small laptop windows
+   included) the mobile hamburger + drawer is the only nav rendered — the
+   old 1024px threshold left a 1024–1199px zone where both this full
+   9-item desktop row AND the hamburger rendered at once, fighting for
+   space in the same pill. */
+@media (min-width: 1200px) {
   .navbar-nav {
     display: flex;
   }
@@ -1066,9 +1074,13 @@
 }
 
 /* ==========================================================================
-   Responsive Adaptations for Tablet & Mobile (< 1024px)
+   Responsive Adaptations for Tablet & Mobile (< 1200px)
+   Matches the hamburger/drawer nav's own breakpoint above — otherwise a
+   1024–1199px viewport would render the hamburger inside the thin
+   desktop-style pill (72px, less-rounded, opaque glass) instead of the
+   taller rounded glass pill this block designs specifically for it.
    ========================================================================== */
-@media (max-width: 1023px) {
+@media (max-width: 1199px) {
   .navbar-pill {
     height: 84.15px;
     padding: 0 1.052rem 0 1.238rem;

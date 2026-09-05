@@ -317,7 +317,7 @@ function SingleProgramDetail() {
   }
 
   const hasNewsEventsYears = newsEventsCategories.length > 0;
-  const newsletterYears = (program.newsletterYears || []).filter((y) => y.year && y.issues && y.issues.length > 0);
+  const newsletterYears = (dept?.newsletterYears?.length ? dept.newsletterYears : (program.newsletterYears || [])).filter((y) => y.year && y.issues && y.issues.length > 0);
   const hasNewsletter = newsletterYears.length > 0;
   const newsletterMaxIssues = Math.max(0, ...newsletterYears.map((y) => y.issues.length));
   // Only links with both a name and an uploaded PDF are shown — a link
@@ -331,13 +331,15 @@ function SingleProgramDetail() {
   const hasRndStructuredTable = rndStructuredColumns.length > 0 && rndStructuredRows.length > 0;
   const hasRnd = !!program.rndIntro || rndTableSections.length > 0 || rndProjectCategories.length > 0 || rndLinks.length > 0 || hasRndStructuredTable;
   // Individual student Placement Records — admin-imported from Excel/CSV per
-  // Academic Year (see PlacementYearsEditor in ProgramsAdmin.tsx), stored
-  // directly on this programme's own doc. Falls back to the first available
-  // year whenever nothing's been explicitly picked yet.
+  // Academic Year (see PlacementYearsEditor in ProgramsAdmin.tsx), stored on
+  // the department's own doc (that editor saves to departments/{id}), with a
+  // fallback to this programme's per-program field for older entries. Falls
+  // back to the first available year whenever nothing's been explicitly
+  // picked yet.
   // Sorted latest-first regardless of the order admin entries were added in
   // (Firestore array order == insertion order, not chronological) — same
   // convention usePlacementYears.ts already uses for the master dataset.
-  const placementYears = [...(program.placementYears || [])].sort((a, b) => b.year.localeCompare(a.year));
+  const placementYears = [...(dept?.placementYears?.length ? dept.placementYears : (program.placementYears || []))].sort((a, b) => (b.year || '').localeCompare(a.year || ''));
   const activePlacementYear = placementYears.find((y) => y.year === placementYear) ?? placementYears[0];
   const placementColumns = activePlacementYear?.columns || [];
   const placementRows = placementColumns.length > 0 && activePlacementYear
@@ -366,7 +368,7 @@ function SingleProgramDetail() {
   // Individual student Internship Records — same shape/pattern as the
   // Placement Records above (see InternshipYearsEditor in ProgramsAdmin.tsx),
   // just for internships instead of placements.
-  const internshipYears = program.internshipYears || [];
+  const internshipYears = dept?.internshipYears?.length ? dept.internshipYears : (program.internshipYears || []);
   const activeInternshipYear = internshipYears.find((y) => y.year === internshipYear) ?? internshipYears[0];
   const internshipColumns = activeInternshipYear?.columns || [];
   const internshipRows = internshipColumns.length > 0 && activeInternshipYear ? activeInternshipYear.rows || [] : [];
