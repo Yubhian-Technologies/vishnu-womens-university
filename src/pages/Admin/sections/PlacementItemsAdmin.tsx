@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import * as XLSX from 'xlsx';
 import { collection, addDoc, deleteDoc, doc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
@@ -6,6 +7,7 @@ import { CONTENT_ICON_NAMES } from '../../../lib/contentIcons';
 import { deleteFile, type UploadResult } from '../../../lib/storage';
 import TableImportButton from '../../../components/TableImportButton/TableImportButton';
 import { useImageCropModal } from '../../../components/ImageUploader/useImageCropModal';
+import { parseStructuredTable, listStructuredTableYears, mergeStructuredTableByYear } from '../../../lib/structuredTable';
 
 export interface NotablePerson {
   name: string;
@@ -97,6 +99,112 @@ function linesToArray(text: string): string[] {
 }
 function arrayToLines(arr: string[] = []): string {
   return arr.join('\n');
+}
+
+// Column names match exactly what the public Internships page's table shows
+// (see the "List of Internships" table in PlacementDetail.tsx) — Year is
+// deliberately left out since InternshipsDataTableEditor below applies it
+// automatically per import, not from a column in the file.
+const INTERNSHIPS_TEMPLATE_HEADERS = ['Company Name', 'Package', 'No.of Selects'];
+const INTERNSHIPS_TEMPLATE_EXAMPLE_ROWS = [
+  ['TCS', '15000', '20'],
+  ['Infosys', '12000', '15'],
+];
+
+/** Downloads a blank Internships Data Table import template (.xlsx) with the
+ *  expected columns and a couple of example rows. */
+function downloadInternshipsItemTemplate() {
+  const ws = XLSX.utils.aoa_to_sheet([INTERNSHIPS_TEMPLATE_HEADERS, ...INTERNSHIPS_TEMPLATE_EXAMPLE_ROWS]);
+  ws['!cols'] = INTERNSHIPS_TEMPLATE_HEADERS.map((h) => ({ wch: Math.max(h.length, 16) }));
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Internships');
+  XLSX.writeFile(wb, 'internships-data-table-template.xlsx');
+}
+
+// The Internships page's Data Table reuses the generic structured-table shape
+// ("Company | Stipend/Month | No. of Selects | Year") but needs to be
+// editable one Academic Year at a time — plain re-import via the generic
+// TableImportButton (see the non-internships branch below) replaces the
+// *entire* tableText, silently wiping every other year's already-saved rows,
+// which is exactly the "current year data vanishing" bug this editor exists
+// to fix. Years are dynamic (typed here, not a fixed list) and an import
+// always targets exactly one of them, via mergeStructuredTableByYear —
+// re-importing a year only ever replaces that year's own rows.
+function InternshipsDataTableEditor({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [pendingYears, setPendingYears] = useState<string[]>([]);
+  const [newYearLabel, setNewYearLabel] = useState('');
+  const rows = parseStructuredTable(value).flatMap((s) => s.rows);
+  const detectedYears = listStructuredTableYears(value);
+  const years = [...new Set([...detectedYears, ...pendingYears])];
+
+  const addYear = () => {
+    const label = newYearLabel.trim();
+    if (!label) return;
+    if (years.some((y) => y.toLowerCase() === label.toLowerCase())) {
+      alert('That Academic Year already exists.');
+      return;
+    }
+    setPendingYears((p) => [...p, label]);
+    setNewYearLabel('');
+  };
+
+  const removeYear = (year: string) => {
+    if (!confirm(`Remove all internship records for "${year}"? This can't be undone once the page is saved.`)) return;
+    const kept = rows.filter((r) => (r.email || '').trim() !== year);
+    onChange(kept.map((r) => [r.name, r.role, r.notes, r.email || ''].join(' | ')).join('\n'));
+    setPendingYears((p) => p.filter((y) => y !== year));
+  };
+
+  return (
+    <div className="admin-field admin-field--full">
+      <label>Data Table — Internships (grouped by Academic Year)</label>
+      <p className="admin-field__hint" style={{ marginTop: 0 }}>
+        Add an Academic Year below, then import an Excel/CSV file of <code>Company Name | Package | No.of
+        Selects</code> rows for it — download the template below to get the exact columns, fill it in, and
+        upload it back. The Year is applied automatically to every row, so the file itself doesn't need a Year
+        column. Re-importing a year replaces only that year's own rows; every other year's data is left
+        untouched.
+      </p>
+      <div style={{ marginBottom: '0.75rem' }}>
+        <button type="button" className="admin-btn admin-btn--ghost admin-btn--sm" onClick={downloadInternshipsItemTemplate}>
+          ⬇ Download Excel Template
+        </button>
+      </div>
+      <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', margin: '0.5rem 0 1rem' }}>
+        <input
+          value={newYearLabel}
+          onChange={(e) => setNewYearLabel(e.target.value)}
+          onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addYear(); } }}
+          placeholder="e.g. 2025-26"
+          style={{ maxWidth: 220 }}
+        />
+        <button type="button" className="admin-btn admin-btn--primary admin-btn--sm" onClick={addYear}>+ Add Academic Year</button>
+      </div>
+      {years.length === 0 && (
+        <p className="admin-field__hint">No Academic Years yet — add one above to start importing internship records.</p>
+      )}
+      {years.map((year) => {
+        const count = rows.filter((r) => (r.email || '').trim() === year).length;
+        return (
+          <div key={year} style={{ border: '1.5px solid var(--color-light-gray)', borderRadius: 8, padding: '0.75rem', marginBottom: '0.6rem', display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+            <strong style={{ flex: 1 }}>{year}</strong>
+            <span className="admin-field__hint" style={{ margin: 0 }}>{count} record{count === 1 ? '' : 's'}</span>
+            <TableImportButton
+              onImport={(text) => onChange(mergeStructuredTableByYear(value, year, text))}
+              label={count > 0 ? 'Re-import (replaces this year)' : 'Import'}
+            />
+            {count > 0 && (
+              <button type="button" className="admin-btn admin-btn--danger admin-btn--sm" onClick={() => removeYear(year)}>Remove Records</button>
+            )}
+          </div>
+        );
+      })}
+      <details style={{ marginTop: '1rem' }}>
+        <summary className="admin-field__hint" style={{ cursor: 'pointer' }}>View/edit raw Data Table text</summary>
+        <textarea rows={6} value={value} onChange={(e) => onChange(e.target.value)} style={{ marginTop: '0.5rem' }} />
+      </details>
+    </div>
+  );
 }
 
 export default function PlacementItemsAdmin() {
@@ -397,25 +505,29 @@ export default function PlacementItemsAdmin() {
               />
             </div>
           )}
-          <div className="admin-field admin-field--full">
-            <label htmlFor="field-data-table-optional-see-format">
-              Data Table (optional — see format above){form.slug === 'placement-highlights' ? ' — data rows only; headers come from the field above' : ''}
-            </label>
-            <textarea id="field-data-table-optional-see-format" rows={6} value={form.tableText} onChange={(e) => set('tableText', e.target.value)} placeholder={'Amazon | 110000 | 29\nFlipkart | 95000 | 12'} />
-            <div style={{ marginTop: '0.4rem' }}>
-              {form.slug === 'placement-highlights' ? (
-                <TableImportButton
-                  onImportSplit={(headerLine, dataText) => {
-                    set('dataTableHeadersText', headerLine);
-                    set('tableText', dataText);
-                  }}
-                  label="Import Data Table from Excel/CSV"
-                />
-              ) : (
-                <TableImportButton onImport={(text) => set('tableText', text)} label="Import Data Table from Excel/CSV" />
-              )}
+          {form.slug === 'internships' ? (
+            <InternshipsDataTableEditor value={form.tableText} onChange={(v) => set('tableText', v)} />
+          ) : (
+            <div className="admin-field admin-field--full">
+              <label htmlFor="field-data-table-optional-see-format">
+                Data Table (optional — see format above){form.slug === 'placement-highlights' ? ' — data rows only; headers come from the field above' : ''}
+              </label>
+              <textarea id="field-data-table-optional-see-format" rows={6} value={form.tableText} onChange={(e) => set('tableText', e.target.value)} placeholder={'Amazon | 110000 | 29\nFlipkart | 95000 | 12'} />
+              <div style={{ marginTop: '0.4rem' }}>
+                {form.slug === 'placement-highlights' ? (
+                  <TableImportButton
+                    onImportSplit={(headerLine, dataText) => {
+                      set('dataTableHeadersText', headerLine);
+                      set('tableText', dataText);
+                    }}
+                    label="Import Data Table from Excel/CSV"
+                  />
+                ) : (
+                  <TableImportButton onImport={(text) => set('tableText', text)} label="Import Data Table from Excel/CSV" />
+                )}
+              </div>
             </div>
-          </div>
+          )}
           {form.slug === 'placement-highlights' && (
             <div className="admin-field admin-field--full">
               <label>Photo Carousel (optional)</label>
