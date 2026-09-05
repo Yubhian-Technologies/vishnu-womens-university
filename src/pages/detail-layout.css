@@ -678,11 +678,21 @@
   .pb-grid {
     grid-template-columns: repeat(3, 1fr);
   }
+
+  .pb-grid-logo {
+    width: 104px;
+    height: 104px;
+  }
 }
 
 @media (max-width: 520px) {
   .pb-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .pb-grid-logo {
+    width: 88px;
+    height: 88px;
   }
 }
 
@@ -708,8 +718,8 @@
 }
 
 .pb-grid-logo {
-  width: 88px;
-  height: 88px;
+  width: 128px;
+  height: 128px;
   min-width: 48px;
   min-height: 48px;
   border-radius: 50%;
