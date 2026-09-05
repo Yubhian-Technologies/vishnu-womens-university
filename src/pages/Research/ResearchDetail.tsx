@@ -383,6 +383,33 @@ export default function ResearchDetail() {
                     {section.title}
                   </h3>
                 )}
+                {item.slug === 'mous' ? (
+                  // MoUs partners render as the same circular-logo grid as
+                  // Professional Bodies (see .pb-grid in detail-layout.css)
+                  // instead of a table — each partner is one row's single
+                  // "Partner" cell; a logo shows when Research > edit "MoUs"
+                  // > Partners has one for this exact partner, otherwise the
+                  // circle just shows the partner's name, same fallback
+                  // Professional Bodies uses for a body with no logo yet.
+                  <div className="pb-grid">
+                    {section.rows.map((row, i) => {
+                      const name = (row[0] || '').trim();
+                      const logoUrl = mousPartnerLogoMap.get(name);
+                      return (
+                        <div key={i} className="pb-grid-item">
+                          <span className="pb-grid-logo">
+                            {logoUrl ? (
+                              <img src={logoUrl} alt={name} />
+                            ) : (
+                              <span className="pb-grid-logo-fallback">{name}</span>
+                            )}
+                          </span>
+                          <span className="pb-grid-name">{name}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
                 <div style={{ overflowX: 'auto' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm)' }}>
                     <thead>
@@ -397,31 +424,17 @@ export default function ResearchDetail() {
                     <tbody>
                       {section.rows.map((row, i) => (
                         <tr key={i} style={{ background: i % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)', borderBottom: '1px solid var(--color-light-gray)' }}>
-                          {row.map((val, j) => {
-                            // MoUs only: a small circular logo before the
-                            // Partner Name (always column 0), when Research >
-                            // edit "MoUs" > Partner Logos has one for this
-                            // exact partner. Every other research item's
-                            // table is unaffected.
-                            const logoUrl = item.slug === 'mous' && j === 0 ? mousPartnerLogoMap.get(val.trim()) : undefined;
-                            return (
-                              <td key={j} style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)', lineHeight: 1.5 }}>
-                                {logoUrl && (
-                                  <img
-                                    src={logoUrl}
-                                    alt=""
-                                    style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'contain', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', verticalAlign: 'middle', marginRight: 'var(--space-3)' }}
-                                  />
-                                )}
-                                {val}
-                              </td>
-                            );
-                          })}
+                          {row.map((val, j) => (
+                            <td key={j} style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)', lineHeight: 1.5 }}>
+                              {val}
+                            </td>
+                          ))}
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
+                )}
               </div>
             ))}
           </div>
