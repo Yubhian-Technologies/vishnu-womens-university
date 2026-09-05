@@ -58,6 +58,11 @@ export function PlacementYearsEditor({ department }: { department: DepartmentDoc
   // Row drag-to-reorder while in Edit Table mode — index of the row currently
   // being dragged, or null when nothing is being dragged.
   const [dragRow, setDragRow] = useState<number | null>(null);
+  // Renaming an Academic Year's own label (e.g. fixing a typo like
+  // "2024-25" → "2025-26") — separate from Edit Table, which only touches
+  // row data. `renameValue` is a working copy edited in place until Save.
+  const [renamingYear, setRenamingYear] = useState<number | null>(null);
+  const [renameValue, setRenameValue] = useState('');
   // Company / package-sort / page-size filters shown above each year's
   // records table — admin-side view/check only (doesn't touch what's
   // saved), keyed by year index so every year keeps its own independent
@@ -107,6 +112,36 @@ export function PlacementYearsEditor({ department }: { department: DepartmentDoc
       await persistYears(next);
     } catch (e) {
       alert(`Couldn't reorder: ${(e as Error).message}`);
+    }
+  };
+
+  const startRenameYear = (yi: number) => {
+    setRenamingYear(yi);
+    setRenameValue(years[yi].year);
+  };
+
+  const cancelRenameYear = () => {
+    setRenamingYear(null);
+    setRenameValue('');
+  };
+
+  const saveRenameYear = async () => {
+    if (renamingYear === null) return;
+    const yi = renamingYear;
+    const label = renameValue.trim();
+    if (!label) return alert('Academic Year cannot be empty.');
+    if (years.some((y, i) => i !== yi && y.year.trim().toLowerCase() === label.toLowerCase())) {
+      alert('That Academic Year already exists for this programme.');
+      return;
+    }
+    setBusyYear(yi);
+    try {
+      await persistYears(years.map((y, i) => (i === yi ? { ...y, year: label } : y)));
+      cancelRenameYear();
+    } catch (e) {
+      alert(`Couldn't rename Academic Year: ${(e as Error).message}`);
+    } finally {
+      setBusyYear(null);
     }
   };
 
@@ -298,14 +333,34 @@ export function PlacementYearsEditor({ department }: { department: DepartmentDoc
           XLSX.utils.book_append_sheet(wb, ws, y.year || 'Placements');
           XLSX.writeFile(wb, `placements-${(y.year || 'records').replace(/[^\w-]+/g, '_')}.xlsx`);
         };
+        const isRenaming = renamingYear === yi;
 
         return (
           <div key={yi} style={{ border: '1.5px solid var(--color-light-gray)', borderRadius: 8, padding: '1rem', marginBottom: '1rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
-              <strong style={{ flex: 1, fontSize: '1rem' }}>{y.year}</strong>
-              <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveYear(yi, -1)} disabled={yi === 0 || isEditing} title="Move up">↑</button>
-              <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveYear(yi, 1)} disabled={yi === years.length - 1 || isEditing} title="Move down">↓</button>
-              <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeYear(yi)} disabled={busy || isEditing}>Remove Year</button>
+              {isRenaming ? (
+                <>
+                  <input
+                    value={renameValue}
+                    onChange={(e) => setRenameValue(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter') saveRenameYear(); if (e.key === 'Escape') cancelRenameYear(); }}
+                    autoFocus
+                    style={{ flex: 1, maxWidth: 220 }}
+                  />
+                  <button type="button" className="admin-btn admin-btn--sm admin-btn--primary" onClick={saveRenameYear} disabled={busy}>
+                    {busy ? 'Saving…' : 'Save'}
+                  </button>
+                  <button type="button" className="admin-btn admin-btn--sm admin-btn--ghost" onClick={cancelRenameYear} disabled={busy}>Cancel</button>
+                </>
+              ) : (
+                <>
+                  <strong style={{ flex: 1, fontSize: '1rem' }}>{y.year}</strong>
+                  <button type="button" className="admin-btn admin-btn--sm" onClick={() => startRenameYear(yi)} disabled={isEditing} title="Edit Academic Year">Edit Year</button>
+                  <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveYear(yi, -1)} disabled={yi === 0 || isEditing} title="Move up">↑</button>
+                  <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveYear(yi, 1)} disabled={yi === years.length - 1 || isEditing} title="Move down">↓</button>
+                  <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeYear(yi)} disabled={busy || isEditing}>Remove Year</button>
+                </>
+              )}
             </div>
 
             {!isEditing && (
@@ -526,6 +581,10 @@ export function InternshipYearsEditor({ department }: { department: DepartmentDo
   // Row drag-to-reorder while in Edit Table mode — index of the row currently
   // being dragged, or null when nothing is being dragged.
   const [dragRow, setDragRow] = useState<number | null>(null);
+  // Renaming an Academic Year's own label — see PlacementYearsEditor's
+  // identical renamingYear/renameValue for the full reasoning.
+  const [renamingYear, setRenamingYear] = useState<number | null>(null);
+  const [renameValue, setRenameValue] = useState('');
 
   const persistYears = (next: InternshipYearRecord[]) => updateDoc(doc(db, 'departments', department.id), { internshipYears: next });
 
@@ -565,6 +624,36 @@ export function InternshipYearsEditor({ department }: { department: DepartmentDo
       await persistYears(next);
     } catch (e) {
       alert(`Couldn't reorder: ${(e as Error).message}`);
+    }
+  };
+
+  const startRenameYear = (yi: number) => {
+    setRenamingYear(yi);
+    setRenameValue(years[yi].year);
+  };
+
+  const cancelRenameYear = () => {
+    setRenamingYear(null);
+    setRenameValue('');
+  };
+
+  const saveRenameYear = async () => {
+    if (renamingYear === null) return;
+    const yi = renamingYear;
+    const label = renameValue.trim();
+    if (!label) return alert('Academic Year cannot be empty.');
+    if (years.some((y, i) => i !== yi && y.year.trim().toLowerCase() === label.toLowerCase())) {
+      alert('That Academic Year already exists for this programme.');
+      return;
+    }
+    setBusyYear(yi);
+    try {
+      await persistYears(years.map((y, i) => (i === yi ? { ...y, year: label } : y)));
+      cancelRenameYear();
+    } catch (e) {
+      alert(`Couldn't rename Academic Year: ${(e as Error).message}`);
+    } finally {
+      setBusyYear(null);
     }
   };
 
@@ -725,13 +814,34 @@ export function InternshipYearsEditor({ department }: { department: DepartmentDo
         const busy = busyYear === yi;
         const isEditing = editingYear === yi;
 
+        const isRenaming = renamingYear === yi;
+
         return (
           <div key={yi} style={{ border: '1.5px solid var(--color-light-gray)', borderRadius: 8, padding: '1rem', marginBottom: '1rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
-              <strong style={{ flex: 1, fontSize: '1rem' }}>{y.year}</strong>
-              <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveYear(yi, -1)} disabled={yi === 0 || isEditing} title="Move up">↑</button>
-              <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveYear(yi, 1)} disabled={yi === years.length - 1 || isEditing} title="Move down">↓</button>
-              <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeYear(yi)} disabled={busy || isEditing}>Remove Year</button>
+              {isRenaming ? (
+                <>
+                  <input
+                    value={renameValue}
+                    onChange={(e) => setRenameValue(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter') saveRenameYear(); if (e.key === 'Escape') cancelRenameYear(); }}
+                    autoFocus
+                    style={{ flex: 1, maxWidth: 220 }}
+                  />
+                  <button type="button" className="admin-btn admin-btn--sm admin-btn--primary" onClick={saveRenameYear} disabled={busy}>
+                    {busy ? 'Saving…' : 'Save'}
+                  </button>
+                  <button type="button" className="admin-btn admin-btn--sm admin-btn--ghost" onClick={cancelRenameYear} disabled={busy}>Cancel</button>
+                </>
+              ) : (
+                <>
+                  <strong style={{ flex: 1, fontSize: '1rem' }}>{y.year}</strong>
+                  <button type="button" className="admin-btn admin-btn--sm" onClick={() => startRenameYear(yi)} disabled={isEditing} title="Edit Academic Year">Edit Year</button>
+                  <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveYear(yi, -1)} disabled={yi === 0 || isEditing} title="Move up">↑</button>
+                  <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveYear(yi, 1)} disabled={yi === years.length - 1 || isEditing} title="Move down">↓</button>
+                  <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeYear(yi)} disabled={busy || isEditing}>Remove Year</button>
+                </>
+              )}
             </div>
 
             {!isEditing && (
