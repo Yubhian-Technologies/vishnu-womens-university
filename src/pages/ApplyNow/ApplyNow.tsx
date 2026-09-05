@@ -39,7 +39,6 @@ export default function ApplyNow() {
 
       <div className="container apply-now-grid">
         <div className="apply-now-info-col">
-          <img src="/images/logo.png" alt="Vishnu Women's University" className="apply-now-logo" />
           <h1 className="apply-now-headline">
             Academic Excellence. <span>Limitless Possibilities.</span>
           </h1>

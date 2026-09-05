@@ -135,15 +135,9 @@ function PublicApp() {
           No lag, no second loading screen behind the video. */}
       <IntroVideo />
       <Header />
-      <ErrorBoundary key={location.pathname}>
-        {/* Keyed to remount this boundary on every navigation. With
-            v7_startTransition on, React otherwise keeps the previous frame
-            visible (suppressing this fallback) while the new lazy chunk
-            loads — producing the "URL updates but the page never renders"
-            freeze. A fresh boundary has no old frame to hold, so the
-            fallback paints immediately. */}
-        <Suspense key={location.key} fallback={<RouteFallback />}>
-          <Routes location={location} key={location.pathname}>
+      <ErrorBoundary>
+        <Suspense fallback={<RouteFallback />}>
+          <Routes location={location}>
             <Route path="/" element={<LandingPageLoader />} />
             <Route path="/academics" element={<Academics />} />
             <Route path="/academics/downloads" element={<AcademicDownloads />} />
