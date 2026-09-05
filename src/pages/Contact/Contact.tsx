@@ -12,7 +12,6 @@ import {
   Send,
   CheckCircle2,
   AlertCircle,
-  Search,
   ExternalLink,
   ShieldAlert,
   Train,
@@ -218,7 +217,6 @@ export default function Contact() {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
   const [activeTransitTab, setActiveTransitTab] = useState<'train' | 'air' | 'road'>('train');
 
   useEffect(() => {
@@ -261,16 +259,6 @@ export default function Contact() {
       setSubmitting(false);
     }
   };
-
-  // Filtered department contacts
-  const filteredDepts = deptContacts.filter((d) => {
-    const q = searchTerm.toLowerCase();
-    return (
-      d.dept.toLowerCase().includes(q) ||
-      d.hod.toLowerCase().includes(q) ||
-      d.email.toLowerCase().includes(q)
-    );
-  });
 
   return (
     <main className="contact-page">
@@ -733,32 +721,10 @@ export default function Contact() {
                 Contact information for Heads of Departments and evaluation cells.
               </p>
             </div>
-
-            {/* Live Search Filter */}
-            <div className="dept-search-box">
-              <Search size={16} className="dept-search-icon" />
-              <input
-                type="text"
-                placeholder="Search department or HOD..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="dept-search-input"
-                aria-label="Search departments"
-              />
-              {searchTerm && (
-                <button 
-                  type="button" 
-                  className="dept-search-clear" 
-                  onClick={() => setSearchTerm('')}
-                >
-                  ✕
-                </button>
-              )}
-            </div>
           </div>
 
           <div className="dept-grid-clean">
-            {filteredDepts.map((d) => (
+            {deptContacts.map((d) => (
               <div key={d.id} className="dept-card-clean">
                 <div className="dept-card-clean__header">
                   <div className="dept-avatar">
@@ -780,20 +746,6 @@ export default function Contact() {
                 </div>
               </div>
             ))}
-
-            {filteredDepts.length === 0 && (
-              <div className="dept-empty-state">
-                <Search size={28} />
-                <p>No departments matched "<strong>{searchTerm}</strong>".</p>
-                <button 
-                  type="button" 
-                  className="clean-btn clean-btn--sm"
-                  onClick={() => setSearchTerm('')}
-                >
-                  Clear Filter
-                </button>
-              </div>
-            )}
           </div>
         </div>
       </section>

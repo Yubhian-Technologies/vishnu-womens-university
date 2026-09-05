@@ -63,6 +63,11 @@ export interface DifferentiatorItemDoc {
   slug: string;
   title: string;
   category: string;
+  // Optional — set only on a differentiator that maps to one teaching
+  // department (e.g. "Vehicle Design Lab" → ME). When set, DifferentiatorDetail
+  // shows that department's faculty automatically (same `faculty` collection
+  // + filter as ProgramDetail), so rosters never need re-entering here.
+  department: string;
   desc: string;
   summary?: string;
   external: boolean;
@@ -90,11 +95,14 @@ export interface DifferentiatorItemDoc {
 }
 
 const EMPTY: Omit<DifferentiatorItemDoc, 'id'> = {
-  slug: '', title: '', category: 'innovation', desc: '', external: false, url: '',
+  slug: '', title: '', category: 'innovation', department: '', desc: '', external: false, url: '',
   highlights: [], intro: '', about: '', facilities: [], outcomes: [], partners: [],
   customSections: [], tabs: [],
   heroImage: '', heroStoragePath: '', order: 0,
 };
+
+// Same list as ProgramsAdmin.tsx's DEPARTMENTS — keep in sync.
+const DEPARTMENTS = ['CSE', 'AI', 'Cyber Security', 'IT', 'ECE', 'EEE', 'Civil', 'Mechanical', 'MBA'];
 
 export const DIFFERENTIATOR_CATEGORIES = [
   { id: 'innovation', label: 'Innovation & Entrepreneurship' },
@@ -361,7 +369,7 @@ export default function DifferentiatorsAdmin() {
   const startEdit = (it: DifferentiatorItemDoc) => {
     setEditing(it.id);
     const next: Omit<DifferentiatorItemDoc, 'id'> = {
-      slug: it.slug, title: it.title, category: it.category, desc: it.desc || '',
+      slug: it.slug, title: it.title, category: it.category, department: it.department || '', desc: it.desc || '',
       external: !!it.external, url: it.url || '', highlights: it.highlights || [],
       intro: it.intro || '', about: it.about || '', facilities: it.facilities || [],
       outcomes: it.outcomes || [], partners: it.partners || [],
@@ -410,6 +418,13 @@ export default function DifferentiatorsAdmin() {
           <div className="admin-field">
             <label htmlFor="field-display-order">Display Order</label>
             <input id="field-display-order" type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
+          </div>
+          <div className="admin-field">
+            <label htmlFor="field-differentiator-department">Department (optional — auto-shows that department's faculty on the detail page)</label>
+            <input id="field-differentiator-department" list="differentiator-departments" value={form.department} onChange={(e) => set('department', e.target.value)} placeholder="e.g. ECE — leave blank if not department-specific" />
+            <datalist id="differentiator-departments">
+              {DEPARTMENTS.map((d) => <option key={d} value={d} />)}
+            </datalist>
           </div>
           <div className="admin-field">
             <label>

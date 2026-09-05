@@ -240,7 +240,7 @@ const navItemsData: NavItem[] = [
       { label: 'Campus Hostels', path: '/campus/campus-hostels' },
       { label: 'Staff Quarters', path: '/campus/staff-quarters' },
       { label: 'Food Courts & Cafeterias', path: '/campus/food-courts' },
-      { label: 'VISHNU Fitness Centre', path: '/campus/fitness-centre' },
+      { label: 'Vishnu Fitness Centre', path: '/campus/fitness-centre' },
       { label: 'Health Care Centre', path: '/campus/health-care' },
       { label: 'Campus Security', path: '/campus/campus-security' },
       { label: 'Sewage Treatment Plants', path: '/campus/sewage-treatment-plants' },
@@ -303,6 +303,37 @@ const navItemsData: NavItem[] = [
   },
 ];
 
+// ── Single source of truth: "does the main nav actually link here?" ──
+// The About page's "Explore VWU in Detail" cards use this so a card never
+// navigates somewhere the navbar itself won't send a visitor — unbuilt
+// pages are marked `disabled` in navItemsData, and external / download /
+// pure-hash targets aren't real in-app routes. Built lazily and cached.
+let _enabledNavPaths: Set<string> | null = null;
+export function isEnabledNavPath(path: string | undefined | null): boolean {
+  if (!path) return false;
+  const clean = path.split('#')[0];
+  if (!clean || clean.startsWith('http')) return false;
+  if (!_enabledNavPaths) {
+    const set = new Set<string>();
+    const add = (c: { path?: string; external?: boolean; download?: boolean; disabled?: boolean }) => {
+      if (!c.path || c.external || c.download || c.disabled) return;
+      if (c.path.startsWith('http')) return;
+      set.add(c.path.split('#')[0]);
+    };
+    for (const item of navItemsData) {
+      add(item);
+      if (item.highlight?.linkPath) add({ path: item.highlight.linkPath });
+      item.children?.forEach((ch) => { add(ch); ch.subItems?.forEach(add); });
+      item.groups?.forEach((g) => {
+        if (g.groupPath) set.add(g.groupPath.split('#')[0]);
+        g.items.forEach((it) => { add(it); it.subItems?.forEach(add); });
+      });
+    }
+    _enabledNavPaths = set;
+  }
+  return _enabledNavPaths.has(clean);
+}
+
 export default function Header() {
   const [mounted, setMounted] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -337,10 +368,10 @@ export default function Header() {
 
   const { docs: programs } = useOrderedCollection<ProgramDoc>('programs', 'order');
   const isVlsiProgram = (p: ProgramDoc) =>
-    p.slug.toUpperCase() === 'EVT' || /VLSI|VSLI/.test(p.name.toUpperCase());
+    (p.slug || '').toUpperCase() === 'EVT' || /VLSI|VSLI/.test((p.name || '').toUpperCase());
   const programItem = (p: ProgramDoc): NavChild => ({
-    label: p.name,
-    path: isVlsiProgram(p) ? '/academics/ece' : `/academics/${p.slug}`,
+    label: p.name || p.slug || 'Programme',
+    path: isVlsiProgram(p) ? '/academics/ece' : p.slug ? `/academics/${p.slug}` : '/academics',
   });
   const ugProgrammes = programs.filter((p) => p.category === 'btech').map(programItem);
   const pgProgrammes = programs.filter((p) => p.category === 'mtech' || p.category === 'mba').map(programItem);

@@ -54,7 +54,7 @@ export default function Gallery() {
     );
     document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
     return () => observer.disconnect();
-  }, [activeYear, photos]);
+  }, [activeYear]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setLightboxIndex(null); };

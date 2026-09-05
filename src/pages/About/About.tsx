@@ -15,6 +15,7 @@ import {
   Globe, Shield, Activity, ArrowRight
 } from 'lucide-react';
 import { resolveContentIcon } from '../../lib/contentIcons';
+import { isEnabledNavPath } from '../../components/Header/Header';
 import BentoInnovationGrid from '../../components/BentoInnovationGrid/BentoInnovationGrid';
 
 const STAT_ICONS = [Calendar, MapPin, GraduationCap, Users, Briefcase, Award, CheckCircle, Sparkles];
@@ -42,10 +43,11 @@ const defaultCampusPhotos = [
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Central library', caption: 'Central Library' },
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Students studying', caption: 'Student Collaboration' },
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Sports facilities', caption: 'Sports Facilities' },
-  // Slots 5-7: standalone single-image sections below
+  // Slots 5-8: standalone single-image sections below
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'VWU campus Bhimavaram', caption: '' },
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'VWU campus facilities', caption: '' },
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Sri Vishnu Educational Society campus', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Students at Vishnu Women\'s University', caption: '' },
 ];
 
 const defaultHistoryHeritagePhotos = [
@@ -252,33 +254,44 @@ export default function About() {
 
       {/* A University Built for Her Ambition — M3 Quote & Statement Box */}
       <section className="section bg-off-white">
-        <div className="container" style={{ textAlign: 'center' }}>
-          <div className="about-ambition-card reveal" style={{ maxWidth: 840, margin: '0 auto' }}>
-            <span className="section-label" style={{ color: 'var(--color-accent)' }}>Our Commitment</span>
-            <h2 className="section-title" style={{ marginTop: '0.25rem' }}>A University Built for Her Ambition</h2>
-            <p style={{ color: 'var(--color-text-light)', lineHeight: 1.8, marginBottom: 'var(--space-4)', fontSize: '1.02rem' }}>
-              At Vishnu Women's University, education goes beyond classrooms. We create opportunities for young
-              women to discover their potential, pursue their passions, build meaningful careers, and lead with
-              confidence.
-            </p>
-            <p style={{ color: 'var(--color-text-light)', lineHeight: 1.8, marginBottom: 'var(--space-5)', fontSize: '1.02rem' }}>
-              With a strong foundation in education and a forward-looking approach to learning, VWU is committed
-              to shaping women who are ready to make a difference — in industry, research, entrepreneurship,
-              society, and the world.
-            </p>
-            <p style={{ fontFamily: 'var(--font-serif)', fontWeight: 800, fontSize: 'clamp(1.2rem, 2.2vw, 1.5rem)', color: 'var(--color-primary)', margin: 0 }}>
-              Her Education. Her Confidence. Her Future.<br />
-              <span style={{ color: 'var(--color-accent)', fontStyle: 'normal' }}>Her University — Vishnu Women's University.</span>
-            </p>
-            <div className="about-ambition-chips">
-              <div className="about-chip about-chip--accent">
-                <Sparkles size={14} /> 100% Women Focused
-              </div>
-              <div className="about-chip">
-                <Shield size={14} /> Safe Safe Campus
-              </div>
-              <div className="about-chip">
-                <Activity size={14} /> High Impact Research
+        <div className="container">
+          <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-12)', alignItems: 'center' }}>
+            {/* Hardcoded campus-view image — not admin-managed, so this
+                section always has its illustration. */}
+            <div className="sves-image-wrapper reveal-left">
+              <img
+                src="/images/campusview.jpg"
+                alt="Vishnu Women's University campus"
+                style={{ width: '100%', height: '420px', objectFit: 'cover' }}
+              />
+            </div>
+            <div className="about-ambition-card reveal-right">
+              <span className="section-label" style={{ color: 'var(--color-accent)' }}>Our Commitment</span>
+              <h2 className="section-title" style={{ marginTop: '0.25rem' }}>A University Built for Her Ambition</h2>
+              <p style={{ color: 'var(--color-text-light)', lineHeight: 1.8, marginBottom: 'var(--space-4)', fontSize: '1.02rem' }}>
+                At Vishnu Women's University, education goes beyond classrooms. We create opportunities for young
+                women to discover their potential, pursue their passions, build meaningful careers, and lead with
+                confidence.
+              </p>
+              <p style={{ color: 'var(--color-text-light)', lineHeight: 1.8, marginBottom: 'var(--space-5)', fontSize: '1.02rem' }}>
+                With a strong foundation in education and a forward-looking approach to learning, VWU is committed
+                to shaping women who are ready to make a difference — in industry, research, entrepreneurship,
+                society, and the world.
+              </p>
+              <p style={{ fontFamily: 'var(--font-serif)', fontWeight: 800, fontSize: 'clamp(1.2rem, 2.2vw, 1.5rem)', color: 'var(--color-primary)', margin: 0 }}>
+                Her Education. Her Confidence. Her Future.<br />
+                <span style={{ color: 'var(--color-accent)', fontStyle: 'normal' }}>Her University — Vishnu Women's University.</span>
+              </p>
+              <div className="about-ambition-chips" style={{ justifyContent: 'flex-start' }}>
+                <div className="about-chip about-chip--accent">
+                  <Sparkles size={14} /> 100% Women Focused
+                </div>
+                <div className="about-chip">
+                  <Shield size={14} /> Safe Safe Campus
+                </div>
+                <div className="about-chip">
+                  <Activity size={14} /> High Impact Research
+                </div>
               </div>
             </div>
           </div>
@@ -572,15 +585,27 @@ export default function About() {
           <div className="about-discover-grid card-grid">
             {discoverCards.map((item) => {
               const Icon = resolveContentIcon(item.icon) || Target;
-              return (
-                <Link to={item.slug || '/about'} key={item.id} className="about-discover-card">
+              // The navbar is the single source of truth for where we send
+              // visitors — a card only links if its target is a real,
+              // enabled nav destination; otherwise it renders as a static
+              // info card (no redirect) instead of a dead link.
+              const linkable = isEnabledNavPath(item.slug);
+              const body = (
+                <>
                   <span className="about-discover-icon"><Icon size={26} strokeWidth={1.8} /></span>
                   <h3>{item.title}</h3>
                   <p>{item.desc}</p>
-                  <span className="about-discover-link">
-                    Explore <ArrowRight size={13} />
-                  </span>
-                </Link>
+                  {linkable && (
+                    <span className="about-discover-link">
+                      Explore <ArrowRight size={13} />
+                    </span>
+                  )}
+                </>
+              );
+              return linkable ? (
+                <Link to={item.slug} key={item.id} className="about-discover-card">{body}</Link>
+              ) : (
+                <div key={item.id} className="about-discover-card about-discover-card--static">{body}</div>
               );
             })}
           </div>

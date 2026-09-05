@@ -147,6 +147,15 @@ interface Props {
   activeSlug: string;
 }
 
+// Every programme-hub tab now shows for every programme regardless of
+// whether that programme has content for it (consistent tab set across all
+// programmes); this is what a content-less tab's body shows when opened.
+const HUB_TAB_EMPTY = (
+  <p className="section-desc" style={{ margin: 0 }}>
+    Details for this section will be published soon.
+  </p>
+);
+
 /**
  * The shared page for a "grouped" department (AI / CSE / ECE). The top half is
  * common content read from the department's `departments` doc (matched by
@@ -398,16 +407,16 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   const hasAbout = !!shared.about;
   const hasDeptHighlights = shared.highlights.length > 0;
   // Individual student Placement Records — admin-imported from Excel/CSV per
-  // Academic Year (see PlacementYearsEditor in ProgramsAdmin.tsx), stored
-  // directly on this specific programme's own doc (`activeProgram`), so
-  // switching the toggle above shows that programme's own years, never
-  // another programme's or the whole department's. Falls back to the first
-  // available year whenever nothing's been explicitly picked yet, or the
-  // previously-picked year doesn't exist for whichever programme is active.
+  // Academic Year (see PlacementYearsEditor in ProgramsAdmin.tsx). That editor
+  // saves to the department's own doc, so the department's dataset wins for
+  // whichever programme the toggle above has active, with a per-program
+  // fallback for older entries. Falls back to the first available year
+  // whenever nothing's been explicitly picked yet, or the previously-picked
+  // year doesn't exist for whichever programme is active.
   // Sorted latest-first regardless of the order admin entries were added in
   // (Firestore array order == insertion order, not chronological) — same
   // convention usePlacementYears.ts already uses for the master dataset.
-  const placementYears = [...(activeProgram.placementYears || [])].sort((a, b) => b.year.localeCompare(a.year));
+  const placementYears = [...(dept?.placementYears?.length ? dept.placementYears : (activeProgram.placementYears || []))].sort((a, b) => (b.year || '').localeCompare(a.year || ''));
   const activePlacementYear = placementYears.find((y) => y.year === placementYear) ?? placementYears[0];
   const placementColumns = activePlacementYear?.columns || [];
   const placementRows = placementColumns.length > 0 && activePlacementYear
@@ -437,7 +446,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   // Individual student Internship Records — same shape/pattern as the
   // Placement Records above (see InternshipYearsEditor in ProgramsAdmin.tsx),
   // just for internships instead of placements.
-  const internshipYears = activeProgram.internshipYears || [];
+  const internshipYears = dept?.internshipYears?.length ? dept.internshipYears : (activeProgram.internshipYears || []);
   const activeInternshipYear = internshipYears.find((y) => y.year === internshipYear) ?? internshipYears[0];
   const internshipColumns = activeInternshipYear?.columns || [];
   const internshipRows = internshipColumns.length > 0 && activeInternshipYear ? activeInternshipYear.rows || [] : [];
@@ -547,7 +556,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   }
 
   const hasNewsEvents = newsEventsCategories.length > 0;
-  const newsletterYears = (activeProgram.newsletterYears || []).filter((y) => y.year && y.issues && y.issues.length > 0);
+  const newsletterYears = (dept?.newsletterYears?.length ? dept.newsletterYears : (activeProgram.newsletterYears || [])).filter((y) => y.year && y.issues && y.issues.length > 0);
   const hasNewsletter = newsletterYears.length > 0;
   const newsletterMaxIssues = Math.max(0, ...newsletterYears.map((y) => y.issues.length));
   // Research & Development (Funded Projects & Patents) — same per-programme
@@ -1453,57 +1462,49 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                 <span>Curriculum &amp; Structure</span>
               </button>
 
-              {hasOutcomeStatements && (
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={activeHubTab === 'outcomes'}
-                  className={`programme-hub-tab-btn${activeHubTab === 'outcomes' ? ' active' : ''}`}
-                  onClick={() => setActiveHubTab('outcomes')}
-                >
-                  <Award size={17} strokeWidth={2.2} />
-                  <span>{outcomeHeading}</span>
-                </button>
-              )}
+              <button
+                type="button"
+                role="tab"
+                aria-selected={activeHubTab === 'outcomes'}
+                className={`programme-hub-tab-btn${activeHubTab === 'outcomes' ? ' active' : ''}`}
+                onClick={() => setActiveHubTab('outcomes')}
+              >
+                <Award size={17} strokeWidth={2.2} />
+                <span>{outcomeHeading}</span>
+              </button>
 
-              {hasNewsEvents && (
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={activeHubTab === 'news'}
-                  className={`programme-hub-tab-btn${activeHubTab === 'news' ? ' active' : ''}`}
-                  onClick={() => setActiveHubTab('news')}
-                >
-                  <Calendar size={17} strokeWidth={2.2} />
-                  <span>News &amp; Events</span>
-                </button>
-              )}
+              <button
+                type="button"
+                role="tab"
+                aria-selected={activeHubTab === 'news'}
+                className={`programme-hub-tab-btn${activeHubTab === 'news' ? ' active' : ''}`}
+                onClick={() => setActiveHubTab('news')}
+              >
+                <Calendar size={17} strokeWidth={2.2} />
+                <span>News &amp; Events</span>
+              </button>
 
-              {hasNewsletter && (
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={activeHubTab === 'newsletter'}
-                  className={`programme-hub-tab-btn${activeHubTab === 'newsletter' ? ' active' : ''}`}
-                  onClick={() => setActiveHubTab('newsletter')}
-                >
-                  <FileText size={17} strokeWidth={2.2} />
-                  <span>Department Newsletter</span>
-                </button>
-              )}
+              <button
+                type="button"
+                role="tab"
+                aria-selected={activeHubTab === 'newsletter'}
+                className={`programme-hub-tab-btn${activeHubTab === 'newsletter' ? ' active' : ''}`}
+                onClick={() => setActiveHubTab('newsletter')}
+              >
+                <FileText size={17} strokeWidth={2.2} />
+                <span>Department Newsletter</span>
+              </button>
 
-              {hasRnd && (
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={activeHubTab === 'rnd'}
-                  className={`programme-hub-tab-btn${activeHubTab === 'rnd' ? ' active' : ''}`}
-                  onClick={() => setActiveHubTab('rnd')}
-                >
-                  <Microscope size={17} strokeWidth={2.2} />
-                  <span>Research &amp; Development</span>
-                </button>
-              )}
+              <button
+                type="button"
+                role="tab"
+                aria-selected={activeHubTab === 'rnd'}
+                className={`programme-hub-tab-btn${activeHubTab === 'rnd' ? ' active' : ''}`}
+                onClick={() => setActiveHubTab('rnd')}
+              >
+                <Microscope size={17} strokeWidth={2.2} />
+                <span>Research &amp; Development</span>
+              </button>
             </div>
 
             {/* Hub Body Content */}
@@ -1588,6 +1589,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                 </div>
               )}
 
+              {activeHubTab === 'outcomes' && !hasOutcomeStatements && HUB_TAB_EMPTY}
               {activeHubTab === 'outcomes' && hasOutcomeStatements && (
                 <div>
                   <p className="section-desc" style={{ marginBottom: '1.5rem' }}>
@@ -1638,6 +1640,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
 
               {/* News & Events — moved into the hub so it shares this card's
                   tab bar instead of its own standalone section below. */}
+              {activeHubTab === 'news' && !hasNewsEvents && HUB_TAB_EMPTY}
               {activeHubTab === 'news' && hasNewsEvents && (
                 <NewsEventsTabs categories={newsEventsCategories} eyebrow={deptName} navOffset={NAV_OFFSET} embedded />
               )}
@@ -1645,6 +1648,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
               {/* Department Newsletter & Publications — same move; the
                   standalone version's own collapsible header is redundant
                   once this is already gated behind a tab click. */}
+              {activeHubTab === 'newsletter' && !hasNewsletter && HUB_TAB_EMPTY}
               {activeHubTab === 'newsletter' && hasNewsletter && (
                 <div>
                   <p className="section-desc" style={{ marginBottom: 'var(--space-5)' }}>
@@ -1691,6 +1695,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                   move; renders whichever of the four admin fields are
                   filled in (overview paragraph, table(s), project/patent
                   cards, and/or a flat PDF link list). */}
+              {activeHubTab === 'rnd' && !hasRnd && HUB_TAB_EMPTY}
               {activeHubTab === 'rnd' && hasRnd && (
                 <div>
                   <div style={{ marginBottom: 'var(--space-6)' }}>

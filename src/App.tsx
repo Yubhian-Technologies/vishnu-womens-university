@@ -10,6 +10,7 @@ import IntroVideo from './components/IntroVideo/IntroVideo';
 import RouteFallback from './components/RouteFallback/RouteFallback';
 import SEO from './components/SEO/SEO';
 import ThemeOverrides from './components/ThemeOverrides/ThemeOverrides';
+import FirestoreErrorBanner from './components/FirestoreErrorBanner/FirestoreErrorBanner';
 import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
 import { smoothScrollTo } from './lib/smoothScroll';
 
@@ -17,18 +18,32 @@ import { smoothScrollTo } from './lib/smoothScroll';
 // the previous build's hashed filenames 404, and React surfaces that inside
 // <Suspense> as a blank white page that only a manual refresh clears. Here we
 // do that refresh automatically — one hard reload pulls a fresh index.html
-// with current hashes. The sessionStorage guard stops a reload loop if the
-// import keeps failing for some other reason (then the error propagates).
+// with current hashes.
+// Both attempts are also time-bounded: a chunk request that neither resolves
+// nor rejects (stalled network, stuck service worker) would otherwise leave
+// the route transition pending forever — the same "must hard-refresh" symptom.
+// A timeout turns that hang into an ordinary failure, flowing into the
+// retry → reload path below.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('Dynamic import timed out')), ms),
+    ),
+  ]);
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function lazyWithRetry<T extends ComponentType<any>>(factory: () => Promise<{ default: T }>) {
   return lazy(async () => {
     try {
-      return await factory();
+      return await withTimeout(factory(), 20000);
     } catch (err) {
-      console.warn('Lazy chunk import failed, retrying...', err);
+      console.warn('Lazy chunk import failed or timed out, retrying...', err);
       try {
         await new Promise((r) => setTimeout(r, 200));
-        return await factory();
+        return await withTimeout(factory(), 20000);
       } catch (retryErr) {
         console.error('Lazy chunk import failed twice, auto-reloading page:', retryErr);
         window.location.reload();
@@ -120,9 +135,9 @@ function PublicApp() {
           No lag, no second loading screen behind the video. */}
       <IntroVideo />
       <Header />
-      <ErrorBoundary key={location.pathname}>
+      <ErrorBoundary>
         <Suspense fallback={<RouteFallback />}>
-          <Routes location={location} key={location.pathname}>
+          <Routes location={location}>
             <Route path="/" element={<LandingPageLoader />} />
             <Route path="/academics" element={<Academics />} />
             <Route path="/academics/downloads" element={<AcademicDownloads />} />
@@ -189,7 +204,7 @@ function PublicApp() {
           </Routes>
         </Suspense>
       </ErrorBoundary>
-      <Footer />
+      {location.pathname !== '/apply-now' && <Footer />}
     </>
   );
 }
@@ -253,6 +268,7 @@ function RootRouter() {
           — Admin.css never reads these variables, it's a separate hardcoded
           design system (see CLAUDE.md). */}
       <ThemeOverrides />
+      <FirestoreErrorBanner />
       <Routes>
         {/* Admin shell is matched by react-router's own segment-aware routing
             (not a manual pathname.startsWith check, which would also match

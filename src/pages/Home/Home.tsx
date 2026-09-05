@@ -160,25 +160,6 @@ export default function Home() {
     return () => observer.disconnect();
   }, []);
 
-  // Re-run reveal for news cards once Firestore data arrives (they don't exist at initial mount)
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const el = entry.target as HTMLElement;
-            const delay = el.dataset.delay || '0';
-            setTimeout(() => el.classList.add('revealed'), parseInt(delay));
-            observer.unobserve(el);
-          }
-        });
-      },
-      { threshold: 0.08 }
-    );
-    document.querySelectorAll('.news-grid .reveal-bounce').forEach(el => observer.observe(el));
-    return () => observer.disconnect();
-  }, [featuredNews]);
-
   const tilt1 = useTilt(10);
   const tilt2 = useTilt(10);
   const tilt3 = useTilt(10);
@@ -316,7 +297,7 @@ export default function Home() {
           </div>
           <div className="news-grid">
             {featuredNews.map((item, i) => (
-              <div key={item.id} className={`news-grid-item ${i === 0 ? 'news-grid-item--featured' : ''} reveal-bounce`} data-delay={`${i * 110}`}>
+              <div key={item.id} className={`news-grid-item ${i === 0 ? 'news-grid-item--featured' : ''}`}>
                 <NewsCard article={item} isFeatured={i === 0} onReadMore={() => setActiveArticle(item)} />
               </div>
             ))}

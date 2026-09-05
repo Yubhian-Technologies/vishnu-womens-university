@@ -44,20 +44,26 @@ function validateRequestInfoForm(form: RequestInfoForm): RequestInfoFormErrors {
 }
 
 // Firebase Phone Auth needs E.164 ("+<countrycode><number>"). This form has
-// no separate country-code selector, so a bare 10-digit number is assumed to
+// no separate country-code selector, so a bare 10-digit number (or 11-digit starting with 0) is assumed to
 // be Indian; anything the applicant already prefixed with "+" is trusted as-is.
 function toE164(phone: string): string {
   const trimmed = phone.trim();
   if (trimmed.startsWith('+')) return `+${trimmed.slice(1).replace(/\D/g, '')}`;
-  const digits = trimmed.replace(/\D/g, '');
+  let digits = trimmed.replace(/\D/g, '');
+  if (digits.length === 11 && digits.startsWith('0')) {
+    digits = digits.slice(1);
+  }
   return digits.length === 10 ? `+91${digits}` : `+${digits}`;
 }
 
 function friendlyOtpError(err: unknown): string {
-  const code = (err as { code?: string } | undefined)?.code || '';
+  const e = err as { code?: string; message?: string } | undefined;
+  const code = e?.code || '';
+  const message = e?.message || '';
+  console.error('Firebase Phone Auth Error:', err);
   switch (code) {
     case 'auth/invalid-phone-number':
-      return 'Please enter a valid mobile number.';
+      return 'Please enter a valid 10-digit mobile number.';
     case 'auth/too-many-requests':
       return 'Too many attempts — please try again later.';
     case 'auth/invalid-verification-code':
@@ -65,9 +71,12 @@ function friendlyOtpError(err: unknown): string {
     case 'auth/code-expired':
       return 'This OTP has expired. Please request a new one.';
     case 'auth/operation-not-allowed':
-      return 'Mobile verification isn’t enabled yet. Please contact admissions directly.';
+      return 'Mobile verification isn’t enabled yet in Firebase. Please enable Phone Auth in Firebase Console.';
+    case 'auth/captcha-check-failed':
+    case 'auth/invalid-app-credential':
+      return 'reCAPTCHA check failed. Please refresh the page and try again.';
     default:
-      return 'Something went wrong. Please try again.';
+      return message ? `Verification error: ${message.replace(/^Firebase:\s*/, '')}` : 'Something went wrong. Please check your phone number and try again.';
   }
 }
 
@@ -108,6 +117,7 @@ export default function AdmissionApplyForm() {
   const [otpError, setOtpError] = useState<string | null>(null);
   const [sendingOtp, setSendingOtp] = useState(false);
   const [verifying, setVerifying] = useState(false);
+  const [submittingDirect, setSubmittingDirect] = useState(false);
 
   const handleRequestFormChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -136,6 +146,52 @@ export default function AdmissionApplyForm() {
       setOtpError(friendlyOtpError(err));
     } finally {
       setSendingOtp(false);
+    }
+  };
+
+  const handleDirectSubmit = async () => {
+    const validationErrors = validateRequestInfoForm(requestForm);
+    if (Object.keys(validationErrors).length > 0) {
+      setRequestErrors(validationErrors);
+      return;
+    }
+
+    setSubmittingDirect(true);
+    setOtpError(null);
+    try {
+      await addDoc(collection(db, 'admissionInquiries'), {
+        ...requestForm,
+        phoneVerified: false,
+        status: 'new',
+        createdAt: serverTimestamp(),
+      });
+
+      if (EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID_ADMISSIONS && EMAILJS_PUBLIC_KEY) {
+        const templateParams = {
+          first_name: requestForm.firstName,
+          phone: requestForm.phone,
+          program: requestForm.program,
+          purpose: requestForm.purpose,
+        };
+        try {
+          await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID_ADMISSIONS, templateParams, EMAILJS_PUBLIC_KEY);
+        } catch {
+          // Non-fatal — the inquiry is already saved above.
+        }
+      }
+
+      try { await logoutFirebaseAuth(); } catch { /* non-fatal */ }
+
+      setRequestStatus('success');
+      setRequestForm(INITIAL_REQUEST_FORM);
+      setRequestErrors({});
+      setStep('details');
+      setConfirmationResult(null);
+      setOtp('');
+    } catch (err) {
+      setOtpError(`Could not submit inquiry: ${(err as Error).message}`);
+    } finally {
+      setSubmittingDirect(false);
     }
   };
 
@@ -233,12 +289,10 @@ export default function AdmissionApplyForm() {
               aria-invalid={!!requestErrors.program}
             >
               <option value="">Select a program...</option>
-              <option>B.Tech – CSE / AI&ML / AI&DS / Cyber Security</option>
-              <option>B.Tech – ECE / EEE / IT</option>
-              <option>B.Tech – Civil / Mechanical Engineering</option>
-              <option>M.Tech Programs</option>
-              <option>MBA</option>
-              <option>Ph.D. Programs</option>
+              <option value="B.Tech">B.Tech</option>
+              <option value="M.Tech">M.Tech</option>
+              <option value="MBA">MBA</option>
+              <option value="Ph.D.">Ph.D.</option>
             </select>
             {requestErrors.program && <span className="adm-form-error">{requestErrors.program}</span>}
           </div>
@@ -261,7 +315,20 @@ export default function AdmissionApplyForm() {
           <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={sendingOtp}>
             {sendingOtp ? 'Sending OTP…' : 'Send OTP'}
           </button>
-          {otpError && <span className="adm-form-error">{otpError}</span>}
+          {otpError && (
+            <div style={{ marginTop: '0.75rem', padding: '0.75rem', background: '#fff5f5', border: '1px solid #fecaca', borderRadius: '8px', textAlign: 'center' }}>
+              <span className="adm-form-error" style={{ display: 'block', marginBottom: '0.6rem' }}>{otpError}</span>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                style={{ width: '100%', fontSize: '0.82rem', padding: '0.5rem 1rem' }}
+                disabled={submittingDirect}
+                onClick={handleDirectSubmit}
+              >
+                {submittingDirect ? 'Submitting Direct Inquiry…' : 'Submit Inquiry Directly'}
+              </button>
+            </div>
+          )}
         </form>
       ) : (
         <form onSubmit={handleVerifyAndSubmit} className="adm-form" noValidate>

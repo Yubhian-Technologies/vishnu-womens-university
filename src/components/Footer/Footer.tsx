@@ -535,10 +535,9 @@ export default function Footer() {
               target="_blank"
               rel="noopener noreferrer"
               className="vwu-tech-hub-badge-link"
-              aria-label="Vishnu Tech Hub (opens in new tab)"
+              aria-label="Vishnu Tech Hub"
             >
               <strong className="vwu-tech-hub-badge">VISHNU TECH HUB</strong>
-              <ExternalLink size={12} className="vwu-external-glyph" aria-hidden="true" />
             </a>
           </div>
         </div>

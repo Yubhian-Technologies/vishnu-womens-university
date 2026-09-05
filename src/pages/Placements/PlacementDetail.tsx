@@ -840,6 +840,13 @@ export default function PlacementDetail() {
   const [sidebarChartBatch, setSidebarChartBatch] = useState('');
   const sidebarChartYear = placementYearData.find((y) => y.batch === sidebarChartBatch);
 
+  useEffect(() => {
+    setActiveTableRow(null);
+    setInternYearFilter('All');
+    setInternPage(0);
+    setSidebarChartBatch('');
+  }, [slug]);
+
   // No scroll-reveal here — this page's content only renders once the
   // Firestore-backed `item` has loaded (see the gotcha documented in CLAUDE.md).
   useEffect(() => {
@@ -885,8 +892,8 @@ export default function PlacementDetail() {
   // than falling back to treating tableText's own first row as the header
   // when it's blank) means a not-yet-configured page just shows nothing,
   // instead of quietly mistaking a real data row for the header again.
-  const flexibleSections = item.slug === 'placement-highlights' && item.dataTableHeadersText.trim()
-    ? parseFlexibleTable(`${item.dataTableHeadersText}\n${item.tableText}`)
+  const flexibleSections = item.slug === 'placement-highlights' && (item.dataTableHeadersText || '').trim()
+    ? parseFlexibleTable(`${item.dataTableHeadersText || ''}\n${item.tableText || ''}`)
     : [];
   const flexibleHeaders = flexibleSections[0]?.headers ?? [];
   const flexibleRows = flexibleSections.flatMap((s) => s.rows);

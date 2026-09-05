@@ -29,6 +29,7 @@ import SiteContactAdmin from './sections/SiteContactAdmin';
 import ContactMessagesAdmin from './sections/ContactMessagesAdmin';
 import CareerApplicationsAdmin from './sections/CareerApplicationsAdmin';
 import AdmissionInquiriesAdmin from './sections/AdmissionInquiriesAdmin';
+import AdmissionsCrmAdmin from './sections/AdmissionsCrmAdmin';
 import CampusVisitRequestsAdmin from './sections/CampusVisitRequestsAdmin';
 import SvesCampusesAdmin from './sections/SvesCampusesAdmin';
 import DownloadsAdmin from './sections/DownloadsAdmin';
@@ -116,6 +117,7 @@ const SECTION_MAP: Record<string, React.ReactNode> = {
   'content-blocks': <ContentBlocksAdmin />,
   contacts: <ContactsAdmin />,
   'site-contact': <SiteContactAdmin />,
+  crm: <AdmissionsCrmAdmin />,
   'contact-messages': <ContactMessagesAdmin />,
   'career-applications': <CareerApplicationsAdmin />,
   'admission-inquiries': <AdmissionInquiriesAdmin />,
