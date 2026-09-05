@@ -324,6 +324,23 @@ async function parsePlacementsPdf(buf: ArrayBuffer): Promise<PlacementImportResu
   return { columns, rows };
 }
 
+// Strict, whole-file validation — unlike the rest of this file (which
+// happily accepts whatever columns/rows a file has), an import is only
+// accepted here if the header row is exactly the template's columns (any
+// order, case/whitespace-insensitive) — nothing missing, nothing extra.
+// Empty rows/columns/cells are fine and don't affect this check; only the
+// column *names* must match. Returns an error message to show, or null if
+// the file is clean and the caller may proceed to preview/save it.
+export function validatePlacementsImport(result: PlacementImportResult): string | null {
+  const norm = (s: string) => s.trim().toLowerCase();
+  const got = [...result.columns].map(norm).sort();
+  const want = [...PLACEMENT_TEMPLATE_HEADERS].map(norm).sort();
+  if (got.length !== want.length || got.some((c, i) => c !== want[i])) {
+    return `This file's columns don't match the required Placements template (any order is fine, but nothing missing or extra).\n\nExpected: ${PLACEMENT_TEMPLATE_HEADERS.join(', ')}\nFound: ${result.columns.join(', ')}\n\nUse "Download Placements Template" above and fill that file in instead.`;
+  }
+  return null;
+}
+
 export async function parsePlacementsFile(file: File): Promise<PlacementImportResult> {
   const name = file.name.toLowerCase();
   const buf = await file.arrayBuffer();

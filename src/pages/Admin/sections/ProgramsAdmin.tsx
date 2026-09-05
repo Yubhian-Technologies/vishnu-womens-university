@@ -141,6 +141,18 @@ export interface NewsletterYear {
   issues: NewsletterIssue[];
 }
 
+// One Academic Year's worth of Research & Development content — same five
+// optional fields the old flat rndIntro/rndTableText/rndProjectsText/
+// rndLinks/rndStructuredTable block had, just scoped per year now.
+export interface RndYear {
+  year: string;
+  intro?: string;
+  tableText?: string;
+  projectsText?: string;
+  links?: RndLink[];
+  structuredTable?: RndStructuredTable;
+}
+
 export interface ProgramDoc {
   id: string;
   slug: string;
@@ -594,6 +606,11 @@ export default function ProgramsAdmin() {
   };
 
   const startEdit = (p: ProgramDoc) => {
+    // The edit form lives above the list, so without this an admin clicking
+    // "Edit" on a card near the bottom sees nothing happen until they
+    // manually scroll all the way back up themselves. .admin-main (not
+    // window) is the actual scroll container — see AdminLayout.tsx.
+    document.querySelector('.admin-main')?.scrollTo({ top: 0, behavior: 'smooth' });
     setEditing(p.id);
     const next: Omit<ProgramDoc, 'id'> = {
       slug: p.slug, name: p.name, shortName: p.shortName, icon: p.icon || 'GraduationCap',
@@ -636,11 +653,27 @@ export default function ProgramsAdmin() {
   return (
     <div className="admin-section">
       <div className="admin-card">
+        {editing && (
+          <button
+            type="button"
+            className="admin-btn admin-btn--ghost admin-btn--sm"
+            style={{ marginBottom: '0.75rem' }}
+            onClick={() => { setEditing(null); setForm(EMPTY); setOriginalForm(null); }}
+          >
+            ← Back to List
+          </button>
+        )}
         <h2 className="admin-card__title">{editing ? 'Edit Program' : 'Add Program'}</h2>
         <p className="admin-field__hint" style={{ background: '#eef6ff', border: '1px solid #bcdcfd', borderRadius: 6, padding: '0.6rem 0.9rem', marginBottom: '1rem' }}>
           This program's hero image is now edited from <strong>Hero Banners → Programs</strong>, not here.
         </p>
-        <div className="admin-form-grid">
+        {/* Editing an existing program: every section starts collapsed —
+            pick the one you need from the list of headings instead of
+            scrolling a long open form. Adding a new one: Basic Info starts
+            open since there's nothing to navigate to yet. */}
+        <details className="admin-accordion" open={!editing}>
+          <summary className="admin-accordion__summary">Basic Info</summary>
+          <div className="admin-form-grid">
           <div className="admin-field">
             <label htmlFor="field-full-name">Full Name *</label>
             <input id="field-full-name" value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="B.Tech Computer Science and Engineering" />
@@ -692,6 +725,12 @@ export default function ProgramsAdmin() {
             <label htmlFor="field-display-order">Display Order</label>
             <input id="field-display-order" type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
           </div>
+          </div>
+        </details>
+
+        <details className="admin-accordion">
+          <summary className="admin-accordion__summary">About Program</summary>
+          <div className="admin-form-grid">
           <div className="admin-field admin-field--full">
             <label htmlFor="field-about">About the Programme</label>
             <p className="admin-field__hint" style={{ marginTop: 0 }}>
@@ -716,7 +755,12 @@ export default function ProgramsAdmin() {
             <label htmlFor="field-career-outcomes-one-per-line">Career Outcomes (one per line)</label>
             <textarea id="field-career-outcomes-one-per-line" rows={5} value={arrayToLines(form.outcomes)} onChange={(e) => set('outcomes', linesToArray(e.target.value))} placeholder="Software Engineer / Developer" />
           </div>
-          <div className="admin-field admin-field--full"><hr /><h3>Programme Structure (Semester-wise Curriculum)</h3></div>
+          </div>
+        </details>
+
+        <details className="admin-accordion">
+          <summary className="admin-accordion__summary">Programme Structure (Semester-wise Curriculum)</summary>
+          <div className="admin-form-grid">
           <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>
             Each semester can have its own uploaded PDF (e.g. the full syllabus). On the public page, clicking that
             semester's PDF link downloads it directly — a semester with no PDF uploaded just shows its subject list
@@ -791,7 +835,12 @@ export default function ProgramsAdmin() {
             )}
           </div>
 
-          <div className="admin-field admin-field--full"><hr /><h3>PEOs, POs, PSOs & WKs</h3></div>
+          </div>
+        </details>
+
+        <details className="admin-accordion">
+          <summary className="admin-accordion__summary">PEOs, POs, PSOs & WKs</summary>
+          <div className="admin-form-grid">
           <div className="admin-field admin-field--full">
             <label htmlFor="field-programme-educational-objectives-peos-one">Programme Educational Objectives — PEOs (one per line)</label>
             <textarea id="field-programme-educational-objectives-peos-one" rows={4} value={arrayToLines(form.peos)} onChange={(e) => set('peos', linesToArray(e.target.value))} placeholder="Graduates will excel in…" />
@@ -817,7 +866,12 @@ export default function ProgramsAdmin() {
             </p>
           </div>
 
-          <div className="admin-field admin-field--full"><hr /><h3>Mind Map</h3></div>
+          </div>
+        </details>
+
+        <details className="admin-accordion">
+          <summary className="admin-accordion__summary">Mind Map</summary>
+          <div className="admin-form-grid">
           <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>
             Upload one or more Mind Map images — shown as a gallery on the public page — plus, optionally, a PDF version visitors can download.
           </p>
@@ -868,7 +922,12 @@ export default function ProgramsAdmin() {
             </p>
           </div>
 
-          <div className="admin-field admin-field--full"><hr /><h3>Custom Sections</h3></div>
+          </div>
+        </details>
+
+        <details className="admin-accordion">
+          <summary className="admin-accordion__summary">Custom Sections</summary>
+          <div className="admin-form-grid">
           <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>
             Optional. Add any section this programme needs beyond the fixed ones above — any name, any number of
             sub-sections, and a choice of plain text, a table, a list of links, or uploaded files per section. Each
@@ -888,7 +947,8 @@ export default function ProgramsAdmin() {
               onGalleryPhotoRemoved={handleCustomSectionGalleryPhotoRemoved}
             />
           </div>
-        </div>
+          </div>
+        </details>
       </div>
       {mindMapCropModal}
 
@@ -901,6 +961,9 @@ export default function ProgramsAdmin() {
         </div>
       </div>
 
+      {/* Hidden while editing an existing program — nothing else to scroll
+          past, so the section list above is the whole page. */}
+      {!editing && (
       <div className="admin-card">
         <h2 className="admin-card__title">All Programs ({programs.length})</h2>
         <p className="admin-field__hint" style={{ marginBottom: '0.75rem' }}>
@@ -932,7 +995,7 @@ export default function ProgramsAdmin() {
                         <td>{p.intake}</td>
                         <td>{p.accreditation || '—'}</td>
                         <td>
-                          <button className="admin-btn admin-btn--sm" onClick={() => startEdit(p)}>Edit</button>
+                          <button className="admin-btn admin-btn--sm" onClick={() => startEdit(p)}>View</button>
                           <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(p.id)}>Delete</button>
                         </td>
                       </tr>
@@ -945,6 +1008,7 @@ export default function ProgramsAdmin() {
           );
         })}
       </div>
+      )}
     </div>
   );
 }

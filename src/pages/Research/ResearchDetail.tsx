@@ -5,6 +5,7 @@ import { useOrderedCollection } from '../../hooks/useCollection';
 import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import type { ConsultancyReportDoc } from '../Admin/sections/ConsultancyReportsAdmin';
 import type { PatentCertificateDoc } from '../Admin/sections/PatentCertificatesAdmin';
+import type { MousPartnerLogoDoc } from '../Admin/sections/MousPartnerLogosAdmin';
 import { usePageBanners } from '../../hooks/usePageBanners';
 import { fetchPriorityAttr } from '../../lib/domAttrs';
 import { resolveContentIcon } from '../../lib/contentIcons';
@@ -81,6 +82,7 @@ export default function ResearchDetail() {
   const { docs: allItems, loading } = useOrderedCollection<ResearchItemDoc>('researchItems', 'order');
   const { docs: consultancyReports } = useOrderedCollection<ConsultancyReportDoc>('consultancyReports', 'order');
   const { docs: patentCertificates } = useOrderedCollection<PatentCertificateDoc>('patentCertificates', 'order');
+  const { docs: mousPartnerLogos } = useOrderedCollection<MousPartnerLogoDoc>('mousPartnerLogos', 'order');
   const { slides: heroSlides } = usePageBanners('research-detail');
   const item = allItems.find((i) => i.slug === slug) ?? null;
   const [openAreas, setOpenAreas] = useState<Set<string>>(new Set());
@@ -94,6 +96,10 @@ export default function ResearchDetail() {
   };
   const [openProjects, setOpenProjects] = useState<Set<string>>(new Set());
   const [activePatentYear, setActivePatentYear] = useState('');
+  // MoUs only: each group (e.g. "Foreign Universities") shows only its
+  // first 10 partners inline; "+ More" links out to that group's own page
+  // (MousGroupDetail.tsx) with the full list.
+  const MOUS_GROUP_PREVIEW_COUNT = 10;
   const toggleProject = (key: string) => {
     setOpenProjects((prev) => {
       const next = new Set(prev);
@@ -127,7 +133,25 @@ export default function ResearchDetail() {
   const about = item.about || DEFAULT_ABOUT_BY_SLUG[item.slug] || '';
   const aboutBlocks = parseAboutContent(about);
   const tableText = item.tableText || DEFAULT_TABLE_TEXT_BY_SLUG[item.slug] || '';
-  const tableSections = parseFlexibleTable(tableText).filter((s) => s.headers.length > 0);
+  const flexibleTableSections = parseFlexibleTable(tableText).filter((s) => s.headers.length > 0);
+  // MoUs' partner list now lives in its own admin section (Research > edit
+  // "MoUs" > Extra Content > Partners) instead of the Data Table field, so
+  // an admin can attach a small circular logo per partner — grouped into the
+  // same named sections ("Foreign Universities", ...) that field used to
+  // hold. Falls back to the old Data Table text (still intact, just no
+  // longer editable) until an admin clicks that section's one-time "Copy
+  // from Data Table" button, so the page is never blank mid-migration.
+  const mousSections = (() => {
+    const byTitle = new Map<string, string[][]>();
+    const order: string[] = [];
+    mousPartnerLogos.forEach((p) => {
+      const title = p.section || '';
+      if (!byTitle.has(title)) { byTitle.set(title, []); order.push(title); }
+      byTitle.get(title)!.push([p.label]);
+    });
+    return order.map((title) => ({ title, headers: ['Partner'], rows: byTitle.get(title)! }));
+  })();
+  const tableSections = item.slug === 'mous' && mousSections.length > 0 ? mousSections : flexibleTableSections;
   const accordionText = item.accordionText || DEFAULT_ACCORDION_TEXT_OVERRIDE_BY_SLUG[item.slug] || '';
   // Thrust Areas of Research is built up incrementally from the admin (a
   // department shell added now, its research areas/faculty filled in later),
@@ -168,6 +192,15 @@ export default function ResearchDetail() {
   // link with the live certificate for that exact application number, so
   // an admin only ever needs to type the plain number in the text field.
   const patentCertificateMap = new Map(patentCertificates.map((d) => [d.label.trim(), d.fileUrl]));
+  // MoUs' partner logos are admin-managed separately (Research > edit "MoUs"
+  // > Partner Logos) rather than embedded in the Data Table text — matched
+  // to a row by its exact Partner Name, same convention as patent
+  // certificates above. A partner with no logo added there just renders
+  // without one, nothing else about its row changes.
+  const mousPartnerLogoMap = new Map(mousPartnerLogos.map((d) => [d.label.trim(), d.imageUrl]));
+  // A partner's MoU PDF (optional) — when set, clicking their logo opens it
+  // in a new tab; otherwise the tile just isn't a link.
+  const mousPartnerPdfMap = new Map(mousPartnerLogos.map((d) => [d.label.trim(), d.pdfUrl]));
   const projectCategories = item.slug === 'patents'
     ? parsedProjectCategories.map((cat) => ({
         ...cat,
@@ -367,6 +400,52 @@ export default function ResearchDetail() {
                     {section.title}
                   </h3>
                 )}
+                {item.slug === 'mous' ? (
+                  // MoUs partners render as the same circular-logo grid as
+                  // Professional Bodies (see .pb-grid in detail-layout.css)
+                  // instead of a table — each partner is one row's single
+                  // "Partner" cell; a logo shows when Research > edit "MoUs"
+                  // > Partners has one for this exact partner, otherwise the
+                  // circle just shows the partner's name, same fallback
+                  // Professional Bodies uses for a body with no logo yet.
+                  <>
+                    <div className="pb-grid pb-grid--mous">
+                      {section.rows.slice(0, MOUS_GROUP_PREVIEW_COUNT).map((row, i) => {
+                        const name = (row[0] || '').trim();
+                        const logoUrl = mousPartnerLogoMap.get(name);
+                        const pdfUrl = mousPartnerPdfMap.get(name);
+                        const content = (
+                          <>
+                            <span className="pb-grid-logo">
+                              {logoUrl ? (
+                                <img src={logoUrl} alt={name} />
+                              ) : (
+                                <span className="pb-grid-logo-fallback">{name}</span>
+                              )}
+                            </span>
+                            <span className="pb-grid-name">{name}</span>
+                          </>
+                        );
+                        return pdfUrl ? (
+                          <a key={i} href={pdfUrl} target="_blank" rel="noopener noreferrer" className="pb-grid-item">
+                            {content}
+                          </a>
+                        ) : (
+                          <div key={i} className="pb-grid-item">
+                            {content}
+                          </div>
+                        );
+                      })}
+                    </div>
+                    {section.rows.length > MOUS_GROUP_PREVIEW_COUNT && (
+                      <div style={{ textAlign: 'center', marginTop: 'var(--space-6)' }}>
+                        <Link to={`/research/mous/${encodeURIComponent(section.title)}`} className="btn btn-outline">
+                          {`+ More (${section.rows.length - MOUS_GROUP_PREVIEW_COUNT})`}
+                        </Link>
+                      </div>
+                    )}
+                  </>
+                ) : (
                 <div style={{ overflowX: 'auto' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm)' }}>
                     <thead>
@@ -391,6 +470,7 @@ export default function ResearchDetail() {
                     </tbody>
                   </table>
                 </div>
+                )}
               </div>
             ))}
           </div>

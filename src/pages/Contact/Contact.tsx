@@ -26,6 +26,7 @@ import {
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { usePageBanner } from '../../hooks/usePageBanner';
+import { useSiteContact, DEFAULT_PHONE } from '../../hooks/useSiteContact';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import type { ContactDoc } from '../Admin/sections/ContactsAdmin';
 import './Contact.css';
@@ -52,7 +53,10 @@ const INITIAL_FORM: ContactForm = {
   name: '',
   email: '',
   phone: '',
-  subject: '',
+  // Matches the "Admissions Enquiry" category below, which starts pre-selected,
+  // so the Subject Summary is in sync with the selected category from the
+  // very first render, not just after the category dropdown changes.
+  subject: 'Admissions Enquiry',
   category: 'Admissions Enquiry',
   message: '',
 };
@@ -81,6 +85,7 @@ const CATEGORY_OPTIONS = [
   'Examinations & Transcripts',
   'Research & Collaboration',
   'General Enquiry',
+  'Others',
 ];
 
 const DEFAULT_INFO_CARDS = [
@@ -149,10 +154,18 @@ export default function Contact() {
   const { docs: liveDeptContacts } = useOrderedCollection<ContactDoc>('contacts', 'order');
   const liveInfoCards = useContentBlocks('contact', 'infoCards');
   const liveSocialLinks = useContentBlocks('contact', 'socialLinks');
+  const { email: siteEmail, phone: sitePhone } = useSiteContact();
+  const defaultPhoneDigits = DEFAULT_PHONE.replace(/\D/g, '');
   const banner = usePageBanner('contact');
 
+  // Two independent info-card fixes compose here, in order: legacy email
+  // domains and a missing admissions address get normalized first (our
+  // guardrails below), then the live Site Contact Info substitution
+  // (origin/main, further down) runs on top of that already-normalized
+  // text — so a card can be both "fixed up" and still track the
+  // admin-managed phone/email as the single source of truth.
   const rawInfoCards = liveInfoCards.length > 0 ? liveInfoCards : DEFAULT_INFO_CARDS;
-  const infoCards = rawInfoCards.map((c) => {
+  const infoCardsLegacyNormalized = rawInfoCards.map((c) => {
     let desc = c.desc ? c.desc.replace(/@vishnu\.edu\.in|@srivishnu\.edu\.in|@svecw\.edu\.in/gi, '@vwu.edu.in') : '';
     if ((c.title.toLowerCase().includes('admission') || c.title.toLowerCase().includes('quick info')) && !desc.includes('admissions@vwu.edu.in')) {
       desc = desc ? `Email: admissions@vwu.edu.in\n${desc}` : 'Email: admissions@vwu.edu.in';
@@ -179,6 +192,26 @@ export default function Contact() {
     };
   });
   const socialLinks = liveSocialLinks.length > 0 ? liveSocialLinks : DEFAULT_SOCIAL_LINKS;
+  // These info cards are admin-typed freeform text (title/desc), but any
+  // line that's exactly an email address or exactly the site's old default
+  // phone number is meant to always track Admin → Site Contact Info instead
+  // of whatever was typed here — matched line-by-line (not a wholesale
+  // desc replace) so unrelated lines survive untouched, e.g. "Mon–Sat: 9 AM
+  // – 5 PM" under the email, or the distinct Society Headquarters numbers
+  // (different digits entirely, so they never match and are left alone).
+  const infoCards = infoCardsLegacyNormalized.map((c) => {
+    const isEmailCard = c.title.toLowerCase().includes('email');
+    const desc = c.desc
+      .split('\n')
+      .map((line) => {
+        const trimmed = line.trim();
+        if (isEmailCard && /^\S+@\S+\.\S+$/.test(trimmed)) return siteEmail;
+        if (trimmed.replace(/\D/g, '') === defaultPhoneDigits) return sitePhone;
+        return line;
+      })
+      .join('\n');
+    return { ...c, desc };
+  });
 
   const [form, setForm] = useState<ContactForm>(INITIAL_FORM);
   const [errors, setErrors] = useState<ContactFormErrors>({});

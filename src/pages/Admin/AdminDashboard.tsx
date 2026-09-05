@@ -1,3 +1,4 @@
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { SECTIONS } from './AdminLayout';
 import Overview from './sections/Overview';
 import ThemeAdmin from './sections/ThemeAdmin';
@@ -24,6 +25,7 @@ import CampusLifeAdmin from './sections/CampusLifeAdmin';
 import JobOpeningsAdmin from './sections/JobOpeningsAdmin';
 import ContentBlocksAdmin from './sections/ContentBlocksAdmin';
 import ContactsAdmin from './sections/ContactsAdmin';
+import SiteContactAdmin from './sections/SiteContactAdmin';
 import ContactMessagesAdmin from './sections/ContactMessagesAdmin';
 import CareerApplicationsAdmin from './sections/CareerApplicationsAdmin';
 import AdmissionInquiriesAdmin from './sections/AdmissionInquiriesAdmin';
@@ -49,13 +51,15 @@ import TpoTeamPhotosAdmin from './sections/TpoTeamPhotosAdmin';
 import IloOfficePhotosAdmin from './sections/IloOfficePhotosAdmin';
 import RecruiterLogosAdmin from './sections/RecruiterLogosAdmin';
 import GsacPhotosAdmin from './sections/GsacPhotosAdmin';
+import UsersRolesAdmin from './sections/UsersRolesAdmin';
 import { useAdminSession } from './AdminSessionContext';
 import ReadOnlyGate from './ReadOnlyGate';
-import { canEdit, RESOURCES, type ResourceKey } from '../../lib/rbac';
+import { canEdit, canWriteModule, RESOURCES, type ResourceKey } from '../../lib/rbac';
 
 interface Props {
   activeSection: string;
   setActiveSection: (id: string) => void;
+  visibleSectionIds: Set<string>;
 }
 
 // Sections wholly dedicated to Placements — a department account holding the
@@ -111,6 +115,7 @@ const SECTION_MAP: Record<string, React.ReactNode> = {
   'job-openings': <JobOpeningsAdmin />,
   'content-blocks': <ContentBlocksAdmin />,
   contacts: <ContactsAdmin />,
+  'site-contact': <SiteContactAdmin />,
   'contact-messages': <ContactMessagesAdmin />,
   'career-applications': <CareerApplicationsAdmin />,
   'admission-inquiries': <AdmissionInquiriesAdmin />,
@@ -136,31 +141,45 @@ const SECTION_MAP: Record<string, React.ReactNode> = {
   'research-items': <ResearchItemsAdmin />,
   'compliance-docs': <ComplianceDocsAdmin />,
   policies: <PoliciesAdmin />,
+  'users-roles': <UsersRolesAdmin />,
 };
 
-export default function AdminDashboard({ activeSection, setActiveSection }: Props) {
+export default function AdminDashboard({ activeSection, setActiveSection, visibleSectionIds }: Props) {
   const session = useAdminSession();
   const current = SECTIONS.find((s) => s.id === activeSection);
 
   const selfGated = SELF_GATED_SECTIONS.has(activeSection) || UNGATED_SECTIONS.has(activeSection);
   const mappedResource = SECTION_RESOURCE[activeSection];
-  const sectionEditable = mappedResource ? canEdit(session, mappedResource) : !!session?.isAdmin;
+  // Legacy Placements resources and the newer per-module `modules` map both
+  // grant write access — either is enough (a Placements-role account is
+  // provisioned through `modules` now, but older Placements docs still use
+  // `resources`, and both should keep working).
+  const sectionEditable = mappedResource
+    ? canEdit(session, mappedResource)
+    : (!!session?.isAdmin || canWriteModule(session, activeSection));
   const readOnly = !selfGated && !sectionEditable;
+  // Defense in depth beyond the sidebar hiding it: even a hand-typed
+  // ?section=users-roles must not render for a non-Super-Admin session.
+  const canSeeUsersRoles = activeSection !== 'users-roles' || !!session?.isSuperAdmin;
 
   return (
     <div className="admin-content">
       <div className="admin-content__header">
-        <h1><span aria-hidden="true">{current?.icon}</span> {current?.label}</h1>
+        <h1>{current && <FontAwesomeIcon icon={current.icon} aria-hidden="true" />} {current?.label}</h1>
         {readOnly && <span className="admin-badge admin-badge--gray"><span aria-hidden="true">🔒</span> Read Only</span>}
       </div>
       <div className="admin-content__body">
-        <ReadOnlyGate readOnly={readOnly}>
-          {SECTION_MAP[activeSection] ?? <Overview />}
-        </ReadOnlyGate>
+        {canSeeUsersRoles ? (
+          <ReadOnlyGate readOnly={readOnly}>
+            {SECTION_MAP[activeSection] ?? <Overview />}
+          </ReadOnlyGate>
+        ) : (
+          <p className="admin-field__hint">You don't have access to this section.</p>
+        )}
       </div>
       {/* Mobile bottom nav */}
       <nav className="admin-bottom-nav" aria-label="Admin sections">
-        {SECTIONS.map((s) => {
+        {SECTIONS.filter((s) => visibleSectionIds.has(s.id)).map((s) => {
           const isActive = activeSection === s.id;
           return (
             <button
@@ -169,7 +188,7 @@ export default function AdminDashboard({ activeSection, setActiveSection }: Prop
               onClick={() => setActiveSection(s.id)}
               aria-current={isActive ? 'page' : undefined}
             >
-              <span aria-hidden="true">{s.icon}</span>
+              <FontAwesomeIcon icon={s.icon} aria-hidden="true" />
               <span>{s.label}</span>
             </button>
           );

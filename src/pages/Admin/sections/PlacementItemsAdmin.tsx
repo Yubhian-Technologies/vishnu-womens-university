@@ -1,11 +1,13 @@
-import { useState } from 'react';
-import { collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { useEffect, useState } from 'react';
+import * as XLSX from 'xlsx';
+import { collection, addDoc, deleteDoc, doc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
 import { CONTENT_ICON_NAMES } from '../../../lib/contentIcons';
 import { deleteFile, type UploadResult } from '../../../lib/storage';
 import TableImportButton from '../../../components/TableImportButton/TableImportButton';
 import { useImageCropModal } from '../../../components/ImageUploader/useImageCropModal';
+import { parseStructuredTable, listStructuredTableYears, mergeStructuredTableByYear } from '../../../lib/structuredTable';
 
 export interface NotablePerson {
   name: string;
@@ -13,6 +15,27 @@ export interface NotablePerson {
   imageUrl: string;
   storagePath: string;
 }
+
+/** A named column of the header's Placements mega-menu — fully admin-
+ *  managed (add/rename/reorder/delete below), read live by Header.tsx.
+ *  `id` is the Firestore doc id; placement items reference it by id via
+ *  their own `menuColumn` field so renaming a column never requires
+ *  touching every item assigned to it. */
+export interface PlacementMenuColumnDoc {
+  id: string;
+  label: string;
+  order: number;
+}
+
+/** Seeded once, automatically, the first time this admin section loads and
+ *  finds the collection empty — using these exact ids so any items already
+ *  carrying the old fixed-column values ('explore'/'quick'/'facilities')
+ *  keep showing under the matching column with no migration step. */
+export const DEFAULT_PLACEMENT_MENU_COLUMNS: { id: string; label: string; order: number }[] = [
+  { id: 'explore', label: 'Explore Directory', order: 0 },
+  { id: 'quick', label: 'Quick Access', order: 1 },
+  { id: 'facilities', label: 'Key Facilities', order: 2 },
+];
 
 export interface PlacementItemDoc {
   id: string;
@@ -50,6 +73,10 @@ export interface PlacementItemDoc {
   heroImage: string;
   heroStoragePath: string;
   order: number;
+  /** Id of the PlacementMenuColumnDoc this item shows under in the header's
+   *  Placements mega-menu. Items without a match (unset, or referencing a
+   *  since-deleted column) fall back to the first column in Header.tsx. */
+  menuColumn?: string;
   /** Only used on the "placement-highlights" page — the "Photo Carousel":
    *  a horizontally scrolling strip of photo cards (name + subtitle under
    *  each), shown below the Data Table. Free-form crop, not a fixed ratio —
@@ -64,6 +91,7 @@ const EMPTY: Omit<PlacementItemDoc, 'id'> = {
   slug: '', title: '', icon: 'BarChart3', desc: '', external: false, url: '',
   intro: '', about: '', highlights: [], outcomes: [], partners: [], tableText: '', dataTableHeadersText: '', rosterGroupsText: '',
   deptCoordinatorsText: '', deptCoordinatorGroupsText: '', emails: [], linkedins: [], heroImage: '', heroStoragePath: '', notablePeople: [], order: 0,
+  menuColumn: 'explore',
 };
 
 function linesToArray(text: string): string[] {
@@ -73,11 +101,193 @@ function arrayToLines(arr: string[] = []): string {
   return arr.join('\n');
 }
 
+// Column names match exactly what the public Internships page's table shows
+// (see the "List of Internships" table in PlacementDetail.tsx) — Year is
+// deliberately left out since InternshipsDataTableEditor below applies it
+// automatically per import, not from a column in the file.
+const INTERNSHIPS_TEMPLATE_HEADERS = ['Company Name', 'Package', 'No.of Selects'];
+const INTERNSHIPS_TEMPLATE_EXAMPLE_ROWS = [
+  ['TCS', '15000', '20'],
+  ['Infosys', '12000', '15'],
+];
+
+/** Downloads a blank Internships Data Table import template (.xlsx) with the
+ *  expected columns and a couple of example rows. */
+function downloadInternshipsItemTemplate() {
+  const ws = XLSX.utils.aoa_to_sheet([INTERNSHIPS_TEMPLATE_HEADERS, ...INTERNSHIPS_TEMPLATE_EXAMPLE_ROWS]);
+  ws['!cols'] = INTERNSHIPS_TEMPLATE_HEADERS.map((h) => ({ wch: Math.max(h.length, 16) }));
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Internships');
+  XLSX.writeFile(wb, 'internships-data-table-template.xlsx');
+}
+
+// The Internships page's Data Table reuses the generic structured-table shape
+// ("Company | Stipend/Month | No. of Selects | Year") but needs to be
+// editable one Academic Year at a time — plain re-import via the generic
+// TableImportButton (see the non-internships branch below) replaces the
+// *entire* tableText, silently wiping every other year's already-saved rows,
+// which is exactly the "current year data vanishing" bug this editor exists
+// to fix. Years are dynamic (typed here, not a fixed list) and an import
+// always targets exactly one of them, via mergeStructuredTableByYear —
+// re-importing a year only ever replaces that year's own rows.
+function InternshipsDataTableEditor({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [pendingYears, setPendingYears] = useState<string[]>([]);
+  const [newYearLabel, setNewYearLabel] = useState('');
+  const rows = parseStructuredTable(value).flatMap((s) => s.rows);
+  const detectedYears = listStructuredTableYears(value);
+  const years = [...new Set([...detectedYears, ...pendingYears])];
+
+  const addYear = () => {
+    const label = newYearLabel.trim();
+    if (!label) return;
+    if (years.some((y) => y.toLowerCase() === label.toLowerCase())) {
+      alert('That Academic Year already exists.');
+      return;
+    }
+    setPendingYears((p) => [...p, label]);
+    setNewYearLabel('');
+  };
+
+  const removeYear = (year: string) => {
+    if (!confirm(`Remove all internship records for "${year}"? This can't be undone once the page is saved.`)) return;
+    const kept = rows.filter((r) => (r.email || '').trim() !== year);
+    onChange(kept.map((r) => [r.name, r.role, r.notes, r.email || ''].join(' | ')).join('\n'));
+    setPendingYears((p) => p.filter((y) => y !== year));
+  };
+
+  return (
+    <div className="admin-field admin-field--full">
+      <label>Data Table — Internships (grouped by Academic Year)</label>
+      <p className="admin-field__hint" style={{ marginTop: 0 }}>
+        Add an Academic Year below, then import an Excel/CSV file of <code>Company Name | Package | No.of
+        Selects</code> rows for it — download the template below to get the exact columns, fill it in, and
+        upload it back. The Year is applied automatically to every row, so the file itself doesn't need a Year
+        column. Re-importing a year replaces only that year's own rows; every other year's data is left
+        untouched.
+      </p>
+      <div style={{ marginBottom: '0.75rem' }}>
+        <button type="button" className="admin-btn admin-btn--ghost admin-btn--sm" onClick={downloadInternshipsItemTemplate}>
+          ⬇ Download Excel Template
+        </button>
+      </div>
+      <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', margin: '0.5rem 0 1rem' }}>
+        <input
+          value={newYearLabel}
+          onChange={(e) => setNewYearLabel(e.target.value)}
+          onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addYear(); } }}
+          placeholder="e.g. 2025-26"
+          style={{ maxWidth: 220 }}
+        />
+        <button type="button" className="admin-btn admin-btn--primary admin-btn--sm" onClick={addYear}>+ Add Academic Year</button>
+      </div>
+      {years.length === 0 && (
+        <p className="admin-field__hint">No Academic Years yet — add one above to start importing internship records.</p>
+      )}
+      {years.map((year) => {
+        const count = rows.filter((r) => (r.email || '').trim() === year).length;
+        return (
+          <div key={year} style={{ border: '1.5px solid var(--color-light-gray)', borderRadius: 8, padding: '0.75rem', marginBottom: '0.6rem', display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+            <strong style={{ flex: 1 }}>{year}</strong>
+            <span className="admin-field__hint" style={{ margin: 0 }}>{count} record{count === 1 ? '' : 's'}</span>
+            <TableImportButton
+              onImport={(text) => onChange(mergeStructuredTableByYear(value, year, text))}
+              label={count > 0 ? 'Re-import (replaces this year)' : 'Import'}
+            />
+            {count > 0 && (
+              <button type="button" className="admin-btn admin-btn--danger admin-btn--sm" onClick={() => removeYear(year)}>Remove Records</button>
+            )}
+          </div>
+        );
+      })}
+      <details style={{ marginTop: '1rem' }}>
+        <summary className="admin-field__hint" style={{ cursor: 'pointer' }}>View/edit raw Data Table text</summary>
+        <textarea rows={6} value={value} onChange={(e) => onChange(e.target.value)} style={{ marginTop: '0.5rem' }} />
+      </details>
+    </div>
+  );
+}
+
 export default function PlacementItemsAdmin() {
   const { docs: items, loading } = useOrderedCollection<PlacementItemDoc>('placementItems', 'order');
   const [form, setForm] = useState<Omit<PlacementItemDoc, 'id'>>(EMPTY);
   const [editing, setEditing] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+
+  // Navbar Menu Columns — auto-provisioned the same way LandingPagesAdmin
+  // seeds registry entries: if the collection is empty on first load, write
+  // the 3 default columns so this feature works immediately with no manual
+  // Firestore setup, and existing items' 'explore'/'quick'/'facilities'
+  // values keep resolving to the right column.
+  const { docs: menuColumns, loading: columnsLoading } = useOrderedCollection<PlacementMenuColumnDoc>('placementMenuColumns', 'order');
+  const [columnsSeeded, setColumnsSeeded] = useState(false);
+  useEffect(() => {
+    if (columnsLoading || columnsSeeded || menuColumns.length > 0) return;
+    setColumnsSeeded(true);
+    DEFAULT_PLACEMENT_MENU_COLUMNS.forEach(({ id, ...rest }) => {
+      setDoc(doc(db, 'placementMenuColumns', id), rest);
+    });
+  }, [columnsLoading, columnsSeeded, menuColumns]);
+
+  const [editingColumnId, setEditingColumnId] = useState<string | null>(null);
+  const [editColumnLabel, setEditColumnLabel] = useState('');
+  const [newColumnLabel, setNewColumnLabel] = useState('');
+  const [columnSaving, setColumnSaving] = useState(false);
+
+  const startEditColumn = (col: PlacementMenuColumnDoc) => {
+    setEditingColumnId(col.id);
+    setEditColumnLabel(col.label);
+  };
+  const saveColumnLabel = async () => {
+    if (!editingColumnId) return;
+    const label = editColumnLabel.trim();
+    if (!label) return alert('Column name cannot be empty.');
+    try {
+      await updateDoc(doc(db, 'placementMenuColumns', editingColumnId), { label });
+      setEditingColumnId(null);
+    } catch (e) {
+      alert(`Couldn't rename: ${(e as Error).message}`);
+    }
+  };
+  const addColumn = async () => {
+    const label = newColumnLabel.trim();
+    if (!label) return;
+    setColumnSaving(true);
+    try {
+      const nextOrder = menuColumns.reduce((max, c) => Math.max(max, c.order), -1) + 1;
+      await addDoc(collection(db, 'placementMenuColumns'), { label, order: nextOrder });
+      setNewColumnLabel('');
+    } catch (e) {
+      alert(`Couldn't add column: ${(e as Error).message}`);
+    } finally {
+      setColumnSaving(false);
+    }
+  };
+  const moveColumn = async (index: number, dir: -1 | 1) => {
+    const target = index + dir;
+    if (target < 0 || target >= menuColumns.length) return;
+    const a = menuColumns[index];
+    const b = menuColumns[target];
+    try {
+      await Promise.all([
+        updateDoc(doc(db, 'placementMenuColumns', a.id), { order: b.order }),
+        updateDoc(doc(db, 'placementMenuColumns', b.id), { order: a.order }),
+      ]);
+    } catch (e) {
+      alert(`Couldn't reorder: ${(e as Error).message}`);
+    }
+  };
+  const deleteColumn = async (col: PlacementMenuColumnDoc) => {
+    const inUse = items.filter((it) => it.menuColumn === col.id).length;
+    if (inUse > 0) {
+      return alert(`"${col.label}" is still used by ${inUse} placement page${inUse === 1 ? '' : 's'} — reassign ${inUse === 1 ? 'it' : 'them'} to a different column first.`);
+    }
+    if (!confirm(`Delete the "${col.label}" column?`)) return;
+    try {
+      await deleteDoc(doc(db, 'placementMenuColumns', col.id));
+    } catch (e) {
+      alert(`Couldn't delete: ${(e as Error).message}`);
+    }
+  };
   // Photo Carousel — same useImageCropModal-direct pattern as other
   // repeatable add-to-list photo fields (e.g. TpoTeamPhotosAdmin). Free-form
   // (no fixed ratio) — these can be whole promotional posters/banners with
@@ -123,6 +333,7 @@ export default function PlacementItemsAdmin() {
       emails: it.emails || [], linkedins: it.linkedins || [],
       heroImage: it.heroImage || '', heroStoragePath: it.heroStoragePath || '',
       notablePeople: it.notablePeople || [], order: it.order,
+      menuColumn: it.menuColumn || menuColumns[0]?.id || 'explore',
     });
   };
 
@@ -237,6 +448,15 @@ export default function PlacementItemsAdmin() {
             <input id="field-display-order" type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
           </div>
           <div className="admin-field">
+            <label htmlFor="field-menu-column">
+              Navbar Menu Column — which column this item shows under in the header's Placements dropdown
+              (manage the columns themselves below)
+            </label>
+            <select id="field-menu-column" value={form.menuColumn || menuColumns[0]?.id || ''} onChange={(e) => set('menuColumn', e.target.value)}>
+              {menuColumns.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
+            </select>
+          </div>
+          <div className="admin-field">
             <label>
               <input type="checkbox" checked={form.external} onChange={(e) => set('external', e.target.checked)} style={{ marginRight: 6 }} />
               Links to an external site (not a VWU detail page)
@@ -285,25 +505,29 @@ export default function PlacementItemsAdmin() {
               />
             </div>
           )}
-          <div className="admin-field admin-field--full">
-            <label htmlFor="field-data-table-optional-see-format">
-              Data Table (optional — see format above){form.slug === 'placement-highlights' ? ' — data rows only; headers come from the field above' : ''}
-            </label>
-            <textarea id="field-data-table-optional-see-format" rows={6} value={form.tableText} onChange={(e) => set('tableText', e.target.value)} placeholder={'Amazon | 110000 | 29\nFlipkart | 95000 | 12'} />
-            <div style={{ marginTop: '0.4rem' }}>
-              {form.slug === 'placement-highlights' ? (
-                <TableImportButton
-                  onImportSplit={(headerLine, dataText) => {
-                    set('dataTableHeadersText', headerLine);
-                    set('tableText', dataText);
-                  }}
-                  label="Import Data Table from Excel/CSV"
-                />
-              ) : (
-                <TableImportButton onImport={(text) => set('tableText', text)} label="Import Data Table from Excel/CSV" />
-              )}
+          {form.slug === 'internships' ? (
+            <InternshipsDataTableEditor value={form.tableText} onChange={(v) => set('tableText', v)} />
+          ) : (
+            <div className="admin-field admin-field--full">
+              <label htmlFor="field-data-table-optional-see-format">
+                Data Table (optional — see format above){form.slug === 'placement-highlights' ? ' — data rows only; headers come from the field above' : ''}
+              </label>
+              <textarea id="field-data-table-optional-see-format" rows={6} value={form.tableText} onChange={(e) => set('tableText', e.target.value)} placeholder={'Amazon | 110000 | 29\nFlipkart | 95000 | 12'} />
+              <div style={{ marginTop: '0.4rem' }}>
+                {form.slug === 'placement-highlights' ? (
+                  <TableImportButton
+                    onImportSplit={(headerLine, dataText) => {
+                      set('dataTableHeadersText', headerLine);
+                      set('tableText', dataText);
+                    }}
+                    label="Import Data Table from Excel/CSV"
+                  />
+                ) : (
+                  <TableImportButton onImport={(text) => set('tableText', text)} label="Import Data Table from Excel/CSV" />
+                )}
+              </div>
             </div>
-          </div>
+          )}
           {form.slug === 'placement-highlights' && (
             <div className="admin-field admin-field--full">
               <label>Photo Carousel (optional)</label>
@@ -420,24 +644,94 @@ export default function PlacementItemsAdmin() {
       </div>
 
       <div className="admin-card">
+        <h2 className="admin-card__title">Navbar Menu Columns ({menuColumns.length})</h2>
+        <p className="admin-lead" style={{ marginBottom: '1rem' }}>
+          The named columns shown in the header's Placements dropdown (Explore Directory / Quick Access /
+          Key Facilities by default) — rename, reorder, add, or delete them here. Each placement page above
+          picks one of these via its "Navbar Menu Column" field. A column can't be deleted while any page
+          is still assigned to it.
+        </p>
+        {columnsLoading ? <p className="admin-loading">Loading…</p> : (
+          <>
+            {menuColumns.length > 0 && (
+              <div className="admin-table-wrap" style={{ marginBottom: '1rem' }}>
+                <table className="admin-table">
+                  <thead><tr><th>Order</th><th>Column Name</th><th>Pages</th><th>Actions</th></tr></thead>
+                  <tbody>
+                    {menuColumns.map((col, i) => (
+                      <tr key={col.id}>
+                        <td>{i + 1}</td>
+                        <td>
+                          {editingColumnId === col.id ? (
+                            <input
+                              value={editColumnLabel}
+                              onChange={(e) => setEditColumnLabel(e.target.value)}
+                              autoFocus
+                              style={{ minWidth: 200 }}
+                            />
+                          ) : col.label}
+                        </td>
+                        <td>{items.filter((it) => (it.menuColumn || menuColumns[0]?.id) === col.id).length}</td>
+                        <td>
+                          {editingColumnId === col.id ? (
+                            <>
+                              <button className="admin-btn admin-btn--sm admin-btn--primary" onClick={saveColumnLabel}>Save</button>
+                              <button className="admin-btn admin-btn--sm admin-btn--ghost" onClick={() => setEditingColumnId(null)}>Cancel</button>
+                            </>
+                          ) : (
+                            <>
+                              <button className="admin-btn admin-btn--sm" onClick={() => startEditColumn(col)}>Rename</button>
+                              <button className="admin-btn admin-btn--sm" onClick={() => moveColumn(i, -1)} disabled={i === 0} title="Move earlier">↑</button>
+                              <button className="admin-btn admin-btn--sm" onClick={() => moveColumn(i, 1)} disabled={i === menuColumns.length - 1} title="Move later">↓</button>
+                              <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => deleteColumn(col)}>Delete</button>
+                            </>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+            <div className="admin-field" style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-end', maxWidth: 420 }}>
+              <div style={{ flex: 1 }}>
+                <label htmlFor="field-new-column-label">Add a new column</label>
+                <input
+                  id="field-new-column-label"
+                  value={newColumnLabel}
+                  onChange={(e) => setNewColumnLabel(e.target.value)}
+                  placeholder="e.g. Alumni Success"
+                  onKeyDown={(e) => { if (e.key === 'Enter') addColumn(); }}
+                />
+              </div>
+              <button className="admin-btn admin-btn--primary admin-btn--sm" onClick={addColumn} disabled={columnSaving || !newColumnLabel.trim()}>
+                {columnSaving ? 'Adding…' : '+ Add Column'}
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+
+      <div className="admin-card">
         <h2 className="admin-card__title">Pages ({items.length})</h2>
         {loading ? <p className="admin-loading">Loading…</p> : (
           <div className="admin-table-wrap">
             <table className="admin-table">
-              <thead><tr><th>Order</th><th>Title</th><th>Slug</th><th>Actions</th></tr></thead>
+              <thead><tr><th>Order</th><th>Title</th><th>Slug</th><th>Menu Column</th><th>Actions</th></tr></thead>
               <tbody>
                 {items.map((it) => (
                   <tr key={it.id}>
                     <td>{it.order}</td>
                     <td>{it.title}</td>
                     <td>{it.slug}</td>
+                    <td>{menuColumns.find((c) => c.id === (it.menuColumn || menuColumns[0]?.id))?.label || '—'}</td>
                     <td>
                       <button className="admin-btn admin-btn--sm" onClick={() => startEdit(it)}>Edit</button>
                       <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(it.id, it.heroStoragePath)}>Delete</button>
                     </td>
                   </tr>
                 ))}
-                {items.length === 0 && <tr><td colSpan={4} className="admin-empty">No placement pages yet.</td></tr>}
+                {items.length === 0 && <tr><td colSpan={5} className="admin-empty">No placement pages yet.</td></tr>}
               </tbody>
             </table>
           </div>

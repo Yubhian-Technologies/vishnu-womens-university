@@ -2,6 +2,7 @@ import { useState, useId } from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, Phone, Mail, ExternalLink, ChevronDown, FileText, ChevronRight, Navigation } from 'lucide-react';
 import { useOrderedCollection } from '../../hooks/useCollection';
+import { useSiteContact, telHref } from '../../hooks/useSiteContact';
 import { COMPLIANCE_GROUPS, DEFAULT_COMPLIANCE_DOCS, type ComplianceDocDoc } from '../../pages/Admin/sections/ComplianceDocsAdmin';
 import { InstagramIcon, FacebookIcon, TwitterIcon, LinkedInIcon, YouTubeIcon } from './SocialIcons';
 import SmoothCollapse from '../SmoothCollapse/SmoothCollapse';
@@ -66,6 +67,7 @@ const LEGAL_LINKS = [
 export default function Footer() {
   const currentYear = new Date().getFullYear();
   const accordionBaseId = useId();
+  const { phone, email } = useSiteContact();
 
   // Mobile accordion state (all closed by default for compact mobile viewport)
   const [openMobileSections, setOpenMobileSections] = useState<Set<string>>(new Set());
@@ -150,14 +152,14 @@ export default function Footer() {
                 <span>Get Directions</span>
               </a>
               <div className="vwu-footer-contact-links">
-                <a href="tel:08816250864" className="vwu-footer-contact-action" aria-label="Phone: 08816-250864">
+                <a href={telHref(phone)} className="vwu-footer-contact-action" aria-label={`Phone: ${phone}`}>
                   <Phone size={14} aria-hidden="true" />
-                  <span>08816-250864</span>
+                  <span>{phone}</span>
                 </a>
                 <span className="vwu-footer-contact-sep" aria-hidden="true">·</span>
-                <a href="mailto:info@vwu.edu.in" className="vwu-footer-contact-action" aria-label="Email: info@vwu.edu.in">
+                <a href={`mailto:${email}`} className="vwu-footer-contact-action" aria-label={`Email: ${email}`}>
                   <Mail size={14} aria-hidden="true" />
-                  <span>info@vwu.edu.in</span>
+                  <span>{email}</span>
                 </a>
               </div>
             </address>

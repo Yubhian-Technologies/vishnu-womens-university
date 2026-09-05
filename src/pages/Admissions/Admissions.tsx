@@ -7,6 +7,7 @@ import AdmissionApplyForm from '../../components/AdmissionApplyForm/AdmissionApp
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useContentBlocks, useEapcetCode } from '../../hooks/useContentBlocks';
 import { useSitePhotos, useSectionHasPhotos } from '../../hooks/useSitePhotos';
+import { useSiteContact, telHref } from '../../hooks/useSiteContact';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import type { FaqDoc } from '../Admin/sections/FaqAdmin';
 import { NotebookPen, ClipboardList, Users, Phone, Mail, MapPin, Sparkles, BarChart2 } from 'lucide-react';
@@ -90,6 +91,7 @@ const DEFAULT_ADMISSIONS_FAQS: FaqDoc[] = [
 
 export default function Admissions() {
   useHashScroll();
+  const { phone, email } = useSiteContact();
   const { docs: allFaqs } = useOrderedCollection<FaqDoc>('faqs', 'order');
   const liveFaqs = allFaqs.filter((f) => f.page === 'admissions');
   const faqs = liveFaqs.length > 0 ? liveFaqs : DEFAULT_ADMISSIONS_FAQS;
@@ -448,14 +450,14 @@ export default function Admissions() {
                   <Phone size={22} strokeWidth={1.75} />
                   <div>
                     <strong>Phone</strong>
-                    <a href="tel:08816250864">08816-250864</a>
+                    <a href={telHref(phone)}>{phone}</a>
                   </div>
                 </div>
                 <div className="adm-contact-item">
                   <Mail size={22} strokeWidth={1.75} />
                   <div>
                     <strong>Email</strong>
-                    <a href="mailto:info@vwu.edu.in">info@vwu.edu.in</a>
+                    <a href={`mailto:${email}`}>{email}</a>
                   </div>
                 </div>
                 <div className="adm-contact-item">
@@ -520,7 +522,7 @@ export default function Admissions() {
           </div>
           <div style={{ textAlign: 'center', marginTop: 'var(--space-10)' }}>
             <p style={{ color: 'var(--color-text-light)', marginBottom: 'var(--space-4)' }}>Still have questions?</p>
-            <a href="tel:08816250864" className="btn btn-primary btn-lg">Call Admissions: 08816-250864</a>
+            <a href={telHref(phone)} className="btn btn-primary btn-lg">Call Admissions: {phone}</a>
           </div>
         </div>
       </section>

@@ -9,6 +9,7 @@ export {
   dedupePlacementRows as dedupeInternshipRows,
   type PlacementImportResult as InternshipImportResult,
 } from './placementsImport';
+import type { PlacementImportResult } from './placementsImport';
 
 // Column names chosen to match the auto-detection heuristics in
 // internshipRecords.ts: "S. No." (findInternshipSerialColumnIndex — hidden
@@ -27,6 +28,22 @@ const INTERNSHIP_TEMPLATE_EXAMPLE_ROWS = [
   ['2', 'B. Swathi', 'Data Analytics', 'Infosys', '2 Months'],
   ['3', 'A. Priya', 'Cloud Computing', 'Wipro', '4 Weeks'],
 ];
+
+// Strict, whole-file validation — same rule as Placements' own
+// validatePlacementsImport (see there for the full reasoning): the header
+// row must exactly be this template's columns (any order, case/whitespace-
+// insensitive) — nothing missing, nothing extra. Empty rows/columns/cells
+// are fine and don't affect this check; only the column *names* must match.
+// Returns an error message to show, or null if the file is clean.
+export function validateInternshipsImport(result: PlacementImportResult): string | null {
+  const norm = (s: string) => s.trim().toLowerCase();
+  const got = [...result.columns].map(norm).sort();
+  const want = [...INTERNSHIP_TEMPLATE_HEADERS].map(norm).sort();
+  if (got.length !== want.length || got.some((c, i) => c !== want[i])) {
+    return `This file's columns don't match the required Internships template (any order is fine, but nothing missing or extra).\n\nExpected: ${INTERNSHIP_TEMPLATE_HEADERS.join(', ')}\nFound: ${result.columns.join(', ')}\n\nUse "Download Internships Template" above and fill that file in instead.`;
+  }
+  return null;
+}
 
 /** Downloads a blank Internships import template (.xlsx) with the expected
  *  columns and a couple of example rows — see InternshipYearsEditor's

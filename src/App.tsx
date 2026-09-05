@@ -61,6 +61,8 @@ const GovernanceDetail = lazyWithRetry(() => import('./pages/Governance/Governan
 const GoverningBody = lazyWithRetry(() => import('./pages/Governance/GoverningBody'));
 const Research = lazyWithRetry(() => import('./pages/Research/Research'));
 const ResearchDetail = lazyWithRetry(() => import('./pages/Research/ResearchDetail'));
+const ProfessionalBodyDetail = lazyWithRetry(() => import('./pages/Research/ProfessionalBodyDetail'));
+const MousGroupDetail = lazyWithRetry(() => import('./pages/Research/MousGroupDetail'));
 const AboutSVES = lazyWithRetry(() => import('./pages/AboutSVES/AboutSVES'));
 const Campus = lazyWithRetry(() => import('./pages/Campus/Campus'));
 const CampusLifeDetail = lazyWithRetry(() => import('./pages/CampusLife/CampusLifeDetail'));
@@ -143,6 +145,8 @@ function PublicApp() {
             <Route path="/governance/:slug" element={<GovernanceDetail />} />
             <Route path="/research" element={<Research />} />
             <Route path="/research/:slug" element={<ResearchDetail />} />
+            <Route path="/research/professional-bodies/:key" element={<ProfessionalBodyDetail />} />
+            <Route path="/research/mous/:group" element={<MousGroupDetail />} />
             <Route path="/about-sves" element={<AboutSVES />} />
             <Route path="/campus" element={<Campus />} />
             {/* Static segment declared alongside the /campus/:slug catch-all —

@@ -63,7 +63,7 @@ export default function CampusLifeShowcase() {
               </div>
               <div className="campus-showcase-pillar-bottom">
                 <span className="campus-showcase-pillar-label">
-                  Cultural fests &amp;<br />hackathons
+                  Cultural fests &amp;<br />Hackathons
                 </span>
                 <span className="campus-showcase-pillar-arrow" aria-hidden="true">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -87,7 +87,7 @@ export default function CampusLifeShowcase() {
               </div>
               <div className="campus-showcase-pillar-bottom">
                 <span className="campus-showcase-pillar-label">
-                  Student clubs &amp;<br />leadership bodies
+                  Student clubs &amp;<br />Leadreship bodies
                 </span>
                 <span className="campus-showcase-pillar-arrow" aria-hidden="true">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -110,7 +110,7 @@ export default function CampusLifeShowcase() {
               </div>
               <div className="campus-showcase-pillar-bottom">
                 <span className="campus-showcase-pillar-label">
-                  Sports, fitness &amp;<br />wellness arenas
+                  Sports, fitness &amp;<br />Wellness arenas
                 </span>
                 <span className="campus-showcase-pillar-arrow" aria-hidden="true">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
