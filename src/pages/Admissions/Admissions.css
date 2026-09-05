@@ -352,6 +352,156 @@
   color: #dc2626;
 }
 
+/* Consent checkbox */
+/* Selector is deliberately ".adm-form-group .adm-consent-row" (two classes),
+   not just ".adm-consent-row" — it needs to out-specificity the existing
+   ".adm-form-group label { font-weight: 700; ... }" rule above, since this
+   checkbox row is itself a <label> inside an .adm-form-group. */
+.adm-form-group .adm-consent-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  cursor: pointer;
+  font-weight: 400;
+}
+
+.adm-consent-row input[type='checkbox'] {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin-top: 0.15rem;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+.adm-consent-row input[type='checkbox'].has-error {
+  outline: 1.5px solid #dc2626;
+  outline-offset: 2px;
+}
+
+.adm-consent-row span {
+  font-size: var(--text-xs);
+  line-height: 1.5;
+  color: var(--color-text-light);
+}
+
+/* Phone number + OTP verification */
+.adm-phone-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.adm-phone-row input {
+  flex: 1;
+  min-width: 0;
+}
+
+.adm-phone-row input:disabled {
+  background: var(--color-off-white);
+  color: var(--color-text-light);
+  cursor: not-allowed;
+}
+
+.adm-otp-btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.adm-otp-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.adm-otp-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.adm-otp-row input {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-3) var(--space-4);
+  border: 1.5px solid var(--color-light-gray);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-base);
+  color: var(--color-text);
+  background: var(--color-white);
+  outline: none;
+  transition: border-color var(--transition-fast);
+  font-family: var(--font-sans);
+  letter-spacing: 0.2em;
+}
+
+.adm-otp-row input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary, #1b4332) 10%, transparent);
+}
+
+.adm-otp-row input.has-error {
+  border-color: #dc2626;
+}
+
+.adm-otp-row input:disabled {
+  background: var(--color-off-white);
+  color: var(--color-text-light);
+  cursor: not-allowed;
+}
+
+.adm-otp-row .btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.adm-otp-resend {
+  align-self: flex-start;
+  margin-top: var(--space-1);
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  font-family: var(--font-sans);
+  color: var(--color-secondary);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.adm-otp-resend:hover:not(:disabled) {
+  color: var(--color-primary);
+}
+
+.adm-otp-resend:disabled {
+  color: var(--color-text-light);
+  cursor: not-allowed;
+  text-decoration: none;
+}
+
+.adm-otp-verified {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-primary);
+  white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+  .adm-phone-row,
+  .adm-otp-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
   .adm-hub-grid { grid-template-columns: repeat(2, 1fr); }
