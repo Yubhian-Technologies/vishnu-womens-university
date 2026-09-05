@@ -16,6 +16,31 @@ function centerAspectCrop(w: number, h: number, aspect: number): Crop {
   return centerCrop(makeAspectCrop({ unit: '%', width: 90 }, aspect, w, h), w, h);
 }
 
+// Rotates the source image itself (not just its on-screen display) by
+// redrawing it onto a canvas, so the crop step downstream never has to know
+// rotation happened — it just sees an already-rotated image, the same as if
+// the file had come in that way. PNG (lossless) since this is only an
+// intermediate working copy; the final crop step still re-encodes to WebP.
+function rotateImageDataUrl(src: string, degrees: number): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const swapped = degrees % 180 !== 0;
+      const canvas = document.createElement('canvas');
+      canvas.width = swapped ? img.naturalHeight : img.naturalWidth;
+      canvas.height = swapped ? img.naturalWidth : img.naturalHeight;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) { reject(new Error('Could not rotate image.')); return; }
+      ctx.translate(canvas.width / 2, canvas.height / 2);
+      ctx.rotate((degrees * Math.PI) / 180);
+      ctx.drawImage(img, -img.naturalWidth / 2, -img.naturalHeight / 2);
+      resolve(canvas.toDataURL('image/png'));
+    };
+    img.onerror = () => reject(new Error('Could not load image for rotation.'));
+    img.src = src;
+  });
+}
+
 // Nothing on this site is ever displayed larger than this, so there's no
 // benefit to uploading (and making every visitor download) pixels beyond
 // it — a source photo straight off a phone/DSLR can otherwise sail through
@@ -57,11 +82,17 @@ async function cropImageToBlob(img: HTMLImageElement, px: PixelCrop): Promise<Bl
 export function useImageCropModal(defaultAspect = 16 / 9) {
   const imgRef = useRef<HTMLImageElement>(null);
   const pendingUpload = useRef<{ folder: string; onUploaded: (r: UploadResult) => void } | null>(null);
+  // The as-selected file, never itself rotated — every rotate step re-derives
+  // `cropSrc` from this so repeated rotations don't compound quality loss
+  // (or drift out of sync with the "0°" starting point).
+  const originalSrc = useRef<string | null>(null);
 
   const [cropSrc,   setCropSrc]   = useState<string | null>(null);
   const [crop,      setCrop]      = useState<Crop>();
   const [pixelCrop, setPixelCrop] = useState<PixelCrop>();
   const [aspect,    setAspect]    = useState<number | undefined>(defaultAspect);
+  const [rotation,  setRotation]  = useState(0);
+  const [rotating,  setRotating]  = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error,     setError]     = useState<string | null>(null);
 
@@ -69,9 +100,35 @@ export function useImageCropModal(defaultAspect = 16 / 9) {
     if (!file.type.startsWith('image/')) { setError('Please select an image file.'); return; }
     setError(null);
     pendingUpload.current = { folder, onUploaded };
+    setRotation(0);
     const reader = new FileReader();
-    reader.onload = () => setCropSrc(reader.result as string);
+    reader.onload = () => {
+      originalSrc.current = reader.result as string;
+      setCropSrc(reader.result as string);
+    };
     reader.readAsDataURL(file);
+  };
+
+  // Always rotates from the original (never the already-rotated `cropSrc`)
+  // by the full new angle — simpler and lossier-safer than compounding 90°
+  // turns on top of each other. Existing crop selection is cleared since the
+  // image's own dimensions change on a 90°/270° turn; onImageLoad below
+  // re-centers a fresh one once the rotated image finishes loading.
+  const rotate = async () => {
+    if (!originalSrc.current || rotating) return;
+    const next = (rotation + 90) % 360;
+    setRotating(true);
+    try {
+      const rotated = next === 0 ? originalSrc.current : await rotateImageDataUrl(originalSrc.current, next);
+      setRotation(next);
+      setCrop(undefined);
+      setPixelCrop(undefined);
+      setCropSrc(rotated);
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setRotating(false);
+    }
   };
 
   const onImageLoad = useCallback((e: React.SyntheticEvent<HTMLImageElement>) => {
@@ -130,6 +187,15 @@ export function useImageCropModal(defaultAspect = 16 / 9) {
               {p.label}
             </button>
           ))}
+          <button
+            type="button"
+            className="crop-aspect-btn crop-rotate-btn"
+            onClick={rotate}
+            disabled={rotating}
+            title="Rotate 90°"
+          >
+            ⟳ Rotate
+          </button>
         </div>
 
         <div className="crop-modal__canvas">
