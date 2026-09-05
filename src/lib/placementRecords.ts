@@ -116,12 +116,15 @@ export function findSerialColumnIndex(columns: string[]): number {
 // prefers "company", then "organisation"/"organization", then "recruiter",
 // then "employer". Returns -1 if nothing matches (No. of Companies Visited
 // then just falls back to 0 rather than guessing).
-function findCompanyColumnIndex(columns: string[]): number {
+export function findCompanyColumnIndex(columns: string[]): number {
   const normalized = columns.map((c) => c.toLowerCase());
   let idx = normalized.findIndex((c) => c.includes('company'));
   if (idx === -1) idx = normalized.findIndex((c) => c.includes('organis') || c.includes('organiz'));
   if (idx === -1) idx = normalized.findIndex((c) => c.includes('recruiter'));
   if (idx === -1) idx = normalized.findIndex((c) => c.includes('employer'));
+  // "Placed in" / "Placed at" — some departments' own sheets label the
+  // company column this way instead of "Company"/"Recruiter".
+  if (idx === -1) idx = normalized.findIndex((c) => c.includes('placed'));
   if (idx === -1) idx = fuzzyColumnIndex(columns, 'company');
   return idx;
 }

@@ -26,3 +26,39 @@ export function getFirebaseStorage(): Promise<FirebaseStorage> {
   }
   return storagePromise;
 }
+
+// A second, independently-named Firebase App (same project config, via
+// `app.options`) purely so Users & Roles can create a new sign-in for
+// someone else (Placements, R&D, a department admin, …) without disturbing
+// the signed-in Super Admin's own session — `createUserWithEmailAndPassword`
+// on the client SDK signs in AS the account it just created, which on the
+// primary `auth` instance would immediately log the admin out of their own
+// session. Running it against this separate instance instead means that
+// side effect lands over here, not on the admin's real session, and it's
+// signed out again right after — see createAdminLogin in lib/rbac.ts.
+let secondaryAuthPromise: Promise<Auth> | null = null;
+function getSecondaryAuth(): Promise<Auth> {
+  if (!secondaryAuthPromise) {
+    secondaryAuthPromise = Promise.all([import('firebase/app'), import('firebase/auth')]).then(
+      ([{ initializeApp, getApps }, { getAuth }]) => {
+        const name = 'AdminUserCreation';
+        const secondaryApp = getApps().find((a) => a.name === name) ?? initializeApp(app.options, name);
+        return getAuth(secondaryApp);
+      }
+    );
+  }
+  return secondaryAuthPromise;
+}
+
+/** Creates a new Firebase Auth sign-in (email + password) via the secondary app instance above, then immediately signs that instance back out. Throws if the email is already registered (caller should treat that as non-fatal — see createAdminLogin). */
+export async function createFirebaseAuthAccount(email: string, password: string): Promise<void> {
+  const [{ createUserWithEmailAndPassword, signOut }, secondaryAuth] = await Promise.all([
+    import('firebase/auth'),
+    getSecondaryAuth(),
+  ]);
+  try {
+    await createUserWithEmailAndPassword(secondaryAuth, email, password);
+  } finally {
+    await signOut(secondaryAuth);
+  }
+}

@@ -6,6 +6,7 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
+import { useSiteContact } from '../../hooks/useSiteContact';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import type { JobOpeningDoc } from '../Admin/sections/JobOpeningsAdmin';
 
@@ -49,6 +50,7 @@ function fileToBase64(file: File): Promise<string> {
 }
 
 export default function Careers() {
+  const { phone, email } = useSiteContact();
   const { docs: allOpenings } = useOrderedCollection<JobOpeningDoc>('jobOpenings', 'order');
   const perks = useContentBlocks('careers', 'perks');
   const positions = useMemo(() => {
@@ -146,7 +148,7 @@ export default function Careers() {
       setForm({ name: '', email: '', phone: '', dept: '', position: '', experience: '', message: '' });
       setResume(null);
     } catch (err) {
-      setSubmitError((err as Error).message || "Couldn't submit your application. Please try again or email info@vwu.edu.in directly.");
+      setSubmitError((err as Error).message || `Couldn't submit your application. Please try again or email ${email} directly.`);
     } finally {
       setSubmitting(false);
     }
@@ -322,7 +324,7 @@ export default function Careers() {
             <span className="section-label" style={{ color: 'var(--color-accent)' }}>Questions?</span>
             <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>Reach Out to HR</h2>
             <p style={{ color: 'rgba(255,255,255,0.8)', maxWidth: 480, margin: '0 auto var(--space-6)', lineHeight: 1.7 }}>
-              For questions about available roles, eligibility requirements, or the selection process, write to us at <strong style={{ color: 'var(--color-accent)' }}>info@vwu.edu.in</strong> or call <strong style={{ color: 'var(--color-accent)' }}>08816-250864</strong>.
+              For questions about available roles, eligibility requirements, or the selection process, write to us at <strong style={{ color: 'var(--color-accent)' }}>{email}</strong> or call <strong style={{ color: 'var(--color-accent)' }}>{phone}</strong>.
             </p>
             <Link to="/contact" className="btn btn-accent btn-lg">Contact Us</Link>
           </div>

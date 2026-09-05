@@ -23,7 +23,7 @@ import LabDialog from '../../components/LabDialog/LabDialog';
 import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import type { FacultyDoc } from './Faculty';
 import { parseFlexibleTable, parseProjectAccordion } from '../../lib/structuredTable';
-import { sortPlacementRows, computePlacementStats, findPackageColumnIndex, formatPackageCell } from '../../lib/placementRecords';
+import { sortPlacementRows, computePlacementStats, findPackageColumnIndex, findCompanyColumnIndex, formatPackageCell } from '../../lib/placementRecords';
 import { computeInternshipStats, findPeriodColumnIndex } from '../../lib/internshipRecords';
 import { hasCustomSectionContent, toQuickLinkItems } from '../../lib/customSections';
 import CustomSectionsRenderer, { SectionSubtree } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
@@ -58,6 +58,15 @@ function SingleProgramDetail() {
   const location = useLocation();
   const [outcomeTab, setOutcomeTab] = useState<string | null>(null);
   const [placementYear, setPlacementYear] = useState<string | null>(null);
+  // Company / minimum-package filters for the placement records below —
+  // admin uploads whatever columns a year's sheet has, so the company list
+  // is derived live from that year's actual rows rather than any fixed
+  // list. Reset directly from the Academic Year pill's onClick (further
+  // down) rather than a useEffect keyed off the active year, since that
+  // derived value isn't available until after this component's early-return
+  // guard — every hook here must stay above that guard.
+  const [placementCompanyFilter, setPlacementCompanyFilter] = useState('');
+  const [placementMinPackage, setPlacementMinPackage] = useState(0);
   // Which Academic Year's internship records are shown — same pattern as
   // the Placements pair above.
   const [internshipYear, setInternshipYear] = useState<string | null>(null);
@@ -233,24 +242,38 @@ function SingleProgramDetail() {
   // editor must actually see it gone, not have this stale data resurface.
   const hasLegacyNewsEvents = !hasNewsEventsDynamic && !dept?.newsEventsMigrated && newsEventsCategories.some((c) => c.years.length > 0);
   const hasNewsEventsYears = hasNewsEventsDynamic || hasLegacyNewsEvents;
-  const newsletterYears = (program.newsletterYears || []).filter((y) => y.year && y.issues && y.issues.length > 0);
+  // Awards & Recognition — same fixed-heading/dynamic-content pattern as
+  // News & Events above, but brand new (no legacy fixed shape to fall back
+  // to), read from the same matching `dept`.
+  const awardsSubSections = (dept?.awardsSections || []).filter(hasCustomSectionContent);
+  const hasAwards = awardsSubSections.length > 0;
+  // Falls back to this programme's own (pre-switchover) data until the
+  // department doc is opened + saved in Admin (which copies it over) — see
+  // the migration in DepartmentsAdmin.tsx's startEdit(). Without this, a
+  // department not yet re-saved would show nothing here even though the
+  // data is safely sitting on this programme's doc, untouched.
+  const newsletterYears = ((dept?.newsletterYears?.length ? dept.newsletterYears : program.newsletterYears) || []).filter((y) => y.year && y.issues && y.issues.length > 0);
   const hasNewsletter = newsletterYears.length > 0;
   const newsletterMaxIssues = Math.max(0, ...newsletterYears.map((y) => y.issues.length));
   // Only links with both a name and an uploaded PDF are shown — a link
   // an admin has started naming but not yet uploaded a PDF for stays
   // invisible rather than rendering a dead/empty link.
-  const rndLinks = (program.rndLinks || []).filter((l) => l.label && l.pdfUrl);
-  const rndTableSections = parseFlexibleTable(program.rndTableText || '').filter((s) => s.headers.length > 0);
-  const rndProjectCategories = parseProjectAccordion(program.rndProjectsText || '').filter((c) => c.projects.length > 0);
-  const rndStructuredColumns = program.rndStructuredTable?.columns || [];
-  const rndStructuredRows = program.rndStructuredTable?.rows || [];
+  const rndIntroValue = dept?.rndIntro || program.rndIntro || '';
+  const rndLinks = (dept?.rndLinks?.length ? dept.rndLinks : program.rndLinks) || [];
+  const rndTableTextValue = dept?.rndTableText || program.rndTableText || '';
+  const rndProjectsTextValue = dept?.rndProjectsText || program.rndProjectsText || '';
+  const rndStructuredTableValue = dept?.rndStructuredTable || program.rndStructuredTable;
+  const rndTableSections = parseFlexibleTable(rndTableTextValue).filter((s) => s.headers.length > 0);
+  const rndProjectCategories = parseProjectAccordion(rndProjectsTextValue).filter((c) => c.projects.length > 0);
+  const rndStructuredColumns = rndStructuredTableValue?.columns || [];
+  const rndStructuredRows = rndStructuredTableValue?.rows || [];
   const hasRndStructuredTable = rndStructuredColumns.length > 0 && rndStructuredRows.length > 0;
-  const hasRnd = !!program.rndIntro || rndTableSections.length > 0 || rndProjectCategories.length > 0 || rndLinks.length > 0 || hasRndStructuredTable;
+  const hasRnd = !!rndIntroValue || rndTableSections.length > 0 || rndProjectCategories.length > 0 || rndLinks.length > 0 || hasRndStructuredTable;
   // Individual student Placement Records — admin-imported from Excel/CSV per
-  // Academic Year (see PlacementYearsEditor in ProgramsAdmin.tsx), stored
-  // directly on this programme's own doc. Falls back to the first available
-  // year whenever nothing's been explicitly picked yet.
-  const placementYears = program.placementYears || [];
+  // Academic Year (see PlacementYearsEditor in ProgramCareerEditors.tsx).
+  // Falls back to the first available year whenever nothing's been
+  // explicitly picked yet.
+  const placementYears = (dept?.placementYears?.length ? dept.placementYears : program.placementYears) || [];
   const activePlacementYear = placementYears.find((y) => y.year === placementYear) ?? placementYears[0];
   const placementColumns = activePlacementYear?.columns || [];
   const placementRows = placementColumns.length > 0 && activePlacementYear
@@ -263,8 +286,19 @@ function SingleProgramDetail() {
   const placementYearStats = activePlacementYear ? computePlacementStats(placementColumns, activePlacementYear.rows || []) : null;
 
   const placementNameIdx = placementColumns.findIndex((c) => /name|student|candidate/i.test(c));
-  const placementCompIdx = placementColumns.findIndex((c) => /company|organization|employer|recruiter/i.test(c));
-  const placementMarqueeItems: PlacementItem[] = placementRows.map((row) => {
+  const placementCompIdx = findCompanyColumnIndex(placementColumns);
+  const placementCompanyOptions = Array.from(new Set(
+    placementRows.map((r) => (placementCompIdx >= 0 ? r.cells[placementCompIdx] : '')?.trim()).filter(Boolean)
+  )).sort((a, b) => a.localeCompare(b));
+  const filteredPlacementRows = placementRows.filter((row) => {
+    if (placementCompanyFilter && row.cells[placementCompIdx]?.trim() !== placementCompanyFilter) return false;
+    if (placementMinPackage > 0) {
+      const pkgNum = parseFloat(formatPackageCell(placementPkgIdx >= 0 ? (row.cells[placementPkgIdx] || '') : ''));
+      if (!(pkgNum >= placementMinPackage)) return false;
+    }
+    return true;
+  });
+  const placementMarqueeItems: PlacementItem[] = filteredPlacementRows.map((row) => {
     const rawName = placementNameIdx >= 0 ? row.cells[placementNameIdx] : (row.cells[1] || row.cells[0]);
     const rawComp = placementCompIdx >= 0 ? row.cells[placementCompIdx] : (row.cells[2] || 'Leading Recruiter');
     const rawPkg = placementPkgIdx >= 0 ? formatPackageCell(row.cells[placementPkgIdx] ?? '') : (row.cells[3] || '');
@@ -275,9 +309,9 @@ function SingleProgramDetail() {
     };
   });
   // Individual student Internship Records — same shape/pattern as the
-  // Placement Records above (see InternshipYearsEditor in ProgramsAdmin.tsx),
-  // just for internships instead of placements.
-  const internshipYears = program.internshipYears || [];
+  // Placement Records above (see InternshipYearsEditor in
+  // ProgramCareerEditors.tsx), just for internships instead of placements.
+  const internshipYears = (dept?.internshipYears?.length ? dept.internshipYears : program.internshipYears) || [];
   const activeInternshipYear = internshipYears.find((y) => y.year === internshipYear) ?? internshipYears[0];
   const internshipColumns = activeInternshipYear?.columns || [];
   const internshipRows = internshipColumns.length > 0 && activeInternshipYear ? activeInternshipYear.rows || [] : [];
@@ -347,6 +381,7 @@ function SingleProgramDetail() {
     hasNewsletter && { id: 'newsletter', label: 'Newsletter' },
     hasNewsEventsYears && { id: 'news-events', label: 'News & Events' },
     hasDeptNews && { id: 'news', label: 'News & Events' },
+    hasAwards && { id: 'awards-recognition', label: 'Awards & Recognition' },
     ...toQuickLinkItems(visibleCustomSections),
   ].filter(Boolean) as { id: string; label: string; children?: { id: string; label: string }[] }[];
 
@@ -1085,7 +1120,7 @@ function SingleProgramDetail() {
                 <button
                   key={y.year}
                   type="button"
-                  onClick={() => setPlacementYear(y.year)}
+                  onClick={() => { setPlacementYear(y.year); setPlacementCompanyFilter(''); }}
                   className={`placement-year-pill${activePlacementYear?.year === y.year ? ' active' : ''}`}
                 >
                   AY. {y.year}
@@ -1156,15 +1191,52 @@ function SingleProgramDetail() {
                   </h3>
                 </div>
                 <span style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--color-accent)', background: 'rgba(201, 168, 76, 0.12)', border: '1px solid rgba(201, 168, 76, 0.3)', borderRadius: '9999px', padding: '0.3rem 0.85rem' }}>
-                  {placementRows.length} Verified Offers
+                  {filteredPlacementRows.length} Verified Offers
                 </span>
               </div>
+
+              {placementCompanyOptions.length > 0 && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem', marginBottom: 'var(--space-4)' }}>
+                  <select
+                    value={placementCompanyFilter}
+                    onChange={(e) => setPlacementCompanyFilter(e.target.value)}
+                    aria-label="Filter by company"
+                    style={{ padding: '0.45rem 0.75rem', borderRadius: '8px', border: '1px solid var(--color-light-gray)', fontSize: '0.85rem', background: 'var(--color-white)' }}
+                  >
+                    <option value="">All Companies</option>
+                    {placementCompanyOptions.map((c) => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                  <select
+                    value={placementMinPackage}
+                    onChange={(e) => setPlacementMinPackage(Number(e.target.value))}
+                    aria-label="Filter by minimum package"
+                    style={{ padding: '0.45rem 0.75rem', borderRadius: '8px', border: '1px solid var(--color-light-gray)', fontSize: '0.85rem', background: 'var(--color-white)' }}
+                  >
+                    <option value={0}>Any Package</option>
+                    <option value={5}>5 LPA & above</option>
+                    <option value={10}>10 LPA & above</option>
+                    <option value={20}>20 LPA & above</option>
+                    <option value={30}>30 LPA & above</option>
+                  </select>
+                  {(placementCompanyFilter || placementMinPackage > 0) && (
+                    <button
+                      type="button"
+                      onClick={() => { setPlacementCompanyFilter(''); setPlacementMinPackage(0); }}
+                      style={{ padding: '0.45rem 0.9rem', borderRadius: '8px', border: '1px solid var(--color-light-gray)', fontSize: '0.85rem', background: 'transparent', cursor: 'pointer', color: 'var(--color-text-light)' }}
+                    >
+                      Clear Filters
+                    </button>
+                  )}
+                </div>
+              )}
 
               {placementMarqueeItems.length > 0 ? (
                 <TestimonialMarquee records={placementMarqueeItems} />
               ) : (
                 <p style={{ color: 'var(--color-text-light)', fontStyle: 'italic', padding: '1.5rem 0' }}>
-                  No placement records uploaded yet for {activePlacementYear?.year}.
+                  {placementRows.length > 0
+                    ? 'No offers match the selected filters.'
+                    : `No placement records uploaded yet for ${activePlacementYear?.year}.`}
                 </p>
               )}
             </div>
@@ -1338,6 +1410,23 @@ function SingleProgramDetail() {
         <NewsEventsTabs categories={newsEventsCategories} eyebrow={deptTitle || program.shortName || program.name} navOffset={NAV_OFFSET} />
       )}
 
+      {/* Awards & Recognition — same fixed-heading/dynamic-content pattern
+          as News & Events above. */}
+      {hasAwards && (
+        <section id="awards-recognition" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
+          <div className="container">
+            <div style={{ marginBottom: 'var(--space-8)' }}>
+              <span className="section-label">{deptTitle || program.shortName || program.name}</span>
+              <h2 className="section-title">Awards &amp; Recognition</h2>
+            </div>
+            <SectionSubtree
+              section={{ id: 'awards-recognition-root', label: 'Awards & Recognition', contentType: 'text', textContent: '', subSections: awardsSubSections }}
+              navOffset={NAV_OFFSET}
+            />
+          </div>
+        </section>
+      )}
+
       {/* News & Events — live from the departmentNews collection, tagged to
           this programme. Both this and the admin-defined table above are
           available; each only appears once an admin has actually filled it
@@ -1410,9 +1499,9 @@ function SingleProgramDetail() {
               <span className="section-label">Research</span>
               <h2 className="section-title">Research &amp; Development (Funded Projects &amp; Patents)</h2>
             </div>
-            {program.rndIntro && (
+            {rndIntroValue && (
               <p style={{ color: 'var(--color-text)', lineHeight: 1.85, fontSize: 'var(--text-base)', marginBottom: 'var(--space-6)', maxWidth: 760, whiteSpace: 'pre-line' }}>
-                {program.rndIntro}
+                {rndIntroValue}
               </p>
             )}
             {rndTableSections.map((section, si) => (
