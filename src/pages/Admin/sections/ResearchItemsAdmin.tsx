@@ -8,6 +8,7 @@ import FileUploader from '../../../components/FileUploader/FileUploader';
 import ConsultancyReportsAdmin from './ConsultancyReportsAdmin';
 import PatentCertificatesAdmin from './PatentCertificatesAdmin';
 import ProfessionalBodiesAdmin from './ProfessionalBodiesAdmin';
+import MousPartnerLogosAdmin from './MousPartnerLogosAdmin';
 import { parseFundedProjectsWorkbook } from '../../../lib/fundedProjectsImport';
 import { parsePatentsWorkbook } from '../../../lib/patentsImport';
 import { mergeProjectAccordion } from '../../../lib/structuredTable';
@@ -21,6 +22,7 @@ const ITEM_SUB_SECTIONS: Record<string, { key: string; label: string; Component:
   'consultancy': [{ key: 'reports', label: 'Consultancy Reports', Component: ConsultancyReportsAdmin }],
   'patents': [{ key: 'certificates', label: 'Patent Certificates', Component: PatentCertificatesAdmin }],
   'professional-bodies': [{ key: 'bodies', label: 'Professional Bodies', Component: ProfessionalBodiesAdmin }],
+  'mous': [{ key: 'logos', label: 'Partner Logos', Component: MousPartnerLogosAdmin }],
 };
 
 export interface PublicationYearEntry {
@@ -192,6 +194,15 @@ export default function ResearchItemsAdmin() {
             <label htmlFor="field-title">Title *</label>
             <input id="field-title" value={form.title} onChange={(e) => set('title', e.target.value)} placeholder="Research Advisory Committee" />
           </div>
+          {form.slug === 'mous' && (
+            <p className="admin-field__hint admin-field--full" style={{ background: '#eef6ff', border: '1px solid #bcdcfd', borderRadius: 6, padding: '0.6rem 0.9rem' }}>
+              MoUs' content fields (Category, Description, Data Table, etc.) are hidden here — its partner list is
+              now managed entirely from <strong>Extra Content → Partners</strong> below, which also supports a
+              logo per partner. The fields below are frozen, not deleted; ask if you ever need one back.
+            </p>
+          )}
+          {form.slug !== 'mous' && (
+          <>
           <div className="admin-field">
             <label htmlFor="field-category">Category *</label>
             <select id="field-category" value={form.category} onChange={(e) => set('category', e.target.value)}>
@@ -261,7 +272,9 @@ export default function ResearchItemsAdmin() {
             <label htmlFor="field-data-table-optional-see-format">Data Table (optional — see format above)</label>
             <textarea id="field-data-table-optional-see-format" rows={8} value={form.tableText} onChange={(e) => set('tableText', e.target.value)} placeholder={'Name | Role\nDr. G. Srinivasa Rao | Chairman\nProf. P. Venkata Rama Raju | Member'} />
           </div>
-          {form.slug !== 'consultancy' && (
+          </>
+          )}
+          {form.slug !== 'consultancy' && form.slug !== 'mous' && (
             <div className="admin-field admin-field--full">
               <label>Expandable Areas (optional — for pages like Thrust Areas of Research that group into
                 categories of collapsible areas instead of a table). Start each category with{' '}
@@ -281,6 +294,7 @@ export default function ResearchItemsAdmin() {
               />
             </div>
           )}
+          {form.slug !== 'mous' && (
           <div className="admin-field admin-field--full">
             <label>Project Accordion (optional — for pages like Funded Projects that need a per-project
               expandable card instead of a table). Start each category with <code>## Category</code> (e.g.{' '}
@@ -347,6 +361,7 @@ export default function ResearchItemsAdmin() {
               placeholder={'## Ongoing Projects\n### Memory-Optimized Co-Processing Unit for Enhanced Edge AI\nPI: Dr. K Padma Vasavi\nDepartment: ECE\nAmount: Rs. 64,55,000\nAgency: Ministry of Electronics & IT\nOutcome:\n- Design and develop a specialized co-processing unit\n- Ensure seamless integration with existing systems'}
             />
           </div>
+          )}
         </div>
         <div className="admin-form-actions">
           {editing && <button className="admin-btn admin-btn--ghost" onClick={() => { setEditing(null); setForm(EMPTY); setActiveSubKey(null); }}>Cancel</button>}
