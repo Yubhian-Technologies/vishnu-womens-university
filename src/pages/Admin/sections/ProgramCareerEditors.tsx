@@ -103,6 +103,29 @@ export function PlacementYearsEditor({ department }: { department: DepartmentDoc
     }
   };
 
+  // Every one of these Records is keyed by array INDEX, not by the year
+  // itself — an unsaved staged import (`previews`) or a view-only company/
+  // sort/page-size filter (`yearFilters`) set on the year at position `a`
+  // must move to position `b` right along with it, or it silently reappears
+  // applied to whichever OTHER year ends up in that slot (e.g. a "Company:
+  // TCS" filter surviving onto a year that never had TCS, showing "No
+  // records match" even though nothing was actually lost) — reading as the
+  // year having moved but its data not coming with it.
+  const swapIndexedYearState = (a: number, b: number) => {
+    setPreviews((p) => {
+      const next = { ...p };
+      if (p[b] !== undefined) next[a] = p[b]; else delete next[a];
+      if (p[a] !== undefined) next[b] = p[a]; else delete next[b];
+      return next;
+    });
+    setYearFilters((f) => {
+      const next = { ...f };
+      if (f[b] !== undefined) next[a] = f[b]; else delete next[a];
+      if (f[a] !== undefined) next[b] = f[a]; else delete next[b];
+      return next;
+    });
+  };
+
   const moveYear = async (yi: number, dir: -1 | 1) => {
     const target = yi + dir;
     if (target < 0 || target >= years.length) return;
@@ -110,6 +133,7 @@ export function PlacementYearsEditor({ department }: { department: DepartmentDoc
     [next[yi], next[target]] = [next[target], next[yi]];
     try {
       await persistYears(next);
+      swapIndexedYearState(yi, target);
     } catch (e) {
       alert(`Couldn't reorder: ${(e as Error).message}`);
     }
@@ -261,6 +285,14 @@ export function PlacementYearsEditor({ department }: { department: DepartmentDoc
     }
   };
 
+  // Disables Move/Remove Year for every row (not just the one being edited)
+  // while any single Academic Year is in Edit Table or Edit Year (rename)
+  // mode — reordering or removing a year while another row's index-keyed
+  // local state (editRows, renameValue) is still pointing at that same
+  // position would leave that in-progress edit attached to the wrong year
+  // once the array shifts.
+  const anyYearBusy = editingYear !== null || renamingYear !== null;
+
   return (
     <div>
       <h3 style={{ fontSize: '0.95rem', margin: '0 0 0.5rem' }}>Placement Records — {department.title}</h3>
@@ -356,9 +388,9 @@ export function PlacementYearsEditor({ department }: { department: DepartmentDoc
                 <>
                   <strong style={{ flex: 1, fontSize: '1rem' }}>{y.year}</strong>
                   <button type="button" className="admin-btn admin-btn--sm" onClick={() => startRenameYear(yi)} disabled={isEditing} title="Edit Academic Year">Edit Year</button>
-                  <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveYear(yi, -1)} disabled={yi === 0 || isEditing} title="Move up">↑</button>
-                  <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveYear(yi, 1)} disabled={yi === years.length - 1 || isEditing} title="Move down">↓</button>
-                  <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeYear(yi)} disabled={busy || isEditing}>Remove Year</button>
+                  <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveYear(yi, -1)} disabled={yi === 0 || anyYearBusy} title="Move up">↑</button>
+                  <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveYear(yi, 1)} disabled={yi === years.length - 1 || anyYearBusy} title="Move down">↓</button>
+                  <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeYear(yi)} disabled={busy || anyYearBusy}>Remove Year</button>
                 </>
               )}
             </div>
@@ -615,6 +647,21 @@ export function InternshipYearsEditor({ department }: { department: DepartmentDo
     }
   };
 
+  // `previews` is keyed by array INDEX, not by the year itself — an unsaved
+  // staged import set on the year at position `a` must move to position `b`
+  // right along with it, or it silently reappears applied to whichever
+  // OTHER year ends up in that slot after the reorder — see
+  // PlacementYearsEditor's identical swapIndexedYearState for the full
+  // reasoning.
+  const swapIndexedYearState = (a: number, b: number) => {
+    setPreviews((p) => {
+      const next = { ...p };
+      if (p[b] !== undefined) next[a] = p[b]; else delete next[a];
+      if (p[a] !== undefined) next[b] = p[a]; else delete next[b];
+      return next;
+    });
+  };
+
   const moveYear = async (yi: number, dir: -1 | 1) => {
     const target = yi + dir;
     if (target < 0 || target >= years.length) return;
@@ -622,6 +669,7 @@ export function InternshipYearsEditor({ department }: { department: DepartmentDo
     [next[yi], next[target]] = [next[target], next[yi]];
     try {
       await persistYears(next);
+      swapIndexedYearState(yi, target);
     } catch (e) {
       alert(`Couldn't reorder: ${(e as Error).message}`);
     }
@@ -773,6 +821,11 @@ export function InternshipYearsEditor({ department }: { department: DepartmentDo
     }
   };
 
+  // See PlacementYearsEditor's identical anyYearBusy for the full reasoning
+  // — disables Move/Remove Year for every row while any single Academic
+  // Year is in Edit Table or Edit Year (rename) mode.
+  const anyYearBusy = editingYear !== null || renamingYear !== null;
+
   return (
     <div>
       <h3 style={{ fontSize: '0.95rem', margin: '1.5rem 0 0.5rem' }}>Internship Records — {department.title}</h3>
@@ -837,9 +890,9 @@ export function InternshipYearsEditor({ department }: { department: DepartmentDo
                 <>
                   <strong style={{ flex: 1, fontSize: '1rem' }}>{y.year}</strong>
                   <button type="button" className="admin-btn admin-btn--sm" onClick={() => startRenameYear(yi)} disabled={isEditing} title="Edit Academic Year">Edit Year</button>
-                  <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveYear(yi, -1)} disabled={yi === 0 || isEditing} title="Move up">↑</button>
-                  <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveYear(yi, 1)} disabled={yi === years.length - 1 || isEditing} title="Move down">↓</button>
-                  <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeYear(yi)} disabled={busy || isEditing}>Remove Year</button>
+                  <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveYear(yi, -1)} disabled={yi === 0 || anyYearBusy} title="Move up">↑</button>
+                  <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveYear(yi, 1)} disabled={yi === years.length - 1 || anyYearBusy} title="Move down">↓</button>
+                  <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeYear(yi)} disabled={busy || anyYearBusy}>Remove Year</button>
                 </>
               )}
             </div>
