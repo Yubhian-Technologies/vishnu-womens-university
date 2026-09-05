@@ -120,10 +120,9 @@ export default function RecruitersSection() {
         {/* Section Header */}
         <div className="recruiters-home-header reveal">
           <div className="recruiters-header-text">
-            <span className="section-label">Placement Partners</span>
             <h2 className="section-title gradient-text">Our Prominent Recruiters</h2>
             <p className="section-desc">
-              Over 150+ industry leaders and Fortune 500 corporations trust and recruit VWU engineers every year.
+              Over 100+ industry leaders and Fortune 500 corporations trust and recruit VWU engineers every year.
             </p>
           </div>
 

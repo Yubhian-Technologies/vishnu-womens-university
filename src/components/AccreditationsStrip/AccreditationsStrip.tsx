@@ -18,7 +18,6 @@ export default function AccreditationsStrip() {
     <section className="accreditations-strip" aria-label="Accreditations and Affiliations">
       <div className="container">
         <div className="accreditations-strip-header">
-          <p className="accreditations-strip-eyebrow">Recognised &amp; Approved</p>
           <h2 className="accreditations-strip-title">Accreditations &amp; Affiliations</h2>
         </div>
 

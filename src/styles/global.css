@@ -109,8 +109,12 @@ html {
   overflow-x: hidden;
 }
 
+body, button, input, select, textarea, h1, h2, h3, h4, h5, h6, p, span, a, li, td, th {
+  font-family: 'Product Sans', sans-serif !important;
+}
+
 body {
-  font-family: var(--font-sans);
+  font-family: 'Product Sans', sans-serif !important;
   color: var(--color-text);
   background-color: var(--color-white);
   line-height: 1.6;
@@ -647,6 +651,16 @@ h6 { font-size: var(--text-lg); }
   align-items: center;
   gap: var(--space-2);
   margin-bottom: var(--space-4);
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  overflow-x: auto;
+  max-width: 100%;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.breadcrumb::-webkit-scrollbar {
+  display: none;
 }
 
 .breadcrumb-item {

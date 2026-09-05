@@ -47,6 +47,8 @@ export interface LabItem {
   description?: string;
   pdfUrl?: string;
   pdfStoragePath?: string;
+  imageUrl?: string;
+  imageStoragePath?: string;
 }
 
 // Older programme docs stored labs as plain strings (no PDF) — normalize

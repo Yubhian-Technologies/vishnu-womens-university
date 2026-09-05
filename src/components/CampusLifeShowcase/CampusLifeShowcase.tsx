@@ -32,11 +32,6 @@ export default function CampusLifeShowcase() {
 
       <div className="container">
         <div className="campus-showcase-content">
-          {/* Eyebrow */}
-          <p className="campus-showcase-eyebrow">
-            Campus Life &amp; Experience
-          </p>
-
           {/* Main Title */}
           <h2 className="campus-showcase-title">
             Where Every Day Becomes Part of Your Journey

@@ -34,8 +34,8 @@ export const FOOTER_COLOR_VARS: ColorVarDef[] = [
 // color of its own, distinct from every button/badge/link on the site that
 // also reads Accent. Inherits Accent/Accent Light until explicitly set.
 export const FACULTY_COLOR_VARS: ColorVarDef[] = [
-  { key: '--faculty-bg', label: 'Faculty Section Background', hint: 'Blank inherits Accent from the theme above.', default: '#ebb024', inheritsFrom: '--color-accent' },
-  { key: '--faculty-bg-light', label: 'Faculty Section Background Light', hint: 'Gradient highlight tone. Blank inherits Accent Light from the theme above.', default: '#f6c035', inheritsFrom: '--color-accent-light' },
+  { key: '--faculty-bg', label: 'Faculty Section Background', hint: 'Default is vibrant yellow (#facc15).', default: '#facc15' },
+  { key: '--faculty-bg-light', label: 'Faculty Section Background Light', hint: 'Gradient highlight tone (#fde047).', default: '#fde047' },
 ];
 
 // "Alumni Voices & Stories" testimonial section — this component ships its

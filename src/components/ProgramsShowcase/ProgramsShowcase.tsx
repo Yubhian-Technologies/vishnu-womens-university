@@ -67,7 +67,6 @@ export default function ProgramsShowcase() {
         {/* ── Left Column: Programs Overview & Filter Navigation ── */}
         <div className="programs-showcase-left-container">
           <div className="programs-showcase-left">
-            <span className="programs-showcase-eyebrow">Programs</span>
             <h2 className="programs-showcase-heading">
               A Spectrum of Programmes. A World of Possibilities.
             </h2>

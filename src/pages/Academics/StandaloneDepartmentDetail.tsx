@@ -9,8 +9,10 @@ import { normalizeLab, type LabItem } from '../Admin/sections/ProgramsAdmin';
 import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import type { FacultyDoc } from './Faculty';
 import type { StandaloneDepartment } from '../../lib/departmentGroups';
+import NewsEventsTabs, { type NewsEventsCategory } from '../../components/NewsEventsTabs/NewsEventsTabs';
+import { parseFlexibleTable } from '../../lib/structuredTable';
 import { hasCustomSectionContent, toQuickLinkItems } from '../../lib/customSections';
-import CustomSectionsRenderer, { SectionSubtree } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
+import CustomSectionsRenderer from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import LabDialog from '../../components/LabDialog/LabDialog';
 import '../detail-layout.css';
 
@@ -79,7 +81,44 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
   // a standalone department (Freshman Engineering's Mathematics/Physics/
   // Chemistry/English) never had a News & Events block before this.
   const newsEventsSubSections = (dept.newsEventsSections || []).filter(hasCustomSectionContent);
-  const hasNewsEvents = newsEventsSubSections.length > 0;
+  const newsEventsCategories: NewsEventsCategory[] = newsEventsSubSections.map((sec) => ({
+    key: sec.id,
+    label: sec.label,
+    years: (sec.subSections || []).filter(hasCustomSectionContent).length > 0
+      ? (sec.subSections || []).filter(hasCustomSectionContent).map((sub) => {
+          const yearLabel = sub.label.replace(/^Academic Year\s*(::|:|-)?\s*/i, '').trim();
+          const parsedTables = parseFlexibleTable(sub.tableText || '');
+          const firstTable = parsedTables[0] || { headers: [], rows: [] };
+          const mode: 'table' | 'cards' | 'text' | 'both' =
+            firstTable.headers.length > 0 && (sub.imageCards?.length ?? 0) > 0
+              ? 'both'
+              : firstTable.headers.length > 0
+              ? 'table'
+              : (sub.imageCards?.length ?? 0) > 0
+              ? 'cards'
+              : 'text';
+          return {
+            year: yearLabel || sub.label,
+            mode,
+            columns: firstTable.headers,
+            rows: firstTable.rows.map((cells) => ({ cells })),
+            cards: sub.imageCards,
+            text: sub.textContent,
+          };
+        })
+      : [
+          {
+            year: sec.label.replace(/^Academic Year\s*(::|:|-)?\s*/i, '').trim() || sec.label,
+            mode: 'table' as const,
+            columns: parseFlexibleTable(sec.tableText || '')[0]?.headers || [],
+            rows: (parseFlexibleTable(sec.tableText || '')[0]?.rows || []).map((cells) => ({ cells })),
+            cards: sec.imageCards,
+            text: sec.textContent,
+          },
+        ],
+  })).filter((c) => c.years.length > 0);
+
+  const hasNewsEvents = newsEventsCategories.length > 0;
 
   const quickLinks = [
     hasAbout && { id: 'about', label: 'About the Department' },
@@ -401,23 +440,8 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
 
       <CustomSectionsRenderer sections={visibleCustomSections} navOffset={NAV_OFFSET} />
 
-      {/* News & Events — the heading is fixed; what's under it is the
-          admin-defined dynamic section list (see newsEventsSubSections
-          above). */}
-      {hasNewsEvents && (
-        <section id="news-events" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
-          <div className="container">
-            <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label dept-section-label">{deptName}</span>
-              <h2 className="section-title">News &amp; Events</h2>
-            </div>
-            <SectionSubtree
-              section={{ id: 'news-events-root', label: 'News & Events', contentType: 'text', textContent: '', subSections: newsEventsSubSections }}
-              navOffset={NAV_OFFSET}
-            />
-          </div>
-        </section>
-      )}
+      {/* News & Events — Compact Collapsible Academic-Year List */}
+      {hasNewsEvents && <NewsEventsTabs categories={newsEventsCategories} eyebrow={deptName} navOffset={NAV_OFFSET} />}
 
       {/* Department Library */}
       {hasLibrary && (

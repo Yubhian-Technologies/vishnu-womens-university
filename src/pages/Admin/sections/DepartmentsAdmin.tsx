@@ -465,6 +465,21 @@ export default function DepartmentsAdmin() {
     }
     setForm((p) => ({ ...p, labs: (p.labs || []).map(normalizeLab).map((l, i) => (i === li ? { ...l, pdfUrl: '', pdfStoragePath: '' } : l)) }));
   };
+  const handleLabImage = (li: number, r: UploadResult) => {
+    setForm((p) => ({ ...p, labs: (p.labs || []).map(normalizeLab).map((l, i) => (i === li ? { ...l, imageUrl: r.url, imageStoragePath: r.path } : l)) }));
+  };
+  const removeLabImage = async (li: number) => {
+    const lab = labs[li];
+    if (!lab?.imageUrl) return;
+    if (!confirm('Remove this image? This cannot be undone.')) return;
+    try {
+      if (lab.imageStoragePath) await deleteFile(lab.imageStoragePath);
+    } catch (e) {
+      alert(`Couldn't delete the file from storage: ${(e as Error).message}`);
+      return;
+    }
+    setForm((p) => ({ ...p, labs: (p.labs || []).map(normalizeLab).map((l, i) => (i === li ? { ...l, imageUrl: '', imageStoragePath: '' } : l)) }));
+  };
 
   // Digital Library section editor — same add/reorder/remove pattern as the
   // per-programme one in ProgramsAdmin.
@@ -670,7 +685,7 @@ export default function DepartmentsAdmin() {
       hod: d.hod || '', hodImage: d.hodImage || '', hodImageStoragePath: d.hodImageStoragePath || '',
       hodEmail: d.hodEmail || '', hodMessage: d.hodMessage || '', hodResearchProfiles: d.hodResearchProfiles || [],
       vision: d.vision || '', mission: d.mission || [], coreValues: d.coreValues || [],
-      labs: (d.labs || []).map(normalizeLab).map((l) => ({ name: l.name, description: l.description || '', pdfUrl: l.pdfUrl || '', pdfStoragePath: l.pdfStoragePath || '' })),
+      labs: (d.labs || []).map(normalizeLab).map((l) => ({ name: l.name, description: l.description || '', pdfUrl: l.pdfUrl || '', pdfStoragePath: l.pdfStoragePath || '', imageUrl: l.imageUrl || '', imageStoragePath: l.imageStoragePath || '' })),
       libraryIntro: d.libraryIntro || '', libraryInCharge: d.libraryInCharge || '',
       librarySections: (d.librarySections || []).map((s) => ({ heading: s.heading, items: s.items || [] })),
       programLevels: (d.programLevels || []).map((l) => ({ title: l.title, intro: l.intro || '', rows: l.rows || [] })),
@@ -858,9 +873,9 @@ export default function DepartmentsAdmin() {
             <label>Laboratories</label>
             <p className="admin-field__hint" style={{ marginTop: 0 }}>
               Each laboratory has its own name, an optional description (a paragraph, or points — one per line, however
-              you write it), and its own uploaded PDF. On the public page, tapping a laboratory tile opens a dialog
-              with its description and a link to its PDF — a lab with no PDF uploaded yet still shows its tile and
-              dialog, just marked as unavailable there.
+              you write it), its own photo, and its own uploaded PDF. On the public page each laboratory shows as a
+              row — description and a link to its PDF on one side, the photo on the other — a lab with no photo or
+              PDF uploaded yet still shows, just without that part.
             </p>
             {labs.length > 0 && (
               <div className="admin-compact-list" style={{ marginBottom: '0.75rem' }}>
@@ -904,6 +919,25 @@ export default function DepartmentsAdmin() {
                       rows={2}
                       style={{ width: '100%', marginTop: '0.4rem' }}
                     />
+                    <div style={{ marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <ImageUploader
+                        folder="vwu/departments/labs"
+                        currentUrl={lab.imageUrl}
+                        onUploaded={(r) => handleLabImage(li, r)}
+                        label="Upload Lab Photo"
+                        aspect={4 / 3}
+                      />
+                      {lab.imageUrl && (
+                        <button
+                          type="button"
+                          className="admin-btn admin-btn--ghost admin-btn--sm"
+                          onClick={() => removeLabImage(li)}
+                          title="Remove photo"
+                        >
+                          Remove Photo
+                        </button>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>

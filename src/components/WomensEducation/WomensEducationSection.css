@@ -1,9 +1,12 @@
-/* ===== Women's Education Section ===== */
+/* ==========================================================================
+   Women's Education Section — Premium University Aesthetic
+   Colors: VWU Navy (#0B1E42, #1E3B75), Green Accent (#1B4332), Gold (#C9973A)
+   ========================================================================== */
 
 .we-section {
   position: relative;
-  background: #ffffff;
-  padding: clamp(4rem, 7vw, 6.5rem) 0;
+  background: #FAFAFC;
+  padding: clamp(3.5rem, 6vw, 5.5rem) 0;
   overflow: hidden;
 }
 
@@ -12,157 +15,168 @@
   position: absolute;
   border-radius: 50%;
   pointer-events: none;
-  filter: blur(80px);
-  opacity: 0.45;
+  filter: blur(90px);
+  opacity: 0.35;
   z-index: 1;
 }
 
 .we-glow--1 {
-  top: 5%;
+  top: -5%;
   right: -5%;
-  width: 450px;
-  height: 450px;
-  background: radial-gradient(circle, rgba(200, 169, 106, 0.22) 0%, color-mix(in srgb, var(--color-primary-light, #2d6a4f) 10%, transparent) 60%, transparent 80%);
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(201, 151, 58, 0.18) 0%, rgba(27, 67, 50, 0.08) 60%, transparent 80%);
 }
 
 .we-glow--2 {
-  bottom: 5%;
+  bottom: -5%;
   left: -5%;
-  width: 400px;
-  height: 400px;
-  background: radial-gradient(circle, color-mix(in srgb, var(--color-primary-light, #2d6a4f) 15%, transparent) 0%, rgba(200, 169, 106, 0.08) 60%, transparent 80%);
+  width: 450px;
+  height: 450px;
+  background: radial-gradient(circle, rgba(27, 67, 50, 0.12) 0%, rgba(201, 151, 58, 0.06) 60%, transparent 80%);
 }
 
-/* Main Split Grid. The placement card already fills 100% of its own
-   column — the leftover space to its right was the column itself being
-   the minority share (0.85fr) of the row. Right column now dominant so
-   the card actually reads as using the right side of the section. */
+/* Main Two-Column Grid */
 .we-grid {
   position: relative;
   z-index: 2;
   display: grid;
-  grid-template-columns: 0.9fr 1.4fr;
+  grid-template-columns: 1fr 1fr;
   align-items: center;
-  gap: clamp(1.5rem, 4vw, 3.5rem);
-  margin-bottom: clamp(3rem, 6vw, 4.5rem);
+  gap: clamp(2rem, 5vw, 4.5rem);
 }
 
-/* Left Content */
+/* Left Content Column */
 .we-content {
   display: flex;
   flex-direction: column;
 }
 
 .we-badge-row {
-  margin-bottom: var(--space-3);
+  margin-bottom: 0.85rem;
 }
 
 .we-badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  background: color-mix(in srgb, var(--color-primary, #1b4332) 8%, transparent);
-  border: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 18%, transparent);
-  color: var(--color-primary-dark, #0b1f16);
+  gap: 7px;
+  background: rgba(11, 30, 66, 0.04);
+  border: 1px solid rgba(11, 30, 66, 0.12);
+  color: #0B1E42;
   padding: 6px 14px;
   border-radius: 9999px;
   font-family: var(--font-sans);
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
 .we-badge-icon {
-  color: var(--color-accent, #c9a84c);
+  color: #C9973A;
+  font-size: 0.8rem;
 }
 
 .we-title {
   font-family: var(--font-serif);
-  font-size: clamp(2.2rem, 4.2vw, 3.4rem);
+  font-size: clamp(2.3rem, 4vw, 3.4rem);
   font-weight: 900;
   line-height: 1.15;
-  color: var(--color-primary-dark, #0b1f16);
-  margin-bottom: var(--space-4);
+  color: #0B1E42;
+  margin-bottom: 1.25rem;
   letter-spacing: -0.02em;
 }
 
+.gradient-text {
+  background: linear-gradient(135deg, #1B4332 0%, #2D6A4F 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 .we-lead {
-  font-size: clamp(1.05rem, 1.6vw, 1.22rem);
+  font-family: var(--font-sans);
+  font-size: clamp(1.05rem, 1.4vw, 1.2rem);
   line-height: 1.65;
-  color: #1f2937;
-  margin-bottom: var(--space-3);
+  color: #1E293B;
+  margin-bottom: 0.85rem;
   font-weight: 500;
 }
 
 .we-lead strong {
-  color: var(--color-primary, #1b4332);
-  font-weight: 700;
+  color: #0B1E42;
+  font-weight: 800;
 }
 
 .we-desc {
-  font-size: clamp(0.92rem, 1.3vw, 1.02rem);
-  line-height: 1.68;
-  color: #4b5563;
-  margin-bottom: var(--space-5);
-}
-
-/* Quick Interactive Tags */
-.we-tags-wrap {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: clamp(1.5rem, 3vw, 2.25rem);
-}
-
-.we-tag-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  background: #f3f4f6;
-  border: 1px solid #e5e7eb;
-  padding: 5px 12px;
-  border-radius: 8px;
   font-family: var(--font-sans);
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #374151;
-  transition: all 0.2s ease;
-  user-select: none;
+  font-size: clamp(0.92rem, 1.1vw, 1rem);
+  line-height: 1.68;
+  color: #475569;
+  margin-bottom: 1.75rem;
 }
 
-.we-tag-chip-icon {
-  font-size: 0.72rem;
-  color: var(--color-accent, #c9a84c);
-  transition: color 0.2s ease;
-}
-
-.we-tag-chip:hover {
-  background: color-mix(in srgb, var(--color-primary, #1b4332) 8%, transparent);
-  border-color: var(--color-accent, #c9a84c);
-  color: var(--color-primary, #1b4332);
-  transform: translateY(-2px);
-}
-
-.we-tag-chip:hover .we-tag-chip-icon {
-  color: var(--color-primary, #1b4332);
-}
-
-/* Buttons */
+/* Action CTAs */
 .we-actions {
   display: flex;
   align-items: center;
-  gap: var(--space-4);
+  gap: 1rem;
   flex-wrap: wrap;
 }
 
 .we-btn-primary {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.6rem;
+  background: #0B1E42;
+  color: #FFFFFF;
+  padding: 0.85rem 1.85rem;
+  border-radius: 9999px;
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 8px 24px rgba(11, 30, 66, 0.18);
+  transition: all 200ms ease;
 }
 
-/* Right Column: Visual Showcase */
+.we-btn-primary:hover {
+  background: #1E3B75;
+  color: #FFFFFF;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(11, 30, 66, 0.25);
+}
+
+.we-btn-arrow {
+  font-size: 0.85rem;
+  transition: transform 200ms ease;
+}
+
+.we-btn-primary:hover .we-btn-arrow {
+  transform: translateX(4px);
+}
+
+.we-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.85rem 1.65rem;
+  background: transparent;
+  color: #0B1E42;
+  border: 1.5px solid rgba(11, 30, 66, 0.2);
+  border-radius: 9999px;
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 200ms ease;
+}
+
+.we-btn-secondary:hover {
+  border-color: #0B1E42;
+  background: rgba(11, 30, 66, 0.04);
+  color: #0B1E42;
+}
+
+/* Right Column: Polished Student Success Card */
 .we-visual-column {
   position: relative;
   display: flex;
@@ -170,228 +184,215 @@
   justify-content: center;
 }
 
-.we-illustration-card {
+.we-success-story-wrapper {
   position: relative;
   width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  /* Vertical padding only — horizontal padding here was eating into the
-     rectangle's own width for no reason, since the card already fills the
-     column. */
-  padding: clamp(1rem, 2vw, 1.5rem) 0;
+  max-width: 580px;
+  height: clamp(260px, 28vw, 320px);
 }
 
-/* Halo Ring */
-.we-halo-ring {
-  position: absolute;
-  width: 340px;
-  height: 340px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(200, 169, 106, 0.18) 0%, color-mix(in srgb, var(--color-primary-light, #2d6a4f) 8%, transparent) 55%, transparent 75%);
-  animation: we-halo-breathe 4s ease-in-out infinite;
-  z-index: 1;
-  pointer-events: none;
-}
-
-@keyframes we-halo-breathe {
-  0%, 100% {
-    transform: scale(0.92);
-    opacity: 0.6;
-  }
-  50% {
-    transform: scale(1.08);
-    opacity: 0.95;
-  }
-}
-
-/* Auto-rotating placement highlight card — no controls, pure timed
-   crossfade (see CAROUSEL_INTERVAL in the component). One continuous
-   silhouette, not two boxes with a gap: a circular photo whose right half
-   is overlapped by a rectangle of the *same height as the circle's
-   diameter*, so the rectangle visually originates from the circle's own
-   center line instead of sitting beside it. --we-photo-d is the single
-   source of truth both the circle's size and the rectangle's overlap math
-   are derived from, so they always stay in sync at every breakpoint. */
-.we-placement-highlight {
-  position: relative;
-  z-index: 2;
-  width: 100%;
-  height: clamp(230px, 30vw, 380px);
-  animation: we-float-gentle 5s ease-in-out infinite;
-}
-
-.we-placement-card {
-  --we-photo-d: clamp(200px, 34vw, 340px);
+.we-success-card {
   position: absolute;
   inset: 0;
+  background: #FFFFFF;
+  border-radius: 24px;
+  border: 1px solid rgba(11, 30, 66, 0.08);
+  box-shadow: 0 20px 48px -10px rgba(11, 30, 66, 0.12);
   display: flex;
   align-items: center;
-  height: var(--we-photo-d);
+  padding: 1.5rem 1.75rem;
+  gap: 1.5rem;
+  overflow: hidden;
   opacity: 0;
-  transform: scale(0.98);
-  transition: opacity 700ms ease, transform 700ms ease;
+  transform: scale(0.97);
+  transition: opacity 600ms ease, transform 600ms ease;
   pointer-events: none;
 }
 
-.we-placement-card.is-active {
+.we-success-card.is-active {
   opacity: 1;
   transform: scale(1);
-  z-index: 1;
+  pointer-events: auto;
+  z-index: 2;
 }
 
-/* The circle — full diameter, painted above the rectangle so their shared
-   edge reads as one shape instead of a visible seam. */
-.we-placement-photo-wrap {
+/* Trophy Watermark */
+.we-trophy-watermark {
+  position: absolute;
+  right: -10px;
+  bottom: -20px;
+  font-size: 11rem;
+  color: rgba(11, 30, 66, 0.04);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Circular Student Avatar */
+.we-student-avatar-frame {
   position: relative;
-  z-index: 2;
+  z-index: 1;
   flex-shrink: 0;
-  width: var(--we-photo-d);
-  height: var(--we-photo-d);
+  width: clamp(150px, 18vw, 200px);
+  height: clamp(150px, 18vw, 200px);
   border-radius: 50%;
   overflow: hidden;
-  border: 5px solid #ffffff;
-  box-shadow: 0 8px 20px color-mix(in srgb, var(--color-primary-dark, #081c15) 22%, transparent);
-  background: #ffffff;
+  border: 4px solid #FFFFFF;
+  box-shadow: 0 10px 28px rgba(11, 30, 66, 0.16);
+  background: #F1F5F9;
 }
 
-.we-placement-photo {
+.we-student-avatar {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
 
-/* The rectangle — pulled left by half the circle's diameter so its own
-   left edge starts exactly at the circle's center, then padded back out
-   by the same amount so the text never sits underneath the photo. Plain
-   white glass — no color tint at all — just blur + a soft edge. */
-.we-placement-info {
+/* Success Content Box */
+.we-success-content {
   position: relative;
   z-index: 1;
   flex: 1;
   min-width: 0;
-  height: 100%;
-  margin-left: calc(var(--we-photo-d) / -2);
-  padding: 0.5rem clamp(0.9rem, 2.4vw, 1.35rem) 0.5rem calc(var(--we-photo-d) / 2 + clamp(0.85rem, 2vw, 1.2rem));
-  border-radius: 0 22px 22px 0;
-  background: rgba(255, 255, 255, 0.18);
-  backdrop-filter: blur(16px) saturate(140%);
-  -webkit-backdrop-filter: blur(16px) saturate(140%);
-  border: 1px solid rgba(255, 255, 255, 0.55);
-  border-left: none;
-  box-shadow: 0 16px 40px color-mix(in srgb, var(--color-primary-dark, #081c15) 8%, transparent), inset 0 1px 0 rgba(255, 255, 255, 0.5);
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 0.25rem;
 }
 
-.we-placement-name {
-  font-family: var(--font-sans);
-  font-size: clamp(1.15rem, 2.8vw, 1.65rem);
-  font-weight: 900;
-  letter-spacing: 0.01em;
-  text-transform: uppercase;
-  color: #0f1f17;
-  line-height: 1.15;
-  margin: 0;
-}
-
-.we-placement-package {
-  font-family: var(--font-sans);
-  font-size: clamp(1.4rem, 3.4vw, 2rem);
-  font-weight: 900;
-  color: var(--color-primary, #1b4332);
-  letter-spacing: 0.01em;
-  white-space: nowrap;
-  margin: 0.15rem 0 0;
-}
-
-.we-placement-company {
-  font-family: var(--font-sans);
-  font-size: clamp(1.05rem, 2.3vw, 1.35rem);
-  font-weight: 800;
-  color: #374151;
-  text-transform: lowercase;
-  margin: 0.3rem 0 0;
-}
-
-/* Uploaded recruiter logo (admin) — shown instead of .we-placement-company
-   when a logo image is set. Height-capped, natural width, so a wide
-   wordmark and a square icon-mark both sit at a consistent visual size. */
-.we-placement-logo {
-  height: clamp(48px, 7.5vw, 78px);
-  width: auto;
-  max-width: 75%;
-  object-fit: contain;
-  object-position: left center;
-  margin-top: 0.5rem;
-  display: block;
-}
-
-/* Large, softly-tinted trophy watermark — fills the empty right portion
-   of the now much-wider glass panel with something that actually means
-   "placement achievement" instead of leaving it blank or padding it with
-   generic decoration. Absolutely-positioned elements with z-index:auto/0
-   actually paint *above* normal-flow siblings, not below — .we-placement-
-   text below is what forces the real content on top regardless. */
-.we-placement-badge-icon {
-  position: absolute;
-  z-index: 0;
-  right: clamp(0.75rem, 3vw, 2.25rem);
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: clamp(3.5rem, 9vw, 7rem);
-  color: color-mix(in srgb, var(--color-primary, #1b4332) 10%, transparent);
-  pointer-events: none;
-}
-
-.we-placement-text {
-  position: relative;
-  z-index: 1;
-}
-
-/* A slot without real name/package/company data yet — plain photo, just
-   a neutral "VWU Graduate" caption instead of fabricated placement info. */
-.we-placement-info--pending {
+.we-success-eyebrow {
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
+  gap: 0.4rem;
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #C9973A;
+  margin-bottom: 0.35rem;
 }
 
-.we-placement-pending-note {
-  font-size: 0.85rem;
+.we-success-award-icon {
+  font-size: 0.75rem;
+}
+
+.we-student-name {
+  font-family: var(--font-sans);
+  font-size: clamp(1.2rem, 1.8vw, 1.5rem);
+  font-weight: 900;
+  color: #0B1E42;
+  letter-spacing: -0.01em;
+  margin: 0 0 0.4rem 0;
+  line-height: 1.2;
+}
+
+/* Package Figure */
+.we-package-highlight {
+  display: flex;
+  align-items: baseline;
+  gap: 0.3rem;
+  margin-bottom: 0.5rem;
+}
+
+.we-package-num {
+  font-family: var(--font-sans);
+  font-size: clamp(2rem, 2.8vw, 2.5rem);
+  font-weight: 900;
+  color: #0B1E42;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.we-package-unit {
+  font-family: var(--font-sans);
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #1B4332;
+  letter-spacing: 0.02em;
+}
+
+/* Company Badge / Logo */
+.we-company-badge {
+  display: flex;
+  align-items: center;
+  margin-top: 0.2rem;
+}
+
+.we-company-logo {
+  height: 28px;
+  width: auto;
+  max-width: 140px;
+  object-fit: contain;
+}
+
+.we-company-name-text {
+  font-family: var(--font-sans);
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #334155;
+}
+
+/* Official Google Multi-Color Logo Badge */
+.we-google-logo-badge {
+  display: inline-flex;
+  align-items: center;
+  font-family: 'Product Sans', system-ui, -apple-system, sans-serif;
+  font-size: 1.45rem;
   font-weight: 700;
-  color: var(--color-primary, #1b4332);
-  text-align: center;
-  margin: 0;
+  letter-spacing: -0.02em;
+  user-select: none;
 }
 
-@keyframes we-float-gentle {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-8px);
-  }
-}
+.we-google-g { color: #4285F4; }
+.we-google-o1 { color: #EA4335; }
+.we-google-o2 { color: #FBBC05; }
+.we-google-g2 { color: #4285F4; }
+.we-google-l { color: #34A853; }
+.we-google-e { color: #EA4335; }
 
-/* Responsive adjustments */
+/* Responsive Overrides */
 @media (max-width: 1024px) {
   .we-grid {
     grid-template-columns: 1fr;
-    text-align: center;
+    gap: 3rem;
   }
 
   .we-content {
     align-items: center;
-  }
-
-  .we-tags-wrap {
-    justify-content: center;
+    text-align: center;
   }
 
   .we-actions {
+    justify-content: center;
+  }
+
+  .we-success-story-wrapper {
+    max-width: 520px;
+  }
+}
+
+@media (max-width: 640px) {
+  .we-success-card {
+    flex-direction: column;
+    text-align: center;
+    padding: 1.5rem 1.25rem;
+    gap: 1rem;
+    height: auto;
+  }
+
+  .we-success-story-wrapper {
+    height: 380px;
+  }
+
+  .we-student-avatar-frame {
+    width: 130px;
+    height: 130px;
+  }
+
+  .we-success-content {
+    align-items: center;
+  }
+
+  .we-package-highlight {
     justify-content: center;
   }
 }

@@ -5,45 +5,28 @@ import type { ContentBlockDoc } from '../../pages/Admin/sections/ContentBlocksAd
 import './CounterSection.css';
 
 const defaultCounters: ContentBlockDoc[] = [
-  { id: 'default-1', page: 'home', section: 'counters', value: '15000', title: 'Engineers Graduated',   desc: 'Alumni strong',              icon: '', slug: '+', order: 0 },
-  { id: 'default-2', page: 'home', section: 'counters', value: '',      title: 'Expert Faculty',        desc: 'Expert educators',           icon: '', slug: '',  order: 1 },
-  { id: 'default-3', page: 'home', section: 'counters', value: '1100',  title: 'Placements',            desc: '2025-2026',                  icon: '', slug: '+', order: 2 },
-  { id: 'default-4', page: 'home', section: 'counters', value: '2500',  title: 'Research Publications', desc: 'International journals',     icon: '', slug: '+', order: 3 },
-  { id: 'default-5', page: 'home', section: 'counters', value: '150',   title: 'Patents Filed',         desc: 'Innovations & inventions',   icon: '', slug: '+', order: 4 },
-  { id: 'default-6', page: 'home', section: 'counters', value: '500',   title: 'Industry Partners',     desc: 'Recruiting & collaborating', icon: '', slug: '+', order: 5 },
-  { id: 'default-7', page: 'home', section: 'counters', value: '25',    title: 'Global MoUs',           desc: 'International outreach',     icon: '', slug: '+', order: 6 },
+  { id: 'default-1', page: 'home', section: 'counters', value: '15000', title: 'Engineers Graduated', desc: '', icon: '', slug: '+', order: 0 },
+  { id: 'default-2', page: 'home', section: 'counters', value: '250', title: 'Experienced Faculty', desc: '', icon: '', slug: '+', order: 1 },
+  { id: 'default-3', page: 'home', section: 'counters', value: '1000', title: 'Annual Placements', desc: '', icon: '', slug: '+', order: 2 },
+  { id: 'default-4', page: 'home', section: 'counters', value: '2500', title: 'Research Publications', desc: '', icon: '', slug: '+', order: 3 },
+  { id: 'default-5', page: 'home', section: 'counters', value: '150', title: 'Patents Filed', desc: '', icon: '', slug: '+', order: 4 },
+  { id: 'default-6', page: 'home', section: 'counters', value: '100', title: 'Top Recruiters', desc: '', icon: '', slug: '+', order: 5 },
+  { id: 'default-7', page: 'home', section: 'counters', value: '25', title: 'Global MoUs', desc: '', icon: '', slug: '+', order: 6 },
 ];
 
-function SingleCounter({
-  item,
-  start,
-}: {
-  item: ContentBlockDoc;
-  start: boolean;
-}) {
-  const count = useCounter(parseInt(item.value, 10) || 0, 2200, start);
+function StatItem({ item, start }: { item: ContentBlockDoc; start: boolean }) {
+  const numVal = parseInt(item.value, 10) || 0;
+  const count = useCounter(numVal, 2000, start);
 
   return (
-    <div className="counter-item-m3">
-      <div className="counter-item-state-layer" />
-      
-      {/* Big Bold Stat Value */}
+    <div className="glance-stat-item">
       {item.value ? (
-        <div className="counter-number-m3">
-          <span className="counter-value">{count.toLocaleString()}</span>
-          <span className="counter-suffix-m3">{item.slug || '+'}</span>
+        <div className="glance-stat-value-wrap">
+          <span className="glance-stat-number">{count.toLocaleString()}</span>
+          <span className="glance-stat-suffix">{item.slug || '+'}</span>
         </div>
       ) : null}
-
-      {/* Metric Label */}
-      <h3 className="counter-label-m3">{item.title}</h3>
-
-      {/* Subtitle / Micro Tag */}
-      {item.desc && (
-        <div className="counter-sub-pill">
-          <span>{item.desc}</span>
-        </div>
-      )}
+      <div className="glance-stat-label">{item.title}</div>
     </div>
   );
 }
@@ -71,15 +54,18 @@ export default function CounterSection() {
   }, []);
 
   return (
-    <section className="counter-section-m3" ref={sectionRef} aria-label="VWU Key University Statistics">
-      {/* Subtle Ambient Glow */}
-      <div className="counter-glow" aria-hidden="true" />
-
+    <section className="glance-section" ref={sectionRef} aria-label="University at a Glance">
       <div className="container">
-        <div className="counter-grid-m3">
-          {counters.map((item) => (
-            <SingleCounter key={item.id} item={item} start={started} />
-          ))}
+        <div className="glance-header">
+          <h2 className="glance-title">University at a Glance</h2>
+        </div>
+
+        <div className="glance-unified-card">
+          <div className="glance-stats-grid">
+            {counters.map((item) => (
+              <StatItem key={item.id} item={item} start={started} />
+            ))}
+          </div>
         </div>
       </div>
     </section>

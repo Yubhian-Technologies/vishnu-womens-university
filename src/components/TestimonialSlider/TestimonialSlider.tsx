@@ -3,10 +3,7 @@ import {
   Quote, 
   ChevronLeft, 
   ChevronRight, 
-  Sparkles, 
   BadgeCheck, 
-  Building2, 
-  GraduationCap, 
   ArrowRight
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -60,7 +57,6 @@ export default function TestimonialSlider({
     setProgress(0);
   };
 
-  // Smooth animated linear progress bar timer
   useEffect(() => {
     if (isPaused || count <= 1) {
       if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
@@ -85,7 +81,6 @@ export default function TestimonialSlider({
     };
   }, [isPaused, count, autoPlayInterval, nextSlide]);
 
-  // Preload avatar images
   useEffect(() => {
     testimonials.forEach((t, i) => {
       const src = (t.slug && t.slug.startsWith('http')) ? t.slug : FALLBACK_AVATARS[i % FALLBACK_AVATARS.length];
@@ -110,28 +105,23 @@ export default function TestimonialSlider({
     .join('')
     .toUpperCase();
 
-  // Highlight company/outcome if present (e.g. Google, Amazon, IIT Hyderabad)
-  const roleParts = authorRole.split(/—|-|\|/);
-  const deptPart = roleParts[0]?.trim() || "Engineering";
-  const outcomePart = roleParts[1]?.trim() || "Alumna";
-
   const slideVariants = {
     enter: (dir: number) => ({
       opacity: 0,
-      x: dir > 0 ? 30 : -30,
-      filter: 'blur(6px)',
+      x: dir > 0 ? 25 : -25,
+      filter: 'blur(4px)',
     }),
     center: {
       opacity: 1,
       x: 0,
       filter: 'blur(0px)',
-      transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] as const },
+      transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] as const },
     },
     exit: (dir: number) => ({
       opacity: 0,
-      x: dir > 0 ? -30 : 30,
-      filter: 'blur(6px)',
-      transition: { duration: 0.3, ease: 'easeIn' as const },
+      x: dir > 0 ? -25 : 25,
+      filter: 'blur(4px)',
+      transition: { duration: 0.25, ease: 'easeIn' as const },
     }),
   };
 
@@ -142,19 +132,12 @@ export default function TestimonialSlider({
       <div className="m3-testi-glow-right" aria-hidden="true" />
 
       <div className="container">
-        {/* Section Header with Google M3 Pill */}
+        {/* Section Header */}
         <div className="m3-testi-header">
-          <div className="m3-testi-eyebrow">
-            <Sparkles size={14} className="m3-testi-sparkle" />
-            <span>Transformations &amp; Real Outcomes</span>
-          </div>
           <h2 className="m3-testi-title">{title}</h2>
-          <p className="m3-testi-subtitle">
-            From premier campus placements to trailblazing startups and global academic research—hear how VWU shapes empowered women leaders.
-          </p>
         </div>
 
-        {/* Carousel Outer Stage */}
+        {/* Carousel Stage */}
         <div 
           className="m3-testi-stage"
           onMouseEnter={() => setIsPaused(true)}
@@ -168,7 +151,7 @@ export default function TestimonialSlider({
         >
           {/* Main Card Surface */}
           <div className="m3-testi-card">
-            {/* Auto-play Linear Progress Bar */}
+            {/* Progress Bar */}
             <div className="m3-testi-progress-track">
               <div 
                 className="m3-testi-progress-bar" 
@@ -186,7 +169,7 @@ export default function TestimonialSlider({
                 exit="exit"
                 className="m3-testi-card-inner"
               >
-                {/* Left Visual Avatar Showcase */}
+                {/* Left Narrow Photo Column */}
                 <div className="m3-testi-portrait-col">
                   <div className="m3-testi-img-frame">
                     {avatarUrl ? (
@@ -205,40 +188,32 @@ export default function TestimonialSlider({
                     )}
                     <div className="m3-testi-img-overlay" />
 
-                    {/* Verified Alumna Badge */}
+                    {/* Simplified Verified Alumna Badge */}
                     <div className="m3-verified-badge">
-                      <BadgeCheck size={16} className="m3-verified-icon" />
+                      <BadgeCheck size={13} className="m3-verified-icon" />
                       <span>Verified Alumna</span>
                     </div>
-                  </div>
-
-                  {/* Quick Highlight Metric */}
-                  <div className="m3-testi-outcome-pill">
-                    <Building2 size={13} />
-                    <span>{outcomePart}</span>
                   </div>
                 </div>
 
                 {/* Right Content Column */}
                 <div className="m3-testi-content-col">
                   <div className="m3-testi-top-bar">
-                    <Quote size={42} className="m3-quote-symbol" />
+                    <Quote size={32} className="m3-quote-symbol" />
                   </div>
 
-                  {/* Main Quote */}
+                  {/* Main Quote (Clamped 3-4 lines) */}
                   <blockquote className="m3-testi-quote-text">
                     "{item.desc}"
                   </blockquote>
 
-                  {/* Author Meta Details */}
+                  {/* Prominent Author Name & Subtle Designation */}
                   <div className="m3-testi-author-block">
                     <div className="m3-author-details">
                       <h3 className="m3-author-name">{authorName}</h3>
                       <div className="m3-author-role-row">
-                        <span className="m3-dept-badge">
-                          <GraduationCap size={13} />
-                          <span>{deptPart}</span>
-                        </span>
+                        <span className="m3-author-role">{authorRole}</span>
+                        <span className="m3-inst-dot">•</span>
                         <span className="m3-inst-text">Vishnu Women's University</span>
                       </div>
                     </div>
@@ -248,9 +223,8 @@ export default function TestimonialSlider({
             </AnimatePresence>
           </div>
 
-          {/* Interactive Navigation & Controls Bar */}
+          {/* Compact Navigation & Thumbnail Switcher */}
           <div className="m3-testi-controls-bar">
-            {/* Prev Button */}
             <button
               type="button"
               className="m3-testi-nav-arrow"
@@ -258,10 +232,10 @@ export default function TestimonialSlider({
               aria-label="Previous story"
               title="Previous Story"
             >
-              <ChevronLeft size={20} />
+              <ChevronLeft size={18} />
             </button>
 
-            {/* Thumbnail / Avatar Switcher Dots */}
+            {/* Cleaner Thumbnail Switcher */}
             <div className="m3-testi-thumbs-bar" role="tablist">
               {testimonials.map((t, idx) => {
                 const thumbImg = (t.slug && t.slug.startsWith('http')) ? t.slug : FALLBACK_AVATARS[idx % FALLBACK_AVATARS.length];
@@ -277,13 +251,11 @@ export default function TestimonialSlider({
                     aria-label={`View story of ${t.title || `Alumna ${idx + 1}`}`}
                   >
                     <img src={thumbImg} alt="" className="m3-thumb-img" />
-                    {isActive && <div className="m3-thumb-active-ring" />}
                   </button>
                 );
               })}
             </div>
 
-            {/* Next Button */}
             <button
               type="button"
               className="m3-testi-nav-arrow"
@@ -291,7 +263,7 @@ export default function TestimonialSlider({
               aria-label="Next story"
               title="Next Story"
             >
-              <ChevronRight size={20} />
+              <ChevronRight size={18} />
             </button>
           </div>
 
@@ -304,7 +276,7 @@ export default function TestimonialSlider({
               className="m3-testi-alumni-link"
             >
               <span>Explore More Alumni Journeys &amp; Giving</span>
-              <ArrowRight size={14} />
+              <ArrowRight size={13} />
             </a>
           </div>
         </div>

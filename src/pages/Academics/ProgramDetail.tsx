@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams, useLocation, Navigate } from 'react-router-dom';
-import { Check, Microscope, Compass, Target, Sparkles, Mail, ExternalLink, BookOpen, FileText, ChevronRight, ChevronDown, GraduationCap, Calendar, Award, Users, ArrowRight, BookMarked, Bookmark, Library } from 'lucide-react';
+import { Check, Microscope, Compass, Mail, ExternalLink, BookOpen, FileText, ChevronRight, ChevronDown, GraduationCap, Calendar, Award, Users, ArrowRight, BookMarked, Bookmark, Library } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import SmoothCollapse from '../../components/SmoothCollapse/SmoothCollapse';
 import ProgrammeStructure from '../../components/ProgrammeStructure/ProgrammeStructure';
 import BodyBlocks, { parseBodyContent } from '../../components/BodyBlocks/BodyBlocks';
 import DepartmentNewsSection, { type DepartmentNewsDoc } from '../../components/DepartmentNews/DepartmentNewsSection';
-import NewsEventsTabs from '../../components/NewsEventsTabs/NewsEventsTabs';
+import NewsEventsTabs, { type NewsEventsCategory } from '../../components/NewsEventsTabs/NewsEventsTabs';
 import DepartmentDetail from './DepartmentDetail';
 import StandaloneDepartmentDetail from './StandaloneDepartmentDetail';
 import { groupForProgramSlug, standaloneDepartmentForSlug } from '../../lib/departmentGroups';
@@ -26,7 +26,7 @@ import { parseFlexibleTable, parseProjectAccordion } from '../../lib/structuredT
 import { sortPlacementRows, computePlacementStats, findPackageColumnIndex, formatPackageCell } from '../../lib/placementRecords';
 import { computeInternshipStats, findPeriodColumnIndex } from '../../lib/internshipRecords';
 import { hasCustomSectionContent, toQuickLinkItems } from '../../lib/customSections';
-import CustomSectionsRenderer, { SectionSubtree } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
+import CustomSectionsRenderer from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import SEO from '../../components/SEO/SEO';
 import { getProgramSchema, getBreadcrumbSchema } from '../../lib/seo/schemas';
 import '../detail-layout.css';
@@ -222,17 +222,55 @@ function SingleProgramDetail() {
   const hasNewsEventsDynamic = newsEventsSubSections.length > 0;
   const validYears = (arr?: NewsEventsYear[]) =>
     (arr || []).filter((y) => y.year && ((y.columns?.length > 0 && y.rows?.length > 0) || (y.cards?.length ?? 0) > 0 || !!y.text));
-  const newsEventsCategories = [
-    { key: 'news', label: 'News & Events', years: validYears(dept?.newsEventsYears?.length ? dept.newsEventsYears : program.newsEventsYears) },
-    { key: 'awards', label: 'Student Awards', years: validYears(dept?.studentAwardsYears) },
-    { key: 'others', label: 'Others', years: validYears(dept?.othersYears) },
-  ];
-  // Once a department has gone through the new Admin flow at least once
-  // (dept.newsEventsMigrated), the old arrays are frozen leftovers, not the
-  // live source of truth — an admin who then deletes everything in the new
-  // editor must actually see it gone, not have this stale data resurface.
-  const hasLegacyNewsEvents = !hasNewsEventsDynamic && !dept?.newsEventsMigrated && newsEventsCategories.some((c) => c.years.length > 0);
-  const hasNewsEventsYears = hasNewsEventsDynamic || hasLegacyNewsEvents;
+
+  let newsEventsCategories: NewsEventsCategory[] = [];
+
+  if (hasNewsEventsDynamic) {
+    newsEventsCategories = newsEventsSubSections.map((sec) => ({
+      key: sec.id,
+      label: sec.label,
+      years: (sec.subSections || []).filter(hasCustomSectionContent).length > 0
+        ? (sec.subSections || []).filter(hasCustomSectionContent).map((sub) => {
+            const yearLabel = sub.label.replace(/^Academic Year\s*(::|:|-)?\s*/i, '').trim();
+            const parsedTables = parseFlexibleTable(sub.tableText || '');
+            const firstTable = parsedTables[0] || { headers: [], rows: [] };
+            const mode: 'table' | 'cards' | 'text' | 'both' =
+              firstTable.headers.length > 0 && (sub.imageCards?.length ?? 0) > 0
+                ? 'both'
+                : firstTable.headers.length > 0
+                ? 'table'
+                : (sub.imageCards?.length ?? 0) > 0
+                ? 'cards'
+                : 'text';
+            return {
+              year: yearLabel || sub.label,
+              mode,
+              columns: firstTable.headers,
+              rows: firstTable.rows.map((cells) => ({ cells })),
+              cards: sub.imageCards,
+              text: sub.textContent,
+            };
+          })
+        : [
+            {
+              year: sec.label.replace(/^Academic Year\s*(::|:|-)?\s*/i, '').trim() || sec.label,
+              mode: 'table' as const,
+              columns: parseFlexibleTable(sec.tableText || '')[0]?.headers || [],
+              rows: (parseFlexibleTable(sec.tableText || '')[0]?.rows || []).map((cells) => ({ cells })),
+              cards: sec.imageCards,
+              text: sec.textContent,
+            },
+          ],
+    })).filter((c) => c.years.length > 0);
+  } else {
+    newsEventsCategories = [
+      { key: 'news', label: 'News & Events', years: validYears(dept?.newsEventsYears?.length ? dept.newsEventsYears : program.newsEventsYears) },
+      { key: 'awards', label: 'Student Awards', years: validYears(dept?.studentAwardsYears) },
+      { key: 'others', label: 'Others', years: validYears(dept?.othersYears) },
+    ].filter((c) => c.years.length > 0);
+  }
+
+  const hasNewsEventsYears = newsEventsCategories.length > 0;
   const newsletterYears = (program.newsletterYears || []).filter((y) => y.year && y.issues && y.issues.length > 0);
   const hasNewsletter = newsletterYears.length > 0;
   const newsletterMaxIssues = Math.max(0, ...newsletterYears.map((y) => y.issues.length));
@@ -303,23 +341,10 @@ function SingleProgramDetail() {
   // department-wide text lives on the matching Academic Departments record
   // (dept.about, edited at Admin → Academic Departments → Overview), while
   // program.about (Admin → Programs → About) is specific to this one
-  // programme. Each only renders once an admin has actually filled it in.
   const hasDeptAbout = !!dept?.about;
   const hasDeptHighlights = !!(dept?.highlights && dept.highlights.length > 0);
   const hasProgrammeAbout = !!program.about;
-  const hasProgrammeHighlights = !!(program.highlights && program.highlights.length > 0);
-  // "Choose a Programme" — same collapsible group DepartmentDetail.tsx uses
-  // for its grouped departments, replicated here purely for a consistent
-  // sidebar shape across every department page; a standalone programme has
-  // nothing to actually switch between, so this never renders the toggle
-  // row DepartmentDetail.tsx shows above its own version of this group.
-  const programmeLinks = [
-    hasProgrammeAbout && { id: 'programme-about', label: 'About the Programme' },
-    hasProgrammeHighlights && { id: 'highlights', label: 'Programme Highlights' },
-    hasOutcomeStatements && { id: 'peos-pos-psos', label: outcomeHeading },
-    hasMindMap && { id: 'mindmap', label: 'Mind Map' },
-    hasCurriculum && { id: 'curriculum', label: 'Curriculum' },
-  ].filter(Boolean) as { id: string; label: string }[];
+
 
   // "Placements" quick link doubles as the Internships entry (Internships
   // has no quick link of its own — it renders directly below Placements on
@@ -339,12 +364,10 @@ function SingleProgramDetail() {
     hasVisionMission && { id: 'vision-mission', label: 'Vision, Mission & Values' },
     hasHod && { id: 'hod', label: 'About HOD' },
     faculty.length > 0 && { id: 'faculty', label: 'Faculty' },
-    { id: 'program-toggle', label: 'Choose a Programme', children: programmeLinks },
     hasLabs && { id: 'labs', label: 'Laboratories' },
     hasLibrary && { id: 'library', label: 'Department Library' },
     hasRnd && { id: 'rnd', label: 'Research & Development (Funded Projects & Patents)' },
     (hasPlacementRecords || hasInternshipRecords) && { id: 'placements', label: placementsLinkLabel },
-    hasNewsletter && { id: 'newsletter', label: 'Newsletter' },
     hasNewsEventsYears && { id: 'news-events', label: 'News & Events' },
     hasDeptNews && { id: 'news', label: 'News & Events' },
     ...toQuickLinkItems(visibleCustomSections),
@@ -357,12 +380,10 @@ function SingleProgramDetail() {
   // department has no dept.about text (e.g. EEE): it just attaches to
   // Vision/Mission, or HOD, whichever actually has content. 'standalone' is
   // the rare fallback where none of the three have content at all.
-  const sidebarHost: 'about' | 'vision-mission' | 'hod' | 'standalone' | null = !hasSidebarContent
+  const sidebarHost: 'about' | 'hod' | 'standalone' | null = !hasSidebarContent
     ? null
     : hasDeptAbout
     ? 'about'
-    : hasVisionMission
-    ? 'vision-mission'
     : hasHod
     ? 'hod'
     : 'standalone';
@@ -676,76 +697,6 @@ function SingleProgramDetail() {
       </section>
       )}
 
-      {/* Vision, Mission & Values (Italian-Inspired Sleek Showcase) */}
-      {hasVisionMission && (
-        <section id="vision-mission" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
-          <div className="container">
-          <div className={sidebarHost === 'vision-mission' ? 'detail-grid' : ''}>
-          <div>
-            <div style={{ marginBottom: 'var(--space-10)' }}>
-              <span className="section-label dept-section-label">Our Guiding Pillars</span>
-              <h2 className="section-title">Vision, Mission &amp; Values</h2>
-            </div>
-            <div className="dept-vm-grid">
-              {shared.vision && (
-                <div className="dept-vm-card">
-                  <div className="dept-vm-card-top">
-                    <span className="dept-vm-num-badge">01 · VISION</span>
-                    <div className="dept-vm-icon-badge">
-                      <Compass size={20} strokeWidth={2.2} />
-                    </div>
-                  </div>
-                  <h3 className="dept-vm-title">Programme Vision</h3>
-                  <p className="dept-vm-body-text">{shared.vision}</p>
-                </div>
-              )}
-
-              {shared.mission.length > 0 && (
-                <div className="dept-vm-card">
-                  <div className="dept-vm-card-top">
-                    <span className="dept-vm-num-badge">02 · MISSION</span>
-                    <div className="dept-vm-icon-badge">
-                      <Target size={20} strokeWidth={2.2} />
-                    </div>
-                  </div>
-                  <h3 className="dept-vm-title">Mission Statements</h3>
-                  <ul className="dept-vm-mission-list">
-                    {shared.mission.map((m, mi) => (
-                      <li key={mi} className="dept-vm-mission-item">
-                        <span className="dept-vm-bullet-circle">
-                          <Check size={12} strokeWidth={3} />
-                        </span>
-                        <span>{m}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {shared.coreValues.length > 0 && (
-                <div className="dept-values-card">
-                  <div className="dept-values-header">
-                    <Sparkles size={22} strokeWidth={2} style={{ color: 'var(--color-accent)' }} />
-                    <h3 className="dept-values-title">Institutional Core Values</h3>
-                  </div>
-                  <div className="dept-values-chips-wrap">
-                    {shared.coreValues.map((v) => (
-                      <span key={v} className="dept-value-pill">
-                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-block' }} />
-                        <span>{v}</span>
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-          {sidebarHost === 'vision-mission' && sidebarNode}
-          </div>
-          </div>
-        </section>
-      )}
-
       {/* About HOD (Executive Italian Editorial Layout) */}
       {hasHod && (
         <section id="hod" className="dept-hod-section" style={{ scrollMarginTop: NAV_OFFSET }}>
@@ -815,6 +766,49 @@ function SingleProgramDetail() {
           {sidebarHost === 'hod' && sidebarNode}
           </div>
           </div>
+
+          {hasVisionMission && (
+            <div className="container" id="vision-mission" style={{ marginTop: 'var(--space-8)', scrollMarginTop: NAV_OFFSET }}>
+              <div className="dept-vm-grid">
+                {shared.vision && (
+                  <div className="dept-vm-card">
+                    <h3 className="dept-vm-title">Vision</h3>
+                    <p className="dept-vm-body-text">{shared.vision}</p>
+                  </div>
+                )}
+
+                {shared.mission.length > 0 && (
+                  <div className="dept-vm-card">
+                    <h3 className="dept-vm-title">Mission</h3>
+                    <ul className="dept-vm-mission-list">
+                      {shared.mission.map((m, mi) => (
+                        <li key={mi} className="dept-vm-mission-item">
+                          <span className="dept-vm-bullet-circle">
+                            <Check size={12} strokeWidth={3} />
+                          </span>
+                          <span>{m}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {shared.coreValues.length > 0 && (
+                  <div className="dept-values-card">
+                    <h3 className="dept-vm-title">Core Values</h3>
+                    <div className="dept-values-chips-wrap">
+                      {shared.coreValues.map((v) => (
+                        <span key={v} className="dept-value-pill">
+                          <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-block' }} />
+                          <span>{v}</span>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </section>
       )}
 
@@ -1107,20 +1101,6 @@ function SingleProgramDetail() {
                     <div className="dept-stat-tile__label">Total No. of Offers</div>
                   </div>
                   <div className="dept-stat-tile">
-                    <button
-                      type="button"
-                      className="dept-stat-tile__circle dept-stat-tile__circle--link"
-                      onClick={() => document.getElementById('placement-records-table')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-                    >
-                      <span className="dept-stat-tile__value">Package wise</span>
-                    </button>
-                    <div className="dept-stat-tile__label">Top 10 Companies List</div>
-                  </div>
-                  <div className="dept-stat-tile">
-                    <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.averageSalary ?? '—'}</span></div>
-                    <div className="dept-stat-tile__label">Average Salary</div>
-                  </div>
-                  <div className="dept-stat-tile">
                     <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.medianSalary ?? '—'}</span></div>
                     <div className="dept-stat-tile__label">Median Salary</div>
                   </div>
@@ -1316,25 +1296,8 @@ function SingleProgramDetail() {
         </section>
       )}
 
-      {/* News & Events — the heading is fixed; what's under it is the
-          admin-defined dynamic section list (see newsEventsSubSections
-          above), or, for a department not yet opened in the new Admin, the
-          old fixed News & Events / Student Awards / Others tabs. */}
-      {hasNewsEventsDynamic && (
-        <section id="news-events" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
-          <div className="container">
-            <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label">{deptTitle || program.shortName || program.name}</span>
-              <h2 className="section-title">News &amp; Events</h2>
-            </div>
-            <SectionSubtree
-              section={{ id: 'news-events-root', label: 'News & Events', contentType: 'text', textContent: '', subSections: newsEventsSubSections }}
-              navOffset={NAV_OFFSET}
-            />
-          </div>
-        </section>
-      )}
-      {hasLegacyNewsEvents && (
+      {/* News & Events — Compact Collapsible Academic-Year List */}
+      {hasNewsEventsYears && (
         <NewsEventsTabs categories={newsEventsCategories} eyebrow={deptTitle || program.shortName || program.name} navOffset={NAV_OFFSET} />
       )}
 
