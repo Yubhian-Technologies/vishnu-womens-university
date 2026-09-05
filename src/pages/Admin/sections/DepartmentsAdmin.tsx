@@ -378,7 +378,24 @@ export default function DepartmentsAdmin() {
   // that migrated data (so it's visible immediately, before the admin even
   // clicks Update), not the raw doc, which is why they're passed this
   // merged object instead of `editingDept` directly.
-  const formDept: DepartmentDoc | null = editingDept ? { ...editingDept, ...form, id: editingDept.id } : null;
+  // Placements/Internships specifically must keep tracking the LIVE Firestore
+  // doc, not the one-time `form` snapshot: PlacementYearsEditor/
+  // InternshipYearsEditor write straight to Firestore (add/rename/remove
+  // Academic Year, import, edit table — see their own comments), completely
+  // bypassing this form's `set()`/Update flow, so `form.placementYears`
+  // never updates again after startEdit() runs. Spreading `form` on top of
+  // `editingDept` further down would permanently shadow every one of those
+  // writes with that stale snapshot — e.g. clicking "+ Add Academic Year"
+  // would save fine but the new year would never appear. Falling back to
+  // `form`'s copy only while the live doc is still empty preserves the
+  // migrated-but-unsaved-yet display described below.
+  const formDept: DepartmentDoc | null = editingDept ? {
+    ...editingDept,
+    ...form,
+    id: editingDept.id,
+    placementYears: editingDept.placementYears?.length ? editingDept.placementYears : form.placementYears,
+    internshipYears: editingDept.internshipYears?.length ? editingDept.internshipYears : form.internshipYears,
+  } : null;
   // News & Events and the HOD fields aren't part of programRichness (they're
   // separate legacy fields, not one of Vision/Mission/Values/Labs/Library) —
   // each found independently as whichever matching program still has it,
