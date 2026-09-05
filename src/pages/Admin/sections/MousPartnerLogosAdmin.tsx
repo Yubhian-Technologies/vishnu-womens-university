@@ -3,6 +3,7 @@ import { collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp } from '
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
 import ImageUploader from '../../../components/ImageUploader/ImageUploader';
+import FileUploader from '../../../components/FileUploader/FileUploader';
 import { deleteFile, type UploadResult } from '../../../lib/storage';
 import { parseFlexibleTable } from '../../../lib/structuredTable';
 import type { ResearchItemDoc } from './ResearchItemsAdmin';
@@ -17,10 +18,14 @@ export interface MousPartnerLogoDoc {
   // Optional — a partner with no logo yet still shows, just without one.
   imageUrl: string;
   storagePath: string;
+  // Optional — the actual MoU document. When set, clicking the partner's
+  // logo on the public page opens this PDF in a new tab.
+  pdfUrl: string;
+  pdfStoragePath: string;
   order: number;
 }
 
-const EMPTY: Omit<MousPartnerLogoDoc, 'id'> = { label: '', section: '', imageUrl: '', storagePath: '', order: 0 };
+const EMPTY: Omit<MousPartnerLogoDoc, 'id'> = { label: '', section: '', imageUrl: '', storagePath: '', pdfUrl: '', pdfStoragePath: '', order: 0 };
 
 // This is now the whole public MoUs page's partner list (name, optional
 // group heading, optional small circular logo) — it replaced the old
@@ -38,6 +43,7 @@ export default function MousPartnerLogosAdmin() {
 
   const set = (k: string, v: string | number) => setForm((p) => ({ ...p, [k]: v }));
   const handleImage = (r: UploadResult) => setForm((p) => ({ ...p, imageUrl: r.url, storagePath: r.path }));
+  const handlePdf = (r: UploadResult) => setForm((p) => ({ ...p, pdfUrl: r.url, pdfStoragePath: r.path }));
 
   const save = async () => {
     if (!form.label) return alert('Partner name is required.');
@@ -56,13 +62,14 @@ export default function MousPartnerLogosAdmin() {
 
   const startEdit = (d: MousPartnerLogoDoc) => {
     setEditing(d.id);
-    setForm({ label: d.label, section: d.section || '', imageUrl: d.imageUrl, storagePath: d.storagePath || '', order: d.order });
+    setForm({ label: d.label, section: d.section || '', imageUrl: d.imageUrl, storagePath: d.storagePath || '', pdfUrl: d.pdfUrl || '', pdfStoragePath: d.pdfStoragePath || '', order: d.order });
   };
 
-  const remove = async (id: string, storagePath?: string) => {
+  const remove = async (id: string, storagePath?: string, pdfStoragePath?: string) => {
     if (!confirm('Delete this partner?')) return;
     try {
       if (storagePath) await deleteFile(storagePath);
+      if (pdfStoragePath) await deleteFile(pdfStoragePath);
       await deleteDoc(doc(db, 'mousPartnerLogos', id));
     } catch (e) {
       alert(`Couldn't delete: ${(e as Error).message}`);
@@ -94,7 +101,7 @@ export default function MousPartnerLogosAdmin() {
     try {
       let order = docs.length;
       for (const p of toAdd) {
-        await addDoc(collection(db, 'mousPartnerLogos'), { label: p.label, section: p.section, imageUrl: '', storagePath: '', order: order++, createdAt: serverTimestamp() });
+        await addDoc(collection(db, 'mousPartnerLogos'), { label: p.label, section: p.section, imageUrl: '', storagePath: '', pdfUrl: '', pdfStoragePath: '', order: order++, createdAt: serverTimestamp() });
       }
     } catch (e) {
       alert(`Couldn't copy: ${(e as Error).message}`);
@@ -132,9 +139,13 @@ export default function MousPartnerLogosAdmin() {
             <label htmlFor="field-section">Group Heading (optional)</label>
             <input id="field-section" value={form.section} onChange={(e) => set('section', e.target.value)} placeholder="Foreign Universities" />
           </div>
-          <div className="admin-field admin-field--full" style={{ maxWidth: 200 }}>
+          <div className="admin-field" style={{ maxWidth: 200 }}>
             <label>Logo (optional)</label>
             <ImageUploader folder="vwu/research-mous" currentUrl={form.imageUrl} onUploaded={handleImage} label="Upload Logo" aspect={1} />
+          </div>
+          <div className="admin-field">
+            <label>MoU PDF (optional — clicking the logo opens this in a new tab)</label>
+            <FileUploader folder="vwu/research-mous-pdfs" currentUrl={form.pdfUrl} onUploaded={handlePdf} label="Upload PDF" />
           </div>
           <div className="admin-field">
             <label htmlFor="field-display-order">Display Order</label>
@@ -154,7 +165,7 @@ export default function MousPartnerLogosAdmin() {
         {loading ? <p className="admin-loading">Loading…</p> : (
           <div className="admin-table-wrap">
             <table className="admin-table">
-              <thead><tr><th>Order</th><th>Logo</th><th>Partner Name</th><th>Group</th><th>Actions</th></tr></thead>
+              <thead><tr><th>Order</th><th>Logo</th><th>Partner Name</th><th>Group</th><th>PDF</th><th>Actions</th></tr></thead>
               <tbody>
                 {docs.map((d) => (
                   <tr key={d.id}>
@@ -162,15 +173,16 @@ export default function MousPartnerLogosAdmin() {
                     <td>{d.imageUrl ? <img src={d.imageUrl} alt="" className="admin-table__avatar" /> : '—'}</td>
                     <td>{d.label}</td>
                     <td>{d.section || '—'}</td>
+                    <td>{d.pdfUrl ? <a href={d.pdfUrl} target="_blank" rel="noopener noreferrer">View</a> : '—'}</td>
                     <td>
                       <button className="admin-btn admin-btn--sm" onClick={() => startEdit(d)}>Edit</button>
-                      <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(d.id, d.storagePath)}>Delete</button>
+                      <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(d.id, d.storagePath, d.pdfStoragePath)}>Delete</button>
                     </td>
                   </tr>
                 ))}
                 {docs.length === 0 && (
                   <tr>
-                    <td colSpan={5} className="admin-empty">No partners yet — add one above, or copy from the Data Table if it still has some.</td>
+                    <td colSpan={6} className="admin-empty">No partners yet — add one above, or copy from the Data Table if it still has some.</td>
                   </tr>
                 )}
               </tbody>

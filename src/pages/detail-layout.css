@@ -694,6 +694,18 @@
     width: 88px;
     height: 88px;
   }
+
+  /* MoUs only (scoped via this extra class, added alongside .pb-grid on
+     that page only) — smaller circles so 3 fit per row on a phone, instead
+     of Professional Bodies' 2. */
+  .pb-grid--mous {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .pb-grid--mous .pb-grid-logo {
+    width: 76px;
+    height: 76px;
+  }
 }
 
 .pb-grid-item {
