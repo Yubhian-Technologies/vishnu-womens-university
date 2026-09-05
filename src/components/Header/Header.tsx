@@ -6,10 +6,17 @@ import { useNavLinkOverride } from '../../hooks/useNavLinkOverride';
 import type { ProgramDoc } from '../../pages/Admin/sections/ProgramsAdmin';
 import { DIFFERENTIATOR_CATEGORIES } from '../../pages/Admin/sections/DifferentiatorsAdmin';
 import type { DifferentiatorItemDoc } from '../../pages/Admin/sections/DifferentiatorsAdmin';
-import type { PlacementItemDoc, PlacementMenuColumn } from '../../pages/Admin/sections/PlacementItemsAdmin';
-import { PLACEMENT_MENU_COLUMNS } from '../../pages/Admin/sections/PlacementItemsAdmin';
+import type { PlacementItemDoc, PlacementMenuColumnDoc } from '../../pages/Admin/sections/PlacementItemsAdmin';
 import SmoothCollapse from '../SmoothCollapse/SmoothCollapse';
 import './Header.css';
+
+// Pure-code safety net for the Placements mega-menu: used only if the
+// `placementMenuColumns` collection is genuinely empty (nobody has opened
+// Admin → Placements yet to trigger its auto-seed), so a first-time deploy
+// never shows an empty dropdown while waiting on that.
+const FALLBACK_PLACEMENT_MENU_COLUMNS: PlacementMenuColumnDoc[] = [
+  { id: 'explore', label: 'Explore Directory', order: 0 },
+];
 
 interface NavChild {
   label: string;
@@ -193,20 +200,34 @@ const navItemsData: NavItem[] = [
       linkText: 'R&D Overview',
       linkPath: '/research/about-rd',
     },
-    children: [
-      { label: 'About R&D', path: '/research/about-rd' },
-      { label: 'Research Advisory Committee', path: '/research/research-advisory-committee' },
-      { label: 'Research Ethics Committee', path: '/research/research-ethics-committee' },
-      { label: 'Intellectual Property Rights (IPR)', path: '/research/ipr-committee' },
-      { label: 'Thrust Areas of Research', path: '/research/thrust-areas-of-research' },
-      { label: 'Research Centers', path: '/research/research-centers' },
-      { label: 'Funded Projects', path: '/research/funded-projects' },
-      { label: 'Seed Money Projects', path: '/research/seed-money-projects' },
-      { label: 'Research Publications', path: '/research/research-publications' },
-      { label: 'MoUs & Collaborations', path: '/research/mous' },
-      { label: 'Patents', path: '/research/patents' },
-      { label: 'Consultancy', path: '/research/consultancy' },
-      { label: 'Professional Bodies', path: '/research/professional-bodies' },
+    groups: [
+      {
+        groupLabel: 'Research Info',
+        items: [
+          { label: 'About R&D', path: '/research/about-rd' },
+          { label: 'Research Advisory Committee', path: '/research/research-advisory-committee' },
+          { label: 'Research Ethics Committee', path: '/research/research-ethics-committee' },
+          { label: 'Intellectual Property Rights (IPR)', path: '/research/ipr-committee' },
+          { label: 'Thrust Areas of Research', path: '/research/thrust-areas-of-research' },
+        ],
+      },
+      {
+        groupLabel: 'Research Outcomes',
+        items: [
+          { label: 'Research Centers', path: '/research/research-centers' },
+          { label: 'Funded Projects', path: '/research/funded-projects' },
+          { label: 'Research Publications', path: '/research/research-publications' },
+          { label: 'MoUs & Collaborations', path: '/research/mous' },
+        ],
+      },
+      {
+        groupLabel: 'Innovations',
+        items: [
+          { label: 'Patents', path: '/research/patents' },
+          { label: 'Consultancy', path: '/research/consultancy' },
+          { label: 'Professional Bodies', path: '/research/professional-bodies' },
+        ],
+      },
     ],
   },
   {
@@ -253,7 +274,6 @@ const navItemsData: NavItem[] = [
         items: [
           { label: 'Upcoming Events', path: '/news-awards/happenings#upcoming-events' },
           { label: 'Recent Events', path: '/news-awards/happenings#recent-events' },
-          { label: 'News & Events', path: '/news' },
           { label: 'Photo & Video Gallery', path: '/news-awards/gallery' },
           { label: 'Vishnu Era Newsletter', path: 'https://www.srivishnu.edu.in/vishnu-era/', external: true },
           { label: 'Prathibha Magazine', path: 'https://heyzine.com/flip-book/088b7b5629.html#page/54', external: true },
@@ -330,6 +350,15 @@ export default function Header() {
 
   const { docs: differentiatorItems } = useOrderedCollection<DifferentiatorItemDoc>('differentiatorItems', 'order');
   const { docs: placementItems } = useOrderedCollection<PlacementItemDoc>('placementItems', 'order');
+  // Admin-managed columns for the Placements mega-menu (add/rename/reorder
+  // in Admin → Placements). If nobody has ever opened that admin section
+  // yet (collection genuinely empty, not just still loading), fall back to
+  // a single column so the menu never renders empty — PlacementItemsAdmin
+  // auto-seeds the real 3 default columns the first time it's opened.
+  const { docs: placementMenuColumnsRaw } = useOrderedCollection<PlacementMenuColumnDoc>('placementMenuColumns', 'order');
+  const placementMenuColumns = placementMenuColumnsRaw.length > 0
+    ? placementMenuColumnsRaw
+    : FALLBACK_PLACEMENT_MENU_COLUMNS;
 
   // Entrance transition trigger (150ms after load)
   useEffect(() => {
@@ -432,28 +461,21 @@ export default function Header() {
           ? { label: p.title, path: p.url, external: true }
           : { label: p.title, path: `/placements/${p.slug}` };
 
-      // Items with an explicit menuColumn (set in Admin → Placements → Menu
-      // Column) go straight into that column. Items saved before this field
-      // existed have no menuColumn yet — those fall back to the same
-      // balanced-thirds split the menu used previously, computed only over
-      // the leftover items, so nothing visibly moves until an admin picks a
-      // column for it.
-      const buckets: Record<PlacementMenuColumn, PlacementItemDoc[]> = { explore: [], quick: [], facilities: [] };
-      const unassigned: PlacementItemDoc[] = [];
+      // Group items by their admin-assigned column id. Anything unassigned,
+      // or pointing at a column that's since been deleted, falls back to
+      // whichever column currently sorts first — so an item never silently
+      // disappears from the menu just because its column went away.
+      const firstColumnId = placementMenuColumns[0]?.id;
+      const buckets = new Map<string, PlacementItemDoc[]>(placementMenuColumns.map((c) => [c.id, []]));
       placementItems.forEach((p) => {
-        if (p.menuColumn) buckets[p.menuColumn].push(p);
-        else unassigned.push(p);
-      });
-      const perCol = Math.ceil(unassigned.length / 3) || 1;
-      unassigned.forEach((p, i) => {
-        const col: PlacementMenuColumn = i < perCol ? 'explore' : i < perCol * 2 ? 'quick' : 'facilities';
-        buckets[col].push(p);
+        const colId = p.menuColumn && buckets.has(p.menuColumn) ? p.menuColumn : firstColumnId;
+        if (colId) buckets.get(colId)!.push(p);
       });
 
       return {
         ...item,
-        groups: PLACEMENT_MENU_COLUMNS
-          .map((c) => ({ groupLabel: c.label, items: buckets[c.value].map(toChild) }))
+        groups: placementMenuColumns
+          .map((c) => ({ groupLabel: c.label, items: (buckets.get(c.id) ?? []).map(toChild) }))
           .filter((g) => g.items.length > 0),
       };
     }
