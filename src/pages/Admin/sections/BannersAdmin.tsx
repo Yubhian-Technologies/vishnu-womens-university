@@ -7,7 +7,7 @@ import { useOrderedCollection } from '../../../hooks/useCollection';
 import ImageUploader from '../../../components/ImageUploader/ImageUploader';
 import VideoUploader from '../../../components/VideoUploader/VideoUploader';
 import { deleteFile, type UploadResult } from '../../../lib/storage';
-import { campusFacilities } from '../../Campus/campusFacilities.data';
+import { allCampusFacilities } from '../../Campus/campusFacilities.data';
 import { DIFFERENTIATOR_CATEGORIES } from './DifferentiatorsAdmin';
 import ItemHeroImagesAdmin from './ItemHeroImagesAdmin';
 import { smoothScrollTo } from '../../../lib/smoothScroll';
@@ -73,7 +73,7 @@ export const PAGES = [
   { value: 'about',                   label: 'About VWU' },
   { value: 'about-sves',              label: 'About SVES' },
   { value: 'campus',                  label: 'Campus Life (Overview)' },
-  ...campusFacilities.map((f) => ({ value: `campus-${f.slug}`, label: `Campus Life: ${f.title}` })),
+  ...allCampusFacilities.map((f) => ({ value: `campus-${f.slug}`, label: `Campus Life: ${f.title}` })),
   { value: 'information',             label: 'Information' },
   { value: 'governance',              label: 'Governance' },
   { value: 'governing-body',          label: 'Governing Body' },
@@ -118,7 +118,7 @@ const PAGE_GROUPS: { label: string; values: string[] }[] = [
   { label: 'Student Life', values: ['student-clubs', 'arts-culture', 'social-services', 'sports-games', 'vishnu-tv', 'campus-magazines'] },
   { label: 'Placements, Careers & Research', values: ['placement-detail', 'careers', 'differentiators', 'differentiators-detail', 'research', 'research-detail'] },
   { label: 'News & Awards', values: ['news', 'events', 'news-awards', 'news-awards-happenings', 'news-awards-accreditations', 'news-awards-gallery'] },
-  { label: 'Campus Life', values: ['campus', ...campusFacilities.map((f) => `campus-${f.slug}`)] },
+  { label: 'Campus Life', values: ['campus', ...allCampusFacilities.map((f) => `campus-${f.slug}`)] },
   { label: 'Compliance & Contact', values: ['disclosures-ugc', 'anti-ragging', 'policies-procedures', 'contact'] },
 ];
 
@@ -163,7 +163,7 @@ const PAGE_TEXT_DEFAULTS: Record<string, { title: string; subtitle?: string }> =
   'vishnu-tv': { title: 'Vishnu TV Academy', subtitle: 'Student-run and student-driven — the only dedicated campus TV Academy in Andhra Pradesh.' },
   'social-services': { title: 'Social Services', subtitle: 'The National Service Scheme at VWU shapes engineers who are equally committed to their craft and to the communities they serve.' },
   'student-clubs': { title: 'Student Clubs', subtitle: '23 active clubs across technology, social service, arts, and culture — VWU has a community for every interest.' },
-  'sports-games': { title: 'Sports & Games', subtitle: 'Physical fitness is taken seriously at VWU — a sound body supports a sound mind, and both are essential to a complete education.' },
+  'sports-games': { title: 'Sports & Games', subtitle: 'Building Strength, Skill, Teamwork, and Sporting Spirit.' },
   'policies-procedures': { title: 'Policies & Procedures', subtitle: 'A structured framework for governance, academics, research, and campus sustainability at VWU.' },
   'research': { title: 'Research & Development', subtitle: 'From funded projects and patents to industry MoUs and professional bodies — a look at how VWU builds knowledge that matters.' },
   'news-awards-accreditations': { title: 'Accreditations & Awards', subtitle: "Endorsed by India's foremost regulatory and ranking bodies — a record of recognised quality and consistent academic achievement." },
@@ -175,7 +175,7 @@ const PAGE_TEXT_DEFAULTS: Record<string, { title: string; subtitle?: string }> =
   'news': { title: 'VWU News & Stories', subtitle: 'Stay up-to-date with the latest happenings, achievements, and stories from the VWU community.' },
   'contact': { title: 'Contact Us', subtitle: "We're happy to assist. Contact us for admissions information, general enquiries, or anything else on your mind." },
   ...Object.fromEntries(
-    campusFacilities.map((f) => [`campus-${f.slug}`, { title: f.title, subtitle: f.heroSubtitle ?? f.desc }])
+    allCampusFacilities.map((f) => [`campus-${f.slug}`, { title: f.title, subtitle: f.heroSubtitle ?? f.desc }])
   ),
 };
 

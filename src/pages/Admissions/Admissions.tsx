@@ -1,11 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import emailjs from '@emailjs/browser';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import './Admissions.css';
 import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
-import { db } from '../../lib/firebase';
+import AdmissionApplyForm from '../../components/AdmissionApplyForm/AdmissionApplyForm';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useContentBlocks, useEapcetCode } from '../../hooks/useContentBlocks';
 import { useSitePhotos, useSectionHasPhotos } from '../../hooks/useSitePhotos';
@@ -16,26 +14,7 @@ import { resolveContentIcon } from '../../lib/contentIcons';
 import { smoothScrollTo } from '../../lib/smoothScroll';
 import { useHashScroll } from '../../hooks/useHashScroll';
 
-interface RequestInfoForm {
-  firstName: string;
-  lastName: string;
-  email: string;
-  program: string;
-  term: string;
-}
-
-type RequestInfoFormErrors = Partial<Record<keyof RequestInfoForm, string>>;
-
-const INITIAL_REQUEST_FORM: RequestInfoForm = {
-  firstName: '',
-  lastName: '',
-  email: '',
-  program: '',
-  term: 'Academic Year 2027 – 28',
-};
-
 interface RankAnalysisItem {
-  sNo: number;
   code: string;
   course: string;
   collegeCode: 'VISW' | 'VISWPU';
@@ -47,43 +26,19 @@ interface RankAnalysisItem {
 
 const eapcetRanksData: RankAnalysisItem[] = [
   // VISW
-  { sNo: 1, code: 'CIV', course: 'CIVIL ENGINEERING', collegeCode: 'VISW', beginRank2026: '10,350', endingRank2026: '30,914', beginRank2025: '11,298', endingRank2025: '51,609' },
-  { sNo: 2, code: 'CSE', course: 'COMPUTER SCIENCE AND ENGINEERING', collegeCode: 'VISW', beginRank2026: '375', endingRank2026: '4,020', beginRank2025: '681', endingRank2025: '4,325' },
-  { sNo: 3, code: 'CSC', course: 'COMPUTER SCIENCE AND ENGINEERING (CYBER SECURITY)', collegeCode: 'VISW', beginRank2026: '2,647', endingRank2026: '5,705', beginRank2025: '1,962', endingRank2025: '7,152' },
-  { sNo: 4, code: 'CSM', course: 'CSE (ARTIFICIAL INTELLIGENCE AND MACHINE LEARNING)', collegeCode: 'VISW', beginRank2026: '1,733', endingRank2026: '4,814', beginRank2025: '523', endingRank2025: '5,256' },
-  { sNo: 5, code: 'CAD', course: 'CSE (ARTIFICIAL INTELLIGENCE & DATA SCIENCE)', collegeCode: 'VISW', beginRank2026: '1,481', endingRank2026: '5,475', beginRank2025: '1,466', endingRank2025: '6,284' },
-  { sNo: 6, code: 'EEE', course: 'ELECTRICAL AND ELECTRONICS ENGINEERING', collegeCode: 'VISW', beginRank2026: '9,353', endingRank2026: '16,183', beginRank2025: '13,282', endingRank2025: '20,962' },
-  { sNo: 7, code: 'ECE', course: 'ELECTRONICS AND COMMUNICATION ENGINEERING', collegeCode: 'VISW', beginRank2026: '2,484', endingRank2026: '6,978', beginRank2025: '3,684', endingRank2025: '9,659' },
-  { sNo: 8, code: 'INF', course: 'INFORMATION TECHNOLOGY', collegeCode: 'VISW', beginRank2026: '5,297', endingRank2026: '8,023', beginRank2025: '6,126', endingRank2025: '10,089' },
-  { sNo: 9, code: 'MEC', course: 'MECHANICAL ENGINEERING', collegeCode: 'VISW', beginRank2026: '7,904', endingRank2026: '20,739', beginRank2025: '18,156', endingRank2025: '33,395' },
+  { code: 'CIV', course: 'CIVIL ENGINEERING', collegeCode: 'VISW', beginRank2026: '10,350', endingRank2026: '30,914', beginRank2025: '11,298', endingRank2025: '51,609' },
+  { code: 'CSE', course: 'COMPUTER SCIENCE AND ENGINEERING', collegeCode: 'VISW', beginRank2026: '375', endingRank2026: '4,020', beginRank2025: '681', endingRank2025: '4,325' },
+  { code: 'CSC', course: 'COMPUTER SCIENCE AND ENGINEERING (CYBER SECURITY)', collegeCode: 'VISW', beginRank2026: '2,647', endingRank2026: '5,705', beginRank2025: '1,962', endingRank2025: '7,152' },
+  { code: 'CSM', course: 'CSE (ARTIFICIAL INTELLIGENCE AND MACHINE LEARNING)', collegeCode: 'VISW', beginRank2026: '1,733', endingRank2026: '4,814', beginRank2025: '523', endingRank2025: '5,256' },
+  { code: 'CAD', course: 'CSE (ARTIFICIAL INTELLIGENCE & DATA SCIENCE)', collegeCode: 'VISW', beginRank2026: '1,481', endingRank2026: '5,475', beginRank2025: '1,466', endingRank2025: '6,284' },
+  { code: 'EEE', course: 'ELECTRICAL AND ELECTRONICS ENGINEERING', collegeCode: 'VISW', beginRank2026: '9,353', endingRank2026: '16,183', beginRank2025: '13,282', endingRank2025: '20,962' },
+  { code: 'ECE', course: 'ELECTRONICS AND COMMUNICATION ENGINEERING', collegeCode: 'VISW', beginRank2026: '2,484', endingRank2026: '6,978', beginRank2025: '3,684', endingRank2025: '9,659' },
+  { code: 'INF', course: 'INFORMATION TECHNOLOGY', collegeCode: 'VISW', beginRank2026: '5,297', endingRank2026: '8,023', beginRank2025: '6,126', endingRank2025: '10,089' },
+  { code: 'MEC', course: 'MECHANICAL ENGINEERING', collegeCode: 'VISW', beginRank2026: '7,904', endingRank2026: '20,739', beginRank2025: '18,156', endingRank2025: '33,395' },
   // VISWPU
-  { sNo: 10, code: 'CSM', course: 'CSE (ARTIFICIAL INTELLIGENCE AND MACHINE LEARNING)', collegeCode: 'VISWPU', beginRank2026: '1,242', endingRank2026: '9,991', beginRank2025: '---', endingRank2025: '---' },
-  { sNo: 11, code: 'EVT', course: 'ELECTRONICS ENGINEERING (VLSI DESIGN AND TECHNOLOGY)', collegeCode: 'VISWPU', beginRank2026: '2,331', endingRank2026: '7,756', beginRank2025: '---', endingRank2025: '---' },
+  { code: 'CSM', course: 'CSE (ARTIFICIAL INTELLIGENCE AND MACHINE LEARNING)', collegeCode: 'VISWPU', beginRank2026: '1,242', endingRank2026: '9,991', beginRank2025: '---', endingRank2025: '---' },
+  { code: 'EVT', course: 'ELECTRONICS ENGINEERING (VLSI DESIGN AND TECHNOLOGY)', collegeCode: 'VISWPU', beginRank2026: '2,331', endingRank2026: '7,756', beginRank2025: '---', endingRank2025: '---' },
 ];
-
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-function validateRequestInfoForm(form: RequestInfoForm): RequestInfoFormErrors {
-  const errors: RequestInfoFormErrors = {};
-  if (!form.firstName.trim()) errors.firstName = 'Please enter your first name.';
-  if (!form.lastName.trim()) errors.lastName = 'Please enter your last name.';
-  if (!form.email.trim()) errors.email = 'Please enter your email address.';
-  else if (!EMAIL_RE.test(form.email.trim())) errors.email = 'Please enter a valid email address.';
-  if (!form.program) errors.program = 'Please select a program.';
-  return errors;
-}
-
-// EmailJS is frontend-only, so the "to" address for each template must be fixed
-// in the EmailJS dashboard rather than passed from the client — otherwise this
-// form could be used to relay email to any address a visitor supplies.
-//   - VITE_EMAILJS_TEMPLATE_ID_ADMISSIONS: "To Email" set to the VWU admissions inbox.
-//   - VITE_EMAILJS_TEMPLATE_ID_CONFIRMATION: an autoreply template with
-//     "To Email" set to the {{email}} template variable, so it only ever
-//     reaches the address the visitor themselves typed in.
-const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
-const EMAILJS_TEMPLATE_ID_ADMISSIONS = import.meta.env.VITE_EMAILJS_TEMPLATE_ID_ADMISSIONS;
-const EMAILJS_TEMPLATE_ID_CONFIRMATION = import.meta.env.VITE_EMAILJS_TEMPLATE_ID_CONFIRMATION;
-const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 
 const defaultAdmissionsPhotos = [
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'VWU campus buildings', caption: 'VWU Campus' },
@@ -149,61 +104,6 @@ export default function Admissions() {
   const pgPhotos = useSitePhotos('admissions', 'pg', defaultPgPhotos);
   const hasPgPhotos = useSectionHasPhotos('admissions', 'pg');
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const [requestForm, setRequestForm] = useState<RequestInfoForm>(INITIAL_REQUEST_FORM);
-  const [requestErrors, setRequestErrors] = useState<RequestInfoFormErrors>({});
-  const [requestStatus, setRequestStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
-
-  const handleRequestFormChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setRequestForm((prev) => ({ ...prev, [name]: value }));
-    setRequestErrors((prev) => (prev[name as keyof RequestInfoForm] ? { ...prev, [name]: undefined } : prev));
-  };
-
-  const handleRequestInfoSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const validationErrors = validateRequestInfoForm(requestForm);
-    if (Object.keys(validationErrors).length > 0) {
-      setRequestErrors(validationErrors);
-      return;
-    }
-
-    setRequestStatus('submitting');
-    try {
-      // Firestore is the system of record for these inquiries — this must
-      // succeed for the submission to count. Emailing admissions/the visitor
-      // (below) via EmailJS is a best-effort convenience on top of it.
-      await addDoc(collection(db, 'admissionInquiries'), {
-        ...requestForm,
-        status: 'new',
-        createdAt: serverTimestamp(),
-      });
-
-      if (EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID_ADMISSIONS && EMAILJS_TEMPLATE_ID_CONFIRMATION && EMAILJS_PUBLIC_KEY) {
-        const templateParams = {
-          first_name: requestForm.firstName,
-          last_name: requestForm.lastName,
-          email: requestForm.email,
-          program: requestForm.program,
-          term: requestForm.term,
-        };
-        try {
-          await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID_ADMISSIONS, templateParams, EMAILJS_PUBLIC_KEY);
-          await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID_CONFIRMATION, templateParams, EMAILJS_PUBLIC_KEY);
-        } catch {
-          // Non-fatal — the inquiry is already saved above.
-        }
-      }
-
-      setRequestStatus('success');
-      setRequestForm(INITIAL_REQUEST_FORM);
-      setRequestErrors({});
-    } catch {
-      setRequestStatus('error');
-    }
-  };
-
   useEffect(() => {
     document.title = "Admissions | Vishnu Women's University";
     const observer = new IntersectionObserver(
@@ -228,8 +128,8 @@ export default function Admissions() {
       {/* Hero */}
       <PageHero
         page="admissions"
-        defaultTitle="Admissions 2027 – 2028"
-        defaultSubtitle="First Private Women’s University in Andhra Pradesh and Telangana. No. 1 preferred choice for female students in EAPCET 2026."
+        defaultTitle="Admissions Open"
+        defaultSubtitle="First Private Women’s University in Andhra Pradesh and Telangana. No. 1 preferred choice for female students in EAPCET."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Admissions' }]}
         scrollCtaTargetId="admissions-content"
       />
@@ -288,6 +188,31 @@ export default function Admissions() {
         </div>
       </section>
 
+      {/* Admissions Overview */}
+      <section className="section bg-white">
+        <div className="container">
+          <div className="adm-intro-grid">
+            <div className="adm-intro-main reveal-left">
+              <span className="section-label">Your Journey to Excellence Starts Here</span>
+              <h2 className="section-title">Admissions at Vishnu Women’s University</h2>
+              <p className="adm-intro-text">
+                Admissions at Vishnu Women’s University open the door to an enriching educational experience shaped by world-class infrastructure, accomplished faculty, diverse academic opportunities, and a vibrant campus environment. Designed to be transparent, student-centric, and merit-driven, the admission process enables aspiring women learners to discover programmes that align with their ambitions and embark on a journey of academic excellence, personal growth, leadership, and lifelong achievement.
+              </p>
+            </div>
+            <div className="adm-intro-hub-panel reveal-right">
+              <div className="adm-intro-hub-icon"><Users size={22} strokeWidth={2} /></div>
+              <h3 className="adm-intro-subtitle">Admission Hub</h3>
+              <p className="adm-intro-text">
+                The Admission Hub is the university’s first point of connection with prospective students—facilitating the admission journey through clear processes, responsive guidance, and personalised support from the first enquiry to enrolment.
+              </p>
+              <p className="adm-intro-text">
+                Vishnu Women’s University is committed to attracting high-potential students who share its pursuit of academic excellence, innovation, leadership, and meaningful impact, reinforcing its reputation as a destination for transformative women’s education.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Steps to Enroll */}
       <section id="apply" className="section bg-off-white">
         <div className="container">
@@ -333,6 +258,10 @@ export default function Admissions() {
             </p>
           </div>
 
+          {(() => {
+            const viswRows = eapcetRanksData.filter(r => r.collegeCode === 'VISW');
+            const viswpuRows = eapcetRanksData.filter(r => r.collegeCode === 'VISWPU');
+            return (
           <div className="reveal" style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-6)', overflowX: 'auto', boxShadow: 'var(--shadow-sm)' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: 780 }}>
               <thead>
@@ -357,9 +286,9 @@ export default function Admissions() {
                     EAPCET College Code: VISW
                   </td>
                 </tr>
-                {eapcetRanksData.filter(r => r.collegeCode === 'VISW').map((row, idx) => (
-                  <tr key={`visw-${row.sNo}`} style={{ borderBottom: '1px solid var(--color-light-gray)', background: idx % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)' }}>
-                    <td style={{ padding: 'var(--space-3)', textAlign: 'center', fontWeight: 600, fontSize: 'var(--text-xs)', color: 'var(--color-text-light)' }}>{row.sNo}</td>
+                {viswRows.map((row, idx) => (
+                  <tr key={`visw-${row.code}`} style={{ borderBottom: '1px solid var(--color-light-gray)', background: idx % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)' }}>
+                    <td style={{ padding: 'var(--space-3)', textAlign: 'center', fontWeight: 600, fontSize: 'var(--text-xs)', color: 'var(--color-text-light)' }}>{idx + 1}</td>
                     <td style={{ padding: 'var(--space-3)', textAlign: 'center' }}>
                       <span style={{ background: 'rgba(0,47,25,0.08)', color: 'var(--color-primary)', padding: '0.15rem 0.5rem', borderRadius: '4px', fontWeight: 800, fontSize: 'var(--text-xs)' }}>{row.code}</span>
                     </td>
@@ -376,9 +305,9 @@ export default function Admissions() {
                     EAPCET College Code: VISWPU
                   </td>
                 </tr>
-                {eapcetRanksData.filter(r => r.collegeCode === 'VISWPU').map((row, idx) => (
-                  <tr key={`viswpu-${row.sNo}`} style={{ borderBottom: '1px solid var(--color-light-gray)', background: idx % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)' }}>
-                    <td style={{ padding: 'var(--space-3)', textAlign: 'center', fontWeight: 600, fontSize: 'var(--text-xs)', color: 'var(--color-text-light)' }}>{row.sNo}</td>
+                {viswpuRows.map((row, idx) => (
+                  <tr key={`viswpu-${row.code}`} style={{ borderBottom: '1px solid var(--color-light-gray)', background: idx % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)' }}>
+                    <td style={{ padding: 'var(--space-3)', textAlign: 'center', fontWeight: 600, fontSize: 'var(--text-xs)', color: 'var(--color-text-light)' }}>{viswRows.length + idx + 1}</td>
                     <td style={{ padding: 'var(--space-3)', textAlign: 'center' }}>
                       <span style={{ background: 'rgba(0,47,25,0.08)', color: 'var(--color-primary)', padding: '0.15rem 0.5rem', borderRadius: '4px', fontWeight: 800, fontSize: 'var(--text-xs)' }}>{row.code}</span>
                     </td>
@@ -395,6 +324,8 @@ export default function Admissions() {
               * Comparative Statement of Official AP EAPCET Cut-off Ranks (2026–27 vs 2025–26) for VWU (College Codes: VISW, VISWPU).
             </div>
           </div>
+            );
+          })()}
         </div>
       </section>
 
@@ -539,86 +470,14 @@ export default function Admissions() {
             <div className="adm-form-card reveal-right">
               <div style={{ background: 'var(--color-primary)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4) var(--space-5)', marginBottom: 'var(--space-6)', borderLeft: '4px solid var(--color-accent)' }}>
                 <span style={{ color: 'var(--color-accent)', fontWeight: 800, fontSize: 'var(--text-xs)', textTransform: 'uppercase', letterSpacing: '0.06em', display: 'block', marginBottom: 2 }}>
-                  Admissions 2027 – 28
+                  Admissions Open
                 </span>
                 <p style={{ color: 'var(--color-white)', fontSize: 'var(--text-sm)', fontWeight: 700, margin: 0, lineHeight: 1.5 }}>
-                  Candidates seeking Admissions for Academic Year 2027 – 28, apply here by filling in the details below.
+                  Candidates seeking Admissions, apply here by filling in the details below.
                 </p>
               </div>
 
-              <h3>Apply for Admission</h3>
-              <form onSubmit={handleRequestInfoSubmit} className="adm-form" noValidate>
-                <div className="adm-form-row">
-                  <div className="adm-form-group">
-                    <label>First Name</label>
-                    <input
-                      type="text" name="firstName" placeholder="First name"
-                      value={requestForm.firstName} onChange={handleRequestFormChange}
-                      className={requestErrors.firstName ? 'has-error' : undefined}
-                      aria-invalid={!!requestErrors.firstName}
-                    />
-                    {requestErrors.firstName && <span className="adm-form-error">{requestErrors.firstName}</span>}
-                  </div>
-                  <div className="adm-form-group">
-                    <label>Last Name</label>
-                    <input
-                      type="text" name="lastName" placeholder="Last name"
-                      value={requestForm.lastName} onChange={handleRequestFormChange}
-                      className={requestErrors.lastName ? 'has-error' : undefined}
-                      aria-invalid={!!requestErrors.lastName}
-                    />
-                    {requestErrors.lastName && <span className="adm-form-error">{requestErrors.lastName}</span>}
-                  </div>
-                </div>
-                <div className="adm-form-group">
-                  <label>Email Address</label>
-                  <input
-                    type="email" name="email" placeholder="your@email.com"
-                    value={requestForm.email} onChange={handleRequestFormChange}
-                    className={requestErrors.email ? 'has-error' : undefined}
-                    aria-invalid={!!requestErrors.email}
-                  />
-                  {requestErrors.email && <span className="adm-form-error">{requestErrors.email}</span>}
-                </div>
-                <div className="adm-form-group">
-                  <label>Program Interest</label>
-                  <select
-                    name="program" value={requestForm.program} onChange={handleRequestFormChange}
-                    className={requestErrors.program ? 'has-error' : undefined}
-                    aria-invalid={!!requestErrors.program}
-                  >
-                    <option value="">Select a program...</option>
-                    <option>B.Tech – CSE / AI&ML / AI&DS / Cyber Security</option>
-                    <option>B.Tech – ECE / EEE / IT</option>
-                    <option>B.Tech – Civil / Mechanical Engineering</option>
-                    <option>M.Tech Programs</option>
-                    <option>MBA</option>
-                    <option>Ph.D. Programs</option>
-                  </select>
-                  {requestErrors.program && <span className="adm-form-error">{requestErrors.program}</span>}
-                </div>
-                <div className="adm-form-group">
-                  <label>Expected Admission Academic Year</label>
-                  <select name="term" value={requestForm.term} onChange={handleRequestFormChange}>
-                    <option>Academic Year 2027 – 28</option>
-                    <option>Academic Year 2026 – 27</option>
-                    <option>Spring 2027</option>
-                  </select>
-                </div>
-                <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={requestStatus === 'submitting'}>
-                  {requestStatus === 'submitting' ? 'Sending…' : 'Request Information'}
-                </button>
-                {requestStatus === 'success' && (
-                  <p style={{ marginTop: 'var(--space-3)', fontSize: 'var(--text-sm)', color: 'var(--color-primary)' }}>
-                    Thanks! We've received your request. Our admissions team will be in touch shortly.
-                  </p>
-                )}
-                {requestStatus === 'error' && (
-                  <p style={{ marginTop: 'var(--space-3)', fontSize: 'var(--text-sm)', color: '#b3261e' }}>
-                    Something went wrong sending your request. Please try again or email us directly.
-                  </p>
-                )}
-              </form>
+              <AdmissionApplyForm />
             </div>
           </div>
         </div>

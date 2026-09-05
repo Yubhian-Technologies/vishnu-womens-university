@@ -23,6 +23,7 @@ export const SECTIONS = [
   { id: 'core-executives', icon: '🧑‍💼', label: 'Core Executives' },
   { id: 'placements',     icon: '💼', label: 'Placement Year Data' },
   { id: 'placement-highlights', icon: '🏅', label: 'Home — Placement Highlights' },
+  { id: 'honoured-guests', icon: '🎖️', label: 'Home — Honoured Guests' },
   { id: 'alumni',         icon: '🎓', label: 'Alumni & Giving' },
   { id: 'announcements',  icon: '📢', label: 'Announcements' },
   { id: 'information',    icon: '📅', label: 'Information Page' },
@@ -71,7 +72,7 @@ export const SECTIONS = [
 export const SECTION_GROUPS: { label: string; ids: string[] }[] = [
   { label: 'Overview', ids: ['overview'] },
   { label: 'Form Submissions', ids: ['contact-messages', 'career-applications', 'admission-inquiries', 'campus-visit-requests'] },
-  { label: 'Site Appearance', ids: ['theme', 'banners', 'landing-pages', 'site-photos', 'nav-links', 'content-blocks', 'compliance-docs'] },
+  { label: 'Site Appearance', ids: ['theme', 'banners', 'landing-pages', 'site-photos', 'nav-links', 'content-blocks', 'compliance-docs', 'honoured-guests'] },
   { label: 'About & Governance', ids: ['governing-body', 'governance-items', 'annual-reports', 'nirf-reports', 'nba-data', 'core-executives', 'sves-campuses', 'contacts', 'policies'] },
   { label: 'Academics', ids: ['programs', 'schools', 'departments', 'faculty', 'curriculum', 'downloads'] },
   { label: 'Admissions & Campus Info', ids: ['information'] },

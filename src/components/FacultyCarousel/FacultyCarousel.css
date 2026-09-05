@@ -3,12 +3,12 @@
    ========================================================================== */
 
 .faculty-impact-section {
-  background: #facc15 !important;
-  background: linear-gradient(135deg, #ffe033 0%, #facc15 100%) !important;
-  padding: clamp(3rem, 6vw, 4.5rem) 0;
+  background: #c1541c !important;
+  padding: 2.25rem 0 !important;
   width: 100%;
   position: relative;
   overflow: hidden;
+  scroll-margin-top: calc(var(--topbar-height, 0px) + var(--header-height, 70px) + 80px) !important;
 }
 
 .faculty-impact-container {
@@ -24,19 +24,19 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1.5rem;
-  margin-bottom: clamp(1.75rem, 3.5vw, 2.5rem);
+  gap: 1rem;
+  margin-bottom: 1.25rem;
   flex-wrap: wrap;
 }
 
 .faculty-impact-title {
   font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
-  font-size: clamp(1.75rem, 3.2vw, 2.45rem);
+  font-size: clamp(1.35rem, 2.4vw, 1.85rem);
   font-weight: 800;
-  color: #0b0e14;
+  color: #ffffff;
   letter-spacing: -0.025em;
   margin: 0;
-  line-height: 1.15;
+  line-height: 1.2;
 }
 
 /* Header Action Controls */
@@ -163,12 +163,12 @@
   }
 }
 
-/* Entire Card in Circular White Background — Scaled 1.35x Height/Padding */
+/* Compact Card Layout */
 .faculty-impact-card {
   background: #ffffff;
-  border-radius: 32px;
-  padding: 1.6rem;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
+  border-radius: 20px;
+  padding: 0.85rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.07);
   border: 1px solid rgba(255, 255, 255, 0.8);
   display: flex;
   flex-direction: column;
@@ -178,15 +178,16 @@
 }
 
 .faculty-impact-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.14);
+  transform: translateY(-4px);
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.12);
 }
 
-/* Photo Frame — Scaled 1.35x Height (250px * 1.35 = 338px) */
+/* Photo Frame — 3:4 Aspect Ratio */
 .faculty-impact-photo-frame {
   width: 100%;
-  height: 338px;
-  border-radius: 24px;
+  aspect-ratio: 3 / 4;
+  height: auto;
+  border-radius: 14px;
   overflow: hidden;
   background: #f8fafc;
   border: 1px solid rgba(0, 0, 0, 0.05);
@@ -229,22 +230,22 @@
 
 /* Info Section inside White Card */
 .faculty-impact-info {
-  padding-top: 1.15rem;
+  padding-top: 0.65rem;
   display: flex;
   flex-direction: column;
   flex: 1;
 }
 
 .faculty-impact-heading-group {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.35rem;
 }
 
 .faculty-impact-name {
   font-family: var(--font-sans);
-  font-size: 1.08rem;
+  font-size: 1.05rem;
   font-weight: 800;
   color: #0f172a;
-  margin: 0 0 0.15rem 0;
+  margin: 0 0 0.1rem 0;
   line-height: 1.25;
   letter-spacing: -0.01em;
 }
@@ -263,29 +264,29 @@
 
 .faculty-impact-meta {
   font-family: var(--font-sans);
-  font-size: 0.76rem;
+  font-size: 0.74rem;
   font-weight: 600;
   color: #64748b;
   margin: 0;
-  line-height: 1.35;
+  line-height: 1.3;
 }
 
 /* Professional Credential Badges */
 .faculty-impact-badges {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.4rem;
-  margin-bottom: 0.75rem;
+  gap: 0.35rem;
+  margin-bottom: 0.45rem;
 }
 
 .faculty-impact-badge {
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
-  padding: 0.25rem 0.65rem;
+  gap: 0.25rem;
+  padding: 0.2rem 0.55rem;
   border-radius: 9999px;
   font-family: var(--font-sans);
-  font-size: 0.68rem;
+  font-size: 0.66rem;
   font-weight: 700;
   letter-spacing: 0.02em;
   white-space: nowrap;
@@ -305,29 +306,29 @@
 
 /* Summary / Specialization Area */
 .faculty-impact-summary-wrap {
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
   flex: 1;
 }
 
 .faculty-impact-summary-label {
   display: block;
   font-family: var(--font-sans);
-  font-size: 0.64rem;
+  font-size: 0.62rem;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.07em;
   color: #94a3b8;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.2rem;
 }
 
 .faculty-impact-bio {
   font-family: var(--font-sans);
-  font-size: 0.82rem;
-  line-height: 1.5;
+  font-size: 0.78rem;
+  line-height: 1.4;
   color: #334155;
   margin: 0;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   font-weight: 500;
@@ -336,7 +337,7 @@
 /* View Full Profile Action Button */
 .faculty-impact-footer {
   margin-top: auto;
-  padding-top: 0.5rem;
+  padding-top: 0.4rem;
   border-top: 1px solid #f1f5f9;
 }
 
@@ -345,9 +346,18 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding: 0.55rem 0.95rem;
+  padding: 0.45rem 0.85rem;
   background: #f8fafc;
   border: 1px solid #e2e8f0;
+  border-radius: 9999px;
+  color: #0f172a;
+  font-family: var(--font-sans);
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 180ms ease;
+  box-sizing: border-box;
+}
   border-radius: 9999px;
   color: #0f172a;
   font-family: var(--font-sans);

@@ -200,24 +200,34 @@ export default function ResearchDetail() {
 
   return (
     <main className="page-wrapper">
-      {/* Hero */}
-      <section className="page-hero" style={{ minHeight: 340 }}>
-        {heroImage && (
-          <img src={heroImage} alt={item.title} className="page-hero-image" loading="eager" decoding="sync" {...fetchPriorityAttr('high')} />
-        )}
-        <div className="page-hero-overlay" />
-        <div className="container page-hero-content">
-          <div className="breadcrumb">
-            <Link to="/" className="breadcrumb-item">Home</Link>
-            <span className="breadcrumb-sep">›</span>
-            <Link to="/research" className="breadcrumb-item">Research & Development</Link>
-            <span className="breadcrumb-sep">›</span>
-            <span className="breadcrumb-item active">{item.title}</span>
+      {/* Hero — Department Hero Card Design */}
+      <section className="dept-hero-section">
+        <div className="container">
+          <div className="dept-hero-card">
+            {heroImage && (
+              <img src={heroImage} alt={item.title} className="dept-hero-bg-img" loading="eager" decoding="sync" {...fetchPriorityAttr('high')} />
+            )}
+            <div className="dept-hero-overlay" />
+            <div className="dept-hero-content">
+              <div className="breadcrumb animate-fade-in" style={{ marginBottom: '0.8rem' }}>
+                <Link to="/" className="breadcrumb-item">Home</Link>
+                <span className="breadcrumb-sep">›</span>
+                <Link to="/research" className="breadcrumb-item">Research &amp; Development</Link>
+                <span className="breadcrumb-sep">›</span>
+                <span className="breadcrumb-item active">{item.title}</span>
+              </div>
+              <div className="animate-fade-in-up" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#C9973A', color: '#0B1E42', fontSize: 'var(--text-xs)', fontWeight: 800, padding: '0.35rem 0.9rem', borderRadius: '9999px', marginBottom: '0.8rem', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                <Icon size={14} /> {categoryLabel}
+              </div>
+              <h1 className="dept-hero-title">{item.title}</h1>
+              {item.intro && (
+                <p className="dept-hero-subtitle">{item.intro}</p>
+              )}
+              <div className="dept-hero-cta">
+                <Link to="/apply-now" className="btn-hero-gold">Apply Now</Link>
+              </div>
+            </div>
           </div>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'var(--color-accent)', color: 'var(--color-white)', fontSize: 'var(--text-xs)', fontWeight: 700, padding: '0.3rem 0.9rem', borderRadius: 'var(--radius-full)', marginBottom: 'var(--space-3)' }}>
-            <Icon size={14} /> {categoryLabel}
-          </div>
-          <h1>{item.title}</h1>
         </div>
       </section>
 

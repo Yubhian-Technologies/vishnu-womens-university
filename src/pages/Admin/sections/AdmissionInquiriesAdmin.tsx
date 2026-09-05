@@ -6,10 +6,10 @@ import { useOrderedCollection } from '../../../hooks/useCollection';
 export interface AdmissionInquiryDoc {
   id: string;
   firstName: string;
-  lastName: string;
-  email: string;
+  phone: string;
   program: string;
-  term: string;
+  purpose: string;
+  phoneVerified?: boolean;
   status: 'new' | 'read';
   createdAt?: { toDate: () => Date };
 }
@@ -65,7 +65,7 @@ export default function AdmissionInquiriesAdmin() {
         {loading ? <p className="admin-loading">Loading…</p> : (
           <div className="admin-table-wrap">
             <table className="admin-table">
-              <thead><tr><th>Status</th><th>Received</th><th>Name</th><th>Email</th><th>Program</th><th>Term</th><th>Actions</th></tr></thead>
+              <thead><tr><th>Status</th><th>Received</th><th>Name</th><th>Phone</th><th>Program</th><th>Purpose</th><th>Actions</th></tr></thead>
               <tbody>
                 {inquiries.map((i) => (
                   <tr key={i.id} style={{ cursor: 'pointer' }} onClick={() => openInquiry(i)}>
@@ -78,10 +78,10 @@ export default function AdmissionInquiriesAdmin() {
                       </button>
                     </td>
                     <td>{formatTimestamp(i.createdAt)}</td>
-                    <td>{i.firstName} {i.lastName}</td>
-                    <td>{i.email}</td>
+                    <td>{i.firstName}</td>
+                    <td>{i.phone}</td>
                     <td>{i.program}</td>
-                    <td>{i.term}</td>
+                    <td>{i.purpose}</td>
                     <td>
                       <button className="admin-btn admin-btn--sm" onClick={(e) => { e.stopPropagation(); openInquiry(i); }}>View</button>
                       <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={(e) => { e.stopPropagation(); remove(i.id); }}>Delete</button>
@@ -98,12 +98,12 @@ export default function AdmissionInquiriesAdmin() {
       {selected && (
         <div className="admin-card admin-detail-card">
           <div className="admin-detail-card__header">
-            <h2 className="admin-card__title">{selected.firstName} {selected.lastName}</h2>
+            <h2 className="admin-card__title">{selected.firstName}</h2>
             <button className="admin-btn admin-btn--sm admin-btn--ghost" onClick={() => setSelectedId(null)}>Close</button>
           </div>
-          <div className="admin-detail-row"><strong>Email:</strong> <a href={`mailto:${selected.email}`}>{selected.email}</a></div>
+          <div className="admin-detail-row"><strong>Phone:</strong> <a href={`tel:${selected.phone}`}>{selected.phone}</a> {selected.phoneVerified && <span className="admin-badge admin-badge--sm admin-badge--green">OTP Verified</span>}</div>
           <div className="admin-detail-row"><strong>Program Interest:</strong> {selected.program}</div>
-          <div className="admin-detail-row"><strong>Expected Start Term:</strong> {selected.term}</div>
+          <div className="admin-detail-row"><strong>Purpose:</strong> {selected.purpose}</div>
           <div className="admin-detail-row"><strong>Received:</strong> {formatTimestamp(selected.createdAt)}</div>
         </div>
       )}

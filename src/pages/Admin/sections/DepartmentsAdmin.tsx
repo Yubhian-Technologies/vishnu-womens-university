@@ -47,6 +47,7 @@ export interface DepartmentDoc {
   // Grouped-department page (shared top) content — all optional.
   heroImage?: string;
   storagePath?: string;
+  tagline?: string;
   about?: string;
   // Same shape/purpose as a programme's own (see ProgramsAdmin) — shown
   // right below "About the Department" on the grouped department page,
@@ -1055,7 +1056,7 @@ export default function DepartmentsAdmin() {
           </div>
           <div className="admin-field">
             <label htmlFor="field-hod-email">HOD Email</label>
-            <input id="field-hod-email" value={form.hodEmail} onChange={(e) => set('hodEmail', e.target.value)} placeholder="hod.cse@vishnu.edu.in" />
+            <input id="field-hod-email" value={form.hodEmail} onChange={(e) => set('hodEmail', e.target.value)} placeholder="hod.cse@vwu.edu.in" />
           </div>
           <div className="admin-field admin-field--full">
             <label htmlFor="field-hod-message">HOD Message</label>

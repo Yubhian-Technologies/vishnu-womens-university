@@ -10,6 +10,7 @@ interface FacultyCarouselProps {
   departmentName?: string;
   title?: string;
   viewMoreLink?: string;
+  autoScrollInterval?: number;
 }
 
 function getInitials(name: string) {
@@ -38,6 +39,7 @@ export default function FacultyCarousel({
   departmentName: _,
   title = 'Learn from our impactful faculty',
   viewMoreLink = '/faculty',
+  autoScrollInterval = 1000,
 }: FacultyCarouselProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -89,10 +91,10 @@ export default function FacultyCarousel({
       } else {
         scrollRef.current.scrollBy({ left: step, behavior: 'smooth' });
       }
-    }, 4000);
+    }, autoScrollInterval);
 
     return () => clearInterval(timer);
-  }, [faculty, isPaused]);
+  }, [faculty, isPaused, autoScrollInterval]);
 
   const pauseTemporarily = () => {
     setIsPaused(true);

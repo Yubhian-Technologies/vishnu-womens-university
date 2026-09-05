@@ -4,18 +4,19 @@
    ========================================================================== */
 
 .m3-testimonial-section {
-  --home-teal: var(--testimonial-bg-light, #0B1E42);
-  --home-teal-deep: var(--testimonial-bg, #041226);
+  --home-teal: #0B1E42;
+  --home-teal-deep: #0B1E42;
   --home-white: #FFFFFF;
   --home-gold: #C9973A;
-  --home-green: var(--testimonial-accent, #78C900);
+  --home-green: #78C900;
 
   position: relative;
-  background: var(--home-teal-deep);
-  background: radial-gradient(circle at 50% 15%, var(--home-teal) 0%, var(--home-teal-deep) 70%, #020b17 100%);
+  background: #ffffff;
   padding: clamp(3.5rem, 6vw, 5rem) 0;
   overflow: hidden;
-  color: var(--home-white);
+  color: #0B1E42;
+  border-top: 1px solid rgba(11, 30, 66, 0.06);
+  border-bottom: 1px solid rgba(11, 30, 66, 0.06);
 }
 
 /* Ambient Radial Glows */
@@ -25,7 +26,7 @@
   left: -60px;
   width: 450px;
   height: 450px;
-  background: radial-gradient(circle, rgba(201, 151, 58, 0.12) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(201, 151, 58, 0.08) 0%, transparent 70%);
   border-radius: 50%;
   pointer-events: none;
   z-index: 1;
@@ -37,13 +38,13 @@
   right: -60px;
   width: 420px;
   height: 420px;
-  background: radial-gradient(circle, rgba(120, 201, 0, 0.10) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(11, 30, 66, 0.05) 0%, transparent 70%);
   border-radius: 50%;
   pointer-events: none;
   z-index: 1;
 }
 
-/* Section Header — Reduced spacing to card */
+/* Section Header */
 .m3-testi-header {
   position: relative;
   z-index: 2;
@@ -52,37 +53,17 @@
   margin: 0 auto clamp(1.25rem, 2.5vw, 1.85rem) auto;
 }
 
-.m3-testi-eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 5px 14px;
-  background: rgba(201, 151, 58, 0.12);
-  border: 1px solid rgba(201, 151, 58, 0.3);
-  border-radius: var(--radius-full);
-  font-size: 0.74rem;
-  font-weight: 800;
-  color: var(--home-gold);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  margin-bottom: 0.65rem;
-}
-
-.m3-testi-sparkle {
-  color: var(--home-gold);
-}
-
 .m3-testi-title {
-  font-family: var(--font-serif);
+  font-family: var(--font-serif, Georgia, serif);
   font-size: clamp(2rem, 3.8vw, 2.8rem);
   font-weight: 800;
-  color: #ffffff;
+  color: #0B1E42;
   letter-spacing: -0.02em;
   margin: 0;
   line-height: 1.2;
 }
 
-/* Carousel Stage & Compact Card */
+/* Carousel Stage & Card */
 .m3-testi-stage {
   position: relative;
   z-index: 2;
@@ -93,27 +74,25 @@
 
 .m3-testi-card {
   position: relative;
-  background: rgba(11, 30, 66, 0.65);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: #ffffff;
+  border: 1px solid rgba(11, 30, 66, 0.1);
   border-radius: 24px;
   overflow: hidden;
-  box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  box-shadow: 0 10px 30px rgba(11, 30, 66, 0.05), 0 2px 6px rgba(0, 0, 0, 0.02);
   transition: border-color 300ms ease, box-shadow 300ms ease;
   margin-bottom: 1.25rem;
 }
 
 .m3-testi-card:hover {
   border-color: rgba(201, 151, 58, 0.4);
-  box-shadow: 0 24px 60px -10px rgba(0, 0, 0, 0.7), 0 0 24px rgba(201, 151, 58, 0.15);
+  box-shadow: 0 18px 45px rgba(11, 30, 66, 0.09);
 }
 
 /* Auto-play Progress Bar */
 .m3-testi-progress-track {
   width: 100%;
   height: 3px;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(11, 30, 66, 0.08);
   position: relative;
 }
 
@@ -121,10 +100,10 @@
   height: 100%;
   background: var(--home-gold);
   transition: width 50ms linear;
-  box-shadow: 0 0 8px rgba(201, 151, 58, 0.6);
+  box-shadow: 0 0 8px rgba(201, 151, 58, 0.4);
 }
 
-/* Split Card Inner Layout — Reduced Height */
+/* Split Card Inner Layout */
 .m3-testi-card-inner {
   display: flex;
   flex-direction: row;
@@ -140,7 +119,7 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  background: #041226;
+  background: #0B1E42;
   overflow: hidden;
 }
 
@@ -169,7 +148,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #0B1E42 0%, #041226 100%);
+  background: linear-gradient(135deg, #0B1E42 0%, #1E3B75 100%);
   font-size: 2.5rem;
   font-weight: 900;
   color: var(--home-gold);
@@ -178,9 +157,7 @@
 .m3-testi-img-overlay {
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(to right, transparent 65%, rgba(11, 30, 66, 0.95) 100%),
-    linear-gradient(to top, rgba(4, 18, 38, 0.8) 0%, transparent 50%);
+  background: linear-gradient(to top, rgba(11, 30, 66, 0.7) 0%, transparent 50%);
   pointer-events: none;
 }
 
@@ -193,10 +170,10 @@
   gap: 5px;
   padding: 4px 10px;
   border-radius: var(--radius-full);
-  background: rgba(4, 18, 38, 0.82);
+  background: rgba(11, 30, 66, 0.85);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   font-size: 0.68rem;
   font-weight: 700;
   color: #ffffff;
@@ -215,6 +192,7 @@
   flex-direction: column;
   justify-content: space-between;
   padding: clamp(1.35rem, 2.8vw, 2.25rem);
+  background: #ffffff;
 }
 
 .m3-testi-top-bar {
@@ -225,16 +203,16 @@
 
 .m3-quote-symbol {
   color: var(--home-gold);
-  opacity: 0.85;
+  opacity: 0.9;
 }
 
-/* Main Quote — Clamped 3-4 lines */
+/* Main Quote */
 .m3-testi-quote-text {
-  font-family: var(--font-sans);
+  font-family: var(--font-sans, system-ui, sans-serif);
   font-size: clamp(0.98rem, 1.3vw, 1.12rem);
   font-weight: 400;
   line-height: 1.6;
-  color: rgba(255, 255, 255, 0.92);
+  color: #1E293B;
   margin: 0 0 1.25rem 0;
   font-style: italic;
   display: -webkit-box;
@@ -243,13 +221,13 @@
   overflow: hidden;
 }
 
-/* Prominent Author Typography & Subtle Role */
+/* Author Block */
 .m3-testi-author-block {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding-top: 0.85rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(11, 30, 66, 0.08);
 }
 
 .m3-author-details {
@@ -259,10 +237,10 @@
 }
 
 .m3-author-name {
-  font-family: var(--font-sans);
+  font-family: var(--font-sans, system-ui, sans-serif);
   font-size: clamp(1.15rem, 1.6vw, 1.35rem);
   font-weight: 800;
-  color: #ffffff;
+  color: #0B1E42;
   margin: 0;
   letter-spacing: -0.01em;
 }
@@ -272,13 +250,13 @@
   align-items: center;
   gap: 8px;
   font-size: 0.82rem;
-  color: rgba(255, 255, 255, 0.7);
+  color: #5A6A85;
   font-weight: 500;
   flex-wrap: wrap;
 }
 
 .m3-author-role {
-  color: var(--home-gold);
+  color: #8C6D17;
   font-weight: 700;
 }
 
@@ -287,10 +265,10 @@
 }
 
 .m3-inst-text {
-  color: rgba(255, 255, 255, 0.6);
+  color: #5A6A85;
 }
 
-/* Controls & Cleaner Avatar Thumbnail Switcher */
+/* Controls & Avatar Thumbnail Switcher */
 .m3-testi-controls-bar {
   display: flex;
   align-items: center;
@@ -306,22 +284,20 @@
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: #ffffff;
+  background: #F1F5F9;
+  border: 1px solid rgba(11, 30, 66, 0.12);
+  color: #0B1E42;
   cursor: pointer;
   transition: all 200ms ease;
   flex-shrink: 0;
 }
 
 .m3-testi-nav-arrow:hover {
-  background: var(--home-gold);
-  color: #041226;
-  border-color: var(--home-gold);
+  background: #0B1E42;
+  color: #ffffff;
+  border-color: #0B1E42;
   transform: scale(1.08);
-  box-shadow: 0 4px 14px rgba(201, 151, 58, 0.4);
+  box-shadow: 0 4px 14px rgba(11, 30, 66, 0.2);
 }
 
 .m3-testi-thumbs-bar {
@@ -329,10 +305,8 @@
   align-items: center;
   gap: 8px;
   padding: 5px 12px;
-  background: rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #F1F5F9;
+  border: 1px solid rgba(11, 30, 66, 0.1);
   border-radius: var(--radius-full);
 }
 
@@ -358,8 +332,8 @@
 .m3-thumb-btn--active {
   opacity: 1;
   transform: scale(1.15);
-  border-color: var(--home-gold);
-  box-shadow: 0 0 10px rgba(201, 151, 58, 0.5);
+  border-color: #C9973A;
+  box-shadow: 0 0 10px rgba(201, 151, 58, 0.4);
 }
 
 .m3-thumb-img {
@@ -381,18 +355,18 @@
   gap: 7px;
   font-size: 0.84rem;
   font-weight: 700;
-  color: var(--home-gold);
+  color: #0B1E42;
   text-decoration: none;
   padding: 7px 16px;
   border-radius: var(--radius-full);
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(201, 151, 58, 0.25);
+  background: transparent;
+  border: 1px solid rgba(11, 30, 66, 0.18);
   transition: all 200ms ease;
 }
 
 .m3-testi-alumni-link:hover {
-  background: rgba(201, 151, 58, 0.15);
-  border-color: var(--home-gold);
+  background: #0B1E42;
+  border-color: #0B1E42;
   color: #ffffff;
   transform: translateY(-2px);
 }

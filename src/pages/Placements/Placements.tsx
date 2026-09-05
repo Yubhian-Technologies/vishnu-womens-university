@@ -149,7 +149,7 @@ export default function Placements() {
               Join a university where academic rigour translates into real career outcomes. Apply now and take the first step toward a future you have earned.
             </p>
             <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Link to="/admissions" className="btn btn-accent">Apply Now</Link>
+              <Link to="/apply-now" className="btn btn-accent">Apply Now</Link>
               <Link to="/academics" className="btn btn-secondary">Academics</Link>
               <Link to="/differentiators" className="btn btn-secondary">Our Differentiators</Link>
             </div>

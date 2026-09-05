@@ -13,6 +13,11 @@ interface Props {
   categories: NewsEventsCategory[];
   eyebrow: string;
   navOffset: string;
+  /** Renders just the category tabs + accordion list, skipping the outer
+   *  section/container and the collapsible "News & Events" header — used
+   *  when this is nested inside another tab (e.g. the Programme Hub) that
+   *  already provides its own label and show/hide affordance. */
+  embedded?: boolean;
 }
 
 function isUrl(text: string): boolean {
@@ -40,7 +45,7 @@ function formatEventCountLabel(count: number): string {
   return `${padded} ${label}`;
 }
 
-export default function NewsEventsTabs({ categories, eyebrow, navOffset }: Props) {
+export default function NewsEventsTabs({ categories, eyebrow, navOffset, embedded }: Props) {
   const withContent = categories.filter((c) => c.years.length > 0);
   const [activeKey, setActiveKey] = useState<string | null>(null);
   const [expandedYearIndex, setExpandedYearIndex] = useState<number | null>(0);
@@ -54,29 +59,8 @@ export default function NewsEventsTabs({ categories, eyebrow, navOffset }: Props
     setExpandedYearIndex(0); // Reset to first year open on tab change
   };
 
-  return (
-    <section id="news-events" className="section bg-white" style={{ scrollMarginTop: navOffset }}>
-      <div className="container">
-        <button
-          type="button"
-          className="dept-outcomes-toggle"
-          onClick={() => setSectionExpanded((v) => !v)}
-          aria-expanded={sectionExpanded}
-          aria-controls="news-events-panel-wrap"
-        >
-          <div>
-            <span className="section-label dept-section-label">{eyebrow}</span>
-            <h2 className="section-title" style={{ marginBottom: 0 }}>News &amp; Events</h2>
-          </div>
-          <ChevronDown
-            size={22}
-            strokeWidth={2.2}
-            className={`dept-outcomes-toggle-chevron${sectionExpanded ? ' is-open' : ''}`}
-            aria-hidden="true"
-          />
-        </button>
-        <SmoothCollapse open={sectionExpanded}>
-        <div id="news-events-panel-wrap" style={{ paddingTop: 'var(--space-6)' }}>
+  const body = (
+    <>
         <p className="section-desc" style={{ marginTop: '0.4rem', marginBottom: 'var(--space-6)' }}>
           Latest department announcements, academic activities, workshops, and student achievements.
         </p>
@@ -249,7 +233,36 @@ export default function NewsEventsTabs({ categories, eyebrow, navOffset }: Props
         ) : (
           <p className="news-events-empty-text">Nothing added under "{active.label}" yet.</p>
         )}
-        </div>
+    </>
+  );
+
+  if (embedded) return body;
+
+  return (
+    <section id="news-events" className="section bg-white" style={{ scrollMarginTop: navOffset }}>
+      <div className="container">
+        <button
+          type="button"
+          className="dept-outcomes-toggle"
+          onClick={() => setSectionExpanded((v) => !v)}
+          aria-expanded={sectionExpanded}
+          aria-controls="news-events-panel-wrap"
+        >
+          <div>
+            <span className="section-label dept-section-label">{eyebrow}</span>
+            <h2 className="section-title" style={{ marginBottom: 0 }}>News &amp; Events</h2>
+          </div>
+          <ChevronDown
+            size={22}
+            strokeWidth={2.2}
+            className={`dept-outcomes-toggle-chevron${sectionExpanded ? ' is-open' : ''}`}
+            aria-hidden="true"
+          />
+        </button>
+        <SmoothCollapse open={sectionExpanded}>
+          <div id="news-events-panel-wrap" style={{ paddingTop: 'var(--space-6)' }}>
+            {body}
+          </div>
         </SmoothCollapse>
       </div>
     </section>

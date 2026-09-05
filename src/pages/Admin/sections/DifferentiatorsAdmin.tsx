@@ -64,6 +64,7 @@ export interface DifferentiatorItemDoc {
   title: string;
   category: string;
   desc: string;
+  summary?: string;
   external: boolean;
   url: string;
   highlights: string[];

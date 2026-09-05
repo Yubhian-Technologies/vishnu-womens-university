@@ -27,6 +27,7 @@ import SEO from '../../components/SEO/SEO';
 import UpcomingEvents from '../../components/UpcomingEvents/UpcomingEvents';
 import SmartInfrastructureShowcase from '../../components/SmartInfrastructureShowcase/SmartInfrastructureShowcase';
 import PlacementMetricsSection from '../../components/PlacementMetricsSection/PlacementMetricsSection';
+import HonouredGuestsSection from '../../components/HonouredGuests/HonouredGuestsSection';
 import { getUniversitySchema } from '../../lib/seo/schemas';
 import './Home.css';
 
@@ -104,16 +105,7 @@ function useTilt(strength = 12) {
   return { ref, onMouseMove: onMove, onMouseLeave: onLeave };
 }
 
-/* ── Wave Divider ─────────────────────────────────────────── */
-function Wave({ flip = false, fill = '#f7f8fb' }: { flip?: boolean; fill?: string }) {
-  return (
-    <div className={`wave-divider${flip ? ' wave-divider--flip' : ''}`}>
-      <svg viewBox="0 0 1440 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M0,30 C360,60 1080,0 1440,30 L1440,60 L0,60 Z" fill={fill} />
-      </svg>
-    </div>
-  );
-}
+
 
 /* ── Component ────────────────────────────────────────────── */
 export default function Home() {
@@ -234,7 +226,7 @@ export default function Home() {
                   style={{ '--card-color': color } as React.CSSProperties}
                 >
                   <div className="study-card-image-wrap">
-                    {photo && <SmoothImage src={photo.src} alt={photo.alt} className="study-card-image" />}
+                    {photo && <SmoothImage src={photo.src} alt={photo.alt} className="study-card-image" loading="lazy" decoding="async" />}
                     <div className="study-card-overlay" style={{ background: `linear-gradient(to top, color-mix(in srgb, ${color} 80%, transparent) 0%, transparent 65%)` }} />
                     <div className="study-card-icon"><Icon size={24} strokeWidth={1.75} color="var(--color-primary-dark)" /></div>
                     <div className="study-card-shine" />
@@ -287,7 +279,7 @@ export default function Home() {
                       src={item.src}
                       alt={item.alt}
                       className="activity-card-img"
-                      {...(i < 3 ? fetchPriorityAttr('high') : {})}
+                      {...(i < 3 ? fetchPriorityAttr('high') : { loading: 'lazy', decoding: 'async' })}
                     />
                     <div className="activity-card-label">{item.caption || item.alt}</div>
                   </div>
@@ -298,16 +290,15 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Chapter 5: Smart Infrastructure & Placement Excellence ── */}
+      {/* ── Chapter 5: Smart Infrastructure & Innovation Ecosystem ── */}
       <SmartInfrastructureShowcase />
       <PlacementMetricsSection />
       <RecruitersSection />
       <CampusLifeShowcase />
+      <HonouredGuestsSection />
 
       {/* ── Chapter 6: Alumni Success & Testimonials ── */}
-      <Wave fill="#09130f" />
       <TestimonialSlider testimonials={testimonials} />
-      <Wave flip fill="var(--color-white)" />
 
       {/* ── Chapter 7: Live Campus Pulse & News ── */}
       <section className="news-section">
@@ -341,7 +332,7 @@ export default function Home() {
 
       {/* ── Admissions CTA Banner ── */}
       <section className="cta-banner">
-        {ctaBannerPhoto && <SmoothImage src={ctaBannerPhoto.src} alt={ctaBannerPhoto.alt} className="cta-banner-bg" />}
+        {ctaBannerPhoto && <SmoothImage src={ctaBannerPhoto.src} alt={ctaBannerPhoto.alt} className="cta-banner-bg" loading="lazy" decoding="async" />}
         <div className="cta-banner-overlay" />
         <div className="cta-particles" aria-hidden="true">
           {Array.from({ length: 12 }).map((_, i) => (

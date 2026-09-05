@@ -112,6 +112,7 @@ const navItemsData: NavItem[] = [
         groupLabel: 'Overview',
         groupPath: '/academics',
         items: [
+          { label: 'Schools', path: '/academics/schools' },
           { label: 'Departments', path: '/academics/departments' },
           { label: 'Programs', path: '/academics/programs' },
           { label: 'Faculty Directory', path: '/faculty' },
@@ -130,6 +131,8 @@ const navItemsData: NavItem[] = [
           { label: 'List of Holidays', path: '/information#holidays' },
           { label: 'Counselling Scheme', path: '/information#counselling' },
           { label: 'ICT Platforms', path: '/information#ict-platforms' },
+          { label: 'Smart Class Rooms', path: '/campus/smart-classrooms' },
+          { label: 'State-of-the-art Labs', path: '/campus/state-of-the-art-labs' },
           { label: 'Other Practices', path: '/information#other-practices' },
         ],
       },
@@ -230,26 +233,31 @@ const navItemsData: NavItem[] = [
       linkPath: '/campus/central-library',
     },
     children: [
-      { label: 'Smart Class Rooms', path: '/campus/smart-classrooms' },
-      { label: 'State-of-the-art Labs', path: '/campus/state-of-the-art-labs' },
       { label: 'Central Library', path: '/campus/central-library' },
       { label: 'Auditoriums & Amphitheaters', path: '/campus/auditoriums' },
       { label: 'Campus Book Stores', path: '/campus/campus-book-stores' },
       { label: 'Wi-Fi Campus', path: '/campus/wifi-campus' },
       { label: 'Campus Hostels', path: '/campus/campus-hostels' },
+      { label: 'Staff Quarters', path: '/campus/staff-quarters' },
       { label: 'Food Courts & Cafeterias', path: '/campus/food-courts' },
       { label: 'VISHNU Fitness Centre', path: '/campus/fitness-centre' },
       { label: 'Health Care Centre', path: '/campus/health-care' },
+      { label: 'Campus Security', path: '/campus/campus-security' },
+      { label: 'Sewage Treatment Plants', path: '/campus/sewage-treatment-plants' },
+      { label: 'Wellness Center', path: '/campus/wellness-center' },
       { label: 'Swimming Pool & Sports', path: '/campus/swimming-pool' },
+      { label: 'Travel Desk', path: '/campus/travel-desk' },
       { label: 'Radio Vishnu 90.4', path: '/differentiators/radio-vishnu-diff' },
       { label: 'Vishnu TV Academy', path: '/vishnu-tv-academy' },
       { label: 'Student Clubs', path: '/student-clubs' },
       { label: 'Arts & Culture', path: '/arts-culture' },
+      { label: 'Temples', path: '/campus/temples' },
       { label: 'Sports & Games', path: '/sports-games' },
+      { label: 'Other Facilities', path: '/campus/other-facilities' },
     ],
   },
   {
-    label: 'News & Events',
+    label: 'Happenings',
     highlight: {
       title: 'Happenings & Accolades',
       badge: 'NAAC A+ & NBA',
@@ -259,7 +267,7 @@ const navItemsData: NavItem[] = [
     },
     groups: [
       {
-        groupLabel: 'News & Events',
+        groupLabel: 'Happenings',
         groupPath: '/news-awards',
         items: [
           { label: 'Upcoming Events', path: '/news-awards/happenings#upcoming-events' },
@@ -324,7 +332,7 @@ export default function Header() {
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Dynamic overrides and data hooks
-  const headerApplyNow = useNavLinkOverride('header-apply-now', '/admissions#admissions-contact');
+  const headerApplyNow = useNavLinkOverride('header-apply-now', '/apply-now');
   const orgChart = useNavLinkOverride('header-organizational-chart', '/downloads/SVECWOrganizationChart.jpg');
 
   const { docs: programs } = useOrderedCollection<ProgramDoc>('programs', 'order');
@@ -599,14 +607,14 @@ export default function Header() {
               >
                 <span>Apply Now</span>
                 <span className="navbar-cta-icon-wrap">
-                  <ArrowRight size={13} strokeWidth={2.5} aria-hidden="true" />
+                  <ArrowRight size={14.6} strokeWidth={2.5} aria-hidden="true" />
                 </span>
               </a>
             ) : (
               <Link to={headerApplyNow.path} className="navbar-cta-btn">
                 <span>Apply Now</span>
                 <span className="navbar-cta-icon-wrap">
-                  <ArrowRight size={13} strokeWidth={2.5} aria-hidden="true" />
+                  <ArrowRight size={14.6} strokeWidth={2.5} aria-hidden="true" />
                 </span>
               </Link>
             )}

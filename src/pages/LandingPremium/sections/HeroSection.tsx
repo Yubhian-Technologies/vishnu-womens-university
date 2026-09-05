@@ -28,7 +28,7 @@ export default function HeroSection({ imageUrl, imageAlt }: Props) {
         <img src={imageUrl} alt={imageAlt} className="lph-hero__photo" />
       </motion.div>
       <motion.div className="lph-hero__actions" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.45 }}>
-        <Link to="/admissions" className="btn btn-accent btn-lg">Apply Now</Link>
+        <Link to="/apply-now" className="btn btn-accent btn-lg">Apply Now</Link>
         <Link to="/academics" className="btn btn-outline btn-lg">Explore Programs</Link>
       </motion.div>
     </section>

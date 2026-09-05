@@ -1,21 +1,6 @@
-/* ===== Department page — decorated section label =====
-   A hand-drawn-style squiggle under the small uppercase eyebrow label,
-   scoped to DepartmentDetail.tsx only (adds to, never replaces, the shared
-   global .section-label class used across the rest of the site). */
+/* ===== Department page — section label ===== */
 .dept-section-label {
   position: relative;
-  padding-bottom: 10px;
-}
-
-.dept-section-label::after {
-  content: '';
-  position: absolute;
-  left: 1px;
-  bottom: 0;
-  width: 46px;
-  height: 10px;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 12'%3E%3Cpath d='M1 8 Q8 2 15 8 T29 8 T43 8 T57 8' fill='none' stroke='%23C9A84C' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat;
-  background-size: contain;
 }
 
 .detail-grid {
@@ -1175,6 +1160,7 @@ td.pb-activities-num {
   margin-bottom: var(--space-5);
 }
 
+
 /* ===== Placements/Internships circular stat counters =====
    Shared by ProgramDetail.tsx and DepartmentDetail.tsx so the "basic
    details" tiles above the Placements/Internships records look identical
@@ -1245,6 +1231,59 @@ td.pb-activities-num {
   .dept-stat-tile__circle {
     transition: none;
   }
+}
+
+/* Placements row can hold up to 8 tiles (6 base + optional Above 50/30 LPA
+   when a batch has that data) — too many for the 3-tile Internships row's
+   auto-fit grid (which wraps once tiles drop below its 130px minimum).
+   This modifier keeps every tile on one line, no matter how many there are
+   or how narrow the viewport, by sizing each circle as a % of its own flex
+   item (so it always exactly fills its allotted share) rather than off the
+   viewport width — a vw-based size doesn't know how many tiles are sharing
+   that width, so it stops shrinking too early and neighboring circles
+   overlap instead of the row properly compressing. */
+.dept-stat-grid--compact {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.dept-stat-grid--compact .dept-stat-tile {
+  flex: 1 1 0;
+  min-width: 0;
+  gap: var(--space-2);
+}
+
+.dept-stat-grid--compact .dept-stat-tile__circle {
+  width: 100%;
+  height: auto;
+  max-width: 112px;
+  aspect-ratio: 1;
+  padding: var(--space-1);
+  overflow: hidden;
+}
+
+/* Longer values ("Package wise", "20.55 LPA") wrap onto a second line once
+   the circle shrinks enough — fine while there's room, but a flex item's
+   content otherwise pushes its box taller than its aspect-ratio to fit that
+   text, turning the circle into a tall oval. Clamping to 2 lines (with the
+   circle's own overflow:hidden as a backstop) lets it wrap normally at
+   comfortable sizes while clipping instead of distorting at the smallest. */
+.dept-stat-grid--compact .dept-stat-tile__value {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  max-width: 100%;
+  font-size: clamp(0.55rem, 1.6vw, 1.2rem);
+  line-height: 1.15;
+}
+
+.dept-stat-grid--compact .dept-stat-tile__label {
+  font-size: clamp(0.55rem, 0.9vw, 0.7rem);
+  max-width: none;
 }
 
 /* "Show N entries" length control above the raw Placement Records table,
@@ -1426,16 +1465,16 @@ td.pb-activities-num {
 
 /* ===== 4-Column Structured Google Material Key Facts Cards ===== */
 .dept-facts-section {
-  background: var(--color-primary);
-  padding: var(--space-6) 0;
+  background: #0B1E42;
+  padding: 1.75rem 0;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .dept-facts-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
-  align-items: start;
+  gap: 1.25rem;
+  align-items: stretch;
 }
 
 .dept-facts-grid.cols-3 {
@@ -1451,59 +1490,57 @@ td.pb-activities-num {
 }
 
 .dept-fact-card {
-  background: rgba(255, 255, 255, 0.06);
+  background: #13274D;
   border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 18px;
-  padding: 1.15rem;
+  border-radius: 20px;
+  padding: 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+  gap: 0.85rem;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+  transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1), border-color 220ms ease, box-shadow 220ms ease;
   min-width: 0;
 }
 
 .dept-fact-card:hover {
-  transform: translateY(-2px);
-  border-color: color-mix(in srgb, var(--color-accent, #c9a84c) 45%, transparent);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+  transform: translateY(-3px);
+  border-color: #C9973A;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.4);
 }
 
 .dept-fact-card.is-hod-card {
-  background: linear-gradient(145deg, color-mix(in srgb, var(--color-accent, #c9a84c) 12%, transparent) 0%, color-mix(in srgb, var(--color-primary, #1b4332) 25%, transparent) 100%);
-  border-color: color-mix(in srgb, var(--color-accent, #c9a84c) 35%, transparent);
+  background: #172D57;
+  border-color: rgba(201, 151, 58, 0.4);
 }
 
 .dept-fact-header {
   display: flex;
   align-items: center;
-  gap: 0.55rem;
-  padding-bottom: 0.55rem;
+  gap: 0.65rem;
+  padding-bottom: 0.65rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .dept-fact-icon-badge {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: color-mix(in srgb, var(--color-accent, #c9a84c) 15%, transparent);
-  color: var(--color-accent);
-  border: 1px solid color-mix(in srgb, var(--color-accent, #c9a84c) 30%, transparent);
+  background: rgba(201, 151, 58, 0.15);
+  color: #FFD028;
+  border: 1px solid rgba(201, 151, 58, 0.35);
   flex-shrink: 0;
 }
 
 .dept-fact-col-title {
   font-family: var(--font-sans);
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   font-weight: 800;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--color-accent);
+  color: #FFD028;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1512,19 +1549,19 @@ td.pb-activities-num {
 
 .dept-fact-count-badge {
   font-family: var(--font-sans);
-  font-size: 0.6rem;
+  font-size: 0.65rem;
   font-weight: 800;
-  background: color-mix(in srgb, var(--color-accent, #c9a84c) 20%, transparent);
-  color: var(--color-accent);
-  border: 1px solid color-mix(in srgb, var(--color-accent, #c9a84c) 40%, transparent);
-  padding: 1px 6px;
+  background: rgba(201, 151, 58, 0.2);
+  color: #FFD028;
+  border: 1px solid rgba(201, 151, 58, 0.4);
+  padding: 2px 7px;
   border-radius: 9999px;
   letter-spacing: 0.02em;
 }
 
 /* Fixed 2-row height container for perfect column symmetry */
 .dept-fact-items-window {
-  height: 114px;
+  height: 118px;
   overflow: hidden;
   position: relative;
   display: flex;
@@ -1570,19 +1607,19 @@ td.pb-activities-num {
 .dept-fact-chip-entry {
   display: flex;
   flex-direction: column;
-  padding: 0.45rem 1rem;
-  background: rgba(255, 255, 255, 0.05);
+  padding: 0.5rem 1rem;
+  background: rgba(10, 20, 42, 0.65);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 9999px;
+  border-radius: 20px;
   transition: background-color 150ms ease, border-color 150ms ease, transform 150ms ease;
-  min-height: 48px;
+  min-height: 50px;
   justify-content: center;
   box-sizing: border-box;
 }
 
 .dept-fact-chip-entry:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.16);
+  background: rgba(10, 20, 42, 0.95);
+  border-color: rgba(201, 151, 58, 0.3);
   transform: translateY(-1px);
 }
 
@@ -1590,13 +1627,35 @@ td.pb-activities-num {
   text-decoration: none;
   color: inherit;
   display: block;
-  border-radius: 9999px;
+  border-radius: 20px;
 }
 
 .dept-fact-chip-link .dept-fact-chip-entry {
-  background: color-mix(in srgb, var(--color-accent, #c9a84c) 12%, transparent);
-  border-color: color-mix(in srgb, var(--color-accent, #c9a84c) 30%, transparent);
+  background: rgba(201, 151, 58, 0.12);
+  border-color: rgba(201, 151, 58, 0.35);
   cursor: pointer;
+}
+
+.dept-fact-chip-sub {
+  font-size: 0.64rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.55);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 2px;
+}
+
+.dept-fact-chip-val {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.is-hod-card .dept-fact-chip-val {
+  color: #FFD028;
 }
 
 .dept-fact-chip-link:hover .dept-fact-chip-entry {
@@ -3140,26 +3199,28 @@ td.pb-activities-num {
 /* ===== Department Hero — rounded image card, dark gradient, gold CTA
    (LPU-reference card hero, shared by AI / CSE / ECE) ===== */
 .dept-hero-section {
-  padding: 84px 0 0 0;
-  background: var(--color-bg, #ffffff);
+  padding-top: 14px !important;
+  padding-bottom: 0.5rem;
 }
 
 .dept-hero-section .container {
   max-width: 100% !important;
-  padding: 0 !important;
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+  width: 100% !important;
 }
 
 .dept-hero-card {
   position: relative;
-  margin: 10px !important;
-  width: calc(100% - 20px) !important;
-  min-height: 510px;
-  border-radius: 24px;
+  width: 100%;
+  margin: 0 auto;
+  min-height: 460px;
+  border-radius: 28px;
   overflow: hidden;
   display: flex;
   align-items: flex-end;
   box-shadow: 0 18px 44px -8px rgba(0, 0, 0, 0.35);
-  background: #0d1b1e;
+  background: linear-gradient(135deg, #0B1E42 0%, #1E3B75 100%);
 }
 
 .dept-hero-bg-img {
@@ -3186,18 +3247,24 @@ td.pb-activities-num {
 .dept-hero-content {
   position: relative;
   z-index: 2;
-  padding: 3.375rem clamp(2.5rem, 5vw, 4.5rem);
-  max-width: 820px;
+  padding: 3rem clamp(2rem, 4vw, 4rem);
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .dept-hero-title {
-  font-size: clamp(2.4rem, 4.5vw, 3.6rem);
+  font-size: clamp(1.5rem, 3.2vw, 2.75rem);
   font-weight: 800;
   color: #ffffff;
   line-height: 1.15;
   letter-spacing: -0.02em;
   margin: 0 0 0.85rem 0;
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .dept-hero-subtitle {
@@ -3833,6 +3900,15 @@ td.pb-activities-num {
   padding: clamp(3rem, 5vw, 4.5rem) 0;
 }
 
+/* Wider than the site's standard 1400px .container — this card's tab bar
+   can hold up to 6 tabs (some with long labels, e.g. "Research &
+   Development (Funded Projects & Patents)"); the extra width lets more of
+   them sit on one row before .programme-hub-tabs-bar's own overflow-x:auto
+   has to kick in as the fallback on narrower viewports. */
+.programme-hub-section .container {
+  max-width: 1600px;
+}
+
 .programme-hub-header {
   text-align: center;
   margin-bottom: 2.25rem;
@@ -4386,6 +4462,204 @@ td.pb-activities-num {
 .section-tab-btn {
   min-height: 44px;
 }
+
+/* ==========================================================================
+   Horizontal Quick Navigation Pill Bar (Capsule attaching under floating navbar)
+   ========================================================================== */
+.dept-horizontal-quicknav-section {
+  position: sticky;
+  top: 90px;
+  z-index: 950;
+  margin: 0.35rem 0 1.25rem 0;
+  padding: 0.25rem 0;
+  pointer-events: auto;
+}
+
+@media (min-width: 1440px) {
+  .dept-horizontal-quicknav-section {
+    top: 90px;
+  }
+}
+
+.dept-horizontal-quicknav-container {
+  display: flex;
+  justify-content: center;
+}
+
+.dept-horizontal-quicknav-pill {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.75) !important;
+  border-radius: 15.43px !important;
+  padding: 0.55rem 0.85rem !important;
+  box-shadow: 0 14px 36px -6px rgba(11, 30, 66, 0.16), 
+              0 4px 14px -2px rgba(0, 0, 0, 0.08) !important;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  width: max-content;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin: 0 auto;
+}
+
+@media (min-width: 1024px) {
+  .dept-horizontal-quicknav-pill {
+    gap: 0.65rem;
+    padding: 0.65rem 1.15rem !important;
+  }
+}
+
+.dept-horizontal-quicknav-pill::-webkit-scrollbar {
+  display: none;
+}
+
+.dept-quicknav-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.55rem 1.15rem;
+  border-radius: 10px;
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #1e293b;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color 180ms ease, color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+  flex-shrink: 0;
+}
+
+.dept-quicknav-link:hover {
+  background: rgba(15, 23, 42, 0.06);
+  color: #0f172a;
+  transform: translateY(-1px);
+}
+
+.dept-quicknav-link.is-active {
+  background: var(--color-primary, #0b1e42);
+  color: #ffffff;
+  font-weight: 700;
+  border-radius: 10px;
+  box-shadow: 0 4px 14px rgba(11, 30, 66, 0.3);
+}
+
+/* Compact Academic Degrees Section */
+.dept-compact-program-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+
+.dept-compact-program-card {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  border-radius: var(--radius-lg, 14px);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 200ms ease;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+}
+
+.dept-compact-program-card:hover {
+  border-color: var(--color-accent, #c9973a);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px -4px rgba(11, 30, 66, 0.12);
+}
+
+.dept-compact-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.85rem;
+}
+
+.dept-compact-card-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: rgba(11, 30, 66, 0.05);
+  color: var(--color-primary, #0b1e42);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dept-compact-cat-badge {
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 0.25rem 0.7rem;
+  border-radius: 9999px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.dept-compact-cat-badge.is-btech {
+  background: var(--color-primary, #0b1e42);
+  color: #ffffff;
+}
+
+.dept-compact-cat-badge.is-mtech {
+  background: var(--color-accent, #c9973a);
+  color: #0b1e42;
+}
+
+.dept-compact-card-title {
+  font-size: 1.08rem;
+  font-weight: 800;
+  color: var(--color-primary, #0b1e42);
+  margin: 0 0 0.6rem 0;
+  line-height: 1.35;
+}
+
+.dept-compact-card-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+
+.dept-compact-chip {
+  font-size: 0.7rem;
+  font-weight: 700;
+  background: var(--color-off-white, #f8fafc);
+  border: 1px solid var(--color-light-gray, #e2e8f0);
+  border-radius: 6px;
+  padding: 3px 8px;
+  color: var(--color-text-light, #64748b);
+  white-space: nowrap;
+}
+
+.dept-compact-chip.is-accredited {
+  background: rgba(201, 168, 76, 0.12);
+  border-color: rgba(201, 168, 76, 0.4);
+  color: var(--color-accent, #c9973a);
+}
+
+.dept-compact-card-footer {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--color-primary, #0b1e42);
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(15, 23, 42, 0.06);
+  transition: color 150ms ease;
+}
+
+.dept-compact-program-card:hover .dept-compact-card-footer {
+  color: var(--color-accent, #c9973a);
+}
+
 
 
 

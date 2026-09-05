@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import './About.css';
 import PageHero from '../../components/PageHero/PageHero';
@@ -9,8 +9,23 @@ import { useOrderedCollection } from '../../hooks/useCollection';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { useSitePhotos, useSectionHasPhotos } from '../../hooks/useSitePhotos';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
-import { Rocket, Target } from 'lucide-react';
+import {
+  Rocket, Target, Calendar, MapPin, GraduationCap, Users,
+  Briefcase, Award, CheckCircle, BookOpen, Lightbulb, Sparkles,
+  Globe, Shield, Activity, ArrowRight
+} from 'lucide-react';
 import { resolveContentIcon } from '../../lib/contentIcons';
+import BentoInnovationGrid from '../../components/BentoInnovationGrid/BentoInnovationGrid';
+
+const STAT_ICONS = [Calendar, MapPin, GraduationCap, Users, Briefcase, Award, CheckCircle, Sparkles];
+
+const PILLAR_ITEMS = [
+  { title: 'Academic Excellence', desc: 'Future-focused programmes designed to develop strong academic foundations, professional competence, and lifelong learning.', icon: BookOpen },
+  { title: 'Innovation & Research', desc: 'An ecosystem that encourages curiosity, creativity, research, problem-solving, and entrepreneurship.', icon: Lightbulb },
+  { title: 'Industry & Careers', desc: 'Strong industry connect and career-oriented learning that prepare students for emerging opportunities and global careers.', icon: Briefcase },
+  { title: 'Holistic Development', desc: 'Beyond academics, students are encouraged to develop leadership, communication, confidence, creativity, and social responsibility.', icon: Sparkles },
+  { title: 'World-Class Learning Engagement', desc: 'Advanced laboratories, smart classrooms, ICT Tools, seminar halls, and modern academic facilities create an engaging learning experience.', icon: Globe },
+];
 
 function getInitials(name: string) {
   const cleaned = name.replace(/\b(Dr|Sri|Prof|Mr|Mrs|Ms)\.?\s*/gi, '');
@@ -49,18 +64,17 @@ const defaultAccreditationRankPhotos = [
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Global Affiliations', caption: '' },
 ];
 
-// Firestore-backed — see src/pages/Admin/sections/CoreExecutivesAdmin.tsx.
-// defaultExecutives is shown until an admin adds real docs to the
-// `coreExecutives` collection (same fallback pattern as GoverningBody.tsx).
 export interface CoreExecutiveMember {
   id: string;
   name: string;
   role: string;
   photoUrl?: string;
   order: number;
-  /** Org-chart tier: 1 (top) to 3. Docs saved before this field existed have
-   *  no value — treated as level 1 wherever this is read. */
   level?: number;
+  qualification?: string;
+  experience?: string;
+  email?: string;
+  bio?: string;
 }
 
 export const defaultExecutives: Omit<CoreExecutiveMember, 'id'>[] = [
@@ -76,6 +90,8 @@ export const defaultExecutives: Omit<CoreExecutiveMember, 'id'>[] = [
 
 export default function About() {
   useHashScroll();
+  const [activeExec, setActiveExec] = useState<CoreExecutiveMember | Omit<CoreExecutiveMember, 'id'> | null>(null);
+  const [execBannerOpen, setExecBannerOpen] = useState(false);
 
   const { docs: execDocs, loading: execLoading } = useOrderedCollection<CoreExecutiveMember>('coreExecutives', 'order');
   const executives = !execLoading && execDocs.length > 0 ? execDocs : defaultExecutives;
@@ -146,29 +162,33 @@ export default function About() {
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'About VWU' }]}
       />
 
-      {/* Quick Stats */}
+      {/* Quick Stats — M3 Tonal Surface Cards */}
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-8) 0' }}>
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-6)' }}>
-            <h2 style={{ color: 'var(--color-white)', fontSize: 'clamp(1.5rem, 3vw, 2rem)', marginBottom: 'var(--space-2)' }}>
+            <h2 style={{ color: 'var(--color-white)', fontSize: 'clamp(1.5rem, 3vw, 2.15rem)', fontWeight: 800, marginBottom: 'var(--space-2)' }}>
               A Legacy of Excellence. A Future of Possibilities.
             </h2>
           </div>
           <div className="about-facts-bar">
-            {quickStats.map(s => (
-              <div key={s.id} className="about-fact">
-                <div className="about-fact-value">{s.value}</div>
-                <div className="about-fact-label">{s.title}</div>
-              </div>
-            ))}
+            {quickStats.map((s, idx) => {
+              const IconComp = STAT_ICONS[idx % STAT_ICONS.length];
+              return (
+                <div key={s.id} className="about-fact">
+                  <IconComp size={20} className="about-fact-icon" strokeWidth={2} />
+                  <div className="about-fact-value">{s.value}</div>
+                  <div className="about-fact-label">{s.title}</div>
+                </div>
+              );
+            })}
           </div>
-          <p style={{ textAlign: 'center', color: 'rgba(255,255,255,0.75)', marginTop: 'var(--space-6)' }}>
+          <p style={{ textAlign: 'center', color: 'rgba(255,255,255,0.75)', marginTop: 'var(--space-6)', fontSize: '0.92rem' }}>
             Building on decades of experience in women's education and professional learning.
           </p>
         </div>
       </section>
 
-      {/* Overview */}
+      {/* Overview — M3 Surface Card Frame */}
       <section className="section bg-off-white">
         <div className="container">
           <div className="about-mission-grid">
@@ -189,11 +209,10 @@ export default function About() {
               </div>
             </div>
             {whoWeAreImg && (
-              <div>
+              <div className="about-who-img-card reveal-right">
                 <img
                   src={whoWeAreImg.src}
                   alt={whoWeAreImg.alt}
-                  style={{ width: '100%', height: '460px', objectFit: 'cover', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-xl)' }}
                 />
               </div>
             )}
@@ -201,81 +220,73 @@ export default function About() {
         </div>
       </section>
 
-      {/* Where Women Learn, Lead & Transform */}
+      {/* Where Women Learn, Lead & Transform — 5 M3 Pillar Cards */}
       <section className="section bg-white">
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', maxWidth: 820, margin: '0 auto var(--space-10)' }}>
             <span className="section-label">Our Campus & Approach</span>
             <h2 className="section-title">Where Women Learn, Lead & Transform</h2>
             <p style={{ color: 'var(--color-text-light)', lineHeight: 1.8, marginBottom: 'var(--space-4)' }}>
-              Set across an approximately 80-acre campus at Vishnupur, just 3 km from Bhimavaram on the
-              Tadepalligudem Road, Vishnu Women's University offers an inspiring environment for learning,
-              discovery, and personal growth.
+              Vishnu Women’s University is situated in the serene, green surroundings of Bhimavaram, West Godavari District, Andhra Pradesh. The University is located on the Bhimavaram–Tadepalligudem Road, with convenient access from Bhimavaram town via B. V. Raju Marg.
             </p>
             <p style={{ color: 'var(--color-text-light)', lineHeight: 1.8 }}>
-              Under the guidance of the Sri Vishnu Educational Society, VWU brings together academic excellence,
-              modern infrastructure, industry engagement, innovation, and student-centric learning.
+              The campus is well connected to Bhimavaram and neighbouring towns, making it easily accessible for students, parents, faculty, and visitors.
             </p>
           </div>
-          <div
-            className="reveal-scale"
-            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 'var(--space-5)' }}
-          >
-            {[
-              { title: 'Academic Excellence', desc: 'Future-focused programmes designed to develop strong academic foundations, professional competence, and lifelong learning.' },
-              { title: 'Innovation & Research', desc: 'An ecosystem that encourages curiosity, creativity, research, problem-solving, and entrepreneurship.' },
-              { title: 'Industry & Careers', desc: 'Strong industry connect and career-oriented learning that prepare students for emerging opportunities and global careers.' },
-              { title: 'Holistic Development', desc: 'Beyond academics, students are encouraged to develop leadership, communication, confidence, creativity, and social responsibility.' },
-              { title: 'World-Class Learning Engagement', desc: 'Advanced laboratories, smart classrooms, ICT Tools, seminar halls, and modern academic facilities create an engaging learning experience.' },
-            ].map((pillar) => (
-              <div
-                key={pillar.title}
-                style={{
-                  background: 'var(--color-off-white)',
-                  border: '1.5px solid var(--color-light-gray)',
-                  borderRadius: 'var(--radius-md)',
-                  borderTop: '4px solid var(--color-accent)',
-                  padding: 'var(--space-6)',
-                }}
-              >
-                <h3 style={{ fontSize: 'var(--text-lg)', color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>
-                  {pillar.title}
-                </h3>
-                <p style={{ color: 'var(--color-text-light)', lineHeight: 1.7, fontSize: 'var(--text-sm)' }}>
-                  {pillar.desc}
-                </p>
-              </div>
-            ))}
+          <div className="about-pillars-grid reveal-scale">
+            {PILLAR_ITEMS.map((pillar) => {
+              const IconComp = pillar.icon;
+              return (
+                <div key={pillar.title} className="about-pillar-card">
+                  <div className="about-pillar-icon-wrap">
+                    <IconComp size={26} strokeWidth={1.8} />
+                  </div>
+                  <h3 className="about-pillar-title">{pillar.title}</h3>
+                  <p className="about-pillar-desc">{pillar.desc}</p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* A University Built for Her Ambition */}
-      <section className="section bg-white">
+      {/* A University Built for Her Ambition — M3 Quote & Statement Box */}
+      <section className="section bg-off-white">
         <div className="container" style={{ textAlign: 'center' }}>
-          <div className="reveal" style={{ maxWidth: 780, margin: '0 auto' }}>
-            <span className="section-label">Our Commitment</span>
-            <h2 className="section-title">A University Built for Her Ambition</h2>
-            <p style={{ color: 'var(--color-text-light)', lineHeight: 1.8, marginBottom: 'var(--space-4)' }}>
+          <div className="about-ambition-card reveal" style={{ maxWidth: 840, margin: '0 auto' }}>
+            <span className="section-label" style={{ color: 'var(--color-accent)' }}>Our Commitment</span>
+            <h2 className="section-title" style={{ marginTop: '0.25rem' }}>A University Built for Her Ambition</h2>
+            <p style={{ color: 'var(--color-text-light)', lineHeight: 1.8, marginBottom: 'var(--space-4)', fontSize: '1.02rem' }}>
               At Vishnu Women's University, education goes beyond classrooms. We create opportunities for young
               women to discover their potential, pursue their passions, build meaningful careers, and lead with
               confidence.
             </p>
-            <p style={{ color: 'var(--color-text-light)', lineHeight: 1.8, marginBottom: 'var(--space-6)' }}>
+            <p style={{ color: 'var(--color-text-light)', lineHeight: 1.8, marginBottom: 'var(--space-5)', fontSize: '1.02rem' }}>
               With a strong foundation in education and a forward-looking approach to learning, VWU is committed
               to shaping women who are ready to make a difference — in industry, research, entrepreneurship,
               society, and the world.
             </p>
-            <p style={{ fontFamily: 'var(--font-serif)', fontWeight: 700, fontSize: 'var(--text-xl)', color: 'var(--color-primary)' }}>
+            <p style={{ fontFamily: 'var(--font-serif)', fontWeight: 800, fontSize: 'clamp(1.2rem, 2.2vw, 1.5rem)', color: 'var(--color-primary)', margin: 0 }}>
               Her Education. Her Confidence. Her Future.<br />
-              Her University — Vishnu Women's University.
+              <span style={{ color: 'var(--color-accent)', fontStyle: 'normal' }}>Her University — Vishnu Women's University.</span>
             </p>
+            <div className="about-ambition-chips">
+              <div className="about-chip about-chip--accent">
+                <Sparkles size={14} /> 100% Women Focused
+              </div>
+              <div className="about-chip">
+                <Shield size={14} /> Safe Safe Campus
+              </div>
+              <div className="about-chip">
+                <Activity size={14} /> High Impact Research
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Academic Snapshot */}
-      <section className="section bg-off-white">
+      {/* Academic Snapshot — M3 Program Cards */}
+      <section className="section bg-white">
         <div className="container">
           <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-12)', alignItems: 'center' }}>
             <div className="reveal-left">
@@ -289,9 +300,9 @@ export default function About() {
             <div className="reveal-right">
               <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
                 {academicSnapshotStats.map(p => (
-                  <div key={p.id} style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', borderLeft: '4px solid var(--color-accent)' }}>
-                    <div style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--color-accent)', letterSpacing: '0.08em', marginBottom: 4 }}>{p.title}</div>
-                    <div style={{ fontFamily: 'var(--font-sans)', fontWeight: 900, color: 'var(--color-primary)', fontSize: 'var(--text-base)' }}>{p.value}</div>
+                  <div key={p.id} className="about-program-card">
+                    <div style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', fontWeight: 800, color: 'var(--color-accent)', letterSpacing: '0.08em', marginBottom: 4 }}>{p.title}</div>
+                    <div style={{ fontFamily: 'var(--font-sans)', fontWeight: 900, color: 'var(--color-primary)', fontSize: '1.05rem' }}>{p.value}</div>
                   </div>
                 ))}
               </div>
@@ -299,6 +310,9 @@ export default function About() {
           </div>
         </div>
       </section>
+
+      {/* Innovation, Research & Startup Ecosystem */}
+      <BentoInnovationGrid />
 
       {/* Core Executive Body */}
       <section id="core-executive" className="section bg-off-white" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
@@ -313,24 +327,67 @@ export default function About() {
           {executivesByLevel.map(([level, members]) => (
             <div key={level} className="exec-level">
               <div className="exec-grid">
-                {members.map((exec) => (
-                  <div key={exec.name} className="exec-card">
-                    <div className="exec-card__media">
-                      {exec.photoUrl ? (
-                        <SmoothImage src={exec.photoUrl} alt={exec.name} className="exec-card__photo" />
-                      ) : (
-                        <div className="exec-card__avatar">{getInitials(exec.name)}</div>
-                      )}
-                    </div>
-                    <div className="exec-card__info">
-                      <h3 className="exec-card__name">{exec.name}</h3>
+                {members.map((exec) => {
+                  const hasDetails = !!(exec.qualification || exec.experience || exec.email || exec.bio);
+                  return (
+                    <div
+                      key={exec.name}
+                      className={`exec-card${activeExec?.name === exec.name && execBannerOpen ? ' is-active' : ''}`}
+                      onMouseEnter={() => { if (hasDetails) { setActiveExec(exec); setExecBannerOpen(true); } }}
+                      onMouseLeave={() => setExecBannerOpen(false)}
+                      onFocus={() => { if (hasDetails) { setActiveExec(exec); setExecBannerOpen(true); } }}
+                      onBlur={() => setExecBannerOpen(false)}
+                      onClick={() => {
+                        if (hasDetails) {
+                          if (activeExec?.name === exec.name && execBannerOpen) {
+                            setExecBannerOpen(false);
+                          } else {
+                            setActiveExec(exec);
+                            setExecBannerOpen(true);
+                          }
+                        }
+                      }}
+                      tabIndex={hasDetails ? 0 : undefined}
+                    >
+                      <div className="exec-card__media">
+                        {exec.photoUrl ? (
+                          <SmoothImage src={exec.photoUrl} alt={exec.name} className="exec-card__photo" />
+                        ) : (
+                          <div className="exec-card__avatar">{getInitials(exec.name)}</div>
+                        )}
+                      </div>
+                      <div className="exec-card__info">
+                        <h3 className="exec-card__name">{exec.name}</h3>
+                      </div>
                       <p className="exec-card__role">{exec.role}</p>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           ))}
+        </div>
+        <div className={`exec-detail-banner${execBannerOpen && activeExec ? ' is-open' : ''}`}>
+          {activeExec && (
+            <div className="container exec-detail-banner__inner">
+              <div className="exec-detail-banner__body">
+                <h3 className="exec-detail-banner__name">{activeExec.name}</h3>
+                <p className="exec-detail-banner__role">{activeExec.role}</p>
+                <div className="exec-detail-banner__facts">
+                  {activeExec.qualification && (
+                    <div className="exec-detail-banner__fact"><span>Qualification</span>{activeExec.qualification}</div>
+                  )}
+                  {activeExec.experience && (
+                    <div className="exec-detail-banner__fact"><span>Experience</span>{activeExec.experience}</div>
+                  )}
+                  {activeExec.email && (
+                    <div className="exec-detail-banner__fact"><span>Email</span><a href={`mailto:${activeExec.email}`}>{activeExec.email}</a></div>
+                  )}
+                </div>
+                {activeExec.bio && <p className="exec-detail-banner__bio">{activeExec.bio}</p>}
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
@@ -351,8 +408,9 @@ export default function About() {
               return (
                 <div key={d.cat} className="about-diff-card">
                   <div className="about-diff-header">
-                    <span className="about-diff-icon"><Icon size={29} strokeWidth={1.75} /></span>
+                    <span className="about-diff-icon"><Icon size={26} strokeWidth={1.8} /></span>
                     <h3>{d.cat}</h3>
+                    <span className="about-diff-badge">{d.items.length} Initiatives</span>
                   </div>
                   <ul className="about-diff-list">
                     {d.items.map(item => (
@@ -423,11 +481,11 @@ export default function About() {
         <div className="container">
           <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-12)', alignItems: 'center' }}>
             {campusSnapshotImg && (
-              <div>
+              <div className="sves-image-wrapper reveal-left">
                 <img
                   src={campusSnapshotImg.src}
                   alt={campusSnapshotImg.alt}
-                  style={{ width: '100%', height: '360px', objectFit: 'cover', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-xl)' }}
+                  style={{ width: '100%', height: '360px', objectFit: 'cover' }}
                 />
               </div>
             )}
@@ -437,9 +495,15 @@ export default function About() {
                 <span style={{ display: 'block', fontSize: '0.55em', fontWeight: 600, opacity: 0.75 }}>Purpose-Built Infrastructure</span>
                 Everything You Need to Learn, Live &amp; Lead.
               </h2>
-              <p style={{ color: 'var(--color-text-light)', lineHeight: 1.8, marginBottom: 'var(--space-5)' }}>
+              <p style={{ color: 'var(--color-text-light)', lineHeight: 1.8, marginBottom: 'var(--space-4)' }}>
                 From advanced learning spaces and high-speed connectivity to sports, wellness, residential, dining, and spiritual facilities&mdash;VWU offers an ecosystem designed around the complete student experience.
               </p>
+              <div className="about-feature-chips">
+                <div className="about-feature-chip"><Sparkles size={13} /> ICT Smart Classrooms</div>
+                <div className="about-feature-chip"><Shield size={13} /> 24/7 Campus Security</div>
+                <div className="about-feature-chip"><Activity size={13} /> Indoor Sports Complex</div>
+                <div className="about-feature-chip"><Globe size={13} /> High-Speed Campus Wi-Fi</div>
+              </div>
               <Link to="/campus" className="btn btn-primary">Explore Campus Facilities →</Link>
             </div>
           </div>
@@ -470,12 +534,28 @@ export default function About() {
               <Link to="/about-sves" className="btn btn-accent">Learn About SVES →</Link>
             </div>
             {parentSocietyImg && (
-              <div style={{ borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
+              <div className="sves-image-wrapper reveal-right">
                 <img
                   src={parentSocietyImg.src}
                   alt={parentSocietyImg.alt}
                   style={{ width: '100%', height: '380px', objectFit: 'cover' }}
                 />
+                <div className="sves-floating-badge">
+                  <div className="sves-stat-item">
+                    <span className="sves-stat-val">11</span>
+                    <span className="sves-stat-lbl">Institutions</span>
+                  </div>
+                  <div style={{ width: 1, height: 28, background: 'rgba(255,255,255,0.2)' }} />
+                  <div className="sves-stat-item">
+                    <span className="sves-stat-val">25,000+</span>
+                    <span className="sves-stat-lbl">Students</span>
+                  </div>
+                  <div style={{ width: 1, height: 28, background: 'rgba(255,255,255,0.2)' }} />
+                  <div className="sves-stat-item">
+                    <span className="sves-stat-val">4</span>
+                    <span className="sves-stat-lbl">Campuses</span>
+                  </div>
+                </div>
               </div>
             )}
           </div>
@@ -494,10 +574,12 @@ export default function About() {
               const Icon = resolveContentIcon(item.icon) || Target;
               return (
                 <Link to={item.slug || '/about'} key={item.id} className="about-discover-card">
-                  <span className="about-discover-icon"><Icon size={32} strokeWidth={1.75} /></span>
+                  <span className="about-discover-icon"><Icon size={26} strokeWidth={1.8} /></span>
                   <h3>{item.title}</h3>
                   <p>{item.desc}</p>
-                  <span className="about-discover-link">Explore →</span>
+                  <span className="about-discover-link">
+                    Explore <ArrowRight size={13} />
+                  </span>
                 </Link>
               );
             })}
@@ -528,7 +610,7 @@ export default function About() {
               </p>
             </div>
             <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Link to="/admissions" className="btn btn-accent btn-lg">Apply Now</Link>
+              <Link to="/apply-now" className="btn btn-accent btn-lg">Apply Now</Link>
               <Link to="/campus" className="btn btn-secondary btn-lg">Visit Campus</Link>
             </div>
           </div>

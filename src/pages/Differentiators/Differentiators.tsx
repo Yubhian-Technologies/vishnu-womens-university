@@ -165,7 +165,7 @@ export default function Differentiators() {
               Visit VWU in person to see these initiatives firsthand. Schedule a campus visit and explore the ecosystem built for India's next generation of women technologists.
             </p>
             <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Link to="/admissions" className="btn btn-accent">Apply Now</Link>
+              <Link to="/apply-now" className="btn btn-accent">Apply Now</Link>
               <Link to="/campus" className="btn btn-secondary">Campus Life</Link>
               <Link to="/academics" className="btn btn-secondary">Academics</Link>
             </div>
