@@ -1198,9 +1198,24 @@ td.pb-activities-num {
    a grouped department. */
 .dept-stat-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-  gap: var(--space-6) var(--space-4);
+  /* auto-fill (not auto-fit): keeps tile size/spacing the same regardless of
+     how many tiles a given academic year actually has — a year with few
+     stat tiles (e.g. no salary data) reserves the unused columns instead of
+     stretching its few real tiles across the full row width. The Placements
+     grid overrides this to auto-fit (below) for a year whose sheet has every
+     stat tile, so a full row of tiles stretches to use the page width the
+     way it always has. */
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: var(--space-6) var(--space-6);
   margin-bottom: var(--space-8);
+}
+
+/* Placements only, applied when the academic year's sheet has every stat
+   tile (package/CTC data present) — stretches that full row of tiles across
+   the page width instead of leaving the auto-fill grid's reserved columns
+   empty. */
+.dept-stat-grid--fill {
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
 }
 
 .dept-stat-tile {

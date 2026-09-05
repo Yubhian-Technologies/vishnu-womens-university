@@ -123,7 +123,9 @@ export function findCompanyColumnIndex(columns: string[]): number {
   if (idx === -1) idx = normalized.findIndex((c) => c.includes('recruiter'));
   if (idx === -1) idx = normalized.findIndex((c) => c.includes('employer'));
   // "Placed in" / "Placed at" — some departments' own sheets label the
-  // company column this way instead of "Company"/"Recruiter".
+  // company column this way instead of "Company"/"Recruiter". Without this,
+  // No. of Companies Visited fell back to 0 even when every row plainly
+  // named a company.
   if (idx === -1) idx = normalized.findIndex((c) => c.includes('placed'));
   if (idx === -1) idx = fuzzyColumnIndex(columns, 'company');
   return idx;
