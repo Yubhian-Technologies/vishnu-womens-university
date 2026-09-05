@@ -20,7 +20,7 @@ import '../Campus/tabbed-section.css';
 const ACTIVITY_DEFAULTS: Record<string, { title: string; subtitle: string }> = {
   'vishnu-tv-academy': { title: 'Vishnu TV Academy', subtitle: 'Student-run and student-driven — the only dedicated campus TV Academy in Andhra Pradesh.' },
   'arts-culture': { title: 'Arts & Culture', subtitle: 'Nurturing creativity, preserving heritage, and building a sense of belonging — developing responsible and culturally grounded leaders.' },
-  'sports-games': { title: 'Sports & Games', subtitle: 'Physical fitness is taken seriously at VWU — a sound body supports a sound mind, and both are essential to a complete education.' },
+  'sports-games': { title: 'Sports & Games', subtitle: 'Building Strength, Skill, Teamwork, and Sporting Spirit.' },
   'social-services': { title: 'Social Services', subtitle: 'The National Service Scheme at VWU shapes engineers who are equally committed to their craft and to the communities they serve.' },
   'campus-magazines': { title: 'Campus Magazines', subtitle: 'Three publications that document academic achievements, student creativity, and the story of campus life at VWU and across SVES.' },
 };
@@ -31,6 +31,14 @@ const ACTIVITY_LABELS: Record<string, string> = {
 };
 
 const NAV_OFFSET = 'calc(var(--topbar-height) + var(--header-height) + 1rem)';
+
+// These two facility pages moved out of Campus Life's header nav and its
+// "Quick Navigation" sidebar list (now linked from Academics > Information
+// instead) — see campusFacilities.data.ts. They're still rendered by this
+// same shared component (their URLs are unchanged), so the sidebar has to be
+// suppressed here explicitly rather than just by removing them from the
+// facilities array, or it'd keep showing on these two pages alone.
+const RELOCATED_TO_ACADEMICS_SLUGS = ['smart-classrooms', 'state-of-the-art-labs'];
 
 /**
  * One shared detail page for every admin-managed Campus Life page — the 16
@@ -54,6 +62,7 @@ export default function CampusLifeDetail({ slug: slugProp }: { slug?: string }) 
   const activeTab = visibleTabs.find((t) => t.id === activeTabId) ?? visibleTabs[0];
 
   const isActivity = ACTIVITY_SLUGS.includes(slug);
+  const showQuickNav = !isActivity && !RELOCATED_TO_ACADEMICS_SLUGS.includes(slug);
   const facilityDefault = !isActivity ? findCampusFacilityBySlug(slug) : undefined;
   const activityDefault = isActivity ? ACTIVITY_DEFAULTS[slug] : undefined;
 
@@ -99,24 +108,47 @@ export default function CampusLifeDetail({ slug: slugProp }: { slug?: string }) 
                 </button>
               ))}
             </div>
-            <div className="detail-grid">
-              <div>
-                <CustomSectionsPlain sections={activeTab.sections} />
-              </div>
-              <div className="detail-sidebar">
-                <div style={{ position: 'sticky', top: 'calc(var(--topbar-height) + var(--header-height) + 1.5rem)' }}>
-                  <CampusFacilitiesNav activeSlug={slug} />
+            {showQuickNav ? (
+              <div className="detail-grid">
+                <div>
+                  <CustomSectionsPlain sections={activeTab.sections} />
+                </div>
+                <div className="detail-sidebar">
+                  <div style={{ position: 'sticky', top: 'calc(var(--topbar-height) + var(--header-height) + 1.5rem)' }}>
+                    <CampusFacilitiesNav activeSlug={slug} />
+                  </div>
                 </div>
               </div>
-            </div>
+            ) : (
+              <CustomSectionsPlain sections={activeTab.sections} />
+            )}
           </div>
         </section>
       ) : !isActivity ? (
         <section className="section bg-white">
           <div className="container">
-            <div className="detail-grid">
+            {showQuickNav ? (
+              <div className="detail-grid">
+                <div>
+                  <span className="section-label">Campus Life</span>
+                  <h2 className="section-title" style={{ fontSize: '1.75rem' }}>About {title}</h2>
+                  {visibleSections.length > 0 ? (
+                    <div style={{ marginTop: 'var(--space-5)' }}>
+                      <CustomSectionsPlain sections={visibleSections} />
+                    </div>
+                  ) : (
+                    <p style={{ color: 'var(--color-text-light)' }}>Content for this page is coming soon.</p>
+                  )}
+                </div>
+                <div className="detail-sidebar">
+                  <div style={{ position: 'sticky', top: 'calc(var(--topbar-height) + var(--header-height) + 1.5rem)' }}>
+                    <CampusFacilitiesNav activeSlug={slug} />
+                  </div>
+                </div>
+              </div>
+            ) : (
               <div>
-                <span className="section-label">Campus Life</span>
+                <span className="section-label">Academics</span>
                 <h2 className="section-title" style={{ fontSize: '1.75rem' }}>About {title}</h2>
                 {visibleSections.length > 0 ? (
                   <div style={{ marginTop: 'var(--space-5)' }}>
@@ -126,12 +158,7 @@ export default function CampusLifeDetail({ slug: slugProp }: { slug?: string }) 
                   <p style={{ color: 'var(--color-text-light)' }}>Content for this page is coming soon.</p>
                 )}
               </div>
-              <div className="detail-sidebar">
-                <div style={{ position: 'sticky', top: 'calc(var(--topbar-height) + var(--header-height) + 1.5rem)' }}>
-                  <CampusFacilitiesNav activeSlug={slug} />
-                </div>
-              </div>
-            </div>
+            )}
           </div>
         </section>
       ) : (

@@ -1,3 +1,8 @@
+/* ==========================================================================
+   VWU About Page — Google Material Design 3 (M3) UI System
+   ========================================================================== */
+
+/* ── 1. M3 Quick Stats Bar ── */
 .about-facts-bar {
   display: flex;
   flex-wrap: nowrap;
@@ -5,47 +10,60 @@
   gap: var(--space-3);
   overflow-x: auto;
   scrollbar-width: thin;
-  scrollbar-color: rgba(255,255,255,0.3) transparent;
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: var(--radius-xl);
-  padding: var(--space-3);
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 24px;
+  padding: 10px;
 }
 
 .about-fact {
   flex: 1 1 0;
-  min-width: 90px;
+  min-width: 110px;
   text-align: center;
-  padding: var(--space-3) var(--space-4);
-  border-right: 1px solid rgba(255,255,255,0.12);
-  border-radius: var(--radius-lg);
-  transition: background-color var(--transition-fast);
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  transition: transform var(--transition-fast), background-color var(--transition-fast), border-color var(--transition-fast);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .about-fact:hover {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
 }
 
-.about-fact:last-child { border-right: none; }
+.about-fact-icon {
+  color: var(--color-accent);
+  margin-bottom: 6px;
+  opacity: 0.9;
+}
 
 .about-fact-value {
   font-family: var(--font-serif);
-  font-size: clamp(1.1rem, 2.2vw, 1.5rem);
+  font-size: clamp(1.1rem, 2vw, 1.45rem);
   font-weight: 900;
   color: var(--color-accent);
+  line-height: 1.1;
 }
 
 .about-fact-label {
   font-size: var(--text-xs);
-  color: rgba(255,255,255,0.75);
+  color: rgba(255, 255, 255, 0.85);
   font-family: var(--font-sans);
-  margin-top: 2px;
-  font-weight: 500;
+  margin-top: 4px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
 }
 
-/* Overview */
+/* ── 2. Overview / Mission ── */
 .about-mission-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -53,7 +71,168 @@
   align-items: center;
 }
 
-/* Differentiators */
+.about-who-img-card {
+  position: relative;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 16px 40px rgba(11, 30, 66, 0.12);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 10%, transparent);
+}
+
+.about-who-img-card img {
+  width: 100%;
+  height: 460px;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.5s ease;
+}
+
+.about-who-img-card:hover img {
+  transform: scale(1.03);
+}
+
+/* ── 3. M3 Pillars Section (5 Pillars) ── */
+.about-pillars-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-5);
+}
+
+.about-pillar-card {
+  background: var(--color-white);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 10%, transparent);
+  border-radius: 20px;
+  padding: 1.75rem 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.about-pillar-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-accent) 100%);
+  opacity: 0.85;
+}
+
+.about-pillar-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 14px 35px rgba(11, 30, 66, 0.1);
+  border-color: var(--color-accent);
+}
+
+.about-pillar-icon-wrap {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--color-primary) 8%, var(--color-off-white));
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.15rem;
+  transition: all 0.3s ease;
+}
+
+.about-pillar-card:hover .about-pillar-icon-wrap {
+  background: var(--color-primary);
+  color: var(--color-accent);
+  transform: scale(1.06);
+}
+
+.about-pillar-title {
+  font-family: var(--font-sans);
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--color-primary);
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+}
+
+.about-pillar-desc {
+  color: var(--color-text-light);
+  line-height: 1.65;
+  font-size: var(--text-sm);
+  margin: 0;
+}
+
+/* ── 4. Her Ambition Statement Block ── */
+.about-ambition-card {
+  background: linear-gradient(145deg, #ffffff 0%, var(--color-off-white) 100%);
+  border: 1.5px solid color-mix(in srgb, var(--color-primary) 12%, transparent);
+  border-radius: 28px;
+  padding: 3rem 2.5rem;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.about-ambition-card::after {
+  content: '"';
+  position: absolute;
+  right: 1.5rem;
+  bottom: -2rem;
+  font-family: var(--font-serif);
+  font-size: 12rem;
+  font-weight: 900;
+  color: color-mix(in srgb, var(--color-primary) 4%, transparent);
+  pointer-events: none;
+  line-height: 1;
+}
+
+.about-ambition-chips {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 1.75rem;
+}
+
+.about-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--color-primary) 8%, var(--color-white));
+  border: 1px solid color-mix(in srgb, var(--color-primary) 15%, transparent);
+  color: var(--color-primary);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.about-chip--accent {
+  background: color-mix(in srgb, var(--color-accent) 15%, var(--color-white));
+  border-color: var(--color-accent);
+  color: #0B1E42;
+}
+
+/* ── 5. Academic Snapshot Program Cards ── */
+.about-program-card {
+  background: var(--color-white);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 10%, transparent);
+  border-radius: 18px;
+  padding: 1.25rem 1.35rem;
+  border-left: 4.5px solid var(--color-accent);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+  transition: all 0.25s ease;
+}
+
+.about-program-card:hover {
+  transform: translateX(4px);
+  box-shadow: 0 8px 25px rgba(11, 30, 66, 0.08);
+  border-color: var(--color-accent);
+}
+
+/* ── 6. Differentiators ── */
 .about-diff-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -62,17 +241,17 @@
 
 .about-diff-card {
   background: var(--color-white);
-  border-radius: 20px;
-  padding: var(--space-7);
-  border: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 8%, transparent);
-  box-shadow: var(--shadow-sm);
+  border-radius: 24px;
+  padding: 2.25rem;
+  border: 1px solid color-mix(in srgb, var(--color-primary) 10%, transparent);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
   transition: all var(--transition-base);
 }
 
 .about-diff-card:hover {
   border-color: var(--color-accent);
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-3px);
+  box-shadow: 0 16px 40px rgba(11, 30, 66, 0.09);
+  transform: translateY(-4px);
 }
 
 .about-diff-header {
@@ -88,13 +267,19 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
-  border-radius: var(--radius-full);
-  background: var(--color-off-white);
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--color-primary) 8%, var(--color-off-white));
   color: var(--color-primary);
   font-size: 1.4rem;
   flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.about-diff-card:hover .about-diff-icon {
+  background: var(--color-primary);
+  color: var(--color-accent);
 }
 
 .about-diff-header h3 {
@@ -104,16 +289,29 @@
   color: var(--color-primary);
 }
 
+.about-diff-badge {
+  margin-left: auto;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--color-primary) 8%, var(--color-off-white));
+  color: var(--color-primary);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 .about-diff-list {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: 10px;
 }
 
 .about-diff-list li {
   display: flex;
-  gap: var(--space-2);
+  align-items: flex-start;
+  gap: 10px;
   font-size: var(--text-sm);
   color: var(--color-text-light);
   line-height: 1.6;
@@ -123,9 +321,10 @@
   color: var(--color-accent);
   font-weight: 900;
   flex-shrink: 0;
+  margin-top: 1px;
 }
 
-/* Core Executive Body */
+/* ── 7. Core Executive Body ── */
 .exec-level + .exec-level {
   margin-top: var(--space-10);
 }
@@ -161,26 +360,113 @@
 }
 
 .exec-card {
+  position: relative;
   background: var(--color-white);
-  border: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 8%, transparent);
-  border-radius: 24px;
-  box-shadow: var(--shadow-sm);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 10%, transparent);
+  border-radius: 22px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
   display: flex;
   flex-direction: column;
-  padding: var(--space-3) var(--space-3) var(--space-5);
-  transition: box-shadow var(--transition-base), border-color var(--transition-base), transform var(--transition-base);
+  overflow: hidden;
+  padding: 10px 10px 16px;
+  transition: box-shadow 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
 }
 
-.exec-card:hover {
-  box-shadow: var(--shadow-xl);
+.exec-card:hover,
+.exec-card.is-active {
+  box-shadow: 0 16px 40px rgba(11, 30, 66, 0.12);
   border-color: var(--color-accent);
-  transform: translateY(-4px);
+  transform: translateY(-5px);
+  z-index: 5;
+}
+
+.exec-detail-banner {
+  width: 100%;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  background: var(--color-white);
+  border: 1.5px solid color-mix(in srgb, var(--color-primary) 15%, transparent);
+  border-radius: 20px;
+  box-shadow: 0 12px 32px rgba(8, 28, 21, 0.08);
+  transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease, margin-top 0.3s ease;
+}
+
+.exec-detail-banner.is-open {
+  max-height: 2000px !important;
+  opacity: 1;
+  margin-top: var(--space-8);
+}
+
+.exec-detail-banner__inner {
+  display: flex;
+  align-items: center;
+  padding: var(--space-8) var(--space-8);
+}
+
+.exec-detail-banner__body {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+}
+
+.exec-detail-banner__name {
+  font-family: var(--font-sans);
+  font-weight: 800;
+  font-size: clamp(1.5rem, 2.4vw, 2.25rem);
+  color: var(--color-primary-dark);
+  line-height: 1.2;
+}
+
+.exec-detail-banner__role {
+  font-size: clamp(1rem, 1.3vw, 1.25rem);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  margin-bottom: var(--space-4);
+}
+
+.exec-detail-banner__facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+  margin-bottom: var(--space-3);
+  width: 100%;
+}
+
+.exec-detail-banner__fact {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: clamp(1rem, 1.2vw, 1.15rem);
+  color: var(--color-primary-dark);
+}
+
+.exec-detail-banner__fact span {
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  color: color-mix(in srgb, var(--color-primary-dark) 65%, transparent);
+}
+
+.exec-detail-banner__fact a {
+  color: var(--color-primary-dark);
+}
+
+.exec-detail-banner__bio {
+  font-size: clamp(1rem, 1.3vw, 1.2rem);
+  color: var(--color-primary-dark);
+  line-height: 1.65;
+  width: 100%;
+  max-width: none;
 }
 
 .exec-card__media {
   position: relative;
   overflow: hidden;
-  border-radius: 18px;
+  border-radius: 16px;
   background: var(--color-off-white);
   aspect-ratio: 4 / 5;
 }
@@ -191,11 +477,11 @@
   height: 100%;
   display: block;
   object-fit: cover;
-  transition: transform var(--transition-base);
+  transition: transform 0.4s ease;
 }
 
 .exec-card:hover .exec-card__photo {
-  transform: scale(1.03);
+  transform: scale(1.04);
 }
 
 .exec-card__avatar {
@@ -213,10 +499,10 @@
 .exec-card__info {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
+  align-items: center;
+  text-align: center;
   gap: 4px;
-  padding: var(--space-4) var(--space-2) 0;
+  padding: 14px 8px 10px;
 }
 
 .exec-card__name {
@@ -229,26 +515,89 @@
 
 .exec-card__role {
   display: inline-block;
-  padding: 0.2rem 0.65rem;
+  align-self: center;
+  width: auto;
+  margin-top: auto;
+  padding: 0.4rem 1rem;
   border-radius: var(--radius-full);
-  background: var(--color-off-white);
+  background: #e76f51;
   font-size: var(--text-xs);
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  font-weight: 800;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--color-primary-light);
-  border: 1px solid var(--color-light-gray);
+  color: #000;
+  text-align: center;
 }
 
-@media (max-width: 1024px) {
-  .exec-grid { grid-template-columns: repeat(2, 1fr); }
+/* ── 8. SVES Parent Society Glassmorphism Badge ── */
+.sves-image-wrapper {
+  position: relative;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
 }
 
-@media (max-width: 640px) {
-  .exec-card__avatar { font-size: 2rem; }
+.sves-floating-badge {
+  position: absolute;
+  bottom: 1.25rem;
+  left: 1.25rem;
+  right: 1.25rem;
+  background: rgba(11, 30, 66, 0.75);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 16px;
+  padding: 12px 18px;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  text-align: center;
 }
 
-/* Discover grid */
+.sves-stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sves-stat-val {
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: var(--color-accent);
+}
+
+.sves-stat-lbl {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.85);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+}
+
+/* ── 9. Feature Chips ── */
+.about-feature-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.about-feature-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--color-primary) 8%, var(--color-off-white));
+  border: 1px solid color-mix(in srgb, var(--color-primary) 12%, transparent);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+/* ── 10. Discover Grid (M3 Interactive Cards) ── */
 .about-discover-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -257,72 +606,78 @@
 
 .about-discover-card {
   background: var(--color-white);
-  border: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 8%, transparent);
-  border-radius: 20px;
-  padding: var(--space-6);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 10%, transparent);
+  border-radius: 24px;
+  padding: 2rem 1.75rem;
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: 1rem;
   text-decoration: none;
-  box-shadow: var(--shadow-sm);
-  transition: all var(--transition-base);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.03);
+  transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+  position: relative;
+  overflow: hidden;
 }
 
 .about-discover-card:hover {
   border-color: var(--color-accent);
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(11, 30, 66, 0.1);
+  transform: translateY(-5px);
 }
 
 .about-discover-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 52px;
-  height: 52px;
-  border-radius: var(--radius-full);
-  background: var(--color-off-white);
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--color-primary) 8%, var(--color-off-white));
   color: var(--color-primary);
-  transition: all var(--transition-fast);
+  transition: all 0.3s ease;
 }
 
 .about-discover-card:hover .about-discover-icon {
-  background: var(--color-accent);
-  color: var(--color-primary-dark);
+  background: var(--color-primary);
+  color: var(--color-accent);
+  transform: scale(1.06);
 }
 
 .about-discover-card h3 {
   font-family: var(--font-sans);
-  font-size: var(--text-base);
+  font-size: 1.15rem;
   font-weight: 800;
   color: var(--color-primary);
+  margin: 0;
 }
 
 .about-discover-card p {
   font-size: var(--text-sm);
   color: var(--color-text-light);
-  line-height: 1.6;
+  line-height: 1.65;
   flex: 1;
+  margin: 0;
 }
 
 .about-discover-link {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-1);
-  padding: 0.35rem 0.9rem;
+  gap: 6px;
+  padding: 0.45rem 1.1rem;
   width: fit-content;
-  border-radius: var(--radius-full);
-  background: var(--color-off-white);
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--color-primary) 8%, var(--color-off-white));
   font-family: var(--font-sans);
   font-size: var(--text-xs);
   font-weight: 800;
   color: var(--color-primary);
-  transition: all var(--transition-fast);
+  transition: all 0.3s ease;
 }
 
 .about-discover-card:hover .about-discover-link {
   background: var(--color-primary);
   color: var(--color-white);
+  padding-right: 1.3rem;
 }
 
 /* Responsive */
@@ -330,6 +685,7 @@
   .about-mission-grid { grid-template-columns: 1fr; gap: var(--space-8); }
   .about-diff-grid { grid-template-columns: 1fr; }
   .about-discover-grid { grid-template-columns: repeat(2, 1fr); }
+  .exec-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 640px) {
@@ -341,9 +697,19 @@
   .about-fact {
     flex: 0 1 45%;
     min-width: 0;
-    padding: var(--space-2);
-    border-right: none;
+    padding: 10px;
   }
   .about-discover-grid { grid-template-columns: 1fr; }
+  .exec-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+  .exec-card { padding: 8px 8px 12px; border-radius: 16px; }
+  .exec-card__info { padding: 8px 4px 4px; }
+  .exec-card__name { font-size: 0.9rem; line-height: 1.25; word-break: break-word; }
+  .exec-card__role { padding: 0.3rem 0.5rem; font-size: 0.68rem; word-break: break-word; text-align: center; max-width: 100%; }
+  .exec-card__avatar { font-size: 2rem; }
+  .exec-detail-banner__inner { padding: 1.25rem 1rem; }
+  .exec-detail-banner__facts { gap: 0.75rem; margin-bottom: 0.75rem; }
+  .exec-detail-banner__fact { font-size: 0.9rem; }
+  .exec-detail-banner__bio { font-size: 0.9rem; line-height: 1.55; }
 }
+
 

@@ -24,8 +24,8 @@
 /* ── Left Column Container: Programs ── */
 .programs-showcase-left-container {
   display: flex;
-  justify-content: flex-end;
-  padding: clamp(3.5rem, 5vw, 5.5rem) clamp(2rem, 4vw, 4.5rem) clamp(3.5rem, 5vw, 5.5rem) max(var(--space-6), calc((100vw - 1440px) / 2 + var(--space-6)));
+  justify-content: flex-start;
+  padding: clamp(3.5rem, 5vw, 5.5rem) clamp(2rem, 4vw, 4.5rem) clamp(3.5rem, 5vw, 5.5rem) max(var(--space-8), calc((100vw - 1400px) / 2 + var(--space-8)));
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;

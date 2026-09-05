@@ -18,12 +18,14 @@ export interface ColorVarDef {
 
 // Footer-specific overrides — separate from COLOR_VARS because the footer
 // intentionally stays dark even when the rest of the site is light, so its
-// colors can't just reuse the main palette directly. --footer-bg and
-// --footer-accent inherit from the main theme until an admin explicitly sets
-// one, so changing Primary Dark or Accent above still re-colors the footer
-// without needing to touch this section at all.
+// colors can't just reuse the main palette directly. --footer-accent still
+// inherits from the main theme until an admin explicitly sets one, so
+// changing Accent above still re-colors the footer's highlights. --footer-bg
+// deliberately does NOT inherit Primary Dark — reference university footers
+// (LPU, VIT, Amrita) all use a near-black neutral background independent of
+// the brand color, not a tinted brand-dark tone, so that's the default here.
 export const FOOTER_COLOR_VARS: ColorVarDef[] = [
-  { key: '--footer-bg', label: 'Footer Background', hint: 'Blank inherits Primary Dark from the theme above.', default: '#0d251a', inheritsFrom: '--color-primary-dark' },
+  { key: '--footer-bg', label: 'Footer Background', hint: 'Near-black neutral by default, independent of the brand color.', default: '#0a0a0a' },
   { key: '--footer-text', label: 'Footer Text', hint: 'Body text and muted details in the footer.', default: '#e2e8f0' },
   { key: '--footer-heading', label: 'Footer Heading', hint: 'Headings, brand name, and brightest text in the footer.', default: '#ffffff' },
   { key: '--footer-accent', label: 'Footer Accent', hint: 'Blank inherits Accent from the theme above.', default: '#c9a84c', inheritsFrom: '--color-accent' },
@@ -34,8 +36,8 @@ export const FOOTER_COLOR_VARS: ColorVarDef[] = [
 // color of its own, distinct from every button/badge/link on the site that
 // also reads Accent. Inherits Accent/Accent Light until explicitly set.
 export const FACULTY_COLOR_VARS: ColorVarDef[] = [
-  { key: '--faculty-bg', label: 'Faculty Section Background', hint: 'Blank inherits Accent from the theme above.', default: '#ebb024', inheritsFrom: '--color-accent' },
-  { key: '--faculty-bg-light', label: 'Faculty Section Background Light', hint: 'Gradient highlight tone. Blank inherits Accent Light from the theme above.', default: '#f6c035', inheritsFrom: '--color-accent-light' },
+  { key: '--faculty-bg', label: 'Faculty Section Background', hint: 'Default is vibrant yellow (#facc15).', default: '#facc15' },
+  { key: '--faculty-bg-light', label: 'Faculty Section Background Light', hint: 'Gradient highlight tone (#fde047).', default: '#fde047' },
 ];
 
 // "Alumni Voices & Stories" testimonial section — this component ships its

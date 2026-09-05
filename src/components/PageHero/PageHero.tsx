@@ -106,106 +106,103 @@ export default function PageHero({
   const slide = allSlides[current];
 
   return (
-    <section
-      className={`page-hero page-hero--${size}`}
-      onMouseEnter={stopTimer}
-      onMouseLeave={startTimer}
-    >
-      {/* Slides. Keyed by imageUrl (not array index) so that when the
-          default hardcoded image is replaced by a Firestore-loaded banner
-          at the same slide position, React unmounts the old <img> instead
-          of reusing the DOM node and silently swapping its src — the
-          latter causes the browser to keep painting the previous bitmap
-          until the new one finishes downloading (a visible "ghosting"
-          flash on every page navigation, since PageHero remounts fresh
-          per route and always starts from the default image). */}
-      {allSlides.map((s, i) => (
+    <section className={`page-hero page-hero--${size}`}>
+      <div className="container">
         <div
-          key={s.imageUrl}
-          className={`page-hero__slide ${i === current ? 'page-hero__slide--active' : ''}`}
+          className="page-hero-card"
+          onMouseEnter={stopTimer}
+          onMouseLeave={startTimer}
         >
-          {visited.has(i) && s.imageUrl && (
-            <SmoothImage
-              src={s.imageUrl}
-              alt={s.title}
-              className="page-hero-image"
-              loading="eager"
-              decoding={i === current ? 'sync' : 'async'}
-              {...fetchPriorityAttr(i === current ? 'high' : 'low')}
-            />
+          {/* Slides */}
+          {allSlides.map((s, i) => (
+            <div
+              key={s.imageUrl}
+              className={`page-hero__slide ${i === current ? 'page-hero__slide--active' : ''}`}
+            >
+              {visited.has(i) && s.imageUrl && (
+                <SmoothImage
+                  src={s.imageUrl}
+                  alt={s.title}
+                  className="page-hero-image"
+                  loading="eager"
+                  decoding={i === current ? 'sync' : 'async'}
+                  {...fetchPriorityAttr(i === current ? 'high' : 'low')}
+                />
+              )}
+            </div>
+          ))}
+
+          <div className="page-hero-overlay" />
+
+          {/* Content */}
+          <div className="page-hero-content">
+            <div className="breadcrumb animate-fade-in">
+              <Breadcrumbs items={breadcrumb} />
+            </div>
+
+            {showText && (
+              <>
+                <h1 key={`title-${current}`} className="page-hero__title animate-fade-in-up">
+                  {slide.title}
+                </h1>
+
+                {slide.subtitle && (
+                  <p key={`sub-${current}`} className="page-hero__subtitle animate-fade-in-up">
+                    {slide.subtitle}
+                  </p>
+                )}
+
+                {slide.ctaLabel && slide.ctaLink && (
+                  <div key={`cta-${current}`} className="page-hero__cta animate-fade-in-up">
+                    {scrollCtaTargetId ? (
+                      <button
+                        type="button"
+                        className="btn-hero-gold"
+                        onClick={() => smoothScrollTo(`#${scrollCtaTargetId}`)}
+                      >
+                        {slide.ctaLabel}
+                      </button>
+                    ) : slide.ctaLink.startsWith('http') ? (
+                      <a href={slide.ctaLink} target="_blank" rel="noopener noreferrer" className="btn-hero-gold">
+                        {slide.ctaLabel}
+                      </a>
+                    ) : (
+                      <Link to={slide.ctaLink} className="btn-hero-gold">
+                        {slide.ctaLabel}
+                      </Link>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+
+          {/* Navigation — only shown if multiple slides */}
+          {allSlides.length > 1 && (
+            <>
+              <button className="page-hero__arrow page-hero__arrow--prev" onClick={prev} aria-label="Previous slide">
+                ‹
+              </button>
+              <button className="page-hero__arrow page-hero__arrow--next" onClick={next} aria-label="Next slide">
+                ›
+              </button>
+              <div className="page-hero__dots">
+                {allSlides.map((_, i) => (
+                  <button
+                    key={i}
+                    className={`page-hero__dot${i === current ? ' page-hero__dot--active' : ''}`}
+                    onClick={() => goTo(i)}
+                    aria-label={`Go to slide ${i + 1}`}
+                  />
+                ))}
+              </div>
+              <div className="page-hero__counter">
+                {current + 1} / {allSlides.length}
+              </div>
+            </>
           )}
         </div>
-      ))}
-
-      <div className="page-hero-overlay" />
-
-      {/* Content */}
-      <div className="container page-hero-content">
-        <div className="breadcrumb animate-fade-in">
-          <Breadcrumbs items={breadcrumb} />
-        </div>
-
-        {showText && (
-          <>
-            <h1 key={`title-${current}`} className="page-hero__title animate-fade-in-up">
-              {slide.title}
-            </h1>
-
-            {slide.subtitle && (
-              <p key={`sub-${current}`} className="page-hero__subtitle animate-fade-in-up">
-                {slide.subtitle}
-              </p>
-            )}
-
-            {slide.ctaLabel && slide.ctaLink && (
-              <div key={`cta-${current}`} className="page-hero__cta animate-fade-in-up">
-                {scrollCtaTargetId ? (
-                  <button
-                    type="button"
-                    className="btn btn-primary"
-                    onClick={() => smoothScrollTo(`#${scrollCtaTargetId}`)}
-                  >
-                    {slide.ctaLabel}
-                  </button>
-                ) : slide.ctaLink.startsWith('http') ? (
-                  <a href={slide.ctaLink} target="_blank" rel="noopener noreferrer" className="btn btn-primary">
-                    {slide.ctaLabel}
-                  </a>
-                ) : (
-                  <Link to={slide.ctaLink} className="btn btn-primary">
-                    {slide.ctaLabel}
-                  </Link>
-                )}
-              </div>
-            )}
-          </>
-        )}
       </div>
-
-      {/* Navigation — only shown if multiple slides */}
-      {allSlides.length > 1 && (
-        <>
-          <button className="page-hero__arrow page-hero__arrow--prev" onClick={prev} aria-label="Previous slide">
-            ‹
-          </button>
-          <button className="page-hero__arrow page-hero__arrow--next" onClick={next} aria-label="Next slide">
-            ›
-          </button>
-          <div className="page-hero__dots">
-            {allSlides.map((_, i) => (
-              <button
-                key={i}
-                className={`page-hero__dot${i === current ? ' page-hero__dot--active' : ''}`}
-                onClick={() => goTo(i)}
-                aria-label={`Go to slide ${i + 1}`}
-              />
-            ))}
-          </div>
-          <div className="page-hero__counter">
-            {current + 1} / {allSlides.length}
-          </div>
-        </>
-      )}
     </section>
   );
 }

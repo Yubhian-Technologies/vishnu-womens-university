@@ -36,7 +36,7 @@ export default function CustomSectionsRenderer({ sections, navOffset = DEFAULT_N
   return (
     <>
       {visible.map((section, index) => (
-        <section key={section.id} id={section.id} className={`section ${index % 2 === 0 ? 'bg-white' : 'bg-off-white'}`} style={{ scrollMarginTop: navOffset }}>
+        <section key={`${section.id}-${index}`} id={section.id} className={`section ${index % 2 === 0 ? 'bg-white' : 'bg-off-white'}`} style={{ scrollMarginTop: navOffset }}>
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
               <span className="section-label">Details</span>
@@ -59,8 +59,8 @@ export function CustomSectionsIntro({ sections }: { sections: CustomSection[] })
   const visible = sections.filter((s) => s.placement === 'intro' && hasCustomSectionContent(s));
   return (
     <>
-      {visible.map((section) => (
-        <div key={section.id} style={{ marginTop: 'var(--space-6)' }}>
+      {visible.map((section, index) => (
+        <div key={`${section.id}-${index}`} style={{ marginTop: 'var(--space-6)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-3)' }}>
             <div style={{ width: 4, height: 24, background: 'var(--color-accent)', borderRadius: 'var(--radius-full)', flexShrink: 0, alignSelf: 'flex-start', marginTop: 2 }} />
             <div>
@@ -116,7 +116,7 @@ export function CustomSectionsPlain({ sections }: { sections: CustomSection[] })
         }
         const section = run.item;
         return (
-          <div key={section.id} style={{ marginTop: i === 0 ? 0 : 'var(--space-6)' }}>
+          <div key={`${section.id}-${i}`} style={{ marginTop: i === 0 ? 0 : 'var(--space-6)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-3)' }}>
               <div style={{ width: 4, height: 24, background: 'var(--color-accent)', borderRadius: 'var(--radius-full)', flexShrink: 0, alignSelf: 'flex-start', marginTop: 2 }} />
               <div>
@@ -146,7 +146,7 @@ function PersonPanelList({ people }: { people: CustomSection[] }) {
         const isOpen = openIndex === i;
         const hasBio = !!person.textContent?.trim();
         return (
-          <div key={person.id}>
+          <div key={`${person.id}-${i}`}>
             <button
               type="button"
               onClick={() => hasBio && setOpenIndex(isOpen ? null : i)}
@@ -212,7 +212,7 @@ export function CustomSectionsAccordion({ sections }: { sections: CustomSection[
       {visible.map((section, i) => {
         const isOpen = openIndex === i;
         return (
-          <div key={section.id}>
+          <div key={`${section.id}-${i}`}>
             <button
               type="button"
               onClick={() => setOpenIndex(isOpen ? null : i)}
@@ -279,12 +279,12 @@ export function SectionSubtree({ section, depth = 0, navOffset = DEFAULT_NAV_OFF
   return (
     <div>
       {body}
-      {visibleSubs.map((sub) => (
+      {visibleSubs.map((sub, subIndex) => (
         // id+scrollMarginTop lets a Quick Links entry for this subsection
         // (see toQuickLinkItems in lib/customSections.ts) jump straight to
         // it with a plain anchor — every stacked subsection is always in the
         // DOM, unlike a pill's, which needs PillSwitcher's hash-sync below.
-        <div key={sub.id} id={sub.id} style={{ marginTop: depth === 0 ? 'var(--space-6)' : 'var(--space-4)', scrollMarginTop: navOffset }}>
+        <div key={`${sub.id}-${subIndex}`} id={sub.id} style={{ marginTop: depth === 0 ? 'var(--space-6)' : 'var(--space-4)', scrollMarginTop: navOffset }}>
           <h4 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: sub.boldHeading ? 800 : 700, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>
             {sub.label}
           </h4>
@@ -338,11 +338,11 @@ function PillSwitcher({ sections, depth = 0, navOffset = DEFAULT_NAV_OFFSET }: {
   return (
     <div id={active.id} style={{ scrollMarginTop: navOffset }}>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)', marginBottom: 'var(--space-6)' }}>
-        {sections.map((s) => {
+        {sections.map((s, sIndex) => {
           const isActive = active.id === s.id;
           return (
             <button
-              key={s.id}
+              key={`${s.id}-${sIndex}`}
               type="button"
               onClick={() => setActiveId(s.id)}
               style={{

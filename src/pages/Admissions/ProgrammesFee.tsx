@@ -17,6 +17,19 @@ const VISWPU_BTECH_PROGRAMS: { name: string; code: string; intake: number; fee: 
   { name: 'Electronics Engineering (VLSI Design & Technology)', code: 'B.Tech EVT', intake: 60, fee: '₹ 47,000' },
 ];
 
+// A program can be split across both codes (e.g. AI&ML: 240 total intake in
+// the admin `programs` collection = 120 VISW + 120 VISWPU) — unlike EVT,
+// which is carved out of the VISW table entirely (see the filter below), the
+// admin's `intake` for these still reflects the combined total. Subtracting
+// each one's fixed VISWPU share here, display-only, is what keeps the VISW
+// table from double-counting the VISWPU seats shown just below it — the
+// admin-editable total itself (240) is correct and unchanged, and anywhere
+// else that reads it (e.g. the department page) is meant to show that
+// combined total, not the VISW-only split.
+const VISWPU_INTAKE_BY_NAME: Record<string, number> = Object.fromEntries(
+  VISWPU_BTECH_PROGRAMS.map((p) => [p.name, p.intake])
+);
+
 export default function ProgrammesFee() {
   const { docs: allPrograms } = useOrderedCollection<ProgramDoc>('programs', 'order');
   // EVT is excluded from the VISW table on this page only — it's listed
@@ -109,15 +122,18 @@ export default function ProgrammesFee() {
                 </tr>
               </thead>
               <tbody>
-                {btechPrograms.map((p, i) => (
-                  <tr key={p.id} style={{ background: i % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)' }}>
-                    <td style={{ ...tableCell, color: 'var(--color-accent)', fontWeight: 900 }}>{String(i + 1).padStart(2, '0')}</td>
-                    <td style={{ ...tableCell, fontWeight: 600, color: 'var(--color-primary)' }}>{p.name}</td>
-                    <td style={tableCell}>{p.shortName}</td>
-                    <td style={{ ...tableCell, textAlign: 'center', fontWeight: 700 }}>{p.intake}</td>
-                    <td style={{ ...tableCell, textAlign: 'center', fontWeight: 700, color: 'var(--color-primary)' }}>{p.fee || DEFAULT_BTECH_FEE}</td>
-                  </tr>
-                ))}
+                {btechPrograms.map((p, i) => {
+                  const viswIntake = p.intake - (VISWPU_INTAKE_BY_NAME[p.name] || 0);
+                  return (
+                    <tr key={p.id} style={{ background: i % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)' }}>
+                      <td style={{ ...tableCell, color: 'var(--color-accent)', fontWeight: 900 }}>{String(i + 1).padStart(2, '0')}</td>
+                      <td style={{ ...tableCell, fontWeight: 600, color: 'var(--color-primary)' }}>{p.name}</td>
+                      <td style={tableCell}>{p.shortName}</td>
+                      <td style={{ ...tableCell, textAlign: 'center', fontWeight: 700 }}>{viswIntake}</td>
+                      <td style={{ ...tableCell, textAlign: 'center', fontWeight: 700, color: 'var(--color-primary)' }}>{p.fee || DEFAULT_BTECH_FEE}</td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -269,7 +285,7 @@ export default function ProgrammesFee() {
             </div>
             <div style={{ display: 'flex', gap: 'var(--space-4)', flexWrap: 'wrap' }}>
               <Link to="/admission-procedure" className="btn btn-accent btn-lg">Admission Procedure</Link>
-              <Link to="/admissions" className="btn btn-secondary btn-lg">Apply Now</Link>
+              <Link to="/apply-now" className="btn btn-secondary btn-lg">Apply Now</Link>
             </div>
           </div>
         </div>

@@ -1,39 +1,34 @@
-import { useEffect, useState } from 'react';
-import { 
-  MapPin, 
-  Phone, 
-  Mail, 
-  Clock, 
-  Building2, 
-  GraduationCap, 
-  Briefcase, 
-  ShieldAlert, 
-  Navigation, 
-  Plane, 
-  Train, 
-  Bus, 
-  CheckCircle2, 
-  AlertCircle, 
-  Sparkles, 
-  Send, 
-  Copy, 
-  Check, 
-  ExternalLink, 
-  Search, 
-  Headphones, 
-  Compass,
-  FileCheck2,
-  PhoneCall
-} from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
+import SEO from '../../components/SEO/SEO';
+import {
+  Mail,
+  MapPin,
+  GraduationCap,
+  Briefcase,
+  Building2,
+  Clock,
+  Send,
+  CheckCircle2,
+  AlertCircle,
+  Search,
+  ExternalLink,
+  ShieldAlert,
+  Train,
+  Plane,
+  Bus,
+  Sparkles,
+  FileCheck2,
+  PhoneCall,
+  Headphones,
+} from 'lucide-react';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { usePageBanner } from '../../hooks/usePageBanner';
 import { useSiteContact, DEFAULT_PHONE } from '../../hooks/useSiteContact';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import type { ContactDoc } from '../Admin/sections/ContactsAdmin';
-import SEO from '../../components/SEO/SEO';
 import './Contact.css';
 
 interface ContactForm {
@@ -45,17 +40,22 @@ interface ContactForm {
   message: string;
 }
 
-type ContactFormErrors = Partial<Record<keyof ContactForm, string>>;
+interface ContactFormErrors {
+  name?: string;
+  email?: string;
+  phone?: string;
+  subject?: string;
+  category?: string;
+  message?: string;
+}
 
 const INITIAL_FORM: ContactForm = {
   name: '',
   email: '',
   phone: '',
-  // Matches the "Admissions Enquiry" category below, which starts pre-selected
-  // (see the chip grid's `form.category === cat` check) — so the Subject
-  // Summary is in sync with the selected category from the very first render,
-  // not just after a chip is clicked (same subjectForCategory() text, inlined
-  // here since it's declared further down and this runs at module-load time).
+  // Matches the "Admissions Enquiry" category below, which starts pre-selected,
+  // so the Subject Summary is in sync with the selected category from the
+  // very first render, not just after the category dropdown changes.
   subject: 'Admissions Enquiry',
   category: 'Admissions Enquiry',
   message: '',
@@ -70,8 +70,8 @@ function validateContactForm(form: ContactForm): ContactFormErrors {
   if (!form.email.trim()) errors.email = 'Please enter your email address.';
   else if (!EMAIL_RE.test(form.email.trim())) errors.email = 'Please enter a valid email address.';
   if (form.phone.trim() && !PHONE_RE.test(form.phone.trim())) errors.phone = 'Please enter a valid phone number.';
-  if (!form.subject.trim()) errors.subject = 'Please enter a subject or summary.';
-  if (!form.message.trim()) errors.message = 'Please enter your message or query.';
+  if (!form.subject.trim()) errors.subject = 'Please enter a subject.';
+  if (!form.message.trim()) errors.message = 'Please enter your message.';
   else if (form.message.trim().length < 10) errors.message = 'Message should be at least 10 characters.';
   return errors;
 }
@@ -88,55 +88,50 @@ const CATEGORY_OPTIONS = [
   'Others',
 ];
 
-// Avoids a doubled-up "Admissions Enquiry Enquiry" for the categories that
-// already end in "Enquiry" — every other category gets " Enquiry" appended
-// so the Subject Summary always reads as a full sentence-like subject line.
-const subjectForCategory = (category: string) => (/enquiry$/i.test(category) ? category : `${category} Enquiry`);
-
 const DEFAULT_INFO_CARDS = [
   {
     id: 'default-info-1',
-    title: 'Admissions Office',
-    desc: 'Vishnu Women\'s University Admissions Cell\nEmail: admissions@vishnu.edu.in\nHelpline: +91 8816 250864, +91 91212 14411',
-    value: 'Mon – Sat: 9:00 AM – 5:00 PM IST',
-    slug: 'Admissions Desk, Admin Block',
-    icon: 'GraduationCap',
-  },
-  {
-    id: 'default-info-2',
-    title: 'Main Campus & Administration',
-    desc: 'Vishnavathi, Kovvada, Bhimavaram,\nWest Godavari District, Andhra Pradesh – 534202, India',
-    value: 'Landmark: Near Pedatadepalli Road',
-    slug: 'Campus Main Gate 1',
+    title: 'Green Meadows Campus',
+    desc: 'Vishnupur, Bhimavaram\nPincode - 534202, West Godavari District, AP, India\nPhone: 08816-250864',
+    value: 'Main Campus',
+    slug: '08816-250864',
     icon: 'MapPin',
   },
   {
+    id: 'default-info-2',
+    title: 'Email Us',
+    desc: 'Email: info@vwu.edu.in\nGeneral Enquiry & Support',
+    value: 'Mon – Sat: 9:00 AM – 5:00 PM IST',
+    slug: 'info@vwu.edu.in',
+    icon: 'Mail',
+  },
+  {
     id: 'default-info-3',
-    title: 'Career Guidance & Placements',
-    desc: 'Training & Corporate Placement Division\nEmail: placements@vishnu.edu.in\nPhone: +91 8816 250867',
-    value: 'Recruiter Liaison & MoUs',
-    slug: 'Placement Hub, Ground Floor',
-    icon: 'Briefcase',
+    title: 'Society Headquarters',
+    desc: 'Plot 7 & 8, Nagarjuna Hills, Punjagutta Main Road\nHyderabad - 500 082, Telangana\nPhones: 040-40334899 / 897 / 866 / 829',
+    value: 'SVES Central Office',
+    slug: '040-40334818 / 4848',
+    icon: 'Building2',
   },
   {
     id: 'default-info-4',
-    title: 'Registrar & Student Affairs',
-    desc: 'Office of the Registrar\nEmail: info@vishnu.edu.in, registrar@vishnu.edu.in\nPhone: +91 8816 250860',
-    value: 'Academic & Institutional Affairs',
-    slug: 'Central Administration Block',
-    icon: 'Building2',
+    title: 'Admissions Quick Info',
+    desc: 'EAPCET Code: VISW, VISWPU\nEmail: admissions@vwu.edu.in\nHelpline: +91 8816 250864',
+    value: 'Mon – Sat: 9:00 AM – 5:00 PM IST',
+    slug: 'Admissions Desk',
+    icon: 'GraduationCap',
   },
 ];
 
 const DEFAULT_DEPT_CONTACTS: ContactDoc[] = [
-  { id: 'dept-1', dept: 'Computer Science & Engineering (CSE)', hod: 'Dr. P. Kiran Sree', phone: '+91 8816 250871', email: 'hod_cse@vishnu.edu.in', order: 1 },
-  { id: 'dept-2', dept: 'Artificial Intelligence & Data Science (AI & DS)', hod: 'Dr. M. Sridevi', phone: '+91 8816 250872', email: 'hod_aids@vishnu.edu.in', order: 2 },
-  { id: 'dept-3', dept: 'Electronics & Communication Engineering (ECE)', hod: 'Dr. J. Somlal', phone: '+91 8816 250873', email: 'hod_ece@vishnu.edu.in', order: 3 },
-  { id: 'dept-4', dept: 'Electrical & Electronics Engineering (EEE)', hod: 'Dr. K. Rayudu', phone: '+91 8816 250874', email: 'hod_eee@vishnu.edu.in', order: 4 },
-  { id: 'dept-5', dept: 'Information Technology (IT)', hod: 'Dr. Ch. Srinivas', phone: '+91 8816 250875', email: 'hod_it@vishnu.edu.in', order: 5 },
-  { id: 'dept-6', dept: 'Basic Sciences & Humanities (BS&H)', hod: 'Dr. V. Rama Devi', phone: '+91 8816 250876', email: 'hod_bsh@vishnu.edu.in', order: 6 },
-  { id: 'dept-7', dept: 'Department of Management Studies (MBA)', hod: 'Dr. T. Sudha', phone: '+91 8816 250877', email: 'hod_mba@vishnu.edu.in', order: 7 },
-  { id: 'dept-8', dept: 'Examinations & Student Evaluation Cell', hod: 'Controller of Examinations', phone: '+91 8816 250878', email: 'ce@vishnu.edu.in', order: 8 },
+  { id: 'dept-1', dept: 'Computer Science & Engineering (CSE)', hod: 'DR. P. KIRAN SREE', phone: '', email: 'hod_cse@vwu.edu.in', order: 1 },
+  { id: 'dept-2', dept: 'Artificial Intelligence & Data Science (AI & DS)', hod: 'DR. M. SRIDEVI', phone: '', email: 'hod_aids@vwu.edu.in', order: 2 },
+  { id: 'dept-3', dept: 'Electronics & Communication Engineering (ECE)', hod: 'DR. J. SOMLAL', phone: '', email: 'hod_ece@vwu.edu.in', order: 3 },
+  { id: 'dept-4', dept: 'Electrical & Electronics Engineering (EEE)', hod: 'DR. K. RAYUDU', phone: '', email: 'hod_eee@vwu.edu.in', order: 4 },
+  { id: 'dept-5', dept: 'Information Technology (IT)', hod: 'DR. CH. SRINIVAS', phone: '', email: 'hod_it@vwu.edu.in', order: 5 },
+  { id: 'dept-6', dept: 'Basic Sciences & Humanities (BS&H)', hod: 'DR. V. RAMA DEVI', phone: '', email: 'hod_bsh@vwu.edu.in', order: 6 },
+  { id: 'dept-7', dept: 'Department of Management Studies (MBA)', hod: 'DR. T. SUDHA', phone: '', email: 'hod_mba@vwu.edu.in', order: 7 },
+  { id: 'dept-8', dept: 'Examinations & Student Evaluation Cell', hod: 'CONTROLLER OF EXAMINATIONS', phone: '', email: 'ce@vwu.edu.in', order: 8 },
 ];
 
 const DEFAULT_SOCIAL_LINKS = [
@@ -163,7 +158,39 @@ export default function Contact() {
   const defaultPhoneDigits = DEFAULT_PHONE.replace(/\D/g, '');
   const banner = usePageBanner('contact');
 
-  const deptContacts = liveDeptContacts.length > 0 ? liveDeptContacts : DEFAULT_DEPT_CONTACTS;
+  // Two independent info-card fixes compose here, in order: legacy email
+  // domains and a missing admissions address get normalized first (our
+  // guardrails below), then the live Site Contact Info substitution
+  // (origin/main, further down) runs on top of that already-normalized
+  // text — so a card can be both "fixed up" and still track the
+  // admin-managed phone/email as the single source of truth.
+  const rawInfoCards = liveInfoCards.length > 0 ? liveInfoCards : DEFAULT_INFO_CARDS;
+  const infoCardsLegacyNormalized = rawInfoCards.map((c) => {
+    let desc = c.desc ? c.desc.replace(/@vishnu\.edu\.in|@srivishnu\.edu\.in|@svecw\.edu\.in/gi, '@vwu.edu.in') : '';
+    if ((c.title.toLowerCase().includes('admission') || c.title.toLowerCase().includes('quick info')) && !desc.includes('admissions@vwu.edu.in')) {
+      desc = desc ? `Email: admissions@vwu.edu.in\n${desc}` : 'Email: admissions@vwu.edu.in';
+    }
+    return {
+      ...c,
+      desc,
+    };
+  });
+
+  const rawDeptContacts = liveDeptContacts.length > 0 ? liveDeptContacts : DEFAULT_DEPT_CONTACTS;
+  const deptContacts = rawDeptContacts.map((d) => {
+    let email = d.email ? d.email.trim() : '';
+    if (email.includes('@')) {
+      email = email.replace(/@[^@]+$/, '@vwu.edu.in');
+    } else if (email) {
+      email = `${email}@vwu.edu.in`;
+    }
+    return {
+      ...d,
+      hod: d.hod ? d.hod.toUpperCase() : '',
+      phone: '', // Guardrail: Mobile numbers removed
+      email,
+    };
+  });
   const socialLinks = liveSocialLinks.length > 0 ? liveSocialLinks : DEFAULT_SOCIAL_LINKS;
   // These info cards are admin-typed freeform text (title/desc), but any
   // line that's exactly an email address or exactly the site's old default
@@ -172,7 +199,7 @@ export default function Contact() {
   // desc replace) so unrelated lines survive untouched, e.g. "Mon–Sat: 9 AM
   // – 5 PM" under the email, or the distinct Society Headquarters numbers
   // (different digits entirely, so they never match and are left alone).
-  const infoCards = (liveInfoCards.length > 0 ? liveInfoCards : DEFAULT_INFO_CARDS).map((c) => {
+  const infoCards = infoCardsLegacyNormalized.map((c) => {
     const isEmailCard = c.title.toLowerCase().includes('email');
     const desc = c.desc
       .split('\n')
@@ -191,7 +218,6 @@ export default function Contact() {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
-  const [copiedId, setCopiedId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTransitTab, setActiveTransitTab] = useState<'train' | 'air' | 'road'>('train');
 
@@ -199,22 +225,12 @@ export default function Contact() {
     document.title = "Contact Us & Campus Directions | Vishnu Women's University";
   }, []);
 
-  const copyToClipboard = (text: string, id: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedId(id);
-    setTimeout(() => setCopiedId(null), 2000);
-  };
-
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
     setErrors((prev) => (prev[name as keyof ContactForm] ? { ...prev, [name]: undefined } : prev));
-  };
-
-  const handleCategorySelect = (category: string) => {
-    setForm((prev) => ({ ...prev, category, subject: subjectForCategory(category) }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -240,7 +256,7 @@ export default function Contact() {
       });
       setSubmitted(true);
     } catch (err) {
-      setSubmitError((err as Error).message || "Couldn't send your message. Please try again or email us directly at info@vishnu.edu.in.");
+      setSubmitError((err as Error).message || "Couldn't send your message. Please try again or email us directly at info@vwu.edu.in.");
     } finally {
       setSubmitting(false);
     }
@@ -252,8 +268,7 @@ export default function Contact() {
     return (
       d.dept.toLowerCase().includes(q) ||
       d.hod.toLowerCase().includes(q) ||
-      d.email.toLowerCase().includes(q) ||
-      (d.phone && d.phone.toLowerCase().includes(q))
+      d.email.toLowerCase().includes(q)
     );
   });
 
@@ -261,82 +276,80 @@ export default function Contact() {
     <main className="contact-page">
       <SEO 
         title="Contact Us & Campus Directions | Vishnu Women's University" 
-        description="Get in touch with Vishnu Women's University (VWU). Admissions helpline, department phone directory, campus address in Bhimavaram, email support, and interactive Google map directions."
+        description="Get in touch with Vishnu Women's University (VWU). Admissions helpline, department directory, campus address in Bhimavaram, email support, and Google map directions."
         canonicalPath="/contact"
       />
 
-      {/* ── Google M3 Hero Section ── */}
-      <section className="contact-hero-m3">
-        <div className="contact-hero-glow-1" aria-hidden="true" />
-        <div className="contact-hero-glow-2" aria-hidden="true" />
-
-        <div className="container contact-hero-m3__inner">
-          <div className="contact-hero-chip">
+      {/* ── Sleek Hero Banner ── */}
+      <section className="contact-hero-clean">
+        <div className="contact-hero-glow" aria-hidden="true" />
+        <div className="container contact-hero-clean__inner">
+          <div className="contact-chip">
             <Sparkles size={14} className="contact-chip-icon" />
-            <span>Official University Helpdesk &amp; Directory</span>
+            <span>Official University Helpdesk</span>
           </div>
 
-          <h1 className="contact-hero-m3__title">
-            {banner?.title || 'Connect with Vishnu Women\'s University'}
+          <h1 className="contact-hero-clean__title">
+            {banner?.title || "We're Here to Help"}
           </h1>
-          <p className="contact-hero-m3__subtitle">
-            {banner?.subtitle || "We are here to guide you. Reach out to our admissions counselors, administrative offices, and academic departments, or plan your visit to our scenic campus."}
+          <p className="contact-hero-clean__subtitle">
+            Have a question about admissions, academic programmes, campus life, or the University? Our team is here to assist you.
+          </p>
+          <p className="contact-hero-clean__subtitle">
+            For admission enquiries, general information, or any other assistance, please get in touch with us. We look forward to hearing from you and helping you find the information you need.
           </p>
 
-          {/* Jump Quick-Action Bar */}
-          <div className="contact-quick-bar">
-            <a href="#primary-desks" className="contact-quick-pill">
+          <nav className="contact-hero-quicknav" aria-label="Contact page sections">
+            <a href="#primary-helpdesks" className="contact-hero-quicknav-pill">
               <Headphones size={15} />
               <span>Primary Helpdesks</span>
             </a>
-            <a href="#send-message" className="contact-quick-pill">
+            <a href="#send-message" className="contact-hero-quicknav-pill">
               <Send size={15} />
               <span>Send a Message</span>
             </a>
-            <a href="#campus-map" className="contact-quick-pill">
-              <Compass size={15} />
+            <a href="#map-directions" className="contact-hero-quicknav-pill">
+              <MapPin size={15} />
               <span>Map &amp; Directions</span>
             </a>
-            <a href="#department-directory" className="contact-quick-pill">
+            <a href="#department-directory" className="contact-hero-quicknav-pill">
               <Building2 size={15} />
               <span>Department Directory</span>
             </a>
-            <a href="#emergency-contacts" className="contact-quick-pill contact-quick-pill--emergency">
+            <a href="#helplines" className="contact-hero-quicknav-pill contact-hero-quicknav-pill--alert">
               <ShieldAlert size={15} />
-              <span>24x7 Helplines</span>
+              <span>24&times;7 Helplines</span>
             </a>
-          </div>
+          </nav>
         </div>
       </section>
 
-      {/* ── Primary Helpdesk Cards Grid ── */}
-      <section className="contact-info-m3" id="primary-desks" aria-label="Primary University Desks">
+      {/* ── Key Contact Points (Primary Support Desks) ── */}
+      <section id="primary-helpdesks" className="contact-info-section" aria-label="Primary Support Desks" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
         <div className="container">
           <div className="section-head-center">
             <span className="section-label">Key Contact Points</span>
-            <h2 className="section-title">Primary Support Desks</h2>
+            <h2 className="section-title">Connect with the Right Team</h2>
             <p className="section-subtitle">
-              Direct channels for student admissions, corporate placements, administrative records, and campus visits.
+              Dedicated support desks for <strong>admissions, administrative services, and campus visits</strong>, providing timely assistance and guidance.
             </p>
           </div>
 
-          <div className="contact-card-grid-m3">
+          <div className="contact-card-grid-clean">
             {infoCards.map((c, i) => {
               const Icon = resolveContentIcon(c.icon) || (i === 0 ? GraduationCap : i === 1 ? MapPin : i === 2 ? Briefcase : Building2);
               return (
-                <div key={c.id || i} className="contact-m3-card">
-                  <div className="contact-m3-card__header">
-                    <div className="contact-m3-card__icon-box">
-                      <Icon size={24} strokeWidth={2} />
+                <div key={c.id || i} className="contact-card-clean">
+                  <div className="contact-card-clean__top">
+                    <div className="contact-card-clean__icon">
+                      <Icon size={22} strokeWidth={2} />
                     </div>
-                    {c.slug && (
-                      <span className="contact-m3-card__badge">{c.slug}</span>
-                    )}
+                    {c.slug && <span className="contact-card-clean__badge">{c.slug}</span>}
                   </div>
 
-                  <h3 className="contact-m3-card__title">{c.title}</h3>
+                  <h3 className="contact-card-clean__title">{c.title}</h3>
 
-                  <div className="contact-m3-card__desc">
+                  <div className="contact-card-clean__body">
                     {c.desc.split('\n').map((line, idx) => {
                       const trimmed = line.trim();
                       const emailMatch = trimmed.match(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/);
@@ -345,10 +358,10 @@ export default function Contact() {
                       if (emailMatch) {
                         const email = emailMatch[1];
                         return (
-                          <div key={idx} className="contact-desc-line">
-                            <span>{trimmed.replace(email, '')}</span>
-                            <a href={`mailto:${email}`} className="contact-link contact-link--email">
-                              <Mail size={13} /> {email}
+                          <div key={idx} className="contact-line">
+                            <Mail size={13} className="contact-line-icon" />
+                            <a href={`mailto:${email}`} className="contact-link">
+                              {email}
                             </a>
                           </div>
                         );
@@ -356,70 +369,24 @@ export default function Contact() {
                       if (phoneMatch) {
                         const phone = phoneMatch[1];
                         return (
-                          <div key={idx} className="contact-desc-line">
-                            <span>{trimmed.replace(phone, '')}</span>
-                            <a href={`tel:${phone.replace(/\s+/g, '')}`} className="contact-link contact-link--phone">
-                              <PhoneCall size={13} /> {phone}
+                          <div key={idx} className="contact-line">
+                            <PhoneCall size={13} className="contact-line-icon" />
+                            <a href={`tel:${phone.replace(/\s+/g, '')}`} className="contact-link">
+                              {phone}
                             </a>
                           </div>
                         );
                       }
-                      return <p key={idx} className="contact-desc-plain">{line}</p>;
+                      return <p key={idx} className="contact-text">{line}</p>;
                     })}
                   </div>
 
                   {c.value && (
-                    <div className="contact-m3-card__timing">
-                      <Clock size={14} className="timing-icon" />
+                    <div className="contact-card-clean__timing">
+                      <Clock size={13} />
                       <span>{c.value}</span>
                     </div>
                   )}
-
-                  <div className="contact-m3-card__footer">
-                    <button 
-                      type="button" 
-                      className="contact-copy-btn"
-                      onClick={() => copyToClipboard(`${c.title}\n${c.desc}\n${c.value || ''}`, c.id)}
-                      title="Copy details"
-                    >
-                      {copiedId === c.id ? (
-                        <>
-                          <Check size={14} color="#1b4332" />
-                          <span style={{ color: '#1b4332' }}>Copied!</span>
-                        </>
-                      ) : (
-                        <>
-                          <Copy size={14} />
-                          <span>Copy Info</span>
-                        </>
-                      )}
-                    </button>
-
-                    {c.title.toLowerCase().includes('admissions') && (
-                      <a href="tel:+918816250864" className="contact-action-btn">
-                        <span>Call Desk</span>
-                        <Phone size={13} />
-                      </a>
-                    )}
-                    {c.title.toLowerCase().includes('placement') && (
-                      <a href="mailto:placements@vishnu.edu.in" className="contact-action-btn">
-                        <span>Email T&amp;P</span>
-                        <Mail size={13} />
-                      </a>
-                    )}
-                    {c.title.toLowerCase().includes('campus') && (
-                      <a href="#campus-map" className="contact-action-btn">
-                        <span>Directions</span>
-                        <Navigation size={13} />
-                      </a>
-                    )}
-                    {c.title.toLowerCase().includes('registrar') && (
-                      <a href="mailto:registrar@vishnu.edu.in" className="contact-action-btn">
-                        <span>Write Registrar</span>
-                        <Mail size={13} />
-                      </a>
-                    )}
-                  </div>
                 </div>
               );
             })}
@@ -427,33 +394,33 @@ export default function Contact() {
         </div>
       </section>
 
-      {/* ── Emergency & Campus Safety Helpline Strip ── */}
-      <section className="contact-emergency-strip" id="emergency-contacts" aria-label="Campus Safety Helplines">
+      {/* ── Emergency & Safety Helplines Strip ── */}
+      <section id="helplines" className="contact-emergency-strip" aria-label="Campus Safety Helplines" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
         <div className="container">
           <div className="emergency-box">
             <div className="emergency-box__left">
               <div className="emergency-icon-circle">
-                <ShieldAlert size={28} />
+                <ShieldAlert size={26} />
               </div>
               <div>
-                <h3 className="emergency-title">24x7 Women's Safety, Health &amp; Anti-Ragging Helplines</h3>
+                <h3 className="emergency-title">24x7 Women's Safety &amp; Helplines</h3>
                 <p className="emergency-sub">
-                  Immediate assistance is available round-the-clock for campus security, health emergencies, and grievance redressal.
+                  Round-the-clock emergency support for student security, health, and campus safety.
                 </p>
               </div>
             </div>
 
             <div className="emergency-box__numbers">
-              <a href="tel:18004250000" className="emergency-pill">
+              <a href="tel:18001805522" className="emergency-pill">
                 <span className="emergency-pill__label">Anti-Ragging Toll-Free</span>
                 <span className="emergency-pill__num">1800-180-5522</span>
               </a>
               <a href="tel:+918816250864" className="emergency-pill">
-                <span className="emergency-pill__label">Campus Security &amp; Safety</span>
+                <span className="emergency-pill__label">Campus Security</span>
                 <span className="emergency-pill__num">+91 8816 250864</span>
               </a>
               <a href="tel:+918816250869" className="emergency-pill">
-                <span className="emergency-pill__label">Health Centre &amp; Ambulance</span>
+                <span className="emergency-pill__label">Health Centre</span>
                 <span className="emergency-pill__num">+91 8816 250869</span>
               </a>
             </div>
@@ -461,25 +428,25 @@ export default function Contact() {
         </div>
       </section>
 
-      {/* ── Map, Transit & Form Section ── */}
-      <section className="contact-main-grid-section" id="send-message">
+      {/* ── Location, Travel & Message Form ── */}
+      <section className="contact-main-section">
         <div className="container">
-          <div className="contact-split-grid">
+          <div className="contact-grid-2col">
             
-            {/* Left Column: Interactive Map & Transit Guide */}
-            <div className="contact-left-col" id="campus-map">
-              <div className="contact-col-header">
+            {/* Left Column: Location & Travel Guide */}
+            <div id="map-directions" className="contact-left-card" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
+              <div className="section-head-left">
                 <span className="section-label">Visit Our Campus</span>
                 <h2 className="section-title">Location &amp; Travel Guide</h2>
                 <p className="section-subtitle">
-                  Situated in the lush green, serene environment of Bhimavaram, West Godavari District, Andhra Pradesh.
+                  Vishnu Women’s University is situated in the serene, green surroundings of Bhimavaram, West Godavari District, Andhra Pradesh. The University is located on the Bhimavaram–Tadepalligudem Road, with convenient access from Bhimavaram town via B. V. Raju Marg.
                 </p>
               </div>
 
-              {/* Map Embed Card */}
-              <div className="contact-map-card">
-                <div className="contact-map-top">
-                  <div className="contact-map-address">
+              {/* Map Embed Box */}
+              <div className="contact-map-box">
+                <div className="contact-map-header">
+                  <div className="contact-map-info">
                     <MapPin size={18} className="map-pin-icon" />
                     <div>
                       <strong>Vishnu Women's University</strong>
@@ -490,102 +457,89 @@ export default function Contact() {
                     href="https://maps.google.com/?q=16.568119,81.522098" 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="contact-map-btn"
+                    className="contact-map-link-btn"
                   >
-                    <span>Open in Google Maps</span>
-                    <ExternalLink size={14} />
+                    <span>Google Maps</span>
+                    <ExternalLink size={13} />
                   </a>
                 </div>
 
-                <div className="contact-iframe-container">
+                <div className="contact-iframe-wrap">
                   <iframe
-                    title="Vishnu Women's University Google Map"
+                    title="VWU Campus Location Map"
                     src="https://maps.google.com/maps?q=16.568119,81.522098&z=15&output=embed"
                     width="100%"
-                    height="320"
+                    height="280"
                     style={{ border: 0 }}
                     allowFullScreen
                     loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
                   />
                 </div>
               </div>
 
-              {/* Transit & Reach Guide Tabs */}
-              <div className="contact-transit-box">
+              {/* How to Reach Tabs */}
+              <div className="contact-transit-container">
                 <h3 className="transit-heading">How to Reach VWU Campus</h3>
                 
                 <div className="transit-tabs">
                   <button 
                     type="button" 
-                    className={`transit-tab ${activeTransitTab === 'train' ? 'transit-tab--active' : ''}`}
+                    className={`transit-tab ${activeTransitTab === 'train' ? 'active' : ''}`}
                     onClick={() => setActiveTransitTab('train')}
                   >
-                    <Train size={16} />
+                    <Train size={15} />
                     <span>By Train</span>
                   </button>
                   <button 
                     type="button" 
-                    className={`transit-tab ${activeTransitTab === 'air' ? 'transit-tab--active' : ''}`}
+                    className={`transit-tab ${activeTransitTab === 'air' ? 'active' : ''}`}
                     onClick={() => setActiveTransitTab('air')}
                   >
-                    <Plane size={16} />
+                    <Plane size={15} />
                     <span>By Air</span>
                   </button>
                   <button 
                     type="button" 
-                    className={`transit-tab ${activeTransitTab === 'road' ? 'transit-tab--active' : ''}`}
+                    className={`transit-tab ${activeTransitTab === 'road' ? 'active' : ''}`}
                     onClick={() => setActiveTransitTab('road')}
                   >
-                    <Bus size={16} />
-                    <span>By Bus &amp; Road</span>
+                    <Bus size={15} />
+                    <span>By Road</span>
                   </button>
                 </div>
 
-                <div className="transit-content">
+                <div className="transit-body">
                   {activeTransitTab === 'train' && (
-                    <div className="transit-panel">
+                    <div className="transit-info">
                       <p>
-                        <strong>Bhimavaram Town Station (BVRM)</strong> &amp; <strong>Bhimavaram Junction (BVRT)</strong> are located just <strong>3.8 km and 4.2 km</strong> from the campus. 
+                        <strong>Bhimavaram Town (BVRM)</strong> &amp; <strong>Junction (BVRT)</strong> stations are <strong>3.8 km and 4.2 km</strong> away. Autos and cabs operate continuously to campus.
                       </p>
-                      <ul className="transit-list">
-                        <li>Frequent trains from Vijayawada (BZA), Visakhapatnam (VSKP), Hyderabad, and Chennai.</li>
-                        <li>Auto-rickshaws, cabs, and campus shuttle services run continuously from both railway stations.</li>
-                      </ul>
                     </div>
                   )}
 
                   {activeTransitTab === 'air' && (
-                    <div className="transit-panel">
+                    <div className="transit-info">
                       <p>
-                        The campus is conveniently accessible via two major regional airports:
+                        <strong>Vijayawada International Airport (VGA):</strong> ~92 km (2 hrs drive).<br />
+                        <strong>Rajahmundry Domestic Airport (RJA):</strong> ~78 km (1.8 hrs drive).
                       </p>
-                      <ul className="transit-list">
-                        <li><strong>Vijayawada International Airport (VGA):</strong> ~92 km (approx. 2 hours via NH-16 / NH-216A).</li>
-                        <li><strong>Rajahmundry Domestic Airport (RJA):</strong> ~78 km (approx. 1.8 hours drive).</li>
-                        <li>Airport taxi and direct inter-city cabs are readily available round-the-clock.</li>
-                      </ul>
                     </div>
                   )}
 
                   {activeTransitTab === 'road' && (
-                    <div className="transit-panel">
+                    <div className="transit-info">
                       <p>
-                        Bhimavaram is well-linked by standard state highways (SH-63, NH-216A) and express bus corridors.
+                        Located on SH-63 / NH-216A. Direct APSRTC buses connect from Vijayawada, Guntur, Rajahmundry, Eluru, and Tanuku.
                       </p>
-                      <ul className="transit-list">
-                        <li>Direct APSRTC Ultra-Deluxe, Super-Luxury, and Express buses run from Vijayawada, Guntur, Rajahmundry, Eluru, and Tanuku.</li>
-                        <li>The university operates a dedicated fleet of 60+ GPS-tracked buses connecting all major towns in West &amp; East Godavari.</li>
-                      </ul>
                     </div>
                   )}
                 </div>
               </div>
 
-              {/* Social Channels Strip */}
-              <div className="contact-social-m3">
-                <h4 className="social-m3-title">Official Social Media Communities</h4>
-                <div className="social-m3-grid">
+              {/* Social Channels */}
+              <div className="contact-social-section">
+                <h4 className="social-heading">Connect via Official Channels</h4>
+                <div className="social-pills-wrap">
                   {socialLinks.map((s) => {
                     const meta = SOCIAL_META[s.title] || { label: s.title, color: '#1b4332', glyph: '●' };
                     return (
@@ -594,12 +548,10 @@ export default function Contact() {
                         href={s.value}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="social-m3-pill"
-                        style={{ '--hover-color': meta.color } as React.CSSProperties}
+                        className="social-pill"
                       >
-                        <span className="social-m3-glyph">{meta.glyph}</span>
                         <span>{meta.label}</span>
-                        <ExternalLink size={12} className="social-ext-icon" />
+                        <ExternalLink size={11} />
                       </a>
                     );
                   })}
@@ -607,191 +559,163 @@ export default function Contact() {
               </div>
             </div>
 
-            {/* Right Column: Google Material 3 Form */}
-            <div className="contact-right-col">
-              <div className="contact-form-card-m3">
-                <div className="form-header-m3">
-                  <span className="section-label">Direct Communication</span>
-                  <h2 className="form-title-m3">Send Us a Message</h2>
-                  <p className="form-sub-m3">
-                    Have questions about admissions, programs, eligibility, or campus life? Submit your enquiry below and our team will get back to you promptly.
-                  </p>
-                </div>
-
-                {submitted ? (
-                  <div className="form-success-m3">
-                    <div className="form-success-icon-box">
-                      <CheckCircle2 size={44} strokeWidth={2.2} />
-                    </div>
-                    <h3 className="form-success-title">Message Received!</h3>
-                    <p className="form-success-desc">
-                      Thank you for contacting Vishnu Women's University. Your enquiry has been routed to the respective department desk. One of our counselors will contact you within <strong>1–2 business days</strong>.
-                    </p>
-
-                    <div className="form-success-info">
-                      <div className="form-success-row">
-                        <span>Submitted By:</span>
-                        <strong>{form.name}</strong>
-                      </div>
-                      <div className="form-success-row">
-                        <span>Email Address:</span>
-                        <strong>{form.email}</strong>
-                      </div>
-                      <div className="form-success-row">
-                        <span>Category:</span>
-                        <strong>{form.category}</strong>
-                      </div>
-                    </div>
-
-                    <button
-                      type="button"
-                      className="m3-btn m3-btn--primary"
-                      onClick={() => {
-                        setForm(INITIAL_FORM);
-                        setErrors({});
-                        setSubmitError('');
-                        setSubmitted(false);
-                      }}
-                    >
-                      <span>Send Another Inquiry</span>
-                    </button>
-                  </div>
-                ) : (
-                  <form className="contact-form-m3" onSubmit={handleSubmit} noValidate>
-                    {/* Category Selection Chips */}
-                    <div className="form-group-m3">
-                      <label className="form-label-m3">Inquiry Category *</label>
-                      <div className="category-chip-grid">
-                        {CATEGORY_OPTIONS.map((cat) => (
-                          <button
-                            key={cat}
-                            type="button"
-                            className={`category-chip ${form.category === cat ? 'category-chip--selected' : ''}`}
-                            onClick={() => handleCategorySelect(cat)}
-                          >
-                            {form.category === cat && <Check size={13} strokeWidth={2.5} />}
-                            <span>{cat}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="form-row-2col">
-                      {/* Name */}
-                      <div className="form-group-m3">
-                        <label htmlFor="cf-name" className="form-label-m3">Full Name *</label>
-                        <input
-                          id="cf-name"
-                          name="name"
-                          type="text"
-                          placeholder="e.g. Ananya Sharma"
-                          value={form.name}
-                          onChange={handleChange}
-                          className={`form-input-m3 ${errors.name ? 'form-input--error' : ''}`}
-                          aria-invalid={!!errors.name}
-                        />
-                        {errors.name && <span className="form-error-msg">{errors.name}</span>}
-                      </div>
-
-                      {/* Email */}
-                      <div className="form-group-m3">
-                        <label htmlFor="cf-email" className="form-label-m3">Email Address *</label>
-                        <input
-                          id="cf-email"
-                          name="email"
-                          type="email"
-                          placeholder="ananya@example.com"
-                          value={form.email}
-                          onChange={handleChange}
-                          className={`form-input-m3 ${errors.email ? 'form-input--error' : ''}`}
-                          aria-invalid={!!errors.email}
-                        />
-                        {errors.email && <span className="form-error-msg">{errors.email}</span>}
-                      </div>
-                    </div>
-
-                    <div className="form-row-2col">
-                      {/* Phone */}
-                      <div className="form-group-m3">
-                        <label htmlFor="cf-phone" className="form-label-m3">Phone / Mobile</label>
-                        <input
-                          id="cf-phone"
-                          name="phone"
-                          type="tel"
-                          placeholder="+91 98765 43210"
-                          value={form.phone}
-                          onChange={handleChange}
-                          className={`form-input-m3 ${errors.phone ? 'form-input--error' : ''}`}
-                          aria-invalid={!!errors.phone}
-                        />
-                        {errors.phone && <span className="form-error-msg">{errors.phone}</span>}
-                      </div>
-
-                      {/* Subject */}
-                      <div className="form-group-m3">
-                        <label htmlFor="cf-subject" className="form-label-m3">Subject Summary *</label>
-                        <input
-                          id="cf-subject"
-                          name="subject"
-                          type="text"
-                          placeholder="e.g. B.Tech CSE Admission 2026 Details"
-                          value={form.subject}
-                          onChange={handleChange}
-                          className={`form-input-m3 ${errors.subject ? 'form-input--error' : ''}`}
-                          aria-invalid={!!errors.subject}
-                        />
-                        {errors.subject && <span className="form-error-msg">{errors.subject}</span>}
-                      </div>
-                    </div>
-
-                    {/* Message */}
-                    <div className="form-group-m3">
-                      <label htmlFor="cf-message" className="form-label-m3">Message Details *</label>
-                      <textarea
-                        id="cf-message"
-                        name="message"
-                        rows={5}
-                        placeholder="Please describe your enquiry, current qualification, or questions..."
-                        value={form.message}
-                        onChange={handleChange}
-                        className={`form-input-m3 form-textarea-m3 ${errors.message ? 'form-input--error' : ''}`}
-                        aria-invalid={!!errors.message}
-                      />
-                      {errors.message && <span className="form-error-msg">{errors.message}</span>}
-                    </div>
-
-                    {submitError && (
-                      <div className="form-alert-error">
-                        <AlertCircle size={18} className="alert-icon" />
-                        <span>{submitError}</span>
-                      </div>
-                    )}
-
-                    <button 
-                      type="submit" 
-                      className="m3-btn m3-btn--primary m3-btn--full" 
-                      disabled={submitting}
-                    >
-                      {submitting ? (
-                        <>
-                          <div className="m3-spinner" />
-                          <span>Sending Inquiry…</span>
-                        </>
-                      ) : (
-                        <>
-                          <span>Submit Message</span>
-                          <Send size={16} />
-                        </>
-                      )}
-                    </button>
-
-                    <div className="form-privacy-note">
-                      <FileCheck2 size={14} />
-                      <span>Your information is protected by our privacy policy and will only be used for responding to your inquiry.</span>
-                    </div>
-                  </form>
-                )}
+            {/* Right Column: Send Us a Message Form */}
+            <div id="send-message" className="contact-right-card" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
+              <div className="form-header-clean">
+                <span className="section-label">Direct Communication</span>
+                <h2 className="form-title-clean">Send Us a Message</h2>
+                <p className="form-sub-clean">
+                  Have questions regarding admissions, academics, or campus facilities? Submit your query below.
+                </p>
               </div>
+
+              {submitted ? (
+                <div className="form-success-clean">
+                  <div className="success-icon-box">
+                    <CheckCircle2 size={40} />
+                  </div>
+                  <h3>Message Received!</h3>
+                  <p>
+                    Thank you for contacting VWU. Your message has been routed. Our admissions team will reach out within <strong>1–2 business days</strong>.
+                  </p>
+                  <button
+                    type="button"
+                    className="clean-btn clean-btn--primary"
+                    onClick={() => {
+                      setForm(INITIAL_FORM);
+                      setErrors({});
+                      setSubmitError('');
+                      setSubmitted(false);
+                    }}
+                  >
+                    <span>Send Another Inquiry</span>
+                  </button>
+                </div>
+              ) : (
+                <form className="contact-form-clean" onSubmit={handleSubmit} noValidate>
+                  {/* Category Dropdown */}
+                  <div className="form-group-clean">
+                    <label htmlFor="cf-category" className="form-label-clean">Inquiry Category *</label>
+                    <select
+                      id="cf-category"
+                      name="category"
+                      value={form.category}
+                      onChange={handleChange}
+                      className="form-select-clean"
+                    >
+                      {CATEGORY_OPTIONS.map((cat) => (
+                        <option key={cat} value={cat}>{cat}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="form-row-2col">
+                    {/* Name */}
+                    <div className="form-group-clean">
+                      <label htmlFor="cf-name" className="form-label-clean">Full Name *</label>
+                      <input
+                        id="cf-name"
+                        name="name"
+                        type="text"
+                        placeholder="e.g. Ananya Sharma"
+                        value={form.name}
+                        onChange={handleChange}
+                        className={`form-input-clean ${errors.name ? 'form-input--error' : ''}`}
+                      />
+                      {errors.name && <span className="form-error-text">{errors.name}</span>}
+                    </div>
+
+                    {/* Email */}
+                    <div className="form-group-clean">
+                      <label htmlFor="cf-email" className="form-label-clean">Email Address *</label>
+                      <input
+                        id="cf-email"
+                        name="email"
+                        type="email"
+                        placeholder="ananya@example.com"
+                        value={form.email}
+                        onChange={handleChange}
+                        className={`form-input-clean ${errors.email ? 'form-input--error' : ''}`}
+                      />
+                      {errors.email && <span className="form-error-text">{errors.email}</span>}
+                    </div>
+                  </div>
+
+                  <div className="form-row-2col">
+                    {/* Phone */}
+                    <div className="form-group-clean">
+                      <label htmlFor="cf-phone" className="form-label-clean">Phone / Mobile</label>
+                      <input
+                        id="cf-phone"
+                        name="phone"
+                        type="tel"
+                        placeholder="+91 98765 43210"
+                        value={form.phone}
+                        onChange={handleChange}
+                        className={`form-input-clean ${errors.phone ? 'form-input--error' : ''}`}
+                      />
+                      {errors.phone && <span className="form-error-text">{errors.phone}</span>}
+                    </div>
+
+                    {/* Subject */}
+                    <div className="form-group-clean">
+                      <label htmlFor="cf-subject" className="form-label-clean">Subject *</label>
+                      <input
+                        id="cf-subject"
+                        name="subject"
+                        type="text"
+                        placeholder="e.g. Admission Query"
+                        value={form.subject}
+                        onChange={handleChange}
+                        className={`form-input-clean ${errors.subject ? 'form-input--error' : ''}`}
+                      />
+                      {errors.subject && <span className="form-error-text">{errors.subject}</span>}
+                    </div>
+                  </div>
+
+                  {/* Message */}
+                  <div className="form-group-clean">
+                    <label htmlFor="cf-message" className="form-label-clean">Message Details *</label>
+                    <textarea
+                      id="cf-message"
+                      name="message"
+                      rows={4}
+                      placeholder="Write your questions or message details here..."
+                      value={form.message}
+                      onChange={handleChange}
+                      className={`form-input-clean form-textarea-clean ${errors.message ? 'form-input--error' : ''}`}
+                    />
+                    {errors.message && <span className="form-error-text">{errors.message}</span>}
+                  </div>
+
+                  {submitError && (
+                    <div className="form-alert-error">
+                      <AlertCircle size={16} />
+                      <span>{submitError}</span>
+                    </div>
+                  )}
+
+                  <button 
+                    type="submit" 
+                    className="clean-btn clean-btn--primary clean-btn--full" 
+                    disabled={submitting}
+                  >
+                    {submitting ? (
+                      <span>Sending Message…</span>
+                    ) : (
+                      <>
+                        <span>Submit Inquiry</span>
+                        <Send size={15} />
+                      </>
+                    )}
+                  </button>
+
+                  <div className="form-privacy-note">
+                    <FileCheck2 size={13} />
+                    <span>Your details are protected under our university privacy policy.</span>
+                  </div>
+                </form>
+              )}
             </div>
 
           </div>
@@ -799,23 +723,23 @@ export default function Contact() {
       </section>
 
       {/* ── Searchable Department Directory ── */}
-      <section className="contact-dept-directory-section" id="department-directory">
+      <section id="department-directory" className="contact-dept-section" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
         <div className="container">
           <div className="dept-directory-header">
             <div>
               <span className="section-label">Academic &amp; Operational Heads</span>
               <h2 className="section-title">Department Directory</h2>
               <p className="section-subtitle">
-                Find contact details for Heads of Departments (HODs), academic cells, and administrative offices.
+                Contact information for Heads of Departments and evaluation cells.
               </p>
             </div>
 
             {/* Live Search Filter */}
             <div className="dept-search-box">
-              <Search size={18} className="dept-search-icon" />
+              <Search size={16} className="dept-search-icon" />
               <input
                 type="text"
-                placeholder="Search department, HOD, email..."
+                placeholder="Search department or HOD..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="dept-search-input"
@@ -826,7 +750,6 @@ export default function Contact() {
                   type="button" 
                   className="dept-search-clear" 
                   onClick={() => setSearchTerm('')}
-                  aria-label="Clear search"
                 >
                   ✕
                 </button>
@@ -834,47 +757,40 @@ export default function Contact() {
             </div>
           </div>
 
-          <div className="dept-directory-grid">
+          <div className="dept-grid-clean">
             {filteredDepts.map((d) => (
-              <div key={d.id} className="dept-m3-card">
-                <div className="dept-m3-card__top">
+              <div key={d.id} className="dept-card-clean">
+                <div className="dept-card-clean__header">
                   <div className="dept-avatar">
                     {d.dept.slice(0, 2).toUpperCase()}
                   </div>
-                  <div className="dept-title-box">
-                    <h3 className="dept-m3-card__title">{d.dept}</h3>
-                    <p className="dept-m3-card__hod">
-                      <strong>HOD / Lead:</strong> {d.hod}
+                  <div>
+                    <h3 className="dept-card-clean__title">{d.dept}</h3>
+                    <p className="dept-card-clean__hod">
+                      <strong>HOD / Lead:</strong> {d.hod?.toUpperCase()}
                     </p>
                   </div>
                 </div>
 
-                <div className="dept-m3-card__links">
-                  <a href={`mailto:${d.email}`} className="dept-link-btn" title={`Email ${d.email}`}>
-                    <Mail size={14} />
+                <div className="dept-card-clean__footer">
+                  <a href={`mailto:${d.email}`} className="dept-email-btn" title={`Email ${d.email}`}>
+                    <Mail size={13} />
                     <span>{d.email}</span>
                   </a>
-
-                  {d.phone && (
-                    <a href={`tel:${d.phone.replace(/\s+/g, '')}`} className="dept-link-btn dept-link-btn--phone" title={`Call ${d.phone}`}>
-                      <Phone size={14} />
-                      <span>{d.phone}</span>
-                    </a>
-                  )}
                 </div>
               </div>
             ))}
 
             {filteredDepts.length === 0 && (
               <div className="dept-empty-state">
-                <Search size={32} className="empty-icon" />
-                <p>No departments matched "<strong>{searchTerm}</strong>". Try clearing your search.</p>
+                <Search size={28} />
+                <p>No departments matched "<strong>{searchTerm}</strong>".</p>
                 <button 
                   type="button" 
-                  className="m3-btn m3-btn--tonal m3-btn--sm"
+                  className="clean-btn clean-btn--sm"
                   onClick={() => setSearchTerm('')}
                 >
-                  Clear Search Filter
+                  Clear Filter
                 </button>
               </div>
             )}

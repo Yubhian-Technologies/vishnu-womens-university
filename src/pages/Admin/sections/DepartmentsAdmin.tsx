@@ -52,6 +52,11 @@ export interface DepartmentDoc {
   heroImage?: string;
   storagePath?: string;
   about?: string;
+  // Optional override for the hero subtitle on the department detail pages —
+  // falls back to getDepartmentTagline()'s hardcoded copy when unset. Not
+  // exposed as its own admin form field (yet); kept so a doc that already
+  // has one (or is set directly in Firestore) still overrides the default.
+  tagline?: string;
   // Same shape/purpose as a programme's own (see ProgramsAdmin) — shown
   // right below "About the Department" on the grouped department page,
   // filling the space that used to be empty next to the Quick Links sidebar

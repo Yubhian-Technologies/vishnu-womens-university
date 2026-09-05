@@ -14,6 +14,7 @@ import GoverningBodyAdmin from './sections/GoverningBodyAdmin';
 import CoreExecutivesAdmin from './sections/CoreExecutivesAdmin';
 import PlacementYearsAdmin from './sections/PlacementYearsAdmin';
 import PlacementHighlightsAdmin from './sections/PlacementHighlightsAdmin';
+import HonouredGuestsAdmin from './sections/HonouredGuestsAdmin';
 import AlumniAdmin from './sections/AlumniAdmin';
 import AnnouncementsAdmin from './sections/AnnouncementsAdmin';
 import InformationAdmin from './sections/InformationAdmin';
@@ -103,6 +104,7 @@ const SECTION_MAP: Record<string, React.ReactNode> = {
   'core-executives': <CoreExecutivesAdmin />,
   placements: <PlacementYearsAdmin />,
   'placement-highlights': <PlacementHighlightsAdmin />,
+  'honoured-guests': <HonouredGuestsAdmin />,
   alumni: <AlumniAdmin />,
   announcements: <AnnouncementsAdmin />,
   information: <InformationAdmin />,

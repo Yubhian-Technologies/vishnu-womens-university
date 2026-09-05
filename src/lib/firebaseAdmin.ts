@@ -1,22 +1,57 @@
-import type { Auth } from 'firebase/auth';
+import type { Auth, ConfirmationResult } from 'firebase/auth';
 import type { FirebaseStorage } from 'firebase/storage';
 import { app } from './firebase';
 
-// firebase/auth and firebase/storage are only needed by /admin (login gate +
-// image/PDF uploads), never by the public site. Loading them via a genuine
-// dynamic import() — rather than a static top-level import — is what
-// actually keeps them out of the public bundle: a static import gets pulled
-// into whatever manualChunks bucket Rollup assigns it to, and that bucket
-// then gets statically referenced from every page chunk that shares any
-// build-time link to it. A dynamic import() always creates its own
-// load-on-demand chunk regardless of manualChunks config, so these only ever
-// download once something under /admin actually calls one of these getters.
+// firebase/auth and firebase/storage used to be needed only by /admin (login
+// gate + image/PDF uploads); AdmissionApplyForm's mobile-OTP verification
+// (the public "Curious to Know More?" form) now uses the auth half too.
+// Loading it via a genuine dynamic import() — rather than a static top-level
+// import — is what keeps it out of every OTHER public page's bundle: a
+// static import gets pulled into whatever manualChunks bucket Rollup assigns
+// it to, and that bucket then gets statically referenced from every page
+// chunk that shares any build-time link to it. A dynamic import() always
+// creates its own load-on-demand chunk regardless of manualChunks config, so
+// this only ever downloads once something that actually needs auth (an
+// /admin page, or the apply/admissions forms) calls one of these functions.
 let authPromise: Promise<Auth> | null = null;
 export function getFirebaseAuth(): Promise<Auth> {
   if (!authPromise) {
     authPromise = import('firebase/auth').then(({ getAuth }) => getAuth(app));
   }
   return authPromise;
+}
+
+/**
+ * Sends a real SMS OTP to `phoneE164` (e.g. "+919876543210") via Firebase
+ * Phone Auth, using an invisible reCAPTCHA bound to the element with id
+ * `containerId`. Requires the "Phone" sign-in provider to be turned on in
+ * the Firebase console (Authentication → Sign-in method) — until then this
+ * rejects with `auth/operation-not-allowed`.
+ */
+export async function sendPhoneOtp(phoneE164: string, containerId: string): Promise<ConfirmationResult> {
+  const [{ RecaptchaVerifier, signInWithPhoneNumber }, auth] = await Promise.all([
+    import('firebase/auth'),
+    getFirebaseAuth(),
+  ]);
+  const verifier = new RecaptchaVerifier(auth, containerId, { size: 'invisible' });
+  try {
+    return await signInWithPhoneNumber(auth, phoneE164, verifier);
+  } finally {
+    // The widget's job is done once signInWithPhoneNumber resolves/rejects —
+    // confirming the code later needs only the ConfirmationResult, not the
+    // verifier. Clearing it now (rather than leaving it mounted) avoids
+    // "reCAPTCHA has already been rendered in this element" if the applicant
+    // has to resend or retry with a different number.
+    verifier.clear();
+  }
+}
+
+/** Ends the phone-auth session Firebase creates once an OTP is confirmed —
+ *  this form only ever needed that as a one-time ownership check, not a
+ *  standing account, so nothing stays signed in after a submission. */
+export async function logoutFirebaseAuth(): Promise<void> {
+  const [{ signOut }, auth] = await Promise.all([import('firebase/auth'), getFirebaseAuth()]);
+  return signOut(auth);
 }
 
 let storagePromise: Promise<FirebaseStorage> | null = null;

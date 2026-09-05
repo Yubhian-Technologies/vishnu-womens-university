@@ -12,6 +12,7 @@ type CoreExecutiveDoc = CoreExecutiveMember & { storagePath?: string };
 
 const EMPTY: Omit<CoreExecutiveDoc, 'id'> = {
   name: '', role: '', photoUrl: '', storagePath: '', order: 0, level: 1,
+  qualification: '', experience: '', email: '', bio: '',
 };
 
 export default function CoreExecutivesAdmin() {
@@ -46,7 +47,10 @@ export default function CoreExecutivesAdmin() {
 
   const startEdit = (m: CoreExecutiveDoc) => {
     setEditing(m.id);
-    setForm({ name: m.name, role: m.role, photoUrl: m.photoUrl || '', storagePath: m.storagePath || '', order: m.order, level: m.level || 1 });
+    setForm({
+      name: m.name, role: m.role, photoUrl: m.photoUrl || '', storagePath: m.storagePath || '', order: m.order, level: m.level || 1,
+      qualification: m.qualification || '', experience: m.experience || '', email: m.email || '', bio: m.bio || '',
+    });
   };
 
   const remove = async (id: string) => {
@@ -103,6 +107,22 @@ export default function CoreExecutivesAdmin() {
               <option value={2}>Level 2</option>
               <option value={3}>Level 3</option>
             </select>
+          </div>
+          <div className="admin-field">
+            <label htmlFor="field-qualification">Qualification (shown on hover)</label>
+            <input id="field-qualification" value={form.qualification || ''} onChange={(e) => set('qualification', e.target.value)} placeholder="Ph.D. in Computer Science" />
+          </div>
+          <div className="admin-field">
+            <label htmlFor="field-experience">Experience (shown on hover)</label>
+            <input id="field-experience" value={form.experience || ''} onChange={(e) => set('experience', e.target.value)} placeholder="20+ years in academia" />
+          </div>
+          <div className="admin-field">
+            <label htmlFor="field-email">Email (shown on hover)</label>
+            <input id="field-email" type="email" value={form.email || ''} onChange={(e) => set('email', e.target.value)} placeholder="name@vwu.edu.in" />
+          </div>
+          <div className="admin-field" style={{ gridColumn: '1 / -1' }}>
+            <label htmlFor="field-bio">Short Bio (shown on hover)</label>
+            <textarea id="field-bio" rows={3} value={form.bio || ''} onChange={(e) => set('bio', e.target.value)} placeholder="A brief note about this executive's role and contribution." />
           </div>
         </div>
         <div className="admin-form-actions">

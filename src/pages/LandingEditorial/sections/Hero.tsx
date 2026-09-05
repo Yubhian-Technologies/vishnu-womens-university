@@ -74,7 +74,7 @@ export default function Hero({ imageUrl, imageAlt, videoUrl }: Props) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.4 }}
         >
-          <Link to="/admissions" className="lpe-btn lpe-btn--gold">Apply Now</Link>
+          <Link to="/apply-now" className="lpe-btn lpe-btn--gold">Apply Now</Link>
           <Link to="/academics" className="lpe-btn lpe-btn--outline-light">Explore Programs</Link>
         </motion.div>
       </div>

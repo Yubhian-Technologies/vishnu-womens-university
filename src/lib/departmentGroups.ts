@@ -71,6 +71,18 @@ export const DEPARTMENT_GROUPS: DepartmentGroup[] = [
   { key: 'cse', deptShortCode: 'CSE', programSlugs: ['cse', 'cyber-security', 'mtech-cse', 'mtech-software-engineering'], facultyDepartments: ['CSE'] },
   { key: 'ece', deptShortCode: 'ECE', programSlugs: ['ece', 'EVT', 'mtech-vlsi'], facultyDepartments: ['ECE'] },
   { key: 'mechanical', deptShortCode: 'ME', programSlugs: ['me'], facultyDepartments: ['Mechanical', 'ME'] },
+  // Single-program departments grouped purely to get the same
+  // DepartmentDetail.tsx page (About / Vision & Mission / HOD / Faculty /
+  // Laboratories / R&D / Placements / News & Events) as the others above,
+  // same reasoning as Mechanical — the "Choose a Programme" toggle just
+  // collapses to a single entry. facultyDepartments lists a couple of
+  // plausible variants defensively (matches this file's existing pattern);
+  // if a department's `faculty` docs use a different `department` tag,
+  // its Faculty section will simply stay hidden until that's corrected here.
+  { key: 'eee', deptShortCode: 'EEE', programSlugs: ['eee'], facultyDepartments: ['EEE', 'Electrical & Electronics Engineering'] },
+  { key: 'ce', deptShortCode: 'CE', programSlugs: ['ce'], facultyDepartments: ['CE', 'Civil', 'Civil Engineering'] },
+  { key: 'it', deptShortCode: 'IT', programSlugs: ['IT'], facultyDepartments: ['IT', 'Information Technology'] },
+  { key: 'mba', deptShortCode: 'MBA', programSlugs: ['mba'], facultyDepartments: ['MBA', 'Management Studies'] },
 ];
 
 /** Every program slug that belongs to a grouped department. */

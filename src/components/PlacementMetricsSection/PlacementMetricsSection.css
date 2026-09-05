@@ -1,0 +1,200 @@
+.vwu-placement-metrics-section {
+  position: relative;
+  padding: 4.5rem 0 4rem;
+  background: #ffffff;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(11, 30, 66, 0.06);
+}
+
+/* ── Header ── */
+.vwu-pm-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 3.5rem;
+  margin-bottom: 3.5rem;
+}
+
+.vwu-pm-badge-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex-shrink: 0;
+  padding-top: 0.35rem;
+}
+
+.vwu-pm-badge {
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #0B1E42;
+  text-transform: uppercase;
+}
+
+.vwu-pm-badge-swash {
+  margin-top: 2px;
+}
+
+.vwu-pm-header-content {
+  flex: 1;
+  max-width: 820px;
+}
+
+.vwu-pm-title {
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: 2.15rem;
+  font-weight: 800;
+  line-height: 1.25;
+  color: #0B1E42;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.02em;
+}
+
+.vwu-pm-title-main {
+  display: block;
+  font-size: 2.4rem;
+}
+
+.vwu-pm-title-sub {
+  font-weight: 700;
+  color: #0B1E42;
+}
+
+.vwu-pm-desc {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #4A5568;
+  max-width: 780px;
+  margin: 0;
+}
+
+/* ── 4 Circular Cards Grid ── */
+.vwu-pm-circles-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+  align-items: center;
+  justify-items: center;
+}
+
+.vwu-pm-circle-card {
+  width: 100%;
+  max-width: 250px;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  border: 1.5px solid rgba(11, 30, 66, 0.15);
+  background: #ffffff;
+  box-shadow: 0 4px 20px rgba(11, 30, 66, 0.02);
+  transition: transform 0.35s cubic-bezier(0.2, 0, 0, 1),
+              border-color 0.35s cubic-bezier(0.2, 0, 0, 1),
+              box-shadow 0.35s cubic-bezier(0.2, 0, 0, 1);
+  cursor: default;
+}
+
+.vwu-pm-circle-card:hover {
+  transform: translateY(-6px);
+  border-color: #C9973A;
+  box-shadow: 0 16px 36px rgba(11, 30, 66, 0.08);
+}
+
+.vwu-pm-circle-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 100%;
+  width: 100%;
+  padding: 1.5rem;
+  box-sizing: border-box;
+}
+
+.vwu-pm-circle-val {
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #0B1E42;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.vwu-pm-circle-bold {
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0B1E42;
+  margin-top: 0.6rem;
+  margin-bottom: 0.15rem;
+  line-height: 1.25;
+}
+
+.vwu-pm-circle-sub {
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: #4A5568;
+  line-height: 1.35;
+  display: block;
+}
+
+/* ── Entry Animation ── */
+.vwu-pm-circles-grid .vwu-pm-circle-card {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.vwu-pm-circles-grid.is-in-view .vwu-pm-circle-card {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.vwu-pm-circles-grid.is-in-view .vwu-pm-circle-card:hover {
+  transform: translateY(-6px);
+}
+
+/* ── Responsive Layouts ── */
+@media (max-width: 1024px) {
+  .vwu-pm-header {
+    gap: 2rem;
+  }
+  .vwu-pm-title {
+    font-size: 1.85rem;
+  }
+  .vwu-pm-title-main {
+    font-size: 2.1rem;
+  }
+  .vwu-pm-circles-grid {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 540px;
+    margin: 0 auto;
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .vwu-pm-header {
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+  }
+  .vwu-pm-title {
+    font-size: 1.5rem;
+  }
+  .vwu-pm-title-main {
+    font-size: 1.8rem;
+  }
+  .vwu-pm-circles-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+  .vwu-pm-circle-val {
+    font-size: 1.65rem;
+  }
+  .vwu-pm-circle-bold {
+    font-size: 0.85rem;
+    margin-top: 0.35rem;
+  }
+  .vwu-pm-circle-sub {
+    font-size: 0.75rem;
+  }
+}
