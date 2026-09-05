@@ -8,8 +8,9 @@ import { findPackageColumnIndex, findCompanyColumnIndex, formatPackageCell, type
 import { parsePlacementsFile, dedupePlacementRows, validatePlacementsImport, type PlacementImportResult } from '../../../lib/placementsImport';
 import type { InternshipYearRecord } from '../../../lib/internshipRecords';
 import { parseInternshipsFile, dedupeInternshipRows, validateInternshipsImport, type InternshipImportResult } from '../../../lib/internshipsImport';
-import RndTableEditor, { type RndStructuredTable } from './RndTableEditor';
-import type { RndLink, NewsletterYear } from './ProgramsAdmin';
+import RndTableEditor from './RndTableEditor';
+import type { NewsletterYear, RndYear } from './ProgramsAdmin';
+import { resolveRndYears } from '../../../components/RndSection/RndSection';
 import type { DepartmentDoc } from './DepartmentsAdmin';
 
 // Placements, Internships, Research & Development, and Newsletter — all four
@@ -1052,54 +1053,61 @@ export function InternshipYearsEditor({ department }: { department: DepartmentDo
 }
 
 // Research & Development (Funded Projects & Patents) for one department —
-// shared across every programme it groups. Stages locally in this
-// component's own state (reset from `department` whenever a different
-// department is opened) and commits via its own "Save Research &
-// Development" button — same type-then-save shape as before, just scoped to
-// this section. Fields/shapes on the `programs/{id}` doc: rndIntro/
-// rndTableText/rndProjectsText/rndLinks/rndStructuredTable.
+// shared across every programme it groups, organized by Academic Year (one
+// entry per year, each with its own Overview/Table/Cards/Links/Structured
+// Table — same five optional fields the old flat block had). Stages locally
+// in this component's own state (reset from `department` whenever a
+// different department is opened) and commits via its own "Save Research &
+// Development" button. Writes `departments/{id}.rndYears` exclusively;
+// resolveRndYears() seeds this from any pre-Academic-Year flat data the
+// first time a department without rndYears yet is opened (see
+// DepartmentsAdmin.tsx's startEdit()), so nothing already entered is lost.
 export function RndEditor({ department }: { department: DepartmentDoc }) {
-  const [rndIntro, setRndIntro] = useState(department.rndIntro || '');
-  const [rndTableText, setRndTableText] = useState(department.rndTableText || '');
-  const [rndProjectsText, setRndProjectsText] = useState(department.rndProjectsText || '');
-  const [rndLinks, setRndLinks] = useState<RndLink[]>(department.rndLinks || []);
-  const [rndStructuredTable, setRndStructuredTable] = useState<RndStructuredTable>(department.rndStructuredTable || { columns: [], rows: [] });
+  const [years, setYears] = useState<RndYear[]>(resolveRndYears(department));
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  // Re-sync from the department whenever a different one is opened in
-  // DepartmentsAdmin (or after this department's own save resolves — no-op
-  // there since state already matches).
   useEffect(() => {
-    setRndIntro(department.rndIntro || '');
-    setRndTableText(department.rndTableText || '');
-    setRndProjectsText(department.rndProjectsText || '');
-    setRndLinks(department.rndLinks || []);
-    setRndStructuredTable(department.rndStructuredTable || { columns: [], rows: [] });
+    setYears(resolveRndYears(department));
     setDirty(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [department.id]);
 
-  const addRndLink = () => { setRndLinks((l) => [...l, { label: '' }]); setDirty(true); };
-  const updateRndLinkLabel = (li: number, label: string) => { setRndLinks((l) => l.map((x, i) => (i === li ? { ...x, label } : x))); setDirty(true); };
-  const moveRndLink = (li: number, dir: -1 | 1) => {
-    setRndLinks((l) => {
-      const target = li + dir;
-      if (target < 0 || target >= l.length) return l;
-      const next = [...l];
-      [next[li], next[target]] = [next[target], next[li]];
-      return next;
-    });
-    setDirty(true);
+  const update = (next: RndYear[]) => { setYears(next); setDirty(true); };
+
+  const addRndYear = () => update([...years, { year: '' }]);
+  const updateRndYearLabel = (yi: number, year: string) => update(years.map((y, i) => (i === yi ? { ...y, year } : y)));
+  const updateRndYearField = <K extends keyof RndYear>(yi: number, field: K, value: RndYear[K]) =>
+    update(years.map((y, i) => (i === yi ? { ...y, [field]: value } : y)));
+  const moveRndYear = (yi: number, dir: -1 | 1) => {
+    const next = [...years];
+    const target = yi + dir;
+    if (target < 0 || target >= next.length) return;
+    [next[yi], next[target]] = [next[target], next[yi]];
+    update(next);
   };
-  const removeRndLink = (li: number) => { setRndLinks((l) => l.filter((_, i) => i !== li)); setDirty(true); };
-  const handleRndLinkPdf = (li: number, r: UploadResult) => { setRndLinks((l) => l.map((x, i) => (i === li ? { ...x, pdfUrl: r.url, pdfStoragePath: r.path } : x))); setDirty(true); };
-  const removeRndLinkPdf = (li: number) => { setRndLinks((l) => l.map((x, i) => (i === li ? { ...x, pdfUrl: '', pdfStoragePath: '' } : x))); setDirty(true); };
+  const removeRndYear = (yi: number) => update(years.filter((_, i) => i !== yi));
+
+  const addRndLink = (yi: number) => updateRndYearField(yi, 'links', [...(years[yi].links || []), { label: '' }]);
+  const updateRndLinkLabel = (yi: number, li: number, label: string) =>
+    updateRndYearField(yi, 'links', (years[yi].links || []).map((x, i) => (i === li ? { ...x, label } : x)));
+  const moveRndLink = (yi: number, li: number, dir: -1 | 1) => {
+    const links = [...(years[yi].links || [])];
+    const target = li + dir;
+    if (target < 0 || target >= links.length) return;
+    [links[li], links[target]] = [links[target], links[li]];
+    updateRndYearField(yi, 'links', links);
+  };
+  const removeRndLink = (yi: number, li: number) => updateRndYearField(yi, 'links', (years[yi].links || []).filter((_, i) => i !== li));
+  const handleRndLinkPdf = (yi: number, li: number, r: UploadResult) =>
+    updateRndYearField(yi, 'links', (years[yi].links || []).map((x, i) => (i === li ? { ...x, pdfUrl: r.url, pdfStoragePath: r.path } : x)));
+  const removeRndLinkPdf = (yi: number, li: number) =>
+    updateRndYearField(yi, 'links', (years[yi].links || []).map((x, i) => (i === li ? { ...x, pdfUrl: '', pdfStoragePath: '' } : x)));
 
   const save = async () => {
     setSaving(true);
     try {
-      await updateDoc(doc(db, 'departments', department.id), { rndIntro, rndTableText, rndProjectsText, rndLinks, rndStructuredTable });
+      await updateDoc(doc(db, 'departments', department.id), { rndYears: years });
       setDirty(false);
     } catch (e) {
       alert(`Couldn't save: ${(e as Error).message}`);
@@ -1107,99 +1115,111 @@ export function RndEditor({ department }: { department: DepartmentDoc }) {
       setSaving(false);
     }
   };
-  const discard = () => {
-    setRndIntro(department.rndIntro || '');
-    setRndTableText(department.rndTableText || '');
-    setRndProjectsText(department.rndProjectsText || '');
-    setRndLinks(department.rndLinks || []);
-    setRndStructuredTable(department.rndStructuredTable || { columns: [], rows: [] });
-    setDirty(false);
-  };
+  const discard = () => { setYears(resolveRndYears(department)); setDirty(false); };
 
   return (
     <div>
       <h3 style={{ fontSize: '0.95rem', margin: '0 0 0.5rem' }}>Research &amp; Development — {department.title}</h3>
       <p className="admin-field__hint" style={{ marginBottom: '1rem' }}>
         Optional. Shown as a "Research &amp; Development (Funded Projects &amp; Patents)" section (and Quick
-        Links entry) on every programme's page this department groups — shared, not per-programme. Real
-        department R&amp;D pages vary a lot — use whichever of the five fields below fit this department's actual
-        content; only the ones you fill in will show.
+        Links entry) on every programme's page this department groups — shared, not per-programme. Add an
+        Academic Year, then use whichever of the five fields fit that year's actual content; only the ones you
+        fill in will show, and years with more than one filled in show a year-pill switcher on the public page.
       </p>
-      <div className="admin-field">
-        <label htmlFor="field-rnd-intro">Overview (optional)</label>
-        <textarea id="field-rnd-intro" rows={3} value={rndIntro} onChange={(e) => { setRndIntro(e.target.value); setDirty(true); }} placeholder="An introductory paragraph, e.g. project background, campus context, or a general statement about the department's research focus." />
-      </div>
-      <div className="admin-field" style={{ marginTop: '1rem' }}>
-        <label>Table (optional — for a flat table like Patents: Application No. | Title | Proof). Start a
-          section with <code>## Section Title</code> (optional if there's only one table), then a header row and
-          data rows, all pipe-separated — the first line under a section becomes the column headers.</label>
-        <textarea
-          rows={6}
-          value={rndTableText}
-          onChange={(e) => { setRndTableText(e.target.value); setDirty(true); }}
-          placeholder={'## Patents\nApplication No. | Title | Proof\n202441093677 | Home safety and guidance system... | https://...\n6335941 | Novel Display Design for Immersive VR | https://...'}
-        />
-      </div>
-      <div className="admin-field" style={{ marginTop: '1rem' }}>
-        <label>Detailed Project / Patent Cards (optional — for entries with several labeled fields, e.g. a
-          granted patent's invention title, patent number, grant date, inventor). Start each category with{' '}
-          <code>## Category</code> (e.g. <code>## Patents Granted</code>), each entry with{' '}
-          <code>### Title</code>, then <code>Label: value</code> lines for its fields, and{' '}
-          <code>- bullet text</code> lines for an optional Outcome list.</label>
-        <textarea
-          rows={8}
-          value={rndProjectsText}
-          onChange={(e) => { setRndProjectsText(e.target.value); setDirty(true); }}
-          placeholder={'## Funds from AICTE\n### Dictated Note Printer in Braille for Blind with Cyber Physical System\nReference: DST/SEED/TIDE/2023/1131 (C)\nAmount: Rs. 34,24,523/- (2025)\n\n## Patents Granted\n### Machine Learning Based DC-DC Converter\nPatent Number: 202441093677\nApplication Number: 202441093677\nGrant Date: 12-03-2025\nInventor: Dr. G Srinivasa Rao'}
-        />
-      </div>
-      <div className="admin-field" style={{ marginTop: '1rem' }}>
-        <label className="admin-field__hint" style={{ display: 'block', marginBottom: '0.5rem' }}>PDF-only Links (optional — for a department that just wants to link out to a couple of PDFs, e.g. "Funded R&amp;D Projects" / "In-house R&amp;D Projects").</label>
-        {rndLinks.map((link, li) => (
-          <div key={li} style={{ border: '1.5px solid var(--color-light-gray)', borderRadius: 8, padding: '0.75rem', marginBottom: '0.75rem' }}>
-            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.6rem' }}>
-              <input
-                value={link.label}
-                onChange={(e) => updateRndLinkLabel(li, e.target.value)}
-                placeholder="Link name, e.g. Funded Project – AICTE RPS 2023"
-                style={{ flex: 1, fontWeight: 700 }}
-              />
-              <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveRndLink(li, -1)} disabled={li === 0} title="Move up">↑</button>
-              <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveRndLink(li, 1)} disabled={li === rndLinks.length - 1} title="Move down">↓</button>
-              <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeRndLink(li)}>Remove Link</button>
-            </div>
-            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
-              <div style={{ maxWidth: 260 }}>
-                <FileUploader
-                  folder="vwu/programs/rnd"
-                  currentUrl={link.pdfUrl}
-                  onUploaded={(r) => handleRndLinkPdf(li, r)}
-                  label="Upload PDF"
-                />
-              </div>
-              {link.pdfUrl && (
-                <button type="button" className="admin-btn admin-btn--ghost admin-btn--sm" onClick={() => removeRndLinkPdf(li)}>
-                  Remove PDF
-                </button>
-              )}
-            </div>
+      {years.map((yr, yi) => (
+        <div key={yi} style={{ border: '1.5px solid var(--color-light-gray)', borderRadius: 8, padding: '0.75rem', marginBottom: '0.75rem' }}>
+          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.75rem' }}>
+            <input
+              value={yr.year}
+              onChange={(e) => updateRndYearLabel(yi, e.target.value)}
+              placeholder="2025-26"
+              style={{ flex: 1, fontWeight: 700 }}
+            />
+            <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveRndYear(yi, -1)} disabled={yi === 0} title="Move up">↑</button>
+            <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveRndYear(yi, 1)} disabled={yi === years.length - 1} title="Move down">↓</button>
+            <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeRndYear(yi)}>Remove Year</button>
           </div>
-        ))}
-        <button type="button" className="admin-btn admin-btn--primary" onClick={addRndLink}>+ Add Link</button>
-        {rndLinks.length === 0 && (
-          <p className="admin-field__hint">No links yet — click "Add Link" to start building this programme's Research &amp; Development list.</p>
-        )}
-      </div>
-      <div className="admin-field" style={{ marginTop: '1rem' }}>
-        <label className="admin-field__hint" style={{ display: 'block', marginBottom: '0.5rem' }}>
-          Structured Table (optional — a table with columns you add yourself, where each row also has its own
-          uploaded PDF, e.g. a Patents table where every row links to that patent's own document).
-        </label>
-        <RndTableEditor
-          table={rndStructuredTable}
-          onChange={(t) => { setRndStructuredTable(t); setDirty(true); }}
-        />
-      </div>
+          <div className="admin-field">
+            <label htmlFor={`field-rnd-intro-${yi}`}>Overview (optional)</label>
+            <textarea id={`field-rnd-intro-${yi}`} rows={3} value={yr.intro || ''} onChange={(e) => updateRndYearField(yi, 'intro', e.target.value)} placeholder="An introductory paragraph, e.g. project background, campus context, or a general statement about the department's research focus." />
+          </div>
+          <div className="admin-field" style={{ marginTop: '1rem' }}>
+            <label>Table (optional — for a flat table like Patents: Application No. | Title | Proof). Start a
+              section with <code>## Section Title</code> (optional if there's only one table), then a header row
+              and data rows, all pipe-separated — the first line under a section becomes the column headers.</label>
+            <textarea
+              rows={6}
+              value={yr.tableText || ''}
+              onChange={(e) => updateRndYearField(yi, 'tableText', e.target.value)}
+              placeholder={'## Patents\nApplication No. | Title | Proof\n202441093677 | Home safety and guidance system... | https://...\n6335941 | Novel Display Design for Immersive VR | https://...'}
+            />
+          </div>
+          <div className="admin-field" style={{ marginTop: '1rem' }}>
+            <label>Detailed Project / Patent Cards (optional — for entries with several labeled fields, e.g. a
+              granted patent's invention title, patent number, grant date, inventor). Start each category with{' '}
+              <code>## Category</code> (e.g. <code>## Patents Granted</code>), each entry with{' '}
+              <code>### Title</code>, then <code>Label: value</code> lines for its fields, and{' '}
+              <code>- bullet text</code> lines for an optional Outcome list.</label>
+            <textarea
+              rows={8}
+              value={yr.projectsText || ''}
+              onChange={(e) => updateRndYearField(yi, 'projectsText', e.target.value)}
+              placeholder={'## Funds from AICTE\n### Dictated Note Printer in Braille for Blind with Cyber Physical System\nReference: DST/SEED/TIDE/2023/1131 (C)\nAmount: Rs. 34,24,523/- (2025)\n\n## Patents Granted\n### Machine Learning Based DC-DC Converter\nPatent Number: 202441093677\nApplication Number: 202441093677\nGrant Date: 12-03-2025\nInventor: Dr. G Srinivasa Rao'}
+            />
+          </div>
+          <div className="admin-field" style={{ marginTop: '1rem' }}>
+            <label className="admin-field__hint" style={{ display: 'block', marginBottom: '0.5rem' }}>PDF-only Links (optional — for a department that just wants to link out to a couple of PDFs, e.g. "Funded R&amp;D Projects" / "In-house R&amp;D Projects").</label>
+            {(yr.links || []).map((link, li) => (
+              <div key={li} style={{ border: '1.5px solid var(--color-light-gray)', borderRadius: 8, padding: '0.75rem', marginBottom: '0.75rem' }}>
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.6rem' }}>
+                  <input
+                    value={link.label}
+                    onChange={(e) => updateRndLinkLabel(yi, li, e.target.value)}
+                    placeholder="Link name, e.g. Funded Project – AICTE RPS 2023"
+                    style={{ flex: 1, fontWeight: 700 }}
+                  />
+                  <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveRndLink(yi, li, -1)} disabled={li === 0} title="Move up">↑</button>
+                  <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveRndLink(yi, li, 1)} disabled={li === (yr.links || []).length - 1} title="Move down">↓</button>
+                  <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeRndLink(yi, li)}>Remove Link</button>
+                </div>
+                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                  <div style={{ maxWidth: 260 }}>
+                    <FileUploader
+                      folder="vwu/programs/rnd"
+                      currentUrl={link.pdfUrl}
+                      onUploaded={(r) => handleRndLinkPdf(yi, li, r)}
+                      label="Upload PDF"
+                    />
+                  </div>
+                  {link.pdfUrl && (
+                    <button type="button" className="admin-btn admin-btn--ghost admin-btn--sm" onClick={() => removeRndLinkPdf(yi, li)}>
+                      Remove PDF
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+            <button type="button" className="admin-btn admin-btn--primary" onClick={() => addRndLink(yi)}>+ Add Link</button>
+            {(yr.links || []).length === 0 && (
+              <p className="admin-field__hint">No links yet — click "Add Link" to start building this year's Research &amp; Development list.</p>
+            )}
+          </div>
+          <div className="admin-field" style={{ marginTop: '1rem' }}>
+            <label className="admin-field__hint" style={{ display: 'block', marginBottom: '0.5rem' }}>
+              Structured Table (optional — a table with columns you add yourself, where each row also has its own
+              uploaded PDF, e.g. a Patents table where every row links to that patent's own document).
+            </label>
+            <RndTableEditor
+              table={yr.structuredTable || { columns: [], rows: [] }}
+              onChange={(t) => updateRndYearField(yi, 'structuredTable', t)}
+            />
+          </div>
+        </div>
+      ))}
+      <button type="button" className="admin-btn admin-btn--primary" onClick={addRndYear}>+ Add Academic Year</button>
+      {years.length === 0 && (
+        <p className="admin-field__hint">No academic years yet — click "Add Academic Year" to start building this department's Research &amp; Development.</p>
+      )}
       <div className="admin-form-actions">
         <button type="button" className="admin-btn admin-btn--ghost" onClick={discard} disabled={!dirty || saving}>Cancel</button>
         <button type="button" className="admin-btn admin-btn--primary" onClick={save} disabled={!dirty || saving}>

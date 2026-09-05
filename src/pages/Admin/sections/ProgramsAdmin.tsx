@@ -139,6 +139,18 @@ export interface NewsletterYear {
   issues: NewsletterIssue[];
 }
 
+// One Academic Year's worth of Research & Development content — same five
+// optional fields the old flat rndIntro/rndTableText/rndProjectsText/
+// rndLinks/rndStructuredTable block had, just scoped per year now.
+export interface RndYear {
+  year: string;
+  intro?: string;
+  tableText?: string;
+  projectsText?: string;
+  links?: RndLink[];
+  structuredTable?: RndStructuredTable;
+}
+
 export interface ProgramDoc {
   id: string;
   slug: string;
