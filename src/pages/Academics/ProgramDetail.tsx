@@ -284,6 +284,11 @@ function SingleProgramDetail() {
   // computePlacementStats already uses for the stat tiles.
   const placementPkgIdx = findPackageColumnIndex(placementColumns);
   const placementYearStats = activePlacementYear ? computePlacementStats(placementColumns, activePlacementYear.rows || []) : null;
+  // Whether this year's imported sheet had a package/CTC column at all —
+  // when it does, every stat tile is present (7 of them) and the grid should
+  // stretch to fill the row; when it doesn't, only 3 tiles show and the grid
+  // should keep them at their normal compact size instead of stretching.
+  const placementStatsFull = placementYearStats?.averageSalary != null;
 
   const placementNameIdx = placementColumns.findIndex((c) => /name|student|candidate/i.test(c));
   const placementCompIdx = findCompanyColumnIndex(placementColumns);
@@ -300,12 +305,15 @@ function SingleProgramDetail() {
   });
   const placementMarqueeItems: PlacementItem[] = filteredPlacementRows.map((row) => {
     const rawName = placementNameIdx >= 0 ? row.cells[placementNameIdx] : (row.cells[1] || row.cells[0]);
-    const rawComp = placementCompIdx >= 0 ? row.cells[placementCompIdx] : (row.cells[2] || 'Leading Recruiter');
-    const rawPkg = placementPkgIdx >= 0 ? formatPackageCell(row.cells[placementPkgIdx] ?? '') : (row.cells[3] || '');
+    const rawComp = placementCompIdx >= 0 ? row.cells[placementCompIdx] : '';
+    // No guessed fallback column for package either — a sheet with no
+    // package/CTC column at all has no package data, not data in whatever
+    // column happens to sit at a fixed position (e.g. the student's own name).
+    const rawPkg = placementPkgIdx >= 0 ? formatPackageCell(row.cells[placementPkgIdx] ?? '') : '';
     return {
       name: rawName?.trim() || 'Student Scholar',
       company: rawComp?.trim() || 'Top Corporation',
-      package: rawPkg ? (rawPkg.toLowerCase().includes('lpa') ? rawPkg : `${rawPkg} LPA`) : 'High Impact CTC',
+      package: rawPkg ? (rawPkg.toLowerCase().includes('lpa') ? rawPkg : `${rawPkg} LPA`) : '',
     };
   });
   // Individual student Internship Records — same shape/pattern as the
@@ -1132,7 +1140,7 @@ function SingleProgramDetail() {
                 <p className="placement-stat-summary">
                   {activePlacementYear.year} Placements as on date: <strong>{placementYearStats.totalOffers.toLocaleString()}</strong>
                 </p>
-                <div className="dept-stat-grid">
+                <div className={`dept-stat-grid${placementStatsFull ? ' dept-stat-grid--fill' : ''}`}>
                   <div className="dept-stat-tile">
                     <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.companiesVisited}</span></div>
                     <div className="dept-stat-tile__label">No. of Companies Visited</div>
@@ -1151,18 +1159,24 @@ function SingleProgramDetail() {
                     </button>
                     <div className="dept-stat-tile__label">Top 10 Companies List</div>
                   </div>
-                  <div className="dept-stat-tile">
-                    <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.averageSalary ?? '—'}</span></div>
-                    <div className="dept-stat-tile__label">Average Salary</div>
-                  </div>
-                  <div className="dept-stat-tile">
-                    <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.medianSalary ?? '—'}</span></div>
-                    <div className="dept-stat-tile__label">Median Salary</div>
-                  </div>
-                  <div className="dept-stat-tile">
-                    <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.highestPackage ?? '—'}</span></div>
-                    <div className="dept-stat-tile__label">Highest Package</div>
-                  </div>
+                  {placementYearStats.averageSalary != null && (
+                    <div className="dept-stat-tile">
+                      <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.averageSalary}</span></div>
+                      <div className="dept-stat-tile__label">Average Salary</div>
+                    </div>
+                  )}
+                  {placementYearStats.medianSalary != null && (
+                    <div className="dept-stat-tile">
+                      <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.medianSalary}</span></div>
+                      <div className="dept-stat-tile__label">Median Salary</div>
+                    </div>
+                  )}
+                  {placementYearStats.highestPackage != null && (
+                    <div className="dept-stat-tile">
+                      <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.highestPackage}</span></div>
+                      <div className="dept-stat-tile__label">Highest Package</div>
+                    </div>
+                  )}
                   {placementYearStats.above50Lpa > 0 && (
                     <div className="dept-stat-tile">
                       <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.above50Lpa} offers</span></div>
@@ -1175,10 +1189,12 @@ function SingleProgramDetail() {
                       <div className="dept-stat-tile__label">Above 30 LPA+</div>
                     </div>
                   )}
-                  <div className="dept-stat-tile">
-                    <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.above10Lpa} offers</span></div>
-                    <div className="dept-stat-tile__label">Above 10 LPA+</div>
-                  </div>
+                  {placementYearStats.above10Lpa > 0 && (
+                    <div className="dept-stat-tile">
+                      <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.above10Lpa} offers</span></div>
+                      <div className="dept-stat-tile__label">Above 10 LPA+</div>
+                    </div>
+                  )}
                 </div>
               </>
             )}

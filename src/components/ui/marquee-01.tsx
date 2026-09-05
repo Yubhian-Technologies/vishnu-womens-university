@@ -24,10 +24,12 @@ export const PlacementRecordCard = ({
           <Building2 size={12} strokeWidth={2.4} style={{ flexShrink: 0 }} />
           <span>{company}</span>
         </span>
-        <span className="placement-card-package-badge">
-          <Sparkles size={11} strokeWidth={2.4} style={{ flexShrink: 0 }} />
-          <span>{pkg}</span>
-        </span>
+        {pkg && (
+          <span className="placement-card-package-badge">
+            <Sparkles size={11} strokeWidth={2.4} style={{ flexShrink: 0 }} />
+            <span>{pkg}</span>
+          </span>
+        )}
       </div>
       <div>
         <h4 className="placement-card-student-name">{name}</h4>
