@@ -326,23 +326,17 @@ async function parsePlacementsPdf(buf: ArrayBuffer): Promise<PlacementImportResu
 
 // Strict, whole-file validation — unlike the rest of this file (which
 // happily accepts whatever columns/rows a file has), an import is only
-// accepted here if BOTH hold: (1) the header row is exactly the template's
-// columns (any order, case/whitespace-insensitive) and (2) every single row
-// has a value in every column. Failing either rejects the ENTIRE file — one
-// bad row is not silently dropped or skipped, since a partial import could
-// leave an admin thinking a batch fully uploaded when rows were quietly
-// missing from it. Returns an error message to show, or null if the file is
-// clean and the caller may proceed to preview/save it.
+// accepted here if the header row is exactly the template's columns (any
+// order, case/whitespace-insensitive) — nothing missing, nothing extra.
+// Empty rows/columns/cells are fine and don't affect this check; only the
+// column *names* must match. Returns an error message to show, or null if
+// the file is clean and the caller may proceed to preview/save it.
 export function validatePlacementsImport(result: PlacementImportResult): string | null {
   const norm = (s: string) => s.trim().toLowerCase();
   const got = [...result.columns].map(norm).sort();
   const want = [...PLACEMENT_TEMPLATE_HEADERS].map(norm).sort();
   if (got.length !== want.length || got.some((c, i) => c !== want[i])) {
     return `This file's columns don't match the required Placements template (any order is fine, but nothing missing or extra).\n\nExpected: ${PLACEMENT_TEMPLATE_HEADERS.join(', ')}\nFound: ${result.columns.join(', ')}\n\nUse "Download Placements Template" above and fill that file in instead.`;
-  }
-  const badRowIndex = result.rows.findIndex((row) => row.some((cell) => !cell.trim()));
-  if (badRowIndex !== -1) {
-    return `Row ${badRowIndex + 1} is missing a value in one or more columns — every column must be filled in for every row. The whole file was NOT imported; fix that row and re-upload it.`;
   }
   return null;
 }
