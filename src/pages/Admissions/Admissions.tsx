@@ -1,13 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import emailjs from '@emailjs/browser';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import type { ConfirmationResult, RecaptchaVerifier } from 'firebase/auth';
 import './Admissions.css';
 import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
 import { db } from '../../lib/firebase';
-import { getFirebaseAuth } from '../../lib/firebaseAdmin';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useContentBlocks, useEapcetCode } from '../../hooks/useContentBlocks';
 import { useSitePhotos, useSectionHasPhotos } from '../../hooks/useSitePhotos';
@@ -21,10 +19,8 @@ interface RequestInfoForm {
   firstName: string;
   lastName: string;
   email: string;
-  phone: string;
   program: string;
   term: string;
-  consent: boolean;
 }
 
 type RequestInfoFormErrors = Partial<Record<keyof RequestInfoForm, string>>;
@@ -33,23 +29,9 @@ const INITIAL_REQUEST_FORM: RequestInfoForm = {
   firstName: '',
   lastName: '',
   email: '',
-  phone: '',
   program: '',
   term: 'Academic Year 2027 – 28',
-  consent: false,
 };
-
-const CONSENT_TEXT =
-  "I authorize Vishnu Women's University to contact me with updates and notifications via Email, SMS, WhatsApp and Call. This will override the registry on DND / NDNC.";
-
-// Indian 10-digit mobile numbers (the university's applicant base), entered
-// without the +91 country code — that's prefixed only when calling Firebase.
-const PHONE_RE = /^[6-9]\d{9}$/;
-
-type OtpStage = 'idle' | 'sending' | 'sent' | 'verifying' | 'verified' | 'expired';
-
-const OTP_EXPIRY_MS = 5 * 60 * 1000;
-const OTP_RESEND_COOLDOWN_S = 30;
 
 interface RankAnalysisItem {
   sNo: number;
@@ -86,10 +68,7 @@ function validateRequestInfoForm(form: RequestInfoForm): RequestInfoFormErrors {
   if (!form.lastName.trim()) errors.lastName = 'Please enter your last name.';
   if (!form.email.trim()) errors.email = 'Please enter your email address.';
   else if (!EMAIL_RE.test(form.email.trim())) errors.email = 'Please enter a valid email address.';
-  if (!form.phone.trim()) errors.phone = 'Please enter your phone number.';
-  else if (!PHONE_RE.test(form.phone.trim())) errors.phone = 'Please enter a valid 10-digit mobile number.';
   if (!form.program) errors.program = 'Please select a program.';
-  if (!form.consent) errors.consent = 'Please provide your authorization to contact you.';
   return errors;
 }
 
@@ -172,139 +151,17 @@ export default function Admissions() {
   const [requestErrors, setRequestErrors] = useState<RequestInfoFormErrors>({});
   const [requestStatus, setRequestStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
 
-  const [otpStage, setOtpStage] = useState<OtpStage>('idle');
-  const [otpCode, setOtpCode] = useState('');
-  const [otpError, setOtpError] = useState('');
-  const [resendCooldown, setResendCooldown] = useState(0);
-
-  const recaptchaVerifierRef = useRef<RecaptchaVerifier | null>(null);
-  const confirmationResultRef = useRef<ConfirmationResult | null>(null);
-  const otpExpiryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const cooldownIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  const clearOtpTimers = () => {
-    if (otpExpiryTimeoutRef.current) clearTimeout(otpExpiryTimeoutRef.current);
-    if (cooldownIntervalRef.current) clearInterval(cooldownIntervalRef.current);
-    otpExpiryTimeoutRef.current = null;
-    cooldownIntervalRef.current = null;
-  };
-
-  const resetOtpFlow = () => {
-    clearOtpTimers();
-    confirmationResultRef.current = null;
-    setOtpStage('idle');
-    setOtpCode('');
-    setOtpError('');
-    setResendCooldown(0);
-  };
-
-  useEffect(() => () => clearOtpTimers(), []);
-
   const handleRequestFormChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     setRequestForm((prev) => ({ ...prev, [name]: value }));
     setRequestErrors((prev) => (prev[name as keyof RequestInfoForm] ? { ...prev, [name]: undefined } : prev));
-    // Editing the phone number after an OTP was sent/verified invalidates that
-    // verification — it was proof of ownership of the old number, not this one.
-    if (name === 'phone' && otpStage !== 'idle') resetOtpFlow();
-  };
-
-  // The consent checkbox is only meant to be ticked once every other field is
-  // genuinely filled in (and the phone number verified) — not merely
-  // disabled, since the requirement is to actively tell the applicant what's
-  // still missing rather than leave them guessing why it won't check.
-  const requiredFieldsFilled =
-    requestForm.firstName.trim() !== '' &&
-    requestForm.lastName.trim() !== '' &&
-    EMAIL_RE.test(requestForm.email.trim()) &&
-    otpStage === 'verified' &&
-    requestForm.program !== '';
-
-  const handleConsentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.checked && !requiredFieldsFilled) {
-      setRequestErrors((prev) => ({ ...prev, consent: 'Please enter all details above and verify your phone number before authorizing us to contact you.' }));
-      return;
-    }
-    setRequestForm((prev) => ({ ...prev, consent: e.target.checked }));
-    setRequestErrors((prev) => (prev.consent ? { ...prev, consent: undefined } : prev));
-  };
-
-  const startResendCooldown = () => {
-    setResendCooldown(OTP_RESEND_COOLDOWN_S);
-    cooldownIntervalRef.current = setInterval(() => {
-      setResendCooldown((prev) => {
-        if (prev <= 1) {
-          if (cooldownIntervalRef.current) clearInterval(cooldownIntervalRef.current);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-  };
-
-  const handleSendOtp = async () => {
-    const phone = requestForm.phone.trim();
-    if (!PHONE_RE.test(phone)) {
-      setRequestErrors((prev) => ({ ...prev, phone: 'Please enter a valid 10-digit mobile number.' }));
-      return;
-    }
-    setOtpError('');
-    setOtpStage('sending');
-    try {
-      const { RecaptchaVerifier, signInWithPhoneNumber } = await import('firebase/auth');
-      const auth = await getFirebaseAuth();
-      if (!recaptchaVerifierRef.current) {
-        recaptchaVerifierRef.current = new RecaptchaVerifier(auth, 'admissions-recaptcha-container', {
-          size: 'invisible',
-        });
-      }
-      confirmationResultRef.current = await signInWithPhoneNumber(auth, `+91${phone}`, recaptchaVerifierRef.current);
-      clearOtpTimers();
-      setOtpStage('sent');
-      setOtpCode('');
-      startResendCooldown();
-      otpExpiryTimeoutRef.current = setTimeout(() => {
-        setOtpStage((stage) => (stage === 'verified' ? stage : 'expired'));
-      }, OTP_EXPIRY_MS);
-    } catch {
-      // Reset the widget so a fresh challenge is issued on retry.
-      recaptchaVerifierRef.current?.clear();
-      recaptchaVerifierRef.current = null;
-      setOtpStage('idle');
-      setRequestErrors((prev) => ({ ...prev, phone: "Couldn't send the OTP. Please check the number and try again." }));
-    }
-  };
-
-  const handleVerifyOtp = async () => {
-    if (!/^\d{6}$/.test(otpCode) || !confirmationResultRef.current) {
-      setOtpError('Please enter the 6-digit OTP.');
-      return;
-    }
-    setOtpStage('verifying');
-    setOtpError('');
-    try {
-      await confirmationResultRef.current.confirm(otpCode);
-      clearOtpTimers();
-      setOtpStage('verified');
-      // confirm() signs in a real Firebase Auth user for this phone number —
-      // we only wanted the yes/no verification, not a live session, since
-      // this is an anonymous inquiry form rather than a login flow.
-      const auth = await getFirebaseAuth();
-      await auth.signOut();
-    } catch {
-      setOtpStage('sent');
-      setOtpError('Invalid OTP. Please try again.');
-    }
   };
 
   const handleRequestInfoSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const validationErrors = validateRequestInfoForm(requestForm);
-    if (otpStage !== 'verified') {
-      validationErrors.phone = 'Please verify your phone number before submitting.';
-    }
     if (Object.keys(validationErrors).length > 0) {
       setRequestErrors(validationErrors);
       return;
@@ -317,7 +174,6 @@ export default function Admissions() {
       // (below) via EmailJS is a best-effort convenience on top of it.
       await addDoc(collection(db, 'admissionInquiries'), {
         ...requestForm,
-        phoneVerified: true,
         status: 'new',
         createdAt: serverTimestamp(),
       });
@@ -327,7 +183,6 @@ export default function Admissions() {
           first_name: requestForm.firstName,
           last_name: requestForm.lastName,
           email: requestForm.email,
-          phone: requestForm.phone,
           program: requestForm.program,
           term: requestForm.term,
         };
@@ -342,7 +197,6 @@ export default function Admissions() {
       setRequestStatus('success');
       setRequestForm(INITIAL_REQUEST_FORM);
       setRequestErrors({});
-      resetOtpFlow();
     } catch {
       setRequestStatus('error');
     }
@@ -725,64 +579,6 @@ export default function Admissions() {
                   {requestErrors.email && <span className="adm-form-error">{requestErrors.email}</span>}
                 </div>
                 <div className="adm-form-group">
-                  <label>Phone Number</label>
-                  <div className="adm-phone-row">
-                    <input
-                      type="tel" name="phone" placeholder="10-digit mobile number" inputMode="numeric" maxLength={10}
-                      value={requestForm.phone} onChange={handleRequestFormChange}
-                      className={requestErrors.phone ? 'has-error' : undefined}
-                      aria-invalid={!!requestErrors.phone}
-                      disabled={otpStage === 'verified'}
-                    />
-                    {(otpStage === 'idle' || otpStage === 'sending') && (
-                      <button
-                        type="button"
-                        className="btn btn-outline btn-sm adm-otp-btn"
-                        onClick={handleSendOtp}
-                        disabled={otpStage === 'sending'}
-                      >
-                        {otpStage === 'sending' ? 'Sending…' : 'Send OTP'}
-                      </button>
-                    )}
-                    {otpStage === 'verified' && <span className="adm-otp-verified">Phone number verified ✓</span>}
-                  </div>
-                  {requestErrors.phone && <span className="adm-form-error">{requestErrors.phone}</span>}
-
-                  {(otpStage === 'sent' || otpStage === 'verifying' || otpStage === 'expired') && (
-                    <>
-                      <div className="adm-otp-row">
-                        <input
-                          type="text" inputMode="numeric" maxLength={6} placeholder="Enter OTP"
-                          value={otpCode}
-                          onChange={(e) => { setOtpCode(e.target.value.replace(/\D/g, '')); setOtpError(''); }}
-                          className={otpError ? 'has-error' : undefined}
-                          aria-invalid={!!otpError}
-                          disabled={otpStage === 'expired'}
-                        />
-                        <button
-                          type="button"
-                          className="btn btn-primary btn-sm"
-                          onClick={handleVerifyOtp}
-                          disabled={otpStage === 'verifying' || otpStage === 'expired'}
-                        >
-                          {otpStage === 'verifying' ? 'Verifying…' : 'Verify OTP'}
-                        </button>
-                      </div>
-                      {otpStage === 'expired' && <span className="adm-form-error">OTP expired. Please resend.</span>}
-                      {otpError && <span className="adm-form-error">{otpError}</span>}
-                      <button
-                        type="button"
-                        className="adm-otp-resend"
-                        onClick={handleSendOtp}
-                        disabled={resendCooldown > 0}
-                      >
-                        {resendCooldown > 0 ? `Resend OTP in ${resendCooldown}s` : 'Resend OTP'}
-                      </button>
-                    </>
-                  )}
-                  <div id="admissions-recaptcha-container" style={{ display: 'none' }}></div>
-                </div>
-                <div className="adm-form-group">
                   <label>Program Interest</label>
                   <select
                     name="program" value={requestForm.program} onChange={handleRequestFormChange}
@@ -806,18 +602,6 @@ export default function Admissions() {
                     <option>Academic Year 2026 – 27</option>
                     <option>Spring 2027</option>
                   </select>
-                </div>
-                <div className="adm-form-group">
-                  <label className="adm-consent-row">
-                    <input
-                      type="checkbox" name="consent"
-                      checked={requestForm.consent} onChange={handleConsentChange}
-                      className={requestErrors.consent ? 'has-error' : undefined}
-                      aria-invalid={!!requestErrors.consent}
-                    />
-                    <span>{CONSENT_TEXT}</span>
-                  </label>
-                  {requestErrors.consent && <span className="adm-form-error">{requestErrors.consent}</span>}
                 </div>
                 <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={requestStatus === 'submitting'}>
                   {requestStatus === 'submitting' ? 'Sending…' : 'Request Information'}
