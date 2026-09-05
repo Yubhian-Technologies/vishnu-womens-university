@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
@@ -6,7 +6,10 @@ import ImageUploader from '../../../components/ImageUploader/ImageUploader';
 import FileUploader from '../../../components/FileUploader/FileUploader';
 import { deleteFile, type UploadResult } from '../../../lib/storage';
 import { PROGRAM_ICON_NAMES } from '../../../lib/programIcons';
-import { normalizeLab, type LabItem, type LibrarySection, type LibraryItem, type NewsEventsYear, type ProgramLink, type ProgramDoc } from './ProgramsAdmin';
+import { normalizeLab, type LabItem, type LibrarySection, type LibraryItem, type NewsEventsYear, type ProgramLink, type ProgramDoc, type RndLink, type NewsletterYear } from './ProgramsAdmin';
+import type { RndStructuredTable } from './RndTableEditor';
+import type { PlacementYearRecord } from '../../../lib/placementRecords';
+import type { InternshipYearRecord } from '../../../lib/internshipRecords';
 import { diffChangedFields } from '../../../lib/formDiff';
 import { PlacementYearsEditor, InternshipYearsEditor, RndEditor, NewsletterYearsEditor } from './ProgramCareerEditors';
 import { downloadPlacementsTemplate } from '../../../lib/placementsImport';
@@ -83,6 +86,21 @@ export interface DepartmentDoc {
   placementIntro?: string;
   placementStats?: LibraryItem[];
   placementRecruiters?: string[];
+  // Placements/Internships/Research & Development/Newsletter records — one
+  // shared dataset per department (a department that groups more than one
+  // programme, e.g. "AI" grouping ai-ds/ai-ml, has exactly ONE set of these,
+  // not one per programme) — see ProgramCareerEditors.tsx. These used to
+  // live per-programme on `ProgramDoc`; startEdit() below migrates any old
+  // per-programme data into this department doc the first time it's opened
+  // after the switchover.
+  placementYears?: PlacementYearRecord[];
+  internshipYears?: InternshipYearRecord[];
+  rndIntro?: string;
+  rndTableText?: string;
+  rndProjectsText?: string;
+  rndLinks?: RndLink[];
+  rndStructuredTable?: RndStructuredTable;
+  newsletterYears?: NewsletterYear[];
   // News & Events — legacy fixed shape (exactly three categories: News &
   // Events / Student Awards / Others, each one academic-year table/cards/
   // text block). Superseded by `newsEventsSections` below but kept so a
@@ -112,6 +130,14 @@ export interface DepartmentDoc {
   // re-run (and duplicate) the conversion on a second open before the
   // first migration was ever saved.
   newsEventsMigrated?: boolean;
+  // Awards & Recognition — same pattern as newsEventsSections above: the
+  // "Awards & Recognition" heading itself is fixed (always shown under that
+  // name, not admin-renameable or removable), but what's shown under it is
+  // a fully dynamic, admin-defined list of sections, each with its own
+  // content-type dropdown — same CustomSectionEditor building block. Brand
+  // new field, so unlike newsEventsSections there's no legacy shape to
+  // migrate from.
+  awardsSections?: CustomSection[];
   // Any name, any number of sub-sections, any content type (text/table/
   // list/links/files/gallery/panel view) — same system as Programs/
   // Differentiators/Faculty/Campus Life. Exists specifically so a
@@ -136,6 +162,7 @@ const EMPTY: Omit<DepartmentDoc, 'id'> = {
   placementIntro: '', placementStats: [], placementRecruiters: [],
   newsEventsYears: [], studentAwardsYears: [], othersYears: [],
   newsEventsSections: [],
+  awardsSections: [],
   customSections: [],
 };
 
@@ -200,7 +227,7 @@ export default function DepartmentsAdmin() {
   // (the general `customSections` below, and `newsEventsSections` under the
   // fixed "News & Events" heading) each needing the full set of file/photo/
   // gallery/image-card upload+remove handlers.
-  const makeSectionHandlers = (field: 'customSections' | 'newsEventsSections') => ({
+  const makeSectionHandlers = (field: 'customSections' | 'newsEventsSections' | 'awardsSections') => ({
     onFileUploaded: (sectionPath: number[], fileIndex: number, r: UploadResult) => {
       setForm((p) => ({
         ...p,
@@ -310,6 +337,7 @@ export default function DepartmentsAdmin() {
   });
   const customSectionHandlers = makeSectionHandlers('customSections');
   const newsEventsSectionHandlers = makeSectionHandlers('newsEventsSections');
+  const awardsSectionHandlers = makeSectionHandlers('awardsSections');
   // One-time starter content for the 4 standalone Freshman Engineering
   // departments (Mathematics/Physics/Chemistry/English) — pre-fills the
   // whole Add form (title/shortCode/about/customSections for Laboratories/
@@ -339,18 +367,18 @@ export default function DepartmentsAdmin() {
   };
 
   // Placements/Internships/R&D/Newsletter — moved here from Admin → Programs
-  // (per-programme data still lives on each programme's own `programs/{id}`
-  // doc, completely unchanged; only where it's edited moved). A department
-  // that groups more than one programme (AI/CSE/ECE) needs a picker to say
-  // which programme's data these four cards below are currently showing —
-  // `matchingPrograms` above already finds them by department Short Code.
+  // AND now stored directly on this department doc, one shared dataset per
+  // department (a department that groups more than one programme, e.g.
+  // AI/CSE/ECE, has exactly ONE set — no per-programme picker needed).
   const editingDept = editing ? departments.find((d) => d.id === editing) || null : null;
-  const careerPrograms = editingDept ? matchingPrograms(editingDept) : [];
-  const [selectedProgramId, setSelectedProgramId] = useState('');
-  useEffect(() => {
-    setSelectedProgramId('');
-  }, [editing]);
-  const selectedProgram = careerPrograms.find((p) => p.id === selectedProgramId) || careerPrograms[0] || null;
+  // `editingDept` is the raw, unmigrated Firestore doc (from the live
+  // `departments` list) — `form` is what startEdit() actually populated,
+  // including the one-time Placements/Internships/R&D/Newsletter migration
+  // copied in from a matching programme. The career editors below must see
+  // that migrated data (so it's visible immediately, before the admin even
+  // clicks Update), not the raw doc, which is why they're passed this
+  // merged object instead of `editingDept` directly.
+  const formDept: DepartmentDoc | null = editingDept ? { ...editingDept, ...form, id: editingDept.id } : null;
   // News & Events and the HOD fields aren't part of programRichness (they're
   // separate legacy fields, not one of Vision/Mission/Values/Labs/Library) —
   // each found independently as whichever matching program still has it,
@@ -660,8 +688,23 @@ export default function DepartmentsAdmin() {
   };
 
   const startEdit = (d: DepartmentDoc) => {
+    // The edit form lives above the list, so without this an admin clicking
+    // "Edit" on a card near the bottom sees nothing happen until they
+    // manually scroll all the way back up themselves. .admin-main (not
+    // window) is the actual scroll container — see AdminLayout.tsx.
+    document.querySelector('.admin-main')?.scrollTo({ top: 0, behavior: 'smooth' });
     setEditing(d.id);
     const needsMigration = !d.newsEventsMigrated && !!(d.newsEventsYears?.length || d.studentAwardsYears?.length || d.othersYears?.length);
+    // Placements/Internships/R&D/Newsletter one-time migration: if this
+    // department doc doesn't have its own data for one of these fields yet,
+    // pull it from whichever matching programme still has it (pre-switchover
+    // data lived there) — same "copy once, only if empty" idea as
+    // Vision/Labs/Library elsewhere in this file, just per-field instead of
+    // needing its own migrated flag.
+    const careerSource = matchingPrograms(d).find((p) =>
+      p.placementYears?.length || p.internshipYears?.length || p.rndIntro || p.rndTableText
+      || p.rndProjectsText || p.rndLinks?.length || p.rndStructuredTable || p.newsletterYears?.length
+    );
     const next: Omit<DepartmentDoc, 'id'> = {
       title: d.title, shortCode: d.shortCode, description: d.description || '',
       icon: d.icon || 'GraduationCap', order: d.order,
@@ -675,19 +718,40 @@ export default function DepartmentsAdmin() {
       librarySections: (d.librarySections || []).map((s) => ({ heading: s.heading, items: s.items || [] })),
       programLevels: (d.programLevels || []).map((l) => ({ title: l.title, intro: l.intro || '', rows: l.rows || [] })),
       placementIntro: d.placementIntro || '', placementStats: d.placementStats || [], placementRecruiters: d.placementRecruiters || [],
+      placementYears: d.placementYears?.length ? d.placementYears : (careerSource?.placementYears || []),
+      internshipYears: d.internshipYears?.length ? d.internshipYears : (careerSource?.internshipYears || []),
+      rndIntro: d.rndIntro || careerSource?.rndIntro || '',
+      rndTableText: d.rndTableText || careerSource?.rndTableText || '',
+      rndProjectsText: d.rndProjectsText || careerSource?.rndProjectsText || '',
+      rndLinks: d.rndLinks?.length ? d.rndLinks : (careerSource?.rndLinks || []),
+      rndStructuredTable: d.rndStructuredTable || careerSource?.rndStructuredTable,
+      newsletterYears: d.newsletterYears?.length ? d.newsletterYears : (careerSource?.newsletterYears || []),
       newsEventsYears: d.newsEventsYears || [], studentAwardsYears: d.studentAwardsYears || [], othersYears: d.othersYears || [],
       newsEventsSections: needsMigration ? migrateNewsEventsToSections(d) : (d.newsEventsSections || []),
       newsEventsMigrated: needsMigration ? true : (d.newsEventsMigrated || false),
+      awardsSections: d.awardsSections || [],
       customSections: d.customSections || [],
     };
     setForm(next);
     // Deliberately NOT `next` here when a migration just ran — originalForm
     // must mirror what's actually still in Firestore (newsEventsSections
-    // without the migrated entries, newsEventsMigrated still false) so the
-    // diff-based save() below sees the migration as a real change and
-    // actually persists it, instead of silently no-op'ing because form and
-    // originalForm already agree.
-    setOriginalForm(needsMigration ? { ...next, newsEventsSections: d.newsEventsSections || [], newsEventsMigrated: d.newsEventsMigrated || false } : next);
+    // without the migrated entries, newsEventsMigrated still false, career
+    // fields still empty) so the diff-based save() below sees the migration
+    // as a real change and actually persists it, instead of silently
+    // no-op'ing because form and originalForm already agree.
+    setOriginalForm({
+      ...next,
+      newsEventsSections: needsMigration ? (d.newsEventsSections || []) : next.newsEventsSections,
+      newsEventsMigrated: needsMigration ? (d.newsEventsMigrated || false) : next.newsEventsMigrated,
+      placementYears: careerSource ? (d.placementYears || []) : next.placementYears,
+      internshipYears: careerSource ? (d.internshipYears || []) : next.internshipYears,
+      rndIntro: careerSource ? (d.rndIntro || '') : next.rndIntro,
+      rndTableText: careerSource ? (d.rndTableText || '') : next.rndTableText,
+      rndProjectsText: careerSource ? (d.rndProjectsText || '') : next.rndProjectsText,
+      rndLinks: careerSource ? (d.rndLinks || []) : next.rndLinks,
+      rndStructuredTable: careerSource ? d.rndStructuredTable : next.rndStructuredTable,
+      newsletterYears: careerSource ? (d.newsletterYears || []) : next.newsletterYears,
+    });
   };
 
   const remove = async (id: string) => {
@@ -722,12 +786,28 @@ export default function DepartmentsAdmin() {
       )}
 
       <div className="admin-card">
+        {editing && (
+          <button
+            type="button"
+            className="admin-btn admin-btn--ghost admin-btn--sm"
+            style={{ marginBottom: '0.75rem' }}
+            onClick={() => { setEditing(null); setForm(EMPTY); setOriginalForm(null); }}
+          >
+            ← Back to List
+          </button>
+        )}
         <h2 className="admin-card__title">{editing ? 'Edit Department' : 'Add Department'}</h2>
         <p className="admin-field__hint" style={{ marginBottom: '1rem' }}>
           Controls the cards in the "Academic Departments" grid on the public Academics page — separate from the
           individual B.Tech/M.Tech programs listed above it.
         </p>
-        <div className="admin-form-grid">
+        {/* Editing an existing department: every section starts collapsed —
+            pick the one you need instead of scrolling a long open form.
+            Adding a new one: Basic Info starts open since there's nothing
+            to navigate to yet. */}
+        <details className="admin-accordion" open={!editing}>
+          <summary className="admin-accordion__summary">Basic Info</summary>
+          <div className="admin-form-grid">
           <div className="admin-field">
             <label htmlFor="field-title">Title *</label>
             <input id="field-title" value={form.title} onChange={(e) => set('title', e.target.value)} placeholder="Computer Science & Engineering" />
@@ -751,7 +831,13 @@ export default function DepartmentsAdmin() {
             <textarea id="field-description" rows={4} value={form.description} onChange={(e) => set('description', e.target.value)} placeholder="The Department of Computer Science & Engineering, established in…" />
           </div>
 
-          <div className="admin-field admin-field--full"><hr /><h3>Department Page — Shared Content</h3>
+          </div>
+        </details>
+
+        <details className="admin-accordion">
+          <summary className="admin-accordion__summary">About Department</summary>
+          <div className="admin-form-grid">
+          <div className="admin-field admin-field--full">
             <p className="admin-field__hint" style={{ marginTop: '0.25rem' }}>
               Shown on every department's page at <code>/academics/&lt;program&gt;</code> — above the programme
               toggle for the grouped departments (<strong>AI</strong>, <strong>CSE</strong>, <strong>ECE</strong>),
@@ -785,7 +871,13 @@ export default function DepartmentsAdmin() {
             <textarea id="field-highlights-one-per-line" rows={5} value={arrayToLines(form.highlights)} onChange={(e) => set('highlights', linesToArray(e.target.value))} placeholder="NAAC A+ Accredited undergraduate programmes" />
           </div>
 
-          <div className="admin-field admin-field--full"><hr /><h3>Department Page — Programme Levels (B.Tech / M.Tech)</h3>
+          </div>
+        </details>
+
+        <details className="admin-accordion">
+          <summary className="admin-accordion__summary">Department Page — Programme Levels (B.Tech / M.Tech)</summary>
+          <div className="admin-form-grid">
+          <div className="admin-field admin-field--full">
             <p className="admin-field__hint" style={{ marginTop: '0.25rem' }}>
               Shown right below "About the Department" as headed subsections, each with its own intro paragraph
               and an intake table (e.g. a "B.Tech." block listing each B.Tech programme's intake).
@@ -840,7 +932,12 @@ export default function DepartmentsAdmin() {
             )}
           </div>
 
-          <div className="admin-field admin-field--full"><hr /><h3>Department Page — Vision, Mission &amp; Values</h3></div>
+          </div>
+        </details>
+
+        <details className="admin-accordion">
+          <summary className="admin-accordion__summary">Department Page — Vision, Mission &amp; Values</summary>
+          <div className="admin-form-grid">
           <div className="admin-field admin-field--full">
             <label htmlFor="field-vision">Vision</label>
             <textarea id="field-vision" rows={3} value={form.vision} onChange={(e) => set('vision', e.target.value)} />
@@ -853,7 +950,38 @@ export default function DepartmentsAdmin() {
             <label htmlFor="field-core-values">Core Values (one per line)</label>
             <textarea id="field-core-values" rows={3} value={arrayToLines(form.coreValues)} onChange={(e) => set('coreValues', linesToArray(e.target.value))} />
           </div>
-          <div className="admin-field admin-field--full"><hr /><h3>Department Page — Laboratories</h3></div>
+          </div>
+        </details>
+
+        <details className="admin-accordion">
+          <summary className="admin-accordion__summary">About HOD</summary>
+          <div className="admin-form-grid">
+          <div className="admin-field admin-field--full">
+            <label>HOD Photo</label>
+            <ImageUploader folder="vwu/departments" currentUrl={form.hodImage} onUploaded={handleHodImage} label="Upload HOD Photo" aspect={1} />
+          </div>
+          <div className="admin-field">
+            <label htmlFor="field-hod">HOD Name</label>
+            <input id="field-hod" value={form.hod} onChange={(e) => set('hod', e.target.value)} placeholder="Dr. …" />
+          </div>
+          <div className="admin-field">
+            <label htmlFor="field-hod-email">HOD Email</label>
+            <input id="field-hod-email" value={form.hodEmail} onChange={(e) => set('hodEmail', e.target.value)} placeholder="hod.cse@vishnu.edu.in" />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label htmlFor="field-hod-message">HOD Message</label>
+            <textarea id="field-hod-message" rows={5} value={form.hodMessage} onChange={(e) => set('hodMessage', e.target.value)} />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label htmlFor="field-hod-research-profiles">HOD Research Profiles (one per line: "Google Scholar: https://…")</label>
+            <textarea id="field-hod-research-profiles" rows={4} value={linksToText(form.hodResearchProfiles)} onChange={(e) => set('hodResearchProfiles', textToLinks(e.target.value))} placeholder="Google Scholar: https://scholar.google.com/citations?user=…" />
+          </div>
+          </div>
+        </details>
+
+        <details className="admin-accordion">
+          <summary className="admin-accordion__summary">Department Page — Laboratories</summary>
+          <div className="admin-form-grid">
           <div className="admin-field admin-field--full">
             <label>Laboratories</label>
             <p className="admin-field__hint" style={{ marginTop: 0 }}>
@@ -914,46 +1042,13 @@ export default function DepartmentsAdmin() {
             )}
           </div>
 
-          <div className="admin-field admin-field--full"><hr /><h3>Department Page — Placements</h3>
-            <p className="admin-field__hint" style={{ marginTop: '0.25rem' }}>
-              Shown as a shared "Placements" section, before the program toggle. The individual student placement
-              records table is managed separately, per programme — see "Placements, Internships, Research &amp;
-              Development &amp; Newsletter" further down this page, once you've saved this department.
-            </p>
           </div>
-          <div className="admin-field admin-field--full">
-            <label htmlFor="field-placement-intro">Placements Overview</label>
-            <textarea id="field-placement-intro" rows={3} value={form.placementIntro} onChange={(e) => set('placementIntro', e.target.value)} placeholder="Graduates of the department are placed in leading IT and core engineering companies…" />
-          </div>
-          <div className="admin-field admin-field--full">
-            <label>Placement Stats</label>
-            {placementStats.map((stat, si) => (
-              <div key={si} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.4rem' }}>
-                <input
-                  value={stat.label}
-                  onChange={(e) => updatePlacementStat(si, { label: e.target.value })}
-                  placeholder="Highest Package"
-                  style={{ flex: 2 }}
-                />
-                <input
-                  value={stat.value}
-                  onChange={(e) => updatePlacementStat(si, { value: e.target.value })}
-                  placeholder="₹12 LPA"
-                  style={{ flex: 1 }}
-                />
-                <button type="button" className="admin-btn admin-btn--sm" onClick={() => movePlacementStat(si, -1)} disabled={si === 0} title="Move up">↑</button>
-                <button type="button" className="admin-btn admin-btn--sm" onClick={() => movePlacementStat(si, 1)} disabled={si === placementStats.length - 1} title="Move down">↓</button>
-                <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removePlacementStat(si)}>✕</button>
-              </div>
-            ))}
-            <button type="button" className="admin-btn admin-btn--sm" onClick={addPlacementStat}>+ Add Stat</button>
-          </div>
-          <div className="admin-field admin-field--full">
-            <label htmlFor="field-placement-recruiters">Recruiters (one per line)</label>
-            <textarea id="field-placement-recruiters" rows={4} value={arrayToLines(form.placementRecruiters)} onChange={(e) => set('placementRecruiters', linesToArray(e.target.value))} placeholder="TCS&#10;Infosys&#10;Wipro" />
-          </div>
+        </details>
 
-          <div className="admin-field admin-field--full"><hr /><h3>Department Page — Digital Library</h3>
+        <details className="admin-accordion">
+          <summary className="admin-accordion__summary">Department Library</summary>
+          <div className="admin-form-grid">
+          <div className="admin-field admin-field--full">
             <p className="admin-field__hint" style={{ marginTop: '0.25rem' }}>
               Shown as a shared "Digital Library" section, before the program toggle. Each section below becomes
               its own table on the public page.
@@ -1010,29 +1105,99 @@ export default function DepartmentsAdmin() {
             )}
           </div>
 
-          <div className="admin-field admin-field--full"><hr /><h3>Department Page — Head of Department</h3></div>
-          <div className="admin-field admin-field--full">
-            <label>HOD Photo</label>
-            <ImageUploader folder="vwu/departments" currentUrl={form.hodImage} onUploaded={handleHodImage} label="Upload HOD Photo" aspect={1} />
           </div>
-          <div className="admin-field">
-            <label htmlFor="field-hod">HOD Name</label>
-            <input id="field-hod" value={form.hod} onChange={(e) => set('hod', e.target.value)} placeholder="Dr. …" />
-          </div>
-          <div className="admin-field">
-            <label htmlFor="field-hod-email">HOD Email</label>
-            <input id="field-hod-email" value={form.hodEmail} onChange={(e) => set('hodEmail', e.target.value)} placeholder="hod.cse@vishnu.edu.in" />
-          </div>
-          <div className="admin-field admin-field--full">
-            <label htmlFor="field-hod-message">HOD Message</label>
-            <textarea id="field-hod-message" rows={5} value={form.hodMessage} onChange={(e) => set('hodMessage', e.target.value)} />
-          </div>
-          <div className="admin-field admin-field--full">
-            <label htmlFor="field-hod-research-profiles">HOD Research Profiles (one per line: "Google Scholar: https://…")</label>
-            <textarea id="field-hod-research-profiles" rows={4} value={linksToText(form.hodResearchProfiles)} onChange={(e) => set('hodResearchProfiles', textToLinks(e.target.value))} placeholder="Google Scholar: https://scholar.google.com/citations?user=…" />
-          </div>
+        </details>
 
-          <div className="admin-field admin-field--full"><hr /><h3>Department Page — News &amp; Events</h3>
+        <details className="admin-accordion">
+          <summary className="admin-accordion__summary">Research &amp; Development</summary>
+          <div className="admin-form-grid">
+          {editingDept ? (
+            <div className="admin-field admin-field--full">
+              <RndEditor department={formDept!} />
+            </div>
+          ) : (
+            <div className="admin-field admin-field--full">
+              <p className="admin-field__hint">Save this department first (Add Department) — Research &amp; Development is only available once editing an existing department.</p>
+            </div>
+          )}
+          </div>
+        </details>
+
+        <details className="admin-accordion">
+          <summary className="admin-accordion__summary">Placements</summary>
+          <div className="admin-form-grid">
+          <div className="admin-field admin-field--full">
+            <label htmlFor="field-placement-intro">Placements Overview</label>
+            <textarea id="field-placement-intro" rows={3} value={form.placementIntro} onChange={(e) => set('placementIntro', e.target.value)} placeholder="Graduates of the department are placed in leading IT and core engineering companies…" />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label>Placement Stats</label>
+            {placementStats.map((stat, si) => (
+              <div key={si} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.4rem' }}>
+                <input
+                  value={stat.label}
+                  onChange={(e) => updatePlacementStat(si, { label: e.target.value })}
+                  placeholder="Highest Package"
+                  style={{ flex: 2 }}
+                />
+                <input
+                  value={stat.value}
+                  onChange={(e) => updatePlacementStat(si, { value: e.target.value })}
+                  placeholder="₹12 LPA"
+                  style={{ flex: 1 }}
+                />
+                <button type="button" className="admin-btn admin-btn--sm" onClick={() => movePlacementStat(si, -1)} disabled={si === 0} title="Move up">↑</button>
+                <button type="button" className="admin-btn admin-btn--sm" onClick={() => movePlacementStat(si, 1)} disabled={si === placementStats.length - 1} title="Move down">↓</button>
+                <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removePlacementStat(si)}>✕</button>
+              </div>
+            ))}
+            <button type="button" className="admin-btn admin-btn--sm" onClick={addPlacementStat}>+ Add Stat</button>
+          </div>
+          <div className="admin-field admin-field--full">
+            <label htmlFor="field-placement-recruiters">Recruiters (one per line)</label>
+            <textarea id="field-placement-recruiters" rows={4} value={arrayToLines(form.placementRecruiters)} onChange={(e) => set('placementRecruiters', linesToArray(e.target.value))} placeholder="TCS&#10;Infosys&#10;Wipro" />
+          </div>
+          {editingDept ? (
+            <div className="admin-field admin-field--full">
+              <div style={{ marginBottom: '1rem' }}>
+                <button type="button" className="admin-btn admin-btn--ghost admin-btn--sm" onClick={downloadPlacementsTemplate}>
+                  ⬇ Download Placements Template
+                </button>{' '}
+                <button type="button" className="admin-btn admin-btn--ghost admin-btn--sm" onClick={downloadInternshipsTemplate}>
+                  ⬇ Download Internships Template
+                </button>
+              </div>
+              <PlacementYearsEditor department={formDept!} />
+              <hr style={{ margin: '1.5rem 0', border: 'none', borderTop: '1px solid var(--color-light-gray, #e5e7eb)' }} />
+              <InternshipYearsEditor department={formDept!} />
+            </div>
+          ) : (
+            <div className="admin-field admin-field--full">
+              <p className="admin-field__hint">Save this department first (Add Department) — Placement/Internship records are only available once editing an existing department.</p>
+            </div>
+          )}
+          </div>
+        </details>
+
+        <details className="admin-accordion">
+          <summary className="admin-accordion__summary">Newsletter</summary>
+          <div className="admin-form-grid">
+          {editingDept ? (
+              <div className="admin-field admin-field--full">
+                <NewsletterYearsEditor department={formDept!} />
+              </div>
+          ) : (
+            <div className="admin-field admin-field--full">
+              <p className="admin-field__hint">Save this department first (Add Department) — Newsletter is only available once editing an existing department.</p>
+            </div>
+          )}
+          </div>
+        </details>
+
+        <details className="admin-accordion">
+          <summary className="admin-accordion__summary">Department Page — News &amp; Events</summary>
+          <div className="admin-form-grid">
+          <div className="admin-field admin-field--full">
             <p className="admin-field__hint" style={{ marginTop: '0.25rem' }}>
               Always shown on the public page under the fixed heading "News &amp; Events" — that heading itself
               can't be renamed or removed. What's inside it is fully up to you: add any number of sections (e.g.
@@ -1062,10 +1227,46 @@ export default function DepartmentsAdmin() {
               onImageCardPhotoRemoved={newsEventsSectionHandlers.onImageCardPhotoRemoved}
             />
           </div>
+          </div>
+        </details>
 
+        <details className="admin-accordion">
+          <summary className="admin-accordion__summary">Department Page — Awards &amp; Recognition</summary>
+          <div className="admin-form-grid">
+          <div className="admin-field admin-field--full">
+            <p className="admin-field__hint" style={{ marginTop: '0.25rem' }}>
+              Always shown on the public page under the fixed heading "Awards &amp; Recognition" — that heading
+              itself can't be renamed or removed. What's inside it is fully up to you: add any number of sections,
+              each with its own name and content type (plain text, a table, a checklist, a list of links, uploaded
+              files, a photo gallery, or images with their own caption). Applies to every department, grouped or
+              standalone.
+            </p>
+          </div>
+          <div className="admin-field admin-field--full">
+            <CustomSectionEditor
+              sections={form.awardsSections || []}
+              onChange={(next) => set('awardsSections', next)}
+              rootSections={form.awardsSections || []}
+              parentPath={[]}
+              onFileUploaded={awardsSectionHandlers.onFileUploaded}
+              onFileRemoved={awardsSectionHandlers.onFileRemoved}
+              onPhotoUploaded={awardsSectionHandlers.onPhotoUploaded}
+              onPhotoRemoved={awardsSectionHandlers.onPhotoRemoved}
+              onGalleryPhotoUploaded={awardsSectionHandlers.onGalleryPhotoUploaded}
+              onGalleryPhotoRemoved={awardsSectionHandlers.onGalleryPhotoRemoved}
+              onImageCardPhotoUploaded={awardsSectionHandlers.onImageCardPhotoUploaded}
+              onImageCardPhotoRemoved={awardsSectionHandlers.onImageCardPhotoRemoved}
+            />
+          </div>
+          </div>
+        </details>
+
+        <details className="admin-accordion">
+          <summary className="admin-accordion__summary">Department Page — Custom Sections</summary>
+          <div className="admin-form-grid">
           {STANDALONE_DEPARTMENTS.some((d) => d.deptShortCode.trim().toLowerCase() === form.shortCode.trim().toLowerCase()) ? (
             <>
-              <div className="admin-field admin-field--full"><hr /><h3>Department Page — Custom Sections</h3>
+              <div className="admin-field admin-field--full">
                 <p className="admin-field__hint" style={{ marginTop: '0.25rem' }}>
                   Optional. Add any OTHER section this department needs beyond News &amp; Events above — Research
                   &amp; Development, Awards &amp; Recognitions, or anything else — any name, any number of
@@ -1102,7 +1303,8 @@ export default function DepartmentsAdmin() {
               </p>
             </div>
           )}
-        </div>
+          </div>
+        </details>
 
         <div className="admin-form-actions">
           {editing && <button className="admin-btn admin-btn--ghost" onClick={() => { setEditing(null); setForm(EMPTY); setOriginalForm(null); }}>Cancel</button>}
@@ -1111,58 +1313,6 @@ export default function DepartmentsAdmin() {
           </button>
         </div>
       </div>
-
-      {editingDept && (
-        <div className="admin-card">
-          <h2 className="admin-card__title">Placements, Internships, Research &amp; Development &amp; Newsletter — {editingDept.title}</h2>
-          <p className="admin-field__hint" style={{ marginBottom: '1rem' }}>
-            Per-programme, not shared across the department — each programme keeps its own independent Academic
-            Years/records, exactly as it always has. Pick a programme below to manage its Placements, Internships,
-            Research &amp; Development, and Newsletter.
-          </p>
-          <div style={{ marginBottom: '1rem' }}>
-            <button type="button" className="admin-btn admin-btn--ghost admin-btn--sm" onClick={downloadPlacementsTemplate}>
-              ⬇ Download Placements Template
-            </button>{' '}
-            <button type="button" className="admin-btn admin-btn--ghost admin-btn--sm" onClick={downloadInternshipsTemplate}>
-              ⬇ Download Internships Template
-            </button>
-          </div>
-          {careerPrograms.length === 0 ? (
-            <p className="admin-field__hint">
-              No programme's Department code matches this department's Short Code ({editingDept.shortCode}) yet —
-              add/edit a programme under <strong>Admin → Programs</strong> with that Department code to manage its
-              Placements, Internships, R&amp;D, and Newsletter here.
-            </p>
-          ) : (
-            <>
-              {careerPrograms.length > 1 && (
-                <div className="admin-field" style={{ maxWidth: 360 }}>
-                  <label htmlFor="field-select-programme">Programme</label>
-                  <select
-                    id="field-select-programme"
-                    value={selectedProgram?.id || ''}
-                    onChange={(e) => setSelectedProgramId(e.target.value)}
-                  >
-                    {careerPrograms.map((p) => (
-                      <option key={p.id} value={p.id}>{p.shortName || p.name}</option>
-                    ))}
-                  </select>
-                </div>
-              )}
-            </>
-          )}
-        </div>
-      )}
-
-      {selectedProgram && (
-        <>
-          <PlacementYearsEditor program={selectedProgram} />
-          <InternshipYearsEditor program={selectedProgram} />
-          <RndEditor program={selectedProgram} />
-          <NewsletterYearsEditor program={selectedProgram} />
-        </>
-      )}
 
       {editingDept && (
         <div className="admin-card">
@@ -1180,6 +1330,9 @@ export default function DepartmentsAdmin() {
         </div>
       )}
 
+      {/* Hidden while editing an existing department — nothing else to
+          scroll past, so the section list above is the whole page. */}
+      {!editing && (
       <div className="admin-card">
         <h2 className="admin-card__title">Departments ({departments.length})</h2>
         {departmentsMissingContent.length > 0 && (
@@ -1203,7 +1356,7 @@ export default function DepartmentsAdmin() {
                     <td><span className="admin-badge" style={{ textTransform: 'none' }}>{d.shortCode}</span></td>
                     <td>{d.order}</td>
                     <td>
-                      <button className="admin-btn admin-btn--sm" onClick={() => startEdit(d)}>Edit</button>
+                      <button className="admin-btn admin-btn--sm" onClick={() => startEdit(d)}>View</button>
                       <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(d.id)}>Delete</button>
                     </td>
                   </tr>
@@ -1214,6 +1367,7 @@ export default function DepartmentsAdmin() {
           </div>
         )}
       </div>
+      )}
     </div>
   );
 }

@@ -30,6 +30,7 @@ import { db } from '../../lib/firebase';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { usePageBanner } from '../../hooks/usePageBanner';
+import { useSiteContact, DEFAULT_PHONE } from '../../hooks/useSiteContact';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import type { ContactDoc } from '../Admin/sections/ContactsAdmin';
 import SEO from '../../components/SEO/SEO';
@@ -158,11 +159,32 @@ export default function Contact() {
   const { docs: liveDeptContacts } = useOrderedCollection<ContactDoc>('contacts', 'order');
   const liveInfoCards = useContentBlocks('contact', 'infoCards');
   const liveSocialLinks = useContentBlocks('contact', 'socialLinks');
+  const { email: siteEmail, phone: sitePhone } = useSiteContact();
+  const defaultPhoneDigits = DEFAULT_PHONE.replace(/\D/g, '');
   const banner = usePageBanner('contact');
 
-  const infoCards = liveInfoCards.length > 0 ? liveInfoCards : DEFAULT_INFO_CARDS;
   const deptContacts = liveDeptContacts.length > 0 ? liveDeptContacts : DEFAULT_DEPT_CONTACTS;
   const socialLinks = liveSocialLinks.length > 0 ? liveSocialLinks : DEFAULT_SOCIAL_LINKS;
+  // These info cards are admin-typed freeform text (title/desc), but any
+  // line that's exactly an email address or exactly the site's old default
+  // phone number is meant to always track Admin → Site Contact Info instead
+  // of whatever was typed here — matched line-by-line (not a wholesale
+  // desc replace) so unrelated lines survive untouched, e.g. "Mon–Sat: 9 AM
+  // – 5 PM" under the email, or the distinct Society Headquarters numbers
+  // (different digits entirely, so they never match and are left alone).
+  const infoCards = (liveInfoCards.length > 0 ? liveInfoCards : DEFAULT_INFO_CARDS).map((c) => {
+    const isEmailCard = c.title.toLowerCase().includes('email');
+    const desc = c.desc
+      .split('\n')
+      .map((line) => {
+        const trimmed = line.trim();
+        if (isEmailCard && /^\S+@\S+\.\S+$/.test(trimmed)) return siteEmail;
+        if (trimmed.replace(/\D/g, '') === defaultPhoneDigits) return sitePhone;
+        return line;
+      })
+      .join('\n');
+    return { ...c, desc };
+  });
 
   const [form, setForm] = useState<ContactForm>(INITIAL_FORM);
   const [errors, setErrors] = useState<ContactFormErrors>({});

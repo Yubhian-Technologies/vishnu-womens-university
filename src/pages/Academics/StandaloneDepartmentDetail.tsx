@@ -80,6 +80,10 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
   // Chemistry/English) never had a News & Events block before this.
   const newsEventsSubSections = (dept.newsEventsSections || []).filter(hasCustomSectionContent);
   const hasNewsEvents = newsEventsSubSections.length > 0;
+  // Awards & Recognition — same fixed-heading/dynamic-contents pattern as
+  // News & Events above, brand new, no legacy fallback needed here either.
+  const awardsSubSections = (dept.awardsSections || []).filter(hasCustomSectionContent);
+  const hasAwards = awardsSubSections.length > 0;
 
   const quickLinks = [
     hasAbout && { id: 'about', label: 'About the Department' },
@@ -89,6 +93,7 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
     hasLabs && { id: 'labs', label: 'Laboratories' },
     ...toQuickLinkItems(visibleCustomSections),
     hasNewsEvents && { id: 'news-events', label: 'News & Events' },
+    hasAwards && { id: 'awards-recognition', label: 'Awards & Recognition' },
     hasLibrary && { id: 'library', label: 'Department Library' },
   ].filter(Boolean) as { id: string; label: string; children?: { id: string; label: string }[] }[];
 
@@ -413,6 +418,23 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
             </div>
             <SectionSubtree
               section={{ id: 'news-events-root', label: 'News & Events', contentType: 'text', textContent: '', subSections: newsEventsSubSections }}
+              navOffset={NAV_OFFSET}
+            />
+          </div>
+        </section>
+      )}
+
+      {/* Awards & Recognition — same fixed-heading/dynamic-content pattern
+          as News & Events above. */}
+      {hasAwards && (
+        <section id="awards-recognition" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
+          <div className="container">
+            <div style={{ marginBottom: 'var(--space-8)' }}>
+              <span className="section-label dept-section-label">{deptName}</span>
+              <h2 className="section-title">Awards &amp; Recognition</h2>
+            </div>
+            <SectionSubtree
+              section={{ id: 'awards-recognition-root', label: 'Awards & Recognition', contentType: 'text', textContent: '', subSections: awardsSubSections }}
               navOffset={NAV_OFFSET}
             />
           </div>
