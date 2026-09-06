@@ -68,6 +68,11 @@ interface RequestInfoForm {
   program: string;
   customProgram: string;
   purpose: string;
+  // Only used (and required) when purpose === 'Other' — the free-text
+  // reason, substituted in for the literal word "Other" at submit time
+  // (see submitPurpose below) so admin/email views show what the applicant
+  // actually typed instead of just "Other".
+  purposeOther: string;
 }
 
 type RequestInfoFormErrors = Partial<Record<keyof RequestInfoForm, string>>;
@@ -80,6 +85,7 @@ const INITIAL_REQUEST_FORM: RequestInfoForm = {
   program: '',
   customProgram: '',
   purpose: '',
+  purposeOther: '',
 };
 
 const PHONE_RE = /^[+]?[\d\s-]{7,15}$/;
@@ -110,7 +116,15 @@ function validateRequestInfoForm(form: RequestInfoForm): RequestInfoFormErrors {
     errors.customProgram = 'Please specify your program name.';
   }
   if (!form.purpose) errors.purpose = 'Please select a purpose.';
+  else if (form.purpose === 'Other' && !form.purposeOther.trim()) errors.purposeOther = 'Please tell us your purpose.';
   return errors;
+}
+
+// What actually gets saved/emailed for "purpose" — the applicant's own
+// typed-in reason when they picked "Other", so admin/email views show that
+// text directly instead of the unhelpful literal word "Other".
+function submitPurpose(form: RequestInfoForm): string {
+  return form.purpose === 'Other' ? form.purposeOther.trim() : form.purpose;
 }
 
 // Firebase Phone Auth needs E.164 ("+<countrycode><number>"). This form has
@@ -454,6 +468,19 @@ export default function AdmissionApplyForm() {
             </select>
             {requestErrors.purpose && <span className="adm-form-error">{requestErrors.purpose}</span>}
           </div>
+          {requestForm.purpose === 'Other' && (
+            <div className="adm-form-group">
+              <label>Please specify</label>
+              <input
+                type="text" name="purposeOther" placeholder="Tell us your purpose"
+                value={requestForm.purposeOther} onChange={handleRequestFormChange}
+                className={requestErrors.purposeOther ? 'has-error' : undefined}
+                aria-invalid={!!requestErrors.purposeOther}
+                autoFocus
+              />
+              {requestErrors.purposeOther && <span className="adm-form-error">{requestErrors.purposeOther}</span>}
+            </div>
+          )}
 
           {/* Invisible reCAPTCHA anchor for Firebase Phone Auth — renders no visible UI. */}
           <div id={RECAPTCHA_CONTAINER_ID} />

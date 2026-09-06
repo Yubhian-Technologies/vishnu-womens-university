@@ -11,6 +11,7 @@ import { parseInternshipsFile, dedupeInternshipRows, validateInternshipsImport, 
 import RndTableEditor from './RndTableEditor';
 import type { NewsletterYear, RndYear } from './ProgramsAdmin';
 import { resolveRndYears } from '../../../components/RndSection/RndSection';
+import { describeSaveError } from '../../../lib/formDiff';
 import type { DepartmentDoc } from './DepartmentsAdmin';
 
 // Placements, Internships, Research & Development, and Newsletter — all four
@@ -218,7 +219,7 @@ export function PlacementYearsEditor({ department }: { department: DepartmentDoc
       await persistYears(next);
       discardPreview(yi);
     } catch (e) {
-      alert(`Couldn't save: ${(e as Error).message}`);
+      alert(describeSaveError(e));
     } finally {
       setBusyYear(null);
     }
@@ -280,7 +281,7 @@ export function PlacementYearsEditor({ department }: { department: DepartmentDoc
       setEditingYear(null);
       setEditRows([]);
     } catch (e) {
-      alert(`Couldn't save changes: ${(e as Error).message}`);
+      alert(describeSaveError(e));
     } finally {
       setBusyYear(null);
     }
@@ -754,7 +755,7 @@ export function InternshipYearsEditor({ department }: { department: DepartmentDo
       await persistYears(next);
       discardPreview(yi);
     } catch (e) {
-      alert(`Couldn't save: ${(e as Error).message}`);
+      alert(describeSaveError(e));
     } finally {
       setBusyYear(null);
     }
@@ -816,7 +817,7 @@ export function InternshipYearsEditor({ department }: { department: DepartmentDo
       setEditingYear(null);
       setEditRows([]);
     } catch (e) {
-      alert(`Couldn't save changes: ${(e as Error).message}`);
+      alert(describeSaveError(e));
     } finally {
       setBusyYear(null);
     }
@@ -1110,7 +1111,7 @@ export function RndEditor({ department }: { department: DepartmentDoc }) {
       await updateDoc(doc(db, 'departments', department.id), { rndYears: years });
       setDirty(false);
     } catch (e) {
-      alert(`Couldn't save: ${(e as Error).message}`);
+      alert(describeSaveError(e));
     } finally {
       setSaving(false);
     }
@@ -1282,7 +1283,7 @@ export function NewsletterYearsEditor({ department }: { department: DepartmentDo
       await updateDoc(doc(db, 'departments', department.id), { newsletterYears: years });
       setDirty(false);
     } catch (e) {
-      alert(`Couldn't save: ${(e as Error).message}`);
+      alert(describeSaveError(e));
     } finally {
       setSaving(false);
     }
