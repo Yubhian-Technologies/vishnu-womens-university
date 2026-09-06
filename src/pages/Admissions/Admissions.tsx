@@ -431,14 +431,14 @@ export default function Admissions() {
                   <Mail size={22} strokeWidth={1.75} />
                   <div>
                     <strong>Email</strong>
-                    <a href={`mailto:${email}`}>{email}</a>
+                    <a href={`mailto:${email || 'admissions@vwu.edu.in'}`}>{email || 'admissions@vwu.edu.in'}</a>
                   </div>
                 </div>
                 <div className="adm-contact-item">
                   <MapPin size={22} strokeWidth={1.75} />
                   <div>
                     <strong>Office Location</strong>
-                    <span>Bhimavaram, West Godavari Dist., AP – 534 202</span>
+                    <span>Vishnupur, Bhimavaram, West Godavari Dist., AP – 534 202</span>
                   </div>
                 </div>
               </div>
