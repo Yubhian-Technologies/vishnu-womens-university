@@ -6,7 +6,7 @@ import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import { useOrderedCollection, type WithId } from '../../hooks/useCollection';
 import { usePageBanners } from '../../hooks/usePageBanners';
 import { fetchPriorityAttr } from '../../lib/domAttrs';
-import { CustomSectionsIntro, CustomSectionsAccordion, CustomSectionsPlain, CustomSectionsPills, SectionSubtree } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
+import { CustomSectionsIntro, CustomSectionsGalleries, CustomSectionsAccordion, CustomSectionsPlain, CustomSectionsPills, SectionSubtree } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import { hasCustomSectionContent, type CustomSection } from '../../lib/customSections';
 import CustomTabsPage, { type TabItem } from '../../components/CustomTabsPage/CustomTabsPage';
 import FacultyCarousel from '../../components/FacultyCarousel/FacultyCarousel';
@@ -454,19 +454,39 @@ export default function DifferentiatorDetail() {
 
   const CategoryIcon = CATEGORY_ICONS[category.id] || Rocket;
   const faculty = item.department ? allFaculty.filter((f) => f.department === item.department) : [];
-  // Real Custom Sections plus any not-yet-migrated legacy Highlights/
-  // Facilities/Outcomes/Partners content (see legacySectionsFromItem) —
-  // never duplicated, since a legacy id is skipped once a real section with
-  // that same id exists (i.e. once the admin re-saves the item). Vision/
-  // Mission/Objectives are excluded here — they're their own fixed fields
-  // now (see introBlocks below), rendered separately so they always lead,
-  // in a fixed order, ahead of any other admin-added intro section.
+  // Real Custom Sections, plus (only for an item that has genuinely never
+  // been through the new structure — `description` still unset) any legacy
+  // Highlights/Facilities/Outcomes/Partners content synthesized from the
+  // deprecated fields (see legacySectionsFromItem). That `alreadyMigrated`
+  // check matters: those deprecated fields are deliberately never cleared,
+  // so once an item HAS been migrated, re-merging them here on every render
+  // would silently bring back a Custom Section an admin just deleted (its id
+  // simply wouldn't be in `item.customSections` anymore, so the "already
+  // present" de-dupe below wouldn't catch it). Vision/Mission/Objectives are
+  // excluded here — they're their own fixed fields now (see introBlocks
+  // below), rendered separately so they always lead, in a fixed order, ahead
+  // of any other admin-added intro section.
+  const alreadyMigrated = item.description !== undefined;
   const promotedBlockIds = new Set(['vision', 'mission', 'objectives']);
-  const existingSectionIds = new Set((item.customSections || []).map((s) => s.id));
-  const effectiveCustomSections = [
-    ...(item.customSections || []).filter((s) => !promotedBlockIds.has(s.id)),
-    ...legacySectionsFromItem(item).filter((s) => !existingSectionIds.has(s.id)),
-  ];
+  const baseCustomSections = (item.customSections || []).filter((s) => !promotedBlockIds.has(s.id));
+  const legacyMergedSections = alreadyMigrated ? [] : (() => {
+    const existingIds = new Set(baseCustomSections.map((s) => s.id));
+    return legacySectionsFromItem(item).filter((s) => !existingIds.has(s.id));
+  })();
+  const effectiveCustomSections = [...baseCustomSections, ...legacyMergedSections];
+  // If the resolved description has no real content — never filled in, or
+  // (a since-fixed bug) migrated from an item that had only a Short
+  // Description and no old Intro/About text, leaving `description` written
+  // as empty — fall back to the item's Short Description (`desc`) rather
+  // than showing a blank page. Safe to do regardless of migration status,
+  // unlike falling back to intro/about again: `desc` is still a live,
+  // admin-editable field (the "Short Description" textarea), not a frozen
+  // deprecated one, so this can never resurrect something an admin actually
+  // deleted from Description.
+  const resolvedDescription = alreadyMigrated ? item.description! : legacyDescriptionFromItem(item);
+  const descriptionSection: CustomSection = hasCustomSectionContent(resolvedDescription)
+    ? resolvedDescription
+    : { id: 'description', label: 'Description', contentType: 'text', textContent: (item.desc || '').trim() };
   const introBlocks: CustomSection[] = (['vision', 'mission', 'objectives'] as const)
     .map((key) => resolveBlock(item, key))
     .filter((s): s is CustomSection => !!s)
@@ -501,8 +521,12 @@ export default function DifferentiatorDetail() {
                 <CategoryIcon size={14} /> {category.label}
               </div>
               <h1 className="dept-hero-title">{item.title}</h1>
-              {item.summary && (
-                <p className="dept-hero-subtitle">{item.summary}</p>
+              {/* `summary` has no admin field to set it — always empty in
+                  practice — so this falls back to the Short Description,
+                  same as PlacementDetail.tsx's hero uses `item.desc` for the
+                  same slot. */}
+              {(item.summary || item.desc) && (
+                <p className="dept-hero-subtitle">{item.summary || item.desc}</p>
               )}
             </div>
           </div>
@@ -524,16 +548,12 @@ export default function DifferentiatorDetail() {
               Outcomes, Partners, Contacts, ...) is just Custom Sections, so
               there's no more fixed sidebar. */}
           <div className="dept-about-main">
-            <div className="dept-about-header">
-              <span className="section-label dept-section-label">Overview</span>
-              <h2 className="section-title">
-                <span style={{ fontWeight: 400 }}>About </span>
-                <span style={{ fontWeight: 800 }}>{item.title}</span>
-              </h2>
-            </div>
-
+            {/* No "Overview" / "About {title}" heading here on purpose — the
+                description below is meant to lead the page with no heading
+                of its own or above it (unlike About VWU/About SVES/About
+                R&D elsewhere on the site, which keep theirs). */}
             <div className="dept-about-card">
-              <SectionSubtree section={item.description && hasCustomSectionContent(item.description) ? item.description : legacyDescriptionFromItem(item)} />
+              <SectionSubtree section={descriptionSection} />
             </div>
 
             {/* Vision/Mission/Objectives (introBlocks — fixed fields, only
@@ -543,6 +563,7 @@ export default function DifferentiatorDetail() {
                 Contacts, ...) renders as a collapsible accordion below (see
                 lib/customSections.ts). */}
             <CustomSectionsIntro sections={[...introBlocks, ...effectiveCustomSections]} />
+            <CustomSectionsGalleries sections={effectiveCustomSections} />
             <CustomSectionsAccordion sections={effectiveCustomSections} />
           </div>
         </div>

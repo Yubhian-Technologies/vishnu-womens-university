@@ -4,6 +4,7 @@ import { hasCustomSectionContent, type CustomSection, type CustomSectionPhoto } 
 import { parseFlexibleTable, parseLinkList } from '../../lib/structuredTable';
 import FlexibleTable from '../FlexibleTable/FlexibleTable';
 import SmoothCollapse from '../SmoothCollapse/SmoothCollapse';
+import PhotoCarouselStrip from '../PhotoCarousel/PhotoCarouselStrip';
 import { linkify } from '../../lib/linkify';
 import './CustomSectionsRenderer.css';
 
@@ -56,8 +57,12 @@ export default function CustomSectionsRenderer({ sections, navOffset = DEFAULT_N
 // compactly inline in the page's existing intro column (next to About),
 // matching the small accent-bar SectionHeading style the old hardcoded
 // Vision/Mission/Objectives blocks used, instead of a full boxed section.
+// Excludes Photo Gallery sections — each column here is narrow
+// (minmax(240px, 1fr), see .dh-brief-grid), which squeezes a gallery's own
+// photo grid down to a single vertical column of thumbnails; those render
+// as their own full-width carousel instead (see CustomSectionsGalleries).
 export function CustomSectionsIntro({ sections }: { sections: CustomSection[] }) {
-  const visible = sections.filter((s) => s.placement === 'intro' && hasCustomSectionContent(s));
+  const visible = sections.filter((s) => s.placement === 'intro' && s.contentType !== 'gallery' && hasCustomSectionContent(s));
   if (visible.length === 0) return null;
   return (
     <div className="dh-brief-grid">
@@ -69,6 +74,35 @@ export function CustomSectionsIntro({ sections }: { sections: CustomSection[] })
           <SectionSubtitle subtitle={section.subtitle} />
           <div className="dh-brief__body">
             <SectionSubtree section={section} />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// Differentiators detail page — Photo Gallery sections never collapse behind
+// the accordion (see CustomSectionsAccordion) and never squeeze into the
+// narrow CustomSectionsIntro grid either (see the comment there): each one
+// gets its own full-width auto-scrolling carousel, positioned between the
+// two — always visible, never vertical.
+export function CustomSectionsGalleries({ sections }: { sections: CustomSection[] }) {
+  const visible = sections.filter((s) => s.contentType === 'gallery' && hasCustomSectionContent(s));
+  if (visible.length === 0) return null;
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-8)', marginTop: 'var(--space-6)' }}>
+      {visible.map((section, index) => (
+        <div key={`${section.id}-${index}`}>
+          <div className="dh-brief__label" style={section.boldHeading ? { fontWeight: 900 } : undefined}>
+            {section.label}
+          </div>
+          <SectionSubtitle subtitle={section.subtitle} />
+          <div style={{ marginTop: 'var(--space-3)' }}>
+            <PhotoCarouselStrip
+              cards={(section.galleryPhotos || [])
+                .filter((p) => p.imageUrl)
+                .map((p) => ({ name: '', subtitle: '', imageUrl: p.imageUrl, storagePath: p.storagePath }))}
+            />
           </div>
         </div>
       ))}
@@ -201,9 +235,11 @@ export function CustomSectionsPills({ sections }: { sections: CustomSection[] })
 // Differentiators detail page — every section WITHOUT placement:'intro'
 // (the default) renders as a single-open collapsible accordion, matching the
 // old hardcoded In-charge/Academic Projects/Students Benefited/Outcomes/
-// Activities accordions.
+// Activities accordions. A Photo Gallery section is excluded here even when
+// left at the default placement — it always renders in CustomSectionsIntro
+// above instead, never collapsed (see the comment there).
 export function CustomSectionsAccordion({ sections }: { sections: CustomSection[] }) {
-  const visible = sections.filter((s) => s.placement !== 'intro' && hasCustomSectionContent(s));
+  const visible = sections.filter((s) => s.placement !== 'intro' && s.contentType !== 'gallery' && hasCustomSectionContent(s));
   const [openIndex, setOpenIndex] = useState<number | null>(0);
   if (visible.length === 0) return null;
 

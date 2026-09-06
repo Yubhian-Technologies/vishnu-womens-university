@@ -232,16 +232,22 @@ export default function CustomSectionEditor({
                 </select>
               </div>
               {showPlacementToggle && depth === 0 && (
-                <div className="admin-field" style={{ flex: 1, minWidth: 170 }}>
-                  <select
-                    value={s.placement === 'intro' ? 'intro' : 'accordion'}
-                    onChange={(e) => updateSection(si, { placement: e.target.value === 'intro' ? 'intro' : 'accordion' })}
-                    title="Where this section shows on the public page"
-                  >
-                    <option value="accordion">In the accordion below</option>
-                    <option value="intro">In the intro area above</option>
-                  </select>
-                </div>
+                s.contentType === 'gallery' ? (
+                  <p className="admin-field__hint" style={{ flex: 1, minWidth: 170, margin: 0, alignSelf: 'center' }}>
+                    A Photo Gallery always shows as its own full-width carousel, never collapsed.
+                  </p>
+                ) : (
+                  <div className="admin-field" style={{ flex: 1, minWidth: 170 }}>
+                    <select
+                      value={s.placement === 'intro' ? 'intro' : 'accordion'}
+                      onChange={(e) => updateSection(si, { placement: e.target.value === 'intro' ? 'intro' : 'accordion' })}
+                      title="Where this section shows on the public page"
+                    >
+                      <option value="accordion">In the accordion below</option>
+                      <option value="intro">In the intro area above</option>
+                    </select>
+                  </div>
+                )
               )}
               <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', alignSelf: 'center', fontSize: 'var(--text-sm)', whiteSpace: 'nowrap' }}>
                 <input

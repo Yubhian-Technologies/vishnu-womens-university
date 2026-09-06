@@ -205,16 +205,34 @@ const TABS_SLUGS = new Set(['talentsprint-wise', 'institution-innovation-cell', 
 // item ends up byte-for-byte identical to one an admin opened and saved by
 // hand. Pure and additive: never removes/overwrites real content, only fills
 // in the new fields from whatever legacy content is present.
+//
+// Once an item has been through this once — its `description` field exists
+// at all in Firestore, even set to empty text by an admin who deliberately
+// cleared it — this must NOT go back to the deprecated legacy fields again.
+// Those fields (highlights/facilities/outcomes/partners/intro/about) are
+// kept around forever on purpose (nothing here ever deletes them), so
+// re-deriving Custom Sections from them on every call would mean an admin
+// deleting, say, the "Facilities & Equipment" Custom Section just comes back
+// on the next save or page load, since `it.facilities` itself never changed.
+// `description`'s mere presence is what tells the two apart: it's always
+// written together with the other 4 fields (see save()'s
+// editingWasAlreadyMigrated handling below, and migrateAll), so an item
+// missing it has genuinely never been touched by the new structure yet.
 function computeMigratedFields(it: DifferentiatorItemDoc): Pick<DifferentiatorItemDoc, 'description' | 'vision' | 'mission' | 'objectives' | 'customSections'> {
-  const existingSectionIds = new Set((it.customSections || []).map((s) => s.id));
-  const migratedSections = TABS_SLUGS.has(it.slug) ? [] : legacySectionsFrom(it).filter((s) => !existingSectionIds.has(s.id));
+  const alreadyMigrated = it.description !== undefined;
   const promotedIds = new Set(['vision', 'mission', 'objectives']);
+  const baseCustomSections = (it.customSections || []).filter((s) => !promotedIds.has(s.id));
+  let migratedSections: CustomSection[] = [];
+  if (!alreadyMigrated && !TABS_SLUGS.has(it.slug)) {
+    const existingIds = new Set(baseCustomSections.map((s) => s.id));
+    migratedSections = legacySectionsFrom(it).filter((s) => !existingIds.has(s.id));
+  }
   return {
-    description: it.description && hasCustomSectionContent(it.description) ? it.description : legacyDescriptionFrom(it),
+    description: alreadyMigrated ? it.description! : legacyDescriptionFrom(it),
     vision: blockOrPromotedSection(it, 'vision'),
     mission: blockOrPromotedSection(it, 'mission'),
     objectives: blockOrPromotedSection(it, 'objectives'),
-    customSections: [...(it.customSections || []).filter((s) => !promotedIds.has(s.id)), ...migratedSections],
+    customSections: [...baseCustomSections, ...migratedSections],
   };
 }
 
@@ -289,6 +307,17 @@ export default function DifferentiatorsAdmin() {
   // stale copy (see lib/formDiff.ts). null while adding a new item.
   const [originalForm, setOriginalForm] = useState<Omit<DifferentiatorItemDoc, 'id'> | null>(null);
   const [editing, setEditing] = useState<string | null>(null);
+  // Whether the item currently being edited already had `description` set
+  // in Firestore when startEdit opened it — i.e. whether it had already been
+  // through the new structure once. See save()'s use of this: the very
+  // first save of a not-yet-migrated item must write description/vision/
+  // mission/objectives/customSections in full, even where their computed
+  // values happen to match what startEdit already prefilled, or `description`
+  // could stay unset in Firestore and computeMigratedFields would keep
+  // treating the item as unmigrated — silently undoing any Custom Section
+  // the admin just deleted the next time this item loads (see
+  // computeMigratedFields's comment for the full explanation).
+  const [editingWasAlreadyMigrated, setEditingWasAlreadyMigrated] = useState(true);
   const [saving, setSaving] = useState(false);
   const [filterCat, setFilterCat] = useState('All');
   const [activeSubKey, setActiveSubKey] = useState<string | null>(null);
@@ -533,13 +562,21 @@ export default function DifferentiatorsAdmin() {
         // Only send fields that actually changed in this editing session —
         // see originalForm/diffChangedFields above.
         const changed = originalForm ? diffChangedFields(payload, originalForm) : payload;
-        if (Object.keys(changed).length > 0) {
-          await updateDoc(doc(db, 'differentiatorItems', editing), changed);
+        // See editingWasAlreadyMigrated above — force these 5 through on the
+        // very first save of a not-yet-migrated item, even if none of them
+        // individually differ from what startEdit already prefilled.
+        const finalChanged = editingWasAlreadyMigrated ? changed : {
+          ...changed,
+          description: payload.description, vision: payload.vision, mission: payload.mission,
+          objectives: payload.objectives, customSections: payload.customSections,
+        };
+        if (Object.keys(finalChanged).length > 0) {
+          await updateDoc(doc(db, 'differentiatorItems', editing), finalChanged);
         }
       } else {
         await addDoc(collection(db, 'differentiatorItems'), { ...payload, order: form.order || items.length + 1, createdAt: serverTimestamp() });
       }
-      setForm(EMPTY); setEditing(null); setActiveSubKey(null); setOriginalForm(null);
+      setForm(EMPTY); setEditing(null); setActiveSubKey(null); setOriginalForm(null); setEditingWasAlreadyMigrated(true);
     } catch (e) {
       alert(`Couldn't save: ${(e as Error).message}`);
     } finally { setSaving(false); }
@@ -547,6 +584,7 @@ export default function DifferentiatorsAdmin() {
 
   const startEdit = (it: DifferentiatorItemDoc) => {
     setEditing(it.id);
+    setEditingWasAlreadyMigrated(it.description !== undefined);
     const next: Omit<DifferentiatorItemDoc, 'id'> = {
       slug: it.slug, title: it.title, category: it.category, department: it.department || '', desc: it.desc || '',
       external: !!it.external, url: it.url || '',
@@ -770,7 +808,7 @@ export default function DifferentiatorsAdmin() {
           )}
         </div>
         <div className="admin-form-actions">
-          {editing && <button className="admin-btn admin-btn--ghost" onClick={() => { setEditing(null); setForm(EMPTY); setActiveSubKey(null); setOriginalForm(null); }}>Cancel</button>}
+          {editing && <button className="admin-btn admin-btn--ghost" onClick={() => { setEditing(null); setForm(EMPTY); setActiveSubKey(null); setOriginalForm(null); setEditingWasAlreadyMigrated(true); }}>Cancel</button>}
           <button className="admin-btn admin-btn--primary" onClick={save} disabled={saving}>{saving ? 'Saving…' : editing ? 'Update' : 'Add Item'}</button>
         </div>
       </div>
