@@ -115,7 +115,7 @@ const DEFAULT_INFO_CARDS = [
   {
     id: 'default-info-4',
     title: 'Admissions Quick Info',
-    desc: 'EAPCET Code: VISW, VISWPU\nEmail: admissions@vwu.edu.in\nHelpline: +91 8816 250864',
+    desc: 'AP EAPCET Code: VISW, VISWPU\nEmail: admissions@vwu.edu.in\nHelpline: +91 8816 250864',
     value: 'Mon – Sat: 9:00 AM – 5:00 PM IST',
     slug: 'Admissions Desk',
     icon: 'GraduationCap',
@@ -402,6 +402,10 @@ export default function Contact() {
               <a href="tel:18001805522" className="emergency-pill">
                 <span className="emergency-pill__label">Anti-Ragging Toll-Free</span>
                 <span className="emergency-pill__num">1800-180-5522</span>
+              </a>
+              <a href="tel:18005990599" className="emergency-pill">
+                <span className="emergency-pill__label">University Toll-Free</span>
+                <span className="emergency-pill__num">1800 599 0599</span>
               </a>
               <a href="tel:+918816250864" className="emergency-pill">
                 <span className="emergency-pill__label">Campus Security</span>

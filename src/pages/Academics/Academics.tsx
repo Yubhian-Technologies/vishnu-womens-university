@@ -473,10 +473,10 @@ export default function Academics() {
             <span className="section-label" style={{ color: 'var(--color-accent)' }}>Get Started</span>
             <h2 className="section-title" style={{ color: 'var(--color-white)' }}>Ready to Join VWU?</h2>
             <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 'var(--text-lg)', maxWidth: 560, margin: '0 auto var(--space-8)' }}>
-              Arrange a campus visit, request further information, or apply through EAPCET (Code: {eapcetCode}) today.
+              Arrange a campus visit, request further information, or apply through AP EAPCET (Code: {eapcetCode}) today.
             </p>
             <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Link to="/admissions" className="btn btn-accent btn-lg">Apply via EAPCET</Link>
+              <Link to="/admissions" className="btn btn-accent btn-lg">Apply via AP EAPCET</Link>
               <Link to="/admission-procedure" className="btn btn-secondary btn-lg">Admission Procedure</Link>
               <Link to="/programmes-fee-structure" className="btn btn-secondary btn-lg">Fee Structure</Link>
             </div>

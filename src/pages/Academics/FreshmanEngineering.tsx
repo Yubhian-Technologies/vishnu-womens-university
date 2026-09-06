@@ -514,7 +514,7 @@ export const SUB_DEPTS: SubDept[] = [
     key: 'Department of Mathematics',
     slug: 'mathematics',
     title: 'Department of Mathematics',
-    tabs: ['Department Overview', 'About HOD', 'Faculty', 'Research & Development', 'Awards & Recognitions'],
+    tabs: ['Department Overview', 'Brief Profile', 'Faculty', 'Research & Development', 'Awards & Recognitions'],
     about: [
       { type: 'paragraph', text: "Engineering Mathematics is considered as basis for all branches of engineering as it encompasses theoretical principles underlying many real time applications. It is in fact the art of applying mathematics to complex real-world problems. It combines mathematical theory, practical engineering and scientific computing to address today's technological challenges. A strong foundation in Mathematics at entry level enables an Engineering student to have a fruitful academic career at lateral levels and subsequently make a correct choice for his / her professional arena. Keeping this as the main objective, the Mathematics team of Basic Science Department is striving to cater to the needs of students of all branches of engineering and also that of Management studies. Having its presence since the inception of the institution, the team has since grown in size as well as in reputation with faculty members who are well qualified and fully experienced in the areas of Mathematics as well as Statistics, the team is certainly one of the most sought after in the institute." },
       { type: 'lead', text: 'The subjects that are handled as a part of regular engineering and Management studies curricula are:' },
@@ -561,7 +561,7 @@ export const SUB_DEPTS: SubDept[] = [
     key: 'Department of Physics',
     slug: 'physics',
     title: 'Department of Physics',
-    tabs: ['Department Overview', 'About HOD', 'Faculty', 'Laboratories', 'Research & Development', 'Awards'],
+    tabs: ['Department Overview', 'Brief Profile', 'Faculty', 'Laboratories', 'Research & Development', 'Awards'],
     about: [
       { type: 'paragraph', text: <>The Department of Physics at <strong>Shri Vishnu Engineering College for Women</strong> plays a pivotal role in bridging the gap between fundamental scientific principles and engineering innovation. As an integral part of the college&apos;s interdisciplinary approach to education and research, our department is committed to advancing knowledge at the intersection of physics and engineering while preparing students for successful careers in a rapidly evolving technological landscape.</> },
     ],
@@ -615,7 +615,7 @@ export const SUB_DEPTS: SubDept[] = [
     key: 'Department of Chemistry',
     slug: 'chemistry',
     title: 'Department of Chemistry',
-    tabs: ['Department Overview', 'About HOD', 'Faculty', 'Laboratories', 'Research & Development', 'Awards & Recognitions'],
+    tabs: ['Department Overview', 'Brief Profile', 'Faculty', 'Laboratories', 'Research & Development', 'Awards & Recognitions'],
     about: [
       { type: 'paragraph', text: 'The Department of Chemistry at SVECW plays a vital role in equipping our engineering students with a strong foundation in chemical principles. We believe a deep understanding of chemistry is essential for success in various engineering disciplines.' },
       { type: 'heading', text: 'Courses' },
@@ -688,7 +688,7 @@ export const SUB_DEPTS: SubDept[] = [
     key: 'Department of English',
     slug: 'english',
     title: 'Department of English',
-    tabs: ['Department Overview', 'About HOD', 'Faculty', 'Laboratories', 'Research & Development', 'Awards'],
+    tabs: ['Department Overview', 'Brief Profile', 'Faculty', 'Laboratories', 'Research & Development', 'Awards'],
     about: [
       { type: 'paragraph', text: "Department of English plays a pivotal role in nurturing students' language proficiency across the four essential skills. With a dedicated focus on fortifying fundamental principles and revitalizing knowledge, our department boasts a team of target-oriented, seasoned faculty members with extensive teaching experience. The team consistently strive to exceed student expectations, fostering an environment where students feel comfortable seeking guidance, counselling, or clarification. Accessible and approachable, our faculty members ensure that students receive the support they need to excel in courses ranging from Communicative English to Communicative English Lab and Advanced Communication Skills." },
       { type: 'paragraph', text: 'At the heart of our English department lies a commitment to empowering students with the linguistic tools necessary for success in an increasingly interconnected world. Through comprehensive instruction and personalized mentorship, we aim to equip students with the proficiency and confidence to navigate diverse linguistic contexts with ease. Our faculty members serve not only as educators but also as mentors, guiding students on their journey towards proficiency in English language and communication. With a steadfast dedication to quality, the English department empower students to thrive in academic, professional, and personal endeavours.' },
@@ -765,7 +765,7 @@ export function SubDeptSection({ dept }: { dept: SubDept }) {
       </div>
 
       {innerTab === 'Department Overview' && <Blocks blocks={dept.about} />}
-      {innerTab === 'About HOD' && <FeAboutHodSection department={deptName} />}
+      {innerTab === 'Brief Profile' && <FeAboutHodSection department={deptName} />}
       {innerTab === 'Faculty' && <FeFacultyGridSection department={deptName} />}
       {innerTab === 'Research & Development' && (
         dept.researchDev ? <Blocks blocks={dept.researchDev} /> : (

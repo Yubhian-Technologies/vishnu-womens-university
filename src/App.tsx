@@ -111,15 +111,35 @@ const PoliciesProcedures = lazyWithRetry(() => import('./pages/PoliciesProcedure
 const AdminLayout = lazyWithRetry(() => import('./pages/Admin/AdminLayout'));
 const Launch = lazyWithRetry(() => import('./pages/Launch/Launch'));
 
-function ScrollToTop() {
+// Resets scroll to the top on every route change. Rendered INSIDE the route
+// <Suspense> (see PublicApp) rather than as a sibling of it, on purpose:
+// with v7_startTransition React keeps the previous page on screen until the
+// next route's lazy chunk finishes loading, so an effect placed outside
+// Suspense fires while the old page is still showing — then the new (often
+// taller) page mounts wherever the old scroll position left it, which is the
+// "page opens at the footer" bug. Inside Suspense this effect runs in the
+// same commit as the newly-loaded page, so the reset always lands on it.
+function RouteScrollReset() {
   const { pathname, hash } = useLocation();
+
+  // Stop the browser from restoring a remembered scroll position on
+  // back/forward — it lands asynchronously, after this reset, and fights
+  // Lenis for the final position.
   useEffect(() => {
-    // Skip resetting scroll when the URL carries a hash (e.g. "/campus#library") —
-    // the destination page's own useHashScroll effect owns positioning in that
-    // case, and racing it here caused inconsistent/flaky landing positions.
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  }, []);
+
+  useEffect(() => {
+    // A hashed URL (e.g. "/campus#library") is positioned by the destination
+    // page's own useHashScroll effect — don't race it here.
     if (hash) return;
     smoothScrollTo(0, { immediate: true });
+    // Re-assert on the next frame in case the page's own mount effects nudge
+    // scroll (carousel autoplay, autofocus, late layout shift).
+    const raf = requestAnimationFrame(() => smoothScrollTo(0, { immediate: true }));
+    return () => cancelAnimationFrame(raf);
   }, [pathname, hash]);
+
   return null;
 }
 
@@ -128,7 +148,6 @@ function PublicApp() {
 
   return (
     <>
-      <ScrollToTop />
       {/* Full-screen intro video (once per session). Rendered on top of — but
           not gating — the rest of PublicApp, so the Header, Footer, and the
           lazy-loaded page all download and render in parallel beneath it.
@@ -137,6 +156,7 @@ function PublicApp() {
       <Header />
       <ErrorBoundary>
         <Suspense fallback={<RouteFallback />}>
+          <RouteScrollReset />
           <Routes location={location}>
             <Route path="/" element={<LandingPageLoader />} />
             <Route path="/academics" element={<Academics />} />

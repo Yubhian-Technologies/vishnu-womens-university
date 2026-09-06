@@ -504,9 +504,6 @@ export default function DifferentiatorDetail() {
               {item.summary && (
                 <p className="dept-hero-subtitle">{item.summary}</p>
               )}
-              <div className="dept-hero-cta">
-                <Link to="/apply-now" className="btn-hero-gold">Apply Now</Link>
-              </div>
             </div>
           </div>
         </div>

@@ -6,6 +6,7 @@ import { useOrderedCollection } from '../../../hooks/useCollection';
 export interface AdmissionInquiryDoc {
   id: string;
   firstName: string;
+  lastName?: string;
   phone: string;
   program: string;
   purpose: string;
@@ -78,7 +79,7 @@ export default function AdmissionInquiriesAdmin() {
                       </button>
                     </td>
                     <td>{formatTimestamp(i.createdAt)}</td>
-                    <td>{i.firstName}</td>
+                    <td>{[i.firstName, i.lastName].filter(Boolean).join(' ')}</td>
                     <td>{i.phone}</td>
                     <td>{i.program}</td>
                     <td>{i.purpose}</td>
@@ -98,7 +99,7 @@ export default function AdmissionInquiriesAdmin() {
       {selected && (
         <div className="admin-card admin-detail-card">
           <div className="admin-detail-card__header">
-            <h2 className="admin-card__title">{selected.firstName}</h2>
+            <h2 className="admin-card__title">{[selected.firstName, selected.lastName].filter(Boolean).join(' ')}</h2>
             <button className="admin-btn admin-btn--sm admin-btn--ghost" onClick={() => setSelectedId(null)}>Close</button>
           </div>
           <div className="admin-detail-row"><strong>Phone:</strong> <a href={`tel:${selected.phone}`}>{selected.phone}</a> {selected.phoneVerified && <span className="admin-badge admin-badge--sm admin-badge--green">OTP Verified</span>}</div>

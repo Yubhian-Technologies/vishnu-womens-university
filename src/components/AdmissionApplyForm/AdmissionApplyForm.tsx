@@ -14,10 +14,59 @@ const PURPOSE_OPTIONS = [
   'Other',
 ];
 
+const PROGRAM_LEVEL_OPTIONS = [
+  { value: 'B.Tech', label: 'B.Tech (Undergraduate)' },
+  { value: 'M.Tech', label: 'M.Tech (Postgraduate)' },
+  { value: 'MBA', label: 'MBA (Postgraduate)' },
+  { value: 'Ph.D.', label: 'Ph.D. (Doctoral Research)' },
+  { value: 'Other', label: 'Other Degree / Program' },
+];
+
+const SPECIFIC_PROGRAMS: Record<string, string[]> = {
+  'B.Tech': [
+    'B.Tech - Computer Science & Engineering (CSE)',
+    'B.Tech - CSE (Artificial Intelligence & Machine Learning)',
+    'B.Tech - CSE (Artificial Intelligence & Data Science)',
+    'B.Tech - CSE (Cyber Security)',
+    'B.Tech - Information Technology (IT)',
+    'B.Tech - Electronics & Communication Engineering (ECE)',
+    'B.Tech - Electronics Engineering (VLSI Design & Technology)',
+    'B.Tech - Electrical & Electronics Engineering (EEE)',
+    'B.Tech - Civil Engineering',
+    'B.Tech - Mechanical Engineering',
+    'Other (Please specify)',
+  ],
+  'M.Tech': [
+    'M.Tech - Computer Science & Engineering',
+    'M.Tech - VLSI Design',
+    'M.Tech - Power Electronics',
+    'M.Tech - Software Engineering',
+    'Other (Please specify)',
+  ],
+  'MBA': [
+    'Master of Business Administration (MBA)',
+    'Other (Please specify)',
+  ],
+  'Ph.D.': [
+    'Ph.D. - Computer Science & Engineering',
+    'Ph.D. - Electronics & Communication Engineering',
+    'Ph.D. - Electrical & Electronics Engineering',
+    'Ph.D. - Information Technology',
+    'Ph.D. - Basic Sciences & Humanities',
+    'Other (Please specify)',
+  ],
+  'Other': [
+    'Other (Please specify)',
+  ],
+};
+
 interface RequestInfoForm {
   firstName: string;
+  lastName: string;
   phone: string;
+  degreeLevel: string;
   program: string;
+  customProgram: string;
   purpose: string;
   // Only used (and required) when purpose === 'Other' — the free-text
   // reason, substituted in for the literal word "Other" at submit time
@@ -30,8 +79,11 @@ type RequestInfoFormErrors = Partial<Record<keyof RequestInfoForm, string>>;
 
 const INITIAL_REQUEST_FORM: RequestInfoForm = {
   firstName: '',
+  lastName: '',
   phone: '',
+  degreeLevel: '',
   program: '',
+  customProgram: '',
   purpose: '',
   purposeOther: '',
 };
@@ -39,12 +91,30 @@ const INITIAL_REQUEST_FORM: RequestInfoForm = {
 const PHONE_RE = /^[+]?[\d\s-]{7,15}$/;
 const RECAPTCHA_CONTAINER_ID = 'curious-form-recaptcha-container';
 
+function isCustomProgramRequired(form: RequestInfoForm): boolean {
+  return form.degreeLevel === 'Other' || form.program.startsWith('Other');
+}
+
+function getSubmittedProgram(form: RequestInfoForm): string {
+  if (isCustomProgramRequired(form) && form.customProgram.trim()) {
+    return form.degreeLevel && form.degreeLevel !== 'Other'
+      ? `${form.degreeLevel} - ${form.customProgram.trim()}`
+      : form.customProgram.trim();
+  }
+  return form.program;
+}
+
 function validateRequestInfoForm(form: RequestInfoForm): RequestInfoFormErrors {
   const errors: RequestInfoFormErrors = {};
   if (!form.firstName.trim()) errors.firstName = 'Please enter your first name.';
+  if (!form.lastName.trim()) errors.lastName = 'Please enter your last name.';
   if (!form.phone.trim()) errors.phone = 'Please enter your mobile number.';
   else if (!PHONE_RE.test(form.phone.trim())) errors.phone = 'Please enter a valid mobile number.';
-  if (!form.program) errors.program = 'Please select a program.';
+  if (!form.degreeLevel) errors.degreeLevel = 'Please select a degree level.';
+  if (!form.program) errors.program = 'Please select a specific program.';
+  if (isCustomProgramRequired(form) && !form.customProgram.trim()) {
+    errors.customProgram = 'Please specify your program name.';
+  }
   if (!form.purpose) errors.purpose = 'Please select a purpose.';
   else if (form.purpose === 'Other' && !form.purposeOther.trim()) errors.purposeOther = 'Please tell us your purpose.';
   return errors;
@@ -173,10 +243,13 @@ export default function AdmissionApplyForm() {
     setSubmittingDirect(true);
     setOtpError(null);
     try {
-      const { purposeOther: _purposeOther, ...inquiryFields } = requestForm;
+      const submittedProgram = getSubmittedProgram(requestForm);
+      const submittedPurpose = submitPurpose(requestForm);
+
       await addDoc(collection(db, 'admissionInquiries'), {
-        ...inquiryFields,
-        purpose: submitPurpose(requestForm),
+        ...requestForm,
+        program: submittedProgram,
+        purpose: submittedPurpose,
         phoneVerified: false,
         status: 'new',
         createdAt: serverTimestamp(),
@@ -185,9 +258,11 @@ export default function AdmissionApplyForm() {
       if (EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID_ADMISSIONS && EMAILJS_PUBLIC_KEY) {
         const templateParams = {
           first_name: requestForm.firstName,
+          last_name: requestForm.lastName,
+          full_name: `${requestForm.firstName} ${requestForm.lastName}`.trim(),
           phone: requestForm.phone,
-          program: requestForm.program,
-          purpose: submitPurpose(requestForm),
+          program: submittedProgram,
+          purpose: submittedPurpose,
         };
         try {
           await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID_ADMISSIONS, templateParams, EMAILJS_PUBLIC_KEY);
@@ -233,10 +308,13 @@ export default function AdmissionApplyForm() {
       // nothing is saved until this line succeeds.
       await confirmationResult.confirm(otp.trim());
 
-      const { purposeOther: _purposeOther, ...inquiryFields } = requestForm;
+      const submittedProgram = getSubmittedProgram(requestForm);
+      const submittedPurpose = submitPurpose(requestForm);
+
       await addDoc(collection(db, 'admissionInquiries'), {
-        ...inquiryFields,
-        purpose: submitPurpose(requestForm),
+        ...requestForm,
+        program: submittedProgram,
+        purpose: submittedPurpose,
         phoneVerified: true,
         status: 'new',
         createdAt: serverTimestamp(),
@@ -245,9 +323,11 @@ export default function AdmissionApplyForm() {
       if (EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID_ADMISSIONS && EMAILJS_PUBLIC_KEY) {
         const templateParams = {
           first_name: requestForm.firstName,
+          last_name: requestForm.lastName,
+          full_name: `${requestForm.firstName} ${requestForm.lastName}`.trim(),
           phone: requestForm.phone,
-          program: requestForm.program,
-          purpose: submitPurpose(requestForm),
+          program: submittedProgram,
+          purpose: submittedPurpose,
         };
         try {
           await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID_ADMISSIONS, templateParams, EMAILJS_PUBLIC_KEY);
@@ -290,6 +370,16 @@ export default function AdmissionApplyForm() {
             {requestErrors.firstName && <span className="adm-form-error">{requestErrors.firstName}</span>}
           </div>
           <div className="adm-form-group">
+            <label>Last Name</label>
+            <input
+              type="text" name="lastName" placeholder="Last name"
+              value={requestForm.lastName} onChange={handleRequestFormChange}
+              className={requestErrors.lastName ? 'has-error' : undefined}
+              aria-invalid={!!requestErrors.lastName}
+            />
+            {requestErrors.lastName && <span className="adm-form-error">{requestErrors.lastName}</span>}
+          </div>
+          <div className="adm-form-group">
             <label>Mobile Number</label>
             <input
               type="tel" name="phone" placeholder="+91 98765 43210"
@@ -300,20 +390,76 @@ export default function AdmissionApplyForm() {
             {requestErrors.phone && <span className="adm-form-error">{requestErrors.phone}</span>}
           </div>
           <div className="adm-form-group">
-            <label>Program Interest</label>
+            <label>Degree Level</label>
             <select
-              name="program" value={requestForm.program} onChange={handleRequestFormChange}
+              name="degreeLevel"
+              value={requestForm.degreeLevel}
+              onChange={(e) => {
+                const val = e.target.value;
+                setRequestForm((prev) => ({
+                  ...prev,
+                  degreeLevel: val,
+                  program: '',
+                }));
+                setRequestErrors((prev) => ({
+                  ...prev,
+                  degreeLevel: undefined,
+                  program: undefined,
+                }));
+              }}
+              className={requestErrors.degreeLevel ? 'has-error' : undefined}
+              aria-invalid={!!requestErrors.degreeLevel}
+            >
+              <option value="">Select degree level...</option>
+              {PROGRAM_LEVEL_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+            {requestErrors.degreeLevel && <span className="adm-form-error">{requestErrors.degreeLevel}</span>}
+          </div>
+
+          <div className="adm-form-group">
+            <label>Specific Program / Specialization</label>
+            <select
+              name="program"
+              value={requestForm.program}
+              onChange={handleRequestFormChange}
+              disabled={!requestForm.degreeLevel}
               className={requestErrors.program ? 'has-error' : undefined}
               aria-invalid={!!requestErrors.program}
             >
-              <option value="">Select a program...</option>
-              <option value="B.Tech">B.Tech</option>
-              <option value="M.Tech">M.Tech</option>
-              <option value="MBA">MBA</option>
-              <option value="Ph.D.">Ph.D.</option>
+              <option value="">
+                {requestForm.degreeLevel ? 'Select a program / specialization...' : 'Select degree level first'}
+              </option>
+              {requestForm.degreeLevel &&
+                (SPECIFIC_PROGRAMS[requestForm.degreeLevel] || []).map((p) => (
+                  <option key={p} value={p}>
+                    {p}
+                  </option>
+                ))}
             </select>
             {requestErrors.program && <span className="adm-form-error">{requestErrors.program}</span>}
           </div>
+
+          {isCustomProgramRequired(requestForm) && (
+            <div className="adm-form-group">
+              <label>Specify Program Name</label>
+              <input
+                type="text"
+                name="customProgram"
+                placeholder="Enter custom program / specialization name..."
+                value={requestForm.customProgram}
+                onChange={handleRequestFormChange}
+                className={requestErrors.customProgram ? 'has-error' : undefined}
+                aria-invalid={!!requestErrors.customProgram}
+              />
+              {requestErrors.customProgram && (
+                <span className="adm-form-error">{requestErrors.customProgram}</span>
+              )}
+            </div>
+          )}
           <div className="adm-form-group">
             <label>Purpose</label>
             <select

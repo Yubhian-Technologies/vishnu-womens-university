@@ -151,7 +151,7 @@ const PAGE_TEXT_DEFAULTS: Record<string, { title: string; subtitle?: string }> =
   'academics': { title: 'You Will Excel.', subtitle: 'Rigorous, industry-aligned programs designed to build your technical expertise, sharpen your research instincts, and develop you as a professional.' },
   'faculty': { title: 'Our Faculty', subtitle: 'Experienced educators and researchers across every department, dedicated to academic excellence and student success.' },
   'academics-downloads': { title: 'Academic Documents', subtitle: 'Official academic documents — calendar and regulations — available for download.' },
-  'programmes-fee': { title: 'Programmes & Fee Structure', subtitle: 'Complete list of programs, intake capacities, and annual fee structure for AY 2025–26.' },
+  'programmes-fee': { title: 'Programmes & Fee Structure', subtitle: 'Complete list of programs, intake capacities, and annual fee structure Category A.' },
   'student-life': { title: 'Discover Your Place at VWU', subtitle: 'VWU offers more than an engineering qualification. It is where you find your community, sharpen your purpose, and start building your future.' },
   'differentiators': { title: 'What Sets VWU Apart', subtitle: 'Distinctive initiatives in innovation, industry engagement, research, international outreach, and student development — all aimed at producing well-rounded women engineers.' },
   'governing-body': { title: 'Governing Body', subtitle: 'Dedicated leaders and distinguished members committed to academic excellence, institutional governance, innovation, and the continuous growth of Shri Vishnu Engineering College for Women.' },

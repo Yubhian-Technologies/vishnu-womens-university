@@ -24,6 +24,7 @@ interface Props {
 
 export default function StandaloneDepartmentDetail({ dept: group }: Props) {
   const [activeLab, setActiveLab] = useState<LabItem | null>(null);
+  const [activeSectionId, setActiveSectionId] = useState<string>('');
   const { docs: allDepartments, loading } = useOrderedCollection<DepartmentDoc>('departments', 'order');
   const dept = allDepartments.find((d) => d.shortCode?.trim().toLowerCase() === group.deptShortCode.trim().toLowerCase());
   const facultyDeptNames = new Set(group.facultyDepartments);
@@ -34,24 +35,21 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
     if (dept) document.title = `${dept.title} | Vishnu Women's University`;
   }, [dept]);
 
-  if (!loading && !dept) return <Navigate to="/academics" replace />;
-  if (!dept) return null;
-
-  const deptName = dept.title;
-  const hasAbout = !!dept.about;
-  const hasCoreValues = (dept.coreValues?.length ?? 0) > 0;
-  const hasHod = !!(dept.hodMessage || dept.hodImage || dept.hodEmail || dept.hod);
-  const labs = (dept.labs || []).map(normalizeLab).filter((l) => l.name);
+  const deptName = dept?.title ?? '';
+  const hasAbout = !!dept?.about;
+  const hasCoreValues = (dept?.coreValues?.length ?? 0) > 0;
+  const hasHod = !!(dept?.hodMessage || dept?.hodImage || dept?.hodEmail || dept?.hod);
+  const labs = (dept?.labs || []).map(normalizeLab).filter((l) => l.name);
   const hasLabs = labs.length > 0;
-  const visibleCustomSections = (dept.customSections || []).filter(hasCustomSectionContent);
-  const hasLibrary = !!(dept.libraryIntro || dept.libraryInCharge || dept.librarySections?.length);
+  const visibleCustomSections = (dept?.customSections || []).filter(hasCustomSectionContent);
+  const hasLibrary = !!(dept?.libraryIntro || dept?.libraryInCharge || dept?.librarySections?.length);
   // News & Events — same fixed-heading/dynamic-contents pattern as
   // DepartmentDetail.tsx/ProgramDetail.tsx: the "News & Events" heading
   // itself is fixed, what's under it is dept.newsEventsSections' fully
   // admin-defined list of named sections. No legacy fallback needed here —
   // a standalone department (Freshman Engineering's Mathematics/Physics/
   // Chemistry/English) never had a News & Events block before this.
-  const newsEventsSubSections = (dept.newsEventsSections || []).filter(hasCustomSectionContent);
+  const newsEventsSubSections = (dept?.newsEventsSections || []).filter(hasCustomSectionContent);
   const newsEventsCategories: NewsEventsCategory[] = newsEventsSubSections.map((sec) => ({
     key: sec.id,
     label: sec.label,
@@ -94,15 +92,13 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
   const quickLinks = [
     hasAbout && { id: 'about', label: 'Department Overview' },
     hasCoreValues && { id: 'vision-mission', label: 'Core Values' },
-    hasHod && { id: 'hod', label: 'About HOD' },
+    hasHod && { id: 'hod', label: 'Brief Profile' },
     faculty.length > 0 && { id: 'faculty', label: 'Faculty' },
     hasLabs && { id: 'labs', label: 'Laboratories' },
     ...toQuickLinkItems(visibleCustomSections),
     hasNewsEvents && { id: 'news-events', label: 'Happenings' },
     hasLibrary && { id: 'library', label: 'Department Library' },
   ].filter(Boolean) as { id: string; label: string; children?: { id: string; label: string }[] }[];
-
-  const [activeSectionId, setActiveSectionId] = useState<string>('');
 
   useEffect(() => {
     if (!quickLinks.length) return;
@@ -124,6 +120,9 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
 
     return () => observer.disconnect();
   }, [quickLinks]);
+
+  if (!loading && !dept) return <Navigate to="/academics" replace />;
+  if (!dept) return null;
 
   return (
     <main className="page-wrapper">
@@ -265,26 +264,23 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
           <div className="container">
             <div style={{ marginBottom: 'var(--space-10)' }}>
               <span className="section-label dept-section-label">Academic Leadership</span>
-              <h2 className="section-title">Head of Department</h2>
+              <h2 className="section-title">Brief Profile</h2>
             </div>
             <div className="dept-hod-editorial-card">
-              {dept.hodImage && (
-                <div className="dept-hod-media-frame">
-                  <SmoothImage src={dept.hodImage} alt={dept.hod || 'Head of Department'} className="dept-hod-photo" />
-                </div>
-              )}
-              <div className="dept-hod-content">
-                <div className="dept-hod-badge-wrap">
-                  <span className="dept-hod-role-badge">Department Leadership</span>
-                  <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>•</span>
-                  <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>{deptName}</span>
-                </div>
-                {dept.hod && (
-                  <h3 className="dept-hod-name">{dept.hod}</h3>
+              <div className="dept-hod-media-col">
+                {dept.hodImage && (
+                  <div className="dept-hod-media-frame">
+                    <SmoothImage src={dept.hodImage} alt={dept.hod || 'Head of Department'} className="dept-hod-photo" />
+                  </div>
                 )}
-                <div className="dept-hod-meta">
-                  <span>Head of the Department &amp; Senior Faculty</span>
-                </div>
+                {dept.hod && (
+                  <div className="dept-hod-media-caption">
+                    <h3 className="dept-hod-name">{dept.hod}</h3>
+                    <div className="dept-hod-meta">Head of the Department</div>
+                  </div>
+                )}
+              </div>
+              <div className="dept-hod-content">
                 {dept.hodMessage && (
                   <div className="dept-hod-message-box">
                     <p className="dept-hod-message-text">{dept.hodMessage}</p>
