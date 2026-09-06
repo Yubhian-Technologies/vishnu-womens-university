@@ -3339,9 +3339,9 @@ td.pb-activities-num {
   inset: 0;
   background: linear-gradient(
     90deg,
-    rgba(10, 18, 20, 0.68) 0%,
-    rgba(10, 18, 20, 0.42) 55%,
-    rgba(10, 18, 20, 0.18) 100%
+    rgba(10, 18, 20, 0.48) 0%,
+    rgba(10, 18, 20, 0.28) 55%,
+    rgba(10, 18, 20, 0.1) 100%
   );
   z-index: 1;
 }

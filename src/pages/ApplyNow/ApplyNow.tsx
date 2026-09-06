@@ -8,7 +8,7 @@ import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import './ApplyNow.css';
 
 const defaultHeroPhoto = [
-  { src: '/images/future-focussed.jpeg', alt: 'VWU campus', caption: '' },
+  { src: '/images/apply-bg.png', alt: 'VWU campus', caption: '' },
 ];
 
 const PROGRAMMES_DATA = [

@@ -91,7 +91,7 @@
   width: 300px;
   background: #ffffff;
   border: 1.5px solid color-mix(in srgb, var(--color-primary, #1b4332) 9%, transparent);
-  border-radius: 22px;
+  border-radius: 4px;
   padding: 1.15rem 1.35rem;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
   display: flex;
@@ -128,7 +128,7 @@
   color: var(--color-primary, #1b4332);
   background: color-mix(in srgb, var(--color-primary, #1b4332) 6%, transparent);
   padding: 0.25rem 0.65rem;
-  border-radius: 9999px;
+  border-radius: 3px;
   max-width: 145px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -146,7 +146,7 @@
   background: linear-gradient(135deg, rgba(254, 240, 138, 0.45) 0%, rgba(253, 230, 138, 0.7) 100%);
   border: 1px solid color-mix(in srgb, var(--color-accent, #c9a84c) 40%, transparent);
   padding: 0.25rem 0.65rem;
-  border-radius: 9999px;
+  border-radius: 3px;
   letter-spacing: 0.02em;
   white-space: nowrap;
 }

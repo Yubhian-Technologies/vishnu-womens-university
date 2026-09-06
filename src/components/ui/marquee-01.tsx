@@ -27,7 +27,7 @@ export const PlacementRecordCard = ({
         {pkg && (
           <span className="placement-card-package-badge">
             <Sparkles size={11} strokeWidth={2.4} style={{ flexShrink: 0 }} />
-            <span>{pkg}</span>
+            <span>{/lpa/i.test(pkg) ? pkg : `${pkg} LPA`}</span>
           </span>
         )}
       </div>

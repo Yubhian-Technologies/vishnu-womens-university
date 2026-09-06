@@ -12,14 +12,9 @@
 
 .adm-form-row {
   display: grid;
-  /* minmax(0, 1fr) rather than 1fr: grid items default to min-width: auto,
-     so an unshrinkable input (its default browser content-box width) was
-     forcing this track — and the whole card — wider than its container,
-     same root cause documented for .adm-tuition-grid/.adm-contact-grid in
-     Admissions.css. Most visible on the narrower Apply Now card, where the
-     "Last Name" column had nowhere to shrink into and overflowed. */
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: var(--space-4);
+  align-items: end;
 }
 
 .adm-form-group {
@@ -27,6 +22,7 @@
   flex-direction: column;
   gap: var(--space-2);
   min-width: 0;
+  justify-content: flex-end;
 }
 
 .adm-form-group label {
@@ -34,20 +30,39 @@
   font-weight: 700;
   color: var(--color-text);
   font-family: var(--font-sans);
+  line-height: 1.25;
+  min-height: 2.3rem;
+  display: flex;
+  align-items: flex-end;
 }
 
 .adm-form-group input,
 .adm-form-group select {
   width: 100%;
-  padding: var(--space-3) var(--space-4);
+  height: 44px;
+  padding: 0 0.75rem;
   border: 1.5px solid var(--color-light-gray);
   border-radius: var(--radius-sm);
-  font-size: var(--text-base);
+  font-size: 0.85rem;
   color: var(--color-text);
   background: var(--color-white);
   outline: none;
   transition: border-color var(--transition-fast);
   font-family: var(--font-sans);
+  box-sizing: border-box;
+}
+
+.adm-form-group select {
+  padding-right: 1.75rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23333333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.65rem center;
+  background-size: 0.85rem;
 }
 
 .adm-form-group input:focus,
@@ -69,6 +84,43 @@
 .adm-form-error {
   font-size: 0.8rem;
   color: #dc2626;
+}
+
+/* Fallback OTP Error box & direct submit button */
+.adm-otp-error-container {
+  margin-top: 0.75rem;
+  padding: 0.85rem;
+  background: #fff5f5;
+  border: 1px solid #fecaca;
+  border-radius: var(--radius-sm);
+  text-align: center;
+}
+
+.adm-otp-error-text {
+  display: block;
+  margin-bottom: 0.65rem;
+  font-size: 0.82rem;
+  color: #dc2626;
+  line-height: 1.4;
+  font-weight: 500;
+}
+
+.adm-direct-submit-btn {
+  width: 100%;
+  font-size: 0.82rem;
+  padding: 0.55rem 1rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  background: #ffffff;
+  border: 1.5px solid var(--color-primary);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.adm-direct-submit-btn:hover {
+  background: var(--color-primary);
+  color: #ffffff;
 }
 
 @media (max-width: 768px) {
