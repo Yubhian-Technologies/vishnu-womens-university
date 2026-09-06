@@ -162,6 +162,7 @@ export default function About() {
         defaultTitle="Vishnu Women's University"
         defaultSubtitle="The First Private State University for Women in the Telugu States — Empowering Women. Inspiring Excellence. Shaping the Future."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'About VWU' }]}
+        hideCta={true}
       />
 
       {/* Quick Stats — M3 Tonal Surface Cards */}
