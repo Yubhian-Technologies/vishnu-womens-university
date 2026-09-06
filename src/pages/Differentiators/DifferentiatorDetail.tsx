@@ -521,12 +521,11 @@ export default function DifferentiatorDetail() {
                 <CategoryIcon size={14} /> {category.label}
               </div>
               <h1 className="dept-hero-title">{item.title}</h1>
-              {/* `summary` has no admin field to set it — always empty in
-                  practice — so this falls back to the Short Description,
-                  same as PlacementDetail.tsx's hero uses `item.desc` for the
-                  same slot. */}
-              {(item.summary || item.desc) && (
-                <p className="dept-hero-subtitle">{item.summary || item.desc}</p>
+              {/* Its own "Hero Subtitle" admin field — deliberately not the
+                  same as the Short Description (hub-card blurb) or the
+                  Description block further down the page. */}
+              {item.summary && (
+                <p className="dept-hero-subtitle">{item.summary}</p>
               )}
             </div>
           </div>
