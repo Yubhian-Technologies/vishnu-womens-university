@@ -1074,16 +1074,6 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                         <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{displayedTotalOffers}</span></div>
                         <div className="dept-stat-tile__label">Total No. of Offers</div>
                       </div>
-                      <div className="dept-stat-tile">
-                        <button
-                          type="button"
-                          className="dept-stat-tile__circle dept-stat-tile__circle--link"
-                          onClick={() => document.getElementById('placement-records-table')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-                        >
-                          <span className="dept-stat-tile__value">Package wise</span>
-                        </button>
-                        <div className="dept-stat-tile__label">Top 10 Companies List</div>
-                      </div>
                       {placementYearStats.averageSalary != null && (
                         <div className="dept-stat-tile">
                           <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.averageSalary}</span></div>
