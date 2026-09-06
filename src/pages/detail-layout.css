@@ -1,21 +1,6 @@
-/* ===== Department page — decorated section label =====
-   A hand-drawn-style squiggle under the small uppercase eyebrow label,
-   scoped to DepartmentDetail.tsx only (adds to, never replaces, the shared
-   global .section-label class used across the rest of the site). */
+/* ===== Department page — section label ===== */
 .dept-section-label {
   position: relative;
-  padding-bottom: 10px;
-}
-
-.dept-section-label::after {
-  content: '';
-  position: absolute;
-  left: 1px;
-  bottom: 0;
-  width: 46px;
-  height: 10px;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 12'%3E%3Cpath d='M1 8 Q8 2 15 8 T29 8 T43 8 T57 8' fill='none' stroke='%23C9A84C' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat;
-  background-size: contain;
 }
 
 .detail-grid {
@@ -26,39 +11,41 @@
 }
 
 /* ===== Department page — Programmes Offered collapsible cards =====
-   Rounded, elevated cards (Material-style: resting shadow, raised shadow +
-   lift on interaction) that expand on hover for desktop mouse users AND on
-   click/Enter/Space (the .open class) so touch and keyboard users — who get
-   no :hover at all — have a reliable way in too. */
+   Plain tap/click accordion — the exact same trigger and behavior on
+   mobile and desktop, no hover-driven expand. Hover only gets a light
+   affordance (border/shadow), never opens the panel, so there's no
+   mismatch between what a mouse user sees and what a touch user gets. */
 .dept-level-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: var(--space-6);
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-5);
   align-items: start;
 }
 
 .dept-level-card {
   background: var(--color-white);
-  border: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 8%, transparent);
-  border-radius: 22px;
-  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-light-gray);
+  border-radius: 16px;
   overflow: hidden;
-  transition: all var(--transition-base);
+  transition: border-color var(--transition-base), box-shadow var(--transition-base);
 }
 
-.dept-level-card:hover,
+.dept-level-card:hover {
+  border-color: color-mix(in srgb, var(--color-accent, #c9a84c) 45%, transparent);
+}
+
 .dept-level-card.open {
   border-color: var(--color-accent);
-  box-shadow: var(--shadow-xl);
-  transform: translateY(-3px);
+  box-shadow: var(--shadow-sm);
 }
 
 .dept-level-card-trigger {
   width: 100%;
+  min-height: 56px;
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  padding: var(--space-5) var(--space-6);
+  padding: var(--space-4) var(--space-5);
   background: none;
   border: none;
   font-family: inherit;
@@ -78,7 +65,7 @@
   flex: 1;
   min-width: 0;
   font-family: var(--font-sans);
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   font-weight: 800;
   color: var(--color-primary);
 }
@@ -89,7 +76,6 @@
   transition: transform var(--transition-base), color var(--transition-base);
 }
 
-.dept-level-card:hover .dept-level-card-chevron,
 .dept-level-card.open .dept-level-card-chevron {
   color: var(--color-accent);
   transform: rotate(180deg);
@@ -107,7 +93,6 @@
   transition: grid-template-rows var(--transition-slow), opacity var(--transition-base);
 }
 
-.dept-level-card:hover .dept-level-card-panel,
 .dept-level-card.open .dept-level-card-panel {
   grid-template-rows: 1fr;
   opacity: 1;
@@ -119,23 +104,7 @@
 }
 
 .dept-level-card-content {
-  padding: 0 var(--space-6) var(--space-6);
-}
-
-/* Touch devices report no real :hover (it can otherwise "stick" after a tap
-   in some mobile browsers) — fall back to the click-toggled .open state as
-   the only trigger there, so tapping is a reliable, un-confusing toggle. */
-@media (hover: none) {
-  .dept-level-card:hover:not(.open) .dept-level-card-panel {
-    grid-template-rows: 0fr;
-    opacity: 0;
-  }
-
-  .dept-level-card:hover:not(.open) {
-    border-color: var(--color-light-gray);
-    box-shadow: var(--shadow-sm);
-    transform: none;
-  }
+  padding: 0 var(--space-5) var(--space-5);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -187,6 +156,79 @@
   .detail-grid .detail-sidebar > div {
     position: static !important;
   }
+}
+
+/* ===== CustomTabsPage — mobile horizontal tab strip =====
+   Hidden on desktop (the sidebar quick-nav card is the real nav there);
+   shown at the .detail-grid single-column breakpoint, where the sidebar
+   card would otherwise land below all of the active tab's content. */
+.tabs-mobile-strip-wrap {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .tabs-mobile-strip-wrap {
+    display: block;
+    position: sticky;
+    top: calc(var(--topbar-height, 0px) + var(--header-height, 70px));
+    z-index: 20;
+    background: var(--color-white);
+    padding-bottom: var(--space-4);
+    margin-bottom: var(--space-2);
+  }
+
+  /* The sidebar quick-nav card duplicates this strip once it's visible —
+     drop it rather than show the same tab list twice on one page. Scoped to
+     CustomTabsPage's own grid (.detail-grid--tabs) only — every other
+     .detail-grid page (Programme/Department detail, Governance, ...) has no
+     equivalent mobile strip replacing its sidebar, so hiding it there would
+     just delete real content/nav instead of de-duplicating it. */
+  .detail-grid--tabs > .detail-sidebar {
+    display: none;
+  }
+}
+
+.tabs-mobile-strip {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.tabs-mobile-strip::-webkit-scrollbar {
+  display: none;
+}
+
+.tabs-mobile-strip-btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+  padding: 0.5rem 1.1rem;
+  border-radius: var(--radius-full);
+  border: 1.5px solid var(--color-light-gray);
+  background: var(--color-off-white);
+  color: var(--color-primary);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.tabs-mobile-strip-btn:hover,
+.tabs-mobile-strip-btn:focus-visible {
+  border-color: var(--color-accent);
+}
+
+.tabs-mobile-strip-btn:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.tabs-mobile-strip-btn.is-active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-white);
 }
 
 @media (max-width: 768px) {
@@ -1203,6 +1245,7 @@ td.pb-activities-num {
   margin-bottom: var(--space-5);
 }
 
+
 /* ===== Placements/Internships circular stat counters =====
    Shared by ProgramDetail.tsx and DepartmentDetail.tsx so the "basic
    details" tiles above the Placements/Internships records look identical
@@ -1288,6 +1331,59 @@ td.pb-activities-num {
   .dept-stat-tile__circle {
     transition: none;
   }
+}
+
+/* Placements row can hold up to 8 tiles (6 base + optional Above 50/30 LPA
+   when a batch has that data) — too many for the 3-tile Internships row's
+   auto-fit grid (which wraps once tiles drop below its 130px minimum).
+   This modifier keeps every tile on one line, no matter how many there are
+   or how narrow the viewport, by sizing each circle as a % of its own flex
+   item (so it always exactly fills its allotted share) rather than off the
+   viewport width — a vw-based size doesn't know how many tiles are sharing
+   that width, so it stops shrinking too early and neighboring circles
+   overlap instead of the row properly compressing. */
+.dept-stat-grid--compact {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.dept-stat-grid--compact .dept-stat-tile {
+  flex: 1 1 0;
+  min-width: 0;
+  gap: var(--space-2);
+}
+
+.dept-stat-grid--compact .dept-stat-tile__circle {
+  width: 100%;
+  height: auto;
+  max-width: 112px;
+  aspect-ratio: 1;
+  padding: var(--space-1);
+  overflow: hidden;
+}
+
+/* Longer values ("Package wise", "20.55 LPA") wrap onto a second line once
+   the circle shrinks enough — fine while there's room, but a flex item's
+   content otherwise pushes its box taller than its aspect-ratio to fit that
+   text, turning the circle into a tall oval. Clamping to 2 lines (with the
+   circle's own overflow:hidden as a backstop) lets it wrap normally at
+   comfortable sizes while clipping instead of distorting at the smallest. */
+.dept-stat-grid--compact .dept-stat-tile__value {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  max-width: 100%;
+  font-size: clamp(0.55rem, 1.6vw, 1.2rem);
+  line-height: 1.15;
+}
+
+.dept-stat-grid--compact .dept-stat-tile__label {
+  font-size: clamp(0.55rem, 0.9vw, 0.7rem);
+  max-width: none;
 }
 
 /* "Show N entries" length control above the raw Placement Records table,
@@ -1469,16 +1565,16 @@ td.pb-activities-num {
 
 /* ===== 4-Column Structured Google Material Key Facts Cards ===== */
 .dept-facts-section {
-  background: var(--color-primary);
-  padding: var(--space-6) 0;
+  background: #0B1E42;
+  padding: 1.75rem 0;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .dept-facts-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
-  align-items: start;
+  gap: 1.25rem;
+  align-items: stretch;
 }
 
 .dept-facts-grid.cols-3 {
@@ -1494,59 +1590,57 @@ td.pb-activities-num {
 }
 
 .dept-fact-card {
-  background: rgba(255, 255, 255, 0.06);
+  background: #13274D;
   border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 18px;
-  padding: 1.15rem;
+  border-radius: 20px;
+  padding: 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+  gap: 0.85rem;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+  transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1), border-color 220ms ease, box-shadow 220ms ease;
   min-width: 0;
 }
 
 .dept-fact-card:hover {
-  transform: translateY(-2px);
-  border-color: color-mix(in srgb, var(--color-accent, #c9a84c) 45%, transparent);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+  transform: translateY(-3px);
+  border-color: #C9973A;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.4);
 }
 
 .dept-fact-card.is-hod-card {
-  background: linear-gradient(145deg, color-mix(in srgb, var(--color-accent, #c9a84c) 12%, transparent) 0%, color-mix(in srgb, var(--color-primary, #1b4332) 25%, transparent) 100%);
-  border-color: color-mix(in srgb, var(--color-accent, #c9a84c) 35%, transparent);
+  background: #172D57;
+  border-color: rgba(201, 151, 58, 0.4);
 }
 
 .dept-fact-header {
   display: flex;
   align-items: center;
-  gap: 0.55rem;
-  padding-bottom: 0.55rem;
+  gap: 0.65rem;
+  padding-bottom: 0.65rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .dept-fact-icon-badge {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: color-mix(in srgb, var(--color-accent, #c9a84c) 15%, transparent);
-  color: var(--color-accent);
-  border: 1px solid color-mix(in srgb, var(--color-accent, #c9a84c) 30%, transparent);
+  background: rgba(201, 151, 58, 0.15);
+  color: #FFD028;
+  border: 1px solid rgba(201, 151, 58, 0.35);
   flex-shrink: 0;
 }
 
 .dept-fact-col-title {
   font-family: var(--font-sans);
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   font-weight: 800;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--color-accent);
+  color: #FFD028;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1555,19 +1649,19 @@ td.pb-activities-num {
 
 .dept-fact-count-badge {
   font-family: var(--font-sans);
-  font-size: 0.6rem;
+  font-size: 0.65rem;
   font-weight: 800;
-  background: color-mix(in srgb, var(--color-accent, #c9a84c) 20%, transparent);
-  color: var(--color-accent);
-  border: 1px solid color-mix(in srgb, var(--color-accent, #c9a84c) 40%, transparent);
-  padding: 1px 6px;
+  background: rgba(201, 151, 58, 0.2);
+  color: #FFD028;
+  border: 1px solid rgba(201, 151, 58, 0.4);
+  padding: 2px 7px;
   border-radius: 9999px;
   letter-spacing: 0.02em;
 }
 
 /* Fixed 2-row height container for perfect column symmetry */
 .dept-fact-items-window {
-  height: 114px;
+  height: 118px;
   overflow: hidden;
   position: relative;
   display: flex;
@@ -1613,19 +1707,19 @@ td.pb-activities-num {
 .dept-fact-chip-entry {
   display: flex;
   flex-direction: column;
-  padding: 0.45rem 1rem;
-  background: rgba(255, 255, 255, 0.05);
+  padding: 0.5rem 1rem;
+  background: rgba(10, 20, 42, 0.65);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 9999px;
+  border-radius: 20px;
   transition: background-color 150ms ease, border-color 150ms ease, transform 150ms ease;
-  min-height: 48px;
+  min-height: 50px;
   justify-content: center;
   box-sizing: border-box;
 }
 
 .dept-fact-chip-entry:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.16);
+  background: rgba(10, 20, 42, 0.95);
+  border-color: rgba(201, 151, 58, 0.3);
   transform: translateY(-1px);
 }
 
@@ -1633,13 +1727,35 @@ td.pb-activities-num {
   text-decoration: none;
   color: inherit;
   display: block;
-  border-radius: 9999px;
+  border-radius: 20px;
 }
 
 .dept-fact-chip-link .dept-fact-chip-entry {
-  background: color-mix(in srgb, var(--color-accent, #c9a84c) 12%, transparent);
-  border-color: color-mix(in srgb, var(--color-accent, #c9a84c) 30%, transparent);
+  background: rgba(201, 151, 58, 0.12);
+  border-color: rgba(201, 151, 58, 0.35);
   cursor: pointer;
+}
+
+.dept-fact-chip-sub {
+  font-size: 0.64rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.55);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 2px;
+}
+
+.dept-fact-chip-val {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.is-hod-card .dept-fact-chip-val {
+  color: #FFD028;
 }
 
 .dept-fact-chip-link:hover .dept-fact-chip-entry {
@@ -1695,7 +1811,7 @@ td.pb-activities-num {
 
 /* ===== Google Material 3 Mobile Jump Bar ===== */
 .dept-mobile-jump-bar-root {
-  background: var(--color-primary-dark, #133024);
+  background: var(--color-primary-dark, #07142c);
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   padding: 0.65rem 0;
@@ -1799,6 +1915,50 @@ td.pb-activities-num {
   white-space: pre-line;
   margin: 0;
   letter-spacing: 0.005em;
+}
+
+/* Compact stat row — pulls the key numbers already in the About prose
+   (established year, accreditation, HOD, programme count) up top so the
+   card reads at a glance instead of as a flat wall of text. */
+.dept-about-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-6);
+  padding-bottom: var(--space-5);
+  margin-bottom: var(--space-5);
+  border-bottom: 1px solid var(--color-light-gray);
+}
+
+.dept-about-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  text-decoration: none;
+}
+
+.dept-about-stat-value {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--color-primary-dark, var(--color-primary));
+  line-height: 1.2;
+}
+
+.dept-about-stat-label {
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--color-text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.dept-about-stat--link .dept-about-stat-value {
+  transition: color 180ms ease;
+}
+
+.dept-about-stat--link:hover .dept-about-stat-value {
+  color: var(--color-accent);
 }
 
 /* ===== Google Material 3 Programme Highlights (Full Circular Pill Cards) ===== */
@@ -1954,6 +2114,28 @@ td.pb-activities-num {
   color: #ffffff;
   transform: translateX(3px);
   outline: none;
+}
+
+/* Scoped to this page — every Quick Navigation row gets the same defined,
+   accent-bordered pill treatment "Choose a Programme" already had, instead
+   of that one row alone standing out against plain dark siblings. Hover
+   still intensifies further so the interactive state stays legible. */
+.dept-detail-page .dept-quick-nav-link {
+  background: color-mix(in srgb, var(--color-accent, #c9a84c) 9%, transparent);
+  border-color: color-mix(in srgb, var(--color-accent, #c9a84c) 25%, transparent);
+  border-left-color: var(--color-accent);
+  color: rgba(255, 255, 255, 0.94);
+}
+
+.dept-detail-page .dept-quick-nav-link:hover,
+.dept-detail-page .dept-quick-nav-link:focus-visible {
+  background: color-mix(in srgb, var(--color-accent, #c9a84c) 22%, transparent);
+  border-color: var(--color-accent);
+  color: #ffffff;
+}
+
+.dept-detail-page .dept-quick-nav-list {
+  gap: 0.5rem;
 }
 
 /* "You are here" state — for a quick-nav list of separate pages (e.g.
@@ -2258,7 +2440,7 @@ td.pb-activities-num {
 }
 
 .dept-lab-card:hover .dept-lab-title {
-  color: var(--color-primary, #1b4332);
+  color: var(--color-primary, #0b1e42);
 }
 
 .dept-lab-spec-desc {
@@ -2306,7 +2488,7 @@ td.pb-activities-num {
   background: var(--color-primary);
   color: #ffffff;
   border-color: var(--color-primary);
-  box-shadow: 0 4px 14px color-mix(in srgb, var(--color-primary, #1b4332) 22%, transparent);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--color-primary, #0b1e42) 22%, transparent);
   outline: none;
 }
 
@@ -2340,7 +2522,7 @@ td.pb-activities-num {
 
 .dept-vm-card {
   background: #ffffff;
-  border: 1.5px solid color-mix(in srgb, var(--color-primary, #1b4332) 8%, transparent);
+  border: 1.5px solid color-mix(in srgb, var(--color-primary, #0b1e42) 8%, transparent);
   border-radius: 28px;
   padding: clamp(1.6rem, 3vw, 2.2rem);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
@@ -2380,12 +2562,12 @@ td.pb-activities-num {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: color-mix(in srgb, var(--color-primary, #1b4332) 5%, transparent);
+  background: color-mix(in srgb, var(--color-primary, #0b1e42) 5%, transparent);
   color: var(--color-primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-primary, #0b1e42) 10%, transparent);
   transition: all 200ms ease;
 }
 
@@ -2399,7 +2581,7 @@ td.pb-activities-num {
   font-family: var(--font-sans);
   font-size: 1.35rem;
   font-weight: 800;
-  color: var(--color-primary-dark, #133024);
+  color: var(--color-primary-dark, #07142c);
   margin: 0 0 0.85rem 0;
   letter-spacing: -0.015em;
 }
@@ -2447,7 +2629,7 @@ td.pb-activities-num {
 /* Core Values Pill Box */
 .dept-values-card {
   grid-column: 1 / -1;
-  background: linear-gradient(135deg, #133024 0%, var(--color-primary, #1b4332) 100%);
+  background: linear-gradient(135deg, #07142c 0%, var(--color-primary, #0b1e42) 100%);
   border-radius: 28px;
   padding: clamp(1.75rem, 3.5vw, 2.5rem);
   box-shadow: 0 12px 34px rgba(19, 48, 36, 0.2);
@@ -2510,7 +2692,7 @@ td.pb-activities-num {
 
 .dept-hod-editorial-card {
   background: #ffffff;
-  border: 1.5px solid color-mix(in srgb, var(--color-primary, #1b4332) 8%, transparent);
+  border: 1.5px solid color-mix(in srgb, var(--color-primary, #0b1e42) 8%, transparent);
   border-radius: 32px;
   padding: clamp(2rem, 4vw, 3.2rem);
   box-shadow: 0 16px 44px rgba(19, 48, 36, 0.06);
@@ -2581,7 +2763,7 @@ td.pb-activities-num {
   font-family: var(--font-serif, Georgia, serif);
   font-size: clamp(1.6rem, 2.8vw, 2.15rem);
   font-weight: 800;
-  color: var(--color-primary-dark, #133024);
+  color: var(--color-primary-dark, #07142c);
   margin: 0 0 0.4rem 0;
   line-height: 1.2;
 }
@@ -2613,8 +2795,8 @@ td.pb-activities-num {
   align-items: center;
   gap: 0.55rem;
   padding: 0.65rem 1.35rem;
-  background: color-mix(in srgb, var(--color-primary, #1b4332) 6%, transparent);
-  border: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 14%, transparent);
+  background: color-mix(in srgb, var(--color-primary, #0b1e42) 6%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-primary, #0b1e42) 14%, transparent);
   border-radius: 9999px;
   color: var(--color-primary-dark);
   font-family: var(--font-sans);
@@ -2629,7 +2811,7 @@ td.pb-activities-num {
   color: #ffffff;
   border-color: var(--color-primary);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px color-mix(in srgb, var(--color-primary, #1b4332) 20%, transparent);
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--color-primary, #0b1e42) 20%, transparent);
 }
 
 /* ==========================================================================
@@ -2644,7 +2826,7 @@ td.pb-activities-num {
 
 .dept-highlight-item-card {
   background: #ffffff;
-  border: 1.5px solid color-mix(in srgb, var(--color-primary, #1b4332) 8%, transparent);
+  border: 1.5px solid color-mix(in srgb, var(--color-primary, #0b1e42) 8%, transparent);
   border-radius: 22px;
   padding: 1.25rem 1.4rem;
   display: flex;
@@ -2685,7 +2867,7 @@ td.pb-activities-num {
 /* Outcome Statements List */
 .dept-outcomes-container {
   background: #ffffff;
-  border: 1.5px solid color-mix(in srgb, var(--color-primary, #1b4332) 8%, transparent);
+  border: 1.5px solid color-mix(in srgb, var(--color-primary, #0b1e42) 8%, transparent);
   border-radius: 28px;
   padding: clamp(1.75rem, 3.5vw, 2.5rem);
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.04);
@@ -2777,7 +2959,7 @@ td.pb-activities-num {
   align-items: center;
   gap: 1.25rem;
   background: #ffffff;
-  border: 1.5px solid color-mix(in srgb, var(--color-primary, #1b4332) 8%, transparent);
+  border: 1.5px solid color-mix(in srgb, var(--color-primary, #0b1e42) 8%, transparent);
   border-radius: 22px;
   padding: 1.25rem 1.5rem;
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.03);
@@ -2788,7 +2970,7 @@ td.pb-activities-num {
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: color-mix(in srgb, var(--color-primary, #1b4332) 7%, transparent);
+  background: color-mix(in srgb, var(--color-primary, #0b1e42) 7%, transparent);
   color: var(--color-primary);
   display: flex;
   align-items: center;
@@ -2867,7 +3049,7 @@ td.pb-activities-num {
 .dept-library-card {
   position: relative;
   background: #ffffff;
-  border: 1.5px solid color-mix(in srgb, var(--color-primary, #1b4332) 8%, transparent);
+  border: 1.5px solid color-mix(in srgb, var(--color-primary, #0b1e42) 8%, transparent);
   border-radius: 24px;
   padding: 1.4rem 1.5rem;
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.03);
@@ -2910,7 +3092,7 @@ td.pb-activities-num {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: color-mix(in srgb, var(--color-primary, #1b4332) 6%, transparent);
+  background: color-mix(in srgb, var(--color-primary, #0b1e42) 6%, transparent);
   color: var(--color-primary);
   display: flex;
   align-items: center;
@@ -2971,7 +3153,7 @@ td.pb-activities-num {
 
 .dept-news-accordion-item {
   background: #ffffff;
-  border: 1.5px solid color-mix(in srgb, var(--color-primary, #1b4332) 9%, transparent);
+  border: 1.5px solid color-mix(in srgb, var(--color-primary, #0b1e42) 9%, transparent);
   border-radius: 22px;
   overflow: hidden;
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.03);
@@ -3003,7 +3185,7 @@ td.pb-activities-num {
 
 .dept-news-accordion-item.open .dept-news-accordion-header {
   background: #f8fafc;
-  border-bottom: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 6%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-primary, #0b1e42) 6%, transparent);
 }
 
 .dept-news-accordion-header-left {
@@ -3038,7 +3220,7 @@ td.pb-activities-num {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: color-mix(in srgb, var(--color-primary, #1b4332) 5%, transparent);
+  background: color-mix(in srgb, var(--color-primary, #0b1e42) 5%, transparent);
   color: var(--color-primary);
   display: flex;
   align-items: center;
@@ -3113,6 +3295,1477 @@ td.pb-activities-num {
     height: 30px;
   }
 }
+
+/* ===== Department Hero — rounded image card, dark gradient, gold CTA
+   (LPU-reference card hero, shared by AI / CSE / ECE) ===== */
+.dept-hero-section {
+  padding-top: 14px !important;
+  padding-bottom: 0.5rem;
+}
+
+.dept-hero-section .container {
+  max-width: 100% !important;
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+  width: 100% !important;
+}
+
+.dept-hero-card {
+  position: relative;
+  width: 100%;
+  margin: 0 auto;
+  min-height: 460px;
+  border-radius: 28px;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  box-shadow: 0 18px 44px -8px rgba(0, 0, 0, 0.35);
+  background: linear-gradient(135deg, #0B1E42 0%, #1E3B75 100%);
+}
+
+.dept-hero-bg-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.dept-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(10, 18, 20, 0.92) 0%,
+    rgba(10, 18, 20, 0.72) 55%,
+    rgba(10, 18, 20, 0.4) 100%
+  );
+  z-index: 1;
+}
+
+.dept-hero-content {
+  position: relative;
+  z-index: 2;
+  padding: 3rem clamp(2rem, 4vw, 4rem);
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.dept-hero-title {
+  font-size: clamp(1.5rem, 3.2vw, 2.75rem);
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.85rem 0;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  /* Long differentiator/department names ("Institution Innovation Cell",
+     "Rural Women Technology Park") were ellipsis-truncated by nowrap — let
+     them wrap to at most two lines instead. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  max-width: 100%;
+}
+
+.dept-hero-subtitle {
+  font-size: clamp(1rem, 1.8vw, 1.25rem);
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.5;
+  margin: 0 0 1.85rem 0;
+  max-width: 640px;
+}
+
+.dept-hero-cta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.btn-hero-gold,
+.btn-hero-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.9rem 2rem;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: all 0.22s ease;
+}
+
+.btn-hero-gold {
+  background: #ffd028;
+  color: #0b1517;
+  box-shadow: 0 4px 16px rgba(255, 208, 40, 0.3);
+}
+
+.btn-hero-gold:hover {
+  background: #ffc400;
+  color: #000000;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 208, 40, 0.45);
+}
+
+.btn-hero-outline {
+  background: transparent;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+.btn-hero-outline:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: #ffffff;
+  transform: translateY(-2px);
+}
+
+/* ===== Plain card primitive — reused by Vision/Mission, Labs, Library
+   cards on this page only, layered on top of their existing base rules
+   (which are still used as-is by ProgramDetail/StandaloneDepartmentDetail).
+   Declared after those rules so it wins ties on shared properties. ===== */
+.dept-content-card {
+  border-radius: 16px;
+}
+
+.dept-content-card-icon {
+  display: block;
+  color: var(--color-primary);
+  margin-bottom: 0.75rem;
+}
+
+.dept-outcome-code {
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--color-accent);
+  flex-shrink: 0;
+  letter-spacing: 0.02em;
+}
+
+/* Scoped to this page only — strips the pill/badge chrome that
+   ProgramDetail.tsx / StandaloneDepartmentDetail.tsx still use as-is. */
+.dept-detail-page .dept-hod-role-badge {
+  background: none;
+  border: none;
+  padding: 0;
+  border-radius: 0;
+}
+
+.dept-detail-page .dept-hod-editorial-card::after {
+  content: none;
+}
+
+
+/* ===== Mind Map — folded into Curriculum as a compact thumbnail row ===== */
+.dept-mindmap-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: var(--space-8);
+}
+
+.dept-mindmap-thumb {
+  display: block;
+  width: 84px;
+  height: 84px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1.5px solid var(--color-light-gray);
+  transition: border-color 160ms ease;
+}
+
+.dept-mindmap-thumb:hover {
+  border-color: var(--color-accent);
+}
+
+.dept-mindmap-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.dept-mindmap-pdf-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.6rem 1.1rem;
+  background: var(--color-off-white);
+  border: 1px solid var(--color-light-gray);
+  border-radius: var(--radius-full);
+  color: var(--color-primary-dark, var(--color-primary));
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 160ms ease;
+}
+
+.dept-mindmap-pdf-link:hover {
+  background: var(--color-primary);
+  color: #ffffff;
+  border-color: var(--color-primary);
+}
+
+/* ===== PEOs/POs/PSOs collapse toggle ===== */
+.dept-outcomes-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+}
+
+.dept-outcomes-toggle-chevron {
+  color: var(--color-primary);
+  flex-shrink: 0;
+  transition: transform 220ms ease;
+}
+
+.dept-outcomes-toggle-chevron.is-open {
+  transform: rotate(180deg);
+}
+
+/* ===== Placements/Internships — sleek pass =====
+   Scoped to this page only: ProgramDetail.tsx keeps the original circular
+   counters and auto-scrolling marquee as-is. */
+
+/* Circular value badges, alternating dark/light per tile — the label stays
+   plain text below the circle (unchanged), only the circle itself and its
+   number swap theme. */
+.dept-detail-page .dept-stat-tile__circle {
+  width: 104px;
+  height: 104px;
+  border: none;
+  border-radius: 50%;
+  padding: var(--space-2);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.dept-detail-page .dept-stat-tile:hover .dept-stat-tile__circle {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.dept-detail-page .dept-stat-tile__value {
+  font-size: 1.15rem;
+  line-height: 1.2;
+}
+
+.dept-detail-page .dept-stat-grid .dept-stat-tile:nth-child(odd) .dept-stat-tile__circle {
+  background: var(--color-primary);
+}
+
+.dept-detail-page .dept-stat-grid .dept-stat-tile:nth-child(odd) .dept-stat-tile__value {
+  color: #ffffff;
+}
+
+.dept-detail-page .dept-stat-grid .dept-stat-tile:nth-child(even) .dept-stat-tile__circle {
+  background: var(--color-off-white);
+  border: 1px solid var(--color-light-gray);
+}
+
+.dept-detail-page .dept-stat-grid .dept-stat-tile:nth-child(even) .dept-stat-tile__value {
+  color: var(--color-primary-dark, #07142c);
+}
+
+/* Clickable tiles ("Package wise" / "View All") stay gold + underlined in
+   either circle color so they still read as a link, not just a number. */
+.dept-detail-page .dept-stat-grid .dept-stat-tile:nth-child(odd) .dept-stat-tile__circle--link .dept-stat-tile__value,
+.dept-detail-page .dept-stat-grid .dept-stat-tile:nth-child(even) .dept-stat-tile__circle--link .dept-stat-tile__value {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+/* Plain static grid of offer cards instead of an auto-scrolling marquee —
+   same PlacementRecordCard, just laid out like every other card grid on
+   this page (Labs, Library) rather than animated. */
+/* ===== Placement/Internship profile cards — continuous scroll =====
+   Photo-forward card (avatar + company badge, name, role, package) shown
+   in a two-row auto-scrolling marquee. No real photo/logo exists in the
+   admin-imported records, so every card uses the same generic fallback
+   graphics rather than a fabricated "real" photo. */
+.dept-profile-card {
+  width: 230px;
+  flex-shrink: 0;
+  background: var(--color-primary-dark, var(--color-primary));
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.16);
+}
+
+.dept-profile-card-photo {
+  position: relative;
+  height: 150px;
+  margin: 8px 8px 0;
+  border-radius: 14px;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--color-accent, #c9a84c) 30%, var(--color-primary)) 0%, var(--color-primary-dark, var(--color-primary)) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.dept-profile-card-logo-badge {
+  position: absolute;
+  left: 10px;
+  bottom: -14px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary-dark, var(--color-primary));
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+}
+
+.dept-profile-card-body {
+  padding: 22px 14px 16px;
+}
+
+.dept-profile-card-name {
+  font-family: var(--font-sans);
+  font-size: 0.98rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 3px 0;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dept-profile-card-role {
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0 0 0.75rem 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dept-profile-card-package {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--color-primary-dark, var(--color-primary));
+  background: var(--color-accent);
+  padding: 0.3rem 0.75rem;
+  border-radius: 9999px;
+}
+
+/* ===== HOD card — photo + name/role caption, plain message, Vision/
+   Mission/Core Values as individual accordion rows =====
+   Scoped to this page only; ProgramDetail.tsx keeps the original card. */
+.dept-detail-page .dept-hod-editorial-card {
+  align-items: flex-start;
+  border-width: 3px;
+  border-color: var(--color-accent);
+}
+
+.dept-detail-page .dept-hod-media-frame {
+  align-self: auto;
+}
+
+.dept-detail-page .dept-hod-photo {
+  height: 290px;
+  min-height: 0;
+}
+
+.dept-hod-media-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  flex: 0 0 240px;
+  max-width: 260px;
+}
+
+.dept-hod-media-col .dept-hod-media-frame {
+  width: 100%;
+}
+
+.dept-hod-media-caption .dept-hod-name {
+  font-size: 1.1rem;
+  margin-bottom: 0.2rem;
+}
+
+.dept-hod-message-title {
+  font-family: var(--font-serif, Georgia, serif);
+  font-size: clamp(1.5rem, 2.6vw, 1.9rem);
+  font-weight: 800;
+  color: var(--color-primary-dark, #133024);
+  margin: 0 0 1rem 0;
+  line-height: 1.2;
+}
+
+.dept-hod-message-text-plain {
+  font-family: var(--font-sans);
+  font-size: 0.96rem;
+  line-height: 1.85;
+  color: #334155;
+  margin: 0 0 1.5rem 0;
+  white-space: pre-line;
+}
+
+/* Vision / Mission / Core Values — plain white bordered rows, each its own
+   accordion (opening one doesn't close the others). */
+.dept-vm-accordion {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: 1.5rem;
+}
+
+.dept-vm-accordion-row {
+  border: 1px solid var(--color-light-gray);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: border-color 160ms ease;
+}
+
+.dept-vm-accordion-row.open {
+  border-color: var(--color-accent);
+}
+
+.dept-vm-accordion-trigger {
+  width: 100%;
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.75rem 1.1rem;
+  background: #ffffff;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+}
+
+.dept-vm-accordion-icon {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-accent);
+  color: var(--color-primary-dark, var(--color-primary));
+}
+
+.dept-vm-accordion-label {
+  flex: 1;
+  font-family: var(--font-sans);
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--color-primary-dark, var(--color-primary));
+}
+
+.dept-vm-accordion-chevron {
+  flex-shrink: 0;
+  color: var(--color-text-light);
+  transition: transform 200ms ease;
+}
+
+.dept-vm-accordion-row.open .dept-vm-accordion-chevron {
+  transform: rotate(180deg);
+  color: var(--color-accent);
+}
+
+.dept-vm-accordion-body {
+  padding: 0 1.1rem 1.1rem calc(1.1rem + 32px + 0.85rem);
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  line-height: 1.75;
+  color: #475569;
+}
+
+.dept-vm-accordion-row .dept-vm-mission-list {
+  padding: 0 1.1rem 1.1rem calc(1.1rem + 32px + 0.85rem);
+  margin: 0;
+}
+
+/* ===== Laboratories — premium unified-card carousel =====
+   One slide = one card (40% text / 60% image), rounded corners clip both
+   halves together. Palette is scoped to this component (navy/gold),
+   deliberately distinct from the rest of the site's green/gold theme. */
+.dept-lab-rows {
+  display: flex;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.dept-lab-rows::-webkit-scrollbar {
+  display: none;
+}
+
+.dept-lab-slide {
+  display: grid;
+  grid-template-columns: 4fr 6fr;
+  flex: 0 0 100%;
+  max-width: 100%;
+  min-height: 300px;
+  scroll-snap-align: start;
+  background: #ffffff;
+  border: 1px solid #e4e7ec;
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(11, 30, 66, 0.08);
+}
+
+.dept-lab-slide-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.55rem;
+  padding: clamp(1.75rem, 3vw, 2.75rem);
+  min-width: 0;
+}
+
+.dept-lab-slide-number {
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #c9973a;
+}
+
+.dept-lab-slide-icon {
+  color: #1e3b75;
+  margin-top: 0.35rem;
+}
+
+.dept-lab-slide-title {
+  font-family: var(--font-sans);
+  font-size: clamp(1.3rem, 2.1vw, 1.55rem);
+  font-weight: 800;
+  color: #0b1e42;
+  margin: 0.15rem 0 0 0;
+  line-height: 1.25;
+}
+
+.dept-lab-slide-desc {
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  line-height: 1.65;
+  color: #5b6472;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.dept-lab-slide-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  align-self: flex-start;
+  margin-top: 0.65rem;
+  padding: 0.7rem 1.4rem;
+  background: #c9973a;
+  color: #0b1e42;
+  border-radius: 9999px;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 180ms ease;
+}
+
+.dept-lab-slide-cta:hover {
+  background: #b3812c;
+  transform: translateY(-2px);
+}
+
+.dept-lab-slide-media {
+  position: relative;
+  min-height: 0;
+}
+
+.dept-lab-slide-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.dept-lab-carousel-controls {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: var(--space-5);
+}
+
+.dept-lab-carousel-dots {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.dept-lab-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: none;
+  background: #d9deE7;
+  padding: 0;
+  cursor: pointer;
+  transition: all 200ms ease;
+}
+
+.dept-lab-dot.active {
+  width: 22px;
+  border-radius: 4px;
+  background: #c9973a;
+}
+
+.dept-lab-carousel-arrows {
+  display: flex;
+  gap: 0.6rem;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.dept-lab-carousel-arrow-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1.5px solid #e4e7ec;
+  background: #ffffff;
+  color: #0b1e42;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 180ms ease;
+}
+
+.dept-lab-carousel-arrow-btn:hover:not(:disabled) {
+  background: #c9973a;
+  border-color: #c9973a;
+  color: #0b1e42;
+}
+
+.dept-lab-carousel-arrow-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+@media (max-width: 860px) {
+  .dept-lab-slide {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+
+  .dept-lab-slide-media {
+    height: 220px;
+  }
+
+  .dept-lab-carousel-controls {
+    justify-content: space-between;
+  }
+
+  .dept-lab-carousel-arrows {
+    position: static;
+    transform: none;
+  }
+}
+
+/* ===== Unified Programme Hub Card Section ===== */
+.programme-hub-section {
+  background: var(--color-off-white, #f8fafc);
+  padding: clamp(3rem, 5vw, 4.5rem) 0;
+}
+
+/* Wider than the site's standard 1400px .container — this card's tab bar
+   can hold up to 6 tabs (some with long labels, e.g. "Research &
+   Development (Funded Projects & Patents)"); the extra width lets more of
+   them sit on one row before .programme-hub-tabs-bar's own overflow-x:auto
+   has to kick in as the fallback on narrower viewports. */
+.programme-hub-section .container {
+  max-width: 1600px;
+}
+
+.programme-hub-header {
+  text-align: center;
+  margin-bottom: 2.25rem;
+}
+
+.programme-hub-pills {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: #ffffff;
+  padding: 0.4rem;
+  border-radius: 9999px;
+  border: 1.5px solid #e2e8f0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+}
+
+.programme-hub-pill-btn {
+  padding: 0.65rem 1.5rem;
+  border-radius: 9999px;
+  border: none;
+  background: transparent;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #475569;
+  cursor: pointer;
+  transition: all 180ms ease;
+}
+
+.programme-hub-pill-btn:hover {
+  color: #0f172a;
+  background: #f1f5f9;
+}
+
+.programme-hub-pill-btn.active {
+  background: var(--color-primary, #1b4332);
+  color: #ffffff;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--color-primary, #1b4332) 25%, transparent);
+}
+
+.programme-hub-card {
+  background: #ffffff;
+  border-radius: 24px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+.programme-hub-tabs-bar {
+  display: flex;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.programme-hub-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 1.15rem 1.75rem;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #64748b;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 180ms ease;
+}
+
+.programme-hub-tab-btn:hover {
+  color: #0f172a;
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.programme-hub-tab-btn.active {
+  color: var(--color-primary, #1b4332);
+  border-bottom-color: var(--color-accent, #c9a84c);
+  background: #ffffff;
+}
+
+.programme-hub-body {
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.programme-hub-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2.25rem;
+}
+
+@media (max-width: 900px) {
+  .programme-hub-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===== News & Events Compact Accordion List (VWU Navy & Gold Theme) ===== */
+.news-events-accordion-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.news-events-accordion-item {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1.5px solid #e2e8f0;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  transition: border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+}
+
+.news-events-accordion-item.is-open {
+  border-color: var(--color-primary, #1b4332);
+  box-shadow: 0 8px 24px rgba(27, 67, 50, 0.08);
+}
+
+.news-events-accordion-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.1rem 1.4rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 160ms ease;
+}
+
+.news-events-accordion-trigger:hover {
+  background: #f8fafc;
+}
+
+.news-events-accordion-item.is-open .news-events-accordion-trigger {
+  background: color-mix(in srgb, var(--color-primary, #1b4332) 4%, #ffffff);
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.news-events-accordion-year-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.news-events-accordion-year-icon {
+  color: var(--color-accent, #c9a84c);
+  flex-shrink: 0;
+}
+
+.news-events-accordion-year-text {
+  font-family: var(--font-sans);
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.01em;
+}
+
+.news-events-accordion-item.is-open .news-events-accordion-year-text {
+  color: var(--color-primary-dark, #081c15);
+}
+
+.news-events-accordion-right {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.news-events-count-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.8rem;
+  background: color-mix(in srgb, var(--color-accent, #c9a84c) 14%, transparent);
+  color: #856404;
+  border: 1px solid color-mix(in srgb, var(--color-accent, #c9a84c) 30%, transparent);
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 800;
+  border-radius: 9999px;
+  letter-spacing: 0.02em;
+}
+
+.news-events-chevron-circle {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 200ms ease;
+  flex-shrink: 0;
+}
+
+.news-events-accordion-item.is-open .news-events-chevron-circle {
+  background: var(--color-primary, #1b4332);
+  color: #ffffff;
+}
+
+.news-events-accordion-chevron {
+  transition: transform 220ms ease;
+}
+
+.news-events-accordion-chevron.is-open {
+  transform: rotate(180deg);
+}
+
+.news-events-accordion-panel {
+  padding: 1.35rem 1.4rem 1.6rem 1.4rem;
+  background: #ffffff;
+}
+
+.news-events-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+}
+
+.news-events-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+}
+
+.news-events-table th {
+  background: var(--color-primary, #1b4332);
+  color: #ffffff;
+  padding: 0.85rem 1rem;
+  font-weight: 700;
+  text-align: left;
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+}
+
+.news-events-table td {
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid #f1f5f9;
+  color: #334155;
+  line-height: 1.5;
+}
+
+.news-events-table tr:hover td {
+  background: #f8fafc;
+}
+
+.news-events-pdf-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.85rem;
+  background: color-mix(in srgb, var(--color-primary, #1b4332) 8%, transparent);
+  color: var(--color-primary, #1b4332);
+  border: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 20%, transparent);
+  border-radius: 9999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 160ms ease;
+}
+
+.news-events-pdf-link:hover {
+  background: var(--color-primary, #1b4332);
+  color: #ffffff;
+}
+
+/* Mobile responsive card list for table rows on mobile screens */
+.mobile-only-cards {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .desktop-only-table {
+    display: none;
+  }
+
+  .mobile-only-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .news-events-mobile-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 1.1rem;
+  }
+
+  .news-events-mobile-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .news-events-sno-pill {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: var(--color-primary, #1b4332);
+    background: #ffffff;
+    padding: 0.2rem 0.6rem;
+    border-radius: 9999px;
+    border: 1px solid #e2e8f0;
+  }
+
+  .news-events-date-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #64748b;
+  }
+
+  .news-events-mobile-card-title {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 0.4rem 0;
+    line-height: 1.4;
+  }
+
+  .news-events-mobile-card-desc {
+    font-size: 0.85rem;
+    color: #475569;
+    margin: 0 0 0.85rem 0;
+    line-height: 1.5;
+  }
+
+  .news-events-mobile-card-action {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 1rem;
+    background: var(--color-primary, #1b4332);
+    color: #ffffff;
+    border-radius: 9999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-decoration: none;
+  }
+}
+
+/* ===== Research & Development — clean tables + project detail cards =====
+   Tables reuse the site's existing .pb-activities-scroll wrapper instead of
+   one-off inline styles, so they match every other table on this page. */
+.dept-rnd-intro {
+  color: var(--color-text);
+  line-height: 1.85;
+  font-size: var(--text-base);
+  margin: 0 0 var(--space-6) 0;
+  max-width: 760px;
+  white-space: pre-line;
+}
+
+.dept-rnd-table-group {
+  margin-bottom: var(--space-8);
+}
+
+.dept-rnd-table-title {
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--color-primary);
+  margin: 0 0 var(--space-3) 0;
+}
+
+.dept-rnd-view-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--color-primary);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.dept-rnd-view-link:hover {
+  color: var(--color-accent);
+}
+
+.dept-rnd-project-body {
+  padding: var(--space-4) var(--space-5);
+}
+
+.dept-rnd-project-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-4) var(--space-5);
+  margin-bottom: var(--space-4);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-light-gray);
+}
+
+.dept-rnd-project-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.dept-rnd-project-field-label {
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-light);
+}
+
+.dept-rnd-project-field-value {
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  color: var(--color-text);
+  line-height: 1.5;
+}
+
+.dept-rnd-outcomes-title {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: var(--space-2);
+}
+
+.dept-rnd-outcomes-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.dept-rnd-outcome-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  color: var(--color-text);
+  line-height: 1.5;
+}
+
+.dept-rnd-outcome-item svg {
+  color: var(--color-accent);
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+
+/* ==========================================================================
+   Mobile Responsiveness & Touch Optimization Enhancements
+   ========================================================================== */
+
+/* 1. Programme Hub Tabs Bar Scroll Indicator & Touch Inertia */
+.programme-hub-card {
+  position: relative;
+}
+
+.programme-hub-tabs-bar {
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pan-y;
+  position: relative;
+}
+
+@media (max-width: 900px) {
+  .programme-hub-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 32px;
+    height: 54px;
+    background: linear-gradient(90deg, transparent 0%, rgba(248, 250, 252, 0.95) 100%);
+    pointer-events: none;
+    z-index: 5;
+    border-top-right-radius: 24px;
+  }
+}
+
+/* 2. HOD Photo & Media Frame Mobile Cap (<640px) */
+@media (max-width: 640px) {
+  .dept-hod-editorial-card {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 1.25rem 1rem !important;
+    gap: 1.25rem;
+  }
+
+  .dept-hod-media-frame,
+  .dept-detail-page .dept-hod-media-frame,
+  .dept-hod-media-col {
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    max-width: 200px !important;
+    margin: 0 auto;
+  }
+
+  .dept-hod-photo,
+  .dept-detail-page .dept-hod-photo {
+    height: 220px !important;
+    max-height: 220px !important;
+    border-radius: 18px !important;
+  }
+
+  .dept-hod-badge-wrap {
+    justify-content: center;
+  }
+
+  .dept-hod-message-box {
+    border-left: none;
+    border-top: 3px solid var(--color-accent);
+    padding-left: 0;
+    padding-top: 1rem;
+    text-align: left;
+  }
+
+  .dept-hod-mail-btn {
+    width: 100%;
+    justify-content: center;
+    word-break: break-all;
+    min-height: 44px;
+  }
+}
+
+/* 3. Table & Container Touch Inertia Scrolling */
+.news-events-table-wrap,
+.pb-activities-scroll,
+.dept-table-scroll-wrapper,
+.dept-newsletter-cards-grid {
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pan-y;
+}
+
+/* 4. Touch Target Compliance (min-height 44px) */
+.programme-hub-tab-btn,
+.programme-hub-pill-btn,
+.dept-newsletter-btn,
+.dept-lab-card,
+.section-tab-btn {
+  min-height: 44px;
+}
+
+/* ==========================================================================
+   Horizontal Quick Navigation Pill Bar (Capsule attaching under floating navbar)
+   ========================================================================== */
+.dept-horizontal-quicknav-section {
+  position: sticky;
+  top: 90px;
+  z-index: 950;
+  margin: 0.35rem 0 1.25rem 0;
+  padding: 0.25rem 0;
+  pointer-events: auto;
+}
+
+@media (min-width: 1440px) {
+  .dept-horizontal-quicknav-section {
+    top: 90px;
+  }
+}
+
+.dept-horizontal-quicknav-container {
+  display: flex;
+  justify-content: center;
+}
+
+.dept-horizontal-quicknav-pill {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.75) !important;
+  border-radius: 15.43px !important;
+  padding: 0.55rem 0.85rem !important;
+  box-shadow: 0 14px 36px -6px rgba(11, 30, 66, 0.16), 
+              0 4px 14px -2px rgba(0, 0, 0, 0.08) !important;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  width: max-content;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin: 0 auto;
+}
+
+@media (min-width: 1024px) {
+  .dept-horizontal-quicknav-pill {
+    gap: 0.65rem;
+    padding: 0.65rem 1.15rem !important;
+  }
+}
+
+.dept-horizontal-quicknav-pill::-webkit-scrollbar {
+  display: none;
+}
+
+.dept-quicknav-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.55rem 1.15rem;
+  border-radius: 10px;
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #1e293b;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color 180ms ease, color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+  flex-shrink: 0;
+}
+
+.dept-quicknav-link:hover {
+  background: rgba(15, 23, 42, 0.06);
+  color: #0f172a;
+  transform: translateY(-1px);
+}
+
+.dept-quicknav-link.is-active {
+  background: var(--color-primary, #0b1e42);
+  color: #ffffff;
+  font-weight: 700;
+  border-radius: 10px;
+  box-shadow: 0 4px 14px rgba(11, 30, 66, 0.3);
+}
+
+/* Compact Academic Degrees Section */
+.dept-compact-program-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+
+.dept-compact-program-card {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  border-radius: var(--radius-lg, 14px);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 200ms ease;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+}
+
+.dept-compact-program-card:hover {
+  border-color: var(--color-accent, #c9973a);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px -4px rgba(11, 30, 66, 0.12);
+}
+
+.dept-compact-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.85rem;
+}
+
+.dept-compact-card-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: rgba(11, 30, 66, 0.05);
+  color: var(--color-primary, #0b1e42);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dept-compact-cat-badge {
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 0.25rem 0.7rem;
+  border-radius: 9999px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.dept-compact-cat-badge.is-btech {
+  background: var(--color-primary, #0b1e42);
+  color: #ffffff;
+}
+
+.dept-compact-cat-badge.is-mtech {
+  background: var(--color-accent, #c9973a);
+  color: #0b1e42;
+}
+
+.dept-compact-card-title {
+  font-size: 1.08rem;
+  font-weight: 800;
+  color: var(--color-primary, #0b1e42);
+  margin: 0 0 0.6rem 0;
+  line-height: 1.35;
+}
+
+.dept-compact-card-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+
+.dept-compact-chip {
+  font-size: 0.7rem;
+  font-weight: 700;
+  background: var(--color-off-white, #f8fafc);
+  border: 1px solid var(--color-light-gray, #e2e8f0);
+  border-radius: 6px;
+  padding: 3px 8px;
+  color: var(--color-text-light, #64748b);
+  white-space: nowrap;
+}
+
+.dept-compact-chip.is-accredited {
+  background: rgba(201, 168, 76, 0.12);
+  border-color: rgba(201, 168, 76, 0.4);
+  color: var(--color-accent, #c9973a);
+}
+
+.dept-compact-card-footer {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--color-primary, #0b1e42);
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(15, 23, 42, 0.06);
+  transition: color 150ms ease;
+}
+
+.dept-compact-program-card:hover .dept-compact-card-footer {
+  color: var(--color-accent, #c9973a);
+}
+
+
 
 
 

@@ -1,6 +1,6 @@
 import { useState, useId } from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, Phone, Mail, ExternalLink, ChevronDown, FileText, ChevronRight } from 'lucide-react';
+import { MapPin, Phone, Mail, ExternalLink, ChevronDown, FileText, ChevronRight, Navigation } from 'lucide-react';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useSiteContact, telHref } from '../../hooks/useSiteContact';
 import { COMPLIANCE_GROUPS, DEFAULT_COMPLIANCE_DOCS, type ComplianceDocDoc } from '../../pages/Admin/sections/ComplianceDocsAdmin';
@@ -37,6 +37,7 @@ const ACADEMIC_LINKS = [
   { label: 'Fee Structure', href: '/programmes-fee-structure' },
   { label: 'Examinations Portal', href: 'https://www.svecwexams.in/', external: true },
   { label: 'Vishnu LMS', href: 'https://www.vishnulearning.com/login/index.php', external: true },
+  { label: 'Vishnu Tech Hub', href: 'https://www.vishnutechhub.in/', external: true },
   { label: 'VEDIC Learning Center', href: 'https://vedic.edu.in/', external: true },
   { label: 'Vishnu Era Magazine', href: 'https://www.srivishnu.edu.in/vishnu-era/', external: true },
   { label: 'Prathibha Magazine', href: 'https://heyzine.com/flip-book/14449c1cd4.html', external: true },
@@ -141,6 +142,15 @@ export default function Footer() {
                 <MapPin size={15} className="vwu-footer-contact-icon" aria-hidden="true" />
                 <span>Bhimavaram, West Godavari Dist., Andhra Pradesh – 534 202</span>
               </div>
+              <a
+                href="https://www.google.com/maps/search/?api=1&query=16.568119,81.522098"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="vwu-footer-get-directions"
+              >
+                <Navigation size={13} aria-hidden="true" />
+                <span>Get Directions</span>
+              </a>
               <div className="vwu-footer-contact-links">
                 <a href={telHref(phone)} className="vwu-footer-contact-action" aria-label={`Phone: ${phone}`}>
                   <Phone size={14} aria-hidden="true" />
@@ -520,7 +530,15 @@ export default function Footer() {
 
           <div className="vwu-footer-attribution">
             <span>Developed by</span>
-            <strong className="vwu-tech-hub-badge">VISHNU TECH HUB</strong>
+            <a
+              href="https://www.vishnutechhub.in/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="vwu-tech-hub-badge-link"
+              aria-label="Vishnu Tech Hub"
+            >
+              <strong className="vwu-tech-hub-badge">VISHNU TECH HUB</strong>
+            </a>
           </div>
         </div>
       </div>

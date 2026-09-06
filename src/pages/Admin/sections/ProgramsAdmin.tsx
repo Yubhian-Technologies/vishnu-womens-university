@@ -47,6 +47,8 @@ export interface LabItem {
   description?: string;
   pdfUrl?: string;
   pdfStoragePath?: string;
+  imageUrl?: string;
+  imageStoragePath?: string;
 }
 
 // Older programme docs stored labs as plain strings (no PDF) — normalize
@@ -137,6 +139,18 @@ export interface NewsletterYear {
   // Ordered — an issue's "Issue – N" label is always its 1-based position,
   // never stored, so there's nothing to keep in sync when one is removed.
   issues: NewsletterIssue[];
+}
+
+// One Academic Year's worth of Research & Development content — same five
+// optional fields the old flat rndIntro/rndTableText/rndProjectsText/
+// rndLinks/rndStructuredTable block had, just scoped per year now.
+export interface RndYear {
+  year: string;
+  intro?: string;
+  tableText?: string;
+  projectsText?: string;
+  links?: RndLink[];
+  structuredTable?: RndStructuredTable;
 }
 
 export interface ProgramDoc {

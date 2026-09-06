@@ -42,26 +42,42 @@ export default function StudentClubDetail() {
 
   return (
     <main className="page-wrapper">
-      {/* Hero — plain solid-color background, same as other detail pages
-          (governance, placements, differentiators): club photos live in the
-          Overview section below instead, at their own natural size, rather
-          than being cropped into a hero banner. */}
-      <section className="page-hero" style={{ minHeight: 320 }}>
-        <div className="page-hero-overlay" />
-        <div className="container page-hero-content">
-          <div className="breadcrumb animate-fade-in">
-            <Link to="/" className="breadcrumb-item">Home</Link>
-            <span className="breadcrumb-sep">›</span>
-            <Link to="/student-life" className="breadcrumb-item">Student Life</Link>
-            <span className="breadcrumb-sep">›</span>
-            <Link to="/student-clubs" className="breadcrumb-item">Student Clubs</Link>
-            <span className="breadcrumb-sep">›</span>
-            <span className="breadcrumb-item active">{club.name}</span>
+      {/* Hero */}
+      <section className="dept-hero-section">
+        <div className="container">
+          <div className="dept-hero-card">
+            {images.length > 0 && (
+              <img
+                src={typeof images[0] === 'string' ? images[0] : images[0]?.url}
+                alt={club.name}
+                className="dept-hero-bg-img"
+                loading="eager"
+                decoding="sync"
+              />
+            )}
+            <div className="dept-hero-overlay" />
+            <div className="dept-hero-content">
+              <div className="breadcrumb animate-fade-in" style={{ marginBottom: '0.8rem' }}>
+                <Link to="/" className="breadcrumb-item">Home</Link>
+                <span className="breadcrumb-sep">›</span>
+                <Link to="/student-life" className="breadcrumb-item">Student Life</Link>
+                <span className="breadcrumb-sep">›</span>
+                <Link to="/student-clubs" className="breadcrumb-item">Student Clubs</Link>
+                <span className="breadcrumb-sep">›</span>
+                <span className="breadcrumb-item active">{club.name}</span>
+              </div>
+              <div className="animate-fade-in-up" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#C9973A', color: '#0B1E42', fontSize: 'var(--text-xs)', fontWeight: 800, padding: '0.35rem 0.9rem', borderRadius: '9999px', marginBottom: '0.8rem', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                <Icon size={14} /> {club.category}
+              </div>
+              <h1 className="dept-hero-title">{club.name}</h1>
+              {club.desc && (
+                <p className="dept-hero-subtitle">{club.desc.slice(0, 160)}{club.desc.length > 160 ? '...' : ''}</p>
+              )}
+              <div className="dept-hero-cta">
+                <Link to="/student-clubs" className="btn-hero-gold">All Clubs</Link>
+              </div>
+            </div>
           </div>
-          <div className="animate-fade-in-up" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'var(--color-accent)', color: 'var(--color-white)', fontSize: 'var(--text-xs)', fontWeight: 700, padding: '0.3rem 0.9rem', borderRadius: 'var(--radius-full)', marginBottom: 'var(--space-3)' }}>
-            <Icon size={14} /> {club.category}
-          </div>
-          <h1 className="animate-fade-in-up">{club.name}</h1>
         </div>
       </section>
 

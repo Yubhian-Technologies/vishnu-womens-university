@@ -10,7 +10,7 @@ import {
   faClipboardList, faBus, faCity, faDownload, faTableList, faCamera, faLink, faScaleBalanced, faFolderOpen,
   faChartPie, faChartBar, faStar, faArrowTrendUp, faIdCard, faCalendarCheck, faPortrait, faBuilding, faTag,
   faPlane, faTrophy, faFlask, faFileCircleCheck, faBook, faUserShield, faRightFromBracket, faPhone,
-  faPalette, faMedal,
+  faPalette, faMedal, faAward,
 } from '@fortawesome/free-solid-svg-icons';
 import { getFirebaseAuth } from '../../lib/firebaseAdmin';
 import { resolveAdminSession, canReadModule } from '../../lib/rbac';
@@ -37,6 +37,7 @@ export const SECTIONS: { id: string; icon: IconDefinition; label: string }[] = [
   { id: 'core-executives', icon: faUserTie, label: 'Core Executives' },
   { id: 'placements',     icon: faBriefcase, label: 'Placement Year Data' },
   { id: 'placement-highlights', icon: faMedal, label: 'Home — Placement Highlights' },
+  { id: 'honoured-guests', icon: faAward, label: 'Home — Honoured Guests' },
   { id: 'alumni',         icon: faUserGraduate, label: 'Alumni & Giving' },
   { id: 'announcements',  icon: faBullhorn, label: 'Announcements' },
   { id: 'information',    icon: faCircleInfo, label: 'Information Page' },
@@ -48,6 +49,7 @@ export const SECTIONS: { id: string; icon: IconDefinition; label: string }[] = [
   { id: 'content-blocks', icon: faPuzzlePiece, label: 'Page Content Blocks' },
   { id: 'contacts',       icon: faAddressBook, label: 'Department Contacts' },
   { id: 'site-contact',   icon: faPhone, label: 'Site Contact Info' },
+  { id: 'crm',            icon: faAddressBook, label: 'CRM (Admissions Leads)' },
   { id: 'contact-messages', icon: faEnvelope, label: 'Contact Us Messages' },
   { id: 'career-applications', icon: faFileLines, label: 'Career Applications' },
   { id: 'admission-inquiries', icon: faClipboardList, label: 'Admission Inquiries' },
@@ -87,8 +89,8 @@ export const SECTIONS: { id: string; icon: IconDefinition; label: string }[] = [
 // hunting through one long undifferentiated list.
 export const SECTION_GROUPS: { label: string; ids: string[] }[] = [
   { label: 'Overview', ids: ['overview'] },
-  { label: 'Form Submissions', ids: ['contact-messages', 'career-applications', 'admission-inquiries', 'campus-visit-requests'] },
-  { label: 'Site Appearance', ids: ['theme', 'banners', 'landing-pages', 'site-photos', 'nav-links', 'content-blocks', 'compliance-docs'] },
+  { label: 'Form Submissions & CRM', ids: ['crm', 'contact-messages', 'career-applications', 'admission-inquiries', 'campus-visit-requests'] },
+  { label: 'Site Appearance', ids: ['theme', 'banners', 'landing-pages', 'honoured-guests', 'site-photos', 'nav-links', 'content-blocks', 'compliance-docs'] },
   { label: 'About & Governance', ids: ['governing-body', 'governance-items', 'annual-reports', 'nirf-reports', 'nba-data', 'core-executives', 'sves-campuses', 'contacts', 'site-contact', 'policies'] },
   { label: 'Academics', ids: ['departments', 'programs', 'schools', 'faculty', 'curriculum', 'downloads'] },
   { label: 'Admissions & Campus Info', ids: ['information'] },

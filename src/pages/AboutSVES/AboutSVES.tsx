@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin } from 'lucide-react';
+import { MapPin, ExternalLink } from 'lucide-react';
 import './AboutSVES.css';
 import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
@@ -63,7 +63,7 @@ export default function AboutSVES() {
       <PageHero
         page="about-sves"
         defaultTitle="Sri Vishnu Educational Society"
-  defaultSubtitle="More than 25 years of educational commitment, spanning 11 institutions across Andhra Pradesh and Telangana."
+        defaultSubtitle="A Legacy of Educational Excellence Since 1992 — Comprising over 25,000 students and 1,400+ faculty across Andhra Pradesh and Telangana."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Discover', to: '/' }, { label: 'About SVES' }]}
       />
 
@@ -81,38 +81,39 @@ export default function AboutSVES() {
         </div>
       </section>
 
-      {/* About */}
+      {/* About SVES */}
       <section className="section bg-off-white">
         <div className="container">
           <div className="grid-img-text">
             <div className="reveal-left">
-              <span className="section-label">Our Parent Society</span>
-              <h2 className="section-title">About Sri Vishnu Educational Society</h2>
+              <span className="section-label">ABOUT SVES</span>
+              <h2 className="section-title">Sri Vishnu Educational Society</h2>
+              <p style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-4)' }}>
+                A Legacy of Educational Excellence Since 1992
+              </p>
               <div className="divider" />
               <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-4)', color: 'var(--color-text-light)' }}>
-                The <strong>Sri Vishnu Educational Society (SVES)</strong> has earned a distinguished reputation through
-                its sustained commitment to building institutions of genuine educational quality. It was established by the late
-                <strong> Padma Bhushan Dr. B. V. Raju</strong>, a visionary leader who created a network of educational
-                institutions with a clear focus on technical and professional learning.
+                Founded in 1992 by the late <strong>Dr. B. V. Raju</strong>, an eminent industrialist, philanthropist, and recipient of the <strong>Padma Shri and Padma Bhushan</strong>, the Sri Vishnu Educational Society (SVES) is a not-for-profit, self-funded educational organization committed to advancing quality higher education.
               </p>
               <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-4)', color: 'var(--color-text-light)' }}>
-                After Dr. Raju's passing, his grandson <strong>Sri K. V. Vishnu Raju</strong> took over as Chairman
-                and has since carried the mission forward while also championing social welfare activities. Through the
-                <strong> Dr. B. V. Raju Foundation</strong>, the society runs leprosy care centres, schools, women's
-                associations, community halls, and veterinary services in surrounding villages — entirely independently of government funding.
+                Over the decades, SVES has built a strong presence across Engineering, Dentistry, Pharmacy, Commerce &amp; Sciences, Management, and Polytechnic education, providing diverse opportunities for students to learn, innovate, and build meaningful careers.
               </p>
-              <p style={{ lineHeight: 1.8, color: 'var(--color-text-light)' }}>
-                SVES currently operates <strong>11 institutions</strong> across <strong>4 campuses</strong> — Green Meadows
-                (Bhimavaram), Orchard Park (Narsapur), Valley Vista (Hyderabad), and Lake View (Medak) — collectively
-                educating over <strong> 50,000 students</strong> annually across engineering, pharmacy, dental, polytechnic, and school streams.
+              <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-4)', color: 'var(--color-text-light)' }}>
+                Today, the SVES group of institutions comprises more than <strong>25,000 students</strong> and over <strong>1,400 faculty members</strong>. Its institutions offer a wide range of undergraduate and postgraduate programmes across campuses in Andhra Pradesh and Telangana, with a strong reputation for academic excellence and student development.
               </p>
+              <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-5)', color: 'var(--color-text-light)' }}>
+                SVES has also been a pioneer in women’s engineering education, with two exclusive women’s engineering institutions recognized among the leading institutions in the region.
+              </p>
+              <a href="https://www.srivishnu.edu.in/" target="_blank" rel="noopener noreferrer" className="btn btn-accent">
+                Know More <ExternalLink size={15} strokeWidth={2.4} style={{ marginLeft: '0.4rem' }} />
+              </a>
             </div>
             {svesIntroImg && (
               <div>
                 <img
                   src={svesIntroImg.src}
                   alt={svesIntroImg.alt}
-                  style={{ width: '100%', height: '420px', objectFit: 'cover', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-xl)' }}
+                  style={{ width: '100%', height: '480px', objectFit: 'cover', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-xl)' }}
                 />
               </div>
             )}
@@ -120,8 +121,39 @@ export default function AboutSVES() {
         </div>
       </section>
 
-      {/* Campuses */}
+      {/* Legacy Rooted in Vision & Built on Purpose */}
       <section className="section bg-white">
+        <div className="container">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 'var(--space-8)' }}>
+            <div className="reveal-left" style={{ background: 'var(--color-off-white)', padding: 'var(--space-8)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-light-gray)' }}>
+              <span className="section-label">Legacy Rooted in Vision</span>
+              <h3 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-3)' }}>Inspiring Generations Since 1992</h3>
+              <div className="divider" style={{ margin: '0 0 var(--space-4) 0' }} />
+              <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-4)', color: 'var(--color-text-light)' }}>
+                The story of SVES began with the vision of <strong>Late Dr. B. V. Raju</strong>, a pioneer of the Indian cement industry and a passionate advocate of education as a force for social transformation.
+              </p>
+              <p style={{ lineHeight: 1.8, color: 'var(--color-text-light)' }}>
+                Driven by his belief that quality education should reach aspiring learners beyond major cities, he established institutions that brought opportunities for excellence to students in smaller towns and emerging communities. His vision continues to guide SVES in creating educational environments that nurture knowledge, character, confidence, and leadership.
+              </p>
+            </div>
+
+            <div className="reveal-right" style={{ background: 'var(--color-off-white)', padding: 'var(--space-8)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-light-gray)' }}>
+              <span className="section-label">Leadership &amp; Culture</span>
+              <h3 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-3)' }}>Built on Purpose. Driven by Passion.</h3>
+              <div className="divider" style={{ margin: '0 0 var(--space-4) 0' }} />
+              <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-4)', color: 'var(--color-text-light)' }}>
+                The vision of the Founder Chairman, <strong>Late Dr. B. V. Raju</strong>, continues to inspire the leadership of <strong>Sri K. V. Vishnu Raju</strong>, Chairman and grandson of the Founder Chairman.
+              </p>
+              <p style={{ lineHeight: 1.8, color: 'var(--color-text-light)' }}>
+                Together, this enduring legacy has shaped a culture of purpose, innovation, excellence, and student-centered learning. SVES remains committed to creating transformative educational experiences that empower students to realize their potential and contribute meaningfully to society across Andhra Pradesh and Telangana.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Campuses */}
+      <section className="section bg-off-white">
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>
             <span className="section-label">SVES Campuses</span>
@@ -149,7 +181,7 @@ export default function AboutSVES() {
       </section>
 
       {/* Campus Photos */}
-      <section className="section bg-off-white">
+      <section className="section bg-white">
         <div className="container">
           <PhotoGrid
             images={svesPhotos}
@@ -159,8 +191,8 @@ export default function AboutSVES() {
             highlights={[
               '11 institutions across Andhra Pradesh & Telangana',
               '4 campuses — Bhimavaram, Narsapur, Hyderabad, Medak',
-              '50,000+ students educated annually',
-              '25+ years of educational leadership',
+              '25,000+ students & 1,400+ faculty',
+              '30+ years of educational leadership',
               'Engineering, Pharmacy, Dental, School & beyond',
             ]}
             columns={2}
@@ -212,7 +244,7 @@ export default function AboutSVES() {
               <Link to="/about" className="btn btn-accent">About VWU</Link>
               <Link to="/vision-mission" className="btn btn-secondary">Vision & Mission</Link>
               <Link to="/governance" className="btn btn-secondary">Governance</Link>
-              <Link to="/admissions" className="btn btn-secondary">Apply Now</Link>
+              <Link to="/apply-now" className="btn btn-secondary">Apply Now</Link>
             </div>
           </div>
         </div>

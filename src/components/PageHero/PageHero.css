@@ -1,31 +1,49 @@
 /* =========================================================
-   PageHero — shared carousel hero for all pages
+   PageHero — Academic Department Style Floating Card Hero
    ========================================================= */
 
 .page-hero {
   position: relative;
+  width: 100%;
+  padding-top: 14px !important;
+  padding-bottom: 0.5rem;
+  background: transparent;
+}
+
+.page-hero .container {
+  max-width: 100% !important;
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+  width: 100% !important;
+}
+
+/* ── Floating Rounded Hero Card ── */
+.page-hero-card {
+  position: relative;
+  width: 100%;
+  margin: 0 auto;
+  min-height: 460px;
+  border-radius: 28px;
   overflow: hidden;
   display: flex;
-  align-items: center;
-  /* Placeholder color behind a still-loading .page-hero-image — mainly for
-     the detail pages (ProgramDetail, DifferentiatorDetail) that place a
-     bare <img class="page-hero-image"> directly here instead of going
-     through the slide-carousel markup below. */
-  background: var(--color-primary-dark);
+  align-items: flex-end;
+  box-shadow: 0 18px 44px -8px rgba(0, 0, 0, 0.35);
+  background: linear-gradient(135deg, #0B1E42 0%, #1E3B75 100%);
+  box-sizing: border-box;
 }
 
 /* Size variants */
-.page-hero--large  { min-height: 520px; }
-.page-hero--medium { min-height: 420px; }
-.page-hero--small  { min-height: 320px; }
+.page-hero--large .page-hero-card  { min-height: 520px; }
+.page-hero--medium .page-hero-card { min-height: 450px; }
+.page-hero--small .page-hero-card  { min-height: 360px; }
 
 /* ---- Slides ---- */
 .page-hero__slide {
   position: absolute;
   inset: 0;
   opacity: 0;
-  background: var(--color-primary-dark);
-  transition: opacity 0.7s ease;
+  background: linear-gradient(135deg, #0B1E42 0%, #1E3B75 100%);
+  transition: opacity 0.7s cubic-bezier(0.2, 0, 0, 1);
   z-index: 0;
 }
 
@@ -42,28 +60,16 @@
   display: block;
 }
 
-/* ---- Overlay ----
-   Two stacked gradients: a horizontal scrim (dark under the text column,
-   fading toward the right) plus a vertical scrim (dark at top/bottom edges
-   where the title, breadcrumb, and dots/counter sit). Guarantees legible
-   contrast over the hero image regardless of how bright/busy that image is. */
+/* ---- Dual Scrim Overlay ---- */
 .page-hero-overlay {
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(
-      to right,
-      color-mix(in srgb, var(--color-primary-dark, #081c15) 80%, transparent) 0%,
-      color-mix(in srgb, var(--color-primary, #1b4332) 55%, transparent) 50%,
-      color-mix(in srgb, var(--color-primary, #1b4332) 22%, transparent) 100%
-    ),
-    linear-gradient(
-      to bottom,
-      color-mix(in srgb, var(--color-primary-dark, #081c15) 35%, transparent) 0%,
-      color-mix(in srgb, var(--color-primary-dark, #081c15) 0%, transparent) 30%,
-      color-mix(in srgb, var(--color-primary-dark, #081c15) 0%, transparent) 70%,
-      color-mix(in srgb, var(--color-primary-dark, #081c15) 40%, transparent) 100%
-    );
+  background: linear-gradient(
+    90deg,
+    rgba(11, 30, 66, 0.92) 0%,
+    rgba(11, 30, 66, 0.72) 55%,
+    rgba(11, 30, 66, 0.38) 100%
+  );
   z-index: 2;
 }
 
@@ -71,46 +77,38 @@
 .page-hero-content {
   position: relative;
   z-index: 3;
-  padding-top: 3rem;
-  padding-bottom: 3rem;
+  padding: 3rem clamp(2rem, 4vw, 4rem);
   width: 100%;
-  max-width: 780px;
-  /* .container (shared with this element — see PageHero.tsx) sets
-     margin: 0 auto, which centers this narrower 780px column in the
-     middle of the banner instead of pinning it to the left edge like the
-     rest of the site's left-aligned content. Cancel that here so the
-     title/subtitle column starts flush at the container's left padding,
-     with only .container's own horizontal padding as the edge gap. */
+  max-width: 100%;
   margin-left: 0;
-  /* A second, older ".page-hero-content { padding: var(--space-20) 0 }"
-     rule in global.css (predates this component; still used directly by
-     a few hand-rolled detail-page heroes that share this class name)
-     zeroes out horizontal padding via that shorthand's "0" — since this
-     rule only sets padding-top/padding-bottom, the older rule's left/right
-     values otherwise win by load order. Set them explicitly here to match
-     .container's own edge padding instead of relying on the cascade. */
-  padding-left: var(--space-8);
-  padding-right: var(--space-8);
+  text-align: left;
+  box-sizing: border-box;
 }
 
 .page-hero__title {
-  font-family: var(--font-serif);
-  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-family: var(--font-serif, Georgia, serif);
+  font-size: clamp(1.5rem, 3.2vw, 2.75rem);
   font-weight: 800;
-  color: #fff;
-  line-height: 1.15;
-  margin: 0.5rem 0 1rem;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5), 0 4px 20px rgba(0, 0, 0, 0.4);
+  color: #ffffff;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin: 0.6rem 0 0.85rem 0;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+  white-space: normal;
+  overflow: visible;
+  word-break: break-word;
+  max-width: 100%;
   animation-duration: 0.5s;
   animation-fill-mode: both;
 }
 
 .page-hero__subtitle {
-  font-size: clamp(1rem, 2vw, 1.2rem);
-  color: rgba(255, 255, 255, 0.9);
-  line-height: 1.65;
-  max-width: 620px;
-  margin: 0 0 1.5rem;
+  font-size: clamp(1rem, 1.8vw, 1.22rem);
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.92);
+  line-height: 1.6;
+  max-width: 640px;
+  margin: 0 0 1.75rem 0;
   text-shadow: 0 1px 8px rgba(0, 0, 0, 0.3);
   animation-duration: 0.5s;
   animation-delay: 0.1s;
@@ -118,13 +116,71 @@
 }
 
 .page-hero__cta {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
   animation-duration: 0.5s;
   animation-delay: 0.2s;
   animation-fill-mode: both;
 }
 
+/* Gold Primary Hero CTA Button */
+.btn-hero-gold {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #C9973A;
+  color: #0B1E42;
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-weight: 800;
+  font-size: var(--text-sm, 0.92rem);
+  padding: 0.85rem 1.85rem;
+  border-radius: 9999px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 6px 20px rgba(201, 151, 58, 0.35);
+  line-height: 1;
+}
 
-/* ---- Arrows ---- */
+.btn-hero-gold:hover {
+  background: #D4A347;
+  color: #0B1E42;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(201, 151, 58, 0.45);
+}
+
+/* Translucent Outline Hero CTA Button */
+.btn-hero-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #ffffff;
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-weight: 700;
+  font-size: var(--text-sm, 0.92rem);
+  padding: 0.85rem 1.85rem;
+  border-radius: 9999px;
+  border: 1.5px solid rgba(255, 255, 255, 0.6);
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  line-height: 1;
+}
+
+.btn-hero-outline:hover {
+  background: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+  border-color: #ffffff;
+  transform: translateY(-2px);
+}
+
+/* ---- Slider Arrows ---- */
 .page-hero__arrow {
   position: absolute;
   top: 50%;
@@ -153,7 +209,6 @@
   box-shadow: 0 6px 16px rgba(0,0,0,0.3);
 }
 
-/* Both arrows cluster on the right */
 .page-hero__arrow--prev { right: 4.5rem; }
 .page-hero__arrow--next { right: 1.25rem; }
 
@@ -185,9 +240,6 @@
   transition: all 0.25s ease;
 }
 
-/* The visible dot stays small by design, but its clickable/tappable area
-   should still meet the 48x48dp minimum touch target — expand the hit area
-   invisibly rather than growing the dot itself. */
 .page-hero__dot::before {
   content: '';
   position: absolute;
@@ -195,9 +247,9 @@
 }
 
 .page-hero__dot--active {
-  background: var(--color-accent);
+  background: var(--color-accent, #C9973A);
   width: 22px;
-  box-shadow: 0 0 8px color-mix(in srgb, var(--color-accent, #c9a84c) 60%, transparent);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--color-accent, #C9973A) 60%, transparent);
 }
 
 /* ---- Counter ---- */
@@ -216,49 +268,112 @@
   border-radius: var(--radius-full);
 }
 
-/* ---- Breadcrumb ---- */
+/* ---- Glassmorphism Breadcrumbs ---- */
 .breadcrumb {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
   flex-wrap: wrap;
   margin-bottom: 0.6rem;
-  background: rgba(0, 0, 0, 0.22);
-  backdrop-filter: blur(8px);
-  padding: 0.3rem 0.85rem;
-  border-radius: var(--radius-full);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 0.35rem 0.95rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
   width: fit-content;
 }
 
 .breadcrumb-item {
   font-size: 0.78rem;
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.85);
   text-decoration: none;
-  font-weight: 500;
+  font-weight: 600;
   transition: color 0.15s ease;
 }
 
-.breadcrumb-item.active { color: var(--color-accent, #c8a03c); font-weight: 700; }
+.breadcrumb-item.active { color: var(--color-accent, #C9973A); font-weight: 700; }
 .breadcrumb-item:not(.active):hover { color: #fff; }
-.breadcrumb-sep { color: rgba(255, 255, 255, 0.4); font-size: 0.75rem; }
+.breadcrumb-sep { color: rgba(255, 255, 255, 0.45); font-size: 0.75rem; }
 
-/* ---- Responsive ---- */
-@media (max-width: 768px) {
-  .page-hero--large  { min-height: 380px; }
-  .page-hero--medium { min-height: 320px; }
-  .page-hero--small  { min-height: 260px; }
-
-  /* Kept at the 44px floor (not the full 36px it was) so the tap target
-     stays close to the 48x48dp minimum even in the hero's cramped mobile
-     chrome — a straight shrink-to-fit would drop it to a clearly sub-minimum
-     36px. */
-  .page-hero__arrow { width: 44px; height: 44px; font-size: 1.3rem; }
-  .page-hero__arrow--prev { right: 3.25rem; }
-  .page-hero__arrow--next { right: 0.5rem; }
-
-  /* Match .container's own mobile padding reduction (global.css) — see
-     the padding-left/right override above for why this can't just fall
-     through from .container on its own. */
-  .page-hero-content { padding-left: var(--space-4); padding-right: var(--space-4); }
+/* ---- Responsive Reflow ---- */
+@media (max-width: 992px) {
+  .page-hero-card {
+    min-height: 420px;
+    margin: 8px auto !important;
+    width: calc(100% - 16px) !important;
+    border-radius: 20px;
+  }
+  .page-hero-content {
+    padding: 2.5rem 1.75rem 3.5rem 1.75rem;
+  }
+  .page-hero__title {
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+  }
 }
+
+@media (max-width: 768px) {
+  .page-hero-overlay {
+    background: linear-gradient(
+      180deg,
+      rgba(11, 30, 66, 0.65) 0%,
+      rgba(11, 30, 66, 0.84) 45%,
+      rgba(11, 30, 66, 0.96) 100%
+    );
+  }
+  .page-hero__arrow {
+    top: 1.15rem;
+    transform: none;
+    width: 36px;
+    height: 36px;
+    font-size: 1.15rem;
+    background: rgba(0, 0, 0, 0.35);
+    border-color: rgba(255, 255, 255, 0.4);
+  }
+  .page-hero__arrow--prev {
+    right: 3.75rem;
+  }
+  .page-hero__arrow--next {
+    right: 1rem;
+  }
+  .breadcrumb {
+    max-width: calc(100% - 90px);
+  }
+}
+
+@media (max-width: 640px) {
+  .page-hero-card {
+    min-height: 420px;
+    border-radius: 18px;
+  }
+  .page-hero-content {
+    padding: 3.25rem 1.15rem 4rem 1.15rem;
+  }
+  .page-hero__title {
+    font-size: clamp(1.45rem, 5.5vw, 1.85rem);
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    word-break: break-word;
+    margin-top: 0.5rem;
+    line-height: 1.25;
+  }
+  .page-hero__subtitle {
+    font-size: 0.93rem;
+    line-height: 1.55;
+    margin-bottom: 1.25rem;
+  }
+  .btn-hero-gold,
+  .btn-hero-outline {
+    padding: 0.75rem 1.4rem;
+    font-size: 0.85rem;
+  }
+  .page-hero__dots {
+    bottom: 1rem;
+  }
+  .page-hero__counter {
+    bottom: 1rem;
+    right: 1rem;
+  }
+}
+

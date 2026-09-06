@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Laptop, Newspaper, ArrowRight } from 'lucide-react';
+import { Laptop, ArrowRight } from 'lucide-react';
 import HeroSlider from '../../components/HeroSlider/HeroSlider';
 import CounterSection from '../../components/CounterSection/CounterSection';
 import ScrollTopButton from '../../components/ScrollTopButton/ScrollTopButton';
@@ -26,6 +26,8 @@ import type { ContentBlockDoc } from '../Admin/sections/ContentBlocksAdmin';
 import SEO from '../../components/SEO/SEO';
 import UpcomingEvents from '../../components/UpcomingEvents/UpcomingEvents';
 import SmartInfrastructureShowcase from '../../components/SmartInfrastructureShowcase/SmartInfrastructureShowcase';
+import PlacementMetricsSection from '../../components/PlacementMetricsSection/PlacementMetricsSection';
+import HonouredGuestsSection from '../../components/HonouredGuests/HonouredGuestsSection';
 import { getUniversitySchema } from '../../lib/seo/schemas';
 import './Home.css';
 
@@ -103,16 +105,7 @@ function useTilt(strength = 12) {
   return { ref, onMouseMove: onMove, onMouseLeave: onLeave };
 }
 
-/* ── Wave Divider ─────────────────────────────────────────── */
-function Wave({ flip = false, fill = '#f7f8fb' }: { flip?: boolean; fill?: string }) {
-  return (
-    <div className={`wave-divider${flip ? ' wave-divider--flip' : ''}`}>
-      <svg viewBox="0 0 1440 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M0,30 C360,60 1080,0 1440,30 L1440,60 L0,60 Z" fill={fill} />
-      </svg>
-    </div>
-  );
-}
+
 
 /* ── Component ────────────────────────────────────────────── */
 export default function Home() {
@@ -167,25 +160,6 @@ export default function Home() {
     return () => observer.disconnect();
   }, []);
 
-  // Re-run reveal for news cards once Firestore data arrives (they don't exist at initial mount)
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const el = entry.target as HTMLElement;
-            const delay = el.dataset.delay || '0';
-            setTimeout(() => el.classList.add('revealed'), parseInt(delay));
-            observer.unobserve(el);
-          }
-        });
-      },
-      { threshold: 0.08 }
-    );
-    document.querySelectorAll('.news-grid .reveal-bounce').forEach(el => observer.observe(el));
-    return () => observer.disconnect();
-  }, [featuredNews]);
-
   const tilt1 = useTilt(10);
   const tilt2 = useTilt(10);
   const tilt3 = useTilt(10);
@@ -200,57 +174,14 @@ export default function Home() {
         jsonLd={getUniversitySchema()}
       />
 
-      {/* ── Hero Slider ── */}
+      {/* ── Chapter 1: Hero & Trust Bar ── */}
       <HeroSlider />
+      <AccreditationsStrip />
 
-      {/* ── Recent Activities Section ── */}
-      <section className="activity-section" aria-label="Recent Activities">
-        {/* Section Header */}
-        <div className="container">
-          <div className="activity-section-header reveal">
-            <div className="activity-section-titlebar">
-              <div className="activity-section-meta">
-                <span className="section-label">Campus Life</span>
-                <h2 className="section-title">Recent Activities</h2>
-              </div>
-              <p className="activity-section-desc">
-                From mBAJA racing championships to NASA-level internships — VWU students lead, build, and inspire at every stage.
-              </p>
-            </div>
-            <Link to="/news-awards/gallery" className="btn btn-outline reveal-right">View Gallery →</Link>
-          </div>
-        </div>
-
-        {/* Photo Marquee */}
-        <div className="activity-strip">
-          <div className="activity-track-wrap">
-            <div className="activity-track">
-              {activitiesLoading ? (
-                Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="activity-card activity-card--skeleton" aria-hidden="true" />
-                ))
-              ) : (
-                [...activityPhotos, ...activityPhotos].map((item, i) => (
-                  <div key={i} className="activity-card">
-                    <SmoothImage
-                      src={item.src}
-                      alt={item.alt}
-                      className="activity-card-img"
-                      {...(i < 3 ? fetchPriorityAttr('high') : {})}
-                    />
-                    <div className="activity-card-label">{item.caption || item.alt}</div>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Counter Stats ── */}
+      {/* ── Chapter 2: Institutional Impact & Stat Matrix ── */}
       <CounterSection />
 
-      {/* ── Study at VWU ── */}
+      {/* ── Chapter 3: Unified Academic Hub & Degree Programs ── */}
       <section className="study-section section">
         {/* floating shapes */}
         <div className="floating-shapes" aria-hidden="true">
@@ -260,7 +191,6 @@ export default function Home() {
         </div>
         <div className="container">
           <div className="study-intro reveal">
-            <span className="section-label">Academics</span>
             <h2 className="section-title gradient-text">Study at VWU</h2>
             <p className="section-desc"><strong>Learn. Lead. Innovate.</strong><br />At VWU, education goes beyond the classroom. Experience personalized, industry-focused learning that builds technical expertise, leadership confidence, creativity, and the skills to shape your future.</p>
           </div>
@@ -277,7 +207,7 @@ export default function Home() {
                   style={{ '--card-color': color } as React.CSSProperties}
                 >
                   <div className="study-card-image-wrap">
-                    {photo && <SmoothImage src={photo.src} alt={photo.alt} className="study-card-image" />}
+                    {photo && <SmoothImage src={photo.src} alt={photo.alt} className="study-card-image" loading="lazy" decoding="async" />}
                     <div className="study-card-overlay" style={{ background: `linear-gradient(to top, color-mix(in srgb, ${color} 80%, transparent) 0%, transparent 65%)` }} />
                     <div className="study-card-icon"><Icon size={24} strokeWidth={1.75} color="var(--color-primary-dark)" /></div>
                     <div className="study-card-shine" />
@@ -297,42 +227,67 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Campus Life Showcase (A vibrant campus. A memorable journey.) ── */}
-      <CampusLifeShowcase />
-
-      {/* ── Accreditations & Affiliations ── */}
-      <AccreditationsStrip />
-
-      {/* ── Programs & Schools Showcase (Future-focused education across disciplines) ── */}
+      {/* Programs & Schools Explorer */}
       <ProgramsShowcase />
 
-      {/* ── Women's Education & Empowerment ── */}
+      {/* ── Chapter 4: The VWU Advantage — Women in STEM & Leadership ── */}
       <WomensEducationSection />
 
-      {/* ── Smart Infrastructure & Campus Showcase (Engineered for Discovery. Built for Living.) ── */}
+      {/* Recent Campus Activities */}
+      <section className="activity-section" aria-label="Recent Activities">
+        <div className="container">
+          <div className="activity-section-header reveal">
+            <div className="activity-section-titlebar">
+              <div className="activity-section-meta">
+                <h2 className="section-title">Recent Campus Activities</h2>
+              </div>
+            </div>
+            <Link to="/news-awards/gallery" className="btn btn-outline reveal-right">View Gallery →</Link>
+          </div>
+        </div>
+
+        <div className="activity-strip">
+          <div className="activity-track-wrap">
+            <div className="activity-track">
+              {activitiesLoading ? (
+                Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="activity-card activity-card--skeleton" aria-hidden="true" />
+                ))
+              ) : (
+                [...activityPhotos, ...activityPhotos].map((item, i) => (
+                  <div key={i} className="activity-card">
+                    <SmoothImage
+                      src={item.src}
+                      alt={item.alt}
+                      className="activity-card-img"
+                      {...(i < 3 ? fetchPriorityAttr('high') : { loading: 'lazy', decoding: 'async' })}
+                    />
+                    <div className="activity-card-label">{item.caption || item.alt}</div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Chapter 5: Smart Infrastructure & Innovation Ecosystem ── */}
       <SmartInfrastructureShowcase />
-
-      {/* ── Our Recruiters (3-Row Auto-Scrolling Marquee) ── */}
+      <PlacementMetricsSection />
       <RecruitersSection />
+      <CampusLifeShowcase />
+      <HonouredGuestsSection />
 
-      <Wave fill="#09130f" />
-
-      {/* ── Modern Testimonials Slider ── */}
+      {/* ── Chapter 6: Alumni Success & Testimonials ── */}
       <TestimonialSlider testimonials={testimonials} />
 
-      <Wave flip fill="var(--color-white)" />
-
-      {/* ── News (Recent Happenings) ── */}
+      {/* ── Chapter 7: Live Campus Pulse & News ── */}
       <section className="news-section">
         <div className="news-glow-1" aria-hidden="true" />
         <div className="news-glow-2" aria-hidden="true" />
         <div className="container">
           <div className="news-section-header">
             <div className="reveal-left">
-              <span className="news-chip">
-                <Newspaper size={14} className="news-chip-icon" />
-                <span>Stay Informed</span>
-              </span>
               <h2 className="section-title">Latest from VWU</h2>
             </div>
             <Link to="/news-awards/happenings" className="news-btn-tonal reveal-right">
@@ -342,8 +297,8 @@ export default function Home() {
           </div>
           <div className="news-grid">
             {featuredNews.map((item, i) => (
-              <div key={item.id} className="reveal-bounce" data-delay={`${i * 110}`}>
-                <NewsCard article={item} onReadMore={() => setActiveArticle(item)} />
+              <div key={item.id} className={`news-grid-item ${i === 0 ? 'news-grid-item--featured' : ''}`}>
+                <NewsCard article={item} isFeatured={i === 0} onReadMore={() => setActiveArticle(item)} />
               </div>
             ))}
             {featuredNews.length === 0 && (
@@ -354,13 +309,11 @@ export default function Home() {
       </section>
 
       <NewsArticleDialog article={activeArticle} onClose={() => setActiveArticle(null)} />
-
-      {/* ── Events (Upcoming Happenings) ── */}
       <UpcomingEvents happenings={upcomingHappenings} />
 
-      {/* ── CTA Banner ── */}
+      {/* ── Admissions CTA Banner ── */}
       <section className="cta-banner">
-        {ctaBannerPhoto && <SmoothImage src={ctaBannerPhoto.src} alt={ctaBannerPhoto.alt} className="cta-banner-bg" />}
+        {ctaBannerPhoto && <SmoothImage src={ctaBannerPhoto.src} alt={ctaBannerPhoto.alt} className="cta-banner-bg" loading="lazy" decoding="async" />}
         <div className="cta-banner-overlay" />
         <div className="cta-particles" aria-hidden="true">
           {Array.from({ length: 12 }).map((_, i) => (
@@ -369,7 +322,6 @@ export default function Home() {
         </div>
         <div className="container">
           <div className="cta-banner-content reveal">
-            <span className="section-label" style={{ color: 'var(--color-accent)' }}>Take the Next Step</span>
             <h2>The best way to understand VWU is to see it for yourself.</h2>
             <p>Arrange a campus tour, speak with our admissions team, or submit your application today. Your path to a purposeful engineering career starts here.</p>
             <div className="cta-actions">

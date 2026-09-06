@@ -27,7 +27,7 @@ export default function StickyChrome() {
           <span>Admissions Open for 2026–27 — Apply Now for VWU's B.Tech, M.Tech, and MBA Programs</span>
           <span>Admissions Open for 2026–27 — Apply Now for VWU's B.Tech, M.Tech, and MBA Programs</span>
         </div>
-        <Link to="/admissions" className="lph-ticker__cta">Apply Now</Link>
+        <Link to="/apply-now" className="lph-ticker__cta">Apply Now</Link>
       </div>
     </>
   );

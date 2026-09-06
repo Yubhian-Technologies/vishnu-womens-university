@@ -13,6 +13,11 @@ export function useDocument<T extends DocumentData>(
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!db) {
+      setLoading(false);
+      setError('Firestore is not configured.');
+      return;
+    }
     if (!docId) {
       setLoading(false);
       return;

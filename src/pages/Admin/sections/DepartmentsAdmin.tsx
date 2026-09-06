@@ -6,12 +6,13 @@ import ImageUploader from '../../../components/ImageUploader/ImageUploader';
 import FileUploader from '../../../components/FileUploader/FileUploader';
 import { deleteFile, type UploadResult } from '../../../lib/storage';
 import { PROGRAM_ICON_NAMES } from '../../../lib/programIcons';
-import { normalizeLab, type LabItem, type LibrarySection, type LibraryItem, type NewsEventsYear, type ProgramLink, type ProgramDoc, type RndLink, type NewsletterYear } from './ProgramsAdmin';
+import { normalizeLab, type LabItem, type LibrarySection, type LibraryItem, type NewsEventsYear, type ProgramLink, type ProgramDoc, type RndLink, type NewsletterYear, type RndYear } from './ProgramsAdmin';
 import type { RndStructuredTable } from './RndTableEditor';
 import type { PlacementYearRecord } from '../../../lib/placementRecords';
 import type { InternshipYearRecord } from '../../../lib/internshipRecords';
 import { diffChangedFields } from '../../../lib/formDiff';
 import { PlacementYearsEditor, InternshipYearsEditor, RndEditor, NewsletterYearsEditor } from './ProgramCareerEditors';
+import { resolveRndYears } from '../../../components/RndSection/RndSection';
 import { downloadPlacementsTemplate } from '../../../lib/placementsImport';
 import { downloadInternshipsTemplate } from '../../../lib/internshipsImport';
 import CustomSectionEditor from './CustomSectionEditor';
@@ -51,6 +52,11 @@ export interface DepartmentDoc {
   heroImage?: string;
   storagePath?: string;
   about?: string;
+  // Optional override for the hero subtitle on the department detail pages —
+  // falls back to getDepartmentTagline()'s hardcoded copy when unset. Not
+  // exposed as its own admin form field (yet); kept so a doc that already
+  // has one (or is set directly in Firestore) still overrides the default.
+  tagline?: string;
   // Same shape/purpose as a programme's own (see ProgramsAdmin) — shown
   // right below "About the Department" on the grouped department page,
   // filling the space that used to be empty next to the Quick Links sidebar
@@ -95,11 +101,15 @@ export interface DepartmentDoc {
   // after the switchover.
   placementYears?: PlacementYearRecord[];
   internshipYears?: InternshipYearRecord[];
+  // Legacy flat R&D fields — pre-Academic-Year shape, kept only as a
+  // migration source for rndYears (see startEdit() below). New saves go
+  // through RndEditor's per-year form and write rndYears exclusively.
   rndIntro?: string;
   rndTableText?: string;
   rndProjectsText?: string;
   rndLinks?: RndLink[];
   rndStructuredTable?: RndStructuredTable;
+  rndYears?: RndYear[];
   newsletterYears?: NewsletterYear[];
   // News & Events — legacy fixed shape (exactly three categories: News &
   // Events / Student Awards / Others, each one academic-year table/cards/
@@ -742,6 +752,7 @@ export default function DepartmentsAdmin() {
       rndProjectsText: d.rndProjectsText || careerSource?.rndProjectsText || '',
       rndLinks: d.rndLinks?.length ? d.rndLinks : (careerSource?.rndLinks || []),
       rndStructuredTable: d.rndStructuredTable || careerSource?.rndStructuredTable,
+      rndYears: resolveRndYears(d, careerSource),
       newsletterYears: d.newsletterYears?.length ? d.newsletterYears : (careerSource?.newsletterYears || []),
       newsEventsYears: d.newsEventsYears || [], studentAwardsYears: d.studentAwardsYears || [], othersYears: d.othersYears || [],
       newsEventsSections: needsMigration ? migrateNewsEventsToSections(d) : (d.newsEventsSections || []),
@@ -767,6 +778,7 @@ export default function DepartmentsAdmin() {
       rndProjectsText: careerSource ? (d.rndProjectsText || '') : next.rndProjectsText,
       rndLinks: careerSource ? (d.rndLinks || []) : next.rndLinks,
       rndStructuredTable: careerSource ? d.rndStructuredTable : next.rndStructuredTable,
+      rndYears: d.rndYears || [],
       newsletterYears: careerSource ? (d.newsletterYears || []) : next.newsletterYears,
     });
   };
@@ -1323,6 +1335,13 @@ export default function DepartmentsAdmin() {
           </div>
         </details>
 
+        {editingDept && (
+          <p className="admin-field__hint" style={{ marginBottom: '0.75rem' }}>
+            Placements, Internships, Research &amp; Development, and Newsletter above each save on their own
+            ("Save Changes" / "Save Research &amp; Development" / "Save Newsletter"). Once you're done editing this
+            department, use Update below to save the department fields themselves.
+          </p>
+        )}
         <div className="admin-form-actions">
           {editing && <button className="admin-btn admin-btn--ghost" onClick={() => { setEditing(null); setForm(EMPTY); setOriginalForm(null); }}>Cancel</button>}
           <button className="admin-btn admin-btn--primary" onClick={save} disabled={saving}>
@@ -1330,22 +1349,6 @@ export default function DepartmentsAdmin() {
           </button>
         </div>
       </div>
-
-      {editingDept && (
-        <div className="admin-card">
-          <p className="admin-field__hint" style={{ marginBottom: '0.75rem' }}>
-            Placements, Internships, Research &amp; Development, and Newsletter above each save on their own
-            ("Save Changes" / "Save Research &amp; Development" / "Save Newsletter"). Once you're done editing this
-            department, use Update below to save the department fields themselves.
-          </p>
-          <div className="admin-form-actions">
-            <button className="admin-btn admin-btn--ghost" onClick={() => { setEditing(null); setForm(EMPTY); setOriginalForm(null); }}>Cancel</button>
-            <button className="admin-btn admin-btn--primary" onClick={save} disabled={saving}>
-              {saving ? 'Saving…' : 'Update'}
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* Hidden while editing an existing department — nothing else to
           scroll past, so the section list above is the whole page. */}

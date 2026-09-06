@@ -111,19 +111,14 @@ export default function Campus() {
               const cardStyle: CSSProperties = { display: 'block', textDecoration: 'none', background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', transition: 'all var(--transition-base)', scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' };
               const onMouseEnter = (e: ReactMouseEvent<HTMLElement>) => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-accent)'; (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-md)'; };
               const onMouseLeave = (e: ReactMouseEvent<HTMLElement>) => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-light-gray)'; (e.currentTarget as HTMLElement).style.boxShadow = 'none'; };
+              const matchedFacility = resolveCampusFacility(f.title, f.slug);
               const cardInner = (
                 <>
                   <div style={{ marginBottom: 'var(--space-3)' }}><Icon size={35} strokeWidth={1.75} /></div>
-                  <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>{f.title}</h3>
-                  <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6 }}>{f.desc}</p>
+                  <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>{matchedFacility?.title || f.title}</h3>
+                  <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6 }}>{matchedFacility?.desc || f.desc}</p>
                 </>
               );
-              // Link tiles that match one of the 16 dedicated facility pages
-              // (/campus/:slug) — by slug first, falling back to a known
-              // title alias (e.g. "Specialised Laboratories" → the "State-
-              // of-the-art Labs" page) since admin-entered slugs don't
-              // always line up. No match just stays a plain, unlinked card.
-              const matchedFacility = resolveCampusFacility(f.title, f.slug);
               if (matchedFacility) {
                 return (
                   <Link key={f.id} id={f.slug || undefined} to={`/campus/${matchedFacility.slug}`} style={cardStyle} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>

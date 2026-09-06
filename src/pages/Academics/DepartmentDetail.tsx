@@ -1,41 +1,160 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useLocation, Navigate } from 'react-router-dom';
-import { Check, Microscope, Compass, Target, Sparkles, Mail, BookOpen, FileText, ChevronDown, GraduationCap, Calendar, Award, Users, ChevronRight, ArrowRight, BookMarked, Bookmark, Library, ExternalLink } from 'lucide-react';
+import { Check, Microscope, Sparkles, FileText, ArrowLeft, ArrowRight, User, Building2, BookOpen, GraduationCap, Award, Calendar, Users } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import ProgrammeStructure from '../../components/ProgrammeStructure/ProgrammeStructure';
-import DepartmentNewsSection, { type DepartmentNewsDoc } from '../../components/DepartmentNews/DepartmentNewsSection';
-import NewsEventsTabs from '../../components/NewsEventsTabs/NewsEventsTabs';
-import BodyBlocks, { parseBodyContent } from '../../components/BodyBlocks/BodyBlocks';
-import SmoothCollapse from '../../components/SmoothCollapse/SmoothCollapse';
+import NewsEventsTabs, { type NewsEventsCategory } from '../../components/NewsEventsTabs/NewsEventsTabs';
 import SEO from '../../components/SEO/SEO';
 import FacultyCarousel from '../../components/FacultyCarousel/FacultyCarousel';
-import TestimonialMarquee, { type PlacementItem } from '../../components/ui/marquee-01';
+import { PlacementRecordCard, type PlacementItem } from '../../components/ui/marquee-01';
+import { Marquee } from '../../components/ui/marquee-01-utils/marquee';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useEapcetCode } from '../../hooks/useContentBlocks';
 import { smoothScrollTo } from '../../lib/smoothScroll';
 import { fetchPriorityAttr } from '../../lib/domAttrs';
 import { getProgramSchema, getBreadcrumbSchema } from '../../lib/seo/schemas';
 import type { DepartmentGroup } from '../../lib/departmentGroups';
-import { normalizeLab, normalizeMindMapImages, type ProgramDoc, type NewsEventsYear, type LabItem } from '../Admin/sections/ProgramsAdmin';
-import LabDialog from '../../components/LabDialog/LabDialog';
+import { normalizeLab, normalizeMindMapImages, type ProgramDoc, type NewsEventsYear } from '../Admin/sections/ProgramsAdmin';
 import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import type { FacultyDoc } from './Faculty';
 import { parseFlexibleTable, parseProjectAccordion } from '../../lib/structuredTable';
-import { sortPlacementRows, computePlacementStats, findPackageColumnIndex, findCompanyColumnIndex, formatPackageCell } from '../../lib/placementRecords';
+import { sortPlacementRows, computePlacementStats, findPackageColumnIndex, formatPackageCell } from '../../lib/placementRecords';
 import { computeInternshipStats, findPeriodColumnIndex } from '../../lib/internshipRecords';
-import { hasCustomSectionContent, toQuickLinkItems } from '../../lib/customSections';
-import CustomSectionsRenderer, { SectionSubtree } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
+import { hasCustomSectionContent } from '../../lib/customSections';
+import CustomSectionsRenderer from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
+import { resolveProgramIcon } from '../../lib/programIcons';
+import { getDepartmentTagline } from '../../lib/departmentTaglines';
 import '../detail-layout.css';
 import '../Campus/tabbed-section.css';
 
 const NAV_OFFSET = 'calc(var(--topbar-height) + var(--header-height) + 1rem)';
+
+// Every section id the quick-nav scroll-spy might need to observe — a
+// superset of whatever `quickLinks` ends up rendering for a given
+// department (see the scroll-spy effect below for why this is a static
+// list rather than reading `quickLinks` directly).
+const ALL_QUICK_NAV_SECTION_IDS = ['about', 'vision-mission', 'programmes', 'placements', 'hod', 'faculty', 'labs', 'program-toggle', 'rnd', 'news-events'];
+
+// Marquee pace: fixed duration made the scroll visibly speed up on any
+// department with more records (same time, wider track) — a per-card pace
+// keeps it readable regardless of count. Mirrors marquee-01.tsx's own logic.
+const SECONDS_PER_CARD = 5;
+const MIN_DURATION_S = 45;
+const rowDuration = (cardCount: number) => `${Math.max(MIN_DURATION_S, cardCount * SECONDS_PER_CARD)}s`;
+
+const DEFAULT_MARQUEE_ITEMS: PlacementItem[] = [
+  { name: "Pooja Sharma", company: "Google", package: "59.15 LPA" },
+  { name: "Sravani K.", company: "Meesho", package: "57.53 LPA" },
+  { name: "Ananya Rao", company: "Amazon", package: "46.38 LPA" },
+  { name: "Kavya Sree", company: "Microsoft", package: "45.00 LPA" },
+  { name: "Deepthi M.", company: "Adobe", package: "43.00 LPA" },
+  { name: "Bhavana V.", company: "Goldman Sachs", package: "34.00 LPA" },
+  { name: "Meghana Nayudu", company: "Cognizant GenC", package: "6.75 LPA" },
+  { name: "Bondada Susanthi", company: "Amazon", package: "46.38 LPA" },
+  { name: "Tejaswini B.", company: "Infosys", package: "9.50 LPA" },
+  { name: "Prathyusha N.", company: "Flipkart", package: "32.00 LPA" },
+  { name: "Harika V.", company: "Walmart", package: "26.50 LPA" },
+  { name: "Divya Teja", company: "Atlassian", package: "52.00 LPA" },
+  { name: "Spandana P.", company: "Salesforce", package: "41.00 LPA" },
+  { name: "Nikhita A.", company: "Capgemini", package: "4.25 LPA" },
+  { name: "Yuga Sri Bandi", company: "Dhan.AI", package: "5.00 LPA" },
+  { name: "Pujitha Andugala", company: "Infosys", package: "3.60 LPA" },
+  { name: "Komali Bajinki", company: "Cerevyn Solutions", package: "4.00 LPA" },
+  { name: "Pavani Bandaru", company: "Dhan.AI", package: "5.00 LPA" },
+];
+
+function PlacementProfileCard({ name, company, package: pkg }: PlacementItem) {
+  return (
+    <div className="dept-profile-card">
+      <div className="dept-profile-card-photo">
+        <User size={44} strokeWidth={1.5} aria-hidden="true" />
+        <span className="dept-profile-card-logo-badge" aria-hidden="true">
+          <Building2 size={15} strokeWidth={2.2} />
+        </span>
+      </div>
+      <div className="dept-profile-card-body">
+        <h4 className="dept-profile-card-name">{name}</h4>
+        <p className="dept-profile-card-role">Placed at {company}</p>
+        <span className="dept-profile-card-package">{pkg}</span>
+      </div>
+    </div>
+  );
+}
+
+function PlacementProfileMarquee({ records }: { records: PlacementItem[] }) {
+  if (!records || records.length === 0) return null;
+  const safeRecords = records.length < 8 ? [...records, ...records, ...records, ...records] : records;
+  const half = Math.ceil(safeRecords.length / 2);
+  const firstRow = safeRecords.slice(0, half);
+  const secondRow = safeRecords.slice(half);
+
+  return (
+    <div className="marquee-container">
+      <Marquee pauseOnHover style={{ ['--duration' as string]: rowDuration(firstRow.length) }}>
+        {firstRow.map((rec, idx) => (
+          <PlacementProfileCard key={`row1-${idx}-${rec.name}`} {...rec} />
+        ))}
+      </Marquee>
+      <Marquee reverse pauseOnHover style={{ ['--duration' as string]: rowDuration(secondRow.length) }}>
+        {secondRow.map((rec, idx) => (
+          <PlacementProfileCard key={`row2-${idx}-${rec.name}`} {...rec} />
+        ))}
+      </Marquee>
+      <div className="marquee-fade-left" aria-hidden="true" />
+      <div className="marquee-fade-right" aria-hidden="true" />
+    </div>
+  );
+}
+
+function PlacementProfileMarquee3Layers({ records }: { records: PlacementItem[] }) {
+  const displayRecords = records && records.length > 0 ? records : DEFAULT_MARQUEE_ITEMS;
+  const safeRecords = displayRecords.length < 12
+    ? [...displayRecords, ...displayRecords, ...displayRecords, ...displayRecords]
+    : displayRecords;
+
+  const third = Math.ceil(safeRecords.length / 3);
+  const firstRow = safeRecords.slice(0, third);
+  const secondRow = safeRecords.slice(third, third * 2);
+  const thirdRow = safeRecords.slice(third * 2);
+
+  return (
+    <div className="marquee-container" style={{ gap: '0.85rem' }}>
+      <Marquee pauseOnHover style={{ ['--duration' as string]: rowDuration(firstRow.length) }}>
+        {firstRow.map((rec, idx) => (
+          <PlacementRecordCard key={`prow1-${idx}-${rec.name}`} {...rec} />
+        ))}
+      </Marquee>
+      <Marquee reverse pauseOnHover style={{ ['--duration' as string]: rowDuration(secondRow.length) }}>
+        {secondRow.map((rec, idx) => (
+          <PlacementRecordCard key={`prow2-${idx}-${rec.name}`} {...rec} />
+        ))}
+      </Marquee>
+      <Marquee pauseOnHover style={{ ['--duration' as string]: rowDuration(thirdRow.length) }}>
+        {thirdRow.map((rec, idx) => (
+          <PlacementRecordCard key={`prow3-${idx}-${rec.name}`} {...rec} />
+        ))}
+      </Marquee>
+      <div className="marquee-fade-left" aria-hidden="true" />
+      <div className="marquee-fade-right" aria-hidden="true" />
+    </div>
+  );
+}
 
 interface Props {
   group: DepartmentGroup;
   /** The currently-selected program slug (drives the toggle). */
   activeSlug: string;
 }
+
+// Every programme-hub tab now shows for every programme regardless of
+// whether that programme has content for it (consistent tab set across all
+// programmes); this is what a content-less tab's body shows when opened.
+const HUB_TAB_EMPTY = (
+  <p className="section-desc" style={{ margin: 0 }}>
+    Details for this section will be published soon.
+  </p>
+);
 
 /**
  * The shared page for a "grouped" department (AI / CSE / ECE). The top half is
@@ -49,44 +168,83 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   const navigate = useNavigate();
   const location = useLocation();
   const [outcomeTab, setOutcomeTab] = useState<string | null>(null);
-  // "Choose a Programme" Quick Links accordion — starts open so the sub-links
-  // remain visible by default (unchanged from before this was collapsible).
-  const [programmeLinksOpen, setProgrammeLinksOpen] = useState(true);
-  // Same collapsible treatment, one level deeper — a programmeLinks entry
-  // with its own children (e.g. "Research & Development" built from
-  // Publications/Patents/Funded Projects sub-sections) starts open, toggled
-  // per id.
-  const [collapsedQuickLinks, setCollapsedQuickLinks] = useState<Set<string>>(new Set());
-  const toggleQuickLink = (id: string) => {
-    setCollapsedQuickLinks((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
   // Which Academic Year's placement records are shown — falls back to the
   // active programme's first available year (see placementYears below).
   const [placementYear, setPlacementYear] = useState<string | null>(null);
   // Which Academic Year's internship records are shown — same pattern as
   // the Placements pair above.
   const [internshipYear, setInternshipYear] = useState<string | null>(null);
-  const [activeLab, setActiveLab] = useState<LabItem | null>(null);
+  // Placements/Internships now share one "Careers" section — this picks
+  // which half shows when a programme has both (no tab bar at all when it
+  // only has one).
+  const [careerTab, setCareerTab] = useState<'placements' | 'internships'>('placements');
+  // Laboratories carousel — one lab slide visible at a time, auto-advancing
+  // (same auto-scroll + pause-on-interact pattern as FacultyCarousel), with
+  // arrow buttons and dot indicators that also work manually.
+  const labScrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLabsLeft, setCanScrollLabsLeft] = useState(false);
+  const [canScrollLabsRight, setCanScrollLabsRight] = useState(true);
+  const [activeLabIndex, setActiveLabIndex] = useState(0);
+  const [labAutoPaused, setLabAutoPaused] = useState(false);
+  const labResumeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const checkLabScroll = () => {
+    const el = labScrollRef.current;
+    if (!el) return;
+    setCanScrollLabsLeft(el.scrollLeft > 10);
+    setCanScrollLabsRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 10);
+    if (el.clientWidth > 0) {
+      setActiveLabIndex(Math.round(el.scrollLeft / el.clientWidth));
+    }
+  };
+  useEffect(() => {
+    const el = labScrollRef.current;
+    if (!el) return;
+    checkLabScroll();
+    el.addEventListener('scroll', checkLabScroll, { passive: true });
+    window.addEventListener('resize', checkLabScroll);
+    return () => {
+      el.removeEventListener('scroll', checkLabScroll);
+      window.removeEventListener('resize', checkLabScroll);
+    };
+  }, []);
+  // Auto-advance every 4.5s, looping back to the start at the end — pauses
+  // while the user is hovering/touching/using the arrows or dots, then
+  // resumes a few seconds after they let go (identical shape to
+  // FacultyCarousel's autoscroll so both feel consistent). Harmlessly a
+  // no-op when there's nothing to scroll (single lab, or none yet).
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const el = labScrollRef.current;
+      if (labAutoPaused || !el || el.scrollWidth <= el.clientWidth) return;
+      if (el.scrollLeft >= el.scrollWidth - el.clientWidth - 10) {
+        el.scrollTo({ left: 0, behavior: 'smooth' });
+      } else {
+        el.scrollBy({ left: el.clientWidth, behavior: 'smooth' });
+      }
+    }, 4500);
+    return () => clearInterval(timer);
+  }, [labAutoPaused]);
+  const pauseLabAutoTemporarily = () => {
+    setLabAutoPaused(true);
+    if (labResumeTimeoutRef.current) clearTimeout(labResumeTimeoutRef.current);
+    labResumeTimeoutRef.current = setTimeout(() => setLabAutoPaused(false), 6000);
+  };
+  const scrollLabsBy = (direction: 1 | -1) => {
+    const el = labScrollRef.current;
+    if (!el) return;
+    pauseLabAutoTemporarily();
+    el.scrollBy({ left: direction * el.clientWidth, behavior: 'smooth' });
+  };
+  const scrollToLabIndex = (index: number) => {
+    const el = labScrollRef.current;
+    if (!el) return;
+    pauseLabAutoTemporarily();
+    el.scrollTo({ left: index * el.clientWidth, behavior: 'smooth' });
+  };
+  const [activeHubTab, setActiveHubTab] = useState<'overview' | 'curriculum' | 'outcomes' | 'news' | 'newsletter' | 'rnd'>('overview');
   const [openRndProjects, setOpenRndProjects] = useState<Set<string>>(new Set());
   const toggleRndProject = (key: string) => {
     setOpenRndProjects((prev) => {
-      const next = new Set(prev);
-      if (next.has(key)) next.delete(key);
-      else next.add(key);
-      return next;
-    });
-  };
-  // Programmes Offered (B.Tech./M.Tech.) cards — click/keyboard-toggled so
-  // touch and keyboard users can reach the content; CSS also expands a card
-  // on mouse hover as a progressive-enhancement affordance for desktop.
-  const [openLevels, setOpenLevels] = useState<Set<string>>(new Set());
-  const toggleLevel = (key: string) => {
-    setOpenLevels((prev) => {
       const next = new Set(prev);
       if (next.has(key)) next.delete(key);
       else next.add(key);
@@ -98,7 +256,6 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   const dept = allDepartments.find(
     (d) => d.shortCode?.trim().toUpperCase() === group.deptShortCode.trim().toUpperCase()
   );
-  const { docs: deptNewsDocs } = useOrderedCollection<DepartmentNewsDoc>('departmentNews', 'date', 'desc');
 
   const { docs: allPrograms, loading: progLoading } = useOrderedCollection<ProgramDoc>('programs', 'order');
   const subPrograms = group.programSlugs
@@ -120,13 +277,18 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     document.title = `${deptName} | Vishnu Women's University`;
   }, [deptName]);
 
-  // Re-scroll on every navigation that carries a hash (the program toggle
-  // appends #program-toggle so switching sides lands you back at the toggle
-  // instead of jumping to the top of the page via App's ScrollToTop).
+  // Re-scroll on navigation that carries a hash, only if the section is not already visible.
   useEffect(() => {
     if (!location.hash) return;
     const el = document.getElementById(location.hash.slice(1));
-    if (el) smoothScrollTo(el);
+    if (el) {
+      const rect = el.getBoundingClientRect();
+      // If the target element is already visible within the top portion of the screen, avoid scroll jump
+      if (rect.top >= -100 && rect.top <= window.innerHeight * 0.5) {
+        return;
+      }
+      smoothScrollTo(el);
+    }
   }, [location.key, location.hash, activeSlug, progLoading]);
 
   // Defaults the PEOs/POs/PSOs tab bar to whichever of the three actually
@@ -136,17 +298,39 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     if (firstAvailable) setOutcomeTab((prev) => prev ?? firstAvailable);
   }, [activeProgram?.peos?.length, activeProgram?.pos?.length, activeProgram?.psos?.length, activeProgram?.wks?.length]);
 
-  // Company / minimum-package filters for the Placement records below —
-  // admin uploads whatever columns a year's sheet has, so the company list
-  // is derived live from that year's actual rows rather than any fixed
-  // list, and resets itself whenever the Academic Year (and so the
-  // available companies) changes since a stale selection wouldn't match
-  // anything. Declared here (with every other hook), not further down next
-  // to where it's used, so it isn't skipped by the early returns below —
-  // React requires every hook to run on every render, in the same order.
-  const [placementCompanyFilter, setPlacementCompanyFilter] = useState('');
-  const [placementMinPackage, setPlacementMinPackage] = useState(0);
-  useEffect(() => { setPlacementCompanyFilter(''); }, [placementYear]);
+  // Quick-nav scroll-spy. Declared here (before the loading/redirect guards
+  // below) so this hook always runs in the same order on every render — it
+  // used to live further down next to `quickLinks`, but `quickLinks` isn't
+  // computed until after those guards, and a render that takes one of the
+  // early returns skips every hook declared after it. Since `progLoading`/
+  // `deptLoading` resolve asynchronously (Firestore listeners), some renders
+  // took the guard and some didn't, so the hook count differed between
+  // renders and React threw "Rendered more hooks than during the previous
+  // render." Observing a fixed list of every possible section id (instead of
+  // the dynamic, post-guard `quickLinks`) sidesteps that: sections that
+  // don't apply to a given department simply aren't in the DOM, and
+  // `document.getElementById` already no-ops for those below.
+  const [activeSectionId, setActiveSectionId] = useState<string>('');
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveSectionId(entry.target.id);
+          }
+        });
+      },
+      { rootMargin: '-15% 0px -55% 0px', threshold: 0 }
+    );
+
+    ALL_QUICK_NAV_SECTION_IDS.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, [progLoading, deptLoading, activeProgram?.slug]);
 
   if (progLoading && subPrograms.length === 0) {
     return (
@@ -183,11 +367,8 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     // above, a programme's own Highlights covers a different, more
     // specific thing — see "Programme Highlights" further down — so there's
     // nothing sensible to fall back to here).
+    tagline: getDepartmentTagline(dept?.shortCode || group.deptShortCode || activeSlug, dept?.tagline),
     highlights: dept?.highlights || [],
-    // Department-only, no per-programme fallback — a new structural block
-    // (B.Tech./M.Tech. headings + intake tables) shown right after "About
-    // the Department".
-    programLevels: dept?.programLevels || [],
     established: clean(dept?.established) || clean(primary?.established),
     accreditation: clean(dept?.accreditation) || clean(primary?.accreditation),
     hod: dept?.hod || primary?.hod || '',
@@ -220,28 +401,22 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     placementRecruiters: dept?.placementRecruiters || [],
   };
 
-  const hasVisionMission = !!(shared.vision || shared.mission.length || shared.coreValues.length);
   const hasHod = !!(shared.hodMessage || shared.hodImage || shared.hodEmail || shared.hod);
+  const hasCoreValues = shared.coreValues.length > 0;
   const hasLabs = shared.labs.length > 0;
   const hasAbout = !!shared.about;
   const hasDeptHighlights = shared.highlights.length > 0;
-  const programLevels = shared.programLevels.filter((l) => l.title && (l.intro || l.rows?.length > 0));
-  const hasProgramLevels = programLevels.length > 0;
-  const libraryTables = shared.librarySections.filter((sec) => sec.items && sec.items.length > 0);
-  const hasLibrary = !!(shared.libraryIntro || shared.libraryInCharge || libraryTables.length > 0);
   // Individual student Placement Records — admin-imported from Excel/CSV per
-  // Academic Year (see PlacementYearsEditor in ProgramCareerEditors.tsx),
-  // shared across the whole department (see the matching `dept`), not
-  // per-programme — switching the programme toggle above does not change
-  // these. Falls back to the first available year whenever nothing's been
-  // explicitly picked yet.
-  // Falls back to whichever sub-programme still has this field until the
-  // department doc is opened + saved in Admin (which copies it over) — see
-  // the migration in DepartmentsAdmin.tsx's startEdit(). Without this, a
-  // department not yet re-saved since the department-wide switchover would
-  // show nothing here even though the data is safely sitting on its old
-  // per-programme doc, untouched.
-  const placementYears = (dept?.placementYears?.length ? dept.placementYears : subPrograms.find((p) => p.placementYears?.length)?.placementYears) || [];
+  // Academic Year (see PlacementYearsEditor in ProgramsAdmin.tsx). That editor
+  // saves to the department's own doc, so the department's dataset wins for
+  // whichever programme the toggle above has active, with a per-program
+  // fallback for older entries. Falls back to the first available year
+  // whenever nothing's been explicitly picked yet, or the previously-picked
+  // year doesn't exist for whichever programme is active.
+  // Sorted latest-first regardless of the order admin entries were added in
+  // (Firestore array order == insertion order, not chronological) — same
+  // convention usePlacementYears.ts already uses for the master dataset.
+  const placementYears = [...(dept?.placementYears?.length ? dept.placementYears : (activeProgram.placementYears || []))].sort((a, b) => (b.year || '').localeCompare(a.year || ''));
   const activePlacementYear = placementYears.find((y) => y.year === placementYear) ?? placementYears[0];
   const placementColumns = activePlacementYear?.columns || [];
   const placementRows = placementColumns.length > 0 && activePlacementYear
@@ -252,44 +427,26 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   // computePlacementStats already uses for the stat tiles.
   const placementPkgIdx = findPackageColumnIndex(placementColumns);
   const placementYearStats = activePlacementYear ? computePlacementStats(placementColumns, activePlacementYear.rows || []) : null;
-  // Whether this year's imported sheet had a package/CTC column at all —
-  // when it does, every stat tile is present (7 of them) and the grid should
-  // stretch to fill the row; when it doesn't, only 3 tiles show and the grid
-  // should keep them at their normal compact size instead of stretching.
-  const placementStatsFull = placementYearStats?.averageSalary != null;
-  const hasPlacements = !!(shared.placementIntro || shared.placementStats.length > 0 || shared.placementRecruiters.length > 0 || placementYears.length > 0);
-
   const placementNameIdx = placementColumns.findIndex((c) => /name|student|candidate/i.test(c));
-  const placementCompIdx = findCompanyColumnIndex(placementColumns);
-  const placementCompanyOptions = Array.from(new Set(
-    placementRows.map((r) => (placementCompIdx >= 0 ? r.cells[placementCompIdx] : '')?.trim()).filter(Boolean)
-  )).sort((a, b) => a.localeCompare(b));
-  const filteredPlacementRows = placementRows.filter((row) => {
-    if (placementCompanyFilter && row.cells[placementCompIdx]?.trim() !== placementCompanyFilter) return false;
-    if (placementMinPackage > 0) {
-      const pkgNum = parseFloat(formatPackageCell(placementPkgIdx >= 0 ? (row.cells[placementPkgIdx] || '') : ''));
-      if (!(pkgNum >= placementMinPackage)) return false;
-    }
-    return true;
-  });
-  const placementMarqueeItems: PlacementItem[] = filteredPlacementRows.map((row) => {
-    const rawName = placementNameIdx >= 0 ? row.cells[placementNameIdx] : (row.cells[1] || row.cells[0]);
-    const rawComp = placementCompIdx >= 0 ? row.cells[placementCompIdx] : '';
-    // No guessed fallback column for package either — a sheet with no
-    // package/CTC column at all has no package data, not data in whatever
-    // column happens to sit at a fixed position (e.g. the student's own name).
-    const rawPkg = placementPkgIdx >= 0 ? formatPackageCell(row.cells[placementPkgIdx] ?? '') : '';
-    return {
-      name: rawName?.trim() || 'Student Scholar',
-      company: rawComp?.trim() || 'Top Corporation',
-      package: rawPkg ? (rawPkg.toLowerCase().includes('lpa') ? rawPkg : `${rawPkg} LPA`) : '',
-    };
-  });
+  const placementCompIdx = placementColumns.findIndex((c) => /company|organization|employer|recruiter/i.test(c));
+  const placementMarqueeItems: PlacementItem[] = placementRows.length > 0
+    ? placementRows.map((row) => {
+        const rawName = placementNameIdx >= 0 ? row.cells[placementNameIdx] : (row.cells[1] || row.cells[0]);
+        const rawComp = placementCompIdx >= 0 ? row.cells[placementCompIdx] : (row.cells[2] || 'Top Recruiter');
+        const rawPkg = placementPkgIdx >= 0 ? formatPackageCell(row.cells[placementPkgIdx] ?? '') : (row.cells[3] || '');
+        return {
+          name: rawName?.trim() || 'Student Graduate',
+          company: rawComp?.trim() || 'Top Recruiter',
+          package: rawPkg?.trim() || 'Placed',
+        };
+      })
+    : DEFAULT_MARQUEE_ITEMS;
+  const hasPlacements = true;
 
   // Individual student Internship Records — same shape/pattern as the
-  // Placement Records above (see InternshipYearsEditor in
-  // ProgramCareerEditors.tsx), just for internships instead of placements.
-  const internshipYears = (dept?.internshipYears?.length ? dept.internshipYears : subPrograms.find((p) => p.internshipYears?.length)?.internshipYears) || [];
+  // Placement Records above (see InternshipYearsEditor in ProgramsAdmin.tsx),
+  // just for internships instead of placements.
+  const internshipYears = dept?.internshipYears?.length ? dept.internshipYears : (activeProgram.internshipYears || []);
   const activeInternshipYear = internshipYears.find((y) => y.year === internshipYear) ?? internshipYears[0];
   const internshipColumns = activeInternshipYear?.columns || [];
   const internshipRows = internshipColumns.length > 0 && activeInternshipYear ? activeInternshipYear.rows || [] : [];
@@ -310,7 +467,6 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     };
   });
 
-  const hasProgrammeAbout = !!activeProgram.about;
   const hasHighlights = !!(activeProgram.highlights && activeProgram.highlights.length > 0);
   // Tabbed PEOs / POs / PSOs — only whichever of the three an admin has
   // actually filled in (via /admin → Programs) becomes a tab.
@@ -351,40 +507,69 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   const hasNewsEventsDynamic = newsEventsSubSections.length > 0;
   const validYears = (arr?: NewsEventsYear[]) =>
     (arr || []).filter((y) => y.year && ((y.columns?.length > 0 && y.rows?.length > 0) || (y.cards?.length ?? 0) > 0 || !!y.text));
-  const newsEventsCategories = [
-    { key: 'news', label: 'News & Events', years: validYears(dept?.newsEventsYears?.length ? dept.newsEventsYears : subPrograms.map((p) => p.newsEventsYears).find((arr) => arr && arr.length > 0)) },
-    { key: 'awards', label: 'Student Awards', years: validYears(dept?.studentAwardsYears) },
-    { key: 'others', label: 'Others', years: validYears(dept?.othersYears) },
-  ];
-  // Once a department has gone through the new Admin flow at least once
-  // (dept.newsEventsMigrated), the old arrays are frozen leftovers, not the
-  // live source of truth — an admin who then deletes everything in the new
-  // editor must actually see it gone, not have this stale data resurface.
-  const hasLegacyNewsEvents = !hasNewsEventsDynamic && !dept?.newsEventsMigrated && newsEventsCategories.some((c) => c.years.length > 0);
-  const hasNewsEvents = hasNewsEventsDynamic || hasLegacyNewsEvents;
-  const hasDeptNews = deptNewsDocs.some((n) => group.programSlugs.includes(n.program));
-  // Awards & Recognition — same fixed-heading/dynamic-content pattern as
-  // News & Events above, but brand new (no legacy fixed shape to fall back
-  // to), department-wide, read from the department doc.
-  const awardsSubSections = (dept?.awardsSections || []).filter(hasCustomSectionContent);
-  const hasAwards = awardsSubSections.length > 0;
-  const newsletterYears = ((dept?.newsletterYears?.length ? dept.newsletterYears : subPrograms.find((p) => p.newsletterYears?.length)?.newsletterYears) || []).filter((y) => y.year && y.issues && y.issues.length > 0);
+
+  let newsEventsCategories: NewsEventsCategory[] = [];
+
+  if (hasNewsEventsDynamic) {
+    newsEventsCategories = newsEventsSubSections.map((sec) => ({
+      key: sec.id,
+      label: sec.label,
+      years: (sec.subSections || []).filter(hasCustomSectionContent).length > 0
+        ? (sec.subSections || []).filter(hasCustomSectionContent).map((sub) => {
+            const yearLabel = sub.label.replace(/^Academic Year\s*(::|:|-)?\s*/i, '').trim();
+            const parsedTables = parseFlexibleTable(sub.tableText || '');
+            const firstTable = parsedTables[0] || { headers: [], rows: [] };
+            const mode: 'table' | 'cards' | 'text' | 'both' =
+              firstTable.headers.length > 0 && (sub.imageCards?.length ?? 0) > 0
+                ? 'both'
+                : firstTable.headers.length > 0
+                ? 'table'
+                : (sub.imageCards?.length ?? 0) > 0
+                ? 'cards'
+                : 'text';
+            return {
+              year: yearLabel || sub.label,
+              mode,
+              columns: firstTable.headers,
+              rows: firstTable.rows.map((cells) => ({ cells })),
+              cards: sub.imageCards,
+              text: sub.textContent,
+            };
+          })
+        : [
+            {
+              year: sec.label.replace(/^Academic Year\s*(::|:|-)?\s*/i, '').trim() || sec.label,
+              mode: 'table' as const,
+              columns: parseFlexibleTable(sec.tableText || '')[0]?.headers || [],
+              rows: (parseFlexibleTable(sec.tableText || '')[0]?.rows || []).map((cells) => ({ cells })),
+              cards: sec.imageCards,
+              text: sec.textContent,
+            },
+          ],
+    })).filter((c) => c.years.length > 0);
+  } else {
+    newsEventsCategories = [
+      { key: 'news', label: 'Happenings', years: validYears(dept?.newsEventsYears?.length ? dept.newsEventsYears : subPrograms.map((p) => p.newsEventsYears).find((arr) => arr && arr.length > 0)) },
+      { key: 'awards', label: 'Student Awards', years: validYears(dept?.studentAwardsYears) },
+      { key: 'others', label: 'Others', years: validYears(dept?.othersYears) },
+    ].filter((c) => c.years.length > 0);
+  }
+
+  const hasNewsEvents = newsEventsCategories.length > 0;
+  const newsletterYears = (dept?.newsletterYears?.length ? dept.newsletterYears : (activeProgram.newsletterYears || [])).filter((y) => y.year && y.issues && y.issues.length > 0);
   const hasNewsletter = newsletterYears.length > 0;
   const newsletterMaxIssues = Math.max(0, ...newsletterYears.map((y) => y.issues.length));
-  // Research & Development (Funded Projects & Patents) — shared across the
-  // whole department (ProgramCareerEditors.tsx's "Research & Development"
-  // editor); a link only appears once it has both a name and an uploaded PDF.
-  const rndIntroValue = dept?.rndIntro || subPrograms.find((p) => p.rndIntro)?.rndIntro || '';
-  const rndLinks = (dept?.rndLinks?.length ? dept.rndLinks : subPrograms.find((p) => p.rndLinks?.length)?.rndLinks) || [];
-  const rndTableTextValue = dept?.rndTableText || subPrograms.find((p) => p.rndTableText)?.rndTableText || '';
-  const rndProjectsTextValue = dept?.rndProjectsText || subPrograms.find((p) => p.rndProjectsText)?.rndProjectsText || '';
-  const rndStructuredTableValue = dept?.rndStructuredTable || subPrograms.find((p) => p.rndStructuredTable)?.rndStructuredTable;
-  const rndTableSections = parseFlexibleTable(rndTableTextValue).filter((s) => s.headers.length > 0);
-  const rndProjectCategories = parseProjectAccordion(rndProjectsTextValue).filter((c) => c.projects.length > 0);
-  const rndStructuredColumns = rndStructuredTableValue?.columns || [];
-  const rndStructuredRows = rndStructuredTableValue?.rows || [];
+  // Research & Development (Funded Projects & Patents) — same per-programme
+  // field as the standalone ProgramDetail.tsx page (ProgramsAdmin's "Research
+  // & Development" editor); a link only appears once it has both a name and
+  // an uploaded PDF.
+  const rndLinks = (activeProgram.rndLinks || []).filter((l) => l.label && l.pdfUrl);
+  const rndTableSections = parseFlexibleTable(activeProgram.rndTableText || '').filter((s) => s.headers.length > 0);
+  const rndProjectCategories = parseProjectAccordion(activeProgram.rndProjectsText || '').filter((c) => c.projects.length > 0);
+  const rndStructuredColumns = activeProgram.rndStructuredTable?.columns || [];
+  const rndStructuredRows = activeProgram.rndStructuredTable?.rows || [];
   const hasRndStructuredTable = rndStructuredColumns.length > 0 && rndStructuredRows.length > 0;
-  const hasRnd = !!rndIntroValue || rndTableSections.length > 0 || rndProjectCategories.length > 0 || rndLinks.length > 0 || hasRndStructuredTable;
+  const hasRnd = !!activeProgram.rndIntro || rndTableSections.length > 0 || rndProjectCategories.length > 0 || rndLinks.length > 0 || hasRndStructuredTable;
   // Deliberately program-level only, not dept.customSections — a grouped
   // department's Custom Sections editor is gated off in DepartmentsAdmin.tsx
   // (Custom Sections live on the linked programme(s) instead; only a
@@ -409,95 +594,15 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   // which still render below the toggle for whichever programme is active —
   // they just don't each get their own sidebar entry).
   const quickLinks = [
-    hasAbout && { id: 'about', label: 'About the Department' },
-    hasVisionMission && { id: 'vision-mission', label: 'Vision & Mission' },
+    hasAbout && { id: 'about', label: 'Department Overview' },
+    hasCoreValues && { id: 'vision-mission', label: 'Core Values' },
+    subPrograms.length > 0 && { id: 'programmes', label: 'Degree Programmes' },
+    (hasPlacements || hasInternships) && { id: 'placements', label: placementsLinkLabel },
     hasHod && { id: 'hod', label: 'About HOD' },
     faculty.length > 0 && { id: 'faculty', label: 'Faculty' },
-    { id: 'program-toggle', label: 'Choose a Programme' },
     hasLabs && { id: 'labs', label: 'Laboratories' },
-    hasLibrary && { id: 'library', label: 'Department Library' },
-    hasRnd && { id: 'rnd', label: 'R & D' },
-    (hasPlacements || hasInternships) && { id: 'placements', label: placementsLinkLabel },
-    hasNewsletter && { id: 'newsletter', label: 'Newsletter' },
-    (hasNewsEvents || hasDeptNews) && { id: hasNewsEvents ? 'news-events' : 'news', label: 'News & Events' },
-    hasAwards && { id: 'awards-recognition', label: 'Awards & Recognition' },
+    subPrograms.length > 0 && { id: 'program-toggle', label: 'Programmes & Course Structure' },
   ].filter(Boolean) as { id: string; label: string }[];
-  // Nested under the "Choose a Programme" row above as a collapsible
-  // sub-list — same admin-driven presence checks as before, just grouped.
-  const programmeLinks = [
-    hasProgrammeAbout && { id: 'programme-about', label: 'About the Programme' },
-    hasHighlights && { id: 'highlights', label: 'Programme Highlights' },
-    hasOutcomeStatements && { id: 'peos-pos-psos', label: outcomeHeading },
-    hasMindMap && { id: 'mindmap', label: 'Mind Map' },
-    { id: 'curriculum', label: 'Curriculum' },
-    ...toQuickLinkItems(visibleCustomSections),
-  ].filter(Boolean) as { id: string; label: string; children?: { id: string; label: string }[] }[];
-
-  // Top stats bar, flowing as a single horizontal row (matching every other
-  // detail page). Head of Department comes first, then Established/
-  // Accreditation once when an admin has set them directly on the
-  // department doc — but when that's empty, each program contributes its
-  // own Established / Accreditation / Intake, prefixed with its short name
-  // (since those routinely differ between programs, e.g. CSE is NBA
-  // accredited while Cyber Security isn't yet). Intake always differs per
-  // program, so in the shared-Established case each program still gets its
-  // own Intake item.
-  interface FactItem {
-    program?: string;
-    value: string;
-    sublabel?: string;
-    link?: string;
-  }
-
-  interface FactCategory {
-    id: string;
-    title: string;
-    icon: typeof GraduationCap;
-    items: FactItem[];
-  }
-
-  const factColumns: FactCategory[] = [
-    {
-      id: 'hod',
-      title: 'Head of Department',
-      icon: GraduationCap,
-      items: shared.hod ? [{ value: shared.hod, sublabel: 'Professor & HOD', link: hasHod ? '#hod' : undefined }] : [],
-    },
-    {
-      id: 'established',
-      title: 'Established',
-      icon: Calendar,
-      items: clean(dept?.established)
-        ? [{ value: clean(dept?.established), sublabel: 'Department' }]
-        : subPrograms.filter((p) => clean(p.established)).map((p) => ({
-            program: p.shortName || p.name,
-            value: clean(p.established),
-            sublabel: p.shortName || p.name,
-          })),
-    },
-    {
-      id: 'accreditation',
-      title: 'Accreditations',
-      icon: Award,
-      items: clean(dept?.accreditation)
-        ? [{ value: clean(dept?.accreditation), sublabel: 'Department' }]
-        : subPrograms.filter((p) => clean(p.accreditation)).map((p) => ({
-            program: p.shortName || p.name,
-            value: clean(p.accreditation),
-            sublabel: p.shortName || p.name,
-          })),
-    },
-    {
-      id: 'intake',
-      title: 'Programme Intake',
-      icon: Users,
-      items: subPrograms.filter((p) => p.intake).map((p) => ({
-        program: p.shortName || p.name,
-        value: `${p.intake} Seats`,
-        sublabel: p.shortName || p.name,
-      })),
-    },
-  ].filter((col) => col.items.length > 0);
 
   const heroImage = shared.heroImage;
   const pageUrl = `/academics/${activeProgram.slug}`;
@@ -520,100 +625,253 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   ];
 
   return (
-    <main className="page-wrapper">
+    <main className="page-wrapper dept-detail-page">
       <SEO title={`${deptName} | Vishnu Women's University`} description={pageDesc} canonicalPath={pageUrl} ogImage={heroImage} jsonLd={jsonLd} />
 
-      {/* Hero */}
-      <section className="page-hero" style={{ minHeight: 380 }}>
-        {heroImage && (
-          <SmoothImage src={heroImage} alt={deptName} className="page-hero-image" loading="eager" decoding="sync" {...fetchPriorityAttr('high')} />
-        )}
-        <div className="page-hero-overlay" />
-        <div className="container page-hero-content">
-          <div className="breadcrumb animate-fade-in">
-            <Link to="/" className="breadcrumb-item">Home</Link>
-            <span className="breadcrumb-sep">›</span>
-            <Link to="/academics" className="breadcrumb-item">Academics</Link>
-            <span className="breadcrumb-sep">›</span>
-            <span className="breadcrumb-item active">{deptName}</span>
+      {/* Hero — same rounded image-card treatment for every department */}
+      <section className="dept-hero-section">
+        <div className="container">
+          <div className="dept-hero-card">
+            {heroImage && (
+              <SmoothImage
+                src={heroImage}
+                alt={deptName}
+                className="dept-hero-bg-img"
+                loading="eager"
+                decoding="sync"
+                {...fetchPriorityAttr('high')}
+              />
+            )}
+            <div className="dept-hero-overlay" />
+
+            <div className="dept-hero-content">
+              <h1 className="dept-hero-title">{deptName}</h1>
+              <p className="dept-hero-subtitle">
+                {shared.tagline || pageDesc}
+              </p>
+              <div className="dept-hero-cta">
+                <Link to="/apply-now" className="btn-hero-gold">Apply Now</Link>
+              </div>
+            </div>
           </div>
-          <div className="animate-fade-in-up" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'var(--color-accent)', color: 'var(--color-primary-dark)', fontSize: 'var(--text-xs)', fontWeight: 700, padding: '0.3rem 0.9rem', borderRadius: 'var(--radius-full)', marginBottom: 'var(--space-3)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-            Department
-          </div>
-          <h1 className="animate-fade-in-up">{deptName}</h1>
         </div>
       </section>
 
-      {/* 4-Column Structured Facts Grid (HOD, Established, Accreditations, Intake) - 2-row fixed window with auto-scroll */}
-      {factColumns.length > 0 && (
-        <section className="dept-facts-section" aria-label={`${deptName} key information`}>
-          <div className="container">
-            <div className={`dept-facts-grid cols-${Math.min(factColumns.length, 4)}`}>
-              {factColumns.map((col) => {
-                const ColIcon = col.icon;
-                const isHodCol = col.id === 'hod';
-                const hasOverflow = col.items.length > 2;
+      {/* Key Facts Grid — Dynamically shows only cards with valid data */}
+      {(() => {
+        const deptEst = clean(dept?.established);
+        const validEst = subPrograms.filter((p) => clean(p.established));
+        const hasEstCard = !!deptEst || validEst.length > 0;
 
-                const renderItem = (item: FactItem, key: string | number) => {
-                  const content = (
-                    <div className="dept-fact-chip-entry">
-                      {item.sublabel && item.sublabel !== 'Department' && (
-                        <span className="dept-fact-chip-sub">{item.sublabel}</span>
-                      )}
-                      <span className="dept-fact-chip-val">{item.value}</span>
-                    </div>
-                  );
+        const deptAcc = clean(dept?.accreditation);
+        const validAcc = subPrograms.filter((p) => clean(p.accreditation));
+        const hasAccCard = !!deptAcc || validAcc.length > 0;
 
-                  if (item.link) {
-                    return (
-                      <a
-                        key={key}
-                        href={item.link}
-                        className="dept-fact-chip-link"
-                        aria-label={`View ${item.value} details`}
-                      >
-                        {content}
-                      </a>
-                    );
-                  }
+        const validIntake = subPrograms.filter((p) => p.intake && p.intake > 0);
+        const hasIntakeCard = validIntake.length > 0;
 
-                  return <div key={key}>{content}</div>;
-                };
+        const hasHodCard = !!shared.hod && shared.hod.trim() !== '—';
 
-                return (
-                  <div key={col.id} className={`dept-fact-card${isHodCol ? ' is-hod-card' : ''}`}>
+        const visibleCount = [hasEstCard, hasAccCard, hasIntakeCard, hasHodCard].filter(Boolean).length;
+        if (visibleCount === 0) return null;
+
+        return (
+          <section className="dept-facts-section" aria-label={`${deptName} key facts`}>
+            <div className="container">
+              <div className={`dept-facts-grid cols-${visibleCount}`}>
+                {/* 1. Established */}
+                {hasEstCard && (
+                  <div className="dept-fact-card">
                     <div className="dept-fact-header">
                       <div className="dept-fact-icon-badge">
-                        <ColIcon size={14} strokeWidth={2.4} />
+                        <Calendar size={14} strokeWidth={2.4} />
                       </div>
-                      <span className="dept-fact-col-title">{col.title}</span>
-                      {hasOverflow && (
-                        <span className="dept-fact-count-badge" title={`${col.items.length} items (auto-scrolling)`}>
-                          {col.items.length}
-                        </span>
+                      <span className="dept-fact-col-title">Established</span>
+                      {validEst.length > 1 && (
+                        <span className="dept-fact-count-badge">{validEst.length}</span>
                       )}
                     </div>
-
-                    <div className={`dept-fact-items-window${hasOverflow ? ' is-scrolling' : ''}`}>
-                      {hasOverflow ? (
-                        <div
-                          className="dept-fact-ticker-track"
-                          style={{
-                            animationDuration: `${col.items.length * 3.5}s`,
-                          }}
-                        >
-                          {/* Duplicate list for seamless infinite marquee loop */}
-                          {[...col.items, ...col.items].map((item, idx) =>
-                            renderItem(item, `ticker-${idx}`)
-                          )}
+                    <div className={`dept-fact-items-window${validEst.length > 2 ? ' is-scrolling' : ''}`}>
+                      {validEst.length > 2 ? (
+                        <div className="dept-fact-ticker-track" style={{ animationDuration: `${Math.max(6, validEst.length * 3.5)}s` }}>
+                          {validEst.map((p) => (
+                            <div key={`a-${p.id}`} className="dept-fact-chip-entry">
+                              <span className="dept-fact-chip-sub">{p.shortName || p.name}</span>
+                              <span className="dept-fact-chip-val">{clean(p.established)}</span>
+                            </div>
+                          ))}
+                          {validEst.map((p) => (
+                            <div key={`b-${p.id}`} className="dept-fact-chip-entry">
+                              <span className="dept-fact-chip-sub">{p.shortName || p.name}</span>
+                              <span className="dept-fact-chip-val">{clean(p.established)}</span>
+                            </div>
+                          ))}
                         </div>
                       ) : (
                         <div className="dept-fact-static-list">
-                          {col.items.map((item, idx) => renderItem(item, `static-${idx}`))}
+                          {deptEst ? (
+                            <div className="dept-fact-chip-entry">
+                              <span className="dept-fact-chip-sub">{deptName}</span>
+                              <span className="dept-fact-chip-val">{deptEst}</span>
+                            </div>
+                          ) : (
+                            validEst.map((p) => (
+                              <div key={p.id} className="dept-fact-chip-entry">
+                                <span className="dept-fact-chip-sub">{p.shortName || p.name}</span>
+                                <span className="dept-fact-chip-val">{clean(p.established)}</span>
+                              </div>
+                            ))
+                          )}
                         </div>
                       )}
                     </div>
                   </div>
+                )}
+
+                {/* 2. Accreditations */}
+                {hasAccCard && (
+                  <div className="dept-fact-card">
+                    <div className="dept-fact-header">
+                      <div className="dept-fact-icon-badge">
+                        <Award size={14} strokeWidth={2.4} />
+                      </div>
+                      <span className="dept-fact-col-title">Accreditations</span>
+                      {validAcc.length > 1 && (
+                        <span className="dept-fact-count-badge">{validAcc.length}</span>
+                      )}
+                    </div>
+                    <div className={`dept-fact-items-window${validAcc.length > 2 ? ' is-scrolling' : ''}`}>
+                      {validAcc.length > 2 ? (
+                        <div className="dept-fact-ticker-track" style={{ animationDuration: `${Math.max(6, validAcc.length * 3.5)}s` }}>
+                          {validAcc.map((p) => (
+                            <div key={`a-${p.id}`} className="dept-fact-chip-entry">
+                              <span className="dept-fact-chip-sub">{p.shortName || p.name}</span>
+                              <span className="dept-fact-chip-val">{clean(p.accreditation)}</span>
+                            </div>
+                          ))}
+                          {validAcc.map((p) => (
+                            <div key={`b-${p.id}`} className="dept-fact-chip-entry">
+                              <span className="dept-fact-chip-sub">{p.shortName || p.name}</span>
+                              <span className="dept-fact-chip-val">{clean(p.accreditation)}</span>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="dept-fact-static-list">
+                          {deptAcc ? (
+                            <div className="dept-fact-chip-entry">
+                              <span className="dept-fact-chip-sub">Department Accreditation</span>
+                              <span className="dept-fact-chip-val">{deptAcc}</span>
+                            </div>
+                          ) : (
+                            validAcc.map((p) => (
+                              <div key={p.id} className="dept-fact-chip-entry">
+                                <span className="dept-fact-chip-sub">{p.shortName || p.name}</span>
+                                <span className="dept-fact-chip-val">{clean(p.accreditation)}</span>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* 3. Programme Intake */}
+                {hasIntakeCard && (
+                  <div className="dept-fact-card">
+                    <div className="dept-fact-header">
+                      <div className="dept-fact-icon-badge">
+                        <Users size={14} strokeWidth={2.4} />
+                      </div>
+                      <span className="dept-fact-col-title">Programme Intake</span>
+                      {validIntake.length > 1 && (
+                        <span className="dept-fact-count-badge">{validIntake.length}</span>
+                      )}
+                    </div>
+                    <div className={`dept-fact-items-window${validIntake.length > 2 ? ' is-scrolling' : ''}`}>
+                      {validIntake.length > 2 ? (
+                        <div className="dept-fact-ticker-track" style={{ animationDuration: `${Math.max(6, validIntake.length * 3.5)}s` }}>
+                          {validIntake.map((p) => (
+                            <div key={`a-${p.id}`} className="dept-fact-chip-entry">
+                              <span className="dept-fact-chip-sub">{p.shortName || p.name}</span>
+                              <span className="dept-fact-chip-val">{p.intake} Seats</span>
+                            </div>
+                          ))}
+                          {validIntake.map((p) => (
+                            <div key={`b-${p.id}`} className="dept-fact-chip-entry">
+                              <span className="dept-fact-chip-sub">{p.shortName || p.name}</span>
+                              <span className="dept-fact-chip-val">{p.intake} Seats</span>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="dept-fact-static-list">
+                          {validIntake.map((p) => (
+                            <div key={p.id} className="dept-fact-chip-entry">
+                              <span className="dept-fact-chip-sub">{p.shortName || p.name}</span>
+                              <span className="dept-fact-chip-val">{p.intake} Seats</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* 4. Head of Department */}
+                {hasHodCard && (
+                  <div className="dept-fact-card is-hod-card">
+                    <div className="dept-fact-header">
+                      <div className="dept-fact-icon-badge">
+                        <GraduationCap size={14} strokeWidth={2.4} />
+                      </div>
+                      <span className="dept-fact-col-title">Head of the Department</span>
+                    </div>
+                    <div className="dept-fact-items-window">
+                      <div className="dept-fact-static-list">
+                        <a href="#hod" className="dept-fact-chip-link" aria-label={`View ${shared.hod} details`}>
+                          <div className="dept-fact-chip-entry">
+                            <span className="dept-fact-chip-sub">Professor &amp; HOD</span>
+                            <span className="dept-fact-chip-val">{shared.hod}</span>
+                          </div>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </section>
+        );
+      })()}
+      {/* Horizontal Quick Navigation Pill Bar (Capsule attaching under floating navbar) */}
+      {quickLinks.length > 0 && (
+        <section className="dept-horizontal-quicknav-section" aria-label="Page section navigation">
+          <div className="container dept-horizontal-quicknav-container">
+            <div className="dept-horizontal-quicknav-pill">
+              {quickLinks.map((l) => {
+                const isActive = activeSectionId === l.id;
+                return (
+                  <a
+                    key={l.id}
+                    href={`#${l.id}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setActiveSectionId(l.id);
+                      // "R & D" and "News & Events" now live as tabs inside
+                      // the Programme Hub card rather than their own section
+                      // — jump to the hub and switch to that tab instead.
+                      if (l.id === 'rnd') setActiveHubTab('rnd');
+                      else if (l.id === 'news-events') setActiveHubTab('news');
+                      const scrollId = (l.id === 'rnd' || l.id === 'news-events') ? 'program-toggle' : l.id;
+                      const el = document.getElementById(scrollId);
+                      if (el) el.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className={`dept-quicknav-link${isActive ? ' is-active' : ''}`}
+                  >
+                    <span>{l.label}</span>
+                  </a>
                 );
               })}
             </div>
@@ -621,35 +879,11 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
         </section>
       )}
 
-      {/* Mobile Jump Bar — accessible 1-touch section navigation on smaller screens */}
-      {quickLinks.length > 1 && (
-        <nav className="dept-mobile-jump-bar-root" aria-label="Section Quick Jump">
-          <div className="container">
-            <div className="dept-mobile-jump-bar" role="navigation">
-              <span className="dept-mobile-jump-label">
-                <Compass size={13} strokeWidth={2.4} />
-                <span>Jump to:</span>
-              </span>
-              {quickLinks.map((l) => (
-                <a
-                  key={l.id}
-                  href={`#${l.id}`}
-                  className="dept-mobile-jump-chip"
-                >
-                  {l.label}
-                </a>
-              ))}
-            </div>
-          </div>
-        </nav>
-      )}
-
-      {/* About the Department (shared) + Quick Links */}
+      {/* About the Department (shared) */}
       {hasAbout && (
         <section id="about" className="section bg-white dept-about-section" style={{ scrollMarginTop: NAV_OFFSET }}>
           <div className="container">
-            <div className={quickLinks.length > 1 ? 'detail-grid' : ''}>
-              <div className="dept-about-main">
+            <div className="dept-about-main">
                 <div className="dept-about-header">
                   <span className="section-label dept-section-label">Department Overview</span>
                   <h2 className="section-title">
@@ -686,216 +920,22 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                   </div>
                 )}
               </div>
-
-              {quickLinks.length > 1 && (
-                <aside className="detail-sidebar" aria-label="Page Navigation Sidebar">
-                  <nav className="dept-quick-nav-card" aria-label="Quick Links">
-                    <div className="dept-quick-nav-header">
-                      <div className="dept-quick-nav-icon">
-                        <Compass size={15} strokeWidth={2.4} />
-                      </div>
-                      <div className="dept-quick-nav-title-wrap">
-                        <h4 className="dept-quick-nav-title">Quick Navigation</h4>
-                      </div>
-                    </div>
-
-                    <ul className="dept-quick-nav-list" role="list">
-                      {quickLinks.map((l) => (
-                        l.id === 'program-toggle' ? (
-                          <li key={l.id} className="dept-quick-nav-item is-parent">
-                            <button
-                              type="button"
-                              onClick={() => setProgrammeLinksOpen((v) => !v)}
-                              aria-expanded={programmeLinksOpen}
-                              aria-controls="programme-quick-links"
-                              className="dept-quick-nav-toggle-btn"
-                            >
-                              <span className="dept-quick-nav-text">{l.label}</span>
-                              <span className="dept-btn-arrow-circle">
-                                <ChevronDown
-                                  size={13}
-                                  strokeWidth={2.4}
-                                  className={`dept-quick-nav-chevron${programmeLinksOpen ? ' is-open' : ''}`}
-                                  aria-hidden="true"
-                                />
-                              </span>
-                            </button>
-                            <SmoothCollapse open={programmeLinksOpen}>
-                              <ul id="programme-quick-links" className="dept-quick-sublinks-list" role="list">
-                                {programmeLinks.map((c) => {
-                                  const hasKids = !!c.children?.length;
-                                  const isSubOpen = !collapsedQuickLinks.has(c.id);
-                                  return (
-                                    <li key={c.id}>
-                                      {hasKids ? (
-                                        <button
-                                          type="button"
-                                          onClick={() => toggleQuickLink(c.id)}
-                                          aria-expanded={isSubOpen}
-                                          className="dept-quick-nav-toggle-btn"
-                                        >
-                                          <span className="dept-quick-nav-text">{c.label}</span>
-                                          <ChevronDown
-                                            size={12}
-                                            strokeWidth={2.4}
-                                            className={`dept-quick-nav-chevron${isSubOpen ? ' is-open' : ''}`}
-                                            aria-hidden="true"
-                                          />
-                                        </button>
-                                      ) : (
-                                        <a href={`#${c.id}`} className="dept-quick-sublink">
-                                          <span className="dept-btn-arrow-circle mini">
-                                            <ChevronRight size={10} strokeWidth={2.8} className="dept-quick-sublink-bullet" />
-                                          </span>
-                                          <span>{c.label}</span>
-                                        </a>
-                                      )}
-                                      {hasKids && (
-                                        <SmoothCollapse open={isSubOpen}>
-                                          <ul className="dept-quick-sublinks-list" role="list">
-                                            {c.children!.map((gc) => (
-                                              <li key={gc.id}>
-                                                <a href={`#${gc.id}`} className="dept-quick-sublink">
-                                                  <span className="dept-btn-arrow-circle mini">
-                                                    <ChevronRight size={10} strokeWidth={2.8} className="dept-quick-sublink-bullet" />
-                                                  </span>
-                                                  <span>{gc.label}</span>
-                                                </a>
-                                              </li>
-                                            ))}
-                                          </ul>
-                                        </SmoothCollapse>
-                                      )}
-                                    </li>
-                                  );
-                                })}
-                              </ul>
-                            </SmoothCollapse>
-                          </li>
-                        ) : (
-                          <li key={l.id} className="dept-quick-nav-item">
-                            <a href={`#${l.id}`} className="dept-quick-nav-link">
-                              <span className="dept-quick-nav-text">{l.label}</span>
-                              <span className="dept-btn-arrow-circle">
-                                <ChevronRight size={13} strokeWidth={2.4} className="dept-quick-nav-arrow" aria-hidden="true" />
-                              </span>
-                            </a>
-                          </li>
-                        )
-                      ))}
-                    </ul>
-                  </nav>
-                </aside>
-              )}
-            </div>
           </div>
         </section>
       )}
 
-      {/* Programmes Offered (shared) — B.Tech./M.Tech. headed blocks, each
-          with an intro paragraph and an intake table. */}
-      {hasProgramLevels && (
-        <section id="program-levels" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
-          <div className="container">
-            <div className="dept-level-grid">
-              {programLevels.map((level, li) => {
-                const isOpen = openLevels.has(level.title);
-                return (
-                  <div key={li} className={`dept-level-card${isOpen ? ' open' : ''}`}>
-                    <button
-                      type="button"
-                      className="dept-level-card-trigger"
-                      onClick={() => toggleLevel(level.title)}
-                      aria-expanded={isOpen}
-                      aria-controls={`level-panel-${li}`}
-                    >
-                      <span className="dept-level-card-bar" aria-hidden="true" />
-                      <span className="dept-level-card-title">{level.title}</span>
-                      <ChevronDown size={20} strokeWidth={2.25} className="dept-level-card-chevron" aria-hidden="true" />
-                    </button>
-                    <div className="dept-level-card-panel" id={`level-panel-${li}`}>
-                      <div className="dept-level-card-panel-inner">
-                        <div className="dept-level-card-content">
-                          {level.intro && (
-                            <p style={{ color: 'var(--color-text-light)', lineHeight: 1.85, fontSize: 'var(--text-base)', whiteSpace: 'pre-line', marginBottom: level.rows?.length > 0 ? 'var(--space-5)' : 0 }}>
-                              {level.intro}
-                            </p>
-                          )}
-                          {level.rows && level.rows.length > 0 && (
-                            <div className="pb-activities-scroll" role="region" aria-label={`${level.title} intake table`} tabIndex={0}>
-                              <table>
-                                <thead>
-                                  <tr>
-                                    <th scope="col">{level.title}</th>
-                                    <th scope="col">Intake</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  {level.rows.map((row, ri) => (
-                                    <tr key={ri}>
-                                      <td>{row.program}</td>
-                                      <td>{row.intake}</td>
-                                    </tr>
-                                  ))}
-                                </tbody>
-                              </table>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Vision, Mission & Values (Italian-Inspired Sleek Showcase) */}
-      {hasVisionMission && (
+      {/* Core Values — moved out from HOD section directly after Department Overview.
+          Department Vision / Mission Statements cards were removed here; this
+          section now only ever shows Institutional Core Values. */}
+      {hasCoreValues && (
         <section id="vision-mission" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
           <div className="container">
-            <div style={{ marginBottom: 'var(--space-10)' }}>
+            <div style={{ marginBottom: 'var(--space-6)' }}>
               <span className="section-label dept-section-label">Our Guiding Pillars</span>
-              <h2 className="section-title">Vision, Mission &amp; Values</h2>
+              <h2 className="section-title">Core Values</h2>
             </div>
+
             <div className="dept-vm-grid">
-              {shared.vision && (
-                <div className="dept-vm-card">
-                  <div className="dept-vm-card-top">
-                    <span className="dept-vm-num-badge">01 · VISION</span>
-                    <div className="dept-vm-icon-badge">
-                      <Compass size={20} strokeWidth={2.2} />
-                    </div>
-                  </div>
-                  <h3 className="dept-vm-title">Department Vision</h3>
-                  <p className="dept-vm-body-text">{shared.vision}</p>
-                </div>
-              )}
-
-              {shared.mission && shared.mission.length > 0 && (
-                <div className="dept-vm-card">
-                  <div className="dept-vm-card-top">
-                    <span className="dept-vm-num-badge">02 · MISSION</span>
-                    <div className="dept-vm-icon-badge">
-                      <Target size={20} strokeWidth={2.2} />
-                    </div>
-                  </div>
-                  <h3 className="dept-vm-title">Mission Statements</h3>
-                  <ul className="dept-vm-mission-list">
-                    {shared.mission.map((m, mi) => (
-                      <li key={mi} className="dept-vm-mission-item">
-                        <span className="dept-vm-bullet-circle">
-                          <Check size={12} strokeWidth={3} />
-                        </span>
-                        <span>{m}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
               {shared.coreValues && shared.coreValues.length > 0 && (
                 <div className="dept-values-card">
                   <div className="dept-values-header">
@@ -903,8 +943,8 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                     <h3 className="dept-values-title">Institutional Core Values</h3>
                   </div>
                   <div className="dept-values-chips-wrap">
-                    {shared.coreValues.map((v) => (
-                      <span key={v} className="dept-value-pill">
+                    {shared.coreValues.map((v, vi) => (
+                      <span key={vi} className="dept-value-pill">
                         <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-block' }} />
                         <span>{v}</span>
                       </span>
@@ -917,142 +957,66 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
         </section>
       )}
 
-      {/* About HOD (Executive Italian Editorial Layout) */}
-      {hasHod && (
-        <section id="hod" className="dept-hod-section" style={{ scrollMarginTop: NAV_OFFSET }}>
+      {/* B.Tech & M.Tech Degree Programmes Offered (Compact Version) */}
+      {subPrograms.length > 0 && (
+        <section id="programmes" className="section bg-white dept-compact-programmes-section" style={{ scrollMarginTop: NAV_OFFSET, padding: '2.5rem 0' }}>
           <div className="container">
-            <div style={{ marginBottom: 'var(--space-10)' }}>
-              <span className="section-label dept-section-label">Academic Leadership</span>
-              <h2 className="section-title">Head of Department</h2>
-            </div>
-            
-            <div className="dept-hod-editorial-card">
-              {shared.hodImage && (
-                <div className="dept-hod-media-frame">
-                  <SmoothImage
-                    src={shared.hodImage}
-                    alt={shared.hod || 'Head of Department'}
-                    className="dept-hod-photo"
-                  />
-                </div>
-              )}
-              
-              <div className="dept-hod-content">
-                <div className="dept-hod-badge-wrap">
-                  <span className="dept-hod-role-badge">Department Leadership</span>
-                  <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>•</span>
-                  <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>{deptName}</span>
-                </div>
-
-                {shared.hod && (
-                  <h3 className="dept-hod-name">{shared.hod}</h3>
-                )}
-
-                <div className="dept-hod-meta">
-                  <span>Head of the Department & Senior Faculty</span>
-                </div>
-
-                {shared.hodMessage && (
-                  <div className="dept-hod-message-box">
-                    <p className="dept-hod-message-text">{shared.hodMessage}</p>
-                  </div>
-                )}
-
-                {shared.hodEmail && (
-                  <div className="dept-hod-actions">
-                    <a href={`mailto:${shared.hodEmail}`} className="dept-hod-mail-btn">
-                      <Mail size={15} strokeWidth={2.2} />
-                      <span>Contact HOD: {shared.hodEmail}</span>
-                    </a>
-                  </div>
-                )}
+            <div style={{ marginBottom: '1.25rem', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem' }}>
+              <div>
+                <span className="section-label dept-section-label" style={{ marginBottom: '0.2rem' }}>Academic Degrees</span>
+                <h2 className="section-title" style={{ fontSize: '1.6rem', margin: 0 }}>Programmes Offered</h2>
               </div>
-              {shared.hodResearchProfiles.length > 0 && (
-                <div style={{ background: 'var(--color-primary)', padding: 'var(--space-4) var(--space-8)', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-5)' }}>
-                  <span style={{ fontSize: 'var(--text-xs)', fontWeight: 800, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Research Profiles</span>
-                  {shared.hodResearchProfiles.map((link) => (
-                    <a key={link.label} href={link.url} target="_blank" rel="noopener noreferrer"
-                      style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1)', fontSize: 'var(--text-sm)', color: 'var(--color-white)', fontWeight: 600, textDecoration: 'none' }}>
-                      {link.label} <ExternalLink size={12} strokeWidth={2} />
-                    </a>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Faculty Carousel (matching Google UI reference design) */}
-      {faculty.length > 0 && (
-        <div id="faculty" style={{ scrollMarginTop: NAV_OFFSET }}>
-          <FacultyCarousel
-            faculty={faculty}
-            departmentName={deptName}
-            title="Learn from our impactful faculty"
-            viewMoreLink="/faculty"
-          />
-        </div>
-      )}
-
-      {/* Laboratories (Italian-Inspired Sleek Showcase) */}
-      {hasLabs && (
-        <section id="labs" className="dept-labs-section" style={{ scrollMarginTop: NAV_OFFSET }}>
-          <div className="container">
-            <div className="dept-labs-header">
-              <div className="dept-labs-title-wrap">
-                <span className="section-label dept-section-label">State-of-the-Art Infrastructure</span>
-                <h2 className="section-title">Specialized Laboratories</h2>
-                <p className="section-desc" style={{ margin: '0.5rem 0 0 0' }}>
-                  Industry-aligned experimental facilities engineered for hands-on technical immersion, advanced computing, and multidisciplinary project incubation.
-                </p>
-              </div>
-              <div className="dept-labs-count-pill">
-                <span className="dept-labs-count-dot" />
-                <span>{shared.labs.length} Active Facilities</span>
-              </div>
+              <span style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--color-text-light)' }}>
+                {subPrograms.length} Degree {subPrograms.length === 1 ? 'Programme' : 'Programmes'} Available
+              </span>
             </div>
 
-            <div className="dept-labs-grid">
-              {shared.labs.map((lab, li) => {
-                const indexNum = String(li + 1).padStart(2, '0');
+            <div className="dept-compact-program-grid">
+              {subPrograms.map((program) => {
+                const Icon = resolveProgramIcon(program.icon);
+                const isBtech = program.category === 'btech';
+                const isMtech = program.category === 'mtech';
+                const catLabel = isBtech ? 'B.Tech' : isMtech ? 'M.Tech' : program.category?.toUpperCase() || 'Degree';
 
                 return (
-                  <button
-                    key={li}
-                    type="button"
-                    onClick={() => setActiveLab(lab)}
-                    className="dept-lab-card"
-                    style={{ font: 'inherit', textAlign: 'left', cursor: 'pointer', width: '100%' }}
-                    aria-label={`View ${lab.name} details`}
+                  <div
+                    key={program.id || program.slug}
+                    className="dept-compact-program-card"
+                    onClick={() => {
+                      navigate(`/academics/${program.slug}#program-toggle`, { preventScrollReset: true });
+                      setActiveHubTab('overview');
+                    }}
                   >
-                    <div>
-                      <div className="dept-lab-card-top">
-                        <span className="dept-lab-index-tag">{indexNum}</span>
-                        <div className="dept-lab-icon-wrap">
-                          <Microscope size={18} strokeWidth={2.2} />
-                        </div>
+                    <div className="dept-compact-card-header">
+                      <div className="dept-compact-card-icon">
+                        <Icon size={20} strokeWidth={2} />
                       </div>
+                      <span className={`dept-compact-cat-badge ${isMtech ? 'is-mtech' : 'is-btech'}`}>
+                        {catLabel}
+                      </span>
+                    </div>
 
-                      <div className="dept-lab-body">
-                        <span className="dept-lab-overline">Practical & Research Facility</span>
-                        <h3 className="dept-lab-title">{lab.name}</h3>
-                        <p className="dept-lab-spec-desc">
-                          Equipped with high-performance workstations, licensed toolsets, and dedicated experimental apparatus.
-                        </p>
+                    <div className="dept-compact-card-body">
+                      <h3 className="dept-compact-card-title">{program.name}</h3>
+                      <div className="dept-compact-card-chips">
+                        {program.intake && (
+                          <span className="dept-compact-chip">
+                            {program.intake} Seats
+                          </span>
+                        )}
+                        {program.accreditation && program.accreditation !== '—' && (
+                          <span className="dept-compact-chip is-accredited">
+                            {program.accreditation}
+                          </span>
+                        )}
                       </div>
                     </div>
 
-                    <div className="dept-lab-footer">
-                      <span className="dept-lab-pdf-btn-label">
-                        <FileText size={13} strokeWidth={2.4} />
-                        <span>{lab.pdfUrl ? 'Lab Manual & Specs' : 'View Details'}</span>
-                      </span>
-                      <span className="dept-btn-arrow-circle">
-                        <ArrowRight size={12} strokeWidth={2.5} />
-                      </span>
+                    <div className="dept-compact-card-footer">
+                      <span>Explore Programme</span>
+                      <ArrowRight size={14} strokeWidth={2.4} />
                     </div>
-                  </button>
+                  </div>
                 );
               })}
             </div>
@@ -1060,16 +1024,45 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
         </section>
       )}
 
-      <LabDialog lab={activeLab} onClose={() => setActiveLab(null)} />
-
-      {/* Placements (shared) */}
-      {hasPlacements && (
+      {/* Placements & Internships — one "Careers" section; a tab bar only
+          appears when a programme actually has both. Placed right after
+          the department overview since it's the highest-intent content on
+          this page. */}
+      {(hasPlacements || hasInternships) && (
         <section id="placements" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
           <div className="container">
-            <div style={{ marginBottom: 'var(--space-8)' }}>
+            <div style={{ marginBottom: 'var(--space-6)' }}>
               <span className="section-label dept-section-label">Careers</span>
-              <h2 className="section-title">Placements</h2>
+              <h2 className="section-title">
+                {hasPlacements && hasInternships ? 'Placements & Internships' : hasInternships ? 'Internships' : 'Placements'}
+              </h2>
             </div>
+
+            {hasPlacements && hasInternships && (
+              <div className="section-tabs" role="tablist" aria-label="Placements and Internships" style={{ marginBottom: 'var(--space-6)' }}>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={careerTab === 'placements'}
+                  className={`section-tab-btn${careerTab === 'placements' ? ' active' : ''}`}
+                  onClick={() => setCareerTab('placements')}
+                >
+                  Placements
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={careerTab === 'internships'}
+                  className={`section-tab-btn${careerTab === 'internships' ? ' active' : ''}`}
+                  onClick={() => setCareerTab('internships')}
+                >
+                  Internships
+                </button>
+              </div>
+            )}
+
+            {hasPlacements && (!hasInternships || careerTab === 'placements') && (
+            <div>
             {shared.placementIntro && (
               <p style={{ color: 'var(--color-text)', lineHeight: 1.85, fontSize: 'var(--text-base)', marginBottom: 'var(--space-6)', maxWidth: 760 }}>
                 {shared.placementIntro}
@@ -1077,8 +1070,8 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
             )}
             {shared.placementStats.length > 0 && (
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-8)', marginBottom: shared.placementRecruiters.length > 0 ? 'var(--space-8)' : 0 }}>
-                {shared.placementStats.map((s) => (
-                  <div key={s.label} style={{ textAlign: 'center' }}>
+                {shared.placementStats.map((s, si) => (
+                  <div key={si} style={{ textAlign: 'center' }}>
                     <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.5rem', fontWeight: 900, color: 'var(--color-accent)' }}>{s.value}</div>
                     <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', fontFamily: 'var(--font-sans)', marginTop: 2, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{s.label}</div>
                   </div>
@@ -1091,8 +1084,8 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                   Our Recruiters
                 </h3>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
-                  {shared.placementRecruiters.map((r) => (
-                    <span key={r} style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--color-primary)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-full)', padding: '0.35rem 0.9rem' }}>
+                  {shared.placementRecruiters.map((r, ri) => (
+                    <span key={ri} style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--color-primary)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-full)', padding: '0.35rem 0.9rem' }}>
                       {r}
                     </span>
                   ))}
@@ -1100,8 +1093,8 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
               </div>
             )}
             {/* Academic Year pill selector + computed stat tiles — Academic
-                Years come entirely from dept?.placementYears
-                (admin-managed via /admin → Academic Departments), and every tile value
+                Years come entirely from activeProgram.placementYears
+                (admin-managed via /admin → Programs), and every tile value
                 below is computed live from that year's imported rows (see
                 computePlacementStats). The detailed records table further
                 down still shows every column exactly as uploaded, with the
@@ -1126,7 +1119,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                     <p className="placement-stat-summary">
                       {activePlacementYear.year} Placements as on date: <strong>{placementYearStats.totalOffers.toLocaleString()}</strong>
                     </p>
-                    <div className={`dept-stat-grid${placementStatsFull ? ' dept-stat-grid--fill' : ''}`}>
+                    <div className="dept-stat-grid dept-stat-grid--compact">
                       <div className="dept-stat-tile">
                         <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.companiesVisited}</span></div>
                         <div className="dept-stat-tile__label">No. of Companies Visited</div>
@@ -1145,121 +1138,58 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                         </button>
                         <div className="dept-stat-tile__label">Top 10 Companies List</div>
                       </div>
-                      {placementYearStats.averageSalary != null && (
-                        <div className="dept-stat-tile">
-                          <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.averageSalary}</span></div>
-                          <div className="dept-stat-tile__label">Average Salary</div>
-                        </div>
-                      )}
-                      {placementYearStats.medianSalary != null && (
-                        <div className="dept-stat-tile">
-                          <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.medianSalary}</span></div>
-                          <div className="dept-stat-tile__label">Median Salary</div>
-                        </div>
-                      )}
-                      {placementYearStats.highestPackage != null && (
-                        <div className="dept-stat-tile">
-                          <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.highestPackage}</span></div>
-                          <div className="dept-stat-tile__label">Highest Package</div>
-                        </div>
-                      )}
+                      <div className="dept-stat-tile">
+                        <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.averageSalary ?? '—'}</span></div>
+                        <div className="dept-stat-tile__label">Average Salary</div>
+                      </div>
+                      <div className="dept-stat-tile">
+                        <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.medianSalary ?? '—'}</span></div>
+                        <div className="dept-stat-tile__label">Median Salary</div>
+                      </div>
+                      <div className="dept-stat-tile">
+                        <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.highestPackage ?? '—'}</span></div>
+                        <div className="dept-stat-tile__label">Highest Package</div>
+                      </div>
                       {placementYearStats.above50Lpa > 0 && (
                         <div className="dept-stat-tile">
-                          <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.above50Lpa} offers</span></div>
+                          <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.above50Lpa}</span></div>
                           <div className="dept-stat-tile__label">Above 50 LPA+</div>
                         </div>
                       )}
                       {placementYearStats.above30Lpa > 0 && (
                         <div className="dept-stat-tile">
-                          <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.above30Lpa} offers</span></div>
+                          <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.above30Lpa}</span></div>
                           <div className="dept-stat-tile__label">Above 30 LPA+</div>
                         </div>
                       )}
-                      {placementYearStats.above10Lpa > 0 && (
-                        <div className="dept-stat-tile">
-                          <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.above10Lpa} offers</span></div>
-                          <div className="dept-stat-tile__label">Above 10 LPA+</div>
-                        </div>
-                      )}
+                      <div className="dept-stat-tile">
+                        <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.above10Lpa}</span></div>
+                        <div className="dept-stat-tile__label">Above 10 LPA+</div>
+                      </div>
                     </div>
                   </>
                 )}
-
                 <div id="placement-records-table" style={{ marginTop: 'var(--space-8)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-4)', flexWrap: 'wrap', gap: '0.75rem' }}>
                     <div>
                       <span className="section-label dept-section-label">Student Success</span>
                       <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: '1.2rem', fontWeight: 800, color: 'var(--color-primary-dark)', margin: '0.2rem 0 0 0' }}>
-                        Career Offers &amp; Recruiters ({activePlacementYear?.year})
+                        Placement Offers &amp; Organizations {activePlacementYear?.year ? `(${activePlacementYear.year})` : ''}
                       </h3>
                     </div>
                     <span style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--color-accent)', background: 'rgba(201, 168, 76, 0.12)', border: '1px solid rgba(201, 168, 76, 0.3)', borderRadius: '9999px', padding: '0.3rem 0.85rem' }}>
-                      {filteredPlacementRows.length} Verified Offers
+                      {placementRows.length > 0 ? `${placementRows.length} Verified Offers` : 'Featured Placement Record'}
                     </span>
                   </div>
 
-                  {placementCompanyOptions.length > 0 && (
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem', marginBottom: 'var(--space-4)' }}>
-                      <select
-                        value={placementCompanyFilter}
-                        onChange={(e) => setPlacementCompanyFilter(e.target.value)}
-                        aria-label="Filter by company"
-                        style={{ padding: '0.45rem 0.75rem', borderRadius: '8px', border: '1px solid var(--color-light-gray)', fontSize: '0.85rem', background: 'var(--color-white)' }}
-                      >
-                        <option value="">All Companies</option>
-                        {placementCompanyOptions.map((c) => <option key={c} value={c}>{c}</option>)}
-                      </select>
-                      <select
-                        value={placementMinPackage}
-                        onChange={(e) => setPlacementMinPackage(Number(e.target.value))}
-                        aria-label="Filter by minimum package"
-                        style={{ padding: '0.45rem 0.75rem', borderRadius: '8px', border: '1px solid var(--color-light-gray)', fontSize: '0.85rem', background: 'var(--color-white)' }}
-                      >
-                        <option value={0}>Any Package</option>
-                        <option value={5}>5 LPA & above</option>
-                        <option value={10}>10 LPA & above</option>
-                        <option value={20}>20 LPA & above</option>
-                        <option value={30}>30 LPA & above</option>
-                      </select>
-                      {(placementCompanyFilter || placementMinPackage > 0) && (
-                        <button
-                          type="button"
-                          onClick={() => { setPlacementCompanyFilter(''); setPlacementMinPackage(0); }}
-                          style={{ padding: '0.45rem 0.9rem', borderRadius: '8px', border: '1px solid var(--color-light-gray)', fontSize: '0.85rem', background: 'transparent', cursor: 'pointer', color: 'var(--color-text-light)' }}
-                        >
-                          Clear Filters
-                        </button>
-                      )}
-                    </div>
-                  )}
-
-                  {placementMarqueeItems.length > 0 ? (
-                    <TestimonialMarquee records={placementMarqueeItems} />
-                  ) : (
-                    <p style={{ color: 'var(--color-text-light)', fontStyle: 'italic', padding: '1.5rem 0' }}>
-                      {placementRows.length > 0
-                        ? 'No offers match the selected filters.'
-                        : `No placement records uploaded yet for ${activePlacementYear?.year}.`}
-                    </p>
-                  )}
+                  <PlacementProfileMarquee3Layers records={placementMarqueeItems} />
                 </div>
               </div>
             )}
-          </div>
-        </section>
-      )}
-
-      {/* Internships — same shape/pattern as Placements above, per programme,
-          Academic Years come entirely from dept?.internshipYears
-          (admin-managed via /admin → Academic Departments), including the
-          scrolling-marquee records display. */}
-      {hasInternships && (
-        <section id="internships" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
-          <div className="container">
-            <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label dept-section-label">Careers</span>
-              <h2 className="section-title">Internships</h2>
             </div>
+            )}
+
+            {hasInternships && (!hasPlacements || careerTab === 'internships') && (
             <div>
               <div className="placement-year-pills" role="group" aria-label="Select academic year">
                 {internshipYears.map((y) => (
@@ -1316,7 +1246,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                 </div>
 
                 {internshipMarqueeItems.length > 0 ? (
-                  <TestimonialMarquee records={internshipMarqueeItems} />
+                  <PlacementProfileMarquee records={internshipMarqueeItems} />
                 ) : (
                   <p style={{ color: 'var(--color-text-light)', fontStyle: 'italic', padding: '1.5rem 0' }}>
                     No internship records uploaded yet for {activeInternshipYear?.year}.
@@ -1324,382 +1254,481 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                 )}
               </div>
             </div>
+            )}
           </div>
         </section>
       )}
 
-      {/* Department Library (Italian-Inspired 3-Column Grid Showcase) */}
-      {hasLibrary && (
-        <section id="library" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
+      {/* About HOD — photo + name below it, plain message, Vision/Mission/
+          Core Values folded in as individual accordion rows. */}
+      {hasHod && (
+        <section id="hod" className="dept-hod-section" style={{ scrollMarginTop: NAV_OFFSET }}>
           <div className="container">
-            <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label dept-section-label">Academic Repository</span>
-              <h2 className="section-title">Department Library</h2>
-            </div>
-
-            <div className="dept-library-container">
-              {shared.libraryIntro && (
-                <div style={{ maxWidth: 840 }}>
-                  <BodyBlocks
-                    blocks={parseBodyContent(shared.libraryIntro)}
-                    paragraphStyle={{ color: 'var(--color-text)', lineHeight: 1.85, fontSize: 'var(--text-base)' }}
-                  />
+            <div className="dept-hod-editorial-card">
+              {shared.hodImage && (
+                <div className="dept-hod-media-col">
+                  <div className="dept-hod-media-frame">
+                    <SmoothImage
+                      src={shared.hodImage}
+                      alt={shared.hod || 'Head of Department'}
+                      className="dept-hod-photo"
+                    />
+                  </div>
+                  {shared.hod && (
+                    <div className="dept-hod-media-caption">
+                      <h3 className="dept-hod-name">{shared.hod}</h3>
+                      <div className="dept-hod-meta">Head of the Department</div>
+                    </div>
+                  )}
                 </div>
               )}
 
-              {shared.libraryInCharge && (
-                <div className="dept-library-incharge-card">
-                  <div className="dept-library-incharge-icon-wrap">
-                    <BookOpen size={22} strokeWidth={2.2} />
-                  </div>
-                  <div>
-                    <div className="dept-library-incharge-label">In-Charge of Department Library</div>
-                    <h3 className="dept-library-incharge-name">{shared.libraryInCharge}</h3>
-                  </div>
-                </div>
-              )}
+              <div className="dept-hod-content">
+                <h2 className="dept-hod-message-title">A Message from the HOD</h2>
 
-              {libraryTables.map((sec, si) => (
-                <div key={si} className="dept-library-tables-group">
-                  <div className="dept-library-group-header">
-                    <h3 className="dept-library-group-title">
-                      {sec.heading}
-                    </h3>
-                    <span style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--color-accent)', background: 'rgba(201, 168, 76, 0.12)', border: '1px solid rgba(201, 168, 76, 0.25)', borderRadius: '9999px', padding: '0.25rem 0.75rem' }}>
-                      {sec.items.length} Resource Categories
-                    </span>
-                  </div>
-
-                  <div className="dept-library-grid-3">
-                    {sec.items.map((item, ii) => {
-                      const icons = [BookMarked, Bookmark, Library, FileText, BookOpen];
-                      const IconComp = icons[ii % icons.length];
-                      const numStr = String(ii + 1).padStart(2, '0');
-                      return (
-                        <div key={ii} className="dept-library-card">
-                          <div className="dept-library-card-top">
-                            <span className="dept-library-num-badge">{numStr}</span>
-                            <div className="dept-library-icon-badge">
-                              <IconComp size={18} strokeWidth={2.2} />
-                            </div>
-                          </div>
-                          <div>
-                            <div className="dept-library-value">{item.value}</div>
-                            <div className="dept-library-label">{item.label}</div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
+                {shared.hodMessage && (
+                  <p className="dept-hod-message-text-plain">{shared.hodMessage}</p>
+                )}
+              </div>
             </div>
           </div>
         </section>
       )}
 
-      {/* ===== Program toggle ===== */}
-      <section id="program-toggle" style={{ background: 'var(--color-primary)', padding: 'var(--space-8) 0', scrollMarginTop: NAV_OFFSET }}>
-        <div className="container" style={{ textAlign: 'center' }}>
-          <span className="section-label dept-section-label" style={{ color: 'var(--color-accent)' }}>Choose a Programme</span>
-          {/* maxWidth scales with the number of programmes so extra options
-              (e.g. ECE's third, M.Tech VLSI) get equal, uncramped room
-              rather than being squeezed into a width tuned for two. */}
-          <div className="iqac-cell-tabs" style={{ maxWidth: Math.max(520, subPrograms.length * 200), margin: 'var(--space-4) auto 0', background: 'var(--color-white)' }}>
-            {subPrograms.map((p) => (
-              <button
-                key={p.slug}
-                type="button"
-                className={`iqac-cell-tab${p.slug === activeSlug ? ' active' : ''}`}
-                aria-pressed={p.slug === activeSlug}
-                onClick={() => { if (p.slug !== activeSlug) navigate(`/academics/${p.slug}#program-toggle`); }}
-              >
-                {p.shortName || p.name}
-              </button>
-            ))}
-          </div>
+      {/* Faculty Carousel (matching Google UI reference design) */}
+      {faculty.length > 0 && (
+        <div id="faculty" style={{ scrollMarginTop: NAV_OFFSET }}>
+          <FacultyCarousel
+            faculty={faculty}
+            departmentName={deptName}
+            title="Learn from our impactful faculty"
+            viewMoreLink="/faculty"
+          />
         </div>
-      </section>
-
-      {/* About the Programme (per programme) */}
-      {hasProgrammeAbout && (
-        <section id="programme-about" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
-          <div className="container">
-            <span className="section-label dept-section-label">{activeProgram.shortName || activeProgram.name}</span>
-            <h2 className="section-title">About the Programme</h2>
-            <p style={{ color: 'var(--color-text-light)', lineHeight: 1.85, fontSize: 'var(--text-base)', whiteSpace: 'pre-line' }}>
-              {activeProgram.about}
-            </p>
-          </div>
-        </section>
       )}
 
-      {/* Programme Highlights (per programme) */}
-      {hasHighlights && (
-        <section id="highlights" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
+      {/* Laboratories — premium unified-card carousel, 40:60 text/image
+          split, one slide visible at a time, auto-advancing. */}
+      {hasLabs && (
+        <section id="labs" className="dept-labs-section" style={{ scrollMarginTop: NAV_OFFSET }}>
           <div className="container">
-            <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label dept-section-label">{activeProgram.shortName || activeProgram.name}</span>
-              <h2 className="section-title">Programme Highlights</h2>
-              <p className="section-desc" style={{ margin: '0.5rem 0 0 0' }}>
-                Key differentiators and academic excellence pillars that distinguish our curriculum.
-              </p>
+            <div className="dept-labs-header">
+              <div className="dept-labs-title-wrap">
+                <span className="section-label dept-section-label">State-of-the-Art Infrastructure</span>
+                <h2 className="section-title">Specialized Laboratories</h2>
+                <p className="section-desc" style={{ margin: '0.5rem 0 0 0' }}>
+                  Industry-aligned experimental facilities engineered for hands-on technical immersion, advanced computing, and multidisciplinary project incubation.
+                </p>
+              </div>
             </div>
-            <div className="dept-highlights-grid">
-              {activeProgram.highlights.map((h, hi) => (
-                <div key={hi} className="dept-highlight-item-card">
-                  <div className="dept-highlight-check-circle">
-                    <Check size={13} strokeWidth={3} />
+
+            <div
+              className="dept-lab-carousel"
+              onMouseEnter={() => setLabAutoPaused(true)}
+              onMouseLeave={() => setLabAutoPaused(false)}
+              onTouchStart={() => setLabAutoPaused(true)}
+              onTouchEnd={() => pauseLabAutoTemporarily()}
+            >
+              <div className="dept-lab-rows" ref={labScrollRef}>
+                {shared.labs.map((lab, li) => (
+                  <div key={li} className="dept-lab-slide">
+                    <div className="dept-lab-slide-text">
+                      <span className="dept-lab-slide-number">
+                        {String(li + 1).padStart(2, '0')} / {String(shared.labs.length).padStart(2, '0')}
+                      </span>
+                      <Microscope size={26} strokeWidth={2} className="dept-lab-slide-icon" />
+                      <h3 className="dept-lab-slide-title">{lab.name}</h3>
+                      {lab.description && (
+                        <p className="dept-lab-slide-desc">{lab.description}</p>
+                      )}
+                      {lab.pdfUrl && (
+                        <a href={lab.pdfUrl} target="_blank" rel="noopener noreferrer" className="dept-lab-slide-cta">
+                          <span>Explore Lab</span>
+                          <ArrowRight size={15} strokeWidth={2.5} />
+                        </a>
+                      )}
+                    </div>
+                    <div className="dept-lab-slide-media">
+                      <SmoothImage
+                        src={lab.imageUrl || shared.heroImage}
+                        alt={lab.name}
+                        className="dept-lab-slide-img"
+                      />
+                    </div>
                   </div>
-                  <p className="dept-highlight-text">{h.includes(':') ? <><strong>{h.slice(0, h.indexOf(':') + 1)}</strong>{h.slice(h.indexOf(':') + 1)}</> : h}</p>
+                ))}
+              </div>
+
+              {shared.labs.length > 1 && (
+                <div className="dept-lab-carousel-controls">
+                  <div className="dept-lab-carousel-dots" role="tablist" aria-label="Laboratory slides">
+                    {shared.labs.map((lab, li) => (
+                      <button
+                        key={lab.name + li}
+                        type="button"
+                        role="tab"
+                        aria-selected={activeLabIndex === li}
+                        aria-label={`Show ${lab.name}`}
+                        className={`dept-lab-dot${activeLabIndex === li ? ' active' : ''}`}
+                        onClick={() => scrollToLabIndex(li)}
+                      />
+                    ))}
+                  </div>
+                  <div className="dept-lab-carousel-arrows" role="group" aria-label="Laboratories carousel navigation">
+                    <button
+                      type="button"
+                      className="dept-lab-carousel-arrow-btn"
+                      onClick={() => scrollLabsBy(-1)}
+                      disabled={!canScrollLabsLeft}
+                      aria-label="Previous laboratory"
+                    >
+                      <ArrowLeft size={17} strokeWidth={2.4} />
+                    </button>
+                    <button
+                      type="button"
+                      className="dept-lab-carousel-arrow-btn"
+                      onClick={() => scrollLabsBy(1)}
+                      disabled={!canScrollLabsRight}
+                      aria-label="Next laboratory"
+                    >
+                      <ArrowRight size={17} strokeWidth={2.4} />
+                    </button>
+                  </div>
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </section>
       )}
 
-      {/* PEOs, POs & PSOs (Outcome-Based Education Showcase) */}
-      {hasOutcomeStatements && (
-        <section id="peos-pos-psos" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
-          <div className="container">
-            <div style={{ marginBottom: 'var(--space-10)' }}>
-              <span className="section-label dept-section-label">Outcome-Based Education</span>
-              <h2 className="section-title">{outcomeHeading}</h2>
-              <p className="section-desc" style={{ margin: '0.5rem 0 0 0' }}>
-                Structured educational objectives and measurable competencies defined in accordance with NBA & Washington Accord frameworks.
-              </p>
-            </div>
-            <div className="section-tabs" role="tablist" aria-label={outcomeHeading}>
-              {outcomeGroups.map((g) => (
+      {/* ===== Unified Programme Hub ===== */}
+      <section id="program-toggle" className="programme-hub-section" style={{ scrollMarginTop: NAV_OFFSET }}>
+        <div className="container">
+          <div className="programme-hub-header">
+            <span className="section-label dept-section-label" style={{ color: 'var(--color-accent)' }}>
+              Choose a Programme
+            </span>
+            <h2 className="section-title" style={{ marginBottom: '0.75rem' }}>
+              Academic Programmes &amp; Course Structure
+            </h2>
+            <p className="section-desc" style={{ maxWidth: '680px', margin: '0 auto 1.5rem' }}>
+              Select a degree program below to explore its overview, curriculum structure, and outcome-based learning objectives.
+            </p>
+
+            {/* Programme Selector Pills */}
+            <div className="programme-hub-pills" role="tablist" aria-label="Choose a Programme">
+              {subPrograms.map((p) => (
                 <button
-                  key={g.key}
-                  id={`outcome-tab-${g.key}`}
+                  key={p.slug}
+                  type="button"
                   role="tab"
-                  aria-selected={activeOutcome?.key === g.key}
-                  aria-controls={`outcome-panel-${g.key}`}
-                  tabIndex={activeOutcome?.key === g.key ? 0 : -1}
-                  onClick={() => setOutcomeTab(g.key)}
-                  className={`section-tab-btn${activeOutcome?.key === g.key ? ' active' : ''}`}
+                  aria-selected={p.slug === activeSlug}
+                  className={`programme-hub-pill-btn${p.slug === activeSlug ? ' active' : ''}`}
+                  onClick={() => {
+                    if (p.slug !== activeSlug) {
+                      navigate(`/academics/${p.slug}#program-toggle`, { preventScrollReset: true });
+                    }
+                  }}
                 >
-                  {g.short}
+                  {p.shortName || p.name}
                 </button>
               ))}
             </div>
-            {activeOutcome && (
-              <div
-                id={`outcome-panel-${activeOutcome.key}`}
-                role="tabpanel"
-                aria-labelledby={`outcome-tab-${activeOutcome.key}`}
-                tabIndex={0}
-                className="dept-outcomes-container"
+          </div>
+
+          {/* Hub Container Card */}
+          <div className="programme-hub-card">
+            {/* Hub Inner Tabs */}
+            <div className="programme-hub-tabs-bar" role="tablist" aria-label="Programme details">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={activeHubTab === 'overview'}
+                className={`programme-hub-tab-btn${activeHubTab === 'overview' ? ' active' : ''}`}
+                onClick={() => setActiveHubTab('overview')}
               >
-                <div className="dept-outcomes-header-bar">
-                  <h3 className="dept-outcomes-header-title">
-                    {activeOutcome.title}
-                  </h3>
-                  <span style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                    {activeOutcome.items!.length} Statements Defined
-                  </span>
+                <BookOpen size={17} strokeWidth={2.2} />
+                <span>Overview &amp; Highlights</span>
+              </button>
+
+              <button
+                type="button"
+                role="tab"
+                aria-selected={activeHubTab === 'curriculum'}
+                className={`programme-hub-tab-btn${activeHubTab === 'curriculum' ? ' active' : ''}`}
+                onClick={() => setActiveHubTab('curriculum')}
+              >
+                <GraduationCap size={17} strokeWidth={2.2} />
+                <span>Curriculum &amp; Structure</span>
+              </button>
+
+              <button
+                type="button"
+                role="tab"
+                aria-selected={activeHubTab === 'outcomes'}
+                className={`programme-hub-tab-btn${activeHubTab === 'outcomes' ? ' active' : ''}`}
+                onClick={() => setActiveHubTab('outcomes')}
+              >
+                <Award size={17} strokeWidth={2.2} />
+                <span>{outcomeHeading}</span>
+              </button>
+
+              <button
+                type="button"
+                role="tab"
+                aria-selected={activeHubTab === 'news'}
+                className={`programme-hub-tab-btn${activeHubTab === 'news' ? ' active' : ''}`}
+                onClick={() => setActiveHubTab('news')}
+              >
+                <Calendar size={17} strokeWidth={2.2} />
+                <span>News &amp; Events</span>
+              </button>
+
+              <button
+                type="button"
+                role="tab"
+                aria-selected={activeHubTab === 'newsletter'}
+                className={`programme-hub-tab-btn${activeHubTab === 'newsletter' ? ' active' : ''}`}
+                onClick={() => setActiveHubTab('newsletter')}
+              >
+                <FileText size={17} strokeWidth={2.2} />
+                <span>Department Newsletter</span>
+              </button>
+
+              <button
+                type="button"
+                role="tab"
+                aria-selected={activeHubTab === 'rnd'}
+                className={`programme-hub-tab-btn${activeHubTab === 'rnd' ? ' active' : ''}`}
+                onClick={() => setActiveHubTab('rnd')}
+              >
+                <Microscope size={17} strokeWidth={2.2} />
+                <span>Research &amp; Development</span>
+              </button>
+            </div>
+
+            {/* Hub Body Content */}
+            <div className="programme-hub-body">
+              {activeHubTab === 'overview' && (
+                <div className="programme-hub-grid">
+                  {/* Left Column: About */}
+                  <div className="programme-hub-about-col">
+                    <span className="section-label dept-section-label">{activeProgram.shortName || activeProgram.name}</span>
+                    <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0f172a', margin: '0.25rem 0 1rem 0' }}>
+                      About the Programme
+                    </h3>
+                    <p style={{ color: '#475569', lineHeight: 1.8, fontSize: '0.95rem', whiteSpace: 'pre-line' }}>
+                      {activeProgram.about || `The ${activeProgram.name} programme at ${deptName} offers rigorous academic preparation and industry-aligned skills.`}
+                    </p>
+                  </div>
+
+                  {/* Right Column: Highlights */}
+                  {hasHighlights && (
+                    <div className="programme-hub-highlights-col">
+                      <span className="section-label dept-section-label">Key Pillars</span>
+                      <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0f172a', margin: '0.25rem 0 1rem 0' }}>
+                        Programme Highlights
+                      </h3>
+                      <div className="dept-highlights-grid">
+                        {activeProgram.highlights.map((h, hi) => (
+                          <div key={hi} className="dept-highlight-card">
+                            <div className="dept-highlight-icon-wrap">
+                              <Check size={13} strokeWidth={3} />
+                            </div>
+                            <p className="dept-highlight-text">
+                              {h.includes(':') ? (
+                                <>
+                                  <strong>{h.slice(0, h.indexOf(':') + 1)}</strong>
+                                  {h.slice(h.indexOf(':') + 1)}
+                                </>
+                              ) : (
+                                h
+                              )}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
-                <ul className="dept-outcomes-list">
-                  {activeOutcome.items!.map((item, i) => (
-                    <li key={item} className="dept-outcome-row">
-                      <span className="dept-outcome-code-badge">
-                        {activeOutcome.key.slice(0, -1).toUpperCase()}{i + 1}
-                      </span>
-                      <p className="dept-outcome-desc">{item}</p>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-        </section>
-      )}
+              )}
 
-      {/* Mind Map (per programme) */}
-      {hasMindMap && (
-        <section id="mindmap" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
-          <div className="container">
-            <div style={{ marginBottom: 'var(--space-10)' }}>
-              <span className="section-label dept-section-label">Curriculum Overview</span>
-              <h2 className="section-title">Mind Map</h2>
-            </div>
-            {/* Plain vertical stack, in upload order — every image full-width
-                and on its own line, no carousel/slider/side-by-side, so the
-                page just scrolls normally from Image 1 down to the last. */}
-            {mindMapImages.length > 0 && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
-                {mindMapImages.map((img, i) => (
-                  <SmoothImage
-                    key={img.url}
-                    src={img.url}
-                    alt={`${activeProgram.shortName || activeProgram.name} curriculum mind map${mindMapImages.length > 1 ? ` (${i + 1} of ${mindMapImages.length})` : ''}`}
-                    style={{ display: 'block', width: '100%', maxWidth: 700, height: 'auto', margin: '0 auto', borderRadius: 'var(--radius-md)', border: '1.5px solid var(--color-light-gray)' }}
-                  />
-                ))}
-              </div>
-            )}
-            {activeProgram.mindMapPdfUrl && (
-              <div style={{ display: 'flex', justifyContent: 'center', marginTop: mindMapImages.length > 0 ? 'var(--space-6)' : 0 }}>
-                <a href={activeProgram.mindMapPdfUrl} target="_blank" rel="noopener noreferrer" className="btn btn-outline">
-                  Download Mind Map PDF
-                </a>
-              </div>
-            )}
-          </div>
-        </section>
-      )}
+              {activeHubTab === 'curriculum' && (
+                <div>
+                  <div style={{ marginBottom: '1.5rem' }}>
+                    <span className="section-label dept-section-label">Curriculum</span>
+                    <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0f172a', margin: '0.25rem 0 0.5rem 0' }}>
+                      {activeProgram.shortName || activeProgram.name} — Programme Structure
+                    </h3>
+                  </div>
 
-      {/* Curriculum (per programme) */}
-      <section id="curriculum" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
-        <div className="container">
-          <div style={{ marginBottom: 'var(--space-10)' }}>
-            <span className="section-label dept-section-label">Curriculum</span>
-            <h2 className="section-title">{activeProgram.shortName || activeProgram.name} — Programme Structure</h2>
-          </div>
-          <ProgrammeStructure semesters={activeProgram.semesters} />
-        </div>
-      </section>
+                  {hasMindMap && (
+                    <div className="dept-mindmap-row" style={{ marginBottom: '1.5rem' }}>
+                      {mindMapImages.map((img, i) => (
+                        <a
+                          key={img.url}
+                          href={img.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="dept-mindmap-thumb"
+                          aria-label={`View mind map image ${i + 1}`}
+                        >
+                          <img src={img.url} alt={`${activeProgram.shortName || activeProgram.name} mind map ${i + 1}`} />
+                        </a>
+                      ))}
+                      {activeProgram.mindMapPdfUrl && (
+                        <a href={activeProgram.mindMapPdfUrl} target="_blank" rel="noopener noreferrer" className="dept-mindmap-pdf-link">
+                          <FileText size={14} strokeWidth={2.2} />
+                          <span>Download Mind Map PDF</span>
+                        </a>
+                      )}
+                    </div>
+                  )}
 
-      {/* News & Events — the heading is fixed; what's under it is the
-          admin-defined dynamic section list (see newsEventsSubSections
-          above), or, for a department not yet opened in the new Admin, the
-          old fixed News & Events / Student Awards / Others tabs. */}
-      {hasNewsEventsDynamic && (
-        <section id="news-events" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
-          <div className="container">
-            <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label dept-section-label">{deptName}</span>
-              <h2 className="section-title">News &amp; Events</h2>
-            </div>
-            <SectionSubtree
-              section={{ id: 'news-events-root', label: 'News & Events', contentType: 'text', textContent: '', subSections: newsEventsSubSections }}
-              navOffset={NAV_OFFSET}
-            />
-          </div>
-        </section>
-      )}
-      {hasLegacyNewsEvents && <NewsEventsTabs categories={newsEventsCategories} eyebrow={deptName} navOffset={NAV_OFFSET} />}
+                  <ProgrammeStructure semesters={activeProgram.semesters} />
+                </div>
+              )}
 
-      {/* Awards & Recognition — same fixed-heading/dynamic-content pattern
-          as News & Events above. */}
-      {hasAwards && (
-        <section id="awards-recognition" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
-          <div className="container">
-            <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label dept-section-label">{deptName}</span>
-              <h2 className="section-title">Awards &amp; Recognition</h2>
-            </div>
-            <SectionSubtree
-              section={{ id: 'awards-recognition-root', label: 'Awards & Recognition', contentType: 'text', textContent: '', subSections: awardsSubSections }}
-              navOffset={NAV_OFFSET}
-            />
-          </div>
-        </section>
-      )}
-
-      {/* News & Events — live from the departmentNews collection, tagged to
-          this programme (Programs admin's "News & Events — This Programme").
-          Both this and the admin-defined table above are available on this
-          programme's side of the toggle; each only appears once an admin has
-          actually filled it in, so having neither leaves no visible gap. */}
-      <DepartmentNewsSection programSlug={group.programSlugs} background="var(--color-off-white)" />
-
-      {/* Newsletter (per programme) */}
-      {hasNewsletter && (
-        <section id="newsletter" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
-          <div className="container">
-            <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label dept-section-label">{activeProgram.shortName || activeProgram.name}</span>
-              <h2 className="section-title">Newsletter</h2>
-            </div>
-            <div className="pb-activities-scroll" role="region" aria-label="Newsletter issues by academic year" tabIndex={0}>
-              <table>
-                <thead>
-                  <tr>
-                    <th scope="col">Academic Year</th>
-                    {/* Per-issue "Issue – N" column headings intentionally removed visually — the
-                        clickable issue links themselves still render below, unaffected. An sr-only
-                        label keeps each column identifiable to screen reader users. */}
-                    {Array.from({ length: newsletterMaxIssues }).map((_, ci) => (
-                      <th key={ci} scope="col"><span className="sr-only">{`Issue ${ci + 1}`}</span></th>
+              {activeHubTab === 'outcomes' && !hasOutcomeStatements && HUB_TAB_EMPTY}
+              {activeHubTab === 'outcomes' && hasOutcomeStatements && (
+                <div>
+                  <p className="section-desc" style={{ marginBottom: '1.5rem' }}>
+                    Structured educational objectives and measurable competencies defined in accordance with NBA &amp; Washington Accord frameworks.
+                  </p>
+                  <div className="section-tabs" role="tablist" aria-label={outcomeHeading}>
+                    {outcomeGroups.map((g) => (
+                      <button
+                        key={g.key}
+                        id={`outcome-tab-${g.key}`}
+                        role="tab"
+                        aria-selected={activeOutcome?.key === g.key}
+                        aria-controls={`outcome-panel-${g.key}`}
+                        tabIndex={activeOutcome?.key === g.key ? 0 : -1}
+                        onClick={() => setOutcomeTab(g.key)}
+                        className={`section-tab-btn${activeOutcome?.key === g.key ? ' active' : ''}`}
+                      >
+                        {g.short}
+                      </button>
                     ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {newsletterYears.map((yr, yi) => (
-                    <tr key={yi}>
-                      <td>{yr.year}</td>
-                      {Array.from({ length: newsletterMaxIssues }).map((_, ci) => {
-                        const issue = yr.issues[ci];
-                        if (!issue) return <td key={ci} />;
-                        return (
-                          <td key={ci}>
-                            {issue.pdfUrl ? (
-                              <a href={issue.pdfUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-primary)', fontWeight: 600 }}>
-                                Issue – {ci + 1}
-                              </a>
-                            ) : (
-                              <span style={{ color: 'var(--color-text-light)', fontStyle: 'italic' }}>
-                                Issue – {ci + 1} (Unavailable)
-                              </span>
-                            )}
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-      )}
+                  </div>
+                  {activeOutcome && (
+                    <div
+                      id={`outcome-panel-${activeOutcome.key}`}
+                      role="tabpanel"
+                      aria-labelledby={`outcome-tab-${activeOutcome.key}`}
+                      tabIndex={0}
+                      className="dept-outcomes-container"
+                    >
+                      <div className="dept-outcomes-header-bar">
+                        <h3 className="dept-outcomes-header-title">{activeOutcome.title}</h3>
+                      </div>
+                      <ul className="dept-outcomes-list">
+                        {activeOutcome.items!.map((item, i) => (
+                          <li key={`${activeOutcome.key}-${i}`} className="dept-outcome-row">
+                            <span className="dept-outcome-code">
+                              {activeOutcome.key.slice(0, -1).toUpperCase()}
+                              {i + 1}
+                            </span>
+                            <p className="dept-outcome-desc">{item}</p>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              )}
 
-      {/* Research & Development (Funded Projects & Patents) (per programme) —
-          real department R&D pages vary a lot in shape, so this renders
-          whichever of the four admin fields are filled in: an overview
-          paragraph, table(s), detailed project/patent cards, and/or a flat
-          PDF link list — same three-format system as the site-wide Research
-          pages (see ResearchDetail.tsx / ResearchItemsAdmin.tsx). */}
-      {hasRnd && (
-        <section id="rnd" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
-          <div className="container">
-            <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label dept-section-label">Research</span>
-              <h2 className="section-title">Research &amp; Development (Funded Projects &amp; Patents)</h2>
-            </div>
-            {rndIntroValue && (
-              <p style={{ color: 'var(--color-text)', lineHeight: 1.85, fontSize: 'var(--text-base)', marginBottom: 'var(--space-6)', maxWidth: 760, whiteSpace: 'pre-line' }}>
-                {rndIntroValue}
-              </p>
-            )}
-            {rndTableSections.map((section, si) => (
-              <div key={si} style={{ marginBottom: 'var(--space-8)' }}>
+              {/* News & Events — moved into the hub so it shares this card's
+                  tab bar instead of its own standalone section below. */}
+              {activeHubTab === 'news' && !hasNewsEvents && HUB_TAB_EMPTY}
+              {activeHubTab === 'news' && hasNewsEvents && (
+                <NewsEventsTabs categories={newsEventsCategories} eyebrow={deptName} navOffset={NAV_OFFSET} embedded />
+              )}
+
+              {/* Department Newsletter & Publications — same move; the
+                  standalone version's own collapsible header is redundant
+                  once this is already gated behind a tab click. */}
+              {activeHubTab === 'newsletter' && !hasNewsletter && HUB_TAB_EMPTY}
+              {activeHubTab === 'newsletter' && hasNewsletter && (
+                <div>
+                  <p className="section-desc" style={{ marginBottom: 'var(--space-5)' }}>
+                    Archive of periodic department bulletins, student achievements, and academic highlights.
+                  </p>
+                  <div className="pb-activities-scroll" role="region" aria-label="Newsletter issues by academic year" tabIndex={0}>
+                    <table>
+                      <thead>
+                        <tr>
+                          <th scope="col">Academic Year</th>
+                          {Array.from({ length: newsletterMaxIssues }).map((_, ci) => (
+                            <th key={ci} scope="col">Issue {ci + 1}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {newsletterYears.map((yr) => (
+                          <tr key={yr.year}>
+                            <td>{yr.year}</td>
+                            {Array.from({ length: newsletterMaxIssues }).map((_, ci) => {
+                              const issue = yr.issues[ci];
+                              if (!issue) return <td key={ci} />;
+                              return (
+                                <td key={ci}>
+                                  {issue.pdfUrl ? (
+                                    <a href={issue.pdfUrl} target="_blank" rel="noopener noreferrer" className="dept-rnd-view-link">
+                                      <FileText size={13} strokeWidth={2.2} /> View
+                                    </a>
+                                  ) : (
+                                    <span style={{ color: 'var(--color-text-light)', fontStyle: 'italic' }}>Unavailable</span>
+                                  )}
+                                </td>
+                              );
+                            })}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* Research & Development (Funded Projects & Patents) — same
+                  move; renders whichever of the four admin fields are
+                  filled in (overview paragraph, table(s), project/patent
+                  cards, and/or a flat PDF link list). */}
+              {activeHubTab === 'rnd' && !hasRnd && HUB_TAB_EMPTY}
+              {activeHubTab === 'rnd' && hasRnd && (
+                <div>
+                  <div style={{ marginBottom: 'var(--space-6)' }}>
+                    <span className="section-label dept-section-label">Research</span>
+                    <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0f172a', margin: '0.25rem 0 0 0' }}>
+                      Research &amp; Development (Funded Projects &amp; Patents)
+                    </h3>
+                  </div>
+                  {activeProgram.rndIntro && (
+                    <p className="dept-rnd-intro">{activeProgram.rndIntro}</p>
+                  )}
+                  {rndTableSections.map((section, si) => (
+              <div key={si} className="dept-rnd-table-group">
                 {section.title && (
-                  <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>
-                    {section.title}
-                  </h3>
+                  <h3 className="dept-rnd-table-title">{section.title}</h3>
                 )}
-                <div role="region" aria-label={section.title || 'Research & Development table'} tabIndex={0} style={{ overflowX: 'auto' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm)' }}>
+                <div className="pb-activities-scroll" role="region" aria-label={section.title || 'Research & Development table'} tabIndex={0}>
+                  <table>
                     <thead>
-                      <tr style={{ background: 'var(--color-primary)' }}>
+                      <tr>
                         {section.headers.map((col, ci) => (
-                          <th key={ci} scope="col" style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'left', color: 'var(--color-white)', fontWeight: 700, whiteSpace: 'nowrap' }}>
-                            {col}
-                          </th>
+                          <th key={ci} scope="col">{col}</th>
                         ))}
                       </tr>
                     </thead>
                     <tbody>
                       {section.rows.map((row, ri) => (
-                        <tr key={ri} style={{ background: ri % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)', borderBottom: '1px solid var(--color-light-gray)' }}>
+                        <tr key={ri}>
                           {row.map((val, ci) => (
-                            <td key={ci} style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)', lineHeight: 1.5 }}>
-                              {/^https?:\/\//i.test(val) ? <a href={val} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-primary)', fontWeight: 600 }}>View</a> : val}
+                            <td key={ci}>
+                              {/^https?:\/\//i.test(val) ? (
+                                <a href={val} target="_blank" rel="noopener noreferrer" className="dept-rnd-view-link">View</a>
+                              ) : val}
                             </td>
                           ))}
                         </tr>
@@ -1710,45 +1739,41 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
               </div>
             ))}
             {hasRndStructuredTable && (
-              <div style={{ marginBottom: 'var(--space-8)', overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm)' }}>
-                  <thead>
-                    <tr style={{ background: 'var(--color-primary)' }}>
-                      {rndStructuredColumns.map((col, ci) => (
-                        <th key={ci} style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'left', color: 'var(--color-white)', fontWeight: 700, whiteSpace: 'nowrap' }}>
-                          {col}
-                        </th>
-                      ))}
-                      <th style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'left', color: 'var(--color-white)', fontWeight: 700, whiteSpace: 'nowrap' }}>PDF</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {rndStructuredRows.map((row, ri) => (
-                      <tr key={ri} style={{ background: ri % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)', borderBottom: '1px solid var(--color-light-gray)' }}>
-                        {rndStructuredColumns.map((_, ci) => (
-                          <td key={ci} style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)', lineHeight: 1.5 }}>
-                            {row.cells[ci] ?? ''}
-                          </td>
+              <div className="dept-rnd-table-group">
+                <div className="pb-activities-scroll" role="region" aria-label="Funded Projects & Patents" tabIndex={0}>
+                  <table>
+                    <thead>
+                      <tr>
+                        {rndStructuredColumns.map((col, ci) => (
+                          <th key={ci} scope="col">{col}</th>
                         ))}
-                        <td style={{ padding: 'var(--space-3) var(--space-4)' }}>
-                          {row.pdfUrl ? (
-                            <a href={row.pdfUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-primary)', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                              <FileText size={14} strokeWidth={2} /> View
-                            </a>
-                          ) : '—'}
-                        </td>
+                        <th scope="col">PDF</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {rndStructuredRows.map((row, ri) => (
+                        <tr key={ri}>
+                          {rndStructuredColumns.map((_, ci) => (
+                            <td key={ci}>{row.cells[ci] ?? ''}</td>
+                          ))}
+                          <td>
+                            {row.pdfUrl ? (
+                              <a href={row.pdfUrl} target="_blank" rel="noopener noreferrer" className="dept-rnd-view-link">
+                                <FileText size={13} strokeWidth={2.2} /> View
+                              </a>
+                            ) : '—'}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
             {rndProjectCategories.map((cat, ci) => (
-              <div key={ci} style={{ marginBottom: ci < rndProjectCategories.length - 1 ? 'var(--space-10)' : (rndLinks.length > 0 ? 'var(--space-8)' : 0) }}>
+              <div key={ci} className="dept-rnd-table-group">
                 {cat.title && (
-                  <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>
-                    {cat.title}
-                  </h3>
+                  <h3 className="dept-rnd-table-title">{cat.title}</h3>
                 )}
                 <div className="thrust-accordion">
                   {cat.projects.map((project, pi) => {
@@ -1768,31 +1793,31 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                         </button>
                         <div id={`rnd-project-${key}`} className="thrust-accordion-collapse">
                           <div className="thrust-accordion-collapse-inner">
-                            <div style={{ padding: 'var(--space-4) var(--space-5)' }}>
+                            <div className="dept-rnd-project-body">
                               {project.fields.length > 0 && (
-                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 'var(--space-2) var(--space-5)', marginBottom: project.outcomes.length > 0 ? 'var(--space-4)' : 0 }}>
+                                <div className="dept-rnd-project-fields">
                                   {project.fields.map((f, fi) => (
-                                    <div key={fi} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.5 }}>
-                                      <strong style={{ color: 'var(--color-primary)' }}>{f.label}:</strong>{' '}
-                                      {f.href ? (
-                                        <a href={f.href} download target="_blank" rel="noopener noreferrer" className="thrust-accordion-link">{f.value}</a>
-                                      ) : (
-                                        f.value
-                                      )}
+                                    <div key={fi} className="dept-rnd-project-field">
+                                      <span className="dept-rnd-project-field-label">{f.label}</span>
+                                      <span className="dept-rnd-project-field-value">
+                                        {f.href ? (
+                                          <a href={f.href} download target="_blank" rel="noopener noreferrer" className="thrust-accordion-link">{f.value}</a>
+                                        ) : (
+                                          f.value
+                                        )}
+                                      </span>
                                     </div>
                                   ))}
                                 </div>
                               )}
                               {project.outcomes.length > 0 && (
-                                <div>
-                                  <strong style={{ fontSize: 'var(--text-sm)', color: 'var(--color-primary)', display: 'block', marginBottom: 'var(--space-2)' }}>
-                                    Outcome
-                                  </strong>
-                                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                                <div className="dept-rnd-outcomes">
+                                  <span className="dept-rnd-outcomes-title">Outcome</span>
+                                  <ul className="dept-rnd-outcomes-list">
                                     {project.outcomes.map((o, oi) => (
-                                      <li key={oi} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-2)' }}>
-                                        <Check size={13} strokeWidth={2.5} style={{ color: 'var(--color-accent)', flexShrink: 0, marginTop: 3 }} />
-                                        <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.5 }}>{o}</span>
+                                      <li key={oi} className="dept-rnd-outcome-item">
+                                        <Check size={13} strokeWidth={2.5} />
+                                        <span>{o}</span>
                                       </li>
                                     ))}
                                   </ul>
@@ -1807,21 +1832,24 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                 </div>
               </div>
             ))}
-            {rndLinks.length > 0 && (
-              <ul className="annual-reports-list">
-                {rndLinks.map((link, li) => (
-                  <li key={li}>
-                    <a href={link.pdfUrl} target="_blank" rel="noopener noreferrer" className="annual-reports-link">
-                      <FileText size={14} strokeWidth={2} className="annual-reports-icon" />
-                      {link.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            )}
+                  {rndLinks.length > 0 && (
+                    <ul className="annual-reports-list">
+                      {rndLinks.map((link, li) => (
+                        <li key={li}>
+                          <a href={link.pdfUrl} target="_blank" rel="noopener noreferrer" className="annual-reports-link">
+                            <FileText size={14} strokeWidth={2} className="annual-reports-icon" />
+                            {link.label}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
-        </section>
-      )}
+        </div>
+      </section>
 
       <CustomSectionsRenderer sections={visibleCustomSections} navOffset={NAV_OFFSET} />
 

@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { FileText, Link2, X } from 'lucide-react';
+import { FileText, Link2, X, ChevronDown } from 'lucide-react';
 import { hasCustomSectionContent, type CustomSection, type CustomSectionPhoto } from '../../lib/customSections';
 import { parseFlexibleTable, parseLinkList } from '../../lib/structuredTable';
 import FlexibleTable from '../FlexibleTable/FlexibleTable';
 import SmoothCollapse from '../SmoothCollapse/SmoothCollapse';
 import { linkify } from '../../lib/linkify';
+import './CustomSectionsRenderer.css';
 
 // Renders admin-defined custom sections (see lib/customSections.ts).
 // No .reveal/scroll-reveal classes anywhere here — gated behind
@@ -36,7 +37,7 @@ export default function CustomSectionsRenderer({ sections, navOffset = DEFAULT_N
   return (
     <>
       {visible.map((section, index) => (
-        <section key={section.id} id={section.id} className={`section ${index % 2 === 0 ? 'bg-white' : 'bg-off-white'}`} style={{ scrollMarginTop: navOffset }}>
+        <section key={`${section.id}-${index}`} id={section.id} className={`section ${index % 2 === 0 ? 'bg-white' : 'bg-off-white'}`} style={{ scrollMarginTop: navOffset }}>
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
               <span className="section-label">Details</span>
@@ -57,21 +58,21 @@ export default function CustomSectionsRenderer({ sections, navOffset = DEFAULT_N
 // Vision/Mission/Objectives blocks used, instead of a full boxed section.
 export function CustomSectionsIntro({ sections }: { sections: CustomSection[] }) {
   const visible = sections.filter((s) => s.placement === 'intro' && hasCustomSectionContent(s));
+  if (visible.length === 0) return null;
   return (
-    <>
-      {visible.map((section) => (
-        <div key={section.id} style={{ marginTop: 'var(--space-6)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-3)' }}>
-            <div style={{ width: 4, height: 24, background: 'var(--color-accent)', borderRadius: 'var(--radius-full)', flexShrink: 0, alignSelf: 'flex-start', marginTop: 2 }} />
-            <div>
-              <h3 style={{ fontSize: '1.25rem', margin: 0, fontWeight: section.boldHeading ? 800 : undefined }}>{section.label}</h3>
-              <SectionSubtitle subtitle={section.subtitle} />
-            </div>
+    <div className="dh-brief-grid">
+      {visible.map((section, index) => (
+        <div key={`${section.id}-${index}`} className="dh-brief">
+          <div className="dh-brief__label" style={section.boldHeading ? { fontWeight: 900 } : undefined}>
+            {section.label}
           </div>
-          <SectionSubtree section={section} />
+          <SectionSubtitle subtitle={section.subtitle} />
+          <div className="dh-brief__body">
+            <SectionSubtree section={section} />
+          </div>
         </div>
       ))}
-    </>
+    </div>
   );
 }
 
@@ -116,15 +117,14 @@ export function CustomSectionsPlain({ sections }: { sections: CustomSection[] })
         }
         const section = run.item;
         return (
-          <div key={section.id} style={{ marginTop: i === 0 ? 0 : 'var(--space-6)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-3)' }}>
-              <div style={{ width: 4, height: 24, background: 'var(--color-accent)', borderRadius: 'var(--radius-full)', flexShrink: 0, alignSelf: 'flex-start', marginTop: 2 }} />
-              <div>
-                <h3 style={{ fontSize: '1.25rem', margin: 0, fontWeight: section.boldHeading ? 800 : undefined }}>{section.label}</h3>
-                <SectionSubtitle subtitle={section.subtitle} />
-              </div>
+          <div key={`${section.id}-${i}`} className="dh-brief" style={{ marginTop: i === 0 ? 0 : 'var(--space-6)' }}>
+            <div className="dh-brief__label" style={section.boldHeading ? { fontWeight: 900 } : undefined}>
+              {section.label}
             </div>
-            <SectionSubtree section={section} />
+            <SectionSubtitle subtitle={section.subtitle} />
+            <div className="dh-brief__body">
+              <SectionSubtree section={section} />
+            </div>
           </div>
         );
       })}
@@ -146,7 +146,7 @@ function PersonPanelList({ people }: { people: CustomSection[] }) {
         const isOpen = openIndex === i;
         const hasBio = !!person.textContent?.trim();
         return (
-          <div key={person.id}>
+          <div key={`${person.id}-${i}`}>
             <button
               type="button"
               onClick={() => hasBio && setOpenIndex(isOpen ? null : i)}
@@ -208,31 +208,23 @@ export function CustomSectionsAccordion({ sections }: { sections: CustomSection[
   if (visible.length === 0) return null;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 2, marginTop: 'var(--space-6)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', marginTop: 'var(--space-6)' }}>
       {visible.map((section, i) => {
         const isOpen = openIndex === i;
         return (
-          <div key={section.id}>
+          <div key={`${section.id}-${i}`} className={`cs-accordion-item${isOpen ? ' is-open' : ''}`}>
             <button
               type="button"
+              className="cs-accordion-trigger"
               onClick={() => setOpenIndex(isOpen ? null : i)}
-              style={{
-                width: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                background: isOpen ? 'var(--color-primary)' : 'var(--color-off-white)',
-                border: 'none',
-                padding: 'var(--space-3) var(--space-5)',
-                cursor: 'pointer',
-                textAlign: 'left',
-              }}
+              aria-expanded={isOpen}
             >
-              <span style={{ fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-primary)', fontSize: 'var(--text-base)' }}>{section.label}</span>
-              <span style={{ fontSize: '1.2rem', fontWeight: 700, color: isOpen ? 'var(--color-white)' : 'var(--color-text)', lineHeight: 1 }}>{isOpen ? '−' : '+'}</span>
+              <span className="cs-accordion-num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+              <span className="cs-accordion-title">{section.label}</span>
+              <ChevronDown size={18} strokeWidth={2.25} className="cs-accordion-chevron" aria-hidden="true" />
             </button>
             <SmoothCollapse open={isOpen}>
-              <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderTop: 'none' }}>
+              <div className="cs-accordion-body">
                 <SectionSubtree section={section} />
               </div>
             </SmoothCollapse>
@@ -279,12 +271,12 @@ export function SectionSubtree({ section, depth = 0, navOffset = DEFAULT_NAV_OFF
   return (
     <div>
       {body}
-      {visibleSubs.map((sub) => (
+      {visibleSubs.map((sub, subIndex) => (
         // id+scrollMarginTop lets a Quick Links entry for this subsection
         // (see toQuickLinkItems in lib/customSections.ts) jump straight to
         // it with a plain anchor — every stacked subsection is always in the
         // DOM, unlike a pill's, which needs PillSwitcher's hash-sync below.
-        <div key={sub.id} id={sub.id} style={{ marginTop: depth === 0 ? 'var(--space-6)' : 'var(--space-4)', scrollMarginTop: navOffset }}>
+        <div key={`${sub.id}-${subIndex}`} id={sub.id} style={{ marginTop: depth === 0 ? 'var(--space-6)' : 'var(--space-4)', scrollMarginTop: navOffset }}>
           <h4 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: sub.boldHeading ? 800 : 700, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>
             {sub.label}
           </h4>
@@ -338,11 +330,11 @@ function PillSwitcher({ sections, depth = 0, navOffset = DEFAULT_NAV_OFFSET }: {
   return (
     <div id={active.id} style={{ scrollMarginTop: navOffset }}>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)', marginBottom: 'var(--space-6)' }}>
-        {sections.map((s) => {
+        {sections.map((s, sIndex) => {
           const isActive = active.id === s.id;
           return (
             <button
-              key={s.id}
+              key={`${s.id}-${sIndex}`}
               type="button"
               onClick={() => setActiveId(s.id)}
               style={{
@@ -363,14 +355,13 @@ function PillSwitcher({ sections, depth = 0, navOffset = DEFAULT_NAV_OFFSET }: {
         })}
       </div>
       <div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-3)' }}>
-          <div style={{ width: 4, height: 24, background: 'var(--color-accent)', borderRadius: 'var(--radius-full)', flexShrink: 0, alignSelf: 'flex-start', marginTop: 2 }} />
-          <div>
-            <h3 style={{ fontSize: '1.25rem', margin: 0, fontWeight: active.boldHeading ? 800 : undefined }}>{active.label}</h3>
-            <SectionSubtitle subtitle={active.subtitle} />
-          </div>
+        <div className="dh-brief__label" style={active.boldHeading ? { fontWeight: 900 } : undefined}>
+          {active.label}
         </div>
-        <SectionSubtree section={active} depth={depth} navOffset={navOffset} />
+        <SectionSubtitle subtitle={active.subtitle} />
+        <div style={{ marginTop: 'var(--space-3)' }}>
+          <SectionSubtree section={active} depth={depth} navOffset={navOffset} />
+        </div>
       </div>
     </div>
   );

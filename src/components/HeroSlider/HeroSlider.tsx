@@ -5,13 +5,13 @@ import { usePageBanners } from '../../hooks/usePageBanners';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
 import './HeroSlider.css';
 
-// Served from public/ (not imported as a JS module) so this ~27MB file never
+// Served from public/ (not imported as a JS module) so this ~61MB file never
 // enters Vite's module graph or gets processed/hashed on every build. It's
 // still a genuinely large download — re-encoding it to a smaller bitrate
 // with an external tool (ffmpeg/HandBrake) would help more than anything
 // done here — but deferring the fetch (below) at least keeps it from
 // competing with the JS bundle for bandwidth during initial page load.
-const HERO_VIDEO_SRC = '/HERO-VIDEO.mp4';
+const HERO_VIDEO_SRC = '/VWU%20CAMPUS-BVRM.mp4';
 
 
 interface Slide {
@@ -39,7 +39,7 @@ function buildStaticSlides(btechCount: string): Slide[] {
       heading: 'Empowering.\nWomen.\nThrough Tech.',
       description: 'VWU equips women with rigorous engineering education, research opportunities, and the practical skills that top employers demand.',
       primaryCta: { label: 'Schedule a Visit', path: '/contact' },
-      secondaryCta: { label: 'Apply Now', path: '/admissions' },
+      secondaryCta: { label: 'Apply Now', path: '/apply-now' },
     },
     {
       id: 2,
@@ -55,7 +55,7 @@ function buildStaticSlides(btechCount: string): Slide[] {
       heading: 'Learn, Grow\nand Excel',
       description: "VWU is more than a degree — it is a community where you build real skills, lasting connections, and the confidence to lead in your chosen field.",
       primaryCta: { label: 'Campus Life', path: '/student-life' },
-      secondaryCta: { label: 'Apply Now', path: '/admissions' },
+      secondaryCta: { label: 'Apply Now', path: '/apply-now' },
     },
     {
       id: 4,
@@ -71,7 +71,7 @@ function buildStaticSlides(btechCount: string): Slide[] {
       heading: "The First Private\nWomen's University\nin the Telugu States",
       description: 'Vishnu Women\'s University is the first private university exclusively for women across the Telugu states — built to give women a dedicated space to lead in engineering, technology, and research.',
       primaryCta: { label: 'Explore VWU', path: '/about' },
-      secondaryCta: { label: 'Apply Now', path: '/admissions' },
+      secondaryCta: { label: 'Apply Now', path: '/apply-now' },
     },
   ];
 }

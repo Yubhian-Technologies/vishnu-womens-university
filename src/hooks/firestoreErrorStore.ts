@@ -25,6 +25,13 @@ export function clearFirestoreError(id: string) {
   if (errors.delete(id)) notify();
 }
 
+/** Clears all current Firestore error banner notices. */
+export function clearAllFirestoreErrors() {
+  if (errors.size === 0) return;
+  errors.clear();
+  notify();
+}
+
 export function useFirestoreErrors(): string[] {
   const [, setTick] = useState(0);
   useEffect(() => {

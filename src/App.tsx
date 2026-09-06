@@ -10,33 +10,45 @@ import IntroVideo from './components/IntroVideo/IntroVideo';
 import RouteFallback from './components/RouteFallback/RouteFallback';
 import SEO from './components/SEO/SEO';
 import ThemeOverrides from './components/ThemeOverrides/ThemeOverrides';
+import FirestoreErrorBanner from './components/FirestoreErrorBanner/FirestoreErrorBanner';
+import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
 import { smoothScrollTo } from './lib/smoothScroll';
 
 // A failed dynamic import() is almost always a stale chunk after a new deploy:
 // the previous build's hashed filenames 404, and React surfaces that inside
 // <Suspense> as a blank white page that only a manual refresh clears. Here we
 // do that refresh automatically — one hard reload pulls a fresh index.html
-// with current hashes. The sessionStorage guard stops a reload loop if the
-// import keeps failing for some other reason (then the error propagates).
+// with current hashes.
+// Both attempts are also time-bounded: a chunk request that neither resolves
+// nor rejects (stalled network, stuck service worker) would otherwise leave
+// the route transition pending forever — the same "must hard-refresh" symptom.
+// A timeout turns that hang into an ordinary failure, flowing into the
+// retry → reload path below.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('Dynamic import timed out')), ms),
+    ),
+  ]);
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function lazyWithRetry<T extends ComponentType<any>>(factory: () => Promise<{ default: T }>) {
-  const KEY = 'chunk-reload';
   return lazy(async () => {
     try {
-      const mod = await factory();
-      try { sessionStorage.removeItem(KEY); } catch { /* private mode */ }
-      return mod;
+      return await withTimeout(factory(), 20000);
     } catch (err) {
-      let retried = true;
+      console.warn('Lazy chunk import failed or timed out, retrying...', err);
       try {
-        retried = sessionStorage.getItem(KEY) === '1';
-        if (!retried) sessionStorage.setItem(KEY, '1');
-      } catch { retried = true; }
-      if (!retried) {
+        await new Promise((r) => setTimeout(r, 200));
+        return await withTimeout(factory(), 20000);
+      } catch (retryErr) {
+        console.error('Lazy chunk import failed twice, auto-reloading page:', retryErr);
         window.location.reload();
-        return new Promise<{ default: T }>(() => {}); // hold until the reload
+        return new Promise<{ default: T }>(() => {});
       }
-      throw err;
     }
   });
 }
@@ -69,6 +81,8 @@ const MousGroupDetail = lazyWithRetry(() => import('./pages/Research/MousGroupDe
 const AboutSVES = lazyWithRetry(() => import('./pages/AboutSVES/AboutSVES'));
 const Campus = lazyWithRetry(() => import('./pages/Campus/Campus'));
 const CampusLifeDetail = lazyWithRetry(() => import('./pages/CampusLife/CampusLifeDetail'));
+const SewageTreatment = lazyWithRetry(() => import('./pages/Campus/SewageTreatment'));
+const WellnessCenter = lazyWithRetry(() => import('./pages/Campus/WellnessCenter'));
 const Information = lazyWithRetry(() => import('./pages/Information/Information'));
 const ProgrammesFee = lazyWithRetry(() => import('./pages/Admissions/ProgrammesFee'));
 const AdmissionProcedure = lazyWithRetry(() => import('./pages/Admissions/AdmissionProcedure'));
@@ -86,6 +100,7 @@ const GalleryPage = lazyWithRetry(() => import('./pages/NewsAwards/Gallery'));
 const SocialMedia = lazyWithRetry(() => import('./pages/NewsAwards/SocialMedia'));
 const Careers = lazyWithRetry(() => import('./pages/Careers/Careers'));
 const Contact = lazyWithRetry(() => import('./pages/Contact/Contact'));
+const ApplyNow = lazyWithRetry(() => import('./pages/ApplyNow/ApplyNow'));
 const UGCDisclosure = lazyWithRetry(() => import('./pages/Disclosures/UGCDisclosure'));
 const AicteFeedback = lazyWithRetry(() => import('./pages/AicteFeedback/AicteFeedback'));
 const AntiRagging = lazyWithRetry(() => import('./pages/AntiRagging/AntiRagging'));
@@ -109,6 +124,8 @@ function ScrollToTop() {
 }
 
 function PublicApp() {
+  const location = useLocation();
+
   return (
     <>
       <ScrollToTop />
@@ -118,67 +135,76 @@ function PublicApp() {
           No lag, no second loading screen behind the video. */}
       <IntroVideo />
       <Header />
-      <Suspense fallback={<RouteFallback />}>
-        <Routes>
-          <Route path="/" element={<LandingPageLoader />} />
-          <Route path="/academics" element={<Academics />} />
-          <Route path="/academics/downloads" element={<AcademicDownloads />} />
-          <Route path="/academics/curriculum" element={<CurriculumMatrix />} />
-          <Route path="/academics/freshman-engineering" element={<FreshmanEngineering />} />
-          <Route path="/academics/schools" element={<Schools />} />
-          <Route path="/academics/departments" element={<Departments />} />
-          <Route path="/academics/programs" element={<Programs />} />
-          <Route path="/academics/:slug" element={<ProgramDetail />} />
-          <Route path="/faculty" element={<Faculty />} />
-          <Route path="/faculty/:id" element={<FacultyProfile />} />
-          <Route path="/admissions" element={<Admissions />} />
-          <Route path="/campus-visit" element={<CampusVisit />} />
-          <Route path="/student-life" element={<StudentLife />} />
-          <Route path="/alumni-giving" element={<AlumniGiving />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/vision-mission" element={<VisionMission />} />
-          <Route path="/governance" element={<Governance />} />
-          <Route path="/governance/governing-body" element={<GoverningBody />} />
-          <Route path="/governance/:slug" element={<GovernanceDetail />} />
-          <Route path="/research" element={<Research />} />
-          <Route path="/research/:slug" element={<ResearchDetail />} />
-          <Route path="/research/professional-bodies/:key" element={<ProfessionalBodyDetail />} />
-          <Route path="/research/mous/:group" element={<MousGroupDetail />} />
-          <Route path="/about-sves" element={<AboutSVES />} />
-          <Route path="/campus" element={<Campus />} />
-          <Route path="/campus/:slug" element={<CampusLifeDetail />} />
-          <Route path="/information" element={<Information />} />
-          <Route path="/programmes-fee-structure" element={<ProgrammesFee />} />
-          <Route path="/admission-procedure" element={<AdmissionProcedure />} />
-          <Route path="/result-analysis" element={<ResultAnalysis />} />
-          <Route path="/vishnu-tv-academy" element={<CampusLifeDetail slug="vishnu-tv-academy" />} />
-          <Route path="/student-clubs" element={<StudentClubs />} />
-          <Route path="/student-clubs/:slug" element={<StudentClubDetail />} />
-          <Route path="/social-services" element={<CampusLifeDetail slug="social-services" />} />
-          <Route path="/campus-magazines" element={<CampusLifeDetail slug="campus-magazines" />} />
-          <Route path="/arts-culture" element={<CampusLifeDetail slug="arts-culture" />} />
-          <Route path="/sports-games" element={<CampusLifeDetail slug="sports-games" />} />
-          <Route path="/differentiators" element={<Differentiators />} />
-          <Route path="/differentiators/:slug" element={<DifferentiatorDetail />} />
-          <Route path="/placements" element={<Placements />} />
-          <Route path="/placements/:slug" element={<PlacementDetail />} />
-          <Route path="/news" element={<News />} />
-          <Route path="/events" element={<Events />} />
-          <Route path="/news-awards" element={<NewsAwards />} />
-          <Route path="/news-awards/happenings" element={<Happenings />} />
-          <Route path="/news-awards/accreditations-awards" element={<Accreditations />} />
-          <Route path="/news-awards/gallery" element={<GalleryPage />} />
-          <Route path="/news-awards/social-media-handles" element={<SocialMedia />} />
-          <Route path="/careers" element={<Careers />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/disclosures/ugc" element={<UGCDisclosure />} />
-          <Route path="/aicte-feedback-facility" element={<AicteFeedback />} />
-          <Route path="/anti-ragging" element={<AntiRagging />} />
-          <Route path="/policies-procedures" element={<PoliciesProcedures />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Suspense>
-      <Footer />
+      <ErrorBoundary>
+        <Suspense fallback={<RouteFallback />}>
+          <Routes location={location}>
+            <Route path="/" element={<LandingPageLoader />} />
+            <Route path="/academics" element={<Academics />} />
+            <Route path="/academics/downloads" element={<AcademicDownloads />} />
+            <Route path="/academics/curriculum" element={<CurriculumMatrix />} />
+            <Route path="/academics/freshman-engineering" element={<FreshmanEngineering />} />
+            <Route path="/academics/schools" element={<Schools />} />
+            <Route path="/academics/departments" element={<Departments />} />
+            <Route path="/academics/programs" element={<Programs />} />
+            <Route path="/academics/:slug" element={<ProgramDetail />} />
+            <Route path="/faculty" element={<Faculty />} />
+            <Route path="/faculty/:id" element={<FacultyProfile />} />
+            <Route path="/admissions" element={<Admissions />} />
+            <Route path="/campus-visit" element={<CampusVisit />} />
+            <Route path="/student-life" element={<StudentLife />} />
+            <Route path="/alumni-giving" element={<AlumniGiving />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/vision-mission" element={<VisionMission />} />
+            <Route path="/governance" element={<Governance />} />
+            <Route path="/governance/governing-body" element={<GoverningBody />} />
+            <Route path="/governance/:slug" element={<GovernanceDetail />} />
+            <Route path="/research" element={<Research />} />
+            <Route path="/research/:slug" element={<ResearchDetail />} />
+            <Route path="/research/professional-bodies/:key" element={<ProfessionalBodyDetail />} />
+            <Route path="/research/mous/:group" element={<MousGroupDetail />} />
+            <Route path="/about-sves" element={<AboutSVES />} />
+            <Route path="/campus" element={<Campus />} />
+            {/* Static segment declared alongside the /campus/:slug catch-all —
+                React Router ranks the literal path higher, so this page (whose
+                content lives in code, not the campusLifeItems collection)
+                renders instead of CampusLifeDetail redirecting to /campus. */}
+            <Route path="/campus/sewage-treatment-plants" element={<SewageTreatment />} />
+            <Route path="/campus/wellness-center" element={<WellnessCenter />} />
+            <Route path="/campus/:slug" element={<CampusLifeDetail />} />
+            <Route path="/information" element={<Information />} />
+            <Route path="/programmes-fee-structure" element={<ProgrammesFee />} />
+            <Route path="/admission-procedure" element={<AdmissionProcedure />} />
+            <Route path="/result-analysis" element={<ResultAnalysis />} />
+            <Route path="/vishnu-tv-academy" element={<CampusLifeDetail slug="vishnu-tv-academy" />} />
+            <Route path="/student-clubs" element={<StudentClubs />} />
+            <Route path="/student-clubs/:slug" element={<StudentClubDetail />} />
+            <Route path="/social-services" element={<CampusLifeDetail slug="social-services" />} />
+            <Route path="/campus-magazines" element={<CampusLifeDetail slug="campus-magazines" />} />
+            <Route path="/arts-culture" element={<CampusLifeDetail slug="arts-culture" />} />
+            <Route path="/sports-games" element={<CampusLifeDetail slug="sports-games" />} />
+            <Route path="/differentiators" element={<Differentiators />} />
+            <Route path="/differentiators/:slug" element={<DifferentiatorDetail />} />
+            <Route path="/placements" element={<Placements />} />
+            <Route path="/placements/:slug" element={<PlacementDetail />} />
+            <Route path="/news" element={<News />} />
+            <Route path="/events" element={<Events />} />
+            <Route path="/news-awards" element={<NewsAwards />} />
+            <Route path="/news-awards/happenings" element={<Happenings />} />
+            <Route path="/news-awards/accreditations-awards" element={<Accreditations />} />
+            <Route path="/news-awards/gallery" element={<GalleryPage />} />
+            <Route path="/news-awards/social-media-handles" element={<SocialMedia />} />
+            <Route path="/careers" element={<Careers />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/apply-now" element={<ApplyNow />} />
+            <Route path="/disclosures/ugc" element={<UGCDisclosure />} />
+            <Route path="/aicte-feedback-facility" element={<AicteFeedback />} />
+            <Route path="/anti-ragging" element={<AntiRagging />} />
+            <Route path="/policies-procedures" element={<PoliciesProcedures />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
+      </ErrorBoundary>
+      {location.pathname !== '/apply-now' && <Footer />}
     </>
   );
 }
@@ -242,6 +268,7 @@ function RootRouter() {
           — Admin.css never reads these variables, it's a separate hardcoded
           design system (see CLAUDE.md). */}
       <ThemeOverrides />
+      <FirestoreErrorBanner />
       <Routes>
         {/* Admin shell is matched by react-router's own segment-aware routing
             (not a manual pathname.startsWith check, which would also match

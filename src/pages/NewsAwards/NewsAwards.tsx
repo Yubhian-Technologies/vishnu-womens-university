@@ -132,7 +132,7 @@ export default function NewsAwards() {
               Join a university that earns its recognition every year through student achievement, research, and institutional excellence.
             </p>
             <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Link to="/admissions" className="btn btn-accent">Apply Now</Link>
+              <Link to="/apply-now" className="btn btn-accent">Apply Now</Link>
               <Link to="/differentiators" className="btn btn-secondary">Our Differentiators</Link>
             </div>
           </div>

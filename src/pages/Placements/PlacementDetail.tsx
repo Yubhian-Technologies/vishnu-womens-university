@@ -840,6 +840,13 @@ export default function PlacementDetail() {
   const [sidebarChartBatch, setSidebarChartBatch] = useState('');
   const sidebarChartYear = placementYearData.find((y) => y.batch === sidebarChartBatch);
 
+  useEffect(() => {
+    setActiveTableRow(null);
+    setInternYearFilter('All');
+    setInternPage(0);
+    setSidebarChartBatch('');
+  }, [slug]);
+
   // No scroll-reveal here — this page's content only renders once the
   // Firestore-backed `item` has loaded (see the gotcha documented in CLAUDE.md).
   useEffect(() => {
@@ -885,8 +892,8 @@ export default function PlacementDetail() {
   // than falling back to treating tableText's own first row as the header
   // when it's blank) means a not-yet-configured page just shows nothing,
   // instead of quietly mistaking a real data row for the header again.
-  const flexibleSections = item.slug === 'placement-highlights' && item.dataTableHeadersText.trim()
-    ? parseFlexibleTable(`${item.dataTableHeadersText}\n${item.tableText}`)
+  const flexibleSections = item.slug === 'placement-highlights' && (item.dataTableHeadersText || '').trim()
+    ? parseFlexibleTable(`${item.dataTableHeadersText || ''}\n${item.tableText || ''}`)
     : [];
   const flexibleHeaders = flexibleSections[0]?.headers ?? [];
   const flexibleRows = flexibleSections.flatMap((s) => s.rows);
@@ -989,40 +996,50 @@ export default function PlacementDetail() {
   return (
     <main className="page-wrapper">
       {/* Hero */}
-      <section className="page-hero" style={{ minHeight: 360 }}>
-        {heroVideo ? (
-          <video
-            src={heroVideo}
-            poster={heroImage || undefined}
-            className="page-hero-image"
-            autoPlay
-            muted
-            loop
-            playsInline
-          />
-        ) : heroImage && (
-          <img
-            src={heroImage}
-            alt={item.title}
-            className="page-hero-image"
-            loading="eager"
-            decoding="sync"
-            {...fetchPriorityAttr('high')}
-          />
-        )}
-        <div className="page-hero-overlay" />
-        <div className="container page-hero-content">
-          <div className="breadcrumb animate-fade-in">
-            <Link to="/" className="breadcrumb-item">Home</Link>
-            <span className="breadcrumb-sep">›</span>
-            <Link to="/placements" className="breadcrumb-item">Placements</Link>
-            <span className="breadcrumb-sep">›</span>
-            <span className="breadcrumb-item active">{item.title}</span>
+      <section className="dept-hero-section">
+        <div className="container">
+          <div className="dept-hero-card">
+            {heroVideo ? (
+              <video
+                src={heroVideo}
+                poster={heroImage || undefined}
+                className="dept-hero-bg-video"
+                autoPlay
+                muted
+                loop
+                playsInline
+              />
+            ) : heroImage && (
+              <img
+                src={heroImage}
+                alt={item.title}
+                className="dept-hero-bg-img"
+                loading="eager"
+                decoding="sync"
+                {...fetchPriorityAttr('high')}
+              />
+            )}
+            <div className="dept-hero-overlay" />
+            <div className="dept-hero-content">
+              <div className="breadcrumb animate-fade-in" style={{ marginBottom: '0.8rem' }}>
+                <Link to="/" className="breadcrumb-item">Home</Link>
+                <span className="breadcrumb-sep">›</span>
+                <Link to="/placements" className="breadcrumb-item">Placements</Link>
+                <span className="breadcrumb-sep">›</span>
+                <span className="breadcrumb-item active">{item.title}</span>
+              </div>
+              <div className="animate-fade-in-up" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#C9973A', color: '#0B1E42', fontSize: 'var(--text-xs)', fontWeight: 800, padding: '0.35rem 0.9rem', borderRadius: '9999px', marginBottom: '0.8rem', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                <Icon size={14} /> Placements & Careers
+              </div>
+              <h1 className="dept-hero-title">{item.title}</h1>
+              {item.desc && (
+                <p className="dept-hero-subtitle">{item.desc}</p>
+              )}
+              <div className="dept-hero-cta">
+                <Link to="/apply-now" className="btn-hero-gold">Apply Now</Link>
+              </div>
+            </div>
           </div>
-          <div className="animate-fade-in-up" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'var(--color-accent)', color: 'var(--color-white)', fontSize: 'var(--text-xs)', fontWeight: 700, padding: '0.3rem 0.9rem', borderRadius: 'var(--radius-full)', marginBottom: 'var(--space-3)' }}>
-            <Icon size={16} /> Placements & Careers
-          </div>
-          <h1 className="animate-fade-in-up">{item.title}</h1>
         </div>
       </section>
 
@@ -1086,6 +1103,30 @@ export default function PlacementDetail() {
                     </span>
                   ))}
                 </p>
+              )}
+
+              {/* SVES network graphic — the society's ILO/campus map, shown
+                  above the per-office Regional Offices accordion below. Static
+                  asset (not admin-managed) since it's society-issued artwork,
+                  same as the /images/placements/* photos elsewhere. The
+                  onError hide keeps the page clean rather than showing a
+                  broken-image icon if the file isn't present. */}
+              {item.slug === 'industry-liaison-offices' && (
+                <img
+                  src="/images/placements/industry-liaison-offices.png"
+                  alt="Sri Vishnu Educational Society — Industry Liaison Offices, campuses and contact details across India"
+                  loading="lazy"
+                  onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+                  style={{
+                    display: 'block',
+                    width: '100%',
+                    maxWidth: 560,
+                    height: 'auto',
+                    margin: 'var(--space-8) auto 0',
+                    borderRadius: 'var(--radius-lg)',
+                    boxShadow: 'var(--shadow-md)',
+                  }}
+                />
               )}
             </div>
 
@@ -1442,7 +1483,7 @@ export default function PlacementDetail() {
             </h2>
             <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
               <Link to="/placements" className="btn btn-accent">Back to Placements</Link>
-              <Link to="/admissions" className="btn btn-secondary">Apply Now</Link>
+              <Link to="/apply-now" className="btn btn-secondary">Apply Now</Link>
             </div>
           </div>
         </div>

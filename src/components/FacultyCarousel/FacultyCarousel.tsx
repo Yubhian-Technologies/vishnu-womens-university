@@ -10,6 +10,7 @@ interface FacultyCarouselProps {
   departmentName?: string;
   title?: string;
   viewMoreLink?: string;
+  autoScrollInterval?: number;
 }
 
 function getInitials(name: string) {
@@ -20,40 +21,25 @@ function getInitials(name: string) {
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
-function getFacultySummary(f: FacultyDoc, departmentName?: string) {
+function getFacultySummary(f: FacultyDoc) {
   const expFact = f.facts?.find((x) => /experience/i.test(x.label))?.value;
   const specFact = f.facts?.find((x) => /specialization|interest|area/i.test(x.label))?.value;
   const pubFact = f.facts?.find((x) => /publication|paper/i.test(x.label))?.value;
-  const bioSection = f.sections?.find((s) => /summary|bio|about|profile/i.test(s.title));
-  const bioParagraph = bioSection?.blocks?.find((b) => b.type === 'paragraph')?.text;
-
-  let summaryText = '';
-  if (bioParagraph) {
-    summaryText = bioParagraph.slice(0, 150).trim() + (bioParagraph.length > 150 ? '...' : '');
-  } else if (f.specialization) {
-    summaryText = f.specialization;
-  } else if (specFact) {
-    summaryText = specFact;
-  } else if (f.qualification) {
-    summaryText = `${f.qualification} in ${f.department || departmentName || 'Engineering'}`;
-  } else {
-    summaryText = `Academician in ${f.department || departmentName || 'the department'}`;
-  }
 
   return {
     experience: expFact,
     specialization: f.specialization || specFact,
     qualification: f.qualification,
     publications: pubFact,
-    summaryText,
   };
 }
 
 export default function FacultyCarousel({
   faculty,
-  departmentName,
+  departmentName: _,
   title = 'Learn from our impactful faculty',
   viewMoreLink = '/faculty',
+  autoScrollInterval = 1000,
 }: FacultyCarouselProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -105,10 +91,10 @@ export default function FacultyCarousel({
       } else {
         scrollRef.current.scrollBy({ left: step, behavior: 'smooth' });
       }
-    }, 4000);
+    }, autoScrollInterval);
 
     return () => clearInterval(timer);
-  }, [faculty, isPaused]);
+  }, [faculty, isPaused, autoScrollInterval]);
 
   const pauseTemporarily = () => {
     setIsPaused(true);
@@ -179,7 +165,7 @@ export default function FacultyCarousel({
           aria-label="Faculty cards carousel"
         >
           {faculty.map((f) => {
-            const summary = getFacultySummary(f, departmentName);
+            const summary = getFacultySummary(f);
 
             return (
               <div key={f.id} className="faculty-impact-card-wrapper">
@@ -228,11 +214,7 @@ export default function FacultyCarousel({
                       )}
                     </div>
 
-                    {/* Real Professional Summary / Area */}
-                    <div className="faculty-impact-summary-wrap">
-                      <span className="faculty-impact-summary-label">Area of Expertise</span>
-                      <p className="faculty-impact-bio">{summary.summaryText}</p>
-                    </div>
+
 
                     {/* View Full Profile Action Button with Arrow Circle */}
                     <div className="faculty-impact-footer">

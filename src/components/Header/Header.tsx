@@ -6,17 +6,9 @@ import { useNavLinkOverride } from '../../hooks/useNavLinkOverride';
 import type { ProgramDoc } from '../../pages/Admin/sections/ProgramsAdmin';
 import { DIFFERENTIATOR_CATEGORIES } from '../../pages/Admin/sections/DifferentiatorsAdmin';
 import type { DifferentiatorItemDoc } from '../../pages/Admin/sections/DifferentiatorsAdmin';
-import type { PlacementItemDoc, PlacementMenuColumnDoc } from '../../pages/Admin/sections/PlacementItemsAdmin';
+import type { PlacementItemDoc } from '../../pages/Admin/sections/PlacementItemsAdmin';
 import SmoothCollapse from '../SmoothCollapse/SmoothCollapse';
 import './Header.css';
-
-// Pure-code safety net for the Placements mega-menu: used only if the
-// `placementMenuColumns` collection is genuinely empty (nobody has opened
-// Admin → Placements yet to trigger its auto-seed), so a first-time deploy
-// never shows an empty dropdown while waiting on that.
-const FALLBACK_PLACEMENT_MENU_COLUMNS: PlacementMenuColumnDoc[] = [
-  { id: 'explore', label: 'Explore Directory', order: 0 },
-];
 
 interface NavChild {
   label: string;
@@ -120,6 +112,7 @@ const navItemsData: NavItem[] = [
         groupLabel: 'Overview',
         groupPath: '/academics',
         items: [
+          { label: 'Schools', path: '/academics/schools' },
           { label: 'Departments', path: '/academics/departments' },
           { label: 'Programs', path: '/academics/programs' },
           { label: 'Faculty Directory', path: '/faculty' },
@@ -138,6 +131,8 @@ const navItemsData: NavItem[] = [
           { label: 'List of Holidays', path: '/information#holidays' },
           { label: 'Counselling Scheme', path: '/information#counselling' },
           { label: 'ICT Platforms', path: '/information#ict-platforms' },
+          { label: 'Smart Class Rooms', path: '/campus/smart-classrooms' },
+          { label: 'State-of-the-art Labs', path: '/campus/state-of-the-art-labs' },
           { label: 'Other Practices', path: '/information#other-practices' },
         ],
       },
@@ -187,9 +182,7 @@ const navItemsData: NavItem[] = [
       linkText: 'Placement Insights',
       linkPath: '/placements',
     },
-    // Populated below from the live `placementItems` collection, grouped by
-    // each item's admin-set menuColumn (see renderedNavItems).
-    groups: [],
+    children: [],
   },
   {
     label: 'Research',
@@ -240,26 +233,31 @@ const navItemsData: NavItem[] = [
       linkPath: '/campus/central-library',
     },
     children: [
-      { label: 'Smart Class Rooms', path: '/campus/smart-classrooms' },
-      { label: 'State-of-the-art Labs', path: '/campus/state-of-the-art-labs' },
       { label: 'Central Library', path: '/campus/central-library' },
       { label: 'Auditoriums & Amphitheaters', path: '/campus/auditoriums' },
       { label: 'Campus Book Stores', path: '/campus/campus-book-stores' },
       { label: 'Wi-Fi Campus', path: '/campus/wifi-campus' },
       { label: 'Campus Hostels', path: '/campus/campus-hostels' },
+      { label: 'Staff Quarters', path: '/campus/staff-quarters' },
       { label: 'Food Courts & Cafeterias', path: '/campus/food-courts' },
-      { label: 'VISHNU Fitness Centre', path: '/campus/fitness-centre' },
+      { label: 'Vishnu Fitness Centre', path: '/campus/fitness-centre' },
       { label: 'Health Care Centre', path: '/campus/health-care' },
+      { label: 'Campus Security', path: '/campus/campus-security' },
+      { label: 'Sewage Treatment Plants', path: '/campus/sewage-treatment-plants' },
+      { label: 'Wellness Center', path: '/campus/wellness-center' },
       { label: 'Swimming Pool & Sports', path: '/campus/swimming-pool' },
-      { label: 'Radio Vishnu 90.4', path: 'http://radiovishnu.com/', external: true },
+      { label: 'Travel Desk', path: '/campus/travel-desk' },
+      { label: 'Radio Vishnu 90.4', path: '/differentiators/radio-vishnu-diff' },
       { label: 'Vishnu TV Academy', path: '/vishnu-tv-academy' },
       { label: 'Student Clubs', path: '/student-clubs' },
       { label: 'Arts & Culture', path: '/arts-culture' },
+      { label: 'Temples', path: '/campus/temples' },
       { label: 'Sports & Games', path: '/sports-games' },
+      { label: 'Other Facilities', path: '/campus/other-facilities' },
     ],
   },
   {
-    label: 'News & Events',
+    label: 'Happenings',
     highlight: {
       title: 'Happenings & Accolades',
       badge: 'NAAC A+ & NBA',
@@ -269,7 +267,7 @@ const navItemsData: NavItem[] = [
     },
     groups: [
       {
-        groupLabel: 'News & Events',
+        groupLabel: 'Happenings',
         groupPath: '/news-awards',
         items: [
           { label: 'Upcoming Events', path: '/news-awards/happenings#upcoming-events' },
@@ -305,6 +303,37 @@ const navItemsData: NavItem[] = [
   },
 ];
 
+// ── Single source of truth: "does the main nav actually link here?" ──
+// The About page's "Explore VWU in Detail" cards use this so a card never
+// navigates somewhere the navbar itself won't send a visitor — unbuilt
+// pages are marked `disabled` in navItemsData, and external / download /
+// pure-hash targets aren't real in-app routes. Built lazily and cached.
+let _enabledNavPaths: Set<string> | null = null;
+export function isEnabledNavPath(path: string | undefined | null): boolean {
+  if (!path) return false;
+  const clean = path.split('#')[0];
+  if (!clean || clean.startsWith('http')) return false;
+  if (!_enabledNavPaths) {
+    const set = new Set<string>();
+    const add = (c: { path?: string; external?: boolean; download?: boolean; disabled?: boolean }) => {
+      if (!c.path || c.external || c.download || c.disabled) return;
+      if (c.path.startsWith('http')) return;
+      set.add(c.path.split('#')[0]);
+    };
+    for (const item of navItemsData) {
+      add(item);
+      if (item.highlight?.linkPath) add({ path: item.highlight.linkPath });
+      item.children?.forEach((ch) => { add(ch); ch.subItems?.forEach(add); });
+      item.groups?.forEach((g) => {
+        if (g.groupPath) set.add(g.groupPath.split('#')[0]);
+        g.items.forEach((it) => { add(it); it.subItems?.forEach(add); });
+      });
+    }
+    _enabledNavPaths = set;
+  }
+  return _enabledNavPaths.has(clean);
+}
+
 export default function Header() {
   const [mounted, setMounted] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -334,15 +363,15 @@ export default function Header() {
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Dynamic overrides and data hooks
-  const headerApplyNow = useNavLinkOverride('header-apply-now', '/admissions');
+  const headerApplyNow = useNavLinkOverride('header-apply-now', '/apply-now');
   const orgChart = useNavLinkOverride('header-organizational-chart', '/downloads/SVECWOrganizationChart.jpg');
 
   const { docs: programs } = useOrderedCollection<ProgramDoc>('programs', 'order');
   const isVlsiProgram = (p: ProgramDoc) =>
-    p.slug.toUpperCase() === 'EVT' || /VLSI|VSLI/.test(p.name.toUpperCase());
+    (p.slug || '').toUpperCase() === 'EVT' || /VLSI|VSLI/.test((p.name || '').toUpperCase());
   const programItem = (p: ProgramDoc): NavChild => ({
-    label: p.name,
-    path: isVlsiProgram(p) ? '/academics/ece' : `/academics/${p.slug}`,
+    label: p.name || p.slug || 'Programme',
+    path: isVlsiProgram(p) ? '/academics/ece' : p.slug ? `/academics/${p.slug}` : '/academics',
   });
   const ugProgrammes = programs.filter((p) => p.category === 'btech').map(programItem);
   const pgProgrammes = programs.filter((p) => p.category === 'mtech' || p.category === 'mba').map(programItem);
@@ -350,15 +379,6 @@ export default function Header() {
 
   const { docs: differentiatorItems } = useOrderedCollection<DifferentiatorItemDoc>('differentiatorItems', 'order');
   const { docs: placementItems } = useOrderedCollection<PlacementItemDoc>('placementItems', 'order');
-  // Admin-managed columns for the Placements mega-menu (add/rename/reorder
-  // in Admin → Placements). If nobody has ever opened that admin section
-  // yet (collection genuinely empty, not just still loading), fall back to
-  // a single column so the menu never renders empty — PlacementItemsAdmin
-  // auto-seeds the real 3 default columns the first time it's opened.
-  const { docs: placementMenuColumnsRaw } = useOrderedCollection<PlacementMenuColumnDoc>('placementMenuColumns', 'order');
-  const placementMenuColumns = placementMenuColumnsRaw.length > 0
-    ? placementMenuColumnsRaw
-    : FALLBACK_PLACEMENT_MENU_COLUMNS;
 
   // Entrance transition trigger (150ms after load)
   useEffect(() => {
@@ -456,27 +476,13 @@ export default function Header() {
       return { ...item, groups };
     }
     if (item.label === 'Placements') {
-      const toChild = (p: PlacementItemDoc): NavChild =>
-        p.external && p.url
-          ? { label: p.title, path: p.url, external: true }
-          : { label: p.title, path: `/placements/${p.slug}` };
-
-      // Group items by their admin-assigned column id. Anything unassigned,
-      // or pointing at a column that's since been deleted, falls back to
-      // whichever column currently sorts first — so an item never silently
-      // disappears from the menu just because its column went away.
-      const firstColumnId = placementMenuColumns[0]?.id;
-      const buckets = new Map<string, PlacementItemDoc[]>(placementMenuColumns.map((c) => [c.id, []]));
-      placementItems.forEach((p) => {
-        const colId = p.menuColumn && buckets.has(p.menuColumn) ? p.menuColumn : firstColumnId;
-        if (colId) buckets.get(colId)!.push(p);
-      });
-
       return {
         ...item,
-        groups: placementMenuColumns
-          .map((c) => ({ groupLabel: c.label, items: (buckets.get(c.id) ?? []).map(toChild) }))
-          .filter((g) => g.items.length > 0),
+        children: placementItems.map((p): NavChild =>
+          p.external && p.url
+            ? { label: p.title, path: p.url, external: true }
+            : { label: p.title, path: `/placements/${p.slug}` }
+        ),
       };
     }
     return item;
@@ -632,14 +638,14 @@ export default function Header() {
               >
                 <span>Apply Now</span>
                 <span className="navbar-cta-icon-wrap">
-                  <ArrowRight size={13} strokeWidth={2.5} aria-hidden="true" />
+                  <ArrowRight size={14.6} strokeWidth={2.5} aria-hidden="true" />
                 </span>
               </a>
             ) : (
               <Link to={headerApplyNow.path} className="navbar-cta-btn">
                 <span>Apply Now</span>
                 <span className="navbar-cta-icon-wrap">
-                  <ArrowRight size={13} strokeWidth={2.5} aria-hidden="true" />
+                  <ArrowRight size={14.6} strokeWidth={2.5} aria-hidden="true" />
                 </span>
               </Link>
             )}

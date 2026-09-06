@@ -14,6 +14,7 @@ import GoverningBodyAdmin from './sections/GoverningBodyAdmin';
 import CoreExecutivesAdmin from './sections/CoreExecutivesAdmin';
 import PlacementYearsAdmin from './sections/PlacementYearsAdmin';
 import PlacementHighlightsAdmin from './sections/PlacementHighlightsAdmin';
+import HonouredGuestsAdmin from './sections/HonouredGuestsAdmin';
 import AlumniAdmin from './sections/AlumniAdmin';
 import AnnouncementsAdmin from './sections/AnnouncementsAdmin';
 import InformationAdmin from './sections/InformationAdmin';
@@ -28,6 +29,7 @@ import SiteContactAdmin from './sections/SiteContactAdmin';
 import ContactMessagesAdmin from './sections/ContactMessagesAdmin';
 import CareerApplicationsAdmin from './sections/CareerApplicationsAdmin';
 import AdmissionInquiriesAdmin from './sections/AdmissionInquiriesAdmin';
+import AdmissionsCrmAdmin from './sections/AdmissionsCrmAdmin';
 import CampusVisitRequestsAdmin from './sections/CampusVisitRequestsAdmin';
 import SvesCampusesAdmin from './sections/SvesCampusesAdmin';
 import DownloadsAdmin from './sections/DownloadsAdmin';
@@ -103,6 +105,7 @@ const SECTION_MAP: Record<string, React.ReactNode> = {
   'core-executives': <CoreExecutivesAdmin />,
   placements: <PlacementYearsAdmin />,
   'placement-highlights': <PlacementHighlightsAdmin />,
+  'honoured-guests': <HonouredGuestsAdmin />,
   alumni: <AlumniAdmin />,
   announcements: <AnnouncementsAdmin />,
   information: <InformationAdmin />,
@@ -114,6 +117,7 @@ const SECTION_MAP: Record<string, React.ReactNode> = {
   'content-blocks': <ContentBlocksAdmin />,
   contacts: <ContactsAdmin />,
   'site-contact': <SiteContactAdmin />,
+  crm: <AdmissionsCrmAdmin />,
   'contact-messages': <ContactMessagesAdmin />,
   'career-applications': <CareerApplicationsAdmin />,
   'admission-inquiries': <AdmissionInquiriesAdmin />,
