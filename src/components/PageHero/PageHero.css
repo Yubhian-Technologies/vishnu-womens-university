@@ -66,9 +66,9 @@
   inset: 0;
   background: linear-gradient(
     90deg,
-    rgba(11, 30, 66, 0.68) 0%,
-    rgba(11, 30, 66, 0.42) 55%,
-    rgba(11, 30, 66, 0.18) 100%
+    rgba(11, 30, 66, 0.48) 0%,
+    rgba(11, 30, 66, 0.28) 55%,
+    rgba(11, 30, 66, 0.1) 100%
   );
   z-index: 2;
 }
@@ -107,7 +107,7 @@
   font-weight: 500;
   color: rgba(255, 255, 255, 0.92);
   line-height: 1.6;
-  max-width: 640px;
+  max-width: 720px;
   margin: 0 0 1.75rem 0;
   text-shadow: 0 1px 8px rgba(0, 0, 0, 0.3);
   animation-duration: 0.5s;
@@ -316,9 +316,9 @@
   .page-hero-overlay {
     background: linear-gradient(
       180deg,
-      rgba(11, 30, 66, 0.45) 0%,
-      rgba(11, 30, 66, 0.62) 45%,
-      rgba(11, 30, 66, 0.78) 100%
+      rgba(11, 30, 66, 0.3) 0%,
+      rgba(11, 30, 66, 0.44) 45%,
+      rgba(11, 30, 66, 0.58) 100%
     );
   }
   .page-hero__arrow {

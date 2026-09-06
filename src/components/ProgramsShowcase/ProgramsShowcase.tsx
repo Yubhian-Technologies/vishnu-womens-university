@@ -157,8 +157,8 @@ export default function ProgramsShowcase() {
         {/* ── Right Column: Campus Photo ── */}
         <div className="programs-showcase-right">
           <img
-            src="/images/future-focussed.jpeg"
-            alt="Vishnu Women's University campus"
+            src="/images/spectrum.png"
+            alt="Vishnu Women's University students across a spectrum of programmes"
             className="programs-showcase-right-bg-img"
           />
         </div>

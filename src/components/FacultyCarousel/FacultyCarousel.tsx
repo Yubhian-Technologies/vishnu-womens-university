@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, ChevronRight, Award, Briefcase } from 'lucide-react';
 import type { FacultyDoc } from '../../pages/Academics/Faculty';
@@ -39,58 +39,66 @@ export default function FacultyCarousel({
   departmentName: _,
   title = 'Learn from our impactful faculty',
   viewMoreLink = '/faculty',
-  autoScrollInterval = 1000,
+  autoScrollInterval = 2000,
 }: FacultyCarouselProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
   const resumeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const checkScroll = () => {
-    if (!scrollRef.current) return;
-    const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-    setCanScrollLeft(scrollLeft > 10);
-    setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 15);
-  };
+  // Circular Array Data Structure: Triplicate faculty list so the last card connects
+  // directly to the first card seamlessly without any sudden revert/rewind to start.
+  const displayItems = useMemo(() => {
+    if (!faculty || faculty.length === 0) return [];
+    if (faculty.length === 1) return faculty;
+    return [...faculty, ...faculty, ...faculty];
+  }, [faculty]);
 
+  // Set initial scroll position to the start of the middle set
   useEffect(() => {
     const el = scrollRef.current;
-    if (!el) return;
-    checkScroll();
-    el.addEventListener('scroll', checkScroll, { passive: true });
-    window.addEventListener('resize', checkScroll);
-    return () => {
-      el.removeEventListener('scroll', checkScroll);
-      window.removeEventListener('resize', checkScroll);
+    if (!el || !faculty || faculty.length <= 1) return;
+    const initialPosition = el.scrollWidth / 3;
+    el.scrollLeft = initialPosition;
+  }, [faculty]);
+
+  // Seamless circular array modulo scroll listener
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el || !faculty || faculty.length <= 1) return;
+
+    const handleScroll = () => {
+      const { scrollLeft, scrollWidth } = el;
+      const singleSetWidth = scrollWidth / 3;
+
+      // Instantaneous modulo shift (invisible to user) when crossing set boundaries
+      if (scrollLeft >= 2 * singleSetWidth - 10) {
+        el.scrollLeft -= singleSetWidth;
+      } else if (scrollLeft <= 10) {
+        el.scrollLeft += singleSetWidth;
+      }
     };
+
+    el.addEventListener('scroll', handleScroll, { passive: true });
+    return () => el.removeEventListener('scroll', handleScroll);
   }, [faculty]);
 
   const getCardStep = () => {
-    if (!scrollRef.current) return 320;
+    if (!scrollRef.current) return 240;
     const firstCard = scrollRef.current.querySelector('.faculty-impact-card-wrapper') as HTMLElement | null;
     if (firstCard) {
-      return firstCard.offsetWidth + 20;
+      return firstCard.offsetWidth + 14;
     }
-    return scrollRef.current.clientWidth / 4;
+    return scrollRef.current.clientWidth / 5;
   };
 
-  // Autoscroll timer effect
+  // Continuous autoscroll loop
   useEffect(() => {
     if (!faculty || faculty.length <= 1) return;
 
     const timer = setInterval(() => {
       if (isPaused || !scrollRef.current) return;
-
-      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
       const step = getCardStep();
-
-      if (scrollLeft >= scrollWidth - clientWidth - 25) {
-        // Smoothly loop back to start
-        scrollRef.current.scrollTo({ left: 0, behavior: 'smooth' });
-      } else {
-        scrollRef.current.scrollBy({ left: step, behavior: 'smooth' });
-      }
+      scrollRef.current.scrollBy({ left: step, behavior: 'smooth' });
     }, autoScrollInterval);
 
     return () => clearInterval(timer);
@@ -137,7 +145,6 @@ export default function FacultyCarousel({
                 type="button"
                 className="faculty-impact-arrow-btn"
                 onClick={() => scrollBy(-1)}
-                disabled={!canScrollLeft}
                 aria-label="Scroll faculty left"
               >
                 <ArrowLeft size={19} strokeWidth={2.4} />
@@ -147,7 +154,6 @@ export default function FacultyCarousel({
                 type="button"
                 className="faculty-impact-arrow-btn"
                 onClick={() => scrollBy(1)}
-                disabled={!canScrollRight}
                 aria-label="Scroll faculty right"
               >
                 <ArrowRight size={19} strokeWidth={2.4} />
@@ -156,7 +162,7 @@ export default function FacultyCarousel({
           </div>
         </div>
 
-        {/* Horizontal Carousel Track with Unclipped End Spacing */}
+        {/* Horizontal Carousel Track with Infinite Circular Buffer */}
         <div
           ref={scrollRef}
           className="faculty-impact-track"
@@ -164,11 +170,11 @@ export default function FacultyCarousel({
           role="region"
           aria-label="Faculty cards carousel"
         >
-          {faculty.map((f) => {
+          {displayItems.map((f, idx) => {
             const summary = getFacultySummary(f);
 
             return (
-              <div key={f.id} className="faculty-impact-card-wrapper">
+              <div key={`${f.id}-${idx}`} className="faculty-impact-card-wrapper">
                 {/* Entire Card in Circular White Background */}
                 <div className="faculty-impact-card">
                   {/* Portrait Photo Frame */}

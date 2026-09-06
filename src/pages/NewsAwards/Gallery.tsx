@@ -1,20 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { X } from 'lucide-react';
-import { galleryAlbums, galleryYears } from './news-awards.data';
+import { Image as ImageIcon, ExternalLink } from 'lucide-react';
 import { useOrderedCollection } from '../../hooks/useCollection';
+import type { GalleryAlbumDoc } from '../Admin/sections/GalleryAdmin';
 import { useHashScroll } from '../../hooks/useHashScroll';
 import PageHero from '../../components/PageHero/PageHero';
-import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import './Gallery.css';
-
-interface GalleryPhoto {
-  id: string;
-  title: string;
-  category: string;
-  imageUrl: string;
-  order: number;
-}
 
 const yearColors: Record<number, string> = {
   2026: '#003087',
@@ -29,11 +20,24 @@ const yearColors: Record<number, string> = {
   2017: '#C9A84C',
 };
 
+const formatLink = (url?: string) => {
+  if (!url) return '';
+  const trimmed = url.trim();
+  if (!trimmed) return '';
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  return `https://${trimmed}`;
+};
+
 export default function Gallery() {
   useHashScroll();
-  const [activeYear, setActiveYear] = useState<number | 'all'>('all');
-  const { docs: photos, loading: photosLoading } = useOrderedCollection<GalleryPhoto>('gallery', 'order');
-  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  // null until a pill is clicked — falls through to the most recent year.
+  const [activeYear, setActiveYear] = useState<number | null>(null);
+  const { docs: liveAlbums } = useOrderedCollection<GalleryAlbumDoc>('galleryAlbums', 'order');
+
+  // Live admin-managed albums in Firestore
+  const albums = liveAlbums.map((a) => ({ title: a.title, date: a.date, year: a.year, link: a.link || '', imageUrl: a.imageUrl || '' }));
+  const galleryYears = Array.from(new Set(albums.map((a) => a.year))).sort((a, b) => b - a);
+  const year = activeYear ?? galleryYears[0];
 
   useEffect(() => {
     document.title = "Gallery | Vishnu Women's University";
@@ -54,15 +58,9 @@ export default function Gallery() {
     );
     document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
     return () => observer.disconnect();
-  }, [activeYear]);
+  }, [year]);
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setLightboxIndex(null); };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, []);
-
-  const filtered = activeYear === 'all' ? galleryAlbums : galleryAlbums.filter(a => a.year === activeYear);
+  const filtered = year ? albums.filter((a) => a.year === year) : [];
 
   return (
     <main className="page-wrapper">
@@ -70,7 +68,7 @@ export default function Gallery() {
       <PageHero
         page="news-awards-gallery"
         defaultTitle="Gallery"
-  defaultSubtitle="A visual archive of campus life at VWU — from national competitions and graduation days to cultural festivals and industry events."
+        defaultSubtitle="A visual archive of campus life at VWU — from national competitions and graduation days to cultural festivals and industry events."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'News & Awards', to: '/news-awards' }, { label: 'Gallery' }]}
         scrollCtaTargetId="gallery-content"
       />
@@ -80,7 +78,7 @@ export default function Gallery() {
         <div className="container">
           <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-14)', flexWrap: 'wrap' }}>
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', fontWeight: 900, color: 'var(--color-accent)' }}>{galleryAlbums.length}+</div>
+              <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', fontWeight: 900, color: 'var(--color-accent)' }}>{albums.length}</div>
               <div style={{ fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)' }}>Gallery Albums</div>
             </div>
             <div style={{ textAlign: 'center' }}>
@@ -88,158 +86,187 @@ export default function Gallery() {
               <div style={{ fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)' }}>Years of Memories</div>
             </div>
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', fontWeight: 900, color: 'var(--color-accent)' }}>{galleryYears[0]}</div>
+              <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', fontWeight: 900, color: 'var(--color-accent)' }}>{galleryYears[0] || '—'}</div>
               <div style={{ fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)' }}>Most Recent Year</div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Photo Gallery — live from admin uploads */}
-      <section id="photo-gallery" className="section bg-white" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
-        <div className="container">
-          <div className="reveal" style={{ marginBottom: 'var(--space-6)' }}>
-            <span className="section-label">Fresh from Campus</span>
-            <h2 className="section-title">Photo Gallery</h2>
-            <p style={{ color: 'var(--color-text-light)', maxWidth: 600, lineHeight: 1.7 }}>
-              Photos uploaded by the VWU team, updated in real time.
-            </p>
-          </div>
-
-          {/* Rendered from Firestore, so no scroll-reveal animation here
-              (see the gotcha documented in CLAUDE.md). */}
-          {photosLoading ? (
-            <p style={{ color: 'var(--color-text-light)' }}>Loading photos…</p>
-          ) : photos.length > 0 ? (
-            <div className="pg-grid">
-              {photos.map((photo, i) => (
-                <div
-                  key={photo.id}
-                  className="pg-tile"
-                  onClick={() => setLightboxIndex(i)}
-                >
-                  <img src={photo.imageUrl} alt={photo.title} />
-                  <div className="pg-tile__overlay">
-                    <span className="pg-tile__caption">{photo.title}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p style={{ color: 'var(--color-text-light)' }}>No photos yet — check back soon.</p>
-          )}
-        </div>
-      </section>
-
-      {lightboxIndex !== null && photos[lightboxIndex] && (
-        <div className="pg-lightbox" onClick={(e) => e.target === e.currentTarget && setLightboxIndex(null)}>
-          <div className="pg-lightbox__inner">
-            <button className="pg-lightbox__close" onClick={() => setLightboxIndex(null)} aria-label="Close"><X size={16} /></button>
-            <SmoothImage src={photos[lightboxIndex].imageUrl} alt={photos[lightboxIndex].title} />
-            <div className="pg-lightbox__caption">
-              <strong>{photos[lightboxIndex].title}</strong>
-              <span>{photos[lightboxIndex].category}</span>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Year Filter + Albums */}
       <section className="section bg-off-white">
         <div className="container">
           <div className="reveal" style={{ marginBottom: 'var(--space-6)' }}>
-            <span className="section-label">Since 2017</span>
+            <span className="section-label">Campus Archive</span>
             <h2 className="section-title">Milestones by Year</h2>
             <p style={{ color: 'var(--color-text-light)', maxWidth: 600, lineHeight: 1.7 }}>
-              A written index of major campus events and milestones across the years.
+              A visual index of major campus events and milestones across the years.
             </p>
           </div>
           {/* Year pills */}
-          <div style={{ display: 'flex', gap: 'var(--space-2)', marginBottom: 'var(--space-8)', flexWrap: 'wrap' }}>
-            <button
-              onClick={() => setActiveYear('all')}
-              style={{
-                padding: '0.5rem 1.1rem',
-                borderRadius: 'var(--radius-full)',
-                border: '1.5px solid',
-                fontSize: 'var(--text-sm)',
-                fontWeight: 600,
-                cursor: 'pointer',
-                transition: 'all var(--transition-base)',
-                background: activeYear === 'all' ? 'var(--color-primary)' : 'var(--color-white)',
-                borderColor: activeYear === 'all' ? 'var(--color-primary)' : 'var(--color-light-gray)',
-                color: activeYear === 'all' ? 'var(--color-white)' : 'var(--color-text)',
-              }}
-            >
-              All Years
-            </button>
-            {galleryYears.map((year) => (
-              <button
-                key={year}
-                onClick={() => setActiveYear(year)}
-                style={{
-                  padding: '0.5rem 1.1rem',
-                  borderRadius: 'var(--radius-full)',
-                  border: '1.5px solid',
-                  fontSize: 'var(--text-sm)',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  transition: 'all var(--transition-base)',
-                  background: activeYear === year ? (yearColors[year] || 'var(--color-primary)') : 'var(--color-white)',
-                  borderColor: activeYear === year ? (yearColors[year] || 'var(--color-primary)') : 'var(--color-light-gray)',
-                  color: activeYear === year ? 'var(--color-white)' : 'var(--color-text)',
-                }}
-              >
-                {year}
-              </button>
-            ))}
-          </div>
+          {galleryYears.length > 0 && (
+            <div style={{ display: 'flex', gap: 'var(--space-2)', marginBottom: 'var(--space-8)', flexWrap: 'wrap' }}>
+              {galleryYears.map((y) => (
+                <button
+                  key={y}
+                  onClick={() => setActiveYear(y)}
+                  style={{
+                    padding: '0.5rem 1.1rem',
+                    borderRadius: 0,
+                    border: '1.5px solid',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    transition: 'all var(--transition-base)',
+                    background: y === year ? (yearColors[y] || 'var(--color-primary)') : 'var(--color-white)',
+                    borderColor: y === year ? (yearColors[y] || 'var(--color-primary)') : 'var(--color-light-gray)',
+                    color: y === year ? 'var(--color-white)' : 'var(--color-text)',
+                  }}
+                >
+                  {y}
+                </button>
+              ))}
+            </div>
+          )}
 
           <div style={{ marginBottom: 'var(--space-5)', fontSize: 'var(--text-sm)', color: 'var(--color-text-light)' }}>
             Showing {filtered.length} album{filtered.length !== 1 ? 's' : ''}
-            {activeYear !== 'all' && ` from ${activeYear}`}
+            {year && ` from ${year}`}
           </div>
 
           {/* Albums grid */}
-          <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 'var(--space-4)' }}>
-            {filtered.map((album, i) => {
-              const color = yearColors[album.year] || 'var(--color-primary)';
-              const CardTag = album.link ? 'a' : 'div';
-              return (
-                <CardTag
-                  key={i}
-                  className="reveal"
-                  data-delay={`${(i % 4) * 60}`}
-                  {...(album.link ? { href: album.link, target: '_blank', rel: 'noopener noreferrer' } : {})}
-                  style={{
-                    background: 'var(--color-white)',
-                    border: '1.5px solid var(--color-light-gray)',
-                    borderRadius: 'var(--radius-md)',
-                    overflow: 'hidden',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    transition: 'all var(--transition-base)',
-                    textDecoration: 'none',
-                    cursor: album.link ? 'pointer' : 'default',
-                  }}
-                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-md)'; (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; }}
-                  onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = 'none'; (e.currentTarget as HTMLElement).style.transform = 'none'; }}
-                >
-                  {/* Color bar top */}
-                  <div style={{ height: 6, background: color }} />
-                  <div style={{ padding: 'var(--space-4)', flex: 1, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-                    <span style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                      {album.year}
-                    </span>
-                    <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-primary)', lineHeight: 1.45, flex: 1 }}>
-                      {album.title}
-                    </h3>
-                    <p style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)' }}>{album.date}</p>
+          {filtered.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: 'var(--space-12) 0', background: 'var(--color-white)', border: '1.5px dashed var(--color-light-gray)', margin: 'var(--space-4) 0' }}>
+              <ImageIcon size={48} style={{ color: 'var(--color-text-light)', opacity: 0.4, marginBottom: 'var(--space-3)' }} />
+              <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: '1.1rem', fontWeight: 600, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>No Gallery Albums Found</h3>
+              <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', maxWidth: 460, margin: '0 auto' }}>
+                Albums uploaded or bulk imported from the Admin Dashboard will appear here automatically.
+              </p>
+            </div>
+          ) : (
+            <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 'var(--space-6)' }}>
+              {filtered.map((album, i) => {
+                const color = yearColors[album.year] || 'var(--color-primary)';
+                return (
+                  <div
+                    key={i}
+                    className="reveal"
+                    data-delay={`${(i % 4) * 60}`}
+                    style={{
+                      background: 'var(--color-white)',
+                      border: '1.5px solid var(--color-light-gray)',
+                      borderRadius: 0,
+                      overflow: 'hidden',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                      boxShadow: 'var(--shadow-sm)',
+                    }}
+                    onMouseEnter={(e) => {
+                      const card = e.currentTarget as HTMLElement;
+                      card.style.boxShadow = 'var(--shadow-lg)';
+                      card.style.transform = 'translateY(-4px)';
+                      const img = card.querySelector('img');
+                      if (img) img.style.transform = 'scale(1.06)';
+                    }}
+                    onMouseLeave={(e) => {
+                      const card = e.currentTarget as HTMLElement;
+                      card.style.boxShadow = 'var(--shadow-sm)';
+                      card.style.transform = 'none';
+                      const img = card.querySelector('img');
+                      if (img) img.style.transform = 'scale(1)';
+                    }}
+                  >
+                    {album.imageUrl ? (
+                      <div style={{ position: 'relative', width: '100%', aspectRatio: '4 / 3', minHeight: '220px', overflow: 'hidden', backgroundColor: '#f3f4f6' }}>
+                        <img
+                          src={album.imageUrl}
+                          alt={album.title}
+                          loading="lazy"
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                            display: 'block',
+                            transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                          }}
+                        />
+                        <div
+                          style={{
+                            position: 'absolute',
+                            top: '0.75rem',
+                            right: '0.75rem',
+                            background: 'rgba(0, 0, 0, 0.65)',
+                            backdropFilter: 'blur(4px)',
+                            color: '#fff',
+                            padding: '0.25rem 0.6rem',
+                            borderRadius: 0,
+                            fontSize: '0.7rem',
+                            fontWeight: 600,
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '0.25rem',
+                          }}
+                        >
+                          <ImageIcon size={12} /> Photo Album
+                        </div>
+                      </div>
+                    ) : (
+                      <div
+                        style={{
+                          width: '100%',
+                          height: '160px',
+                          background: `linear-gradient(135deg, ${color}15 0%, ${color}35 100%)`,
+                          borderBottom: `3px solid ${color}`,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          position: 'relative',
+                        }}
+                      >
+                        <ImageIcon size={36} style={{ color: color, opacity: 0.4 }} />
+                      </div>
+                    )}
+                    <div style={{ padding: '1.25rem', flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                          {album.year}
+                        </span>
+                        {album.date && <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)' }}>{album.date}</span>}
+                      </div>
+                      <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: '0.95rem', fontWeight: 600, color: 'var(--color-primary)', lineHeight: 1.45, flex: 1, margin: 0 }}>
+                        {album.title}
+                      </h3>
+                      {(() => {
+                        const albumUrl = formatLink(album.link);
+                        return albumUrl ? (
+                          <a
+                            href={albumUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn btn-accent"
+                            style={{
+                              alignSelf: 'flex-start',
+                              marginTop: '0.5rem',
+                              padding: '0.45rem 1.1rem',
+                              fontSize: 'var(--text-xs)',
+                              borderRadius: 0,
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '0.4rem',
+                            }}
+                          >
+                            <span>VIEW ALBUM</span>
+                            <ExternalLink size={13} />
+                          </a>
+                        ) : null;
+                      })()}
+                    </div>
                   </div>
-                </CardTag>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </section>
 
@@ -249,9 +276,9 @@ export default function Gallery() {
           <div className="reveal">
             <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>Explore More at VWU</h2>
             <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Link to="/news-awards/happenings" className="btn btn-accent">Happenings at VWU</Link>
-              <Link to="/news-awards/accreditations-awards" className="btn btn-secondary">Accreditations & Awards</Link>
-              <Link to="/news-awards" className="btn btn-secondary">Back to News & Awards</Link>
+              <Link to="/news-awards/happenings" className="btn btn-accent" style={{ borderRadius: 0 }}>Happenings at VWU</Link>
+              <Link to="/news-awards/accreditations-awards" className="btn btn-secondary" style={{ borderRadius: 0 }}>Accreditations & Awards</Link>
+              <Link to="/news-awards" className="btn btn-secondary" style={{ borderRadius: 0 }}>Back to News & Awards</Link>
             </div>
           </div>
         </div>
