@@ -1409,10 +1409,10 @@ function SingleProgramDetail() {
             <span className="section-label" style={{ color: 'var(--color-accent)' }}>Apply Today</span>
             <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>Begin Your Journey in {program.shortName || program.name}</h2>
             <p style={{ color: 'rgba(255,255,255,0.8)', maxWidth: 500, margin: '0 auto var(--space-8)', lineHeight: 1.7 }}>
-              Join a thriving academic community. Apply through EAPCET (Code: {eapcetCode}), explore our fee structure, or schedule a campus visit today.
+              Join a thriving academic community. Apply through AP EAPCET (Code: {eapcetCode}), explore our fee structure, or schedule a campus visit today.
             </p>
             <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Link to="/admissions" className="btn btn-accent btn-lg">Apply via EAPCET</Link>
+              <Link to="/admissions" className="btn btn-accent btn-lg">Apply via AP EAPCET</Link>
               <Link to="/programmes-fee-structure" className="btn btn-secondary btn-lg">Fee Structure</Link>
               <Link to="/academics" className="btn btn-secondary btn-lg">All Programmes</Link>
             </div>

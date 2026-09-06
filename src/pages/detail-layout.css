@@ -3699,8 +3699,7 @@ td.pb-activities-num {
    Scoped to this page only; ProgramDetail.tsx keeps the original card. */
 .dept-detail-page .dept-hod-editorial-card {
   align-items: flex-start;
-  border-width: 3px;
-  border-color: var(--color-accent);
+  border: 10px solid var(--color-accent);
 }
 
 .dept-detail-page .dept-hod-media-frame {

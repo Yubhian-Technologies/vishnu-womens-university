@@ -244,10 +244,12 @@ export default function AdmissionApplyForm() {
     setOtpError(null);
     try {
       const submittedProgram = getSubmittedProgram(requestForm);
+      const submittedPurpose = submitPurpose(requestForm);
 
       await addDoc(collection(db, 'admissionInquiries'), {
         ...requestForm,
         program: submittedProgram,
+        purpose: submittedPurpose,
         phoneVerified: false,
         status: 'new',
         createdAt: serverTimestamp(),
@@ -260,7 +262,7 @@ export default function AdmissionApplyForm() {
           full_name: `${requestForm.firstName} ${requestForm.lastName}`.trim(),
           phone: requestForm.phone,
           program: submittedProgram,
-          purpose: requestForm.purpose,
+          purpose: submittedPurpose,
         };
         try {
           await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID_ADMISSIONS, templateParams, EMAILJS_PUBLIC_KEY);
@@ -307,10 +309,12 @@ export default function AdmissionApplyForm() {
       await confirmationResult.confirm(otp.trim());
 
       const submittedProgram = getSubmittedProgram(requestForm);
+      const submittedPurpose = submitPurpose(requestForm);
 
       await addDoc(collection(db, 'admissionInquiries'), {
         ...requestForm,
         program: submittedProgram,
+        purpose: submittedPurpose,
         phoneVerified: true,
         status: 'new',
         createdAt: serverTimestamp(),
@@ -323,7 +327,7 @@ export default function AdmissionApplyForm() {
           full_name: `${requestForm.firstName} ${requestForm.lastName}`.trim(),
           phone: requestForm.phone,
           program: submittedProgram,
-          purpose: requestForm.purpose,
+          purpose: submittedPurpose,
         };
         try {
           await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID_ADMISSIONS, templateParams, EMAILJS_PUBLIC_KEY);

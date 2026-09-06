@@ -127,7 +127,7 @@ export default function FaqAdmin() {
           </div>
           <div className="admin-field admin-field--full">
             <label htmlFor="field-question">Question *</label>
-            <input id="field-question" value={form.question} onChange={(e) => set('question', e.target.value)} placeholder="What is the VWU college code for EAPCET?" />
+            <input id="field-question" value={form.question} onChange={(e) => set('question', e.target.value)} placeholder="What is the VWU college code for AP EAPCET?" />
           </div>
           <div className="admin-field admin-field--full">
             <label htmlFor="field-answer">Answer *</label>
