@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Image as ImageIcon, ExternalLink } from 'lucide-react';
 import { galleryAlbums as staticAlbums } from './news-awards.data';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import type { GalleryAlbumDoc } from '../Admin/sections/GalleryAdmin';
@@ -103,7 +104,7 @@ export default function Gallery() {
               onClick={() => setActiveYear('all')}
               style={{
                 padding: '0.5rem 1.1rem',
-                borderRadius: 'var(--radius-full)',
+                borderRadius: 0,
                 border: '1.5px solid',
                 fontSize: 'var(--text-sm)',
                 fontWeight: 600,
@@ -122,7 +123,7 @@ export default function Gallery() {
                 onClick={() => setActiveYear(year)}
                 style={{
                   padding: '0.5rem 1.1rem',
-                  borderRadius: 'var(--radius-full)',
+                  borderRadius: 0,
                   border: '1.5px solid',
                   fontSize: 'var(--text-sm)',
                   fontWeight: 600,
@@ -144,7 +145,7 @@ export default function Gallery() {
           </div>
 
           {/* Albums grid */}
-          <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 'var(--space-4)' }}>
+          <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 'var(--space-5)' }}>
             {filtered.map((album, i) => {
               const color = yearColors[album.year] || 'var(--color-primary)';
               return (
@@ -155,35 +156,107 @@ export default function Gallery() {
                   style={{
                     background: 'var(--color-white)',
                     border: '1.5px solid var(--color-light-gray)',
-                    borderRadius: 'var(--radius-md)',
+                    borderRadius: 0,
                     overflow: 'hidden',
                     display: 'flex',
                     flexDirection: 'column',
-                    transition: 'all var(--transition-base)',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    boxShadow: 'var(--shadow-sm)',
                   }}
-                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-md)'; (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; }}
-                  onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = 'none'; (e.currentTarget as HTMLElement).style.transform = 'none'; }}
+                  onMouseEnter={(e) => {
+                    const card = e.currentTarget as HTMLElement;
+                    card.style.boxShadow = 'var(--shadow-lg)';
+                    card.style.transform = 'translateY(-4px)';
+                    const img = card.querySelector('img');
+                    if (img) img.style.transform = 'scale(1.06)';
+                  }}
+                  onMouseLeave={(e) => {
+                    const card = e.currentTarget as HTMLElement;
+                    card.style.boxShadow = 'var(--shadow-sm)';
+                    card.style.transform = 'none';
+                    const img = card.querySelector('img');
+                    if (img) img.style.transform = 'scale(1)';
+                  }}
                 >
-                  {album.imageUrl
-                    ? <img src={album.imageUrl} alt={album.title} loading="lazy" style={{ width: '100%', aspectRatio: '4 / 3', objectFit: 'cover', display: 'block' }} />
-                    : <div style={{ height: 6, background: color }} />}
-                  <div style={{ padding: 'var(--space-4)', flex: 1, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-                    <span style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                      {album.year}
-                    </span>
-                    <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-primary)', lineHeight: 1.45, flex: 1 }}>
+                  {album.imageUrl ? (
+                    <div style={{ position: 'relative', width: '100%', aspectRatio: '16 / 9', overflow: 'hidden', backgroundColor: '#f3f4f6' }}>
+                      <img
+                        src={album.imageUrl}
+                        alt={album.title}
+                        loading="lazy"
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          display: 'block',
+                          transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                        }}
+                      />
+                      <div
+                        style={{
+                          position: 'absolute',
+                          top: '0.75rem',
+                          right: '0.75rem',
+                          background: 'rgba(0, 0, 0, 0.65)',
+                          backdropFilter: 'blur(4px)',
+                          color: '#fff',
+                          padding: '0.25rem 0.6rem',
+                          borderRadius: 0,
+                          fontSize: '0.7rem',
+                          fontWeight: 600,
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.25rem',
+                        }}
+                      >
+                        <ImageIcon size={12} /> Photo Album
+                      </div>
+                    </div>
+                  ) : (
+                    <div
+                      style={{
+                        width: '100%',
+                        height: '110px',
+                        background: `linear-gradient(135deg, ${color}15 0%, ${color}35 100%)`,
+                        borderBottom: `3px solid ${color}`,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        position: 'relative',
+                      }}
+                    >
+                      <ImageIcon size={32} style={{ color: color, opacity: 0.4 }} />
+                    </div>
+                  )}
+                  <div style={{ padding: '1.25rem', flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                        {album.year}
+                      </span>
+                      {album.date && <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)' }}>{album.date}</span>}
+                    </div>
+                    <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: '0.95rem', fontWeight: 600, color: 'var(--color-primary)', lineHeight: 1.45, flex: 1, margin: 0 }}>
                       {album.title}
                     </h3>
-                    {album.date && <p style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)' }}>{album.date}</p>}
                     {album.link && (
                       <a
                         href={album.link}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="btn btn-accent"
-                        style={{ alignSelf: 'flex-start', marginTop: 'var(--space-2)', padding: '0.45rem 1.1rem', fontSize: 'var(--text-xs)' }}
+                        style={{
+                          alignSelf: 'flex-start',
+                          marginTop: '0.5rem',
+                          padding: '0.45rem 1.1rem',
+                          fontSize: 'var(--text-xs)',
+                          borderRadius: 0,
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.4rem',
+                        }}
                       >
-                        VIEW
+                        <span>VIEW ALBUM</span>
+                        <ExternalLink size={13} />
                       </a>
                     )}
                   </div>
@@ -200,9 +273,9 @@ export default function Gallery() {
           <div className="reveal">
             <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>Explore More at VWU</h2>
             <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Link to="/news-awards/happenings" className="btn btn-accent">Happenings at VWU</Link>
-              <Link to="/news-awards/accreditations-awards" className="btn btn-secondary">Accreditations & Awards</Link>
-              <Link to="/news-awards" className="btn btn-secondary">Back to News & Awards</Link>
+              <Link to="/news-awards/happenings" className="btn btn-accent" style={{ borderRadius: 0 }}>Happenings at VWU</Link>
+              <Link to="/news-awards/accreditations-awards" className="btn btn-secondary" style={{ borderRadius: 0 }}>Accreditations & Awards</Link>
+              <Link to="/news-awards" className="btn btn-secondary" style={{ borderRadius: 0 }}>Back to News & Awards</Link>
             </div>
           </div>
         </div>

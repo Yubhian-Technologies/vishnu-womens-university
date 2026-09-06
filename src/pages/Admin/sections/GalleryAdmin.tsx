@@ -201,9 +201,22 @@ export default function GalleryAdmin() {
   };
 
   // ── Event Albums (by Year) ──────────────────────────────────────────────
+  const effectiveAlbums = useMemo(() => {
+    if (albums.length > 0) return albums;
+    return STATIC_ALBUMS.map((a, i) => ({
+      id: `static-${i}`,
+      year: a.year,
+      title: a.title,
+      imageUrl: '',
+      link: a.link || '',
+      date: a.date || '',
+      order: i,
+    })) as GalleryAlbumDoc[];
+  }, [albums]);
+
   const docYears = useMemo(
-    () => Array.from(new Set(albums.map((a) => a.year))).sort((a, b) => b - a),
-    [albums],
+    () => Array.from(new Set(effectiveAlbums.map((a) => a.year))).sort((a, b) => b - a),
+    [effectiveAlbums],
   );
   const [extraYears, setExtraYears] = useState<number[]>([]);
   const years = useMemo(
@@ -212,7 +225,7 @@ export default function GalleryAdmin() {
   );
   const [activeYear, setActiveYear] = useState<number | null>(null);
   const year = activeYear ?? years[0] ?? CURRENT_YEAR;
-  const yearAlbums = useMemo(() => albums.filter((a) => a.year === year), [albums, year]);
+  const yearAlbums = useMemo(() => effectiveAlbums.filter((a) => a.year === year), [effectiveAlbums, year]);
 
   const [newYear, setNewYear] = useState('');
   const [form, setForm] = useState({ title: '', imageUrl: '', link: '', date: '' });
@@ -470,7 +483,7 @@ export default function GalleryAdmin() {
               className={`admin-btn admin-btn--sm${y === year ? ' admin-btn--primary' : ''}`}
               onClick={() => setActiveYear(y)}
             >
-              {y} ({albums.filter((a) => a.year === y).length})
+              {y} ({effectiveAlbums.filter((a) => a.year === y).length})
             </button>
           ))}
           <span style={{ display: 'inline-flex', gap: '0.35rem', alignItems: 'center' }}>
