@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import {
   Cpu, Radio, Zap, Cog, Building2, FlaskConical, Briefcase, Layers, ChevronDown, LayoutGrid,
   type LucideIcon,
@@ -45,43 +45,10 @@ export default function ThrustAreasSection({ categories }: { categories: Accordi
     });
   };
 
-  const stats = useMemo(() => {
-    // For an area that's really a sub-department group (e.g. Basic Science's
-    // Mathematics), count its sub-areas as the real areas of work rather
-    // than counting "Mathematics" itself as one area.
-    let areaCount = 0;
-    const facultySet = new Set<string>();
-    categories.forEach((c) => c.areas.forEach((a) => {
-      if (a.subAreas && a.subAreas.length > 0) {
-        areaCount += a.subAreas.length;
-        a.subAreas.forEach((sub) => sub.items.forEach((it) => facultySet.add(it.href || it.label)));
-      } else {
-        areaCount += 1;
-        a.items.forEach((it) => facultySet.add(it.href || it.label));
-      }
-    }));
-    return { deptCount: categories.length, areaCount, facultyCount: facultySet.size };
-  }, [categories]);
-
   const visibleCategories = activeDept === 'All' ? categories : categories.filter((c) => c.title === activeDept);
 
   return (
     <>
-      <div className="thrust-stats">
-        <div className="thrust-stat">
-          <strong>{stats.deptCount}</strong>
-          <span>Departments</span>
-        </div>
-        <div className="thrust-stat">
-          <strong>{stats.areaCount}</strong>
-          <span>Research Areas</span>
-        </div>
-        <div className="thrust-stat">
-          <strong>{stats.facultyCount}</strong>
-          <span>Contributing Faculty</span>
-        </div>
-      </div>
-
       <div className="thrust-dept-tabs" role="tablist">
         <button
           type="button"

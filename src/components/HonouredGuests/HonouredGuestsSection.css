@@ -1,0 +1,64 @@
+.honoured-guests-section {
+  background: var(--color-accent);
+  padding: clamp(2.5rem, 4vw, 3.5rem) 0;
+}
+
+.honoured-guests-title {
+  font-family: var(--font-serif);
+  font-size: clamp(1.6rem, 2.6vw, 2.2rem);
+  font-weight: 800;
+  color: var(--color-primary-dark, #081c15);
+  text-align: center;
+  margin: 0 0 clamp(1.75rem, 3vw, 2.5rem) 0;
+}
+
+.honoured-guests-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--space-5);
+}
+
+.honoured-guest-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.honoured-guest-photo-wrap {
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  margin-bottom: var(--space-4);
+}
+
+.honoured-guest-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.honoured-guest-name {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--color-primary-dark, #081c15);
+  margin: 0 0 2px 0;
+}
+
+.honoured-guest-role {
+  font-size: 0.85rem;
+  color: color-mix(in srgb, var(--color-primary-dark, #081c15) 75%, transparent);
+  margin: 0;
+  line-height: 1.4;
+}
+
+@media (max-width: 1024px) {
+  .honoured-guests-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .honoured-guests-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

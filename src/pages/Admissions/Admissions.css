@@ -1,3 +1,86 @@
+/* Admissions Overview — editorial intro, before "How to Apply" */
+.adm-intro-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: var(--space-10);
+  align-items: start;
+}
+
+.adm-intro-main {
+  background: var(--color-white);
+  border: 1px solid color-mix(in srgb, var(--color-primary, #0B1E42) 10%, transparent);
+  border-top: 4px solid var(--color-primary);
+  border-radius: 20px;
+  padding: var(--space-8);
+  box-shadow: 0 10px 30px rgba(11, 30, 66, 0.05);
+  transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.adm-intro-main:hover {
+  border-color: var(--color-accent);
+  border-top-color: var(--color-accent);
+  box-shadow: 0 18px 45px rgba(11, 30, 66, 0.1);
+  transform: translateY(-3px);
+}
+
+.adm-intro-main .section-label {
+  display: block;
+  margin-bottom: var(--space-2);
+}
+
+.adm-intro-main .section-title {
+  margin-bottom: var(--space-4);
+}
+
+.adm-intro-hub-panel {
+  background: color-mix(in srgb, var(--color-primary, #1b4332) 4%, var(--color-off-white));
+  border-left: 4px solid var(--color-accent);
+  border-radius: 16px;
+  padding: var(--space-7);
+}
+
+.adm-intro-hub-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: var(--color-accent);
+  margin-bottom: var(--space-3);
+}
+
+.adm-intro-subtitle {
+  font-family: var(--font-sans);
+  font-size: var(--text-lg);
+  font-weight: 800;
+  color: var(--color-primary);
+  margin: 0 0 var(--space-3);
+}
+
+.adm-intro-text {
+  color: var(--color-text-light);
+  line-height: 1.75;
+  font-size: var(--text-base);
+  margin: 0;
+}
+
+.adm-intro-main .adm-intro-text {
+  font-size: var(--text-lg);
+}
+
+.adm-intro-hub-panel .adm-intro-text + .adm-intro-text {
+  margin-top: var(--space-3);
+}
+
+@media (max-width: 900px) {
+  .adm-intro-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+  }
+}
+
 /* Admissions Hub */
 .adm-hub-grid {
   display: grid;
@@ -8,7 +91,7 @@
 
 .adm-hub-card {
   background: var(--color-white);
-  border: 1px solid rgba(27, 67, 50, 0.08);
+  border: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 8%, transparent);
   border-radius: 20px;
   padding: var(--space-6);
   display: flex;
@@ -31,8 +114,8 @@
 
 .adm-hub-highlight {
   display: inline-block;
-  background: rgba(201,168,76,0.15);
-  border: 1px solid rgba(201,168,76,0.35);
+  background: color-mix(in srgb, var(--color-accent, #c9a84c) 15%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-accent, #c9a84c) 35%, transparent);
   border-radius: var(--radius-full);
   padding: 3px 12px;
   font-family: var(--font-sans);
@@ -95,7 +178,7 @@
   border-radius: 20px;
   padding: var(--space-6);
   text-align: center;
-  border: 1px solid rgba(27, 67, 50, 0.08);
+  border: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 8%, transparent);
   box-shadow: var(--shadow-sm);
   position: relative;
   z-index: 1;
@@ -287,71 +370,6 @@
   border: 1px solid var(--color-light-gray);
 }
 
-.adm-form-card h3 {
-  font-size: var(--text-2xl);
-  color: var(--color-primary);
-  margin-bottom: var(--space-6);
-}
-
-.adm-form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-.adm-form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-4);
-}
-
-.adm-form-group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.adm-form-group label {
-  font-size: var(--text-sm);
-  font-weight: 700;
-  color: var(--color-text);
-  font-family: var(--font-sans);
-}
-
-.adm-form-group input,
-.adm-form-group select {
-  padding: var(--space-3) var(--space-4);
-  border: 1.5px solid var(--color-light-gray);
-  border-radius: var(--radius-sm);
-  font-size: var(--text-base);
-  color: var(--color-text);
-  background: var(--color-white);
-  outline: none;
-  transition: border-color var(--transition-fast);
-  font-family: var(--font-sans);
-}
-
-.adm-form-group input:focus,
-.adm-form-group select:focus {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(27,67,50,0.1);
-}
-
-.adm-form-group input.has-error,
-.adm-form-group select.has-error {
-  border-color: #dc2626;
-}
-
-.adm-form-group input.has-error:focus,
-.adm-form-group select.has-error:focus {
-  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
-}
-
-.adm-form-error {
-  font-size: 0.8rem;
-  color: #dc2626;
-}
-
 /* Responsive */
 @media (max-width: 1024px) {
   .adm-hub-grid { grid-template-columns: repeat(2, 1fr); }
@@ -379,9 +397,6 @@
     grid-template-columns: 1fr;
   }
   .adm-visit-grid {
-    grid-template-columns: 1fr;
-  }
-  .adm-form-row {
     grid-template-columns: 1fr;
   }
 }

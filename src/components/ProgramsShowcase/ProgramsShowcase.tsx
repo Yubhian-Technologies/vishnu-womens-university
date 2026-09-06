@@ -54,11 +54,10 @@ export default function ProgramsShowcase() {
   };
 
   const categories = [
-    { id: 'ug', label: `UG\nPrograms${btechCount > 0 ? ` (${btechCount})` : ''}`, link: '/academics?tab=btech' },
-    { id: 'pg', label: `PG\nPrograms${pgCount > 0 ? ` (${pgCount})` : ''}`, link: '/academics?tab=mtech' },
-    { id: 'phd', label: `Ph.D\nPrograms${phdCount > 0 ? ` (${phdCount})` : ''}`, link: '/academics?tab=phd' },
-    { id: 'diploma', label: 'Corporate PG Diploma\nPrograms', link: '/academics' },
-    { id: 'executive', label: 'Executive Education\nPrograms', link: '/academics' },
+    // ‌ (ZWNJ) after "(" stops fonts substituting "(5)"/"(3)" with a circled-digit ligature
+    { id: 'ug', label: `Undergraduate Programs${btechCount > 0 ? ` (‌${btechCount})` : ''}`, link: '/academics?tab=btech' },
+    { id: 'pg', label: `Postgraduate Programs${pgCount > 0 ? ` (‌${pgCount})` : ''}`, link: '/academics?tab=mtech' },
+    { id: 'phd', label: `Ph.D Programs${phdCount > 0 ? ` (‌${phdCount})` : ''}`, link: '/academics?tab=phd' },
   ];
 
   return (
@@ -68,10 +67,13 @@ export default function ProgramsShowcase() {
         {/* ── Left Column: Programs Overview & Filter Navigation ── */}
         <div className="programs-showcase-left-container">
           <div className="programs-showcase-left">
-            <span className="programs-showcase-eyebrow">Programs</span>
             <h2 className="programs-showcase-heading">
-              Future-focused education across disciplines
+              A Spectrum of Programmes. A World of Possibilities.
             </h2>
+            <div className="programs-showcase-desc">
+              <p>VWU offers a diverse portfolio of academic programmes that bring together rigorous learning, research, global perspectives, and meaningful industry engagement. From undergraduate to doctoral study, every programme is designed to nurture curiosity, build future-ready capabilities, and empower students to transform ideas into innovation and impact.</p>
+              <p>With opportunities to learn across disciplines, engage in research, gain global exposure, and connect with industry, students are prepared not just for successful careers, but to become confident leaders, thoughtful innovators, and lifelong learners in an ever-evolving world.</p>
+            </div>
 
             {/* Interactive Live Search Bar */}
             <div ref={searchWrapRef} className="programs-showcase-search-container">
@@ -155,8 +157,8 @@ export default function ProgramsShowcase() {
         {/* ── Right Column: Campus Photo ── */}
         <div className="programs-showcase-right">
           <img
-            src="/images/SLS01311.JPG"
-            alt="Vishnu Women's University campus"
+            src="/images/spectrum.png"
+            alt="Vishnu Women's University students across a spectrum of programmes"
             className="programs-showcase-right-bg-img"
           />
         </div>

@@ -236,6 +236,15 @@
   color: #fff;
 }
 
+.crop-rotate-btn {
+  margin-left: auto;
+}
+
+.crop-rotate-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
 /* Canvas area */
 .crop-modal__canvas {
   flex: 1;

@@ -11,6 +11,7 @@ import type { HappeningDoc } from '../Admin/sections/NewsAwardsDataAdmin';
 import './News.css';
 import PageHero from '../../components/PageHero/PageHero';
 import { useHashScroll } from '../../hooks/useHashScroll';
+import { useSiteContact } from '../../hooks/useSiteContact';
 import SEO from '../../components/SEO/SEO';
 import { getArticleSchema, getBreadcrumbSchema } from '../../lib/seo/schemas';
 
@@ -23,9 +24,11 @@ export default function News() {
   // else (News/Achievement/Award/Announcement/Research) still comes from
   // the News & Events admin, same as always.
   const { docs: happenings } = useOrderedCollection<HappeningDoc>('happenings', 'order');
+  const { email: contactEmail } = useSiteContact();
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeArticle, setActiveArticle] = useState<NewsArticle | null>(null);
+  const [newsletterEmail, setNewsletterEmail] = useState('');
 
   useHashScroll();
 
@@ -48,7 +51,7 @@ export default function News() {
     );
     document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => observer.observe(el));
     return () => observer.disconnect();
-  }, [items, happenings]);
+  }, []);
 
   // The featured hero banner below only ever picks from real news articles
   // — it shows a `body` and an ISO-formatted `date` neither of which a
@@ -67,8 +70,8 @@ export default function News() {
 
   const filtered = combined.filter(article => {
     const matchCategory = activeCategory === 'All' || article.category === activeCategory;
-    const matchSearch = article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      article.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchSearch = (article.title || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (article.excerpt || '').toLowerCase().includes(searchQuery.toLowerCase());
     return matchCategory && matchSearch;
   });
 
@@ -216,8 +219,25 @@ export default function News() {
             <p style={{ color: 'rgba(255,255,255,0.7)', maxWidth: 480, margin: '0 auto var(--space-6)', fontSize: 'var(--text-lg)' }}>
               Subscribe to the VWU newsletter for the latest news, events, and campus updates.
             </p>
-            <form onSubmit={e => e.preventDefault()} className="news-newsletter-form">
-              <input type="email" placeholder="Enter your email address" className="news-newsletter-input" />
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const email = newsletterEmail.trim();
+                if (!email) return;
+                const subject = encodeURIComponent('VWU Newsletter Subscription');
+                const body = encodeURIComponent(`Please add me to the VWU newsletter mailing list.\n\nMy email is: ${email}`);
+                window.location.href = `mailto:${contactEmail}?subject=${subject}&body=${body}`;
+              }}
+              className="news-newsletter-form"
+            >
+              <input
+                type="email"
+                required
+                value={newsletterEmail}
+                onChange={(e) => setNewsletterEmail(e.target.value)}
+                placeholder="Enter your email address"
+                className="news-newsletter-input"
+              />
               <button type="submit" className="btn btn-accent">Subscribe</button>
             </form>
           </div>

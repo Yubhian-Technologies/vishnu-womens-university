@@ -246,7 +246,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  background: linear-gradient(to top, rgba(8,28,21,0.85) 0%, rgba(8,28,21,0.1) 70%, transparent 100%);
+  background: linear-gradient(to top, color-mix(in srgb, var(--color-primary-dark, #081c15) 85%, transparent) 0%, color-mix(in srgb, var(--color-primary-dark, #081c15) 10%, transparent) 70%, transparent 100%);
   color: rgba(255,255,255,0.95);
   font-size: var(--text-xs);
   font-family: var(--font-sans);
@@ -276,7 +276,7 @@
   position: absolute;
   z-index: 1;
   inset: 0;
-  background: rgba(8,28,21,0.18);
+  background: color-mix(in srgb, var(--color-primary-dark, #081c15) 18%, transparent);
   display: flex;
   align-items: center;
   justify-content: center;

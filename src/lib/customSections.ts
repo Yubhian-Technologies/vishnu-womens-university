@@ -8,7 +8,7 @@ import { parseFlexibleTable, parseLinkList } from './structuredTable';
 // Purely additive: every existing hardcoded section on those pages is
 // untouched by this.
 
-export type CustomSectionContentType = 'text' | 'table' | 'links' | 'files' | 'list' | 'person' | 'gallery' | 'imageCards';
+export type CustomSectionContentType = 'text' | 'table' | 'links' | 'files' | 'list' | 'person' | 'gallery' | 'imageCards' | 'contacts';
 
 export interface CustomSectionFile {
   label: string;
@@ -29,6 +29,16 @@ export interface CustomSectionImageCard {
   storagePath: string;
   title: string;
   description: string;
+}
+
+// contentType 'contacts' — a repeatable role/name/phone/email entry, e.g. a
+// Differentiator's "who to contact" section. No file/photo per entry, so it
+// needs no upload handlers the way 'imageCards'/'gallery' do.
+export interface CustomSectionContact {
+  role: string;
+  name: string;
+  phone: string;
+  email: string;
 }
 
 export interface CustomSection {
@@ -90,6 +100,8 @@ export interface CustomSection {
   galleryPhotos?: CustomSectionPhoto[];
   // contentType 'imageCards' only — see CustomSectionImageCard above.
   imageCards?: CustomSectionImageCard[];
+  // contentType 'contacts' only — see CustomSectionContact above.
+  contacts?: CustomSectionContact[];
 }
 
 // Every anchor id already hardcoded in ProgramDetail.tsx/DepartmentDetail.tsx
@@ -147,6 +159,8 @@ export function hasCustomSectionContent(section: CustomSection): boolean {
         return (section.galleryPhotos || []).some((p) => !!p.imageUrl);
       case 'imageCards':
         return (section.imageCards || []).some((c) => !!c.imageUrl || !!c.title.trim() || !!c.description.trim());
+      case 'contacts':
+        return (section.contacts || []).some((c) => !!c.role.trim() || !!c.name.trim() || !!c.phone.trim() || !!c.email.trim());
       default:
         return false;
     }

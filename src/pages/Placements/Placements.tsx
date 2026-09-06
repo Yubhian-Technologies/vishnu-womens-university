@@ -48,12 +48,16 @@ export default function Placements() {
       <section id="placements-content" style={{ background: 'var(--color-primary)', padding: 'var(--space-6) 0', scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
         <div className="container">
           <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-14)', flexWrap: 'wrap' }}>
-            {stats.map((s) => (
+            {stats.length > 0 ? stats.map((s) => (
               <div key={s.id} style={{ textAlign: 'center' }}>
                 <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', fontWeight: 900, color: 'var(--color-accent)' }}>{s.value}</div>
                 <div style={{ fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)' }}>{s.title}</div>
               </div>
-            ))}
+            )) : (
+              <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.6)', fontSize: 'var(--text-sm)' }}>
+                Placement statistics will appear here once the Training & Placement Office shares its latest figures.
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -135,6 +139,12 @@ export default function Placements() {
               );
             })}
           </div>
+          {placementItems.length === 0 && (
+            <div style={{ textAlign: 'center', padding: 'var(--space-10) 1rem', color: 'var(--color-text-light)' }}>
+              <BarChart3 size={28} style={{ marginBottom: 'var(--space-3)', opacity: 0.5 }} />
+              <p style={{ fontSize: 'var(--text-sm)' }}>Placement resources are being updated. Check back soon.</p>
+            </div>
+          )}
         </div>
       </section>
 
@@ -149,7 +159,7 @@ export default function Placements() {
               Join a university where academic rigour translates into real career outcomes. Apply now and take the first step toward a future you have earned.
             </p>
             <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Link to="/admissions" className="btn btn-accent">Apply Now</Link>
+              <Link to="/apply-now" className="btn btn-accent">Apply Now</Link>
               <Link to="/academics" className="btn btn-secondary">Academics</Link>
               <Link to="/differentiators" className="btn btn-secondary">Our Differentiators</Link>
             </div>

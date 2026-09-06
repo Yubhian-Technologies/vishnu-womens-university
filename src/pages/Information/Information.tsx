@@ -7,15 +7,12 @@ import { useSitePhotos, useSectionHasPhotos } from '../../hooks/useSitePhotos';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import { CALENDAR_CATEGORIES, type CalendarEntry } from '../Admin/sections/AcademicCalendarAdmin';
 import type { HolidayEntry } from '../Admin/sections/HolidaysAdmin';
-import { Monitor, Plane, MapPin, Phone, Mail, Navigation, FileText } from 'lucide-react';
+import { CalendarOff, Monitor, FileText } from 'lucide-react';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { resolveContentIcon } from '../../lib/contentIcons';
+import { ICT_RESOURCE_GROUPS } from './ictResources.data';
+import { DEFAULT_OTHER_PRACTICES, EXPERIENTIAL_LEARNING_INTRO, type OtherPracticeItem } from './otherPractices.data';
 import './Information.css';
-
-// Same coordinates as the embedded map on the Contact page. Omitting the
-// "origin" param makes Google Maps use the visitor's current location
-// (after they grant the browser permission prompt) as the route start.
-const GOOGLE_MAPS_DIRECTIONS_URL = 'https://www.google.com/maps/dir/?api=1&destination=16.5681279,81.5220952';
 
 const defaultPlacementsCareersPhotos = [
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Placement Drive', caption: '' },
@@ -33,12 +30,11 @@ const defaultAntiRaggingSafetyPhotos = [
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Campus Patrol & Security', caption: '' },
 ];
 
-type TabId = 'calendar' | 'holidays' | 'reach' | 'counselling' | 'ict' | 'practices';
+type TabId = 'calendar' | 'holidays' | 'counselling' | 'ict' | 'practices';
 
 const hashToTab: Record<string, TabId> = {
   '#academic-calendar': 'calendar',
   '#holidays':          'holidays',
-  '#how-to-reach':      'reach',
   '#counselling':       'counselling',
   '#ict-platforms':     'ict',
   '#other-practices':   'practices',
@@ -61,9 +57,8 @@ export default function Information() {
   const antiRaggingSafetyPhotos = useSitePhotos('information', 'anti-ragging-safety', defaultAntiRaggingSafetyPhotos);
   const hasAntiRaggingSafetyPhotos = useSectionHasPhotos('information', 'anti-ragging-safety');
   const ictPlatforms = useContentBlocks('information', 'ictPlatforms');
-  const howToReach = useContentBlocks('information', 'howToReach');
   const counsellingScheme = useContentBlocks('information', 'counsellingScheme');
-  const otherPractices = useContentBlocks('information', 'otherPractices');
+  const otherPractices = DEFAULT_OTHER_PRACTICES;
 
   useEffect(() => {
     const tab = hashToTab[location.hash];
@@ -73,7 +68,6 @@ export default function Information() {
   const tabs: { id: TabId; label: string }[] = [
     { id: 'calendar', label: 'Academic Calendar' },
     { id: 'holidays', label: 'List of Holidays' },
-    { id: 'reach', label: 'How to Reach' },
     { id: 'counselling', label: 'Counselling Scheme' },
     { id: 'ict', label: 'ICT Platforms' },
     { id: 'practices', label: 'Other Practices' },
@@ -85,7 +79,7 @@ export default function Information() {
       <PageHero
         page="information"
         defaultTitle="Information"
-  defaultSubtitle="Academic calendar, holidays, how to reach us, counselling, ICT platforms, and more."
+  defaultSubtitle="Academic calendar, holidays, counselling, ICT platforms, and more."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Discover', to: '/' }, { label: 'Information' }]}
       />
 
@@ -155,54 +149,23 @@ export default function Information() {
             <div>
               <h2 className="section-title" style={{ marginBottom: 'var(--space-8)' }}>List of Holidays 2026</h2>
               <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-4)' }}>
-                {holidays.map((h) => (
+                {holidays.length > 0 ? holidays.map((h) => (
                   <div key={h.id} style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
                     <div style={{ background: 'var(--color-primary)', color: 'var(--color-accent)', fontFamily: 'var(--font-serif)', fontWeight: 900, fontSize: '1.3rem', borderRadius: 'var(--radius-sm)', padding: 'var(--space-3)', minWidth: 52, textAlign: 'center', lineHeight: 1 }}>
-                      {h.date.split(' ')[1].replace(',', '')}
-                      <div style={{ fontSize: '0.55rem', color: 'rgba(255,255,255,0.6)', fontFamily: 'var(--font-sans)', fontWeight: 400, letterSpacing: '0.05em', textTransform: 'uppercase' }}>{h.date.split(' ')[0].toUpperCase()}</div>
+                      {h.date ? h.date.split(' ')[1]?.replace(',', '') ?? '' : ''}
+                      <div style={{ fontSize: '0.55rem', color: 'rgba(255,255,255,0.6)', fontFamily: 'var(--font-sans)', fontWeight: 400, letterSpacing: '0.05em', textTransform: 'uppercase' }}>{h.date ? (h.date.split(' ')[0] || '').toUpperCase() : ''}</div>
                     </div>
                     <div>
                       <div style={{ fontFamily: 'var(--font-sans)', fontWeight: 700, color: 'var(--color-primary)', fontSize: 'var(--text-sm)' }}>{h.name}</div>
                       <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)' }}>{h.date}</div>
                     </div>
                   </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* How to Reach */}
-          {activeTab === 'reach' && (
-            <div>
-              <h2 className="section-title" style={{ marginBottom: 'var(--space-4)' }}>How to Reach VWU</h2>
-              <p style={{ color: 'var(--color-text-light)', marginBottom: 'var(--space-8)', maxWidth: 600 }}>
-                Vishnu Women's University is located in Vishnupur, Bhimavaram, West Godavari District, Andhra Pradesh – 534 202.
-              </p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', marginBottom: 'var(--space-10)' }}>
-                {howToReach.map((r) => {
-                  const Icon = resolveContentIcon(r.icon) || Plane;
-                  return (
-                    <div key={r.id} style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', display: 'flex', gap: 'var(--space-5)', alignItems: 'flex-start', borderLeft: '4px solid var(--color-accent)' }}>
-                      <Icon size={29} strokeWidth={1.75} style={{ flexShrink: 0, color: 'var(--color-primary)' }} />
-                      <div>
-                        <h3 style={{ fontFamily: 'var(--font-sans)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>{r.title}</h3>
-                        <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.7, whiteSpace: 'pre-line' }}>{r.desc}</p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-              <div style={{ background: 'var(--color-primary)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', color: 'rgba(255,255,255,0.8)', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', lineHeight: 1.8 }}>
-                <strong style={{ color: 'var(--color-accent)', display: 'flex', alignItems: 'center', gap: '0.35rem', marginBottom: 'var(--space-2)' }}><MapPin size={15} /> Address</strong>
-                Vishnu Women's University, Vishnupur, Bhimavaram – 534 202<br />
-                West Godavari District, Andhra Pradesh, India<br />
-                <a href="tel:08816250864" style={{ color: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><Phone size={14} /> 08816-250864</a> &nbsp;|&nbsp;
-                <a href="mailto:info@vwu.edu.in" style={{ color: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><Mail size={14} /> info@vwu.edu.in</a>
-                <div style={{ marginTop: 'var(--space-4)' }}>
-                  <a href={GOOGLE_MAPS_DIRECTIONS_URL} target="_blank" rel="noopener noreferrer" className="btn btn-accent">
-                    <Navigation size={16} strokeWidth={2} style={{ marginRight: '0.4rem' }} /> Get Route
-                  </a>
-                </div>
+                )) : (
+                  <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: 'var(--space-8) 1rem', color: 'var(--color-text-light)' }}>
+                    <CalendarOff size={28} style={{ marginBottom: 'var(--space-3)', opacity: 0.5 }} />
+                    <p style={{ fontSize: 'var(--text-sm)' }}>The holiday list for this year hasn&apos;t been published yet.</p>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -212,12 +175,16 @@ export default function Information() {
             <div>
               <h2 className="section-title" style={{ marginBottom: 'var(--space-6)' }}>Counselling Scheme</h2>
               <ul style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', listStyle: 'none', padding: 0, margin: 0, maxWidth: 820 }}>
-                {counsellingScheme.map((s) => (
+                {counsellingScheme.length > 0 ? counsellingScheme.map((s) => (
                   <li key={s.id} style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
                     <span style={{ flexShrink: 0, width: 8, height: 8, borderRadius: '50% 50% 50% 0', background: 'var(--color-accent)', marginTop: '0.5em' }} />
                     <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.7 }}>{s.desc || s.title}</p>
                   </li>
-                ))}
+                )) : (
+                  <li style={{ textAlign: 'center', padding: 'var(--space-8) 1rem', color: 'var(--color-text-light)' }}>
+                    <p style={{ fontSize: 'var(--text-sm)' }}>The counselling scheme details haven&apos;t been published yet. Please contact the admissions office for assistance.</p>
+                  </li>
+                )}
               </ul>
               <div style={{ textAlign: 'center', marginTop: 'var(--space-8)' }}>
                 <Link to="/admissions" className="btn btn-primary btn-lg">Learn More About Admissions</Link>
@@ -247,25 +214,69 @@ export default function Information() {
                   );
                 })}
               </div>
+
+              {/* Historical link archive carried over from the old SVECW
+                  ICT Platforms page — see ictResources.data.ts */}
+              <div style={{ marginTop: 'var(--space-12)', display: 'flex', flexDirection: 'column', gap: 'var(--space-10)' }}>
+                {ICT_RESOURCE_GROUPS.map((group) => (
+                  <div key={group.heading}>
+                    <h3 style={{ fontFamily: 'var(--font-sans)', fontWeight: 900, color: 'var(--color-primary)', fontSize: 'var(--text-lg)', marginBottom: 'var(--space-4)', paddingBottom: 'var(--space-2)', borderBottom: '2px solid var(--color-accent)' }}>
+                      {group.heading}
+                    </h3>
+                    <ul className="mobile-stack-grid" style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', columnGap: 'var(--space-8)' }}>
+                      {group.links.map((link) => (
+                        <li key={link.label} style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start', padding: 'var(--space-2) 0', borderBottom: '1px solid var(--color-light-gray)' }}>
+                          <span style={{ flexShrink: 0, width: 6, height: 6, borderRadius: '50% 50% 50% 0', background: 'var(--color-accent)', marginTop: '0.6em' }} />
+                          <span style={{ fontSize: 'var(--text-sm)', lineHeight: 1.6 }}>
+                            {link.url ? (
+                              <a href={link.url} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-primary)', fontWeight: 600, textDecoration: 'none' }}>
+                                {link.label}
+                              </a>
+                            ) : (
+                              <span style={{ color: 'var(--color-text)' }}>{link.label}</span>
+                            )}
+                            {link.note && (
+                              <span style={{ display: 'block', color: 'var(--color-text-light)', fontSize: 'var(--text-xs)', marginTop: 2 }}>{link.note}</span>
+                            )}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
-          {/* Other Practices */}
+          {/* Other Practices / Experiential Learning */}
           {activeTab === 'practices' && (
             <div>
-              <h2 className="section-title" style={{ marginBottom: 'var(--space-4)' }}>Other Practices at VWU</h2>
-              <p style={{ color: 'var(--color-text-light)', marginBottom: 'var(--space-8)', maxWidth: 680 }}>
-                Beyond academics, VWU follows best practices in sustainability, inclusivity, ethics, and community engagement.
-              </p>
+              <h2 className="section-title" style={{ marginBottom: 'var(--space-3)' }}>Experiential Learning & Other Practices at VWU</h2>
+              <div style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderLeft: '4px solid var(--color-accent)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', marginBottom: 'var(--space-8)' }}>
+                <p style={{ color: 'var(--color-text)', fontSize: 'var(--text-base)', lineHeight: 1.7, margin: 0 }}>
+                  {EXPERIENTIAL_LEARNING_INTRO}
+                </p>
+              </div>
+
               <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-5)' }}>
                 {otherPractices.map((item) => {
                   const Icon = resolveContentIcon(item.icon) || Monitor;
+                  const practiceBullets = (item as OtherPracticeItem).bullets;
                   return (
                     <div key={item.id} style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', display: 'flex', gap: 'var(--space-4)', borderLeft: '4px solid var(--color-accent)' }}>
-                      <Icon size={32} strokeWidth={1.75} />
+                      <Icon size={32} strokeWidth={1.75} style={{ flexShrink: 0, color: 'var(--color-primary)' }} />
                       <div>
                         <h3 style={{ fontFamily: 'var(--font-sans)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>{item.title}</h3>
-                        <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6 }}>{item.desc}</p>
+                        <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6, marginBottom: practiceBullets?.length ? 'var(--space-3)' : 0 }}>{item.desc}</p>
+                        {practiceBullets && practiceBullets.length > 0 && (
+                          <ul style={{ paddingLeft: 'var(--space-4)', margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+                            {practiceBullets.map((bullet, idx) => (
+                              <li key={idx} style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text)', lineHeight: 1.5 }}>
+                                {bullet}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
                       </div>
                     </div>
                   );

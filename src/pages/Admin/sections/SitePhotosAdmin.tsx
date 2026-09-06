@@ -40,7 +40,7 @@ export const SITE_PHOTO_PAGES = [
   { value: 'sports-games', label: 'Sports & Games' },
   { value: 'social-services', label: 'Social Services (NSS)' },
   { value: 'iqac', label: 'IQAC' },
-  { value: 'anti-ragging', label: 'Anti Ragging' },
+  { value: 'anti-ragging', label: 'Anti-Ragging' },
 ];
 
 interface SlotDefault { imageUrl: string; alt: string; caption: string; label?: string; }
@@ -335,6 +335,18 @@ const DEFAULT_SECTIONS: Record<string, Record<string, SectionDef>> = {
         { imageUrl: 'https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=900&q=80', alt: 'SVES campus', caption: '', label: '"About SVES" intro section photo' },
       ],
     },
+    'legacy-vision': {
+      label: 'Legacy Rooted in Vision Photo',
+      slots: [
+        { imageUrl: '/sves-legacy-vision.jpg', alt: 'Legacy Rooted in Vision — Late Dr. B. V. Raju', caption: '', label: 'Section Photo' },
+      ],
+    },
+    'leadership-culture': {
+      label: 'Leadership & Culture Photo',
+      slots: [
+        { imageUrl: '/sves-leadership-culture.jpg', alt: 'Leadership & Culture — Sri K. V. Vishnu Raju', caption: '', label: 'Section Photo' },
+      ],
+    },
     'sves-heritage': placeholderSection('SVES Campuses & Heritage', [
       'Society Central Office', 'Sister Institutions', 'Founder Chairman Vision', 'Joint Campus Events', 'Community Development Outreach',
     ]),
@@ -395,9 +407,9 @@ const DEFAULT_SECTIONS: Record<string, Record<string, SectionDef>> = {
   },
   'anti-ragging': {
     main: {
-      label: 'Anti Ragging Page Photo',
+      label: 'Anti-Ragging Page Photo',
       slots: [
-        { imageUrl: PHOTO_NEEDED_PLACEHOLDER, alt: 'Anti Ragging', caption: '' },
+        { imageUrl: PHOTO_NEEDED_PLACEHOLDER, alt: 'Anti-Ragging', caption: '' },
       ],
     },
   },

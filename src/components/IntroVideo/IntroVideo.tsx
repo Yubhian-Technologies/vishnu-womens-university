@@ -32,13 +32,12 @@ function hasSeenIntro() {
 export default function IntroVideo() {
   const [show, setShow] = useState(() => !hasSeenIntro());
   const [fading, setFading] = useState(false);
-  const [play, setPlay] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const dismiss = useCallback(() => {
     if (fading) return;
     setFading(true);
-    // Keep the flag write out of the branch below so a skipped session still
+    // Keep the flag write out of the branch below so a session still
     // only ever stamps it once.
     try {
       sessionStorage.setItem(INTRO_VIDEO_KEY, '1');
@@ -56,15 +55,6 @@ export default function IntroVideo() {
     }
   }, [dismiss]);
 
-  // Kick the video off only once mounted; the <video> element is present in
-  // the DOM immediately (so the app still renders beneath it) but playback is
-  // started right away so the screen never sits frozen.
-  useEffect(() => {
-    if (!show) return;
-    const t = window.setTimeout(() => setPlay(true), 30);
-    return () => window.clearTimeout(t);
-  }, [show]);
-
   const onEnded = useCallback(() => dismiss(), [dismiss]);
 
   if (!show) return null;
@@ -75,7 +65,6 @@ export default function IntroVideo() {
       role="dialog"
       aria-modal="true"
       aria-label="Welcome to Vishnu Women's University"
-      onClick={dismiss}
     >
       <video
         ref={videoRef}
@@ -86,18 +75,7 @@ export default function IntroVideo() {
         playsInline
         preload="auto"
         onEnded={onEnded}
-        onPlaying={() => setPlay(true)}
       />
-      {play && (
-        <button
-          type="button"
-          className="intro-video__skip"
-          aria-label="Skip intro"
-          onClick={dismiss}
-        >
-          Skip&nbsp;›
-        </button>
-      )}
     </div>
   );
 }

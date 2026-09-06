@@ -24,10 +24,12 @@ const EMPTY: Omit<PlacementHighlightDoc, 'id'> = {
   order: 0,
 };
 
-// Backs the auto-rotating placement highlight card (photo + name + package +
-// recruiter logo) in the "Educate a Woman, Transform the World" section on
-// Home — see PLACEMENT_PHOTOS / WomensEducationSection.tsx, which falls back
-// to its own hardcoded defaults until at least one highlight is added here.
+// Backs two Home sections from the same data: the small auto-rotating card
+// in "Educate a Woman, Transform the World" (WomensEducationSection.tsx,
+// falls back to its own hardcoded defaults until a highlight exists here),
+// and the full "Our Latest Graduates Conquering the World" carousel
+// (LatestGraduatesShowcase.tsx, which has no fallback — it stays hidden
+// entirely until at least one highlight is added here).
 export default function PlacementHighlightsAdmin() {
   const { docs: highlights, loading } = useOrderedCollection<PlacementHighlightDoc>('placementHighlights', 'order');
   const [form, setForm] = useState<Omit<PlacementHighlightDoc, 'id'>>(EMPTY);
@@ -119,8 +121,10 @@ export default function PlacementHighlightsAdmin() {
       <div className="admin-card">
         <h2 className="admin-card__title">Placement Highlights ({highlights.length})</h2>
         <p className="admin-field__hint">
-          Shown on Home in the "Educate a Woman, Transform the World" section, rotating every few seconds.
-          Until at least one highlight is added here, that section shows its original hardcoded defaults.
+          Shown on Home in two places: the "Educate a Woman, Transform the World" section (rotates every few
+          seconds; shows its original hardcoded defaults until at least one highlight is added here), and the
+          "Our Latest Graduates Conquering the World" carousel further down the page — which stays hidden
+          entirely until at least one highlight exists here.
         </p>
         {loading ? <p className="admin-loading">Loading…</p> : (
           <div className="admin-table-wrap">

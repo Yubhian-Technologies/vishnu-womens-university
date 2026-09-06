@@ -7,7 +7,7 @@ function Stat({ value, suffix, label, start, index }: { value: number; suffix: s
   const count = useCounter(value, 1800, start);
   return (
     <Reveal className="lpe-stat lpe-stat--big" index={index}>
-      <span className="lpe-stat__num">{count.toLocaleString()}{suffix}</span>
+      {value > 0 && <span className="lpe-stat__num">{count.toLocaleString()}{suffix}</span>}
       <span className="lpe-stat__label">{label}</span>
     </Reveal>
   );

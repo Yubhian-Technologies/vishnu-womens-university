@@ -1,7 +1,8 @@
 import { useState, useId } from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, Phone, Mail, ExternalLink, ChevronDown, ShieldCheck, FileText, ChevronRight } from 'lucide-react';
+import { MapPin, Phone, Mail, ExternalLink, ChevronDown, FileText, ChevronRight, Navigation } from 'lucide-react';
 import { useOrderedCollection } from '../../hooks/useCollection';
+import { useSiteContact, telHref } from '../../hooks/useSiteContact';
 import { COMPLIANCE_GROUPS, DEFAULT_COMPLIANCE_DOCS, type ComplianceDocDoc } from '../../pages/Admin/sections/ComplianceDocsAdmin';
 import { InstagramIcon, FacebookIcon, TwitterIcon, LinkedInIcon, YouTubeIcon } from './SocialIcons';
 import SmoothCollapse from '../SmoothCollapse/SmoothCollapse';
@@ -19,18 +20,13 @@ const SOCIAL_LINKS = [
   { label: 'YouTube', href: 'https://www.youtube.com/@SVECW-B0', Icon: YouTubeIcon },
 ];
 
-const ACCREDITATIONS = [
-  { code: 'NBA', title: 'National Board of Accreditation' },
-  { code: 'NAAC', title: 'Quality Assurance Grade' },
-  { code: 'UGC', title: 'University Grants Commission' },
-  { code: 'AICTE Approved', title: 'All India Council for Tech Education' },
-  { code: 'JNTUK Affiliated', title: 'Jawaharlal Nehru Tech University' },
-];
-
-const UNIVERSITY_LINKS = [
+// `disabled` items render as greyed, non-clickable text — mirroring the
+// navbar, where the corresponding pages (Governance sub-pages, Campus
+// Facilities) aren't live yet.
+const UNIVERSITY_LINKS: { label: string; href: string; disabled?: boolean }[] = [
   { label: 'About VWU', href: '/about' },
-  { label: 'Governance & Leadership', href: '/governance' },
-  { label: 'Campus Facilities', href: '/campus-facilities' },
+  { label: 'Governance & Leadership', href: '/governance', disabled: true },
+  { label: 'Campus Facilities', href: '/campus-facilities', disabled: true },
   { label: 'Careers at VWU', href: '/careers' },
   { label: 'Alumni Network', href: '/alumni-giving#network' },
   { label: 'Contact Us', href: '/contact' },
@@ -41,6 +37,7 @@ const ACADEMIC_LINKS = [
   { label: 'Fee Structure', href: '/programmes-fee-structure' },
   { label: 'Examinations Portal', href: 'https://www.svecwexams.in/', external: true },
   { label: 'Vishnu LMS', href: 'https://www.vishnulearning.com/login/index.php', external: true },
+  { label: 'Vishnu Tech Hub', href: 'https://www.vishnutechhub.in/', external: true },
   { label: 'VEDIC Learning Center', href: 'https://vedic.edu.in/', external: true },
   { label: 'Vishnu Era Magazine', href: 'https://www.srivishnu.edu.in/vishnu-era/', external: true },
   { label: 'Prathibha Magazine', href: 'https://heyzine.com/flip-book/14449c1cd4.html', external: true },
@@ -58,17 +55,10 @@ const STUDENT_SERVICE_LINKS = [
 
 const LEGAL_LINKS = [
   { label: 'Policies & Procedures', href: '/policies-procedures' },
-  { label: 'Anti Ragging Policy', href: '/anti-ragging' },
+  { label: 'Anti-Ragging Policy', href: '/anti-ragging' },
   { label: 'Disclosures – UGC', href: '/disclosures/ugc' },
   { label: 'Contact Us', href: '/contact' },
 ];
-
-const PINNED_UGC_DISCLOSURE = {
-  label: 'Disclosures – UGC (Public Self-Disclosure)',
-  href: '/disclosures/ugc',
-  download: false,
-  external: false,
-};
 
 /* -------------------------------------------------------------------------- */
 /* Main Redesigned Footer Component                                           */
@@ -77,11 +67,13 @@ const PINNED_UGC_DISCLOSURE = {
 export default function Footer() {
   const currentYear = new Date().getFullYear();
   const accordionBaseId = useId();
+  const { phone, email } = useSiteContact();
 
   // Mobile accordion state (all closed by default for compact mobile viewport)
   const [openMobileSections, setOpenMobileSections] = useState<Set<string>>(new Set());
   // Compliance group toggle state on desktop/mobile
-  const [activeComplianceGroup, setActiveComplianceGroup] = useState<string>(COMPLIANCE_GROUPS[0]);
+  const initialGroup = COMPLIANCE_GROUPS.find((g) => g !== 'Mandatory Disclosures') || COMPLIANCE_GROUPS[0];
+  const [activeComplianceGroup, setActiveComplianceGroup] = useState<string>(initialGroup);
 
   const toggleMobileSection = (sectionKey: string) => {
     setOpenMobileSections((prev) => {
@@ -99,45 +91,39 @@ export default function Footer() {
   const { docs: liveDocs } = useOrderedCollection<ComplianceDocDoc>('complianceDocs', 'order');
   const complianceDocs = liveDocs.length > 0 ? liveDocs : (DEFAULT_COMPLIANCE_DOCS as ComplianceDocDoc[]);
 
-  const complianceGroups = COMPLIANCE_GROUPS.map((title) => {
-    const isMandatory = title === 'Mandatory Disclosures';
-    const groupItems = complianceDocs.filter((d) => d.group === title);
-    const links = [
-      ...(isMandatory ? [PINNED_UGC_DISCLOSURE] : []),
-      ...groupItems.map((d) => ({
+  const complianceGroups = COMPLIANCE_GROUPS
+    .filter((title) => title !== 'Mandatory Disclosures')
+    .map((title) => {
+      const groupItems = complianceDocs.filter((d) => d.group === title);
+      const links = groupItems.map((d) => ({
         label: d.label,
         href: d.fileUrl,
         download: d.external ? false : d.download !== false,
         external: !!d.external,
-      })),
-    ];
-    return { title, links };
-  }).filter((g) => g.links.length > 0);
+      }));
+      return { title, links };
+    })
+    .filter((g) => g.links.length > 0);
 
   const selectedComplianceLinks = complianceGroups.find((g) => g.title === activeComplianceGroup)?.links || complianceGroups[0]?.links || [];
 
   return (
     <footer className="vwu-footer" role="contentinfo">
       {/* ------------------------------------------------------------------ */}
-      {/* TIER 1: Identity & Institutional Accreditations Header             */}
+      {/* TIER 1: Identity (left) & Structured Navigation / Compliance (right) */}
       {/* ------------------------------------------------------------------ */}
-      <div className="vwu-footer-identity-tier">
-        <div className="container vwu-footer-identity-inner">
+      <div className="vwu-footer-main-tier">
+        <div className="container vwu-footer-main-inner">
           {/* Brand Anchor */}
           <div className="vwu-footer-brand-block">
             <Link to="/" className="vwu-footer-logo-wrap" aria-label="Vishnu Women's University Home">
               <img
-                src="/images/square%20logo.png"
-                alt="VWU Emblem"
+                src="/images/footer-logo.png"
+                alt="Vishnu Women's University"
                 className="vwu-footer-logo-img"
-                width={52}
-                height={52}
                 loading="lazy"
               />
-              <div className="vwu-footer-brand-title">
-                <span className="vwu-brand-main">Vishnu Women's</span>
-                <span className="vwu-brand-sub">University</span>
-              </div>
+              <span className="vwu-brand-main" lang="te">విష్ణు మహిళా విశ్వవిద్యాలయం</span>
             </Link>
 
             <p className="vwu-footer-mission-text">
@@ -151,52 +137,46 @@ export default function Footer() {
                 <MapPin size={15} className="vwu-footer-contact-icon" aria-hidden="true" />
                 <span>Bhimavaram, West Godavari Dist., Andhra Pradesh – 534 202</span>
               </div>
+              <a
+                href="https://www.google.com/maps/search/?api=1&query=16.568119,81.522098"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="vwu-footer-get-directions"
+              >
+                <Navigation size={13} aria-hidden="true" />
+                <span>Get Directions</span>
+              </a>
               <div className="vwu-footer-contact-links">
-                <a href="tel:08816250864" className="vwu-footer-contact-action" aria-label="Phone: 08816-250864">
+                <a href={telHref(phone)} className="vwu-footer-contact-action" aria-label={`Phone: ${phone}`}>
                   <Phone size={14} aria-hidden="true" />
-                  <span>08816-250864</span>
+                  <span>{phone}</span>
                 </a>
                 <span className="vwu-footer-contact-sep" aria-hidden="true">·</span>
-                <a href="mailto:info@vwu.edu.in" className="vwu-footer-contact-action" aria-label="Email: info@vwu.edu.in">
+                <a href={`mailto:${email}`} className="vwu-footer-contact-action" aria-label={`Email: ${email}`}>
                   <Mail size={14} aria-hidden="true" />
-                  <span>info@vwu.edu.in</span>
+                  <span>{email}</span>
                 </a>
               </div>
             </address>
           </div>
 
-          {/* Institutional Accreditations Panel */}
-          <div className="vwu-footer-accreditation-block">
-            <div className="vwu-footer-accreditation-header">
-              <ShieldCheck size={16} className="vwu-footer-acc-shield" aria-hidden="true" />
-              <span className="vwu-footer-acc-heading">Accreditations &amp; Affiliations</span>
-            </div>
-            <div className="vwu-footer-accreditation-grid">
-              {ACCREDITATIONS.map((acc) => (
-                <div key={acc.code} className="vwu-footer-acc-card" title={acc.title}>
-                  <strong className="vwu-footer-acc-code">{acc.code}</strong>
-                  <span className="vwu-footer-acc-title">{acc.title}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ------------------------------------------------------------------ */}
-      {/* TIER 2: Structured Navigation & Compliance Matrix                   */}
-      {/* ------------------------------------------------------------------ */}
-      <div className="vwu-footer-nav-tier">
-        <div className="container vwu-footer-nav-grid">
+          {/* Navigation Columns */}
+          <div className="vwu-footer-nav-grid">
           {/* Column 1: University */}
           <div className="vwu-footer-nav-col">
             <h3 className="vwu-footer-nav-title">University</h3>
             <ul className="vwu-footer-nav-list" role="list">
               {UNIVERSITY_LINKS.map((item) => (
                 <li key={item.label}>
-                  <Link to={item.href} className="vwu-footer-nav-link">
-                    {item.label}
-                  </Link>
+                  {item.disabled ? (
+                    <span className="vwu-footer-nav-link is-disabled" aria-disabled="true">
+                      {item.label}
+                    </span>
+                  ) : (
+                    <Link to={item.href} className="vwu-footer-nav-link">
+                      {item.label}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>
@@ -314,6 +294,7 @@ export default function Footer() {
                 <ChevronRight size={14} aria-hidden="true" />
               </Link>
             )}
+          </div>
           </div>
         </div>
 
@@ -544,7 +525,15 @@ export default function Footer() {
 
           <div className="vwu-footer-attribution">
             <span>Developed by</span>
-            <strong className="vwu-tech-hub-badge">VISHNU TECH HUB</strong>
+            <a
+              href="https://www.vishnutechhub.in/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="vwu-tech-hub-badge-link"
+              aria-label="Vishnu Tech Hub"
+            >
+              <strong className="vwu-tech-hub-badge">VISHNU TECH HUB</strong>
+            </a>
           </div>
         </div>
       </div>

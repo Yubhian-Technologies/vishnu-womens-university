@@ -7,7 +7,7 @@ import { useOrderedCollection } from '../../../hooks/useCollection';
 import ImageUploader from '../../../components/ImageUploader/ImageUploader';
 import VideoUploader from '../../../components/VideoUploader/VideoUploader';
 import { deleteFile, type UploadResult } from '../../../lib/storage';
-import { campusFacilities } from '../../Campus/campusFacilities.data';
+import { allCampusFacilities } from '../../Campus/campusFacilities.data';
 import { DIFFERENTIATOR_CATEGORIES } from './DifferentiatorsAdmin';
 import ItemHeroImagesAdmin from './ItemHeroImagesAdmin';
 import { smoothScrollTo } from '../../../lib/smoothScroll';
@@ -64,6 +64,7 @@ export const PAGES = [
   { value: 'academics',               label: 'Academics' },
   { value: 'academics-curriculum',    label: 'Academics: Curriculum Matrix' },
   { value: 'academics-downloads',     label: 'Academics: Documents' },
+  { value: 'academics-schools',       label: 'Academics: Schools' },
   { value: 'faculty',                 label: 'Faculty' },
   { value: 'admissions',              label: 'Admissions' },
   { value: 'campus-visit',            label: 'Campus Visit' },
@@ -73,7 +74,7 @@ export const PAGES = [
   { value: 'about',                   label: 'About VWU' },
   { value: 'about-sves',              label: 'About SVES' },
   { value: 'campus',                  label: 'Campus Life (Overview)' },
-  ...campusFacilities.map((f) => ({ value: `campus-${f.slug}`, label: `Campus Life: ${f.title}` })),
+  ...allCampusFacilities.map((f) => ({ value: `campus-${f.slug}`, label: `Campus Life: ${f.title}` })),
   { value: 'information',             label: 'Information' },
   { value: 'governance',              label: 'Governance' },
   { value: 'governing-body',          label: 'Governing Body' },
@@ -87,7 +88,7 @@ export const PAGES = [
   { value: 'news-awards-gallery',     label: 'Gallery' },
   { value: 'programmes-fee',          label: 'Programmes & Fee' },
   { value: 'admission-procedure',     label: 'Admission Procedure' },
-  { value: 'result-analysis',         label: 'Result Analysis' },
+  { value: 'result-analysis',         label: 'Results Analysis' },
   { value: 'differentiators',         label: 'Differentiators' },
   { value: 'differentiators-detail',  label: 'Differentiators Detail Pages (fallback — used when a differentiator item has no image of its own)' },
   { value: 'research',                label: 'Research' },
@@ -97,7 +98,7 @@ export const PAGES = [
   { value: 'social-services',         label: 'Social Services' },
   { value: 'campus-magazines',        label: 'Campus Magazines' },
   { value: 'disclosures-ugc',         label: 'UGC Public Self-Disclosure' },
-  { value: 'anti-ragging',            label: 'Anti Ragging' },
+  { value: 'anti-ragging',            label: 'Anti-Ragging' },
   { value: 'policies-procedures',     label: 'Policies & Procedures' },
   { value: 'sports-games',            label: 'Sports & Games' },
   { value: 'vishnu-tv',               label: 'Vishnu TV' },
@@ -114,11 +115,11 @@ export const PAGES = [
 const PAGE_GROUPS: { label: string; values: string[] }[] = [
   { label: 'Main Pages', values: ['home', 'academics', 'admissions', 'programmes-fee', 'admission-procedure', 'result-analysis', 'campus-visit', 'student-life', 'placements', 'alumni-giving', 'about', 'information'] },
   { label: 'About, Society & Governance', values: ['about-sves', 'vision-mission', 'governance', 'governing-body', 'governance-detail'] },
-  { label: 'Academics', values: ['academics-curriculum', 'academics-downloads', 'faculty', 'program-detail'] },
+  { label: 'Academics', values: ['academics-curriculum', 'academics-downloads', 'academics-schools', 'faculty', 'program-detail'] },
   { label: 'Student Life', values: ['student-clubs', 'arts-culture', 'social-services', 'sports-games', 'vishnu-tv', 'campus-magazines'] },
   { label: 'Placements, Careers & Research', values: ['placement-detail', 'careers', 'differentiators', 'differentiators-detail', 'research', 'research-detail'] },
   { label: 'News & Awards', values: ['news', 'events', 'news-awards', 'news-awards-happenings', 'news-awards-accreditations', 'news-awards-gallery'] },
-  { label: 'Campus Life', values: ['campus', ...campusFacilities.map((f) => `campus-${f.slug}`)] },
+  { label: 'Campus Life', values: ['campus', ...allCampusFacilities.map((f) => `campus-${f.slug}`)] },
   { label: 'Compliance & Contact', values: ['disclosures-ugc', 'anti-ragging', 'policies-procedures', 'contact'] },
 ];
 
@@ -137,12 +138,12 @@ const FALLBACK_PAGES = new Set(['program-detail', 'governance-detail', 'placemen
 // many different items with their own titles) are intentionally omitted.
 const PAGE_TEXT_DEFAULTS: Record<string, { title: string; subtitle?: string }> = {
   'about': { title: "About Vishnu Women's University", subtitle: "Rooted in Bhimavaram since 2001, VWU has grown into Andhra Pradesh's foremost institution for women's technical education." },
-  'anti-ragging': { title: 'Anti Ragging', subtitle: "Vishnu Women's University is committed to a safe, ragging-free campus for every student." },
+  'anti-ragging': { title: 'Anti-Ragging', subtitle: "Vishnu Women's University is committed to a safe, ragging-free campus for every student." },
   'alumni-giving': { title: 'Always a Vishnu Engineer', subtitle: 'Graduation is not the end of your VWU story. Stay engaged, give back, and help shape the next generation of women engineers.' },
   'admissions': { title: 'Your Journey Starts Here', subtitle: 'Choosing VWU sets you on a path to a fulfilling engineering career, a strong professional network, and a future built on real achievement.' },
   'campus-visit': { title: 'Come See VWU for Yourself', subtitle: 'Seeing VWU in person is the best way to know if it is the right fit for you. Choose the visit format that suits you best.' },
   'disclosures-ugc': { title: 'UGC Public Self-Disclosure', subtitle: 'Shri Vishnu Engineering College for Women (Autonomous) — published as required by the University Grants Commission.' },
-  'result-analysis': { title: 'Result Analysis', subtitle: 'VWU consistently ranks among the top 5 affiliated colleges of JNTU Kakinada with 90%+ annual pass rates.' },
+  'result-analysis': { title: 'Results Analysis', subtitle: 'VWU consistently ranks Among the Top 5 JNTUK-Affiliated Institutions with 90%+ annual pass rates.' },
   'about-sves': { title: 'Sri Vishnu Educational Society', subtitle: 'More than 25 years of educational commitment, spanning 11 institutions across Andhra Pradesh and Telangana.' },
   'admission-procedure': { title: 'Admission Procedure', subtitle: 'A clear, step-by-step guide to joining VWU — covering eligibility, entrance examinations, and the enrollment process for all programmes.' },
   'careers': { title: 'Careers at VWU', subtitle: 'Build your career alongside a community of educators and professionals who are genuinely invested in advancing women in engineering and technology.' },
@@ -150,8 +151,9 @@ const PAGE_TEXT_DEFAULTS: Record<string, { title: string; subtitle?: string }> =
   'events': { title: 'Campus Events', subtitle: 'Technical symposia, sports tournaments, graduation ceremonies, and much more — the VWU calendar is always full.' },
   'academics': { title: 'You Will Excel.', subtitle: 'Rigorous, industry-aligned programs designed to build your technical expertise, sharpen your research instincts, and develop you as a professional.' },
   'faculty': { title: 'Our Faculty', subtitle: 'Experienced educators and researchers across every department, dedicated to academic excellence and student success.' },
+  'academics-schools': { title: 'Schools' },
   'academics-downloads': { title: 'Academic Documents', subtitle: 'Official academic documents — calendar and regulations — available for download.' },
-  'programmes-fee': { title: 'Programmes & Fee Structure', subtitle: 'Complete list of programs, intake capacities, and annual fee structure for AY 2025–26.' },
+  'programmes-fee': { title: 'Programmes & Fee Structure', subtitle: 'Complete list of programs, intake capacities, and annual fee structure Category A.' },
   'student-life': { title: 'Discover Your Place at VWU', subtitle: 'VWU offers more than an engineering qualification. It is where you find your community, sharpen your purpose, and start building your future.' },
   'differentiators': { title: 'What Sets VWU Apart', subtitle: 'Distinctive initiatives in innovation, industry engagement, research, international outreach, and student development — all aimed at producing well-rounded women engineers.' },
   'governing-body': { title: 'Governing Body', subtitle: 'Dedicated leaders and distinguished members committed to academic excellence, institutional governance, innovation, and the continuous growth of Shri Vishnu Engineering College for Women.' },
@@ -163,7 +165,7 @@ const PAGE_TEXT_DEFAULTS: Record<string, { title: string; subtitle?: string }> =
   'vishnu-tv': { title: 'Vishnu TV Academy', subtitle: 'Student-run and student-driven — the only dedicated campus TV Academy in Andhra Pradesh.' },
   'social-services': { title: 'Social Services', subtitle: 'The National Service Scheme at VWU shapes engineers who are equally committed to their craft and to the communities they serve.' },
   'student-clubs': { title: 'Student Clubs', subtitle: '23 active clubs across technology, social service, arts, and culture — VWU has a community for every interest.' },
-  'sports-games': { title: 'Sports & Games', subtitle: 'Physical fitness is taken seriously at VWU — a sound body supports a sound mind, and both are essential to a complete education.' },
+  'sports-games': { title: 'Sports & Games', subtitle: 'Building Strength, Skill, Teamwork, and Sporting Spirit.' },
   'policies-procedures': { title: 'Policies & Procedures', subtitle: 'A structured framework for governance, academics, research, and campus sustainability at VWU.' },
   'research': { title: 'Research & Development', subtitle: 'From funded projects and patents to industry MoUs and professional bodies — a look at how VWU builds knowledge that matters.' },
   'news-awards-accreditations': { title: 'Accreditations & Awards', subtitle: "Endorsed by India's foremost regulatory and ranking bodies — a record of recognised quality and consistent academic achievement." },
@@ -175,7 +177,7 @@ const PAGE_TEXT_DEFAULTS: Record<string, { title: string; subtitle?: string }> =
   'news': { title: 'VWU News & Stories', subtitle: 'Stay up-to-date with the latest happenings, achievements, and stories from the VWU community.' },
   'contact': { title: 'Contact Us', subtitle: "We're happy to assist. Contact us for admissions information, general enquiries, or anything else on your mind." },
   ...Object.fromEntries(
-    campusFacilities.map((f) => [`campus-${f.slug}`, { title: f.title, subtitle: f.heroSubtitle ?? f.desc }])
+    allCampusFacilities.map((f) => [`campus-${f.slug}`, { title: f.title, subtitle: f.heroSubtitle ?? f.desc }])
   ),
 };
 
@@ -256,8 +258,8 @@ function PageBannersAdmin() {
     setForm({
       page: b.page ?? 'home',
       title: b.title, subtitle: b.subtitle, imageUrl: b.imageUrl,
-      storagePath: b.storagePath, videoUrl: b.videoUrl || '', videoStoragePath: b.videoStoragePath || '',
-      ctaLabel: b.ctaLabel, ctaLink: b.ctaLink, order: b.order,
+      storagePath: b.storagePath || '', videoUrl: b.videoUrl || '', videoStoragePath: b.videoStoragePath || '',
+      ctaLabel: b.ctaLabel || '', ctaLink: b.ctaLink || '', order: b.order,
     });
     setSelectedGroup(groupOfPage(b.page ?? 'home') ?? null);
     // The banner list (below the form) covers every page's banners, so the

@@ -6,6 +6,7 @@ import { useHashScroll } from '../../hooks/useHashScroll';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { DIFFERENTIATOR_CATEGORIES } from '../Admin/sections/DifferentiatorsAdmin';
 import type { DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
+import './Differentiators.css';
 
 // Fixed top-level categories — not admin content. Items within each are Firestore-backed.
 const CATEGORY_ICONS: Record<string, typeof Rocket> = {
@@ -75,13 +76,7 @@ export default function Differentiators() {
         <div className="container">
           <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap', justifyContent: 'center' }}>
             {categories.map((cat) => (
-              <a
-                key={cat.id}
-                href={`#${cat.id}`}
-                style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', padding: '0.4rem 1rem', borderRadius: 'var(--radius-full)', border: '1.5px solid var(--color-primary)', color: 'var(--color-primary)', fontSize: 'var(--text-sm)', fontWeight: 600, textDecoration: 'none', transition: 'all var(--transition-base)' }}
-                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'var(--color-primary)'; (e.currentTarget as HTMLElement).style.color = 'var(--color-white)'; }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.color = 'var(--color-primary)'; }}
-              >
+              <a key={cat.id} href={`#${cat.id}`} className="diff-jump-pill">
                 <cat.icon size={16} strokeWidth={1.75} /> {cat.label}
               </a>
             ))}
@@ -94,21 +89,20 @@ export default function Differentiators() {
         <section key={cat.id} id={cat.id} className={`section ${ci % 2 === 0 ? 'bg-off-white' : 'bg-white'}`} style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
           <div className="container">
             <div className="reveal" style={{ marginBottom: 'var(--space-10)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-2)' }}>
-                <cat.icon size={32} strokeWidth={1.75} />
-                <span className="section-label" style={{ position: 'static', marginBottom: 0 }}>{cat.label}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)', marginBottom: 'var(--space-2)' }}>
+                <div className="diff-category-icon">
+                  <cat.icon size={26} strokeWidth={1.75} />
+                </div>
+                <div>
+                  <span className="section-label" style={{ position: 'static', marginBottom: 0 }}>{cat.label}</span>
+                  <h2 className="section-title" style={{ margin: 0 }}>{cat.label}</h2>
+                </div>
               </div>
-              <h2 className="section-title">{cat.label}</h2>
             </div>
 
             <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 'var(--space-5)' }}>
               {cat.items.map((item) => (
-                <div
-                  key={item.slug}
-                  style={{ background: ci % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', display: 'flex', flexDirection: 'column', transition: 'all var(--transition-base)' }}
-                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-accent)'; (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-md)'; (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; }}
-                  onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-light-gray)'; (e.currentTarget as HTMLElement).style.boxShadow = 'none'; (e.currentTarget as HTMLElement).style.transform = 'none'; }}
-                >
+                <div key={item.slug} className={`diff-item-card${ci % 2 === 0 ? '' : ' diff-item-card--alt'}`}>
                   <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--color-accent)', marginBottom: 'var(--space-3)' }} />
 
                   <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-2)', lineHeight: 1.35 }}>
@@ -121,26 +115,14 @@ export default function Differentiators() {
 
                   {/* Learn More */}
                   {item.external && item.url ? (
-                    <a
-                      href={item.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-primary)', textDecoration: 'none', paddingTop: 'var(--space-3)', borderTop: '1px solid var(--color-light-gray)', marginTop: 'auto' }}
-                      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = 'var(--color-accent)'; }}
-                      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = 'var(--color-primary)'; }}
-                    >
+                    <a href={item.url} target="_blank" rel="noopener noreferrer" className="diff-item-link">
                       Learn More
                       <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
                         <path d="M2.5 9.5l7-7M4 2.5h5.5V8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
                     </a>
                   ) : (
-                    <Link
-                      to={`/differentiators/${item.slug}`}
-                      style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-primary)', textDecoration: 'none', paddingTop: 'var(--space-3)', borderTop: '1px solid var(--color-light-gray)', marginTop: 'auto' }}
-                      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = 'var(--color-accent)'; }}
-                      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = 'var(--color-primary)'; }}
-                    >
+                    <Link to={`/differentiators/${item.slug}`} className="diff-item-link">
                       Learn More
                       <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
                         <path d="M2 6h8M6 2l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -165,7 +147,7 @@ export default function Differentiators() {
               Visit VWU in person to see these initiatives firsthand. Schedule a campus visit and explore the ecosystem built for India's next generation of women technologists.
             </p>
             <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Link to="/admissions" className="btn btn-accent">Apply Now</Link>
+              <Link to="/apply-now" className="btn btn-accent">Apply Now</Link>
               <Link to="/campus" className="btn btn-secondary">Campus Life</Link>
               <Link to="/academics" className="btn btn-secondary">Academics</Link>
             </div>

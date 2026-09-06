@@ -1,0 +1,50 @@
+/* Bigger, full-width tab bar for the Admission Procedure page's 4 programme
+   tabs and their Category A/B sub-tabs — scoped here (rather than editing
+   the shared tabbed-section.css) so Campus Life / Academics pages that also
+   use .section-tabs / .section-subtabs keep their existing sizing. */
+
+.admission-tabs-bar {
+  padding: 10px;
+}
+
+.admission-tabs-bar .section-tab-btn {
+  font-size: var(--text-base);
+  font-weight: 800;
+  padding: var(--space-4) var(--space-6);
+  min-height: 48px;
+}
+
+.admission-subtabs-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.admission-subtabs-bar .section-subtab-btn {
+  flex: 1 1 220px;
+  min-height: 48px;
+  font-size: var(--text-sm);
+  padding: var(--space-3) var(--space-5);
+  text-align: center;
+}
+
+.admission-category-card {
+  padding: var(--space-6);
+}
+
+@media (max-width: 768px) {
+  .admission-tabs-bar .section-tab-btn {
+    font-size: var(--text-sm);
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .admission-category-card {
+    padding: var(--space-4);
+  }
+}
+
+@media (max-width: 640px) {
+  .admission-subtabs-bar .section-subtab-btn {
+    flex: 1 1 100%;
+  }
+}

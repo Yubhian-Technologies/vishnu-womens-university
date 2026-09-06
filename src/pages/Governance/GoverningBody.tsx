@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
@@ -103,7 +104,7 @@ export default function GoverningBody() {
       <PageHero
         page="governing-body"
         defaultTitle="Governing Body"
-        defaultSubtitle="Dedicated leaders and distinguished members committed to academic excellence, institutional governance, innovation, and the continuous growth of Shri Vishnu Engineering College for Women."
+        defaultSubtitle="Dedicated leaders and distinguished members committed to academic excellence, institutional governance, innovation, and continuous growth."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Governance', to: '/governance' }, { label: 'Governing Body' }]}
       />
 
@@ -112,8 +113,8 @@ export default function GoverningBody() {
         <div className="container">
           <div className="gb-overview__grid reveal">
             <div className="gb-overview__inner">
-              <span className="gb-label">Overview</span>
-              <h2 className="gb-overview__title">Overview</h2>
+              <span className="section-label">Apex Authority</span>
+              <h2 className="gb-overview__title">Institutional Overview</h2>
               <p>{overviewText}</p>
               {overviewItem?.highlights && overviewItem.highlights.length > 0 && (
                 <ul style={{ marginTop: 'var(--space-4)', paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
@@ -134,13 +135,28 @@ export default function GoverningBody() {
       <section className="section gb-members">
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>
-            <span className="gb-label">Members</span>
+            <span className="section-label">Board Members</span>
             <h2 className="gb-overview__title">Governing Body Members</h2>
             <p className="gb-members__subtitle">
-              Meet the leaders steering VWU's institutional vision and governance.
+              Meet the distinguished leaders steering VWU's strategic vision and institutional governance.
             </p>
           </div>
           <MembersTiles />
+        </div>
+      </section>
+
+      {/* Bottom CTA Banner */}
+      <section className="about-cta-banner">
+        <div className="container">
+          <div className="about-cta-inner">
+            <h2>Explore Institutional Governance</h2>
+            <p>Discover our statutory committees, academic councils, and quality assurance frameworks.</p>
+            <div className="about-cta-buttons">
+              <Link to="/governance" className="btn btn-accent">All Governance</Link>
+              <Link to="/vision-mission" className="btn btn-secondary">Vision & Mission</Link>
+              <Link to="/about" className="btn btn-secondary">About VWU</Link>
+            </div>
+          </div>
         </div>
       </section>
     </main>

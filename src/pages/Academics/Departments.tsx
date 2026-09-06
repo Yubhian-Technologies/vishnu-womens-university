@@ -46,7 +46,7 @@ export default function Departments() {
             <span className="section-label">Departments</span>
             <h2 className="section-title">Academic Departments</h2>
             <p className="section-desc" style={{ margin: '0 auto' }}>
-              Specialised departments — each bringing together experienced faculty, well-equipped laboratories, and curricula shaped by industry demands.
+              Specialised departments bringing together experienced faculty, modern laboratories, and industry-aligned curricula for relevant and future-ready education.
             </p>
           </div>
           <div className="dept-grid">

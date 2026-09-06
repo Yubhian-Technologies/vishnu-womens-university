@@ -8,9 +8,34 @@ const DEFAULT_BTECH_FEE = '₹ 1,05,000';
 const DEFAULT_MTECH_FEE = '₹ 55,800';
 const DEFAULT_MBA_FEE = '₹ 55,000';
 
+// VISWPU is a second, separate AP EAPCET college code — its B.Tech seats
+// aren't part of the admin-managed `programs` collection (those are the
+// VISW-code totals), so they're hardcoded here rather than admin-editable:
+// this is a fixed, externally-issued code and count, not day-to-day content.
+const VISWPU_BTECH_PROGRAMS: { name: string; code: string; intake: number; fee: string }[] = [
+  { name: 'CSE [Artificial Intelligence & Machine Learning]', code: 'B.Tech AI & ML', intake: 120, fee: '₹ 47,000' },
+  { name: 'Electronics Engineering (VLSI Design & Technology)', code: 'B.Tech EVT', intake: 60, fee: '₹ 47,000' },
+];
+
+// A program can be split across both codes (e.g. AI&ML: 240 total intake in
+// the admin `programs` collection = 120 VISW + 120 VISWPU) — unlike EVT,
+// which is carved out of the VISW table entirely (see the filter below), the
+// admin's `intake` for these still reflects the combined total. Subtracting
+// each one's fixed VISWPU share here, display-only, is what keeps the VISW
+// table from double-counting the VISWPU seats shown just below it — the
+// admin-editable total itself (240) is correct and unchanged, and anywhere
+// else that reads it (e.g. the department page) is meant to show that
+// combined total, not the VISW-only split.
+const VISWPU_INTAKE_BY_NAME: Record<string, number> = Object.fromEntries(
+  VISWPU_BTECH_PROGRAMS.map((p) => [p.name, p.intake])
+);
+
 export default function ProgrammesFee() {
   const { docs: allPrograms } = useOrderedCollection<ProgramDoc>('programs', 'order');
-  const btechPrograms = useMemo(() => allPrograms.filter(p => p.category === 'btech'), [allPrograms]);
+  // EVT is excluded from the VISW table on this page only — it's listed
+  // under VISWPU instead (see VISWPU_BTECH_PROGRAMS above). Nothing is
+  // changed in admin/Firestore or on any other page that reads `programs`.
+  const btechPrograms = useMemo(() => allPrograms.filter(p => p.category === 'btech' && p.shortName !== 'B.Tech EVT'), [allPrograms]);
   const mtechPrograms = useMemo(() => allPrograms.filter(p => p.category === 'mtech'), [allPrograms]);
   const mbaProgram = useMemo(() => allPrograms.find(p => p.category === 'mba'), [allPrograms]);
   const phdPrograms = useMemo(() => allPrograms.filter(p => p.category === 'phd'), [allPrograms]);
@@ -58,7 +83,7 @@ export default function ProgrammesFee() {
       <PageHero
         page="programmes-fee"
         defaultTitle="Programmes & Fee Structure"
-  defaultSubtitle="Complete list of programs, intake capacities, and annual fee structure for AY 2025–26."
+  defaultSubtitle="Complete list of programs, intake capacities, and annual fee structure Category A."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Admissions', to: '/admissions' }, { label: 'Programmes & Fee' }]}
         scrollCtaTargetId="programmes-fee-content"
       />
@@ -82,6 +107,9 @@ export default function ProgrammesFee() {
               ))}
             </div>
           </div>
+          <span style={{ display: 'inline-block', background: 'var(--color-primary)', color: 'var(--color-white)', fontWeight: 800, fontSize: 'var(--text-sm)', letterSpacing: '0.04em', padding: '0.4rem 1.1rem', borderRadius: 'var(--radius-sm)', marginBottom: 'var(--space-3)' }}>
+            VISW
+          </span>
           <div className="reveal" style={{ borderRadius: 'var(--radius-md)', overflowX: 'auto', overflowY: 'hidden', boxShadow: 'var(--shadow-md)' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', background: 'var(--color-white)' }}>
               <thead>
@@ -94,13 +122,45 @@ export default function ProgrammesFee() {
                 </tr>
               </thead>
               <tbody>
-                {btechPrograms.map((p, i) => (
-                  <tr key={p.id} style={{ background: i % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)' }}>
+                {btechPrograms.map((p, i) => {
+                  const viswIntake = p.intake - (VISWPU_INTAKE_BY_NAME[p.name] || 0);
+                  return (
+                    <tr key={p.id} style={{ background: i % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)' }}>
+                      <td style={{ ...tableCell, color: 'var(--color-accent)', fontWeight: 900 }}>{String(i + 1).padStart(2, '0')}</td>
+                      <td style={{ ...tableCell, fontWeight: 600, color: 'var(--color-primary)' }}>{p.name}</td>
+                      <td style={tableCell}>{p.shortName}</td>
+                      <td style={{ ...tableCell, textAlign: 'center', fontWeight: 700 }}>{viswIntake}</td>
+                      <td style={{ ...tableCell, textAlign: 'center', fontWeight: 700, color: 'var(--color-primary)' }}>{p.fee || DEFAULT_BTECH_FEE}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          {/* VISWPU B.Tech programs — hardcoded, see note above VISWPU_BTECH_PROGRAMS */}
+          <span style={{ display: 'inline-block', background: 'var(--color-primary)', color: 'var(--color-white)', fontWeight: 800, fontSize: 'var(--text-sm)', letterSpacing: '0.04em', padding: '0.4rem 1.1rem', borderRadius: 'var(--radius-sm)', margin: 'var(--space-10) 0 var(--space-3)' }}>
+            VISWPU
+          </span>
+          <div className="reveal" style={{ borderRadius: 'var(--radius-md)', overflowX: 'auto', overflowY: 'hidden', boxShadow: 'var(--shadow-md)' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', background: 'var(--color-white)' }}>
+              <thead>
+                <tr>
+                  <th style={tableHead}>S.No</th>
+                  <th style={tableHead}>Programme</th>
+                  <th style={tableHead}>Code</th>
+                  <th style={{ ...tableHead, textAlign: 'center' }}>Intake (Seats)</th>
+                  <th style={{ ...tableHead, textAlign: 'center' }}>Annual Fee</th>
+                </tr>
+              </thead>
+              <tbody>
+                {VISWPU_BTECH_PROGRAMS.map((p, i) => (
+                  <tr key={p.code} style={{ background: i % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)' }}>
                     <td style={{ ...tableCell, color: 'var(--color-accent)', fontWeight: 900 }}>{String(i + 1).padStart(2, '0')}</td>
                     <td style={{ ...tableCell, fontWeight: 600, color: 'var(--color-primary)' }}>{p.name}</td>
-                    <td style={tableCell}>{p.shortName}</td>
+                    <td style={tableCell}>{p.code}</td>
                     <td style={{ ...tableCell, textAlign: 'center', fontWeight: 700 }}>{p.intake}</td>
-                    <td style={{ ...tableCell, textAlign: 'center', fontWeight: 700, color: 'var(--color-primary)' }}>{p.fee || DEFAULT_BTECH_FEE}</td>
+                    <td style={{ ...tableCell, textAlign: 'center', fontWeight: 700, color: 'var(--color-primary)' }}>{p.fee}</td>
                   </tr>
                 ))}
               </tbody>
@@ -225,7 +285,7 @@ export default function ProgrammesFee() {
             </div>
             <div style={{ display: 'flex', gap: 'var(--space-4)', flexWrap: 'wrap' }}>
               <Link to="/admission-procedure" className="btn btn-accent btn-lg">Admission Procedure</Link>
-              <Link to="/admissions" className="btn btn-secondary btn-lg">Apply Now</Link>
+              <Link to="/apply-now" className="btn btn-secondary btn-lg">Apply Now</Link>
             </div>
           </div>
         </div>

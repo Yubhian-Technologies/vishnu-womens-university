@@ -198,7 +198,7 @@ export default function StudentLife() {
             {athletics.map((s) => {
               const Icon = resolveContentIcon(s.icon) || Target;
               return (
-                <Link key={s.id} to="/news-awards/gallery?category=Sports#photo-gallery" className="sl-sport-card sl-sport-card--link">
+                <Link key={s.id} to="/news-awards/gallery#photo-gallery" className="sl-sport-card sl-sport-card--link">
                   <span className="sl-sport-icon"><Icon size={32} strokeWidth={1.75} /></span>
                   <div className="sl-sport-name">{s.title}</div>
                   <span className="sl-sport-season">{s.value}</span>

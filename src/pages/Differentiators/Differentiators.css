@@ -1,0 +1,96 @@
+/* ===== Differentiators hub — category quick-jump pills ===== */
+.diff-jump-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0.5rem 1.1rem;
+  border-radius: var(--radius-full);
+  border: 1.5px solid var(--color-primary);
+  color: var(--color-primary);
+  background: var(--color-white);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-decoration: none;
+  transition: all var(--transition-base);
+}
+
+.diff-jump-pill:hover,
+.diff-jump-pill:focus-visible {
+  background: var(--color-primary);
+  color: var(--color-white);
+  box-shadow: var(--shadow-sm);
+}
+
+.diff-jump-pill:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* ===== Category section header icon badge ===== */
+.diff-category-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-accent, #c9a84c) 14%, transparent);
+  color: var(--color-accent);
+  flex-shrink: 0;
+}
+
+/* ===== Item card ===== */
+.diff-item-card {
+  background: var(--color-white);
+  border: 1.5px solid var(--color-light-gray);
+  border-top: 3px solid transparent;
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  transition: border-color var(--transition-base), box-shadow var(--transition-base), transform var(--transition-base);
+}
+
+.diff-item-card--alt {
+  background: var(--color-off-white);
+}
+
+.diff-item-card:hover,
+.diff-item-card:focus-within {
+  border-color: var(--color-accent);
+  border-top-color: var(--color-accent);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-3px);
+}
+
+.diff-item-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-primary);
+  text-decoration: none;
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-light-gray);
+  margin-top: auto;
+  transition: color var(--transition-fast), gap var(--transition-fast);
+}
+
+.diff-item-link:hover,
+.diff-item-link:focus-visible {
+  color: var(--color-accent);
+  gap: 0.5rem;
+}
+
+.diff-item-link:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .diff-item-card {
+    transition: none;
+  }
+}

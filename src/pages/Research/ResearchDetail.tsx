@@ -5,6 +5,7 @@ import { useOrderedCollection } from '../../hooks/useCollection';
 import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import type { ConsultancyReportDoc } from '../Admin/sections/ConsultancyReportsAdmin';
 import type { PatentCertificateDoc } from '../Admin/sections/PatentCertificatesAdmin';
+import type { MousPartnerLogoDoc } from '../Admin/sections/MousPartnerLogosAdmin';
 import { usePageBanners } from '../../hooks/usePageBanners';
 import { fetchPriorityAttr } from '../../lib/domAttrs';
 import { resolveContentIcon } from '../../lib/contentIcons';
@@ -67,11 +68,21 @@ const DEFAULT_ABOUT_BY_SLUG: Record<string, string> = {
   'ipr-committee': DEFAULT_IPR_ABOUT,
 };
 
+// These committee pages show their descriptive text only — any member
+// table pasted into the admin's Data Table field is intentionally not
+// rendered here (content decision).
+const TABLE_SUPPRESSED_SLUGS = new Set([
+  'research-advisory-committee',
+  'research-ethics-committee',
+  'ipr-committee',
+]);
+
 export default function ResearchDetail() {
   const { slug } = useParams<{ slug: string }>();
   const { docs: allItems, loading } = useOrderedCollection<ResearchItemDoc>('researchItems', 'order');
   const { docs: consultancyReports } = useOrderedCollection<ConsultancyReportDoc>('consultancyReports', 'order');
   const { docs: patentCertificates } = useOrderedCollection<PatentCertificateDoc>('patentCertificates', 'order');
+  const { docs: mousPartnerLogos } = useOrderedCollection<MousPartnerLogoDoc>('mousPartnerLogos', 'order');
   const { slides: heroSlides } = usePageBanners('research-detail');
   const item = allItems.find((i) => i.slug === slug) ?? null;
   const [openAreas, setOpenAreas] = useState<Set<string>>(new Set());
@@ -85,6 +96,10 @@ export default function ResearchDetail() {
   };
   const [openProjects, setOpenProjects] = useState<Set<string>>(new Set());
   const [activePatentYear, setActivePatentYear] = useState('');
+  // MoUs only: each group (e.g. "Foreign Universities") shows only its
+  // first 10 partners inline; "+ More" links out to that group's own page
+  // (MousGroupDetail.tsx) with the full list.
+  const MOUS_GROUP_PREVIEW_COUNT = 10;
   const toggleProject = (key: string) => {
     setOpenProjects((prev) => {
       const next = new Set(prev);
@@ -99,7 +114,7 @@ export default function ResearchDetail() {
   // .reveal/IntersectionObserver setup would be racing async data on every
   // navigation (see the gotcha documented in CLAUDE.md).
   useEffect(() => {
-    if (item) document.title = `${item.title} | Vishnu Women's University`;
+    if (item) document.title = `${item.title.replace(/^about\s+/i, '')} | Vishnu Women's University`;
   }, [item]);
 
   if (!item) {
@@ -111,6 +126,7 @@ export default function ResearchDetail() {
     return <Navigate to="/research" replace />;
   }
 
+  const displayTitle = item.title.replace(/^about\s+/i, '');
   const Icon = resolveContentIcon(item.icon) || Microscope;
   const categoryLabel = CATEGORY_LABELS[item.category] || item.category;
   const heroImage = item.heroImage || heroSlides[0]?.imageUrl;
@@ -118,7 +134,25 @@ export default function ResearchDetail() {
   const about = item.about || DEFAULT_ABOUT_BY_SLUG[item.slug] || '';
   const aboutBlocks = parseAboutContent(about);
   const tableText = item.tableText || DEFAULT_TABLE_TEXT_BY_SLUG[item.slug] || '';
-  const tableSections = parseFlexibleTable(tableText).filter((s) => s.headers.length > 0);
+  const flexibleTableSections = parseFlexibleTable(tableText).filter((s) => s.headers.length > 0);
+  // MoUs' partner list now lives in its own admin section (Research > edit
+  // "MoUs" > Extra Content > Partners) instead of the Data Table field, so
+  // an admin can attach a small circular logo per partner — grouped into the
+  // same named sections ("Foreign Universities", ...) that field used to
+  // hold. Falls back to the old Data Table text (still intact, just no
+  // longer editable) until an admin clicks that section's one-time "Copy
+  // from Data Table" button, so the page is never blank mid-migration.
+  const mousSections = (() => {
+    const byTitle = new Map<string, string[][]>();
+    const order: string[] = [];
+    mousPartnerLogos.forEach((p) => {
+      const title = p.section || '';
+      if (!byTitle.has(title)) { byTitle.set(title, []); order.push(title); }
+      byTitle.get(title)!.push([p.label]);
+    });
+    return order.map((title) => ({ title, headers: ['Partner'], rows: byTitle.get(title)! }));
+  })();
+  const tableSections = item.slug === 'mous' && mousSections.length > 0 ? mousSections : flexibleTableSections;
   const accordionText = item.accordionText || DEFAULT_ACCORDION_TEXT_OVERRIDE_BY_SLUG[item.slug] || '';
   // Thrust Areas of Research is built up incrementally from the admin (a
   // department shell added now, its research areas/faculty filled in later),
@@ -159,6 +193,15 @@ export default function ResearchDetail() {
   // link with the live certificate for that exact application number, so
   // an admin only ever needs to type the plain number in the text field.
   const patentCertificateMap = new Map(patentCertificates.map((d) => [d.label.trim(), d.fileUrl]));
+  // MoUs' partner logos are admin-managed separately (Research > edit "MoUs"
+  // > Partner Logos) rather than embedded in the Data Table text — matched
+  // to a row by its exact Partner Name, same convention as patent
+  // certificates above. A partner with no logo added there just renders
+  // without one, nothing else about its row changes.
+  const mousPartnerLogoMap = new Map(mousPartnerLogos.map((d) => [d.label.trim(), d.imageUrl]));
+  // A partner's MoU PDF (optional) — when set, clicking their logo opens it
+  // in a new tab; otherwise the tile just isn't a link.
+  const mousPartnerPdfMap = new Map(mousPartnerLogos.map((d) => [d.label.trim(), d.pdfUrl]));
   const projectCategories = item.slug === 'patents'
     ? parsedProjectCategories.map((cat) => ({
         ...cat,
@@ -191,24 +234,31 @@ export default function ResearchDetail() {
 
   return (
     <main className="page-wrapper">
-      {/* Hero */}
-      <section className="page-hero" style={{ minHeight: 340 }}>
-        {heroImage && (
-          <img src={heroImage} alt={item.title} className="page-hero-image" loading="eager" decoding="sync" {...fetchPriorityAttr('high')} />
-        )}
-        <div className="page-hero-overlay" />
-        <div className="container page-hero-content">
-          <div className="breadcrumb">
-            <Link to="/" className="breadcrumb-item">Home</Link>
-            <span className="breadcrumb-sep">›</span>
-            <Link to="/research" className="breadcrumb-item">Research & Development</Link>
-            <span className="breadcrumb-sep">›</span>
-            <span className="breadcrumb-item active">{item.title}</span>
+      {/* Hero — Department Hero Card Design */}
+      <section className="dept-hero-section">
+        <div className="container">
+          <div className="dept-hero-card">
+            {heroImage && (
+              <img src={heroImage} alt={displayTitle} className="dept-hero-bg-img" loading="eager" decoding="sync" {...fetchPriorityAttr('high')} />
+            )}
+            <div className="dept-hero-overlay" />
+            <div className="dept-hero-content">
+              <div className="breadcrumb animate-fade-in" style={{ marginBottom: '0.8rem' }}>
+                <Link to="/" className="breadcrumb-item">Home</Link>
+                <span className="breadcrumb-sep">›</span>
+                <Link to="/research" className="breadcrumb-item">Research &amp; Development</Link>
+                <span className="breadcrumb-sep">›</span>
+                <span className="breadcrumb-item active">{displayTitle}</span>
+              </div>
+              <div className="animate-fade-in-up" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#C9973A', color: '#0B1E42', fontSize: 'var(--text-xs)', fontWeight: 800, padding: '0.35rem 0.9rem', borderRadius: '9999px', marginBottom: '0.8rem', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                <Icon size={14} /> {categoryLabel}
+              </div>
+              <h1 className="dept-hero-title">{displayTitle}</h1>
+              {item.intro && (
+                <p className="dept-hero-subtitle">{item.intro}</p>
+              )}
+            </div>
           </div>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'var(--color-accent)', color: 'var(--color-white)', fontSize: 'var(--text-xs)', fontWeight: 700, padding: '0.3rem 0.9rem', borderRadius: 'var(--radius-full)', marginBottom: 'var(--space-3)' }}>
-            <Icon size={14} /> {categoryLabel}
-          </div>
-          <h1>{item.title}</h1>
         </div>
       </section>
 
@@ -219,13 +269,8 @@ export default function ResearchDetail() {
             <div>
               <span className="section-label">Overview</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>
-                {item.title.toLowerCase().startsWith('about ') ? item.title : `About ${item.title}`}
+                {displayTitle}
               </h2>
-              {intro && (
-                <p style={{ fontSize: 'var(--text-lg)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-5)' }}>
-                  {intro}
-                </p>
-              )}
               {aboutBlocks.map((block, bi) => {
                 if (block.type === 'heading') {
                   return (
@@ -262,9 +307,9 @@ export default function ResearchDetail() {
                   </p>
                 );
               })}
-              {!intro && aboutBlocks.length === 0 && (
+              {aboutBlocks.length === 0 && (
                 <p style={{ fontSize: 'var(--text-lg)', color: 'var(--color-text)', lineHeight: 1.75 }}>
-                  {item.desc}
+                  {item.desc || intro}
                 </p>
               )}
             </div>
@@ -332,13 +377,13 @@ export default function ResearchDetail() {
       {/* Data table(s) — a single unnamed section renders as one table under
           the item's own title; multiple named sections (e.g. Patents grouped
           by year) each get their own sub-heading. */}
-      {item.slug !== 'professional-bodies' && tableSections.length > 0 && projectCategories.length === 0 && accordionCategories.length === 0 && (
+      {item.slug !== 'professional-bodies' && !TABLE_SUPPRESSED_SLUGS.has(item.slug) && tableSections.length > 0 && projectCategories.length === 0 && accordionCategories.length === 0 && (
         <section className="section bg-off-white">
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
               <span className="section-label">Details</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>
-                {item.slug === 'about-rd' ? "Research Team at Vishnu Women's University" : item.title}
+                {item.slug === 'about-rd' ? 'Research Team' : item.title}
               </h2>
             </div>
             {tableSections.map((section, si) => (
@@ -348,6 +393,52 @@ export default function ResearchDetail() {
                     {section.title}
                   </h3>
                 )}
+                {item.slug === 'mous' ? (
+                  // MoUs partners render as the same circular-logo grid as
+                  // Professional Bodies (see .pb-grid in detail-layout.css)
+                  // instead of a table — each partner is one row's single
+                  // "Partner" cell; a logo shows when Research > edit "MoUs"
+                  // > Partners has one for this exact partner, otherwise the
+                  // circle just shows the partner's name, same fallback
+                  // Professional Bodies uses for a body with no logo yet.
+                  <>
+                    <div className="pb-grid pb-grid--mous">
+                      {section.rows.slice(0, MOUS_GROUP_PREVIEW_COUNT).map((row, i) => {
+                        const name = (row[0] || '').trim();
+                        const logoUrl = mousPartnerLogoMap.get(name);
+                        const pdfUrl = mousPartnerPdfMap.get(name);
+                        const content = (
+                          <>
+                            <span className="pb-grid-logo">
+                              {logoUrl ? (
+                                <img src={logoUrl} alt={name} />
+                              ) : (
+                                <span className="pb-grid-logo-fallback">{name}</span>
+                              )}
+                            </span>
+                            <span className="pb-grid-name">{name}</span>
+                          </>
+                        );
+                        return pdfUrl ? (
+                          <a key={i} href={pdfUrl} target="_blank" rel="noopener noreferrer" className="pb-grid-item">
+                            {content}
+                          </a>
+                        ) : (
+                          <div key={i} className="pb-grid-item">
+                            {content}
+                          </div>
+                        );
+                      })}
+                    </div>
+                    {section.rows.length > MOUS_GROUP_PREVIEW_COUNT && (
+                      <div style={{ textAlign: 'center', marginTop: 'var(--space-6)' }}>
+                        <Link to={`/research/mous/${encodeURIComponent(section.title)}`} className="btn btn-outline">
+                          {`+ More (${section.rows.length - MOUS_GROUP_PREVIEW_COUNT})`}
+                        </Link>
+                      </div>
+                    )}
+                  </>
+                ) : (
                 <div style={{ overflowX: 'auto' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm)' }}>
                     <thead>
@@ -372,6 +463,7 @@ export default function ResearchDetail() {
                     </tbody>
                   </table>
                 </div>
+                )}
               </div>
             ))}
           </div>

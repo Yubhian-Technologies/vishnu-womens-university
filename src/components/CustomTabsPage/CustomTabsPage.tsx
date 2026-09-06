@@ -30,7 +30,30 @@ export default function CustomTabsPage({ tabs, defaultTabId }: { tabs: TabItem[]
   return (
     <section className="section bg-white">
       <div className="container">
-        <div className="detail-grid">
+        {/* Mobile-only horizontal tab strip — the sidebar quick-nav card
+            below is desktop-only (see detail-layout.css); at the
+            .detail-grid single-column breakpoint it would otherwise land
+            BELOW the active tab's full content, forcing a scroll-past just
+            to reach the next tab. This sits pinned above the content
+            instead, so switching tabs never requires scrolling first. */}
+        <div className="tabs-mobile-strip-wrap">
+          <div className="tabs-mobile-strip" role="tablist" aria-label="Sections">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                role="tab"
+                aria-selected={active.id === tab.id}
+                onClick={() => setActiveId(tab.id)}
+                className={`tabs-mobile-strip-btn${active.id === tab.id ? ' is-active' : ''}`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="detail-grid detail-grid--tabs">
           <div>
             <span className="section-label">{active.eyebrow || 'Details'}</span>
             <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-5)' }}>

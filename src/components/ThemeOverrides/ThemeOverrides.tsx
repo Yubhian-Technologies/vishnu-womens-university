@@ -1,10 +1,12 @@
 import { useEffect } from 'react';
 import { useDocument } from '../../hooks/useDocument';
-import { COLOR_VARS, THEME_DOC } from '../../lib/theme';
+import { COLOR_VARS, FOOTER_COLOR_VARS, FACULTY_COLOR_VARS, TESTIMONIAL_COLOR_VARS, THEME_DOC } from '../../lib/theme';
 
 interface ThemeDoc {
   [cssVar: string]: string;
 }
+
+const ALL_VARS = [...COLOR_VARS, ...FOOTER_COLOR_VARS, ...FACULTY_COLOR_VARS, ...TESTIMONIAL_COLOR_VARS];
 
 // Renders nothing — just keeps :root's CSS custom properties in sync with
 // whatever an admin has saved in Firestore (see ThemeAdmin.tsx). Since every
@@ -17,7 +19,7 @@ export default function ThemeOverrides() {
 
   useEffect(() => {
     const root = document.documentElement.style;
-    for (const { key } of COLOR_VARS) {
+    for (const { key } of ALL_VARS) {
       const value = data?.[key];
       if (value) root.setProperty(key, value);
       else root.removeProperty(key);

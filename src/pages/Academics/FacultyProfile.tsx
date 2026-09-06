@@ -70,7 +70,7 @@ export default function FacultyProfile() {
     return <Navigate to="/faculty" replace />;
   }
 
-  const isHod = person.designation.toLowerCase().includes('hod') || person.designation.toLowerCase().includes('head');
+  const isHod = (person.designation || '').toLowerCase().includes('hod') || (person.designation || '').toLowerCase().includes('head');
   const program = programs.find((p) => p.department === person.department);
   // Head of Department name/message/research-profiles live on the
   // `departments` doc now, not per-programme (see DepartmentsAdmin.tsx) —
@@ -85,7 +85,7 @@ export default function FacultyProfile() {
   const hodName = dept?.hod || program?.hod || '';
   const hodMessage = dept?.hodMessage || program?.hodMessage || '';
   const hodResearchProfiles = (dept?.hodResearchProfiles?.length ? dept.hodResearchProfiles : program?.hodResearchProfiles) || [];
-  const hodMatches = isHod && !!hodName && hodName.trim() === person.name.trim();
+  const hodMatches = isHod && !!hodName && hodName.trim() === (person.name || '').trim();
 
   const activeCustom = usingCustomSections ? (customSections.find((s) => s.id === activeKey) ?? customSections[0]) : null;
   const activeLegacy = !usingCustomSections ? (legacySections.find((s) => s.title === activeKey) ?? legacySections[0]) : null;

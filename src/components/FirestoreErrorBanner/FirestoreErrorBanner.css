@@ -1,0 +1,67 @@
+.firestore-error-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  background: var(--color-red);
+  color: var(--color-white);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  line-height: 1.4;
+  box-shadow: var(--shadow-md);
+  z-index: 1000;
+}
+
+.firestore-error-banner__icon {
+  flex-shrink: 0;
+}
+
+.firestore-error-banner__content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.firestore-error-banner__content strong {
+  font-weight: 600;
+}
+
+.firestore-error-banner__content span {
+  opacity: 0.92;
+}
+
+.firestore-error-banner__dismiss {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.16);
+  color: var(--color-white);
+  cursor: pointer;
+  transition: background 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.firestore-error-banner__dismiss:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.firestore-error-banner__dismiss:active {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.firestore-error-banner__dismiss:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-white);
+}
+
+@media (max-width: 640px) {
+  .firestore-error-banner {
+    padding: 0.625rem 1rem;
+    font-size: 0.8125rem;
+  }
+}

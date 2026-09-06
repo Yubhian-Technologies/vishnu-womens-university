@@ -56,48 +56,45 @@ const navItemsData: NavItem[] = [
         items: [
           { label: 'About VWU', path: '/about' },
           { label: 'Vision & Mission', path: '/vision-mission' },
-          { label: 'Institutional Development Plan', path: '/governance/idp' },
-          { label: 'Organizational Chart', path: '/downloads/SVECWOrganizationChart.jpg', download: true },
+          { label: 'Institutional Development Plan', path: '/governance/idp', disabled: true },
+          { label: 'Organizational Chart', path: '/downloads/SVECWOrganizationChart.jpg', download: true, disabled: true },
           { label: 'Core Executive Body', path: '/about#core-executive' },
           { label: 'About Society (SVES)', path: '/about-sves' },
         ],
       },
       {
         groupLabel: 'Governance',
-        groupPath: '/governance',
         items: [
-          { label: 'Governing Body', path: '/governance/governing-body' },
-          { label: 'Academic Council', path: '/governance/academic-council' },
-          { label: 'Board of Studies', path: '/governance/board-of-studies' },
-          { label: 'Finance Committee', path: '/governance/finance-committee' },
+          { label: 'Governing Body', path: '/governance/governing-body', disabled: true },
+          { label: 'Academic Council', path: '/governance/academic-council', disabled: true },
+          { label: 'Board of Studies', path: '/governance/board-of-studies', disabled: true },
+          { label: 'Finance Committee', path: '/governance/finance-committee', disabled: true },
         ],
       },
       {
         groupLabel: 'Committees',
-        groupPath: '/governance#committees',
         items: [
-          { label: 'College Academic Committee', path: '/governance/college-academic-committee' },
-          { label: 'Acad. & Admin. Audit Committee', path: '/governance/academic-administrative-audit' },
-          { label: 'Freshmen Committee', path: '/governance/freshmen-committee' },
-          { label: 'Infrastructure Management', path: '/governance/infrastructure-management' },
-          { label: 'Faculty Grievance Redressal', path: '/governance/faculty-grievance' },
-          { label: 'Student Grievance Redressal', path: '/governance/student-grievance' },
-          { label: 'Central Purchase Committee', path: '/governance/central-purchase' },
-          { label: 'Anti Ragging Committee', path: '/governance/anti-ragging' },
-          { label: 'Internal Committee (POSH)', path: '/governance/internal-committee' },
-          { label: 'SC/ST Cell', path: '/governance/sc-st-cell' },
-          { label: 'R&D Committee', path: '/governance/rd-committee' },
+          { label: 'College Academic Committee', path: '/governance/college-academic-committee', disabled: true },
+          { label: 'Acad. & Admin. Audit Committee', path: '/governance/academic-administrative-audit', disabled: true },
+          { label: 'Freshmen Committee', path: '/governance/freshmen-committee', disabled: true },
+          { label: 'Infrastructure Management', path: '/governance/infrastructure-management', disabled: true },
+          { label: 'Faculty Grievance Redressal', path: '/governance/faculty-grievance', disabled: true },
+          { label: 'Student Grievance Redressal', path: '/governance/student-grievance', disabled: true },
+          {label: 'Central Purchase Committee', path: '/governance/central-purchase', disabled: true },
+          { label: 'Anti-Ragging Committee', path: '/governance/anti-ragging', disabled: true },
+          { label: 'Internal Committee (POSH)', path: '/governance/internal-committee', disabled: true },
+          { label: 'SC/ST Cell', path: '/governance/sc-st-cell', disabled: true },
+          { label: 'R&D Committee', path: '/governance/rd-committee', disabled: true },
         ],
       },
       {
         groupLabel: 'IQAC',
-        groupPath: '/governance#iqac',
         items: [
-          { label: 'About IQAC', path: '/governance/about-iqac' },
-          { label: 'IQAC Worksystem', path: '/governance/iqac-worksystem' },
-          { label: 'Quality Parameters', path: '/governance/quality-parameters' },
-          { label: 'IQAC Committee', path: '/governance/iqac-committee' },
-          { label: 'Policies & Procedures', path: '/governance/policies-procedures' },
+          { label: 'About IQAC', path: '/governance/about-iqac', disabled: true },
+          { label: 'IQAC Worksystem', path: '/governance/iqac-worksystem', disabled: true },
+          { label: 'Quality Parameters', path: '/governance/quality-parameters', disabled: true },
+          { label: 'IQAC Committee', path: '/governance/iqac-committee', disabled: true },
+          { label: 'Policies & Procedures', path: '/governance/policies-procedures', disabled: true },
         ],
       },
     ],
@@ -106,7 +103,6 @@ const navItemsData: NavItem[] = [
     label: 'Academics',
     highlight: {
       title: 'Academic Excellence',
-      badge: 'Autonomous',
       description: 'Industry-aligned curriculum, multidisciplinary research, distinguished faculty, and hands-on laboratory learning.',
       linkText: 'All Programs',
       linkPath: '/academics',
@@ -116,12 +112,11 @@ const navItemsData: NavItem[] = [
         groupLabel: 'Overview',
         groupPath: '/academics',
         items: [
-          { label: 'Programs & Departments', path: '/academics' },
           { label: 'Schools', path: '/academics/schools' },
           { label: 'Departments', path: '/academics/departments' },
           { label: 'Programs', path: '/academics/programs' },
           { label: 'Faculty Directory', path: '/faculty' },
-          { label: 'Result Analysis', path: '/result-analysis' },
+          { label: 'Results Analysis', path: '/result-analysis' },
           { label: 'Examinations Portal', path: 'https://www.svecwexams.in/', external: true },
         ],
       },
@@ -136,6 +131,8 @@ const navItemsData: NavItem[] = [
           { label: 'List of Holidays', path: '/information#holidays' },
           { label: 'Counselling Scheme', path: '/information#counselling' },
           { label: 'ICT Platforms', path: '/information#ict-platforms' },
+          { label: 'Smart Class Rooms', path: '/campus/smart-classrooms' },
+          { label: 'State-of-the-art Labs', path: '/campus/state-of-the-art-labs' },
           { label: 'Other Practices', path: '/information#other-practices' },
         ],
       },
@@ -154,9 +151,9 @@ const navItemsData: NavItem[] = [
       { label: 'Admissions Overview', path: '/admissions' },
       { label: 'Programmes & Fee Structure', path: '/programmes-fee-structure' },
       { label: 'Admission Procedure', path: '/admission-procedure' },
-      { label: 'Result Analysis', path: '/result-analysis' },
+      { label: 'Results Analysis', path: '/result-analysis' },
       { label: 'Fee Payment Portal', path: 'https://svecw.ac.in/Default.aspx?ReturnUrl=%2f', external: true },
-      { label: 'How to Reach Campus', path: '/information#how-to-reach' },
+      { label: 'How to Reach Campus', path: '/contact' },
     ],
   },
   {
@@ -196,20 +193,34 @@ const navItemsData: NavItem[] = [
       linkText: 'R&D Overview',
       linkPath: '/research/about-rd',
     },
-    children: [
-      { label: 'About R&D', path: '/research/about-rd' },
-      { label: 'Research Advisory Committee', path: '/research/research-advisory-committee' },
-      { label: 'Research Ethics Committee', path: '/research/research-ethics-committee' },
-      { label: 'Intellectual Property Rights (IPR)', path: '/research/ipr-committee' },
-      { label: 'Thrust Areas of Research', path: '/research/thrust-areas-of-research' },
-      { label: 'Research Centers', path: '/research/research-centers' },
-      { label: 'Funded Projects', path: '/research/funded-projects' },
-      { label: 'Seed Money Projects', path: '/research/seed-money-projects' },
-      { label: 'Research Publications', path: '/research/research-publications' },
-      { label: 'MoUs & Collaborations', path: '/research/mous' },
-      { label: 'Patents', path: '/research/patents' },
-      { label: 'Consultancy', path: '/research/consultancy' },
-      { label: 'Professional Bodies', path: '/research/professional-bodies' },
+    groups: [
+      {
+        groupLabel: 'Research Info',
+        items: [
+          { label: 'R&D', path: '/research/about-rd' },
+          { label: 'Research Advisory Committee', path: '/research/research-advisory-committee' },
+          { label: 'Research Ethics Committee', path: '/research/research-ethics-committee' },
+          { label: 'Intellectual Property Rights (IPR)', path: '/research/ipr-committee' },
+          { label: 'Thrust Areas of Research', path: '/research/thrust-areas-of-research' },
+        ],
+      },
+      {
+        groupLabel: 'Research Outcomes',
+        items: [
+          { label: 'Research Centers', path: '/research/research-centers' },
+          { label: 'Funded Projects', path: '/research/funded-projects' },
+          { label: 'Research Publications', path: '/research/research-publications' },
+          { label: 'MoUs & Collaborations', path: '/research/mous' },
+        ],
+      },
+      {
+        groupLabel: 'Innovations',
+        items: [
+          { label: 'Patents', path: '/research/patents' },
+          { label: 'Consultancy', path: '/research/consultancy' },
+          { label: 'Professional Bodies', path: '/research/professional-bodies' },
+        ],
+      },
     ],
   },
   {
@@ -222,26 +233,31 @@ const navItemsData: NavItem[] = [
       linkPath: '/campus/central-library',
     },
     children: [
-      { label: 'Smart Class Rooms', path: '/campus/smart-classrooms' },
-      { label: 'State-of-the-art Labs', path: '/campus/state-of-the-art-labs' },
       { label: 'Central Library', path: '/campus/central-library' },
       { label: 'Auditoriums & Amphitheaters', path: '/campus/auditoriums' },
       { label: 'Campus Book Stores', path: '/campus/campus-book-stores' },
       { label: 'Wi-Fi Campus', path: '/campus/wifi-campus' },
       { label: 'Campus Hostels', path: '/campus/campus-hostels' },
+      { label: 'Staff Quarters', path: '/campus/staff-quarters' },
       { label: 'Food Courts & Cafeterias', path: '/campus/food-courts' },
-      { label: 'VISHNU Fitness Centre', path: '/campus/fitness-centre' },
+      { label: 'Vishnu Fitness Centre', path: '/campus/fitness-centre' },
       { label: 'Health Care Centre', path: '/campus/health-care' },
+      { label: 'Campus Security', path: '/campus/campus-security' },
+      { label: 'Sewage Treatment Plants', path: '/campus/sewage-treatment-plants' },
+      { label: 'Wellness Center', path: '/campus/wellness-center' },
       { label: 'Swimming Pool & Sports', path: '/campus/swimming-pool' },
+      { label: 'Travel Desk', path: '/campus/travel-desk' },
       { label: 'Radio Vishnu 90.4', path: '/differentiators/radio-vishnu-diff' },
       { label: 'Vishnu TV Academy', path: '/vishnu-tv-academy' },
       { label: 'Student Clubs', path: '/student-clubs' },
       { label: 'Arts & Culture', path: '/arts-culture' },
+      { label: 'Vishnu School of Music', path: 'https://svesschoolofmusic.in/', external: true },
       { label: 'Sports & Games', path: '/sports-games' },
+      { label: 'Other Facilities', path: '/campus/other-facilities' },
     ],
   },
   {
-    label: 'News & Events',
+    label: 'Happenings',
     highlight: {
       title: 'Happenings & Accolades',
       badge: 'NAAC A+ & NBA',
@@ -251,13 +267,12 @@ const navItemsData: NavItem[] = [
     },
     groups: [
       {
-        groupLabel: 'News & Events',
+        groupLabel: 'Happenings',
         groupPath: '/news-awards',
         items: [
           { label: 'Upcoming Events', path: '/news-awards/happenings#upcoming-events' },
           { label: 'Recent Events', path: '/news-awards/happenings#recent-events' },
-          { label: 'News & Events', path: '/news' },
-          { label: 'Photo & Video Gallery', path: '/news-awards/gallery' },
+          { label: 'Gallery', path: '/news-awards/gallery' },
           { label: 'Vishnu Era Newsletter', path: 'https://www.srivishnu.edu.in/vishnu-era/', external: true },
           { label: 'Prathibha Magazine', path: 'https://heyzine.com/flip-book/088b7b5629.html#page/54', external: true },
         ],
@@ -283,10 +298,41 @@ const navItemsData: NavItem[] = [
     },
     children: [
       { label: 'Contact Us', path: '/contact' },
-      { label: 'How to Reach Campus', path: '/information#how-to-reach' },
+      { label: 'How to Reach Campus', path: '/contact' },
     ],
   },
 ];
+
+// ── Single source of truth: "does the main nav actually link here?" ──
+// The About page's "Explore VWU in Detail" cards use this so a card never
+// navigates somewhere the navbar itself won't send a visitor — unbuilt
+// pages are marked `disabled` in navItemsData, and external / download /
+// pure-hash targets aren't real in-app routes. Built lazily and cached.
+let _enabledNavPaths: Set<string> | null = null;
+export function isEnabledNavPath(path: string | undefined | null): boolean {
+  if (!path) return false;
+  const clean = path.split('#')[0];
+  if (!clean || clean.startsWith('http')) return false;
+  if (!_enabledNavPaths) {
+    const set = new Set<string>();
+    const add = (c: { path?: string; external?: boolean; download?: boolean; disabled?: boolean }) => {
+      if (!c.path || c.external || c.download || c.disabled) return;
+      if (c.path.startsWith('http')) return;
+      set.add(c.path.split('#')[0]);
+    };
+    for (const item of navItemsData) {
+      add(item);
+      if (item.highlight?.linkPath) add({ path: item.highlight.linkPath });
+      item.children?.forEach((ch) => { add(ch); ch.subItems?.forEach(add); });
+      item.groups?.forEach((g) => {
+        if (g.groupPath) set.add(g.groupPath.split('#')[0]);
+        g.items.forEach((it) => { add(it); it.subItems?.forEach(add); });
+      });
+    }
+    _enabledNavPaths = set;
+  }
+  return _enabledNavPaths.has(clean);
+}
 
 export default function Header() {
   const [mounted, setMounted] = useState(false);
@@ -317,15 +363,15 @@ export default function Header() {
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Dynamic overrides and data hooks
-  const headerApplyNow = useNavLinkOverride('header-apply-now', '/admissions');
+  const headerApplyNow = useNavLinkOverride('header-apply-now', '/apply-now');
   const orgChart = useNavLinkOverride('header-organizational-chart', '/downloads/SVECWOrganizationChart.jpg');
 
   const { docs: programs } = useOrderedCollection<ProgramDoc>('programs', 'order');
   const isVlsiProgram = (p: ProgramDoc) =>
-    p.slug.toUpperCase() === 'EVT' || /VLSI|VSLI/.test(p.name.toUpperCase());
+    (p.slug || '').toUpperCase() === 'EVT' || /VLSI|VSLI/.test((p.name || '').toUpperCase());
   const programItem = (p: ProgramDoc): NavChild => ({
-    label: p.name,
-    path: isVlsiProgram(p) ? '/academics/ece' : `/academics/${p.slug}`,
+    label: p.name || p.slug || 'Programme',
+    path: isVlsiProgram(p) ? '/academics/ece' : p.slug ? `/academics/${p.slug}` : '/academics',
   });
   const ugProgrammes = programs.filter((p) => p.category === 'btech').map(programItem);
   const pgProgrammes = programs.filter((p) => p.category === 'mtech' || p.category === 'mba').map(programItem);
@@ -592,14 +638,14 @@ export default function Header() {
               >
                 <span>Apply Now</span>
                 <span className="navbar-cta-icon-wrap">
-                  <ArrowRight size={13} strokeWidth={2.5} aria-hidden="true" />
+                  <ArrowRight size={14.6} strokeWidth={2.5} aria-hidden="true" />
                 </span>
               </a>
             ) : (
               <Link to={headerApplyNow.path} className="navbar-cta-btn">
                 <span>Apply Now</span>
                 <span className="navbar-cta-icon-wrap">
-                  <ArrowRight size={13} strokeWidth={2.5} aria-hidden="true" />
+                  <ArrowRight size={14.6} strokeWidth={2.5} aria-hidden="true" />
                 </span>
               </Link>
             )}
@@ -628,7 +674,7 @@ export default function Header() {
             role="region"
             aria-label={`${activeItemData.label} Submenu`}
           >
-            <div className="mega-dropdown-grid">
+            <div key={activeItemData.label} className="mega-dropdown-grid">
               {/* If categorized groups exist */}
               {activeItemData.groups && (
                 <div className="mega-groups-container">

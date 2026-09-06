@@ -1,5 +1,4 @@
 import { useEffect, type CSSProperties } from 'react';
-import { Link } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { resolveContentIcon } from '../../lib/contentIcons';
@@ -54,7 +53,7 @@ export default function ResultAnalysis() {
   const factors = useContentBlocks('result-analysis', 'factors');
 
   useEffect(() => {
-    document.title = 'Result Analysis | VWU';
+    document.title = 'Results Analysis | VWU';
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -76,23 +75,14 @@ export default function ResultAnalysis() {
       {/* Hero */}
       <PageHero
         page="result-analysis"
-        defaultTitle="Result Analysis"
-  defaultSubtitle="VWU consistently ranks among the top 5 affiliated colleges of JNTU Kakinada with 90%+ annual pass rates."
-        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Admissions', to: '/admissions' }, { label: 'Result Analysis' }]}
+        defaultTitle="Results Analysis"
+        defaultSubtitle="Consistent, top-tier academic outcomes with 90%+ annual pass rates across 22+ graduating batches."
+        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Admissions', to: '/admissions' }, { label: 'Results Analysis' }]}
         scrollCtaTargetId="result-analysis-content"
       />
 
-      {/* Key Statement Banner */}
-      <section id="result-analysis-content" style={{ background: 'var(--color-primary)', padding: 'var(--space-8) 0', scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
-        <div className="container" style={{ textAlign: 'center' }}>
-          <blockquote style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(1rem, 2vw, 1.4rem)', fontWeight: 700, color: 'var(--color-accent)', fontStyle: 'italic', maxWidth: 820, margin: '0 auto', lineHeight: 1.7 }}>
-            "Shri Vishnu Engineering College for Women always stands one among the top five affiliated colleges of JNTU Kakinada in terms of pass percentage."
-          </blockquote>
-        </div>
-      </section>
-
       {/* Batch-wise Pass Percentage */}
-      <section className="section bg-off-white">
+      <section id="result-analysis-content" className="section bg-off-white" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-10)' }}>
             <span className="section-label">Academic Performance</span>
@@ -224,19 +214,6 @@ export default function ResultAnalysis() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section style={{ background: 'var(--color-primary)', padding: 'var(--space-12) 0' }}>
-        <div className="container" style={{ textAlign: 'center' }}>
-          <div className="reveal">
-            <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>Join a College That Delivers Results</h2>
-            <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Link to="/admission-procedure" className="btn btn-accent">How to Apply</Link>
-              <Link to="/programmes-fee-structure" className="btn btn-secondary">Fee Structure</Link>
-              <Link to="/admissions" className="btn btn-secondary">Admissions Home</Link>
-            </div>
-          </div>
-        </div>
-      </section>
     </main>
   );
 }

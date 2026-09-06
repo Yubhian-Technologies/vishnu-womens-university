@@ -19,13 +19,13 @@ export const PLACEMENT_STATS = [
   { value: 1400, suffix: '+', label: 'annual placements' },
   { value: 500, suffix: '+', label: 'industry partners recruiting' },
   { value: 13100, suffix: '+', label: 'engineers graduated' },
-  { value: 230, suffix: '+', label: 'experienced faculty' },
+  { value: 0, suffix: '', label: 'Expert Faculty' },
 ];
 
 export const RESEARCH_STATS = [
   { big: '2500+', label: 'RESEARCH PUBLICATIONS' },
   { big: '90+', label: 'PATENTS FILED' },
-  { big: '300+', label: 'QUALIFIED FACULTY' },
+  { big: '', label: 'EXPERT FACULTY' },
   { big: '25+', label: 'GLOBAL MoUs' },
 ];
 

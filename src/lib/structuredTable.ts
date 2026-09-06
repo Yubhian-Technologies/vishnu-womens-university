@@ -50,6 +50,50 @@ export function parseStructuredTable(text: string): StructuredTableSection[] {
   return sections;
 }
 
+// Distinct Year labels present in a flat structured table that reuses the
+// optional 4th pipe field ("email" slot) as a Year instead of a real email —
+// e.g. Placements' Internships page ("Company | Stipend/Month | No. of
+// Selects | Year"). Rows with no 4th field at all are legacy/undated rows and
+// aren't counted as a year.
+export function listStructuredTableYears(text: string): string[] {
+  const years = new Set<string>();
+  parseStructuredTable(text).forEach((s) => s.rows.forEach((r) => {
+    if (r.email && r.email.trim()) years.add(r.email.trim());
+  }));
+  return [...years];
+}
+
+// For flat "Name | Role | Notes | Year" tables (see listStructuredTableYears
+// above) — merges newly imported rows for one specific year into the
+// existing text, replacing only that year's own previous rows while leaving
+// every other year's rows (and any legacy rows with no year at all)
+// untouched. Unlike mergeFlexibleTable's "## " title-keyed sections, the year
+// here lives inside each row itself, so it's forced onto every row of
+// newDataText regardless of what (if anything) that field already held —
+// the whole point is that an admin picks the year once, in the UI, rather
+// than typing it into every row of the source spreadsheet.
+export function mergeStructuredTableByYear(existingText: string, year: string, newDataText: string): string {
+  const targetYear = year.trim();
+  const existingRows = parseStructuredTable(existingText).flatMap((s) => s.rows);
+  const importedRows = parseStructuredTable(newDataText).flatMap((s) => s.rows)
+    .map((r): StructuredTableRow => ({ ...r, email: targetYear }));
+
+  const noYear: StructuredTableRow[] = [];
+  const byYear = new Map<string, StructuredTableRow[]>();
+  const yearOrder: string[] = [];
+  for (const row of existingRows) {
+    const y = (row.email || '').trim();
+    if (!y) { noYear.push(row); continue; }
+    if (!byYear.has(y)) { byYear.set(y, []); yearOrder.push(y); }
+    byYear.get(y)!.push(row);
+  }
+  if (!byYear.has(targetYear)) yearOrder.push(targetYear);
+  byYear.set(targetYear, importedRows);
+
+  const orderedRows = [...noYear, ...yearOrder.flatMap((y) => byYear.get(y) || [])];
+  return orderedRows.map((r) => [r.name, r.role, r.notes, r.email || ''].join(' | ')).join('\n');
+}
+
 // A more general text-table format for data that doesn't fit the fixed
 // Name/Role/Notes shape above — e.g. Research's tables, which vary from a
 // single "Area" column to "Project Title | PI | Amount | Agency". The first

@@ -13,5 +13,11 @@ export function useHashScroll() {
     if (!location.hash) return;
     const el = document.getElementById(location.hash.slice(1));
     if (el) smoothScrollTo(el);
-  }, [location.hash]);
+    // location.pathname (not just .hash) is a dependency too: switching between
+    // programs on the same detail page navigates to the same "#program-toggle"
+    // hash each time (e.g. "/academics/cse" -> "/academics/cyber-security", both
+    // "#program-toggle"), and a same-string hash doesn't retrigger this effect
+    // on its own — leaving the freshly re-mounted page's scroll position
+    // wherever it happened to land instead of back at the target section.
+  }, [location.hash, location.pathname]);
 }

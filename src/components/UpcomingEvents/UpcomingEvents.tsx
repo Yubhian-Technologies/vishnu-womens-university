@@ -5,7 +5,6 @@ import {
   MapPin, 
   Sparkles, 
   ArrowRight, 
-  ExternalLink, 
   X, 
   Clock, 
   Check, 
@@ -176,10 +175,6 @@ export default function UpcomingEvents({ happenings = [] }: Props) {
         {/* Section Header with Google M3 Pill Badge */}
         <div className="m3-upcoming-header">
           <div className="m3-upcoming-header-text reveal-left">
-            <div className="m3-chip m3-chip--primary">
-              <Sparkles size={14} className="m3-chip-icon" />
-              <span>Campus Calendar & Milestones</span>
-            </div>
             <h2 className="m3-upcoming-title">Upcoming at VWU</h2>
             <p className="m3-upcoming-subtitle">
               Mark your calendar for upcoming tech symposiums, IEEE conferences, workshops, and campus life milestones.
@@ -194,9 +189,9 @@ export default function UpcomingEvents({ happenings = [] }: Props) {
           </div>
         </div>
 
-        {/* M3 Layout: Spotlight Grid */}
+        {/* Events Layout: Spotlight Grid */}
         <div className="m3-upcoming-grid">
-          {/* Hero Spotlight Card (First / Next Event) */}
+          {/* Hero Spotlight Card (Featured Next Event) */}
           {featuredEvent && featuredDate && (
             <div 
               className="m3-card m3-card--featured reveal-left"
@@ -205,35 +200,25 @@ export default function UpcomingEvents({ happenings = [] }: Props) {
               tabIndex={0}
               onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setSelectedEvent(featuredEvent); }}
             >
-              <div className="m3-card-state-layer" />
-              
               <div className="m3-featured-top">
-                <div className="m3-badge-next">
-                  <span className="m3-pulse-dot" />
-                  <span>Next Happening</span>
-                </div>
-
+                <span className="m3-badge-next">Next Event</span>
                 {featuredEvent.dept && (
                   <span className="m3-dept-tag">
-                    <Building2 size={13} />
                     <span>{featuredEvent.dept}</span>
                   </span>
                 )}
               </div>
 
               <div className="m3-featured-content">
-                {/* Google Calendar Date Tile */}
+                {/* Date Tile */}
                 <div className="m3-cal-tile m3-cal-tile--hero">
                   <div className="m3-cal-tile-month">{featuredDate.month}</div>
                   <div className="m3-cal-tile-day">{featuredDate.day}</div>
-                  {featuredDate.weekday && (
-                    <div className="m3-cal-tile-sub">{featuredDate.weekday}</div>
-                  )}
                 </div>
 
                 <div className="m3-featured-details">
                   <div className="m3-event-date-full">
-                    <CalendarDays size={15} />
+                    <CalendarDays size={14} strokeWidth={2} />
                     <span>{featuredEvent.date}</span>
                   </div>
                   <h3 className="m3-featured-title">{featuredEvent.title}</h3>
@@ -243,12 +228,12 @@ export default function UpcomingEvents({ happenings = [] }: Props) {
 
                   <div className="m3-featured-meta-row">
                     <span className="m3-meta-item">
-                      <MapPin size={14} />
-                      <span>VWU Campus Auditorium / Labs</span>
+                      <MapPin size={13} strokeWidth={2} />
+                      <span>VWU Campus Auditorium</span>
                     </span>
                     <span className="m3-meta-item">
-                      <Clock size={14} />
-                      <span>Full Day / Schedule</span>
+                      <Clock size={13} strokeWidth={2} />
+                      <span>Full Day Event</span>
                     </span>
                   </div>
                 </div>
@@ -262,23 +247,22 @@ export default function UpcomingEvents({ happenings = [] }: Props) {
                   className="m3-btn m3-btn--primary m3-btn--sm"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <CalendarPlus size={15} />
-                  <span>Add to Google Calendar</span>
+                  <CalendarPlus size={14} />
+                  <span>Add to Calendar</span>
                 </a>
 
                 <button 
                   type="button" 
-                  className="m3-btn m3-btn--outlined m3-btn--sm"
+                  className="m3-btn-subtle"
                   onClick={() => setSelectedEvent(featuredEvent)}
                 >
-                  <span>Quick View</span>
-                  <ExternalLink size={14} />
+                  <span>Quick Details →</span>
                 </button>
               </div>
             </div>
           )}
 
-          {/* Schedule Column (Remaining Events) */}
+          {/* Schedule Column (Compact Remaining Events) */}
           <div className="m3-schedule-list reveal-right">
             {otherEvents.map((item, idx) => {
               const dt = parseEventDate(item.date);
@@ -291,9 +275,7 @@ export default function UpcomingEvents({ happenings = [] }: Props) {
                   tabIndex={0}
                   onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setSelectedEvent(item); }}
                 >
-                  <div className="m3-card-state-layer" />
-
-                  {/* Google Calendar Date Tile */}
+                  {/* Calendar Date Tile */}
                   <div className="m3-cal-tile">
                     <div className="m3-cal-tile-month">{dt.month}</div>
                     <div className="m3-cal-tile-day">{dt.day}</div>
@@ -308,10 +290,6 @@ export default function UpcomingEvents({ happenings = [] }: Props) {
                     </div>
 
                     <h4 className="m3-row-title">{item.title}</h4>
-
-                    {item.description && (
-                      <p className="m3-row-desc">{item.description}</p>
-                    )}
                   </div>
 
                   <div className="m3-row-actions">
@@ -324,11 +302,11 @@ export default function UpcomingEvents({ happenings = [] }: Props) {
                       aria-label="Add to Google Calendar"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      <CalendarPlus size={16} />
+                      <CalendarPlus size={15} />
                     </a>
 
                     <div className="m3-action-arrow">
-                      <ArrowRight size={18} />
+                      <ArrowRight size={16} />
                     </div>
                   </div>
                 </div>
@@ -337,14 +315,10 @@ export default function UpcomingEvents({ happenings = [] }: Props) {
           </div>
         </div>
 
-        {/* Quick Footer Info Strip */}
+        {/* Subdued Footer Archive Link */}
         <div className="m3-upcoming-footer-bar reveal">
-          <div className="m3-footer-info">
-            <span className="m3-info-dot" />
-            <span>Looking for past symposiums, MoUs, or student achievements?</span>
-          </div>
           <Link to="/news-awards/happenings" className="m3-footer-link">
-            <span>Explore Happenings Archive</span>
+            <span>Explore Past Happenings &amp; Archives</span>
             <ArrowRight size={14} />
           </Link>
         </div>

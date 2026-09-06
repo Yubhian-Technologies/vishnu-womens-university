@@ -8,7 +8,7 @@ function StatCircle({ value, suffix, label, start }: { value: number; suffix: st
   const count = useCounter(value, 2000, start);
   return (
     <div className="lph-stat-circle">
-      <div className="lph-stat-circle__number">{count}{suffix}</div>
+      {value > 0 && <div className="lph-stat-circle__number">{count}{suffix}</div>}
       <p>{label}</p>
     </div>
   );

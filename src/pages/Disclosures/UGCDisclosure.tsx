@@ -44,7 +44,7 @@ const sections: DisclosureSection[] = [
       { label: 'About us: Overview', status: 'Available', links: [{ label: 'About VWU', path: '/about' }] },
       { label: 'Act and Statutes or MoA', status: 'Not Applicable' },
       { label: 'Institutional Development Plan', status: 'Available', links: [{ label: 'Institutional Development Plan', path: '/governance/idp' }] },
-      { label: 'Constituent Units / Affiliated Colleges, Affiliating University (in case of Colleges), Off-campus / Off-shore campus / Learning Support Centres under ODL mode (wherever applicable)', status: 'Affiliated to JNTUK, Kakinada', links: [{ label: 'JNTUK Kakinada', path: 'https://www.jntuk.edu.in/', external: true }] },
+      { label: 'Constituent Units / Affiliated Colleges, Affiliating University (in case of Colleges), Off-campus / Off-shore campus / Learning Support Centres under ODL mode (wherever applicable)', status: 'UGC Approved Private State University', links: [{ label: 'UGC Approved', path: '/disclosures-ugc' }] },
       { label: 'Accreditation / Ranking status (NAAC, NBA, NIRF)', status: 'Available', links: [
         { label: 'NAAC Approvals', path: 'https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2FNAACApprovals.pdf?alt=media&token=74745fe4-2332-4338-9f13-b753372b42d7', download: true, key: 'naac-approvals' },
         { label: 'NBA Approvals', path: 'https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2FNBAApprovals.pdf?alt=media&token=f25ad763-643d-4321-a36c-874029264996', download: true, key: 'nba-approvals' },
@@ -114,10 +114,10 @@ const sections: DisclosureSection[] = [
       { label: 'Details of Student Grievance Redressal Committee (SGRC) and Ombudsperson', status: 'Available', links: [{ label: 'Student Grievance Redressal Committee', path: '/governance/student-grievance' }] },
       { label: 'Health facilities', status: 'Available', links: [{ label: 'Health Care', path: '/campus/health-care' }] },
       { label: 'Internal Complaint Committee', status: 'Available', links: [{ label: 'Internal Committee (POSH)', path: '/governance/internal-committee' }] },
-      { label: 'Anti-Ragging Cell', status: 'Available', links: [{ label: 'Anti Ragging Committee', path: '/governance/anti-ragging' }] },
+      { label: 'Anti-Ragging Cell', status: 'Available', links: [{ label: 'Anti-Ragging Committee', path: '/governance/anti-ragging' }] },
       { label: 'Equal Opportunity Cell', status: 'Available', links: [{ label: 'Governance', path: '/governance' }] },
       { label: 'Socio-Economically Disadvantaged Groups Cell (SEDG)', status: 'Available', links: [{ label: 'SC/ST Cell', path: '/governance/sc-st-cell' }] },
-      { label: 'Facilities for differently-abled (e.g. barrier-free environment)', status: 'Available', links: [{ label: 'Facilities for Physically Challenged', path: 'https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2FSVECWPhysicallyChallengedFacilities.pdf?alt=media&token=168a11aa-9a64-4f19-94bc-8a022ce558bc', download: true, key: 'facilities-physically-challenged' }] },
+      { label: 'Facilities for differently-abled (e.g. barrier-free environment)', status: 'Available', links: [{ label: 'Facilities for Persons with Disabilities', path: 'https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2FSVECWPhysicallyChallengedFacilities.pdf?alt=media&token=168a11aa-9a64-4f19-94bc-8a022ce558bc', download: true, key: 'facilities-physically-challenged' }] },
     ],
   },
   {
@@ -214,7 +214,7 @@ export default function UGCDisclosure() {
             <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6, maxWidth: 820 }}>
               The signed original of this disclosure is also available as a downloadable PDF —{' '}
               <a href={docsByKey.get('ugc-public-self-disclosure')!.fileUrl} download style={{ color: 'var(--color-primary)', fontWeight: 600 }}>
-                UGC Public Self Disclosure ↓
+                UGC Public Self-Disclosure ↓
               </a>.
             </p>
           )}

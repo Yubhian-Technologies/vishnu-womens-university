@@ -11,7 +11,7 @@
   aspect-ratio: 4 / 3;
   cursor: pointer;
   background: var(--color-off-white);
-  border: 1px solid rgba(27, 67, 50, 0.08);
+  border: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 8%, transparent);
   box-shadow: var(--shadow-sm);
   transition: all var(--transition-base);
 }
@@ -40,7 +40,7 @@
   display: flex;
   align-items: flex-end;
   padding: var(--space-4);
-  background: linear-gradient(to top, rgba(8, 28, 21, 0.85) 0%, rgba(8, 28, 21, 0) 55%);
+  background: linear-gradient(to top, color-mix(in srgb, var(--color-primary-dark, #081c15) 85%, transparent) 0%, color-mix(in srgb, var(--color-primary-dark, #081c15) 0%, transparent) 55%);
   opacity: 0;
   transition: opacity var(--transition-base);
 }
@@ -58,7 +58,7 @@
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: rgba(8, 28, 21, 0.92);
+  background: color-mix(in srgb, var(--color-primary-dark, #081c15) 92%, transparent);
   backdrop-filter: blur(12px);
   display: flex;
   align-items: center;

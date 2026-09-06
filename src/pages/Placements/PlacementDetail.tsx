@@ -129,6 +129,8 @@ const PARTNER_DOMAINS: Record<string, string> = {
 // their actual logo) — checked before falling back to that lookup.
 const PARTNER_LOGO_OVERRIDES: Record<string, string> = {
   'IBM': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/IBM_logo.svg/250px-IBM_logo.svg.png',
+  // Google's favicon service has nothing for providence.org, so the lookup 404s
+  'Providence': 'https://upload.wikimedia.org/wikipedia/en/thumb/7/79/Providence_Health_logo.svg/250px-Providence_Health_logo.svg.png',
 };
 
 // Placement Cell's Summary tiles are a single free-text line per batch (e.g.
@@ -143,10 +145,14 @@ function OutcomeTileText({ text }: { text: string }) {
   const m = text.match(OUTCOME_BATCH_SUMMARY_RE);
   if (!m) return <>{text}</>;
   const [, batch, count, highest] = m;
+  // The raw admin-entered count sometimes has a thousands comma baked in
+  // (e.g. "1,156") and sometimes doesn't (e.g. "1103") — strip it so every
+  // tile reads the same way regardless of how it was typed.
+  const countDigitsOnly = count.replace(/,/g, '');
   return (
     <>
       <span style={{ display: 'block', textAlign: 'center' }}>{batch} batch</span>
-      <span style={{ display: 'block', textAlign: 'center' }}>{count} placements</span>
+      <span style={{ display: 'block', textAlign: 'center' }}>{countDigitsOnly} placements</span>
       Highest Package: {highest}
     </>
   );
@@ -786,6 +792,10 @@ export default function PlacementDetail() {
   // Month | No. of Selects | Year") reuses StructuredTableRow's optional
   // `email` slot, since this table never uses real email/LinkedIn data.
   const [internYearFilter, setInternYearFilter] = useState<string>('All');
+  // Show-entries pagination for the same table — same pattern as the
+  // Placements, Year by Year company table in PlacementYearAccordion.tsx.
+  const [internEntriesPerPage, setInternEntriesPerPage] = useState(10);
+  const [internPage, setInternPage] = useState(0);
   // Full bios (Admin → TPO Team Info) and photos (Admin → TPO Team Photos)
   // for the TPO Team roster — both keyed by the same exact name string as it
   // appears in the roster table, so a matching row's accordion expands to
@@ -830,6 +840,13 @@ export default function PlacementDetail() {
   const [sidebarChartBatch, setSidebarChartBatch] = useState('');
   const sidebarChartYear = placementYearData.find((y) => y.batch === sidebarChartBatch);
 
+  useEffect(() => {
+    setActiveTableRow(null);
+    setInternYearFilter('All');
+    setInternPage(0);
+    setSidebarChartBatch('');
+  }, [slug]);
+
   // No scroll-reveal here — this page's content only renders once the
   // Firestore-backed `item` has loaded (see the gotcha documented in CLAUDE.md).
   useEffect(() => {
@@ -857,6 +874,11 @@ export default function PlacementDetail() {
   const filteredInternRows = internYearFilter === 'All'
     ? tableRows
     : tableRows.filter((r) => !r.email || r.email === internYearFilter);
+  const internTotalPages = Math.max(1, Math.ceil(filteredInternRows.length / internEntriesPerPage));
+  const internPageClamped = Math.min(internPage, internTotalPages - 1);
+  const internPageRows = internEntriesPerPage >= filteredInternRows.length
+    ? filteredInternRows
+    : filteredInternRows.slice(internPageClamped * internEntriesPerPage, internPageClamped * internEntriesPerPage + internEntriesPerPage);
   // Placement Highlights uses a fully dynamic table (its own column headers
   // straight from row 1 of the Data Table field, not a fixed shape like the
   // roster/company tables above) — see the flexibleHeaders/flexibleRows
@@ -870,8 +892,8 @@ export default function PlacementDetail() {
   // than falling back to treating tableText's own first row as the header
   // when it's blank) means a not-yet-configured page just shows nothing,
   // instead of quietly mistaking a real data row for the header again.
-  const flexibleSections = item.slug === 'placement-highlights' && item.dataTableHeadersText.trim()
-    ? parseFlexibleTable(`${item.dataTableHeadersText}\n${item.tableText}`)
+  const flexibleSections = item.slug === 'placement-highlights' && (item.dataTableHeadersText || '').trim()
+    ? parseFlexibleTable(`${item.dataTableHeadersText || ''}\n${item.tableText || ''}`)
     : [];
   const flexibleHeaders = flexibleSections[0]?.headers ?? [];
   const flexibleRows = flexibleSections.flatMap((s) => s.rows);
@@ -974,40 +996,48 @@ export default function PlacementDetail() {
   return (
     <main className="page-wrapper">
       {/* Hero */}
-      <section className="page-hero" style={{ minHeight: 360 }}>
-        {heroVideo ? (
-          <video
-            src={heroVideo}
-            poster={heroImage || undefined}
-            className="page-hero-image"
-            autoPlay
-            muted
-            loop
-            playsInline
-          />
-        ) : heroImage && (
-          <img
-            src={heroImage}
-            alt={item.title}
-            className="page-hero-image"
-            loading="eager"
-            decoding="sync"
-            {...fetchPriorityAttr('high')}
-          />
-        )}
-        <div className="page-hero-overlay" />
-        <div className="container page-hero-content">
-          <div className="breadcrumb animate-fade-in">
-            <Link to="/" className="breadcrumb-item">Home</Link>
-            <span className="breadcrumb-sep">›</span>
-            <Link to="/placements" className="breadcrumb-item">Placements</Link>
-            <span className="breadcrumb-sep">›</span>
-            <span className="breadcrumb-item active">{item.title}</span>
+      <section className="dept-hero-section">
+        <div className="container">
+          <div className="dept-hero-card">
+            {heroVideo ? (
+              <video
+                src={heroVideo}
+                poster={heroImage || undefined}
+                className="dept-hero-bg-video"
+                autoPlay
+                muted
+                loop
+                playsInline
+              />
+            ) : heroImage && (
+              <img
+                src={heroImage}
+                alt={item.title}
+                className="dept-hero-bg-img"
+                loading="eager"
+                decoding="sync"
+                {...fetchPriorityAttr('high')}
+              />
+            )}
+            <div className="dept-hero-overlay" />
+            <div className="dept-hero-content">
+              <div className="breadcrumb animate-fade-in" style={{ marginBottom: '0.8rem' }}>
+                <Link to="/" className="breadcrumb-item">Home</Link>
+                <span className="breadcrumb-sep">›</span>
+                <Link to="/placements" className="breadcrumb-item">Placements</Link>
+                <span className="breadcrumb-sep">›</span>
+                <span className="breadcrumb-item active">{item.title}</span>
+              </div>
+              <div className="animate-fade-in-up" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#C9973A', color: '#0B1E42', fontSize: 'var(--text-xs)', fontWeight: 800, padding: '0.35rem 0.9rem', borderRadius: '9999px', marginBottom: '0.8rem', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                <Icon size={14} /> Placements & Careers
+              </div>
+              <h1 className="dept-hero-title">{item.title}</h1>
+              {item.desc && (
+                <p className="dept-hero-subtitle">{item.desc}</p>
+              )}
+
+            </div>
           </div>
-          <div className="animate-fade-in-up" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'var(--color-accent)', color: 'var(--color-white)', fontSize: 'var(--text-xs)', fontWeight: 700, padding: '0.3rem 0.9rem', borderRadius: 'var(--radius-full)', marginBottom: 'var(--space-3)' }}>
-            <Icon size={16} /> Placements & Careers
-          </div>
-          <h1 className="animate-fade-in-up">{item.title}</h1>
         </div>
       </section>
 
@@ -1071,6 +1101,38 @@ export default function PlacementDetail() {
                     </span>
                   ))}
                 </p>
+              )}
+
+              {/* SVES network graphic — the society's ILO/campus map, shown
+                  above the per-office Regional Offices accordion below. Static
+                  asset (not admin-managed) since it's society-issued artwork,
+                  same as the /images/placements/* photos elsewhere. The
+                  onError hide keeps the page clean rather than showing a
+                  broken-image icon if the file isn't present. */}
+              {item.slug === 'industry-liaison-offices' && (
+                <img
+                  src="/images/placements/industry-liaison-offices.png"
+                  alt="Sri Vishnu Educational Society — Industry Liaison Offices, campuses and contact details across India"
+                  loading="lazy"
+                  onError={(e) => {
+                    const target = e.currentTarget as HTMLImageElement;
+                    if (!target.dataset.triedFallback) {
+                      target.dataset.triedFallback = 'true';
+                      target.src = '/images/image (3).png';
+                    } else {
+                      target.style.display = 'none';
+                    }
+                  }}
+                  style={{
+                    display: 'block',
+                    width: '100%',
+                    maxWidth: '720px',
+                    height: 'auto',
+                    margin: 'var(--space-8) auto 0',
+                    borderRadius: 'var(--radius-lg)',
+                    boxShadow: 'var(--shadow-md)',
+                  }}
+                />
               )}
             </div>
 
@@ -1256,7 +1318,7 @@ export default function PlacementDetail() {
                     <button
                       key={yr}
                       type="button"
-                      onClick={() => setInternYearFilter(yr)}
+                      onClick={() => { setInternYearFilter(yr); setInternPage(0); }}
                       style={{
                         padding: '0.6rem 1.5rem',
                         borderRadius: 'var(--radius-full)',
@@ -1292,6 +1354,20 @@ export default function PlacementDetail() {
               // always show regardless of which filter pill is active (filter
               // pills themselves render beside the heading above, not here).
               <>
+                {filteredInternRows.length > 0 && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 'var(--text-sm)', color: 'var(--color-text)', marginBottom: 'var(--space-4)' }}>
+                    <span>Show</span>
+                    <select
+                      value={internEntriesPerPage}
+                      onChange={(e) => { setInternEntriesPerPage(Number(e.target.value)); setInternPage(0); }}
+                      style={{ border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-sm)', padding: '0.3rem 0.5rem', fontSize: 'var(--text-sm)' }}
+                    >
+                      {[10, 25, 50, 100].map((n) => <option key={n} value={n}>{n}</option>)}
+                      <option value={filteredInternRows.length || 1}>All</option>
+                    </select>
+                    <span>entries</span>
+                  </div>
+                )}
                 <div style={{ overflowX: 'auto' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm)' }}>
                     <thead>
@@ -1303,9 +1379,9 @@ export default function PlacementDetail() {
                       </tr>
                     </thead>
                     <tbody>
-                      {filteredInternRows.map((row, i) => (
+                      {internPageRows.map((row, i) => (
                         <tr key={i} style={{ background: i % 2 === 0 ? 'var(--color-off-white)' : 'transparent' }}>
-                          <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)' }}>{i + 1}</td>
+                          <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)' }}>{internPageClamped * internEntriesPerPage + i + 1}</td>
                           <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)', fontWeight: 600 }}>{row.name}</td>
                           <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)' }}>{row.role}</td>
                           <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)' }}>{row.notes}</td>
@@ -1314,6 +1390,29 @@ export default function PlacementDetail() {
                     </tbody>
                   </table>
                 </div>
+                {internTotalPages > 1 && filteredInternRows.length > 0 && (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'var(--space-4)', fontSize: 'var(--text-sm)', color: 'var(--color-text-light)' }}>
+                    <span>
+                      Showing {internPageClamped * internEntriesPerPage + 1} to {Math.min(internPageClamped * internEntriesPerPage + internEntriesPerPage, filteredInternRows.length)} of {filteredInternRows.length} entries
+                    </span>
+                    <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+                      <button
+                        onClick={() => setInternPage((p) => Math.max(0, p - 1))}
+                        disabled={internPageClamped === 0}
+                        style={{ padding: '0.3rem 0.8rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-light-gray)', background: 'var(--color-white)', cursor: internPageClamped === 0 ? 'default' : 'pointer', opacity: internPageClamped === 0 ? 0.5 : 1 }}
+                      >
+                        Previous
+                      </button>
+                      <button
+                        onClick={() => setInternPage((p) => Math.min(internTotalPages - 1, p + 1))}
+                        disabled={internPageClamped >= internTotalPages - 1}
+                        style={{ padding: '0.3rem 0.8rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-light-gray)', background: 'var(--color-white)', cursor: internPageClamped >= internTotalPages - 1 ? 'default' : 'pointer', opacity: internPageClamped >= internTotalPages - 1 ? 0.5 : 1 }}
+                      >
+                        Next
+                      </button>
+                    </div>
+                  </div>
+                )}
                 <PageContactLine emails={item.emails} linkedins={item.linkedins} />
               </>
             ) : (
@@ -1390,7 +1489,7 @@ export default function PlacementDetail() {
             </h2>
             <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
               <Link to="/placements" className="btn btn-accent">Back to Placements</Link>
-              <Link to="/admissions" className="btn btn-secondary">Apply Now</Link>
+              <Link to="/apply-now" className="btn btn-secondary">Apply Now</Link>
             </div>
           </div>
         </div>

@@ -15,6 +15,6 @@ export type PlacementYearDoc = WithId & PlacementYear;
 export function usePlacementYears() {
   const { docs: allYears } = useCollection<PlacementYearDoc>('placementYears', [], { silent: true });
   return allYears.length > 0
-    ? [...allYears].sort((a, b) => b.batch.localeCompare(a.batch))
+    ? [...allYears].sort((a, b) => (b.batch || '').localeCompare(a.batch || ''))
     : staticPlacementYearData;
 }

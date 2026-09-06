@@ -117,34 +117,18 @@ function cardsList(cards: { title: string }[]): string {
 // ---------------------------------------------------------------------
 
 const FACILITY_BODIES: Record<string, string> = {
-  'smart-classrooms': `The classrooms are architecturally designed to create a comfortable, inspiring, and student-friendly learning environment. Spacious interiors, large windows, and scientifically planned ventilation ensure an abundance of natural light and fresh air throughout the day. This thoughtfully designed atmosphere promotes concentration, creativity, and overall well-being, providing students with the ideal setting to learn, collaborate, relax, and grow both academically and personally.
+  'smart-classrooms': `Vishnu Women's University provides fully air-conditioned, spacious, and technology-enabled smart classrooms designed for a comfortable and engaging learning experience.
 
-Each classroom is equipped with state-of-the-art technological facilities that support modern teaching methodologies. Advanced digital teaching aids, including LCD projectors, interactive presentation systems, video players, high-speed internet connectivity, and audio-visual equipment, enable teachers to deliver engaging and effective lessons. These smart classroom facilities make learning more interactive, helping students understand concepts through visual demonstrations, multimedia presentations, educational videos, and real-time digital resources.
+Equipped with interactive digital teaching tools, multimedia systems, high-speed internet, and audio-visual facilities, the classrooms support dynamic, collaborative, and student-centred learning.
 
-The integration of technology into everyday classroom instruction allows teachers to adopt innovative and student-centered teaching practices. Lessons become more dynamic through presentations, animations, virtual demonstrations, and collaborative learning activities, encouraging active participation and critical thinking among students. With access to digital resources at the click of a button, teachers can seamlessly incorporate the latest educational content into their lessons, making learning more relevant and meaningful.
+Thoughtfully designed for interactive discussions, presentations, project-based learning, and active participation, these smart classrooms create an environment that encourages curiosity, creativity, critical thinking, and academic excellence.`,
+  'state-of-the-art-labs': `#### About Our Laboratories
 
-The classrooms are also designed to facilitate group discussions, project-based learning, seminars, and interactive sessions that nurture communication skills, teamwork, and problem-solving abilities. Comfortable seating arrangements and a well-organized layout ensure that every student enjoys an inclusive and distraction-free learning experience.
+State-of-the-art laboratories are at the heart of **practical, industry-oriented engineering education**. At Vishnu Women's University, students gain hands-on experience through modern laboratories equipped with contemporary tools, technologies, and industry-standard equipment.
 
-Our technologically advanced classrooms create an environment where teaching and learning go beyond traditional methods. By blending modern infrastructure with innovative educational practices, the institution ensures that students remain actively involved in the learning process. This not only enhances the pace and quality of education but also fosters curiosity, confidence, creativity, and a lifelong passion for learning, preparing students to meet the challenges of a rapidly evolving world.`,
-  'state-of-the-art-labs': `#### State-of-the-art laboratories are the back bone of any Engineering college. Practical exposure brings real value to an engineering degree.
+Each department maintains **specialized laboratories** aligned with its academic and practical requirements. Facilities are regularly upgraded to keep pace with **emerging technologies and industry developments**.
 
-- Vishnu Women's University believes in imparting strong practical exposure to its students.
-- Modern laboratories are an integral part of the various departments of the college.
-- Each department maintains its specialized labs, equipped with modern equipment of industry standards.
-- Vishnu Women's University keeps upgrading the facilities and equipment in the laboratories to the latest industry standards, from time to time.
-
-#### Apart from regular experiments, all departments conduct additional experiments in all laboratories to train the students in the cutting edge technologies.
-
-- Electronics Engineering (VLSI Design & Technology) Labs
-- Electronics & Communication Engineering Labs
-- Electrical & Electronics Engineering Labs
-- Computer Science & Engineering Labs
-- Information Technology Labs
-- Artificial Intelligence Labs
-- Civil Engineering Labs
-- Mechanical Engineering Labs
-- Basic Science Labs
-- Master of Business Administration Labs`,
+Beyond the prescribed curriculum, students are encouraged to undertake **additional experiments, projects, and practical activities**, strengthening their technical skills, problem-solving abilities, and readiness for the professional world.`,
   'auditoriums': `Considering that a variety of events like cultural programmes, seminars, debates, plays and other programmes are conducted throughout the year, Vishnu Women's University houses an Indoor Auditorium, Open-air-Auditorium, Mini-Auditorium and numerous Seminar Halls which facilitate the students to carry on their activities smoothly and with ease. They attract students to flock together to share, discuss and explore knowledge in their areas of learning.
 
 Smt. B. Seetha Indoor Auditorium is centrally air-conditioned with a fully sound proof setup and equipped with latest technology for all types of audio/video presentations.
@@ -204,7 +188,30 @@ The desk operates daily from 4:00 PM to 7:00 PM, and on Sundays from 11:00 AM to
 
 This facility is designed to simplify travel and documentation needs for students, faculty, and staff.`,
   'temples': `Worship is putting the spotlight on God. This whole idea is to engage our Vishnu Women's University students in an atmosphere and attitude of reverence and joy. Vishnu Women's University engage students from varied faith and religious traditions as well as students without religious affiliation. So, Vishnu Women's University holds a place for temple of gods in the campus. The temple is built on a high foundation covering an area of 25,000 square feet.`,
-  'health-care': `Health Care Centre is available with all types of medical advice, clinical tests and inpatient facility with two beds. The centre is monitored by a resident general physician Dr. Varaprasad, a psychiatrist Dr. Ramakrishnam Raju and a gynaecologist Dr. Jayakumari visit the centre during their appointed hours. Students and Staff also have free access to dental hospital located in the campus to get their dental problems treated.`,
+  'health-care': `The Health Care Centre at Vishnu Women's University provides accessible medical care and essential health support to students and staff throughout the academic year. The Centre offers medical consultation, first aid, basic clinical testing, emergency support, and inpatient care.
+
+- General Medical Consultation and OPD Services
+- First Aid and Emergency Care
+- Basic Clinical Laboratory Services
+- ECG and Vital Signs Monitoring
+- Inpatient and Sick Bay Facilities
+- Pharmacy with Essential Medicines
+- Ambulance and Emergency Support
+- Specialist Medical Consultations
+
+The University maintains dedicated healthcare and first-aid facilities at key locations across the campus, ensuring prompt access to medical assistance.
+
+Medical OPD – CSSD Block, VDC. Timings: 8:30 AM – 5:00 PM. Medical Officer: Dr. V. Deepika, MBBS. The facility includes a clinical laboratory with cell counter, semi-auto analyser, and centrifuge, along with ECG, oxygen support, IV stands, BP apparatus, wheelchair, stretcher, pulse oximeter, nebulizer, steam inhalation facility, and other essential medical equipment. Nursing Staff: Mr. I. Kiran, B.Sc. (N). Laboratory Technician: Mr. Ramu Narayana Rao, Intermediate (MLT). Pharmacy: An on-campus medical shop provides essential medicines.
+
+Sick Bay – Near Medha Hostel. Timings: 8:30 AM – 6:00 PM. The Sick Bay provides inpatient and first-aid care, with four hospital cots and four general cots, along with essential emergency and medical equipment. Nursing Staff: Mrs. M. Shanthi, B.Sc. (N). Specialist Consultation: Dr. M. Jagadeeshwari, MBBS, DNB (OBGY), every Tuesday, 5:00 PM – 6:00 PM.
+
+First Aid Centre – Near Warden's Office. Timings: 8:30 AM – 6:00 PM. The facility provides first-aid and emergency care with hospital cots, ECG, bedside monitoring, medicines, dressing materials, oxygen and essential medical equipment. Ambulance support is also available. Medical Officer: Dr. S. P. Vadana, MD (Physician). Nursing Staff: Mrs. M. Anitha, GNM.
+
+Specialist doctors visit the campus at scheduled times to provide additional healthcare support, including general medical and gynecological consultations. Students and staff also have access to dental care at the on-campus Vishnu Dental College & Hospital.
+
+Medical and nursing personnel are available round the clock for emergency assistance, ensuring timely healthcare support beyond regular consultation hours.
+
+The University is committed to maintaining a safe, healthy, and supportive campus environment, with healthcare facilities designed to meet the everyday and emergency medical needs of its students and staff.`,
   'swimming-pool': `Whether you want to relax after a long day at studies are maintain a healthy life style, the newly opened swimming pool, next the sports complex is the ideal place for swimming enthusiasts. A world class pool with 80 feet length 40 feet width six lanes containing 4,05,000 liters of water provides excellent opportunities.
 
 The latest technological features, round the clock water circulation and purification plants, life saving apparatus and pool side equipment is an superb facility that only Vishnu Women's University has. Individualized assistance in developing skills in all the four strokes by the coach is available. In addition the well equipped Eat Out provides the right ambiance for a pool side party.`,

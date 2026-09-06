@@ -28,7 +28,7 @@ const NAV_LINK_OVERRIDES: {
   {
     id: 'header-apply-now',
     label: 'Header → Apply Now button',
-    defaultPath: '/admissions',
+    defaultPath: '/apply-now',
   },
   {
     id: 'header-organizational-chart',

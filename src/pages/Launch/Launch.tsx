@@ -23,7 +23,7 @@ function Confetti() {
     resize();
     window.addEventListener('resize', resize);
 
-    const colors = ['#C9A84C', '#e8c96a', '#f5fbf7', '#40916c'];
+    const colors = ['#C9A84C', '#e8c96a', '#ffffff', '#1e3a8a'];
     const particles = Array.from({ length: 140 }, () => ({
       x: canvas.width / 2,
       y: canvas.height / 2,

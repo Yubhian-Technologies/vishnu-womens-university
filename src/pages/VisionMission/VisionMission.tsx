@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Trophy, Check } from 'lucide-react';
 import './VisionMission.css';
+import '../About/About.css';
 import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
@@ -61,7 +63,7 @@ export default function VisionMission() {
       <PageHero
         page="vision-mission"
         defaultTitle="Vision & Mission"
-  defaultSubtitle="The principles, purpose, and commitments that inform every decision and action at Vishnu Womens University."
+        defaultSubtitle="The principles, purpose, and commitments that inform every decision and action at Vishnu Womens University."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Discover', to: '/' }, { label: 'Vision & Mission' }]}
       />
 
@@ -125,7 +127,7 @@ export default function VisionMission() {
               const Icon = resolveContentIcon(v.icon) || Trophy;
               return (
                 <div key={v.id} className="vm-value-card">
-                  <div className="vm-value-icon"><Icon size={40} strokeWidth={1.75} /></div>
+                  <div className="vm-value-icon"><Icon size={24} strokeWidth={1.8} /></div>
                   <h3>{v.title}</h3>
                   <p>{v.desc}</p>
                 </div>
@@ -136,7 +138,7 @@ export default function VisionMission() {
       </section>
 
       {/* Campus Photos */}
-      <section className="section bg-white">
+      <section className="section bg-off-white">
         <div className="container">
           <PhotoGrid
             images={inspirationPhotos}
@@ -158,7 +160,7 @@ export default function VisionMission() {
 
       {/* Our Core Values — hidden until real photos are added */}
       {hasCoreValuesPhotos && (
-        <section className="section bg-off-white">
+        <section className="section bg-white">
           <div className="container">
             <PhotoGrid
               images={coreValuesPhotos}
@@ -178,21 +180,21 @@ export default function VisionMission() {
             <div className="reveal-left">
               <span className="section-label" style={{ color: 'var(--color-accent)' }}>Quality Commitment</span>
               <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-6)' }}>Quality Policy</h2>
-              <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
                 {qualityPolicy.map((p) => (
                   <li key={p.id} style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
-                    <Check size={17} strokeWidth={2.5} style={{ color: 'var(--color-accent)', flexShrink: 0 }} />
-                    <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: 'var(--text-sm)', lineHeight: 1.7 }}>{p.title}</p>
+                    <Check size={17} strokeWidth={2.5} style={{ color: 'var(--color-accent)', flexShrink: 0, marginTop: 2 }} />
+                    <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: 'var(--text-sm)', lineHeight: 1.7, margin: 0 }}>{p.title}</p>
                   </li>
                 ))}
               </ul>
             </div>
             {qualityPolicyImg && (
-              <div>
+              <div className="sves-image-wrapper reveal-right">
                 <img
                   src={qualityPolicyImg.src}
                   alt={qualityPolicyImg.alt}
-                  style={{ width: '100%', height: '400px', objectFit: 'cover', borderRadius: 'var(--radius-lg)' }}
+                  style={{ width: '100%', height: '400px', objectFit: 'cover' }}
                 />
               </div>
             )}
@@ -200,6 +202,26 @@ export default function VisionMission() {
         </div>
       </section>
 
+      {/* CTA */}
+      <section style={{ background: 'var(--color-primary)', padding: 'var(--space-20) 0' }}>
+        <div className="container" style={{ textAlign: 'center' }}>
+          <div className="reveal">
+            <span className="section-label" style={{ color: 'var(--color-accent)' }}>Learn More About VWU</span>
+            <h2 style={{ color: 'var(--color-white)', fontSize: 'clamp(1.75rem, 4vw, 2.75rem)', marginBottom: 'var(--space-4)' }}>
+              Empowering Women Through Excellence
+            </h2>
+            <div style={{ maxWidth: 720, margin: '0 auto var(--space-8)' }}>
+              <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 'var(--text-lg)', marginBottom: 'var(--space-4)' }}>
+                Discover our academic programs, state-of-the-art campus infrastructure, and vibrant student community.
+              </p>
+            </div>
+            <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
+              <Link to="/about" className="btn btn-accent btn-lg">About VWU</Link>
+              <Link to="/academics" className="btn btn-secondary btn-lg">Explore Academics</Link>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
