@@ -39,7 +39,7 @@ export default function FacultyCarousel({
   departmentName: _,
   title = 'Learn from our impactful faculty',
   viewMoreLink = '/faculty',
-  autoScrollInterval = 1000,
+  autoScrollInterval = 2000,
 }: FacultyCarouselProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isPaused, setIsPaused] = useState(false);
