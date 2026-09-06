@@ -533,11 +533,13 @@ export default function DifferentiatorDetail() {
         </div>
       </section>
 
-      {/* Intro — Institution Innovation Cell, Vehicle Design Lab, and
-          TalentSprint – WISE each get their own dedicated tabbed page below
-          instead, since they have a persistent section nav sidebar rather
-          than the generic Key Highlights sidebar. */}
-      {!iic && !vdl && !wise && !ideaLab && (
+      {/* Overview — Description/Vision/Mission/Objectives/Custom Sections,
+          the same structure every non-external item has. Institution
+          Innovation Cell, Vehicle Design Lab, TalentSprint – WISE, and AICTE
+          Idea Lab (iic/vdl/wise/ideaLab) render this too, then ADDITIONALLY
+          get their own dedicated tabbed page (IicPage/VdlPage/WisePage/
+          IdeaLabPage) right below it — the two are no longer mutually
+          exclusive. */}
       <section className="section bg-white">
         <div className="container">
           {/* Same "About the Department" card treatment as the academic
@@ -568,7 +570,6 @@ export default function DifferentiatorDetail() {
           </div>
         </div>
       </section>
-      )}
 
       {/* Rural Women Tech Park's Report Links are admin-managed separately
           (Admin > Differentiators > Rural Women Tech Park > Report Links)

@@ -192,11 +192,11 @@ export const DIFFERENTIATOR_CATEGORIES = [
   { id: 'student', label: 'Student Development & Social Impact' },
 ];
 
-// The 4 items with a sidebar-tab layout instead of the intro/accordion one —
-// they render `tabs`, never `customSections`, on the public page, so
-// migrating legacy Highlights/Facilities/Outcomes/Partners into
-// `customSections` for them would just be dead data (see
-// computeMigratedFields below).
+// The 4 items with their own extra sidebar-tab layout (see IicPage/VdlPage/
+// WisePage/IdeaLabPage in DifferentiatorDetail.tsx) — on top of the same
+// Description/Vision/Mission/Objectives/Custom Sections Overview section
+// every other item has. Only gates the Tabs editor below; every other field
+// applies to these 4 exactly like any other item.
 const TABS_SLUGS = new Set(['talentsprint-wise', 'institution-innovation-cell', 'vehicle-design-lab', 'aicte-idea-lab']);
 
 // The single source of truth for "what does this item look like under the
@@ -222,8 +222,13 @@ function computeMigratedFields(it: DifferentiatorItemDoc): Pick<DifferentiatorIt
   const alreadyMigrated = it.description !== undefined;
   const promotedIds = new Set(['vision', 'mission', 'objectives']);
   const baseCustomSections = (it.customSections || []).filter((s) => !promotedIds.has(s.id));
+  // Every non-external item — including the 4 TABS_SLUGS ones, which also
+  // get the same Description/Vision/Mission/Objectives/Custom Sections
+  // Overview section as everyone else now, on top of their own Tabs content
+  // (see DifferentiatorDetail.tsx) — can have legacy Highlights/Facilities/
+  // Outcomes/Partners content worth migrating in.
   let migratedSections: CustomSection[] = [];
-  if (!alreadyMigrated && !TABS_SLUGS.has(it.slug)) {
+  if (!alreadyMigrated) {
     const existingIds = new Set(baseCustomSections.map((s) => s.id));
     migratedSections = legacySectionsFrom(it).filter((s) => !existingIds.has(s.id));
   }
@@ -725,72 +730,64 @@ export default function DifferentiatorsAdmin() {
             onPhotoUploaded={(r) => handleBlockPhotoUploaded('description', r)}
             onPhotoRemoved={() => handleBlockPhotoRemoved('description')}
           />
-          {!TABS_SLUGS.has(form.slug) && (
-            <>
-              <div className="admin-field admin-field--full"><hr /></div>
-              <BlockEditor
-                blockKey="vision"
-                label="Vision"
-                value={form.vision || emptyBlock('vision')}
-                onChange={(next) => set('vision', next)}
-                onPhotoUploaded={(r) => handleBlockPhotoUploaded('vision', r)}
-                onPhotoRemoved={() => handleBlockPhotoRemoved('vision')}
-              />
-              <BlockEditor
-                blockKey="mission"
-                label="Mission"
-                value={form.mission || emptyBlock('mission')}
-                onChange={(next) => set('mission', next)}
-                onPhotoUploaded={(r) => handleBlockPhotoUploaded('mission', r)}
-                onPhotoRemoved={() => handleBlockPhotoRemoved('mission')}
-              />
-              <BlockEditor
-                blockKey="objectives"
-                label="Objectives"
-                value={form.objectives || emptyBlock('objectives')}
-                onChange={(next) => set('objectives', next)}
-                onPhotoUploaded={(r) => handleBlockPhotoUploaded('objectives', r)}
-                onPhotoRemoved={() => handleBlockPhotoRemoved('objectives')}
-              />
-            </>
-          )}
-          {!TABS_SLUGS.has(form.slug) && (
-            <>
-              <div className="admin-field admin-field--full"><hr /><h3>Custom Sections</h3></div>
-              <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>
-                Add any section this item needs beyond Description/Vision/Mission/Objectives above — Key Highlights,
-                Facilities, Outcomes, Partners, Contacts, or anything else — any name, any number of sub-sections, and
-                a choice of plain text, a checklist, a table, a list of links, uploaded files, or contacts
-                (role/name/phone/email) per section. Each one shows up on the public page once it has content. Use
-                the Placement dropdown per section to choose "In the intro area above" (shown inline near the
-                description, like Vision/Mission/Objectives) vs. "In the accordion below" (the default — everything
-                else, shown as a click-to-expand panel).
-              </p>
-              <div className="admin-field admin-field--full">
-                <CustomSectionEditor
-                  sections={form.customSections || []}
-                  onChange={(next) => set('customSections', next)}
-                  rootSections={form.customSections || []}
-                  parentPath={[]}
-                  onFileUploaded={handleCustomSectionFileUploaded}
-                  onFileRemoved={handleCustomSectionFileRemoved}
-                  onPhotoUploaded={handleCustomSectionPhotoUploaded}
-                  onPhotoRemoved={handleCustomSectionPhotoRemoved}
-                  onGalleryPhotoUploaded={handleCustomSectionGalleryPhotoUploaded}
-                  onGalleryPhotoRemoved={handleCustomSectionGalleryPhotoRemoved}
-                  showPlacementToggle
-                />
-              </div>
-            </>
-          )}
+          <div className="admin-field admin-field--full"><hr /></div>
+          <BlockEditor
+            blockKey="vision"
+            label="Vision"
+            value={form.vision || emptyBlock('vision')}
+            onChange={(next) => set('vision', next)}
+            onPhotoUploaded={(r) => handleBlockPhotoUploaded('vision', r)}
+            onPhotoRemoved={() => handleBlockPhotoRemoved('vision')}
+          />
+          <BlockEditor
+            blockKey="mission"
+            label="Mission"
+            value={form.mission || emptyBlock('mission')}
+            onChange={(next) => set('mission', next)}
+            onPhotoUploaded={(r) => handleBlockPhotoUploaded('mission', r)}
+            onPhotoRemoved={() => handleBlockPhotoRemoved('mission')}
+          />
+          <BlockEditor
+            blockKey="objectives"
+            label="Objectives"
+            value={form.objectives || emptyBlock('objectives')}
+            onChange={(next) => set('objectives', next)}
+            onPhotoUploaded={(r) => handleBlockPhotoUploaded('objectives', r)}
+            onPhotoRemoved={() => handleBlockPhotoRemoved('objectives')}
+          />
+          <div className="admin-field admin-field--full"><hr /><h3>Custom Sections</h3></div>
+          <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>
+            Add any section this item needs beyond Description/Vision/Mission/Objectives above — Key Highlights,
+            Facilities, Outcomes, Partners, Contacts, or anything else — any name, any number of sub-sections, and
+            a choice of plain text, a checklist, a table, a list of links, uploaded files, or contacts
+            (role/name/phone/email) per section. Each one shows up on the public page once it has content. Use
+            the Placement dropdown per section to choose "In the intro area above" (shown inline near the
+            description, like Vision/Mission/Objectives) vs. "In the accordion below" (the default — everything
+            else, shown as a click-to-expand panel).
+          </p>
+          <div className="admin-field admin-field--full">
+            <CustomSectionEditor
+              sections={form.customSections || []}
+              onChange={(next) => set('customSections', next)}
+              rootSections={form.customSections || []}
+              parentPath={[]}
+              onFileUploaded={handleCustomSectionFileUploaded}
+              onFileRemoved={handleCustomSectionFileRemoved}
+              onPhotoUploaded={handleCustomSectionPhotoUploaded}
+              onPhotoRemoved={handleCustomSectionPhotoRemoved}
+              onGalleryPhotoUploaded={handleCustomSectionGalleryPhotoUploaded}
+              onGalleryPhotoRemoved={handleCustomSectionGalleryPhotoRemoved}
+              showPlacementToggle
+            />
+          </div>
 
           {TABS_SLUGS.has(form.slug) && (
             <>
               <div className="admin-field admin-field--full"><hr /><h3>Tabs</h3></div>
               <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>
-                This item shows a sidebar of tabs on the public page instead of a single scrolling page. Add, rename,
-                reorder, or remove tabs below — click "Edit Content" on a tab to add sections to it (same plain
-                text / checklist / table / links / files editor as everywhere else).
+                This item also shows a sidebar of tabs on the public page, below the Overview section above. Add,
+                rename, reorder, or remove tabs below — click "Edit Content" on a tab to add sections to it (same
+                plain text / checklist / table / links / files editor as everywhere else).
               </p>
               <div className="admin-field admin-field--full">
                 <CustomTabsEditor
