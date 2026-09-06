@@ -201,18 +201,7 @@ export default function GalleryAdmin() {
   };
 
   // ── Event Albums (by Year) ──────────────────────────────────────────────
-  const effectiveAlbums = useMemo(() => {
-    if (albums.length > 0) return albums;
-    return STATIC_ALBUMS.map((a, i) => ({
-      id: `static-${i}`,
-      year: a.year,
-      title: a.title,
-      imageUrl: '',
-      link: a.link || '',
-      date: a.date || '',
-      order: i,
-    })) as GalleryAlbumDoc[];
-  }, [albums]);
+  const effectiveAlbums = albums;
 
   const docYears = useMemo(
     () => Array.from(new Set(effectiveAlbums.map((a) => a.year))).sort((a, b) => b - a),
