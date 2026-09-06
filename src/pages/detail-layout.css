@@ -3592,6 +3592,26 @@ td.pb-activities-num {
   cursor: pointer;
 }
 
+/* Placements & Internships specifically opt back out of the alternating
+   dark/light "sleek pass" above and keep the original bordered, single-tone
+   circle look (same as ProgramDetail.tsx's untouched version) — an ID
+   selector beats the .dept-detail-page-scoped rules above regardless of
+   source order, since an ID always outweighs any number of classes. */
+#placements .dept-stat-tile__circle {
+  width: 112px;
+  height: 112px;
+  border: 3px solid var(--color-accent);
+  background: var(--color-off-white);
+}
+
+#placements .dept-stat-tile__value {
+  color: var(--color-primary);
+}
+
+#placements .dept-stat-tile__circle--link:hover {
+  border-color: var(--color-primary);
+}
+
 /* Plain static grid of offer cards instead of an auto-scrolling marquee —
    same PlacementRecordCard, just laid out like every other card grid on
    this page (Labs, Library) rather than animated. */

@@ -386,6 +386,19 @@ export default function DifferentiatorDetail() {
     }
   }, [item]);
 
+  // External items (TBI, VJOC, Vishnu Student Success Centre, Radio Vishnu,
+  // School of Music, ...) have no internal detail page — the card grid and
+  // nav dropdown already link straight to item.url, but if anyone still
+  // lands on this internal route (a stale bookmark, an old indexed link, a
+  // menu spot that wasn't updated to check `external`), send them on to the
+  // actual external site rather than stranding them on the generic
+  // Differentiators listing.
+  useEffect(() => {
+    if (item?.external && item.url) {
+      window.location.replace(item.url);
+    }
+  }, [item]);
+
   if (!item || !category) {
     if (loading) {
       return (
@@ -395,11 +408,8 @@ export default function DifferentiatorDetail() {
     return <Navigate to="/differentiators" replace />;
   }
 
-  // External items (TBI, VJOC, Vishnu Student Success Centre, Radio Vishnu, School of
-  // Music, ...) have no internal detail page — both the card grid and the nav dropdown
-  // send visitors straight to item.url, so this route should never render for them.
   if (item.external && item.url) {
-    return <Navigate to="/differentiators" replace />;
+    return <RouteFallback />;
   }
 
   const CategoryIcon = CATEGORY_ICONS[category.id] || Rocket;
