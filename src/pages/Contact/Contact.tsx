@@ -261,7 +261,7 @@ export default function Contact() {
   };
 
   return (
-    <main className="contact-page">
+    <main className="page-wrapper contact-page">
       <SEO 
         title="Contact Us & Campus Directions | Vishnu Women's University" 
         description="Get in touch with Vishnu Women's University (VWU). Admissions helpline, department directory, campus address in Bhimavaram, email support, and Google map directions."
