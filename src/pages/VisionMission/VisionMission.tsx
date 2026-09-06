@@ -217,7 +217,6 @@ export default function VisionMission() {
             </div>
             <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
               <Link to="/about" className="btn btn-accent btn-lg">About VWU</Link>
-              <Link to="/academics" className="btn btn-secondary btn-lg">Explore Academics</Link>
             </div>
           </div>
         </div>
