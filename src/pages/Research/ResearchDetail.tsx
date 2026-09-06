@@ -114,7 +114,7 @@ export default function ResearchDetail() {
   // .reveal/IntersectionObserver setup would be racing async data on every
   // navigation (see the gotcha documented in CLAUDE.md).
   useEffect(() => {
-    if (item) document.title = `${item.title} | Vishnu Women's University`;
+    if (item) document.title = `${item.title.replace(/^about\s+/i, '')} | Vishnu Women's University`;
   }, [item]);
 
   if (!item) {
@@ -126,6 +126,7 @@ export default function ResearchDetail() {
     return <Navigate to="/research" replace />;
   }
 
+  const displayTitle = item.title.replace(/^about\s+/i, '');
   const Icon = resolveContentIcon(item.icon) || Microscope;
   const categoryLabel = CATEGORY_LABELS[item.category] || item.category;
   const heroImage = item.heroImage || heroSlides[0]?.imageUrl;
@@ -238,7 +239,7 @@ export default function ResearchDetail() {
         <div className="container">
           <div className="dept-hero-card">
             {heroImage && (
-              <img src={heroImage} alt={item.title} className="dept-hero-bg-img" loading="eager" decoding="sync" {...fetchPriorityAttr('high')} />
+              <img src={heroImage} alt={displayTitle} className="dept-hero-bg-img" loading="eager" decoding="sync" {...fetchPriorityAttr('high')} />
             )}
             <div className="dept-hero-overlay" />
             <div className="dept-hero-content">
@@ -247,12 +248,12 @@ export default function ResearchDetail() {
                 <span className="breadcrumb-sep">›</span>
                 <Link to="/research" className="breadcrumb-item">Research &amp; Development</Link>
                 <span className="breadcrumb-sep">›</span>
-                <span className="breadcrumb-item active">{item.title}</span>
+                <span className="breadcrumb-item active">{displayTitle}</span>
               </div>
               <div className="animate-fade-in-up" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#C9973A', color: '#0B1E42', fontSize: 'var(--text-xs)', fontWeight: 800, padding: '0.35rem 0.9rem', borderRadius: '9999px', marginBottom: '0.8rem', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
                 <Icon size={14} /> {categoryLabel}
               </div>
-              <h1 className="dept-hero-title">{item.title}</h1>
+              <h1 className="dept-hero-title">{displayTitle}</h1>
               {item.intro && (
                 <p className="dept-hero-subtitle">{item.intro}</p>
               )}
@@ -268,7 +269,7 @@ export default function ResearchDetail() {
             <div>
               <span className="section-label">Overview</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>
-                {item.title.toLowerCase().startsWith('about ') ? item.title : `About ${item.title}`}
+                {displayTitle}
               </h2>
               {aboutBlocks.map((block, bi) => {
                 if (block.type === 'heading') {
