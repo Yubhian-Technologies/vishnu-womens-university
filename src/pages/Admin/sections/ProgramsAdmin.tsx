@@ -294,8 +294,10 @@ const EMPTY: Omit<ProgramDoc, 'id'> = {
 // included), throwing "Unsupported field value: undefined". This strips
 // every such undefined leaf right before saving, so a program with an
 // empty subject Code/Credits (or any other optional field left blank)
-// always saves successfully.
-function stripUndefined<T>(value: T): T {
+// always saves successfully. Exported for DepartmentsAdmin.tsx, which hits
+// the exact same class of crash from its own deeply-nested optional fields
+// (Custom Sections, Programme Levels, Library Sections, ...).
+export function stripUndefined<T>(value: T): T {
   if (Array.isArray(value)) {
     return value.map((v) => stripUndefined(v)) as unknown as T;
   }

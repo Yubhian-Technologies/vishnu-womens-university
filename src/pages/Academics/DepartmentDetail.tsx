@@ -1084,6 +1084,12 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                         </button>
                         <div className="dept-stat-tile__label">Top 10 Companies List</div>
                       </div>
+                      {/* computePlacementStats returns these as null when the
+                          imported rows have no column that looks like a
+                          package/CTC figure — hide the tile entirely rather
+                          than showing a placeholder "—", since that read as a
+                          broken/missing stat instead of "not applicable for
+                          this year's data". */}
                       {placementYearStats.averageSalary != null && (
                         <div className="dept-stat-tile">
                           <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.averageSalary}</span></div>
