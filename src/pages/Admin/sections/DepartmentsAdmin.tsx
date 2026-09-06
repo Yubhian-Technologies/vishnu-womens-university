@@ -53,9 +53,8 @@ export interface DepartmentDoc {
   storagePath?: string;
   about?: string;
   // Optional override for the hero subtitle on the department detail pages —
-  // falls back to getDepartmentTagline()'s hardcoded copy when unset. Not
-  // exposed as its own admin form field (yet); kept so a doc that already
-  // has one (or is set directly in Firestore) still overrides the default.
+  // falls back to getDepartmentTagline()'s hardcoded copy when unset. Edited
+  // via the "Hero Tagline" field in the form below.
   tagline?: string;
   // Same shape/purpose as a programme's own (see ProgramsAdmin) — shown
   // right below "About the Department" on the grouped department page,
@@ -164,7 +163,7 @@ export interface DepartmentDoc {
 
 const EMPTY: Omit<DepartmentDoc, 'id'> = {
   title: '', shortCode: '', description: '', icon: 'GraduationCap', order: 0,
-  heroImage: '', storagePath: '', about: '', highlights: [], established: '', accreditation: '',
+  heroImage: '', storagePath: '', tagline: '', about: '', highlights: [], established: '', accreditation: '',
   hod: '', hodImage: '', hodImageStoragePath: '', hodEmail: '', hodMessage: '', hodResearchProfiles: [],
   vision: '', mission: [], coreValues: [], labs: [],
   libraryIntro: '', libraryInCharge: '', librarySections: [],
@@ -735,7 +734,7 @@ export default function DepartmentsAdmin() {
     const next: Omit<DepartmentDoc, 'id'> = {
       title: d.title, shortCode: d.shortCode, description: d.description || '',
       icon: d.icon || 'GraduationCap', order: d.order,
-      heroImage: d.heroImage || '', storagePath: d.storagePath || '',
+      heroImage: d.heroImage || '', storagePath: d.storagePath || '', tagline: d.tagline || '',
       about: d.about || '', highlights: d.highlights || [], established: d.established || '', accreditation: d.accreditation || '',
       hod: d.hod || '', hodImage: d.hodImage || '', hodImageStoragePath: d.hodImageStoragePath || '',
       hodEmail: d.hodEmail || '', hodMessage: d.hodMessage || '', hodResearchProfiles: d.hodResearchProfiles || [],
@@ -879,6 +878,13 @@ export default function DepartmentsAdmin() {
           <div className="admin-field admin-field--full">
             <label>Hero Image</label>
             <ImageUploader folder="vwu/departments" currentUrl={form.heroImage} onUploaded={handleHero} label="Upload Hero Image" />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label htmlFor="field-tagline">Hero Tagline</label>
+            <textarea id="field-tagline" rows={2} value={form.tagline || ''} onChange={(e) => set('tagline', e.target.value)} placeholder="Short line shown under the department name in the page hero" />
+            <p className="admin-field__hint" style={{ marginTop: '0.25rem' }}>
+              Optional. Overrides the built-in hero subtitle on this department's page. The hero title itself is the <strong>Title</strong> field above.
+            </p>
           </div>
           <div className="admin-field">
             <label htmlFor="field-established">Established</label>
