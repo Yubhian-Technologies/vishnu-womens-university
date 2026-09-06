@@ -4,7 +4,6 @@ import { hasCustomSectionContent, type CustomSection, type CustomSectionPhoto } 
 import { parseFlexibleTable, parseLinkList } from '../../lib/structuredTable';
 import FlexibleTable from '../FlexibleTable/FlexibleTable';
 import SmoothCollapse from '../SmoothCollapse/SmoothCollapse';
-import PhotoCarouselStrip from '../PhotoCarousel/PhotoCarouselStrip';
 import { linkify } from '../../lib/linkify';
 import './CustomSectionsRenderer.css';
 
@@ -84,8 +83,8 @@ export function CustomSectionsIntro({ sections }: { sections: CustomSection[] })
 // Differentiators detail page — Photo Gallery sections never collapse behind
 // the accordion (see CustomSectionsAccordion) and never squeeze into the
 // narrow CustomSectionsIntro grid either (see the comment there): each one
-// gets its own full-width auto-scrolling carousel, positioned between the
-// two — always visible, never vertical.
+// gets its own full-width static horizontal strip (see StaticGalleryStrip),
+// positioned between the two — always visible, never vertical.
 export function CustomSectionsGalleries({ sections }: { sections: CustomSection[] }) {
   const visible = sections.filter((s) => s.contentType === 'gallery' && hasCustomSectionContent(s));
   if (visible.length === 0) return null;
@@ -98,11 +97,7 @@ export function CustomSectionsGalleries({ sections }: { sections: CustomSection[
           </div>
           <SectionSubtitle subtitle={section.subtitle} />
           <div style={{ marginTop: 'var(--space-3)' }}>
-            <PhotoCarouselStrip
-              cards={(section.galleryPhotos || [])
-                .filter((p) => p.imageUrl)
-                .map((p) => ({ name: '', subtitle: '', imageUrl: p.imageUrl, storagePath: p.storagePath }))}
-            />
+            <StaticGalleryStrip photos={section.galleryPhotos || []} />
           </div>
         </div>
       ))}
@@ -408,6 +403,61 @@ function PillSwitcher({ sections, depth = 0, navOffset = DEFAULT_NAV_OFFSET }: {
 // regardless of its own aspect ratio, with a click-to-enlarge lightbox.
 // Distinct from CustomSectionBody's single round `photo` below, which is a
 // small accent image any OTHER content type can carry alongside it.
+// Shared full-screen click-to-enlarge view for a photo set, with prev/next
+// when there's more than one — used by both GalleryGrid's tiled grid and
+// StaticGalleryStrip's horizontal row below.
+function PhotoLightbox({ photos, index, onClose, onNavigate }: {
+  photos: CustomSectionPhoto[];
+  index: number;
+  onClose: () => void;
+  onNavigate: (index: number) => void;
+}) {
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 1000,
+        display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'var(--space-6)', cursor: 'zoom-out',
+      }}
+    >
+      <button
+        type="button"
+        onClick={onClose}
+        aria-label="Close"
+        style={{ position: 'absolute', top: 'var(--space-4)', right: 'var(--space-4)', background: 'rgba(255,255,255,0.12)', border: 'none', borderRadius: '50%', width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-white)', cursor: 'pointer' }}
+      >
+        <X size={20} strokeWidth={2} />
+      </button>
+      {photos.length > 1 && (
+        <>
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); onNavigate((index - 1 + photos.length) % photos.length); }}
+            aria-label="Previous photo"
+            style={{ position: 'absolute', left: 'var(--space-4)', top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.12)', border: 'none', borderRadius: '50%', width: 44, height: 44, fontSize: '1.5rem', color: 'var(--color-white)', cursor: 'pointer' }}
+          >
+            ‹
+          </button>
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); onNavigate((index + 1) % photos.length); }}
+            aria-label="Next photo"
+            style={{ position: 'absolute', right: 'var(--space-4)', top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.12)', border: 'none', borderRadius: '50%', width: 44, height: 44, fontSize: '1.5rem', color: 'var(--color-white)', cursor: 'pointer' }}
+          >
+            ›
+          </button>
+        </>
+      )}
+      <img
+        src={photos[index].imageUrl}
+        alt=""
+        onClick={(e) => e.stopPropagation()}
+        style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', borderRadius: 'var(--radius-md)', cursor: 'default' }}
+      />
+    </div>
+  );
+}
+
 function GalleryGrid({ photos }: { photos: CustomSectionPhoto[] }) {
   const [lightbox, setLightbox] = useState<number | null>(null);
   const valid = photos.filter((p) => p.imageUrl);
@@ -431,50 +481,45 @@ function GalleryGrid({ photos }: { photos: CustomSectionPhoto[] }) {
           </button>
         ))}
       </div>
-
       {lightbox !== null && (
-        <div
-          onClick={() => setLightbox(null)}
-          style={{
-            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 1000,
-            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'var(--space-6)', cursor: 'zoom-out',
-          }}
-        >
+        <PhotoLightbox photos={valid} index={lightbox} onClose={() => setLightbox(null)} onNavigate={setLightbox} />
+      )}
+    </>
+  );
+}
+
+// Differentiators detail page — a Photo Gallery section's photos as a
+// static horizontal row (manually scrollable, nothing auto-animating),
+// each fixed-width, click to enlarge. Used instead of GalleryGrid's
+// wrapping tile grid specifically so it can't collapse into a single
+// narrow column the way it did squeezed into CustomSectionsIntro (see the
+// comment there) — a continuously auto-scrolling version of this was tried
+// first but didn't render reliably, so this stays static on purpose.
+function StaticGalleryStrip({ photos }: { photos: CustomSectionPhoto[] }) {
+  const [lightbox, setLightbox] = useState<number | null>(null);
+  const valid = photos.filter((p) => p.imageUrl);
+  if (valid.length === 0) return null;
+
+  return (
+    <>
+      <div style={{ display: 'flex', gap: 'var(--space-4)', overflowX: 'auto', paddingBottom: 'var(--space-2)' }}>
+        {valid.map((p, i) => (
           <button
+            key={p.imageUrl}
             type="button"
-            onClick={() => setLightbox(null)}
-            aria-label="Close"
-            style={{ position: 'absolute', top: 'var(--space-4)', right: 'var(--space-4)', background: 'rgba(255,255,255,0.12)', border: 'none', borderRadius: '50%', width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-white)', cursor: 'pointer' }}
+            onClick={() => setLightbox(i)}
+            aria-label={`View photo ${i + 1}`}
+            style={{
+              flex: '0 0 220px', padding: 0, border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)',
+              overflow: 'hidden', cursor: 'zoom-in', aspectRatio: '4 / 3', background: 'var(--color-off-white)',
+            }}
           >
-            <X size={20} strokeWidth={2} />
+            <img src={p.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
           </button>
-          {valid.length > 1 && (
-            <>
-              <button
-                type="button"
-                onClick={(e) => { e.stopPropagation(); setLightbox((i) => (i! - 1 + valid.length) % valid.length); }}
-                aria-label="Previous photo"
-                style={{ position: 'absolute', left: 'var(--space-4)', top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.12)', border: 'none', borderRadius: '50%', width: 44, height: 44, fontSize: '1.5rem', color: 'var(--color-white)', cursor: 'pointer' }}
-              >
-                ‹
-              </button>
-              <button
-                type="button"
-                onClick={(e) => { e.stopPropagation(); setLightbox((i) => (i! + 1) % valid.length); }}
-                aria-label="Next photo"
-                style={{ position: 'absolute', right: 'var(--space-4)', top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.12)', border: 'none', borderRadius: '50%', width: 44, height: 44, fontSize: '1.5rem', color: 'var(--color-white)', cursor: 'pointer' }}
-              >
-                ›
-              </button>
-            </>
-          )}
-          <img
-            src={valid[lightbox].imageUrl}
-            alt=""
-            onClick={(e) => e.stopPropagation()}
-            style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', borderRadius: 'var(--radius-md)', cursor: 'default' }}
-          />
-        </div>
+        ))}
+      </div>
+      {lightbox !== null && (
+        <PhotoLightbox photos={valid} index={lightbox} onClose={() => setLightbox(null)} onNavigate={setLightbox} />
       )}
     </>
   );
