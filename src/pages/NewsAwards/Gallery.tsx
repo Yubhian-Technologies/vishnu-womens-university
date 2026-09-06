@@ -145,7 +145,7 @@ export default function Gallery() {
           </div>
 
           {/* Albums grid */}
-          <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 'var(--space-5)' }}>
+          <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 'var(--space-6)' }}>
             {filtered.map((album, i) => {
               const color = yearColors[album.year] || 'var(--color-primary)';
               return (
@@ -179,7 +179,7 @@ export default function Gallery() {
                   }}
                 >
                   {album.imageUrl ? (
-                    <div style={{ position: 'relative', width: '100%', aspectRatio: '16 / 9', overflow: 'hidden', backgroundColor: '#f3f4f6' }}>
+                    <div style={{ position: 'relative', width: '100%', aspectRatio: '4 / 3', minHeight: '220px', overflow: 'hidden', backgroundColor: '#f3f4f6' }}>
                       <img
                         src={album.imageUrl}
                         alt={album.title}
@@ -216,7 +216,7 @@ export default function Gallery() {
                     <div
                       style={{
                         width: '100%',
-                        height: '110px',
+                        height: '160px',
                         background: `linear-gradient(135deg, ${color}15 0%, ${color}35 100%)`,
                         borderBottom: `3px solid ${color}`,
                         display: 'flex',
@@ -225,7 +225,7 @@ export default function Gallery() {
                         position: 'relative',
                       }}
                     >
-                      <ImageIcon size={32} style={{ color: color, opacity: 0.4 }} />
+                      <ImageIcon size={36} style={{ color: color, opacity: 0.4 }} />
                     </div>
                   )}
                   <div style={{ padding: '1.25rem', flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>

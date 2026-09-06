@@ -365,6 +365,25 @@ export default function GalleryAdmin() {
     await deleteDoc(doc(db, 'galleryAlbums', id));
   };
 
+  const [deletingYearAlbums, setDeletingYearAlbums] = useState(false);
+  const deleteYearAlbums = async () => {
+    const targetAlbums = albums.filter((a) => a.year === year);
+    if (targetAlbums.length === 0 || deletingYearAlbums) return;
+    if (!confirm(`Delete all ${targetAlbums.length} album(s) for year ${year}?`)) return;
+    setDeletingYearAlbums(true);
+    try {
+      for (let i = 0; i < targetAlbums.length; i += 400) {
+        const batch = writeBatch(db);
+        targetAlbums.slice(i, i + 400).forEach((a) => batch.delete(doc(db, 'galleryAlbums', a.id)));
+        await batch.commit();
+      }
+    } catch (e) {
+      alert(`Couldn't delete albums for ${year}: ${(e as Error).message}`);
+    } finally {
+      setDeletingYearAlbums(false);
+    }
+  };
+
   const [deletingAllAlbums, setDeletingAllAlbums] = useState(false);
   const deleteAllAlbums = async () => {
     if (albums.length === 0 || deletingAllAlbums) return;
@@ -553,9 +572,20 @@ export default function GalleryAdmin() {
         </details>
 
         {/* Cards for the selected year */}
-        <h3 style={{ margin: '1.5rem 0 0.75rem', fontSize: '0.95rem' }}>
-          {year} — {yearAlbums.length} album{yearAlbums.length === 1 ? '' : 's'}
-        </h3>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '1.5rem 0 0.75rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+          <h3 style={{ margin: 0, fontSize: '0.95rem' }}>
+            {year} — {yearAlbums.length} album{yearAlbums.length === 1 ? '' : 's'}
+          </h3>
+          {albums.filter((a) => a.year === year).length > 0 && (
+            <button
+              className="admin-btn admin-btn--sm admin-btn--danger"
+              disabled={deletingYearAlbums}
+              onClick={deleteYearAlbums}
+            >
+              {deletingYearAlbums ? 'Deleting…' : `Delete all ${year} albums (${albums.filter((a) => a.year === year).length})`}
+            </button>
+          )}
+        </div>
         {albumsLoading ? (
           <p className="admin-loading">Loading…</p>
         ) : yearAlbums.length === 0 ? (
