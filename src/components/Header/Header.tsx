@@ -197,7 +197,7 @@ const navItemsData: NavItem[] = [
       {
         groupLabel: 'Research Info',
         items: [
-          { label: 'About R&D', path: '/research/about-rd' },
+          { label: 'R&D', path: '/research/about-rd' },
           { label: 'Research Advisory Committee', path: '/research/research-advisory-committee' },
           { label: 'Research Ethics Committee', path: '/research/research-ethics-committee' },
           { label: 'Intellectual Property Rights (IPR)', path: '/research/ipr-committee' },

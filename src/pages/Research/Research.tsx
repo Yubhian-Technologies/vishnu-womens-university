@@ -86,6 +86,7 @@ export default function Research() {
               <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 'var(--space-5)' }}>
                 {items.map((item) => {
                   const Icon = resolveContentIcon(item.icon) || cat.icon;
+                  const displayTitle = item.title.startsWith('About ') ? item.title.slice(6) : item.title;
                   return (
                     <div
                       key={item.slug}
@@ -95,7 +96,7 @@ export default function Research() {
                     >
                       <div style={{ marginBottom: 'var(--space-3)' }}><Icon size={32} strokeWidth={1.75} /></div>
                       <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-2)', lineHeight: 1.35 }}>
-                        {item.title}
+                        {displayTitle}
                       </h3>
                       <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.65, flex: 1, marginBottom: 'var(--space-4)' }}>
                         {item.desc}
