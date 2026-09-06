@@ -1,20 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { X } from 'lucide-react';
-import { galleryAlbums, galleryYears } from './news-awards.data';
+import { galleryAlbums as staticAlbums } from './news-awards.data';
 import { useOrderedCollection } from '../../hooks/useCollection';
+import type { GalleryAlbumDoc } from '../Admin/sections/GalleryAdmin';
 import { useHashScroll } from '../../hooks/useHashScroll';
 import PageHero from '../../components/PageHero/PageHero';
-import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import './Gallery.css';
-
-interface GalleryPhoto {
-  id: string;
-  title: string;
-  category: string;
-  imageUrl: string;
-  order: number;
-}
 
 const yearColors: Record<number, string> = {
   2026: '#003087',
@@ -32,8 +23,15 @@ const yearColors: Record<number, string> = {
 export default function Gallery() {
   useHashScroll();
   const [activeYear, setActiveYear] = useState<number | 'all'>('all');
-  const { docs: photos, loading: photosLoading } = useOrderedCollection<GalleryPhoto>('gallery', 'order');
-  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const { docs: liveAlbums } = useOrderedCollection<GalleryAlbumDoc>('galleryAlbums', 'order');
+
+  // Live admin-managed albums win once any exist; otherwise the built-in
+  // year-by-year archive (news-awards.data.ts) still shows. Both are
+  // normalised to the same shape so the grid below doesn't care which.
+  const albums = liveAlbums.length > 0
+    ? liveAlbums.map((a) => ({ title: a.title, date: a.date, year: a.year, link: a.link || '', imageUrl: a.imageUrl || '' }))
+    : staticAlbums.map((a) => ({ title: a.title, date: a.date, year: a.year, link: a.link || '', imageUrl: '' }));
+  const galleryYears = Array.from(new Set(albums.map((a) => a.year))).sort((a, b) => b - a);
 
   useEffect(() => {
     document.title = "Gallery | Vishnu Women's University";
@@ -56,13 +54,7 @@ export default function Gallery() {
     return () => observer.disconnect();
   }, [activeYear]);
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setLightboxIndex(null); };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, []);
-
-  const filtered = activeYear === 'all' ? galleryAlbums : galleryAlbums.filter(a => a.year === activeYear);
+  const filtered = activeYear === 'all' ? albums : albums.filter(a => a.year === activeYear);
 
   return (
     <main className="page-wrapper">
@@ -70,7 +62,7 @@ export default function Gallery() {
       <PageHero
         page="news-awards-gallery"
         defaultTitle="Gallery"
-  defaultSubtitle="A visual archive of campus life at VWU — from national competitions and graduation days to cultural festivals and industry events."
+        defaultSubtitle="A visual archive of campus life at VWU — from national competitions and graduation days to cultural festivals and industry events."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'News & Awards', to: '/news-awards' }, { label: 'Gallery' }]}
         scrollCtaTargetId="gallery-content"
       />
@@ -80,7 +72,7 @@ export default function Gallery() {
         <div className="container">
           <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-14)', flexWrap: 'wrap' }}>
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', fontWeight: 900, color: 'var(--color-accent)' }}>{galleryAlbums.length}+</div>
+              <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', fontWeight: 900, color: 'var(--color-accent)' }}>{albums.length}+</div>
               <div style={{ fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)' }}>Gallery Albums</div>
             </div>
             <div style={{ textAlign: 'center' }}>
@@ -94,55 +86,6 @@ export default function Gallery() {
           </div>
         </div>
       </section>
-
-      {/* Photo Gallery — live from admin uploads */}
-      <section id="photo-gallery" className="section bg-white" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
-        <div className="container">
-          <div className="reveal" style={{ marginBottom: 'var(--space-6)' }}>
-            <span className="section-label">Fresh from Campus</span>
-            <h2 className="section-title">Photo Gallery</h2>
-            <p style={{ color: 'var(--color-text-light)', maxWidth: 600, lineHeight: 1.7 }}>
-              Photos uploaded by the VWU team, updated in real time.
-            </p>
-          </div>
-
-          {/* Rendered from Firestore, so no scroll-reveal animation here
-              (see the gotcha documented in CLAUDE.md). */}
-          {photosLoading ? (
-            <p style={{ color: 'var(--color-text-light)' }}>Loading photos…</p>
-          ) : photos.length > 0 ? (
-            <div className="pg-grid">
-              {photos.map((photo, i) => (
-                <div
-                  key={photo.id}
-                  className="pg-tile"
-                  onClick={() => setLightboxIndex(i)}
-                >
-                  <img src={photo.imageUrl} alt={photo.title} />
-                  <div className="pg-tile__overlay">
-                    <span className="pg-tile__caption">{photo.title}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p style={{ color: 'var(--color-text-light)' }}>No photos yet — check back soon.</p>
-          )}
-        </div>
-      </section>
-
-      {lightboxIndex !== null && photos[lightboxIndex] && (
-        <div className="pg-lightbox" onClick={(e) => e.target === e.currentTarget && setLightboxIndex(null)}>
-          <div className="pg-lightbox__inner">
-            <button className="pg-lightbox__close" onClick={() => setLightboxIndex(null)} aria-label="Close"><X size={16} /></button>
-            <SmoothImage src={photos[lightboxIndex].imageUrl} alt={photos[lightboxIndex].title} />
-            <div className="pg-lightbox__caption">
-              <strong>{photos[lightboxIndex].title}</strong>
-              <span>{photos[lightboxIndex].category}</span>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Year Filter + Albums */}
       <section className="section bg-off-white">
@@ -204,13 +147,11 @@ export default function Gallery() {
           <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 'var(--space-4)' }}>
             {filtered.map((album, i) => {
               const color = yearColors[album.year] || 'var(--color-primary)';
-              const CardTag = album.link ? 'a' : 'div';
               return (
-                <CardTag
+                <div
                   key={i}
                   className="reveal"
                   data-delay={`${(i % 4) * 60}`}
-                  {...(album.link ? { href: album.link, target: '_blank', rel: 'noopener noreferrer' } : {})}
                   style={{
                     background: 'var(--color-white)',
                     border: '1.5px solid var(--color-light-gray)',
@@ -219,14 +160,13 @@ export default function Gallery() {
                     display: 'flex',
                     flexDirection: 'column',
                     transition: 'all var(--transition-base)',
-                    textDecoration: 'none',
-                    cursor: album.link ? 'pointer' : 'default',
                   }}
                   onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-md)'; (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; }}
                   onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = 'none'; (e.currentTarget as HTMLElement).style.transform = 'none'; }}
                 >
-                  {/* Color bar top */}
-                  <div style={{ height: 6, background: color }} />
+                  {album.imageUrl
+                    ? <img src={album.imageUrl} alt={album.title} loading="lazy" style={{ width: '100%', aspectRatio: '4 / 3', objectFit: 'cover', display: 'block' }} />
+                    : <div style={{ height: 6, background: color }} />}
                   <div style={{ padding: 'var(--space-4)', flex: 1, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                     <span style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                       {album.year}
@@ -234,9 +174,20 @@ export default function Gallery() {
                     <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-primary)', lineHeight: 1.45, flex: 1 }}>
                       {album.title}
                     </h3>
-                    <p style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)' }}>{album.date}</p>
+                    {album.date && <p style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)' }}>{album.date}</p>}
+                    {album.link && (
+                      <a
+                        href={album.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-accent"
+                        style={{ alignSelf: 'flex-start', marginTop: 'var(--space-2)', padding: '0.45rem 1.1rem', fontSize: 'var(--text-xs)' }}
+                      >
+                        VIEW
+                      </a>
+                    )}
                   </div>
-                </CardTag>
+                </div>
               );
             })}
           </div>
