@@ -2692,7 +2692,7 @@ td.pb-activities-num {
 
 .dept-hod-editorial-card {
   background: #ffffff;
-  border: 1.5px solid color-mix(in srgb, var(--color-primary, #0b1e42) 8%, transparent);
+  border: 10px solid #000000;
   border-radius: 32px;
   padding: clamp(2rem, 4vw, 3.2rem);
   box-shadow: 0 16px 44px rgba(19, 48, 36, 0.06);
@@ -3704,7 +3704,7 @@ td.pb-activities-num {
    Scoped to this page only; ProgramDetail.tsx keeps the original card. */
 .dept-detail-page .dept-hod-editorial-card {
   align-items: flex-start;
-  border: 10px solid var(--color-accent);
+  border: 10px solid #000000;
 }
 
 .dept-detail-page .dept-hod-media-frame {
