@@ -65,6 +65,8 @@ export const CONTENT_BLOCK_SECTIONS: { page: string; section: string; label: str
   { page: 'news-awards', section: 'highlights', label: 'News & Awards — Highlights' },
   { page: 'about-sves', section: 'stats', label: 'About SVES — Stats' },
   { page: 'about-sves', section: 'milestones', label: 'About SVES — Milestones' },
+  { page: 'about-sves', section: 'legacy-vision', label: 'About SVES — Legacy Rooted in Vision (Value=Label, Title=Heading, Desc=Paragraph)' },
+  { page: 'about-sves', section: 'leadership-culture', label: 'About SVES — Leadership & Culture (Value=Label, Title=Heading, Desc=Paragraph)' },
   { page: 'home', section: 'counters', label: 'Home — Key Statistics (animated counters)' },
   { page: 'home', section: 'recognitions', label: 'Home — Recognitions' },
   { page: 'home', section: 'campusFeatures', label: 'Home — Campus Features' },

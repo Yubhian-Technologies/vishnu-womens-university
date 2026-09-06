@@ -12,7 +12,7 @@ import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import {
   Rocket, Target, Calendar, MapPin, GraduationCap, Users,
   Briefcase, Award, CheckCircle, BookOpen, Lightbulb, Sparkles,
-  Globe, Shield, Activity, ArrowRight
+  Globe, Shield, Activity, ArrowRight, Wifi, Building2
 } from 'lucide-react';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import { isEnabledNavPath } from '../../components/Header/Header';
@@ -252,46 +252,43 @@ export default function About() {
         </div>
       </section>
 
-      {/* A University Built for Her Ambition — M3 Quote & Statement Box */}
-      <section className="section bg-off-white">
-        <div className="container">
-          <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-12)', alignItems: 'center' }}>
-            {/* Hardcoded campus-view image — not admin-managed, so this
-                section always has its illustration. */}
-            <div className="sves-image-wrapper reveal-left">
-              <img
-                src="/images/campusview.jpg"
-                alt="Vishnu Women's University campus"
-                style={{ width: '100%', height: '420px', objectFit: 'cover' }}
-              />
-            </div>
-            <div className="about-ambition-card reveal-right">
-              <span className="section-label" style={{ color: 'var(--color-accent)' }}>Our Commitment</span>
-              <h2 className="section-title" style={{ marginTop: '0.25rem' }}>A University Built for Her Ambition</h2>
-              <p style={{ color: 'var(--color-text-light)', lineHeight: 1.8, marginBottom: 'var(--space-4)', fontSize: '1.02rem' }}>
-                At Vishnu Women's University, education goes beyond classrooms. We create opportunities for young
-                women to discover their potential, pursue their passions, build meaningful careers, and lead with
-                confidence.
-              </p>
-              <p style={{ color: 'var(--color-text-light)', lineHeight: 1.8, marginBottom: 'var(--space-5)', fontSize: '1.02rem' }}>
-                With a strong foundation in education and a forward-looking approach to learning, VWU is committed
-                to shaping women who are ready to make a difference — in industry, research, entrepreneurship,
-                society, and the world.
-              </p>
-              <p style={{ fontFamily: 'var(--font-serif)', fontWeight: 800, fontSize: 'clamp(1.2rem, 2.2vw, 1.5rem)', color: 'var(--color-primary)', margin: 0 }}>
-                Her Education. Her Confidence. Her Future.<br />
-                <span style={{ color: 'var(--color-accent)', fontStyle: 'normal' }}>Her University — Vishnu Women's University.</span>
-              </p>
-              <div className="about-ambition-chips" style={{ justifyContent: 'flex-start' }}>
-                <div className="about-chip about-chip--accent">
-                  <Sparkles size={14} /> 100% Women Focused
-                </div>
-                <div className="about-chip">
-                  <Shield size={14} /> Safe Safe Campus
-                </div>
-                <div className="about-chip">
-                  <Activity size={14} /> High Impact Research
-                </div>
+      {/* A University Built for Her Ambition — Full 50:50 2-Column Edge-to-Edge Layout */}
+      <section style={{ padding: 0, background: 'var(--color-white)', overflow: 'hidden' }}>
+        <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0, width: '100%', alignItems: 'stretch' }}>
+          {/* Hardcoded campus-view image — full 50% height & width, no gaps */}
+          <div className="reveal-left" style={{ height: '100%', minHeight: '480px' }}>
+            <img
+              src="/images/DJI_0317.JPG"
+              alt="Vishnu Women's University campus"
+              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', borderRadius: 0 }}
+            />
+          </div>
+          <div className="reveal-right" style={{ background: 'var(--color-off-white)', padding: 'clamp(2.5rem, 5vw, 5rem)', display: 'flex', flexDirection: 'column', justifyContent: 'center', height: '100%' }}>
+            <span className="section-label" style={{ color: 'var(--color-accent)' }}>Our Commitment</span>
+            <h2 className="section-title" style={{ marginTop: '0.25rem' }}>A University Built for Her Ambition</h2>
+            <p style={{ color: 'var(--color-text-light)', lineHeight: 1.8, marginBottom: 'var(--space-4)', fontSize: '1.02rem' }}>
+              At Vishnu Women's University, education goes beyond classrooms. We create opportunities for young
+              women to discover their potential, pursue their passions, build meaningful careers, and lead with
+              confidence.
+            </p>
+            <p style={{ color: 'var(--color-text-light)', lineHeight: 1.8, marginBottom: 'var(--space-5)', fontSize: '1.02rem' }}>
+              With a strong foundation in education and a forward-looking approach to learning, VWU is committed
+              to shaping women who are ready to make a difference — in industry, research, entrepreneurship,
+              society, and the world.
+            </p>
+            <p style={{ fontFamily: 'var(--font-serif)', fontWeight: 800, fontSize: 'clamp(1.2rem, 2.2vw, 1.5rem)', color: 'var(--color-primary)', margin: '0 0 var(--space-5) 0' }}>
+              Her Education. Her Confidence. Her Future.<br />
+              <span style={{ color: 'var(--color-accent)', fontStyle: 'normal' }}>Her University — Vishnu Women's University.</span>
+            </p>
+            <div className="about-ambition-chips" style={{ justifyContent: 'flex-start', margin: 0 }}>
+              <div className="about-chip about-chip--accent">
+                <Sparkles size={14} /> 100% Women Focused
+              </div>
+              <div className="about-chip">
+                <Shield size={14} /> Safe Campus
+              </div>
+              <div className="about-chip">
+                <Activity size={14} /> High Impact Research
               </div>
             </div>
           </div>
@@ -334,7 +331,7 @@ export default function About() {
             <span className="section-label">Leadership</span>
             <h2 className="section-title">Core Executive Body</h2>
             <p className="section-desc" style={{ margin: '0 auto' }}>
-              The senior leadership team responsible for guiding VWU's academic direction and institutional development.
+              A distinguished leadership team shaping the University's academic vision, strategic direction, and institutional excellence.
             </p>
           </div>
           {executivesByLevel.map(([level, members]) => (
@@ -511,11 +508,23 @@ export default function About() {
               <p style={{ color: 'var(--color-text-light)', lineHeight: 1.8, marginBottom: 'var(--space-4)' }}>
                 From advanced learning spaces and high-speed connectivity to sports, wellness, residential, dining, and spiritual facilities&mdash;VWU offers an ecosystem designed around the complete student experience.
               </p>
-              <div className="about-feature-chips">
-                <div className="about-feature-chip"><Sparkles size={13} /> ICT Smart Classrooms</div>
-                <div className="about-feature-chip"><Shield size={13} /> 24/7 Campus Security</div>
-                <div className="about-feature-chip"><Activity size={13} /> Indoor Sports Complex</div>
-                <div className="about-feature-chip"><Globe size={13} /> High-Speed Campus Wi-Fi</div>
+              <div className="about-pillars-grid" style={{ marginBottom: 'var(--space-5)', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}>
+                {[
+                  { title: 'Modern Campus Facilities', desc: 'Smart classrooms, well-equipped labs, and world-class infrastructure.', icon: Building2, bg: '#E8EEF7', fg: 'var(--color-primary)' },
+                  { title: 'High-Speed Connectivity', desc: 'Seamless digital access for a smarter tomorrow.', icon: Wifi, bg: '#E4F0EA', fg: '#2F7D5D' },
+                  { title: 'Vibrant Student Life', desc: 'Clubs, sports, events and endless opportunities to grow.', icon: Users, bg: '#F7EEDD', fg: 'var(--color-accent)' },
+                ].map((card) => {
+                  const IconComp = card.icon;
+                  return (
+                    <div key={card.title} className="about-pillar-card">
+                      <div className="about-pillar-icon-wrap" style={{ background: card.bg, color: card.fg }}>
+                        <IconComp size={26} strokeWidth={1.8} />
+                      </div>
+                      <h3 className="about-pillar-title">{card.title}</h3>
+                      <p className="about-pillar-desc">{card.desc}</p>
+                    </div>
+                  );
+                })}
               </div>
               <Link to="/campus" className="btn btn-primary">Explore Campus Facilities →</Link>
             </div>

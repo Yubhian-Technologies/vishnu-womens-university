@@ -3337,9 +3337,9 @@ td.pb-activities-num {
   inset: 0;
   background: linear-gradient(
     90deg,
-    rgba(10, 18, 20, 0.92) 0%,
-    rgba(10, 18, 20, 0.72) 55%,
-    rgba(10, 18, 20, 0.4) 100%
+    rgba(10, 18, 20, 0.68) 0%,
+    rgba(10, 18, 20, 0.42) 55%,
+    rgba(10, 18, 20, 0.18) 100%
   );
   z-index: 1;
 }
@@ -3695,18 +3695,34 @@ td.pb-activities-num {
 .dept-hod-media-col {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-3);
   flex: 0 0 240px;
   max-width: 260px;
+  align-items: center;
+  text-align: center;
 }
 
 .dept-hod-media-col .dept-hod-media-frame {
   width: 100%;
 }
 
+.dept-hod-media-caption {
+  text-align: center;
+  width: 100%;
+}
+
 .dept-hod-media-caption .dept-hod-name {
-  font-size: 1.1rem;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--color-primary-dark, #07142c);
+  text-align: center;
   margin-bottom: 0.2rem;
+}
+
+.dept-hod-media-caption .dept-hod-meta {
+  text-align: center;
+  font-size: 0.85rem;
+  color: #64748b;
 }
 
 .dept-hod-message-title {

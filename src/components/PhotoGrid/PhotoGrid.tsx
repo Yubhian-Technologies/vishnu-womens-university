@@ -26,7 +26,7 @@ interface PhotoGridProps {
 export default function PhotoGrid({
   images,
   label = 'Gallery',
-  title = 'Campus in Pictures',
+  title = 'Campus Gallery',
   subtitle,
   highlights,
   columns = 3,

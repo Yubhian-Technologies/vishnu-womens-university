@@ -83,7 +83,7 @@ export default function ProgrammesFee() {
       <PageHero
         page="programmes-fee"
         defaultTitle="Programmes & Fee Structure"
-  defaultSubtitle="Complete list of programs, intake capacities, and annual fee structure for AY 2025–26."
+  defaultSubtitle="Complete list of programs, intake capacities, and annual fee structure Category A."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Admissions', to: '/admissions' }, { label: 'Programmes & Fee' }]}
         scrollCtaTargetId="programmes-fee-content"
       />

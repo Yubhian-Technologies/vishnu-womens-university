@@ -1035,9 +1035,7 @@ export default function PlacementDetail() {
               {item.desc && (
                 <p className="dept-hero-subtitle">{item.desc}</p>
               )}
-              <div className="dept-hero-cta">
-                <Link to="/apply-now" className="btn-hero-gold">Apply Now</Link>
-              </div>
+
             </div>
           </div>
         </div>
@@ -1116,11 +1114,19 @@ export default function PlacementDetail() {
                   src="/images/placements/industry-liaison-offices.png"
                   alt="Sri Vishnu Educational Society — Industry Liaison Offices, campuses and contact details across India"
                   loading="lazy"
-                  onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+                  onError={(e) => {
+                    const target = e.currentTarget as HTMLImageElement;
+                    if (!target.dataset.triedFallback) {
+                      target.dataset.triedFallback = 'true';
+                      target.src = '/images/image (3).png';
+                    } else {
+                      target.style.display = 'none';
+                    }
+                  }}
                   style={{
                     display: 'block',
                     width: '100%',
-                    maxWidth: 560,
+                    maxWidth: '720px',
                     height: 'auto',
                     margin: 'var(--space-8) auto 0',
                     borderRadius: 'var(--radius-lg)',

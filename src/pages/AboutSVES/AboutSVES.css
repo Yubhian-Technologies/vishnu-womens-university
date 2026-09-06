@@ -1,116 +1,160 @@
-.sves-stats-bar {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: var(--space-3);
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: var(--radius-xl);
-  padding: var(--space-4) var(--space-3);
-}
+/* ==========================================================================
+   VWU About SVES Page — Human-Designed & Premium Editorial System
+   ========================================================================== */
 
-.sves-stat {
-  text-align: center;
-  padding: var(--space-3) var(--space-2);
-  border-right: 1px solid rgba(255,255,255,0.12);
-  border-radius: var(--radius-lg);
-  transition: background-color var(--transition-fast);
-}
-
-.sves-stat:hover {
-  background: rgba(255, 255, 255, 0.06);
-}
-
-.sves-stat:last-child { border-right: none; }
-
-.sves-stat-value {
-  font-family: var(--font-serif);
-  font-size: clamp(1.1rem, 2vw, 1.6rem);
-  font-weight: 900;
-  color: var(--color-accent);
-}
-
-.sves-stat-label {
-  font-size: var(--text-xs);
-  color: rgba(255,255,255,0.75);
-  font-family: var(--font-sans);
-  margin-top: 3px;
-  font-weight: 500;
-}
-
-/* Campuses */
+/* Campuses Grid & Enhanced Cards — Unified Editorial Theme */
 .sves-campuses-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: var(--space-6);
+  align-items: stretch;
+}
+
+@media (max-width: 1200px) {
+  .sves-campuses-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .sves-campuses-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .sves-campus-card {
   background: var(--color-white);
-  border: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 8%, transparent);
-  border-radius: 22px;
+  border: 1px solid var(--color-light-gray);
+  border-left: 3.5px solid var(--color-primary);
+  border-radius: 8px;
   overflow: hidden;
-  box-shadow: var(--shadow-sm);
-  transition: all var(--transition-base);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  position: relative;
 }
 
 .sves-campus-card:hover {
   border-color: var(--color-accent);
-  box-shadow: var(--shadow-xl);
+  border-left-color: var(--color-accent);
+  box-shadow: 0 12px 28px rgba(11, 30, 66, 0.09);
   transform: translateY(-4px);
 }
 
 .sves-campus-header {
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
-  padding: var(--space-6) var(--space-7);
+  padding: 1.5rem 1.5rem 1.25rem;
+  background: var(--color-off-white);
+  border-bottom: 1px solid var(--color-light-gray);
 }
 
-.sves-campus-header h3 {
+.sves-campus-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.85rem;
+}
+
+.sves-campus-index {
   font-family: var(--font-serif);
-  font-size: var(--text-lg);
+  font-size: 1.1rem;
   font-weight: 900;
-  color: var(--color-white);
-  margin-bottom: 6px;
+  color: var(--color-accent);
+  letter-spacing: -0.02em;
 }
 
 .sves-campus-location {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  padding: 0.2rem 0.75rem;
-  border-radius: var(--radius-full);
-  background: color-mix(in srgb, var(--color-accent, #c9a84c) 20%, transparent);
-  border: 1px solid color-mix(in srgb, var(--color-accent, #c9a84c) 40%, transparent);
-  font-size: var(--text-xs);
+  gap: 0.3rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 4px;
+  background: var(--color-white);
+  border: 1px solid var(--color-light-gray);
+  font-size: 0.75rem;
   font-weight: 700;
-  color: var(--color-accent);
-  font-family: var(--font-sans);
+  color: var(--color-primary);
+}
+
+.sves-campus-name {
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--color-primary);
+  margin: 0 0 0.6rem 0;
+  line-height: 1.3;
+}
+
+.sves-campus-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--color-primary);
+  background: rgba(11, 30, 66, 0.06);
+  padding: 0.25rem 0.65rem;
+  border-radius: 4px;
+  border: 1px solid rgba(11, 30, 66, 0.1);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.sves-campus-body {
+  padding: 1.25rem 1.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
 .sves-campus-list {
   list-style: none;
-  padding: var(--space-6) var(--space-7);
+  padding: 0;
+  margin: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: 0.65rem;
 }
 
 .sves-campus-list li {
   display: flex;
-  gap: var(--space-2);
-  font-size: var(--text-sm);
-  color: var(--color-text);
-  line-height: 1.5;
+  align-items: flex-start;
+  gap: 0.55rem;
+  font-size: 0.88rem;
+  color: var(--color-text-light);
+  line-height: 1.45;
+  transition: color 0.2s ease;
 }
 
-.sves-campus-list li span:first-child {
+.sves-campus-list li:hover .sves-inst-text {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.sves-list-bullet {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(201, 168, 76, 0.2);
   color: var(--color-accent);
-  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
+  margin-top: 2px;
+  transition: all 0.25s ease;
 }
 
-/* Milestones */
+.sves-campus-card:hover .sves-list-bullet {
+  background: var(--color-accent);
+  color: #0B1E42;
+}
+
+.sves-inst-text {
+  transition: all 0.2s ease;
+}
+
+/* Milestones Timeline */
 .sves-milestones {
   --sves-rail: 90px;
   display: flex;
@@ -181,7 +225,6 @@
 
 /* Responsive */
 @media (max-width: 768px) {
-  .sves-stats-bar { grid-template-columns: repeat(3, 1fr); }
   .sves-campuses-grid { grid-template-columns: 1fr; }
   .sves-milestones::before { display: none; }
   .sves-milestone { flex-direction: column; gap: var(--space-2); }
@@ -191,4 +234,3 @@
   }
   .sves-milestone-text { padding-left: var(--space-3); }
 }
-

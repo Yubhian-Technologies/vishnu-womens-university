@@ -131,7 +131,7 @@ export default function CampusLifeDetail({ slug: slugProp }: { slug?: string }) 
               <div className="detail-grid">
                 <div>
                   <span className="section-label">Campus Life</span>
-                  <h2 className="section-title" style={{ fontSize: '1.75rem' }}>About {title}</h2>
+                  <h2 className="section-title" style={{ fontSize: '1.75rem' }}>{title}</h2>
                   {visibleSections.length > 0 ? (
                     <div style={{ marginTop: 'var(--space-5)' }}>
                       <CustomSectionsPlain sections={visibleSections} />
@@ -149,7 +149,7 @@ export default function CampusLifeDetail({ slug: slugProp }: { slug?: string }) 
             ) : (
               <div>
                 <span className="section-label">Academics</span>
-                <h2 className="section-title" style={{ fontSize: '1.75rem' }}>About {title}</h2>
+                <h2 className="section-title" style={{ fontSize: '1.75rem' }}>{title}</h2>
                 {visibleSections.length > 0 ? (
                   <div style={{ marginTop: 'var(--space-5)' }}>
                     <CustomSectionsPlain sections={visibleSections} />
@@ -168,7 +168,7 @@ export default function CampusLifeDetail({ slug: slugProp }: { slug?: string }) 
       {!isActivity && photos.length > 0 && (
         <section className="section bg-off-white">
           <div className="container">
-            <PhotoGrid images={photos} label={title} title={`${title} in Pictures`} columns={3} layout="default" />
+            <PhotoGrid images={photos} label="" title={title} columns={3} layout="default" />
           </div>
         </section>
       )}

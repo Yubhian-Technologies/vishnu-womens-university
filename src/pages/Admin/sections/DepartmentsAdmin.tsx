@@ -983,7 +983,7 @@ export default function DepartmentsAdmin() {
         </details>
 
         <details className="admin-accordion">
-          <summary className="admin-accordion__summary">About HOD</summary>
+          <summary className="admin-accordion__summary">Brief Profile (HOD)</summary>
           <div className="admin-form-grid">
           <div className="admin-field admin-field--full">
             <label>HOD Photo</label>

@@ -108,7 +108,7 @@ export const DIFFERENTIATOR_CATEGORIES = [
   { id: 'innovation', label: 'Innovation & Entrepreneurship' },
   { id: 'industry', label: 'Industry Centres of Excellence' },
   { id: 'research', label: 'Research & Specialised Labs' },
-  { id: 'global', label: 'International & Global Outreach' },
+  { id: 'global', label: 'Global Outreach' },
   { id: 'student', label: 'Student Development & Social Impact' },
 ];
 
