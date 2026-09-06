@@ -1,11 +1,12 @@
-import { useState, type ComponentType } from 'react';
+import { useMemo, useState, type ComponentType } from 'react';
 import { collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
 import { deleteFile, type UploadResult } from '../../../lib/storage';
+import ImageUploader from '../../../components/ImageUploader/ImageUploader';
 import CustomSectionEditor from './CustomSectionEditor';
 import CustomTabsEditor from './CustomTabsEditor';
-import { replaceAtPath, getAtPath, type CustomSection } from '../../../lib/customSections';
+import { replaceAtPath, getAtPath, hasCustomSectionContent, type CustomSection } from '../../../lib/customSections';
 import { type CustomTab } from '../../../lib/customTabs';
 import { diffChangedFields } from '../../../lib/formDiff';
 import AicteIdeaLabTeamAdmin from './AicteIdeaLabTeamAdmin';
@@ -69,15 +70,45 @@ export interface DifferentiatorItemDoc {
   // + filter as ProgramDetail), so rosters never need re-entering here.
   department: string;
   desc: string;
+  // Hero banner subtitle — shown under the title on the detail page's hero,
+  // distinct from `desc` (the hub-page card blurb) and `description` (the
+  // full headingless block further down the page). Its own field so editing
+  // one never silently changes what shows on the other two.
   summary?: string;
   external: boolean;
   url: string;
-  highlights: string[];
-  intro: string;
-  about: string;
-  facilities: string[];
-  outcomes: string[];
-  partners: string[];
+  // The page's headingless top description block — text, a bullet list, or
+  // either plus a photo (admin's choice of contentType). Replaces the old
+  // separate `intro`/`about` paragraph fields below.
+  description?: CustomSection;
+  // Vision / Mission / Objectives — pre-existing named slots every item has
+  // in the admin form (so they're never ad-hoc-typed Custom Sections with an
+  // inconsistent name), each the same text/checklist/photo shape as
+  // `description`. Shown on the public page — compactly, inline near the
+  // description — only when it actually has content (see
+  // hasCustomSectionContent), same as every other optional section here.
+  vision?: CustomSection;
+  mission?: CustomSection;
+  objectives?: CustomSection;
+  /** @deprecated superseded by `description` above — kept only so existing
+   * items' old paragraphs can still be read as a fallback (see
+   * legacyDescriptionFrom below and DifferentiatorDetail.tsx) until each
+   * item is re-saved from the new admin field. No longer written to. */
+  intro?: string;
+  /** @deprecated see `intro` above. */
+  about?: string;
+  /** @deprecated Key Highlights/Facilities/Outcomes/Partners are no longer
+   * fixed fields — they're just Custom Sections now, like Vision/Mission/
+   * Contacts/anything else (see legacySectionsFrom below and
+   * DifferentiatorDetail.tsx). Kept only so old items' content is still read
+   * as a fallback until each item is re-saved. No longer written to. */
+  highlights?: string[];
+  /** @deprecated see `highlights` above. */
+  facilities?: string[];
+  /** @deprecated see `highlights` above. */
+  outcomes?: string[];
+  /** @deprecated see `highlights` above. */
+  partners?: string[];
   // Admin-defined sections beyond the fixed fields above — any name, any
   // number of sub-sections, and a choice of plain text / checklist / table /
   // links / files per section (see lib/customSections.ts). Fully additive:
@@ -94,12 +125,65 @@ export interface DifferentiatorItemDoc {
   order: number;
 }
 
+// The single-block fields (Description, Vision, Mission, Objectives) share
+// this shape — text, a checklist, or either plus a photo — and this same
+// empty starting point, keyed by their own fixed id/label.
+export type BlockKey = 'description' | 'vision' | 'mission' | 'objectives';
+export const BLOCK_LABELS: Record<BlockKey, string> = {
+  description: 'Description', vision: 'Vision', mission: 'Mission', objectives: 'Objectives',
+};
+function emptyBlock(key: BlockKey): CustomSection {
+  return { id: key, label: BLOCK_LABELS[key], contentType: 'text', textContent: '' };
+}
+
 const EMPTY: Omit<DifferentiatorItemDoc, 'id'> = {
-  slug: '', title: '', category: 'innovation', department: '', desc: '', external: false, url: '',
-  highlights: [], intro: '', about: '', facilities: [], outcomes: [], partners: [],
+  slug: '', title: '', category: 'innovation', department: '', desc: '', summary: '', external: false, url: '',
+  description: emptyBlock('description'), vision: emptyBlock('vision'), mission: emptyBlock('mission'), objectives: emptyBlock('objectives'),
   customSections: [], tabs: [],
   heroImage: '', heroStoragePath: '', order: 0,
 };
+
+// Only used to prefill the new single Description field when opening an item
+// that predates it — never written back automatically. Prefers the longer
+// `about` paragraph, falling back to `intro`, so admins re-saving an old item
+// see their existing copy already in place instead of starting from blank.
+function legacyDescriptionFrom(it: DifferentiatorItemDoc): CustomSection {
+  const text = (it.about || it.intro || '').trim();
+  return { id: 'description', label: 'Description', contentType: 'text', textContent: text };
+}
+
+// Vision/Mission/Objectives used to only exist as ad-hoc Custom Sections an
+// admin typed in themselves (same name, no guarantee) — now they're their
+// own fixed field, like `description`. Prefers the item's own `vision`/
+// `mission`/`objectives` field if it already has content; otherwise looks
+// for a Custom Section with that exact id (the slug `generateSectionId`
+// would have produced from a section literally named "Vision" etc.) so any
+// content already entered that way is picked up automatically instead of
+// looking blank the first time an item is reopened after this change.
+function blockOrPromotedSection(it: DifferentiatorItemDoc, key: Exclude<BlockKey, 'description'>): CustomSection {
+  const direct = it[key];
+  if (direct && hasCustomSectionContent(direct)) return direct;
+  const legacy = (it.customSections || []).find((s) => s.id === key);
+  if (legacy && hasCustomSectionContent(legacy)) return { ...legacy, id: key, label: legacy.label || BLOCK_LABELS[key] };
+  return emptyBlock(key);
+}
+
+// Turns the old fixed Key Highlights/Facilities/Outcomes/Partners fields into
+// equivalent Custom Sections, so opening an old item for edit shows that
+// content already migrated into the generic system instead of gone. Only
+// called for ids not already present in the item's customSections (see
+// startEdit), so re-opening an already-migrated item never duplicates them.
+function legacySectionsFrom(it: DifferentiatorItemDoc): CustomSection[] {
+  const specs: { id: string; label: string; values?: string[] }[] = [
+    { id: 'highlights', label: 'Key Highlights', values: it.highlights },
+    { id: 'facilities', label: 'Facilities & Equipment', values: it.facilities },
+    { id: 'outcomes', label: 'Outcomes & Achievements', values: it.outcomes },
+    { id: 'partners', label: 'Partners', values: it.partners },
+  ];
+  return specs
+    .filter((s) => (s.values || []).filter(Boolean).length > 0)
+    .map((s) => ({ id: s.id, label: s.label, contentType: 'list', listText: (s.values || []).filter(Boolean).join('\n') }));
+}
 
 // Same list as ProgramsAdmin.tsx's DEPARTMENTS — keep in sync.
 const DEPARTMENTS = ['CSE', 'AI', 'Cyber Security', 'IT', 'ECE', 'EEE', 'Civil', 'Mechanical', 'MBA'];
@@ -112,11 +196,115 @@ export const DIFFERENTIATOR_CATEGORIES = [
   { id: 'student', label: 'Student Development & Social Impact' },
 ];
 
-function linesToArray(text: string): string[] {
-  return text.split('\n').map((s) => s.trim());
+// The 4 items with their own extra sidebar-tab layout (see IicPage/VdlPage/
+// WisePage/IdeaLabPage in DifferentiatorDetail.tsx) — on top of the same
+// Description/Vision/Mission/Objectives/Custom Sections Overview section
+// every other item has. Only gates the Tabs editor below; every other field
+// applies to these 4 exactly like any other item.
+const TABS_SLUGS = new Set(['talentsprint-wise', 'institution-innovation-cell', 'vehicle-design-lab', 'aicte-idea-lab']);
+
+// The single source of truth for "what does this item look like under the
+// new structure" — used both when opening one item for edit (startEdit) and
+// by the bulk "Migrate to New Structure" action below, so a bulk-migrated
+// item ends up byte-for-byte identical to one an admin opened and saved by
+// hand. Pure and additive: never removes/overwrites real content, only fills
+// in the new fields from whatever legacy content is present.
+//
+// Once an item has been through this once — its `description` field exists
+// at all in Firestore, even set to empty text by an admin who deliberately
+// cleared it — this must NOT go back to the deprecated legacy fields again.
+// Those fields (highlights/facilities/outcomes/partners/intro/about) are
+// kept around forever on purpose (nothing here ever deletes them), so
+// re-deriving Custom Sections from them on every call would mean an admin
+// deleting, say, the "Facilities & Equipment" Custom Section just comes back
+// on the next save or page load, since `it.facilities` itself never changed.
+// `description`'s mere presence is what tells the two apart: it's always
+// written together with the other 4 fields (see save()'s
+// editingWasAlreadyMigrated handling below, and migrateAll), so an item
+// missing it has genuinely never been touched by the new structure yet.
+function computeMigratedFields(it: DifferentiatorItemDoc): Pick<DifferentiatorItemDoc, 'description' | 'vision' | 'mission' | 'objectives' | 'customSections'> {
+  const alreadyMigrated = it.description !== undefined;
+  const promotedIds = new Set(['vision', 'mission', 'objectives']);
+  const baseCustomSections = (it.customSections || []).filter((s) => !promotedIds.has(s.id));
+  // Every non-external item — including the 4 TABS_SLUGS ones, which also
+  // get the same Description/Vision/Mission/Objectives/Custom Sections
+  // Overview section as everyone else now, on top of their own Tabs content
+  // (see DifferentiatorDetail.tsx) — can have legacy Highlights/Facilities/
+  // Outcomes/Partners content worth migrating in.
+  let migratedSections: CustomSection[] = [];
+  if (!alreadyMigrated) {
+    const existingIds = new Set(baseCustomSections.map((s) => s.id));
+    migratedSections = legacySectionsFrom(it).filter((s) => !existingIds.has(s.id));
+  }
+  return {
+    description: alreadyMigrated ? it.description! : legacyDescriptionFrom(it),
+    vision: blockOrPromotedSection(it, 'vision'),
+    mission: blockOrPromotedSection(it, 'mission'),
+    objectives: blockOrPromotedSection(it, 'objectives'),
+    customSections: [...baseCustomSections, ...migratedSections],
+  };
 }
-function arrayToLines(arr: string[] = []): string {
-  return arr.join('\n');
+
+// Shared editor for the single-block fields (Description, Vision, Mission,
+// Objectives) — a content-type choice of Plain text / Checklist, the
+// matching textarea, and an optional photo. Used four times below instead of
+// once since each is its own fixed field, not a repeatable list.
+function BlockEditor({ blockKey, label, hint, value, onChange, onPhotoUploaded, onPhotoRemoved }: {
+  blockKey: BlockKey;
+  label: string;
+  hint?: string;
+  value: CustomSection;
+  onChange: (next: CustomSection) => void;
+  onPhotoUploaded: (r: UploadResult) => void;
+  onPhotoRemoved: () => void;
+}) {
+  return (
+    <div className="admin-field admin-field--full">
+      <label>{label}</label>
+      {hint && <p className="admin-field__hint" style={{ marginTop: '-0.25rem' }}>{hint}</p>}
+      <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.5rem' }}>
+        <select
+          value={value.contentType === 'list' ? 'list' : 'text'}
+          onChange={(e) => onChange({ ...value, contentType: e.target.value as 'text' | 'list' })}
+          style={{ maxWidth: 220 }}
+        >
+          <option value="text">Plain text</option>
+          <option value="list">Checklist (bullet points)</option>
+        </select>
+      </div>
+      {value.contentType === 'list' ? (
+        <textarea
+          rows={4}
+          value={value.listText || ''}
+          onChange={(e) => onChange({ ...value, listText: e.target.value })}
+          placeholder="One point per line…"
+        />
+      ) : (
+        <textarea
+          rows={4}
+          value={value.textContent || ''}
+          onChange={(e) => onChange({ ...value, textContent: e.target.value })}
+          placeholder={`${label}…`}
+        />
+      )}
+      <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', marginTop: '0.5rem' }}>
+        <div style={{ width: 140 }}>
+          <ImageUploader
+            folder={`vwu/differentiators/${blockKey}`}
+            currentUrl={value.photo?.imageUrl}
+            aspect={1}
+            label="+ Add Photo"
+            onUploaded={onPhotoUploaded}
+          />
+        </div>
+        {value.photo?.imageUrl && (
+          <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={onPhotoRemoved}>
+            Remove Photo
+          </button>
+        )}
+      </div>
+    </div>
+  );
 }
 
 export default function DifferentiatorsAdmin() {
@@ -128,11 +316,22 @@ export default function DifferentiatorsAdmin() {
   // stale copy (see lib/formDiff.ts). null while adding a new item.
   const [originalForm, setOriginalForm] = useState<Omit<DifferentiatorItemDoc, 'id'> | null>(null);
   const [editing, setEditing] = useState<string | null>(null);
+  // Whether the item currently being edited already had `description` set
+  // in Firestore when startEdit opened it — i.e. whether it had already been
+  // through the new structure once. See save()'s use of this: the very
+  // first save of a not-yet-migrated item must write description/vision/
+  // mission/objectives/customSections in full, even where their computed
+  // values happen to match what startEdit already prefilled, or `description`
+  // could stay unset in Firestore and computeMigratedFields would keep
+  // treating the item as unmigrated — silently undoing any Custom Section
+  // the admin just deleted the next time this item loads (see
+  // computeMigratedFields's comment for the full explanation).
+  const [editingWasAlreadyMigrated, setEditingWasAlreadyMigrated] = useState(true);
   const [saving, setSaving] = useState(false);
   const [filterCat, setFilterCat] = useState('All');
   const [activeSubKey, setActiveSubKey] = useState<string | null>(null);
 
-  const set = (k: string, v: string | number | string[] | boolean | CustomSection[] | CustomTab[]) => setForm((p) => ({ ...p, [k]: v }));
+  const set = (k: string, v: string | number | boolean | CustomSection | CustomSection[] | CustomTab[]) => setForm((p) => ({ ...p, [k]: v }));
 
   // Custom Sections — file uploads route through the functional `setForm(p
   // => ...)` form via replaceAtPath, recomputing from `p.customSections` at
@@ -233,11 +432,35 @@ export default function DifferentiatorsAdmin() {
     }));
   };
 
-  // Custom Tabs — used only by the 4 items with a sidebar-tab layout
-  // instead of the intro/accordion one. Same shape as Custom Sections above,
-  // one level deeper (tab -> its own section tree).
-  const TABS_SLUGS = new Set(['talentsprint-wise', 'institution-innovation-cell', 'vehicle-design-lab', 'aicte-idea-lab']);
+  // Description/Vision/Mission/Objectives' own optional photo — a plain
+  // object on `form[key]`, not a path-addressed tree like Custom Sections
+  // above, since there's only ever one of it per block.
+  const handleBlockPhotoUploaded = (key: BlockKey, r: UploadResult) => {
+    setForm((p) => ({
+      ...p,
+      [key]: { ...(p[key] || emptyBlock(key)), photo: { imageUrl: r.url, storagePath: r.path } },
+    }));
+  };
+  const handleBlockPhotoRemoved = async (key: BlockKey) => {
+    const photo = form[key]?.photo;
+    if (!photo?.imageUrl) return;
+    if (!confirm('Remove this photo? This cannot be undone.')) return;
+    try {
+      if (photo.storagePath) await deleteFile(photo.storagePath);
+    } catch (e) {
+      alert(`Couldn't delete the photo from storage: ${(e as Error).message}`);
+      return;
+    }
+    setForm((p) => {
+      const next = { ...(p[key] || emptyBlock(key)) };
+      delete next.photo;
+      return { ...p, [key]: next };
+    });
+  };
 
+  // Custom Tabs — used only by the 4 TABS_SLUGS items with a sidebar-tab
+  // layout instead of the intro/accordion one. Same shape as Custom Sections
+  // above, one level deeper (tab -> its own section tree).
   const handleTabFileUploaded = (tabIndex: number, sectionPath: number[], fileIndex: number, r: UploadResult) => {
     setForm((p) => ({
       ...p,
@@ -343,24 +566,26 @@ export default function DifferentiatorsAdmin() {
     if (!form.slug || !form.title) return alert('Slug and title are required.');
     setSaving(true);
     try {
-      const payload = {
-        ...form,
-        highlights: form.highlights.filter(Boolean),
-        facilities: form.facilities.filter(Boolean),
-        outcomes: form.outcomes.filter(Boolean),
-        partners: form.partners.filter(Boolean),
-      };
+      const payload = { ...form };
       if (editing) {
         // Only send fields that actually changed in this editing session —
         // see originalForm/diffChangedFields above.
         const changed = originalForm ? diffChangedFields(payload, originalForm) : payload;
-        if (Object.keys(changed).length > 0) {
-          await updateDoc(doc(db, 'differentiatorItems', editing), changed);
+        // See editingWasAlreadyMigrated above — force these 5 through on the
+        // very first save of a not-yet-migrated item, even if none of them
+        // individually differ from what startEdit already prefilled.
+        const finalChanged = editingWasAlreadyMigrated ? changed : {
+          ...changed,
+          description: payload.description, vision: payload.vision, mission: payload.mission,
+          objectives: payload.objectives, customSections: payload.customSections,
+        };
+        if (Object.keys(finalChanged).length > 0) {
+          await updateDoc(doc(db, 'differentiatorItems', editing), finalChanged);
         }
       } else {
         await addDoc(collection(db, 'differentiatorItems'), { ...payload, order: form.order || items.length + 1, createdAt: serverTimestamp() });
       }
-      setForm(EMPTY); setEditing(null); setActiveSubKey(null); setOriginalForm(null);
+      setForm(EMPTY); setEditing(null); setActiveSubKey(null); setOriginalForm(null); setEditingWasAlreadyMigrated(true);
     } catch (e) {
       alert(`Couldn't save: ${(e as Error).message}`);
     } finally { setSaving(false); }
@@ -368,12 +593,13 @@ export default function DifferentiatorsAdmin() {
 
   const startEdit = (it: DifferentiatorItemDoc) => {
     setEditing(it.id);
+    setEditingWasAlreadyMigrated(it.description !== undefined);
     const next: Omit<DifferentiatorItemDoc, 'id'> = {
       slug: it.slug, title: it.title, category: it.category, department: it.department || '', desc: it.desc || '',
-      external: !!it.external, url: it.url || '', highlights: it.highlights || [],
-      intro: it.intro || '', about: it.about || '', facilities: it.facilities || [],
-      outcomes: it.outcomes || [], partners: it.partners || [],
-      customSections: it.customSections || [], tabs: it.tabs || [],
+      summary: it.summary || '',
+      external: !!it.external, url: it.url || '',
+      ...computeMigratedFields(it),
+      tabs: it.tabs || [],
       heroImage: it.heroImage || '', heroStoragePath: it.heroStoragePath || '', order: it.order,
     };
     setForm(next);
@@ -391,10 +617,70 @@ export default function DifferentiatorsAdmin() {
     }
   };
 
+  // One-time (but safe to re-run) bulk migration: writes the new
+  // description/vision/mission/objectives/customSections fields into every
+  // existing item in Firestore, computed the exact same way startEdit does —
+  // so this never has to be run by hand, item by item. Strictly additive:
+  // updateDoc only ever touches these fields, so nothing existing (including
+  // the deprecated intro/about/highlights/facilities/outcomes/partners) is
+  // ever deleted — an item already migrated is simply skipped (diffed
+  // against itself, nothing changes, nothing is written).
+  // What each item's fields would change to vs. what they are now — used to
+  // both size/label the button honestly (so it reads "0 to migrate" instead
+  // of always showing the total item count, migrated or not) and, in
+  // migrateAll below, to actually write only what's changed.
+  const pendingMigrations = useMemo(() => items.map((it) => {
+    const fields = computeMigratedFields(it);
+    const before: typeof fields = {
+      description: it.description as CustomSection, vision: it.vision as CustomSection,
+      mission: it.mission as CustomSection, objectives: it.objectives as CustomSection,
+      customSections: it.customSections || [],
+    };
+    return { it, changed: diffChangedFields(fields, before) };
+  }).filter((m) => Object.keys(m.changed).length > 0), [items]);
+
+  const [migrating, setMigrating] = useState(false);
+  const migrateAll = async () => {
+    if (pendingMigrations.length === 0) return;
+    if (!confirm(`Migrate ${pendingMigrations.length} item(s) to the new Description/Vision/Mission/Objectives structure?\n\nThis only adds/updates those fields — nothing is deleted.`)) return;
+    setMigrating(true);
+    let migratedCount = 0;
+    try {
+      for (const { it, changed } of pendingMigrations) {
+        await updateDoc(doc(db, 'differentiatorItems', it.id), changed);
+        migratedCount++;
+      }
+      alert(`Done. Migrated ${migratedCount} item(s).`);
+    } catch (e) {
+      alert(`Migration stopped partway: ${(e as Error).message}\n\nAlready-migrated items were saved successfully — just run this again to pick up where it left off.`);
+    } finally {
+      setMigrating(false);
+    }
+  };
+
   const filtered = filterCat === 'All' ? items : items.filter((i) => i.category === filterCat);
 
   return (
     <div className="admin-section">
+      <div className="admin-card">
+        <h2 className="admin-card__title">Migrate to New Structure</h2>
+        <p className="admin-field__hint" style={{ marginBottom: '1rem' }}>
+          Moves every item's old Intro/About/Key Highlights/Facilities/Outcomes/Partners content into the new
+          Description/Vision/Mission/Objectives fields and Custom Sections — the same thing that happens automatically
+          when you open one item and click Update, just for all of them at once. Nothing is ever deleted (the old
+          fields are simply left in place, unused).
+        </p>
+        {!loading && pendingMigrations.length === 0 ? (
+          <p style={{ color: 'var(--color-text-light)', fontWeight: 600, margin: 0 }}>
+            ✓ All {items.length} item(s) already use the new structure — nothing to migrate.
+          </p>
+        ) : (
+          <button className="admin-btn admin-btn--primary" onClick={migrateAll} disabled={migrating || loading}>
+            {migrating ? 'Migrating…' : `Migrate ${pendingMigrations.length} Item(s)`}
+          </button>
+        )}
+      </div>
+
       <div className="admin-card">
         <h2 className="admin-card__title">{editing ? 'Edit Differentiator' : 'Add Differentiator'}</h2>
         <p className="admin-field__hint" style={{ background: '#eef6ff', border: '1px solid #bcdcfd', borderRadius: 6, padding: '0.6rem 0.9rem', marginBottom: '1rem' }}>
@@ -441,65 +727,76 @@ export default function DifferentiatorsAdmin() {
             <textarea id="field-short-description-shown-on-the" rows={2} value={form.desc} onChange={(e) => set('desc', e.target.value)} />
           </div>
           <div className="admin-field admin-field--full">
-            <label htmlFor="field-key-highlights-one-per-line">Key Highlights (one per line)</label>
-            <textarea id="field-key-highlights-one-per-line" rows={4} value={arrayToLines(form.highlights)} onChange={(e) => set('highlights', linesToArray(e.target.value))} />
+            <label htmlFor="field-hero-subtitle">Hero Subtitle (shown under the title on the detail page's hero banner, only when not an external link)</label>
+            <textarea id="field-hero-subtitle" rows={2} value={form.summary || ''} onChange={(e) => set('summary', e.target.value)} />
           </div>
+          <BlockEditor
+            blockKey="description"
+            label="Description"
+            hint="Shown at the top of the detail page with no heading, only when not an external link."
+            value={form.description || emptyBlock('description')}
+            onChange={(next) => set('description', next)}
+            onPhotoUploaded={(r) => handleBlockPhotoUploaded('description', r)}
+            onPhotoRemoved={() => handleBlockPhotoRemoved('description')}
+          />
+          <div className="admin-field admin-field--full"><hr /></div>
+          <BlockEditor
+            blockKey="vision"
+            label="Vision"
+            value={form.vision || emptyBlock('vision')}
+            onChange={(next) => set('vision', next)}
+            onPhotoUploaded={(r) => handleBlockPhotoUploaded('vision', r)}
+            onPhotoRemoved={() => handleBlockPhotoRemoved('vision')}
+          />
+          <BlockEditor
+            blockKey="mission"
+            label="Mission"
+            value={form.mission || emptyBlock('mission')}
+            onChange={(next) => set('mission', next)}
+            onPhotoUploaded={(r) => handleBlockPhotoUploaded('mission', r)}
+            onPhotoRemoved={() => handleBlockPhotoRemoved('mission')}
+          />
+          <BlockEditor
+            blockKey="objectives"
+            label="Objectives"
+            value={form.objectives || emptyBlock('objectives')}
+            onChange={(next) => set('objectives', next)}
+            onPhotoUploaded={(r) => handleBlockPhotoUploaded('objectives', r)}
+            onPhotoRemoved={() => handleBlockPhotoRemoved('objectives')}
+          />
+          <div className="admin-field admin-field--full"><hr /><h3>Custom Sections</h3></div>
+          <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>
+            Add any section this item needs beyond Description/Vision/Mission/Objectives above — Key Highlights,
+            Facilities, Outcomes, Partners, Contacts, or anything else — any name, any number of sub-sections, and
+            a choice of plain text, a checklist, a table, a list of links, uploaded files, or contacts
+            (role/name/phone/email) per section. Each one shows up on the public page once it has content. Use
+            the Placement dropdown per section to choose "In the intro area above" (shown inline near the
+            description, like Vision/Mission/Objectives) vs. "In the accordion below" (the default — everything
+            else, shown as a click-to-expand panel).
+          </p>
           <div className="admin-field admin-field--full">
-            <label htmlFor="field-intro-detail-page-only-used">Intro (detail page — only used when not an external link)</label>
-            <textarea id="field-intro-detail-page-only-used" rows={3} value={form.intro} onChange={(e) => set('intro', e.target.value)} />
+            <CustomSectionEditor
+              sections={form.customSections || []}
+              onChange={(next) => set('customSections', next)}
+              rootSections={form.customSections || []}
+              parentPath={[]}
+              onFileUploaded={handleCustomSectionFileUploaded}
+              onFileRemoved={handleCustomSectionFileRemoved}
+              onPhotoUploaded={handleCustomSectionPhotoUploaded}
+              onPhotoRemoved={handleCustomSectionPhotoRemoved}
+              onGalleryPhotoUploaded={handleCustomSectionGalleryPhotoUploaded}
+              onGalleryPhotoRemoved={handleCustomSectionGalleryPhotoRemoved}
+              showPlacementToggle
+            />
           </div>
-          <div className="admin-field admin-field--full">
-            <label htmlFor="field-about-detail-page-longer-paragraph">About (detail page — longer paragraph)</label>
-            <textarea id="field-about-detail-page-longer-paragraph" rows={4} value={form.about} onChange={(e) => set('about', e.target.value)} />
-          </div>
-          <div className="admin-field admin-field--full">
-            <label htmlFor="field-facilities-equipment-one-per-line">Facilities & Equipment (one per line — optional)</label>
-            <textarea id="field-facilities-equipment-one-per-line" rows={3} value={arrayToLines(form.facilities)} onChange={(e) => set('facilities', linesToArray(e.target.value))} />
-          </div>
-          <div className="admin-field admin-field--full">
-            <label htmlFor="field-outcomes-achievements-one-per-line">Outcomes & Achievements (one per line — optional)</label>
-            <textarea id="field-outcomes-achievements-one-per-line" rows={3} value={arrayToLines(form.outcomes)} onChange={(e) => set('outcomes', linesToArray(e.target.value))} />
-          </div>
-          <div className="admin-field admin-field--full">
-            <label htmlFor="field-partners-one-per-line-optional">Partners (one per line — optional)</label>
-            <textarea id="field-partners-one-per-line-optional" rows={2} value={arrayToLines(form.partners)} onChange={(e) => set('partners', linesToArray(e.target.value))} />
-          </div>
-
-          {!TABS_SLUGS.has(form.slug) && (
-            <>
-              <div className="admin-field admin-field--full"><hr /><h3>Custom Sections</h3></div>
-              <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>
-                Optional. Add any section this item needs beyond the fixed fields above — any name, any number of
-                sub-sections, and a choice of plain text, a checklist, a table, a list of links, or uploaded files per
-                section. Each one shows up on the public page once it has content. Use the Placement dropdown per
-                section to choose "In the intro area above" (short items like Vision/Mission/Objectives, shown inline
-                near About) vs. "In the accordion below" (the default — everything else, shown as a click-to-expand panel).
-              </p>
-              <div className="admin-field admin-field--full">
-                <CustomSectionEditor
-                  sections={form.customSections || []}
-                  onChange={(next) => set('customSections', next)}
-                  rootSections={form.customSections || []}
-                  parentPath={[]}
-                  onFileUploaded={handleCustomSectionFileUploaded}
-                  onFileRemoved={handleCustomSectionFileRemoved}
-                  onPhotoUploaded={handleCustomSectionPhotoUploaded}
-                  onPhotoRemoved={handleCustomSectionPhotoRemoved}
-                  onGalleryPhotoUploaded={handleCustomSectionGalleryPhotoUploaded}
-                  onGalleryPhotoRemoved={handleCustomSectionGalleryPhotoRemoved}
-                  showPlacementToggle
-                />
-              </div>
-            </>
-          )}
 
           {TABS_SLUGS.has(form.slug) && (
             <>
               <div className="admin-field admin-field--full"><hr /><h3>Tabs</h3></div>
               <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>
-                This item shows a sidebar of tabs on the public page instead of a single scrolling page. Add, rename,
-                reorder, or remove tabs below — click "Edit Content" on a tab to add sections to it (same plain
-                text / checklist / table / links / files editor as everywhere else).
+                This item also shows a sidebar of tabs on the public page, below the Overview section above. Add,
+                rename, reorder, or remove tabs below — click "Edit Content" on a tab to add sections to it (same
+                plain text / checklist / table / links / files editor as everywhere else).
               </p>
               <div className="admin-field admin-field--full">
                 <CustomTabsEditor
@@ -517,7 +814,7 @@ export default function DifferentiatorsAdmin() {
           )}
         </div>
         <div className="admin-form-actions">
-          {editing && <button className="admin-btn admin-btn--ghost" onClick={() => { setEditing(null); setForm(EMPTY); setActiveSubKey(null); setOriginalForm(null); }}>Cancel</button>}
+          {editing && <button className="admin-btn admin-btn--ghost" onClick={() => { setEditing(null); setForm(EMPTY); setActiveSubKey(null); setOriginalForm(null); setEditingWasAlreadyMigrated(true); }}>Cancel</button>}
           <button className="admin-btn admin-btn--primary" onClick={save} disabled={saving}>{saving ? 'Saving…' : editing ? 'Update' : 'Add Item'}</button>
         </div>
       </div>

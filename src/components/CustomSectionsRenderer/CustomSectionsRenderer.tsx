@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { FileText, Link2, X, ChevronDown } from 'lucide-react';
+import { FileText, Link2, X, ChevronDown, Phone, Mail } from 'lucide-react';
 import { hasCustomSectionContent, type CustomSection, type CustomSectionPhoto } from '../../lib/customSections';
 import { parseFlexibleTable, parseLinkList } from '../../lib/structuredTable';
 import FlexibleTable from '../FlexibleTable/FlexibleTable';
@@ -56,8 +56,12 @@ export default function CustomSectionsRenderer({ sections, navOffset = DEFAULT_N
 // compactly inline in the page's existing intro column (next to About),
 // matching the small accent-bar SectionHeading style the old hardcoded
 // Vision/Mission/Objectives blocks used, instead of a full boxed section.
+// Excludes Photo Gallery sections — each column here is narrow
+// (minmax(240px, 1fr), see .dh-brief-grid), which squeezes a gallery's own
+// photo grid down to a single vertical column of thumbnails; those render
+// as their own full-width carousel instead (see CustomSectionsGalleries).
 export function CustomSectionsIntro({ sections }: { sections: CustomSection[] }) {
-  const visible = sections.filter((s) => s.placement === 'intro' && hasCustomSectionContent(s));
+  const visible = sections.filter((s) => s.placement === 'intro' && s.contentType !== 'gallery' && hasCustomSectionContent(s));
   if (visible.length === 0) return null;
   return (
     <div className="dh-brief-grid">
@@ -69,6 +73,31 @@ export function CustomSectionsIntro({ sections }: { sections: CustomSection[] })
           <SectionSubtitle subtitle={section.subtitle} />
           <div className="dh-brief__body">
             <SectionSubtree section={section} />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// Differentiators detail page — Photo Gallery sections never collapse behind
+// the accordion (see CustomSectionsAccordion) and never squeeze into the
+// narrow CustomSectionsIntro grid either (see the comment there): each one
+// gets its own full-width static horizontal strip (see StaticGalleryStrip),
+// positioned between the two — always visible, never vertical.
+export function CustomSectionsGalleries({ sections }: { sections: CustomSection[] }) {
+  const visible = sections.filter((s) => s.contentType === 'gallery' && hasCustomSectionContent(s));
+  if (visible.length === 0) return null;
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-8)', marginTop: 'var(--space-6)' }}>
+      {visible.map((section, index) => (
+        <div key={`${section.id}-${index}`}>
+          <div className="dh-brief__label" style={section.boldHeading ? { fontWeight: 900 } : undefined}>
+            {section.label}
+          </div>
+          <SectionSubtitle subtitle={section.subtitle} />
+          <div style={{ marginTop: 'var(--space-3)' }}>
+            <StaticGalleryStrip photos={section.galleryPhotos || []} />
           </div>
         </div>
       ))}
@@ -201,9 +230,11 @@ export function CustomSectionsPills({ sections }: { sections: CustomSection[] })
 // Differentiators detail page — every section WITHOUT placement:'intro'
 // (the default) renders as a single-open collapsible accordion, matching the
 // old hardcoded In-charge/Academic Projects/Students Benefited/Outcomes/
-// Activities accordions.
+// Activities accordions. A Photo Gallery section is excluded here even when
+// left at the default placement — it always renders in CustomSectionsIntro
+// above instead, never collapsed (see the comment there).
 export function CustomSectionsAccordion({ sections }: { sections: CustomSection[] }) {
-  const visible = sections.filter((s) => s.placement !== 'intro' && hasCustomSectionContent(s));
+  const visible = sections.filter((s) => s.placement !== 'intro' && s.contentType !== 'gallery' && hasCustomSectionContent(s));
   const [openIndex, setOpenIndex] = useState<number | null>(0);
   if (visible.length === 0) return null;
 
@@ -372,6 +403,61 @@ function PillSwitcher({ sections, depth = 0, navOffset = DEFAULT_NAV_OFFSET }: {
 // regardless of its own aspect ratio, with a click-to-enlarge lightbox.
 // Distinct from CustomSectionBody's single round `photo` below, which is a
 // small accent image any OTHER content type can carry alongside it.
+// Shared full-screen click-to-enlarge view for a photo set, with prev/next
+// when there's more than one — used by both GalleryGrid's tiled grid and
+// StaticGalleryStrip's horizontal row below.
+function PhotoLightbox({ photos, index, onClose, onNavigate }: {
+  photos: CustomSectionPhoto[];
+  index: number;
+  onClose: () => void;
+  onNavigate: (index: number) => void;
+}) {
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 1000,
+        display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'var(--space-6)', cursor: 'zoom-out',
+      }}
+    >
+      <button
+        type="button"
+        onClick={onClose}
+        aria-label="Close"
+        style={{ position: 'absolute', top: 'var(--space-4)', right: 'var(--space-4)', background: 'rgba(255,255,255,0.12)', border: 'none', borderRadius: '50%', width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-white)', cursor: 'pointer' }}
+      >
+        <X size={20} strokeWidth={2} />
+      </button>
+      {photos.length > 1 && (
+        <>
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); onNavigate((index - 1 + photos.length) % photos.length); }}
+            aria-label="Previous photo"
+            style={{ position: 'absolute', left: 'var(--space-4)', top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.12)', border: 'none', borderRadius: '50%', width: 44, height: 44, fontSize: '1.5rem', color: 'var(--color-white)', cursor: 'pointer' }}
+          >
+            ‹
+          </button>
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); onNavigate((index + 1) % photos.length); }}
+            aria-label="Next photo"
+            style={{ position: 'absolute', right: 'var(--space-4)', top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.12)', border: 'none', borderRadius: '50%', width: 44, height: 44, fontSize: '1.5rem', color: 'var(--color-white)', cursor: 'pointer' }}
+          >
+            ›
+          </button>
+        </>
+      )}
+      <img
+        src={photos[index].imageUrl}
+        alt=""
+        onClick={(e) => e.stopPropagation()}
+        style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', borderRadius: 'var(--radius-md)', cursor: 'default' }}
+      />
+    </div>
+  );
+}
+
 function GalleryGrid({ photos }: { photos: CustomSectionPhoto[] }) {
   const [lightbox, setLightbox] = useState<number | null>(null);
   const valid = photos.filter((p) => p.imageUrl);
@@ -395,50 +481,45 @@ function GalleryGrid({ photos }: { photos: CustomSectionPhoto[] }) {
           </button>
         ))}
       </div>
-
       {lightbox !== null && (
-        <div
-          onClick={() => setLightbox(null)}
-          style={{
-            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 1000,
-            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'var(--space-6)', cursor: 'zoom-out',
-          }}
-        >
+        <PhotoLightbox photos={valid} index={lightbox} onClose={() => setLightbox(null)} onNavigate={setLightbox} />
+      )}
+    </>
+  );
+}
+
+// Differentiators detail page — a Photo Gallery section's photos as a
+// static horizontal row (manually scrollable, nothing auto-animating),
+// each fixed-width, click to enlarge. Used instead of GalleryGrid's
+// wrapping tile grid specifically so it can't collapse into a single
+// narrow column the way it did squeezed into CustomSectionsIntro (see the
+// comment there) — a continuously auto-scrolling version of this was tried
+// first but didn't render reliably, so this stays static on purpose.
+function StaticGalleryStrip({ photos }: { photos: CustomSectionPhoto[] }) {
+  const [lightbox, setLightbox] = useState<number | null>(null);
+  const valid = photos.filter((p) => p.imageUrl);
+  if (valid.length === 0) return null;
+
+  return (
+    <>
+      <div style={{ display: 'flex', gap: 'var(--space-4)', overflowX: 'auto', paddingBottom: 'var(--space-2)' }}>
+        {valid.map((p, i) => (
           <button
+            key={p.imageUrl}
             type="button"
-            onClick={() => setLightbox(null)}
-            aria-label="Close"
-            style={{ position: 'absolute', top: 'var(--space-4)', right: 'var(--space-4)', background: 'rgba(255,255,255,0.12)', border: 'none', borderRadius: '50%', width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-white)', cursor: 'pointer' }}
+            onClick={() => setLightbox(i)}
+            aria-label={`View photo ${i + 1}`}
+            style={{
+              flex: '0 0 220px', padding: 0, border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)',
+              overflow: 'hidden', cursor: 'zoom-in', aspectRatio: '4 / 3', background: 'var(--color-off-white)',
+            }}
           >
-            <X size={20} strokeWidth={2} />
+            <img src={p.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
           </button>
-          {valid.length > 1 && (
-            <>
-              <button
-                type="button"
-                onClick={(e) => { e.stopPropagation(); setLightbox((i) => (i! - 1 + valid.length) % valid.length); }}
-                aria-label="Previous photo"
-                style={{ position: 'absolute', left: 'var(--space-4)', top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.12)', border: 'none', borderRadius: '50%', width: 44, height: 44, fontSize: '1.5rem', color: 'var(--color-white)', cursor: 'pointer' }}
-              >
-                ‹
-              </button>
-              <button
-                type="button"
-                onClick={(e) => { e.stopPropagation(); setLightbox((i) => (i! + 1) % valid.length); }}
-                aria-label="Next photo"
-                style={{ position: 'absolute', right: 'var(--space-4)', top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.12)', border: 'none', borderRadius: '50%', width: 44, height: 44, fontSize: '1.5rem', color: 'var(--color-white)', cursor: 'pointer' }}
-              >
-                ›
-              </button>
-            </>
-          )}
-          <img
-            src={valid[lightbox].imageUrl}
-            alt=""
-            onClick={(e) => e.stopPropagation()}
-            style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', borderRadius: 'var(--radius-md)', cursor: 'default' }}
-          />
-        </div>
+        ))}
+      </div>
+      {lightbox !== null && (
+        <PhotoLightbox photos={valid} index={lightbox} onClose={() => setLightbox(null)} onNavigate={setLightbox} />
       )}
     </>
   );
@@ -550,6 +631,40 @@ function CustomSectionBodyContent({ section }: { section: CustomSection }) {
               )}
               {card.description && (
                 <p style={{ color: 'var(--color-text)', lineHeight: 1.6, margin: 0, whiteSpace: 'pre-line' }}>{card.description}</p>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+  if (section.contentType === 'contacts') {
+    const contacts = (section.contacts || []).filter((c) => c.role.trim() || c.name.trim() || c.phone.trim() || c.email.trim());
+    if (contacts.length === 0) return null;
+    return (
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 'var(--space-4)' }}>
+        {contacts.map((c, ci) => (
+          <div key={ci} style={{ border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4)', background: 'var(--color-white)' }}>
+            {c.role && (
+              <p style={{ fontSize: 'var(--text-xs)', color: 'var(--color-accent)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', margin: '0 0 var(--space-1)' }}>
+                {c.role}
+              </p>
+            )}
+            {c.name && (
+              <p style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', margin: '0 0 var(--space-2)' }}>
+                {c.name}
+              </p>
+            )}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+              {c.phone && (
+                <a href={`tel:${c.phone}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', color: 'var(--color-text)', fontSize: 'var(--text-sm)' }}>
+                  <Phone size={14} strokeWidth={2} /> {c.phone}
+                </a>
+              )}
+              {c.email && (
+                <a href={`mailto:${c.email}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', color: 'var(--color-text)', fontSize: 'var(--text-sm)' }}>
+                  <Mail size={14} strokeWidth={2} /> {c.email}
+                </a>
               )}
             </div>
           </div>
