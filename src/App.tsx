@@ -95,6 +95,7 @@ const Placements = lazyWithRetry(() => import('./pages/Placements/Placements'));
 const PlacementDetail = lazyWithRetry(() => import('./pages/Placements/PlacementDetail'));
 const NewsAwards = lazyWithRetry(() => import('./pages/NewsAwards/NewsAwards'));
 const Happenings = lazyWithRetry(() => import('./pages/NewsAwards/Happenings'));
+const HappeningDetail = lazyWithRetry(() => import('./pages/NewsAwards/HappeningDetail'));
 const Accreditations = lazyWithRetry(() => import('./pages/NewsAwards/Accreditations'));
 const GalleryPage = lazyWithRetry(() => import('./pages/NewsAwards/Gallery'));
 const SocialMedia = lazyWithRetry(() => import('./pages/NewsAwards/SocialMedia'));
@@ -210,6 +211,7 @@ function PublicApp() {
             <Route path="/events" element={<Events />} />
             <Route path="/news-awards" element={<NewsAwards />} />
             <Route path="/news-awards/happenings" element={<Happenings />} />
+            <Route path="/news-awards/happenings/:id" element={<HappeningDetail />} />
             <Route path="/news-awards/accreditations-awards" element={<Accreditations />} />
             <Route path="/news-awards/gallery" element={<GalleryPage />} />
             <Route path="/news-awards/social-media-handles" element={<SocialMedia />} />
