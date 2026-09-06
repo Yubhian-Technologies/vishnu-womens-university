@@ -6,11 +6,12 @@ import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import { useOrderedCollection, type WithId } from '../../hooks/useCollection';
 import { usePageBanners } from '../../hooks/usePageBanners';
 import { fetchPriorityAttr } from '../../lib/domAttrs';
-import { CustomSectionsIntro, CustomSectionsAccordion, CustomSectionsPlain, CustomSectionsPills } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
+import { CustomSectionsIntro, CustomSectionsAccordion, CustomSectionsPlain, CustomSectionsPills, SectionSubtree } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
+import { hasCustomSectionContent, type CustomSection } from '../../lib/customSections';
 import CustomTabsPage, { type TabItem } from '../../components/CustomTabsPage/CustomTabsPage';
 import FacultyCarousel from '../../components/FacultyCarousel/FacultyCarousel';
 import { hasTabContent, type CustomTab } from '../../lib/customTabs';
-import { DIFFERENTIATOR_CATEGORIES } from '../Admin/sections/DifferentiatorsAdmin';
+import { DIFFERENTIATOR_CATEGORIES, type BlockKey } from '../Admin/sections/DifferentiatorsAdmin';
 import type { DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
 import type { FacultyDoc } from '../Academics/Faculty';
 import type { AicteIdeaLabTeamMemberDoc } from '../Admin/sections/AicteIdeaLabTeamAdmin';
@@ -21,7 +22,6 @@ import { vehicleDesignLab } from './vehicleDesignLab.data';
 import { talentSprintWise } from './talentSprintWise.data';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import '../detail-layout.css';
-import './DifferentiatorDetail.css';
 
 function IicMemberCard({ name, role, size = 96, photoUrl }: { name: string; role: string; size?: number; photoUrl?: string }) {
   return (
@@ -371,6 +371,46 @@ const CATEGORY_ICONS: Record<string, typeof Rocket> = {
   innovation: Rocket, industry: Factory, research: Microscope, global: Globe2, student: GraduationCap,
 };
 
+// Items saved before `description` existed still have their copy in the old
+// `intro`/`about` fields (kept, deprecated, on DifferentiatorItemDoc) — build
+// a throwaway CustomSection from those so the page never renders blank for
+// an item that hasn't been re-saved from the new admin field yet.
+function legacyDescriptionFromItem(item: DifferentiatorItemDoc): CustomSection {
+  const text = (item.about || item.intro || item.desc || '').trim();
+  return { id: 'description', label: 'Description', contentType: 'text', textContent: text };
+}
+
+// Same idea for the old fixed Key Highlights/Facilities/Outcomes/Partners
+// fields — items not yet re-saved from the admin still have their content
+// only there, not as Custom Sections, so synthesize the equivalent sections
+// on every render (rather than requiring a migration step) and merge them in
+// below whatever real Custom Sections the item already has.
+function legacySectionsFromItem(item: DifferentiatorItemDoc): CustomSection[] {
+  const specs: { id: string; label: string; values?: string[] }[] = [
+    { id: 'highlights', label: 'Key Highlights', values: item.highlights },
+    { id: 'facilities', label: 'Facilities & Equipment', values: item.facilities },
+    { id: 'outcomes', label: 'Outcomes & Achievements', values: item.outcomes },
+    { id: 'partners', label: 'Partners', values: item.partners },
+  ];
+  return specs
+    .filter((s) => (s.values || []).filter(Boolean).length > 0)
+    .map((s) => ({ id: s.id, label: s.label, contentType: 'list' as const, listText: (s.values || []).filter(Boolean).join('\n') }));
+}
+
+// Vision/Mission/Objectives are pre-existing named slots (their own field on
+// DifferentiatorItemDoc, see DifferentiatorsAdmin.tsx) — only rendered when
+// they actually have content, same as every other optional section here.
+// Falls back to a same-id Custom Section for an item saved before these
+// became fixed fields (when an admin had typed a "Vision" Custom Section by
+// hand), so it still shows up here instead of looking blank.
+function resolveBlock(item: DifferentiatorItemDoc, key: Exclude<BlockKey, 'description'>): CustomSection | null {
+  const direct = item[key];
+  if (direct && hasCustomSectionContent(direct)) return direct;
+  const legacy = (item.customSections || []).find((s) => s.id === key);
+  if (legacy && hasCustomSectionContent(legacy)) return legacy;
+  return null;
+}
+
 export default function DifferentiatorDetail() {
   const { slug } = useParams<{ slug: string }>();
   const { docs: allItems, loading } = useOrderedCollection<DifferentiatorItemDoc>('differentiatorItems', 'order');
@@ -414,6 +454,23 @@ export default function DifferentiatorDetail() {
 
   const CategoryIcon = CATEGORY_ICONS[category.id] || Rocket;
   const faculty = item.department ? allFaculty.filter((f) => f.department === item.department) : [];
+  // Real Custom Sections plus any not-yet-migrated legacy Highlights/
+  // Facilities/Outcomes/Partners content (see legacySectionsFromItem) —
+  // never duplicated, since a legacy id is skipped once a real section with
+  // that same id exists (i.e. once the admin re-saves the item). Vision/
+  // Mission/Objectives are excluded here — they're their own fixed fields
+  // now (see introBlocks below), rendered separately so they always lead,
+  // in a fixed order, ahead of any other admin-added intro section.
+  const promotedBlockIds = new Set(['vision', 'mission', 'objectives']);
+  const existingSectionIds = new Set((item.customSections || []).map((s) => s.id));
+  const effectiveCustomSections = [
+    ...(item.customSections || []).filter((s) => !promotedBlockIds.has(s.id)),
+    ...legacySectionsFromItem(item).filter((s) => !existingSectionIds.has(s.id)),
+  ];
+  const introBlocks: CustomSection[] = (['vision', 'mission', 'objectives'] as const)
+    .map((key) => resolveBlock(item, key))
+    .filter((s): s is CustomSection => !!s)
+    .map((s) => ({ ...s, placement: 'intro' as const }));
   const heroImage = item.heroImage || heroSlides[0]?.imageUrl;
   const ideaLab = item.slug === 'aicte-idea-lab' ? aicteIdeaLab : null;
   const iic = item.slug === 'institution-innovation-cell' ? institutionInnovationCell : null;
@@ -462,73 +519,34 @@ export default function DifferentiatorDetail() {
       {!iic && !vdl && !wise && !ideaLab && (
       <section className="section bg-white">
         <div className="container">
-          <div className="detail-grid">
-            {/* Main content — same "About the Department" card treatment as
-                the academic department pages (see .dept-about-* in
-                detail-layout.css): accent-bordered gradient card, section
-                label + title header above it. */}
-            <div className="dept-about-main">
-              <div className="dept-about-header">
-                <span className="section-label dept-section-label">Overview</span>
-                <h2 className="section-title">
-                  <span style={{ fontWeight: 400 }}>About </span>
-                  <span style={{ fontWeight: 800 }}>{item.title}</span>
-                </h2>
-              </div>
-
-              <div className="dept-about-card">
-                {item.intro && <p className="dept-about-lead-text">{item.intro}</p>}
-                {item.about && (
-                  <p
-                    className="dept-about-lead-text"
-                    style={{ marginTop: item.intro ? 'var(--space-4)' : 0, color: 'var(--color-text-light)' }}
-                  >
-                    {item.about}
-                  </p>
-                )}
-                {!item.intro && !item.about && <p className="dept-about-lead-text">{item.desc}</p>}
-              </div>
-
-              {/* Admin-defined custom sections (see lib/customSections.ts) —
-                  used by items whose real content used to be hardcoded with
-                  no admin field at all (Ultra Tech CoE, Concrete Canoe Lab,
-                  Dream House Construction Lab), and available to any other
-                  item that adds its own. 'intro'-placed sections (e.g.
-                  Vision/Mission/Objectives) render compactly right here;
-                  everything else renders as a collapsible accordion below. */}
-              <CustomSectionsIntro sections={item.customSections || []} />
-              <CustomSectionsAccordion sections={item.customSections || []} />
+          {/* Same "About the Department" card treatment as the academic
+              department pages (see .dept-about-* in detail-layout.css):
+              accent-bordered gradient card, section label + title header
+              above it. Full-width now — everything beyond the description
+              (Vision/Mission/Objectives, Key Highlights, Facilities,
+              Outcomes, Partners, Contacts, ...) is just Custom Sections, so
+              there's no more fixed sidebar. */}
+          <div className="dept-about-main">
+            <div className="dept-about-header">
+              <span className="section-label dept-section-label">Overview</span>
+              <h2 className="section-title">
+                <span style={{ fontWeight: 400 }}>About </span>
+                <span style={{ fontWeight: 800 }}>{item.title}</span>
+              </h2>
             </div>
 
-            {/* Sidebar: key highlights — editorial "spec sheet" card */}
-            <div className="detail-sidebar">
-              <aside className="dh-card">
-                <div className="dh-card__head">
-                  <h3 className="dh-card__title">Key Highlights</h3>
-                  {(item.highlights || []).length > 0 && (
-                    <span className="dh-card__count">{(item.highlights || []).length}</span>
-                  )}
-                </div>
-                <ol className="dh-list">
-                  {(item.highlights || []).map((h, i) => (
-                    <li key={h} className="dh-list__row">
-                      <span className="dh-list__num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
-                      <span className="dh-list__text">{h}</span>
-                    </li>
-                  ))}
-                </ol>
-                {item.partners && item.partners.length > 0 && (
-                  <div className="dh-card__foot">
-                    <p className="dh-card__foot-label">In partnership with</p>
-                    <div className="dh-chips">
-                      {item.partners.map((p) => (
-                        <span key={p} className="dh-chip">{p}</span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </aside>
+            <div className="dept-about-card">
+              <SectionSubtree section={item.description && hasCustomSectionContent(item.description) ? item.description : legacyDescriptionFromItem(item)} />
             </div>
+
+            {/* Vision/Mission/Objectives (introBlocks — fixed fields, only
+                rendered when filled in) lead, in that order, followed by any
+                other admin-added 'intro'-placed Custom Section; everything
+                else (Key Highlights, Facilities, Outcomes, Partners,
+                Contacts, ...) renders as a collapsible accordion below (see
+                lib/customSections.ts). */}
+            <CustomSectionsIntro sections={[...introBlocks, ...effectiveCustomSections]} />
+            <CustomSectionsAccordion sections={effectiveCustomSections} />
           </div>
         </div>
       </section>
@@ -580,51 +598,6 @@ export default function DifferentiatorDetail() {
         <div id="faculty" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
           <FacultyCarousel faculty={faculty} title="Faculty" viewMoreLink="/faculty" />
         </div>
-      )}
-
-      {/* Facilities */}
-      {item.facilities && item.facilities.length > 0 && (
-        <section className="section bg-off-white">
-          <div className="container">
-            <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label">Infrastructure</span>
-              <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Facilities & Equipment</h2>
-            </div>
-            <div className="diff-detail-card-grid diff-detail-card-grid--facilities">
-              {item.facilities.map((f) => (
-                <div key={f} className="diff-detail-card">
-                  <div className="diff-detail-card-dot" />
-                  <span className="diff-detail-card-text" style={{ fontWeight: 500 }}>{f}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Outcomes — background alternates with whether Facilities rendered
-          just above it (hardcoding bg-white here assumed Facilities, which
-          is bg-off-white, always precedes it; when an item has no facilities
-          data — e.g. TalentSprint – WISE — Outcomes landed directly under
-          Overview with the *same* bg-white and no visual break between them,
-          which read as a single oversized blank gap rather than two sections). */}
-      {item.outcomes && item.outcomes.length > 0 && (
-        <section className={`section ${item.facilities && item.facilities.length > 0 ? 'bg-white' : 'bg-off-white'}`}>
-          <div className="container">
-            <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label">Impact</span>
-              <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Outcomes & Achievements</h2>
-            </div>
-            <div className="dh-outcome-grid">
-              {item.outcomes.map((o, i) => (
-                <div key={o} className="dh-outcome">
-                  <span className="dh-outcome__num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
-                  <p className="dh-outcome__text">{o}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
       )}
 
       {/* CTA */}

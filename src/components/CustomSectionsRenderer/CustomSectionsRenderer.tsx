@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { FileText, Link2, X, ChevronDown } from 'lucide-react';
+import { FileText, Link2, X, ChevronDown, Phone, Mail } from 'lucide-react';
 import { hasCustomSectionContent, type CustomSection, type CustomSectionPhoto } from '../../lib/customSections';
 import { parseFlexibleTable, parseLinkList } from '../../lib/structuredTable';
 import FlexibleTable from '../FlexibleTable/FlexibleTable';
@@ -550,6 +550,40 @@ function CustomSectionBodyContent({ section }: { section: CustomSection }) {
               )}
               {card.description && (
                 <p style={{ color: 'var(--color-text)', lineHeight: 1.6, margin: 0, whiteSpace: 'pre-line' }}>{card.description}</p>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+  if (section.contentType === 'contacts') {
+    const contacts = (section.contacts || []).filter((c) => c.role.trim() || c.name.trim() || c.phone.trim() || c.email.trim());
+    if (contacts.length === 0) return null;
+    return (
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 'var(--space-4)' }}>
+        {contacts.map((c, ci) => (
+          <div key={ci} style={{ border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4)', background: 'var(--color-white)' }}>
+            {c.role && (
+              <p style={{ fontSize: 'var(--text-xs)', color: 'var(--color-accent)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', margin: '0 0 var(--space-1)' }}>
+                {c.role}
+              </p>
+            )}
+            {c.name && (
+              <p style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', margin: '0 0 var(--space-2)' }}>
+                {c.name}
+              </p>
+            )}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+              {c.phone && (
+                <a href={`tel:${c.phone}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', color: 'var(--color-text)', fontSize: 'var(--text-sm)' }}>
+                  <Phone size={14} strokeWidth={2} /> {c.phone}
+                </a>
+              )}
+              {c.email && (
+                <a href={`mailto:${c.email}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', color: 'var(--color-text)', fontSize: 'var(--text-sm)' }}>
+                  <Mail size={14} strokeWidth={2} /> {c.email}
+                </a>
               )}
             </div>
           </div>

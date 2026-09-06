@@ -15,6 +15,7 @@ const CONTENT_TYPE_LABELS: Record<CustomSectionContentType, string> = {
   person: 'Panel View',
   gallery: 'Photo Gallery',
   imageCards: 'Images (photo + caption each)',
+  contacts: 'Contacts (role, name, phone, email)',
 };
 
 interface Props {
@@ -140,6 +141,25 @@ export default function CustomSectionEditor({
     if (onImageCardPhotoRemoved) { onImageCardPhotoRemoved(path, ci); return; }
     if (!confirm('Remove this image? This cannot be undone.')) return;
     updateSection(si, { imageCards: (sections[si].imageCards || []).filter((_, i) => i !== ci) });
+  };
+
+  const addContact = (si: number) => {
+    const contacts = sections[si].contacts || [];
+    updateSection(si, { contacts: [...contacts, { role: '', name: '', phone: '', email: '' }] });
+  };
+  const updateContactField = (si: number, ci: number, field: 'role' | 'name' | 'phone' | 'email', value: string) => {
+    const contacts = (sections[si].contacts || []).map((c, i) => (i === ci ? { ...c, [field]: value } : c));
+    updateSection(si, { contacts });
+  };
+  const moveContact = (si: number, ci: number, dir: -1 | 1) => {
+    const contacts = [...(sections[si].contacts || [])];
+    const target = ci + dir;
+    if (target < 0 || target >= contacts.length) return;
+    [contacts[ci], contacts[target]] = [contacts[target], contacts[ci]];
+    updateSection(si, { contacts });
+  };
+  const removeContact = (si: number, ci: number) => {
+    updateSection(si, { contacts: (sections[si].contacts || []).filter((_, i) => i !== ci) });
   };
 
   const handleTableImport = async (si: number, file: File) => {
@@ -479,6 +499,43 @@ export default function CustomSectionEditor({
                   </div>
                 ))}
                 <button type="button" className="admin-btn admin-btn--sm" onClick={() => addImageCard(si)}>+ Add Image</button>
+              </div>
+            )}
+
+            {s.contentType === 'contacts' && (
+              <div>
+                {(s.contacts || []).map((c, ci) => (
+                  <div key={ci} style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
+                    <input
+                      value={c.role}
+                      onChange={(e) => updateContactField(si, ci, 'role', e.target.value)}
+                      placeholder="Role (e.g. Coordinator)"
+                      style={{ flex: 1, minWidth: 140 }}
+                    />
+                    <input
+                      value={c.name}
+                      onChange={(e) => updateContactField(si, ci, 'name', e.target.value)}
+                      placeholder="Name"
+                      style={{ flex: 1, minWidth: 140, fontWeight: 700 }}
+                    />
+                    <input
+                      value={c.phone}
+                      onChange={(e) => updateContactField(si, ci, 'phone', e.target.value)}
+                      placeholder="Phone"
+                      style={{ flex: 1, minWidth: 140 }}
+                    />
+                    <input
+                      value={c.email}
+                      onChange={(e) => updateContactField(si, ci, 'email', e.target.value)}
+                      placeholder="Email"
+                      style={{ flex: 1, minWidth: 160 }}
+                    />
+                    <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveContact(si, ci, -1)} disabled={ci === 0} title="Move up">↑</button>
+                    <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveContact(si, ci, 1)} disabled={ci === (s.contacts?.length || 0) - 1} title="Move down">↓</button>
+                    <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeContact(si, ci)}>✕</button>
+                  </div>
+                ))}
+                <button type="button" className="admin-btn admin-btn--sm" onClick={() => addContact(si)}>+ Add Contact</button>
               </div>
             )}
 
