@@ -1074,22 +1074,6 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                         <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{displayedTotalOffers}</span></div>
                         <div className="dept-stat-tile__label">Total No. of Offers</div>
                       </div>
-                      <div className="dept-stat-tile">
-                        <button
-                          type="button"
-                          className="dept-stat-tile__circle dept-stat-tile__circle--link"
-                          onClick={() => document.getElementById('placement-records-table')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-                        >
-                          <span className="dept-stat-tile__value">Package wise</span>
-                        </button>
-                        <div className="dept-stat-tile__label">Top 10 Companies List</div>
-                      </div>
-                      {/* computePlacementStats returns these as null when the
-                          imported rows have no column that looks like a
-                          package/CTC figure — hide the tile entirely rather
-                          than showing a placeholder "—", since that read as a
-                          broken/missing stat instead of "not applicable for
-                          this year's data". */}
                       {placementYearStats.averageSalary != null && (
                         <div className="dept-stat-tile">
                           <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.averageSalary}</span></div>
@@ -1334,97 +1318,143 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
 
       {/* Laboratories — premium unified-card carousel, 40:60 text/image
           split, one slide visible at a time, auto-advancing. */}
-      {hasLabs && (
-        <section id="labs" className="dept-labs-section" style={{ scrollMarginTop: NAV_OFFSET }}>
-          <div className="container">
-            <div className="dept-labs-header">
-              <div className="dept-labs-title-wrap">
-                <span className="section-label dept-section-label">State-of-the-Art Infrastructure</span>
-                <h2 className="section-title">Specialized Laboratories</h2>
-                <p className="section-desc" style={{ margin: '0.5rem 0 0 0' }}>
-                  Industry-aligned experimental facilities engineered for hands-on technical immersion, advanced computing, and multidisciplinary project incubation.
-                </p>
-              </div>
-            </div>
-
-            <div
-              className="dept-lab-carousel"
-              onMouseEnter={() => setLabAutoPaused(true)}
-              onMouseLeave={() => setLabAutoPaused(false)}
-              onTouchStart={() => setLabAutoPaused(true)}
-              onTouchEnd={() => pauseLabAutoTemporarily()}
-            >
-              <div className="dept-lab-rows" ref={labScrollRef}>
-                {shared.labs.map((lab, li) => (
-                  <div key={li} className="dept-lab-slide">
-                    <div className="dept-lab-slide-text">
-                      <span className="dept-lab-slide-number">
-                        {String(li + 1).padStart(2, '0')} / {String(shared.labs.length).padStart(2, '0')}
-                      </span>
-                      <Microscope size={26} strokeWidth={2} className="dept-lab-slide-icon" />
-                      <h3 className="dept-lab-slide-title">{lab.name}</h3>
-                      {lab.description && (
-                        <p className="dept-lab-slide-desc">{lab.description}</p>
-                      )}
-                      {lab.pdfUrl && (
-                        <a href={lab.pdfUrl} target="_blank" rel="noopener noreferrer" className="dept-lab-slide-cta">
-                          <span>Explore Lab</span>
-                          <ArrowRight size={15} strokeWidth={2.5} />
-                        </a>
-                      )}
-                    </div>
-                    <div className="dept-lab-slide-media">
-                      <SmoothImage
-                        src={lab.imageUrl || shared.heroImage}
-                        alt={lab.name}
-                        className="dept-lab-slide-img"
-                      />
-                    </div>
-                  </div>
-                ))}
+      {hasLabs && (() => {
+        const hasLabImages = shared.labs.some((l) => Boolean(l.imageUrl && l.imageUrl.trim()));
+        return (
+          <section id="labs" className="dept-labs-section" style={{ scrollMarginTop: NAV_OFFSET }}>
+            <div className="container">
+              <div className="dept-labs-header">
+                <div className="dept-labs-title-wrap">
+                  <span className="section-label dept-section-label">State-of-the-Art Infrastructure</span>
+                  <h2 className="section-title">Specialized Laboratories</h2>
+                  <p className="section-desc" style={{ margin: '0.5rem 0 0 0' }}>
+                    Industry-aligned experimental facilities engineered for hands-on technical immersion, advanced computing, and multidisciplinary project incubation.
+                  </p>
+                </div>
+                <div className="dept-labs-count-pill">
+                  <span className="dept-labs-count-dot" />
+                  <span>{shared.labs.length} Active Facilities</span>
+                </div>
               </div>
 
-              {shared.labs.length > 1 && (
-                <div className="dept-lab-carousel-controls">
-                  <div className="dept-lab-carousel-dots" role="tablist" aria-label="Laboratory slides">
+              {hasLabImages ? (
+                <div
+                  className="dept-lab-carousel"
+                  onMouseEnter={() => setLabAutoPaused(true)}
+                  onMouseLeave={() => setLabAutoPaused(false)}
+                  onTouchStart={() => setLabAutoPaused(true)}
+                  onTouchEnd={() => pauseLabAutoTemporarily()}
+                >
+                  <div className="dept-lab-rows" ref={labScrollRef}>
                     {shared.labs.map((lab, li) => (
-                      <button
-                        key={lab.name + li}
-                        type="button"
-                        role="tab"
-                        aria-selected={activeLabIndex === li}
-                        aria-label={`Show ${lab.name}`}
-                        className={`dept-lab-dot${activeLabIndex === li ? ' active' : ''}`}
-                        onClick={() => scrollToLabIndex(li)}
-                      />
+                      <div key={li} className="dept-lab-slide">
+                        <div className="dept-lab-slide-text">
+                          <span className="dept-lab-slide-number">
+                            {String(li + 1).padStart(2, '0')} / {String(shared.labs.length).padStart(2, '0')}
+                          </span>
+                          <Microscope size={26} strokeWidth={2} className="dept-lab-slide-icon" />
+                          <h3 className="dept-lab-slide-title">{lab.name}</h3>
+                          {lab.description && (
+                            <p className="dept-lab-slide-desc">{lab.description}</p>
+                          )}
+                          {lab.pdfUrl && (
+                            <a href={lab.pdfUrl} target="_blank" rel="noopener noreferrer" className="dept-lab-slide-cta">
+                              <span>Explore Lab</span>
+                              <ArrowRight size={15} strokeWidth={2.5} />
+                            </a>
+                          )}
+                        </div>
+                        <div className="dept-lab-slide-media">
+                          <SmoothImage
+                            src={lab.imageUrl || shared.heroImage}
+                            alt={lab.name}
+                            className="dept-lab-slide-img"
+                          />
+                        </div>
+                      </div>
                     ))}
                   </div>
-                  <div className="dept-lab-carousel-arrows" role="group" aria-label="Laboratories carousel navigation">
-                    <button
-                      type="button"
-                      className="dept-lab-carousel-arrow-btn"
-                      onClick={() => scrollLabsBy(-1)}
-                      disabled={!canScrollLabsLeft}
-                      aria-label="Previous laboratory"
-                    >
-                      <ArrowLeft size={17} strokeWidth={2.4} />
-                    </button>
-                    <button
-                      type="button"
-                      className="dept-lab-carousel-arrow-btn"
-                      onClick={() => scrollLabsBy(1)}
-                      disabled={!canScrollLabsRight}
-                      aria-label="Next laboratory"
-                    >
-                      <ArrowRight size={17} strokeWidth={2.4} />
-                    </button>
-                  </div>
+
+                  {shared.labs.length > 1 && (
+                    <div className="dept-lab-carousel-controls">
+                      <div className="dept-lab-carousel-dots" role="tablist" aria-label="Laboratory slides">
+                        {shared.labs.map((lab, li) => (
+                          <button
+                            key={lab.name + li}
+                            type="button"
+                            role="tab"
+                            aria-selected={activeLabIndex === li}
+                            aria-label={`Show ${lab.name}`}
+                            className={`dept-lab-dot${activeLabIndex === li ? ' active' : ''}`}
+                            onClick={() => scrollToLabIndex(li)}
+                          />
+                        ))}
+                      </div>
+                      <div className="dept-lab-carousel-arrows" role="group" aria-label="Laboratories carousel navigation">
+                        <button
+                          type="button"
+                          className="dept-lab-carousel-arrow-btn"
+                          onClick={() => scrollLabsBy(-1)}
+                          disabled={!canScrollLabsLeft}
+                          aria-label="Previous laboratory"
+                        >
+                          <ArrowLeft size={17} strokeWidth={2.4} />
+                        </button>
+                        <button
+                          type="button"
+                          className="dept-lab-carousel-arrow-btn"
+                          onClick={() => scrollLabsBy(1)}
+                          disabled={!canScrollLabsRight}
+                          aria-label="Next laboratory"
+                        >
+                          <ArrowRight size={17} strokeWidth={2.4} />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="dept-labs-grid">
+                  {shared.labs.map((lab, li) => {
+                    const indexNum = String(li + 1).padStart(2, '0');
+                    return (
+                      <div key={li} className="dept-lab-card">
+                        <div>
+                          <div className="dept-lab-card-top">
+                            <span className="dept-lab-index-tag">{indexNum}</span>
+                            <div className="dept-lab-icon-wrap">
+                              <Microscope size={18} strokeWidth={2} />
+                            </div>
+                          </div>
+                          <div className="dept-lab-body">
+                            <span className="dept-lab-overline">Practical & Research Facility</span>
+                            <h3 className="dept-lab-title">{lab.name}</h3>
+                            <p className="dept-lab-spec-desc">
+                              {lab.description || 'Equipped with high-performance workstations and dedicated experimental apparatus.'}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="dept-lab-footer">
+                          {lab.pdfUrl ? (
+                            <a href={lab.pdfUrl} target="_blank" rel="noopener noreferrer" className="dept-lab-pdf-btn">
+                              <span className="dept-lab-pdf-btn-label">Lab Manual & Specs</span>
+                              <span className="dept-btn-arrow-circle">
+                                <ArrowRight size={12} strokeWidth={2.5} />
+                              </span>
+                            </a>
+                          ) : (
+                            <span className="dept-lab-status-tag">Active Research Facility</span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
-          </div>
-        </section>
-      )}
+          </section>
+        );
+      })()}
 
       {/* ===== Unified Programme Hub ===== */}
       <section id="program-toggle" className="programme-hub-section" style={{ scrollMarginTop: NAV_OFFSET }}>

@@ -197,7 +197,7 @@ const navItemsData: NavItem[] = [
       {
         groupLabel: 'Research Info',
         items: [
-          { label: 'About R&D', path: '/research/about-rd' },
+          { label: 'R&D', path: '/research/about-rd' },
           { label: 'Research Advisory Committee', path: '/research/research-advisory-committee' },
           { label: 'Research Ethics Committee', path: '/research/research-ethics-committee' },
           { label: 'Intellectual Property Rights (IPR)', path: '/research/ipr-committee' },
@@ -272,7 +272,7 @@ const navItemsData: NavItem[] = [
         items: [
           { label: 'Upcoming Events', path: '/news-awards/happenings#upcoming-events' },
           { label: 'Recent Events', path: '/news-awards/happenings#recent-events' },
-          { label: 'Photo & Video Gallery', path: '/news-awards/gallery' },
+          { label: 'Gallery', path: '/news-awards/gallery' },
           { label: 'Vishnu Era Newsletter', path: 'https://www.srivishnu.edu.in/vishnu-era/', external: true },
           { label: 'Prathibha Magazine', path: 'https://heyzine.com/flip-book/088b7b5629.html#page/54', external: true },
         ],

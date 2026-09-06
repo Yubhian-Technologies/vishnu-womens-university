@@ -158,6 +158,9 @@ export interface ProgramDoc {
   slug: string;
   name: string;
   shortName: string;
+  // Optional hero subtitle shown under the programme name in the page hero
+  // (ProgramDetail.tsx). Edited via the "Hero Tagline" field in the form.
+  description: string;
   icon: string;
   category: string;
   intake: number;
@@ -265,7 +268,7 @@ export interface ProgramDoc {
 }
 
 const EMPTY: Omit<ProgramDoc, 'id'> = {
-  slug: '', name: '', shortName: '', icon: 'GraduationCap', category: 'btech', intake: 60,
+  slug: '', name: '', shortName: '', description: '', icon: 'GraduationCap', category: 'btech', intake: 60,
   established: '', accreditation: '', hod: '', department: '', fee: '', heroImage: '', storagePath: '', about: '',
   highlights: [], labs: [], outcomes: [], semesters: [],
   vision: '', mission: [], coreValues: [], peos: [], pos: [], psos: [], wks: [],
@@ -615,7 +618,7 @@ export default function ProgramsAdmin() {
     document.querySelector('.admin-main')?.scrollTo({ top: 0, behavior: 'smooth' });
     setEditing(p.id);
     const next: Omit<ProgramDoc, 'id'> = {
-      slug: p.slug, name: p.name, shortName: p.shortName, icon: p.icon || 'GraduationCap',
+      slug: p.slug, name: p.name, shortName: p.shortName, description: p.description || '', icon: p.icon || 'GraduationCap',
       category: p.category, intake: p.intake, established: p.established, accreditation: p.accreditation,
       hod: p.hod, department: p.department || '', fee: p.fee || '', heroImage: p.heroImage, storagePath: p.storagePath, about: p.about,
       highlights: p.highlights || [],
@@ -683,6 +686,13 @@ export default function ProgramsAdmin() {
           <div className="admin-field">
             <label htmlFor="field-short-name">Short Name</label>
             <input id="field-short-name" value={form.shortName} onChange={(e) => set('shortName', e.target.value)} placeholder="B.Tech CSE" />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label htmlFor="field-hero-tagline">Hero Tagline</label>
+            <textarea id="field-hero-tagline" rows={2} value={form.description} onChange={(e) => set('description', e.target.value)} placeholder="Short line shown under the programme name in the page hero" />
+            <p className="admin-field__hint" style={{ marginTop: '0.25rem' }}>
+              Optional. The hero title is the <strong>Full Name</strong> above; the hero image is set in <strong>Hero Banners → Programs</strong>.
+            </p>
           </div>
           <div className="admin-field">
             <label htmlFor="field-slug-used-in-url">Slug (used in URL) *</label>

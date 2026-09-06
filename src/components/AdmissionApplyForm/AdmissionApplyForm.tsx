@@ -359,130 +359,143 @@ export default function AdmissionApplyForm() {
 
       {step === 'details' ? (
         <form onSubmit={handleSendOtp} className="adm-form" noValidate>
-          <div className="adm-form-group">
-            <label>First Name</label>
-            <input
-              type="text" name="firstName" placeholder="First name"
-              value={requestForm.firstName} onChange={handleRequestFormChange}
-              className={requestErrors.firstName ? 'has-error' : undefined}
-              aria-invalid={!!requestErrors.firstName}
-            />
-            {requestErrors.firstName && <span className="adm-form-error">{requestErrors.firstName}</span>}
-          </div>
-          <div className="adm-form-group">
-            <label>Last Name</label>
-            <input
-              type="text" name="lastName" placeholder="Last name"
-              value={requestForm.lastName} onChange={handleRequestFormChange}
-              className={requestErrors.lastName ? 'has-error' : undefined}
-              aria-invalid={!!requestErrors.lastName}
-            />
-            {requestErrors.lastName && <span className="adm-form-error">{requestErrors.lastName}</span>}
-          </div>
-          <div className="adm-form-group">
-            <label>Mobile Number</label>
-            <input
-              type="tel" name="phone" placeholder="+91 98765 43210"
-              value={requestForm.phone} onChange={handleRequestFormChange}
-              className={requestErrors.phone ? 'has-error' : undefined}
-              aria-invalid={!!requestErrors.phone}
-            />
-            {requestErrors.phone && <span className="adm-form-error">{requestErrors.phone}</span>}
-          </div>
-          <div className="adm-form-group">
-            <label>Degree Level</label>
-            <select
-              name="degreeLevel"
-              value={requestForm.degreeLevel}
-              onChange={(e) => {
-                const val = e.target.value;
-                setRequestForm((prev) => ({
-                  ...prev,
-                  degreeLevel: val,
-                  program: '',
-                }));
-                setRequestErrors((prev) => ({
-                  ...prev,
-                  degreeLevel: undefined,
-                  program: undefined,
-                }));
-              }}
-              className={requestErrors.degreeLevel ? 'has-error' : undefined}
-              aria-invalid={!!requestErrors.degreeLevel}
-            >
-              <option value="">Select degree level...</option>
-              {PROGRAM_LEVEL_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-            {requestErrors.degreeLevel && <span className="adm-form-error">{requestErrors.degreeLevel}</span>}
+          <div className="adm-form-row">
+            <div className="adm-form-group">
+              <label>First Name</label>
+              <input
+                type="text" name="firstName" placeholder="First name"
+                value={requestForm.firstName} onChange={handleRequestFormChange}
+                className={requestErrors.firstName ? 'has-error' : undefined}
+                aria-invalid={!!requestErrors.firstName}
+              />
+              {requestErrors.firstName && <span className="adm-form-error">{requestErrors.firstName}</span>}
+            </div>
+            <div className="adm-form-group">
+              <label>Last Name</label>
+              <input
+                type="text" name="lastName" placeholder="Last name"
+                value={requestForm.lastName} onChange={handleRequestFormChange}
+                className={requestErrors.lastName ? 'has-error' : undefined}
+                aria-invalid={!!requestErrors.lastName}
+              />
+              {requestErrors.lastName && <span className="adm-form-error">{requestErrors.lastName}</span>}
+            </div>
           </div>
 
-          <div className="adm-form-group">
-            <label>Specific Program / Specialization</label>
-            <select
-              name="program"
-              value={requestForm.program}
-              onChange={handleRequestFormChange}
-              disabled={!requestForm.degreeLevel}
-              className={requestErrors.program ? 'has-error' : undefined}
-              aria-invalid={!!requestErrors.program}
-            >
-              <option value="">
-                {requestForm.degreeLevel ? 'Select a program / specialization...' : 'Select degree level first'}
-              </option>
-              {requestForm.degreeLevel &&
-                (SPECIFIC_PROGRAMS[requestForm.degreeLevel] || []).map((p) => (
-                  <option key={p} value={p}>
-                    {p}
+          <div className="adm-form-row">
+            <div className="adm-form-group">
+              <label>Mobile Number</label>
+              <input
+                type="tel" name="phone" placeholder="+91 98765 43210"
+                value={requestForm.phone} onChange={handleRequestFormChange}
+                className={requestErrors.phone ? 'has-error' : undefined}
+                aria-invalid={!!requestErrors.phone}
+              />
+              {requestErrors.phone && <span className="adm-form-error">{requestErrors.phone}</span>}
+            </div>
+            <div className="adm-form-group">
+              <label>Degree Level</label>
+              <select
+                name="degreeLevel"
+                value={requestForm.degreeLevel}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setRequestForm((prev) => ({
+                    ...prev,
+                    degreeLevel: val,
+                    program: '',
+                  }));
+                  setRequestErrors((prev) => ({
+                    ...prev,
+                    degreeLevel: undefined,
+                    program: undefined,
+                  }));
+                }}
+                className={requestErrors.degreeLevel ? 'has-error' : undefined}
+                aria-invalid={!!requestErrors.degreeLevel}
+              >
+                <option value="">Select degree level...</option>
+                {PROGRAM_LEVEL_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
                   </option>
                 ))}
-            </select>
-            {requestErrors.program && <span className="adm-form-error">{requestErrors.program}</span>}
+              </select>
+              {requestErrors.degreeLevel && <span className="adm-form-error">{requestErrors.degreeLevel}</span>}
+            </div>
           </div>
 
-          {isCustomProgramRequired(requestForm) && (
+          <div className="adm-form-row">
             <div className="adm-form-group">
-              <label>Specify Program Name</label>
-              <input
-                type="text"
-                name="customProgram"
-                placeholder="Enter custom program / specialization name..."
-                value={requestForm.customProgram}
+              <label>Specific Program / Specialization</label>
+              <select
+                name="program"
+                value={requestForm.program}
                 onChange={handleRequestFormChange}
-                className={requestErrors.customProgram ? 'has-error' : undefined}
-                aria-invalid={!!requestErrors.customProgram}
-              />
-              {requestErrors.customProgram && (
-                <span className="adm-form-error">{requestErrors.customProgram}</span>
-              )}
+                disabled={!requestForm.degreeLevel}
+                className={requestErrors.program ? 'has-error' : undefined}
+                aria-invalid={!!requestErrors.program}
+              >
+                <option value="">
+                  {requestForm.degreeLevel ? 'Select a program...' : 'Select degree first'}
+                </option>
+                {requestForm.degreeLevel &&
+                  (SPECIFIC_PROGRAMS[requestForm.degreeLevel] || []).map((p) => (
+                    <option key={p} value={p}>
+                      {p}
+                    </option>
+                  ))}
+              </select>
+              {requestErrors.program && <span className="adm-form-error">{requestErrors.program}</span>}
             </div>
-          )}
-          <div className="adm-form-group">
-            <label>Purpose</label>
-            <select
-              name="purpose" value={requestForm.purpose} onChange={handleRequestFormChange}
-              className={requestErrors.purpose ? 'has-error' : undefined}
-              aria-invalid={!!requestErrors.purpose}
-            >
-              <option value="">Select purpose...</option>
-              {PURPOSE_OPTIONS.map((p) => <option key={p}>{p}</option>)}
-            </select>
-            {requestErrors.purpose && <span className="adm-form-error">{requestErrors.purpose}</span>}
-          </div>
-          {requestForm.purpose === 'Other' && (
+
             <div className="adm-form-group">
-              <label>Please specify</label>
-              <input
-                type="text" name="purposeOther" placeholder="Tell us your purpose"
-                value={requestForm.purposeOther} onChange={handleRequestFormChange}
-                className={requestErrors.purposeOther ? 'has-error' : undefined}
-                aria-invalid={!!requestErrors.purposeOther}
-                autoFocus
-              />
-              {requestErrors.purposeOther && <span className="adm-form-error">{requestErrors.purposeOther}</span>}
+              <label>Purpose</label>
+              <select
+                name="purpose" value={requestForm.purpose} onChange={handleRequestFormChange}
+                className={requestErrors.purpose ? 'has-error' : undefined}
+                aria-invalid={!!requestErrors.purpose}
+              >
+                <option value="">Select purpose...</option>
+                {PURPOSE_OPTIONS.map((p) => <option key={p}>{p}</option>)}
+              </select>
+              {requestErrors.purpose && <span className="adm-form-error">{requestErrors.purpose}</span>}
+            </div>
+          </div>
+
+          {(isCustomProgramRequired(requestForm) || requestForm.purpose === 'Other') && (
+            <div className="adm-form-row">
+              {isCustomProgramRequired(requestForm) && (
+                <div className="adm-form-group">
+                  <label>Specify Program Name</label>
+                  <input
+                    type="text"
+                    name="customProgram"
+                    placeholder="Enter custom program name..."
+                    value={requestForm.customProgram}
+                    onChange={handleRequestFormChange}
+                    className={requestErrors.customProgram ? 'has-error' : undefined}
+                    aria-invalid={!!requestErrors.customProgram}
+                  />
+                  {requestErrors.customProgram && (
+                    <span className="adm-form-error">{requestErrors.customProgram}</span>
+                  )}
+                </div>
+              )}
+
+              {requestForm.purpose === 'Other' && (
+                <div className="adm-form-group">
+                  <label>Please specify</label>
+                  <input
+                    type="text" name="purposeOther" placeholder="Tell us your purpose"
+                    value={requestForm.purposeOther} onChange={handleRequestFormChange}
+                    className={requestErrors.purposeOther ? 'has-error' : undefined}
+                    aria-invalid={!!requestErrors.purposeOther}
+                    autoFocus
+                  />
+                  {requestErrors.purposeOther && <span className="adm-form-error">{requestErrors.purposeOther}</span>}
+                </div>
+              )}
             </div>
           )}
 
