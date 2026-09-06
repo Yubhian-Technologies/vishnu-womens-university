@@ -1,14 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useLocation, Navigate } from 'react-router-dom';
-import { Check, Microscope, Sparkles, FileText, ArrowLeft, ArrowRight, User, Building2, BookOpen, GraduationCap, Award, Calendar, Users } from 'lucide-react';
+import { Check, Microscope, Sparkles, FileText, ArrowLeft, ArrowRight, BookOpen, GraduationCap, Award, Calendar, Users } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import ProgrammeStructure from '../../components/ProgrammeStructure/ProgrammeStructure';
 import NewsEventsTabs, { type NewsEventsCategory } from '../../components/NewsEventsTabs/NewsEventsTabs';
 import SEO from '../../components/SEO/SEO';
 import FacultyCarousel from '../../components/FacultyCarousel/FacultyCarousel';
-import { PlacementRecordCard, type PlacementItem } from '../../components/ui/marquee-01';
-import { Marquee } from '../../components/ui/marquee-01-utils/marquee';
+import TestimonialMarquee, { type PlacementItem } from '../../components/ui/marquee-01';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useEapcetCode } from '../../hooks/useContentBlocks';
 import { smoothScrollTo } from '../../lib/smoothScroll';
@@ -19,8 +18,11 @@ import { normalizeLab, normalizeMindMapImages, type ProgramDoc, type NewsEventsY
 import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import type { FacultyDoc } from './Faculty';
 import { parseFlexibleTable, parseProjectAccordion } from '../../lib/structuredTable';
-import { sortPlacementRows, computePlacementStats, findPackageColumnIndex, formatPackageCell } from '../../lib/placementRecords';
+import { resolveRndYears, rndYearHasContent } from '../../components/RndSection/RndSection';
+import { sortPlacementRows, computePlacementStats, findPackageColumnIndex, findCompanyColumnIndex, formatPackageCell } from '../../lib/placementRecords';
 import { computeInternshipStats, findPeriodColumnIndex } from '../../lib/internshipRecords';
+import { getDeptBatchStats, findDeptBatchStatsForYearLabel } from '../../lib/departmentPlacementBridge';
+import { usePlacementYears } from '../Placements/usePlacementYears';
 import { hasCustomSectionContent } from '../../lib/customSections';
 import CustomSectionsRenderer from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import { resolveProgramIcon } from '../../lib/programIcons';
@@ -35,111 +37,6 @@ const NAV_OFFSET = 'calc(var(--topbar-height) + var(--header-height) + 1rem)';
 // department (see the scroll-spy effect below for why this is a static
 // list rather than reading `quickLinks` directly).
 const ALL_QUICK_NAV_SECTION_IDS = ['about', 'vision-mission', 'programmes', 'placements', 'hod', 'faculty', 'labs', 'program-toggle', 'rnd', 'news-events'];
-
-// Marquee pace: fixed duration made the scroll visibly speed up on any
-// department with more records (same time, wider track) — a per-card pace
-// keeps it readable regardless of count. Mirrors marquee-01.tsx's own logic.
-const SECONDS_PER_CARD = 5;
-const MIN_DURATION_S = 45;
-const rowDuration = (cardCount: number) => `${Math.max(MIN_DURATION_S, cardCount * SECONDS_PER_CARD)}s`;
-
-const DEFAULT_MARQUEE_ITEMS: PlacementItem[] = [
-  { name: "Pooja Sharma", company: "Google", package: "59.15 LPA" },
-  { name: "Sravani K.", company: "Meesho", package: "57.53 LPA" },
-  { name: "Ananya Rao", company: "Amazon", package: "46.38 LPA" },
-  { name: "Kavya Sree", company: "Microsoft", package: "45.00 LPA" },
-  { name: "Deepthi M.", company: "Adobe", package: "43.00 LPA" },
-  { name: "Bhavana V.", company: "Goldman Sachs", package: "34.00 LPA" },
-  { name: "Meghana Nayudu", company: "Cognizant GenC", package: "6.75 LPA" },
-  { name: "Bondada Susanthi", company: "Amazon", package: "46.38 LPA" },
-  { name: "Tejaswini B.", company: "Infosys", package: "9.50 LPA" },
-  { name: "Prathyusha N.", company: "Flipkart", package: "32.00 LPA" },
-  { name: "Harika V.", company: "Walmart", package: "26.50 LPA" },
-  { name: "Divya Teja", company: "Atlassian", package: "52.00 LPA" },
-  { name: "Spandana P.", company: "Salesforce", package: "41.00 LPA" },
-  { name: "Nikhita A.", company: "Capgemini", package: "4.25 LPA" },
-  { name: "Yuga Sri Bandi", company: "Dhan.AI", package: "5.00 LPA" },
-  { name: "Pujitha Andugala", company: "Infosys", package: "3.60 LPA" },
-  { name: "Komali Bajinki", company: "Cerevyn Solutions", package: "4.00 LPA" },
-  { name: "Pavani Bandaru", company: "Dhan.AI", package: "5.00 LPA" },
-];
-
-function PlacementProfileCard({ name, company, package: pkg }: PlacementItem) {
-  return (
-    <div className="dept-profile-card">
-      <div className="dept-profile-card-photo">
-        <User size={44} strokeWidth={1.5} aria-hidden="true" />
-        <span className="dept-profile-card-logo-badge" aria-hidden="true">
-          <Building2 size={15} strokeWidth={2.2} />
-        </span>
-      </div>
-      <div className="dept-profile-card-body">
-        <h4 className="dept-profile-card-name">{name}</h4>
-        <p className="dept-profile-card-role">Placed at {company}</p>
-        <span className="dept-profile-card-package">{pkg}</span>
-      </div>
-    </div>
-  );
-}
-
-function PlacementProfileMarquee({ records }: { records: PlacementItem[] }) {
-  if (!records || records.length === 0) return null;
-  const safeRecords = records.length < 8 ? [...records, ...records, ...records, ...records] : records;
-  const half = Math.ceil(safeRecords.length / 2);
-  const firstRow = safeRecords.slice(0, half);
-  const secondRow = safeRecords.slice(half);
-
-  return (
-    <div className="marquee-container">
-      <Marquee pauseOnHover style={{ ['--duration' as string]: rowDuration(firstRow.length) }}>
-        {firstRow.map((rec, idx) => (
-          <PlacementProfileCard key={`row1-${idx}-${rec.name}`} {...rec} />
-        ))}
-      </Marquee>
-      <Marquee reverse pauseOnHover style={{ ['--duration' as string]: rowDuration(secondRow.length) }}>
-        {secondRow.map((rec, idx) => (
-          <PlacementProfileCard key={`row2-${idx}-${rec.name}`} {...rec} />
-        ))}
-      </Marquee>
-      <div className="marquee-fade-left" aria-hidden="true" />
-      <div className="marquee-fade-right" aria-hidden="true" />
-    </div>
-  );
-}
-
-function PlacementProfileMarquee3Layers({ records }: { records: PlacementItem[] }) {
-  const displayRecords = records && records.length > 0 ? records : DEFAULT_MARQUEE_ITEMS;
-  const safeRecords = displayRecords.length < 12
-    ? [...displayRecords, ...displayRecords, ...displayRecords, ...displayRecords]
-    : displayRecords;
-
-  const third = Math.ceil(safeRecords.length / 3);
-  const firstRow = safeRecords.slice(0, third);
-  const secondRow = safeRecords.slice(third, third * 2);
-  const thirdRow = safeRecords.slice(third * 2);
-
-  return (
-    <div className="marquee-container" style={{ gap: '0.85rem' }}>
-      <Marquee pauseOnHover style={{ ['--duration' as string]: rowDuration(firstRow.length) }}>
-        {firstRow.map((rec, idx) => (
-          <PlacementRecordCard key={`prow1-${idx}-${rec.name}`} {...rec} />
-        ))}
-      </Marquee>
-      <Marquee reverse pauseOnHover style={{ ['--duration' as string]: rowDuration(secondRow.length) }}>
-        {secondRow.map((rec, idx) => (
-          <PlacementRecordCard key={`prow2-${idx}-${rec.name}`} {...rec} />
-        ))}
-      </Marquee>
-      <Marquee pauseOnHover style={{ ['--duration' as string]: rowDuration(thirdRow.length) }}>
-        {thirdRow.map((rec, idx) => (
-          <PlacementRecordCard key={`prow3-${idx}-${rec.name}`} {...rec} />
-        ))}
-      </Marquee>
-      <div className="marquee-fade-left" aria-hidden="true" />
-      <div className="marquee-fade-right" aria-hidden="true" />
-    </div>
-  );
-}
 
 interface Props {
   group: DepartmentGroup;
@@ -174,6 +71,18 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   // Which Academic Year's internship records are shown — same pattern as
   // the Placements pair above.
   const [internshipYear, setInternshipYear] = useState<string | null>(null);
+  // Which Academic Year's Research & Development content is shown — same
+  // pattern as Placements/Internships above.
+  const [rndYear, setRndYear] = useState<string | null>(null);
+  // Company / minimum-package filters for the Placement records below —
+  // admin uploads whatever columns a year's sheet has, so the company list
+  // is derived live from that year's actual rows rather than any fixed
+  // list, and resets itself whenever the Academic Year (and so the
+  // available companies) changes since a stale selection wouldn't match
+  // anything.
+  const [placementCompanyFilter, setPlacementCompanyFilter] = useState('');
+  const [placementMinPackage, setPlacementMinPackage] = useState(0);
+  useEffect(() => { setPlacementCompanyFilter(''); }, [placementYear]);
   // Placements/Internships now share one "Careers" section — this picks
   // which half shows when a programme has both (no tab bar at all when it
   // only has one).
@@ -270,6 +179,11 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   const faculty = allFaculty.filter((f) => f.department && deptKeys.has(f.department));
 
   const eapcetCode = useEapcetCode();
+  // Hoisted above the loading/redirect guards below (same reasoning as the
+  // scroll-spy effect further down) — a hook must run on every render in
+  // the same order, and progLoading/deptLoading resolving asynchronously
+  // means some renders take an early return and some don't.
+  const mainPlacementYears = usePlacementYears();
 
   const deptName = dept?.title || activeProgram?.department || group.deptShortCode;
 
@@ -428,20 +342,47 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   const placementPkgIdx = findPackageColumnIndex(placementColumns);
   const placementYearStats = activePlacementYear ? computePlacementStats(placementColumns, activePlacementYear.rows || []) : null;
   const placementNameIdx = placementColumns.findIndex((c) => /name|student|candidate/i.test(c));
-  const placementCompIdx = placementColumns.findIndex((c) => /company|organization|employer|recruiter/i.test(c));
-  const placementMarqueeItems: PlacementItem[] = placementRows.length > 0
-    ? placementRows.map((row) => {
-        const rawName = placementNameIdx >= 0 ? row.cells[placementNameIdx] : (row.cells[1] || row.cells[0]);
-        const rawComp = placementCompIdx >= 0 ? row.cells[placementCompIdx] : (row.cells[2] || 'Top Recruiter');
-        const rawPkg = placementPkgIdx >= 0 ? formatPackageCell(row.cells[placementPkgIdx] ?? '') : (row.cells[3] || '');
-        return {
-          name: rawName?.trim() || 'Student Graduate',
-          company: rawComp?.trim() || 'Top Recruiter',
-          package: rawPkg?.trim() || 'Placed',
-        };
-      })
-    : DEFAULT_MARQUEE_ITEMS;
-  const hasPlacements = true;
+  const placementCompIdx = findCompanyColumnIndex(placementColumns);
+  const placementStatsFull = placementYearStats?.averageSalary != null;
+  const placementCompanyOptions = Array.from(new Set(
+    placementRows.map((r) => (placementCompIdx >= 0 ? r.cells[placementCompIdx] : '')?.trim()).filter(Boolean)
+  )).sort();
+  const filteredPlacementRows = placementRows.filter((row) => {
+    if (placementCompanyFilter && row.cells[placementCompIdx]?.trim() !== placementCompanyFilter) return false;
+    if (placementMinPackage > 0) {
+      const pkgNum = parseFloat(formatPackageCell(placementPkgIdx >= 0 ? (row.cells[placementPkgIdx] || '') : ''));
+      if (!(pkgNum >= placementMinPackage)) return false;
+    }
+    return true;
+  });
+  const placementMarqueeItems: PlacementItem[] = filteredPlacementRows.map((row) => {
+    const rawName = placementNameIdx >= 0 ? row.cells[placementNameIdx] : (row.cells[1] || row.cells[0]);
+    const rawComp = placementCompIdx >= 0 ? row.cells[placementCompIdx] : '';
+    const rawPkg = placementPkgIdx >= 0 ? formatPackageCell(row.cells[placementPkgIdx] ?? '') : '';
+    return {
+      name: rawName?.trim() || 'Student Graduate',
+      company: rawComp?.trim() || 'Top Recruiter',
+      package: rawPkg?.trim() || 'Placed',
+    };
+  });
+  // Institution-wide "Placements" module figures for this department (see
+  // departmentPlacementBridge.ts) — an independent, separately-maintained
+  // dataset from the department's own uploaded placementYears above, kept
+  // visible here (rather than hidden) so a visitor never sees "no data" for
+  // a batch the institution has actually published a figure for, and so
+  // the two numbers can be cross-checked against each other.
+  const deptShortCodeForPlacements = dept?.shortCode || group.deptShortCode;
+  const staticDeptBatches = getDeptBatchStats(deptShortCodeForPlacements, mainPlacementYears);
+  const activeStaticBatch = activePlacementYear
+    ? findDeptBatchStatsForYearLabel(deptShortCodeForPlacements, activePlacementYear.year, mainPlacementYears)
+    : null;
+  // The institution-wide published figure is the authoritative one when it
+  // exists for this Academic Year — the department's own uploaded sheet
+  // (placementYearStats.totalOffers) is often a partial/in-progress count,
+  // not the final published total, so this replaces the tile's number
+  // outright rather than showing both side by side.
+  const displayedTotalOffers = activeStaticBatch?.offers ?? placementYearStats?.totalOffers ?? 0;
+  const hasPlacements = !!(shared.placementIntro || shared.placementStats.length > 0 || shared.placementRecruiters.length > 0 || placementYears.length > 0 || staticDeptBatches.length > 0);
 
   // Individual student Internship Records — same shape/pattern as the
   // Placement Records above (see InternshipYearsEditor in ProgramsAdmin.tsx),
@@ -559,17 +500,22 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   const newsletterYears = (dept?.newsletterYears?.length ? dept.newsletterYears : (activeProgram.newsletterYears || [])).filter((y) => y.year && y.issues && y.issues.length > 0);
   const hasNewsletter = newsletterYears.length > 0;
   const newsletterMaxIssues = Math.max(0, ...newsletterYears.map((y) => y.issues.length));
-  // Research & Development (Funded Projects & Patents) — same per-programme
-  // field as the standalone ProgramDetail.tsx page (ProgramsAdmin's "Research
-  // & Development" editor); a link only appears once it has both a name and
-  // an uploaded PDF.
-  const rndLinks = (activeProgram.rndLinks || []).filter((l) => l.label && l.pdfUrl);
-  const rndTableSections = parseFlexibleTable(activeProgram.rndTableText || '').filter((s) => s.headers.length > 0);
-  const rndProjectCategories = parseProjectAccordion(activeProgram.rndProjectsText || '').filter((c) => c.projects.length > 0);
-  const rndStructuredColumns = activeProgram.rndStructuredTable?.columns || [];
-  const rndStructuredRows = activeProgram.rndStructuredTable?.rows || [];
+  // Research & Development (Funded Projects & Patents) — organized by
+  // Academic Year (same pattern as Placements/Internships/Newsletter
+  // above); resolveRndYears() also covers a department/programme still on
+  // the old flat (pre-Academic-Year) shape by wrapping it as a single
+  // unlabeled year, so nothing already entered is lost.
+  const rndFallbackProgram = subPrograms.find((p) => p.rndIntro || p.rndTableText || p.rndProjectsText || p.rndLinks?.length || p.rndStructuredTable);
+  const rndYearsResolved = resolveRndYears(dept, rndFallbackProgram).filter(rndYearHasContent);
+  const activeRndYear = rndYearsResolved.find((y) => y.year === rndYear) ?? rndYearsResolved[0];
+  const rndLabeledYears = rndYearsResolved.filter((y) => y.year);
+  const rndLinks = (activeRndYear?.links || []).filter((l) => l.label && l.pdfUrl);
+  const rndTableSections = parseFlexibleTable(activeRndYear?.tableText || '').filter((s) => s.headers.length > 0);
+  const rndProjectCategories = parseProjectAccordion(activeRndYear?.projectsText || '').filter((c) => c.projects.length > 0);
+  const rndStructuredColumns = activeRndYear?.structuredTable?.columns || [];
+  const rndStructuredRows = activeRndYear?.structuredTable?.rows || [];
   const hasRndStructuredTable = rndStructuredColumns.length > 0 && rndStructuredRows.length > 0;
-  const hasRnd = !!activeProgram.rndIntro || rndTableSections.length > 0 || rndProjectCategories.length > 0 || rndLinks.length > 0 || hasRndStructuredTable;
+  const hasRnd = rndYearsResolved.length > 0;
   // Deliberately program-level only, not dept.customSections — a grouped
   // department's Custom Sections editor is gated off in DepartmentsAdmin.tsx
   // (Custom Sections live on the linked programme(s) instead; only a
@@ -1117,15 +1063,15 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                 {activePlacementYear && placementYearStats && (
                   <>
                     <p className="placement-stat-summary">
-                      {activePlacementYear.year} Placements as on date: <strong>{placementYearStats.totalOffers.toLocaleString()}</strong>
+                      {activePlacementYear.year} Placements as on date: <strong>{displayedTotalOffers.toLocaleString()}</strong>
                     </p>
-                    <div className="dept-stat-grid dept-stat-grid--compact">
+                    <div className={`dept-stat-grid${placementStatsFull ? ' dept-stat-grid--fill' : ''}`}>
                       <div className="dept-stat-tile">
                         <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.companiesVisited}</span></div>
                         <div className="dept-stat-tile__label">No. of Companies Visited</div>
                       </div>
                       <div className="dept-stat-tile">
-                        <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.totalOffers}</span></div>
+                        <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{displayedTotalOffers}</span></div>
                         <div className="dept-stat-tile__label">Total No. of Offers</div>
                       </div>
                       <div className="dept-stat-tile">
@@ -1164,19 +1110,19 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                       )}
                       {placementYearStats.above50Lpa > 0 && (
                         <div className="dept-stat-tile">
-                          <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.above50Lpa}</span></div>
+                          <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.above50Lpa} offers</span></div>
                           <div className="dept-stat-tile__label">Above 50 LPA+</div>
                         </div>
                       )}
                       {placementYearStats.above30Lpa > 0 && (
                         <div className="dept-stat-tile">
-                          <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.above30Lpa}</span></div>
+                          <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.above30Lpa} offers</span></div>
                           <div className="dept-stat-tile__label">Above 30 LPA+</div>
                         </div>
                       )}
                       {placementYearStats.above10Lpa > 0 && (
                         <div className="dept-stat-tile">
-                          <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.above10Lpa}</span></div>
+                          <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.above10Lpa} offers</span></div>
                           <div className="dept-stat-tile__label">Above 10 LPA+</div>
                         </div>
                       )}
@@ -1188,16 +1134,81 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                     <div>
                       <span className="section-label dept-section-label">Student Success</span>
                       <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: '1.2rem', fontWeight: 800, color: 'var(--color-primary-dark)', margin: '0.2rem 0 0 0' }}>
-                        Placement Offers &amp; Organizations {activePlacementYear?.year ? `(${activePlacementYear.year})` : ''}
+                        Career Offers &amp; Recruiters ({activePlacementYear?.year})
                       </h3>
                     </div>
                     <span style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--color-accent)', background: 'rgba(201, 168, 76, 0.12)', border: '1px solid rgba(201, 168, 76, 0.3)', borderRadius: '9999px', padding: '0.3rem 0.85rem' }}>
-                      {placementRows.length > 0 ? `${placementRows.length} Verified Offers` : 'Featured Placement Record'}
+                      {filteredPlacementRows.length} Verified Offers
                     </span>
                   </div>
 
-                  <PlacementProfileMarquee3Layers records={placementMarqueeItems} />
+                  {placementCompanyOptions.length > 0 && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem', marginBottom: 'var(--space-4)' }}>
+                      <select
+                        value={placementCompanyFilter}
+                        onChange={(e) => setPlacementCompanyFilter(e.target.value)}
+                        aria-label="Filter by company"
+                        style={{ padding: '0.45rem 0.75rem', borderRadius: '8px', border: '1px solid var(--color-light-gray)', fontSize: '0.85rem', background: 'var(--color-white)' }}
+                      >
+                        <option value="">All Companies</option>
+                        {placementCompanyOptions.map((c) => <option key={c} value={c}>{c}</option>)}
+                      </select>
+                      <select
+                        value={placementMinPackage}
+                        onChange={(e) => setPlacementMinPackage(Number(e.target.value))}
+                        aria-label="Filter by minimum package"
+                        style={{ padding: '0.45rem 0.75rem', borderRadius: '8px', border: '1px solid var(--color-light-gray)', fontSize: '0.85rem', background: 'var(--color-white)' }}
+                      >
+                        <option value={0}>Any Package</option>
+                        <option value={5}>5 LPA & above</option>
+                        <option value={10}>10 LPA & above</option>
+                        <option value={20}>20 LPA & above</option>
+                        <option value={30}>30 LPA & above</option>
+                      </select>
+                      {(placementCompanyFilter || placementMinPackage > 0) && (
+                        <button
+                          type="button"
+                          onClick={() => { setPlacementCompanyFilter(''); setPlacementMinPackage(0); }}
+                          style={{ padding: '0.45rem 0.9rem', borderRadius: '8px', border: '1px solid var(--color-light-gray)', fontSize: '0.85rem', background: 'transparent', cursor: 'pointer', color: 'var(--color-text-light)' }}
+                        >
+                          Clear Filters
+                        </button>
+                      )}
+                    </div>
+                  )}
+
+                  {placementMarqueeItems.length > 0 ? (
+                    <TestimonialMarquee records={placementMarqueeItems} />
+                  ) : (
+                    <p style={{ color: 'var(--color-text-light)', fontStyle: 'italic', padding: '1.5rem 0' }}>
+                      {placementRows.length > 0
+                        ? 'No offers match the selected filters.'
+                        : `No placement records uploaded yet for ${activePlacementYear?.year}.`}
+                    </p>
+                  )}
                 </div>
+              </div>
+            )}
+            {placementYears.length === 0 && staticDeptBatches.length > 0 && (
+              <div>
+                <div className="placement-year-pills" role="group" aria-label="Select academic year">
+                  {staticDeptBatches.map((b) => (
+                    <span key={b.batch} className="placement-year-pill">AY. {b.batch}</span>
+                  ))}
+                </div>
+                <p style={{ color: 'var(--color-text)', fontSize: '0.9rem', marginBottom: 'var(--space-4)', maxWidth: 640 }}>
+                  Individual student records for this department haven't been uploaded here yet, but VWU's
+                  institution-wide Placement Details page has published totals for these batches:
+                </p>
+                <div className="dept-stat-grid dept-stat-grid--fill">
+                  {staticDeptBatches.map((b) => (
+                    <div className="dept-stat-tile" key={b.batch}>
+                      <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{b.offers}</span></div>
+                      <div className="dept-stat-tile__label">{b.batch} Offers{b.highestLPA != null ? ` · Highest ${b.highestLPA} LPA` : ''}</div>
+                    </div>
+                  ))}
+                </div>
+                <Link to="/placements/placement-details" style={{ fontSize: '0.85rem' }}>See full Placement Details &rarr;</Link>
               </div>
             )}
             </div>
@@ -1260,7 +1271,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                 </div>
 
                 {internshipMarqueeItems.length > 0 ? (
-                  <PlacementProfileMarquee records={internshipMarqueeItems} />
+                  <TestimonialMarquee records={internshipMarqueeItems} />
                 ) : (
                   <p style={{ color: 'var(--color-text-light)', fontStyle: 'italic', padding: '1.5rem 0' }}>
                     No internship records uploaded yet for {activeInternshipYear?.year}.
@@ -1718,8 +1729,23 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                       Research &amp; Development (Funded Projects &amp; Patents)
                     </h3>
                   </div>
-                  {activeProgram.rndIntro && (
-                    <p className="dept-rnd-intro">{activeProgram.rndIntro}</p>
+                  {rndLabeledYears.length > 0 && (
+                    <div className="placement-year-pills" role="group" aria-label="Select academic year" style={{ marginBottom: 'var(--space-5)' }}>
+                      {rndLabeledYears.map((y) => (
+                        <button
+                          key={y.year}
+                          type="button"
+                          onClick={() => setRndYear(y.year)}
+                          className={`placement-year-pill${activeRndYear?.year === y.year ? ' active' : ''}`}
+                          aria-pressed={activeRndYear?.year === y.year}
+                        >
+                          AY. {y.year}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  {activeRndYear?.intro && (
+                    <p className="dept-rnd-intro">{activeRndYear.intro}</p>
                   )}
                   {rndTableSections.map((section, si) => (
               <div key={si} className="dept-rnd-table-group">
@@ -1791,7 +1817,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                 )}
                 <div className="thrust-accordion">
                   {cat.projects.map((project, pi) => {
-                    const key = `${ci}-${pi}`;
+                    const key = `${activeRndYear?.year}-${ci}-${pi}`;
                     const isOpen = openRndProjects.has(key);
                     return (
                       <div key={pi} className={`thrust-accordion-item${isOpen ? ' open' : ''}`}>

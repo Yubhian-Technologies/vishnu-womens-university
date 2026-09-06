@@ -10,7 +10,7 @@ import { normalizeLab, type LabItem, type LibrarySection, type LibraryItem, type
 import type { RndStructuredTable } from './RndTableEditor';
 import type { PlacementYearRecord } from '../../../lib/placementRecords';
 import type { InternshipYearRecord } from '../../../lib/internshipRecords';
-import { diffChangedFields } from '../../../lib/formDiff';
+import { diffChangedFields, describeSaveError } from '../../../lib/formDiff';
 import { PlacementYearsEditor, InternshipYearsEditor, RndEditor, NewsletterYearsEditor } from './ProgramCareerEditors';
 import { resolveRndYears } from '../../../components/RndSection/RndSection';
 import { downloadPlacementsTemplate } from '../../../lib/placementsImport';
@@ -648,7 +648,7 @@ export default function DepartmentsAdmin() {
       }
       setForm(EMPTY); setEditing(null); setOriginalForm(null);
     } catch (e) {
-      alert(`Couldn't save: ${(e as Error).message}`);
+      alert(describeSaveError(e));
     } finally { setSaving(false); }
   };
 
