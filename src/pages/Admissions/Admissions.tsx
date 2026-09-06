@@ -129,7 +129,7 @@ export default function Admissions() {
       <PageHero
         page="admissions"
         defaultTitle="Admissions Open"
-        defaultSubtitle="First Private Women’s University in Andhra Pradesh and Telangana. No. 1 preferred choice for female students in EAPCET."
+        defaultSubtitle="First Private Women’s University in Andhra Pradesh and Telangana. No. 1 preferred choice for female students in AP EAPCET."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Admissions' }]}
         scrollCtaTargetId="admissions-content"
       />
@@ -137,16 +137,16 @@ export default function Admissions() {
       {/* Admissions Hub */}
       <section id="admissions-content" className="section bg-off-white" style={{ paddingBottom: 0, scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
         <div className="container">
-          {/* EAPCET 2026 Distinction Highlight Card */}
+          {/* AP EAPCET 2026 Distinction Highlight Card */}
           <div className="reveal" style={{ background: 'linear-gradient(135deg, var(--color-primary) 0%, #173824 100%)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-6) var(--space-8)', color: 'var(--color-white)', textAlign: 'center', marginBottom: 'var(--space-10)', border: '1.5px solid rgba(201,168,76,0.4)', boxShadow: 'var(--shadow-lg)' }}>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', background: 'var(--color-accent)', color: 'var(--color-primary)', fontWeight: 800, fontSize: 'var(--text-xs)', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '0.35rem 0.85rem', borderRadius: '999px', marginBottom: 'var(--space-3)' }}>
-              <Sparkles size={14} /> APEAPCET 2026 Benchmark
+              <Sparkles size={14} /> AP EAPCET 2026 Benchmark
             </div>
             <h2 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-2xl)', fontWeight: 900, color: 'var(--color-white)', margin: 0, lineHeight: 1.3 }}>
               First Private Women’s University in Andhra Pradesh and Telangana
             </h2>
             <p style={{ fontSize: 'var(--text-lg)', color: 'var(--color-accent)', fontWeight: 700, marginTop: 'var(--space-2)', marginBottom: 0 }}>
-              No. 1 preferred choice for female students in APEAPCET 2026.
+              No. 1 preferred choice for female students in AP EAPCET 2026.
             </p>
           </div>
 
@@ -213,16 +213,16 @@ export default function Admissions() {
         </div>
       </section>
 
-      {/* APEAPCET 2026 - 27 Opening & Closing Ranks Analysis */}
+      {/* AP EAPCET 2026 - 27 Opening & Closing Ranks Analysis */}
       <section id="rank-analysis" className="section bg-white" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', maxWidth: 760, margin: '0 auto var(--space-10)' }}>
             <span className="section-label" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
-              <BarChart2 size={16} /> APEAPCET Cut-off Analysis
+              <BarChart2 size={16} /> AP EAPCET Cut-off Analysis
             </span>
-            <h2 className="section-title">Opening and Ending Ranks Analysis of VWU in APEAPCET 2026 – 27</h2>
+            <h2 className="section-title">Opening and Ending Ranks Analysis of VWU in AP EAPCET 2026 – 27</h2>
             <p className="section-desc" style={{ margin: '0 auto' }}>
-              Official branch-wise Opening and Closing ranks analysis for Vishnu Women's University in APEAPCET 2026 – 27 counseling.
+              Official branch-wise Opening and Closing ranks analysis for Vishnu Women's University in AP EAPCET 2026 – 27 counseling.
             </p>
           </div>
 
@@ -259,7 +259,7 @@ export default function Admissions() {
                 {/* VISW Section */}
                 <tr style={{ background: 'rgba(0,47,25,0.08)', borderBottom: '1.5px solid var(--color-primary)' }}>
                   <td colSpan={7} style={{ padding: '0.4rem 1rem', fontWeight: 800, fontSize: 'var(--text-xs)', color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    APEAPCET College Code: VISW
+                    AP EAPCET College Code: VISW
                   </td>
                 </tr>
                 {viswRows.map((row, idx) => (
@@ -278,7 +278,7 @@ export default function Admissions() {
                 {/* VISWPU Section */}
                 <tr style={{ background: 'rgba(0,47,25,0.08)', borderTop: '2px solid var(--color-primary)', borderBottom: '1.5px solid var(--color-primary)' }}>
                   <td colSpan={7} style={{ padding: '0.4rem 1rem', fontWeight: 800, fontSize: 'var(--text-xs)', color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    APEAPCET College Code: VISWPU
+                    AP EAPCET College Code: VISWPU
                   </td>
                 </tr>
                 {viswpuRows.map((row, idx) => (
@@ -297,7 +297,7 @@ export default function Admissions() {
               </tbody>
             </table>
             <div style={{ marginTop: 'var(--space-4)', fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', textAlign: 'right', fontStyle: 'italic' }}>
-              * Comparative Statement of Official APEAPCET Cut-off Ranks (2026–27 vs 2025–26) for VWU (College Codes: VISW, VISWPU).
+              * Comparative Statement of Official AP EAPCET Cut-off Ranks (2026–27 vs 2025–26) for VWU (College Codes: VISW, VISWPU).
             </div>
           </div>
             );
@@ -366,7 +366,7 @@ export default function Admissions() {
             title="Experience the VWU Difference"
             subtitle="From modern labs and smart classrooms to hostels, sports grounds, and a buzzing placement season — see what awaits you at VWU."
             highlights={[
-              `EAPCET college code: ${eapcetCode}`,
+              `AP EAPCET college code: ${eapcetCode}`,
               '1,400+ placements in 2024–25 alone',
               'Highest package: ₹59.28 LPA',
               '100% scholarship coverage available for eligible students',

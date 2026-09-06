@@ -115,7 +115,7 @@ const DEFAULT_INFO_CARDS = [
   {
     id: 'default-info-4',
     title: 'Admissions Quick Info',
-    desc: 'EAPCET Code: VISW, VISWPU\nEmail: admissions@vwu.edu.in\nHelpline: +91 8816 250864',
+    desc: 'AP EAPCET Code: VISW, VISWPU\nEmail: admissions@vwu.edu.in\nHelpline: +91 8816 250864',
     value: 'Mon – Sat: 9:00 AM – 5:00 PM IST',
     slug: 'Admissions Desk',
     icon: 'GraduationCap',

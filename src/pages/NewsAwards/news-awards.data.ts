@@ -14,7 +14,7 @@ export interface GalleryAlbum {
 export const galleryAlbums: GalleryAlbum[] = [
   // 2026
   { title: "A New Era of Excellence – Inauguration Ceremony 2026 – Vishnu Women's University", date: 'August 23, 2026', year: 2026, link: 'https://photos.google.com/share/AF1QipP0Ar72PZx_r1xt_Q28fSBLhCwl-ORbdn0qdcZe61YHOQn_tKH53VDukqx4E5G0PA?key=dVh2QXp4aVRxUmpleVJrWTBJTld1QXB0MzBNOFJB' },
-  { title: 'Celebrations of Remarkable Achievement in Admissions of EAPCET 2026', date: 'August 13, 2026', year: 2026, link: 'https://photos.google.com/share/AF1QipOau71Q74yxB1523N2s3o8frrKECBgweDZttE9jxvhl187xPv9CSrBQAVChN_je8w?key=TUw2OEJ6WVBmY21NNmVpZDg0cGVaYTZLeGdJSUx3' },
+  { title: 'Celebrations of Remarkable Achievement in Admissions of AP EAPCET 2026', date: 'August 13, 2026', year: 2026, link: 'https://photos.google.com/share/AF1QipOau71Q74yxB1523N2s3o8frrKECBgweDZttE9jxvhl187xPv9CSrBQAVChN_je8w?key=TUw2OEJ6WVBmY21NNmVpZDg0cGVaYTZLeGdJSUx3' },
   { title: 'Celebrations of International Yoga Day 2026', date: 'June 21, 2026', year: 2026, link: 'https://photos.google.com/share/AF1QipO7UiK_TwuZsP7lYi-hPH5hnVczktU4jPVvKJNSx7YG6qf8dDD4IIcTTqMJNSoVkg?key=ODJRRFhTc1h6MmFyT09TX3B0cFhmYWQzdndmVDBR' },
   { title: 'Celebrations of World Environment Day 2026', date: 'June 5, 2026', year: 2026, link: 'https://photos.google.com/share/AF1QipNnZu9ZRjSeuXjfJlgklnIuj7ckGEf2GWMgWKol3MM1YKzAC1xh_c1TqevNeI3xsA?key=ZXlLSDZ0WjdhaGg3ZWtzQzRPcWU1cmlGQkFUeDBB' },
   { title: 'Signed MoU with Mahindra & Mahindra', date: 'March 9, 2026', year: 2026, link: 'https://photos.google.com/share/AF1QipM3saryVvRfxS-HmZ-fT253Eono47Nd-pXkQ5m9aAlULmtBU6LjCloGdK1XkP5DPg?key=WFdQTXlxNmVlRHFOZnFFaWc2b1R1ekZKXzdYelNB' },
