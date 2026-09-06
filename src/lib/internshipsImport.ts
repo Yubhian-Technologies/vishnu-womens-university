@@ -31,16 +31,21 @@ const INTERNSHIP_TEMPLATE_EXAMPLE_ROWS = [
 
 // Strict, whole-file validation — same rule as Placements' own
 // validatePlacementsImport (see there for the full reasoning): the header
-// row must exactly be this template's columns (any order, case/whitespace-
-// insensitive) — nothing missing, nothing extra. Empty rows/columns/cells
-// are fine and don't affect this check; only the column *names* must match.
-// Returns an error message to show, or null if the file is clean.
+// row must exactly be this template's columns, in that exact order
+// (case/whitespace-insensitive) — nothing missing, extra, or reordered —
+// AND every single row must have a value in every column. Failing either
+// rejects the ENTIRE file, never a partial import with a bad row silently
+// dropped. Returns an error message to show, or null if the file is clean.
 export function validateInternshipsImport(result: PlacementImportResult): string | null {
   const norm = (s: string) => s.trim().toLowerCase();
-  const got = [...result.columns].map(norm).sort();
-  const want = [...INTERNSHIP_TEMPLATE_HEADERS].map(norm).sort();
+  const got = result.columns.map(norm);
+  const want = INTERNSHIP_TEMPLATE_HEADERS.map(norm);
   if (got.length !== want.length || got.some((c, i) => c !== want[i])) {
-    return `This file's columns don't match the required Internships template (any order is fine, but nothing missing or extra).\n\nExpected: ${INTERNSHIP_TEMPLATE_HEADERS.join(', ')}\nFound: ${result.columns.join(', ')}\n\nUse "Download Internships Template" above and fill that file in instead.`;
+    return `This file's columns don't match the required Internships template — they must appear in this exact order, with nothing missing or extra.\n\nExpected: ${INTERNSHIP_TEMPLATE_HEADERS.join(', ')}\nFound: ${result.columns.join(', ')}\n\nUse "Download Internships Template" above and fill that file in instead.`;
+  }
+  const badRowIndex = result.rows.findIndex((row) => row.some((cell) => !cell.trim()));
+  if (badRowIndex !== -1) {
+    return `Row ${badRowIndex + 1} is missing a value in one or more columns — every column must be filled in for every row. The whole file was NOT imported; fix that row and re-upload it.`;
   }
   return null;
 }
