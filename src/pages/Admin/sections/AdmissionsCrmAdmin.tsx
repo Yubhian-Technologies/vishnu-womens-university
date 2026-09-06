@@ -9,6 +9,7 @@ export type LeadStatus = 'new' | 'contacted' | 'in_progress' | 'admitted' | 'clo
 export interface CrmLeadDoc {
   id: string;
   firstName: string;
+  lastName?: string;
   phone: string;
   program: string;
   purpose: string;
@@ -100,6 +101,7 @@ export default function AdmissionsCrmAdmin() {
     const matchesSearch =
       searchQuery.trim() === '' ||
       l.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (l.lastName && l.lastName.toLowerCase().includes(searchQuery.toLowerCase())) ||
       l.phone.includes(searchQuery);
     return matchesStatus && matchesProgram && matchesSearch;
   });
@@ -215,7 +217,7 @@ export default function AdmissionsCrmAdmin() {
                         </span>
                       </td>
                       <td style={{ fontSize: '0.83rem', whiteSpace: 'nowrap' }}>{formatTimestamp(l.createdAt)}</td>
-                      <td style={{ fontWeight: 700 }}>{l.firstName}</td>
+                      <td style={{ fontWeight: 700 }}>{[l.firstName, l.lastName].filter(Boolean).join(' ')}</td>
                       <td style={{ whiteSpace: 'nowrap' }}>
                         {l.phone}{' '}
                         {l.phoneVerified && (

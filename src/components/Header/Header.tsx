@@ -674,7 +674,7 @@ export default function Header() {
             role="region"
             aria-label={`${activeItemData.label} Submenu`}
           >
-            <div className="mega-dropdown-grid">
+            <div key={activeItemData.label} className="mega-dropdown-grid">
               {/* If categorized groups exist */}
               {activeItemData.groups && (
                 <div className="mega-groups-container">

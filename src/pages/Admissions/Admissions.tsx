@@ -10,9 +10,8 @@ import { useSitePhotos, useSectionHasPhotos } from '../../hooks/useSitePhotos';
 import { useSiteContact, telHref } from '../../hooks/useSiteContact';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import type { FaqDoc } from '../Admin/sections/FaqAdmin';
-import { NotebookPen, ClipboardList, Users, Phone, Mail, MapPin, Sparkles, BarChart2 } from 'lucide-react';
+import { ClipboardList, Users, Phone, Mail, MapPin, Sparkles, BarChart2 } from 'lucide-react';
 import { resolveContentIcon } from '../../lib/contentIcons';
-import { smoothScrollTo } from '../../lib/smoothScroll';
 import { useHashScroll } from '../../hooks/useHashScroll';
 
 interface RankAnalysisItem {
@@ -96,7 +95,6 @@ export default function Admissions() {
   const liveFaqs = allFaqs.filter((f) => f.page === 'admissions');
   const faqs = liveFaqs.length > 0 ? liveFaqs : DEFAULT_ADMISSIONS_FAQS;
   const tuitionData = useContentBlocks('admissions', 'tuitionData');
-  const steps = useContentBlocks('admissions', 'steps');
   const admissionHub = useContentBlocks('admissions', 'admissionHub');
   const visitOptions = useContentBlocks('admissions', 'visitOptions');
   const eapcetCode = useEapcetCode();
@@ -142,13 +140,13 @@ export default function Admissions() {
           {/* EAPCET 2026 Distinction Highlight Card */}
           <div className="reveal" style={{ background: 'linear-gradient(135deg, var(--color-primary) 0%, #173824 100%)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-6) var(--space-8)', color: 'var(--color-white)', textAlign: 'center', marginBottom: 'var(--space-10)', border: '1.5px solid rgba(201,168,76,0.4)', boxShadow: 'var(--shadow-lg)' }}>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', background: 'var(--color-accent)', color: 'var(--color-primary)', fontWeight: 800, fontSize: 'var(--text-xs)', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '0.35rem 0.85rem', borderRadius: '999px', marginBottom: 'var(--space-3)' }}>
-              <Sparkles size={14} /> EAPCET 2026 Benchmark
+              <Sparkles size={14} /> APEAPCET 2026 Benchmark
             </div>
             <h2 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-2xl)', fontWeight: 900, color: 'var(--color-white)', margin: 0, lineHeight: 1.3 }}>
               First Private Women’s University in Andhra Pradesh and Telangana
             </h2>
             <p style={{ fontSize: 'var(--text-lg)', color: 'var(--color-accent)', fontWeight: 700, marginTop: 'var(--space-2)', marginBottom: 0 }}>
-              No. 1 preferred choice for female students in EAPCET 2026.
+              No. 1 preferred choice for female students in APEAPCET 2026.
             </p>
           </div>
 
@@ -215,54 +213,30 @@ export default function Admissions() {
         </div>
       </section>
 
-      {/* Steps to Enroll */}
-      <section id="apply" className="section bg-off-white">
-        <div className="container">
-          <div className="reveal" style={{ textAlign: 'center', maxWidth: 600, margin: '0 auto var(--space-12)' }}>
-            <span className="section-label">How to Apply</span>
-            <h2 className="section-title">5 Steps to Join VWU</h2>
-          </div>
-          <div className="adm-steps">
-            {steps.map((s, i) => {
-              const Icon = resolveContentIcon(s.icon) || NotebookPen;
-              return (
-                <div key={s.id} className="adm-step">
-                  <div className="adm-step-number">{i + 1}</div>
-                  <div className="adm-step-icon"><Icon size={32} strokeWidth={1.75} /></div>
-                  <h3 className="adm-step-title">{s.title}</h3>
-                  <p className="adm-step-desc">{s.desc}</p>
-                </div>
-              );
-            })}
-          </div>
-          <div style={{ textAlign: 'center', marginTop: 'var(--space-10)' }}>
-            <button
-              type="button"
-              className="btn btn-primary btn-lg"
-              onClick={() => smoothScrollTo('#admissions-contact')}
-            >
-              Start Your Application
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* EAPCET 2026 - 27 Opening & Closing Ranks Analysis */}
+      {/* APEAPCET 2026 - 27 Opening & Closing Ranks Analysis */}
       <section id="rank-analysis" className="section bg-white" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', maxWidth: 760, margin: '0 auto var(--space-10)' }}>
             <span className="section-label" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
-              <BarChart2 size={16} /> EAPCET Cut-off Analysis
+              <BarChart2 size={16} /> APEAPCET Cut-off Analysis
             </span>
-            <h2 className="section-title">Opening and Ending Ranks Analysis of VWU in EAPCET 2026 – 27</h2>
+            <h2 className="section-title">Opening and Ending Ranks Analysis of VWU in APEAPCET 2026 – 27</h2>
             <p className="section-desc" style={{ margin: '0 auto' }}>
-              Official branch-wise Opening and Closing ranks analysis for Vishnu Women's University in EAPCET 2026 – 27 counseling.
+              Official branch-wise Opening and Closing ranks analysis for Vishnu Women's University in APEAPCET 2026 – 27 counseling.
             </p>
           </div>
 
           {(() => {
-            const viswRows = eapcetRanksData.filter(r => r.collegeCode === 'VISW');
-            const viswpuRows = eapcetRanksData.filter(r => r.collegeCode === 'VISWPU');
+            const parseRank = (val: string) => {
+              const num = parseInt(val.replace(/,/g, ''), 10);
+              return isNaN(num) ? Infinity : num;
+            };
+            const viswRows = eapcetRanksData
+              .filter(r => r.collegeCode === 'VISW')
+              .sort((a, b) => parseRank(a.endingRank2026) - parseRank(b.endingRank2026));
+            const viswpuRows = eapcetRanksData
+              .filter(r => r.collegeCode === 'VISWPU')
+              .sort((a, b) => parseRank(a.endingRank2026) - parseRank(b.endingRank2026));
             return (
           <div className="reveal" style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-6)', overflowX: 'auto', boxShadow: 'var(--shadow-sm)' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: 780 }}>
@@ -285,7 +259,7 @@ export default function Admissions() {
                 {/* VISW Section */}
                 <tr style={{ background: 'rgba(0,47,25,0.08)', borderBottom: '1.5px solid var(--color-primary)' }}>
                   <td colSpan={7} style={{ padding: '0.4rem 1rem', fontWeight: 800, fontSize: 'var(--text-xs)', color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    EAPCET College Code: VISW
+                    APEAPCET College Code: VISW
                   </td>
                 </tr>
                 {viswRows.map((row, idx) => (
@@ -304,7 +278,7 @@ export default function Admissions() {
                 {/* VISWPU Section */}
                 <tr style={{ background: 'rgba(0,47,25,0.08)', borderTop: '2px solid var(--color-primary)', borderBottom: '1.5px solid var(--color-primary)' }}>
                   <td colSpan={7} style={{ padding: '0.4rem 1rem', fontWeight: 800, fontSize: 'var(--text-xs)', color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    EAPCET College Code: VISWPU
+                    APEAPCET College Code: VISWPU
                   </td>
                 </tr>
                 {viswpuRows.map((row, idx) => (
@@ -323,7 +297,7 @@ export default function Admissions() {
               </tbody>
             </table>
             <div style={{ marginTop: 'var(--space-4)', fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', textAlign: 'right', fontStyle: 'italic' }}>
-              * Comparative Statement of Official AP EAPCET Cut-off Ranks (2026–27 vs 2025–26) for VWU (College Codes: VISW, VISWPU).
+              * Comparative Statement of Official APEAPCET Cut-off Ranks (2026–27 vs 2025–26) for VWU (College Codes: VISW, VISWPU).
             </div>
           </div>
             );
@@ -337,7 +311,7 @@ export default function Admissions() {
           <div className="adm-tuition-grid">
             <div className="reveal-left">
               <span className="section-label" style={{ color: 'var(--color-accent)' }}>Fee Structure</span>
-              <h2 className="section-title" style={{ color: 'var(--color-white)' }}>Understanding the Investment</h2>
+              <h2 className="section-title" style={{ color: 'var(--color-white)' }}>Education Within Reach</h2>
               <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 'var(--text-lg)', lineHeight: 1.7, marginBottom: 'var(--space-6)' }}>
                 B.Tech tuition is ₹1,05,000 per year. M.Tech is ₹55,800 and MBA is ₹55,000 annually.
                 Through government scholarships, SC/ST/BC fee reimbursement, and the PM Vidyalaxmi Scheme,

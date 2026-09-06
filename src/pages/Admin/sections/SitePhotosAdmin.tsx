@@ -335,6 +335,18 @@ const DEFAULT_SECTIONS: Record<string, Record<string, SectionDef>> = {
         { imageUrl: 'https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=900&q=80', alt: 'SVES campus', caption: '', label: '"About SVES" intro section photo' },
       ],
     },
+    'legacy-vision': {
+      label: 'Legacy Rooted in Vision Photo',
+      slots: [
+        { imageUrl: '/sves-legacy-vision.jpg', alt: 'Legacy Rooted in Vision — Late Dr. B. V. Raju', caption: '', label: 'Section Photo' },
+      ],
+    },
+    'leadership-culture': {
+      label: 'Leadership & Culture Photo',
+      slots: [
+        { imageUrl: '/sves-leadership-culture.jpg', alt: 'Leadership & Culture — Sri K. V. Vishnu Raju', caption: '', label: 'Section Photo' },
+      ],
+    },
     'sves-heritage': placeholderSection('SVES Campuses & Heritage', [
       'Society Central Office', 'Sister Institutions', 'Founder Chairman Vision', 'Joint Campus Events', 'Community Development Outreach',
     ]),

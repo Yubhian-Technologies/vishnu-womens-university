@@ -403,6 +403,10 @@ export default function Contact() {
                 <span className="emergency-pill__label">Anti-Ragging Toll-Free</span>
                 <span className="emergency-pill__num">1800-180-5522</span>
               </a>
+              <a href="tel:18005990599" className="emergency-pill">
+                <span className="emergency-pill__label">University Toll-Free</span>
+                <span className="emergency-pill__num">1800 599 0599</span>
+              </a>
               <a href="tel:+918816250864" className="emergency-pill">
                 <span className="emergency-pill__label">Campus Security</span>
                 <span className="emergency-pill__num">+91 8816 250864</span>

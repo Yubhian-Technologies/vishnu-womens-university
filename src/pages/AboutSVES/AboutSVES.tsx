@@ -1,7 +1,12 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, ExternalLink } from 'lucide-react';
+import {
+  MapPin, ExternalLink, GraduationCap, Check, Building2,
+  Users, Award, BookOpen, Sparkles, Globe
+} from 'lucide-react';
 import './AboutSVES.css';
+import '../About/About.css';
+import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
@@ -9,6 +14,8 @@ import { useOrderedCollection } from '../../hooks/useCollection';
 import { useSitePhotos, useSectionHasPhotos } from '../../hooks/useSitePhotos';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import type { SvesCampusDoc } from '../Admin/sections/SvesCampusesAdmin';
+
+const STAT_ICONS = [Building2, GraduationCap, Users, Award, BookOpen, Sparkles, MapPin, Globe];
 
 const defaultSvesPhotos = [
   // Slots 0-4: "Our Campuses" PhotoGrid gallery
@@ -29,15 +36,32 @@ const defaultSvesHeritagePhotos = [
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Community Development Outreach', caption: '' },
 ];
 
+const defaultLegacyVisionPhotos = [
+  { src: '/sves-legacy-vision.jpg', alt: 'Legacy Rooted in Vision — Late Dr. B. V. Raju', caption: '' },
+];
+
+const defaultLeadershipCulturePhotos = [
+  { src: '/sves-leadership-culture.jpg', alt: 'Leadership & Culture — Sri K. V. Vishnu Raju', caption: '' },
+];
+
 export default function AboutSVES() {
   const svesStats = useContentBlocks('about-sves', 'stats');
   const milestones = useContentBlocks('about-sves', 'milestones');
+  const legacyVisionBlocks = useContentBlocks('about-sves', 'legacy-vision');
+  const leadershipCultureBlocks = useContentBlocks('about-sves', 'leadership-culture');
+
   const { docs: campuses } = useOrderedCollection<SvesCampusDoc>('svesCampuses', 'order');
   const svesMainPhotos = useSitePhotos('about-sves', 'main', defaultSvesPhotos);
   const svesPhotos = svesMainPhotos.slice(0, 5);
   const svesIntroImg = svesMainPhotos[5];
   const svesHeritagePhotos = useSitePhotos('about-sves', 'sves-heritage', defaultSvesHeritagePhotos);
   const hasSvesHeritagePhotos = useSectionHasPhotos('about-sves', 'sves-heritage');
+
+  const legacyVisionPhotos = useSitePhotos('about-sves', 'legacy-vision', defaultLegacyVisionPhotos);
+  const legacyVisionImg = legacyVisionPhotos[0] || defaultLegacyVisionPhotos[0];
+
+  const leadershipCulturePhotos = useSitePhotos('about-sves', 'leadership-culture', defaultLeadershipCulturePhotos);
+  const leadershipCultureImg = leadershipCulturePhotos[0] || defaultLeadershipCulturePhotos[0];
 
   useEffect(() => {
     document.title = 'About SVES | VWU';
@@ -67,28 +91,40 @@ export default function AboutSVES() {
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Discover', to: '/' }, { label: 'About SVES' }]}
       />
 
-      {/* Stats */}
+      {/* Quick Stats Bar — M3 Tonal Surface Cards */}
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-8) 0' }}>
         <div className="container">
-          <div className="sves-stats-bar">
-            {svesStats.map(s => (
-              <div key={s.id} className="sves-stat">
-                <div className="sves-stat-value">{s.value}</div>
-                <div className="sves-stat-label">{s.title}</div>
-              </div>
-            ))}
+          <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-6)' }}>
+            <h2 style={{ color: 'var(--color-white)', fontSize: 'clamp(1.5rem, 3vw, 2.15rem)', fontWeight: 800, marginBottom: 'var(--space-2)' }}>
+              30+ Years of Educational Leadership &amp; Impact
+            </h2>
+            <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: '0.95rem' }}>
+              Empowering over 25,000 students across Andhra Pradesh &amp; Telangana.
+            </p>
+          </div>
+          <div className="about-facts-bar">
+            {svesStats.map((s, idx) => {
+              const IconComp = STAT_ICONS[idx % STAT_ICONS.length];
+              return (
+                <div key={s.id} className="about-fact">
+                  <IconComp size={20} className="about-fact-icon" strokeWidth={2} />
+                  <div className="about-fact-value">{s.value}</div>
+                  <div className="about-fact-label">{s.title}</div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* About SVES */}
+      {/* About SVES — M3 Surface Card Frame */}
       <section className="section bg-off-white">
         <div className="container">
-          <div className="grid-img-text">
+          <div className="about-mission-grid">
             <div className="reveal-left">
               <span className="section-label">ABOUT SVES</span>
               <h2 className="section-title">Sri Vishnu Educational Society</h2>
-              <p style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-4)' }}>
+              <p style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-4)' }}>
                 A Legacy of Educational Excellence Since 1992
               </p>
               <div className="divider" />
@@ -99,21 +135,27 @@ export default function AboutSVES() {
                 Over the decades, SVES has built a strong presence across Engineering, Dentistry, Pharmacy, Commerce &amp; Sciences, Management, and Polytechnic education, providing diverse opportunities for students to learn, innovate, and build meaningful careers.
               </p>
               <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-4)', color: 'var(--color-text-light)' }}>
-                Today, the SVES group of institutions comprises more than <strong>25,000 students</strong> and over <strong>1,400 faculty members</strong>. Its institutions offer a wide range of undergraduate and postgraduate programmes across campuses in Andhra Pradesh and Telangana, with a strong reputation for academic excellence and student development.
+                Today, the SVES group of institutions comprises more than <strong>25,000 students</strong> and over <strong>1,400 faculty members</strong> across campuses in Andhra Pradesh and Telangana, with a strong reputation for academic excellence and student development.
               </p>
               <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-5)', color: 'var(--color-text-light)' }}>
                 SVES has also been a pioneer in women’s engineering education, with two exclusive women’s engineering institutions recognized among the leading institutions in the region.
               </p>
-              <a href="https://www.srivishnu.edu.in/" target="_blank" rel="noopener noreferrer" className="btn btn-accent">
+              <a href="https://www.srivishnu.edu.in/" target="_blank" rel="noopener noreferrer" className="btn btn-primary">
                 Know More <ExternalLink size={15} strokeWidth={2.4} style={{ marginLeft: '0.4rem' }} />
               </a>
             </div>
             {svesIntroImg && (
-              <div>
-                <img
+              <div className="about-who-img-card reveal-right">
+                <SmoothImage
                   src={svesIntroImg.src}
-                  alt={svesIntroImg.alt}
-                  style={{ width: '100%', height: '480px', objectFit: 'cover', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-xl)' }}
+                  alt={svesIntroImg.alt || 'Sri Vishnu Educational Society Campus'}
+                  onError={(e) => {
+                    const target = e.currentTarget;
+                    if (!target.dataset.triedFallback) {
+                      target.dataset.triedFallback = 'true';
+                      target.src = PHOTO_NEEDED_PLACEHOLDER;
+                    }
+                  }}
                 />
               </div>
             )}
@@ -121,59 +163,139 @@ export default function AboutSVES() {
         </div>
       </section>
 
-      {/* Legacy Rooted in Vision & Built on Purpose */}
+      {/* Section 1: Legacy Rooted in Vision (Left Image, Right Content) */}
       <section className="section bg-white">
         <div className="container">
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 'var(--space-8)' }}>
-            <div className="reveal-left" style={{ background: 'var(--color-off-white)', padding: 'var(--space-8)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-light-gray)' }}>
-              <span className="section-label">Legacy Rooted in Vision</span>
-              <h3 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-3)' }}>Inspiring Generations Since 1992</h3>
+          <div className="about-mission-grid">
+            {legacyVisionImg && (
+              <div className="about-who-img-card reveal-left">
+                <SmoothImage
+                  src={legacyVisionImg.src}
+                  alt={legacyVisionImg.alt || 'Legacy Rooted in Vision — Late Dr. B. V. Raju'}
+                  onError={(e) => {
+                    const target = e.currentTarget;
+                    if (!target.dataset.triedFallback) {
+                      target.dataset.triedFallback = 'true';
+                      target.src = PHOTO_NEEDED_PLACEHOLDER;
+                    }
+                  }}
+                />
+              </div>
+            )}
+            <div className="reveal-right">
+              <span className="section-label">
+                {legacyVisionBlocks[0]?.value || 'Legacy Rooted in Vision'}
+              </span>
+              <h2 className="section-title">
+                {legacyVisionBlocks[0]?.title || 'Inspiring Generations Since 1992'}
+              </h2>
               <div className="divider" style={{ margin: '0 0 var(--space-4) 0' }} />
-              <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-4)', color: 'var(--color-text-light)' }}>
-                The story of SVES began with the vision of <strong>Late Dr. B. V. Raju</strong>, a pioneer of the Indian cement industry and a passionate advocate of education as a force for social transformation.
-              </p>
-              <p style={{ lineHeight: 1.8, color: 'var(--color-text-light)' }}>
-                Driven by his belief that quality education should reach aspiring learners beyond major cities, he established institutions that brought opportunities for excellence to students in smaller towns and emerging communities. His vision continues to guide SVES in creating educational environments that nurture knowledge, character, confidence, and leadership.
-              </p>
-            </div>
-
-            <div className="reveal-right" style={{ background: 'var(--color-off-white)', padding: 'var(--space-8)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-light-gray)' }}>
-              <span className="section-label">Leadership &amp; Culture</span>
-              <h3 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-3)' }}>Built on Purpose. Driven by Passion.</h3>
-              <div className="divider" style={{ margin: '0 0 var(--space-4) 0' }} />
-              <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-4)', color: 'var(--color-text-light)' }}>
-                The vision of the Founder Chairman, <strong>Late Dr. B. V. Raju</strong>, continues to inspire the leadership of <strong>Sri K. V. Vishnu Raju</strong>, Chairman and grandson of the Founder Chairman.
-              </p>
-              <p style={{ lineHeight: 1.8, color: 'var(--color-text-light)' }}>
-                Together, this enduring legacy has shaped a culture of purpose, innovation, excellence, and student-centered learning. SVES remains committed to creating transformative educational experiences that empower students to realize their potential and contribute meaningfully to society across Andhra Pradesh and Telangana.
-              </p>
+              {legacyVisionBlocks.length > 0 ? (
+                legacyVisionBlocks.map((block) => (
+                  <p key={block.id} style={{ lineHeight: 1.8, marginBottom: 'var(--space-4)', color: 'var(--color-text-light)' }}>
+                    {block.desc}
+                  </p>
+                ))
+              ) : (
+                <>
+                  <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-4)', color: 'var(--color-text-light)' }}>
+                    The story of SVES began with the vision of <strong>Late Dr. B. V. Raju</strong>, a pioneer of the Indian cement industry and a passionate advocate of education as a force for social transformation.
+                  </p>
+                  <p style={{ lineHeight: 1.8, color: 'var(--color-text-light)' }}>
+                    Driven by his belief that quality education should reach aspiring learners beyond major cities, he established institutions that brought opportunities for excellence to students in smaller towns and emerging communities. His vision continues to guide SVES in creating educational environments that nurture knowledge, character, confidence, and leadership.
+                  </p>
+                </>
+              )}
             </div>
           </div>
         </div>
       </section>
 
-      {/* Campuses */}
+      {/* Section 2: Leadership & Culture (Left Content, Right Image) */}
       <section className="section bg-off-white">
         <div className="container">
-          <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>
-            <span className="section-label">SVES Campuses</span>
+          <div className="about-mission-grid">
+            <div className="reveal-left">
+              <span className="section-label">
+                {leadershipCultureBlocks[0]?.value || 'Leadership & Culture'}
+              </span>
+              <h2 className="section-title">
+                {leadershipCultureBlocks[0]?.title || 'Built on Purpose. Driven by Passion.'}
+              </h2>
+              <div className="divider" style={{ margin: '0 0 var(--space-4) 0' }} />
+              {leadershipCultureBlocks.length > 0 ? (
+                leadershipCultureBlocks.map((block) => (
+                  <p key={block.id} style={{ lineHeight: 1.8, marginBottom: 'var(--space-4)', color: 'var(--color-text-light)' }}>
+                    {block.desc}
+                  </p>
+                ))
+              ) : (
+                <>
+                  <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-4)', color: 'var(--color-text-light)' }}>
+                    The vision of the Founder Chairman, <strong>Late Dr. B. V. Raju</strong>, continues to inspire the leadership of <strong>Sri K. V. Vishnu Raju</strong>, Chairman and grandson of the Founder Chairman.
+                  </p>
+                  <p style={{ lineHeight: 1.8, color: 'var(--color-text-light)' }}>
+                    Together, this enduring legacy has shaped a culture of purpose, innovation, excellence, and student-centered learning. SVES remains committed to creating transformative educational experiences that empower students to realize their potential and contribute meaningfully to society across Andhra Pradesh and Telangana.
+                  </p>
+                </>
+              )}
+            </div>
+            {leadershipCultureImg && (
+              <div className="about-who-img-card reveal-right">
+                <SmoothImage
+                  src={leadershipCultureImg.src}
+                  alt={leadershipCultureImg.alt || 'Leadership & Culture — Sri K. V. Vishnu Raju'}
+                  onError={(e) => {
+                    const target = e.currentTarget;
+                    if (!target.dataset.triedFallback) {
+                      target.dataset.triedFallback = 'true';
+                      target.src = PHOTO_NEEDED_PLACEHOLDER;
+                    }
+                  }}
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Four Distinct Campuses */}
+      <section className="section bg-white">
+        <div className="container">
+          <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-10)' }}>
+            <span className="section-label">SVES Network</span>
             <h2 className="section-title">Four Distinct Campuses</h2>
+            <p style={{ color: 'var(--color-text-light)', maxWidth: '650px', margin: '0.5rem auto 0', lineHeight: 1.7, fontSize: '1.02rem' }}>
+              Spanning across strategic academic hubs in Andhra Pradesh and Telangana, providing world-class learning ecosystems.
+            </p>
           </div>
           <div className="sves-campuses-grid">
-            {campuses.map((campus) => (
+            {campuses.map((campus, index) => (
               <div key={campus.id} className="sves-campus-card">
                 <div className="sves-campus-header">
-                  <h3>{campus.name}</h3>
-                  <span className="sves-campus-location" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}><MapPin size={13} /> {campus.location}</span>
+                  <div className="sves-campus-meta">
+                    <span className="sves-campus-index">0{index + 1}</span>
+                    <span className="sves-campus-location">
+                      <MapPin size={12} strokeWidth={2.5} /> {campus.location}
+                    </span>
+                  </div>
+                  <h3 className="sves-campus-name">{campus.name}</h3>
+                  <div className="sves-campus-badge">
+                    <GraduationCap size={13} /> {(campus.institutions || []).length} Institutions
+                  </div>
                 </div>
-                <ul className="sves-campus-list">
-                  {(campus.institutions || []).map(inst => (
-                    <li key={inst}>
-                      <span>›</span>
-                      <span>{inst}</span>
-                    </li>
-                  ))}
-                </ul>
+                <div className="sves-campus-body">
+                  <ul className="sves-campus-list">
+                    {(campus.institutions || []).map((inst) => (
+                      <li key={inst}>
+                        <span className="sves-list-bullet">
+                          <Check size={12} strokeWidth={3} />
+                        </span>
+                        <span className="sves-inst-text">{inst}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
             ))}
           </div>
@@ -181,12 +303,12 @@ export default function AboutSVES() {
       </section>
 
       {/* Campus Photos */}
-      <section className="section bg-white">
+      <section className="section bg-off-white">
         <div className="container">
           <PhotoGrid
             images={svesPhotos}
             label="Our Campuses"
-            title="SVES Institutions in Pictures"
+            title="SVES Institutions"
             subtitle="Glimpses from the campuses, events, and milestones of the Sri Vishnu Educational Society."
             highlights={[
               '11 institutions across Andhra Pradesh & Telangana',
@@ -196,7 +318,7 @@ export default function AboutSVES() {
               'Engineering, Pharmacy, Dental, School & beyond',
             ]}
             columns={2}
-            layout="side-text-reverse"
+            layout="side-text"
           />
         </div>
       </section>
@@ -221,7 +343,7 @@ export default function AboutSVES() {
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>
             <span className="section-label" style={{ color: 'var(--color-accent)' }}>Journey</span>
-            <h2 className="section-title" style={{ color: 'var(--color-white)' }}>25+ Years of SVES Excellence</h2>
+            <h2 className="section-title" style={{ color: 'var(--color-white)' }}>30+ Years of SVES Excellence</h2>
           </div>
           <div className="sves-milestones">
             {milestones.map((m) => (
@@ -235,16 +357,25 @@ export default function AboutSVES() {
         </div>
       </section>
 
-      {/* Navigation */}
-      <section style={{ background: 'var(--color-primary)', padding: 'var(--space-12) 0' }}>
+      {/* CTA */}
+      <section style={{ background: 'var(--color-primary)', padding: 'var(--space-20) 0' }}>
         <div className="container" style={{ textAlign: 'center' }}>
           <div className="reveal">
-            <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-6)' }}>Explore More</h2>
+            <span className="section-label" style={{ color: 'var(--color-accent)' }}>Join SVES</span>
+            <h2 style={{ color: 'var(--color-white)', fontSize: 'clamp(1.75rem, 4vw, 2.75rem)', marginBottom: 'var(--space-4)' }}>
+              Empowering Education Across Generations
+            </h2>
+            <div style={{ maxWidth: 720, margin: '0 auto var(--space-8)' }}>
+              <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 'var(--text-lg)', marginBottom: 'var(--space-4)' }}>
+                Sri Vishnu Educational Society continues to shape future leaders, innovators, and professionals through world-class academic institutions.
+              </p>
+              <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: 'var(--text-lg)', fontWeight: 700, marginBottom: 0 }}>
+                Discover our flagship university — Vishnu Women's University.
+              </p>
+            </div>
             <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Link to="/about" className="btn btn-accent">About VWU</Link>
-              <Link to="/vision-mission" className="btn btn-secondary">Vision & Mission</Link>
-              <Link to="/governance" className="btn btn-secondary">Governance</Link>
-              <Link to="/apply-now" className="btn btn-secondary">Apply Now</Link>
+              <Link to="/about" className="btn btn-accent btn-lg">About VWU</Link>
+              <Link to="/academics" className="btn btn-secondary btn-lg">Explore Academics</Link>
             </div>
           </div>
         </div>

@@ -405,7 +405,7 @@ function SingleProgramDetail() {
   const quickLinks = [
     hasDeptAbout && { id: 'about', label: 'Department Overview' },
     hasVisionMission && { id: 'vision-mission', label: 'Vision, Mission & Values' },
-    hasHod && { id: 'hod', label: 'About HOD' },
+    hasHod && { id: 'hod', label: 'Brief Profile' },
     faculty.length > 0 && { id: 'faculty', label: 'Faculty' },
     hasLabs && { id: 'labs', label: 'Laboratories' },
     hasLibrary && { id: 'library', label: 'Department Library' },
@@ -733,33 +733,28 @@ function SingleProgramDetail() {
           <div>
             <div style={{ marginBottom: 'var(--space-10)' }}>
               <span className="section-label dept-section-label">Academic Leadership</span>
-              <h2 className="section-title">Head of Department</h2>
+              <h2 className="section-title">Brief Profile</h2>
             </div>
             <div className="dept-hod-editorial-card">
-              {shared.hodImage && (
-                <div className="dept-hod-media-frame">
-                  <SmoothImage
-                    src={shared.hodImage}
-                    alt={shared.hod || 'Head of Department'}
-                    className="dept-hod-photo"
-                  />
-                </div>
-              )}
+              <div className="dept-hod-media-col">
+                {shared.hodImage && (
+                  <div className="dept-hod-media-frame">
+                    <SmoothImage
+                      src={shared.hodImage}
+                      alt={shared.hod || 'Head of Department'}
+                      className="dept-hod-photo"
+                    />
+                  </div>
+                )}
+                {shared.hod && (
+                  <div className="dept-hod-media-caption">
+                    <h3 className="dept-hod-name">{shared.hod}</h3>
+                    <div className="dept-hod-meta">Head of the Department</div>
+                  </div>
+                )}
+              </div>
 
               <div className="dept-hod-content">
-                <div className="dept-hod-badge-wrap">
-                  <span className="dept-hod-role-badge">Department Leadership</span>
-                  <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>•</span>
-                  <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>{program.shortName || program.name}</span>
-                </div>
-
-                {shared.hod && (
-                  <h3 className="dept-hod-name">{shared.hod}</h3>
-                )}
-
-                <div className="dept-hod-meta">
-                  <span>Head of the Department & Senior Faculty</span>
-                </div>
 
                 {shared.hodMessage && (
                   <div className="dept-hod-message-box">

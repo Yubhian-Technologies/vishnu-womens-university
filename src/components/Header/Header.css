@@ -333,18 +333,18 @@
   position: absolute;
   top: 0;
   left: 0;
-  background: rgba(27, 67, 50, 0.09) !important;
-  backdrop-filter: blur(8px) !important;
-  -webkit-backdrop-filter: blur(8px) !important;
-  border: 1px solid rgba(27, 67, 50, 0.16) !important;
+  background: color-mix(in srgb, var(--color-primary, #0b1e42) 10%, transparent) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid color-mix(in srgb, var(--color-primary, #0b1e42) 18%, transparent) !important;
   border-radius: 8px !important;
   pointer-events: none;
   will-change: transform, width, height, opacity;
-  transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1),
-              width 280ms cubic-bezier(0.16, 1, 0.3, 1),
-              height 280ms cubic-bezier(0.16, 1, 0.3, 1),
-              opacity 200ms cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+  transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1),
+              width 220ms cubic-bezier(0.16, 1, 0.3, 1),
+              height 220ms cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 4px 14px rgba(0, 0, 0, 0.06) !important;
   z-index: 0;
 }
 
@@ -371,7 +371,12 @@
   text-transform: uppercase;
   color: var(--color-primary-dark);
   white-space: nowrap;
-  transition: color 200ms cubic-bezier(0.16, 1, 0.3, 1), transform 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: color 180ms cubic-bezier(0.16, 1, 0.3, 1),
+              transform 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nav-tab-btn:hover {
+  transform: translateY(-1px);
 }
 
 @media (min-width: 1600px) {
@@ -570,10 +575,22 @@
   }
 }
 
+@keyframes megaGridFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.995);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 .mega-dropdown-grid {
   display: flex;
   gap: 2.5rem;
   align-items: stretch;
+  animation: megaGridFadeIn 220ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .mega-groups-container,
@@ -589,7 +606,7 @@
   flex: 1;
   min-width: 0;
   opacity: 0;
-  animation: navColFadeIn 280ms cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+  animation: navColFadeIn 220ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .mega-group-col.is-col-wide {
@@ -599,7 +616,7 @@
 @keyframes navColFadeIn {
   0% {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(4px);
   }
   100% {
     opacity: 1;
@@ -680,14 +697,19 @@
   text-decoration: none;
   line-height: 1.4;
   border-left: 3px solid transparent;
-  transition: all 160ms ease;
+  transition: color 180ms cubic-bezier(0.16, 1, 0.3, 1),
+              background-color 180ms cubic-bezier(0.16, 1, 0.3, 1),
+              border-left-color 180ms cubic-bezier(0.16, 1, 0.3, 1),
+              transform 180ms cubic-bezier(0.16, 1, 0.3, 1),
+              padding-left 180ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .mega-sublink:hover {
   color: var(--color-primary-dark);
-  background: color-mix(in srgb, var(--color-primary, #1b4332) 6%, transparent);
+  background: color-mix(in srgb, var(--color-primary, #0b1e42) 7%, transparent);
   border-left-color: var(--color-accent);
-  padding-left: 16px;
+  padding-left: 15px;
+  transform: translateX(3px);
 }
 
 .mega-link-text {

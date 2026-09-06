@@ -82,13 +82,13 @@ export default function Governance() {
       />
 
       {/* Stats bar */}
-      <section style={{ background: 'var(--color-primary)', padding: 'var(--space-6) 0' }}>
+      <section className="about-facts-bar">
         <div className="container">
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-14)', flexWrap: 'wrap' }}>
+          <div className="about-facts-grid">
             {stats.map(s => (
-              <div key={s.id} style={{ textAlign: 'center' }}>
-                <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', fontWeight: 900, color: 'var(--color-accent)' }}>{s.value}</div>
-                <div style={{ fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)' }}>{s.title}</div>
+              <div key={s.id} className="about-fact">
+                <div className="about-fact-num">{s.value}</div>
+                <div className="about-fact-label">{s.title}</div>
               </div>
             ))}
           </div>
@@ -96,8 +96,8 @@ export default function Governance() {
       </section>
 
       {/* Quick-jump nav */}
-      <div style={{ background: 'rgba(232, 245, 237, 0.85)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', borderBottom: '1px solid var(--color-light-gray)', position: 'sticky', top: 'calc(var(--topbar-height) + var(--header-height))', zIndex: 10, padding: 'var(--space-2) 0' }}>
-        <div className="container" style={{ display: 'flex', gap: 'var(--space-2)', overflowX: 'auto', paddingBottom: '2px' }}>
+      <div style={{ background: 'rgba(255, 255, 255, 0.92)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(27, 67, 50, 0.1)', position: 'sticky', top: 'calc(var(--topbar-height) + var(--header-height))', zIndex: 10, padding: 'var(--space-3) 0' }}>
+        <div className="container" style={{ display: 'flex', gap: 'var(--space-3)', overflowX: 'auto', paddingBottom: '2px' }}>
           {govCategories.map(cat => (
             <a
               key={cat.key}
@@ -105,14 +105,14 @@ export default function Governance() {
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '0.45rem',
+                gap: '0.5rem',
                 padding: '0.45rem 1.25rem',
                 fontSize: 'var(--text-xs)',
                 fontWeight: 800,
                 letterSpacing: '0.04em',
                 textTransform: 'uppercase',
                 color: 'var(--color-primary)',
-                background: 'var(--color-white)',
+                background: 'var(--color-off-white)',
                 border: '1px solid rgba(27, 67, 50, 0.1)',
                 borderRadius: 'var(--radius-full)',
                 textDecoration: 'none',
@@ -129,7 +129,7 @@ export default function Governance() {
               }}
               onMouseLeave={e => {
                 const el = e.currentTarget as HTMLElement;
-                el.style.background = 'var(--color-white)';
+                el.style.background = 'var(--color-off-white)';
                 el.style.color = 'var(--color-primary)';
                 el.style.borderColor = 'rgba(27, 67, 50, 0.1)';
                 el.style.transform = 'none';
@@ -153,12 +153,14 @@ export default function Governance() {
           >
             <div className="container">
               <div className="reveal" style={{ marginBottom: 'var(--space-10)' }}>
-                <span className="section-label" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', background: 'rgba(201, 168, 76, 0.15)', padding: '0.3rem 0.85rem', borderRadius: 'var(--radius-full)' }}><cat.icon size={14} /> {cat.label}</span>
-                <h2 className="section-title">{cat.label}</h2>
-                <p style={{ color: 'var(--color-text-light)', maxWidth: 600, lineHeight: 1.7 }}>{cat.desc}</p>
+                <span className="section-label" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <cat.icon size={14} /> {cat.label}
+                </span>
+                <h2 className="section-title" style={{ fontFamily: 'var(--font-serif)', letterSpacing: '-0.01em' }}>{cat.label}</h2>
+                <p style={{ color: 'var(--color-text-light)', maxWidth: 620, lineHeight: 1.75 }}>{cat.desc}</p>
               </div>
 
-              <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 'var(--space-6)' }}>
+              <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))', gap: 'var(--space-6)' }}>
                 {items.map((item) => {
                   const Icon = resolveContentIcon(item.icon) || Landmark;
                   return (
@@ -167,7 +169,8 @@ export default function Governance() {
                       style={{
                         background: 'var(--color-white)',
                         border: '1px solid rgba(27, 67, 50, 0.08)',
-                        borderRadius: '20px',
+                        borderLeft: '3.5px solid var(--color-primary)',
+                        borderRadius: '18px',
                         padding: 'var(--space-6)',
                         display: 'flex',
                         flexDirection: 'column',
@@ -176,13 +179,15 @@ export default function Governance() {
                       }}
                       onMouseEnter={e => {
                         const el = e.currentTarget as HTMLElement;
-                        el.style.borderColor = 'var(--color-accent)';
+                        el.style.borderColor = 'rgba(27, 67, 50, 0.15)';
+                        el.style.borderLeftColor = 'var(--color-accent)';
                         el.style.boxShadow = 'var(--shadow-xl)';
                         el.style.transform = 'translateY(-4px)';
                       }}
                       onMouseLeave={e => {
                         const el = e.currentTarget as HTMLElement;
                         el.style.borderColor = 'rgba(27, 67, 50, 0.08)';
+                        el.style.borderLeftColor = 'var(--color-primary)';
                         el.style.boxShadow = 'var(--shadow-sm)';
                         el.style.transform = 'none';
                       }}
@@ -191,16 +196,17 @@ export default function Governance() {
                         display: 'inline-flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        width: '52px',
-                        height: '52px',
-                        borderRadius: 'var(--radius-full)',
+                        width: '48px',
+                        height: '48px',
+                        borderRadius: '14px',
                         background: 'var(--color-off-white)',
                         color: 'var(--color-primary)',
-                        marginBottom: 'var(--space-4)'
+                        marginBottom: 'var(--space-4)',
+                        border: '1px solid rgba(27, 67, 50, 0.08)'
                       }}>
-                        <Icon size={26} strokeWidth={1.8} />
+                        <Icon size={24} strokeWidth={1.8} />
                       </div>
-                      <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 800, color: 'var(--color-primary)', marginBottom: 'var(--space-2)', lineHeight: 1.35 }}>
+                      <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: 'var(--text-lg)', fontWeight: 800, color: 'var(--color-primary)', marginBottom: 'var(--space-2)', lineHeight: 1.35 }}>
                         {item.title}
                       </h3>
                       <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.65, flex: 1, marginBottom: 'var(--space-5)' }}>
@@ -212,7 +218,7 @@ export default function Governance() {
                           display: 'inline-flex',
                           alignItems: 'center',
                           justifyContent: 'space-between',
-                          padding: '0.45rem 1rem',
+                          padding: '0.5rem 1.1rem',
                           borderRadius: 'var(--radius-full)',
                           background: 'var(--color-off-white)',
                           fontSize: 'var(--text-xs)',
@@ -220,20 +226,23 @@ export default function Governance() {
                           color: 'var(--color-primary)',
                           textDecoration: 'none',
                           marginTop: 'auto',
+                          border: '1px solid rgba(27, 67, 50, 0.08)',
                           transition: 'all var(--transition-fast)'
                         }}
                         onMouseEnter={e => {
                           const el = e.currentTarget as HTMLElement;
                           el.style.background = 'var(--color-primary)';
                           el.style.color = '#ffffff';
+                          el.style.borderColor = 'var(--color-primary)';
                         }}
                         onMouseLeave={e => {
                           const el = e.currentTarget as HTMLElement;
                           el.style.background = 'var(--color-off-white)';
                           el.style.color = 'var(--color-primary)';
+                          el.style.borderColor = 'rgba(27, 67, 50, 0.08)';
                         }}
                       >
-                        <span>Learn More</span>
+                        <span>View Framework</span>
                         <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
                           <path d="M2 6h8M6 2l4 4-4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
@@ -252,7 +261,7 @@ export default function Governance() {
         <div className="container">
           <PhotoGrid
             images={govPhotos}
-            label="Institutional Life"
+            label=""
             title="Governance in Action"
             subtitle="From council meetings to convocation, VWU's governance is built on transparency, accountability, and a commitment to excellence."
             highlights={[
@@ -274,7 +283,7 @@ export default function Governance() {
           <div className="container">
             <PhotoGrid
               images={boardOfDirectorsPhotos}
-              label="Board of Directors"
+              label=""
               title="Guiding VWU's Strategic Direction"
               columns={3}
               layout="default"
@@ -289,7 +298,7 @@ export default function Governance() {
           <div className="container">
             <PhotoGrid
               images={academicCouncilPhotos}
-              label="Academic Council"
+              label=""
               title="Shaping Curriculum & Academic Quality"
               columns={3}
               layout="default"
@@ -298,12 +307,13 @@ export default function Governance() {
         </section>
       )}
 
-      {/* CTA */}
-      <section style={{ background: 'var(--color-primary)', padding: 'var(--space-14) 0' }}>
-        <div className="container" style={{ textAlign: 'center' }}>
-          <div className="reveal">
-            <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>Learn More About VWU</h2>
-            <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
+      {/* Bottom CTA Banner */}
+      <section className="about-cta-banner">
+        <div className="container">
+          <div className="about-cta-inner">
+            <h2>Learn More About VWU</h2>
+            <p>Explore our history, leadership, vision, and campus ecosystem.</p>
+            <div className="about-cta-buttons">
               <Link to="/about" className="btn btn-accent">About VWU</Link>
               <Link to="/vision-mission" className="btn btn-secondary">Vision & Mission</Link>
               <Link to="/about-sves" className="btn btn-secondary">About SVES</Link>

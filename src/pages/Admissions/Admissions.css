@@ -6,6 +6,23 @@
   align-items: start;
 }
 
+.adm-intro-main {
+  background: var(--color-white);
+  border: 1px solid color-mix(in srgb, var(--color-primary, #0B1E42) 10%, transparent);
+  border-top: 4px solid var(--color-primary);
+  border-radius: 20px;
+  padding: var(--space-8);
+  box-shadow: 0 10px 30px rgba(11, 30, 66, 0.05);
+  transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.adm-intro-main:hover {
+  border-color: var(--color-accent);
+  border-top-color: var(--color-accent);
+  box-shadow: 0 18px 45px rgba(11, 30, 66, 0.1);
+  transform: translateY(-3px);
+}
+
 .adm-intro-main .section-label {
   display: block;
   margin-bottom: var(--space-2);

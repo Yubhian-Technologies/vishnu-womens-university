@@ -544,7 +544,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     hasCoreValues && { id: 'vision-mission', label: 'Core Values' },
     subPrograms.length > 0 && { id: 'programmes', label: 'Degree Programmes' },
     (hasPlacements || hasInternships) && { id: 'placements', label: placementsLinkLabel },
-    hasHod && { id: 'hod', label: 'About HOD' },
+    hasHod && { id: 'hod', label: 'Brief Profile' },
     faculty.length > 0 && { id: 'faculty', label: 'Faculty' },
     hasLabs && { id: 'labs', label: 'Laboratories' },
     subPrograms.length > 0 && { id: 'program-toggle', label: 'Programmes & Course Structure' },
@@ -1303,7 +1303,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
               )}
 
               <div className="dept-hod-content">
-                <h2 className="dept-hod-message-title">A Message from the HOD</h2>
+                <h2 className="dept-hod-message-title">Brief Profile</h2>
 
                 {shared.hodMessage && (
                   <p className="dept-hod-message-text-plain">{shared.hodMessage}</p>
