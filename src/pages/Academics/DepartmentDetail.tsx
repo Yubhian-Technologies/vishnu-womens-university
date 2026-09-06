@@ -544,7 +544,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     hasCoreValues && { id: 'vision-mission', label: 'Core Values' },
     subPrograms.length > 0 && { id: 'programmes', label: 'Degree Programmes' },
     (hasPlacements || hasInternships) && { id: 'placements', label: placementsLinkLabel },
-    hasHod && { id: 'hod', label: 'About HOD' },
+    hasHod && { id: 'hod', label: 'Brief Profile' },
     faculty.length > 0 && { id: 'faculty', label: 'Faculty' },
     hasLabs && { id: 'labs', label: 'Laboratories' },
     subPrograms.length > 0 && { id: 'program-toggle', label: 'Programmes & Course Structure' },
@@ -1309,7 +1309,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
               )}
 
               <div className="dept-hod-content">
-                <h2 className="dept-hod-message-title">A Message from the HOD</h2>
+                <h2 className="dept-hod-message-title">Brief Profile</h2>
 
                 {shared.hodMessage && (
                   <p className="dept-hod-message-text-plain">{shared.hodMessage}</p>
@@ -1897,12 +1897,12 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-14) 0' }}>
         <div className="container" style={{ textAlign: 'center' }}>
           <span className="section-label dept-section-label" style={{ color: 'var(--color-accent)' }}>Apply Today</span>
-          <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>Begin Your Journey in {activeProgram.shortName || activeProgram.name}</h2>
+          <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>Begin Your Journey in {deptName}</h2>
           <p style={{ color: 'rgba(255,255,255,0.8)', maxWidth: 500, margin: '0 auto var(--space-8)', lineHeight: 1.7 }}>
-            Join a thriving academic community. Apply through EAPCET (Code: {eapcetCode}), explore our fee structure, or schedule a campus visit today.
+            Join a thriving academic community. Apply through AP EAPCET (Code: {eapcetCode}), explore our fee structure, or schedule a campus visit today.
           </p>
           <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link to="/admissions" className="btn btn-accent btn-lg">Apply via EAPCET</Link>
+            <Link to="/admissions" className="btn btn-accent btn-lg">Apply via AP EAPCET</Link>
             <Link to="/programmes-fee-structure" className="btn btn-secondary btn-lg">Fee Structure</Link>
             <Link to="/academics" className="btn btn-secondary btn-lg">All Programmes</Link>
           </div>

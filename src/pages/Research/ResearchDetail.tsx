@@ -256,9 +256,6 @@ export default function ResearchDetail() {
               {item.intro && (
                 <p className="dept-hero-subtitle">{item.intro}</p>
               )}
-              <div className="dept-hero-cta">
-                <Link to="/apply-now" className="btn-hero-gold">Apply Now</Link>
-              </div>
             </div>
           </div>
         </div>
@@ -273,11 +270,6 @@ export default function ResearchDetail() {
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>
                 {item.title.toLowerCase().startsWith('about ') ? item.title : `About ${item.title}`}
               </h2>
-              {intro && (
-                <p style={{ fontSize: 'var(--text-lg)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-5)' }}>
-                  {intro}
-                </p>
-              )}
               {aboutBlocks.map((block, bi) => {
                 if (block.type === 'heading') {
                   return (
@@ -314,9 +306,9 @@ export default function ResearchDetail() {
                   </p>
                 );
               })}
-              {!intro && aboutBlocks.length === 0 && (
+              {aboutBlocks.length === 0 && (
                 <p style={{ fontSize: 'var(--text-lg)', color: 'var(--color-text)', lineHeight: 1.75 }}>
-                  {item.desc}
+                  {item.desc || intro}
                 </p>
               )}
             </div>

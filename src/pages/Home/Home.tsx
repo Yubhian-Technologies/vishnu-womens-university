@@ -335,7 +335,7 @@ export default function Home() {
             <div className="cta-actions">
               <Link to="/admissions" className="btn btn-accent btn-lg">Schedule a Visit</Link>
               <Link to="/admissions" className="btn btn-secondary btn-lg">Request Information</Link>
-              <Link to="/admissions" className="btn btn-secondary btn-lg">Apply via EAPCET</Link>
+              <Link to="/admissions" className="btn btn-secondary btn-lg">Apply via AP EAPCET</Link>
             </div>
           </div>
         </div>
