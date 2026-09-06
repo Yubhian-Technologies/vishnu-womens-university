@@ -69,14 +69,22 @@ const defaultStudyCards: ContentBlockDoc[] = [
   { id: 'default-3', page: 'home', section: 'studyCards', value: 'Ph.D. Programs', title: 'Research & Ph.D.', desc: 'Conduct doctoral research in CSE, ECE, and EEE — backed by 2,500+ publications, 90+ patents, and purpose-built research facilities.', icon: 'FlaskConical', slug: '/academics', order: 2 },
 ];
 
-// The "M.Tech & MBA" study card's slug is admin-editable in Firestore and
-// currently just points at the plain "/academics" page, which lands on its
-// default B.Tech tab. Route that specific card straight to the M.Tech tab
-// instead — but only when it's still the generic default, so an admin who
-// deliberately customizes the slug (e.g. to an external link) isn't overridden.
+// Each study card's slug is admin-editable in Firestore and currently just
+// points at the plain "/academics" page, which always lands on its default
+// B.Tech tab. Route each card straight to the Programs tab matching what it
+// actually advertises instead — but only when it's still the generic
+// default, so an admin who deliberately customizes the slug (e.g. to an
+// external link) isn't overridden.
+const STUDY_CARD_TABS: Record<string, string> = {
+  'B.Tech Programs': 'btech',
+  'M.Tech & MBA Programs': 'mtech',
+  'Ph.D. Programs': 'phd',
+};
+
 function studyCardHref(card: ContentBlockDoc): string {
-  if (card.value === 'M.Tech & MBA Programs' && (card.slug === '/academics' || !card.slug)) {
-    return '/academics?tab=mtech';
+  const tab = STUDY_CARD_TABS[card.value];
+  if (tab && (card.slug === '/academics' || !card.slug)) {
+    return `/academics?tab=${tab}`;
   }
   return card.slug || '/academics';
 }
