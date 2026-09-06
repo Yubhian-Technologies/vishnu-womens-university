@@ -6,7 +6,7 @@ import ImageUploader from '../../../components/ImageUploader/ImageUploader';
 import FileUploader from '../../../components/FileUploader/FileUploader';
 import { deleteFile, type UploadResult } from '../../../lib/storage';
 import { PROGRAM_ICON_NAMES } from '../../../lib/programIcons';
-import { normalizeLab, type LabItem, type LibrarySection, type LibraryItem, type NewsEventsYear, type ProgramLink, type ProgramDoc, type RndLink, type NewsletterYear, type RndYear } from './ProgramsAdmin';
+import { normalizeLab, stripUndefined, type LabItem, type LibrarySection, type LibraryItem, type NewsEventsYear, type ProgramLink, type ProgramDoc, type RndLink, type NewsletterYear, type RndYear } from './ProgramsAdmin';
 import type { RndStructuredTable } from './RndTableEditor';
 import type { PlacementYearRecord } from '../../../lib/placementRecords';
 import type { InternshipYearRecord } from '../../../lib/internshipRecords';
@@ -629,17 +629,24 @@ export default function DepartmentsAdmin() {
     if (!form.title || !form.shortCode) return alert('Title and Short Code are required.');
     setSaving(true);
     try {
-      const payload = {
+      // stripUndefined (see ProgramsAdmin.tsx) drops every literal `undefined`
+      // left over anywhere in the department's deeply-nested optional content
+      // (Custom Sections, Programme Levels, Library Sections, Research
+      // Profile links, ...) — Firestore's updateDoc/addDoc reject the whole
+      // write if even one nested field is `undefined`, and diffChangedFields
+      // only guards against a TOP-level field being undefined, not one
+      // buried inside an object/array that's otherwise being saved.
+      const payload = stripUndefined({
         ...form,
         highlights: (form.highlights || []).filter(Boolean),
         mission: (form.mission || []).filter(Boolean),
         coreValues: (form.coreValues || []).filter(Boolean),
         labs: labs.filter((l) => l.name),
-      };
+      });
       if (editing) {
         // Only send fields that actually changed in this editing session —
         // see originalForm/diffChangedFields above.
-        const changed = originalForm ? diffChangedFields(payload, originalForm) : payload;
+        const changed = originalForm ? diffChangedFields(payload, stripUndefined(originalForm)) : payload;
         if (Object.keys(changed).length > 0) {
           await updateDoc(doc(db, 'departments', editing), changed);
         }
