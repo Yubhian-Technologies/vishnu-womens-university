@@ -298,8 +298,12 @@
 .shape--3 { width: 180px; height: 180px; top: 40%; right: 12%; animation-delay: -6s; }
 
 .study-intro {
-  max-width: 700px;
+  max-width: 100%;
   margin-bottom: var(--space-12);
+}
+
+.study-intro .section-desc {
+  max-width: 100%;
 }
 .study-grid {
   display: grid;

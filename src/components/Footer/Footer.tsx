@@ -118,17 +118,12 @@ export default function Footer() {
           <div className="vwu-footer-brand-block">
             <Link to="/" className="vwu-footer-logo-wrap" aria-label="Vishnu Women's University Home">
               <img
-                src="/images/square%20logo.png"
-                alt="VWU Emblem"
+                src="/images/footer-logo.png"
+                alt="Vishnu Women's University"
                 className="vwu-footer-logo-img"
-                width={52}
-                height={52}
                 loading="lazy"
               />
-              <div className="vwu-footer-brand-title">
-                <span className="vwu-brand-main">Vishnu Women's</span>
-                <span className="vwu-brand-sub">University</span>
-              </div>
+              <span className="vwu-brand-main" lang="te">విష్ణు మహిళా విశ్వవిద్యాలయం</span>
             </Link>
 
             <p className="vwu-footer-mission-text">

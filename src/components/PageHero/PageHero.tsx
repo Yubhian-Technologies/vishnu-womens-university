@@ -23,6 +23,7 @@ interface PageHeroProps {
   size?: 'large' | 'medium' | 'small';
   /** When set, the CTA button scrolls to this element id instead of following ctaLink. */
   scrollCtaTargetId?: string;
+  hideCta?: boolean;
 }
 
 const INTERVAL = 5000;
@@ -35,6 +36,7 @@ export default function PageHero({
   breadcrumb,
   size = 'medium',
   scrollCtaTargetId,
+  hideCta = false,
 }: PageHeroProps) {
   const { slides, loading } = usePageBanners(page);
   const [current, setCurrent] = useState(0);
@@ -159,7 +161,7 @@ export default function PageHero({
                   </p>
                 )}
 
-                {(slide.ctaLabel || scrollCtaTargetId) && (slide.ctaLink || scrollCtaTargetId) && (
+                {!hideCta && (slide.ctaLabel || scrollCtaTargetId) && (slide.ctaLink || scrollCtaTargetId) && (
                   <div key={`cta-${current}`} className="page-hero__cta animate-fade-in-up">
                     {scrollCtaTargetId ? (
                       <button

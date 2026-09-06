@@ -72,35 +72,20 @@
 }
 
 .vwu-footer-logo-img {
-  width: 52px;
-  height: 52px;
-  border-radius: 8px;
-  background: #ffffff;
-  padding: 3px;
+  height: 58px;
+  width: auto;
   object-fit: contain;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-}
-
-.vwu-footer-brand-title {
-  display: flex;
-  flex-direction: column;
+  flex-shrink: 0;
 }
 
 .vwu-brand-main {
   font-family: var(--font-serif, Georgia, serif);
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   font-weight: 700;
-  color: var(--footer-heading, #ffffff);
+  color: #ffffff;
+  line-height: 1.25;
   letter-spacing: -0.01em;
-}
-
-.vwu-brand-sub {
-  font-family: var(--font-sans);
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: var(--footer-accent, var(--color-accent, #c9a84c));
+  white-space: nowrap;
 }
 
 .vwu-footer-mission-text {
