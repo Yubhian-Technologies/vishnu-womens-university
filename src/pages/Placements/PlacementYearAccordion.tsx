@@ -175,9 +175,10 @@ function BranchOffersDonut({ data, total }: { data: BranchOfferCount[]; total: n
         </div>
       </div>
 
-      <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 'var(--space-2) var(--space-4)', minWidth: 260, flex: 1 }}>
+      <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(165px, 1fr))', gap: 'var(--space-3)', minWidth: 260, flex: 1 }}>
         {slices.map((s) => {
           const isHovered = hovered === s.branch;
+          const displayLabel = s.branch.replace(/\s*Offers$/i, '');
           return (
             <li
               key={s.branch}
@@ -189,17 +190,26 @@ function BranchOffersDonut({ data, total }: { data: BranchOfferCount[]; total: n
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 'var(--space-2)',
-                padding: '0.35rem 0.5rem',
-                borderRadius: 'var(--radius-sm)',
-                background: isHovered ? 'var(--color-off-white)' : 'transparent',
-                transition: 'background var(--transition-fast)',
+                justifyContent: 'space-between',
+                gap: '0.4rem',
+                minHeight: '52px',
+                height: '100%',
+                padding: '0.5rem 0.75rem',
+                borderRadius: '6px',
+                border: isHovered ? `1.5px solid ${s.color}` : '1px solid #e2e8f0',
+                background: isHovered ? 'color-mix(in srgb, var(--color-primary) 4%, #ffffff)' : '#ffffff',
+                boxShadow: isHovered ? '0 4px 10px rgba(0, 0, 0, 0.06)' : '0 1px 2px rgba(0, 0, 0, 0.03)',
+                transition: 'all 200ms ease',
                 cursor: 'pointer',
               }}
             >
-              <span style={{ width: 12, height: 12, borderRadius: 3, background: s.color, flexShrink: 0 }} />
-              <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', flex: 1 }}>{s.branch}</span>
-              <span style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-primary)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', minWidth: 0, flex: 1 }}>
+                <span style={{ width: 10, height: 10, borderRadius: 2, background: s.color, flexShrink: 0 }} />
+                <span style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--color-text)', lineHeight: 1.25 }}>
+                  {displayLabel}
+                </span>
+              </div>
+              <span style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--color-primary)', flexShrink: 0, marginLeft: '0.25rem' }}>
                 {s.offers.toLocaleString('en-IN')}
               </span>
             </li>

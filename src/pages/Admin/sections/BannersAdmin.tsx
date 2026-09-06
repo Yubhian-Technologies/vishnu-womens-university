@@ -65,6 +65,8 @@ export const PAGES = [
   { value: 'academics-curriculum',    label: 'Academics: Curriculum Matrix' },
   { value: 'academics-downloads',     label: 'Academics: Documents' },
   { value: 'academics-schools',       label: 'Academics: Schools' },
+  { value: 'academics-departments',   label: 'Academics: Departments' },
+  { value: 'academics-programs',      label: 'Academics: Programs' },
   { value: 'faculty',                 label: 'Faculty' },
   { value: 'admissions',              label: 'Admissions' },
   { value: 'campus-visit',            label: 'Campus Visit' },
@@ -115,7 +117,7 @@ export const PAGES = [
 const PAGE_GROUPS: { label: string; values: string[] }[] = [
   { label: 'Main Pages', values: ['home', 'academics', 'admissions', 'programmes-fee', 'admission-procedure', 'result-analysis', 'campus-visit', 'student-life', 'placements', 'alumni-giving', 'about', 'information'] },
   { label: 'About, Society & Governance', values: ['about-sves', 'vision-mission', 'governance', 'governing-body', 'governance-detail'] },
-  { label: 'Academics', values: ['academics-curriculum', 'academics-downloads', 'academics-schools', 'faculty', 'program-detail'] },
+  { label: 'Academics', values: ['academics-curriculum', 'academics-downloads', 'academics-schools', 'academics-departments', 'academics-programs', 'faculty', 'program-detail'] },
   { label: 'Student Life', values: ['student-clubs', 'arts-culture', 'social-services', 'sports-games', 'vishnu-tv', 'campus-magazines'] },
   { label: 'Placements, Careers & Research', values: ['placement-detail', 'careers', 'differentiators', 'differentiators-detail', 'research', 'research-detail'] },
   { label: 'News & Awards', values: ['news', 'events', 'news-awards', 'news-awards-happenings', 'news-awards-accreditations', 'news-awards-gallery'] },
@@ -151,7 +153,9 @@ const PAGE_TEXT_DEFAULTS: Record<string, { title: string; subtitle?: string }> =
   'events': { title: 'Campus Events', subtitle: 'Technical symposia, sports tournaments, graduation ceremonies, and much more — the VWU calendar is always full.' },
   'academics': { title: 'You Will Excel.', subtitle: 'Rigorous, industry-aligned programs designed to build your technical expertise, sharpen your research instincts, and develop you as a professional.' },
   'faculty': { title: 'Our Faculty', subtitle: 'Experienced educators and researchers across every department, dedicated to academic excellence and student success.' },
-  'academics-schools': { title: 'Schools' },
+  'academics-schools': { title: 'Schools', subtitle: 'Explore our academic schools and departments.' },
+  'academics-departments': { title: 'Departments', subtitle: 'Discover our specialized academic departments.' },
+  'academics-programs': { title: 'Programs', subtitle: 'B.Tech, M.Tech, MBA, and Ph.D. degree programmes.' },
   'academics-downloads': { title: 'Academic Documents', subtitle: 'Official academic documents — calendar and regulations — available for download.' },
   'programmes-fee': { title: 'Programmes & Fee Structure', subtitle: 'Complete list of programs, intake capacities, and annual fee structure Category A.' },
   'student-life': { title: 'Discover Your Place at VWU', subtitle: 'VWU offers more than an engineering qualification. It is where you find your community, sharpen your purpose, and start building your future.' },
@@ -305,7 +309,12 @@ function PageBannersAdmin() {
                   key={group.label}
                   type="button"
                   className="admin-page-btn"
-                  onClick={() => setSelectedGroup(group.label)}
+                  onClick={() => {
+                    setSelectedGroup(group.label);
+                    if (group.values.length > 0 && !group.values.includes(form.page)) {
+                      selectPage(group.values[0]);
+                    }
+                  }}
                 >
                   {group.label} ({bannersInGroup(group.label)})
                 </button>

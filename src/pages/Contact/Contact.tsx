@@ -13,7 +13,7 @@ import {
   CheckCircle2,
   AlertCircle,
   ExternalLink,
-  ShieldAlert,
+  ShieldCheck,
   Train,
   Plane,
   Bus,
@@ -21,9 +21,16 @@ import {
   PhoneCall,
   Headphones,
 } from 'lucide-react';
+import type { ComponentType } from 'react';
+import {
+  InstagramIcon,
+  FacebookIcon,
+  TwitterIcon,
+  LinkedInIcon,
+  YouTubeIcon,
+} from '../../components/Footer/SocialIcons';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
-import { usePageBanner } from '../../hooks/usePageBanner';
 import { useSiteContact, DEFAULT_PHONE } from '../../hooks/useSiteContact';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import type { ContactDoc } from '../Admin/sections/ContactsAdmin';
@@ -121,15 +128,30 @@ const DEFAULT_INFO_CARDS = [
   },
 ];
 
+function getDeptAvatarCode(deptName: string, index: number): string {
+  const upper = deptName.toUpperCase();
+  if (upper.includes('COMPUTER') || upper.includes('CSE')) return 'CSE';
+  if (upper.includes('ARTIFICIAL') || upper.includes('AI')) return 'AI';
+  if (upper.includes('INFORMATION') || upper.includes(' IT') || upper.includes('(IT)') || upper.includes(' IN') || upper.includes('(IN)')) return 'IN';
+  if (upper.includes('ELECTRONICS') || upper.includes('ECE')) return 'ECE';
+  if (upper.includes('ELECTRICAL') || upper.includes('EEE')) return 'EEE';
+  if (upper.includes('CIVIL') || upper.includes('CE') || upper.includes('BASIC')) return 'CE';
+  if (upper.includes('MECHANICAL') || upper.includes('ME')) return 'ME';
+  if (upper.includes('MANAGEMENT') || upper.includes('MBA')) return 'MBA';
+
+  const defaultCodes = ['CSE', 'AI', 'IN', 'ECE', 'EEE', 'CE', 'ME', 'MBA'];
+  return defaultCodes[index] || deptName.slice(0, 2).toUpperCase();
+}
+
 const DEFAULT_DEPT_CONTACTS: ContactDoc[] = [
-  { id: 'dept-1', dept: 'Computer Science & Engineering (CSE)', hod: 'DR. P. KIRAN SREE', phone: '', email: 'hod_cse@vwu.edu.in', order: 1 },
-  { id: 'dept-2', dept: 'Artificial Intelligence & Data Science (AI & DS)', hod: 'DR. M. SRIDEVI', phone: '', email: 'hod_aids@vwu.edu.in', order: 2 },
-  { id: 'dept-3', dept: 'Electronics & Communication Engineering (ECE)', hod: 'DR. J. SOMLAL', phone: '', email: 'hod_ece@vwu.edu.in', order: 3 },
-  { id: 'dept-4', dept: 'Electrical & Electronics Engineering (EEE)', hod: 'DR. K. RAYUDU', phone: '', email: 'hod_eee@vwu.edu.in', order: 4 },
-  { id: 'dept-5', dept: 'Information Technology (IT)', hod: 'DR. CH. SRINIVAS', phone: '', email: 'hod_it@vwu.edu.in', order: 5 },
-  { id: 'dept-6', dept: 'Basic Sciences & Humanities (BS&H)', hod: 'DR. V. RAMA DEVI', phone: '', email: 'hod_bsh@vwu.edu.in', order: 6 },
-  { id: 'dept-7', dept: 'Department of Management Studies (MBA)', hod: 'DR. T. SUDHA', phone: '', email: 'hod_mba@vwu.edu.in', order: 7 },
-  { id: 'dept-8', dept: 'Examinations & Student Evaluation Cell', hod: 'CONTROLLER OF EXAMINATIONS', phone: '', email: 'ce@vwu.edu.in', order: 8 },
+  { id: 'dept-1', dept: 'Computer Science & Engineering (CSE)', hod: 'Dr. P. KIRAN SREE', phone: '', email: 'hod_cse@vwu.edu.in', order: 1 },
+  { id: 'dept-2', dept: 'Artificial Intelligence & Data Science (AI)', hod: 'Dr. M. SRIDEVI', phone: '', email: 'hod_aids@vwu.edu.in', order: 2 },
+  { id: 'dept-3', dept: 'Information Technology (IN)', hod: 'Dr. CH. SRINIVAS', phone: '', email: 'hod_it@vwu.edu.in', order: 3 },
+  { id: 'dept-4', dept: 'Electronics & Communication Engineering (ECE)', hod: 'Dr. J. SOMLAL', phone: '', email: 'hod_ece@vwu.edu.in', order: 4 },
+  { id: 'dept-5', dept: 'Electrical & Electronics Engineering (EEE)', hod: 'Dr. K. RAYUDU', phone: '', email: 'hod_eee@vwu.edu.in', order: 5 },
+  { id: 'dept-6', dept: 'Civil Engineering (CE)', hod: 'Dr. V. RAMA DEVI', phone: '', email: 'hod_ce@vwu.edu.in', order: 6 },
+  { id: 'dept-7', dept: 'Mechanical Engineering (ME)', hod: 'Dr. B. V. RAMANA', phone: '', email: 'hod_me@vwu.edu.in', order: 7 },
+  { id: 'dept-8', dept: 'Department of Management Studies (MBA)', hod: 'Dr. T. SUDHA', phone: '', email: 'hod_mba@vwu.edu.in', order: 8 },
 ];
 
 const DEFAULT_SOCIAL_LINKS = [
@@ -140,12 +162,12 @@ const DEFAULT_SOCIAL_LINKS = [
   { id: 'soc-5', title: 'Twitter', value: 'https://twitter.com/vishnuuniv', icon: 'twitter' },
 ];
 
-const SOCIAL_META: Record<string, { label: string; color: string; glyph: string }> = {
-  LinkedIn: { label: 'LinkedIn', color: '#0077b5', glyph: 'in' },
-  YouTube: { label: 'YouTube', color: '#ff0000', glyph: '▶' },
-  Instagram: { label: 'Instagram', color: '#e1306c', glyph: '◎' },
-  Facebook: { label: 'Facebook', color: '#1877f2', glyph: 'f' },
-  Twitter: { label: 'X (Twitter)', color: '#111827', glyph: '𝕏' },
+const SOCIAL_META: Record<string, { label: string; color: string; Icon: ComponentType<{ size?: number }> }> = {
+  LinkedIn: { label: 'LinkedIn', color: '#0077b5', Icon: LinkedInIcon },
+  YouTube: { label: 'YouTube', color: '#ff0000', Icon: YouTubeIcon },
+  Instagram: { label: 'Instagram', color: '#e1306c', Icon: InstagramIcon },
+  Facebook: { label: 'Facebook', color: '#1877f2', Icon: FacebookIcon },
+  Twitter: { label: 'X (Twitter)', color: '#111827', Icon: TwitterIcon },
 };
 
 export default function Contact() {
@@ -154,7 +176,6 @@ export default function Contact() {
   const liveSocialLinks = useContentBlocks('contact', 'socialLinks');
   const { email: siteEmail, phone: sitePhone } = useSiteContact();
   const defaultPhoneDigits = DEFAULT_PHONE.replace(/\D/g, '');
-  const banner = usePageBanner('contact');
 
   // Two independent info-card fixes compose here, in order: legacy email
   // domains and a missing admissions address get normalized first (our
@@ -182,9 +203,13 @@ export default function Contact() {
     } else if (email) {
       email = `${email}@vwu.edu.in`;
     }
+    let hod = d.hod ? d.hod.trim() : '';
+    if (/^DR\.?\s+/i.test(hod)) {
+      hod = hod.replace(/^DR\.?\s+/i, 'Dr. ');
+    }
     return {
       ...d,
-      hod: d.hod ? d.hod.toUpperCase() : '',
+      hod,
       phone: '', // Guardrail: Mobile numbers removed
       email,
     };
@@ -272,13 +297,13 @@ export default function Contact() {
         <div className="contact-hero-glow" aria-hidden="true" />
         <div className="container contact-hero-clean__inner">
           <h1 className="contact-hero-clean__title">
-            {banner?.title || "We're Here to Help"}
+            Got Questions? We’ve Got You 💬
           </h1>
           <p className="contact-hero-clean__subtitle">
-            Have a question about admissions, academic programmes, campus life, or the University? Our team is here to assist you.
+            Curious about admissions, programmes, or campus life? Our team is here to help you with everything you need.
           </p>
-          <p className="contact-hero-clean__subtitle">
-            For admission enquiries, general information, or any other assistance, please get in touch with us. We look forward to hearing from you and helping you find the information you need.
+          <p className="contact-hero-clean__subtitle" style={{ fontWeight: 600, color: 'var(--color-accent, #c9a84c)' }}>
+            Reach out. Ask away. Start your journey. ✨
           </p>
 
           <nav className="contact-hero-quicknav" aria-label="Contact page sections">
@@ -299,7 +324,7 @@ export default function Contact() {
               <span>Department Directory</span>
             </a>
             <a href="#helplines" className="contact-hero-quicknav-pill contact-hero-quicknav-pill--alert">
-              <ShieldAlert size={15} />
+              <ShieldCheck size={15} />
               <span>24&times;7 Helplines</span>
             </a>
           </nav>
@@ -311,7 +336,7 @@ export default function Contact() {
         <div className="container">
           <div className="section-head-center">
             <span className="section-label">Key Contact Points</span>
-            <h2 className="section-title">Connect with the Right Team</h2>
+            <h2 className="section-title">Connect with the Team</h2>
             <p className="section-subtitle">
               Dedicated support desks for <strong>admissions, administrative services, and campus visits</strong>, providing timely assistance and guidance.
             </p>
@@ -382,7 +407,7 @@ export default function Contact() {
           <div className="emergency-box">
             <div className="emergency-box__left">
               <div className="emergency-icon-circle">
-                <ShieldAlert size={26} />
+                <ShieldCheck size={26} />
               </div>
               <div>
                 <h3 className="emergency-title">24x7 Women's Safety &amp; Helplines</h3>
@@ -393,10 +418,6 @@ export default function Contact() {
             </div>
 
             <div className="emergency-box__numbers">
-              <a href="tel:18001805522" className="emergency-pill">
-                <span className="emergency-pill__label">Anti-Ragging Toll-Free</span>
-                <span className="emergency-pill__num">1800-180-5522</span>
-              </a>
               <a href="tel:18005990599" className="emergency-pill">
                 <span className="emergency-pill__label">University Toll-Free</span>
                 <span className="emergency-pill__num">1800 599 0599</span>
@@ -408,6 +429,10 @@ export default function Contact() {
               <a href="tel:+918816250869" className="emergency-pill">
                 <span className="emergency-pill__label">Health Centre</span>
                 <span className="emergency-pill__num">+91 8816 250869</span>
+              </a>
+              <a href="tel:18001805522" className="emergency-pill">
+                <span className="emergency-pill__label">Anti-Ragging Toll-Free</span>
+                <span className="emergency-pill__num">1800-180-5522</span>
               </a>
             </div>
           </div>
@@ -525,19 +550,23 @@ export default function Contact() {
               {/* Social Channels */}
               <div className="contact-social-section">
                 <h4 className="social-heading">Connect via Official Channels</h4>
-                <div className="social-pills-wrap">
+                <div className="social-icons-wrap">
                   {socialLinks.map((s) => {
-                    const meta = SOCIAL_META[s.title] || { label: s.title, color: '#1b4332', glyph: '●' };
+                    const meta = SOCIAL_META[s.title];
+                    const label = meta?.label || s.title;
+                    const Icon = meta?.Icon;
                     return (
                       <a
                         key={s.id}
                         href={s.value}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="social-pill"
+                        className="social-icon-btn"
+                        style={{ ['--brand' as string]: meta?.color || 'var(--color-primary)' }}
+                        aria-label={label}
+                        title={label}
                       >
-                        <span>{meta.label}</span>
-                        <ExternalLink size={11} />
+                        {Icon ? <Icon size={19} /> : <ExternalLink size={16} />}
                       </a>
                     );
                   })}
@@ -722,16 +751,16 @@ export default function Contact() {
           </div>
 
           <div className="dept-grid-clean">
-            {deptContacts.map((d) => (
+            {deptContacts.map((d, i) => (
               <div key={d.id} className="dept-card-clean">
                 <div className="dept-card-clean__header">
                   <div className="dept-avatar">
-                    {d.dept.slice(0, 2).toUpperCase()}
+                    {getDeptAvatarCode(d.dept, i)}
                   </div>
                   <div>
                     <h3 className="dept-card-clean__title">{d.dept}</h3>
                     <p className="dept-card-clean__hod">
-                      <strong>HOD / Lead:</strong> {d.hod?.toUpperCase()}
+                      <strong>HOD:</strong> {d.hod}
                     </p>
                   </div>
                 </div>

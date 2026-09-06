@@ -20,7 +20,23 @@ const categoryIcons: Record<TabKey, LucideIcon> = {
   accreditation: CheckCircle2,
 };
 
+// Accreditation bodies have a fixed, well-known set of marks — match the
+// issuer/name text to a logo already in public/images/accreditations/
+// rather than adding a per-record upload field.
+const ACCREDITATION_LOGOS: { match: RegExp; src: string; alt: string }[] = [
+  { match: /naac|national assessment/i, src: '/images/accreditations/naac.png', alt: 'NAAC' },
+  { match: /\bnba\b|national board of accreditation/i, src: '/images/accreditations/nba.png', alt: 'NBA' },
+  { match: /\bugc\b|university grants commission/i, src: '/images/accreditations/ugc.png', alt: 'UGC' },
+  { match: /\baicte\b|all india council/i, src: '/images/accreditations/aicte.png', alt: 'AICTE' },
+];
+
+function logoFor(item: AwardDoc): { src: string; alt: string } | null {
+  const hay = `${item.name} ${item.issuedBy || ''}`;
+  return ACCREDITATION_LOGOS.find((l) => l.match.test(hay)) ?? null;
+}
+
 function AwardCard({ item }: { item: AwardDoc }) {
+  const logo = logoFor(item);
   return (
     <div
       style={{
@@ -34,9 +50,19 @@ function AwardCard({ item }: { item: AwardDoc }) {
       }}
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 'var(--space-3)' }}>
-        <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-primary)', lineHeight: 1.4, flex: 1 }}>
-          {item.name}
-        </h3>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', flex: 1, minWidth: 0 }}>
+          {logo && (
+            <img
+              src={logo.src}
+              alt={logo.alt}
+              loading="lazy"
+              style={{ width: 46, height: 46, objectFit: 'contain', flexShrink: 0 }}
+            />
+          )}
+          <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-primary)', lineHeight: 1.4 }}>
+            {item.name}
+          </h3>
+        </div>
         {item.year && (
           <span style={{ flexShrink: 0, fontSize: 'var(--text-xs)', fontWeight: 700, background: 'var(--color-accent)', color: 'var(--color-white)', padding: '0.2rem 0.6rem', borderRadius: 'var(--radius-full)' }}>
             {item.year}

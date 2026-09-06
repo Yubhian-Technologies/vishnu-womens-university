@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
-import CampusFacilitiesNav from '../Campus/CampusFacilitiesNav';
 import CustomSectionsRenderer, { CustomSectionsPlain } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useSitePhotos } from '../../hooks/useSitePhotos';
@@ -108,57 +107,23 @@ export default function CampusLifeDetail({ slug: slugProp }: { slug?: string }) 
                 </button>
               ))}
             </div>
-            {showQuickNav ? (
-              <div className="detail-grid">
-                <div>
-                  <CustomSectionsPlain sections={activeTab.sections} />
-                </div>
-                <div className="detail-sidebar">
-                  <div style={{ position: 'sticky', top: 'calc(var(--topbar-height) + var(--header-height) + 1.5rem)' }}>
-                    <CampusFacilitiesNav activeSlug={slug} />
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <CustomSectionsPlain sections={activeTab.sections} />
-            )}
+            <CustomSectionsPlain sections={activeTab.sections} />
           </div>
         </section>
       ) : !isActivity ? (
         <section className="section bg-white">
           <div className="container">
-            {showQuickNav ? (
-              <div className="detail-grid">
-                <div>
-                  <span className="section-label">Campus Life</span>
-                  <h2 className="section-title" style={{ fontSize: '1.75rem' }}>{title}</h2>
-                  {visibleSections.length > 0 ? (
-                    <div style={{ marginTop: 'var(--space-5)' }}>
-                      <CustomSectionsPlain sections={visibleSections} />
-                    </div>
-                  ) : (
-                    <p style={{ color: 'var(--color-text-light)' }}>Content for this page is coming soon.</p>
-                  )}
+            <div>
+              <span className="section-label">{showQuickNav ? 'Campus Life' : 'Academics'}</span>
+              <h2 className="section-title" style={{ fontSize: '1.75rem' }}>{title}</h2>
+              {visibleSections.length > 0 ? (
+                <div style={{ marginTop: 'var(--space-5)' }}>
+                  <CustomSectionsPlain sections={visibleSections} />
                 </div>
-                <div className="detail-sidebar">
-                  <div style={{ position: 'sticky', top: 'calc(var(--topbar-height) + var(--header-height) + 1.5rem)' }}>
-                    <CampusFacilitiesNav activeSlug={slug} />
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div>
-                <span className="section-label">Academics</span>
-                <h2 className="section-title" style={{ fontSize: '1.75rem' }}>{title}</h2>
-                {visibleSections.length > 0 ? (
-                  <div style={{ marginTop: 'var(--space-5)' }}>
-                    <CustomSectionsPlain sections={visibleSections} />
-                  </div>
-                ) : (
-                  <p style={{ color: 'var(--color-text-light)' }}>Content for this page is coming soon.</p>
-                )}
-              </div>
-            )}
+              ) : (
+                <p style={{ color: 'var(--color-text-light)' }}>Content for this page is coming soon.</p>
+              )}
+            </div>
           </div>
         </section>
       ) : (
