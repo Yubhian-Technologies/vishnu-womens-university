@@ -427,7 +427,7 @@ export default function AdmissionApplyForm() {
 
           <div className="adm-form-row">
             <div className="adm-form-group">
-              <label>Specific Program / Specialization</label>
+              <label>Specific Program</label>
               <select
                 name="program"
                 value={requestForm.program}
@@ -506,12 +506,11 @@ export default function AdmissionApplyForm() {
             {sendingOtp ? 'Sending OTP…' : 'Send OTP'}
           </button>
           {otpError && (
-            <div style={{ marginTop: '0.75rem', padding: '0.75rem', background: '#fff5f5', border: '1px solid #fecaca', borderRadius: '8px', textAlign: 'center' }}>
-              <span className="adm-form-error" style={{ display: 'block', marginBottom: '0.6rem' }}>{otpError}</span>
+            <div className="adm-otp-error-container">
+              <span className="adm-otp-error-text">{otpError}</span>
               <button
                 type="button"
-                className="btn btn-secondary"
-                style={{ width: '100%', fontSize: '0.82rem', padding: '0.5rem 1rem' }}
+                className="adm-direct-submit-btn"
                 disabled={submittingDirect}
                 onClick={handleDirectSubmit}
               >

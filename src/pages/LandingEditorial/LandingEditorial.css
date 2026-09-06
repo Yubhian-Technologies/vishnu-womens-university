@@ -233,7 +233,7 @@
 .lpe-hero__media-inner img, .lpe-hero__media-inner video { width: 100%; height: 100%; object-fit: cover; }
 .lpe-hero__overlay {
   position: absolute; inset: 0;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--color-primary-dark, #081c15) 55%, transparent) 0%, color-mix(in srgb, var(--color-primary-dark, #081c15) 35%, transparent) 40%, color-mix(in srgb, var(--color-primary-dark, #081c15) 92%, transparent) 100%);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--color-primary-dark, #081c15) 40%, transparent) 0%, color-mix(in srgb, var(--color-primary-dark, #081c15) 22%, transparent) 40%, color-mix(in srgb, var(--color-primary-dark, #081c15) 72%, transparent) 100%);
 }
 .lpe-hero__content { position: relative; z-index: 1; padding-bottom: clamp(4rem, 8vw, 6rem); padding-top: 6rem; }
 .lpe-eyebrow--on-dark { color: var(--lpe-gold-light); }
