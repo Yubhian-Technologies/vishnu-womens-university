@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState } from 'react';
+import * as XLSX from 'xlsx';
 import { addDoc, collection, deleteDoc, doc, serverTimestamp, writeBatch } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
@@ -62,28 +63,13 @@ function displayDate(row: BulkRow): string {
   return `${d} – ${e}`;
 }
 
-/** Split one CSV line, honouring "quoted, fields" and "" escapes. */
-function splitCsvLine(line: string): string[] {
-  const out: string[] = [];
-  let cur = '';
-  let q = false;
-  for (let i = 0; i < line.length; i++) {
-    const ch = line[i];
-    if (q) {
-      if (ch === '"' && line[i + 1] === '"') { cur += '"'; i++; }
-      else if (ch === '"') q = false;
-      else cur += ch;
-    } else if (ch === '"') q = true;
-    else if (ch === ',') { out.push(cur); cur = ''; }
-    else cur += ch;
-  }
-  out.push(cur);
-  return out.map((c) => c.trim());
-}
+const TEMPLATE_HEADERS = ['Title', 'Image URL', 'Google Photos Link', 'Date', 'End Date'];
 
-function rowsFromDelimited(text: string, kind: 'tab' | 'csv'): BulkRow[] {
-  const lines = text.split('\n').map((l) => l.replace(/\r$/, '')).filter((l) => l.trim());
-  const cells = lines.map((l) => (kind === 'csv' ? splitCsvLine(l) : l.split('\t').map((c) => c.trim())));
+// Grid of cells (first row = header row if its cells all map to known
+// column names) → BulkRow[]. Shared by the spreadsheet reader below; the
+// same header-alias / positional-fallback rules as before, just fed rows
+// from `xlsx` instead of a hand-rolled CSV splitter.
+function rowsFromCells(cells: string[][]): BulkRow[] {
   if (cells.length === 0) return [];
   const head = cells[0].map(norm);
   const isHeader = head.some((c) => c in HEADER_ALIASES) && head.every((c) => !c || c in HEADER_ALIASES);
@@ -94,46 +80,34 @@ function rowsFromDelimited(text: string, kind: 'tab' | 'csv'): BulkRow[] {
     .slice(isHeader ? 1 : 0)
     .map((row) => {
       const r: BulkRow = { title: '', imageUrl: '', link: '', date: '', endDate: '' };
-      row.forEach((val, i) => { const k = cols[i]; if (k) r[k] = val; });
+      row.forEach((val, i) => { const k = cols[i]; if (k) r[k] = (val ?? '').trim(); });
       return r;
     })
     .filter((r) => r.title);
 }
 
-function rowsFromJson(text: string): BulkRow[] {
-  const data = JSON.parse(text);
-  const arr = Array.isArray(data) ? data : [data];
-  return arr
-    .map((o: Record<string, unknown>): BulkRow => {
-      const by: Record<string, string> = {};
-      Object.keys(o || {}).forEach((k) => { by[norm(k)] = String(o[k] ?? '').trim(); });
-      const pick = (...names: string[]) => names.map((n) => by[n]).find(Boolean) || '';
-      return {
-        title: pick('title', 'name', 'event'),
-        imageUrl: pick('image url', 'imageurl', 'image', 'cover', 'poster', 'image link'),
-        link: pick('google photos link', 'google photos', 'link', 'photos link', 'url'),
-        date: pick('date', 'start date', 'from'),
-        endDate: pick('end date', 'enddate', 'date end', 'to', 'display date'),
-      };
-    })
-    .filter((r) => r.title);
+/** Read a .xlsx / .xls / .csv file's first sheet into BulkRow[]. Cells are
+ *  read as formatted text (raw: false) so a "Date" column typed in Excel
+ *  still comes through as e.g. "Oct 15, 2025". Rejects (throws) on an
+ *  unreadable file; an empty/title-less sheet just yields []. */
+async function readSpreadsheet(file: File): Promise<BulkRow[]> {
+  const wb = XLSX.read(await file.arrayBuffer(), { type: 'array' });
+  const sheet = wb.Sheets[wb.SheetNames[0]];
+  if (!sheet) return [];
+  const grid: unknown[][] = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: false, defval: '' });
+  return rowsFromCells(grid.map((row) => row.map((c) => String(c ?? ''))));
 }
 
-/** Parse a bulk paste — auto-detects JSON (array/object), CSV, or
- *  Tab-separated. Columns: Title, Image URL, Google Photos Link, Date,
- *  End Date (positional, or by header names in any order). End Date is
- *  optional and may repeat Date for single-day events. Never throws — bad
- *  input yields []. */
-function parseBulk(text: string): BulkRow[] {
-  const t = text.trim();
-  if (!t) return [];
-  if (t[0] === '[' || t[0] === '{') {
-    try { return rowsFromJson(t); } catch { return []; }
-  }
-  const firstLine = t.split('\n')[0];
-  if (firstLine.includes('\t')) return rowsFromDelimited(t, 'tab');
-  if (firstLine.includes(',')) return rowsFromDelimited(t, 'csv');
-  return rowsFromDelimited(t, 'tab'); // single column = titles only
+/** Downloads a blank import template with the expected columns + examples. */
+function downloadTemplate() {
+  const ws = XLSX.utils.aoa_to_sheet([
+    TEMPLATE_HEADERS,
+    ['TECHNOVA 2025 – Valedictory', 'https://…/poster.jpg', 'https://photos.app.goo.gl/…', 'Oct 15, 2025', 'Oct 15, 2025'],
+    ['Sports Meet 2024', '', 'https://photos.app.goo.gl/…', 'Feb 7, 2024', 'Feb 9, 2024'],
+  ]);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Albums');
+  XLSX.writeFile(wb, 'gallery-albums-template.xlsx');
 }
 
 export default function GalleryAdmin() {
@@ -219,9 +193,32 @@ export default function GalleryAdmin() {
   const [newYear, setNewYear] = useState('');
   const [form, setForm] = useState({ title: '', imageUrl: '', link: '', date: '' });
   const [saving, setSaving] = useState(false);
-  const [bulkText, setBulkText] = useState('');
+  const [bulkRows, setBulkRows] = useState<BulkRow[]>([]);
+  const [bulkFileName, setBulkFileName] = useState('');
+  const [bulkErr, setBulkErr] = useState('');
   const [bulkOpen, setBulkOpen] = useState(false);
   const [importMsg, setImportMsg] = useState('');
+  const bulkInputRef = useRef<HTMLInputElement>(null);
+
+  const handleBulkFile = async (file: File) => {
+    setBulkErr('');
+    setImportMsg('');
+    try {
+      const rows = await readSpreadsheet(file);
+      if (rows.length === 0) {
+        setBulkRows([]);
+        setBulkFileName('');
+        setBulkErr('No rows with a Title were found in that file.');
+        return;
+      }
+      setBulkRows(rows);
+      setBulkFileName(file.name);
+    } catch {
+      setBulkRows([]);
+      setBulkFileName('');
+      setBulkErr("Couldn't read that file — use an .xlsx, .xls or .csv.");
+    }
+  };
 
   const nextOrder = () => (albums.length ? Math.max(...albums.map((a) => a.order || 0)) + 1 : 0);
 
@@ -255,8 +252,8 @@ export default function GalleryAdmin() {
   };
 
   const importBulk = async () => {
-    const parsed = parseBulk(bulkText);
-    if (parsed.length === 0) return setImportMsg('Nothing to import — check the format (Tab-separated, CSV, or a JSON array with a "title" on each row).');
+    const parsed = bulkRows;
+    if (parsed.length === 0) return setImportMsg('Choose a spreadsheet file first — each row needs a Title.');
     setSaving(true);
     setImportMsg('');
     try {
@@ -313,7 +310,8 @@ export default function GalleryAdmin() {
 
       const yrs = [...touchedYears].sort((a, b) => a - b).join(', ');
       setImportMsg(`Done — ${created} new, ${updated} updated across ${yrs}.`);
-      setBulkText('');
+      setBulkRows([]);
+      setBulkFileName('');
       if (touchedYears.size) setActiveYear(Math.max(...touchedYears));
     } catch (e) {
       setImportMsg(`Import failed: ${(e as Error).message}`);
@@ -533,27 +531,38 @@ export default function GalleryAdmin() {
 
         {/* Bulk import */}
         <details className="admin-accordion" open={bulkOpen} onToggle={(e) => setBulkOpen((e.target as HTMLDetailsElement).open)} style={{ marginTop: '1rem' }}>
-          <summary className="admin-accordion__summary">Bulk import — auto-sorted by year</summary>
+          <summary className="admin-accordion__summary">Bulk import from a spreadsheet — auto-sorted by year</summary>
           <div style={{ padding: '0.75rem 0' }}>
             <p className="admin-lead" style={{ marginTop: 0 }}>
-              Paste in any of these formats — the type is auto-detected:
-              <br />• <strong>Tab-separated</strong> or <strong>CSV</strong>, one album per line:&nbsp;
+              Upload an <strong>.xlsx</strong>, .xls or .csv with columns&nbsp;
               <code>Title, Image URL, Google Photos Link, Date, End Date</code>
-              <br />• <strong>JSON</strong> array:&nbsp;
-              <code>{'[{ "title": "…", "imageUrl": "…", "link": "…", "date": "…", "endDate": "…" }]'}</code>
-              <br />Column order is positional, or matched by a header row (any order). Image URL, Link and End Date may be blank.
-              <br /><strong>Each row files itself under the year in its Date</strong> (<code>Oct 15, 2025</code>, <code>Aug/23/2026</code>, ranges, or a bare year all work) — new years are created automatically. A row whose title already exists in that year <strong>updates</strong> that card instead of adding a duplicate. Rows with no year in the date fall back to {year}.
+              &nbsp;— a header row in any order also works; Image URL, Link and End Date may be blank.
+              <br /><strong>Each row files itself under the year in its Date</strong> (<code>Oct 15, 2025</code>, <code>Aug/23/2026</code>, ranges, or a bare 4-digit year all work) — new years are created automatically. A row whose title already exists in that year <strong>updates</strong> that card instead of adding a duplicate. Rows with no year in the date fall back to {year}.
             </p>
-            <textarea
-              rows={8}
-              value={bulkText}
-              onChange={(e) => setBulkText(e.target.value)}
-              placeholder={'"Celebrating the Legacy of Dr. B. V. Raju Garu","https://…/0J2A7183.jpg","https://photos.app.goo.gl/…","Oct 15, 2025","Oct 15, 2025"'}
-              style={{ width: '100%', fontFamily: 'monospace', fontSize: '0.85rem' }}
-            />
-            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginTop: '0.5rem' }}>
-              <button className="admin-btn admin-btn--primary" disabled={saving || !bulkText.trim()} onClick={importBulk}>
-                {saving ? 'Importing…' : `Import ${parseBulk(bulkText).length} row${parseBulk(bulkText).length === 1 ? '' : 's'}`}
+            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
+              <button type="button" className="admin-btn admin-btn--sm" onClick={downloadTemplate}>
+                Download template (.xlsx)
+              </button>
+              <button type="button" className="admin-btn admin-btn--sm" onClick={() => bulkInputRef.current?.click()}>
+                Choose file…
+              </button>
+              <input
+                ref={bulkInputRef}
+                type="file"
+                accept=".xlsx,.xls,.csv"
+                style={{ display: 'none' }}
+                onChange={(e) => { const f = e.target.files?.[0]; if (f) handleBulkFile(f); e.target.value = ''; }}
+              />
+              {bulkFileName && (
+                <span style={{ fontSize: '0.85rem', color: '#555' }}>
+                  {bulkFileName} — {bulkRows.length} row{bulkRows.length === 1 ? '' : 's'}
+                </span>
+              )}
+            </div>
+            {bulkErr && <p style={{ color: '#b45', fontSize: '0.85rem', marginTop: '0.5rem' }}>{bulkErr}</p>}
+            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginTop: '0.75rem' }}>
+              <button className="admin-btn admin-btn--primary" disabled={saving || bulkRows.length === 0} onClick={importBulk}>
+                {saving ? 'Importing…' : `Import ${bulkRows.length} row${bulkRows.length === 1 ? '' : 's'}`}
               </button>
               {importMsg && <span style={{ fontSize: '0.85rem', color: '#555' }}>{importMsg}</span>}
             </div>

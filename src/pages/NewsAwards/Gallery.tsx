@@ -30,12 +30,14 @@ const formatLink = (url?: string) => {
 
 export default function Gallery() {
   useHashScroll();
-  const [activeYear, setActiveYear] = useState<number | 'all'>('all');
+  // null until a pill is clicked — falls through to the most recent year.
+  const [activeYear, setActiveYear] = useState<number | null>(null);
   const { docs: liveAlbums } = useOrderedCollection<GalleryAlbumDoc>('galleryAlbums', 'order');
 
   // Live admin-managed albums in Firestore
   const albums = liveAlbums.map((a) => ({ title: a.title, date: a.date, year: a.year, link: a.link || '', imageUrl: a.imageUrl || '' }));
   const galleryYears = Array.from(new Set(albums.map((a) => a.year))).sort((a, b) => b - a);
+  const year = activeYear ?? galleryYears[0];
 
   useEffect(() => {
     document.title = "Gallery | Vishnu Women's University";
@@ -56,9 +58,9 @@ export default function Gallery() {
     );
     document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
     return () => observer.disconnect();
-  }, [activeYear]);
+  }, [year]);
 
-  const filtered = activeYear === 'all' ? albums : albums.filter(a => a.year === activeYear);
+  const filtered = year ? albums.filter((a) => a.year === year) : [];
 
   return (
     <main className="page-wrapper">
@@ -104,27 +106,10 @@ export default function Gallery() {
           {/* Year pills */}
           {galleryYears.length > 0 && (
             <div style={{ display: 'flex', gap: 'var(--space-2)', marginBottom: 'var(--space-8)', flexWrap: 'wrap' }}>
-              <button
-                onClick={() => setActiveYear('all')}
-                style={{
-                  padding: '0.5rem 1.1rem',
-                  borderRadius: 0,
-                  border: '1.5px solid',
-                  fontSize: 'var(--text-sm)',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  transition: 'all var(--transition-base)',
-                  background: activeYear === 'all' ? 'var(--color-primary)' : 'var(--color-white)',
-                  borderColor: activeYear === 'all' ? 'var(--color-primary)' : 'var(--color-light-gray)',
-                  color: activeYear === 'all' ? 'var(--color-white)' : 'var(--color-text)',
-                }}
-              >
-                All Years
-              </button>
-              {galleryYears.map((year) => (
+              {galleryYears.map((y) => (
                 <button
-                  key={year}
-                  onClick={() => setActiveYear(year)}
+                  key={y}
+                  onClick={() => setActiveYear(y)}
                   style={{
                     padding: '0.5rem 1.1rem',
                     borderRadius: 0,
@@ -133,12 +118,12 @@ export default function Gallery() {
                     fontWeight: 600,
                     cursor: 'pointer',
                     transition: 'all var(--transition-base)',
-                    background: activeYear === year ? (yearColors[year] || 'var(--color-primary)') : 'var(--color-white)',
-                    borderColor: activeYear === year ? (yearColors[year] || 'var(--color-primary)') : 'var(--color-light-gray)',
-                    color: activeYear === year ? 'var(--color-white)' : 'var(--color-text)',
+                    background: y === year ? (yearColors[y] || 'var(--color-primary)') : 'var(--color-white)',
+                    borderColor: y === year ? (yearColors[y] || 'var(--color-primary)') : 'var(--color-light-gray)',
+                    color: y === year ? 'var(--color-white)' : 'var(--color-text)',
                   }}
                 >
-                  {year}
+                  {y}
                 </button>
               ))}
             </div>
@@ -146,7 +131,7 @@ export default function Gallery() {
 
           <div style={{ marginBottom: 'var(--space-5)', fontSize: 'var(--text-sm)', color: 'var(--color-text-light)' }}>
             Showing {filtered.length} album{filtered.length !== 1 ? 's' : ''}
-            {activeYear !== 'all' && ` from ${activeYear}`}
+            {year && ` from ${year}`}
           </div>
 
           {/* Albums grid */}

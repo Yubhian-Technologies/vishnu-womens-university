@@ -83,12 +83,12 @@ export default function FacultyCarousel({
   }, [faculty]);
 
   const getCardStep = () => {
-    if (!scrollRef.current) return 320;
+    if (!scrollRef.current) return 240;
     const firstCard = scrollRef.current.querySelector('.faculty-impact-card-wrapper') as HTMLElement | null;
     if (firstCard) {
-      return firstCard.offsetWidth + 20;
+      return firstCard.offsetWidth + 14;
     }
-    return scrollRef.current.clientWidth / 4;
+    return scrollRef.current.clientWidth / 5;
   };
 
   // Continuous autoscroll loop
