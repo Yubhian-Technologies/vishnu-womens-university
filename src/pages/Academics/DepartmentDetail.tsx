@@ -1138,18 +1138,30 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                         </button>
                         <div className="dept-stat-tile__label">Top 10 Companies List</div>
                       </div>
-                      <div className="dept-stat-tile">
-                        <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.averageSalary ?? '—'}</span></div>
-                        <div className="dept-stat-tile__label">Average Salary</div>
-                      </div>
-                      <div className="dept-stat-tile">
-                        <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.medianSalary ?? '—'}</span></div>
-                        <div className="dept-stat-tile__label">Median Salary</div>
-                      </div>
-                      <div className="dept-stat-tile">
-                        <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.highestPackage ?? '—'}</span></div>
-                        <div className="dept-stat-tile__label">Highest Package</div>
-                      </div>
+                      {/* computePlacementStats returns these as null when the
+                          imported rows have no column that looks like a
+                          package/CTC figure — hide the tile entirely rather
+                          than showing a placeholder "—", since that read as a
+                          broken/missing stat instead of "not applicable for
+                          this year's data". */}
+                      {placementYearStats.averageSalary != null && (
+                        <div className="dept-stat-tile">
+                          <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.averageSalary}</span></div>
+                          <div className="dept-stat-tile__label">Average Salary</div>
+                        </div>
+                      )}
+                      {placementYearStats.medianSalary != null && (
+                        <div className="dept-stat-tile">
+                          <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.medianSalary}</span></div>
+                          <div className="dept-stat-tile__label">Median Salary</div>
+                        </div>
+                      )}
+                      {placementYearStats.highestPackage != null && (
+                        <div className="dept-stat-tile">
+                          <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.highestPackage}</span></div>
+                          <div className="dept-stat-tile__label">Highest Package</div>
+                        </div>
+                      )}
                       {placementYearStats.above50Lpa > 0 && (
                         <div className="dept-stat-tile">
                           <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.above50Lpa}</span></div>
@@ -1162,10 +1174,12 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                           <div className="dept-stat-tile__label">Above 30 LPA+</div>
                         </div>
                       )}
-                      <div className="dept-stat-tile">
-                        <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.above10Lpa}</span></div>
-                        <div className="dept-stat-tile__label">Above 10 LPA+</div>
-                      </div>
+                      {placementYearStats.above10Lpa > 0 && (
+                        <div className="dept-stat-tile">
+                          <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.above10Lpa}</span></div>
+                          <div className="dept-stat-tile__label">Above 10 LPA+</div>
+                        </div>
+                      )}
                     </div>
                   </>
                 )}
