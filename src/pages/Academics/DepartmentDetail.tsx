@@ -53,6 +53,15 @@ const HUB_TAB_EMPTY = (
   </p>
 );
 
+// A placement year label like "2022–2026" -> "2026" for the snapshot
+// heading — the graduating year reads more naturally there than the full
+// 4-year range. Already-bare years (or labels with no 4-digit year at all)
+// pass through unchanged.
+function endingYear(label: string): string {
+  const years = label.match(/\d{4}/g);
+  return years ? years[years.length - 1] : label;
+}
+
 /**
  * The shared page for a "grouped" department (AI / CSE / ECE). The top half is
  * common content read from the department's `departments` doc (matched by
@@ -1063,7 +1072,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                 {activePlacementYear && placementYearStats && (
                   <>
                     <p className="placement-stat-summary">
-                      {activePlacementYear.year} Placements as on date: <strong>{displayedTotalOffers.toLocaleString()}</strong>
+                      {endingYear(activePlacementYear.year)} Placement Snapshot
                     </p>
                     <div className={`dept-stat-grid${placementStatsFull ? ' dept-stat-grid--fill' : ''}`}>
                       <div className="dept-stat-tile">

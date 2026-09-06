@@ -3,6 +3,15 @@ import type { BranchOfferCount, PlacementRow } from './placementStats.data';
 import { usePlacementYears } from './usePlacementYears';
 import '../detail-layout.css';
 
+// A batch label like "2022–2026" -> "2026" for the snapshot heading — the
+// graduating year reads more naturally there than the full 4-year range.
+// Already-bare years (or anything with no 4-digit year at all) pass through
+// unchanged.
+function endingYear(label: string): string {
+  const years = label.match(/\d{4}/g);
+  return years ? years[years.length - 1] : label;
+}
+
 interface Props {
   /** Restrict to just these batch labels (e.g. only the 4 most recent) —
    *  omit to show every batch. Used by the Placement Details sub-page,
@@ -375,7 +384,7 @@ export default function PlacementYearAccordion({ years, enrichedYears, onActiveY
         return (
               <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)' }}>
                 <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', marginBottom: 'var(--space-5)' }}>
-                  {y.batch} Placements as on date: <strong>{y.total !== null ? y.total.toLocaleString('en-IN') : '—'}</strong>
+                  {endingYear(y.batch)} Placement Snapshot
                 </p>
 
                 {y.note && (
@@ -472,7 +481,7 @@ export default function PlacementYearAccordion({ years, enrichedYears, onActiveY
                     </div>
 
                     <h3 style={{ fontFamily: 'var(--font-sans)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 'var(--space-3)', fontSize: 'var(--text-base)' }}>
-                      Department-wise Offers — {y.batch}
+                      Branch-Wise Placement Overview
                     </h3>
                     <BranchOffersDonut data={y.branchOffers} total={y.total ?? 0} />
                   </div>
