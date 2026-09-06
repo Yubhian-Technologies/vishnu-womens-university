@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Image as ImageIcon, ExternalLink } from 'lucide-react';
-import { galleryAlbums as staticAlbums } from './news-awards.data';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import type { GalleryAlbumDoc } from '../Admin/sections/GalleryAdmin';
 import { useHashScroll } from '../../hooks/useHashScroll';
@@ -19,6 +18,14 @@ const yearColors: Record<number, string> = {
   2019: '#BF360C',
   2018: '#E65100',
   2017: '#C9A84C',
+};
+
+const formatLink = (url?: string) => {
+  if (!url) return '';
+  const trimmed = url.trim();
+  if (!trimmed) return '';
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  return `https://${trimmed}`;
 };
 
 export default function Gallery() {
@@ -245,27 +252,30 @@ export default function Gallery() {
                       <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: '0.95rem', fontWeight: 600, color: 'var(--color-primary)', lineHeight: 1.45, flex: 1, margin: 0 }}>
                         {album.title}
                       </h3>
-                      {album.link && (
-                        <a
-                          href={album.link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="btn btn-accent"
-                          style={{
-                            alignSelf: 'flex-start',
-                            marginTop: '0.5rem',
-                            padding: '0.45rem 1.1rem',
-                            fontSize: 'var(--text-xs)',
-                            borderRadius: 0,
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '0.4rem',
-                          }}
-                        >
-                          <span>VIEW ALBUM</span>
-                          <ExternalLink size={13} />
-                        </a>
-                      )}
+                      {(() => {
+                        const albumUrl = formatLink(album.link);
+                        return albumUrl ? (
+                          <a
+                            href={albumUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn btn-accent"
+                            style={{
+                              alignSelf: 'flex-start',
+                              marginTop: '0.5rem',
+                              padding: '0.45rem 1.1rem',
+                              fontSize: 'var(--text-xs)',
+                              borderRadius: 0,
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '0.4rem',
+                            }}
+                          >
+                            <span>VIEW ALBUM</span>
+                            <ExternalLink size={13} />
+                          </a>
+                        ) : null;
+                      })()}
                     </div>
                   </div>
                 );

@@ -50,7 +50,14 @@ export default function PageHero({
   // hero just shows its solid background until a banner exists.
   // Text: only render once Firestore has responded — prevents flashing the
   //       hardcoded title before the uploaded title appears.
-  const defaultSlide = { imageUrl: defaultImage ?? '', videoUrl: '', title: defaultTitle, subtitle: defaultSubtitle ?? '', ctaLabel: '', ctaLink: '' };
+  const defaultSlide = {
+    imageUrl: defaultImage ?? '',
+    videoUrl: '',
+    title: defaultTitle,
+    subtitle: defaultSubtitle ?? '',
+    ctaLabel: scrollCtaTargetId ? 'Explore Gallery' : '',
+    ctaLink: scrollCtaTargetId ? `#${scrollCtaTargetId}` : '',
+  };
   const allSlides: Omit<BannerSlide, 'id' | 'order'>[] =
     slides.length > 0 ? slides : [defaultSlide];
   const showText = !loading;
@@ -152,7 +159,7 @@ export default function PageHero({
                   </p>
                 )}
 
-                {slide.ctaLabel && slide.ctaLink && (
+                {(slide.ctaLabel || scrollCtaTargetId) && (slide.ctaLink || scrollCtaTargetId) && (
                   <div key={`cta-${current}`} className="page-hero__cta animate-fade-in-up">
                     {scrollCtaTargetId ? (
                       <button
@@ -160,7 +167,7 @@ export default function PageHero({
                         className="btn-hero-gold"
                         onClick={() => smoothScrollTo(`#${scrollCtaTargetId}`)}
                       >
-                        {slide.ctaLabel}
+                        {slide.ctaLabel || 'Explore Gallery'}
                       </button>
                     ) : slide.ctaLink.startsWith('http') ? (
                       <a href={slide.ctaLink} target="_blank" rel="noopener noreferrer" className="btn-hero-gold">
