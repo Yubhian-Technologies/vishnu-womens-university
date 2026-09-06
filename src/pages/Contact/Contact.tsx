@@ -17,7 +17,6 @@ import {
   Train,
   Plane,
   Bus,
-  Sparkles,
   FileCheck2,
   PhoneCall,
   Headphones,
@@ -272,11 +271,6 @@ export default function Contact() {
       <section className="contact-hero-clean">
         <div className="contact-hero-glow" aria-hidden="true" />
         <div className="container contact-hero-clean__inner">
-          <div className="contact-chip">
-            <Sparkles size={14} className="contact-chip-icon" />
-            <span>Official University Helpdesk</span>
-          </div>
-
           <h1 className="contact-hero-clean__title">
             {banner?.title || "We're Here to Help"}
           </h1>
