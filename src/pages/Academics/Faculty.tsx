@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Award, Briefcase, ChevronRight } from 'lucide-react';
 import './Faculty.css';
+import '../../components/FacultyCarousel/FacultyCarousel.css';
 import PageHero from '../../components/PageHero/PageHero';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import { useOrderedCollection } from '../../hooks/useCollection';
@@ -84,6 +86,19 @@ function getInitials(name: string) {
   if (parts.length === 0) return '';
   if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
+function getFacultySummary(f: FacultyDoc) {
+  const expFact = f.facts?.find((x) => /experience/i.test(x.label))?.value;
+  const specFact = f.facts?.find((x) => /specialization|interest|area/i.test(x.label))?.value;
+  const pubFact = f.facts?.find((x) => /publication|paper/i.test(x.label))?.value;
+
+  return {
+    experience: expFact,
+    specialization: f.specialization || specFact,
+    qualification: f.qualification,
+    publications: pubFact,
+  };
 }
 
 export default function Faculty() {
@@ -178,7 +193,7 @@ export default function Faculty() {
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-10)' }}>
             <span className="section-label">Meet the Team</span>
-            <h2 className="section-title">{uniqueFacultyCount > 0 ? `${uniqueFacultyCount}+ Faculty Members` : 'Faculty'}</h2>
+            <h2 className="section-title">{uniqueFacultyCount > 0 ? `${uniqueFacultyCount} Faculty Members` : 'Faculty'}</h2>
             <p className="section-desc" style={{ margin: '0 auto' }}>
               Browse faculty by department.
             </p>
@@ -204,24 +219,65 @@ export default function Faculty() {
                 </div>
               )}
               <div className="faculty-grid">
-                {members.map((f) => (
-                  <Link key={f.id} to={`/faculty/${f.id}`} className="faculty-card">
-                    <div className="faculty-card__top">
-                      <span className="faculty-card__arch" aria-hidden="true" />
-                      {f.imageUrl ? (
-                        <SmoothImage src={f.imageUrl} alt={f.name || f.id} className="faculty-card__photo" />
-                      ) : (
-                        <div className="faculty-card__avatar">{getInitials(f.name || '')}</div>
-                      )}
+                {members.map((f) => {
+                  const summary = getFacultySummary(f);
+                  return (
+                    <div key={f.id} className="faculty-impact-card">
+                      {/* Portrait Photo Frame */}
+                      <Link to={`/faculty/${f.id}`} className="faculty-impact-photo-frame" aria-label={`View ${f.name} profile`}>
+                        {f.imageUrl ? (
+                          <SmoothImage
+                            src={f.imageUrl}
+                            alt={f.name || f.id}
+                            className="faculty-impact-photo"
+                          />
+                        ) : (
+                          <div className="faculty-impact-avatar-fallback">
+                            <span className="faculty-impact-initials">{getInitials(f.name || '')}</span>
+                          </div>
+                        )}
+                      </Link>
+
+                      {/* Info inside Card */}
+                      <div className="faculty-impact-info">
+                        <div className="faculty-impact-heading-group">
+                          <h3 className="faculty-impact-name">
+                            <Link to={`/faculty/${f.id}`} className="faculty-impact-name-link">
+                              {f.name}
+                            </Link>
+                          </h3>
+                          <p className="faculty-impact-meta">{f.designation}</p>
+                        </div>
+
+                        {/* Professional Badges */}
+                        <div className="faculty-impact-badges">
+                          {summary.qualification && (
+                            <span className="faculty-impact-badge qual-badge">
+                              <Award size={11} strokeWidth={2.5} />
+                              <span>{summary.qualification}</span>
+                            </span>
+                          )}
+                          {summary.experience && (
+                            <span className="faculty-impact-badge exp-badge">
+                              <Briefcase size={11} strokeWidth={2.5} />
+                              <span>{summary.experience}</span>
+                            </span>
+                          )}
+                        </div>
+
+                        {/* View Full Profile Action Button */}
+                        <div className="faculty-impact-footer">
+                          <Link to={`/faculty/${f.id}`} className="faculty-card-profile-btn">
+                            <span>View Full Profile</span>
+                            <span className="faculty-btn-arrow-circle">
+                              <ChevronRight size={13} strokeWidth={2.4} />
+                            </span>
+                          </Link>
+                        </div>
+                      </div>
                     </div>
-                    <h3 className="faculty-card__name">{f.name}</h3>
-                    <p className="faculty-card__designation">{f.designation}</p>
-                    {f.qualification && <p className="faculty-card__qualification">{f.qualification}</p>}
-                    <div className="faculty-card__actions">
-                      <span className="faculty-card__btn faculty-card__btn--primary">View Profile</span>
-                    </div>
-                  </Link>
-                ))}
+                  );
+                })}
               </div>
             </div>
           ))}

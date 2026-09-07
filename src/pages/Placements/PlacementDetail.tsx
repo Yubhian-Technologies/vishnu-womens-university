@@ -11,8 +11,10 @@ import { parseStructuredTable, parseFlexibleTable } from '../../lib/structuredTa
 import type { PlacementItemDoc } from '../Admin/sections/PlacementItemsAdmin';
 import type { TpoTeamBioDoc } from '../Admin/sections/TpoTeamInfoAdmin';
 import type { PlacementCrtDoc } from '../Admin/sections/PlacementCrtDocsAdmin';
-import PlacementYearAccordion, { BranchOffersBarChart } from './PlacementYearAccordion';
+import PlacementYearAccordion, { BranchOffersBarChart, formatSalary } from './PlacementYearAccordion';
+import type { PlacementYear } from './placementStats.data';
 import SmoothCollapse from '../../components/SmoothCollapse/SmoothCollapse';
+import CareerGuidanceInterestForm from '../../components/CareerGuidanceInterestForm/CareerGuidanceInterestForm';
 import { successStories } from './successStories.data';
 import { industryLiaisonOffices } from './industryLiaisonOffices.data';
 import { employabilitySkillTabs } from './employabilitySkills.data';
@@ -111,21 +113,25 @@ Mrs. P. Prasanthi, Asst. Professor — Email: [jprasanthi@svecw.edu.in](mailto:j
 // copy), because the BODY_OVERRIDES entry above only shows when the CMS
 // `intro` is empty — and this page has a CMS intro. `**Heading:**` lines
 // get the highlighted serif sub-heading treatment via BodyBlocks.
-const CAREER_GUIDANCE_TRAINING = `**GRE / TOEFL:**
-
-Special training is provided to students who are aspiring for higher education abroad. It focuses on Verbal, Quantitative and Reasoning skills along with Analytical Writing Assessment. A good number of students from different branches utilized the services and progressing in different universities abroad.
-
-**GATE:**
-
-Higher Educational pursuits are one of the major goals of most of the students of SVECW. Helping them in realizing their goals the institution is offering regularly GATE training classes. Though the record of GATE ranks in SVECW is less initially there is gradual ascendancy.
-
-**IES, IFS & IAS:**
-
-With the academic commitment of the student fraternity SVECW always brings forward any initiative that widens the scope of the career of the students. Eventually a special training for the students who are interested in taking up a career at IES, IAS, IAF, etc. has been started recently and completed the required formative training.
-
-**SVES–NS-IAS Civil Services Coaching Programme**
-
-The SVES–NS-IAS Civil Services Coaching Programme was initiated in 2024 as a student-centric initiative to provide aspiring Civil Services candidates with structured, accessible, and quality-oriented competitive examination preparation. The programme was established through a Memorandum of Understanding (MoU) signed on 1 April 2024 between SVES and NS-IAS Academy, Hyderabad, with a shared vision of creating better career opportunities for students through expert guidance and systematic preparation.
+// Career Guidance Cell training tracks — rendered as an expand/collapse
+// accordion (CareerGuidanceAccordion) on the career-guidance-cell sub-page.
+// Each `body` uses the same **bold** / "- " bullet syntax BodyBlocks parses.
+const CAREER_GUIDANCE_SECTIONS: { title: string; body: string }[] = [
+  {
+    title: 'GRE / TOEFL',
+    body: `Special training is provided to students who are aspiring for higher education abroad. It focuses on Verbal, Quantitative and Reasoning skills along with Analytical Writing Assessment. A good number of students from different branches utilized the services and progressing in different universities abroad.`,
+  },
+  {
+    title: 'GATE',
+    body: `Higher Educational pursuits are one of the major goals of most of the students of SVECW. Helping them in realizing their goals the institution is offering regularly GATE training classes. Though the record of GATE ranks in SVECW is less initially there is gradual ascendancy.`,
+  },
+  {
+    title: 'IES, IFS & IAS',
+    body: `With the academic commitment of the student fraternity SVECW always brings forward any initiative that widens the scope of the career of the students. Eventually a special training for the students who are interested in taking up a career at IES, IAS, IAF, etc. has been started recently and completed the required formative training.`,
+  },
+  {
+    title: 'SVES–NS-IAS Civil Services Coaching Programme',
+    body: `The SVES–NS-IAS Civil Services Coaching Programme was initiated in 2024 as a student-centric initiative to provide aspiring Civil Services candidates with structured, accessible, and quality-oriented competitive examination preparation. The programme was established through a Memorandum of Understanding (MoU) signed on 1 April 2024 between SVES and NS-IAS Academy, Hyderabad, with a shared vision of creating better career opportunities for students through expert guidance and systematic preparation.
 
 The programme has been carefully designed to complement students' regular academic curriculum without disturbing their institutional timetable. While the primary focus is on UPSC Civil Services Examination preparation, the knowledge and skills developed through the programme also provide students with a foundation for preparing for other competitive examinations, including State Government Group-I and Group-II examinations. Students also gain exposure to the fundamentals and general awareness areas relevant to Banking and other competitive examinations.
 
@@ -143,7 +149,9 @@ The programme has been carefully designed to complement students' regular academ
 
 Since its inception, the programme has supported 60 students across SVES institutions, including 42 students exclusively from SVECW (Autonomous). The current cohort comprises 39 students across SVES institutions, including 18 students from SVECW (Autonomous).
 
-Through the SVES–NS-IAS initiative, Vishnu Women's University is committed to empowering students with access to quality competitive-examination coaching, expert mentorship, structured assessment, and flexible learning opportunities, enabling them to pursue diverse career pathways in Civil Services, State Government services, Banking, and other competitive examinations.`;
+Through the SVES–NS-IAS initiative, Vishnu Women's University is committed to empowering students with access to quality competitive-examination coaching, expert mentorship, structured assessment, and flexible learning opportunities, enabling them to pursue diverse career pathways in Civil Services, State Government services, Banking, and other competitive examinations.`,
+  },
+];
 
 const PARTNER_DOMAINS: Record<string, string> = {
   'Amazon': 'amazon.com', 'Adobe': 'adobe.com', 'Microsoft': 'microsoft.com',
@@ -172,14 +180,33 @@ const PARTNER_LOGO_OVERRIDES: Record<string, string> = {
   'Providence': 'https://upload.wikimedia.org/wikipedia/en/thumb/7/79/Providence_Health_logo.svg/250px-Providence_Health_logo.svg.png',
 };
 
-// Placement Cell's Summary tiles are a single free-text line per batch (e.g.
-// "2022-2026 batch: 1103 placements, highest 59.28 LPA(Google)") — this
-// breaks that one line into three ("2022-2026 batch" / "1103 placements" /
-// "Highest Package: 59.28 LPA(Google)") when it matches the usual shape a
-// batch summary is entered in, so the tile always reads as three distinct
-// facts instead of a wrapped run-on sentence. Any outcome text that doesn't
-// match (a different sub-page's plain achievement bullet, say) renders as-is.
-const OUTCOME_BATCH_SUMMARY_RE = /^(.+?)\s+batch:\s*([\d,]+)\s*placements,\s*highest\s+(.+)$/i;
+// Placement Cell's Summary tiles used to be a manually-typed free-text line
+// per batch (e.g. "2022-2026 batch: 1103 placements, highest 59.28
+// LPA(Google)"), kept on the placement-details item's Outcomes field — a
+// completely separate admin field from the "Placements, Year by Year" batch
+// data below it on this same page, with nothing keeping the two in sync. An
+// admin editing/re-importing a batch's Company Rows had no way to know the
+// Summary tile above still quoted the old numbers (or was simply missing
+// for a newly-added batch). This derives every tile straight from the same
+// placementYears data the Year-by-Year section reads, so both always agree
+// and a new batch gets a tile automatically.
+function batchHighestPackage(y: PlacementYear): { lpa: number; company?: string } | undefined {
+  const rows = y.rows || [];
+  let best: { lpa: number; company: string } | undefined;
+  for (const r of rows) {
+    const lpa = parseFloat(formatSalary(r.salary));
+    if (!Number.isFinite(lpa)) continue;
+    if (!best || lpa > best.lpa) best = { lpa, company: r.company };
+  }
+  const lpa = y.highestPackageLPA ?? best?.lpa;
+  if (lpa == null) return undefined;
+  // If the batch's own Highest Package figure doesn't exactly match its top
+  // Company Row (e.g. a manually-typed override), still show the row whose
+  // salary matches it rather than mislabeling best's company under a
+  // different number.
+  const company = rows.find((r) => Math.abs((parseFloat(formatSalary(r.salary)) || -Infinity) - lpa) < 0.01)?.company ?? (y.highestPackageLPA == null ? best?.company : undefined);
+  return { lpa, company };
+}
 
 // Logo only — no company name label beside it (per request). The name still
 // lives in alt text/title for accessibility and hover, just not rendered as
@@ -402,6 +429,62 @@ function HigherEducationAccordion() {
   );
 }
 
+// Career Guidance Cell training tracks as an expand/collapse accordion —
+// each card toggles independently; the first is open on load.
+function CareerGuidanceAccordion() {
+  const [open, setOpen] = useState<Set<string>>(
+    () => new Set(CAREER_GUIDANCE_SECTIONS[0] ? [CAREER_GUIDANCE_SECTIONS[0].title] : [])
+  );
+  const toggle = (title: string) =>
+    setOpen((prev) => {
+      const next = new Set(prev);
+      if (next.has(title)) next.delete(title);
+      else next.add(title);
+      return next;
+    });
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', marginTop: 'var(--space-6)' }}>
+      {CAREER_GUIDANCE_SECTIONS.map((section) => {
+        const isOpen = open.has(section.title);
+        return (
+          <div key={section.title} style={{ border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
+            <button
+              onClick={() => toggle(section.title)}
+              aria-expanded={isOpen}
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 'var(--space-4)',
+                background: isOpen ? 'var(--color-primary)' : 'var(--color-off-white)',
+                border: 'none',
+                padding: 'var(--space-4) var(--space-5)',
+                cursor: 'pointer',
+                textAlign: 'left',
+                transition: 'background var(--transition-base)',
+              }}
+            >
+              <span style={{ fontFamily: 'var(--font-serif)', fontWeight: 700, fontSize: 'var(--text-base)', color: isOpen ? 'var(--color-white)' : 'var(--color-primary)', transition: 'color var(--transition-base)' }}>
+                {section.title}
+              </span>
+              <span aria-hidden="true" style={{ fontSize: '1.3rem', fontWeight: 700, lineHeight: 1, flexShrink: 0, color: isOpen ? 'var(--color-white)' : 'var(--color-text)', transition: 'color var(--transition-base)' }}>
+                {isOpen ? '−' : '+'}
+              </span>
+            </button>
+            <SmoothCollapse open={isOpen}>
+              <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)', fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75 }}>
+                <BodyBlocks blocks={parseBodyContent(section.body)} paragraphStyle={{}} />
+              </div>
+            </SmoothCollapse>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 // Shared by the Placement Guidelines and Campus Recruitment & Training
 // sub-pages — both read the same admin-entered Intro text every other
 // Placement sub-page already uses (see BodyBlocks.tsx: "**Heading**" lines
@@ -527,38 +610,34 @@ function CampusRecruitmentTrainingSections({ intro }: { intro: string }) {
 }
 
 // Placement Details' Summary section (placementCellSummarySection below) —
-// each item.outcomes line already encodes one batch's headline stats as
-// "<batch> batch: <count> placements, highest <package>" (see
-// OUTCOME_BATCH_SUMMARY_RE/the old OutcomeTileText it replaces), so no data
-// change is needed here, only the card's look: alternating navy/cream
-// colours by position, a checkbox-style heading icon, and the batch/offers/
-// package split across their own lines instead of one plain paragraph.
+// alternating navy/cream colours by position, a checkbox-style heading icon,
+// and the batch/offers/package split across their own lines. Offers and
+// Highest Package come straight from the batch's placementYears record
+// (see batchHighestPackage above) rather than a separately-typed line, so
+// this always matches the Year-by-Year section further down the page.
 const BATCH_CARD_COLORS = [
   { background: 'var(--color-primary-light)', border: 'var(--color-primary-light)', heading: 'var(--color-white)', body: 'rgba(255,255,255,0.85)' },
   { background: '#FCEFD9', border: '#E8A83C', heading: '#7A4A12', body: '#8A5A20' },
 ];
 
-function BatchSummaryCard({ text, index }: { text: string; index: number }) {
+function BatchSummaryCard({ batch, offers, highest, index }: { batch: string; offers: number | null; highest?: { lpa: number; company?: string }; index: number }) {
   const color = BATCH_CARD_COLORS[index % BATCH_CARD_COLORS.length];
-  const m = text.match(OUTCOME_BATCH_SUMMARY_RE);
   return (
     <div style={{ background: color.background, border: `1.5px solid ${color.border}`, borderRadius: 'var(--radius-lg)', padding: 'var(--space-5)' }}>
-      {m ? (
-        <>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-3)' }}>
-            <span style={{ width: 14, height: 14, border: `2px solid ${color.heading}`, borderRadius: 3, flexShrink: 0 }} />
-            <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: color.heading, margin: 0 }}>
-              {m[1]} batch
-            </h3>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <span style={{ fontSize: 'var(--text-sm)', color: color.body }}>{m[2].replace(/,/g, '')} offers</span>
-            <span style={{ fontSize: 'var(--text-sm)', color: color.body }}>{m[3]}</span>
-          </div>
-        </>
-      ) : (
-        <span style={{ fontSize: 'var(--text-sm)', color: color.body }}>{text}</span>
-      )}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-3)' }}>
+        <span style={{ width: 14, height: 14, border: `2px solid ${color.heading}`, borderRadius: 3, flexShrink: 0 }} />
+        <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: color.heading, margin: 0 }}>
+          {batch} batch
+        </h3>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <span style={{ fontSize: 'var(--text-sm)', color: color.body }}>{offers != null ? offers.toLocaleString('en-IN') : '—'} offers</span>
+        {highest && (
+          <span style={{ fontSize: 'var(--text-sm)', color: color.body }}>
+            highest {highest.lpa} LPA{highest.company ? `(${highest.company})` : ''}
+          </span>
+        )}
+      </div>
     </div>
   );
 }
@@ -1097,7 +1176,8 @@ export default function PlacementDetail() {
   // this generic Outcomes & Achievements block would just repeat them. Our
   // Recruiters drops it per request — the recruiter logo grid below is the
   // page's actual point, and Outcomes was just repeating the Overview text.
-  const showOutcomes = !!item.outcomes && item.outcomes.length > 0 && item.slug !== 'placement-highlights' && item.slug !== 'our-recruiters' && item.slug !== 'tpo-team' && item.slug !== 'industry-liaison-offices';
+  const activeOutcomes = (item.outcomes || []).filter((o) => !o.includes('2015-2019') && !o.includes('2015–2019'));
+  const showOutcomes = activeOutcomes.length > 0 && item.slug !== 'placement-highlights' && item.slug !== 'our-recruiters' && item.slug !== 'tpo-team' && item.slug !== 'industry-liaison-offices';
   // Shared markup for the below-Overview spot every non-Placement-Cell page
   // uses. Placement Cell renders its own combined Summary+chart block near
   // the hero instead (see placementCellSummarySection below) — it needs the
@@ -1116,7 +1196,7 @@ export default function PlacementDetail() {
             placementCellSummarySection above). mobile-stack-grid still
             collapses this to one column on small screens. */}
         <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-4)' }}>
-          {item.outcomes!.map((o) => (
+          {activeOutcomes.map((o) => (
             <div key={o}
               style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', minHeight: 110, display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
               <Trophy size={20} strokeWidth={1.75} style={{ flexShrink: 0, color: 'var(--color-accent)' }} />
@@ -1130,21 +1210,27 @@ export default function PlacementDetail() {
   // Placement Cell's own combined Summary (batch cards) — full width, no
   // longer paired with the Branch-wise Placement Distribution chart (that
   // now only appears further down, in the Placements/Year-by-Year section).
-  const placementCellSummarySection = showOutcomes && item.slug === 'placement-details' && (
+  // Reads placementYearData directly (the same data the Year-by-Year section
+  // below uses) instead of the item's separately-typed Outcomes field, so a
+  // batch's offers/highest-package here can never drift from what the
+  // Year-by-Year section shows for that same batch, and a newly-added batch
+  // gets a card automatically instead of needing a matching Outcomes line
+  // typed in by hand.
+  const summaryYearData = placementYearData.filter((y) => !y.hideFromSummary);
+  const placementCellSummarySection = item.slug === 'placement-details' && summaryYearData.length > 0 && (
     <section className="section bg-off-white">
       <div className="container">
         <div style={{ marginBottom: 'var(--space-8)' }}>
           <span className="section-label">Impact</span>
           <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Summary</h2>
         </div>
-        {/* Fixed 4-column grid (2 rows of 4 for the usual 8 cards), not
-            auto-fit/minmax — auto-fit would stretch a partial last row's
-            items to fill the leftover space instead of leaving them at the
-            same width as every other row. mobile-stack-grid still collapses
-            this to a single column on small screens. */}
+        {/* Fixed 4-column grid, not auto-fit/minmax — auto-fit would stretch
+            a partial last row's items to fill the leftover space instead of
+            leaving them at the same width as every other row. mobile-stack-
+            grid still collapses this to a single column on small screens. */}
         <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-4)' }}>
-          {item.outcomes!.map((o, i) => (
-            <BatchSummaryCard key={o} text={o} index={i} />
+          {summaryYearData.map((y, i) => (
+            <BatchSummaryCard key={y.batch} batch={y.batch} offers={y.total} highest={batchHighestPackage(y)} index={i} />
           ))}
         </div>
       </div>
@@ -1262,9 +1348,11 @@ export default function PlacementDetail() {
                   training sections. Always shown here (not via BODY_OVERRIDES,
                   which is suppressed when the CMS intro is set). */}
               {item.slug === 'career-guidance-cell' && !hasBodyOverride && (
-                <div style={{ fontSize: 'var(--text-lg)', color: 'var(--color-text)', lineHeight: 1.75, marginTop: 'var(--space-6)' }}>
-                  <BodyBlocks blocks={parseBodyContent(CAREER_GUIDANCE_TRAINING)} paragraphStyle={{}} />
-                </div>
+                <CareerGuidanceAccordion />
+              )}
+
+              {item.slug === 'career-guidance-cell' && (
+                <CareerGuidanceInterestForm tracks={CAREER_GUIDANCE_SECTIONS.map((s) => s.title)} />
               )}
 
               {/* Only shown here when there's no roster below to show it instead

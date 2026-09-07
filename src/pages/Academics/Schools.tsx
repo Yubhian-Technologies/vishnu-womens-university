@@ -11,6 +11,16 @@ import '../Academics/Academics.css';
 import '../detail-layout.css';
 import './Schools.css';
 
+// Per-school highlight line shown under the title. Keyed by normalised
+// school title (lowercased, trimmed). Not an admin field yet — add a
+// `tagline` to SchoolDoc + SchoolsAdmin if these need editing without a deploy.
+const SCHOOL_TAGLINES: Record<string, string> = {
+  'school of computing': 'Empowering Women to Shape the Digital Future.',
+  'school of engineering': 'Empowering Women to Engineer the Future.',
+  'school of sciences': 'Empowering Women to Explore, Discover & Shape the Future.',
+  'school of management': 'Empowering Women to Lead with Purpose and Vision.',
+};
+
 export default function Schools() {
   const { docs: schools, loading } = useOrderedCollection<SchoolDoc>('schools', 'order');
   const { docs: departments } = useOrderedCollection<DepartmentDoc>('departments', 'order');
@@ -25,9 +35,12 @@ export default function Schools() {
     <main className="page-wrapper schools-page">
       <PageHero
         page="academics-schools"
-        defaultTitle="Schools"
+        defaultTitle="VWU's Four Schools"
+        defaultSubtitle="A Connected Academic Community"
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Academics', to: '/academics' }, { label: 'Schools' }]}
       />
+
+
 
       {loading ? (
         <section className="section bg-white">
@@ -46,8 +59,10 @@ export default function Schools() {
           <section key={school.id} className={`section ${i % 2 === 0 ? 'bg-white' : 'bg-off-white'}`}>
             <div className="container">
               <div style={{ textAlign: 'left', marginBottom: 'var(--space-10)' }}>
-                <span className="section-label">Schools</span>
-                <h2 className="section-title">{school.title}</h2>
+                <h2 className="section-title school-title">{school.title}</h2>
+                {SCHOOL_TAGLINES[school.title.trim().toLowerCase()] && (
+                  <p className="school-tagline">{SCHOOL_TAGLINES[school.title.trim().toLowerCase()]}</p>
+                )}
                 {school.description && (
                   <p className="section-desc">{school.description}</p>
                 )}

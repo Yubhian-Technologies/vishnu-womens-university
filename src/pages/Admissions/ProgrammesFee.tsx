@@ -98,7 +98,8 @@ export default function ProgrammesFee() {
               {[
                 { label: 'Duration', value: '4 Years' },
                 { label: 'Annual Fee', value: btechPrograms[0]?.fee || DEFAULT_BTECH_FEE },
-                { label: 'Total Intake', value: `${btechPrograms.reduce((s, p) => s + (p.intake || 0), 0)} Seats` },
+                // All B.Tech seats incl. EVT (which btechPrograms excludes for the VISW table below).
+                { label: 'Total Intake', value: `${allPrograms.filter(p => p.category === 'btech').reduce((s, p) => s + (p.intake || 0), 0)} Seats` },
               ].map(s => (
                 <div key={s.label} style={{ background: 'var(--color-primary)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4) var(--space-6)', textAlign: 'center' }}>
                   <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.4rem', fontWeight: 900, color: 'var(--color-accent)' }}>{s.value}</div>

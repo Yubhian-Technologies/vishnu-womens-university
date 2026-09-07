@@ -39,15 +39,17 @@ export default function NewsCard({ article, className = '', isFeatured = false, 
         {showCategory && <span className="news-card-category">{article.category}</span>}
       </div>
       <div className="news-card-body">
-        <time className="news-card-date" dateTime={article.date}>
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#C9973A" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="news-card-date-icon">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-            <line x1="16" y1="2" x2="16" y2="6"/>
-            <line x1="8" y1="2" x2="8" y2="6"/>
-            <line x1="3" y1="10" x2="21" y2="10"/>
-          </svg>
-          <span>{article.date}</span>
-        </time>
+        {article.date && (
+          <time className="news-card-date" dateTime={article.date}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#C9973A" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="news-card-date-icon">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+            <span>{article.date}</span>
+          </time>
+        )}
         {onReadMore ? (
           <button type="button" className="news-card-title news-card-title--btn" onClick={onReadMore}>
             {article.title}

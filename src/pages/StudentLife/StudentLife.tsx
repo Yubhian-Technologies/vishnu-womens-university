@@ -7,7 +7,7 @@ import { useSitePhotos, useSectionHasPhotos } from '../../hooks/useSitePhotos';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { resolveContentIcon } from '../../lib/contentIcons';
-import { Radio, GraduationCap, Target, Check } from 'lucide-react';
+import { Radio, GraduationCap, Check } from 'lucide-react';
 
 const defaultStudentLifePhotos = [
   // Slots 0-4: "Campus Moments" PhotoGrid gallery
@@ -40,14 +40,10 @@ const defaultClubsFestivalsPhotos = [
 
 export default function StudentLife() {
   const clubs = useContentBlocks('student-life', 'clubs');
-  const housing = useContentBlocks('student-life', 'housing');
   const services = useContentBlocks('student-life', 'services');
-  const athletics = useContentBlocks('student-life', 'athletics');
   const diningFeatures = useContentBlocks('student-life', 'diningFeatures');
   const studentLifeMainPhotos = useSitePhotos('student-life', 'main', defaultStudentLifePhotos);
   const studentLifePhotos = studentLifeMainPhotos.slice(0, 5);
-  const hostelImg = studentLifeMainPhotos[5];
-  const athleticsImg = studentLifeMainPhotos[6];
   const diningImg = studentLifeMainPhotos[7];
   const sportsRecreationPhotos = useSitePhotos('student-life', 'sports-recreation', defaultSportsRecreationPhotos);
   const hasSportsRecreationPhotos = useSectionHasPhotos('student-life', 'sports-recreation');
@@ -98,9 +94,9 @@ export default function StudentLife() {
         <div className="container">
           <div className="reveal" style={{ marginBottom: 'var(--space-10)' }}>
             <span className="section-label">Get Involved</span>
-            <h2 className="section-title">Student Organizations & Clubs</h2>
+            <h2 className="section-title">Student Clubs</h2>
             <p className="section-desc">
-              With 30+ student clubs and organisations, VWU has a community for every interest.
+              With 30+ student clubs, VWU has a community for every interest.
               If nothing fits, start your own.
             </p>
           </div>
@@ -142,72 +138,8 @@ export default function StudentLife() {
         </div>
       </section>
 
-      {/* Housing */}
-      <section className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', minHeight: '480px' }}>
-        <div style={{ position: 'relative', overflow: 'hidden', background: 'var(--color-primary-dark)' }}>
-          {hostelImg && (
-            <>
-              <img
-                src={hostelImg.src}
-                alt={hostelImg.alt}
-                style={{ width: '100%', height: '100%', objectFit: 'cover', minHeight: '380px' }}
-              />
-              <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,28,84,0.25)' }} />
-            </>
-          )}
-        </div>
-        <div className="reveal-right" style={{ background: 'var(--color-primary)', padding: 'var(--space-12) var(--space-10)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-          <span className="section-label" style={{ color: 'var(--color-accent)' }}>Campus Hostels</span>
-          <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-6)' }}>Your Home Away from Home</h2>
-          <div className="sl-housing-list">
-            {housing.map(h => (
-              <div key={h.id} className="sl-housing-item">
-                <div className="sl-housing-name">{h.title}</div>
-                <div className="sl-housing-type">{h.value}</div>
-                <div className="sl-housing-desc">{h.desc}</div>
-              </div>
-            ))}
-          </div>
-          <Link to="/student-life" className="btn btn-accent" style={{ alignSelf: 'flex-start', marginTop: 'var(--space-6)' }}>
-            Explore Housing Options
-          </Link>
-        </div>
-      </section>
-
-      {/* Athletics */}
-      <section className="section bg-off-white">
-        <div className="container">
-          <div className="sl-athletics-header reveal">
-            <div>
-              <span className="section-label">VWU Sports</span>
-              <h2 className="section-title">Sports & Games at VWU</h2>
-              <p className="section-desc">
-                VWU actively promotes physical development through diverse sports facilities,
-                inter-college competitions, and participation in state-level tournaments.
-              </p>
-            </div>
-            {athleticsImg && (
-              <img
-                src={athleticsImg.src}
-                alt={athleticsImg.alt}
-                className="sl-athletics-image"
-              />
-            )}
-          </div>
-          <div className="sl-sports-grid">
-            {athletics.map((s) => {
-              const Icon = resolveContentIcon(s.icon) || Target;
-              return (
-                <Link key={s.id} to="/news-awards/gallery#photo-gallery" className="sl-sport-card sl-sport-card--link">
-                  <span className="sl-sport-icon"><Icon size={32} strokeWidth={1.75} /></span>
-                  <div className="sl-sport-name">{s.title}</div>
-                  <span className="sl-sport-season">{s.value}</span>
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      </section>
+      {/* "Sports & Games at VWU" moved to the /sports-games activity page
+          (see components/VwuSportsSection). */}
 
       {/* Student Services */}
       <section className="section bg-white">

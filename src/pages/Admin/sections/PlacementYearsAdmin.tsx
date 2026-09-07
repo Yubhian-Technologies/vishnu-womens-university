@@ -27,11 +27,13 @@ interface FormState {
   offersAbove50LPA: string;
   offersAbove30LPA: string;
   offersAbove10LPA: string;
+  hideFromSummary: boolean;
 }
 
 const EMPTY: FormState = {
   batch: '', total: '', salaryLabel: 'CTC (LPA)', companiesVisited: '', note: '', rowsText: '', branchOffersText: '',
   averageSalaryLPA: '', medianSalaryLPA: '', highestPackageLPA: '', offersAbove50LPA: '', offersAbove30LPA: '', offersAbove10LPA: '',
+  hideFromSummary: false,
 };
 
 function rowsToText(rows: PlacementRow[]): string {
@@ -414,7 +416,7 @@ export default function PlacementYearsAdmin() {
   // edit an existing year, since none of those retain fresh per-student data.
   const [importedDedupedSalaries, setImportedDedupedSalaries] = useState<number[] | undefined>(undefined);
 
-  const set = (k: keyof FormState, v: string) => setForm((p) => ({ ...p, [k]: v }));
+  const set = <K extends keyof FormState>(k: K, v: FormState[K]) => setForm((p) => ({ ...p, [k]: v }));
 
   // Fills Total Placements, Companies Visited, and every salary/offers stat
   // straight from the Company Rows text — run right after an import and
@@ -463,6 +465,7 @@ export default function PlacementYearsAdmin() {
         offersAbove50LPA: form.offersAbove50LPA ? Number(form.offersAbove50LPA) : null,
         offersAbove30LPA: form.offersAbove30LPA ? Number(form.offersAbove30LPA) : null,
         offersAbove10LPA: form.offersAbove10LPA ? Number(form.offersAbove10LPA) : null,
+        hideFromSummary: form.hideFromSummary,
         updatedAt: serverTimestamp(),
       });
       setForm(EMPTY);
@@ -492,6 +495,7 @@ export default function PlacementYearsAdmin() {
       offersAbove50LPA: y.offersAbove50LPA != null ? String(y.offersAbove50LPA) : '',
       offersAbove30LPA: y.offersAbove30LPA != null ? String(y.offersAbove30LPA) : '',
       offersAbove10LPA: y.offersAbove10LPA != null ? String(y.offersAbove10LPA) : '',
+      hideFromSummary: y.hideFromSummary ?? false,
     });
     // Median specifically is always refreshed live from the year's current
     // Company Rows on open — it never needs per-student import data (see
@@ -534,6 +538,7 @@ export default function PlacementYearsAdmin() {
           offersAbove50LPA: y.offersAbove50LPA ?? null,
           offersAbove30LPA: y.offersAbove30LPA ?? null,
           offersAbove10LPA: y.offersAbove10LPA ?? null,
+          hideFromSummary: y.hideFromSummary ?? false,
           updatedAt: serverTimestamp(),
         });
       }
@@ -640,6 +645,12 @@ export default function PlacementYearsAdmin() {
           <div className="admin-field admin-field--full">
             <label htmlFor="field-note-optional">Note (optional)</label>
             <input id="field-note-optional" value={form.note} onChange={(e) => set('note', e.target.value)} placeholder="Shown in italics above the table, if set" />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+              <input type="checkbox" checked={form.hideFromSummary} onChange={(e) => set('hideFromSummary', e.target.checked)} />
+              Hide from Impact Summary (Placement Details page) — still shows normally in Placements, Year by Year. Use this for a batch still in progress that shouldn't yet count as a finished headline stat.
+            </label>
           </div>
           <div className="admin-field admin-field--full">
             <label htmlFor="field-branch-wise-offers-optional-one">Department-wise Offers (optional — one per line, "Department | Offers | Highest LPA". Highest LPA is optional per line — when set, that department's tile/donut also shows its highest package.)</label>

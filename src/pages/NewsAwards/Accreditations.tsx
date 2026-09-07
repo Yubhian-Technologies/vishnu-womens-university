@@ -7,9 +7,9 @@ import { useOrderedCollection } from '../../hooks/useCollection';
 import type { AwardDoc } from '../Admin/sections/NewsAwardsDataAdmin';
 
 const tabs = [
+  { key: 'accreditation', label: 'Accreditations & Approvals' },
   { key: 'ranking', label: 'Rankings & Ratings' },
   { key: 'award', label: 'Awards & Recognitions' },
-  { key: 'accreditation', label: 'Accreditations & Approvals' },
 ] as const;
 
 type TabKey = typeof tabs[number]['key'];
@@ -88,7 +88,7 @@ function tabFromHash(hash: string): TabKey | null {
 
 export default function Accreditations() {
   const location = useLocation();
-  const [activeTab, setActiveTab] = useState<TabKey>(() => tabFromHash(location.hash) ?? 'ranking');
+  const [activeTab, setActiveTab] = useState<TabKey>(() => tabFromHash(location.hash) ?? 'accreditation');
   useHashScroll();
   const { docs: awards } = useOrderedCollection<AwardDoc>('awards', 'order');
 
@@ -128,9 +128,9 @@ export default function Accreditations() {
       <PageHero
         page="news-awards-accreditations"
         defaultTitle="Accreditations & Awards"
-  defaultSubtitle="Endorsed by India's foremost regulatory and ranking bodies — a record of recognised quality and consistent academic achievement."
+        defaultSubtitle="Endorsed by India's foremost regulatory and ranking bodies — a record of recognised quality and consistent academic achievement."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'News & Awards', to: '/news-awards' }, { label: 'Accreditations & Awards' }]}
-        scrollCtaTargetId="accreditations-content"
+        hideCta
       />
 
       {/* Stats bar */}
@@ -138,16 +138,16 @@ export default function Accreditations() {
         <div className="container">
           <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-14)', flexWrap: 'wrap' }}>
             <div style={{ textAlign: 'center' }}>
+              <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', fontWeight: 900, color: 'var(--color-accent)' }}>{counts.accreditation}</div>
+              <div style={{ fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)' }}>Accreditations & Approvals</div>
+            </div>
+            <div style={{ textAlign: 'center' }}>
               <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', fontWeight: 900, color: 'var(--color-accent)' }}>{counts.ranking}</div>
               <div style={{ fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)' }}>Rankings & Ratings</div>
             </div>
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', fontWeight: 900, color: 'var(--color-accent)' }}>{counts.award}</div>
               <div style={{ fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)' }}>Awards & Recognitions</div>
-            </div>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', fontWeight: 900, color: 'var(--color-accent)' }}>{counts.accreditation}</div>
-              <div style={{ fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)' }}>Accreditations & Approvals</div>
             </div>
           </div>
         </div>

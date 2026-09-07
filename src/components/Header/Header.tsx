@@ -60,6 +60,7 @@ const navItemsData: NavItem[] = [
           { label: 'Organizational Chart', path: '/downloads/SVECWOrganizationChart.jpg', download: true, disabled: true },
           { label: 'Core Executive Body', path: '/about#core-executive' },
           { label: 'About Society (SVES)', path: '/about-sves' },
+          { label: 'Global Alumni Network', path: 'https://alumni.srivishnu.edu.in/', external: true },
         ],
       },
       {
@@ -104,7 +105,7 @@ const navItemsData: NavItem[] = [
     highlight: {
       title: 'Academic Excellence',
       description: 'Industry-aligned curriculum, multidisciplinary research, distinguished faculty, and hands-on laboratory learning.',
-      linkText: 'All Programs',
+      linkText: 'All Programmes',
       linkPath: '/academics',
     },
     groups: [
@@ -114,18 +115,13 @@ const navItemsData: NavItem[] = [
         items: [
           { label: 'Schools', path: '/academics/schools' },
           { label: 'Departments', path: '/academics/departments' },
-          { label: 'Programs', path: '/academics/programs' },
+          { label: 'Programmes', path: '/academics/programs' },
           { label: 'Faculty Directory', path: '/faculty' },
           { label: 'Results Analysis', path: '/result-analysis' },
           { label: 'Examinations Portal', path: 'https://www.svecwexams.in/', external: true },
         ],
       },
-      { groupLabel: 'UG Programmes', groupPath: '/academics?tab=btech', items: [] },
-      { groupLabel: 'PG Programmes', groupPath: '/academics?tab=mtech', items: [] },
-      // No groupPath — the Ph.D heading is plain text, not a link. Its
-      // programme rows are marked `disabled` in the render map below so they
-      // show but never navigate.
-      { groupLabel: 'Ph.D Programmes', items: [] },
+      { groupLabel: 'Departments', groupPath: '/academics/departments', items: [] },
       {
         groupLabel: 'Information',
         groupPath: '/information',
@@ -256,22 +252,24 @@ const navItemsData: NavItem[] = [
       { label: 'Arts & Culture', path: '/arts-culture' },
       { label: 'Vishnu School of Music', path: 'https://svesschoolofmusic.in/', external: true },
       { label: 'Sports & Games', path: '/sports-games' },
+      { label: 'Social Services', path: '/social-services' },
       { label: 'Other Facilities', path: '/campus/other-facilities' },
     ],
   },
   {
     label: 'Rankings',
+    path: '/news-awards/accreditations-awards#ranking',
     highlight: {
       title: 'Recognised Quality',
       badge: 'NAAC A+ & NBA',
       description: 'A record of national rankings, ratings, awards, and accreditations endorsed by India\'s foremost regulatory and ranking bodies.',
       linkText: 'View All Recognitions',
-      linkPath: '/news-awards/accreditations-awards',
+      linkPath: '/news-awards/accreditations-awards#ranking',
     },
     groups: [
       {
         groupLabel: 'Rankings & Recognitions',
-        groupPath: '/news-awards/accreditations-awards',
+        groupPath: '/news-awards/accreditations-awards#ranking',
         items: [
           { label: 'Rankings & Ratings', path: '/news-awards/accreditations-awards#ranking' },
           { label: 'Awards & Recognitions', path: '/news-awards/accreditations-awards#award' },
@@ -296,17 +294,10 @@ const navItemsData: NavItem[] = [
         items: [
           { label: 'Upcoming Events', path: '/news-awards/happenings#upcoming-events' },
           { label: 'Recent Events', path: '/news-awards/happenings#recent-events' },
+          { label: 'VWU Insights', path: '/news-awards/vwu-insights' },
           { label: 'Gallery', path: '/news-awards/gallery' },
           { label: 'Vishnu Era Newsletter', path: 'https://www.srivishnu.edu.in/vishnu-era/', external: true },
           { label: 'Prathibha Magazine', path: 'https://heyzine.com/flip-book/088b7b5629.html#page/54', external: true },
-        ],
-      },
-      {
-        groupLabel: 'Accreditations & Rankings',
-        groupPath: '/news-awards/accreditations-awards',
-        items: [
-          { label: 'Accreditations (NAAC, NBA)', path: '/news-awards/accreditations-awards#accreditation' },
-          { label: 'Rankings & Awards', path: '/news-awards/accreditations-awards#ranking' },
         ],
       },
     ],
@@ -398,8 +389,6 @@ export default function Header() {
     path: isVlsiProgram(p) ? '/academics/ece' : p.slug ? `/academics/${p.slug}` : '/academics',
   });
   const ugProgrammes = programs.filter((p) => p.category === 'btech').map(programItem);
-  const pgProgrammes = programs.filter((p) => p.category === 'mtech' || p.category === 'mba').map(programItem);
-  const phdProgrammes = programs.filter((p) => p.category === 'phd').map(programItem);
 
   const { docs: differentiatorItems } = useOrderedCollection<DifferentiatorItemDoc>('differentiatorItems', 'order');
   const { docs: placementItems } = useOrderedCollection<PlacementItemDoc>('placementItems', 'order');
@@ -475,9 +464,7 @@ export default function Header() {
     }
     if (item.label === 'Academics' && item.groups) {
       const groups = item.groups.map((group) => {
-        if (group.groupLabel === 'UG Programmes') return { ...group, items: ugProgrammes };
-        if (group.groupLabel === 'PG Programmes') return { ...group, items: pgProgrammes };
-        if (group.groupLabel === 'Ph.D Programmes') return { ...group, items: phdProgrammes.map((c) => ({ ...c, disabled: true })) };
+        if (group.groupLabel === 'Departments') return { ...group, items: ugProgrammes };
         return group;
       });
       return { ...item, groups };

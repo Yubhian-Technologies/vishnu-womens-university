@@ -1,15 +1,14 @@
 import { useEffect, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import { Check, Sparkles, Mail, ExternalLink, BookOpen, ChevronRight } from 'lucide-react';
+import { Check, Sparkles, Mail, BookOpen, ChevronRight } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import FacultyCarousel from '../../components/FacultyCarousel/FacultyCarousel';
 import { useOrderedCollection } from '../../hooks/useCollection';
-import { normalizeLab, type LabItem } from '../Admin/sections/ProgramsAdmin';
+import { normalizeLab, type LabItem, type NewsEventsYear } from '../Admin/sections/ProgramsAdmin';
 import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import type { FacultyDoc } from './Faculty';
 import type { StandaloneDepartment } from '../../lib/departmentGroups';
 import NewsEventsTabs, { type NewsEventsCategory } from '../../components/NewsEventsTabs/NewsEventsTabs';
-import { parseFlexibleTable } from '../../lib/structuredTable';
 import { hasCustomSectionContent, toQuickLinkItems } from '../../lib/customSections';
 import CustomSectionsRenderer from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import LabDialog from '../../components/LabDialog/LabDialog';
@@ -53,38 +52,24 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
   const newsEventsCategories: NewsEventsCategory[] = newsEventsSubSections.map((sec) => ({
     key: sec.id,
     label: sec.label,
-    years: (sec.subSections || []).filter(hasCustomSectionContent).length > 0
-      ? (sec.subSections || []).filter(hasCustomSectionContent).map((sub) => {
-          const yearLabel = sub.label.replace(/^Academic Year\s*(::|:|-)?\s*/i, '').trim();
-          const parsedTables = parseFlexibleTable(sub.tableText || '');
-          const firstTable = parsedTables[0] || { headers: [], rows: [] };
-          const mode: 'table' | 'cards' | 'text' | 'both' =
-            firstTable.headers.length > 0 && (sub.imageCards?.length ?? 0) > 0
-              ? 'both'
-              : firstTable.headers.length > 0
-              ? 'table'
-              : (sub.imageCards?.length ?? 0) > 0
-              ? 'cards'
-              : 'text';
-          return {
-            year: yearLabel || sub.label,
-            mode,
-            columns: firstTable.headers,
-            rows: firstTable.rows.map((cells) => ({ cells })),
-            cards: sub.imageCards,
-            text: sub.textContent,
-          };
-        })
-      : [
-          {
-            year: sec.label.replace(/^Academic Year\s*(::|:|-)?\s*/i, '').trim() || sec.label,
-            mode: 'table' as const,
-            columns: parseFlexibleTable(sec.tableText || '')[0]?.headers || [],
-            rows: (parseFlexibleTable(sec.tableText || '')[0]?.rows || []).map((cells) => ({ cells })),
-            cards: sec.imageCards,
-            text: sec.textContent,
-          },
-        ],
+    // Every section/sub-section renders generically (SectionSubtree) below
+    // regardless of its contentType — table, text, image cards, files,
+    // checklist, links, photo gallery, person, contacts, or any mix of
+    // those via further nesting. No content type is special-cased or
+    // filtered out here.
+    years: (() => {
+        // A section can have its own content AND sub-sections at once —
+        // both must show, not just one or the other.
+        const ownOnly = { ...sec, subSections: undefined };
+        const out: NewsEventsYear[] = [];
+        if (hasCustomSectionContent(ownOnly)) {
+          out.push({ year: sec.label.replace(/^Academic Year\s*(::|:|-)?\s*/i, '').trim() || sec.label, columns: [], rows: [], section: ownOnly });
+        }
+        (sec.subSections || []).filter(hasCustomSectionContent).forEach((sub) => {
+          out.push({ year: sub.label.replace(/^Academic Year\s*(::|:|-)?\s*/i, '').trim() || sub.label, columns: [], rows: [], section: sub });
+        });
+        return out;
+      })(),
   })).filter((c) => c.years.length > 0);
 
   const hasNewsEvents = newsEventsCategories.length > 0;
@@ -262,29 +247,24 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
       {hasHod && (
         <section id="hod" className="dept-hod-section" style={{ scrollMarginTop: NAV_OFFSET }}>
           <div className="container">
-            <div style={{ marginBottom: 'var(--space-10)' }}>
-              <span className="section-label dept-section-label">Academic Leadership</span>
-              <h2 className="section-title">Brief Profile</h2>
-            </div>
             <div className="dept-hod-editorial-card">
-              <div className="dept-hod-media-col">
-                {dept.hodImage && (
+              {dept.hodImage && (
+                <div className="dept-hod-media-col">
                   <div className="dept-hod-media-frame">
                     <SmoothImage src={dept.hodImage} alt={dept.hod || 'Head of Department'} className="dept-hod-photo" />
                   </div>
-                )}
-                {dept.hod && (
-                  <div className="dept-hod-media-caption">
-                    <h3 className="dept-hod-name">{dept.hod}</h3>
-                    <div className="dept-hod-meta">Head of the Department</div>
-                  </div>
-                )}
-              </div>
+                  {dept.hod && (
+                    <div className="dept-hod-media-caption">
+                      <h3 className="dept-hod-name">{dept.hod}</h3>
+                      <div className="dept-hod-meta">Head of the Department</div>
+                    </div>
+                  )}
+                </div>
+              )}
               <div className="dept-hod-content">
+                <h2 className="dept-hod-message-title">Brief Profile</h2>
                 {dept.hodMessage && (
-                  <div className="dept-hod-message-box">
-                    <p className="dept-hod-message-text">{dept.hodMessage}</p>
-                  </div>
+                  <p className="dept-hod-message-text-plain">{dept.hodMessage}</p>
                 )}
                 {dept.hodEmail && (
                   <div className="dept-hod-actions">
@@ -295,17 +275,6 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
                   </div>
                 )}
               </div>
-              {(dept.hodResearchProfiles?.length ?? 0) > 0 && (
-                <div style={{ background: 'var(--color-primary)', padding: 'var(--space-4) var(--space-8)', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-5)' }}>
-                  <span style={{ fontSize: 'var(--text-xs)', fontWeight: 800, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Research Profiles</span>
-                  {dept.hodResearchProfiles!.map((link) => (
-                    <a key={link.label} href={link.url} target="_blank" rel="noopener noreferrer"
-                      style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1)', fontSize: 'var(--text-sm)', color: 'var(--color-white)', fontWeight: 600, textDecoration: 'none' }}>
-                      {link.label} <ExternalLink size={12} strokeWidth={2} />
-                    </a>
-                  ))}
-                </div>
-              )}
             </div>
           </div>
         </section>
