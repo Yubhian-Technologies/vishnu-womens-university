@@ -86,6 +86,7 @@ const WellnessCenter = lazyWithRetry(() => import('./pages/Campus/WellnessCenter
 const Information = lazyWithRetry(() => import('./pages/Information/Information'));
 const ProgrammesFee = lazyWithRetry(() => import('./pages/Admissions/ProgrammesFee'));
 const AdmissionProcedure = lazyWithRetry(() => import('./pages/Admissions/AdmissionProcedure'));
+const VWUNET = lazyWithRetry(() => import('./pages/Admissions/VWUNET'));
 const ResultAnalysis = lazyWithRetry(() => import('./pages/Admissions/ResultAnalysis'));
 const StudentClubs = lazyWithRetry(() => import('./pages/StudentActivities/StudentClubs'));
 const StudentClubDetail = lazyWithRetry(() => import('./pages/StudentActivities/StudentClubDetail'));
@@ -197,6 +198,7 @@ function PublicApp() {
             <Route path="/information" element={<Information />} />
             <Route path="/programmes-fee-structure" element={<ProgrammesFee />} />
             <Route path="/admission-procedure" element={<AdmissionProcedure />} />
+            <Route path="/vwunet" element={<VWUNET />} />
             <Route path="/result-analysis" element={<ResultAnalysis />} />
             <Route path="/vishnu-tv-academy" element={<CampusLifeDetail slug="vishnu-tv-academy" />} />
             <Route path="/student-clubs" element={<StudentClubs />} />

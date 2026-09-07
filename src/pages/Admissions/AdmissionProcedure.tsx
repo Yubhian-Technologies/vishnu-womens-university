@@ -75,8 +75,8 @@ export default function AdmissionProcedure() {
         </div>
       </section>
 
-      {/* Admission Procedure Tabs */}
-      <section className="section bg-off-white">
+      {/* Admission Procedure title */}
+      <section className="section bg-off-white" style={{ paddingBottom: 0 }}>
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-8)' }}>
             <span className="section-label">Admissions 2027</span>
@@ -85,7 +85,22 @@ export default function AdmissionProcedure() {
               Select your programme below to explore the applicable entrance examination, admission category and pathway.
             </p>
           </div>
+        </div>
+      </section>
 
+      {/* VWUNET — full-screen banner linking to its (placeholder) page */}
+      <Link to="/vwunet" className="vwunet-banner">
+        <span className="vwunet-banner__line">
+          <span className="vwunet-banner__title">VWUNET</span>
+          <span className="vwunet-banner__subtitle">
+            &ndash;&nbsp;Vishnu Women&rsquo;s University National Entrance Test
+          </span>
+        </span>
+      </Link>
+
+      {/* Admission Procedure Tabs */}
+      <section className="section bg-off-white">
+        <div className="container">
           <div className="section-tabs admission-tabs-bar" role="tablist" aria-label="Admission programmes">
             {admissionTabs.map((t) => (
               <button
@@ -121,7 +136,7 @@ export default function AdmissionProcedure() {
             </div>
           )}
 
-          <div className="admission-category-card" style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)' }}>
+          <div className="admission-category-card" style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-mid-gray)', borderRadius: 'var(--radius-md)' }}>
             <h4 style={{ fontFamily: 'var(--font-sans)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>{activeCategory.title}</h4>
             <p style={{ color: 'var(--color-text-light)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-5)' }}>{activeCategory.description}</p>
 
@@ -142,7 +157,7 @@ export default function AdmissionProcedure() {
               <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--space-2)', marginTop: 'var(--space-2)' }}>
                 {activeCategory.steps.map((step, i) => (
                   <div key={step} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                    <span style={{ background: 'var(--color-off-white)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-sm)', padding: 'var(--space-2) var(--space-4)', fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-primary-dark)' }}>
+                    <span style={{ background: 'var(--color-off-white)', border: '1px solid var(--color-mid-gray)', borderRadius: 'var(--radius-sm)', padding: 'var(--space-2) var(--space-4)', fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-primary-dark)' }}>
                       {step}
                     </span>
                     {i < activeCategory.steps.length - 1 && (
