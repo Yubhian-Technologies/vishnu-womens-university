@@ -1184,7 +1184,8 @@ export default function PlacementDetail() {
   // this generic Outcomes & Achievements block would just repeat them. Our
   // Recruiters drops it per request — the recruiter logo grid below is the
   // page's actual point, and Outcomes was just repeating the Overview text.
-  const showOutcomes = !!item.outcomes && item.outcomes.length > 0 && item.slug !== 'placement-highlights' && item.slug !== 'our-recruiters' && item.slug !== 'tpo-team' && item.slug !== 'industry-liaison-offices';
+  const activeOutcomes = (item.outcomes || []).filter((o) => !o.includes('2015-2019') && !o.includes('2015–2019'));
+  const showOutcomes = activeOutcomes.length > 0 && item.slug !== 'placement-highlights' && item.slug !== 'our-recruiters' && item.slug !== 'tpo-team' && item.slug !== 'industry-liaison-offices';
   // Shared markup for the below-Overview spot every non-Placement-Cell page
   // uses. Placement Cell renders its own combined Summary+chart block near
   // the hero instead (see placementCellSummarySection below) — it needs the
@@ -1203,7 +1204,7 @@ export default function PlacementDetail() {
             placementCellSummarySection above). mobile-stack-grid still
             collapses this to one column on small screens. */}
         <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-4)' }}>
-          {item.outcomes!.map((o) => (
+          {activeOutcomes.map((o) => (
             <div key={o}
               style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', minHeight: 110, display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
               <Trophy size={20} strokeWidth={1.75} style={{ flexShrink: 0, color: 'var(--color-accent)' }} />

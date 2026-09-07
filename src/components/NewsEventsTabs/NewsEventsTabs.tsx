@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Calendar, FileText, ExternalLink, ChevronDown, ChevronRight } from 'lucide-react';
 import type { NewsEventsYear } from '../../pages/Admin/sections/ProgramsAdmin';
 import SmoothCollapse from '../SmoothCollapse/SmoothCollapse';
+import { SectionSubtree } from '../CustomSectionsRenderer/CustomSectionsRenderer';
+import { hasCustomSectionContent } from '../../lib/customSections';
 
 export interface NewsEventsCategory {
   key: string;
@@ -25,6 +27,7 @@ function isUrl(text: string): boolean {
 }
 
 function getEventCount(yr: NewsEventsYear): number {
+  if (yr.section) return hasCustomSectionContent(yr.section) ? 1 : 0;
   const mode = yr.mode || 'table';
   let count = 0;
   if (mode === 'table' || mode === 'both') {
@@ -87,10 +90,11 @@ export default function NewsEventsTabs({ categories, eyebrow, navOffset, embedde
             {active.years.map((yr, yi) => {
               const isExpanded = expandedYearIndex === yi;
               const mode = yr.mode || 'table';
-              const showTable = (mode === 'table' || mode === 'both') && yr.columns.length > 0;
+              const showSection = !!yr.section;
+              const showTable = !showSection && (mode === 'table' || mode === 'both') && yr.columns.length > 0;
               const cards = yr.cards || [];
-              const showCards = (mode === 'cards' || mode === 'both') && cards.length > 0;
-              const showText = mode === 'text' && !!yr.text;
+              const showCards = !showSection && (mode === 'cards' || mode === 'both') && cards.length > 0;
+              const showText = !showSection && mode === 'text' && !!yr.text;
               const count = getEventCount(yr);
               const countLabel = formatEventCountLabel(count);
 
@@ -221,7 +225,9 @@ export default function NewsEventsTabs({ categories, eyebrow, navOffset, embedde
 
                       {showText && <p className="news-events-text-block">{yr.text}</p>}
 
-                      {!showTable && !showCards && !showText && (
+                      {showSection && <SectionSubtree section={yr.section!} />}
+
+                      {!showTable && !showCards && !showText && !showSection && (
                         <p className="news-events-empty-text">Nothing added for this academic year yet.</p>
                       )}
                     </div>
