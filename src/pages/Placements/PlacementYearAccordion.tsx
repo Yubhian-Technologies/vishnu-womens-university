@@ -14,8 +14,10 @@ function endingYear(label: string): string {
 
 interface Props {
   /** Restrict to just these batch labels (e.g. only the 4 most recent) —
-   *  omit to show every batch. Used by the Placement Details sub-page,
-   *  which only wants 2022–2026 through 2019–2023. */
+   *  omit to show every batch. Neither the main Placements page nor the
+   *  Placement Details sub-page currently pass this, so both show every
+   *  batch in the admin's Batch Years list automatically; a page can still
+   *  opt into a fixed subset by passing it explicitly. */
   years?: string[];
   /** Batches that should show the richer view (companies-visited /
    *  branch-offers stat tiles, a branch-wise bar chart, and named student
