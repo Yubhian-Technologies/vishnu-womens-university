@@ -544,7 +544,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   const quickLinks = [
     hasAbout && { id: 'about', label: 'Department Overview' },
     hasCoreValues && { id: 'vision-mission', label: 'Core Values' },
-    subPrograms.length > 0 && { id: 'programmes', label: 'Degree Programmes' },
+    subPrograms.length > 0 && { id: 'programmes', label: 'Programs' },
     (hasPlacements || hasInternships) && { id: 'placements', label: placementsLinkLabel },
     hasHod && { id: 'hod', label: 'Brief Profile' },
     faculty.length > 0 && { id: 'faculty', label: 'Faculty' },
