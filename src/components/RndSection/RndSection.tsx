@@ -224,9 +224,6 @@ export default function RndSection({ years, sectionClassName = 'section bg-white
                           )}
                           {project.outcomes.length > 0 && (
                             <div>
-                              <strong style={{ fontSize: 'var(--text-sm)', color: 'var(--color-primary)', display: 'block', marginBottom: 'var(--space-2)' }}>
-                                Outcome
-                              </strong>
                               <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                                 {project.outcomes.map((o, oi) => (
                                   <li key={oi} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-2)' }}>
