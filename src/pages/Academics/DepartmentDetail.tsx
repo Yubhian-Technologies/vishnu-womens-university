@@ -53,6 +53,15 @@ const HUB_TAB_EMPTY = (
   </p>
 );
 
+// A placement year label like "2022–2026" -> "2026" for the snapshot
+// heading — the graduating year reads more naturally there than the full
+// 4-year range. Already-bare years (or labels with no 4-digit year at all)
+// pass through unchanged.
+function endingYear(label: string): string {
+  const years = label.match(/\d{4}/g);
+  return years ? years[years.length - 1] : label;
+}
+
 /**
  * The shared page for a "grouped" department (AI / CSE / ECE). The top half is
  * common content read from the department's `departments` doc (matched by
@@ -376,12 +385,14 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   const activeStaticBatch = activePlacementYear
     ? findDeptBatchStatsForYearLabel(deptShortCodeForPlacements, activePlacementYear.year, mainPlacementYears)
     : null;
-  // The institution-wide published figure is the authoritative one when it
-  // exists for this Academic Year — the department's own uploaded sheet
-  // (placementYearStats.totalOffers) is often a partial/in-progress count,
-  // not the final published total, so this replaces the tile's number
-  // outright rather than showing both side by side.
-  const displayedTotalOffers = activeStaticBatch?.offers ?? placementYearStats?.totalOffers ?? 0;
+  // The department's own uploaded sheet (placementYearStats.totalOffers) is
+  // the authoritative count for the "Total No. of Offers" tile whenever it
+  // exists — it's the actual, complete row count of what an admin imported
+  // for this Academic Year. The institution-wide module's figure only fills
+  // in when the department hasn't uploaded its own records at all for this
+  // year (placementYearStats is null), so a visitor still never sees "no
+  // data" for a batch the institution has published a figure for.
+  const displayedTotalOffers = placementYearStats?.totalOffers ?? activeStaticBatch?.offers ?? 0;
   const hasPlacements = !!(shared.placementIntro || shared.placementStats.length > 0 || shared.placementRecruiters.length > 0 || placementYears.length > 0 || staticDeptBatches.length > 0);
 
   // Individual student Internship Records — same shape/pattern as the
@@ -1063,7 +1074,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                 {activePlacementYear && placementYearStats && (
                   <>
                     <p className="placement-stat-summary">
-                      {activePlacementYear.year} Placements as on date: <strong>{displayedTotalOffers.toLocaleString()}</strong>
+                      {endingYear(activePlacementYear.year)} Placement Snapshot
                     </p>
                     <div className={`dept-stat-grid${placementStatsFull ? ' dept-stat-grid--fill' : ''}`}>
                       <div className="dept-stat-tile">

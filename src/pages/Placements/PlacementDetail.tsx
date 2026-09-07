@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { orderBy } from 'firebase/firestore';
-import { Trophy, BarChart3, PlayCircle, MapPin } from 'lucide-react';
+import { Trophy, BarChart3, PlayCircle, MapPin, CheckCircle2 } from 'lucide-react';
 import { useCollection, useOrderedCollection, type WithId } from '../../hooks/useCollection';
 import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import { usePageBanners } from '../../hooks/usePageBanners';
@@ -11,7 +11,8 @@ import { parseStructuredTable, parseFlexibleTable } from '../../lib/structuredTa
 import type { PlacementItemDoc } from '../Admin/sections/PlacementItemsAdmin';
 import type { TpoTeamBioDoc } from '../Admin/sections/TpoTeamInfoAdmin';
 import type { PlacementCrtDoc } from '../Admin/sections/PlacementCrtDocsAdmin';
-import PlacementYearAccordion, { BranchOffersBarChart, BRANCH_COLORS } from './PlacementYearAccordion';
+import PlacementYearAccordion, { BranchOffersBarChart, formatSalary } from './PlacementYearAccordion';
+import type { PlacementYear } from './placementStats.data';
 import SmoothCollapse from '../../components/SmoothCollapse/SmoothCollapse';
 import CareerGuidanceInterestForm from '../../components/CareerGuidanceInterestForm/CareerGuidanceInterestForm';
 import { successStories } from './successStories.data';
@@ -179,29 +180,32 @@ const PARTNER_LOGO_OVERRIDES: Record<string, string> = {
   'Providence': 'https://upload.wikimedia.org/wikipedia/en/thumb/7/79/Providence_Health_logo.svg/250px-Providence_Health_logo.svg.png',
 };
 
-// Placement Cell's Summary tiles are a single free-text line per batch (e.g.
-// "2022-2026 batch: 1103 placements, highest 59.28 LPA(Google)") — this
-// breaks that one line into three ("2022-2026 batch" / "1103 placements" /
-// "Highest Package: 59.28 LPA(Google)") when it matches the usual shape a
-// batch summary is entered in, so the tile always reads as three distinct
-// facts instead of a wrapped run-on sentence. Any outcome text that doesn't
-// match (a different sub-page's plain achievement bullet, say) renders as-is.
-const OUTCOME_BATCH_SUMMARY_RE = /^(.+?)\s+batch:\s*([\d,]+)\s*placements,\s*highest\s+(.+)$/i;
-function OutcomeTileText({ text }: { text: string }) {
-  const m = text.match(OUTCOME_BATCH_SUMMARY_RE);
-  if (!m) return <>{text}</>;
-  const [, batch, count, highest] = m;
-  // The raw admin-entered count sometimes has a thousands comma baked in
-  // (e.g. "1,156") and sometimes doesn't (e.g. "1103") — strip it so every
-  // tile reads the same way regardless of how it was typed.
-  const countDigitsOnly = count.replace(/,/g, '');
-  return (
-    <>
-      <span style={{ display: 'block', textAlign: 'center' }}>{batch} batch</span>
-      <span style={{ display: 'block', textAlign: 'center' }}>{countDigitsOnly} placements</span>
-      Highest Package: {highest}
-    </>
-  );
+// Placement Cell's Summary tiles used to be a manually-typed free-text line
+// per batch (e.g. "2022-2026 batch: 1103 placements, highest 59.28
+// LPA(Google)"), kept on the placement-details item's Outcomes field — a
+// completely separate admin field from the "Placements, Year by Year" batch
+// data below it on this same page, with nothing keeping the two in sync. An
+// admin editing/re-importing a batch's Company Rows had no way to know the
+// Summary tile above still quoted the old numbers (or was simply missing
+// for a newly-added batch). This derives every tile straight from the same
+// placementYears data the Year-by-Year section reads, so both always agree
+// and a new batch gets a tile automatically.
+function batchHighestPackage(y: PlacementYear): { lpa: number; company?: string } | undefined {
+  const rows = y.rows || [];
+  let best: { lpa: number; company: string } | undefined;
+  for (const r of rows) {
+    const lpa = parseFloat(formatSalary(r.salary));
+    if (!Number.isFinite(lpa)) continue;
+    if (!best || lpa > best.lpa) best = { lpa, company: r.company };
+  }
+  const lpa = y.highestPackageLPA ?? best?.lpa;
+  if (lpa == null) return undefined;
+  // If the batch's own Highest Package figure doesn't exactly match its top
+  // Company Row (e.g. a manually-typed override), still show the row whose
+  // salary matches it rather than mislabeling best's company under a
+  // different number.
+  const company = rows.find((r) => Math.abs((parseFloat(formatSalary(r.salary)) || -Infinity) - lpa) < 0.01)?.company ?? (y.highestPackageLPA == null ? best?.company : undefined);
+  return { lpa, company };
 }
 
 // Logo only — no company name label beside it (per request). The name still
@@ -477,6 +481,163 @@ function CareerGuidanceAccordion() {
           </div>
         );
       })}
+    </div>
+  );
+}
+
+// Shared by the Placement Guidelines and Campus Recruitment & Training
+// sub-pages — both read the same admin-entered Intro text every other
+// Placement sub-page already uses (see BodyBlocks.tsx: "**Heading**" lines
+// as sub-headings, "- " lines as bullets), just grouped into cards here
+// instead of the plain BodyBlocks paragraph/bullet styling. Nothing new to
+// type in the admin — a "**Category**" line starts a new card, the "- "
+// lines under it become that card's checklist.
+interface ChecklistCategory {
+  title: string;
+  items: string[];
+}
+
+function parseChecklistCategories(intro: string): ChecklistCategory[] {
+  const categories: ChecklistCategory[] = [];
+  let current: ChecklistCategory | null = null;
+  for (const block of parseBodyContent(intro)) {
+    if (block.type === 'paragraph') {
+      const headingMatch = block.text.match(/^\*\*(.+)\*\*$/);
+      if (headingMatch) {
+        current = { title: headingMatch[1].replace(/:\s*$/, '').trim(), items: [] };
+        categories.push(current);
+        continue;
+      }
+      // A plain (non-"- ", non-heading) line under a category — e.g.
+      // Placement Excellence's "1103 offers" / "59.28 LPA (Google)" lines,
+      // which aren't bulleted. Collected as an item exactly like a "- " line
+      // would be; the renderer decides whether to show a bullet at all.
+      if (!current) {
+        current = { title: '', items: [] };
+        categories.push(current);
+      }
+      current.items.push(block.text);
+      continue;
+    }
+    if (!current) {
+      current = { title: '', items: [] };
+      categories.push(current);
+    }
+    current.items.push(...block.items);
+  }
+  return categories;
+}
+
+const GUIDELINE_CATEGORY_COLORS = [
+  { background: '#EAF3FC', heading: '#1D4ED8' },
+  { background: '#E9F7F1', heading: '#0F766E' },
+  { background: '#FBEEE6', heading: '#C2410C' },
+  { background: '#EFEAFB', heading: '#6D28D9' },
+];
+
+function PlacementGuidelinesSections({ intro }: { intro: string }) {
+  const categories = parseChecklistCategories(intro);
+  if (categories.length === 0) return null;
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
+      {categories.map((category, i) => {
+        const color = GUIDELINE_CATEGORY_COLORS[i % GUIDELINE_CATEGORY_COLORS.length];
+        return (
+          <div
+            key={`${category.title}-${i}`}
+            style={{ background: color.background, borderRadius: 'var(--radius-md)', padding: 'var(--space-5) var(--space-6)' }}
+          >
+            {category.title && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
+                <span style={{ width: 8, height: 8, borderRadius: '50%', background: color.heading, flexShrink: 0 }} />
+                <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: color.heading, margin: 0 }}>
+                  {category.title}
+                </h3>
+              </div>
+            )}
+            <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+              {category.items.map((point, pi) => (
+                <li key={pi} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-3)', paddingLeft: 'calc(16px + var(--space-3))' }}>
+                  <span style={{ width: 7, height: 7, marginTop: 8, borderRadius: '50%', background: color.heading, flexShrink: 0 }} />
+                  <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6 }}>{point}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// Campus Recruitment & Training sub-page — same parsing as Placement
+// Guidelines above, styled instead as one solid navy card per category (with
+// a checkbox-in-a-badge heading icon and en-dash bullets), matching this
+// page's own reference design rather than reusing the pastel multi-colour
+// look.
+function CampusRecruitmentTrainingSections({ intro }: { intro: string }) {
+  const categories = parseChecklistCategories(intro);
+  if (categories.length === 0) return null;
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+      {categories.map((category, i) => (
+        <div
+          key={`${category.title}-${i}`}
+          style={{ background: 'var(--color-primary-light)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-6) var(--space-8)' }}
+        >
+          {category.title && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
+              <CheckCircle2 size={22} strokeWidth={2} color="var(--color-white)" style={{ flexShrink: 0 }} />
+              <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-lg)', fontWeight: 700, color: 'var(--color-white)', margin: 0 }}>
+                {category.title}
+              </h3>
+            </div>
+          )}
+          <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+            {category.items.map((point, pi) => (
+              <li key={pi} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-2)', paddingLeft: 'calc(22px + var(--space-3))' }}>
+                <span style={{ color: 'rgba(255,255,255,0.55)', lineHeight: 1.6 }}>–</span>
+                <span style={{ fontSize: 'var(--text-base)', color: 'rgba(255,255,255,0.9)', lineHeight: 1.6 }}>{point}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// Placement Details' Summary section (placementCellSummarySection below) —
+// alternating navy/cream colours by position, a checkbox-style heading icon,
+// and the batch/offers/package split across their own lines. Offers and
+// Highest Package come straight from the batch's placementYears record
+// (see batchHighestPackage above) rather than a separately-typed line, so
+// this always matches the Year-by-Year section further down the page.
+const BATCH_CARD_COLORS = [
+  { background: 'var(--color-primary-light)', border: 'var(--color-primary-light)', heading: 'var(--color-white)', body: 'rgba(255,255,255,0.85)' },
+  { background: '#FCEFD9', border: '#E8A83C', heading: '#7A4A12', body: '#8A5A20' },
+];
+
+function BatchSummaryCard({ batch, offers, highest, index }: { batch: string; offers: number | null; highest?: { lpa: number; company?: string }; index: number }) {
+  const color = BATCH_CARD_COLORS[index % BATCH_CARD_COLORS.length];
+  return (
+    <div style={{ background: color.background, border: `1.5px solid ${color.border}`, borderRadius: 'var(--radius-lg)', padding: 'var(--space-5)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-3)' }}>
+        <span style={{ width: 14, height: 14, border: `2px solid ${color.heading}`, borderRadius: 3, flexShrink: 0 }} />
+        <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: color.heading, margin: 0 }}>
+          {batch} batch
+        </h3>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <span style={{ fontSize: 'var(--text-sm)', color: color.body }}>{offers != null ? offers.toLocaleString('en-IN') : '—'} offers</span>
+        {highest && (
+          <span style={{ fontSize: 'var(--text-sm)', color: color.body }}>
+            highest {highest.lpa} LPA{highest.company ? `(${highest.company})` : ''}
+          </span>
+        )}
+      </div>
     </div>
   );
 }
@@ -941,6 +1102,14 @@ export default function PlacementDetail() {
   const placementYearData = usePlacementYears();
   const [sidebarChartBatch, setSidebarChartBatch] = useState('');
   const sidebarChartYear = placementYearData.find((y) => y.batch === sidebarChartBatch);
+  // Which batches get the richer "enriched" view (companies-visited/branch-
+  // offers stat tiles, donut chart, named student records) below is derived
+  // straight from whether a batch actually HAS that data, rather than a
+  // fixed list of batch labels — so a new year added from the admin (Batch
+  // Years section) shows up here automatically, with the enriched view
+  // switching on by itself the moment its Department-wise Offers are filled
+  // in, instead of needing this page's code updated by hand every time.
+  const enrichedYearBatches = placementYearData.filter((y) => (y.branchOffers?.length ?? 0) > 0).map((y) => y.batch);
 
   useEffect(() => {
     setActiveTableRow(null);
@@ -1048,27 +1217,27 @@ export default function PlacementDetail() {
   // Placement Cell's own combined Summary (batch cards) — full width, no
   // longer paired with the Branch-wise Placement Distribution chart (that
   // now only appears further down, in the Placements/Year-by-Year section).
-  const outcomeAccentColors = Object.values(BRANCH_COLORS);
-  const placementCellSummarySection = showOutcomes && item.slug === 'placement-details' && (
+  // Reads placementYearData directly (the same data the Year-by-Year section
+  // below uses) instead of the item's separately-typed Outcomes field, so a
+  // batch's offers/highest-package here can never drift from what the
+  // Year-by-Year section shows for that same batch, and a newly-added batch
+  // gets a card automatically instead of needing a matching Outcomes line
+  // typed in by hand.
+  const summaryYearData = placementYearData.filter((y) => !y.hideFromSummary);
+  const placementCellSummarySection = item.slug === 'placement-details' && summaryYearData.length > 0 && (
     <section className="section bg-off-white">
       <div className="container">
         <div style={{ marginBottom: 'var(--space-8)' }}>
           <span className="section-label">Impact</span>
           <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Summary</h2>
         </div>
-        {/* Fixed 4-column grid (2 rows of 4 for the usual 8 cards), not
-            auto-fit/minmax — auto-fit would stretch a partial last row's
-            items to fill the leftover space instead of leaving them at the
-            same width as every other row. mobile-stack-grid still collapses
-            this to a single column on small screens. */}
+        {/* Fixed 4-column grid, not auto-fit/minmax — auto-fit would stretch
+            a partial last row's items to fill the leftover space instead of
+            leaving them at the same width as every other row. mobile-stack-
+            grid still collapses this to a single column on small screens. */}
         <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-4)' }}>
-          {item.outcomes!.map((o, i) => (
-            <div key={o}
-              style={{ position: 'relative', overflow: 'hidden', background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5) var(--space-5) var(--space-5) calc(var(--space-5) + 4px)', minHeight: 110, display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
-              <span style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, background: outcomeAccentColors[i % outcomeAccentColors.length] }} />
-              <Trophy size={20} strokeWidth={1.75} style={{ flexShrink: 0, color: outcomeAccentColors[i % outcomeAccentColors.length] }} />
-              <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6, fontWeight: 700 }}><OutcomeTileText text={o} /></span>
-            </div>
+          {summaryYearData.map((y, i) => (
+            <BatchSummaryCard key={y.batch} batch={y.batch} offers={y.total} highest={batchHighestPackage(y)} index={i} />
           ))}
         </div>
       </div>
@@ -1093,7 +1262,7 @@ export default function PlacementDetail() {
   // Our Recruiters drops the whole Overview section per request instead —
   // its Key Highlights/About text duplicated the logo grid below, which is
   // the page's actual content — with no full-width-grid replacement.
-  const skipOverviewSection = (item.slug === 'employability-skills' && !hasBodyOverride && !item.intro && !item.desc) || item.slug === 'our-recruiters' || item.slug === 'internships' || item.slug === 'placement-details';
+  const skipOverviewSection = (item.slug === 'employability-skills' && !hasBodyOverride && !item.intro && !item.desc) || item.slug === 'our-recruiters' || item.slug === 'internships' || item.slug === 'placement-details' || item.slug === 'placement-guidelines' || (item.slug === 'campus-recruitment-training' && !!item.intro);
 
   return (
     <main className="page-wrapper">
@@ -1216,37 +1385,6 @@ export default function PlacementDetail() {
                 </p>
               )}
 
-              {/* SVES network graphic — the society's ILO/campus map, shown
-                  above the per-office Regional Offices accordion below. Static
-                  asset (not admin-managed) since it's society-issued artwork,
-                  same as the /images/placements/* photos elsewhere. The
-                  onError hide keeps the page clean rather than showing a
-                  broken-image icon if the file isn't present. */}
-              {item.slug === 'industry-liaison-offices' && (
-                <img
-                  src="/images/placements/industry-liaison-offices.png"
-                  alt="Sri Vishnu Educational Society — Industry Liaison Offices, campuses and contact details across India"
-                  loading="lazy"
-                  onError={(e) => {
-                    const target = e.currentTarget as HTMLImageElement;
-                    if (!target.dataset.triedFallback) {
-                      target.dataset.triedFallback = 'true';
-                      target.src = '/images/image (3).png';
-                    } else {
-                      target.style.display = 'none';
-                    }
-                  }}
-                  style={{
-                    display: 'block',
-                    width: '100%',
-                    maxWidth: '720px',
-                    height: 'auto',
-                    margin: 'var(--space-8) auto 0',
-                    borderRadius: 'var(--radius-lg)',
-                    boxShadow: 'var(--shadow-md)',
-                  }}
-                />
-              )}
             </div>
 
             {/* Sidebar: on Placement Cell, a branch-wise bar chart synced to
@@ -1318,6 +1456,29 @@ export default function PlacementDetail() {
         <section className="section bg-white" style={{ paddingTop: 'var(--space-6)' }}>
           <div className="container">
             <HigherEducationAccordion />
+          </div>
+        </section>
+      )}
+
+      {/* Colour-coded checklist — only on the Placement Guidelines sub-page,
+          replacing the plain BodyBlocks rendering of the same Intro text
+          Overview would otherwise show (see skipOverviewSection above). */}
+      {item.slug === 'placement-guidelines' && (
+        <section className="section bg-white" style={{ paddingTop: 'var(--space-6)' }}>
+          <div className="container">
+            <PlacementGuidelinesSections intro={item.intro || ''} />
+          </div>
+        </section>
+      )}
+
+      {/* Navy checklist cards — only on Campus Recruitment & Training, and
+          only once the admin has entered real Intro content in this format
+          (the "**Heading**"/"- item" convention) — otherwise this slug falls
+          back to its old hardcoded BODY_OVERRIDES paragraphs unchanged. */}
+      {item.slug === 'campus-recruitment-training' && item.intro && (
+        <section className="section bg-white" style={{ paddingTop: 'var(--space-6)' }}>
+          <div className="container">
+            <CampusRecruitmentTrainingSections intro={item.intro} />
           </div>
         </section>
       )}
@@ -1405,8 +1566,7 @@ export default function PlacementDetail() {
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Placements, Year by Year</h2>
             </div>
             <PlacementYearAccordion
-              years={['2022–2026', '2021–2025', '2020–2024', '2019–2023']}
-              enrichedYears={['2022–2026', '2021–2025', '2020–2024', '2019–2023']}
+              enrichedYears={enrichedYearBatches}
               onActiveYearChange={setSidebarChartBatch}
             />
           </div>
@@ -1528,6 +1688,52 @@ export default function PlacementDetail() {
                 )}
                 <PageContactLine emails={item.emails} linkedins={item.linkedins} />
               </>
+            ) : item.slug === 'industry-liaison-offices' ? (
+              // SVES network map (society-issued artwork, not admin-managed —
+              // same /images/placements/* pattern as elsewhere) sits beside
+              // the Regional Offices list instead of above it, smaller than
+              // its old full-width-up-to-720px size since it no longer needs
+              // to carry the whole row on its own.
+              <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 340px) 1fr', gap: 'var(--space-8)', alignItems: 'start' }}>
+                <img
+                  src="/images/placements/industry-liaison-offices.png"
+                  alt="Sri Vishnu Educational Society — Industry Liaison Offices, campuses and contact details across India"
+                  loading="lazy"
+                  onError={(e) => {
+                    const target = e.currentTarget as HTMLImageElement;
+                    if (!target.dataset.triedFallback) {
+                      target.dataset.triedFallback = 'true';
+                      target.src = '/images/image (3).png';
+                    } else {
+                      target.style.display = 'none';
+                    }
+                  }}
+                  style={{
+                    display: 'block',
+                    width: '100%',
+                    height: 'auto',
+                    borderRadius: 'var(--radius-lg)',
+                    boxShadow: 'var(--shadow-md)',
+                    position: 'sticky',
+                    top: 'calc(var(--topbar-height) + var(--header-height) + 1rem)',
+                  }}
+                />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  {tableRows.map((row, i) => (
+                    <TeamRosterRow
+                      key={i}
+                      row={row}
+                      isOpen={activeTableRow === i}
+                      onToggle={() => setActiveTableRow(activeTableRow === i ? null : i)}
+                      tpoPhotoMap={tpoPhotoMap}
+                      tpoBiosMap={tpoBiosMap}
+                      iloPhotoMap={iloPhotoMap}
+                      addressOnly
+                    />
+                  ))}
+                  <PageContactLine emails={item.emails} linkedins={item.linkedins} />
+                </div>
+              </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 {tableRows.map((row, i) => (
@@ -1539,7 +1745,6 @@ export default function PlacementDetail() {
                     tpoPhotoMap={tpoPhotoMap}
                     tpoBiosMap={tpoBiosMap}
                     iloPhotoMap={iloPhotoMap}
-                    addressOnly={item.slug === 'industry-liaison-offices'}
                   />
                 ))}
                 <PageContactLine emails={item.emails} linkedins={item.linkedins} />
