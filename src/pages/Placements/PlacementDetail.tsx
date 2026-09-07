@@ -545,12 +545,9 @@ function BatchSummaryCard({ text, index }: { text: string; index: number }) {
     <div style={{ background: color.background, border: `1.5px solid ${color.border}`, borderRadius: 'var(--radius-lg)', padding: 'var(--space-5)' }}>
       {m ? (
         <>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-3)' }}>
-            <span style={{ width: 14, height: 14, border: `2px solid ${color.heading}`, borderRadius: 3, flexShrink: 0 }} />
-            <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: color.heading, margin: 0 }}>
-              {m[1]} batch
-            </h3>
-          </div>
+          <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: color.heading, margin: 0, marginBottom: 'var(--space-3)' }}>
+            {m[1]} batch
+          </h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <span style={{ fontSize: 'var(--text-sm)', color: color.body }}>{m[2].replace(/,/g, '')} offers</span>
             <span style={{ fontSize: 'var(--text-sm)', color: color.body }}>{m[3]}</span>
@@ -1105,7 +1102,8 @@ export default function PlacementDetail() {
   // this generic Outcomes & Achievements block would just repeat them. Our
   // Recruiters drops it per request — the recruiter logo grid below is the
   // page's actual point, and Outcomes was just repeating the Overview text.
-  const showOutcomes = !!item.outcomes && item.outcomes.length > 0 && item.slug !== 'placement-highlights' && item.slug !== 'our-recruiters' && item.slug !== 'tpo-team' && item.slug !== 'industry-liaison-offices';
+  const activeOutcomes = (item.outcomes || []).filter((o) => !o.includes('2015-2019') && !o.includes('2015–2019'));
+  const showOutcomes = activeOutcomes.length > 0 && item.slug !== 'placement-highlights' && item.slug !== 'our-recruiters' && item.slug !== 'tpo-team' && item.slug !== 'industry-liaison-offices';
   // Shared markup for the below-Overview spot every non-Placement-Cell page
   // uses. Placement Cell renders its own combined Summary+chart block near
   // the hero instead (see placementCellSummarySection below) — it needs the
@@ -1124,7 +1122,7 @@ export default function PlacementDetail() {
             placementCellSummarySection above). mobile-stack-grid still
             collapses this to one column on small screens. */}
         <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-4)' }}>
-          {item.outcomes!.map((o) => (
+          {activeOutcomes.map((o) => (
             <div key={o}
               style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', minHeight: 110, display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
               <Trophy size={20} strokeWidth={1.75} style={{ flexShrink: 0, color: 'var(--color-accent)' }} />
@@ -1151,7 +1149,7 @@ export default function PlacementDetail() {
             same width as every other row. mobile-stack-grid still collapses
             this to a single column on small screens. */}
         <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-4)' }}>
-          {item.outcomes!.map((o, i) => (
+          {activeOutcomes.map((o, i) => (
             <BatchSummaryCard key={o} text={o} index={i} />
           ))}
         </div>

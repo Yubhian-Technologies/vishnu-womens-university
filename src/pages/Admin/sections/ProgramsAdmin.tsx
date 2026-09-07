@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import {
-  collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp, writeBatch,
+  collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp, writeBatch, deleteField,
 } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
@@ -72,7 +72,7 @@ export function normalizeMindMapImages(p: {
   mindMapImage?: string;
   mindMapImageStoragePath?: string;
 }): MindMapImage[] {
-  if (p.mindMapImages && p.mindMapImages.length > 0) return p.mindMapImages;
+  if (Array.isArray(p.mindMapImages)) return p.mindMapImages;
   if (p.mindMapImage) return [{ url: p.mindMapImage, storagePath: p.mindMapImageStoragePath || '' }];
   return [];
 }
@@ -591,6 +591,12 @@ export default function ProgramsAdmin() {
         peos: form.peos.filter(Boolean),
         pos: form.pos.filter(Boolean),
         psos: form.psos.filter(Boolean),
+        // When the new mindMapImages array is empty (all images deleted),
+        // also clear the legacy single-image fields so normalizeMindMapImages()
+        // doesn't fall back to the old field and resurrect a deleted image on
+        // the public page. Empty string is falsy, matching the `if
+        // (p.mindMapImage)` guard in normalizeMindMapImages.
+        ...((form.mindMapImages || []).length === 0 ? { mindMapImage: '', mindMapImageStoragePath: '' } : {}),
       });
       if (editing) {
         // Only send fields that actually changed since this edit session
@@ -598,8 +604,16 @@ export default function ProgramsAdmin() {
         // network call entirely if nothing did (e.g. Edit then Update with
         // no changes).
         const changed = originalForm ? diffChangedFields(payload, stripUndefined(originalForm)) : payload;
-        if (Object.keys(changed).length > 0) {
-          await updateDoc(doc(db, 'programs', editing), changed);
+        // Additionally, if all mindmap images were deleted, ensure the legacy
+        // fields are cleared in Firestore even if they were already '' in
+        // originalForm (they may never have been written at all, sitting as
+        // real data fields from the old schema).
+        const legacyClearNeeded = (form.mindMapImages || []).length === 0;
+        if (Object.keys(changed).length > 0 || legacyClearNeeded) {
+          await updateDoc(doc(db, 'programs', editing), {
+            ...changed,
+            ...(legacyClearNeeded ? { mindMapImage: deleteField(), mindMapImageStoragePath: deleteField() } : {}),
+          });
         }
       } else {
         await addDoc(collection(db, 'programs'), { ...payload, order: form.order || programs.filter((p) => p.category === form.category).length, createdAt: serverTimestamp() });
