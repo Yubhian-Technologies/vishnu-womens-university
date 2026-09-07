@@ -120,12 +120,7 @@ const navItemsData: NavItem[] = [
           { label: 'Examinations Portal', path: 'https://www.svecwexams.in/', external: true },
         ],
       },
-      { groupLabel: 'UG Programmes', groupPath: '/academics?tab=btech', items: [] },
-      { groupLabel: 'PG Programmes', groupPath: '/academics?tab=mtech', items: [] },
-      // No groupPath — the Ph.D heading is plain text, not a link. Its
-      // programme rows are marked `disabled` in the render map below so they
-      // show but never navigate.
-      { groupLabel: 'Ph.D Programmes', items: [] },
+      { groupLabel: 'Departments', groupPath: '/academics/departments', items: [] },
       {
         groupLabel: 'Information',
         groupPath: '/information',
@@ -297,6 +292,7 @@ const navItemsData: NavItem[] = [
         items: [
           { label: 'Upcoming Events', path: '/news-awards/happenings#upcoming-events' },
           { label: 'Recent Events', path: '/news-awards/happenings#recent-events' },
+          { label: 'VWU Insights', path: '/news-awards/vwu-insights' },
           { label: 'Gallery', path: '/news-awards/gallery' },
           { label: 'Vishnu Era Newsletter', path: 'https://www.srivishnu.edu.in/vishnu-era/', external: true },
           { label: 'Prathibha Magazine', path: 'https://heyzine.com/flip-book/088b7b5629.html#page/54', external: true },
@@ -391,8 +387,6 @@ export default function Header() {
     path: isVlsiProgram(p) ? '/academics/ece' : p.slug ? `/academics/${p.slug}` : '/academics',
   });
   const ugProgrammes = programs.filter((p) => p.category === 'btech').map(programItem);
-  const pgProgrammes = programs.filter((p) => p.category === 'mtech' || p.category === 'mba').map(programItem);
-  const phdProgrammes = programs.filter((p) => p.category === 'phd').map(programItem);
 
   const { docs: differentiatorItems } = useOrderedCollection<DifferentiatorItemDoc>('differentiatorItems', 'order');
   const { docs: placementItems } = useOrderedCollection<PlacementItemDoc>('placementItems', 'order');
@@ -468,9 +462,7 @@ export default function Header() {
     }
     if (item.label === 'Academics' && item.groups) {
       const groups = item.groups.map((group) => {
-        if (group.groupLabel === 'UG Programmes') return { ...group, items: ugProgrammes };
-        if (group.groupLabel === 'PG Programmes') return { ...group, items: pgProgrammes };
-        if (group.groupLabel === 'Ph.D Programmes') return { ...group, items: phdProgrammes.map((c) => ({ ...c, disabled: true })) };
+        if (group.groupLabel === 'Departments') return { ...group, items: ugProgrammes };
         return group;
       });
       return { ...item, groups };

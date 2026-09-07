@@ -25,9 +25,27 @@ export default function Schools() {
     <main className="page-wrapper schools-page">
       <PageHero
         page="academics-schools"
-        defaultTitle="Schools"
+        defaultTitle="VWU's Four Schools"
+        defaultSubtitle="A Connected Academic Community"
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Academics', to: '/academics' }, { label: 'Schools' }]}
       />
+
+      <section className="section bg-white" style={{ padding: 'var(--space-10) 0 var(--space-4)' }}>
+        <div className="container" style={{ maxWidth: '960px', textAlign: 'center' }}>
+          <p
+            className="schools-intro-desc"
+            style={{
+              fontSize: 'clamp(1.05rem, 1.8vw, 1.2rem)',
+              lineHeight: 1.85,
+              color: 'var(--color-text)',
+              margin: '0 auto',
+              fontWeight: 450,
+            }}
+          >
+            At Vishnu Women’s University, diverse disciplines converge within a collaborative academic ecosystem. The interaction of ideas, perspectives, and expertise across fields enriches learning, inspires innovation, and empowers students to approach complex challenges with creativity and confidence.
+          </p>
+        </div>
+      </section>
 
       {loading ? (
         <section className="section bg-white">

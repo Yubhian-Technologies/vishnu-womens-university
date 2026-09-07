@@ -12,7 +12,7 @@ import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import {
   Rocket, Target, Calendar, MapPin, GraduationCap, Users,
   Briefcase, Award, CheckCircle, BookOpen, Lightbulb, Sparkles,
-  Globe, Shield, Activity, ArrowRight, Wifi, Building2
+  Globe, ArrowRight, Wifi, Building2
 } from 'lucide-react';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import { isEnabledNavPath } from '../../components/Header/Header';
@@ -284,17 +284,6 @@ export default function About() {
               Her Education. Her Confidence. Her Future.<br />
               <span style={{ color: 'var(--color-accent)', fontStyle: 'normal' }}>Her University — Vishnu Women's University.</span>
             </p>
-            <div className="about-ambition-chips" style={{ justifyContent: 'flex-start', margin: 0 }}>
-              <div className="about-chip about-chip--accent">
-                <Sparkles size={14} /> 100% Women Focused
-              </div>
-              <div className="about-chip">
-                <Shield size={14} /> Safe Campus
-              </div>
-              <div className="about-chip">
-                <Activity size={14} /> High Impact Research
-              </div>
-            </div>
           </div>
         </div>
       </section>

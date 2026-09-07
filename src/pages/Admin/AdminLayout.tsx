@@ -10,7 +10,7 @@ import {
   faClipboardList, faBus, faCity, faDownload, faTableList, faCamera, faLink, faScaleBalanced, faFolderOpen,
   faChartPie, faChartBar, faStar, faArrowTrendUp, faIdCard, faCalendarCheck, faPortrait, faBuilding, faTag,
   faPlane, faTrophy, faFlask, faFileCircleCheck, faBook, faUserShield, faRightFromBracket, faPhone,
-  faPalette, faMedal, faAward,
+  faPalette, faMedal, faAward, faLightbulb,
 } from '@fortawesome/free-solid-svg-icons';
 import { getFirebaseAuth } from '../../lib/firebaseAdmin';
 import { resolveAdminSession, canReadModule } from '../../lib/rbac';
@@ -54,6 +54,7 @@ export const SECTIONS: { id: string; icon: IconDefinition; label: string }[] = [
   { id: 'career-applications', icon: faFileLines, label: 'Career Applications' },
   { id: 'admission-inquiries', icon: faClipboardList, label: 'Admission Inquiries' },
   { id: 'campus-visit-requests', icon: faBus, label: 'Campus Visit Requests' },
+  { id: 'career-guidance-interest', icon: faClipboardList, label: 'Career Guidance Interest' },
   { id: 'sves-campuses',  icon: faCity, label: 'SVES Campuses' },
   { id: 'downloads',      icon: faDownload, label: 'Academic Documents' },
   { id: 'curriculum',     icon: faTableList, label: 'Course Curriculum Matrix' },
@@ -72,6 +73,7 @@ export const SECTIONS: { id: string; icon: IconDefinition; label: string }[] = [
   { id: 'recruiter-logos', icon: faTag, label: 'Recruiter Logos' },
   { id: 'gsac-photos', icon: faPlane, label: 'GSAC Photos' },
   { id: 'news-awards-data', icon: faTrophy, label: 'Happenings & Awards' },
+  { id: 'insights',       icon: faLightbulb, label: 'VWU Insights' },
   { id: 'research-items', icon: faFlask, label: 'Research' },
   { id: 'compliance-docs', icon: faFileCircleCheck, label: 'Compliance Documents' },
   { id: 'policies', icon: faBook, label: 'Institutional Policies' },
@@ -89,7 +91,7 @@ export const SECTIONS: { id: string; icon: IconDefinition; label: string }[] = [
 // hunting through one long undifferentiated list.
 export const SECTION_GROUPS: { label: string; ids: string[] }[] = [
   { label: 'Overview', ids: ['overview'] },
-  { label: 'Form Submissions & CRM', ids: ['crm', 'contact-messages', 'career-applications', 'admission-inquiries', 'campus-visit-requests'] },
+  { label: 'Form Submissions & CRM', ids: ['crm', 'contact-messages', 'career-applications', 'admission-inquiries', 'campus-visit-requests', 'career-guidance-interest'] },
   { label: 'Site Appearance', ids: ['theme', 'banners', 'landing-pages', 'honoured-guests', 'site-photos', 'nav-links', 'content-blocks', 'compliance-docs'] },
   { label: 'About & Governance', ids: ['governing-body', 'governance-items', 'annual-reports', 'nirf-reports', 'nba-data', 'core-executives', 'sves-campuses', 'contacts', 'site-contact', 'policies'] },
   { label: 'Academics', ids: ['departments', 'programs', 'schools', 'faculty', 'curriculum', 'downloads'] },
@@ -98,7 +100,7 @@ export const SECTION_GROUPS: { label: string; ids: string[] }[] = [
   { label: 'Placements & Careers', ids: ['placements', 'placement-highlights', 'placement-items', 'tpo-team-info', 'placement-crt-docs', 'tpo-team-photos', 'ilo-office-photos', 'recruiter-logos', 'gsac-photos'] },
   { label: 'Differentiators', ids: ['differentiators'] },
   { label: 'Research', ids: ['research-items'] },
-  { label: 'News & Awards', ids: ['news', 'gallery', 'news-awards-data', 'announcements'] },
+  { label: 'News & Awards', ids: ['news', 'gallery', 'news-awards-data', 'insights', 'announcements'] },
   { label: 'Alumni & Giving', ids: ['alumni'] },
   { label: 'Administration', ids: ['users-roles'] },
 ];

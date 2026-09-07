@@ -13,6 +13,7 @@ import type { TpoTeamBioDoc } from '../Admin/sections/TpoTeamInfoAdmin';
 import type { PlacementCrtDoc } from '../Admin/sections/PlacementCrtDocsAdmin';
 import PlacementYearAccordion, { BranchOffersBarChart, BRANCH_COLORS } from './PlacementYearAccordion';
 import SmoothCollapse from '../../components/SmoothCollapse/SmoothCollapse';
+import CareerGuidanceInterestForm from '../../components/CareerGuidanceInterestForm/CareerGuidanceInterestForm';
 import { successStories } from './successStories.data';
 import { industryLiaisonOffices } from './industryLiaisonOffices.data';
 import { employabilitySkillTabs } from './employabilitySkills.data';
@@ -111,21 +112,25 @@ Mrs. P. Prasanthi, Asst. Professor — Email: [jprasanthi@svecw.edu.in](mailto:j
 // copy), because the BODY_OVERRIDES entry above only shows when the CMS
 // `intro` is empty — and this page has a CMS intro. `**Heading:**` lines
 // get the highlighted serif sub-heading treatment via BodyBlocks.
-const CAREER_GUIDANCE_TRAINING = `**GRE / TOEFL:**
-
-Special training is provided to students who are aspiring for higher education abroad. It focuses on Verbal, Quantitative and Reasoning skills along with Analytical Writing Assessment. A good number of students from different branches utilized the services and progressing in different universities abroad.
-
-**GATE:**
-
-Higher Educational pursuits are one of the major goals of most of the students of SVECW. Helping them in realizing their goals the institution is offering regularly GATE training classes. Though the record of GATE ranks in SVECW is less initially there is gradual ascendancy.
-
-**IES, IFS & IAS:**
-
-With the academic commitment of the student fraternity SVECW always brings forward any initiative that widens the scope of the career of the students. Eventually a special training for the students who are interested in taking up a career at IES, IAS, IAF, etc. has been started recently and completed the required formative training.
-
-**SVES–NS-IAS Civil Services Coaching Programme**
-
-The SVES–NS-IAS Civil Services Coaching Programme was initiated in 2024 as a student-centric initiative to provide aspiring Civil Services candidates with structured, accessible, and quality-oriented competitive examination preparation. The programme was established through a Memorandum of Understanding (MoU) signed on 1 April 2024 between SVES and NS-IAS Academy, Hyderabad, with a shared vision of creating better career opportunities for students through expert guidance and systematic preparation.
+// Career Guidance Cell training tracks — rendered as an expand/collapse
+// accordion (CareerGuidanceAccordion) on the career-guidance-cell sub-page.
+// Each `body` uses the same **bold** / "- " bullet syntax BodyBlocks parses.
+const CAREER_GUIDANCE_SECTIONS: { title: string; body: string }[] = [
+  {
+    title: 'GRE / TOEFL',
+    body: `Special training is provided to students who are aspiring for higher education abroad. It focuses on Verbal, Quantitative and Reasoning skills along with Analytical Writing Assessment. A good number of students from different branches utilized the services and progressing in different universities abroad.`,
+  },
+  {
+    title: 'GATE',
+    body: `Higher Educational pursuits are one of the major goals of most of the students of SVECW. Helping them in realizing their goals the institution is offering regularly GATE training classes. Though the record of GATE ranks in SVECW is less initially there is gradual ascendancy.`,
+  },
+  {
+    title: 'IES, IFS & IAS',
+    body: `With the academic commitment of the student fraternity SVECW always brings forward any initiative that widens the scope of the career of the students. Eventually a special training for the students who are interested in taking up a career at IES, IAS, IAF, etc. has been started recently and completed the required formative training.`,
+  },
+  {
+    title: 'SVES–NS-IAS Civil Services Coaching Programme',
+    body: `The SVES–NS-IAS Civil Services Coaching Programme was initiated in 2024 as a student-centric initiative to provide aspiring Civil Services candidates with structured, accessible, and quality-oriented competitive examination preparation. The programme was established through a Memorandum of Understanding (MoU) signed on 1 April 2024 between SVES and NS-IAS Academy, Hyderabad, with a shared vision of creating better career opportunities for students through expert guidance and systematic preparation.
 
 The programme has been carefully designed to complement students' regular academic curriculum without disturbing their institutional timetable. While the primary focus is on UPSC Civil Services Examination preparation, the knowledge and skills developed through the programme also provide students with a foundation for preparing for other competitive examinations, including State Government Group-I and Group-II examinations. Students also gain exposure to the fundamentals and general awareness areas relevant to Banking and other competitive examinations.
 
@@ -143,7 +148,9 @@ The programme has been carefully designed to complement students' regular academ
 
 Since its inception, the programme has supported 60 students across SVES institutions, including 42 students exclusively from SVECW (Autonomous). The current cohort comprises 39 students across SVES institutions, including 18 students from SVECW (Autonomous).
 
-Through the SVES–NS-IAS initiative, Vishnu Women's University is committed to empowering students with access to quality competitive-examination coaching, expert mentorship, structured assessment, and flexible learning opportunities, enabling them to pursue diverse career pathways in Civil Services, State Government services, Banking, and other competitive examinations.`;
+Through the SVES–NS-IAS initiative, Vishnu Women's University is committed to empowering students with access to quality competitive-examination coaching, expert mentorship, structured assessment, and flexible learning opportunities, enabling them to pursue diverse career pathways in Civil Services, State Government services, Banking, and other competitive examinations.`,
+  },
+];
 
 const PARTNER_DOMAINS: Record<string, string> = {
   'Amazon': 'amazon.com', 'Adobe': 'adobe.com', 'Microsoft': 'microsoft.com',
@@ -409,6 +416,62 @@ function HigherEducationAccordion() {
                     {section.tabs ? `The ${tab?.label} list will appear here once it's added from the admin.` : "This list will appear here once it's added from the admin."}
                   </p>
                 )}
+              </div>
+            </SmoothCollapse>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// Career Guidance Cell training tracks as an expand/collapse accordion —
+// each card toggles independently; the first is open on load.
+function CareerGuidanceAccordion() {
+  const [open, setOpen] = useState<Set<string>>(
+    () => new Set(CAREER_GUIDANCE_SECTIONS[0] ? [CAREER_GUIDANCE_SECTIONS[0].title] : [])
+  );
+  const toggle = (title: string) =>
+    setOpen((prev) => {
+      const next = new Set(prev);
+      if (next.has(title)) next.delete(title);
+      else next.add(title);
+      return next;
+    });
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', marginTop: 'var(--space-6)' }}>
+      {CAREER_GUIDANCE_SECTIONS.map((section) => {
+        const isOpen = open.has(section.title);
+        return (
+          <div key={section.title} style={{ border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
+            <button
+              onClick={() => toggle(section.title)}
+              aria-expanded={isOpen}
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 'var(--space-4)',
+                background: isOpen ? 'var(--color-primary)' : 'var(--color-off-white)',
+                border: 'none',
+                padding: 'var(--space-4) var(--space-5)',
+                cursor: 'pointer',
+                textAlign: 'left',
+                transition: 'background var(--transition-base)',
+              }}
+            >
+              <span style={{ fontFamily: 'var(--font-serif)', fontWeight: 700, fontSize: 'var(--text-base)', color: isOpen ? 'var(--color-white)' : 'var(--color-primary)', transition: 'color var(--transition-base)' }}>
+                {section.title}
+              </span>
+              <span aria-hidden="true" style={{ fontSize: '1.3rem', fontWeight: 700, lineHeight: 1, flexShrink: 0, color: isOpen ? 'var(--color-white)' : 'var(--color-text)', transition: 'color var(--transition-base)' }}>
+                {isOpen ? '−' : '+'}
+              </span>
+            </button>
+            <SmoothCollapse open={isOpen}>
+              <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)', fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75 }}>
+                <BodyBlocks blocks={parseBodyContent(section.body)} paragraphStyle={{}} />
               </div>
             </SmoothCollapse>
           </div>
@@ -1123,9 +1186,11 @@ export default function PlacementDetail() {
                   training sections. Always shown here (not via BODY_OVERRIDES,
                   which is suppressed when the CMS intro is set). */}
               {item.slug === 'career-guidance-cell' && !hasBodyOverride && (
-                <div style={{ fontSize: 'var(--text-lg)', color: 'var(--color-text)', lineHeight: 1.75, marginTop: 'var(--space-6)' }}>
-                  <BodyBlocks blocks={parseBodyContent(CAREER_GUIDANCE_TRAINING)} paragraphStyle={{}} />
-                </div>
+                <CareerGuidanceAccordion />
+              )}
+
+              {item.slug === 'career-guidance-cell' && (
+                <CareerGuidanceInterestForm tracks={CAREER_GUIDANCE_SECTIONS.map((s) => s.title)} />
               )}
 
               {/* Only shown here when there's no roster below to show it instead
