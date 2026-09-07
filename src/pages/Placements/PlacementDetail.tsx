@@ -11,7 +11,7 @@ import { parseStructuredTable, parseFlexibleTable } from '../../lib/structuredTa
 import type { PlacementItemDoc } from '../Admin/sections/PlacementItemsAdmin';
 import type { TpoTeamBioDoc } from '../Admin/sections/TpoTeamInfoAdmin';
 import type { PlacementCrtDoc } from '../Admin/sections/PlacementCrtDocsAdmin';
-import PlacementYearAccordion, { BranchOffersBarChart, BRANCH_COLORS } from './PlacementYearAccordion';
+import PlacementYearAccordion, { BranchOffersBarChart } from './PlacementYearAccordion';
 import SmoothCollapse from '../../components/SmoothCollapse/SmoothCollapse';
 import { successStories } from './successStories.data';
 import { industryLiaisonOffices } from './industryLiaisonOffices.data';
@@ -141,22 +141,6 @@ const PARTNER_LOGO_OVERRIDES: Record<string, string> = {
 // facts instead of a wrapped run-on sentence. Any outcome text that doesn't
 // match (a different sub-page's plain achievement bullet, say) renders as-is.
 const OUTCOME_BATCH_SUMMARY_RE = /^(.+?)\s+batch:\s*([\d,]+)\s*placements,\s*highest\s+(.+)$/i;
-function OutcomeTileText({ text }: { text: string }) {
-  const m = text.match(OUTCOME_BATCH_SUMMARY_RE);
-  if (!m) return <>{text}</>;
-  const [, batch, count, highest] = m;
-  // The raw admin-entered count sometimes has a thousands comma baked in
-  // (e.g. "1,156") and sometimes doesn't (e.g. "1103") — strip it so every
-  // tile reads the same way regardless of how it was typed.
-  const countDigitsOnly = count.replace(/,/g, '');
-  return (
-    <>
-      <span style={{ display: 'block', textAlign: 'center' }}>{batch} batch</span>
-      <span style={{ display: 'block', textAlign: 'center' }}>{countDigitsOnly} placements</span>
-      Highest Package: {highest}
-    </>
-  );
-}
 
 // Logo only — no company name label beside it (per request). The name still
 // lives in alt text/title for accessibility and hover, just not rendered as
@@ -503,44 +487,39 @@ function CampusRecruitmentTrainingSections({ intro }: { intro: string }) {
   );
 }
 
-// Placement Excellence sub-page — same "**Heading**" + plain-line parsing
-// as above, laid out as a grid of small batch cards (one per
-// "**20XX-YY batch**" heading) with two alternating card colours by
-// position, matching this page's own reference design.
-const EXCELLENCE_COLORS = [
+// Placement Details' Summary section (placementCellSummarySection below) —
+// each item.outcomes line already encodes one batch's headline stats as
+// "<batch> batch: <count> placements, highest <package>" (see
+// OUTCOME_BATCH_SUMMARY_RE/the old OutcomeTileText it replaces), so no data
+// change is needed here, only the card's look: alternating navy/cream
+// colours by position, a checkbox-style heading icon, and the batch/offers/
+// package split across their own lines instead of one plain paragraph.
+const BATCH_CARD_COLORS = [
   { background: 'var(--color-primary-light)', border: 'var(--color-primary-light)', heading: 'var(--color-white)', body: 'rgba(255,255,255,0.85)' },
   { background: '#FCEFD9', border: '#E8A83C', heading: '#7A4A12', body: '#8A5A20' },
 ];
 
-function PlacementExcellenceGrid({ intro }: { intro: string }) {
-  const categories = parseChecklistCategories(intro);
-  if (categories.length === 0) return null;
-
+function BatchSummaryCard({ text, index }: { text: string; index: number }) {
+  const color = BATCH_CARD_COLORS[index % BATCH_CARD_COLORS.length];
+  const m = text.match(OUTCOME_BATCH_SUMMARY_RE);
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 'var(--space-4)' }}>
-      {categories.map((category, i) => {
-        const color = EXCELLENCE_COLORS[i % EXCELLENCE_COLORS.length];
-        return (
-          <div
-            key={`${category.title}-${i}`}
-            style={{ background: color.background, border: `1.5px solid ${color.border}`, borderRadius: 'var(--radius-lg)', padding: 'var(--space-5)' }}
-          >
-            {category.title && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-3)' }}>
-                <span style={{ width: 14, height: 14, border: `2px solid ${color.heading}`, borderRadius: 3, flexShrink: 0 }} />
-                <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: color.heading, margin: 0 }}>
-                  {category.title}
-                </h3>
-              </div>
-            )}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              {category.items.map((point, pi) => (
-                <span key={pi} style={{ fontSize: 'var(--text-sm)', color: color.body }}>{point}</span>
-              ))}
-            </div>
+    <div style={{ background: color.background, border: `1.5px solid ${color.border}`, borderRadius: 'var(--radius-lg)', padding: 'var(--space-5)' }}>
+      {m ? (
+        <>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-3)' }}>
+            <span style={{ width: 14, height: 14, border: `2px solid ${color.heading}`, borderRadius: 3, flexShrink: 0 }} />
+            <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: color.heading, margin: 0 }}>
+              {m[1]} batch
+            </h3>
           </div>
-        );
-      })}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <span style={{ fontSize: 'var(--text-sm)', color: color.body }}>{m[2].replace(/,/g, '')} offers</span>
+            <span style={{ fontSize: 'var(--text-sm)', color: color.body }}>{m[3]}</span>
+          </div>
+        </>
+      ) : (
+        <span style={{ fontSize: 'var(--text-sm)', color: color.body }}>{text}</span>
+      )}
     </div>
   );
 }
@@ -1112,7 +1091,6 @@ export default function PlacementDetail() {
   // Placement Cell's own combined Summary (batch cards) — full width, no
   // longer paired with the Branch-wise Placement Distribution chart (that
   // now only appears further down, in the Placements/Year-by-Year section).
-  const outcomeAccentColors = Object.values(BRANCH_COLORS);
   const placementCellSummarySection = showOutcomes && item.slug === 'placement-details' && (
     <section className="section bg-off-white">
       <div className="container">
@@ -1127,12 +1105,7 @@ export default function PlacementDetail() {
             this to a single column on small screens. */}
         <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-4)' }}>
           {item.outcomes!.map((o, i) => (
-            <div key={o}
-              style={{ position: 'relative', overflow: 'hidden', background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5) var(--space-5) var(--space-5) calc(var(--space-5) + 4px)', minHeight: 110, display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
-              <span style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, background: outcomeAccentColors[i % outcomeAccentColors.length] }} />
-              <Trophy size={20} strokeWidth={1.75} style={{ flexShrink: 0, color: outcomeAccentColors[i % outcomeAccentColors.length] }} />
-              <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6, fontWeight: 700 }}><OutcomeTileText text={o} /></span>
-            </div>
+            <BatchSummaryCard key={o} text={o} index={i} />
           ))}
         </div>
       </div>
@@ -1157,7 +1130,7 @@ export default function PlacementDetail() {
   // Our Recruiters drops the whole Overview section per request instead —
   // its Key Highlights/About text duplicated the logo grid below, which is
   // the page's actual content — with no full-width-grid replacement.
-  const skipOverviewSection = (item.slug === 'employability-skills' && !hasBodyOverride && !item.intro && !item.desc) || item.slug === 'our-recruiters' || item.slug === 'internships' || item.slug === 'placement-details' || item.slug === 'placement-guidelines' || (item.slug === 'campus-recruitment-training' && !!item.intro) || (item.slug === 'placement-excellence' && !!item.intro);
+  const skipOverviewSection = (item.slug === 'employability-skills' && !hasBodyOverride && !item.intro && !item.desc) || item.slug === 'our-recruiters' || item.slug === 'internships' || item.slug === 'placement-details' || item.slug === 'placement-guidelines' || (item.slug === 'campus-recruitment-training' && !!item.intro);
 
   return (
     <main className="page-wrapper">
@@ -1363,19 +1336,6 @@ export default function PlacementDetail() {
         <section className="section bg-white" style={{ paddingTop: 'var(--space-6)' }}>
           <div className="container">
             <CampusRecruitmentTrainingSections intro={item.intro} />
-          </div>
-        </section>
-      )}
-
-      {/* Batch-card grid — only on Placement Excellence, and only once the
-          admin has entered real Intro content in this format (a
-          "**20XX-YY batch**" heading per card, followed by its two plain
-          summary lines) — otherwise falls back to the normal Overview
-          rendering of whatever Intro/About text is there. */}
-      {item.slug === 'placement-excellence' && item.intro && (
-        <section className="section bg-white" style={{ paddingTop: 'var(--space-6)' }}>
-          <div className="container">
-            <PlacementExcellenceGrid intro={item.intro} />
           </div>
         </section>
       )}
