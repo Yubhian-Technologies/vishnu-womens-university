@@ -984,6 +984,14 @@ export default function PlacementDetail() {
   const placementYearData = usePlacementYears();
   const [sidebarChartBatch, setSidebarChartBatch] = useState('');
   const sidebarChartYear = placementYearData.find((y) => y.batch === sidebarChartBatch);
+  // Which batches get the richer "enriched" view (companies-visited/branch-
+  // offers stat tiles, donut chart, named student records) below is derived
+  // straight from whether a batch actually HAS that data, rather than a
+  // fixed list of batch labels — so a new year added from the admin (Batch
+  // Years section) shows up here automatically, with the enriched view
+  // switching on by itself the moment its Department-wise Offers are filled
+  // in, instead of needing this page's code updated by hand every time.
+  const enrichedYearBatches = placementYearData.filter((y) => (y.branchOffers?.length ?? 0) > 0).map((y) => y.batch);
 
   useEffect(() => {
     setActiveTableRow(null);
@@ -1423,8 +1431,7 @@ export default function PlacementDetail() {
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Placements, Year by Year</h2>
             </div>
             <PlacementYearAccordion
-              years={['2022–2026', '2021–2025', '2020–2024', '2019–2023']}
-              enrichedYears={['2022–2026', '2021–2025', '2020–2024', '2019–2023']}
+              enrichedYears={enrichedYearBatches}
               onActiveYearChange={setSidebarChartBatch}
             />
           </div>
