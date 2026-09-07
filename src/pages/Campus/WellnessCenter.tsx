@@ -197,7 +197,7 @@ export default function WellnessCenter() {
         <div className="container">
           <div className="reveal" style={{ marginBottom: 'var(--space-8)' }}>
             <span className="section-label">Support Areas</span>
-            <h2 className="section-title">I Can Help You With</h2>
+            <h2 className="section-title">We Can Help You With</h2>
           </div>
           <div
             className="mobile-stack-grid"
@@ -232,7 +232,7 @@ export default function WellnessCenter() {
         </div>
       </section>
 
-      {/* What I Wish Every Student Knew + If Counselling Feels Scary */}
+      {/* What We Wish Every Student Knew + If Counselling Feels Scary */}
       <section className="section bg-off-white">
         <div className="container">
           <div
@@ -253,7 +253,7 @@ export default function WellnessCenter() {
                 <Quote size={22} strokeWidth={2.2} style={{ color: 'var(--color-primary)' }} />
               </span>
               <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-lg)', fontWeight: 800, color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>
-                What I Wish Every Student Knew
+                What We Wish Every Student Knew
               </h3>
               <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text-light)', lineHeight: 1.75, fontStyle: 'italic' }}>
                 &ldquo;You don&rsquo;t have to carry every burden alone. Speaking up isn&rsquo;t a sign of weakness; it&rsquo;s the first
@@ -297,30 +297,100 @@ export default function WellnessCenter() {
             className="mobile-stack-grid"
             style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 'var(--space-4)' }}
           >
-            {ABOUT_FACTS.map((fact, i) => (
-              <div
-                key={i}
-                style={{
-                  display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start',
-                  padding: 'var(--space-5)', background: 'var(--color-off-white)',
-                  border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)',
-                }}
-              >
-                <Heart size={16} strokeWidth={2.2} style={{ color: 'var(--color-accent)', flexShrink: 0, marginTop: 3 }} />
-                <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.7, margin: 0 }}>{fact}</p>
-              </div>
-            ))}
+            {ABOUT_FACTS.map((fact, i) => {
+              const isEven = i % 2 === 0;
+              return (
+                <div
+                  key={i}
+                  className="about-fact-card"
+                  style={{
+                    display: 'flex',
+                    gap: 'var(--space-4)',
+                    alignItems: 'flex-start',
+                    padding: 'var(--space-5) var(--space-6)',
+                    background: isEven
+                      ? 'linear-gradient(135deg, var(--color-primary) 0%, #071530 100%)'
+                      : 'linear-gradient(135deg, #ffffff 0%, #fffdf4 100%)',
+                    border: isEven
+                      ? '1.5px solid color-mix(in srgb, var(--color-accent) 40%, transparent)'
+                      : '1.5px solid color-mix(in srgb, var(--color-accent) 45%, #e2e8f0)',
+                    borderLeft: `4px solid ${isEven ? 'var(--color-accent)' : 'var(--color-primary)'}`,
+                    borderRadius: 'var(--radius-lg)',
+                    boxShadow: isEven
+                      ? '0 6px 24px rgba(11, 30, 66, 0.14)'
+                      : '0 4px 20px rgba(11, 30, 66, 0.06)',
+                    transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: 10,
+                      background: isEven
+                        ? 'rgba(201, 168, 76, 0.2)'
+                        : 'color-mix(in srgb, var(--color-accent) 18%, transparent)',
+                      border: isEven
+                        ? '1px solid rgba(201, 168, 76, 0.4)'
+                        : '1px solid color-mix(in srgb, var(--color-accent) 35%, transparent)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <Heart
+                      size={16}
+                      strokeWidth={2.5}
+                      style={{ color: isEven ? 'var(--color-accent)' : 'var(--color-primary)' }}
+                    />
+                  </div>
+                  <p
+                    style={{
+                      fontSize: 'var(--text-sm)',
+                      color: isEven ? 'rgba(255, 255, 255, 0.95)' : 'var(--color-primary)',
+                      fontWeight: 500,
+                      lineHeight: 1.7,
+                      margin: 0,
+                    }}
+                  >
+                    {fact}
+                  </p>
+                </div>
+              );
+            })}
           </div>
 
           <div
             className="reveal"
             style={{
-              marginTop: 'var(--space-6)', display: 'flex', alignItems: 'center', gap: 'var(--space-4)',
-              padding: 'var(--space-5) var(--space-6)', background: 'var(--color-primary)', borderRadius: 'var(--radius-md)',
+              marginTop: 'var(--space-6)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--space-4)',
+              padding: 'var(--space-5) var(--space-6)',
+              background: 'linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%)',
+              border: '1.5px solid color-mix(in srgb, var(--color-accent) 45%, transparent)',
+              borderRadius: 'var(--radius-lg)',
+              boxShadow: '0 6px 24px rgba(11, 30, 66, 0.15)',
               flexWrap: 'wrap',
             }}
           >
-            <Sun size={22} strokeWidth={2.2} style={{ color: 'var(--color-accent)', flexShrink: 0 }} />
+            <div
+              style={{
+                width: 38,
+                height: 38,
+                borderRadius: '50%',
+                background: 'rgba(201, 168, 76, 0.15)',
+                border: '1px solid rgba(201, 168, 76, 0.35)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+              }}
+            >
+              <Sun size={20} strokeWidth={2.2} style={{ color: 'var(--color-accent)' }} />
+            </div>
             <p style={{ margin: 0, fontSize: 'var(--text-sm)', color: 'var(--color-white)', lineHeight: 1.6 }}>
               <strong style={{ color: 'var(--color-accent)' }}>Fun fact:</strong> I can probably recommend you a psychology book, a
               comfort movie, or a biryani place depending on what kind of day you&rsquo;re having.
