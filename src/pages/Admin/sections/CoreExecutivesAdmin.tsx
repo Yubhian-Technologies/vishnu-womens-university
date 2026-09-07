@@ -12,7 +12,7 @@ type CoreExecutiveDoc = CoreExecutiveMember & { storagePath?: string };
 
 const EMPTY: Omit<CoreExecutiveDoc, 'id'> = {
   name: '', role: '', photoUrl: '', storagePath: '', order: 0, level: 1,
-  qualification: '', experience: '', email: '', bio: '',
+  qualification: '', experience: '', email: '', bio: '', description: '',
 };
 
 export default function CoreExecutivesAdmin() {
@@ -50,6 +50,7 @@ export default function CoreExecutivesAdmin() {
     setForm({
       name: m.name, role: m.role, photoUrl: m.photoUrl || '', storagePath: m.storagePath || '', order: m.order, level: m.level || 1,
       qualification: m.qualification || '', experience: m.experience || '', email: m.email || '', bio: m.bio || '',
+      description: m.description || '',
     });
   };
 
@@ -123,6 +124,16 @@ export default function CoreExecutivesAdmin() {
           <div className="admin-field" style={{ gridColumn: '1 / -1' }}>
             <label htmlFor="field-bio">Short Bio (shown on hover)</label>
             <textarea id="field-bio" rows={3} value={form.bio || ''} onChange={(e) => set('bio', e.target.value)} placeholder="A brief note about this executive's role and contribution." />
+          </div>
+          <div className="admin-field" style={{ gridColumn: '1 / -1' }}>
+            <label htmlFor="field-description">Full Description (paragraphs — shown in the expanded detail panel)</label>
+            <textarea
+              id="field-description"
+              rows={8}
+              value={form.description || ''}
+              onChange={(e) => set('description', e.target.value)}
+              placeholder={"Longer profile text.\n\nLeave a blank line between paragraphs — each block becomes its own paragraph on the page."}
+            />
           </div>
         </div>
         <div className="admin-form-actions">

@@ -106,6 +106,45 @@ USA, Canada, UK, China, Germany, Australia, Spain
 Mrs. P. Prasanthi, Asst. Professor — Email: [jprasanthi@svecw.edu.in](mailto:jprasanthi@svecw.edu.in) — Phone: [9440111470](tel:9440111470)`,
 };
 
+// Higher-studies / competitive-exam training blurb for the Career Guidance
+// Cell page. Rendered unconditionally on that page (below the Overview
+// copy), because the BODY_OVERRIDES entry above only shows when the CMS
+// `intro` is empty — and this page has a CMS intro. `**Heading:**` lines
+// get the highlighted serif sub-heading treatment via BodyBlocks.
+const CAREER_GUIDANCE_TRAINING = `**GRE / TOEFL:**
+
+Special training is provided to students who are aspiring for higher education abroad. It focuses on Verbal, Quantitative and Reasoning skills along with Analytical Writing Assessment. A good number of students from different branches utilized the services and progressing in different universities abroad.
+
+**GATE:**
+
+Higher Educational pursuits are one of the major goals of most of the students of SVECW. Helping them in realizing their goals the institution is offering regularly GATE training classes. Though the record of GATE ranks in SVECW is less initially there is gradual ascendancy.
+
+**IES, IFS & IAS:**
+
+With the academic commitment of the student fraternity SVECW always brings forward any initiative that widens the scope of the career of the students. Eventually a special training for the students who are interested in taking up a career at IES, IAS, IAF, etc. has been started recently and completed the required formative training.
+
+**SVES–NS-IAS Civil Services Coaching Programme**
+
+The SVES–NS-IAS Civil Services Coaching Programme was initiated in 2024 as a student-centric initiative to provide aspiring Civil Services candidates with structured, accessible, and quality-oriented competitive examination preparation. The programme was established through a Memorandum of Understanding (MoU) signed on 1 April 2024 between SVES and NS-IAS Academy, Hyderabad, with a shared vision of creating better career opportunities for students through expert guidance and systematic preparation.
+
+The programme has been carefully designed to complement students' regular academic curriculum without disturbing their institutional timetable. While the primary focus is on UPSC Civil Services Examination preparation, the knowledge and skills developed through the programme also provide students with a foundation for preparing for other competitive examinations, including State Government Group-I and Group-II examinations. Students also gain exposure to the fundamentals and general awareness areas relevant to Banking and other competitive examinations.
+
+**Key Programme Highlights**
+
+- **Subsidised Fee Structure:** Specially discounted coaching is offered to students under the SVES initiative.
+- **Academic-Friendly Schedule:** Classes are scheduled to complement the regular academic timetable without affecting students' coursework.
+- **Comprehensive Study Material:** Enrolled students are provided with relevant study materials to support systematic preparation.
+- **Online Learning & Recorded Classes:** Online classes offer flexibility, with recorded sessions available for revision and self-paced learning.
+- **Weekly Tests:** Regular tests help students assess their preparation, identify areas for improvement, and build examination confidence.
+- **Expert Mentorship:** Dr. N. S. Sridhar, Founder & Chairman of NS-IAS Academy, provides periodic campus-based interaction, guidance, and mentorship to students.
+- **Multi-Examination Exposure:** The programme develops conceptual knowledge, current affairs awareness, analytical ability, and aptitude that can support preparation for UPSC Civil Services, State Government Group-I & Group-II examinations, Banking examinations, and other competitive examinations.
+
+**Programme Reach**
+
+Since its inception, the programme has supported 60 students across SVES institutions, including 42 students exclusively from SVECW (Autonomous). The current cohort comprises 39 students across SVES institutions, including 18 students from SVECW (Autonomous).
+
+Through the SVES–NS-IAS initiative, Vishnu Women's University is committed to empowering students with access to quality competitive-examination coaching, expert mentorship, structured assessment, and flexible learning opportunities, enabling them to pursue diverse career pathways in Civil Services, State Government services, Banking, and other competitive examinations.`;
+
 const PARTNER_DOMAINS: Record<string, string> = {
   'Amazon': 'amazon.com', 'Adobe': 'adobe.com', 'Microsoft': 'microsoft.com',
   'Google': 'google.com', 'Flipkart': 'flipkart.com', 'PayPal': 'paypal.com',
@@ -1217,6 +1256,15 @@ export default function PlacementDetail() {
                 <p style={{ fontSize: 'var(--text-lg)', color: 'var(--color-text)', lineHeight: 1.75 }}>
                   {item.desc}
                 </p>
+              )}
+
+              {/* Career Guidance Cell — higher-studies / competitive-exam
+                  training sections. Always shown here (not via BODY_OVERRIDES,
+                  which is suppressed when the CMS intro is set). */}
+              {item.slug === 'career-guidance-cell' && !hasBodyOverride && (
+                <div style={{ fontSize: 'var(--text-lg)', color: 'var(--color-text)', lineHeight: 1.75, marginTop: 'var(--space-6)' }}>
+                  <BodyBlocks blocks={parseBodyContent(CAREER_GUIDANCE_TRAINING)} paragraphStyle={{}} />
+                </div>
               )}
 
               {/* Only shown here when there's no roster below to show it instead

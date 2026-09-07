@@ -73,7 +73,7 @@ export default function WellnessCenter() {
         defaultTitle="Wellness Center"
         defaultSubtitle="A space where you can be yourself and talk about the things that really matter to you."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Campus Life', to: '/campus' }, { label: 'Wellness Center' }]}
-        scrollCtaTargetId="wellness-content"
+        hideCta={true}
       />
 
       {/* Meet the Counsellor */}

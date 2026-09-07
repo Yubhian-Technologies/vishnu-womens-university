@@ -177,9 +177,9 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
 
   const { docs: allPrograms, loading: progLoading } = useOrderedCollection<ProgramDoc>('programs', 'order');
   const subPrograms = group.programSlugs
-    .map((s) => allPrograms.find((p) => p.slug === s))
+    .map((s) => allPrograms.find((p) => p.slug?.toLowerCase() === s.toLowerCase()))
     .filter((p): p is ProgramDoc => !!p);
-  const activeProgram = subPrograms.find((p) => p.slug === activeSlug);
+  const activeProgram = subPrograms.find((p) => p.slug?.toLowerCase() === activeSlug.toLowerCase()) || subPrograms[0];
 
   const { docs: allFaculty } = useOrderedCollection<FacultyDoc>('faculty', 'order');
   const deptKeys = new Set<string>(group.facultyDepartments);
@@ -260,7 +260,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
       <RouteFallback />
     );
   }
-  if (!progLoading && !activeProgram) return <Navigate to="/academics" replace />;
+  if (!progLoading && !activeProgram && subPrograms.length === 0) return <Navigate to="/academics" replace />;
   // Also wait on the department lookup: rendering before it resolves would
   // show the short code (activeProgram.department / group.deptShortCode)
   // as the page title/H1 and then flash to the full department title once

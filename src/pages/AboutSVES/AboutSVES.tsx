@@ -315,7 +315,7 @@ export default function AboutSVES() {
               '4 campuses — Bhimavaram, Narsapur, Hyderabad, Aziz Nagar',
               '25,000+ students & 1,400+ faculty',
               '25+ years of educational leadership',
-              'Engineering,Pharmacy,Dental,Polytechnic,Life sciences & school -KGto PG',
+              'Engineering, Pharmacy, Dental, Polytechnic, Life Sciences & School — KG to PG',
             ]}
             columns={2}
             layout="side-text"
@@ -375,7 +375,6 @@ export default function AboutSVES() {
             </div>
             <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
               <Link to="/about" className="btn btn-accent btn-lg">About VWU</Link>
-              <Link to="/academics" className="btn btn-secondary btn-lg">Explore Academics</Link>
             </div>
           </div>
         </div>
