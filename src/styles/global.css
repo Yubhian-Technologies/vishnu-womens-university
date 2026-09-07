@@ -876,3 +876,9 @@ h6 { font-size: var(--text-lg); }
     max-width: 94%;
   }
 }
+
+.about-fact-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(201, 168, 76, 0.2) !important;
+  border-color: var(--color-accent) !important;
+}

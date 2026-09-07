@@ -7,10 +7,10 @@ import PageHero from '../../components/PageHero/PageHero';
 // Campus & sewage-load figures quoted in the DST project write-up. Kept as
 // data rather than inline JSX so the stat band stays one place to edit.
 const CAMPUS_STATS: { value: string; label: string }[] = [
-  { value: '100', label: 'Acre Campus' },
+  { value: '80', label: 'Acre Campus' },
   { value: '7', label: 'Constituent Institutes' },
-  { value: '~15,000', label: 'Students' },
-  { value: '~4,000', label: 'Hostel Residents' },
+  { value: '~17,000', label: 'Students' },
+  { value: '~6,000', label: 'Hostel Residents' },
   { value: '~9 Lakh L', label: 'Daily Water Requirement' },
   { value: '~7 Lakh L', label: 'Daily Sewage Generated' },
 ];
@@ -97,9 +97,9 @@ export default function SewageTreatment() {
               management consistently encourages natural-resource-conservative practices across the campus.
             </p>
             <p style={{ lineHeight: 1.8, color: 'var(--color-text-light)' }}>
-              The campus extends across a serene <strong>100 acres</strong>, three kilometres from the outskirts of
+              The campus extends across a serene <strong>80 acres</strong>, three kilometres from the outskirts of
               Bhimavaram town. It houses <strong>7 constituent institutes</strong> with a total strength of about{' '}
-              <strong>15,000 students</strong>, of whom around <strong>4,000 stay in the hostels</strong>. Meeting the
+              <strong>17,000 students</strong>, of whom around <strong>6,000 stay in the hostels</strong>. Meeting the
               daily needs of a campus this size requires roughly <strong>9 lakh litres of water per day</strong> — and
               the sewage generated is correspondingly high, estimated at about{' '}
               <strong>7 lakh litres per day</strong>, all of which would ultimately reach a natural drain.
