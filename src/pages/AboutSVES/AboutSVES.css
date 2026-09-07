@@ -107,6 +107,35 @@
   flex: 1;
 }
 
+.sves-campus-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sves-campus-section + .sves-campus-section {
+  margin-top: 1rem;
+  padding-top: 0.85rem;
+  border-top: 1px dashed rgba(11, 30, 66, 0.12);
+}
+
+.sves-subtag-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--color-accent, #c9a84c);
+  background: color-mix(in srgb, var(--color-accent, #c9a84c) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-accent, #c9a84c) 30%, transparent);
+  padding: 0.2rem 0.55rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  width: fit-content;
+  margin-bottom: 0.25rem;
+}
+
 .sves-campus-list {
   list-style: none;
   padding: 0;

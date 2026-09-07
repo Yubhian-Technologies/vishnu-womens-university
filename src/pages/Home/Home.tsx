@@ -1,11 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Laptop, ArrowRight } from 'lucide-react';
 import HeroSlider from '../../components/HeroSlider/HeroSlider';
 import CounterSection from '../../components/CounterSection/CounterSection';
 import ScrollTopButton from '../../components/ScrollTopButton/ScrollTopButton';
 import NewsCard, { type NewsArticle } from '../../components/NewsCard/NewsCard';
-import NewsArticleDialog from '../../components/NewsCard/NewsArticleDialog';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import TestimonialSlider from '../../components/TestimonialSlider/TestimonialSlider';
 import RecruitersSection from '../../components/RecruitersMarquee/RecruitersSection';
@@ -18,7 +17,6 @@ import { fetchPriorityAttr } from '../../lib/domAttrs';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { useSitePhotos, useSitePhotosLoading } from '../../hooks/useSitePhotos';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
-import { happeningToArticle } from '../../lib/happenings';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import type { HappeningDoc } from '../Admin/sections/NewsAwardsDataAdmin';
 import type { ContentBlockDoc } from '../Admin/sections/ContentBlocksAdmin';
@@ -115,23 +113,38 @@ function useTilt(strength = 12) {
 
 
 
+/* Subset of a `gallery` collection doc we actually read for the home strip. */
+interface GalleryImageLite {
+  id: string;
+  title: string;
+  category: string;
+  imageUrl: string;
+  order: number;
+}
+
 /* ── Component ────────────────────────────────────────────── */
 export default function Home() {
-  // "Latest from VWU" / "Upcoming at VWU" below are driven by the same
-  // Happenings collection the admin's "Happenings & Awards" → Happenings
-  // editor writes to (see NewsAwardsDataAdmin.tsx) and the /news-awards/
-  // happenings page reads — not by the separate `news`/`events` collections
-  // — so marking something Recent/Upcoming there is what shows it here.
-  // "Latest from VWU" caps to 3, matching the original news-grid's size —
-  // "View All News" links to /news-awards/happenings for the rest. Ordered
-  // by the admin's Display Order field, same as the Happenings admin table
-  // itself, so a newly-added item needs a lower order to appear in the top 3
-  // (see the Happenings form's "Display Order" field).
+  // "Upcoming at VWU" is driven by the Happenings collection the admin's
+  // "Happenings & Awards" → Happenings editor writes to (see
+  // NewsAwardsDataAdmin.tsx) — marking something Upcoming there is what
+  // shows it below.
   const { docs: happenings } = useOrderedCollection<HappeningDoc>('happenings', 'order');
-  const recentHappenings = happenings.filter(h => h.type === 'recent');
   const upcomingHappenings = happenings.filter(h => h.type === 'upcoming');
-  const featuredNews = recentHappenings.slice(0, 3).map(happeningToArticle);
-  const [activeArticle, setActiveArticle] = useState<NewsArticle | null>(null);
+
+  // "Latest from VWU" strip shows the 3 most recently added Gallery photos
+  // (`gallery` collection — new uploads get an increasing `order`), each
+  // card linking to the full /news-awards/gallery page.
+  const { docs: galleryImages } = useOrderedCollection<GalleryImageLite>('gallery', 'order');
+  const featuredNews: NewsArticle[] = galleryImages.slice(-3).reverse().map((img) => ({
+    id: img.id,
+    title: img.title,
+    excerpt: '',
+    date: '',
+    category: img.category || '',
+    imageUrl: img.imageUrl,
+    imageAlt: img.title,
+    path: '/news-awards/gallery',
+  }));
   const liveTestimonials = useContentBlocks('home', 'testimonials');
   const testimonials = liveTestimonials.length > 0 ? liveTestimonials : defaultTestimonials;
   const liveStudyCards = useContentBlocks('home', 'studyCards');
@@ -298,25 +311,24 @@ export default function Home() {
             <div className="reveal-left">
               <h2 className="section-title">Latest from VWU</h2>
             </div>
-            <Link to="/news-awards/happenings" className="news-btn-tonal reveal-right">
-              <span>View All News</span>
+            <Link to="/news-awards/gallery" className="news-btn-tonal reveal-right">
+              <span>View Gallery</span>
               <ArrowRight size={16} className="news-btn-arrow" />
             </Link>
           </div>
           <div className="news-grid">
-            {featuredNews.map((item, i) => (
-              <div key={item.id} className={`news-grid-item ${i === 0 ? 'news-grid-item--featured' : ''}`}>
-                <NewsCard article={item} isFeatured={i === 0} onReadMore={() => setActiveArticle(item)} />
+            {featuredNews.map((item) => (
+              <div key={item.id} className="news-grid-item">
+                <NewsCard article={item} isFeatured />
               </div>
             ))}
             {featuredNews.length === 0 && (
-              <p style={{ color: 'var(--color-text-light)' }}>No recent happenings yet — check back soon.</p>
+              <p style={{ color: 'var(--color-text-light)' }}>No gallery photos yet — check back soon.</p>
             )}
           </div>
         </div>
       </section>
 
-      <NewsArticleDialog article={activeArticle} onClose={() => setActiveArticle(null)} />
       <UpcomingEvents happenings={upcomingHappenings} />
 
       {/* ── Admissions CTA Banner ── */}

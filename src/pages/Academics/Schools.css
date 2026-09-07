@@ -3,13 +3,43 @@
   text-align: justify;
 }
 
+/* School name in a bordered card box — replaces the old "Schools" eyebrow pill */
+.schools-page .school-title {
+  display: inline-block;
+  color: var(--color-primary);
+  padding: var(--space-3) var(--space-6);
+  border: 2px solid var(--color-accent);
+  border-radius: var(--radius-md);
+  background: var(--color-white);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Per-school key highlight / tagline — right-aligned, "~" prefix */
+.schools-page .school-tagline {
+  margin: var(--space-3) 0 var(--space-4);
+  text-align: left;
+  font-family: var(--font-serif);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  font-style: italic;
+  color: var(--color-accent);
+  line-height: 1.4;
+}
+
+.schools-page .school-tagline::before {
+  content: "~ ";
+}
+
 .schools-page .dept-desc {
-  text-align: justify;
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-align: left;
 }
 
 @media (max-width: 640px) {
-  .schools-page .section-desc,
-  .schools-page .dept-desc {
+  .schools-page .section-desc {
     text-align: left;
   }
 }
