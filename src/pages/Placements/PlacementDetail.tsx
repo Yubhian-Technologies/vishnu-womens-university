@@ -11,7 +11,8 @@ import { parseStructuredTable, parseFlexibleTable } from '../../lib/structuredTa
 import type { PlacementItemDoc } from '../Admin/sections/PlacementItemsAdmin';
 import type { TpoTeamBioDoc } from '../Admin/sections/TpoTeamInfoAdmin';
 import type { PlacementCrtDoc } from '../Admin/sections/PlacementCrtDocsAdmin';
-import PlacementYearAccordion, { BranchOffersBarChart } from './PlacementYearAccordion';
+import PlacementYearAccordion, { BranchOffersBarChart, formatSalary } from './PlacementYearAccordion';
+import type { PlacementYear } from './placementStats.data';
 import SmoothCollapse from '../../components/SmoothCollapse/SmoothCollapse';
 import { successStories } from './successStories.data';
 import { industryLiaisonOffices } from './industryLiaisonOffices.data';
@@ -172,14 +173,33 @@ const PARTNER_LOGO_OVERRIDES: Record<string, string> = {
   'Providence': 'https://upload.wikimedia.org/wikipedia/en/thumb/7/79/Providence_Health_logo.svg/250px-Providence_Health_logo.svg.png',
 };
 
-// Placement Cell's Summary tiles are a single free-text line per batch (e.g.
-// "2022-2026 batch: 1103 placements, highest 59.28 LPA(Google)") — this
-// breaks that one line into three ("2022-2026 batch" / "1103 placements" /
-// "Highest Package: 59.28 LPA(Google)") when it matches the usual shape a
-// batch summary is entered in, so the tile always reads as three distinct
-// facts instead of a wrapped run-on sentence. Any outcome text that doesn't
-// match (a different sub-page's plain achievement bullet, say) renders as-is.
-const OUTCOME_BATCH_SUMMARY_RE = /^(.+?)\s+batch:\s*([\d,]+)\s*placements,\s*highest\s+(.+)$/i;
+// Placement Cell's Summary tiles used to be a manually-typed free-text line
+// per batch (e.g. "2022-2026 batch: 1103 placements, highest 59.28
+// LPA(Google)"), kept on the placement-details item's Outcomes field — a
+// completely separate admin field from the "Placements, Year by Year" batch
+// data below it on this same page, with nothing keeping the two in sync. An
+// admin editing/re-importing a batch's Company Rows had no way to know the
+// Summary tile above still quoted the old numbers (or was simply missing
+// for a newly-added batch). This derives every tile straight from the same
+// placementYears data the Year-by-Year section reads, so both always agree
+// and a new batch gets a tile automatically.
+function batchHighestPackage(y: PlacementYear): { lpa: number; company?: string } | undefined {
+  const rows = y.rows || [];
+  let best: { lpa: number; company: string } | undefined;
+  for (const r of rows) {
+    const lpa = parseFloat(formatSalary(r.salary));
+    if (!Number.isFinite(lpa)) continue;
+    if (!best || lpa > best.lpa) best = { lpa, company: r.company };
+  }
+  const lpa = y.highestPackageLPA ?? best?.lpa;
+  if (lpa == null) return undefined;
+  // If the batch's own Highest Package figure doesn't exactly match its top
+  // Company Row (e.g. a manually-typed override), still show the row whose
+  // salary matches it rather than mislabeling best's company under a
+  // different number.
+  const company = rows.find((r) => Math.abs((parseFloat(formatSalary(r.salary)) || -Infinity) - lpa) < 0.01)?.company ?? (y.highestPackageLPA == null ? best?.company : undefined);
+  return { lpa, company };
+}
 
 // Logo only — no company name label beside it (per request). The name still
 // lives in alt text/title for accessibility and hover, just not rendered as
@@ -527,35 +547,34 @@ function CampusRecruitmentTrainingSections({ intro }: { intro: string }) {
 }
 
 // Placement Details' Summary section (placementCellSummarySection below) —
-// each item.outcomes line already encodes one batch's headline stats as
-// "<batch> batch: <count> placements, highest <package>" (see
-// OUTCOME_BATCH_SUMMARY_RE/the old OutcomeTileText it replaces), so no data
-// change is needed here, only the card's look: alternating navy/cream
-// colours by position, a checkbox-style heading icon, and the batch/offers/
-// package split across their own lines instead of one plain paragraph.
+// alternating navy/cream colours by position, a checkbox-style heading icon,
+// and the batch/offers/package split across their own lines. Offers and
+// Highest Package come straight from the batch's placementYears record
+// (see batchHighestPackage above) rather than a separately-typed line, so
+// this always matches the Year-by-Year section further down the page.
 const BATCH_CARD_COLORS = [
   { background: 'var(--color-primary-light)', border: 'var(--color-primary-light)', heading: 'var(--color-white)', body: 'rgba(255,255,255,0.85)' },
   { background: '#FCEFD9', border: '#E8A83C', heading: '#7A4A12', body: '#8A5A20' },
 ];
 
-function BatchSummaryCard({ text, index }: { text: string; index: number }) {
+function BatchSummaryCard({ batch, offers, highest, index }: { batch: string; offers: number | null; highest?: { lpa: number; company?: string }; index: number }) {
   const color = BATCH_CARD_COLORS[index % BATCH_CARD_COLORS.length];
-  const m = text.match(OUTCOME_BATCH_SUMMARY_RE);
   return (
     <div style={{ background: color.background, border: `1.5px solid ${color.border}`, borderRadius: 'var(--radius-lg)', padding: 'var(--space-5)' }}>
-      {m ? (
-        <>
-          <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: color.heading, margin: 0, marginBottom: 'var(--space-3)' }}>
-            {m[1]} batch
-          </h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <span style={{ fontSize: 'var(--text-sm)', color: color.body }}>{m[2].replace(/,/g, '')} offers</span>
-            <span style={{ fontSize: 'var(--text-sm)', color: color.body }}>{m[3]}</span>
-          </div>
-        </>
-      ) : (
-        <span style={{ fontSize: 'var(--text-sm)', color: color.body }}>{text}</span>
-      )}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-3)' }}>
+        <span style={{ width: 14, height: 14, border: `2px solid ${color.heading}`, borderRadius: 3, flexShrink: 0 }} />
+        <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: color.heading, margin: 0 }}>
+          {batch} batch
+        </h3>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <span style={{ fontSize: 'var(--text-sm)', color: color.body }}>{offers != null ? offers.toLocaleString('en-IN') : '—'} offers</span>
+        {highest && (
+          <span style={{ fontSize: 'var(--text-sm)', color: color.body }}>
+            highest {highest.lpa} LPA{highest.company ? `(${highest.company})` : ''}
+          </span>
+        )}
+      </div>
     </div>
   );
 }
@@ -1136,21 +1155,27 @@ export default function PlacementDetail() {
   // Placement Cell's own combined Summary (batch cards) — full width, no
   // longer paired with the Branch-wise Placement Distribution chart (that
   // now only appears further down, in the Placements/Year-by-Year section).
-  const placementCellSummarySection = showOutcomes && item.slug === 'placement-details' && (
+  // Reads placementYearData directly (the same data the Year-by-Year section
+  // below uses) instead of the item's separately-typed Outcomes field, so a
+  // batch's offers/highest-package here can never drift from what the
+  // Year-by-Year section shows for that same batch, and a newly-added batch
+  // gets a card automatically instead of needing a matching Outcomes line
+  // typed in by hand.
+  const summaryYearData = placementYearData.filter((y) => !y.hideFromSummary);
+  const placementCellSummarySection = item.slug === 'placement-details' && summaryYearData.length > 0 && (
     <section className="section bg-off-white">
       <div className="container">
         <div style={{ marginBottom: 'var(--space-8)' }}>
           <span className="section-label">Impact</span>
           <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Summary</h2>
         </div>
-        {/* Fixed 4-column grid (2 rows of 4 for the usual 8 cards), not
-            auto-fit/minmax — auto-fit would stretch a partial last row's
-            items to fill the leftover space instead of leaving them at the
-            same width as every other row. mobile-stack-grid still collapses
-            this to a single column on small screens. */}
+        {/* Fixed 4-column grid, not auto-fit/minmax — auto-fit would stretch
+            a partial last row's items to fill the leftover space instead of
+            leaving them at the same width as every other row. mobile-stack-
+            grid still collapses this to a single column on small screens. */}
         <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-4)' }}>
-          {activeOutcomes.map((o, i) => (
-            <BatchSummaryCard key={o} text={o} index={i} />
+          {summaryYearData.map((y, i) => (
+            <BatchSummaryCard key={y.batch} batch={y.batch} offers={y.total} highest={batchHighestPackage(y)} index={i} />
           ))}
         </div>
       </div>
