@@ -1878,7 +1878,6 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                               )}
                               {project.outcomes.length > 0 && (
                                 <div className="dept-rnd-outcomes">
-                                  <span className="dept-rnd-outcomes-title">Outcome</span>
                                   <ul className="dept-rnd-outcomes-list">
                                     {project.outcomes.map((o, oi) => (
                                       <li key={oi} className="dept-rnd-outcome-item">
