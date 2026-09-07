@@ -284,7 +284,9 @@ function bracketedBranchLabel(label: string): string {
 // definite pixel height already work reliably here.
 function BranchHighestPackageChart({ data }: { data: BranchOfferCount[] }) {
   const [hovered, setHovered] = useState<string | null>(null);
-  const withPackage = data.filter((d): d is BranchOfferCount & { highestLPA: number } => d.highestLPA != null);
+  const withPackage = data
+    .filter((d): d is BranchOfferCount & { highestLPA: number } => d.highestLPA != null)
+    .sort((a, b) => b.highestLPA - a.highestLPA);
   if (withPackage.length === 0) return null;
 
   const rawMax = Math.max(1, ...withPackage.map((d) => d.highestLPA));
