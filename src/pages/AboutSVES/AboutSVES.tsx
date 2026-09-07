@@ -315,7 +315,7 @@ export default function AboutSVES() {
               '4 campuses — Bhimavaram, Narsapur, Hyderabad, Aziz Nagar',
               '25,000+ students & 1,400+ faculty',
               '25+ years of educational leadership',
-              'Engineering,Pharmacy,Dental,Polytechnic,Life sciences & school -Kg to PG',
+              'Engineering,Pharmacy,Dental,Polytechnic,Life sciences & school -KGto PG',
             ]}
             columns={2}
             layout="side-text"
