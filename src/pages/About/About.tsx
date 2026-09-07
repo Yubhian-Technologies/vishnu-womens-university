@@ -77,6 +77,9 @@ export interface CoreExecutiveMember {
   experience?: string;
   email?: string;
   bio?: string;
+  /** Long-form description — rendered as paragraphs (split on blank lines)
+      in the expanded executive detail banner. Managed from the admin. */
+  description?: string;
 }
 
 export const defaultExecutives: Omit<CoreExecutiveMember, 'id'>[] = [
@@ -339,7 +342,7 @@ export default function About() {
             <div key={level} className="exec-level">
               <div className="exec-grid">
                 {members.map((exec) => {
-                  const hasDetails = !!(exec.qualification || exec.experience || exec.email || exec.bio);
+                  const hasDetails = !!(exec.qualification || exec.experience || exec.email || exec.bio || exec.description);
                   return (
                     <div
                       key={exec.name}
@@ -396,6 +399,13 @@ export default function About() {
                   )}
                 </div>
                 {activeExec.bio && <p className="exec-detail-banner__bio">{activeExec.bio}</p>}
+                {activeExec.description && (
+                  <div className="exec-detail-banner__description">
+                    {activeExec.description.split(/\n\s*\n/).map((para, i) => (
+                      <p key={i}>{para.trim()}</p>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           )}

@@ -1389,7 +1389,7 @@ export default function DepartmentsAdmin() {
                     <td><span className="admin-badge" style={{ textTransform: 'none' }}>{d.shortCode}</span></td>
                     <td>{d.order}</td>
                     <td>
-                      <button className="admin-btn admin-btn--sm" onClick={() => startEdit(d)}>View</button>
+                      <button className="admin-btn admin-btn--sm" onClick={() => startEdit(d)}>Edit</button>
                       <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(d.id)}>Delete</button>
                     </td>
                   </tr>

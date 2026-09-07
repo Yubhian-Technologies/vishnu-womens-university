@@ -67,7 +67,7 @@ const KNOWN_PAGES: { slug: string; title: string; group: CampusLifeItemDoc['grou
   { slug: 'campus-hostels', title: 'Campus Hostels', group: 'facility' },
   { slug: 'food-courts', title: 'Food Courts', group: 'facility' },
   { slug: 'fitness-centre', title: 'VISHNU Fitness Centre', group: 'facility' },
-  { slug: 'staff-quarters', title: 'Staff Quarters', group: 'facility' },
+  { slug: 'staff-quarters', title: 'Faculty & Staff Residential Facilities', group: 'facility' },
   { slug: 'travel-desk', title: 'Travel Desk', group: 'facility' },
   { slug: 'temples', title: 'Temples', group: 'facility' },
   { slug: 'health-care', title: 'Health Care', group: 'facility' },

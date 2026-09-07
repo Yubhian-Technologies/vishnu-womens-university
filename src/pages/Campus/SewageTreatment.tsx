@@ -24,6 +24,14 @@ const PROJECT_FACTS: { icon: typeof Droplets; label: string; value: string }[] =
   { icon: FlaskConical, label: 'Treatment Technology', value: 'Improved Moving Bed Bio-film Reactor (MBBR)' },
 ];
 
+// Photos live in public/images/sewage-treatment-plants/ (see the README
+// there). Any slot whose file isn't present hides itself on load, so the
+// grid can be pre-wired for more shots than exist yet.
+export const GALLERY_PHOTOS: { src: string; alt: string }[] = Array.from({ length: 8 }, (_, i) => ({
+  src: `/images/sewage-treatment-plants/stp-${i + 1}.jpg`,
+  alt: `Sewage treatment plant at VWU — photo ${i + 1}`,
+}));
+
 export default function SewageTreatment() {
   useEffect(() => {
     document.title = 'Sewage Treatment Plants | VWU';
@@ -56,7 +64,7 @@ export default function SewageTreatment() {
         defaultTitle="Sewage Treatment Plants"
         defaultSubtitle="A zero-discharge campus — every drop of sewage generated is treated on site and returned to the land as irrigation for campus and highway greenery."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Campus Life', to: '/campus' }, { label: 'Sewage Treatment Plants' }]}
-        scrollCtaTargetId="sewage-content"
+        hideCta={true}
       />
 
       {/* Campus scale & daily load */}
@@ -225,6 +233,46 @@ export default function SewageTreatment() {
                 adopted sites.
               </p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Gallery — photos from public/images/sewage-treatment-plants/.
+          Each <img> hides its own cell if the file 404s, so empty slots
+          never show a broken-image icon. */}
+      <section className="section bg-off-white">
+        <div className="container">
+          <div className="reveal" style={{ marginBottom: 'var(--space-8)', maxWidth: 860 }}>
+            <span className="section-label">Gallery</span>
+            <h2 className="section-title">On-Site Treatment Plants</h2>
+          </div>
+          <div
+            className="mobile-stack-grid"
+            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 'var(--space-4)' }}
+          >
+            {GALLERY_PHOTOS.map((photo) => (
+              <div
+                key={photo.src}
+                style={{
+                  overflow: 'hidden',
+                  borderRadius: 'var(--radius-md)',
+                  border: '1.5px solid var(--color-light-gray)',
+                  aspectRatio: '4 / 3',
+                  background: 'var(--color-light-gray)',
+                }}
+              >
+                <img
+                  src={photo.src}
+                  alt={photo.alt}
+                  loading="lazy"
+                  onError={(e) => {
+                    const cell = (e.currentTarget.parentElement as HTMLElement | null);
+                    if (cell) cell.style.display = 'none';
+                  }}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                />
+              </div>
+            ))}
           </div>
         </div>
       </section>

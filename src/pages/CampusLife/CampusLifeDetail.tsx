@@ -91,6 +91,7 @@ export default function CampusLifeDetail({ slug: slugProp }: { slug?: string }) 
         breadcrumb={isActivity
           ? [{ label: 'Home', to: '/' }, { label: 'Student Life', to: '/student-life' }, { label: title }]
           : [{ label: 'Home', to: '/' }, { label: 'Campus Life', to: '/campus' }, { label: title }]}
+        hideCta={true}
       />
 
       {visibleTabs.length > 0 && activeTab ? (

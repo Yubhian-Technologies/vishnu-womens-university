@@ -1421,14 +1421,110 @@ td.pb-activities-num {
   margin-top: 0;
 }
 
-@media (max-width: 768px) {
-  .dept-stat-tile,
-  #placements .dept-stat-tile {
-    border-right: 1px solid rgba(255, 255, 255, 0.25);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+/* Responsive Grid Adaptations for Placement Stat Strip */
+@media (max-width: 1024px) {
+  .dept-stat-grid,
+  .dept-stat-grid--fill,
+  .dept-stat-grid--compact,
+  .dept-detail-page .dept-stat-grid,
+  #placements .dept-stat-grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    flex-wrap: wrap !important;
+    overflow-x: visible !important;
+    padding: 1.25rem 0.75rem !important;
+    gap: 0 !important;
   }
-  .dept-stat-tile:nth-child(2n) {
-    border-right: none;
+
+  .dept-stat-tile,
+  .dept-detail-page .dept-stat-tile,
+  #placements .dept-stat-tile {
+    flex: initial !important;
+    width: 100% !important;
+    padding: 0.75rem 0.4rem !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.25) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+  }
+
+  /* Remove right border on last column in 4-column grid */
+  .dept-stat-tile:nth-child(4n),
+  .dept-detail-page .dept-stat-tile:nth-child(4n),
+  #placements .dept-stat-tile:nth-child(4n) {
+    border-right: none !important;
+  }
+
+  /* Remove bottom border on bottom row of 4-column grid */
+  .dept-stat-tile:nth-child(n+5),
+  .dept-detail-page .dept-stat-tile:nth-child(n+5),
+  #placements .dept-stat-tile:nth-child(n+5) {
+    border-bottom: none !important;
+  }
+
+  .dept-stat-tile__value,
+  #placements .dept-stat-tile__value,
+  .dept-detail-page .dept-stat-tile__value {
+    font-size: 1.35rem !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .dept-stat-grid,
+  .dept-stat-grid--fill,
+  .dept-stat-grid--compact,
+  .dept-detail-page .dept-stat-grid,
+  #placements .dept-stat-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    padding: 1rem 0.5rem !important;
+    border-radius: 16px !important;
+  }
+
+  .dept-stat-tile,
+  .dept-detail-page .dept-stat-tile,
+  #placements .dept-stat-tile {
+    padding: 0.75rem 0.3rem !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.25) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+  }
+
+  /* Reset 4-column border overrides for 2-column grid */
+  .dept-stat-tile:nth-child(4n),
+  .dept-detail-page .dept-stat-tile:nth-child(4n),
+  #placements .dept-stat-tile:nth-child(4n) {
+    border-right: 1px solid rgba(255, 255, 255, 0.25) !important;
+  }
+
+  .dept-stat-tile:nth-child(n+5),
+  .dept-detail-page .dept-stat-tile:nth-child(n+5),
+  #placements .dept-stat-tile:nth-child(n+5) {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+  }
+
+  /* 2-Column Rules: Remove right border on even items (2, 4, 6, 8) */
+  .dept-stat-tile:nth-child(2n),
+  .dept-detail-page .dept-stat-tile:nth-child(2n),
+  #placements .dept-stat-tile:nth-child(2n) {
+    border-right: none !important;
+  }
+
+  /* 2-Column Rules: Remove bottom border on last 2 items */
+  .dept-stat-tile:nth-last-child(-n+2),
+  .dept-detail-page .dept-stat-tile:nth-last-child(-n+2),
+  #placements .dept-stat-tile:nth-last-child(-n+2) {
+    border-bottom: none !important;
+  }
+
+  .dept-stat-tile__value,
+  #placements .dept-stat-tile__value,
+  .dept-detail-page .dept-stat-tile__value {
+    font-size: 1.25rem !important;
+  }
+
+  .dept-stat-tile__label,
+  #placements .dept-stat-tile__label,
+  .dept-detail-page .dept-stat-tile__label {
+    font-size: 0.58rem !important;
+    letter-spacing: 0.02em !important;
   }
 }
 
