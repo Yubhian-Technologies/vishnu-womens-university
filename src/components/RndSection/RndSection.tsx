@@ -22,8 +22,11 @@ interface LegacyRndFields {
 // exactly what it already had — no data disappears, and no year pills show
 // until an admin actually adds a labeled year.
 export function resolveRndYears(primary?: LegacyRndFields | null, fallback?: LegacyRndFields | null): RndYear[] {
-  if (primary?.rndYears?.length) return primary.rndYears;
-  if (fallback?.rndYears?.length) return fallback.rndYears;
+  // An empty Academic Year row (added but never filled in) still has
+  // length > 0 — checking content, not just length, keeps it from
+  // permanently shadowing real fallback data on the other side.
+  if (primary?.rndYears?.some(rndYearHasContent)) return primary.rndYears;
+  if (fallback?.rndYears?.some(rndYearHasContent)) return fallback.rndYears;
   const intro = primary?.rndIntro || fallback?.rndIntro || '';
   const tableText = primary?.rndTableText || fallback?.rndTableText || '';
   const projectsText = primary?.rndProjectsText || fallback?.rndProjectsText || '';
