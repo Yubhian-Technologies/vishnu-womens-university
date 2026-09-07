@@ -112,7 +112,7 @@ const DEFAULT_INFO_CARDS = [
   },
   {
     id: 'default-info-3',
-    title: 'Society Headquarters',
+    title: 'SVES Head office',
     desc: 'Plot 7 & 8, Nagarjuna Hills, Punjagutta Main Road\nHyderabad - 500 082, Telangana\nPhones: 040-40334899 / 897 / 866 / 829',
     value: 'SVES Central Office',
     slug: '040-40334818 / 4848',
