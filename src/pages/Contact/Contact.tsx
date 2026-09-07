@@ -112,7 +112,7 @@ const DEFAULT_INFO_CARDS = [
   },
   {
     id: 'default-info-3',
-    title: 'Society Headquarters',
+    title: 'Society Head Office',
     desc: 'Plot 7 & 8, Nagarjuna Hills, Punjagutta Main Road\nHyderabad - 500 082, Telangana\nPhones: 040-40334899 / 897 / 866 / 829',
     value: 'SVES Central Office',
     slug: '040-40334818 / 4848',
@@ -297,7 +297,7 @@ export default function Contact() {
         <div className="contact-hero-glow" aria-hidden="true" />
         <div className="container contact-hero-clean__inner">
           <h1 className="contact-hero-clean__title">
-            Got Questions? We’ve Got You 💬
+            Got Questions? We Are Here
           </h1>
           <p className="contact-hero-clean__subtitle">
             Curious about admissions, programmes, or campus life? Our team is here to help you with everything you need.
@@ -321,7 +321,7 @@ export default function Contact() {
             </a>
             <a href="#department-directory" className="contact-hero-quicknav-pill">
               <Building2 size={15} />
-              <span>Department Directory</span>
+              <span>Departments Directory</span>
             </a>
             <a href="#helplines" className="contact-hero-quicknav-pill contact-hero-quicknav-pill--alert">
               <ShieldCheck size={15} />
@@ -336,7 +336,7 @@ export default function Contact() {
         <div className="container">
           <div className="section-head-center">
             <span className="section-label">Key Contact Points</span>
-            <h2 className="section-title">Connect with the Team</h2>
+            <h2 className="section-title">Connect with our Team</h2>
             <p className="section-subtitle">
               Dedicated support desks for <strong>admissions, administrative services, and campus visits</strong>, providing timely assistance and guidance.
             </p>
@@ -743,7 +743,7 @@ export default function Contact() {
           <div className="dept-directory-header">
             <div>
               <span className="section-label">Academic &amp; Operational Heads</span>
-              <h2 className="section-title">Department Directory</h2>
+              <h2 className="section-title">Departments Directory</h2>
               <p className="section-subtitle">
                 Contact information for Heads of Departments and evaluation cells.
               </p>

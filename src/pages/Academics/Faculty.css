@@ -41,12 +41,29 @@
    they all stay in sync. margin-top/row-gap build on it so a row's
    protruding arches+photos never collide with the card row above. */
 .faculty-grid {
-  --card-top-overlap: 90px;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  column-gap: var(--space-6);
-  row-gap: calc(var(--card-top-overlap) + var(--space-6));
-  margin-top: calc(var(--card-top-overlap) + var(--space-4));
+  gap: 1.25rem;
+  margin-top: var(--space-6);
+}
+
+@media (max-width: 1200px) {
+  .faculty-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 840px) {
+  .faculty-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .faculty-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Marks the boundary between the 4 designation groups (leadership trio /

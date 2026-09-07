@@ -81,7 +81,6 @@ import { normalizeLab, normalizeMindMapImages, type ProgramDoc, type NewsEventsY
 import LabDialog from '../../components/LabDialog/LabDialog';
 import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import type { FacultyDoc } from './Faculty';
-import { parseFlexibleTable } from '../../lib/structuredTable';
 import RndSection, { resolveRndYears, rndYearsHaveContent } from '../../components/RndSection/RndSection';
 import { sortPlacementRows, computePlacementStats, findPackageColumnIndex, formatPackageCell } from '../../lib/placementRecords';
 import { computeInternshipStats, findPeriodColumnIndex } from '../../lib/internshipRecords';
@@ -100,6 +99,15 @@ const categoryLabel: Record<string, string> = {
   mba: 'MBA',
   phd: 'Ph.D.',
 };
+
+// A placement year label like "2022–2026" -> "2026" for the snapshot
+// heading — the graduating year reads more naturally there than the full
+// 4-year range. Already-bare years (or labels with no 4-digit year at all)
+// pass through unchanged.
+function endingYear(label: string): string {
+  const years = label.match(/\d{4}/g);
+  return years ? years[years.length - 1] : label;
+}
 
 export default function ProgramDetail() {
   // AI / CSE / ECE are "grouped" departments whose sub-program slugs render a
@@ -267,38 +275,24 @@ function SingleProgramDetail() {
     newsEventsCategories = newsEventsSubSections.map((sec) => ({
       key: sec.id,
       label: sec.label,
-      years: (sec.subSections || []).filter(hasCustomSectionContent).length > 0
-        ? (sec.subSections || []).filter(hasCustomSectionContent).map((sub) => {
-            const yearLabel = sub.label.replace(/^Academic Year\s*(::|:|-)?\s*/i, '').trim();
-            const parsedTables = parseFlexibleTable(sub.tableText || '');
-            const firstTable = parsedTables[0] || { headers: [], rows: [] };
-            const mode: 'table' | 'cards' | 'text' | 'both' =
-              firstTable.headers.length > 0 && (sub.imageCards?.length ?? 0) > 0
-                ? 'both'
-                : firstTable.headers.length > 0
-                ? 'table'
-                : (sub.imageCards?.length ?? 0) > 0
-                ? 'cards'
-                : 'text';
-            return {
-              year: yearLabel || sub.label,
-              mode,
-              columns: firstTable.headers,
-              rows: firstTable.rows.map((cells) => ({ cells })),
-              cards: sub.imageCards,
-              text: sub.textContent,
-            };
-          })
-        : [
-            {
-              year: sec.label.replace(/^Academic Year\s*(::|:|-)?\s*/i, '').trim() || sec.label,
-              mode: 'table' as const,
-              columns: parseFlexibleTable(sec.tableText || '')[0]?.headers || [],
-              rows: (parseFlexibleTable(sec.tableText || '')[0]?.rows || []).map((cells) => ({ cells })),
-              cards: sec.imageCards,
-              text: sec.textContent,
-            },
-          ],
+      // Every section/sub-section renders generically (SectionSubtree) below
+      // regardless of its contentType — table, text, image cards, files,
+      // checklist, links, photo gallery, person, contacts, or any mix of
+      // those via further nesting. No content type is special-cased or
+      // filtered out here.
+      years: (() => {
+          // A section can have its own content AND sub-sections at once —
+          // both must show, not just one or the other.
+          const ownOnly = { ...sec, subSections: undefined };
+          const out: NewsEventsYear[] = [];
+          if (hasCustomSectionContent(ownOnly)) {
+            out.push({ year: sec.label.replace(/^Academic Year\s*(::|:|-)?\s*/i, '').trim() || sec.label, columns: [], rows: [], section: ownOnly });
+          }
+          (sec.subSections || []).filter(hasCustomSectionContent).forEach((sub) => {
+            out.push({ year: sub.label.replace(/^Academic Year\s*(::|:|-)?\s*/i, '').trim() || sub.label, columns: [], rows: [], section: sub });
+          });
+          return out;
+        })(),
     })).filter((c) => c.years.length > 0);
   } else {
     newsEventsCategories = [
@@ -1112,7 +1106,7 @@ function SingleProgramDetail() {
             {activePlacementYear && placementYearStats && (
               <>
                 <p className="placement-stat-summary">
-                  {activePlacementYear.year} Placements as on date: <strong>{placementYearStats.totalOffers.toLocaleString()}</strong>
+                  {endingYear(activePlacementYear.year)} Placement Snapshot
                 </p>
                 <div className="dept-stat-grid dept-stat-grid--compact">
                   <div className="dept-stat-tile">

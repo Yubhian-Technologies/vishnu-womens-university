@@ -101,8 +101,8 @@
    (CustomSectionsIntro). Boxed light cards with an uppercase kicker over a
    short gold rule, replacing the old thin accent-bar heading. ===== */
 .dh-brief-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: var(--space-4);
 }
 
@@ -126,7 +126,7 @@
 }
 
 .dh-brief__body {
-  font-size: var(--text-sm);
+  font-size: var(--text-base);
   line-height: 1.7;
   color: var(--color-text);
 }

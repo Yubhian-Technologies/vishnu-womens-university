@@ -53,6 +53,15 @@ const HUB_TAB_EMPTY = (
   </p>
 );
 
+// A placement year label like "2022–2026" -> "2026" for the snapshot
+// heading — the graduating year reads more naturally there than the full
+// 4-year range. Already-bare years (or labels with no 4-digit year at all)
+// pass through unchanged.
+function endingYear(label: string): string {
+  const years = label.match(/\d{4}/g);
+  return years ? years[years.length - 1] : label;
+}
+
 /**
  * The shared page for a "grouped" department (AI / CSE / ECE). The top half is
  * common content read from the department's `departments` doc (matched by
@@ -168,9 +177,9 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
 
   const { docs: allPrograms, loading: progLoading } = useOrderedCollection<ProgramDoc>('programs', 'order');
   const subPrograms = group.programSlugs
-    .map((s) => allPrograms.find((p) => p.slug === s))
+    .map((s) => allPrograms.find((p) => p.slug?.toLowerCase() === s.toLowerCase()))
     .filter((p): p is ProgramDoc => !!p);
-  const activeProgram = subPrograms.find((p) => p.slug === activeSlug);
+  const activeProgram = subPrograms.find((p) => p.slug?.toLowerCase() === activeSlug.toLowerCase()) || subPrograms[0];
 
   const { docs: allFaculty } = useOrderedCollection<FacultyDoc>('faculty', 'order');
   const deptKeys = new Set<string>(group.facultyDepartments);
@@ -251,7 +260,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
       <RouteFallback />
     );
   }
-  if (!progLoading && !activeProgram) return <Navigate to="/academics" replace />;
+  if (!progLoading && !activeProgram && subPrograms.length === 0) return <Navigate to="/academics" replace />;
   // Also wait on the department lookup: rendering before it resolves would
   // show the short code (activeProgram.department / group.deptShortCode)
   // as the page title/H1 and then flash to the full department title once
@@ -376,12 +385,14 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   const activeStaticBatch = activePlacementYear
     ? findDeptBatchStatsForYearLabel(deptShortCodeForPlacements, activePlacementYear.year, mainPlacementYears)
     : null;
-  // The institution-wide published figure is the authoritative one when it
-  // exists for this Academic Year — the department's own uploaded sheet
-  // (placementYearStats.totalOffers) is often a partial/in-progress count,
-  // not the final published total, so this replaces the tile's number
-  // outright rather than showing both side by side.
-  const displayedTotalOffers = activeStaticBatch?.offers ?? placementYearStats?.totalOffers ?? 0;
+  // The department's own uploaded sheet (placementYearStats.totalOffers) is
+  // the authoritative count for the "Total No. of Offers" tile whenever it
+  // exists — it's the actual, complete row count of what an admin imported
+  // for this Academic Year. The institution-wide module's figure only fills
+  // in when the department hasn't uploaded its own records at all for this
+  // year (placementYearStats is null), so a visitor still never sees "no
+  // data" for a batch the institution has published a figure for.
+  const displayedTotalOffers = placementYearStats?.totalOffers ?? activeStaticBatch?.offers ?? 0;
   const hasPlacements = !!(shared.placementIntro || shared.placementStats.length > 0 || shared.placementRecruiters.length > 0 || placementYears.length > 0 || staticDeptBatches.length > 0);
 
   // Individual student Internship Records — same shape/pattern as the
@@ -455,38 +466,24 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     newsEventsCategories = newsEventsSubSections.map((sec) => ({
       key: sec.id,
       label: sec.label,
-      years: (sec.subSections || []).filter(hasCustomSectionContent).length > 0
-        ? (sec.subSections || []).filter(hasCustomSectionContent).map((sub) => {
-            const yearLabel = sub.label.replace(/^Academic Year\s*(::|:|-)?\s*/i, '').trim();
-            const parsedTables = parseFlexibleTable(sub.tableText || '');
-            const firstTable = parsedTables[0] || { headers: [], rows: [] };
-            const mode: 'table' | 'cards' | 'text' | 'both' =
-              firstTable.headers.length > 0 && (sub.imageCards?.length ?? 0) > 0
-                ? 'both'
-                : firstTable.headers.length > 0
-                ? 'table'
-                : (sub.imageCards?.length ?? 0) > 0
-                ? 'cards'
-                : 'text';
-            return {
-              year: yearLabel || sub.label,
-              mode,
-              columns: firstTable.headers,
-              rows: firstTable.rows.map((cells) => ({ cells })),
-              cards: sub.imageCards,
-              text: sub.textContent,
-            };
-          })
-        : [
-            {
-              year: sec.label.replace(/^Academic Year\s*(::|:|-)?\s*/i, '').trim() || sec.label,
-              mode: 'table' as const,
-              columns: parseFlexibleTable(sec.tableText || '')[0]?.headers || [],
-              rows: (parseFlexibleTable(sec.tableText || '')[0]?.rows || []).map((cells) => ({ cells })),
-              cards: sec.imageCards,
-              text: sec.textContent,
-            },
-          ],
+      // Every section/sub-section renders generically (SectionSubtree) below
+      // regardless of its contentType — table, text, image cards, files,
+      // checklist, links, photo gallery, person, contacts, or any mix of
+      // those via further nesting. No content type is special-cased or
+      // filtered out here.
+      years: (() => {
+          // A section can have its own content AND sub-sections at once —
+          // both must show, not just one or the other.
+          const ownOnly = { ...sec, subSections: undefined };
+          const out: NewsEventsYear[] = [];
+          if (hasCustomSectionContent(ownOnly)) {
+            out.push({ year: sec.label.replace(/^Academic Year\s*(::|:|-)?\s*/i, '').trim() || sec.label, columns: [], rows: [], section: ownOnly });
+          }
+          (sec.subSections || []).filter(hasCustomSectionContent).forEach((sub) => {
+            out.push({ year: sub.label.replace(/^Academic Year\s*(::|:|-)?\s*/i, '').trim() || sub.label, columns: [], rows: [], section: sub });
+          });
+          return out;
+        })(),
     })).filter((c) => c.years.length > 0);
   } else {
     newsEventsCategories = [
@@ -909,7 +906,6 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
           <div className="container">
             <div style={{ marginBottom: '1.25rem', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem' }}>
               <div>
-                <span className="section-label dept-section-label" style={{ marginBottom: '0.2rem' }}>Academic Degrees</span>
                 <h2 className="section-title" style={{ fontSize: '1.6rem', margin: 0 }}>Programmes Offered</h2>
               </div>
               <span style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--color-text-light)' }}>
@@ -1063,7 +1059,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                 {activePlacementYear && placementYearStats && (
                   <>
                     <p className="placement-stat-summary">
-                      {activePlacementYear.year} Placements as on date: <strong>{displayedTotalOffers.toLocaleString()}</strong>
+                      {endingYear(activePlacementYear.year)} Placement Snapshot
                     </p>
                     <div className={`dept-stat-grid${placementStatsFull ? ' dept-stat-grid--fill' : ''}`}>
                       <div className="dept-stat-tile">

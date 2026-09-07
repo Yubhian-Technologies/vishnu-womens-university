@@ -495,7 +495,7 @@
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: 1.15fr 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: var(--space-6);
   align-items: stretch;
 }

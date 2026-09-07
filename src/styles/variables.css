@@ -17,9 +17,9 @@
   --color-text: #0f172a;
   --color-text-light: #475569;
 
-  /* Typography — Universal Product Sans */
-  --font-sans: 'Product Sans', sans-serif;
-  --font-serif: 'Product Sans', sans-serif;
+  /* Typography — Stanford Typography System */
+  --font-sans: "Source Sans 3", Helvetica, Arial, sans-serif;
+  --font-serif: "Source Serif 4", Georgia, "Times New Roman", serif;
 
   /* Font Sizes */
   --text-xs: 0.75rem;

@@ -5,6 +5,10 @@
 
 .admission-tabs-bar {
   padding: 10px;
+  /* White bar so the off-white inactive tab chips inside it read as
+     separate, pressable options against the off-white section. */
+  background: var(--color-white);
+  border-color: var(--color-mid-gray);
 }
 
 .admission-tabs-bar .section-tab-btn {
@@ -12,6 +16,23 @@
   font-weight: 800;
   padding: var(--space-4) var(--space-6);
   min-height: 48px;
+  /* The shared style leaves inactive tabs transparent + borderless; give
+     each one a fill and border so it's obvious there are other tabs. */
+  background: var(--color-off-white);
+  border: 1.5px solid var(--color-mid-gray);
+}
+
+.admission-tabs-bar .section-tab-btn:not(.active):hover {
+  background: var(--color-light-gray);
+  border-color: var(--color-accent);
+}
+
+.admission-tabs-bar .section-tab-btn.active {
+  /* re-assert the shared active fill — this file loads after
+     tabbed-section.css, so the inactive background above would otherwise
+     win at equal specificity. */
+  background: var(--color-primary);
+  border-color: var(--color-primary);
 }
 
 .admission-subtabs-bar {
@@ -26,6 +47,7 @@
   font-size: var(--text-sm);
   padding: var(--space-3) var(--space-5);
   text-align: center;
+  border-color: var(--color-mid-gray);
 }
 
 .admission-category-card {
@@ -46,5 +68,59 @@
 @media (max-width: 640px) {
   .admission-subtabs-bar .section-subtab-btn {
     flex: 1 1 100%;
+  }
+}
+
+/* VWUNET full-screen banner (between the page title and the tabs).
+   Rendered outside .container so it spans the full viewport width. */
+.vwunet-banner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: var(--space-2);
+  min-height: clamp(320px, 52vh, 460px);
+  padding: var(--space-12) var(--space-6);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 55%, var(--color-secondary) 100%);
+  color: var(--color-white);
+  text-decoration: none;
+  transition: filter var(--transition-base);
+}
+
+.vwunet-banner:hover {
+  filter: brightness(1.08);
+}
+
+/* VWUNET + full form share one baseline-aligned line; wraps only when the
+   screen is too narrow to fit both. */
+.vwunet-banner__line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  column-gap: var(--space-3);
+  row-gap: var(--space-1);
+}
+
+.vwunet-banner__title {
+  font-family: var(--font-serif);
+  font-weight: 900;
+  font-size: clamp(2.25rem, 6vw, 4rem);
+  line-height: 1.1;
+  letter-spacing: 0.02em;
+}
+
+.vwunet-banner__subtitle {
+  font-family: var(--font-serif);
+  font-size: clamp(1rem, 2.6vw, 1.7rem);
+  line-height: 1.2;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+@media (max-width: 768px) {
+  .vwunet-banner {
+    min-height: clamp(280px, 44vh, 380px);
+    padding: var(--space-10) var(--space-5);
   }
 }

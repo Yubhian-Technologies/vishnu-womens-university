@@ -60,15 +60,21 @@ export default function IntroVideo() {
 
   if (!show) return null;
 
-  // Portalled to <body> so no ancestor in the app tree (which sets
-  // overflow-x: clip on html/body and various stacking contexts) can clip
-  // or offset the full-screen overlay on mobile.
+  // Portalled up to #root (not <body>): `body` carries `overflow-x: clip`,
+  // which clips a position:fixed element that is its *direct* child, leaving
+  // the overlay inset from the viewport on mobile. #root has overflow:
+  // visible — the same place the Header and RouteFallback render and fill
+  // correctly from.
+  const host = (typeof document !== 'undefined' && document.getElementById('root')) || document.body;
   return createPortal(
     <div
       className={`intro-video${fading ? ' intro-video--fading' : ''}`}
-      role="dialog"
-      aria-modal="true"
-      aria-label="Welcome to Vishnu Women's University"
+      // Not role="dialog": a brief auto-dismissing splash isn't a modal, and
+      // a global `@media (max-width:768px) [role="dialog"]` rule was forcing
+      // it into a centred "modal card" (max-width/height minus a 1rem gutter),
+      // which is why it didn't fill the mobile viewport.
+      role="status"
+      aria-label="Loading Vishnu Women's University"
     >
       <video
         ref={videoRef}
@@ -81,6 +87,6 @@ export default function IntroVideo() {
         onEnded={onEnded}
       />
     </div>,
-    document.body,
+    host,
   );
 }

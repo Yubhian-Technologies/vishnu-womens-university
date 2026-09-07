@@ -313,9 +313,8 @@ export default function Admissions() {
               <span className="section-label" style={{ color: 'var(--color-accent)' }}>Fee Structure</span>
               <h2 className="section-title" style={{ color: 'var(--color-white)' }}>Education Within Reach</h2>
               <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 'var(--text-lg)', lineHeight: 1.7, marginBottom: 'var(--space-6)' }}>
-                B.Tech tuition is ₹1,05,000 per year. M.Tech is ₹55,800 and MBA is ₹55,000 annually.
-                Through government scholarships, SC/ST/BC fee reimbursement, and the PM Vidyalaxmi Scheme,
-                a VWU education is financially accessible to every deserving student.
+                At Vishnu Women's University, we are committed to making quality higher education
+                accessible to every deserving student.
               </p>
               <Link to="/programmes-fee-structure" className="btn btn-accent">View Full Fee Structure</Link>
             </div>
@@ -323,7 +322,7 @@ export default function Admissions() {
               {tuitionData.map((row, i) => (
                 <div key={row.id} className="adm-tuition-row" style={{ borderTop: i === tuitionData.length - 2 ? '2px solid rgba(201,168,76,0.4)' : undefined }}>
                   <span>{row.title}</span>
-                  <strong style={{ color: i >= tuitionData.length - 2 ? 'var(--color-accent)' : 'var(--color-white)' }}>{row.value}</strong>
+                  <strong style={{ color: 'var(--color-white)' }}>{row.value}</strong>
                 </div>
               ))}
             </div>
@@ -367,7 +366,7 @@ export default function Admissions() {
             subtitle="From modern labs and smart classrooms to hostels, sports grounds, and a buzzing placement season — see what awaits you at VWU."
             highlights={[
               `AP EAPCET college code: ${eapcetCode}`,
-              '1,400+ placements in 2024–25 alone',
+              '1,100+ placements in 2025–26',
               'Highest package: ₹59.28 LPA',
               '100% scholarship coverage available for eligible students',
               'Campus visit & virtual tour options available',

@@ -440,6 +440,22 @@
   max-width: none;
 }
 
+.exec-detail-banner__description {
+  width: 100%;
+  margin-top: 0.75rem;
+}
+
+.exec-detail-banner__description p {
+  font-size: 1rem;
+  color: var(--color-text-light);
+  line-height: 1.75;
+  margin: 0 0 0.9rem;
+}
+
+.exec-detail-banner__description p:last-child {
+  margin-bottom: 0;
+}
+
 .exec-card__media {
   position: relative;
   overflow: hidden;
@@ -521,7 +537,9 @@
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(0, 47, 25, 0.95);
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-top: 1px solid rgba(255, 255, 255, 0.15);
   padding: 14px 18px;
   color: #ffffff;

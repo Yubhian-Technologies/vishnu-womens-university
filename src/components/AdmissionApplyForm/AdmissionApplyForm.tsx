@@ -20,7 +20,7 @@ const PROGRAM_LEVEL_OPTIONS = [
   { value: 'M.Tech', label: 'M.Tech (Postgraduate)' },
   { value: 'MBA', label: 'MBA (Postgraduate)' },
   { value: 'Ph.D.', label: 'Ph.D. (Doctoral Research)' },
-  { value: 'Other', label: 'Other Degree / Program' },
+  { value: 'Other', label: 'Other Program' },
 ];
 
 const SPECIFIC_PROGRAMS: Record<string, string[]> = {
@@ -111,7 +111,7 @@ function validateRequestInfoForm(form: RequestInfoForm): RequestInfoFormErrors {
   if (!form.lastName.trim()) errors.lastName = 'Please enter your last name.';
   if (!form.phone.trim()) errors.phone = 'Please enter your mobile number.';
   else if (!PHONE_RE.test(form.phone.trim())) errors.phone = 'Please enter a valid mobile number.';
-  if (!form.degreeLevel) errors.degreeLevel = 'Please select a degree level.';
+  if (!form.degreeLevel) errors.degreeLevel = 'Please select a course.';
   if (!form.program) errors.program = 'Please select a specific program.';
   if (isCustomProgramRequired(form) && !form.customProgram.trim()) {
     errors.customProgram = 'Please specify your program name.';
@@ -279,11 +279,10 @@ export default function AdmissionApplyForm() {
 
       try { await logoutFirebaseAuth(); } catch { /* non-fatal */ }
 
-      const fullName = `${requestForm.firstName} ${requestForm.lastName}`.trim();
       setToastInfo({
         show: true,
-        title: 'Inquiry Saved to CRM',
-        message: `Thank you, ${fullName}! Your inquiry details have been saved to the VWU Admissions CRM. Our team will contact you shortly.`,
+        title: 'Verification Successful',
+        message: 'Our VWU team will contact you soon.',
       });
 
       setRequestStatus('success');
@@ -353,11 +352,10 @@ export default function AdmissionApplyForm() {
       // don't leave the browser signed in.
       try { await logoutFirebaseAuth(); } catch { /* non-fatal */ }
 
-      const fullName = `${requestForm.firstName} ${requestForm.lastName}`.trim();
       setToastInfo({
         show: true,
-        title: 'Verification Successful & Added to CRM',
-        message: `Mobile verification complete! ${fullName} has been added to the VWU Admissions CRM. Our team will reach out to ${requestForm.phone} shortly.`,
+        title: 'Verification Successful',
+        message: 'Our VWU team will contact you soon.',
       });
 
       setRequestStatus('success');
@@ -414,7 +412,22 @@ export default function AdmissionApplyForm() {
               {requestErrors.phone && <span className="adm-form-error">{requestErrors.phone}</span>}
             </div>
             <div className="adm-form-group">
-              <label>Degree Level</label>
+              <label>Purpose</label>
+              <select
+                name="purpose" value={requestForm.purpose} onChange={handleRequestFormChange}
+                className={requestErrors.purpose ? 'has-error' : undefined}
+                aria-invalid={!!requestErrors.purpose}
+              >
+                <option value="">Select purpose...</option>
+                {PURPOSE_OPTIONS.map((p) => <option key={p}>{p}</option>)}
+              </select>
+              {requestErrors.purpose && <span className="adm-form-error">{requestErrors.purpose}</span>}
+            </div>
+          </div>
+
+          <div className="adm-form-row">
+            <div className="adm-form-group">
+              <label>Course</label>
               <select
                 name="degreeLevel"
                 value={requestForm.degreeLevel}
@@ -434,7 +447,7 @@ export default function AdmissionApplyForm() {
                 className={requestErrors.degreeLevel ? 'has-error' : undefined}
                 aria-invalid={!!requestErrors.degreeLevel}
               >
-                <option value="">Select degree level...</option>
+                <option value="">Select course...</option>
                 {PROGRAM_LEVEL_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value}>
                     {opt.label}
@@ -443,11 +456,9 @@ export default function AdmissionApplyForm() {
               </select>
               {requestErrors.degreeLevel && <span className="adm-form-error">{requestErrors.degreeLevel}</span>}
             </div>
-          </div>
 
-          <div className="adm-form-row">
             <div className="adm-form-group">
-              <label>Specific Program</label>
+              <label>Program</label>
               <select
                 name="program"
                 value={requestForm.program}
@@ -457,7 +468,7 @@ export default function AdmissionApplyForm() {
                 aria-invalid={!!requestErrors.program}
               >
                 <option value="">
-                  {requestForm.degreeLevel ? 'Select a program...' : 'Select degree first'}
+                  {requestForm.degreeLevel ? 'Select a program...' : 'Select course first'}
                 </option>
                 {requestForm.degreeLevel &&
                   (SPECIFIC_PROGRAMS[requestForm.degreeLevel] || []).map((p) => (
@@ -468,23 +479,10 @@ export default function AdmissionApplyForm() {
               </select>
               {requestErrors.program && <span className="adm-form-error">{requestErrors.program}</span>}
             </div>
-
-            <div className="adm-form-group">
-              <label>Purpose</label>
-              <select
-                name="purpose" value={requestForm.purpose} onChange={handleRequestFormChange}
-                className={requestErrors.purpose ? 'has-error' : undefined}
-                aria-invalid={!!requestErrors.purpose}
-              >
-                <option value="">Select purpose...</option>
-                {PURPOSE_OPTIONS.map((p) => <option key={p}>{p}</option>)}
-              </select>
-              {requestErrors.purpose && <span className="adm-form-error">{requestErrors.purpose}</span>}
-            </div>
           </div>
 
           {(isCustomProgramRequired(requestForm) || requestForm.purpose === 'Other') && (
-            <div className="adm-form-row">
+            <div className="adm-form-row adm-form-row--full">
               {isCustomProgramRequired(requestForm) && (
                 <div className="adm-form-group">
                   <label>Specify Program Name</label>
