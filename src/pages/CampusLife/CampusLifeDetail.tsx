@@ -8,6 +8,7 @@ import { useSitePhotos } from '../../hooks/useSitePhotos';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import { hasCustomSectionContent } from '../../lib/customSections';
 import { findCampusFacilityBySlug } from '../Campus/campusFacilities.data';
+import VwuSportsSection from '../../components/VwuSportsSection/VwuSportsSection';
 import type { CampusLifeItemDoc } from '../Admin/sections/CampusLifeAdmin';
 import '../detail-layout.css';
 import '../Campus/tabbed-section.css';
@@ -130,6 +131,9 @@ export default function CampusLifeDetail({ slug: slugProp }: { slug?: string }) 
       ) : (
         <CustomSectionsRenderer sections={visibleSections} navOffset={NAV_OFFSET} />
       )}
+
+      {/* "Sports & Games at VWU" — relocated here from /student-life. */}
+      {slug === 'sports-games' && <VwuSportsSection />}
 
       {!isActivity && photos.length > 0 && (
         <section className="section bg-off-white">

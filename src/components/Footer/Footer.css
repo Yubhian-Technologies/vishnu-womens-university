@@ -506,6 +506,21 @@
     padding: 2.5rem 0 2rem;
   }
 
+  /* Keep the Telugu brand title on one line — scale it (and the logo) down
+     with the viewport instead of letting it overflow the container. */
+  .vwu-footer-logo-wrap {
+    gap: 0.6rem;
+    max-width: 100%;
+  }
+
+  .vwu-footer-logo-img {
+    height: 44px;
+  }
+
+  .vwu-brand-main {
+    font-size: clamp(0.7rem, 4.2vw, 1.15rem);
+  }
+
   /* Switch desktop grid to mobile accordions */
   .vwu-footer-nav-grid {
     display: none;
