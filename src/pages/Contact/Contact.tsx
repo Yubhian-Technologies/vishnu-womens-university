@@ -112,7 +112,7 @@ const DEFAULT_INFO_CARDS = [
   },
   {
     id: 'default-info-3',
-    title: 'SVES Head office',
+    title: 'Society Head Office',
     desc: 'Plot 7 & 8, Nagarjuna Hills, Punjagutta Main Road\nHyderabad - 500 082, Telangana\nPhones: 040-40334899 / 897 / 866 / 829',
     value: 'SVES Central Office',
     slug: '040-40334818 / 4848',
@@ -297,7 +297,7 @@ export default function Contact() {
         <div className="contact-hero-glow" aria-hidden="true" />
         <div className="container contact-hero-clean__inner">
           <h1 className="contact-hero-clean__title">
-            Got Questions? We’ve Got You
+            Got Questions? We Are Here
           </h1>
           <p className="contact-hero-clean__subtitle">
             Curious about admissions, programmes, or campus life? Our team is here to help you with everything you need.
@@ -336,7 +336,7 @@ export default function Contact() {
         <div className="container">
           <div className="section-head-center">
             <span className="section-label">Key Contact Points</span>
-            <h2 className="section-title">Connect with the Team</h2>
+            <h2 className="section-title">Connect with our Team</h2>
             <p className="section-subtitle">
               Dedicated support desks for <strong>admissions, administrative services, and campus visits</strong>, providing timely assistance and guidance.
             </p>

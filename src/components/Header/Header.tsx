@@ -44,9 +44,9 @@ const navItemsData: NavItem[] = [
     label: 'About Us',
     highlight: {
       title: 'Vishnu Women\'s University',
-      badge: 'About SVES',
-      description: 'Pioneering women\'s engineering education under Sri Vishnu Educational Society with world-class infrastructure and values.',
-      linkText: 'Explore Campus',
+      badge: 'About VWU',
+      description: 'Sri Vishnu Educational Society, sponsoring Society for Vishnu Women\'s University is committed to empowering women through excellence in engineering education.',
+      linkText: 'Explore VWU',
       linkPath: '/about',
     },
     groups: [

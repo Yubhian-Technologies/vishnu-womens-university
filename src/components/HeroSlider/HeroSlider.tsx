@@ -242,9 +242,9 @@ export default function HeroSlider() {
           </div>
         </form>
         <div className="hero-tag-words" aria-label="Values">
-          <span>Empower</span>
+          <span>Think</span>
           <span className="hero-tag-dot">•</span>
-          <span>Innovate</span>
+          <span>Build</span>
           <span className="hero-tag-dot">•</span>
           <span>Lead</span>
         </div>

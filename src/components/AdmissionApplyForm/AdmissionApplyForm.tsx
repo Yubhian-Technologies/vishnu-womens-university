@@ -482,7 +482,7 @@ export default function AdmissionApplyForm() {
           </div>
 
           {(isCustomProgramRequired(requestForm) || requestForm.purpose === 'Other') && (
-            <div className="adm-form-row">
+            <div className="adm-form-row adm-form-row--full">
               {isCustomProgramRequired(requestForm) && (
                 <div className="adm-form-group">
                   <label>Specify Program Name</label>

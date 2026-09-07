@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import * as XLSX from 'xlsx';
-import { deleteDoc, doc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { deleteDoc, doc, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useCollection, type WithId } from '../../../hooks/useCollection';
 import {
@@ -39,10 +39,16 @@ const EMPTY: FormState = {
 function rowsToText(rows: PlacementRow[]): string {
   return rows.map((r) => r.sector ? `${r.company} | ${r.selects} | ${r.salary} | ${r.sector}` : `${r.company} | ${r.selects} | ${r.salary}`).join('\n');
 }
+// A blank/malformed Selects field defaults to 1, not 0 — matching
+// parseCompanyRowsWorkbook's Excel-import convention below. A row stuck at
+// 0 selects would still count toward Median (which doesn't weight by
+// Selects) while contributing nothing to Average (which does), making
+// Average silently wrong or missing for a hand-typed/edited row whenever
+// its Selects number is left blank or mistyped.
 function textToRows(text: string): PlacementRow[] {
   return text.split('\n').map((l) => l.trim()).filter(Boolean).map((line) => {
-    const [company = '', selects = '0', salary = '', sector] = line.split('|').map((p) => p.trim());
-    return { company, selects: Number(selects) || 0, salary, ...(sector ? { sector } : {}) };
+    const [company = '', selects = '', salary = '', sector] = line.split('|').map((p) => p.trim());
+    return { company, selects: Number(selects) || 1, salary, ...(sector ? { sector } : {}) };
   });
 }
 // Catches the #1 way this textarea silently corrupts data: a line typed
@@ -93,31 +99,72 @@ interface ComputedPlacementStats {
 // row of "Capgemini | 116 | 4.25" counts as 116 students at 4.25 LPA, not
 // one data point) — a plain per-row average would be skewed by companies
 // that only hired a handful of students vs. those that hired hundreds.
-function computePlacementYearStats(rows: PlacementRow[]): ComputedPlacementStats {
+// `dedupedSalariesLPA`, when given, is one entry per distinct student —
+// their single highest-package offer — collected at Excel-import time
+// before per-student identity is lost to Company+CTC grouping (see
+// parseCompanyRowsWorkbook). A student who shows up on 3 rows (e.g.
+// Amazon-34, Adobe-32, Capgemini-13) must count only their 34 toward
+// average/median/highest/offers-above-X, not all three — otherwise a
+// student who simply collected more offers skews those figures. `total`
+// and `companiesVisited` are unaffected: every offer still counts toward
+// Total Placements and each company's Selects, since those genuinely
+// happened — only the salary-based figures are computed off the deduped
+// list when it's available.
+// Median is computed on a different basis than Average/Highest/Offers-above-X
+// — deliberately, per an explicit admin call: a company that hired 279
+// students at 3.6 LPA is one entry in the sorted list for Median purposes,
+// not 279 identical ones dominating where the middle falls. So `medianBasis`
+// is always one CTC per Company Row (or one per distinct student, when
+// `dedupedSalariesLPA` is available from a fresh per-student Excel import —
+// see parseCompanyRowsWorkbook) — never repeated by Selects.
+// Split out so it can be recomputed on its own (see startEdit below) without
+// touching Average/Highest/Offers-above-X — those still need per-student
+// data to dedupe correctly, which only exists right after a fresh Excel
+// import and can't be reconstructed once a year is saved and reopened, so
+// they must keep showing whatever was saved rather than being silently
+// recalculated wrong on every edit. Median never has that problem: it's
+// always derivable from the Company Rows alone (Company/Selects/CTC), so
+// it's safe — and important — to always show a live, current value.
+function computeMedianSalaryLPA(rows: PlacementRow[], dedupedSalariesLPA?: number[]): number | null {
+  const medianBasis = dedupedSalariesLPA && dedupedSalariesLPA.length > 0
+    ? dedupedSalariesLPA
+    : rows.map((r) => parseSalaryLPA(r.salary)).filter((v): v is number => v != null);
+  if (medianBasis.length === 0) return null;
+  const round2 = (n: number) => Math.round(n * 100) / 100;
+  const sorted = [...medianBasis].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 !== 0 ? sorted[mid] : round2((sorted[mid - 1] + sorted[mid]) / 2);
+}
+
+function computePlacementYearStats(rows: PlacementRow[], dedupedSalariesLPA?: number[]): ComputedPlacementStats {
   const total = rows.reduce((sum, r) => sum + (r.selects || 0), 0);
   const companiesVisited = new Set(rows.map((r) => r.company.trim().toLowerCase()).filter(Boolean)).size;
 
-  const salaryEntries: number[] = [];
-  for (const r of rows) {
-    const lpa = parseSalaryLPA(r.salary);
-    if (lpa == null) continue;
-    for (let i = 0; i < r.selects; i++) salaryEntries.push(lpa);
+  let salaryEntries: number[];
+  if (dedupedSalariesLPA && dedupedSalariesLPA.length > 0) {
+    salaryEntries = dedupedSalariesLPA;
+  } else {
+    salaryEntries = [];
+    for (const r of rows) {
+      const lpa = parseSalaryLPA(r.salary);
+      if (lpa == null) continue;
+      for (let i = 0; i < r.selects; i++) salaryEntries.push(lpa);
+    }
   }
 
-  if (salaryEntries.length === 0) {
-    return { total, companiesVisited, averageSalaryLPA: null, medianSalaryLPA: null, highestPackageLPA: null, offersAbove50LPA: 0, offersAbove30LPA: 0, offersAbove10LPA: 0 };
-  }
   const round2 = (n: number) => Math.round(n * 100) / 100;
+
+  if (salaryEntries.length === 0) {
+    return { total, companiesVisited, averageSalaryLPA: null, medianSalaryLPA: computeMedianSalaryLPA(rows, dedupedSalariesLPA), highestPackageLPA: null, offersAbove50LPA: 0, offersAbove30LPA: 0, offersAbove10LPA: 0 };
+  }
   const sorted = [...salaryEntries].sort((a, b) => a - b);
-  const mid = Math.floor(sorted.length / 2);
-  const medianSalaryLPA = sorted.length % 2 !== 0 ? sorted[mid] : round2((sorted[mid - 1] + sorted[mid]) / 2);
   const averageSalaryLPA = round2(salaryEntries.reduce((a, b) => a + b, 0) / salaryEntries.length);
 
   return {
     total,
     companiesVisited,
     averageSalaryLPA,
-    medianSalaryLPA,
+    medianSalaryLPA: computeMedianSalaryLPA(rows, dedupedSalariesLPA),
     highestPackageLPA: sorted[sorted.length - 1],
     offersAbove50LPA: salaryEntries.filter((v) => v > 50).length,
     offersAbove30LPA: salaryEntries.filter((v) => v > 30).length,
@@ -134,6 +181,10 @@ interface CompanyRowsImportResult {
   /** Only set when the source sheet also has a Department/Branch column —
    *  see parseCompanyRowsWorkbook below. */
   branchOffers?: BranchOfferCount[];
+  /** Only set when the source sheet also has a student Name/Regd No column —
+   *  one entry per distinct student, their highest package only. See
+   *  computePlacementYearStats. */
+  dedupedSalariesLPA?: number[];
   warning?: string;
 }
 
@@ -168,6 +219,24 @@ function parseCompanyRowsWorkbook(buf: ArrayBuffer): CompanyRowsImportResult {
   const sectorIdx = findCol('industry', 'sector');
   const selectsIdx = findCol('select', 'offers');
   const departmentIdx = findCol('department', 'branch');
+  // Student identity, when the sheet has it — Regd/Roll No preferred over
+  // Name (two students could share a name; a reg no never collides). Used
+  // only to collapse one student's multiple offer-rows down to their single
+  // highest package for the salary-based stats below — the "name" check
+  // excludes "Company Name"-style headers so it doesn't latch onto that
+  // column instead.
+  // Covers both abbreviated ("Roll No", "Reg No") and spelled-out ("Roll
+  // Number", "Register Number") headers — "rollno" as a plain substring
+  // check doesn't match "rollnumber", so both suffixes are checked.
+  let studentKeyIdx = header.findIndex((h) =>
+    ['regdno', 'regdnumber', 'regno', 'regnumber', 'registrationno', 'registrationnumber', 'registerno', 'registernumber', 'rollno', 'rollnumber', 'htno', 'htnumber', 'hallticketno', 'hallticketnumber', 'hallticket', 'admissionno', 'admissionnumber'].some((a) => h.includes(a))
+  );
+  const studentKeyIsUniqueId = studentKeyIdx !== -1;
+  if (studentKeyIdx === -1) {
+    studentKeyIdx = header.findIndex((h, i) =>
+      h.includes('name') && !['company', 'recruiter', 'employer', 'organis', 'organiz'].some((bad) => header[i].includes(bad))
+    );
+  }
 
   if (companyIdx === -1 || packageIdx === -1) {
     return {
@@ -177,6 +246,40 @@ function parseCompanyRowsWorkbook(buf: ArrayBuffer): CompanyRowsImportResult {
   }
 
   const dataRows = raw.slice(1).map((r) => r.map((c) => String(c ?? '').trim())).filter((r) => r.some((c) => c !== ''));
+
+  // One entry per distinct student — their highest package only — collected
+  // here while each row still names the student, before the grouping below
+  // discards that identity into Company+CTC buckets. A student with offers
+  // from 3 companies at different packages must only count once, at their
+  // best offer, toward average/median/highest/offers-above-X.
+  //
+  // When the sheet has no unique ID (Roll No/Reg No) and we're falling back
+  // to Name, two different students with the same name would otherwise get
+  // wrongly merged into one — silently dropping a real data point and
+  // skewing rank-based stats like the median (this is what "median: got
+  // 4.25, expected 5.5" turned out to be: one merge too many flipped an
+  // odd-length list, whose median is a single real value, into an
+  // even-length one, whose median is an average of two). Folding in
+  // Department (when the sheet has one) as part of the key makes an
+  // accidental same-name merge require both a name AND department match,
+  // which two distinct students are far less likely to hit than name alone.
+  let dedupedSalariesLPA: number[] | undefined;
+  if (studentKeyIdx !== -1) {
+    const bestByStudent = new Map<string, number>();
+    for (const row of dataRows) {
+      const rawKey = (row[studentKeyIdx] || '').trim().toLowerCase();
+      if (!rawKey) continue;
+      const key = !studentKeyIsUniqueId && departmentIdx !== -1
+        ? `${rawKey}|${(row[departmentIdx] || '').trim().toLowerCase()}`
+        : rawKey;
+      const lpa = parseSalaryLPA((row[packageIdx] || '').trim());
+      if (lpa == null) continue;
+      const existing = bestByStudent.get(key);
+      if (existing == null || lpa > existing) bestByStudent.set(key, lpa);
+    }
+    if (bestByStudent.size > 0) dedupedSalariesLPA = [...bestByStudent.values()];
+  }
+
   const groups = new Map<string, PlacementRow>();
   const departmentGroups = new Map<string, { label: string; offers: number; highestLPA: number | null }>();
   for (const row of dataRows) {
@@ -214,7 +317,7 @@ function parseCompanyRowsWorkbook(buf: ArrayBuffer): CompanyRowsImportResult {
         ...(g.highestLPA != null ? { highestLPA: g.highestLPA } : {}),
       }));
 
-  return { rows: Array.from(groups.values()), branchOffers };
+  return { rows: Array.from(groups.values()), branchOffers, dedupedSalariesLPA };
 }
 
 /** Header-aware counterpart to the generic TableImportButton, specific to
@@ -223,7 +326,7 @@ function parseCompanyRowsWorkbook(buf: ArrayBuffer): CompanyRowsImportResult {
  *  Department column is present (see parseCompanyRowsWorkbook above),
  *  rather than blindly joining columns in whatever order the file has them,
  *  which is what silently produced garbled rows before this existed. */
-function CompanyRowsImportButton({ onImport }: { onImport: (rows: PlacementRow[], branchOffers?: BranchOfferCount[]) => void }) {
+function CompanyRowsImportButton({ onImport }: { onImport: (rows: PlacementRow[], branchOffers?: BranchOfferCount[], dedupedSalariesLPA?: number[]) => void }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -233,7 +336,7 @@ function CompanyRowsImportButton({ onImport }: { onImport: (rows: PlacementRow[]
     setStatus(null);
     try {
       const buf = await file.arrayBuffer();
-      const { rows, branchOffers, warning } = parseCompanyRowsWorkbook(buf);
+      const { rows, branchOffers, dedupedSalariesLPA, warning } = parseCompanyRowsWorkbook(buf);
       if (warning) {
         setError(warning);
         return;
@@ -242,10 +345,11 @@ function CompanyRowsImportButton({ onImport }: { onImport: (rows: PlacementRow[]
         setError('No data rows found in that file.');
         return;
       }
-      onImport(rows, branchOffers);
+      onImport(rows, branchOffers, dedupedSalariesLPA);
       const studentCount = rows.reduce((sum, r) => sum + r.selects, 0);
       const deptNote = branchOffers ? ` and Department-wise Offers for ${branchOffers.length} department${branchOffers.length === 1 ? '' : 's'}` : '';
-      setStatus(`Imported ${studentCount} student${studentCount === 1 ? '' : 's'} across ${rows.length} Company/CTC row${rows.length === 1 ? '' : 's'}${deptNote} — replaced the table${branchOffers ? 's' : ''} above.`);
+      const dedupNote = dedupedSalariesLPA ? ` Average/Median/Highest salary were computed from each student's single best offer (${dedupedSalariesLPA.length} distinct student${dedupedSalariesLPA.length === 1 ? '' : 's'}), not every row.` : '';
+      setStatus(`Imported ${studentCount} student${studentCount === 1 ? '' : 's'} across ${rows.length} Company/CTC row${rows.length === 1 ? '' : 's'}${deptNote} — replaced the table${branchOffers ? 's' : ''} above.${dedupNote}`);
     } catch {
       setError("Could not read that file — make sure it's a valid Excel (.xlsx/.xls) or CSV file.");
     }
@@ -301,6 +405,16 @@ export default function PlacementYearsAdmin() {
   const [editing, setEditing] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [seeding, setSeeding] = useState(false);
+  const [recalculating, setRecalculating] = useState(false);
+  // Set only right after a fresh Excel import that found a student-identity
+  // column (see parseCompanyRowsWorkbook) — one highest-package entry per
+  // distinct student. Kept in state (not just passed once to
+  // applyComputedStats) so that later edits to the Company Rows textarea
+  // still use it on blur, instead of silently reverting Average/Median back
+  // to the old weighted-by-every-offer calculation the moment the admin
+  // clicks into that field again. Cleared on save, cancel, or switching to
+  // edit an existing year, since none of those retain fresh per-student data.
+  const [importedDedupedSalaries, setImportedDedupedSalaries] = useState<number[] | undefined>(undefined);
 
   const set = <K extends keyof FormState>(k: K, v: FormState[K]) => setForm((p) => ({ ...p, [k]: v }));
 
@@ -310,9 +424,9 @@ export default function PlacementYearsAdmin() {
   // fields never have to be worked out and typed in separately. Left as
   // ordinary editable inputs afterward, so an admin can still override any
   // one of them before saving.
-  const applyComputedStats = (rows: PlacementRow[]) => {
+  const applyComputedStats = (rows: PlacementRow[], dedupedSalariesLPA?: number[]) => {
     if (rows.length === 0) return;
-    const stats = computePlacementYearStats(rows);
+    const stats = computePlacementYearStats(rows, dedupedSalariesLPA);
     setForm((p) => ({
       ...p,
       total: String(stats.total),
@@ -356,6 +470,7 @@ export default function PlacementYearsAdmin() {
       });
       setForm(EMPTY);
       setEditing(null);
+      setImportedDedupedSalaries(undefined);
     } catch (e) {
       alert(`Couldn't save: ${(e as Error).message}`);
     } finally {
@@ -365,6 +480,7 @@ export default function PlacementYearsAdmin() {
 
   const startEdit = (y: PlacementYearDoc) => {
     setEditing(y.batch);
+    setImportedDedupedSalaries(undefined);
     setForm({
       batch: y.batch,
       total: y.total != null ? String(y.total) : '',
@@ -381,6 +497,17 @@ export default function PlacementYearsAdmin() {
       offersAbove10LPA: y.offersAbove10LPA != null ? String(y.offersAbove10LPA) : '',
       hideFromSummary: y.hideFromSummary ?? false,
     });
+    // Median specifically is always refreshed live from the year's current
+    // Company Rows on open — it never needs per-student import data (see
+    // computeMedianSalaryLPA), so there's no reason to ever show a stale
+    // saved value for it. Average/Highest/Offers-above-X are deliberately
+    // left as whatever was saved: those can only be correctly deduped by
+    // student right after a fresh Excel import, and that per-student data
+    // no longer exists once a year is saved and reopened — recalculating
+    // them here would silently replace a correct saved figure with a wrong
+    // one computed from the aggregated rows alone.
+    const liveMedian = computeMedianSalaryLPA(y.rows || []);
+    setForm((p) => ({ ...p, medianSalaryLPA: liveMedian != null ? String(liveMedian) : '' }));
   };
 
   const remove = async (batchId: string) => {
@@ -419,6 +546,50 @@ export default function PlacementYearsAdmin() {
       alert(`Couldn't load site data: ${(e as Error).message}`);
     } finally {
       setSeeding(false);
+    }
+  };
+
+  // Re-runs the SAFE stats against every already-saved year's own Company
+  // Rows, all at once — Total Placements, Companies Visited, Median Salary,
+  // and Highest Package are always exactly derivable from Company/Selects/
+  // CTC alone (median never weights by Selects — see computeMedianSalaryLPA
+  // — and the max of a set is the same whether or not it's weighted), so
+  // it's always safe to recompute these for every year in bulk, covering
+  // years saved before this median fix existed without having to reopen
+  // each one individually.
+  //
+  // Average Salary and the Offers-above-X counts are deliberately left
+  // alone here — they should weight by Selects, per-student-deduped when
+  // possible, and that per-student identity (who got which of their
+  // multiple offers) only exists right after a fresh Excel import; it's
+  // gone from the aggregated Company Rows once a year is saved. Bulk-
+  // recomputing them here would silently replace a correctly-deduped saved
+  // Average with a wrong non-deduped one for any year that WAS imported
+  // correctly — exactly the regression this same mistake caused in
+  // startEdit before it was fixed. The only way to get a truly correct,
+  // per-student-deduped Average for an already-saved year is to re-import
+  // that year's original per-student Excel file.
+  const recalculateAllStats = async () => {
+    const withRows = sortedYears.filter((y) => (y.rows?.length ?? 0) > 0);
+    if (withRows.length === 0) return alert('No years have Company Rows to calculate stats from.');
+    if (!confirm(`Recalculate Total Placements, Companies Visited, Median Salary, and Highest Package for all ${withRows.length} year(s) that have Company Rows, from their Salary column? This overwrites whatever those fields currently hold for each. Average Salary and the Offers-above-X counts are left untouched — those need each year's original per-student Excel re-imported to recompute correctly.`)) return;
+    setRecalculating(true);
+    try {
+      for (const y of withRows) {
+        const stats = computePlacementYearStats(y.rows);
+        await updateDoc(doc(db, 'placementYears', y.batch), {
+          total: stats.total,
+          companiesVisited: stats.companiesVisited,
+          medianSalaryLPA: stats.medianSalaryLPA,
+          highestPackageLPA: stats.highestPackageLPA,
+          updatedAt: serverTimestamp(),
+        });
+      }
+      alert(`Recalculated Total Placements, Companies Visited, Median Salary, and Highest Package for ${withRows.length} year(s). Average Salary and Offers-above-X were left as-is — re-import a year's original per-student Excel to correct those.`);
+    } catch (e) {
+      alert(`Couldn't recalculate all years: ${(e as Error).message}`);
+    } finally {
+      setRecalculating(false);
     }
   };
 
@@ -495,22 +666,23 @@ export default function PlacementYearsAdmin() {
               rows={14}
               value={form.rowsText}
               onChange={(e) => set('rowsText', e.target.value)}
-              onBlur={(e) => applyComputedStats(textToRows(e.target.value))}
+              onBlur={(e) => applyComputedStats(textToRows(e.target.value), importedDedupedSalaries)}
               placeholder={'Google | 3 | 59.15 | IT Sector\nAdobe | 4 | 53.35 | IT Sector'}
             />
             <div style={{ marginTop: '0.4rem' }}>
               <CompanyRowsImportButton
-                onImport={(rows, branchOffers) => {
+                onImport={(rows, branchOffers, dedupedSalariesLPA) => {
                   set('rowsText', rowsToText(rows));
                   if (branchOffers && branchOffers.length > 0) set('branchOffersText', offersToText(branchOffers));
-                  applyComputedStats(rows);
+                  setImportedDedupedSalaries(dedupedSalariesLPA);
+                  applyComputedStats(rows, dedupedSalariesLPA);
                 }}
               />
             </div>
           </div>
         </div>
         <div className="admin-form-actions">
-          {editing && <button className="admin-btn admin-btn--ghost" onClick={() => { setEditing(null); setForm(EMPTY); }}>Cancel</button>}
+          {editing && <button className="admin-btn admin-btn--ghost" onClick={() => { setEditing(null); setForm(EMPTY); setImportedDedupedSalaries(undefined); }}>Cancel</button>}
           <button className="admin-btn admin-btn--primary" onClick={save} disabled={saving}>
             {saving ? 'Saving…' : editing ? 'Update' : 'Add Year'}
           </button>
@@ -551,9 +723,14 @@ export default function PlacementYearsAdmin() {
           </div>
         )}
         {sortedYears.length > 0 && (
-          <button className="admin-btn admin-btn--sm admin-btn--ghost" style={{ marginTop: '1rem' }} onClick={seedFromSiteData} disabled={seeding}>
-            {seeding ? 'Loading…' : 'Re-load original site data'}
-          </button>
+          <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap', marginTop: '1rem' }}>
+            <button className="admin-btn admin-btn--sm admin-btn--ghost" onClick={seedFromSiteData} disabled={seeding}>
+              {seeding ? 'Loading…' : 'Re-load original site data'}
+            </button>
+            <button className="admin-btn admin-btn--sm" onClick={recalculateAllStats} disabled={recalculating}>
+              {recalculating ? 'Recalculating…' : '🔄 Recalculate Median Salary for All Years'}
+            </button>
+          </div>
         )}
       </div>
     </div>

@@ -32,14 +32,6 @@ const ACTIVITY_LABELS: Record<string, string> = {
 
 const NAV_OFFSET = 'calc(var(--topbar-height) + var(--header-height) + 1rem)';
 
-// These two facility pages moved out of Campus Life's header nav and its
-// "Quick Navigation" sidebar list (now linked from Academics > Information
-// instead) — see campusFacilities.data.ts. They're still rendered by this
-// same shared component (their URLs are unchanged), so the sidebar has to be
-// suppressed here explicitly rather than just by removing them from the
-// facilities array, or it'd keep showing on these two pages alone.
-const RELOCATED_TO_ACADEMICS_SLUGS = ['smart-classrooms', 'state-of-the-art-labs'];
-
 /**
  * One shared detail page for every admin-managed Campus Life page — the 16
  * facility pages under /campus/:slug (some as a single scrolling page of
@@ -62,7 +54,6 @@ export default function CampusLifeDetail({ slug: slugProp }: { slug?: string }) 
   const activeTab = visibleTabs.find((t) => t.id === activeTabId) ?? visibleTabs[0];
 
   const isActivity = ACTIVITY_SLUGS.includes(slug);
-  const showQuickNav = !isActivity && !RELOCATED_TO_ACADEMICS_SLUGS.includes(slug);
   const facilityDefault = !isActivity ? findCampusFacilityBySlug(slug) : undefined;
   const activityDefault = isActivity ? ACTIVITY_DEFAULTS[slug] : undefined;
 
@@ -116,7 +107,6 @@ export default function CampusLifeDetail({ slug: slugProp }: { slug?: string }) 
         <section className="section bg-white">
           <div className="container">
             <div>
-              <span className="section-label">{showQuickNav ? 'Campus Life' : 'Academics'}</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>{title}</h2>
               {visibleSections.length > 0 ? (
                 <div style={{ marginTop: 'var(--space-5)' }}>

@@ -131,6 +131,29 @@ export function findCompanyColumnIndex(columns: string[]): number {
   return idx;
 }
 
+// Finds whichever column identifies the actual student — Registration/Roll
+// Number preferred over Name (two different students could technically
+// share a name within one batch; a reg no never collides). Used to collapse
+// a student who appears on more than one row (one row per offer they
+// received, e.g. Amazon/Capgemini/Adobe at 34/54/42 LPA) down to a single
+// entry at their own highest package before computing salary-based stats —
+// without this, that one student's 3 offers would each count separately
+// and skew the average/median toward someone who just happened to interview
+// more, rather than reflecting what students actually earn. Returns -1 when
+// the data has no such column (e.g. the aggregate "Company Rows" shape used
+// elsewhere, which has no per-student identity at all), in which case every
+// row's package is used as-is.
+function findStudentKeyColumnIndex(columns: string[]): number {
+  const normalized = columns.map((c) => c.toLowerCase().replace(/[^a-z]/g, ''));
+  let idx = normalized.findIndex((c) => c.includes('regdno') || c.includes('registrationno') || c.includes('regno') || c.includes('rollno') || c.includes('htno') || c.includes('hallticket'));
+  if (idx === -1) {
+    idx = normalized.findIndex((c, i) =>
+      c.includes('name') && !['company', 'recruiter', 'employer', 'organis', 'organiz'].some((bad) => normalized[i].includes(bad))
+    );
+  }
+  return idx;
+}
+
 function median(values: number[]): number {
   if (values.length === 0) return NaN;
   const sorted = [...values].sort((a, b) => a - b);
@@ -171,11 +194,29 @@ export function computePlacementStats(columns: string[], rows: PlacementRecordRo
       ).size;
 
   const pkgIdx = findPackageColumnIndex(columns);
+  const studentKeyIdx = findStudentKeyColumnIndex(columns);
   // parsePackageValue already normalizes rupee-scale figures down to LPA,
-  // so nothing further is needed here.
-  const packages = pkgIdx === -1
-    ? []
-    : rows.map((r) => parsePackageValue(r.cells[pkgIdx] || '')).filter((v) => !Number.isNaN(v));
+  // so nothing further is needed here. When the data identifies students
+  // (Regd No / Name), a student with more than one offer row is collapsed
+  // to a single entry at their own highest package first — see
+  // findStudentKeyColumnIndex. Without such a column, every row's package
+  // is used as-is (can't dedupe what can't be identified).
+  let packages: number[];
+  if (pkgIdx === -1) {
+    packages = [];
+  } else if (studentKeyIdx === -1) {
+    packages = rows.map((r) => parsePackageValue(r.cells[pkgIdx] || '')).filter((v) => !Number.isNaN(v));
+  } else {
+    const bestByStudent = new Map<string, number>();
+    for (const r of rows) {
+      const key = (r.cells[studentKeyIdx] || '').trim().toLowerCase();
+      const value = parsePackageValue(r.cells[pkgIdx] || '');
+      if (!key || Number.isNaN(value)) continue;
+      const existing = bestByStudent.get(key);
+      if (existing == null || value > existing) bestByStudent.set(key, value);
+    }
+    packages = [...bestByStudent.values()];
+  }
 
   const hasPackages = packages.length > 0;
   return {
