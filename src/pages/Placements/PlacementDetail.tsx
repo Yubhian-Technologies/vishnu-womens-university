@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { orderBy } from 'firebase/firestore';
-import { Trophy, BarChart3, PlayCircle, MapPin } from 'lucide-react';
+import { Trophy, BarChart3, PlayCircle, MapPin, CheckCircle2 } from 'lucide-react';
 import { useCollection, useOrderedCollection, type WithId } from '../../hooks/useCollection';
 import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import { usePageBanners } from '../../hooks/usePageBanners';
@@ -11,7 +11,7 @@ import { parseStructuredTable, parseFlexibleTable } from '../../lib/structuredTa
 import type { PlacementItemDoc } from '../Admin/sections/PlacementItemsAdmin';
 import type { TpoTeamBioDoc } from '../Admin/sections/TpoTeamInfoAdmin';
 import type { PlacementCrtDoc } from '../Admin/sections/PlacementCrtDocsAdmin';
-import PlacementYearAccordion, { BranchOffersBarChart, BRANCH_COLORS } from './PlacementYearAccordion';
+import PlacementYearAccordion, { BranchOffersBarChart } from './PlacementYearAccordion';
 import SmoothCollapse from '../../components/SmoothCollapse/SmoothCollapse';
 import { successStories } from './successStories.data';
 import { industryLiaisonOffices } from './industryLiaisonOffices.data';
@@ -141,22 +141,6 @@ const PARTNER_LOGO_OVERRIDES: Record<string, string> = {
 // facts instead of a wrapped run-on sentence. Any outcome text that doesn't
 // match (a different sub-page's plain achievement bullet, say) renders as-is.
 const OUTCOME_BATCH_SUMMARY_RE = /^(.+?)\s+batch:\s*([\d,]+)\s*placements,\s*highest\s+(.+)$/i;
-function OutcomeTileText({ text }: { text: string }) {
-  const m = text.match(OUTCOME_BATCH_SUMMARY_RE);
-  if (!m) return <>{text}</>;
-  const [, batch, count, highest] = m;
-  // The raw admin-entered count sometimes has a thousands comma baked in
-  // (e.g. "1,156") and sometimes doesn't (e.g. "1103") — strip it so every
-  // tile reads the same way regardless of how it was typed.
-  const countDigitsOnly = count.replace(/,/g, '');
-  return (
-    <>
-      <span style={{ display: 'block', textAlign: 'center' }}>{batch} batch</span>
-      <span style={{ display: 'block', textAlign: 'center' }}>{countDigitsOnly} placements</span>
-      Highest Package: {highest}
-    </>
-  );
-}
 
 // Logo only — no company name label beside it (per request). The name still
 // lives in alt text/title for accessibility and hover, just not rendered as
@@ -375,6 +359,167 @@ function HigherEducationAccordion() {
           </div>
         );
       })}
+    </div>
+  );
+}
+
+// Shared by the Placement Guidelines and Campus Recruitment & Training
+// sub-pages — both read the same admin-entered Intro text every other
+// Placement sub-page already uses (see BodyBlocks.tsx: "**Heading**" lines
+// as sub-headings, "- " lines as bullets), just grouped into cards here
+// instead of the plain BodyBlocks paragraph/bullet styling. Nothing new to
+// type in the admin — a "**Category**" line starts a new card, the "- "
+// lines under it become that card's checklist.
+interface ChecklistCategory {
+  title: string;
+  items: string[];
+}
+
+function parseChecklistCategories(intro: string): ChecklistCategory[] {
+  const categories: ChecklistCategory[] = [];
+  let current: ChecklistCategory | null = null;
+  for (const block of parseBodyContent(intro)) {
+    if (block.type === 'paragraph') {
+      const headingMatch = block.text.match(/^\*\*(.+)\*\*$/);
+      if (headingMatch) {
+        current = { title: headingMatch[1].replace(/:\s*$/, '').trim(), items: [] };
+        categories.push(current);
+        continue;
+      }
+      // A plain (non-"- ", non-heading) line under a category — e.g.
+      // Placement Excellence's "1103 offers" / "59.28 LPA (Google)" lines,
+      // which aren't bulleted. Collected as an item exactly like a "- " line
+      // would be; the renderer decides whether to show a bullet at all.
+      if (!current) {
+        current = { title: '', items: [] };
+        categories.push(current);
+      }
+      current.items.push(block.text);
+      continue;
+    }
+    if (!current) {
+      current = { title: '', items: [] };
+      categories.push(current);
+    }
+    current.items.push(...block.items);
+  }
+  return categories;
+}
+
+const GUIDELINE_CATEGORY_COLORS = [
+  { background: '#EAF3FC', heading: '#1D4ED8' },
+  { background: '#E9F7F1', heading: '#0F766E' },
+  { background: '#FBEEE6', heading: '#C2410C' },
+  { background: '#EFEAFB', heading: '#6D28D9' },
+];
+
+function PlacementGuidelinesSections({ intro }: { intro: string }) {
+  const categories = parseChecklistCategories(intro);
+  if (categories.length === 0) return null;
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
+      {categories.map((category, i) => {
+        const color = GUIDELINE_CATEGORY_COLORS[i % GUIDELINE_CATEGORY_COLORS.length];
+        return (
+          <div
+            key={`${category.title}-${i}`}
+            style={{ background: color.background, borderRadius: 'var(--radius-md)', padding: 'var(--space-5) var(--space-6)' }}
+          >
+            {category.title && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
+                <span style={{ width: 8, height: 8, borderRadius: '50%', background: color.heading, flexShrink: 0 }} />
+                <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: color.heading, margin: 0 }}>
+                  {category.title}
+                </h3>
+              </div>
+            )}
+            <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+              {category.items.map((point, pi) => (
+                <li key={pi} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-3)', paddingLeft: 'calc(16px + var(--space-3))' }}>
+                  <span style={{ width: 7, height: 7, marginTop: 8, borderRadius: '50%', background: color.heading, flexShrink: 0 }} />
+                  <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6 }}>{point}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// Campus Recruitment & Training sub-page — same parsing as Placement
+// Guidelines above, styled instead as one solid navy card per category (with
+// a checkbox-in-a-badge heading icon and en-dash bullets), matching this
+// page's own reference design rather than reusing the pastel multi-colour
+// look.
+function CampusRecruitmentTrainingSections({ intro }: { intro: string }) {
+  const categories = parseChecklistCategories(intro);
+  if (categories.length === 0) return null;
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+      {categories.map((category, i) => (
+        <div
+          key={`${category.title}-${i}`}
+          style={{ background: 'var(--color-primary-light)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-6) var(--space-8)' }}
+        >
+          {category.title && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
+              <CheckCircle2 size={22} strokeWidth={2} color="var(--color-white)" style={{ flexShrink: 0 }} />
+              <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-lg)', fontWeight: 700, color: 'var(--color-white)', margin: 0 }}>
+                {category.title}
+              </h3>
+            </div>
+          )}
+          <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+            {category.items.map((point, pi) => (
+              <li key={pi} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-2)', paddingLeft: 'calc(22px + var(--space-3))' }}>
+                <span style={{ color: 'rgba(255,255,255,0.55)', lineHeight: 1.6 }}>–</span>
+                <span style={{ fontSize: 'var(--text-base)', color: 'rgba(255,255,255,0.9)', lineHeight: 1.6 }}>{point}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// Placement Details' Summary section (placementCellSummarySection below) —
+// each item.outcomes line already encodes one batch's headline stats as
+// "<batch> batch: <count> placements, highest <package>" (see
+// OUTCOME_BATCH_SUMMARY_RE/the old OutcomeTileText it replaces), so no data
+// change is needed here, only the card's look: alternating navy/cream
+// colours by position, a checkbox-style heading icon, and the batch/offers/
+// package split across their own lines instead of one plain paragraph.
+const BATCH_CARD_COLORS = [
+  { background: 'var(--color-primary-light)', border: 'var(--color-primary-light)', heading: 'var(--color-white)', body: 'rgba(255,255,255,0.85)' },
+  { background: '#FCEFD9', border: '#E8A83C', heading: '#7A4A12', body: '#8A5A20' },
+];
+
+function BatchSummaryCard({ text, index }: { text: string; index: number }) {
+  const color = BATCH_CARD_COLORS[index % BATCH_CARD_COLORS.length];
+  const m = text.match(OUTCOME_BATCH_SUMMARY_RE);
+  return (
+    <div style={{ background: color.background, border: `1.5px solid ${color.border}`, borderRadius: 'var(--radius-lg)', padding: 'var(--space-5)' }}>
+      {m ? (
+        <>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-3)' }}>
+            <span style={{ width: 14, height: 14, border: `2px solid ${color.heading}`, borderRadius: 3, flexShrink: 0 }} />
+            <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: color.heading, margin: 0 }}>
+              {m[1]} batch
+            </h3>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <span style={{ fontSize: 'var(--text-sm)', color: color.body }}>{m[2].replace(/,/g, '')} offers</span>
+            <span style={{ fontSize: 'var(--text-sm)', color: color.body }}>{m[3]}</span>
+          </div>
+        </>
+      ) : (
+        <span style={{ fontSize: 'var(--text-sm)', color: color.body }}>{text}</span>
+      )}
     </div>
   );
 }
@@ -946,7 +1091,6 @@ export default function PlacementDetail() {
   // Placement Cell's own combined Summary (batch cards) — full width, no
   // longer paired with the Branch-wise Placement Distribution chart (that
   // now only appears further down, in the Placements/Year-by-Year section).
-  const outcomeAccentColors = Object.values(BRANCH_COLORS);
   const placementCellSummarySection = showOutcomes && item.slug === 'placement-details' && (
     <section className="section bg-off-white">
       <div className="container">
@@ -961,12 +1105,7 @@ export default function PlacementDetail() {
             this to a single column on small screens. */}
         <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-4)' }}>
           {item.outcomes!.map((o, i) => (
-            <div key={o}
-              style={{ position: 'relative', overflow: 'hidden', background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5) var(--space-5) var(--space-5) calc(var(--space-5) + 4px)', minHeight: 110, display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
-              <span style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, background: outcomeAccentColors[i % outcomeAccentColors.length] }} />
-              <Trophy size={20} strokeWidth={1.75} style={{ flexShrink: 0, color: outcomeAccentColors[i % outcomeAccentColors.length] }} />
-              <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6, fontWeight: 700 }}><OutcomeTileText text={o} /></span>
-            </div>
+            <BatchSummaryCard key={o} text={o} index={i} />
           ))}
         </div>
       </div>
@@ -991,7 +1130,7 @@ export default function PlacementDetail() {
   // Our Recruiters drops the whole Overview section per request instead —
   // its Key Highlights/About text duplicated the logo grid below, which is
   // the page's actual content — with no full-width-grid replacement.
-  const skipOverviewSection = (item.slug === 'employability-skills' && !hasBodyOverride && !item.intro && !item.desc) || item.slug === 'our-recruiters' || item.slug === 'internships' || item.slug === 'placement-details';
+  const skipOverviewSection = (item.slug === 'employability-skills' && !hasBodyOverride && !item.intro && !item.desc) || item.slug === 'our-recruiters' || item.slug === 'internships' || item.slug === 'placement-details' || item.slug === 'placement-guidelines' || (item.slug === 'campus-recruitment-training' && !!item.intro);
 
   return (
     <main className="page-wrapper">
@@ -1103,37 +1242,6 @@ export default function PlacementDetail() {
                 </p>
               )}
 
-              {/* SVES network graphic — the society's ILO/campus map, shown
-                  above the per-office Regional Offices accordion below. Static
-                  asset (not admin-managed) since it's society-issued artwork,
-                  same as the /images/placements/* photos elsewhere. The
-                  onError hide keeps the page clean rather than showing a
-                  broken-image icon if the file isn't present. */}
-              {item.slug === 'industry-liaison-offices' && (
-                <img
-                  src="/images/placements/industry-liaison-offices.png"
-                  alt="Sri Vishnu Educational Society — Industry Liaison Offices, campuses and contact details across India"
-                  loading="lazy"
-                  onError={(e) => {
-                    const target = e.currentTarget as HTMLImageElement;
-                    if (!target.dataset.triedFallback) {
-                      target.dataset.triedFallback = 'true';
-                      target.src = '/images/image (3).png';
-                    } else {
-                      target.style.display = 'none';
-                    }
-                  }}
-                  style={{
-                    display: 'block',
-                    width: '100%',
-                    maxWidth: '720px',
-                    height: 'auto',
-                    margin: 'var(--space-8) auto 0',
-                    borderRadius: 'var(--radius-lg)',
-                    boxShadow: 'var(--shadow-md)',
-                  }}
-                />
-              )}
             </div>
 
             {/* Sidebar: on Placement Cell, a branch-wise bar chart synced to
@@ -1205,6 +1313,29 @@ export default function PlacementDetail() {
         <section className="section bg-white" style={{ paddingTop: 'var(--space-6)' }}>
           <div className="container">
             <HigherEducationAccordion />
+          </div>
+        </section>
+      )}
+
+      {/* Colour-coded checklist — only on the Placement Guidelines sub-page,
+          replacing the plain BodyBlocks rendering of the same Intro text
+          Overview would otherwise show (see skipOverviewSection above). */}
+      {item.slug === 'placement-guidelines' && (
+        <section className="section bg-white" style={{ paddingTop: 'var(--space-6)' }}>
+          <div className="container">
+            <PlacementGuidelinesSections intro={item.intro || ''} />
+          </div>
+        </section>
+      )}
+
+      {/* Navy checklist cards — only on Campus Recruitment & Training, and
+          only once the admin has entered real Intro content in this format
+          (the "**Heading**"/"- item" convention) — otherwise this slug falls
+          back to its old hardcoded BODY_OVERRIDES paragraphs unchanged. */}
+      {item.slug === 'campus-recruitment-training' && item.intro && (
+        <section className="section bg-white" style={{ paddingTop: 'var(--space-6)' }}>
+          <div className="container">
+            <CampusRecruitmentTrainingSections intro={item.intro} />
           </div>
         </section>
       )}
@@ -1415,6 +1546,52 @@ export default function PlacementDetail() {
                 )}
                 <PageContactLine emails={item.emails} linkedins={item.linkedins} />
               </>
+            ) : item.slug === 'industry-liaison-offices' ? (
+              // SVES network map (society-issued artwork, not admin-managed —
+              // same /images/placements/* pattern as elsewhere) sits beside
+              // the Regional Offices list instead of above it, smaller than
+              // its old full-width-up-to-720px size since it no longer needs
+              // to carry the whole row on its own.
+              <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 340px) 1fr', gap: 'var(--space-8)', alignItems: 'start' }}>
+                <img
+                  src="/images/placements/industry-liaison-offices.png"
+                  alt="Sri Vishnu Educational Society — Industry Liaison Offices, campuses and contact details across India"
+                  loading="lazy"
+                  onError={(e) => {
+                    const target = e.currentTarget as HTMLImageElement;
+                    if (!target.dataset.triedFallback) {
+                      target.dataset.triedFallback = 'true';
+                      target.src = '/images/image (3).png';
+                    } else {
+                      target.style.display = 'none';
+                    }
+                  }}
+                  style={{
+                    display: 'block',
+                    width: '100%',
+                    height: 'auto',
+                    borderRadius: 'var(--radius-lg)',
+                    boxShadow: 'var(--shadow-md)',
+                    position: 'sticky',
+                    top: 'calc(var(--topbar-height) + var(--header-height) + 1rem)',
+                  }}
+                />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  {tableRows.map((row, i) => (
+                    <TeamRosterRow
+                      key={i}
+                      row={row}
+                      isOpen={activeTableRow === i}
+                      onToggle={() => setActiveTableRow(activeTableRow === i ? null : i)}
+                      tpoPhotoMap={tpoPhotoMap}
+                      tpoBiosMap={tpoBiosMap}
+                      iloPhotoMap={iloPhotoMap}
+                      addressOnly
+                    />
+                  ))}
+                  <PageContactLine emails={item.emails} linkedins={item.linkedins} />
+                </div>
+              </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 {tableRows.map((row, i) => (
@@ -1426,7 +1603,6 @@ export default function PlacementDetail() {
                     tpoPhotoMap={tpoPhotoMap}
                     tpoBiosMap={tpoBiosMap}
                     iloPhotoMap={iloPhotoMap}
-                    addressOnly={item.slug === 'industry-liaison-offices'}
                   />
                 ))}
                 <PageContactLine emails={item.emails} linkedins={item.linkedins} />

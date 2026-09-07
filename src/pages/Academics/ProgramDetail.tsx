@@ -101,6 +101,15 @@ const categoryLabel: Record<string, string> = {
   phd: 'Ph.D.',
 };
 
+// A placement year label like "2022–2026" -> "2026" for the snapshot
+// heading — the graduating year reads more naturally there than the full
+// 4-year range. Already-bare years (or labels with no 4-digit year at all)
+// pass through unchanged.
+function endingYear(label: string): string {
+  const years = label.match(/\d{4}/g);
+  return years ? years[years.length - 1] : label;
+}
+
 export default function ProgramDetail() {
   // AI / CSE / ECE are "grouped" departments whose sub-program slugs render a
   // shared department page with a program toggle instead of this standalone
@@ -1112,7 +1121,7 @@ function SingleProgramDetail() {
             {activePlacementYear && placementYearStats && (
               <>
                 <p className="placement-stat-summary">
-                  {activePlacementYear.year} Placements as on date: <strong>{placementYearStats.totalOffers.toLocaleString()}</strong>
+                  {endingYear(activePlacementYear.year)} Placement Snapshot
                 </p>
                 <div className="dept-stat-grid dept-stat-grid--compact">
                   <div className="dept-stat-tile">
