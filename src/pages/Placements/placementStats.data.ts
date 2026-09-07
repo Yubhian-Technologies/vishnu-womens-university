@@ -54,6 +54,13 @@ export interface PlacementYear {
   offersAbove50LPA?: number;
   offersAbove30LPA?: number;
   offersAbove10LPA?: number;
+  /** Keeps a batch out of the Placement Details page's "Impact > Summary"
+   *  batch-card grid while still showing it normally in the "Placements,
+   *  Year by Year" accordion below it — e.g. a batch still in progress
+   *  (current final-year students not yet fully placed) that shouldn't yet
+   *  appear as a finished headline stat, without needing it removed from
+   *  Year-by-Year too. */
+  hideFromSummary?: boolean;
 }
 
 export const placementYearData: PlacementYear[] = [

@@ -35,7 +35,7 @@ interface Props {
 // (e.g. "₹59,14,620") instead of converting it by hand first. Auto-convert
 // that shape at display time so either input renders correctly, rather than
 // requiring admins to divide by 1,00,000 themselves before saving.
-function formatSalary(value: string): string {
+export function formatSalary(value: string): string {
   const trimmed = (value || '').trim();
   const match = trimmed.match(/^₹\s*([\d,]+(?:\.\d+)?)$/);
   if (!match) return trimmed;
