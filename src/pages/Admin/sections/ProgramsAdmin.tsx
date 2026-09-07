@@ -121,6 +121,14 @@ export interface NewsEventsYear {
   // Only shown when `mode` is 'text' — a plain paragraph for a year that's
   // neither a table nor image cards.
   text?: string;
+  // Set only when this "year" was actually built from a News & Events
+  // Custom Section that isn't a table/text/image-cards shape (e.g. Files,
+  // Checklist, Links, Photo Gallery, Person, Contacts) — the table/cards/
+  // text/mode fields above can't represent those, so when this is present
+  // NewsEventsTabs renders the section generically (SectionSubtree) instead
+  // of using mode. See DepartmentDetail.tsx/StandaloneDepartmentDetail.tsx/
+  // ProgramDetail.tsx's News & Events conversion.
+  section?: CustomSection;
 }
 
 export interface NewsletterIssue {
@@ -604,14 +612,18 @@ export default function ProgramsAdmin() {
         // network call entirely if nothing did (e.g. Edit then Update with
         // no changes).
         const changed = originalForm ? diffChangedFields(payload, stripUndefined(originalForm)) : payload;
-        // Additionally, if all mindmap images were deleted, ensure the legacy
-        // fields are cleared in Firestore even if they were already '' in
-        // originalForm (they may never have been written at all, sitting as
-        // real data fields from the old schema).
+        // mindMapImages is deliberately never left to the generic diff above
+        // — a mind map deletion (removing one of several images, not
+        // necessarily all of them) must never silently fail to persist just
+        // because diffChangedFields happened to not flag it that particular
+        // save. Always sent explicitly, same as the legacy-field clearing
+        // below already does for the all-deleted case.
         const legacyClearNeeded = (form.mindMapImages || []).length === 0;
-        if (Object.keys(changed).length > 0 || legacyClearNeeded) {
+        const mindMapChanged = JSON.stringify(payload.mindMapImages || []) !== JSON.stringify(originalForm?.mindMapImages || []);
+        if (Object.keys(changed).length > 0 || legacyClearNeeded || mindMapChanged) {
           await updateDoc(doc(db, 'programs', editing), {
             ...changed,
+            ...(mindMapChanged ? { mindMapImages: payload.mindMapImages || [] } : {}),
             ...(legacyClearNeeded ? { mindMapImage: deleteField(), mindMapImageStoragePath: deleteField() } : {}),
           });
         }
