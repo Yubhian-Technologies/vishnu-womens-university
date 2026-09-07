@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   MapPin, ExternalLink, GraduationCap, Check, Building2,
-  Users, Award, BookOpen, Sparkles, Globe
+  Users, Award, BookOpen, Sparkles, Globe, Tag
 } from 'lucide-react';
 import './AboutSVES.css';
 import '../About/About.css';
@@ -270,34 +270,84 @@ export default function AboutSVES() {
             </p>
           </div>
           <div className="sves-campuses-grid">
-            {campuses.map((campus, index) => (
-              <div key={campus.id} className="sves-campus-card">
-                <div className="sves-campus-header">
-                  <div className="sves-campus-meta">
-                    <span className="sves-campus-index">0{index + 1}</span>
-                    <span className="sves-campus-location">
-                      <MapPin size={12} strokeWidth={2.5} /> {campus.location}
-                    </span>
+            {campuses.map((campus, index) => {
+              const nameLower = campus.name.toLowerCase();
+              const rawInsts = campus.institutions || [];
+              let sections: { tag?: string; items: string[] }[] = [];
+
+              if (nameLower.includes('green meadows') || index === 0) {
+                const mainItems = rawInsts.filter(
+                  (inst) => !inst.toLowerCase().includes('seetha polytechnic')
+                );
+                const southItems = rawInsts.filter((inst) =>
+                  inst.toLowerCase().includes('seetha polytechnic')
+                );
+                const polyItem = southItems.length > 0 ? southItems : ['Smt. B Seetha Polytechnic'];
+                const filteredMain = mainItems.length > 0 ? mainItems : [
+                  "Vishnu Women's University",
+                  'Vishnu Institute of Technology',
+                  'Vishnu Dental College & Hospital',
+                  'Shri Vishnu College of Pharmacy',
+                  'B. V. Raju College',
+                  'Vishnu School, Bhimavaram',
+                ];
+                sections = [
+                  { items: filteredMain },
+                  { tag: 'South Campus', items: polyItem },
+                ];
+              } else if (nameLower.includes('lake view') || nameLower.includes('vedic') || index === 3) {
+                const vedicName = rawInsts[0] || 'Vishnu Educational Development and Innovation Centre (VEDIC)';
+                sections = [
+                  { tag: 'Hyderabad', items: [vedicName] },
+                  { tag: 'Bangalore', items: [vedicName] },
+                ];
+              } else {
+                sections = [{ items: rawInsts }];
+              }
+
+              const totalCount = sections.reduce((acc, sec) => acc + sec.items.length, 0);
+              const displayLocation = (nameLower.includes('lake view') || index === 3)
+                ? 'Hyderabad & Bangalore'
+                : campus.location;
+
+              return (
+                <div key={campus.id} className="sves-campus-card">
+                  <div className="sves-campus-header">
+                    <div className="sves-campus-meta">
+                      <span className="sves-campus-index">0{index + 1}</span>
+                      <span className="sves-campus-location">
+                        <MapPin size={12} strokeWidth={2.5} /> {displayLocation}
+                      </span>
+                    </div>
+                    <h3 className="sves-campus-name">{campus.name}</h3>
+                    <div className="sves-campus-badge">
+                      <GraduationCap size={13} /> {totalCount} {totalCount === 1 ? 'Institution' : 'Institutions'}
+                    </div>
                   </div>
-                  <h3 className="sves-campus-name">{campus.name}</h3>
-                  <div className="sves-campus-badge">
-                    <GraduationCap size={13} /> {(campus.institutions || []).length} Institutions
-                  </div>
-                </div>
-                <div className="sves-campus-body">
-                  <ul className="sves-campus-list">
-                    {(campus.institutions || []).map((inst) => (
-                      <li key={inst}>
-                        <span className="sves-list-bullet">
-                          <Check size={12} strokeWidth={3} />
-                        </span>
-                        <span className="sves-inst-text">{inst}</span>
-                      </li>
+                  <div className="sves-campus-body">
+                    {sections.map((section, sIdx) => (
+                      <div key={section.tag || `sec-${sIdx}`} className="sves-campus-section">
+                        {section.tag && (
+                          <div className="sves-subtag-badge">
+                            <Tag size={11} strokeWidth={2.5} /> {section.tag}
+                          </div>
+                        )}
+                        <ul className="sves-campus-list">
+                          {section.items.map((inst) => (
+                            <li key={inst}>
+                              <span className="sves-list-bullet">
+                                <Check size={12} strokeWidth={3} />
+                              </span>
+                              <span className="sves-inst-text">{inst}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
                     ))}
-                  </ul>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -370,7 +420,7 @@ export default function AboutSVES() {
                 Sri Vishnu Educational Society continues to shape future leaders, innovators, and professionals through world-class academic institutions.
               </p>
               <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: 'var(--text-lg)', fontWeight: 700, marginBottom: 0 }}>
-                Discover our flagship university — Vishnu Women's University.
+                Discover Vishnu Women&rsquo;s University — empowering women to learn, lead, and shape the future.
               </p>
             </div>
             <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>

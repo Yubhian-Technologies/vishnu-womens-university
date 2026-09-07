@@ -12,7 +12,7 @@ import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import {
   Rocket, Target, Calendar, MapPin, GraduationCap, Users,
   Briefcase, Award, CheckCircle, BookOpen, Lightbulb, Sparkles,
-  Globe, Shield, Activity, ArrowRight, Wifi, Building2
+  Globe, ArrowRight, Wifi, Building2
 } from 'lucide-react';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import { isEnabledNavPath } from '../../components/Header/Header';
@@ -98,6 +98,24 @@ export default function About() {
   const [activeExec, setActiveExec] = useState<CoreExecutiveMember | Omit<CoreExecutiveMember, 'id'> | null>(null);
   const [execBannerOpen, setExecBannerOpen] = useState(false);
 
+  // The detail banner used to auto-close on mouseleave, which made its text
+  // impossible to select/copy. It now stays open (hovering another card just
+  // swaps the content) and is dismissed only by Escape or a click outside
+  // any exec card / the banner itself.
+  useEffect(() => {
+    if (!execBannerOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setExecBannerOpen(false); };
+    const onDown = (e: MouseEvent) => {
+      if (!(e.target as Element).closest('.exec-card, .exec-detail-banner')) setExecBannerOpen(false);
+    };
+    document.addEventListener('keydown', onKey);
+    document.addEventListener('mousedown', onDown);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.removeEventListener('mousedown', onDown);
+    };
+  }, [execBannerOpen]);
+
   const { docs: execDocs, loading: execLoading } = useOrderedCollection<CoreExecutiveMember>('coreExecutives', 'order');
   const executives = !execLoading && execDocs.length > 0 ? execDocs : defaultExecutives;
   const executivesByLevel = useMemo(() => {
@@ -163,7 +181,7 @@ export default function About() {
       <PageHero
         page="about"
         defaultTitle="Vishnu Women's University"
-        defaultSubtitle="The First Private State University for Women in the Telugu States — Empowering Women. Inspiring Excellence. Shaping the Future."
+        defaultSubtitle="Discover Vishnu Women's University — empowering women to learn, lead, and shape the future."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'About VWU' }]}
         hideCta={true}
       />
@@ -200,7 +218,7 @@ export default function About() {
           <div className="about-mission-grid">
             <div className="reveal-left">
               <span className="section-label">Who We Are</span>
-              <h2 className="section-title">First Private State University for Women in Telugu States</h2>
+              <h2 className="section-title">First Private State Women's University in Telugu States</h2>
               <div className="divider" />
               <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-6)', color: 'var(--color-text-light)' }}>
                 Vishnu Women's University (VWU), located at Vishnupur, Bhimavaram, Andhra Pradesh, is a pioneering
@@ -284,17 +302,6 @@ export default function About() {
               Her Education. Her Confidence. Her Future.<br />
               <span style={{ color: 'var(--color-accent)', fontStyle: 'normal' }}>Her University — Vishnu Women's University.</span>
             </p>
-            <div className="about-ambition-chips" style={{ justifyContent: 'flex-start', margin: 0 }}>
-              <div className="about-chip about-chip--accent">
-                <Sparkles size={14} /> 100% Women Focused
-              </div>
-              <div className="about-chip">
-                <Shield size={14} /> Safe Campus
-              </div>
-              <div className="about-chip">
-                <Activity size={14} /> High Impact Research
-              </div>
-            </div>
           </div>
         </div>
       </section>
@@ -348,9 +355,7 @@ export default function About() {
                       key={exec.name}
                       className={`exec-card${activeExec?.name === exec.name && execBannerOpen ? ' is-active' : ''}`}
                       onMouseEnter={() => { if (hasDetails) { setActiveExec(exec); setExecBannerOpen(true); } }}
-                      onMouseLeave={() => setExecBannerOpen(false)}
                       onFocus={() => { if (hasDetails) { setActiveExec(exec); setExecBannerOpen(true); } }}
-                      onBlur={() => setExecBannerOpen(false)}
                       onClick={() => {
                         if (hasDetails) {
                           if (activeExec?.name === exec.name && execBannerOpen) {
@@ -456,7 +461,7 @@ export default function About() {
               <>
                 <strong>More Than a Campus.<br />A Place to Become.</strong>
                 <br /><br />
-                A place where ideas take flight, friendships become lifelong, talent finds its stage, and every student is encouraged to dream bigger, discover more and lead with confidence.
+                A vibrant environment where ideas flourish, friendships grow, talents find expression, and aspirations take shape. Every student is encouraged to explore new possibilities, discover their potential, and develop the confidence to lead, innovate, and make a difference.
                 <br /><br />
                 Explore. Experience. Excel.
               </>
@@ -517,7 +522,7 @@ export default function About() {
                 Everything You Need to Learn, Live &amp; Lead.
               </h2>
               <p style={{ color: 'var(--color-text-light)', lineHeight: 1.8, marginBottom: 'var(--space-4)' }}>
-                From advanced learning spaces and high-speed connectivity to sports, wellness, residential, dining, and spiritual facilities&mdash;VWU offers an ecosystem designed around the complete student experience.
+                From advanced learning spaces and seamless connectivity to sports, wellness, residential, dining, and spiritual facilities, VWU offers a thoughtfully designed campus ecosystem that supports learning, well-being, belonging, and holistic student development.
               </p>
               <div className="about-pillars-grid" style={{ marginBottom: 'var(--space-5)', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}>
                 {[
@@ -548,7 +553,7 @@ export default function About() {
         <div className="container">
           <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-12)', alignItems: 'center' }}>
             <div className="reveal-left">
-              <span className="section-label" style={{ color: 'var(--color-accent)' }}>Our Parent Society</span>
+              <span className="section-label section-label--dark">Our Parent Society</span>
               <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>Sri Vishnu Educational Society (SVES)</h2>
               <p style={{ color: 'rgba(255,255,255,0.75)', lineHeight: 1.8, marginBottom: 'var(--space-4)' }}>
                 Founded by Padma Bhushan Dr. B. V. Raju, Sri Vishnu Educational Society (SVES) is a distinguished

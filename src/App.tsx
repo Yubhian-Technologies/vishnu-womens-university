@@ -97,6 +97,8 @@ const NewsAwards = lazyWithRetry(() => import('./pages/NewsAwards/NewsAwards'));
 const Happenings = lazyWithRetry(() => import('./pages/NewsAwards/Happenings'));
 const HappeningDetail = lazyWithRetry(() => import('./pages/NewsAwards/HappeningDetail'));
 const Accreditations = lazyWithRetry(() => import('./pages/NewsAwards/Accreditations'));
+const VWUInsights = lazyWithRetry(() => import('./pages/NewsAwards/VWUInsights'));
+const VWUInsightsSection = lazyWithRetry(() => import('./pages/NewsAwards/VWUInsightsSection'));
 const GalleryPage = lazyWithRetry(() => import('./pages/NewsAwards/Gallery'));
 const SocialMedia = lazyWithRetry(() => import('./pages/NewsAwards/SocialMedia'));
 const Careers = lazyWithRetry(() => import('./pages/Careers/Careers'));
@@ -212,6 +214,11 @@ function PublicApp() {
             <Route path="/news-awards" element={<NewsAwards />} />
             <Route path="/news-awards/happenings" element={<Happenings />} />
             <Route path="/news-awards/happenings/:id" element={<HappeningDetail />} />
+            <Route path="/news-awards/vwu-insights" element={<VWUInsights />} />
+            <Route path="/news-awards/vwu-insights/university-news" element={<VWUInsightsSection category="university-news" />} />
+            <Route path="/news-awards/vwu-insights/research-innovation" element={<VWUInsightsSection category="research-innovation" />} />
+            <Route path="/news-awards/vwu-insights/campus-life" element={<VWUInsightsSection category="campus-life" />} />
+            <Route path="/news-awards/vwu-insights/student-life" element={<VWUInsightsSection category="student-life" />} />
             <Route path="/news-awards/accreditations-awards" element={<Accreditations />} />
             <Route path="/news-awards/gallery" element={<GalleryPage />} />
             <Route path="/news-awards/social-media-handles" element={<SocialMedia />} />

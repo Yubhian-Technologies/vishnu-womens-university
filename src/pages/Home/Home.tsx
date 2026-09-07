@@ -1,11 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Laptop, ArrowRight } from 'lucide-react';
 import HeroSlider from '../../components/HeroSlider/HeroSlider';
 import CounterSection from '../../components/CounterSection/CounterSection';
 import ScrollTopButton from '../../components/ScrollTopButton/ScrollTopButton';
-import NewsCard, { type NewsArticle } from '../../components/NewsCard/NewsCard';
-import NewsArticleDialog from '../../components/NewsCard/NewsArticleDialog';
+import NewsCard from '../../components/NewsCard/NewsCard';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import TestimonialSlider from '../../components/TestimonialSlider/TestimonialSlider';
 import RecruitersSection from '../../components/RecruitersMarquee/RecruitersSection';
@@ -131,7 +130,6 @@ export default function Home() {
   const recentHappenings = happenings.filter(h => h.type === 'recent');
   const upcomingHappenings = happenings.filter(h => h.type === 'upcoming');
   const featuredNews = recentHappenings.slice(0, 3).map(happeningToArticle);
-  const [activeArticle, setActiveArticle] = useState<NewsArticle | null>(null);
   const liveTestimonials = useContentBlocks('home', 'testimonials');
   const testimonials = liveTestimonials.length > 0 ? liveTestimonials : defaultTestimonials;
   const liveStudyCards = useContentBlocks('home', 'studyCards');
@@ -304,9 +302,9 @@ export default function Home() {
             </Link>
           </div>
           <div className="news-grid">
-            {featuredNews.map((item, i) => (
-              <div key={item.id} className={`news-grid-item ${i === 0 ? 'news-grid-item--featured' : ''}`}>
-                <NewsCard article={item} isFeatured={i === 0} onReadMore={() => setActiveArticle(item)} />
+            {featuredNews.map((item) => (
+              <div key={item.id} className="news-grid-item">
+                <NewsCard article={item} isFeatured />
               </div>
             ))}
             {featuredNews.length === 0 && (
@@ -316,7 +314,6 @@ export default function Home() {
         </div>
       </section>
 
-      <NewsArticleDialog article={activeArticle} onClose={() => setActiveArticle(null)} />
       <UpcomingEvents happenings={upcomingHappenings} />
 
       {/* ── Admissions CTA Banner ── */}

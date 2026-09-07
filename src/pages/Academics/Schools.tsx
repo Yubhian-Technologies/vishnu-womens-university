@@ -25,9 +25,12 @@ export default function Schools() {
     <main className="page-wrapper schools-page">
       <PageHero
         page="academics-schools"
-        defaultTitle="Schools"
+        defaultTitle="VWU's Four Schools"
+        defaultSubtitle="A Connected Academic Community"
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Academics', to: '/academics' }, { label: 'Schools' }]}
       />
+
+
 
       {loading ? (
         <section className="section bg-white">
@@ -46,8 +49,7 @@ export default function Schools() {
           <section key={school.id} className={`section ${i % 2 === 0 ? 'bg-white' : 'bg-off-white'}`}>
             <div className="container">
               <div style={{ textAlign: 'left', marginBottom: 'var(--space-10)' }}>
-                <span className="section-label">Schools</span>
-                <h2 className="section-title">{school.title}</h2>
+                <h2 className="section-title school-title">{school.title}</h2>
                 {school.description && (
                   <p className="section-desc">{school.description}</p>
                 )}

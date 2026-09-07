@@ -109,15 +109,12 @@ html {
   overflow-x: clip;
 }
 
-body, button, input, select, textarea, h1, h2, h3, h4, h5, h6, p, span, a, li, td, th {
-  font-family: 'Product Sans', sans-serif !important;
-}
-
 body {
-  font-family: 'Product Sans', sans-serif !important;
+  font-family: var(--font-sans);
   color: var(--color-text);
   background-color: var(--color-white);
   line-height: 1.6;
+  font-weight: 400;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: clip;
@@ -344,18 +341,25 @@ input, textarea, select {
   transform: translateY(-1px);
 }
 
-/* ---- Typography ---- */
-h1, h2, h3, h4, h5, h6 {
+/* ---- Stanford Typography System ---- */
+h1, h2, h3 {
   font-family: var(--font-serif);
-  font-weight: 700;
-  line-height: 1.2;
-  color: var(--color-text);
+  font-weight: 400;
+  line-height: 1.1;
+  color: #2E2D29;
 }
 
-h1 { font-size: clamp(2rem, 5vw, var(--text-5xl)); }
-h2 { font-size: clamp(1.5rem, 3.5vw, var(--text-4xl)); }
-h3 { font-size: clamp(1.25rem, 2.5vw, var(--text-3xl)); }
-h4 { font-size: clamp(1.1rem, 2vw, var(--text-2xl)); }
+h4, h5, h6 {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  line-height: 1.2;
+  color: #2E2D29;
+}
+
+h1 { font-size: clamp(2.25rem, 5vw, 48px); }
+h2 { font-size: clamp(1.75rem, 4vw, 40px); }
+h3 { font-size: clamp(1.35rem, 3vw, 32px); }
+h4 { font-size: var(--text-2xl); }
 h5 { font-size: var(--text-xl); }
 h6 { font-size: var(--text-lg); }
 
@@ -414,19 +418,37 @@ h6 { font-size: var(--text-lg); }
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
 }
 
+.hero-title,
 .section-title {
   font-family: var(--font-serif);
-  font-size: clamp(1.75rem, 4vw, 2.75rem);
-  color: var(--color-primary);
-  line-height: 1.2;
-  margin-bottom: var(--space-5);
+  font-size: 48px;
+  font-weight: 400;
+  line-height: 1.1;
+  color: #2E2D29;
+  margin: 0 0 var(--space-4) 0;
 }
 
+@media (max-width: 768px) {
+  .hero-title,
+  .section-title {
+    font-size: 36px;
+  }
+}
+
+.body-text,
+.section-description,
 .section-desc {
-  font-size: var(--text-lg);
-  color: var(--color-text-light);
-  line-height: 1.7;
-  max-width: 640px;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.6;
+  font-weight: 400;
+  color: #2E2D29;
+}
+
+.button,
+.btn {
+  font-family: var(--font-sans);
+  font-weight: 600;
 }
 
 /* ---- Animations ---- */
