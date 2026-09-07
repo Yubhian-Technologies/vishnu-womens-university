@@ -42,6 +42,11 @@ export interface AdminSession {
   email: string | null;
   department: string;
   role: AdminRole;
+  // Only meaningful when role === 'custom' — the admin-typed label used to
+  // tell one custom role apart from another on the login screen (see
+  // sessionMatchesRoleSelection below) and everywhere else a custom role's
+  // name is shown (see roleLabelFor in UsersRolesAdmin.tsx).
+  roleName?: string;
   isAdmin: boolean;
   isSuperAdmin: boolean;
   permissions: Record<string, boolean>;
@@ -85,6 +90,7 @@ export async function resolveAdminSession(user: User): Promise<AdminSession> {
       email: user.email,
       department: data.department ?? userDoc.id,
       role,
+      roleName: data.roleName,
       isAdmin,
       isSuperAdmin: false,
       permissions: data.permissions ?? {},
@@ -98,20 +104,58 @@ export async function resolveAdminSession(user: User): Promise<AdminSession> {
   }
 }
 
-// Every distinct department name currently provisioned in `department_users`
-// (plus the always-available "Admin"), for the login screen's dropdown.
-export async function listDepartments(): Promise<string[]> {
+// ── Login screen role picker ────────────────────────────────────────────
+// The five fixed roles the login dropdown always offers, regardless of
+// whether any account currently uses them — these are role TYPES, not
+// per-account records, so (unlike custom roles below) there's nothing to
+// query for. 'superadmin' has no ROLE_PRESETS entry (it's the implicit
+// no-record fallback, never something the "Add Admin User" form creates)
+// so it's listed here directly instead.
+const MAIN_ROLE_OPTIONS: { value: AdminRole; label: string }[] = [
+  { value: 'superadmin', label: 'Super Admin' },
+  { value: 'admin', label: 'Admin' },
+  { value: 'department', label: 'Departments Admin' },
+  { value: 'placements', label: 'Placements Login' },
+  { value: 'rnd', label: 'R&D Login' },
+];
+
+export interface RoleOption {
+  /** What the login form submits — one of MAIN_ROLE_OPTIONS' AdminRole
+   *  values, or a custom role's roleName text for an "Others" entry. */
+  value: string;
+  label: string;
+  group: 'main' | 'other';
+}
+
+/** Every role the login screen's dropdown should offer: the five fixed
+ *  roles, plus every distinct custom roleName currently in use (only
+ *  queried — unlike the fixed roles, these truly are per-account data). */
+export async function listRoleOptions(): Promise<RoleOption[]> {
+  const main: RoleOption[] = MAIN_ROLE_OPTIONS.map((r) => ({ ...r, group: 'main' }));
   try {
-    const snap = await getDocs(collection(db, 'department_users'));
+    const snap = await getDocs(query(collection(db, 'department_users'), where('role', '==', 'custom')));
     const names = snap.docs
       .map((d) => d.data())
       .filter((d) => d.active !== false)
-      .map((d) => d.department as string)
-      .filter((name): name is string => typeof name === 'string' && name.length > 0);
-    return Array.from(new Set(names));
+      .map((d) => (d.roleName as string) || '')
+      .filter((n) => n.trim().length > 0);
+    const others: RoleOption[] = Array.from(new Set(names)).map((n) => ({ value: n, label: n, group: 'other' }));
+    return [...main, ...others];
   } catch {
-    return [];
+    return main;
   }
+}
+
+/** True if the resolved session actually holds the role selected on the
+ *  login screen — 'superadmin' checks isSuperAdmin (it's never a stored
+ *  `role` value), the other four fixed roles check `role` directly, and
+ *  anything else is treated as a custom role's roleName (case-insensitive,
+ *  matching how department names were compared before this). */
+export function sessionMatchesRoleSelection(session: AdminSession, selected: string): boolean {
+  if (!selected) return false;
+  if (selected === 'superadmin') return session.isSuperAdmin;
+  if (MAIN_ROLE_OPTIONS.some((r) => r.value === selected)) return session.role === selected;
+  return session.role === 'custom' && (session.roleName || '').trim().toLowerCase() === selected.trim().toLowerCase();
 }
 
 // ── Permission helpers ───────────────────────────────────────────────────
