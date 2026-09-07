@@ -199,8 +199,12 @@
   background: transparent;
 }
 
+/* One rectangular logo at every width. Height is fixed per breakpoint and
+   width follows the aspect ratio; the max-width clamp + shrinkable brand
+   link (see the <1199px block) guarantee it can never push the CTA or the
+   hamburger off-edge or overlap them on small screens. */
 .navbar-logo-desktop {
-  display: none;
+  display: block;
   height: 52px !important;
   max-height: 52px !important;
   width: auto !important;
@@ -209,82 +213,8 @@
   transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@media (min-width: 1024px) {
-  .navbar-logo-desktop {
-    display: block;
-    height: 52px !important;
-    max-height: 52px !important;
-    width: auto !important;
-  }
-}
-
-@media (min-width: 1440px) {
-  .navbar-logo-desktop {
-    height: 52px !important;
-    max-height: 52px !important;
-    width: auto !important;
-  }
-}
-
 .navbar-brand-link:hover .navbar-logo-desktop {
   transform: scale(1.025);
-}
-
-/* Mobile Square Logo Branding */
-.navbar-brand-mobile {
-  display: flex;
-  align-items: center;
-  gap: 1.052rem;
-}
-
-@media (min-width: 1024px) {
-  .navbar-brand-mobile {
-    display: none;
-  }
-}
-
-.navbar-logo-square {
-  width: 68.06px;
-  height: 68.06px;
-  border-radius: 12.38px;
-  background: #ffffff;
-  padding: 3.71px;
-  object-fit: contain;
-  box-shadow: 0 2px 8px color-mix(in srgb, var(--color-primary-dark, #081c15) 14%, transparent);
-  border: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 12%, transparent);
-  flex-shrink: 0;
-  transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 240ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.navbar-brand-link:hover .navbar-logo-square {
-  transform: scale(1.04);
-  box-shadow: 0 4px 14px color-mix(in srgb, var(--color-primary, #1b4332) 25%, transparent);
-}
-
-.navbar-brand-mobile-text {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.1;
-  gap: 2.48px;
-}
-
-.navbar-brand-m-name {
-  font-family: var(--font-sans);
-  font-size: 1.51rem;
-  font-weight: 800;
-  color: var(--color-primary-dark, #081c15);
-  letter-spacing: -0.01em;
-  transition: color 200ms ease;
-}
-
-.navbar-brand-m-sub {
-  font-family: var(--font-sans);
-  font-size: 1.021rem;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--color-primary, #1b4332);
-  transition: color 200ms ease;
 }
 
 /* ===== Center: Desktop Navigation Tabs ===== */
@@ -1186,6 +1116,21 @@
 
   .navbar-actions {
     gap: 0.743rem;
+    flex-shrink: 0;
+  }
+
+  /* Let the brand column give up space (and clamp the logo) so the CTA +
+     hamburger always keep their place — no overflow, no overlap. */
+  .navbar-brand-link {
+    min-width: 0;
+    flex-shrink: 1;
+    margin: 10px 0.75rem 10px 10px !important;
+  }
+
+  .navbar-logo-desktop {
+    height: 44px !important;
+    max-height: 44px !important;
+    max-width: 46vw;
   }
 }
 
@@ -1195,19 +1140,11 @@
     padding: 0 0.804rem 0 1.052rem;
   }
 
-  .navbar-logo-square {
-    width: 47.03px;
-    height: 47.03px;
-  }
-
-  .navbar-brand-m-name {
-    font-size: 1.139rem;
-    font-weight: 800;
-  }
-
-  .navbar-brand-m-sub {
-    font-size: 0.767rem;
-    font-weight: 800;
+  /* CTA is hidden here, so the logo may use more of the row. */
+  .navbar-logo-desktop {
+    height: 40px !important;
+    max-height: 40px !important;
+    max-width: 62vw;
   }
 
   .navbar-cta-btn {
