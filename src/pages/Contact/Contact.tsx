@@ -461,7 +461,7 @@ export default function Contact() {
                     <MapPin size={18} className="map-pin-icon" />
                     <div>
                       <strong>Vishnu Women's University</strong>
-                      <span>Vishnavathi, Kovvada, Bhimavaram, AP 534202</span>
+                      <span>Vishnupur, Bhimavaram, AP 534202</span>
                     </div>
                   </div>
                   <a 
