@@ -40,7 +40,7 @@ const ACADEMIC_LINKS = [
   { label: 'Vishnu Tech Hub', href: 'https://www.vishnutechhub.in/', external: true },
   { label: 'VEDIC Learning Center', href: 'https://vedic.edu.in/', external: true },
   { label: 'Vishnu Era Magazine', href: 'https://www.srivishnu.edu.in/vishnu-era/', external: true },
-  { label: 'Prathibha Magazine', href: 'https://heyzine.com/flip-book/14449c1cd4.html', external: true },
+  { label: 'Prathibha Magazine', href: 'https://heyzine.com/flip-book/088b7b5629.html', external: true },
   { label: 'Global Alumni Portal', href: 'https://alumni.srivishnu.edu.in/', external: true },
 ];
 
