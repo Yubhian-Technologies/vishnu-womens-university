@@ -34,7 +34,7 @@ export default function VWUNET() {
             className="section-title"
             style={{ fontSize: 'clamp(2.25rem, 7vw, 4rem)', margin: 0 }}
           >
-            Section Under Development
+            Section Under Development…
           </h2>
         </div>
       </section>

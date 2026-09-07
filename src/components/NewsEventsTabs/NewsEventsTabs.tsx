@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Calendar, FileText, ExternalLink, ChevronDown, ChevronRight } from 'lucide-react';
 import type { NewsEventsYear } from '../../pages/Admin/sections/ProgramsAdmin';
 import SmoothCollapse from '../SmoothCollapse/SmoothCollapse';
+import { SectionSubtree } from '../CustomSectionsRenderer/CustomSectionsRenderer';
 
 export interface NewsEventsCategory {
   key: string;
@@ -22,27 +23,6 @@ interface Props {
 
 function isUrl(text: string): boolean {
   return /^(https?:\/\/|\/|.*\.pdf$)/i.test(text.trim());
-}
-
-function getEventCount(yr: NewsEventsYear): number {
-  const mode = yr.mode || 'table';
-  let count = 0;
-  if (mode === 'table' || mode === 'both') {
-    count = Math.max(count, yr.rows?.length || 0);
-  }
-  if (mode === 'cards' || mode === 'both') {
-    count = Math.max(count, yr.cards?.length || 0);
-  }
-  if (mode === 'text' && yr.text) {
-    count = Math.max(count, 1);
-  }
-  return count;
-}
-
-function formatEventCountLabel(count: number): string {
-  const padded = String(count).padStart(2, '0');
-  const label = count === 1 ? 'event' : 'events';
-  return `${padded} ${label}`;
 }
 
 export default function NewsEventsTabs({ categories, eyebrow, navOffset, embedded }: Props) {
@@ -87,12 +67,11 @@ export default function NewsEventsTabs({ categories, eyebrow, navOffset, embedde
             {active.years.map((yr, yi) => {
               const isExpanded = expandedYearIndex === yi;
               const mode = yr.mode || 'table';
-              const showTable = (mode === 'table' || mode === 'both') && yr.columns.length > 0;
+              const showSection = !!yr.section;
+              const showTable = !showSection && (mode === 'table' || mode === 'both') && yr.columns.length > 0;
               const cards = yr.cards || [];
-              const showCards = (mode === 'cards' || mode === 'both') && cards.length > 0;
-              const showText = mode === 'text' && !!yr.text;
-              const count = getEventCount(yr);
-              const countLabel = formatEventCountLabel(count);
+              const showCards = !showSection && (mode === 'cards' || mode === 'both') && cards.length > 0;
+              const showText = !showSection && mode === 'text' && !!yr.text;
 
               return (
                 <div key={yi} className={`news-events-accordion-item${isExpanded ? ' is-open' : ''}`}>
@@ -110,7 +89,6 @@ export default function NewsEventsTabs({ categories, eyebrow, navOffset, embedde
                     </div>
 
                     <div className="news-events-accordion-right">
-                      <span className="news-events-count-badge">{countLabel}</span>
                       <span className="news-events-chevron-circle">
                         <ChevronDown
                           size={16}
@@ -221,7 +199,9 @@ export default function NewsEventsTabs({ categories, eyebrow, navOffset, embedde
 
                       {showText && <p className="news-events-text-block">{yr.text}</p>}
 
-                      {!showTable && !showCards && !showText && (
+                      {showSection && <SectionSubtree section={yr.section!} />}
+
+                      {!showTable && !showCards && !showText && !showSection && (
                         <p className="news-events-empty-text">Nothing added for this academic year yet.</p>
                       )}
                     </div>

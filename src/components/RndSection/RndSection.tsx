@@ -22,8 +22,11 @@ interface LegacyRndFields {
 // exactly what it already had — no data disappears, and no year pills show
 // until an admin actually adds a labeled year.
 export function resolveRndYears(primary?: LegacyRndFields | null, fallback?: LegacyRndFields | null): RndYear[] {
-  if (primary?.rndYears?.length) return primary.rndYears;
-  if (fallback?.rndYears?.length) return fallback.rndYears;
+  // An empty Academic Year row (added but never filled in) still has
+  // length > 0 — checking content, not just length, keeps it from
+  // permanently shadowing real fallback data on the other side.
+  if (primary?.rndYears?.some(rndYearHasContent)) return primary.rndYears;
+  if (fallback?.rndYears?.some(rndYearHasContent)) return fallback.rndYears;
   const intro = primary?.rndIntro || fallback?.rndIntro || '';
   const tableText = primary?.rndTableText || fallback?.rndTableText || '';
   const projectsText = primary?.rndProjectsText || fallback?.rndProjectsText || '';
@@ -221,9 +224,6 @@ export default function RndSection({ years, sectionClassName = 'section bg-white
                           )}
                           {project.outcomes.length > 0 && (
                             <div>
-                              <strong style={{ fontSize: 'var(--text-sm)', color: 'var(--color-primary)', display: 'block', marginBottom: 'var(--space-2)' }}>
-                                Outcome
-                              </strong>
                               <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                                 {project.outcomes.map((o, oi) => (
                                   <li key={oi} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-2)' }}>

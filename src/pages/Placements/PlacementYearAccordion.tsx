@@ -19,11 +19,6 @@ interface Props {
    *  batch in the admin's Batch Years list automatically; a page can still
    *  opt into a fixed subset by passing it explicitly. */
   years?: string[];
-  /** Batches that should show the richer view (companies-visited /
-   *  branch-offers stat tiles, a branch-wise bar chart, and named student
-   *  records) instead of the plain company table — only for batches that
-   *  actually have that data (`branchOffers`/`students` on the record). */
-  enrichedYears?: string[];
   /** Reports the currently active batch upward whenever it changes (initial
    *  auto-pick included) — this component still owns the selection itself,
    *  a parent can just use this to mirror the choice elsewhere on the page. */
@@ -63,6 +58,8 @@ export const BRANCH_COLORS: Record<string, string> = {
   MBA: '#7551a8',
   Mechanical: '#a8710a',
   'M. Tech.': '#455a64',
+  'M. Tech PE': '#6b8e23',
+  'M. Tech SE': '#1e6f9e',
 };
 
 function branchKey(label: string): string {
@@ -115,22 +112,8 @@ function BranchOffersDonut({ data, total }: { data: BranchOfferCount[]; total: n
     cumulative = endAngle;
     return { ...d, startAngle, endAngle, color: branchColor(d.branch) };
   });
-  const topBranch = [...slices].sort((a, b) => b.offers - a.offers)[0];
-
   return (
-    <div
-      style={{
-        background: 'var(--color-white)',
-        border: '1.5px solid var(--color-light-gray)',
-        borderRadius: 'var(--radius-md)',
-        padding: 'var(--space-6) var(--space-5)',
-        display: 'flex',
-        flexWrap: 'wrap',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 'var(--space-8)',
-      }}
-    >
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-5)' }}>
       <div style={{ position: 'relative', width: DONUT_SIZE, height: DONUT_SIZE, flexShrink: 0 }}>
         <svg viewBox={`0 0 ${DONUT_SIZE} ${DONUT_SIZE}`} width={DONUT_SIZE} height={DONUT_SIZE}>
           {slices.map((s) => {
@@ -140,7 +123,7 @@ function BranchOffersDonut({ data, total }: { data: BranchOfferCount[]; total: n
                 key={s.branch}
                 d={donutSectorPath(DONUT_CENTER, DONUT_CENTER, DONUT_OUTER_R, DONUT_INNER_R, s.startAngle, s.endAngle)}
                 fill={s.color}
-                stroke="var(--color-white)"
+                stroke="var(--color-off-white)"
                 strokeWidth={3}
                 strokeLinejoin="round"
                 style={{
@@ -172,21 +155,16 @@ function BranchOffersDonut({ data, total }: { data: BranchOfferCount[]; total: n
             </>
           ) : (
             <>
-              <div style={{ fontSize: 'var(--text-2xl)', fontWeight: 900, color: 'var(--color-primary)', lineHeight: 1 }}>
+              <div style={{ fontSize: 'var(--text-2xl)', fontWeight: 900, color: 'var(--color-text)', lineHeight: 1 }}>
                 {total.toLocaleString('en-IN')}
               </div>
-              <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', marginTop: 'var(--space-1)' }}>Total Offers</div>
-              {topBranch && (
-                <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', marginTop: 2 }}>
-                  Top: <span style={{ fontWeight: 700, color: topBranch.color }}>{topBranch.branch}</span>
-                </div>
-              )}
+              <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', marginTop: 'var(--space-1)' }}>total offers</div>
             </>
           )}
         </div>
       </div>
 
-      <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(165px, 1fr))', gap: 'var(--space-3)', minWidth: 260, flex: 1 }}>
+      <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', columnGap: 'var(--space-6)', rowGap: 'var(--space-3)', width: '100%' }}>
         {slices.map((s) => {
           const isHovered = hovered === s.branch;
           const displayLabel = s.branch.replace(/\s*Offers$/i, '');
@@ -201,26 +179,17 @@ function BranchOffersDonut({ data, total }: { data: BranchOfferCount[]; total: n
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: '0.4rem',
-                minHeight: '52px',
-                height: '100%',
-                padding: '0.5rem 0.75rem',
-                borderRadius: '6px',
-                border: isHovered ? `1.5px solid ${s.color}` : '1px solid #e2e8f0',
-                background: isHovered ? 'color-mix(in srgb, var(--color-primary) 4%, #ffffff)' : '#ffffff',
-                boxShadow: isHovered ? '0 4px 10px rgba(0, 0, 0, 0.06)' : '0 1px 2px rgba(0, 0, 0, 0.03)',
-                transition: 'all 200ms ease',
+                gap: '0.55rem',
                 cursor: 'pointer',
+                opacity: hovered && !isHovered ? 0.55 : 1,
+                transition: 'opacity var(--transition-fast)',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', minWidth: 0, flex: 1 }}>
-                <span style={{ width: 10, height: 10, borderRadius: 2, background: s.color, flexShrink: 0 }} />
-                <span style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--color-text)', lineHeight: 1.25 }}>
-                  {displayLabel}
-                </span>
-              </div>
-              <span style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--color-primary)', flexShrink: 0, marginLeft: '0.25rem' }}>
+              <span style={{ width: 11, height: 11, borderRadius: 3, background: s.color, flexShrink: 0 }} />
+              <span style={{ fontSize: '0.85rem', color: 'var(--color-text)', lineHeight: 1.3 }}>
+                {displayLabel}
+              </span>
+              <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-text)' }}>
                 {s.offers.toLocaleString('en-IN')}
               </span>
             </li>
@@ -295,6 +264,114 @@ export function BranchOffersBarChart({ data }: { data: BranchOfferCount[] }) {
   );
 }
 
+const LOLLIPOP_HEIGHT = 300;
+
+// "CSE(AI&DS)" -> "CSE [AI&DS]" — the axis-label bracket style, distinct
+// from shortBranchLabel's further-abbreviated "AI&DS" used by the narrow
+// sidebar bar chart; this chart has room for the fuller name set on a
+// diagonal.
+function bracketedBranchLabel(label: string): string {
+  const key = branchKey(label);
+  return key.replace(/\(([^)]+)\)/, ' [$1]');
+}
+
+// Highest package achieved per branch, one "lollipop" per branch — the
+// right-hand half of "Branch-Wise Placement Overview", paired with
+// BranchOffersDonut on the left. Each branch keeps the same identity color
+// as its donut slice (via branchColor) so the two charts read as one
+// connected story instead of two unrelated ones. Uses the same div-based
+// bar-chart scaffold as BranchOffersBarChart above (gridlines + flex bars)
+// rather than a separate SVG approach, for the same reason that one does:
+// no charting library, and percentage heights inside a flex item with a
+// definite pixel height already work reliably here.
+function BranchHighestPackageChart({ data }: { data: BranchOfferCount[] }) {
+  const [hovered, setHovered] = useState<string | null>(null);
+  const withPackage = data
+    .filter((d): d is BranchOfferCount & { highestLPA: number } => d.highestLPA != null)
+    .sort((a, b) => b.highestLPA - a.highestLPA);
+  if (withPackage.length === 0) return null;
+
+  const rawMax = Math.max(1, ...withPackage.map((d) => d.highestLPA));
+  const chartMax = Math.max(10, Math.ceil(rawMax / 10) * 10);
+  const ticks = [1, 0.75, 0.5, 0.25, 0].map((f) => Math.round(chartMax * f));
+
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', columnGap: 'var(--space-3)' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: LOLLIPOP_HEIGHT, fontSize: '0.78rem', color: 'var(--color-text-light)' }}>
+        {ticks.map((t) => <span key={t} style={{ lineHeight: 1 }}>{t} LPA</span>)}
+      </div>
+      <div style={{ position: 'relative', height: LOLLIPOP_HEIGHT }}>
+        {ticks.map((t) => (
+          <div key={t} style={{ position: 'absolute', left: 0, right: 0, bottom: `${(t / chartMax) * 100}%`, borderTop: '1px solid var(--color-light-gray)' }} />
+        ))}
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'flex-end', gap: 4 }}>
+          {withPackage.map((d) => {
+            const color = branchColor(d.branch);
+            const isHovered = hovered === d.branch;
+            return (
+              <div
+                key={d.branch}
+                tabIndex={0}
+                role="img"
+                aria-label={`${branchKey(d.branch)}: ${d.highestLPA} LPA highest package`}
+                title={`${branchKey(d.branch)}: ${d.highestLPA} LPA`}
+                onMouseEnter={() => setHovered(d.branch)}
+                onMouseLeave={() => setHovered(null)}
+                onFocus={() => setHovered(d.branch)}
+                onBlur={() => setHovered(null)}
+                style={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', cursor: 'pointer' }}
+              >
+                <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--color-text)', marginBottom: 4, whiteSpace: 'nowrap' }}>
+                  {d.highestLPA}
+                </span>
+                <div style={{ position: 'relative', width: 2, height: `${(d.highestLPA / chartMax) * 100}%`, background: color, borderRadius: 2 }}>
+                  <span
+                    style={{
+                      position: 'absolute',
+                      top: -7,
+                      left: '50%',
+                      transform: `translateX(-50%) scale(${isHovered ? 1.3 : 1})`,
+                      transition: 'transform var(--transition-fast)',
+                      width: 14,
+                      height: 14,
+                      borderRadius: '50%',
+                      background: color,
+                      border: '2px solid var(--color-off-white)',
+                      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.25)',
+                    }}
+                  />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      <div />
+      <div style={{ display: 'flex', gap: 4, marginTop: 'var(--space-4)' }}>
+        {withPackage.map((d) => (
+          <div key={d.branch} style={{ flex: 1, position: 'relative', height: 56 }}>
+            <span
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: '50%',
+                transformOrigin: 'top left',
+                transform: 'rotate(40deg)',
+                fontSize: '0.72rem',
+                fontWeight: 700,
+                color: branchColor(d.branch),
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {bracketedBranchLabel(d.branch)}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // Shared by the main Placements page and the "Placement Details" sub-page —
 // both show the exact same batch-wise accordion, so the state/markup lives
 // here once instead of being duplicated.
@@ -323,12 +400,10 @@ function matchesCompanyFilter(row: PlacementRow, filter: CompanyFilter): boolean
   return sector.includes('core');
 }
 
-export default function PlacementYearAccordion({ years, enrichedYears, onActiveYearChange }: Props) {
+export default function PlacementYearAccordion({ years, onActiveYearChange }: Props) {
   const placementYearData = usePlacementYears();
   const visibleYears = years ? placementYearData.filter((y) => years.includes(y.batch)) : placementYearData;
   const [activeStatsYear, setActiveStatsYear] = useState('');
-  const [entriesPerPage, setEntriesPerPage] = useState(10);
-  const [statsPage, setStatsPage] = useState(0);
   const [companyFilter, setCompanyFilter] = useState<CompanyFilter>('all');
 
   // Opens the first batch by default, and re-picks one if the currently
@@ -359,9 +434,6 @@ export default function PlacementYearAccordion({ years, enrichedYears, onActiveY
 
   const activeYear = visibleYears.find((y) => y.batch === activeStatsYear) ?? visibleYears[0];
   const filteredRows = companyFilter === 'all' ? activeYear.rows : activeYear.rows.filter((r) => matchesCompanyFilter(r, companyFilter));
-  const totalPages = Math.max(1, Math.ceil(filteredRows.length / entriesPerPage));
-  const page = Math.min(statsPage, totalPages - 1);
-  const pageRows = entriesPerPage >= filteredRows.length ? filteredRows : filteredRows.slice(page * entriesPerPage, page * entriesPerPage + entriesPerPage);
 
   return (
     <div>
@@ -372,7 +444,7 @@ export default function PlacementYearAccordion({ years, enrichedYears, onActiveY
           return (
             <button
               key={y.batch}
-              onClick={() => { setActiveStatsYear(y.batch); setStatsPage(0); }}
+              onClick={() => setActiveStatsYear(y.batch)}
               style={{
                 padding: '0.6rem 1.5rem',
                 borderRadius: 'var(--radius-full)',
@@ -405,7 +477,7 @@ export default function PlacementYearAccordion({ years, enrichedYears, onActiveY
                   </p>
                 )}
 
-                {enrichedYears?.includes(y.batch) && y.branchOffers && (
+                {y.branchOffers && y.branchOffers.length > 0 && (
                   <div style={{ marginBottom: 'var(--space-8)' }}>
                     {/* Same dept-stat-grid/dept-stat-tile styling as the
                         Department Overview Placements stat tiles (see
@@ -461,59 +533,32 @@ export default function PlacementYearAccordion({ years, enrichedYears, onActiveY
                       )}
                     </div>
 
-                    <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-3)', marginBottom: 'var(--space-6)' }}>
-                      {y.branchOffers.map((b) => (
-                        <div
-                          key={b.branch}
-                          style={{
-                            position: 'relative',
-                            background: 'var(--color-white)',
-                            border: '1px solid var(--color-light-gray)',
-                            borderRadius: 'var(--radius-md)',
-                            padding: 'var(--space-3) var(--space-3) var(--space-3) calc(var(--space-3) + 4px)',
-                            overflow: 'hidden',
-                            boxShadow: 'var(--shadow-sm)',
-                            display: 'flex',
-                            alignItems: 'stretch',
-                          }}
-                        >
-                          <span style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, background: branchColor(b.branch) }} />
-                          <div style={{ flex: 1, textAlign: 'center' }}>
-                            <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', fontWeight: 700 }}>{b.branch}</div>
-                            <div style={{ fontSize: '1.3rem', fontWeight: 900, color: 'var(--color-primary)' }}>{b.offers.toLocaleString('en-IN')}</div>
-                          </div>
-                          {b.highestLPA != null && (
-                            <div style={{ flex: 1, textAlign: 'center', borderLeft: '1px solid var(--color-light-gray)', marginLeft: 'var(--space-2)', paddingLeft: 'var(--space-2)' }}>
-                              <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', fontWeight: 700 }}>Highest Package</div>
-                              <div style={{ fontSize: '1.3rem', fontWeight: 900, color: 'var(--color-primary)' }}>{b.highestLPA} LPA</div>
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-
                     <h3 style={{ fontFamily: 'var(--font-sans)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 'var(--space-3)', fontSize: 'var(--text-base)' }}>
                       Branch-Wise Placement Overview
                     </h3>
-                    <BranchOffersDonut data={y.branchOffers} total={y.total ?? 0} />
+                    <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: 'var(--space-5)', alignItems: 'start' }}>
+                      <div>
+                        <h4 style={{ fontFamily: 'var(--font-sans)', fontWeight: 500, color: 'var(--color-text)', marginBottom: 'var(--space-4)', fontSize: '1rem' }}>
+                          Offers by branch
+                        </h4>
+                        <BranchOffersDonut data={y.branchOffers} total={y.total ?? 0} />
+                      </div>
+                      <div>
+                        <h4 style={{ fontFamily: 'var(--font-sans)', fontWeight: 500, color: 'var(--color-text)', marginBottom: 'var(--space-4)', fontSize: '1rem' }}>
+                          Highest package by branch (LPA)
+                        </h4>
+                        <BranchHighestPackageChart data={y.branchOffers} />
+                      </div>
+                    </div>
                   </div>
                 )}
 
                 {y.rows.length > 0 && (
                   <>
                     <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 'var(--text-sm)', color: 'var(--color-text)' }}>
-                        <span>Show</span>
-                        <select
-                          value={entriesPerPage}
-                          onChange={(e) => { setEntriesPerPage(Number(e.target.value)); setStatsPage(0); }}
-                          style={{ border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-sm)', padding: '0.3rem 0.5rem', fontSize: 'var(--text-sm)' }}
-                        >
-                          {[10, 25, 50, 100].map((n) => <option key={n} value={n}>{n}</option>)}
-                          <option value={filteredRows.length || 1}>All</option>
-                        </select>
-                        <span>entries</span>
-                      </div>
+                      <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)' }}>
+                        {filteredRows.length.toLocaleString('en-IN')} {filteredRows.length === 1 ? 'company' : 'companies'}
+                      </span>
 
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
                         {COMPANY_FILTERS.map((f) => {
@@ -521,7 +566,7 @@ export default function PlacementYearAccordion({ years, enrichedYears, onActiveY
                           return (
                             <button
                               key={f.key}
-                              onClick={() => { setCompanyFilter(f.key); setStatsPage(0); }}
+                              onClick={() => setCompanyFilter(f.key)}
                               style={{
                                 padding: '0.45rem 1rem',
                                 borderRadius: 'var(--radius-md)',
@@ -547,25 +592,25 @@ export default function PlacementYearAccordion({ years, enrichedYears, onActiveY
                         No companies match this filter for this batch.
                       </p>
                     ) : (
-                    <div style={{ overflowX: 'auto' }}>
+                    <div style={{ overflow: 'auto', maxHeight: 520, border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)' }}>
                       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm)' }}>
                         <thead>
                           <tr style={{ background: 'var(--color-accent)' }}>
-                            <th style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900, whiteSpace: 'nowrap' }}>S.No</th>
-                            <th style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900 }}>Company Name</th>
-                            <th style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900, whiteSpace: 'nowrap' }}>No. of Selects</th>
+                            <th style={{ position: 'sticky', top: 0, textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900, whiteSpace: 'nowrap', background: 'var(--color-accent)' }}>S.No</th>
+                            <th style={{ position: 'sticky', top: 0, textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900, background: 'var(--color-accent)' }}>Company Name</th>
+                            <th style={{ position: 'sticky', top: 0, textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900, whiteSpace: 'nowrap', background: 'var(--color-accent)' }}>No. of Selects</th>
                             {y.salaryLabel && (
-                              <th style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900 }}>{y.salaryLabel}</th>
+                              <th style={{ position: 'sticky', top: 0, textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900, background: 'var(--color-accent)' }}>{y.salaryLabel}</th>
                             )}
                             {y.rows.some((r) => r.sector) && (
-                              <th style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900 }}>Sector</th>
+                              <th style={{ position: 'sticky', top: 0, textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900, background: 'var(--color-accent)' }}>Sector</th>
                             )}
                           </tr>
                         </thead>
                         <tbody>
-                          {pageRows.map((row, i) => (
+                          {filteredRows.map((row, i) => (
                             <tr key={`${row.company}-${i}`} style={{ background: i % 2 === 0 ? 'var(--color-off-white)' : 'transparent' }}>
-                              <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)' }}>{page * entriesPerPage + i + 1}</td>
+                              <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)' }}>{i + 1}</td>
                               <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)', fontWeight: 600 }}>{row.company}</td>
                               <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)' }}>{row.selects}</td>
                               {y.salaryLabel && (
@@ -579,30 +624,6 @@ export default function PlacementYearAccordion({ years, enrichedYears, onActiveY
                         </tbody>
                       </table>
                     </div>
-                    )}
-
-                    {totalPages > 1 && filteredRows.length > 0 && (
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'var(--space-4)', fontSize: 'var(--text-sm)', color: 'var(--color-text-light)' }}>
-                        <span>
-                          Showing {page * entriesPerPage + 1} to {Math.min(page * entriesPerPage + entriesPerPage, filteredRows.length)} of {filteredRows.length} entries
-                        </span>
-                        <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
-                          <button
-                            onClick={() => setStatsPage((p) => Math.max(0, p - 1))}
-                            disabled={page === 0}
-                            style={{ padding: '0.3rem 0.8rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-light-gray)', background: 'var(--color-white)', cursor: page === 0 ? 'default' : 'pointer', opacity: page === 0 ? 0.5 : 1 }}
-                          >
-                            Previous
-                          </button>
-                          <button
-                            onClick={() => setStatsPage((p) => Math.min(totalPages - 1, p + 1))}
-                            disabled={page >= totalPages - 1}
-                            style={{ padding: '0.3rem 0.8rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-light-gray)', background: 'var(--color-white)', cursor: page >= totalPages - 1 ? 'default' : 'pointer', opacity: page >= totalPages - 1 ? 0.5 : 1 }}
-                          >
-                            Next
-                          </button>
-                        </div>
-                      </div>
                     )}
                   </>
                 )}

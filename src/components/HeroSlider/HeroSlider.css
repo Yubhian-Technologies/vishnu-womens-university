@@ -230,7 +230,7 @@
   justify-content: center;
   gap: 0.7rem;
   margin-top: var(--space-5);
-  font-size: var(--text-xs, 0.75rem);
+  font-size: var(--text-base, 1rem);
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -241,7 +241,7 @@
 .hero-tag-dot {
   color: var(--hero-ivory);
   opacity: 0.85;
-  font-size: 0.75rem;
+  font-size: 1rem;
   line-height: 1;
 }
 
@@ -273,8 +273,8 @@
   }
 
   .hero-tag-words {
-    font-size: 0.68rem;
-    gap: 0.45rem;
+    font-size: 0.9rem;
+    gap: 0.5rem;
     letter-spacing: 0.09em;
   }
 }
@@ -306,8 +306,8 @@
   }
 
   .hero-tag-words {
-    font-size: 0.62rem;
-    gap: 0.35rem;
+    font-size: 0.8rem;
+    gap: 0.4rem;
     letter-spacing: 0.08em;
   }
 }
@@ -319,8 +319,8 @@
   }
 
   .hero-tag-words {
-    font-size: 0.56rem;
-    gap: 0.3rem;
+    font-size: 0.72rem;
+    gap: 0.32rem;
   }
 }
 

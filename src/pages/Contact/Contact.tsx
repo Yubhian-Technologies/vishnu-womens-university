@@ -335,7 +335,7 @@ export default function Contact() {
       <section id="primary-helpdesks" className="contact-info-section" aria-label="Primary Support Desks" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
         <div className="container">
           <div className="section-head-center">
-            <span className="section-label">Key Contact Points</span>
+            <span className="section-label">Key Contacts</span>
             <h2 className="section-title">Connect with our Team</h2>
             <p className="section-subtitle">
               Dedicated support desks for <strong>admissions, administrative services, and campus visits</strong>, providing timely assistance and guidance.

@@ -1102,14 +1102,6 @@ export default function PlacementDetail() {
   const placementYearData = usePlacementYears();
   const [sidebarChartBatch, setSidebarChartBatch] = useState('');
   const sidebarChartYear = placementYearData.find((y) => y.batch === sidebarChartBatch);
-  // Which batches get the richer "enriched" view (companies-visited/branch-
-  // offers stat tiles, donut chart, named student records) below is derived
-  // straight from whether a batch actually HAS that data, rather than a
-  // fixed list of batch labels — so a new year added from the admin (Batch
-  // Years section) shows up here automatically, with the enriched view
-  // switching on by itself the moment its Department-wise Offers are filled
-  // in, instead of needing this page's code updated by hand every time.
-  const enrichedYearBatches = placementYearData.filter((y) => (y.branchOffers?.length ?? 0) > 0).map((y) => y.batch);
 
   useEffect(() => {
     setActiveTableRow(null);
@@ -1184,7 +1176,8 @@ export default function PlacementDetail() {
   // this generic Outcomes & Achievements block would just repeat them. Our
   // Recruiters drops it per request — the recruiter logo grid below is the
   // page's actual point, and Outcomes was just repeating the Overview text.
-  const showOutcomes = !!item.outcomes && item.outcomes.length > 0 && item.slug !== 'placement-highlights' && item.slug !== 'our-recruiters' && item.slug !== 'tpo-team' && item.slug !== 'industry-liaison-offices';
+  const activeOutcomes = (item.outcomes || []).filter((o) => !o.includes('2015-2019') && !o.includes('2015–2019'));
+  const showOutcomes = activeOutcomes.length > 0 && item.slug !== 'placement-highlights' && item.slug !== 'our-recruiters' && item.slug !== 'tpo-team' && item.slug !== 'industry-liaison-offices';
   // Shared markup for the below-Overview spot every non-Placement-Cell page
   // uses. Placement Cell renders its own combined Summary+chart block near
   // the hero instead (see placementCellSummarySection below) — it needs the
@@ -1203,7 +1196,7 @@ export default function PlacementDetail() {
             placementCellSummarySection above). mobile-stack-grid still
             collapses this to one column on small screens. */}
         <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-4)' }}>
-          {item.outcomes!.map((o) => (
+          {activeOutcomes.map((o) => (
             <div key={o}
               style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', minHeight: 110, display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
               <Trophy size={20} strokeWidth={1.75} style={{ flexShrink: 0, color: 'var(--color-accent)' }} />
@@ -1566,7 +1559,6 @@ export default function PlacementDetail() {
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Placements, Year by Year</h2>
             </div>
             <PlacementYearAccordion
-              enrichedYears={enrichedYearBatches}
               onActiveYearChange={setSidebarChartBatch}
             />
           </div>

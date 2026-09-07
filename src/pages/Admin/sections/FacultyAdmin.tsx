@@ -171,6 +171,11 @@ export default function FacultyAdmin() {
   const [importing, setImporting] = useState(false);
   const [importResult, setImportResult] = useState<string | null>(null);
 
+  const [jsonDept, setJsonDept] = useState('CSE');
+  const [jsonText, setJsonText] = useState('');
+  const [jsonImporting, setJsonImporting] = useState(false);
+  const [jsonResult, setJsonResult] = useState<string | null>(null);
+
   const set = (k: keyof FormState, v: string | number | CustomSection[]) => setForm((p) => ({ ...p, [k]: v }));
   const handleImage = (r: UploadResult) => setForm((p) => ({ ...p, imageUrl: r.url, storagePath: r.path }));
 
@@ -325,6 +330,96 @@ export default function FacultyAdmin() {
     } catch (e) {
       setImportResult(`Couldn't import: ${(e as Error).message}`);
     } finally { setImporting(false); }
+  };
+
+  // Full-record importer — takes a JSON array of faculty objects, from an
+  // uploaded file or pasted text. Each entry needs a `name`; every other
+  // field is optional. An entry whose name + department (case-insensitive)
+  // matches an existing record updates just the fields it carries; otherwise
+  // a new record is created with sensible defaults for anything missing.
+  // Nothing is ever deleted. Accepts a top-level array or `{ faculty: [...] }`.
+  // Per-entry keys are case-insensitive; `factsText` / `sectionsText` strings
+  // are parsed the same way the form does, or pass ready-made `facts` /
+  // `sections` / `customSections` straight through. Runs independently of the
+  // two importers above — nothing else in this section changes.
+  const importJson = async (raw: string) => {
+    setJsonImporting(true);
+    setJsonResult(null);
+    try {
+      const parsed: unknown = JSON.parse(raw);
+      const list = (Array.isArray(parsed)
+        ? parsed
+        : Array.isArray((parsed as { faculty?: unknown[] })?.faculty)
+          ? (parsed as { faculty: unknown[] }).faculty
+          : []) as Record<string, unknown>[];
+      if (list.length === 0) throw new Error('Expected a JSON array of faculty objects (or { "faculty": [ … ] }).');
+
+      const pick = (o: Record<string, unknown>, ...keys: string[]) => {
+        const lower: Record<string, unknown> = {};
+        for (const k of Object.keys(o)) lower[k.toLowerCase()] = o[k];
+        for (const k of keys) {
+          const v = lower[k.toLowerCase()];
+          if (v !== undefined && v !== null) return v;
+        }
+        return undefined;
+      };
+      const str = (v: unknown) => (v === undefined ? undefined : String(v).trim());
+
+      // Next free `order` per department, so new records append in sequence.
+      const nextOrder: Record<string, number> = {};
+      faculty.forEach((f) => { nextOrder[f.department] = Math.max(nextOrder[f.department] ?? -1, f.order); });
+
+      let created = 0;
+      let updated = 0;
+      let skipped = 0;
+      for (const entry of list) {
+        if (!entry || typeof entry !== 'object') { skipped++; continue; }
+        const name = str(pick(entry, 'name', 'fullName', 'full_name'));
+        if (!name) { skipped++; continue; }
+        const department = str(pick(entry, 'department', 'dept')) || jsonDept;
+
+        const fields: Record<string, unknown> = { name, department };
+        const setIf = (k: string, v: unknown) => { if (v !== undefined) fields[k] = v; };
+        setIf('designation', str(pick(entry, 'designation', 'title')));
+        setIf('qualification', str(pick(entry, 'qualification', 'qualifications')));
+        setIf('specialization', str(pick(entry, 'specialization', 'specialisation')));
+        setIf('email', str(pick(entry, 'email', 'mail')));
+        setIf('imageUrl', str(pick(entry, 'imageUrl', 'image', 'photo', 'photoUrl')));
+        setIf('storagePath', str(pick(entry, 'storagePath')));
+        const order = pick(entry, 'order');
+        if (order !== undefined && !Number.isNaN(Number(order))) fields.order = Number(order);
+
+        const factsText = pick(entry, 'factsText', 'facts_text');
+        if (typeof factsText === 'string') fields.facts = textToFacts(factsText);
+        else setIf('facts', pick(entry, 'facts'));
+        const sectionsText = pick(entry, 'sectionsText', 'sections_text');
+        if (typeof sectionsText === 'string') fields.sections = textToSections(sectionsText);
+        else setIf('sections', pick(entry, 'sections'));
+        setIf('customSections', pick(entry, 'customSections'));
+
+        const match = faculty.find(
+          (f) => f.name.trim().toLowerCase() === name.toLowerCase()
+            && f.department.trim().toLowerCase() === department.toLowerCase()
+        );
+        if (match) {
+          await updateDoc(doc(db, 'faculty', match.id), fields);
+          updated++;
+        } else {
+          const ord = nextOrder[department] = (nextOrder[department] ?? -1) + 1;
+          await addDoc(collection(db, 'faculty'), {
+            designation: 'Assistant Professor', qualification: '', specialization: '', email: '',
+            imageUrl: '', storagePath: '', facts: [], sections: [], order: ord,
+            ...fields,
+            createdAt: serverTimestamp(),
+          });
+          created++;
+        }
+      }
+      setJsonResult(`Created ${created}, updated ${updated}${skipped ? `, skipped ${skipped} (no name)` : ''}.`);
+      setJsonText('');
+    } catch (e) {
+      setJsonResult(`Couldn't import: ${(e as Error).message}`);
+    } finally { setJsonImporting(false); }
   };
 
   // Shared between save() and its diff against originalForm — the legacy
@@ -509,6 +604,60 @@ export default function FacultyAdmin() {
             {bulkImporting ? 'Importing…' : `Import ${bulkText.split('\n').filter((l) => l.trim()).length || ''} Faculty`}
           </button>
         </div>
+      </div>
+
+      <div className="admin-card">
+        <h2 className="admin-card__title">Import Faculty from JSON</h2>
+        <p className="admin-lead" style={{ marginBottom: '1rem' }}>
+          Import a whole roster in one go — upload a <code>.json</code> file or paste the JSON below.
+          Expects an array of objects (or <code>{'{ "faculty": [ … ] }'}</code>). Every object needs a{' '}
+          <code>name</code>; optional keys (case-insensitive): <code>designation</code>, <code>department</code>,{' '}
+          <code>qualification</code>, <code>specialization</code>, <code>email</code>, <code>imageUrl</code>,{' '}
+          <code>order</code>, <code>facts</code> or <code>factsText</code>, <code>sections</code> or{' '}
+          <code>sectionsText</code>, <code>customSections</code>. An entry matching an existing record by
+          name + department updates that record; anything else is created. Nothing is deleted, and the two
+          importers above are unaffected.
+        </p>
+        <div className="admin-form-grid">
+          <div className="admin-field">
+            <label htmlFor="field-json-dept">Default department</label>
+            <select id="field-json-dept" value={jsonDept} onChange={(e) => setJsonDept(e.target.value)}>
+              {departmentNames.map((d) => <option key={d}>{d}</option>)}
+            </select>
+            <p className="admin-field__hint">Used only for entries that don't name their own department.</p>
+          </div>
+          <div className="admin-field admin-field--full">
+            <label htmlFor="field-json-text">Paste JSON</label>
+            <textarea
+              id="field-json-text"
+              rows={10}
+              value={jsonText}
+              onChange={(e) => setJsonText(e.target.value)}
+              placeholder={'[\n  { "name": "Dr. A. Sharma", "designation": "Professor & HOD", "department": "CSE", "qualification": "Ph.D." }\n]'}
+            />
+          </div>
+        </div>
+        <div className="admin-form-actions">
+          <input
+            type="file"
+            accept="application/json,.json"
+            disabled={jsonImporting}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) file.text().then(importJson);
+              e.target.value = '';
+            }}
+          />
+          <button
+            className="admin-btn admin-btn--primary"
+            onClick={() => importJson(jsonText)}
+            disabled={jsonImporting || !jsonText.trim()}
+          >
+            {jsonImporting ? 'Importing…' : 'Import pasted JSON'}
+          </button>
+        </div>
+        {jsonImporting && <p className="admin-loading">Importing…</p>}
+        {jsonResult && <p className="admin-field__hint">{jsonResult}</p>}
       </div>
 
       <div className="admin-card">
