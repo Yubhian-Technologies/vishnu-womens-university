@@ -1,10 +1,9 @@
 import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Laptop, ArrowRight } from 'lucide-react';
+import { Laptop } from 'lucide-react';
 import HeroSlider from '../../components/HeroSlider/HeroSlider';
 import CounterSection from '../../components/CounterSection/CounterSection';
 import ScrollTopButton from '../../components/ScrollTopButton/ScrollTopButton';
-import NewsCard, { type NewsArticle } from '../../components/NewsCard/NewsCard';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import TestimonialSlider from '../../components/TestimonialSlider/TestimonialSlider';
 import RecruitersSection from '../../components/RecruitersMarquee/RecruitersSection';
@@ -113,15 +112,6 @@ function useTilt(strength = 12) {
 
 
 
-/* Subset of a `gallery` collection doc we actually read for the home strip. */
-interface GalleryImageLite {
-  id: string;
-  title: string;
-  category: string;
-  imageUrl: string;
-  order: number;
-}
-
 /* ── Component ────────────────────────────────────────────── */
 export default function Home() {
   // "Upcoming at VWU" is driven by the Happenings collection the admin's
@@ -131,20 +121,6 @@ export default function Home() {
   const { docs: happenings } = useOrderedCollection<HappeningDoc>('happenings', 'order');
   const upcomingHappenings = happenings.filter(h => h.type === 'upcoming');
 
-  // "Latest from VWU" strip shows the 3 most recently added Gallery photos
-  // (`gallery` collection — new uploads get an increasing `order`), each
-  // card linking to the full /news-awards/gallery page.
-  const { docs: galleryImages } = useOrderedCollection<GalleryImageLite>('gallery', 'order');
-  const featuredNews: NewsArticle[] = galleryImages.slice(-3).reverse().map((img) => ({
-    id: img.id,
-    title: img.title,
-    excerpt: '',
-    date: '',
-    category: img.category || '',
-    imageUrl: img.imageUrl,
-    imageAlt: img.title,
-    path: '/news-awards/gallery',
-  }));
   const liveTestimonials = useContentBlocks('home', 'testimonials');
   const testimonials = liveTestimonials.length > 0 ? liveTestimonials : defaultTestimonials;
   const liveStudyCards = useContentBlocks('home', 'studyCards');
@@ -301,33 +277,6 @@ export default function Home() {
 
       {/* ── Chapter 6: Alumni Success & Testimonials ── */}
       <TestimonialSlider testimonials={testimonials} />
-
-      {/* ── Chapter 7: Live Campus Pulse & News ── */}
-      <section className="news-section">
-        <div className="news-glow-1" aria-hidden="true" />
-        <div className="news-glow-2" aria-hidden="true" />
-        <div className="container">
-          <div className="news-section-header">
-            <div className="reveal-left">
-              <h2 className="section-title">Latest from VWU</h2>
-            </div>
-            <Link to="/news-awards/gallery" className="news-btn-tonal reveal-right">
-              <span>View Gallery</span>
-              <ArrowRight size={16} className="news-btn-arrow" />
-            </Link>
-          </div>
-          <div className="news-grid">
-            {featuredNews.map((item) => (
-              <div key={item.id} className="news-grid-item">
-                <NewsCard article={item} isFeatured />
-              </div>
-            ))}
-            {featuredNews.length === 0 && (
-              <p style={{ color: 'var(--color-text-light)' }}>No gallery photos yet — check back soon.</p>
-            )}
-          </div>
-        </div>
-      </section>
 
       <UpcomingEvents happenings={upcomingHappenings} />
 
