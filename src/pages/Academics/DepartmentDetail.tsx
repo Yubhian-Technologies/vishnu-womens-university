@@ -920,7 +920,6 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
           <div className="container">
             <div style={{ marginBottom: '1.25rem', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem' }}>
               <div>
-                <span className="section-label dept-section-label" style={{ marginBottom: '0.2rem' }}>Academic Degrees</span>
                 <h2 className="section-title" style={{ fontSize: '1.6rem', margin: 0 }}>Programmes Offered</h2>
               </div>
               <span style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--color-text-light)' }}>

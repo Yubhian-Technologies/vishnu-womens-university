@@ -60,6 +60,7 @@ const navItemsData: NavItem[] = [
           { label: 'Organizational Chart', path: '/downloads/SVECWOrganizationChart.jpg', download: true, disabled: true },
           { label: 'Core Executive Body', path: '/about#core-executive' },
           { label: 'About Society (SVES)', path: '/about-sves' },
+          { label: 'Global Alumni Network', path: 'https://alumni.srivishnu.edu.in/', external: true },
         ],
       },
       {

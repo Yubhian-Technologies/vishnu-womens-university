@@ -524,9 +524,16 @@ export default function FacultyAdmin() {
           </div>
           <div className="admin-field">
             <label htmlFor="field-designation">Designation</label>
-            <select id="field-designation" value={form.designation} onChange={(e) => set('designation', e.target.value)}>
-              {DESIGNATIONS.map((d) => <option key={d}>{d}</option>)}
-            </select>
+            <input
+              id="field-designation"
+              list="faculty-designation-options"
+              value={form.designation}
+              onChange={(e) => set('designation', e.target.value)}
+              placeholder="Assistant Professor"
+            />
+            <datalist id="faculty-designation-options">
+              {DESIGNATIONS.map((d) => <option key={d} value={d} />)}
+            </datalist>
           </div>
           <div className="admin-field">
             <label htmlFor="field-department-2">Department</label>
