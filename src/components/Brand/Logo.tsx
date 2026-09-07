@@ -17,7 +17,7 @@ interface LogoProps {
   className?: string;
 }
 
-const DEFAULT_TAGLINE = 'First Private State University for Women in the Telugu States';
+const DEFAULT_TAGLINE = "First Private State Women's University in the Telugu States";
 
 export default function Logo({
   size = 52,

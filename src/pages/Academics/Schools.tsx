@@ -30,22 +30,7 @@ export default function Schools() {
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Academics', to: '/academics' }, { label: 'Schools' }]}
       />
 
-      <section className="section bg-white" style={{ padding: 'var(--space-10) 0 var(--space-4)' }}>
-        <div className="container" style={{ maxWidth: '960px', textAlign: 'center' }}>
-          <p
-            className="schools-intro-desc"
-            style={{
-              fontSize: 'clamp(1.05rem, 1.8vw, 1.2rem)',
-              lineHeight: 1.85,
-              color: 'var(--color-text)',
-              margin: '0 auto',
-              fontWeight: 450,
-            }}
-          >
-            At Vishnu Women’s University, diverse disciplines converge within a collaborative academic ecosystem. The interaction of ideas, perspectives, and expertise across fields enriches learning, inspires innovation, and empowers students to approach complex challenges with creativity and confidence.
-          </p>
-        </div>
-      </section>
+
 
       {loading ? (
         <section className="section bg-white">
@@ -64,8 +49,7 @@ export default function Schools() {
           <section key={school.id} className={`section ${i % 2 === 0 ? 'bg-white' : 'bg-off-white'}`}>
             <div className="container">
               <div style={{ textAlign: 'left', marginBottom: 'var(--space-10)' }}>
-                <span className="section-label">Schools</span>
-                <h2 className="section-title">{school.title}</h2>
+                <h2 className="section-title school-title">{school.title}</h2>
                 {school.description && (
                   <p className="section-desc">{school.description}</p>
                 )}

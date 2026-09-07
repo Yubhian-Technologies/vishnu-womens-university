@@ -420,7 +420,7 @@ export default function AboutSVES() {
                 Sri Vishnu Educational Society continues to shape future leaders, innovators, and professionals through world-class academic institutions.
               </p>
               <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: 'var(--text-lg)', fontWeight: 700, marginBottom: 0 }}>
-                Discover our flagship university — Vishnu Women's University.
+                Discover Vishnu Women&rsquo;s University — empowering women to learn, lead, and shape the future.
               </p>
             </div>
             <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>

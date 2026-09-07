@@ -3,6 +3,14 @@
   text-align: justify;
 }
 
+/* Highlighted school name — replaces the old "Schools" eyebrow pill */
+.schools-page .school-title {
+  display: inline-block;
+  color: var(--color-primary);
+  padding-left: var(--space-4);
+  border-left: 4px solid var(--color-accent);
+}
+
 .schools-page .dept-desc {
   display: -webkit-box;
   -webkit-line-clamp: 5;
