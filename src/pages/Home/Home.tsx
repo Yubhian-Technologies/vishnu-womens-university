@@ -189,7 +189,7 @@ export default function Home() {
         <div className="container">
           <div className="study-intro reveal">
             <h2 className="section-title gradient-text">Study at VWU</h2>
-            <p className="section-desc"><strong>Learn. Lead. Innovate.</strong><br />At VWU, education goes beyond the classroom. Experience personalized, industry-focused learning that builds technical expertise, leadership confidence, creativity, and the skills to shape your future.</p>
+            <p className="section-desc"><strong>Think. Build. Lead.</strong><br />At VWU, education goes beyond the classroom. Experience personalized, industry-focused learning that builds technical expertise, leadership confidence, creativity, and the skills to shape your future.</p>
           </div>
           <div className="study-grid">
             {studyCards.map((card, i) => {
