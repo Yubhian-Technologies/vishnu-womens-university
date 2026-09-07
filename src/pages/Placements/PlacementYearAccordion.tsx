@@ -58,6 +58,8 @@ export const BRANCH_COLORS: Record<string, string> = {
   MBA: '#7551a8',
   Mechanical: '#a8710a',
   'M. Tech.': '#455a64',
+  'M. Tech PE': '#6b8e23',
+  'M. Tech SE': '#1e6f9e',
 };
 
 function branchKey(label: string): string {
@@ -356,8 +358,8 @@ function BranchHighestPackageChart({ data }: { data: BranchOfferCount[] }) {
                 transformOrigin: 'top left',
                 transform: 'rotate(40deg)',
                 fontSize: '0.72rem',
-                fontWeight: 600,
-                color: 'var(--color-text-light)',
+                fontWeight: 700,
+                color: branchColor(d.branch),
                 whiteSpace: 'nowrap',
               }}
             >
