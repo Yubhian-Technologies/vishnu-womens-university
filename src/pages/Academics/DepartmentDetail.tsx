@@ -177,9 +177,9 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
 
   const { docs: allPrograms, loading: progLoading } = useOrderedCollection<ProgramDoc>('programs', 'order');
   const subPrograms = group.programSlugs
-    .map((s) => allPrograms.find((p) => p.slug === s))
+    .map((s) => allPrograms.find((p) => p.slug?.toLowerCase() === s.toLowerCase()))
     .filter((p): p is ProgramDoc => !!p);
-  const activeProgram = subPrograms.find((p) => p.slug === activeSlug);
+  const activeProgram = subPrograms.find((p) => p.slug?.toLowerCase() === activeSlug.toLowerCase()) || subPrograms[0];
 
   const { docs: allFaculty } = useOrderedCollection<FacultyDoc>('faculty', 'order');
   const deptKeys = new Set<string>(group.facultyDepartments);
@@ -260,7 +260,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
       <RouteFallback />
     );
   }
-  if (!progLoading && !activeProgram) return <Navigate to="/academics" replace />;
+  if (!progLoading && !activeProgram && subPrograms.length === 0) return <Navigate to="/academics" replace />;
   // Also wait on the department lookup: rendering before it resolves would
   // show the short code (activeProgram.department / group.deptShortCode)
   // as the page title/H1 and then flash to the full department title once
@@ -385,12 +385,14 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   const activeStaticBatch = activePlacementYear
     ? findDeptBatchStatsForYearLabel(deptShortCodeForPlacements, activePlacementYear.year, mainPlacementYears)
     : null;
-  // The institution-wide published figure is the authoritative one when it
-  // exists for this Academic Year — the department's own uploaded sheet
-  // (placementYearStats.totalOffers) is often a partial/in-progress count,
-  // not the final published total, so this replaces the tile's number
-  // outright rather than showing both side by side.
-  const displayedTotalOffers = activeStaticBatch?.offers ?? placementYearStats?.totalOffers ?? 0;
+  // The department's own uploaded sheet (placementYearStats.totalOffers) is
+  // the authoritative count for the "Total No. of Offers" tile whenever it
+  // exists — it's the actual, complete row count of what an admin imported
+  // for this Academic Year. The institution-wide module's figure only fills
+  // in when the department hasn't uploaded its own records at all for this
+  // year (placementYearStats is null), so a visitor still never sees "no
+  // data" for a batch the institution has published a figure for.
+  const displayedTotalOffers = placementYearStats?.totalOffers ?? activeStaticBatch?.offers ?? 0;
   const hasPlacements = !!(shared.placementIntro || shared.placementStats.length > 0 || shared.placementRecruiters.length > 0 || placementYears.length > 0 || staticDeptBatches.length > 0);
 
   // Individual student Internship Records — same shape/pattern as the

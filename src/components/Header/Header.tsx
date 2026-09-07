@@ -122,6 +122,10 @@ const navItemsData: NavItem[] = [
       },
       { groupLabel: 'UG Programmes', groupPath: '/academics?tab=btech', items: [] },
       { groupLabel: 'PG Programmes', groupPath: '/academics?tab=mtech', items: [] },
+      // No groupPath — the Ph.D heading is plain text, not a link. Its
+      // programme rows are marked `disabled` in the render map below so they
+      // show but never navigate.
+      { groupLabel: 'Ph.D Programmes', items: [] },
       {
         groupLabel: 'Information',
         groupPath: '/information',
@@ -237,7 +241,7 @@ const navItemsData: NavItem[] = [
       { label: 'Campus Book Stores', path: '/campus/campus-book-stores' },
       { label: 'Wi-Fi Campus', path: '/campus/wifi-campus' },
       { label: 'Campus Hostels', path: '/campus/campus-hostels' },
-      { label: 'Staff Quarters', path: '/campus/staff-quarters' },
+      { label: 'Faculty & Staff Residential Facilities', path: '/campus/staff-quarters' },
       { label: 'Food Courts & Cafeterias', path: '/campus/food-courts' },
       { label: 'Vishnu Fitness Centre', path: '/campus/fitness-centre' },
       { label: 'Health Care Centre', path: '/campus/health-care' },
@@ -246,13 +250,34 @@ const navItemsData: NavItem[] = [
       { label: 'Wellness Center', path: '/campus/wellness-center' },
       { label: 'Swimming Pool & Sports', path: '/campus/swimming-pool' },
       { label: 'Travel Desk', path: '/campus/travel-desk' },
-      { label: 'Radio Vishnu 90.4', path: '/differentiators/radio-vishnu-diff' },
+      { label: 'Temples of God', path: '/campus/temples' },
       { label: 'Vishnu TV Academy', path: '/vishnu-tv-academy' },
       { label: 'Student Clubs', path: '/student-clubs' },
       { label: 'Arts & Culture', path: '/arts-culture' },
       { label: 'Vishnu School of Music', path: 'https://svesschoolofmusic.in/', external: true },
       { label: 'Sports & Games', path: '/sports-games' },
       { label: 'Other Facilities', path: '/campus/other-facilities' },
+    ],
+  },
+  {
+    label: 'Rankings',
+    highlight: {
+      title: 'Recognised Quality',
+      badge: 'NAAC A+ & NBA',
+      description: 'A record of national rankings, ratings, awards, and accreditations endorsed by India\'s foremost regulatory and ranking bodies.',
+      linkText: 'View All Recognitions',
+      linkPath: '/news-awards/accreditations-awards',
+    },
+    groups: [
+      {
+        groupLabel: 'Rankings & Recognitions',
+        groupPath: '/news-awards/accreditations-awards',
+        items: [
+          { label: 'Rankings & Ratings', path: '/news-awards/accreditations-awards#ranking' },
+          { label: 'Awards & Recognitions', path: '/news-awards/accreditations-awards#award' },
+          { label: 'Accreditations & Approvals', path: '/news-awards/accreditations-awards#accreditation' },
+        ],
+      },
     ],
   },
   {
@@ -374,6 +399,7 @@ export default function Header() {
   });
   const ugProgrammes = programs.filter((p) => p.category === 'btech').map(programItem);
   const pgProgrammes = programs.filter((p) => p.category === 'mtech' || p.category === 'mba').map(programItem);
+  const phdProgrammes = programs.filter((p) => p.category === 'phd').map(programItem);
 
   const { docs: differentiatorItems } = useOrderedCollection<DifferentiatorItemDoc>('differentiatorItems', 'order');
   const { docs: placementItems } = useOrderedCollection<PlacementItemDoc>('placementItems', 'order');
@@ -451,6 +477,7 @@ export default function Header() {
       const groups = item.groups.map((group) => {
         if (group.groupLabel === 'UG Programmes') return { ...group, items: ugProgrammes };
         if (group.groupLabel === 'PG Programmes') return { ...group, items: pgProgrammes };
+        if (group.groupLabel === 'Ph.D Programmes') return { ...group, items: phdProgrammes.map((c) => ({ ...c, disabled: true })) };
         return group;
       });
       return { ...item, groups };

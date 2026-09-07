@@ -367,7 +367,7 @@ export default function Admissions() {
             subtitle="From modern labs and smart classrooms to hostels, sports grounds, and a buzzing placement season — see what awaits you at VWU."
             highlights={[
               `AP EAPCET college code: ${eapcetCode}`,
-              '1,400+ placements in 2024–25 alone',
+              '1,100+ placements in 2025–26',
               'Highest package: ₹59.28 LPA',
               '100% scholarship coverage available for eligible students',
               'Campus visit & virtual tour options available',
