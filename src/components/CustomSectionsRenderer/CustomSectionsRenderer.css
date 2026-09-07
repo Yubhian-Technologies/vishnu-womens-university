@@ -126,7 +126,7 @@
 }
 
 .dh-brief__body {
-  font-size: var(--text-sm);
+  font-size: var(--text-base);
   line-height: 1.7;
   color: var(--color-text);
 }
