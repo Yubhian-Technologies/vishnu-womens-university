@@ -107,28 +107,50 @@
 /* Clean Material-style surface — a near-solid white pill instead of heavy
    glassmorphism, so the search field reads as a clear, tappable affordance
    against the deep teal hero rather than another translucent layer. */
+/* Apple VisionOS Liquid Glass Hero Search Bar */
 .hero-search-box {
   display: flex;
   align-items: center;
-  background: var(--hero-white);
+  background: rgba(255, 255, 255, 0.45) !important;
+  backdrop-filter: blur(32px) saturate(210%) contrast(104%) brightness(1.02) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(210%) contrast(104%) brightness(1.02) !important;
+  border: 1px solid rgba(255, 255, 255, 0.58) !important;
   border-radius: var(--radius-full, 9999px);
   padding: 6px 6px 6px 20px;
-  box-shadow: 0 8px 24px -6px rgba(2, 37, 48, 0.35);
-  border: 1px solid rgba(4, 56, 75, 0.08);
+  box-shadow: 0 20px 48px -8px rgba(0, 0, 0, 0.22),
+              0 8px 20px -4px rgba(0, 0, 0, 0.12),
+              inset 0 1px 0.5px 0.5px rgba(255, 255, 255, 0.95),
+              inset 0 -1px 0 0 rgba(255, 255, 255, 0.3) !important;
   outline: none !important;
-  transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+  transition: all 280ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hero-search-box:hover {
+  background: rgba(255, 255, 255, 0.58) !important;
+  backdrop-filter: blur(36px) saturate(220%) contrast(105%) brightness(1.03) !important;
+  -webkit-backdrop-filter: blur(36px) saturate(220%) contrast(105%) brightness(1.03) !important;
+  border-color: rgba(255, 255, 255, 0.78) !important;
+  box-shadow: 0 24px 56px -10px rgba(0, 0, 0, 0.28),
+              0 10px 24px -4px rgba(0, 0, 0, 0.14),
+              inset 0 1.5px 0 0 rgba(255, 255, 255, 0.98),
+              inset 0 -1px 0 0 rgba(255, 255, 255, 0.4) !important;
 }
 
 .hero-search-box:focus-within {
-  box-shadow: 0 10px 28px -6px rgba(2, 37, 48, 0.4), 0 0 0 3px rgba(4, 56, 75, 0.12);
-  border-color: rgba(4, 56, 75, 0.18);
-  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.65) !important;
+  backdrop-filter: blur(36px) saturate(220%) brightness(1.03) !important;
+  -webkit-backdrop-filter: blur(36px) saturate(220%) brightness(1.03) !important;
+  border-color: rgba(255, 255, 255, 0.88) !important;
+  box-shadow: 0 24px 56px -10px rgba(0, 0, 0, 0.32),
+              0 0 0 3px rgba(255, 255, 255, 0.35),
+              inset 0 1.5px 0 0 rgba(255, 255, 255, 0.98) !important;
+  transform: translateY(-2px);
   outline: none !important;
 }
 
 .hero-search-icon {
-  color: var(--hero-teal);
-  opacity: 0.7;
+  color: var(--hero-teal, #0b1e42);
+  opacity: 0.85;
   flex-shrink: 0;
   margin-right: 10px;
   pointer-events: none;
@@ -143,7 +165,8 @@
   box-shadow: none !important;
   background: transparent;
   font-size: var(--text-base, 1rem);
-  color: var(--hero-teal);
+  color: var(--hero-teal, #0b1e42);
+  font-weight: 600;
   font-family: inherit;
   padding: 6px 0;
   -webkit-appearance: none;
@@ -159,8 +182,8 @@
 }
 
 .hero-search-input::placeholder {
-  color: rgba(4, 56, 75, 0.5);
-  font-weight: 400;
+  color: rgba(11, 30, 66, 0.65);
+  font-weight: 500;
 }
 
 /* The hero's one and only primary CTA — orange fill per the VWU theme, with

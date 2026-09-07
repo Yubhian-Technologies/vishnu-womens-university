@@ -32,8 +32,8 @@ export function getDepartmentTagline(keyOrCode?: string, override?: string): str
   if (key === 'EVT' || key === 'MTECH-VLSI' || key === 'ELECTRONICS & COMMUNICATION ENGINEERING') {
     return DEPARTMENT_TAGLINES.ECE;
   }
-  if (key === 'MECHANICAL' || key === 'MECHANICAL ENGINEERING') {
-    return DEPARTMENT_TAGLINES.ME;
+  if (key === 'EEE' || key === 'MTECH-POWER-ELECTRONICS' || key === 'MTECH-PE' || key === 'ELECTRICAL & ELECTRONICS ENGINEERING') {
+    return DEPARTMENT_TAGLINES.EEE;
   }
   if (key === 'CIVIL' || key === 'CIVIL ENGINEERING') {
     return DEPARTMENT_TAGLINES.CE;

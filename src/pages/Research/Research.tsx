@@ -45,6 +45,7 @@ export default function Research() {
         defaultTitle="Research & Development"
         defaultSubtitle="From funded projects and patents to industry MoUs and professional bodies — a look at how VWU builds knowledge that matters."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Research & Development' }]}
+        hideCta={true}
       />
 
       {/* Quick-jump nav */}

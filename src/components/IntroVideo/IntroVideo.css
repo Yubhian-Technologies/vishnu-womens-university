@@ -1,17 +1,24 @@
 .intro-video {
+  /* Portalled to <body> (see IntroVideo.tsx), so `position: fixed; inset: 0`
+     fills the whole viewport on every screen — same anchoring the site
+     Header uses. (Viewport units like 100vw/100dvh were unreliable here.) */
   position: fixed;
-  top: 0;
-  left: 0;
-  /* Explicit viewport units (not just inset:0) so the overlay fills the
-     real mobile viewport regardless of any ancestor containing block, and
-     100dvh follows the browser's collapsing/expanding URL bar. */
-  width: 100vw;
-  height: 100vh;
-  height: 100svh;
-  height: 100dvh;
+  inset: 0;
+  /* Defeat any global modal-card sizing (e.g. a `[role="dialog"]` mobile
+     rule with max-width/height + margin: auto) — this is a full-bleed
+     splash, never a centred card. */
+  max-width: none !important;
+  max-height: none !important;
+  margin: 0 !important;
   z-index: 99999;
-  background: var(--color-primary-dark, #081c15);
+  /* The video's own background colour, sampled from the clip — the
+     letterbox area around the centred, uncropped video is the same shade,
+     so it reads as one seamless screen at any aspect ratio. */
+  background: #02232e;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: opacity var(--transition-smooth, 600ms cubic-bezier(0.4, 0, 0.2, 1));
   opacity: 1;
 }
@@ -21,15 +28,16 @@
   pointer-events: none;
 }
 
-/* Full-screen pulled-straight video — no controls, no chrome. Absolutely
-   positioned (not a flex child) so it always spans the overlay box exactly,
-   with no chance of intrinsic-size or flex-alignment gaps on mobile. */
+/* Centred and shown whole (contain, not cover) at every screen size — the
+   letterbox area is the same logo green as the overlay and the video's own
+   background, so nothing is cropped and the seam is invisible. */
 .intro-video__media {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  object-position: center;
   display: block;
 }
 

@@ -158,7 +158,7 @@ Students often compete in Inter Collegiate, Inter University and State Level tou
   },
   {
     slug: 'staff-quarters',
-    title: 'Staff Quarters',
+    title: 'Faculty & Staff Residential Facilities',
     heroSubtitle: 'Comfortable On-Campus Living for Faculty and Staff.',
     body: `Of three basic human needs, accommodation has got the highest priority in this modern world of high standards of living. Green Meadows is the creation of our beloved chairman with the very idea of providing own houses to the faculty. Green Meadows is a cluster of about hundred houses. With the beautiful scenery around and a pond in front of the Green Meadows add more beauty and pleasantness to all the inmates.
 

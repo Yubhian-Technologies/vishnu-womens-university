@@ -279,11 +279,10 @@ export default function AdmissionApplyForm() {
 
       try { await logoutFirebaseAuth(); } catch { /* non-fatal */ }
 
-      const fullName = `${requestForm.firstName} ${requestForm.lastName}`.trim();
       setToastInfo({
         show: true,
-        title: 'Inquiry Saved to CRM',
-        message: `Thank you, ${fullName}! Your inquiry details have been saved to the VWU Admissions CRM. Our team will contact you shortly.`,
+        title: 'Verification Successful',
+        message: 'Our VWU team will contact you soon.',
       });
 
       setRequestStatus('success');
@@ -353,11 +352,10 @@ export default function AdmissionApplyForm() {
       // don't leave the browser signed in.
       try { await logoutFirebaseAuth(); } catch { /* non-fatal */ }
 
-      const fullName = `${requestForm.firstName} ${requestForm.lastName}`.trim();
       setToastInfo({
         show: true,
-        title: 'Verification Successful & Added to CRM',
-        message: `Mobile verification complete! ${fullName} has been added to the VWU Admissions CRM. Our team will reach out to ${requestForm.phone} shortly.`,
+        title: 'Verification Successful',
+        message: 'Our VWU team will contact you soon.',
       });
 
       setRequestStatus('success');
@@ -434,7 +432,7 @@ export default function AdmissionApplyForm() {
                 className={requestErrors.degreeLevel ? 'has-error' : undefined}
                 aria-invalid={!!requestErrors.degreeLevel}
               >
-                <option value="">Select degree level...</option>
+                <option value="">Select level...</option>
                 {PROGRAM_LEVEL_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value}>
                     {opt.label}
