@@ -1,6 +1,6 @@
 import { useState, useId } from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, Phone, Mail, ExternalLink, ChevronDown, FileText, ChevronRight, Navigation } from 'lucide-react';
+import { MapPin, Phone, Mail, ExternalLink, ChevronDown, Navigation } from 'lucide-react';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useSiteContact, telHref } from '../../hooks/useSiteContact';
 import { COMPLIANCE_GROUPS, DEFAULT_COMPLIANCE_DOCS, type ComplianceDocDoc } from '../../pages/Admin/sections/ComplianceDocsAdmin';
@@ -23,12 +23,12 @@ const SOCIAL_LINKS = [
 // `disabled` items render as greyed, non-clickable text — mirroring the
 // navbar, where the corresponding pages (Governance sub-pages, Campus
 // Facilities) aren't live yet.
-const UNIVERSITY_LINKS: { label: string; href: string; disabled?: boolean }[] = [
+const UNIVERSITY_LINKS: { label: string; href: string; disabled?: boolean; external?: boolean }[] = [
   { label: 'About VWU', href: '/about' },
   { label: 'Governance & Leadership', href: '/governance', disabled: true },
   { label: 'Campus Facilities', href: '/campus-facilities', disabled: true },
   { label: 'Careers at VWU', href: '/careers' },
-  { label: 'Alumni Network', href: '/alumni-giving#network' },
+  { label: 'Alumni Network', href: 'https://alumni.srivishnu.edu.in/', external: true },
   { label: 'Contact Us', href: '/contact' },
 ];
 
@@ -172,6 +172,16 @@ export default function Footer() {
                     <span className="vwu-footer-nav-link is-disabled" aria-disabled="true">
                       {item.label}
                     </span>
+                  ) : item.external ? (
+                    <a
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="vwu-footer-nav-link external"
+                    >
+                      <span>{item.label}</span>
+                      <ExternalLink size={12} className="vwu-external-glyph" aria-hidden="true" />
+                    </a>
                   ) : (
                     <Link to={item.href} className="vwu-footer-nav-link">
                       {item.label}
@@ -254,46 +264,14 @@ export default function Footer() {
               ))}
             </div>
 
-            {/* Active Compliance Group Links List */}
+            {/* Active Compliance Group List — plain text, no links */}
             <ul className="vwu-footer-nav-list vwu-compliance-active-list" role="list">
               {selectedComplianceLinks.slice(0, 6).map((item) => (
                 <li key={item.label}>
-                  {item.download ? (
-                    <a
-                      href={item.href}
-                      download
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="vwu-footer-nav-link compliance-doc"
-                    >
-                      <FileText size={13} className="vwu-doc-icon" aria-hidden="true" />
-                      <span>{item.label}</span>
-                    </a>
-                  ) : item.external ? (
-                    <a
-                      href={item.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="vwu-footer-nav-link external"
-                    >
-                      <span>{item.label}</span>
-                      <ExternalLink size={12} className="vwu-external-glyph" aria-hidden="true" />
-                    </a>
-                  ) : (
-                    <Link to={item.href} className="vwu-footer-nav-link">
-                      {item.label}
-                    </Link>
-                  )}
+                  <span className="vwu-footer-nav-link is-disabled">{item.label}</span>
                 </li>
               ))}
             </ul>
-
-            {selectedComplianceLinks.length > 6 && (
-              <Link to="/disclosures/ugc" className="vwu-footer-comp-view-all">
-                <span>View all institutional documents</span>
-                <ChevronRight size={14} aria-hidden="true" />
-              </Link>
-            )}
           </div>
           </div>
         </div>
@@ -443,32 +421,7 @@ export default function Footer() {
                     <ul className="vwu-footer-nav-list" role="list">
                       {grp.links.map((item) => (
                         <li key={item.label}>
-                          {item.download ? (
-                            <a
-                              href={item.href}
-                              download
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="vwu-footer-nav-link compliance-doc"
-                            >
-                              <FileText size={13} className="vwu-doc-icon" aria-hidden="true" />
-                              <span>{item.label}</span>
-                            </a>
-                          ) : item.external ? (
-                            <a
-                              href={item.href}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="vwu-footer-nav-link external"
-                            >
-                              <span>{item.label}</span>
-                              <ExternalLink size={12} className="vwu-external-glyph" aria-hidden="true" />
-                            </a>
-                          ) : (
-                            <Link to={item.href} className="vwu-footer-nav-link">
-                              {item.label}
-                            </Link>
-                          )}
+                          <span className="vwu-footer-nav-link is-disabled">{item.label}</span>
                         </li>
                       ))}
                     </ul>

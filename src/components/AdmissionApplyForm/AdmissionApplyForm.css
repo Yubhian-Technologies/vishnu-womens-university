@@ -17,6 +17,12 @@
   align-items: end;
 }
 
+/* Conditional rows (e.g. "Specify Program Name") that hold a single field —
+   span the full form width instead of sitting in one half-column. */
+.adm-form-row--full {
+  grid-template-columns: 1fr;
+}
+
 .adm-form-group {
   display: flex;
   flex-direction: column;

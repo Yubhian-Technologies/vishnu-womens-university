@@ -297,7 +297,7 @@ export default function Contact() {
         <div className="contact-hero-glow" aria-hidden="true" />
         <div className="container contact-hero-clean__inner">
           <h1 className="contact-hero-clean__title">
-            Got Questions? We’ve Got You
+            Got Questions? We Are Here
           </h1>
           <p className="contact-hero-clean__subtitle">
             Curious about admissions, programmes, or campus life? Our team is here to help you with everything you need.
