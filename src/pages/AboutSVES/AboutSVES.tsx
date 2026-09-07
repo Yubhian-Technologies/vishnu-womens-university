@@ -96,7 +96,7 @@ export default function AboutSVES() {
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-6)' }}>
             <h2 style={{ color: 'var(--color-white)', fontSize: 'clamp(1.5rem, 3vw, 2.15rem)', fontWeight: 800, marginBottom: 'var(--space-2)' }}>
-              30+ Years of Educational Leadership &amp; Impact
+              25+ Years of Educational Leadership &amp; Impact
             </h2>
             <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: '0.95rem' }}>
               Empowering over 25,000 students across Andhra Pradesh &amp; Telangana.
@@ -312,10 +312,10 @@ export default function AboutSVES() {
             subtitle="Glimpses from the campuses, events, and milestones of the Sri Vishnu Educational Society."
             highlights={[
               '11 institutions across Andhra Pradesh & Telangana',
-              '4 campuses — Bhimavaram, Narsapur, Hyderabad, Medak',
+              '4 campuses — Bhimavaram, Narsapur, Hyderabad, Aziz Nagar',
               '25,000+ students & 1,400+ faculty',
-              '30+ years of educational leadership',
-              'Engineering, Pharmacy, Dental, School & beyond',
+              '25+ years of educational leadership',
+              'Engineering,Pharmacy,Dental,Polytechnic,Life sciences & school -KGto PG',
             ]}
             columns={2}
             layout="side-text"
@@ -343,7 +343,7 @@ export default function AboutSVES() {
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>
             <span className="section-label" style={{ color: 'var(--color-accent)' }}>Journey</span>
-            <h2 className="section-title" style={{ color: 'var(--color-white)' }}>30+ Years of SVES Excellence</h2>
+            <h2 className="section-title" style={{ color: 'var(--color-white)' }}>25+ Years of SVES Excellence</h2>
           </div>
           <div className="sves-milestones">
             {milestones.map((m) => (

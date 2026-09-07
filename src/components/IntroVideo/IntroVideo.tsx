@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import './IntroVideo.css';
 
 // Full-screen intro video shown once per browser session when the site first
@@ -59,7 +60,10 @@ export default function IntroVideo() {
 
   if (!show) return null;
 
-  return (
+  // Portalled to <body> so no ancestor in the app tree (which sets
+  // overflow-x: clip on html/body and various stacking contexts) can clip
+  // or offset the full-screen overlay on mobile.
+  return createPortal(
     <div
       className={`intro-video${fading ? ' intro-video--fading' : ''}`}
       role="dialog"
@@ -76,6 +80,7 @@ export default function IntroVideo() {
         preload="auto"
         onEnded={onEnded}
       />
-    </div>
+    </div>,
+    document.body,
   );
 }
