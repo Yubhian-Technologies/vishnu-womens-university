@@ -104,7 +104,7 @@ const navItemsData: NavItem[] = [
     highlight: {
       title: 'Academic Excellence',
       description: 'Industry-aligned curriculum, multidisciplinary research, distinguished faculty, and hands-on laboratory learning.',
-      linkText: 'All Programs',
+      linkText: 'All Programmes',
       linkPath: '/academics',
     },
     groups: [
@@ -114,7 +114,7 @@ const navItemsData: NavItem[] = [
         items: [
           { label: 'Schools', path: '/academics/schools' },
           { label: 'Departments', path: '/academics/departments' },
-          { label: 'Programs', path: '/academics/programs' },
+          { label: 'Programmes', path: '/academics/programs' },
           { label: 'Faculty Directory', path: '/faculty' },
           { label: 'Results Analysis', path: '/result-analysis' },
           { label: 'Examinations Portal', path: 'https://www.svecwexams.in/', external: true },
@@ -261,17 +261,18 @@ const navItemsData: NavItem[] = [
   },
   {
     label: 'Rankings',
+    path: '/news-awards/accreditations-awards#ranking',
     highlight: {
       title: 'Recognised Quality',
       badge: 'NAAC A+ & NBA',
       description: 'A record of national rankings, ratings, awards, and accreditations endorsed by India\'s foremost regulatory and ranking bodies.',
       linkText: 'View All Recognitions',
-      linkPath: '/news-awards/accreditations-awards',
+      linkPath: '/news-awards/accreditations-awards#ranking',
     },
     groups: [
       {
         groupLabel: 'Rankings & Recognitions',
-        groupPath: '/news-awards/accreditations-awards',
+        groupPath: '/news-awards/accreditations-awards#ranking',
         items: [
           { label: 'Rankings & Ratings', path: '/news-awards/accreditations-awards#ranking' },
           { label: 'Awards & Recognitions', path: '/news-awards/accreditations-awards#award' },
@@ -299,14 +300,6 @@ const navItemsData: NavItem[] = [
           { label: 'Gallery', path: '/news-awards/gallery' },
           { label: 'Vishnu Era Newsletter', path: 'https://www.srivishnu.edu.in/vishnu-era/', external: true },
           { label: 'Prathibha Magazine', path: 'https://heyzine.com/flip-book/088b7b5629.html#page/54', external: true },
-        ],
-      },
-      {
-        groupLabel: 'Accreditations & Rankings',
-        groupPath: '/news-awards/accreditations-awards',
-        items: [
-          { label: 'Accreditations (NAAC, NBA)', path: '/news-awards/accreditations-awards#accreditation' },
-          { label: 'Rankings & Awards', path: '/news-awards/accreditations-awards#ranking' },
         ],
       },
     ],
