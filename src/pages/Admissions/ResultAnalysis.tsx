@@ -193,7 +193,7 @@ export default function ResultAnalysis() {
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>
             <span className="section-label" style={{ color: 'var(--color-accent)' }}>Why We Excel</span>
-            <h2 style={{ color: 'var(--color-white)' }} className="section-title">Factors Behind Our Results</h2>
+            <h2 style={{ color: 'var(--color-white)' }} className="section-title">The Drivers of Our Success</h2>
           </div>
           <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-5)' }}>
             {factors.map((f) => {
@@ -204,7 +204,7 @@ export default function ResultAnalysis() {
                   onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'; (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-accent)'; }}
                   onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.12)'; }}
                 >
-                  <div style={{ marginBottom: 'var(--space-3)' }}><Icon size={32} strokeWidth={1.75} /></div>
+                  <div style={{ marginBottom: 'var(--space-3)', color: 'var(--color-white)' }}><Icon size={32} strokeWidth={1.75} /></div>
                   <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 900, color: 'var(--color-accent)', marginBottom: 'var(--space-2)' }}>{f.title}</h3>
                   <p style={{ fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.75)', lineHeight: 1.6 }}>{f.desc}</p>
                 </div>

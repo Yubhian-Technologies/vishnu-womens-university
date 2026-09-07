@@ -3,7 +3,6 @@ import {
   Quote, 
   ChevronLeft, 
   ChevronRight, 
-  BadgeCheck, 
   ArrowRight
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -186,13 +185,8 @@ export default function TestimonialSlider({
                         <span>{initials}</span>
                       </div>
                     )}
+                    {/* Photo Overlay */}
                     <div className="m3-testi-img-overlay" />
-
-                    {/* Simplified Verified Alumna Badge */}
-                    <div className="m3-verified-badge">
-                      <BadgeCheck size={13} className="m3-verified-icon" />
-                      <span>Verified Alumna</span>
-                    </div>
                   </div>
                 </div>
 
