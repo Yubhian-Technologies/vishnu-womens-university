@@ -404,8 +404,6 @@ export default function PlacementYearAccordion({ years, onActiveYearChange }: Pr
   const placementYearData = usePlacementYears();
   const visibleYears = years ? placementYearData.filter((y) => years.includes(y.batch)) : placementYearData;
   const [activeStatsYear, setActiveStatsYear] = useState('');
-  const [entriesPerPage, setEntriesPerPage] = useState(10);
-  const [statsPage, setStatsPage] = useState(0);
   const [companyFilter, setCompanyFilter] = useState<CompanyFilter>('all');
 
   // Opens the first batch by default, and re-picks one if the currently
@@ -436,9 +434,6 @@ export default function PlacementYearAccordion({ years, onActiveYearChange }: Pr
 
   const activeYear = visibleYears.find((y) => y.batch === activeStatsYear) ?? visibleYears[0];
   const filteredRows = companyFilter === 'all' ? activeYear.rows : activeYear.rows.filter((r) => matchesCompanyFilter(r, companyFilter));
-  const totalPages = Math.max(1, Math.ceil(filteredRows.length / entriesPerPage));
-  const page = Math.min(statsPage, totalPages - 1);
-  const pageRows = entriesPerPage >= filteredRows.length ? filteredRows : filteredRows.slice(page * entriesPerPage, page * entriesPerPage + entriesPerPage);
 
   return (
     <div>
@@ -449,7 +444,7 @@ export default function PlacementYearAccordion({ years, onActiveYearChange }: Pr
           return (
             <button
               key={y.batch}
-              onClick={() => { setActiveStatsYear(y.batch); setStatsPage(0); }}
+              onClick={() => setActiveStatsYear(y.batch)}
               style={{
                 padding: '0.6rem 1.5rem',
                 borderRadius: 'var(--radius-full)',
@@ -561,18 +556,9 @@ export default function PlacementYearAccordion({ years, onActiveYearChange }: Pr
                 {y.rows.length > 0 && (
                   <>
                     <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 'var(--text-sm)', color: 'var(--color-text)' }}>
-                        <span>Show</span>
-                        <select
-                          value={entriesPerPage}
-                          onChange={(e) => { setEntriesPerPage(Number(e.target.value)); setStatsPage(0); }}
-                          style={{ border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-sm)', padding: '0.3rem 0.5rem', fontSize: 'var(--text-sm)' }}
-                        >
-                          {[10, 25, 50, 100].map((n) => <option key={n} value={n}>{n}</option>)}
-                          <option value={filteredRows.length || 1}>All</option>
-                        </select>
-                        <span>entries</span>
-                      </div>
+                      <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)' }}>
+                        {filteredRows.length.toLocaleString('en-IN')} {filteredRows.length === 1 ? 'company' : 'companies'}
+                      </span>
 
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
                         {COMPANY_FILTERS.map((f) => {
@@ -580,7 +566,7 @@ export default function PlacementYearAccordion({ years, onActiveYearChange }: Pr
                           return (
                             <button
                               key={f.key}
-                              onClick={() => { setCompanyFilter(f.key); setStatsPage(0); }}
+                              onClick={() => setCompanyFilter(f.key)}
                               style={{
                                 padding: '0.45rem 1rem',
                                 borderRadius: 'var(--radius-md)',
@@ -606,25 +592,25 @@ export default function PlacementYearAccordion({ years, onActiveYearChange }: Pr
                         No companies match this filter for this batch.
                       </p>
                     ) : (
-                    <div style={{ overflowX: 'auto' }}>
+                    <div style={{ overflow: 'auto', maxHeight: 520, border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)' }}>
                       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm)' }}>
                         <thead>
                           <tr style={{ background: 'var(--color-accent)' }}>
-                            <th style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900, whiteSpace: 'nowrap' }}>S.No</th>
-                            <th style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900 }}>Company Name</th>
-                            <th style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900, whiteSpace: 'nowrap' }}>No. of Selects</th>
+                            <th style={{ position: 'sticky', top: 0, textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900, whiteSpace: 'nowrap', background: 'var(--color-accent)' }}>S.No</th>
+                            <th style={{ position: 'sticky', top: 0, textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900, background: 'var(--color-accent)' }}>Company Name</th>
+                            <th style={{ position: 'sticky', top: 0, textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900, whiteSpace: 'nowrap', background: 'var(--color-accent)' }}>No. of Selects</th>
                             {y.salaryLabel && (
-                              <th style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900 }}>{y.salaryLabel}</th>
+                              <th style={{ position: 'sticky', top: 0, textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900, background: 'var(--color-accent)' }}>{y.salaryLabel}</th>
                             )}
                             {y.rows.some((r) => r.sector) && (
-                              <th style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900 }}>Sector</th>
+                              <th style={{ position: 'sticky', top: 0, textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900, background: 'var(--color-accent)' }}>Sector</th>
                             )}
                           </tr>
                         </thead>
                         <tbody>
-                          {pageRows.map((row, i) => (
+                          {filteredRows.map((row, i) => (
                             <tr key={`${row.company}-${i}`} style={{ background: i % 2 === 0 ? 'var(--color-off-white)' : 'transparent' }}>
-                              <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)' }}>{page * entriesPerPage + i + 1}</td>
+                              <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)' }}>{i + 1}</td>
                               <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)', fontWeight: 600 }}>{row.company}</td>
                               <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)' }}>{row.selects}</td>
                               {y.salaryLabel && (
@@ -638,30 +624,6 @@ export default function PlacementYearAccordion({ years, onActiveYearChange }: Pr
                         </tbody>
                       </table>
                     </div>
-                    )}
-
-                    {totalPages > 1 && filteredRows.length > 0 && (
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'var(--space-4)', fontSize: 'var(--text-sm)', color: 'var(--color-text-light)' }}>
-                        <span>
-                          Showing {page * entriesPerPage + 1} to {Math.min(page * entriesPerPage + entriesPerPage, filteredRows.length)} of {filteredRows.length} entries
-                        </span>
-                        <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
-                          <button
-                            onClick={() => setStatsPage((p) => Math.max(0, p - 1))}
-                            disabled={page === 0}
-                            style={{ padding: '0.3rem 0.8rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-light-gray)', background: 'var(--color-white)', cursor: page === 0 ? 'default' : 'pointer', opacity: page === 0 ? 0.5 : 1 }}
-                          >
-                            Previous
-                          </button>
-                          <button
-                            onClick={() => setStatsPage((p) => Math.min(totalPages - 1, p + 1))}
-                            disabled={page >= totalPages - 1}
-                            style={{ padding: '0.3rem 0.8rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-light-gray)', background: 'var(--color-white)', cursor: page >= totalPages - 1 ? 'default' : 'pointer', opacity: page >= totalPages - 1 ? 0.5 : 1 }}
-                          >
-                            Next
-                          </button>
-                        </div>
-                      </div>
                     )}
                   </>
                 )}
