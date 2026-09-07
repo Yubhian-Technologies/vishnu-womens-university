@@ -99,7 +99,7 @@ export default function Happenings() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 'var(--space-6)' }}>
             {recent.map((ev) => {
               const article = happeningToArticle(ev);
-              return <NewsCard key={ev.id} article={article} onReadMore={() => setActiveArticle(article)} />;
+              return <NewsCard key={ev.id} article={article} />;
             })}
             {recent.length === 0 && (
               <p style={{ color: 'var(--color-text-light)' }}>No recent happenings yet — check back soon.</p>

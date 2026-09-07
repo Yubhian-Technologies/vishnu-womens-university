@@ -70,6 +70,10 @@ export interface DifferentiatorItemDoc {
   // + filter as ProgramDetail), so rosters never need re-entering here.
   department: string;
   desc: string;
+  // Hero banner subtitle — shown under the title on the detail page's hero,
+  // distinct from `desc` (the hub-page card blurb) and `description` (the
+  // full headingless block further down the page). Its own field so editing
+  // one never silently changes what shows on the other two.
   summary?: string;
   external: boolean;
   url: string;
@@ -133,7 +137,7 @@ function emptyBlock(key: BlockKey): CustomSection {
 }
 
 const EMPTY: Omit<DifferentiatorItemDoc, 'id'> = {
-  slug: '', title: '', category: 'innovation', department: '', desc: '', external: false, url: '',
+  slug: '', title: '', category: 'innovation', department: '', desc: '', summary: '', external: false, url: '',
   description: emptyBlock('description'), vision: emptyBlock('vision'), mission: emptyBlock('mission'), objectives: emptyBlock('objectives'),
   customSections: [], tabs: [],
   heroImage: '', heroStoragePath: '', order: 0,
@@ -592,6 +596,7 @@ export default function DifferentiatorsAdmin() {
     setEditingWasAlreadyMigrated(it.description !== undefined);
     const next: Omit<DifferentiatorItemDoc, 'id'> = {
       slug: it.slug, title: it.title, category: it.category, department: it.department || '', desc: it.desc || '',
+      summary: it.summary || '',
       external: !!it.external, url: it.url || '',
       ...computeMigratedFields(it),
       tabs: it.tabs || [],
@@ -720,6 +725,10 @@ export default function DifferentiatorsAdmin() {
           <div className="admin-field admin-field--full">
             <label htmlFor="field-short-description-shown-on-the">Short Description (shown on the listing card)</label>
             <textarea id="field-short-description-shown-on-the" rows={2} value={form.desc} onChange={(e) => set('desc', e.target.value)} />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label htmlFor="field-hero-subtitle">Hero Subtitle (shown under the title on the detail page's hero banner, only when not an external link)</label>
+            <textarea id="field-hero-subtitle" rows={2} value={form.summary || ''} onChange={(e) => set('summary', e.target.value)} />
           </div>
           <BlockEditor
             blockKey="description"

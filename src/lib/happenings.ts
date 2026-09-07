@@ -17,6 +17,6 @@ export function happeningToArticle(item: HappeningDoc): NewsArticle {
     category: item.dept || 'Recent',
     imageUrl: item.imageUrl || NEWS_FALLBACK_IMAGE,
     imageAlt: item.title,
-    path: '/news-awards/happenings',
+    path: `/news-awards/happenings/${item.id}`,
   };
 }

@@ -1,6 +1,16 @@
 import { useEffect, useState } from 'react';
 import type { BranchOfferCount, PlacementRow } from './placementStats.data';
 import { usePlacementYears } from './usePlacementYears';
+import '../detail-layout.css';
+
+// A batch label like "2022–2026" -> "2026" for the snapshot heading — the
+// graduating year reads more naturally there than the full 4-year range.
+// Already-bare years (or anything with no 4-digit year at all) pass through
+// unchanged.
+function endingYear(label: string): string {
+  const years = label.match(/\d{4}/g);
+  return years ? years[years.length - 1] : label;
+}
 
 interface Props {
   /** Restrict to just these batch labels (e.g. only the 4 most recent) —
@@ -174,9 +184,10 @@ function BranchOffersDonut({ data, total }: { data: BranchOfferCount[]; total: n
         </div>
       </div>
 
-      <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 'var(--space-2) var(--space-4)', minWidth: 260, flex: 1 }}>
+      <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(165px, 1fr))', gap: 'var(--space-3)', minWidth: 260, flex: 1 }}>
         {slices.map((s) => {
           const isHovered = hovered === s.branch;
+          const displayLabel = s.branch.replace(/\s*Offers$/i, '');
           return (
             <li
               key={s.branch}
@@ -188,17 +199,26 @@ function BranchOffersDonut({ data, total }: { data: BranchOfferCount[]; total: n
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 'var(--space-2)',
-                padding: '0.35rem 0.5rem',
-                borderRadius: 'var(--radius-sm)',
-                background: isHovered ? 'var(--color-off-white)' : 'transparent',
-                transition: 'background var(--transition-fast)',
+                justifyContent: 'space-between',
+                gap: '0.4rem',
+                minHeight: '52px',
+                height: '100%',
+                padding: '0.5rem 0.75rem',
+                borderRadius: '6px',
+                border: isHovered ? `1.5px solid ${s.color}` : '1px solid #e2e8f0',
+                background: isHovered ? 'color-mix(in srgb, var(--color-primary) 4%, #ffffff)' : '#ffffff',
+                boxShadow: isHovered ? '0 4px 10px rgba(0, 0, 0, 0.06)' : '0 1px 2px rgba(0, 0, 0, 0.03)',
+                transition: 'all 200ms ease',
                 cursor: 'pointer',
               }}
             >
-              <span style={{ width: 12, height: 12, borderRadius: 3, background: s.color, flexShrink: 0 }} />
-              <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', flex: 1 }}>{s.branch}</span>
-              <span style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-primary)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', minWidth: 0, flex: 1 }}>
+                <span style={{ width: 10, height: 10, borderRadius: 2, background: s.color, flexShrink: 0 }} />
+                <span style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--color-text)', lineHeight: 1.25 }}>
+                  {displayLabel}
+                </span>
+              </div>
+              <span style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--color-primary)', flexShrink: 0, marginLeft: '0.25rem' }}>
                 {s.offers.toLocaleString('en-IN')}
               </span>
             </li>
@@ -374,7 +394,7 @@ export default function PlacementYearAccordion({ years, enrichedYears, onActiveY
         return (
               <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)' }}>
                 <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', marginBottom: 'var(--space-5)' }}>
-                  {y.batch} Placements as on date: <strong>{y.total !== null ? y.total.toLocaleString('en-IN') : '—'}</strong>
+                  {endingYear(y.batch)} Placement Snapshot
                 </p>
 
                 {y.note && (
@@ -385,35 +405,59 @@ export default function PlacementYearAccordion({ years, enrichedYears, onActiveY
 
                 {enrichedYears?.includes(y.batch) && y.branchOffers && (
                   <div style={{ marginBottom: 'var(--space-8)' }}>
-                    <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-4)', marginBottom: 'var(--space-5)' }}>
-                      <div style={{ background: 'var(--color-off-white)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4)', textAlign: 'center' }}>
-                        <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.03em' }}>No. of Companies Visited</div>
-                        <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.75rem', fontWeight: 900, color: 'var(--color-primary)' }}>{y.companiesVisited}</div>
+                    {/* Same dept-stat-grid/dept-stat-tile styling as the
+                        Department Overview Placements stat tiles (see
+                        DepartmentDetail.tsx) — one dark navy/gold card with
+                        every stat as a divided column, instead of separate
+                        light gray boxes. Average Salary/Median Salary/
+                        Highest Package/Above N LPA+ tiles are individually
+                        hidden when not present, same as there. */}
+                    <div className="dept-stat-grid">
+                      <div className="dept-stat-tile">
+                        <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{y.companiesVisited}</span></div>
+                        <div className="dept-stat-tile__label">No. of Companies Visited</div>
                       </div>
-                      <div style={{ background: 'var(--color-off-white)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4)', textAlign: 'center' }}>
-                        <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.03em' }}>Total no. of Offers</div>
-                        <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.75rem', fontWeight: 900, color: 'var(--color-primary)' }}>{y.total?.toLocaleString('en-IN')}</div>
+                      <div className="dept-stat-tile">
+                        <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{y.total?.toLocaleString('en-IN')}</span></div>
+                        <div className="dept-stat-tile__label">Total No. of Offers</div>
                       </div>
+                      {y.averageSalaryLPA != null && (
+                        <div className="dept-stat-tile">
+                          <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{y.averageSalaryLPA} LPA</span></div>
+                          <div className="dept-stat-tile__label">Average Salary</div>
+                        </div>
+                      )}
+                      {y.medianSalaryLPA != null && (
+                        <div className="dept-stat-tile">
+                          <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{y.medianSalaryLPA} LPA</span></div>
+                          <div className="dept-stat-tile__label">Median Salary</div>
+                        </div>
+                      )}
+                      {y.highestPackageLPA != null && (
+                        <div className="dept-stat-tile">
+                          <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{y.highestPackageLPA} LPA</span></div>
+                          <div className="dept-stat-tile__label">Highest Package</div>
+                        </div>
+                      )}
+                      {y.offersAbove50LPA != null && (
+                        <div className="dept-stat-tile">
+                          <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{y.offersAbove50LPA} offers</span></div>
+                          <div className="dept-stat-tile__label">Above 50 LPA+</div>
+                        </div>
+                      )}
+                      {y.offersAbove30LPA != null && (
+                        <div className="dept-stat-tile">
+                          <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{y.offersAbove30LPA} offers</span></div>
+                          <div className="dept-stat-tile__label">Above 30 LPA+</div>
+                        </div>
+                      )}
+                      {y.offersAbove10LPA != null && (
+                        <div className="dept-stat-tile">
+                          <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{y.offersAbove10LPA} offers</span></div>
+                          <div className="dept-stat-tile__label">Above 10 LPA+</div>
+                        </div>
+                      )}
                     </div>
-
-                    {(y.averageSalaryLPA != null || y.medianSalaryLPA != null || y.highestPackageLPA != null
-                      || y.offersAbove50LPA != null || y.offersAbove30LPA != null || y.offersAbove10LPA != null) && (
-                      <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-4)', marginBottom: 'var(--space-5)' }}>
-                        {[
-                          { label: 'Average Salary', value: y.averageSalaryLPA != null ? `${y.averageSalaryLPA} LPA` : undefined },
-                          { label: 'Median Salary', value: y.medianSalaryLPA != null ? `${y.medianSalaryLPA} LPA` : undefined },
-                          { label: 'Highest Package', value: y.highestPackageLPA != null ? `${y.highestPackageLPA} LPA` : undefined },
-                          { label: 'Above 50 LPA+', value: y.offersAbove50LPA != null ? `${y.offersAbove50LPA} offers` : undefined },
-                          { label: 'Above 30 LPA+', value: y.offersAbove30LPA != null ? `${y.offersAbove30LPA} offers` : undefined },
-                          { label: 'Above 10 LPA+', value: y.offersAbove10LPA != null ? `${y.offersAbove10LPA} offers` : undefined },
-                        ].filter((tile) => tile.value).map((tile) => (
-                          <div key={tile.label} style={{ background: 'var(--color-off-white)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4)', textAlign: 'center' }}>
-                            <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.03em' }}>{tile.label}</div>
-                            <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.75rem', fontWeight: 900, color: 'var(--color-primary)' }}>{tile.value}</div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
 
                     <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-3)', marginBottom: 'var(--space-6)' }}>
                       {y.branchOffers.map((b) => (
@@ -447,7 +491,7 @@ export default function PlacementYearAccordion({ years, enrichedYears, onActiveY
                     </div>
 
                     <h3 style={{ fontFamily: 'var(--font-sans)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 'var(--space-3)', fontSize: 'var(--text-base)' }}>
-                      Department-wise Offers — {y.batch}
+                      Branch-Wise Placement Overview
                     </h3>
                     <BranchOffersDonut data={y.branchOffers} total={y.total ?? 0} />
                   </div>

@@ -4,6 +4,7 @@ import type { ConfirmationResult } from 'firebase/auth';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { sendPhoneOtp, logoutFirebaseAuth } from '../../lib/firebaseAdmin';
+import Toast from '../Toast/Toast';
 import './AdmissionApplyForm.css';
 
 const PURPOSE_OPTIONS = [
@@ -202,6 +203,11 @@ export default function AdmissionApplyForm() {
   const [sendingOtp, setSendingOtp] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [submittingDirect, setSubmittingDirect] = useState(false);
+  const [toastInfo, setToastInfo] = useState<{ show: boolean; title: string; message: string }>({
+    show: false,
+    title: '',
+    message: '',
+  });
 
   const handleRequestFormChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -273,6 +279,13 @@ export default function AdmissionApplyForm() {
 
       try { await logoutFirebaseAuth(); } catch { /* non-fatal */ }
 
+      const fullName = `${requestForm.firstName} ${requestForm.lastName}`.trim();
+      setToastInfo({
+        show: true,
+        title: 'Inquiry Saved to CRM',
+        message: `Thank you, ${fullName}! Your inquiry details have been saved to the VWU Admissions CRM. Our team will contact you shortly.`,
+      });
+
       setRequestStatus('success');
       setRequestForm(INITIAL_REQUEST_FORM);
       setRequestErrors({});
@@ -339,6 +352,13 @@ export default function AdmissionApplyForm() {
       // This was only ever a one-time ownership check, not an account —
       // don't leave the browser signed in.
       try { await logoutFirebaseAuth(); } catch { /* non-fatal */ }
+
+      const fullName = `${requestForm.firstName} ${requestForm.lastName}`.trim();
+      setToastInfo({
+        show: true,
+        title: 'Verification Successful & Added to CRM',
+        message: `Mobile verification complete! ${fullName} has been added to the VWU Admissions CRM. Our team will reach out to ${requestForm.phone} shortly.`,
+      });
 
       setRequestStatus('success');
       setRequestForm(INITIAL_REQUEST_FORM);
@@ -551,9 +571,18 @@ export default function AdmissionApplyForm() {
       )}
       {requestStatus === 'error' && (
         <p style={{ marginTop: 'var(--space-3)', fontSize: 'var(--text-sm)', color: '#b3261e' }}>
-          Something went wrong sending your request. Please try again or email us directly.
+          Something went wrong sending your request. Please try again or email us directly at <a href="mailto:admissions@vwu.edu.in" style={{ color: 'inherit', fontWeight: 700 }}>admissions@vwu.edu.in</a>.
         </p>
       )}
+
+      <Toast
+        show={toastInfo.show}
+        type="success"
+        title={toastInfo.title}
+        message={toastInfo.message}
+        onClose={() => setToastInfo((prev) => ({ ...prev, show: false }))}
+        duration={7000}
+      />
     </>
   );
 }

@@ -122,7 +122,6 @@ const navItemsData: NavItem[] = [
       },
       { groupLabel: 'UG Programmes', groupPath: '/academics?tab=btech', items: [] },
       { groupLabel: 'PG Programmes', groupPath: '/academics?tab=mtech', items: [] },
-      { groupLabel: 'Ph.D Programmes', groupPath: '/academics?tab=phd', items: [] },
       {
         groupLabel: 'Information',
         groupPath: '/information',
@@ -375,7 +374,6 @@ export default function Header() {
   });
   const ugProgrammes = programs.filter((p) => p.category === 'btech').map(programItem);
   const pgProgrammes = programs.filter((p) => p.category === 'mtech' || p.category === 'mba').map(programItem);
-  const phdProgrammes = programs.filter((p) => p.category === 'phd').map(programItem);
 
   const { docs: differentiatorItems } = useOrderedCollection<DifferentiatorItemDoc>('differentiatorItems', 'order');
   const { docs: placementItems } = useOrderedCollection<PlacementItemDoc>('placementItems', 'order');
@@ -453,7 +451,6 @@ export default function Header() {
       const groups = item.groups.map((group) => {
         if (group.groupLabel === 'UG Programmes') return { ...group, items: ugProgrammes };
         if (group.groupLabel === 'PG Programmes') return { ...group, items: pgProgrammes };
-        if (group.groupLabel === 'Ph.D Programmes') return { ...group, items: phdProgrammes };
         return group;
       });
       return { ...item, groups };

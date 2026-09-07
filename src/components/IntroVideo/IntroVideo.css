@@ -1,11 +1,17 @@
 .intro-video {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  /* Explicit viewport units (not just inset:0) so the overlay fills the
+     real mobile viewport regardless of any ancestor containing block, and
+     100dvh follows the browser's collapsing/expanding URL bar. */
+  width: 100vw;
+  height: 100vh;
+  height: 100svh;
+  height: 100dvh;
   z-index: 99999;
   background: var(--color-primary-dark, #081c15);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  overflow: hidden;
   transition: opacity var(--transition-smooth, 600ms cubic-bezier(0.4, 0, 0.2, 1));
   opacity: 1;
 }
@@ -15,8 +21,12 @@
   pointer-events: none;
 }
 
-/* Full-screen pulled-straight video — no controls, no chrome. */
+/* Full-screen pulled-straight video — no controls, no chrome. Absolutely
+   positioned (not a flex child) so it always spans the overlay box exactly,
+   with no chance of intrinsic-size or flex-alignment gaps on mobile. */
 .intro-video__media {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;

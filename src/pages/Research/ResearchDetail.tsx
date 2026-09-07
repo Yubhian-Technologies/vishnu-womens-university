@@ -12,7 +12,7 @@ import { resolveContentIcon } from '../../lib/contentIcons';
 import { parseFlexibleTable, parseAccordionTable, parseProjectAccordion } from '../../lib/structuredTable';
 import { parseAboutContent } from '../../lib/aboutContent';
 import { linkify } from '../../lib/linkify';
-import type { ResearchItemDoc } from '../Admin/sections/ResearchItemsAdmin';
+import type { ResearchItemDoc, PublicationYearEntry } from '../Admin/sections/ResearchItemsAdmin';
 import ThrustAreasSection from './ThrustAreasSection';
 import ProfessionalBodiesSection from './ProfessionalBodiesSection';
 import { DEFAULT_THRUST_AREAS_INTRO, DEFAULT_THRUST_AREAS_TEXT } from './thrustAreasDefault';
@@ -77,6 +77,78 @@ const TABLE_SUPPRESSED_SLUGS = new Set([
   'ipr-committee',
 ]);
 
+const DEFAULT_RESEARCH_ITEMS_BY_SLUG: Record<string, Partial<ResearchItemDoc>> = {
+  'research-publications': {
+    id: 'default-research-publications',
+    slug: 'research-publications',
+    title: 'Research Publications',
+    category: 'output',
+    intro: "Explore the year-by-year research publications, journal papers, and conference proceedings published by the faculty and students of Vishnu Women's University.",
+    about: "Our faculty and researchers actively publish in indexed international journals (Scopus, Web of Science, IEEE, Springer, Elsevier) and peer-reviewed conference proceedings.",
+    icon: 'FlaskConical',
+    publicationYears: [],
+  },
+  'consultancy': {
+    id: 'default-consultancy',
+    slug: 'consultancy',
+    title: 'Consultancy Services & Reports',
+    category: 'engagement',
+    intro: 'Industrial consultancy projects, testing services, and collaborative R&D executed by VWU departments for industry partners.',
+    icon: 'Handshake',
+  },
+  'patents': {
+    id: 'default-patents',
+    slug: 'patents',
+    title: 'Patents & Intellectual Property',
+    category: 'output',
+    intro: 'Patents filed and granted to VWU faculty and student innovators.',
+    icon: 'ShieldCheck',
+  },
+  'thrust-areas-of-research': {
+    id: 'default-thrust-areas-of-research',
+    slug: 'thrust-areas-of-research',
+    title: 'Thrust Areas of Research',
+    category: 'output',
+    intro: DEFAULT_THRUST_AREAS_INTRO,
+    accordionText: DEFAULT_THRUST_AREAS_TEXT,
+    icon: 'FlaskConical',
+  },
+  'research-centers': {
+    id: 'default-research-centers',
+    slug: 'research-centers',
+    title: 'Research Centers',
+    category: 'governance',
+    intro: DEFAULT_RESEARCH_CENTERS_INTRO,
+    tableText: DEFAULT_RESEARCH_CENTERS_TABLE_TEXT,
+    icon: 'ShieldCheck',
+  },
+  'seed-money-projects': {
+    id: 'default-seed-money-projects',
+    slug: 'seed-money-projects',
+    title: 'Seed Money Projects',
+    category: 'output',
+    intro: DEFAULT_SEED_MONEY_PROJECTS_INTRO,
+    tableText: DEFAULT_SEED_MONEY_PROJECTS_TABLE_TEXT,
+    icon: 'FlaskConical',
+  },
+  'about-rd': {
+    id: 'default-about-rd',
+    slug: 'about-rd',
+    title: 'About R&D',
+    category: 'governance',
+    tableText: DEFAULT_ABOUT_RD_TABLE_TEXT,
+    icon: 'ShieldCheck',
+  },
+  'mous': {
+    id: 'default-mous',
+    slug: 'mous',
+    title: 'MoUs & Partnerships',
+    category: 'engagement',
+    tableText: DEFAULT_MOUS_TABLE_TEXT,
+    icon: 'Handshake',
+  },
+};
+
 export default function ResearchDetail() {
   const { slug } = useParams<{ slug: string }>();
   const { docs: allItems, loading } = useOrderedCollection<ResearchItemDoc>('researchItems', 'order');
@@ -84,7 +156,31 @@ export default function ResearchDetail() {
   const { docs: patentCertificates } = useOrderedCollection<PatentCertificateDoc>('patentCertificates', 'order');
   const { docs: mousPartnerLogos } = useOrderedCollection<MousPartnerLogoDoc>('mousPartnerLogos', 'order');
   const { slides: heroSlides } = usePageBanners('research-detail');
-  const item = allItems.find((i) => i.slug === slug) ?? null;
+
+  const targetSlug = (slug || '').toLowerCase().trim().replace(/_/g, '-');
+  const foundItem = allItems.find((i) => {
+    const itemSlug = (i.slug || '').toLowerCase().trim().replace(/_/g, '-');
+    const itemTitleSlug = (i.title || '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-');
+    return itemSlug === targetSlug || itemTitleSlug === targetSlug || i.id === slug;
+  });
+  const defaultItem = DEFAULT_RESEARCH_ITEMS_BY_SLUG[targetSlug];
+  const item: ResearchItemDoc | null = foundItem
+    ? foundItem
+    : defaultItem
+    ? ({
+        id: defaultItem.id || targetSlug,
+        slug: targetSlug,
+        title: defaultItem.title || 'Research Detail',
+        category: defaultItem.category || 'output',
+        intro: defaultItem.intro || '',
+        about: defaultItem.about || '',
+        icon: defaultItem.icon || 'FlaskConical',
+        order: 1,
+        publicationYears: [],
+        highlights: [],
+        ...defaultItem,
+      } as ResearchItemDoc)
+    : null;
   const [openAreas, setOpenAreas] = useState<Set<string>>(new Set());
   const toggleArea = (key: string) => {
     setOpenAreas((prev) => {
@@ -164,18 +260,35 @@ export default function ResearchDetail() {
   // an admin has added at least one year that way, instead of the plain-text
   // accordion format every other page uses — a dedicated year + file upload
   // is a much better fit than hand-typing "### 2026\nClick Here | <url>".
-  const publicationYears = (item.publicationYears || []).filter((e) => e.year && e.fileUrl);
+  const allPubYears = [
+    ...(item.publicationYears || []),
+    ...allItems.flatMap((i) =>
+      (i.slug?.toLowerCase().includes('publication') || i.title?.toLowerCase().includes('publication'))
+        ? (i.publicationYears || [])
+        : []
+    ),
+  ];
+  const publicationYearsMap = new Map<string, PublicationYearEntry>();
+  allPubYears.forEach((e) => {
+    if (e.year && e.fileUrl && !publicationYearsMap.has(e.year)) {
+      publicationYearsMap.set(e.year, e);
+    }
+  });
+  const publicationYears = Array.from(publicationYearsMap.values());
   // Consultancy's year list is managed the same way as Research
   // Publications — structured data (Admin > Consultancy Reports: add a
   // year, upload its PDF) instead of hand-typing "### 2026\nClick Here | <url>".
-  const accordionCategories = item.slug === 'research-publications' && publicationYears.length > 0
+  const isPublicationsSlug = (item.slug || '').toLowerCase().includes('publication') || (item.title || '').toLowerCase().includes('publication');
+  const isConsultancySlug = (item.slug || '').toLowerCase().includes('consultancy') || (item.title || '').toLowerCase().includes('consultancy');
+
+  const accordionCategories = isPublicationsSlug && publicationYears.length > 0
     ? [{
         title: '',
         areas: [...publicationYears]
           .sort((a, b) => b.year.localeCompare(a.year))
           .map((e) => ({ name: e.year, items: [{ label: 'Click Here to download', href: e.fileUrl }] })),
       }]
-    : item.slug === 'consultancy' && consultancyReports.length > 0
+    : isConsultancySlug && consultancyReports.length > 0
     ? [{
         title: '',
         areas: [...consultancyReports]

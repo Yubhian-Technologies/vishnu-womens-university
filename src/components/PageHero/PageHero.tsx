@@ -39,7 +39,7 @@ export default function PageHero({
   hideCta = false,
 }: PageHeroProps) {
   const { slides, loading } = usePageBanners(page);
-  const [current, setCurrent] = useState(0);
+  const [rawCurrent, setCurrent] = useState(0);
   const [animating, setAnimating] = useState(false);
   // Only the slides a visitor has actually reached get an <img> in the DOM —
   // otherwise every banner for a page (most have 2-4) downloads its full-size
@@ -62,6 +62,13 @@ export default function PageHero({
   };
   const allSlides: Omit<BannerSlide, 'id' | 'order'>[] =
     slides.length > 0 ? slides : [defaultSlide];
+  // Clamp the carousel index into range for *this* render. A live
+  // usePageBanners update can shrink `slides` (a banner deleted in /admin,
+  // or a Firestore cache→server re-delivery) while `rawCurrent` still points
+  // at a now-removed slide — the [slides.length] reset effect below only
+  // fires *after* this render, so without clamping `allSlides[current]` is
+  // undefined and PageHero crashes reading `slide.title`.
+  const current = Math.min(Math.max(rawCurrent, 0), allSlides.length - 1);
   const showText = !loading;
 
   const goTo = (idx: number) => {

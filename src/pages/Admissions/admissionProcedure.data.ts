@@ -23,8 +23,8 @@ const CATEGORY_B_FOOTNOTE =
 export const admissionTabs: AdmissionTab[] = [
   {
     key: 'btech-regular',
-    label: 'B.Tech (UG) Regular',
-    heading: 'B.Tech. (UG) — Regular',
+    label: 'B.Tech Regular',
+    heading: 'B.Tech. — Regular',
     intro:
       "Vishnu Women's University offers admission to B.Tech. programmes through Category A and Category B, providing eligible students with multiple pathways to begin their engineering education. Students who have completed 10+2 with MPC (Mathematics, Physics and Chemistry) and fulfil the prescribed eligibility criteria may seek admission through either of the applicable pathways.",
     categories: [
