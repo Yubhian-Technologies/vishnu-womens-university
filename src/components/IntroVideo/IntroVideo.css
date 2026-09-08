@@ -28,6 +28,50 @@
   pointer-events: none;
 }
 
+/* On-brand "Think · Build · Lead" tagline over the intro clip. Every size
+   uses clamp() against the viewport so it scales from a 320px phone up to
+   desktop without wrapping or overflowing — font size, letter spacing and
+   the gap between words all shrink together. Sits in the lower third so it
+   never lands on the centred, uncropped video content. */
+.intro-video__tagline {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(1.5rem, 9vh, 4.5rem);
+  transform: translateX(-50%);
+  display: flex;
+  align-items: baseline;
+  margin: 0;
+  padding: 0 1rem;
+  max-width: 100%;
+  color: #ffffff;
+  font-family: var(--font-sans, sans-serif);
+  font-weight: 700;
+  font-size: clamp(0.85rem, 4.5vw, 1.75rem);
+  letter-spacing: clamp(0.12em, 1.2vw, 0.3em);
+  text-transform: uppercase;
+  white-space: nowrap;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  animation: intro-video-tagline-in 700ms ease 350ms forwards;
+}
+
+.intro-video__tagline span + span::before {
+  content: "·";
+  margin: 0 clamp(0.4em, 3vw, 1em);
+  opacity: 0.55;
+}
+
+@keyframes intro-video-tagline-in {
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro-video__tagline {
+    animation: none;
+    opacity: 1;
+  }
+}
+
 /* Centred and shown whole (contain, not cover) at every screen size — the
    letterbox area is the same logo green as the overlay and the video's own
    background, so nothing is cropped and the seam is invisible. */
