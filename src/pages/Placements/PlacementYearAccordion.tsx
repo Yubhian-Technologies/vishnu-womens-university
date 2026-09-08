@@ -405,6 +405,7 @@ export default function PlacementYearAccordion({ years, onActiveYearChange }: Pr
   const visibleYears = years ? placementYearData.filter((y) => years.includes(y.batch)) : placementYearData;
   const [activeStatsYear, setActiveStatsYear] = useState('');
   const [companyFilter, setCompanyFilter] = useState<CompanyFilter>('all');
+  const [entriesLimit, setEntriesLimit] = useState<number | 'all'>(10);
 
   // Opens the first batch by default, and re-picks one if the currently
   // open batch disappears from the list (e.g. the static fallback above
@@ -433,7 +434,18 @@ export default function PlacementYearAccordion({ years, onActiveYearChange }: Pr
   }
 
   const activeYear = visibleYears.find((y) => y.batch === activeStatsYear) ?? visibleYears[0];
-  const filteredRows = companyFilter === 'all' ? activeYear.rows : activeYear.rows.filter((r) => matchesCompanyFilter(r, companyFilter));
+  // IT/Software and Core sort by highest package first — everyone browsing
+  // those two filters is comparing companies by pay, not headcount. Every
+  // other filter (All Companies, Dream Package) keeps the highest-selects
+  // ordering, since Dream Package is already narrowed to ≥10 LPA offers and
+  // reads better ranked by who hired the most at that tier.
+  const sortByLpa = companyFilter === 'it' || companyFilter === 'core';
+  const filteredRows = (companyFilter === 'all' ? activeYear.rows : activeYear.rows.filter((r) => matchesCompanyFilter(r, companyFilter)))
+    .slice()
+    .sort((a, b) => sortByLpa
+      ? (parseFloat(formatSalary(b.salary)) || 0) - (parseFloat(formatSalary(a.salary)) || 0)
+      : b.selects - a.selects);
+  const visibleRows = entriesLimit === 'all' ? filteredRows : filteredRows.slice(0, entriesLimit);
 
   return (
     <div>
@@ -555,7 +567,20 @@ export default function PlacementYearAccordion({ years, onActiveYearChange }: Pr
 
                 {y.rows.length > 0 && (
                   <>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'flex-end', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 'var(--text-sm)', color: 'var(--color-text)' }}>
+                        <span>Show</span>
+                        <select
+                          value={entriesLimit}
+                          onChange={(e) => setEntriesLimit(e.target.value === 'all' ? 'all' : Number(e.target.value))}
+                          style={{ border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-sm)', padding: '0.3rem 0.5rem', fontSize: 'var(--text-sm)' }}
+                        >
+                          {[10, 25, 50, 100].map((n) => <option key={n} value={n}>{n}</option>)}
+                          <option value="all">All</option>
+                        </select>
+                        <span>entries</span>
+                      </div>
+
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
                         {COMPANY_FILTERS.map((f) => {
                           const isActive = companyFilter === f.key;
@@ -604,7 +629,7 @@ export default function PlacementYearAccordion({ years, onActiveYearChange }: Pr
                           </tr>
                         </thead>
                         <tbody>
-                          {filteredRows.map((row, i) => (
+                          {visibleRows.map((row, i) => (
                             <tr key={`${row.company}-${i}`} style={{ background: i % 2 === 0 ? 'var(--color-off-white)' : 'transparent' }}>
                               <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)' }}>{i + 1}</td>
                               <td style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)', fontWeight: 600 }}>{row.company}</td>
