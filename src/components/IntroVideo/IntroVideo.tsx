@@ -86,6 +86,11 @@ export default function IntroVideo() {
         preload="auto"
         onEnded={onEnded}
       />
+      <p className="intro-video__tagline" aria-hidden="true">
+        <span>Think</span>
+        <span>Build</span>
+        <span>Lead</span>
+      </p>
     </div>,
     host,
   );
