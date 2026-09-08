@@ -40,7 +40,7 @@
   top: var(--space-3);
   left: var(--space-3);
   font-family: var(--font-sans);
-  font-size: 0.68rem;
+  font-size: 0.76rem;
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -118,7 +118,7 @@
   padding: 0;
   cursor: pointer;
   font-family: var(--font-sans);
-  font-size: 0.75rem;
+  font-size: 0.83rem;
   font-weight: 700;
   color: var(--color-accent);
 }

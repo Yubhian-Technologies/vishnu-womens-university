@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import { Check, Sparkles, Mail, BookOpen, ChevronRight } from 'lucide-react';
+import { Check, Sparkles, Mail, BookOpen, ChevronRight, Hash } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import FacultyCarousel from '../../components/FacultyCarousel/FacultyCarousel';
 import { useOrderedCollection } from '../../hooks/useCollection';
+import { useEapcetCode } from '../../hooks/useContentBlocks';
 import { normalizeLab, type LabItem, type NewsEventsYear } from '../Admin/sections/ProgramsAdmin';
 import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import type { FacultyDoc } from './Faculty';
@@ -25,6 +26,7 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
   const [activeLab, setActiveLab] = useState<LabItem | null>(null);
   const [activeSectionId, setActiveSectionId] = useState<string>('');
   const { docs: allDepartments, loading } = useOrderedCollection<DepartmentDoc>('departments', 'order');
+  const eapcetCode = useEapcetCode();
   const dept = allDepartments.find((d) => d.shortCode?.trim().toLowerCase() === group.deptShortCode.trim().toLowerCase());
   const facultyDeptNames = new Set(group.facultyDepartments);
   const { docs: allFaculty } = useOrderedCollection<FacultyDoc>('faculty', 'order');
@@ -136,6 +138,34 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
               )}
               <div className="dept-hero-cta">
                 <Link to="/apply-now" className="btn-hero-gold">Apply Now</Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* AP EAPCET College Code — same always-shown card as DepartmentDetail.tsx,
+          so this is surfaced directly to visitors on every department page,
+          not just the freshman-engineering ones with a full Key Facts grid. */}
+      <section className="dept-facts-section" aria-label={`${deptName} key facts`}>
+        <div className="container">
+          <div className="dept-facts-grid cols-1">
+            <div className="dept-fact-card is-eapcet-card">
+              <div className="dept-fact-header">
+                <div className="dept-fact-icon-badge">
+                  <Hash size={14} strokeWidth={2.4} />
+                </div>
+                <span className="dept-fact-col-title">AP EAPCET Code</span>
+              </div>
+              <div className="dept-fact-items-window">
+                <div className="dept-fact-static-list">
+                  <Link to="/admissions" className="dept-fact-chip-link" aria-label="View AP EAPCET college codes and admissions details">
+                    <div className="dept-fact-chip-entry">
+                      <span className="dept-fact-chip-sub">College Code</span>
+                      <span className="dept-fact-chip-val">{eapcetCode}</span>
+                    </div>
+                  </Link>
+                </div>
               </div>
             </div>
           </div>

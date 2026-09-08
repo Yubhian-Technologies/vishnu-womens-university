@@ -30,7 +30,7 @@ export default function TestimonialSlider({
   const [current, setCurrent] = useState(0);
   const [direction, setDirection] = useState(1);
   const [isPaused, setIsPaused] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const [, setProgress] = useState(0);
 
   const count = testimonials.length;
   const progressIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -150,14 +150,6 @@ export default function TestimonialSlider({
         >
           {/* Main Card Surface */}
           <div className="m3-testi-card">
-            {/* Progress Bar */}
-            <div className="m3-testi-progress-track">
-              <div 
-                className="m3-testi-progress-bar" 
-                style={{ width: `${progress}%` }} 
-              />
-            </div>
-
             <AnimatePresence custom={direction} mode="wait">
               <motion.div
                 key={item.id || current}

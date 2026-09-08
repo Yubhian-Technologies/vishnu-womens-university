@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Phone, BookOpen, Briefcase, Cpu, Microscope } from 'lucide-react';
 import SEO from '../../components/SEO/SEO';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
@@ -27,7 +28,7 @@ const PROGRAMMES_DATA = [
   {
     key: 'pg',
     count: '4',
-    fullForm: 'Postgraduate (M.Tech)',
+    fullForm: 'Postgraduate (M.Tech.)',
     icon: Cpu,
   },
   {
@@ -50,7 +51,7 @@ export default function ApplyNow() {
     <main className="apply-now-page">
       <SEO
         title="Apply Now | Vishnu Women's University"
-        description="Apply to Vishnu Women's University — quality education, modern infrastructure, experienced faculty, and research opportunities across 10 UG, 1 MBA, 4 M.Tech, and 3 Research programmes."
+        description="Apply to Vishnu Women's University — quality education, modern infrastructure, experienced faculty, and research opportunities across 10 UG, 1 MBA, 4 M.Tech., and 3 Research programmes."
         canonicalPath="/apply-now"
       />
 
@@ -82,7 +83,7 @@ export default function ApplyNow() {
               {PROGRAMMES_DATA.map((prog) => {
                 const IconComp = prog.icon;
                 return (
-                  <div key={prog.key} className="apply-now-card">
+                  <Link key={prog.key} to="/academics/departments" className="apply-now-card">
                     <div className="apply-now-card-top">
                       <div className="apply-now-card-icon-wrap">
                         <IconComp size={18} className="apply-now-card-icon" />
@@ -93,7 +94,7 @@ export default function ApplyNow() {
                       </span>
                     </div>
                     <div className="apply-now-card-title">{prog.fullForm}</div>
-                  </div>
+                  </Link>
                 );
               })}
             </div>

@@ -3,41 +3,87 @@ import { Link } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
+import { dotTech } from '../../lib/academicDegreeNames';
 
-const DEFAULT_BTECH_FEE = '₹ 1,05,000';
-const DEFAULT_MTECH_FEE = '₹ 55,800';
-const DEFAULT_MBA_FEE = '₹ 55,000';
+const BTECH_FEE = '₹ 1,05,000';
+const MTECH_FEE = '₹ 55,800';
+const MBA_FEE = '₹ 55,000';
 
-// VISWPU is a second, separate AP EAPCET college code — its B.Tech seats
-// aren't part of the admin-managed `programs` collection (those are the
-// VISW-code totals), so they're hardcoded here rather than admin-editable:
-// this is a fixed, externally-issued code and count, not day-to-day content.
-const VISWPU_BTECH_PROGRAMS: { name: string; code: string; intake: number; fee: string }[] = [
-  { name: 'CSE [Artificial Intelligence & Machine Learning]', code: 'B.Tech AI & ML', intake: 120, fee: '₹ 47,000' },
-  { name: 'Electronics Engineering (VLSI Design & Technology)', code: 'B.Tech EVT', intake: 60, fee: '₹ 47,000' },
+type ProgramRow = { name: string; code: string; intake: number; fee: string };
+
+// All programme tables on this page are hardcoded reference data (Category A
+// intake + fee), not admin-managed content — these are fixed, externally
+// issued branch codes and seat counts.
+
+// Category A, VISW college code.
+const BTECH_VISW_PROGRAMS: ProgramRow[] = [
+  { name: 'Computer Science & Engineering', code: 'B.Tech CSE', intake: 180, fee: BTECH_FEE },
+  { name: 'CSE [Artificial Intelligence & Machine Learning]', code: 'B.Tech CSE(AI & ML)', intake: 120, fee: BTECH_FEE },
+  { name: 'CSE [Artificial Intelligence & Data Science]', code: 'B.Tech CSE(AI & DS)', intake: 120, fee: BTECH_FEE },
+  { name: 'CSE [Cyber Security]', code: 'B.Tech Cyber Security', intake: 60, fee: BTECH_FEE },
+  { name: 'Information Technology', code: 'B.Tech IT', intake: 180, fee: BTECH_FEE },
+  { name: 'Electronics & Communication Engineering', code: 'B.Tech ECE', intake: 120, fee: BTECH_FEE },
+  { name: 'Electrical & Electronics Engineering', code: 'B.Tech EEE', intake: 60, fee: BTECH_FEE },
+  { name: 'Civil Engineering', code: 'B.Tech CE', intake: 60, fee: BTECH_FEE },
+  { name: 'Mechanical Engineering', code: 'B.Tech ME', intake: 60, fee: BTECH_FEE },
 ];
 
-// A program can be split across both codes (e.g. AI&ML: 240 total intake in
-// the admin `programs` collection = 120 VISW + 120 VISWPU) — unlike EVT,
-// which is carved out of the VISW table entirely (see the filter below), the
-// admin's `intake` for these still reflects the combined total. Subtracting
-// each one's fixed VISWPU share here, display-only, is what keeps the VISW
-// table from double-counting the VISWPU seats shown just below it — the
-// admin-editable total itself (240) is correct and unchanged, and anywhere
-// else that reads it (e.g. the department page) is meant to show that
-// combined total, not the VISW-only split.
-const VISWPU_INTAKE_BY_NAME: Record<string, number> = Object.fromEntries(
-  VISWPU_BTECH_PROGRAMS.map((p) => [p.name, p.intake])
-);
+// Second AP EAPCET college code (VISWPU) — separate B.Tech seats.
+const VISWPU_BTECH_PROGRAMS: ProgramRow[] = [
+  { name: 'CSE [Artificial Intelligence & Machine Learning]', code: 'CSM', intake: 120, fee: '₹ 47,000' },
+  { name: 'Electronics Engineering (VLSI Design & Technology)', code: 'EVT', intake: 60, fee: '₹ 47,000' },
+];
+
+const MTECH_PROGRAMS: ProgramRow[] = [
+  { name: 'M.Tech – Computer Science & Engineering', code: 'M.Tech CSE', intake: 18, fee: MTECH_FEE },
+  { name: 'M.Tech – VLSI Design', code: 'M.Tech VLSI', intake: 18, fee: MTECH_FEE },
+  { name: 'M.Tech – Power Electronics', code: 'M.Tech Power Electronics', intake: 9, fee: MTECH_FEE },
+  { name: 'M.Tech – Software Engineering', code: 'M.Tech Software Engg.', intake: 9, fee: MTECH_FEE },
+];
+
+const BTECH_TOTAL_INTAKE = [...BTECH_VISW_PROGRAMS, ...VISWPU_BTECH_PROGRAMS].reduce((s, p) => s + p.intake, 0);
+const MTECH_TOTAL_INTAKE = MTECH_PROGRAMS.reduce((s, p) => s + p.intake, 0);
+
+const tableHead: React.CSSProperties = {
+  background: 'var(--color-primary)',
+  color: 'var(--color-white)',
+  fontFamily: 'var(--font-sans)',
+  fontSize: 'var(--text-xs)',
+  fontWeight: 700,
+  letterSpacing: '0.06em',
+  textTransform: 'uppercase',
+  padding: 'var(--space-4) var(--space-5)',
+  textAlign: 'left',
+};
+const tableCell: React.CSSProperties = {
+  padding: 'var(--space-4) var(--space-5)',
+  fontSize: 'var(--text-sm)',
+  color: 'var(--color-text)',
+  borderBottom: '1px solid var(--color-light-gray)',
+  fontFamily: 'var(--font-sans)',
+};
+
+// One shared header row for every programme table on this page. `extra`
+// appends table-specific trailing columns (e.g. MBA's "Entrance").
+const BASE_HEADERS = ['S.No.', 'Programme', 'Branch Code', 'Total Intake', 'Tuition Fee (CAT A)'];
+
+function TableHead({ extra = [] }: { extra?: string[] }) {
+  return (
+    <thead>
+      <tr>
+        {[...BASE_HEADERS, ...extra].map((label, i) => (
+          <th key={label} style={i >= 3 ? { ...tableHead, textAlign: 'center' } : tableHead}>
+            {label}
+          </th>
+        ))}
+      </tr>
+    </thead>
+  );
+}
 
 export default function ProgrammesFee() {
+  // Ph.D. programmes stay admin-managed; the taught-programme tables below are hardcoded.
   const { docs: allPrograms } = useOrderedCollection<ProgramDoc>('programs', 'order');
-  // EVT is excluded from the VISW table on this page only — it's listed
-  // under VISWPU instead (see VISWPU_BTECH_PROGRAMS above). Nothing is
-  // changed in admin/Firestore or on any other page that reads `programs`.
-  const btechPrograms = useMemo(() => allPrograms.filter(p => p.category === 'btech' && p.shortName !== 'B.Tech EVT'), [allPrograms]);
-  const mtechPrograms = useMemo(() => allPrograms.filter(p => p.category === 'mtech'), [allPrograms]);
-  const mbaProgram = useMemo(() => allPrograms.find(p => p.category === 'mba'), [allPrograms]);
   const phdPrograms = useMemo(() => allPrograms.filter(p => p.category === 'phd'), [allPrograms]);
 
   useEffect(() => {
@@ -58,25 +104,6 @@ export default function ProgrammesFee() {
     return () => observer.disconnect();
   }, []);
 
-  const tableHead: React.CSSProperties = {
-    background: 'var(--color-primary)',
-    color: 'var(--color-white)',
-    fontFamily: 'var(--font-sans)',
-    fontSize: 'var(--text-xs)',
-    fontWeight: 700,
-    letterSpacing: '0.06em',
-    textTransform: 'uppercase',
-    padding: 'var(--space-4) var(--space-5)',
-    textAlign: 'left',
-  };
-  const tableCell: React.CSSProperties = {
-    padding: 'var(--space-4) var(--space-5)',
-    fontSize: 'var(--text-sm)',
-    color: 'var(--color-text)',
-    borderBottom: '1px solid var(--color-light-gray)',
-    fontFamily: 'var(--font-sans)',
-  };
-
   return (
     <main className="page-wrapper">
       {/* Hero */}
@@ -93,13 +120,12 @@ export default function ProgrammesFee() {
         <div className="container">
           <div className="reveal" style={{ marginBottom: 'var(--space-8)' }}>
             <span className="section-label">Undergraduate</span>
-            <h2 className="section-title">B.Tech Programs</h2>
+            <h2 className="section-title">{dotTech('B.Tech Programs')}</h2>
             <div style={{ display: 'flex', gap: 'var(--space-6)', flexWrap: 'wrap', marginTop: 'var(--space-4)' }}>
               {[
                 { label: 'Duration', value: '4 Years' },
-                { label: 'Annual Fee', value: btechPrograms[0]?.fee || DEFAULT_BTECH_FEE },
-                // All B.Tech seats incl. EVT (which btechPrograms excludes for the VISW table below).
-                { label: 'Total Intake', value: `${allPrograms.filter(p => p.category === 'btech').reduce((s, p) => s + (p.intake || 0), 0)} Seats` },
+                { label: 'Tuition Fee', value: BTECH_FEE },
+                { label: 'Total Intake', value: `${BTECH_TOTAL_INTAKE} Seats` },
               ].map(s => (
                 <div key={s.label} style={{ background: 'var(--color-primary)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4) var(--space-6)', textAlign: 'center' }}>
                   <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.4rem', fontWeight: 900, color: 'var(--color-accent)' }}>{s.value}</div>
@@ -113,28 +139,17 @@ export default function ProgrammesFee() {
           </span>
           <div className="reveal" style={{ borderRadius: 'var(--radius-md)', overflowX: 'auto', overflowY: 'hidden', boxShadow: 'var(--shadow-md)' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', background: 'var(--color-white)' }}>
-              <thead>
-                <tr>
-                  <th style={tableHead}>S.No</th>
-                  <th style={tableHead}>Programme</th>
-                  <th style={tableHead}>Code</th>
-                  <th style={{ ...tableHead, textAlign: 'center' }}>Intake (Seats)</th>
-                  <th style={{ ...tableHead, textAlign: 'center' }}>Annual Fee</th>
-                </tr>
-              </thead>
+              <TableHead />
               <tbody>
-                {btechPrograms.map((p, i) => {
-                  const viswIntake = p.intake - (VISWPU_INTAKE_BY_NAME[p.name] || 0);
-                  return (
-                    <tr key={p.id} style={{ background: i % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)' }}>
-                      <td style={{ ...tableCell, color: 'var(--color-accent)', fontWeight: 900 }}>{String(i + 1).padStart(2, '0')}</td>
-                      <td style={{ ...tableCell, fontWeight: 600, color: 'var(--color-primary)' }}>{p.name}</td>
-                      <td style={tableCell}>{p.shortName}</td>
-                      <td style={{ ...tableCell, textAlign: 'center', fontWeight: 700 }}>{viswIntake}</td>
-                      <td style={{ ...tableCell, textAlign: 'center', fontWeight: 700, color: 'var(--color-primary)' }}>{p.fee || DEFAULT_BTECH_FEE}</td>
-                    </tr>
-                  );
-                })}
+                {BTECH_VISW_PROGRAMS.map((p, i) => (
+                  <tr key={p.code} style={{ background: i % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)' }}>
+                    <td style={{ ...tableCell, color: 'var(--color-accent)', fontWeight: 900 }}>{String(i + 1).padStart(2, '0')}</td>
+                    <td style={{ ...tableCell, fontWeight: 600, color: 'var(--color-primary)' }}>{dotTech(p.name)}</td>
+                    <td style={tableCell}>{dotTech(p.code)}</td>
+                    <td style={{ ...tableCell, textAlign: 'center', fontWeight: 700 }}>{p.intake}</td>
+                    <td style={{ ...tableCell, textAlign: 'center', fontWeight: 700, color: 'var(--color-primary)' }}>{p.fee}</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
@@ -145,21 +160,13 @@ export default function ProgrammesFee() {
           </span>
           <div className="reveal" style={{ borderRadius: 'var(--radius-md)', overflowX: 'auto', overflowY: 'hidden', boxShadow: 'var(--shadow-md)' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', background: 'var(--color-white)' }}>
-              <thead>
-                <tr>
-                  <th style={tableHead}>S.No</th>
-                  <th style={tableHead}>Programme</th>
-                  <th style={tableHead}>Code</th>
-                  <th style={{ ...tableHead, textAlign: 'center' }}>Intake (Seats)</th>
-                  <th style={{ ...tableHead, textAlign: 'center' }}>Annual Fee</th>
-                </tr>
-              </thead>
+              <TableHead />
               <tbody>
                 {VISWPU_BTECH_PROGRAMS.map((p, i) => (
                   <tr key={p.code} style={{ background: i % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)' }}>
                     <td style={{ ...tableCell, color: 'var(--color-accent)', fontWeight: 900 }}>{String(i + 1).padStart(2, '0')}</td>
-                    <td style={{ ...tableCell, fontWeight: 600, color: 'var(--color-primary)' }}>{p.name}</td>
-                    <td style={tableCell}>{p.code}</td>
+                    <td style={{ ...tableCell, fontWeight: 600, color: 'var(--color-primary)' }}>{dotTech(p.name)}</td>
+                    <td style={tableCell}>{dotTech(p.code)}</td>
                     <td style={{ ...tableCell, textAlign: 'center', fontWeight: 700 }}>{p.intake}</td>
                     <td style={{ ...tableCell, textAlign: 'center', fontWeight: 700, color: 'var(--color-primary)' }}>{p.fee}</td>
                   </tr>
@@ -175,12 +182,12 @@ export default function ProgrammesFee() {
         <div className="container">
           <div className="reveal" style={{ marginBottom: 'var(--space-8)' }}>
             <span className="section-label">Postgraduate</span>
-            <h2 className="section-title">M.Tech Programs</h2>
+            <h2 className="section-title">{dotTech('M.Tech Programs')}</h2>
             <div style={{ display: 'flex', gap: 'var(--space-6)', flexWrap: 'wrap', marginTop: 'var(--space-4)' }}>
               {[
                 { label: 'Duration', value: '2 Years' },
-                { label: 'Annual Fee', value: mtechPrograms[0]?.fee || DEFAULT_MTECH_FEE },
-                { label: 'Total Intake', value: `${mtechPrograms.reduce((s, p) => s + (p.intake || 0), 0)} Seats` },
+                { label: 'Tuition Fee', value: MTECH_FEE },
+                { label: 'Total Intake', value: `${MTECH_TOTAL_INTAKE} Seats` },
               ].map(s => (
                 <div key={s.label} style={{ background: 'var(--color-primary)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4) var(--space-6)', textAlign: 'center' }}>
                   <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.4rem', fontWeight: 900, color: 'var(--color-accent)' }}>{s.value}</div>
@@ -191,19 +198,15 @@ export default function ProgrammesFee() {
           </div>
           <div className="reveal" style={{ borderRadius: 'var(--radius-md)', overflowX: 'auto', overflowY: 'hidden', boxShadow: 'var(--shadow-md)' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', background: 'var(--color-white)' }}>
-              <thead>
-                <tr>
-                  <th style={tableHead}>Programme</th>
-                  <th style={{ ...tableHead, textAlign: 'center' }}>Seats</th>
-                  <th style={{ ...tableHead, textAlign: 'center' }}>Annual Fee</th>
-                </tr>
-              </thead>
+              <TableHead />
               <tbody>
-                {mtechPrograms.map((p, i) => (
-                  <tr key={p.id} style={{ background: i % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)' }}>
-                    <td style={{ ...tableCell, fontWeight: 600, color: 'var(--color-primary)' }}>{p.name}</td>
+                {MTECH_PROGRAMS.map((p, i) => (
+                  <tr key={p.code} style={{ background: i % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)' }}>
+                    <td style={{ ...tableCell, color: 'var(--color-accent)', fontWeight: 900 }}>{String(i + 1).padStart(2, '0')}</td>
+                    <td style={{ ...tableCell, fontWeight: 600, color: 'var(--color-primary)' }}>{dotTech(p.name)}</td>
+                    <td style={tableCell}>{dotTech(p.code)}</td>
                     <td style={{ ...tableCell, textAlign: 'center', fontWeight: 700 }}>{p.intake}</td>
-                    <td style={{ ...tableCell, textAlign: 'center', fontWeight: 700, color: 'var(--color-primary)' }}>{p.fee || DEFAULT_MTECH_FEE}</td>
+                    <td style={{ ...tableCell, textAlign: 'center', fontWeight: 700, color: 'var(--color-primary)' }}>{p.fee}</td>
                   </tr>
                 ))}
               </tbody>
@@ -221,8 +224,8 @@ export default function ProgrammesFee() {
             <div style={{ display: 'flex', gap: 'var(--space-6)', flexWrap: 'wrap', marginTop: 'var(--space-4)' }}>
               {[
                 { label: 'Duration', value: '2 Years' },
-                { label: 'Annual Fee', value: mbaProgram?.fee || DEFAULT_MBA_FEE },
-                { label: 'Total Intake', value: `${mbaProgram?.intake || 60} Seats` },
+                { label: 'Tuition Fee', value: MBA_FEE },
+                { label: 'Total Intake', value: '60 Seats' },
               ].map(s => (
                 <div key={s.label} style={{ background: 'var(--color-primary)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4) var(--space-6)', textAlign: 'center' }}>
                   <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.4rem', fontWeight: 900, color: 'var(--color-accent)' }}>{s.value}</div>
@@ -233,19 +236,14 @@ export default function ProgrammesFee() {
           </div>
           <div className="reveal" style={{ borderRadius: 'var(--radius-md)', overflowX: 'auto', overflowY: 'hidden', boxShadow: 'var(--shadow-md)' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', background: 'var(--color-white)' }}>
-              <thead>
-                <tr>
-                  <th style={tableHead}>Programme</th>
-                  <th style={{ ...tableHead, textAlign: 'center' }}>Seats</th>
-                  <th style={{ ...tableHead, textAlign: 'center' }}>Annual Fee</th>
-                  <th style={{ ...tableHead, textAlign: 'center' }}>Entrance</th>
-                </tr>
-              </thead>
+              <TableHead extra={['Entrance']} />
               <tbody>
                 <tr style={{ background: 'var(--color-white)' }}>
+                  <td style={{ ...tableCell, color: 'var(--color-accent)', fontWeight: 900 }}>01</td>
                   <td style={{ ...tableCell, fontWeight: 600, color: 'var(--color-primary)' }}>Master of Business Administration</td>
-                  <td style={{ ...tableCell, textAlign: 'center', fontWeight: 700 }}>{mbaProgram?.intake || 60}</td>
-                  <td style={{ ...tableCell, textAlign: 'center', fontWeight: 700, color: 'var(--color-primary)' }}>{mbaProgram?.fee || DEFAULT_MBA_FEE}</td>
+                  <td style={tableCell}></td>
+                  <td style={{ ...tableCell, textAlign: 'center', fontWeight: 700 }}>60</td>
+                  <td style={{ ...tableCell, textAlign: 'center', fontWeight: 700, color: 'var(--color-primary)' }}>{MBA_FEE}</td>
                   <td style={{ ...tableCell, textAlign: 'center' }}>ICET</td>
                 </tr>
               </tbody>
@@ -265,7 +263,7 @@ export default function ProgrammesFee() {
             {phdPrograms.map((p) => (
               <div key={p.id} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', padding: 'var(--space-4)', background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-sm)', borderLeft: '3px solid var(--color-accent)' }}>
                 <span style={{ color: 'var(--color-accent)', fontWeight: 900 }}>PhD</span>
-                <span style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-primary)' }}>{p.name}</span>
+                <span style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-primary)' }}>{dotTech(p.name)}</span>
               </div>
             ))}
           </div>

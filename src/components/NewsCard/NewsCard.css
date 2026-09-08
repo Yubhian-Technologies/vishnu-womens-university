@@ -51,7 +51,7 @@
   left: 12px;
   background: #0B1E42;
   color: #C9973A;
-  font-size: 0.7rem;
+  font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -74,7 +74,7 @@
 }
 
 .news-card-date {
-  font-size: 0.78rem;
+  font-size: 0.86rem;
   color: #5A6A85;
   font-family: var(--font-sans, system-ui, sans-serif);
   font-weight: 600;

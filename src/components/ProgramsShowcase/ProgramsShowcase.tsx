@@ -54,10 +54,12 @@ export default function ProgramsShowcase() {
   };
 
   const categories = [
-    // ‌ (ZWNJ) after "(" stops fonts substituting "(5)"/"(3)" with a circled-digit ligature
-    { id: 'ug', label: `Undergraduate Programs${btechCount > 0 ? ` (‌${btechCount})` : ''}`, link: '/academics?tab=btech' },
-    { id: 'pg', label: `Postgraduate Programs${pgCount > 0 ? ` (‌${pgCount})` : ''}`, link: '/academics?tab=mtech' },
-    { id: 'phd', label: `Ph.D Programs${phdCount > 0 ? ` (‌${phdCount})` : ''}`, link: '/academics?tab=phd' },
+    // ‌ (ZWNJ) after "(" stops fonts substituting "(5)"/"(3)" with a circled-digit ligature.
+    //   (no-break space) before "(" glues the count to "Programs" so "(10)" never
+    // wraps onto a line of its own in the narrow 3-column tab grid.
+    { id: 'ug', label: `Undergraduate Programs${btechCount > 0 ? ` (‌${btechCount})` : ''}`, link: '/academics?tab=btech' },
+    { id: 'pg', label: `Postgraduate Programs${pgCount > 0 ? ` (‌${pgCount})` : ''}`, link: '/academics?tab=mtech' },
+    { id: 'phd', label: `Ph.D Programs${phdCount > 0 ? ` (‌${phdCount})` : ''}`, link: '/academics?tab=phd' },
   ];
 
   return (
@@ -71,8 +73,7 @@ export default function ProgramsShowcase() {
               A Spectrum of Programmes. A World of Possibilities.
             </h2>
             <div className="programs-showcase-desc">
-              <p>VWU offers a diverse portfolio of academic programmes that bring together rigorous learning, research, global perspectives, and meaningful industry engagement. From undergraduate to doctoral study, every programme is designed to nurture curiosity, build future-ready capabilities, and empower students to transform ideas into innovation and impact.</p>
-              <p>With opportunities to learn across disciplines, engage in research, gain global exposure, and connect with industry, students are prepared not just for successful careers, but to become confident leaders, thoughtful innovators, and lifelong learners in an ever-evolving world.</p>
+              <p>From undergraduate to doctoral study, VWU's programmes bring together rigorous learning, research, global exposure, and industry engagement — preparing students to become confident leaders, thoughtful innovators, and lifelong learners in an ever-evolving world.</p>
             </div>
 
             {/* Interactive Live Search Bar */}

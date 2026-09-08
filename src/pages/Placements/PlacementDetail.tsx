@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { orderBy } from 'firebase/firestore';
-import { Trophy, BarChart3, PlayCircle, MapPin, CheckCircle2 } from 'lucide-react';
+import { Trophy, BarChart3, PlayCircle, MapPin, CheckCircle2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCollection, useOrderedCollection, type WithId } from '../../hooks/useCollection';
 import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import { usePageBanners } from '../../hooks/usePageBanners';
@@ -639,6 +639,75 @@ function BatchSummaryCard({ batch, offers, highest, index }: { batch: string; of
   );
 }
 
+// Impact > Summary trend chart — offers (navy bars) and highest package in
+// LPA (gold line) per batch, plotted against the batch's passing-out year.
+// Reads the same PlacementYear records as the cards above, so it can never
+// disagree with them. Plain inline SVG — no chart library.
+function BatchTrendChart({ data }: { data: PlacementYear[] }) {
+  const rows = data
+    .map((y) => ({
+      label: (y.batch.split(/[–-]/).pop() || y.batch).trim(),
+      year: Number(y.batch.split(/[–-]/).pop()),
+      offers: y.total ?? 0,
+      highest: batchHighestPackage(y)?.lpa ?? 0,
+    }))
+    .sort((a, b) => a.year - b.year);
+
+  if (rows.length < 2) return null;
+
+  const W = 760;
+  const H = 340;
+  const m = { top: 28, right: 24, bottom: 44, left: 44 };
+  const iw = W - m.left - m.right;
+  const ih = H - m.top - m.bottom;
+  const maxOffers = Math.max(...rows.map((r) => r.offers)) * 1.18 || 1;
+  const maxLpa = Math.max(...rows.map((r) => r.highest)) * 1.18 || 1;
+  const x = (i: number) => m.left + (iw / rows.length) * (i + 0.5);
+  const yOffers = (v: number) => m.top + ih - (v / maxOffers) * ih;
+  const yLpa = (v: number) => m.top + ih - (v / maxLpa) * ih;
+  const barW = Math.min(46, (iw / rows.length) * 0.5);
+  const linePath = rows.map((r, i) => `${i === 0 ? 'M' : 'L'} ${x(i)} ${yLpa(r.highest)}`).join(' ');
+
+  return (
+    <div style={{ marginTop: 'var(--space-8)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-5)' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-5)', marginBottom: 'var(--space-3)', fontSize: 'var(--text-sm)', color: 'var(--color-text-light)' }}>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+          <i style={{ width: 12, height: 12, borderRadius: 3, background: 'var(--color-primary)', display: 'inline-block' }} /> Number of offers
+        </span>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+          <i style={{ width: 12, height: 12, borderRadius: 3, background: 'var(--color-accent)', display: 'inline-block' }} /> Highest package (LPA)
+        </span>
+      </div>
+      <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 'auto', display: 'block' }} role="img" aria-label="Placement offers and highest package by batch year">
+        {[0, 0.25, 0.5, 0.75, 1].map((g) => (
+          <line key={g} x1={m.left} x2={W - m.right} y1={m.top + ih * g} y2={m.top + ih * g} stroke="var(--color-light-gray)" strokeWidth={1} />
+        ))}
+        {rows.map((r, i) => (
+          <rect key={`bar-${i}`} x={x(i) - barW / 2} y={yOffers(r.offers)} width={barW} height={Math.max(0, m.top + ih - yOffers(r.offers))} rx={3} fill="var(--color-primary)" opacity={0.92} />
+        ))}
+        {rows.map((r, i) => (
+          <text key={`ov-${i}`} x={x(i)} y={yOffers(r.offers) - 6} textAnchor="middle" fontSize={11} fontWeight={700} fill="var(--color-primary-dark)">
+            {r.offers.toLocaleString('en-IN')}
+          </text>
+        ))}
+        <path d={linePath} fill="none" stroke="var(--color-accent)" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
+        {rows.map((r, i) => (
+          <g key={`pt-${i}`}>
+            <circle cx={x(i)} cy={yLpa(r.highest)} r={4} fill="var(--color-accent)" stroke="#ffffff" strokeWidth={1.5} />
+            <text x={x(i)} y={yLpa(r.highest) - 11} textAnchor="middle" fontSize={11} fontWeight={700} fill="#8A5A20">{r.highest}</text>
+          </g>
+        ))}
+        {rows.map((r, i) => (
+          <text key={`xl-${i}`} x={x(i)} y={H - m.bottom + 22} textAnchor="middle" fontSize={12} fill="var(--color-text-light)">{r.label}</text>
+        ))}
+        <text x={m.left} y={m.top - 12} fontSize={11} fill="var(--color-text-light)">Offers</text>
+        <text x={W - m.right} y={m.top - 12} textAnchor="end" fontSize={11} fill="var(--color-text-light)">LPA</text>
+        <text x={W / 2} y={H - 6} textAnchor="middle" fontSize={12} fontWeight={700} fill="var(--color-text-light)">Passing-out year</text>
+      </svg>
+    </div>
+  );
+}
+
 // One roster row's accordion — expands to the TPO bio, the Industry Liaison
 // office details, or a plain Role/Notes view, whichever matches the name.
 // Shared by the flat roster list (Regional Offices, etc.) and the tile-
@@ -1230,6 +1299,7 @@ export default function PlacementDetail() {
             <BatchSummaryCard key={y.batch} batch={y.batch} offers={y.total} highest={batchHighestPackage(y)} index={i} />
           ))}
         </div>
+        <BatchTrendChart data={summaryYearData} />
       </div>
     </section>
   );
@@ -1311,7 +1381,11 @@ export default function PlacementDetail() {
       {!skipOverviewSection && (
       <section className="section bg-white" style={{ paddingBottom: (showOutcomes && item.slug !== 'placement-details') || item.slug === 'employability-skills' || item.slug === 'gsac' || item.slug === 'higher-education' || item.slug === 'placement-highlights' || item.slug === 'tpo-team' || item.slug === 'industry-liaison-offices' ? 'var(--space-6)' : undefined }}>
         <div className="container">
-          <div className={(item.highlights && item.highlights.length > 0) || item.slug === 'placement-details' ? 'detail-grid' : ''}>
+          <div className={
+            (item.highlights && item.highlights.length > 0) || item.slug === 'placement-details'
+              ? `detail-grid${item.slug === 'gsac' ? ' detail-grid--image-sidebar' : ''}${item.slug === 'higher-education' ? ' detail-grid--higher-ed-sidebar' : ''}`
+              : ''
+          }>
             {/* Main */}
             <div>
               {item.slug !== 'tpo-team' && <span className="section-label">Overview</span>}
@@ -1326,7 +1400,7 @@ export default function PlacementDetail() {
                 <>
                   <BodyBlocks
                     blocks={parseBodyContent(item.intro)}
-                    paragraphStyle={{ fontSize: 'var(--text-lg)', color: 'var(--color-text)', lineHeight: 1.75 }}
+                    paragraphStyle={{ fontSize: 'var(--text-lg)', color: 'var(--color-text)', lineHeight: item.slug === 'higher-education' ? 1.5 : 1.75 }}
                   />
                   {item.about && (
                     <BodyBlocks
@@ -1392,6 +1466,29 @@ export default function PlacementDetail() {
                   </div>
                 </div>
               )
+            ) : item.slug === 'gsac' ? (
+              <div className="detail-sidebar">
+                <div style={{ position: 'sticky', top: '110px', display: 'flex', justifyContent: 'center' }}>
+                  <img
+                    src="/images/placements/gsac-green-shield.png"
+                    alt="Graduate Study Abroad Center (GSAC)"
+                    loading="lazy"
+                    style={{ width: '100%', maxWidth: 420, height: 'auto' }}
+                  />
+                </div>
+              </div>
+            ) : item.slug === 'higher-education' ? (
+              <div className="detail-sidebar">
+                <div style={{ position: 'sticky', top: '110px' }}>
+                  <SidebarImageCarousel
+                    images={[
+                      '/images/placements/global-universities.jpg',
+                      '/images/placements/collaboration-with-institutions.jpg',
+                    ]}
+                    alt="Higher Education partnerships and collaborations"
+                  />
+                </div>
+              </div>
             ) : item.highlights && item.highlights.length > 0 && (
               <div className="detail-sidebar">
                 <div style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', position: 'sticky', top: '110px' }}>
@@ -1682,7 +1779,10 @@ export default function PlacementDetail() {
               // same /images/placements/* pattern as elsewhere) sits beside
               // the Regional Offices list instead of above it, smaller than
               // its old full-width-up-to-720px size since it no longer needs
-              // to carry the whole row on its own.
+              // to carry the whole row on its own. The artwork itself already
+              // includes the per-city icon row (see the updated
+              // industry-liaison-offices.png), so nothing extra is rendered
+              // here for that anymore.
               <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 340px) 1fr', gap: 'var(--space-8)', alignItems: 'start' }}>
                 <img
                   src="/images/placements/industry-liaison-offices.png"

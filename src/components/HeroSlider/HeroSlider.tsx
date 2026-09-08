@@ -3,15 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import { usePageBanners } from '../../hooks/usePageBanners';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
+import { HERO_VIDEO_SRC } from '../../lib/heroVideo';
 import './HeroSlider.css';
 
-// Served from public/ (not imported as a JS module) so this ~61MB file never
-// enters Vite's module graph or gets processed/hashed on every build. It's
-// still a genuinely large download — re-encoding it to a smaller bitrate
-// with an external tool (ffmpeg/HandBrake) would help more than anything
-// done here — but deferring the fetch (below) at least keeps it from
-// competing with the JS bundle for bandwidth during initial page load.
-const HERO_VIDEO_SRC = '/VWU%20CAMPUS-BVRM.mp4';
+// HERO_VIDEO_SRC lives in src/lib/heroVideo.ts so the Campus Visit page's
+// virtual tour can reuse the same source. The fetch is still deferred (see
+// the effect below) so it doesn't compete with the JS bundle on load.
 
 
 interface Slide {

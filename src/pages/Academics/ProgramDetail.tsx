@@ -133,22 +133,28 @@ function SingleProgramDetail() {
   const { docs: allPrograms, loading } = useOrderedCollection<ProgramDoc>('programs', 'order');
   const program = allPrograms.find((p) => p.slug === slug);
 
-  const { docs: allFaculty } = useOrderedCollection<FacultyDoc>('faculty', 'order');
-  const faculty = program?.department ? allFaculty.filter((f) => f.department === program.department) : [];
-  const { docs: deptNews } = useOrderedCollection<DepartmentNewsDoc>('departmentNews', 'date', 'desc');
-  const hasDeptNews = deptNews.some((n) => n.program === slug);
   // Resolves the program's short `department` code (e.g. "IT") to its full
   // Academic Departments admin record — used for the "About the Department"
   // heading below (reading the same way it does on the AI/CSE/ECE grouped
   // page) and, further down, as the source for Vision/Mission/Values,
   // Laboratories, and the Department Library (see `shared` below). A couple
   // of legacy programs spell their department out in prose ("Civil",
-  // "Mechanical") rather than the admin's short code ("CE", "ME") — this
-  // alias table is the only place that mismatch needs correcting.
+  // "Mechanical") rather than the admin's short code ("CE", "ME") — resolved
+  // through this alias below wherever a faculty/department record's own
+  // `department` field is compared against another, not just for the dept
+  // doc lookup, since a faculty member's `department` field uses the same
+  // prose spelling as the program's and an unresolved comparison only ever
+  // matched by accident for every other department, never for these two.
   const DEPT_CODE_ALIASES: Record<string, string> = { Civil: 'CE', Mechanical: 'ME' };
+  const resolveDeptCode = (d: string) => (DEPT_CODE_ALIASES[d] || d || '').trim().toUpperCase();
+  const deptCode = resolveDeptCode(program?.department || '');
+
+  const { docs: allFaculty } = useOrderedCollection<FacultyDoc>('faculty', 'order');
+  const faculty = program?.department ? allFaculty.filter((f) => resolveDeptCode(f.department) === deptCode) : [];
+  const { docs: deptNews } = useOrderedCollection<DepartmentNewsDoc>('departmentNews', 'date', 'desc');
+  const hasDeptNews = deptNews.some((n) => n.program === slug);
   const { docs: allDepartments, loading: deptLoading } = useOrderedCollection<DepartmentDoc>('departments', 'order');
-  const deptCode = DEPT_CODE_ALIASES[program?.department || ''] || program?.department || '';
-  const dept = allDepartments.find((d) => d.shortCode?.trim().toUpperCase() === deptCode.trim().toUpperCase());
+  const dept = allDepartments.find((d) => (d.shortCode || '').trim().toUpperCase() === deptCode);
   const deptTitle = dept?.title || program?.department;
   // Falls back to a shared "Program Pages" banner (Hero Banners admin) only
   // when this specific program hasn't had its own image uploaded yet via
@@ -1391,15 +1397,15 @@ function SingleProgramDetail() {
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-14) 0' }}>
         <div className="container" style={{ textAlign: 'center' }}>
           <div>
-            <span className="section-label" style={{ color: 'var(--color-accent)' }}>Apply Today</span>
             <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>Begin Your Journey in {program.shortName || program.name}</h2>
             <p style={{ color: 'rgba(255,255,255,0.8)', maxWidth: 500, margin: '0 auto var(--space-8)', lineHeight: 1.7 }}>
-              Join a thriving academic community. Apply through AP EAPCET (Code: {eapcetCode}), explore our fee structure, or schedule a campus visit today.
+              Join a thriving academic community. Apply through AP EAPCET (Code: {eapcetCode}), explore our fee structure, or schedule a campus visit.
             </p>
             <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Link to="/admissions" className="btn btn-accent btn-lg">Apply via AP EAPCET</Link>
+              <Link to="/admissions" className="btn btn-secondary btn-lg">For Admissions</Link>
               <Link to="/programmes-fee-structure" className="btn btn-secondary btn-lg">Fee Structure</Link>
               <Link to="/academics" className="btn btn-secondary btn-lg">All Programmes</Link>
+              <Link to="/campus-visit" className="btn btn-secondary btn-lg">Book a Campus Visit</Link>
             </div>
           </div>
         </div>

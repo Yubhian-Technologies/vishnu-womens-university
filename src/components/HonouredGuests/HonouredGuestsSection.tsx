@@ -14,35 +14,49 @@ export interface HonouredGuestDoc {
 type HonouredGuestItem = WithId & HonouredGuestDoc;
 
 /**
- * Home page-only section — photo, name, and role for notable visitors VWU
- * has hosted. Admin-managed via /admin → Honoured Guests; renders nothing
- * until at least one guest has been added, same fallback pattern as every
- * other Firestore-backed section on this page (see CLAUDE.md's content
- * model notes).
+ * Home page-only section — photo, name, and role for eminent personalities
+ * VWU has hosted. Admin-managed via /admin → Home — Eminent Personalities;
+ * renders nothing until at least one entry has been added, same fallback
+ * pattern as every other Firestore-backed section on this page (see
+ * CLAUDE.md's content model notes).
+ *
+ * ponytail: Firestore collection is still `honouredGuests` (its original
+ * name) — kept as-is so existing entries and the admin section don't need
+ * a data migration. Only the visible labels + layout changed.
+ *
+ * Marquee is pure CSS (duplicated list + translateX(-50%)), the same
+ * approach as Home's `.activity-track` — no IntersectionObserver, so the
+ * Firestore-vs-`.reveal` gotcha doesn't apply here.
  */
 export default function HonouredGuestsSection() {
-  const { docs: guests } = useOrderedCollection<HonouredGuestItem>('honouredGuests', 'order');
-  if (guests.length === 0) return null;
+  const { docs: people } = useOrderedCollection<HonouredGuestItem>('honouredGuests', 'order');
+  if (people.length === 0) return null;
+
+  const loop = [...people, ...people];
 
   return (
-    <section className="honoured-guests-section" aria-label="Honoured Guests at VWU">
+    <section className="eminent-section" aria-label="Eminent Personalities at VWU">
       <div className="container">
-        <h2 className="honoured-guests-title">Honoured Guests at VWU</h2>
-        <div className="honoured-guests-grid">
-          {guests.map((g) => (
-            <div key={g.id} className="honoured-guest-card">
-              <div className="honoured-guest-photo-wrap">
+        <h2 className="eminent-title">Eminent Personalities at VWU</h2>
+      </div>
+      <div className="eminent-marquee">
+        <div className="eminent-track">
+          {loop.map((p, i) => (
+            <figure key={`${p.id}-${i}`} className="eminent-card" aria-hidden={i >= people.length}>
+              <div className="eminent-photo-wrap">
                 <SmoothImage
-                  src={g.imageUrl}
-                  alt={g.name}
-                  className="honoured-guest-photo"
+                  src={p.imageUrl}
+                  alt={p.name}
+                  className="eminent-photo"
                   loading="lazy"
                   decoding="async"
                 />
               </div>
-              <h3 className="honoured-guest-name">{g.name}</h3>
-              {g.role && <p className="honoured-guest-role">{g.role}</p>}
-            </div>
+              <figcaption>
+                <span className="eminent-name">{p.name}</span>
+                {p.role && <span className="eminent-role">{p.role}</span>}
+              </figcaption>
+            </figure>
           ))}
         </div>
       </div>

@@ -135,15 +135,6 @@ export default function RecruitersSection() {
 
       {/* 3 Auto-Scrolling Marquee Rows (Non-Synchronized, Zero Gap) */}
       <div className="recruiters-marquee-container">
-        {/* Left & Right Black Rectangular Slits (Origination/Destination Effect) */}
-        <div className="recruiter-slit recruiter-slit--left" aria-hidden="true">
-          <div className="slit-inner-aperture" />
-        </div>
-        <div className="recruiter-slit recruiter-slit--right" aria-hidden="true">
-          <div className="slit-inner-aperture" />
-        </div>
-
-        {/* Row 1: Leftward (Slower pace: 85s) */}
         <Marquee
           pauseOnHover
           repeat={3}

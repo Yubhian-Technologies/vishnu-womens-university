@@ -57,7 +57,9 @@ export default function CounterSection() {
     <section className="glance-section" ref={sectionRef} aria-label="University at a Glance">
       <div className="container">
         <div className="glance-header">
+          <span className="glance-eyebrow">By the Numbers</span>
           <h2 className="glance-title">University at a Glance</h2>
+          <p className="glance-subtitle">The scale of our academic community, research output, and industry partnerships — in numbers.</p>
         </div>
 
         <div className="glance-unified-card">

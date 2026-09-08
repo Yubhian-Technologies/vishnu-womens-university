@@ -270,7 +270,7 @@
   border: 1px solid color-mix(in srgb, var(--footer-heading, #ffffff) 12%, transparent);
   color: color-mix(in srgb, var(--footer-text, #e2e8f0) 80%, transparent);
   font-family: inherit;
-  font-size: 0.72rem;
+  font-size: 0.8rem;
   font-weight: 700;
   padding: 0.35rem 0.8rem;
   border-radius: var(--radius-full);
@@ -576,7 +576,7 @@
   }
 
   .vwu-footer-m-comp-title {
-    font-size: 0.78rem;
+    font-size: 0.86rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.06em;

@@ -4,7 +4,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faTrophy,
   faArrowRight,
-  faAward,
 } from '@fortawesome/free-solid-svg-icons';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import type { PlacementHighlightDoc } from '../../pages/Admin/sections/PlacementHighlightsAdmin';
@@ -83,27 +82,23 @@ export default function WomensEducationSection() {
 
   return (
     <section className="we-section" aria-label="Women's Education at VWU">
-      {/* Background Decorative Ambient Glows */}
-      <div className="we-glow we-glow--1" aria-hidden="true" />
-      <div className="we-glow we-glow--2" aria-hidden="true" />
-
       <div className="container">
         <div className="we-grid">
           {/* Left Column: Mission, Headline & CTAs */}
           <div className="we-content">
+            <span className="we-eyebrow">Vishnu Women's University</span>
+
             <h2 className="we-title">
               Educate a Woman,<br />
-              <span className="gradient-text">Transform the World.</span>
+              <span className="we-title-accent">Transform the World.</span>
             </h2>
 
             <p className="we-lead">
-              At <strong>Vishnu Women's University</strong>, when women master advanced technology,
-              they don't just participate in the future — they engineer it.
+              We empower women to master advanced technology — not just to participate in the future, but to engineer it.
             </p>
 
             <p className="we-desc">
-              We cultivate critical thinkers, bold leaders, and visionary innovators who lead top technology firms,
-              publish ground-breaking research, and shape the digital world.
+              Our graduates lead top technology firms, publish pioneering research, and shape the digital world.
             </p>
 
             {/* Action Buttons */}
@@ -124,6 +119,7 @@ export default function WomensEducationSection() {
               {placementItems.map((item, i) => {
                 const isActive = i === activePhoto;
                 const isGoogle = (item.company || '').toLowerCase().includes('google') || !item.company;
+                const rawNum = (item.package ? item.package.replace(/LPA/i, '').trim() : '59.29');
                 return (
                   <div
                     key={item.src + i}
@@ -139,15 +135,13 @@ export default function WomensEducationSection() {
 
                     {/* Student Success Content */}
                     <div className="we-success-content">
-                      <div className="we-success-eyebrow">
-                        <FontAwesomeIcon icon={faAward} className="we-success-award-icon" />
-                        <span>STUDENT SUCCESS STORY</span>
-                      </div>
+                      <span className="we-success-eyebrow">Student Success Story</span>
 
                       <h3 className="we-student-name">{item.name || 'D. RENUKA GANGA'}</h3>
 
                       <div className="we-package-highlight">
-                        <span className="we-package-num">{item.package ? item.package.replace(/LPA/i, '').trim() : '59.29'}</span>
+                        <span className="we-package-currency" aria-hidden="true">{rawNum.includes('₹') ? '' : '₹'}</span>
+                        <span className="we-package-num">{rawNum.replace('₹', '')}</span>
                         <span className="we-package-unit">LPA</span>
                       </div>
 

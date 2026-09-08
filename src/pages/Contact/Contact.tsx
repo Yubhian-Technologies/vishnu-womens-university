@@ -19,7 +19,6 @@ import {
   Bus,
   FileCheck2,
   PhoneCall,
-  Headphones,
 } from 'lucide-react';
 import type { ComponentType } from 'react';
 import {
@@ -292,50 +291,10 @@ export default function Contact() {
         canonicalPath="/contact"
       />
 
-      {/* ── Sleek Hero Banner ── */}
-      <section className="contact-hero-clean">
-        <div className="contact-hero-glow" aria-hidden="true" />
-        <div className="container contact-hero-clean__inner">
-          <h1 className="contact-hero-clean__title">
-            Got Questions? We Are Here
-          </h1>
-          <p className="contact-hero-clean__subtitle">
-            Curious about admissions, programmes, or campus life? Our team is here to help you with everything you need.
-          </p>
-          <p className="contact-hero-clean__subtitle" style={{ fontWeight: 600, color: 'var(--color-accent, #c9a84c)' }}>
-            Reach out. Ask away. Start your journey. ✨
-          </p>
-
-          <nav className="contact-hero-quicknav" aria-label="Contact page sections">
-            <a href="#primary-helpdesks" className="contact-hero-quicknav-pill">
-              <Headphones size={15} />
-              <span>Primary Helpdesks</span>
-            </a>
-            <a href="#send-message" className="contact-hero-quicknav-pill">
-              <Send size={15} />
-              <span>Send a Message</span>
-            </a>
-            <a href="#map-directions" className="contact-hero-quicknav-pill">
-              <MapPin size={15} />
-              <span>Map &amp; Directions</span>
-            </a>
-            <a href="#department-directory" className="contact-hero-quicknav-pill">
-              <Building2 size={15} />
-              <span>Departments Directory</span>
-            </a>
-            <a href="#helplines" className="contact-hero-quicknav-pill contact-hero-quicknav-pill--alert">
-              <ShieldCheck size={15} />
-              <span>24&times;7 Helplines</span>
-            </a>
-          </nav>
-        </div>
-      </section>
-
       {/* ── Key Contact Points (Primary Support Desks) ── */}
       <section id="primary-helpdesks" className="contact-info-section" aria-label="Primary Support Desks" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
         <div className="container">
           <div className="section-head-center">
-            <span className="section-label">Key Contact Points</span>
             <h2 className="section-title">Connect with our Team</h2>
             <p className="section-subtitle">
               Dedicated support desks for <strong>admissions, administrative services, and campus visits</strong>, providing timely assistance and guidance.
@@ -439,23 +398,107 @@ export default function Contact() {
         </div>
       </section>
 
-      {/* ── Location, Travel & Message Form ── */}
-      <section className="contact-main-section">
+      {/* ── Location & Travel Guide ── */}
+      <section id="map-directions" className="contact-location-section" aria-label="Location & Travel Guide" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
         <div className="container">
-          <div className="contact-grid-2col">
-            
-            {/* Left Column: Location & Travel Guide */}
-            <div id="map-directions" className="contact-left-card" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
-              <div className="section-head-left">
-                <span className="section-label">Visit Our Campus</span>
-                <h2 className="section-title">Location &amp; Travel Guide</h2>
-                <p className="section-subtitle">
-                  Vishnu Women’s University is situated in the serene, green surroundings of Bhimavaram, West Godavari District, Andhra Pradesh. The University is located on the Bhimavaram–Tadepalligudem Road, with convenient access from Bhimavaram town via B. V. Raju Marg.
-                </p>
+          <div className="contact-split">
+            <div className="contact-loc-col">
+            <div className="section-head-left">
+              <span className="section-label">Visit Our Campus</span>
+              <h2 className="section-title">Location &amp; Travel Guide</h2>
+              <p className="section-subtitle">
+                Vishnu Women’s University is situated in the serene, green surroundings of Bhimavaram, West Godavari District, Andhra Pradesh. The University is located on the Bhimavaram–Tadepalligudem Road, with convenient access from Bhimavaram town via B. V. Raju Marg.
+              </p>
+            </div>
+
+            {/* How to Reach VWU Campus */}
+            <div className="contact-transit-container">
+              <h3 className="transit-heading">How to Reach VWU Campus</h3>
+
+              <div className="transit-tabs">
+                <button 
+                  type="button" 
+                  className={`transit-tab ${activeTransitTab === 'train' ? 'active' : ''}`}
+                  onClick={() => setActiveTransitTab('train')}
+                >
+                  <Train size={15} />
+                  <span>By Train</span>
+                </button>
+                <button 
+                  type="button" 
+                  className={`transit-tab ${activeTransitTab === 'air' ? 'active' : ''}`}
+                  onClick={() => setActiveTransitTab('air')}
+                >
+                  <Plane size={15} />
+                  <span>By Air</span>
+                </button>
+                <button 
+                  type="button" 
+                  className={`transit-tab ${activeTransitTab === 'road' ? 'active' : ''}`}
+                  onClick={() => setActiveTransitTab('road')}
+                >
+                  <Bus size={15} />
+                  <span>By Road</span>
+                </button>
               </div>
 
-              {/* Map Embed Box */}
-              <div className="contact-map-box">
+              <div className="transit-body">
+                {activeTransitTab === 'train' && (
+                  <div className="transit-info">
+                    <p>
+                      <strong>Bhimavaram Town (BVRM)</strong> &amp; <strong>Junction (BVRT)</strong> stations are <strong>3.8 km and 4.2 km</strong> away. Autos and cabs operate continuously to campus.
+                    </p>
+                  </div>
+                )}
+
+                {activeTransitTab === 'air' && (
+                  <div className="transit-info">
+                    <p>
+                      <strong>Vijayawada International Airport (VGA):</strong> ~92 km (2 hrs drive).<br />
+                      <strong>Rajahmundry Domestic Airport (RJA):</strong> ~78 km (1.8 hrs drive).
+                    </p>
+                  </div>
+                )}
+
+                {activeTransitTab === 'road' && (
+                  <div className="transit-info">
+                    <p>
+                      Located on SH-63 / NH-216A. Direct APSRTC buses connect from Vijayawada, Guntur, Rajahmundry, Eluru, and Tanuku.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Social Channels */}
+            <div className="contact-social-section">
+              <h4 className="social-heading">Connect via Official Channels</h4>
+              <div className="social-icons-wrap">
+                {socialLinks.map((s) => {
+                  const meta = SOCIAL_META[s.title];
+                  const label = meta?.label || s.title;
+                  const Icon = meta?.Icon;
+                  return (
+                    <a
+                      key={s.id}
+                      href={s.value}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="social-icon-btn"
+                      style={{ ['--brand' as string]: meta?.color || 'var(--color-primary)' }}
+                      aria-label={label}
+                      title={label}
+                    >
+                      {Icon ? <Icon size={19} /> : <ExternalLink size={16} />}
+                    </a>
+                  );
+                })}
+              </div>
+            </div>
+            </div>
+
+            {/* Map Embed Box */}
+            <div className="contact-map-box">
                 <div className="contact-map-header">
                   <div className="contact-map-info">
                     <MapPin size={18} className="map-pin-icon" />
@@ -487,96 +530,19 @@ export default function Contact() {
                   />
                 </div>
               </div>
-
-              {/* How to Reach Tabs */}
-              <div className="contact-transit-container">
-                <h3 className="transit-heading">How to Reach VWU Campus</h3>
-                
-                <div className="transit-tabs">
-                  <button 
-                    type="button" 
-                    className={`transit-tab ${activeTransitTab === 'train' ? 'active' : ''}`}
-                    onClick={() => setActiveTransitTab('train')}
-                  >
-                    <Train size={15} />
-                    <span>By Train</span>
-                  </button>
-                  <button 
-                    type="button" 
-                    className={`transit-tab ${activeTransitTab === 'air' ? 'active' : ''}`}
-                    onClick={() => setActiveTransitTab('air')}
-                  >
-                    <Plane size={15} />
-                    <span>By Air</span>
-                  </button>
-                  <button 
-                    type="button" 
-                    className={`transit-tab ${activeTransitTab === 'road' ? 'active' : ''}`}
-                    onClick={() => setActiveTransitTab('road')}
-                  >
-                    <Bus size={15} />
-                    <span>By Road</span>
-                  </button>
-                </div>
-
-                <div className="transit-body">
-                  {activeTransitTab === 'train' && (
-                    <div className="transit-info">
-                      <p>
-                        <strong>Bhimavaram Town (BVRM)</strong> &amp; <strong>Junction (BVRT)</strong> stations are <strong>3.8 km and 4.2 km</strong> away. Autos and cabs operate continuously to campus.
-                      </p>
-                    </div>
-                  )}
-
-                  {activeTransitTab === 'air' && (
-                    <div className="transit-info">
-                      <p>
-                        <strong>Vijayawada International Airport (VGA):</strong> ~92 km (2 hrs drive).<br />
-                        <strong>Rajahmundry Domestic Airport (RJA):</strong> ~78 km (1.8 hrs drive).
-                      </p>
-                    </div>
-                  )}
-
-                  {activeTransitTab === 'road' && (
-                    <div className="transit-info">
-                      <p>
-                        Located on SH-63 / NH-216A. Direct APSRTC buses connect from Vijayawada, Guntur, Rajahmundry, Eluru, and Tanuku.
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Social Channels */}
-              <div className="contact-social-section">
-                <h4 className="social-heading">Connect via Official Channels</h4>
-                <div className="social-icons-wrap">
-                  {socialLinks.map((s) => {
-                    const meta = SOCIAL_META[s.title];
-                    const label = meta?.label || s.title;
-                    const Icon = meta?.Icon;
-                    return (
-                      <a
-                        key={s.id}
-                        href={s.value}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="social-icon-btn"
-                        style={{ ['--brand' as string]: meta?.color || 'var(--color-primary)' }}
-                        aria-label={label}
-                        title={label}
-                      >
-                        {Icon ? <Icon size={19} /> : <ExternalLink size={16} />}
-                      </a>
-                    );
-                  })}
-                </div>
-              </div>
             </div>
+          </div>
+      </section>
 
-            {/* Right Column: Send Us a Message Form */}
-            <div id="send-message" className="contact-right-card" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
-              <div className="form-header-clean">
+      {/* ── Send Us a Message ── */}
+      <section id="send-message" className="contact-main-section" aria-label="Send Us a Message" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
+        <div className="container">
+          <div className="contact-form-wrap">
+            <div className="contact-form-media" aria-hidden="true">
+              <img src="/images/campusview.jpg" alt="" loading="lazy" />
+            </div>
+            <div className="contact-form-body">
+            <div className="form-header-clean">
                 <span className="section-label">Direct Communication</span>
                 <h2 className="form-title-clean">Send Us a Message</h2>
                 <p className="form-sub-clean">
@@ -732,9 +698,8 @@ export default function Contact() {
                 </form>
               )}
             </div>
-
+            </div>
           </div>
-        </div>
       </section>
 
       {/* ── Searchable Department Directory ── */}

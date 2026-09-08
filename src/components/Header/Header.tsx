@@ -121,7 +121,7 @@ const navItemsData: NavItem[] = [
           { label: 'Examinations Portal', path: 'https://www.svecwexams.in/', external: true },
         ],
       },
-      { groupLabel: 'Departments', groupPath: '/academics/departments', items: [] },
+      { groupLabel: 'Departments / Courses', groupPath: '/academics/departments', items: [] },
       {
         groupLabel: 'Information',
         groupPath: '/information',
@@ -464,7 +464,7 @@ export default function Header() {
     }
     if (item.label === 'Academics' && item.groups) {
       const groups = item.groups.map((group) => {
-        if (group.groupLabel === 'Departments') return { ...group, items: ugProgrammes };
+        if (group.groupLabel === 'Departments / Courses') return { ...group, items: ugProgrammes };
         return group;
       });
       return { ...item, groups };
@@ -564,31 +564,18 @@ export default function Header() {
       >
         {/* Main Pill Island */}
         <div className="navbar-pill">
-          {/* Left Brand Identity: Responsive Desktop Logo / Mobile Square Logo */}
+          {/* Left Brand Identity: the same rectangular full logo at every width */}
           <Link
             to="/"
             onClick={handleLogoClick}
             className="navbar-brand-link"
             aria-label="Vishnu Women's University - Home"
           >
-            {/* Desktop Rectangular Full Logo */}
             <img
               src="/images/logo.png"
               alt="Vishnu Women's University"
               className="navbar-logo-img navbar-logo-desktop"
             />
-            {/* Mobile Square Logo from Footer with typography */}
-            <div className="navbar-brand-mobile">
-              <img
-                src="/images/square%20logo.png"
-                alt="Vishnu Women's University Logo"
-                className="navbar-logo-square"
-              />
-              <div className="navbar-brand-mobile-text">
-                <span className="navbar-brand-m-name">Vishnu Women's</span>
-                <span className="navbar-brand-m-sub">University</span>
-              </div>
-            </div>
           </Link>
 
           {/* Center Navigation Tabs with Clean Labels & Sliding Hover Capsule */}

@@ -13,6 +13,7 @@ import type { FaqDoc } from '../Admin/sections/FaqAdmin';
 import { ClipboardList, Users, Phone, Mail, MapPin, Sparkles, BarChart2 } from 'lucide-react';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import { useHashScroll } from '../../hooks/useHashScroll';
+import { dotTech } from '../../lib/academicDegreeNames';
 
 interface RankAnalysisItem {
   code: string;
@@ -49,7 +50,7 @@ const defaultAdmissionsPhotos = [
 ];
 
 const defaultUgPhotos = [
-  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'B.Tech Counseling', caption: '' },
+  { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'B.Tech. Counseling', caption: '' },
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'UG Orientation', caption: '' },
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'UG Lab Demos', caption: '' },
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Classroom Culture', caption: '' },
@@ -131,7 +132,7 @@ export default function Admissions() {
         defaultTitle="Admissions Open"
         defaultSubtitle="First Private Women’s University in Andhra Pradesh and Telangana. No. 1 preferred choice for female students in AP EAPCET."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Admissions' }]}
-        scrollCtaTargetId="admissions-content"
+        hideCta
       />
 
       {/* Admissions Hub */}
@@ -168,9 +169,9 @@ export default function Admissions() {
               const cardBody = (
                 <>
                   <div className="adm-hub-icon"><Icon size={38} strokeWidth={1.75} /></div>
-                  <div className="adm-hub-highlight">{item.value}</div>
-                  <h3 className="adm-hub-title">{item.title}</h3>
-                  <p className="adm-hub-desc">{item.desc}</p>
+                  <div className="adm-hub-highlight">{dotTech(item.value)}</div>
+                  <h3 className="adm-hub-title">{dotTech(item.title)}</h3>
+                  <p className="adm-hub-desc">{dotTech(item.desc)}</p>
                   <span className="adm-hub-arrow">View Details →</span>
                 </>
               );
@@ -321,8 +322,8 @@ export default function Admissions() {
             <div className="adm-tuition-table">
               {tuitionData.map((row, i) => (
                 <div key={row.id} className="adm-tuition-row" style={{ borderTop: i === tuitionData.length - 2 ? '2px solid rgba(201,168,76,0.4)' : undefined }}>
-                  <span>{row.title}</span>
-                  <strong style={{ color: 'var(--color-white)' }}>{row.value}</strong>
+                  <span>{dotTech(row.title)}</span>
+                  <strong style={{ color: 'var(--color-white)' }}>{dotTech(row.value)}</strong>
                 </div>
               ))}
             </div>
@@ -346,8 +347,8 @@ export default function Admissions() {
               return (
                 <div key={v.id} className="adm-visit-card">
                   <div className="adm-visit-icon"><Icon size={40} strokeWidth={1.75} /></div>
-                  <h3>{v.title}</h3>
-                  <p>{v.desc}</p>
+                  <h3>{dotTech(v.title)}</h3>
+                  <p>{dotTech(v.desc)}</p>
                   <Link to="/campus-visit" className="btn btn-outline" style={{ marginTop: 'auto' }}>Schedule Now</Link>
                 </div>
               );
@@ -384,7 +385,7 @@ export default function Admissions() {
             <PhotoGrid
               images={ugPhotos}
               label="Undergraduate (UG)"
-              title="Your B.Tech Journey Starts Here"
+              title="Your B.Tech. Journey Starts Here"
               columns={3}
               layout="default"
             />
@@ -478,7 +479,7 @@ export default function Admissions() {
                   onClick={() => setOpenFaq(openFaq === i ? null : i)}
                   aria-expanded={openFaq === i}
                 >
-                  <span>{faq.question}</span>
+                  <span>{dotTech(faq.question)}</span>
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0, transition: 'transform 0.3s', transform: openFaq === i ? 'rotate(180deg)' : 'rotate(0deg)' }}>
                     <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
@@ -487,7 +488,7 @@ export default function Admissions() {
                     so the answer animates open/closed instead of hard-mounting/unmounting. */}
                 <div className="adm-faq-collapse" aria-hidden={openFaq !== i}>
                   <div className="adm-faq-collapse-inner">
-                    <div className="adm-faq-answer">{faq.answer}</div>
+                    <div className="adm-faq-answer">{dotTech(faq.answer)}</div>
                   </div>
                 </div>
               </div>
