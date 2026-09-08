@@ -35,7 +35,7 @@ export interface ResearchItemDoc {
   id: string;
   slug: string;
   title: string;
-  category: 'governance' | 'output' | 'engagement';
+  category: 'governance' | 'centres' | 'output' | 'engagement';
   icon: string;
   desc: string;
   intro: string;
@@ -60,6 +60,7 @@ const EMPTY: Omit<ResearchItemDoc, 'id'> = {
 
 const CATEGORIES: { value: ResearchItemDoc['category']; label: string }[] = [
   { value: 'governance', label: 'R&D Governance' },
+  { value: 'centres', label: 'Research Centres' },
   { value: 'output', label: 'Research Output' },
   { value: 'engagement', label: 'Industry & Professional Engagement' },
 ];
