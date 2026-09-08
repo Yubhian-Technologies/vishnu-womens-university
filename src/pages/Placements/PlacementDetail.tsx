@@ -642,6 +642,63 @@ function BatchSummaryCard({ batch, offers, highest, index }: { batch: string; of
   );
 }
 
+// Simple click-through image slideshow for a sidebar — arrows only show up
+// once there's more than one image (a single image just renders flat, no
+// dead-end arrows pointing at themselves). Used by Higher Education's
+// sidebar in place of the plain Key Highlights list.
+function SidebarImageCarousel({ images, alt }: { images: string[]; alt: string }) {
+  const [index, setIndex] = useState(0);
+  if (images.length === 0) return null;
+  return (
+    <div style={{ position: 'relative' }}>
+      <img
+        src={images[index]}
+        alt={`${alt} (${index + 1} of ${images.length})`}
+        loading="lazy"
+        style={{ width: '100%', height: 'auto', borderRadius: 'var(--radius-md)', display: 'block' }}
+      />
+      {images.length > 1 && (
+        <>
+          <button
+            type="button"
+            aria-label="Previous image"
+            onClick={() => setIndex((i) => (i - 1 + images.length) % images.length)}
+            style={{
+              position: 'absolute', left: 8, top: '50%', transform: 'translateY(-50%)',
+              width: 34, height: 34, borderRadius: '50%', border: 'none',
+              background: 'rgba(255, 255, 255, 0.9)', boxShadow: 'var(--shadow-md)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+            }}
+          >
+            <ChevronLeft size={18} />
+          </button>
+          <button
+            type="button"
+            aria-label="Next image"
+            onClick={() => setIndex((i) => (i + 1) % images.length)}
+            style={{
+              position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)',
+              width: 34, height: 34, borderRadius: '50%', border: 'none',
+              background: 'rgba(255, 255, 255, 0.9)', boxShadow: 'var(--shadow-md)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+            }}
+          >
+            <ChevronRight size={18} />
+          </button>
+          <div style={{ position: 'absolute', bottom: 10, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 6 }}>
+            {images.map((img, i) => (
+              <span
+                key={img}
+                style={{ width: 6, height: 6, borderRadius: '50%', background: i === index ? 'var(--color-white)' : 'rgba(255, 255, 255, 0.5)' }}
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 // Impact > Summary trend chart — offers (navy bars) and highest package in
 // LPA (gold line) per batch, plotted against the batch's passing-out year.
 // Reads the same PlacementYear records as the cards above, so it can never
