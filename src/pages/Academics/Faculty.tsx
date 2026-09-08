@@ -15,19 +15,26 @@ import type { CustomSection } from '../../lib/customSections';
 // real records use varying spellings (e.g. "Mechanical" not "ME", "AI&ML"/
 // "AI&DS" instead of a single "AI"). A tab simply doesn't render if none of
 // its departments currently have any faculty.
+// Kept in sync with DEPARTMENT_GROUPS/STANDALONE_DEPARTMENTS' own
+// facultyDepartments lists in lib/departmentGroups.ts — this page has its
+// own copy (different shape: a fixed tab label, not a program-slug group)
+// but the same underlying spelling variants apply, so a department missing
+// an alias here that the canonical list already has (as CE was, missing
+// "Civil Engineering") silently drops that department's faculty from this
+// tab even though every other page that reads facultyDepartments shows them.
 const DEPARTMENT_GROUPS: { label: string; departments: string[] }[] = [
   { label: 'CSE', departments: ['CSE'] },
   { label: 'AI', departments: ['AI', 'AI&ML', 'AI&DS'] },
-  { label: 'IT', departments: ['IT'] },
+  { label: 'IT', departments: ['IT', 'Information Technology'] },
   { label: 'ECE', departments: ['ECE'] },
-  { label: 'EEE', departments: ['EEE'] },
-  { label: 'CE', departments: ['Civil', 'CE'] },
+  { label: 'EEE', departments: ['EEE', 'Electrical & Electronics Engineering'] },
+  { label: 'CE', departments: ['Civil', 'CE', 'Civil Engineering'] },
   { label: 'ME', departments: ['Mechanical', 'ME'] },
   { label: 'Maths', departments: ['Mathematics'] },
   { label: 'Physics', departments: ['Physics'] },
   { label: 'Chemistry', departments: ['Chemistry'] },
   { label: 'English', departments: ['English'] },
-  { label: 'MBA', departments: ['MBA'] },
+  { label: 'MBA', departments: ['MBA', 'Management Studies'] },
 ];
 
 // Exactly 4 visual designation groups a department's faculty are always
@@ -73,6 +80,12 @@ export interface FacultyDoc {
   imageUrl: string;
   storagePath: string;
   order: number;
+  /** Optional per-person override of which designation group this person is
+   *  listed under on the /faculty directory (0 leadership · 1 Professor ·
+   *  2 Associate · 3 Assistant · 4 Other). Absent or < 0 = auto (derived
+   *  from `designation` text). Position within the group is still the
+   *  `order` field. Set via /admin → Faculty. */
+  groupOverride?: number;
   /** Set via /admin → Faculty; shown on this person's own full profile
    *  page (FacultyProfile.tsx), not on this grid. */
   facts?: FacultyFact[];
@@ -160,7 +173,11 @@ export default function Faculty() {
   const designationGroups = useMemo(() => {
     const buckets = new Map<number, FacultyDoc[]>();
     for (const f of filtered) {
-      const rank = designationGroupRank(f.designation);
+      // A per-person groupOverride (set in /admin → Faculty) wins over the
+      // designation-text guess; anything absent or < 0 falls back to auto.
+      const rank = typeof f.groupOverride === 'number' && f.groupOverride >= 0
+        ? f.groupOverride
+        : designationGroupRank(f.designation);
       if (!buckets.has(rank)) buckets.set(rank, []);
       buckets.get(rank)!.push(f);
     }

@@ -15,6 +15,8 @@ import type { ProgramDoc } from './ProgramsAdmin';
 import CustomSectionEditor from './CustomSectionEditor';
 import { replaceAtPath, getAtPath, hasCustomSectionContent, type CustomSection } from '../../../lib/customSections';
 import { diffChangedFields } from '../../../lib/formDiff';
+import { useAdminSession } from '../AdminSessionContext';
+import { departmentTagsForShortCode } from '../../../lib/departmentGroups';
 
 export type { FacultyFact, FacultySection };
 
@@ -29,6 +31,11 @@ export interface FacultyDoc {
   imageUrl: string;
   storagePath: string;
   order: number;
+  /** Per-person override of the /faculty directory designation group
+   *  (0 leadership · 1 Professor · 2 Associate · 3 Assistant · 4 Other).
+   *  -1 / absent = auto from `designation`. Order within the group is the
+   *  `order` field above. */
+  groupOverride?: number;
   /** Optional richer profile — shown on that person's own full profile
    *  page (FacultyProfile.tsx) below the basic card fields above. Free-
    *  form because different people (and different departments — a CSE
@@ -55,6 +62,19 @@ export interface FacultyDoc {
 
 const DESIGNATIONS = ['Professor & HOD', 'Professor & Head', 'Professor', 'Associate Professor', 'Assoc. Professor', 'Assistant Professor', 'Asst. Professor'];
 
+// /faculty directory designation-group buckets, in display order. The value
+// is the rank number Faculty.tsx's `groupOverride` expects; -1 means "auto"
+// (let the designation text decide). Keep in sync with designationGroupRank()
+// in src/pages/Academics/Faculty.tsx.
+const GROUP_OVERRIDE_OPTIONS: { value: number; label: string }[] = [
+  { value: -1, label: 'Auto (from designation)' },
+  { value: 0, label: 'Leadership (HOD / Dean)' },
+  { value: 1, label: 'Professors' },
+  { value: 2, label: 'Associate Professors' },
+  { value: 3, label: 'Assistant Professors' },
+  { value: 4, label: 'Other' },
+];
+
 // First-year foundation subjects (Freshman Engineering page) have no
 // Program entry of their own — always offered here regardless of Program
 // or current-faculty data. Keep in sync with Faculty.tsx's matching set.
@@ -75,11 +95,41 @@ interface FormState extends Omit<FacultyDoc, 'id' | 'facts' | 'sections' | 'cust
 const EMPTY_FORM: FormState = {
   name: '', designation: 'Assistant Professor', department: 'CSE',
   qualification: '', specialization: '', email: '', imageUrl: '', storagePath: '', order: 0,
+  groupOverride: -1,
   factsText: '', customSections: [],
 };
 
 export default function FacultyAdmin() {
   const { docs: faculty, loading } = useOrderedCollection<FacultyDoc>('faculty', 'order');
+  const session = useAdminSession();
+  // A scoped (non-admin/superadmin) account is restricted to the one
+  // department it was assigned in Users & Roles — that field was previously
+  // captured but never enforced, so a "CSE Webmaster" account could see and
+  // edit every department's faculty. `faculty.department` stores a short
+  // code/tag (e.g. "CSE"), but the session only carries the department's
+  // full title, so this resolves title -> shortCode via the `departments`
+  // collection (same join ProgramsAdmin.tsx/DepartmentsAdmin.tsx use).
+  const { docs: allDepartmentsForScope } = useOrderedCollection<{ id: string; title: string; shortCode: string }>('departments', 'order');
+  const scopedDeptTitle = session && !session.isAdmin ? (session.department || '').trim() : '';
+  const scopedShortCode = scopedDeptTitle
+    ? (allDepartmentsForScope.find((d) => d.title.trim() === scopedDeptTitle)?.shortCode || '').trim().toUpperCase()
+    : '';
+  // A handful of departments (Civil, Mechanical, ...) have faculty/program
+  // records tagged in prose ("Civil", "Mechanical") instead of the short
+  // code ("CE", "ME") — comparing a scoped account's department against the
+  // bare shortCode alone silently matched zero records for exactly those
+  // departments (see departmentTagsForShortCode's own comment). Every
+  // department-tag comparison below uses this alias-expanded set instead.
+  const scopedDeptTags = useMemo(
+    () => (scopedShortCode ? new Set(departmentTagsForShortCode(scopedShortCode).map((t) => t.trim().toUpperCase())) : null),
+    [scopedShortCode]
+  );
+  const matchesScopedDept = (dept: string) => !scopedDeptTags || scopedDeptTags.has((dept || '').trim().toUpperCase());
+  const visibleFaculty = useMemo(
+    () => (scopedDeptTags ? faculty.filter((f) => matchesScopedDept(f.department)) : faculty),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [faculty, scopedDeptTags]
+  );
   // Departments aren't a separate managed list — this is the union of every
   // Program's `department` field (/admin → Programs), every department
   // that already has faculty tagged to it, and the fixed set of first-year
@@ -96,8 +146,11 @@ export default function FacultyAdmin() {
     programs.forEach((p) => add(p.department));
     faculty.forEach((f) => add(f.department));
     FOUNDATION_DEPARTMENTS.forEach(add);
-    return names;
-  }, [programs, faculty]);
+    // A scoped account only ever gets its own department as a pickable
+    // option, so it can't add/move a faculty record into another one.
+    return scopedDeptTags ? names.filter((n) => matchesScopedDept(n)) : names;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [programs, faculty, scopedDeptTags]);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   // Snapshot of `form` taken when "Edit" was clicked (see startEdit) —
   // save() diffs against this so Update only writes fields actually changed
@@ -116,9 +169,9 @@ export default function FacultyAdmin() {
   const [drag, setDrag] = useState<{ dept: string; index: number } | null>(null);
   useEffect(() => {
     const groups: Record<string, FacultyDoc[]> = {};
-    faculty.forEach((f) => { (groups[f.department] ??= []).push(f); });
+    visibleFaculty.forEach((f) => { (groups[f.department] ??= []).push(f); });
     setGroupedOrdered(groups);
-  }, [faculty]);
+  }, [visibleFaculty]);
 
   const handleDragOver = (dept: string, i: number) => {
     if (!drag || drag.dept !== dept || drag.index === i) return;
@@ -273,6 +326,9 @@ export default function FacultyAdmin() {
   // Pastes a whole roster at once — "Name | Designation | Qualification | Specialization | Email"
   // per line (trailing fields optional) — instead of one add-doc round trip per person.
   const bulkImport = async () => {
+    if (scopedDeptTags && !matchesScopedDept(bulkDept)) {
+      return alert(`You can only import ${scopedDeptTitle} faculty — set Department to ${scopedShortCode}.`);
+    }
     const rows = bulkText.split('\n').map((l) => l.trim()).filter(Boolean);
     if (rows.length === 0) return;
     setBulkImporting(true);
@@ -315,6 +371,10 @@ export default function FacultyAdmin() {
       let updated = 0;
       const unmatched: string[] = [];
       for (const entry of entries) {
+        if (scopedDeptTags && !matchesScopedDept(entry.department)) {
+          unmatched.push(`${entry.name} (${entry.department}) — outside your department`);
+          continue;
+        }
         const match = faculty.find(
           (f) => f.name.trim().toLowerCase() === entry.name.trim().toLowerCase()
             && f.department.trim().toLowerCase() === entry.department.trim().toLowerCase()
@@ -388,6 +448,8 @@ export default function FacultyAdmin() {
         setIf('storagePath', str(pick(entry, 'storagePath')));
         const order = pick(entry, 'order');
         if (order !== undefined && !Number.isNaN(Number(order))) fields.order = Number(order);
+        const groupOverride = pick(entry, 'groupOverride', 'group_override', 'group');
+        if (groupOverride !== undefined && !Number.isNaN(Number(groupOverride))) fields.groupOverride = Number(groupOverride);
 
         const factsText = pick(entry, 'factsText', 'facts_text');
         if (typeof factsText === 'string') fields.facts = textToFacts(factsText);
@@ -428,12 +490,17 @@ export default function FacultyAdmin() {
     name: f.name, designation: f.designation, department: f.department,
     qualification: f.qualification, specialization: f.specialization,
     email: f.email, imageUrl: f.imageUrl, storagePath: f.storagePath, order: f.order,
+    // -1 stored as-is; Faculty.tsx treats any value < 0 (or absent) as "auto".
+    groupOverride: f.groupOverride ?? -1,
     facts: textToFacts(f.factsText),
     customSections: f.customSections,
   });
 
   const save = async () => {
     if (!form.name) return alert('Name is required.');
+    if (scopedDeptTags && !matchesScopedDept(form.department)) {
+      return alert(`You can only manage ${scopedDeptTitle} faculty — set Department to ${scopedShortCode}.`);
+    }
     setSaving(true);
     try {
       const payload = toPayload(form);
@@ -464,6 +531,7 @@ export default function FacultyAdmin() {
       name: f.name, designation: f.designation, department: f.department,
       qualification: f.qualification, specialization: f.specialization,
       email: f.email, imageUrl: f.imageUrl, storagePath: f.storagePath, order: f.order,
+      groupOverride: f.groupOverride ?? -1,
       factsText: factsToText(f.facts), customSections,
     };
     setForm(next);
@@ -471,6 +539,12 @@ export default function FacultyAdmin() {
   };
 
   const remove = async (id: string) => {
+    if (scopedDeptTags) {
+      const target = faculty.find((f) => f.id === id);
+      if (!target || !matchesScopedDept(target.department)) {
+        return alert(`You don't have access to remove this faculty member.`);
+      }
+    }
     if (!confirm('Remove this faculty member?')) return;
     try {
       await deleteDoc(doc(db, 'faculty', id));
@@ -479,7 +553,7 @@ export default function FacultyAdmin() {
     }
   };
 
-  const filtered = filterDept === 'All' ? faculty : faculty.filter((f) => f.department === filterDept);
+  const filtered = filterDept === 'All' ? visibleFaculty : visibleFaculty.filter((f) => f.department === filterDept);
 
   // One-time cleanup: AI&ML/AI&DS and EVT were separate department tags left
   // over from before the grouped AI/ECE department pages existed; merge them
@@ -712,8 +786,25 @@ export default function FacultyAdmin() {
               min={0}
             />
             <p className="admin-field__hint">
-              Lower numbers come first within this person's department. Can also be changed later
+              Lower numbers come first within this person's <strong>designation group</strong> on the
+              /faculty directory (and within the department elsewhere). Can also be changed later
               directly in the table below, or by dragging rows.
+            </p>
+          </div>
+          <div className="admin-field">
+            <label htmlFor="field-group-override">Directory Group</label>
+            <select
+              id="field-group-override"
+              value={form.groupOverride ?? -1}
+              onChange={(e) => set('groupOverride', +e.target.value)}
+            >
+              {GROUP_OVERRIDE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+            <p className="admin-field__hint">
+              Which section this person is listed under on the /faculty directory. Leave on
+              <em> Auto</em> to derive it from the Designation text; pick a group to force them
+              higher or lower regardless of designation. Position within the chosen group is the
+              Display Order above.
             </p>
           </div>
           <div className="admin-field admin-field--full">
@@ -828,7 +919,14 @@ export default function FacultyAdmin() {
                             </td>
                             <td>{f.imageUrl ? <img src={f.imageUrl} alt="" className="admin-table__avatar" /> : '👤'}</td>
                             <td>{f.name}</td>
-                            <td><span className="admin-badge admin-badge--sm">{f.designation}</span></td>
+                            <td>
+                              <span className="admin-badge admin-badge--sm">{f.designation}</span>
+                              {typeof f.groupOverride === 'number' && f.groupOverride >= 0 && (
+                                <span className="admin-badge admin-badge--sm" style={{ marginLeft: 4 }} title="Directory group overridden">
+                                  → {GROUP_OVERRIDE_OPTIONS.find((o) => o.value === f.groupOverride)?.label ?? f.groupOverride}
+                                </span>
+                              )}
+                            </td>
                             <td>{f.qualification}</td>
                             <td>
                               {(f.customSections ?? []).filter(hasCustomSectionContent).length > 0

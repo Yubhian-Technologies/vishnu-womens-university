@@ -71,17 +71,23 @@ export default function FacultyProfile() {
   }
 
   const isHod = (person.designation || '').toLowerCase().includes('hod') || (person.designation || '').toLowerCase().includes('head');
-  const program = programs.find((p) => p.department === person.department);
   // Head of Department name/message/research-profiles live on the
   // `departments` doc now, not per-programme (see DepartmentsAdmin.tsx) —
   // matched the same way ProgramDetail/DepartmentDetail do, with a fallback
   // to the programme's own (now admin-hidden, but still intact) field for a
   // department that hasn't had this copied over yet. A couple of legacy
   // programs spell their department out in prose ("Civil", "Mechanical")
-  // rather than the admin's short code ("CE", "ME").
+  // rather than the admin's short code ("CE", "ME") — resolved through this
+  // alias on BOTH the program lookup and the department lookup below, since
+  // a faculty member's own `department` field uses the same prose spelling
+  // and comparing it against `program.department` (or the department doc's
+  // shortCode) unresolved only ever matched by accident for every other
+  // department, never for these two.
   const DEPT_CODE_ALIASES: Record<string, string> = { Civil: 'CE', Mechanical: 'ME' };
-  const deptCode = DEPT_CODE_ALIASES[person.department || ''] || person.department || '';
-  const dept = departments.find((d) => d.shortCode?.trim().toUpperCase() === deptCode.trim().toUpperCase());
+  const resolveDeptCode = (d: string) => (DEPT_CODE_ALIASES[d] || d || '').trim().toUpperCase();
+  const deptCode = resolveDeptCode(person.department || '');
+  const program = programs.find((p) => resolveDeptCode(p.department) === deptCode);
+  const dept = departments.find((d) => (d.shortCode || '').trim().toUpperCase() === deptCode);
   const hodName = dept?.hod || program?.hod || '';
   const hodMessage = dept?.hodMessage || program?.hodMessage || '';
   const hodResearchProfiles = (dept?.hodResearchProfiles?.length ? dept.hodResearchProfiles : program?.hodResearchProfiles) || [];
