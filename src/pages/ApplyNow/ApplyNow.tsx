@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Phone, BookOpen, Briefcase, Cpu, Microscope } from 'lucide-react';
 import SEO from '../../components/SEO/SEO';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
@@ -82,7 +83,7 @@ export default function ApplyNow() {
               {PROGRAMMES_DATA.map((prog) => {
                 const IconComp = prog.icon;
                 return (
-                  <div key={prog.key} className="apply-now-card">
+                  <Link key={prog.key} to="/academics/departments" className="apply-now-card">
                     <div className="apply-now-card-top">
                       <div className="apply-now-card-icon-wrap">
                         <IconComp size={18} className="apply-now-card-icon" />
@@ -93,7 +94,7 @@ export default function ApplyNow() {
                       </span>
                     </div>
                     <div className="apply-now-card-title">{prog.fullForm}</div>
-                  </div>
+                  </Link>
                 );
               })}
             </div>

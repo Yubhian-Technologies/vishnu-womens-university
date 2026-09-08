@@ -1685,7 +1685,10 @@ export default function PlacementDetail() {
               // same /images/placements/* pattern as elsewhere) sits beside
               // the Regional Offices list instead of above it, smaller than
               // its old full-width-up-to-720px size since it no longer needs
-              // to carry the whole row on its own.
+              // to carry the whole row on its own. The artwork itself already
+              // includes the per-city icon row (see the updated
+              // industry-liaison-offices.png), so nothing extra is rendered
+              // here for that anymore.
               <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 340px) 1fr', gap: 'var(--space-8)', alignItems: 'start' }}>
                 <img
                   src="/images/placements/industry-liaison-offices.png"

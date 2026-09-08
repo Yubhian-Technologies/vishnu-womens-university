@@ -1,0 +1,24 @@
+[
+  {
+    "name": "Dr. Jane Doe",
+    "designation": "Professor & HOD",
+    "department": "CSE",
+    "qualification": "Ph.D.",
+    "specialization": "Machine Learning",
+    "email": "janedoe@svecw.edu.in",
+    "imageUrl": "",
+    "order": 0,
+    "factsText": "Ph.D | Andhra University, 2004\nTeaching Experience | 20 years\nEmployee ID | SVECW0001\nDate of Joining | 01-06-2005\nContact Number | 9440000000\nWebsite | https://example.com",
+    "sectionsText": "## Educational Qualifications\nTABLE:\nDegree | Specialization | Institution\nPh.D. | Computer Science | Andhra University\nM.Tech. | Computer Science & Engineering | JNTUK\nB.Tech. | CSE | SVECW\n\n## Research Interests\n- Machine Learning and Deep Learning\n- Natural Language Processing\n- Computer Vision\n\n## Research Publications\n- Doe J., Smith A., \"A Sample Paper Title,\" Journal of Examples, 2023; 12(3).\n- Doe J., \"Another Sample Paper,\" International Conference on Examples, 2022, pp. 1-6.\n\n## Awards & Recognition\n- Best Teacher Award, SVECW, 2021\n- NPTEL Elite Certificate, 2020"
+  },
+  {
+    "name": "Mr. John Smith",
+    "designation": "Assistant Professor",
+    "department": "CSE",
+    "qualification": "M.Tech.(Ph.D.)",
+    "specialization": "Cloud Computing",
+    "email": "johnsmith@svecw.edu.in",
+    "order": 1,
+    "factsText": "Designation | Assistant Professor\nDepartment | Computer Science & Engineering (CSE)\nDate of Joining | 01-07-2018\nTeaching Experience | 7 years"
+  }
+]
