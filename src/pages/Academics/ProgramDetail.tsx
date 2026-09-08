@@ -133,22 +133,28 @@ function SingleProgramDetail() {
   const { docs: allPrograms, loading } = useOrderedCollection<ProgramDoc>('programs', 'order');
   const program = allPrograms.find((p) => p.slug === slug);
 
-  const { docs: allFaculty } = useOrderedCollection<FacultyDoc>('faculty', 'order');
-  const faculty = program?.department ? allFaculty.filter((f) => f.department === program.department) : [];
-  const { docs: deptNews } = useOrderedCollection<DepartmentNewsDoc>('departmentNews', 'date', 'desc');
-  const hasDeptNews = deptNews.some((n) => n.program === slug);
   // Resolves the program's short `department` code (e.g. "IT") to its full
   // Academic Departments admin record — used for the "About the Department"
   // heading below (reading the same way it does on the AI/CSE/ECE grouped
   // page) and, further down, as the source for Vision/Mission/Values,
   // Laboratories, and the Department Library (see `shared` below). A couple
   // of legacy programs spell their department out in prose ("Civil",
-  // "Mechanical") rather than the admin's short code ("CE", "ME") — this
-  // alias table is the only place that mismatch needs correcting.
+  // "Mechanical") rather than the admin's short code ("CE", "ME") — resolved
+  // through this alias below wherever a faculty/department record's own
+  // `department` field is compared against another, not just for the dept
+  // doc lookup, since a faculty member's `department` field uses the same
+  // prose spelling as the program's and an unresolved comparison only ever
+  // matched by accident for every other department, never for these two.
   const DEPT_CODE_ALIASES: Record<string, string> = { Civil: 'CE', Mechanical: 'ME' };
+  const resolveDeptCode = (d: string) => (DEPT_CODE_ALIASES[d] || d || '').trim().toUpperCase();
+  const deptCode = resolveDeptCode(program?.department || '');
+
+  const { docs: allFaculty } = useOrderedCollection<FacultyDoc>('faculty', 'order');
+  const faculty = program?.department ? allFaculty.filter((f) => resolveDeptCode(f.department) === deptCode) : [];
+  const { docs: deptNews } = useOrderedCollection<DepartmentNewsDoc>('departmentNews', 'date', 'desc');
+  const hasDeptNews = deptNews.some((n) => n.program === slug);
   const { docs: allDepartments, loading: deptLoading } = useOrderedCollection<DepartmentDoc>('departments', 'order');
-  const deptCode = DEPT_CODE_ALIASES[program?.department || ''] || program?.department || '';
-  const dept = allDepartments.find((d) => d.shortCode?.trim().toUpperCase() === deptCode.trim().toUpperCase());
+  const dept = allDepartments.find((d) => (d.shortCode || '').trim().toUpperCase() === deptCode);
   const deptTitle = dept?.title || program?.department;
   // Falls back to a shared "Program Pages" banner (Hero Banners admin) only
   // when this specific program hasn't had its own image uploaded yet via

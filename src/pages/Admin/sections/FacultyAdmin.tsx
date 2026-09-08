@@ -15,6 +15,8 @@ import type { ProgramDoc } from './ProgramsAdmin';
 import CustomSectionEditor from './CustomSectionEditor';
 import { replaceAtPath, getAtPath, hasCustomSectionContent, type CustomSection } from '../../../lib/customSections';
 import { diffChangedFields } from '../../../lib/formDiff';
+import { useAdminSession } from '../AdminSessionContext';
+import { departmentTagsForShortCode } from '../../../lib/departmentGroups';
 
 export type { FacultyFact, FacultySection };
 
@@ -99,6 +101,35 @@ const EMPTY_FORM: FormState = {
 
 export default function FacultyAdmin() {
   const { docs: faculty, loading } = useOrderedCollection<FacultyDoc>('faculty', 'order');
+  const session = useAdminSession();
+  // A scoped (non-admin/superadmin) account is restricted to the one
+  // department it was assigned in Users & Roles — that field was previously
+  // captured but never enforced, so a "CSE Webmaster" account could see and
+  // edit every department's faculty. `faculty.department` stores a short
+  // code/tag (e.g. "CSE"), but the session only carries the department's
+  // full title, so this resolves title -> shortCode via the `departments`
+  // collection (same join ProgramsAdmin.tsx/DepartmentsAdmin.tsx use).
+  const { docs: allDepartmentsForScope } = useOrderedCollection<{ id: string; title: string; shortCode: string }>('departments', 'order');
+  const scopedDeptTitle = session && !session.isAdmin ? (session.department || '').trim() : '';
+  const scopedShortCode = scopedDeptTitle
+    ? (allDepartmentsForScope.find((d) => d.title.trim() === scopedDeptTitle)?.shortCode || '').trim().toUpperCase()
+    : '';
+  // A handful of departments (Civil, Mechanical, ...) have faculty/program
+  // records tagged in prose ("Civil", "Mechanical") instead of the short
+  // code ("CE", "ME") — comparing a scoped account's department against the
+  // bare shortCode alone silently matched zero records for exactly those
+  // departments (see departmentTagsForShortCode's own comment). Every
+  // department-tag comparison below uses this alias-expanded set instead.
+  const scopedDeptTags = useMemo(
+    () => (scopedShortCode ? new Set(departmentTagsForShortCode(scopedShortCode).map((t) => t.trim().toUpperCase())) : null),
+    [scopedShortCode]
+  );
+  const matchesScopedDept = (dept: string) => !scopedDeptTags || scopedDeptTags.has((dept || '').trim().toUpperCase());
+  const visibleFaculty = useMemo(
+    () => (scopedDeptTags ? faculty.filter((f) => matchesScopedDept(f.department)) : faculty),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [faculty, scopedDeptTags]
+  );
   // Departments aren't a separate managed list — this is the union of every
   // Program's `department` field (/admin → Programs), every department
   // that already has faculty tagged to it, and the fixed set of first-year
@@ -115,8 +146,11 @@ export default function FacultyAdmin() {
     programs.forEach((p) => add(p.department));
     faculty.forEach((f) => add(f.department));
     FOUNDATION_DEPARTMENTS.forEach(add);
-    return names;
-  }, [programs, faculty]);
+    // A scoped account only ever gets its own department as a pickable
+    // option, so it can't add/move a faculty record into another one.
+    return scopedDeptTags ? names.filter((n) => matchesScopedDept(n)) : names;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [programs, faculty, scopedDeptTags]);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   // Snapshot of `form` taken when "Edit" was clicked (see startEdit) —
   // save() diffs against this so Update only writes fields actually changed
@@ -135,9 +169,9 @@ export default function FacultyAdmin() {
   const [drag, setDrag] = useState<{ dept: string; index: number } | null>(null);
   useEffect(() => {
     const groups: Record<string, FacultyDoc[]> = {};
-    faculty.forEach((f) => { (groups[f.department] ??= []).push(f); });
+    visibleFaculty.forEach((f) => { (groups[f.department] ??= []).push(f); });
     setGroupedOrdered(groups);
-  }, [faculty]);
+  }, [visibleFaculty]);
 
   const handleDragOver = (dept: string, i: number) => {
     if (!drag || drag.dept !== dept || drag.index === i) return;
@@ -292,6 +326,9 @@ export default function FacultyAdmin() {
   // Pastes a whole roster at once — "Name | Designation | Qualification | Specialization | Email"
   // per line (trailing fields optional) — instead of one add-doc round trip per person.
   const bulkImport = async () => {
+    if (scopedDeptTags && !matchesScopedDept(bulkDept)) {
+      return alert(`You can only import ${scopedDeptTitle} faculty — set Department to ${scopedShortCode}.`);
+    }
     const rows = bulkText.split('\n').map((l) => l.trim()).filter(Boolean);
     if (rows.length === 0) return;
     setBulkImporting(true);
@@ -334,6 +371,10 @@ export default function FacultyAdmin() {
       let updated = 0;
       const unmatched: string[] = [];
       for (const entry of entries) {
+        if (scopedDeptTags && !matchesScopedDept(entry.department)) {
+          unmatched.push(`${entry.name} (${entry.department}) — outside your department`);
+          continue;
+        }
         const match = faculty.find(
           (f) => f.name.trim().toLowerCase() === entry.name.trim().toLowerCase()
             && f.department.trim().toLowerCase() === entry.department.trim().toLowerCase()
@@ -457,6 +498,9 @@ export default function FacultyAdmin() {
 
   const save = async () => {
     if (!form.name) return alert('Name is required.');
+    if (scopedDeptTags && !matchesScopedDept(form.department)) {
+      return alert(`You can only manage ${scopedDeptTitle} faculty — set Department to ${scopedShortCode}.`);
+    }
     setSaving(true);
     try {
       const payload = toPayload(form);
@@ -495,6 +539,12 @@ export default function FacultyAdmin() {
   };
 
   const remove = async (id: string) => {
+    if (scopedDeptTags) {
+      const target = faculty.find((f) => f.id === id);
+      if (!target || !matchesScopedDept(target.department)) {
+        return alert(`You don't have access to remove this faculty member.`);
+      }
+    }
     if (!confirm('Remove this faculty member?')) return;
     try {
       await deleteDoc(doc(db, 'faculty', id));
@@ -503,7 +553,7 @@ export default function FacultyAdmin() {
     }
   };
 
-  const filtered = filterDept === 'All' ? faculty : faculty.filter((f) => f.department === filterDept);
+  const filtered = filterDept === 'All' ? visibleFaculty : visibleFaculty.filter((f) => f.department === filterDept);
 
   // One-time cleanup: AI&ML/AI&DS and EVT were separate department tags left
   // over from before the grouped AI/ECE department pages existed; merge them

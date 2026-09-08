@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { orderBy } from 'firebase/firestore';
-import { Trophy, BarChart3, PlayCircle, MapPin, CheckCircle2 } from 'lucide-react';
+import { Trophy, BarChart3, PlayCircle, MapPin, CheckCircle2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCollection, useOrderedCollection, type WithId } from '../../hooks/useCollection';
 import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import { usePageBanners } from '../../hooks/usePageBanners';
@@ -1384,7 +1384,11 @@ export default function PlacementDetail() {
       {!skipOverviewSection && (
       <section className="section bg-white" style={{ paddingBottom: (showOutcomes && item.slug !== 'placement-details') || item.slug === 'employability-skills' || item.slug === 'gsac' || item.slug === 'higher-education' || item.slug === 'placement-highlights' || item.slug === 'tpo-team' || item.slug === 'industry-liaison-offices' ? 'var(--space-6)' : undefined }}>
         <div className="container">
-          <div className={(item.highlights && item.highlights.length > 0) || item.slug === 'placement-details' ? 'detail-grid' : ''}>
+          <div className={
+            (item.highlights && item.highlights.length > 0) || item.slug === 'placement-details'
+              ? `detail-grid${item.slug === 'gsac' ? ' detail-grid--image-sidebar' : ''}${item.slug === 'higher-education' ? ' detail-grid--higher-ed-sidebar' : ''}`
+              : ''
+          }>
             {/* Main */}
             <div>
               {item.slug !== 'tpo-team' && <span className="section-label">Overview</span>}
@@ -1399,7 +1403,7 @@ export default function PlacementDetail() {
                 <>
                   <BodyBlocks
                     blocks={parseBodyContent(item.intro)}
-                    paragraphStyle={{ fontSize: 'var(--text-lg)', color: 'var(--color-text)', lineHeight: 1.75 }}
+                    paragraphStyle={{ fontSize: 'var(--text-lg)', color: 'var(--color-text)', lineHeight: item.slug === 'higher-education' ? 1.5 : 1.75 }}
                   />
                   {item.about && (
                     <BodyBlocks
@@ -1465,6 +1469,29 @@ export default function PlacementDetail() {
                   </div>
                 </div>
               )
+            ) : item.slug === 'gsac' ? (
+              <div className="detail-sidebar">
+                <div style={{ position: 'sticky', top: '110px', display: 'flex', justifyContent: 'center' }}>
+                  <img
+                    src="/images/placements/gsac-green-shield.png"
+                    alt="Graduate Study Abroad Center (GSAC)"
+                    loading="lazy"
+                    style={{ width: '100%', maxWidth: 420, height: 'auto' }}
+                  />
+                </div>
+              </div>
+            ) : item.slug === 'higher-education' ? (
+              <div className="detail-sidebar">
+                <div style={{ position: 'sticky', top: '110px' }}>
+                  <SidebarImageCarousel
+                    images={[
+                      '/images/placements/global-universities.jpg',
+                      '/images/placements/collaboration-with-institutions.jpg',
+                    ]}
+                    alt="Higher Education partnerships and collaborations"
+                  />
+                </div>
+              </div>
             ) : item.highlights && item.highlights.length > 0 && (
               <div className="detail-sidebar">
                 <div style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', position: 'sticky', top: '110px' }}>
@@ -1755,7 +1782,10 @@ export default function PlacementDetail() {
               // same /images/placements/* pattern as elsewhere) sits beside
               // the Regional Offices list instead of above it, smaller than
               // its old full-width-up-to-720px size since it no longer needs
-              // to carry the whole row on its own.
+              // to carry the whole row on its own. The artwork itself already
+              // includes the per-city icon row (see the updated
+              // industry-liaison-offices.png), so nothing extra is rendered
+              // here for that anymore.
               <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 340px) 1fr', gap: 'var(--space-8)', alignItems: 'start' }}>
                 <img
                   src="/images/placements/industry-liaison-offices.png"
