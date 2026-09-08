@@ -457,7 +457,7 @@ export default function PlacementYearAccordion({ years, onActiveYearChange }: Pr
                 transition: 'background var(--transition-base), color var(--transition-base)',
               }}
             >
-              AY. {y.batch.replace('–', '-')}
+              {y.batch.replace('–', '-')}
             </button>
           );
         })}

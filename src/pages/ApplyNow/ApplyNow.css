@@ -149,6 +149,7 @@
   min-height: 96px;
   box-sizing: border-box;
   color: #ffffff;
+  text-decoration: none;
 }
 
 .apply-now-card:hover {
