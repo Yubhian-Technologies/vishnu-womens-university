@@ -711,7 +711,8 @@ function BatchTrendChart({ data }: { data: PlacementYear[] }) {
 
   const W = 480;
   const H = 320;
-  const m = { top: 20, right: 18, bottom: 40, left: 52 };
+  const m = { top: 28, right: 18, bottom: 40, left: 52 };
+  const valueText = { fontSize: 12, fill: 'var(--color-text)', fontWeight: 600 } as const;
   const iw = W - m.left - m.right;
   const ih = H - m.top - m.bottom;
   const xBar = (i: number) => m.left + (iw / rows.length) * (i + 0.5);
@@ -754,6 +755,9 @@ function BatchTrendChart({ data }: { data: PlacementYear[] }) {
             <rect key={i} x={xBar(i) - barW / 2} y={yOffers(r.offers)} width={barW} height={Math.max(0, m.top + ih - yOffers(r.offers))} rx={2} fill="var(--color-primary)" />
           ))}
           {rows.map((r, i) => (
+            <text key={`v-${i}`} x={xBar(i)} y={yOffers(r.offers) - 7} textAnchor="middle" {...valueText}>{r.offers.toLocaleString('en-IN')}</text>
+          ))}
+          {rows.map((r, i) => (
             <text key={i} x={xBar(i)} y={H - m.bottom + 20} textAnchor="middle" {...axisText}>{r.label}</text>
           ))}
         </svg>
@@ -776,6 +780,9 @@ function BatchTrendChart({ data }: { data: PlacementYear[] }) {
           <path d={smoothLinePath(lpaPts)} fill="none" stroke="var(--color-accent)" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
           {lpaPts.map((p, i) => (
             <circle key={i} cx={p.x} cy={p.y} r={4.5} fill="var(--color-accent)" stroke="#ffffff" strokeWidth={1.5} />
+          ))}
+          {lpaPts.map((p, i) => (
+            <text key={`v-${i}`} x={p.x} y={p.y - 12} textAnchor="middle" {...valueText}>{rows[i].highest}</text>
           ))}
           {rows.map((r, i) => (
             <text key={i} x={xLine(i)} y={H - m.bottom + 20} textAnchor="middle" {...axisText}>{r.label}</text>
