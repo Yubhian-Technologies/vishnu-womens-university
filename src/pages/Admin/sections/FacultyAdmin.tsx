@@ -12,12 +12,10 @@ import {
   facultySectionsToCustomSections,
 } from '../../../lib/facultySections';
 import type { ProgramDoc } from './ProgramsAdmin';
-import type { DepartmentDoc } from './DepartmentsAdmin';
 import CustomSectionEditor from './CustomSectionEditor';
 import { replaceAtPath, getAtPath, hasCustomSectionContent, type CustomSection } from '../../../lib/customSections';
 import { diffChangedFields } from '../../../lib/formDiff';
 import { useAdminSession } from '../AdminSessionContext';
-import { STANDALONE_DEPARTMENTS, groupForDeptShortCode } from '../../../lib/departmentGroups';
 
 export type { FacultyFact, FacultySection };
 
@@ -103,40 +101,22 @@ const EMPTY_FORM: FormState = {
 export default function FacultyAdmin() {
   const { docs: faculty, loading } = useOrderedCollection<FacultyDoc>('faculty', 'order');
   const session = useAdminSession();
-  const { docs: allDepartmentDocs } = useOrderedCollection<DepartmentDoc>('departments', 'order');
-  // A scoped admin login (role 'department'/'custom'/etc. — e.g.
-  // civilweb@vwu.edu.in) only ever sees and edits its own department's
-  // faculty; Super Admin and full Admin (session.isAdmin) see every
-  // department, exactly as before. This is a UI-level convenience, same as
-  // every other canReadModule/canWriteModule check in this codebase — it
-  // isn't a hard security boundary, since firestore.rules currently allows
-  // any authenticated write regardless of department.
-  const isScoped = !!session && !session.isAdmin;
-  // department_users stores the department DOC's own `title` (see the
-  // picker in UsersRolesAdmin.tsx), not the short code faculty records
-  // actually use ("Civil Engineering" vs "CE"/"Civil") — resolve the
-  // matching doc to get its shortCode, then reuse the exact same
-  // DEPARTMENT_GROUPS/STANDALONE_DEPARTMENTS alias lists the rest of the
-  // site already relies on to reconcile every spelling a faculty record's
-  // `department` field might hold for that department.
-  const myDeptDoc = isScoped ? allDepartmentDocs.find((d) => d.title === session.department) : undefined;
-  const myShortCode = myDeptDoc?.shortCode || session?.department || '';
-  const myFacultyDepartments = useMemo(() => {
-    if (!isScoped) return null; // null = unrestricted, sees every department
-    const group = groupForDeptShortCode(myShortCode);
-    if (group) return group.facultyDepartments;
-    const standalone = STANDALONE_DEPARTMENTS.find((d) => d.deptShortCode.trim().toUpperCase() === myShortCode.trim().toUpperCase());
-    if (standalone) return standalone.facultyDepartments;
-    return myShortCode ? [myShortCode] : [];
-  }, [isScoped, myShortCode]);
-  const canSeeDept = (dept: string) => !myFacultyDepartments || myFacultyDepartments.some((d) => d.trim().toLowerCase() === (dept || '').trim().toLowerCase());
-  // The one canonical value a scoped admin's new/edited records should
-  // actually be tagged with — the department doc's own shortCode when
-  // resolved, so a newly-added faculty member always gets the same value
-  // the rest of the site treats as canonical, not whichever alias happens
-  // to be first in the list.
-  const myCanonicalDepartment = myShortCode || (myFacultyDepartments?.[0] ?? '');
-  const visibleFaculty = myFacultyDepartments ? faculty.filter((f) => canSeeDept(f.department)) : faculty;
+  // A scoped (non-admin/superadmin) account is restricted to the one
+  // department it was assigned in Users & Roles — that field was previously
+  // captured but never enforced, so a "CSE Webmaster" account could see and
+  // edit every department's faculty. `faculty.department` stores a short
+  // code/tag (e.g. "CSE"), but the session only carries the department's
+  // full title, so this resolves title -> shortCode via the `departments`
+  // collection (same join ProgramsAdmin.tsx/DepartmentsAdmin.tsx use).
+  const { docs: allDepartmentsForScope } = useOrderedCollection<{ id: string; title: string; shortCode: string }>('departments', 'order');
+  const scopedDeptTitle = session && !session.isAdmin ? (session.department || '').trim() : '';
+  const scopedShortCode = scopedDeptTitle
+    ? (allDepartmentsForScope.find((d) => d.title.trim() === scopedDeptTitle)?.shortCode || '').trim().toUpperCase()
+    : '';
+  const visibleFaculty = useMemo(
+    () => (scopedShortCode ? faculty.filter((f) => (f.department || '').trim().toUpperCase() === scopedShortCode) : faculty),
+    [faculty, scopedShortCode]
+  );
   // Departments aren't a separate managed list — this is the union of every
   // Program's `department` field (/admin → Programs), every department
   // that already has faculty tagged to it, and the fixed set of first-year
@@ -145,31 +125,18 @@ export default function FacultyAdmin() {
   // member was removed, making it impossible to add a replacement). A
   // Program's department pointing elsewhere (e.g. a shared HOD across two
   // programs) can never make an existing faculty department disappear.
-  // A scoped admin only ever needs (and only ever sees) its own single
-  // canonical department — everything else is out of scope.
   const { docs: programs } = useOrderedCollection<ProgramDoc>('programs', 'order');
   const departmentNames = useMemo(() => {
-    if (isScoped) return myCanonicalDepartment ? [myCanonicalDepartment] : [];
     const seen = new Set<string>();
     const names: string[] = [];
     const add = (d: string) => { if (d && !seen.has(d)) { seen.add(d); names.push(d); } };
     programs.forEach((p) => add(p.department));
     faculty.forEach((f) => add(f.department));
     FOUNDATION_DEPARTMENTS.forEach(add);
-    return names;
-  }, [isScoped, myCanonicalDepartment, programs, faculty]);
-  // The grouped drag-reorder table below groups by each record's own exact
-  // `department` string, not the canonical shortCode — a scoped admin's
-  // faculty can legitimately be tagged with more than one spelling of the
-  // same department (e.g. "Civil" on an older record vs. "CE" on a newer
-  // one), so it needs every distinct value actually present, not just the
-  // single canonical name departmentNames collapses to above, or records
-  // under an alias other than the canonical one would silently never show
-  // up there to be reordered.
-  const visibleDeptKeys = useMemo(() => {
-    if (!isScoped) return departmentNames;
-    return Array.from(new Set(visibleFaculty.map((f) => f.department)));
-  }, [isScoped, departmentNames, visibleFaculty]);
+    // A scoped account only ever gets its own department as a pickable
+    // option, so it can't add/move a faculty record into another one.
+    return scopedShortCode ? names.filter((n) => n.trim().toUpperCase() === scopedShortCode) : names;
+  }, [programs, faculty, scopedShortCode]);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   // Snapshot of `form` taken when "Edit" was clicked (see startEdit) —
   // save() diffs against this so Update only writes fields actually changed
@@ -178,17 +145,6 @@ export default function FacultyAdmin() {
   const [originalForm, setOriginalForm] = useState<FormState | null>(null);
   const [editing, setEditing] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-  // Keeps a scoped admin's Add-Faculty form pinned to its own department
-  // (the field itself is also disabled below) — covers both the initial
-  // mount, before session/department docs have resolved, and any later
-  // change while still in "Add" mode (never while editing an existing
-  // record, whose own department value must stay exactly as loaded).
-  useEffect(() => {
-    if (isScoped && myCanonicalDepartment && !editing) {
-      setForm((p) => (p.department === myCanonicalDepartment ? p : { ...p, department: myCanonicalDepartment }));
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isScoped, myCanonicalDepartment]);
   const [filterDept, setFilterDept] = useState('All');
 
   // Drag-to-reorder — grouped by department, since that's the unit both public
@@ -258,23 +214,9 @@ export default function FacultyAdmin() {
   const [jsonText, setJsonText] = useState('');
   const [jsonImporting, setJsonImporting] = useState(false);
   const [jsonResult, setJsonResult] = useState<string | null>(null);
-  // Pins both bulk-import tools' department pickers to a scoped admin's own
-  // department too (both selects are also disabled below) — same reasoning
-  // as the Add-Faculty form effect above.
-  useEffect(() => {
-    if (isScoped && myCanonicalDepartment) {
-      setBulkDept(myCanonicalDepartment);
-      setJsonDept(myCanonicalDepartment);
-    }
-  }, [isScoped, myCanonicalDepartment]);
 
   const set = (k: keyof FormState, v: string | number | CustomSection[]) => setForm((p) => ({ ...p, [k]: v }));
   const handleImage = (r: UploadResult) => setForm((p) => ({ ...p, imageUrl: r.url, storagePath: r.path }));
-  // Resets straight to a scoped admin's own department instead of
-  // EMPTY_FORM's hardcoded 'CSE' default, so Cancel/Add-success never
-  // flashes the wrong department even for the one render before the
-  // dedicated useEffect above would otherwise correct it.
-  const resetForm = () => setForm(isScoped && myCanonicalDepartment ? { ...EMPTY_FORM, department: myCanonicalDepartment } : EMPTY_FORM);
 
   // Custom Sections (Profile Sections) — same wiring as ProgramsAdmin.tsx /
   // DifferentiatorsAdmin.tsx: file uploads route through the functional
@@ -370,11 +312,14 @@ export default function FacultyAdmin() {
   // Pastes a whole roster at once — "Name | Designation | Qualification | Specialization | Email"
   // per line (trailing fields optional) — instead of one add-doc round trip per person.
   const bulkImport = async () => {
+    if (scopedShortCode && bulkDept.trim().toUpperCase() !== scopedShortCode) {
+      return alert(`You can only import ${scopedDeptTitle} faculty — set Department to ${scopedShortCode}.`);
+    }
     const rows = bulkText.split('\n').map((l) => l.trim()).filter(Boolean);
     if (rows.length === 0) return;
     setBulkImporting(true);
     try {
-      let order = visibleFaculty.filter((f) => f.department === bulkDept).length;
+      let order = faculty.filter((f) => f.department === bulkDept).length;
       for (const row of rows) {
         const [name, designation, qualification, specialization, email] = row.split('|').map((s) => (s || '').trim());
         if (!name) continue;
@@ -412,10 +357,11 @@ export default function FacultyAdmin() {
       let updated = 0;
       const unmatched: string[] = [];
       for (const entry of entries) {
-        // Matched only against visibleFaculty — a scoped admin's import can
-        // never touch a record outside its own department, even if the
-        // file itself names a different one.
-        const match = visibleFaculty.find(
+        if (scopedShortCode && entry.department.trim().toUpperCase() !== scopedShortCode) {
+          unmatched.push(`${entry.name} (${entry.department}) — outside your department`);
+          continue;
+        }
+        const match = faculty.find(
           (f) => f.name.trim().toLowerCase() === entry.name.trim().toLowerCase()
             && f.department.trim().toLowerCase() === entry.department.trim().toLowerCase()
         );
@@ -476,10 +422,7 @@ export default function FacultyAdmin() {
         if (!entry || typeof entry !== 'object') { skipped++; continue; }
         const name = str(pick(entry, 'name', 'fullName', 'full_name'));
         if (!name) { skipped++; continue; }
-        // A scoped admin's import is pinned to its own department
-        // regardless of what the file itself names — same reasoning as
-        // importFile's match-against-visibleFaculty above.
-        const department = isScoped ? myCanonicalDepartment : (str(pick(entry, 'department', 'dept')) || jsonDept);
+        const department = str(pick(entry, 'department', 'dept')) || jsonDept;
 
         const fields: Record<string, unknown> = { name, department };
         const setIf = (k: string, v: unknown) => { if (v !== undefined) fields[k] = v; };
@@ -502,7 +445,7 @@ export default function FacultyAdmin() {
         else setIf('sections', pick(entry, 'sections'));
         setIf('customSections', pick(entry, 'customSections'));
 
-        const match = visibleFaculty.find(
+        const match = faculty.find(
           (f) => f.name.trim().toLowerCase() === name.toLowerCase()
             && f.department.trim().toLowerCase() === department.toLowerCase()
         );
@@ -541,6 +484,9 @@ export default function FacultyAdmin() {
 
   const save = async () => {
     if (!form.name) return alert('Name is required.');
+    if (scopedShortCode && (form.department || '').trim().toUpperCase() !== scopedShortCode) {
+      return alert(`You can only manage ${scopedDeptTitle} faculty — set Department to ${scopedShortCode}.`);
+    }
     setSaving(true);
     try {
       const payload = toPayload(form);
@@ -554,7 +500,7 @@ export default function FacultyAdmin() {
       } else {
         await addDoc(collection(db, 'faculty'), { ...payload, createdAt: serverTimestamp() });
       }
-      resetForm(); setEditing(null); setOriginalForm(null);
+      setForm(EMPTY_FORM); setEditing(null); setOriginalForm(null);
     } catch (e) {
       alert(`Couldn't save: ${(e as Error).message}`);
     } finally { setSaving(false); }
@@ -579,6 +525,12 @@ export default function FacultyAdmin() {
   };
 
   const remove = async (id: string) => {
+    if (scopedShortCode) {
+      const target = faculty.find((f) => f.id === id);
+      if (!target || (target.department || '').trim().toUpperCase() !== scopedShortCode) {
+        return alert(`You don't have access to remove this faculty member.`);
+      }
+    }
     if (!confirm('Remove this faculty member?')) return;
     try {
       await deleteDoc(doc(db, 'faculty', id));
@@ -593,13 +545,13 @@ export default function FacultyAdmin() {
   // over from before the grouped AI/ECE department pages existed; merge them
   // into the single "AI" / "ECE" tag so editing one place updates everyone.
   const LEGACY_MERGE: Record<string, string> = { 'AI&ML': 'AI', 'AI&DS': 'AI', EVT: 'ECE' };
-  const legacyCount = visibleFaculty.filter((f) => LEGACY_MERGE[f.department]).length;
+  const legacyCount = faculty.filter((f) => LEGACY_MERGE[f.department]).length;
   const [merging, setMerging] = useState(false);
   const mergeLegacyDepartments = async () => {
     if (!confirm(`Retag ${legacyCount} faculty member(s) from AI&ML/AI&DS → AI and EVT → ECE?`)) return;
     setMerging(true);
     try {
-      for (const f of visibleFaculty) {
+      for (const f of faculty) {
         const target = LEGACY_MERGE[f.department];
         if (target) await updateDoc(doc(db, 'faculty', f.id), { department: target });
       }
@@ -646,13 +598,13 @@ export default function FacultyAdmin() {
   // Engineering department pages) — copies the fact's value into the field
   // wherever the field is empty, so both places agree.
   const qualificationFact = (f: FacultyDoc) => (f.facts ?? []).find((x) => /qualification/i.test(x.label))?.value;
-  const missingQualCount = visibleFaculty.filter((f) => !f.qualification && qualificationFact(f)).length;
+  const missingQualCount = faculty.filter((f) => !f.qualification && qualificationFact(f)).length;
   const [fillingQual, setFillingQual] = useState(false);
   const fillMissingQualifications = async () => {
     if (!confirm(`Fill in the Qualification field for ${missingQualCount} faculty member(s) from their own Profile Facts?`)) return;
     setFillingQual(true);
     try {
-      for (const f of visibleFaculty) {
+      for (const f of faculty) {
         const value = !f.qualification ? qualificationFact(f) : undefined;
         if (value) await updateDoc(doc(db, 'faculty', f.id), { qualification: value });
       }
@@ -693,7 +645,7 @@ export default function FacultyAdmin() {
         <div className="admin-form-grid">
           <div className="admin-field">
             <label htmlFor="field-department">Department</label>
-            <select id="field-department" value={bulkDept} onChange={(e) => setBulkDept(e.target.value)} disabled={isScoped}>
+            <select id="field-department" value={bulkDept} onChange={(e) => setBulkDept(e.target.value)}>
               {departmentNames.map((d) => <option key={d}>{d}</option>)}
             </select>
           </div>
@@ -729,7 +681,7 @@ export default function FacultyAdmin() {
         <div className="admin-form-grid">
           <div className="admin-field">
             <label htmlFor="field-json-dept">Default department</label>
-            <select id="field-json-dept" value={jsonDept} onChange={(e) => setJsonDept(e.target.value)} disabled={isScoped}>
+            <select id="field-json-dept" value={jsonDept} onChange={(e) => setJsonDept(e.target.value)}>
               {departmentNames.map((d) => <option key={d}>{d}</option>)}
             </select>
             <p className="admin-field__hint">Used only for entries that don't name their own department.</p>
@@ -794,19 +746,9 @@ export default function FacultyAdmin() {
           </div>
           <div className="admin-field">
             <label htmlFor="field-department-2">Department</label>
-            {isScoped ? (
-              // A plain disabled text field, not a <select> — a scoped
-              // admin's records can carry a spelling alias of their own
-              // department (e.g. "Civil" on an older record vs. "CE"
-              // canonical) that wouldn't match the single locked option a
-              // dropdown would offer, showing blank even though the actual
-              // value is fine. This just shows the real value, always.
-              <input id="field-department-2" value={form.department} disabled readOnly />
-            ) : (
-              <select id="field-department-2" value={form.department} onChange={(e) => set('department', e.target.value)}>
-                {departmentNames.map((d) => <option key={d}>{d}</option>)}
-              </select>
-            )}
+            <select id="field-department-2" value={form.department} onChange={(e) => set('department', e.target.value)}>
+              {departmentNames.map((d) => <option key={d}>{d}</option>)}
+            </select>
           </div>
           <div className="admin-field">
             <label htmlFor="field-qualification">Qualification</label>
@@ -882,7 +824,7 @@ export default function FacultyAdmin() {
           </div>
         </div>
         <div className="admin-form-actions">
-          {editing && <button className="admin-btn admin-btn--ghost" onClick={() => { setEditing(null); resetForm(); setOriginalForm(null); }}>Cancel</button>}
+          {editing && <button className="admin-btn admin-btn--ghost" onClick={() => { setEditing(null); setForm(EMPTY_FORM); setOriginalForm(null); }}>Cancel</button>}
           <button className="admin-btn admin-btn--primary" onClick={save} disabled={saving}>
             {saving ? 'Saving…' : editing ? 'Update' : 'Add Faculty'}
           </button>
@@ -892,12 +834,10 @@ export default function FacultyAdmin() {
       <div className="admin-card">
         <div className="admin-card__toolbar">
           <h2 className="admin-card__title">Faculty ({filtered.length})</h2>
-          {!isScoped && (
-            <select value={filterDept} onChange={(e) => setFilterDept(e.target.value)} className="admin-select-sm">
-              <option value="All">All Departments</option>
-              {departmentNames.map((d) => <option key={d}>{d}</option>)}
-            </select>
-          )}
+          <select value={filterDept} onChange={(e) => setFilterDept(e.target.value)} className="admin-select-sm">
+            <option value="All">All Departments</option>
+            {departmentNames.map((d) => <option key={d}>{d}</option>)}
+          </select>
         </div>
         {legacyCount > 0 && (
           <p className="admin-field__hint" style={{ margin: '0 0 0.5rem' }}>
@@ -929,7 +869,7 @@ export default function FacultyAdmin() {
           (within their designation group) and on each department's /academics page (#faculty section).
         </p>
         {loading ? <p className="admin-loading">Loading…</p> : (
-          (filterDept === 'All' ? visibleDeptKeys : [filterDept])
+          (filterDept === 'All' ? departmentNames : [filterDept])
             .filter((d) => filterDept !== 'All' || (groupedOrdered[d]?.length ?? 0) > 0)
             .map((dept) => {
               const list = groupedOrdered[dept] || [];

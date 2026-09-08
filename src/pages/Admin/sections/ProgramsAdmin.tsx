@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp, writeBatch, deleteField,
 } from 'firebase/firestore';
@@ -14,6 +14,7 @@ import CustomSectionEditor from './CustomSectionEditor';
 import { replaceAtPath, getAtPath, type CustomSection } from '../../../lib/customSections';
 import type { RndStructuredTable } from './RndTableEditor';
 import { diffChangedFields } from '../../../lib/formDiff';
+import { useAdminSession } from '../AdminSessionContext';
 
 export interface ProgramSubject {
   title: string;
@@ -336,6 +337,23 @@ function arrayToLines(arr: string[] = []): string {
 }
 export default function ProgramsAdmin() {
   const { docs: programs, loading } = useOrderedCollection<ProgramDoc>('programs', 'order');
+  const session = useAdminSession();
+  // A scoped (non-admin/superadmin) account is restricted to the one
+  // department it was assigned in Users & Roles — that field was previously
+  // captured but never enforced, so a "CSE Webmaster" account could see and
+  // edit every department's programs. `program.department` stores a short
+  // code (e.g. "CSE"), but the session only carries the department's full
+  // title, so this resolves title -> shortCode via the `departments`
+  // collection (same join DepartmentsAdmin.tsx's own matching already uses).
+  const { docs: allDepartmentsForScope } = useOrderedCollection<{ id: string; title: string; shortCode: string }>('departments', 'order');
+  const scopedDeptTitle = session && !session.isAdmin ? (session.department || '').trim() : '';
+  const scopedShortCode = scopedDeptTitle
+    ? (allDepartmentsForScope.find((d) => d.title.trim() === scopedDeptTitle)?.shortCode || '').trim().toUpperCase()
+    : '';
+  const visiblePrograms = useMemo(
+    () => (scopedShortCode ? programs.filter((p) => (p.department || '').trim().toUpperCase() === scopedShortCode) : programs),
+    [programs, scopedShortCode]
+  );
   const [form, setForm] = useState<Omit<ProgramDoc, 'id'>>(EMPTY);
   // Snapshot of `form` taken at the moment "Edit" was clicked (see
   // startEdit) — save() diffs against this so Update only writes fields you
@@ -357,9 +375,9 @@ export default function ProgramsAdmin() {
   useEffect(() => {
     const groups: Record<string, ProgramDoc[]> = {};
     CATEGORIES.forEach((c) => { groups[c] = []; });
-    programs.forEach((p) => { (groups[p.category] ??= []).push(p); });
+    visiblePrograms.forEach((p) => { (groups[p.category] ??= []).push(p); });
     setGroupedOrdered(groups);
-  }, [programs]);
+  }, [visiblePrograms]);
 
   const handleDragOver = (cat: string, i: number) => {
     if (!drag || drag.cat !== cat || drag.index === i) return;
@@ -588,6 +606,9 @@ export default function ProgramsAdmin() {
 
   const save = async () => {
     if (!form.name || !form.slug) return alert('Program name and slug are required.');
+    if (scopedShortCode && (form.department || '').trim().toUpperCase() !== scopedShortCode) {
+      return alert(`You can only manage ${scopedDeptTitle} programs — set Department to ${scopedShortCode}.`);
+    }
     setSaving(true);
     try {
       const payload = stripUndefined({
@@ -673,6 +694,12 @@ export default function ProgramsAdmin() {
   };
 
   const remove = async (id: string) => {
+    if (scopedShortCode) {
+      const target = programs.find((p) => p.id === id);
+      if (!target || (target.department || '').trim().toUpperCase() !== scopedShortCode) {
+        return alert(`You don't have access to delete this program.`);
+      }
+    }
     if (!confirm('Delete this program?')) return;
     try {
       await deleteDoc(doc(db, 'programs', id));
@@ -1003,7 +1030,7 @@ export default function ProgramsAdmin() {
           past, so the section list above is the whole page. */}
       {!editing && (
       <div className="admin-card">
-        <h2 className="admin-card__title">All Programs ({programs.length})</h2>
+        <h2 className="admin-card__title">All Programs ({visiblePrograms.length})</h2>
         <p className="admin-field__hint" style={{ marginBottom: '0.75rem' }}>
           Programs are grouped by category, matching the tabs on the public Academics page. Drag rows by the ⠿ handle
           within a category to change the order they appear in on that tab.
