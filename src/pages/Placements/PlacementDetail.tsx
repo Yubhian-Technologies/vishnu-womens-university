@@ -609,6 +609,48 @@ function CampusRecruitmentTrainingSections({ intro }: { intro: string }) {
   );
 }
 
+// A small, self-contained sidebar carousel — used by the Higher Education
+// sub-page (item.slug === 'higher-education') to cycle its two partnership
+// photos. Just Prev/Next + dot indicators; not the full PhotoCarouselStrip
+// (that one's a horizontal scroll strip meant for a full-width section, not
+// a narrow sticky sidebar).
+function SidebarImageCarousel({ images, alt }: { images: string[]; alt: string }) {
+  const [index, setIndex] = useState(0);
+  if (images.length === 0) return null;
+  const prev = () => setIndex((i) => (i - 1 + images.length) % images.length);
+  const next = () => setIndex((i) => (i + 1) % images.length);
+  return (
+    <div style={{ position: 'relative', borderRadius: 'var(--radius-md)', overflow: 'hidden', border: '1.5px solid var(--color-light-gray)' }}>
+      <img src={images[index]} alt={alt} loading="lazy" style={{ width: '100%', height: 'auto', display: 'block' }} />
+      {images.length > 1 && (
+        <>
+          <button
+            type="button"
+            onClick={prev}
+            aria-label="Previous image"
+            style={{ position: 'absolute', top: '50%', left: 'var(--space-2)', transform: 'translateY(-50%)', width: 32, height: 32, borderRadius: '50%', border: 'none', background: 'rgba(11,30,66,0.7)', color: 'var(--color-white)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+          >
+            <ChevronLeft size={18} />
+          </button>
+          <button
+            type="button"
+            onClick={next}
+            aria-label="Next image"
+            style={{ position: 'absolute', top: '50%', right: 'var(--space-2)', transform: 'translateY(-50%)', width: 32, height: 32, borderRadius: '50%', border: 'none', background: 'rgba(11,30,66,0.7)', color: 'var(--color-white)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+          >
+            <ChevronRight size={18} />
+          </button>
+          <div style={{ position: 'absolute', bottom: 'var(--space-2)', left: 0, right: 0, display: 'flex', justifyContent: 'center', gap: 'var(--space-1)' }}>
+            {images.map((_, i) => (
+              <span key={i} style={{ width: 6, height: 6, borderRadius: '50%', background: i === index ? 'var(--color-accent)' : 'rgba(255,255,255,0.6)' }} />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 // Placement Details' Summary section (placementCellSummarySection below) —
 // alternating navy/cream colours by position, a plain batch heading, and
 // the batch/offers/package split across their own lines. Offers and
