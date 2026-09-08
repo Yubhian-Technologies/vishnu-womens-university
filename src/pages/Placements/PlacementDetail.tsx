@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { orderBy } from 'firebase/firestore';
-import { Trophy, BarChart3, PlayCircle, MapPin, CheckCircle2 } from 'lucide-react';
+import { Trophy, BarChart3, PlayCircle, MapPin, CheckCircle2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCollection, useOrderedCollection, type WithId } from '../../hooks/useCollection';
 import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import { usePageBanners } from '../../hooks/usePageBanners';
@@ -638,6 +638,63 @@ function BatchSummaryCard({ batch, offers, highest, index }: { batch: string; of
           </span>
         )}
       </div>
+    </div>
+  );
+}
+
+// Simple click-through image slideshow for a sidebar — arrows only show up
+// once there's more than one image (a single image just renders flat, no
+// dead-end arrows pointing at themselves). Used by Higher Education's
+// sidebar in place of the plain Key Highlights list.
+function SidebarImageCarousel({ images, alt }: { images: string[]; alt: string }) {
+  const [index, setIndex] = useState(0);
+  if (images.length === 0) return null;
+  return (
+    <div style={{ position: 'relative' }}>
+      <img
+        src={images[index]}
+        alt={`${alt} (${index + 1} of ${images.length})`}
+        loading="lazy"
+        style={{ width: '100%', height: 'auto', borderRadius: 'var(--radius-md)', display: 'block' }}
+      />
+      {images.length > 1 && (
+        <>
+          <button
+            type="button"
+            aria-label="Previous image"
+            onClick={() => setIndex((i) => (i - 1 + images.length) % images.length)}
+            style={{
+              position: 'absolute', left: 8, top: '50%', transform: 'translateY(-50%)',
+              width: 34, height: 34, borderRadius: '50%', border: 'none',
+              background: 'rgba(255, 255, 255, 0.9)', boxShadow: 'var(--shadow-md)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+            }}
+          >
+            <ChevronLeft size={18} />
+          </button>
+          <button
+            type="button"
+            aria-label="Next image"
+            onClick={() => setIndex((i) => (i + 1) % images.length)}
+            style={{
+              position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)',
+              width: 34, height: 34, borderRadius: '50%', border: 'none',
+              background: 'rgba(255, 255, 255, 0.9)', boxShadow: 'var(--shadow-md)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+            }}
+          >
+            <ChevronRight size={18} />
+          </button>
+          <div style={{ position: 'absolute', bottom: 10, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 6 }}>
+            {images.map((img, i) => (
+              <span
+                key={img}
+                style={{ width: 6, height: 6, borderRadius: '50%', background: i === index ? 'var(--color-white)' : 'rgba(255, 255, 255, 0.5)' }}
+              />
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }
@@ -1314,7 +1371,11 @@ export default function PlacementDetail() {
       {!skipOverviewSection && (
       <section className="section bg-white" style={{ paddingBottom: (showOutcomes && item.slug !== 'placement-details') || item.slug === 'employability-skills' || item.slug === 'gsac' || item.slug === 'higher-education' || item.slug === 'placement-highlights' || item.slug === 'tpo-team' || item.slug === 'industry-liaison-offices' ? 'var(--space-6)' : undefined }}>
         <div className="container">
-          <div className={(item.highlights && item.highlights.length > 0) || item.slug === 'placement-details' ? 'detail-grid' : ''}>
+          <div className={
+            (item.highlights && item.highlights.length > 0) || item.slug === 'placement-details'
+              ? `detail-grid${item.slug === 'gsac' ? ' detail-grid--image-sidebar' : ''}${item.slug === 'higher-education' ? ' detail-grid--higher-ed-sidebar' : ''}`
+              : ''
+          }>
             {/* Main */}
             <div>
               {item.slug !== 'tpo-team' && <span className="section-label">Overview</span>}
@@ -1329,7 +1390,7 @@ export default function PlacementDetail() {
                 <>
                   <BodyBlocks
                     blocks={parseBodyContent(item.intro)}
-                    paragraphStyle={{ fontSize: 'var(--text-lg)', color: 'var(--color-text)', lineHeight: 1.75 }}
+                    paragraphStyle={{ fontSize: 'var(--text-lg)', color: 'var(--color-text)', lineHeight: item.slug === 'higher-education' ? 1.5 : 1.75 }}
                   />
                   {item.about && (
                     <BodyBlocks
@@ -1395,6 +1456,29 @@ export default function PlacementDetail() {
                   </div>
                 </div>
               )
+            ) : item.slug === 'gsac' ? (
+              <div className="detail-sidebar">
+                <div style={{ position: 'sticky', top: '110px', display: 'flex', justifyContent: 'center' }}>
+                  <img
+                    src="/images/placements/gsac-green-shield.png"
+                    alt="Graduate Study Abroad Center (GSAC)"
+                    loading="lazy"
+                    style={{ width: '100%', maxWidth: 420, height: 'auto' }}
+                  />
+                </div>
+              </div>
+            ) : item.slug === 'higher-education' ? (
+              <div className="detail-sidebar">
+                <div style={{ position: 'sticky', top: '110px' }}>
+                  <SidebarImageCarousel
+                    images={[
+                      '/images/placements/global-universities.jpg',
+                      '/images/placements/collaboration-with-institutions.jpg',
+                    ]}
+                    alt="Higher Education partnerships and collaborations"
+                  />
+                </div>
+              </div>
             ) : item.highlights && item.highlights.length > 0 && (
               <div className="detail-sidebar">
                 <div style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', position: 'sticky', top: '110px' }}>

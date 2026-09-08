@@ -10,6 +10,20 @@
   align-items: start;
 }
 
+/* Wider sidebar track for pages whose sidebar is a full-bleed image/carousel
+   (GSAC crest) rather than the plain Key Highlights text card — 360px crops
+   those images down to a sliver. */
+.detail-grid--image-sidebar {
+  grid-template-columns: 1fr 460px;
+}
+
+/* Higher Education's carousel specifically — wider still, so the (naturally
+   landscape) photo's height gets closer to the Overview text column's height
+   without cropping any of the university cards out of frame. */
+.detail-grid--higher-ed-sidebar {
+  grid-template-columns: 1fr 600px;
+}
+
 /* ===== Department page — Programmes Offered collapsible cards =====
    Plain tap/click accordion — the exact same trigger and behavior on
    mobile and desktop, no hover-driven expand. Hover only gets a light
