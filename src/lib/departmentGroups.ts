@@ -95,3 +95,30 @@ export function groupForDeptShortCode(code?: string): DepartmentGroup | undefine
   const norm = code.trim().toUpperCase();
   return DEPARTMENT_GROUPS.find((g) => g.deptShortCode.toUpperCase() === norm);
 }
+
+/**
+ * Every raw `department` tag spelling (on a faculty or program record) that
+ * should count as belonging to the department with this `shortCode` —
+ * always includes the shortCode itself. Most departments only ever use
+ * their shortCode as the tag, so this just returns `[shortCode]` for them;
+ * a handful (Civil, Mechanical, ...) have faculty/program records that spell
+ * the department out in prose instead ("Civil", "Mechanical") — those are
+ * exactly the departments already listed in DEPARTMENT_GROUPS/
+ * STANDALONE_DEPARTMENTS' own `facultyDepartments`, so this just reuses
+ * whichever of those two matches. Any code comparing a scoped admin's
+ * department (resolved to a shortCode) against a faculty/program record's
+ * free-text `department` field should match against this list, not the bare
+ * shortCode — an exact-shortCode-only comparison silently excludes every
+ * record for a department that's tagged in prose (see FacultyAdmin.tsx/
+ * ProgramsAdmin.tsx's scoping, and FacultyProfile.tsx/ProgramDetail.tsx's
+ * own DEPT_CODE_ALIASES for the same class of bug on the public site).
+ */
+export function departmentTagsForShortCode(shortCode: string): string[] {
+  const code = shortCode.trim();
+  if (!code) return [];
+  const group = groupForDeptShortCode(code);
+  if (group) return group.facultyDepartments;
+  const standalone = STANDALONE_DEPARTMENTS.find((d) => d.deptShortCode.trim().toUpperCase() === code.toUpperCase());
+  if (standalone) return standalone.facultyDepartments;
+  return [code];
+}
