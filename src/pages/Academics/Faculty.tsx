@@ -73,6 +73,12 @@ export interface FacultyDoc {
   imageUrl: string;
   storagePath: string;
   order: number;
+  /** Optional per-person override of which designation group this person is
+   *  listed under on the /faculty directory (0 leadership · 1 Professor ·
+   *  2 Associate · 3 Assistant · 4 Other). Absent or < 0 = auto (derived
+   *  from `designation` text). Position within the group is still the
+   *  `order` field. Set via /admin → Faculty. */
+  groupOverride?: number;
   /** Set via /admin → Faculty; shown on this person's own full profile
    *  page (FacultyProfile.tsx), not on this grid. */
   facts?: FacultyFact[];
@@ -160,7 +166,11 @@ export default function Faculty() {
   const designationGroups = useMemo(() => {
     const buckets = new Map<number, FacultyDoc[]>();
     for (const f of filtered) {
-      const rank = designationGroupRank(f.designation);
+      // A per-person groupOverride (set in /admin → Faculty) wins over the
+      // designation-text guess; anything absent or < 0 falls back to auto.
+      const rank = typeof f.groupOverride === 'number' && f.groupOverride >= 0
+        ? f.groupOverride
+        : designationGroupRank(f.designation);
       if (!buckets.has(rank)) buckets.set(rank, []);
       buckets.get(rank)!.push(f);
     }
