@@ -10,6 +10,9 @@ export interface PlacementHighlightDoc {
   name: string;
   package: string;
   companyName: string;
+  /** Job role / placement category — optional; only shown by consumers that
+   *  have room for it (e.g. the "Recent Placement Highlights" grid). */
+  role?: string;
   photoUrl: string;
   photoStoragePath: string;
   logoUrl: string;
@@ -18,7 +21,7 @@ export interface PlacementHighlightDoc {
 }
 
 const EMPTY: Omit<PlacementHighlightDoc, 'id'> = {
-  name: '', package: '', companyName: '',
+  name: '', package: '', companyName: '', role: '',
   photoUrl: '', photoStoragePath: '',
   logoUrl: '', logoStoragePath: '',
   order: 0,
@@ -64,7 +67,7 @@ export default function PlacementHighlightsAdmin() {
   const startEdit = (h: PlacementHighlightDoc) => {
     setEditing(h.id);
     setForm({
-      name: h.name, package: h.package, companyName: h.companyName || '',
+      name: h.name, package: h.package, companyName: h.companyName || '', role: h.role || '',
       photoUrl: h.photoUrl || '', photoStoragePath: h.photoStoragePath || '',
       logoUrl: h.logoUrl || '', logoStoragePath: h.logoStoragePath || '',
       order: h.order,
@@ -106,6 +109,10 @@ export default function PlacementHighlightsAdmin() {
             <input id="field-ph-company" value={form.companyName} onChange={(e) => set('companyName', e.target.value)} placeholder="Amazon" />
           </div>
           <div className="admin-field">
+            <label htmlFor="field-ph-role">Job Role (shown on the "Recent Placement Highlights" grid only)</label>
+            <input id="field-ph-role" value={form.role} onChange={(e) => set('role', e.target.value)} placeholder="Software Development Engineer" />
+          </div>
+          <div className="admin-field">
             <label htmlFor="field-ph-order">Display Order</label>
             <input id="field-ph-order" type="number" value={form.order} onChange={(e) => set('order', Number(e.target.value))} />
           </div>
@@ -121,15 +128,16 @@ export default function PlacementHighlightsAdmin() {
       <div className="admin-card">
         <h2 className="admin-card__title">Placement Highlights ({highlights.length})</h2>
         <p className="admin-field__hint">
-          Shown on Home in two places: the "Educate a Woman, Transform the World" section (rotates every few
-          seconds; shows its original hardcoded defaults until at least one highlight is added here), and the
-          "Our Latest Graduates Conquering the World" carousel further down the page — which stays hidden
-          entirely until at least one highlight exists here.
+          Shown on Home in three places: the "Educate a Woman, Transform the World" section (rotates every few
+          seconds; shows its original hardcoded defaults until at least one highlight is added here), the
+          "Our Latest Graduates Conquering the World" carousel, and the "Recent Placement Highlights" card grid —
+          the latter two stay hidden entirely until at least one highlight exists here. Only the card grid shows
+          the Role field.
         </p>
         {loading ? <p className="admin-loading">Loading…</p> : (
           <div className="admin-table-wrap">
             <table className="admin-table">
-              <thead><tr><th>Photo</th><th>Logo</th><th>Name</th><th>Package</th><th>Company</th><th>Order</th><th>Actions</th></tr></thead>
+              <thead><tr><th>Photo</th><th>Logo</th><th>Name</th><th>Package</th><th>Company</th><th>Role</th><th>Order</th><th>Actions</th></tr></thead>
               <tbody>
                 {highlights.map((h) => (
                   <tr key={h.id}>
@@ -138,6 +146,7 @@ export default function PlacementHighlightsAdmin() {
                     <td>{h.name}</td>
                     <td>{h.package}</td>
                     <td>{h.companyName}</td>
+                    <td>{h.role}</td>
                     <td>{h.order}</td>
                     <td>
                       <button className="admin-btn admin-btn--sm" onClick={() => startEdit(h)}>Edit</button>
@@ -145,7 +154,7 @@ export default function PlacementHighlightsAdmin() {
                     </td>
                   </tr>
                 ))}
-                {highlights.length === 0 && <tr><td colSpan={7} className="admin-empty">No highlights yet — add one using the form above.</td></tr>}
+                {highlights.length === 0 && <tr><td colSpan={8} className="admin-empty">No highlights yet — add one using the form above.</td></tr>}
               </tbody>
             </table>
           </div>

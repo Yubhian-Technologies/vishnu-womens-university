@@ -55,7 +55,7 @@
 }
 
 .about-fact-label {
-  font-size: 0.72rem;
+  font-size: 0.8rem;
   color: rgba(255, 255, 255, 0.85);
   font-family: var(--font-sans);
   margin-top: 6px;
@@ -173,7 +173,7 @@
   background: var(--color-white);
   border: 1px solid var(--color-light-gray);
   color: var(--color-primary);
-  font-size: 0.78rem;
+  font-size: 0.86rem;
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -263,7 +263,7 @@
 
 .about-diff-badge {
   margin-left: auto;
-  font-size: 0.7rem;
+  font-size: 0.78rem;
   font-weight: 800;
   padding: 4px 10px;
   border-radius: 4px;
@@ -307,7 +307,7 @@
 .exec-level__title {
   font-family: var(--font-sans);
   font-weight: 800;
-  font-size: 0.78rem;
+  font-size: 0.86rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--color-primary);
@@ -423,7 +423,7 @@
   font-weight: 800;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  font-size: 0.72rem;
+  font-size: 0.8rem;
   color: var(--color-text-light);
 }
 
@@ -515,7 +515,7 @@
   border-radius: 4px;
   background: rgba(0, 47, 25, 0.06);
   border: 1px solid rgba(0, 47, 25, 0.1);
-  font-size: 0.72rem;
+  font-size: 0.8rem;
   font-weight: 800;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -563,7 +563,7 @@
 }
 
 .sves-stat-lbl {
-  font-size: 0.7rem;
+  font-size: 0.78rem;
   color: rgba(255, 255, 255, 0.85);
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -587,7 +587,7 @@
   border-radius: 4px;
   background: var(--color-off-white);
   border: 1px solid var(--color-light-gray);
-  font-size: 0.78rem;
+  font-size: 0.86rem;
   font-weight: 700;
   color: var(--color-primary);
 }
@@ -680,7 +680,7 @@
   background: var(--color-off-white);
   border: 1px solid var(--color-light-gray);
   font-family: var(--font-sans);
-  font-size: 0.78rem;
+  font-size: 0.86rem;
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -718,7 +718,7 @@
   .exec-card { padding: 8px 8px 12px; border-radius: 6px; }
   .exec-card__info { padding: 8px 4px 4px; }
   .exec-card__name { font-size: 0.92rem; line-height: 1.25; word-break: break-word; }
-  .exec-card__role { padding: 0.3rem 0.5rem; font-size: 0.68rem; word-break: break-word; text-align: center; max-width: 100%; }
+  .exec-card__role { padding: 0.3rem 0.5rem; font-size: 0.76rem; word-break: break-word; text-align: center; max-width: 100%; }
   .exec-card__avatar { font-size: 1.85rem; }
   .exec-detail-banner__inner { padding: 1.25rem 1rem; }
   .exec-detail-banner__facts { gap: 0.75rem; margin-bottom: 0.75rem; }

@@ -381,7 +381,7 @@ const COMPANY_FILTERS: { key: CompanyFilter; label: string }[] = [
   { key: 'all', label: 'All Companies' },
   { key: 'it', label: 'IT / Software' },
   { key: 'core', label: 'Core' },
-  { key: 'dream', label: 'Dream Package (≥₹10L)' },
+  { key: 'dream', label: 'Dream Package (≥10 LPA)' },
 ];
 
 // Sector-based filters read the row's own `sector` field (only populated for
@@ -477,6 +477,9 @@ export default function PlacementYearAccordion({ years, onActiveYearChange }: Pr
 
       {(() => {
         const y = activeYear;
+        // Company-wise table's salary column always shows "(LPA)" even when
+        // the admin label omits it (e.g. "CTC" instead of "CTC (LPA)").
+        const salaryHeader = /lpa/i.test(y.salaryLabel) ? y.salaryLabel : `${y.salaryLabel} (LPA)`.trim();
         return (
               <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)' }}>
                 <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', marginBottom: 'var(--space-5)' }}>
@@ -621,7 +624,7 @@ export default function PlacementYearAccordion({ years, onActiveYearChange }: Pr
                             <th style={{ position: 'sticky', top: 0, textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900, background: 'var(--color-accent)' }}>Company Name</th>
                             <th style={{ position: 'sticky', top: 0, textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900, whiteSpace: 'nowrap', background: 'var(--color-accent)' }}>No. of Selects</th>
                             {y.salaryLabel && (
-                              <th style={{ position: 'sticky', top: 0, textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900, background: 'var(--color-accent)' }}>{y.salaryLabel}</th>
+                              <th style={{ position: 'sticky', top: 0, textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900, background: 'var(--color-accent)' }}>{salaryHeader}</th>
                             )}
                             {y.rows.some((r) => r.sector) && (
                               <th style={{ position: 'sticky', top: 0, textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900, background: 'var(--color-accent)' }}>Sector</th>

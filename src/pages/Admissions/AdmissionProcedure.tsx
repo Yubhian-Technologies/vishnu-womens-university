@@ -1,35 +1,32 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Check, ArrowRight } from 'lucide-react';
+import { Check } from 'lucide-react';
 import PageHero from '../../components/PageHero/PageHero';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { admissionTabs, CATEGORY_B_FOOTNOTE } from './admissionProcedure.data';
-import '../Campus/tabbed-section.css';
+import { dotTech } from '../../lib/academicDegreeNames';
 import './AdmissionProcedure.css';
-
-const fieldLabelStyle: React.CSSProperties = {
-  fontFamily: 'var(--font-sans)',
-  fontSize: '0.7rem',
-  fontWeight: 800,
-  textTransform: 'uppercase',
-  letterSpacing: '0.06em',
-  color: 'var(--color-text-light)',
+/** Split "Name (note)" -> ["Name", "note"]; no parens -> ["Name", ""]. */
+const splitNote = (s: string): [string, string] => {
+  const m = s.match(/^(.*?)\s*\(([^)]+)\)\s*$/);
+  return m ? [m[1], m[2]] : [s, ''];
 };
 
 export default function AdmissionProcedure() {
-  const stats = useContentBlocks('admission-procedure', 'stats');
   const documents = useContentBlocks('admission-procedure', 'documents');
 
   const [activeTabKey, setActiveTabKey] = useState(admissionTabs[0].key);
   const activeTab = admissionTabs.find((t) => t.key === activeTabKey) ?? admissionTabs[0];
-  const [activeCategoryKey, setActiveCategoryKey] = useState(activeTab.categories[0].key);
-  const activeCategory =
-    activeTab.categories.find((c) => c.key === activeCategoryKey) ?? activeTab.categories[0];
+  const [activeCatKey, setActiveCatKey] = useState(admissionTabs[0].categories[0].key);
+  const activeCat = activeTab.categories.find((c) => c.key === activeCatKey) ?? activeTab.categories[0];
+  const [progName, progNote] = splitNote(dotTech(activeTab.label));
+  const showCategoryTabs = activeTab.categories.length > 0;
+  const catIsVwunet = /VWUNET/.test(activeCat.examName);
 
-  const handleTabChange = (key: string) => {
+  const selectTab = (key: string) => {
     setActiveTabKey(key);
-    const nextTab = admissionTabs.find((t) => t.key === key);
-    setActiveCategoryKey(nextTab?.categories[0].key ?? 'A');
+    const next = admissionTabs.find((t) => t.key === key);
+    setActiveCatKey(next?.categories[0].key ?? 'A');
   };
 
   useEffect(() => {
@@ -38,188 +35,181 @@ export default function AdmissionProcedure() {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            const el = entry.target as HTMLElement;
-            setTimeout(() => el.classList.add('revealed'), parseInt(el.dataset.delay || '0'));
-            observer.unobserve(el);
+            entry.target.classList.add('revealed');
+            observer.unobserve(entry.target);
           }
         });
       },
-      { threshold: 0.1 }
+      { threshold: 0.15 }
     );
-    document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => observer.observe(el));
+    document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
     return () => observer.disconnect();
   }, []);
 
   return (
-    <main className="page-wrapper">
-      {/* Hero */}
+    <main className="page-wrapper ap">
       <PageHero
         page="admission-procedure"
         defaultTitle="Admission Procedure"
-  defaultSubtitle="A clear, step-by-step guide to joining VWU — covering eligibility, entrance examinations, and the enrollment process for all programmes."
+        defaultSubtitle="Which entrance exam applies to you, who can apply, and every step from application to enrolment."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Admissions', to: '/admissions' }, { label: 'Admission Procedure' }]}
-        scrollCtaTargetId="admission-procedure-content"
+        hideCta
       />
 
-      {/* EAPCET code banner */}
-      <section id="admission-procedure-content" style={{ background: 'var(--color-primary)', padding: 'var(--space-5) 0', scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
-        <div className="container">
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-12)', flexWrap: 'wrap' }}>
-            {stats.map(s => (
-              <div key={s.id} style={{ textAlign: 'center' }}>
-                <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.5rem', fontWeight: 900, color: 'var(--color-accent)' }}>{s.value}</div>
-                <div style={{ fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.65)', marginTop: 2 }}>{s.title}</div>
-              </div>
-            ))}
-          </div>
+      <section className="ap-codes">
+        <div className="container ap-codes__inner">
+          <span className="ap-codes__exams">EAPCET | ECET | PGCET | ICET</span>
+          <span className="ap-codes__code">CODES: VISW & VISWPU</span>
         </div>
       </section>
 
-      {/* Admission Procedure title */}
-      <section className="section bg-off-white" style={{ paddingBottom: 0 }}>
+      <section className="section ap-main" id="admission-procedure-content">
         <div className="container">
-          <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-8)' }}>
-            <span className="section-label">Admissions 2027</span>
-            <h2 className="section-title">Admission Procedure</h2>
-            <p style={{ color: 'var(--color-text-light)', maxWidth: 640, margin: '0 auto' }}>
-              Select your programme below to explore the applicable entrance examination, admission category and pathway.
+          <header className="ap-lead reveal">
+            <p className="ap-lead__title">Find your pathway</p>
+            <p className="ap-lead__text">
+             Choose your programme to explore the applicable entrance exam, eligibility criteria, and the steps involved in the admission process.
             </p>
-          </div>
-        </div>
-      </section>
+          </header>
 
-      {/* VWUNET — full-screen banner linking to its (placeholder) page */}
-      <Link to="/vwunet" className="vwunet-banner">
-        <span className="vwunet-banner__line">
-          <span className="vwunet-banner__title">VWUNET</span>
-          <span className="vwunet-banner__subtitle">
-            &ndash;&nbsp;Vishnu Women&rsquo;s University National Entrance Test
-          </span>
-        </span>
-      </Link>
-
-      {/* Admission Procedure Tabs */}
-      <section className="section bg-off-white">
-        <div className="container">
-          <div className="section-tabs admission-tabs-bar" role="tablist" aria-label="Admission programmes">
-            {admissionTabs.map((t) => (
-              <button
-                key={t.key}
-                type="button"
-                role="tab"
-                aria-selected={activeTab.key === t.key}
-                onClick={() => handleTabChange(t.key)}
-                className={`section-tab-btn${activeTab.key === t.key ? ' active' : ''}`}
-              >
-                {t.label}
-              </button>
-            ))}
-          </div>
-
-          <h3 style={{ fontFamily: 'var(--font-serif)', color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>{activeTab.heading}</h3>
-          <p style={{ color: 'var(--color-text-light)', width: '100%', maxWidth: '100%', marginBottom: 'var(--space-6)' }}>{activeTab.intro}</p>
-
-          {activeTab.categories.length > 1 && (
-            <div className="section-subtabs admission-subtabs-bar" role="tablist" aria-label="Admission category">
-              {activeTab.categories.map((c) => (
+          <div className="ap-switch" role="tablist" aria-label="Programme">
+            {admissionTabs.map((t) => {
+              const isActive = t.key === activeTab.key;
+              return (
                 <button
-                  key={c.key}
+                  key={t.key}
                   type="button"
                   role="tab"
-                  aria-selected={activeCategory.key === c.key}
-                  onClick={() => setActiveCategoryKey(c.key)}
-                  className={`section-subtab-btn${activeCategory.key === c.key ? ' active' : ''}`}
+                  aria-selected={isActive}
+                  className={`ap-switch__btn${isActive ? ' is-active' : ''}`}
+                  onClick={() => selectTab(t.key)}
                 >
-                  {c.title}
+                  {dotTech(splitNote(t.label)[0])}
                 </button>
-              ))}
-            </div>
-          )}
+              );
+            })}
+          </div>
 
-          <div className="admission-category-card" style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-mid-gray)', borderRadius: 'var(--radius-md)' }}>
-            <h4 style={{ fontFamily: 'var(--font-sans)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>{activeCategory.title}</h4>
-            <p style={{ color: 'var(--color-text-light)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-5)' }}>{activeCategory.description}</p>
+          <div className="ap-panel">
+            <h2 className="ap-panel__name">
+              {progName}
+              {progNote && <span className="ap-panel__note"> ({dotTech(progNote)})</span>}
+            </h2>
+            <p className="ap-panel__intro">{dotTech(activeTab.intro)}</p>
 
-            {activeCategory.eligibility && (
-              <div style={{ marginBottom: 'var(--space-5)' }}>
-                <div style={fieldLabelStyle}>Eligibility</div>
-                <p style={{ color: 'var(--color-text-light)', fontSize: 'var(--text-sm)', marginTop: 4 }}>{activeCategory.eligibility}</p>
+            {showCategoryTabs && (
+              <div className="ap-subswitch" role="tablist" aria-label="Admission category">
+                {activeTab.categories.map((c) => {
+                  const on = c.key === activeCat.key;
+                  return (
+                    <button
+                      key={c.key}
+                      type="button"
+                      role="tab"
+                      aria-selected={on}
+                      className={`ap-subswitch__btn${on ? ' is-active' : ''}`}
+                      onClick={() => setActiveCatKey(c.key)}
+                    >
+                      Category {c.key}
+                    </button>
+                  );
+                })}
               </div>
             )}
 
-            <div style={{ marginBottom: 'var(--space-5)' }}>
-              <div style={fieldLabelStyle}>Entrance Examination</div>
-              <p style={{ color: 'var(--color-primary-dark)', fontSize: 'var(--text-sm)', fontWeight: 700, marginTop: 4 }}>{activeCategory.examName}</p>
-            </div>
+            <article className="ap-route">
+              <h3 className="ap-route__exam">{dotTech(activeCat.examName)}</h3>
+              <p className="ap-route__desc">{dotTech(activeCat.description)}</p>
 
-            <div>
-              <div style={fieldLabelStyle}>Admission Process</div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--space-2)', marginTop: 'var(--space-2)' }}>
-                {activeCategory.steps.map((step, i) => (
-                  <div key={step} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                    <span style={{ background: 'var(--color-off-white)', border: '1px solid var(--color-mid-gray)', borderRadius: 'var(--radius-sm)', padding: 'var(--space-2) var(--space-4)', fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-primary-dark)' }}>
-                      {step}
-                    </span>
-                    {i < activeCategory.steps.length - 1 && (
-                      <ArrowRight size={16} strokeWidth={2.2} style={{ color: 'var(--color-accent)', flexShrink: 0 }} />
-                    )}
-                  </div>
-                ))}
+              {catIsVwunet && (
+                <p className="ap-route__more">
+                  <Link to="/vwunet">About VWUNET and the test format</Link>
+                </p>
+              )}
+
+              {activeCat.eligibility && (
+                <p className="ap-route__who">
+                  <span className="ap-route__who-tag">Who can apply</span>
+                  {dotTech(activeCat.eligibility)}
+                  {activeCat.eligibilityMoreUrl && (
+                    <>
+                      {' '}
+                      {/^https?:\/\//.test(activeCat.eligibilityMoreUrl) ? (
+                        <a
+                          className="ap-route__who-link"
+                          href={activeCat.eligibilityMoreUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Full eligibility details
+                        </a>
+                      ) : (
+                        <Link className="ap-route__who-link" to={activeCat.eligibilityMoreUrl}>
+                          Full eligibility details
+                        </Link>
+                      )}
+                    </>
+                  )}
+                </p>
+              )}
+
+              <div className="ap-track">
+                <p className="ap-track__title">How admission works</p>
+                <ol className="ap-track__steps">
+                  {activeCat.steps.map((step, i) => (
+                    <li key={step} className="ap-track__step">
+                      <span className="ap-track__num">{i + 1}</span>
+                      <span className="ap-track__name">{dotTech(step)}</span>
+                    </li>
+                  ))}
+                </ol>
               </div>
-            </div>
 
-            {activeCategory.codes && (
-              <div style={{ marginTop: 'var(--space-5)' }}>
-                <div style={fieldLabelStyle}>AP EAPCET Codes</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', marginTop: 'var(--space-2)' }}>
-                  {activeCategory.codes.map((c) => (
-                    <div key={c.code} style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-3)', alignItems: 'baseline' }}>
-                      <span style={{ fontWeight: 900, color: 'var(--color-primary)', fontSize: 'var(--text-sm)', minWidth: 70 }}>{c.code}</span>
-                      <span style={{ color: 'var(--color-text-light)', fontSize: 'var(--text-sm)' }}>{c.label}</span>
+              {activeCat.codes && (
+                <dl className="ap-codes-def">
+                  <dt>College codes for counselling</dt>
+                  {activeCat.codes.map((c) => (
+                    <div key={c.code} className="ap-codes-def__row">
+                      <span className="ap-codes-def__key">{c.code}</span>
+                      <span className="ap-codes-def__val">{c.label}</span>
                     </div>
                   ))}
-                </div>
-              </div>
-            )}
+                </dl>
+              )}
 
-            {activeCategory.key === 'B' && (
-              <p style={{ color: 'var(--color-text-light)', fontSize: 'var(--text-xs)', marginTop: 'var(--space-5)', fontStyle: 'italic' }}>
-                {CATEGORY_B_FOOTNOTE}
-              </p>
-            )}
+              {activeCat.key === 'B' && <p className="ap-route__foot">{dotTech(CATEGORY_B_FOOTNOTE)}</p>}
+            </article>
           </div>
         </div>
       </section>
 
-      {/* Documents Required */}
-      <section className="section" style={{ background: 'linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%)' }}>
+      <section className="section ap-docs">
         <div className="container">
-          <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-10)' }}>
-            <span className="section-label" style={{ color: 'var(--color-accent)' }}>Checklist</span>
-            <h2 style={{ color: 'var(--color-white)' }} className="section-title">Documents Required</h2>
-          </div>
-          <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-3)', maxWidth: 800, margin: '0 auto' }}>
+          <header className="ap-docs__head reveal">
+            <span className="section-label section-label--dark">Before you apply</span>
+            <h2 className="ap-docs__title">Documents to keep ready</h2>
+          </header>
+          <ul className="ap-docs__grid">
             {documents.map((doc) => (
-              <div key={doc.id}
-                style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 'var(--radius-sm)', padding: 'var(--space-3) var(--space-4)' }}>
-                <Check size={16} strokeWidth={2.5} style={{ color: 'var(--color-accent)', flexShrink: 0 }} />
-                <span style={{ fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.85)' }}>{doc.title}</span>
-              </div>
+              <li key={doc.id} className="ap-docs__item">
+                <Check size={16} strokeWidth={2.5} />
+                <span>{dotTech(doc.title || '')}</span>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
       </section>
 
-      {/* CTA */}
-      <section style={{ background: 'var(--color-primary)', padding: 'var(--space-12) 0' }}>
-        <div className="container" style={{ textAlign: 'center' }}>
-          <div className="reveal">
-            <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>Ready to Apply?</h2>
-            <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Link to="/programmes-fee-structure" className="btn btn-accent">View Fee Structure</Link>
-              <Link to="/result-analysis" className="btn btn-secondary">Results Analysis</Link>
-              <Link to="/admissions" className="btn btn-secondary">Admissions Home</Link>
-            </div>
+      <section className="ap-cta">
+        <div className="container ap-cta__inner reveal">
+          <h2 className="ap-cta__title">Ready to apply?</h2>
+          <p className="ap-cta__text">
+            Check the fee structure and recent results, or go back to the admissions overview.
+          </p>
+          <div className="ap-cta__actions">
+            <Link to="/programmes-fee-structure" className="btn btn-accent">View fee structure</Link>
+            <Link to="/result-analysis" className="btn btn-secondary">Results analysis</Link>
+            <Link to="/admissions" className="btn btn-secondary">Admissions home</Link>
           </div>
         </div>
       </section>

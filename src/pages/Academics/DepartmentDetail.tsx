@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useLocation, Navigate } from 'react-router-dom';
-import { Check, Microscope, Sparkles, FileText, ArrowLeft, ArrowRight, BookOpen, GraduationCap, Award, Calendar, Users } from 'lucide-react';
+import { Check, Microscope, Sparkles, FileText, ArrowLeft, ArrowRight, BookOpen, GraduationCap, Award, Calendar, Users, Hash } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import ProgrammeStructure from '../../components/ProgrammeStructure/ProgrammeStructure';
@@ -615,13 +615,36 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
 
         const hasHodCard = !!shared.hod && shared.hod.trim() !== '—';
 
-        const visibleCount = [hasEstCard, hasAccCard, hasIntakeCard, hasHodCard].filter(Boolean).length;
-        if (visibleCount === 0) return null;
+        // AP EAPCET College Code — always shown (useEapcetCode() falls back to
+        // "VISW, VISWPU" even with no admin override), first in the grid so
+        // every department page surfaces it immediately below the hero
+        // instead of only in the "Apply Today" CTA text at the page bottom.
+        const visibleCount = [true, hasEstCard, hasAccCard, hasIntakeCard, hasHodCard].filter(Boolean).length;
 
         return (
           <section className="dept-facts-section" aria-label={`${deptName} key facts`}>
             <div className="container">
               <div className={`dept-facts-grid cols-${visibleCount}`}>
+                {/* 0. AP EAPCET College Code — always shown, first card */}
+                <div className="dept-fact-card is-eapcet-card">
+                  <div className="dept-fact-header">
+                    <div className="dept-fact-icon-badge">
+                      <Hash size={14} strokeWidth={2.4} />
+                    </div>
+                    <span className="dept-fact-col-title">AP EAPCET Code</span>
+                  </div>
+                  <div className="dept-fact-items-window">
+                    <div className="dept-fact-static-list">
+                      <Link to="/admissions" className="dept-fact-chip-link" aria-label="View AP EAPCET college codes and admissions details">
+                        <div className="dept-fact-chip-entry">
+                          <span className="dept-fact-chip-sub">College Code</span>
+                          <span className="dept-fact-chip-val">{eapcetCode}</span>
+                        </div>
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+
                 {/* 1. Established */}
                 {hasEstCard && (
                   <div className="dept-fact-card">
@@ -1921,15 +1944,15 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
       {/* CTA */}
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-14) 0' }}>
         <div className="container" style={{ textAlign: 'center' }}>
-          <span className="section-label dept-section-label" style={{ color: 'var(--color-accent)' }}>Apply Today</span>
           <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>Begin Your Journey in {deptName}</h2>
           <p style={{ color: 'rgba(255,255,255,0.8)', maxWidth: 500, margin: '0 auto var(--space-8)', lineHeight: 1.7 }}>
-            Join a thriving academic community. Apply through AP EAPCET (Code: {eapcetCode}), explore our fee structure, or schedule a campus visit today.
+            Join a thriving academic community. Apply through AP EAPCET (Code: {eapcetCode}), explore our fee structure, or schedule a campus visit.
           </p>
           <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link to="/admissions" className="btn btn-accent btn-lg">Apply via AP EAPCET</Link>
+            <Link to="/admissions" className="btn btn-secondary btn-lg">For Admissions</Link>
             <Link to="/programmes-fee-structure" className="btn btn-secondary btn-lg">Fee Structure</Link>
             <Link to="/academics" className="btn btn-secondary btn-lg">All Programmes</Link>
+            <Link to="/campus-visit" className="btn btn-secondary btn-lg">Book a Campus Visit</Link>
           </div>
         </div>
       </section>

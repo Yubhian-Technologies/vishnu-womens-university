@@ -3,14 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import { usePageBanners } from '../../hooks/usePageBanners';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
+import { HERO_VIDEO_SRC } from '../../lib/heroVideo';
 import './HeroSlider.css';
 
-// Hosted on Firebase Storage (was public/VWU CAMPUS-BVRM.mp4, ~64MB) so the
-// large file no longer ships in the deploy or enters Vite's module graph.
-// Still a heavy download — re-encoding to a lower bitrate (ffmpeg/HandBrake)
-// helps more than anything here — but the fetch is deferred (see the effect
-// below) so it doesn't compete with the JS bundle during initial page load.
-const HERO_VIDEO_SRC = 'https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/VWU%20CAMPUS-BVRM.mp4?alt=media&token=75975cc3-19a1-4c53-8ca1-e9cb47a1545e';
+// HERO_VIDEO_SRC lives in src/lib/heroVideo.ts so the Campus Visit page's
+// virtual tour can reuse the same source. The fetch is still deferred (see
+// the effect below) so it doesn't compete with the JS bundle on load.
 
 
 interface Slide {

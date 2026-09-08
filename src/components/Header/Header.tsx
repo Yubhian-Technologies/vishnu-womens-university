@@ -121,7 +121,7 @@ const navItemsData: NavItem[] = [
           { label: 'Examinations Portal', path: 'https://www.svecwexams.in/', external: true },
         ],
       },
-      { groupLabel: 'Departments', groupPath: '/academics/departments', items: [] },
+      { groupLabel: 'Departments / Courses', groupPath: '/academics/departments', items: [] },
       {
         groupLabel: 'Information',
         groupPath: '/information',
@@ -464,7 +464,7 @@ export default function Header() {
     }
     if (item.label === 'Academics' && item.groups) {
       const groups = item.groups.map((group) => {
-        if (group.groupLabel === 'Departments') return { ...group, items: ugProgrammes };
+        if (group.groupLabel === 'Departments / Courses') return { ...group, items: ugProgrammes };
         return group;
       });
       return { ...item, groups };

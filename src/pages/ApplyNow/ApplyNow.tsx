@@ -28,7 +28,7 @@ const PROGRAMMES_DATA = [
   {
     key: 'pg',
     count: '4',
-    fullForm: 'Postgraduate (M.Tech)',
+    fullForm: 'Postgraduate (M.Tech.)',
     icon: Cpu,
   },
   {
@@ -51,7 +51,7 @@ export default function ApplyNow() {
     <main className="apply-now-page">
       <SEO
         title="Apply Now | Vishnu Women's University"
-        description="Apply to Vishnu Women's University — quality education, modern infrastructure, experienced faculty, and research opportunities across 10 UG, 1 MBA, 4 M.Tech, and 3 Research programmes."
+        description="Apply to Vishnu Women's University — quality education, modern infrastructure, experienced faculty, and research opportunities across 10 UG, 1 MBA, 4 M.Tech., and 3 Research programmes."
         canonicalPath="/apply-now"
       />
 

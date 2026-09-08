@@ -302,7 +302,7 @@
 
   .hero-search-submit {
     padding: 0.48rem 0.95rem;
-    font-size: 0.78rem;
+    font-size: 0.86rem;
   }
 
   .hero-tag-words {
@@ -314,12 +314,12 @@
 
 @media (max-width: 360px) {
   .hero-center-tagline {
-    font-size: 0.72rem;
+    font-size: 0.8rem;
     height: 1.8rem;
   }
 
   .hero-tag-words {
-    font-size: 0.72rem;
+    font-size: 0.8rem;
     gap: 0.32rem;
   }
 }

@@ -488,7 +488,7 @@
   padding: 0 0.35rem;
   border-radius: var(--radius-full);
   background: rgba(0, 0, 0, 0.06);
-  font-size: 0.7rem;
+  font-size: 0.78rem;
   font-weight: 800;
 }
 
@@ -691,7 +691,7 @@
   border-radius: 50%;
   background: var(--color-off-white);
   color: var(--color-primary);
-  font-size: 0.65rem;
+  font-size: 0.73rem;
   font-weight: 800;
   flex-shrink: 0;
 }
@@ -1390,7 +1390,7 @@ td.pb-activities-num {
 #placements .dept-stat-tile__label,
 .dept-detail-page .dept-stat-tile__label {
   font-family: var(--font-sans);
-  font-size: 0.60rem !important;
+  font-size: 0.68rem !important;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -1429,7 +1429,7 @@ td.pb-activities-num {
 }
 
 .dept-stat-grid--compact .dept-stat-tile__label {
-  font-size: 0.60rem !important;
+  font-size: 0.68rem !important;
   max-width: 100%;
   text-align: center;
   margin-top: 0;
@@ -1537,7 +1537,7 @@ td.pb-activities-num {
   .dept-stat-tile__label,
   #placements .dept-stat-tile__label,
   .dept-detail-page .dept-stat-tile__label {
-    font-size: 0.58rem !important;
+    font-size: 0.66rem !important;
     letter-spacing: 0.02em !important;
   }
 }
@@ -1745,6 +1745,10 @@ td.pb-activities-num {
   grid-template-columns: 1fr;
 }
 
+.dept-facts-grid.cols-5 {
+  grid-template-columns: repeat(5, 1fr);
+}
+
 .dept-fact-card {
   background: #13274D;
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -1764,7 +1768,8 @@ td.pb-activities-num {
   box-shadow: 0 14px 36px rgba(0, 0, 0, 0.4);
 }
 
-.dept-fact-card.is-hod-card {
+.dept-fact-card.is-hod-card,
+.dept-fact-card.is-eapcet-card {
   background: #172D57;
   border-color: rgba(201, 151, 58, 0.4);
 }
@@ -1792,7 +1797,7 @@ td.pb-activities-num {
 
 .dept-fact-col-title {
   font-family: var(--font-sans);
-  font-size: 0.72rem;
+  font-size: 0.8rem;
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -1805,7 +1810,7 @@ td.pb-activities-num {
 
 .dept-fact-count-badge {
   font-family: var(--font-sans);
-  font-size: 0.65rem;
+  font-size: 0.73rem;
   font-weight: 800;
   background: rgba(201, 151, 58, 0.2);
   color: #FFD028;
@@ -1893,7 +1898,7 @@ td.pb-activities-num {
 }
 
 .dept-fact-chip-sub {
-  font-size: 0.64rem;
+  font-size: 0.72rem;
   font-weight: 700;
   color: rgba(255, 255, 255, 0.55);
   text-transform: uppercase;
@@ -1921,7 +1926,7 @@ td.pb-activities-num {
 
 .dept-fact-chip-sub {
   font-family: var(--font-sans);
-  font-size: 0.62rem;
+  font-size: 0.7rem;
   font-weight: 700;
   color: rgba(255, 255, 255, 0.65);
   text-transform: uppercase;
@@ -1945,18 +1950,21 @@ td.pb-activities-num {
   text-overflow: ellipsis;
 }
 
-.dept-fact-card.is-hod-card .dept-fact-chip-val {
+.dept-fact-card.is-hod-card .dept-fact-chip-val,
+.dept-fact-card.is-eapcet-card .dept-fact-chip-val {
   color: var(--color-accent);
 }
 
 @media (max-width: 1024px) {
-  .dept-facts-grid {
+  .dept-facts-grid,
+  .dept-facts-grid.cols-5 {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 600px) {
-  .dept-facts-grid {
+  .dept-facts-grid,
+  .dept-facts-grid.cols-5 {
     grid-template-columns: 1fr;
   }
   .dept-fact-card {
@@ -2004,7 +2012,7 @@ td.pb-activities-num {
   align-items: center;
   gap: 0.35rem;
   font-family: var(--font-sans);
-  font-size: 0.68rem;
+  font-size: 0.76rem;
   font-weight: 800;
   color: var(--color-accent);
   text-transform: uppercase;
@@ -2023,7 +2031,7 @@ td.pb-activities-num {
   border-radius: 9999px;
   color: rgba(255, 255, 255, 0.92);
   font-family: var(--font-sans);
-  font-size: 0.74rem;
+  font-size: 0.82rem;
   font-weight: 700;
   text-decoration: none;
   white-space: nowrap;
@@ -2102,7 +2110,7 @@ td.pb-activities-num {
 
 .dept-about-stat-label {
   font-family: var(--font-sans);
-  font-size: 0.7rem;
+  font-size: 0.78rem;
   font-weight: 700;
   color: var(--color-text-light);
   text-transform: uppercase;
@@ -2214,7 +2222,7 @@ td.pb-activities-num {
 
 .dept-quick-nav-subtitle {
   font-family: var(--font-sans);
-  font-size: 0.65rem;
+  font-size: 0.73rem;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.55);
   letter-spacing: 0.04em;
@@ -2400,7 +2408,7 @@ td.pb-activities-num {
   border-radius: 9999px;
   color: rgba(255, 255, 255, 0.75);
   font-family: var(--font-sans);
-  font-size: 0.78rem;
+  font-size: 0.86rem;
   font-weight: 600;
   text-decoration: none;
   transition: all 140ms ease;
@@ -2451,7 +2459,7 @@ td.pb-activities-num {
   border: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 12%, transparent);
   border-radius: 9999px;
   font-family: var(--font-sans);
-  font-size: 0.76rem;
+  font-size: 0.84rem;
   font-weight: 800;
   color: var(--color-primary-dark);
   text-transform: uppercase;
@@ -2578,7 +2586,7 @@ td.pb-activities-num {
 .dept-lab-overline {
   display: block;
   font-family: var(--font-sans);
-  font-size: 0.65rem;
+  font-size: 0.73rem;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -2633,7 +2641,7 @@ td.pb-activities-num {
   border-radius: 9999px;
   color: var(--color-primary-dark);
   font-family: var(--font-sans);
-  font-size: 0.78rem;
+  font-size: 0.86rem;
   font-weight: 700;
   letter-spacing: 0.02em;
   text-decoration: none;
@@ -2661,7 +2669,7 @@ td.pb-activities-num {
   align-items: center;
   gap: 0.45rem;
   font-family: var(--font-sans);
-  font-size: 0.74rem;
+  font-size: 0.82rem;
   font-weight: 700;
   color: #64748b;
   letter-spacing: 0.02em;
@@ -2906,7 +2914,7 @@ td.pb-activities-num {
   align-items: center;
   gap: 0.35rem;
   font-family: var(--font-sans);
-  font-size: 0.72rem;
+  font-size: 0.8rem;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -3138,7 +3146,7 @@ td.pb-activities-num {
 
 .dept-library-incharge-label {
   font-family: var(--font-sans);
-  font-size: 0.74rem;
+  font-size: 0.82rem;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -3236,7 +3244,7 @@ td.pb-activities-num {
 
 .dept-library-num-badge {
   font-family: var(--font-serif, Georgia, serif);
-  font-size: 0.76rem;
+  font-size: 0.84rem;
   font-weight: 800;
   color: var(--color-accent);
   background: color-mix(in srgb, var(--color-accent, #c9a84c) 12%, transparent);
@@ -3365,7 +3373,7 @@ td.pb-activities-num {
 
 .dept-news-count-badge {
   font-family: var(--font-sans);
-  font-size: 0.76rem;
+  font-size: 0.84rem;
   font-weight: 800;
   color: var(--color-accent);
   background: color-mix(in srgb, var(--color-accent, #c9a84c) 12%, transparent);
@@ -3444,7 +3452,7 @@ td.pb-activities-num {
   }
 
   .dept-news-count-badge {
-    font-size: 0.7rem;
+    font-size: 0.78rem;
     padding: 0.15rem 0.5rem;
   }
 
@@ -3759,7 +3767,7 @@ td.pb-activities-num {
 
 .dept-profile-card-role {
   font-family: var(--font-sans);
-  font-size: 0.78rem;
+  font-size: 0.86rem;
   color: rgba(255, 255, 255, 0.6);
   margin: 0 0 0.75rem 0;
   overflow: hidden;
@@ -3967,7 +3975,7 @@ td.pb-activities-num {
 
 .dept-lab-slide-number {
   font-family: var(--font-sans);
-  font-size: 0.78rem;
+  font-size: 0.86rem;
   font-weight: 800;
   letter-spacing: 0.08em;
   color: #c9973a;
@@ -4321,7 +4329,7 @@ td.pb-activities-num {
   color: #856404;
   border: 1px solid color-mix(in srgb, var(--color-accent, #c9a84c) 30%, transparent);
   font-family: var(--font-sans);
-  font-size: 0.78rem;
+  font-size: 0.86rem;
   font-weight: 800;
   border-radius: 9999px;
   letter-spacing: 0.02em;
@@ -4402,7 +4410,7 @@ td.pb-activities-num {
   color: var(--color-primary, #1b4332);
   border: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 20%, transparent);
   border-radius: 9999px;
-  font-size: 0.78rem;
+  font-size: 0.86rem;
   font-weight: 700;
   text-decoration: none;
   transition: all 160ms ease;
@@ -4445,7 +4453,7 @@ td.pb-activities-num {
   }
 
   .news-events-sno-pill {
-    font-size: 0.75rem;
+    font-size: 0.83rem;
     font-weight: 800;
     color: var(--color-primary, #1b4332);
     background: #ffffff;
@@ -4458,7 +4466,7 @@ td.pb-activities-num {
     display: inline-flex;
     align-items: center;
     gap: 0.3rem;
-    font-size: 0.75rem;
+    font-size: 0.83rem;
     font-weight: 700;
     color: #64748b;
   }
@@ -4550,7 +4558,7 @@ td.pb-activities-num {
 
 .dept-rnd-project-field-label {
   font-family: var(--font-sans);
-  font-size: 0.7rem;
+  font-size: 0.78rem;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -4697,17 +4705,11 @@ td.pb-activities-num {
    ========================================================================== */
 .dept-horizontal-quicknav-section {
   position: sticky;
-  top: 90px;
+  top: calc(var(--topbar-height, 0px) + var(--header-height, 70px));
   z-index: 950;
   margin: 0.35rem 0 1.25rem 0;
   padding: 0.25rem 0;
   pointer-events: auto;
-}
-
-@media (min-width: 1440px) {
-  .dept-horizontal-quicknav-section {
-    top: 90px;
-  }
 }
 
 .dept-horizontal-quicknav-container {
@@ -4823,7 +4825,7 @@ td.pb-activities-num {
 }
 
 .dept-compact-cat-badge {
-  font-size: 0.72rem;
+  font-size: 0.8rem;
   font-weight: 800;
   padding: 0.25rem 0.7rem;
   border-radius: 9999px;
@@ -4857,7 +4859,7 @@ td.pb-activities-num {
 }
 
 .dept-compact-chip {
-  font-size: 0.7rem;
+  font-size: 0.78rem;
   font-weight: 700;
   background: var(--color-off-white, #f8fafc);
   border: 1px solid var(--color-light-gray, #e2e8f0);

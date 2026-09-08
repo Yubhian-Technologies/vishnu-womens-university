@@ -4,6 +4,7 @@ export interface AdmissionCategory {
   examName: string;
   description: string;
   eligibility?: string;
+  eligibilityMoreUrl?: string;
   steps: string[];
   codes?: { code: string; label: string }[];
 }
@@ -23,7 +24,7 @@ const CATEGORY_B_FOOTNOTE =
 export const admissionTabs: AdmissionTab[] = [
   {
     key: 'btech-regular',
-    label: 'B.Tech Regular',
+    label: 'B.Tech. — Regular (after 10+2 MPC)',
     heading: 'B.Tech. — Regular',
     intro:
       "Vishnu Women's University offers admission to B.Tech. programmes through Category A and Category B, providing eligible students with multiple pathways to begin their engineering education. Students who have completed 10+2 with MPC (Mathematics, Physics and Chemistry) and fulfil the prescribed eligibility criteria may seek admission through either of the applicable pathways.",
@@ -36,6 +37,8 @@ export const admissionTabs: AdmissionTab[] = [
           'Eligible students can seek admission through AP EAPCET 2027 and participate in the applicable counselling and seat-allotment process.',
         eligibility:
           'Students who have completed 10+2 with MPC, subject to the prescribed programme-specific eligibility requirements.',
+        eligibilityMoreUrl:
+          'https://cets.apsche.ap.gov.in/EAPCET/PDF/APEAPCET2026_Instruction_Booklet_Engineering_V4.pdf',
         steps: ['AP EAPCET 2027', 'Counselling', 'Web Options', 'Seat Allotment', 'Admission'],
         codes: [
           { code: 'VISW', label: "Vishnu Women's University" },
@@ -54,7 +57,7 @@ export const admissionTabs: AdmissionTab[] = [
   },
   {
     key: 'btech-lateral',
-    label: 'B.Tech Lateral Entry',
+    label: 'B.Tech. — LE (after Diploma)',
     heading: 'B.Tech. Lateral Entry',
     intro:
       'Students who have successfully completed a Diploma in Engineering/Technology and meet the prescribed eligibility requirements may seek lateral entry directly into the second year of the B.Tech. programme.',
@@ -65,13 +68,14 @@ export const admissionTabs: AdmissionTab[] = [
         examName: 'AP ECET 2027',
         description: 'Lateral Entry admissions are made through Category A only.',
         eligibility: 'Diploma holders in Engineering/Technology, subject to the prescribed eligibility requirements.',
+        eligibilityMoreUrl: 'https://cets.apsche.ap.gov.in/ECET/',
         steps: ['AP ECET 2027', 'Counselling', 'Web Options', 'Seat Allotment', 'Admission'],
       },
     ],
   },
   {
     key: 'mtech',
-    label: 'M.Tech (PG)',
+    label: 'M.Tech. (after UG)',
     heading: 'M.Tech. (PG)',
     intro:
       "Vishnu Women's University offers M.Tech. programmes for graduates seeking advanced knowledge, specialised expertise and opportunities for professional and research-oriented growth. Eligible candidates can seek admission through Category A or Category B.",
@@ -96,7 +100,7 @@ export const admissionTabs: AdmissionTab[] = [
   },
   {
     key: 'mba',
-    label: 'MBA (PG)',
+    label: 'MBA (after UG)',
     heading: 'MBA (PG)',
     intro:
       "The MBA programme at Vishnu Women's University offers Category A and Category B pathways for eligible graduates seeking to develop advanced capabilities in management, leadership, strategy and entrepreneurship.",

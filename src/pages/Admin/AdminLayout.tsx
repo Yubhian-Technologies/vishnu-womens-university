@@ -37,7 +37,7 @@ export const SECTIONS: { id: string; icon: IconDefinition; label: string }[] = [
   { id: 'core-executives', icon: faUserTie, label: 'Core Executives' },
   { id: 'placements',     icon: faBriefcase, label: 'Placement Year Data' },
   { id: 'placement-highlights', icon: faMedal, label: 'Home — Placement Highlights' },
-  { id: 'honoured-guests', icon: faAward, label: 'Home — Honoured Guests' },
+  { id: 'honoured-guests', icon: faAward, label: 'Home — Eminent Personalities' },
   { id: 'alumni',         icon: faUserGraduate, label: 'Alumni & Giving' },
   { id: 'announcements',  icon: faBullhorn, label: 'Announcements' },
   { id: 'information',    icon: faCircleInfo, label: 'Information Page' },
