@@ -22,8 +22,9 @@ import type { ContentBlockDoc } from '../Admin/sections/ContentBlocksAdmin';
 
 import SEO from '../../components/SEO/SEO';
 import UpcomingEvents from '../../components/UpcomingEvents/UpcomingEvents';
-import SmartInfrastructureShowcase from '../../components/SmartInfrastructureShowcase/SmartInfrastructureShowcase';
 import PlacementMetricsSection from '../../components/PlacementMetricsSection/PlacementMetricsSection';
+// Recent Placement Highlights — temporarily disabled, see usage below.
+// import PlacementSpotlightsSection from '../../components/PlacementSpotlights/PlacementSpotlightsSection';
 import HonouredGuestsSection from '../../components/HonouredGuests/HonouredGuestsSection';
 import { getUniversitySchema } from '../../lib/seo/schemas';
 import './Home.css';
@@ -236,8 +237,12 @@ export default function Home() {
           <div className="activity-section-header reveal">
             <div className="activity-section-titlebar">
               <div className="activity-section-meta">
+                <p className="activity-section-eyebrow">Campus Life</p>
                 <h2 className="section-title">Recent Campus Activities</h2>
               </div>
+              <p className="activity-section-desc">
+                A rolling glimpse of the events, celebrations, and everyday moments that shape life at VWU.
+              </p>
             </div>
             <Link to="/news-awards/gallery" className="btn btn-outline reveal-right">View Gallery →</Link>
           </div>
@@ -269,8 +274,9 @@ export default function Home() {
       </section>
 
       {/* ── Chapter 5: Smart Infrastructure & Innovation Ecosystem ── */}
-      <SmartInfrastructureShowcase />
       <PlacementMetricsSection />
+      {/* Recent Placement Highlights — commented out, uncomment (and the import above) to restore.
+      <PlacementSpotlightsSection /> */}
       <RecruitersSection />
       <CampusLifeShowcase />
       <HonouredGuestsSection />

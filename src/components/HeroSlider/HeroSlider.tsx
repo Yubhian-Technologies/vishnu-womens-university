@@ -10,7 +10,7 @@ import './HeroSlider.css';
 // Still a heavy download — re-encoding to a lower bitrate (ffmpeg/HandBrake)
 // helps more than anything here — but the fetch is deferred (see the effect
 // below) so it doesn't compete with the JS bundle during initial page load.
-const HERO_VIDEO_SRC = 'https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/VWU%20CAMPUS-BVRM.mp4?alt=media&token=75975cc3-19a1-4c53-8ca1-e9cb47a1545e';
+const HERO_VIDEO_SRC = 'https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/VWU%20CAMPUS%20VIEW.mp4?alt=media&token=d9e236eb-d921-4379-a30e-1fc019a44e0b';
 
 
 interface Slide {

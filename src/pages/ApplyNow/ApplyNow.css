@@ -121,7 +121,7 @@
 }
 
 .apply-now-stat-hint {
-  font-size: 0.75rem;
+  font-size: 0.83rem;
   color: var(--color-accent);
   font-weight: 600;
 }
@@ -193,7 +193,7 @@
 }
 
 .apply-now-card-unit {
-  font-size: 0.72rem;
+  font-size: 0.8rem;
   font-weight: 700;
   color: rgba(255, 255, 255, 0.75);
   text-transform: uppercase;

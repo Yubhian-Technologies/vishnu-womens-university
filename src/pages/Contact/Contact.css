@@ -239,7 +239,7 @@
 }
 
 .contact-card-clean__badge {
-  font-size: 0.7rem;
+  font-size: 0.78rem;
   font-weight: 700;
   color: #1b4332;
   background: #d8f3dc;
@@ -300,7 +300,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.75rem;
+  font-size: 0.83rem;
   font-weight: 600;
   color: #2d6a4f;
 }
@@ -381,7 +381,7 @@
 }
 
 .emergency-pill__label {
-  font-size: 0.68rem;
+  font-size: 0.76rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -401,6 +401,67 @@
 
 .contact-main-section {
   padding: 4rem 0;
+}
+
+/* Split sections for Location / How to Reach */
+.contact-location-section {
+  padding: 4rem 0;
+}
+
+.contact-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+@media (max-width: 992px) {
+  .contact-split {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Send Us a Message — centred card */
+.contact-form-wrap {
+  max-width: 1120px;
+  margin: 0 auto;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: var(--radius-lg, 14px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(0, 42%) 1fr;
+  align-items: stretch;
+}
+
+/* Left image column — fills its cell and matches the form column's height. */
+.contact-form-media {
+  position: relative;
+  min-height: 100%;
+  background: var(--color-primary-dark);
+}
+
+.contact-form-media img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.contact-form-body {
+  padding: 2rem;
+}
+
+@media (max-width: 860px) {
+  .contact-form-wrap {
+    grid-template-columns: 1fr;
+  }
+  .contact-form-media {
+    min-height: 200px;
+  }
 }
 
 .contact-grid-2col {
@@ -468,7 +529,7 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-size: 0.75rem;
+  font-size: 0.83rem;
   font-weight: 700;
   color: var(--color-primary);
   text-decoration: none;
@@ -635,7 +696,7 @@
 }
 
 .form-label-clean {
-  font-size: 0.78rem;
+  font-size: 0.86rem;
   font-weight: 700;
   color: var(--color-primary-dark);
   text-transform: uppercase;
@@ -670,7 +731,7 @@
 }
 
 .form-error-text {
-  font-size: 0.72rem;
+  font-size: 0.8rem;
   color: #ef4444;
   font-weight: 600;
 }
@@ -723,7 +784,7 @@
 
 .clean-btn--sm {
   padding: 6px 14px;
-  font-size: 0.78rem;
+  font-size: 0.86rem;
   background: color-mix(in srgb, var(--color-primary) 8%, transparent);
   color: var(--color-primary);
 }
@@ -734,7 +795,7 @@
   color: #991b1b;
   padding: 10px 14px;
   border-radius: 8px;
-  font-size: 0.78rem;
+  font-size: 0.86rem;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -744,7 +805,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.72rem;
+  font-size: 0.8rem;
   color: var(--color-text-light);
   margin-top: 4px;
 }
@@ -920,7 +981,7 @@
 }
 
 .dept-card-clean__hod {
-  font-size: 0.75rem;
+  font-size: 0.83rem;
   color: var(--color-text-light);
   margin: 0;
 }
@@ -938,7 +999,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.75rem;
+  font-size: 0.83rem;
   font-weight: 600;
   color: var(--color-primary);
   text-decoration: none;
@@ -964,4 +1025,59 @@
 .dept-empty-state svg {
   margin-bottom: 10px;
   opacity: 0.5;
+}
+
+/* ==========================================================================
+   6. Mobile Responsive Polish
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  .contact-info-section,
+  .contact-location-section,
+  .contact-main-section {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
+
+  .contact-dept-section {
+    padding-top: 3rem;
+    padding-bottom: 3.5rem;
+  }
+
+  .contact-split {
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Map header wraps so the address/link never collide or overflow */
+  .contact-map-header {
+    flex-wrap: wrap;
+  }
+
+  .contact-map-info {
+    flex-wrap: wrap;
+  }
+
+  .transit-tabs {
+    flex-wrap: wrap;
+  }
+
+  .contact-form-body {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .contact-form-media {
+    min-height: 160px;
+  }
+
+  .emergency-box__numbers {
+    width: 100%;
+  }
+
+  .emergency-pill {
+    flex: 1 1 100%;
+    align-items: center;
+    text-align: center;
+  }
 }

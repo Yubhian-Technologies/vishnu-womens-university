@@ -2,6 +2,7 @@ import { useEffect, type CSSProperties } from 'react';
 import PageHero from '../../components/PageHero/PageHero';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { resolveContentIcon } from '../../lib/contentIcons';
+import { dotTech } from '../../lib/academicDegreeNames';
 import { Trophy } from 'lucide-react';
 
 const batchPassRates: { batch: string; passPercent: number }[] = [
@@ -205,8 +206,8 @@ export default function ResultAnalysis() {
                   onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.12)'; }}
                 >
                   <div style={{ marginBottom: 'var(--space-3)', color: 'var(--color-white)' }}><Icon size={32} strokeWidth={1.75} /></div>
-                  <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 900, color: 'var(--color-accent)', marginBottom: 'var(--space-2)' }}>{f.title}</h3>
-                  <p style={{ fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.75)', lineHeight: 1.6 }}>{f.desc}</p>
+                  <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 900, color: 'var(--color-accent)', marginBottom: 'var(--space-2)' }}>{dotTech(f.title)}</h3>
+                  <p style={{ fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.75)', lineHeight: 1.6 }}>{dotTech(f.desc)}</p>
                 </div>
               );
             })}

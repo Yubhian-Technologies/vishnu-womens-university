@@ -18,7 +18,7 @@
 .admin-page-selector { margin-bottom: 0.25rem; }
 
 .admin-page-selector__label {
-  font-size: 0.78rem;
+  font-size: 0.86rem;
   font-weight: 700;
   color: #374151;
   text-transform: uppercase;
@@ -27,7 +27,7 @@
 }
 
 .admin-page-selector__group-label {
-  font-size: 0.72rem;
+  font-size: 0.8rem;
   font-weight: 700;
   color: #9ca3af;
   text-transform: uppercase;
@@ -215,7 +215,7 @@
 .admin-sidebar__group-label {
   padding: 0.4rem 1.2rem 0.3rem;
   margin: 0;
-  font-size: 0.68rem;
+  font-size: 0.76rem;
   font-weight: 700;
   letter-spacing: 0.07em;
   text-transform: uppercase;
@@ -287,13 +287,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.75rem;
+  font-size: 0.83rem;
   font-weight: 800;
 }
 
 .admin-sidebar__account-text { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; }
-.admin-sidebar__account-email { font-size: 0.78rem; font-weight: 600; max-width: 150px; overflow: hidden; text-overflow: ellipsis; }
-.admin-sidebar__account-dept { font-size: 0.7rem; color: rgba(255,255,255,0.5); }
+.admin-sidebar__account-email { font-size: 0.86rem; font-weight: 600; max-width: 150px; overflow: hidden; text-overflow: ellipsis; }
+.admin-sidebar__account-dept { font-size: 0.78rem; color: rgba(255,255,255,0.5); }
 
 .admin-sidebar__account-menu {
   position: absolute;
@@ -424,7 +424,7 @@
 .admin-field__hint { color: #9ca3af; font-size: 0.82rem; margin: -0.15rem 0 0.15rem; }
 
 .admin-field label {
-  font-size: 0.78rem;
+  font-size: 0.86rem;
   font-weight: 700;
   color: #374151;
   text-transform: uppercase;
@@ -491,7 +491,7 @@
 .admin-btn--primary { background: #081c15; color: #fff; }
 .admin-btn--ghost { background: #f3f4f6; color: #374151; border: 1.5px solid #d1d5db; }
 .admin-btn--danger { background: #fee2e2; color: #dc2626; }
-.admin-btn--sm { padding: 0.35rem 0.9rem; font-size: 0.78rem; margin-right: 0.3rem; }
+.admin-btn--sm { padding: 0.35rem 0.9rem; font-size: 0.86rem; margin-right: 0.3rem; }
 
 /* ---- Tables ---- */
 .admin-table-wrap { overflow-x: auto; }
@@ -506,7 +506,7 @@
   background: #f8f9fb;
   padding: 0.7rem 0.85rem;
   text-align: left;
-  font-size: 0.75rem;
+  font-size: 0.83rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -618,7 +618,7 @@
   justify-content: center;
   background: #eef0f2;
   color: #9ca3af;
-  font-size: 0.78rem;
+  font-size: 0.86rem;
   font-weight: 600;
 }
 
@@ -716,7 +716,7 @@
   display: inline-block;
   padding: 0.2rem 0.55rem;
   border-radius: 4px;
-  font-size: 0.72rem;
+  font-size: 0.8rem;
   font-weight: 700;
   background: #dbeafe;
   color: #1e40af;
@@ -724,7 +724,7 @@
   letter-spacing: 0.04em;
 }
 
-.admin-badge--sm { font-size: 0.65rem; }
+.admin-badge--sm { font-size: 0.73rem; }
 .admin-badge--green { background: #dcfce7; color: #16a34a; }
 .admin-badge--gray { background: #f3f4f6; color: #6b7280; }
 .admin-badge--clickable { cursor: pointer; border: none; font-family: inherit; transition: opacity 0.15s; }
@@ -886,7 +886,7 @@
   font-size: 1.15rem;
 }
 .admin-stat-card__count { font-size: 1.5rem; font-weight: 800; color: #081c15; display: block; line-height: 1; }
-.admin-stat-card__label { font-size: 0.75rem; color: #6b7280; margin-top: 0.2rem; display: block; }
+.admin-stat-card__label { font-size: 0.83rem; color: #6b7280; margin-top: 0.2rem; display: block; }
 
 .admin-info-box {
   background: #eff6ff;
@@ -970,7 +970,7 @@
     background: none;
     border: none;
     color: rgba(255,255,255,0.6);
-    font-size: 0.6rem;
+    font-size: 0.68rem;
     cursor: pointer;
     transition: color 0.15s;
   }

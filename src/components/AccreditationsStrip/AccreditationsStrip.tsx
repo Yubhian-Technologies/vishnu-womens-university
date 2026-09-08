@@ -18,7 +18,9 @@ export default function AccreditationsStrip() {
     <section className="accreditations-strip" aria-label="Accreditations and Affiliations">
       <div className="container">
         <div className="accreditations-strip-header">
+          <span className="accreditations-strip-eyebrow">Academic Recognition</span>
           <h2 className="accreditations-strip-title">Accreditations &amp; Affiliations</h2>
+          <p className="accreditations-strip-subtitle">Recognized by leading academic and regulatory bodies in India.</p>
         </div>
 
         <div className="accreditations-strip-row">
@@ -28,6 +30,7 @@ export default function AccreditationsStrip() {
                 <img src={logo} alt={`${code} — ${title} logo`} loading="lazy" />
               </div>
               <span className="accreditations-strip-code">{code}</span>
+              <span className="accreditations-strip-rule" aria-hidden="true" />
               <span className="accreditations-strip-desc">{title}</span>
             </div>
           ))}

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
 import { useOrderedCollection } from '../../hooks/useCollection';
@@ -57,7 +57,6 @@ export default function Information() {
   const antiRaggingSafetyPhotos = useSitePhotos('information', 'anti-ragging-safety', defaultAntiRaggingSafetyPhotos);
   const hasAntiRaggingSafetyPhotos = useSectionHasPhotos('information', 'anti-ragging-safety');
   const ictPlatforms = useContentBlocks('information', 'ictPlatforms');
-  const counsellingScheme = useContentBlocks('information', 'counsellingScheme');
   const otherPractices = DEFAULT_OTHER_PRACTICES;
 
   useEffect(() => {
@@ -173,21 +172,39 @@ export default function Information() {
           {/* Counselling */}
           {activeTab === 'counselling' && (
             <div>
-              <h2 className="section-title" style={{ marginBottom: 'var(--space-6)' }}>Counselling Scheme</h2>
-              <ul style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', listStyle: 'none', padding: 0, margin: 0, maxWidth: 820 }}>
-                {counsellingScheme.length > 0 ? counsellingScheme.map((s) => (
-                  <li key={s.id} style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
-                    <span style={{ flexShrink: 0, width: 8, height: 8, borderRadius: '50% 50% 50% 0', background: 'var(--color-accent)', marginTop: '0.5em' }} />
-                    <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.7 }}>{s.desc || s.title}</p>
-                  </li>
-                )) : (
-                  <li style={{ textAlign: 'center', padding: 'var(--space-8) 1rem', color: 'var(--color-text-light)' }}>
-                    <p style={{ fontSize: 'var(--text-sm)' }}>The counselling scheme details haven&apos;t been published yet. Please contact the admissions office for assistance.</p>
-                  </li>
-                )}
-              </ul>
-              <div style={{ textAlign: 'center', marginTop: 'var(--space-8)' }}>
-                <Link to="/admissions" className="btn btn-primary btn-lg">Learn More About Admissions</Link>
+              <h2 className="section-title" style={{ marginBottom: 'var(--space-6)' }}>Student Counselling &amp; Mentoring</h2>
+
+              <div style={{ maxWidth: 820 }}>
+                <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.7, marginBottom: 'var(--space-6)' }}>
+                  At our University, every student is valued, heard, and supported. Our counselling and mentoring system is
+                  designed to provide personalised guidance and continuous care, helping students navigate their academic
+                  journey, personal challenges, and overall development with confidence.
+                </p>
+                <ul style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', listStyle: 'none', padding: 0, margin: '0 0 var(--space-6)' }}>
+                  {[
+                    ['Personalised Guidance', 'Each student is assigned a faculty counsellor who provides individual attention and guidance for academic, personal, and career-related concerns.'],
+                    ['A Trusted Faculty Connect', 'Faculty members serve as counsellors and mentors, creating a supportive environment where students can openly share their concerns without hesitation.'],
+                    ['Dedicated Student Support', 'Each counsellor mentors approximately 20 students, enabling meaningful interaction, regular follow-up, and close attention to individual needs.'],
+                    ['Holistic Well-being', "Counsellors listen to concerns that may affect a student's learning, well-being, relationships, or personal growth and help identify appropriate support."],
+                    ['A Safe Space to Be Heard', 'Students can discuss academic challenges, hostel or campus facilities, and other concerns directly with their counsellors.'],
+                    ['Responsive Resolution', 'Counsellors work closely with the Counselling Coordinator and concerned authorities to ensure that genuine concerns are addressed promptly and appropriate solutions are identified.'],
+                    ['Continuous Care', 'Counselling is not limited to scheduled meetings. Faculty mentors remain accessible to students whenever guidance, encouragement, or support is needed.'],
+                  ].map(([label, text]) => (
+                    <li key={label} style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
+                      <span style={{ flexShrink: 0, width: 8, height: 8, borderRadius: '50% 50% 50% 0', background: 'var(--color-accent)', marginTop: '0.5em' }} />
+                      <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.7 }}>
+                        <strong style={{ color: 'var(--color-primary)' }}>{label}:</strong> {text}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+                <p style={{ fontFamily: 'var(--font-serif)', fontSize: 'var(--text-xl)', color: 'var(--color-primary)', fontWeight: 700, margin: '0 0 var(--space-3)' }}>
+                  Every Student Matters. Every Concern Is Heard.
+                </p>
+                <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.7, margin: 0 }}>
+                  Our counselling system reflects our commitment to ensuring that no student feels alone in her journey and
+                  that every student receives the guidance, encouragement, and care needed to learn, grow, and succeed.
+                </p>
               </div>
             </div>
           )}

@@ -4,6 +4,7 @@ import type { ConfirmationResult } from 'firebase/auth';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { sendPhoneOtp, logoutFirebaseAuth } from '../../lib/firebaseAdmin';
+import { dotTech } from '../../lib/academicDegreeNames';
 import Toast from '../Toast/Toast';
 import './AdmissionApplyForm.css';
 
@@ -13,6 +14,28 @@ const PURPOSE_OPTIONS = [
   'Hostel & Campus Facilities',
   'Placement Information',
   'Other',
+];
+
+const HEAR_ABOUT_OPTIONS = [
+  'Search Engine (Google, Bing…)',
+  'Social Media (Instagram, Facebook, YouTube…)',
+  'Friend or Family',
+  'Current Student or Alumna',
+  'Newspaper / Advertisement',
+  'School / College Counsellor',
+  'Education Fair or Event',
+  'Other',
+];
+
+const INDIAN_STATES = [
+  'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa',
+  'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala',
+  'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland',
+  'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura',
+  'Uttar Pradesh', 'Uttarakhand', 'West Bengal',
+  'Andaman & Nicobar Islands', 'Chandigarh', 'Dadra & Nagar Haveli and Daman & Diu',
+  'Delhi (NCT)', 'Jammu & Kashmir', 'Ladakh', 'Lakshadweep', 'Puducherry',
+  'Outside India',
 ];
 
 const PROGRAM_LEVEL_OPTIONS = [
@@ -65,6 +88,9 @@ interface RequestInfoForm {
   firstName: string;
   lastName: string;
   phone: string;
+  email: string;
+  state: string;
+  hearAbout: string;
   degreeLevel: string;
   program: string;
   customProgram: string;
@@ -82,6 +108,9 @@ const INITIAL_REQUEST_FORM: RequestInfoForm = {
   firstName: '',
   lastName: '',
   phone: '',
+  email: '',
+  state: '',
+  hearAbout: '',
   degreeLevel: '',
   program: '',
   customProgram: '',
@@ -90,10 +119,17 @@ const INITIAL_REQUEST_FORM: RequestInfoForm = {
 };
 
 const PHONE_RE = /^[+]?[\d\s-]{7,15}$/;
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const RECAPTCHA_CONTAINER_ID = 'curious-form-recaptcha-container';
 
 function isCustomProgramRequired(form: RequestInfoForm): boolean {
   return form.degreeLevel === 'Other' || form.program.startsWith('Other');
+}
+
+// A generic "Other" enquiry isn't about a specific course, so the
+// course/program pickers are hidden and skipped in validation for it.
+function isCourseRelevant(form: RequestInfoForm): boolean {
+  return form.purpose !== 'Other';
 }
 
 function getSubmittedProgram(form: RequestInfoForm): string {
@@ -111,10 +147,16 @@ function validateRequestInfoForm(form: RequestInfoForm): RequestInfoFormErrors {
   if (!form.lastName.trim()) errors.lastName = 'Please enter your last name.';
   if (!form.phone.trim()) errors.phone = 'Please enter your mobile number.';
   else if (!PHONE_RE.test(form.phone.trim())) errors.phone = 'Please enter a valid mobile number.';
-  if (!form.degreeLevel) errors.degreeLevel = 'Please select a course.';
-  if (!form.program) errors.program = 'Please select a specific program.';
-  if (isCustomProgramRequired(form) && !form.customProgram.trim()) {
-    errors.customProgram = 'Please specify your program name.';
+  if (!form.email.trim()) errors.email = 'Please enter your email address.';
+  else if (!EMAIL_RE.test(form.email.trim())) errors.email = 'Please enter a valid email address.';
+  if (!form.state) errors.state = 'Please select your state.';
+  if (!form.hearAbout) errors.hearAbout = 'Please let us know how you heard about VWU.';
+  if (isCourseRelevant(form)) {
+    if (!form.degreeLevel) errors.degreeLevel = 'Please select a course.';
+    if (!form.program) errors.program = 'Please select a specific program.';
+    if (isCustomProgramRequired(form) && !form.customProgram.trim()) {
+      errors.customProgram = 'Please specify your program name.';
+    }
   }
   if (!form.purpose) errors.purpose = 'Please select a purpose.';
   else if (form.purpose === 'Other' && !form.purposeOther.trim()) errors.purposeOther = 'Please tell us your purpose.';
@@ -267,6 +309,9 @@ export default function AdmissionApplyForm() {
           last_name: requestForm.lastName,
           full_name: `${requestForm.firstName} ${requestForm.lastName}`.trim(),
           phone: requestForm.phone,
+          email: requestForm.email,
+          state: requestForm.state,
+          hear_about: requestForm.hearAbout,
           program: submittedProgram,
           purpose: submittedPurpose,
         };
@@ -338,6 +383,9 @@ export default function AdmissionApplyForm() {
           last_name: requestForm.lastName,
           full_name: `${requestForm.firstName} ${requestForm.lastName}`.trim(),
           phone: requestForm.phone,
+          email: requestForm.email,
+          state: requestForm.state,
+          hear_about: requestForm.hearAbout,
           program: submittedProgram,
           purpose: submittedPurpose,
         };
@@ -414,7 +462,27 @@ export default function AdmissionApplyForm() {
             <div className="adm-form-group">
               <label>Purpose</label>
               <select
-                name="purpose" value={requestForm.purpose} onChange={handleRequestFormChange}
+                name="purpose"
+                value={requestForm.purpose}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setRequestForm((prev) => ({
+                    ...prev,
+                    purpose: val,
+                    // A generic "Other" enquiry hides the course pickers —
+                    // clear any stale selection so it isn't submitted.
+                    ...(val === 'Other'
+                      ? { degreeLevel: '', program: '', customProgram: '' }
+                      : {}),
+                  }));
+                  setRequestErrors((prev) => ({
+                    ...prev,
+                    purpose: undefined,
+                    ...(val === 'Other'
+                      ? { degreeLevel: undefined, program: undefined, customProgram: undefined }
+                      : {}),
+                  }));
+                }}
                 className={requestErrors.purpose ? 'has-error' : undefined}
                 aria-invalid={!!requestErrors.purpose}
               >
@@ -425,6 +493,7 @@ export default function AdmissionApplyForm() {
             </div>
           </div>
 
+          {isCourseRelevant(requestForm) && (
           <div className="adm-form-row">
             <div className="adm-form-group">
               <label>Course</label>
@@ -450,7 +519,7 @@ export default function AdmissionApplyForm() {
                 <option value="">Select course...</option>
                 {PROGRAM_LEVEL_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value}>
-                    {opt.label}
+                    {dotTech(opt.label)}
                   </option>
                 ))}
               </select>
@@ -473,17 +542,58 @@ export default function AdmissionApplyForm() {
                 {requestForm.degreeLevel &&
                   (SPECIFIC_PROGRAMS[requestForm.degreeLevel] || []).map((p) => (
                     <option key={p} value={p}>
-                      {p}
+                      {dotTech(p)}
                     </option>
                   ))}
               </select>
               {requestErrors.program && <span className="adm-form-error">{requestErrors.program}</span>}
             </div>
           </div>
+          )}
+
+          <div className="adm-form-row">
+            <div className="adm-form-group">
+              <label>Email</label>
+              <input
+                type="email" name="email" placeholder="you@example.com" inputMode="email" autoComplete="email"
+                value={requestForm.email} onChange={handleRequestFormChange}
+                className={requestErrors.email ? 'has-error' : undefined}
+                aria-invalid={!!requestErrors.email}
+              />
+              {requestErrors.email && <span className="adm-form-error">{requestErrors.email}</span>}
+            </div>
+            <div className="adm-form-group">
+              <label>State</label>
+              <select
+                name="state" value={requestForm.state} onChange={handleRequestFormChange}
+                className={requestErrors.state ? 'has-error' : undefined}
+                aria-invalid={!!requestErrors.state}
+              >
+                <option value="">Select state...</option>
+                {INDIAN_STATES.map((s) => <option key={s}>{s}</option>)}
+              </select>
+              {requestErrors.state && <span className="adm-form-error">{requestErrors.state}</span>}
+            </div>
+          </div>
+
+          <div className="adm-form-row adm-form-row--full">
+            <div className="adm-form-group">
+              <label>How did you hear about VWU?</label>
+              <select
+                name="hearAbout" value={requestForm.hearAbout} onChange={handleRequestFormChange}
+                className={requestErrors.hearAbout ? 'has-error' : undefined}
+                aria-invalid={!!requestErrors.hearAbout}
+              >
+                <option value="">Select an option...</option>
+                {HEAR_ABOUT_OPTIONS.map((h) => <option key={h}>{h}</option>)}
+              </select>
+              {requestErrors.hearAbout && <span className="adm-form-error">{requestErrors.hearAbout}</span>}
+            </div>
+          </div>
 
           {(isCustomProgramRequired(requestForm) || requestForm.purpose === 'Other') && (
             <div className="adm-form-row adm-form-row--full">
-              {isCustomProgramRequired(requestForm) && (
+              {isCourseRelevant(requestForm) && isCustomProgramRequired(requestForm) && (
                 <div className="adm-form-group">
                   <label>Specify Program Name</label>
                   <input

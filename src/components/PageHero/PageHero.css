@@ -258,7 +258,7 @@
   bottom: 1.2rem;
   right: 1.5rem;
   z-index: 10;
-  font-size: 0.75rem;
+  font-size: 0.83rem;
   color: rgba(255, 255, 255, 0.75);
   font-weight: 700;
   letter-spacing: 0.05em;
@@ -285,7 +285,7 @@
 }
 
 .breadcrumb-item {
-  font-size: 0.78rem;
+  font-size: 0.86rem;
   color: rgba(255, 255, 255, 0.85);
   text-decoration: none;
   font-weight: 600;
@@ -294,7 +294,7 @@
 
 .breadcrumb-item.active { color: var(--color-accent, #C9973A); font-weight: 700; }
 .breadcrumb-item:not(.active):hover { color: #fff; }
-.breadcrumb-sep { color: rgba(255, 255, 255, 0.45); font-size: 0.75rem; }
+.breadcrumb-sep { color: rgba(255, 255, 255, 0.45); font-size: 0.83rem; }
 
 /* ---- Responsive Reflow ---- */
 @media (max-width: 992px) {

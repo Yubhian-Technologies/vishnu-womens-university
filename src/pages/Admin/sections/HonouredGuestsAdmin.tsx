@@ -49,7 +49,7 @@ export default function HonouredGuestsAdmin() {
   };
 
   const remove = async (id: string, storagePath?: string) => {
-    if (!confirm('Remove this honoured guest?')) return;
+    if (!confirm('Remove this personality?')) return;
     try {
       if (storagePath) await deleteFile(storagePath);
       await deleteDoc(doc(db, 'honouredGuests', id));
@@ -61,9 +61,9 @@ export default function HonouredGuestsAdmin() {
   return (
     <div className="admin-section">
       <div className="admin-card">
-        <h2 className="admin-card__title">{editing ? 'Edit Honoured Guest' : 'Add Honoured Guest'}</h2>
+        <h2 className="admin-card__title">{editing ? 'Edit Personality' : 'Add Personality'}</h2>
         <p className="admin-field__hint" style={{ marginBottom: '1rem' }}>
-          Shown in the "Honoured Guests at VWU" section on the Home page — photo, name, and role only.
+          Shown in the scrolling "Eminent Personalities at VWU" section on the Home page — photo, name, and role only.
         </p>
         <div className="admin-form-grid">
           <div className="admin-field" style={{ gridColumn: '1 / -1', maxWidth: 200 }}>
@@ -86,13 +86,13 @@ export default function HonouredGuestsAdmin() {
         <div className="admin-form-actions">
           {editing && <button className="admin-btn admin-btn--ghost" onClick={() => { setEditing(null); setForm(EMPTY); }}>Cancel</button>}
           <button className="admin-btn admin-btn--primary" onClick={save} disabled={saving}>
-            {saving ? 'Saving…' : editing ? 'Update' : 'Add Guest'}
+            {saving ? 'Saving…' : editing ? 'Update' : 'Add Personality'}
           </button>
         </div>
       </div>
 
       <div className="admin-card">
-        <h2 className="admin-card__title">Honoured Guests ({guests.length})</h2>
+        <h2 className="admin-card__title">Eminent Personalities ({guests.length})</h2>
         {loading ? <p className="admin-loading">Loading…</p> : (
           <div className="admin-table-wrap">
             <table className="admin-table">
@@ -110,7 +110,7 @@ export default function HonouredGuestsAdmin() {
                     </td>
                   </tr>
                 ))}
-                {guests.length === 0 && <tr><td colSpan={5} className="admin-empty">No honoured guests yet — add one using the form above.</td></tr>}
+                {guests.length === 0 && <tr><td colSpan={5} className="admin-empty">No personalities yet — add one using the form above.</td></tr>}
               </tbody>
             </table>
           </div>
