@@ -20,6 +20,7 @@ import { replaceAtPath, getAtPath, RESERVED_SECTION_IDS, type CustomSection } fr
 import { slugify } from '../../../lib/slugify';
 import { FRESHMAN_DEPARTMENT_SEEDS } from '../../Academics/freshmanDepartmentSeeds';
 import { STANDALONE_DEPARTMENTS } from '../../../lib/departmentGroups';
+import { useAdminSession } from '../AdminSessionContext';
 
 // Backs the "Academic Departments" card grid on Academics.tsx — independent
 // of the `programs` collection, so a department's card copy doesn't have to
@@ -216,6 +217,16 @@ function programRichness(p: ProgramDoc): number {
 export default function DepartmentsAdmin() {
   const { docs: departments, loading } = useOrderedCollection<DepartmentDoc>('departments', 'order');
   const { docs: allPrograms } = useOrderedCollection<ProgramDoc>('programs', 'order');
+  const session = useAdminSession();
+  // A scoped (non-admin/superadmin) account is restricted to the one
+  // department it was assigned in Users & Roles — that field was previously
+  // captured but never actually enforced anywhere, so an account like a
+  // "CSE Webmaster" could see and edit every department's data, not just
+  // its own. `visibleDepartments` is the fix's read side; `save()` below
+  // guards the write side (no creating new departments, no editing one
+  // outside scope even via a stale/tampered `editing` id).
+  const scopedDeptTitle = session && !session.isAdmin ? (session.department || '').trim() : '';
+  const visibleDepartments = scopedDeptTitle ? departments.filter((d) => d.title.trim() === scopedDeptTitle) : departments;
   const [form, setForm] = useState<Omit<DepartmentDoc, 'id'>>(EMPTY);
   // Snapshot of `form` taken when "Edit" was clicked (see startEdit) — save()
   // diffs against this so Update only writes fields actually changed in this
@@ -416,7 +427,7 @@ export default function DepartmentsAdmin() {
   const legacyNewsEvents = (matches: ProgramDoc[]) => matches.map((p) => p.newsEventsYears).find((arr) => arr && arr.length > 0);
   const hasHodInfo = (p: ProgramDoc) => !!(p.hod || p.hodImage || p.hodEmail || p.hodMessage || p.hodResearchProfiles?.length);
   const legacyHod = (matches: ProgramDoc[]) => matches.find(hasHodInfo);
-  const departmentsMissingContent = departments.filter((d) => {
+  const departmentsMissingContent = visibleDepartments.filter((d) => {
     const matches = matchingPrograms(d);
     const richest = matches.reduce((best: ProgramDoc | null, p) => (!best || programRichness(p) > programRichness(best) ? p : best), null);
     const news = legacyNewsEvents(matches);
@@ -626,6 +637,11 @@ export default function DepartmentsAdmin() {
 
   const save = async () => {
     if (!form.title || !form.shortCode) return alert('Title and Short Code are required.');
+    if (scopedDeptTitle) {
+      if (!editing) return alert(`You can only edit the ${scopedDeptTitle} department — contact a Super Admin to add a new department.`);
+      const target = departments.find((d) => d.id === editing);
+      if (!target || target.title.trim() !== scopedDeptTitle) return alert(`You don't have access to edit this department.`);
+    }
     setSaving(true);
     try {
       // stripUndefined (see ProgramsAdmin.tsx) drops every literal `undefined`
@@ -790,6 +806,10 @@ export default function DepartmentsAdmin() {
   };
 
   const remove = async (id: string) => {
+    if (scopedDeptTitle) {
+      const target = departments.find((d) => d.id === id);
+      if (!target || target.title.trim() !== scopedDeptTitle) return alert(`You don't have access to delete this department.`);
+    }
     if (!confirm('Delete this department card?')) return;
     try {
       await deleteDoc(doc(db, 'departments', id));
@@ -800,7 +820,7 @@ export default function DepartmentsAdmin() {
 
   return (
     <div className="admin-section">
-      {freshmanNotYetCreated.length > 0 && (
+      {freshmanNotYetCreated.length > 0 && !scopedDeptTitle && (
         <div className="admin-card">
           <h2 className="admin-card__title">Freshman Engineering — Quick Add</h2>
           <p className="admin-field__hint">
@@ -1383,7 +1403,7 @@ export default function DepartmentsAdmin() {
             <table className="admin-table">
               <thead><tr><th>Title</th><th>Short Code</th><th>Order</th><th>Actions</th></tr></thead>
               <tbody>
-                {departments.map((d) => (
+                {visibleDepartments.map((d) => (
                   <tr key={d.id}>
                     <td><strong>{d.title}</strong></td>
                     <td><span className="admin-badge" style={{ textTransform: 'none' }}>{d.shortCode}</span></td>
@@ -1394,7 +1414,7 @@ export default function DepartmentsAdmin() {
                     </td>
                   </tr>
                 ))}
-                {departments.length === 0 && <tr><td colSpan={4} className="admin-empty">No departments yet — add one using the form above.</td></tr>}
+                {visibleDepartments.length === 0 && <tr><td colSpan={4} className="admin-empty">No departments yet — add one using the form above.</td></tr>}
               </tbody>
             </table>
           </div>

@@ -15,6 +15,7 @@ import type { ProgramDoc } from './ProgramsAdmin';
 import CustomSectionEditor from './CustomSectionEditor';
 import { replaceAtPath, getAtPath, hasCustomSectionContent, type CustomSection } from '../../../lib/customSections';
 import { diffChangedFields } from '../../../lib/formDiff';
+import { useAdminSession } from '../AdminSessionContext';
 
 export type { FacultyFact, FacultySection };
 
@@ -80,6 +81,23 @@ const EMPTY_FORM: FormState = {
 
 export default function FacultyAdmin() {
   const { docs: faculty, loading } = useOrderedCollection<FacultyDoc>('faculty', 'order');
+  const session = useAdminSession();
+  // A scoped (non-admin/superadmin) account is restricted to the one
+  // department it was assigned in Users & Roles — that field was previously
+  // captured but never enforced, so a "CSE Webmaster" account could see and
+  // edit every department's faculty. `faculty.department` stores a short
+  // code/tag (e.g. "CSE"), but the session only carries the department's
+  // full title, so this resolves title -> shortCode via the `departments`
+  // collection (same join ProgramsAdmin.tsx/DepartmentsAdmin.tsx use).
+  const { docs: allDepartmentsForScope } = useOrderedCollection<{ id: string; title: string; shortCode: string }>('departments', 'order');
+  const scopedDeptTitle = session && !session.isAdmin ? (session.department || '').trim() : '';
+  const scopedShortCode = scopedDeptTitle
+    ? (allDepartmentsForScope.find((d) => d.title.trim() === scopedDeptTitle)?.shortCode || '').trim().toUpperCase()
+    : '';
+  const visibleFaculty = useMemo(
+    () => (scopedShortCode ? faculty.filter((f) => (f.department || '').trim().toUpperCase() === scopedShortCode) : faculty),
+    [faculty, scopedShortCode]
+  );
   // Departments aren't a separate managed list — this is the union of every
   // Program's `department` field (/admin → Programs), every department
   // that already has faculty tagged to it, and the fixed set of first-year
@@ -96,8 +114,10 @@ export default function FacultyAdmin() {
     programs.forEach((p) => add(p.department));
     faculty.forEach((f) => add(f.department));
     FOUNDATION_DEPARTMENTS.forEach(add);
-    return names;
-  }, [programs, faculty]);
+    // A scoped account only ever gets its own department as a pickable
+    // option, so it can't add/move a faculty record into another one.
+    return scopedShortCode ? names.filter((n) => n.trim().toUpperCase() === scopedShortCode) : names;
+  }, [programs, faculty, scopedShortCode]);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   // Snapshot of `form` taken when "Edit" was clicked (see startEdit) —
   // save() diffs against this so Update only writes fields actually changed
@@ -116,9 +136,9 @@ export default function FacultyAdmin() {
   const [drag, setDrag] = useState<{ dept: string; index: number } | null>(null);
   useEffect(() => {
     const groups: Record<string, FacultyDoc[]> = {};
-    faculty.forEach((f) => { (groups[f.department] ??= []).push(f); });
+    visibleFaculty.forEach((f) => { (groups[f.department] ??= []).push(f); });
     setGroupedOrdered(groups);
-  }, [faculty]);
+  }, [visibleFaculty]);
 
   const handleDragOver = (dept: string, i: number) => {
     if (!drag || drag.dept !== dept || drag.index === i) return;
@@ -268,6 +288,9 @@ export default function FacultyAdmin() {
   // Pastes a whole roster at once — "Name | Designation | Qualification | Specialization | Email"
   // per line (trailing fields optional) — instead of one add-doc round trip per person.
   const bulkImport = async () => {
+    if (scopedShortCode && bulkDept.trim().toUpperCase() !== scopedShortCode) {
+      return alert(`You can only import ${scopedDeptTitle} faculty — set Department to ${scopedShortCode}.`);
+    }
     const rows = bulkText.split('\n').map((l) => l.trim()).filter(Boolean);
     if (rows.length === 0) return;
     setBulkImporting(true);
@@ -310,6 +333,10 @@ export default function FacultyAdmin() {
       let updated = 0;
       const unmatched: string[] = [];
       for (const entry of entries) {
+        if (scopedShortCode && entry.department.trim().toUpperCase() !== scopedShortCode) {
+          unmatched.push(`${entry.name} (${entry.department}) — outside your department`);
+          continue;
+        }
         const match = faculty.find(
           (f) => f.name.trim().toLowerCase() === entry.name.trim().toLowerCase()
             && f.department.trim().toLowerCase() === entry.department.trim().toLowerCase()
@@ -339,6 +366,9 @@ export default function FacultyAdmin() {
 
   const save = async () => {
     if (!form.name) return alert('Name is required.');
+    if (scopedShortCode && (form.department || '').trim().toUpperCase() !== scopedShortCode) {
+      return alert(`You can only manage ${scopedDeptTitle} faculty — set Department to ${scopedShortCode}.`);
+    }
     setSaving(true);
     try {
       const payload = toPayload(form);
@@ -376,6 +406,12 @@ export default function FacultyAdmin() {
   };
 
   const remove = async (id: string) => {
+    if (scopedShortCode) {
+      const target = faculty.find((f) => f.id === id);
+      if (!target || (target.department || '').trim().toUpperCase() !== scopedShortCode) {
+        return alert(`You don't have access to remove this faculty member.`);
+      }
+    }
     if (!confirm('Remove this faculty member?')) return;
     try {
       await deleteDoc(doc(db, 'faculty', id));
@@ -384,7 +420,7 @@ export default function FacultyAdmin() {
     }
   };
 
-  const filtered = filterDept === 'All' ? faculty : faculty.filter((f) => f.department === filterDept);
+  const filtered = filterDept === 'All' ? visibleFaculty : visibleFaculty.filter((f) => f.department === filterDept);
 
   // One-time cleanup: AI&ML/AI&DS and EVT were separate department tags left
   // over from before the grouped AI/ECE department pages existed; merge them
