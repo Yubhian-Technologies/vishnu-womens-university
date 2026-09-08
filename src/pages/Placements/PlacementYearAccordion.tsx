@@ -555,11 +555,7 @@ export default function PlacementYearAccordion({ years, onActiveYearChange }: Pr
 
                 {y.rows.length > 0 && (
                   <>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
-                      <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)' }}>
-                        {filteredRows.length.toLocaleString('en-IN')} {filteredRows.length === 1 ? 'company' : 'companies'}
-                      </span>
-
+                    <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'flex-end', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
                         {COMPANY_FILTERS.map((f) => {
                           const isActive = companyFilter === f.key;
