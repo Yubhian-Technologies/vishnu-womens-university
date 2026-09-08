@@ -29,6 +29,11 @@ export interface FacultyDoc {
   imageUrl: string;
   storagePath: string;
   order: number;
+  /** Per-person override of the /faculty directory designation group
+   *  (0 leadership · 1 Professor · 2 Associate · 3 Assistant · 4 Other).
+   *  -1 / absent = auto from `designation`. Order within the group is the
+   *  `order` field above. */
+  groupOverride?: number;
   /** Optional richer profile — shown on that person's own full profile
    *  page (FacultyProfile.tsx) below the basic card fields above. Free-
    *  form because different people (and different departments — a CSE
@@ -55,6 +60,19 @@ export interface FacultyDoc {
 
 const DESIGNATIONS = ['Professor & HOD', 'Professor & Head', 'Professor', 'Associate Professor', 'Assoc. Professor', 'Assistant Professor', 'Asst. Professor'];
 
+// /faculty directory designation-group buckets, in display order. The value
+// is the rank number Faculty.tsx's `groupOverride` expects; -1 means "auto"
+// (let the designation text decide). Keep in sync with designationGroupRank()
+// in src/pages/Academics/Faculty.tsx.
+const GROUP_OVERRIDE_OPTIONS: { value: number; label: string }[] = [
+  { value: -1, label: 'Auto (from designation)' },
+  { value: 0, label: 'Leadership (HOD / Dean)' },
+  { value: 1, label: 'Professors' },
+  { value: 2, label: 'Associate Professors' },
+  { value: 3, label: 'Assistant Professors' },
+  { value: 4, label: 'Other' },
+];
+
 // First-year foundation subjects (Freshman Engineering page) have no
 // Program entry of their own — always offered here regardless of Program
 // or current-faculty data. Keep in sync with Faculty.tsx's matching set.
@@ -75,6 +93,7 @@ interface FormState extends Omit<FacultyDoc, 'id' | 'facts' | 'sections' | 'cust
 const EMPTY_FORM: FormState = {
   name: '', designation: 'Assistant Professor', department: 'CSE',
   qualification: '', specialization: '', email: '', imageUrl: '', storagePath: '', order: 0,
+  groupOverride: -1,
   factsText: '', customSections: [],
 };
 
@@ -388,6 +407,8 @@ export default function FacultyAdmin() {
         setIf('storagePath', str(pick(entry, 'storagePath')));
         const order = pick(entry, 'order');
         if (order !== undefined && !Number.isNaN(Number(order))) fields.order = Number(order);
+        const groupOverride = pick(entry, 'groupOverride', 'group_override', 'group');
+        if (groupOverride !== undefined && !Number.isNaN(Number(groupOverride))) fields.groupOverride = Number(groupOverride);
 
         const factsText = pick(entry, 'factsText', 'facts_text');
         if (typeof factsText === 'string') fields.facts = textToFacts(factsText);
@@ -428,6 +449,8 @@ export default function FacultyAdmin() {
     name: f.name, designation: f.designation, department: f.department,
     qualification: f.qualification, specialization: f.specialization,
     email: f.email, imageUrl: f.imageUrl, storagePath: f.storagePath, order: f.order,
+    // -1 stored as-is; Faculty.tsx treats any value < 0 (or absent) as "auto".
+    groupOverride: f.groupOverride ?? -1,
     facts: textToFacts(f.factsText),
     customSections: f.customSections,
   });
@@ -464,6 +487,7 @@ export default function FacultyAdmin() {
       name: f.name, designation: f.designation, department: f.department,
       qualification: f.qualification, specialization: f.specialization,
       email: f.email, imageUrl: f.imageUrl, storagePath: f.storagePath, order: f.order,
+      groupOverride: f.groupOverride ?? -1,
       factsText: factsToText(f.facts), customSections,
     };
     setForm(next);
@@ -712,8 +736,25 @@ export default function FacultyAdmin() {
               min={0}
             />
             <p className="admin-field__hint">
-              Lower numbers come first within this person's department. Can also be changed later
+              Lower numbers come first within this person's <strong>designation group</strong> on the
+              /faculty directory (and within the department elsewhere). Can also be changed later
               directly in the table below, or by dragging rows.
+            </p>
+          </div>
+          <div className="admin-field">
+            <label htmlFor="field-group-override">Directory Group</label>
+            <select
+              id="field-group-override"
+              value={form.groupOverride ?? -1}
+              onChange={(e) => set('groupOverride', +e.target.value)}
+            >
+              {GROUP_OVERRIDE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+            <p className="admin-field__hint">
+              Which section this person is listed under on the /faculty directory. Leave on
+              <em> Auto</em> to derive it from the Designation text; pick a group to force them
+              higher or lower regardless of designation. Position within the chosen group is the
+              Display Order above.
             </p>
           </div>
           <div className="admin-field admin-field--full">
@@ -828,7 +869,14 @@ export default function FacultyAdmin() {
                             </td>
                             <td>{f.imageUrl ? <img src={f.imageUrl} alt="" className="admin-table__avatar" /> : '👤'}</td>
                             <td>{f.name}</td>
-                            <td><span className="admin-badge admin-badge--sm">{f.designation}</span></td>
+                            <td>
+                              <span className="admin-badge admin-badge--sm">{f.designation}</span>
+                              {typeof f.groupOverride === 'number' && f.groupOverride >= 0 && (
+                                <span className="admin-badge admin-badge--sm" style={{ marginLeft: 4 }} title="Directory group overridden">
+                                  → {GROUP_OVERRIDE_OPTIONS.find((o) => o.value === f.groupOverride)?.label ?? f.groupOverride}
+                                </span>
+                              )}
+                            </td>
                             <td>{f.qualification}</td>
                             <td>
                               {(f.customSections ?? []).filter(hasCustomSectionContent).length > 0
