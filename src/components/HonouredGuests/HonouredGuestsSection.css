@@ -57,12 +57,14 @@
   to   { transform: translateX(-50%); }
 }
 
+/* Reduced motion: no auto-scroll, but keep it a single swipeable row
+   (not a wrapped grid of every card). */
 @media (prefers-reduced-motion: reduce) {
+  .eminent-marquee {
+    overflow-x: auto;
+  }
   .eminent-track {
     animation: none;
-    flex-wrap: wrap;
-    justify-content: center;
-    width: auto;
   }
   .eminent-card[aria-hidden='true'] {
     display: none;

@@ -6,6 +6,7 @@ import PageHero from '../../components/PageHero/PageHero';
 import { db } from '../../lib/firebase';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
+import { HERO_VIDEO_SRC } from '../../lib/heroVideo';
 import type { ProgramDoc } from '../Admin/sections/ProgramsAdmin';
 import { Users, User, Video, GraduationCap } from 'lucide-react';
 
@@ -164,18 +165,24 @@ export default function CampusVisit() {
 
           {activeType === 'virtual' ? (
             <div className="cv-video-card">
-              {video?.value ? (
-                <div className="cv-video-embed">
+              <div className="cv-video-embed">
+                {video?.value ? (
                   <iframe
                     src={video.value}
                     title="VWU Virtual Campus Tour"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                   />
-                </div>
-              ) : (
-                <p className="cv-video-empty">Our virtual campus tour video is coming soon. Please check back shortly.</p>
-              )}
+                ) : (
+                  <video
+                    src={HERO_VIDEO_SRC}
+                    title="VWU Virtual Campus Tour"
+                    controls
+                    playsInline
+                    preload="metadata"
+                  />
+                )}
+              </div>
             </div>
           ) : (
             <div className="cv-form-card">

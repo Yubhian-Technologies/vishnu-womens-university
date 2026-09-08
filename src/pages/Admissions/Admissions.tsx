@@ -132,7 +132,7 @@ export default function Admissions() {
         defaultTitle="Admissions Open"
         defaultSubtitle="First Private Women’s University in Andhra Pradesh and Telangana. No. 1 preferred choice for female students in AP EAPCET."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Admissions' }]}
-        scrollCtaTargetId="admissions-content"
+        hideCta
       />
 
       {/* Admissions Hub */}

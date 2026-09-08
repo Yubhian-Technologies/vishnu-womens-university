@@ -1731,6 +1731,10 @@ td.pb-activities-num {
   grid-template-columns: 1fr;
 }
 
+.dept-facts-grid.cols-5 {
+  grid-template-columns: repeat(5, 1fr);
+}
+
 .dept-fact-card {
   background: #13274D;
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -1750,7 +1754,8 @@ td.pb-activities-num {
   box-shadow: 0 14px 36px rgba(0, 0, 0, 0.4);
 }
 
-.dept-fact-card.is-hod-card {
+.dept-fact-card.is-hod-card,
+.dept-fact-card.is-eapcet-card {
   background: #172D57;
   border-color: rgba(201, 151, 58, 0.4);
 }
@@ -1931,18 +1936,21 @@ td.pb-activities-num {
   text-overflow: ellipsis;
 }
 
-.dept-fact-card.is-hod-card .dept-fact-chip-val {
+.dept-fact-card.is-hod-card .dept-fact-chip-val,
+.dept-fact-card.is-eapcet-card .dept-fact-chip-val {
   color: var(--color-accent);
 }
 
 @media (max-width: 1024px) {
-  .dept-facts-grid {
+  .dept-facts-grid,
+  .dept-facts-grid.cols-5 {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 600px) {
-  .dept-facts-grid {
+  .dept-facts-grid,
+  .dept-facts-grid.cols-5 {
     grid-template-columns: 1fr;
   }
   .dept-fact-card {
@@ -4683,17 +4691,11 @@ td.pb-activities-num {
    ========================================================================== */
 .dept-horizontal-quicknav-section {
   position: sticky;
-  top: 90px;
+  top: calc(var(--topbar-height, 0px) + var(--header-height, 70px));
   z-index: 950;
   margin: 0.35rem 0 1.25rem 0;
   padding: 0.25rem 0;
   pointer-events: auto;
-}
-
-@media (min-width: 1440px) {
-  .dept-horizontal-quicknav-section {
-    top: 90px;
-  }
 }
 
 .dept-horizontal-quicknav-container {
