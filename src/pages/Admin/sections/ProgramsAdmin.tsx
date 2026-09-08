@@ -15,6 +15,7 @@ import { replaceAtPath, getAtPath, type CustomSection } from '../../../lib/custo
 import type { RndStructuredTable } from './RndTableEditor';
 import { diffChangedFields } from '../../../lib/formDiff';
 import { useAdminSession } from '../AdminSessionContext';
+import { departmentTagsForShortCode } from '../../../lib/departmentGroups';
 
 export interface ProgramSubject {
   title: string;
@@ -350,9 +351,21 @@ export default function ProgramsAdmin() {
   const scopedShortCode = scopedDeptTitle
     ? (allDepartmentsForScope.find((d) => d.title.trim() === scopedDeptTitle)?.shortCode || '').trim().toUpperCase()
     : '';
+  // A handful of departments (Civil, Mechanical, ...) have program records
+  // tagged in prose ("Civil", "Mechanical") instead of the short code ("CE",
+  // "ME") — comparing a scoped account's department against the bare
+  // shortCode alone silently matched zero programs for exactly those
+  // departments (see departmentTagsForShortCode's own comment). Every
+  // department-tag comparison below uses this alias-expanded set instead.
+  const scopedDeptTags = useMemo(
+    () => (scopedShortCode ? new Set(departmentTagsForShortCode(scopedShortCode).map((t) => t.trim().toUpperCase())) : null),
+    [scopedShortCode]
+  );
+  const matchesScopedDept = (dept: string) => !scopedDeptTags || scopedDeptTags.has((dept || '').trim().toUpperCase());
   const visiblePrograms = useMemo(
-    () => (scopedShortCode ? programs.filter((p) => (p.department || '').trim().toUpperCase() === scopedShortCode) : programs),
-    [programs, scopedShortCode]
+    () => (scopedDeptTags ? programs.filter((p) => matchesScopedDept(p.department)) : programs),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [programs, scopedDeptTags]
   );
   const [form, setForm] = useState<Omit<ProgramDoc, 'id'>>(EMPTY);
   // Snapshot of `form` taken at the moment "Edit" was clicked (see
@@ -606,7 +619,7 @@ export default function ProgramsAdmin() {
 
   const save = async () => {
     if (!form.name || !form.slug) return alert('Program name and slug are required.');
-    if (scopedShortCode && (form.department || '').trim().toUpperCase() !== scopedShortCode) {
+    if (scopedDeptTags && !matchesScopedDept(form.department)) {
       return alert(`You can only manage ${scopedDeptTitle} programs — set Department to ${scopedShortCode}.`);
     }
     setSaving(true);
@@ -694,9 +707,9 @@ export default function ProgramsAdmin() {
   };
 
   const remove = async (id: string) => {
-    if (scopedShortCode) {
+    if (scopedDeptTags) {
       const target = programs.find((p) => p.id === id);
-      if (!target || (target.department || '').trim().toUpperCase() !== scopedShortCode) {
+      if (!target || !matchesScopedDept(target.department)) {
         return alert(`You don't have access to delete this program.`);
       }
     }

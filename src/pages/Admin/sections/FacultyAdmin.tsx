@@ -16,6 +16,7 @@ import CustomSectionEditor from './CustomSectionEditor';
 import { replaceAtPath, getAtPath, hasCustomSectionContent, type CustomSection } from '../../../lib/customSections';
 import { diffChangedFields } from '../../../lib/formDiff';
 import { useAdminSession } from '../AdminSessionContext';
+import { departmentTagsForShortCode } from '../../../lib/departmentGroups';
 
 export type { FacultyFact, FacultySection };
 
@@ -113,9 +114,21 @@ export default function FacultyAdmin() {
   const scopedShortCode = scopedDeptTitle
     ? (allDepartmentsForScope.find((d) => d.title.trim() === scopedDeptTitle)?.shortCode || '').trim().toUpperCase()
     : '';
+  // A handful of departments (Civil, Mechanical, ...) have faculty/program
+  // records tagged in prose ("Civil", "Mechanical") instead of the short
+  // code ("CE", "ME") — comparing a scoped account's department against the
+  // bare shortCode alone silently matched zero records for exactly those
+  // departments (see departmentTagsForShortCode's own comment). Every
+  // department-tag comparison below uses this alias-expanded set instead.
+  const scopedDeptTags = useMemo(
+    () => (scopedShortCode ? new Set(departmentTagsForShortCode(scopedShortCode).map((t) => t.trim().toUpperCase())) : null),
+    [scopedShortCode]
+  );
+  const matchesScopedDept = (dept: string) => !scopedDeptTags || scopedDeptTags.has((dept || '').trim().toUpperCase());
   const visibleFaculty = useMemo(
-    () => (scopedShortCode ? faculty.filter((f) => (f.department || '').trim().toUpperCase() === scopedShortCode) : faculty),
-    [faculty, scopedShortCode]
+    () => (scopedDeptTags ? faculty.filter((f) => matchesScopedDept(f.department)) : faculty),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [faculty, scopedDeptTags]
   );
   // Departments aren't a separate managed list — this is the union of every
   // Program's `department` field (/admin → Programs), every department
@@ -135,8 +148,9 @@ export default function FacultyAdmin() {
     FOUNDATION_DEPARTMENTS.forEach(add);
     // A scoped account only ever gets its own department as a pickable
     // option, so it can't add/move a faculty record into another one.
-    return scopedShortCode ? names.filter((n) => n.trim().toUpperCase() === scopedShortCode) : names;
-  }, [programs, faculty, scopedShortCode]);
+    return scopedDeptTags ? names.filter((n) => matchesScopedDept(n)) : names;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [programs, faculty, scopedDeptTags]);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   // Snapshot of `form` taken when "Edit" was clicked (see startEdit) —
   // save() diffs against this so Update only writes fields actually changed
@@ -312,7 +326,7 @@ export default function FacultyAdmin() {
   // Pastes a whole roster at once — "Name | Designation | Qualification | Specialization | Email"
   // per line (trailing fields optional) — instead of one add-doc round trip per person.
   const bulkImport = async () => {
-    if (scopedShortCode && bulkDept.trim().toUpperCase() !== scopedShortCode) {
+    if (scopedDeptTags && !matchesScopedDept(bulkDept)) {
       return alert(`You can only import ${scopedDeptTitle} faculty — set Department to ${scopedShortCode}.`);
     }
     const rows = bulkText.split('\n').map((l) => l.trim()).filter(Boolean);
@@ -357,7 +371,7 @@ export default function FacultyAdmin() {
       let updated = 0;
       const unmatched: string[] = [];
       for (const entry of entries) {
-        if (scopedShortCode && entry.department.trim().toUpperCase() !== scopedShortCode) {
+        if (scopedDeptTags && !matchesScopedDept(entry.department)) {
           unmatched.push(`${entry.name} (${entry.department}) — outside your department`);
           continue;
         }
@@ -484,7 +498,7 @@ export default function FacultyAdmin() {
 
   const save = async () => {
     if (!form.name) return alert('Name is required.');
-    if (scopedShortCode && (form.department || '').trim().toUpperCase() !== scopedShortCode) {
+    if (scopedDeptTags && !matchesScopedDept(form.department)) {
       return alert(`You can only manage ${scopedDeptTitle} faculty — set Department to ${scopedShortCode}.`);
     }
     setSaving(true);
@@ -525,9 +539,9 @@ export default function FacultyAdmin() {
   };
 
   const remove = async (id: string) => {
-    if (scopedShortCode) {
+    if (scopedDeptTags) {
       const target = faculty.find((f) => f.id === id);
-      if (!target || (target.department || '').trim().toUpperCase() !== scopedShortCode) {
+      if (!target || !matchesScopedDept(target.department)) {
         return alert(`You don't have access to remove this faculty member.`);
       }
     }
