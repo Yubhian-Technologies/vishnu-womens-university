@@ -666,36 +666,6 @@ function SidebarImageCarousel({ images, alt }: { images: string[]; alt: string }
   );
 }
 
-// Placement Details' Summary section (placementCellSummarySection below) —
-// alternating navy/cream colours by position, a plain batch heading, and
-// the batch/offers/package split across their own lines. Offers and
-// Highest Package come straight from the batch's placementYears record
-// (see batchHighestPackage above) rather than a separately-typed line, so
-// this always matches the Year-by-Year section further down the page.
-const BATCH_CARD_COLORS = [
-  { background: 'var(--color-primary-light)', border: 'var(--color-primary-light)', heading: 'var(--color-white)', body: 'rgba(255,255,255,0.85)' },
-  { background: '#FCEFD9', border: '#E8A83C', heading: '#7A4A12', body: '#8A5A20' },
-];
-
-function BatchSummaryCard({ batch, offers, highest, index }: { batch: string; offers: number | null; highest?: { lpa: number; company?: string }; index: number }) {
-  const color = BATCH_CARD_COLORS[index % BATCH_CARD_COLORS.length];
-  return (
-    <div style={{ background: color.background, border: `1.5px solid ${color.border}`, borderRadius: 'var(--radius-lg)', padding: 'var(--space-5)' }}>
-      <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: color.heading, margin: '0 0 var(--space-3)' }}>
-        {batch} batch
-      </h3>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        <span style={{ fontSize: 'var(--text-sm)', color: color.body }}>{offers != null ? offers.toLocaleString('en-IN') : '—'} offers</span>
-        {highest && (
-          <span style={{ fontSize: 'var(--text-sm)', color: color.body }}>
-            highest {highest.lpa} LPA{highest.company ? `(${highest.company})` : ''}
-          </span>
-        )}
-      </div>
-    </div>
-  );
-}
-
 // Round a value up to a "nice" axis maximum (1/2/5 × 10ⁿ).
 function niceCeil(v: number): number {
   if (v <= 0) return 1;
