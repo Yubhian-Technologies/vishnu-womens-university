@@ -214,6 +214,17 @@ The University is committed to maintaining a safe, healthy, and supportive campu
     desc: 'Quality Healthcare, Close to Campus — accessible medical care and essential health support for students and staff throughout the academic year.',
   },
   {
+    slug: 'sports',
+    title: 'Sports',
+    heroSubtitle: 'World-Class Sports Infrastructure for Every Discipline.',
+    body: `# Sports
+
+Vishnu Women's University maintains a spacious sports ground, an indoor stadium, and dedicated courts to support a wide range of athletic and recreational activities. Students train and compete across cricket, football, basketball, volleyball, badminton, tennis, table tennis, athletics, chess, and kabaddi, with qualified coaches guiding day-to-day training and competition preparation.
+
+The facilities support everyday fitness sessions as well as inter-collegiate and university-level tournaments, giving every student the opportunity to discover their strength, build confidence, and strive for excellence on the field and court.`,
+    desc: 'World-Class Sports Infrastructure for Every Discipline.',
+  },
+  {
     slug: 'swimming-pool',
     title: 'Swimming Pool',
     heroSubtitle: 'Fitness, Recreation, and Wellness Through Swimming.',
