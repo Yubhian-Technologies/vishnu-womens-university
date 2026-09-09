@@ -7,6 +7,7 @@ import type { ProgramDoc } from '../../pages/Admin/sections/ProgramsAdmin';
 import { DIFFERENTIATOR_CATEGORIES } from '../../pages/Admin/sections/DifferentiatorsAdmin';
 import type { DifferentiatorItemDoc } from '../../pages/Admin/sections/DifferentiatorsAdmin';
 import type { PlacementItemDoc } from '../../pages/Admin/sections/PlacementItemsAdmin';
+import type { CampusLifeItemDoc } from '../../pages/Admin/sections/CampusLifeAdmin';
 import SmoothCollapse from '../SmoothCollapse/SmoothCollapse';
 import './Header.css';
 
@@ -231,30 +232,25 @@ const navItemsData: NavItem[] = [
       linkText: 'Explore Facilities',
       linkPath: '/campus/central-library',
     },
+    // Every "facility"-group page from Admin -> Campus Life (Central Library,
+    // Auditoriums, Event, Club, ...) is appended here dynamically at render
+    // time instead of being individually hardcoded — see the 'Campus Life'
+    // branch in renderedNavItems below. What's left here is only the handful
+    // of Campus Life menu entries that genuinely have no campusLifeItems
+    // equivalent: two standalone pages with their own routes/components
+    // (Sewage Treatment Plants, Wellness Center), the five Student Activities
+    // pages (their own top-level routes, e.g. /arts-culture, rather than
+    // /campus/:slug), Student Clubs (its own separate admin section), and one
+    // plain external link.
     children: [
-      { label: 'Central Library', path: '/campus/central-library' },
-      { label: 'Auditoriums & Amphitheaters', path: '/campus/auditoriums' },
-      { label: 'Campus Book Stores', path: '/campus/campus-book-stores' },
-      { label: 'Wi-Fi Campus', path: '/campus/wifi-campus' },
-      { label: 'Campus Hostels', path: '/campus/campus-hostels' },
-      { label: 'Faculty & Staff Residential Facilities', path: '/campus/staff-quarters' },
-      { label: 'Food Courts & Cafeterias', path: '/campus/food-courts' },
-      { label: 'Vishnu Fitness Centre', path: '/campus/fitness-centre' },
-      { label: 'Health Care Centre', path: '/campus/health-care' },
-      { label: 'Campus Security', path: '/campus/campus-security' },
       { label: 'Sewage Treatment Plants', path: '/campus/sewage-treatment-plants' },
       { label: 'Wellness Center', path: '/campus/wellness-center' },
-      { label: 'Swimming Pool & Sports', path: '/campus/swimming-pool' },
-      { label: 'Travel Desk', path: '/campus/travel-desk' },
-      { label: 'Temples of God', path: '/campus/temples' },
-      { label: 'Event', path: '/campus/event' },
       { label: 'Vishnu TV Academy', path: '/vishnu-tv-academy' },
       { label: 'Student Clubs', path: '/student-clubs' },
       { label: 'Arts & Culture', path: '/arts-culture' },
       { label: 'Vishnu School of Music', path: 'https://svesschoolofmusic.in/', external: true },
       { label: 'Sports & Games', path: '/sports-games' },
       { label: 'Social Services', path: '/social-services' },
-      { label: 'Other Facilities', path: '/campus/other-facilities' },
     ],
   },
   {
@@ -329,6 +325,12 @@ export function isEnabledNavPath(path: string | undefined | null): boolean {
   if (!path) return false;
   const clean = path.split('#')[0];
   if (!clean || clean.startsWith('http')) return false;
+  // /campus/:slug pages are appended to the Campus Life menu dynamically
+  // from the campusLifeItems collection (see the 'Campus Life' branch in
+  // renderedNavItems below), not listed individually in navItemsData below
+  // — so treat every /campus/* path as enabled rather than needing it
+  // pre-declared here, matching the generic catch-all route in App.tsx.
+  if (clean.startsWith('/campus/')) return true;
   if (!_enabledNavPaths) {
     const set = new Set<string>();
     const add = (c: { path?: string; external?: boolean; download?: boolean; disabled?: boolean }) => {
@@ -393,6 +395,10 @@ export default function Header() {
 
   const { docs: differentiatorItems } = useOrderedCollection<DifferentiatorItemDoc>('differentiatorItems', 'order');
   const { docs: placementItems } = useOrderedCollection<PlacementItemDoc>('placementItems', 'order');
+  const { docs: campusLifeItems } = useOrderedCollection<CampusLifeItemDoc>('campusLifeItems', 'order');
+  const campusFacilityNavItems: NavChild[] = campusLifeItems
+    .filter((it) => it.group === 'facility')
+    .map((it) => ({ label: it.title, path: `/campus/${it.slug}` }));
 
   // Entrance transition trigger (150ms after load)
   useEffect(() => {
@@ -496,6 +502,12 @@ export default function Header() {
             : { label: p.title, path: `/placements/${p.slug}` }
         ),
       };
+    }
+    if (item.label === 'Campus Life' && item.children) {
+      // Every "facility" page added from Admin -> Campus Life shows up here
+      // automatically — item.children at this point holds only the handful
+      // of entries with no campusLifeItems equivalent (see navItemsData).
+      return { ...item, children: [...campusFacilityNavItems, ...item.children] };
     }
     return item;
   });
