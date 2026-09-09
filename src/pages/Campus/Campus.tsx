@@ -5,10 +5,12 @@ import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
 import { useHashScroll } from '../../hooks/useHashScroll';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
+import { useOrderedCollection } from '../../hooks/useCollection';
 import { useSitePhotos, useSectionHasPhotos } from '../../hooks/useSitePhotos';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
-import { resolveCampusFacility } from './campusFacilities.data';
+import { resolveCampusFacility, findCampusFacilityBySlug } from './campusFacilities.data';
+import type { CampusLifeItemDoc } from '../Admin/sections/CampusLifeAdmin';
 import { Building } from 'lucide-react';
 
 const defaultCampusGalleryPhotos = [
@@ -46,6 +48,20 @@ export default function Campus() {
   useHashScroll();
   const stats = useContentBlocks('campus', 'stats');
   const facilities = useContentBlocks('campus', 'facilities');
+  const { docs: campusLifeItems } = useOrderedCollection<CampusLifeItemDoc>('campusLifeItems', 'order');
+
+  // Every facility added in Admin -> Campus Life should show up here without
+  // a second manual step in Page Content Blocks. `facilities` (the hand-
+  // curated Content Blocks cards) stays the primary source so existing
+  // cards keep their chosen icon/copy; any Campus Life facility page not
+  // already represented there gets an auto-generated card appended, using
+  // its own icon/desc (falling back to the legacy static data's desc).
+  const contentBlockSlugs = new Set(
+    facilities.map((f) => resolveCampusFacility(f.title, f.slug)?.slug ?? f.slug).filter(Boolean)
+  );
+  const autoFacilities = campusLifeItems.filter(
+    (it) => it.group === 'facility' && !contentBlockSlugs.has(it.slug)
+  );
   const campusGalleryPhotos = useSitePhotos('campus', 'main', defaultCampusGalleryPhotos);
   const facilitiesPhotos = useSitePhotos('campus', 'facilities-infrastructure', defaultFacilitiesPhotos);
   const hasFacilitiesPhotos = useSectionHasPhotos('campus', 'facilities-infrastructure');
@@ -131,6 +147,20 @@ export default function Campus() {
                 <div key={f.id} id={f.slug || undefined} style={cardStyle} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
                   {cardInner}
                 </div>
+              );
+            })}
+            {autoFacilities.map((it) => {
+              const Icon = resolveContentIcon(it.icon) || Building;
+              const desc = it.desc || findCampusFacilityBySlug(it.slug)?.desc || '';
+              const cardStyle: CSSProperties = { display: 'block', textDecoration: 'none', background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)', transition: 'all var(--transition-base)', scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' };
+              const onMouseEnter = (e: ReactMouseEvent<HTMLElement>) => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-accent)'; (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-md)'; };
+              const onMouseLeave = (e: ReactMouseEvent<HTMLElement>) => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-light-gray)'; (e.currentTarget as HTMLElement).style.boxShadow = 'none'; };
+              return (
+                <Link key={it.id} id={it.slug} to={`/campus/${it.slug}`} style={cardStyle} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+                  <div style={{ marginBottom: 'var(--space-3)' }}><Icon size={35} strokeWidth={1.75} /></div>
+                  <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>{it.title}</h3>
+                  <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6 }}>{desc}</p>
+                </Link>
               );
             })}
           </div>
