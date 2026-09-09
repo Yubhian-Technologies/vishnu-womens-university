@@ -247,6 +247,7 @@ const navItemsData: NavItem[] = [
       { label: 'Swimming Pool & Sports', path: '/campus/swimming-pool' },
       { label: 'Travel Desk', path: '/campus/travel-desk' },
       { label: 'Temples of God', path: '/campus/temples' },
+      { label: 'Event', path: '/campus/event' },
       { label: 'Vishnu TV Academy', path: '/vishnu-tv-academy' },
       { label: 'Student Clubs', path: '/student-clubs' },
       { label: 'Arts & Culture', path: '/arts-culture' },

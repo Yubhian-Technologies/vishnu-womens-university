@@ -129,6 +129,14 @@ export default function Campus() {
               const onMouseEnter = (e: ReactMouseEvent<HTMLElement>) => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-accent)'; (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-md)'; };
               const onMouseLeave = (e: ReactMouseEvent<HTMLElement>) => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-light-gray)'; (e.currentTarget as HTMLElement).style.boxShadow = 'none'; };
               const matchedFacility = resolveCampusFacility(f.title, f.slug);
+              // A facility not in the static campusFacilities.data.ts list (e.g. a
+              // brand-new one added purely from /admin, with no matching code
+              // entry) used to fall through to an unclickable plain <div> here —
+              // this card's own Anchor Slug field is enough to link it to its
+              // /campus/:slug detail page (the route is a generic catch-all
+              // resolved from the campusLifeItems collection, so no static match
+              // is actually required for the link itself to work).
+              const linkSlug = matchedFacility?.slug || f.slug;
               const cardInner = (
                 <>
                   <div style={{ marginBottom: 'var(--space-3)' }}><Icon size={35} strokeWidth={1.75} /></div>
@@ -136,9 +144,9 @@ export default function Campus() {
                   <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6 }}>{matchedFacility?.desc || f.desc}</p>
                 </>
               );
-              if (matchedFacility) {
+              if (linkSlug) {
                 return (
-                  <Link key={f.id} id={f.slug || undefined} to={`/campus/${matchedFacility.slug}`} style={cardStyle} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+                  <Link key={f.id} id={f.slug || undefined} to={`/campus/${linkSlug}`} style={cardStyle} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
                     {cardInner}
                   </Link>
                 );
