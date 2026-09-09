@@ -609,40 +609,55 @@ function CampusRecruitmentTrainingSections({ intro }: { intro: string }) {
   );
 }
 
-// A small, self-contained sidebar carousel — used by the Higher Education
-// sub-page (item.slug === 'higher-education') to cycle its two partnership
-// photos. Just Prev/Next + dot indicators; not the full PhotoCarouselStrip
-// (that one's a horizontal scroll strip meant for a full-width section, not
-// a narrow sticky sidebar).
+// Simple click-through image slideshow for a sidebar — arrows only show up
+// once there's more than one image (a single image just renders flat, no
+// dead-end arrows pointing at themselves). Used by Higher Education's
+// sidebar in place of the plain Key Highlights list.
 function SidebarImageCarousel({ images, alt }: { images: string[]; alt: string }) {
   const [index, setIndex] = useState(0);
   if (images.length === 0) return null;
-  const prev = () => setIndex((i) => (i - 1 + images.length) % images.length);
-  const next = () => setIndex((i) => (i + 1) % images.length);
   return (
-    <div style={{ position: 'relative', borderRadius: 'var(--radius-md)', overflow: 'hidden', border: '1.5px solid var(--color-light-gray)' }}>
-      <img src={images[index]} alt={alt} loading="lazy" style={{ width: '100%', height: 'auto', display: 'block' }} />
+    <div style={{ position: 'relative' }}>
+      <img
+        src={images[index]}
+        alt={`${alt} (${index + 1} of ${images.length})`}
+        loading="lazy"
+        style={{ width: '100%', height: 'auto', borderRadius: 'var(--radius-md)', display: 'block' }}
+      />
       {images.length > 1 && (
         <>
           <button
             type="button"
-            onClick={prev}
             aria-label="Previous image"
-            style={{ position: 'absolute', top: '50%', left: 'var(--space-2)', transform: 'translateY(-50%)', width: 32, height: 32, borderRadius: '50%', border: 'none', background: 'rgba(11,30,66,0.7)', color: 'var(--color-white)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+            onClick={() => setIndex((i) => (i - 1 + images.length) % images.length)}
+            style={{
+              position: 'absolute', left: 8, top: '50%', transform: 'translateY(-50%)',
+              width: 34, height: 34, borderRadius: '50%', border: 'none',
+              background: 'rgba(255, 255, 255, 0.9)', boxShadow: 'var(--shadow-md)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+            }}
           >
             <ChevronLeft size={18} />
           </button>
           <button
             type="button"
-            onClick={next}
             aria-label="Next image"
-            style={{ position: 'absolute', top: '50%', right: 'var(--space-2)', transform: 'translateY(-50%)', width: 32, height: 32, borderRadius: '50%', border: 'none', background: 'rgba(11,30,66,0.7)', color: 'var(--color-white)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+            onClick={() => setIndex((i) => (i + 1) % images.length)}
+            style={{
+              position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)',
+              width: 34, height: 34, borderRadius: '50%', border: 'none',
+              background: 'rgba(255, 255, 255, 0.9)', boxShadow: 'var(--shadow-md)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+            }}
           >
             <ChevronRight size={18} />
           </button>
-          <div style={{ position: 'absolute', bottom: 'var(--space-2)', left: 0, right: 0, display: 'flex', justifyContent: 'center', gap: 'var(--space-1)' }}>
-            {images.map((_, i) => (
-              <span key={i} style={{ width: 6, height: 6, borderRadius: '50%', background: i === index ? 'var(--color-accent)' : 'rgba(255,255,255,0.6)' }} />
+          <div style={{ position: 'absolute', bottom: 10, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 6 }}>
+            {images.map((img, i) => (
+              <span
+                key={img}
+                style={{ width: 6, height: 6, borderRadius: '50%', background: i === index ? 'var(--color-white)' : 'rgba(255, 255, 255, 0.5)' }}
+              />
             ))}
           </div>
         </>
@@ -681,10 +696,37 @@ function BatchSummaryCard({ batch, offers, highest, index }: { batch: string; of
   );
 }
 
-// Impact > Summary trend chart — offers (navy bars) and highest package in
-// LPA (gold line) per batch, plotted against the batch's passing-out year.
-// Reads the same PlacementYear records as the cards above, so it can never
-// disagree with them. Plain inline SVG — no chart library.
+// Round a value up to a "nice" axis maximum (1/2/5 × 10ⁿ).
+function niceCeil(v: number): number {
+  if (v <= 0) return 1;
+  const mag = Math.pow(10, Math.floor(Math.log10(v)));
+  const n = v / mag;
+  const step = n <= 1 ? 1 : n <= 2 ? 2 : n <= 5 ? 5 : 10;
+  return step * mag;
+}
+
+// Catmull-Rom → cubic-bezier smoothing for the LPA line.
+function smoothLinePath(pts: { x: number; y: number }[]): string {
+  if (pts.length < 2) return '';
+  const d = [`M ${pts[0].x} ${pts[0].y}`];
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[i - 1] || pts[i];
+    const p1 = pts[i];
+    const p2 = pts[i + 1];
+    const p3 = pts[i + 2] || p2;
+    const cp1x = p1.x + (p2.x - p0.x) / 6;
+    const cp1y = p1.y + (p2.y - p0.y) / 6;
+    const cp2x = p2.x - (p3.x - p1.x) / 6;
+    const cp2y = p2.y - (p3.y - p1.y) / 6;
+    d.push(`C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y}`);
+  }
+  return d.join(' ');
+}
+
+// Impact > Summary — two side-by-side charts sharing the passing-out year
+// axis: offers per year (navy bars, 0-based) and highest package in LPA per
+// year (gold smooth line, non-zero baseline so the trend reads). Reads the
+// same PlacementYear records as the cards above. Plain inline SVG, no library.
 function BatchTrendChart({ data }: { data: PlacementYear[] }) {
   const rows = data
     .map((y) => ({
@@ -697,55 +739,86 @@ function BatchTrendChart({ data }: { data: PlacementYear[] }) {
 
   if (rows.length < 2) return null;
 
-  const W = 760;
-  const H = 340;
-  const m = { top: 28, right: 24, bottom: 44, left: 44 };
+  const W = 480;
+  const H = 320;
+  const m = { top: 28, right: 18, bottom: 40, left: 52 };
+  const valueText = { fontSize: 12, fill: 'var(--color-text)', fontWeight: 600 } as const;
   const iw = W - m.left - m.right;
   const ih = H - m.top - m.bottom;
-  const maxOffers = Math.max(...rows.map((r) => r.offers)) * 1.18 || 1;
-  const maxLpa = Math.max(...rows.map((r) => r.highest)) * 1.18 || 1;
-  const x = (i: number) => m.left + (iw / rows.length) * (i + 0.5);
-  const yOffers = (v: number) => m.top + ih - (v / maxOffers) * ih;
-  const yLpa = (v: number) => m.top + ih - (v / maxLpa) * ih;
-  const barW = Math.min(46, (iw / rows.length) * 0.5);
-  const linePath = rows.map((r, i) => `${i === 0 ? 'M' : 'L'} ${x(i)} ${yLpa(r.highest)}`).join(' ');
+  const xBar = (i: number) => m.left + (iw / rows.length) * (i + 0.5);
+  const xLine = (i: number) => m.left + (iw / (rows.length - 1)) * i;
+  const axisText = { fontSize: 11, fill: 'var(--color-text-light)' } as const;
+  const cardStyle = { background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-5)' } as const;
+  const titleStyle = { fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-text)', marginBottom: 'var(--space-3)' } as const;
+
+  // Offers axis: 0 → nice ceiling, 5 evenly-spaced ticks.
+  const offersMax = niceCeil(Math.max(...rows.map((r) => r.offers)) || 1);
+  const yOffers = (v: number) => m.top + ih - (v / offersMax) * ih;
+  const OFFER_TICKS = 5;
+  const barW = Math.min(42, (iw / rows.length) * 0.55);
+
+  // LPA axis: nice floor → nice ceiling in steps of 5.
+  const lpaVals = rows.map((r) => r.highest);
+  const lpaLo = Math.max(0, Math.floor(Math.min(...lpaVals) / 5) * 5);
+  let lpaHi = Math.ceil(Math.max(...lpaVals) / 5) * 5;
+  if (lpaHi <= lpaLo) lpaHi = lpaLo + 5;
+  const yLpa = (v: number) => m.top + ih - ((v - lpaLo) / (lpaHi - lpaLo)) * ih;
+  const lpaPts = rows.map((r, i) => ({ x: xLine(i), y: yLpa(r.highest) }));
 
   return (
-    <div style={{ marginTop: 'var(--space-8)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-5)' }}>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-5)', marginBottom: 'var(--space-3)', fontSize: 'var(--text-sm)', color: 'var(--color-text-light)' }}>
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-          <i style={{ width: 12, height: 12, borderRadius: 3, background: 'var(--color-primary)', display: 'inline-block' }} /> Number of offers
-        </span>
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-          <i style={{ width: 12, height: 12, borderRadius: 3, background: 'var(--color-accent)', display: 'inline-block' }} /> Highest package (LPA)
-        </span>
+    <div style={{ marginTop: 'var(--space-8)', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 'var(--space-5)' }}>
+      {/* Number of offers — bar chart */}
+      <div style={cardStyle}>
+        <div style={titleStyle}>Number of offers</div>
+        <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 'auto', display: 'block' }} role="img" aria-label="Number of placement offers by passing-out year">
+          {Array.from({ length: OFFER_TICKS + 1 }, (_, t) => {
+            const val = (offersMax / OFFER_TICKS) * t;
+            const gy = yOffers(val);
+            return (
+              <g key={t}>
+                <line x1={m.left} x2={W - m.right} y1={gy} y2={gy} stroke="var(--color-light-gray)" strokeWidth={1} />
+                <text x={m.left - 8} y={gy + 4} textAnchor="end" {...axisText}>{Math.round(val).toLocaleString('en-IN')}</text>
+              </g>
+            );
+          })}
+          {rows.map((r, i) => (
+            <rect key={i} x={xBar(i) - barW / 2} y={yOffers(r.offers)} width={barW} height={Math.max(0, m.top + ih - yOffers(r.offers))} rx={2} fill="var(--color-primary)" />
+          ))}
+          {rows.map((r, i) => (
+            <text key={`v-${i}`} x={xBar(i)} y={yOffers(r.offers) - 7} textAnchor="middle" {...valueText}>{r.offers.toLocaleString('en-IN')}</text>
+          ))}
+          {rows.map((r, i) => (
+            <text key={i} x={xBar(i)} y={H - m.bottom + 20} textAnchor="middle" {...axisText}>{r.label}</text>
+          ))}
+        </svg>
       </div>
-      <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 'auto', display: 'block' }} role="img" aria-label="Placement offers and highest package by batch year">
-        {[0, 0.25, 0.5, 0.75, 1].map((g) => (
-          <line key={g} x1={m.left} x2={W - m.right} y1={m.top + ih * g} y2={m.top + ih * g} stroke="var(--color-light-gray)" strokeWidth={1} />
-        ))}
-        {rows.map((r, i) => (
-          <rect key={`bar-${i}`} x={x(i) - barW / 2} y={yOffers(r.offers)} width={barW} height={Math.max(0, m.top + ih - yOffers(r.offers))} rx={3} fill="var(--color-primary)" opacity={0.92} />
-        ))}
-        {rows.map((r, i) => (
-          <text key={`ov-${i}`} x={x(i)} y={yOffers(r.offers) - 6} textAnchor="middle" fontSize={11} fontWeight={700} fill="var(--color-primary-dark)">
-            {r.offers.toLocaleString('en-IN')}
-          </text>
-        ))}
-        <path d={linePath} fill="none" stroke="var(--color-accent)" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
-        {rows.map((r, i) => (
-          <g key={`pt-${i}`}>
-            <circle cx={x(i)} cy={yLpa(r.highest)} r={4} fill="var(--color-accent)" stroke="#ffffff" strokeWidth={1.5} />
-            <text x={x(i)} y={yLpa(r.highest) - 11} textAnchor="middle" fontSize={11} fontWeight={700} fill="#8A5A20">{r.highest}</text>
-          </g>
-        ))}
-        {rows.map((r, i) => (
-          <text key={`xl-${i}`} x={x(i)} y={H - m.bottom + 22} textAnchor="middle" fontSize={12} fill="var(--color-text-light)">{r.label}</text>
-        ))}
-        <text x={m.left} y={m.top - 12} fontSize={11} fill="var(--color-text-light)">Offers</text>
-        <text x={W - m.right} y={m.top - 12} textAnchor="end" fontSize={11} fill="var(--color-text-light)">LPA</text>
-        <text x={W / 2} y={H - 6} textAnchor="middle" fontSize={12} fontWeight={700} fill="var(--color-text-light)">Passing-out year</text>
-      </svg>
+
+      {/* Highest package (LPA) — line chart */}
+      <div style={cardStyle}>
+        <div style={titleStyle}>Highest package (LPA)</div>
+        <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 'auto', display: 'block' }} role="img" aria-label="Highest placement package in LPA by passing-out year">
+          {Array.from({ length: Math.round((lpaHi - lpaLo) / 5) + 1 }, (_, t) => {
+            const val = lpaLo + 5 * t;
+            const gy = yLpa(val);
+            return (
+              <g key={t}>
+                <line x1={m.left} x2={W - m.right} y1={gy} y2={gy} stroke="var(--color-light-gray)" strokeWidth={1} />
+                <text x={m.left - 8} y={gy + 4} textAnchor="end" {...axisText}>{val}</text>
+              </g>
+            );
+          })}
+          <path d={smoothLinePath(lpaPts)} fill="none" stroke="var(--color-accent)" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
+          {lpaPts.map((p, i) => (
+            <circle key={i} cx={p.x} cy={p.y} r={4.5} fill="var(--color-accent)" stroke="#ffffff" strokeWidth={1.5} />
+          ))}
+          {lpaPts.map((p, i) => (
+            <text key={`v-${i}`} x={p.x} y={p.y - 12} textAnchor="middle" {...valueText}>{rows[i].highest}</text>
+          ))}
+          {rows.map((r, i) => (
+            <text key={i} x={xLine(i)} y={H - m.bottom + 20} textAnchor="middle" {...axisText}>{r.label}</text>
+          ))}
+        </svg>
+      </div>
     </div>
   );
 }
@@ -1328,18 +1401,9 @@ export default function PlacementDetail() {
   const placementCellSummarySection = item.slug === 'placement-details' && summaryYearData.length > 0 && (
     <section className="section bg-off-white">
       <div className="container">
-        <div style={{ marginBottom: 'var(--space-8)' }}>
+        <div>
           <span className="section-label">Impact</span>
           <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Summary</h2>
-        </div>
-        {/* Fixed 4-column grid, not auto-fit/minmax — auto-fit would stretch
-            a partial last row's items to fill the leftover space instead of
-            leaving them at the same width as every other row. mobile-stack-
-            grid still collapses this to a single column on small screens. */}
-        <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-4)' }}>
-          {summaryYearData.map((y, i) => (
-            <BatchSummaryCard key={y.batch} batch={y.batch} offers={y.total} highest={batchHighestPackage(y)} index={i} />
-          ))}
         </div>
         <BatchTrendChart data={summaryYearData} />
       </div>

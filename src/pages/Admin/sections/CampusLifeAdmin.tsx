@@ -9,6 +9,7 @@ import { replaceAtPath, getAtPath, type CustomSection } from '../../../lib/custo
 import { type CustomTab } from '../../../lib/customTabs';
 import { diffChangedFields } from '../../../lib/formDiff';
 import { CAMPUS_LIFE_LEGACY_SEEDS } from '../../CampusLife/campusLifeLegacySeeds';
+import { CONTENT_ICON_NAMES } from '../../../lib/contentIcons';
 
 // Backs every "Campus Life" page (the 16 facility pages under /campus/*,
 // Vishnu TV Academy, Arts & Culture, Sports & Games, Social Services,
@@ -29,6 +30,12 @@ export interface CampusLifeItemDoc {
   // to visitors.
   group: 'facility' | 'activity';
   order: number;
+  // Icon + short description for this item's auto-generated card on the
+  // public /campus hub grid (see Campus.tsx) — only used for facilities
+  // not already hand-curated as a Content Blocks card. Optional so a page
+  // added here still gets a (generic) card with zero extra admin steps.
+  icon?: string;
+  desc?: string;
   // Plain sections (most pages) — same shape as Programs/Differentiators.
   customSections?: CustomSection[];
   // Sidebar-tab layout (Central Library, Campus Hostels, Other Facilities —
@@ -38,7 +45,7 @@ export interface CampusLifeItemDoc {
 }
 
 const EMPTY: Omit<CampusLifeItemDoc, 'id'> = {
-  slug: '', title: '', group: 'facility', order: 0, customSections: [], tabs: [],
+  slug: '', title: '', group: 'facility', order: 0, icon: '', desc: '', customSections: [], tabs: [],
 };
 
 // Pages that keep their existing multi-tab layout — everything else is a
@@ -354,7 +361,7 @@ export default function CampusLifeAdmin() {
   const quickAdd = (page: typeof KNOWN_PAGES[number]) => {
     setEditing(null);
     const seed = CAMPUS_LIFE_LEGACY_SEEDS[page.slug]?.() || {};
-    setForm({ slug: page.slug, title: page.title, group: page.group, order: 0, customSections: [], tabs: [], ...seed });
+    setForm({ slug: page.slug, title: page.title, group: page.group, order: 0, icon: '', desc: '', customSections: [], tabs: [], ...seed });
   };
   const notYetCreated = KNOWN_PAGES.filter((p) => !items.some((it) => it.slug === p.slug));
 
@@ -381,6 +388,7 @@ export default function CampusLifeAdmin() {
     setEditing(it.id);
     const next: Omit<CampusLifeItemDoc, 'id'> = {
       slug: it.slug, title: it.title, group: it.group, order: it.order,
+      icon: it.icon || '', desc: it.desc || '',
       customSections: it.customSections || [], tabs: it.tabs || [],
     };
     setForm(next);
@@ -453,6 +461,22 @@ export default function CampusLifeAdmin() {
             <label htmlFor="field-cl-order">Display Order</label>
             <input id="field-cl-order" type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
           </div>
+          <div className="admin-field">
+            <label htmlFor="field-cl-icon">Card Icon (Campus Facility hub grid)</label>
+            <select id="field-cl-icon" value={form.icon} onChange={(e) => set('icon', e.target.value)}>
+              <option value="">None (generic icon)</option>
+              {CONTENT_ICON_NAMES.map((n) => <option key={n} value={n}>{n}</option>)}
+            </select>
+          </div>
+          <div className="admin-field">
+            <label htmlFor="field-cl-desc">Card Description (Campus Facility hub grid)</label>
+            <input id="field-cl-desc" value={form.desc} onChange={(e) => set('desc', e.target.value)} placeholder="One line shown on the /campus card" />
+          </div>
+          <p className="admin-field__hint admin-field--full" style={{ marginTop: '-0.5rem' }}>
+            Icon and description above are only used for a Campus Facility's card on the public <strong>/campus</strong>{' '}
+            hub page — every facility added here shows up there automatically. They're ignored for Student Activity
+            items and for any facility that already has its own hand-curated card in Admin → Page Content Blocks.
+          </p>
 
           {CAMPUS_LIFE_LEGACY_SEEDS[form.slug] && (
             <p className="admin-field__hint admin-field--full" style={{ background: '#eef6ff', border: '1px solid #bcdcfd', borderRadius: 6, padding: '0.6rem 0.9rem' }}>
