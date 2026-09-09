@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ShieldCheck, FlaskConical, Handshake } from 'lucide-react';
+import { ShieldCheck, Building2, FlaskConical, Handshake } from 'lucide-react';
 import PageHero from '../../components/PageHero/PageHero';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useHashScroll } from '../../hooks/useHashScroll';
@@ -11,7 +11,8 @@ import type { ResearchItemDoc } from '../Admin/sections/ResearchItemsAdmin';
 // admin-editable (researchItems collection), matching the pattern used by
 // Governance's governance/committees/iqac categories.
 const researchCategories = [
-  { key: 'governance' as const, label: 'R&D Governance', desc: 'The committees and centers that set policy, oversee ethics, and protect intellectual property across every research activity at VWU.', icon: ShieldCheck },
+  { key: 'governance' as const, label: 'R&D Governance', desc: 'The committees that set policy, oversee ethics, and protect intellectual property across every research activity at VWU.', icon: ShieldCheck },
+  { key: 'centres' as const, label: 'Research Centres', desc: 'The dedicated centres that host and coordinate focused research activity across VWU departments.', icon: Building2 },
   { key: 'output' as const, label: 'Research Output', desc: 'Funded projects, seed money grants, publications, and patents produced by VWU faculty and students.', icon: FlaskConical },
   { key: 'engagement' as const, label: 'Industry & Professional Engagement', desc: 'Partnerships, consultancy work, and professional body chapters that connect VWU research to the wider industry and academic community.', icon: Handshake },
 ];

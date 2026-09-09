@@ -27,6 +27,7 @@ import '../detail-layout.css';
 
 const CATEGORY_LABELS: Record<string, string> = {
   governance: 'R&D Governance',
+  centres: 'Research Centres',
   output: 'Research Output',
   engagement: 'Industry & Professional Engagement',
 };
@@ -108,7 +109,7 @@ const DEFAULT_RESEARCH_ITEMS_BY_SLUG: Record<string, Partial<ResearchItemDoc>> =
     id: 'default-thrust-areas-of-research',
     slug: 'thrust-areas-of-research',
     title: 'Thrust Areas of Research',
-    category: 'output',
+    category: 'governance',
     intro: DEFAULT_THRUST_AREAS_INTRO,
     accordionText: DEFAULT_THRUST_AREAS_TEXT,
     icon: 'FlaskConical',
@@ -117,7 +118,7 @@ const DEFAULT_RESEARCH_ITEMS_BY_SLUG: Record<string, Partial<ResearchItemDoc>> =
     id: 'default-research-centers',
     slug: 'research-centers',
     title: 'Research Centers',
-    category: 'governance',
+    category: 'centres',
     intro: DEFAULT_RESEARCH_CENTERS_INTRO,
     tableText: DEFAULT_RESEARCH_CENTERS_TABLE_TEXT,
     icon: 'ShieldCheck',

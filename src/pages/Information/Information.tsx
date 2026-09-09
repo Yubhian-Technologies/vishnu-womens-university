@@ -12,6 +12,9 @@ import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import { ICT_RESOURCE_GROUPS } from './ictResources.data';
 import { DEFAULT_OTHER_PRACTICES, EXPERIENTIAL_LEARNING_INTRO, type OtherPracticeItem } from './otherPractices.data';
+import { CustomSectionsPlain } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
+import { hasCustomSectionContent } from '../../lib/customSections';
+import type { CampusLifeItemDoc } from '../Admin/sections/CampusLifeAdmin';
 import './Information.css';
 
 const defaultPlacementsCareersPhotos = [
@@ -30,7 +33,7 @@ const defaultAntiRaggingSafetyPhotos = [
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Campus Patrol & Security', caption: '' },
 ];
 
-type TabId = 'calendar' | 'holidays' | 'counselling' | 'ict' | 'practices';
+type TabId = 'calendar' | 'holidays' | 'counselling' | 'ict' | 'practices' | 'smart-classrooms' | 'state-of-the-art-labs';
 
 const hashToTab: Record<string, TabId> = {
   '#academic-calendar': 'calendar',
@@ -38,6 +41,8 @@ const hashToTab: Record<string, TabId> = {
   '#counselling':       'counselling',
   '#ict-platforms':     'ict',
   '#other-practices':   'practices',
+  '#smart-classrooms':      'smart-classrooms',
+  '#state-of-the-art-labs': 'state-of-the-art-labs',
 };
 
 export default function Information() {
@@ -58,6 +63,17 @@ export default function Information() {
   const hasAntiRaggingSafetyPhotos = useSectionHasPhotos('information', 'anti-ragging-safety');
   const ictPlatforms = useContentBlocks('information', 'ictPlatforms');
   const otherPractices = DEFAULT_OTHER_PRACTICES;
+  // Smart Class Rooms / State-of-the-art Labs are Campus Life facility pages
+  // (same `campusLifeItems` doc/admin section as /campus/smart-classrooms
+  // and /campus/state-of-the-art-labs) — shown here as tabs too, reusing the
+  // exact same content and site photos rather than duplicating them.
+  const { docs: campusLifeItems } = useOrderedCollection<CampusLifeItemDoc>('campusLifeItems', 'order');
+  const smartClassroomsItem = campusLifeItems.find((i) => i.slug === 'smart-classrooms');
+  const stateOfArtLabsItem = campusLifeItems.find((i) => i.slug === 'state-of-the-art-labs');
+  const smartClassroomsSections = (smartClassroomsItem?.customSections || []).filter(hasCustomSectionContent);
+  const stateOfArtLabsSections = (stateOfArtLabsItem?.customSections || []).filter(hasCustomSectionContent);
+  const smartClassroomsPhotos = useSitePhotos('campus', 'smart-classrooms', []);
+  const stateOfArtLabsPhotos = useSitePhotos('campus', 'state-of-the-art-labs', []);
 
   useEffect(() => {
     const tab = hashToTab[location.hash];
@@ -69,6 +85,8 @@ export default function Information() {
     { id: 'holidays', label: 'List of Holidays' },
     { id: 'counselling', label: 'Counselling Scheme' },
     { id: 'ict', label: 'ICT Platforms' },
+    { id: 'smart-classrooms', label: 'Smart Class Rooms' },
+    { id: 'state-of-the-art-labs', label: 'State-of-the-art Labs' },
     { id: 'practices', label: 'Other Practices' },
   ];
 
@@ -262,6 +280,46 @@ export default function Information() {
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Smart Class Rooms — content managed from Admin → Campus Life
+              (same doc as /campus/smart-classrooms). */}
+          {activeTab === 'smart-classrooms' && (
+            <div>
+              <h2 className="section-title" style={{ marginBottom: 'var(--space-5)' }}>
+                {smartClassroomsItem?.title || 'Smart Class Rooms'}
+              </h2>
+              {smartClassroomsSections.length > 0 ? (
+                <CustomSectionsPlain sections={smartClassroomsSections} />
+              ) : (
+                <p style={{ color: 'var(--color-text-light)' }}>Content for this section is coming soon.</p>
+              )}
+              {smartClassroomsPhotos.length > 0 && (
+                <div style={{ marginTop: 'var(--space-8)' }}>
+                  <PhotoGrid images={smartClassroomsPhotos} label="" title="" columns={3} layout="default" />
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* State-of-the-art Labs — content managed from Admin → Campus
+              Life (same doc as /campus/state-of-the-art-labs). */}
+          {activeTab === 'state-of-the-art-labs' && (
+            <div>
+              <h2 className="section-title" style={{ marginBottom: 'var(--space-5)' }}>
+                {stateOfArtLabsItem?.title || 'State-of-the-art Labs'}
+              </h2>
+              {stateOfArtLabsSections.length > 0 ? (
+                <CustomSectionsPlain sections={stateOfArtLabsSections} />
+              ) : (
+                <p style={{ color: 'var(--color-text-light)' }}>Content for this section is coming soon.</p>
+              )}
+              {stateOfArtLabsPhotos.length > 0 && (
+                <div style={{ marginTop: 'var(--space-8)' }}>
+                  <PhotoGrid images={stateOfArtLabsPhotos} label="" title="" columns={3} layout="default" />
+                </div>
+              )}
             </div>
           )}
 
