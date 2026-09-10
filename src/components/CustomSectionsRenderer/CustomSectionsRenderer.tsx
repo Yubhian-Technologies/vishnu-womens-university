@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { FileText, Link2, X, ChevronDown, Phone, Mail } from 'lucide-react';
 import { hasCustomSectionContent, type CustomSection, type CustomSectionPhoto } from '../../lib/customSections';
 import { parseFlexibleTable, parseLinkList } from '../../lib/structuredTable';
@@ -448,12 +448,19 @@ function PhotoLightbox({ photos, index, onClose, onNavigate }: {
           </button>
         </>
       )}
-      <img
-        src={photos[index].imageUrl}
-        alt=""
-        onClick={(e) => e.stopPropagation()}
-        style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', borderRadius: 'var(--radius-md)', cursor: 'default' }}
-      />
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-3)', maxWidth: '100%', maxHeight: '100%' }}>
+        <img
+          src={photos[index].imageUrl}
+          alt=""
+          onClick={(e) => e.stopPropagation()}
+          style={{ maxWidth: '100%', maxHeight: '80vh', objectFit: 'contain', borderRadius: 'var(--radius-md)', cursor: 'default' }}
+        />
+        {photos[index].caption && (
+          <p onClick={(e) => e.stopPropagation()} style={{ color: 'rgba(255,255,255,0.85)', fontSize: 'var(--text-sm)', textAlign: 'center', cursor: 'default' }}>
+            {photos[index].caption}
+          </p>
+        )}
+      </div>
     </div>
   );
 }
@@ -473,11 +480,22 @@ function GalleryGrid({ photos }: { photos: CustomSectionPhoto[] }) {
             onClick={() => setLightbox(i)}
             aria-label={`View photo ${i + 1}`}
             style={{
-              padding: 0, border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)',
+              position: 'relative', padding: 0, border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)',
               overflow: 'hidden', cursor: 'zoom-in', aspectRatio: '4 / 3', background: 'var(--color-off-white)',
             }}
           >
-            <img src={p.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+            <img src={p.imageUrl} alt={p.caption || ''} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+            {p.caption && (
+              <span
+                style={{
+                  position: 'absolute', insetInline: 0, bottom: 0, padding: 'var(--space-2)',
+                  background: 'linear-gradient(0deg, rgba(0,0,0,0.72), transparent)',
+                  color: 'var(--color-white)', fontSize: 'var(--text-xs)', textAlign: 'left',
+                }}
+              >
+                {p.caption}
+              </span>
+            )}
           </button>
         ))}
       </div>
@@ -510,11 +528,22 @@ function StaticGalleryStrip({ photos }: { photos: CustomSectionPhoto[] }) {
             onClick={() => setLightbox(i)}
             aria-label={`View photo ${i + 1}`}
             style={{
-              flex: '0 0 220px', padding: 0, border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)',
+              position: 'relative', flex: '0 0 220px', padding: 0, border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)',
               overflow: 'hidden', cursor: 'zoom-in', aspectRatio: '4 / 3', background: 'var(--color-off-white)',
             }}
           >
-            <img src={p.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+            <img src={p.imageUrl} alt={p.caption || ''} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+            {p.caption && (
+              <span
+                style={{
+                  position: 'absolute', insetInline: 0, bottom: 0, padding: 'var(--space-2)',
+                  background: 'linear-gradient(0deg, rgba(0,0,0,0.72), transparent)',
+                  color: 'var(--color-white)', fontSize: 'var(--text-xs)', textAlign: 'left',
+                }}
+              >
+                {p.caption}
+              </span>
+            )}
           </button>
         ))}
       </div>
@@ -526,7 +555,22 @@ function StaticGalleryStrip({ photos }: { photos: CustomSectionPhoto[] }) {
 }
 
 function CustomSectionBody({ section }: { section: CustomSection }) {
-  const body = <CustomSectionBodyContent section={section} />;
+  let body: ReactNode = <CustomSectionBodyContent section={section} />;
+  // A section can carry photos alongside whatever its primary contentType
+  // is (see CustomSectionEditor.tsx's always-available "Photos" block) —
+  // contentType 'gallery' already renders these via the switch above, so
+  // only append them again here for every other type, right below that
+  // type's own content.
+  if (section.contentType !== 'gallery' && (section.galleryPhotos || []).some((p) => p.imageUrl)) {
+    body = (
+      <>
+        {body}
+        <div style={{ marginTop: 'var(--space-5)' }}>
+          <GalleryGrid photos={section.galleryPhotos || []} />
+        </div>
+      </>
+    );
+  }
   if (!section.photo?.imageUrl) return body;
   return (
     <div style={{ display: 'flex', gap: 'var(--space-5)', alignItems: 'flex-start', flexWrap: 'wrap' }}>

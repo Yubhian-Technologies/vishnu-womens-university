@@ -79,6 +79,7 @@ export const PAGES = [
   ...allCampusFacilities.map((f) => ({ value: `campus-${f.slug}`, label: `Campus Life: ${f.title}` })),
   { value: 'campus-wellness-center',  label: 'Campus Life: Wellness Center' },
   { value: 'campus-sewage-treatment-plants', label: 'Campus Life: Sewage Treatment Plants' },
+  { value: 'campus-events',           label: 'Campus Life: Events' },
   { value: 'information',             label: 'Information' },
   { value: 'governance',              label: 'Governance' },
   { value: 'governing-body',          label: 'Governing Body' },
@@ -123,7 +124,7 @@ const PAGE_GROUPS: { label: string; values: string[] }[] = [
   { label: 'Student Life', values: ['student-clubs', 'arts-culture', 'social-services', 'sports-games', 'vishnu-tv', 'campus-magazines'] },
   { label: 'Placements, Careers & Research', values: ['placement-detail', 'careers', 'differentiators', 'differentiators-detail', 'research', 'research-detail'] },
   { label: 'News & Awards', values: ['news', 'events', 'news-awards', 'news-awards-happenings', 'news-awards-accreditations', 'news-awards-gallery'] },
-  { label: 'Campus Life', values: ['campus', ...allCampusFacilities.map((f) => `campus-${f.slug}`), 'campus-wellness-center', 'campus-sewage-treatment-plants'] },
+  { label: 'Campus Life', values: ['campus', ...allCampusFacilities.map((f) => `campus-${f.slug}`), 'campus-wellness-center', 'campus-sewage-treatment-plants', 'campus-events'] },
   { label: 'Compliance & Contact', values: ['disclosures-ugc', 'anti-ragging', 'policies-procedures', 'contact'] },
 ];
 

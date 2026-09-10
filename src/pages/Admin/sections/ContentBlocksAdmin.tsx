@@ -110,6 +110,7 @@ export const CONTENT_BLOCK_SECTIONS: { page: string; section: string; label: str
   { page: 'central-library', section: 'eDatabasesVideoOnDemand', label: 'Central Library — e-Databases: Video On Demand (Slug field = optional URL)' },
   { page: 'central-library', section: 'eDatabasesOpenCourseware', label: 'Central Library — e-Databases: Open Courseware (Slug field = optional URL)' },
   { page: 'placements', section: 'stats', label: 'Placements — Stats Bar' },
+  { page: 'events', section: 'stats', label: 'Events — Stats Bar' },
 ];
 
 export default function ContentBlocksAdmin() {

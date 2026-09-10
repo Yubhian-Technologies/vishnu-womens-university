@@ -19,6 +19,10 @@ export interface CustomSectionFile {
 export interface CustomSectionPhoto {
   imageUrl: string;
   storagePath: string;
+  /** Optional caption shown under this photo in the gallery grid — only
+   *  used by contentType 'gallery' (the single `photo` field on every other
+   *  content type has no caption of its own). */
+  caption?: string;
 }
 
 // contentType 'imageCards' — an item is a photo plus its own title/
@@ -88,6 +92,13 @@ export interface CustomSection {
   // Optional heavier heading weight for this section's label, admin-toggled
   // per section — off by default (matches the current look everywhere).
   boldHeading?: boolean;
+  // Optional pinned accent colour (a key into SECTION_ACCENT_COLORS, see
+  // lib/sectionAccentColors.ts) — currently only consumed by
+  // CampusEventsShowcase.tsx (the Campus Life "Events" page's bespoke
+  // look), where it overrides that section's automatic by-position colour.
+  // Ignored by every other page's renderer, so it's harmless to leave unset
+  // elsewhere.
+  accentColor?: string;
   // Optional single photo shown beside this section's content (round avatar
   // treatment — see CustomSectionBody in CustomSectionsRenderer.tsx).
   // Independent of contentType — a section can have a photo alongside text,
@@ -141,6 +152,11 @@ export function generateSectionId(label: string, allSections: CustomSection[]): 
 // no content of its own still counts as visible if any subsection does.
 export function hasCustomSectionContent(section: CustomSection): boolean {
   if (section.photo?.imageUrl) return true;
+  // The multi-photo gallery is addable on every contentType, not just
+  // 'gallery' (see CustomSectionEditor.tsx) — a section with photos but no
+  // other content (e.g. "Plain text" with an empty textarea) must still
+  // count as visible, or those photos would silently never render anywhere.
+  if ((section.galleryPhotos || []).some((p) => !!p.imageUrl)) return true;
   const ownContent = (() => {
     switch (section.contentType) {
       case 'text':
