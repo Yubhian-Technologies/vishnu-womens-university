@@ -85,6 +85,11 @@ const SportsDetail = lazyWithRetry(() => import('./pages/Campus/SportsDetail'));
 const CampusLifeDetail = lazyWithRetry(() => import('./pages/CampusLife/CampusLifeDetail'));
 const SewageTreatment = lazyWithRetry(() => import('./pages/Campus/SewageTreatment'));
 const WellnessCenter = lazyWithRetry(() => import('./pages/Campus/WellnessCenter'));
+const Television = lazyWithRetry(() => import('./pages/Campus/Television'));
+const HealthCare = lazyWithRetry(() => import('./pages/Campus/HealthCare'));
+const Temples = lazyWithRetry(() => import('./pages/Campus/Temples'));
+const TravelDesk = lazyWithRetry(() => import('./pages/Campus/TravelDesk'));
+const StaffQuarters = lazyWithRetry(() => import('./pages/Campus/StaffQuarters'));
 const Clubs = lazyWithRetry(() => import('./pages/Campus/Clubs'));
 const FoodCourts = lazyWithRetry(() => import('./pages/Campus/FoodCourts'));
 const Information = lazyWithRetry(() => import('./pages/Information/Information'));
@@ -198,6 +203,16 @@ function PublicApp() {
                 renders instead of CampusLifeDetail redirecting to /campus. */}
             <Route path="/campus/sewage-treatment-plants" element={<SewageTreatment />} />
             <Route path="/campus/wellness-center" element={<WellnessCenter />} />
+            <Route path="/campus/television" element={<Television />} />
+            <Route path="/television" element={<Television />} />
+            <Route path="/campus/health-care" element={<HealthCare />} />
+            <Route path="/health-care" element={<HealthCare />} />
+            <Route path="/campus/temples" element={<Temples />} />
+            <Route path="/temples" element={<Temples />} />
+            <Route path="/campus/travel-desk" element={<TravelDesk />} />
+            <Route path="/travel-desk" element={<TravelDesk />} />
+            <Route path="/campus/staff-quarters" element={<StaffQuarters />} />
+            <Route path="/staff-quarters" element={<StaffQuarters />} />
             <Route path="/campus/sports" element={<Sports />} />
             <Route path="/campus/sports/:id" element={<SportsDetail />} />
             <Route path="/campus/clubs" element={<Clubs />} />
