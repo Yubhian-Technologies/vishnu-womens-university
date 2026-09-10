@@ -117,33 +117,6 @@ Indoor / outdoor games are provided in the hostel. Pictures are screened regular
     desc: 'Safe, Comfortable Living for a Connected Campus Experience.',
   },
   {
-    slug: 'food-courts',
-    title: 'Food Courts',
-    heroSubtitle: 'Hygienic Dining with Variety and Convenience.',
-    body: `Eating a variety of healthy foods is the key to a well-balanced diet and good nutrition. It keeps our bodies working well and helps prevent diseases such as diabetes, cancer and cardiovascular disease. On the other hand, youth would like to have a variety of modern food items to satisfy their love for food.
-
-Food Courts offer both modern and traditional food items in the campus. The huge campus has got Food Courts at seventeen different locations, occasionally alluring students and faculty for taste of food items. Thus, these places provide them an opportunity to eat out just to deviate from their monotonous routine. These food courts are open from 6.30a.m. to 8.30p.m. They are:
-
-- Canoe & Cusine
-- Brewista
-- Tea leaf
-- Central Square
-- Bakers Treat
-- Tasty Corner
-- Nescafe Coffee Shops
-- Fresh Choice Bakery at Lake View
-- Lake View Court
-- Jercy Juicy Shop and Fast Food Items
-- Annapurna Fast Food Items
-- Fresh Choice at Temple Square
-- Snacks Corner
-- Juice Shop and Fast Foods
-- Annapurna Canteen
-- Sita Mess
-- Vishnu Canteen`,
-    desc: 'Hygienic Dining with Variety and Convenience.',
-  },
-  {
     slug: 'fitness-centre',
     title: 'Vishnu Fitness Centre',
     heroSubtitle: 'Supporting Fitness, Wellness, and an Active Lifestyle.',

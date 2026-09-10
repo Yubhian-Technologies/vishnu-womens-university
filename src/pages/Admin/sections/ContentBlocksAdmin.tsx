@@ -37,7 +37,12 @@ const EMPTY: Omit<ContentBlockDoc, 'id'> = { page: '', section: '', value: '', t
 
 // Sections whose "slug" field is an uploaded avatar/photo rather than a
 // pasted URL or anchor link — shows an ImageUploader instead of a text input.
-const IMAGE_SLUG_SECTIONS = new Set(['home::testimonials']);
+const IMAGE_SLUG_SECTIONS = new Set(['home::testimonials', 'clubs::testimonials']);
+
+// Sections whose "icon" field is a short free-text badge label (e.g.
+// "Featured Leader") rather than a picked icon from the shared icon set —
+// shows a text input instead of the icon <select>. Leave blank for no badge.
+const TEXT_ICON_SECTIONS = new Set(['clubs::testimonials']);
 
 // Every (page, section) pair currently wired up to read from this
 // collection. Add a new entry here first when wiring a new list.
@@ -50,6 +55,10 @@ export const CONTENT_BLOCK_SECTIONS: { page: string; section: string; label: str
   { page: 'academics', section: 'studentActivities', label: 'Academics — Student Activities Nav' },
   { page: 'academics', section: 'careerOutcomeStats', label: 'Academics — Career Outcome Stats' },
   { page: 'campus', section: 'stats', label: 'Campus — Stats Bar' },
+  { page: 'clubs', section: 'stats', label: 'Clubs — Stats Bar (2 extra pills alongside the live clubs/categories count)' },
+  { page: 'clubs', section: 'testimonials', label: 'Clubs — Testimonials (Icon field = optional badge label, e.g. "Featured Leader" — leave blank for none)' },
+  { page: 'clubs', section: 'whyJoin', label: 'Clubs — Why Join Clubs (5 Pillars list: Icon + Title + Desc)' },
+  { page: 'clubs', section: 'hero', label: 'Clubs — Hero Extra Text (single item: Value=Badge, Title=Script Tagline, Desc=Top-Right Corner Text (line break for 2 lines), Slug=2nd Button Link)' },
   { page: 'information', section: 'ictPlatforms', label: 'Information — ICT Platforms' },
   { page: 'information', section: 'counsellingScheme', label: 'Information — Counselling Scheme' },
   { page: 'information', section: 'otherPractices', label: 'Information — Other Practices' },
@@ -110,6 +119,7 @@ export const CONTENT_BLOCK_SECTIONS: { page: string; section: string; label: str
   { page: 'central-library', section: 'eDatabasesVideoOnDemand', label: 'Central Library — e-Databases: Video On Demand (Slug field = optional URL)' },
   { page: 'central-library', section: 'eDatabasesOpenCourseware', label: 'Central Library — e-Databases: Open Courseware (Slug field = optional URL)' },
   { page: 'placements', section: 'stats', label: 'Placements — Stats Bar' },
+  { page: 'events', section: 'stats', label: 'Events — Stats Bar' },
 ];
 
 export default function ContentBlocksAdmin() {
@@ -190,11 +200,20 @@ export default function ContentBlocksAdmin() {
               <input id="field-value-number-short-value-if" value={form.value} onChange={(e) => set('value', e.target.value)} placeholder="100 Acres" />
             </div>
             <div className="admin-field">
-              <label htmlFor="field-icon-if-this-section-uses">Icon (if this section uses icon cards)</label>
-              <select id="field-icon-if-this-section-uses" value={form.icon} onChange={(e) => set('icon', e.target.value)}>
-                <option value="">None</option>
-                {CONTENT_ICON_NAMES.map((n) => <option key={n} value={n}>{n}</option>)}
-              </select>
+              {TEXT_ICON_SECTIONS.has(`${form.page}::${form.section}`) ? (
+                <>
+                  <label htmlFor="field-icon-badge-label">Badge Label (e.g. "Featured Leader" — leave blank for no badge)</label>
+                  <input id="field-icon-badge-label" value={form.icon} onChange={(e) => set('icon', e.target.value)} placeholder="Featured Leader" />
+                </>
+              ) : (
+                <>
+                  <label htmlFor="field-icon-if-this-section-uses">Icon (if this section uses icon cards)</label>
+                  <select id="field-icon-if-this-section-uses" value={form.icon} onChange={(e) => set('icon', e.target.value)}>
+                    <option value="">None</option>
+                    {CONTENT_ICON_NAMES.map((n) => <option key={n} value={n}>{n}</option>)}
+                  </select>
+                </>
+              )}
             </div>
             <div className="admin-field">
               {IMAGE_SLUG_SECTIONS.has(`${form.page}::${form.section}`) ? (

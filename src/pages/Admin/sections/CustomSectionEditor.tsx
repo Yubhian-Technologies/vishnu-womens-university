@@ -5,6 +5,7 @@ import type { UploadResult } from '../../../lib/storage';
 import { mergeFlexibleTable, mergeLinkList } from '../../../lib/structuredTable';
 import { parseGenericTableWorkbook, parseGenericLinksWorkbook } from '../../../lib/genericSectionImport';
 import { generateSectionId, type CustomSection, type CustomSectionContentType } from '../../../lib/customSections';
+import { SECTION_ACCENT_COLORS } from '../../../lib/sectionAccentColors';
 
 const CONTENT_TYPE_LABELS: Record<CustomSectionContentType, string> = {
   text: 'Plain text',
@@ -110,7 +111,11 @@ export default function CustomSectionEditor({
 
   const addGalleryPhoto = (si: number) => {
     const photos = sections[si].galleryPhotos || [];
-    updateSection(si, { galleryPhotos: [...photos, { imageUrl: '', storagePath: '' }] });
+    updateSection(si, { galleryPhotos: [...photos, { imageUrl: '', storagePath: '', caption: '' }] });
+  };
+  const updateGalleryPhotoCaption = (si: number, pi: number, caption: string) => {
+    const photos = (sections[si].galleryPhotos || []).map((p, i) => (i === pi ? { ...p, caption } : p));
+    updateSection(si, { galleryPhotos: photos });
   };
 
   const addImageCard = (si: number) => {
@@ -257,6 +262,36 @@ export default function CustomSectionEditor({
                 />
                 Bold heading
               </label>
+              {/* Only actually changes anything on the Campus Life "Events"
+                  page's bespoke design (CampusEventsShowcase.tsx) — harmless
+                  to set on any other page's section, since nothing else
+                  reads it. Unset ("Auto") lets that page keep cycling
+                  colours by section position instead. */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', alignSelf: 'center' }}>
+                <span style={{ fontSize: 'var(--text-xs)', color: '#6b7280' }}>Accent:</span>
+                <button
+                  type="button"
+                  onClick={() => updateSection(si, { accentColor: undefined })}
+                  title="Auto (cycle by position)"
+                  style={{
+                    width: 20, height: 20, borderRadius: '50%', cursor: 'pointer',
+                    border: !s.accentColor ? '2px solid var(--color-primary, #1b4332)' : '1px solid var(--color-light-gray)',
+                    background: 'repeating-conic-gradient(#ddd 0% 25%, #fff 0% 50%) 50% / 8px 8px',
+                  }}
+                />
+                {SECTION_ACCENT_COLORS.map((c) => (
+                  <button
+                    key={c.key}
+                    type="button"
+                    onClick={() => updateSection(si, { accentColor: c.key })}
+                    title={c.label}
+                    style={{
+                      width: 20, height: 20, borderRadius: '50%', cursor: 'pointer', background: c.accent,
+                      border: s.accentColor === c.key ? '2px solid var(--color-primary, #1b4332)' : '1px solid rgba(0,0,0,0.1)',
+                    }}
+                  />
+                ))}
+              </div>
               {(s.subSections?.length ?? 0) > 0 && (
                 <div className="admin-field" style={{ flex: 1, minWidth: 190 }}>
                   <select
@@ -276,10 +311,13 @@ export default function CustomSectionEditor({
               </div>
             </div>
 
-            {/* The section's own single accent photo — independent of
-                contentType elsewhere, but redundant (and confusing next to
-                the Gallery's own "+ Add Photo" below) specifically when
-                contentType is already 'gallery', so it's hidden there. */}
+            {/* The section's own single round/square accent photo —
+                independent of contentType elsewhere, but redundant (and
+                confusing next to the multi-photo gallery below)
+                specifically when contentType is already 'gallery', so it's
+                hidden there. Labelled "Accent Photo" (rather than the
+                gallery's own "+ Add Photo" below) so the two aren't mistaken
+                for the same thing. */}
             {s.contentType !== 'gallery' && (
               <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', marginBottom: '0.75rem' }}>
                 {s.photo?.imageUrl || photoRevealed.has(s.id) ? (
@@ -289,13 +327,13 @@ export default function CustomSectionEditor({
                         folder="vwu/custom-sections/photos"
                         currentUrl={s.photo?.imageUrl}
                         aspect={1}
-                        label="+ Add Photo"
+                        label="+ Add Accent Photo"
                         onUploaded={(r) => onPhotoUploaded(path, r)}
                       />
                     </div>
                     {s.photo?.imageUrl && (
                       <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => onPhotoRemoved(path)}>
-                        Remove Photo
+                        Remove Accent Photo
                       </button>
                     )}
                   </>
@@ -305,11 +343,49 @@ export default function CustomSectionEditor({
                     className="admin-btn admin-btn--sm"
                     onClick={() => setPhotoRevealed((prev) => new Set(prev).add(s.id))}
                   >
-                    + Add Photo
+                    + Add Accent Photo
                   </button>
                 )}
               </div>
             )}
+
+            {/* Multi-photo gallery, each with its own caption — available
+                on every section regardless of contentType (not just ones
+                set to "Photo Gallery"), so any section can carry as many
+                photos as needed alongside its own text/table/etc. content. */}
+            <div style={{ marginBottom: '0.75rem' }}>
+              <p className="admin-field__hint" style={{ marginTop: 0, marginBottom: '0.4rem', fontWeight: 700 }}>
+                Photos (optional — add as many as you like, each with its own caption)
+              </p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '0.5rem' }}>
+                {(s.galleryPhotos || []).map((p, pi) => (
+                  <div key={pi} style={{ width: 140 }}>
+                    <ImageUploader
+                      folder="vwu/custom-sections/gallery"
+                      currentUrl={p.imageUrl}
+                      aspect={4 / 3}
+                      label="Choose Photo"
+                      onUploaded={(r) => onGalleryPhotoUploaded(path, pi, r)}
+                    />
+                    <input
+                      value={p.caption || ''}
+                      onChange={(e) => updateGalleryPhotoCaption(si, pi, e.target.value)}
+                      placeholder="Caption (optional)"
+                      style={{ width: '100%', marginTop: '0.35rem', fontSize: '0.8rem' }}
+                    />
+                    <button
+                      type="button"
+                      className="admin-btn admin-btn--sm admin-btn--danger"
+                      style={{ width: '100%', marginTop: '0.35rem' }}
+                      onClick={() => onGalleryPhotoRemoved(path, pi)}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <button type="button" className="admin-btn admin-btn--sm" onClick={() => addGalleryPhoto(si)}>+ Add Photo</button>
+            </div>
 
             {s.contentType === 'text' && (
               <div className="admin-field">
@@ -437,37 +513,6 @@ export default function CustomSectionEditor({
                 ))}
                 <button type="button" className="admin-btn admin-btn--sm" onClick={() => addFileRow(si)}>+ Add File</button>
                 <p className="admin-field__hint">No bulk import for files — add and upload one at a time.</p>
-              </div>
-            )}
-
-            {s.contentType === 'gallery' && (
-              <div>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '0.5rem' }}>
-                  {(s.galleryPhotos || []).map((p, pi) => (
-                    <div key={pi} style={{ width: 140 }}>
-                      <ImageUploader
-                        folder="vwu/custom-sections/gallery"
-                        currentUrl={p.imageUrl}
-                        aspect={4 / 3}
-                        label="Choose Photo"
-                        onUploaded={(r) => onGalleryPhotoUploaded(path, pi, r)}
-                      />
-                      <button
-                        type="button"
-                        className="admin-btn admin-btn--sm admin-btn--danger"
-                        style={{ width: '100%', marginTop: '0.35rem' }}
-                        onClick={() => onGalleryPhotoRemoved(path, pi)}
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  ))}
-                </div>
-                <button type="button" className="admin-btn admin-btn--sm" onClick={() => addGalleryPhoto(si)}>+ Add Photo</button>
-                <p className="admin-field__hint">
-                  Any number of photos, shown on the public page as a grid you can click through — each one still gets
-                  the crop step (pick "Free" in there for an uncropped fit, or any of the other ratios).
-                </p>
               </div>
             )}
 

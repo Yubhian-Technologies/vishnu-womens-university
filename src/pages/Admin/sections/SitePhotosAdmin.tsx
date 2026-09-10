@@ -174,6 +174,25 @@ const DEFAULT_SECTIONS: Record<string, Record<string, SectionDef>> = {
     'hostels-living': placeholderSection('Hostels & Living', [
       'Hostel Blocks Exterior', 'Standard Room Layout', 'Dining Hall & Mess', 'Indoor Recreation Room', 'Security & Main Gate',
     ]),
+    // "Clubs in Action" gallery on the Clubs landing page (/campus/clubs) —
+    // also feeds that page's Student Voices photo collage (its first 3
+    // slots). Starts with stock defaults (matching Clubs.tsx's
+    // DEFAULT_GALLERY) rather than the shared placeholder bank, so the page
+    // shows real-looking photos immediately; replace each slot with VWU's
+    // own event photos here.
+    'clubs': {
+      label: 'Clubs in Action',
+      slots: [
+        { imageUrl: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&q=80', alt: 'Campus cultural festival performance', caption: 'Campus Cultural Fest', label: 'Photo 1' },
+        { imageUrl: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=800&q=80', alt: 'Students at a technical hackathon', caption: 'Hackathon Winners', label: 'Photo 2' },
+        { imageUrl: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=800&q=80', alt: 'Robotics team celebrating a win', caption: 'Robotics Champions', label: 'Photo 3' },
+        { imageUrl: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80', alt: 'Students collaborating in a coding workshop', caption: 'Coding Workshop', label: 'Photo 4' },
+        { imageUrl: 'https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=800&q=80', alt: 'Club members on a community outreach visit', caption: 'Community Outreach', label: 'Photo 5' },
+        { imageUrl: 'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=800&q=80', alt: 'Seminar and workshop hall in session', caption: 'Guest Lecture', label: 'Photo 6' },
+        { imageUrl: 'https://images.unsplash.com/photo-1531545514256-b1400bc00f31?w=800&q=80', alt: 'Students collaborating on a science project', caption: 'Science & Innovation Club', label: 'Photo 7' },
+        { imageUrl: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=800&q=80', alt: 'Students on a campus nature walk', caption: 'Ecology Club Outing', label: 'Photo 8' },
+      ],
+    },
     // The 16 real "Discover > Campus Life" header dropdown items — each its
     // own 5-photo bank, matching the real nav exactly (Header.tsx navItems).
     'smart-classrooms': placeholderPhotoBank('Smart Class Rooms'),
