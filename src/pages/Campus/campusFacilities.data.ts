@@ -251,6 +251,15 @@ Indian Bank was exclusively runs for the students and employees of Vishnu Women'
 Apart from it, there are two ATMs. One of which is located at the entrance of the Main Gate of the campus and another near the Dental College in order to meet their banking needs hassle free.`,
     desc: 'More Facilities for a Complete Campus Experience.',
   },
+  {
+    slug: 'television',
+    title: 'Television',
+    heroSubtitle: 'University Level Television & Broadcast Media Center.',
+    body: `# Television
+
+The University Television & Broadcast Media Center at Vishnu Women's University is dedicated to delivering high-quality campus broadcasts, educational video resources, live streaming of university events, and student-led video productions.`,
+    desc: 'University Level Television & Broadcast Media Center.',
+  },
 ];
 
 export const RELOCATED_FACILITIES: CampusFacility[] = [

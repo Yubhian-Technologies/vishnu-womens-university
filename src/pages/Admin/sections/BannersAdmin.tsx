@@ -276,12 +276,18 @@ function PageBannersAdmin() {
     if (formRef.current) smoothScrollTo(formRef.current);
   };
 
-  const remove = async (id: string) => {
-    if (!confirm('Delete this banner?')) return;
+  const remove = async (b: Banner) => {
+    if (!window.confirm(`Delete banner "${b.title || 'Untitled'}"?`)) return;
     try {
-      await deleteDoc(doc(db, 'banners', id));
+      await deleteDoc(doc(db, 'banners', b.id));
+      if (b.storagePath) await deleteFile(b.storagePath).catch(() => {});
+      if (b.videoStoragePath) await deleteFile(b.videoStoragePath).catch(() => {});
+      if (editing === b.id) {
+        setEditing(null);
+        setForm(EMPTY);
+      }
     } catch (e) {
-      alert(`Couldn't delete: ${(e as Error).message}`);
+      alert(`Couldn't delete banner: ${(e as Error).message}`);
     }
   };
 
@@ -457,7 +463,7 @@ function PageBannersAdmin() {
                   <ReadOnlyGate readOnly={!canEdit(session, RESOURCES.PLACEMENTS_HERO_BANNERS, PLACEMENTS_BANNER_PAGES.has(b.page ?? 'home'))}>
                     <div className="admin-image-card__actions">
                       <button className="admin-btn admin-btn--sm" onClick={() => startEdit(b)}>Edit</button>
-                      <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(b.id)}>Delete</button>
+                      <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(b)}>Delete</button>
                     </div>
                   </ReadOnlyGate>
                 </div>
