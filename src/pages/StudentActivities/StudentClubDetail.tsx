@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { Users, FileText } from 'lucide-react';
 import { useOrderedCollection } from '../../hooks/useCollection';
+import { usePageBanner } from '../../hooks/usePageBanner';
 import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import { slugify } from '../../lib/slugify';
 import type { ClubDoc } from '../Admin/sections/StudentClubsAdmin';
@@ -12,6 +13,10 @@ export default function StudentClubDetail() {
   const { slug } = useParams<{ slug: string }>();
   const { docs: allClubs, loading } = useOrderedCollection<ClubDoc>('studentClubs', 'order');
   const club = allClubs.find((c) => (c.slug || slugify(c.name)) === slug) ?? null;
+  // Independent of the club's own `images` gallery/thumbnail — set per-club
+  // in Hero Banners > Student Clubs, falling back to the shared "Student
+  // Club Detail Pages" banner when a club has no hero image of its own.
+  const fallbackBanner = usePageBanner('student-club-detail');
 
   const otherClubsInCategory = club
     ? allClubs.filter((c) => c.category === club.category && c.id !== club.id)
@@ -34,6 +39,7 @@ export default function StudentClubDetail() {
 
   const Icon = CLUB_CATEGORY_ICONS[club.category] || Users;
   const images = club.images || [];
+  const heroImage = club.heroImage || fallbackBanner?.imageUrl;
   const infoCards = [
     ...(club.vision ? [{ label: 'Vision', content: club.vision }] : []),
     ...(club.mission ? [{ label: 'Mission', content: club.mission }] : []),
@@ -46,9 +52,9 @@ export default function StudentClubDetail() {
       <section className="dept-hero-section">
         <div className="container">
           <div className="dept-hero-card">
-            {images.length > 0 && (
+            {heroImage && (
               <img
-                src={typeof images[0] === 'string' ? images[0] : images[0]?.url}
+                src={heroImage}
                 alt={club.name}
                 className="dept-hero-bg-img"
                 loading="eager"

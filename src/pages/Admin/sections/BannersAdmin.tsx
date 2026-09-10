@@ -9,6 +9,7 @@ import VideoUploader from '../../../components/VideoUploader/VideoUploader';
 import { deleteFile, type UploadResult } from '../../../lib/storage';
 import { allCampusFacilities } from '../../Campus/campusFacilities.data';
 import { DIFFERENTIATOR_CATEGORIES } from './DifferentiatorsAdmin';
+import { CLUB_CATEGORIES } from './StudentClubsAdmin';
 import ItemHeroImagesAdmin from './ItemHeroImagesAdmin';
 import { smoothScrollTo } from '../../../lib/smoothScroll';
 import { useAdminSession } from '../AdminSessionContext';
@@ -39,6 +40,7 @@ const RESEARCH_CATEGORIES = [
   { value: 'engagement', label: 'Industry & Professional Engagement' },
 ];
 const DIFFERENTIATOR_CATEGORY_OPTIONS = DIFFERENTIATOR_CATEGORIES.map((c) => ({ value: c.id, label: c.label }));
+const CLUB_CATEGORY_OPTIONS = CLUB_CATEGORIES.map((c) => ({ value: c, label: c }));
 
 interface Banner {
   id: string;
@@ -99,6 +101,8 @@ export const PAGES = [
   { value: 'research',                label: 'Research' },
   { value: 'research-detail',         label: 'Research Detail Pages (fallback — used when a research item has no image of its own)' },
   { value: 'student-clubs',           label: 'Student Clubs' },
+  { value: 'student-club-detail',     label: 'Student Club Detail Pages (fallback — used when a club has no hero image of its own)' },
+  { value: 'clubs',                   label: 'Clubs (Campus Life landing page)' },
   { value: 'arts-culture',            label: 'Arts & Culture' },
   { value: 'social-services',         label: 'Social Services' },
   { value: 'campus-magazines',        label: 'Campus Magazines' },
@@ -121,14 +125,14 @@ const PAGE_GROUPS: { label: string; values: string[] }[] = [
   { label: 'Main Pages', values: ['home', 'academics', 'admissions', 'programmes-fee', 'admission-procedure', 'result-analysis', 'campus-visit', 'student-life', 'placements', 'alumni-giving', 'about', 'information'] },
   { label: 'About, Society & Governance', values: ['about-sves', 'vision-mission', 'governance', 'governing-body', 'governance-detail'] },
   { label: 'Academics', values: ['academics-curriculum', 'academics-downloads', 'academics-schools', 'academics-departments', 'academics-programs', 'faculty', 'program-detail'] },
-  { label: 'Student Life', values: ['student-clubs', 'arts-culture', 'social-services', 'sports-games', 'vishnu-tv', 'campus-magazines'] },
+  { label: 'Student Life', values: ['student-clubs', 'student-club-detail', 'clubs', 'arts-culture', 'social-services', 'sports-games', 'vishnu-tv', 'campus-magazines'] },
   { label: 'Placements, Careers & Research', values: ['placement-detail', 'careers', 'differentiators', 'differentiators-detail', 'research', 'research-detail'] },
   { label: 'News & Awards', values: ['news', 'events', 'news-awards', 'news-awards-happenings', 'news-awards-accreditations', 'news-awards-gallery'] },
   { label: 'Campus Life', values: ['campus', ...allCampusFacilities.map((f) => `campus-${f.slug}`), 'campus-wellness-center', 'campus-sewage-treatment-plants', 'campus-events'] },
   { label: 'Compliance & Contact', values: ['disclosures-ugc', 'anti-ragging', 'policies-procedures', 'contact'] },
 ];
 
-const FALLBACK_PAGES = new Set(['program-detail', 'governance-detail', 'placement-detail', 'differentiators-detail', 'research-detail']);
+const FALLBACK_PAGES = new Set(['program-detail', 'governance-detail', 'placement-detail', 'differentiators-detail', 'research-detail', 'student-club-detail']);
 
 // The heading/subtitle each page currently shows by default (the
 // `defaultTitle`/`defaultSubtitle` props passed to that page's <PageHero>,
@@ -172,6 +176,7 @@ const PAGE_TEXT_DEFAULTS: Record<string, { title: string; subtitle?: string }> =
   'vishnu-tv': { title: 'Vishnu TV Academy', subtitle: 'Student-run and student-driven — the only dedicated campus TV Academy in Andhra Pradesh.' },
   'social-services': { title: 'Social Services', subtitle: 'The National Service Scheme at VWU shapes engineers who are equally committed to their craft and to the communities they serve.' },
   'student-clubs': { title: 'Student Clubs', subtitle: '23 active clubs across technology, social service, arts, and culture — VWU has a community for every interest.' },
+  'clubs': { title: 'Find Your Passion, Join a Club', subtitle: 'From technology to the arts, service to sport — VWU has a club for every interest, and a community waiting to welcome you.' },
   'sports-games': { title: 'Sports & Games', subtitle: 'Building Strength, Skill, Teamwork, and Sporting Spirit.' },
   'policies-procedures': { title: 'Policies & Procedures', subtitle: 'A structured framework for governance, academics, research, and campus sustainability at VWU.' },
   'research': { title: 'Research & Development', subtitle: 'From funded projects and patents to industry MoUs and professional bodies — a look at how VWU builds knowledge that matters.' },
@@ -481,6 +486,7 @@ const TABS = [
   { id: 'placements',     label: 'Placements' },
   { id: 'differentiators', label: 'Differentiators' },
   { id: 'research',       label: 'Research' },
+  { id: 'studentClubs',   label: 'Student Clubs' },
 ] as const;
 
 type TabId = typeof TABS[number]['id'];
@@ -588,6 +594,21 @@ export default function BannersAdmin() {
           getCategoryValue={(d) => d.category as string}
           categories={RESEARCH_CATEGORIES}
           emptyMessage="No research items yet — add one in the Research admin section."
+        />
+        </ReadOnlyGate>
+      )}
+      {tab === 'studentClubs' && (
+        <ReadOnlyGate readOnly={!otherTabsEditable}>
+        <ItemHeroImagesAdmin
+          collectionName="studentClubs"
+          orderByField="order"
+          imageField="heroImage"
+          storagePathField="heroStoragePath"
+          folder="vwu/student-clubs"
+          getLabel={(d) => d.name as string}
+          getCategoryValue={(d) => d.category as string}
+          categories={CLUB_CATEGORY_OPTIONS}
+          emptyMessage="No clubs yet — add one in the Student Clubs admin section."
         />
         </ReadOnlyGate>
       )}
