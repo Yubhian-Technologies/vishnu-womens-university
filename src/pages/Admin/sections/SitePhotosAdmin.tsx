@@ -403,10 +403,25 @@ const DEFAULT_SECTIONS: Record<string, Record<string, SectionDef>> = {
     },
   },
   'social-services': {
+    hero: {
+      label: 'Hero Banner Photo',
+      slots: [
+        { imageUrl: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1920&q=80', alt: 'NSS students engaged in community service', caption: '', label: 'Hero Background' },
+      ],
+    },
     main: {
       label: 'Main Gallery',
       slots: [
         { imageUrl: 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=900&q=80', alt: 'NSS community service', caption: '', label: '"NSS at VWU" section photo' },
+      ],
+    },
+    communities: placeholderSection('Communities We Serve (Card Photos)', [
+      'Rural Students', 'Leprosy Care', 'Village Communities', 'Persons with Disabilities', 'Hospital Patients', 'Academic Excellence',
+    ]),
+    'founder-legacy': {
+      label: "Founder's Legacy Photo (Dr. B. V. Raju)",
+      slots: [
+        { imageUrl: '/sves-legacy-vision.jpg', alt: 'Founder’s Legacy — Late Dr. B. V. Raju', caption: '', label: 'Section Photo' },
       ],
     },
   },
