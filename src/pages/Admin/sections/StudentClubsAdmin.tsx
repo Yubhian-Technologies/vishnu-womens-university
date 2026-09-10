@@ -63,9 +63,14 @@ export interface ClubDoc {
   // same way as Vision/Mission, so admins aren't limited to the fixed set
   // of fields hardcoded here.
   customFields?: ClubCustomField[];
-  // Up to MAX_CLUB_IMAGES photos — the first doubles as the detail page's
-  // hero image, the rest render in a small gallery beneath it.
+  // Up to MAX_CLUB_IMAGES photos, shown as this club's card thumbnail (the
+  // first one) and a small gallery on the detail page. Independent of the
+  // detail page's hero banner (heroImage below) — see Hero Banners admin ->
+  // Student Clubs tab, which falls back to the shared "Student Club Detail
+  // Pages" page banner when a club has no hero image of its own.
   images?: ClubImage[];
+  heroImage?: string;
+  heroStoragePath?: string;
   pdfUrl?: string;
   pdfStoragePath?: string;
   committee?: ClubCommitteeMember[];
@@ -199,7 +204,7 @@ export default function StudentClubsAdmin() {
           <div className="admin-field admin-field--full">
             <label>Club Images (up to {MAX_CLUB_IMAGES})</label>
             <p className="admin-field__hint">
-              The first image doubles as this club's page banner; any others show in a small gallery below it.
+              The first image is used as this club's card thumbnail on the Clubs pages; all of them show in a small gallery on the detail page. The detail page's hero banner is separate — set it in Hero Banners &gt; Student Clubs.
             </p>
             <div className="admin-image-grid">
               {images.map((img, i) => (
