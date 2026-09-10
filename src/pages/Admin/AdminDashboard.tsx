@@ -22,6 +22,7 @@ import EventsAdmin from './sections/EventsAdmin';
 import FaqAdmin from './sections/FaqAdmin';
 import StudentClubsAdmin from './sections/StudentClubsAdmin';
 import CampusLifeAdmin from './sections/CampusLifeAdmin';
+import SportsAdmin from './sections/SportsAdmin';
 import JobOpeningsAdmin from './sections/JobOpeningsAdmin';
 import ContentBlocksAdmin from './sections/ContentBlocksAdmin';
 import ContactsAdmin from './sections/ContactsAdmin';
@@ -115,6 +116,7 @@ const SECTION_MAP: Record<string, React.ReactNode> = {
   faqs: <FaqAdmin />,
   'student-clubs': <StudentClubsAdmin />,
   'campus-life': <CampusLifeAdmin />,
+  sports: <SportsAdmin />,
   'job-openings': <JobOpeningsAdmin />,
   'content-blocks': <ContentBlocksAdmin />,
   contacts: <ContactsAdmin />,

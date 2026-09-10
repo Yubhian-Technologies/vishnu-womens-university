@@ -61,7 +61,9 @@ export default function PageHero({
     ctaLink: scrollCtaTargetId ? `#${scrollCtaTargetId}` : '',
   };
   const allSlides: Omit<BannerSlide, 'id' | 'order'>[] =
-    slides.length > 0 ? slides : [defaultSlide];
+    slides.length > 0
+      ? slides.map((s) => ({ ...s, imageUrl: s.imageUrl || defaultImage || '' }))
+      : [defaultSlide];
   // Clamp the carousel index into range for *this* render. A live
   // usePageBanners update can shrink `slides` (a banner deleted in /admin,
   // or a Firestore cache→server re-delivery) while `rawCurrent` still points
