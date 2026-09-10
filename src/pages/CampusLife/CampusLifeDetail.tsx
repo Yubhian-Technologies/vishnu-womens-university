@@ -9,6 +9,7 @@ import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import { hasCustomSectionContent } from '../../lib/customSections';
 import { findCampusFacilityBySlug } from '../Campus/campusFacilities.data';
 import VwuSportsSection from '../../components/VwuSportsSection/VwuSportsSection';
+import CampusEventsShowcase from '../../components/CampusEventsShowcase/CampusEventsShowcase';
 import type { CampusLifeItemDoc } from '../Admin/sections/CampusLifeAdmin';
 import '../detail-layout.css';
 import '../Campus/tabbed-section.css';
@@ -29,6 +30,13 @@ const ACTIVITY_LABELS: Record<string, string> = {
   'vishnu-tv-academy': 'Vishnu TV Academy', 'arts-culture': 'Arts & Culture', 'sports-games': 'Sports & Games',
   'social-services': 'Social Services', 'campus-magazines': 'Campus Magazines',
 };
+
+// Whichever slug the admin currently has this page saved under (it's been
+// renamed once already while being set up) gets the CampusEventsShowcase
+// treatment below — matching both rather than one exact string means a
+// future rename between these two doesn't silently drop back to the plain
+// placeholder-text view.
+const EVENTS_SHOWCASE_SLUGS = new Set(['event', 'events']);
 
 const NAV_OFFSET = 'calc(var(--topbar-height) + var(--header-height) + 1rem)';
 
@@ -76,17 +84,21 @@ export default function CampusLifeDetail({ slug: slugProp }: { slug?: string }) 
 
   return (
     <main className="page-wrapper">
-      <PageHero
-        page={heroPage}
-        defaultTitle={title}
-        defaultSubtitle={subtitle}
-        breadcrumb={isActivity
-          ? [{ label: 'Home', to: '/' }, { label: 'Student Life', to: '/student-life' }, { label: title }]
-          : [{ label: 'Home', to: '/' }, { label: 'Campus Life', to: '/campus' }, { label: title }]}
-        hideCta={true}
-      />
+      {!EVENTS_SHOWCASE_SLUGS.has(slug) && (
+        <PageHero
+          page={heroPage}
+          defaultTitle={title}
+          defaultSubtitle={subtitle}
+          breadcrumb={isActivity
+            ? [{ label: 'Home', to: '/' }, { label: 'Student Life', to: '/student-life' }, { label: title }]
+            : [{ label: 'Home', to: '/' }, { label: 'Campus Life', to: '/campus' }, { label: title }]}
+          hideCta={true}
+        />
+      )}
 
-      {visibleTabs.length > 0 && activeTab ? (
+      {EVENTS_SHOWCASE_SLUGS.has(slug) ? (
+        <CampusEventsShowcase sourceItem={item} />
+      ) : visibleTabs.length > 0 && activeTab ? (
         <section className="section bg-white">
           <div className="container">
             <div className="section-tabs">
@@ -125,7 +137,7 @@ export default function CampusLifeDetail({ slug: slugProp }: { slug?: string }) 
       {/* "Sports & Games at VWU" — relocated here from /student-life. */}
       {slug === 'sports-games' && <VwuSportsSection />}
 
-      {!isActivity && photos.length > 0 && (
+      {!isActivity && !EVENTS_SHOWCASE_SLUGS.has(slug) && photos.length > 0 && (
         <section className="section bg-off-white">
           <div className="container">
             <PhotoGrid images={photos} label="" title={title} columns={3} layout="default" />
@@ -133,28 +145,33 @@ export default function CampusLifeDetail({ slug: slugProp }: { slug?: string }) 
         </section>
       )}
 
-      <section style={{ background: 'var(--color-primary)', padding: 'var(--space-14) 0' }}>
-        <div className="container" style={{ textAlign: 'center' }}>
-          <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>
-            {isActivity ? 'Explore More Student Activities' : 'Explore More of Campus Life'}
-          </h2>
-          <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
-            {isActivity ? (
-              <>
-                <Link to="/student-clubs" className="btn btn-accent">Student Clubs</Link>
-                {ACTIVITY_SLUGS.filter((s) => s !== slug).slice(0, 2).map((s) => (
-                  <Link key={s} to={`/${s}`} className="btn btn-secondary">{ACTIVITY_LABELS[s]}</Link>
-                ))}
-              </>
-            ) : (
-              <>
-                <Link to="/campus" className="btn btn-accent">Back to Campus Life</Link>
-                <Link to="/student-life" className="btn btn-secondary">Student Life</Link>
-              </>
-            )}
+      {/* The Events showcase already has its own "Explore More of Campus
+          Life" closing band (see .ces-close in CampusEventsShowcase.tsx) —
+          this generic one would otherwise duplicate it directly underneath. */}
+      {!EVENTS_SHOWCASE_SLUGS.has(slug) && (
+        <section style={{ background: 'var(--color-primary)', padding: 'var(--space-14) 0' }}>
+          <div className="container" style={{ textAlign: 'center' }}>
+            <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>
+              {isActivity ? 'Explore More Student Activities' : 'Explore More of Campus Life'}
+            </h2>
+            <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
+              {isActivity ? (
+                <>
+                  <Link to="/student-clubs" className="btn btn-accent">Student Clubs</Link>
+                  {ACTIVITY_SLUGS.filter((s) => s !== slug).slice(0, 2).map((s) => (
+                    <Link key={s} to={`/${s}`} className="btn btn-secondary">{ACTIVITY_LABELS[s]}</Link>
+                  ))}
+                </>
+              ) : (
+                <>
+                  <Link to="/campus" className="btn btn-accent">Back to Campus Life</Link>
+                  <Link to="/student-life" className="btn btn-secondary">Student Life</Link>
+                </>
+              )}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
     </main>
   );
 }

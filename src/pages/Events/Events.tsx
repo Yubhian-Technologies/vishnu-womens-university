@@ -1,10 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CalendarX2, Clock, MapPin } from 'lucide-react';
+import { CalendarX2, Clock, MapPin, Search, User } from 'lucide-react';
 import './Events.css';
 import PageHero from '../../components/PageHero/PageHero';
+import EventDetailModal from './EventDetailModal';
 import { useHashScroll } from '../../hooks/useHashScroll';
 import { useOrderedCollection } from '../../hooks/useCollection';
+import { useContentBlocks } from '../../hooks/useContentBlocks';
 import type { EventDoc } from '../Admin/sections/EventsAdmin';
 import SEO from '../../components/SEO/SEO';
 import { getEventSchema, getBreadcrumbSchema } from '../../lib/seo/schemas';
@@ -18,10 +20,52 @@ const categoryColors: Record<string, string> = {
   'Sports': '#0b1e42',
 };
 
+// A category an admin types in fresh (not one of the ones above) still gets
+// a real, consistent colour instead of always falling back to plain navy —
+// picked deterministically from its name so the same category always lands
+// on the same colour across a session, without needing a "manage
+// categories" admin step of its own.
+const FALLBACK_PALETTE = ['#C9A84C', '#7c5cbf', '#1f8f5c', '#b3542a', '#0b6e7a', '#a8324f'];
+function colorForCategory(category: string): string {
+  if (categoryColors[category]) return categoryColors[category];
+  let hash = 0;
+  for (let i = 0; i < category.length; i++) hash = (hash * 31 + category.charCodeAt(i)) >>> 0;
+  return FALLBACK_PALETTE[hash % FALLBACK_PALETTE.length];
+}
+
+const MONTH_INDEX: Record<string, number> = {
+  JAN: 0, FEB: 1, MAR: 2, APR: 3, MAY: 4, JUN: 5, JUL: 6, AUG: 7, SEP: 8, OCT: 9, NOV: 10, DEC: 11,
+};
+
+// Upcoming/Past is derived straight from the event's own month/day/year
+// fields rather than a separately admin-maintained status flag — that way
+// it's always correct the day after an event happens, with nothing for an
+// admin to remember to go update.
+function eventDate(e: EventDoc): Date | null {
+  const monthIdx = MONTH_INDEX[(e.month || '').toUpperCase().slice(0, 3)];
+  const day = parseInt(e.day, 10);
+  const year = parseInt(e.year, 10) || new Date().getFullYear();
+  if (monthIdx == null || Number.isNaN(day)) return null;
+  return new Date(year, monthIdx, day);
+}
+function isPastEvent(e: EventDoc): boolean {
+  const d = eventDate(e);
+  if (!d) return false;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return d < today;
+}
+
+type TimeFilter = 'all' | 'upcoming' | 'past';
+
 export default function Events() {
   const { docs: events } = useOrderedCollection<EventDoc>('events', 'order');
+  const stats = useContentBlocks('events', 'stats');
   const [activeCategory, setActiveCategory] = useState('All');
+  const [timeFilter, setTimeFilter] = useState<TimeFilter>('all');
+  const [search, setSearch] = useState('');
   const [view, setView] = useState<'list' | 'grid'>('list');
+  const [detailEvent, setDetailEvent] = useState<EventDoc | null>(null);
   const categories = ['All', ...Array.from(new Set(events.map(e => e.category)))];
 
   useHashScroll();
@@ -47,9 +91,15 @@ export default function Events() {
     return () => observer.disconnect();
   }, []);
 
-  const filtered = activeCategory === 'All'
-    ? events
-    : events.filter(e => e.category === activeCategory);
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return events.filter((e) => {
+      if (activeCategory !== 'All' && e.category !== activeCategory) return false;
+      if (timeFilter !== 'all' && isPastEvent(e) !== (timeFilter === 'past')) return false;
+      if (q && !e.title.toLowerCase().includes(q) && !e.desc.toLowerCase().includes(q)) return false;
+      return true;
+    });
+  }, [events, activeCategory, timeFilter, search]);
 
   const featured = events.filter(e => e.featured);
 
@@ -72,14 +122,29 @@ export default function Events() {
         canonicalPath="/events"
         jsonLd={eventsJsonLd}
       />
-      {/* Hero */}
+      {/* Hero — image/title/subtitle/CTA all admin-editable via Hero Banners */}
       <PageHero
         page="events"
-        defaultTitle="Campus Events"
-  defaultSubtitle="Technical symposia, sports tournaments, graduation ceremonies, and much more — the VWU calendar is always full."
+        defaultTitle="Events That Bring Us Together"
+        defaultSubtitle="Technical symposia, sports tournaments, graduation ceremonies, and much more — the VWU calendar is always full."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Events' }]}
         scrollCtaTargetId="events-content"
+        size="large"
       />
+
+      {/* Stats bar — Admin -> Page Content Blocks -> "Events — Stats Bar" */}
+      {stats.length > 0 && (
+        <section className="ev-statbar">
+          <div className="container ev-statbar-row">
+            {stats.map((s) => (
+              <div key={s.id} className="ev-stat">
+                <div className="ev-stat-value">{s.value}</div>
+                <div className="ev-stat-label">{s.title}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Featured Events */}
       <section id="events-content" className="section bg-off-white" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
@@ -89,34 +154,39 @@ export default function Events() {
             <h2 className="section-title">Featured Events</h2>
           </div>
           <div className="ev-featured-grid">
-            {featured.map((event) => (
-              <div key={event.id} className="ev-featured-card">
-                <div className="ev-featured-date">
-                  <span className="ev-month">{event.month}</span>
-                  <span className="ev-day">{event.day}</span>
-                  <span className="ev-year">{event.year}</span>
-                </div>
-                <div className="ev-featured-body">
-                  <span
-                    className="ev-category-badge"
-                    style={{ background: categoryColors[event.category] || 'var(--color-primary)' }}
-                  >
-                    {event.category}
-                  </span>
-                  <h3>{event.title}</h3>
-                  <p>{event.desc}</p>
-                  <div className="ev-meta">
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><Clock size={14} /> {event.time}</span>
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><MapPin size={14} /> {event.location}</span>
-                  </div>
-                  {event.link && (
-                    <a href={event.link} target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ marginTop: 'var(--space-4)', fontSize: 'var(--text-sm)' }}>
-                      Register / Learn More
-                    </a>
+            {featured.map((event) => {
+              const color = colorForCategory(event.category);
+              return (
+                <div
+                  key={event.id}
+                  className={`ev-featured-card${event.image ? ' ev-featured-card--photo' : ''}`}
+                  style={event.image ? { backgroundImage: `url(${event.image})` } : undefined}
+                >
+                  {!event.image && (
+                    <div className="ev-featured-date" style={{ background: `linear-gradient(135deg, ${color}, var(--color-primary-light))` }}>
+                      <span className="ev-month">{event.month}</span>
+                      <span className="ev-day">{event.day}</span>
+                      <span className="ev-year">{event.year}</span>
+                    </div>
                   )}
+                  <div className="ev-featured-body">
+                    {event.image && (
+                      <span className="ev-featured-date-badge">{event.month} {event.day}</span>
+                    )}
+                    <span className="ev-category-badge" style={{ background: color }}>{event.category}</span>
+                    <h3>{event.title}</h3>
+                    <p>{event.desc}</p>
+                    <div className="ev-meta">
+                      {event.time && <span><Clock size={14} /> {event.time}</span>}
+                      {event.location && <span><MapPin size={14} /> {event.location}</span>}
+                    </div>
+                    <button type="button" className="btn btn-primary ev-details-btn" onClick={() => setDetailEvent(event)}>
+                      View Details
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
           {featured.length === 0 && (
             <div style={{ textAlign: 'center', padding: 'var(--space-10) 1rem', color: 'var(--color-text-light)' }}>
@@ -133,9 +203,19 @@ export default function Events() {
           <div className="ev-header reveal">
             <div>
               <span className="section-label">Calendar</span>
-              <h2 className="section-title">All Upcoming Events</h2>
+              <h2 className="section-title">All Events</h2>
             </div>
             <div className="ev-controls">
+              <div className="ev-search">
+                <Search size={16} />
+                <input
+                  type="search"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search events…"
+                  aria-label="Search events"
+                />
+              </div>
               <div className="ev-view-toggle">
                 <button className={`ev-view-btn${view === 'list' ? ' active' : ''}`} onClick={() => setView('list')} aria-label="List view">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
@@ -147,13 +227,21 @@ export default function Events() {
             </div>
           </div>
 
+          <div className="ev-time-toggle reveal">
+            {(['all', 'upcoming', 'past'] as TimeFilter[]).map((t) => (
+              <button key={t} className={`ev-time-btn${timeFilter === t ? ' active' : ''}`} onClick={() => setTimeFilter(t)}>
+                {t === 'all' ? 'All' : t === 'upcoming' ? 'Upcoming' : 'Past'}
+              </button>
+            ))}
+          </div>
+
           <div className="ev-filter-bar reveal">
             {categories.map(cat => (
               <button
                 key={cat}
                 className={`ev-cat-btn${activeCategory === cat ? ' active' : ''}`}
                 onClick={() => setActiveCategory(cat)}
-                style={activeCategory === cat && cat !== 'All' ? { background: categoryColors[cat] || 'var(--color-primary)', borderColor: 'transparent' } : {}}
+                style={activeCategory === cat && cat !== 'All' ? { background: colorForCategory(cat), borderColor: 'transparent' } : {}}
               >
                 {cat}
               </button>
@@ -162,65 +250,71 @@ export default function Events() {
 
           {view === 'list' ? (
             <div className="ev-list">
-              {filtered.map((event) => (
-                <div key={event.id} className="ev-list-item">
-                  <div className="ev-list-date">
-                    <span className="ev-month">{event.month}</span>
-                    <span className="ev-day">{event.day}</span>
-                  </div>
-                  <div className="ev-list-body">
-                    <span
-                      className="ev-category-badge"
-                      style={{ background: categoryColors[event.category] || 'var(--color-primary)' }}
-                    >
-                      {event.category}
-                    </span>
-                    <h3 className="ev-list-title">{event.title}</h3>
-                    <p className="ev-list-desc">{event.desc}</p>
-                    <div className="ev-meta">
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><Clock size={14} /> {event.time}</span>
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><MapPin size={14} /> {event.location}</span>
+              {filtered.map((event) => {
+                const color = colorForCategory(event.category);
+                return (
+                  <div key={event.id} className="ev-list-item">
+                    {event.image ? (
+                      <div className="ev-list-thumb" style={{ backgroundImage: `url(${event.image})` }} />
+                    ) : (
+                      <div className="ev-list-date" style={{ background: color }}>
+                        <span className="ev-month">{event.month}</span>
+                        <span className="ev-day">{event.day}</span>
+                      </div>
+                    )}
+                    <div className="ev-list-body">
+                      <span className="ev-category-badge" style={{ background: color }}>{event.category}</span>
+                      <h3 className="ev-list-title">{event.title}</h3>
+                      <p className="ev-list-desc">{event.desc}</p>
+                      <div className="ev-meta">
+                        {event.time && <span><Clock size={14} /> {event.time}</span>}
+                        {event.location && <span><MapPin size={14} /> {event.location}</span>}
+                        {event.organizer && <span><User size={14} /> {event.organizer}</span>}
+                      </div>
                     </div>
-                  </div>
-                  {event.link && (
-                    <a href={event.link} target="_blank" rel="noopener noreferrer" className="btn btn-outline ev-list-btn" style={{ fontSize: 'var(--text-xs)', padding: '0.5rem 1rem', flexShrink: 0 }}>
+                    <button type="button" className="btn btn-outline ev-list-btn" onClick={() => setDetailEvent(event)}>
                       Details
-                    </a>
-                  )}
-                </div>
-              ))}
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           ) : (
             <div className="ev-grid-view">
-              {filtered.map((event) => (
-                <div key={event.id} className="ev-grid-card">
-                  <div className="ev-grid-date-bar" style={{ background: categoryColors[event.category] || 'var(--color-primary)' }}>
-                    <span>{event.month} {event.day}, {event.year}</span>
-                  </div>
-                  <div className="ev-grid-body">
-                    <span className="ev-category-badge" style={{ background: categoryColors[event.category] || 'var(--color-primary)' }}>
-                      {event.category}
-                    </span>
-                    <h3>{event.title}</h3>
-                    <div className="ev-meta" style={{ marginTop: 'var(--space-3)' }}>
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><Clock size={14} /> {event.time}</span>
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><MapPin size={14} /> {event.location}</span>
-                    </div>
-                    {event.link && (
-                      <a href={event.link} target="_blank" rel="noopener noreferrer" className="btn btn-outline" style={{ marginTop: 'var(--space-4)', fontSize: 'var(--text-xs)', width: '100%' }}>
-                        View Event
-                      </a>
+              {filtered.map((event) => {
+                const color = colorForCategory(event.category);
+                return (
+                  <div key={event.id} className="ev-grid-card">
+                    {event.image ? (
+                      <div className="ev-grid-photo" style={{ backgroundImage: `url(${event.image})` }}>
+                        <span className="ev-grid-photo-date">{event.month} {event.day}, {event.year}</span>
+                      </div>
+                    ) : (
+                      <div className="ev-grid-date-bar" style={{ background: color }}>
+                        <span>{event.month} {event.day}, {event.year}</span>
+                      </div>
                     )}
+                    <div className="ev-grid-body">
+                      <span className="ev-category-badge" style={{ background: color }}>{event.category}</span>
+                      <h3>{event.title}</h3>
+                      <div className="ev-meta" style={{ marginTop: 'var(--space-3)' }}>
+                        {event.time && <span><Clock size={14} /> {event.time}</span>}
+                        {event.location && <span><MapPin size={14} /> {event.location}</span>}
+                      </div>
+                      <button type="button" className="btn btn-outline" style={{ marginTop: 'var(--space-4)', fontSize: 'var(--text-xs)', width: '100%' }} onClick={() => setDetailEvent(event)}>
+                        View Event
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
           {filtered.length === 0 && (
             <div style={{ textAlign: 'center', padding: 'var(--space-10) 1rem', color: 'var(--color-text-light)' }}>
               <CalendarX2 size={28} style={{ marginBottom: 'var(--space-3)', opacity: 0.5 }} />
               <p style={{ fontSize: 'var(--text-sm)' }}>
-                {activeCategory === 'All' ? 'No events have been added yet — check back soon.' : `No ${activeCategory} events right now.`}
+                {events.length === 0 ? 'No events have been added yet — check back soon.' : 'No events match your filters right now.'}
               </p>
             </div>
           )}
@@ -239,6 +333,10 @@ export default function Events() {
           </div>
         </div>
       </section>
+
+      {detailEvent && (
+        <EventDetailModal event={detailEvent} categoryColor={colorForCategory(detailEvent.category)} onClose={() => setDetailEvent(null)} />
+      )}
     </main>
   );
 }
