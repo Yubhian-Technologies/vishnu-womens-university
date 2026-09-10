@@ -80,6 +80,8 @@ const ProfessionalBodyDetail = lazyWithRetry(() => import('./pages/Research/Prof
 const MousGroupDetail = lazyWithRetry(() => import('./pages/Research/MousGroupDetail'));
 const AboutSVES = lazyWithRetry(() => import('./pages/AboutSVES/AboutSVES'));
 const Campus = lazyWithRetry(() => import('./pages/Campus/Campus'));
+const Sports = lazyWithRetry(() => import('./pages/Campus/Sports'));
+const SportsDetail = lazyWithRetry(() => import('./pages/Campus/SportsDetail'));
 const CampusLifeDetail = lazyWithRetry(() => import('./pages/CampusLife/CampusLifeDetail'));
 const SewageTreatment = lazyWithRetry(() => import('./pages/Campus/SewageTreatment'));
 const WellnessCenter = lazyWithRetry(() => import('./pages/Campus/WellnessCenter'));
@@ -194,6 +196,8 @@ function PublicApp() {
                 renders instead of CampusLifeDetail redirecting to /campus. */}
             <Route path="/campus/sewage-treatment-plants" element={<SewageTreatment />} />
             <Route path="/campus/wellness-center" element={<WellnessCenter />} />
+            <Route path="/campus/sports" element={<Sports />} />
+            <Route path="/campus/sports/:id" element={<SportsDetail />} />
             <Route path="/campus/:slug" element={<CampusLifeDetail />} />
             <Route path="/information" element={<Information />} />
             <Route path="/programmes-fee-structure" element={<ProgrammesFee />} />

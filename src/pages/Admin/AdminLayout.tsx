@@ -10,7 +10,7 @@ import {
   faClipboardList, faBus, faCity, faDownload, faTableList, faCamera, faLink, faScaleBalanced, faFolderOpen,
   faChartPie, faChartBar, faStar, faArrowTrendUp, faIdCard, faCalendarCheck, faPortrait, faBuilding, faTag,
   faPlane, faTrophy, faFlask, faFileCircleCheck, faBook, faUserShield, faRightFromBracket, faPhone,
-  faPalette, faMedal, faAward, faLightbulb,
+  faPalette, faMedal, faAward, faLightbulb, faFutbol,
 } from '@fortawesome/free-solid-svg-icons';
 import { getFirebaseAuth } from '../../lib/firebaseAdmin';
 import { resolveAdminSession, canReadModule, sessionMatchesRoleSelection } from '../../lib/rbac';
@@ -45,6 +45,7 @@ export const SECTIONS: { id: string; icon: IconDefinition; label: string }[] = [
   { id: 'faqs',           icon: faCircleQuestion, label: 'FAQs' },
   { id: 'student-clubs',  icon: faPeopleGroup, label: 'Student Clubs' },
   { id: 'campus-life',    icon: faTree, label: 'Campus Life' },
+  { id: 'sports',         icon: faFutbol, label: 'Campus Life — Sports' },
   { id: 'job-openings',   icon: faFileContract, label: 'Job Openings' },
   { id: 'content-blocks', icon: faPuzzlePiece, label: 'Page Content Blocks' },
   { id: 'contacts',       icon: faAddressBook, label: 'Department Contacts' },
@@ -96,7 +97,7 @@ export const SECTION_GROUPS: { label: string; ids: string[] }[] = [
   { label: 'About & Governance', ids: ['governing-body', 'governance-items', 'annual-reports', 'nirf-reports', 'nba-data', 'core-executives', 'sves-campuses', 'contacts', 'site-contact', 'policies'] },
   { label: 'Academics', ids: ['departments', 'programs', 'schools', 'faculty', 'curriculum', 'downloads'] },
   { label: 'Admissions & Campus Info', ids: ['information'] },
-  { label: 'Student Life', ids: ['student-clubs', 'campus-life', 'faqs', 'job-openings', 'events'] },
+  { label: 'Student Life', ids: ['student-clubs', 'campus-life', 'sports', 'faqs', 'job-openings', 'events'] },
   { label: 'Placements & Careers', ids: ['placements', 'placement-highlights', 'placement-items', 'tpo-team-info', 'placement-crt-docs', 'tpo-team-photos', 'ilo-office-photos', 'recruiter-logos', 'gsac-photos'] },
   { label: 'Differentiators', ids: ['differentiators'] },
   { label: 'Research', ids: ['research-items'] },
