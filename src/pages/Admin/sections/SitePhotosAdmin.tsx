@@ -211,6 +211,8 @@ const DEFAULT_SECTIONS: Record<string, Record<string, SectionDef>> = {
     'swimming-pool': placeholderPhotoBank('Swimming Pool'),
     'campus-security': placeholderPhotoBank('Campus Security'),
     'other-facilities': placeholderPhotoBank('Other Facilities'),
+    'television': placeholderPhotoBank('Television'),
+    'sewage-treatment-plants': placeholderPhotoBank('Sewage Treatment Plants'),
   },
   about: {
     main: {
@@ -403,10 +405,33 @@ const DEFAULT_SECTIONS: Record<string, Record<string, SectionDef>> = {
     },
   },
   'social-services': {
-    main: {
-      label: 'Main Gallery',
+    hero: {
+      label: 'Hero Banner Photo',
       slots: [
-        { imageUrl: 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=900&q=80', alt: 'NSS community service', caption: '', label: '"NSS at VWU" section photo' },
+        { imageUrl: '/images/vibrant-campus.png', alt: 'NSS Social Services Community Outreach', caption: '', label: 'Hero Background' },
+      ],
+    },
+    main: {
+      label: '"NSS at VWU" Section Photo',
+      slots: [
+        { imageUrl: '/images/1000074551.jpg', alt: 'VWU Students Planting Trees', caption: '', label: 'Section Photo' },
+      ],
+    },
+    communities: {
+      label: 'Communities We Serve (Card Photos)',
+      slots: [
+        { imageUrl: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=700&auto=format&fit=crop', alt: 'Rural Students', caption: '', label: 'Rural Students' },
+        { imageUrl: 'https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?q=80&w=700&auto=format&fit=crop', alt: 'Leprosy Care', caption: '', label: 'Leprosy Care' },
+        { imageUrl: 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=700&auto=format&fit=crop', alt: 'Village Communities', caption: '', label: 'Village Communities' },
+        { imageUrl: 'https://images.unsplash.com/photo-1531206715517-5c0ba140b2b8?q=80&w=700&auto=format&fit=crop', alt: 'Persons with Disabilities', caption: '', label: 'Persons with Disabilities' },
+        { imageUrl: 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?q=80&w=700&auto=format&fit=crop', alt: 'Hospital Patients', caption: '', label: 'Hospital Patients' },
+        { imageUrl: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=700&auto=format&fit=crop', alt: 'Academic Excellence', caption: '', label: 'Academic Excellence' },
+      ],
+    },
+    'founder-legacy': {
+      label: "Founder's Legacy Photo (Dr. B. V. Raju)",
+      slots: [
+        { imageUrl: '/images/governing-body-founder.jpg', alt: 'Padma Bhushan Dr. B. V. Raju', caption: '', label: 'Section Photo' },
       ],
     },
   },

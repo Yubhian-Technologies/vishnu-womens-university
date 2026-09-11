@@ -1,0 +1,447 @@
+/* ==========================================================================
+   Campus Life — Travel Desk Dedicated Styles
+   ========================================================================== */
+
+.travel-desk-page {
+  --td-blue: #0b1e42;
+  --td-gold: #c9973a;
+  --td-gold-dark: #b8860b;
+  --td-bg-main: #f8fafc;
+  --td-card-bg: #ffffff;
+  --td-text-dark: #0f172a;
+  --td-text-muted: #64748b;
+  --td-border: #e2e8f0;
+
+  position: relative;
+  background: var(--td-bg-main);
+  color: var(--td-text-dark);
+  min-height: 100vh;
+  overflow-x: hidden;
+  font-family: var(--font-sans, system-ui, -apple-system, sans-serif);
+}
+
+.td-container {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.td-section {
+  padding: 5rem 0;
+  position: relative;
+}
+
+/* Section Header */
+.td-section-header {
+  text-align: center;
+  max-width: 760px;
+  margin: 0 auto 3.5rem auto;
+}
+
+.td-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 1.2rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid rgba(3, 105, 161, 0.2);
+  margin-bottom: 1rem;
+}
+
+.td-section-title {
+  font-size: clamp(2.25rem, 4vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--td-text-dark);
+  line-height: 1.25;
+  margin-bottom: 0.875rem;
+}
+
+.td-section-title span {
+  color: #0284c7;
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.td-section-subtitle {
+  font-size: 1.125rem;
+  color: var(--td-text-muted);
+  line-height: 1.6;
+}
+
+/* Hero Section */
+.td-hero {
+  padding: 4rem 0 5rem 0;
+  background: linear-gradient(180deg, #f0f9ff 0%, #f8fafc 100%);
+  border-bottom: 1px solid var(--td-border);
+}
+
+.td-hero-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 3.5rem;
+  align-items: center;
+}
+
+@media (max-width: 992px) {
+  .td-hero-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.td-hero-title {
+  font-size: clamp(2.75rem, 5.5vw, 3.8rem);
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: var(--td-blue);
+  margin: 1rem 0 1.25rem 0;
+}
+
+.td-hero-highlight {
+  color: #0284c7;
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.td-hero-subtitle {
+  font-size: 1.2rem;
+  color: var(--td-text-muted);
+  line-height: 1.7;
+  margin-bottom: 2.25rem;
+}
+
+.td-hero-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.td-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.85rem 1.25rem;
+  border-radius: 1.25rem;
+  background: #ffffff;
+  border: 1px solid var(--td-border);
+  box-shadow: 0 4px 15px rgba(2, 132, 199, 0.06);
+}
+
+.td-pill-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #e0f2fe;
+  color: #0369a1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.td-pill-val {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--td-text-dark);
+  line-height: 1.2;
+}
+
+.td-pill-lbl {
+  font-size: 0.775rem;
+  color: var(--td-text-muted);
+  font-weight: 600;
+}
+
+.td-hero-img-box {
+  position: relative;
+  border-radius: 2rem;
+  overflow: hidden;
+  box-shadow: 0 25px 50px rgba(2, 132, 199, 0.12);
+  border: 5px solid #ffffff;
+  aspect-ratio: 4 / 3;
+}
+
+.td-hero-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* About & Info Card Layout */
+.td-about-card {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 2.5rem;
+  background: #ffffff;
+  border-radius: 1.75rem;
+  border: 1px solid var(--td-border);
+  padding: 3rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+}
+
+@media (max-width: 992px) {
+  .td-about-card {
+    grid-template-columns: 1fr;
+    padding: 2rem;
+  }
+}
+
+.td-about-paragraph {
+  font-size: 1.125rem;
+  color: #334155;
+  line-height: 1.8;
+  margin-bottom: 1.25rem;
+}
+
+.td-info-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.td-info-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 1.25rem;
+  padding: 1.75rem;
+}
+
+.td-info-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.td-info-icon {
+  color: #0284c7;
+}
+
+.td-info-header h3 {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--td-blue);
+  margin: 0;
+}
+
+.td-timing-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px dashed #cbd5e1;
+  font-size: 0.95rem;
+}
+
+.td-timing-row:last-child {
+  border-bottom: none;
+}
+
+.td-timing-day {
+  color: var(--td-text-muted);
+  font-weight: 600;
+}
+
+.td-timing-time {
+  color: var(--td-text-dark);
+  font-weight: 700;
+}
+
+.td-contact-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+  color: #334155;
+}
+
+.td-contact-item a {
+  color: #0284c7;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.td-contact-item a:hover {
+  text-decoration: underline;
+}
+
+.td-partner-tag {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #e2e8f0;
+  font-size: 0.875rem;
+  color: var(--td-text-muted);
+}
+
+/* Services Grid */
+.td-services-section {
+  background: #ffffff;
+  border-top: 1px solid var(--td-border);
+  border-bottom: 1px solid var(--td-border);
+}
+
+.td-services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+}
+
+.td-service-card {
+  background: #f8fafc;
+  border: 1px solid var(--td-border);
+  border-radius: 1.5rem;
+  padding: 2.25rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+.td-service-card:hover {
+  transform: translateY(-6px);
+  border-color: #0284c7;
+  box-shadow: 0 15px 35px rgba(2, 132, 199, 0.12);
+  background: #ffffff;
+}
+
+.td-service-icon-box {
+  width: 54px;
+  height: 54px;
+  border-radius: 1.25rem;
+  background: #e0f2fe;
+  color: #0369a1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.td-service-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--td-blue);
+  margin-bottom: 0.75rem;
+}
+
+.td-service-desc {
+  font-size: 0.975rem;
+  color: var(--td-text-muted);
+  line-height: 1.7;
+  margin-bottom: 1.5rem;
+  flex-grow: 1;
+}
+
+.td-service-check {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #0369a1;
+}
+
+/* Gallery Section */
+.td-gallery-section {
+  background: #f8fafc;
+}
+
+/* Bottom CTA Banner */
+.td-cta-section {
+  background: linear-gradient(135deg, #0b1e42 0%, #1e3b75 100%);
+  color: #ffffff;
+  padding: 5rem 0;
+  text-align: center;
+}
+
+.td-cta-section h2 {
+  font-size: 2.25rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  color: #ffffff;
+}
+
+.td-cta-section p {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.85);
+  max-width: 600px;
+  margin: 0 auto 2.25rem auto;
+}
+
+.td-cta-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.td-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.85rem 2rem;
+  border-radius: 9999px;
+  font-weight: 800;
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition: all 0.25s ease;
+}
+
+.td-btn-gold {
+  background: var(--td-gold);
+  color: var(--td-blue);
+}
+
+.td-btn-gold:hover {
+  background: #d4a347;
+  transform: translateY(-2px);
+}
+
+.td-btn-outline {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border: 1.5px solid rgba(255, 255, 255, 0.5);
+}
+
+.td-btn-outline:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   Mobile & Tablet Responsiveness (< 768px, < 640px)
+   ========================================================================== */
+@media (max-width: 768px) {
+  .td-grid-layout {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  .td-services-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+  .td-about-card,
+  .td-info-box {
+    padding: 1.25rem 1rem;
+    border-radius: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .td-location-pill {
+    padding: 0.5rem 0.85rem;
+    font-size: 0.825rem;
+  }
+  .td-service-card {
+    padding: 1.25rem 1rem;
+  }
+}

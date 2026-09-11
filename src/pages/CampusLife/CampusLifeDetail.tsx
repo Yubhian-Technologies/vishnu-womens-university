@@ -4,7 +4,7 @@ import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
 import CustomSectionsRenderer, { CustomSectionsPlain } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import { useOrderedCollection } from '../../hooks/useCollection';
-import { useSitePhotos } from '../../hooks/useSitePhotos';
+import { useSitePhotos, useSitePhotosLoading } from '../../hooks/useSitePhotos';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import { hasCustomSectionContent } from '../../lib/customSections';
 import { findCampusFacilityBySlug } from '../Campus/campusFacilities.data';
@@ -69,6 +69,13 @@ export default function CampusLifeDetail({ slug: slugProp }: { slug?: string }) 
     src: PHOTO_NEEDED_PLACEHOLDER, alt: `${item?.title || slug} — Photo ${i + 1}`, caption: '',
   }));
   const photos = useSitePhotos('campus', slug, defaultPhotos);
+  // Gates the photo grid's first paint: until Firestore actually responds,
+  // an admin-uploaded photo can't be told apart from "none uploaded yet",
+  // so rendering immediately would flash the generic default photo before
+  // swapping to the real one a moment later on every page load/refresh.
+  // Shares useSitePhotos' subscription (not a separate listener) so this
+  // resolves at the exact same moment as `photos` itself.
+  const photosLoading = useSitePhotosLoading();
 
   useEffect(() => {
     if (item) document.title = `${item.title} | VWU`;
@@ -137,7 +144,7 @@ export default function CampusLifeDetail({ slug: slugProp }: { slug?: string }) 
       {/* "Sports & Games at VWU" — relocated here from /student-life. */}
       {slug === 'sports-games' && <VwuSportsSection />}
 
-      {!isActivity && !EVENTS_SHOWCASE_SLUGS.has(slug) && photos.length > 0 && (
+      {!isActivity && !EVENTS_SHOWCASE_SLUGS.has(slug) && !photosLoading && photos.length > 0 && (
         <section className="section bg-off-white">
           <div className="container">
             <PhotoGrid images={photos} label="" title={title} columns={3} layout="default" />

@@ -1,12 +1,21 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Droplets, Recycle, FlaskConical, Leaf, IndianRupee, CalendarDays } from 'lucide-react';
+import {
+  Droplets, Recycle, FlaskConical, Leaf, IndianRupee, CalendarDays,
+  Sparkles, ShieldCheck, Waves, Factory, ArrowRight, Camera
+} from 'lucide-react';
 import SEO from '../../components/SEO/SEO';
 import PageHero from '../../components/PageHero/PageHero';
+import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
+import CustomSectionsRenderer from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
+import { useOrderedCollection } from '../../hooks/useCollection';
+import { useSitePhotos } from '../../hooks/useSitePhotos';
+import { hasCustomSectionContent } from '../../lib/customSections';
+import type { CampusLifeItemDoc } from '../Admin/sections/CampusLifeAdmin';
+import './SewageTreatment.css';
 
-// Campus & sewage-load figures quoted in the DST project write-up. Kept as
-// data rather than inline JSX so the stat band stays one place to edit.
-const CAMPUS_STATS: { value: string; label: string }[] = [
+// Campus & sewage-load figures quoted in the DST project write-up
+const CAMPUS_STATS = [
   { value: '80', label: 'Acre Campus' },
   { value: '7', label: 'Constituent Institutes' },
   { value: '~17,000', label: 'Students' },
@@ -15,8 +24,8 @@ const CAMPUS_STATS: { value: string; label: string }[] = [
   { value: '~7 Lakh L', label: 'Daily Sewage Generated' },
 ];
 
-const PROJECT_FACTS: { icon: typeof Droplets; label: string; value: string }[] = [
-  { icon: Recycle, label: 'Plants Commissioned', value: '2 Sewage Treatment Plants' },
+const PROJECT_FACTS = [
+  { icon: Factory, label: 'Plants Commissioned', value: '2 Sewage Treatment Plants' },
   { icon: Droplets, label: 'Capacity (each)', value: '200 KLD' },
   { icon: IndianRupee, label: 'DST Grant Sanctioned', value: 'Rs. 59.866 Lakhs' },
   { icon: IndianRupee, label: 'Total Project Cost', value: 'Rs. 170.536 Lakhs' },
@@ -24,17 +33,39 @@ const PROJECT_FACTS: { icon: typeof Droplets; label: string; value: string }[] =
   { icon: FlaskConical, label: 'Treatment Technology', value: 'Improved Moving Bed Bio-film Reactor (MBBR)' },
 ];
 
-// Photos live in public/images/sewage-treatment-plants/ (see the README
-// there). Any slot whose file isn't present hides itself on load, so the
-// grid can be pre-wired for more shots than exist yet.
-export const GALLERY_PHOTOS: { src: string; alt: string }[] = Array.from({ length: 8 }, (_, i) => ({
-  src: `/images/sewage-treatment-plants/stp-${i + 1}.jpg`,
-  alt: `Sewage treatment plant at VWU — photo ${i + 1}`,
-}));
+export const DEFAULT_PHOTOS = [
+  { src: '/images/sewage-treatment-plants/stp-1.jpg', alt: 'Sewage Treatment Plant at VWU — photo 1', caption: 'On-site 200 KLD MBBR Plant' },
+  { src: '/images/sewage-treatment-plants/stp-2.jpg', alt: 'Sewage Treatment Plant at VWU — photo 2', caption: 'Aeration & Distribution Tank' },
+  { src: '/images/sewage-treatment-plants/stp-3.jpg', alt: 'Sewage Treatment Plant at VWU — photo 3', caption: 'Sand & Carbon Filter Pressure Vessels' },
+];
 
 export default function SewageTreatment() {
+  const photos = useSitePhotos('campus', 'sewage-treatment-plants', DEFAULT_PHOTOS);
+
+  const getPhotoSrc = (index: number) => {
+    const p = photos[index]?.src;
+    if (p && !p.includes('photoPlaceholder') && !p.includes('data:image')) return p;
+    return DEFAULT_PHOTOS[index % DEFAULT_PHOTOS.length].src;
+  };
+
+  // Admin-editable name + extra content (including a proper multi-photo
+  // gallery section type) — same `campusLifeItems` system every other
+  // Campus Life page uses, via Admin -> Campus Life -> Sewage Treatment
+  // Plants. Falls back to the existing hardcoded title if no admin item
+  // has been created yet.
+  const { docs: campusLifeItems } = useOrderedCollection<CampusLifeItemDoc>('campusLifeItems', 'order');
+  const adminItem = campusLifeItems.find((i) => i.slug === 'sewage-treatment-plants');
+  const pageTitle = adminItem?.title || 'Sewage Treatment Plants';
+  const customSections = (adminItem?.customSections || []).filter(hasCustomSectionContent);
+
   useEffect(() => {
-    document.title = 'Sewage Treatment Plants | VWU';
+    document.title = `${pageTitle} | VWU`;
+  }, [pageTitle]);
+
+  // Mount-only, not keyed on Firestore data — see the .reveal/Firestore
+  // gotcha in CLAUDE.md (re-running this per live data update can tear the
+  // observer down mid-animation and permanently miss elements).
+  useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -52,7 +83,7 @@ export default function SewageTreatment() {
   }, []);
 
   return (
-    <main className="page-wrapper">
+    <main className="stp-page">
       <SEO
         title="Sewage Treatment Plants — Zero Discharge Campus | Vishnu Women's University"
         description="Two DST-funded 200 KLD sewage treatment plants using MBBR technology make the VWU campus a zero-discharge campus, with treated effluent reused for campus and highway greenery."
@@ -61,116 +92,171 @@ export default function SewageTreatment() {
 
       <PageHero
         page="campus-sewage-treatment-plants"
-        defaultTitle="Sewage Treatment Plants"
+        defaultTitle={pageTitle}
         defaultSubtitle="A zero-discharge campus — every drop of sewage generated is treated on site and returned to the land as irrigation for campus and highway greenery."
-        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Campus Life', to: '/campus' }, { label: 'Sewage Treatment Plants' }]}
+        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Campus Life', to: '/campus' }, { label: pageTitle }]}
         hideCta={true}
       />
 
-      {/* Campus scale & daily load */}
-      <section
-        id="sewage-content"
-        style={{ background: 'var(--color-primary)', padding: 'var(--space-8) 0', scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}
-      >
-        <div className="container">
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-10)', flexWrap: 'wrap' }}>
+      {/* Admin-added content (Admin -> Campus Life -> Sewage Treatment
+          Plants -> Sections) — includes a "Photo Gallery" section type for
+          adding as many extra photos as needed, beyond the 3 fixed Site
+          Photos slots used throughout the page below. Hidden until an
+          admin actually adds something here. */}
+      {customSections.length > 0 && (
+        <section className="stp-section">
+          <div className="stp-container">
+            <CustomSectionsRenderer sections={customSections} />
+          </div>
+        </section>
+      )}
+
+      {/* 1. Eco Metrics Hero Dashboard */}
+      <section className="stp-stats-banner">
+        <div className="stp-container">
+          <div className="stp-stats-grid">
             {CAMPUS_STATS.map((s) => (
-              <div key={s.label} style={{ textAlign: 'center' }}>
-                <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.6rem', fontWeight: 900, color: 'var(--color-accent)' }}>{s.value}</div>
-                <div style={{ fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.7)', marginTop: 2 }}>{s.label}</div>
+              <div key={s.label} className="stp-stat-card">
+                <div className="stp-stat-val">{s.value}</div>
+                <div className="stp-stat-lbl">{s.label}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Why — water as a resource */}
-      <section className="section bg-off-white">
-        <div className="container">
-          <div className="reveal" style={{ maxWidth: 860 }}>
-            <span className="section-label">Our Commitment</span>
-            <h2 className="section-title">Water is a Precious Natural Resource</h2>
-            <p style={{ lineHeight: 1.8, color: 'var(--color-text-light)', marginBottom: 'var(--space-4)' }}>
-              Water is a precious natural resource gifted by God to mankind, and one of the five powerful elements of
-              life creation. A resource this precious needs careful consumption. Knowing this, the University has
-              incorporated <strong>sustainable environmental protection into its Vision Statement</strong>, and the
-              management consistently encourages natural-resource-conservative practices across the campus.
+      {/* 2. Vision & Water Conservation Narrative with Interleaved Media */}
+      <section className="stp-section stp-vision-section">
+        <div className="stp-container">
+          <div className="stp-header">
+            <div className="stp-badge">
+              <Leaf size={14} />
+              <span>SUSTAINABLE VISION</span>
+            </div>
+            <h2 className="stp-title">
+              Water is a Precious <span>Natural Resource</span>
+            </h2>
+            <p className="stp-subtitle">
+              Pioneering natural resource conservation as an integral part of institutional vision.
             </p>
-            <p style={{ lineHeight: 1.8, color: 'var(--color-text-light)' }}>
-              The campus extends across a serene <strong>80 acres</strong>, three kilometres from the outskirts of
-              Bhimavaram town. It houses <strong>7 constituent institutes</strong> with a total strength of about{' '}
-              <strong>17,000 students</strong>, of whom around <strong>6,000 stay in the hostels</strong>. Meeting the
-              daily needs of a campus this size requires roughly <strong>9 lakh litres of water per day</strong> — and
-              the sewage generated is correspondingly high, estimated at about{' '}
-              <strong>7 lakh litres per day</strong>, all of which would ultimately reach a natural drain.
-            </p>
+          </div>
+
+          <div className="stp-vision-card">
+            <div className="stp-vision-quote">
+              <div className="stp-vision-quote-text">
+                “Water is a precious natural resource gifted by God to mankind, and one of the five powerful elements of life creation. A resource this precious needs careful consumption.”
+              </div>
+            </div>
+
+            <div className="stp-vision-grid">
+              <div className="stp-vision-body">
+                <p>
+                  Knowing this, Vishnu Women’s University has incorporated <strong>sustainable environmental protection into its Vision Statement</strong>, and the management consistently encourages natural-resource-conservative practices across the campus.
+                </p>
+                <p>
+                  The campus extends across a serene <strong>80 acres</strong>, three kilometres from the outskirts of Bhimavaram town. It houses <strong>7 constituent institutes</strong> with a total strength of about <strong>17,000 students</strong>, of whom around <strong>6,000 stay in the hostels</strong>. Meeting the daily needs of a campus this size requires roughly <strong>9 lakh litres of water per day</strong> — and the sewage generated is correspondingly high, estimated at about <strong>7 lakh litres per day</strong>, all of which would ultimately reach a natural drain without intervention.
+                </p>
+
+                <div className="stp-vision-highlight-box">
+                  <div className="stp-vision-highlight-title">
+                    <Recycle size={20} />
+                    <span>Closed-Loop Resource Cycle</span>
+                  </div>
+                  <div className="stp-water-loop">
+                    <div className="stp-loop-step">
+                      <Droplets size={18} className="stp-loop-icon" />
+                      <span>9 Lakh Litres Daily Campus Demand</span>
+                    </div>
+                    <div className="stp-loop-step">
+                      <Waves size={18} className="stp-loop-icon" />
+                      <span>7 Lakh Litres Daily Sewage Channeled</span>
+                    </div>
+                    <div className="stp-loop-step">
+                      <ShieldCheck size={18} className="stp-loop-icon" />
+                      <span>100% Zero Discharge Into Public Drains</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Interleaved Photo Slot 1 & 2 */}
+              <div className="stp-vision-sidebar">
+                <div className="stp-media-card">
+                  <img
+                    src={getPhotoSrc(0)}
+                    alt="VWU Sewage Treatment Plant View"
+                    className="stp-media-img"
+                    onError={(e) => { e.currentTarget.src = DEFAULT_PHOTOS[0].src; }}
+                  />
+                  <div className="stp-media-badge">
+                    <Camera size={16} />
+                    <span>On-Site 200 KLD MBBR Plant</span>
+                  </div>
+                </div>
+
+                <div className="stp-media-card">
+                  <img
+                    src={getPhotoSrc(1)}
+                    alt="VWU Sewage Treatment Water Recycling"
+                    className="stp-media-img"
+                    onError={(e) => { e.currentTarget.src = DEFAULT_PHOTOS[1].src; }}
+                  />
+                  <div className="stp-media-badge">
+                    <Sparkles size={16} />
+                    <span>Treated Effluent Distribution</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* The DST-funded project */}
-      <section className="section bg-white">
-        <div className="container">
-          <div className="reveal" style={{ marginBottom: 'var(--space-8)', maxWidth: 860 }}>
-            <span className="section-label">The Project</span>
-            <h2 className="section-title">DST-Funded Treatment Plants</h2>
-            <p style={{ lineHeight: 1.8, color: 'var(--color-text-light)' }}>
-              To provide an eco-friendly environment and ensure <strong>zero discharge into the drain</strong>, the
-              University — with extended help from the management — applied to the{' '}
-              <strong>Department of Science &amp; Technology (DST), New Delhi</strong> to construct a sewage treatment
-              plant for the sewage generated on campus. On a kind perusal of the proposal, DST sanctioned the project,
-              and sewage collected from the various zones of activity across the campus is now channelled through a
-              network of drainages into the treatment plants.
+      {/* 3. DST-Funded Treatment Plants Specifications Showcase */}
+      <section className="stp-section stp-dst-section">
+        <div className="stp-container">
+          <div className="stp-header">
+            <div className="stp-badge">
+              <Sparkles size={14} />
+              <span>DST NEW DELHI FUNDED PROJECT</span>
+            </div>
+            <h2 className="stp-title">
+              DST-Funded <span>Treatment Plants</span>
+            </h2>
+            <p className="stp-subtitle">
+              Sanctioned by the Department of Science & Technology to achieve 100% zero-discharge campus operations.
             </p>
           </div>
 
-          <div
-            className="mobile-stack-grid"
-            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--space-4)' }}
-          >
+          <div className="stp-dst-showcase">
+            <div className="stp-dst-narrative">
+              To provide an eco-friendly environment and ensure <strong>zero discharge into the drain</strong>, the University — with extended help from the management — applied to the <strong>Department of Science & Technology (DST), New Delhi</strong> to construct a sewage treatment plant for the sewage generated on campus. On a kind perusal of the proposal, DST sanctioned the project, and sewage collected from the various zones of activity across the campus is now channelled through a network of drainages into the treatment plants.
+            </div>
+
+            {/* Interleaved Photo Slot 3 */}
+            <div className="stp-media-card">
+              <img
+                src={getPhotoSrc(2)}
+                alt="DST Funded Sewage Treatment Installation"
+                className="stp-media-img"
+                onError={(e) => { e.currentTarget.src = DEFAULT_PHOTOS[2].src; }}
+              />
+              <div className="stp-media-badge">
+                <ShieldCheck size={16} />
+                <span>DST Sanctioned Facility • Rs. 170+ Lakh Project</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="stp-spec-grid">
             {PROJECT_FACTS.map(({ icon: Icon, label, value }) => (
-              <div
-                key={label}
-                style={{
-                  display: 'flex',
-                  gap: 'var(--space-4)',
-                  alignItems: 'flex-start',
-                  background: 'var(--color-off-white)',
-                  border: '1.5px solid var(--color-light-gray)',
-                  borderRadius: 'var(--radius-md)',
-                  padding: 'var(--space-5)',
-                }}
-              >
-                <span
-                  style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: '50%',
-                    background: 'var(--color-primary)',
-                    color: 'var(--color-accent)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                  }}
-                >
-                  <Icon size={19} strokeWidth={2.2} />
-                </span>
+              <div key={label} className="stp-spec-card">
+                <div className="stp-spec-icon-box">
+                  <Icon size={24} />
+                </div>
                 <div>
-                  <div
-                    style={{
-                      fontSize: '0.7rem',
-                      fontWeight: 800,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.06em',
-                      color: 'var(--color-text-light)',
-                    }}
-                  >
-                    {label}
-                  </div>
-                  <div style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginTop: 4, lineHeight: 1.4 }}>
-                    {value}
-                  </div>
+                  <div className="stp-spec-lbl">{label}</div>
+                  <div className="stp-spec-val">{value}</div>
                 </div>
               </div>
             ))}
@@ -178,115 +264,157 @@ export default function SewageTreatment() {
         </div>
       </section>
 
-      {/* Methodology */}
-      <section className="section bg-off-white">
-        <div className="container">
-          <div className="reveal" style={{ maxWidth: 860 }}>
-            <span className="section-label">Methodology</span>
-            <h2 className="section-title">MBBR Technology with Probiotics</h2>
-            <p style={{ lineHeight: 1.8, color: 'var(--color-text-light)', marginBottom: 'var(--space-4)' }}>
-              Treatment is carried out using an <strong>Improved Moving Bed Bio-film Reactor (MBBR)</strong>. The
-              methodology includes the use of <strong>probiotics along with MBBR technology</strong> for the treatment
-              of waste water.
-            </p>
-            <p style={{ lineHeight: 1.8, color: 'var(--color-text-light)' }}>
-              Samples are collected periodically <strong>before and after treatment</strong> and analysed for various
-              important physio-chemical parameters, with results compared against the standard data prescribed by the{' '}
-              <strong>Bureau of Indian Standards</strong>.
+      {/* 4. Treatment Methodology Process Cards with Integrated Step Photos */}
+      <section className="stp-section stp-method-section">
+        <div className="stp-container">
+          <div className="stp-header">
+            <div className="stp-badge">
+              <FlaskConical size={14} />
+              <span>ADVANCED CLEAN-TECH METHODOLOGY</span>
+            </div>
+            <h2 className="stp-title">
+              MBBR Technology <span>with Probiotics</span>
+            </h2>
+            <p className="stp-subtitle">
+              Integrating bio-film reactors and biological probiotics for high-efficiency effluent purification.
             </p>
           </div>
-        </div>
-      </section>
 
-      {/* Impact */}
-      <section className="section bg-white">
-        <div className="container">
-          <div className="reveal" style={{ marginBottom: 'var(--space-8)', maxWidth: 860 }}>
-            <span className="section-label">Impact</span>
-            <h2 className="section-title">Treated Water, Put Back to Work</h2>
-          </div>
-
-          <div
-            className="mobile-stack-grid"
-            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 'var(--space-5)' }}
-          >
-            <div style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderLeft: '4px solid var(--color-accent)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)' }}>
-              <Leaf size={22} strokeWidth={2.2} style={{ color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }} />
-              <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-lg)', fontWeight: 800, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>
-                Campus Greenery
-              </h3>
-              <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.7 }}>
-                The treated sewage (effluent) is used for gardening purposes across the campus, saving a substantial
-                quantity of fresh water demand and supporting greenery development within the campus.
-              </p>
-            </div>
-
-            <div style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderLeft: '4px solid var(--color-accent)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)' }}>
-              <Recycle size={22} strokeWidth={2.2} style={{ color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }} />
-              <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-lg)', fontWeight: 800, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>
-                2.5 KM of Adopted Highway
-              </h3>
-              <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.7 }}>
-                Sri Vishnu Educational Society has long been invested in societal problems. In that spirit, the Society
-                has adopted the maintenance of nearly <strong>2.5 km of the proposed National Highway road</strong>{' '}
-                passing in front of the campus — with treated water consumed in the road-partition greenery and other
-                adopted sites.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Gallery — photos from public/images/sewage-treatment-plants/.
-          Each <img> hides its own cell if the file 404s, so empty slots
-          never show a broken-image icon. */}
-      <section className="section bg-off-white">
-        <div className="container">
-          <div className="reveal" style={{ marginBottom: 'var(--space-8)', maxWidth: 860 }}>
-            <span className="section-label">Gallery</span>
-            <h2 className="section-title">On-Site Treatment Plants</h2>
-          </div>
-          <div
-            className="mobile-stack-grid"
-            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 'var(--space-4)' }}
-          >
-            {GALLERY_PHOTOS.map((photo) => (
-              <div
-                key={photo.src}
-                style={{
-                  overflow: 'hidden',
-                  borderRadius: 'var(--radius-md)',
-                  border: '1.5px solid var(--color-light-gray)',
-                  aspectRatio: '4 / 3',
-                  background: 'var(--color-light-gray)',
-                }}
-              >
+          <div className="stp-process-flow">
+            <div className="stp-process-card">
+              <div className="stp-process-num">01</div>
+              {/* Interleaved Photo Slot 4 */}
+              <div className="stp-process-img-box">
                 <img
-                  src={photo.src}
-                  alt={photo.alt}
-                  loading="lazy"
-                  onError={(e) => {
-                    const cell = (e.currentTarget.parentElement as HTMLElement | null);
-                    if (cell) cell.style.display = 'none';
-                  }}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  src={getPhotoSrc(3)}
+                  alt="Zonal Drainage Network"
+                  onError={(e) => { e.currentTarget.src = DEFAULT_PHOTOS[0].src; }}
                 />
               </div>
-            ))}
+              <h3 className="stp-process-title">Zonal Sewage Collection</h3>
+              <p className="stp-process-body">
+                Sewage collected from hostels, academic blocks, mess facilities, and residential quarters across the 80-acre campus is channelled through an integrated network of underground drainages into the treatment plants.
+              </p>
+            </div>
+
+            <div className="stp-process-card">
+              <div className="stp-process-num">02</div>
+              {/* Interleaved Photo Slot 5 */}
+              <div className="stp-process-img-box">
+                <img
+                  src={getPhotoSrc(4)}
+                  alt="MBBR Biofilm Reactor"
+                  onError={(e) => { e.currentTarget.src = DEFAULT_PHOTOS[1].src; }}
+                />
+              </div>
+              <h3 className="stp-process-title">MBBR & Probiotic Dosing</h3>
+              <p className="stp-process-body">
+                Treatment is carried out using an <strong>Improved Moving Bed Bio-film Reactor (MBBR)</strong>. The methodology includes the strategic use of <strong>probiotics along with MBBR technology</strong> for bio-degradation of waste water.
+              </p>
+            </div>
+
+            <div className="stp-process-card">
+              <div className="stp-process-num">03</div>
+              {/* Interleaved Photo Slot 6 */}
+              <div className="stp-process-img-box">
+                <img
+                  src={getPhotoSrc(5)}
+                  alt="BIS Quality Water Testing"
+                  onError={(e) => { e.currentTarget.src = DEFAULT_PHOTOS[2].src; }}
+                />
+              </div>
+              <h3 className="stp-process-title">BIS Standard Analysis</h3>
+              <p className="stp-process-body">
+                Samples are collected periodically <strong>before and after treatment</strong> and analysed for various important physio-chemical parameters, with results strictly verified against standards prescribed by the <strong>Bureau of Indian Standards</strong>.
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* CTA */}
-      <section style={{ background: 'var(--color-primary)', padding: 'var(--space-12) 0' }}>
-        <div className="container" style={{ textAlign: 'center' }}>
-          <div className="reveal">
-            <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>Explore More of Campus Life</h2>
-            <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Link to="/campus" className="btn btn-accent">Back to Campus Life</Link>
-              <Link to="/campus/other-facilities" className="btn btn-secondary">Other Facilities</Link>
-              <Link to="/differentiators" className="btn btn-secondary">Differentiators</Link>
+      {/* 5. Impact & Application Dual Spotlight with Feature Photos */}
+      <section className="stp-section stp-impact-section">
+        <div className="stp-container">
+          <div className="stp-header">
+            <div className="stp-badge">
+              <Leaf size={14} />
+              <span>ENVIRONMENTAL IMPACT</span>
             </div>
+            <h2 className="stp-title">
+              Treated Water, <span>Put Back to Work</span>
+            </h2>
+            <p className="stp-subtitle">
+              Recycling 100% of treated effluent to nourish campus landscaping and public highway greenery.
+            </p>
+          </div>
+
+          <div className="stp-impact-grid">
+            <div className="stp-impact-media-card">
+              {/* Interleaved Photo Slot 7 */}
+              <div className="stp-impact-img-box">
+                <img
+                  src={getPhotoSrc(6)}
+                  alt="Campus Greenery Irrigation"
+                  onError={(e) => { e.currentTarget.src = DEFAULT_PHOTOS[0].src; }}
+                />
+              </div>
+              <div className="stp-impact-body">
+                <span className="stp-impact-tag">ON-CAMPUS IRRIGATION</span>
+                <h3 className="stp-impact-title">Campus Greenery & Botanical Lawns</h3>
+                <p className="stp-impact-desc">
+                  The treated sewage (effluent) is used for gardening purposes across the campus, saving a substantial quantity of fresh water demand and supporting rich greenery development throughout the 80-acre university grounds.
+                </p>
+              </div>
+            </div>
+
+            <div className="stp-impact-media-card">
+              {/* Interleaved Photo Slot 8 */}
+              <div className="stp-impact-img-box">
+                <img
+                  src={getPhotoSrc(7)}
+                  alt="2.5 KM Adopted Highway Greenery"
+                  onError={(e) => { e.currentTarget.src = DEFAULT_PHOTOS[1].src; }}
+                />
+              </div>
+              <div className="stp-impact-body">
+                <span className="stp-impact-tag">COMMUNITY HIGHWAY ADOPTION</span>
+                <h3 className="stp-impact-title">2.5 KM Adopted National Highway Greenery</h3>
+                <p className="stp-impact-desc">
+                  Sri Vishnu Educational Society has long been invested in societal problems. In that spirit, the Society has adopted the maintenance of nearly <strong>2.5 km of the proposed National Highway road</strong> passing in front of the campus — with treated water consumed in the road-partition greenery and other adopted sites.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 6. On-Site Gallery Section */}
+      <section className="stp-section stp-gallery-section">
+        <div className="stp-container">
+          <PhotoGrid
+            images={photos}
+            title="STP Infrastructure Gallery"
+            label="GALLERY SHOWCASE"
+            subtitle="Visual glimpses of the 200 KLD MBBR sewage treatment plants, testing labs, and recycled water distribution."
+          />
+        </div>
+      </section>
+
+      {/* 7. Eco Action Bottom CTA */}
+      <section className="stp-cta-banner">
+        <div className="stp-container">
+          <h2>Explore More Campus Life Facilities</h2>
+          <p>Discover our central library, hosteller amenities, health care, and sustainability initiatives across VWU.</p>
+          <div className="stp-cta-btns">
+            <Link to="/campus" className="stp-btn stp-btn-emerald">
+              Back to Campus Life <ArrowRight size={18} style={{ marginLeft: 6 }} />
+            </Link>
+            <Link to="/campus/other-facilities" className="stp-btn stp-btn-outline">
+              Other Facilities
+            </Link>
+            <Link to="/differentiators" className="stp-btn stp-btn-outline">
+              Differentiators
+            </Link>
           </div>
         </div>
       </section>

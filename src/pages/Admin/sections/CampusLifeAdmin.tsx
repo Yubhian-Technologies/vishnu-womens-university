@@ -3,6 +3,7 @@ import { collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp, writeBa
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
 import { deleteFile, type UploadResult } from '../../../lib/storage';
+import ImageUploader from '../../../components/ImageUploader/ImageUploader';
 import CustomSectionEditor from './CustomSectionEditor';
 import CustomTabsEditor from './CustomTabsEditor';
 import { replaceAtPath, getAtPath, type CustomSection } from '../../../lib/customSections';
@@ -11,6 +12,10 @@ import { diffChangedFields } from '../../../lib/formDiff';
 import { CAMPUS_LIFE_LEGACY_SEEDS } from '../../CampusLife/campusLifeLegacySeeds';
 import { CONTENT_ICON_NAMES } from '../../../lib/contentIcons';
 import AuditoriumsAdmin from './AuditoriumsAdmin';
+import {
+  TELEVISION_PILLAR_KEYS, TELEVISION_PILLAR_LABELS, toTelevisionPillarsForm,
+  type TelevisionPillars,
+} from '../../../lib/televisionPillars';
 
 // Backs every "Campus Life" page (the 16 facility pages under /campus/*,
 // Vishnu TV Academy, Arts & Culture, Sports & Games, Social Services,
@@ -43,6 +48,10 @@ export interface CampusLifeItemDoc {
   // the pages that already had multiple tabs before this) — same shape as
   // WISE/IIC/VDL/Idea Lab in Differentiators.
   tabs?: CustomTab[];
+  // Television only — the "Programming & Content" section's 4 fixed
+  // categories (Education/Entertainment/News/Events), each with its own
+  // admin photo + short description. See televisionPillars.ts.
+  pillars?: TelevisionPillars;
 }
 
 const EMPTY: Omit<CampusLifeItemDoc, 'id'> = {
@@ -81,6 +90,8 @@ const KNOWN_PAGES: { slug: string; title: string; group: CampusLifeItemDoc['grou
   { slug: 'swimming-pool', title: 'Swimming Pool', group: 'facility' },
   { slug: 'campus-security', title: 'Campus Security', group: 'facility' },
   { slug: 'other-facilities', title: 'Other Facilities', group: 'facility' },
+  { slug: 'television', title: 'Television', group: 'facility' },
+  { slug: 'sewage-treatment-plants', title: 'Sewage Treatment Plants', group: 'facility' },
   { slug: 'vishnu-tv-academy', title: 'Vishnu TV Academy', group: 'activity' },
   { slug: 'arts-culture', title: 'Arts & Culture', group: 'activity' },
   { slug: 'sports-games', title: 'Sports & Games', group: 'activity' },
@@ -390,9 +401,24 @@ export default function CampusLifeAdmin() {
       slug: it.slug, title: it.title, group: it.group, order: it.order,
       icon: it.icon || '', desc: it.desc || '',
       customSections: it.customSections || [], tabs: it.tabs || [],
+      pillars: it.slug === 'television' ? toTelevisionPillarsForm(it.pillars) : it.pillars,
     };
     setForm(next);
     setOriginalForm(next);
+  };
+
+  const setPillarField = <K extends keyof TelevisionPillars[keyof TelevisionPillars]>(
+    key: keyof TelevisionPillars,
+    field: K,
+    value: TelevisionPillars[keyof TelevisionPillars][K],
+  ) => {
+    setForm((p) => ({
+      ...p,
+      pillars: {
+        ...toTelevisionPillarsForm(p.pillars),
+        [key]: { ...toTelevisionPillarsForm(p.pillars)[key], [field]: value },
+      },
+    }));
   };
 
   const remove = async (id: string) => {
@@ -487,6 +513,41 @@ export default function CampusLifeAdmin() {
                 {(form.customSections?.length || form.tabs?.length) ? 'Re-seed (overwrite)' : 'Add starter content'}
               </button>
             </p>
+          )}
+
+          {form.slug === 'television' && (
+            <>
+              <div className="admin-field admin-field--full"><hr /><h3>Programming Pillars</h3></div>
+              <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>
+                The "Programming &amp; Content" section's 4 fixed categories — Education, Entertainment, News, and
+                Events. Add a photo and a short description for each; a category with no photo stays hidden on the
+                public page.
+              </p>
+              <div className="admin-field admin-field--full" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.25rem' }}>
+                {TELEVISION_PILLAR_KEYS.map((key) => {
+                  const pillar = toTelevisionPillarsForm(form.pillars)[key];
+                  return (
+                    <div key={key} style={{ border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: '1rem' }}>
+                      <label style={{ display: 'block', marginBottom: '0.5rem' }}>{TELEVISION_PILLAR_LABELS[key]}</label>
+                      <ImageUploader
+                        folder="vwu/campus-life/television"
+                        currentUrl={pillar.imageUrl}
+                        onUploaded={(r) => { setPillarField(key, 'imageUrl', r.url); setPillarField(key, 'storagePath', r.path); }}
+                        label="Upload Photo"
+                        aspect={4 / 3}
+                      />
+                      <textarea
+                        value={pillar.desc}
+                        onChange={(e) => setPillarField(key, 'desc', e.target.value)}
+                        placeholder={`Short description of ${TELEVISION_PILLAR_LABELS[key].toLowerCase()} programming`}
+                        rows={3}
+                        style={{ marginTop: '0.75rem', width: '100%' }}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            </>
           )}
 
           {!usesTabs && (

@@ -82,6 +82,7 @@ export const PAGES = [
   { value: 'campus-wellness',         label: 'Campus Life: Wellness (hero banner image only)' },
   { value: 'campus-sewage-treatment-plants', label: 'Campus Life: Sewage Treatment Plants' },
   { value: 'campus-events',           label: 'Campus Life: Events' },
+  { value: 'campus-food-courts',      label: 'Campus Life: Food Courts' },
   { value: 'information',             label: 'Information' },
   { value: 'governance',              label: 'Governance' },
   { value: 'governing-body',          label: 'Governing Body' },
@@ -128,7 +129,7 @@ const PAGE_GROUPS: { label: string; values: string[] }[] = [
   { label: 'Student Life', values: ['student-clubs', 'student-club-detail', 'clubs', 'arts-culture', 'social-services', 'sports-games', 'vishnu-tv', 'campus-magazines'] },
   { label: 'Placements, Careers & Research', values: ['placement-detail', 'careers', 'differentiators', 'differentiators-detail', 'research', 'research-detail'] },
   { label: 'News & Awards', values: ['news', 'events', 'news-awards', 'news-awards-happenings', 'news-awards-accreditations', 'news-awards-gallery'] },
-  { label: 'Campus Life', values: ['campus', ...allCampusFacilities.map((f) => `campus-${f.slug}`), 'campus-wellness-center', 'campus-wellness', 'campus-sewage-treatment-plants', 'campus-events'] },
+  { label: 'Campus Life', values: ['campus', ...allCampusFacilities.map((f) => `campus-${f.slug}`), 'campus-wellness-center', 'campus-wellness', 'campus-sewage-treatment-plants', 'campus-events', 'campus-food-courts'] },
   { label: 'Compliance & Contact', values: ['disclosures-ugc', 'anti-ragging', 'policies-procedures', 'contact'] },
 ];
 
@@ -194,6 +195,7 @@ const PAGE_TEXT_DEFAULTS: Record<string, { title: string; subtitle?: string }> =
   'campus-wellness-center': { title: 'Wellness Center', subtitle: 'A space where you can be yourself and talk about the things that really matter to you.' },
   'campus-wellness': { title: 'Your Wellbeing Matters', subtitle: 'At WellCentre, we provide a safe, supportive and judgement-free space for you to pause, talk and grow.' },
   'campus-sewage-treatment-plants': { title: 'Sewage Treatment Plants', subtitle: 'A zero-discharge campus — every drop of sewage generated is treated on site and returned to the land as irrigation for campus and highway greenery.' },
+  'campus-food-courts': { title: 'Food Courts', subtitle: 'Hygienic Dining with Variety and Convenience.' },
 };
 
 function groupOfPage(pageValue: string): string | undefined {
@@ -283,12 +285,18 @@ function PageBannersAdmin() {
     if (formRef.current) smoothScrollTo(formRef.current);
   };
 
-  const remove = async (id: string) => {
-    if (!confirm('Delete this banner?')) return;
+  const remove = async (b: Banner) => {
+    if (!window.confirm(`Delete banner "${b.title || 'Untitled'}"?`)) return;
     try {
-      await deleteDoc(doc(db, 'banners', id));
+      await deleteDoc(doc(db, 'banners', b.id));
+      if (b.storagePath) await deleteFile(b.storagePath).catch(() => {});
+      if (b.videoStoragePath) await deleteFile(b.videoStoragePath).catch(() => {});
+      if (editing === b.id) {
+        setEditing(null);
+        setForm(EMPTY);
+      }
     } catch (e) {
-      alert(`Couldn't delete: ${(e as Error).message}`);
+      alert(`Couldn't delete banner: ${(e as Error).message}`);
     }
   };
 
@@ -464,7 +472,7 @@ function PageBannersAdmin() {
                   <ReadOnlyGate readOnly={!canEdit(session, RESOURCES.PLACEMENTS_HERO_BANNERS, PLACEMENTS_BANNER_PAGES.has(b.page ?? 'home'))}>
                     <div className="admin-image-card__actions">
                       <button className="admin-btn admin-btn--sm" onClick={() => startEdit(b)}>Edit</button>
-                      <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(b.id)}>Delete</button>
+                      <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(b)}>Delete</button>
                     </div>
                   </ReadOnlyGate>
                 </div>
