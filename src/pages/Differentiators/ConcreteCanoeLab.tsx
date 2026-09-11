@@ -129,7 +129,6 @@ export default function ConcreteCanoeLab() {
                 {...fetchPriorityAttr('high')}
               />
             )}
-            <div className="canoe-hero-overlay" />
             <div className="canoe-hero-content animate-fade-in-up">
               <nav aria-label="Breadcrumb" className="canoe-breadcrumb">
                 <Link to="/">Home</Link>
