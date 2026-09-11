@@ -60,7 +60,7 @@
 .pat-card__lpa {
   font-family: var(--font-serif);
   font-size: var(--text-xl);
-  font-weight: 900;
+  font-weight: 700;
   color: var(--color-accent-dark, var(--color-accent));
 }
 

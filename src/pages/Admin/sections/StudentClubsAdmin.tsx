@@ -1,8 +1,12 @@
-import { useState } from 'react';
-import { collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
-import { Laptop, Handshake, Palette, type LucideIcon } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import {
+  collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp, writeBatch,
+} from 'firebase/firestore';
+import { Sparkles } from 'lucide-react';
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
+import { CLUB_CATEGORIES_COLLECTION, DEFAULT_CLUB_CATEGORIES, useClubCategories, type ClubCategoryDef, type ClubCategoryDoc } from '../../../lib/clubCategories';
+import { CONTENT_ICON_NAMES, resolveContentIcon } from '../../../lib/contentIcons';
 import { slugify } from '../../../lib/slugify';
 import { useImageCropModal } from '../../../components/ImageUploader/useImageCropModal';
 import FileUploader from '../../../components/FileUploader/FileUploader';
@@ -87,21 +91,77 @@ const EMPTY: FormState = {
   vision: '', mission: '', customFields: [], images: [], pdfUrl: '', pdfStoragePath: '', committeeText: '',
 };
 
-export const CLUB_CATEGORIES = ['Technical Clubs', 'Social & Service Clubs', 'Creative & Arts Clubs'];
-
-export const CLUB_CATEGORY_ICONS: Record<string, LucideIcon> = {
-  'Technical Clubs': Laptop,
-  'Social & Service Clubs': Handshake,
-  'Creative & Arts Clubs': Palette,
-};
+const EMPTY_CATEGORY = { name: '', icon: 'Sparkles', bg: '#E1E6EC', accent: '#2F5FD0' };
 
 export default function StudentClubsAdmin() {
   const { docs: clubs, loading } = useOrderedCollection<ClubDoc>('studentClubs', 'order');
+  const { docs: clubCatDocs, loading: catLoading } = useOrderedCollection<ClubCategoryDoc>(CLUB_CATEGORIES_COLLECTION, 'order');
+  const seeded = clubCatDocs.length > 0;
+  const categories = useClubCategories();
+  const [catForm, setCatForm] = useState(EMPTY_CATEGORY);
+  const [editingCat, setEditingCat] = useState<string | null>(null);
+  const [savingCat, setSavingCat] = useState(false);
   const [form, setForm] = useState<FormState>(EMPTY);
   const [editing, setEditing] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const { openCrop, cropModal } = useImageCropModal(4 / 3);
   const [uploadingSlot, setUploadingSlot] = useState<number | null>(null);
+
+  // On a brand-new project the `studentClubCategories` collection is empty,
+  // so nothing is editable/deletable yet (the three starter categories are
+  // only a code fallback). Auto-materialise the starters as real Firestore
+  // docs the moment this section loads — a one-time seed guarded by a ref so
+  // React.StrictMode's double-invoke of effects can't create duplicates — so
+  // every category is immediately editable and deletable.
+  const seedingRef = useRef(false);
+  useEffect(() => {
+    if (catLoading || seeded || seedingRef.current) return;
+    seedingRef.current = true;
+    (async () => {
+      try {
+        await Promise.all(DEFAULT_CLUB_CATEGORIES.map((d) => addDoc(collection(db, CLUB_CATEGORIES_COLLECTION), { ...d, createdAt: serverTimestamp() })));
+      } catch {
+        // A blocked write here isn't fatal — the fallback starter list still
+        // shows, and the admin can retry via the restore / save handlers.
+        seedingRef.current = false;
+      }
+    })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [catLoading, seeded]);
+
+  // Drag-to-reorder — clubs.map/filter on the public pages both preserve
+  // the underlying `order` sort, so dragging rows here and writing the new
+  // `order` values back is enough to reorder the site's Clubs grids too
+  // (same pattern as GoverningBodyAdmin.tsx).
+  const [orderedClubs, setOrderedClubs] = useState<ClubDoc[]>([]);
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
+  useEffect(() => setOrderedClubs(clubs), [clubs]);
+
+  const handleDragOver = (i: number) => {
+    if (dragIndex === null || dragIndex === i) return;
+    setOrderedClubs((prev) => {
+      const next = [...prev];
+      const [moved] = next.splice(dragIndex, 1);
+      next.splice(i, 0, moved);
+      return next;
+    });
+    setDragIndex(i);
+  };
+  const handleDrop = async () => {
+    setDragIndex(null);
+    const batch = writeBatch(db);
+    let changed = false;
+    orderedClubs.forEach((c, i) => {
+      if (c.order !== i) { batch.update(doc(db, 'studentClubs', c.id), { order: i }); changed = true; }
+    });
+    if (changed) {
+      try {
+        await batch.commit();
+      } catch (e) {
+        alert(`Couldn't save new order: ${(e as Error).message}`);
+      }
+    }
+  };
 
   const set = (k: string, v: string | number) => setForm((p) => ({ ...p, [k]: v }));
   const handlePdf = (r: UploadResult) => setForm((p) => ({ ...p, pdfUrl: r.url, pdfStoragePath: r.path }));
@@ -196,6 +256,83 @@ export default function StudentClubsAdmin() {
     }
   };
 
+  const saveCategory = async () => {
+    const name = catForm.name.trim();
+    if (!name) return alert('Category name is required.');
+    const dup = categories.find((c) => c.name.toLowerCase() === name.toLowerCase() && c.id !== editingCat);
+    if (dup) return alert(`A category called "${name}" already exists — pick a different name.`);
+    setSavingCat(true);
+    try {
+      if (editingCat) {
+        const before = categories.find((c) => c.id === editingCat);
+        await updateDoc(doc(db, CLUB_CATEGORIES_COLLECTION, editingCat), {
+          name, icon: catForm.icon || 'Sparkles', bg: catForm.bg, accent: catForm.accent,
+        });
+        // Renaming a category cascades to every club that referenced it, so
+        // its clubs don't silently lose their grouping/colour/icon.
+        if (before && before.name !== name) {
+          const batch = writeBatch(db);
+          clubs.filter((c) => c.category === before.name).forEach((c) => batch.update(doc(db, 'studentClubs', c.id), { category: name }));
+          await batch.commit();
+        }
+      } else {
+        // Safety net for the moment before the auto-seed write lands: if the
+        // starters still aren't in Firestore, write any missing ones first so
+        // every category — including the defaults — is a real editable doc.
+        if (!seeded) {
+          const missing = DEFAULT_CLUB_CATEGORIES.filter((d) => !clubCatDocs.some((c) => c.name === d.name));
+          if (missing.length > 0) {
+            await Promise.all(missing.map((d) => addDoc(collection(db, CLUB_CATEGORIES_COLLECTION), { ...d, createdAt: serverTimestamp() })));
+          }
+        }
+        await addDoc(collection(db, CLUB_CATEGORIES_COLLECTION), {
+          name, icon: catForm.icon || 'Sparkles', bg: catForm.bg, accent: catForm.accent,
+          order: Math.max(...categories.map((c) => c.order), -1) + 1,
+          createdAt: serverTimestamp(),
+        });
+      }
+      setCatForm(EMPTY_CATEGORY); setEditingCat(null);
+    } catch (e) {
+      alert(`Couldn't save category: ${(e as Error).message}`);
+    } finally { setSavingCat(false); }
+  };
+
+  const seedStarterCategories = async () => {
+    // Add whatever starter categories aren't already in Firestore — a fresh
+    // project gets all three; an app where an admin deleted one default gets
+    // just that one back (no duplicates ever).
+    const missing = DEFAULT_CLUB_CATEGORIES.filter((d) => !categories.some((c) => c.name === d.name));
+    if (missing.length === 0) return;
+    setSavingCat(true);
+    try {
+      await Promise.all(missing.map((d) => addDoc(collection(db, CLUB_CATEGORIES_COLLECTION), { ...d, createdAt: serverTimestamp() })));
+      setCatForm(EMPTY_CATEGORY); setEditingCat(null);
+    } catch (e) {
+      alert(`Couldn't save categories: ${(e as Error).message}`);
+    } finally { setSavingCat(false); }
+  };
+
+  const removeCategory = async (cat: ClubCategoryDef) => {
+    if (!cat.id) return alert('Starter categories become editable/deletable once you add or seed categories below.');
+    const usedBy = clubs.filter((c) => c.category === cat.name).length;
+    if (usedBy > 0) return alert(`Can't delete "${cat.name}" — ${usedBy} club${usedBy > 1 ? 's' : ''} still use it. Reassign those clubs first.`);
+    if (!confirm(`Delete category "${cat.name}"?`)) return;
+    try {
+      await deleteDoc(doc(db, CLUB_CATEGORIES_COLLECTION, cat.id));
+    } catch (e) {
+      alert(`Couldn't delete: ${(e as Error).message}`);
+    }
+  };
+
+  const startEditCategory = (cat: ClubCategoryDef) => {
+    setEditingCat(cat.id ?? null);
+    setCatForm({ name: cat.name, icon: cat.icon, bg: cat.bg, accent: cat.accent });
+  };
+
+  const missingStarterCount = DEFAULT_CLUB_CATEGORIES.filter((d) => !categories.some((c) => c.name === d.name)).length;
+
+  const CatPreviewIcon = resolveContentIcon(catForm.icon) || Sparkles;
+
   return (
     <div className="admin-section">
       <div className="admin-card">
@@ -253,8 +390,9 @@ export default function StudentClubsAdmin() {
           <div className="admin-field">
             <label htmlFor="field-category">Category</label>
             <select id="field-category" value={form.category} onChange={(e) => set('category', e.target.value)}>
-              {CLUB_CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+              {categories.map((c) => <option key={c.name} value={c.name}>{c.name}</option>)}
             </select>
+            <p className="admin-field__hint">Categories are managed right below this form — add a new one there and it shows up here.</p>
           </div>
           <div className="admin-field">
             <label htmlFor="field-display-order">Display Order</label>
@@ -347,14 +485,119 @@ export default function StudentClubsAdmin() {
       </div>
 
       <div className="admin-card">
+        <h2 className="admin-card__title">Club Categories ({categories.length})</h2>
+        <p className="admin-field__hint" style={{ marginBottom: '0.75rem' }}>
+          Categories are stored in Firestore, so you can add, edit, and delete them without a deploy. Renaming a
+          category also re-assigns its existing clubs. {!seeded && !catLoading && (
+            <>The three starter categories are being written into Firestore in the background right now — once that
+            finishes, every row is editable and deletable.</>
+          )}
+        </p>
+        {seeded && missingStarterCount > 0 && (
+          <button className="admin-btn admin-btn--ghost" onClick={seedStarterCategories} disabled={savingCat} style={{ marginBottom: 'var(--space-4)' }}>
+            {savingCat ? 'Restoring…' : `Restore missing starter categor${missingStarterCount > 1 ? 'ies' : 'y'} (${missingStarterCount})`}
+          </button>
+        )}
+        <div style={{ display: 'grid', gap: 'var(--space-5)', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', alignItems: 'end' }}>
+          <div className="admin-field">
+            <label>Category Name *</label>
+            <input value={catForm.name} onChange={(e) => setCatForm((p) => ({ ...p, name: e.target.value }))} placeholder="e.g. Sports Clubs" />
+          </div>
+          <div className="admin-field">
+            <label>Tile Icon</label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <CatPreviewIcon size={20} color={catForm.accent} />
+              <input
+                list="club-category-icon-options"
+                value={catForm.icon}
+                onChange={(e) => setCatForm((p) => ({ ...p, icon: e.target.value }))}
+                placeholder="Sparkles"
+              />
+            </div>
+            <datalist id="club-category-icon-options">
+              {CONTENT_ICON_NAMES.map((n) => <option key={n} value={n} />)}
+            </datalist>
+          </div>
+          <div className="admin-field">
+            <label>Tile Background</label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <input type="color" value={catForm.bg} onChange={(e) => setCatForm((p) => ({ ...p, bg: e.target.value }))} style={{ width: 44, height: 34, padding: 0, border: 'none', background: 'none', cursor: 'pointer' }} />
+              <code>{catForm.bg}</code>
+            </div>
+          </div>
+          <div className="admin-field">
+            <label>Accent Colour</label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <input type="color" value={catForm.accent} onChange={(e) => setCatForm((p) => ({ ...p, accent: e.target.value }))} style={{ width: 44, height: 34, padding: 0, border: 'none', background: 'none', cursor: 'pointer' }} />
+              <code>{catForm.accent}</code>
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: '0.5rem', alignSelf: 'center' }}>
+            {editingCat && (
+              <button className="admin-btn admin-btn--ghost" onClick={() => { setEditingCat(null); setCatForm(EMPTY_CATEGORY); }}>
+                Cancel
+              </button>
+            )}
+            <button className="admin-btn admin-btn--primary" onClick={saveCategory} disabled={savingCat}>
+              {savingCat ? 'Saving…' : editingCat ? 'Save Changes' : '+ Add Category'}
+            </button>
+          </div>
+        </div>
+        {catLoading && <p className="admin-loading" style={{ marginTop: 'var(--space-4)' }}>Loading…</p>}
+        {!catLoading && (
+        <div className="admin-table-wrap" style={{ marginTop: 'var(--space-5)' }}>
+          <table className="admin-table">
+            <thead><tr><th>Icon</th><th>Name</th><th>Colours</th><th>Clubs</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>
+              {categories.map((cat) => {
+                const Icon = resolveContentIcon(cat.icon) || Sparkles;
+                const usedBy = clubs.filter((c) => c.category === cat.name).length;
+                return (
+                  <tr key={cat.name}>
+                    <td><Icon size={20} color={cat.accent} /></td>
+                    <td>{cat.name}</td>
+                    <td>
+                      <span style={{ display: 'inline-block', width: 16, height: 16, borderRadius: 4, background: cat.bg, border: '1px solid var(--color-mid-gray)', verticalAlign: 'middle', marginRight: 6 }} />
+                      <span style={{ display: 'inline-block', width: 16, height: 16, borderRadius: 4, background: cat.accent, verticalAlign: 'middle' }} />
+                    </td>
+                    <td>{usedBy}</td>
+                    <td>
+                      {cat.id
+                        ? <span className="admin-badge admin-badge--sm">{editingCat === cat.id ? 'Editing' : 'Saved'}</span>
+                        : <span className="admin-badge admin-badge--sm admin-badge--gray">Starter</span>}
+                    </td>
+                    <td>
+                      <button className="admin-btn admin-btn--sm" disabled={!cat.id && !seeded} title={!cat.id && !seeded ? 'Seed or add a category first to make starters editable' : ''} onClick={() => startEditCategory(cat)}>Edit</button>
+                      <button className="admin-btn admin-btn--sm admin-btn--danger" disabled={!cat.id && !seeded} title={!cat.id && !seeded ? 'Seed or add a category first to make starters deletable' : ''} onClick={() => removeCategory(cat)}>Delete</button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+        )}
+      </div>
+
+      <div className="admin-card">
         <h2 className="admin-card__title">All Clubs ({clubs.length})</h2>
+        <p className="admin-field__hint" style={{ marginBottom: '0.75rem' }}>Drag rows by the ⠿ handle to change the order clubs appear in on the public site.</p>
         {loading ? <p className="admin-loading">Loading…</p> : (
           <div className="admin-table-wrap">
             <table className="admin-table">
-              <thead><tr><th>Image</th><th>Name</th><th>Category</th><th>Order</th><th>URL Slug</th><th>Document</th><th>Actions</th></tr></thead>
+              <thead><tr><th></th><th>Image</th><th>Name</th><th>Category</th><th>Order</th><th>URL Slug</th><th>Document</th><th>Actions</th></tr></thead>
               <tbody>
-                {clubs.map((c) => (
-                  <tr key={c.id}>
+                {orderedClubs.map((c, i) => (
+                  <tr
+                    key={c.id}
+                    draggable
+                    onDragStart={() => setDragIndex(i)}
+                    onDragOver={(e) => { e.preventDefault(); handleDragOver(i); }}
+                    onDrop={handleDrop}
+                    onDragEnd={() => setDragIndex(null)}
+                    style={{ opacity: dragIndex === i ? 0.5 : 1, cursor: 'grab' }}
+                  >
+                    <td style={{ color: 'var(--color-text-light, #9ca3af)', fontSize: '1.1rem', userSelect: 'none' }}>⠿</td>
                     <td>
                       {c.images && c.images.length > 0 ? (
                         <>
@@ -374,7 +617,7 @@ export default function StudentClubsAdmin() {
                     </td>
                   </tr>
                 ))}
-                {clubs.length === 0 && <tr><td colSpan={7} className="admin-empty">No clubs yet.</td></tr>}
+                {clubs.length === 0 && <tr><td colSpan={8} className="admin-empty">No clubs yet.</td></tr>}
               </tbody>
             </table>
           </div>

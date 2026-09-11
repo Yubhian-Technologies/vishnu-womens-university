@@ -9,7 +9,7 @@ import VideoUploader from '../../../components/VideoUploader/VideoUploader';
 import { deleteFile, type UploadResult } from '../../../lib/storage';
 import { allCampusFacilities } from '../../Campus/campusFacilities.data';
 import { DIFFERENTIATOR_CATEGORIES } from './DifferentiatorsAdmin';
-import { CLUB_CATEGORIES } from './StudentClubsAdmin';
+import { useClubCategories } from '../../../lib/clubCategories';
 import ItemHeroImagesAdmin from './ItemHeroImagesAdmin';
 import { smoothScrollTo } from '../../../lib/smoothScroll';
 import { useAdminSession } from '../AdminSessionContext';
@@ -40,7 +40,6 @@ const RESEARCH_CATEGORIES = [
   { value: 'engagement', label: 'Industry & Professional Engagement' },
 ];
 const DIFFERENTIATOR_CATEGORY_OPTIONS = DIFFERENTIATOR_CATEGORIES.map((c) => ({ value: c.id, label: c.label }));
-const CLUB_CATEGORY_OPTIONS = CLUB_CATEGORIES.map((c) => ({ value: c, label: c }));
 
 interface Banner {
   id: string;
@@ -80,6 +79,7 @@ export const PAGES = [
   { value: 'campus',                  label: 'Campus Life (Overview)' },
   ...allCampusFacilities.map((f) => ({ value: `campus-${f.slug}`, label: `Campus Life: ${f.title}` })),
   { value: 'campus-wellness-center',  label: 'Campus Life: Wellness Center' },
+  { value: 'campus-wellness',         label: 'Campus Life: Wellness (hero banner image only)' },
   { value: 'campus-sewage-treatment-plants', label: 'Campus Life: Sewage Treatment Plants' },
   { value: 'campus-events',           label: 'Campus Life: Events' },
   { value: 'campus-food-courts',      label: 'Campus Life: Food Courts' },
@@ -129,7 +129,7 @@ const PAGE_GROUPS: { label: string; values: string[] }[] = [
   { label: 'Student Life', values: ['student-clubs', 'student-club-detail', 'clubs', 'arts-culture', 'social-services', 'sports-games', 'vishnu-tv', 'campus-magazines'] },
   { label: 'Placements, Careers & Research', values: ['placement-detail', 'careers', 'differentiators', 'differentiators-detail', 'research', 'research-detail'] },
   { label: 'News & Awards', values: ['news', 'events', 'news-awards', 'news-awards-happenings', 'news-awards-accreditations', 'news-awards-gallery'] },
-  { label: 'Campus Life', values: ['campus', ...allCampusFacilities.map((f) => `campus-${f.slug}`), 'campus-wellness-center', 'campus-sewage-treatment-plants', 'campus-events', 'campus-food-courts'] },
+  { label: 'Campus Life', values: ['campus', ...allCampusFacilities.map((f) => `campus-${f.slug}`), 'campus-wellness-center', 'campus-wellness', 'campus-sewage-treatment-plants', 'campus-events', 'campus-food-courts'] },
   { label: 'Compliance & Contact', values: ['disclosures-ugc', 'anti-ragging', 'policies-procedures', 'contact'] },
 ];
 
@@ -150,8 +150,8 @@ const PAGE_TEXT_DEFAULTS: Record<string, { title: string; subtitle?: string }> =
   'about': { title: "About Vishnu Women's University", subtitle: "Rooted in Bhimavaram since 2001, VWU has grown into Andhra Pradesh's foremost institution for women's technical education." },
   'anti-ragging': { title: 'Anti-Ragging', subtitle: "Vishnu Women's University is committed to a safe, ragging-free campus for every student." },
   'alumni-giving': { title: 'Always a Vishnu Engineer', subtitle: 'Graduation is not the end of your VWU story. Stay engaged, give back, and help shape the next generation of women engineers.' },
-  'admissions': { title: 'Your Journey Starts Here', subtitle: 'Choosing VWU sets you on a path to a fulfilling engineering career, a strong professional network, and a future built on real achievement.' },
-  'campus-visit': { title: 'Come See VWU for Yourself', subtitle: 'Seeing VWU in person is the best way to know if it is the right fit for you. Choose the visit format that suits you best.' },
+  'admissions': { title: 'Start Your Application to VWU', subtitle: 'Explore programmes, admission routes, fees and the information you need to apply to Vishnu Women\u2019s University.' },
+  'campus-visit': { title: 'Come See VWU for Yourself', subtitle: 'Explore the campus, academic facilities and student environment before making your decision.' },
   'disclosures-ugc': { title: 'UGC Public Self-Disclosure', subtitle: 'Shri Vishnu Engineering College for Women (Autonomous) — published as required by the University Grants Commission.' },
   'result-analysis': { title: 'Results Analysis', subtitle: 'VWU consistently ranks Among the Top 5 JNTUK-Affiliated Institutions with 90%+ annual pass rates.' },
   'about-sves': { title: 'Sri Vishnu Educational Society', subtitle: 'More than 25 years of educational commitment, spanning 11 institutions across Andhra Pradesh and Telangana.' },
@@ -193,6 +193,7 @@ const PAGE_TEXT_DEFAULTS: Record<string, { title: string; subtitle?: string }> =
     allCampusFacilities.map((f) => [`campus-${f.slug}`, { title: f.title, subtitle: f.heroSubtitle ?? f.desc }])
   ),
   'campus-wellness-center': { title: 'Wellness Center', subtitle: 'A space where you can be yourself and talk about the things that really matter to you.' },
+  'campus-wellness': { title: 'Your Wellbeing Matters', subtitle: 'At WellCentre, we provide a safe, supportive and judgement-free space for you to pause, talk and grow.' },
   'campus-sewage-treatment-plants': { title: 'Sewage Treatment Plants', subtitle: 'A zero-discharge campus — every drop of sewage generated is treated on site and returned to the land as irrigation for campus and highway greenery.' },
   'campus-food-courts': { title: 'Food Courts', subtitle: 'Hygienic Dining with Variety and Convenience.' },
 };
@@ -502,6 +503,11 @@ type TabId = typeof TABS[number]['id'];
 export default function BannersAdmin() {
   const session = useAdminSession();
   const [tab, setTab] = useState<TabId>('pages');
+  // Club categories live in Firestore (they're admin-manageable in the
+  // Student Clubs section), so the Student Clubs tab's category drill-down
+  // reflects whatever categories exist today.
+  const clubCategories = useClubCategories();
+  const clubCategoryOptions = clubCategories.map((c) => ({ value: c.name, label: c.name }));
   // Only the "Placements" tab (per-item hero images for placement sub-pages)
   // is a Placements resource — the other item-hero tabs (Programs,
   // Governance, Differentiators, Research) belong to no department yet.
@@ -615,7 +621,7 @@ export default function BannersAdmin() {
           folder="vwu/student-clubs"
           getLabel={(d) => d.name as string}
           getCategoryValue={(d) => d.category as string}
-          categories={CLUB_CATEGORY_OPTIONS}
+          categories={clubCategoryOptions}
           emptyMessage="No clubs yet — add one in the Student Clubs admin section."
         />
         </ReadOnlyGate>

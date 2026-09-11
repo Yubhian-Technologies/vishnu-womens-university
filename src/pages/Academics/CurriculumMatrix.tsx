@@ -108,7 +108,6 @@ export default function CurriculumMatrix() {
       <section id="curriculum-content" className="section bg-white">
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>
-            <span className="section-label">Academics</span>
             <h2 className="section-title">Curriculum by Programme & Regulation</h2>
             <p className="section-desc" style={{ margin: '0 auto' }}>
               Select the semester and regulation to download the corresponding curriculum document.

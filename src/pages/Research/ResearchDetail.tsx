@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
-import { Sparkles, Microscope, Check } from 'lucide-react';
+import { Microscope, Check } from 'lucide-react';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import type { ConsultancyReportDoc } from '../Admin/sections/ConsultancyReportsAdmin';
@@ -380,7 +380,6 @@ export default function ResearchDetail() {
         <div className="container">
           <div className={item.highlights && item.highlights.length > 0 ? 'detail-grid' : ''}>
             <div>
-              <span className="section-label">Overview</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>
                 {displayTitle}
               </h2>
@@ -479,7 +478,6 @@ export default function ResearchDetail() {
         <section className="section bg-off-white">
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label">Details</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>{item.title}</h2>
             </div>
             <ProfessionalBodiesSection />
@@ -494,7 +492,6 @@ export default function ResearchDetail() {
         <section className="section bg-off-white">
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label">Details</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>
                 {item.slug === 'about-rd' ? 'Research Team' : item.title}
               </h2>
@@ -595,7 +592,6 @@ export default function ResearchDetail() {
         <section className="section bg-off-white">
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label">Details</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>{item.title}</h2>
             </div>
             <ThrustAreasSection categories={accordionCategories} />
@@ -606,7 +602,6 @@ export default function ResearchDetail() {
         <section className="section bg-off-white">
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label">Details</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>{item.title}</h2>
             </div>
             {accordionCategories.map((cat, ci) => (
@@ -677,7 +672,6 @@ export default function ResearchDetail() {
         <section className="section bg-off-white">
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label">Details</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>{item.title}</h2>
             </div>
             {patentYears.length > 1 && (
@@ -782,9 +776,6 @@ export default function ResearchDetail() {
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-14) 0' }}>
         <div className="container" style={{ textAlign: 'center' }}>
           <div>
-            <span className="section-label" style={{ color: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', gap: '0.4rem', justifyContent: 'center' }}>
-              <Sparkles size={14} /> Research at VWU
-            </span>
             <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>
               Explore More Research Resources
             </h2>

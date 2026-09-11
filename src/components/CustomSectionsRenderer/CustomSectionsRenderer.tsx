@@ -40,7 +40,6 @@ export default function CustomSectionsRenderer({ sections, navOffset = DEFAULT_N
         <section key={`${section.id}-${index}`} id={section.id} className={`section ${index % 2 === 0 ? 'bg-white' : 'bg-off-white'}`} style={{ scrollMarginTop: navOffset }}>
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label">Details</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem', fontWeight: section.boldHeading ? 800 : undefined }}>{section.label}</h2>
               <SectionSubtitle subtitle={section.subtitle} />
             </div>

@@ -1,0 +1,934 @@
+/* ==========================================================================
+   Institution's Innovation Council (IIC) — Bespoke UI Stylesheet
+   Fully responsive: Mobile-first, optimized for all screen sizes
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+.iic-page-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  padding-bottom: 3rem;
+  font-family: 'Inter', sans-serif;
+}
+
+/* --------------------------------------------------------------------------
+   1. Telemetry Metric Strip
+   -------------------------------------------------------------------------- */
+.iic-telemetry-strip {
+  margin-top: 0.5rem;
+}
+
+.iic-telemetry-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .iic-telemetry-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+  }
+}
+
+.iic-telemetry-card {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 1rem 1.1rem;
+  background: linear-gradient(135deg, #0B1E42 0%, #173266 100%);
+  border: 1px solid rgba(201, 151, 58, 0.35);
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(11, 30, 66, 0.12);
+  color: #FFFFFF;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.iic-telemetry-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 3px;
+  height: 100%;
+  background: linear-gradient(180deg, #C9973A 0%, #00F2FE 100%);
+}
+
+.iic-telemetry-card:hover {
+  transform: translateY(-3px);
+  border-color: #C9973A;
+  box-shadow: 0 10px 28px rgba(201, 151, 58, 0.22);
+}
+
+.iic-telemetry-icon-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  border-radius: 9px;
+  flex-shrink: 0;
+}
+
+.iic-telemetry-icon-box.gold {
+  background: rgba(201, 151, 58, 0.18);
+  border: 1px solid rgba(201, 151, 58, 0.4);
+  color: #C9973A;
+}
+
+.iic-telemetry-icon-box.cyan {
+  background: rgba(0, 242, 254, 0.15);
+  border: 1px solid rgba(0, 242, 254, 0.35);
+  color: #00F2FE;
+}
+
+.iic-telemetry-icon-box.green {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #10B981;
+}
+
+.iic-telemetry-icon-box.purple {
+  background: rgba(168, 85, 247, 0.15);
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  color: #C084FC;
+}
+
+.iic-telemetry-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.iic-telemetry-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.iic-telemetry-val {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.iic-telemetry-lbl {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  margin-top: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* --------------------------------------------------------------------------
+   2. Main Layout Grid (Content + Quick Navigation Sidebar)
+   -------------------------------------------------------------------------- */
+.iic-main-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (min-width: 1024px) {
+  .iic-main-layout {
+    grid-template-columns: 1fr 280px;
+    gap: 2rem;
+  }
+}
+
+.iic-content-area {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  min-width: 0;
+}
+
+.iic-card {
+  background: #FFFFFF;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 16px;
+  padding: 1.35rem;
+  box-shadow: 0 2px 16px rgba(11, 30, 66, 0.05);
+  transition: all 0.2s ease;
+}
+
+@media (min-width: 640px) {
+  .iic-card {
+    padding: 1.75rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .iic-card {
+    padding: 2rem;
+  }
+}
+
+.iic-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.28rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.73rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: rgba(11, 30, 66, 0.08);
+  color: #0B1E42;
+  margin-bottom: 0.85rem;
+}
+
+.iic-badge.gold {
+  background: rgba(201, 151, 58, 0.14);
+  color: #7A5410;
+}
+
+.iic-badge.cyan {
+  background: rgba(0, 168, 204, 0.1);
+  color: #006B80;
+}
+
+.iic-card-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #0B1E42;
+  margin-bottom: 0.85rem;
+  line-height: 1.3;
+}
+
+@media (min-width: 640px) {
+  .iic-card-title {
+    font-size: 1.55rem;
+  }
+}
+
+.iic-lead-text {
+  font-size: 0.95rem;
+  line-height: 1.72;
+  color: #334155;
+  margin: 0;
+}
+
+@media (min-width: 768px) {
+  .iic-lead-text {
+    font-size: 1rem;
+  }
+}
+
+.iic-subcard-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #0B1E42;
+  margin-bottom: 0.85rem;
+  line-height: 1.3;
+}
+
+/* --------------------------------------------------------------------------
+   3. Vision & Mission Cards
+   -------------------------------------------------------------------------- */
+.iic-journey-card {
+  margin-top: 1.25rem;
+  border-left: 4px solid #C9973A;
+  background: linear-gradient(135deg, #FFFDF8 0%, #FFFFFF 100%);
+}
+
+.iic-vision-mission-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .iic-vision-mission-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
+}
+
+.iic-vision-card {
+  border-top: 4px solid #00A8CC;
+}
+
+.iic-mission-card {
+  border-top: 4px solid #C9973A;
+}
+
+.iic-checklist {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.iic-checklist li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: #334155;
+}
+
+.iic-check-icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.iic-check-icon.cyan {
+  color: #00A8CC;
+}
+
+.iic-check-icon.gold {
+  color: #C9973A;
+}
+
+/* --------------------------------------------------------------------------
+   4. Council Members Roster
+   -------------------------------------------------------------------------- */
+.iic-council-roster-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.85rem;
+  margin-top: 1rem;
+}
+
+@media (min-width: 480px) {
+  .iic-council-roster-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 768px) {
+  .iic-council-roster-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.1rem;
+  }
+}
+
+@media (min-width: 1100px) {
+  .iic-council-roster-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+.iic-council-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 1.1rem 0.85rem;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 14px;
+  transition: all 0.2s ease;
+}
+
+.iic-council-card:hover {
+  transform: translateY(-2px);
+  border-color: #0B1E42;
+  background: #FFFFFF;
+  box-shadow: 0 4px 14px rgba(11, 30, 66, 0.08);
+}
+
+.iic-council-avatar {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #C9973A;
+  margin-bottom: 0.65rem;
+}
+
+@media (min-width: 640px) {
+  .iic-council-avatar {
+    width: 76px;
+    height: 76px;
+  }
+}
+
+.iic-council-name {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #0B1E42;
+  margin-bottom: 0.2rem;
+  line-height: 1.3;
+}
+
+.iic-council-role {
+  font-size: 0.7rem;
+  color: #64748B;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  line-height: 1.4;
+}
+
+.iic-constitution-fallback-roster {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  margin-top: 1rem;
+}
+
+.iic-council-tier-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.iic-tier-label {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #C9973A;
+}
+
+.iic-pills-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.iic-member-pill {
+  padding: 0.55rem 0.9rem;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  color: #0B1E42;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.iic-member-pill:hover {
+  border-color: rgba(11, 30, 66, 0.3);
+  background: #FFFFFF;
+}
+
+.iic-member-pill.chairman {
+  background: linear-gradient(135deg, #0B1E42 0%, #173266 100%);
+  color: #FFFFFF;
+  border: 1px solid #C9973A;
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.iic-council-pdf-wrap {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid #E2E8F0;
+}
+
+.iic-pdf-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.2rem;
+  background: #0B1E42;
+  color: #FFFFFF;
+  font-weight: 700;
+  font-size: 0.86rem;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.iic-pdf-btn:hover {
+  background: #C9973A;
+  color: #0B1E42;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(201, 151, 58, 0.3);
+}
+
+/* --------------------------------------------------------------------------
+   5. Documents & Download Cards
+   -------------------------------------------------------------------------- */
+.iic-docs-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.85rem;
+  margin-top: 1rem;
+}
+
+@media (min-width: 480px) {
+  .iic-docs-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 900px) {
+  .iic-docs-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.iic-doc-card {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 1rem 1.1rem;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  text-decoration: none;
+  color: #0B1E42;
+  transition: all 0.25s ease;
+}
+
+.iic-doc-card:hover {
+  background: #FFFFFF;
+  border-color: #C9973A;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(11, 30, 66, 0.08);
+}
+
+.iic-doc-icon-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  background: rgba(11, 30, 66, 0.07);
+  color: #0B1E42;
+  border-radius: 9px;
+  flex-shrink: 0;
+}
+
+.iic-doc-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.iic-doc-label {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #0B1E42;
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.iic-doc-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #C9973A;
+  white-space: nowrap;
+}
+
+.iic-empty-msg {
+  font-size: 0.93rem;
+  color: #64748B;
+  font-style: italic;
+  margin-top: 0.85rem;
+}
+
+/* --------------------------------------------------------------------------
+   6. NISP Table
+   -------------------------------------------------------------------------- */
+.iic-nisp-table-wrap {
+  margin-top: 1rem;
+  border-radius: 12px;
+  border: 1px solid #E2E8F0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.iic-nisp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.87rem;
+  min-width: 400px;
+}
+
+.iic-nisp-table th {
+  background: #0B1E42;
+  color: #FFFFFF;
+  padding: 0.8rem 0.95rem;
+  text-align: left;
+  font-weight: 800;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.iic-nisp-table td {
+  padding: 0.8rem 0.95rem;
+  border-bottom: 1px solid #E2E8F0;
+  color: #334155;
+  vertical-align: top;
+}
+
+.iic-nisp-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.iic-nisp-table tbody tr:nth-child(even) {
+  background: #F8FAFC;
+}
+
+.iic-nisp-download-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: #C9973A;
+  font-weight: 700;
+  text-decoration: none;
+  font-size: 0.83rem;
+  white-space: nowrap;
+}
+
+.iic-nisp-download-link:hover {
+  text-decoration: underline;
+}
+
+/* --------------------------------------------------------------------------
+   7. ATL Schools Cards Grid
+   -------------------------------------------------------------------------- */
+.iic-atl-schools-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+@media (min-width: 480px) {
+  .iic-atl-schools-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 900px) {
+  .iic-atl-schools-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.iic-school-card {
+  display: flex;
+  flex-direction: column;
+  padding: 1.1rem;
+  background: #F8FAFC;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 14px;
+  transition: all 0.2s ease;
+}
+
+.iic-school-card:hover {
+  background: #FFFFFF;
+  border-color: #0B1E42;
+  box-shadow: 0 4px 14px rgba(11, 30, 66, 0.08);
+  transform: translateY(-2px);
+}
+
+.iic-school-header {
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid #E2E8F0;
+}
+
+.iic-school-code {
+  font-size: 0.7rem;
+  font-weight: 800;
+  font-family: monospace;
+  color: #C9973A;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.iic-school-name {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #0B1E42;
+  margin: 0.2rem 0 0;
+  line-height: 1.3;
+}
+
+.iic-school-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  font-size: 0.85rem;
+  color: #334155;
+}
+
+.iic-school-address,
+.iic-school-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+  margin: 0;
+  line-height: 1.45;
+}
+
+.iic-school-icon {
+  color: #0B1E42;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.iic-school-info a {
+  color: #0B1E42;
+  font-weight: 600;
+  text-decoration: none;
+  word-break: break-all;
+}
+
+.iic-school-info a:hover {
+  color: #C9973A;
+  text-decoration: underline;
+}
+
+.iic-school-coordinator-badge {
+  margin-top: 0.45rem;
+  padding: 0.45rem 0.75rem;
+  background: rgba(11, 30, 66, 0.07);
+  border-radius: 8px;
+  font-size: 0.8rem;
+  color: #0B1E42;
+  line-height: 1.4;
+}
+
+/* --------------------------------------------------------------------------
+   8. Quick Navigation Sidebar Card
+   -------------------------------------------------------------------------- */
+.iic-sidebar {
+  position: static;
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .iic-sidebar {
+    position: sticky;
+    top: 100px;
+    width: 100%;
+  }
+}
+
+.iic-quick-nav-card {
+  background: #0B1E42;
+  border-radius: 16px;
+  padding: 1.35rem;
+  color: #FFFFFF;
+  box-shadow: 0 6px 24px rgba(11, 30, 66, 0.18);
+  border: 1px solid rgba(201, 151, 58, 0.28);
+}
+
+@media (min-width: 640px) {
+  .iic-quick-nav-card {
+    padding: 1.5rem;
+  }
+}
+
+/* Mobile: horizontal scrolling nav */
+@media (max-width: 1023px) {
+  .iic-quick-nav-list {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    gap: 0.4rem !important;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 0.25rem;
+  }
+
+  .iic-quick-nav-list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .iic-quick-nav-item {
+    flex-shrink: 0;
+  }
+
+  .iic-quick-nav-btn {
+    white-space: nowrap;
+    width: auto !important;
+    padding: 0.55rem 0.9rem !important;
+    font-size: 0.79rem !important;
+    justify-content: center !important;
+    min-width: max-content;
+  }
+
+  .iic-quick-nav-arrow {
+    display: none !important;
+  }
+
+  .iic-quick-nav-header {
+    padding-bottom: 0.75rem !important;
+    margin-bottom: 0.75rem !important;
+  }
+}
+
+.iic-quick-nav-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.iic-quick-nav-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  background: #C9973A;
+  color: #0B1E42;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.iic-quick-nav-title {
+  font-size: 0.98rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  margin: 0;
+}
+
+.iic-quick-nav-subtitle {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.62);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.iic-quick-nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.iic-quick-nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.68rem 0.88rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid transparent;
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.84rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.iic-quick-nav-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #FFFFFF;
+}
+
+.iic-quick-nav-btn.is-active {
+  background: linear-gradient(135deg, #C9973A 0%, #A87A28 100%);
+  color: #0B1E42;
+  font-weight: 800;
+  border-color: #C9973A;
+  box-shadow: 0 4px 12px rgba(201, 151, 58, 0.3);
+}
+
+.iic-quick-nav-arrow {
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.iic-quick-nav-btn.is-active .iic-quick-nav-arrow {
+  transform: translateX(3px);
+}
+
+/* Tab pane fade-in */
+.iic-tab-pane {
+  animation: iicFadeIn 0.25s ease-out;
+}
+
+@keyframes iicFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* --------------------------------------------------------------------------
+   Mobile extra-small overrides
+   -------------------------------------------------------------------------- */
+@media (max-width: 480px) {
+  .iic-page-container {
+    gap: 1.1rem;
+  }
+
+  .iic-telemetry-val {
+    font-size: 0.95rem;
+  }
+
+  .iic-telemetry-lbl {
+    font-size: 0.62rem;
+  }
+
+  .iic-telemetry-icon-box {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+  }
+
+  .iic-card-title {
+    font-size: 1.15rem;
+  }
+
+  .iic-council-avatar {
+    width: 60px;
+    height: 60px;
+  }
+
+  .iic-council-name {
+    font-size: 0.78rem;
+  }
+
+  .iic-school-name {
+    font-size: 0.92rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .iic-telemetry-card {
+    padding: 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .iic-council-roster-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

@@ -44,7 +44,8 @@
 .grad-showcase-title {
   font-family: var(--font-serif);
   font-size: clamp(1.6rem, 3.2vw, 2.5rem);
-  font-weight: 800;
+  font-weight: 600;
+  letter-spacing: -0.02em;
   color: var(--color-primary);
   margin: 0 0 var(--space-3);
   line-height: 1.15;
@@ -203,7 +204,7 @@
 .grad-card-name {
   font-family: var(--font-serif);
   font-size: var(--text-xl);
-  font-weight: 800;
+  font-weight: 600;
   color: var(--color-primary);
   margin: 0 0 0.3rem;
 }

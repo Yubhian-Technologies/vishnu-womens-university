@@ -79,14 +79,13 @@ export default function ResultAnalysis() {
         defaultTitle="Results Analysis"
         defaultSubtitle="Consistent, top-tier academic outcomes with 90%+ annual pass rates across 22+ graduating batches."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Admissions', to: '/admissions' }, { label: 'Results Analysis' }]}
-        scrollCtaTargetId="result-analysis-content"
+        hideCta={true}
       />
 
       {/* Batch-wise Pass Percentage */}
       <section id="result-analysis-content" className="section bg-off-white" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-10)' }}>
-            <span className="section-label">Academic Performance</span>
             <h2 className="section-title">Batch-Wise Pass Percentage</h2>
             <p className="section-desc" style={{ margin: '0 auto' }}>
               Consistent, top-tier outcomes across {batchPassRates.length} graduating batches from {batchPassRates[0].batch} to {latestBatch.batch}.
@@ -193,8 +192,7 @@ export default function ResultAnalysis() {
       <section className="section" style={{ background: 'linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%)' }}>
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>
-            <span className="section-label" style={{ color: 'var(--color-accent)' }}>Why We Excel</span>
-            <h2 style={{ color: 'var(--color-white)' }} className="section-title">The Drivers of Our Success</h2>
+            <h2 style={{ color: 'var(--color-white)' }} className="section-title">Supporting Student Achievement</h2>
           </div>
           <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-5)' }}>
             {factors.map((f) => {

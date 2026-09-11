@@ -1,21 +1,24 @@
 import { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { Sparkles } from 'lucide-react';
 import PageHero from '../../components/PageHero/PageHero';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
+import { useClubCategories } from '../../lib/clubCategories';
+import { resolveContentIcon } from '../../lib/contentIcons';
 import { slugify } from '../../lib/slugify';
 import type { ClubDoc } from '../Admin/sections/StudentClubsAdmin';
-import { CLUB_CATEGORIES, CLUB_CATEGORY_ICONS } from '../Admin/sections/StudentClubsAdmin';
 
 export default function StudentClubs() {
   const { docs: allClubs } = useOrderedCollection<ClubDoc>('studentClubs', 'order');
+  const categories = useClubCategories();
   const stats = useContentBlocks('student-clubs', 'stats');
 
   const clubCategories = useMemo(() => (
-    CLUB_CATEGORIES
-      .map((label) => ({ label, icon: CLUB_CATEGORY_ICONS[label], clubs: allClubs.filter((c) => c.category === label) }))
+    categories
+      .map((cat) => ({ label: cat.name, icon: resolveContentIcon(cat.icon) || Sparkles, clubs: allClubs.filter((c) => c.category === cat.name) }))
       .filter((cat) => cat.clubs.length > 0)
-  ), [allClubs]);
+  ), [allClubs, categories]);
 
   useEffect(() => {
     document.title = 'Student Clubs | VWU';
@@ -68,7 +71,6 @@ export default function StudentClubs() {
             <div style={{ marginBottom: 'var(--space-10)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-2)' }}>
                 <cat.icon size={32} strokeWidth={1.75} />
-                <span className="section-label" style={{ position: 'static', marginBottom: 0 }}>{cat.label}</span>
               </div>
               <h2 className="section-title">{cat.label}</h2>
             </div>

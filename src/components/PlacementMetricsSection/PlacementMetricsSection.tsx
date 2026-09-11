@@ -14,15 +14,15 @@ const METRICS: MetricItem[] = [
     id: 'recruiters',
     value: '100+',
     boldText: 'recruiters',
-    line1: 'hired VWU',
-    line2: 'graduates',
+    line1: 'partner with',
+    line2: 'VWU',
   },
   {
     id: 'placements',
-    value: '1000+',
-    boldText: 'annual placements',
-    line1: 'from Fortune 500',
-    line2: 'companies',
+    value: '1100+',
+    boldText: 'placements',
+    line1: 'every year',
+    line2: '',
   },
   {
     id: 'package',
@@ -77,9 +77,9 @@ export default function PlacementMetricsSection() {
               <span className="vwu-pm-title-main">Explore</span>
               <span className="vwu-pm-title-sub">the Top Global recruiters who choose VWU talent</span>
             </h2>
-            <p className="vwu-pm-desc">
-              VWU offers top placements with packages of up to ₹59.29 LPA, featuring 100+ recruiters like Google, Amazon, Microsoft, Palo Alto Networks, and Adobe, along with career-focused training.
-            </p>
+<p className="vwu-pm-desc">
+               VWU offers top placements with packages of up to ₹59.29 LPA, featuring 100+ recruiters like Google, Amazon, Microsoft, Palo Alto Networks, and Adobe, along with 1,100+ career-focused placements every year.
+             </p>
           </div>
         </div>
 

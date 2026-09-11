@@ -1,0 +1,872 @@
+/* ==========================================================================
+   High Performance Computing (HPC) Lab — Cyber Tech Stylesheet
+   Bespoke UI Design tailored specifically for CoE in HPC
+   Fully responsive: Mobile-first, optimized for all screen sizes
+   ========================================================================== */
+
+/* ── Font Import ── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap');
+
+.hpc-page-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  padding-bottom: 3rem;
+  font-family: 'Inter', sans-serif;
+}
+
+/* --------------------------------------------------------------------------
+   1. Telemetry Metric Strip
+   -------------------------------------------------------------------------- */
+.hpc-telemetry-strip {
+  margin-top: 0.5rem;
+}
+
+.hpc-telemetry-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .hpc-telemetry-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+  }
+}
+
+.hpc-telemetry-card {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 1rem 1.1rem;
+  background: linear-gradient(135deg, #0B1E42 0%, #070F22 100%);
+  border: 1px solid rgba(0, 242, 254, 0.22);
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15), inset 0 1px 1px rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(8px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.hpc-telemetry-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 100%;
+  background: linear-gradient(180deg, #00F2FE 0%, #4FACFE 100%);
+}
+
+.hpc-telemetry-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(0, 242, 254, 0.5);
+  box-shadow: 0 10px 28px rgba(0, 242, 254, 0.18);
+}
+
+.hpc-telemetry-icon-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  background: rgba(0, 242, 254, 0.1);
+  border: 1px solid rgba(0, 242, 254, 0.3);
+  border-radius: 9px;
+  color: #00F2FE;
+  flex-shrink: 0;
+}
+
+.hpc-telemetry-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.hpc-telemetry-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.hpc-telemetry-val {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hpc-telemetry-lbl {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.68);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  margin-top: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* --------------------------------------------------------------------------
+   2. Cyber Navigation Console (Tabs)
+   -------------------------------------------------------------------------- */
+.hpc-nav-console {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem;
+  background: #0B1E42;
+  border-radius: 12px;
+  border: 1px solid rgba(201, 151, 58, 0.3);
+  margin-bottom: 0.25rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  flex-wrap: nowrap;
+}
+
+.hpc-nav-console::-webkit-scrollbar {
+  display: none;
+}
+
+.hpc-console-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 0.9rem;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.hpc-console-tab:hover {
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.hpc-console-tab.active {
+  background: linear-gradient(135deg, #C9973A 0%, #A87A28 100%);
+  color: #0B1E42;
+  box-shadow: 0 3px 10px rgba(201, 151, 58, 0.35);
+  font-weight: 800;
+}
+
+/* --------------------------------------------------------------------------
+   3. Generic Cyber Cards & Typography
+   -------------------------------------------------------------------------- */
+.hpc-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.hpc-cyber-card {
+  background: #FFFFFF;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 16px rgba(11, 30, 66, 0.05);
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+@media (min-width: 640px) {
+  .hpc-cyber-card {
+    padding: 2rem;
+  }
+}
+
+.hpc-cyber-card:hover {
+  box-shadow: 0 6px 24px rgba(11, 30, 66, 0.08);
+  border-color: rgba(11, 30, 66, 0.18);
+}
+
+.hpc-card-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.28rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.73rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: rgba(11, 30, 66, 0.08);
+  color: #0B1E42;
+  margin-bottom: 0.85rem;
+}
+
+.hpc-card-badge.gold {
+  background: rgba(201, 151, 58, 0.14);
+  color: #7A5410;
+}
+
+.hpc-card-badge.cyan {
+  background: rgba(0, 168, 204, 0.1);
+  color: #006B80;
+}
+
+.hpc-section-heading {
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: #0B1E42;
+  margin-bottom: 0.85rem;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+
+@media (min-width: 640px) {
+  .hpc-section-heading {
+    font-size: 1.65rem;
+  }
+}
+
+.hpc-section-subtext {
+  font-size: 0.93rem;
+  color: #64748B;
+  line-height: 1.6;
+}
+
+.hpc-subcard-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #0B1E42;
+  margin-bottom: 0.85rem;
+  line-height: 1.3;
+}
+
+/* --------------------------------------------------------------------------
+   4. Overview, Vision, Mission & Objectives
+   -------------------------------------------------------------------------- */
+.hpc-paragraphs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.hpc-lead-paragraph {
+  font-size: 0.97rem;
+  line-height: 1.72;
+  color: #334155;
+}
+
+@media (min-width: 768px) {
+  .hpc-lead-paragraph {
+    font-size: 1.02rem;
+  }
+}
+
+.hpc-vision-mission-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .hpc-vision-mission-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
+}
+
+.hpc-vision-card {
+  border-left: 4px solid #C9973A;
+  background: linear-gradient(135deg, #FFFDF8 0%, #FFFFFF 100%);
+}
+
+.hpc-vision-text {
+  font-size: 0.97rem;
+  line-height: 1.68;
+  color: #0B1E42;
+  font-weight: 600;
+  font-style: italic;
+}
+
+.hpc-mission-card {
+  border-left: 4px solid #00A8CC;
+  background: linear-gradient(135deg, #F5FDFF 0%, #FFFFFF 100%);
+}
+
+.hpc-mission-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.hpc-mission-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  font-size: 0.9rem;
+  line-height: 1.58;
+  color: #334155;
+}
+
+.hpc-bullet-icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.hpc-bullet-icon.cyan {
+  color: #00A8CC;
+}
+
+.hpc-objectives-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.85rem;
+}
+
+@media (min-width: 480px) {
+  .hpc-objectives-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 900px) {
+  .hpc-objectives-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.hpc-objective-tile {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: 1.1rem;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.hpc-objective-tile:hover {
+  background: #FFFFFF;
+  border-color: #C9973A;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(201, 151, 58, 0.12);
+}
+
+.hpc-objective-num {
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: #C9973A;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.hpc-objective-text {
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: #334155;
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   5. R&D Projects & Faculty Research
+   -------------------------------------------------------------------------- */
+.hpc-funded-box {
+  padding: 1.35rem;
+  background: linear-gradient(135deg, #0B1E42 0%, #152C59 100%);
+  border-radius: 12px;
+  color: #FFFFFF;
+  border: 1px solid rgba(201, 151, 58, 0.4);
+}
+
+.hpc-funded-header {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-bottom: 0.85rem;
+}
+
+@media (min-width: 540px) {
+  .hpc-funded-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+}
+
+.hpc-badge-grant {
+  background: #C9973A;
+  color: #0B1E42;
+  font-weight: 800;
+  font-size: 0.73rem;
+  padding: 0.28rem 0.75rem;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: inline-block;
+}
+
+.hpc-grant-no {
+  font-size: 0.78rem;
+  font-family: 'JetBrains Mono', monospace;
+  color: rgba(255, 255, 255, 0.72);
+  word-break: break-all;
+}
+
+.hpc-funded-desc {
+  font-size: 0.98rem;
+  line-height: 1.65;
+  margin: 0;
+  color: #F1F5F9;
+}
+
+.hpc-research-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.hpc-research-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: 1.1rem;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.hpc-research-item:hover {
+  background: #FFFFFF;
+  border-color: rgba(0, 168, 204, 0.35);
+  box-shadow: 0 4px 12px rgba(0, 168, 204, 0.06);
+}
+
+.hpc-research-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  background: rgba(11, 30, 66, 0.07);
+  border-radius: 9px;
+  color: #0B1E42;
+  flex-shrink: 0;
+}
+
+.hpc-research-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.hpc-research-tag {
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #007791;
+}
+
+.hpc-research-text {
+  font-size: 0.91rem;
+  line-height: 1.55;
+  color: #334155;
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   6. Publications Grid
+   -------------------------------------------------------------------------- */
+.hpc-outcomes-header-row {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid #E2E8F0;
+}
+
+@media (min-width: 480px) {
+  .hpc-outcomes-header-row {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+}
+
+.hpc-pub-count-badge {
+  background: #0B1E42;
+  color: #FFFFFF;
+  font-weight: 700;
+  font-size: 0.82rem;
+  padding: 0.38rem 0.9rem;
+  border-radius: 9999px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.hpc-publications-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 600px) {
+  .hpc-publications-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.hpc-pub-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding: 1.1rem;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  transition: all 0.25s ease;
+}
+
+.hpc-pub-card:hover {
+  background: #FFFFFF;
+  border-color: #0B1E42;
+  box-shadow: 0 4px 14px rgba(11, 30, 66, 0.08);
+}
+
+.hpc-pub-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.hpc-pub-type-chip {
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.2rem 0.55rem;
+  border-radius: 4px;
+}
+
+.hpc-pub-type-chip.ieee {
+  background: rgba(0, 98, 155, 0.1);
+  color: #00629B;
+}
+
+.hpc-pub-type-chip.journal {
+  background: rgba(201, 151, 58, 0.14);
+  color: #8C6212;
+}
+
+.hpc-pub-type-chip.scopus {
+  background: rgba(11, 30, 66, 0.07);
+  color: #0B1E42;
+}
+
+.hpc-pub-index {
+  font-size: 0.73rem;
+  font-weight: 800;
+  color: #94A3B8;
+}
+
+.hpc-pub-title {
+  font-size: 0.88rem;
+  line-height: 1.58;
+  color: #334155;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* --------------------------------------------------------------------------
+   7. Team Roster Cards
+   -------------------------------------------------------------------------- */
+.hpc-team-group {
+  margin-top: 1.25rem;
+}
+
+.hpc-team-group:first-child {
+  margin-top: 0.5rem;
+}
+
+.hpc-team-group-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #0B1E42;
+  margin-bottom: 0.85rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #E2E8F0;
+}
+
+.hpc-team-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 480px) {
+  .hpc-team-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 900px) {
+  .hpc-team-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.hpc-member-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 1.25rem;
+  background: #F8FAFC;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 14px;
+  transition: all 0.2s ease;
+}
+
+.hpc-member-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(11, 30, 66, 0.08);
+  border-color: rgba(11, 30, 66, 0.25);
+}
+
+.hpc-member-card.in-charge {
+  border-color: #C9973A;
+  background: linear-gradient(135deg, #FFFDF9 0%, #FFFFFF 100%);
+}
+
+.hpc-member-header {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.hpc-member-avatar-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  min-width: 50px;
+  border-radius: 50%;
+  background: #0B1E42;
+  color: #FFFFFF;
+  flex-shrink: 0;
+}
+
+.hpc-member-name {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #0B1E42;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.hpc-member-role {
+  font-size: 0.75rem;
+  color: #64748B;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-top: 2px;
+}
+
+.hpc-member-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  font-size: 0.85rem;
+  color: #334155;
+}
+
+.hpc-member-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+  word-break: break-word;
+}
+
+.hpc-member-row a {
+  color: #0B1E42;
+  font-weight: 600;
+  text-decoration: none;
+  word-break: break-all;
+}
+
+.hpc-member-row a:hover {
+  text-decoration: underline;
+  color: #C9973A;
+}
+
+.hpc-member-icon {
+  color: #C9973A;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   8. Workshops & Activities Timeline
+   -------------------------------------------------------------------------- */
+.hpc-activities-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  position: relative;
+  padding-left: 1rem;
+}
+
+.hpc-activities-timeline::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  left: 7px;
+  width: 2px;
+  background: linear-gradient(180deg, #C9973A 0%, #E2E8F0 100%);
+}
+
+.hpc-activity-timeline-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  position: relative;
+}
+
+.hpc-timeline-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
+  border-radius: 50%;
+  background: #0B1E42;
+  border: 3px solid #FFFFFF;
+  box-shadow: 0 0 0 2px #C9973A;
+  flex-shrink: 0;
+  margin-top: 4px;
+  z-index: 1;
+}
+
+.hpc-marker-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #FFFFFF;
+}
+
+.hpc-activity-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.9rem 1.1rem;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  width: 100%;
+  transition: all 0.2s ease;
+}
+
+.hpc-activity-content:hover {
+  background: #FFFFFF;
+  border-color: rgba(201, 151, 58, 0.4);
+  box-shadow: 0 3px 10px rgba(201, 151, 58, 0.1);
+}
+
+.hpc-activity-tag {
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #C9973A;
+}
+
+.hpc-activity-text {
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: #334155;
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Responsive Layout Overrides — Mobile First
+   -------------------------------------------------------------------------- */
+@media (max-width: 480px) {
+  .hpc-page-container {
+    gap: 1.1rem;
+  }
+
+  .hpc-telemetry-val {
+    font-size: 1rem;
+  }
+
+  .hpc-telemetry-lbl {
+    font-size: 0.62rem;
+  }
+
+  .hpc-telemetry-icon-box {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+  }
+
+  .hpc-section-heading {
+    font-size: 1.25rem;
+  }
+
+  .hpc-console-tab {
+    font-size: 0.72rem;
+    padding: 0.45rem 0.7rem;
+  }
+
+  .hpc-objective-num {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .hpc-telemetry-card {
+    padding: 0.75rem;
+    gap: 0.6rem;
+  }
+
+  .hpc-telemetry-val {
+    font-size: 0.9rem;
+  }
+}
+
+/* Wide desktop enhancements */
+@media (min-width: 1200px) {
+  .hpc-objectives-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .hpc-publications-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

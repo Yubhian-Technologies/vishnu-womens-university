@@ -58,7 +58,7 @@
 .sves-campus-index {
   font-family: var(--font-serif);
   font-size: 1.1rem;
-  font-weight: 900;
+  font-weight: 700;
   color: var(--color-accent);
   letter-spacing: -0.02em;
 }
@@ -79,7 +79,8 @@
 .sves-campus-name {
   font-family: var(--font-serif);
   font-size: 1.2rem;
-  font-weight: 800;
+  font-weight: 600;
+  letter-spacing: -0.02em;
   color: var(--color-primary);
   margin: 0 0 0.6rem 0;
   line-height: 1.3;

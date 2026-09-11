@@ -51,18 +51,15 @@
   font-size: clamp(1.2rem, 2.8vw, 2.4rem);
   font-weight: 600;
   color: var(--hero-white);
-  line-height: 1;
+  line-height: 1.15;
   letter-spacing: -0.015em;
   margin: 0 0 var(--space-7) 0;
   text-align: center;
   text-shadow: 0 2px 20px rgba(2, 37, 48, 0.55);
-  /* Locked height ensures the search bar underneath never shifts position */
-  height: 3.2rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-wrap: nowrap;
-  white-space: nowrap;
+  flex-wrap: wrap;
   column-gap: 0.35rem;
   transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1),
               transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
@@ -85,142 +82,36 @@
 .hero-title-lead {
   font-weight: 500;
   letter-spacing: -0.01em;
-  white-space: nowrap;
+  white-space: pre-line;
+  line-height: 1.2;
 }
 
-/* Editorial italic accent — carries the headline's emphasis word in Warm Ivory */
-.hero-title-italic {
-  font-family: 'Playfair Display', 'Didot', 'Bodoni MT', Georgia, serif;
-  font-style: italic;
+.hero-title-lead .line-break {
+  display: block;
+}
+
+/* Subtitle beneath hero tagline */
+.hero-subtitle {
+  font-family: var(--font-sans);
+  font-size: clamp(1.05rem, 2.2vw, 1.5rem);
   font-weight: 500;
-  color: var(--hero-ivory);
+  color: rgba(255, 255, 255, 0.92);
   letter-spacing: 0.01em;
-  white-space: nowrap;
-  text-shadow: 0 2px 16px rgba(245, 240, 198, 0.2), 0 2px 12px rgba(2, 37, 48, 0.55);
+  margin: -2px 0 var(--space-7) 0;
+  text-align: center;
+  text-shadow: 0 1px 8px rgba(2, 37, 48, 0.5);
+  animation: fadeInUp 0.6s ease 0.3s both;
 }
 
-.hero-center-search {
-  width: 100%;
-  max-width: 500px;
-}
-
-/* Clean Material-style surface — a near-solid white pill instead of heavy
-   glassmorphism, so the search field reads as a clear, tappable affordance
-   against the deep teal hero rather than another translucent layer. */
-/* Apple VisionOS Liquid Glass Hero Search Bar */
-.hero-search-box {
-  display: flex;
-  align-items: center;
-  background: rgba(255, 255, 255, 0.45) !important;
-  backdrop-filter: blur(32px) saturate(210%) contrast(104%) brightness(1.02) !important;
-  -webkit-backdrop-filter: blur(32px) saturate(210%) contrast(104%) brightness(1.02) !important;
-  border: 1px solid rgba(255, 255, 255, 0.58) !important;
-  border-radius: var(--radius-full, 9999px);
-  padding: 6px 6px 6px 20px;
-  box-shadow: 0 20px 48px -8px rgba(0, 0, 0, 0.22),
-              0 8px 20px -4px rgba(0, 0, 0, 0.12),
-              inset 0 1px 0.5px 0.5px rgba(255, 255, 255, 0.95),
-              inset 0 -1px 0 0 rgba(255, 255, 255, 0.3) !important;
-  outline: none !important;
-  transition: all 280ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.hero-search-box:hover {
-  background: rgba(255, 255, 255, 0.58) !important;
-  backdrop-filter: blur(36px) saturate(220%) contrast(105%) brightness(1.03) !important;
-  -webkit-backdrop-filter: blur(36px) saturate(220%) contrast(105%) brightness(1.03) !important;
-  border-color: rgba(255, 255, 255, 0.78) !important;
-  box-shadow: 0 24px 56px -10px rgba(0, 0, 0, 0.28),
-              0 10px 24px -4px rgba(0, 0, 0, 0.14),
-              inset 0 1.5px 0 0 rgba(255, 255, 255, 0.98),
-              inset 0 -1px 0 0 rgba(255, 255, 255, 0.4) !important;
-}
-
-.hero-search-box:focus-within {
-  background: rgba(255, 255, 255, 0.65) !important;
-  backdrop-filter: blur(36px) saturate(220%) brightness(1.03) !important;
-  -webkit-backdrop-filter: blur(36px) saturate(220%) brightness(1.03) !important;
-  border-color: rgba(255, 255, 255, 0.88) !important;
-  box-shadow: 0 24px 56px -10px rgba(0, 0, 0, 0.32),
-              0 0 0 3px rgba(255, 255, 255, 0.35),
-              inset 0 1.5px 0 0 rgba(255, 255, 255, 0.98) !important;
-  transform: translateY(-2px);
-  outline: none !important;
-}
-
-.hero-search-icon {
-  color: var(--hero-teal, #0b1e42);
-  opacity: 0.85;
-  flex-shrink: 0;
-  margin-right: 10px;
-  pointer-events: none;
-}
-
-.hero-search-input {
-  flex: 1;
-  min-width: 0;
-  min-height: 36px;
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
-  background: transparent;
-  font-size: var(--text-base, 1rem);
-  color: var(--hero-teal, #0b1e42);
-  font-weight: 600;
-  font-family: inherit;
-  padding: 6px 0;
-  -webkit-appearance: none;
-  appearance: none;
-}
-
-.hero-search-input:focus,
-.hero-search-input:focus-visible {
-  outline: none !important;
-  outline-offset: 0 !important;
-  box-shadow: none !important;
-  border: none !important;
-}
-
-.hero-search-input::placeholder {
-  color: rgba(11, 30, 66, 0.65);
-  font-weight: 500;
-}
-
-/* The hero's one and only primary CTA — orange fill per the VWU theme, with
-   dark teal (not white) label text: white-on-#FF7A00 falls short of WCAG AA
-   text contrast, teal-on-orange clears it comfortably while staying on-brand. */
-.hero-search-submit {
-  background: var(--hero-orange);
-  color: var(--hero-teal);
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
-  border-radius: var(--radius-full, 9999px);
-  min-height: 48px;
-  padding: 0.65rem 1.6rem;
-  font-size: var(--text-sm, 0.875rem);
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.15s ease;
-  flex-shrink: 0;
-  -webkit-appearance: none;
-  appearance: none;
-}
-
-.hero-search-submit:focus,
-.hero-search-submit:focus-visible {
-  outline: none !important;
-  outline-offset: 0 !important;
-  box-shadow: none !important;
-}
-
-.hero-search-submit:hover {
-  background: var(--hero-orange-dark);
-}
-
-.hero-search-submit:active {
-  transform: scale(0.97);
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ===== 3-Word Dot-Separated Tag ===== */
@@ -259,19 +150,6 @@
     column-gap: 0.25rem;
   }
 
-  .hero-search-box {
-    padding: 5px 5px 5px 14px;
-  }
-
-  .hero-search-input {
-    font-size: 0.92rem;
-  }
-
-  .hero-search-submit {
-    padding: 0.55rem 1.1rem;
-    font-size: 0.82rem;
-  }
-
   .hero-tag-words {
     font-size: 0.9rem;
     gap: 0.5rem;
@@ -290,19 +168,6 @@
     height: 2rem;
     margin-bottom: var(--space-3);
     column-gap: 0.2rem;
-  }
-
-  .hero-search-box {
-    padding: 4px 4px 4px 12px;
-  }
-
-  .hero-search-input {
-    font-size: 0.85rem;
-  }
-
-  .hero-search-submit {
-    padding: 0.48rem 0.95rem;
-    font-size: 0.86rem;
   }
 
   .hero-tag-words {

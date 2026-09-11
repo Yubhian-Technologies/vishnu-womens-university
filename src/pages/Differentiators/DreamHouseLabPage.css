@@ -1,0 +1,1043 @@
+/* Dream House Construction Lab (DHCL) Bespoke Stylesheet */
+
+:root {
+  --dhcl-terracotta: #A04A2C;
+  --dhcl-terracotta-light: #C85A32;
+  --dhcl-terracotta-bg: #FDF6F0;
+  --dhcl-sandstone: #F8F4EE;
+  --dhcl-slate-dark: #0B1E42;
+  --dhcl-slate-muted: #1E293B;
+  --dhcl-gold: #D97706;
+  --dhcl-gold-light: #FEF3C7;
+  --dhcl-border-color: #E5DCD3;
+  --dhcl-card-shadow: 0 4px 20px rgba(160, 74, 44, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+  --dhcl-card-shadow-hover: 0 12px 32px rgba(160, 74, 44, 0.12), 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.dhcl-page-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6, 1.5rem);
+  padding: var(--space-6, 1.5rem) 0 var(--space-8, 2rem);
+}
+
+/* ==========================================================================
+   1. Structural Stats Strip
+   ========================================================================== */
+.dhcl-stats-section {
+  margin-top: 0;
+}
+
+.dhcl-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4, 1rem);
+}
+
+.dhcl-stat-card {
+  background: #ffffff;
+  border: 1px solid var(--dhcl-border-color);
+  border-radius: var(--radius-lg, 12px);
+  padding: var(--space-5, 1.25rem);
+  display: flex;
+  align-items: center;
+  gap: var(--space-4, 1rem);
+  box-shadow: var(--dhcl-card-shadow);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dhcl-stat-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--dhcl-terracotta-light);
+  box-shadow: var(--dhcl-card-shadow-hover);
+}
+
+.dhcl-stat-icon-wrapper {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  background: var(--dhcl-terracotta-bg);
+  color: var(--dhcl-terracotta);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.dhcl-stat-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.dhcl-stat-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.dhcl-stat-number {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--dhcl-slate-dark);
+  line-height: 1.2;
+}
+
+.dhcl-stat-label {
+  font-size: 0.825rem;
+  font-weight: 600;
+  color: #64748B;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* ==========================================================================
+   2. Main Overview & In-Charge Spotlight
+   ========================================================================== */
+.dhcl-overview-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.dhcl-about-card {
+  background: #ffffff;
+  border: 1px solid var(--dhcl-border-color);
+  border-radius: var(--radius-xl, 16px);
+  padding: var(--space-8, 2rem);
+  box-shadow: var(--dhcl-card-shadow);
+  position: relative;
+  overflow: hidden;
+}
+
+.dhcl-about-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 6px;
+  height: 100%;
+  background: linear-gradient(180deg, var(--dhcl-terracotta) 0%, var(--dhcl-gold) 100%);
+}
+
+.dhcl-card-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--dhcl-terracotta-bg);
+  color: var(--dhcl-terracotta);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-3, 0.75rem);
+}
+
+.dhcl-section-heading {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--dhcl-slate-dark);
+  margin-bottom: var(--space-4, 1rem);
+  line-height: 1.3;
+}
+
+.dhcl-lead-paragraph {
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: #334155;
+}
+
+.dhcl-custom-sections-wrapper {
+  margin-top: var(--space-6, 1.5rem);
+  padding-top: var(--space-6, 1.5rem);
+  border-top: 1px dashed var(--dhcl-border-color);
+}
+
+.dhcl-custom-sections-wrapper:empty {
+  display: none;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+/* In-Charge Spotlight Bar (Horizontal Layout) */
+.dhcl-incharge-spotlight-bar {
+  margin-top: var(--space-6, 1.5rem);
+  background: var(--dhcl-sandstone);
+  border: 1.5px solid var(--dhcl-border-color);
+  border-radius: var(--radius-lg, 14px);
+  padding: var(--space-5, 1.25rem);
+  display: grid;
+  grid-template-columns: 280px 1fr 240px;
+  gap: var(--space-5, 1.25rem);
+  align-items: center;
+}
+
+.dhcl-incharge-profile-col {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4, 1rem);
+  border-right: 1px solid rgba(160, 74, 44, 0.15);
+  padding-right: var(--space-4, 1rem);
+}
+
+.dhcl-incharge-avatar-box {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--dhcl-terracotta);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(160, 74, 44, 0.2);
+}
+
+.dhcl-incharge-interests-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  border-right: 1px solid rgba(160, 74, 44, 0.15);
+  padding-right: var(--space-4, 1rem);
+}
+
+.dhcl-incharge-contacts-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.dhcl-incharge-titles {
+  display: flex;
+  flex-direction: column;
+}
+
+.dhcl-incharge-tag {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--dhcl-terracotta);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.dhcl-incharge-name {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--dhcl-slate-dark);
+  margin: 0.1rem 0;
+}
+
+.dhcl-incharge-designation {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.dhcl-incharge-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4, 1rem);
+}
+
+.dhcl-field-label {
+  font-size: 0.775rem;
+  font-weight: 700;
+  color: var(--dhcl-slate-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  display: block;
+  margin-bottom: var(--space-2, 0.5rem);
+}
+
+.dhcl-interests-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.dhcl-interest-pill {
+  background: #ffffff;
+  border: 1px solid var(--dhcl-border-color);
+  color: var(--dhcl-terracotta);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+}
+
+.dhcl-incharge-contacts {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background: #ffffff;
+  padding: 0.85rem;
+  border-radius: 10px;
+  border: 1px solid var(--dhcl-border-color);
+}
+
+.dhcl-contact-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.85rem;
+  color: var(--dhcl-slate-dark);
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a.dhcl-contact-item:hover {
+  color: var(--dhcl-terracotta);
+}
+
+.dhcl-contact-item svg {
+  color: var(--dhcl-terracotta);
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   3. Vision & Mission Quad-Grid
+   ========================================================================== */
+.dhcl-vm-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6, 1.5rem);
+}
+
+.dhcl-vision-card {
+  background: linear-gradient(135deg, var(--dhcl-slate-dark) 0%, #172554 100%);
+  color: #ffffff;
+  border-radius: var(--radius-xl, 16px);
+  padding: var(--space-8, 2rem);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-6, 1.5rem);
+  box-shadow: 0 10px 30px rgba(11, 30, 66, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.dhcl-vision-card::after {
+  content: '';
+  position: absolute;
+  right: -20px;
+  bottom: -20px;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: rgba(200, 90, 50, 0.12);
+  pointer-events: none;
+}
+
+.dhcl-vm-icon-box {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.vision-icon {
+  background: rgba(255, 255, 255, 0.15);
+  color: #FDBA74;
+}
+
+.mission-icon {
+  background: var(--dhcl-terracotta-bg);
+  color: var(--dhcl-terracotta);
+}
+
+.dhcl-vm-subtitle {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.8;
+}
+
+.dhcl-vision-card .dhcl-vm-subtitle {
+  color: #FDBA74;
+}
+
+.dhcl-vm-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin: 0.1rem 0 0.5rem;
+}
+
+.dhcl-vision-text {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+/* Mission Block */
+.dhcl-mission-block {
+  background: #ffffff;
+  border: 1px solid var(--dhcl-border-color);
+  border-radius: var(--radius-xl, 16px);
+  padding: var(--space-8, 2rem);
+  box-shadow: var(--dhcl-card-shadow);
+}
+
+.dhcl-mission-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4, 1rem);
+  margin-bottom: var(--space-6, 1.5rem);
+}
+
+.dhcl-mission-header .dhcl-vm-subtitle {
+  color: var(--dhcl-terracotta);
+}
+
+.dhcl-mission-header .dhcl-vm-title {
+  color: var(--dhcl-slate-dark);
+}
+
+.dhcl-mission-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-4, 1rem);
+}
+
+.dhcl-mission-card {
+  background: var(--dhcl-sandstone);
+  border: 1px solid var(--dhcl-border-color);
+  border-radius: var(--radius-lg, 12px);
+  padding: var(--space-5, 1.25rem);
+  display: flex;
+  gap: var(--space-4, 1rem);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.dhcl-mission-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--dhcl-terracotta-light);
+}
+
+.dhcl-mission-badge {
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: var(--dhcl-terracotta);
+  opacity: 0.5;
+  line-height: 1;
+}
+
+.dhcl-mission-text-wrap {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+
+.dhcl-check-icon {
+  color: var(--dhcl-terracotta);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.dhcl-mission-text {
+  font-size: 0.925rem;
+  line-height: 1.6;
+  color: #334155;
+  font-weight: 500;
+}
+
+/* Objectives Card */
+.dhcl-objectives-card {
+  background: var(--dhcl-terracotta-bg);
+  border: 1px solid rgba(160, 74, 44, 0.2);
+  border-radius: var(--radius-xl, 16px);
+  padding: var(--space-6, 1.5rem);
+}
+
+.dhcl-objectives-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--dhcl-terracotta);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: var(--space-4, 1rem);
+}
+
+.dhcl-objectives-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-4, 1rem);
+}
+
+.dhcl-objective-item {
+  display: flex;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #334155;
+}
+
+.dhcl-obj-bullet {
+  color: var(--dhcl-terracotta);
+  font-weight: 900;
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+/* ==========================================================================
+   4. Incubation Outcomes Showcase (ITIC BUILD Winners)
+   ========================================================================== */
+.dhcl-outcomes-card {
+  background: #ffffff;
+  border: 1px solid var(--dhcl-border-color);
+  border-radius: var(--radius-xl, 16px);
+  overflow: hidden;
+  box-shadow: var(--dhcl-card-shadow);
+}
+
+.dhcl-outcomes-header-banner {
+  background: linear-gradient(135deg, #78350F 0%, #92400E 50%, var(--dhcl-terracotta) 100%);
+  color: #ffffff;
+  padding: var(--space-8, 2rem);
+  display: flex;
+  align-items: center;
+  gap: var(--space-6, 1.5rem);
+}
+
+.dhcl-trophy-badge {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #FEF3C7;
+  color: #B45309;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.dhcl-outcomes-title-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.dhcl-outcomes-tag {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #FDE68A;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.dhcl-outcomes-main-title {
+  font-size: 1.75rem;
+  font-weight: 900;
+  color: #ffffff;
+  margin: 0;
+}
+
+.dhcl-outcomes-badge-pill {
+  display: inline-block;
+  align-self: flex-start;
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(4px);
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  margin-top: 0.3rem;
+}
+
+.dhcl-outcomes-body {
+  padding: var(--space-8, 2rem);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6, 1.5rem);
+}
+
+.dhcl-outcome-alert {
+  background: var(--dhcl-gold-light);
+  border: 1.5px solid #F59E0B;
+  border-radius: var(--radius-lg, 12px);
+  padding: var(--space-5, 1.25rem);
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+}
+
+.dhcl-alert-sparkle {
+  color: #B45309;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.dhcl-alert-text {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #78350F;
+  line-height: 1.65;
+}
+
+.dhcl-brief-box {
+  background: var(--dhcl-sandstone);
+  border-left: 4px solid var(--dhcl-terracotta);
+  border-radius: 0 12px 12px 0;
+  padding: var(--space-5, 1.25rem);
+}
+
+.dhcl-brief-heading {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--dhcl-terracotta);
+  margin-bottom: 0.4rem;
+}
+
+.dhcl-brief-text {
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: #334155;
+}
+
+/* Data Tables & Toggle Header Controls */
+.dhcl-table-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.dhcl-table-header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dhcl-table-header-toggleable {
+  background: var(--dhcl-sandstone);
+  border: 1.5px solid var(--dhcl-border-color);
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+}
+
+.dhcl-table-header-toggleable:hover {
+  background: var(--dhcl-terracotta-bg);
+  border-color: var(--dhcl-terracotta-light);
+  box-shadow: 0 4px 12px rgba(160, 74, 44, 0.08);
+}
+
+.dhcl-table-title-group {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.dhcl-plus-minus-badge {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: #ffffff;
+  border: 1.5px solid var(--dhcl-terracotta);
+  color: var(--dhcl-terracotta);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.dhcl-table-header-toggleable:hover .dhcl-plus-minus-badge {
+  background: var(--dhcl-terracotta);
+  color: #ffffff;
+  transform: scale(1.05);
+}
+
+.dhcl-table-meta-group {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.dhcl-expand-hint {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--dhcl-terracotta);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: #ffffff;
+  border: 1px solid var(--dhcl-border-color);
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+}
+
+.dhcl-team-box-header {
+  margin-bottom: 0.75rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dhcl-table-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--dhcl-slate-dark);
+}
+
+.dhcl-table-count {
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: var(--dhcl-terracotta-bg);
+  color: var(--dhcl-terracotta);
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+}
+
+.dhcl-table-responsive {
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid var(--dhcl-border-color);
+}
+
+.dhcl-data-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+.dhcl-data-table th {
+  background: var(--dhcl-slate-dark);
+  color: #ffffff;
+  font-weight: 700;
+  padding: 0.75rem 1rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.dhcl-data-table td {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid #F1F5F9;
+  color: #334155;
+}
+
+.dhcl-data-table tr:last-child td {
+  border-bottom: none;
+}
+
+.dhcl-data-table tr:nth-child(even) {
+  background: #F8FAFC;
+}
+
+.dhcl-data-table tr:hover {
+  background: var(--dhcl-terracotta-bg);
+}
+
+.dhcl-td-sno {
+  font-weight: 700;
+  color: var(--dhcl-terracotta);
+  width: 60px;
+}
+
+.dhcl-td-regd {
+  font-family: monospace;
+  font-weight: 700;
+  color: var(--dhcl-slate-dark);
+}
+
+/* ==========================================================================
+   5. Academic Project Showcase
+   ========================================================================== */
+.dhcl-project-card {
+  background: #ffffff;
+  border: 1px solid var(--dhcl-border-color);
+  border-radius: var(--radius-xl, 16px);
+  padding: var(--space-8, 2rem);
+  box-shadow: var(--dhcl-card-shadow);
+}
+
+.dhcl-project-header {
+  margin-bottom: var(--space-6, 1.5rem);
+}
+
+.dhcl-project-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #EFF6FF;
+  color: #1D4ED8;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+
+.dhcl-project-heading {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--dhcl-slate-dark);
+  line-height: 1.4;
+}
+
+.dhcl-project-content-grid {
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  gap: var(--space-6, 1.5rem);
+  align-items: start;
+}
+
+.dhcl-project-paragraph {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: #334155;
+  margin-bottom: 1rem;
+}
+
+.dhcl-team-box {
+  background: var(--dhcl-sandstone);
+  border: 1px solid var(--dhcl-border-color);
+  border-radius: 12px;
+  padding: var(--space-4, 1rem);
+}
+
+.dhcl-team-box-title {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: var(--dhcl-slate-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.dhcl-faculty-cell {
+  font-weight: 700;
+  color: var(--dhcl-terracotta);
+}
+
+/* ==========================================================================
+   6. Student Beneficiaries Directory
+   ========================================================================== */
+.dhcl-beneficiaries-card {
+  background: #ffffff;
+  border: 1px solid var(--dhcl-border-color);
+  border-radius: var(--radius-xl, 16px);
+  padding: var(--space-8, 2rem);
+  box-shadow: var(--dhcl-card-shadow);
+}
+
+.dhcl-beneficiaries-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: var(--space-6, 1.5rem);
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.dhcl-beneficiaries-tag {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--dhcl-terracotta);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.dhcl-beneficiaries-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--dhcl-slate-dark);
+  margin-top: 0.1rem;
+}
+
+.dhcl-cohort-tabs {
+  display: flex;
+  gap: 0.5rem;
+  background: var(--dhcl-sandstone);
+  padding: 0.35rem;
+  border-radius: 10px;
+  border: 1px solid var(--dhcl-border-color);
+}
+
+.dhcl-cohort-tab {
+  background: transparent;
+  border: none;
+  color: #64748B;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 0.4rem 0.9rem;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.2s ease;
+}
+
+.dhcl-cohort-tab.active {
+  background: #ffffff;
+  color: var(--dhcl-terracotta);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.dhcl-cohort-count {
+  background: rgba(160, 74, 44, 0.1);
+  color: var(--dhcl-terracotta);
+  font-size: 0.725rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 9999px;
+}
+
+.dhcl-cohort-tab.active .dhcl-cohort-count {
+  background: var(--dhcl-terracotta);
+  color: #ffffff;
+}
+
+.dhcl-students-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space-3, 0.75rem);
+}
+
+.dhcl-student-card {
+  background: var(--dhcl-sandstone);
+  border: 1px solid var(--dhcl-border-color);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.dhcl-student-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--dhcl-terracotta-light);
+  background: #ffffff;
+}
+
+.dhcl-student-regd {
+  font-family: monospace;
+  font-size: 0.775rem;
+  font-weight: 700;
+  color: var(--dhcl-terracotta);
+}
+
+.dhcl-student-name {
+  font-size: 0.925rem;
+  font-weight: 700;
+  color: var(--dhcl-slate-dark);
+}
+
+/* ==========================================================================
+   7. Activities Section
+   ========================================================================== */
+.dhcl-activities-card {
+  background: #ffffff;
+  border: 1px solid var(--dhcl-border-color);
+  border-radius: var(--radius-xl, 16px);
+  padding: var(--space-6, 1.5rem);
+  box-shadow: var(--dhcl-card-shadow);
+}
+
+.dhcl-activities-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--dhcl-terracotta);
+  margin-bottom: var(--space-4, 1rem);
+}
+
+.dhcl-activities-title {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--dhcl-slate-dark);
+}
+
+.dhcl-activities-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.dhcl-activity-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  background: var(--dhcl-sandstone);
+  padding: 0.85rem 1.1rem;
+  border-radius: 10px;
+  border: 1px solid var(--dhcl-border-color);
+}
+
+.dhcl-act-bullet {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--dhcl-terracotta);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.dhcl-act-text {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #334155;
+  line-height: 1.5;
+}
+
+/* ==========================================================================
+   Responsive Adjustments
+   ========================================================================== */
+@media (max-width: 1024px) {
+  .dhcl-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .dhcl-overview-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dhcl-project-content-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .dhcl-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dhcl-mission-grid,
+  .dhcl-objectives-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dhcl-outcomes-header-banner {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .dhcl-outcomes-badge-pill {
+    align-self: center;
+  }
+
+  .dhcl-beneficiaries-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .dhcl-cohort-tabs {
+    width: 100%;
+    overflow-x: auto;
+  }
+}

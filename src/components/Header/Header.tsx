@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ArrowRight, ChevronDown, ExternalLink, ArrowUpRight } from 'lucide-react';
+import { ArrowRight, ChevronDown, ArrowUpRight } from 'lucide-react';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useNavLinkOverride } from '../../hooks/useNavLinkOverride';
 import type { ProgramDoc } from '../../pages/Admin/sections/ProgramsAdmin';
@@ -17,6 +17,7 @@ interface NavChild {
   external?: boolean;
   download?: boolean;
   disabled?: boolean;
+  hideExternalIcon?: boolean;
   subItems?: NavChild[];
 }
 
@@ -245,6 +246,7 @@ const navItemsData: NavItem[] = [
     children: [
       { label: 'Sewage Treatment Plants', path: '/campus/sewage-treatment-plants' },
       { label: 'Wellness Center', path: '/campus/wellness-center' },
+      { label: 'Wellness', path: '/campus/wellness' },
       { label: 'Vishnu TV Academy', path: '/vishnu-tv-academy' },
       { label: 'Clubs', path: '/campus/clubs' },
       { label: 'Student Clubs', path: '/student-clubs' },
@@ -378,7 +380,7 @@ export default function Header() {
   const navContainerRef = useRef<HTMLDivElement>(null);
   const navListRef = useRef<HTMLUListElement>(null);
   const navItemRefs = useRef<Record<string, HTMLLIElement | null>>({});
-  const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Dynamic overrides and data hooks
   const headerApplyNow = useNavLinkOverride('header-apply-now', '/apply-now');
@@ -390,6 +392,8 @@ export default function Header() {
   const programItem = (p: ProgramDoc): NavChild => ({
     label: p.name || p.slug || 'Programme',
     path: isVlsiProgram(p) ? '/academics/ece' : p.slug ? `/academics/${p.slug}` : '/academics',
+    external: true,
+    hideExternalIcon: true,
   });
   const ugProgrammes = programs.filter((p) => p.category === 'btech').map(programItem);
 
@@ -498,8 +502,8 @@ export default function Header() {
         ...item,
         children: placementItems.map((p): NavChild =>
           p.external && p.url
-            ? { label: p.title, path: p.url, external: true }
-            : { label: p.title, path: `/placements/${p.slug}` }
+            ? { label: p.title, path: p.url, external: true, hideExternalIcon: true }
+            : { label: p.title, path: `/placements/${p.slug}`, external: true, hideExternalIcon: true }
         ),
       };
     }
@@ -728,7 +732,6 @@ export default function Header() {
                                     onClick={() => setOpenItem(null)}
                                   >
                                     <span className="mega-link-text">{child.label}</span>
-                                    {!child.download && <ExternalLink size={11} className="mega-ext-icon" />}
                                   </a>
                                 ) : (
                                   <Link
@@ -754,7 +757,12 @@ export default function Header() {
                 <div className="mega-children-container">
                   {(() => {
                     const items = activeItemData.children;
-                    const itemsPerCol = Math.ceil(items.length / (items.length > 10 ? 3 : 2));
+                    // Splitting a short list (e.g. Contact's 2 links) into
+                    // multiple columns leaves each one mostly empty inside
+                    // its flexed width — only split once there's enough
+                    // content to actually fill more than one column.
+                    const numCols = items.length > 10 ? 3 : items.length > 4 ? 2 : 1;
+                    const itemsPerCol = Math.ceil(items.length / numCols);
                     const cols: NavChild[][] = [];
                     for (let i = 0; i < items.length; i += itemsPerCol) {
                       cols.push(items.slice(i, i + itemsPerCol));
@@ -785,7 +793,6 @@ export default function Header() {
                                   onClick={() => setOpenItem(null)}
                                 >
                                   <span className="mega-link-text">{child.label}</span>
-                                  {!child.download && <ExternalLink size={11} className="mega-ext-icon" />}
                                 </a>
                               ) : (
                                 <Link
@@ -880,7 +887,6 @@ export default function Header() {
                                     onClick={() => setMobileOpen(false)}
                                   >
                                     <span>{child.label}</span>
-                                    <ExternalLink size={12} />
                                   </a>
                                 ) : (
                                   <Link
@@ -947,7 +953,6 @@ export default function Header() {
                                               onClick={() => setMobileOpen(false)}
                                             >
                                               <span>{child.label}</span>
-                                              <ExternalLink size={12} />
                                             </a>
                                           ) : (
                                             <Link

@@ -1,0 +1,771 @@
+/* Wellness (Campus Life > Wellness) — hero, floating stats bar,
+   service/support cards, counsellor spotlight, impact stats, closing CTA.
+   A separate page from WellnessCenter.tsx/.css — do not merge the two. */
+
+/* ---- Hero ---- */
+
+.wellness-hero-section {
+  position: relative;
+}
+
+.wellness-hero-card {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  min-height: 560px;
+  background: linear-gradient(135deg, #0B1E42 0%, #1E3B75 100%);
+}
+
+.wellness-hero-bg-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.wellness-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, rgba(7, 14, 32, 0.94) 0%, rgba(7, 14, 32, 0.8) 45%, rgba(7, 14, 32, 0.45) 78%, rgba(7, 14, 32, 0.2) 100%);
+}
+
+.wellness-hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 640px;
+  padding: 4rem clamp(1.5rem, 4vw, 4rem) 5rem;
+}
+
+.wellness-hero-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.wellness-hero-badge-dash {
+  width: 28px;
+  height: 2px;
+  background: var(--color-accent);
+  display: inline-block;
+}
+
+.wellness-hero-badge-text {
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+.wellness-hero-title {
+  margin: 0 0 1rem;
+  font-family: var(--font-sans);
+  font-weight: 900;
+  font-size: clamp(2.4rem, 5vw, 3.75rem);
+  line-height: 1.06;
+  letter-spacing: -0.01em;
+  color: #ffffff;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.4);
+}
+
+.wellness-hero-title span {
+  display: block;
+}
+
+.wellness-hero-title span.wellness-hero-title--accent {
+  color: var(--color-accent);
+}
+
+.wellness-hero-body {
+  max-width: 46ch;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: var(--text-base);
+  line-height: 1.7;
+  margin: 0 0 2rem;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.3);
+}
+
+.wellness-hero-actions {
+  display: flex;
+  gap: 0.9rem;
+  flex-wrap: wrap;
+}
+
+.wellness-hero-actions .btn-hero-outline {
+  gap: 0.55rem;
+}
+
+.wellness-hero-actions .btn-hero-outline svg {
+  flex-shrink: 0;
+}
+
+/* ---- Floating stats bar — overlaps the hero/next-section seam ---- */
+
+.wellness-stats-float-wrap {
+  position: relative;
+  z-index: 3;
+}
+
+.wellness-stats-float {
+  position: relative;
+  margin: -3.5rem auto 0;
+  max-width: 1100px;
+  background: var(--color-white);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  padding: var(--space-6) clamp(var(--space-4), 4vw, var(--space-8));
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-5);
+}
+
+.wellness-stat-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.wellness-stat-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wellness-stat-title {
+  font-family: var(--font-sans);
+  font-weight: 800;
+  font-size: var(--text-sm);
+  color: var(--color-primary);
+  line-height: 1.3;
+}
+
+.wellness-stat-sub {
+  font-size: var(--text-xs);
+  color: var(--color-text-light);
+  line-height: 1.3;
+}
+
+/* ---- Shared section header (label + heading on the left, blurb on the right) ---- */
+
+.wellness-section-header {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: var(--space-8);
+  align-items: end;
+  margin-bottom: var(--space-8);
+}
+
+.wellness-section-header p {
+  color: var(--color-text-light);
+  font-size: var(--text-base);
+  line-height: 1.7;
+  margin: 0;
+}
+
+.wellness-heading-accent {
+  color: var(--color-primary-light);
+  text-decoration: underline;
+  text-decoration-style: wavy;
+  text-decoration-color: color-mix(in srgb, var(--color-accent) 55%, #8b5cf6);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 6px;
+}
+
+/* ---- Our Services header — solid pill badge + compact bold sans heading,
+   matching the reference design (rather than the site's default outlined
+   .section-label / serif .section-title used elsewhere on this page). ---- */
+
+.wellness-services-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--color-accent);
+  color: var(--color-primary-dark);
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.4rem 1rem 0.4rem 0.85rem;
+  border-radius: var(--radius-full);
+}
+
+.wellness-services-badge::before {
+  content: '';
+  width: 14px;
+  height: 2px;
+  background: var(--color-primary-dark);
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.wellness-services-heading {
+  font-family: var(--font-sans);
+  font-weight: 800;
+  font-size: clamp(1.9rem, 3vw, 2.4rem);
+  line-height: 1.18;
+  letter-spacing: -0.015em;
+  color: var(--color-primary);
+  margin: var(--space-3) 0 0;
+}
+
+/* ---- Service / Support cards ---- */
+
+.wellness-card {
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  /* Thin defined navy-tinted edge so the pastel tiles read as crisp,
+     bordered cards instead of soft colour blocks. */
+  border: 1.5px solid color-mix(in srgb, var(--color-primary) 14%, transparent);
+  transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
+}
+
+.wellness-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: color-mix(in srgb, var(--color-primary) 30%, transparent);
+}
+
+.wellness-card-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-4);
+}
+
+/* Our Services icons specifically read bigger/bolder than the default —
+   Support Areas keeps the smaller .wellness-card-icon size. */
+.wellness-card-icon--lg {
+  width: 58px;
+  height: 58px;
+}
+
+/* Phosphor's duotone weight renders its secondary "fill" path at a very
+   faint 0.2 opacity by default (a fixed SVG attribute, not a prop the
+   component exposes) — that CSS presentation attribute can still be
+   overridden here, raising it so the icon reads as solidly filled rather
+   than a bold outline over a near-invisible tint. */
+.wellness-card-icon--duotone svg path[opacity] {
+  opacity: 0.65;
+}
+
+.wellness-card-title {
+  font-family: var(--font-sans);
+  font-weight: 800;
+  font-size: var(--text-base);
+  color: var(--color-primary);
+  margin: 0 0 0.35rem;
+}
+
+.wellness-card-desc {
+  font-size: var(--text-sm);
+  color: var(--color-text-light);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.wellness-card--sm {
+  padding: var(--space-5);
+}
+
+.wellness-card--sm .wellness-card-icon {
+  width: 44px;
+  height: 44px;
+  margin-bottom: var(--space-3);
+}
+
+.wellness-card--sm .wellness-card-title {
+  font-size: var(--text-sm);
+}
+
+.wellness-card--sm .wellness-card-desc {
+  font-size: var(--text-xs);
+}
+
+/* ---- Meet Our Counsellor ---- */
+
+.wellness-counsellor-section {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #0B1E42 0%, #142d5e 100%);
+  padding: var(--space-16) 0;
+}
+
+/* Wiggly background blobs in much darker shades of blue than the section's
+   navy gradient — crisp, defined amoeba shapes (no blur) so each one reads
+   as a distinct silhouette instead of a diffused fog. */
+
+.wellness-counsellor-blobs {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.wellness-blob {
+  position: absolute;
+}
+
+.wellness-blob--1 {
+  top: -80px;
+  left: -90px;
+  width: 340px;
+  height: 300px;
+  background: #04081A;
+  border-radius: 40% 60% 65% 35% / 55% 40% 60% 45%;
+  opacity: 0.85;
+}
+
+.wellness-blob--2 {
+  top: -50px;
+  right: -110px;
+  width: 360px;
+  height: 320px;
+  background: #060F28;
+  border-radius: 60% 40% 45% 55% / 40% 55% 45% 60%;
+  opacity: 0.8;
+}
+
+.wellness-blob--3 {
+  top: 18%;
+  left: -140px;
+  width: 320px;
+  height: 300px;
+  background: #061434;
+  border-radius: 50% 50% 60% 40% / 60% 45% 55% 40%;
+  opacity: 0.85;
+}
+
+.wellness-blob--4 {
+  top: 48%;
+  right: -140px;
+  width: 340px;
+  height: 310px;
+  background: #040A1C;
+  border-radius: 65% 35% 45% 55% / 45% 60% 40% 55%;
+  opacity: 0.8;
+}
+
+.wellness-blob--5 {
+  bottom: -110px;
+  left: -100px;
+  width: 380px;
+  height: 330px;
+  background: #060F28;
+  border-radius: 45% 55% 40% 60% / 50% 45% 55% 50%;
+  opacity: 0.85;
+}
+
+.wellness-blob--6 {
+  bottom: -90px;
+  right: -80px;
+  width: 340px;
+  height: 300px;
+  background: #04081A;
+  border-radius: 55% 45% 60% 40% / 40% 55% 45% 60%;
+  opacity: 0.6;
+}
+
+.wellness-counsellor-section > .container {
+  position: relative;
+  z-index: 1;
+}
+
+.wellness-counsellor-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: var(--space-10);
+  align-items: center;
+}
+
+.wellness-counsellor-heading {
+  font-family: var(--font-sans);
+  font-weight: 800;
+  font-size: clamp(2.25rem, 3.6vw, 3rem);
+  line-height: 1.12;
+  letter-spacing: -0.025em;
+  color: #ffffff;
+  margin: 0;
+}
+
+.wellness-counsellor-name {
+  font-family: var(--font-sans);
+  font-weight: 800;
+  font-size: clamp(1.5rem, 2.2vw, 1.9rem);
+  color: #ffffff;
+  margin: 0.9rem 0 0.35rem;
+  position: relative;
+  display: inline-block;
+}
+
+.wellness-counsellor-name::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  width: 65%;
+  height: 3px;
+  background: color-mix(in srgb, var(--color-accent) 55%, #8b5cf6);
+  border-radius: var(--radius-full);
+}
+
+.wellness-counsellor-role {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: var(--text-base);
+  color: #ffffff;
+  margin: 0.75rem 0 0.25rem;
+}
+
+.wellness-counsellor-bio {
+  font-size: var(--text-base);
+  color: rgba(255, 255, 255, 0.78);
+  line-height: 1.75;
+  margin: var(--space-4) 0 var(--space-6);
+}
+
+.wellness-counsellor-quote {
+  margin: 0;
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.04);
+  font-family: var(--font-serif);
+  font-size: var(--text-base);
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.92);
+  line-height: 1.6;
+}
+
+.wellness-counsellor-quote cite {
+  display: block;
+  margin-top: var(--space-2);
+  font-family: var(--font-sans);
+  font-style: normal;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--color-accent-light);
+}
+
+.wellness-counsellor-photo-wrap {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-5);
+}
+
+.wellness-counsellor-photo {
+  flex: 1;
+  min-width: 0;
+  aspect-ratio: 4 / 5;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: 0 24px 50px -18px rgba(0, 0, 0, 0.55);
+}
+
+.wellness-counsellor-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Slim column beside the photo — sticky note near the top, the word list
+   trailing below it down toward the photo's bottom edge. */
+.wellness-counsellor-side {
+  flex: 0 0 148px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  height: 100%;
+  padding-top: var(--space-6);
+}
+
+/* "Sticky note" card — a big quote-mark glyph sitting above the bold
+   headline, like a note pinned beside the photo. */
+.wellness-counsellor-sticky {
+  width: 148px;
+  background: #E7F7EC;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 var(--radius-lg);
+  padding: var(--space-3) var(--space-4) var(--space-4);
+  box-shadow: var(--shadow-lg);
+}
+
+.wellness-counsellor-sticky-mark {
+  color: #1F6E3D;
+  opacity: 0.45;
+  margin-bottom: 0.2rem;
+}
+
+.wellness-counsellor-sticky p {
+  margin: 0;
+  color: #14532D;
+  font-family: var(--font-sans);
+  font-weight: 800;
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
+.wellness-counsellor-values {
+  margin-top: auto;
+  padding-top: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.3rem;
+}
+
+.wellness-counsellor-values span {
+  color: rgba(255, 255, 255, 0.92);
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: var(--text-sm);
+}
+
+.wellness-counsellor-values-last {
+  position: relative;
+  padding-bottom: 0.4rem;
+}
+
+.wellness-counsellor-values-last::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 32px;
+  height: 2px;
+  background: var(--color-accent);
+}
+
+/* ---- Our Impact ---- */
+
+.wellness-impact-section {
+  position: relative;
+  overflow: hidden;
+  padding: var(--space-16) 0;
+}
+
+.wellness-impact-bg-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.wellness-impact-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(7, 14, 32, 0.88) 0%, rgba(7, 14, 32, 0.82) 100%);
+}
+
+.wellness-impact-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+}
+
+.wellness-impact-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-6);
+  margin-top: var(--space-8);
+}
+
+.wellness-impact-value {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  font-family: var(--font-sans);
+  font-weight: 900;
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  color: #ffffff;
+}
+
+.wellness-impact-value svg {
+  color: var(--color-red);
+}
+
+.wellness-impact-label {
+  margin-top: 0.35rem;
+  font-size: var(--text-sm);
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* ---- Closing CTA ---- */
+
+.wellness-cta-section {
+  padding: var(--space-16) 0;
+}
+
+.wellness-cta-grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-10);
+  align-items: center;
+}
+
+.wellness-cta-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 700;
+  font-size: clamp(1.25rem, 2vw, 1.5rem);
+  color: var(--color-accent-dark, #b8862f);
+  margin-bottom: 0.6rem;
+}
+
+.wellness-cta-eyebrow::before {
+  content: '';
+  width: 30px;
+  height: 2px;
+  background: var(--color-accent-dark, #b8862f);
+  display: inline-block;
+}
+
+.wellness-cta-heading {
+  font-family: 'Inter', var(--font-sans);
+  font-weight: 800;
+  font-size: clamp(2.6rem, 5vw, 4rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: var(--color-primary);
+  margin: 0 0 var(--space-5);
+  max-width: 14ch;
+}
+
+.wellness-cta-heading .wellness-heading-accent {
+  color: var(--color-accent-dark, #b8862f);
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 800;
+}
+
+.wellness-cta-body {
+  max-width: 50ch;
+  color: var(--color-text-light);
+  font-size: clamp(1.05rem, 1.4vw, 1.15rem);
+  line-height: 1.75;
+  margin: 0 0 var(--space-7);
+}
+
+.wellness-cta-actions {
+  display: flex;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.wellness-cta-badge {
+  width: 168px;
+  height: 168px;
+  border-radius: 50%;
+  background: #E7F7EC;
+  color: var(--color-primary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 0.3rem;
+  padding: var(--space-4);
+  flex-shrink: 0;
+}
+
+.wellness-cta-badge svg {
+  color: #2E9E5B;
+  margin-bottom: 0.2rem;
+}
+
+.wellness-cta-badge span {
+  font-family: var(--font-sans);
+  font-weight: 800;
+  font-size: 0.78rem;
+  line-height: 1.3;
+}
+
+/* ---- Responsive ---- */
+
+@media (max-width: 992px) {
+  .wellness-counsellor-grid {
+    grid-template-columns: 1fr;
+  }
+  .wellness-counsellor-values {
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-top: var(--space-4);
+    padding-top: 0;
+  }
+  .wellness-section-header {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+  .wellness-cta-grid {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  .wellness-cta-actions {
+    justify-content: center;
+  }
+  .wellness-cta-badge {
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 900px) {
+  .wellness-stats-float {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .wellness-impact-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .wellness-hero-content {
+    padding: 3rem 1.25rem 4rem;
+  }
+  .wellness-stats-float {
+    grid-template-columns: 1fr;
+    margin-top: -2.25rem;
+  }
+  .wellness-counsellor-photo-wrap {
+    flex-direction: column;
+  }
+  .wellness-counsellor-side {
+    flex-basis: auto;
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: var(--space-4);
+  }
+  .wellness-counsellor-sticky {
+    width: auto;
+    flex: 1;
+    border-radius: var(--radius-lg);
+  }
+  .wellness-counsellor-values {
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-top: 0;
+    padding-top: 0;
+  }
+}

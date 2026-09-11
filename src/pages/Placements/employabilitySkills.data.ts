@@ -12,21 +12,17 @@ export interface SkillTab {
 export const employabilitySkillTabs: SkillTab[] = [
   {
     label: 'Essential Employability Skills',
+    intro: 'These core skills support effective participation in the workplace and form the foundation for continued professional development.',
     categories: [
       {
         title: 'Foundational Skills',
         items: [
-          'Be organized',
-          'Arrive to work on time, or early',
-          'Be dependable',
-          'Have a positive attitude toward work',
-          'Exert high levels of effort and perseverance',
-          'Complete tasks on time and accurately',
-          'Seek out information to improve skills',
-          'Be flexible and adaptable',
-          'Complete all tasks, even if unpleasant',
-          'Understand dress code or uniform guidelines',
-          'Maintain personal hygiene',
+          'Organise work and manage time effectively',
+          'Demonstrate reliability and accountability',
+          'Adapt to changing tasks and workplace expectations',
+          'Complete work accurately and within timelines',
+          'Take initiative to learn and improve',
+          'Maintain appropriate professional standards',
         ],
       },
       {

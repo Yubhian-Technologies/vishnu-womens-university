@@ -1,4 +1,4 @@
-import { Building2, Sparkles } from "lucide-react";
+import { Building2 } from "lucide-react";
 import { Marquee } from "./marquee-01-utils/marquee";
 
 export interface PlacementItem {
@@ -26,7 +26,6 @@ export const PlacementRecordCard = ({
         </span>
         {pkg && (
           <span className="placement-card-package-badge">
-            <Sparkles size={11} strokeWidth={2.4} style={{ flexShrink: 0 }} />
             <span>{/lpa/i.test(pkg) ? pkg : `${pkg} LPA`}</span>
           </span>
         )}

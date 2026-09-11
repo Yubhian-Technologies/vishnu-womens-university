@@ -86,6 +86,8 @@ const CampusLifeDetail = lazyWithRetry(() => import('./pages/CampusLife/CampusLi
 const SocialServicesPage = lazyWithRetry(() => import('./pages/CampusLife/SocialServicesPage'));
 const SewageTreatment = lazyWithRetry(() => import('./pages/Campus/SewageTreatment'));
 const WellnessCenter = lazyWithRetry(() => import('./pages/Campus/WellnessCenter'));
+const Wellness = lazyWithRetry(() => import('./pages/Campus/Wellness'));
+const Auditoriums = lazyWithRetry(() => import('./pages/Campus/Auditoriums'));
 const FitnessCentre = lazyWithRetry(() => import('./pages/Campus/FitnessCentre'));
 const Television = lazyWithRetry(() => import('./pages/Campus/Television'));
 const HealthCare = lazyWithRetry(() => import('./pages/Campus/HealthCare'));
@@ -103,6 +105,9 @@ const StudentClubs = lazyWithRetry(() => import('./pages/StudentActivities/Stude
 const StudentClubDetail = lazyWithRetry(() => import('./pages/StudentActivities/StudentClubDetail'));
 const Differentiators = lazyWithRetry(() => import('./pages/Differentiators/Differentiators'));
 const DifferentiatorDetail = lazyWithRetry(() => import('./pages/Differentiators/DifferentiatorDetail'));
+const ArVrStudio = lazyWithRetry(() => import('./pages/Differentiators/ArVrStudio'));
+const ConcreteCanoeLab = lazyWithRetry(() => import('./pages/Differentiators/ConcreteCanoeLab'));
+const AdvancedElectricalRdLab = lazyWithRetry(() => import('./pages/Differentiators/AdvancedElectricalRdLab'));
 const Placements = lazyWithRetry(() => import('./pages/Placements/Placements'));
 const PlacementDetail = lazyWithRetry(() => import('./pages/Placements/PlacementDetail'));
 const NewsAwards = lazyWithRetry(() => import('./pages/NewsAwards/NewsAwards'));
@@ -205,6 +210,7 @@ function PublicApp() {
                 renders instead of CampusLifeDetail redirecting to /campus. */}
             <Route path="/campus/sewage-treatment-plants" element={<SewageTreatment />} />
             <Route path="/campus/wellness-center" element={<WellnessCenter />} />
+            <Route path="/campus/wellness" element={<Wellness />} />
             <Route path="/campus/television" element={<Television />} />
             <Route path="/television" element={<Television />} />
             <Route path="/campus/health-care" element={<HealthCare />} />
@@ -218,6 +224,7 @@ function PublicApp() {
             <Route path="/campus/sports" element={<Sports />} />
             <Route path="/campus/sports/:id" element={<SportsDetail />} />
             <Route path="/campus/clubs" element={<Clubs />} />
+            <Route path="/campus/auditoriums" element={<Auditoriums />} />
             <Route path="/campus/food-courts" element={<FoodCourts />} />
             <Route path="/campus/fitness-centre" element={<FitnessCentre />} />
             <Route path="/campus/:slug" element={<CampusLifeDetail />} />
@@ -234,6 +241,13 @@ function PublicApp() {
             <Route path="/arts-culture" element={<CampusLifeDetail slug="arts-culture" />} />
             <Route path="/sports-games" element={<CampusLifeDetail slug="sports-games" />} />
             <Route path="/differentiators" element={<Differentiators />} />
+            {/* Static segment declared alongside the /differentiators/:slug
+                catch-all — React Router ranks the literal path higher, so
+                this bespoke dark "Tech/AR" redesign renders instead of the
+                shared DifferentiatorDetail template every other item uses. */}
+            <Route path="/differentiators/ar-vr-studio" element={<ArVrStudio />} />
+            <Route path="/differentiators/concrete-canoe-lab" element={<ConcreteCanoeLab />} />
+            <Route path="/differentiators/advanced-electrical-rd-lab" element={<AdvancedElectricalRdLab />} />
             <Route path="/differentiators/:slug" element={<DifferentiatorDetail />} />
             <Route path="/placements" element={<Placements />} />
             <Route path="/placements/:slug" element={<PlacementDetail />} />
