@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { orderBy } from 'firebase/firestore';
-import { Trophy, BarChart3, PlayCircle, MapPin, CheckCircle2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Trophy, BarChart3, PlayCircle, MapPin, CheckCircle2, ChevronLeft, ChevronRight, ChevronDown, Clock } from 'lucide-react';
 import { useCollection, useOrderedCollection, type WithId } from '../../hooks/useCollection';
 import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import { usePageBanners } from '../../hooks/usePageBanners';
@@ -25,6 +25,7 @@ import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import BodyBlocks, { parseBodyContent } from '../../components/BodyBlocks/BodyBlocks';
 import PhotoCarouselStrip from '../../components/PhotoCarousel/PhotoCarouselStrip';
 import '../detail-layout.css';
+import '../gsac-shared.css';
 
 // Overrides the body heading only — hero/breadcrumb still show
 // the CMS title as-is, so a slug here can read differently in the body
@@ -32,6 +33,15 @@ import '../detail-layout.css';
 const ABOUT_TITLE_OVERRIDES: Record<string, string> = {
   'placement-details': 'Placement Cell',
 };
+
+// GSAC's "Global Opportunities" stat row — shown when an admin hasn't
+// added any "Global Opportunities Stats" yet, so the globe card never
+// sits as a blank box below "Global Opportunities · Brighter Futures".
+const DEFAULT_GSAC_STATS = [
+  { value: '7+', label: 'Global Destinations' },
+  { value: '360', label: 'End-to-End Support' },
+  { value: 'Global', label: 'Alumni Network' },
+];
 
 const BODY_OVERRIDES: Record<string, string> = {
   'career-guidance-cell': `Career guidance is not a new concept and its roots can be traced back to ancient times. However, career guidance in its present form, owes its origin to US and other developed countries. Career guidance encompasses information, guidance and counseling services to assist in making educational training and occupational choice.
@@ -1225,6 +1235,13 @@ export default function PlacementDetail() {
   const iloPhotoMap = new Map(iloPhotoDocs.map((d) => [d.id, d.photos || []]));
   // Admin-uploaded gallery for the GSAC page.
   const { docs: gsacPhotos } = useCollection<WithId & { imageUrl: string }>('gsacPhotos', [orderBy('order', 'asc')], { silent: true });
+  // GSAC's "Moments from GSAC" gallery starts collapsed to 3 photos (matching
+  // the reference layout) with a toggle to reveal the rest in place — no
+  // separate gallery route needed. GSAC's Key Highlights/Outcomes render as
+  // an accordion (only one open at a time) instead of the generic sidebar
+  // list / 3-col grid every other Placements sub-page uses.
+  const [gsacGalleryExpanded, setGsacGalleryExpanded] = useState(false);
+  const [gsacOpenAccordion, setGsacOpenAccordion] = useState<'highlights' | 'outcomes' | null>(null);
   // Admin-uploaded recruiter logos (Admin → Recruiter Logos), keyed by the
   // exact company name string used in batch data / item.partners — shared
   // by Our Recruiters (AllRecruiters) and the Recruiting Partners grid
@@ -1328,7 +1345,7 @@ export default function PlacementDetail() {
   // Recruiters drops it per request — the recruiter logo grid below is the
   // page's actual point, and Outcomes was just repeating the Overview text.
   const activeOutcomes = (item.outcomes || []).filter((o) => !o.includes('2015-2019') && !o.includes('2015–2019'));
-  const showOutcomes = activeOutcomes.length > 0 && item.slug !== 'placement-highlights' && item.slug !== 'our-recruiters' && item.slug !== 'tpo-team' && item.slug !== 'industry-liaison-offices';
+  const showOutcomes = activeOutcomes.length > 0 && item.slug !== 'placement-highlights' && item.slug !== 'our-recruiters' && item.slug !== 'tpo-team' && item.slug !== 'industry-liaison-offices' && item.slug !== 'gsac';
   // Shared markup for the below-Overview spot every non-Placement-Cell page
   // uses. Placement Cell renders its own combined Summary+chart block near
   // the hero instead (see placementCellSummarySection below) — it needs the
@@ -1379,6 +1396,15 @@ export default function PlacementDetail() {
       </div>
     </section>
   );
+  // GSAC's "Global Opportunities" stat row — admin-entered "Value | Label"
+  // lines (Admin → Placement Sub-pages → gsac → Global Opportunities Stats).
+  const gsacStats = (item.globalStats || [])
+    .map((line) => {
+      const [value, label] = line.split('|').map((s) => s.trim());
+      return value ? { value, label: label || '' } : null;
+    })
+    .filter((s): s is { value: string; label: string } => !!s);
+  const displayGsacStats = gsacStats.length > 0 ? gsacStats : DEFAULT_GSAC_STATS;
   const hasBodyOverride = !item.intro && Boolean(BODY_OVERRIDES[item.slug]);
   let bodyText = hasBodyOverride ? BODY_OVERRIDES[item.slug] : '';
   // The CDP/C-Program "More Details …" links point at bundled PDFs by
@@ -1458,7 +1484,7 @@ export default function PlacementDetail() {
       <section className="section bg-white" style={{ paddingBottom: (showOutcomes && item.slug !== 'placement-details') || item.slug === 'employability-skills' || item.slug === 'gsac' || item.slug === 'higher-education' || item.slug === 'placement-highlights' || item.slug === 'tpo-team' || item.slug === 'industry-liaison-offices' ? 'var(--space-6)' : undefined }}>
         <div className="container">
           <div className={
-            (item.highlights && item.highlights.length > 0) || item.slug === 'placement-details'
+            (item.highlights && item.highlights.length > 0) || item.slug === 'placement-details' || item.slug === 'gsac'
               ? `detail-grid${item.slug === 'gsac' ? ' detail-grid--image-sidebar' : ''}${item.slug === 'higher-education' ? ' detail-grid--higher-ed-sidebar' : ''}`
               : ''
           }>
@@ -1469,24 +1495,24 @@ export default function PlacementDetail() {
                 <h2 className="section-title" style={{ fontSize: '1.75rem' }}>{ABOUT_TITLE_OVERRIDES[item.slug] || item.title}</h2>
               )}
               {hasBodyOverride ? (
-                <div style={{ fontSize: 'var(--text-lg)', color: 'var(--color-text)', lineHeight: 1.75 }}>
+                <div className={item.slug === 'gsac' ? 'gsac-body-card' : undefined} style={item.slug === 'gsac' ? undefined : { fontSize: 'var(--text-lg)', color: 'var(--color-text)', lineHeight: 1.75 }}>
                   <BodyBlocks blocks={bodyBlocks} paragraphStyle={{}} />
                 </div>
               ) : item.intro ? (
-                <>
+                <div className={item.slug === 'gsac' ? 'gsac-body-card' : undefined}>
                   <BodyBlocks
                     blocks={parseBodyContent(item.intro)}
-                    paragraphStyle={{ fontSize: 'var(--text-lg)', color: 'var(--color-text)', lineHeight: item.slug === 'higher-education' ? 1.5 : 1.75 }}
+                    paragraphStyle={item.slug === 'gsac' ? {} : { fontSize: 'var(--text-lg)', color: 'var(--color-text)', lineHeight: item.slug === 'higher-education' ? 1.5 : 1.75 }}
                   />
                   {item.about && (
                     <BodyBlocks
                       blocks={parseBodyContent(item.about)}
-                      paragraphStyle={{ fontSize: 'var(--text-base)', color: 'var(--color-text-light)', lineHeight: 1.75 }}
+                      paragraphStyle={item.slug === 'gsac' ? {} : { fontSize: 'var(--text-base)', color: 'var(--color-text-light)', lineHeight: 1.75 }}
                     />
                   )}
-                </>
+                </div>
               ) : (
-                <p style={{ fontSize: 'var(--text-lg)', color: 'var(--color-text)', lineHeight: 1.75 }}>
+                <p className={item.slug === 'gsac' ? 'gsac-body-card' : undefined} style={item.slug === 'gsac' ? undefined : { fontSize: 'var(--text-lg)', color: 'var(--color-text)', lineHeight: 1.75 }}>
                   {item.desc}
                 </p>
               )}
@@ -1544,13 +1570,18 @@ export default function PlacementDetail() {
               )
             ) : item.slug === 'gsac' ? (
               <div className="detail-sidebar">
-                <div style={{ position: 'sticky', top: '110px', display: 'flex', justifyContent: 'center' }}>
-                  <img
-                    src="/images/placements/gsac-green-shield.png"
-                    alt="Graduate Study Abroad Center (GSAC)"
-                    loading="lazy"
-                    style={{ width: '100%', maxWidth: 420, height: 'auto' }}
-                  />
+                <div className="gsac-globe-card">
+                  <img src="/images/dot world map.webp" alt="" aria-hidden="true" className="gsac-globe-map" />
+                  <h3 className="gsac-globe-title">Global<br />Opportunities<br />Brighter Futures</h3>
+                  <div className="gsac-globe-divider" aria-hidden="true" />
+                  <div className="gsac-globe-stats">
+                    {displayGsacStats.map((s, i) => (
+                      <div key={i} className="gsac-globe-stat">
+                        <strong>{s.value}</strong>
+                        {s.label && <span>{s.label}</span>}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             ) : item.slug === 'higher-education' ? (
@@ -1646,20 +1677,70 @@ export default function PlacementDetail() {
         </section>
       )}
 
-      {/* Photo gallery — only on the GSAC sub-page */}
+      {/* Photo gallery — only on the GSAC sub-page. Starts collapsed to 3
+          photos with a toggle to reveal the rest in place. */}
       {item.slug === 'gsac' && gsacPhotos.length > 0 && (
         <section className="section bg-white" style={{ paddingTop: 'var(--space-6)' }}>
           <div className="container">
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--space-5)' }}>
-              {gsacPhotos.map((p) => (
-                <img
-                  key={p.id}
-                  src={p.imageUrl}
-                  alt="Graduate Study Abroad Center"
-                  style={{ width: '100%', height: 280, objectFit: 'cover', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-light-gray)' }}
-                />
+            <div className="gsac-gallery-header">
+              <div>
+                <span className="section-label">Gallery</span>
+                <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Moments from GSAC</h2>
+                <p style={{ color: 'var(--color-text-light)', margin: 0 }}>Sessions, interactions and global opportunities in action.</p>
+              </div>
+              {gsacPhotos.length > 3 && (
+                <button type="button" className="gsac-gallery-toggle" onClick={() => setGsacGalleryExpanded((v) => !v)}>
+                  {gsacGalleryExpanded ? 'Show Less' : 'View Full Gallery'} <ChevronRight size={16} strokeWidth={2} />
+                </button>
+              )}
+            </div>
+            <div className="gsac-gallery-grid">
+              {(gsacGalleryExpanded ? gsacPhotos : gsacPhotos.slice(0, 3)).map((p) => (
+                <div className="gsac-gallery-item" key={p.id}>
+                  <img src={p.imageUrl} alt="Graduate Study Abroad Center" loading="lazy" />
+                </div>
               ))}
             </div>
+          </div>
+        </section>
+      )}
+
+      {/* Key Highlights / Outcomes & Achievements — GSAC-only accordion
+          (only one open at a time), reusing the same item.highlights /
+          activeOutcomes data every other Placements sub-page shows as a
+          plain sidebar list / 3-col grid (see outcomesSection below, which
+          is skipped for this slug so it isn't shown twice). */}
+      {item.slug === 'gsac' && ((item.highlights && item.highlights.length > 0) || activeOutcomes.length > 0) && (
+        <section className="section bg-off-white" style={{ paddingTop: 'var(--space-6)' }}>
+          <div className="container" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+            {item.highlights && item.highlights.length > 0 && (
+              <div className="gsac-accordion">
+                <button type="button" className="gsac-accordion__toggle" onClick={() => setGsacOpenAccordion((v) => (v === 'highlights' ? null : 'highlights'))}>
+                  <span className="gsac-accordion__icon"><Clock size={18} strokeWidth={1.75} /></span>
+                  <span className="gsac-accordion__label">Key Highlights</span>
+                  <ChevronDown size={18} className={`gsac-accordion__chevron${gsacOpenAccordion === 'highlights' ? ' is-open' : ''}`} />
+                </button>
+                <SmoothCollapse open={gsacOpenAccordion === 'highlights'}>
+                  <ul className="gsac-accordion__list">
+                    {item.highlights.map((h) => <li key={h}>{h}</li>)}
+                  </ul>
+                </SmoothCollapse>
+              </div>
+            )}
+            {activeOutcomes.length > 0 && (
+              <div className="gsac-accordion">
+                <button type="button" className="gsac-accordion__toggle" onClick={() => setGsacOpenAccordion((v) => (v === 'outcomes' ? null : 'outcomes'))}>
+                  <span className="gsac-accordion__icon"><BarChart3 size={18} strokeWidth={1.75} /></span>
+                  <span className="gsac-accordion__label">Outcomes &amp; Achievements</span>
+                  <ChevronDown size={18} className={`gsac-accordion__chevron${gsacOpenAccordion === 'outcomes' ? ' is-open' : ''}`} />
+                </button>
+                <SmoothCollapse open={gsacOpenAccordion === 'outcomes'}>
+                  <ul className="gsac-accordion__list">
+                    {activeOutcomes.map((o) => <li key={o}>{o}</li>)}
+                  </ul>
+                </SmoothCollapse>
+              </div>
+            )}
           </div>
         </section>
       )}

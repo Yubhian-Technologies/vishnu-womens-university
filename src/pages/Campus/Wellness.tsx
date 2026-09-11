@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Shield, Lock, Leaf, UsersRound, Play, Heart, Quote } from 'lucide-react';
+import { Shield, Lock, Leaf, UsersRound, Play, Quote } from 'lucide-react';
 // Our Services / Support Areas icons are Phosphor Duotone specifically
 // (not Lucide, which is outline-only) — kept to just these two sections per
 // request; the rest of the page still uses the site's usual Lucide set.
@@ -294,25 +294,50 @@ export default function Wellness() {
         </div>
       </section>
 
-      {/* It's Okay To Ask for Help */}
+      {/* It's Okay To Ask for Help — Redesigned CTA section matching Image 2 */}
       <section className="wellness-cta-section bg-white">
         <div className="container">
-          <div className="wellness-cta-grid">
-            <div>
+          <div className="wellness-cta-card">
+            {/* Left Content Column */}
+            <div className="wellness-cta-text-col">
               <span className="wellness-cta-eyebrow">It&rsquo;s Okay</span>
-              <h2 className="wellness-cta-heading">To Ask for <span className="wellness-heading-accent">Help</span></h2>
+              <h2 className="wellness-cta-heading">To Ask for Help</h2>
               <p className="wellness-cta-body">
                 Your mental health matters. Reach out, book a session, or simply say hello &mdash; we&rsquo;re here for you.
               </p>
-              <div className="wellness-cta-actions">
-                <Link to="/contact" className="btn btn-primary">Book a Session</Link>
-                <Link to="/contact" className="btn btn-outline">Contact Us</Link>
-              </div>
             </div>
-            <div className="wellness-cta-badge">
-              <Heart size={26} fill="currentColor" strokeWidth={0} />
-              <span>Same Student</span>
-              <span>Brighter Tomorrows</span>
+
+            {/* Vertical Line Divider */}
+            <div className="wellness-cta-divider" aria-hidden="true" />
+
+            {/* Middle Action Buttons Column */}
+            <div className="wellness-cta-actions-col">
+              <Link to="/contact" className="btn-cta-primary">
+                Book a Session <span>&rarr;</span>
+              </Link>
+              <Link to="/contact" className="btn-cta-secondary">
+                Contact Us
+              </Link>
+            </div>
+
+            {/* Right Leaf Badge Circle */}
+            <div className="wellness-cta-leaf-badge">
+              <div className="wellness-cta-leaf-illustration" aria-hidden="true">
+                <svg width="48" height="76" viewBox="0 0 48 76" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M24 74C23.5 50 24 25 24 6" stroke="#285235" strokeWidth="2.5" strokeLinecap="round"/>
+                  <path d="M24 50C10 42 2 28 4 12C20 12 26 26 24 50Z" fill="#3B6E47"/>
+                  <path d="M24 50C16 42 10 30 11 18C20 18 24 28 24 50Z" fill="#285235"/>
+                  <path d="M24 38C38 30 46 16 44 0C28 0 22 14 24 38Z" fill="#4D885B"/>
+                  <path d="M24 38C32 30 38 18 37 4C28 4 24 14 24 38Z" fill="#3B6E47"/>
+                  <path d="M24 60C36 54 42 42 40 30C28 30 23 42 24 60Z" fill="#285235"/>
+                </svg>
+              </div>
+              <div className="wellness-cta-badge-text">
+                <span>Same</span>
+                <span>Student</span>
+                <span>Brighter</span>
+                <span>Tomorrows</span>
+              </div>
             </div>
           </div>
         </div>
