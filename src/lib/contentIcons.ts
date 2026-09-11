@@ -7,6 +7,7 @@ import {
   Library, Shield, HelpCircle, ShieldCheck, Recycle, Car, Train, Plane, Info, Layers, Rocket, Wrench,
   Sprout, Bot, Brain, Volleyball, CircleDot, Swords, Disc, Crown, TrainFront, Scale,
   Search, Construction, Megaphone, ShoppingCart, MessageCircle, Settings, Flag, Compass, UsersRound,
+  Heart,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -22,6 +23,7 @@ export const CONTENT_ICONS: Record<string, LucideIcon> = {
   Library, Shield, HelpCircle, ShieldCheck, Recycle, Car, Train, Plane, Info, Layers, Rocket, Wrench,
   Sprout, Bot, Brain, Volleyball, CircleDot, Swords, Disc, Crown, TrainFront, Scale,
   Search, Construction, Megaphone, ShoppingCart, MessageCircle, Settings, Flag, Compass, UsersRound,
+  Heart,
 };
 
 export const CONTENT_ICON_NAMES = Object.keys(CONTENT_ICONS);

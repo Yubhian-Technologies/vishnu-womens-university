@@ -245,6 +245,7 @@ const navItemsData: NavItem[] = [
     children: [
       { label: 'Sewage Treatment Plants', path: '/campus/sewage-treatment-plants' },
       { label: 'Wellness Center', path: '/campus/wellness-center' },
+      { label: 'Wellness', path: '/campus/wellness' },
       { label: 'Vishnu TV Academy', path: '/vishnu-tv-academy' },
       { label: 'Clubs', path: '/campus/clubs' },
       { label: 'Student Clubs', path: '/student-clubs' },
