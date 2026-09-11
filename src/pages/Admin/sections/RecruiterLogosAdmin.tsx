@@ -78,6 +78,11 @@ export default function RecruiterLogosAdmin() {
   const [archiveStatus, setArchiveStatus] = useState<string | null>(null);
   const [archiveError, setArchiveError] = useState<string | null>(null);
   const [clearingAll, setClearingAll] = useState(false);
+  // Doc ID = company name (see saveLogo), so "editing the name" means
+  // creating a new doc under the new name with the same image, then
+  // deleting the old one — not an in-place field update.
+  const [renameDrafts, setRenameDrafts] = useState<Record<string, string>>({});
+  const [renaming, setRenaming] = useState<string | null>(null);
 
   const saveLogo = async (company: string, result: UploadResult) => {
     const prevPath = logoMap.get(company)?.storagePath;
@@ -109,6 +114,28 @@ export default function RecruiterLogosAdmin() {
       if (existing?.storagePath) await deleteFile(existing.storagePath).catch(() => {});
     } catch (e) {
       alert(`Couldn't remove: ${(e as Error).message}`);
+    }
+  };
+
+  const renameLogo = async (oldName: string) => {
+    const newName = (renameDrafts[oldName] ?? oldName).trim();
+    if (!newName || newName === oldName) return;
+    const existing = logoMap.get(oldName);
+    if (!existing) return;
+    if (logoMap.has(newName) && !confirm(`"${newName}" already has an uploaded logo — replace it with ${oldName}'s image?`)) return;
+    setRenaming(oldName);
+    try {
+      await setDoc(doc(db, 'recruiterLogos', newName), {
+        imageUrl: existing.imageUrl,
+        storagePath: existing.storagePath,
+        updatedAt: serverTimestamp(),
+      });
+      await deleteDoc(doc(db, 'recruiterLogos', oldName));
+      setRenameDrafts((p) => { const next = { ...p }; delete next[oldName]; return next; });
+    } catch (e) {
+      alert(`Couldn't rename: ${(e as Error).message}`);
+    } finally {
+      setRenaming(null);
     }
   };
 
@@ -247,7 +274,21 @@ export default function RecruiterLogosAdmin() {
               <div key={logo.id} className="admin-image-card">
                 <img src={logo.imageUrl} alt={logo.id} />
                 <div className="admin-image-card__info">
-                  <strong>{logo.id}</strong>
+                  <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
+                    <input
+                      value={renameDrafts[logo.id] ?? logo.id}
+                      onChange={(e) => setRenameDrafts((p) => ({ ...p, [logo.id]: e.target.value }))}
+                      style={{ flex: 1, fontWeight: 700, border: '1px solid #d1d5db', borderRadius: 4, padding: '0.25rem 0.4rem' }}
+                    />
+                    <button
+                      type="button"
+                      className="admin-btn admin-btn--sm"
+                      onClick={() => renameLogo(logo.id)}
+                      disabled={renaming !== null || (renameDrafts[logo.id] ?? logo.id).trim() === logo.id || !(renameDrafts[logo.id] ?? logo.id).trim()}
+                    >
+                      {renaming === logo.id ? 'Renaming…' : 'Rename'}
+                    </button>
+                  </div>
                 </div>
                 <div className="admin-image-card__actions">
                   <label className="admin-btn admin-btn--sm" style={{ opacity: uploadingName !== null || clearingAll ? 0.5 : 1 }}>

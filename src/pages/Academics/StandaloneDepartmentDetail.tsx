@@ -1,18 +1,18 @@
 import { useEffect, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import { Check, Sparkles, Mail, BookOpen, ChevronRight, Hash } from 'lucide-react';
+import { Check, Sparkles, Mail, BookOpen, Hash, ChevronDown } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import FacultyCarousel from '../../components/FacultyCarousel/FacultyCarousel';
+import LabsCarousel from '../../components/LabsCarousel/LabsCarousel';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useEapcetCode } from '../../hooks/useContentBlocks';
-import { normalizeLab, type LabItem, type NewsEventsYear } from '../Admin/sections/ProgramsAdmin';
+import { normalizeLab, type NewsEventsYear } from '../Admin/sections/ProgramsAdmin';
 import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import type { FacultyDoc } from './Faculty';
 import type { StandaloneDepartment } from '../../lib/departmentGroups';
 import NewsEventsTabs, { type NewsEventsCategory } from '../../components/NewsEventsTabs/NewsEventsTabs';
 import { hasCustomSectionContent, toQuickLinkItems } from '../../lib/customSections';
 import CustomSectionsRenderer from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
-import LabDialog from '../../components/LabDialog/LabDialog';
 import { getDepartmentTagline } from '../../lib/departmentTaglines';
 import '../detail-layout.css';
 
@@ -23,11 +23,12 @@ interface Props {
 }
 
 export default function StandaloneDepartmentDetail({ dept: group }: Props) {
-  const [activeLab, setActiveLab] = useState<LabItem | null>(null);
   const [activeSectionId, setActiveSectionId] = useState<string>('');
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
   const { docs: allDepartments, loading } = useOrderedCollection<DepartmentDoc>('departments', 'order');
   const eapcetCode = useEapcetCode();
   const dept = allDepartments.find((d) => d.shortCode?.trim().toLowerCase() === group.deptShortCode.trim().toLowerCase());
+  const faqs = dept?.faqs || [];
   const facultyDeptNames = new Set(group.facultyDepartments);
   const { docs: allFaculty } = useOrderedCollection<FacultyDoc>('faculty', 'order');
   const faculty = allFaculty.filter((f) => f.department && facultyDeptNames.has(f.department));
@@ -85,6 +86,7 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
     ...toQuickLinkItems(visibleCustomSections),
     hasNewsEvents && { id: 'news-events', label: 'Happenings' },
     hasLibrary && { id: 'library', label: 'Department Library' },
+    faqs.length > 0 && { id: 'faq', label: 'FAQs' },
   ].filter(Boolean) as { id: string; label: string; children?: { id: string; label: string }[] }[];
 
   useEffect(() => {
@@ -206,7 +208,6 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
           <div className="container">
             <div className="dept-about-main">
               <div className="dept-about-header">
-                <span className="section-label dept-section-label">Department Overview</span>
                 <h2 className="section-title">
                   <span style={{ fontWeight: 400 }}>Welcome to </span>
                   <span style={{ fontWeight: 800 }}>{deptName}</span>
@@ -240,10 +241,9 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
       {/* Core Values — Department Vision / Mission Statements cards were
           removed here; this section now only ever shows Core Values. */}
       {hasCoreValues && (
-        <section id="vision-mission" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
+        <section id="vision-mission" className="section dept-section-navy" style={{ scrollMarginTop: NAV_OFFSET }}>
           <div className="container">
             <div style={{ marginBottom: 'var(--space-10)' }}>
-              <span className="section-label dept-section-label">Our Guiding Pillars</span>
               <h2 className="section-title">Core Values</h2>
             </div>
             <div className="dept-vm-grid">
@@ -317,76 +317,25 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
         </div>
       )}
 
-      {/* Laboratories */}
       {hasLabs && (
-        <section id="labs" className="dept-labs-section" style={{ scrollMarginTop: NAV_OFFSET }}>
-          <div className="container">
-            <div className="dept-labs-header">
-              <div className="dept-labs-title-wrap">
-                <span className="section-label dept-section-label">State-of-the-Art Infrastructure</span>
-                <h2 className="section-title">Specialized Laboratories</h2>
-                <p className="section-desc" style={{ margin: '0.5rem 0 0 0' }}>
-                  Industry-aligned experimental facilities engineered for hands-on technical immersion and practical learning.
-                </p>
-              </div>
-              <div className="dept-labs-count-pill">
-                <span className="dept-labs-count-dot" />
-                <span>{labs.length} Active Facilities</span>
-              </div>
-            </div>
-            <div className="dept-labs-grid">
-              {labs.map((lab, li) => {
-                const indexNum = String(li + 1).padStart(2, '0');
-                return (
-                  <button
-                    key={li}
-                    type="button"
-                    onClick={() => setActiveLab(lab)}
-                    className="dept-lab-card"
-                    style={{ font: 'inherit', textAlign: 'left', cursor: 'pointer', width: '100%' }}
-                    aria-label={`View ${lab.name} details`}
-                  >
-                    <div>
-                      <div className="dept-lab-card-top">
-                        <span className="dept-lab-index-tag">{indexNum}</span>
-                      </div>
-                      <div className="dept-lab-body">
-                        <span className="dept-lab-overline">Practical & Research Facility</span>
-                        <h3 className="dept-lab-title">{lab.name}</h3>
-                        <p className="dept-lab-spec-desc">
-                          {lab.description ? lab.description.slice(0, 110) : 'Equipped with high-performance workstations and dedicated experimental apparatus.'}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="dept-lab-footer">
-                      <span className="dept-lab-pdf-btn-label">
-                        {lab.pdfUrl ? 'Lab Manual & Specs' : 'View Details'}
-                      </span>
-                      <span className="dept-btn-arrow-circle">
-                        <ChevronRight size={12} strokeWidth={2.5} />
-                      </span>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </section>
+        <LabsCarousel
+          labs={labs}
+          navOffset={NAV_OFFSET}
+          fallbackImage={dept.heroImage}
+          description="Industry-aligned experimental facilities engineered for hands-on technical immersion and practical learning."
+        />
       )}
-
-      <LabDialog lab={activeLab} onClose={() => setActiveLab(null)} />
 
       <CustomSectionsRenderer sections={visibleCustomSections} navOffset={NAV_OFFSET} />
 
       {/* News & Events — Compact Collapsible Academic-Year List */}
-      {hasNewsEvents && <NewsEventsTabs categories={newsEventsCategories} eyebrow={deptName} navOffset={NAV_OFFSET} />}
+      {hasNewsEvents && <NewsEventsTabs categories={newsEventsCategories} navOffset={NAV_OFFSET} />}
 
       {/* Department Library */}
       {hasLibrary && (
         <section id="library" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label dept-section-label">Academic Repository</span>
               <h2 className="section-title">Department Library</h2>
             </div>
             <div className="dept-library-container">
@@ -431,6 +380,46 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
             </div>
           </div>
         </section>
+      )}
+
+      {/* FAQ — last content section on the page. Items render from this
+          department's own `faqs` field (Admin → Academic Departments →
+          Department Page — FAQs); hidden entirely until an admin adds real
+          entries. No scroll-reveal animation here (see the Firestore
+          gotcha in CLAUDE.md). */}
+      {faqs.length > 0 && (
+      <section id="faq" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
+        <div className="container">
+          <div style={{ textAlign: 'center', maxWidth: 600, margin: '0 auto var(--space-12)' }}>
+            <h2 className="section-title">
+              Frequently Asked <span style={{ color: 'var(--color-accent)' }}>Questions</span>
+            </h2>
+            <p className="section-desc" style={{ marginTop: 'var(--space-3)' }}>
+              Common questions about this department, answered. If you do not find what you are looking for, contact our admissions team directly.
+            </p>
+          </div>
+          <div className="dept-faq-list">
+            {faqs.map((faq, i) => (
+              <div key={i} className={`dept-faq-card${openFaq === i ? ' open' : ''}`}>
+                <button
+                  type="button"
+                  className="dept-faq-question"
+                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                  aria-expanded={openFaq === i}
+                >
+                  <span>{faq.question}</span>
+                  <ChevronDown size={18} strokeWidth={2.4} style={{ flexShrink: 0, transition: 'transform 0.3s', transform: openFaq === i ? 'rotate(180deg)' : 'rotate(0deg)' }} />
+                </button>
+                <div className="dept-faq-collapse" aria-hidden={openFaq !== i}>
+                  <div className="dept-faq-collapse-inner">
+                    <div className="dept-faq-answer">{faq.answer}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
       )}
     </main>
   );

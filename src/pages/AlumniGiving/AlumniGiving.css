@@ -29,7 +29,7 @@
 .ag-impact-stat {
   font-family: var(--font-serif);
   font-size: clamp(2rem, 3.5vw, 2.8rem);
-  font-weight: 900;
+  font-weight: 700;
   color: var(--color-accent);
   line-height: 1;
   margin-bottom: var(--space-2);

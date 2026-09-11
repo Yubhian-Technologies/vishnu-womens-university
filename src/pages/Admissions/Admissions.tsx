@@ -1,16 +1,16 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
 import './Admissions.css';
 import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
 import AdmissionApplyForm from '../../components/AdmissionApplyForm/AdmissionApplyForm';
 import { useOrderedCollection } from '../../hooks/useCollection';
-import { useContentBlocks, useEapcetCode } from '../../hooks/useContentBlocks';
+import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { useSitePhotos, useSectionHasPhotos } from '../../hooks/useSitePhotos';
 import { useSiteContact, telHref } from '../../hooks/useSiteContact';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import type { FaqDoc } from '../Admin/sections/FaqAdmin';
-import { ClipboardList, Users, Phone, Mail, MapPin, Sparkles, BarChart2 } from 'lucide-react';
+import { ClipboardList, Users, Phone, Mail, MapPin, Sparkles } from 'lucide-react';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import { useHashScroll } from '../../hooks/useHashScroll';
 import { dotTech } from '../../lib/academicDegreeNames';
@@ -98,13 +98,15 @@ export default function Admissions() {
   const tuitionData = useContentBlocks('admissions', 'tuitionData');
   const admissionHub = useContentBlocks('admissions', 'admissionHub');
   const visitOptions = useContentBlocks('admissions', 'visitOptions');
-  const eapcetCode = useEapcetCode();
   const admissionsPhotos = useSitePhotos('admissions', 'main', defaultAdmissionsPhotos);
   const ugPhotos = useSitePhotos('admissions', 'ug', defaultUgPhotos);
   const hasUgPhotos = useSectionHasPhotos('admissions', 'ug');
   const pgPhotos = useSitePhotos('admissions', 'pg', defaultPgPhotos);
   const hasPgPhotos = useSectionHasPhotos('admissions', 'pg');
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [rankYear, setRankYear] = useState<'2026-27' | '2025-26'>('2026-27');
+  const [rankCollege, setRankCollege] = useState<'VISW' | 'VISWPU'>('VISW');
+  const [rankProgramme, setRankProgramme] = useState<string>('all');
   useEffect(() => {
     document.title = "Admissions | Vishnu Women's University";
     const observer = new IntersectionObserver(
@@ -152,10 +154,9 @@ export default function Admissions() {
           </div>
 
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-8)' }}>
-            <span className="section-label">Admissions</span>
             <h2 className="section-title">Everything You Need to Apply</h2>
             <p className="section-desc" style={{ margin: '0 auto' }}>
-              Everything you need to apply — fees, step-by-step procedure, opening & closing ranks, and the application portal — in one place.
+              Find key information on programmes, eligibility, admission procedures, fees and AP EAPCET counselling.
             </p>
           </div>
           <div className="adm-hub-grid">
@@ -194,11 +195,12 @@ export default function Admissions() {
         <div className="container">
           <div className="adm-intro-grid">
             <div className="adm-intro-main reveal-left">
-              <span className="section-label">Your Journey to Excellence Starts Here</span>
-              <h2 className="section-title">Admissions at Vishnu Women’s University</h2>
+              <span className="section-label">Admissions at VWU</span>
+              <h2 className="section-title">Applying to Vishnu Women’s University</h2>
               <p className="adm-intro-text">
-                Admissions at Vishnu Women’s University open the door to an enriching educational experience shaped by world-class infrastructure, accomplished faculty, diverse academic opportunities, and a vibrant campus environment. Designed to be transparent, student-centric, and merit-driven, the admission process enables aspiring women learners to discover programmes that align with their ambitions and embark on a journey of academic excellence, personal growth, leadership, and lifelong achievement.
+                Admissions information is organised here to help students and families understand programmes, eligibility, fees, counselling and the application process.
               </p>
+              <Link to="/admission-procedure" className="btn btn-primary" style={{ marginTop: 'var(--space-4)' }}>Check Eligibility</Link>
             </div>
             <div className="adm-intro-hub-panel reveal-right">
               <div className="adm-intro-hub-icon"><Users size={22} strokeWidth={2} /></div>
@@ -218,12 +220,9 @@ export default function Admissions() {
       <section id="rank-analysis" className="section bg-white" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', maxWidth: 760, margin: '0 auto var(--space-10)' }}>
-            <span className="section-label" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
-              <BarChart2 size={16} /> AP EAPCET Cut-off Analysis
-            </span>
-            <h2 className="section-title">Opening and Ending Ranks Analysis of VWU in AP EAPCET 2026 – 27</h2>
+            <h2 className="section-title">AP EAPCET Opening & Closing Ranks</h2>
             <p className="section-desc" style={{ margin: '0 auto' }}>
-              Official branch-wise Opening and Closing ranks analysis for Vishnu Women's University in AP EAPCET 2026 – 27 counseling.
+              Official branch-wise Opening and Closing ranks analysis for Vishnu Women's University in AP EAPCET counseling.
             </p>
           </div>
 
@@ -232,75 +231,113 @@ export default function Admissions() {
               const num = parseInt(val.replace(/,/g, ''), 10);
               return isNaN(num) ? Infinity : num;
             };
-            const viswRows = eapcetRanksData
-              .filter(r => r.collegeCode === 'VISW')
-              .sort((a, b) => parseRank(a.endingRank2026) - parseRank(b.endingRank2026));
-            const viswpuRows = eapcetRanksData
-              .filter(r => r.collegeCode === 'VISWPU')
-              .sort((a, b) => parseRank(a.endingRank2026) - parseRank(b.endingRank2026));
+            const beginKey: keyof RankAnalysisItem = rankYear === '2026-27' ? 'beginRank2026' : 'beginRank2025';
+            const endKey: keyof RankAnalysisItem = rankYear === '2026-27' ? 'endingRank2026' : 'endingRank2025';
+            const collegeRows = eapcetRanksData.filter(r => r.collegeCode === rankCollege);
+            const programmeOptions = [...new Map(collegeRows.map(r => [r.code, r.course])).entries()];
+            const filteredRows = collegeRows
+              .filter(r => rankProgramme === 'all' || r.code === rankProgramme)
+              .sort((a, b) => parseRank(a[endKey]) - parseRank(b[endKey]));
+
+            const selectStyle: CSSProperties = {
+              border: '1.5px solid var(--color-light-gray)',
+              borderRadius: 'var(--radius-sm)',
+              padding: '0.65rem 0.9rem',
+              minHeight: 48,
+              fontSize: 'var(--text-sm)',
+              fontWeight: 600,
+              color: 'var(--color-primary)',
+              background: 'var(--color-white)',
+              cursor: 'pointer',
+              minWidth: 220,
+            };
+            const labelStyle: CSSProperties = {
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.35rem',
+              fontSize: 'var(--text-xs)',
+              fontWeight: 800,
+              color: 'var(--color-text-light)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.04em',
+            };
+
             return (
-          <div className="reveal" style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-6)', overflowX: 'auto', boxShadow: 'var(--shadow-sm)' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: 780 }}>
-              <thead>
-                <tr style={{ background: 'var(--color-primary)', color: 'var(--color-white)' }}>
-                  <th rowSpan={2} style={{ padding: 'var(--space-3)', fontSize: 'var(--text-xs)', fontWeight: 800, textAlign: 'center', borderRight: '1px solid rgba(255,255,255,0.15)' }}>S.No.</th>
-                  <th rowSpan={2} style={{ padding: 'var(--space-3)', fontSize: 'var(--text-xs)', fontWeight: 800, textAlign: 'center', borderRight: '1px solid rgba(255,255,255,0.15)' }}>Branch</th>
-                  <th rowSpan={2} style={{ padding: 'var(--space-3) var(--space-4)', fontSize: 'var(--text-xs)', fontWeight: 800, borderRight: '1px solid rgba(255,255,255,0.15)' }}>Course Name</th>
-                  <th colSpan={2} style={{ padding: 'var(--space-2) var(--space-3)', fontSize: 'var(--text-xs)', fontWeight: 800, textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,0.2)', borderRight: '1px solid rgba(255,255,255,0.15)' }}>2026 – 27 Ranks (OC)</th>
-                  <th colSpan={2} style={{ padding: 'var(--space-2) var(--space-3)', fontSize: 'var(--text-xs)', fontWeight: 800, textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,0.2)' }}>2025 – 26 Ranks (OC)</th>
-                </tr>
-                <tr style={{ background: 'var(--color-primary)', color: 'var(--color-white)', borderBottom: '2px solid var(--color-accent)' }}>
-                  <th style={{ padding: '0.4rem', fontSize: 'var(--text-xs)', fontWeight: 700, textAlign: 'center' }}>Begin Rank</th>
-                  <th style={{ padding: '0.4rem', fontSize: 'var(--text-xs)', fontWeight: 700, textAlign: 'center', borderRight: '1px solid rgba(255,255,255,0.15)' }}>Ending Rank</th>
-                  <th style={{ padding: '0.4rem', fontSize: 'var(--text-xs)', fontWeight: 700, textAlign: 'center' }}>Begin Rank</th>
-                  <th style={{ padding: '0.4rem', fontSize: 'var(--text-xs)', fontWeight: 700, textAlign: 'center' }}>Ending Rank</th>
-                </tr>
-              </thead>
-              <tbody>
-                {/* VISW Section */}
-                <tr style={{ background: 'rgba(0,47,25,0.08)', borderBottom: '1.5px solid var(--color-primary)' }}>
-                  <td colSpan={7} style={{ padding: '0.4rem 1rem', fontWeight: 800, fontSize: 'var(--text-xs)', color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    AP EAPCET College Code: VISW
-                  </td>
-                </tr>
-                {viswRows.map((row, idx) => (
-                  <tr key={`visw-${row.code}`} style={{ borderBottom: '1px solid var(--color-light-gray)', background: idx % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)' }}>
-                    <td style={{ padding: 'var(--space-3)', textAlign: 'center', fontWeight: 600, fontSize: 'var(--text-xs)', color: 'var(--color-text-light)' }}>{idx + 1}</td>
-                    <td style={{ padding: 'var(--space-3)', textAlign: 'center' }}>
-                      <span style={{ background: 'rgba(0,47,25,0.08)', color: 'var(--color-primary)', padding: '0.15rem 0.5rem', borderRadius: '4px', fontWeight: 800, fontSize: 'var(--text-xs)' }}>{row.code}</span>
-                    </td>
-                    <td style={{ padding: 'var(--space-3) var(--space-4)', fontWeight: 700, color: 'var(--color-primary)', fontSize: 'var(--text-xs)' }}>{row.course}</td>
-                    <td style={{ padding: 'var(--space-3)', textAlign: 'center', fontWeight: 700, color: '#1b5e20', fontSize: 'var(--text-xs)' }}>{row.beginRank2026}</td>
-                    <td style={{ padding: 'var(--space-3)', textAlign: 'center', fontWeight: 700, color: 'var(--color-primary)', fontSize: 'var(--text-xs)' }}>{row.endingRank2026}</td>
-                    <td style={{ padding: 'var(--space-3)', textAlign: 'center', fontWeight: 600, color: 'var(--color-text-light)', fontSize: 'var(--text-xs)' }}>{row.beginRank2025}</td>
-                    <td style={{ padding: 'var(--space-3)', textAlign: 'center', fontWeight: 600, color: 'var(--color-text-light)', fontSize: 'var(--text-xs)' }}>{row.endingRank2025}</td>
-                  </tr>
-                ))}
-                {/* VISWPU Section */}
-                <tr style={{ background: 'rgba(0,47,25,0.08)', borderTop: '2px solid var(--color-primary)', borderBottom: '1.5px solid var(--color-primary)' }}>
-                  <td colSpan={7} style={{ padding: '0.4rem 1rem', fontWeight: 800, fontSize: 'var(--text-xs)', color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    AP EAPCET College Code: VISWPU
-                  </td>
-                </tr>
-                {viswpuRows.map((row, idx) => (
-                  <tr key={`viswpu-${row.code}`} style={{ borderBottom: '1px solid var(--color-light-gray)', background: idx % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)' }}>
-                    <td style={{ padding: 'var(--space-3)', textAlign: 'center', fontWeight: 600, fontSize: 'var(--text-xs)', color: 'var(--color-text-light)' }}>{viswRows.length + idx + 1}</td>
-                    <td style={{ padding: 'var(--space-3)', textAlign: 'center' }}>
-                      <span style={{ background: 'rgba(0,47,25,0.08)', color: 'var(--color-primary)', padding: '0.15rem 0.5rem', borderRadius: '4px', fontWeight: 800, fontSize: 'var(--text-xs)' }}>{row.code}</span>
-                    </td>
-                    <td style={{ padding: 'var(--space-3) var(--space-4)', fontWeight: 700, color: 'var(--color-primary)', fontSize: 'var(--text-xs)' }}>{row.course}</td>
-                    <td style={{ padding: 'var(--space-3)', textAlign: 'center', fontWeight: 700, color: '#1b5e20', fontSize: 'var(--text-xs)' }}>{row.beginRank2026}</td>
-                    <td style={{ padding: 'var(--space-3)', textAlign: 'center', fontWeight: 700, color: 'var(--color-primary)', fontSize: 'var(--text-xs)' }}>{row.endingRank2026}</td>
-                    <td style={{ padding: 'var(--space-3)', textAlign: 'center', fontWeight: 600, color: 'var(--color-text-light)', fontSize: 'var(--text-xs)' }}>{row.beginRank2025}</td>
-                    <td style={{ padding: 'var(--space-3)', textAlign: 'center', fontWeight: 600, color: 'var(--color-text-light)', fontSize: 'var(--text-xs)' }}>{row.endingRank2025}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <div style={{ marginTop: 'var(--space-4)', fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', textAlign: 'right', fontStyle: 'italic' }}>
-              * Comparative Statement of Official AP EAPCET Cut-off Ranks (2026–27 vs 2025–26) for VWU (College Codes: VISW, VISWPU).
+          <>
+            <div className="reveal" style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-4)', justifyContent: 'center', marginBottom: 'var(--space-8)' }}>
+              <label style={labelStyle}>
+                Academic Year
+                <select
+                  value={rankYear}
+                  onChange={(e) => setRankYear(e.target.value as typeof rankYear)}
+                  style={selectStyle}
+                >
+                  <option value="2026-27">2026 – 27</option>
+                  <option value="2025-26">2025 – 26</option>
+                </select>
+              </label>
+              <label style={labelStyle}>
+                College Code
+                <select
+                  value={rankCollege}
+                  onChange={(e) => { setRankCollege(e.target.value as typeof rankCollege); setRankProgramme('all'); }}
+                  style={selectStyle}
+                >
+                  <option value="VISW">VISW</option>
+                  <option value="VISWPU">VISWPU</option>
+                </select>
+              </label>
+              <label style={labelStyle}>
+                Programme
+                <select
+                  value={rankProgramme}
+                  onChange={(e) => setRankProgramme(e.target.value)}
+                  style={selectStyle}
+                >
+                  <option value="all">All Programmes</option>
+                  {programmeOptions.map(([code, course]) => (
+                    <option key={code} value={code}>{course} ({code})</option>
+                  ))}
+                </select>
+              </label>
             </div>
-          </div>
+
+            <div className="reveal" style={{ background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-6)', overflowX: 'auto', boxShadow: 'var(--shadow-sm)' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: 560 }}>
+                <thead>
+                  <tr style={{ background: 'var(--color-primary)', color: 'var(--color-white)' }}>
+                    <th style={{ padding: 'var(--space-3)', fontSize: 'var(--text-xs)', fontWeight: 800, textAlign: 'center', borderRight: '1px solid rgba(255,255,255,0.15)' }}>S.No.</th>
+                    <th style={{ padding: 'var(--space-3)', fontSize: 'var(--text-xs)', fontWeight: 800, textAlign: 'center', borderRight: '1px solid rgba(255,255,255,0.15)' }}>Branch</th>
+                    <th style={{ padding: 'var(--space-3) var(--space-4)', fontSize: 'var(--text-xs)', fontWeight: 800, borderRight: '1px solid rgba(255,255,255,0.15)' }}>Course Name</th>
+                    <th style={{ padding: 'var(--space-3)', fontSize: 'var(--text-xs)', fontWeight: 800, textAlign: 'center', borderRight: '1px solid rgba(255,255,255,0.15)' }}>Begin Rank</th>
+                    <th style={{ padding: 'var(--space-3)', fontSize: 'var(--text-xs)', fontWeight: 800, textAlign: 'center' }}>Ending Rank</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredRows.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} style={{ padding: 'var(--space-6)', textAlign: 'center', color: 'var(--color-text-light)', fontSize: 'var(--text-sm)' }}>
+                        No rank data available for this selection.
+                      </td>
+                    </tr>
+                  ) : filteredRows.map((row, idx) => (
+                    <tr key={row.code} style={{ borderBottom: '1px solid var(--color-light-gray)', background: idx % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)' }}>
+                      <td style={{ padding: 'var(--space-3)', textAlign: 'center', fontWeight: 600, fontSize: 'var(--text-xs)', color: 'var(--color-text-light)' }}>{idx + 1}</td>
+                      <td style={{ padding: 'var(--space-3)', textAlign: 'center' }}>
+                        <span style={{ background: 'rgba(0,47,25,0.08)', color: 'var(--color-primary)', padding: '0.15rem 0.5rem', borderRadius: '4px', fontWeight: 800, fontSize: 'var(--text-xs)' }}>{row.code}</span>
+                      </td>
+                      <td style={{ padding: 'var(--space-3) var(--space-4)', fontWeight: 700, color: 'var(--color-primary)', fontSize: 'var(--text-xs)' }}>{row.course}</td>
+                      <td style={{ padding: 'var(--space-3)', textAlign: 'center', fontWeight: 700, color: '#1b5e20', fontSize: 'var(--text-xs)' }}>{row[beginKey]}</td>
+                      <td style={{ padding: 'var(--space-3)', textAlign: 'center', fontWeight: 700, color: 'var(--color-primary)', fontSize: 'var(--text-xs)' }}>{row[endKey]}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <div style={{ marginTop: 'var(--space-4)', fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', textAlign: 'right', fontStyle: 'italic' }}>
+                * Official AP EAPCET Cut-off Ranks (OC) for VWU — College Code: {rankCollege}, {rankYear} counseling.
+              </div>
+            </div>
+          </>
             );
           })()}
         </div>
@@ -311,11 +348,9 @@ export default function Admissions() {
         <div className="container">
           <div className="adm-tuition-grid">
             <div className="reveal-left">
-              <span className="section-label" style={{ color: 'var(--color-accent)' }}>Fee Structure</span>
-              <h2 className="section-title" style={{ color: 'var(--color-white)' }}>Education Within Reach</h2>
+              <h2 className="section-title" style={{ color: 'var(--color-white)' }}>Programme Fees</h2>
               <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 'var(--text-lg)', lineHeight: 1.7, marginBottom: 'var(--space-6)' }}>
-                At Vishnu Women's University, we are committed to making quality higher education
-                accessible to every deserving student.
+                View the applicable tuition fees and available fee-related information for each programme.
               </p>
               <Link to="/programmes-fee-structure" className="btn btn-accent">View Full Fee Structure</Link>
             </div>
@@ -335,21 +370,31 @@ export default function Admissions() {
       <section id="visit" className="section bg-off-white">
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', maxWidth: 600, margin: '0 auto var(--space-12)' }}>
-            <span className="section-label">Campus Visits</span>
             <h2 className="section-title">Come See VWU for Yourself</h2>
             <p className="section-desc" style={{ margin: '0 auto' }}>
-              Seeing VWU in person is the best way to know if it is the right fit for you. Choose the visit format that suits you best.
+              Explore the campus, academic facilities and student environment before making your decision.
             </p>
           </div>
           <div className="adm-visit-grid">
             {visitOptions.map((v) => {
               const Icon = resolveContentIcon(v.icon) || Users;
+              // CTA text is admin-editable via the card's "slug" field in
+              // Content Blocks admin (Admissions — Campus Visit Options).
+              // Falls back to a title-keyword guess for cards an admin
+              // hasn't set it on yet, so old/un-edited docs don't all show
+              // the same generic "Schedule a Visit".
+              const title = v.title.toLowerCase();
+              const cta = v.slug?.trim() || (title.includes('virtual')
+                ? 'Take the Virtual Tour'
+                : title.includes('book')
+                  ? 'Book a Campus Tour'
+                  : 'Schedule a Visit');
               return (
                 <div key={v.id} className="adm-visit-card">
                   <div className="adm-visit-icon"><Icon size={40} strokeWidth={1.75} /></div>
                   <h3>{dotTech(v.title)}</h3>
                   <p>{dotTech(v.desc)}</p>
-                  <Link to="/campus-visit" className="btn btn-outline" style={{ marginTop: 'auto' }}>Schedule Now</Link>
+                  <Link to="/campus-visit" className="btn btn-outline" style={{ marginTop: 'auto' }}>{cta}</Link>
                 </div>
               );
             })}
@@ -362,19 +407,15 @@ export default function Admissions() {
         <div className="container">
           <PhotoGrid
             images={admissionsPhotos}
-            label="Why VWU"
-            title="Experience the VWU Difference"
-            subtitle="From modern labs and smart classrooms to hostels, sports grounds, and a buzzing placement season — see what awaits you at VWU."
-            highlights={[
-              `AP EAPCET college code: ${eapcetCode}`,
-              '1,100+ placements in 2025–26',
-              'Highest package: ₹59.28 LPA',
-              '100% scholarship coverage available for eligible students',
-              'Campus visit & virtual tour options available',
-            ]}
+            label="WHY VWU"
+            title="A University Experience Designed Around Learning"
+            subtitle="Explore VWU's academic environment, campus facilities, student life and career support before making your choice."
             columns={2}
             layout="side-text"
           />
+          <div style={{ textAlign: 'center', marginTop: 'var(--space-8)' }}>
+            <Link to="/campus-visit" className="btn btn-primary btn-lg">Explore Campus →</Link>
+          </div>
         </div>
       </section>
 
@@ -413,7 +454,6 @@ export default function Admissions() {
         <div className="container">
           <div className="adm-contact-grid">
             <div className="reveal-left">
-              <span className="section-label">Contact Us</span>
               <h2 className="section-title">Talk to Our Admissions Team</h2>
               <p className="section-desc" style={{ marginBottom: 'var(--space-6)' }}>
                 Our admissions team is ready to answer your questions, walk you through each step,
@@ -463,7 +503,6 @@ export default function Admissions() {
       <section className="section bg-off-white">
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', maxWidth: 600, margin: '0 auto var(--space-12)' }}>
-            <span className="section-label">FAQ</span>
             <h2 className="section-title">Frequently Asked Questions</h2>
             <p className="section-desc" style={{ margin: '0 auto' }}>
               Common questions about joining VWU, answered. If you do not find what you are looking for, contact our admissions team directly.

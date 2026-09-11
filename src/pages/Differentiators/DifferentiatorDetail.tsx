@@ -252,7 +252,6 @@ export default function DifferentiatorDetail() {
         <section className="section bg-off-white">
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label">Reports</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Report Links</h2>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>

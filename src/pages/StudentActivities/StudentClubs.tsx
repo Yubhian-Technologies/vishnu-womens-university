@@ -71,7 +71,6 @@ export default function StudentClubs() {
             <div style={{ marginBottom: 'var(--space-10)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-2)' }}>
                 <cat.icon size={32} strokeWidth={1.75} />
-                <span className="section-label" style={{ position: 'static', marginBottom: 0 }}>{cat.label}</span>
               </div>
               <h2 className="section-title">{cat.label}</h2>
             </div>

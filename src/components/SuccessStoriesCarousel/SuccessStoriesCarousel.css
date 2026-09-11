@@ -1,0 +1,220 @@
+/* ==========================================================================
+   Success Stories Carousel — editorial, image-led, data-driven.
+   Any number of stories: cards are sized by flex-basis (not divided by a
+   fixed count), the list is triplicated for a seamless loop, and there's no
+   branch anywhere on "how many stories" — 1 story and 30 stories render
+   through the same markup.
+   ========================================================================== */
+
+.success-stories-section {
+  padding: var(--space-12) 0;
+  background:
+    radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.05) 1px, transparent 0) 0 0/24px 24px,
+    linear-gradient(135deg, #07142c 0%, var(--color-primary, #0b1e42) 100%);
+}
+
+.success-stories-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-6);
+  margin-bottom: var(--space-8);
+  flex-wrap: wrap;
+}
+
+.success-stories-title {
+  font-family: var(--font-serif);
+  font-size: var(--text-h2);
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0 0 0.4rem 0;
+}
+
+.success-stories-subtitle {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.78);
+  margin: 0;
+}
+
+.success-stories-arrows {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-shrink: 0;
+}
+
+.success-stories-arrow-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 200ms ease, border-color 200ms ease, transform 200ms ease;
+}
+
+.success-stories-arrow-btn:hover,
+.success-stories-arrow-btn:focus-visible {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-primary-dark, var(--color-primary));
+  transform: translateY(-2px);
+  outline: none;
+}
+
+/* Horizontal track — scroll-snap carries touch/swipe and mouse-wheel
+   scrolling for free; arrow buttons + keyboard just call scrollBy on it. */
+.success-stories-track {
+  display: flex;
+  gap: 1.5rem;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  scroll-snap-type: x proximity;
+  padding: 0.25rem 0 0.5rem 0;
+  margin: 0;
+}
+
+.success-stories-track::-webkit-scrollbar {
+  display: none;
+}
+
+.success-stories-track:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 4px;
+}
+
+/* ~3 cards visible on desktop with the next one peeking, ~2 on tablet, one
+   card (plus a peek) on mobile — sizes come from flex-basis percentages, not
+   a divide-by-story-count calculation, so the layout never depends on how
+   many stories exist. */
+.success-story-card-wrap {
+  flex: 0 0 30%;
+  max-width: 30%;
+  scroll-snap-align: start;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+@media (max-width: 1024px) {
+  .success-story-card-wrap {
+    flex-basis: 46%;
+    max-width: 46%;
+  }
+}
+
+@media (max-width: 640px) {
+  .success-stories-track {
+    gap: 1rem;
+  }
+  .success-story-card-wrap {
+    flex-basis: 86%;
+    max-width: 86%;
+  }
+}
+
+.success-story-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.success-story-photo-frame {
+  width: 100%;
+  /* Shorter than the previous 4/5 portrait crop so a full row of cards —
+     header, photo, and caption — fits within one screen without needing
+     to scroll inside the section on typical laptop viewport heights. */
+  aspect-ratio: 16 / 10;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--color-light-gray);
+  position: relative;
+}
+
+.success-story-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.success-story-photo-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(145deg, var(--color-off-white) 0%, var(--color-light-gray) 100%);
+}
+
+.success-story-photo-fallback span {
+  font-family: var(--font-serif);
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: var(--color-primary-dark, var(--color-primary));
+  letter-spacing: 0.03em;
+}
+
+.success-story-body {
+  padding-top: var(--space-4);
+}
+
+.success-story-desc {
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0 0 var(--space-3) 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.success-story-name {
+  font-family: var(--font-serif);
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.success-story-programme {
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  color: var(--color-accent-light, var(--color-accent));
+  margin: 0.15rem 0 0 0;
+}
+
+/* Thin scroll-progress readout — a low-key "there's more to explore" cue
+   instead of one dot per story (which wouldn't scale) or per group (which
+   isn't meaningful once the list loops infinitely). */
+.success-stories-progress {
+  width: 100%;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-full);
+  margin-top: var(--space-6);
+  overflow: hidden;
+}
+
+.success-stories-progress-bar {
+  height: 100%;
+  background: var(--color-accent);
+  border-radius: var(--radius-full);
+  transition: width 150ms linear;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .success-stories-track {
+    scroll-behavior: auto;
+  }
+  .success-stories-progress-bar {
+    transition: none;
+  }
+}

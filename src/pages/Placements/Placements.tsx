@@ -66,8 +66,7 @@ export default function Placements() {
       <section className="section bg-white">
         <div className="container">
           <div className="reveal" style={{ marginBottom: 'var(--space-8)' }}>
-            <span className="section-label">Placement Statistics</span>
-            <h2 className="section-title">Placements, Year by Year</h2>
+            <h2 className="section-title">Our Students Career Destinations</h2>
             <p style={{ color: 'var(--color-text-light)', maxWidth: 640, lineHeight: 1.7 }}>
               A full batch-wise record of every recruiter, number of selects, and package offered — updated season by season by the Training & Placement Office.
             </p>
@@ -81,10 +80,9 @@ export default function Placements() {
       <section className="section bg-off-white">
         <div className="container">
           <div className="reveal" style={{ marginBottom: 'var(--space-10)' }}>
-            <span className="section-label">Training & Placement Office</span>
             <h2 className="section-title">Explore Placements at VWU</h2>
             <p style={{ color: 'var(--color-text-light)', maxWidth: 640, lineHeight: 1.7 }}>
-              Career outcomes, campus recruitment, industry partnerships, and higher education pathways — everything in one place.
+              View placement outcomes, recruiting organisations and career-development initiatives across the University.
             </p>
           </div>
 

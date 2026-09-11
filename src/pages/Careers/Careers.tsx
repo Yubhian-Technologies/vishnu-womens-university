@@ -182,7 +182,6 @@ export default function Careers() {
       <section id="careers-content" className="section bg-off-white" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>
-            <span className="section-label">Why VWU</span>
             <h2 className="section-title">Why Work With Us</h2>
             <p className="section-desc" style={{ margin: '0 auto' }}>
               VWU is a place where faculty and staff grow alongside students — in a focused, research-oriented academic environment.
@@ -208,7 +207,6 @@ export default function Careers() {
       <section className="section bg-white">
         <div className="container">
           <div className="reveal" style={{ marginBottom: 'var(--space-10)' }}>
-            <span className="section-label">Openings</span>
             <h2 className="section-title">Current Openings</h2>
             <p className="section-desc">Applications from qualified candidates across all departments are accepted throughout the year.</p>
           </div>
@@ -246,7 +244,6 @@ export default function Careers() {
         <div className="container">
           <div style={{ maxWidth: 720, margin: '0 auto' }}>
             <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-10)' }}>
-              <span className="section-label">Apply</span>
               <h2 className="section-title">Submit Your Application</h2>
               <p className="section-desc">Complete the form below and a member of our HR team will be in contact within 5–7 working days.</p>
             </div>
@@ -334,7 +331,6 @@ export default function Careers() {
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-14) 0' }}>
         <div className="container" style={{ textAlign: 'center' }}>
           <div className="reveal">
-            <span className="section-label" style={{ color: 'var(--color-accent)' }}>Questions?</span>
             <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>Reach Out to HR</h2>
             <p style={{ color: 'rgba(255,255,255,0.8)', maxWidth: 480, margin: '0 auto var(--space-6)', lineHeight: 1.7 }}>
               For questions about available roles, eligibility requirements, or the selection process, write to us at <strong style={{ color: 'var(--color-accent)' }}>{email}</strong> or call <strong style={{ color: 'var(--color-accent)' }}>{phone}</strong>.

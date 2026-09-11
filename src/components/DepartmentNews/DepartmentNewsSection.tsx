@@ -56,7 +56,6 @@ export default function DepartmentNewsSection({ programSlug, background = 'var(-
     <section id="news" className="section" style={{ background, scrollMarginTop: NAV_OFFSET }}>
       <div className="container">
         <div style={{ marginBottom: 'var(--space-10)' }}>
-          <span className="section-label">Latest Updates</span>
           <h2 className="section-title">News &amp; Events</h2>
           <p className="section-desc">
             Announcements, events, achievements and activities from the department.

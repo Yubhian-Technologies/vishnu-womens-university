@@ -4,7 +4,7 @@ import { useSitePhotos } from '../../hooks/useSitePhotos';
 import SmoothImage from '../SmoothImage/SmoothImage';
 import './CampusLifeShowcase.css';
 
-const DEFAULT_CAMPUS_LIFE_IMAGE = '/images/vibrant-campus.png';
+const DEFAULT_CAMPUS_LIFE_IMAGE = '/images/campus-vibrant.jpeg';
 
 const defaultShowcasePhoto = [
   {
@@ -34,14 +34,13 @@ export default function CampusLifeShowcase() {
         <div className="campus-showcase-content">
           {/* Main Title */}
           <h2 className="campus-showcase-title">
-            Where Every Day Becomes Part of Your Journey
+            Your Journey, Your Way
           </h2>
 
           {/* Lead Paragraph */}
           <div className="campus-showcase-desc">
-            <p>At Vishnu Women&rsquo;s University, campus life is an experience in becoming finding your voice, discovering your strengths, and building the confidence to shape what comes next.</p>
-            <p>Here, classrooms extend into innovation labs, racing tracks, sports arenas, cultural stages, and student-led communities by celebrating culture, pursuing technology, excelling in sport, and creating lasting friendships, every experience opens a new possibility.</p>
-            <p>It is a campus where curiosity becomes courage, ideas become action, and ambition finds its purpose.</p>
+            <p>Most of what happens outside class here is run by students. Clubs are led by students, the annual fest is organised by students, and the student council is elected by the campus each year.</p>
+            <p>Twenty-two clubs. Eight sports teams. One fest, one technical symposium, and a council that decides how both are run.</p>
             <p>Discover. Create. Connect. Lead.<br />Your journey begins here.</p>
           </div>
 
@@ -87,7 +86,7 @@ export default function CampusLifeShowcase() {
               </div>
               <div className="campus-showcase-pillar-bottom">
                 <span className="campus-showcase-pillar-label">
-                  Student clubs &amp;<br />Leadreship bodies
+                  Student clubs &amp;<br />Leadership bodies
                 </span>
                 <span className="campus-showcase-pillar-arrow" aria-hidden="true">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -110,7 +109,7 @@ export default function CampusLifeShowcase() {
               </div>
               <div className="campus-showcase-pillar-bottom">
                 <span className="campus-showcase-pillar-label">
-                  Sports, fitness &amp;<br />Wellness arenas
+                  Sports, fitness &amp;<br />Wellness
                 </span>
                 <span className="campus-showcase-pillar-arrow" aria-hidden="true">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

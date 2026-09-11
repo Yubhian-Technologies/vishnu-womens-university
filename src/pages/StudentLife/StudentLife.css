@@ -59,7 +59,7 @@
 .sl-housing-name {
   font-family: var(--font-serif);
   font-size: var(--text-lg);
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-white);
   margin-bottom: 2px;
 }

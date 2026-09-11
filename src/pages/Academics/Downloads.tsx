@@ -41,7 +41,6 @@ export default function AcademicDownloads() {
       <section id="downloads-content" className="section bg-white">
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>
-            <span className="section-label">Academics</span>
             <h2 className="section-title">Downloadable Resources</h2>
             <p className="section-desc" style={{ margin: '0 auto' }}>
               Download the latest course curriculum, academic calendar, and academic regulations documents.

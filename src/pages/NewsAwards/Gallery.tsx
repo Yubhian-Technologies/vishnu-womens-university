@@ -97,7 +97,6 @@ export default function Gallery() {
       <section className="section bg-off-white">
         <div className="container">
           <div className="reveal" style={{ marginBottom: 'var(--space-6)' }}>
-            <span className="section-label">Campus Archive</span>
             <h2 className="section-title">Milestones by Year</h2>
             <p style={{ color: 'var(--color-text-light)', maxWidth: 600, lineHeight: 1.7 }}>
               A visual index of major campus events and milestones across the years.
