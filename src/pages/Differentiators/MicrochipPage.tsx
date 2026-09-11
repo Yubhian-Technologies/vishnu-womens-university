@@ -3,12 +3,11 @@ import type { CustomSection } from '../../lib/customSections';
 import { CustomSectionsGalleries, CustomSectionsAccordion } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import SmoothCollapse from '../../components/SmoothCollapse/SmoothCollapse';
 import { microchipEmbedded } from './microchipEmbedded.data';
-import { 
-  Target, 
-  Compass, 
-  Mail, 
-  Phone, 
-  ExternalLink, 
+import {
+  Target,
+  Compass,
+  Mail,
+  ExternalLink,
   BookOpen,
   Radio,
   ChevronDown
@@ -127,12 +126,6 @@ export default function MicrochipPage({ customSections = [] }: MicrochipPageProp
                         <a href={`mailto:${team.inCharge.email}`}>{team.inCharge.email}</a>
                       </div>
                     )}
-                    {team.inCharge.mobile && (
-                      <div className="mc-contact-item">
-                        <Phone size={15} color="#c9973a" />
-                        <span>{team.inCharge.mobile}</span>
-                      </div>
-                    )}
                     {team.inCharge.interests && (
                       <div className="mc-contact-item">
                         <BookOpen size={15} color="#c9973a" />
@@ -177,12 +170,6 @@ export default function MicrochipPage({ customSections = [] }: MicrochipPageProp
                         <div style={{ wordBreak: 'break-all' }}>
                           <Mail size={13} style={{ display: 'inline', marginRight: 4 }} />
                           <a href={`mailto:${member.email}`} style={{ color: '#0b1e42' }}>{member.email}</a>
-                        </div>
-                      )}
-                      {member.mobile && (
-                        <div>
-                          <Phone size={13} style={{ display: 'inline', marginRight: 4 }} />
-                          <span>{member.mobile}</span>
                         </div>
                       )}
                       {member.profileLink && (

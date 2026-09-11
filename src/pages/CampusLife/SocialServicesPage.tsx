@@ -13,7 +13,7 @@ import {
 import SEO from '../../components/SEO/SEO';
 import { smoothScrollTo } from '../../lib/smoothScroll';
 import { useOrderedCollection } from '../../hooks/useCollection';
-import { useSitePhotos } from '../../hooks/useSitePhotos';
+import { useSitePhotos, useSitePhotosLoading } from '../../hooks/useSitePhotos';
 import { usePageBanners } from '../../hooks/usePageBanners';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import type { CampusLifeItemDoc } from '../Admin/sections/CampusLifeAdmin';
@@ -46,12 +46,20 @@ export default function SocialServicesPage() {
   // are reasonable places an admin would look to change it. A Hero Banners
   // upload wins when one exists; the Website Photos "hero" slot is the
   // fallback otherwise.
-  const { slides: heroBanners } = usePageBanners('social-services');
+  const { slides: heroBanners, loading: heroBannersLoading } = usePageBanners('social-services');
 
   // Real-time site photos, each editable from /admin → Website Photos →
   // Student Life → Social Services (NSS) — see DEFAULT_SECTIONS['social-services']
   // in SitePhotosAdmin.tsx for the matching gallery definitions.
   const heroPhotos = useSitePhotos('social-services', 'hero', HERO_DEFAULT);
+  // Until BOTH the Hero Banners and Website Photos listeners have actually
+  // responded, an admin-uploaded photo can't be told apart from "none
+  // uploaded yet" — rendering the hardcoded default image immediately would
+  // flash it on every load/refresh before swapping to the real uploaded one
+  // a moment later. Shares useSitePhotos' one subscription (not a separate
+  // listener), so this resolves at the exact same moment the photos do.
+  const sitePhotosLoading = useSitePhotosLoading();
+  const photosLoading = heroBannersLoading || sitePhotosLoading;
   const introPhotos = useSitePhotos('social-services', 'main', INTRO_DEFAULT);
   const founderPhotos = useSitePhotos('social-services', 'founder-legacy', FOUNDER_DEFAULT);
   const communityPhotos = useSitePhotos('social-services', 'communities', COMMUNITY_DEFAULTS);
@@ -92,9 +100,9 @@ export default function SocialServicesPage() {
     }
   };
 
-  const heroBg = heroBanners[0]?.imageUrl || heroPhotos[0]?.src || '/images/campus-vibrant.jpeg';
-  const plantingImg = introPhotos[0]?.src || '/images/1000074551.jpg';
-  const founderImg = founderPhotos[0]?.src || '/images/governing-body-founder.jpg';
+  const heroBg = photosLoading ? undefined : (heroBanners[0]?.imageUrl || heroPhotos[0]?.src || '/images/campus-vibrant.jpeg');
+  const plantingImg = photosLoading ? undefined : (introPhotos[0]?.src || '/images/1000074551.jpg');
+  const founderImg = photosLoading ? undefined : (founderPhotos[0]?.src || '/images/governing-body-founder.jpg');
 
   return (
     <main className="ss-page page-wrapper">
@@ -106,7 +114,7 @@ export default function SocialServicesPage() {
       {/* ====================================================================
           1. HERO BANNER
           ==================================================================== */}
-      <section className="ss-hero-container" style={{ backgroundImage: `url('${heroBg}')` }}>
+      <section className="ss-hero-container" style={heroBg ? { backgroundImage: `url('${heroBg}')` } : undefined}>
         <div className="ss-hero-overlay" />
         
         <div className="ss-hero-content">
@@ -191,13 +199,17 @@ export default function SocialServicesPage() {
                 Social Services (NSS) → "NSS at VWU" → "Edit Text") shows as
                 a small label over the photo when an admin sets one. */}
             <div className="ss-nss-img-box">
-              <img
-                src={plantingImg}
-                alt="VWU Students Planting Sapling in NSS Drive"
-                onError={(e) => {
-                  (e.currentTarget as HTMLImageElement).src = '/images/campus-vibrant.jpeg';
-                }}
-              />
+              {plantingImg ? (
+                <img
+                  src={plantingImg}
+                  alt="VWU Students Planting Sapling in NSS Drive"
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src = '/images/campus-vibrant.jpeg';
+                  }}
+                />
+              ) : (
+                <div className="ss-img-skeleton" style={{ height: '390px' }} />
+              )}
               {introPhotos[0]?.caption && (
                 <div className="ss-nss-img-caption">{introPhotos[0].caption}</div>
               )}
@@ -440,11 +452,15 @@ export default function SocialServicesPage() {
           <div className="ss-legacy-card-grid">
             {/* Left: Founder Photo with Quote Overlay */}
             <div className="ss-founder-img-box">
-              <img
-                src={founderImg}
-                alt="Padma Bhushan Dr. B. V. Raju"
-                onError={(e) => { (e.currentTarget as HTMLImageElement).src = PHOTO_NEEDED_PLACEHOLDER; }}
-              />
+              {founderImg ? (
+                <img
+                  src={founderImg}
+                  alt="Padma Bhushan Dr. B. V. Raju"
+                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = PHOTO_NEEDED_PLACEHOLDER; }}
+                />
+              ) : (
+                <div className="ss-img-skeleton" style={{ height: '360px' }} />
+              )}
               <div className="ss-founder-overlay">
                 {/* The photo's own caption (Website Photos → Social
                     Services (NSS) → Founder's Legacy → "Edit Text")

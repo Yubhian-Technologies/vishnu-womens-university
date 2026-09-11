@@ -56,7 +56,12 @@
 .cts-hero-scrim {
   position: absolute;
   inset: 0;
-  background: linear-gradient(100deg, #f7f4ee 0%, #f7f4ee 42%, rgba(247, 244, 238, 0.55) 62%, rgba(247, 244, 238, 0.1) 100%);
+  /* A simple left-to-right fade (a steep angle + many close stops rendered
+     as a solid block covering the whole hero in some browsers) — even the
+     "solid" part behind the text column stays slightly translucent so the
+     photo is never fully hidden, fully clear by mid-width so the photo's
+     subject in the middle/right isn't veiled. */
+  background: linear-gradient(to right, rgba(247, 244, 238, 0.86) 0%, rgba(247, 244, 238, 0.86) 16%, rgba(247, 244, 238, 0.12) 34%, rgba(247, 244, 238, 0) 42%);
 }
 
 .cts-hero-doodle {
@@ -72,11 +77,18 @@
   text-align: right;
 }
 
-.cts-hero-content {
+.cts-hero-inner {
   position: relative;
   z-index: 1;
-  max-width: 620px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
   padding: var(--space-10) var(--space-8);
+  box-sizing: border-box;
+}
+
+.cts-hero-content {
+  max-width: 440px;
 }
 
 .cts-hero-pills {
@@ -98,7 +110,7 @@
 
 .cts-hero-title {
   font-family: var(--font-serif);
-  font-size: clamp(1.8rem, 3.4vw, 2.5rem);
+  font-size: clamp(1.6rem, 2.6vw, 2.1rem);
   font-weight: 700;
   color: var(--color-primary);
   line-height: 1.15;
@@ -107,9 +119,8 @@
 
 .cts-hero-sub {
   color: var(--color-text-light);
-  font-size: var(--text-base);
+  font-size: var(--text-sm);
   line-height: 1.6;
-  max-width: 480px;
   margin: 0 0 var(--space-6);
 }
 
@@ -214,25 +225,68 @@
 
 .cts-objectives-doodle {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--space-3);
-  color: var(--color-text-light);
+  gap: var(--space-6);
 }
 
 .cts-doodle-text {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-size: var(--text-sm);
-  text-align: center;
-  line-height: 1.3;
-  transform: rotate(-3deg);
+  position: relative;
+  font-family: "Caveat", var(--font-serif);
+  font-weight: 700;
+  font-size: 1.7rem;
+  color: var(--color-primary);
+  line-height: 1.15;
+  transform: rotate(-2deg);
+}
+
+/* A short hand-drawn-style underline beneath "Grow" (the text's last line). */
+.cts-doodle-text::after {
+  content: '';
+  display: block;
+  width: 64%;
+  height: 3px;
+  margin-top: 2px;
+  background: var(--color-accent);
+  border-radius: var(--radius-full);
+  transform: rotate(-2deg);
+}
+
+.cts-doodle-chip-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 84px;
+  height: 84px;
 }
 
 .cts-doodle-chip {
-  color: var(--color-accent);
-  opacity: 0.85;
+  position: relative;
+  z-index: 1;
+}
+
+.cts-doodle-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(6px);
+  opacity: 0.55;
+}
+
+.cts-doodle-blob--green {
+  width: 54px;
+  height: 54px;
+  top: -6px;
+  left: -6px;
+  background: #cfe0c2;
+}
+
+.cts-doodle-blob--orange {
+  width: 44px;
+  height: 44px;
+  bottom: -8px;
+  right: -10px;
+  background: #f3d9ae;
 }
 
 /* Gallery — CustomSectionsGalleries renders its own "Gallery" label above
@@ -241,19 +295,37 @@
   display: none;
 }
 
-/* Modules */
+/* Modules — a 2-column index whose rows expand in place; align-items:start
+   keeps an expanded row's height from stretching its row-mate in the other
+   column (CSS Grid rows otherwise match the tallest cell in that row). */
 .cts-modules-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-2) var(--space-8);
+  align-items: start;
+  gap: var(--space-3) var(--space-8);
 }
 
 .cts-module-row {
+  border: 1px solid #f0ece1;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: border-color var(--transition-fast);
+}
+
+.cts-module-row.is-open {
+  border-color: var(--color-accent);
+}
+
+.cts-module-trigger {
   display: flex;
   align-items: center;
+  width: 100%;
   gap: var(--space-3);
-  padding: var(--space-3) var(--space-2);
-  border-bottom: 1px solid #f0ece1;
+  padding: var(--space-3);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
 }
 
 .cts-module-icon {
@@ -277,6 +349,20 @@
 
 .cts-module-arrow {
   color: var(--color-mid-gray);
+  flex-shrink: 0;
+  transition: transform var(--transition-fast);
+}
+
+.cts-module-row.is-open .cts-module-arrow {
+  transform: rotate(180deg);
+  color: var(--color-accent);
+}
+
+.cts-module-body {
+  padding: 0 var(--space-4) var(--space-4) calc(30px + var(--space-3) + var(--space-3));
+  font-size: var(--text-sm);
+  color: var(--color-text-light);
+  line-height: 1.7;
 }
 
 @media (max-width: 860px) {

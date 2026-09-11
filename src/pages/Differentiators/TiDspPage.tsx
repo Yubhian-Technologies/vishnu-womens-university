@@ -3,11 +3,10 @@ import type { CustomSection } from '../../lib/customSections';
 import { CustomSectionsGalleries, CustomSectionsAccordion } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import SmoothCollapse from '../../components/SmoothCollapse/SmoothCollapse';
 import { tiDspCoe } from './tiDspCoe.data';
-import { 
-  Target, 
-  Compass, 
-  Mail, 
-  Phone, 
+import {
+  Target,
+  Compass,
+  Mail,
   BookOpen,
   ChevronDown
 } from 'lucide-react';
@@ -152,12 +151,6 @@ export default function TiDspPage({ customSections = [] }: TiDspPageProps) {
                         <a href={`mailto:${team.inCharge.email}`}>{team.inCharge.email}</a>
                       </div>
                     )}
-                    {team.inCharge.mobile && (
-                      <div className="ti-contact-item">
-                        <Phone size={15} color="#c9973a" />
-                        <span>{team.inCharge.mobile}</span>
-                      </div>
-                    )}
                     {team.inCharge.interests && (
                       <div className="ti-contact-item">
                         <BookOpen size={15} color="#c9973a" />
@@ -190,12 +183,6 @@ export default function TiDspPage({ customSections = [] }: TiDspPageProps) {
                         <div style={{ wordBreak: 'break-all' }}>
                           <Mail size={13} style={{ display: 'inline', marginRight: 4 }} />
                           <a href={`mailto:${member.email}`} style={{ color: '#0b1e42' }}>{member.email}</a>
-                        </div>
-                      )}
-                      {member.mobile && (
-                        <div>
-                          <Phone size={13} style={{ display: 'inline', marginRight: 4 }} />
-                          <span>{member.mobile}</span>
                         </div>
                       )}
                     </div>
