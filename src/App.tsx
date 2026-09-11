@@ -83,8 +83,10 @@ const Campus = lazyWithRetry(() => import('./pages/Campus/Campus'));
 const Sports = lazyWithRetry(() => import('./pages/Campus/Sports'));
 const SportsDetail = lazyWithRetry(() => import('./pages/Campus/SportsDetail'));
 const CampusLifeDetail = lazyWithRetry(() => import('./pages/CampusLife/CampusLifeDetail'));
+const SocialServicesPage = lazyWithRetry(() => import('./pages/CampusLife/SocialServicesPage'));
 const SewageTreatment = lazyWithRetry(() => import('./pages/Campus/SewageTreatment'));
 const WellnessCenter = lazyWithRetry(() => import('./pages/Campus/WellnessCenter'));
+const FitnessCentre = lazyWithRetry(() => import('./pages/Campus/FitnessCentre'));
 const Television = lazyWithRetry(() => import('./pages/Campus/Television'));
 const HealthCare = lazyWithRetry(() => import('./pages/Campus/HealthCare'));
 const Temples = lazyWithRetry(() => import('./pages/Campus/Temples'));
@@ -217,6 +219,7 @@ function PublicApp() {
             <Route path="/campus/sports/:id" element={<SportsDetail />} />
             <Route path="/campus/clubs" element={<Clubs />} />
             <Route path="/campus/food-courts" element={<FoodCourts />} />
+            <Route path="/campus/fitness-centre" element={<FitnessCentre />} />
             <Route path="/campus/:slug" element={<CampusLifeDetail />} />
             <Route path="/information" element={<Information />} />
             <Route path="/programmes-fee-structure" element={<ProgrammesFee />} />
@@ -226,7 +229,7 @@ function PublicApp() {
             <Route path="/vishnu-tv-academy" element={<CampusLifeDetail slug="vishnu-tv-academy" />} />
             <Route path="/student-clubs" element={<StudentClubs />} />
             <Route path="/student-clubs/:slug" element={<StudentClubDetail />} />
-            <Route path="/social-services" element={<CampusLifeDetail slug="social-services" />} />
+            <Route path="/social-services" element={<SocialServicesPage />} />
             <Route path="/campus-magazines" element={<CampusLifeDetail slug="campus-magazines" />} />
             <Route path="/arts-culture" element={<CampusLifeDetail slug="arts-culture" />} />
             <Route path="/sports-games" element={<CampusLifeDetail slug="sports-games" />} />
