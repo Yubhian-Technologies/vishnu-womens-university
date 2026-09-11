@@ -250,7 +250,6 @@ const navItemsData: NavItem[] = [
       { label: 'Vishnu TV Academy', path: '/vishnu-tv-academy' },
       { label: 'Clubs', path: '/campus/clubs' },
       { label: 'Student Clubs', path: '/student-clubs' },
-      { label: 'Arts & Culture', path: '/arts-culture' },
       { label: 'Vishnu School of Music', path: 'https://svesschoolofmusic.in/', external: true },
       { label: 'Social Services', path: '/social-services' },
     ],

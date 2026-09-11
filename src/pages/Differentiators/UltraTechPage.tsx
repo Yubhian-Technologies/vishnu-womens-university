@@ -2,12 +2,11 @@ import { useState } from 'react';
 import type { CustomSection } from '../../lib/customSections';
 import { CustomSectionsGalleries, SectionSubtree } from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import { ultraTechCoe } from './ultraTechCoe.data';
-import { 
-  Target, 
-  Compass, 
-  Mail, 
-  Phone, 
-  BookOpen, 
+import {
+  Target,
+  Compass,
+  Mail,
+  BookOpen,
   ChevronRight,
   Users,
   Calendar,
@@ -504,12 +503,6 @@ export default function UltraTechPage({
                             <a href={`mailto:${inCharge.email}`} className="utec-contact-chip">
                               <Mail size={14} className="utec-chip-icon" />
                               <span>{inCharge.email}</span>
-                            </a>
-                          )}
-                          {inCharge.mobile && (
-                            <a href={`tel:${inCharge.mobile}`} className="utec-contact-chip">
-                              <Phone size={14} className="utec-chip-icon" />
-                              <span>+91 {inCharge.mobile}</span>
                             </a>
                           )}
                         </div>
