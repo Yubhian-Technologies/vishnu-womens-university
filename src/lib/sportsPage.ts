@@ -37,17 +37,17 @@ export interface SportsCategoryDoc {
   gallery?: SportsGalleryImage[];
 }
 
-// Collegewise Tournaments — photo card with date range, live status, location & tags.
+// Collegewise Tournaments — photo-only cards displayed in an auto-sliding strip.
 export interface SportsTournamentDoc {
-  title: string;
+  title?: string;          // optional — no longer shown on the card
   imageUrl: string;
   storagePath: string;
   order: number;
 }
 
-// Medals & Achievements — just a photo and a name.
+// Medals & Achievements — photo-only cards displayed in a gallery grid.
 export interface SportsAchievementDoc {
-  title: string;
+  title?: string;          // optional — no longer shown on the card
   order: number;
   imageUrl?: string;
   storagePath?: string;
