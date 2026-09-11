@@ -1,0 +1,430 @@
+/* MEDA & PLM CoE Senior UI/UX Theme (Fixed Height & Zero Extra White Space) */
+
+.meda-plm-container {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 var(--space-2, 0.5rem);
+}
+
+/* Hero MoU Banner Section */
+.meda-hero-banner {
+  position: relative;
+  background: linear-gradient(135deg, #0B1E42 0%, #162E5C 60%, #0B1E42 100%);
+  border-radius: var(--radius-lg, 12px);
+  padding: var(--space-4, 1rem) var(--space-5, 1.25rem);
+  color: #FFFFFF;
+  margin-bottom: var(--space-3, 0.75rem);
+  box-shadow: 0 8px 20px rgba(11, 30, 66, 0.12);
+  border: 1px solid rgba(201, 151, 58, 0.35);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3, 0.75rem);
+}
+
+@media (min-width: 900px) {
+  .meda-hero-banner.has-photo {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    align-items: center;
+    gap: var(--space-4, 1rem);
+  }
+}
+
+.meda-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(201, 151, 58, 0.2);
+  border: 1px solid #C9973A;
+  color: #F8DA8D;
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.65rem;
+  border-radius: 9999px;
+  margin-bottom: var(--space-1, 0.25rem);
+}
+
+.meda-hero-text {
+  font-size: 0.975rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.94);
+  font-weight: 400;
+  margin: 0;
+}
+
+/* Full-Width Section Header Banner */
+.meda-section-block {
+  margin-bottom: var(--space-3, 0.75rem);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.04);
+  border-radius: var(--radius-lg, 12px);
+  overflow: hidden;
+  border: 1px solid #E2E8F0;
+}
+
+.meda-section-banner {
+  position: relative;
+  background: linear-gradient(90deg, #0B1E42 0%, #1A3668 100%);
+  padding: var(--space-2, 0.5rem) var(--space-4, 1rem);
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid #C9973A;
+}
+
+.meda-section-banner-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2, 0.5rem);
+}
+
+.meda-section-num {
+  background: #C9973A;
+  color: #0B1E42;
+  font-weight: 900;
+  font-size: 0.75rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+}
+
+.meda-section-name {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+/* Glassmorphism Content Box inside Section Block */
+.meda-glass-card {
+  background: #FFFFFF;
+  padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
+}
+
+.meda-glass-split {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-3, 0.75rem);
+  align-items: start; /* Fix: Prevent vertical stretching between text and photo columns */
+}
+
+@media (min-width: 992px) {
+  .meda-glass-split.has-photo {
+    grid-template-columns: 1fr 300px;
+  }
+  .meda-glass-split.has-photo.reverse {
+    grid-template-columns: 300px 1fr;
+  }
+  .meda-glass-split.no-photo {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Section Photo Frame */
+.meda-photo-frame {
+  position: relative;
+  border-radius: var(--radius-md, 8px);
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(11, 30, 66, 0.12);
+  cursor: pointer;
+  background: #0B1E42;
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  border: 1.5px solid #C9973A;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  height: fit-content;
+}
+
+.meda-photo-frame:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 8px 20px rgba(11, 30, 66, 0.18);
+}
+
+.meda-photo-frame-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.35s ease;
+}
+
+.meda-photo-frame:hover .meda-photo-frame-img {
+  transform: scale(1.04);
+}
+
+.meda-photo-frame-caption {
+  position: absolute;
+  bottom: 0;
+  inset-x: 0;
+  background: linear-gradient(to top, rgba(11, 30, 66, 0.92) 0%, transparent 100%);
+  padding: var(--space-2, 0.5rem);
+  color: #FFFFFF;
+  font-size: 0.7rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Software Tools Display */
+.meda-tools-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 0.5rem);
+  margin-bottom: var(--space-2, 0.5rem);
+}
+
+.meda-tool-pill-card {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-left: 3px solid #0070AD;
+  border-radius: var(--radius-md, 6px);
+  padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2, 0.5rem);
+  transition: all 0.2 ease;
+  height: fit-content;
+}
+
+.meda-tool-pill-card:hover {
+  background: #FFFFFF;
+  border-color: #0070AD;
+  box-shadow: 0 2px 8px rgba(0, 112, 173, 0.08);
+}
+
+.meda-tool-icon-wrap {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  background: rgba(0, 112, 173, 0.1);
+  color: #0070AD;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.meda-tool-desc {
+  font-size: 0.85rem;
+  color: #334155;
+  line-height: 1.4;
+}
+
+.meda-tool-title {
+  font-weight: 800;
+  color: #0B1E42;
+}
+
+/* Technical Concepts Card */
+.meda-concepts-panel {
+  background: #F1F5F9;
+  border-radius: var(--radius-md, 6px);
+  padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
+  border: 1px solid #E2E8F0;
+}
+
+.meda-concepts-header {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #0B1E42;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-1, 0.25rem);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1, 0.25rem);
+}
+
+.meda-concepts-grid {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1, 0.25rem);
+}
+
+.meda-concept-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2, 0.5rem);
+  font-size: 0.825rem;
+  color: #334155;
+  line-height: 1.35;
+}
+
+.meda-concept-check {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #0B1E42;
+  color: #C9973A;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.55rem;
+  font-weight: 900;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.meda-closing-note {
+  font-size: 0.825rem;
+  color: #475569;
+  line-height: 1.45;
+  margin-top: var(--space-2, 0.5rem);
+  padding-top: var(--space-2, 0.5rem);
+  border-top: 1px dashed #CBD5E1;
+  font-style: italic;
+}
+
+/* Outcomes Cards Grid - FIXED ALIGN-ITEMS START to prevent card stretching */
+.meda-outcomes-wrapper {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-2, 0.5rem);
+  align-items: start; /* Fix: Prevent shorter cards from stretching to match longer cards */
+}
+
+@media (min-width: 640px) {
+  .meda-outcomes-wrapper {
+    grid-template-columns: 1fr 1fr;
+    align-items: start; /* Fix: Prevent parallel row stretching */
+  }
+}
+
+.meda-outcome-box {
+  background: #F8FAFC;
+  border-radius: var(--radius-md, 6px);
+  padding: var(--space-3, 0.75rem);
+  border: 1px solid #E2E8F0;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2, 0.5rem);
+  transition: all 0.2s ease;
+  height: fit-content; /* Fix: Strict content fit height */
+}
+
+.meda-outcome-box:hover {
+  background: #FFFFFF;
+  border-color: #C9973A;
+  box-shadow: 0 4px 10px rgba(201, 151, 58, 0.1);
+}
+
+.meda-outcome-icon-wrap {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: rgba(11, 30, 66, 0.08);
+  color: #0B1E42;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.meda-outcome-desc {
+  font-size: 0.825rem;
+  color: #334155;
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* Highlights & Facilities Matrix Grid - FIXED ALIGN-ITEMS START */
+.meda-matrix-wrapper {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-3, 0.75rem);
+  margin-bottom: var(--space-3, 0.75rem);
+  align-items: start; /* Fix: Prevent matrix card row stretching */
+}
+
+@media (min-width: 768px) {
+  .meda-matrix-wrapper {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+}
+
+.meda-matrix-card {
+  background: #FFFFFF;
+  border-radius: var(--radius-lg, 12px);
+  border: 1px solid #E2E8F0;
+  padding: var(--space-3, 0.75rem);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 0.5rem);
+  height: fit-content; /* Fix: Strict content fit height */
+}
+
+.meda-matrix-head {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #0B1E42;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2, 0.5rem);
+}
+
+.meda-matrix-items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1, 0.25rem);
+}
+
+.meda-matrix-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2, 0.5rem);
+  font-size: 0.825rem;
+  color: #334155;
+  background: #F8FAFC;
+  padding: var(--space-1, 0.25rem) var(--space-2, 0.5rem);
+  border-radius: var(--radius-md, 6px);
+  border: 1px solid #E2E8F0;
+}
+
+/* Modal Lightbox */
+.meda-lightbox-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(11, 30, 66, 0.92);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4, 1rem);
+}
+
+.meda-lightbox-content {
+  position: relative;
+  max-width: 90vw;
+  max-height: 85vh;
+}
+
+.meda-lightbox-img {
+  max-width: 100%;
+  max-height: 85vh;
+  border-radius: var(--radius-lg, 12px);
+  object-fit: contain;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+}
+
+.meda-lightbox-close {
+  position: absolute;
+  top: -40px;
+  right: 0;
+  background: transparent;
+  border: none;
+  color: #FFFFFF;
+  font-size: 2rem;
+  cursor: pointer;
+}
