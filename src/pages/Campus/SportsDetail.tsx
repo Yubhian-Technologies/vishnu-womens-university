@@ -1,10 +1,12 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import { useDocument } from '../../hooks/useDocument';
 import type { SportsCategoryDoc } from '../../lib/sportsPage';
 import './SportsDetail.css';
+
+const GALLERY_PREVIEW_COUNT = 3;
 
 // One detail page per "Explore Our Sports" tile, addressed by Firestore doc
 // id (no slug field to manage / no collision risk if two sports share a
@@ -14,6 +16,7 @@ import './SportsDetail.css';
 export default function SportsDetail() {
   const { id } = useParams<{ id: string }>();
   const { data: sport, loading } = useDocument<SportsCategoryDoc>('sportsCategories', id);
+  const [showAllPhotos, setShowAllPhotos] = useState(false);
 
   useEffect(() => {
     document.title = sport ? `${sport.title} | Sports | VWU` : 'Sports | VWU';
@@ -67,12 +70,19 @@ export default function SportsDetail() {
           <div className="container">
             <h2 className="sports-detail__section-title">Gallery</h2>
             <div className="sports-detail__gallery">
-              {gallery.map((g, i) => (
+              {(showAllPhotos ? gallery : gallery.slice(0, GALLERY_PREVIEW_COUNT)).map((g, i) => (
                 <div className="sports-detail__gallery-item" key={g.storagePath || i}>
                   <img src={g.url} alt={`${sport.title} ${i + 1}`} loading="lazy" />
                 </div>
               ))}
             </div>
+            {gallery.length > GALLERY_PREVIEW_COUNT && (
+              <div className="sports-detail__gallery-more">
+                <button type="button" className="sports-detail__gallery-more-btn" onClick={() => setShowAllPhotos((v) => !v)}>
+                  {showAllPhotos ? 'Show Less' : 'Show More'}
+                </button>
+              </div>
+            )}
           </div>
         </section>
       )}

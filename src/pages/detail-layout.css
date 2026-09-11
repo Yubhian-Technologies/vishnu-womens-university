@@ -1,8 +1,3 @@
-/* ===== Department page — section label ===== */
-.dept-section-label {
-  position: relative;
-}
-
 .detail-grid {
   display: grid;
   grid-template-columns: 1fr 360px;
@@ -1252,6 +1247,685 @@ td.pb-activities-num {
   background: var(--color-primary);
 }
 
+/* ===== Placements section title — eyebrow label + gold squiggle
+   underline beside a large heading, and the department Placements-only
+   circular/rectangular stat treatment (scoped to dept-placement-* so the
+   shared .dept-stat-grid used elsewhere on the site is untouched). ===== */
+.dept-placement-title-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.5rem;
+  margin: 0 auto var(--space-6);
+}
+
+.dept-placement-eyebrow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  margin-bottom: var(--space-2);
+}
+
+.dept-placement-eyebrow span {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--color-text);
+}
+
+.dept-placement-squiggle {
+  width: 64px;
+  height: 13px;
+  color: var(--color-accent);
+}
+
+.dept-placement-stats-wrap {
+  margin-bottom: var(--space-8);
+}
+
+.dept-placement-stats-circles {
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+  gap: clamp(1rem, 2.5vw, 2.5rem);
+  margin-bottom: 1.5rem;
+}
+
+.dept-placement-stat-circle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+/* Circles fill the full width of the row — each grows to occupy its
+   1/4 share of the section, so together the row spans edge-to-edge. */
+.dept-placement-stat-circle__ring {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  border: 2px solid var(--color-light-gray);
+  background: radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--color-accent) 10%, transparent) 0%, transparent 70%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 1.5rem;
+  box-sizing: border-box;
+  transition: border-color 150ms ease;
+}
+
+.dept-placement-stat-circle__ring:hover {
+  border-color: #000;
+}
+
+.dept-placement-stat-circle__value {
+  font-family: var(--font-serif);
+  font-size: clamp(1.6rem, 3.2vw, 3.2rem);
+  font-weight: 700;
+  color: var(--color-primary-dark, var(--color-primary));
+  text-align: center;
+  line-height: 1.1;
+}
+
+.dept-placement-stat-circle__label {
+  font-family: var(--font-sans);
+  font-size: clamp(0.75rem, 1.1vw, 1rem);
+  font-weight: 700;
+  color: var(--color-text);
+  text-align: center;
+  line-height: 1.35;
+  max-width: 80%;
+}
+
+@media (max-width: 640px) {
+  .dept-placement-stats-circles {
+    flex-wrap: wrap;
+  }
+
+  .dept-placement-stat-circle {
+    flex: 1 1 calc(50% - 0.5rem);
+  }
+}
+
+.dept-placement-stats-rects {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+}
+
+.dept-placement-stat-rect {
+  flex: 1 1 170px;
+  background: linear-gradient(135deg, #0B1E42 0%, #132a54 100%);
+  border: 1px solid rgba(201, 151, 58, 0.3);
+  border-radius: 14px;
+  padding: 1rem 1.25rem;
+  text-align: center;
+  transition: border-color 200ms ease, box-shadow 200ms ease;
+}
+
+.dept-placement-stat-rect:hover {
+  border-color: #000000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.dept-placement-stat-rect__value {
+  font-family: var(--font-sans);
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.dept-placement-stat-rect__label {
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: rgba(247, 248, 250, 0.82);
+  margin-top: 0.35rem;
+}
+
+/* Tie-Ups & MoUs section wrapper — deliberately not .dept-section-navy:
+   Core Values (above) and Testimonials (below) already use a dark navy
+   field each, so a third one back-to-back read as the same block repeated.
+   A light, gold-tinted surface instead — ties to the "partnerships/
+   prestige" semantics of the section and keeps the white logo tiles
+   (.dept-recruiter-tile) reading exactly as they already do on Top
+   Recruiters' white background above. */
+.dept-tieups-surface {
+  background:
+    radial-gradient(circle at 88% 8%, rgba(201, 168, 76, 0.14) 0%, transparent 50%),
+    var(--color-off-white);
+  border-top: 1px solid var(--color-light-gray);
+  border-bottom: 1px solid var(--color-light-gray);
+}
+
+/* ===== Top Recruiters — 4-column logo grid, rectangular tiles filling
+   the full section width. ===== */
+.dept-recruiters-title {
+  font-family: var(--font-serif);
+  font-size: 1.6rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--color-primary-dark, var(--color-primary));
+  margin: 0 0 var(--space-5) 0;
+}
+
+.dept-recruiters-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  width: 100%;
+  gap: 0;
+}
+
+.dept-recruiter-tile {
+  aspect-ratio: 3 / 1.4;
+  background: var(--color-white);
+  border: 1px solid var(--color-light-gray);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 2rem;
+  box-sizing: border-box;
+  box-shadow: var(--shadow-sm);
+  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+}
+
+.dept-recruiter-tile:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-accent);
+}
+
+.dept-recruiter-tile img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+/* Tie-Ups & MoUs uses the same tile as Top Recruiters but with the partner
+   name always visible underneath the logo (RecruiterTile's `showName`
+   prop) — Top Recruiters stays logo-only/unchanged since it doesn't pass
+   that prop. */
+.dept-recruiter-tile--named {
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 1.1rem 1rem 0.85rem;
+}
+
+.dept-recruiter-tile--named img {
+  max-height: 55%;
+  flex-shrink: 0;
+}
+
+.dept-recruiter-tile-name {
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-text-light);
+  text-align: center;
+  line-height: 1.3;
+}
+
+/* Shown instead of a broken image when a name has no known logo domain —
+   the tile itself is always a white card regardless of section bg, so
+   dark text reads fine in both the light and navy alternating sections. */
+.dept-recruiter-tile--fallback span {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-primary-dark, var(--color-primary));
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .dept-recruiters-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Tie-Ups & MoUs — circular tiles matching the circular partner logos on
+   the Research MoUs page (.pb-grid-logo above), instead of Top Recruiters'
+   rectangular cards. Added alongside .dept-recruiters-grid on the Tie-Ups
+   & MoUs grid only (DepartmentDetail.tsx) — Top Recruiters keeps its
+   existing rectangular tile since it doesn't get this extra class. */
+.dept-recruiters-grid--circular {
+  grid-template-columns: repeat(6, 1fr);
+  justify-items: center;
+  gap: var(--space-6) var(--space-3);
+}
+
+.dept-recruiters-grid--circular .dept-recruiter-tile {
+  aspect-ratio: auto;
+  background: none;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+}
+
+.dept-recruiters-grid--circular .dept-recruiter-tile:hover {
+  transform: none;
+}
+
+.dept-recruiters-grid--circular .dept-recruiter-tile--named img,
+.dept-recruiters-grid--circular .dept-recruiter-tile--fallback {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: var(--color-white);
+  border: 1.5px solid var(--color-light-gray);
+  box-shadow: var(--shadow-sm);
+  box-sizing: border-box;
+  transition: box-shadow 200ms ease, border-color 200ms ease;
+}
+
+.dept-recruiters-grid--circular .dept-recruiter-tile--named img {
+  object-fit: contain;
+  padding: 1rem;
+}
+
+.dept-recruiters-grid--circular .dept-recruiter-tile--fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem;
+}
+
+.dept-recruiters-grid--circular .dept-recruiter-tile--fallback span {
+  font-size: 0.68rem;
+}
+
+.dept-recruiters-grid--circular .dept-recruiter-tile--named:hover img,
+.dept-recruiters-grid--circular .dept-recruiter-tile--fallback:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-accent);
+}
+
+@media (max-width: 900px) {
+  .dept-recruiters-grid--circular {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .dept-recruiters-grid--circular {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .dept-recruiters-grid--circular .dept-recruiter-tile--named img,
+  .dept-recruiters-grid--circular .dept-recruiter-tile--fallback {
+    width: 80px;
+    height: 80px;
+  }
+}
+
+/* ===== Department Profile — editorial "at a glance" section (replaces
+   the earlier five-equal-cards Rankings grid). Establishments,
+   Accreditations and Programme Intake are unbounded per-programme arrays
+   (see DepartmentDetail.tsx), so nothing here assumes a fixed count:
+   .dept-timeline / .dept-intake-list / .dept-accreditation-list all grow by
+   adding rows, and ExpandableGroup caps what renders up front behind a
+   "View all" toggle instead of stretching the section. Hierarchy comes from
+   large serif figures + thin hairline dividers rather than five identical
+   card surfaces; the Leadership panel is the one surface that keeps a
+   shadow, since it doubles as a tap target to the full HOD profile below. */
+.dept-profile-section {
+  padding: var(--space-12) 0;
+  background:
+    radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--color-primary) 6%, transparent) 1px, transparent 0) 0 0/22px 22px,
+    var(--color-white);
+  border-top: 4px solid var(--color-accent);
+  position: relative;
+}
+
+.dept-profile-header {
+  margin-bottom: var(--space-8);
+}
+
+.dept-profile-eyebrow {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  margin-bottom: 0.5rem;
+}
+
+.dept-profile-header .section-title {
+  margin: 0;
+}
+
+/* Two-column editorial grid — Academic Journey / Programmes & Intake, then
+   Accreditation / Leadership — each pair stacking to one column below
+   860px (see media query) so nothing gets squeezed. */
+.dept-profile-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-10);
+  padding-top: var(--space-8);
+  border-top: 1px solid var(--color-light-gray);
+}
+
+.dept-profile-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.dept-profile-panel-head {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.dept-profile-panel-head svg {
+  color: var(--color-accent);
+  flex-shrink: 0;
+}
+
+.dept-profile-panel-head h3 {
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--color-primary-dark, var(--color-primary));
+  margin: 0;
+}
+
+/* Academic Journey — a true vertical timeline: a connecting line down the
+   left edge with a dot marker per entry, not just a plain year/label list. */
+.dept-timeline {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  padding-left: 1.6rem;
+}
+
+.dept-timeline::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  background: var(--color-light-gray);
+}
+
+.dept-timeline-item {
+  display: flex;
+  align-items: baseline;
+  gap: 0.9rem;
+  padding: 0.6rem 0;
+  position: relative;
+}
+
+.dept-timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -1.6rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-white);
+}
+
+.dept-timeline-year {
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--color-accent);
+  flex-shrink: 0;
+  min-width: 5.5rem;
+}
+
+.dept-timeline-label {
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  color: var(--color-text);
+}
+
+/* Programmes & Intake — a colorful table: a tinted header row and a
+   subtle alternating row tint, with the seat count as a solid badge
+   rather than plain right-aligned text. */
+.dept-intake-list {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.dept-intake-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.6rem 0.75rem;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  color: var(--color-text);
+}
+
+.dept-intake-row:nth-of-type(even) {
+  background: color-mix(in srgb, var(--color-accent) 6%, var(--color-off-white));
+}
+
+.dept-intake-row--head {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #ffffff;
+  background: var(--color-primary-dark, var(--color-primary)) !important;
+}
+
+.dept-intake-seats {
+  font-family: var(--font-serif);
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: var(--color-primary-dark, var(--color-primary));
+  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+  border-radius: 9999px;
+  padding: 0.15rem 0.7rem;
+  justify-self: end;
+}
+
+/* Accreditation — an icon badge next to each accredited programme, name
+   stacked over its status. */
+.dept-accreditation-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.dept-accreditation-row {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--color-light-gray);
+}
+
+.dept-accreditation-row:last-of-type {
+  border-bottom: none;
+}
+
+.dept-accreditation-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+  color: var(--color-accent);
+}
+
+.dept-accreditation-programme {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-light);
+}
+
+.dept-accreditation-status {
+  display: block;
+  font-family: var(--font-serif);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-primary-dark, var(--color-primary));
+}
+
+/* Accreditation Image — full-width image mode when admin uploads an image */
+.dept-accreditation-image-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.dept-accreditation-image-wrapper {
+  position: relative;
+  width: 100%;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--color-off-white);
+}
+
+.dept-accreditation-image-wrapper img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+}
+
+.dept-accreditation-image-label {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: var(--space-3) var(--space-4);
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+  color: var(--color-white);
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* AP EAPCET Code — highlighted panel in the profile grid (was a small
+   pill in the page footer; moved here, into Department Leadership's old
+   slot, and given equivalent visual weight to the other profile panels). */
+.dept-profile-eapcet {
+  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-white));
+  border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  text-decoration: none;
+  color: inherit;
+  box-shadow: var(--shadow-sm);
+  transition: transform 220ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 220ms ease, border-color 220ms ease, background-color 220ms ease;
+}
+
+.dept-profile-eapcet:hover,
+.dept-profile-eapcet:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 20%, var(--color-white));
+  outline: none;
+}
+
+.dept-eapcet-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-top: var(--space-2);
+}
+
+.dept-eapcet-code {
+  font-family: var(--font-serif);
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--color-accent);
+}
+
+.dept-eapcet-hint {
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  color: var(--color-text-light);
+}
+
+.dept-eapcet-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: var(--space-2);
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--color-primary-dark, var(--color-primary));
+}
+
+.dept-profile-eapcet:hover .dept-eapcet-cta {
+  color: var(--color-accent);
+}
+
+/* "View all" — one shared trigger style for every ExpandableGroup instance
+   instead of a bespoke toggle per list. */
+.dept-profile-viewmore {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  align-self: flex-start;
+  margin-top: 0.5rem;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-accent);
+  cursor: pointer;
+}
+
+.dept-profile-viewmore:hover,
+.dept-profile-viewmore:focus-visible {
+  color: var(--color-primary-dark, var(--color-primary));
+  outline: none;
+}
+
+.dept-profile-viewmore-icon {
+  transition: transform 200ms ease;
+}
+
+.dept-profile-viewmore-icon.is-open {
+  transform: rotate(180deg);
+}
+
+@media (max-width: 860px) {
+  .dept-profile-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+  }
+}
+
 .placement-stat-summary {
   font-family: var(--font-sans);
   font-size: var(--text-base);
@@ -1865,35 +2539,37 @@ td.pb-activities-num {
   }
 }
 
+/* Plain stacked label/value rows — no pill/chip box chrome */
 .dept-fact-chip-entry {
   display: flex;
   flex-direction: column;
-  padding: 0.5rem 1rem;
-  background: rgba(10, 20, 42, 0.65);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 20px;
-  transition: background-color 150ms ease, border-color 150ms ease, transform 150ms ease;
-  min-height: 50px;
+  padding: 0.4rem 0;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0;
+  transition: border-color 150ms ease;
+  min-height: 0;
   justify-content: center;
   box-sizing: border-box;
 }
 
 .dept-fact-chip-entry:hover {
-  background: rgba(10, 20, 42, 0.95);
+  background: transparent;
   border-color: rgba(201, 151, 58, 0.3);
-  transform: translateY(-1px);
+  transform: none;
 }
 
 .dept-fact-chip-link {
   text-decoration: none;
   color: inherit;
   display: block;
-  border-radius: 20px;
+  border-radius: 0;
 }
 
 .dept-fact-chip-link .dept-fact-chip-entry {
-  background: rgba(201, 151, 58, 0.12);
-  border-color: rgba(201, 151, 58, 0.35);
+  background: transparent;
+  border-color: rgba(201, 151, 58, 0.2);
   cursor: pointer;
 }
 
@@ -2062,6 +2738,13 @@ td.pb-activities-num {
   margin-bottom: var(--space-2);
 }
 
+.dept-about-body {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: var(--space-8);
+  align-items: stretch;
+}
+
 .dept-about-card {
   background: linear-gradient(180deg, var(--color-white) 0%, var(--color-off-white) 100%);
   border: 1.5px solid var(--color-light-gray);
@@ -2072,10 +2755,39 @@ td.pb-activities-num {
   position: relative;
 }
 
+/* Fit image, no inner gaps/margins — fills its column edge-to-edge */
+.dept-about-media {
+  border-radius: 22px;
+  overflow: hidden;
+  min-height: 320px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.dept-about-media-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  margin: 0;
+  padding: 0;
+}
+
+@media (max-width: 900px) {
+  .dept-about-body {
+    grid-template-columns: 1fr;
+  }
+
+  .dept-about-media {
+    min-height: 240px;
+    order: -1;
+  }
+}
+
 .dept-about-lead-text {
   color: var(--color-text);
   line-height: 1.9;
-  font-size: 1.02rem;
+  font-size: 1.15rem;
   white-space: pre-line;
   margin: 0;
   letter-spacing: 0.005em;
@@ -2103,7 +2815,7 @@ td.pb-activities-num {
 .dept-about-stat-value {
   font-family: var(--font-serif);
   font-size: 1.15rem;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--color-primary-dark, var(--color-primary));
   line-height: 1.2;
 }
@@ -2165,7 +2877,7 @@ td.pb-activities-num {
 
 .dept-highlight-text {
   font-family: var(--font-sans);
-  font-size: var(--text-sm);
+  font-size: var(--text-base);
   color: var(--color-text);
   line-height: 1.45;
   font-weight: 600;
@@ -2433,7 +3145,7 @@ td.pb-activities-num {
 
 .dept-labs-section {
   background: linear-gradient(180deg, var(--color-white) 0%, #fcfbf8 100%);
-  padding: clamp(3.5rem, 6vw, 5.5rem) 0;
+  padding: clamp(4rem, 7vw, 6.5rem) 0;
   position: relative;
 }
 
@@ -2754,8 +3466,8 @@ td.pb-activities-num {
 
 .dept-vm-body-text {
   font-family: var(--font-sans);
-  font-size: 0.92rem;
-  line-height: 1.75;
+  font-size: 1.05rem;
+  line-height: 1.8;
   color: #475569;
   margin: 0;
 }
@@ -2774,8 +3486,8 @@ td.pb-activities-num {
   align-items: flex-start;
   gap: 0.75rem;
   font-family: var(--font-sans);
-  font-size: 0.88rem;
-  line-height: 1.65;
+  font-size: 1rem;
+  line-height: 1.7;
   color: #334155;
 }
 
@@ -2792,7 +3504,34 @@ td.pb-activities-num {
   margin-top: 0.15rem;
 }
 
-/* Core Values Pill Box */
+/* ===== Reusable navy section — the "dark" half of the department page's
+   alternating white/navy rhythm. Overrides every text element that
+   otherwise hardcodes a dark color, so nothing mixes into the background. ===== */
+.dept-section-navy {
+  background:
+    radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.05) 1px, transparent 0) 0 0/24px 24px,
+    linear-gradient(135deg, #07142c 0%, var(--color-primary, #0b1e42) 100%);
+}
+
+.dept-section-navy .section-title,
+.dept-section-navy .section-desc,
+.dept-section-navy h2,
+.dept-section-navy h3,
+.dept-section-navy p {
+  color: #ffffff;
+}
+
+.dept-section-navy .section-desc {
+  opacity: 0.78;
+}
+
+/* Core Values Pill Box — keeps its own navy card look by default (used
+   standalone, e.g. ProgramDetail.tsx's 3-card Vision/Mission/Core Values
+   grid on a light background). When nested inside .dept-section-navy (the
+   Core Values section on DepartmentDetail.tsx / StandaloneDepartmentDetail
+   .tsx), the section itself is already the navy field, so the override
+   below flattens this box to a transparent grouping wrapper instead of
+   stacking two navy surfaces. */
 .dept-values-card {
   grid-column: 1 / -1;
   background: linear-gradient(135deg, #07142c 0%, var(--color-primary, #0b1e42) 100%);
@@ -2800,6 +3539,12 @@ td.pb-activities-num {
   padding: clamp(1.75rem, 3.5vw, 2.5rem);
   box-shadow: 0 12px 34px rgba(19, 48, 36, 0.2);
   color: #ffffff;
+}
+
+.dept-section-navy .dept-values-card {
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
 }
 
 .dept-values-header {
@@ -3023,7 +3768,7 @@ td.pb-activities-num {
 
 .dept-highlight-text {
   font-family: var(--font-sans);
-  font-size: 0.88rem;
+  font-size: 1rem;
   line-height: 1.6;
   color: #1e293b;
   margin: 0;
@@ -3533,10 +4278,10 @@ td.pb-activities-num {
 }
 
 .dept-hero-subtitle {
-  font-size: clamp(1rem, 1.8vw, 1.25rem);
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
   font-weight: 500;
   color: rgba(255, 255, 255, 0.9);
-  line-height: 1.5;
+  line-height: 1.55;
   margin: 0 0 1.85rem 0;
   max-width: 640px;
 }
@@ -3955,7 +4700,7 @@ td.pb-activities-num {
   grid-template-columns: 4fr 6fr;
   flex: 0 0 100%;
   max-width: 100%;
-  min-height: 300px;
+  min-height: clamp(340px, 42vw, 480px);
   scroll-snap-align: start;
   background: #ffffff;
   border: 1px solid #e4e7ec;
@@ -3979,11 +4724,6 @@ td.pb-activities-num {
   font-weight: 800;
   letter-spacing: 0.08em;
   color: #c9973a;
-}
-
-.dept-lab-slide-icon {
-  color: #1e3b75;
-  margin-top: 0.35rem;
 }
 
 .dept-lab-slide-title {
@@ -4133,7 +4873,10 @@ td.pb-activities-num {
 
 /* ===== Unified Programme Hub Card Section ===== */
 .programme-hub-section {
-  background: var(--color-off-white, #f8fafc);
+  background:
+    radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--color-primary) 6%, transparent) 1px, transparent 0) 0 0/22px 22px,
+    var(--color-off-white, #f8fafc);
+  border-top: 4px solid var(--color-accent);
   padding: clamp(3rem, 5vw, 4.5rem) 0;
 }
 
@@ -4715,55 +5458,51 @@ td.pb-activities-num {
 .dept-horizontal-quicknav-container {
   display: flex;
   justify-content: center;
+  width: 100%;
 }
 
 .dept-horizontal-quicknav-pill {
   display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 0.5rem;
+  align-items: stretch;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
   background: rgba(255, 255, 255, 0.9) !important;
   backdrop-filter: blur(20px) saturate(180%) !important;
   -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
   border: 1px solid rgba(255, 255, 255, 0.75) !important;
   border-radius: 15.43px !important;
-  padding: 0.55rem 0.85rem !important;
-  box-shadow: 0 14px 36px -6px rgba(11, 30, 66, 0.16), 
+  padding: 0.4rem !important;
+  box-shadow: 0 14px 36px -6px rgba(11, 30, 66, 0.16),
               0 4px 14px -2px rgba(0, 0, 0, 0.08) !important;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  width: max-content;
-  max-width: 100%;
+  width: 100%;
   box-sizing: border-box;
   margin: 0 auto;
 }
 
 @media (min-width: 1024px) {
   .dept-horizontal-quicknav-pill {
-    gap: 0.65rem;
-    padding: 0.65rem 1.15rem !important;
+    gap: 0.5rem;
+    padding: 0.5rem !important;
   }
-}
-
-.dept-horizontal-quicknav-pill::-webkit-scrollbar {
-  display: none;
 }
 
 .dept-quicknav-link {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.55rem 1.15rem;
+  flex: 1 1 auto;
+  min-width: fit-content;
+  min-height: 48px;
+  padding: 0.5rem 1rem;
   border-radius: 10px;
   font-family: var(--font-sans);
-  font-size: 0.92rem;
+  font-size: 0.86rem;
   font-weight: 700;
   color: #1e293b;
   text-decoration: none;
   white-space: nowrap;
   transition: background-color 180ms ease, color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
-  flex-shrink: 0;
 }
 
 .dept-quicknav-link:hover {
@@ -4890,6 +5629,563 @@ td.pb-activities-num {
 .dept-compact-program-card:hover .dept-compact-card-footer {
   color: var(--color-accent, #c9973a);
 }
+
+/* ===== Department FAQ accordion — same shape as Admissions.css's
+   .adm-faq-* rules, kept here since detail-layout.css is the shared
+   stylesheet for department/program pages. ===== */
+.dept-faq-list {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.dept-faq-card {
+  background: var(--color-white);
+  border: 1px solid var(--color-light-gray);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: box-shadow var(--transition-fast);
+}
+
+.dept-faq-card.open {
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-accent);
+}
+
+.dept-faq-question {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-6);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.dept-faq-question:hover {
+  background: var(--color-off-white);
+}
+
+.dept-faq-collapse {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition: grid-template-rows 0.3s ease, opacity 0.25s ease;
+}
+
+.dept-faq-card.open .dept-faq-collapse {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.dept-faq-collapse-inner {
+  overflow: hidden;
+  min-height: 0;
+}
+
+.dept-faq-answer {
+  padding: 0 var(--space-6) var(--space-5);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  color: var(--color-text-light);
+  line-height: 1.7;
+  border-top: 1px solid var(--color-light-gray);
+  padding-top: var(--space-4);
+}
+
+/* ===== Testimonials — a "quote wall": translucent glass card floating on
+   a warm spotlight gradient, for a bold contrast moment against the
+   lighter sections around it. Deliberately its own gradient/pattern (not
+   Core Values' deep navy dot-grid) — a soft gold glow on --color-secondary
+   blue instead of a repeating dot texture on near-black — so it doesn't
+   read as the same dark section shown twice on this page. ===== */
+.dept-testimonials-navy {
+  background:
+    radial-gradient(circle at 20% 15%, rgba(201, 168, 76, 0.18) 0%, transparent 48%),
+    linear-gradient(160deg, var(--color-secondary, #1e3a8a) 0%, #0b1e42 100%);
+}
+
+.dept-testimonials-navy .section-title,
+.dept-testimonials-navy .section-desc {
+  color: #ffffff;
+}
+
+.dept-testimonials-navy .section-desc {
+  opacity: 0.78;
+}
+
+/* Single-card vertical carousel — one testimonial at a time, with a
+   vertical dot rail alongside it (rather than the previous 3-card grid). */
+@keyframes deptTestimonialSlideIn {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.dept-testimonial-single {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  max-width: 820px;
+  margin: 0 auto;
+}
+
+.dept-testimonial-single-dots {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  flex-shrink: 0;
+}
+
+.dept-testimonial-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 200ms ease, background-color 200ms ease, box-shadow 200ms ease;
+}
+
+.dept-testimonial-dot:hover {
+  background: rgba(255, 255, 255, 0.6);
+  transform: scale(1.15);
+}
+
+/* Stays circular (matches M3's state-indicator convention — scale + a soft
+   focus-ring halo, not an elongated pill) rather than stretching. */
+.dept-testimonial-dot.active {
+  background: var(--color-accent);
+  transform: scale(1.3);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-accent) 25%, transparent);
+}
+
+.dept-testimonial-single-card {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-left: 4px solid var(--color-accent);
+  border-radius: var(--radius-lg);
+  padding: var(--space-8);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.18);
+  animation: deptTestimonialSlideIn 450ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dept-testimonial-single-media {
+  flex-shrink: 0;
+}
+
+.dept-testimonial-single-photo {
+  width: 128px;
+  height: 128px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--color-accent);
+}
+
+.dept-testimonial-single-photo-fallback {
+  width: 128px;
+  height: 128px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  border: 3px solid var(--color-accent);
+}
+
+.dept-testimonial-single-photo-fallback span {
+  font-family: var(--font-serif);
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.dept-testimonial-single-body {
+  min-width: 0;
+}
+
+.dept-testimonial-single-quote-mark {
+  display: block;
+  font-family: var(--font-serif);
+  font-size: 3rem;
+  line-height: 1;
+  color: var(--color-accent);
+  margin-bottom: 0.25rem;
+}
+
+.dept-testimonial-single-quote {
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  font-style: italic;
+  line-height: 1.6;
+  color: #ffffff;
+  margin: 0 0 var(--space-4) 0;
+}
+
+.dept-testimonial-single-name {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.dept-testimonial-single-role {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  color: var(--color-accent-light, var(--color-accent));
+  margin-top: 0.15rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dept-testimonial-single-card {
+    animation: none;
+  }
+}
+
+@media (max-width: 700px) {
+  .dept-testimonial-single {
+    flex-direction: column-reverse;
+    gap: var(--space-5);
+  }
+
+  .dept-testimonial-single-dots {
+    flex-direction: row;
+  }
+
+  .dept-testimonial-dot.active {
+    width: 26px;
+    height: 8px;
+  }
+
+  .dept-testimonial-single-card {
+    flex-direction: column;
+    text-align: center;
+    padding: var(--space-6);
+  }
+}
+
+/* ===================================================================
+   Research & Innovation Section — "Pioneers of research & innovation"
+   LPU-template style: header row + 2-col (stat grid | photo carousel)
+   =================================================================== */
+
+.dept-research-section {
+  background: #faf9f7;
+}
+
+/* ── Header row: title left, circular button right ── */
+.dept-research-header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-6);
+  margin-bottom: var(--space-8);
+}
+
+.dept-research-heading {
+  margin: 0;
+  line-height: 1.15;
+}
+
+.dept-research-heading-light {
+  display: block;
+  font-weight: 500;
+  font-size: clamp(1.5rem, 3vw, 2.4rem);
+  color: var(--color-text);
+}
+
+.dept-research-heading-bold {
+  display: block;
+  font-weight: 900;
+  font-size: clamp(1.6rem, 3.2vw, 2.6rem);
+  color: var(--color-primary);
+  letter-spacing: -0.025em;
+}
+
+/* Circular "Research" button — top-right of the heading row */
+.dept-research-circle-btn {
+  flex-shrink: 0;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: background 200ms ease, transform 200ms ease;
+}
+
+.dept-research-circle-btn:hover {
+  background: var(--color-accent, #c9a84c);
+  transform: scale(1.06);
+}
+
+/* ── Body: two equal columns ── */
+.dept-research-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-6);
+  align-items: stretch;
+}
+
+/* ── Left: 2×2 stat cards ── */
+.dept-research-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 0.85rem;
+  height: 100%;
+}
+
+.dept-research-stat-card {
+  background: #e8e8e6;
+  border-radius: 18px;
+  padding: 2rem 1.5rem 1.75rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 0.4rem;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+  min-height: 150px;
+}
+
+.dept-research-stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.07);
+}
+
+.dept-research-stat-count {
+  display: flex;
+  align-items: baseline;
+  gap: 0.05em;
+  line-height: 1;
+}
+
+.dept-research-stat-value {
+  font-family: var(--font-sans);
+  font-size: clamp(2rem, 3.5vw, 2.75rem);
+  font-weight: 900;
+  color: #0f172a;
+  letter-spacing: -0.04em;
+}
+
+.dept-research-stat-plus {
+  font-family: var(--font-sans);
+  font-size: clamp(1.4rem, 2.5vw, 2rem);
+  font-weight: 900;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+}
+
+.dept-research-stat-label {
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: #64748b;
+  line-height: 1.35;
+  margin: 0;
+}
+
+/* ── Right: photo carousel ── */
+.dept-research-slider-wrap {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  background: #1e293b;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Arrow buttons — absolute top-right, same as reference image */
+.dept-research-arrows {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  z-index: 10;
+}
+
+.dept-research-arrow {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #0f172a;
+  color: #ffffff;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 160ms ease, transform 160ms ease;
+}
+
+.dept-research-arrow:hover {
+  background: var(--color-accent, #c9a84c);
+  transform: scale(1.08);
+}
+
+/* Slide */
+.dept-research-slide {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  animation: researchFadeIn 0.4s ease;
+}
+
+@keyframes researchFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.dept-research-slide-photo {
+  flex: 1;
+  overflow: hidden;
+  min-height: 240px;
+}
+
+.dept-research-slide-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.5s ease;
+}
+
+.dept-research-slider-wrap:hover .dept-research-slide-img {
+  transform: scale(1.03);
+}
+
+.dept-research-slide-placeholder {
+  width: 100%;
+  height: 100%;
+  min-height: 240px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
+}
+
+/* Dark caption panel below the photo */
+.dept-research-slide-caption {
+  background: #0f172a;
+  padding: 1.25rem 1.5rem 1.35rem;
+  flex-shrink: 0;
+}
+
+.dept-research-slide-title {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 0.45rem;
+  line-height: 1.4;
+}
+
+.dept-research-slide-desc {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.6;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Dot indicators */
+.dept-research-dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.75rem 0 1rem;
+  background: #0f172a;
+  flex-shrink: 0;
+}
+
+.dept-research-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.25);
+  cursor: pointer;
+  transition: background 200ms ease, width 200ms ease;
+  padding: 0;
+}
+
+.dept-research-dot.active {
+  background: var(--color-accent, #c9a84c);
+  width: 24px;
+  border-radius: 4px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .dept-research-layout {
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+  }
+
+  .dept-research-slider-wrap {
+    min-height: 420px;
+  }
+}
+
+@media (max-width: 600px) {
+  .dept-research-header-row {
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .dept-research-circle-btn {
+    width: 72px;
+    height: 72px;
+    font-size: 0.68rem;
+  }
+
+  .dept-research-stats-grid {
+    gap: 0.6rem;
+  }
+
+  .dept-research-stat-card {
+    padding: 1.5rem 1.1rem 1.25rem;
+    border-radius: 14px;
+    min-height: 120px;
+  }
+
+  .dept-research-stat-value {
+    font-size: 1.75rem;
+  }
+}
+
+
 
 
 

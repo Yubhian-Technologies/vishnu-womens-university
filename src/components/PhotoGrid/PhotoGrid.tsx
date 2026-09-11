@@ -113,7 +113,6 @@ export default function PhotoGrid({
 
   const textPanel = (
     <div className="photo-text-panel">
-      {label && <span className="section-label">{label}</span>}
       {title && <h2 className="section-title">{title}</h2>}
       {subtitle && <p className="photo-text-desc">{subtitle}</p>}
       {highlights && highlights.length > 0 && (
@@ -179,7 +178,6 @@ export default function PhotoGrid({
     <div className={`photo-grid-wrapper ${className}`}>
       {(label || title) && (
         <div className="photo-grid-header">
-          {label && <span className="section-label">{label}</span>}
           {title && <h2 className="section-title">{title}</h2>}
           {subtitle && <p className="section-desc">{subtitle}</p>}
         </div>

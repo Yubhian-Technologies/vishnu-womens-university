@@ -113,7 +113,6 @@ export default function GoverningBody() {
         <div className="container">
           <div className="gb-overview__grid reveal">
             <div className="gb-overview__inner">
-              <span className="section-label">Apex Authority</span>
               <h2 className="gb-overview__title">Institutional Overview</h2>
               <p>{overviewText}</p>
               {overviewItem?.highlights && overviewItem.highlights.length > 0 && (
@@ -135,7 +134,6 @@ export default function GoverningBody() {
       <section className="section gb-members">
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>
-            <span className="section-label">Board Members</span>
             <h2 className="gb-overview__title">Governing Body Members</h2>
             <p className="gb-members__subtitle">
               Meet the distinguished leaders steering VWU's strategic vision and institutional governance.

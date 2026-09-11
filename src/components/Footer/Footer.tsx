@@ -1,9 +1,7 @@
 import { useState, useId } from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, Phone, Mail, ExternalLink, ChevronDown, Navigation } from 'lucide-react';
-import { useOrderedCollection } from '../../hooks/useCollection';
 import { useSiteContact, telHref } from '../../hooks/useSiteContact';
-import { COMPLIANCE_GROUPS, DEFAULT_COMPLIANCE_DOCS, type ComplianceDocDoc } from '../../pages/Admin/sections/ComplianceDocsAdmin';
 import { InstagramIcon, FacebookIcon, TwitterIcon, LinkedInIcon, YouTubeIcon } from './SocialIcons';
 import SmoothCollapse from '../SmoothCollapse/SmoothCollapse';
 import './Footer.css';
@@ -20,19 +18,16 @@ const SOCIAL_LINKS = [
   { label: 'YouTube', href: 'https://www.youtube.com/@SVECW-B0', Icon: YouTubeIcon },
 ];
 
-// `disabled` items render as greyed, non-clickable text — mirroring the
-// navbar, where the corresponding pages (Governance sub-pages, Campus
-// Facilities) aren't live yet.
 const UNIVERSITY_LINKS: { label: string; href: string; disabled?: boolean; external?: boolean }[] = [
   { label: 'About VWU', href: '/about' },
   { label: 'Governance & Leadership', href: '/governance', disabled: true },
   { label: 'Campus Facilities', href: '/campus-facilities', disabled: true },
   { label: 'Careers at VWU', href: '/careers' },
-  { label: 'Alumni Network', href: 'https://alumni.srivishnu.edu.in/', external: true },
+  { label: 'Alumni', href: 'https://alumni.srivishnu.edu.in/', external: true },
   { label: 'Contact Us', href: '/contact' },
 ];
 
-const ACADEMIC_LINKS = [
+const ACADEMIC_LINKS: { label: string; href: string; external?: boolean }[] = [
   { label: 'Academic Programmes', href: '/academics' },
   { label: 'Fee Structure', href: '/programmes-fee-structure' },
   { label: 'Examinations Portal', href: 'https://www.svecwexams.in/', external: true },
@@ -40,17 +35,28 @@ const ACADEMIC_LINKS = [
   { label: 'Vishnu Tech Hub', href: 'https://www.vishnutechhub.in/', external: true },
   { label: 'VEDIC Learning Center', href: 'https://vedic.edu.in/', external: true },
   { label: 'Vishnu Era Magazine', href: 'https://www.srivishnu.edu.in/vishnu-era/', external: true },
-  { label: 'Prathibha Magazine', href: 'https://heyzine.com/flip-book/088b7b5629.html', external: true },
+  { label: 'Pratibha Magazine', href: 'https://heyzine.com/flip-book/088b7b5629.html', external: true },
   { label: 'Global Alumni Portal', href: 'https://alumni.srivishnu.edu.in/', external: true },
 ];
 
-const STUDENT_SERVICE_LINKS = [
+const STUDENT_SERVICE_LINKS: { label: string; href: string; external?: boolean }[] = [
   { label: 'Student Life & Clubs', href: '/student-life' },
   { label: "Vishnu's Wellness Center", href: 'https://vishnuwellness.in/', external: true },
   { label: "Students' Feedback", href: 'https://forms.gle/UuURnxKUZw7wW1NW9', external: true },
   { label: "Parents' Feedback", href: 'https://forms.gle/eT2QF3WNJZDwpEzj8', external: true },
   { label: "Faculty's Feedback", href: 'https://forms.gle/K89PMmjNbJNGSVEa9', external: true },
-  { label: 'AICTE Feedback Facility', href: '/aicte-feedback-facility', external: false },
+  { label: 'AICTE Feedback Facility', href: '/aicte-feedback-facility' },
+];
+
+const COMPLIANCE_LINKS: { label: string; href: string; external?: boolean }[] = [
+  { label: 'Infrastructure & Facilities', href: 'https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2FSVECWCollegeFeePayment.pdf?alt=media&token=196d3e64-8e1b-4d11-963e-7363c9be4000' },
+  { label: 'Institutional Data', href: 'https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2FSVECWAuditStatements.pdf?alt=media&token=949e45f9-c171-404a-8578-9c5b0114f92f' },
+  { label: 'College Fee Payment', href: 'https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2FSVECWCollegeFeePayment.pdf?alt=media&token=196d3e64-8e1b-4d11-963e-7363c9be4000' },
+  { label: 'Hostel Fee Payment', href: 'https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2FSVECWHostelFeePayment.pdf?alt=media&token=166d9223-5e4e-4a56-918e-45e9f32243c1' },
+  { label: 'Building Plans', href: 'https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2FSVECWBuildingPlans.pdf?alt=media&token=6652dd95-c77b-4fe0-9535-326db47e485e' },
+  { label: 'Structural Stability', href: 'https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2FSVECWStructuralStability.pdf?alt=media&token=e88445e0-448e-4009-bb72-a3bde520bb2b' },
+  { label: 'Land Use Certificate', href: 'https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2FSVECWLandUseCertificate.pdf?alt=media&token=351b20dd-fe3d-44ee-b382-f60ecb644dc0' },
+  { label: 'Land Conversion Certificate', href: 'https://svecw.edu.in/wp-content/uploads/2024/07/SVECWLandConversion.pdf', external: true },
 ];
 
 const LEGAL_LINKS = [
@@ -61,7 +67,7 @@ const LEGAL_LINKS = [
 ];
 
 /* -------------------------------------------------------------------------- */
-/* Main Redesigned Footer Component                                           */
+/* Main Footer Component                                                      */
 /* -------------------------------------------------------------------------- */
 
 export default function Footer() {
@@ -69,11 +75,7 @@ export default function Footer() {
   const accordionBaseId = useId();
   const { phone, email } = useSiteContact();
 
-  // Mobile accordion state (all closed by default for compact mobile viewport)
   const [openMobileSections, setOpenMobileSections] = useState<Set<string>>(new Set());
-  // Compliance group toggle state on desktop/mobile
-  const initialGroup = COMPLIANCE_GROUPS.find((g) => g !== 'Mandatory Disclosures') || COMPLIANCE_GROUPS[0];
-  const [activeComplianceGroup, setActiveComplianceGroup] = useState<string>(initialGroup);
 
   const toggleMobileSection = (sectionKey: string) => {
     setOpenMobileSections((prev) => {
@@ -87,388 +89,244 @@ export default function Footer() {
     });
   };
 
-  // Real-time Firestore sync with fallback
-  const { docs: liveDocs } = useOrderedCollection<ComplianceDocDoc>('complianceDocs', 'order');
-  const complianceDocs = liveDocs.length > 0 ? liveDocs : (DEFAULT_COMPLIANCE_DOCS as ComplianceDocDoc[]);
-
-  const complianceGroups = COMPLIANCE_GROUPS
-    .filter((title) => title !== 'Mandatory Disclosures')
-    .map((title) => {
-      const groupItems = complianceDocs.filter((d) => d.group === title);
-      const links = groupItems.map((d) => ({
-        label: d.label,
-        href: d.fileUrl,
-        download: d.external ? false : d.download !== false,
-        external: !!d.external,
-      }));
-      return { title, links };
-    })
-    .filter((g) => g.links.length > 0);
-
-  const selectedComplianceLinks = complianceGroups.find((g) => g.title === activeComplianceGroup)?.links || complianceGroups[0]?.links || [];
+  const renderNavLink = (item: { label: string; href: string; disabled?: boolean; external?: boolean }) => {
+    if (item.disabled) {
+      return (
+        <span className="vwu-footer-link is-muted" aria-disabled="true">
+          {item.label}
+        </span>
+      );
+    }
+    if (item.external) {
+      return (
+        <a href={item.href} target="_blank" rel="noopener noreferrer" className="vwu-footer-link has-icon">
+          <span>{item.label}</span>
+          <ExternalLink size={11} className="vwu-footer-ext-icon" aria-hidden="true" />
+        </a>
+      );
+    }
+    return (
+      <Link to={item.href} className="vwu-footer-link">
+        {item.label}
+      </Link>
+    );
+  };
 
   return (
     <footer className="vwu-footer" role="contentinfo">
-      {/* ------------------------------------------------------------------ */}
-      {/* TIER 1: Identity (left) & Structured Navigation / Compliance (right) */}
-      {/* ------------------------------------------------------------------ */}
-      <div className="vwu-footer-main-tier">
-        <div className="container vwu-footer-main-inner">
-          {/* Brand Anchor */}
-          <div className="vwu-footer-brand-block">
-            <Link to="/" className="vwu-footer-logo-wrap" aria-label="Vishnu Women's University Home">
+      {/* ─── MAIN TIER ─── */}
+      <div className="vwu-footer-main">
+        <div className="vwu-footer-inner">
+          {/* Brand Block */}
+          <div className="vwu-footer-brand">
+            <Link to="/" className="vwu-footer-logo-link" aria-label="Vishnu Women's University Home">
               <img
                 src="/images/footer-logo.png"
                 alt="Vishnu Women's University"
-                className="vwu-footer-logo-img"
+                className="vwu-footer-logo"
                 loading="lazy"
               />
-              <span className="vwu-brand-main" lang="te">విష్ణు మహిళా విశ్వవిద్యాలయం</span>
             </Link>
 
-            <p className="vwu-footer-mission-text">
+            <h2 className="vwu-footer-uni-name">Vishnu Women's University</h2>
+            <p className="vwu-footer-mission">
               Empowering women scholars through excellence in engineering education,
               interdisciplinary research, and transformative leadership.
             </p>
 
-            {/* Actionable Compact Contact Info */}
-            <address className="vwu-footer-contact-items">
-              <div className="vwu-footer-contact-row">
-                <MapPin size={15} className="vwu-footer-contact-icon" aria-hidden="true" />
-                <span>Bhimavaram, West Godavari Dist., Andhra Pradesh – 534 202</span>
+            <address className="vwu-footer-address">
+              <div className="vwu-footer-addr-row">
+                <MapPin size={14} className="vwu-footer-addr-icon" aria-hidden="true" />
+                <span>Bhimavaram, West Godavari Dist.,<br />Andhra Pradesh – 534 202</span>
               </div>
               <a
                 href="https://www.google.com/maps/search/?api=1&query=16.568119,81.522098"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="vwu-footer-get-directions"
+                className="vwu-footer-directions"
               >
-                <Navigation size={13} aria-hidden="true" />
+                <Navigation size={12} aria-hidden="true" />
                 <span>Get Directions</span>
               </a>
-              <div className="vwu-footer-contact-links">
-                <a href={telHref(phone)} className="vwu-footer-contact-action" aria-label={`Phone: ${phone}`}>
-                  <Phone size={14} aria-hidden="true" />
-                  <span>{phone}</span>
-                </a>
-                <span className="vwu-footer-contact-sep" aria-hidden="true">·</span>
-                <a href={`mailto:${email}`} className="vwu-footer-contact-action" aria-label={`Email: ${email}`}>
-                  <Mail size={14} aria-hidden="true" />
-                  <span>{email}</span>
-                </a>
+              <div className="vwu-footer-addr-row">
+                <Phone size={14} className="vwu-footer-addr-icon" aria-hidden="true" />
+                <a href={telHref(phone)} className="vwu-footer-contact-link">{phone}</a>
+              </div>
+              <div className="vwu-footer-addr-row">
+                <Mail size={14} className="vwu-footer-addr-icon" aria-hidden="true" />
+                <a href={`mailto:${email}`} className="vwu-footer-contact-link">{email}</a>
               </div>
             </address>
           </div>
 
           {/* Navigation Columns */}
-          <div className="vwu-footer-nav-grid">
-          {/* Column 1: University */}
-          <div className="vwu-footer-nav-col">
-            <h3 className="vwu-footer-nav-title">University</h3>
-            <ul className="vwu-footer-nav-list" role="list">
-              {UNIVERSITY_LINKS.map((item) => (
-                <li key={item.label}>
-                  {item.disabled ? (
-                    <span className="vwu-footer-nav-link is-disabled" aria-disabled="true">
-                      {item.label}
-                    </span>
-                  ) : item.external ? (
-                    <a
-                      href={item.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="vwu-footer-nav-link external"
-                    >
-                      <span>{item.label}</span>
-                      <ExternalLink size={12} className="vwu-external-glyph" aria-hidden="true" />
-                    </a>
-                  ) : (
-                    <Link to={item.href} className="vwu-footer-nav-link">
-                      {item.label}
-                    </Link>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Column 2: Academics & Portals */}
-          <div className="vwu-footer-nav-col">
-            <h3 className="vwu-footer-nav-title">Academics &amp; Portals</h3>
-            <ul className="vwu-footer-nav-list" role="list">
-              {ACADEMIC_LINKS.map((item) => (
-                <li key={item.label}>
-                  {item.external ? (
-                    <a
-                      href={item.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="vwu-footer-nav-link external"
-                    >
-                      <span>{item.label}</span>
-                      <ExternalLink size={12} className="vwu-external-glyph" aria-hidden="true" />
-                    </a>
-                  ) : (
-                    <Link to={item.href} className="vwu-footer-nav-link">
-                      {item.label}
-                    </Link>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Column 3: Student Life & Feedback */}
-          <div className="vwu-footer-nav-col">
-            <h3 className="vwu-footer-nav-title">Student Life &amp; Services</h3>
-            <ul className="vwu-footer-nav-list" role="list">
-              {STUDENT_SERVICE_LINKS.map((item) => (
-                <li key={item.label}>
-                  {item.external ? (
-                    <a
-                      href={item.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="vwu-footer-nav-link external"
-                    >
-                      <span>{item.label}</span>
-                      <ExternalLink size={12} className="vwu-external-glyph" aria-hidden="true" />
-                    </a>
-                  ) : (
-                    <Link to={item.href} className="vwu-footer-nav-link">
-                      {item.label}
-                    </Link>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Column 4: Statutory & Compliance (Dynamic Firestore) */}
-          <div className="vwu-footer-nav-col vwu-footer-compliance-col">
-            <h3 className="vwu-footer-nav-title">Compliance &amp; Disclosures</h3>
-            
-            {/* Group Tab Pills (Desktop) */}
-            <div className="vwu-footer-compliance-tabs" role="tablist" aria-label="Compliance Document Categories">
-              {complianceGroups.map((g) => (
-                <button
-                  key={g.title}
-                  type="button"
-                  role="tab"
-                  aria-selected={activeComplianceGroup === g.title}
-                  className={`vwu-footer-comp-tab-btn${activeComplianceGroup === g.title ? ' active' : ''}`}
-                  onClick={() => setActiveComplianceGroup(g.title)}
-                >
-                  {g.title}
-                </button>
-              ))}
+          <nav className="vwu-footer-nav" aria-label="Footer navigation">
+            <div className="vwu-footer-col">
+              <h3 className="vwu-footer-heading">University</h3>
+              <ul className="vwu-footer-list" role="list">
+                {UNIVERSITY_LINKS.map((item) => (
+                  <li key={item.label}>{renderNavLink(item)}</li>
+                ))}
+              </ul>
             </div>
 
-            {/* Active Compliance Group List — plain text, no links */}
-            <ul className="vwu-footer-nav-list vwu-compliance-active-list" role="list">
-              {selectedComplianceLinks.slice(0, 6).map((item) => (
-                <li key={item.label}>
-                  <span className="vwu-footer-nav-link is-disabled">{item.label}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-          </div>
-        </div>
+            <div className="vwu-footer-col">
+              <h3 className="vwu-footer-heading">Academics &amp; Portals</h3>
+              <ul className="vwu-footer-list" role="list">
+                {ACADEMIC_LINKS.map((item) => (
+                  <li key={item.label}>{renderNavLink(item)}</li>
+                ))}
+              </ul>
+            </div>
 
-        {/* ---------------------------------------------------------------- */}
-        {/* MOBILE ACCORDIONS (Progressive Disclosure on Small Viewports)    */}
-        {/* ---------------------------------------------------------------- */}
-        <div className="container vwu-footer-mobile-accordions">
-          {/* Section: University */}
-          <div className="vwu-footer-m-acc-item">
+            <div className="vwu-footer-col">
+              <h3 className="vwu-footer-heading">Student Life &amp; Services</h3>
+              <ul className="vwu-footer-list" role="list">
+                {STUDENT_SERVICE_LINKS.map((item) => (
+                  <li key={item.label}>{renderNavLink(item)}</li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="vwu-footer-col">
+              <h3 className="vwu-footer-heading">Compliance &amp; Disclosures</h3>
+              <ul className="vwu-footer-list" role="list">
+                {COMPLIANCE_LINKS.map((item) => (
+                  <li key={item.label}>{renderNavLink(item)}</li>
+                ))}
+              </ul>
+            </div>
+          </nav>
+        </div>
+      </div>
+
+      {/* ─── MOBILE ACCORDIONS ─── */}
+      <div className="vwu-footer-mobile">
+        <div className="vwu-footer-inner">
+          {/* University */}
+          <div className="vwu-footer-acc">
             <button
               type="button"
-              className="vwu-footer-m-acc-btn"
+              className="vwu-footer-acc-btn"
               onClick={() => toggleMobileSection('university')}
               aria-expanded={openMobileSections.has('university')}
-              aria-controls={`${accordionBaseId}-m-uni`}
+              aria-controls={`${accordionBaseId}-uni`}
             >
               <span>University</span>
-              <ChevronDown
-                size={18}
-                className={`vwu-m-acc-chevron${openMobileSections.has('university') ? ' open' : ''}`}
-                aria-hidden="true"
-              />
+              <ChevronDown size={16} className={`vwu-footer-acc-chevron${openMobileSections.has('university') ? ' open' : ''}`} aria-hidden="true" />
             </button>
             <SmoothCollapse open={openMobileSections.has('university')}>
-              <div id={`${accordionBaseId}-m-uni`} className="vwu-footer-m-acc-content">
-                <ul className="vwu-footer-nav-list" role="list">
+              <div id={`${accordionBaseId}-uni`} className="vwu-footer-acc-body">
+                <ul className="vwu-footer-list" role="list">
                   {UNIVERSITY_LINKS.map((item) => (
-                    <li key={item.label}>
-                      <Link to={item.href} className="vwu-footer-nav-link">
-                        {item.label}
-                      </Link>
-                    </li>
+                    <li key={item.label}>{renderNavLink(item)}</li>
                   ))}
                 </ul>
               </div>
             </SmoothCollapse>
           </div>
 
-          {/* Section: Academics & Portals */}
-          <div className="vwu-footer-m-acc-item">
+          {/* Academics */}
+          <div className="vwu-footer-acc">
             <button
               type="button"
-              className="vwu-footer-m-acc-btn"
+              className="vwu-footer-acc-btn"
               onClick={() => toggleMobileSection('academics')}
               aria-expanded={openMobileSections.has('academics')}
-              aria-controls={`${accordionBaseId}-m-acad`}
+              aria-controls={`${accordionBaseId}-acad`}
             >
               <span>Academics &amp; Portals</span>
-              <ChevronDown
-                size={18}
-                className={`vwu-m-acc-chevron${openMobileSections.has('academics') ? ' open' : ''}`}
-                aria-hidden="true"
-              />
+              <ChevronDown size={16} className={`vwu-footer-acc-chevron${openMobileSections.has('academics') ? ' open' : ''}`} aria-hidden="true" />
             </button>
             <SmoothCollapse open={openMobileSections.has('academics')}>
-              <div id={`${accordionBaseId}-m-acad`} className="vwu-footer-m-acc-content">
-                <ul className="vwu-footer-nav-list" role="list">
+              <div id={`${accordionBaseId}-acad`} className="vwu-footer-acc-body">
+                <ul className="vwu-footer-list" role="list">
                   {ACADEMIC_LINKS.map((item) => (
-                    <li key={item.label}>
-                      {item.external ? (
-                        <a
-                          href={item.href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="vwu-footer-nav-link external"
-                        >
-                          <span>{item.label}</span>
-                          <ExternalLink size={12} className="vwu-external-glyph" aria-hidden="true" />
-                        </a>
-                      ) : (
-                        <Link to={item.href} className="vwu-footer-nav-link">
-                          {item.label}
-                        </Link>
-                      )}
-                    </li>
+                    <li key={item.label}>{renderNavLink(item)}</li>
                   ))}
                 </ul>
               </div>
             </SmoothCollapse>
           </div>
 
-          {/* Section: Student Life & Services */}
-          <div className="vwu-footer-m-acc-item">
+          {/* Student Life */}
+          <div className="vwu-footer-acc">
             <button
               type="button"
-              className="vwu-footer-m-acc-btn"
+              className="vwu-footer-acc-btn"
               onClick={() => toggleMobileSection('services')}
               aria-expanded={openMobileSections.has('services')}
-              aria-controls={`${accordionBaseId}-m-serv`}
+              aria-controls={`${accordionBaseId}-serv`}
             >
               <span>Student Life &amp; Services</span>
-              <ChevronDown
-                size={18}
-                className={`vwu-m-acc-chevron${openMobileSections.has('services') ? ' open' : ''}`}
-                aria-hidden="true"
-              />
+              <ChevronDown size={16} className={`vwu-footer-acc-chevron${openMobileSections.has('services') ? ' open' : ''}`} aria-hidden="true" />
             </button>
             <SmoothCollapse open={openMobileSections.has('services')}>
-              <div id={`${accordionBaseId}-m-serv`} className="vwu-footer-m-acc-content">
-                <ul className="vwu-footer-nav-list" role="list">
+              <div id={`${accordionBaseId}-serv`} className="vwu-footer-acc-body">
+                <ul className="vwu-footer-list" role="list">
                   {STUDENT_SERVICE_LINKS.map((item) => (
-                    <li key={item.label}>
-                      {item.external ? (
-                        <a
-                          href={item.href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="vwu-footer-nav-link external"
-                        >
-                          <span>{item.label}</span>
-                          <ExternalLink size={12} className="vwu-external-glyph" aria-hidden="true" />
-                        </a>
-                      ) : (
-                        <Link to={item.href} className="vwu-footer-nav-link">
-                          {item.label}
-                        </Link>
-                      )}
-                    </li>
+                    <li key={item.label}>{renderNavLink(item)}</li>
                   ))}
                 </ul>
               </div>
             </SmoothCollapse>
           </div>
 
-          {/* Section: Compliance & Disclosures */}
-          <div className="vwu-footer-m-acc-item">
+          {/* Compliance */}
+          <div className="vwu-footer-acc">
             <button
               type="button"
-              className="vwu-footer-m-acc-btn"
+              className="vwu-footer-acc-btn"
               onClick={() => toggleMobileSection('compliance')}
               aria-expanded={openMobileSections.has('compliance')}
-              aria-controls={`${accordionBaseId}-m-comp`}
+              aria-controls={`${accordionBaseId}-comp`}
             >
               <span>Compliance &amp; Disclosures</span>
-              <ChevronDown
-                size={18}
-                className={`vwu-m-acc-chevron${openMobileSections.has('compliance') ? ' open' : ''}`}
-                aria-hidden="true"
-              />
+              <ChevronDown size={16} className={`vwu-footer-acc-chevron${openMobileSections.has('compliance') ? ' open' : ''}`} aria-hidden="true" />
             </button>
             <SmoothCollapse open={openMobileSections.has('compliance')}>
-              <div id={`${accordionBaseId}-m-comp`} className="vwu-footer-m-acc-content">
-                {complianceGroups.map((grp) => (
-                  <div key={grp.title} className="vwu-footer-m-comp-group">
-                    <h4 className="vwu-footer-m-comp-title">{grp.title}</h4>
-                    <ul className="vwu-footer-nav-list" role="list">
-                      {grp.links.map((item) => (
-                        <li key={item.label}>
-                          <span className="vwu-footer-nav-link is-disabled">{item.label}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
+              <div id={`${accordionBaseId}-comp`} className="vwu-footer-acc-body">
+                <ul className="vwu-footer-list" role="list">
+                  {COMPLIANCE_LINKS.map((item) => (
+                    <li key={item.label}>{renderNavLink(item)}</li>
+                  ))}
+                </ul>
               </div>
             </SmoothCollapse>
           </div>
         </div>
       </div>
 
-      {/* ------------------------------------------------------------------ */}
-      {/* TIER 3: Social & Community Connect Strip                           */}
-      {/* ------------------------------------------------------------------ */}
-      <div className="vwu-footer-social-tier">
-        <div className="container vwu-footer-social-inner">
-          <div className="vwu-footer-social-label">
-            <span>Connect with Vishnu Women's University</span>
-          </div>
-          <div className="vwu-footer-social-links" aria-label="Social media channels">
+      {/* ─── SOCIAL STRIP ─── */}
+      <div className="vwu-footer-social">
+        <div className="vwu-footer-inner vwu-footer-social-row">
+          <span className="vwu-footer-social-label">Connect with Vishnu Women's University</span>
+          <div className="vwu-footer-social-icons" aria-label="Social media channels">
             {SOCIAL_LINKS.map((s) => (
               <a
                 key={s.label}
                 href={s.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="vwu-social-btn"
+                className="vwu-footer-social-btn"
                 aria-label={`Visit VWU on ${s.label}`}
                 title={`Visit VWU on ${s.label}`}
               >
-                <s.Icon size={18} />
+                <s.Icon size={16} />
               </a>
             ))}
           </div>
         </div>
       </div>
 
-      {/* ------------------------------------------------------------------ */}
-      {/* TIER 4: Legal, Copyright & Technology Attribution Bar               */}
-      {/* ------------------------------------------------------------------ */}
-      <div className="vwu-footer-bottom-tier">
-        <div className="container vwu-footer-bottom-inner">
+      {/* ─── BOTTOM BAR ─── */}
+      <div className="vwu-footer-bottom">
+        <div className="vwu-footer-inner vwu-footer-bottom-row">
           <p className="vwu-footer-copyright">
             &copy; {currentYear} Vishnu Women's University. All rights reserved.
           </p>
 
-          <nav className="vwu-footer-legal-nav" aria-label="Legal and policy links">
+          <nav className="vwu-footer-legal" aria-label="Legal and policy links">
             {LEGAL_LINKS.map((link) => (
               <Link key={link.label} to={link.href} className="vwu-footer-legal-link">
                 {link.label}
@@ -476,16 +334,16 @@ export default function Footer() {
             ))}
           </nav>
 
-          <div className="vwu-footer-attribution">
+          <div className="vwu-footer-dev">
             <span>Developed by</span>
             <a
               href="https://www.vishnutechhub.in/"
               target="_blank"
               rel="noopener noreferrer"
-              className="vwu-tech-hub-badge-link"
+              className="vwu-footer-dev-link"
               aria-label="Vishnu Tech Hub"
             >
-              <strong className="vwu-tech-hub-badge">VISHNU TECH HUB</strong>
+              VISHNU TECH HUB
             </a>
           </div>
         </div>

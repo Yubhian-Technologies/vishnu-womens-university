@@ -1,13 +1,11 @@
 import { useEffect, useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowUp } from '@fortawesome/free-solid-svg-icons';
+import { ArrowUp } from 'lucide-react';
 import './ScrollTopButton.css';
 
-const RADIUS = 20;
+const RADIUS = 17;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 const VISIBLE_AFTER_PX = 480;
 
-/** Floating back-to-top button whose ring doubles as a page scroll-progress indicator. */
 export default function ScrollTopButton() {
   const [progress, setProgress] = useState(0);
   const [visible, setVisible] = useState(false);
@@ -31,16 +29,16 @@ export default function ScrollTopButton() {
       onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
       aria-label="Back to top"
     >
-      <svg width="48" height="48" viewBox="0 0 48 48" className="scroll-top-btn__ring">
-        <circle cx="24" cy="24" r={RADIUS} className="scroll-top-btn__track" />
+      <svg width="40" height="40" viewBox="0 0 40 40" className="scroll-top-btn__ring">
+        <circle cx="20" cy="20" r={RADIUS} className="scroll-top-btn__track" />
         <circle
-          cx="24" cy="24" r={RADIUS}
+          cx="20" cy="20" r={RADIUS}
           className="scroll-top-btn__progress"
           strokeDasharray={CIRCUMFERENCE}
           strokeDashoffset={CIRCUMFERENCE * (1 - progress)}
         />
       </svg>
-      <FontAwesomeIcon icon={faArrowUp} className="scroll-top-btn__icon" style={{ fontSize: 18 }} />
+      <ArrowUp size={16} className="scroll-top-btn__icon" />
     </button>
   );
 }

@@ -103,7 +103,6 @@ export default function WellnessCenter() {
             </div>
 
             <div>
-              <span className="section-label">Meet Your Wellness Counsellor</span>
               <h2 className="section-title" style={{ marginBottom: 'var(--space-1)' }}>Devika Babu</h2>
               <p style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-accent)', marginBottom: '0.3rem' }}>
                 Wellness Counsellor
@@ -196,7 +195,6 @@ export default function WellnessCenter() {
       <section className="section bg-white">
         <div className="container">
           <div className="reveal" style={{ marginBottom: 'var(--space-8)' }}>
-            <span className="section-label">Support Areas</span>
             <h2 className="section-title">We Can Help You With</h2>
           </div>
           <div
@@ -289,7 +287,6 @@ export default function WellnessCenter() {
       <section className="section bg-white">
         <div className="container">
           <div className="reveal" style={{ marginBottom: 'var(--space-8)' }}>
-            <span className="section-label">Get to Know Her</span>
             <h2 className="section-title">A Few Things About Me</h2>
             <p style={{ color: 'var(--color-text-light)' }}>A few random facts before we start:</p>
           </div>

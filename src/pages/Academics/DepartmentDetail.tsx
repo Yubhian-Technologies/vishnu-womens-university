@@ -1,21 +1,26 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link, useNavigate, useLocation, Navigate } from 'react-router-dom';
-import { Check, Microscope, Sparkles, FileText, ArrowLeft, ArrowRight, BookOpen, GraduationCap, Award, Calendar, Users, Hash } from 'lucide-react';
+import { Check, Microscope, Sparkles, FileText, BookOpen, GraduationCap, Award, Calendar, Users, ChevronDown, ArrowRight } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
+import SmoothCollapse from '../../components/SmoothCollapse/SmoothCollapse';
 import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import ProgrammeStructure from '../../components/ProgrammeStructure/ProgrammeStructure';
 import NewsEventsTabs, { type NewsEventsCategory } from '../../components/NewsEventsTabs/NewsEventsTabs';
 import SEO from '../../components/SEO/SEO';
 import FacultyCarousel from '../../components/FacultyCarousel/FacultyCarousel';
+import LabsCarousel from '../../components/LabsCarousel/LabsCarousel';
+import { PARTNER_DOMAINS, PARTNER_LOGO_OVERRIDES } from '../../components/TieUpMoUS/TieUpMoUSSection';
+import SuccessStoriesCarousel, { type SuccessStoryCardData } from '../../components/SuccessStoriesCarousel/SuccessStoriesCarousel';
 import TestimonialMarquee, { type PlacementItem } from '../../components/ui/marquee-01';
-import { useOrderedCollection } from '../../hooks/useCollection';
+import { useOrderedCollection, useCollection, type WithId } from '../../hooks/useCollection';
 import { useEapcetCode } from '../../hooks/useContentBlocks';
 import { smoothScrollTo } from '../../lib/smoothScroll';
-import { fetchPriorityAttr } from '../../lib/domAttrs';
 import { getProgramSchema, getBreadcrumbSchema } from '../../lib/seo/schemas';
 import type { DepartmentGroup } from '../../lib/departmentGroups';
 import { normalizeLab, normalizeMindMapImages, type ProgramDoc, type NewsEventsYear } from '../Admin/sections/ProgramsAdmin';
 import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
+import type { ResearchStat, ResearchSlide } from '../Admin/sections/DepartmentsAdmin';
+import type { MousPartnerLogoDoc } from '../Admin/sections/MousPartnerLogosAdmin';
 import type { FacultyDoc } from './Faculty';
 import { parseFlexibleTable, parseProjectAccordion } from '../../lib/structuredTable';
 import { resolveRndYears, rndYearHasContent } from '../../components/RndSection/RndSection';
@@ -25,7 +30,6 @@ import { getDeptBatchStats, findDeptBatchStatsForYearLabel } from '../../lib/dep
 import { usePlacementYears } from '../Placements/usePlacementYears';
 import { hasCustomSectionContent } from '../../lib/customSections';
 import CustomSectionsRenderer from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
-import { resolveProgramIcon } from '../../lib/programIcons';
 import { getDepartmentTagline } from '../../lib/departmentTaglines';
 import '../detail-layout.css';
 import '../Campus/tabbed-section.css';
@@ -36,22 +40,39 @@ const NAV_OFFSET = 'calc(var(--topbar-height) + var(--header-height) + 1rem)';
 // superset of whatever `quickLinks` ends up rendering for a given
 // department (see the scroll-spy effect below for why this is a static
 // list rather than reading `quickLinks` directly).
-const ALL_QUICK_NAV_SECTION_IDS = ['about', 'vision-mission', 'programmes', 'placements', 'hod', 'faculty', 'labs', 'program-toggle', 'rnd', 'news-events'];
+const ALL_QUICK_NAV_SECTION_IDS = ['about', 'vision-mission', 'placements', 'success-stories', 'rankings', 'labs', 'tieups-mous', 'program-toggle', 'rnd', 'hod', 'faculty', 'news-events', 'testimonials', 'faq'];
+
+// Resolves a plain admin-entered company/institution name (e.g. from
+// dept.placementRecruiters or dept.tieUpsMous) to a real logo. Priority:
+// an admin-uploaded logo from Admin → Recruiter Logos (same global
+// collection/keyed-by-name Home page's "Our Recruiters" marquee and
+// Placements' "Recruiting Partners" already use — see RecruitersSection.tsx),
+// then the known-domain favicon map, then a plain text tile.
+function RecruiterTile({ name, uploadedUrl, showName }: { name: string; uploadedUrl?: string; showName?: boolean }) {
+  const [failed, setFailed] = useState(false);
+  const domain = PARTNER_DOMAINS[name];
+  const imgSrc = uploadedUrl || PARTNER_LOGO_OVERRIDES[name] || (domain ? `https://www.google.com/s2/favicons?domain=${domain}&sz=128` : '');
+
+  if (!imgSrc || failed) {
+    return (
+      <div className="dept-recruiter-tile dept-recruiter-tile--fallback">
+        <span>{name}</span>
+      </div>
+    );
+  }
+  return (
+    <div className={`dept-recruiter-tile${showName ? ' dept-recruiter-tile--named' : ''}`}>
+      <img src={imgSrc} alt={name} loading="lazy" onError={() => setFailed(true)} />
+      {showName && <span className="dept-recruiter-tile-name">{name}</span>}
+    </div>
+  );
+}
 
 interface Props {
   group: DepartmentGroup;
   /** The currently-selected program slug (drives the toggle). */
   activeSlug: string;
 }
-
-// Every programme-hub tab now shows for every programme regardless of
-// whether that programme has content for it (consistent tab set across all
-// programmes); this is what a content-less tab's body shows when opened.
-const HUB_TAB_EMPTY = (
-  <p className="section-desc" style={{ margin: 0 }}>
-    Details for this section will be published soon.
-  </p>
-);
 
 // A placement year label like "2022–2026" -> "2026" for the snapshot
 // heading — the graduating year reads more naturally there than the full
@@ -62,6 +83,192 @@ function endingYear(label: string): string {
   return years ? years[years.length - 1] : label;
 }
 
+interface ProfileListItem {
+  id: string;
+  label: string;
+  value: string | number;
+  image?: string;
+}
+
+// Shared by every list in the "Department Profile" section below
+// (Establishments / Programme Intake / Accreditation) — each of those is an
+// admin-entered per-programme array that can hold any number of entries, so
+// none of them can assume a fixed count. The first `threshold` entries
+// render directly; anything past that collapses behind a "View all" toggle
+// (reusing SmoothCollapse, the same expand/collapse primitive Header/
+// NewsEventsTabs already use) instead of a fixed-height card grid that
+// would either overflow or need per-department layout tweaks as more
+// programmes/accreditations get added.
+function ExpandableGroup({ items, renderItem, threshold = 4 }: {
+  items: ProfileListItem[];
+  renderItem: (item: ProfileListItem) => ReactNode;
+  threshold?: number;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const visible = items.slice(0, threshold);
+  const rest = items.slice(threshold);
+  return (
+    <>
+      {visible.map(renderItem)}
+      {rest.length > 0 && (
+        <SmoothCollapse open={expanded}>
+          <>{rest.map(renderItem)}</>
+        </SmoothCollapse>
+      )}
+      {rest.length > 0 && (
+        <button
+          type="button"
+          className="dept-profile-viewmore"
+          onClick={() => setExpanded((v) => !v)}
+          aria-expanded={expanded}
+        >
+          {expanded ? 'Show less' : `View all ${items.length}`}
+          <ChevronDown size={14} strokeWidth={2.4} className={`dept-profile-viewmore-icon${expanded ? ' is-open' : ''}`} />
+        </button>
+      )}
+    </>
+  );
+}
+
+
+// ─── Research & Innovation Section ───────────────────────────────────────────
+// Mirrors the LPU-style "Pioneers of research & innovation" template. Reads
+// ONLY this department's own admin-entered `researchStats`/`researchSlides`
+// (Admin → Academic Departments → Research & Innovation) — no mock/
+// placeholder content; renders nothing at all when a department has neither,
+// same as every other data-gated section on this page.
+function ResearchSection({
+  deptName,
+  heroImage,
+  stats = [],
+  slides = [],
+}: {
+  deptName: string;
+  heroImage: string;
+  stats?: ResearchStat[];
+  slides?: ResearchSlide[];
+}) {
+  const [slide, setSlide] = useState(0);
+  const total = slides.length;
+  const prev = () => setSlide((s) => (s - 1 + total) % total);
+  const next = () => setSlide((s) => (s + 1) % total);
+
+  // Reset active slide index when slide list changes (admin update)
+  useEffect(() => { setSlide(0); }, [total]);
+
+  // Auto-advance every 4.5 s — nothing to advance through with 0 or 1 slide.
+  useEffect(() => {
+    if (total <= 1) return;
+    const t = setInterval(next, 4500);
+    return () => clearInterval(t);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [total]);
+
+  if (stats.length === 0 && slides.length === 0) return null;
+
+  const current = total > 0 ? slides[Math.min(slide, total - 1)] : null;
+  const slideImg = current?.imageUrl || heroImage;
+
+  return (
+    <section className="section dept-research-section" aria-labelledby="research-heading">
+      <div className="container">
+        {/* ── Header row ── */}
+        <div className="dept-research-header-row">
+          <h2 className="section-title dept-research-heading" id="research-heading">
+            <span className="dept-research-heading-light">Pioneers of<br /></span>
+            <span className="dept-research-heading-bold">Research &amp; Innovation</span>
+          </h2>
+          <a
+            href="/research"
+            className="dept-research-circle-btn"
+            aria-label="Go to research page"
+          >
+            <span>Research</span>
+          </a>
+        </div>
+
+        {/* ── Body: stats left + slider right ── */}
+        <div className="dept-research-layout">
+
+          {/* Left — 2×2 stat cards */}
+          {stats.length > 0 && (
+          <div className="dept-research-stats-grid">
+            {stats.map((s) => (
+              <div key={s.label} className="dept-research-stat-card">
+                <div className="dept-research-stat-count">
+                  <span className="dept-research-stat-value">{s.value.replace('+', '')}</span>
+                  <span className="dept-research-stat-plus">+</span>
+                </div>
+                <p className="dept-research-stat-label">{s.label}</p>
+              </div>
+            ))}
+          </div>
+          )}
+
+          {/* Right — photo + dark caption carousel */}
+          {current && (
+          <div className="dept-research-slider-wrap">
+            {/* Arrow buttons */}
+            <div className="dept-research-arrows">
+              <button
+                type="button"
+                onClick={prev}
+                className="dept-research-arrow"
+                aria-label="Previous research slide"
+              >
+                <ArrowRight size={18} strokeWidth={2.5} style={{ transform: 'rotate(180deg)' }} />
+              </button>
+              <button
+                type="button"
+                onClick={next}
+                className="dept-research-arrow"
+                aria-label="Next research slide"
+              >
+                <ArrowRight size={18} strokeWidth={2.5} />
+              </button>
+            </div>
+
+            {/* Slide */}
+            <div className="dept-research-slide" key={slide}>
+              {/* Photo */}
+              <div className="dept-research-slide-photo">
+                {slideImg ? (
+                  <img src={slideImg} alt={`${deptName} research — ${current.title}`} className="dept-research-slide-img" />
+                ) : (
+                  <div className="dept-research-slide-placeholder">
+                    <Microscope size={64} strokeWidth={1} style={{ color: '#94a3b8' }} />
+                  </div>
+                )}
+              </div>
+
+              {/* Caption overlay */}
+              <div className="dept-research-slide-caption">
+                <h3 className="dept-research-slide-title">{current.title}</h3>
+                <p className="dept-research-slide-desc">{current.desc}</p>
+              </div>
+            </div>
+
+            {/* Dot indicators */}
+            <div className="dept-research-dots">
+              {slides.map((_, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => setSlide(i)}
+                  className={`dept-research-dot${i === slide ? ' active' : ''}`}
+                  aria-label={`Go to slide ${i + 1}`}
+                />
+              ))}
+            </div>
+          </div>
+          )}
+
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /**
  * The shared page for a "grouped" department (AI / CSE / ECE). The top half is
  * common content read from the department's `departments` doc (matched by
@@ -70,6 +277,7 @@ function endingYear(label: string): string {
  * /academics/<slugA> and /academics/<slugB> — the active side is derived
  * purely from the URL, so deep links and the back button work for free.
  */
+
 export default function DepartmentDetail({ group, activeSlug }: Props) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -96,70 +304,26 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   // which half shows when a programme has both (no tab bar at all when it
   // only has one).
   const [careerTab, setCareerTab] = useState<'placements' | 'internships'>('placements');
-  // Laboratories carousel — one lab slide visible at a time, auto-advancing
-  // (same auto-scroll + pause-on-interact pattern as FacultyCarousel), with
-  // arrow buttons and dot indicators that also work manually.
-  const labScrollRef = useRef<HTMLDivElement>(null);
-  const [canScrollLabsLeft, setCanScrollLabsLeft] = useState(false);
-  const [canScrollLabsRight, setCanScrollLabsRight] = useState(true);
-  const [activeLabIndex, setActiveLabIndex] = useState(0);
-  const [labAutoPaused, setLabAutoPaused] = useState(false);
-  const labResumeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const checkLabScroll = () => {
-    const el = labScrollRef.current;
-    if (!el) return;
-    setCanScrollLabsLeft(el.scrollLeft > 10);
-    setCanScrollLabsRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 10);
-    if (el.clientWidth > 0) {
-      setActiveLabIndex(Math.round(el.scrollLeft / el.clientWidth));
-    }
-  };
-  useEffect(() => {
-    const el = labScrollRef.current;
-    if (!el) return;
-    checkLabScroll();
-    el.addEventListener('scroll', checkLabScroll, { passive: true });
-    window.addEventListener('resize', checkLabScroll);
-    return () => {
-      el.removeEventListener('scroll', checkLabScroll);
-      window.removeEventListener('resize', checkLabScroll);
-    };
-  }, []);
-  // Auto-advance every 4.5s, looping back to the start at the end — pauses
-  // while the user is hovering/touching/using the arrows or dots, then
-  // resumes a few seconds after they let go (identical shape to
-  // FacultyCarousel's autoscroll so both feel consistent). Harmlessly a
-  // no-op when there's nothing to scroll (single lab, or none yet).
+  const [activeHubTab, setActiveHubTab] = useState<'overview' | 'curriculum' | 'outcomes' | 'newsletter' | 'rnd'>('overview');
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [activeTestimonial, setActiveTestimonial] = useState(0);
+  // Auto-advance timer for the Testimonials carousel below — declared here
+  // (unconditionally, before the loading/redirect early-returns further
+  // down) so the hook itself is always called on every render. The actual
+  // testimonial count isn't known until testimonialItems is computed
+  // later (after those early-returns), so it's threaded through via a ref
+  // instead of a dependency array, updated by a plain assignment where the
+  // real value is available — see testimonialCountRef.current below.
+  const testimonialCountRef = useRef(0);
   useEffect(() => {
     const timer = setInterval(() => {
-      const el = labScrollRef.current;
-      if (labAutoPaused || !el || el.scrollWidth <= el.clientWidth) return;
-      if (el.scrollLeft >= el.scrollWidth - el.clientWidth - 10) {
-        el.scrollTo({ left: 0, behavior: 'smooth' });
-      } else {
-        el.scrollBy({ left: el.clientWidth, behavior: 'smooth' });
-      }
-    }, 4500);
+      setActiveTestimonial((i) => {
+        const count = testimonialCountRef.current;
+        return count > 1 ? (i + 1) % count : i;
+      });
+    }, 5500);
     return () => clearInterval(timer);
-  }, [labAutoPaused]);
-  const pauseLabAutoTemporarily = () => {
-    setLabAutoPaused(true);
-    if (labResumeTimeoutRef.current) clearTimeout(labResumeTimeoutRef.current);
-    labResumeTimeoutRef.current = setTimeout(() => setLabAutoPaused(false), 6000);
-  };
-  const scrollLabsBy = (direction: 1 | -1) => {
-    const el = labScrollRef.current;
-    if (!el) return;
-    pauseLabAutoTemporarily();
-    el.scrollBy({ left: direction * el.clientWidth, behavior: 'smooth' });
-  };
-  const scrollToLabIndex = (index: number) => {
-    const el = labScrollRef.current;
-    if (!el) return;
-    pauseLabAutoTemporarily();
-    el.scrollTo({ left: index * el.clientWidth, behavior: 'smooth' });
-  };
-  const [activeHubTab, setActiveHubTab] = useState<'overview' | 'curriculum' | 'outcomes' | 'news' | 'newsletter' | 'rnd'>('overview');
+  }, []);
   const [openRndProjects, setOpenRndProjects] = useState<Set<string>>(new Set());
   const toggleRndProject = (key: string) => {
     setOpenRndProjects((prev) => {
@@ -174,6 +338,20 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   const dept = allDepartments.find(
     (d) => d.shortCode?.trim().toUpperCase() === group.deptShortCode.trim().toUpperCase()
   );
+  const faqs = dept?.faqs || [];
+  // Admin-uploaded recruiter/tie-up logos (Admin → Recruiter Logos), keyed
+  // by exact name — see RecruiterTile above.
+  const { docs: recruiterLogoDocs } = useCollection<WithId & { imageUrl: string }>('recruiterLogos', [], { silent: true });
+  const recruiterLogoMap = new Map(recruiterLogoDocs.map((d) => [d.id.toLowerCase(), d.imageUrl]));
+  // The same partner logos already uploaded on the Research > MoUs page
+  // (Admin → Research Items → MoUs → Partner Logos, collection
+  // `mousPartnerLogos`), matched by exact Partner Name — same convention
+  // ResearchDetail.tsx uses to attach these logos to the MoUs table. Takes
+  // priority over the generic Recruiter Logos map below so a name added as
+  // an official MoU partner shows its real uploaded logo here too, instead
+  // of falling through to a favicon guess.
+  const { docs: mousPartnerLogoDocs } = useOrderedCollection<MousPartnerLogoDoc>('mousPartnerLogos', 'order');
+  const mousPartnerLogoMap = new Map(mousPartnerLogoDocs.map((d) => [d.label.trim().toLowerCase(), d.imageUrl]));
 
   const { docs: allPrograms, loading: progLoading } = useOrderedCollection<ProgramDoc>('programs', 'order');
   const subPrograms = group.programSlugs
@@ -238,11 +416,17 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveSectionId(entry.target.id);
-          }
-        });
+        const visible = entries.filter((entry) => entry.isIntersecting);
+        if (visible.length === 0) return;
+        // When multiple sections briefly overlap the observation band at
+        // once, pick whichever is closest to its top edge instead of just
+        // whichever intersection event happened to fire last — otherwise
+        // the pill bar can highlight a section that isn't actually the one
+        // nearest the top of the screen.
+        const nearest = visible.reduce((a, b) =>
+          Math.abs(a.boundingClientRect.top) < Math.abs(b.boundingClientRect.top) ? a : b
+        );
+        setActiveSectionId(nearest.target.id);
       },
       { rootMargin: '-15% 0px -55% 0px', threshold: 0 }
     );
@@ -322,6 +506,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     placementIntro: dept?.placementIntro || '',
     placementStats: dept?.placementStats || [],
     placementRecruiters: dept?.placementRecruiters || [],
+    tieUpsMous: dept?.tieUpsMous || [],
   };
 
   const hasHod = !!(shared.hodMessage || shared.hodImage || shared.hodEmail || shared.hod);
@@ -352,7 +537,6 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   const placementYearStats = activePlacementYear ? computePlacementStats(placementColumns, activePlacementYear.rows || []) : null;
   const placementNameIdx = placementColumns.findIndex((c) => /name|student|candidate/i.test(c));
   const placementCompIdx = findCompanyColumnIndex(placementColumns);
-  const placementStatsFull = placementYearStats?.averageSalary != null;
   const placementCompanyOptions = Array.from(new Set(
     placementRows.map((r) => (placementCompIdx >= 0 ? r.cells[placementCompIdx] : '')?.trim()).filter(Boolean)
   )).sort();
@@ -374,6 +558,34 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
       package: rawPkg?.trim() || 'Placed',
     };
   });
+  // Success Stories carousel — reads ONLY this department's own
+  // admin-entered `successStories` field (Admin → Academic Departments →
+  // Success Stories) — no auto-generated placement-derived fallback and no
+  // mock content. Renders nothing until an admin adds real entries.
+  const successStoryItems: SuccessStoryCardData[] = (dept?.successStories || []).map((s, i) => ({
+    id: `story-${i}`,
+    name: s.name,
+    programme: s.programme,
+    description: s.description,
+    photoUrl: s.photoUrl,
+  }));
+  // "What Our Students Say" testimonials — a SEPARATE admin-entered field
+  // (`dept.testimonials`, Admin → Academic Departments → Testimonials),
+  // deliberately not shared with Success Stories above so the two sections
+  // never show identical content. One big card at a time, auto-advancing;
+  // vertical dot rail lets a visitor jump to any testimonial directly. The
+  // auto-advance hook itself lives earlier (before the loading/redirect
+  // early-returns) — this just keeps its ref in sync with the real count
+  // once it's known.
+  const testimonialItems: SuccessStoryCardData[] = (dept?.testimonials || []).map((s, i) => ({
+    id: `testimonial-${i}`,
+    name: s.name,
+    programme: s.programme,
+    description: s.description,
+    photoUrl: s.photoUrl,
+  }));
+  const testimonialCount = Math.min(testimonialItems.length, 6);
+  testimonialCountRef.current = testimonialCount;
   // Institution-wide "Placements" module figures for this department (see
   // departmentPlacementBridge.ts) — an independent, separately-maintained
   // dataset from the department's own uploaded placementYears above, kept
@@ -531,20 +743,26 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     ? 'Placements & Internships'
     : hasInternships && placementYears.length === 0 ? 'Internships' : 'Placements';
 
-  // Quick Links sidebar — deliberately trimmed to one anchor per major
-  // section rather than every sub-section (e.g. "Choose a Programme" covers
-  // About the Programme / Highlights / PEOs,POs&PSOs / Mind Map / Curriculum,
-  // which still render below the toggle for whichever programme is active —
-  // they just don't each get their own sidebar entry).
+  // Quick Links — one anchor per major section rather than every
+  // sub-section (e.g. "Choose a Programme" covers About the Programme /
+  // Highlights / PEOs,POs&PSOs / Mind Map / Curriculum, which still render
+  // below the toggle for whichever programme is active — they just don't
+  // each get their own pill). The pill bar wraps to a second row on
+  // narrower screens instead of clipping or hiding overflow (see
+  // .dept-horizontal-quicknav-pill's flex-wrap), so adding more entries
+  // here is always safe.
   const quickLinks = [
-    hasAbout && { id: 'about', label: 'Department Overview' },
+    hasAbout && { id: 'about', label: 'Overview' },
     hasCoreValues && { id: 'vision-mission', label: 'Core Values' },
-    subPrograms.length > 0 && { id: 'programmes', label: 'Programs' },
     (hasPlacements || hasInternships) && { id: 'placements', label: placementsLinkLabel },
-    hasHod && { id: 'hod', label: 'Brief Profile' },
+    { id: 'rankings', label: 'Department Profile' },
+    hasLabs && { id: 'labs', label: 'Facilities' },
+    shared.tieUpsMous.length > 0 && { id: 'tieups-mous', label: "Tie-Ups & MoU's" },
+    subPrograms.length > 0 && { id: 'program-toggle', label: 'Programmes' },
+    hasHod && { id: 'hod', label: 'HOD' },
     faculty.length > 0 && { id: 'faculty', label: 'Faculty' },
-    hasLabs && { id: 'labs', label: 'Laboratories' },
-    subPrograms.length > 0 && { id: 'program-toggle', label: 'Programmes & Course Structure' },
+    hasNewsEvents && { id: 'news-events', label: 'Events' },
+    faqs.length > 0 && { id: 'faq', label: 'FAQs' },
   ].filter(Boolean) as { id: string; label: string }[];
 
   const heroImage = shared.heroImage;
@@ -571,22 +789,11 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     <main className="page-wrapper dept-detail-page">
       <SEO title={`${deptName} | Vishnu Women's University`} description={pageDesc} canonicalPath={pageUrl} ogImage={heroImage} jsonLd={jsonLd} />
 
-      {/* Hero — same rounded image-card treatment for every department */}
+      {/* Hero — plain gradient card, no attached image (image now lives
+          beside the Department Overview text below instead). */}
       <section className="dept-hero-section">
         <div className="container">
           <div className="dept-hero-card">
-            {heroImage && (
-              <SmoothImage
-                src={heroImage}
-                alt={deptName}
-                className="dept-hero-bg-img"
-                loading="eager"
-                decoding="sync"
-                {...fetchPriorityAttr('high')}
-              />
-            )}
-            <div className="dept-hero-overlay" />
-
             <div className="dept-hero-content">
               <h1 className="dept-hero-title">{deptName}</h1>
               <p className="dept-hero-subtitle">
@@ -600,217 +807,6 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
         </div>
       </section>
 
-      {/* Key Facts Grid — Dynamically shows only cards with valid data */}
-      {(() => {
-        const deptEst = clean(dept?.established);
-        const validEst = subPrograms.filter((p) => clean(p.established));
-        const hasEstCard = !!deptEst || validEst.length > 0;
-
-        const deptAcc = clean(dept?.accreditation);
-        const validAcc = subPrograms.filter((p) => clean(p.accreditation));
-        const hasAccCard = !!deptAcc || validAcc.length > 0;
-
-        const validIntake = subPrograms.filter((p) => p.intake && p.intake > 0);
-        const hasIntakeCard = validIntake.length > 0;
-
-        const hasHodCard = !!shared.hod && shared.hod.trim() !== '—';
-
-        // AP EAPCET College Code — always shown (useEapcetCode() falls back to
-        // "VISW, VISWPU" even with no admin override), first in the grid so
-        // every department page surfaces it immediately below the hero
-        // instead of only in the "Apply Today" CTA text at the page bottom.
-        const visibleCount = [true, hasEstCard, hasAccCard, hasIntakeCard, hasHodCard].filter(Boolean).length;
-
-        return (
-          <section className="dept-facts-section" aria-label={`${deptName} key facts`}>
-            <div className="container">
-              <div className={`dept-facts-grid cols-${visibleCount}`}>
-                {/* 0. AP EAPCET College Code — always shown, first card */}
-                <div className="dept-fact-card is-eapcet-card">
-                  <div className="dept-fact-header">
-                    <div className="dept-fact-icon-badge">
-                      <Hash size={14} strokeWidth={2.4} />
-                    </div>
-                    <span className="dept-fact-col-title">AP EAPCET Code</span>
-                  </div>
-                  <div className="dept-fact-items-window">
-                    <div className="dept-fact-static-list">
-                      <Link to="/admissions" className="dept-fact-chip-link" aria-label="View AP EAPCET college codes and admissions details">
-                        <div className="dept-fact-chip-entry">
-                          <span className="dept-fact-chip-sub">College Code</span>
-                          <span className="dept-fact-chip-val">{eapcetCode}</span>
-                        </div>
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-
-                {/* 1. Established */}
-                {hasEstCard && (
-                  <div className="dept-fact-card">
-                    <div className="dept-fact-header">
-                      <div className="dept-fact-icon-badge">
-                        <Calendar size={14} strokeWidth={2.4} />
-                      </div>
-                      <span className="dept-fact-col-title">Established</span>
-                      {validEst.length > 1 && (
-                        <span className="dept-fact-count-badge">{validEst.length}</span>
-                      )}
-                    </div>
-                    <div className={`dept-fact-items-window${validEst.length > 2 ? ' is-scrolling' : ''}`}>
-                      {validEst.length > 2 ? (
-                        <div className="dept-fact-ticker-track" style={{ animationDuration: `${Math.max(6, validEst.length * 3.5)}s` }}>
-                          {validEst.map((p) => (
-                            <div key={`a-${p.id}`} className="dept-fact-chip-entry">
-                              <span className="dept-fact-chip-sub">{p.shortName || p.name}</span>
-                              <span className="dept-fact-chip-val">{clean(p.established)}</span>
-                            </div>
-                          ))}
-                          {validEst.map((p) => (
-                            <div key={`b-${p.id}`} className="dept-fact-chip-entry">
-                              <span className="dept-fact-chip-sub">{p.shortName || p.name}</span>
-                              <span className="dept-fact-chip-val">{clean(p.established)}</span>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="dept-fact-static-list">
-                          {deptEst ? (
-                            <div className="dept-fact-chip-entry">
-                              <span className="dept-fact-chip-sub">{deptName}</span>
-                              <span className="dept-fact-chip-val">{deptEst}</span>
-                            </div>
-                          ) : (
-                            validEst.map((p) => (
-                              <div key={p.id} className="dept-fact-chip-entry">
-                                <span className="dept-fact-chip-sub">{p.shortName || p.name}</span>
-                                <span className="dept-fact-chip-val">{clean(p.established)}</span>
-                              </div>
-                            ))
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* 2. Accreditations */}
-                {hasAccCard && (
-                  <div className="dept-fact-card">
-                    <div className="dept-fact-header">
-                      <div className="dept-fact-icon-badge">
-                        <Award size={14} strokeWidth={2.4} />
-                      </div>
-                      <span className="dept-fact-col-title">Accreditations</span>
-                      {validAcc.length > 1 && (
-                        <span className="dept-fact-count-badge">{validAcc.length}</span>
-                      )}
-                    </div>
-                    <div className={`dept-fact-items-window${validAcc.length > 2 ? ' is-scrolling' : ''}`}>
-                      {validAcc.length > 2 ? (
-                        <div className="dept-fact-ticker-track" style={{ animationDuration: `${Math.max(6, validAcc.length * 3.5)}s` }}>
-                          {validAcc.map((p) => (
-                            <div key={`a-${p.id}`} className="dept-fact-chip-entry">
-                              <span className="dept-fact-chip-sub">{p.shortName || p.name}</span>
-                              <span className="dept-fact-chip-val">{clean(p.accreditation)}</span>
-                            </div>
-                          ))}
-                          {validAcc.map((p) => (
-                            <div key={`b-${p.id}`} className="dept-fact-chip-entry">
-                              <span className="dept-fact-chip-sub">{p.shortName || p.name}</span>
-                              <span className="dept-fact-chip-val">{clean(p.accreditation)}</span>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="dept-fact-static-list">
-                          {deptAcc ? (
-                            <div className="dept-fact-chip-entry">
-                              <span className="dept-fact-chip-sub">Department Accreditation</span>
-                              <span className="dept-fact-chip-val">{deptAcc}</span>
-                            </div>
-                          ) : (
-                            validAcc.map((p) => (
-                              <div key={p.id} className="dept-fact-chip-entry">
-                                <span className="dept-fact-chip-sub">{p.shortName || p.name}</span>
-                                <span className="dept-fact-chip-val">{clean(p.accreditation)}</span>
-                              </div>
-                            ))
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* 3. Programme Intake */}
-                {hasIntakeCard && (
-                  <div className="dept-fact-card">
-                    <div className="dept-fact-header">
-                      <div className="dept-fact-icon-badge">
-                        <Users size={14} strokeWidth={2.4} />
-                      </div>
-                      <span className="dept-fact-col-title">Programme Intake</span>
-                      {validIntake.length > 1 && (
-                        <span className="dept-fact-count-badge">{validIntake.length}</span>
-                      )}
-                    </div>
-                    <div className={`dept-fact-items-window${validIntake.length > 2 ? ' is-scrolling' : ''}`}>
-                      {validIntake.length > 2 ? (
-                        <div className="dept-fact-ticker-track" style={{ animationDuration: `${Math.max(6, validIntake.length * 3.5)}s` }}>
-                          {validIntake.map((p) => (
-                            <div key={`a-${p.id}`} className="dept-fact-chip-entry">
-                              <span className="dept-fact-chip-sub">{p.shortName || p.name}</span>
-                              <span className="dept-fact-chip-val">{p.intake} Seats</span>
-                            </div>
-                          ))}
-                          {validIntake.map((p) => (
-                            <div key={`b-${p.id}`} className="dept-fact-chip-entry">
-                              <span className="dept-fact-chip-sub">{p.shortName || p.name}</span>
-                              <span className="dept-fact-chip-val">{p.intake} Seats</span>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="dept-fact-static-list">
-                          {validIntake.map((p) => (
-                            <div key={p.id} className="dept-fact-chip-entry">
-                              <span className="dept-fact-chip-sub">{p.shortName || p.name}</span>
-                              <span className="dept-fact-chip-val">{p.intake} Seats</span>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* 4. Head of Department */}
-                {hasHodCard && (
-                  <div className="dept-fact-card is-hod-card">
-                    <div className="dept-fact-header">
-                      <div className="dept-fact-icon-badge">
-                        <GraduationCap size={14} strokeWidth={2.4} />
-                      </div>
-                      <span className="dept-fact-col-title">Head of the Department</span>
-                    </div>
-                    <div className="dept-fact-items-window">
-                      <div className="dept-fact-static-list">
-                        <a href="#hod" className="dept-fact-chip-link" aria-label={`View ${shared.hod} details`}>
-                          <div className="dept-fact-chip-entry">
-                            <span className="dept-fact-chip-sub">Professor &amp; HOD</span>
-                            <span className="dept-fact-chip-val">{shared.hod}</span>
-                          </div>
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </section>
-        );
-      })()}
       {/* Horizontal Quick Navigation Pill Bar (Capsule attaching under floating navbar) */}
       {quickLinks.length > 0 && (
         <section className="dept-horizontal-quicknav-section" aria-label="Page section navigation">
@@ -825,12 +821,11 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                     onClick={(e) => {
                       e.preventDefault();
                       setActiveSectionId(l.id);
-                      // "R & D" and "News & Events" now live as tabs inside
-                      // the Programme Hub card rather than their own section
-                      // — jump to the hub and switch to that tab instead.
+                      // "R & D" still lives as a tab inside the Programme Hub
+                      // card rather than its own section — jump to the hub
+                      // and switch to that tab instead.
                       if (l.id === 'rnd') setActiveHubTab('rnd');
-                      else if (l.id === 'news-events') setActiveHubTab('news');
-                      const scrollId = (l.id === 'rnd' || l.id === 'news-events') ? 'program-toggle' : l.id;
+                      const scrollId = l.id === 'rnd' ? 'program-toggle' : l.id;
                       const el = document.getElementById(scrollId);
                       if (el) el.scrollIntoView({ behavior: 'smooth' });
                     }}
@@ -851,17 +846,24 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
           <div className="container">
             <div className="dept-about-main">
                 <div className="dept-about-header">
-                  <span className="section-label dept-section-label">Department Overview</span>
                   <h2 className="section-title">
                     <span style={{ fontWeight: 400 }}>Welcome to </span>
                     <span style={{ fontWeight: 800 }}>{deptName}</span>
                   </h2>
                 </div>
 
-                <div className="dept-about-card">
-                  <p className="dept-about-lead-text">
-                    {shared.about}
-                  </p>
+                <div className="dept-about-body">
+                  <div className="dept-about-card">
+                    <p className="dept-about-lead-text">
+                      {shared.about}
+                    </p>
+                  </div>
+
+                  {heroImage && (
+                    <div className="dept-about-media">
+                      <SmoothImage src={heroImage} alt={deptName} className="dept-about-media-img" loading="eager" fetchPriority="high" />
+                    </div>
+                  )}
                 </div>
 
                 {/* Department Highlights — same layout as a programme's own
@@ -894,11 +896,10 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
           Department Vision / Mission Statements cards were removed here; this
           section now only ever shows Institutional Core Values. */}
       {hasCoreValues && (
-        <section id="vision-mission" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
+        <section id="vision-mission" className="section dept-section-navy" style={{ scrollMarginTop: NAV_OFFSET }}>
           <div className="container">
             <div style={{ marginBottom: 'var(--space-6)' }}>
-              <span className="section-label dept-section-label">Our Guiding Pillars</span>
-              <h2 className="section-title">Core Values</h2>
+              <h2 className="section-title">Our Core Values</h2>
             </div>
 
             <div className="dept-vm-grid">
@@ -923,83 +924,23 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
         </section>
       )}
 
-      {/* B.Tech & M.Tech Degree Programmes Offered (Compact Version) */}
-      {subPrograms.length > 0 && (
-        <section id="programmes" className="section bg-white dept-compact-programmes-section" style={{ scrollMarginTop: NAV_OFFSET, padding: '2.5rem 0' }}>
-          <div className="container">
-            <div style={{ marginBottom: '1.25rem', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem' }}>
-              <div>
-                <h2 className="section-title" style={{ fontSize: '1.6rem', margin: 0 }}>Programmes Offered</h2>
-              </div>
-              <span style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--color-text-light)' }}>
-                {subPrograms.length} Degree {subPrograms.length === 1 ? 'Programme' : 'Programmes'} Available
-              </span>
-            </div>
-
-            <div className="dept-compact-program-grid">
-              {subPrograms.map((program) => {
-                const Icon = resolveProgramIcon(program.icon);
-                const isBtech = program.category === 'btech';
-                const isMtech = program.category === 'mtech';
-                const catLabel = isBtech ? 'B.Tech' : isMtech ? 'M.Tech' : program.category?.toUpperCase() || 'Degree';
-
-                return (
-                  <div
-                    key={program.id || program.slug}
-                    className="dept-compact-program-card"
-                    onClick={() => {
-                      navigate(`/academics/${program.slug}#program-toggle`, { preventScrollReset: true });
-                      setActiveHubTab('overview');
-                    }}
-                  >
-                    <div className="dept-compact-card-header">
-                      <div className="dept-compact-card-icon">
-                        <Icon size={20} strokeWidth={2} />
-                      </div>
-                      <span className={`dept-compact-cat-badge ${isMtech ? 'is-mtech' : 'is-btech'}`}>
-                        {catLabel}
-                      </span>
-                    </div>
-
-                    <div className="dept-compact-card-body">
-                      <h3 className="dept-compact-card-title">{program.name}</h3>
-                      <div className="dept-compact-card-chips">
-                        {program.intake && (
-                          <span className="dept-compact-chip">
-                            {program.intake} Seats
-                          </span>
-                        )}
-                        {program.accreditation && program.accreditation !== '—' && (
-                          <span className="dept-compact-chip is-accredited">
-                            {program.accreditation}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="dept-compact-card-footer">
-                      <span>Explore Programme</span>
-                      <ArrowRight size={14} strokeWidth={2.4} />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-      )}
-
       {/* Placements & Internships — one "Careers" section; a tab bar only
           appears when a programme actually has both. Placed right after
           the department overview since it's the highest-intent content on
           this page. */}
       {(hasPlacements || hasInternships) && (
-        <section id="placements" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
+
+        <section id="placements" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
           <div className="container">
-            <div style={{ marginBottom: 'var(--space-6)' }}>
-              <span className="section-label dept-section-label">Careers</span>
-              <h2 className="section-title">
-                {hasPlacements && hasInternships ? 'Placements & Internships' : hasInternships ? 'Internships' : 'Placements'}
+            <div className="dept-placement-title-row">
+            
+              <h2 className="section-title" style={{ margin: 0 }}>
+                {hasPlacements && hasInternships ? (
+                  <>
+                    <span style={{ fontWeight: 400 }}>Placements </span>
+                    <span style={{ fontWeight: 800 }}>&amp; Internships</span>
+                  </>
+                ) : hasInternships ? 'Internships' : 'Placements'}
               </h2>
             </div>
 
@@ -1034,27 +975,13 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
               </p>
             )}
             {shared.placementStats.length > 0 && (
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-8)', marginBottom: shared.placementRecruiters.length > 0 ? 'var(--space-8)' : 0 }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-8)', marginBottom: 'var(--space-8)' }}>
                 {shared.placementStats.map((s, si) => (
                   <div key={si} style={{ textAlign: 'center' }}>
                     <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.5rem', fontWeight: 900, color: 'var(--color-accent)' }}>{s.value}</div>
                     <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', fontFamily: 'var(--font-sans)', marginTop: 2, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{s.label}</div>
                   </div>
                 ))}
-              </div>
-            )}
-            {shared.placementRecruiters.length > 0 && (
-              <div style={{ marginBottom: placementRows.length > 0 ? 'var(--space-8)' : 0 }}>
-                <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 800, color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 'var(--space-3)' }}>
-                  Our Recruiters
-                </h3>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
-                  {shared.placementRecruiters.map((r, ri) => (
-                    <span key={ri} style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--color-primary)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-full)', padding: '0.35rem 0.9rem' }}>
-                      {r}
-                    </span>
-                  ))}
-                </div>
               </div>
             )}
             {/* Academic Year pill selector + computed stat tiles — Academic
@@ -1075,7 +1002,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                       className={`placement-year-pill${activePlacementYear?.year === y.year ? ' active' : ''}`}
                       aria-pressed={activePlacementYear?.year === y.year}
                     >
-                      AY. {y.year}
+                      {y.year}
                     </button>
                   ))}
                 </div>
@@ -1084,49 +1011,63 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                     <p className="placement-stat-summary">
                       {endingYear(activePlacementYear.year)} Placement Snapshot
                     </p>
-                    <div className={`dept-stat-grid${placementStatsFull ? ' dept-stat-grid--fill' : ''}`}>
-                      <div className="dept-stat-tile">
-                        <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.companiesVisited}</span></div>
-                        <div className="dept-stat-tile__label">No. of Companies Visited</div>
+                    <div className="dept-placement-stats-wrap">
+                      <div className="dept-placement-stats-circles">
+                        <div className="dept-placement-stat-circle">
+                          <div className="dept-placement-stat-circle__ring">
+                            <span className="dept-placement-stat-circle__value">{placementYearStats.companiesVisited}</span>
+                            <span className="dept-placement-stat-circle__label">No. of Companies Visited</span>
+                          </div>
+                        </div>
+                        <div className="dept-placement-stat-circle">
+                          <div className="dept-placement-stat-circle__ring">
+                            <span className="dept-placement-stat-circle__value">{displayedTotalOffers}</span>
+                            <span className="dept-placement-stat-circle__label">Total No. of Offers</span>
+                          </div>
+                        </div>
+                        {placementYearStats.highestPackage != null && (
+                          <div className="dept-placement-stat-circle">
+                            <div className="dept-placement-stat-circle__ring">
+                              <span className="dept-placement-stat-circle__value">{placementYearStats.highestPackage}</span>
+                              <span className="dept-placement-stat-circle__label">Highest Package</span>
+                            </div>
+                          </div>
+                        )}
+                        {placementYearStats.averageSalary != null && (
+                          <div className="dept-placement-stat-circle">
+                            <div className="dept-placement-stat-circle__ring">
+                              <span className="dept-placement-stat-circle__value">{placementYearStats.averageSalary}</span>
+                              <span className="dept-placement-stat-circle__label">Average Salary</span>
+                            </div>
+                          </div>
+                        )}
                       </div>
-                      <div className="dept-stat-tile">
-                        <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{displayedTotalOffers}</span></div>
-                        <div className="dept-stat-tile__label">Total No. of Offers</div>
-                      </div>
-                      {placementYearStats.averageSalary != null && (
-                        <div className="dept-stat-tile">
-                          <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.averageSalary}</span></div>
-                          <div className="dept-stat-tile__label">Average Salary</div>
-                        </div>
-                      )}
-                      {placementYearStats.medianSalary != null && (
-                        <div className="dept-stat-tile">
-                          <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.medianSalary}</span></div>
-                          <div className="dept-stat-tile__label">Median Salary</div>
-                        </div>
-                      )}
-                      {placementYearStats.highestPackage != null && (
-                        <div className="dept-stat-tile">
-                          <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.highestPackage}</span></div>
-                          <div className="dept-stat-tile__label">Highest Package</div>
-                        </div>
-                      )}
-                      {placementYearStats.above50Lpa > 0 && (
-                        <div className="dept-stat-tile">
-                          <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.above50Lpa} offers</span></div>
-                          <div className="dept-stat-tile__label">Above 50 LPA+</div>
-                        </div>
-                      )}
-                      {placementYearStats.above30Lpa > 0 && (
-                        <div className="dept-stat-tile">
-                          <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.above30Lpa} offers</span></div>
-                          <div className="dept-stat-tile__label">Above 30 LPA+</div>
-                        </div>
-                      )}
-                      {placementYearStats.above10Lpa > 0 && (
-                        <div className="dept-stat-tile">
-                          <div className="dept-stat-tile__circle"><span className="dept-stat-tile__value">{placementYearStats.above10Lpa} offers</span></div>
-                          <div className="dept-stat-tile__label">Above 10 LPA+</div>
+                      {(placementYearStats.medianSalary != null || placementYearStats.above50Lpa > 0 || placementYearStats.above30Lpa > 0 || placementYearStats.above10Lpa > 0) && (
+                        <div className="dept-placement-stats-rects">
+                          {placementYearStats.medianSalary != null && (
+                            <div className="dept-placement-stat-rect">
+                              <div className="dept-placement-stat-rect__value">{placementYearStats.medianSalary}</div>
+                              <div className="dept-placement-stat-rect__label">Median Salary</div>
+                            </div>
+                          )}
+                          {placementYearStats.above50Lpa > 0 && (
+                            <div className="dept-placement-stat-rect">
+                              <div className="dept-placement-stat-rect__value">{placementYearStats.above50Lpa} offers</div>
+                              <div className="dept-placement-stat-rect__label">Above 50 LPA+</div>
+                            </div>
+                          )}
+                          {placementYearStats.above30Lpa > 0 && (
+                            <div className="dept-placement-stat-rect">
+                              <div className="dept-placement-stat-rect__value">{placementYearStats.above30Lpa} offers</div>
+                              <div className="dept-placement-stat-rect__label">Above 30 LPA+</div>
+                            </div>
+                          )}
+                          {placementYearStats.above10Lpa > 0 && (
+                            <div className="dept-placement-stat-rect">
+                              <div className="dept-placement-stat-rect__value">{placementYearStats.above10Lpa} offers</div>
+                              <div className="dept-placement-stat-rect__label">Above 10 LPA+</div>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
@@ -1135,14 +1076,11 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                 <div id="placement-records-table" style={{ marginTop: 'var(--space-8)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-4)', flexWrap: 'wrap', gap: '0.75rem' }}>
                     <div>
-                      <span className="section-label dept-section-label">Student Success</span>
                       <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: '1.2rem', fontWeight: 800, color: 'var(--color-primary-dark)', margin: '0.2rem 0 0 0' }}>
                         Career Offers &amp; Recruiters ({activePlacementYear?.year})
                       </h3>
                     </div>
-                    <span style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--color-accent)', background: 'rgba(201, 168, 76, 0.12)', border: '1px solid rgba(201, 168, 76, 0.3)', borderRadius: '9999px', padding: '0.3rem 0.85rem' }}>
-                      {filteredPlacementRows.length} Verified Offers
-                    </span>
+                  
                   </div>
 
                   {placementCompanyOptions.length > 0 && (
@@ -1190,13 +1128,34 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                     </p>
                   )}
                 </div>
+
+                {/* Top Recruiters — admin-entered company names
+                    (dept.placementRecruiters), resolved to a real logo
+                    where the name is a known company. */}
+                {shared.placementRecruiters.length > 0 && (
+                  <div className="dept-recruiters-section" style={{ marginTop: 'var(--space-8)' }}>
+                    <h3 className="dept-recruiters-title">Top Recruiters</h3>
+                    <div className="dept-recruiters-grid">
+                      {shared.placementRecruiters.map((name, ri) => (
+                        <RecruiterTile key={name + ri} name={name} uploadedUrl={recruiterLogoMap.get(name.toLowerCase())} />
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div style={{ textAlign: 'center', marginTop: 'var(--space-10)' }}>
+                  <Link to="/placements/placement-details" className="btn btn-outline btn-lg">
+                    Explore the Full University Placement Report
+                    <ArrowRight size={16} strokeWidth={2.5} />
+                  </Link>
+                </div>
               </div>
             )}
             {placementYears.length === 0 && staticDeptBatches.length > 0 && (
               <div>
                 <div className="placement-year-pills" role="group" aria-label="Select academic year">
                   {staticDeptBatches.map((b) => (
-                    <span key={b.batch} className="placement-year-pill">AY. {b.batch}</span>
+                    <span key={b.batch} className="placement-year-pill">{b.batch}</span>
                   ))}
                 </div>
                 <p style={{ color: 'var(--color-text)', fontSize: '0.9rem', marginBottom: 'var(--space-4)', maxWidth: 640 }}>
@@ -1263,7 +1222,6 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
               <div id="internship-records-table" style={{ marginTop: 'var(--space-8)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-4)', flexWrap: 'wrap', gap: '0.75rem' }}>
                   <div>
-                    <span className="section-label dept-section-label">Student Success</span>
                     <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: '1.2rem', fontWeight: 800, color: 'var(--color-primary-dark)', margin: '0.2rem 0 0 0' }}>
                       Internship Offers &amp; Organizations ({activeInternshipYear?.year})
                     </h3>
@@ -1287,187 +1245,155 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
         </section>
       )}
 
-      {/* About HOD — photo + name below it, plain message, Vision/Mission/
-          Core Values folded in as individual accordion rows. */}
-      {hasHod && (
-        <section id="hod" className="dept-hod-section" style={{ scrollMarginTop: NAV_OFFSET }}>
-          <div className="container">
-            <div className="dept-hod-editorial-card">
-              {shared.hodImage && (
-                <div className="dept-hod-media-col">
-                  <div className="dept-hod-media-frame">
-                    <SmoothImage
-                      src={shared.hodImage}
-                      alt={shared.hod || 'Head of Department'}
-                      className="dept-hod-photo"
-                    />
-                  </div>
-                  {shared.hod && (
-                    <div className="dept-hod-media-caption">
-                      <h3 className="dept-hod-name">{shared.hod}</h3>
-                      <div className="dept-hod-meta">Head of the Department</div>
+      <div id="success-stories" style={{ scrollMarginTop: NAV_OFFSET }}>
+        <SuccessStoriesCarousel stories={successStoryItems} />
+      </div>
+
+      {/* Department Profile — an editorial "at a glance" read of the
+          department's identity/history/programmes/accreditation/leadership,
+          replacing the earlier five-equal-cards grid. Establishments,
+          Accreditations and Programme Intake are each admin-entered
+          per-programme arrays (see ProgramsAdmin.tsx) that can hold any
+          number of entries, so none of the three groups below assumes a
+          fixed count — every list renders through ExpandableGroup, which
+          shows the first few entries directly and collapses the rest behind
+          a "View all" toggle, so the layout stays the same shape whether a
+          department has one programme or several. A department-level
+          override (dept.established / dept.accreditation) still wins as a
+          single dept-wide entry, same fallback the previous grid used. */}
+      {(() => {
+        const deptEst = clean(dept?.established);
+        const validEst = subPrograms.filter((p) => clean(p.established));
+        const establishmentItems: ProfileListItem[] = deptEst
+          ? [{ id: 'dept-est', label: deptName, value: deptEst }]
+          : validEst.map((p) => ({ id: p.id, label: p.shortName || p.name, value: clean(p.established) }));
+
+        const deptAcc = clean(dept?.accreditation);
+        const deptAccImage = dept?.accreditationImage || '';
+        const validAcc = subPrograms.filter((p) => clean(p.accreditation));
+        const accreditationItems: ProfileListItem[] = deptAcc
+          ? [{ id: 'dept-acc', label: deptName, value: deptAcc, image: deptAccImage }]
+          : validAcc.map((p) => ({ id: p.id, label: p.shortName || p.name, value: clean(p.accreditation), image: p.accreditationImage || '' }));
+
+        const intakeItems: ProfileListItem[] = subPrograms
+          .filter((p) => p.intake && p.intake > 0)
+          .map((p) => ({ id: p.id, label: p.shortName || p.name, value: p.intake }));
+
+        const hasJourneyRow = establishmentItems.length > 0 || intakeItems.length > 0;
+        // AP EAPCET Code panel below always renders, so this row is never empty.
+        const hasAccreditationRow = true;
+
+        return (
+          <section id="rankings" className="dept-profile-section" style={{ scrollMarginTop: NAV_OFFSET }}>
+            <div className="container">
+              <div className="dept-profile-header">
+                <span className="dept-profile-eyebrow">Department Profile</span>
+                <h2 className="section-title">{deptName} at a Glance</h2>
+              </div>
+
+              {hasJourneyRow && (
+                <div className="dept-profile-grid">
+                  {establishmentItems.length > 0 && (
+                    <div className="dept-profile-panel">
+                      <div className="dept-profile-panel-head">
+                        <Calendar size={16} strokeWidth={2.2} />
+                        <h3>Academic Journey</h3>
+                      </div>
+                      <div className="dept-timeline">
+                        <ExpandableGroup
+                          items={establishmentItems}
+                          renderItem={(item) => (
+                            <div className="dept-timeline-item" key={item.id}>
+                              <span className="dept-timeline-year">{item.value}</span>
+                              <span className="dept-timeline-label">{item.label}</span>
+                            </div>
+                          )}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {intakeItems.length > 0 && (
+                    <div className="dept-profile-panel">
+                      <div className="dept-profile-panel-head">
+                        <Users size={16} strokeWidth={2.2} />
+                        <h3>Programmes &amp; Intake</h3>
+                      </div>
+                      <div className="dept-intake-list" role="table" aria-label="Programme intake">
+                        <div className="dept-intake-row dept-intake-row--head" role="row">
+                          <span role="columnheader">Programme</span>
+                          <span role="columnheader">Intake</span>
+                        </div>
+                        <ExpandableGroup
+                          items={intakeItems}
+                          renderItem={(item) => (
+                            <div className="dept-intake-row" role="row" key={item.id}>
+                              <span role="cell">{item.label}</span>
+                              <span role="cell" className="dept-intake-seats">{item.value}</span>
+                            </div>
+                          )}
+                        />
+                      </div>
                     </div>
                   )}
                 </div>
               )}
 
-              <div className="dept-hod-content">
-                <h2 className="dept-hod-message-title">Brief Profile</h2>
-
-                {shared.hodMessage && (
-                  <p className="dept-hod-message-text-plain">{shared.hodMessage}</p>
-                )}
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Faculty Carousel (matching Google UI reference design) */}
-      {faculty.length > 0 && (
-        <div id="faculty" style={{ scrollMarginTop: NAV_OFFSET }}>
-          <FacultyCarousel
-            faculty={faculty}
-            departmentName={deptName}
-            title="Learn from our impactful faculty"
-            viewMoreLink="/faculty"
-          />
-        </div>
-      )}
-
-      {/* Laboratories — premium unified-card carousel, 40:60 text/image
-          split, one slide visible at a time, auto-advancing. */}
-      {hasLabs && (() => {
-        const hasLabImages = shared.labs.some((l) => Boolean(l.imageUrl && l.imageUrl.trim()));
-        return (
-          <section id="labs" className="dept-labs-section" style={{ scrollMarginTop: NAV_OFFSET }}>
-            <div className="container">
-              <div className="dept-labs-header">
-                <div className="dept-labs-title-wrap">
-                  <span className="section-label dept-section-label">State-of-the-Art Infrastructure</span>
-                  <h2 className="section-title">Specialized Laboratories</h2>
-                  <p className="section-desc" style={{ margin: '0.5rem 0 0 0' }}>
-                    Industry-aligned experimental facilities engineered for hands-on technical immersion, advanced computing, and multidisciplinary project incubation.
-                  </p>
-                </div>
-                <div className="dept-labs-count-pill">
-                  <span className="dept-labs-count-dot" />
-                  <span>{shared.labs.length} Active Facilities</span>
-                </div>
-              </div>
-
-              {hasLabImages ? (
-                <div
-                  className="dept-lab-carousel"
-                  onMouseEnter={() => setLabAutoPaused(true)}
-                  onMouseLeave={() => setLabAutoPaused(false)}
-                  onTouchStart={() => setLabAutoPaused(true)}
-                  onTouchEnd={() => pauseLabAutoTemporarily()}
-                >
-                  <div className="dept-lab-rows" ref={labScrollRef}>
-                    {shared.labs.map((lab, li) => (
-                      <div key={li} className="dept-lab-slide">
-                        <div className="dept-lab-slide-text">
-                          <span className="dept-lab-slide-number">
-                            {String(li + 1).padStart(2, '0')} / {String(shared.labs.length).padStart(2, '0')}
-                          </span>
-                          <Microscope size={26} strokeWidth={2} className="dept-lab-slide-icon" />
-                          <h3 className="dept-lab-slide-title">{lab.name}</h3>
-                          {lab.description && (
-                            <p className="dept-lab-slide-desc">{lab.description}</p>
-                          )}
-                          {lab.pdfUrl && (
-                            <a href={lab.pdfUrl} target="_blank" rel="noopener noreferrer" className="dept-lab-slide-cta">
-                              <span>Explore Lab</span>
-                              <ArrowRight size={15} strokeWidth={2.5} />
-                            </a>
-                          )}
+              {hasAccreditationRow && (
+                <div className="dept-profile-grid">
+                  {accreditationItems.length > 0 && (
+                    <div className="dept-profile-panel">
+                      {accreditationItems.some((item) => item.image) ? (
+                        // Image mode — occupy entire section
+                        <div className="dept-accreditation-image-section">
+                          {accreditationItems.filter((item) => item.image).map((item) => (
+                            <div key={item.id} className="dept-accreditation-image-wrapper">
+                              <img src={item.image} alt={`${item.label} accreditation`} />
+                              <span className="dept-accreditation-image-label">{item.label}</span>
+                            </div>
+                          ))}
                         </div>
-                        <div className="dept-lab-slide-media">
-                          <SmoothImage
-                            src={lab.imageUrl || shared.heroImage}
-                            alt={lab.name}
-                            className="dept-lab-slide-img"
-                          />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {shared.labs.length > 1 && (
-                    <div className="dept-lab-carousel-controls">
-                      <div className="dept-lab-carousel-dots" role="tablist" aria-label="Laboratory slides">
-                        {shared.labs.map((lab, li) => (
-                          <button
-                            key={lab.name + li}
-                            type="button"
-                            role="tab"
-                            aria-selected={activeLabIndex === li}
-                            aria-label={`Show ${lab.name}`}
-                            className={`dept-lab-dot${activeLabIndex === li ? ' active' : ''}`}
-                            onClick={() => scrollToLabIndex(li)}
-                          />
-                        ))}
-                      </div>
-                      <div className="dept-lab-carousel-arrows" role="group" aria-label="Laboratories carousel navigation">
-                        <button
-                          type="button"
-                          className="dept-lab-carousel-arrow-btn"
-                          onClick={() => scrollLabsBy(-1)}
-                          disabled={!canScrollLabsLeft}
-                          aria-label="Previous laboratory"
-                        >
-                          <ArrowLeft size={17} strokeWidth={2.4} />
-                        </button>
-                        <button
-                          type="button"
-                          className="dept-lab-carousel-arrow-btn"
-                          onClick={() => scrollLabsBy(1)}
-                          disabled={!canScrollLabsRight}
-                          aria-label="Next laboratory"
-                        >
-                          <ArrowRight size={17} strokeWidth={2.4} />
-                        </button>
-                      </div>
+                      ) : (
+                        // Text mode — original layout
+                        <>
+                          <div className="dept-profile-panel-head">
+                            <Award size={16} strokeWidth={2.2} />
+                            <h3>Accreditation</h3>
+                          </div>
+                          <div className="dept-accreditation-list">
+                            <ExpandableGroup
+                              items={accreditationItems}
+                              renderItem={(item) => (
+                                <div className="dept-accreditation-row" key={item.id}>
+                                  <span className="dept-accreditation-badge" aria-hidden="true">
+                                    <Award size={16} strokeWidth={2.2} />
+                                  </span>
+                                  <div>
+                                    <span className="dept-accreditation-programme">{item.label}</span>
+                                    <span className="dept-accreditation-status">{item.value}</span>
+                                  </div>
+                                </div>
+                              )}
+                            />
+                          </div>
+                        </>
+                      )}
                     </div>
                   )}
-                </div>
-              ) : (
-                <div className="dept-labs-grid">
-                  {shared.labs.map((lab, li) => {
-                    const indexNum = String(li + 1).padStart(2, '0');
-                    return (
-                      <div key={li} className="dept-lab-card">
-                        <div>
-                          <div className="dept-lab-card-top">
-                            <span className="dept-lab-index-tag">{indexNum}</span>
-                            <div className="dept-lab-icon-wrap">
-                              <Microscope size={18} strokeWidth={2} />
-                            </div>
-                          </div>
-                          <div className="dept-lab-body">
-                            <span className="dept-lab-overline">Practical & Research Facility</span>
-                            <h3 className="dept-lab-title">{lab.name}</h3>
-                            <p className="dept-lab-spec-desc">
-                              {lab.description || 'Equipped with high-performance workstations and dedicated experimental apparatus.'}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="dept-lab-footer">
-                          {lab.pdfUrl ? (
-                            <a href={lab.pdfUrl} target="_blank" rel="noopener noreferrer" className="dept-lab-pdf-btn">
-                              <span className="dept-lab-pdf-btn-label">Lab Manual & Specs</span>
-                              <span className="dept-btn-arrow-circle">
-                                <ArrowRight size={12} strokeWidth={2.5} />
-                              </span>
-                            </a>
-                          ) : (
-                            <span className="dept-lab-status-tag">Active Research Facility</span>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
+
+                  <Link to="/admissions" className="dept-profile-panel dept-profile-eapcet">
+                    <div className="dept-profile-panel-head">
+                      <h3>Applying via AP EAPCET?</h3>
+                    </div>
+                    <div className="dept-eapcet-body">
+                      <span className="dept-eapcet-code">{eapcetCode}</span>
+                      <span className="dept-eapcet-hint">Enter this code during counselling to choose {deptName}</span>
+                      <span className="dept-eapcet-cta">
+                        See the full admissions process
+                        <ArrowRight size={13} strokeWidth={2.5} />
+                      </span>
+                    </div>
+                  </Link>
                 </div>
               )}
             </div>
@@ -1475,19 +1401,57 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
         );
       })()}
 
+      {hasLabs && (
+        <LabsCarousel
+          labs={shared.labs}
+          navOffset={NAV_OFFSET}
+          fallbackImage={shared.heroImage}
+          title="Academic Infrastructure & Learning Facilities"
+          description={`Explore the laboratories, studios, and campus infrastructure that support hands-on learning in ${deptName} — from specialized equipment to dedicated project and research spaces.`}
+        />
+      )}
+
+      {/* ── Research & Innovation ────────────────────────────────────────
+          Template: "Pioneers of research & innovation" style.
+          Left: 2×2 stat cards. Right: auto-advancing research slide carousel.
+          Data comes from this department's own doc (Admin → Academic
+          Departments → Research & Innovation) — see ResearchSection above. */}
+      <ResearchSection deptName={deptName} heroImage={heroImage} stats={dept?.researchStats} slides={dept?.researchSlides} />
+
+      {/* Tie-Ups & MoUs — admin-entered partner/institution names
+          (dept.tieUpsMous), same rectangular tile grid as Top Recruiters
+          above, resolved to a real logo where the name is known. A light
+          gold-accented surface (.dept-tieups-surface, detail-layout.css) —
+          deliberately not .dept-section-navy, which Core Values above and
+          Testimonials below already use; three sections in the same navy
+          made them read as one repeated block. */}
+      {shared.tieUpsMous.length > 0 && (
+        <section id="tieups-mous" className="section dept-tieups-surface" style={{ scrollMarginTop: NAV_OFFSET }}>
+          <div className="container">
+            <div className="dept-recruiters-section">
+              <h3 className="dept-recruiters-title">Tie-Ups &amp; MoUs</h3>
+              <div className="dept-recruiters-grid dept-recruiters-grid--circular">
+                {shared.tieUpsMous.map((name, ri) => (
+                  <RecruiterTile
+                    key={name + ri}
+                    name={name}
+                    uploadedUrl={mousPartnerLogoMap.get(name.trim().toLowerCase()) || recruiterLogoMap.get(name.toLowerCase())}
+                    showName
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* ===== Unified Programme Hub ===== */}
       <section id="program-toggle" className="programme-hub-section" style={{ scrollMarginTop: NAV_OFFSET }}>
         <div className="container">
           <div className="programme-hub-header">
-            <span className="section-label dept-section-label" style={{ color: 'var(--color-accent)' }}>
-              Choose a Programme
-            </span>
-            <h2 className="section-title" style={{ marginBottom: '0.75rem' }}>
-              Academic Programmes &amp; Course Structure
-            </h2>
-            <p className="section-desc" style={{ maxWidth: '680px', margin: '0 auto 1.5rem' }}>
-              Select a degree program below to explore its overview, curriculum structure, and outcome-based learning objectives.
-            </p>
+<h2 className="section-title" style={{ marginBottom: '0.75rem' }}>
+               Academic Programmes &amp; Course Structure
+             </h2>
 
             {/* Programme Selector Pills */}
             <div className="programme-hub-pills" role="tablist" aria-label="Choose a Programme">
@@ -1522,7 +1486,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                 onClick={() => setActiveHubTab('overview')}
               >
                 <BookOpen size={17} strokeWidth={2.2} />
-                <span>Overview &amp; Highlights</span>
+                <span>Overview & Highlights</span>
               </button>
 
               <button
@@ -1533,9 +1497,10 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                 onClick={() => setActiveHubTab('curriculum')}
               >
                 <GraduationCap size={17} strokeWidth={2.2} />
-                <span>Curriculum &amp; Structure</span>
+                <span>Curriculum & Structure</span>
               </button>
 
+              {hasOutcomeStatements && (
               <button
                 type="button"
                 role="tab"
@@ -1546,18 +1511,9 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                 <Award size={17} strokeWidth={2.2} />
                 <span>{outcomeHeading}</span>
               </button>
+              )}
 
-              <button
-                type="button"
-                role="tab"
-                aria-selected={activeHubTab === 'news'}
-                className={`programme-hub-tab-btn${activeHubTab === 'news' ? ' active' : ''}`}
-                onClick={() => setActiveHubTab('news')}
-              >
-                <Calendar size={17} strokeWidth={2.2} />
-                <span>News &amp; Events</span>
-              </button>
-
+              {hasNewsletter && (
               <button
                 type="button"
                 role="tab"
@@ -1568,7 +1524,9 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                 <FileText size={17} strokeWidth={2.2} />
                 <span>Department Newsletter</span>
               </button>
+              )}
 
+              {hasRnd && (
               <button
                 type="button"
                 role="tab"
@@ -1577,8 +1535,9 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                 onClick={() => setActiveHubTab('rnd')}
               >
                 <Microscope size={17} strokeWidth={2.2} />
-                <span>Research &amp; Development</span>
+                <span>Research & Development</span>
               </button>
+              )}
             </div>
 
             {/* Hub Body Content */}
@@ -1587,7 +1546,6 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                 <div className="programme-hub-grid">
                   {/* Left Column: About */}
                   <div className="programme-hub-about-col">
-                    <span className="section-label dept-section-label">{activeProgram.shortName || activeProgram.name}</span>
                     <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0f172a', margin: '0.25rem 0 1rem 0' }}>
                       About the Programme
                     </h3>
@@ -1599,7 +1557,6 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                   {/* Right Column: Highlights */}
                   {hasHighlights && (
                     <div className="programme-hub-highlights-col">
-                      <span className="section-label dept-section-label">Key Pillars</span>
                       <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0f172a', margin: '0.25rem 0 1rem 0' }}>
                         Programme Highlights
                       </h3>
@@ -1630,7 +1587,6 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
               {activeHubTab === 'curriculum' && (
                 <div>
                   <div style={{ marginBottom: '1.5rem' }}>
-                    <span className="section-label dept-section-label">Curriculum</span>
                     <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0f172a', margin: '0.25rem 0 0.5rem 0' }}>
                       {activeProgram.shortName || activeProgram.name} — Programme Structure
                     </h3>
@@ -1663,7 +1619,6 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                 </div>
               )}
 
-              {activeHubTab === 'outcomes' && !hasOutcomeStatements && HUB_TAB_EMPTY}
               {activeHubTab === 'outcomes' && hasOutcomeStatements && (
                 <div>
                   <p className="section-desc" style={{ marginBottom: '1.5rem' }}>
@@ -1712,17 +1667,9 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                 </div>
               )}
 
-              {/* News & Events — moved into the hub so it shares this card's
-                  tab bar instead of its own standalone section below. */}
-              {activeHubTab === 'news' && !hasNewsEvents && HUB_TAB_EMPTY}
-              {activeHubTab === 'news' && hasNewsEvents && (
-                <NewsEventsTabs categories={newsEventsCategories} eyebrow={deptName} navOffset={NAV_OFFSET} embedded />
-              )}
-
               {/* Department Newsletter & Publications — same move; the
                   standalone version's own collapsible header is redundant
                   once this is already gated behind a tab click. */}
-              {activeHubTab === 'newsletter' && !hasNewsletter && HUB_TAB_EMPTY}
               {activeHubTab === 'newsletter' && hasNewsletter && (
                 <div>
                   <p className="section-desc" style={{ marginBottom: 'var(--space-5)' }}>
@@ -1769,11 +1716,9 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                   move; renders whichever of the four admin fields are
                   filled in (overview paragraph, table(s), project/patent
                   cards, and/or a flat PDF link list). */}
-              {activeHubTab === 'rnd' && !hasRnd && HUB_TAB_EMPTY}
               {activeHubTab === 'rnd' && hasRnd && (
                 <div>
                   <div style={{ marginBottom: 'var(--space-6)' }}>
-                    <span className="section-label dept-section-label">Research</span>
                     <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0f172a', margin: '0.25rem 0 0 0' }}>
                       Research &amp; Development (Funded Projects &amp; Patents)
                     </h3>
@@ -1939,20 +1884,193 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
         </div>
       </section>
 
+      {/* About HOD — photo + name below it, plain message, Vision/Mission/
+          Core Values folded in as individual accordion rows. */}
+      {hasHod && (
+        <section id="hod" className="dept-hod-section" style={{ scrollMarginTop: NAV_OFFSET }}>
+          <div className="container">
+            <div style={{ textAlign: 'center', maxWidth: 600, margin: '0 auto var(--space-8)' }}>
+              <h2 className="section-title">Head of the Department</h2>
+            </div>
+            <div className="dept-hod-editorial-card">
+              {shared.hodImage && (
+                <div className="dept-hod-media-col">
+                  <div className="dept-hod-media-frame">
+                    <SmoothImage
+                      src={shared.hodImage}
+                      alt={shared.hod || 'Head of Department'}
+                      className="dept-hod-photo"
+                    />
+                  </div>
+                  {shared.hod && (
+                    <div className="dept-hod-media-caption">
+                      <h3 className="dept-hod-name">{shared.hod}</h3>
+                      <div className="dept-hod-meta">Head of the Department</div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className="dept-hod-content">
+                <h2 className="dept-hod-message-title">Brief Profile</h2>
+
+                {shared.hodMessage && (
+                  <p className="dept-hod-message-text-plain">{shared.hodMessage}</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Faculty Carousel (matching Google UI reference design) */}
+      {faculty.length > 0 && (
+        <div id="faculty" style={{ scrollMarginTop: NAV_OFFSET }}>
+          <FacultyCarousel
+            faculty={faculty}
+            departmentName={deptName}
+            title="The People Behind Expertise"
+            viewMoreLink="/faculty"
+          />
+        </div>
+      )}
+
+      {/* Events & Happenings — extracted from the Programme Hub's tab bar
+          into its own standalone section. NewsEventsTabs renders its own
+          section/container + collapsible header when not embedded. */}
+      {hasNewsEvents && (
+        <NewsEventsTabs categories={newsEventsCategories} navOffset={NAV_OFFSET} />
+      )}
+
+      {/* Testimonials — a bold navy "quote wall" (matching the Core Values
+          card's gradient) for visual contrast against the lighter sections
+          around it; cards float as translucent glass surfaces. Own data
+          (dept.testimonials, Admin → Academic Departments → Testimonials) —
+          not shared with the Success Stories carousel above. */}
+      {testimonialItems.length > 0 && (
+        <section id="testimonials" className="section dept-testimonials-navy" style={{ scrollMarginTop: NAV_OFFSET }}>
+          <div className="container">
+            <div style={{ textAlign: 'center', maxWidth: 600, margin: '0 auto var(--space-10)' }}>
+              <h2 className="section-title">What Our Students Say</h2>
+              <p className="section-desc" style={{ margin: '0 auto' }}>
+                Testimonials from graduates and current students of {deptName}.
+              </p>
+            </div>
+            <div className="dept-testimonial-single">
+              <div className="dept-testimonial-single-dots" role="tablist" aria-label="Testimonials">
+                {testimonialItems.slice(0, testimonialCount).map((story, i) => (
+                  <button
+                    key={story.id || i}
+                    type="button"
+                    role="tab"
+                    aria-selected={activeTestimonial === i}
+                    aria-label={`Show testimonial from ${story.name}`}
+                    className={`dept-testimonial-dot${activeTestimonial === i ? ' active' : ''}`}
+                    onClick={() => setActiveTestimonial(i)}
+                  />
+                ))}
+              </div>
+
+              {testimonialItems[activeTestimonial] && (
+                <div key={activeTestimonial} className="dept-testimonial-single-card">
+                  <div className="dept-testimonial-single-media">
+                    {testimonialItems[activeTestimonial].photoUrl ? (
+                      <SmoothImage
+                        src={testimonialItems[activeTestimonial].photoUrl}
+                        alt={testimonialItems[activeTestimonial].name}
+                        className="dept-testimonial-single-photo"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="dept-testimonial-single-photo-fallback">
+                        <span>
+                          {testimonialItems[activeTestimonial].name
+                            .split(' ')
+                            .map((p) => p[0])
+                            .slice(0, 2)
+                            .join('')
+                            .toUpperCase()}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="dept-testimonial-single-body">
+                    <span className="dept-testimonial-single-quote-mark" aria-hidden="true">&ldquo;</span>
+                    {testimonialItems[activeTestimonial].description && (
+                      <p className="dept-testimonial-single-quote">{testimonialItems[activeTestimonial].description}</p>
+                    )}
+                    <div>
+                      <span className="dept-testimonial-single-name">{testimonialItems[activeTestimonial].name}</span>
+                      {testimonialItems[activeTestimonial].programme && (
+                        <span className="dept-testimonial-single-role">{testimonialItems[activeTestimonial].programme}</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
       <CustomSectionsRenderer sections={visibleCustomSections} navOffset={NAV_OFFSET} />
 
-      {/* CTA */}
-      <section style={{ background: 'var(--color-primary)', padding: 'var(--space-14) 0' }}>
+      {/* FAQ — last content section on the page, right before the closing
+          CTA. Items render from this department's own `faqs` field (Admin →
+          Academic Departments → Department Page — FAQs); the section is
+          hidden entirely until an admin adds real entries, so no
+          mock/placeholder questions ever show. No scroll-reveal animation
+          here (see the Firestore gotcha in CLAUDE.md). */}
+      {faqs.length > 0 && (
+      <section id="faq" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
+        <div className="container">
+          <div style={{ textAlign: 'center', maxWidth: 600, margin: '0 auto var(--space-12)' }}>
+            <h2 className="section-title">
+              Frequently Asked <span style={{ color: 'var(--color-accent)' }}>Questions</span>
+            </h2>
+            <p className="section-desc" style={{ margin: '0 auto' }}>
+              Common questions about this department, answered. If you do not find what you are looking for, contact our admissions team directly.
+            </p>
+          </div>
+          <div className="dept-faq-list">
+            {faqs.map((faq, i) => (
+              <div key={i} className={`dept-faq-card${openFaq === i ? ' open' : ''}`}>
+                <button
+                  type="button"
+                  className="dept-faq-question"
+                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                  aria-expanded={openFaq === i}
+                >
+                  <span>{faq.question}</span>
+                  <ChevronDown size={18} strokeWidth={2.4} style={{ flexShrink: 0, transition: 'transform 0.3s', transform: openFaq === i ? 'rotate(180deg)' : 'rotate(0deg)' }} />
+                </button>
+                <div className="dept-faq-collapse" aria-hidden={openFaq !== i}>
+                  <div className="dept-faq-collapse-inner">
+                    <div className="dept-faq-answer">{faq.answer}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+      )}
+
+      {/* CTA — navy-themed closing section for strong visual closure */}
+      <section className="section" style={{ background: 'var(--color-primary)' }}>
         <div className="container" style={{ textAlign: 'center' }}>
-          <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>Begin Your Journey in {deptName}</h2>
-          <p style={{ color: 'rgba(255,255,255,0.8)', maxWidth: 500, margin: '0 auto var(--space-8)', lineHeight: 1.7 }}>
-            Join a thriving academic community. Apply through AP EAPCET (Code: {eapcetCode}), explore our fee structure, or schedule a campus visit.
+          <h2 className="section-title" style={{ color: 'var(--color-white)' }}>Begin Your Journey in {deptName}</h2>
+          <p style={{ color: 'rgba(255,255,255,0.8)', maxWidth: 520, margin: '0 auto var(--space-8)', lineHeight: 1.7, fontSize: 'var(--text-lg)' }}>
+            Join a thriving academic community. Apply through AP EAPCET (Code: {eapcetCode}) or schedule a campus visit today.
           </p>
-          <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link to="/admissions" className="btn btn-secondary btn-lg">For Admissions</Link>
-            <Link to="/programmes-fee-structure" className="btn btn-secondary btn-lg">Fee Structure</Link>
-            <Link to="/academics" className="btn btn-secondary btn-lg">All Programmes</Link>
+          <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap', marginBottom: 'var(--space-6)' }}>
+            <Link to="/apply-now" className="btn btn-accent btn-lg">Apply Now</Link>
             <Link to="/campus-visit" className="btn btn-secondary btn-lg">Book a Campus Visit</Link>
+          </div>
+          <div style={{ display: 'flex', gap: 'var(--space-6)', justifyContent: 'center', flexWrap: 'wrap' }}>
+            <Link to="/programmes-fee-structure" style={{ color: 'rgba(255,255,255,0.7)', fontSize: 'var(--text-sm)', fontWeight: 600, textDecoration: 'underline', textUnderlineOffset: '3px' }}>Fee Structure</Link>
+            <Link to="/academics" style={{ color: 'rgba(255,255,255,0.7)', fontSize: 'var(--text-sm)', fontWeight: 600, textDecoration: 'underline', textUnderlineOffset: '3px' }}>All Programmes</Link>
+            <Link to="/admissions" style={{ color: 'rgba(255,255,255,0.7)', fontSize: 'var(--text-sm)', fontWeight: 600, textDecoration: 'underline', textUnderlineOffset: '3px' }}>Admission Procedure</Link>
           </div>
         </div>
       </section>

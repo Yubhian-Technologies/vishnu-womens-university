@@ -28,7 +28,8 @@
 .vm-label h2 {
   font-family: var(--font-serif);
   font-size: 1.85rem;
-  font-weight: 800;
+  font-weight: 600;
+  letter-spacing: -0.02em;
   color: var(--color-primary);
 }
 
@@ -67,6 +68,14 @@
   font-weight: 500;
 }
 
+.vm-mission-intro {
+  font-size: var(--text-base);
+  color: var(--color-text-light);
+  line-height: 1.75;
+  margin: 0 0 var(--space-6);
+  max-width: 68ch;
+}
+
 .vm-mission-list {
   list-style: none;
   display: flex;
@@ -77,9 +86,6 @@
 }
 
 .vm-mission-item {
-  display: flex;
-  gap: var(--space-5);
-  align-items: flex-start;
   background: var(--color-white);
   border: 1px solid var(--color-light-gray);
   border-left: 3.5px solid var(--color-primary);
@@ -89,11 +95,32 @@
   transition: transform 0.25s ease, box-shadow 0.25s ease, border-left-color 0.25s ease;
 }
 
+.vm-mission-item:not(.vm-mission-item--collapsible) {
+  display: flex;
+  gap: var(--space-5);
+  align-items: flex-start;
+}
+
 .vm-mission-item:hover {
   border-left-color: var(--color-accent);
   border-color: var(--color-accent);
   box-shadow: 0 8px 24px rgba(11, 30, 66, 0.08);
   transform: translateX(4px);
+}
+
+.vm-mission-item details > summary {
+  display: flex;
+  gap: var(--space-5);
+  align-items: flex-start;
+  cursor: pointer;
+  list-style: none;
+  min-height: 34px;
+}
+
+.vm-mission-item details > summary::-webkit-details-marker,
+.vm-mission-item details > summary::marker {
+  display: none;
+  content: '';
 }
 
 .vm-mission-num {
@@ -112,12 +139,33 @@
   flex-shrink: 0;
 }
 
-.vm-mission-item p {
+.vm-mission-item p,
+.vm-mission-preview {
   font-size: var(--text-base);
   color: var(--color-text-light);
   line-height: 1.65;
   margin: 0;
   padding-top: 4px;
+}
+
+.vm-mission-preview {
+  flex: 1;
+}
+
+.vm-mission-chevron {
+  flex-shrink: 0;
+  margin-top: 6px;
+  color: var(--color-primary);
+  transition: transform 0.25s ease;
+}
+
+.vm-mission-item details[open] .vm-mission-chevron {
+  transform: rotate(180deg);
+}
+
+.vm-mission-full {
+  margin-left: calc(34px + var(--space-5));
+  padding-top: var(--space-3);
 }
 
 /* Values Grid */
@@ -170,7 +218,8 @@
 .vm-value-card h3 {
   font-family: var(--font-serif);
   font-size: 1.15rem;
-  font-weight: 800;
+  font-weight: 600;
+  letter-spacing: -0.02em;
   color: var(--color-primary);
   margin-bottom: 0.5rem;
   line-height: 1.35;

@@ -40,12 +40,12 @@ function PaginatedTable({ section }: { section: FlexibleTableSection }) {
 
   return (
     <>
-      <div style={{ overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm)' }}>
+      <div style={{ overflowX: 'auto', borderRadius: '14px', border: '1.5px solid #e2e8f0', boxShadow: '0 6px 18px rgba(11, 30, 66, 0.05)', background: '#ffffff', margin: '0.75rem 0 1.25rem' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
           <thead>
-            <tr style={{ background: 'var(--color-primary)' }}>
+            <tr style={{ background: 'linear-gradient(135deg, #0b1e42 0%, #162d5a 100%)', borderBottom: '3px solid #c9973a' }}>
               {section.headers.map((col, ci) => (
-                <th key={ci} style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'left', color: 'var(--color-white)', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                <th key={ci} style={{ padding: '0.9rem 1.2rem', textAlign: 'left', color: '#ffffff', fontWeight: 700, whiteSpace: 'nowrap', letterSpacing: '0.02em', fontSize: '0.85rem', textTransform: 'uppercase' }}>
                   {col}
                 </th>
               ))}
@@ -53,11 +53,11 @@ function PaginatedTable({ section }: { section: FlexibleTableSection }) {
           </thead>
           <tbody>
             {visibleRows.map((row, i) => (
-              <tr key={start + i} style={{ background: i % 2 === 0 ? 'var(--color-white)' : 'var(--color-off-white)', borderBottom: '1px solid var(--color-light-gray)' }}>
+              <tr key={start + i} style={{ background: i % 2 === 0 ? '#ffffff' : '#f8fafc', borderBottom: '1px solid #edf2f7' }}>
                 {row.map((val, j) => (
-                  <td key={j} style={{ padding: 'var(--space-3) var(--space-4)', color: 'var(--color-text)', lineHeight: 1.5 }}>
+                  <td key={j} style={{ padding: '0.85rem 1.2rem', color: '#334155', lineHeight: 1.6, fontWeight: 500 }}>
                     {/^https?:\/\//i.test(val) ? (
-                      <a href={val} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-primary)', fontWeight: 600 }}>View</a>
+                      <a href={val} target="_blank" rel="noopener noreferrer" style={{ color: '#b45309', fontWeight: 700, textDecoration: 'underline' }}>View</a>
                     ) : val}
                   </td>
                 ))}

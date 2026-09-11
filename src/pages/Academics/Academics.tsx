@@ -226,7 +226,6 @@ export default function Academics() {
       <section className="academics-programs-section">
         <div className="container">
           <div className="reveal">
-            <span className="section-label">Academic Programs</span>
             <h2 className="section-title">Explore Your Options</h2>
             <p className="section-desc" style={{ marginBottom: 'var(--space-8)' }}>
               Whether you are beginning your B.Tech, advancing to M.Tech, or pursuing doctoral research — VWU offers a program matched to your goals.
@@ -257,12 +256,12 @@ export default function Academics() {
                   <div className="program-card-icon"><Icon size={29} strokeWidth={1.75} /></div>
                   <h3>{program.name}</h3>
                   <p>{truncate(program.about, 140)}</p>
-                  <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap', marginTop: 'var(--space-3)' }}>
-                    <span style={{ fontSize: '0.68rem', fontWeight: 700, background: 'var(--color-off-white)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-sm)', padding: '2px 8px', color: 'var(--color-text-light)', fontFamily: 'var(--font-sans)', whiteSpace: 'nowrap' }}>
+                  <div className="program-card-badges">
+                    <span className="program-badge-seats">
                       {program.intake} Seats
                     </span>
                     {program.accreditation && program.accreditation !== '—' && (
-                      <span style={{ fontSize: '0.68rem', fontWeight: 700, background: 'rgba(201,168,76,0.12)', border: '1px solid rgba(201,168,76,0.4)', borderRadius: 'var(--radius-sm)', padding: '2px 8px', color: 'var(--color-accent)', fontFamily: 'var(--font-sans)', whiteSpace: 'nowrap' }}>
+                      <span className="program-badge-accreditation">
                         {program.accreditation.split(' ').slice(0, 2).join(' ')}
                       </span>
                     )}
@@ -290,7 +289,6 @@ export default function Academics() {
       <section className="section bg-white">
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>
-            <span className="section-label">Departments</span>
             <h2 className="section-title">Academic Departments</h2>
             <p className="section-desc" style={{ margin: '0 auto' }}>
               Specialised departments bringing together experienced faculty, modern laboratories, and industry-aligned curricula for relevant and future-ready education.
@@ -314,9 +312,9 @@ export default function Academics() {
                     <button
                       type="button"
                       onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleDept(dept.id); }}
-                      style={{ alignSelf: 'flex-start', fontSize: '0.72rem', fontWeight: 700, color: 'var(--color-accent)', fontFamily: 'var(--font-sans)', background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+                      className="dept-expand-toggle"
                     >
-                      {expanded ? '← Show less' : 'More →'}
+                      {expanded ? 'Show less' : 'Read more'}
                     </button>
                   )}
                 </>
@@ -343,7 +341,6 @@ export default function Academics() {
       <section className="section bg-off-white">
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-10)' }}>
-            <span className="section-label">Student Life</span>
             <h2 className="section-title">Beyond the Classroom</h2>
             <p className="section-desc" style={{ margin: '0 auto var(--space-8)' }}>
               From managing a campus radio station to competing at inter-collegiate sports meets — there is a great deal more to life at VWU than lectures alone.
@@ -392,7 +389,6 @@ export default function Academics() {
         <div className="container">
           <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-12)', alignItems: 'center' }}>
             <div className="reveal-left">
-              <span className="section-label">Career Outcomes</span>
               <h2 className="section-title">Where VWU Engineers Go</h2>
               <p style={{ color: 'var(--color-text-light)', lineHeight: 1.8, marginBottom: 'var(--space-6)' }}>
                 The Training & Placement Cell maintains year-round engagement with India's leading employers — including Amazon, TCS, Infosys, Wipro, HCL, Cognizant, and 150+ other companies.
@@ -470,7 +466,6 @@ export default function Academics() {
       <section className="section" style={{ background: 'var(--color-primary)' }}>
         <div className="container" style={{ textAlign: 'center' }}>
           <div className="reveal">
-            <span className="section-label" style={{ color: 'var(--color-accent)' }}>Get Started</span>
             <h2 className="section-title" style={{ color: 'var(--color-white)' }}>Ready to Join VWU?</h2>
             <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 'var(--text-lg)', maxWidth: 560, margin: '0 auto var(--space-8)' }}>
               Arrange a campus visit, request further information, or apply through AP EAPCET (Code: {eapcetCode}) today.

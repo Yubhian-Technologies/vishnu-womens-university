@@ -93,7 +93,6 @@ export default function StudentLife() {
       <section className="section bg-off-white">
         <div className="container">
           <div className="reveal" style={{ marginBottom: 'var(--space-10)' }}>
-            <span className="section-label">Get Involved</span>
             <h2 className="section-title">Student Clubs</h2>
             <p className="section-desc">
               With 30+ student clubs, VWU has a community for every interest.
@@ -145,7 +144,6 @@ export default function StudentLife() {
       <section className="section bg-white">
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', maxWidth: 600, margin: '0 auto var(--space-12)' }}>
-            <span className="section-label">Support</span>
             <h2 className="section-title">We're Here for You</h2>
             <p className="section-desc" style={{ margin: '0 auto' }}>
               From orientation to graduation, VWU's student services team is with you at every stage.
@@ -180,7 +178,6 @@ export default function StudentLife() {
         <div className="container">
           <div className="sl-dining-grid">
             <div className="reveal-left">
-              <span className="section-label" style={{ color: 'var(--color-accent)' }}>Campus Dining</span>
               <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>Fresh, Nourishing, and Convenient</h2>
               <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: 'var(--text-lg)', lineHeight: 1.7, marginBottom: 'var(--space-6)' }}>
                 VWU's campus food courts serve hygienic, freshly prepared vegetarian and
@@ -263,7 +260,6 @@ export default function StudentLife() {
       <section className="section bg-off-white">
         <div className="container" style={{ textAlign: 'center' }}>
           <div className="reveal">
-            <span className="section-label">Take the Next Step</span>
             <h2 className="section-title">Ready to Join VWU?</h2>
             <p className="section-desc" style={{ margin: '0 auto var(--space-8)' }}>
               Visit the campus and see what student life at VWU actually looks like — firsthand.

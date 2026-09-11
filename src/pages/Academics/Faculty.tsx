@@ -188,15 +188,6 @@ export default function Faculty() {
     return [...buckets.entries()].sort(([a], [b]) => a - b).map(([, members]) => members);
   }, [filtered]);
 
-  // A handful of people are legitimately listed under two departments (e.g.
-  // AI&DS and AI&ML both credit the same faculty member) — that's fine for
-  // per-department browsing, but the headline count should reflect distinct
-  // people, not distinct department listings.
-  const uniqueFacultyCount = useMemo(
-    () => new Set(faculty.map((f) => (f.name || '').trim().toLowerCase())).size,
-    [faculty]
-  );
-
   return (
     <main className="page-wrapper">
       <PageHero
@@ -209,8 +200,7 @@ export default function Faculty() {
       <section className="section faculty-intro-section bg-off-white">
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-10)' }}>
-            <span className="section-label">Meet the Team</span>
-            <h2 className="section-title">{uniqueFacultyCount > 0 ? `${uniqueFacultyCount} Faculty Members` : 'Faculty'}</h2>
+            <h2 className="section-title">Faculty</h2>
             <p className="section-desc" style={{ margin: '0 auto' }}>
               Browse faculty by department.
             </p>

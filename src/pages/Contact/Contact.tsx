@@ -404,7 +404,6 @@ export default function Contact() {
           <div className="contact-split">
             <div className="contact-loc-col">
             <div className="section-head-left">
-              <span className="section-label">Visit Our Campus</span>
               <h2 className="section-title">Location &amp; Travel Guide</h2>
               <p className="section-subtitle">
                 Vishnu Women’s University is situated in the serene, green surroundings of Bhimavaram, West Godavari District, Andhra Pradesh. The University is located on the Bhimavaram–Tadepalligudem Road, with convenient access from Bhimavaram town via B. V. Raju Marg.
@@ -543,7 +542,6 @@ export default function Contact() {
             </div>
             <div className="contact-form-body">
             <div className="form-header-clean">
-                <span className="section-label">Direct Communication</span>
                 <h2 className="form-title-clean">Send Us a Message</h2>
                 <p className="form-sub-clean">
                   Have questions regarding admissions, academics, or campus facilities? Submit your query below.
@@ -707,7 +705,6 @@ export default function Contact() {
         <div className="container">
           <div className="dept-directory-header">
             <div>
-              <span className="section-label">Academic &amp; Operational Heads</span>
               <h2 className="section-title">Departments Directory</h2>
               <p className="section-subtitle">
                 Contact information for Heads of Departments and evaluation cells.

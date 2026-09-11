@@ -1,4 +1,4 @@
-import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { Rocket, Factory, Microscope, Globe2, GraduationCap, ChevronRight, Users, BarChart3, ArrowRight, Plane, ChevronLeft } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
@@ -14,16 +14,21 @@ import { hasTabContent, type CustomTab } from '../../lib/customTabs';
 import { DIFFERENTIATOR_CATEGORIES, type BlockKey } from '../Admin/sections/DifferentiatorsAdmin';
 import type { DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
 import type { FacultyDoc } from '../Academics/Faculty';
-import type { AicteIdeaLabTeamMemberDoc } from '../Admin/sections/AicteIdeaLabTeamAdmin';
-import type { AicteIdeaLabAmbassadorDoc } from '../Admin/sections/AicteIdeaLabAmbassadorsAdmin';
-import { aicteIdeaLab } from './aicteIdeaLab.data';
-import { institutionInnovationCell } from './institutionInnovationCell.data';
-import { vehicleDesignLab } from './vehicleDesignLab.data';
 import { talentSprintWise } from './talentSprintWise.data';
 import { foreignLanguages } from './foreignLanguages.data';
+import MicrochipPage from './MicrochipPage';
+import TiDspPage from './TiDspPage';
+import UltraTechPage from './UltraTechPage';
+import ChipsToStartupPage from './ChipsToStartupPage';
+import MedaPlmCoePage from './MedaPlmCoePage';
+import VsacPage from './VsacPage';
+import VehicleDesignLabPage from './VehicleDesignLabPage';
+import DreamHouseLabPage from './DreamHouseLabPage';
+import HpcLabPage from './HpcLabPage';
+import IdeaLabPage from './IdeaLabPage';
+import IicPage from './IicPage';
 import RuralWomenTechParkPage from './RuralWomenTechParkPage';
 import SmartInterviewsPage from './SmartInterviewsPage';
-import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import '../detail-layout.css';
 import '../gsac-shared.css';
 import './foreign-languages.css';
@@ -37,201 +42,6 @@ const DEFAULT_GSAC_STATS = [
   { value: 'Global', label: 'Alumni Network' },
 ];
 
-function IicMemberCard({ name, role, size = 96, photoUrl }: { name: string; role: string; size?: number; photoUrl?: string }) {
-  return (
-    <div style={{ border: '1.5px solid var(--color-accent)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4)', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 'var(--space-2)' }}>
-      <img
-        src={photoUrl || PHOTO_NEEDED_PLACEHOLDER}
-        alt={name}
-        style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover', border: '1px solid var(--color-light-gray)' }}
-      />
-      <span style={{ fontWeight: 700, color: 'var(--color-primary)', fontSize: 'var(--text-sm)' }}>{name}</span>
-      <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-light)', textTransform: 'uppercase', letterSpacing: '0.02em' }}>{role}</span>
-    </div>
-  );
-}
-
-
-interface IicDocEntryDoc extends WithId {
-  label: string;
-  fileUrl: string;
-  order: number;
-}
-
-interface IicCouncilMemberDoc extends WithId {
-  name: string;
-  role: string;
-  tier: 'chairman' | 'leadership' | 'coordinator';
-  imageUrl: string;
-  order: number;
-}
-
-// "IIC – Constitution"'s council roster (add/edit/remove/reorder,
-// IicCouncilMembersAdmin.tsx) and single council-members PDF link,
-// "Innovation Ambassadors"'s and "IIC Activities"'s PDF-link lists, and the
-// 4 fully Firestore-driven tabs (Rating Certificates / IIC Annual Reports /
-// SIH Internal Hackathon Reports / National Innovation Start-Up Policy, all
-// via IicDocumentsAdmin.tsx) all stay exactly as they did before — rendered
-// alongside whatever dynamic tabs the admin has defined.
-function IicPage({ iic, tabs }: { iic: typeof institutionInnovationCell; tabs: CustomTab[] }) {
-  const { docs: councilMembers } = useOrderedCollection<IicCouncilMemberDoc>('iicCouncilMembers', 'order');
-  const byTier = (tier: IicCouncilMemberDoc['tier']) => councilMembers.filter((m) => m.tier === tier);
-  const { docs: councilMembersLinks } = useOrderedCollection<IicDocEntryDoc>('iicCouncilMembersLinks', 'order');
-  const { docs: innovationAmbassadorLinks } = useOrderedCollection<IicDocEntryDoc>('iicInnovationAmbassadorLinks', 'order');
-  const { docs: iicActivityYears } = useOrderedCollection<IicDocEntryDoc>('iicActivities', 'order');
-  const { docs: ratingCertificates } = useOrderedCollection<IicDocEntryDoc>('iicRatingCertificates', 'order');
-  const { docs: annualReports } = useOrderedCollection<IicDocEntryDoc>('iicAnnualReports', 'order');
-  const { docs: sihHackathonReports } = useOrderedCollection<IicDocEntryDoc>('iicSihHackathonReports', 'order');
-  const { docs: nispPolicies } = useOrderedCollection<IicDocEntryDoc>('iicNispPolicies', 'order');
-
-  const fixedList = (docs: IicDocEntryDoc[]) => (
-    docs.length === 0 ? (
-      <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text-light)' }}>Content for this section is coming soon.</p>
-    ) : (
-      <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-        {docs.map((d) => (
-          <li key={d.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-2)' }}>
-            <span style={{ width: 20, height: 20, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
-              <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-            </span>
-            <a href={d.fileUrl} download style={{ color: 'var(--color-primary)', fontWeight: 700, fontSize: 'var(--text-base)' }}>{d.label}</a>
-          </li>
-        ))}
-      </ul>
-    )
-  );
-
-  const dynamicTabItems: TabItem[] = tabs.map((tab): TabItem => {
-    let fixedExtra: ReactNode = null;
-    if (tab.label === 'IIC – Constitution') {
-      // One flat, uniform grid — Chairman/Leadership/Coordinator are still
-      // shown as each person's own role text, but no longer get a visually
-      // distinct tier (different card size / centered row / etc.); every
-      // card is the same size, fixed at 3 per row (see .iic-council-grid).
-      const allMembers = [...byTier('chairman'), ...byTier('leadership'), ...byTier('coordinator')];
-      fixedExtra = (
-        <div style={{ marginTop: 'var(--space-6)' }}>
-          {allMembers.length > 0 && (
-            <div className="iic-council-grid" style={{ marginBottom: 'var(--space-6)' }}>
-              {allMembers.map((person) => (
-                <IicMemberCard key={person.id} name={person.name} role={person.role} size={84} photoUrl={person.imageUrl} />
-              ))}
-            </div>
-          )}
-          {councilMembersLinks.length > 0 && (
-            <p style={{ fontSize: 'var(--text-sm)' }}>
-              <a href={councilMembersLinks[0].fileUrl} download style={{ color: 'var(--color-primary)', fontWeight: 700 }}>
-                {councilMembersLinks[0].label}
-              </a>
-            </p>
-          )}
-        </div>
-      );
-    } else if (tab.label === 'Innovation Ambassadors') {
-      // The role-description paragraph, responsibilities, and the caption
-      // above the PDF links are this tab's own admin-editable Custom
-      // Sections content ("About Innovation Ambassadors" / "Ambassador
-      // List") — only the PDF links list itself stays fixed, same hybrid
-      // pattern as "IIC – Constitution" above.
-      fixedExtra = (
-        <div style={{ marginTop: 'var(--space-6)' }}>
-          {fixedList(innovationAmbassadorLinks)}
-        </div>
-      );
-    } else if (tab.label === 'IIC Activities') {
-      fixedExtra = <div style={{ marginTop: 'var(--space-6)' }}>{fixedList(iicActivityYears)}</div>;
-    }
-    return {
-      id: tab.id,
-      label: tab.label,
-      content: (
-        <>
-          {tab.sectionsDisplay === 'pills' ? <CustomSectionsPills sections={tab.sections} /> : <CustomSectionsPlain sections={tab.sections} />}
-          {fixedExtra}
-        </>
-      ),
-    };
-  });
-
-  const mergedTabs: TabItem[] = [
-    ...dynamicTabItems,
-    { id: 'rating-certificates', label: 'Rating Certificates', content: fixedList(ratingCertificates) },
-    { id: 'iic-annual-reports', label: 'IIC Annual Reports', content: fixedList(annualReports) },
-    { id: 'sih-hackathon-reports', label: 'SIH Internal Hackathon Reports', content: fixedList(sihHackathonReports) },
-    {
-      id: 'nisp',
-      label: 'National Innovation Start-Up Policy',
-      heading: iic.nisp.heading,
-      content: nispPolicies.length === 0 ? (
-        <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text-light)' }}>Content for this section is coming soon.</p>
-      ) : (
-        <div style={{ border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
-          {nispPolicies.map((row, i) => (
-            <div
-              key={row.id}
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-4)', padding: 'var(--space-4) var(--space-5)', background: i % 2 === 0 ? 'var(--color-off-white)' : 'var(--color-white)' }}
-            >
-              <span style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)' }}>{row.label}</span>
-              <a href={row.fileUrl} download style={{ color: 'var(--color-accent)', fontWeight: 700, fontSize: 'var(--text-sm)', whiteSpace: 'nowrap' }}>Click here..</a>
-            </div>
-          ))}
-        </div>
-      ),
-    },
-  ];
-
-  const defaultTabId = tabs.find(hasTabContent)?.id ?? mergedTabs[0]?.id;
-  return <CustomTabsPage tabs={mergedTabs} defaultTabId={defaultTabId} />;
-}
-
-// Facility-phase/industry-collab photos used to be matched to this content
-// by array position or endowment id (VdlFacilitiesPhotosAdmin.tsx) — that
-// panel is retired along with these tabs' conversion; a "Photos" files
-// section in each tab lets the admin re-add them freely instead. The
-// achievement-reports list (VdlAchievementsAdmin.tsx, already
-// freely-addable Firestore CRUD) stays exactly as it did before, rendered
-// directly below the "Students Achievements & Placements" tab's dynamic
-// content.
-function VdlPage({ tabs }: { tabs: CustomTab[] }) {
-  const { docs: vdlAchievementReportDocs } = useOrderedCollection<WithId & { label: string; fileUrl: string }>('vdlAchievementReports', 'order');
-
-  const dynamicTabItems: TabItem[] = tabs.map((tab): TabItem => {
-    let fixedExtra: ReactNode = null;
-    if (tab.label === 'Students Achievements & Placements' && vdlAchievementReportDocs.length > 0) {
-      fixedExtra = (
-        <div style={{ marginTop: 'var(--space-6)' }}>
-          <h4 style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>
-            Achievement Reports
-          </h4>
-          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-            {vdlAchievementReportDocs.map((d) => (
-              <li key={d.id} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                <span style={{ width: 20, height: 20, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                </span>
-                <a href={d.fileUrl} download style={{ fontSize: 'var(--text-base)', color: 'var(--color-primary)', fontWeight: 600 }}>{d.label}</a>
-              </li>
-            ))}
-          </ul>
-        </div>
-      );
-    }
-    return {
-      id: tab.id,
-      label: tab.label,
-      content: (
-        <>
-          {tab.sectionsDisplay === 'pills' ? <CustomSectionsPills sections={tab.sections} /> : <CustomSectionsPlain sections={tab.sections} />}
-          {fixedExtra}
-        </>
-      ),
-    };
-  });
-
-  const defaultTabId = tabs.find(hasTabContent)?.id ?? dynamicTabItems[0]?.id;
-  return <CustomTabsPage tabs={dynamicTabItems} defaultTabId={defaultTabId} />;
-}
-
 // All 9 tabs are fully admin-defined now. Team/Testimonial/ELITE-project/
 // NSE-clipping photos used to be admin-uploaded per fixed hardcoded id
 // (WiseTeamPhotosAdmin.tsx etc.) — those panels are retired along with this
@@ -241,144 +51,6 @@ function WisePage({ tabs }: { tabs: CustomTab[] }) {
   const tabItems: TabItem[] = tabs.map((tab) => ({ id: tab.id, label: tab.label, content: tab.sectionsDisplay === 'pills' ? <CustomSectionsPills sections={tab.sections} /> : <CustomSectionsPlain sections={tab.sections} /> }));
   const defaultTabId = tabs.find(hasTabContent)?.id ?? tabItems[0]?.id;
   return <CustomTabsPage tabs={tabItems} defaultTabId={defaultTabId} />;
-}
-
-const IDEA_LAB_TABLE_TH_STYLE: CSSProperties = {
-  textAlign: 'left',
-  padding: 'var(--space-3) var(--space-4)',
-  color: 'var(--color-primary-dark, var(--color-primary))',
-  fontWeight: 900,
-  whiteSpace: 'nowrap',
-};
-const IDEA_LAB_TABLE_TD_STYLE: CSSProperties = {
-  padding: 'var(--space-3) var(--space-4)',
-  color: 'var(--color-text)',
-  fontSize: 'var(--text-sm)',
-};
-
-function IdeaLabTeamTable({ team }: { team: AicteIdeaLabTeamMemberDoc[] }) {
-  if (team.length === 0) {
-    return (
-      <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text-light)' }}>
-        Content for this section is coming soon.
-      </p>
-    );
-  }
-  return (
-    <div style={{ overflowX: 'auto' }}>
-      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm)' }}>
-        <thead>
-          <tr style={{ background: 'var(--color-accent)' }}>
-            <th style={IDEA_LAB_TABLE_TH_STYLE}>S.No</th>
-            <th style={IDEA_LAB_TABLE_TH_STYLE}>Name of the Faculty</th>
-            <th style={IDEA_LAB_TABLE_TH_STYLE}>Designation</th>
-            <th style={IDEA_LAB_TABLE_TH_STYLE}>Role</th>
-          </tr>
-        </thead>
-        <tbody>
-          {team.map((m, i) => (
-            <tr key={m.id} style={{ background: i % 2 === 0 ? 'var(--color-off-white)' : 'transparent' }}>
-              <td style={IDEA_LAB_TABLE_TD_STYLE}>{i + 1}</td>
-              <td style={IDEA_LAB_TABLE_TD_STYLE}>{m.name}</td>
-              <td style={IDEA_LAB_TABLE_TD_STYLE}>{m.designation}</td>
-              <td style={IDEA_LAB_TABLE_TD_STYLE}>{m.role}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-function IdeaLabAmbassadorsTable({ ambassadors }: { ambassadors: AicteIdeaLabAmbassadorDoc[] }) {
-  if (ambassadors.length === 0) {
-    return (
-      <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text-light)' }}>
-        Content for this section is coming soon.
-      </p>
-    );
-  }
-  return (
-    <div style={{ overflowX: 'auto' }}>
-      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm)' }}>
-        <thead>
-          <tr style={{ background: 'var(--color-accent)' }}>
-            <th style={IDEA_LAB_TABLE_TH_STYLE}>S.No</th>
-            <th style={IDEA_LAB_TABLE_TH_STYLE}>Reg. Number</th>
-            <th style={IDEA_LAB_TABLE_TH_STYLE}>Name of the Student</th>
-            <th style={IDEA_LAB_TABLE_TH_STYLE}>Year</th>
-            <th style={IDEA_LAB_TABLE_TH_STYLE}>Branch</th>
-            <th style={IDEA_LAB_TABLE_TH_STYLE}>WhatsApp Number</th>
-            <th style={IDEA_LAB_TABLE_TH_STYLE}>E Mail Id</th>
-          </tr>
-        </thead>
-        <tbody>
-          {ambassadors.map((a, i) => (
-            <tr key={a.id} style={{ background: i % 2 === 0 ? 'var(--color-off-white)' : 'transparent' }}>
-              <td style={IDEA_LAB_TABLE_TD_STYLE}>{i + 1}</td>
-              <td style={IDEA_LAB_TABLE_TD_STYLE}>{a.regNumber}</td>
-              <td style={IDEA_LAB_TABLE_TD_STYLE}>{a.name}</td>
-              <td style={IDEA_LAB_TABLE_TD_STYLE}>{a.year}</td>
-              <td style={IDEA_LAB_TABLE_TD_STYLE}>{a.branch}</td>
-              <td style={IDEA_LAB_TABLE_TD_STYLE}>{a.whatsapp}</td>
-              <td style={IDEA_LAB_TABLE_TD_STYLE}>
-                <a href={`mailto:${a.email}`} style={{ color: 'var(--color-primary)', fontWeight: 600 }}>{a.email}</a>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-// Shown until real photos are uploaded from the admin's "AICTE IDEA Lab
-// Facility Photos" section — a fixed bank of placeholder tiles rather than
-// an empty gap, so the tab reads as "content coming" rather than broken.
-const IDEA_LAB_FACILITY_PLACEHOLDER_COUNT = 6;
-
-function IdeaLabFacilitiesGrid({ photos }: { photos: (WithId & { imageUrl: string })[] }) {
-  const tiles = photos.length > 0
-    ? photos
-    : Array.from({ length: IDEA_LAB_FACILITY_PLACEHOLDER_COUNT }, (_, i) => ({ id: `placeholder-${i}`, imageUrl: PHOTO_NEEDED_PLACEHOLDER }));
-  // A plain CSS grid forces every row to the height of its tallest photo,
-  // leaving ragged gaps under the shorter ones next to it whenever photos
-  // don't share an aspect ratio (masonry packs them tightly instead) — and
-  // unlike a fixed-height + object-fit:cover grid, this never re-crops a
-  // photo beyond however the admin already cropped it on upload.
-  return (
-    <div style={{ columns: '220px 3', columnGap: 'var(--space-4)' }}>
-      {tiles.map((p) => (
-        <img
-          key={p.id}
-          src={p.imageUrl}
-          alt="AICTE IDEA Lab facility"
-          style={{ width: '100%', height: 'auto', display: 'block', marginBottom: 'var(--space-4)', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-light-gray)', breakInside: 'avoid' }}
-        />
-      ))}
-    </div>
-  );
-}
-
-// Team, Student Ambassadors, and Facilities are already fully
-// Firestore-driven, freely-addable CRUD (AicteIdeaLabTeamAdmin.tsx /
-// AicteIdeaLabAmbassadorsAdmin.tsx / AicteIdeaLabFacilityPhotosAdmin.tsx) —
-// those stay exactly as they did before, as fixed tabs alongside whatever
-// dynamic tabs the admin has defined.
-function IdeaLabPage({ tabs }: { tabs: CustomTab[] }) {
-  const { docs: team } = useOrderedCollection<AicteIdeaLabTeamMemberDoc>('aicteIdeaLabTeam', 'order');
-  const { docs: ambassadors } = useOrderedCollection<AicteIdeaLabAmbassadorDoc>('aicteIdeaLabAmbassadors', 'order');
-  const { docs: facilityPhotos } = useOrderedCollection<WithId & { imageUrl: string }>('aicteIdeaLabFacilityPhotos', 'order');
-
-  const mergedTabs: TabItem[] = [
-    ...tabs.map((tab): TabItem => ({ id: tab.id, label: tab.label, content: tab.sectionsDisplay === 'pills' ? <CustomSectionsPills sections={tab.sections} /> : <CustomSectionsPlain sections={tab.sections} /> })),
-    { id: 'team', label: 'Team', eyebrow: 'Team', heading: 'VWU AICTE IDEA LAB Team', content: <IdeaLabTeamTable team={team} /> },
-    { id: 'student-ambassadors', label: 'Student Ambassadors', content: <IdeaLabAmbassadorsTable ambassadors={ambassadors} /> },
-    { id: 'facilities', label: 'Facilities', eyebrow: 'Infrastructure', heading: 'Facilities Available in AICTE – IDEA LAB', content: <IdeaLabFacilitiesGrid photos={facilityPhotos} /> },
-  ];
-
-  const defaultTabId = tabs.find(hasTabContent)?.id ?? mergedTabs[0]?.id;
-  return <CustomTabsPage tabs={mergedTabs} defaultTabId={defaultTabId} />;
 }
 
 const LANGUAGE_SUBTITLES: Record<string, string> = {
@@ -397,8 +69,8 @@ function LanguageModuleAccordion({ lang, index }: { lang: typeof foreignLanguage
 
   return (
     <div className={`fl-module-card ${isOpen ? 'is-open' : ''}`}>
-      <button 
-        className="fl-module-header" 
+      <button
+        className="fl-module-header"
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
       >
@@ -415,14 +87,14 @@ function LanguageModuleAccordion({ lang, index }: { lang: typeof foreignLanguage
           {isOpen ? '-' : '+'}
         </div>
       </button>
-      
+
       {isOpen && (
         <div className="fl-module-body animate-fade-in">
-          <p className="fl-module-quote">"{lang.quote}"</p>
+          <p className="fl-module-quote">&quot;{lang.quote}&quot;</p>
           <div className="fl-module-paragraphs">
             {lang.paragraphs.map((p, i) => <p key={i}>{p}</p>)}
           </div>
-          
+
           {lang.table && lang.table.length > 0 && (
             <div className="fl-module-stats">
               <h4 style={{ fontSize: 'var(--text-sm)', color: '#0F2547', marginBottom: 'var(--space-3)', fontWeight: 700 }}>{lang.reportLabel}</h4>
@@ -453,7 +125,7 @@ function ForeignLanguagesPage({ data }: { data: typeof foreignLanguages }) {
       <div className="fl-body-quote-banner">
         <div className="fl-quote-banner-left">
           <div className="fl-quote-accent-bar" aria-hidden="true" />
-          <div className="fl-quote-icon" aria-hidden="true">“</div>
+          <div className="fl-quote-icon" aria-hidden="true">&ldquo;</div>
           <div className="fl-quote-content">
             <h2 className="fl-quote-title">
               &ldquo;A different language is a different <span className="fl-text-orange">vision of life.</span>&rdquo;
@@ -599,6 +271,17 @@ const CATEGORY_ICONS: Record<string, typeof Rocket> = {
   innovation: Rocket, industry: Factory, research: Microscope, global: Globe2, student: GraduationCap,
 };
 
+// Items with their own dedicated `{item, sections}`-style page component
+// (MedaPlmCoePage, VsacPage, ...) render it compactly — no padded section
+// wrapper or bottom margin on the shared hero above it, since each of these
+// pages supplies its own spacing.
+const COMPACT_SLUGS = new Set([
+  'meda-plm-coe', 'vsac', 'vehicle-design-lab', 'dream-house-lab', 'hpc-lab', 'aicte-idea-lab', 'institution-innovation-cell',
+]);
+// These three instead render inside the normal padded white section, just
+// with a bit less top padding than the generic fallback below them.
+const PADDED_SLUGS = new Set(['microchip-embedded', 'ti-dsp-coe', 'ultratech-coe']);
+
 // Items saved before `description` existed still have their copy in the old
 // `intro`/`about` fields (kept, deprecated, on DifferentiatorItemDoc) — build
 // a throwaway CustomSection from those so the page never renders blank for
@@ -647,7 +330,7 @@ function GsacHero({ heroImage }: { heroImage?: string }) {
           <img src={heroImage} alt="GSAC" className="gsac-hero-bg" loading="eager" />
         )}
         <div className="gsac-hero-overlay" />
-        
+
         <svg className="gsac-hero-doodle" viewBox="0 0 1200 400" preserveAspectRatio="none">
           <path d="M -100 350 Q 400 -50 1100 150" fill="none" stroke="var(--color-accent)" strokeWidth="1.5" strokeDasharray="6,4" opacity="0.6" />
         </svg>
@@ -671,7 +354,7 @@ function GsacHero({ heroImage }: { heroImage?: string }) {
             <p className="gsac-hero-subtitle">
               Empowering students to pursue international higher education across 7 global destinations through expert counselling, test preparation, loan support, and pre-departure guidance.
             </p>
-            
+
             <div className="gsac-hero-features">
               <div className="gsac-hero-feature">
                 <div className="gsac-hero-line" style={{ width: '20px', marginBottom: '8px' }}></div>
@@ -725,11 +408,11 @@ function GsacHero({ heroImage }: { heroImage?: string }) {
                 <div className="gsac-hero-line" style={{ alignSelf: 'flex-end', marginTop: '8px' }}></div>
               </div>
             </div>
-            
+
             <div className="gsac-hero-bottom-right">
               <div className="gsac-hero-script">Beyond<br/>Borders</div>
               <div className="gsac-script-underline"></div>
-              
+
               <div className="gsac-hero-carousel-controls">
                 <button className="gsac-carousel-btn"><ChevronLeft size={16} /></button>
                 <span>01 / 03</span>
@@ -751,7 +434,7 @@ function ForeignLanguagesHero({ heroImage }: { heroImage?: string }) {
           <img src={heroImage} alt="Foreign Languages" className="fl-hero-bg" loading="eager" />
         )}
         <div className="fl-hero-overlay" />
-        
+
         <svg className="fl-hero-doodle" viewBox="0 0 1200 400" preserveAspectRatio="none">
           <path d="M 0 180 Q 250 80 500 250 T 1200 300" fill="none" stroke="var(--color-accent)" strokeWidth="1.5" opacity="0.6" />
         </svg>
@@ -806,7 +489,7 @@ function ForeignLanguagesHero({ heroImage }: { heroImage?: string }) {
                   Languages<br />Build<br />Brighter<br />Futures
                 </div>
               </div>
-              
+
               <div className="fl-hero-bottom-right">
                 <div className="fl-hero-languages-pill">
                   <span className="fl-pill-label">LANGUAGES OFFERED</span>
@@ -1061,10 +744,14 @@ export default function DifferentiatorDetail() {
     .filter((s): s is CustomSection => !!s)
     .map((s) => ({ ...s, placement: 'intro' as const }));
   const heroImage = item.heroImage || heroSlides[0]?.imageUrl;
-  const ideaLab = item.slug === 'aicte-idea-lab' ? aicteIdeaLab : null;
-  const iic = item.slug === 'institution-innovation-cell' ? institutionInnovationCell : null;
-  const vdl = item.slug === 'vehicle-design-lab' ? vehicleDesignLab : null;
   const wise = item.slug === 'talentsprint-wise' ? talentSprintWise : null;
+
+  // Chips to Startup (C2S) has its own bespoke hero + layout (see
+  // ChipsToStartupPage.tsx) instead of the shared navy hero card below —
+  // same idea as microchip-embedded/ti-dsp-coe/ultratech-coe's own body
+  // below, just also replacing the hero. Faculty carousel / closing CTA
+  // band further down the page still render normally afterward.
+  const isChipsToStartup = item.slug === 'chips-to-startup';
 
   // GSAC's bespoke layout below (two-column Overview with a "Global
   // Opportunities" stats card, and a restyled Gallery header) is built
@@ -1117,13 +804,13 @@ export default function DifferentiatorDetail() {
 
   return (
     <main className="page-wrapper">
-      {/* Hero */}
+      {/* Hero — Department Hero Card Design */}
       {isGsac ? (
         <GsacHero heroImage={heroImage} />
       ) : isForeignLanguages ? (
         <ForeignLanguagesHero heroImage={heroImage} />
-      ) : (
-        <section className="dept-hero-section">
+      ) : !isChipsToStartup && (
+        <section className="dept-hero-section" style={COMPACT_SLUGS.has(item.slug) ? { marginBottom: 0 } : undefined}>
           <div className="container">
             <div className="dept-hero-card">
               {heroImage && (
@@ -1132,7 +819,13 @@ export default function DifferentiatorDetail() {
               <div className="dept-hero-overlay" />
               <div className="dept-hero-content">
                 <div className="breadcrumb animate-fade-in" style={{ marginBottom: '0.8rem' }}>
-                  <Link to="/">Home</Link> <ChevronRight size={12} /> <Link to="/differentiators">Differentiators</Link> <ChevronRight size={12} /> <span className="breadcrumb-current">{item.title}</span>
+                  <Link to="/" className="breadcrumb-item">Home</Link>
+                  <span className="breadcrumb-sep">›</span>
+                  <Link to="/differentiators" className="breadcrumb-item">Differentiators</Link>
+                  <span className="breadcrumb-sep">›</span>
+                  <Link to={`/differentiators#${category.id}`} className="breadcrumb-item">{category.label}</Link>
+                  <span className="breadcrumb-sep">›</span>
+                  <span className="breadcrumb-item active">{item.title}</span>
                 </div>
                 <div className="animate-fade-in-up" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#C9973A', color: '#0B1E42', fontSize: 'var(--text-xs)', fontWeight: 800, padding: '0.35rem 0.9rem', borderRadius: '9999px', marginBottom: '0.8rem', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
                   <CategoryIcon size={14} /> {category.label}
@@ -1152,105 +845,155 @@ export default function DifferentiatorDetail() {
 
       {/* Overview — Description/Vision/Mission/Objectives/Custom Sections,
           the same structure every non-external item has. Institution
-          Innovation Cell, Vehicle Design Lab, TalentSprint – WISE, and AICTE
-          Idea Lab (iic/vdl/wise/ideaLab) render this too, then ADDITIONALLY
-          get their own dedicated tabbed page (IicPage/VdlPage/WisePage/
-          IdeaLabPage) right below it — the two are no longer mutually
-          exclusive. */}
-      <section className="section bg-white">
-        <div className="container">
-          {/* Same "About the Department" card treatment as the academic
-              department pages (see .dept-about-* in detail-layout.css):
-              accent-bordered gradient card, section label + title header
-              above it. Full-width for every item except GSAC, which adds a
-              "Global Opportunities" stats sidebar next to it (see isGsac
-              above) — everything beyond the description (Vision/Mission/
-              Objectives, Key Highlights, Facilities, Outcomes, Partners,
-              Contacts, ...) is just Custom Sections either way. */}
-          <div className={isGsac ? 'detail-grid detail-grid--image-sidebar' : undefined}>
-          {isForeignLanguages ? (
-            <ForeignLanguagesPage data={foreignLanguages} />
-          ) : (
-            <div className="dept-about-main">
-              {/* No "Overview" / "About {title}" heading here on purpose — the
-                  description below is meant to lead the page with no heading
-                  of its own or above it (unlike About VWU/About SVES/About
-                  R&D elsewhere on the site, which keep theirs). */}
-              <div className="dept-about-card">
-                <SectionSubtree section={descriptionSection} />
-              </div>
-
-              {/* Vision/Mission/Objectives (introBlocks — fixed fields, only
-                  rendered when filled in) lead, in that order, followed by any
-                  other admin-added 'intro'-placed Custom Section; everything
-                  else (Key Highlights, Facilities, Outcomes, Partners,
-                  Contacts, ...) renders as a collapsible accordion below (see
-                  lib/customSections.ts). GSAC renders its own Gallery further
-                  below (see gsacGallerySection) instead of the generic one. */}
-              <CustomSectionsIntro sections={[...introBlocks, ...effectiveCustomSections]} />
-              {!isGsac && <CustomSectionsGalleries sections={effectiveCustomSections} />}
-              <CustomSectionsAccordion sections={accordionSections} />
-            </div>
-          )}
-
-          {isGsac && (
-            <div className="detail-sidebar">
-              <div className="gsac-globe-card">
-                <img src="/images/dot world map.webp" alt="" aria-hidden="true" className="gsac-globe-map" />
-                <h3 className="gsac-globe-title">Global<br />Opportunities<br />Brighter Futures</h3>
-                <div className="gsac-globe-divider" aria-hidden="true" />
-                <div className="gsac-globe-stats">
-                  {displayGsacStats.map((s, i) => (
-                    <div key={i} className="gsac-globe-stat">
-                      <strong>{s.value}</strong>
-                      {s.label && <span>{s.label}</span>}
+          Innovation Cell, Vehicle Design Lab, and AICTE Idea Lab each have
+          their own dedicated `{item, sections}` page component below;
+          TalentSprint – WISE keeps its own dedicated tabbed page
+          (WisePage) rendered separately, further down. */}
+      {isChipsToStartup ? (
+        <ChipsToStartupPage item={item} customSections={effectiveCustomSections} />
+      ) : (isGsac || isForeignLanguages) ? (
+        <section className="section bg-white">
+          <div className="container">
+            {isForeignLanguages ? (
+              <ForeignLanguagesPage data={foreignLanguages} />
+            ) : (
+              <>
+                {/* Same "About the Department" card treatment as the academic
+                    department pages (see .dept-about-* in detail-layout.css):
+                    accent-bordered gradient card, section label + title header
+                    above it. GSAC adds a "Global Opportunities" stats sidebar
+                    next to it — everything beyond the description (Vision/
+                    Mission/Objectives, Key Highlights, Facilities, Outcomes,
+                    Partners, Contacts, ...) is just Custom Sections either
+                    way. */}
+                <div className="detail-grid detail-grid--image-sidebar">
+                  <div className="dept-about-main">
+                    {/* No "Overview" / "About {title}" heading here on purpose
+                        — the description below is meant to lead the page with
+                        no heading of its own or above it (unlike About VWU/
+                        About SVES/About R&D elsewhere on the site, which keep
+                        theirs). */}
+                    <div className="dept-about-card">
+                      <SectionSubtree section={descriptionSection} />
                     </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-          </div>
 
-          {/* GSAC's gallery — "Moments from GSAC" header, collapsed to 3
-              photos with a toggle to reveal the rest in place. Every other
-              differentiator item's gallery still renders generically above
-              (CustomSectionsGalleries), unaffected. */}
-          {isGsac && gsacGalleryPhotos.length > 0 && (
-            <div style={{ marginTop: 'var(--space-10)' }}>
-              <div className="gsac-gallery-header">
-                <div>
-                  <span className="section-label">Gallery</span>
-                  <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Moments from GSAC</h2>
-                  <p style={{ color: 'var(--color-text-light)', margin: 0 }}>Sessions, interactions and global opportunities in action.</p>
-                </div>
-                {gsacGalleryPhotos.length > 3 && (
-                  <button type="button" className="gsac-gallery-toggle" onClick={() => setGsacGalleryExpanded((v) => !v)}>
-                    {gsacGalleryExpanded ? 'Show Less' : 'View Full Gallery'} <ChevronRight size={16} strokeWidth={2} />
-                  </button>
-                )}
-              </div>
-              <div className="gsac-gallery-grid">
-                {(gsacGalleryExpanded ? gsacGalleryPhotos : gsacGalleryPhotos.slice(0, 3)).map((p, i) => (
-                  <div className="gsac-gallery-item" key={p.imageUrl || i}>
-                    <img src={p.imageUrl} alt={p.caption || 'Graduate Study Abroad Center'} loading="lazy" />
+                    {/* Vision/Mission/Objectives (introBlocks — fixed fields,
+                        only rendered when filled in) lead, in that order,
+                        followed by any other admin-added 'intro'-placed
+                        Custom Section; everything else (Key Highlights,
+                        Facilities, Outcomes, Partners, Contacts, ...) renders
+                        as a collapsible accordion below (see
+                        lib/customSections.ts). GSAC renders its own Gallery
+                        further below (see gsacGallerySection) instead of the
+                        generic one. */}
+                    <CustomSectionsIntro sections={[...introBlocks, ...effectiveCustomSections]} />
+                    <CustomSectionsAccordion sections={accordionSections} />
                   </div>
-                ))}
+
+                  <div className="detail-sidebar">
+                    <div className="gsac-globe-card">
+                      <img src="/images/dot world map.webp" alt="" aria-hidden="true" className="gsac-globe-map" />
+                      <h3 className="gsac-globe-title">Global<br />Opportunities<br />Brighter Futures</h3>
+                      <div className="gsac-globe-divider" aria-hidden="true" />
+                      <div className="gsac-globe-stats">
+                        {displayGsacStats.map((s, i) => (
+                          <div key={i} className="gsac-globe-stat">
+                            <strong>{s.value}</strong>
+                            {s.label && <span>{s.label}</span>}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* GSAC's gallery — "Moments from GSAC" header, collapsed to 3
+                    photos with a toggle to reveal the rest in place. Every
+                    other differentiator item's gallery still renders
+                    generically (CustomSectionsGalleries), unaffected. */}
+                {gsacGalleryPhotos.length > 0 && (
+                  <div style={{ marginTop: 'var(--space-10)' }}>
+                    <div className="gsac-gallery-header">
+                      <div>
+                        <span className="section-label">Gallery</span>
+                        <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Moments from GSAC</h2>
+                        <p style={{ color: 'var(--color-text-light)', margin: 0 }}>Sessions, interactions and global opportunities in action.</p>
+                      </div>
+                      {gsacGalleryPhotos.length > 3 && (
+                        <button type="button" className="gsac-gallery-toggle" onClick={() => setGsacGalleryExpanded((v) => !v)}>
+                          {gsacGalleryExpanded ? 'Show Less' : 'View Full Gallery'} <ChevronRight size={16} strokeWidth={2} />
+                        </button>
+                      )}
+                    </div>
+                    <div className="gsac-gallery-grid">
+                      {(gsacGalleryExpanded ? gsacGalleryPhotos : gsacGalleryPhotos.slice(0, 3)).map((p, i) => (
+                        <div className="gsac-gallery-item" key={p.imageUrl || i}>
+                          <img src={p.imageUrl} alt={p.caption || 'Graduate Study Abroad Center'} loading="lazy" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </section>
+      ) : (
+        <section
+          className={COMPACT_SLUGS.has(item.slug) ? 'section-compact' : 'section bg-white'}
+          style={COMPACT_SLUGS.has(item.slug) ? { padding: 0 } : PADDED_SLUGS.has(item.slug) ? { paddingTop: '1rem' } : undefined}
+        >
+          <div className="container">
+            {item.slug === 'microchip-embedded' ? (
+              <MicrochipPage customSections={effectiveCustomSections} />
+            ) : item.slug === 'ti-dsp-coe' ? (
+              <TiDspPage customSections={effectiveCustomSections} />
+            ) : item.slug === 'ultratech-coe' ? (
+              <UltraTechPage
+                customSections={effectiveCustomSections}
+                descriptionSection={descriptionSection}
+                introBlocks={introBlocks}
+              />
+            ) : item.slug === 'meda-plm-coe' ? (
+              <MedaPlmCoePage item={item} sections={effectiveCustomSections} />
+            ) : item.slug === 'vsac' ? (
+              <VsacPage item={item} sections={effectiveCustomSections} />
+            ) : item.slug === 'vehicle-design-lab' ? (
+              <VehicleDesignLabPage item={item} sections={effectiveCustomSections} />
+            ) : item.slug === 'dream-house-lab' ? (
+              <DreamHouseLabPage item={item} sections={effectiveCustomSections} />
+            ) : item.slug === 'hpc-lab' ? (
+              <HpcLabPage item={item} sections={effectiveCustomSections} />
+            ) : item.slug === 'aicte-idea-lab' ? (
+              <IdeaLabPage item={item} sections={effectiveCustomSections} />
+            ) : item.slug === 'institution-innovation-cell' ? (
+              <IicPage item={item} sections={effectiveCustomSections} />
+            ) : (
+              <div className="dept-about-main">
+                <div className="dept-about-card">
+                  <SectionSubtree section={descriptionSection} />
+                </div>
+                <CustomSectionsIntro sections={[...introBlocks, ...effectiveCustomSections]} />
+                <CustomSectionsGalleries sections={effectiveCustomSections} />
+                <CustomSectionsAccordion sections={effectiveCustomSections} />
               </div>
-            </div>
-          )}
-        </div>
-      </section>
+            )}
+          </div>
+        </section>
+      )}
 
       {/* Rural Women Tech Park's Report Links are admin-managed separately
           (Admin > Differentiators > Rural Women Tech Park > Report Links)
           — shown as their own labeled block here since a generic section
-          has no way to know these specific entries are download links. */}
+          has no way to know these specific entries are download links.
+          Unreachable in practice: isRwtp returns its own dedicated page
+          (RuralWomenTechParkPage, which renders these report links itself)
+          before this point — kept only so a future removal of that early
+          return doesn't silently lose these entirely. */}
       {item.slug === 'rural-women-tech-park' && rwtpReportLinkDocs.length > 0 && (
         <section className="section bg-off-white">
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label">Reports</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Report Links</h2>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
@@ -1264,21 +1007,9 @@ export default function DifferentiatorDetail() {
         </section>
       )}
 
-      {/* Institution Innovation Cell's own tabbed page (About IIC / IIC –
-          Constitution / and 7 more sections navigable from its sidebar). */}
-      {iic && <IicPage iic={iic} tabs={item.tabs || []} />}
-
-      {/* Vehicle Design Lab's own tabbed page (About VDL / Facilities &
-          Projects / and 3 more sections navigable from its sidebar). */}
-      {vdl && <VdlPage tabs={item.tabs || []} />}
-
       {/* TalentSprint – WISE's own tabbed page (About WISE / Beneficiaries –
           Placements / and 7 more sections navigable from its sidebar). */}
       {wise && <WisePage tabs={item.tabs || []} />}
-
-      {/* AICTE IDEA Lab's own tabbed page (About AICTE IDEA Lab / Team /
-          Student Ambassadors / Facilities navigable from its sidebar). */}
-      {ideaLab && <IdeaLabPage tabs={item.tabs || []} />}
 
       {/* Faculty — shown only when this differentiator is linked to a
           teaching department (item.department). Reuses the Academics faculty
@@ -1294,18 +1025,19 @@ export default function DifferentiatorDetail() {
       {isForeignLanguages ? (
         <ForeignLanguagesFooter />
       ) : (
-        <section style={{ background: 'var(--color-primary)', padding: 'var(--space-14) 0' }}>
+        <section style={{ background: 'var(--color-primary)', padding: (item.slug === 'meda-plm-coe' || item.slug === 'vsac' || item.slug === 'vehicle-design-lab' || item.slug === 'dream-house-lab' || item.slug === 'hpc-lab' || item.slug === 'aicte-idea-lab' || item.slug === 'institution-innovation-cell') ? 'var(--space-6) 0' : 'var(--space-14) 0' }}>
           <div className="container" style={{ textAlign: 'center' }}>
             <div>
               <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>
                 Explore More Differentiators
               </h2>
               <p style={{ color: 'rgba(255,255,255,0.75)', maxWidth: 520, margin: '0 auto var(--space-6)' }}>
-                Discover all the unique initiatives, labs, and centres that make VWU
-                an extraordinary place to learn and grow.
+                Discover all the unique initiatives, labs, and centres that make VWU an extraordinary place to learn and grow.
               </p>
               <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
-                <Link to="/differentiators" className="btn btn-accent" style={{ padding: '0.75rem 2rem' }}>All Differentiators</Link>
+                <Link to="/differentiators" className="btn btn-accent">All Differentiators</Link>
+                <Link to="/apply-now" className="btn btn-secondary">Apply Now</Link>
+                <Link to="/academics" className="btn btn-secondary">Academics</Link>
               </div>
             </div>
           </div>

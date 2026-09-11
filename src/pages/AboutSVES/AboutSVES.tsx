@@ -96,10 +96,10 @@ export default function AboutSVES() {
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-6)' }}>
             <h2 style={{ color: 'var(--color-white)', fontSize: 'clamp(1.5rem, 3vw, 2.15rem)', fontWeight: 800, marginBottom: 'var(--space-2)' }}>
-              25+ Years of Educational Leadership &amp; Impact
+              SVES AT A GLANCE
             </h2>
             <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: '0.95rem' }}>
-              Empowering over 25,000 students across Andhra Pradesh &amp; Telangana.
+              A Growing Educational Community
             </p>
           </div>
           <div className="about-facts-bar">
@@ -122,23 +122,19 @@ export default function AboutSVES() {
         <div className="container">
           <div className="about-mission-grid">
             <div className="reveal-left">
-              <span className="section-label">ABOUT SVES</span>
               <h2 className="section-title">Sri Vishnu Educational Society</h2>
               <p style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-4)' }}>
-                A Legacy of Educational Excellence Since 1992
+               Sri Vishnu Educational Society Education with a Long View since 1992
               </p>
               <div className="divider" />
               <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-4)', color: 'var(--color-text-light)' }}>
-                Founded in 1992 by the late <strong>Dr. B. V. Raju</strong>, an eminent industrialist, philanthropist, and recipient of the <strong>Padma Shri and Padma Bhushan</strong>, the Sri Vishnu Educational Society (SVES) is a not-for-profit, self-funded educational organization committed to advancing quality higher education.
+                Sri Vishnu Educational Society was founded in 1992 by Late <strong>Dr. B. V. Raju</strong>, an industrialist, philanthropist and recipient of the <strong>Padma Shri and Padma Bhushan</strong>.
               </p>
               <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-4)', color: 'var(--color-text-light)' }}>
-                Over the decades, SVES has built a strong presence across Engineering, Dentistry, Pharmacy, Commerce &amp; Sciences, Management, and Polytechnic education, providing diverse opportunities for students to learn, innovate, and build meaningful careers.
-              </p>
-              <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-4)', color: 'var(--color-text-light)' }}>
-                Today, the SVES group of institutions comprises more than <strong>25,000 students</strong> and over <strong>1,400 faculty members</strong> across campuses in Andhra Pradesh and Telangana, with a strong reputation for academic excellence and student development.
+                Established as a not-for-profit educational organisation, SVES has developed institutions across engineering, pharmacy, dentistry, management, sciences, polytechnic and school education.
               </p>
               <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-5)', color: 'var(--color-text-light)' }}>
-                SVES has also been a pioneer in women’s engineering education, with two exclusive women’s engineering institutions recognized among the leading institutions in the region.
+                Over the years, the Society has focused on creating learning environments that bring together academic quality, practical exposure and opportunities for students to progress in their chosen fields.
               </p>
               <a href="https://www.srivishnu.edu.in/" target="_blank" rel="noopener noreferrer" className="btn btn-primary">
                 Know More <ExternalLink size={15} strokeWidth={2.4} style={{ marginLeft: '0.4rem' }} />
@@ -183,11 +179,8 @@ export default function AboutSVES() {
               </div>
             )}
             <div className="reveal-right">
-              <span className="section-label">
-                {legacyVisionBlocks[0]?.value || 'Legacy Rooted in Vision'}
-              </span>
               <h2 className="section-title">
-                {legacyVisionBlocks[0]?.title || 'Inspiring Generations Since 1992'}
+                {legacyVisionBlocks[0]?.title || 'A Vision That Began in 1992'}
               </h2>
               <div className="divider" style={{ margin: '0 0 var(--space-4) 0' }} />
               {legacyVisionBlocks.length > 0 ? (
@@ -199,10 +192,13 @@ export default function AboutSVES() {
               ) : (
                 <>
                   <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-4)', color: 'var(--color-text-light)' }}>
-                    The story of SVES began with the vision of <strong>Late Dr. B. V. Raju</strong>, a pioneer of the Indian cement industry and a passionate advocate of education as a force for social transformation.
+                    Late Dr. B. V. Raju believed that quality education should be accessible to aspiring learners beyond major urban centres.
+                  </p>
+                  <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-4)', color: 'var(--color-text-light)' }}>
+                    That belief led to the establishment of Sri Vishnu Educational Society and shaped its approach to creating institutions where students could gain knowledge, develop skills and build meaningful futures.
                   </p>
                   <p style={{ lineHeight: 1.8, color: 'var(--color-text-light)' }}>
-                    Driven by his belief that quality education should reach aspiring learners beyond major cities, he established institutions that brought opportunities for excellence to students in smaller towns and emerging communities. His vision continues to guide SVES in creating educational environments that nurture knowledge, character, confidence, and leadership.
+                    His commitment to education continues to guide the Society's academic direction and growth.
                   </p>
                 </>
               )}
@@ -216,11 +212,8 @@ export default function AboutSVES() {
         <div className="container">
           <div className="about-mission-grid">
             <div className="reveal-left">
-              <span className="section-label">
-                {leadershipCultureBlocks[0]?.value || 'Leadership & Culture'}
-              </span>
               <h2 className="section-title">
-                {leadershipCultureBlocks[0]?.title || 'Built on Purpose. Driven by Passion.'}
+                {leadershipCultureBlocks[0]?.title || 'Carrying the Vision Forward'}
               </h2>
               <div className="divider" style={{ margin: '0 0 var(--space-4) 0' }} />
               {leadershipCultureBlocks.length > 0 ? (
@@ -232,10 +225,10 @@ export default function AboutSVES() {
               ) : (
                 <>
                   <p style={{ lineHeight: 1.8, marginBottom: 'var(--space-4)', color: 'var(--color-text-light)' }}>
-                    The vision of the Founder Chairman, <strong>Late Dr. B. V. Raju</strong>, continues to inspire the leadership of <strong>Sri K. V. Vishnu Raju</strong>, Chairman and grandson of the Founder Chairman.
+                    The educational vision established by <strong>Late Dr. B. V. Raju</strong> continues under the leadership of <strong>Sri K. V. Vishnu Raju</strong>, Chairman, and grandson of the Founder Chairman.
                   </p>
                   <p style={{ lineHeight: 1.8, color: 'var(--color-text-light)' }}>
-                    Together, this enduring legacy has shaped a culture of purpose, innovation, excellence, and student-centered learning. SVES remains committed to creating transformative educational experiences that empower students to realize their potential and contribute meaningfully to society across Andhra Pradesh and Telangana.
+                    SVES remains committed to creating transformative educational experiences that empower students to realize their potential and contribute meaningfully to society across Andhra Pradesh and Telangana.
                   </p>
                 </>
               )}
@@ -263,10 +256,9 @@ export default function AboutSVES() {
       <section className="section bg-white">
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-10)' }}>
-            <span className="section-label">SVES Network</span>
-            <h2 className="section-title">Four Distinct Campuses</h2>
+            <h2 className="section-title">Four Campus Communities.</h2>
             <p style={{ color: 'var(--color-text-light)', maxWidth: '650px', margin: '0.5rem auto 0', lineHeight: 1.7, fontSize: '1.02rem' }}>
-              Spanning across strategic academic hubs in Andhra Pradesh and Telangana, providing world-class learning ecosystems.
+              SVES institutions are organised across distinct campus communities in Andhra Pradesh and Telangana, each contributing to the Society's wider academic network.
             </p>
           </div>
           <div className="sves-campuses-grid">
@@ -357,16 +349,9 @@ export default function AboutSVES() {
         <div className="container">
           <PhotoGrid
             images={svesPhotos}
-            label="Our Campuses"
-            title="SVES Institutions"
-            subtitle="Glimpses from the campuses, events, and milestones of the Sri Vishnu Educational Society."
-            highlights={[
-              '11 institutions across Andhra Pradesh & Telangana',
-              '4 campuses — Bhimavaram, Narsapur, Hyderabad, Aziz Nagar',
-              '25,000+ students & 1,400+ faculty',
-              '25+ years of educational leadership',
-              'Engineering, Pharmacy, Dental, Polytechnic, Life Sciences & School — KG to PG',
-            ]}
+            label="ACROSS SVES"
+            title="Life Across Our Campuses"
+            subtitle="A glimpse of the academic spaces, people and experiences that make up the wider SVES community."
             columns={2}
             layout="side-text"
           />
@@ -392,8 +377,10 @@ export default function AboutSVES() {
       <section className="section" style={{ background: 'linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%)' }}>
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>
-            <span className="section-label" style={{ color: 'var(--color-accent)' }}>Journey</span>
-            <h2 className="section-title" style={{ color: 'var(--color-white)' }}>25+ Years of SVES Excellence</h2>
+            <h2 className="section-title" style={{ color: 'var(--color-white)' }}>Milestones in the SVES Journey</h2>
+            <p style={{ color: 'rgba(255,255,255,0.8)', maxWidth: '600px', margin: '0.5rem auto 0', lineHeight: 1.7, fontSize: '1.02rem' }}>
+              Each milestone reflects the Society's continued growth across institutions, disciplines and learning communities.
+            </p>
           </div>
           <div className="sves-milestones">
             {milestones.map((m) => (
@@ -411,20 +398,22 @@ export default function AboutSVES() {
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-20) 0' }}>
         <div className="container" style={{ textAlign: 'center' }}>
           <div className="reveal">
-            <span className="section-label" style={{ color: 'var(--color-accent)' }}>Join SVES</span>
+            <span style={{ display: 'block', color: 'var(--color-accent)', fontSize: '0.82rem', fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 'var(--space-3)' }}>
+              Vishnu Women&rsquo;s University
+            </span>
             <h2 style={{ color: 'var(--color-white)', fontSize: 'clamp(1.75rem, 4vw, 2.75rem)', marginBottom: 'var(--space-4)' }}>
-              Empowering Education Across Generations
+              Explore Vishnu Women&rsquo;s University
             </h2>
             <div style={{ maxWidth: 720, margin: '0 auto var(--space-8)' }}>
               <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 'var(--text-lg)', marginBottom: 'var(--space-4)' }}>
-                Sri Vishnu Educational Society continues to shape future leaders, innovators, and professionals through world-class academic institutions.
+                Vishnu Women&rsquo;s University carries forward the educational legacy of SVES through academic programmes, research, student development and a university experience centred on women.
               </p>
               <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: 'var(--text-lg)', fontWeight: 700, marginBottom: 0 }}>
-                Discover Vishnu Women&rsquo;s University — empowering women to learn, lead, and shape the future.
+                Discover the University, its academic environment and the opportunities available to students.
               </p>
             </div>
             <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Link to="/about" className="btn btn-accent btn-lg">About VWU</Link>
+              <Link to="/about" className="btn btn-accent btn-lg">Join VWU →</Link>
             </div>
           </div>
         </div>

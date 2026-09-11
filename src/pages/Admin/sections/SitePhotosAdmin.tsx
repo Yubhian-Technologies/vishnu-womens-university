@@ -111,7 +111,7 @@ const DEFAULT_SECTIONS: Record<string, Record<string, SectionDef>> = {
     'campus-life-showcase': {
       label: 'Campus Life Showcase Banner Photo',
       slots: [
-        { imageUrl: '/images/vibrant-campus.png', alt: 'Campus Life & Cultural Showcase', caption: 'Campus Life at VWU' },
+        { imageUrl: '/images/campus-vibrant.jpeg', alt: 'Campus Life & Cultural Showcase', caption: 'Campus Life at VWU' },
       ],
     },
     // The full-width background photo behind the "Smart Infrastructure & Living Campus" section.
@@ -408,7 +408,7 @@ const DEFAULT_SECTIONS: Record<string, Record<string, SectionDef>> = {
     hero: {
       label: 'Hero Banner Photo',
       slots: [
-        { imageUrl: '/images/vibrant-campus.png', alt: 'NSS Social Services Community Outreach', caption: '', label: 'Hero Background' },
+        { imageUrl: '/images/campus-vibrant.jpeg', alt: 'NSS Social Services Community Outreach', caption: '', label: 'Hero Background' },
       ],
     },
     main: {
