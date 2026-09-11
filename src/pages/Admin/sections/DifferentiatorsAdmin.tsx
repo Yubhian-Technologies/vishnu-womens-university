@@ -15,6 +15,7 @@ import AicteIdeaLabFacilityPhotosAdmin from './AicteIdeaLabFacilityPhotosAdmin';
 import IicCouncilMembersAdmin from './IicCouncilMembersAdmin';
 import IicDocumentsAdmin from './IicDocumentsAdmin';
 import VdlAchievementsAdmin from './VdlAchievementsAdmin';
+import VdlTeamAdmin from './VdlTeamAdmin';
 import RwtpReportsAdmin from './RwtpReportsAdmin';
 
 // Some differentiator items have extra editable content beyond the base
@@ -42,6 +43,7 @@ const ITEM_SUB_SECTIONS: Record<string, { key: string; label: string; Component:
   // target to manage anymore. Achievement Reports stays: it's still
   // rendered as-is on the public page.
   'vehicle-design-lab': [
+    { key: 'team', label: 'Team', Component: VdlTeamAdmin },
     { key: 'achievement-reports', label: 'Achievement Reports', Component: VdlAchievementsAdmin },
   ],
   'rural-women-tech-park': [{ key: 'report-links', label: 'Report Links', Component: RwtpReportsAdmin }],
@@ -792,11 +794,9 @@ export default function DifferentiatorsAdmin() {
 
           {TABS_SLUGS.has(form.slug) && (
             <>
-              <div className="admin-field admin-field--full"><hr /><h3>Tabs</h3></div>
+              <div className="admin-field admin-field--full"><hr /><h3>Quick Navigation (Dynamic Tabs)</h3></div>
               <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>
-                This item also shows a sidebar of tabs on the public page, below the Overview section above. Add,
-                rename, reorder, or remove tabs below — click "Edit Content" on a tab to add sections to it (same
-                plain text / checklist / table / links / files editor as everywhere else).
+                Add, rename, reorder, or remove dynamic sections under the <strong>Quick Navigation</strong> sidebar menu on the public page. Click "Edit Content" on any tab to add custom sections (text, tables, checklists, links, or files).
               </p>
               <div className="admin-field admin-field--full">
                 <CustomTabsEditor
