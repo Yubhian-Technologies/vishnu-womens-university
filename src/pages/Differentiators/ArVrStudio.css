@@ -1,0 +1,381 @@
+/* =========================================================
+   AR/VR Studio — bespoke "Tech/AR" theme: a dark, immersive hero and CTA
+   bookend a light, airy body (white/frosted-glass cards with teal/violet
+   accents) rather than an all-dark page.
+   Everything here is scoped under .arvr-page so it can never leak into
+   any other page — every other differentiator keeps the shared light
+   DifferentiatorDetail.tsx template untouched.
+   ========================================================= */
+
+.arvr-page {
+  --avr-bg: #f3f6fb;
+  --avr-bg-alt: #eaf0f9;
+  --avr-navy: #0b1e42;
+  --avr-navy-alt: #142c56;
+  --avr-panel: rgba(255, 255, 255, 0.82);
+  --avr-panel-border: rgba(15, 23, 42, 0.09);
+  --avr-panel-border-hover: rgba(14, 116, 144, 0.45);
+  --avr-cyan: #0e7490;
+  --avr-cyan-bright: #22d3ee;
+  --avr-violet: #6d4fe0;
+  --avr-gold: #b9822f;
+  --avr-text: #0f172a;
+  --avr-text-dim: #475569;
+  --avr-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, SFMono-Regular, Consolas, monospace;
+  position: relative;
+  background: var(--avr-bg);
+  color: var(--avr-text);
+  overflow: hidden;
+}
+
+/* Soft ambient color blobs — a hint of the tech palette in the page's own
+   background, kept low-opacity so the body still reads as light. */
+.arvr-page::before,
+.arvr-page::after {
+  content: '';
+  position: absolute;
+  width: 55vw;
+  height: 55vw;
+  max-width: 800px;
+  max-height: 800px;
+  border-radius: 50%;
+  filter: blur(130px);
+  opacity: 0.16;
+  z-index: -1;
+  pointer-events: none;
+}
+.arvr-page::before { top: 8%; left: -14%; background: var(--avr-violet); }
+.arvr-page::after { bottom: 4%; right: -14%; background: var(--avr-cyan-bright); }
+
+.arvr-container {
+  max-width: var(--max-width, 1280px);
+  margin: 0 auto;
+  padding: 0 var(--space-8);
+}
+
+.arvr-section { padding: var(--space-14) 0; }
+
+.arvr-section-title {
+  font-family: var(--font-sans);
+  font-size: var(--text-2xl);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--avr-text);
+  margin: 0 0 var(--space-6);
+}
+
+/* Base "light glass" panel used by every card on this page */
+.arvr-glass {
+  position: relative;
+  background: var(--avr-panel);
+  border: 1px solid var(--avr-panel-border);
+  border-radius: 20px;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+  transition: border-color 0.35s ease, box-shadow 0.35s ease, transform 0.35s ease;
+}
+.arvr-glass:hover {
+  border-color: var(--avr-panel-border-hover);
+  box-shadow: 0 14px 36px rgba(14, 116, 144, 0.16);
+  transform: translateY(-3px);
+}
+
+.arvr-prose p {
+  color: var(--avr-text-dim);
+  line-height: 1.8;
+  font-size: var(--text-base);
+  margin: 0;
+  white-space: pre-line;
+}
+.arvr-prose a { color: var(--avr-cyan) !important; }
+
+/* ---- Hero — kept dark & immersive as the page's dramatic opener ---- */
+.arvr-hero {
+  position: relative;
+  min-height: 560px;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+  isolation: isolate;
+}
+.arvr-hero__bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  filter: saturate(1.05) contrast(1.03);
+}
+.arvr-hero__grid {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(34, 211, 238, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34, 211, 238, 0.1) 1px, transparent 1px);
+  background-size: 42px 42px;
+  -webkit-mask-image: radial-gradient(ellipse at bottom left, black 0%, transparent 65%);
+  mask-image: radial-gradient(ellipse at bottom left, black 0%, transparent 65%);
+}
+.arvr-hero__content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: var(--space-14) clamp(1.5rem, 6vw, 5rem) var(--space-12);
+}
+
+.arvr-breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--avr-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.85);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.85);
+  margin-bottom: var(--space-5);
+}
+.arvr-breadcrumb a { color: rgba(255, 255, 255, 0.85); text-decoration: none; transition: color 0.2s ease; }
+.arvr-breadcrumb a:hover { color: #fff; }
+.arvr-breadcrumb .is-current { color: #fff; font-weight: 800; }
+.arvr-breadcrumb span:not(.is-current) { opacity: 0.5; }
+
+.arvr-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #f7e6c0;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+  background: rgba(11, 30, 66, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(201, 151, 58, 0.55);
+  padding: 0.4rem 0.9rem;
+  border-radius: 9999px;
+  margin-bottom: var(--space-4);
+  width: fit-content;
+}
+
+.arvr-hero__title {
+  font-family: var(--font-sans);
+  font-size: clamp(2.25rem, 5vw, 4rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  margin: 0 0 var(--space-4);
+  color: #fff;
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.75), 0 1px 4px rgba(0, 0, 0, 0.9), 0 0 40px rgba(34, 211, 238, 0.35);
+}
+
+.arvr-hero__subtitle {
+  font-size: clamp(1rem, 1.6vw, 1.2rem);
+  color: rgba(255, 255, 255, 0.92);
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.8), 0 1px 3px rgba(0, 0, 0, 0.9);
+  max-width: 640px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ---- Overview ---- */
+.arvr-overview {
+  padding: var(--space-8);
+  border-left: 3px solid var(--avr-cyan);
+}
+.arvr-overview__mark { display: block; color: var(--avr-cyan); opacity: 0.7; margin-bottom: var(--space-3); }
+
+/* ---- Vision / Mission — side-by-side cards ---- */
+.arvr-vm-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-6);
+}
+.arvr-vm-card { padding: var(--space-7); }
+
+.arvr-card-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--avr-cyan);
+  margin-bottom: var(--space-4);
+}
+
+.arvr-checklist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.arvr-checklist li {
+  position: relative;
+  padding-left: 1.6rem;
+  color: var(--avr-text-dim);
+  line-height: 1.6;
+}
+.arvr-checklist li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.5em;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--avr-cyan);
+  box-shadow: 0 0 8px rgba(14, 116, 144, 0.5);
+}
+
+/* ---- Objectives — one per row, stacked vertically ---- */
+.arvr-objectives-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.arvr-objective-card {
+  padding: var(--space-5) var(--space-6);
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+}
+.arvr-objective-num {
+  flex-shrink: 0;
+  font-family: var(--avr-mono);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--avr-cyan);
+  opacity: 0.9;
+}
+.arvr-objective-card p { margin: 0; color: var(--avr-text); line-height: 1.65; font-size: var(--text-base); }
+
+/* ---- Gallery ---- */
+.arvr-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-4);
+}
+.arvr-gallery-tile {
+  position: relative;
+  padding: 0;
+  border: 1px solid var(--avr-panel-border);
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: zoom-in;
+  aspect-ratio: 4 / 3;
+  background: #fff;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+  transition: border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+}
+.arvr-gallery-tile:hover {
+  border-color: var(--avr-cyan);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(14, 116, 144, 0.22);
+}
+.arvr-gallery-tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.arvr-gallery-caption {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  padding: var(--space-2) var(--space-3);
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.75), transparent);
+  color: #fff;
+  font-size: var(--text-xs);
+  text-align: left;
+}
+
+/* ---- Other info sections (Facilities, Contact, Faculty, Highlights, ...) ---- */
+.arvr-other-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-6);
+  align-items: start;
+}
+.arvr-info-card { padding: var(--space-6); }
+.arvr-chip-list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.arvr-chip-list li {
+  font-size: var(--text-sm);
+  color: var(--avr-text);
+  background: rgba(14, 116, 144, 0.07);
+  border: 1px solid rgba(14, 116, 144, 0.25);
+  padding: 0.45rem 0.9rem;
+  border-radius: 9999px;
+}
+
+/* ---- CTA — dark navy bookend, matching the rest of the site's CTA bands ---- */
+.arvr-cta {
+  position: relative;
+  padding: var(--space-14) 0;
+  background: linear-gradient(180deg, var(--avr-navy) 0%, var(--avr-navy-alt) 100%);
+}
+.arvr-cta__title { color: #fff; font-family: var(--font-sans); font-weight: 800; font-size: var(--text-2xl); margin: 0 0 var(--space-4); }
+.arvr-cta__text { color: rgba(255, 255, 255, 0.75); max-width: 520px; margin: 0 auto var(--space-6); }
+.arvr-cta__actions { display: flex; gap: var(--space-4); justify-content: center; flex-wrap: wrap; }
+
+/* ---- Lightbox ---- */
+.arvr-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(2, 4, 10, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
+  cursor: zoom-out;
+}
+.arvr-lightbox img {
+  max-width: 100%;
+  max-height: 85vh;
+  object-fit: contain;
+  border-radius: 12px;
+  cursor: default;
+  box-shadow: 0 0 60px rgba(34, 211, 238, 0.18);
+}
+.arvr-lightbox__close,
+.arvr-lightbox__nav {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+.arvr-lightbox__close { top: var(--space-5); right: var(--space-5); width: 42px; height: 42px; }
+.arvr-lightbox__nav { top: 50%; transform: translateY(-50%); width: 48px; height: 48px; }
+.arvr-lightbox__nav--prev { left: var(--space-5); }
+.arvr-lightbox__nav--next { right: var(--space-5); }
+.arvr-lightbox__close:hover,
+.arvr-lightbox__nav:hover { border-color: var(--avr-cyan-bright); color: var(--avr-cyan-bright); }
+
+/* ---- Responsive ---- */
+@media (max-width: 900px) {
+  .arvr-vm-grid { grid-template-columns: 1fr; }
+  .arvr-hero { min-height: 460px; }
+}
+
+@media (max-width: 640px) {
+  .arvr-container { padding: 0 var(--space-5); }
+  .arvr-hero__content { padding: var(--space-10) var(--space-5) var(--space-8); }
+}
