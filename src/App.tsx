@@ -105,6 +105,7 @@ const StudentClubs = lazyWithRetry(() => import('./pages/StudentActivities/Stude
 const StudentClubDetail = lazyWithRetry(() => import('./pages/StudentActivities/StudentClubDetail'));
 const Differentiators = lazyWithRetry(() => import('./pages/Differentiators/Differentiators'));
 const DifferentiatorDetail = lazyWithRetry(() => import('./pages/Differentiators/DifferentiatorDetail'));
+const ArVrStudio = lazyWithRetry(() => import('./pages/Differentiators/ArVrStudio'));
 const Placements = lazyWithRetry(() => import('./pages/Placements/Placements'));
 const PlacementDetail = lazyWithRetry(() => import('./pages/Placements/PlacementDetail'));
 const NewsAwards = lazyWithRetry(() => import('./pages/NewsAwards/NewsAwards'));
@@ -238,6 +239,11 @@ function PublicApp() {
             <Route path="/arts-culture" element={<CampusLifeDetail slug="arts-culture" />} />
             <Route path="/sports-games" element={<CampusLifeDetail slug="sports-games" />} />
             <Route path="/differentiators" element={<Differentiators />} />
+            {/* Static segment declared alongside the /differentiators/:slug
+                catch-all — React Router ranks the literal path higher, so
+                this bespoke dark "Tech/AR" redesign renders instead of the
+                shared DifferentiatorDetail template every other item uses. */}
+            <Route path="/differentiators/ar-vr-studio" element={<ArVrStudio />} />
             <Route path="/differentiators/:slug" element={<DifferentiatorDetail />} />
             <Route path="/placements" element={<Placements />} />
             <Route path="/placements/:slug" element={<PlacementDetail />} />
