@@ -1502,7 +1502,7 @@ export default function PlacementDetail() {
                 <span className="breadcrumb-sep">›</span>
                 <span className="breadcrumb-item active">{item.title}</span>
               </div>
-              {item.slug !== 'tpo-team' && item.slug !== 'industry-liaison-offices' && (
+              {item.slug !== 'tpo-team' && item.slug !== 'placement-guidelines' && item.slug !== 'employability-skills' && item.slug !== 'campus-recruitment-training' && (
                 <div className="animate-fade-in-up" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#C9973A', color: '#0B1E42', fontSize: 'var(--text-xs)', fontWeight: 800, padding: '0.35rem 0.9rem', borderRadius: '9999px', marginBottom: '0.8rem', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
                   <Icon size={14} /> Placements & Careers
                 </div>
@@ -1698,6 +1698,63 @@ export default function PlacementDetail() {
         <section className="section bg-white" style={{ paddingTop: 'var(--space-6)' }}>
           <div className="container">
             <PlacementGuidelinesSections intro={item.intro || ''} />
+          </div>
+        </section>
+      )}
+
+      {/* Placement Guidelines — Placement Support section */}
+      {item.slug === 'placement-guidelines' && (
+        <section className="section bg-white" style={{ paddingTop: 0 }}>
+          <div className="container">
+            <div style={{
+              padding: 'var(--space-8)',
+              background: 'var(--color-off-white)',
+              borderRadius: 'var(--radius-md)',
+              border: '1px solid var(--color-light-gray)',
+            }}>
+              <p style={{
+                fontFamily: 'var(--font-sans)',
+                fontSize: '0.75rem',
+                fontWeight: 800,
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
+                color: 'var(--color-accent)',
+                margin: '0 0 0.5rem',
+              }}>
+                Placement Support
+              </p>
+              <h3 style={{
+                fontFamily: 'var(--font-serif)',
+                fontSize: 'clamp(1.25rem, 2.5vw, 1.75rem)',
+                fontWeight: 600,
+                color: 'var(--color-primary)',
+                margin: '0 0 0.75rem',
+              }}>
+                Support Available to Students
+              </h3>
+              <p style={{
+                fontSize: 'var(--text-sm)',
+                color: 'var(--color-text-light)',
+                margin: '0 0 1.25rem',
+                lineHeight: 1.7,
+              }}>
+                VWU supports career preparation through placement training, aptitude and technical preparation, interview practice, industry interaction and career guidance.
+              </p>
+              <Link
+                to="/placements/tpo-team"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 600,
+                  color: 'var(--color-primary)',
+                  textDecoration: 'none',
+                }}
+              >
+                Meet the Placement Team →
+              </Link>
+            </div>
           </div>
         </section>
       )}
@@ -2029,16 +2086,44 @@ export default function PlacementDetail() {
       {/* CTA */}
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-14) 0' }}>
         <div className="container" style={{ textAlign: 'center' }}>
-          <div>
-            <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>
-              Explore More Placement Resources
-            </h2>
-            <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Link to="/placements/placement-highlights" className="btn btn-accent">Placement Highlights →</Link>
-              <Link to="/placements/our-recruiters" className="btn btn-secondary">Our Recruiters →</Link>
-              <Link to="/placements" className="btn btn-secondary">Back to Placements →</Link>
+          {item.slug === 'placement-guidelines' ? (
+            <div>
+              <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-3)' }}>
+                Continue Your Placement Preparation
+              </h2>
+              <p style={{ color: 'rgba(255,255,255,0.75)', maxWidth: 520, margin: '0 auto var(--space-6)', lineHeight: 1.7 }}>
+                Explore career resources, placement support and the team responsible for coordinating student recruitment activities.
+              </p>
+              <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
+                <Link to="/placements" className="btn btn-accent">Explore Placements →</Link>
+                <Link to="/placements/tpo-team" className="btn btn-secondary">Meet the Placement Team →</Link>
+              </div>
             </div>
-          </div>
+          ) : item.slug === 'campus-recruitment-training' ? (
+            <div>
+              <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.75rem', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-accent)', margin: '0 0 0.75rem' }}>
+                Next Steps
+              </p>
+              <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>
+                Explore Placement Support at VWU
+              </h2>
+              <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
+                <Link to="/placements" className="btn btn-accent">Explore Placements →</Link>
+                <Link to="/placements/tpo-team" className="btn btn-secondary">Meet the Placement Team →</Link>
+              </div>
+            </div>
+          ) : (
+            <div>
+              <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>
+                Explore More Placement Resources
+              </h2>
+              <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
+                <Link to="/placements/placement-highlights" className="btn btn-accent">Placement Highlights →</Link>
+                <Link to="/placements/our-recruiters" className="btn btn-secondary">Our Recruiters →</Link>
+                <Link to="/placements" className="btn btn-secondary">Back to Placements →</Link>
+              </div>
+            </div>
+          )}
         </div>
       </section>
     </main>
