@@ -1,0 +1,1218 @@
+/* ===== Concrete Canoe Laboratory Bespoke Redesign =====
+   Theme: Vishnu Women's University Deep Navy & Gold
+   Palette: Navy (#0B1E42, #07142C, #1E3A8A), Gold (#C9A84C, #C9973A, #E8C96A), Slate & White
+====================================================== */
+
+.canoe-page {
+  background-color: var(--color-off-white, #f8fafc);
+  color: var(--color-text, #0f172a);
+  font-family: var(--font-sans, "Source Sans 3", sans-serif);
+  overflow-x: hidden;
+}
+
+/* --- Hero Section --- */
+.canoe-hero-section {
+  padding-top: var(--space-4, 1rem);
+  padding-bottom: var(--space-6, 1.5rem);
+}
+
+.canoe-hero-card {
+  position: relative;
+  min-height: 440px;
+  border-radius: var(--radius-xl, 24px);
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  padding: var(--space-8, 2rem) var(--space-10, 2.5rem);
+  box-shadow: var(--shadow-lg, 0 10px 40px rgba(0, 0, 0, 0.12));
+  background: linear-gradient(135deg, #07142c 0%, #0b1e42 55%, #162f5d 100%);
+}
+
+@media (max-width: 768px) {
+  .canoe-hero-card {
+    min-height: 380px;
+    padding: var(--space-6, 1.5rem) var(--space-5, 1.25rem);
+  }
+}
+
+.canoe-hero-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  z-index: 0;
+  transition: transform 0.6s ease;
+}
+
+.canoe-hero-card:hover .canoe-hero-bg {
+  transform: scale(1.02);
+}
+
+.canoe-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(7, 20, 44, 0.4) 0%,
+    rgba(11, 30, 66, 0.85) 60%,
+    rgba(7, 20, 44, 0.98) 100%
+  );
+  z-index: 1;
+}
+
+.canoe-hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 900px;
+  color: var(--color-white, #ffffff);
+}
+
+.canoe-breadcrumb {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: var(--text-xs, 0.8125rem);
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: var(--space-3, 0.75rem);
+  font-weight: 600;
+}
+
+.canoe-breadcrumb a {
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  transition: color var(--transition-fast, 150ms ease);
+}
+
+.canoe-breadcrumb a:hover {
+  color: var(--color-accent-light, #e8c96a);
+  text-decoration: underline;
+}
+
+.canoe-breadcrumb-sep {
+  opacity: 0.6;
+}
+
+.canoe-breadcrumb-current {
+  color: var(--color-accent-light, #e8c96a);
+  font-weight: 700;
+}
+
+.canoe-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #c9973a 0%, #e8c96a 100%);
+  color: #07142c;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 0.35rem 0.9rem;
+  border-radius: var(--radius-full, 9999px);
+  margin-bottom: var(--space-3, 0.75rem);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  box-shadow: 0 2px 10px rgba(201, 151, 58, 0.35);
+}
+
+.canoe-hero-title {
+  font-family: var(--font-serif, "Source Serif 4", Georgia, serif);
+  font-size: clamp(2rem, 4vw, 3.25rem);
+  font-weight: 800;
+  line-height: 1.15;
+  color: var(--color-white, #ffffff);
+  margin-bottom: var(--space-3, 0.75rem);
+  letter-spacing: -0.02em;
+}
+
+.canoe-hero-subtitle {
+  font-size: clamp(0.95rem, 1.8vw, 1.15rem);
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.9);
+  max-width: 760px;
+  font-weight: 400;
+  margin: 0;
+}
+
+/* --- Sticky Sub-Navigation Bar --- */
+.canoe-sticky-nav-wrapper {
+  position: sticky;
+  top: var(--topbar-height, 0px);
+  z-index: 90;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--color-light-gray, #e2e8f0);
+  box-shadow: 0 4px 20px rgba(11, 30, 66, 0.06);
+  transition: all var(--transition-base, 250ms ease);
+}
+
+.canoe-nav-scroll {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2, 0.5rem);
+  padding: var(--space-3, 0.75rem) 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.canoe-nav-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.canoe-nav-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: var(--radius-full, 9999px);
+  font-size: var(--text-xs, 0.8125rem);
+  font-weight: 700;
+  color: var(--color-text-light, #475569);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: all var(--transition-fast, 150ms ease);
+  background: transparent;
+  border: 1px solid transparent;
+}
+
+.canoe-nav-item:hover {
+  color: var(--color-primary, #0b1e42);
+  background: rgba(11, 30, 66, 0.05);
+  border-color: var(--color-light-gray, #e2e8f0);
+}
+
+.canoe-nav-item.active {
+  color: var(--color-primary-dark, #07142c);
+  background: rgba(201, 168, 76, 0.18);
+  border-color: var(--color-accent, #c9a84c);
+  font-weight: 800;
+}
+
+/* --- Section Layout & Typography --- */
+.canoe-section {
+  padding: var(--space-12, 3rem) 0;
+  scroll-margin-top: 80px;
+}
+
+.canoe-section--alt {
+  background: var(--color-white, #ffffff);
+  border-top: 1px solid var(--color-light-gray, #e2e8f0);
+  border-bottom: 1px solid var(--color-light-gray, #e2e8f0);
+}
+
+.canoe-section-header {
+  margin-bottom: var(--space-8, 2rem);
+}
+
+.canoe-section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-accent, #c9a84c);
+  margin-bottom: var(--space-2, 0.5rem);
+}
+
+.canoe-section-title {
+  font-family: var(--font-serif, "Source Serif 4", Georgia, serif);
+  font-size: clamp(1.6rem, 2.8vw, 2.25rem);
+  font-weight: 800;
+  color: var(--color-primary, #0b1e42);
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+  margin: 0;
+}
+
+.canoe-section-lead {
+  font-size: var(--text-base, 1rem);
+  line-height: 1.65;
+  color: var(--color-text-light, #475569);
+  margin-top: var(--space-3, 0.75rem);
+  max-width: 820px;
+}
+
+/* --- Overview Card --- */
+.canoe-overview-card {
+  background: var(--color-white, #ffffff);
+  border-radius: var(--radius-lg, 16px);
+  border: 1px solid var(--color-light-gray, #e2e8f0);
+  border-left: 5px solid var(--color-accent, #c9a84c);
+  padding: var(--space-8, 2rem);
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.08));
+  position: relative;
+  overflow: hidden;
+}
+
+.canoe-overview-quote-mark {
+  position: absolute;
+  top: 1rem;
+  right: 1.5rem;
+  color: rgba(201, 168, 76, 0.15);
+  pointer-events: none;
+}
+
+.canoe-prose {
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: var(--color-text, #0f172a);
+}
+
+.canoe-prose p {
+  margin-bottom: var(--space-4, 1rem);
+}
+
+.canoe-prose p:last-child {
+  margin-bottom: 0;
+}
+
+/* --- Vision & Mission Cards --- */
+.canoe-vm-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-6, 1.5rem);
+  margin-top: var(--space-6, 1.5rem);
+}
+
+@media (max-width: 860px) {
+  .canoe-vm-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.canoe-vm-card {
+  background: var(--color-white, #ffffff);
+  border: 1px solid var(--color-light-gray, #e2e8f0);
+  border-radius: var(--radius-lg, 16px);
+  padding: var(--space-7, 1.75rem);
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.08));
+  transition: transform var(--transition-base, 250ms ease), box-shadow var(--transition-base, 250ms ease);
+}
+
+.canoe-vm-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md, 0 4px 16px rgba(0, 0, 0, 0.1));
+}
+
+.canoe-vm-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3, 0.75rem);
+  margin-bottom: var(--space-4, 1rem);
+  padding-bottom: var(--space-3, 0.75rem);
+  border-bottom: 1px solid var(--color-light-gray, #e2e8f0);
+}
+
+.canoe-vm-icon-box {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-md, 8px);
+  background: rgba(201, 168, 76, 0.15);
+  color: var(--color-accent, #c9a84c);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.canoe-vm-title {
+  font-family: var(--font-serif, "Source Serif 4", Georgia, serif);
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--color-primary, #0b1e42);
+  margin: 0;
+}
+
+.canoe-mission-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3, 0.75rem);
+}
+
+.canoe-mission-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3, 0.75rem);
+  font-size: var(--text-sm, 0.9375rem);
+  line-height: 1.55;
+  color: var(--color-text, #0f172a);
+}
+
+.canoe-check-badge {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-accent, #c9a84c);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* --- Objective Banner --- */
+.canoe-objective-banner {
+  background: linear-gradient(135deg, rgba(11, 30, 66, 0.04) 0%, rgba(201, 168, 76, 0.1) 100%);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 30%, #e2e8f0);
+  border-radius: var(--radius-lg, 16px);
+  padding: var(--space-6, 1.5rem) var(--space-8, 2rem);
+  margin-top: var(--space-6, 1.5rem);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4, 1rem);
+}
+
+.canoe-objective-icon {
+  color: var(--color-accent, #c9a84c);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.canoe-objective-text {
+  margin: 0;
+  font-size: var(--text-sm, 0.9375rem);
+  line-height: 1.6;
+  color: var(--color-primary-dark, #07142c);
+  font-weight: 600;
+}
+
+/* --- Incubation / ITIC BUILD Spotlight --- */
+.canoe-spotlight-card {
+  background: linear-gradient(135deg, #07142c 0%, #0b1e42 60%, #162f5d 100%);
+  border-radius: var(--radius-xl, 24px);
+  padding: var(--space-8, 2rem) var(--space-10, 2.5rem);
+  color: var(--color-white, #ffffff);
+  box-shadow: var(--shadow-lg, 0 10px 40px rgba(0, 0, 0, 0.12));
+  border: 1px solid rgba(201, 168, 76, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.canoe-spotlight-card::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(201, 168, 76, 0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+@media (max-width: 768px) {
+  .canoe-spotlight-card {
+    padding: var(--space-6, 1.5rem) var(--space-5, 1.25rem);
+  }
+}
+
+.canoe-spotlight-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-4, 1rem);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-6, 1.5rem);
+}
+
+.canoe-spotlight-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(201, 168, 76, 0.2);
+  border: 1px solid var(--color-accent, #c9a84c);
+  color: var(--color-accent-light, #e8c96a);
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.35rem 0.85rem;
+  border-radius: var(--radius-full, 9999px);
+}
+
+.canoe-grant-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #ffffff;
+  color: #07142c;
+  padding: 0.4rem 1rem;
+  border-radius: var(--radius-full, 9999px);
+  font-weight: 800;
+  font-size: var(--text-sm, 0.9375rem);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+}
+
+.canoe-grant-amount {
+  color: #0b1e42;
+  font-weight: 900;
+}
+
+.canoe-spotlight-title {
+  font-family: var(--font-serif, "Source Serif 4", Georgia, serif);
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  font-weight: 800;
+  color: var(--color-white, #ffffff);
+  margin-bottom: var(--space-3, 0.75rem);
+}
+
+.canoe-spotlight-desc {
+  font-size: 1.05rem;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: var(--space-6, 1.5rem);
+}
+
+.canoe-spotlight-brief {
+  background: rgba(255, 255, 255, 0.08);
+  border-left: 4px solid var(--color-accent, #c9a84c);
+  border-radius: 0 var(--radius-md, 8px) var(--radius-md, 8px) 0;
+  padding: var(--space-4, 1rem) var(--space-5, 1.25rem);
+  margin-bottom: var(--space-6, 1.5rem);
+  font-size: var(--text-sm, 0.9375rem);
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.canoe-spotlight-team-title {
+  font-size: var(--text-xs, 0.8125rem);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-accent-light, #e8c96a);
+  font-weight: 800;
+  margin-bottom: var(--space-3, 0.75rem);
+}
+
+.canoe-student-badges-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2, 0.5rem);
+}
+
+.canoe-student-badge {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-md, 8px);
+  font-size: var(--text-xs, 0.8125rem);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.canoe-student-reg {
+  color: var(--color-accent-light, #e8c96a);
+  font-weight: 700;
+  font-size: 0.75rem;
+}
+
+/* --- Research Project Showcase --- */
+.canoe-project-card {
+  background: var(--color-white, #ffffff);
+  border-radius: var(--radius-lg, 16px);
+  border: 1px solid var(--color-light-gray, #e2e8f0);
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.08));
+  overflow: hidden;
+}
+
+.canoe-project-header {
+  background: linear-gradient(135deg, rgba(11, 30, 66, 0.03) 0%, rgba(201, 168, 76, 0.08) 100%);
+  padding: var(--space-6, 1.5rem) var(--space-8, 2rem);
+  border-bottom: 1px solid var(--color-light-gray, #e2e8f0);
+}
+
+.canoe-project-heading {
+  font-family: var(--font-serif, "Source Serif 4", Georgia, serif);
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--color-primary, #0b1e42);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.canoe-project-body {
+  padding: var(--space-8, 2rem);
+}
+
+.canoe-project-prose {
+  font-size: var(--text-base, 1rem);
+  line-height: 1.7;
+  color: var(--color-text, #0f172a);
+  margin-bottom: var(--space-8, 2rem);
+}
+
+.canoe-project-prose p {
+  margin-bottom: var(--space-4, 1rem);
+}
+
+/* --- Tables (University Standard) --- */
+.canoe-table-container {
+  border: 1px solid var(--color-light-gray, #e2e8f0);
+  border-radius: var(--radius-md, 8px);
+  overflow-x: auto;
+  background: var(--color-white, #ffffff);
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.04));
+}
+
+.canoe-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm, 0.9375rem);
+  text-align: left;
+}
+
+.canoe-table th {
+  background: var(--color-primary, #0b1e42);
+  color: var(--color-white, #ffffff);
+  font-weight: 700;
+  padding: var(--space-4, 1rem) var(--space-5, 1.25rem);
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+  font-size: var(--text-xs, 0.8125rem);
+  text-transform: uppercase;
+  border-bottom: 2px solid var(--color-accent, #c9a84c);
+}
+
+.canoe-table td {
+  padding: var(--space-4, 1rem) var(--space-5, 1.25rem);
+  color: var(--color-text, #0f172a);
+  border-bottom: 1px solid var(--color-light-gray, #e2e8f0);
+  vertical-align: top;
+  line-height: 1.5;
+}
+
+.canoe-table tr:nth-child(even) td {
+  background: var(--color-off-white, #f8fafc);
+}
+
+.canoe-table tr:hover td {
+  background: rgba(201, 168, 76, 0.05);
+}
+
+/* --- Fleet Evolution Comparison Matrix --- */
+.canoe-fleet-matrix {
+  border: 1px solid var(--color-light-gray, #e2e8f0);
+  border-radius: var(--radius-lg, 16px);
+  overflow-x: auto;
+  background: var(--color-white, #ffffff);
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.08));
+}
+
+.canoe-fleet-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 820px;
+}
+
+.canoe-fleet-table th {
+  background: var(--color-primary, #0b1e42);
+  color: var(--color-white, #ffffff);
+  padding: var(--space-4, 1rem) var(--space-4, 1rem);
+  font-weight: 800;
+  font-size: var(--text-sm, 0.9375rem);
+  text-align: left;
+  border-bottom: 3px solid var(--color-accent, #c9a84c);
+}
+
+.canoe-fleet-table th:first-child {
+  background: var(--color-primary-dark, #07142c);
+  width: 180px;
+}
+
+.canoe-fleet-table td {
+  padding: var(--space-4, 1rem);
+  border-bottom: 1px solid var(--color-light-gray, #e2e8f0);
+  border-right: 1px solid var(--color-light-gray, #e2e8f0);
+  font-size: var(--text-xs, 0.8125rem);
+  color: var(--color-text, #0f172a);
+  line-height: 1.5;
+  vertical-align: top;
+  white-space: pre-line;
+}
+
+.canoe-fleet-table td:first-child {
+  font-weight: 700;
+  color: var(--color-primary, #0b1e42);
+  background: var(--color-off-white, #f8fafc);
+  border-right: 2px solid var(--color-accent, #c9a84c);
+}
+
+.canoe-fleet-table tr:nth-child(even) td:not(:first-child) {
+  background: #fbfcfe;
+}
+
+.canoe-fleet-table tr:hover td:not(:first-child) {
+  background: rgba(201, 168, 76, 0.04);
+}
+
+/* --- Competitions & Awards Cards --- */
+.canoe-competitions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: var(--space-6, 1.5rem);
+}
+
+@media (max-width: 480px) {
+  .canoe-competitions-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.canoe-award-card {
+  background: var(--color-white, #ffffff);
+  border: 1px solid var(--color-light-gray, #e2e8f0);
+  border-radius: var(--radius-lg, 16px);
+  padding: var(--space-6, 1.5rem);
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.08));
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all var(--transition-base, 250ms ease);
+  position: relative;
+  overflow: hidden;
+}
+
+.canoe-award-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md, 0 4px 16px rgba(0, 0, 0, 0.1));
+  border-color: color-mix(in srgb, var(--color-accent) 50%, var(--color-light-gray));
+}
+
+.canoe-award-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-3, 0.75rem);
+  margin-bottom: var(--space-3, 0.75rem);
+}
+
+.canoe-award-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(201, 168, 76, 0.15);
+  border: 1px solid var(--color-accent, #c9a84c);
+  color: #926a17;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-full, 9999px);
+}
+
+.canoe-award-pill.first-prize {
+  background: linear-gradient(135deg, #c9973a 0%, #e8c96a 100%);
+  color: #07142c;
+  border: none;
+  font-weight: 900;
+}
+
+.canoe-award-date {
+  font-size: var(--text-xs, 0.8125rem);
+  color: var(--color-text-light, #475569);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.canoe-award-name {
+  font-family: var(--font-sans, "Source Sans 3", sans-serif);
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--color-primary, #0b1e42);
+  line-height: 1.4;
+  margin-bottom: var(--space-4, 1rem);
+}
+
+.canoe-award-students {
+  margin-top: var(--space-4, 1rem);
+  padding-top: var(--space-3, 0.75rem);
+  border-top: 1px solid var(--color-light-gray, #e2e8f0);
+}
+
+.canoe-award-students-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-light, #475569);
+  font-weight: 700;
+  margin-bottom: var(--space-2, 0.5rem);
+}
+
+.canoe-students-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.canoe-student-chip {
+  background: var(--color-off-white, #f8fafc);
+  border: 1px solid var(--color-light-gray, #e2e8f0);
+  color: var(--color-text, #0f172a);
+  font-size: 0.75rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-sm, 4px);
+  font-weight: 500;
+}
+
+/* --- National Event (NCCC) Highlight Banner --- */
+.canoe-event-card {
+  background: linear-gradient(135deg, rgba(11, 30, 66, 0.03) 0%, rgba(201, 168, 76, 0.12) 100%);
+  border: 1.5px solid var(--color-accent, #c9a84c);
+  border-radius: var(--radius-lg, 16px);
+  padding: var(--space-8, 2rem);
+  position: relative;
+  overflow: hidden;
+}
+
+.canoe-event-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--color-primary, #0b1e42);
+  color: var(--color-white, #ffffff);
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.35rem 0.85rem;
+  border-radius: var(--radius-full, 9999px);
+  margin-bottom: var(--space-3, 0.75rem);
+}
+
+.canoe-event-title {
+  font-family: var(--font-serif, "Source Serif 4", Georgia, serif);
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--color-primary, #0b1e42);
+  margin-bottom: var(--space-4, 1rem);
+}
+
+.canoe-event-body {
+  font-size: var(--text-base, 1rem);
+  line-height: 1.7;
+  color: var(--color-text, #0f172a);
+}
+
+.canoe-event-body p {
+  margin-bottom: var(--space-3, 0.75rem);
+}
+
+.canoe-event-body p:last-child {
+  margin-bottom: 0;
+}
+
+/* --- Leadership & Mentorship Cards --- */
+.canoe-leadership-grid {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: var(--space-8, 2rem);
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .canoe-leadership-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.canoe-incharge-card {
+  background: var(--color-white, #ffffff);
+  border: 1.5px solid var(--color-accent, #c9a84c);
+  border-radius: var(--radius-lg, 16px);
+  padding: var(--space-7, 1.75rem);
+  box-shadow: var(--shadow-md, 0 4px 16px rgba(0, 0, 0, 0.1));
+}
+
+.canoe-incharge-tag {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-accent, #c9a84c);
+  margin-bottom: var(--space-2, 0.5rem);
+}
+
+.canoe-incharge-name {
+  font-family: var(--font-serif, "Source Serif 4", Georgia, serif);
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--color-primary, #0b1e42);
+  margin-bottom: var(--space-1, 0.25rem);
+}
+
+.canoe-incharge-role {
+  font-size: var(--text-sm, 0.9375rem);
+  color: var(--color-text-light, #475569);
+  font-weight: 600;
+  margin-bottom: var(--space-4, 1rem);
+}
+
+.canoe-incharge-contacts {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 0.5rem);
+  margin-bottom: var(--space-4, 1rem);
+  padding-bottom: var(--space-4, 1rem);
+  border-bottom: 1px solid var(--color-light-gray, #e2e8f0);
+}
+
+.canoe-contact-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--text-sm, 0.9375rem);
+  color: var(--color-primary, #0b1e42);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color var(--transition-fast, 150ms ease);
+}
+
+.canoe-contact-link:hover {
+  color: var(--color-accent, #c9a84c);
+}
+
+.canoe-incharge-interests-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-light, #475569);
+  font-weight: 700;
+  margin-bottom: var(--space-2, 0.5rem);
+}
+
+.canoe-interests-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.canoe-interest-chip {
+  background: rgba(11, 30, 66, 0.05);
+  border: 1px solid var(--color-light-gray, #e2e8f0);
+  color: var(--color-primary, #0b1e42);
+  font-size: var(--text-xs, 0.8125rem);
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--radius-sm, 4px);
+  font-weight: 600;
+}
+
+/* Mentors & Student Cohorts Right Column */
+.canoe-cohorts-box {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6, 1.5rem);
+}
+
+.canoe-mentors-card {
+  background: var(--color-white, #ffffff);
+  border: 1px solid var(--color-light-gray, #e2e8f0);
+  border-radius: var(--radius-lg, 16px);
+  padding: var(--space-6, 1.5rem);
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.08));
+}
+
+.canoe-subcard-title {
+  font-family: var(--font-serif, "Source Serif 4", Georgia, serif);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--color-primary, #0b1e42);
+  margin-bottom: var(--space-4, 1rem);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.canoe-mentors-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-3, 0.75rem);
+}
+
+.canoe-mentor-item {
+  background: var(--color-off-white, #f8fafc);
+  border: 1px solid var(--color-light-gray, #e2e8f0);
+  border-radius: var(--radius-md, 8px);
+  padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3, 0.75rem);
+  font-size: var(--text-sm, 0.9375rem);
+  font-weight: 700;
+  color: var(--color-primary, #0b1e42);
+}
+
+.canoe-teams-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4, 1rem);
+}
+
+.canoe-team-card {
+  background: var(--color-white, #ffffff);
+  border: 1px solid var(--color-light-gray, #e2e8f0);
+  border-radius: var(--radius-md, 8px);
+  padding: var(--space-5, 1.25rem);
+}
+
+.canoe-team-header {
+  font-size: var(--text-sm, 0.9375rem);
+  font-weight: 800;
+  color: var(--color-primary, #0b1e42);
+  margin-bottom: var(--space-3, 0.75rem);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.canoe-team-count {
+  font-size: 0.75rem;
+  background: rgba(201, 168, 76, 0.15);
+  color: #926a17;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-full, 9999px);
+  font-weight: 800;
+}
+
+/* --- Photo Gallery --- */
+.canoe-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-4, 1rem);
+}
+
+.canoe-gallery-tile {
+  background: var(--color-white, #ffffff);
+  border: 1px solid var(--color-light-gray, #e2e8f0);
+  border-radius: var(--radius-lg, 16px);
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.08));
+  transition: all var(--transition-base, 250ms ease);
+}
+
+.canoe-gallery-tile:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md, 0 4px 16px rgba(0, 0, 0, 0.12));
+  border-color: var(--color-accent, #c9a84c);
+}
+
+.canoe-gallery-img-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: #0b1e42;
+}
+
+.canoe-gallery-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.canoe-gallery-tile:hover .canoe-gallery-img {
+  transform: scale(1.05);
+}
+
+.canoe-gallery-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(7, 20, 44, 0.35);
+  opacity: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  transition: opacity var(--transition-fast, 150ms ease);
+}
+
+.canoe-gallery-tile:hover .canoe-gallery-overlay {
+  opacity: 1;
+}
+
+.canoe-gallery-caption {
+  padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
+  font-size: var(--text-xs, 0.8125rem);
+  color: var(--color-text-light, #475569);
+  line-height: 1.4;
+  font-weight: 600;
+  background: var(--color-white, #ffffff);
+}
+
+/* --- Facilities & Highlights --- */
+.canoe-highlights-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--space-6, 1.5rem);
+}
+
+.canoe-highlight-card {
+  background: var(--color-white, #ffffff);
+  border: 1px solid var(--color-light-gray, #e2e8f0);
+  border-radius: var(--radius-lg, 16px);
+  padding: var(--space-6, 1.5rem);
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.08));
+}
+
+.canoe-highlight-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3, 0.75rem);
+  margin-bottom: var(--space-4, 1rem);
+  color: var(--color-primary, #0b1e42);
+}
+
+.canoe-highlight-title {
+  font-family: var(--font-serif, "Source Serif 4", Georgia, serif);
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin: 0;
+}
+
+/* --- CTA Section (University Standard) --- */
+.canoe-cta-section {
+  background: linear-gradient(135deg, #07142c 0%, #0b1e42 60%, #162f5d 100%);
+  padding: var(--space-16, 4rem) 0;
+  color: var(--color-white, #ffffff);
+  text-align: center;
+}
+
+.canoe-cta-title {
+  font-family: var(--font-serif, "Source Serif 4", Georgia, serif);
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+  font-weight: 800;
+  color: var(--color-white, #ffffff);
+  margin-bottom: var(--space-3, 0.75rem);
+}
+
+.canoe-cta-desc {
+  font-size: var(--text-base, 1rem);
+  color: rgba(255, 255, 255, 0.85);
+  max-width: 580px;
+  margin: 0 auto var(--space-6, 1.5rem);
+  line-height: 1.6;
+}
+
+.canoe-cta-buttons {
+  display: flex;
+  gap: var(--space-4, 1rem);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Lightbox Modal */
+.canoe-lightbox-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(7, 20, 44, 0.95);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6, 1.5rem);
+}
+
+.canoe-lightbox-dialog {
+  position: relative;
+  max-width: 90vw;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.canoe-lightbox-img {
+  max-width: 100%;
+  max-height: 75vh;
+  object-fit: contain;
+  border-radius: var(--radius-md, 8px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.canoe-lightbox-caption {
+  color: #ffffff;
+  margin-top: var(--space-3, 0.75rem);
+  font-size: var(--text-sm, 0.9375rem);
+  text-align: center;
+  max-width: 600px;
+}
+
+.canoe-lightbox-close {
+  position: absolute;
+  top: -45px;
+  right: 0;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast, 150ms ease);
+}
+
+.canoe-lightbox-close:hover {
+  background: var(--color-accent, #c9a84c);
+  color: #07142c;
+}
+
+.canoe-lightbox-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast, 150ms ease);
+}
+
+.canoe-lightbox-btn:hover {
+  background: var(--color-accent, #c9a84c);
+  color: #07142c;
+}
+
+.canoe-lightbox-btn--prev {
+  left: -60px;
+}
+
+.canoe-lightbox-btn--next {
+  right: -60px;
+}
+
+@media (max-width: 768px) {
+  .canoe-lightbox-btn--prev {
+    left: 10px;
+  }
+  .canoe-lightbox-btn--next {
+    right: 10px;
+  }
+}
