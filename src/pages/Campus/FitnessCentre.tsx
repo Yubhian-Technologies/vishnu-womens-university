@@ -20,7 +20,7 @@ const DEFAULT_PHOTOS = [
   { src: '/images/sports-trophy-banner.jpg', alt: 'Sports & Athletic Competitions', caption: 'State & Inter-Collegiate Tournaments' },
   { src: '/images/sports-volleyball-champion.jpg', alt: 'Student Sports Training', caption: 'Physical Stamina & Sports Coaching' },
   { src: '/images/hall-of-champions-banner.jpg', alt: 'Hall of Champions', caption: 'Sports & Fitness Champions' },
-  { src: '/images/vibrant-campus.png', alt: 'VWU Campus Active Life', caption: 'Yoga & Active Campus Wellness' }
+  { src: '/images/campus-vibrant.jpeg', alt: 'VWU Campus Active Life', caption: 'Yoga & Active Campus Wellness' }
 ];
 
 export default function FitnessCentre() {

@@ -19,7 +19,7 @@ import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import type { CampusLifeItemDoc } from '../Admin/sections/CampusLifeAdmin';
 import './SocialServicesPage.css';
 
-const HERO_DEFAULT = [{ src: '/images/vibrant-campus.png', alt: 'NSS Social Services Community Outreach', caption: '' }];
+const HERO_DEFAULT = [{ src: '/images/campus-vibrant.jpeg', alt: 'NSS Social Services Community Outreach', caption: '' }];
 const INTRO_DEFAULT = [{ src: '/images/1000074551.jpg', alt: 'VWU Students Planting Trees', caption: '' }];
 const FOUNDER_DEFAULT = [{ src: '/images/governing-body-founder.jpg', alt: 'Padma Bhushan Dr. B. V. Raju', caption: '' }];
 // Order and alt text match the "communities" gallery's default slots 1:1 in
@@ -92,7 +92,7 @@ export default function SocialServicesPage() {
     }
   };
 
-  const heroBg = heroBanners[0]?.imageUrl || heroPhotos[0]?.src || '/images/vibrant-campus.png';
+  const heroBg = heroBanners[0]?.imageUrl || heroPhotos[0]?.src || '/images/campus-vibrant.jpeg';
   const plantingImg = introPhotos[0]?.src || '/images/1000074551.jpg';
   const founderImg = founderPhotos[0]?.src || '/images/governing-body-founder.jpg';
 
@@ -195,7 +195,7 @@ export default function SocialServicesPage() {
                 src={plantingImg}
                 alt="VWU Students Planting Sapling in NSS Drive"
                 onError={(e) => {
-                  (e.currentTarget as HTMLImageElement).src = '/images/vibrant-campus.png';
+                  (e.currentTarget as HTMLImageElement).src = '/images/campus-vibrant.jpeg';
                 }}
               />
               {introPhotos[0]?.caption && (
@@ -258,7 +258,7 @@ export default function SocialServicesPage() {
             <div className="ss-card">
               <div className="ss-card-img-wrap">
                 <img
-                  src={communityPhotoAt(0).src || communityPhotoByAlt.get('Rural Students')?.src || '/images/vibrant-campus.png'}
+                  src={communityPhotoAt(0).src || communityPhotoByAlt.get('Rural Students')?.src || '/images/campus-vibrant.jpeg'}
                   alt="Rural Students"
                   onError={(e) => { (e.currentTarget as HTMLImageElement).src = PHOTO_NEEDED_PLACEHOLDER; }}
                 />
@@ -309,7 +309,7 @@ export default function SocialServicesPage() {
             <div className="ss-card">
               <div className="ss-card-img-wrap">
                 <img
-                  src={communityPhotoAt(3).src || communityPhotoByAlt.get('Persons with Disabilities')?.src || '/images/vibrant-campus.png'}
+                  src={communityPhotoAt(3).src || communityPhotoByAlt.get('Persons with Disabilities')?.src || '/images/campus-vibrant.jpeg'}
                   alt="Persons with Disabilities"
                   onError={(e) => { (e.currentTarget as HTMLImageElement).src = PHOTO_NEEDED_PLACEHOLDER; }}
                 />

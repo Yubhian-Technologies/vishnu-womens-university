@@ -15,6 +15,10 @@ import { DIFFERENTIATOR_CATEGORIES, type BlockKey } from '../Admin/sections/Diff
 import type { DifferentiatorItemDoc } from '../Admin/sections/DifferentiatorsAdmin';
 import type { FacultyDoc } from '../Academics/Faculty';
 import { talentSprintWise } from './talentSprintWise.data';
+import MicrochipPage from './MicrochipPage';
+import TiDspPage from './TiDspPage';
+import UltraTechPage from './UltraTechPage';
+import ChipsToStartupPage from './ChipsToStartupPage';
 import MedaPlmCoePage from './MedaPlmCoePage';
 import VsacPage from './VsacPage';
 import VehicleDesignLabPage from './VehicleDesignLabPage';
@@ -48,6 +52,17 @@ function WisePage({ tabs }: { tabs: CustomTab[] }) {
 const CATEGORY_ICONS: Record<string, typeof Rocket> = {
   innovation: Rocket, industry: Factory, research: Microscope, global: Globe2, student: GraduationCap,
 };
+
+// Items with their own dedicated `{item, sections}`-style page component
+// (MedaPlmCoePage, VsacPage, ...) render it compactly — no padded section
+// wrapper or bottom margin on the shared hero above it, since each of these
+// pages supplies its own spacing.
+const COMPACT_SLUGS = new Set([
+  'meda-plm-coe', 'vsac', 'vehicle-design-lab', 'dream-house-lab', 'hpc-lab', 'aicte-idea-lab', 'institution-innovation-cell',
+]);
+// These three instead render inside the normal padded white section, just
+// with a bit less top padding than the generic fallback below them.
+const PADDED_SLUGS = new Set(['microchip-embedded', 'ti-dsp-coe', 'ultratech-coe']);
 
 // Items saved before `description` existed still have their copy in the old
 // `intro`/`about` fields (kept, deprecated, on DifferentiatorItemDoc) — build
@@ -172,10 +187,18 @@ export default function DifferentiatorDetail() {
   const heroImage = item.heroImage || heroSlides[0]?.imageUrl;
   const wise = item.slug === 'talentsprint-wise' ? talentSprintWise : null;
 
+  // Chips to Startup (C2S) has its own bespoke hero + layout (see
+  // ChipsToStartupPage.tsx) instead of the shared navy hero card below —
+  // same idea as microchip-embedded/ti-dsp-coe/ultratech-coe's own body
+  // below, just also replacing the hero. Faculty carousel / closing CTA
+  // band further down the page still render normally afterward.
+  const isChipsToStartup = item.slug === 'chips-to-startup';
+
   return (
     <main className="page-wrapper">
       {/* Hero — Department Hero Card Design */}
-      <section className="dept-hero-section" style={(item.slug === 'meda-plm-coe' || item.slug === 'vsac' || item.slug === 'vehicle-design-lab' || item.slug === 'dream-house-lab' || item.slug === 'hpc-lab' || item.slug === 'aicte-idea-lab' || item.slug === 'institution-innovation-cell') ? { marginBottom: 0 } : undefined}>
+      {!isChipsToStartup && (
+      <section className="dept-hero-section" style={COMPACT_SLUGS.has(item.slug) ? { marginBottom: 0 } : undefined}>
         <div className="container">
           <div className="dept-hero-card">
             {heroImage && (
@@ -206,6 +229,7 @@ export default function DifferentiatorDetail() {
           </div>
         </div>
       </section>
+      )}
 
       {/* Overview — Description/Vision/Mission/Objectives/Custom Sections,
           the same structure every non-external item has. Institution
@@ -214,35 +238,51 @@ export default function DifferentiatorDetail() {
           get their own dedicated tabbed page (IicPage/VdlPage/WisePage/
           IdeaLabPage) right below it — the two are no longer mutually
           exclusive. */}
-      <section className={(item.slug === 'meda-plm-coe' || item.slug === 'vsac' || item.slug === 'vehicle-design-lab' || item.slug === 'dream-house-lab' || item.slug === 'hpc-lab' || item.slug === 'aicte-idea-lab' || item.slug === 'institution-innovation-cell') ? 'section-compact' : 'section bg-white'} style={(item.slug === 'meda-plm-coe' || item.slug === 'vsac' || item.slug === 'vehicle-design-lab' || item.slug === 'dream-house-lab' || item.slug === 'hpc-lab' || item.slug === 'aicte-idea-lab' || item.slug === 'institution-innovation-cell') ? { padding: 0 } : undefined}>
-        <div className="container">
-          {item.slug === 'meda-plm-coe' ? (
-            <MedaPlmCoePage item={item} sections={effectiveCustomSections} />
-          ) : item.slug === 'vsac' ? (
-            <VsacPage item={item} sections={effectiveCustomSections} />
-          ) : item.slug === 'vehicle-design-lab' ? (
-            <VehicleDesignLabPage item={item} sections={effectiveCustomSections} />
-          ) : item.slug === 'dream-house-lab' ? (
-            <DreamHouseLabPage item={item} sections={effectiveCustomSections} />
-          ) : item.slug === 'hpc-lab' ? (
-            <HpcLabPage item={item} sections={effectiveCustomSections} />
-          ) : item.slug === 'aicte-idea-lab' ? (
-            <IdeaLabPage item={item} sections={effectiveCustomSections} />
-          ) : item.slug === 'institution-innovation-cell' ? (
-            <IicPage item={item} sections={effectiveCustomSections} />
-          ) : (
-            <div className="dept-about-main">
-              <div className="dept-about-card">
-                <SectionSubtree section={descriptionSection} />
+      {isChipsToStartup ? (
+        <ChipsToStartupPage item={item} customSections={effectiveCustomSections} />
+      ) : (
+        <section
+          className={COMPACT_SLUGS.has(item.slug) ? 'section-compact' : 'section bg-white'}
+          style={COMPACT_SLUGS.has(item.slug) ? { padding: 0 } : PADDED_SLUGS.has(item.slug) ? { paddingTop: '1rem' } : undefined}
+        >
+          <div className="container">
+            {item.slug === 'microchip-embedded' ? (
+              <MicrochipPage customSections={effectiveCustomSections} />
+            ) : item.slug === 'ti-dsp-coe' ? (
+              <TiDspPage customSections={effectiveCustomSections} />
+            ) : item.slug === 'ultratech-coe' ? (
+              <UltraTechPage
+                customSections={effectiveCustomSections}
+                descriptionSection={descriptionSection}
+                introBlocks={introBlocks}
+              />
+            ) : item.slug === 'meda-plm-coe' ? (
+              <MedaPlmCoePage item={item} sections={effectiveCustomSections} />
+            ) : item.slug === 'vsac' ? (
+              <VsacPage item={item} sections={effectiveCustomSections} />
+            ) : item.slug === 'vehicle-design-lab' ? (
+              <VehicleDesignLabPage item={item} sections={effectiveCustomSections} />
+            ) : item.slug === 'dream-house-lab' ? (
+              <DreamHouseLabPage item={item} sections={effectiveCustomSections} />
+            ) : item.slug === 'hpc-lab' ? (
+              <HpcLabPage item={item} sections={effectiveCustomSections} />
+            ) : item.slug === 'aicte-idea-lab' ? (
+              <IdeaLabPage item={item} sections={effectiveCustomSections} />
+            ) : item.slug === 'institution-innovation-cell' ? (
+              <IicPage item={item} sections={effectiveCustomSections} />
+            ) : (
+              <div className="dept-about-main">
+                <div className="dept-about-card">
+                  <SectionSubtree section={descriptionSection} />
+                </div>
+                <CustomSectionsIntro sections={[...introBlocks, ...effectiveCustomSections]} />
+                <CustomSectionsGalleries sections={effectiveCustomSections} />
+                <CustomSectionsAccordion sections={effectiveCustomSections} />
               </div>
-
-              <CustomSectionsIntro sections={[...introBlocks, ...effectiveCustomSections]} />
-              <CustomSectionsGalleries sections={effectiveCustomSections} />
-              <CustomSectionsAccordion sections={effectiveCustomSections} />
-            </div>
-          )}
-        </div>
-      </section>
+            )}
+          </div>
+        </section>
+      )}
 
       {/* Rural Women Tech Park's Report Links are admin-managed separately
           (Admin > Differentiators > Rural Women Tech Park > Report Links)

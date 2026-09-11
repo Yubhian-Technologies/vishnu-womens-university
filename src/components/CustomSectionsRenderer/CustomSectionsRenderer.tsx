@@ -232,7 +232,7 @@ export function CustomSectionsPills({ sections }: { sections: CustomSection[] })
 // Activities accordions. A Photo Gallery section is excluded here even when
 // left at the default placement — it always renders in CustomSectionsIntro
 // above instead, never collapsed (see the comment there).
-export function CustomSectionsAccordion({ sections }: { sections: CustomSection[] }) {
+export function CustomSectionsAccordion({ sections, startIndex = 1 }: { sections: CustomSection[]; startIndex?: number }) {
   const visible = sections.filter((s) => s.placement !== 'intro' && s.contentType !== 'gallery' && hasCustomSectionContent(s));
   const [openIndex, setOpenIndex] = useState<number | null>(0);
   if (visible.length === 0) return null;
@@ -249,9 +249,11 @@ export function CustomSectionsAccordion({ sections }: { sections: CustomSection[
               onClick={() => setOpenIndex(isOpen ? null : i)}
               aria-expanded={isOpen}
             >
-              <span className="cs-accordion-num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+              <span className="cs-accordion-num" aria-hidden="true">{String(i + startIndex).padStart(2, '0')}</span>
               <span className="cs-accordion-title">{section.label}</span>
-              <ChevronDown size={18} strokeWidth={2.25} className="cs-accordion-chevron" aria-hidden="true" />
+              <div className="cs-chevron-box">
+                <ChevronDown size={18} strokeWidth={2.25} className="cs-accordion-chevron" aria-hidden="true" />
+              </div>
             </button>
             <SmoothCollapse open={isOpen}>
               <div className="cs-accordion-body">
@@ -519,25 +521,45 @@ function StaticGalleryStrip({ photos }: { photos: CustomSectionPhoto[] }) {
 
   return (
     <>
-      <div style={{ display: 'flex', gap: 'var(--space-4)', overflowX: 'auto', paddingBottom: 'var(--space-2)' }}>
+      <div style={{ display: 'flex', gap: 'var(--space-5)', overflowX: 'auto', padding: 'var(--space-3) var(--space-2) var(--space-4)' }}>
         {valid.map((p, i) => (
           <button
             key={p.imageUrl}
             type="button"
             onClick={() => setLightbox(i)}
             aria-label={`View photo ${i + 1}`}
+            className="cs-gallery-frame-btn"
             style={{
-              position: 'relative', flex: '0 0 220px', padding: 0, border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)',
-              overflow: 'hidden', cursor: 'zoom-in', aspectRatio: '4 / 3', background: 'var(--color-off-white)',
+              position: 'relative',
+              flex: '0 0 250px',
+              padding: '8px 8px 12px 8px',
+              border: '1.5px solid rgba(201, 151, 58, 0.35)',
+              borderRadius: '16px',
+              overflow: 'hidden',
+              cursor: 'zoom-in',
+              background: '#ffffff',
+              boxShadow: '0 8px 24px rgba(11, 30, 66, 0.08)',
+              transition: 'transform 250ms ease, box-shadow 250ms ease, border-color 250ms ease',
+              display: 'flex',
+              flexDirection: 'column',
             }}
           >
-            <img src={p.imageUrl} alt={p.caption || ''} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+            <div style={{ width: '100%', height: 160, borderRadius: 10, overflow: 'hidden', background: '#f1f5f9' }}>
+              <img src={p.imageUrl} alt={p.caption || ''} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+            </div>
             {p.caption && (
               <span
                 style={{
-                  position: 'absolute', insetInline: 0, bottom: 0, padding: 'var(--space-2)',
-                  background: 'linear-gradient(0deg, rgba(0,0,0,0.72), transparent)',
-                  color: 'var(--color-white)', fontSize: 'var(--text-xs)', textAlign: 'left',
+                  display: 'block',
+                  padding: '8px 4px 2px',
+                  color: '#334155',
+                  fontSize: 'var(--text-xs)',
+                  fontWeight: 600,
+                  textAlign: 'center',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  width: '100%',
                 }}
               >
                 {p.caption}
