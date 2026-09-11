@@ -211,6 +211,8 @@ const DEFAULT_SECTIONS: Record<string, Record<string, SectionDef>> = {
     'swimming-pool': placeholderPhotoBank('Swimming Pool'),
     'campus-security': placeholderPhotoBank('Campus Security'),
     'other-facilities': placeholderPhotoBank('Other Facilities'),
+    'television': placeholderPhotoBank('Television'),
+    'sewage-treatment-plants': placeholderPhotoBank('Sewage Treatment Plants'),
   },
   about: {
     main: {

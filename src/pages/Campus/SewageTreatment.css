@@ -1,0 +1,718 @@
+/* ==========================================================================
+   Sewage Treatment Plants — Bespoke Eco Clean-Tech UI Architecture
+   ========================================================================== */
+
+.stp-page {
+  --stp-emerald: #059669;
+  --stp-emerald-dark: #064e3b;
+  --stp-emerald-light: #d1fae5;
+  --stp-teal: #0d9488;
+  --stp-teal-light: #ccfbf1;
+  --stp-cyan: #0284c7;
+  --stp-bg-dark: #022c22;
+  --stp-bg-light: #f0fdf4;
+  --stp-card-bg: #ffffff;
+  --stp-text-dark: #064e3b;
+  --stp-text-body: #1e293b;
+  --stp-text-muted: #64748b;
+  --stp-border: #a7f3d0;
+
+  position: relative;
+  background: var(--stp-bg-light);
+  color: var(--stp-text-body);
+  min-height: 100vh;
+  overflow-x: hidden;
+  font-family: var(--font-sans, system-ui, -apple-system, sans-serif);
+}
+
+.stp-container {
+  max-width: 1260px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.stp-section {
+  padding: 5.5rem 0;
+  position: relative;
+}
+
+/* Header Component */
+.stp-header {
+  text-align: center;
+  max-width: 780px;
+  margin: 0 auto 3.5rem auto;
+}
+
+.stp-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 1.25rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: #d1fae5;
+  color: #047857;
+  border: 1px solid rgba(5, 150, 105, 0.3);
+  margin-bottom: 1rem;
+}
+
+.stp-badge-dark {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border-color: rgba(52, 211, 153, 0.3);
+}
+
+.stp-title {
+  font-size: clamp(2.25rem, 4.5vw, 3.25rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  color: var(--stp-emerald-dark);
+  line-height: 1.2;
+  margin-bottom: 1rem;
+}
+
+.stp-title span {
+  background: linear-gradient(135deg, #059669 0%, #0d9488 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.stp-subtitle {
+  font-size: 1.15rem;
+  color: var(--stp-text-muted);
+  line-height: 1.75;
+}
+
+/* ==========================================================================
+   1. Eco Metrics Hero Dashboard (Dark Emerald Gradient Banner)
+   ========================================================================== */
+.stp-stats-banner {
+  background: linear-gradient(135deg, #022c22 0%, #064e3b 50%, #042f2e 100%);
+  padding: 3.5rem 0;
+  border-top: 3px solid #10b981;
+  border-bottom: 3px solid #10b981;
+  box-shadow: 0 15px 40px rgba(2, 44, 34, 0.25);
+  position: relative;
+  overflow: hidden;
+}
+
+.stp-stats-banner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1200px;
+  height: 100%;
+  background: radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.stp-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1.25rem;
+}
+
+@media (max-width: 1024px) {
+  .stp-stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .stp-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.stp-stat-card {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(52, 211, 153, 0.25);
+  border-radius: 1.25rem;
+  padding: 1.5rem 1rem;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.stp-stat-card:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-4px);
+  border-color: #34d399;
+  box-shadow: 0 10px 25px rgba(52, 211, 153, 0.2);
+}
+
+.stp-stat-val {
+  font-family: var(--font-serif, serif);
+  font-size: clamp(1.5rem, 2.5vw, 2.1rem);
+  font-weight: 900;
+  color: #34d399;
+  line-height: 1.1;
+  margin-bottom: 0.35rem;
+}
+
+.stp-stat-lbl {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.85);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ==========================================================================
+   2. Water Conservation Vision & Narrative Card
+   ========================================================================== */
+.stp-vision-section {
+  background: #ffffff;
+}
+
+.stp-vision-card {
+  background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+  border: 2px solid #a7f3d0;
+  border-radius: 2rem;
+  padding: 3.5rem;
+  box-shadow: 0 15px 45px rgba(5, 150, 105, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+.stp-vision-quote {
+  background: #ffffff;
+  border-left: 5px solid #059669;
+  border-radius: 1.25rem;
+  padding: 2rem 2.5rem;
+  margin-bottom: 2.5rem;
+  box-shadow: 0 6px 20px rgba(5, 150, 105, 0.06);
+}
+
+.stp-vision-quote-text {
+  font-family: var(--font-serif, Georgia, serif);
+  font-size: 1.3rem;
+  font-style: italic;
+  color: #064e3b;
+  line-height: 1.7;
+}
+
+.stp-vision-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 3rem;
+  align-items: center;
+}
+
+@media (max-width: 992px) {
+  .stp-vision-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.stp-vision-body p {
+  font-size: 1.1rem;
+  color: #334155;
+  line-height: 1.8;
+  margin-bottom: 1.25rem;
+}
+
+.stp-vision-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.stp-media-card {
+  position: relative;
+  border-radius: 1.75rem;
+  overflow: hidden;
+  border: 4px solid #ffffff;
+  box-shadow: 0 15px 35px rgba(5, 150, 105, 0.15);
+  aspect-ratio: 4 / 3;
+  background: #064e3b;
+}
+
+.stp-media-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.stp-media-badge {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  right: 1rem;
+  background: rgba(2, 44, 34, 0.85);
+  backdrop-filter: blur(8px);
+  color: #34d399;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.6rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stp-vision-highlight-box {
+  background: #064e3b;
+  color: #ffffff;
+  border-radius: 1.5rem;
+  padding: 2.25rem;
+  box-shadow: 0 12px 35px rgba(6, 78, 59, 0.2);
+}
+
+.stp-vision-highlight-title {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #34d399;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.stp-water-loop {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.stp-loop-step {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.85rem 1.25rem;
+  border-radius: 0.85rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.stp-loop-icon {
+  color: #38bdf8;
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   3. DST-Funded Treatment Plants Holographic Spec Grid
+   ========================================================================== */
+.stp-dst-section {
+  background: #f0fdf4;
+  border-top: 1px solid #d1fae5;
+  border-bottom: 1px solid #d1fae5;
+}
+
+.stp-dst-showcase {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 2.5rem;
+  align-items: center;
+  margin-bottom: 3rem;
+}
+
+@media (max-width: 992px) {
+  .stp-dst-showcase {
+    grid-template-columns: 1fr;
+  }
+}
+
+.stp-dst-narrative {
+  font-size: 1.15rem;
+  color: #334155;
+  line-height: 1.85;
+  background: #ffffff;
+  border-radius: 1.5rem;
+  border: 1px solid #a7f3d0;
+  padding: 2.5rem;
+  box-shadow: 0 8px 30px rgba(5, 150, 105, 0.05);
+}
+
+.stp-process-img-box {
+  width: 100%;
+  height: 180px;
+  border-radius: 1.25rem;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  border: 2px solid #a7f3d0;
+}
+
+.stp-process-img-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.stp-impact-media-card {
+  background: #ffffff;
+  border: 2px solid #a7f3d0;
+  border-radius: 2rem;
+  overflow: hidden;
+  box-shadow: 0 12px 35px rgba(5, 150, 105, 0.08);
+  display: flex;
+  flex-direction: column;
+}
+
+.stp-impact-img-box {
+  width: 100%;
+  height: 220px;
+  overflow: hidden;
+  position: relative;
+}
+
+.stp-impact-img-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.stp-impact-body {
+  padding: 2.5rem;
+}
+
+.stp-spec-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.75rem;
+}
+
+.stp-spec-card {
+  background: #ffffff;
+  border: 1px solid #a7f3d0;
+  border-radius: 1.5rem;
+  padding: 2rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.03);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.stp-spec-card:hover {
+  transform: translateY(-5px);
+  border-color: #059669;
+  box-shadow: 0 15px 35px rgba(5, 150, 105, 0.15);
+}
+
+.stp-spec-icon-box {
+  width: 52px;
+  height: 52px;
+  border-radius: 1.25rem;
+  background: #d1fae5;
+  color: #047857;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stp-spec-lbl {
+  font-size: 0.775rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #059669;
+  margin-bottom: 0.35rem;
+}
+
+.stp-spec-val {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #064e3b;
+  line-height: 1.35;
+}
+
+/* ==========================================================================
+   4. Methodology — MBBR Technology Process Workflow
+   ========================================================================== */
+.stp-method-section {
+  background: #ffffff;
+}
+
+.stp-process-flow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+@media (max-width: 992px) {
+  .stp-process-flow {
+    grid-template-columns: 1fr;
+  }
+}
+
+.stp-process-card {
+  background: linear-gradient(180deg, #ffffff 0%, #f0fdf4 100%);
+  border: 1.5px solid #a7f3d0;
+  border-radius: 1.75rem;
+  padding: 2.5rem;
+  position: relative;
+  box-shadow: 0 8px 25px rgba(5, 150, 105, 0.06);
+}
+
+.stp-process-num {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: rgba(5, 150, 105, 0.15);
+}
+
+.stp-process-icon {
+  width: 54px;
+  height: 54px;
+  border-radius: 1.25rem;
+  background: #064e3b;
+  color: #34d399;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.stp-process-title {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #064e3b;
+  margin-bottom: 1rem;
+}
+
+.stp-process-body {
+  font-size: 1rem;
+  color: #334155;
+  line-height: 1.75;
+}
+
+/* ==========================================================================
+   5. Impact & Application Dual Spotlight
+   ========================================================================== */
+.stp-impact-section {
+  background: #f0fdf4;
+  border-top: 1px solid #d1fae5;
+  border-bottom: 1px solid #d1fae5;
+}
+
+.stp-impact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2.5rem;
+}
+
+@media (max-width: 992px) {
+  .stp-impact-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.stp-impact-card {
+  background: #ffffff;
+  border: 2px solid #a7f3d0;
+  border-radius: 2rem;
+  padding: 3rem;
+  box-shadow: 0 12px 35px rgba(5, 150, 105, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+.stp-impact-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  background: linear-gradient(90deg, #059669 0%, #0d9488 100%);
+}
+
+.stp-impact-tag {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: #d1fae5;
+  color: #047857;
+  padding: 0.35rem 0.95rem;
+  border-radius: 9999px;
+  margin-bottom: 1.25rem;
+}
+
+.stp-impact-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #064e3b;
+  margin-bottom: 1rem;
+  line-height: 1.3;
+}
+
+.stp-impact-desc {
+  font-size: 1.05rem;
+  color: #334155;
+  line-height: 1.8;
+}
+
+/* ==========================================================================
+   6. On-Site Gallery Showcase
+   ========================================================================== */
+.stp-gallery-section {
+  background: #ffffff;
+}
+
+.stp-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.stp-gallery-item {
+  position: relative;
+  border-radius: 1.25rem;
+  overflow: hidden;
+  border: 1px solid #d1fae5;
+  aspect-ratio: 4 / 3;
+  background: #e2e8f0;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.stp-gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.5s ease;
+}
+
+.stp-gallery-item:hover img {
+  transform: scale(1.08);
+}
+
+/* ==========================================================================
+   7. Eco Action Bottom CTA Banner
+   ========================================================================== */
+.stp-cta-banner {
+  background: linear-gradient(135deg, #064e3b 0%, #042f2e 100%);
+  color: #ffffff;
+  padding: 5.5rem 0;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.stp-cta-banner h2 {
+  font-size: clamp(2rem, 3.5vw, 2.75rem);
+  font-weight: 900;
+  margin-bottom: 1rem;
+  color: #ffffff;
+}
+
+.stp-cta-banner p {
+  font-size: 1.15rem;
+  color: rgba(255, 255, 255, 0.85);
+  max-width: 650px;
+  margin: 0 auto 2.5rem auto;
+  line-height: 1.65;
+}
+
+.stp-cta-btns {
+  display: flex;
+  justify-content: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.stp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.95rem 2.25rem;
+  border-radius: 9999px;
+  font-weight: 800;
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition: all 0.25s ease;
+}
+
+.stp-btn-emerald {
+  background: #10b981;
+  color: #022c22;
+}
+
+.stp-btn-emerald:hover {
+  background: #34d399;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(52, 211, 153, 0.3);
+}
+
+.stp-btn-outline {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+}
+
+.stp-btn-outline:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   Mobile & Tablet Responsiveness (< 768px, < 640px)
+   ========================================================================== */
+@media (max-width: 768px) {
+  .stp-stats-strip {
+    padding: 1.5rem 0;
+  }
+  .stp-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+  .stp-stat-box {
+    padding: 1rem 0.65rem;
+  }
+  .stp-stat-val {
+    font-size: 1.5rem;
+  }
+  .stp-two-col {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  .stp-spec-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  .stp-impact-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  .stp-card {
+    padding: 1.5rem 1.15rem;
+    border-radius: 1.25rem;
+  }
+  .stp-section-title {
+    font-size: 1.65rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .stp-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+  .stp-stat-val {
+    font-size: 1.25rem;
+  }
+  .stp-stat-lbl {
+    font-size: 0.725rem;
+  }
+  .stp-card {
+    padding: 1.15rem 0.85rem;
+  }
+}
