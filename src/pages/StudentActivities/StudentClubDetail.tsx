@@ -3,15 +3,17 @@ import { Link, useParams, Navigate } from 'react-router-dom';
 import { Users, FileText } from 'lucide-react';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { usePageBanner } from '../../hooks/usePageBanner';
+import { useClubCategories } from '../../lib/clubCategories';
+import { resolveContentIcon } from '../../lib/contentIcons';
 import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import { slugify } from '../../lib/slugify';
 import type { ClubDoc } from '../Admin/sections/StudentClubsAdmin';
-import { CLUB_CATEGORY_ICONS } from '../Admin/sections/StudentClubsAdmin';
 import '../detail-layout.css';
 
 export default function StudentClubDetail() {
   const { slug } = useParams<{ slug: string }>();
   const { docs: allClubs, loading } = useOrderedCollection<ClubDoc>('studentClubs', 'order');
+  const categories = useClubCategories();
   const club = allClubs.find((c) => (c.slug || slugify(c.name)) === slug) ?? null;
   // Independent of the club's own `images` gallery/thumbnail — set per-club
   // in Hero Banners > Student Clubs, falling back to the shared "Student
@@ -37,7 +39,8 @@ export default function StudentClubDetail() {
     return <Navigate to="/student-clubs" replace />;
   }
 
-  const Icon = CLUB_CATEGORY_ICONS[club.category] || Users;
+  const catDef = categories.find((c) => c.name === club.category);
+  const Icon = (catDef && resolveContentIcon(catDef.icon)) || Users;
   const images = club.images || [];
   const heroImage = club.heroImage || fallbackBanner?.imageUrl;
   const infoCards = [

@@ -10,6 +10,7 @@ import { type CustomTab } from '../../../lib/customTabs';
 import { diffChangedFields } from '../../../lib/formDiff';
 import { CAMPUS_LIFE_LEGACY_SEEDS } from '../../CampusLife/campusLifeLegacySeeds';
 import { CONTENT_ICON_NAMES } from '../../../lib/contentIcons';
+import AuditoriumsAdmin from './AuditoriumsAdmin';
 
 // Backs every "Campus Life" page (the 16 facility pages under /campus/*,
 // Vishnu TV Academy, Arts & Culture, Sports & Games, Social Services,
@@ -68,7 +69,6 @@ const KNOWN_PAGES: { slug: string; title: string; group: CampusLifeItemDoc['grou
   { slug: 'smart-classrooms', title: 'Smart Class Rooms', group: 'facility' },
   { slug: 'state-of-the-art-labs', title: 'State-of-the-art Labs', group: 'facility' },
   { slug: 'central-library', title: 'Central Library', group: 'facility' },
-  { slug: 'auditoriums', title: 'Auditoriums', group: 'facility' },
   { slug: 'campus-book-stores', title: 'Campus Book Stores', group: 'facility' },
   { slug: 'wifi-campus', title: 'Wi-Fi Campus', group: 'facility' },
   { slug: 'campus-hostels', title: 'Campus Hostels', group: 'facility' },
@@ -420,6 +420,8 @@ export default function CampusLifeAdmin() {
           Student Clubs → <strong>Admin → Student Clubs</strong>. Radio Vishnu → <strong>Admin → Differentiators</strong> (search "Radio Vishnu").
         </p>
       </div>
+
+      <AuditoriumsAdmin />
 
       {notYetCreated.length > 0 && (
         <div className="admin-card">

@@ -16,7 +16,7 @@ import { smoothScrollTo } from '../../lib/smoothScroll';
 import { slugify } from '../../lib/slugify';
 import type { PhotoItem } from '../../components/PhotoGrid/PhotoGrid';
 import type { ClubDoc } from '../Admin/sections/StudentClubsAdmin';
-import { CLUB_CATEGORIES, CLUB_CATEGORY_ICONS } from '../Admin/sections/StudentClubsAdmin';
+import { useClubCategories } from '../../lib/clubCategories';
 import './Clubs.css';
 
 // Defaults shown until an admin sets a real "clubs" Hero Banner (title,
@@ -73,19 +73,11 @@ const WHY_JOIN_TILE_COLORS = [
   { bg: '#E1F5F1', fg: '#1F9E86' },
 ];
 
-// Pastel "wiggly tile" colours per club category — purely decorative, keyed
-// to the same 3 CLUB_CATEGORIES StudentClubsAdmin.tsx defines.
-// Backgrounds are light tints (~10% mix into off-white) of the site's own
-// navy/gold/neutral brand tokens rather than arbitrary saturated hues, so
-// the tiles read as part of the same low-saturation VWU palette (close in
-// feel to --color-off-white / --color-light-gray) instead of clashing with
-// it; accent stays a distinct, more saturated colour per category for
-// badge/icon/button legibility.
-const CLUB_TILE_COLORS: Record<string, { bg: string; accent: string }> = {
-  'Technical Clubs': { bg: '#E1E6EC', accent: '#2F5FD0' },
-  'Social & Service Clubs': { bg: '#F2F0E7', accent: '#268946' },
-  'Creative & Arts Clubs': { bg: '#E7E8E6', accent: '#C0529A' },
-};
+// Pastel "wiggly tile" fallback colours when a club's category can't be
+// matched (e.g. admin deleted the category but clubs still reference it).
+// Per-category colours/icons come from the merged `studentClubCategories`
+// list (src/lib/clubCategories.ts) — built-in defaults plus anything an
+// admin has added, each carrying its own icon name/colours.
 const DEFAULT_TILE_COLOR = { bg: '#FDF4DA', accent: '#C9973A' };
 
 // "Clubs in Action" photos — feeds both the CoverFlow carousel and (first 3)
@@ -247,6 +239,7 @@ function ClubsGalleryCarousel({ photos }: { photos: PhotoItem[] }) {
 
 export default function Clubs() {
   const { docs: allClubs } = useOrderedCollection<ClubDoc>('studentClubs', 'order');
+  const categories = useClubCategories();
   const liveStats = useContentBlocks('clubs', 'stats');
   const liveTestimonials = useContentBlocks('clubs', 'testimonials');
   const liveWhyJoin = useContentBlocks('clubs', 'whyJoin');
@@ -273,8 +266,8 @@ export default function Clubs() {
   const heroCta2Link = heroExtra?.slug || '/events';
 
   const categoriesPresent = useMemo(
-    () => CLUB_CATEGORIES.filter((label) => allClubs.some((c) => c.category === label)),
-    [allClubs]
+    () => categories.filter((c) => allClubs.some((club) => club.category === c.name)),
+    [allClubs, categories]
   );
 
   const visibleClubs = useMemo(
@@ -284,8 +277,8 @@ export default function Clubs() {
 
   const derivedStats = useMemo(() => ([
     { id: 'clubs-count', icon: Users2, value: `${allClubs.length}+`, label: 'Clubs & Associations' },
-    { id: 'categories-count', icon: Sparkles, value: `${categoriesPresent.length || CLUB_CATEGORIES.length}`, label: 'Interest Areas' },
-  ]), [allClubs.length, categoriesPresent.length]);
+    { id: 'categories-count', icon: Sparkles, value: `${categoriesPresent.length || categories.length}`, label: 'Interest Areas' },
+  ]), [allClubs.length, categoriesPresent.length, categories.length]);
 
   const extraStatIcons = [Trophy, CalendarDays];
 
@@ -445,14 +438,14 @@ export default function Clubs() {
 
           {categoriesPresent.length > 1 && (
             <div className="clubs-filter-row">
-              {categoriesPresent.map((label) => (
+              {categoriesPresent.map((cat) => (
                 <button
-                  key={label}
+                  key={cat.name}
                   type="button"
-                  className={`clubs-filter-chip ${activeCategory === label ? 'clubs-filter-chip--active' : ''}`}
-                  onClick={() => setActiveCategory(label)}
+                  className={`clubs-filter-chip ${activeCategory === cat.name ? 'clubs-filter-chip--active' : ''}`}
+                  onClick={() => setActiveCategory(cat.name)}
                 >
-                  {label}
+                  {cat.name}
                 </button>
               ))}
               <button
@@ -467,9 +460,10 @@ export default function Clubs() {
 
           <div className="grid-4 clubs-wiggly-grid">
             {visibleClubs.map((club) => {
-              const Icon = CLUB_CATEGORY_ICONS[club.category] || Sparkles;
+              const cat = categories.find((c) => c.name === club.category);
+              const Icon = (cat && resolveContentIcon(cat.icon)) || Sparkles;
               const thumb = club.images?.[0]?.url;
-              const color = CLUB_TILE_COLORS[club.category] || DEFAULT_TILE_COLOR;
+              const color = cat ? { bg: cat.bg, accent: cat.accent } : DEFAULT_TILE_COLOR;
               const tileVars = { '--wiggly-bg': color.bg, '--wiggly-accent': color.accent } as CSSProperties;
               return (
                 <Link key={club.id} to={`/student-clubs/${club.slug || slugify(club.name)}`} className="clubs-wiggly-card" style={tileVars}>
