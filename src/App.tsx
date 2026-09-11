@@ -86,6 +86,8 @@ const CampusLifeDetail = lazyWithRetry(() => import('./pages/CampusLife/CampusLi
 const SocialServicesPage = lazyWithRetry(() => import('./pages/CampusLife/SocialServicesPage'));
 const SewageTreatment = lazyWithRetry(() => import('./pages/Campus/SewageTreatment'));
 const WellnessCenter = lazyWithRetry(() => import('./pages/Campus/WellnessCenter'));
+const Wellness = lazyWithRetry(() => import('./pages/Campus/Wellness'));
+const Auditoriums = lazyWithRetry(() => import('./pages/Campus/Auditoriums'));
 const FitnessCentre = lazyWithRetry(() => import('./pages/Campus/FitnessCentre'));
 const Television = lazyWithRetry(() => import('./pages/Campus/Television'));
 const HealthCare = lazyWithRetry(() => import('./pages/Campus/HealthCare'));
@@ -205,6 +207,7 @@ function PublicApp() {
                 renders instead of CampusLifeDetail redirecting to /campus. */}
             <Route path="/campus/sewage-treatment-plants" element={<SewageTreatment />} />
             <Route path="/campus/wellness-center" element={<WellnessCenter />} />
+            <Route path="/campus/wellness" element={<Wellness />} />
             <Route path="/campus/television" element={<Television />} />
             <Route path="/television" element={<Television />} />
             <Route path="/campus/health-care" element={<HealthCare />} />
@@ -218,6 +221,7 @@ function PublicApp() {
             <Route path="/campus/sports" element={<Sports />} />
             <Route path="/campus/sports/:id" element={<SportsDetail />} />
             <Route path="/campus/clubs" element={<Clubs />} />
+            <Route path="/campus/auditoriums" element={<Auditoriums />} />
             <Route path="/campus/food-courts" element={<FoodCourts />} />
             <Route path="/campus/fitness-centre" element={<FitnessCentre />} />
             <Route path="/campus/:slug" element={<CampusLifeDetail />} />
