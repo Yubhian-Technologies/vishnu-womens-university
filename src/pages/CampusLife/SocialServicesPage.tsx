@@ -1,39 +1,83 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  HeartHandshake, 
-  Users, 
-  GraduationCap, 
-  Sparkles, 
-  ArrowRight, 
-  Heart, 
-  Building2, 
-  Stethoscope, 
-  Star, 
-  ShieldCheck, 
-  BookOpen, 
-  Activity, 
-  Leaf 
+import {
+  HeartHandshake,
+  Users,
+  GraduationCap,
+  Sparkles,
+  ArrowRight,
+  ShieldCheck,
+  BookOpen,
+  Leaf
 } from 'lucide-react';
 import SEO from '../../components/SEO/SEO';
 import { smoothScrollTo } from '../../lib/smoothScroll';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useSitePhotos } from '../../hooks/useSitePhotos';
+import { usePageBanners } from '../../hooks/usePageBanners';
+import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import type { CampusLifeItemDoc } from '../Admin/sections/CampusLifeAdmin';
 import './SocialServicesPage.css';
 
-const DEFAULT_PHOTOS = [
-  { src: '/images/vibrant-campus.png', alt: 'NSS Social Services Community Outreach' },
-  { src: '/images/1000074551.jpg', alt: 'VWU Students Planting Trees' }
+const HERO_DEFAULT = [{ src: '/images/vibrant-campus.png', alt: 'NSS Social Services Community Outreach', caption: '' }];
+const INTRO_DEFAULT = [{ src: '/images/1000074551.jpg', alt: 'VWU Students Planting Trees', caption: '' }];
+const FOUNDER_DEFAULT = [{ src: '/images/governing-body-founder.jpg', alt: 'Padma Bhushan Dr. B. V. Raju', caption: '' }];
+// Order and alt text match the "communities" gallery's default slots 1:1 in
+// Admin → Website Photos → Student Life → Social Services (NSS), so an
+// admin-replaced photo for e.g. "Leprosy Care" always lands on that exact
+// card below regardless of gaps or upload order — see communityPhotoByAlt.
+const COMMUNITY_DEFAULTS = [
+  { src: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=700&auto=format&fit=crop', alt: 'Rural Students', caption: '' },
+  { src: 'https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?q=80&w=700&auto=format&fit=crop', alt: 'Leprosy Care', caption: '' },
+  { src: 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=700&auto=format&fit=crop', alt: 'Village Communities', caption: '' },
+  { src: 'https://images.unsplash.com/photo-1531206715517-5c0ba140b2b8?q=80&w=700&auto=format&fit=crop', alt: 'Persons with Disabilities', caption: '' },
+  { src: 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?q=80&w=700&auto=format&fit=crop', alt: 'Hospital Patients', caption: '' },
+  { src: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=700&auto=format&fit=crop', alt: 'Academic Excellence', caption: '' },
 ];
 
 export default function SocialServicesPage() {
   // Real-time Firestore subscription to campusLifeItems collection
   const { docs: items } = useOrderedCollection<CampusLifeItemDoc>('campusLifeItems', 'order');
   const firestoreDoc = items.find((i) => i.slug === 'social-services');
-  
-  // Real-time site photos subscription from Firestore /admin → Site Photos
-  const photos = useSitePhotos('campus', 'social-services', DEFAULT_PHOTOS);
+
+  // This page's hero image can be set from EITHER admin screen — Hero
+  // Banners (the same page='social-services' banner every other page's
+  // PageHero reads) or Website Photos' "hero" gallery below — since both
+  // are reasonable places an admin would look to change it. A Hero Banners
+  // upload wins when one exists; the Website Photos "hero" slot is the
+  // fallback otherwise.
+  const { slides: heroBanners } = usePageBanners('social-services');
+
+  // Real-time site photos, each editable from /admin → Website Photos →
+  // Student Life → Social Services (NSS) — see DEFAULT_SECTIONS['social-services']
+  // in SitePhotosAdmin.tsx for the matching gallery definitions.
+  const heroPhotos = useSitePhotos('social-services', 'hero', HERO_DEFAULT);
+  const introPhotos = useSitePhotos('social-services', 'main', INTRO_DEFAULT);
+  const founderPhotos = useSitePhotos('social-services', 'founder-legacy', FOUNDER_DEFAULT);
+  const communityPhotos = useSitePhotos('social-services', 'communities', COMMUNITY_DEFAULTS);
+  // Each card's photo AND its description text come from the same admin
+  // slot — Website Photos → Student Life → Social Services (NSS) →
+  // Communities We Serve → "Edit Text" sets the caption shown below that
+  // card's photo, alongside "Replace Image" for the photo itself.
+  const communityPhotoByAlt = new Map(communityPhotos.map((p) => [p.alt, { src: p.src, caption: p.caption }]));
+
+  // Most admins reach for the OTHER, more obvious path instead — /admin →
+  // Campus Life → "Social Services" → the "Communities We Serve" section's
+  // own photo gallery (the same generic per-section gallery every Campus
+  // Life page section has) — since that's the actual content editor for
+  // this page. Uploads made there take priority over the Website Photos
+  // slots above; the two are just alternate places to set the same 6
+  // photos, in upload order (Rural Students, Leprosy Care, Village
+  // Communities, Persons with Disabilities, Hospital Patients, Academic
+  // Excellence — matching the card order below).
+  const communitiesSection = firestoreDoc?.customSections?.find(
+    (s) => s.label.trim().toLowerCase() === 'communities we serve'
+  );
+  const cmsCommunityPhotos = (communitiesSection?.galleryPhotos || []).filter((p) => !!p.imageUrl);
+  const communityPhotoAt = (index: number) => ({
+    src: cmsCommunityPhotos[index]?.imageUrl || undefined,
+    caption: cmsCommunityPhotos[index]?.caption || undefined,
+  });
 
   useEffect(() => {
     const title = firestoreDoc?.title ? `${firestoreDoc.title} | VWU` : "Social Services & NSS | Vishnu Women's University";
@@ -48,8 +92,9 @@ export default function SocialServicesPage() {
     }
   };
 
-  const heroBg = photos[0]?.src || '/images/vibrant-campus.png';
-  const plantingImg = photos[1]?.src || '/images/1000074551.jpg';
+  const heroBg = heroBanners[0]?.imageUrl || heroPhotos[0]?.src || '/images/vibrant-campus.png';
+  const plantingImg = introPhotos[0]?.src || '/images/1000074551.jpg';
+  const founderImg = founderPhotos[0]?.src || '/images/governing-body-founder.jpg';
 
   return (
     <main className="ss-page page-wrapper">
@@ -67,18 +112,23 @@ export default function SocialServicesPage() {
         <div className="ss-hero-content">
           {/* Badge */}
           <div className="ss-hero-badge">
-            VIT SOCIAL SERVICE
+            VWU Social Service
           </div>
 
-          {/* H1 Heading */}
+          {/* H1 Heading — fixed brand copy for this page, like the badge
+              above, rather than the admin-entered campusLifeItems title
+              (which holds the plain "Social Services" nav/breadcrumb label
+              used elsewhere, e.g. the Explore More band below). */}
           <h1 className="ss-hero-title">
-            {firestoreDoc?.title || "Extending Education."}
+            Extending Education.
             <span>Empowering Communities.</span>
           </h1>
 
-          {/* Subtitle */}
+          {/* Subtitle — a Hero Banners subtitle wins first (matching the
+              image priority above), then the hero photo's own caption
+              (Website Photos → Hero → "Edit Text"), then the fixed default. */}
           <p className="ss-hero-sub">
-            {firestoreDoc?.desc || "Through NSS and community initiatives, our students turn knowledge into meaningful action."}
+            {heroBanners[0]?.subtitle || heroPhotos[0]?.caption || firestoreDoc?.desc || "Through NSS and community initiatives, our students turn knowledge into meaningful action."}
           </p>
 
           {/* Buttons */}
@@ -137,15 +187,20 @@ export default function SocialServicesPage() {
       <section className="ss-nss-section">
         <div className="ss-section-inner">
           <div className="ss-nss-grid">
-            {/* Left: Tree Planting Photo */}
+            {/* Left: Tree Planting Photo — its caption (Website Photos →
+                Social Services (NSS) → "NSS at VWU" → "Edit Text") shows as
+                a small label over the photo when an admin sets one. */}
             <div className="ss-nss-img-box">
-              <img 
-                src={plantingImg} 
+              <img
+                src={plantingImg}
                 alt="VWU Students Planting Sapling in NSS Drive"
                 onError={(e) => {
                   (e.currentTarget as HTMLImageElement).src = '/images/vibrant-campus.png';
                 }}
               />
+              {introPhotos[0]?.caption && (
+                <div className="ss-nss-img-caption">{introPhotos[0].caption}</div>
+              )}
             </div>
 
             {/* Right: Text & Quote */}
@@ -202,19 +257,16 @@ export default function SocialServicesPage() {
             {/* Card 1: Rural Students */}
             <div className="ss-card">
               <div className="ss-card-img-wrap">
-                <img 
-                  src="https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=600&auto=format&fit=crop" 
+                <img
+                  src={communityPhotoAt(0).src || communityPhotoByAlt.get('Rural Students')?.src || '/images/vibrant-campus.png'}
                   alt="Rural Students"
-                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/images/vibrant-campus.png'; }}
+                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = PHOTO_NEEDED_PLACEHOLDER; }}
                 />
-                <div className="ss-card-icon-badge">
-                  <GraduationCap size={22} />
-                </div>
               </div>
               <div className="ss-card-body">
                 <h3 className="ss-card-title">Rural Students</h3>
                 <p className="ss-card-desc">
-                  Extending educational support and skills programs to economically disadvantaged students from rural backgrounds.
+                  {communityPhotoAt(0).caption || communityPhotoByAlt.get('Rural Students')?.caption || 'Extending educational support and skills programs to economically disadvantaged students from rural backgrounds.'}
                 </p>
               </div>
             </div>
@@ -222,19 +274,16 @@ export default function SocialServicesPage() {
             {/* Card 2: Leprosy Care */}
             <div className="ss-card">
               <div className="ss-card-img-wrap">
-                <img 
-                  src="https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?q=80&w=600&auto=format&fit=crop" 
+                <img
+                  src={communityPhotoAt(1).src || communityPhotoByAlt.get('Leprosy Care')?.src || '/images/campusview.jpg'}
                   alt="Leprosy Care"
-                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/images/campusview.jpg'; }}
+                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = PHOTO_NEEDED_PLACEHOLDER; }}
                 />
-                <div className="ss-card-icon-badge">
-                  <Heart size={22} />
-                </div>
               </div>
               <div className="ss-card-body">
                 <h3 className="ss-card-title">Leprosy Care</h3>
                 <p className="ss-card-desc">
-                  Offering care, compassion, and dignity to individuals affected by leprosy through regular visits and welfare activities.
+                  {communityPhotoAt(1).caption || communityPhotoByAlt.get('Leprosy Care')?.caption || 'Offering care, compassion, and dignity to individuals affected by leprosy through regular visits and welfare activities.'}
                 </p>
               </div>
             </div>
@@ -242,19 +291,16 @@ export default function SocialServicesPage() {
             {/* Card 3: Village Communities */}
             <div className="ss-card">
               <div className="ss-card-img-wrap">
-                <img 
-                  src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=600&auto=format&fit=crop" 
+                <img
+                  src={communityPhotoAt(2).src || communityPhotoByAlt.get('Village Communities')?.src || '/images/SLS01311.JPG'}
                   alt="Village Communities"
-                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/images/SLS01311.JPG'; }}
+                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = PHOTO_NEEDED_PLACEHOLDER; }}
                 />
-                <div className="ss-card-icon-badge">
-                  <Building2 size={22} />
-                </div>
               </div>
               <div className="ss-card-body">
                 <h3 className="ss-card-title">Village Communities</h3>
                 <p className="ss-card-desc">
-                  Working with nearby villages on technical literacy, nutritional awareness, and broader community welfare initiatives.
+                  {communityPhotoAt(2).caption || communityPhotoByAlt.get('Village Communities')?.caption || 'Working with nearby villages on technical literacy, nutritional awareness, and broader community welfare initiatives.'}
                 </p>
               </div>
             </div>
@@ -262,19 +308,16 @@ export default function SocialServicesPage() {
             {/* Card 4: Persons with Disabilities */}
             <div className="ss-card">
               <div className="ss-card-img-wrap">
-                <img 
-                  src="https://images.unsplash.com/photo-1531206715517-5c0ba140b2b8?q=80&w=600&auto=format&fit=crop" 
+                <img
+                  src={communityPhotoAt(3).src || communityPhotoByAlt.get('Persons with Disabilities')?.src || '/images/vibrant-campus.png'}
                   alt="Persons with Disabilities"
-                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/images/vibrant-campus.png'; }}
+                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = PHOTO_NEEDED_PLACEHOLDER; }}
                 />
-                <div className="ss-card-icon-badge">
-                  <Activity size={22} />
-                </div>
               </div>
               <div className="ss-card-body">
                 <h3 className="ss-card-title">Persons with Disabilities</h3>
                 <p className="ss-card-desc">
-                  Supporting individuals with physical disabilities through awareness programs, assistive technology exposure, and inclusive campus activities.
+                  {communityPhotoAt(3).caption || communityPhotoByAlt.get('Persons with Disabilities')?.caption || 'Supporting individuals with physical disabilities through awareness programs, assistive technology exposure, and inclusive campus activities.'}
                 </p>
               </div>
             </div>
@@ -282,19 +325,16 @@ export default function SocialServicesPage() {
             {/* Card 5: Hospital Patients */}
             <div className="ss-card">
               <div className="ss-card-img-wrap">
-                <img 
-                  src="https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?q=80&w=600&auto=format&fit=crop" 
+                <img
+                  src={communityPhotoAt(4).src || communityPhotoByAlt.get('Hospital Patients')?.src || '/images/campusview.jpg'}
                   alt="Hospital Patients"
-                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/images/campusview.jpg'; }}
+                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = PHOTO_NEEDED_PLACEHOLDER; }}
                 />
-                <div className="ss-card-icon-badge">
-                  <Stethoscope size={22} />
-                </div>
               </div>
               <div className="ss-card-body">
                 <h3 className="ss-card-title">Hospital Patients</h3>
                 <p className="ss-card-desc">
-                  Serving hospital patients through welfare visits, blood donation drives, and coordination with partner organisations.
+                  {communityPhotoAt(4).caption || communityPhotoByAlt.get('Hospital Patients')?.caption || 'Serving hospital patients through welfare visits, blood donation drives, and coordination with partner organisations.'}
                 </p>
               </div>
             </div>
@@ -302,19 +342,16 @@ export default function SocialServicesPage() {
             {/* Card 6: Academic Excellence */}
             <div className="ss-card">
               <div className="ss-card-img-wrap">
-                <img 
-                  src="https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=600&auto=format&fit=crop" 
+                <img
+                  src={communityPhotoAt(5).src || communityPhotoByAlt.get('Academic Excellence')?.src || '/images/SLS01311.JPG'}
                   alt="Academic Excellence"
-                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/images/SLS01311.JPG'; }}
+                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = PHOTO_NEEDED_PLACEHOLDER; }}
                 />
-                <div className="ss-card-icon-badge">
-                  <Star size={22} />
-                </div>
               </div>
               <div className="ss-card-body">
                 <h3 className="ss-card-title">Academic Excellence</h3>
                 <p className="ss-card-desc">
-                  Acknowledging and supporting high-achieving students from nearby institutions through mentoring and motivational programs.
+                  {communityPhotoAt(5).caption || communityPhotoByAlt.get('Academic Excellence')?.caption || 'Acknowledging and supporting high-achieving students from nearby institutions through mentoring and motivational programs.'}
                 </p>
               </div>
             </div>
@@ -403,13 +440,18 @@ export default function SocialServicesPage() {
           <div className="ss-legacy-card-grid">
             {/* Left: Founder Photo with Quote Overlay */}
             <div className="ss-founder-img-box">
-              <img 
-                src="/images/governing-body-founder.jpg" 
+              <img
+                src={founderImg}
                 alt="Padma Bhushan Dr. B. V. Raju"
+                onError={(e) => { (e.currentTarget as HTMLImageElement).src = PHOTO_NEEDED_PLACEHOLDER; }}
               />
               <div className="ss-founder-overlay">
+                {/* The photo's own caption (Website Photos → Social
+                    Services (NSS) → Founder's Legacy → "Edit Text")
+                    overrides this quote so it can be rewritten alongside
+                    the photo. */}
                 <p className="ss-founder-quote-text">
-                  “Service to humanity is the highest form of education.”
+                  {founderPhotos[0]?.caption || '“Service to humanity is the highest form of education.”'}
                 </p>
                 <p className="ss-founder-name">- Dr. B. V. Raju</p>
               </div>
