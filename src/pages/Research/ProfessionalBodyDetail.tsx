@@ -74,7 +74,6 @@ export default function ProfessionalBodyDetail() {
               )}
             </span>
             <div>
-              <span className="section-label">Details</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 0 }}>{body.shortName}</h2>
             </div>
           </div>

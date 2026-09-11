@@ -1,22 +1,27 @@
 /* ==========================================================================
-   Vishnu Women's University — Redesigned Footer (Material / Google UX)
-   Clean, Institutional, Accessible, Mobile-First
+   Vishnu Women's University — Footer
+   Institutional · Prestigious · Trustworthy · Clean · Modern
    ========================================================================== */
 
 .vwu-footer {
-  /* Near-black neutral, independent of the brand color — matches the
-     reference university footers (LPU/VIT/Amrita), which all use a
-     near-black base rather than a tinted brand-dark background. */
-  background: var(--footer-bg, #0a0a0a);
-  color: var(--footer-text, #e2e8f0);
-  font-family: var(--font-sans, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
-  border-top: 1px solid color-mix(in srgb, var(--footer-accent, var(--color-accent, #c9a84c)) 25%, transparent);
+  --footer-bg: #0b1e42;
+  --footer-surface: #0f2444;
+  --footer-surface-raised: #132d54;
+  --footer-border: rgba(255, 255, 255, 0.08);
+  --footer-heading: #ffffff;
+  --footer-text: rgba(255, 255, 255, 0.72);
+  --footer-text-muted: rgba(255, 255, 255, 0.45);
+  --footer-accent: #c9a84c;
+  --footer-accent-dim: rgba(201, 168, 76, 0.35);
+
+  background: var(--footer-bg);
+  color: var(--footer-text);
+  font-family: var(--font-sans, system-ui, -apple-system, sans-serif);
+  line-height: 1.55;
   position: relative;
-  overflow: hidden;
-  line-height: 1.5;
 }
 
-/* Reduced motion accessibility */
+/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .vwu-footer * {
     transition: none !important;
@@ -24,409 +29,316 @@
   }
 }
 
-/* Common container constraints */
-.vwu-footer .container {
+/* ─── Shared container ─── */
+.vwu-footer-inner {
   width: 100%;
   max-width: 1280px;
   margin: 0 auto;
-  padding-left: var(--space-6, 1.5rem);
-  padding-right: var(--space-6, 1.5rem);
+  padding-left: clamp(1.25rem, 3vw, 2rem);
+  padding-right: clamp(1.25rem, 3vw, 2rem);
   box-sizing: border-box;
 }
 
 /* ==========================================================================
-   TIER 1: Identity & Navigation — brand on the left, link columns on the right
+   MAIN TIER — Brand (left) + 4 Nav Columns (right)
    ========================================================================== */
 
-.vwu-footer-main-tier {
-  padding: 3.5rem 0 3rem;
-  background: rgba(0, 0, 0, 0.12);
+.vwu-footer-main {
+  padding: 3rem 0 2.5rem;
 }
 
-.vwu-footer-main-inner {
+.vwu-footer-main .vwu-footer-inner {
   display: grid;
-  grid-template-columns: minmax(280px, 340px) 1fr;
-  gap: 3.5rem;
+  grid-template-columns: minmax(260px, 320px) 1fr;
+  gap: 3rem;
   align-items: start;
 }
 
-/* Brand Anchor Block */
-.vwu-footer-brand-block {
+/* ── Brand Block ── */
+.vwu-footer-brand {
   display: flex;
   flex-direction: column;
-  gap: 1.2rem;
+  gap: 0.9rem;
 }
 
-.vwu-footer-logo-wrap {
+.vwu-footer-logo-link {
   display: inline-flex;
   align-items: center;
-  gap: 1rem;
-  text-decoration: none;
   width: fit-content;
+  text-decoration: none;
 }
 
-.vwu-footer-logo-wrap:focus-visible {
-  outline: 2px solid var(--footer-accent, var(--color-accent, #c9a84c));
+.vwu-footer-logo-link:focus-visible {
+  outline: 2px solid var(--footer-accent);
   outline-offset: 4px;
-  border-radius: 6px;
-}
-
-.vwu-footer-logo-img {
-  height: 58px;
-  width: auto;
-  object-fit: contain;
-  flex-shrink: 0;
-}
-
-.vwu-brand-main {
-  font-family: var(--font-serif, Georgia, serif);
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: #ffffff;
-  line-height: 1.25;
-  letter-spacing: -0.01em;
-  white-space: nowrap;
-}
-
-.vwu-footer-mission-text {
-  font-size: 0.9rem;
-  color: color-mix(in srgb, var(--footer-text, #e2e8f0) 78%, transparent);
-  line-height: 1.65;
-  margin: 0;
-  max-width: 520px;
-}
-
-/* Contact Info */
-.vwu-footer-contact-items {
-  font-style: normal;
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-  font-size: 0.86rem;
-  color: color-mix(in srgb, var(--footer-text, #e2e8f0) 82%, transparent);
-  margin-top: 0.3rem;
-}
-
-.vwu-footer-contact-row {
-  display: flex;
-  align-items: center;
-  gap: 0.55rem;
-}
-
-.vwu-footer-contact-icon {
-  color: var(--footer-accent, var(--color-accent, #c9a84c));
-  flex-shrink: 0;
-}
-
-/* "Get Directions" quick action — matches the identity-block CTA pattern
-   seen on reference university footers (e.g. LPU's own footer). */
-.vwu-footer-get-directions {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  width: fit-content;
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  color: var(--footer-accent, var(--color-accent, #c9a84c));
-  text-decoration: none;
-  padding-left: 1.55rem;
-  transition: color 150ms ease;
-}
-
-.vwu-footer-get-directions:hover {
-  color: var(--footer-heading, #ffffff);
-  text-decoration: underline;
-}
-
-.vwu-footer-get-directions:focus-visible {
-  outline: 2px solid var(--footer-accent, var(--color-accent, #c9a84c));
-  outline-offset: 2px;
   border-radius: 4px;
 }
 
-.vwu-footer-contact-links {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  flex-wrap: wrap;
+.vwu-footer-logo {
+  height: 62px;
+  width: auto;
+  object-fit: contain;
 }
 
-.vwu-footer-contact-action {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  color: var(--footer-heading, #ffffff);
+.vwu-footer-uni-name {
+  font-family: var(--font-serif, Georgia, serif);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--footer-heading);
+  margin: 0;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.vwu-footer-mission {
+  font-size: 0.875rem;
+  color: var(--footer-text);
+  line-height: 1.65;
+  margin: 0;
+  max-width: 440px;
+}
+
+/* Address / Contact */
+.vwu-footer-address {
+  font-style: normal;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  margin-top: 0.25rem;
+  font-size: 0.84rem;
+  color: var(--footer-text);
+}
+
+.vwu-footer-addr-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  line-height: 1.5;
+}
+
+.vwu-footer-addr-icon {
+  color: var(--footer-accent);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.vwu-footer-contact-link {
+  color: var(--footer-heading);
   text-decoration: none;
   font-weight: 500;
   transition: color 150ms ease;
 }
 
-.vwu-footer-contact-action:hover {
-  color: var(--footer-accent, var(--color-accent, #c9a84c));
+.vwu-footer-contact-link:hover {
+  color: var(--footer-accent);
   text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
-.vwu-footer-contact-action:focus-visible {
-  outline: 2px solid var(--footer-accent, var(--color-accent, #c9a84c));
+.vwu-footer-contact-link:focus-visible {
+  outline: 2px solid var(--footer-accent);
   outline-offset: 2px;
-  border-radius: 4px;
+  border-radius: 2px;
 }
 
-.vwu-footer-contact-sep {
-  color: color-mix(in srgb, var(--footer-heading, #ffffff) 30%, transparent);
+.vwu-footer-directions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  width: fit-content;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--footer-accent);
+  text-decoration: none;
+  padding-left: 1.5rem;
+  transition: color 150ms ease;
 }
 
-/* ==========================================================================
-   Categorized Navigation Grid (Desktop) — right side of the main tier
-   ========================================================================== */
+.vwu-footer-directions:hover {
+  color: var(--footer-heading);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
 
-.vwu-footer-nav-grid {
+.vwu-footer-directions:focus-visible {
+  outline: 2px solid var(--footer-accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* ── Navigation Columns ── */
+.vwu-footer-nav {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 2.5rem;
+  gap: 2rem;
 }
 
-.vwu-footer-nav-col {
+.vwu-footer-col {
   display: flex;
   flex-direction: column;
 }
 
-.vwu-footer-nav-title {
+.vwu-footer-heading {
   font-family: var(--font-sans);
-  font-size: 0.85rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--footer-heading, #ffffff);
-  margin: 0 0 1.25rem 0;
-  padding-bottom: 0.6rem;
-  border-bottom: 2px solid color-mix(in srgb, var(--footer-accent, var(--color-accent, #c9a84c)) 50%, transparent);
-  width: fit-content;
+  color: var(--footer-heading);
+  margin: 0 0 1rem;
+  padding-bottom: 0.55rem;
+  border-bottom: 2px solid var(--footer-accent-dim);
 }
 
-.vwu-footer-nav-list {
+.vwu-footer-list {
   list-style: none;
   padding: 0;
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.6rem;
 }
 
-.vwu-footer-nav-link {
-  font-size: 0.88rem;
-  color: color-mix(in srgb, var(--footer-text, #e2e8f0) 72%, transparent);
+/* ── Link styles ── */
+.vwu-footer-link {
+  font-size: 0.84rem;
+  color: var(--footer-text);
   text-decoration: none;
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.35rem;
   width: fit-content;
-  transition: all 150ms ease;
+  line-height: 1.45;
+  transition: color 150ms ease;
 }
 
-.vwu-footer-nav-link:hover {
-  color: var(--footer-heading, #ffffff);
-  transform: translateX(3px);
+.vwu-footer-link:hover {
+  color: var(--footer-heading);
 }
 
-.vwu-footer-nav-link.is-disabled {
-  color: color-mix(in srgb, var(--footer-text, #e2e8f0) 38%, transparent);
+.vwu-footer-link:focus-visible {
+  outline: 2px solid var(--footer-accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+  color: var(--footer-heading);
+}
+
+.vwu-footer-link.is-muted {
+  color: var(--footer-text-muted);
   cursor: default;
   pointer-events: none;
 }
 
-.vwu-footer-nav-link:focus-visible {
-  outline: 2px solid var(--footer-accent, var(--color-accent, #c9a84c));
-  outline-offset: 2px;
-  border-radius: 4px;
-  color: var(--footer-heading, #ffffff);
-}
-
-.vwu-external-glyph {
-  color: color-mix(in srgb, var(--footer-heading, #ffffff) 40%, transparent);
+.vwu-footer-ext-icon {
+  color: var(--footer-text-muted);
   flex-shrink: 0;
-}
-
-.vwu-footer-nav-link:hover .vwu-external-glyph {
-  color: var(--footer-accent, var(--color-accent, #c9a84c));
-}
-
-.vwu-doc-icon {
-  color: var(--footer-accent, var(--color-accent, #c9a84c));
-  flex-shrink: 0;
-}
-
-/* Compliance Column Tabs & List */
-.vwu-footer-compliance-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-  margin-bottom: 1.1rem;
-}
-
-.vwu-footer-comp-tab-btn {
-  background: color-mix(in srgb, var(--footer-heading, #ffffff) 6%, transparent);
-  border: 1px solid color-mix(in srgb, var(--footer-heading, #ffffff) 12%, transparent);
-  color: color-mix(in srgb, var(--footer-text, #e2e8f0) 80%, transparent);
-  font-family: inherit;
-  font-size: 0.8rem;
-  font-weight: 700;
-  padding: 0.35rem 0.8rem;
-  border-radius: var(--radius-full);
-  cursor: pointer;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-  transition: all 150ms ease;
-}
-
-.vwu-footer-comp-tab-btn:hover {
-  background: color-mix(in srgb, var(--footer-heading, #ffffff) 15%, transparent);
-  color: var(--footer-heading, #ffffff);
-  transform: translateY(-1px);
-}
-
-.vwu-footer-comp-tab-btn.active {
-  background: var(--footer-accent, var(--color-accent, #c9a84c));
-  color: var(--footer-bg, #0a0a0a);
-  border-color: var(--footer-accent, var(--color-accent, #c9a84c));
-  font-weight: 800;
-  box-shadow: 0 2px 8px color-mix(in srgb, var(--footer-accent, var(--color-accent, #c9a84c)) 30%, transparent);
-}
-
-.vwu-footer-comp-tab-btn:focus-visible {
-  outline: 2px solid var(--footer-heading, #ffffff);
-  outline-offset: 2px;
-}
-
-.vwu-compliance-active-list {
-  min-height: 180px;
-}
-
-.vwu-footer-comp-view-all {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--footer-accent, var(--color-accent, #c9a84c));
-  text-decoration: none;
-  margin-top: 1rem;
   transition: color 150ms ease;
 }
 
-.vwu-footer-comp-view-all:hover {
-  color: var(--footer-heading, #ffffff);
-  text-decoration: underline;
-}
-
-.vwu-footer-comp-view-all:focus-visible {
-  outline: 2px solid var(--footer-accent, var(--color-accent, #c9a84c));
-  outline-offset: 2px;
-  border-radius: 4px;
+.vwu-footer-link:hover .vwu-footer-ext-icon {
+  color: var(--footer-accent);
 }
 
 /* ==========================================================================
-   MOBILE ACCORDIONS (Hidden on Desktop)
+   MOBILE ACCORDIONS (hidden on desktop)
    ========================================================================== */
 
-.vwu-footer-mobile-accordions {
+.vwu-footer-mobile {
   display: none;
 }
 
 /* ==========================================================================
-   TIER 3: Social & Connect Strip
+   SOCIAL STRIP
    ========================================================================== */
 
-.vwu-footer-social-tier {
-  padding: 1.5rem 0;
-  background: rgba(0, 0, 0, 0.16);
-  border-top: 1px solid color-mix(in srgb, var(--footer-heading, #ffffff) 8%, transparent);
-  border-bottom: 1px solid color-mix(in srgb, var(--footer-heading, #ffffff) 8%, transparent);
+.vwu-footer-social {
+  border-top: 1px solid var(--footer-border);
+  padding: 1.25rem 0;
 }
 
-.vwu-footer-social-inner {
+.vwu-footer-social-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1.5rem;
+  gap: 1.25rem;
   flex-wrap: wrap;
 }
 
 .vwu-footer-social-label {
-  font-size: 0.88rem;
-  font-weight: 700;
-  color: var(--footer-heading, #ffffff);
-  letter-spacing: 0.02em;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--footer-heading);
+  letter-spacing: 0.01em;
 }
 
-.vwu-footer-social-links {
+.vwu-footer-social-icons {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.6rem;
 }
 
-.vwu-social-btn {
+.vwu-footer-social-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  background: color-mix(in srgb, var(--footer-heading, #ffffff) 6%, transparent);
-  border: 1px solid color-mix(in srgb, var(--footer-heading, #ffffff) 14%, transparent);
-  color: color-mix(in srgb, var(--footer-heading, #ffffff) 85%, transparent);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--footer-text);
   text-decoration: none;
-  transition: background 180ms ease, color 180ms ease, border-color 180ms ease, transform 180ms ease;
+  transition: background 180ms ease, color 180ms ease, border-color 180ms ease;
 }
 
-.vwu-social-btn:hover {
-  background: var(--footer-accent, var(--color-accent, #c9a84c));
-  color: var(--footer-bg, #0a0a0a);
-  border-color: var(--footer-accent, var(--color-accent, #c9a84c));
-  transform: translateY(-2px);
+.vwu-footer-social-btn:hover {
+  background: var(--footer-accent);
+  color: var(--footer-bg);
+  border-color: var(--footer-accent);
 }
 
-.vwu-social-btn:focus-visible {
-  outline: 2px solid var(--footer-heading, #ffffff);
+.vwu-footer-social-btn:focus-visible {
+  outline: 2px solid var(--footer-heading);
   outline-offset: 2px;
 }
 
 /* ==========================================================================
-   TIER 4: Bottom Legal & Credit Bar
+   BOTTOM BAR
    ========================================================================== */
 
-.vwu-footer-bottom-tier {
-  padding: 1.5rem 0;
-  background: rgba(0, 0, 0, 0.28);
+.vwu-footer-bottom {
+  border-top: 1px solid var(--footer-border);
+  padding: 1.1rem 0;
+  background: rgba(0, 0, 0, 0.15);
 }
 
-.vwu-footer-bottom-inner {
+.vwu-footer-bottom-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1.5rem;
+  gap: 1.25rem;
   flex-wrap: wrap;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
 }
 
 .vwu-footer-copyright {
-  color: color-mix(in srgb, var(--footer-text, #e2e8f0) 60%, transparent);
+  color: var(--footer-text-muted);
   margin: 0;
+  white-space: nowrap;
 }
 
-.vwu-footer-legal-nav {
+.vwu-footer-legal {
   display: flex;
   align-items: center;
   gap: 0;
   flex-wrap: wrap;
 }
 
-/* Pipe-separated legal links — matches the reference university footers
-   (LPU's own CSS does this via an identical `content: "|"` pseudo-element). */
 .vwu-footer-legal-link {
   position: relative;
-  padding: 0 0.9rem;
-  color: color-mix(in srgb, var(--footer-text, #e2e8f0) 65%, transparent);
+  padding: 0 0.85rem;
+  color: var(--footer-text-muted);
   text-decoration: none;
   transition: color 150ms ease;
 }
@@ -439,162 +351,143 @@
   content: "|";
   position: absolute;
   right: 0;
-  color: color-mix(in srgb, var(--footer-text, #e2e8f0) 30%, transparent);
+  color: rgba(255, 255, 255, 0.2);
 }
 
 .vwu-footer-legal-link:hover {
-  color: var(--footer-heading, #ffffff);
+  color: var(--footer-heading);
   text-decoration: underline;
   text-underline-offset: 2px;
 }
 
 .vwu-footer-legal-link:focus-visible {
-  outline: 2px solid var(--footer-accent, var(--color-accent, #c9a84c));
+  outline: 2px solid var(--footer-accent);
   outline-offset: 2px;
   border-radius: 2px;
 }
 
-.vwu-footer-attribution {
+.vwu-footer-dev {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  color: color-mix(in srgb, var(--footer-text, #e2e8f0) 55%, transparent);
+  color: var(--footer-text-muted);
+  white-space: nowrap;
 }
 
-.vwu-tech-hub-badge-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
+.vwu-footer-dev-link {
+  color: var(--footer-accent);
   text-decoration: none;
-  transition: opacity 180ms ease, transform 180ms ease;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  transition: color 150ms ease;
 }
 
-.vwu-tech-hub-badge-link:hover {
-  opacity: 0.85;
-  transform: translateY(-1px);
+.vwu-footer-dev-link:hover {
+  color: var(--footer-heading);
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
-.vwu-tech-hub-badge {
-  color: var(--footer-accent, var(--color-accent, #c9a84c));
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  transition: color 180ms ease;
-}
-
-.vwu-tech-hub-badge-link:hover .vwu-tech-hub-badge {
-  color: #ffffff;
+.vwu-footer-dev-link:focus-visible {
+  outline: 2px solid var(--footer-accent);
+  outline-offset: 2px;
+  border-radius: 2px;
 }
 
 /* ==========================================================================
-   RESPONSIVE ADAPTATIONS (Tablet & Mobile)
+   RESPONSIVE — Tablet (≤1024px)
    ========================================================================== */
 
 @media (max-width: 1024px) {
-  .vwu-footer-main-inner {
+  .vwu-footer-main .vwu-footer-inner {
     grid-template-columns: 1fr;
-    gap: 2.5rem;
+    gap: 2.25rem;
   }
 
-  .vwu-footer-nav-grid {
+  .vwu-footer-brand {
+    max-width: 600px;
+  }
+
+  .vwu-footer-nav {
     grid-template-columns: repeat(2, 1fr);
-    gap: 2.5rem;
+    gap: 2rem;
   }
 }
 
+/* ==========================================================================
+   RESPONSIVE — Mobile (≤768px)
+   ========================================================================== */
+
 @media (max-width: 768px) {
-  .vwu-footer-main-tier {
-    padding: 2.5rem 0 2rem;
-  }
-
-  /* Keep the Telugu brand title on one line — scale it (and the logo) down
-     with the viewport instead of letting it overflow the container. */
-  .vwu-footer-logo-wrap {
-    gap: 0.6rem;
-    max-width: 100%;
-  }
-
-  .vwu-footer-logo-img {
-    height: 44px;
-  }
-
-  .vwu-brand-main {
-    font-size: clamp(0.7rem, 4.2vw, 1.15rem);
-  }
-
-  /* Switch desktop grid to mobile accordions */
-  .vwu-footer-nav-grid {
+  .vwu-footer-main {
     display: none;
   }
 
-  .vwu-footer-mobile-accordions {
+  .vwu-footer-mobile {
+    display: block;
+    padding: 2.25rem 0 1.75rem;
+  }
+
+  .vwu-footer-mobile .vwu-footer-inner {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0;
   }
 
-  .vwu-footer-m-acc-item {
-    border-bottom: 1px solid color-mix(in srgb, var(--footer-heading, #ffffff) 8%, transparent);
+  .vwu-footer-acc {
+    border-bottom: 1px solid var(--footer-border);
   }
 
-  .vwu-footer-m-acc-btn {
+  .vwu-footer-acc:last-child {
+    border-bottom: none;
+  }
+
+  .vwu-footer-acc-btn {
     width: 100%;
     min-height: 48px;
     background: transparent;
     border: none;
-    padding: 0.9rem 0;
+    padding: 0.85rem 0;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    color: var(--footer-heading, #ffffff);
+    color: var(--footer-heading);
     font-family: inherit;
-    font-size: 0.95rem;
-    font-weight: 700;
+    font-size: 0.9rem;
+    font-weight: 600;
     text-align: left;
     cursor: pointer;
   }
 
-  .vwu-footer-m-acc-btn:focus-visible {
-    outline: 2px solid var(--footer-accent, var(--color-accent, #c9a84c));
+  .vwu-footer-acc-btn:focus-visible {
+    outline: 2px solid var(--footer-accent);
     outline-offset: 2px;
   }
 
-  .vwu-m-acc-chevron {
-    color: var(--footer-accent, var(--color-accent, #c9a84c));
+  .vwu-footer-acc-chevron {
+    color: var(--footer-accent);
     transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .vwu-m-acc-chevron.open {
+  .vwu-footer-acc-chevron.open {
     transform: rotate(180deg);
   }
 
-  .vwu-footer-m-acc-content {
-    padding: 0.5rem 0 1.25rem 0;
+  .vwu-footer-acc-body {
+    padding: 0.25rem 0 1.1rem;
   }
 
-  .vwu-footer-m-comp-group {
-    margin-bottom: 1.2rem;
-  }
-
-  .vwu-footer-m-comp-title {
-    font-size: 0.86rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--footer-accent, var(--color-accent, #c9a84c));
-    margin: 0 0 0.5rem 0;
-  }
-
-  .vwu-footer-social-inner,
-  .vwu-footer-bottom-inner {
+  .vwu-footer-social-row,
+  .vwu-footer-bottom-row {
     flex-direction: column;
     align-items: flex-start;
-    gap: 1rem;
+    gap: 0.85rem;
   }
 
-  .vwu-footer-legal-nav {
+  .vwu-footer-legal {
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.75rem;
+    gap: 0.6rem;
   }
 
   .vwu-footer-legal-link {
@@ -603,5 +496,27 @@
 
   .vwu-footer-legal-link::after {
     content: none;
+  }
+
+  .vwu-footer-logo {
+    height: 50px;
+  }
+
+  .vwu-footer-uni-name {
+    font-size: 1.05rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .vwu-footer-logo {
+    height: 44px;
+  }
+
+  .vwu-footer-uni-name {
+    font-size: 0.95rem;
+  }
+
+  .vwu-footer-mission {
+    font-size: 0.82rem;
   }
 }

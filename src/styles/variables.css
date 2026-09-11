@@ -17,8 +17,8 @@
   --color-text: #0f172a;
   --color-text-light: #475569;
 
-  /* Typography — Stanford Typography System */
-  --font-sans: "Source Sans 3", Helvetica, Arial, sans-serif;
+  /* Typography — Google Sans (self-hosted as "Product Sans", see global.css @font-face) */
+  --font-sans: "Product Sans", "Source Sans 3", Helvetica, Arial, sans-serif;
   --font-serif: "Source Serif 4", Georgia, "Times New Roman", serif;
 
   /* Font Sizes */
@@ -32,6 +32,24 @@
   --text-4xl: 2.25rem;
   --text-5xl: 3rem;
   --text-6xl: 3.75rem;
+
+  /* Editorial Type Scale — hero/page/section headings */
+  --text-display: clamp(2.8rem, 5vw, 5rem);
+  --text-h1: clamp(2.2rem, 4vw, 3.5rem);
+  --text-h2: clamp(1.8rem, 3vw, 2.6rem);
+  --text-h3: clamp(1.35rem, 2.4vw, 1.9rem);
+
+  /* Line Heights */
+  --leading-tight: 1.08;
+  --leading-snug: 1.2;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.65;
+
+  /* Letter Spacing */
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.04em;
+  --tracking-label: 0.08em;
 
   /* Spacing */
   --space-1: 0.25rem;

@@ -103,7 +103,6 @@ export default function StudentClubDetail() {
           100%, height auto) rather than being cropped or letterboxed. */}
       <section className="section bg-white">
         <div className="container">
-          <span className="section-label">Overview</span>
           <h2 className="section-title" style={{ fontSize: '1.75rem' }}>About {club.name}</h2>
           {(() => {
             const descriptionBlock = (
@@ -208,7 +207,6 @@ export default function StudentClubDetail() {
       {club.committee && club.committee.length > 0 && (
         <section className="section bg-white">
           <div className="container">
-            <span className="section-label">Committee</span>
             <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-6)' }}>
               The {club.name} Committee is constituted with the following members:
             </h2>

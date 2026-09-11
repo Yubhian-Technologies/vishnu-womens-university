@@ -51,7 +51,6 @@ export default function Happenings() {
         <section id="upcoming-events" className="section bg-white" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label">Mark Your Calendar</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Upcoming Events</h2>
             </div>
             <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 'var(--space-5)' }}>
@@ -92,7 +91,6 @@ export default function Happenings() {
       <section id="recent-events" className="section bg-off-white" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
         <div className="container">
           <div className="reveal" style={{ marginBottom: 'var(--space-8)' }}>
-            <span className="section-label">Latest Updates</span>
             <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Recent Events</h2>
           </div>
 

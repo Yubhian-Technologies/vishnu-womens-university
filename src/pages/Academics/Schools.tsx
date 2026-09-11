@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { Layers } from 'lucide-react';
 import PageHero from '../../components/PageHero/PageHero';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { resolveProgramIcon } from '../../lib/programIcons';
@@ -44,8 +45,10 @@ export default function Schools() {
 
       {loading ? (
         <section className="section bg-white">
-          <div className="container" style={{ textAlign: 'center' }}>
-            <p className="admin-loading">Loading…</p>
+          <div className="container">
+            <div className="card-skeleton-grid">
+              {Array.from({ length: 6 }).map((_, i) => <div key={i} className="card-skeleton" />)}
+            </div>
           </div>
         </section>
       ) : schools.length === 0 ? (
@@ -58,7 +61,8 @@ export default function Schools() {
         schools.map((school, i) => (
           <section key={school.id} className={`section ${i % 2 === 0 ? 'bg-white' : 'bg-off-white'}`}>
             <div className="container">
-              <div style={{ textAlign: 'left', marginBottom: 'var(--space-10)' }}>
+              <div className="school-header" style={{ marginBottom: 'var(--space-10)' }}>
+                <span className="school-index" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
                 <h2 className="section-title school-title">{school.title}</h2>
                 {SCHOOL_TAGLINES[school.title.trim().toLowerCase()] && (
                   <p className="school-tagline">{SCHOOL_TAGLINES[school.title.trim().toLowerCase()]}</p>
@@ -66,14 +70,21 @@ export default function Schools() {
                 {school.description && (
                   <p className="section-desc">{school.description}</p>
                 )}
+                <div className="academics-stat-row">
+                  <span className="chip-badge">
+                    <Layers size={14} strokeWidth={2} />
+                    {(school.departmentIds || []).length} Department{(school.departmentIds || []).length === 1 ? '' : 's'}
+                  </span>
+                </div>
               </div>
               <div className="dept-grid">
                 {(school.departmentIds || [])
                   .map((id) => departmentById.get(id))
                   .filter((d): d is DepartmentDoc => Boolean(d))
-                  .map((dept) => {
+                  .map((dept, idx) => {
                     const Icon = resolveProgramIcon(dept.icon);
                     const linkSlug = findDeptProgramSlug(dept, programs);
+                    const cardStyle = { animationDelay: `${Math.min(idx, 8) * 60}ms` };
                     const body = (
                       <>
                         <div className="dept-card-top">
@@ -85,12 +96,17 @@ export default function Schools() {
                       </>
                     );
                     return linkSlug ? (
-                      <Link key={dept.id} to={`/academics/${linkSlug}`} className="dept-card dept-card--link">
+                      <Link
+                        key={dept.id}
+                        to={`/academics/${linkSlug}`}
+                        className="dept-card dept-card--link dept-card--roster animate-fade-in-up"
+                        style={cardStyle}
+                      >
                         {body}
                         <span className="dept-card-arrow" style={{ marginTop: 'auto' }}>Learn More →</span>
                       </Link>
                     ) : (
-                      <div key={dept.id} className="dept-card">{body}</div>
+                      <div key={dept.id} className="dept-card dept-card--roster animate-fade-in-up" style={cardStyle}>{body}</div>
                     );
                   })}
                 {(school.departmentIds || []).length === 0 && (

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Trophy, Check } from 'lucide-react';
+import { Trophy, Check, ChevronDown } from 'lucide-react';
 import './VisionMission.css';
 import '../About/About.css';
 import PageHero from '../../components/PageHero/PageHero';
@@ -21,6 +21,15 @@ const defaultInspirationPhotos = [
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'VWU quality education', caption: '' },
 ];
 
+const MISSION_PREVIEW_LEN = 100;
+
+const QUALITY_COMMITMENT_ITEMS = [
+  { title: 'Academic Quality', desc: 'Maintain high standards across teaching, learning and research.' },
+  { title: 'Student Development', desc: 'Support meaningful learning experiences and the overall development of students.' },
+  { title: 'Continuous Improvement', desc: 'Respond to evolving educational needs, technologies and academic practices.' },
+  { title: 'Integrity & Responsibility', desc: 'Uphold integrity, consistency and responsible practices across the University.' },
+];
+
 const defaultCoreValuesPhotos = [
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Empowering Women in Tech', caption: '' },
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Tech Innovation', caption: '' },
@@ -32,7 +41,6 @@ const defaultCoreValuesPhotos = [
 export default function VisionMission() {
   const missionPoints = useContentBlocks('vision-mission', 'missionPoints');
   const values = useContentBlocks('vision-mission', 'values');
-  const qualityPolicy = useContentBlocks('vision-mission', 'qualityPolicy');
   const visionMissionPhotos = useSitePhotos('vision-mission', 'main', defaultInspirationPhotos);
   const inspirationPhotos = visionMissionPhotos.slice(0, 5);
   const qualityPolicyImg = visionMissionPhotos[5];
@@ -65,6 +73,7 @@ export default function VisionMission() {
         defaultTitle="Vision & Mission"
         defaultSubtitle="The principles, purpose, and commitments that inform every decision and action at Vishnu Womens University."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Discover', to: '/' }, { label: 'Vision & Mission' }]}
+        hideCta={true}
       />
 
       {/* Vision */}
@@ -99,13 +108,37 @@ export default function VisionMission() {
               <h2>Mission</h2>
             </div>
             <div className="vm-content">
+              <p className="vm-mission-intro">
+                To advance knowledge and women’s education through academic excellence, research, innovation and
+                responsible engagement with society. We are committed to equity, sustainability, global
+                collaboration and the development of graduates who are prepared to contribute with competence and
+                integrity.
+              </p>
               <ul className="vm-mission-list">
-                {missionPoints.map((point, i) => (
-                  <li key={point.id} className="vm-mission-item">
-                    <span className="vm-mission-num">{String(i + 1).padStart(2, '0')}</span>
-                    <p>{point.title}</p>
-                  </li>
-                ))}
+                {missionPoints.map((point, i) => {
+                  const num = String(i + 1).padStart(2, '0');
+                  const isLong = point.title.length > MISSION_PREVIEW_LEN;
+                  if (!isLong) {
+                    return (
+                      <li key={point.id} className="vm-mission-item">
+                        <span className="vm-mission-num">{num}</span>
+                        <p>{point.title}</p>
+                      </li>
+                    );
+                  }
+                  return (
+                    <li key={point.id} className="vm-mission-item vm-mission-item--collapsible">
+                      <details>
+                        <summary>
+                          <span className="vm-mission-num">{num}</span>
+                          <span className="vm-mission-preview">{point.title.slice(0, MISSION_PREVIEW_LEN).trimEnd()}…</span>
+                          <ChevronDown size={18} className="vm-mission-chevron" />
+                        </summary>
+                        <p className="vm-mission-full">{point.title}</p>
+                      </details>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           </div>
@@ -116,10 +149,9 @@ export default function VisionMission() {
       <section className="section bg-white">
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>
-            <span className="section-label">Core Values</span>
             <h2 className="section-title">What We Stand For</h2>
             <p className="section-desc" style={{ margin: '0 auto' }}>
-              Six enduring values that shape how we teach, how we work, and how we engage with the world.
+              The values that guide our teaching, research and engagement.
             </p>
           </div>
           <div className="vm-values-grid">
@@ -178,13 +210,22 @@ export default function VisionMission() {
         <div className="container">
           <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-12)', alignItems: 'center' }}>
             <div className="reveal-left">
-              <span className="section-label" style={{ color: 'var(--color-accent)' }}>Quality Commitment</span>
-              <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-6)' }}>Quality Policy</h2>
+              <span style={{ display: 'block', fontFamily: 'var(--font-sans)', fontSize: '0.8rem', fontWeight: 800, letterSpacing: '0.1em', color: 'var(--color-accent)', marginBottom: 'var(--space-3)' }}>
+                QUALITY COMMITMENT
+              </span>
+              <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>Quality Policy</h2>
+              <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 'var(--text-base)', lineHeight: 1.75, marginBottom: 'var(--space-6)' }}>
+                We are committed to maintaining high standards in teaching, learning, research and institutional
+                practice, with a continued focus on student development and academic improvement.
+              </p>
               <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-                {qualityPolicy.map((p) => (
-                  <li key={p.id} style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
-                    <Check size={17} strokeWidth={2.5} style={{ color: 'var(--color-accent)', flexShrink: 0, marginTop: 2 }} />
-                    <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: 'var(--text-sm)', lineHeight: 1.7, margin: 0 }}>{p.title}</p>
+                {QUALITY_COMMITMENT_ITEMS.map((item) => (
+                  <li key={item.title} style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
+                    <Check size={17} strokeWidth={2.5} style={{ color: 'var(--color-accent)', flexShrink: 0, marginTop: 4 }} />
+                    <div>
+                      <p style={{ color: 'var(--color-white)', fontSize: 'var(--text-sm)', fontWeight: 700, margin: 0 }}>{item.title}</p>
+                      <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 'var(--text-sm)', lineHeight: 1.65, margin: '2px 0 0' }}>{item.desc}</p>
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -206,7 +247,6 @@ export default function VisionMission() {
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-20) 0' }}>
         <div className="container" style={{ textAlign: 'center' }}>
           <div className="reveal">
-            <span className="section-label" style={{ color: 'var(--color-accent)' }}>Learn More About VWU</span>
             <h2 style={{ color: 'var(--color-white)', fontSize: 'clamp(1.75rem, 4vw, 2.75rem)', marginBottom: 'var(--space-4)' }}>
               Empowering Women Through Excellence
             </h2>

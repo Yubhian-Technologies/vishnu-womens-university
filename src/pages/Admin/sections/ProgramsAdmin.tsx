@@ -5,6 +5,7 @@ import {
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
 import { useImageCropModal } from '../../../components/ImageUploader/useImageCropModal';
+import ImageUploader from '../../../components/ImageUploader/ImageUploader';
 import FileUploader from '../../../components/FileUploader/FileUploader';
 import { deleteFile, type UploadResult } from '../../../lib/storage';
 import { PROGRAM_ICON_NAMES } from '../../../lib/programIcons';
@@ -51,6 +52,12 @@ export interface LabItem {
   pdfStoragePath?: string;
   imageUrl?: string;
   imageStoragePath?: string;
+  // Optional short video (e.g. a lab walkthrough) shown instead of the
+  // static image on the public Academic Infrastructure carousel when set —
+  // see LabsCarousel.tsx, which uses `imageUrl` as its poster frame so the
+  // clip itself only loads once a visitor presses play.
+  videoUrl?: string;
+  videoStoragePath?: string;
 }
 
 // Older programme docs stored labs as plain strings (no PDF) — normalize
@@ -176,6 +183,8 @@ export interface ProgramDoc {
   intake: number;
   established: string;
   accreditation: string;
+  accreditationImage?: string;
+  accreditationStoragePath?: string;
   hod: string;
   department: string;
   fee: string;
@@ -279,7 +288,7 @@ export interface ProgramDoc {
 
 const EMPTY: Omit<ProgramDoc, 'id'> = {
   slug: '', name: '', shortName: '', description: '', icon: 'GraduationCap', category: 'btech', intake: 60,
-  established: '', accreditation: '', hod: '', department: '', fee: '', heroImage: '', storagePath: '', about: '',
+  established: '', accreditation: '', accreditationImage: '', accreditationStoragePath: '', hod: '', department: '', fee: '', heroImage: '', storagePath: '', about: '',
   highlights: [], labs: [], outcomes: [], semesters: [],
   vision: '', mission: [], coreValues: [], peos: [], pos: [], psos: [], wks: [],
   hodMessage: '', hodImage: '', hodImageStoragePath: '', hodEmail: '', hodResearchProfiles: [],
@@ -679,10 +688,10 @@ export default function ProgramsAdmin() {
     setEditing(p.id);
     const next: Omit<ProgramDoc, 'id'> = {
       slug: p.slug, name: p.name, shortName: p.shortName, description: p.description || '', icon: p.icon || 'GraduationCap',
-      category: p.category, intake: p.intake, established: p.established, accreditation: p.accreditation,
+      category: p.category, intake: p.intake, established: p.established, accreditation: p.accreditation, accreditationImage: p.accreditationImage || '', accreditationStoragePath: p.accreditationStoragePath || '',
       hod: p.hod, department: p.department || '', fee: p.fee || '', heroImage: p.heroImage, storagePath: p.storagePath, about: p.about,
       highlights: p.highlights || [],
-      labs: (p.labs || []).map(normalizeLab).map((l) => ({ name: l.name, description: l.description || '', pdfUrl: l.pdfUrl || '', pdfStoragePath: l.pdfStoragePath || '' })),
+      labs: (p.labs || []).map(normalizeLab).map((l) => ({ name: l.name, description: l.description || '', pdfUrl: l.pdfUrl || '', pdfStoragePath: l.pdfStoragePath || '', imageUrl: l.imageUrl || '', imageStoragePath: l.imageStoragePath || '' })),
       outcomes: p.outcomes || [],
       semesters: (p.semesters || []).map((s) => ({
         label: s.label, subjects: (s.subjects || []).map(normalizeSubject),
@@ -787,6 +796,10 @@ export default function ProgramsAdmin() {
           <div className="admin-field">
             <label htmlFor="field-accreditation">Accreditation</label>
             <input id="field-accreditation" value={form.accreditation} onChange={(e) => set('accreditation', e.target.value)} placeholder="NBA Tier-I Accredited" />
+          </div>
+          <div className="admin-field">
+            <label>Accreditation Image (optional — certificate/logo, rectangular)</label>
+            <ImageUploader folder="vwu/accreditation" currentUrl={form.accreditationImage} onUploaded={(r) => setForm((p) => ({ ...p, accreditationImage: r.url, accreditationStoragePath: r.path }))} label="Upload Accreditation Image" aspect={16 / 9} />
           </div>
           <div className="admin-field">
             <label htmlFor="field-annual-fee">Annual Fee</label>

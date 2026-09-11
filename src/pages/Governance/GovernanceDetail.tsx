@@ -190,7 +190,6 @@ export default function GovernanceDetail() {
         <div className="container">
           <div className={highlights.length > 0 || item.slug === 'iqac-committee' ? 'detail-grid' : ''}>
             <div>
-              <span className="section-label">Overview</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>
                 {item.title.toLowerCase().startsWith('about ') ? item.title : `About ${item.title}`}
               </h2>
@@ -296,7 +295,6 @@ export default function GovernanceDetail() {
         <section className="section bg-off-white">
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label">Framework</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>IQAC Work System Framework</h2>
             </div>
             <div
@@ -326,7 +324,6 @@ export default function GovernanceDetail() {
         <section className="section bg-off-white">
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label">Details</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>{item.title}</h2>
             </div>
             <QualityParametersSection />
@@ -342,7 +339,6 @@ export default function GovernanceDetail() {
         <section className="section bg-off-white">
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label">Details</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Institutional Policies</h2>
             </div>
             <PoliciesListSection />
@@ -359,7 +355,6 @@ export default function GovernanceDetail() {
         <section className="section bg-off-white">
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label">Details</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>{item.title}</h2>
             </div>
             <AnnualReportsSection />
@@ -374,7 +369,6 @@ export default function GovernanceDetail() {
         <section className="section bg-off-white">
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label">Details</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>{item.title}</h2>
             </div>
             <NirfReportsSection />
@@ -389,7 +383,6 @@ export default function GovernanceDetail() {
         <section className="section bg-off-white">
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label">Details</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>{item.title}</h2>
             </div>
             <NbaDataSection />
@@ -405,7 +398,6 @@ export default function GovernanceDetail() {
         <section className="section bg-off-white">
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label">Members</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>{item.title}</h2>
             </div>
             <InternalQACellSection />
@@ -418,7 +410,6 @@ export default function GovernanceDetail() {
         <section className="section bg-off-white">
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label">Members</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>
                 {tableSections.length > 1 ? 'Department Boards of Studies'
                   : item.slug === 'iqac-committee' ? 'Committee Composition' : 'Members & Composition'}
@@ -466,7 +457,6 @@ export default function GovernanceDetail() {
         <section className="section bg-off-white">
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label">Impact</span>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Outcomes & Achievements</h2>
             </div>
             <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 'var(--space-4)' }}>

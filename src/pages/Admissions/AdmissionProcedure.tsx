@@ -68,7 +68,7 @@ export default function AdmissionProcedure() {
           <header className="ap-lead reveal">
             <p className="ap-lead__title">Find your pathway</p>
             <p className="ap-lead__text">
-             Choose your programme to explore the applicable entrance exam, eligibility criteria, and the steps involved in the admission process.
+              Choose your programme to view eligibility, entrance route and admission steps.
             </p>
           </header>
 
@@ -186,8 +186,8 @@ export default function AdmissionProcedure() {
       <section className="section ap-docs">
         <div className="container">
           <header className="ap-docs__head reveal">
-            <span className="section-label section-label--dark">Before you apply</span>
-            <h2 className="ap-docs__title">Documents to keep ready</h2>
+            <h2 className="ap-docs__title">Documents Required for Admission</h2>
+            <p className="ap-docs__desc">Requirements may vary by programme, admission route and applicant category.</p>
           </header>
           <ul className="ap-docs__grid">
             {documents.map((doc) => (
@@ -202,14 +202,14 @@ export default function AdmissionProcedure() {
 
       <section className="ap-cta">
         <div className="container ap-cta__inner reveal">
-          <h2 className="ap-cta__title">Ready to apply?</h2>
+          <h2 className="ap-cta__title">Ready to Apply?</h2>
           <p className="ap-cta__text">
-            Check the fee structure and recent results, or go back to the admissions overview.
+            Review your programme, confirm your eligibility and proceed with the applicable admission process
           </p>
           <div className="ap-cta__actions">
-            <Link to="/programmes-fee-structure" className="btn btn-accent">View fee structure</Link>
-            <Link to="/result-analysis" className="btn btn-secondary">Results analysis</Link>
-            <Link to="/admissions" className="btn btn-secondary">Admissions home</Link>
+            <Link to="/programmes-fee-structure" className="btn btn-accent">View Fee Structure</Link>
+            <Link to="/result-analysis" className="btn btn-secondary">View Results Analysis</Link>
+            <Link to="/admissions" className="btn btn-secondary">Back to Admissions</Link>
           </div>
         </div>
       </section>

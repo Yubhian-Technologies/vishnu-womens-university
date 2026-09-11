@@ -12,7 +12,6 @@ export interface NewsEventsCategory {
 
 interface Props {
   categories: NewsEventsCategory[];
-  eyebrow: string;
   navOffset: string;
   /** Renders just the category tabs + accordion list, skipping the outer
    *  section/container and the collapsible "News & Events" header — used
@@ -25,7 +24,7 @@ function isUrl(text: string): boolean {
   return /^(https?:\/\/|\/|.*\.pdf$)/i.test(text.trim());
 }
 
-export default function NewsEventsTabs({ categories, eyebrow, navOffset, embedded }: Props) {
+export default function NewsEventsTabs({ categories, navOffset, embedded }: Props) {
   const withContent = categories.filter((c) => c.years.length > 0);
   const [activeKey, setActiveKey] = useState<string | null>(null);
   const [expandedYearIndex, setExpandedYearIndex] = useState<number | null>(0);
@@ -229,8 +228,7 @@ export default function NewsEventsTabs({ categories, eyebrow, navOffset, embedde
           aria-controls="news-events-panel-wrap"
         >
           <div>
-            <span className="section-label dept-section-label">{eyebrow}</span>
-            <h2 className="section-title" style={{ marginBottom: 0 }}>News &amp; Events</h2>
+            <h2 className="section-title" style={{ marginBottom: 0 }}>Events &amp; Happenings</h2>
           </div>
           <ChevronDown
             size={22}

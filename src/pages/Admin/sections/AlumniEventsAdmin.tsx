@@ -4,16 +4,26 @@ import {
 } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
+import ImageUploader from '../../../components/ImageUploader/ImageUploader';
+import type { UploadResult } from '../../../lib/storage';
 
-interface AlumniEvent {
+// Exported so the Home page's Alumni Events section (which reads this same
+// `alumniEvents` collection — see AlumniEventsShowcase.tsx) shares one
+// definition instead of a second, drifting copy of the shape.
+export interface AlumniEvent {
   id: string;
   title: string;
   date: string;
   desc: string;
   order: number;
+  photoUrl?: string;
+  photoStoragePath?: string;
+  // Alumni Connect section fields
+  row?: 1 | 2;           // Which row (1 = photo left, 2 = photo right)
+  displayType?: 'photo' | 'text'; // Photo card or text content
 }
 
-const EMPTY: Omit<AlumniEvent, 'id'> = { title: '', date: '', desc: '', order: 0 };
+const EMPTY: Omit<AlumniEvent, 'id'> = { title: '', date: '', desc: '', order: 0, photoUrl: '', photoStoragePath: '', row: 1, displayType: 'photo' };
 
 const DEFAULTS: Omit<AlumniEvent, 'id'>[] = [
   { title: 'Annual Alumni Meet', date: 'January 2027', desc: 'The annual reunion that brings graduates back to the VWU campus for networking, catching up with batchmates, and celebrating shared milestones.', order: 0 },
@@ -29,6 +39,7 @@ export default function AlumniEventsAdmin() {
   const [saving, setSaving] = useState(false);
 
   const set = (k: string, v: string | number) => setForm((p) => ({ ...p, [k]: v }));
+  const handlePhoto = (r: UploadResult) => setForm((p) => ({ ...p, photoUrl: r.url, photoStoragePath: r.path }));
 
   const save = async () => {
     if (!form.title || !form.date) return alert('Title and date are required.');
@@ -49,7 +60,7 @@ export default function AlumniEventsAdmin() {
 
   const startEdit = (e: AlumniEvent) => {
     setEditing(e.id);
-    setForm({ title: e.title, date: e.date, desc: e.desc, order: e.order });
+    setForm({ title: e.title, date: e.date, desc: e.desc, order: e.order, photoUrl: e.photoUrl || '', photoStoragePath: e.photoStoragePath || '', row: e.row || 1, displayType: e.displayType || 'photo' });
   };
 
   const remove = async (id: string) => {
@@ -76,6 +87,10 @@ export default function AlumniEventsAdmin() {
     <div className="admin-section">
       <div className="admin-card">
         <h2 className="admin-card__title">{editing ? 'Edit Event' : 'Add Alumni Event'}</h2>
+        <p className="admin-lead" style={{ marginBottom: '1rem' }}>
+          Events appear in both the Alumni Events showcase and the Alumni Connect section on the Home page.
+          For Alumni Connect photos, set <strong>Display Type</strong> to "Photo" and choose the row position.
+        </p>
         <div className="admin-form-grid">
           <div className="admin-field">
             <label htmlFor="field-title">Title *</label>
@@ -89,9 +104,35 @@ export default function AlumniEventsAdmin() {
             <label htmlFor="field-display-order">Display Order</label>
             <input id="field-display-order" type="number" value={form.order} onChange={(e) => set('order', +e.target.value)} min={0} />
           </div>
+          <div className="admin-field">
+            <label htmlFor="field-display-type">Display Type</label>
+            <select id="field-display-type" value={form.displayType} onChange={(e) => set('displayType', e.target.value)}>
+              <option value="photo">Photo (Alumni Connect scroll)</option>
+              <option value="text">Text (used in Events showcase only)</option>
+            </select>
+          </div>
+          {form.displayType === 'photo' && (
+            <div className="admin-field">
+              <label htmlFor="field-row">Row Position</label>
+              <select id="field-row" value={form.row} onChange={(e) => set('row', +e.target.value)}>
+                <option value={1}>Row 1 (Photo Left, Text Right)</option>
+                <option value={2}>Row 2 (Text Left, Photo Right)</option>
+              </select>
+              <p className="admin-field__hint">Row 1 photos scroll on the left; Row 2 on the right.</p>
+            </div>
+          )}
           <div className="admin-field admin-field--full">
             <label htmlFor="field-description">Description</label>
             <textarea id="field-description" rows={3} value={form.desc} onChange={(e) => set('desc', e.target.value)} placeholder="Short description shown on the card…" />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label>Photo</label>
+            <p className="admin-field__hint" style={{ marginTop: '-0.25rem', marginBottom: '0.5rem' }}>
+              {form.displayType === 'photo'
+                ? 'Shown in the Alumni Connect horizontal scroll on the Home page — landscape/rectangular photos work best.'
+                : 'Shown on the Home page\'s "Alumni Events" cards — a landscape/rectangular photo works best.'}
+            </p>
+            <ImageUploader folder="vwu/alumni-events" currentUrl={form.photoUrl} onUploaded={handlePhoto} label="Upload Event Photo" aspect={3 / 2} />
           </div>
         </div>
         <div className="admin-form-actions">
@@ -107,13 +148,14 @@ export default function AlumniEventsAdmin() {
         {loading ? <p className="admin-loading">Loading…</p> : (
           <div className="admin-table-wrap">
             <table className="admin-table">
-              <thead><tr><th>Title</th><th>Date</th><th>Description</th><th>Actions</th></tr></thead>
+              <thead><tr><th>Title</th><th>Date</th><th>Type</th><th>Row</th><th>Actions</th></tr></thead>
               <tbody>
                 {items.map((e) => (
                   <tr key={e.id}>
                     <td>{e.title}</td>
                     <td>{e.date}</td>
-                    <td>{e.desc}</td>
+                    <td><span className="admin-badge">{e.displayType === 'photo' ? 'Photo' : 'Text'}</span></td>
+                    <td>{e.displayType === 'photo' ? `Row ${e.row || 1}` : '—'}</td>
                     <td>
                       <button className="admin-btn admin-btn--sm" onClick={() => startEdit(e)}>Edit</button>
                       <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(e.id)}>Delete</button>
@@ -122,7 +164,7 @@ export default function AlumniEventsAdmin() {
                 ))}
                 {items.length === 0 && (
                   <tr>
-                    <td colSpan={4} className="admin-empty">
+                    <td colSpan={5} className="admin-empty">
                       No events yet.{' '}
                       <button className="admin-btn admin-btn--sm" onClick={seedDefaults}>Add starter events</button>
                     </td>

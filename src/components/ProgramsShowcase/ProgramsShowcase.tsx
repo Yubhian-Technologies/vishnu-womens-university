@@ -6,7 +6,6 @@ import './ProgramsShowcase.css';
 
 export default function ProgramsShowcase() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeCategory, setActiveCategory] = useState('ug');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const searchWrapRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -24,11 +23,6 @@ export default function ProgramsShowcase() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
-  // Compute live program counts per category
-  const btechCount = useMemo(() => programs.filter(p => p.category === 'btech').length, [programs]);
-  const pgCount = useMemo(() => programs.filter(p => p.category === 'mtech' || p.category === 'mba').length, [programs]);
-  const phdCount = useMemo(() => programs.filter(p => p.category === 'phd').length, [programs]);
 
   // Real-time live search suggestions
   const searchSuggestions = useMemo(() => {
@@ -53,15 +47,6 @@ export default function ProgramsShowcase() {
     }
   };
 
-  const categories = [
-    // ‌ (ZWNJ) after "(" stops fonts substituting "(5)"/"(3)" with a circled-digit ligature.
-    //   (no-break space) before "(" glues the count to "Programs" so "(10)" never
-    // wraps onto a line of its own in the narrow 3-column tab grid.
-    { id: 'ug', label: `Undergraduate Programs${btechCount > 0 ? ` (‌${btechCount})` : ''}`, link: '/academics?tab=btech' },
-    { id: 'pg', label: `Postgraduate Programs${pgCount > 0 ? ` (‌${pgCount})` : ''}`, link: '/academics?tab=mtech' },
-    { id: 'phd', label: `Ph.D Programs${phdCount > 0 ? ` (‌${phdCount})` : ''}`, link: '/academics?tab=phd' },
-  ];
-
   return (
     <section className="programs-showcase-section programs-showcase--light" aria-label="Future-focused education programs and schools">
       <div className="programs-showcase-split-wrapper">
@@ -70,10 +55,10 @@ export default function ProgramsShowcase() {
         <div className="programs-showcase-left-container">
           <div className="programs-showcase-left">
             <h2 className="programs-showcase-heading">
-              A Spectrum of Programmes. A World of Possibilities.
+              Find Your Programme
             </h2>
             <div className="programs-showcase-desc">
-              <p>From undergraduate to doctoral study, VWU's programmes bring together rigorous learning, research, global exposure, and industry engagement — preparing students to become confident leaders, thoughtful innovators, and lifelong learners in an ever-evolving world.</p>
+              <p>Search by subject, or browse all eighteen programmes by level.</p>
             </div>
 
             {/* Interactive Live Search Bar */}
@@ -129,21 +114,6 @@ export default function ProgramsShowcase() {
                   </div>
                 </div>
               )}
-            </div>
-
-            {/* Category Nav Links Grid */}
-            <div className="programs-showcase-nav-grid">
-              {categories.map((cat) => (
-                <Link
-                  key={cat.id}
-                  to={cat.link}
-                  className={`programs-showcase-nav-item ${activeCategory === cat.id ? 'active' : ''}`}
-                  onClick={() => setActiveCategory(cat.id)}
-                >
-                  <span className="programs-showcase-nav-text">{cat.label}</span>
-                  <span className="programs-showcase-nav-line" aria-hidden="true" />
-                </Link>
-              ))}
             </div>
 
             {/* Action CTA */}

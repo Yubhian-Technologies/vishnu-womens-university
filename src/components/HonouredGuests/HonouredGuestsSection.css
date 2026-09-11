@@ -7,7 +7,8 @@
 .eminent-title {
   font-family: var(--font-serif);
   font-size: clamp(1.6rem, 2.6vw, 2.2rem);
-  font-weight: 800;
+  font-weight: 600;
+  letter-spacing: -0.02em;
   color: var(--color-primary-dark, #081c15);
   text-align: center;
   margin: 0 0 clamp(1.75rem, 3vw, 2.5rem) 0;

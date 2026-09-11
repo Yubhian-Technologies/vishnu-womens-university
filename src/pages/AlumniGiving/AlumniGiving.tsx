@@ -37,7 +37,6 @@ export default function AlumniGiving() {
       <section id="network" className="section bg-off-white">
         <div className="container">
           <div style={{ textAlign: 'center', marginBottom: 'var(--space-10)' }}>
-            <span className="section-label">Alumni Voices</span>
             <h2 className="section-title">What Our Graduates Say</h2>
           </div>
           <div className="ag-stories-grid">

@@ -150,7 +150,6 @@ export default function Events() {
       <section id="events-content" className="section bg-off-white" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
         <div className="container">
           <div className="reveal" style={{ marginBottom: 'var(--space-8)' }}>
-            <span className="section-label">Don't Miss</span>
             <h2 className="section-title">Featured Events</h2>
           </div>
           <div className="ev-featured-grid">
@@ -203,7 +202,7 @@ export default function Events() {
           <div className="ev-header reveal">
             <div>
               <span className="section-label">Calendar</span>
-              <h2 className="section-title">All Events</h2>
+              <h2 className="section-title">All Upcoming Events</h2>
             </div>
             <div className="ev-controls">
               <div className="ev-search">

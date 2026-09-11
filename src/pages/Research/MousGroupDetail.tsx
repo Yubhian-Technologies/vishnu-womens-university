@@ -56,7 +56,6 @@ export default function MousGroupDetail() {
       <section className="section bg-white">
         <div className="container">
           <div style={{ marginBottom: 'var(--space-8)' }}>
-            <span className="section-label">Details</span>
             <h2 className="section-title" style={{ fontSize: '1.75rem' }}>{groupName}</h2>
           </div>
           <div className="pb-grid pb-grid--mous">

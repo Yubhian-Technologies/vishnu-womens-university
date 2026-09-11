@@ -27,7 +27,7 @@ export const admissionTabs: AdmissionTab[] = [
     label: 'B.Tech. — Regular (after 10+2 MPC)',
     heading: 'B.Tech. — Regular',
     intro:
-      "Vishnu Women's University offers admission to B.Tech. programmes through Category A and Category B, providing eligible students with multiple pathways to begin their engineering education. Students who have completed 10+2 with MPC (Mathematics, Physics and Chemistry) and fulfil the prescribed eligibility criteria may seek admission through either of the applicable pathways.",
+      "Vishnu Women's University offers B.Tech. admission through Category A and Category B for students who have completed 10+2 with MPC and meet the prescribed eligibility requirements.",
     categories: [
       {
         key: 'A',
