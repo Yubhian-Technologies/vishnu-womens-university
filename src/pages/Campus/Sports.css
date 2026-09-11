@@ -524,6 +524,36 @@
   margin: 1.25rem 0 0 0;
 }
 
+/* Show More / Show Less toggle — used under the Hall of Champions grid and
+   any other gallery this site's carrying a preview-count cap. */
+.sports-show-more-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 2.5rem;
+}
+
+.sports-show-more-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.7rem 1.75rem;
+  border-radius: 9999px;
+  border: 1.5px solid var(--color-accent, #C9A84C);
+  background: transparent;
+  color: var(--color-accent, #C9A84C);
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.sports-show-more-btn:hover {
+  background: var(--color-accent, #C9A84C);
+  color: #090c10;
+}
+
 .sports-medallion-sub {
   font-size: 0.85rem;
   color: rgba(255, 255, 255, 0.7);
