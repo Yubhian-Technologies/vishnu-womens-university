@@ -20,6 +20,10 @@ import { aicteIdeaLab } from './aicteIdeaLab.data';
 import { institutionInnovationCell } from './institutionInnovationCell.data';
 import { vehicleDesignLab } from './vehicleDesignLab.data';
 import { talentSprintWise } from './talentSprintWise.data';
+import MicrochipPage from './MicrochipPage';
+import TiDspPage from './TiDspPage';
+import UltraTechPage from './UltraTechPage';
+import ChipsToStartupPage from './ChipsToStartupPage';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import '../detail-layout.css';
 
@@ -497,9 +501,17 @@ export default function DifferentiatorDetail() {
   const vdl = item.slug === 'vehicle-design-lab' ? vehicleDesignLab : null;
   const wise = item.slug === 'talentsprint-wise' ? talentSprintWise : null;
 
+  // Chips to Startup (C2S) has its own bespoke hero + layout (see
+  // ChipsToStartupPage.tsx) instead of the shared navy hero card below —
+  // same idea as microchip-embedded/ti-dsp-coe/ultratech-coe's own body
+  // below, just also replacing the hero. Faculty carousel / closing CTA
+  // band further down the page still render normally afterward.
+  const isChipsToStartup = item.slug === 'chips-to-startup';
+
   return (
     <main className="page-wrapper">
       {/* Hero — Department Hero Card Design */}
+      {!isChipsToStartup && (
       <section className="dept-hero-section">
         <div className="container">
           <div className="dept-hero-card">
@@ -531,6 +543,7 @@ export default function DifferentiatorDetail() {
           </div>
         </div>
       </section>
+      )}
 
       {/* Overview — Description/Vision/Mission/Objectives/Custom Sections,
           the same structure every non-external item has. Institution
@@ -539,36 +552,44 @@ export default function DifferentiatorDetail() {
           get their own dedicated tabbed page (IicPage/VdlPage/WisePage/
           IdeaLabPage) right below it — the two are no longer mutually
           exclusive. */}
-      <section className="section bg-white">
-        <div className="container">
-          {/* Same "About the Department" card treatment as the academic
-              department pages (see .dept-about-* in detail-layout.css):
-              accent-bordered gradient card, section label + title header
-              above it. Full-width now — everything beyond the description
-              (Vision/Mission/Objectives, Key Highlights, Facilities,
-              Outcomes, Partners, Contacts, ...) is just Custom Sections, so
-              there's no more fixed sidebar. */}
-          <div className="dept-about-main">
-            {/* No "Overview" / "About {title}" heading here on purpose — the
-                description below is meant to lead the page with no heading
-                of its own or above it (unlike About VWU/About SVES/About
-                R&D elsewhere on the site, which keep theirs). */}
-            <div className="dept-about-card">
-              <SectionSubtree section={descriptionSection} />
-            </div>
-
-            {/* Vision/Mission/Objectives (introBlocks — fixed fields, only
-                rendered when filled in) lead, in that order, followed by any
-                other admin-added 'intro'-placed Custom Section; everything
-                else (Key Highlights, Facilities, Outcomes, Partners,
-                Contacts, ...) renders as a collapsible accordion below (see
-                lib/customSections.ts). */}
-            <CustomSectionsIntro sections={[...introBlocks, ...effectiveCustomSections]} />
-            <CustomSectionsGalleries sections={effectiveCustomSections} />
-            <CustomSectionsAccordion sections={effectiveCustomSections} />
+      {isChipsToStartup ? (
+        <ChipsToStartupPage item={item} customSections={effectiveCustomSections} />
+      ) : item.slug === 'microchip-embedded' ? (
+        <section className="section bg-white" style={{ paddingTop: '1rem' }}>
+          <div className="container">
+            <MicrochipPage customSections={effectiveCustomSections} />
           </div>
-        </div>
-      </section>
+        </section>
+      ) : item.slug === 'ti-dsp-coe' ? (
+        <section className="section bg-white" style={{ paddingTop: '1rem' }}>
+          <div className="container">
+            <TiDspPage customSections={effectiveCustomSections} />
+          </div>
+        </section>
+      ) : item.slug === 'ultratech-coe' ? (
+        <section className="section bg-white" style={{ paddingTop: '1rem' }}>
+          <div className="container">
+            <UltraTechPage
+              customSections={effectiveCustomSections}
+              descriptionSection={descriptionSection}
+              introBlocks={introBlocks}
+            />
+          </div>
+        </section>
+      ) : (
+        <section className="section bg-white">
+          <div className="container">
+            <div className="dept-about-main">
+              <div className="dept-about-card">
+                <SectionSubtree section={descriptionSection} />
+              </div>
+              <CustomSectionsIntro sections={[...introBlocks, ...effectiveCustomSections]} />
+              <CustomSectionsGalleries sections={effectiveCustomSections} />
+              <CustomSectionsAccordion sections={effectiveCustomSections} />
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Rural Women Tech Park's Report Links are admin-managed separately
           (Admin > Differentiators > Rural Women Tech Park > Report Links)
