@@ -212,7 +212,6 @@ export default function News() {
       <section className="section" style={{ background: 'var(--color-primary)' }}>
         <div className="container" style={{ textAlign: 'center' }}>
           <div className="reveal">
-            <span className="section-label" style={{ color: 'var(--color-accent)' }}>Stay Connected</span>
             <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>
               Get VWU News Delivered to You
             </h2>

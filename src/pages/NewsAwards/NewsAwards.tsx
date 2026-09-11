@@ -80,7 +80,6 @@ export default function NewsAwards() {
       <section className="section bg-off-white">
         <div className="container">
           <div className="reveal" style={{ marginBottom: 'var(--space-10)' }}>
-            <span className="section-label">At a Glance</span>
             <h2 className="section-title">Explore News & Awards</h2>
             <p style={{ color: 'var(--color-text-light)', maxWidth: 600, lineHeight: 1.7 }}>
               Everything you need to know about VWU's recognition, campus life, and visual history — all in one place.

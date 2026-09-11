@@ -94,7 +94,6 @@ export default function Differentiators() {
                   <cat.icon size={26} strokeWidth={1.75} />
                 </div>
                 <div>
-                  <span className="section-label" style={{ position: 'static', marginBottom: 0 }}>{cat.label}</span>
                   <h2 className="section-title" style={{ margin: 0 }}>{cat.label}</h2>
                 </div>
               </div>

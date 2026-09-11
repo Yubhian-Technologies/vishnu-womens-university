@@ -153,9 +153,6 @@ export default function Governance() {
           >
             <div className="container">
               <div className="reveal" style={{ marginBottom: 'var(--space-10)' }}>
-                <span className="section-label" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
-                  <cat.icon size={14} /> {cat.label}
-                </span>
                 <h2 className="section-title" style={{ fontFamily: 'var(--font-serif)', letterSpacing: '-0.01em' }}>{cat.label}</h2>
                 <p style={{ color: 'var(--color-text-light)', maxWidth: 620, lineHeight: 1.75 }}>{cat.desc}</p>
               </div>

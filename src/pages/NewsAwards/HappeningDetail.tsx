@@ -165,7 +165,6 @@ export default function HappeningDetail() {
           {otherRecent.length > 0 && (
             <div className="happ-detail-related">
               <div className="section-head-left" style={{ marginBottom: '1.5rem' }}>
-                <span className="section-label">More Updates</span>
                 <h2 className="section-title" style={{ fontSize: '1.5rem' }}>Other Recent Happenings</h2>
               </div>
 

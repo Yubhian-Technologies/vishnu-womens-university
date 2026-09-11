@@ -1,6 +1,4 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Search } from 'lucide-react';
 import { usePageBanners } from '../../hooks/usePageBanners';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { HERO_VIDEO_SRC } from '../../lib/heroVideo';
@@ -15,7 +13,7 @@ interface Slide {
   id: number | string;
   tag: string;
   heading: string;
-  description: string;
+  description?: string;
   primaryCta: { label: string; path: string };
   secondaryCta?: { label: string; path: string };
   image?: string;
@@ -33,8 +31,7 @@ function buildStaticSlides(btechCount: string): Slide[] {
     {
       id: 1,
       tag: 'Welcome to VWU',
-      heading: 'Empowering.\nWomen.\nThrough Tech.',
-      description: 'VWU equips women with rigorous engineering education, research opportunities, and the practical skills that top employers demand.',
+      heading: 'Leading by Design.\nBeyond Every Expectation.\nRewriting Who Builds the World.',
       primaryCta: { label: 'Schedule a Visit', path: '/contact' },
       secondaryCta: { label: 'Apply Now', path: '/apply-now' },
     },
@@ -79,7 +76,7 @@ interface HeroTitle {
 }
 
 const HERO_TITLES: HeroTitle[] = [
-  { lead: 'Pioneering', italic: 'Women in Engineering.' },
+  { lead: 'Leading by Design.\nBeyond Every Expectation.\nRewriting Who Builds the World.', italic: '' },
   { lead: 'Where Ambition Meets', italic: 'Excellence.' },
   { lead: 'Engineering the', italic: 'Future of Tech.' },
   { lead: 'Inspiring Brilliance,', italic: 'Leading Change.' },
@@ -88,8 +85,6 @@ const HERO_TITLES: HeroTitle[] = [
 const SLIDE_DURATION = 6000;
 
 export default function HeroSlider() {
-  const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState('');
   const [titleIndex, setTitleIndex] = useState(0);
   const [isFadingTitle, setIsFadingTitle] = useState(false);
   const [current, setCurrent] = useState(0);
@@ -187,15 +182,6 @@ export default function HeroSlider() {
     }
   };
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/academics/programs?search=${encodeURIComponent(searchQuery.trim())}`);
-    } else {
-      navigate('/academics/programs');
-    }
-  };
-
   return (
     <section className="hero-slider" aria-label="Featured content">
 
@@ -222,29 +208,14 @@ export default function HeroSlider() {
           {' '}
           <span className="hero-title-italic">{HERO_TITLES[titleIndex].italic}</span>
         </h1>
-        <form className="hero-center-search" onSubmit={handleSearch} role="search">
-          <div className="hero-search-box">
-            <Search className="hero-search-icon" size={19} strokeWidth={2} />
-            <input
-              type="text"
-              className="hero-search-input"
-              placeholder="Explore courses"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              aria-label="Explore courses"
-            />
-            <button type="submit" className="hero-search-submit">
-              Search
-            </button>
-          </div>
-        </form>
-        <div className="hero-tag-words" aria-label="Values">
+
+        {/* <div className="hero-tag-words" aria-label="Values">
           <span>Think</span>
           <span className="hero-tag-dot">•</span>
           <span>Build</span>
           <span className="hero-tag-dot">•</span>
           <span>Lead</span>
-        </div>
+        </div> */}
       </div>
 
       {/* Slide layer — carries only the optional admin-uploaded Hero Banner

@@ -1,16 +1,14 @@
-import { useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
-import { Laptop } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Laptop, Search } from 'lucide-react';
 import HeroSlider from '../../components/HeroSlider/HeroSlider';
 import CounterSection from '../../components/CounterSection/CounterSection';
 import ScrollTopButton from '../../components/ScrollTopButton/ScrollTopButton';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import TestimonialSlider from '../../components/TestimonialSlider/TestimonialSlider';
 import RecruitersSection from '../../components/RecruitersMarquee/RecruitersSection';
-import WomensEducationSection from '../../components/WomensEducation/WomensEducationSection';
 import CampusLifeShowcase from '../../components/CampusLifeShowcase/CampusLifeShowcase';
 import AccreditationsStrip from '../../components/AccreditationsStrip/AccreditationsStrip';
-import ProgramsShowcase from '../../components/ProgramsShowcase/ProgramsShowcase';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { fetchPriorityAttr } from '../../lib/domAttrs';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
@@ -26,6 +24,8 @@ import PlacementMetricsSection from '../../components/PlacementMetricsSection/Pl
 // Recent Placement Highlights — temporarily disabled, see usage below.
 // import PlacementSpotlightsSection from '../../components/PlacementSpotlights/PlacementSpotlightsSection';
 import HonouredGuestsSection from '../../components/HonouredGuests/HonouredGuestsSection';
+import AlumniConnect from '../../components/AlumniConnect/AlumniConnect';
+import YouTubeShowcase from '../../components/YouTubeShowcase/YouTubeShowcase';
 import { getUniversitySchema } from '../../lib/seo/schemas';
 import './Home.css';
 
@@ -62,9 +62,9 @@ const defaultCtaBannerPhoto = [
 // <section>). Shown until an admin adds real entries there — same fallback
 // pattern used throughout this codebase (e.g. defaultExecutives in About.tsx).
 const defaultStudyCards: ContentBlockDoc[] = [
-  { id: 'default-1', page: 'home', section: 'studyCards', value: 'Explore Programs', title: 'B.Tech Programs', desc: 'Choose from 10+ B.Tech specializations — CSE, CSE[AI & ML], CSE[AI & DS], CSE[Cyber Security], IT, ECE, ECE[VLSI], ECE[EVT], EEE, Civil, and Mechanical Engineering.', icon: 'Laptop', slug: '/academics', order: 0 },
-  { id: 'default-2', page: 'home', section: 'studyCards', value: 'M.Tech & MBA Programs', title: 'M.Tech & MBA', desc: 'Elevate your qualifications with postgraduate programs in CSE, VLSI Design, Power Electronics, Software Engineering, and MBA.', icon: 'GraduationCap', slug: '/academics', order: 1 },
-  { id: 'default-3', page: 'home', section: 'studyCards', value: 'Ph.D. Programs', title: 'Research & Ph.D.', desc: 'Conduct doctoral research in CSE, ECE, and EEE — backed by 2,500+ publications, 90+ patents, and purpose-built research facilities.', icon: 'FlaskConical', slug: '/academics', order: 2 },
+  { id: 'default-1', page: 'home', section: 'studyCards', value: 'Explore Programs', title: 'B.Tech Programs', desc: 'Ten specialisations across Computer Science, Electronics, Electrical, Civil and Mechanical Engineering — including AI & Machine Learning, AI & Data Science, and Cyber Security.', icon: 'Laptop', slug: '/academics', order: 0 },
+  { id: 'default-2', page: 'home', section: 'studyCards', value: 'M.Tech & MBA Programs', title: 'M.Tech & MBA', desc: 'Five postgraduate programmes: M.Tech in Computer Science, VLSI Design, Power Electronics and Software Engineering, and a two-year MBA.', icon: 'GraduationCap', slug: '/academics', order: 1 },
+  { id: 'default-3', page: 'home', section: 'studyCards', value: 'Ph.D. Programs', title: 'Research & Ph.D.', desc: 'Doctoral research in Computer Science, Electronics and Electrical Engineering, supported by 2,500+ publications, 150+ patents and dedicated research facilities.', icon: 'FlaskConical', slug: '/academics', order: 2 },
 ];
 
 // Each study card's slug is admin-editable in Firestore and currently just
@@ -115,6 +115,13 @@ function useTilt(strength = 12) {
 
 /* ── Component ────────────────────────────────────────────── */
 export default function Home() {
+  const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState('');
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    navigate(searchQuery.trim() ? `/academics/programs?search=${encodeURIComponent(searchQuery.trim())}` : '/academics/programs');
+  };
+
   // "Upcoming at VWU" is driven by the Happenings collection the admin's
   // "Happenings & Awards" → Happenings editor writes to (see
   // NewsAwardsDataAdmin.tsx) — marking something Upcoming there is what
@@ -138,7 +145,7 @@ export default function Home() {
   const ctaBannerPhoto = useSitePhotos('home', 'cta-banner', defaultCtaBannerPhoto)[0];
 
   useEffect(() => {
-    document.title = 'VWU | Empowering Women Through Knowledge and Action';
+    document.title = 'VWU | Leading by Design — Women in Engineering';
 
     // Scroll reveal
     const observer = new IntersectionObserver(
@@ -174,6 +181,27 @@ export default function Home() {
 
       {/* ── Chapter 1: Hero & Trust Bar ── */}
       <HeroSlider />
+
+      {/* Straddles the hero/Accreditations seam — half the pill overlaps
+          the hero's bottom edge, half sits in the strip below, via the
+          negative margin-top in Home.css (no visible section of its own). */}
+      <section className="home-search-float" aria-label="Search Programs">
+        <form className="home-search-form" onSubmit={handleSearch} role="search">
+          <div className="home-search-box">
+            <Search className="home-search-icon" size={19} strokeWidth={2} />
+            <input
+              type="text"
+              className="home-search-input"
+              placeholder="Explore courses"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              aria-label="Explore courses"
+            />
+            <button type="submit" className="home-search-submit">Search</button>
+          </div>
+        </form>
+      </section>
+
       <AccreditationsStrip />
 
       {/* ── Chapter 2: Institutional Impact & Stat Matrix ── */}
@@ -190,7 +218,7 @@ export default function Home() {
         <div className="container">
           <div className="study-intro reveal">
             <h2 className="section-title gradient-text">Study at VWU</h2>
-            <p className="section-desc"><strong>Think. Build. Lead.</strong><br />At VWU, education goes beyond the classroom. Experience personalized, industry-focused learning that builds technical expertise, leadership confidence, creativity, and the skills to shape your future.</p>
+            <p className="section-desc"><strong>Courses for Women</strong><br />At VWU, education goes beyond the classroom. Experience personalized, industry-focused learning that builds technical expertise, leadership confidence, creativity, and the skills to shape your future. Every course here is taught to women, in working laboratories, by faculty who bring industry into the classroom from the first year. All programmes are approved by AICTE and recognised by the UGC.</p>
           </div>
           <div className="study-grid">
             {studyCards.map((card, i) => {
@@ -225,12 +253,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Programs & Schools Explorer */}
-      <ProgramsShowcase />
-
-      {/* ── Chapter 4: The VWU Advantage — Women in STEM & Leadership ── */}
-      <WomensEducationSection />
-
+      {/* ── Chapter 3: Programme Finder ── */}
       {/* Recent Campus Activities */}
       <section className="activity-section" aria-label="Recent Activities">
         <div className="container">
@@ -277,12 +300,20 @@ export default function Home() {
       <PlacementMetricsSection />
       {/* Recent Placement Highlights — commented out, uncomment (and the import above) to restore.
       <PlacementSpotlightsSection /> */}
+      <YouTubeShowcase />
       <RecruitersSection />
       <CampusLifeShowcase />
       <HonouredGuestsSection />
+      <AlumniConnect />
 
-      {/* ── Chapter 6: Alumni Success & Testimonials ── */}
-      <TestimonialSlider testimonials={testimonials} />
+      {/* ── Chapter 6: Student Voices & Testimonials ── */}
+      <div className="student-voices-header reveal">
+        <div className="container">
+          <p className="section-eyebrow">Student Voices</p>
+          <h2 className="section-title gradient-text">What Our Students Say</h2>
+        </div>
+      </div>
+      <TestimonialSlider testimonials={testimonials} title="" />
 
       <UpcomingEvents happenings={upcomingHappenings} />
 

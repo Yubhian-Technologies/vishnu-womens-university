@@ -116,7 +116,6 @@ export default function Campus() {
       <section className="section bg-off-white">
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>
-            <span className="section-label">Infrastructure</span>
             <h2 className="section-title">World-Class Campus Facilities</h2>
             <p className="section-desc" style={{ margin: '0 auto' }}>
               Each facility at VWU has been developed to support students academically, promote personal well-being, and enrich campus life.
@@ -230,7 +229,6 @@ export default function Campus() {
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-16) 0' }}>
         <div className="container" style={{ textAlign: 'center' }}>
           <div className="reveal">
-            <span className="section-label" style={{ color: 'var(--color-accent)' }}>Experience VWU</span>
             <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>Come See Our Campus</h2>
             <p style={{ color: 'rgba(255,255,255,0.8)', maxWidth: 500, margin: '0 auto var(--space-8)' }}>
               Schedule a campus visit to tour the facilities in person, meet our faculty, and get a clear picture of life at VWU.

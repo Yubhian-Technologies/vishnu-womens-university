@@ -133,7 +133,7 @@ export default function CampusVisit() {
       <PageHero
         page="campus-visit"
         defaultTitle="Come See VWU for Yourself"
-        defaultSubtitle="Seeing VWU in person is the best way to know if it is the right fit for you. Choose the visit format that suits you best."
+        defaultSubtitle="Explore the campus, academic facilities and student environment before making your decision."
         breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Admissions', to: '/admissions' }, { label: 'Campus Visit' }]}
         scrollCtaTargetId="visit-picker"
       />
@@ -141,7 +141,6 @@ export default function CampusVisit() {
       <section id="visit-picker" className="section bg-off-white" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
         <div className="container">
           <div style={{ textAlign: 'center', maxWidth: 600, margin: '0 auto var(--space-10)' }}>
-            <span className="section-label">Campus Visits</span>
             <h2 className="section-title">Choose Your Visit</h2>
           </div>
 

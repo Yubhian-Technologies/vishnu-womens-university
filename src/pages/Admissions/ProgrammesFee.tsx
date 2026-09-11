@@ -119,7 +119,6 @@ export default function ProgrammesFee() {
       <section id="programmes-fee-content" className="section bg-off-white" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
         <div className="container">
           <div className="reveal" style={{ marginBottom: 'var(--space-8)' }}>
-            <span className="section-label">Undergraduate</span>
             <h2 className="section-title">{dotTech('B.Tech Programs')}</h2>
             <div style={{ display: 'flex', gap: 'var(--space-6)', flexWrap: 'wrap', marginTop: 'var(--space-4)' }}>
               {[
@@ -181,7 +180,6 @@ export default function ProgrammesFee() {
       <section className="section bg-white">
         <div className="container">
           <div className="reveal" style={{ marginBottom: 'var(--space-8)' }}>
-            <span className="section-label">Postgraduate</span>
             <h2 className="section-title">{dotTech('M.Tech Programs')}</h2>
             <div style={{ display: 'flex', gap: 'var(--space-6)', flexWrap: 'wrap', marginTop: 'var(--space-4)' }}>
               {[
@@ -219,7 +217,6 @@ export default function ProgrammesFee() {
       <section className="section bg-off-white">
         <div className="container">
           <div className="reveal" style={{ marginBottom: 'var(--space-8)' }}>
-            <span className="section-label">Management</span>
             <h2 className="section-title">MBA</h2>
             <div style={{ display: 'flex', gap: 'var(--space-6)', flexWrap: 'wrap', marginTop: 'var(--space-4)' }}>
               {[
@@ -256,7 +253,6 @@ export default function ProgrammesFee() {
       <section className="section bg-white">
         <div className="container">
           <div className="reveal" style={{ marginBottom: 'var(--space-8)' }}>
-            <span className="section-label">Doctoral</span>
             <h2 className="section-title">Ph.D. Programs</h2>
           </div>
           <div className="reveal" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 'var(--space-3)' }}>
@@ -275,7 +271,6 @@ export default function ProgrammesFee() {
         <div className="container">
           <div className="reveal" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-8)', flexWrap: 'wrap' }}>
             <div style={{ flex: 1, minWidth: 280 }}>
-              <span className="section-label" style={{ color: 'var(--color-accent)' }}>Financial Support</span>
               <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-3)' }}>PM Vidyalaxmi Scheme</h2>
               <p style={{ color: 'rgba(255,255,255,0.8)', lineHeight: 1.7 }}>
                 Meritorious students can avail financial assistance through the <strong style={{ color: 'var(--color-accent)' }}>PM Vidyalaxmi Scheme</strong>,

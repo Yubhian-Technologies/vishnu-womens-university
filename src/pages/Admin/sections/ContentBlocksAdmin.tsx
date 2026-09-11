@@ -8,6 +8,7 @@ import type { UploadResult } from '../../../lib/storage';
 import { useAdminSession } from '../AdminSessionContext';
 import ReadOnlyGate from '../ReadOnlyGate';
 import { canEdit, RESOURCES } from '../../../lib/rbac';
+import { Search } from 'lucide-react';
 
 // A single flexible content type used across many pages for their small
 // repeating text blocks (stat bars, icon+title+desc feature lists, highlight
@@ -135,6 +136,7 @@ export default function ContentBlocksAdmin() {
   const [editing, setEditing] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [filterKey, setFilterKey] = useState(`${CONTENT_BLOCK_SECTIONS[0].page}::${CONTENT_BLOCK_SECTIONS[0].section}`);
+  const [sectionSearch, setSectionSearch] = useState('');
   // This screen covers page-content blocks for the whole site, not just
   // Placements, so — like Hero Banners — permission is scoped per item
   // rather than to the section as a whole.
@@ -147,6 +149,12 @@ export default function ContentBlocksAdmin() {
     const [page, section] = filterKey.split('::');
     return blocks.filter((b) => b.page === page && b.section === section);
   }, [blocks, filterKey]);
+
+  const filteredSections = useMemo(() => {
+    if (!sectionSearch.trim()) return CONTENT_BLOCK_SECTIONS;
+    const q = sectionSearch.toLowerCase();
+    return CONTENT_BLOCK_SECTIONS.filter((s) => s.label.toLowerCase().includes(q));
+  }, [sectionSearch]);
 
   const save = async () => {
     if (!form.page || !form.section || !form.title) return alert('Page, section, and title are required.');
@@ -229,7 +237,7 @@ export default function ContentBlocksAdmin() {
                 </>
               ) : (
                 <>
-                  <label>Anchor Slug / Extra field (only if this item needs a #link — a second meta line for Contact Info Cards, or the click-through link for Student Life Clubs — an external https:// URL or an internal /path)</label>
+                  <label>Anchor Slug / Extra field (only if this item needs a #link — a second meta line for Contact Info Cards, the click-through link for Student Life Clubs — an external https:// URL or an internal /path — or the CTA button text for Admissions Visit Options, e.g. "Book a Campus Tour")</label>
                   <input value={form.slug} onChange={(e) => set('slug', e.target.value)} placeholder="smart-classrooms" />
                 </>
               )}
@@ -259,11 +267,24 @@ export default function ContentBlocksAdmin() {
       <div className="admin-card">
         <div className="admin-card__toolbar">
           <h2 className="admin-card__title">Items ({filtered.length})</h2>
-          <select value={filterKey} onChange={(e) => setFilterKey(e.target.value)} className="admin-select-sm">
-            {CONTENT_BLOCK_SECTIONS.map((s) => (
-              <option key={`${s.page}::${s.section}`} value={`${s.page}::${s.section}`}>{s.label}</option>
-            ))}
-          </select>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'flex-end' }}>
+            <div style={{ position: 'relative' }}>
+              <Search size={14} style={{ position: 'absolute', left: 8, top: '50%', transform: 'translateY(-50%)', opacity: 0.5 }} />
+              <input
+                type="text"
+                placeholder="Search sections…"
+                value={sectionSearch}
+                onChange={(e) => setSectionSearch(e.target.value)}
+                className="admin-select-sm"
+                style={{ paddingLeft: 28, width: 220 }}
+              />
+            </div>
+            <select value={filterKey} onChange={(e) => setFilterKey(e.target.value)} className="admin-select-sm">
+              {filteredSections.map((s) => (
+                <option key={`${s.page}::${s.section}`} value={`${s.page}::${s.section}`}>{s.label}</option>
+              ))}
+            </select>
+          </div>
         </div>
         {loading ? <p className="admin-loading">Loading…</p> : (
           <div className="admin-table-wrap">

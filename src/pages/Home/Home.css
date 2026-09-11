@@ -28,9 +28,80 @@
   transform: scale(1) translateY(0);
 }
 
+/* ===== Programme Finder Section ===== */
+
+.programme-finder-section {
+  position: relative;
+  overflow: hidden;
+  padding: var(--space-20) 0;
+  background: #ffffff;
+}
+
+.programme-finder-header {
+  text-align: center;
+  margin-bottom: var(--space-10);
+}
+
+.programme-finder-eyebrow {
+  margin: 0 0 0.4rem 0;
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-accent, #C9A84C);
+}
+
+/* ===== Student Voices Section =====
+   The header sits above TestimonialSlider without an explicit section
+   wrapper — the .student-voices-header provides the navy background
+   and the testimonial cards render below with their own background. */
+
+.student-voices-header {
+  background: #0B1E42;
+  padding: var(--space-20) 0;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.student-voices-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 12%;
+  right: 12%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(201, 151, 58, 0.7), transparent);
+}
+
+.student-voices-header .section-eyebrow {
+  margin: 0 0 0.4rem 0;
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-accent, #C9A84C);
+}
+
+.student-voices-header .section-title {
+  margin-bottom: 0;
+}
+
 /* ===== Utilities ===== */
 
 .home-page { overflow-x: hidden; }
+
+.section-eyebrow {
+  margin: 0 0 0.4rem 0;
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-accent, #C9A84C);
+}
 
 .gradient-text {
   background: linear-gradient(135deg, var(--color-primary) 0%, #52b788 45%, var(--color-accent) 100%);
@@ -289,6 +360,125 @@
   transform: translateY(-2px);
 }
 
+/* ===== Search Bar — floats on the Hero/Accreditations seam ===== */
+
+/* No background/padding of its own — this section is just a centering
+   shell for the pill. The negative margin-top pulls it up so roughly half
+   its height overlaps the hero's bottom edge and half sits over the
+   Accreditations strip below, and the positive z-index (above the hero's
+   highest z-index of 10) keeps it painting on top of both neighbours. */
+.home-search-float {
+  position: relative;
+  z-index: 20;
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--space-4) clamp(1.5rem, 3vw, 2.25rem);
+  margin-top: -30px;
+}
+
+.home-search-form {
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+.home-search-box {
+  display: flex;
+  align-items: center;
+  background: var(--color-white);
+  border: 1px solid var(--color-light-gray);
+  border-radius: var(--radius-full);
+  padding: 6px 6px 6px 20px;
+  box-shadow: var(--shadow-lg);
+  transition: box-shadow var(--transition-base), border-color var(--transition-base);
+}
+
+.home-search-box:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.home-search-box:focus-within {
+  box-shadow: 0 0 0 3px rgba(11, 30, 66, 0.12);
+}
+
+.home-search-icon {
+  color: var(--color-primary);
+  opacity: 0.8;
+  flex-shrink: 0;
+  margin-right: 10px;
+  pointer-events: none;
+}
+
+.home-search-input {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  border: none;
+  outline: none;
+  box-shadow: none;
+  background: transparent;
+  font-size: var(--text-base);
+  color: var(--color-text);
+  font-weight: 600;
+  font-family: inherit;
+  padding: 6px 0;
+}
+
+/* Overrides global.css's input:focus-visible outline (higher specificity
+   there than this input's own `outline: none` above) — the pill wrapper's
+   .home-search-box:focus-within box-shadow ring is the focus indicator for
+   this field instead. */
+.home-search-input:focus-visible {
+  outline: none;
+}
+
+.home-search-input::placeholder {
+  color: var(--color-text-light);
+  font-weight: 500;
+}
+
+.home-search-submit {
+  background: var(--color-accent);
+  color: var(--color-primary);
+  border: none;
+  border-radius: var(--radius-full);
+  min-height: 48px;
+  padding: 0.65rem 1.6rem;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background-color var(--transition-fast), transform var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.home-search-submit:hover {
+  background: var(--color-accent-light);
+}
+
+.home-search-submit:active {
+  transform: scale(0.97);
+}
+
+@media (max-width: 480px) {
+  .home-search-float {
+    margin-top: -22px;
+  }
+
+  .home-search-box {
+    padding: 5px 5px 5px 14px;
+  }
+
+  .home-search-input {
+    font-size: 0.92rem;
+  }
+
+  .home-search-submit {
+    padding: 0.55rem 1.1rem;
+    font-size: 0.82rem;
+  }
+}
+
 /* ===== Study Section ===== */
 
 .study-section {
@@ -379,7 +569,7 @@
 .study-card-title {
   font-family: var(--font-serif);
   font-size: 1.25rem;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.3;
   color: var(--study-navy);
   margin: 0 0 var(--space-2);

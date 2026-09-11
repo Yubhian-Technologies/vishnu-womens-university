@@ -32,9 +32,9 @@
 .glance-title {
   font-family: var(--font-serif);
   font-size: clamp(1.8rem, 3.2vw, 2.5rem);
-  font-weight: 800;
+  font-weight: 600;
   color: #0B1E42;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
   margin: 0 0 0.55rem 0;
 }
 
@@ -46,11 +46,11 @@
   margin: 0;
 }
 
-/* ── Navy Metrics Card ── */
+/* ── Navy Metrics Bar — full-width horizontal stats row ── */
 .glance-unified-card {
   background: #0B1E42;
   border-radius: 18px;
-  padding: clamp(1.35rem, 2vw, 1.75rem) clamp(1rem, 2.5vw, 2rem);
+  padding: clamp(1.35rem, 2vw, 1.75rem) clamp(1.25rem, 3vw, 2.5rem);
   box-shadow: 0 14px 36px rgba(11, 30, 66, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(201, 151, 58, 0.22);
   position: relative;
@@ -66,11 +66,13 @@
   background: linear-gradient(90deg, transparent, rgba(201, 151, 58, 0.7), transparent);
 }
 
-/* ── Stats Grid & Subtle Vertical Dividers ── */
+/* ── Stats Row & Subtle Vertical Dividers ── */
 .glance-stats-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  display: flex;
+  flex: 1;
   align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
 }
 
 .glance-stat-item {
@@ -78,20 +80,22 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 0.9rem 0.5rem;
+  padding: 0.5rem 1rem;
   position: relative;
   transition: transform 200ms ease;
   cursor: default;
+  flex: 1;
 }
 
 .glance-stat-item:not(:last-child)::after {
   content: '';
   position: absolute;
+  top: 50%;
   right: 0;
-  top: 18%;
-  height: 64%;
+  transform: translateY(-50%);
   width: 1px;
-  background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+  height: 60%;
+  background: rgba(255, 255, 255, 0.14);
 }
 
 .glance-stat-item:hover {
@@ -136,30 +140,21 @@
 }
 
 /* ==========================================================================
-   Responsive — 7 columns desktop · 3 columns tablet · 2 columns mobile
+   Responsive — single horizontal row on desktop, stacked below tablet
    ========================================================================== */
 
-@media (max-width: 1099px) {
+@media (max-width: 900px) {
   .glance-stats-grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.6rem clamp(1rem, 3vw, 2.5rem);
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .glance-stat-item {
+    flex: 1 1 40%;
   }
 
   .glance-stat-item::after {
     display: none;
-  }
-
-  .glance-stat-item {
-    border-right: 1px solid rgba(255, 255, 255, 0.07);
-  }
-
-  .glance-stat-item:nth-child(3n),
-  .glance-stat-item:last-child {
-    border-right: none;
-  }
-
-  .glance-stat-item:nth-child(7) {
-    grid-column: 1 / -1;
   }
 }
 
@@ -170,28 +165,15 @@
   }
 
   .glance-stats-grid {
-    grid-template-columns: repeat(2, 1fr);
     gap: 1.35rem 0;
   }
 
   .glance-stat-item {
+    flex: 1 1 45%;
     padding: 0.75rem 0.5rem;
-    border-right: 1px solid rgba(255, 255, 255, 0.07);
-  }
-
-  .glance-stat-item:nth-child(2n) {
-    border-right: none;
-  }
-
-  .glance-stat-item:nth-child(7) {
-    grid-column: 1 / -1;
   }
 
   .glance-stat-number {
     font-size: 2rem;
-  }
-
-  .glance-header {
-    margin-bottom: 1.5rem;
   }
 }

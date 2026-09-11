@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams, useLocation, Navigate } from 'react-router-dom';
-import { Check, Microscope, Mail, ExternalLink, BookOpen, FileText, GraduationCap, Calendar, Award, Users, ArrowRight, BookMarked, Bookmark, Library } from 'lucide-react';
+import { Check, Mail, ExternalLink, BookOpen, FileText, GraduationCap, Calendar, Award, Users, BookMarked, Bookmark, Library } from 'lucide-react';
 import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import ProgrammeStructure from '../../components/ProgrammeStructure/ProgrammeStructure';
@@ -11,6 +11,7 @@ import DepartmentDetail from './DepartmentDetail';
 import StandaloneDepartmentDetail from './StandaloneDepartmentDetail';
 import { groupForProgramSlug, standaloneDepartmentForSlug } from '../../lib/departmentGroups';
 import FacultyCarousel from '../../components/FacultyCarousel/FacultyCarousel';
+import LabsCarousel from '../../components/LabsCarousel/LabsCarousel';
 import TestimonialMarquee, { PlacementRecordCard, type PlacementItem } from '../../components/ui/marquee-01';
 import { Marquee } from '../../components/ui/marquee-01-utils/marquee';
 
@@ -77,8 +78,7 @@ import { usePageBanner } from '../../hooks/usePageBanner';
 import { useEapcetCode } from '../../hooks/useContentBlocks';
 import { smoothScrollTo } from '../../lib/smoothScroll';
 import { fetchPriorityAttr } from '../../lib/domAttrs';
-import { normalizeLab, normalizeMindMapImages, type ProgramDoc, type NewsEventsYear, type LabItem } from '../Admin/sections/ProgramsAdmin';
-import LabDialog from '../../components/LabDialog/LabDialog';
+import { normalizeLab, normalizeMindMapImages, type ProgramDoc, type NewsEventsYear } from '../Admin/sections/ProgramsAdmin';
 import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import type { FacultyDoc } from './Faculty';
 import RndSection, { resolveRndYears, rndYearsHaveContent } from '../../components/RndSection/RndSection';
@@ -129,7 +129,6 @@ function SingleProgramDetail() {
   // Which Academic Year's internship records are shown — same pattern as
   // the Placements pair above.
   const [internshipYear, setInternshipYear] = useState<string | null>(null);
-  const [activeLab, setActiveLab] = useState<LabItem | null>(null);
   const { docs: allPrograms, loading } = useOrderedCollection<ProgramDoc>('programs', 'order');
   const program = allPrograms.find((p) => p.slug === slug);
 
@@ -687,7 +686,6 @@ function SingleProgramDetail() {
             {/* Main content */}
             <div className="dept-about-main">
               <div className="dept-about-header">
-                <span className="section-label dept-section-label">Department Overview</span>
                 <h2 className="section-title">{deptTitle || program.shortName || program.name}</h2>
               </div>
 
@@ -732,7 +730,6 @@ function SingleProgramDetail() {
           <div className={sidebarHost === 'hod' ? 'detail-grid' : ''}>
           <div>
             <div style={{ marginBottom: 'var(--space-10)' }}>
-              <span className="section-label dept-section-label">Academic Leadership</span>
               <h2 className="section-title">Brief Profile</h2>
             </div>
             <div className="dept-hod-editorial-card">
@@ -852,7 +849,7 @@ function SingleProgramDetail() {
           <FacultyCarousel
             faculty={faculty}
             departmentName={deptTitle || program.name}
-            title="Meet Our Faculty"
+            title="The People Behind Expertise"
             viewMoreLink="/faculty"
           />
         </div>
@@ -864,11 +861,9 @@ function SingleProgramDetail() {
           <div className="container">
             {!hasDeptAbout && (
               <div className="dept-about-header">
-                <span className="section-label dept-section-label">About the Programme</span>
                 <h2 className="section-title">{deptTitle || program.shortName || program.name}</h2>
               </div>
             )}
-            {hasDeptAbout && <span className="section-label dept-section-label">About the Programme</span>}
             <div className="dept-about-card">
               <p className="dept-about-lead-text">
                 {program.about}
@@ -883,7 +878,6 @@ function SingleProgramDetail() {
         <section id="highlights" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
           <div className="container">
             <div style={{ marginBottom: 'var(--space-5)' }}>
-              <span className="section-label dept-section-label">Key Strengths</span>
               <h3 className="section-title" style={{ fontSize: '1.4rem' }}>
                 Programme Highlights
               </h3>
@@ -907,7 +901,6 @@ function SingleProgramDetail() {
         <section id="peos-pos-psos" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
           <div className="container">
             <div style={{ marginBottom: 'var(--space-10)' }}>
-              <span className="section-label dept-section-label">Outcome-Based Education</span>
               <h2 className="section-title">{outcomeHeading}</h2>
               <p className="section-desc" style={{ margin: '0.5rem 0 0 0' }}>
                 Structured educational objectives and measurable competencies defined in accordance with NBA & Washington Accord frameworks.
@@ -966,7 +959,6 @@ function SingleProgramDetail() {
         <section id="mindmap" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
           <div className="container">
             <div style={{ marginBottom: 'var(--space-10)' }}>
-              <span className="section-label">Curriculum Overview</span>
               <h2 className="section-title">Mind Map</h2>
               <p className="section-desc">A visual overview of how the programme&apos;s courses and specialisations connect together.</p>
             </div>
@@ -1002,7 +994,6 @@ function SingleProgramDetail() {
         <section id="curriculum" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
           <div className="container">
             <div style={{ marginBottom: 'var(--space-10)' }}>
-              <span className="section-label">Curriculum</span>
               <h2 className="section-title">Programme Structure</h2>
               <p className="section-desc">A well-structured curriculum blending core foundations with advanced specialisations and practical projects.</p>
             </div>
@@ -1011,78 +1002,9 @@ function SingleProgramDetail() {
         </section>
       )}
 
-      {/* Laboratories (Italian-Inspired Sleek Showcase) */}
       {hasLabs && (
-        <section id="labs" className="dept-labs-section" style={{ scrollMarginTop: NAV_OFFSET }}>
-          <div className="container">
-            <div className="dept-labs-header">
-              <div className="dept-labs-title-wrap">
-                <span className="section-label dept-section-label">State-of-the-Art Infrastructure</span>
-                <h2 className="section-title">Specialized Laboratories</h2>
-                <p className="section-desc" style={{ margin: '0.5rem 0 0 0' }}>
-                  Industry-aligned experimental facilities engineered for hands-on technical immersion, advanced computing, and multidisciplinary project incubation.
-                </p>
-              </div>
-              <div className="dept-labs-count-pill">
-                <span className="dept-labs-count-dot" />
-                <span>{labs.length} Active Facilities</span>
-              </div>
-            </div>
-
-            {/* Tile always stays visible even with no PDF yet — just marked
-                unavailable in the dialog, same convention as the Newsletter
-                issues above. Tapping opens LabDialog (description + PDF
-                link) rather than jumping straight to the PDF, since a lab
-                with a description but no PDF would otherwise have nothing
-                to tap through to. */}
-            <div className="dept-labs-grid">
-              {labs.map((lab, li) => {
-                const indexNum = String(li + 1).padStart(2, '0');
-
-                return (
-                  <button
-                    key={li}
-                    type="button"
-                    onClick={() => setActiveLab(lab)}
-                    className="dept-lab-card"
-                    style={{ font: 'inherit', textAlign: 'left', cursor: 'pointer', width: '100%' }}
-                    aria-label={`View ${lab.name} details`}
-                  >
-                    <div>
-                      <div className="dept-lab-card-top">
-                        <span className="dept-lab-index-tag">{indexNum}</span>
-                        <div className="dept-lab-icon-wrap">
-                          <Microscope size={18} strokeWidth={2.2} />
-                        </div>
-                      </div>
-
-                      <div className="dept-lab-body">
-                        <span className="dept-lab-overline">Practical & Research Facility</span>
-                        <h3 className="dept-lab-title">{lab.name}</h3>
-                        <p className="dept-lab-spec-desc">
-                          Equipped with high-performance workstations, licensed toolsets, and dedicated experimental apparatus.
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="dept-lab-footer">
-                      <span className="dept-lab-pdf-btn-label">
-                        <FileText size={13} strokeWidth={2.4} />
-                        <span>{lab.pdfUrl ? 'Lab Manual & Specs' : 'View Details'}</span>
-                      </span>
-                      <span className="dept-btn-arrow-circle">
-                        <ArrowRight size={12} strokeWidth={2.5} />
-                      </span>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </section>
+        <LabsCarousel labs={labs} navOffset={NAV_OFFSET} fallbackImage={programImage} />
       )}
-
-      <LabDialog lab={activeLab} onClose={() => setActiveLab(null)} />
 
       {/* Placements — admin-imported from Excel/CSV per Academic Year (see
           PlacementYearsEditor in ProgramsAdmin.tsx), every column shown
@@ -1094,7 +1016,6 @@ function SingleProgramDetail() {
         <section id="placements" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label">Careers</span>
               <h2 className="section-title">Placements</h2>
             </div>
             <div className="placement-year-pills">
@@ -1158,7 +1079,6 @@ function SingleProgramDetail() {
             <div id="placement-records-table" style={{ marginTop: 'var(--space-8)' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-4)', flexWrap: 'wrap', gap: '0.75rem' }}>
                 <div>
-                  <span className="section-label dept-section-label">Student Success</span>
                   <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: '1.2rem', fontWeight: 800, color: 'var(--color-primary-dark)', margin: '0.2rem 0 0 0' }}>
                     Placement Offers &amp; Organizations {activePlacementYear?.year ? `(${activePlacementYear.year})` : ''}
                   </h3>
@@ -1181,7 +1101,6 @@ function SingleProgramDetail() {
         <section id="internships" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label">Careers</span>
               <h2 className="section-title">Internships</h2>
             </div>
             <div className="placement-year-pills">
@@ -1226,7 +1145,6 @@ function SingleProgramDetail() {
             <div id="internship-records-table" style={{ marginTop: 'var(--space-8)' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-4)', flexWrap: 'wrap', gap: '0.75rem' }}>
                 <div>
-                  <span className="section-label dept-section-label">Student Success</span>
                   <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: '1.2rem', fontWeight: 800, color: 'var(--color-primary-dark)', margin: '0.2rem 0 0 0' }}>
                     Internship Offers &amp; Organizations ({activeInternshipYear?.year})
                   </h3>
@@ -1253,7 +1171,6 @@ function SingleProgramDetail() {
         <section id="library" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label dept-section-label">Academic Repository</span>
               <h2 className="section-title">Department Library</h2>
             </div>
 
@@ -1320,7 +1237,7 @@ function SingleProgramDetail() {
 
       {/* News & Events — Compact Collapsible Academic-Year List */}
       {hasNewsEventsYears && (
-        <NewsEventsTabs categories={newsEventsCategories} eyebrow={deptTitle || program.shortName || program.name} navOffset={NAV_OFFSET} />
+        <NewsEventsTabs categories={newsEventsCategories} navOffset={NAV_OFFSET} />
       )}
 
       {/* News & Events — live from the departmentNews collection, tagged to
@@ -1337,7 +1254,6 @@ function SingleProgramDetail() {
         <section id="newsletter" className="section bg-white" style={{ scrollMarginTop: NAV_OFFSET }}>
           <div className="container">
             <div style={{ marginBottom: 'var(--space-8)' }}>
-              <span className="section-label">Publications</span>
               <h2 className="section-title">Newsletter</h2>
             </div>
             <div className="pb-activities-scroll">

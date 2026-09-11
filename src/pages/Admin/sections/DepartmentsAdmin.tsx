@@ -1,14 +1,17 @@
-import { useState } from 'react';
+import { useState, type ChangeEvent } from 'react';
 import { collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
-import { useOrderedCollection } from '../../../hooks/useCollection';
+import { useOrderedCollection, useCollection, type WithId } from '../../../hooks/useCollection';
 import ImageUploader from '../../../components/ImageUploader/ImageUploader';
 import FileUploader from '../../../components/FileUploader/FileUploader';
+import VideoUploader from '../../../components/VideoUploader/VideoUploader';
 import { deleteFile, type UploadResult } from '../../../lib/storage';
 import { PROGRAM_ICON_NAMES } from '../../../lib/programIcons';
 import { normalizeLab, stripUndefined, type LabItem, type LibrarySection, type LibraryItem, type NewsEventsYear, type ProgramLink, type ProgramDoc, type RndLink, type NewsletterYear, type RndYear } from './ProgramsAdmin';
 import type { RndStructuredTable } from './RndTableEditor';
-import type { PlacementYearRecord } from '../../../lib/placementRecords';
+import { sortPlacementRows, findCompanyColumnIndex, findPackageColumnIndex, formatPackageCell, type PlacementYearRecord } from '../../../lib/placementRecords';
+import { PARTNER_DOMAINS } from '../../../components/TieUpMoUS/TieUpMoUSSection';
+import type { MousPartnerLogoDoc } from './MousPartnerLogosAdmin';
 import type { InternshipYearRecord } from '../../../lib/internshipRecords';
 import { diffChangedFields, describeSaveError } from '../../../lib/formDiff';
 import { PlacementYearsEditor, InternshipYearsEditor, RndEditor, NewsletterYearsEditor } from './ProgramCareerEditors';
@@ -34,6 +37,43 @@ import { useAdminSession } from '../AdminSessionContext';
 export interface ProgramLevelRow {
   program: string;
   intake: string;
+}
+
+export interface FaqItem {
+  question: string;
+  answer: string;
+}
+
+export interface SuccessStoryItem {
+  name: string;
+  programme?: string;
+  description?: string;
+  photoUrl?: string;
+  photoStoragePath?: string;
+}
+
+// Own type/field so "What Our Students Say" never shares data with the
+// Success Stories carousel above it — each section reads only its own
+// admin-entered content (see DepartmentDetail.tsx).
+export interface TestimonialItem {
+  name: string;
+  programme?: string;
+  description?: string;
+  photoUrl?: string;
+  photoStoragePath?: string;
+}
+
+// Research & Innovation section — stat tiles + photo slides.
+export interface ResearchStat {
+  value: string;   // e.g. "2500+"
+  label: string;   // e.g. "Publications"
+}
+
+export interface ResearchSlide {
+  title: string;        // e.g. "Paper Published"
+  desc: string;         // caption text
+  imageUrl?: string;    // faculty/research photo
+  imagePath?: string;   // Storage path for deletion
 }
 
 export interface ProgramLevel {
@@ -64,6 +104,8 @@ export interface DepartmentDoc {
   highlights?: string[];
   established?: string;
   accreditation?: string;
+  accreditationImage?: string;
+  accreditationStoragePath?: string;
   hod?: string;
   hodImage?: string;
   hodImageStoragePath?: string;
@@ -92,6 +134,9 @@ export interface DepartmentDoc {
   placementIntro?: string;
   placementStats?: LibraryItem[];
   placementRecruiters?: string[];
+  // Tie-Ups & MoUs — institutional/academic partner names, shown as a
+  // rectangular logo tile grid (same layout as Top Recruiters above).
+  tieUpsMous?: string[];
   // Placements/Internships/Research & Development/Newsletter records — one
   // shared dataset per department (a department that groups more than one
   // programme, e.g. "AI" grouping ai-ds/ai-ml, has exactly ONE set of these,
@@ -160,20 +205,39 @@ export interface DepartmentDoc {
   // rendered alongside (not instead of) the grouped department page's
   // existing Program-sourced customSections.
   customSections?: CustomSection[];
+  // FAQs shown on this department's page (grouped AI/CSE/ECE pages via
+  // DepartmentDetail.tsx) — per-department, unlike the shared "faqs"
+  // Firestore collection (page: 'admissions') used by FaqAdmin.tsx.
+  faqs?: FaqItem[];
+  // Success Stories carousel on this department's page — admin-curated
+  // only, no auto-generated fallback (see DepartmentDetail.tsx).
+  successStories?: SuccessStoryItem[];
+  // "What Our Students Say" testimonials — a separate curated list, NOT
+  // shared with successStories above, so the two sections never show
+  // identical content.
+  testimonials?: TestimonialItem[];
+  // Research & Innovation section — 4 stat tiles + carousel slides.
+  researchStats?: ResearchStat[];
+  researchSlides?: ResearchSlide[];
 }
 
 const EMPTY: Omit<DepartmentDoc, 'id'> = {
   title: '', shortCode: '', description: '', icon: 'GraduationCap', order: 0,
-  heroImage: '', storagePath: '', tagline: '', about: '', highlights: [], established: '', accreditation: '',
+  heroImage: '', storagePath: '', tagline: '', about: '', highlights: [], established: '', accreditation: '', accreditationImage: '', accreditationStoragePath: '',
   hod: '', hodImage: '', hodImageStoragePath: '', hodEmail: '', hodMessage: '', hodResearchProfiles: [],
   vision: '', mission: [], coreValues: [], labs: [],
   libraryIntro: '', libraryInCharge: '', librarySections: [],
   programLevels: [],
-  placementIntro: '', placementStats: [], placementRecruiters: [],
+  placementIntro: '', placementStats: [], placementRecruiters: [], tieUpsMous: [],
   newsEventsYears: [], studentAwardsYears: [], othersYears: [],
   newsEventsSections: [],
   awardsSections: [],
   customSections: [],
+  faqs: [],
+  successStories: [],
+  testimonials: [],
+  researchStats: [],
+  researchSlides: [],
 };
 
 function linesToArray(text: string): string[] {
@@ -214,9 +278,66 @@ function programRichness(p: ProgramDoc): number {
     + (p.libraryIntro || p.libraryInCharge || p.librarySections?.length ? 50 : 0);
 }
 
+// Search-to-add widget for Recruiters/Tie-Ups & MoUs below — lets an admin
+// pick a name that's already known to resolve to a real logo (either
+// uploaded via Admin → Recruiter Logos, or the built-in favicon-domain
+// list) instead of free-typing a name that might not match exactly and so
+// never gets a logo on the public page (see RecruiterTile in
+// DepartmentDetail.tsx).
+function CompanySearchAdd({ known, current, onAdd }: { known: string[]; current: string[]; onAdd: (name: string) => void }) {
+  const [q, setQ] = useState('');
+  const query = q.trim().toLowerCase();
+  const currentLower = new Set(current.map((n) => n.toLowerCase()));
+  const matches = query
+    ? known.filter((n) => n.toLowerCase().includes(query) && !currentLower.has(n.toLowerCase())).slice(0, 8)
+    : [];
+  return (
+    <div style={{ marginBottom: '0.5rem' }}>
+      <input
+        value={q}
+        onChange={(e) => setQ(e.target.value)}
+        placeholder="Search a company/institution with a known logo to add…"
+        style={{ width: '100%' }}
+      />
+      {matches.length > 0 && (
+        <div style={{ border: '1px solid var(--color-light-gray)', borderRadius: 6, marginTop: '0.25rem', maxHeight: 180, overflowY: 'auto' }}>
+          {matches.map((name) => (
+            <button
+              key={name}
+              type="button"
+              onClick={() => { onAdd(name.toLowerCase()); setQ(''); }}
+              style={{ display: 'block', width: '100%', textAlign: 'left', padding: '0.4rem 0.6rem', border: 'none', borderBottom: '1px solid var(--color-light-gray)', background: 'none', cursor: 'pointer' }}
+            >
+              {name}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function DepartmentsAdmin() {
   const { docs: departments, loading } = useOrderedCollection<DepartmentDoc>('departments', 'order');
   const { docs: allPrograms } = useOrderedCollection<ProgramDoc>('programs', 'order');
+  // Known company/institution names with a real logo — Admin → Recruiter
+  // Logos uploads plus the built-in favicon-domain list — powers the
+  // Recruiters/Tie-Ups & MoUs search-to-add widgets below.
+  const { docs: recruiterLogoDocs } = useCollection<WithId & { imageUrl?: string }>('recruiterLogos');
+  const knownCompanyNames = Array.from(new Set([...recruiterLogoDocs.map((d) => d.id), ...Object.keys(PARTNER_DOMAINS)])).sort();
+  // Known MoU partner names with a real logo — Admin → Research → MoUs →
+  // Partner Logos (`mousPartnerLogos`), the actual source a department's
+  // Tie-Ups & MoUs field needs to exact-match against (see RecruiterTile /
+  // mousPartnerLogoMap in DepartmentDetail.tsx). Listed first in the
+  // Tie-Ups & MoUs search-to-add widget below since that's the collection
+  // this field is meant to connect to; recruiter/company names remain
+  // available too for tie-ups that are actually industry recruiters.
+  const { docs: mousPartnerLogoDocs } = useOrderedCollection<MousPartnerLogoDoc>('mousPartnerLogos', 'order');
+  const knownMousPartnerNames = Array.from(new Set(mousPartnerLogoDocs.map((d) => d.label.trim()).filter(Boolean))).sort();
+  // MoU partner names first (unsorted-relative-to-companies) so
+  // CompanySearchAdd's match order surfaces them ahead of recruiter/company
+  // names for this field.
+  const knownTieUpNames = Array.from(new Set([...knownMousPartnerNames, ...knownCompanyNames]));
   const session = useAdminSession();
   // A scoped (non-admin/superadmin) account is restricted to the one
   // department it was assigned in Users & Roles — that field was previously
@@ -237,7 +358,7 @@ export default function DepartmentsAdmin() {
   const [saving, setSaving] = useState(false);
   const [copying, setCopying] = useState(false);
 
-  const set = (k: string, v: string | number | string[] | LibrarySection[] | ProgramLevel[] | LibraryItem[] | LabItem[] | NewsEventsYear[] | ProgramLink[] | CustomSection[]) => setForm((p) => ({ ...p, [k]: v }));
+  const set = (k: string, v: string | number | string[] | LibrarySection[] | ProgramLevel[] | LibraryItem[] | LabItem[] | NewsEventsYear[] | ProgramLink[] | CustomSection[] | FaqItem[] | SuccessStoryItem[] | TestimonialItem[] | ResearchStat[] | ResearchSlide[]) => setForm((p) => ({ ...p, [k]: v }));
   const handleHero = (r: UploadResult) => setForm((p) => ({ ...p, heroImage: r.url, storagePath: r.path }));
   const handleHodImage = (r: UploadResult) => setForm((p) => ({ ...p, hodImage: r.url, hodImageStoragePath: r.path }));
 
@@ -518,6 +639,18 @@ export default function DepartmentsAdmin() {
   const handleLabPdf = (li: number, r: UploadResult) => {
     setForm((p) => ({ ...p, labs: (p.labs || []).map(normalizeLab).map((l, i) => (i === li ? { ...l, pdfUrl: r.url, pdfStoragePath: r.path } : l)) }));
   };
+  const handleLabImage = (li: number, r: UploadResult) => {
+    setForm((p) => ({ ...p, labs: (p.labs || []).map(normalizeLab).map((l, i) => (i === li ? { ...l, imageUrl: r.url, imageStoragePath: r.path } : l)) }));
+  };
+  const handleLabVideo = (li: number, r: UploadResult) => {
+    setForm((p) => ({ ...p, labs: (p.labs || []).map(normalizeLab).map((l, i) => (i === li ? { ...l, videoUrl: r.url, videoStoragePath: r.path } : l)) }));
+  };
+  // VideoUploader's own "Remove" button already deletes the Storage file
+  // and calls onRemoved (see VideoUploader.tsx's handleRemove) — this just
+  // clears the field on the form, no second delete/confirm needed.
+  const removeLabVideo = (li: number) => {
+    setForm((p) => ({ ...p, labs: (p.labs || []).map(normalizeLab).map((l, i) => (i === li ? { ...l, videoUrl: '', videoStoragePath: '' } : l)) }));
+  };
   const removeLabPdf = async (li: number) => {
     const lab = labs[li];
     if (!lab?.pdfUrl) return;
@@ -635,6 +768,146 @@ export default function DepartmentsAdmin() {
     set('placementStats', placementStats.filter((_, i) => i !== si));
   };
 
+  // FAQs — shown on this department's public page (see DepartmentDetail.tsx).
+  // Plain array on the department doc, same add/move/remove pattern as
+  // Placement Stats above; saved as part of the normal Update flow, not a
+  // separate Firestore write.
+  const faqs = form.faqs || [];
+  const addFaq = () => set('faqs', [...faqs, { question: '', answer: '' }]);
+  const updateFaq = (fi: number, patch: Partial<FaqItem>) => {
+    set('faqs', faqs.map((f, i) => (i === fi ? { ...f, ...patch } : f)));
+  };
+  const moveFaq = (fi: number, dir: -1 | 1) => {
+    const next = [...faqs];
+    const target = fi + dir;
+    if (target < 0 || target >= next.length) return;
+    [next[fi], next[target]] = [next[target], next[fi]];
+    set('faqs', next);
+  };
+  const removeFaq = (fi: number) => set('faqs', faqs.filter((_, i) => i !== fi));
+
+  const [faqImportText, setFaqImportText] = useState('');
+  const loadFaqImportFile = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) file.text().then(setFaqImportText);
+    e.target.value = '';
+  };
+  const importFaqsJson = () => {
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(faqImportText);
+    } catch {
+      return alert('That is not valid JSON.');
+    }
+    if (!Array.isArray(parsed)) return alert('Expected a JSON array of FAQ objects.');
+    const rows = parsed as Array<Partial<FaqItem>>;
+    const bad = rows.findIndex((r) => !r || typeof r.question !== 'string' || typeof r.answer !== 'string');
+    if (bad !== -1) return alert(`Entry ${bad + 1} is missing a "question" or "answer" string.`);
+    set('faqs', [...faqs, ...rows.map((r) => ({ question: r.question!, answer: r.answer! }))]);
+    setFaqImportText('');
+  };
+
+  // Success Stories carousel — shown on this department's public page,
+  // admin-curated only, no auto-generated fallback (see DepartmentDetail.tsx).
+  const successStories = form.successStories || [];
+  const addSuccessStory = () => set('successStories', [...successStories, { name: '', programme: '', description: '' }]);
+  const updateSuccessStory = (si: number, patch: Partial<SuccessStoryItem>) => {
+    set('successStories', successStories.map((s, i) => (i === si ? { ...s, ...patch } : s)));
+  };
+  const moveSuccessStory = (si: number, dir: -1 | 1) => {
+    const next = [...successStories];
+    const target = si + dir;
+    if (target < 0 || target >= next.length) return;
+    [next[si], next[target]] = [next[target], next[si]];
+    set('successStories', next);
+  };
+  const removeSuccessStory = (si: number) => set('successStories', successStories.filter((_, i) => i !== si));
+  const handleSuccessStoryPhoto = (si: number, r: UploadResult) => {
+    set('successStories', successStories.map((s, i) => (i === si ? { ...s, photoUrl: r.url, photoStoragePath: r.path } : s)));
+  };
+
+  // "What Our Students Say" testimonials — a SEPARATE curated list from
+  // Success Stories above; same add/move/remove/photo pattern, but its own
+  // field so the two sections never show identical content.
+  const testimonials = form.testimonials || [];
+  const addTestimonial = () => set('testimonials', [...testimonials, { name: '', programme: '', description: '' }]);
+  const updateTestimonial = (si: number, patch: Partial<TestimonialItem>) => {
+    set('testimonials', testimonials.map((s, i) => (i === si ? { ...s, ...patch } : s)));
+  };
+  const moveTestimonial = (si: number, dir: -1 | 1) => {
+    const next = [...testimonials];
+    const target = si + dir;
+    if (target < 0 || target >= next.length) return;
+    [next[si], next[target]] = [next[target], next[si]];
+    set('testimonials', next);
+  };
+  const removeTestimonial = (si: number) => set('testimonials', testimonials.filter((_, i) => i !== si));
+  const handleTestimonialPhoto = (si: number, r: UploadResult) => {
+    set('testimonials', testimonials.map((s, i) => (i === si ? { ...s, photoUrl: r.url, photoStoragePath: r.path } : s)));
+  };
+
+  // ── Research & Innovation ────────────────────────────────────────────────
+  // Stat tiles (value + label) and carousel slides (title + desc + photo).
+  const researchStats = form.researchStats || [];
+  const addResearchStat = () => set('researchStats', [...researchStats, { value: '', label: '' }]);
+  const updateResearchStat = (i: number, patch: Partial<ResearchStat>) =>
+    set('researchStats', researchStats.map((s, idx) => (idx === i ? { ...s, ...patch } : s)));
+  const moveResearchStat = (i: number, dir: -1 | 1) => {
+    const next = [...researchStats];
+    const t = i + dir;
+    if (t < 0 || t >= next.length) return;
+    [next[i], next[t]] = [next[t], next[i]];
+    set('researchStats', next);
+  };
+  const removeResearchStat = (i: number) => set('researchStats', researchStats.filter((_, idx) => idx !== i));
+
+  const researchSlides = form.researchSlides || [];
+  const addResearchSlide = () => set('researchSlides', [...researchSlides, { title: '', desc: '' }]);
+  const updateResearchSlide = (i: number, patch: Partial<ResearchSlide>) =>
+    set('researchSlides', researchSlides.map((s, idx) => (idx === i ? { ...s, ...patch } : s)));
+  const moveResearchSlide = (i: number, dir: -1 | 1) => {
+    const next = [...researchSlides];
+    const t = i + dir;
+    if (t < 0 || t >= next.length) return;
+    [next[i], next[t]] = [next[t], next[i]];
+    set('researchSlides', next);
+  };
+  const removeResearchSlide = (i: number) => set('researchSlides', researchSlides.filter((_, idx) => idx !== i));
+  const handleResearchSlideImage = (i: number, r: UploadResult) =>
+    set('researchSlides', researchSlides.map((s, idx) => (idx === i ? { ...s, imageUrl: r.url, imagePath: r.path } : s)));
+
+  // Seeds the list above from this department's own current Placement Years
+  // data (its first/most-recent Academic Year — same "index 0 = current"
+  // convention DepartmentDetail.tsx's default active year uses) — the exact
+  // same derivation the public page falls back to automatically when no
+  // curated stories exist, just run here so an admin has real starting
+  // content to edit/add photos to instead of writing from a blank form.
+  const loadCurrentSuccessStories = () => {
+    const year = formDept?.placementYears?.[0];
+    if (!year || !year.columns?.length) return alert('No Placement Years data found for this department yet — add it under Placements first.');
+    const rows = sortPlacementRows(year.columns, year.rows || []).slice(0, 8);
+    const nameIdx = year.columns.findIndex((c) => /name|student|candidate/i.test(c));
+    const compIdx = findCompanyColumnIndex(year.columns);
+    const pkgIdx = findPackageColumnIndex(year.columns);
+    const generated: SuccessStoryItem[] = [];
+    for (const row of rows) {
+      const rawName = nameIdx >= 0 ? row.cells[nameIdx] : (row.cells[1] || row.cells[0]);
+      const name = rawName?.trim();
+      if (!name) continue;
+      const company = (compIdx >= 0 ? row.cells[compIdx] : '')?.trim();
+      const pkg = (pkgIdx >= 0 ? formatPackageCell(row.cells[pkgIdx] ?? '') : '')?.trim();
+      if (!company && !pkg) continue;
+      const pkgText = pkg ? (/lpa/i.test(pkg) ? pkg : `${pkg} LPA`) : '';
+      const description = company && pkgText
+        ? `Placed at ${company} with a package of ${pkgText}.`
+        : company ? `Placed at ${company}.` : `Secured an offer with a package of ${pkgText}.`;
+      generated.push({ name, description });
+    }
+    if (generated.length === 0) return alert(`No usable rows found in ${year.year}'s placement data.`);
+    if (!confirm(`Load ${generated.length} stor${generated.length === 1 ? 'y' : 'ies'} from ${year.year}'s placement data? Appends to the list below — review, add photos, and edit before saving.`)) return;
+    set('successStories', [...successStories, ...generated]);
+  };
+
   const save = async () => {
     if (!form.title || !form.shortCode) return alert('Title and Short Code are required.');
     if (scopedDeptTitle) {
@@ -657,6 +930,11 @@ export default function DepartmentsAdmin() {
         mission: (form.mission || []).filter(Boolean),
         coreValues: (form.coreValues || []).filter(Boolean),
         labs: labs.filter((l) => l.name),
+        faqs: faqs.filter((f) => f.question && f.answer),
+        successStories: successStories.filter((s) => s.name),
+        testimonials: testimonials.filter((s) => s.name),
+        researchStats: researchStats.filter((s) => s.value && s.label),
+        researchSlides: researchSlides.filter((s) => s.title),
       });
       if (editing) {
         // Only send fields that actually changed in this editing session —
@@ -758,15 +1036,15 @@ export default function DepartmentsAdmin() {
       title: d.title, shortCode: d.shortCode, description: d.description || '',
       icon: d.icon || 'GraduationCap', order: d.order,
       heroImage: d.heroImage || '', storagePath: d.storagePath || '', tagline: d.tagline || '',
-      about: d.about || '', highlights: d.highlights || [], established: d.established || '', accreditation: d.accreditation || '',
+      about: d.about || '', highlights: d.highlights || [], established: d.established || '', accreditation: d.accreditation || '', accreditationImage: d.accreditationImage || '', accreditationStoragePath: d.accreditationStoragePath || '',
       hod: d.hod || '', hodImage: d.hodImage || '', hodImageStoragePath: d.hodImageStoragePath || '',
       hodEmail: d.hodEmail || '', hodMessage: d.hodMessage || '', hodResearchProfiles: d.hodResearchProfiles || [],
       vision: d.vision || '', mission: d.mission || [], coreValues: d.coreValues || [],
-      labs: (d.labs || []).map(normalizeLab).map((l) => ({ name: l.name, description: l.description || '', pdfUrl: l.pdfUrl || '', pdfStoragePath: l.pdfStoragePath || '' })),
+      labs: (d.labs || []).map(normalizeLab).map((l) => ({ name: l.name, description: l.description || '', pdfUrl: l.pdfUrl || '', pdfStoragePath: l.pdfStoragePath || '', imageUrl: l.imageUrl || '', imageStoragePath: l.imageStoragePath || '' })),
       libraryIntro: d.libraryIntro || '', libraryInCharge: d.libraryInCharge || '',
       librarySections: (d.librarySections || []).map((s) => ({ heading: s.heading, items: s.items || [] })),
       programLevels: (d.programLevels || []).map((l) => ({ title: l.title, intro: l.intro || '', rows: l.rows || [] })),
-      placementIntro: d.placementIntro || '', placementStats: d.placementStats || [], placementRecruiters: d.placementRecruiters || [],
+      placementIntro: d.placementIntro || '', placementStats: d.placementStats || [], placementRecruiters: d.placementRecruiters || [], tieUpsMous: d.tieUpsMous || [],
       placementYears: d.placementYears?.length ? d.placementYears : (careerSource?.placementYears || []),
       internshipYears: d.internshipYears?.length ? d.internshipYears : (careerSource?.internshipYears || []),
       rndIntro: d.rndIntro || careerSource?.rndIntro || '',
@@ -781,6 +1059,11 @@ export default function DepartmentsAdmin() {
       newsEventsMigrated: needsMigration ? true : (d.newsEventsMigrated || false),
       awardsSections: d.awardsSections || [],
       customSections: d.customSections || [],
+      faqs: d.faqs || [],
+      successStories: d.successStories || [],
+      testimonials: d.testimonials || [],
+      researchStats: d.researchStats || [],
+      researchSlides: d.researchSlides || [],
     };
     setForm(next);
     // Deliberately NOT `next` here when a migration just ran — originalForm
@@ -921,6 +1204,10 @@ export default function DepartmentsAdmin() {
             <label htmlFor="field-accreditation">Accreditation</label>
             <input id="field-accreditation" value={form.accreditation} onChange={(e) => set('accreditation', e.target.value)} placeholder="NBA Accredited" />
           </div>
+          <div className="admin-field">
+            <label>Accreditation Image (optional — certificate/logo, rectangular)</label>
+            <ImageUploader folder="vwu/accreditation" currentUrl={form.accreditationImage} onUploaded={(r) => setForm((p) => ({ ...p, accreditationImage: r.url, accreditationStoragePath: r.path }))} label="Upload Accreditation Image" aspect={16 / 9} />
+          </div>
           <div className="admin-field admin-field--full">
             <label htmlFor="field-about">Overview</label>
             <textarea id="field-about" rows={5} value={form.about} onChange={(e) => set('about', e.target.value)} placeholder="About the department…" />
@@ -931,6 +1218,68 @@ export default function DepartmentsAdmin() {
               Shown right below "About the Department" — same layout as a programme's own Highlights.
             </p>
             <textarea id="field-highlights-one-per-line" rows={5} value={arrayToLines(form.highlights)} onChange={(e) => set('highlights', linesToArray(e.target.value))} placeholder="NAAC A+ Accredited undergraduate programmes" />
+          </div>
+
+          </div>
+        </details>
+
+        <details className="admin-accordion">
+          <summary className="admin-accordion__summary">Department Profile — At a Glance</summary>
+          <div className="admin-form-grid">
+          <div className="admin-field admin-field--full">
+            <p className="admin-field__hint" style={{ marginTop: '0.25rem' }}>
+              Controls the <strong>Department Profile</strong> section on the public page (Academic Journey, Accreditation, AP EAPCET Code).
+              These fields are department-wide overrides — if set here, they take precedence over per-programme values.
+              Programme Intake is managed per-programme in <strong>Admin → Programs → Intake</strong>.
+            </p>
+          </div>
+
+          {/* Academic Journey */}
+          <div className="admin-field admin-field--full">
+            <label style={{ fontWeight: 800, fontSize: '0.9rem', marginBottom: '0.5rem', display: 'block' }}>
+              📅 Academic Journey
+            </label>
+            <div className="admin-form-grid">
+              <div className="admin-field">
+                <label htmlFor="field-dept-established">Established Year</label>
+                <input id="field-dept-established" value={form.established} onChange={(e) => set('established', e.target.value)} placeholder="e.g. 2001" />
+                <p className="admin-field__hint">Department-wide establishment year (shown in timeline)</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Accreditation */}
+          <div className="admin-field admin-field--full">
+            <label style={{ fontWeight: 800, fontSize: '0.9rem', marginBottom: '0.5rem', display: 'block' }}>
+              🏆 Accreditation
+            </label>
+            <div className="admin-form-grid">
+              <div className="admin-field">
+                <label htmlFor="field-dept-accreditation">Accreditation Status</label>
+                <input id="field-dept-accreditation" value={form.accreditation} onChange={(e) => set('accreditation', e.target.value)} placeholder="NBA Accredited" />
+                <p className="admin-field__hint">e.g. "NBA Tier-I Accredited", "NAAC A+ Grade"</p>
+              </div>
+              <div className="admin-field">
+                <label>Accreditation Image (optional)</label>
+                <ImageUploader folder="vwu/accreditation" currentUrl={form.accreditationImage} onUploaded={(r) => setForm((p) => ({ ...p, accreditationImage: r.url, accreditationStoragePath: r.path }))} label="Upload Certificate/Logo" aspect={16 / 9} />
+                <p className="admin-field__hint">Upload a rectangular image (certificate, logo, badge)</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Reference */}
+          <div className="admin-field admin-field--full">
+            <label style={{ fontWeight: 800, fontSize: '0.9rem', marginBottom: '0.5rem', display: 'block' }}>
+              📋 Per-Programme Data (managed in Programs)
+            </label>
+            <p className="admin-field__hint">
+              The following fields are edited per-programme in <strong>Admin → Programs</strong>:
+            </p>
+            <ul style={{ margin: '0.5rem 0 0 1.5rem', fontSize: '0.85rem', color: 'var(--color-text-light)' }}>
+              <li><strong>Programme Intake</strong> — seats per programme (Admin → Programs → Intake)</li>
+              <li><strong>Per-Programme Accreditation</strong> — if no department-wide accreditation is set above, each programme's own accreditation is used</li>
+              <li><strong>Per-Programme Established Year</strong> — if no department-wide year is set above, each programme's own year is used</li>
+            </ul>
           </div>
 
           </div>
@@ -1050,7 +1399,9 @@ export default function DepartmentsAdmin() {
               Each laboratory has its own name, an optional description (a paragraph, or points — one per line, however
               you write it), and its own uploaded PDF. On the public page, tapping a laboratory tile opens a dialog
               with its description and a link to its PDF — a lab with no PDF uploaded yet still shows its tile and
-              dialog, just marked as unavailable there.
+              dialog, just marked as unavailable there. A lab can also carry a short video instead of (or alongside)
+              its image — when set, the carousel plays that video with the image as its poster frame, so nothing
+              extra downloads until a visitor presses play.
             </p>
             {labs.length > 0 && (
               <div className="admin-compact-list" style={{ marginBottom: '0.75rem' }}>
@@ -1063,6 +1414,15 @@ export default function DepartmentsAdmin() {
                         onChange={(e) => updateLabName(li, e.target.value)}
                         placeholder="Advanced Computing Lab"
                       />
+                      <div className="admin-compact-row__file">
+                        <ImageUploader
+                          folder="vwu/departments/labs"
+                          currentUrl={lab.imageUrl}
+                          onUploaded={(r) => handleLabImage(li, r)}
+                          label="Upload Image"
+                          aspect={4 / 3}
+                        />
+                      </div>
                       <div className="admin-compact-row__file">
                         <FileUploader
                           compact
@@ -1094,6 +1454,16 @@ export default function DepartmentsAdmin() {
                       rows={2}
                       style={{ width: '100%', marginTop: '0.4rem' }}
                     />
+                    <div style={{ marginTop: '0.5rem', maxWidth: 320 }}>
+                      <VideoUploader
+                        folder="vwu/departments/labs"
+                        currentUrl={lab.videoUrl}
+                        currentPath={lab.videoStoragePath}
+                        onUploaded={(r) => handleLabVideo(li, r)}
+                        onRemoved={() => removeLabVideo(li)}
+                        label="Upload Lab Video (optional)"
+                      />
+                    </div>
                   </div>
                 ))}
               </div>
@@ -1217,7 +1587,63 @@ export default function DepartmentsAdmin() {
           </div>
           <div className="admin-field admin-field--full">
             <label htmlFor="field-placement-recruiters">Recruiters (one per line)</label>
+            <p className="admin-field__hint" style={{ marginTop: '-0.25rem', marginBottom: '0.4rem' }}>
+              Each name is shown as a logo tile — spelling must exactly match a name in{' '}
+              <strong>Admin → Recruiter Logos</strong> to show that uploaded image; otherwise it falls back to an
+              automatic lookup or plain text. Search below to add a name that's already known to have a logo.
+            </p>
+            <CompanySearchAdd
+              known={knownCompanyNames}
+              current={form.placementRecruiters || []}
+              onAdd={(name) => set('placementRecruiters', [...(form.placementRecruiters || []), name])}
+            />
+            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
+              <label className="admin-btn admin-btn--sm admin-btn--ghost" style={{ cursor: 'pointer' }}>
+                📄 Bulk Add from File
+                <input
+                  type="file"
+                  accept=".csv,.txt,.tsv"
+                  hidden
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                      const text = ev.target?.result as string;
+                      const existing = form.placementRecruiters || [];
+                      const existingLower = new Set(existing.map((n) => n.toLowerCase()));
+                      const names = text.split(/[\n\r]+/)
+                        .map((l) => l.replace(/^[\d,.;:]+[.\s)\]]*/, '').trim())
+                        .filter(Boolean)
+                        .map((n) => n.toLowerCase())
+                        .filter((n) => !existingLower.has(n));
+                      if (names.length > 0) {
+                        set('placementRecruiters', [...existing, ...names]);
+                      }
+                    };
+                    reader.readAsText(file);
+                    e.target.value = '';
+                  }}
+                />
+              </label>
+              <span style={{ fontSize: '0.78rem', color: '#6b7280' }}>CSV/TXT — one name per line (auto-lowercased)</span>
+            </div>
             <textarea id="field-placement-recruiters" rows={4} value={arrayToLines(form.placementRecruiters)} onChange={(e) => set('placementRecruiters', linesToArray(e.target.value))} placeholder="TCS&#10;Infosys&#10;Wipro" />
+          </div>
+          <div className="admin-field admin-field--full">
+            <label htmlFor="field-tieups-mous">Tie-Ups &amp; MoUs (one per line)</label>
+            <p className="admin-field__hint" style={{ marginTop: '-0.25rem', marginBottom: '0.4rem' }}>
+              Spelling must exactly match a Partner Name in{' '}
+              <strong>Admin → Research Items → MoUs → Partner Logos</strong> to show that partner's real uploaded
+              logo here too; otherwise it falls back to a Recruiter Logos match or plain text. Search below to add
+              a name already known to have a logo — MoU partners are listed first.
+            </p>
+            <CompanySearchAdd
+              known={knownTieUpNames}
+              current={form.tieUpsMous || []}
+              onAdd={(name) => set('tieUpsMous', [...(form.tieUpsMous || []), name])}
+            />
+            <textarea id="field-tieups-mous" rows={4} value={arrayToLines(form.tieUpsMous)} onChange={(e) => set('tieUpsMous', linesToArray(e.target.value))} placeholder="IIT Bombay&#10;NASSCOM&#10;IEEE" />
           </div>
           {editingDept ? (
             <div className="admin-field admin-field--full">
@@ -1238,6 +1664,291 @@ export default function DepartmentsAdmin() {
               <p className="admin-field__hint">Save this department first (Add Department) — Placement/Internship records are only available once editing an existing department.</p>
             </div>
           )}
+          </div>
+        </details>
+
+        <details className="admin-accordion">
+          <summary className="admin-accordion__summary">Success Stories</summary>
+          <div className="admin-form-grid">
+          <div className="admin-field admin-field--full">
+            <p className="admin-field__hint" style={{ marginTop: '0.25rem' }}>
+              Powers the "Success Stories" carousel on this department's page — its own content, independent of
+              Testimonials below. Hidden entirely on the public page until at least one story is added here.
+            </p>
+          </div>
+          {editingDept ? (
+            <div className="admin-field admin-field--full">
+              <button type="button" className="admin-btn admin-btn--ghost admin-btn--sm" onClick={loadCurrentSuccessStories}>
+                ⬇ Load Current Placement Data as Starting Point
+              </button>
+              <p className="admin-field__hint" style={{ marginTop: '0.35rem' }}>
+                One-time copy from this department's own Placement Years data into the list below — review and edit
+                before saving. Nothing here stays linked to Placements afterward.
+              </p>
+            </div>
+          ) : (
+            <div className="admin-field admin-field--full">
+              <p className="admin-field__hint">Save this department first (Add Department) — loading current placement data is only available once editing an existing department.</p>
+            </div>
+          )}
+          <div className="admin-field admin-field--full">
+            {successStories.map((s, si) => (
+              <div key={si} style={{ display: 'flex', gap: '0.75rem', border: '1.5px solid var(--color-light-gray)', borderRadius: 8, padding: '0.75rem', marginBottom: '0.75rem' }}>
+                <div style={{ width: 96, flexShrink: 0 }}>
+                  <ImageUploader
+                    folder="vwu/departments/success-stories"
+                    currentUrl={s.photoUrl}
+                    onUploaded={(r) => handleSuccessStoryPhoto(si, r)}
+                    label="Photo"
+                    aspect={1}
+                  />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.4rem' }}>
+                    <input
+                      value={s.name}
+                      onChange={(e) => updateSuccessStory(si, { name: e.target.value })}
+                      placeholder="Student name"
+                      style={{ flex: 1, fontWeight: 700 }}
+                    />
+                    <input
+                      value={s.programme || ''}
+                      onChange={(e) => updateSuccessStory(si, { programme: e.target.value })}
+                      placeholder="Programme (optional)"
+                      style={{ flex: 1 }}
+                    />
+                  </div>
+                  <textarea
+                    rows={2}
+                    value={s.description || ''}
+                    onChange={(e) => updateSuccessStory(si, { description: e.target.value })}
+                    placeholder="Placed at Google with a package of 45 LPA."
+                    style={{ width: '100%' }}
+                  />
+                  <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.4rem' }}>
+                    <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveSuccessStory(si, -1)} disabled={si === 0} title="Move up">↑</button>
+                    <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveSuccessStory(si, 1)} disabled={si === successStories.length - 1} title="Move down">↓</button>
+                    <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeSuccessStory(si)}>Remove</button>
+                  </div>
+                </div>
+              </div>
+            ))}
+            <button type="button" className="admin-btn admin-btn--primary" onClick={addSuccessStory}>+ Add Story</button>
+            {successStories.length === 0 && (
+              <p className="admin-field__hint">No stories yet — the section stays hidden on the public page until you add one.</p>
+            )}
+          </div>
+          </div>
+        </details>
+
+        <details className="admin-accordion">
+          <summary className="admin-accordion__summary">Testimonials</summary>
+          <div className="admin-form-grid">
+          <div className="admin-field admin-field--full">
+            <p className="admin-field__hint" style={{ marginTop: '0.25rem' }}>
+              Powers "What Our Students Say" on this department's page — its own content, independent of Success
+              Stories above (the two used to share data; they no longer do). Hidden entirely on the public page
+              until at least one testimonial is added here.
+            </p>
+          </div>
+          <div className="admin-field admin-field--full">
+            {testimonials.map((s, si) => (
+              <div key={si} style={{ display: 'flex', gap: '0.75rem', border: '1.5px solid var(--color-light-gray)', borderRadius: 8, padding: '0.75rem', marginBottom: '0.75rem' }}>
+                <div style={{ width: 96, flexShrink: 0 }}>
+                  <ImageUploader
+                    folder="vwu/departments/testimonials"
+                    currentUrl={s.photoUrl}
+                    onUploaded={(r) => handleTestimonialPhoto(si, r)}
+                    label="Photo"
+                    aspect={1}
+                  />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.4rem' }}>
+                    <input
+                      value={s.name}
+                      onChange={(e) => updateTestimonial(si, { name: e.target.value })}
+                      placeholder="Student name"
+                      style={{ flex: 1, fontWeight: 700 }}
+                    />
+                    <input
+                      value={s.programme || ''}
+                      onChange={(e) => updateTestimonial(si, { programme: e.target.value })}
+                      placeholder="Programme (optional)"
+                      style={{ flex: 1 }}
+                    />
+                  </div>
+                  <textarea
+                    rows={2}
+                    value={s.description || ''}
+                    onChange={(e) => updateTestimonial(si, { description: e.target.value })}
+                    placeholder="The faculty and hands-on labs here shaped how I approach real engineering problems."
+                    style={{ width: '100%' }}
+                  />
+                  <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.4rem' }}>
+                    <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveTestimonial(si, -1)} disabled={si === 0} title="Move up">↑</button>
+                    <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveTestimonial(si, 1)} disabled={si === testimonials.length - 1} title="Move down">↓</button>
+                    <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeTestimonial(si)}>Remove</button>
+                  </div>
+                </div>
+              </div>
+            ))}
+            <button type="button" className="admin-btn admin-btn--primary" onClick={addTestimonial}>+ Add Testimonial</button>
+            {testimonials.length === 0 && (
+              <p className="admin-field__hint">No testimonials yet — the section stays hidden on the public page until you add one.</p>
+            )}
+          </div>
+          </div>
+        </details>
+
+        {/* ── Research & Innovation ── */}
+        <details className="admin-accordion">
+          <summary className="admin-accordion__summary">Department Page — Research &amp; Innovation</summary>
+          <div className="admin-form-grid">
+            <div className="admin-field admin-field--full">
+              <p className="admin-field__hint" style={{ marginTop: '0.25rem' }}>
+                Powers the "Pioneers of Research &amp; Innovation" section on the department page.
+                Add up to 4 stat tiles (left) and any number of photo slides (right carousel).
+                Hidden entirely on the public page until at least one of either is added — no mock content ever shows.
+              </p>
+            </div>
+
+            {/* Stat tiles */}
+            <div className="admin-field admin-field--full">
+              <label>Research Stat Tiles</label>
+              {researchStats.map((s, i) => (
+                <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 2fr auto auto auto', gap: '0.5rem', alignItems: 'center', marginBottom: '0.5rem' }}>
+                  <input
+                    value={s.value}
+                    onChange={(e) => updateResearchStat(i, { value: e.target.value })}
+                    placeholder="Value (e.g. 2500+)"
+                  />
+                  <input
+                    value={s.label}
+                    onChange={(e) => updateResearchStat(i, { label: e.target.value })}
+                    placeholder="Label (e.g. Publications)"
+                  />
+                  <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveResearchStat(i, -1)}>↑</button>
+                  <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveResearchStat(i, 1)}>↓</button>
+                  <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeResearchStat(i)}>✕</button>
+                </div>
+              ))}
+              {researchStats.length === 0 && (
+                <p className="admin-field__hint">No stat tiles yet. Add up to 4 (Publications, Crossref Citations, Scopus Citations, Patents).</p>
+              )}
+              <button type="button" className="admin-btn admin-btn--primary" onClick={addResearchStat}>+ Add Stat Tile</button>
+            </div>
+
+            {/* Carousel slides */}
+            <div className="admin-field admin-field--full">
+              <label>Research Slides (Carousel)</label>
+              {researchSlides.map((slide, i) => (
+                <div key={i} style={{ border: '1px solid var(--color-light-gray)', borderRadius: 8, padding: '1rem', marginBottom: '1rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                    <strong style={{ fontSize: '0.82rem' }}>Slide {i + 1}</strong>
+                    <div style={{ display: 'flex', gap: '0.4rem' }}>
+                      <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveResearchSlide(i, -1)}>↑</button>
+                      <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveResearchSlide(i, 1)}>↓</button>
+                      <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeResearchSlide(i)}>✕</button>
+                    </div>
+                  </div>
+                  <div className="admin-form-grid" style={{ gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                    <div className="admin-field">
+                      <label>Title</label>
+                      <input
+                        value={slide.title}
+                        onChange={(e) => updateResearchSlide(i, { title: e.target.value })}
+                        placeholder="e.g. Paper Published"
+                      />
+                    </div>
+                    <div className="admin-field">
+                      <label>Description</label>
+                      <textarea
+                        value={slide.desc}
+                        onChange={(e) => updateResearchSlide(i, { desc: e.target.value })}
+                        rows={3}
+                        placeholder="Short description of the research/publication/patent…"
+                        style={{ resize: 'vertical' }}
+                      />
+                    </div>
+                    <div className="admin-field">
+                      <label>Photo</label>
+                      <ImageUploader
+                        folder="vwu/departments/research"
+                        currentUrl={slide.imageUrl}
+                        onUploaded={(r) => handleResearchSlideImage(i, r)}
+                        label="Upload photo"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {researchSlides.length === 0 && (
+                <p className="admin-field__hint">No slides yet.</p>
+              )}
+              <button type="button" className="admin-btn admin-btn--primary" onClick={addResearchSlide}>+ Add Slide</button>
+            </div>
+          </div>
+        </details>
+
+        <details className="admin-accordion">
+          <summary className="admin-accordion__summary">Department Page — FAQs</summary>
+          <div className="admin-form-grid">
+          <div className="admin-field admin-field--full">
+            <p className="admin-field__hint" style={{ marginTop: '0.25rem' }}>
+              Shown as an accordion near the bottom of this department's page. Hidden entirely until at least one
+              FAQ is added below.
+            </p>
+          </div>
+          <div className="admin-field admin-field--full">
+            <label>FAQs</label>
+            {faqs.map((f, fi) => (
+              <div key={fi} style={{ border: '1.5px solid var(--color-light-gray)', borderRadius: 8, padding: '0.75rem', marginBottom: '0.75rem' }}>
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
+                  <input
+                    value={f.question}
+                    onChange={(e) => updateFaq(fi, { question: e.target.value })}
+                    placeholder="What is the eligibility criteria for this programme?"
+                    style={{ flex: 1, fontWeight: 700 }}
+                  />
+                  <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveFaq(fi, -1)} disabled={fi === 0} title="Move up">↑</button>
+                  <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveFaq(fi, 1)} disabled={fi === faqs.length - 1} title="Move down">↓</button>
+                  <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeFaq(fi)}>Remove</button>
+                </div>
+                <textarea
+                  rows={3}
+                  value={f.answer}
+                  onChange={(e) => updateFaq(fi, { answer: e.target.value })}
+                  placeholder="Answer…"
+                  style={{ width: '100%' }}
+                />
+              </div>
+            ))}
+            <button type="button" className="admin-btn admin-btn--primary" onClick={addFaq}>+ Add FAQ</button>
+            {faqs.length === 0 && (
+              <p className="admin-field__hint">No FAQs yet — click "+ Add FAQ" to add one, or bulk-import below.</p>
+            )}
+          </div>
+          <div className="admin-field admin-field--full">
+            <label htmlFor="field-faq-import">Bulk Import (JSON) — paste a JSON array, or choose a file</label>
+            <p className="admin-field__hint" style={{ marginTop: '-0.25rem', marginBottom: '0.5rem' }}>
+              Appends to the FAQs above — nothing existing is removed. Click Update below to save after importing.
+            </p>
+            <input id="field-faq-import-file" type="file" accept="application/json,.json" onChange={loadFaqImportFile} />
+            <textarea
+              id="field-faq-import"
+              rows={5}
+              value={faqImportText}
+              onChange={(e) => setFaqImportText(e.target.value)}
+              placeholder={'[{ "question": "…", "answer": "…" }]'}
+              style={{ width: '100%', marginTop: '0.5rem' }}
+            />
+            <div style={{ marginTop: '0.5rem' }}>
+              <button type="button" className="admin-btn admin-btn--sm" onClick={importFaqsJson} disabled={!faqImportText.trim()}>
+                Import
+              </button>
+            </div>
+          </div>
           </div>
         </details>
 

@@ -86,8 +86,6 @@ export default function WomensEducationSection() {
         <div className="we-grid">
           {/* Left Column: Mission, Headline & CTAs */}
           <div className="we-content">
-            <span className="we-eyebrow">Vishnu Women's University</span>
-
             <h2 className="we-title">
               Educate a Woman,<br />
               <span className="we-title-accent">Transform the World.</span>

@@ -55,7 +55,6 @@ export default function CustomTabsPage({ tabs, defaultTabId }: { tabs: TabItem[]
 
         <div className="detail-grid detail-grid--tabs">
           <div>
-            <span className="section-label">{active.eyebrow || 'Details'}</span>
             <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-5)' }}>
               {active.heading || active.label}
             </h2>
