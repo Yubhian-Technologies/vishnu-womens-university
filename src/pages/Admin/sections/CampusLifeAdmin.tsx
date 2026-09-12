@@ -12,6 +12,10 @@ import { diffChangedFields } from '../../../lib/formDiff';
 import { CAMPUS_LIFE_LEGACY_SEEDS } from '../../CampusLife/campusLifeLegacySeeds';
 import { CONTENT_ICON_NAMES } from '../../../lib/contentIcons';
 import AuditoriumsAdmin from './AuditoriumsAdmin';
+import TravelDeskAdmin from './TravelDeskAdmin';
+import TemplesAdmin from './TemplesAdmin';
+import StaffQuartersAdmin from './StaffQuartersAdmin';
+import HealthCareAdmin from './HealthCareAdmin';
 import {
   TELEVISION_PILLAR_KEYS, TELEVISION_PILLAR_LABELS, toTelevisionPillarsForm,
   type TelevisionPillars,
@@ -448,6 +452,10 @@ export default function CampusLifeAdmin() {
       </div>
 
       <AuditoriumsAdmin />
+      <TravelDeskAdmin />
+      <TemplesAdmin />
+      <StaffQuartersAdmin />
+      <HealthCareAdmin />
 
       {notYetCreated.length > 0 && (
         <div className="admin-card">
