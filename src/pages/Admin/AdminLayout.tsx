@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { User } from 'firebase/auth';
 import { useSearchParams } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -10,10 +10,10 @@ import {
   faClipboardList, faBus, faCity, faDownload, faTableList, faCamera, faLink, faScaleBalanced, faFolderOpen,
   faChartPie, faChartBar, faStar, faArrowTrendUp, faIdCard, faCalendarCheck, faPortrait, faBuilding, faTag,
   faPlane, faTrophy, faFlask, faFileCircleCheck, faBook, faUserShield, faRightFromBracket, faPhone,
-  faPalette, faMedal, faAward, faLightbulb, faFutbol,
+  faPalette, faMedal, faAward, faLightbulb, faFutbol, faGear,
 } from '@fortawesome/free-solid-svg-icons';
 import { getFirebaseAuth } from '../../lib/firebaseAdmin';
-import { resolveAdminSession, canReadModule, sessionMatchesRoleSelection } from '../../lib/rbac';
+import { resolveAdminSession, canReadModule } from '../../lib/rbac';
 import AdminLogin from './AdminLogin';
 import AdminDashboard from './AdminDashboard';
 import AdminSessionProvider, { useAdminSession } from './AdminSessionContext';
@@ -80,6 +80,7 @@ export const SECTIONS: { id: string; icon: IconDefinition; label: string }[] = [
   { id: 'policies', icon: faBook, label: 'Institutional Policies' },
   // Super Admin only — see canSeeUsersRoles below and UsersRolesAdmin.tsx.
   { id: 'users-roles', icon: faUserShield, label: 'Users & Roles' },
+  { id: 'settings', icon: faGear, label: 'Settings' },
 ];
 
 // Groups the flat SECTIONS list under headers in the desktop sidebar only —
@@ -110,13 +111,6 @@ export default function AdminLayout() {
   const [user, setUser] = useState<User | null>(null);
   const [checking, setChecking] = useState(true);
   const [loginError, setLoginError] = useState('');
-  // Which role the in-flight sign-in was submitted under — set by AdminLogin
-  // synchronously, before it calls signInWithEmailAndPassword, so it's
-  // available the instant this listener sees the resulting auth state
-  // change. A ref (not state) because it must be current inside the very
-  // next onAuthStateChanged callback, not just on AdminLogin's next render.
-  const attemptedRoleRef = useRef('');
-  const attemptedRoleLabelRef = useRef('');
 
   useEffect(() => {
     let unsub: (() => void) | undefined;
@@ -125,27 +119,15 @@ export default function AdminLayout() {
       if (cancelled) return;
       unsub = onAuthStateChanged(auth, async (u) => {
         if (cancelled) return;
-        const attempted = attemptedRoleRef.current;
-        if (u && attempted) {
+        if (u) {
           const session = await resolveAdminSession(u);
           if (cancelled) return;
-          if (!sessionMatchesRoleSelection(session, attempted)) {
-            // Wrong role for this account — sign back out without ever
-            // exposing `user` as truthy, so AdminLogin never unmounts and
-            // this error survives to be shown on the same screen. The
-            // signOut below re-fires this same listener with u=null, which
-            // is a no-op past this point since attemptedRoleRef is already
-            // cleared.
-            const label = attemptedRoleLabelRef.current;
-            attemptedRoleRef.current = '';
-            attemptedRoleLabelRef.current = '';
-            setLoginError(`This account isn't registered under the "${label}" role.`);
+          if (session.role === 'inactive') {
+            setLoginError(`Your account has been deactivated.`);
             await signOut(auth);
             return;
           }
         }
-        attemptedRoleRef.current = '';
-        attemptedRoleLabelRef.current = '';
         setUser(u);
         setChecking(false);
       });
@@ -168,11 +150,7 @@ export default function AdminLayout() {
     return (
       <AdminLogin
         error={loginError}
-        onAttempt={(role, label) => {
-          setLoginError('');
-          attemptedRoleRef.current = role;
-          attemptedRoleLabelRef.current = label;
-        }}
+        onAttempt={() => setLoginError('')}
       />
     );
   }

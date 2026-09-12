@@ -14,6 +14,7 @@ const ROLE_LABELS: Record<AdminRole, string> = {
   placements: 'Placements Login',
   rnd: 'R&D Login',
   custom: 'Custom Role',
+  inactive: 'Deactivated',
 };
 
 /** The role label to display for one admin user — a custom role shows its own admin-typed name instead of the generic "Custom Role". */

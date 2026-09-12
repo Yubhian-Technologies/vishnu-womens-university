@@ -32,7 +32,7 @@ export type ResourceKey = (typeof RESOURCES)[keyof typeof RESOURCES];
 //   screen can show a recognizable role name instead of every scoped account
 //   just saying "Custom".
 // 'custom' — any other admin-defined role.
-export type AdminRole = 'superadmin' | 'admin' | 'department' | 'placements' | 'rnd' | 'custom';
+export type AdminRole = 'superadmin' | 'admin' | 'department' | 'placements' | 'rnd' | 'custom' | 'inactive';
 
 export type ModuleLevel = 'read' | 'write';
 
@@ -80,8 +80,11 @@ export async function resolveAdminSession(user: User): Promise<AdminSession> {
   if (!user.email) return superAdminSessionFor(user);
   try {
     const snap = await getDocs(query(collection(db, 'department_users'), where('email', '==', user.email)));
+    if (snap.empty) return superAdminSessionFor(user);
     const userDoc = snap.docs.find((d) => d.data().active !== false);
-    if (!userDoc) return superAdminSessionFor(user);
+    if (!userDoc) {
+      return { ...superAdminSessionFor(user), isSuperAdmin: false, isAdmin: false, role: 'inactive' };
+    }
     const data = userDoc.data();
     const role = (data.role as AdminRole) ?? 'department';
     const isAdmin = role === 'admin';

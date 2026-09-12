@@ -1246,13 +1246,13 @@ export default function DepartmentsAdmin() {
                     next[idx] = { ...next[idx], label: e.target.value };
                     setForm(p => ({ ...p, academicJourneyList: next }));
                   }} placeholder="B.Tech CSE" />
-                  <button type="button" className="btn-icon" style={{ flexShrink: 0 }} onClick={() => {
+                  <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" style={{ flexShrink: 0 }} onClick={() => {
                     setForm(p => ({ ...p, academicJourneyList: (p.academicJourneyList || []).filter((_, i) => i !== idx) }));
                   }} aria-label="Remove"><Trash2 size={16} /></button>
                 </div>
               ))}
               <div style={{ marginTop: '0.25rem' }}>
-                <button type="button" className="btn-secondary" onClick={() => {
+                <button type="button" className="admin-btn admin-btn--sm" onClick={() => {
                   setForm(p => ({ ...p, academicJourneyList: [...(p.academicJourneyList || []), { year: '', label: '' }] }));
                 }}>
                   <Plus size={16} /> Add Milestone
@@ -1279,13 +1279,13 @@ export default function DepartmentsAdmin() {
                     next[idx] = { ...next[idx], intake: e.target.value };
                     setForm(p => ({ ...p, programmeIntakeList: next }));
                   }} placeholder="180" />
-                  <button type="button" className="btn-icon" style={{ flexShrink: 0 }} onClick={() => {
+                  <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" style={{ flexShrink: 0 }} onClick={() => {
                     setForm(p => ({ ...p, programmeIntakeList: (p.programmeIntakeList || []).filter((_, i) => i !== idx) }));
                   }} aria-label="Remove"><Trash2 size={16} /></button>
                 </div>
               ))}
               <div style={{ marginTop: '0.25rem' }}>
-                <button type="button" className="btn-secondary" onClick={() => {
+                <button type="button" className="admin-btn admin-btn--sm" onClick={() => {
                   setForm(p => ({ ...p, programmeIntakeList: [...(p.programmeIntakeList || []), { program: '', intake: '' }] }));
                 }}>
                   <Plus size={16} /> Add Intake Record

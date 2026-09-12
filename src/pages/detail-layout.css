@@ -6056,6 +6056,8 @@ td.pb-activities-num {
   display: flex;
   flex-direction: column;
   animation: researchFadeIn 0.4s ease;
+  min-width: 0;
+  min-height: 0;
 }
 
 @keyframes researchFadeIn {
@@ -6067,6 +6069,7 @@ td.pb-activities-num {
   flex: 1;
   overflow: hidden;
   min-height: 240px;
+  aspect-ratio: 16 / 10;
 }
 
 .dept-research-slide-img {
