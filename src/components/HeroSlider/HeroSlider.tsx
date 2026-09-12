@@ -91,7 +91,6 @@ export default function HeroSlider() {
   const [progressWidth, setProgressWidth] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
-  const [videoReady, setVideoReady] = useState(false);
   // Only slides a visitor has actually reached get their photo downloaded —
   // admin-uploaded banner slides append photos after the 4 static marketing
   // slides, so without this every one of them would load on first paint
