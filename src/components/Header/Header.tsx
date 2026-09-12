@@ -504,7 +504,7 @@ export default function Header() {
         children: placementItems.map((p): NavChild =>
           p.external && p.url
             ? { label: p.title, path: p.url, external: true, hideExternalIcon: true }
-            : { label: p.title, path: `/placements/${p.slug}`, external: true, hideExternalIcon: true }
+            : { label: p.title, path: `/placements/${p.slug}` }
         ),
       };
     }

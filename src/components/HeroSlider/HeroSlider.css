@@ -28,6 +28,14 @@
   height: 100%;
   object-fit: cover;
   z-index: 0;
+  pointer-events: none;
+}
+
+.hero-video::-webkit-media-controls,
+.hero-video::-webkit-media-controls-start-playback-button,
+.hero-video::-webkit-media-controls-play-button {
+  display: none !important;
+  -webkit-appearance: none;
 }
 
 /* ===== Center Tagline & Clean Sleek Search ===== */

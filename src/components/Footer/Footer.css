@@ -61,6 +61,13 @@
   gap: 0.9rem;
 }
 
+.vwu-footer-brand-header {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  align-items: center;
+}
+
 .vwu-footer-logo-link {
   display: inline-flex;
   align-items: center;
@@ -426,12 +433,27 @@
 
 @media (max-width: 768px) {
   .vwu-footer-main {
+    padding: 2.25rem 0 1rem;
+  }
+
+  .vwu-footer-main .vwu-footer-inner {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .vwu-footer-nav {
     display: none;
+  }
+
+  .vwu-footer-brand-header {
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
   }
 
   .vwu-footer-mobile {
     display: block;
-    padding: 2.25rem 0 1.75rem;
+    padding: 1.5rem 0 1.75rem;
   }
 
   .vwu-footer-mobile .vwu-footer-inner {
