@@ -130,6 +130,39 @@ function ExpandableGroup({ items, renderItem, threshold = 4 }: {
   );
 }
 
+function VmExpandableCard({ title, icon, content }: { title: string; icon: ReactNode; content: string | string[] }) {
+  const [expanded, setExpanded] = useState(false);
+  const isArray = Array.isArray(content);
+  return (
+    <div 
+      className="dept-vm-card" 
+      onClick={() => setExpanded(!expanded)}
+      style={{ cursor: 'pointer' }}
+    >
+      <div className="dept-vm-card-top">
+        <h3 className="dept-vm-title" style={{ fontSize: '1.25rem', margin: 0, color: 'var(--color-primary)' }}>{title}</h3>
+        <div className="dept-vm-icon-badge">{icon}</div>
+      </div>
+      <SmoothCollapse open={expanded}>
+        <div style={{ paddingTop: '0.5rem' }}>
+          {isArray ? (
+            <ul style={{ paddingLeft: '1.25rem', margin: 0, color: 'var(--color-text)', lineHeight: 1.6 }}>
+              {content.map((c, i) => <li key={i} style={{ marginBottom: '0.5rem' }}>{c}</li>)}
+            </ul>
+          ) : (
+            <p style={{ margin: 0, color: 'var(--color-text)', lineHeight: 1.6 }}>{content}</p>
+          )}
+        </div>
+      </SmoothCollapse>
+      <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid rgba(0,0,0,0.05)' }}>
+        <span style={{ fontSize: '0.85rem', color: 'var(--color-text-light)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          {expanded ? 'Hide Details' : 'Click to expand'}
+          <ChevronDown size={14} style={{ transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }} />
+        </span>
+      </div>
+    </div>
+  );
+}
 
 // ─── Research & Innovation Section ───────────────────────────────────────────
 // Mirrors the LPU-style "Pioneers of research & innovation" template. Reads
@@ -897,11 +930,35 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
         </section>
       )}
 
+      {/* Vision & Mission Expandable Cards */}
+      {(shared.vision || shared.mission.length > 0) && (
+        <section id="vision-mission" className="section bg-light" style={{ scrollMarginTop: NAV_OFFSET, padding: 'var(--space-8) 0' }}>
+          <div className="container">
+            <div className="dept-vm-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem' }}>
+              {shared.vision && (
+                <VmExpandableCard 
+                  title="Our Vision" 
+                  icon={<Sparkles size={20} />} 
+                  content={shared.vision} 
+                />
+              )}
+              {shared.mission.length > 0 && (
+                <VmExpandableCard 
+                  title="Our Mission" 
+                  icon={<Microscope size={20} />} 
+                  content={shared.mission} 
+                />
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Core Values — moved out from HOD section directly after Department Overview.
           Department Vision / Mission Statements cards were removed here; this
           section now only ever shows Institutional Core Values. */}
       {hasCoreValues && (
-        <section id="vision-mission" className="section dept-section-navy" style={{ scrollMarginTop: NAV_OFFSET }}>
+        <section id="core-values" className="section dept-section-navy" style={{ scrollMarginTop: NAV_OFFSET }}>
           <div className="container">
             <div style={{ marginBottom: 'var(--space-6)' }}>
               <h2 className="section-title">Our Core Values</h2>
