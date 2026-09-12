@@ -292,7 +292,7 @@ export function SectionSubtree({ section, depth = 0, navOffset = DEFAULT_NAV_OFF
       <div>
         {body}
         <div style={{ marginTop: 'var(--space-5)' }}>
-          <PillSwitcher sections={visibleSubs} depth={depth + 1} navOffset={navOffset} />
+          <TabsRenderer sections={visibleSubs} depth={depth + 1} navOffset={navOffset} departmentSlug={departmentSlug} categorySlug={categorySlug} />
         </div>
       </div>
     );
@@ -305,7 +305,7 @@ export function SectionSubtree({ section, depth = 0, navOffset = DEFAULT_NAV_OFF
         // id+scrollMarginTop lets a Quick Links entry for this subsection
         // (see toQuickLinkItems in lib/customSections.ts) jump straight to
         // it with a plain anchor — every stacked subsection is always in the
-        // DOM, unlike a pill's, which needs PillSwitcher's hash-sync below.
+        // DOM, unlike a pill's, which needs TabsRenderer's hash-sync below.
         <div key={`${sub.id}-${subIndex}`} id={sub.id} style={{ marginTop: depth === 0 ? 'var(--space-6)' : 'var(--space-4)', scrollMarginTop: navOffset }}>
           <h4 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: sub.boldHeading ? 800 : 700, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>
             {sub.label}
@@ -324,7 +324,7 @@ export function SectionSubtree({ section, depth = 0, navOffset = DEFAULT_NAV_OFF
 // one's content shown below, rendered through SectionSubtree so further
 // nesting (a pill whose own content is itself split into pieces) keeps
 // working at any depth.
-function PillSwitcher({ sections, depth = 0, navOffset = DEFAULT_NAV_OFFSET }: { sections: CustomSection[]; depth?: number; navOffset?: string }) {
+function TabsRenderer({ sections, depth = 0, navOffset = DEFAULT_NAV_OFFSET, departmentSlug, categorySlug }: { sections: CustomSection[]; depth?: number; navOffset?: string; departmentSlug?: string; categorySlug?: string }) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const active = sections.find((s) => s.id === activeId) ?? sections[0];
   const scrollPendingRef = useRef(false);

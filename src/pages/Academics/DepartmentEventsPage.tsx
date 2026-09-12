@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
 import SEO from '../../components/SEO/SEO';
-import { useOrderedCollection } from '../../lib/useFirestore';
+import { useOrderedCollection } from '../../hooks/useCollection';
 import type { DepartmentDoc } from '../Admin/sections/DepartmentsAdmin';
 import { DEPARTMENT_GROUPS, STANDALONE_DEPARTMENTS } from '../../lib/departmentGroups';
-import { hasCustomSectionContent } from '../../lib/customSections';
+import { hasCustomSectionContent, type CustomSection } from '../../lib/customSections';
 import type { NewsEventsCategory } from '../../components/NewsEventsTabs/NewsEventsTabs';
 import { ArrowLeft } from 'lucide-react';
 import '../detail-layout.css';
@@ -16,7 +16,7 @@ export default function DepartmentEventsPage() {
   const group = Object.values(DEPARTMENT_GROUPS).find((g) => g.key === slug) || Object.values(STANDALONE_DEPARTMENTS).find((g) => g.key === slug);
 
   const { docs: allDepartments, loading } = useOrderedCollection<DepartmentDoc>('departments', 'order');
-  const dept = allDepartments.find((d) => group && d.shortCode?.trim().toLowerCase() === group.deptShortCode.trim().toLowerCase());
+  const dept = allDepartments.find((d: DepartmentDoc) => group && d.shortCode?.trim().toLowerCase() === group.deptShortCode.trim().toLowerCase());
 
   useEffect(() => {
     if (dept) {
@@ -34,7 +34,7 @@ export default function DepartmentEventsPage() {
   const newsEventsCategories: NewsEventsCategory[] = [];
 
   if (newsEventsSubSections.length > 0) {
-    newsEventsCategories.push(...newsEventsSubSections.map((sec) => ({
+    newsEventsCategories.push(...newsEventsSubSections.map((sec: CustomSection) => ({
       key: sec.id,
       label: sec.label,
       years: (() => {
@@ -43,12 +43,12 @@ export default function DepartmentEventsPage() {
         if (hasCustomSectionContent(ownOnly)) {
           out.push({ year: sec.label.replace(/^Academic Year\s*(::|:|-)?\s*/i, '').trim() || sec.label, columns: [], rows: [], section: ownOnly });
         }
-        (sec.subSections || []).filter(hasCustomSectionContent).forEach((sub) => {
+        (sec.subSections || []).filter(hasCustomSectionContent).forEach((sub: CustomSection) => {
           out.push({ year: sub.label.replace(/^Academic Year\s*(::|:|-)?\s*/i, '').trim() || sub.label, columns: [], rows: [], section: sub });
         });
         return out;
       })(),
-    })).filter((c) => c.years.length > 0));
+    })).filter((c: any) => c.years.length > 0));
   }
 
   const category = newsEventsCategories.find(c => c.key === categorySlug);

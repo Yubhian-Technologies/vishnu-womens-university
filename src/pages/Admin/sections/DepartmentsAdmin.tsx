@@ -228,6 +228,8 @@ const EMPTY: Omit<DepartmentDoc, 'id'> = {
   heroImage: '', storagePath: '', tagline: '', about: '', highlights: [], established: '', accreditation: '', accreditationImage: '', accreditationStoragePath: '',
   hod: '', hodImage: '', hodImageStoragePath: '', hodEmail: '', hodMessage: '', hodResearchProfiles: [],
   vision: '', mission: [], coreValues: [], labs: [],
+  academicJourneyList: [],
+  programmeIntakeList: [],
   libraryIntro: '', libraryInCharge: '', librarySections: [],
   programLevels: [],
   placementIntro: '', placementStats: [], placementRecruiters: [], tieUpsMous: [],
@@ -1236,22 +1238,22 @@ export default function DepartmentsAdmin() {
                 <div key={idx} style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                   <input style={{ width: '120px' }} value={aj.year} onChange={(e) => {
                     const next = [...(form.academicJourneyList || [])];
-                    next[idx].year = e.target.value;
-                    set('academicJourneyList', next);
+                    next[idx] = { ...next[idx], year: e.target.value };
+                    setForm(p => ({ ...p, academicJourneyList: next }));
                   }} placeholder="2001-02" />
                   <input style={{ flex: 1 }} value={aj.label} onChange={(e) => {
                     const next = [...(form.academicJourneyList || [])];
-                    next[idx].label = e.target.value;
-                    set('academicJourneyList', next);
+                    next[idx] = { ...next[idx], label: e.target.value };
+                    setForm(p => ({ ...p, academicJourneyList: next }));
                   }} placeholder="B.Tech CSE" />
                   <button type="button" className="btn-icon" style={{ flexShrink: 0 }} onClick={() => {
-                    set('academicJourneyList', (form.academicJourneyList || []).filter((_, i) => i !== idx));
+                    setForm(p => ({ ...p, academicJourneyList: (p.academicJourneyList || []).filter((_, i) => i !== idx) }));
                   }} aria-label="Remove"><Trash2 size={16} /></button>
                 </div>
               ))}
               <div style={{ marginTop: '0.25rem' }}>
                 <button type="button" className="btn-secondary" onClick={() => {
-                  set('academicJourneyList', [...(form.academicJourneyList || []), { year: '', label: '' }]);
+                  setForm(p => ({ ...p, academicJourneyList: [...(p.academicJourneyList || []), { year: '', label: '' }] }));
                 }}>
                   <Plus size={16} /> Add Milestone
                 </button>
@@ -1269,22 +1271,22 @@ export default function DepartmentsAdmin() {
                 <div key={idx} style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                   <input style={{ flex: 1 }} value={pi.program} onChange={(e) => {
                     const next = [...(form.programmeIntakeList || [])];
-                    next[idx].program = e.target.value;
-                    set('programmeIntakeList', next);
+                    next[idx] = { ...next[idx], program: e.target.value };
+                    setForm(p => ({ ...p, programmeIntakeList: next }));
                   }} placeholder="B.Tech CSE" />
                   <input style={{ width: '100px' }} value={pi.intake} onChange={(e) => {
                     const next = [...(form.programmeIntakeList || [])];
-                    next[idx].intake = e.target.value;
-                    set('programmeIntakeList', next);
+                    next[idx] = { ...next[idx], intake: e.target.value };
+                    setForm(p => ({ ...p, programmeIntakeList: next }));
                   }} placeholder="180" />
                   <button type="button" className="btn-icon" style={{ flexShrink: 0 }} onClick={() => {
-                    set('programmeIntakeList', (form.programmeIntakeList || []).filter((_, i) => i !== idx));
+                    setForm(p => ({ ...p, programmeIntakeList: (p.programmeIntakeList || []).filter((_, i) => i !== idx) }));
                   }} aria-label="Remove"><Trash2 size={16} /></button>
                 </div>
               ))}
               <div style={{ marginTop: '0.25rem' }}>
                 <button type="button" className="btn-secondary" onClick={() => {
-                  set('programmeIntakeList', [...(form.programmeIntakeList || []), { program: '', intake: '' }]);
+                  setForm(p => ({ ...p, programmeIntakeList: [...(p.programmeIntakeList || []), { program: '', intake: '' }] }));
                 }}>
                   <Plus size={16} /> Add Intake Record
                 </button>
