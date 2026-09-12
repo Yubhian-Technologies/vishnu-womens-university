@@ -123,14 +123,15 @@
   display: flex;
   flex-direction: column;
   height: 100%;
+  min-height: 400px;
 }
 
 .success-story-photo-frame {
   width: 100%;
-  /* Shorter than the previous 4/5 portrait crop so a full row of cards —
-     header, photo, and caption — fits within one screen without needing
-     to scroll inside the section on typical laptop viewport heights. */
-  aspect-ratio: 16 / 10;
+  /* Increased height: min-height ensures cards are taller (1.25x) regardless
+     of viewport width; aspect-ratio provides proportional scaling above that. */
+  min-height: 275px;
+  aspect-ratio: 16 / 15.625;
   border-radius: var(--radius-lg);
   overflow: hidden;
   background: var(--color-light-gray);

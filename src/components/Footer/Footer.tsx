@@ -128,7 +128,7 @@ export default function Footer() {
               />
             </Link>
 
-            <h2 className="vwu-footer-uni-name">Vishnu Women's University</h2>
+            <h2 className="vwu-footer-uni-name">విష్ణు మహిళా విశ్వవిద్యాలయం</h2>
             <p className="vwu-footer-mission">
               Empowering women scholars through excellence in engineering education,
               interdisciplinary research, and transformative leadership.

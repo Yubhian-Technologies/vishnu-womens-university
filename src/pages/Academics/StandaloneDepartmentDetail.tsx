@@ -329,8 +329,10 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
       <CustomSectionsRenderer sections={visibleCustomSections} navOffset={NAV_OFFSET} />
 
       {/* News & Events — Compact Collapsible Academic-Year List */}
-      {hasNewsEvents && <NewsEventsTabs categories={newsEventsCategories} navOffset={NAV_OFFSET} />}
-
+      {hasNewsEvents && (
+        <NewsEventsTabs categories={newsEventsCategories} navOffset={NAV_OFFSET} departmentSlug={group.key} />
+      )}
+      
       {/* Department Library */}
       {hasLibrary && (
         <section id="library" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>

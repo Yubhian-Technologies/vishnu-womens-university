@@ -282,8 +282,8 @@ export function CustomSectionsAccordion({ sections }: { sections: CustomSection[
 // HOD tab) can render one admin-picked CustomSection's body — including its
 // sub-sections, tables, and pill switcher — without pulling in one of the
 // full layout wrappers above (which each impose their own heading/spacing).
-export function SectionSubtree({ section, depth = 0, navOffset = DEFAULT_NAV_OFFSET }: { section: CustomSection; depth?: number; navOffset?: string }) {
-  const body = <CustomSectionBody section={section} />;
+export function SectionSubtree({ section, depth = 0, navOffset = DEFAULT_NAV_OFFSET, departmentSlug, categorySlug }: { section: CustomSection; depth?: number; navOffset?: string; departmentSlug?: string; categorySlug?: string }) {
+  const body = <CustomSectionBody section={section} departmentSlug={departmentSlug} categorySlug={categorySlug} />;
   const visibleSubs = (section.subSections || []).filter(hasCustomSectionContent);
   if (visibleSubs.length === 0) return body;
 
@@ -311,7 +311,7 @@ export function SectionSubtree({ section, depth = 0, navOffset = DEFAULT_NAV_OFF
             {sub.label}
           </h4>
           <SectionSubtitle subtitle={sub.subtitle} />
-          <SectionSubtree section={sub} depth={depth + 1} navOffset={navOffset} />
+          <SectionSubtree section={sub} depth={depth + 1} navOffset={navOffset} departmentSlug={departmentSlug} categorySlug={categorySlug} />
         </div>
       ))}
     </div>
@@ -390,7 +390,7 @@ function PillSwitcher({ sections, depth = 0, navOffset = DEFAULT_NAV_OFFSET }: {
         </div>
         <SectionSubtitle subtitle={active.subtitle} />
         <div style={{ marginTop: 'var(--space-3)' }}>
-          <SectionSubtree section={active} depth={depth} navOffset={navOffset} />
+          <SectionSubtree section={active} depth={depth} navOffset={navOffset} departmentSlug={departmentSlug} categorySlug={categorySlug} />
         </div>
       </div>
     </div>
@@ -553,8 +553,8 @@ function StaticGalleryStrip({ photos }: { photos: CustomSectionPhoto[] }) {
   );
 }
 
-function CustomSectionBody({ section }: { section: CustomSection }) {
-  let body: ReactNode = <CustomSectionBodyContent section={section} />;
+function CustomSectionBody({ section, departmentSlug, categorySlug }: { section: CustomSection; departmentSlug?: string; categorySlug?: string }) {
+  let body: ReactNode = <CustomSectionBodyContent section={section} departmentSlug={departmentSlug} categorySlug={categorySlug} />;
   // A section can carry photos alongside whatever its primary contentType
   // is (see CustomSectionEditor.tsx's always-available "Photos" block) —
   // contentType 'gallery' already renders these via the switch above, so
@@ -583,7 +583,9 @@ function CustomSectionBody({ section }: { section: CustomSection }) {
   );
 }
 
-function CustomSectionBodyContent({ section }: { section: CustomSection }) {
+import HorizontalEventsShowcase from '../HorizontalEventsShowcase/HorizontalEventsShowcase';
+
+function CustomSectionBodyContent({ section, departmentSlug, categorySlug }: { section: CustomSection; departmentSlug?: string; categorySlug?: string }) {
   if (section.contentType === 'text') {
     if (!section.textContent?.trim()) return null;
     return (
@@ -659,6 +661,17 @@ function CustomSectionBodyContent({ section }: { section: CustomSection }) {
   if (section.contentType === 'imageCards') {
     const cards = (section.imageCards || []).filter((c) => c.imageUrl || c.title.trim() || c.description.trim());
     if (cards.length === 0) return null;
+    
+    if (departmentSlug && categorySlug) {
+      return (
+        <HorizontalEventsShowcase 
+          cards={cards} 
+          departmentSlug={departmentSlug} 
+          categorySlug={categorySlug} 
+        />
+      );
+    }
+    
     return (
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 'var(--space-5)' }}>
         {cards.map((card, ci) => (
