@@ -135,13 +135,18 @@ export interface PlacementItemDoc {
    *  baked-in text/photo, so forcing one ratio would cut into that content.
    *  Optional: most items never set this. */
   notablePeople?: NotablePerson[];
+  /** Only used on the "gsac" page — the "Global Opportunities, Brighter
+   *  Futures" stat row shown beside the Overview text. One "Value | Label"
+   *  per line, e.g. "7+ | Global Destinations". Optional: hidden on the
+   *  public page until at least one is added. */
+  globalStats?: string[];
 }
 
 const EMPTY: Omit<PlacementItemDoc, 'id'> = {
   slug: '', title: '', icon: 'BarChart3', desc: '', external: false, url: '',
   intro: '', about: '', highlights: [], outcomes: [], partners: [], tableText: '', dataTableHeadersText: '', rosterGroupsText: '',
   deptCoordinatorsText: '', deptCoordinatorGroupsText: '', emails: [], linkedins: [], heroImage: '', heroStoragePath: '', notablePeople: [], order: 0,
-  menuColumn: 'explore',
+  menuColumn: 'explore', globalStats: [],
 };
 
 function linesToArray(text: string): string[] {
@@ -368,6 +373,7 @@ export default function PlacementItemsAdmin() {
         partners: form.partners.filter(Boolean),
         emails: form.emails.filter(Boolean),
         linkedins: form.linkedins.filter(Boolean),
+        globalStats: (form.globalStats || []).filter(Boolean),
       };
       if (editing) {
         await updateDoc(doc(db, 'placementItems', editing), { ...payload });
@@ -392,6 +398,7 @@ export default function PlacementItemsAdmin() {
       heroImage: it.heroImage || '', heroStoragePath: it.heroStoragePath || '',
       notablePeople: it.notablePeople || [], order: it.order,
       menuColumn: it.menuColumn || menuColumns[0]?.id || 'explore',
+      globalStats: it.globalStats || [],
     });
   };
 
@@ -644,6 +651,20 @@ export default function PlacementItemsAdmin() {
             <label htmlFor="field-about-detail-page-longer-paragraph">About (detail page — longer paragraph)</label>
             <textarea id="field-about-detail-page-longer-paragraph" rows={4} value={form.about} onChange={(e) => set('about', e.target.value)} />
           </div>
+          {form.slug === 'gsac' && (
+            <div className="admin-field admin-field--full">
+              <label htmlFor="field-global-stats-one-per-line">
+                Global Opportunities Stats (GSAC only — one per line, format: Value | Label — optional, hidden until at least one is added)
+              </label>
+              <textarea
+                id="field-global-stats-one-per-line"
+                rows={3}
+                value={arrayToLines(form.globalStats)}
+                onChange={(e) => set('globalStats', linesToArray(e.target.value))}
+                placeholder={'7+ | Global Destinations\n360° | End-to-End Support\nA Global | Alumni Network'}
+              />
+            </div>
+          )}
           <div className="admin-field admin-field--full">
             <label htmlFor="field-key-highlights-one-per-line">Key Highlights (one per line)</label>
             <textarea id="field-key-highlights-one-per-line" rows={4} value={arrayToLines(form.highlights)} onChange={(e) => set('highlights', linesToArray(e.target.value))} />

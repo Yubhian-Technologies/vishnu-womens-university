@@ -32,6 +32,8 @@ function paletteVarsFor(palette: SportsPalette, opacity = 100, isSolid = false):
   } as CSSProperties;
 }
 
+const ACHIEVEMENTS_PREVIEW_COUNT = 6;
+
 const RING_CLASSES = [
   'sports-circle-card--gold',
   'sports-circle-card--pink',
@@ -168,14 +170,10 @@ function SportsTournamentSlider({ tournaments }: { tournaments: TournamentItem[]
           <div className="sports-tournament-card-v2" key={t.uniqueKey}>
             <div className="sports-tournament-card-v2__media">
               {t.imageUrl ? (
-                <img src={t.imageUrl} alt={t.title} loading="lazy" />
+                <img src={t.imageUrl} alt="College-wise tournament" loading="lazy" />
               ) : (
                 <div style={{ width: '100%', height: '100%', background: '#121826' }} />
               )}
-            </div>
-
-            <div className="sports-tournament-card-v2__content">
-              <h3 className="sports-tournament-card-v2__title">{t.title}</h3>
             </div>
           </div>
         ))}
@@ -204,6 +202,7 @@ export default function Sports() {
   const { data: settingsDoc } = useDocument<SportsPageSettingsDoc>('sportsPageSettings', 'main');
 
   const [activeTab, setActiveTab] = useState<string>('ALL');
+  const [showAllAchievements, setShowAllAchievements] = useState(false);
 
   const heroTitle = settingsDoc?.heroTitle || SPORTS_HERO_DEFAULTS.heroTitle;
   const heroSubtitle = settingsDoc?.heroSubtitle || SPORTS_HERO_DEFAULTS.heroSubtitle;
@@ -337,24 +336,32 @@ export default function Sports() {
             </div>
 
             {/* Champions Gallery Grid — the card is the photo, full-bleed;
-                the name sits below it, outside the card's own box. */}
+                the name sits below it, outside the card's own box. Only
+                the first ACHIEVEMENTS_PREVIEW_COUNT show until "Show More"
+                is clicked, so a long list doesn't dominate the page. */}
             <div className="sports-champions-gallery">
-              {achievements.map((a) => (
+              {(showAllAchievements ? achievements : achievements.slice(0, ACHIEVEMENTS_PREVIEW_COUNT)).map((a) => (
                 <div className="sports-medallion-item" key={a.id}>
                   <div className="sports-medallion-card">
                     {a.imageUrl ? (
-                      <img src={a.imageUrl} alt={a.title} className="sports-medallion-card__img" loading="lazy" />
+                      <img src={a.imageUrl} alt="Achievement photo" className="sports-medallion-card__img" loading="lazy" />
                     ) : (
                       <div className="sports-medallion-card__placeholder">
                         <Trophy size={36} />
                       </div>
                     )}
                   </div>
-
-                  <h3 className="sports-medallion-name">{a.title}</h3>
                 </div>
               ))}
             </div>
+
+            {achievements.length > ACHIEVEMENTS_PREVIEW_COUNT && (
+              <div className="sports-show-more-wrap">
+                <button type="button" className="sports-show-more-btn" onClick={() => setShowAllAchievements((v) => !v)}>
+                  {showAllAchievements ? 'Show Less' : 'Show More'}
+                </button>
+              </div>
+            )}
           </div>
         </section>
       </Section>

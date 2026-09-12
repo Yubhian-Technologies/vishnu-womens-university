@@ -246,7 +246,7 @@ export default function Clubs() {
   const heroExtra = useContentBlocks('clubs', 'hero')[0];
   const { slides: heroSlides } = usePageBanners('clubs');
   const galleryPhotos = useSitePhotos('campus', 'clubs', DEFAULT_GALLERY);
-  const [activeCategory, setActiveCategory] = useState<string | null>('Technical Clubs');
+  const [activeCategory, setActiveCategory] = useState<string | null>('Technical, Innovation & Academic');
   const [storyIndex, setStoryIndex] = useState(0);
 
   const testimonials = liveTestimonials.length > 0 ? liveTestimonials : DEFAULT_TESTIMONIALS;

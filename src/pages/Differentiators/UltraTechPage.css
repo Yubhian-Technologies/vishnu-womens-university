@@ -1,0 +1,1780 @@
+/* ==========================================================================
+   UltraTech CoE Page Redesign — Senior UI/UX Architectural Design System
+   Matches enterprise engineering lab standards, retaining all existing data.
+   ========================================================================== */
+
+.utec-page {
+  font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif);
+  color: #1e293b;
+  background: transparent;
+  padding-bottom: 3.5rem;
+  line-height: 1.6;
+}
+
+/* ==========================================================================
+   1. HERO BANNER: Atmospheric Dark Navy & Industrial Gold Co-Lab Showcase
+   ========================================================================== */
+
+.utec-hero-banner {
+  position: relative;
+  background: linear-gradient(135deg, #07152b 0%, #0c2044 45%, #152d5e 100%);
+  border-radius: 24px;
+  padding: 3.5rem 3rem 2.25rem;
+  margin-bottom: 3rem;
+  overflow: hidden;
+  box-shadow: 0 20px 45px -10px rgba(7, 21, 43, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+/* Ambient dynamic backdrops */
+.utec-hero-ambient {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(80px);
+}
+
+.utec-ambient-1 {
+  top: -60px;
+  left: -40px;
+  width: 320px;
+  height: 320px;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.22) 0%, transparent 70%);
+}
+
+.utec-ambient-2 {
+  bottom: -40px;
+  right: 5%;
+  width: 380px;
+  height: 260px;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, transparent 70%);
+}
+
+.utec-hero-blueprint-grid {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 32px 32px;
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+.utec-hero-container {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 2.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 2.75rem;
+}
+
+.utec-hero-content {
+  flex: 1;
+  min-width: 320px;
+  max-width: 720px;
+}
+
+/* Top kicker & badges */
+.utec-badge-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+
+.utec-yellow-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.85rem;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: 9999px;
+  color: #fbbf24;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  backdrop-filter: blur(8px);
+}
+
+.utec-kicker-beacon {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.utec-beacon-dot {
+  width: 6px;
+  height: 6px;
+  background: #f59e0b;
+  border-radius: 50%;
+}
+
+.utec-beacon-ping {
+  position: absolute;
+  inset: -2px;
+  background: #f59e0b;
+  border-radius: 50%;
+  animation: utecPing 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+  opacity: 0.75;
+}
+
+@keyframes utecPing {
+  75%, 100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+.utec-kicker-slash {
+  color: #f59e0b;
+  font-weight: 900;
+}
+
+.utec-partner-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.8rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/* Title & typography */
+.utec-hero-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  line-height: 1.2;
+  color: #ffffff;
+  margin: 0 0 1rem;
+  letter-spacing: -0.02em;
+}
+
+.utec-hero-script {
+  display: inline-block;
+  background: linear-gradient(135deg, #fde68a 0%, #f59e0b 50%, #d97706 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-style: italic;
+  font-weight: 600;
+}
+
+.utec-hero-subtitle {
+  font-size: 1rem;
+  line-height: 1.75;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0;
+  max-width: 640px;
+}
+
+/* Right Glassmorphic Floating Badge Card */
+.utec-hero-watermark-card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-radius: 20px;
+  padding: 1.5rem 1.75rem;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.25);
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+  min-width: 250px;
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.utec-hero-watermark-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(245, 158, 11, 0.5);
+}
+
+.utec-watermark-icon-ring {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(16, 185, 129, 0.2) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fbbf24;
+}
+
+.utec-watermark-leaf {
+  filter: drop-shadow(0 2px 6px rgba(245, 158, 11, 0.4));
+}
+
+.utec-watermark-text-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+.utec-watermark-main {
+  font-size: 1.15rem;
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.3;
+}
+
+.utec-watermark-sub {
+  font-size: 1.4rem;
+  font-weight: 700;
+  font-style: italic;
+  color: #f59e0b;
+  line-height: 1.25;
+}
+
+.utec-watermark-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #34d399;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  margin-top: 0.25rem;
+}
+
+/* Hero Bottom Stats Bar */
+.utec-hero-stats-bar {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  padding: 1.25rem 1.75rem;
+  background: rgba(11, 30, 66, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.utec-hstat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.utec-hstat-number {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.utec-hstat-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 0.2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.utec-hstat-divider {
+  width: 1px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.12);
+  align-self: center;
+}
+
+@media (max-width: 900px) {
+  .utec-hero-stats-bar {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
+  .utec-hstat-divider {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .utec-hero-banner {
+    padding: 2.25rem 1.5rem 1.75rem;
+    border-radius: 18px;
+  }
+  .utec-hero-title {
+    font-size: 1.85rem;
+  }
+  .utec-hero-watermark-card {
+    width: 100%;
+    align-items: flex-start;
+    text-align: left;
+  }
+  .utec-watermark-text-wrap {
+    align-items: flex-start;
+  }
+}
+
+/* ==========================================================================
+   2. TOP EXECUTIVE GRID: About Us + 4 Pillars & Strategic Blueprint
+   ========================================================================== */
+
+.utec-executive-grid {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  gap: 2rem;
+  margin-bottom: 3.5rem;
+  align-items: stretch;
+}
+
+@media (max-width: 1080px) {
+  .utec-executive-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Section Kicker Bar */
+.utec-section-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: #0c2044;
+  text-transform: uppercase;
+}
+
+.utec-yellow-bar {
+  width: 22px;
+  height: 4px;
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+  border-radius: 9999px;
+}
+
+/* LEFT PANEL: ABOUT US & PILLARS */
+.utec-about-panel {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 2.25rem;
+  box-shadow: 0 10px 30px -5px rgba(12, 32, 68, 0.05);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.utec-about-panel:hover {
+  box-shadow: 0 16px 40px -8px rgba(12, 32, 68, 0.08);
+}
+
+.utec-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.utec-badge-outline {
+  font-size: 0.725rem;
+  font-weight: 700;
+  color: #0c2044;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.utec-about-title {
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: #07152b;
+  margin: 0 0 1rem;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+}
+
+.utec-about-desc {
+  font-size: 0.95rem;
+  line-height: 1.8;
+  color: #475569;
+  margin: 0 0 1.75rem;
+}
+
+/* Pillars Integrated Wrapper */
+.utec-pillars-wrapper {
+  background: #f8fafc;
+  border: 1px solid #edf2f7;
+  border-radius: 16px;
+  padding: 1.25rem;
+  margin-bottom: 1.75rem;
+}
+
+.utec-pillars-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #64748b;
+  margin-bottom: 1rem;
+}
+
+.utec-pillars-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+}
+
+@media (max-width: 600px) {
+  .utec-pillars-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.utec-pillar-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 1rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.utec-pillar-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+}
+
+.utec-pillar-card.p-green:hover {
+  border-color: #86efac;
+}
+
+.utec-pillar-card.p-blue:hover {
+  border-color: #7dd3fc;
+}
+
+.utec-pillar-card.p-pink:hover {
+  border-color: #fda4af;
+}
+
+.utec-pillar-card.p-purple:hover {
+  border-color: #d8b4fe;
+}
+
+.utec-pillar-icon-box {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.utec-pillar-icon-box.green {
+  background: #ecfdf5;
+  color: #059669;
+  border: 1px solid #a7f3d0;
+}
+
+.utec-pillar-icon-box.blue {
+  background: #f0f9ff;
+  color: #0284c7;
+  border: 1px solid #bae6fd;
+}
+
+.utec-pillar-icon-box.pink {
+  background: #fff1f2;
+  color: #e11d48;
+  border: 1px solid #fecdd3;
+}
+
+.utec-pillar-icon-box.purple {
+  background: #faf5ff;
+  color: #7c3aed;
+  border: 1px solid #e9d5ff;
+}
+
+.utec-pillar-body {
+  flex: 1;
+}
+
+.utec-pillar-title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 0.2rem;
+  line-height: 1.3;
+}
+
+.utec-pillar-desc {
+  font-size: 0.775rem;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.45;
+}
+
+/* Action Button */
+.utec-about-action {
+  margin-top: auto;
+  padding-top: 0.5rem;
+}
+
+.utec-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  background: #07152b;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.875rem;
+  padding: 0.75rem 1.6rem;
+  border-radius: 9999px;
+  text-decoration: none;
+  width: fit-content;
+  box-shadow: 0 4px 14px rgba(7, 21, 43, 0.25);
+  transition: all 0.25s ease;
+}
+
+.utec-btn-primary:hover {
+  background: #11284d;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(7, 21, 43, 0.35);
+}
+
+.utec-btn-arrow {
+  transition: transform 0.25s ease;
+}
+
+.utec-btn-primary:hover .utec-btn-arrow {
+  transform: translateX(4px);
+}
+
+/* RIGHT PANEL: STRATEGIC BLUEPRINT (VISION & MISSION) */
+.utec-blueprint-card {
+  background: linear-gradient(180deg, #ffffff 0%, #fffdfa 100%);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 20px;
+  padding: 2.25rem;
+  box-shadow: 0 10px 30px -5px rgba(245, 158, 11, 0.08);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.utec-blueprint-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #f59e0b, #fbbf24, #d97706);
+}
+
+.utec-blueprint-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.725rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #b45309;
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+  padding: 0.3rem 0.8rem;
+  border-radius: 9999px;
+  width: fit-content;
+  margin-bottom: 1.5rem;
+  text-transform: uppercase;
+}
+
+.utec-vm-section {
+  margin-bottom: 1.75rem;
+}
+
+.utec-vm-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: 0.85rem;
+}
+
+.utec-vm-icon-bubble {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.utec-vm-icon-bubble.vision {
+  background: #fef3c7;
+  color: #d97706;
+  border: 1px solid #fde68a;
+}
+
+.utec-vm-icon-bubble.mission {
+  background: #e0f2fe;
+  color: #0284c7;
+  border: 1px solid #bae6fd;
+}
+
+.utec-vm-subtitle {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #94a3b8;
+  display: block;
+}
+
+.utec-vm-heading {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #07152b;
+  margin: 0;
+  line-height: 1.2;
+}
+
+/* Vision Quote Card */
+.utec-vision-quote-card {
+  position: relative;
+  background: #f8fafc;
+  border-left: 3px solid #f59e0b;
+  border-radius: 0 12px 12px 0;
+  padding: 1.1rem 1.25rem 1.1rem 2.25rem;
+}
+
+.utec-quote-mark {
+  position: absolute;
+  top: 0.25rem;
+  left: 0.65rem;
+  font-family: Georgia, serif;
+  font-size: 2.25rem;
+  color: #f59e0b;
+  line-height: 1;
+  opacity: 0.6;
+}
+
+.utec-vision-quote-text {
+  font-size: 0.875rem;
+  line-height: 1.7;
+  color: #334155;
+  font-style: italic;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Mission Checklist */
+.utec-mission-checklist {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.utec-mission-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: #334155;
+}
+
+.utec-mission-bullet-gold {
+  color: #f59e0b;
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+  display: flex;
+  align-items: center;
+}
+
+.utec-mission-text {
+  flex: 1;
+}
+
+/* Blueprint Footer Motto */
+.utec-blueprint-footer {
+  margin-top: auto;
+  padding-top: 1.25rem;
+  border-top: 1px dashed rgba(245, 158, 11, 0.35);
+  text-align: center;
+}
+
+.utec-blueprint-footer-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #d97706;
+  margin-bottom: 0.35rem;
+}
+
+.utec-blueprint-quote {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-style: italic;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #b45309;
+  margin: 0;
+  line-height: 1.45;
+}
+
+/* ==========================================================================
+   3. SECTION 2: OUR FOCUS / KEY OBJECTIVES
+   ========================================================================== */
+
+.utec-focus-section {
+  margin-bottom: 3.5rem;
+}
+
+.utec-focus-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.utec-section-heading {
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: #07152b;
+  margin: 0.4rem 0 0;
+  letter-spacing: -0.02em;
+}
+
+.utec-focus-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.775rem;
+  font-weight: 700;
+  color: #0c2044;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  padding: 0.4rem 0.85rem;
+  border-radius: 9999px;
+}
+
+.utec-focus-intro-box {
+  background: #f8fafc;
+  border-left: 4px solid #0c2044;
+  border-radius: 0 14px 14px 0;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+}
+
+.utec-focus-intro-box p {
+  font-size: 0.95rem;
+  line-height: 1.8;
+  color: #334155;
+  margin: 0;
+  max-width: 960px;
+}
+
+/* Objectives 4-Card Bento Grid */
+.utec-objectives-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+}
+
+@media (max-width: 1024px) {
+  .utec-objectives-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 540px) {
+  .utec-objectives-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.utec-obj-card {
+  position: relative;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 1.75rem 1.35rem 1.5rem;
+  box-shadow: 0 4px 16px rgba(12, 32, 68, 0.04);
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+
+.utec-obj-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3.5px;
+  opacity: 0.7;
+  transition: height 0.25s ease, opacity 0.25s ease;
+}
+
+.utec-obj-card.card-green::before {
+  background: linear-gradient(90deg, #10b981, #059669);
+}
+
+.utec-obj-card.card-blue::before {
+  background: linear-gradient(90deg, #0284c7, #0369a1);
+}
+
+.utec-obj-card.card-pink::before {
+  background: linear-gradient(90deg, #e11d48, #be123c);
+}
+
+.utec-obj-card.card-purple::before {
+  background: linear-gradient(90deg, #9333ea, #7e22ce);
+}
+
+.utec-obj-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 16px 32px rgba(12, 32, 68, 0.09);
+  border-color: #cbd5e1;
+}
+
+.utec-obj-card:hover::before {
+  height: 5px;
+  opacity: 1;
+}
+
+.utec-obj-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.utec-obj-icon-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.utec-obj-icon-circle.green {
+  background: #ecfdf5;
+  color: #059669;
+  border: 1px solid #a7f3d0;
+}
+
+.utec-obj-icon-circle.blue {
+  background: #f0f9ff;
+  color: #0284c7;
+  border: 1px solid #bae6fd;
+}
+
+.utec-obj-icon-circle.pink {
+  background: #fff1f2;
+  color: #e11d48;
+  border: 1px solid #fecdd3;
+}
+
+.utec-obj-icon-circle.purple {
+  background: #faf5ff;
+  color: #7c3aed;
+  border: 1px solid #e9d5ff;
+}
+
+.utec-obj-index {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #cbd5e1;
+  line-height: 1;
+}
+
+.utec-obj-badge {
+  display: inline-block;
+  font-size: 0.675rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  width: fit-content;
+  margin-bottom: 0.75rem;
+}
+
+.utec-obj-badge.green {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.utec-obj-badge.blue {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.utec-obj-badge.pink {
+  background: #ffe4e6;
+  color: #be123c;
+}
+
+.utec-obj-badge.purple {
+  background: #f3e8ff;
+  color: #6b21a8;
+}
+
+.utec-obj-text {
+  font-size: 0.885rem;
+  line-height: 1.65;
+  color: #334155;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* ==========================================================================
+   4. MORE INFORMATION: SIDE-BY-SIDE MASTER-DETAIL TABS LAYOUT
+   ========================================================================== */
+
+.utec-side-by-side-section {
+  margin-bottom: 3.5rem;
+}
+
+.utec-accordion-header-title {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin-bottom: 1.75rem;
+}
+
+.utec-acc-title-left {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #07152b;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.utec-acc-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #f59e0b;
+}
+
+.utec-header-rule {
+  flex: 1;
+  height: 2px;
+  background: linear-gradient(90deg, #f59e0b 0%, rgba(245, 158, 11, 0.2) 60%, transparent 100%);
+}
+
+/* Master-Detail Layout Grid */
+.utec-master-detail-layout {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 1.75rem;
+  align-items: start;
+}
+
+@media (max-width: 960px) {
+  .utec-master-detail-layout {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+/* LEFT SIDEBAR: TAB CONTROLS */
+.utec-tabs-sidebar {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 1.25rem;
+  box-shadow: 0 8px 24px -4px rgba(12, 32, 68, 0.05);
+  position: sticky;
+  top: calc(var(--topbar-height, 40px) + var(--header-height, 70px) + 1rem);
+  z-index: 10;
+}
+
+.utec-sidebar-heading {
+  font-size: 0.725rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #94a3b8;
+  margin-bottom: 0.85rem;
+  padding-left: 0.35rem;
+}
+
+.utec-tabs-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+@media (max-width: 960px) {
+  .utec-tabs-nav {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 0.65rem;
+    padding-bottom: 0.35rem;
+  }
+}
+
+.utec-side-tab-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1rem;
+  border-radius: 14px;
+  border: 1.5px solid transparent;
+  background: #f8fafc;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  color: #1e293b;
+}
+
+@media (max-width: 960px) {
+  .utec-side-tab-btn {
+    width: auto;
+    white-space: nowrap;
+    flex-shrink: 0;
+    padding: 0.65rem 0.95rem;
+  }
+}
+
+.utec-side-tab-btn:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  transform: translateX(2px);
+}
+
+@media (max-width: 960px) {
+  .utec-side-tab-btn:hover {
+    transform: none;
+  }
+}
+
+.utec-side-tab-btn.is-active {
+  background: #07152b;
+  color: #ffffff;
+  border-color: #07152b;
+  box-shadow: 0 6px 18px rgba(7, 21, 43, 0.18);
+}
+
+.utec-tab-btn-main {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.utec-tab-num {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #cbd5e1;
+  line-height: 1;
+  min-width: 24px;
+  transition: color 0.2s ease;
+}
+
+.utec-side-tab-btn.is-active .utec-tab-num {
+  color: #f59e0b;
+}
+
+.utec-tab-btn-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.utec-tab-title {
+  font-size: 0.925rem;
+  font-weight: 700;
+  color: inherit;
+  line-height: 1.3;
+}
+
+.utec-tab-badge-pill {
+  font-size: 0.685rem;
+  font-weight: 700;
+  color: #64748b;
+  background: rgba(0, 0, 0, 0.05);
+  padding: 0.15rem 0.5rem;
+  border-radius: 9999px;
+  width: fit-content;
+  text-transform: capitalize;
+  transition: all 0.2s ease;
+}
+
+.utec-side-tab-btn.is-active .utec-tab-badge-pill {
+  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.15);
+}
+
+.utec-tab-arrow {
+  color: #94a3b8;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+@media (max-width: 960px) {
+  .utec-tab-arrow {
+    display: none;
+  }
+}
+
+.utec-side-tab-btn.is-active .utec-tab-arrow {
+  color: #f59e0b;
+  transform: translateX(3px);
+}
+
+/* RIGHT MAIN PANEL: ACTIVE CONTENT DISPLAY */
+.utec-tab-content-panel {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 2.25rem;
+  box-shadow: 0 10px 30px -5px rgba(12, 32, 68, 0.06);
+  min-height: 480px;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 600px) {
+  .utec-tab-content-panel {
+    padding: 1.5rem 1.25rem;
+    border-radius: 16px;
+  }
+}
+
+/* Panel Header */
+.utec-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 1.5rem;
+  margin-bottom: 1.75rem;
+  border-bottom: 1.5px solid #f1f5f9;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.utec-panel-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.utec-panel-num {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+  color: #d97706;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.utec-panel-title {
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: #07152b;
+  margin: 0 0 0.2rem;
+  letter-spacing: -0.01em;
+}
+
+.utec-panel-tag {
+  font-size: 0.725rem;
+  font-weight: 700;
+  color: #0284c7;
+  background: #e0f2fe;
+  border: 1px solid #bae6fd;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  text-transform: capitalize;
+}
+
+/* Tab Fade Animation */
+.animate-tab-fade {
+  animation: utecTabFadeIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes utecTabFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.utec-panel-body {
+  flex: 1;
+}
+
+/* 4A. TAB 01: IN-CHARGES EXECUTIVE CARD */
+.utec-incharge-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.utec-incharge-left {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+@media (max-width: 650px) {
+  .utec-incharge-left {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+.utec-avatar-wrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.utec-avatar-circle {
+  width: 80px;
+  height: 80px;
+  border-radius: 22px;
+  background: linear-gradient(135deg, #07152b 0%, #152d5e 100%);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.55rem;
+  letter-spacing: 0.04em;
+  border: 2.5px solid #f59e0b;
+  box-shadow: 0 10px 24px rgba(7, 21, 43, 0.2);
+}
+
+.utec-avatar-badge {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #10b981;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.utec-incharge-main {
+  flex: 1;
+}
+
+.utec-incharge-header-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.25rem;
+}
+
+@media (max-width: 650px) {
+  .utec-incharge-header-row {
+    justify-content: center;
+  }
+}
+
+.utec-incharge-name {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #07152b;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.utec-incharge-badge {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #0284c7;
+  background: #e0f2fe;
+  border: 1px solid #bae6fd;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.utec-incharge-role {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 1rem;
+}
+
+.utec-incharge-contact-chips {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 650px) {
+  .utec-incharge-contact-chips {
+    justify-content: center;
+  }
+}
+
+.utec-contact-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #0c2044;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.utec-contact-chip:hover {
+  background: #0c2044;
+  color: #ffffff;
+  border-color: #0c2044;
+  transform: translateY(-1px);
+}
+
+.utec-chip-icon {
+  color: #f59e0b;
+}
+
+.utec-contact-chip:hover .utec-chip-icon {
+  color: #fbbf24;
+}
+
+/* Interests Box */
+.utec-interests-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 1.25rem 1.5rem;
+}
+
+.utec-interests-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.775rem;
+  font-weight: 800;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.85rem;
+}
+
+.utec-interest-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.utec-tag-item {
+  display: inline-block;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  padding: 0.4rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #1e293b;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+/* 4B. TAB 02: STUDENTS BENEFITED */
+.utec-students-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.utec-year-pills {
+  display: flex;
+  gap: 0.65rem;
+}
+
+.utec-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.1rem;
+  border-radius: 9999px;
+  border: 1.5px solid #e2e8f0;
+  background: #ffffff;
+  color: #64748b;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.utec-pill:hover {
+  border-color: #cbd5e1;
+  color: #0c2044;
+}
+
+.utec-pill.is-active {
+  background: #07152b;
+  color: #ffffff;
+  border-color: #07152b;
+  box-shadow: 0 4px 14px rgba(7, 21, 43, 0.2);
+}
+
+.utec-pill-count {
+  font-size: 0.75rem;
+  font-weight: 800;
+  background: rgba(0, 0, 0, 0.08);
+  padding: 0.15rem 0.5rem;
+  border-radius: 9999px;
+}
+
+.utec-pill.is-active .utec-pill-count {
+  background: #f59e0b;
+  color: #07152b;
+}
+
+.utec-table-caption {
+  font-size: 0.825rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* Student Table */
+.utec-table-container {
+  overflow-x: auto;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.02);
+}
+
+.utec-table-container table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.utec-table-container th {
+  background: #07152b;
+  color: #ffffff;
+  padding: 0.85rem 1.25rem;
+  font-size: 0.775rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-bottom: 2px solid #f59e0b;
+}
+
+.utec-table-container td {
+  padding: 0.8rem 1.25rem;
+  border-bottom: 1px solid #edf2f7;
+  color: #334155;
+  transition: background 0.15s ease;
+}
+
+.utec-table-container tr:nth-child(even) {
+  background: #f8fafc;
+}
+
+.utec-table-container tr:hover td {
+  background: #f1f5f9;
+}
+
+.utec-sno-col {
+  font-family: monospace;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #94a3b8;
+}
+
+.utec-reg-pill {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-weight: 700;
+  font-size: 0.825rem;
+  color: #0c2044;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+}
+
+.utec-student-name-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.utec-student-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #f59e0b;
+}
+
+.utec-dept-tag {
+  display: inline-block;
+  font-size: 0.725rem;
+  font-weight: 700;
+  color: #0284c7;
+  background: #e0f2fe;
+  border: 1px solid #bae6fd;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+}
+
+/* 4C. TAB 03: ACTIVITIES TIMELINE */
+.utec-timeline-wrapper {
+  position: relative;
+  padding: 0.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.utec-timeline-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+  position: relative;
+}
+
+.utec-timeline-marker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 32px;
+  flex-shrink: 0;
+}
+
+.utec-marker-ring {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #fef3c7;
+  border: 2px solid #f59e0b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  box-shadow: 0 0 0 4px #ffffff;
+}
+
+.utec-marker-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #d97706;
+}
+
+.utec-timeline-line {
+  position: absolute;
+  top: 24px;
+  bottom: -24px;
+  left: 15px;
+  width: 2px;
+  background: linear-gradient(180deg, #f59e0b, #e2e8f0);
+}
+
+.utec-timeline-content {
+  flex: 1;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.utec-timeline-content:hover {
+  transform: translateX(4px);
+  border-color: #cbd5e1;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.04);
+}
+
+.utec-timeline-header {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.utec-event-type-badge {
+  font-size: 0.725rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #0c2044;
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+}
+
+.utec-event-date {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.utec-timeline-desc {
+  font-size: 0.925rem;
+  line-height: 1.7;
+  color: #1e293b;
+  margin: 0;
+}
+
+/* 4D. CUSTOM SECTION TAB CONTENT */
+.utec-custom-tab-content {
+  line-height: 1.8;
+  color: #334155;
+}
+
+/* ==========================================================================
+   5. BOTTOM WAVE BANNER: CINEMATIC CLOSING
+   ========================================================================== */
+
+.utec-footer-wave {
+  position: relative;
+  background: linear-gradient(135deg, #07152b 0%, #0c2044 50%, #152d5e 100%);
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  margin-top: 3.5rem;
+  box-shadow: 0 16px 36px rgba(7, 21, 43, 0.2);
+  text-align: center;
+  overflow: hidden;
+}
+
+.utec-footer-ambient-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 400px;
+  height: 150px;
+  background: radial-gradient(ellipse, rgba(245, 158, 11, 0.2) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.utec-wave-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.utec-wave-line {
+  flex: 1;
+  max-width: 140px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #f59e0b, transparent);
+}
+
+.utec-wave-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: #fbbf24;
+}
+
+.utec-wave-text {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-style: italic;
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: #f59e0b;
+  letter-spacing: -0.01em;
+}
+
+.utec-wave-subtext {
+  position: relative;
+  z-index: 2;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+/* ==========================================================================
+   6. GALLERY OVERRIDE (IF ANY)
+   ========================================================================== */
+
+.utec-gallery-section {
+  position: relative;
+}

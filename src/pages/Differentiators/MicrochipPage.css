@@ -1,0 +1,509 @@
+/* Microchip Center of Excellence Custom Styles */
+
+.mc-page-container {
+  padding-bottom: 3rem;
+}
+
+/* 1. Overview Section */
+.mc-overview-section {
+  padding: 4rem 0;
+  background: #ffffff;
+}
+
+.mc-overview-paragraphs {
+  background: #fafafa;
+  border: 1px solid #e2e8f0;
+  border-left: 4px solid #c9973a;
+  border-radius: 16px;
+  padding: 1.75rem 2.25rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
+}
+
+.mc-overview-paragraphs p {
+  font-size: 0.975rem;
+  line-height: 1.85;
+  color: #334155;
+  margin: 0;
+}
+
+.mc-feature-card {
+  background: linear-gradient(145deg, #0b1e42 0%, #1e3a8a 100%);
+  border-radius: 16px;
+  padding: 2rem;
+  color: #ffffff;
+  box-shadow: 0 12px 32px rgba(11, 30, 66, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mc-feature-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.mc-feature-header h3 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+}
+
+.mc-feature-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.mc-feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  font-size: 0.925rem;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.5;
+}
+
+.mc-feature-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(201, 151, 58, 0.2);
+  color: #c9973a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* 2. Vision & Mission Section */
+.mc-vm-section {
+  padding: 4.5rem 0;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.mc-vm-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+@media (max-width: 860px) {
+  .mc-vm-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.mc-vm-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 2.25rem;
+  border: 1.5px solid #e2e8f0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  transition: transform 250ms ease, box-shadow 250ms ease, border-color 250ms ease;
+}
+
+.mc-vm-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 32px rgba(11, 30, 66, 0.08);
+  border-color: #c9973a;
+}
+
+.mc-vm-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #b45309;
+  background: rgba(201, 151, 58, 0.12);
+  padding: 0.35rem 0.8rem;
+  border-radius: 9999px;
+  width: fit-content;
+  margin-bottom: 0.85rem;
+}
+
+.mc-vm-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #0b1e42;
+  margin-bottom: 1.25rem;
+}
+
+.mc-vision-bullets {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.mc-vision-bullet {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  font-size: 0.975rem;
+  color: #475569;
+  line-height: 1.6;
+}
+
+.mc-bullet-disc {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #c9973a;
+  flex-shrink: 0;
+  margin-top: 0.55rem;
+}
+
+.mc-mission-box {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border-left: 4px solid #c9973a;
+  padding: 1.5rem;
+  border-radius: 10px;
+  font-size: 1.025rem;
+  line-height: 1.75;
+  color: #1e293b;
+  font-style: italic;
+  margin-top: auto;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+/* 3. Objectives Section */
+.mc-objectives-section {
+  padding: 4.5rem 0;
+  background: #ffffff;
+}
+
+.mc-section-header {
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto 3rem;
+}
+
+.mc-section-label {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #c9973a;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.mc-section-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #0b1e42;
+  margin: 0;
+}
+
+.mc-objectives-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.75rem;
+}
+
+@media (max-width: 768px) {
+  .mc-objectives-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.mc-obj-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.75rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+  display: flex;
+  gap: 1.25rem;
+}
+
+.mc-obj-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  border-color: #c9973a;
+}
+
+.mc-obj-num {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: rgba(201, 151, 58, 0.12);
+  color: #c9973a;
+  font-weight: 800;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.mc-obj-content h4 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0b1e42;
+  margin: 0 0 0.5rem;
+}
+
+.mc-obj-content p {
+  font-size: 0.925rem;
+  color: #64748b;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* 4. Team Section */
+.mc-team-section {
+  padding: 4.5rem 0;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+}
+
+.mc-incharge-card {
+  background: linear-gradient(135deg, #ffffff 0%, #fffbeb 100%);
+  border: 2px solid #c9973a;
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2.5rem;
+  box-shadow: 0 8px 24px rgba(201, 151, 58, 0.12);
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 2rem;
+  align-items: center;
+}
+
+@media (max-width: 640px) {
+  .mc-incharge-card {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+    text-align: center;
+  }
+}
+
+.mc-incharge-avatar {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0b1e42 0%, #1e3a8a 100%);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.1rem;
+  font-weight: 800;
+  border: 3px solid #c9973a;
+  box-shadow: 0 6px 18px rgba(11, 30, 66, 0.25);
+  margin: 0 auto;
+  transition: transform 250ms ease;
+}
+
+.mc-incharge-card:hover .mc-incharge-avatar {
+  transform: scale(1.06);
+}
+
+.mc-incharge-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #c9973a 0%, #b45309 100%);
+  color: #ffffff;
+  font-size: 0.725rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.75rem;
+  border-radius: 9999px;
+  margin-bottom: 0.5rem;
+  box-shadow: 0 2px 8px rgba(201, 151, 58, 0.25);
+}
+
+.mc-incharge-name {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #0b1e42;
+  margin: 0 0 0.25rem;
+}
+
+.mc-incharge-desig {
+  font-size: 0.925rem;
+  color: #64748b;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.mc-contact-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  font-size: 0.875rem;
+  color: #334155;
+}
+
+@media (max-width: 640px) {
+  .mc-contact-meta {
+    justify-content: center;
+  }
+}
+
+.mc-contact-item {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: rgba(255, 255, 255, 0.7);
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.mc-contact-item a {
+  color: #0b1e42;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 150ms ease;
+}
+
+.mc-contact-item a:hover {
+  color: #c9973a;
+}
+
+.mc-faculty-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.mc-faculty-card {
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+  transition: transform 250ms ease, box-shadow 250ms ease, border-color 250ms ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.mc-faculty-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 28px rgba(11, 30, 66, 0.08);
+  border-color: #c9973a;
+}
+
+.mc-faculty-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.mc-faculty-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0b1e42 0%, #1e3a8a 100%);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.05rem;
+  border: 2px solid #c9973a;
+  flex-shrink: 0;
+  box-shadow: 0 3px 10px rgba(11, 30, 66, 0.2);
+  transition: transform 250ms ease;
+}
+
+.mc-faculty-card:hover .mc-faculty-avatar {
+  transform: scale(1.08);
+}
+
+.mc-faculty-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #0b1e42;
+  margin: 0 0 0.15rem;
+}
+
+.mc-faculty-desig {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.mc-faculty-details {
+  font-size: 0.825rem;
+  color: #475569;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: auto;
+  padding-top: 0.85rem;
+  border-top: 1px solid #f1f5f9;
+}
+
+.mc-callsign-badge {
+  display: inline-block;
+  background: #e0f2fe;
+  color: #0369a1;
+  font-size: 0.725rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  width: fit-content;
+}
+
+/* 5. Activities & Outcomes Section */
+.mc-act-section {
+  padding: 4rem 0;
+  background: #ffffff;
+}
+
+.mc-act-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+@media (max-width: 768px) {
+  .mc-act-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.mc-act-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 2rem;
+}
+
+.mc-act-card h3 {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #0b1e42;
+  margin: 0 0 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.mc-act-card p {
+  font-size: 0.95rem;
+  color: #334155;
+  line-height: 1.65;
+  margin: 0;
+}

@@ -10,6 +10,7 @@ type TournamentItem = WithId & SportsTournamentDoc;
 
 const EMPTY: SportsTournamentDoc = { title: '', imageUrl: '', storagePath: '', order: 0 };
 
+
 export default function SportsTournamentAdmin() {
   const { docs: items, loading } = useOrderedCollection<TournamentItem>('sportsTournaments', 'order');
   const [form, setForm] = useState<SportsTournamentDoc>(EMPTY);
@@ -21,7 +22,6 @@ export default function SportsTournamentAdmin() {
   const handleImage = (r: UploadResult) => setForm((p) => ({ ...p, imageUrl: r.url, storagePath: r.path }));
 
   const save = async () => {
-    if (!form.title.trim()) return alert('Tournament name is required.');
     if (!form.imageUrl) return alert('Please upload a photo.');
     setSaving(true);
     try {
@@ -68,18 +68,14 @@ export default function SportsTournamentAdmin() {
   return (
     <div className="admin-section">
       <div className="admin-card">
-        <h2 className="admin-card__title">{editing ? 'Edit Tournament' : 'Add Tournament'}</h2>
+        <h2 className="admin-card__title">{editing ? 'Edit Photo' : 'Add Photo'}</h2>
         <p className="admin-field__hint" style={{ marginBottom: '1rem' }}>
-          Shown as a card in "Collegewise Tournaments" — just a photo and a name.
+          Shown as a photo card in "Collegewise Tournaments" — upload a photo and set the display order.
         </p>
         <div className="admin-form-grid">
-          <div className="admin-field" style={{ gridColumn: '1 / -1', maxWidth: 260 }}>
+          <div className="admin-field" style={{ gridColumn: '1 / -1', maxWidth: 280 }}>
             <label>Photo *</label>
             <ImageUploader folder="vwu/sports-tournaments" currentUrl={form.imageUrl} onUploaded={handleImage} label="Upload Photo" aspect={4 / 3} />
-          </div>
-          <div className="admin-field">
-            <label htmlFor="field-tournament-title">Tournament Name *</label>
-            <input id="field-tournament-title" value={form.title} onChange={(e) => set('title', e.target.value)} placeholder="Annual Basketball Championship" />
           </div>
           <div className="admin-field">
             <label htmlFor="field-tournament-order">Display Order</label>
@@ -89,22 +85,21 @@ export default function SportsTournamentAdmin() {
         <div className="admin-form-actions">
           {editing && <button className="admin-btn admin-btn--ghost" onClick={() => { setEditing(null); setForm(EMPTY); }}>Cancel</button>}
           <button className="admin-btn admin-btn--primary" onClick={save} disabled={saving}>
-            {saving ? 'Saving…' : editing ? 'Update' : 'Add Tournament'}
+            {saving ? 'Saving…' : editing ? 'Update Photo' : 'Add Photo'}
           </button>
         </div>
       </div>
 
       <div className="admin-card">
-        <h2 className="admin-card__title">Tournaments ({items.length})</h2>
+        <h2 className="admin-card__title">Tournament Photos ({items.length})</h2>
         {loading ? <p className="admin-loading">Loading…</p> : (
           <div className="admin-table-wrap">
             <table className="admin-table">
-              <thead><tr><th>Photo</th><th>Name</th><th>Order</th><th>Actions</th></tr></thead>
+              <thead><tr><th>Photo</th><th>Order</th><th>Actions</th></tr></thead>
               <tbody>
                 {items.map((item) => (
                   <tr key={item.id}>
-                    <td>{item.imageUrl ? <img src={item.imageUrl} alt="" className="admin-table__avatar" /> : '🏆'}</td>
-                    <td>{item.title}</td>
+                    <td>{item.imageUrl ? <img src={item.imageUrl} alt="Tournament photo" className="admin-table__avatar" /> : '🏆'}</td>
                     <td>{item.order}</td>
                     <td>
                       <button className="admin-btn admin-btn--sm" onClick={() => startEdit(item)}>Edit</button>
@@ -119,7 +114,7 @@ export default function SportsTournamentAdmin() {
                     </td>
                   </tr>
                 ))}
-                {items.length === 0 && <tr><td colSpan={4} className="admin-empty">No tournaments yet — add one using the form above.</td></tr>}
+                {items.length === 0 && <tr><td colSpan={3} className="admin-empty">No photos yet — upload one using the form above.</td></tr>}
               </tbody>
             </table>
           </div>

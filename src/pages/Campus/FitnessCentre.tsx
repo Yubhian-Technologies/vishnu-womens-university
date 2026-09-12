@@ -7,12 +7,21 @@ import {
   ArrowRight, 
   Award, 
   Flame, 
-  ChevronRight
+  ChevronRight,
+  Activity,
+  Heart,
+  ShieldCheck,
+  Target,
+  Zap,
+  Users
 } from 'lucide-react';
 import SEO from '../../components/SEO/SEO';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
 import { useSitePhotos, useSitePhotosLoading } from '../../hooks/useSitePhotos';
+import { useOrderedCollection } from '../../hooks/useCollection';
 import { smoothScrollTo } from '../../lib/smoothScroll';
+import { toFitnessCentreForm } from '../../lib/fitnessCentreContent';
+import type { CampusLifeItemDoc } from '../Admin/sections/CampusLifeAdmin';
 import './FitnessCentre.css';
 
 const DEFAULT_PHOTOS = [
@@ -20,22 +29,34 @@ const DEFAULT_PHOTOS = [
   { src: '/images/sports-trophy-banner.jpg', alt: 'Sports & Athletic Competitions', caption: 'State & Inter-Collegiate Tournaments' },
   { src: '/images/sports-volleyball-champion.jpg', alt: 'Student Sports Training', caption: 'Physical Stamina & Sports Coaching' },
   { src: '/images/hall-of-champions-banner.jpg', alt: 'Hall of Champions', caption: 'Sports & Fitness Champions' },
-  { src: '/images/vibrant-campus.png', alt: 'VWU Campus Active Life', caption: 'Yoga & Active Campus Wellness' }
+  { src: '/images/campus-vibrant.jpeg', alt: 'VWU Campus Active Life', caption: 'Yoga & Active Campus Wellness' }
 ];
 
+const ICON_MAP: Record<string, typeof Dumbbell> = {
+  Dumbbell,
+  Award,
+  Trophy,
+  Sparkles,
+  Flame,
+  Activity,
+  Heart,
+  ShieldCheck,
+  Target,
+  Zap,
+  Users,
+};
+
 export default function FitnessCentre() {
+  const { docs: items } = useOrderedCollection<CampusLifeItemDoc>('campusLifeItems', 'order');
+  const adminItem = items.find((i) => i.slug === 'fitness-centre');
+  const fcData = toFitnessCentreForm(adminItem?.fitnessCentre);
+
   const photos = useSitePhotos('campus', 'fitness-centre', DEFAULT_PHOTOS);
-  // Until Firestore actually responds, an admin-uploaded photo can't be
-  // told apart from "none uploaded yet" — rendering `photos` immediately
-  // would flash the hardcoded default photo on every load/refresh before
-  // swapping to the real uploaded one a moment later. Shares useSitePhotos'
-  // subscription (not a separate listener) so this resolves at the exact
-  // same moment `photos` itself does.
   const photosLoading = useSitePhotosLoading();
 
   useEffect(() => {
-    document.title = "VISHNU Fitness Centre | Vishnu Women's University";
-  }, []);
+    document.title = `${adminItem?.title || 'VISHNU Fitness Centre'} | Vishnu Women's University`;
+  }, [adminItem?.title]);
 
   const handleScrollTo = (id: string) => {
     const el = document.getElementById(id);
@@ -46,11 +67,11 @@ export default function FitnessCentre() {
   };
 
   const heroBg = photosLoading ? undefined : (photos[0]?.src || '/images/sports-hero-bg.jpg');
-  const ethosImg = photosLoading ? undefined : (photos[1]?.src || '/images/sports-trophy-banner.jpg');
-  const photo1 = photosLoading ? undefined : (photos[0]?.src || '/images/sports-hero-bg.jpg');
-  const photo2 = photosLoading ? undefined : (photos[1]?.src || '/images/sports-trophy-banner.jpg');
-  const photo3 = photosLoading ? undefined : (photos[2]?.src || '/images/sports-volleyball-champion.jpg');
-  const photo4 = photosLoading ? undefined : (photos[3]?.src || '/images/hall-of-champions-banner.jpg');
+  const ethosImg = fcData.vitalityImageUrl || (photosLoading ? undefined : (photos[1]?.src || '/images/sports-trophy-banner.jpg'));
+  const photo1 = fcData.polaroidPhotos[0]?.imageUrl || (photosLoading ? undefined : (photos[0]?.src || '/images/sports-hero-bg.jpg'));
+  const photo2 = fcData.polaroidPhotos[1]?.imageUrl || (photosLoading ? undefined : (photos[1]?.src || '/images/sports-trophy-banner.jpg'));
+  const photo3 = fcData.polaroidPhotos[2]?.imageUrl || (photosLoading ? undefined : (photos[2]?.src || '/images/sports-volleyball-champion.jpg'));
+  const photo4 = fcData.polaroidPhotos[3]?.imageUrl || (photosLoading ? undefined : (photos[3]?.src || '/images/hall-of-champions-banner.jpg'));
 
   return (
     <main className="fc-page page-wrapper">
@@ -154,7 +175,7 @@ export default function FitnessCentre() {
       </section>
 
       {/* ====================================================================
-          2. CAMPUS FITNESS ETHOS (Exact Image 2 Cultural Initiatives Replica)
+          2. CAMPUS FITNESS FOCUS / FOUR PILLARS
           ==================================================================== */}
       <section className="fc-ethos-layout-section" id="ethos-layout-section">
         <div className="fc-container-wide">
@@ -162,61 +183,42 @@ export default function FitnessCentre() {
             
             {/* Left Column: Tag, Title, Subtitle & 4 Icon Badges Row */}
             <div className="fc-ethos-text-column">
-              <span className="fc-ethos-tag">CAMPUS FITNESS ETHOS</span>
-              <h2 className="fc-ethos-main-title">Four Pillars of Vishnu Fitness Centre</h2>
+              <span className="fc-ethos-tag">{fcData.pillarsTag || 'CAMPUS FITNESS FOCUS'}</span>
+              <h2 className="fc-ethos-main-title">{fcData.pillarsTitle || 'Four Pillars of Vishnu Fitness Centre'}</h2>
               <p className="fc-ethos-main-sub">
-                Building endurance, competitive excellence, and long-term wellness for every student.
+                {fcData.pillarsSubtitle || 'Building endurance, competitive excellence, and long-term wellness for every student.'}
               </p>
 
               {/* 4 Icon Badges Row */}
               <div className="fc-badges-row">
-                <div className="fc-badge-item">
-                  <div className="fc-badge-circle">
-                    <Dumbbell size={24} />
-                  </div>
-                  <h4 className="fc-badge-title">Modern Equipment</h4>
-                  <p className="fc-badge-sub">Sophisticated gym machines</p>
-                </div>
-
-                <div className="fc-badge-item">
-                  <div className="fc-badge-circle">
-                    <Award size={24} />
-                  </div>
-                  <h4 className="fc-badge-title">Trained Instructors</h4>
-                  <p className="fc-badge-sub">Professional supervision</p>
-                </div>
-
-                <div className="fc-badge-item">
-                  <div className="fc-badge-circle">
-                    <Trophy size={24} />
-                  </div>
-                  <h4 className="fc-badge-title">Tournament Champions</h4>
-                  <p className="fc-badge-sub">Inter-collegiate medals</p>
-                </div>
-
-                <div className="fc-badge-item">
-                  <div className="fc-badge-circle">
-                    <Sparkles size={24} />
-                  </div>
-                  <h4 className="fc-badge-title">Yoga & Mind Balance</h4>
-                  <p className="fc-badge-sub">Flexibility & stress relief</p>
-                </div>
+                {fcData.pillars.map((pillar, idx) => {
+                  const IconComp = ICON_MAP[pillar.icon] || Dumbbell;
+                  return (
+                    <div key={idx} className="fc-badge-item">
+                      <div className="fc-badge-circle">
+                        <IconComp size={24} />
+                      </div>
+                      <h4 className="fc-badge-title">{pillar.title}</h4>
+                      <p className="fc-badge-sub">{pillar.desc}</p>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
             {/* Middle Column: Cascading Overlapping Tilted Polaroid Photos */}
             <div className="fc-polaroid-stack">
               <div className="fc-polaroid-card p-1">
-                {photo1 ? <img src={photo1} alt="Fitness Centre Facility 1" /> : <div className="fc-img-skeleton" />}
+                {photo1 ? <img src={photo1} alt={fcData.polaroidPhotos[0]?.alt || "Fitness Centre Facility 1"} /> : <div className="fc-img-skeleton" />}
               </div>
               <div className="fc-polaroid-card p-2">
-                {photo2 ? <img src={photo2} alt="Fitness Centre Facility 2" /> : <div className="fc-img-skeleton" />}
+                {photo2 ? <img src={photo2} alt={fcData.polaroidPhotos[1]?.alt || "Fitness Centre Facility 2"} /> : <div className="fc-img-skeleton" />}
               </div>
               <div className="fc-polaroid-card p-3">
-                {photo3 ? <img src={photo3} alt="Fitness Centre Facility 3" /> : <div className="fc-img-skeleton" />}
+                {photo3 ? <img src={photo3} alt={fcData.polaroidPhotos[2]?.alt || "Fitness Centre Facility 3"} /> : <div className="fc-img-skeleton" />}
               </div>
               <div className="fc-polaroid-card p-4">
-                {photo4 ? <img src={photo4} alt="Fitness Centre Facility 4" /> : <div className="fc-img-skeleton" />}
+                {photo4 ? <img src={photo4} alt={fcData.polaroidPhotos[3]?.alt || "Fitness Centre Facility 4"} /> : <div className="fc-img-skeleton" />}
               </div>
             </div>
 
@@ -225,20 +227,20 @@ export default function FitnessCentre() {
       </section>
 
       {/* ====================================================================
-          3. ETHOS BODY PARAGRAPHS & DETAILS
+          3. ETHOS BODY PARAGRAPHS & DETAILS (HEALTH & VITALITY)
           ==================================================================== */}
       <section className="fc-body-section">
         <div className="fc-container">
           <div className="fc-body-grid">
             <div className="fc-body-box">
-              <span className="fc-ethos-tag">HEALTH & VITALITY</span>
-              <h2 className="fc-ethos-main-title">A Strong Mind Resides in a Healthy Body</h2>
-              <p>
-                A strong mind resides in a healthy body. This saying has never been more significant. The fast pace of modern lifestyle has led to an unimaginable amount of physical and psychological stress on human body and mind. Consequently, demand for trained fitness instructors has increased manifold. Vishnu Fitness Center with its sophisticated modern equipment improves physical fitness for sound health.
-              </p>
-              <p>
-                Students often compete in Inter-Collegiate, Inter-University and State Level tournaments and win prizes and medals. Vishnu Fitness Center is a source of health generation and physical stamina. All types of sports and games have a place on this campus. Even Yoga training is provided, emphasizing the physical and mental fitness of students.
-              </p>
+              <span className="fc-ethos-tag">{fcData.vitalityTag || 'HEALTH & VITALITY'}</span>
+              <h2 className="fc-ethos-main-title">{fcData.vitalityTitle || 'A Strong Mind Resides in a Healthy Body'}</h2>
+              {fcData.vitalityParagraph1 && (
+                <p>{fcData.vitalityParagraph1}</p>
+              )}
+              {fcData.vitalityParagraph2 && (
+                <p>{fcData.vitalityParagraph2}</p>
+              )}
             </div>
 
             <div className="fc-body-media">
@@ -263,10 +265,10 @@ export default function FitnessCentre() {
         <section className="fc-gallery-section" id="gallery-section">
           <div className="fc-container">
             <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-              <span className="fc-ethos-tag" style={{ justifyContent: 'center' }}>FACILITY GALLERY</span>
-              <h2 className="fc-ethos-main-title">Fitness Centre in Action</h2>
+              <span className="fc-ethos-tag" style={{ justifyContent: 'center' }}>{fcData.galleryTag || 'FACILITY GALLERY'}</span>
+              <h2 className="fc-ethos-main-title">{fcData.galleryTitle || 'Fitness Centre in Action'}</h2>
             </div>
-            <PhotoGrid images={photos} label="" title="VISHNU Fitness Centre" columns={3} layout="default" />
+            <PhotoGrid images={photos} label="" title={fcData.gallerySubtitle || 'VISHNU Fitness Centre'} columns={3} layout="default" />
           </div>
         </section>
       )}

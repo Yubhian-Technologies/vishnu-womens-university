@@ -22,7 +22,6 @@ export default function SportsAchievementsAdmin() {
   const handleImage = (r: UploadResult) => setForm((p) => ({ ...p, imageUrl: r.url, storagePath: r.path }));
 
   const save = async () => {
-    if (!form.title.trim()) return alert('Achievement name is required.');
     if (!form.imageUrl) return alert('Please upload a photo.');
     setSaving(true);
     try {
@@ -46,7 +45,7 @@ export default function SportsAchievementsAdmin() {
 
   const startEdit = (a: AchievementItem) => {
     setEditing(a.id);
-    setForm({ title: a.title, order: a.order, imageUrl: a.imageUrl || '', storagePath: a.storagePath || '' });
+    setForm({ title: '', order: a.order, imageUrl: a.imageUrl || '', storagePath: a.storagePath || '' });
   };
 
   // No native window.confirm() — this admin can run inside a sandboxed
@@ -73,18 +72,14 @@ export default function SportsAchievementsAdmin() {
   return (
     <div className="admin-section">
       <div className="admin-card">
-        <h2 className="admin-card__title">{editing ? 'Edit Achievement' : 'Add Achievement'}</h2>
+        <h2 className="admin-card__title">{editing ? 'Edit Photo' : 'Add Photo'}</h2>
         <p className="admin-field__hint" style={{ marginBottom: '1rem' }}>
-          Shown as a card in "Medals &amp; Achievements" — just a photo and a name.
+          Shown as a photo card in "Medals &amp; Achievements" — upload a photo and set the display order.
         </p>
         <div className="admin-form-grid">
-          <div className="admin-field" style={{ gridColumn: '1 / -1', maxWidth: 200 }}>
+          <div className="admin-field" style={{ gridColumn: '1 / -1', maxWidth: 220 }}>
             <label>Photo *</label>
             <ImageUploader folder="vwu/sports" currentUrl={form.imageUrl} onUploaded={handleImage} label="Upload Photo" />
-          </div>
-          <div className="admin-field">
-            <label htmlFor="field-achievement-title">Achievement Name *</label>
-            <input id="field-achievement-title" value={form.title} onChange={(e) => set('title', e.target.value)} placeholder="State Level Badminton Championship (Gold)" />
           </div>
           <div className="admin-field">
             <label htmlFor="field-achievement-order">Display Order</label>
@@ -94,22 +89,21 @@ export default function SportsAchievementsAdmin() {
         <div className="admin-form-actions">
           {editing && <button className="admin-btn admin-btn--ghost" onClick={() => { setEditing(null); setForm(EMPTY); }}>Cancel</button>}
           <button className="admin-btn admin-btn--primary" onClick={save} disabled={saving}>
-            {saving ? 'Saving…' : editing ? 'Update' : 'Add Achievement'}
+            {saving ? 'Saving…' : editing ? 'Update Photo' : 'Add Photo'}
           </button>
         </div>
       </div>
 
       <div className="admin-card">
-        <h2 className="admin-card__title">Achievements ({achievements.length})</h2>
+        <h2 className="admin-card__title">Achievement Photos ({achievements.length})</h2>
         {loading ? <p className="admin-loading">Loading…</p> : (
           <div className="admin-table-wrap">
             <table className="admin-table">
-              <thead><tr><th>Photo</th><th>Name</th><th>Order</th><th>Actions</th></tr></thead>
+              <thead><tr><th>Photo</th><th>Order</th><th>Actions</th></tr></thead>
               <tbody>
                 {achievements.map((a) => (
                   <tr key={a.id}>
-                    <td>{a.imageUrl ? <img src={a.imageUrl} alt="" className="admin-table__avatar" /> : '—'}</td>
-                    <td>{a.title}</td>
+                    <td>{a.imageUrl ? <img src={a.imageUrl} alt="Achievement photo" className="admin-table__avatar" /> : '—'}</td>
                     <td>{a.order}</td>
                     <td>
                       <button className="admin-btn admin-btn--sm" onClick={() => startEdit(a)}>Edit</button>
@@ -124,7 +118,7 @@ export default function SportsAchievementsAdmin() {
                     </td>
                   </tr>
                 ))}
-                {achievements.length === 0 && <tr><td colSpan={4} className="admin-empty">No achievements yet — add one using the form above.</td></tr>}
+                {achievements.length === 0 && <tr><td colSpan={3} className="admin-empty">No photos yet — upload one using the form above.</td></tr>}
               </tbody>
             </table>
           </div>
