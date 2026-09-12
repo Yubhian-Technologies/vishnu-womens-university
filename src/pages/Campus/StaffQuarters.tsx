@@ -6,15 +6,30 @@ import {
 import SEO from '../../components/SEO/SEO';
 import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
+import CustomSectionsRenderer from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import { useSitePhotos } from '../../hooks/useSitePhotos';
+import { useContentBlocks } from '../../hooks/useContentBlocks';
+import { useOrderedCollection } from '../../hooks/useCollection';
+import { hasCustomSectionContent } from '../../lib/customSections';
+import type { CampusLifeItemDoc } from '../Admin/sections/CampusLifeAdmin';
+import {
+  DEFAULT_SQ_STATS,
+  DEFAULT_SQ_ABOUT,
+  DEFAULT_SQ_FEATURES,
+  DEFAULT_SQ_AMENITIES,
+} from '../Admin/sections/StaffQuartersAdmin';
 import './StaffQuarters.css';
 
-const RESIDENTIAL_STATS = [
-  { value: '100+', label: 'Faculty Houses', sub: 'Spacious Residential Cluster', icon: Building2 },
-  { value: '24 / 7', label: 'Guarded Security', sub: 'Round-the-clock Patrols', icon: ShieldCheck },
-  { value: '100%', label: 'Water & Power', sub: 'Zero Utility Disruptions', icon: Zap },
-  { value: 'Green', label: 'Scenic Meadows', sub: 'Lake & Pond Frontage', icon: Trees },
-];
+const ICON_MAP: Record<string, typeof Building2> = {
+  Building2,
+  ShieldCheck,
+  Zap,
+  Trees,
+  Droplets,
+  Sparkles,
+  Award,
+  Shield,
+};
 
 const DEFAULT_PHOTOS = [
   {
@@ -44,42 +59,62 @@ const DEFAULT_PHOTOS = [
   },
 ];
 
-const PHOTO_FEATURES = [
-  {
-    imgIndex: 0,
-    title: 'Green Meadows Landscape',
-    tag: 'Nature & Scenery',
-    desc: 'Surrounded by lush greenery, manicured lawns, and a natural pond directly in front, creating a calm and refreshing atmosphere for inmate families.',
-  },
-  {
-    imgIndex: 3,
-    title: '24-Hour Guarded Security',
-    tag: 'Total Safety',
-    desc: 'Dedicated 24/7 security personnel patrol the premises continuously to guarantee complete safety and peace of mind for every family.',
-  },
-  {
-    imgIndex: 1,
-    title: 'Modern Living Abode',
-    tag: 'High Standards',
-    desc: 'Built with high standards of modern architecture, featuring spacious layouts, contemporary amenities, and proper ventilation.',
-  },
-  {
-    imgIndex: 2,
-    title: 'Scenic Pond Frontage',
-    tag: 'Serene Atmosphere',
-    desc: 'The sparkling pond right in front of Green Meadows adds natural elegance, cool breezes, and peaceful walking pathways.',
-  },
-  {
-    imgIndex: 4,
-    title: 'Warm Faculty Community',
-    tag: 'Camaraderie',
-    desc: 'Fosters a close-knit, supportive residential community among faculty and staff members within the safe perimeter of the campus.',
-  },
-];
-
 export default function StaffQuarters() {
   const photos = useSitePhotos('campus', 'staff-quarters', DEFAULT_PHOTOS);
   const [activePhotoIdx, setActivePhotoIdx] = useState(0);
+
+  // Dynamic content blocks
+  const statDocs = useContentBlocks('staff-quarters', 'stats');
+  const aboutDocs = useContentBlocks('staff-quarters', 'about');
+  const featureDocs = useContentBlocks('staff-quarters', 'features');
+  const amenitiesDocs = useContentBlocks('staff-quarters', 'amenities');
+
+  const { docs: items } = useOrderedCollection<CampusLifeItemDoc>('campusLifeItems', 'order');
+  const adminItem = items.find((i) => i.slug === 'staff-quarters');
+  const customSections = (adminItem?.customSections || []).filter(hasCustomSectionContent);
+
+  const aboutDoc = aboutDocs[0];
+  const amenitiesDoc = amenitiesDocs[0];
+
+  const statsList = statDocs.length > 0
+    ? statDocs.map((s) => ({
+        value: s.value || '',
+        label: s.title || '',
+        sub: s.desc || '',
+        icon: ICON_MAP[s.icon || 'Building2'] || Building2,
+      }))
+    : DEFAULT_SQ_STATS.map((s) => ({
+        value: s.value,
+        label: s.label,
+        sub: s.sub,
+        icon: ICON_MAP[s.icon] || Building2,
+      }));
+
+  const aboutData = {
+    badge: aboutDoc?.value || DEFAULT_SQ_ABOUT.badge,
+    title: aboutDoc?.title || DEFAULT_SQ_ABOUT.title,
+    subtitle: aboutDoc?.slug || DEFAULT_SQ_ABOUT.subtitle,
+    storyParagraphs: (aboutDoc?.desc || DEFAULT_SQ_ABOUT.story).split('\n\n'),
+  };
+
+  const featuresList = featureDocs.length > 0
+    ? featureDocs.map((f, i) => ({
+        imgIndex: i % DEFAULT_PHOTOS.length,
+        title: f.title,
+        tag: f.slug || 'Residential Feature',
+        desc: f.desc,
+      }))
+    : DEFAULT_SQ_FEATURES.map((f, i) => ({
+        imgIndex: i % DEFAULT_PHOTOS.length,
+        title: f.title,
+        tag: f.tag,
+        desc: f.desc,
+      }));
+
+  const amenitiesList = (amenitiesDoc?.desc || DEFAULT_SQ_AMENITIES.join('\n'))
+    .split('\n')
+    .map((s) => s.trim())
+    .filter(Boolean);
 
   const getPhotoSrc = (index: number) => {
     const p = photos[index]?.src;
@@ -88,7 +123,7 @@ export default function StaffQuarters() {
   };
 
   useEffect(() => {
-    document.title = 'Faculty & Staff Residential Facilities | VWU';
+    document.title = `${adminItem?.title || 'Faculty & Staff Residential Facilities'} | VWU`;
     
     const observer = new IntersectionObserver(
       (entries) => {
@@ -105,7 +140,7 @@ export default function StaffQuarters() {
 
     document.querySelectorAll('.sq-animate').forEach((el) => observer.observe(el));
     return () => observer.disconnect();
-  }, []);
+  }, [adminItem?.title]);
 
   return (
     <main className="page-wrapper staff-quarters-page">
@@ -117,12 +152,12 @@ export default function StaffQuarters() {
       {/* Hero Section */}
       <PageHero
         page="campus-staff-quarters"
-        defaultTitle="Faculty & Staff Residential Facilities"
-        defaultSubtitle="Comfortable On-Campus Living for Faculty and Staff."
+        defaultTitle={adminItem?.title || 'Faculty & Staff Residential Facilities'}
+        defaultSubtitle={adminItem?.desc || aboutData.subtitle}
         breadcrumb={[
           { label: 'Home', to: '/' },
           { label: 'Campus Life', to: '/campus' },
-          { label: 'Staff Quarters' },
+          { label: adminItem?.title || 'Staff Quarters' },
         ]}
         hideCta={true}
       />
@@ -168,7 +203,7 @@ export default function StaffQuarters() {
       <section className="sq-stats-strip">
         <div className="container">
           <div className="sq-stats-grid">
-            {RESIDENTIAL_STATS.map((stat, idx) => {
+            {statsList.map((stat, idx) => {
               const IconComponent = stat.icon;
               return (
                 <div key={idx} className="sq-stat-card sq-animate" data-delay={idx * 100}>
@@ -201,7 +236,7 @@ export default function StaffQuarters() {
                 </div>
                 <div className="sq-vision-content">
                   <div className="sq-vision-badge">
-                    <Award size={16} /> Chairman's Founding Vision
+                    <Award size={16} /> {aboutData.badge}
                   </div>
                   <blockquote className="sq-vision-quote">
                     “Of three basic human needs, accommodation has got the highest priority in this modern world of high standards of living.”
@@ -212,7 +247,7 @@ export default function StaffQuarters() {
                 </div>
               </div>
 
-              {/* 2. Green Meadows Enclave Visual Card (100 Houses & Scenic Pond) */}
+              {/* 2. Living at Green Meadows Story Section */}
               <div className="sq-feature-hero-card sq-animate" data-delay="200">
                 <div className="sq-card-image-col">
                   <img src={getPhotoSrc(2)} alt="Green Meadows Pond & Scenery" />
@@ -222,58 +257,22 @@ export default function StaffQuarters() {
                 </div>
                 <div className="sq-card-text-col">
                   <div className="sq-card-tag">
-                    <Building2 size={16} /> Housing Cluster
+                    <Building2 size={16} /> {aboutData.title}
                   </div>
-                  <h2 className="sq-visual-title">Green Meadows Cluster</h2>
+                  <h2 className="sq-visual-title">{aboutData.subtitle}</h2>
                   
                   <div className="sq-text-highlight-box">
-                    <p className="sq-canonical-text">
-                      <strong>Green Meadows is a cluster of about hundred houses.</strong>
-                    </p>
-                    <p className="sq-canonical-text">
-                      <strong>With the beautiful scenery around and a pond in front of the Green Meadows add more beauty and pleasantness to all the inmates.</strong>
-                    </p>
+                    {aboutData.storyParagraphs.map((para, pIdx) => (
+                      <p key={pIdx} className="sq-canonical-text">
+                        {para}
+                      </p>
+                    ))}
                   </div>
 
                   <div className="sq-visual-metrics-pills">
-                    <span className="sq-pill"><CheckCircle2 size={15} /> 100+ Houses Cluster</span>
-                    <span className="sq-pill"><CheckCircle2 size={15} /> Natural Water Pond Front</span>
-                    <span className="sq-pill"><CheckCircle2 size={15} /> Beautiful Scenery & Air</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* 3. Security & Utilities Visual Card */}
-              <div className="sq-feature-hero-card reverse sq-animate" data-delay="300">
-                <div className="sq-card-text-col">
-                  <div className="sq-card-tag gold">
-                    <ShieldCheck size={16} /> Security & Infrastructure
-                  </div>
-                  <h2 className="sq-visual-title">24/7 Security & Uninterrupted Utilities</h2>
-                  
-                  <div className="sq-text-highlight-box gold">
-                    <p className="sq-canonical-text">
-                      <strong>The Green Meadows has security personnel who patrol 24 hours.</strong>
-                    </p>
-                    <p className="sq-canonical-text">
-                      <strong>Water and current are supplied without creating any inconvenience.</strong>
-                    </p>
-                    <p className="sq-canonical-text highlight">
-                      <strong>In every aspect Green Meadows is a modern abode with all the conveniences.</strong>
-                    </p>
-                  </div>
-
-                  <div className="sq-visual-metrics-pills">
-                    <span className="sq-pill gold"><Shield size={15} /> 24/7 Guarded Patrols</span>
-                    <span className="sq-pill gold"><Zap size={15} /> Continuous Power & Backup</span>
-                    <span className="sq-pill gold"><Droplets size={15} /> Pure Water Supply</span>
-                  </div>
-                </div>
-
-                <div className="sq-card-image-col">
-                  <img src={getPhotoSrc(3)} alt="Gated Security Entrance" />
-                  <div className="sq-image-badge gold">
-                    <ShieldCheck size={14} /> 24/7 Patrol Security
+                    {amenitiesList.slice(0, 3).map((am, aIdx) => (
+                      <span key={aIdx} className="sq-pill"><CheckCircle2 size={15} /> {am}</span>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -286,7 +285,7 @@ export default function StaffQuarters() {
                 </div>
 
                 <div className="sq-photo-cards-grid">
-                  {PHOTO_FEATURES.map((item, idx) => (
+                  {featuresList.map((item, idx) => (
                     <div key={idx} className="sq-photo-card">
                       <div className="sq-photo-card-img-wrap">
                         <img src={getPhotoSrc(item.imgIndex)} alt={item.title} />
@@ -300,6 +299,13 @@ export default function StaffQuarters() {
                   ))}
                 </div>
               </div>
+
+              {/* Optional Custom Sections from Admin */}
+              {customSections.length > 0 && (
+                <div className="sq-custom-sections-wrap" style={{ marginTop: '2rem' }}>
+                  <CustomSectionsRenderer sections={customSections} />
+                </div>
+              )}
 
               {/* FULL PHOTO GALLERY */}
               <div className="sq-gallery-wrapper sq-animate" data-delay="500">
@@ -318,32 +324,14 @@ export default function StaffQuarters() {
             {/* Sidebar Navigation & Quick Specs */}
             <aside className="sq-sidebar sq-animate" data-delay="250">
               <div className="sq-sidebar-card">
-                <h3 className="sq-sidebar-title">Residential Quick Facts</h3>
+                <h3 className="sq-sidebar-title">Residential Amenities &amp; Facts</h3>
                 <ul className="sq-quick-facts">
-                  <li>
-                    <span className="fact-label">Location</span>
-                    <span className="fact-val">Green Meadows, VWU Campus</span>
-                  </li>
-                  <li>
-                    <span className="fact-label">Total Housing</span>
-                    <span className="fact-val">Cluster of ~100 Houses</span>
-                  </li>
-                  <li>
-                    <span className="fact-label">Surroundings</span>
-                    <span className="fact-val">Front Pond & Scenery</span>
-                  </li>
-                  <li>
-                    <span className="fact-label">Security</span>
-                    <span className="fact-val">24-Hour Guarded Patrols</span>
-                  </li>
-                  <li>
-                    <span className="fact-label">Utilities</span>
-                    <span className="fact-val">100% Water & Power Supply</span>
-                  </li>
-                  <li>
-                    <span className="fact-label">Living Standard</span>
-                    <span className="fact-val">Modern Abode with Conveniences</span>
-                  </li>
+                  {amenitiesList.map((am, i) => (
+                    <li key={i}>
+                      <span className="fact-label">Amenity {i + 1}</span>
+                      <span className="fact-val">{am}</span>
+                    </li>
+                  ))}
                 </ul>
               </div>
             </aside>

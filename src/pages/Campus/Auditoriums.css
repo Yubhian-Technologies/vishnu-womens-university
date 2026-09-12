@@ -254,71 +254,98 @@
   color: var(--color-accent-dark, #b8862f);
 }
 
-/* ---- Gallery — editorial photo collage, no icons ----
-   Columns are pre-packed in JS (see useMasonryColumns in Auditoriums.tsx) by
-   each photo's own measured aspect ratio, greedily filling whichever column
-   is currently shortest — a real waterfall pack, not CSS `column-count`
-   (which balances by total height and can still leave one column far
-   shorter, and derails if any image fails to load). Each column here is
-   just a plain flex stack. */
+/* ---- Gallery — Organic Cluster Collage (Image 1 Style) ---- */
+
+/* ---- Gallery — Organic Cluster Collage (Image 1 Style) ---- */
 
 .aud-gallery-section {
-  padding: var(--space-16) 0;
+  padding: var(--space-10) 0;
+  background-color: #ffffff;
 }
 
 .aud-gallery-header {
-  margin-bottom: var(--space-8);
+  margin-bottom: var(--space-6);
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
   max-width: 60ch;
 }
 
 .aud-gallery-header p {
   color: var(--color-text);
   font-size: clamp(1.05rem, 1.3vw, 1.125rem);
-  line-height: 1.7;
+  line-height: 1.6;
   margin: var(--space-2) 0 0;
 }
 
-.aud-gallery-grid {
-  display: flex;
-  gap: 10px;
+.aud-collage-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  grid-auto-rows: 62px;
+  gap: 10px 14px;
+  max-width: 840px;
+  margin: 0 auto;
+  padding: 0.5rem 0;
 }
 
-.aud-gallery-col {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  flex: 1;
-  min-width: 0;
-}
-
-/* Stagger each column's top so the top edge reads as uneven as the
-   masonry bottom edge (columns start at 0 / 3rem / 1.5rem / 4.5rem). */
-.aud-gallery-col:nth-child(2) {
-  margin-top: clamp(2rem, 3vw, 3rem);
-}
-.aud-gallery-col:nth-child(3) {
-  margin-top: clamp(1rem, 1.5vw, 1.5rem);
-}
-.aud-gallery-col:nth-child(4) {
-  margin-top: clamp(2.75rem, 4.5vw, 4.5rem);
-}
-
-.aud-gallery-item {
-  display: block;
+.aud-collage-item {
+  position: relative;
   overflow: hidden;
   border-radius: 6px;
-  box-shadow: 0 1px 3px rgba(11, 30, 66, 0.12);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease;
+  background: #f0f0f0;
 }
 
-.aud-gallery-item img {
+.aud-collage-item:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  z-index: 5;
+}
+
+.aud-collage-item img {
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
   display: block;
-  transition: transform var(--transition-slow);
 }
 
-.aud-gallery-item:hover img {
-  transform: scale(1.04);
+/* Compact 6-Image Slot Placements */
+
+/* 1. Top Left Portrait */
+.aud-collage-item-1 {
+  grid-column: 3 / 6;
+  grid-row: 1 / 5;
+}
+
+/* 2. Top Right Tall Portrait */
+.aud-collage-item-2 {
+  grid-column: 6 / 9;
+  grid-row: 1 / 5;
+}
+
+/* 3. Middle Left Landscape */
+.aud-collage-item-3 {
+  grid-column: 1 / 4;
+  grid-row: 4 / 7;
+}
+
+/* 4. Center Main Square Highlight */
+.aud-collage-item-4 {
+  grid-column: 4 / 8;
+  grid-row: 4 / 9;
+}
+
+/* 5. Middle Right Tall Portrait */
+.aud-collage-item-5 {
+  grid-column: 8 / 11;
+  grid-row: 3 / 8;
+}
+
+/* 6. Bottom Wide Photo */
+.aud-collage-item-6 {
+  grid-column: 2 / 6;
+  grid-row: 7 / 10;
 }
 
 /* ---- Responsive ---- */

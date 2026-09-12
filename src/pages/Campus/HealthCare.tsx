@@ -5,9 +5,11 @@ import CustomSectionsRenderer from '../../components/CustomSectionsRenderer/Cust
 import HealthCareDetailsTable from './HealthCareDetailsTable';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useSitePhotos } from '../../hooks/useSitePhotos';
+import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import { hasCustomSectionContent } from '../../lib/customSections';
 import type { CampusLifeItemDoc } from '../Admin/sections/CampusLifeAdmin';
+import { DEFAULT_HC_PILLS } from '../Admin/sections/HealthCareAdmin';
 import './HealthCare.css';
 
 // Default Fallback Photos
@@ -19,6 +21,14 @@ const DEFAULT_HC_PHOTOS = [
   { src: PHOTO_NEEDED_PLACEHOLDER, alt: 'Student Wellness Support', caption: 'Student Wellness' },
 ];
 
+const ICON_MAP: Record<string, typeof Heart> = {
+  Heart,
+  Users,
+  ShieldCheck,
+  Star,
+  Activity,
+};
+
 export default function HealthCare() {
   // Dynamic admin data from Firestore `campusLifeItems` (slug: 'health-care')
   const { docs: items } = useOrderedCollection<CampusLifeItemDoc>('campusLifeItems', 'order');
@@ -26,6 +36,20 @@ export default function HealthCare() {
 
   // Dynamic admin photos from `useSitePhotos`
   const photos = useSitePhotos('campus', 'health-care', DEFAULT_HC_PHOTOS);
+
+  // Dynamic content blocks
+  const pillDocs = useContentBlocks('health-care', 'heroPills');
+  const pillsList = pillDocs.length > 0
+    ? pillDocs.map((p) => ({
+        title: p.title || '',
+        desc: p.desc || '',
+        icon: ICON_MAP[p.icon || 'Heart'] || Heart,
+      }))
+    : DEFAULT_HC_PILLS.map((p) => ({
+        title: p.title,
+        desc: p.desc,
+        icon: ICON_MAP[p.icon] || Heart,
+      }));
 
   // Dynamic page title & desc overrides from Firestore if present
   const title = adminItem?.title || 'Health Care';
@@ -67,41 +91,19 @@ export default function HealthCare() {
 
               {/* 4 Feature Pills */}
               <div className="hc-pills-row">
-                <div className="hc-pill-item">
-                  <div className="hc-pill-icon">
-                    <Heart size={18} />
-                  </div>
-                  <div className="hc-pill-text">
-                    Better<br />Health
-                  </div>
-                </div>
-
-                <div className="hc-pill-item">
-                  <div className="hc-pill-icon">
-                    <Users size={18} />
-                  </div>
-                  <div className="hc-pill-text">
-                    Stronger<br />Community
-                  </div>
-                </div>
-
-                <div className="hc-pill-item">
-                  <div className="hc-pill-icon">
-                    <ShieldCheck size={18} />
-                  </div>
-                  <div className="hc-pill-text">
-                    Safe<br />Campus
-                  </div>
-                </div>
-
-                <div className="hc-pill-item">
-                  <div className="hc-pill-icon">
-                    <Star size={18} />
-                  </div>
-                  <div className="hc-pill-text">
-                    Brighter<br />Future
-                  </div>
-                </div>
+                {pillsList.map((pill, idx) => {
+                  const Icon = pill.icon;
+                  return (
+                    <div key={idx} className="hc-pill-item">
+                      <div className="hc-pill-icon">
+                        <Icon size={18} />
+                      </div>
+                      <div className="hc-pill-text">
+                        {pill.title}<br />{pill.desc}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 

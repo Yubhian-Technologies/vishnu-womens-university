@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import SEO from '../../components/SEO/SEO';
 import { usePageBanners } from '../../hooks/usePageBanners';
@@ -49,11 +49,7 @@ const DEFAULT_ABOUT_QUOTE = 'More than just halls, our auditoriums bring people,
 const DEFAULT_ABOUT_ATTRIBUTION = "Vishnu Women's University";
 const DEFAULT_ABOUT_IMAGE = 'https://images.unsplash.com/photo-1519452575417-564c1401ecc0?w=900&q=80';
 
-// Varied real portrait/landscape/square dimensions (not just varied `alt`
-// text) so the plain CSS-column masonry below — no per-tile size rules —
-// naturally reproduces the reference collage's mix of tall, wide, and
-// square tiles from the image dimensions alone. Placeholder photos; swap
-// each one from Admin -> Site Photos -> Campus Life -> Auditoriums.
+// 10 photos matching the 10 slots of the organic cluster collage layout (Image 1 style)
 const DEFAULT_GALLERY: PhotoItem[] = [
   { src: 'https://images.unsplash.com/photo-1580881783365-1e6d599c39e0?w=500&h=750&fit=crop&q=80', alt: 'Auditorium interior', caption: 'Main Auditorium' },
   { src: 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=450&h=680&fit=crop&q=80', alt: 'Guest lecture in session', caption: 'Guest Lecture' },
@@ -64,6 +60,7 @@ const DEFAULT_GALLERY: PhotoItem[] = [
   { src: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=520&h=560&fit=crop&q=80', alt: 'Audience at a campus event', caption: 'Student Audience' },
   { src: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=420&h=620&fit=crop&q=80', alt: 'Students collaborating', caption: 'Collaborative Session' },
   { src: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=560&h=440&fit=crop&q=80', alt: 'Campus event gathering', caption: 'Campus Gathering' },
+  { src: 'https://images.unsplash.com/photo-1511578314322-379afb476865?w=500&h=700&fit=crop&q=80', alt: 'Outdoor campus event', caption: 'Outdoor Venue' },
 ];
 
 // Tile background/text colours cycled across the two feature-tile rows —
@@ -83,52 +80,6 @@ const BOTTOM_TILE_COLORS = [
   { bg: '#F1F3F5', fg: '#343A40' },
 ];
 
-// CSS `column-count` "masonry" balances by *total* column height, which can
-// still leave one column much shorter than the rest (exactly the uneven,
-// gappy result this replaced) and derails badly if any single image fails
-// to load. This instead packs greedily like a real Pinterest/waterfall
-// grid: each photo goes into whichever column is currently shortest, using
-// its *measured* aspect ratio once loaded (a reasonable guess before that)
-// — so columns stay evenly, tightly packed regardless of image mix or a
-// broken URL.
-function useMasonryColumns(photos: PhotoItem[], columnCount: number) {
-  const [ratios, setRatios] = useState<Record<string, number>>({});
-
-  const handleLoad = (src: string) => (e: React.SyntheticEvent<HTMLImageElement>) => {
-    const img = e.currentTarget;
-    if (!img.naturalWidth || !img.naturalHeight) return;
-    const ratio = img.naturalHeight / img.naturalWidth;
-    setRatios((prev) => (prev[src] === ratio ? prev : { ...prev, [src]: ratio }));
-  };
-
-  const columns = useMemo(() => {
-    const cols: PhotoItem[][] = Array.from({ length: columnCount }, () => []);
-    const heights = new Array(columnCount).fill(0);
-    photos.forEach((photo) => {
-      const shortest = heights.indexOf(Math.min(...heights));
-      cols[shortest].push(photo);
-      heights[shortest] += ratios[photo.src] ?? 1.15; // guess ~4:5 until it loads
-    });
-    return cols;
-  }, [photos, ratios, columnCount]);
-
-  return { columns, handleLoad };
-}
-
-// Same column-count breakpoints as the rest of this page's responsive CSS
-// (992px / 640px) — kept here instead of duplicated in CSS since the
-// column count has to actually change the number of rendered columns.
-function useGalleryColumnCount() {
-  const getCount = () => (window.innerWidth <= 640 ? 2 : window.innerWidth <= 992 ? 3 : 4);
-  const [count, setCount] = useState(getCount);
-  useEffect(() => {
-    const onResize = () => setCount(getCount());
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
-  }, []);
-  return count;
-}
-
 export default function Auditoriums() {
   const { slides: heroSlides } = usePageBanners('campus-auditoriums');
   const heroExtra = useContentBlocks('auditoriums', 'hero')[0];
@@ -136,8 +87,6 @@ export default function Auditoriums() {
   const liveBottomStats = useContentBlocks('auditoriums', 'bottomStats');
   const about = useContentBlocks('auditoriums', 'about')[0];
   const galleryPhotos = useSitePhotos('campus', 'auditoriums', DEFAULT_GALLERY);
-  const galleryColumnCount = useGalleryColumnCount();
-  const { columns: galleryColumns, handleLoad: handleGalleryImgLoad } = useMasonryColumns(galleryPhotos, galleryColumnCount);
 
   const topFeatures = liveTopFeatures.length > 0 ? liveTopFeatures : DEFAULT_TOP_FEATURES;
   const bottomStats = liveBottomStats.length > 0 ? liveBottomStats : DEFAULT_BOTTOM_STATS;
@@ -246,8 +195,7 @@ export default function Auditoriums() {
         })}
       </div>
 
-      {/* Gallery — editorial photo collage (true masonry: each photo keeps
-          its own aspect ratio, no cropping, no per-tile size rules). */}
+      {/* Gallery — organic scattered photo cluster collage (matching Image 1 layout) */}
       {galleryPhotos.length > 0 && (
         <section className="aud-gallery-section bg-off-white">
           <div className="container">
@@ -255,14 +203,10 @@ export default function Auditoriums() {
               <span className="section-label">Gallery</span>
               <p>A closer look at the venues that host VWU&rsquo;s academic, cultural, and institutional life.</p>
             </div>
-            <div className="aud-gallery-grid">
-              {galleryColumns.map((col, ci) => (
-                <div className="aud-gallery-col" key={ci}>
-                  {col.map((photo, i) => (
-                    <div key={photo.src || i} className="aud-gallery-item">
-                      <img src={photo.src} alt={photo.alt} loading="lazy" onLoad={handleGalleryImgLoad(photo.src)} />
-                    </div>
-                  ))}
+            <div className="aud-collage-grid">
+              {galleryPhotos.slice(0, 6).map((photo, i) => (
+                <div key={photo.src || i} className={`aud-collage-item aud-collage-item-${i + 1}`}>
+                  <img src={photo.src} alt={photo.alt || `Auditorium gallery photo ${i + 1}`} loading="lazy" />
                 </div>
               ))}
             </div>

@@ -5,10 +5,16 @@ import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
 import CustomSectionsRenderer from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useSitePhotos } from '../../hooks/useSitePhotos';
+import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import { hasCustomSectionContent } from '../../lib/customSections';
 import { findCampusFacilityBySlug } from './campusFacilities.data';
 import type { CampusLifeItemDoc } from '../Admin/sections/CampusLifeAdmin';
+import {
+  DEFAULT_TEMPLES_HERO_STATS,
+  DEFAULT_TEMPLES_ABOUT,
+  DEFAULT_TEMPLES_PILLARS,
+} from '../Admin/sections/TemplesAdmin';
 import './Temples.css';
 
 // Default Fallback Photos
@@ -17,6 +23,17 @@ const DEFAULT_TEMPLE_PHOTOS = Array.from({ length: 6 }, (_, i) => ({
   alt: `Campus Temple Photo ${i + 1}`,
   caption: `Temples of God — Sacred Campus Sanctuary`,
 }));
+
+const ICON_MAP: Record<string, typeof Heart> = {
+  Heart,
+  Sun,
+  Church,
+  Compass,
+  Flame,
+  Users,
+  Landmark,
+  Sparkles,
+};
 
 export default function Temples() {
   // Dynamic admin data from Firestore `campusLifeItems` (slug: 'temples')
@@ -27,14 +44,51 @@ export default function Temples() {
   // Dynamic admin photos from `useSitePhotos`
   const photos = useSitePhotos('campus', 'temples', DEFAULT_TEMPLE_PHOTOS);
 
+  // Dynamic content blocks
+  const heroStatDocs = useContentBlocks('temples', 'heroStats');
+  const aboutDocs = useContentBlocks('temples', 'about');
+  const pillarDocs = useContentBlocks('temples', 'pillars');
+
+  const aboutDoc = aboutDocs[0];
+
+  const statsList = heroStatDocs.length > 0
+    ? heroStatDocs.map((s) => ({
+        value: s.value || '',
+        label: s.title || '',
+        icon: ICON_MAP[s.icon || 'Church'] || Church,
+      }))
+    : DEFAULT_TEMPLES_HERO_STATS.map((s) => ({
+        value: s.value,
+        label: s.label,
+        icon: ICON_MAP[s.icon] || Church,
+      }));
+
+  const aboutData = {
+    badge: aboutDoc?.value || DEFAULT_TEMPLES_ABOUT.badge,
+    title: aboutDoc?.title || DEFAULT_TEMPLES_ABOUT.title,
+    subtitle: aboutDoc?.slug || DEFAULT_TEMPLES_ABOUT.subtitle,
+    philosophyText: aboutDoc?.desc || DEFAULT_TEMPLES_ABOUT.philosophyText,
+  };
+
+  const pillarsList = pillarDocs.length > 0
+    ? pillarDocs.map((p) => ({
+        icon: ICON_MAP[p.icon || 'Heart'] || Heart,
+        tag: p.slug || '',
+        title: p.title || '',
+        desc: p.desc || '',
+      }))
+    : DEFAULT_TEMPLES_PILLARS.map((p) => ({
+        icon: ICON_MAP[p.icon] || Heart,
+        tag: p.tag,
+        title: p.title,
+        desc: p.desc,
+      }));
+
   // Dynamic titles and subtitles
   const title = adminItem?.title || facilityDefault?.title || 'Temples of God';
   const subtitle = adminItem?.desc || facilityDefault?.heroSubtitle || 'A Space for Reflection, Reverence, and Inner Peace.';
 
-  // Full canonical text preserved 100% intact
-  const canonicalPhilosophyText = `Worship is putting the spotlight on God. This whole idea is to engage our Vishnu Women's University students in an atmosphere and attitude of reverence and joy. Vishnu Women's University engage students from varied faith and religious traditions as well as students without religious affiliation. So, Vishnu Women's University holds a place for temple of gods in the campus. The temple is built on a high foundation covering an area of 25,000 square feet.`;
-
-  // Dynamic admin custom sections (exclude duplicate legacy text version of Reverence section)
+  // Dynamic admin custom sections
   const customSections = (adminItem?.customSections || [])
     .filter(hasCustomSectionContent)
     .filter((sec) => !sec.label?.toLowerCase().includes('reverence') && !sec.label?.toLowerCase().includes('reflection'));
@@ -79,35 +133,20 @@ export default function Temples() {
 
               {/* Stat Badges */}
               <div className="tmpl-hero-stats">
-                <div className="tmpl-stat-pill">
-                  <div className="tmpl-stat-icon">
-                    <Church size={18} />
-                  </div>
-                  <div>
-                    <div className="tmpl-stat-val">25,000</div>
-                    <div className="tmpl-stat-lbl">Sq. Ft. Area</div>
-                  </div>
-                </div>
-
-                <div className="tmpl-stat-pill">
-                  <div className="tmpl-stat-icon">
-                    <Compass size={18} />
-                  </div>
-                  <div>
-                    <div className="tmpl-stat-val">All Faiths</div>
-                    <div className="tmpl-stat-lbl">Inclusive Reverence</div>
-                  </div>
-                </div>
-
-                <div className="tmpl-stat-pill">
-                  <div className="tmpl-stat-icon">
-                    <Flame size={18} />
-                  </div>
-                  <div>
-                    <div className="tmpl-stat-val">Sanctuary</div>
-                    <div className="tmpl-stat-lbl">Inner Peace & Joy</div>
-                  </div>
-                </div>
+                {statsList.map((st, i) => {
+                  const Icon = st.icon;
+                  return (
+                    <div key={i} className="tmpl-stat-pill">
+                      <div className="tmpl-stat-icon">
+                        <Icon size={18} />
+                      </div>
+                      <div>
+                        <div className="tmpl-stat-val">{st.value}</div>
+                        <div className="tmpl-stat-lbl">{st.label}</div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
@@ -122,16 +161,16 @@ export default function Temples() {
         </div>
       </section>
 
-      {/* Spiritual Philosophy & Text Section (100% Preserved Text) */}
+      {/* Spiritual Philosophy & Text Section */}
       <section className="tmpl-section">
         <div className="tmpl-container">
           <div className="tmpl-section-header">
-            <div className="tmpl-badge">CAMPUS SANCTUARY</div>
+            <div className="tmpl-badge">{aboutData.badge}</div>
             <h2 className="tmpl-section-title">
-              Spiritual <span>Philosophy</span>
+              {aboutData.title}
             </h2>
             <p className="tmpl-section-subtitle">
-              A sacred space built to nurture peace, reverence, and spiritual well-being.
+              {aboutData.subtitle}
             </p>
           </div>
 
@@ -140,7 +179,7 @@ export default function Temples() {
               “Worship is putting the spotlight on God. This whole idea is to engage our students in an atmosphere and attitude of reverence and joy.”
             </div>
             <p className="tmpl-philosophy-text">
-              {canonicalPhilosophyText}
+              {aboutData.philosophyText}
             </p>
           </div>
         </div>
@@ -172,45 +211,20 @@ export default function Temples() {
           </div>
 
           <div className="tmpl-pillars-grid">
-            <div className="tmpl-pillar-card">
-              <div className="tmpl-pillar-icon">
-                <Heart size={24} />
-              </div>
-              <h3 className="tmpl-pillar-title">Reverence & Joy</h3>
-              <p className="tmpl-pillar-desc">
-                Creating an atmosphere where students engage in daily reflection with peace, gratitude, and reverence.
-              </p>
-            </div>
-
-            <div className="tmpl-pillar-card">
-              <div className="tmpl-pillar-icon">
-                <Sun size={24} />
-              </div>
-              <h3 className="tmpl-pillar-title">Inclusive Harmony</h3>
-              <p className="tmpl-pillar-desc">
-                Welcoming students from varied faith and religious traditions as well as those without religious affiliation.
-              </p>
-            </div>
-
-            <div className="tmpl-pillar-card">
-              <div className="tmpl-pillar-icon">
-                <Church size={24} />
-              </div>
-              <h3 className="tmpl-pillar-title">25,000 Sq. Ft. Sanctuary</h3>
-              <p className="tmpl-pillar-desc">
-                Built on a high foundation covering 25,000 square feet, offering spacious halls for peaceful reflection.
-              </p>
-            </div>
-
-            <div className="tmpl-pillar-card">
-              <div className="tmpl-pillar-icon">
-                <Sparkles size={24} />
-              </div>
-              <h3 className="tmpl-pillar-title">Festivals & Celebrations</h3>
-              <p className="tmpl-pillar-desc">
-                Observing major traditional festivals with unity, joy, and collective campus participation.
-              </p>
-            </div>
+            {pillarsList.map((p, idx) => {
+              const Icon = p.icon;
+              return (
+                <div key={idx} className="tmpl-pillar-card">
+                  <div className="tmpl-pillar-icon">
+                    <Icon size={24} />
+                  </div>
+                  <h3 className="tmpl-pillar-title">{p.title}</h3>
+                  <p className="tmpl-pillar-desc">
+                    {p.desc}
+                  </p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
