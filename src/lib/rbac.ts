@@ -80,8 +80,11 @@ export async function resolveAdminSession(user: User): Promise<AdminSession> {
   if (!user.email) return superAdminSessionFor(user);
   try {
     const snap = await getDocs(query(collection(db, 'department_users'), where('email', '==', user.email)));
+    if (snap.empty) return superAdminSessionFor(user);
     const userDoc = snap.docs.find((d) => d.data().active !== false);
-    if (!userDoc) return superAdminSessionFor(user);
+    if (!userDoc) {
+      return { ...superAdminSessionFor(user), isSuperAdmin: false, isAdmin: false, role: 'inactive' };
+    }
     const data = userDoc.data();
     const role = (data.role as AdminRole) ?? 'department';
     const isAdmin = role === 'admin';

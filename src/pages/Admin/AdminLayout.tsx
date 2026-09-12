@@ -13,7 +13,7 @@ import {
   faPalette, faMedal, faAward, faLightbulb, faFutbol,
 } from '@fortawesome/free-solid-svg-icons';
 import { getFirebaseAuth } from '../../lib/firebaseAdmin';
-import { resolveAdminSession, canReadModule, sessionMatchesRoleSelection } from '../../lib/rbac';
+import { resolveAdminSession, canReadModule } from '../../lib/rbac';
 import AdminLogin from './AdminLogin';
 import AdminDashboard from './AdminDashboard';
 import AdminSessionProvider, { useAdminSession } from './AdminSessionContext';
@@ -110,13 +110,6 @@ export default function AdminLayout() {
   const [user, setUser] = useState<User | null>(null);
   const [checking, setChecking] = useState(true);
   const [loginError, setLoginError] = useState('');
-  // Which role the in-flight sign-in was submitted under — set by AdminLogin
-  // synchronously, before it calls signInWithEmailAndPassword, so it's
-  // available the instant this listener sees the resulting auth state
-  // change. A ref (not state) because it must be current inside the very
-  // next onAuthStateChanged callback, not just on AdminLogin's next render.
-  const attemptedRoleRef = useRef('');
-  const attemptedRoleLabelRef = useRef('');
 
   useEffect(() => {
     let unsub: (() => void) | undefined;
@@ -125,27 +118,15 @@ export default function AdminLayout() {
       if (cancelled) return;
       unsub = onAuthStateChanged(auth, async (u) => {
         if (cancelled) return;
-        const attempted = attemptedRoleRef.current;
-        if (u && attempted) {
+        if (u) {
           const session = await resolveAdminSession(u);
           if (cancelled) return;
-          if (!sessionMatchesRoleSelection(session, attempted)) {
-            // Wrong role for this account — sign back out without ever
-            // exposing `user` as truthy, so AdminLogin never unmounts and
-            // this error survives to be shown on the same screen. The
-            // signOut below re-fires this same listener with u=null, which
-            // is a no-op past this point since attemptedRoleRef is already
-            // cleared.
-            const label = attemptedRoleLabelRef.current;
-            attemptedRoleRef.current = '';
-            attemptedRoleLabelRef.current = '';
-            setLoginError(`This account isn't registered under the "${label}" role.`);
+          if (session.role === 'inactive') {
+            setLoginError(`Your account has been deactivated.`);
             await signOut(auth);
             return;
           }
         }
-        attemptedRoleRef.current = '';
-        attemptedRoleLabelRef.current = '';
         setUser(u);
         setChecking(false);
       });
@@ -168,11 +149,7 @@ export default function AdminLayout() {
     return (
       <AdminLogin
         error={loginError}
-        onAttempt={(role, label) => {
-          setLoginError('');
-          attemptedRoleRef.current = role;
-          attemptedRoleLabelRef.current = label;
-        }}
+        onAttempt={() => setLoginError('')}
       />
     );
   }
