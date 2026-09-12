@@ -223,7 +223,7 @@ function PersonPanelList({ people }: { people: CustomSection[] }) {
 export function CustomSectionsPills({ sections }: { sections: CustomSection[] }) {
   const visible = sections.filter(hasCustomSectionContent);
   if (visible.length === 0) return null;
-  return <PillSwitcher sections={visible} />;
+  return <TabsRenderer sections={visible} />;
 }
 
 // Differentiators detail page — every section WITHOUT placement:'intro'
