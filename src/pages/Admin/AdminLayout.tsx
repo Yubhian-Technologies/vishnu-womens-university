@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { User } from 'firebase/auth';
 import { useSearchParams } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -10,7 +10,7 @@ import {
   faClipboardList, faBus, faCity, faDownload, faTableList, faCamera, faLink, faScaleBalanced, faFolderOpen,
   faChartPie, faChartBar, faStar, faArrowTrendUp, faIdCard, faCalendarCheck, faPortrait, faBuilding, faTag,
   faPlane, faTrophy, faFlask, faFileCircleCheck, faBook, faUserShield, faRightFromBracket, faPhone,
-  faPalette, faMedal, faAward, faLightbulb, faFutbol,
+  faPalette, faMedal, faAward, faLightbulb, faFutbol, faGear,
 } from '@fortawesome/free-solid-svg-icons';
 import { getFirebaseAuth } from '../../lib/firebaseAdmin';
 import { resolveAdminSession, canReadModule } from '../../lib/rbac';
@@ -80,6 +80,7 @@ export const SECTIONS: { id: string; icon: IconDefinition; label: string }[] = [
   { id: 'policies', icon: faBook, label: 'Institutional Policies' },
   // Super Admin only — see canSeeUsersRoles below and UsersRolesAdmin.tsx.
   { id: 'users-roles', icon: faUserShield, label: 'Users & Roles' },
+  { id: 'settings', icon: faGear, label: 'Settings' },
 ];
 
 // Groups the flat SECTIONS list under headers in the desktop sidebar only —

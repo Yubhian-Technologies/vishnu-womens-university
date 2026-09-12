@@ -157,11 +157,11 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
                 <div className="dept-fact-icon-badge">
                   <Hash size={14} strokeWidth={2.4} />
                 </div>
-                <span className="dept-fact-col-title">AP EAPCET Code</span>
+                <span className="dept-fact-col-title">APEAPCET / ICET / ECET Code</span>
               </div>
               <div className="dept-fact-items-window">
                 <div className="dept-fact-static-list">
-                  <Link to="/admissions" className="dept-fact-chip-link" aria-label="View AP EAPCET college codes and admissions details">
+                  <Link to="/admissions" className="dept-fact-chip-link" aria-label="View APEAPCET / ICET / ECET college codes and admissions details">
                     <div className="dept-fact-chip-entry">
                       <span className="dept-fact-chip-sub">College Code</span>
                       <span className="dept-fact-chip-val">{eapcetCode}</span>

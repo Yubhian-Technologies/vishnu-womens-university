@@ -32,7 +32,7 @@ export type ResourceKey = (typeof RESOURCES)[keyof typeof RESOURCES];
 //   screen can show a recognizable role name instead of every scoped account
 //   just saying "Custom".
 // 'custom' — any other admin-defined role.
-export type AdminRole = 'superadmin' | 'admin' | 'department' | 'placements' | 'rnd' | 'custom';
+export type AdminRole = 'superadmin' | 'admin' | 'department' | 'placements' | 'rnd' | 'custom' | 'inactive';
 
 export type ModuleLevel = 'read' | 'write';
 

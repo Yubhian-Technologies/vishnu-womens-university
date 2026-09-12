@@ -175,11 +175,15 @@ function ResearchSection({
   heroImage,
   stats = [],
   slides = [],
+  navOffset,
+  id = "research",
 }: {
   deptName: string;
   heroImage: string;
   stats?: ResearchStat[];
   slides?: ResearchSlide[];
+  navOffset?: number | string;
+  id?: string;
 }) {
   const [slide, setSlide] = useState(0);
   const total = slides.length;
@@ -203,7 +207,7 @@ function ResearchSection({
   const slideImg = current?.imageUrl || heroImage;
 
   return (
-    <section className="section dept-research-section" aria-labelledby="research-heading">
+    <section id={id} className="section dept-research-section" aria-labelledby="research-heading" style={{ scrollMarginTop: navOffset }}>
       <div className="container">
         {/* ── Header row ── */}
         <div className="dept-research-header-row">
@@ -266,7 +270,7 @@ function ResearchSection({
               {/* Photo */}
               <div className="dept-research-slide-photo">
                 {slideImg ? (
-                  <img src={slideImg} alt={`${deptName} research — ${current.title}`} className="dept-research-slide-img" />
+                  <img src={slideImg} alt={`${deptName} research — ${current.title}`} className="dept-research-slide-img" loading="lazy" />
                 ) : (
                   <div className="dept-research-slide-placeholder">
                     <Microscope size={64} strokeWidth={1} style={{ color: '#94a3b8' }} />
@@ -1441,7 +1445,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
 
                   <Link to="/admissions" className="dept-profile-panel dept-profile-eapcet">
                     <div className="dept-profile-panel-head">
-                      <h3>Applying via AP EAPCET?</h3>
+                      <h3>Applying via APEAPCET / ICET / ECET?</h3>
                     </div>
                     <div className="dept-eapcet-body">
                       <span className="dept-eapcet-code">{eapcetCode}</span>
@@ -1474,7 +1478,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
           Left: 2×2 stat cards. Right: auto-advancing research slide carousel.
           Data comes from this department's own doc (Admin → Academic
           Departments → Research & Innovation) — see ResearchSection above. */}
-      <ResearchSection deptName={deptName} heroImage={pageHeroImage} stats={dept?.researchStats} slides={dept?.researchSlides} />
+      <ResearchSection deptName={deptName} heroImage={pageHeroImage} stats={dept?.researchStats} slides={dept?.researchSlides} navOffset={NAV_OFFSET} />
 
       {/* Tie-Ups & MoUs — admin-entered partner/institution names
           (dept.tieUpsMous), same rectangular tile grid as Top Recruiters
