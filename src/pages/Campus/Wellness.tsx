@@ -101,6 +101,8 @@ export default function Wellness() {
   const counsellor = useContentBlocks('wellness', 'counsellor')[0];
   const liveImpactStats = useContentBlocks('wellness', 'impactStats');
   const impactStats = liveImpactStats.length > 0 ? liveImpactStats : DEFAULT_IMPACT_STATS;
+  const impactBg = useContentBlocks('wellness', 'impactBg')[0];
+  const impactBgImage = impactBg?.slug || IMPACT_BG_IMAGE;
 
   const heroImage = heroSlides[0]?.imageUrl || DEFAULT_HERO_IMAGE;
   const counsellorName = counsellor?.title || DEFAULT_COUNSELLOR_NAME;
@@ -273,7 +275,7 @@ export default function Wellness() {
 
       {/* Our Impact */}
       <section className="wellness-impact-section">
-        <img src={IMPACT_BG_IMAGE} alt="" className="wellness-impact-bg-img" />
+        <img src={impactBgImage} alt="" className="wellness-impact-bg-img" />
         <div className="wellness-impact-overlay" />
         <div className="container wellness-impact-content">
           <span className="section-label section-label--dark">Our Impact</span>

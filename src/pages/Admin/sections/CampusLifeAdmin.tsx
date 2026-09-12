@@ -12,6 +12,7 @@ import { diffChangedFields } from '../../../lib/formDiff';
 import { CAMPUS_LIFE_LEGACY_SEEDS } from '../../CampusLife/campusLifeLegacySeeds';
 import { CONTENT_ICON_NAMES } from '../../../lib/contentIcons';
 import AuditoriumsAdmin from './AuditoriumsAdmin';
+import WellnessAdmin from './WellnessAdmin';
 import TravelDeskAdmin from './TravelDeskAdmin';
 import TemplesAdmin from './TemplesAdmin';
 import StaffQuartersAdmin from './StaffQuartersAdmin';
@@ -499,6 +500,7 @@ export default function CampusLifeAdmin() {
       </div>
 
       <AuditoriumsAdmin />
+      <WellnessAdmin />
       <TravelDeskAdmin />
       <TemplesAdmin />
       <StaffQuartersAdmin />
