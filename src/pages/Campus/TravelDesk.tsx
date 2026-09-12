@@ -5,11 +5,19 @@ import {
 } from 'lucide-react';
 import PageHero from '../../components/PageHero/PageHero';
 import PhotoGrid from '../../components/PhotoGrid/PhotoGrid';
+import CustomSectionsRenderer from '../../components/CustomSectionsRenderer/CustomSectionsRenderer';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { useSitePhotos } from '../../hooks/useSitePhotos';
+import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
+import { hasCustomSectionContent } from '../../lib/customSections';
 import { findCampusFacilityBySlug } from './campusFacilities.data';
 import type { CampusLifeItemDoc } from '../Admin/sections/CampusLifeAdmin';
+import {
+  DEFAULT_TRAVEL_CONTACTS,
+  DEFAULT_TRAVEL_ABOUT,
+  DEFAULT_TRAVEL_SERVICES,
+} from '../Admin/sections/TravelDeskAdmin';
 import './TravelDesk.css';
 
 // Default Fallback Photos for Travel Desk
@@ -19,38 +27,18 @@ const DEFAULT_TRAVEL_PHOTOS = Array.from({ length: 6 }, (_, i) => ({
   caption: `Campus Travel Desk & Ticket Booking Counter`,
 }));
 
-const SERVICES = [
-  {
-    icon: Ticket,
-    title: 'Ticket Bookings',
-    desc: 'Hassle-free reservations for Bus, Train, and Flight tickets for local and outstation journeys.',
-  },
-  {
-    icon: Globe,
-    title: 'Passport & Visa Assistance',
-    desc: 'Complete documentation support and guidance for new passport applications and visa processing.',
-  },
-  {
-    icon: Compass,
-    title: 'Holiday Packages',
-    desc: 'Customized vacation and holiday packages designed for individuals, families, and student groups.',
-  },
-  {
-    icon: Building,
-    title: 'Hotel Bookings',
-    desc: 'Verified hotel reservations and budget-friendly stay arrangements across major destinations.',
-  },
-  {
-    icon: FileCheck,
-    title: 'Attestation Services',
-    desc: 'Professional document verification and attestation support for official travel requirements.',
-  },
-  {
-    icon: GraduationCap,
-    title: 'Overseas Education Guidance',
-    desc: 'Expert guidance for international travel, university visits, and overseas education procedures.',
-  },
-];
+const ICON_MAP: Record<string, typeof Ticket> = {
+  Ticket,
+  Globe,
+  Compass,
+  Building,
+  FileCheck,
+  GraduationCap,
+  Phone,
+  Clock,
+  MapPin,
+  Sparkles,
+};
 
 export default function TravelDesk() {
   const { docs: items } = useOrderedCollection<CampusLifeItemDoc>('campusLifeItems', 'order');
@@ -59,8 +47,50 @@ export default function TravelDesk() {
 
   const photos = useSitePhotos('campus', 'travel-desk', DEFAULT_TRAVEL_PHOTOS);
 
+  // Content Blocks for Travel Desk text editing
+  const contactsDocs = useContentBlocks('travel-desk', 'contacts');
+  const aboutDocs = useContentBlocks('travel-desk', 'about');
+  const serviceDocs = useContentBlocks('travel-desk', 'services');
+
+  const contactsDoc = contactsDocs[0];
+  const aboutDoc = aboutDocs[0];
+
+  const contactParts = (contactsDoc?.storagePath || '').split(';;');
+
+  const contactData = {
+    location: contactsDoc?.title || DEFAULT_TRAVEL_CONTACTS.location,
+    locationSub: contactsDoc?.slug || DEFAULT_TRAVEL_CONTACTS.locationSub,
+    timings: contactsDoc?.value || DEFAULT_TRAVEL_CONTACTS.timings,
+    timingsSub: contactsDoc?.desc || DEFAULT_TRAVEL_CONTACTS.timingsSub,
+    phone: contactsDoc?.icon || DEFAULT_TRAVEL_CONTACTS.phone,
+    email: contactParts[0] || DEFAULT_TRAVEL_CONTACTS.email,
+    partner: contactParts[1] || DEFAULT_TRAVEL_CONTACTS.partner,
+  };
+
+  const aboutData = {
+    badge: aboutDoc?.value || DEFAULT_TRAVEL_ABOUT.badge,
+    title: aboutDoc?.title || DEFAULT_TRAVEL_ABOUT.title,
+    subtitle: aboutDoc?.slug || DEFAULT_TRAVEL_ABOUT.subtitle,
+    paragraphs: aboutDoc?.desc ? aboutDoc.desc.split('\n\n') : [DEFAULT_TRAVEL_ABOUT.paragraph1, DEFAULT_TRAVEL_ABOUT.paragraph2],
+    timingMonSat: aboutDoc?.icon || DEFAULT_TRAVEL_ABOUT.timingMonSat,
+    timingSun: aboutDoc?.storagePath || DEFAULT_TRAVEL_ABOUT.timingSun,
+  };
+
+  const servicesList = serviceDocs.length > 0
+    ? serviceDocs.map((s) => ({
+        icon: ICON_MAP[s.icon || 'Ticket'] || Ticket,
+        title: s.title,
+        desc: s.desc,
+      }))
+    : DEFAULT_TRAVEL_SERVICES.map((s) => ({
+        icon: ICON_MAP[s.icon] || Ticket,
+        title: s.title,
+        desc: s.desc,
+      }));
+
   const title = adminItem?.title || facilityDefault?.title || 'Travel Desk';
   const subtitle = adminItem?.desc || facilityDefault?.heroSubtitle || 'Convenient Travel Support for Local and Outstation Journeys.';
+  const customSections = (adminItem?.customSections || []).filter(hasCustomSectionContent);
 
   useEffect(() => {
     document.title = `${title} | Campus Life | VWU`;
@@ -101,23 +131,23 @@ export default function TravelDesk() {
                 <div className="td-pill">
                   <div className="td-pill-icon"><MapPin size={18} /></div>
                   <div>
-                    <div className="td-pill-val">Opposite Central Square</div>
-                    <div className="td-pill-lbl">Adjacent to ICICI ATM</div>
+                    <div className="td-pill-val">{contactData.location}</div>
+                    <div className="td-pill-lbl">{contactData.locationSub}</div>
                   </div>
                 </div>
 
                 <div className="td-pill">
                   <div className="td-pill-icon"><Clock size={18} /></div>
                   <div>
-                    <div className="td-pill-val">4:00 PM – 7:00 PM</div>
-                    <div className="td-pill-lbl">Daily & Sunday Hours</div>
+                    <div className="td-pill-val">{contactData.timings}</div>
+                    <div className="td-pill-lbl">{contactData.timingsSub}</div>
                   </div>
                 </div>
 
                 <div className="td-pill">
                   <div className="td-pill-icon"><Phone size={18} /></div>
                   <div>
-                    <div className="td-pill-val">9624 123 123</div>
+                    <div className="td-pill-val">{contactData.phone}</div>
                     <div className="td-pill-lbl">Direct Helpline</div>
                   </div>
                 </div>
@@ -139,23 +169,22 @@ export default function TravelDesk() {
       <section className="td-section">
         <div className="td-container">
           <div className="td-section-header">
-            <div className="td-badge">CONVENIENT SERVICES</div>
+            <div className="td-badge">{aboutData.badge}</div>
             <h2 className="td-section-title">
-              About the <span>Travel Desk</span>
+              {aboutData.title}
             </h2>
             <p className="td-section-subtitle">
-              Designed to simplify travel and documentation needs for students, faculty, and staff.
+              {aboutData.subtitle}
             </p>
           </div>
 
           <div className="td-about-card">
             <div className="td-about-main">
-              <p className="td-about-paragraph">
-                A dedicated Travel Desk is now available on campus, conveniently located opposite Central Square and adjacent to the ICICI ATM. It offers a wide range of services including ticket bookings (bus, train, air), passport and visa assistance, holiday packages, hotel bookings, attestation services, and overseas education guidance.
-              </p>
-              <p className="td-about-paragraph">
-                This facility is designed to simplify travel and documentation needs for students, faculty, and staff, ensuring safe, hassle-free journey planning without needing to leave the campus.
-              </p>
+              {aboutData.paragraphs.map((p, idx) => (
+                <p key={idx} className="td-about-paragraph">
+                  {p}
+                </p>
+              ))}
             </div>
 
             {/* Timings & Contact Info Box */}
@@ -168,11 +197,11 @@ export default function TravelDesk() {
                 <div className="td-info-body">
                   <div className="td-timing-row">
                     <span className="td-timing-day">Monday – Saturday:</span>
-                    <span className="td-timing-time">4:00 PM to 7:00 PM</span>
+                    <span className="td-timing-time">{aboutData.timingMonSat}</span>
                   </div>
                   <div className="td-timing-row">
                     <span className="td-timing-day">Sundays:</span>
-                    <span className="td-timing-time">11:00 AM to 7:00 PM</span>
+                    <span className="td-timing-time">{aboutData.timingSun}</span>
                   </div>
                 </div>
               </div>
@@ -185,14 +214,14 @@ export default function TravelDesk() {
                 <div className="td-info-body">
                   <div className="td-contact-item">
                     <Phone size={16} />
-                    <a href="tel:9624123123">9624 123 123</a>
+                    <a href={`tel:${contactData.phone.replace(/\s+/g, '')}`}>{contactData.phone}</a>
                   </div>
                   <div className="td-contact-item">
                     <Mail size={16} />
-                    <a href="mailto:support@ushodayaholidays.in">support@ushodayaholidays.in</a>
+                    <a href={`mailto:${contactData.email}`}>{contactData.email}</a>
                   </div>
                   <div className="td-partner-tag">
-                    Partner: <strong>Ushodaya Holidays</strong>
+                    Partner: <strong>{contactData.partner}</strong>
                   </div>
                 </div>
               </div>
@@ -215,7 +244,7 @@ export default function TravelDesk() {
           </div>
 
           <div className="td-services-grid">
-            {SERVICES.map((s, idx) => {
+            {servicesList.map((s, idx) => {
               const Icon = s.icon;
               return (
                 <div key={idx} className="td-service-card">
@@ -234,6 +263,15 @@ export default function TravelDesk() {
           </div>
         </div>
       </section>
+
+      {/* Optional Custom Sections from Admin */}
+      {customSections.length > 0 && (
+        <section className="td-section">
+          <div className="td-container">
+            <CustomSectionsRenderer sections={customSections} />
+          </div>
+        </section>
+      )}
 
       {/* Photo Gallery Section */}
       <section className="td-section td-gallery-section">
@@ -261,3 +299,4 @@ export default function TravelDesk() {
     </main>
   );
 }
+

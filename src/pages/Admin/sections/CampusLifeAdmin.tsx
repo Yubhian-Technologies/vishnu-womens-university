@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { collection, addDoc, deleteDoc, doc, setDoc, updateDoc, serverTimestamp, writeBatch } from 'firebase/firestore';
+import { collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp, writeBatch } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
 import { deleteFile, type UploadResult } from '../../../lib/storage';
@@ -13,10 +13,18 @@ import { CAMPUS_LIFE_LEGACY_SEEDS } from '../../CampusLife/campusLifeLegacySeeds
 import { CONTENT_ICON_NAMES } from '../../../lib/contentIcons';
 import AuditoriumsAdmin from './AuditoriumsAdmin';
 import WellnessAdmin from './WellnessAdmin';
+import TravelDeskAdmin from './TravelDeskAdmin';
+import TemplesAdmin from './TemplesAdmin';
+import StaffQuartersAdmin from './StaffQuartersAdmin';
+import HealthCareAdmin from './HealthCareAdmin';
 import {
   TELEVISION_PILLAR_KEYS, TELEVISION_PILLAR_LABELS, toTelevisionPillarsForm,
   type TelevisionPillars,
 } from '../../../lib/televisionPillars';
+import {
+  FITNESS_PILLAR_ICONS, toFitnessCentreForm,
+  type FitnessCentreData, type FitnessPillarItem,
+} from '../../../lib/fitnessCentreContent';
 
 // Backs every "Campus Life" page (the 16 facility pages under /campus/*,
 // Vishnu TV Academy, Arts & Culture, Sports & Games, Social Services,
@@ -53,48 +61,15 @@ export interface CampusLifeItemDoc {
   // categories (Education/Entertainment/News/Events), each with its own
   // admin photo + short description. See televisionPillars.ts.
   pillars?: TelevisionPillars;
+  // Fitness Centre only — Four Pillars (tag, title, subtitle, 4 pillars with icons,
+  // 4 polaroid photos), Health & Vitality (tag, title, 2 paragraphs, image),
+  // and Facility Gallery (tag, title, subtitle). See fitnessCentreContent.ts.
+  fitnessCentre?: FitnessCentreData;
 }
 
 const EMPTY: Omit<CampusLifeItemDoc, 'id'> = {
   slug: '', title: '', group: 'facility', order: 0, icon: '', desc: '', customSections: [], tabs: [],
 };
-
-/** A simple nav-link entry in the Campus Life mega-menu — for pages with a
- *  fixed route that isn't the generic /campus/:slug pattern every Campus
- *  Facility page below uses (Wellness, the five Student Activities pages,
- *  Clubs, Student Clubs, Vishnu School of Music's external site), so they
- *  can't just be added as a "Campus Facility" item above. Previously
- *  hardcoded directly in Header.tsx; auto-seeded here with that exact
- *  original list the first time this admin loads and finds the collection
- *  empty, so nothing on the public menu changes until an admin actually
- *  edits/reorders/deletes one. */
-export interface CampusLifeQuickLinkDoc {
-  id: string;
-  label: string;
-  path: string;
-  external?: boolean;
-  order: number;
-}
-
-// Fixed ids (not auto-generated) so re-seeding is idempotent — `setDoc` to
-// the same id just overwrites instead of creating a duplicate, unlike
-// `addDoc`. That matters here: React's dev-mode double-invoke of effects
-// (and any other double-mount) would otherwise write every default link
-// twice before the Firestore listener's first snapshot comes back to make
-// `quickLinks.length > 0` true.
-export const DEFAULT_CAMPUS_LIFE_QUICK_LINKS: CampusLifeQuickLinkDoc[] = [
-  { id: 'sewage-treatment-plants', label: 'Sewage Treatment Plants', path: '/campus/sewage-treatment-plants', order: 0 },
-  { id: 'wellness', label: 'Wellness', path: '/campus/wellness', order: 1 },
-  { id: 'vishnu-tv-academy', label: 'Vishnu TV Academy', path: '/vishnu-tv-academy', order: 2 },
-  { id: 'clubs', label: 'Clubs', path: '/campus/clubs', order: 3 },
-  { id: 'student-clubs', label: 'Student Clubs', path: '/student-clubs', order: 4 },
-  { id: 'arts-culture', label: 'Arts & Culture', path: '/arts-culture', order: 5 },
-  { id: 'vishnu-school-of-music', label: 'Vishnu School of Music', path: 'https://svesschoolofmusic.in/', external: true, order: 6 },
-  { id: 'sports-games', label: 'Sports & Games', path: '/sports-games', order: 7 },
-  { id: 'social-services', label: 'Social Services', path: '/social-services', order: 8 },
-];
-
-const EMPTY_QUICK_LINK: Omit<CampusLifeQuickLinkDoc, 'id'> = { label: '', path: '', external: false, order: 0 };
 
 // Pages that keep their existing multi-tab layout — everything else is a
 // single scrolling page of custom sections. Matches exactly which pages
@@ -144,86 +119,6 @@ export default function CampusLifeAdmin() {
   const [editing, setEditing] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [filterGroup, setFilterGroup] = useState<'All' | CampusLifeItemDoc['group']>('All');
-
-  // Campus Life menu — Other Links (Header.tsx's Campus Life dropdown, the
-  // handful of entries with a fixed route rather than a generic /campus/:slug
-  // page). Auto-seeded from DEFAULT_CAMPUS_LIFE_QUICK_LINKS the first time
-  // this loads and finds the collection empty — same pattern as
-  // PlacementItemsAdmin.tsx's Navbar Menu Columns — so the public menu never
-  // changes just from this admin section existing.
-  const { docs: quickLinks, loading: quickLinksLoading } = useOrderedCollection<CampusLifeQuickLinkDoc>('campusLifeQuickLinks', 'order');
-  const [quickLinksSeeded, setQuickLinksSeeded] = useState(false);
-  useEffect(() => {
-    if (quickLinksLoading || quickLinksSeeded || quickLinks.length > 0) return;
-    setQuickLinksSeeded(true);
-    DEFAULT_CAMPUS_LIFE_QUICK_LINKS.forEach(({ id, ...rest }) => {
-      setDoc(doc(db, 'campusLifeQuickLinks', id), rest);
-    });
-  }, [quickLinksLoading, quickLinksSeeded, quickLinks]);
-
-  const [qlForm, setQlForm] = useState<Omit<CampusLifeQuickLinkDoc, 'id'>>(EMPTY_QUICK_LINK);
-  const [qlEditing, setQlEditing] = useState<string | null>(null);
-  const [qlSaving, setQlSaving] = useState(false);
-
-  const saveQuickLink = async () => {
-    if (!qlForm.label.trim() || !qlForm.path.trim()) return alert('Label and path/URL are required.');
-    setQlSaving(true);
-    try {
-      if (qlEditing) {
-        await updateDoc(doc(db, 'campusLifeQuickLinks', qlEditing), { ...qlForm });
-      } else {
-        await addDoc(collection(db, 'campusLifeQuickLinks'), { ...qlForm, order: qlForm.order || quickLinks.length });
-      }
-      setQlForm(EMPTY_QUICK_LINK);
-      setQlEditing(null);
-    } catch (e) {
-      alert(`Couldn't save: ${(e as Error).message}`);
-    } finally { setQlSaving(false); }
-  };
-
-  const startEditQuickLink = (l: CampusLifeQuickLinkDoc) => {
-    setQlEditing(l.id);
-    setQlForm({ label: l.label, path: l.path, external: !!l.external, order: l.order });
-  };
-
-  const removeQuickLink = async (id: string) => {
-    if (!confirm('Delete this menu link? It will no longer show in the Campus Life dropdown.')) return;
-    try {
-      await deleteDoc(doc(db, 'campusLifeQuickLinks', id));
-    } catch (e) {
-      alert(`Couldn't delete: ${(e as Error).message}`);
-    }
-  };
-
-  // Drag-to-reorder — same pattern as the Pages table below.
-  const [qlOrdered, setQlOrdered] = useState<CampusLifeQuickLinkDoc[]>([]);
-  const [qlDrag, setQlDrag] = useState<number | null>(null);
-  useEffect(() => { setQlOrdered(quickLinks); }, [quickLinks]);
-  const handleQlDragOver = (i: number) => {
-    if (qlDrag === null || qlDrag === i) return;
-    setQlOrdered((prev) => {
-      const list = [...prev];
-      const [moved] = list.splice(qlDrag, 1);
-      list.splice(i, 0, moved);
-      return list;
-    });
-    setQlDrag(i);
-  };
-  const handleQlDrop = async () => {
-    setQlDrag(null);
-    const batch = writeBatch(db);
-    let changed = false;
-    qlOrdered.forEach((l, i) => {
-      if (l.order !== i) { batch.update(doc(db, 'campusLifeQuickLinks', l.id), { order: i }); changed = true; }
-    });
-    if (changed) {
-      try {
-        await batch.commit();
-      } catch (e) {
-        alert(`Couldn't save new order: ${(e as Error).message}`);
-      }
-    }
-  };
 
   // Drag-to-reorder — grouped by `group` (Campus Facility / Student
   // Activity), since `order` only needs to be consistent within a group,
@@ -499,6 +394,9 @@ export default function CampusLifeAdmin() {
     setSaving(true);
     try {
       const payload = { ...form };
+      if (form.slug === 'fitness-centre') {
+        payload.customSections = [];
+      }
       if (editing) {
         const changed = originalForm ? diffChangedFields(payload, originalForm) : payload;
         if (Object.keys(changed).length > 0) {
@@ -518,8 +416,10 @@ export default function CampusLifeAdmin() {
     const next: Omit<CampusLifeItemDoc, 'id'> = {
       slug: it.slug, title: it.title, group: it.group, order: it.order,
       icon: it.icon || '', desc: it.desc || '',
-      customSections: it.customSections || [], tabs: it.tabs || [],
+      customSections: it.slug === 'fitness-centre' ? [] : (it.customSections || []),
+      tabs: it.tabs || [],
       pillars: it.slug === 'television' ? toTelevisionPillarsForm(it.pillars) : it.pillars,
+      fitnessCentre: it.slug === 'fitness-centre' ? toFitnessCentreForm(it.fitnessCentre) : it.fitnessCentre,
     };
     setForm(next);
     setOriginalForm(next);
@@ -537,6 +437,40 @@ export default function CampusLifeAdmin() {
         [key]: { ...toTelevisionPillarsForm(p.pillars)[key], [field]: value },
       },
     }));
+  };
+
+  const setFcField = <K extends keyof FitnessCentreData>(field: K, value: FitnessCentreData[K]) => {
+    setForm((p) => ({
+      ...p,
+      fitnessCentre: {
+        ...toFitnessCentreForm(p.fitnessCentre),
+        [field]: value,
+      },
+    }));
+  };
+
+  const setFcPillar = (index: number, field: keyof FitnessPillarItem, value: string) => {
+    setForm((p) => {
+      const current = toFitnessCentreForm(p.fitnessCentre);
+      const newPillars = [...current.pillars];
+      newPillars[index] = { ...newPillars[index], [field]: value };
+      return {
+        ...p,
+        fitnessCentre: { ...current, pillars: newPillars },
+      };
+    });
+  };
+
+  const setFcPolaroid = (index: number, imageUrl: string, storagePath?: string) => {
+    setForm((p) => {
+      const current = toFitnessCentreForm(p.fitnessCentre);
+      const newPolaroids = [...current.polaroidPhotos];
+      newPolaroids[index] = { ...newPolaroids[index], imageUrl, storagePath: storagePath || '' };
+      return {
+        ...p,
+        fitnessCentre: { ...current, polaroidPhotos: newPolaroids },
+      };
+    });
   };
 
   const remove = async (id: string) => {
@@ -565,68 +499,12 @@ export default function CampusLifeAdmin() {
         </p>
       </div>
 
-      <div className="admin-card">
-        <h2 className="admin-card__title">Campus Life Menu — Other Links</h2>
-        <p className="admin-field__hint">
-          The handful of Campus Life dropdown entries that link to a fixed page or external site rather than a
-          generic Campus Facility page below (e.g. Wellness, Clubs, Student Clubs, the Student Activities pages,
-          Vishnu School of Music). Every Campus Facility page added below shows up in the dropdown automatically —
-          it doesn't need an entry here.
-        </p>
-        <div className="admin-form-grid">
-          <div className="admin-field">
-            <label htmlFor="field-ql-label">Label *</label>
-            <input id="field-ql-label" value={qlForm.label} onChange={(e) => setQlForm((p) => ({ ...p, label: e.target.value }))} placeholder="Wellness" />
-          </div>
-          <div className="admin-field">
-            <label htmlFor="field-ql-path">Path or URL *</label>
-            <input id="field-ql-path" value={qlForm.path} onChange={(e) => setQlForm((p) => ({ ...p, path: e.target.value }))} placeholder="/campus/wellness or https://..." />
-          </div>
-          <div className="admin-field">
-            <label>
-              <input type="checkbox" checked={!!qlForm.external} onChange={(e) => setQlForm((p) => ({ ...p, external: e.target.checked }))} style={{ marginRight: 6 }} />
-              Opens an external site (not a VWU page)
-            </label>
-          </div>
-        </div>
-        <div className="admin-form-actions">
-          {qlEditing && <button className="admin-btn admin-btn--ghost" onClick={() => { setQlEditing(null); setQlForm(EMPTY_QUICK_LINK); }}>Cancel</button>}
-          <button className="admin-btn admin-btn--primary" onClick={saveQuickLink} disabled={qlSaving}>{qlSaving ? 'Saving…' : qlEditing ? 'Update' : 'Add Link'}</button>
-        </div>
-        <p className="admin-field__hint" style={{ margin: '1rem 0 0.5rem' }}>Drag rows by the ⠿ handle to reorder.</p>
-        {quickLinksLoading ? <p className="admin-loading">Loading…</p> : (
-          <div className="admin-table-wrap">
-            <table className="admin-table">
-              <thead><tr><th></th><th>Label</th><th>Path / URL</th><th>Actions</th></tr></thead>
-              <tbody>
-                {qlOrdered.map((l, i) => (
-                  <tr
-                    key={l.id}
-                    draggable
-                    onDragStart={() => setQlDrag(i)}
-                    onDragOver={(e) => { e.preventDefault(); handleQlDragOver(i); }}
-                    onDrop={handleQlDrop}
-                    onDragEnd={() => setQlDrag(null)}
-                    style={{ opacity: qlDrag === i ? 0.5 : 1, cursor: 'grab' }}
-                  >
-                    <td style={{ color: 'var(--color-text-light, #9ca3af)', fontSize: '1.1rem', userSelect: 'none' }}>⠿</td>
-                    <td>{l.label}</td>
-                    <td>{l.path}{l.external ? ' (external)' : ''}</td>
-                    <td>
-                      <button className="admin-btn admin-btn--sm" onClick={() => startEditQuickLink(l)}>Edit</button>
-                      <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeQuickLink(l.id)}>Delete</button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-        {!quickLinksLoading && qlOrdered.length === 0 && <p className="admin-empty">No links yet.</p>}
-      </div>
-
       <AuditoriumsAdmin />
       <WellnessAdmin />
+      <TravelDeskAdmin />
+      <TemplesAdmin />
+      <StaffQuartersAdmin />
+      <HealthCareAdmin />
 
       {notYetCreated.length > 0 && (
         <div className="admin-card">
@@ -685,7 +563,7 @@ export default function CampusLifeAdmin() {
             items and for any facility that already has its own hand-curated card in Admin → Page Content Blocks.
           </p>
 
-          {CAMPUS_LIFE_LEGACY_SEEDS[form.slug] && (
+          {CAMPUS_LIFE_LEGACY_SEEDS[form.slug] && form.slug !== 'fitness-centre' && (
             <p className="admin-field__hint admin-field--full" style={{ background: '#eef6ff', border: '1px solid #bcdcfd', borderRadius: 6, padding: '0.6rem 0.9rem' }}>
               This page's original content is available as a starting point.{' '}
               <button type="button" className="admin-btn admin-btn--sm" onClick={seedStarterContent}>
@@ -729,7 +607,229 @@ export default function CampusLifeAdmin() {
             </>
           )}
 
-          {!usesTabs && (
+          {form.slug === 'fitness-centre' && (() => {
+            const fc = toFitnessCentreForm(form.fitnessCentre);
+            return (
+              <>
+                {/* 1. Four Pillars Section */}
+                <div className="admin-field admin-field--full"><hr /><h3>Four Pillars Section (Campus Fitness Focus)</h3></div>
+                <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>
+                  The top section with the 4 core pillar badges and the cascading preview photos on the right.
+                </p>
+                <div className="admin-field">
+                  <label htmlFor="field-fc-ptag">Section Tag / Eyebrow</label>
+                  <input
+                    id="field-fc-ptag"
+                    value={fc.pillarsTag}
+                    onChange={(e) => setFcField('pillarsTag', e.target.value)}
+                    placeholder="CAMPUS FITNESS FOCUS"
+                  />
+                </div>
+                <div className="admin-field">
+                  <label htmlFor="field-fc-ptitle">Section Title</label>
+                  <input
+                    id="field-fc-ptitle"
+                    value={fc.pillarsTitle}
+                    onChange={(e) => setFcField('pillarsTitle', e.target.value)}
+                    placeholder="Four Pillars of Vishnu Fitness Centre"
+                  />
+                </div>
+                <div className="admin-field admin-field--full">
+                  <label htmlFor="field-fc-psub">Section Subtitle</label>
+                  <input
+                    id="field-fc-psub"
+                    value={fc.pillarsSubtitle}
+                    onChange={(e) => setFcField('pillarsSubtitle', e.target.value)}
+                    placeholder="Building endurance, competitive excellence, and long-term wellness for every student."
+                  />
+                </div>
+
+                <div className="admin-field admin-field--full">
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>The 4 Pillars</label>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
+                    {fc.pillars.map((pillar, i) => (
+                      <div key={i} style={{ border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: '1rem', background: '#fafafa' }}>
+                        <div style={{ fontWeight: 600, marginBottom: '0.5rem', color: '#333' }}>Pillar {i + 1}</div>
+                        <div style={{ marginBottom: '0.5rem' }}>
+                          <label style={{ fontSize: '0.8rem', display: 'block', marginBottom: '0.25rem' }}>Icon</label>
+                          <select
+                            value={pillar.icon}
+                            onChange={(e) => setFcPillar(i, 'icon', e.target.value)}
+                            style={{ width: '100%' }}
+                          >
+                            {FITNESS_PILLAR_ICONS.map((iconName) => (
+                              <option key={iconName} value={iconName}>{iconName}</option>
+                            ))}
+                          </select>
+                        </div>
+                        <div style={{ marginBottom: '0.5rem' }}>
+                          <label style={{ fontSize: '0.8rem', display: 'block', marginBottom: '0.25rem' }}>Title</label>
+                          <input
+                            value={pillar.title}
+                            onChange={(e) => setFcPillar(i, 'title', e.target.value)}
+                            placeholder="Title"
+                            style={{ width: '100%' }}
+                          />
+                        </div>
+                        <div>
+                          <label style={{ fontSize: '0.8rem', display: 'block', marginBottom: '0.25rem' }}>Description</label>
+                          <input
+                            value={pillar.desc}
+                            onChange={(e) => setFcPillar(i, 'desc', e.target.value)}
+                            placeholder="Short description"
+                            style={{ width: '100%' }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="admin-field admin-field--full">
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>Cascading Polaroid Photos (Right Stack)</label>
+                  <p className="admin-field__hint" style={{ marginTop: '-0.25rem', marginBottom: '0.75rem' }}>
+                    Upload custom photos for the 4 overlapping polaroid cards. Leaving a slot empty uses the default facility photo automatically.
+                  </p>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+                    {fc.polaroidPhotos.map((photo, i) => (
+                      <div key={i} style={{ border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: '0.75rem', background: '#fff' }}>
+                        <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.85rem', fontWeight: 600 }}>Polaroid Photo {i + 1}</label>
+                        <ImageUploader
+                          folder="vwu/campus-life/fitness-centre"
+                          currentUrl={photo.imageUrl}
+                          onUploaded={(r) => setFcPolaroid(i, r.url, r.path)}
+                          label={`Upload Photo ${i + 1}`}
+                          aspect={4 / 3}
+                        />
+                        {photo.imageUrl && (
+                          <button
+                            type="button"
+                            className="admin-btn admin-btn--ghost admin-btn--sm"
+                            style={{ marginTop: '0.5rem', width: '100%' }}
+                            onClick={() => setFcPolaroid(i, '', '')}
+                          >
+                            Reset to Default
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 2. Health & Vitality Section */}
+                <div className="admin-field admin-field--full"><hr /><h3>Health &amp; Vitality Section</h3></div>
+                <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>
+                  The middle section with two detailed body paragraphs and a wide featured training photo.
+                </p>
+                <div className="admin-field">
+                  <label htmlFor="field-fc-vtag">Section Tag / Eyebrow</label>
+                  <input
+                    id="field-fc-vtag"
+                    value={fc.vitalityTag}
+                    onChange={(e) => setFcField('vitalityTag', e.target.value)}
+                    placeholder="HEALTH & VITALITY"
+                  />
+                </div>
+                <div className="admin-field">
+                  <label htmlFor="field-fc-vtitle">Section Title</label>
+                  <input
+                    id="field-fc-vtitle"
+                    value={fc.vitalityTitle}
+                    onChange={(e) => setFcField('vitalityTitle', e.target.value)}
+                    placeholder="A Strong Mind Resides in a Healthy Body"
+                  />
+                </div>
+                <div className="admin-field admin-field--full">
+                  <label htmlFor="field-fc-vp1">Body Paragraph 1</label>
+                  <textarea
+                    id="field-fc-vp1"
+                    value={fc.vitalityParagraph1}
+                    onChange={(e) => setFcField('vitalityParagraph1', e.target.value)}
+                    rows={4}
+                    placeholder="A strong mind resides in a healthy body..."
+                    style={{ width: '100%' }}
+                  />
+                </div>
+                <div className="admin-field admin-field--full">
+                  <label htmlFor="field-fc-vp2">Body Paragraph 2</label>
+                  <textarea
+                    id="field-fc-vp2"
+                    value={fc.vitalityParagraph2}
+                    onChange={(e) => setFcField('vitalityParagraph2', e.target.value)}
+                    rows={4}
+                    placeholder="Students often compete in Inter-Collegiate, Inter-University and State Level tournaments..."
+                    style={{ width: '100%' }}
+                  />
+                </div>
+                <div className="admin-field admin-field--full">
+                  <label style={{ display: 'block', marginBottom: '0.4rem', fontWeight: 600 }}>Featured Training Session Image</label>
+                  <p className="admin-field__hint" style={{ marginTop: '-0.25rem', marginBottom: '0.5rem' }}>
+                    The wide featured image displayed alongside the Health &amp; Vitality paragraphs. If left empty, it uses the facility's second photo.
+                  </p>
+                  <div style={{ maxWidth: 400 }}>
+                    <ImageUploader
+                      folder="vwu/campus-life/fitness-centre"
+                      currentUrl={fc.vitalityImageUrl}
+                      onUploaded={(r) => {
+                        setFcField('vitalityImageUrl', r.url);
+                        setFcField('vitalityStoragePath', r.path);
+                      }}
+                      label="Upload Featured Photo"
+                      aspect={16 / 9}
+                    />
+                    {fc.vitalityImageUrl && (
+                      <button
+                        type="button"
+                        className="admin-btn admin-btn--ghost admin-btn--sm"
+                        style={{ marginTop: '0.5rem' }}
+                        onClick={() => {
+                          setFcField('vitalityImageUrl', '');
+                          setFcField('vitalityStoragePath', '');
+                        }}
+                      >
+                        Reset to Default Photo
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* 3. Facility Gallery Section */}
+                <div className="admin-field admin-field--full"><hr /><h3>Facility Gallery Section</h3></div>
+                <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>
+                  The photo gallery showcase at the bottom of the page. Gallery photos are managed under <strong>Admin → Website Photos</strong> (Campus Life → VISHNU Fitness Centre).
+                </p>
+                <div className="admin-field">
+                  <label htmlFor="field-fc-gtag">Gallery Tag / Eyebrow</label>
+                  <input
+                    id="field-fc-gtag"
+                    value={fc.galleryTag}
+                    onChange={(e) => setFcField('galleryTag', e.target.value)}
+                    placeholder="FACILITY GALLERY"
+                  />
+                </div>
+                <div className="admin-field">
+                  <label htmlFor="field-fc-gtitle">Gallery Main Heading</label>
+                  <input
+                    id="field-fc-gtitle"
+                    value={fc.galleryTitle}
+                    onChange={(e) => setFcField('galleryTitle', e.target.value)}
+                    placeholder="Fitness Centre in Action"
+                  />
+                </div>
+                <div className="admin-field admin-field--full">
+                  <label htmlFor="field-fc-gsub">Gallery Subtitle / Label</label>
+                  <input
+                    id="field-fc-gsub"
+                    value={fc.gallerySubtitle}
+                    onChange={(e) => setFcField('gallerySubtitle', e.target.value)}
+                    placeholder="VISHNU Fitness Centre"
+                  />
+                </div>
+              </>
+            );
+          })()}
+
+          {!usesTabs && form.slug !== 'fitness-centre' && (
             <>
               <div className="admin-field admin-field--full"><hr /><h3>Sections</h3></div>
               <p className="admin-field__hint" style={{ marginTop: '-0.5rem' }}>

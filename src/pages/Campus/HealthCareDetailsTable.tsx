@@ -1,70 +1,52 @@
 import { CheckCircle2, Clock, Building2, PhoneCall } from 'lucide-react';
+import { useContentBlocks } from '../../hooks/useContentBlocks';
+import {
+  DEFAULT_HC_ABOUT,
+  DEFAULT_HC_SERVICES,
+  DEFAULT_HC_FACILITIES,
+} from '../Admin/sections/HealthCareAdmin';
 import './HealthCare.css';
 
-// Medical Services Checklist Data
-export const MEDICAL_SERVICES_CHECKLIST = [
-  'General OPD & Medical Consultation',
-  'First Aid & Emergency Care',
-  'Basic Laboratory & Diagnostic Services',
-  'ECG & Vital Monitoring',
-  'Inpatient & Sick Bay Facilities',
-  'Pharmacy & Essential Medicines',
-  'Ambulance Support',
-  'Specialist Consultations',
-];
-
-// Campus Medical Facilities Table Data
-export const CAMPUS_FACILITIES_TABLE = [
-  {
-    facility: 'Medical OPD',
-    location: 'CSSD Block, VDC',
-    timings: '8:30 AM – 5:00 PM',
-    medicalOfficer: 'Dr. V. Deepika, MBBS',
-    staff: [
-      { role: 'Nursing Staff', name: 'Mr. I. Kiran, B.Sc. (N)' },
-      { role: 'Laboratory Technician', name: 'Mr. Ramu Narayana Rao' },
-    ],
-  },
-  {
-    facility: 'Sick Bay',
-    location: 'Near Medha Hostel',
-    timings: '8:30 AM – 6:00 PM',
-    medicalOfficer: 'On-Duty Medical Staff',
-    staff: [
-      { role: 'Nursing Staff', name: 'Mrs. M. Shanthi, B.Sc. (N)' },
-    ],
-  },
-  {
-    facility: 'First Aid Centre',
-    location: 'Near Warden’s Office',
-    timings: '8:30 AM – 6:00 PM',
-    medicalOfficer: 'Dr. S. P. Vadana, MD (Physician)',
-    staff: [
-      { role: 'Nursing Staff', name: 'Mrs. M. Anitha, GNM' },
-    ],
-  },
-  {
-    facility: 'Specialist Consultation',
-    location: 'OBGY Clinic Desk',
-    timings: 'Tuesdays, 5:00 – 6:00 PM',
-    medicalOfficer: 'Dr. M. Jagadeeshwari, DNB (OBGY)',
-    staff: [
-      { role: 'Specialist Visit', name: 'Obstetrics & Gynecology' },
-    ],
-  },
-];
-
 export default function HealthCareDetailsTable() {
+  const aboutDocs = useContentBlocks('health-care', 'about');
+  const servicesDocs = useContentBlocks('health-care', 'servicesChecklist');
+  const facilityDocs = useContentBlocks('health-care', 'medicalFacilities');
+
+  const aboutDoc = aboutDocs[0];
+  const servicesDoc = servicesDocs[0];
+
+  const aboutData = {
+    badge: aboutDoc?.value || DEFAULT_HC_ABOUT.badge,
+    title: aboutDoc?.title || DEFAULT_HC_ABOUT.title,
+    subtitle: aboutDoc?.desc || DEFAULT_HC_ABOUT.subtitle,
+  };
+
+  const servicesList = (servicesDoc?.desc || DEFAULT_HC_SERVICES.join('\n'))
+    .split('\n')
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  const facilitiesList = facilityDocs.length > 0
+    ? facilityDocs.map((d) => ({
+        facility: d.title || '',
+        location: d.slug || '',
+        timings: d.value || '',
+        medicalOfficer: d.desc || '',
+        nursingStaff: d.icon || '',
+        otherStaff: d.storagePath || '',
+      }))
+    : DEFAULT_HC_FACILITIES;
+
   return (
     <section className="hc-section hc-details-section">
       <div className="hc-container">
         <div className="hc-section-header">
-          <div className="hc-badge">FACILITIES & SCHEDULE</div>
+          <div className="hc-badge">{aboutData.badge}</div>
           <h2 className="hc-section-title">
-            Quality Healthcare, <span>Close to Campus</span>
+            {aboutData.title}
           </h2>
           <p className="hc-section-subtitle">
-            Vishnu Women’s University provides accessible and reliable healthcare support to students and staff through dedicated medical facilities across the campus. Services include medical consultation, first aid, basic diagnostics, inpatient care, specialist consultations, pharmacy and emergency support.
+            {aboutData.subtitle}
           </p>
         </div>
 
@@ -73,7 +55,7 @@ export default function HealthCareDetailsTable() {
           Medical Services Offered
         </div>
         <div className="hc-checklist-grid">
-          {MEDICAL_SERVICES_CHECKLIST.map((serviceName, idx) => (
+          {servicesList.map((serviceName, idx) => (
             <div key={idx} className="hc-checklist-item">
               <div className="hc-check-icon">
                 <CheckCircle2 size={18} />
@@ -87,20 +69,20 @@ export default function HealthCareDetailsTable() {
         <div className="hc-table-wrapper">
           <div className="hc-table-title-bar">
             <Building2 size={22} />
-            <span>Campus Medical Facilities & Staff Schedule</span>
+            <span>Campus Medical Facilities &amp; Staff Schedule</span>
           </div>
           <div className="hc-table-scroll">
             <table className="hc-table">
               <thead>
                 <tr>
-                  <th>Facility & Location</th>
+                  <th>Facility &amp; Location</th>
                   <th>Working Hours</th>
                   <th>Medical Officer</th>
-                  <th>Nursing & Technical Staff</th>
+                  <th>Nursing &amp; Technical Staff</th>
                 </tr>
               </thead>
               <tbody>
-                {CAMPUS_FACILITIES_TABLE.map((row, idx) => (
+                {facilitiesList.map((row, idx) => (
                   <tr key={idx}>
                     <td>
                       <div className="hc-facility-name">{row.facility}</div>
@@ -119,12 +101,18 @@ export default function HealthCareDetailsTable() {
                       </div>
                     </td>
                     <td>
-                      {row.staff.map((st, sIdx) => (
-                        <div key={sIdx} className="hc-staff-person">
-                          <span className="hc-staff-role">{st.role}</span>
-                          <span className="hc-staff-name">{st.name}</span>
+                      {row.nursingStaff && (
+                        <div className="hc-staff-person">
+                          <span className="hc-staff-role">Nursing Staff</span>
+                          <span className="hc-staff-name">{row.nursingStaff}</span>
                         </div>
-                      ))}
+                      )}
+                      {row.otherStaff && (
+                        <div className="hc-staff-person">
+                          <span className="hc-staff-role">Staff / Specialist</span>
+                          <span className="hc-staff-name">{row.otherStaff}</span>
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -139,9 +127,9 @@ export default function HealthCareDetailsTable() {
             <PhoneCall size={26} />
           </div>
           <div>
-            <div className="hc-info-title">On-Campus Dental Care & 24×7 Emergency Support</div>
+            <div className="hc-info-title">On-Campus Dental Care &amp; 24×7 Emergency Support</div>
             <div className="hc-info-text">
-              Students and staff also have access to on-campus dental care at <strong>Vishnu Dental College & Hospital</strong>, supported by <strong>24×7 emergency medical assistance and ambulance services</strong>.
+              Students and staff also have access to on-campus dental care at <strong>Vishnu Dental College &amp; Hospital</strong>, supported by <strong>24×7 emergency medical assistance and ambulance services</strong>.
             </div>
           </div>
         </div>
@@ -149,3 +137,4 @@ export default function HealthCareDetailsTable() {
     </section>
   );
 }
+
