@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp, writeBatch } from 'firebase/firestore';
+import { collection, addDoc, deleteDoc, doc, setDoc, updateDoc, serverTimestamp, writeBatch } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
 import { deleteFile, type UploadResult } from '../../../lib/storage';
@@ -71,6 +71,33 @@ const EMPTY: Omit<CampusLifeItemDoc, 'id'> = {
   slug: '', title: '', group: 'facility', order: 0, icon: '', desc: '', customSections: [], tabs: [],
 };
 
+/** A simple nav-link entry in the Campus Life mega-menu — for pages with a
+ *  fixed route that isn't the generic /campus/:slug pattern every Campus
+ *  Facility page below uses (Wellness, Student Clubs, the Student Activities
+ *  pages, Vishnu School of Music's external site), so they can't just be
+ *  added as a "Campus Facility" item above. Previously hardcoded directly in
+ *  Header.tsx; auto-seeded here with that exact original list the first
+ *  time this admin loads and finds the collection empty, so nothing on the
+ *  public menu changes until an admin actually edits/reorders/deletes one. */
+export interface CampusLifeQuickLinkDoc {
+  id: string;
+  label: string;
+  path: string;
+  external?: boolean;
+  order: number;
+}
+
+export const DEFAULT_CAMPUS_LIFE_QUICK_LINKS: CampusLifeQuickLinkDoc[] = [
+  { id: 'sewage-treatment-plants', label: 'Sewage Treatment Plants', path: '/campus/sewage-treatment-plants', order: 0 },
+  { id: 'wellness', label: 'Wellness Centre', path: '/campus/wellness', order: 1 },
+  { id: 'vishnu-tv-academy', label: 'Vishnu TV Academy', path: '/vishnu-tv-academy', order: 2 },
+  { id: 'student-clubs', label: 'Student Clubs', path: '/campus/clubs', order: 3 },
+  { id: 'vishnu-school-of-music', label: 'Vishnu School of Music', path: 'https://svesschoolofmusic.in/', external: true, order: 4 },
+  { id: 'social-services', label: 'Social Services', path: '/social-services', order: 5 },
+];
+
+const EMPTY_QUICK_LINK: Omit<CampusLifeQuickLinkDoc, 'id'> = { label: '', path: '', external: false, order: 0 };
+
 // Pages that keep their existing multi-tab layout — everything else is a
 // single scrolling page of custom sections. Matches exactly which pages
 // had a tabbed UI before this (Central Library, Campus Hostels, Other
@@ -119,6 +146,86 @@ export default function CampusLifeAdmin() {
   const [editing, setEditing] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [filterGroup, setFilterGroup] = useState<'All' | CampusLifeItemDoc['group']>('All');
+
+  // Campus Life menu — Other Links (Header.tsx's Campus Life dropdown, the
+  // handful of entries with a fixed route rather than a generic /campus/:slug
+  // page). Auto-seeded from DEFAULT_CAMPUS_LIFE_QUICK_LINKS the first time
+  // this loads and finds the collection empty — same pattern as
+  // PlacementItemsAdmin.tsx's Navbar Menu Columns — so the public menu never
+  // changes just from this admin section existing.
+  const { docs: quickLinks, loading: quickLinksLoading } = useOrderedCollection<CampusLifeQuickLinkDoc>('campusLifeQuickLinks', 'order');
+  const [quickLinksSeeded, setQuickLinksSeeded] = useState(false);
+  useEffect(() => {
+    if (quickLinksLoading || quickLinksSeeded || quickLinks.length > 0) return;
+    setQuickLinksSeeded(true);
+    DEFAULT_CAMPUS_LIFE_QUICK_LINKS.forEach(({ id, ...rest }) => {
+      setDoc(doc(db, 'campusLifeQuickLinks', id), rest);
+    });
+  }, [quickLinksLoading, quickLinksSeeded, quickLinks]);
+
+  const [qlForm, setQlForm] = useState<Omit<CampusLifeQuickLinkDoc, 'id'>>(EMPTY_QUICK_LINK);
+  const [qlEditing, setQlEditing] = useState<string | null>(null);
+  const [qlSaving, setQlSaving] = useState(false);
+
+  const saveQuickLink = async () => {
+    if (!qlForm.label.trim() || !qlForm.path.trim()) return alert('Label and path/URL are required.');
+    setQlSaving(true);
+    try {
+      if (qlEditing) {
+        await updateDoc(doc(db, 'campusLifeQuickLinks', qlEditing), { ...qlForm });
+      } else {
+        await addDoc(collection(db, 'campusLifeQuickLinks'), { ...qlForm, order: qlForm.order || quickLinks.length });
+      }
+      setQlForm(EMPTY_QUICK_LINK);
+      setQlEditing(null);
+    } catch (e) {
+      alert(`Couldn't save: ${(e as Error).message}`);
+    } finally { setQlSaving(false); }
+  };
+
+  const startEditQuickLink = (l: CampusLifeQuickLinkDoc) => {
+    setQlEditing(l.id);
+    setQlForm({ label: l.label, path: l.path, external: !!l.external, order: l.order });
+  };
+
+  const removeQuickLink = async (id: string) => {
+    if (!confirm('Delete this menu link? It will no longer show in the Campus Life dropdown.')) return;
+    try {
+      await deleteDoc(doc(db, 'campusLifeQuickLinks', id));
+    } catch (e) {
+      alert(`Couldn't delete: ${(e as Error).message}`);
+    }
+  };
+
+  // Drag-to-reorder — same pattern as the Pages table below.
+  const [qlOrdered, setQlOrdered] = useState<CampusLifeQuickLinkDoc[]>([]);
+  const [qlDrag, setQlDrag] = useState<number | null>(null);
+  useEffect(() => { setQlOrdered(quickLinks); }, [quickLinks]);
+  const handleQlDragOver = (i: number) => {
+    if (qlDrag === null || qlDrag === i) return;
+    setQlOrdered((prev) => {
+      const list = [...prev];
+      const [moved] = list.splice(qlDrag, 1);
+      list.splice(i, 0, moved);
+      return list;
+    });
+    setQlDrag(i);
+  };
+  const handleQlDrop = async () => {
+    setQlDrag(null);
+    const batch = writeBatch(db);
+    let changed = false;
+    qlOrdered.forEach((l, i) => {
+      if (l.order !== i) { batch.update(doc(db, 'campusLifeQuickLinks', l.id), { order: i }); changed = true; }
+    });
+    if (changed) {
+      try {
+        await batch.commit();
+      } catch (e) {
+        alert(`Couldn't save new order: ${(e as Error).message}`);
+      }
+    }
+  };
 
   // Drag-to-reorder — grouped by `group` (Campus Facility / Student
   // Activity), since `order` only needs to be consistent within a group,
@@ -497,6 +604,66 @@ export default function CampusLifeAdmin() {
         <p className="admin-field__hint">
           Student Clubs → <strong>Admin → Student Clubs</strong>. Radio Vishnu → <strong>Admin → Differentiators</strong> (search "Radio Vishnu").
         </p>
+      </div>
+
+      <div className="admin-card">
+        <h2 className="admin-card__title">Campus Life Menu — Other Links</h2>
+        <p className="admin-field__hint">
+          The handful of Campus Life dropdown entries that link to a fixed page or external site rather than a
+          generic Campus Facility page below (e.g. Wellness Centre, Student Clubs, Vishnu TV Academy, Vishnu School
+          of Music). Every Campus Facility page added below shows up in the dropdown automatically — it doesn't
+          need an entry here.
+        </p>
+        <div className="admin-form-grid">
+          <div className="admin-field">
+            <label htmlFor="field-ql-label">Label *</label>
+            <input id="field-ql-label" value={qlForm.label} onChange={(e) => setQlForm((p) => ({ ...p, label: e.target.value }))} placeholder="Wellness Centre" />
+          </div>
+          <div className="admin-field">
+            <label htmlFor="field-ql-path">Path or URL *</label>
+            <input id="field-ql-path" value={qlForm.path} onChange={(e) => setQlForm((p) => ({ ...p, path: e.target.value }))} placeholder="/campus/wellness or https://..." />
+          </div>
+          <div className="admin-field">
+            <label>
+              <input type="checkbox" checked={!!qlForm.external} onChange={(e) => setQlForm((p) => ({ ...p, external: e.target.checked }))} style={{ marginRight: 6 }} />
+              Opens an external site (not a VWU page)
+            </label>
+          </div>
+        </div>
+        <div className="admin-form-actions">
+          {qlEditing && <button className="admin-btn admin-btn--ghost" onClick={() => { setQlEditing(null); setQlForm(EMPTY_QUICK_LINK); }}>Cancel</button>}
+          <button className="admin-btn admin-btn--primary" onClick={saveQuickLink} disabled={qlSaving}>{qlSaving ? 'Saving…' : qlEditing ? 'Update' : 'Add Link'}</button>
+        </div>
+        <p className="admin-field__hint" style={{ margin: '1rem 0 0.5rem' }}>Drag rows by the ⠿ handle to reorder.</p>
+        {quickLinksLoading ? <p className="admin-loading">Loading…</p> : (
+          <div className="admin-table-wrap">
+            <table className="admin-table">
+              <thead><tr><th></th><th>Label</th><th>Path / URL</th><th>Actions</th></tr></thead>
+              <tbody>
+                {qlOrdered.map((l, i) => (
+                  <tr
+                    key={l.id}
+                    draggable
+                    onDragStart={() => setQlDrag(i)}
+                    onDragOver={(e) => { e.preventDefault(); handleQlDragOver(i); }}
+                    onDrop={handleQlDrop}
+                    onDragEnd={() => setQlDrag(null)}
+                    style={{ opacity: qlDrag === i ? 0.5 : 1, cursor: 'grab' }}
+                  >
+                    <td style={{ color: 'var(--color-text-light, #9ca3af)', fontSize: '1.1rem', userSelect: 'none' }}>⠿</td>
+                    <td>{l.label}</td>
+                    <td>{l.path}{l.external ? ' (external)' : ''}</td>
+                    <td>
+                      <button className="admin-btn admin-btn--sm" onClick={() => startEditQuickLink(l)}>Edit</button>
+                      <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeQuickLink(l.id)}>Delete</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+        {!quickLinksLoading && qlOrdered.length === 0 && <p className="admin-empty">No links yet.</p>}
       </div>
 
       <AuditoriumsAdmin />
