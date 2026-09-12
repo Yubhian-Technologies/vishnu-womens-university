@@ -62,6 +62,7 @@ const AcademicDownloads = lazyWithRetry(() => import('./pages/Academics/Download
 const CurriculumMatrix = lazyWithRetry(() => import('./pages/Academics/CurriculumMatrix'));
 const Schools = lazyWithRetry(() => import('./pages/Academics/Schools'));
 const Departments = lazyWithRetry(() => import('./pages/Academics/Departments'));
+const DepartmentEventsPage = lazyWithRetry(() => import('./pages/Academics/DepartmentEventsPage'));
 const Programs = lazyWithRetry(() => import('./pages/Academics/Programs'));
 const Admissions = lazyWithRetry(() => import('./pages/Admissions/Admissions'));
 const CampusVisit = lazyWithRetry(() => import('./pages/CampusVisit/CampusVisit'));
@@ -185,6 +186,7 @@ function PublicApp() {
             <Route path="/academics/freshman-engineering" element={<FreshmanEngineering />} />
             <Route path="/academics/schools" element={<Schools />} />
             <Route path="/academics/departments" element={<Departments />} />
+            <Route path="/academics/departments/:slug/events/:categorySlug" element={<DepartmentEventsPage />} />
             <Route path="/academics/programs" element={<Programs />} />
             <Route path="/academics/:slug" element={<ProgramDetail />} />
             <Route path="/faculty" element={<Faculty />} />

@@ -49,7 +49,7 @@
 
 .vwu-footer-main .vwu-footer-inner {
   display: grid;
-  grid-template-columns: minmax(260px, 320px) 1fr;
+  grid-template-columns: minmax(260px, 380px) 1fr;
   gap: 3rem;
   align-items: start;
 }
@@ -88,6 +88,12 @@
   margin: 0;
   line-height: 1.3;
   letter-spacing: -0.01em;
+}
+
+@media (min-width: 768px) {
+  .vwu-footer-uni-name {
+    white-space: nowrap;
+  }
 }
 
 .vwu-footer-mission {

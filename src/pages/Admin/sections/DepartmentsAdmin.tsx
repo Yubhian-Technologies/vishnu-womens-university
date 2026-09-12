@@ -1,10 +1,10 @@
 import { useState, type ChangeEvent } from 'react';
+import { Plus, Trash2 } from 'lucide-react';
 import { collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection, useCollection, type WithId } from '../../../hooks/useCollection';
 import ImageUploader from '../../../components/ImageUploader/ImageUploader';
 import FileUploader from '../../../components/FileUploader/FileUploader';
-import VideoUploader from '../../../components/VideoUploader/VideoUploader';
 import { deleteFile, type UploadResult } from '../../../lib/storage';
 import { PROGRAM_ICON_NAMES } from '../../../lib/programIcons';
 import { normalizeLab, stripUndefined, type LabItem, type LibrarySection, type LibraryItem, type NewsEventsYear, type ProgramLink, type ProgramDoc, type RndLink, type NewsletterYear, type RndYear } from './ProgramsAdmin';
@@ -103,6 +103,8 @@ export interface DepartmentDoc {
   // whenever "About" itself was short.
   highlights?: string[];
   established?: string;
+  academicJourneyList?: { year: string; label: string }[];
+  programmeIntakeList?: { program: string; intake: string }[];
   accreditation?: string;
   accreditationImage?: string;
   accreditationStoragePath?: string;
@@ -226,6 +228,8 @@ const EMPTY: Omit<DepartmentDoc, 'id'> = {
   heroImage: '', storagePath: '', tagline: '', about: '', highlights: [], established: '', accreditation: '', accreditationImage: '', accreditationStoragePath: '',
   hod: '', hodImage: '', hodImageStoragePath: '', hodEmail: '', hodMessage: '', hodResearchProfiles: [],
   vision: '', mission: [], coreValues: [], labs: [],
+  academicJourneyList: [],
+  programmeIntakeList: [],
   libraryIntro: '', libraryInCharge: '', librarySections: [],
   programLevels: [],
   placementIntro: '', placementStats: [], placementRecruiters: [], tieUpsMous: [],
@@ -641,15 +645,6 @@ export default function DepartmentsAdmin() {
   };
   const handleLabImage = (li: number, r: UploadResult) => {
     setForm((p) => ({ ...p, labs: (p.labs || []).map(normalizeLab).map((l, i) => (i === li ? { ...l, imageUrl: r.url, imageStoragePath: r.path } : l)) }));
-  };
-  const handleLabVideo = (li: number, r: UploadResult) => {
-    setForm((p) => ({ ...p, labs: (p.labs || []).map(normalizeLab).map((l, i) => (i === li ? { ...l, videoUrl: r.url, videoStoragePath: r.path } : l)) }));
-  };
-  // VideoUploader's own "Remove" button already deletes the Storage file
-  // and calls onRemoved (see VideoUploader.tsx's handleRemove) — this just
-  // clears the field on the form, no second delete/confirm needed.
-  const removeLabVideo = (li: number) => {
-    setForm((p) => ({ ...p, labs: (p.labs || []).map(normalizeLab).map((l, i) => (i === li ? { ...l, videoUrl: '', videoStoragePath: '' } : l)) }));
   };
   const removeLabPdf = async (li: number) => {
     const lab = labs[li];
@@ -1186,8 +1181,8 @@ export default function DepartmentsAdmin() {
             </p>
           </div>
           <div className="admin-field admin-field--full">
-            <label>Hero Image</label>
-            <ImageUploader folder="vwu/departments" currentUrl={form.heroImage} onUploaded={handleHero} label="Upload Hero Image" />
+            <label>Overview Image</label>
+            <ImageUploader folder="vwu/departments" currentUrl={form.heroImage} onUploaded={handleHero} label="Upload Overview Image" />
           </div>
           <div className="admin-field admin-field--full">
             <label htmlFor="field-tagline">Hero Tagline</label>
@@ -1228,9 +1223,8 @@ export default function DepartmentsAdmin() {
           <div className="admin-form-grid">
           <div className="admin-field admin-field--full">
             <p className="admin-field__hint" style={{ marginTop: '0.25rem' }}>
-              Controls the <strong>Department Profile</strong> section on the public page (Academic Journey, Accreditation, AP EAPCET Code).
-              These fields are department-wide overrides — if set here, they take precedence over per-programme values.
-              Programme Intake is managed per-programme in <strong>Admin → Programs → Intake</strong>.
+              Controls the <strong>Department Profile</strong> section on the public page (Academic Journey, Programmes & Intake, Accreditation).
+              The Academic Journey and Programmes & Intake lists are completely manual and must be populated here to appear on the public page.
             </p>
           </div>
 
@@ -1239,11 +1233,63 @@ export default function DepartmentsAdmin() {
             <label style={{ fontWeight: 800, fontSize: '0.9rem', marginBottom: '0.5rem', display: 'block' }}>
               📅 Academic Journey
             </label>
-            <div className="admin-form-grid">
-              <div className="admin-field">
-                <label htmlFor="field-dept-established">Established Year</label>
-                <input id="field-dept-established" value={form.established} onChange={(e) => set('established', e.target.value)} placeholder="e.g. 2001" />
-                <p className="admin-field__hint">Department-wide establishment year (shown in timeline)</p>
+            <div className="admin-list" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              {(form.academicJourneyList || []).map((aj, idx) => (
+                <div key={idx} style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                  <input style={{ width: '120px' }} value={aj.year} onChange={(e) => {
+                    const next = [...(form.academicJourneyList || [])];
+                    next[idx] = { ...next[idx], year: e.target.value };
+                    setForm(p => ({ ...p, academicJourneyList: next }));
+                  }} placeholder="2001-02" />
+                  <input style={{ flex: 1 }} value={aj.label} onChange={(e) => {
+                    const next = [...(form.academicJourneyList || [])];
+                    next[idx] = { ...next[idx], label: e.target.value };
+                    setForm(p => ({ ...p, academicJourneyList: next }));
+                  }} placeholder="B.Tech CSE" />
+                  <button type="button" className="btn-icon" style={{ flexShrink: 0 }} onClick={() => {
+                    setForm(p => ({ ...p, academicJourneyList: (p.academicJourneyList || []).filter((_, i) => i !== idx) }));
+                  }} aria-label="Remove"><Trash2 size={16} /></button>
+                </div>
+              ))}
+              <div style={{ marginTop: '0.25rem' }}>
+                <button type="button" className="btn-secondary" onClick={() => {
+                  setForm(p => ({ ...p, academicJourneyList: [...(p.academicJourneyList || []), { year: '', label: '' }] }));
+                }}>
+                  <Plus size={16} /> Add Milestone
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Programmes & Intake */}
+          <div className="admin-field admin-field--full">
+            <label style={{ fontWeight: 800, fontSize: '0.9rem', marginBottom: '0.5rem', display: 'block' }}>
+              👥 Programmes & Intake
+            </label>
+            <div className="admin-list" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              {(form.programmeIntakeList || []).map((pi, idx) => (
+                <div key={idx} style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                  <input style={{ flex: 1 }} value={pi.program} onChange={(e) => {
+                    const next = [...(form.programmeIntakeList || [])];
+                    next[idx] = { ...next[idx], program: e.target.value };
+                    setForm(p => ({ ...p, programmeIntakeList: next }));
+                  }} placeholder="B.Tech CSE" />
+                  <input style={{ width: '100px' }} value={pi.intake} onChange={(e) => {
+                    const next = [...(form.programmeIntakeList || [])];
+                    next[idx] = { ...next[idx], intake: e.target.value };
+                    setForm(p => ({ ...p, programmeIntakeList: next }));
+                  }} placeholder="180" />
+                  <button type="button" className="btn-icon" style={{ flexShrink: 0 }} onClick={() => {
+                    setForm(p => ({ ...p, programmeIntakeList: (p.programmeIntakeList || []).filter((_, i) => i !== idx) }));
+                  }} aria-label="Remove"><Trash2 size={16} /></button>
+                </div>
+              ))}
+              <div style={{ marginTop: '0.25rem' }}>
+                <button type="button" className="btn-secondary" onClick={() => {
+                  setForm(p => ({ ...p, programmeIntakeList: [...(p.programmeIntakeList || []), { program: '', intake: '' }] }));
+                }}>
+                  <Plus size={16} /> Add Intake Record
+                </button>
               </div>
             </div>
           </div>
@@ -1454,14 +1500,14 @@ export default function DepartmentsAdmin() {
                       rows={2}
                       style={{ width: '100%', marginTop: '0.4rem' }}
                     />
-                    <div style={{ marginTop: '0.5rem', maxWidth: 320 }}>
-                      <VideoUploader
-                        folder="vwu/departments/labs"
-                        currentUrl={lab.videoUrl}
-                        currentPath={lab.videoStoragePath}
-                        onUploaded={(r) => handleLabVideo(li, r)}
-                        onRemoved={() => removeLabVideo(li)}
-                        label="Upload Lab Video (optional)"
+                    <div style={{ marginTop: '0.5rem' }}>
+                      <label style={{ fontSize: '0.8rem', fontWeight: 600, display: 'block', marginBottom: '0.25rem' }}>YouTube Video URL (optional)</label>
+                      <input
+                        type="url"
+                        value={lab.youtubeUrl || ''}
+                        onChange={(e) => setForm((p) => ({ ...p, labs: (p.labs || []).map(normalizeLab).map((l, i) => (i === li ? { ...l, youtubeUrl: e.target.value } : l)) }))}
+                        placeholder="https://www.youtube.com/watch?v=..."
+                        style={{ width: '100%' }}
                       />
                     </div>
                   </div>

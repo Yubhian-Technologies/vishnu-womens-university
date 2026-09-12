@@ -3,6 +3,11 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 import SmoothImage from '../SmoothImage/SmoothImage';
 import type { LabItem } from '../../pages/Admin/sections/ProgramsAdmin';
 
+function extractYouTubeId(url: string): string {
+  const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/))([^&?#]+)/);
+  return match ? match[1] : '';
+}
+
 interface LabsCarouselProps {
   labs: LabItem[];
   navOffset: string;
@@ -113,22 +118,17 @@ export default function LabsCarousel({
                    )}
                  </div>
                 <div className="dept-lab-slide-media">
-                  {lab.videoUrl ? (
-                    // preload="none" (no autoplay/muted) keeps the clip itself
-                    // out of the network until a visitor actually presses
-                    // play — the poster frame (existing image, or the same
-                    // fallback the image path uses) is all that loads
-                    // up-front, same cost as the plain <img> below.
-                    <video
-                      key={lab.videoUrl}
-                      className="dept-lab-slide-img"
-                      poster={lab.imageUrl || fallbackImage || defaultImage}
-                      controls
-                      preload="none"
-                      playsInline
-                    >
-                      <source src={lab.videoUrl} />
-                    </video>
+                  {lab.youtubeUrl ? (
+                    <div className="dept-lab-slide-img" style={{ position: 'relative', paddingBottom: '56.25%', height: 0, overflow: 'hidden', borderRadius: 'var(--radius-md)' }}>
+                      <iframe
+                        src={`https://www.youtube.com/embed/${extractYouTubeId(lab.youtubeUrl)}`}
+                        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 0 }}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        title={lab.name}
+                        loading="lazy"
+                      />
+                    </div>
                   ) : (
                     <SmoothImage
                       src={lab.imageUrl || fallbackImage || defaultImage}

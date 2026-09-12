@@ -463,7 +463,8 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   const primary = subPrograms[0];
   const clean = (v?: string) => (v && v !== '—' ? v : '');
   const shared = {
-    heroImage: dept?.heroImage || primary?.heroImage || activeProgram.heroImage || '',
+    overviewImage: dept?.heroImage || '',
+    pageHeroImage: primary?.heroImage || activeProgram.heroImage || '',
     // Department-only — never falls back to a programme's own About, which
     // now shows per-programme in the toggle section instead (see
     // "About the Programme" below). `description` is the same card blurb
@@ -765,7 +766,8 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     faqs.length > 0 && { id: 'faq', label: 'FAQs' },
   ].filter(Boolean) as { id: string; label: string }[];
 
-  const heroImage = shared.heroImage;
+  const pageHeroImage = shared.pageHeroImage;
+  const overviewImage = shared.overviewImage || pageHeroImage;
   const pageUrl = `/academics/${activeProgram.slug}`;
   const pageDesc = shared.about
     ? (shared.about.length > 155 ? `${shared.about.slice(0, 155)}...` : shared.about)
@@ -787,13 +789,16 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
 
   return (
     <main className="page-wrapper dept-detail-page">
-      <SEO title={`${deptName} | Vishnu Women's University`} description={pageDesc} canonicalPath={pageUrl} ogImage={heroImage} jsonLd={jsonLd} />
+      <SEO title={`${deptName} | Vishnu Women's University`} description={pageDesc} canonicalPath={pageUrl} ogImage={pageHeroImage} jsonLd={jsonLd} />
 
-      {/* Hero — plain gradient card, no attached image (image now lives
-          beside the Department Overview text below instead). */}
+      {/* Hero — same rounded image-card treatment for every department */}
       <section className="dept-hero-section">
         <div className="container">
           <div className="dept-hero-card">
+            {pageHeroImage && (
+              <SmoothImage src={pageHeroImage} alt={deptName} className="dept-hero-bg-img" loading="eager" decoding="sync" />
+            )}
+            <div className="dept-hero-overlay" />
             <div className="dept-hero-content">
               <h1 className="dept-hero-title">{deptName}</h1>
               <p className="dept-hero-subtitle">
@@ -859,9 +864,9 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                     </p>
                   </div>
 
-                  {heroImage && (
+                  {overviewImage && (
                     <div className="dept-about-media">
-                      <SmoothImage src={heroImage} alt={deptName} className="dept-about-media-img" loading="eager" fetchPriority="high" />
+                      <SmoothImage src={overviewImage} alt={deptName} className="dept-about-media-img" loading="eager" fetchPriority="high" />
                     </div>
                   )}
                 </div>
@@ -1262,11 +1267,8 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
           override (dept.established / dept.accreditation) still wins as a
           single dept-wide entry, same fallback the previous grid used. */}
       {(() => {
-        const deptEst = clean(dept?.established);
-        const validEst = subPrograms.filter((p) => clean(p.established));
-        const establishmentItems: ProfileListItem[] = deptEst
-          ? [{ id: 'dept-est', label: deptName, value: deptEst }]
-          : validEst.map((p) => ({ id: p.id, label: p.shortName || p.name, value: clean(p.established) }));
+        const deptEstList = dept?.academicJourneyList || [];
+        const establishmentItems: ProfileListItem[] = deptEstList.map((aj, i) => ({ id: `dept-aj-${i}`, label: aj.label, value: aj.year }));
 
         const deptAcc = clean(dept?.accreditation);
         const deptAccImage = dept?.accreditationImage || '';
@@ -1275,9 +1277,8 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
           ? [{ id: 'dept-acc', label: deptName, value: deptAcc, image: deptAccImage }]
           : validAcc.map((p) => ({ id: p.id, label: p.shortName || p.name, value: clean(p.accreditation), image: p.accreditationImage || '' }));
 
-        const intakeItems: ProfileListItem[] = subPrograms
-          .filter((p) => p.intake && p.intake > 0)
-          .map((p) => ({ id: p.id, label: p.shortName || p.name, value: p.intake }));
+        const deptIntakeList = dept?.programmeIntakeList || [];
+        const intakeItems: ProfileListItem[] = deptIntakeList.map((pi, i) => ({ id: `dept-pi-${i}`, label: pi.program, value: pi.intake }));
 
         const hasJourneyRow = establishmentItems.length > 0 || intakeItems.length > 0;
         // AP EAPCET Code panel below always renders, so this row is never empty.
@@ -1405,7 +1406,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
         <LabsCarousel
           labs={shared.labs}
           navOffset={NAV_OFFSET}
-          fallbackImage={shared.heroImage}
+          fallbackImage={pageHeroImage}
           title="Academic Infrastructure & Learning Facilities"
           description={`Explore the laboratories, studios, and campus infrastructure that support hands-on learning in ${deptName} — from specialized equipment to dedicated project and research spaces.`}
         />
@@ -1416,7 +1417,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
           Left: 2×2 stat cards. Right: auto-advancing research slide carousel.
           Data comes from this department's own doc (Admin → Academic
           Departments → Research & Innovation) — see ResearchSection above. */}
-      <ResearchSection deptName={deptName} heroImage={heroImage} stats={dept?.researchStats} slides={dept?.researchSlides} />
+      <ResearchSection deptName={deptName} heroImage={pageHeroImage} stats={dept?.researchStats} slides={dept?.researchSlides} />
 
       {/* Tie-Ups & MoUs — admin-entered partner/institution names
           (dept.tieUpsMous), same rectangular tile grid as Top Recruiters
@@ -1939,7 +1940,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
           into its own standalone section. NewsEventsTabs renders its own
           section/container + collapsible header when not embedded. */}
       {hasNewsEvents && (
-        <NewsEventsTabs categories={newsEventsCategories} navOffset={NAV_OFFSET} />
+        <NewsEventsTabs categories={newsEventsCategories} navOffset={NAV_OFFSET} departmentSlug={group.key} />
       )}
 
       {/* Testimonials — a bold navy "quote wall" (matching the Core Values
