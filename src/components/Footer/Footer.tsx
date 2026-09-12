@@ -119,16 +119,17 @@ export default function Footer() {
         <div className="vwu-footer-inner">
           {/* Brand Block */}
           <div className="vwu-footer-brand">
-            <Link to="/" className="vwu-footer-logo-link" aria-label="Vishnu Women's University Home">
-              <img
-                src="/images/footer-logo.png"
-                alt="Vishnu Women's University"
-                className="vwu-footer-logo"
-                loading="lazy"
-              />
-            </Link>
-
-            <h2 className="vwu-footer-uni-name">విష్ణు మహిళా విశ్వవిద్యాలయం</h2>
+            <div className="vwu-footer-brand-header">
+              <Link to="/" className="vwu-footer-logo-link" aria-label="Vishnu Women's University Home">
+                <img
+                  src="/images/footer-logo.png"
+                  alt="Vishnu Women's University"
+                  className="vwu-footer-logo"
+                  loading="lazy"
+                />
+              </Link>
+              <h2 className="vwu-footer-uni-name">విష్ణు మహిళా విశ్వవిద్యాలయం</h2>
+            </div>
             <p className="vwu-footer-mission">
               Empowering women scholars through excellence in engineering education,
               interdisciplinary research, and transformative leadership.
