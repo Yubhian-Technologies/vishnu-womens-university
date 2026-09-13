@@ -67,11 +67,6 @@ export default function HealthCare() {
         page="campus-health-care"
         defaultTitle={title}
         defaultSubtitle={desc}
-        breadcrumb={[
-          { label: 'Home', to: '/' },
-          { label: 'Campus Life', to: '/campus' },
-          { label: title },
-        ]}
         hideCta={true}
       />
 
@@ -80,10 +75,6 @@ export default function HealthCare() {
         <div className="hc-container">
           <div className="hc-hero-grid">
             <div className="hc-hero-content">
-              <div className="hc-badge">
-                <Activity size={14} />
-                <span>HEALTH • CARE • SUPPORT</span>
-              </div>
               <h1 className="hc-hero-title">
                 Campus Life <span className="hc-hero-title-accent">Healthcare</span>
               </h1>
@@ -134,7 +125,6 @@ export default function HealthCare() {
       <section className="hc-section hc-gallery-section">
         <div className="hc-container">
           <div className="hc-section-header">
-            <div className="hc-badge">OUR MOMENTS</div>
             <h2 className="hc-section-title">
               Gallery <span>Campus Healthcare</span>
             </h2>

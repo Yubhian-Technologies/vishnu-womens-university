@@ -130,7 +130,7 @@ function ExpandableGroup({ items, renderItem, threshold = 4 }: {
   );
 }
 
-function VmExpandableCard({ title, icon, content }: { title: string; icon: ReactNode; content: string | string[] }) {
+function VmExpandableCard({ title, content }: { title: string; content: string | string[] }) {
   const [expanded, setExpanded] = useState(false);
   const isArray = Array.isArray(content);
   return (
@@ -141,7 +141,6 @@ function VmExpandableCard({ title, icon, content }: { title: string; icon: React
     >
       <div className="dept-vm-card-top">
         <h3 className="dept-vm-title" style={{ fontSize: '1.25rem', margin: 0, color: 'var(--color-primary)' }}>{title}</h3>
-        <div className="dept-vm-icon-badge">{icon}</div>
       </div>
       <SmoothCollapse open={expanded}>
         <div style={{ paddingTop: '0.5rem' }}>
@@ -942,14 +941,12 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
               {shared.vision && (
                 <VmExpandableCard 
                   title="Our Vision" 
-                  icon={<Sparkles size={20} />} 
                   content={shared.vision} 
                 />
               )}
               {shared.mission.length > 0 && (
                 <VmExpandableCard 
                   title="Our Mission" 
-                  icon={<Microscope size={20} />} 
                   content={shared.mission} 
                 />
               )}

@@ -93,7 +93,6 @@ export default function Campus() {
         page="campus"
         defaultTitle="Campus Life at VWU"
         defaultSubtitle="An 80-acre campus in Bhimavaram where learning, wellness, and community life come together."
-        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Campus Life' }]}
         hideCta={true}
       />
 

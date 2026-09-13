@@ -72,7 +72,6 @@ export default function WellnessCenter() {
         page="campus-wellness-center"
         defaultTitle="Wellness Center"
         defaultSubtitle="A space where you can be yourself and talk about the things that really matter to you."
-        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Campus Life', to: '/campus' }, { label: 'Wellness Center' }]}
         hideCta={true}
       />
 

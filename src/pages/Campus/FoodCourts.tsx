@@ -91,7 +91,6 @@ export default function FoodCourts() {
         page="campus-food-courts"
         defaultTitle="Food Courts"
         defaultSubtitle="Hygienic Dining with Variety and Convenience."
-        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Campus Life', to: '/campus' }, { label: 'Food Courts' }]}
         layout="split"
       />
 

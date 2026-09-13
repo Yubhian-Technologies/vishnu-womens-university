@@ -89,6 +89,10 @@ const SewageTreatment = lazyWithRetry(() => import('./pages/Campus/SewageTreatme
 const WellnessCenter = lazyWithRetry(() => import('./pages/Campus/WellnessCenter'));
 const Wellness = lazyWithRetry(() => import('./pages/Campus/Wellness'));
 const Auditoriums = lazyWithRetry(() => import('./pages/Campus/Auditoriums'));
+const SmartClassrooms = lazyWithRetry(() => import('./pages/Campus/SmartClassrooms'));
+const StateOfTheArtLabs = lazyWithRetry(() => import('./pages/Campus/StateOfTheArtLabs'));
+const CentralLibrary = lazyWithRetry(() => import('./pages/Campus/CentralLibrary'));
+const CampusHostels = lazyWithRetry(() => import('./pages/Campus/CampusHostels'));
 const FitnessCentre = lazyWithRetry(() => import('./pages/Campus/FitnessCentre'));
 const Television = lazyWithRetry(() => import('./pages/Campus/Television'));
 const HealthCare = lazyWithRetry(() => import('./pages/Campus/HealthCare'));
@@ -227,7 +231,11 @@ function PublicApp() {
             <Route path="/campus/sports/:id" element={<SportsDetail />} />
             <Route path="/campus/clubs" element={<Clubs />} />
             <Route path="/campus/auditoriums" element={<Auditoriums />} />
+            <Route path="/campus/smart-classrooms" element={<SmartClassrooms />} />
+            <Route path="/campus/state-of-the-art-labs" element={<StateOfTheArtLabs />} />
+            <Route path="/campus/central-library" element={<CentralLibrary />} />
             <Route path="/campus/food-courts" element={<FoodCourts />} />
+            <Route path="/campus/campus-hostels" element={<CampusHostels />} />
             <Route path="/campus/fitness-centre" element={<FitnessCentre />} />
             <Route path="/campus/:slug" element={<CampusLifeDetail />} />
             <Route path="/information" element={<Information />} />

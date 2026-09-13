@@ -117,11 +117,9 @@ function cardsList(cards: { title: string }[]): string {
 // ---------------------------------------------------------------------
 
 const FACILITY_BODIES: Record<string, string> = {
-  'smart-classrooms': `Vishnu Women's University provides fully air-conditioned, spacious, and technology-enabled smart classrooms designed for a comfortable and engaging learning experience.
+  'smart-classrooms': `Inside Our Smart Classrooms
 
-Equipped with interactive digital teaching tools, multimedia systems, high-speed internet, and audio-visual facilities, the classrooms support dynamic, collaborative, and student-centred learning.
-
-Thoughtfully designed for interactive discussions, presentations, project-based learning, and active participation, these smart classrooms create an environment that encourages curiosity, creativity, critical thinking, and academic excellence.`,
+Explore the technology-enabled classrooms where students learn, collaborate, present ideas and participate in academic activities.`,
   'state-of-the-art-labs': `#### About Our Laboratories
 
 State-of-the-art laboratories are at the heart of **practical, industry-oriented engineering education**. At Vishnu Women's University, students gain hands-on experience through modern laboratories equipped with contemporary tools, technologies, and industry-standard equipment.
@@ -136,11 +134,30 @@ Smt. B. Seetha Indoor Auditorium is centrally air-conditioned with a fully sound
 In addition to the Indoor Auditorium, Vishnu Women's University has an Open-air-Auditorium and Mini-Auditorium, where a vast variety of student activities are regularly arranged.
 
 Vishnu Women's University has well equipped air conditioned Seminar Halls which can accommodate 250 members each. They are centers for knowledge acquisition since right ambiance is created with a podium, a computer system with internet facility, an LCD projector and a sound system.`,
-  'campus-book-stores': `The greatest essayist of England Francis Bacon believed that books are the best companions in a student's life and quoted aptly about the significance of books:
+  'campus-book-stores': `Campus Bookstore at Vishnu Women's University
 
-"Some books should be tasted, some devoured, but only a few should be chewed and digested thoroughly."
+Convenient access to textbooks, reference books, stationery and academic essentials right on campus.
 
-With all the right ambiance, the addition of a well-known book shop 'Higginbotham" creates even better environment for all the students here. The shop is situated very close to the temple complex and is accessible to students.`,
+Books and Academic Essentials, Close at Hand
+
+Vishnu Women's University hosts a Higginbotham bookstore on campus, giving students convenient access to academic books, reference materials, competitive examination resources, general reading and stationery.
+
+Located near the Temple Complex, the bookstore makes it easy for students to find essential learning materials without having to travel outside the campus.
+
+What You'll Find
+
+- Textbooks & Reference Books: Academic resources for courses and subject-specific study.
+- Competitive Exam Resources: Books and preparation materials for competitive examinations.
+- General Reading: A selection of books for reading beyond the curriculum.
+- Stationery & Academic Essentials: Everyday supplies students may need for classes and study.
+
+Find the Bookstore
+
+Location: Near the Temple Complex, Vishnu Women's University campus
+
+Inside the Campus Bookstore
+
+Take a look at the books, resources and learning essentials available to students on campus.`,
   'wifi-campus': `Vishnu Women's University is one of the few Universities, which can boast of its state-of-the-art computing resources and network across the campus. It has IT Infrastructure that can support 3000+ computer terminals, probably one of the largest wi-fi infrastructure. Following are a few highlighting features:
 
 - Completely Wi-Fi Campus with 250+ access point, supported on the technology from RUCKUS

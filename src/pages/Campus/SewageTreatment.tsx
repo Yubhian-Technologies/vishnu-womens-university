@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Droplets, Recycle, FlaskConical, Leaf, IndianRupee, CalendarDays,
-  Sparkles, ShieldCheck, Waves, Factory, ArrowRight, Camera
+  Droplets, Recycle, FlaskConical, IndianRupee, CalendarDays,
+  ShieldCheck, Waves, Factory, ArrowRight
 } from 'lucide-react';
 import SEO from '../../components/SEO/SEO';
 import PageHero from '../../components/PageHero/PageHero';
@@ -94,7 +94,6 @@ export default function SewageTreatment() {
         page="campus-sewage-treatment-plants"
         defaultTitle={pageTitle}
         defaultSubtitle="A zero-discharge campus — every drop of sewage generated is treated on site and returned to the land as irrigation for campus and highway greenery."
-        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Campus Life', to: '/campus' }, { label: pageTitle }]}
         hideCta={true}
       />
 
@@ -129,10 +128,6 @@ export default function SewageTreatment() {
       <section className="stp-section stp-vision-section">
         <div className="stp-container">
           <div className="stp-header">
-            <div className="stp-badge">
-              <Leaf size={14} />
-              <span>SUSTAINABLE VISION</span>
-            </div>
             <h2 className="stp-title">
               Water is a Precious <span>Natural Resource</span>
             </h2>
@@ -188,11 +183,7 @@ export default function SewageTreatment() {
                     className="stp-media-img"
                     onError={(e) => { e.currentTarget.src = DEFAULT_PHOTOS[0].src; }}
                   />
-                  <div className="stp-media-badge">
-                    <Camera size={16} />
-                    <span>On-Site 200 KLD MBBR Plant</span>
                   </div>
-                </div>
 
                 <div className="stp-media-card">
                   <img
@@ -201,11 +192,7 @@ export default function SewageTreatment() {
                     className="stp-media-img"
                     onError={(e) => { e.currentTarget.src = DEFAULT_PHOTOS[1].src; }}
                   />
-                  <div className="stp-media-badge">
-                    <Sparkles size={16} />
-                    <span>Treated Effluent Distribution</span>
                   </div>
-                </div>
               </div>
             </div>
           </div>
@@ -216,10 +203,6 @@ export default function SewageTreatment() {
       <section className="stp-section stp-dst-section">
         <div className="stp-container">
           <div className="stp-header">
-            <div className="stp-badge">
-              <Sparkles size={14} />
-              <span>DST NEW DELHI FUNDED PROJECT</span>
-            </div>
             <h2 className="stp-title">
               DST-Funded <span>Treatment Plants</span>
             </h2>
@@ -241,11 +224,7 @@ export default function SewageTreatment() {
                 className="stp-media-img"
                 onError={(e) => { e.currentTarget.src = DEFAULT_PHOTOS[2].src; }}
               />
-              <div className="stp-media-badge">
-                <ShieldCheck size={16} />
-                <span>DST Sanctioned Facility • Rs. 170+ Lakh Project</span>
               </div>
-            </div>
           </div>
 
           <div className="stp-spec-grid">
@@ -268,10 +247,6 @@ export default function SewageTreatment() {
       <section className="stp-section stp-method-section">
         <div className="stp-container">
           <div className="stp-header">
-            <div className="stp-badge">
-              <FlaskConical size={14} />
-              <span>ADVANCED CLEAN-TECH METHODOLOGY</span>
-            </div>
             <h2 className="stp-title">
               MBBR Technology <span>with Probiotics</span>
             </h2>
@@ -336,10 +311,6 @@ export default function SewageTreatment() {
       <section className="stp-section stp-impact-section">
         <div className="stp-container">
           <div className="stp-header">
-            <div className="stp-badge">
-              <Leaf size={14} />
-              <span>ENVIRONMENTAL IMPACT</span>
-            </div>
             <h2 className="stp-title">
               Treated Water, <span>Put Back to Work</span>
             </h2>

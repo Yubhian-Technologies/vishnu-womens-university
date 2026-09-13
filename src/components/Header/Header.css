@@ -268,7 +268,7 @@
   padding: 2px 2px !important;
   border-radius: 10px !important;
   font-family: var(--font-sans);
-  font-size: clamp(1.06rem, 1.16vw, 1.38rem);
+  font-size: 0.95rem; /* Force a smaller fixed font size */
   font-weight: 700;
   letter-spacing: 0.01em;
   text-transform: none;
@@ -1025,7 +1025,7 @@
      common desktop widths, not just a narrow "intermediate" band). */
   .nav-tab-btn {
     padding: 2px 2px !important;
-    font-size: clamp(1.06rem, 1.16vw, 1.38rem);
+    font-size: 0.95rem; /* Force a smaller fixed font size */
     letter-spacing: 0;
   }
   .navbar-cta-btn {

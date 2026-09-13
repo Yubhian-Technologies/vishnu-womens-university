@@ -1,4 +1,4 @@
-import { CheckCircle2, Clock, Building2, PhoneCall } from 'lucide-react';
+import { CheckCircle2, Building2, PhoneCall } from 'lucide-react';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
 import {
   DEFAULT_HC_ABOUT,
@@ -41,7 +41,6 @@ export default function HealthCareDetailsTable() {
     <section className="hc-section hc-details-section">
       <div className="hc-container">
         <div className="hc-section-header">
-          <div className="hc-badge">{aboutData.badge}</div>
           <h2 className="hc-section-title">
             {aboutData.title}
           </h2>
@@ -89,11 +88,7 @@ export default function HealthCareDetailsTable() {
                       <div className="hc-facility-loc">{row.location}</div>
                     </td>
                     <td>
-                      <div className="hc-badge-timing">
-                        <Clock size={12} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'middle' }} />
-                        {row.timings}
-                      </div>
-                    </td>
+                      </td>
                     <td>
                       <div className="hc-staff-person">
                         <span className="hc-staff-role">Physician / Doctor</span>
