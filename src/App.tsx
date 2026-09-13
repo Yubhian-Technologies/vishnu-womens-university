@@ -12,6 +12,7 @@ import SEO from './components/SEO/SEO';
 import ThemeOverrides from './components/ThemeOverrides/ThemeOverrides';
 import FirestoreErrorBanner from './components/FirestoreErrorBanner/FirestoreErrorBanner';
 import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
+import PopupOverlay from './components/PopupOverlay/PopupOverlay';
 import { smoothScrollTo } from './lib/smoothScroll';
 
 // A failed dynamic import() is almost always a stale chunk after a new deploy:
@@ -178,6 +179,7 @@ function PublicApp() {
           lazy-loaded page all download and render in parallel beneath it.
           No lag, no second loading screen behind the video. */}
       <IntroVideo />
+      <PopupOverlay />
       <Header />
       <ErrorBoundary>
         <Suspense fallback={<RouteFallback />}>
