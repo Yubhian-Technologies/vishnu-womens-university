@@ -68,7 +68,7 @@ export default function ProfessionalBodyDetail() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)', marginBottom: 'var(--space-8)' }}>
             <span className="pb-grid-logo" style={{ width: 72, height: 72 }}>
               {body.imageUrl ? (
-                <img src={body.imageUrl} alt={body.fullName} />
+                <img loading="lazy" src={body.imageUrl} alt={body.fullName} />
               ) : (
                 <span className="pb-grid-logo-fallback">{body.shortName}</span>
               )}

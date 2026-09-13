@@ -160,7 +160,7 @@ export default function CoreExecutivesAdmin() {
               <tbody>
                 {executives.map((m) => (
                   <tr key={m.id}>
-                    <td>{m.photoUrl ? <img src={m.photoUrl} alt="" className="admin-table__avatar" /> : '👤'}</td>
+                    <td>{m.photoUrl ? <img loading="lazy" src={m.photoUrl} alt="" className="admin-table__avatar" /> : '👤'}</td>
                     <td>{m.name}</td>
                     <td>{m.role}</td>
                     <td>{m.order}</td>

@@ -78,7 +78,7 @@ export default function MedaPlmCoePage({ sections }: MedaPlmCoePageProps) {
     const photo = galleryItems[index % galleryItems.length];
     return (
       <div className="meda-photo-frame" onClick={() => setLightboxImg(photo.url)}>
-        <img src={photo.url} alt={photo.label} className="meda-photo-frame-img" />
+        <img loading="lazy" src={photo.url} alt={photo.label} className="meda-photo-frame-img" />
         <div className="meda-photo-frame-caption">
           <span>{photo.label}</span>
           <Maximize2 size={14} />
@@ -342,7 +342,7 @@ export default function MedaPlmCoePage({ sections }: MedaPlmCoePageProps) {
             <button className="meda-lightbox-close" onClick={() => setLightboxImg(null)}>
               <X size={28} />
             </button>
-            <img src={lightboxImg} alt="Enlarged photo" className="meda-lightbox-img" />
+            <img loading="lazy" src={lightboxImg} alt="Enlarged photo" className="meda-lightbox-img" />
           </div>
         </div>
       )}

@@ -149,7 +149,7 @@ export default function ItemHeroImagesAdmin({
           return (
             <div key={item.id} className="admin-image-card">
               {imageUrl ? (
-                <img src={imageUrl} alt={getLabel(item)} />
+                <img loading="lazy" src={imageUrl} alt={getLabel(item)} />
               ) : (
                 <div className="admin-image-card__empty">No image set</div>
               )}

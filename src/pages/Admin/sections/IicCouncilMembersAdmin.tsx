@@ -237,7 +237,7 @@ export default function IicCouncilMembersAdmin() {
                             onMouseDown={(e) => e.stopPropagation()}
                           />
                         </td>
-                        <td>{m.imageUrl ? <img src={m.imageUrl} alt="" className="admin-table__avatar" /> : '👤'}</td>
+                        <td>{m.imageUrl ? <img loading="lazy" src={m.imageUrl} alt="" className="admin-table__avatar" /> : '👤'}</td>
                         <td>{m.name}</td>
                         <td>{m.role}</td>
                         <td>

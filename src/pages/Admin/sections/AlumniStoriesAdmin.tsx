@@ -138,7 +138,7 @@ export default function AlumniStoriesAdmin() {
               <tbody>
                 {items.map((s) => (
                   <tr key={s.id}>
-                    <td>{s.imageUrl ? <img src={s.imageUrl} alt="" className="admin-table__avatar" /> : '👤'}</td>
+                    <td>{s.imageUrl ? <img loading="lazy" src={s.imageUrl} alt="" className="admin-table__avatar" /> : '👤'}</td>
                     <td>{s.name}<br /><small>{s.year}</small></td>
                     <td>{s.role}</td>
                     <td>

@@ -18,7 +18,7 @@ export default function ProfessionalBodiesSection() {
         <Link key={body.id} to={`/research/professional-bodies/${body.key}`} className="pb-grid-item">
           <span className="pb-grid-logo">
             {body.imageUrl ? (
-              <img src={body.imageUrl} alt={body.fullName} />
+              <img loading="lazy" src={body.imageUrl} alt={body.fullName} />
             ) : (
               <span className="pb-grid-logo-fallback">{body.shortName}</span>
             )}

@@ -163,7 +163,7 @@ export default function ProfessionalBodiesAdmin() {
                   <tr key={d.id}>
                     <td>
                       {d.imageUrl ? (
-                        <img src={d.imageUrl} alt={d.shortName} style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover', border: '1px solid var(--color-light-gray, #d1d5db)' }} />
+                        <img loading="lazy" src={d.imageUrl} alt={d.shortName} style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover', border: '1px solid var(--color-light-gray, #d1d5db)' }} />
                       ) : (
                         <span className="admin-field__hint" style={{ margin: 0 }}>None</span>
                       )}

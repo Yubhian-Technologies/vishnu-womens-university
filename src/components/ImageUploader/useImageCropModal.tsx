@@ -207,7 +207,7 @@ export function useImageCropModal(defaultAspect = 16 / 9) {
             minWidth={40}
             minHeight={40}
           >
-            <img
+            <img loading="lazy"
               ref={imgRef}
               src={cropSrc}
               alt="Crop source"

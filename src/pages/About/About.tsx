@@ -232,7 +232,7 @@ export default function About() {
             </div>
             {whoWeAreImg && (
               <div className="about-who-img-card reveal-right">
-                <img
+                <img loading="lazy"
                   src={whoWeAreImg.src}
                   alt={whoWeAreImg.alt}
                 />
@@ -276,7 +276,7 @@ export default function About() {
         <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0, width: '100%', alignItems: 'stretch' }}>
           {/* Hardcoded campus-view image — full 50% height & width, no gaps */}
           <div className="reveal-left" style={{ height: '100%', minHeight: '480px' }}>
-            <img
+            <img loading="lazy"
               src="/images/DJI_0317.JPG"
               alt="Vishnu Women's University campus"
               style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', borderRadius: 0 }}
@@ -495,7 +495,7 @@ export default function About() {
           <div className="mobile-stack-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-12)', alignItems: 'center' }}>
             {campusSnapshotImg && (
               <div className="sves-image-wrapper reveal-left">
-                <img
+                <img loading="lazy"
                   src={campusSnapshotImg.src}
                   alt={campusSnapshotImg.alt}
                   style={{ width: '100%', height: '360px', objectFit: 'cover' }}
@@ -558,7 +558,7 @@ export default function About() {
             </div>
             {parentSocietyImg && (
               <div className="sves-image-wrapper reveal-right">
-                <img
+                <img loading="lazy"
                   src={parentSocietyImg.src}
                   alt={parentSocietyImg.alt}
                   style={{ width: '100%', height: '380px', objectFit: 'cover' }}

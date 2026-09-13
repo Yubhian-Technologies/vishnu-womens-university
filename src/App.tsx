@@ -308,7 +308,7 @@ function MaintenancePage() {
         background: 'var(--color-bg, #fff)',
       }}
     >
-      <img
+      <img loading="lazy"
         src="/vwu-logo.png"
         alt="Vishnu Women's University"
         style={{ height: 80, marginBottom: '2rem', objectFit: 'contain' }}

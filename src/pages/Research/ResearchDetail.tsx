@@ -521,7 +521,7 @@ export default function ResearchDetail() {
                           <>
                             <span className="pb-grid-logo">
                               {logoUrl ? (
-                                <img src={logoUrl} alt={name} />
+                                <img loading="lazy" src={logoUrl} alt={name} />
                               ) : (
                                 <span className="pb-grid-logo-fallback">{name}</span>
                               )}

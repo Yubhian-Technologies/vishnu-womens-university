@@ -440,7 +440,7 @@ export default function GalleryAdmin() {
           <div className="admin-gallery-grid">
             {images.map((img) => (
               <div key={img.id} className="admin-gallery-item">
-                <img src={img.imageUrl} alt={img.title} />
+                <img loading="lazy" src={img.imageUrl} alt={img.title} />
                 <div className="admin-gallery-item__overlay">
                   <span className="admin-badge">{img.category}</span>
                   <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(img.id)}>✕</button>
@@ -593,7 +593,7 @@ export default function GalleryAdmin() {
             {yearAlbums.map((a) => (
               <div key={a.id} className="admin-image-card">
                 {a.imageUrl
-                  ? <img src={a.imageUrl} alt={a.title} />
+                  ? <img loading="lazy" src={a.imageUrl} alt={a.title} />
                   : <div className="admin-image-card__empty">No image</div>}
                 <div className="admin-image-card__info">
                   <strong>{a.title}</strong>

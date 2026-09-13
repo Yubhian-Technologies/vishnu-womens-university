@@ -141,8 +141,8 @@ export default function PlacementHighlightsAdmin() {
               <tbody>
                 {highlights.map((h) => (
                   <tr key={h.id}>
-                    <td>{h.photoUrl ? <img src={h.photoUrl} alt="" className="admin-table__avatar" /> : '👤'}</td>
-                    <td>{h.logoUrl ? <img src={h.logoUrl} alt="" className="admin-table__avatar" /> : '—'}</td>
+                    <td>{h.photoUrl ? <img loading="lazy" src={h.photoUrl} alt="" className="admin-table__avatar" /> : '👤'}</td>
+                    <td>{h.logoUrl ? <img loading="lazy" src={h.logoUrl} alt="" className="admin-table__avatar" /> : '—'}</td>
                     <td>{h.name}</td>
                     <td>{h.package}</td>
                     <td>{h.companyName}</td>

@@ -185,7 +185,7 @@ export default function NewsEventsTabs({ categories, navOffset, embedded, depart
                             <div key={ci} className="news-events-media-card">
                               {card.imageUrl && (
                                 <div className="news-events-card-img-wrap">
-                                  <img src={card.imageUrl} alt={card.title || 'News & Events'} className="news-events-card-img" />
+                                  <img loading="lazy" src={card.imageUrl} alt={card.title || 'News & Events'} className="news-events-card-img" />
                                 </div>
                               )}
                               <div className="news-events-card-body">

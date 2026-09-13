@@ -47,7 +47,7 @@ export default function ImageUploader({
           onDrop={(e) => { e.preventDefault(); const f = e.dataTransfer.files?.[0]; if (f) handleFile(f); }}
         >
           {preview ? (
-            <img src={preview} alt="Preview" className="cld-uploader__preview" />
+            <img loading="lazy" src={preview} alt="Preview" className="cld-uploader__preview" />
           ) : (
             <div className="cld-uploader__placeholder">
               <span className="cld-uploader__icon">🖼️</span>

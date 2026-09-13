@@ -99,7 +99,7 @@ export default function SportsTournamentAdmin() {
               <tbody>
                 {items.map((item) => (
                   <tr key={item.id}>
-                    <td>{item.imageUrl ? <img src={item.imageUrl} alt="Tournament photo" className="admin-table__avatar" /> : '🏆'}</td>
+                    <td>{item.imageUrl ? <img loading="lazy" src={item.imageUrl} alt="Tournament photo" className="admin-table__avatar" /> : '🏆'}</td>
                     <td>{item.order}</td>
                     <td>
                       <button className="admin-btn admin-btn--sm" onClick={() => startEdit(item)}>Edit</button>

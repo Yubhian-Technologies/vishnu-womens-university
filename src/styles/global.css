@@ -342,19 +342,19 @@ input, textarea, select {
 }
 
 /* ---- Editorial Typography System ---- */
-h1, h2, h3 {
+h1, h2, h3, blockquote {
   font-family: var(--font-serif);
-  font-weight: 600;
+  font-weight: 500;
   line-height: var(--leading-tight);
   letter-spacing: var(--tracking-tight);
-  color: #2E2D29;
+  color: var(--color-primary-dark);
 }
 
 h4, h5, h6 {
   font-family: var(--font-sans);
   font-weight: 600;
   line-height: var(--leading-snug);
-  color: #2E2D29;
+  color: var(--color-primary-dark);
 }
 
 h1 { font-size: var(--text-h1); }
@@ -424,18 +424,18 @@ h6 { font-size: var(--text-lg); }
   font-size: var(--text-display);
   font-weight: 600;
   line-height: 1.05;
-  letter-spacing: var(--tracking-tight);
-  color: #2E2D29;
+  letter-spacing: -0.03em;
+  color: var(--color-white);
   margin: 0 0 var(--space-4) 0;
 }
 
 .section-title {
   font-family: var(--font-serif);
   font-size: var(--text-h2);
-  font-weight: 600;
+  font-weight: 500;
   line-height: var(--leading-tight);
-  letter-spacing: var(--tracking-tight);
-  color: #2E2D29;
+  letter-spacing: -0.01em;
+  color: var(--color-primary-dark);
   margin: 0 0 var(--space-4) 0;
 }
 
@@ -446,7 +446,7 @@ h6 { font-size: var(--text-lg); }
   font-size: 1.05rem;
   line-height: var(--leading-relaxed);
   font-weight: 400;
-  color: #2E2D29;
+  color: var(--color-text-light);
 }
 
 .button,
@@ -740,16 +740,20 @@ h6 { font-size: var(--text-lg); }
 
 /* ---- Card Styles ---- */
 .card {
-  background: var(--color-white);
-  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: var(--shadow-sm);
-  transition: all var(--transition-base);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  transition: all 400ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .card:hover {
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px) scale(1.01);
+  border-color: rgba(0, 0, 0, 0.08);
 }
 
 /* ---- Divider ---- */

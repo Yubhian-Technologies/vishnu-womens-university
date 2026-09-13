@@ -42,7 +42,7 @@ export default function AlumniGiving() {
           <div className="ag-stories-grid">
             {testimonials.map((t) => (
               <div key={t.id} className="ag-story-card">
-                {t.slug && <img src={t.slug} alt={t.title} className="ag-story-img" />}
+                {t.slug && <img loading="lazy" src={t.slug} alt={t.title} className="ag-story-img" />}
                 <div className="ag-story-body">
                   <blockquote className="ag-story-quote">"{t.desc}"</blockquote>
                   <div className="ag-story-author">

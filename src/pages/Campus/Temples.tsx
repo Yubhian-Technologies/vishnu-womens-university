@@ -142,7 +142,7 @@ export default function Temples() {
             </div>
 
             <div className="tmpl-hero-img-box">
-              <img
+              <img loading="lazy"
                 src={photos[0]?.src || PHOTO_NEEDED_PLACEHOLDER}
                 alt="Temples of God"
                 className="tmpl-hero-img"

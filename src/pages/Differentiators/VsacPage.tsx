@@ -55,7 +55,7 @@ export default function VsacPage({ sections }: VsacPageProps) {
     const photo = galleryItems[index % galleryItems.length];
     return (
       <div className="vsac-photo-frame" onClick={() => setLightboxImg(photo.url)}>
-        <img src={photo.url} alt={photo.label} className="vsac-photo-frame-img" />
+        <img loading="lazy" src={photo.url} alt={photo.label} className="vsac-photo-frame-img" />
         <div className="vsac-photo-frame-caption">
           <span>{photo.label}</span>
           <Maximize2 size={12} />
@@ -394,7 +394,7 @@ export default function VsacPage({ sections }: VsacPageProps) {
             <div className="vsac-gallery-grid">
               {galleryItems.map((photo, idx) => (
                 <div key={idx} className="vsac-gallery-card" onClick={() => setLightboxImg(photo.url)}>
-                  <img src={photo.url} alt={photo.label} className="vsac-gallery-img" />
+                  <img loading="lazy" src={photo.url} alt={photo.label} className="vsac-gallery-img" />
                   <div className="vsac-gallery-overlay">
                     <span>{photo.label}</span>
                   </div>
@@ -412,7 +412,7 @@ export default function VsacPage({ sections }: VsacPageProps) {
             <button className="meda-lightbox-close" onClick={() => setLightboxImg(null)}>
               <X size={28} />
             </button>
-            <img src={lightboxImg} alt="Enlarged photo" className="meda-lightbox-img" />
+            <img loading="lazy" src={lightboxImg} alt="Enlarged photo" className="meda-lightbox-img" />
           </div>
         </div>
       )}

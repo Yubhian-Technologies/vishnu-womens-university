@@ -528,7 +528,7 @@ export default function AdvancedElectricalRdLab() {
               </>
             )}
 
-            <img
+            <img loading="lazy"
               src={lightbox.photos[lightbox.index].imageUrl}
               alt={lightbox.photos[lightbox.index].caption || 'Advanced Electrical Lab Photo'}
               className="elec-lightbox-img"

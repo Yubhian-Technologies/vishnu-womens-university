@@ -1407,7 +1407,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                         <div className="dept-accreditation-image-section">
                           {accreditationItems.filter((item) => item.image).map((item) => (
                             <div key={item.id} className="dept-accreditation-image-wrapper">
-                              <img src={item.image} alt={`${item.label} accreditation`} />
+                              <img loading="lazy" src={item.image} alt={`${item.label} accreditation`} />
                               <span className="dept-accreditation-image-label">{item.label}</span>
                             </div>
                           ))}
@@ -1662,7 +1662,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                           className="dept-mindmap-thumb"
                           aria-label={`View mind map image ${i + 1}`}
                         >
-                          <img src={img.url} alt={`${activeProgram.shortName || activeProgram.name} mind map ${i + 1}`} />
+                          <img loading="lazy" src={img.url} alt={`${activeProgram.shortName || activeProgram.name} mind map ${i + 1}`} />
                         </a>
                       ))}
                       {activeProgram.mindMapPdfUrl && (

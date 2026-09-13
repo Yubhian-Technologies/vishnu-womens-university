@@ -200,7 +200,7 @@ export default function SocialServicesPage() {
                 a small label over the photo when an admin sets one. */}
             <div className="ss-nss-img-box">
               {plantingImg ? (
-                <img
+                <img loading="lazy"
                   src={plantingImg}
                   alt="VWU Students Planting Sapling in NSS Drive"
                   onError={(e) => {
@@ -269,7 +269,7 @@ export default function SocialServicesPage() {
             {/* Card 1: Rural Students */}
             <div className="ss-card">
               <div className="ss-card-img-wrap">
-                <img
+                <img loading="lazy"
                   src={communityPhotoAt(0).src || communityPhotoByAlt.get('Rural Students')?.src || '/images/campus-vibrant.jpeg'}
                   alt="Rural Students"
                   onError={(e) => { (e.currentTarget as HTMLImageElement).src = PHOTO_NEEDED_PLACEHOLDER; }}
@@ -286,7 +286,7 @@ export default function SocialServicesPage() {
             {/* Card 2: Leprosy Care */}
             <div className="ss-card">
               <div className="ss-card-img-wrap">
-                <img
+                <img loading="lazy"
                   src={communityPhotoAt(1).src || communityPhotoByAlt.get('Leprosy Care')?.src || '/images/campusview.jpg'}
                   alt="Leprosy Care"
                   onError={(e) => { (e.currentTarget as HTMLImageElement).src = PHOTO_NEEDED_PLACEHOLDER; }}
@@ -303,7 +303,7 @@ export default function SocialServicesPage() {
             {/* Card 3: Village Communities */}
             <div className="ss-card">
               <div className="ss-card-img-wrap">
-                <img
+                <img loading="lazy"
                   src={communityPhotoAt(2).src || communityPhotoByAlt.get('Village Communities')?.src || '/images/SLS01311.JPG'}
                   alt="Village Communities"
                   onError={(e) => { (e.currentTarget as HTMLImageElement).src = PHOTO_NEEDED_PLACEHOLDER; }}
@@ -320,7 +320,7 @@ export default function SocialServicesPage() {
             {/* Card 4: Persons with Disabilities */}
             <div className="ss-card">
               <div className="ss-card-img-wrap">
-                <img
+                <img loading="lazy"
                   src={communityPhotoAt(3).src || communityPhotoByAlt.get('Persons with Disabilities')?.src || '/images/campus-vibrant.jpeg'}
                   alt="Persons with Disabilities"
                   onError={(e) => { (e.currentTarget as HTMLImageElement).src = PHOTO_NEEDED_PLACEHOLDER; }}
@@ -337,7 +337,7 @@ export default function SocialServicesPage() {
             {/* Card 5: Hospital Patients */}
             <div className="ss-card">
               <div className="ss-card-img-wrap">
-                <img
+                <img loading="lazy"
                   src={communityPhotoAt(4).src || communityPhotoByAlt.get('Hospital Patients')?.src || '/images/campusview.jpg'}
                   alt="Hospital Patients"
                   onError={(e) => { (e.currentTarget as HTMLImageElement).src = PHOTO_NEEDED_PLACEHOLDER; }}
@@ -354,7 +354,7 @@ export default function SocialServicesPage() {
             {/* Card 6: Academic Excellence */}
             <div className="ss-card">
               <div className="ss-card-img-wrap">
-                <img
+                <img loading="lazy"
                   src={communityPhotoAt(5).src || communityPhotoByAlt.get('Academic Excellence')?.src || '/images/SLS01311.JPG'}
                   alt="Academic Excellence"
                   onError={(e) => { (e.currentTarget as HTMLImageElement).src = PHOTO_NEEDED_PLACEHOLDER; }}
@@ -453,7 +453,7 @@ export default function SocialServicesPage() {
             {/* Left: Founder Photo with Quote Overlay */}
             <div className="ss-founder-img-box">
               {founderImg ? (
-                <img
+                <img loading="lazy"
                   src={founderImg}
                   alt="Padma Bhushan Dr. B. V. Raju"
                   onError={(e) => { (e.currentTarget as HTMLImageElement).src = PHOTO_NEEDED_PLACEHOLDER; }}

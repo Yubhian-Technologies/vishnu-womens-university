@@ -47,7 +47,7 @@ export default function HorizontalEventsShowcase({ cards, departmentSlug, catego
             <div className="horizontal-events-slide" key={i}>
               <div className="events-showcase-card">
                 {card.imageUrl ? (
-                  <img src={card.imageUrl} alt={card.title} className="events-showcase-img" />
+                  <img loading="lazy" src={card.imageUrl} alt={card.title} className="events-showcase-img" />
                 ) : (
                   <div className="events-showcase-img-placeholder" />
                 )}

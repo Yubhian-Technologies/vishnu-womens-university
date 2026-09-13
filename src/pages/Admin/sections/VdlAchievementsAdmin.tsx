@@ -123,7 +123,7 @@ export default function VdlAchievementsAdmin() {
               <tbody>
                 {docs.map((d) => (
                   <tr key={d.id}>
-                    <td>{d.imageUrl ? <img src={d.imageUrl} alt="" className="admin-table__avatar" /> : '—'}</td>
+                    <td>{d.imageUrl ? <img loading="lazy" src={d.imageUrl} alt="" className="admin-table__avatar" /> : '—'}</td>
                     <td>{d.order}</td>
                     <td>{d.label}</td>
                     <td>{d.fileUrl ? <a href={d.fileUrl} target="_blank" rel="noopener noreferrer">View</a> : '—'}</td>

@@ -177,7 +177,7 @@ export default function SewageTreatment() {
               {/* Interleaved Photo Slot 1 & 2 */}
               <div className="stp-vision-sidebar">
                 <div className="stp-media-card">
-                  <img
+                  <img loading="lazy"
                     src={getPhotoSrc(0)}
                     alt="VWU Sewage Treatment Plant View"
                     className="stp-media-img"
@@ -186,7 +186,7 @@ export default function SewageTreatment() {
                   </div>
 
                 <div className="stp-media-card">
-                  <img
+                  <img loading="lazy"
                     src={getPhotoSrc(1)}
                     alt="VWU Sewage Treatment Water Recycling"
                     className="stp-media-img"
@@ -218,7 +218,7 @@ export default function SewageTreatment() {
 
             {/* Interleaved Photo Slot 3 */}
             <div className="stp-media-card">
-              <img
+              <img loading="lazy"
                 src={getPhotoSrc(2)}
                 alt="DST Funded Sewage Treatment Installation"
                 className="stp-media-img"
@@ -260,7 +260,7 @@ export default function SewageTreatment() {
               <div className="stp-process-num">01</div>
               {/* Interleaved Photo Slot 4 */}
               <div className="stp-process-img-box">
-                <img
+                <img loading="lazy"
                   src={getPhotoSrc(3)}
                   alt="Zonal Drainage Network"
                   onError={(e) => { e.currentTarget.src = DEFAULT_PHOTOS[0].src; }}
@@ -276,7 +276,7 @@ export default function SewageTreatment() {
               <div className="stp-process-num">02</div>
               {/* Interleaved Photo Slot 5 */}
               <div className="stp-process-img-box">
-                <img
+                <img loading="lazy"
                   src={getPhotoSrc(4)}
                   alt="MBBR Biofilm Reactor"
                   onError={(e) => { e.currentTarget.src = DEFAULT_PHOTOS[1].src; }}
@@ -292,7 +292,7 @@ export default function SewageTreatment() {
               <div className="stp-process-num">03</div>
               {/* Interleaved Photo Slot 6 */}
               <div className="stp-process-img-box">
-                <img
+                <img loading="lazy"
                   src={getPhotoSrc(5)}
                   alt="BIS Quality Water Testing"
                   onError={(e) => { e.currentTarget.src = DEFAULT_PHOTOS[2].src; }}
@@ -323,7 +323,7 @@ export default function SewageTreatment() {
             <div className="stp-impact-media-card">
               {/* Interleaved Photo Slot 7 */}
               <div className="stp-impact-img-box">
-                <img
+                <img loading="lazy"
                   src={getPhotoSrc(6)}
                   alt="Campus Greenery Irrigation"
                   onError={(e) => { e.currentTarget.src = DEFAULT_PHOTOS[0].src; }}
@@ -341,7 +341,7 @@ export default function SewageTreatment() {
             <div className="stp-impact-media-card">
               {/* Interleaved Photo Slot 8 */}
               <div className="stp-impact-img-box">
-                <img
+                <img loading="lazy"
                   src={getPhotoSrc(7)}
                   alt="2.5 KM Adopted Highway Greenery"
                   onError={(e) => { e.currentTarget.src = DEFAULT_PHOTOS[1].src; }}

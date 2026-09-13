@@ -170,7 +170,7 @@ export default function MousPartnerLogosAdmin() {
                 {docs.map((d) => (
                   <tr key={d.id}>
                     <td>{d.order}</td>
-                    <td>{d.imageUrl ? <img src={d.imageUrl} alt="" className="admin-table__avatar" /> : '—'}</td>
+                    <td>{d.imageUrl ? <img loading="lazy" src={d.imageUrl} alt="" className="admin-table__avatar" /> : '—'}</td>
                     <td>{d.label}</td>
                     <td>{d.section || '—'}</td>
                     <td>{d.pdfUrl ? <a href={d.pdfUrl} target="_blank" rel="noopener noreferrer">View</a> : '—'}</td>

@@ -103,7 +103,7 @@ export default function SportsAchievementsAdmin() {
               <tbody>
                 {achievements.map((a) => (
                   <tr key={a.id}>
-                    <td>{a.imageUrl ? <img src={a.imageUrl} alt="Achievement photo" className="admin-table__avatar" /> : '—'}</td>
+                    <td>{a.imageUrl ? <img loading="lazy" src={a.imageUrl} alt="Achievement photo" className="admin-table__avatar" /> : '—'}</td>
                     <td>{a.order}</td>
                     <td>
                       <button className="admin-btn admin-btn--sm" onClick={() => startEdit(a)}>Edit</button>

@@ -38,7 +38,7 @@ export default function SmoothImage({ src, alt, className = '', onLoad, ...rest 
   }, [src]);
 
   return (
-    <img
+    <img loading="lazy"
       ref={imgRef}
       src={src}
       alt={alt}
