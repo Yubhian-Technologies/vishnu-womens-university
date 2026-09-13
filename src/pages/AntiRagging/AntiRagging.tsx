@@ -69,7 +69,7 @@ export default function AntiRagging() {
 
             <div className="detail-sidebar">
               <div style={{ position: 'sticky', top: '110px' }}>
-                <img
+                <img loading="lazy"
                   src={photo.src}
                   alt={photo.alt}
                   style={{ width: '100%', borderRadius: 'var(--radius-md)', border: '1.5px solid var(--color-light-gray)', display: 'block' }}

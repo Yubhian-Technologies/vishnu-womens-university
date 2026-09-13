@@ -892,7 +892,7 @@ export default function DifferentiatorDetail() {
 
                   <div className="detail-sidebar">
                     <div className="gsac-globe-card">
-                      <img src="/images/dot world map.webp" alt="" aria-hidden="true" className="gsac-globe-map" />
+                      <img loading="lazy" src="/images/dot world map.webp" alt="" aria-hidden="true" className="gsac-globe-map" />
                       <h3 className="gsac-globe-title">Global<br />Opportunities<br />Brighter Futures</h3>
                       <div className="gsac-globe-divider" aria-hidden="true" />
                       <div className="gsac-globe-stats">

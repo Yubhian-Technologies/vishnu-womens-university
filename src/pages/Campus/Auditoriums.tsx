@@ -204,7 +204,7 @@ export default function Auditoriums() {
             </div>
           </div>
           <div className="aud-hero-media">
-            <img src={heroImage} alt="" className="aud-hero-bg-img" />
+            <img loading="lazy" src={heroImage} alt="" className="aud-hero-bg-img" />
             <div className="aud-hero-media-overlay" />
             <div className="aud-hero-screen" aria-hidden="true">
               {heroScreenLines.map((line, i) => (

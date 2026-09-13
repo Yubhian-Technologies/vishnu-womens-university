@@ -185,7 +185,7 @@ export default function EventsAdmin() {
             <label>Event Gallery (optional — extra photos shown on this event's detail view, each with its own caption)</label>
             {(form.galleryPhotos || []).map((g, i) => (
               <div key={g.storagePath || i} style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start', marginBottom: '0.75rem', border: '1px solid var(--color-light-gray)', borderRadius: 8, padding: '0.75rem' }}>
-                <img src={g.url} alt="" style={{ width: 90, height: 60, objectFit: 'cover', borderRadius: 6, flexShrink: 0 }} />
+                <img loading="lazy" src={g.url} alt="" style={{ width: 90, height: 60, objectFit: 'cover', borderRadius: 6, flexShrink: 0 }} />
                 <input
                   value={g.caption}
                   onChange={(e) => setGalleryCaption(i, e.target.value)}

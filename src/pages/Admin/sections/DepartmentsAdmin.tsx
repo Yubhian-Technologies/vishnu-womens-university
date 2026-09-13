@@ -361,6 +361,8 @@ export default function DepartmentsAdmin() {
   const [editing, setEditing] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [copying, setCopying] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
 
   const set = (k: string, v: string | number | string[] | LibrarySection[] | ProgramLevel[] | LibraryItem[] | LabItem[] | NewsEventsYear[] | ProgramLink[] | CustomSection[] | FaqItem[] | SuccessStoryItem[] | TestimonialItem[] | ResearchStat[] | ResearchSlide[]) => setForm((p) => ({ ...p, [k]: v }));
   const handleHero = (r: UploadResult) => setForm((p) => ({ ...p, heroImage: r.url, storagePath: r.path }));
@@ -1083,14 +1085,23 @@ export default function DepartmentsAdmin() {
     });
   };
 
-  const remove = async (id: string) => {
+  // Delete functionality is now handled entirely inside the Edit form (Danger Zone)
+  const executeDelete = async () => {
+    if (!editing) return;
     if (scopedDeptTitle) {
-      const target = departments.find((d) => d.id === id);
-      if (!target || target.title.trim() !== scopedDeptTitle) return alert(`You don't have access to delete this department.`);
+      const target = departments.find((d) => d.id === editing);
+      if (!target || target.title.trim() !== scopedDeptTitle) {
+        alert(`You don't have access to delete this department.`);
+        return;
+      }
     }
-    if (!confirm('Delete this department card?')) return;
     try {
-      await deleteDoc(doc(db, 'departments', id));
+      await deleteDoc(doc(db, 'departments', editing));
+      setEditing(null);
+      setForm(EMPTY);
+      setOriginalForm(null);
+      setDeleteModalOpen(false);
+      setDeleteConfirmText('');
     } catch (e) {
       alert(`Couldn't delete: ${(e as Error).message}`);
     }
@@ -2138,7 +2149,45 @@ export default function DepartmentsAdmin() {
             {saving ? 'Saving…' : editing ? 'Update' : 'Add Department'}
           </button>
         </div>
+        
+        {editing && (
+          <div className="admin-danger-zone" style={{ marginTop: '3rem', padding: '1.5rem', border: '1px solid var(--color-error)', borderRadius: '8px', background: 'rgba(220, 38, 38, 0.05)' }}>
+            <h3 style={{ color: 'var(--color-error)', margin: '0 0 0.5rem', fontSize: '1.1rem' }}>Danger Zone</h3>
+            <p style={{ margin: '0 0 1rem', color: 'var(--color-text)' }}>Once you delete a department, there is no going back. This will delete all custom sections, laboratories, and metadata attached to this department.</p>
+            <button className="admin-btn admin-btn--danger" onClick={() => { setDeleteConfirmText(''); setDeleteModalOpen(true); }}>
+              Delete Department
+            </button>
+          </div>
+        )}
       </div>
+
+      {deleteModalOpen && (
+        <div className="admin-modal-overlay">
+          <div className="admin-modal" style={{ maxWidth: '400px' }}>
+            <h2 className="admin-modal__title" style={{ color: 'var(--color-error)' }}>Are you absolutely sure?</h2>
+            <p style={{ marginBottom: '1rem' }}>This action cannot be undone. This will permanently delete the <strong>{form.title}</strong> department.</p>
+            <p style={{ marginBottom: '1rem' }}>Please type <strong>{form.shortCode}</strong> to confirm.</p>
+            <input 
+              type="text" 
+              className="admin-input" 
+              value={deleteConfirmText} 
+              onChange={(e) => setDeleteConfirmText(e.target.value)} 
+              placeholder={form.shortCode}
+              autoFocus
+            />
+            <div className="admin-modal__actions" style={{ marginTop: '1.5rem' }}>
+              <button className="admin-btn admin-btn--ghost" onClick={() => setDeleteModalOpen(false)}>Cancel</button>
+              <button 
+                className="admin-btn admin-btn--danger" 
+                onClick={executeDelete} 
+                disabled={deleteConfirmText !== form.shortCode}
+              >
+                I understand, delete this department
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Hidden while editing an existing department — nothing else to
           scroll past, so the section list above is the whole page. */}
@@ -2167,7 +2216,6 @@ export default function DepartmentsAdmin() {
                     <td>{d.order}</td>
                     <td>
                       <button className="admin-btn admin-btn--sm" onClick={() => startEdit(d)}>Edit</button>
-                      <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(d.id)}>Delete</button>
                     </td>
                   </tr>
                 ))}

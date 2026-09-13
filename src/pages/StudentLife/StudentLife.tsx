@@ -194,7 +194,7 @@ export default function StudentLife() {
             </div>
             {diningImg && (
               <div style={{ borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
-                <img
+                <img loading="lazy"
                   src={diningImg.src}
                   alt={diningImg.alt}
                   style={{ width: '100%', height: '320px', objectFit: 'cover' }}

@@ -164,7 +164,7 @@ export default function TestimonialSlider({
                 <div className="m3-testi-portrait-col">
                   <div className="m3-testi-img-frame">
                     {avatarUrl ? (
-                      <img
+                      <img loading="lazy"
                         src={avatarUrl}
                         alt={authorName}
                         className="m3-testi-avatar"
@@ -236,7 +236,7 @@ export default function TestimonialSlider({
                     aria-selected={isActive}
                     aria-label={`View story of ${t.title || `Alumna ${idx + 1}`}`}
                   >
-                    <img src={thumbImg} alt="" className="m3-thumb-img" />
+                    <img loading="lazy" src={thumbImg} alt="" className="m3-thumb-img" />
                   </button>
                 );
               })}

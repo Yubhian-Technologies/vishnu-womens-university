@@ -272,7 +272,7 @@ export default function RecruiterLogosAdmin() {
           <div className="admin-image-grid">
             {sortedLogos.map((logo) => (
               <div key={logo.id} className="admin-image-card">
-                <img src={logo.imageUrl} alt={logo.id} />
+                <img loading="lazy" src={logo.imageUrl} alt={logo.id} />
                 <div className="admin-image-card__info">
                   <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
                     <input

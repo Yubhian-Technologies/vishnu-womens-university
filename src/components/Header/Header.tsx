@@ -121,6 +121,8 @@ const navItemsData: NavItem[] = [
           { label: 'Programmes', path: '/academics/programs' },
           { label: 'Faculty Directory', path: '/faculty' },
           { label: 'Results Analysis', path: '/result-analysis' },
+          { label: 'Smart Classrooms', path: '/campus/smart-classrooms' },
+          { label: 'Central Library', path: '/campus/central-library' },
           { label: 'Examinations Portal', path: 'https://www.svecwexams.in/', external: true },
         ],
       },
@@ -133,7 +135,6 @@ const navItemsData: NavItem[] = [
           { label: 'List of Holidays', path: '/information#holidays' },
           { label: 'Counselling Scheme', path: '/information#counselling' },
           { label: 'ICT Platforms', path: '/information#ict-platforms' },
-          { label: 'Smart Class Rooms', path: '/campus/smart-classrooms' },
           { label: 'State-of-the-art Labs', path: '/campus/state-of-the-art-labs' },
           { label: 'Other Practices', path: '/information#other-practices' },
         ],
@@ -599,7 +600,7 @@ export default function Header() {
             className="navbar-brand-link"
             aria-label="Vishnu Women's University - Home"
           >
-            <img
+            <img loading="lazy"
               src="/images/logo.png"
               alt="Vishnu Women's University"
               className="navbar-logo-img navbar-logo-desktop"
@@ -705,7 +706,7 @@ export default function Header() {
               {activeItemData.groups && (
                 <div className="mega-groups-container">
                   {activeItemData.groups.map((group, gIdx) => {
-                    const isCol2 = group.items.length >= 8;
+                    const isCol2 = group.items.length >= 9;
                     return (
                       <div
                         key={group.groupLabel}

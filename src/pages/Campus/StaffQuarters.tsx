@@ -162,7 +162,7 @@ export default function StaffQuarters() {
         <div className="container">
           <div className="sq-hero-gallery-card sq-animate" data-delay="100">
             <div className="sq-main-photo-stage">
-              <img
+              <img loading="lazy"
                 src={getPhotoSrc(activePhotoIdx)}
                 alt={DEFAULT_PHOTOS[activePhotoIdx]?.alt || 'Green Meadows Quarters'}
                 className="sq-stage-img"
@@ -182,7 +182,7 @@ export default function StaffQuarters() {
                   onClick={() => setActivePhotoIdx(idx)}
                   className={`sq-thumb-btn ${activePhotoIdx === idx ? 'active' : ''}`}
                 >
-                  <img src={getPhotoSrc(idx)} alt={p.alt} />
+                  <img loading="lazy" src={getPhotoSrc(idx)} alt={p.alt} />
                   <span className="sq-thumb-number">0{idx + 1}</span>
                 </button>
               ))}
@@ -223,7 +223,7 @@ export default function StaffQuarters() {
               {/* 1. Chairman's Vision Hero Card with Full Background Photo Overlay */}
               <div className="sq-vision-hero-card sq-animate" data-delay="100">
                 <div className="sq-vision-bg-image">
-                  <img src={getPhotoSrc(0)} alt="Green Meadows Housing Vision" />
+                  <img loading="lazy" src={getPhotoSrc(0)} alt="Green Meadows Housing Vision" />
                   <div className="sq-vision-overlay"></div>
                 </div>
                 <div className="sq-vision-content">
@@ -239,7 +239,7 @@ export default function StaffQuarters() {
               {/* 2. Living at Green Meadows Story Section */}
               <div className="sq-feature-hero-card sq-animate" data-delay="200">
                 <div className="sq-card-image-col">
-                  <img src={getPhotoSrc(2)} alt="Green Meadows Pond & Scenery" />
+                  <img loading="lazy" src={getPhotoSrc(2)} alt="Green Meadows Pond & Scenery" />
                   </div>
                 <div className="sq-card-text-col">
                   <div className="sq-card-tag">
@@ -274,7 +274,7 @@ export default function StaffQuarters() {
                   {featuresList.map((item, idx) => (
                     <div key={idx} className="sq-photo-card">
                       <div className="sq-photo-card-img-wrap">
-                        <img src={getPhotoSrc(item.imgIndex)} alt={item.title} />
+                        <img loading="lazy" src={getPhotoSrc(item.imgIndex)} alt={item.title} />
                         <span className="sq-photo-card-tag">{item.tag}</span>
                       </div>
                       <div className="sq-photo-card-content">

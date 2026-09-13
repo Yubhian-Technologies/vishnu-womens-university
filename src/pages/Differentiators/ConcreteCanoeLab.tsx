@@ -700,7 +700,7 @@ export default function ConcreteCanoeLab() {
               </>
             )}
 
-            <img
+            <img loading="lazy"
               src={lightbox.photos[lightbox.index].imageUrl}
               alt={lightbox.photos[lightbox.index].caption || 'Concrete Canoe Lab Photo'}
               className="canoe-lightbox-img"

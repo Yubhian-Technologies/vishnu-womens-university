@@ -129,7 +129,7 @@ export default function Wellness() {
           copy stays fixed, per the requested design. */}
       <section className="wellness-hero-section">
         <div className="wellness-hero-card">
-          <img src={heroImage} alt="" className="wellness-hero-bg-img" />
+          <img loading="lazy" src={heroImage} alt="" className="wellness-hero-bg-img" />
           <div className="wellness-hero-overlay" />
           <div className="wellness-hero-content">
 
@@ -272,7 +272,7 @@ export default function Wellness() {
 
       {/* Our Impact */}
       <section className="wellness-impact-section">
-        <img src={impactBgImage} alt="" className="wellness-impact-bg-img" />
+        <img loading="lazy" src={impactBgImage} alt="" className="wellness-impact-bg-img" />
         <div className="wellness-impact-overlay" />
         <div className="container wellness-impact-content">
           <span className="section-label section-label--dark">Our Impact</span>

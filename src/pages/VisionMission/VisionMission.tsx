@@ -232,7 +232,7 @@ export default function VisionMission() {
             </div>
             {qualityPolicyImg && (
               <div className="sves-image-wrapper reveal-right">
-                <img
+                <img loading="lazy"
                   src={qualityPolicyImg.src}
                   alt={qualityPolicyImg.alt}
                   style={{ width: '100%', height: '400px', objectFit: 'cover' }}

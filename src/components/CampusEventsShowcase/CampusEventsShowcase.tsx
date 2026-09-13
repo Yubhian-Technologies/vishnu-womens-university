@@ -166,7 +166,7 @@ function CesLightbox({
         </>
       )}
       <div className="ces-lightbox-body" onClick={(e) => e.stopPropagation()}>
-        <img src={photos[index].url} alt={photos[index].caption || ''} />
+        <img loading="lazy" src={photos[index].url} alt={photos[index].caption || ''} />
         {photos[index].caption && <p>{photos[index].caption}</p>}
       </div>
     </div>,
@@ -320,7 +320,7 @@ export default function CampusEventsShowcase({ sourceItem }: { sourceItem: Campu
           // own, so it can sit queued behind other page requests (fonts,
           // other photos) even though it's the most important thing to
           // paint first. This hints the browser to fetch it immediately.
-          <img src={heroImage} alt="" className="ces-hero-bg" fetchPriority="high" decoding="async" />
+          <img loading="lazy" src={heroImage} alt="" className="ces-hero-bg" fetchPriority="high" decoding="async" />
         )}
         <div className="container ces-hero-inner">
           <div className="ces-hero-copy">

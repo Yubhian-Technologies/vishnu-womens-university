@@ -917,7 +917,7 @@ export default function FacultyAdmin() {
                                 onMouseDown={(e) => e.stopPropagation()}
                               />
                             </td>
-                            <td>{f.imageUrl ? <img src={f.imageUrl} alt="" className="admin-table__avatar" /> : '👤'}</td>
+                            <td>{f.imageUrl ? <img loading="lazy" src={f.imageUrl} alt="" className="admin-table__avatar" /> : '👤'}</td>
                             <td>{f.name}</td>
                             <td>
                               <span className="admin-badge admin-badge--sm">{f.designation}</span>

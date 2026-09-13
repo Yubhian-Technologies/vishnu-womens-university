@@ -42,7 +42,7 @@ export default function SportsDetail() {
   return (
     <main className="page-wrapper sports-detail-page">
       <div className="sports-detail__hero">
-        {sport.imageUrl && <img src={sport.imageUrl} alt={sport.title} className="sports-detail__hero-img" />}
+        {sport.imageUrl && <img loading="lazy" src={sport.imageUrl} alt={sport.title} className="sports-detail__hero-img" />}
         <div className="sports-detail__hero-overlay" />
         <div className="container sports-detail__hero-content">
           <Link to="/campus/sports" className="sports-detail__back">

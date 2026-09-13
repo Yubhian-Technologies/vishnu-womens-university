@@ -222,7 +222,7 @@ function PartnerLogo({ name, uploadedUrl }: { name: string; uploadedUrl?: string
           {name.charAt(0)}
         </span>
       ) : (
-        <img
+        <img loading="lazy"
           src={logoOverride || `https://www.google.com/s2/favicons?domain=${domain}&sz=128`}
           alt={name}
           className="partner-logo-img"
@@ -896,7 +896,7 @@ function TeamRosterRow({
             </div>
           ) : bio ? (
             <div style={{ display: 'flex', gap: 'var(--space-5)', flexWrap: 'wrap' }}>
-              <img
+              <img loading="lazy"
                 src={tpoPhotoMap.get(row.name) || PHOTO_NEEDED_PLACEHOLDER}
                 alt={row.name}
                 style={{ width: 160, height: 190, objectFit: 'cover', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-light-gray)', flexShrink: 0 }}
@@ -969,7 +969,7 @@ function TeamRosterRow({
               {((iloPhotoMap?.get(row.name)) || []).length > 0 && (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 'var(--space-3)' }}>
                   {((iloPhotoMap?.get(row.name)) || []).map((p, pi) => (
-                    <img
+                    <img loading="lazy"
                       key={p.path || pi}
                       src={p.url}
                       alt={`${row.name} office ${pi + 1}`}
@@ -1666,7 +1666,7 @@ export default function PlacementDetail() {
             ) : item.slug === 'gsac' ? (
               <div className="detail-sidebar">
                 <div className="gsac-globe-card">
-                  <img src="/images/dot world map.webp" alt="" aria-hidden="true" className="gsac-globe-map" />
+                  <img loading="lazy" src="/images/dot world map.webp" alt="" aria-hidden="true" className="gsac-globe-map" />
                   <h3 className="gsac-globe-title">Global<br />Opportunities<br />Brighter Futures</h3>
                   <div className="gsac-globe-divider" aria-hidden="true" />
                   <div className="gsac-globe-stats">

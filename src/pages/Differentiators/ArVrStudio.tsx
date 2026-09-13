@@ -316,7 +316,7 @@ export default function ArVrStudio() {
               </button>
             </>
           )}
-          <img src={lightbox.photos[lightbox.index].imageUrl} alt="" onClick={(e) => e.stopPropagation()} />
+          <img loading="lazy" src={lightbox.photos[lightbox.index].imageUrl} alt="" onClick={(e) => e.stopPropagation()} />
         </div>
       )}
     </main>

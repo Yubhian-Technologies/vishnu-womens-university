@@ -140,7 +140,7 @@ export default function SportsCategoryAdmin() {
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '0.75rem' }}>
               {form.gallery.map((g: SportsGalleryImage, i: number) => (
                 <div key={g.storagePath || i} style={{ position: 'relative' }}>
-                  <img src={g.url} alt="" style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 'var(--radius-md)' }} />
+                  <img loading="lazy" src={g.url} alt="" style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 'var(--radius-md)' }} />
                   <button
                     type="button"
                     onClick={() => removeGalleryImage(i)}
@@ -187,7 +187,7 @@ export default function SportsCategoryAdmin() {
               <tbody>
                 {items.map((item) => (
                   <tr key={item.id}>
-                    <td>{item.imageUrl ? <img src={item.imageUrl} alt="" className="admin-table__avatar" /> : '🏆'}</td>
+                    <td>{item.imageUrl ? <img loading="lazy" src={item.imageUrl} alt="" className="admin-table__avatar" /> : '🏆'}</td>
                     <td>
                       <strong>{item.title}</strong>
                       {item.subtitle && <div style={{ fontSize: '0.8rem', color: '#64748b' }}>{item.subtitle}</div>}

@@ -201,7 +201,7 @@ function PersonPanelList({ people }: { people: CustomSection[] }) {
               <SmoothCollapse open={isOpen}>
                 <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderTop: 'none', display: 'flex', gap: 'var(--space-4)', alignItems: 'flex-start', flexWrap: 'wrap' }}>
                   {person.photo?.imageUrl && (
-                    <img
+                    <img loading="lazy"
                       src={person.photo.imageUrl}
                       alt={person.label}
                       style={{ width: 70, height: 70, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '1px solid var(--color-light-gray)' }}
@@ -450,7 +450,7 @@ function PhotoLightbox({ photos, index, onClose, onNavigate }: {
         </>
       )}
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-3)', maxWidth: '100%', maxHeight: '100%' }}>
-        <img
+        <img loading="lazy"
           src={photos[index].imageUrl}
           alt=""
           onClick={(e) => e.stopPropagation()}
@@ -485,7 +485,7 @@ function GalleryGrid({ photos }: { photos: CustomSectionPhoto[] }) {
               overflow: 'hidden', cursor: 'zoom-in', aspectRatio: '4 / 3', background: 'var(--color-off-white)',
             }}
           >
-            <img src={p.imageUrl} alt={p.caption || ''} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+            <img loading="lazy" src={p.imageUrl} alt={p.caption || ''} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
             {p.caption && (
               <span
                 style={{
@@ -545,7 +545,7 @@ function StaticGalleryStrip({ photos }: { photos: CustomSectionPhoto[] }) {
             }}
           >
             <div style={{ width: '100%', height: 160, borderRadius: 10, overflow: 'hidden', background: '#f1f5f9' }}>
-              <img src={p.imageUrl} alt={p.caption || ''} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+              <img loading="lazy" src={p.imageUrl} alt={p.caption || ''} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
             </div>
             {p.caption && (
               <span
@@ -595,7 +595,7 @@ function CustomSectionBody({ section, departmentSlug, categorySlug }: { section:
   if (!section.photo?.imageUrl) return body;
   return (
     <div style={{ display: 'flex', gap: 'var(--space-5)', alignItems: 'flex-start', flexWrap: 'wrap' }}>
-      <img
+      <img loading="lazy"
         src={section.photo.imageUrl}
         alt={section.label}
         style={{ width: 90, height: 90, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '1px solid var(--color-light-gray)' }}
@@ -699,7 +699,7 @@ function CustomSectionBodyContent({ section, departmentSlug, categorySlug }: { s
         {cards.map((card, ci) => (
           <div key={ci} style={{ border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', overflow: 'hidden', background: 'var(--color-white)' }}>
             {card.imageUrl && (
-              <img src={card.imageUrl} alt={card.title} style={{ width: '100%', aspectRatio: '4 / 3', objectFit: 'cover', display: 'block' }} />
+              <img loading="lazy" src={card.imageUrl} alt={card.title} style={{ width: '100%', aspectRatio: '4 / 3', objectFit: 'cover', display: 'block' }} />
             )}
             <div style={{ padding: 'var(--space-3) var(--space-4)' }}>
               {card.title && (

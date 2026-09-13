@@ -979,7 +979,7 @@ export default function ProgramsAdmin() {
               <div className="admin-image-grid" style={{ marginBottom: '0.75rem' }}>
                 {mindMapImages.map((img, mi) => (
                   <div key={mi} className="admin-image-card">
-                    <img src={img.url} alt="" />
+                    <img loading="lazy" src={img.url} alt="" />
                     <div className="admin-image-card__actions">
                       <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveMindMapImage(mi, -1)} disabled={mi === 0} title="Move up">↑</button>
                       <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveMindMapImage(mi, 1)} disabled={mi === mindMapImages.length - 1} title="Move down">↓</button>

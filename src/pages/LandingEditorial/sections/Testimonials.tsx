@@ -23,7 +23,7 @@ export default function Testimonials() {
                 className={`lpe-testimonial-avatar${i === active ? ' active' : ''}`}
                 onClick={() => setActive(i)}
               >
-                <img src={t.avatar} alt="" aria-hidden="true" />
+                <img loading="lazy" src={t.avatar} alt="" aria-hidden="true" />
                 <span>
                   <span className="name">{t.name}</span>
                   <span className="tag">{t.tag}</span>

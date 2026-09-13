@@ -33,7 +33,7 @@ export default function NewsArticleDialog({ article, onClose }: Props) {
           <X size={18} />
         </button>
         <div className="news-article-dialog-image">
-          <img src={article.imageUrl} alt={article.imageAlt} />
+          <img loading="lazy" src={article.imageUrl} alt={article.imageAlt} />
           <span className="news-article-dialog-category">{article.category}</span>
         </div>
         <div className="news-article-dialog-body">

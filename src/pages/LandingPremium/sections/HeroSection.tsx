@@ -25,7 +25,7 @@ export default function HeroSection({ imageUrl, imageAlt }: Props) {
       </div>
       <motion.div className="lph-hero__photo-wrap" initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.7, delay: 0.15 }}>
         <div className="lph-hero__torn" />
-        <img src={imageUrl} alt={imageAlt} className="lph-hero__photo" />
+        <img loading="lazy" src={imageUrl} alt={imageAlt} className="lph-hero__photo" />
       </motion.div>
       <motion.div className="lph-hero__actions" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.45 }}>
         <Link to="/apply-now" className="btn btn-accent btn-lg">Apply Now</Link>

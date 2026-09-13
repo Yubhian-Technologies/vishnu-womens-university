@@ -13,7 +13,7 @@ export default function RouteFallback() {
       <span className="route-fallback__sr-only">Loading…</span>
       <div className="route-fallback__aurora" aria-hidden="true" />
       <div className="route-fallback__content" aria-hidden="true">
-        <img src="/images/logo.png" alt="" className="route-fallback__logo" />
+        <img loading="lazy" src="/images/logo.png" alt="" className="route-fallback__logo" />
         <p className="route-fallback__tagline">Vishnu Women&rsquo;s University</p>
         <div className="route-fallback__dots">
           <span />

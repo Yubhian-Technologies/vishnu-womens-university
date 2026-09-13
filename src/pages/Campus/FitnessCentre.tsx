@@ -163,16 +163,16 @@ export default function FitnessCentre() {
             {/* Middle Column: Cascading Overlapping Tilted Polaroid Photos */}
             <div className="fc-polaroid-stack">
               <div className="fc-polaroid-card p-1">
-                {photo1 ? <img src={photo1} alt="Fitness Centre Facility 1" /> : <div className="fc-img-skeleton" />}
+                {photo1 ? <img loading="lazy" src={photo1} alt="Fitness Centre Facility 1" /> : <div className="fc-img-skeleton" />}
               </div>
               <div className="fc-polaroid-card p-2">
-                {photo2 ? <img src={photo2} alt="Fitness Centre Facility 2" /> : <div className="fc-img-skeleton" />}
+                {photo2 ? <img loading="lazy" src={photo2} alt="Fitness Centre Facility 2" /> : <div className="fc-img-skeleton" />}
               </div>
               <div className="fc-polaroid-card p-3">
-                {photo3 ? <img src={photo3} alt="Fitness Centre Facility 3" /> : <div className="fc-img-skeleton" />}
+                {photo3 ? <img loading="lazy" src={photo3} alt="Fitness Centre Facility 3" /> : <div className="fc-img-skeleton" />}
               </div>
               <div className="fc-polaroid-card p-4">
-                {photo4 ? <img src={photo4} alt="Fitness Centre Facility 4" /> : <div className="fc-img-skeleton" />}
+                {photo4 ? <img loading="lazy" src={photo4} alt="Fitness Centre Facility 4" /> : <div className="fc-img-skeleton" />}
               </div>
             </div>
 

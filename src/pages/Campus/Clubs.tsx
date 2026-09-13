@@ -310,7 +310,7 @@ export default function Clubs() {
           Content Blocks ("Clubs — Hero Extra Text"). */}
       <section className="clubs-hero-section">
           <div className="clubs-hero-card">
-            <img src={heroImage} alt="" className="clubs-hero-bg-img" />
+            <img loading="lazy" src={heroImage} alt="" className="clubs-hero-bg-img" />
             <div className="clubs-hero-overlay" />
 
             <div className="clubs-hero-corner" aria-hidden="true">
@@ -529,7 +529,7 @@ export default function Clubs() {
 
               <div className="clubs-story-author">
                 {activeStory.slug && activeStory.slug.startsWith('http') ? (
-                  <img src={activeStory.slug} alt={activeStory.title} className="clubs-story-avatar" />
+                  <img loading="lazy" src={activeStory.slug} alt={activeStory.title} className="clubs-story-avatar" />
                 ) : (
                   <div className="clubs-story-avatar clubs-story-avatar--initials">
                     {activeStory.title.split(' ').slice(0, 2).map((n) => n[0]).join('').toUpperCase()}
@@ -579,7 +579,7 @@ export default function Clubs() {
                 </div>
                 {collagePhotos.map((photo, i) => (
                   <div key={photo.src} className={`clubs-collage-polaroid clubs-collage-polaroid--${i}`}>
-                    <img src={photo.src} alt={photo.alt} />
+                    <img loading="lazy" src={photo.src} alt={photo.alt} />
                     <span>{photo.caption || photo.alt}</span>
                   </div>
                 ))}

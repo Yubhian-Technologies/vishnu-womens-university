@@ -462,7 +462,7 @@ function PageBannersAdmin() {
             <div className="admin-image-grid">
               {banners.filter((b) => activeGroup.values.includes(b.page ?? 'home')).map((b) => (
                 <div key={b.id} className="admin-image-card">
-                  <img src={b.imageUrl} alt={b.title} />
+                  <img loading="lazy" src={b.imageUrl} alt={b.title} />
                   <div className="admin-image-card__info">
                     <strong>{b.title}</strong>
                     <span className="admin-badge admin-badge--sm" style={{ marginTop: 4, alignSelf: 'flex-start' }}>

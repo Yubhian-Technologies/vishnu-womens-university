@@ -231,7 +231,7 @@ export default function HeroSlider() {
             <div className={`slide-inner${slide.image ? ' slide-inner--with-image' : ''}`}>
               {slide.image && (
                 <div className="slide-photo-wrap">
-                  {visited.has(i) && <img src={slide.image} alt={slide.heading} className="slide-photo" />}
+                  {visited.has(i) && <img loading="lazy" src={slide.image} alt={slide.heading} className="slide-photo" />}
                 </div>
               )}
             </div>

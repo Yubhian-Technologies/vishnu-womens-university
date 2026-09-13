@@ -141,7 +141,7 @@ export default function HappeningDetail() {
             {/* Main Featured Image */}
             {item.imageUrl && (
               <div className="happ-detail-img-wrap">
-                <img src={item.imageUrl} alt={item.title} className="happ-detail-img" />
+                <img loading="lazy" src={item.imageUrl} alt={item.title} className="happ-detail-img" />
               </div>
             )}
 

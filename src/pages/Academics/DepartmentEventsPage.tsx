@@ -95,7 +95,7 @@ export default function DepartmentEventsPage() {
             {allCards.map((card, ci) => (
               <div key={ci} style={{ border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-lg)', overflow: 'hidden', background: 'var(--color-white)', display: 'flex', flexDirection: 'column', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)' }}>
                 {card.imageUrl ? (
-                  <img src={card.imageUrl} alt={card.title} style={{ width: '100%', aspectRatio: '16 / 10', objectFit: 'cover', display: 'block' }} />
+                  <img loading="lazy" src={card.imageUrl} alt={card.title} style={{ width: '100%', aspectRatio: '16 / 10', objectFit: 'cover', display: 'block' }} />
                 ) : (
                   <div style={{ width: '100%', aspectRatio: '16 / 10', background: 'var(--color-light-gray)' }} />
                 )}

@@ -99,7 +99,7 @@ export default function HealthCare() {
             </div>
 
             <div className="hc-hero-image-wrapper">
-              <img
+              <img loading="lazy"
                 src={photos[0]?.src || PHOTO_NEEDED_PLACEHOLDER}
                 alt="Campus Healthcare"
                 className="hc-hero-img"
@@ -135,7 +135,7 @@ export default function HealthCare() {
 
           <div className="hc-gallery-grid-layout">
             <div className="hc-gallery-featured-card">
-              <img
+              <img loading="lazy"
                 src={photos[0]?.src || PHOTO_NEEDED_PLACEHOLDER}
                 alt="Campus Health Featured"
                 className="hc-gallery-featured-img"
@@ -145,7 +145,7 @@ export default function HealthCare() {
             <div className="hc-gallery-sub-grid">
               {photos.slice(1, 5).map((pic, idx) => (
                 <div key={idx} className="hc-gallery-sub-card">
-                  <img
+                  <img loading="lazy"
                     src={pic.src || PHOTO_NEEDED_PLACEHOLDER}
                     alt={pic.alt || `Healthcare Photo ${idx + 1}`}
                     className="hc-gallery-sub-img"

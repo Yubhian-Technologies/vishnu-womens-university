@@ -146,7 +146,7 @@ export default function TravelDesk() {
             </div>
 
             <div className="td-hero-img-box">
-              <img
+              <img loading="lazy"
                 src={photos[0]?.src || PHOTO_NEEDED_PLACEHOLDER}
                 alt="VWU Travel Desk"
                 className="td-hero-img"

@@ -156,7 +156,7 @@ export default function InsightsAdmin() {
               <tbody>
                 {items.map((item) => (
                   <tr key={item.id}>
-                    <td>{item.imageUrl ? <img src={item.imageUrl} alt="" className="admin-table__thumb" /> : '—'}</td>
+                    <td>{item.imageUrl ? <img loading="lazy" src={item.imageUrl} alt="" className="admin-table__thumb" /> : '—'}</td>
                     <td>{item.title}</td>
                     <td><span className="admin-badge">{labelFor(item.category)}</span></td>
                     <td>{item.date}</td>

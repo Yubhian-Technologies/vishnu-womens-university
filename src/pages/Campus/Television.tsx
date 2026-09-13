@@ -141,7 +141,7 @@ export default function Television() {
             {activeFacility && (
               <div className="tv-tech-card">
                 <div className="tv-tech-img-box">
-                  <img
+                  <img loading="lazy"
                     src={photos[1]?.src || PHOTO_NEEDED_PLACEHOLDER}
                     alt={activeFacility.title}
                     className="tv-tech-img"

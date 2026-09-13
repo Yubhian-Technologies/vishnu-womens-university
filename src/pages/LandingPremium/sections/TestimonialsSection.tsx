@@ -22,7 +22,7 @@ export default function TestimonialsSection() {
                 className={`lph-testimonials__avatar-btn${i === active ? ' active' : ''}`}
                 onClick={() => setActive(i)}
               >
-                <img src={item.avatar} alt={item.name} />
+                <img loading="lazy" src={item.avatar} alt={item.name} />
               </button>
             ))}
           </div>
@@ -40,7 +40,7 @@ export default function TestimonialsSection() {
               <span>{t.role}</span>
             </motion.div>
           </AnimatePresence>
-          <img src={t.avatar} alt="" className="lph-testimonials__hero-photo" />
+          <img loading="lazy" src={t.avatar} alt="" className="lph-testimonials__hero-photo" />
         </div>
       </div>
     </section>
