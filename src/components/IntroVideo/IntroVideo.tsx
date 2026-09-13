@@ -37,7 +37,7 @@ export default function IntroVideo() {
     if (show) {
       const timer = setTimeout(() => {
         dismiss();
-      }, 3700); // 3.7 seconds total duration
+      }, 2600); // 2.6 seconds total (text visually finishes expanding long before its 2.2s easing curve ends)
       return () => clearTimeout(timer);
     }
   }, [show, dismiss]);
@@ -55,7 +55,7 @@ export default function IntroVideo() {
           aria-label="Loading Vishnu Women's University"
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
+          transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
         >
           <motion.div
             layout
