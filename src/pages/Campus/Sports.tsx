@@ -261,7 +261,6 @@ export default function Sports() {
         defaultImage="/images/sports-hero-bg.jpg"
         defaultTitle={heroTitle}
         defaultSubtitle={heroSubtitle}
-        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Campus Life', to: '/campus' }, { label: 'Sports' }]}
         hideCta={true}
       />
 

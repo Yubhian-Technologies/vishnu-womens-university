@@ -132,10 +132,7 @@ export default function Wellness() {
           <img src={heroImage} alt="" className="wellness-hero-bg-img" />
           <div className="wellness-hero-overlay" />
           <div className="wellness-hero-content">
-            <div className="wellness-hero-badge-row">
-              <span className="wellness-hero-badge-dash" />
-              <span className="wellness-hero-badge-text">A Healthier, Happier You</span>
-            </div>
+
             <h1 className="wellness-hero-title">
               <span>Your</span>
               <span className="wellness-hero-title--accent">Wellbeing</span>
@@ -177,7 +174,7 @@ export default function Wellness() {
         <div className="container">
           <div className="wellness-section-header">
             <div>
-              <span className="wellness-services-badge">Our Services</span>
+
               <h2 className="wellness-services-heading">
                 We&rsquo;re Here For Every Part of Your <span className="wellness-heading-accent">Journey</span>
               </h2>
@@ -323,24 +320,7 @@ export default function Wellness() {
             </div>
 
             {/* Right Leaf Badge Circle */}
-            <div className="wellness-cta-leaf-badge">
-              <div className="wellness-cta-leaf-illustration" aria-hidden="true">
-                <svg width="48" height="76" viewBox="0 0 48 76" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M24 74C23.5 50 24 25 24 6" stroke="#285235" strokeWidth="2.5" strokeLinecap="round"/>
-                  <path d="M24 50C10 42 2 28 4 12C20 12 26 26 24 50Z" fill="#3B6E47"/>
-                  <path d="M24 50C16 42 10 30 11 18C20 18 24 28 24 50Z" fill="#285235"/>
-                  <path d="M24 38C38 30 46 16 44 0C28 0 22 14 24 38Z" fill="#4D885B"/>
-                  <path d="M24 38C32 30 38 18 37 4C28 4 24 14 24 38Z" fill="#3B6E47"/>
-                  <path d="M24 60C36 54 42 42 40 30C28 30 23 42 24 60Z" fill="#285235"/>
-                </svg>
-              </div>
-              <div className="wellness-cta-badge-text">
-                <span>Same</span>
-                <span>Student</span>
-                <span>Brighter</span>
-                <span>Tomorrows</span>
-              </div>
-            </div>
+
           </div>
         </div>
       </section>

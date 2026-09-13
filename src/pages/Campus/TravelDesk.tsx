@@ -102,11 +102,6 @@ export default function TravelDesk() {
         page="campus-travel-desk"
         defaultTitle={title}
         defaultSubtitle={subtitle}
-        breadcrumb={[
-          { label: 'Home', to: '/' },
-          { label: 'Campus Life', to: '/campus' },
-          { label: title },
-        ]}
         hideCta={true}
       />
 
@@ -115,10 +110,6 @@ export default function TravelDesk() {
         <div className="td-container">
           <div className="td-hero-grid">
             <div className="td-hero-content">
-              <div className="td-badge">
-                <Sparkles size={14} />
-                <span>ON-CAMPUS TRAVEL FACILITY</span>
-              </div>
               <h1 className="td-hero-title">
                 Campus <span className="td-hero-highlight">Travel Desk</span>
               </h1>
@@ -169,7 +160,6 @@ export default function TravelDesk() {
       <section className="td-section">
         <div className="td-container">
           <div className="td-section-header">
-            <div className="td-badge">{aboutData.badge}</div>
             <h2 className="td-section-title">
               {aboutData.title}
             </h2>
@@ -234,7 +224,6 @@ export default function TravelDesk() {
       <section className="td-section td-services-section">
         <div className="td-container">
           <div className="td-section-header">
-            <div className="td-badge">SERVICE SPECTRUM</div>
             <h2 className="td-section-title">
               Services <span>Offered</span>
             </h2>

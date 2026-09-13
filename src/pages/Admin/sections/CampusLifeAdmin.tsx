@@ -115,7 +115,7 @@ const GROUP_LABELS: Record<CampusLifeItemDoc['group'], string> = {
 // admin re-typing 20 slugs by hand (and risking a typo that leaves a page
 // pointing at nothing).
 const KNOWN_PAGES: { slug: string; title: string; group: CampusLifeItemDoc['group'] }[] = [
-  { slug: 'smart-classrooms', title: 'Smart Class Rooms', group: 'facility' },
+  { slug: 'smart-classrooms', title: 'Smart Classrooms at Vishnu Women’s University', group: 'facility' },
   { slug: 'state-of-the-art-labs', title: 'State-of-the-art Labs', group: 'facility' },
   { slug: 'central-library', title: 'Central Library', group: 'facility' },
   { slug: 'campus-book-stores', title: 'Campus Book Stores', group: 'facility' },

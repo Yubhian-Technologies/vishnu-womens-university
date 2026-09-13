@@ -154,11 +154,6 @@ export default function StaffQuarters() {
         page="campus-staff-quarters"
         defaultTitle={adminItem?.title || 'Faculty & Staff Residential Facilities'}
         defaultSubtitle={adminItem?.desc || aboutData.subtitle}
-        breadcrumb={[
-          { label: 'Home', to: '/' },
-          { label: 'Campus Life', to: '/campus' },
-          { label: adminItem?.title || 'Staff Quarters' },
-        ]}
         hideCta={true}
       />
 
@@ -173,9 +168,6 @@ export default function StaffQuarters() {
                 className="sq-stage-img"
               />
               <div className="sq-stage-overlay">
-                <div className="sq-stage-badge">
-                  <Sparkles size={16} /> Featured Residential View
-                </div>
                 <h3 className="sq-stage-caption">
                   {photos[activePhotoIdx]?.caption || DEFAULT_PHOTOS[activePhotoIdx]?.caption}
                 </h3>
@@ -235,9 +227,6 @@ export default function StaffQuarters() {
                   <div className="sq-vision-overlay"></div>
                 </div>
                 <div className="sq-vision-content">
-                  <div className="sq-vision-badge">
-                    <Award size={16} /> {aboutData.badge}
-                  </div>
                   <blockquote className="sq-vision-quote">
                     “Of three basic human needs, accommodation has got the highest priority in this modern world of high standards of living.”
                   </blockquote>
@@ -251,10 +240,7 @@ export default function StaffQuarters() {
               <div className="sq-feature-hero-card sq-animate" data-delay="200">
                 <div className="sq-card-image-col">
                   <img src={getPhotoSrc(2)} alt="Green Meadows Pond & Scenery" />
-                  <div className="sq-image-badge">
-                    <Trees size={14} /> Scenic Pond Frontage
                   </div>
-                </div>
                 <div className="sq-card-text-col">
                   <div className="sq-card-tag">
                     <Building2 size={16} /> {aboutData.title}

@@ -238,9 +238,9 @@ The University Television & Broadcast Media Center at Vishnu Women's University 
 export const RELOCATED_FACILITIES: CampusFacility[] = [
   {
     slug: 'smart-classrooms',
-    title: 'Smart Class Rooms',
-    heroSubtitle: 'Technology-Enabled Classrooms for Engaging Learning.',
-    desc: 'Technology-Enabled Classrooms for Engaging Learning.',
+    title: 'Smart Classrooms at Vishnu Women’s University',
+    heroSubtitle: 'Technology-enabled learning spaces designed for interaction, collaboration and active participation.',
+    desc: 'Technology-enabled learning spaces designed for interaction, collaboration and active participation.',
   },
   {
     slug: 'state-of-the-art-labs',
