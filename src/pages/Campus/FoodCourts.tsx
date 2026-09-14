@@ -13,9 +13,9 @@ import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 // Real value proposition points — matching WHY the campus has food courts,
 // not a claim about any specific location.
 const VALUE_PROPS: { icon: typeof Utensils; label: string; desc: string }[] = [
-  { icon: Utensils, label: 'Good Food, Better Minds', desc: 'A well-balanced diet keeps students and faculty energised through long academic days.' },
-  { icon: Users, label: 'Great People, Brighter Days', desc: 'Every food court doubles as a meeting point for friends, batchmates, and colleagues.' },
-  { icon: Leaf, label: 'A Healthier, Happier You', desc: 'A mix of modern and traditional food items, prepared fresh, every single day.' },
+  { icon: Utensils, label: 'Convenient Dining', desc: 'Food outlets located across the campus make meals, snacks and refreshments easily accessible during the academic day.' },
+  { icon: Users, label: 'Spaces to Connect', desc: 'Campus food courts provide informal spaces where students can meet, relax and spend time together between classes and activities.' },
+  { icon: Leaf, label: 'Variety of Food Choices', desc: 'A range of everyday meals, snacks, refreshments and contemporary food options gives students greater choice without having to leave the campus.' },
 ];
 
 // The real, current list of food courts across campus — see
@@ -45,10 +45,10 @@ const FOOD_COURTS: string[] = [
 ];
 
 const BOTTOM_FEATURES: { icon: typeof Utensils; label: string; desc: string }[] = [
-  { icon: MapPin, label: 'Diverse Food Spaces', desc: `${FOOD_COURTS.length} dining spaces across campus.` },
-  { icon: Sparkles, label: 'Vibrant Atmosphere', desc: 'A great place to meet and relax.' },
-  { icon: ShieldCheck, label: 'Clean & Hygienic', desc: 'Safe and healthy dining environment.' },
-  { icon: Users, label: 'Student Friendly', desc: 'Designed for your comfort and convenience.' },
+  { icon: MapPin, label: 'Diverse Dining Options', desc: 'Food courts, canteens, cafés and refreshment outlets located across the campus.' },
+  { icon: Sparkles, label: 'Convenient Campus Locations', desc: 'Dining spaces positioned across the University for easy access during the day.' },
+  { icon: ShieldCheck, label: 'Clean Dining Spaces', desc: 'Campus dining facilities are maintained to provide students with comfortable and well-kept spaces for meals and refreshments.' },
+  { icon: Users, label: 'Student-Friendly Spaces', desc: 'Accessible dining areas designed around the convenience and everyday needs of students.' },
 ];
 
 const defaultFoodCourtPhotos = Array.from({ length: 5 }, (_, i) => ({
@@ -82,40 +82,40 @@ export default function FoodCourts() {
   return (
     <main className="page-wrapper">
       <SEO
-        title="Food Courts | Vishnu Women's University"
-        description="Hygienic, varied dining across VWU's campus — a look at the food courts, cafés, and canteens open to every student and staff member from 6:30 AM to 8:30 PM."
+        title="Food Courts & Campus Dining | Vishnu Women's University"
+        description="Fresh, convenient and varied dining across VWU's campus — a look at the food courts, cafés, and canteens open to every student and staff member from 6:30 AM to 8:30 PM."
         canonicalPath="/campus/food-courts"
       />
 
       <PageHero
         page="campus-food-courts"
-        defaultTitle="Food Courts"
-        defaultSubtitle="Hygienic Dining with Variety and Convenience."
+        defaultTitle="Food Courts & Campus Dining"
+        defaultSubtitle="Fresh, Convenient and Varied Dining Across Campus"
         layout="split"
       />
 
-      {/* More Than Just a Meal */}
+      {/* Dining & Food Courts intro */}
       <section id="food-courts-content" className="section bg-white" style={{ scrollMarginTop: 'calc(var(--topbar-height) + var(--header-height) + 1rem)' }}>
         <div className="container">
           <div className="reveal" style={{ maxWidth: 760, marginBottom: 'var(--space-8)' }}>
             <h2 className="section-title">Dining &amp; Food Courts</h2>
             <p style={{ fontSize: 'var(--text-lg)', fontWeight: 700, color: 'var(--color-accent)', marginTop: '0.3rem', marginBottom: 'var(--space-5)' }}>
-              A world of flavours, right on campus.
+              A Variety of Flavours, Right on Campus
             </p>
-            <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-lg)', fontWeight: 800, color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>
-              More Than Just a Meal
-            </h3>
             <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text-light)', lineHeight: 1.8, marginBottom: 'var(--space-3)' }}>
-              VWU offers a vibrant on-campus dining experience with{' '}
-              <strong style={{ color: 'var(--color-primary)' }}>17+ food court and food outlet locations</strong>,
-              providing students with convenient access to a diverse range of healthy, nutritious, traditional, and
-              contemporary food choices.
+              Vishnu Women&rsquo;s University offers{' '}
+              <strong style={{ color: 'var(--color-primary)' }}>{FOOD_COURTS.length}+ food courts and food outlets</strong> across
+              the campus, giving students convenient access to a variety of meals, snacks and refreshments
+              throughout the day.
+            </p>
+            <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text-light)', lineHeight: 1.8, marginBottom: 'var(--space-3)' }}>
+              From everyday meals and traditional favourites to contemporary food choices, caf&eacute;s and quick
+              bites, the campus dining spaces cater to different tastes and preferences. Located across the
+              University, these food outlets also provide welcoming spaces where students can take a break, meet
+              friends and enjoy campus life between academic activities.
             </p>
             <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text-light)', lineHeight: 1.8, marginBottom: 'var(--space-6)' }}>
-              From wholesome everyday meals to popular modern favourites, students can enjoy a variety of flavours
-              and cuisines without leaving campus. The food courts also serve as welcoming spaces to relax, connect,
-              and spend time with friends — open daily from{' '}
-              <strong style={{ color: 'var(--color-primary)' }}>6:30 AM to 8:30 PM</strong>.
+              Dining hours: <strong style={{ color: 'var(--color-primary)' }}>6:30 AM to 8:30 PM</strong>.
             </p>
 
             <div
@@ -126,23 +126,27 @@ export default function FoodCourts() {
               }}
             >
               <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 800, color: 'var(--color-primary)', marginBottom: '0.4rem' }}>
-                Moon Spoon&mdash; The Night Canteen
+                MoonSpoon: The Night Canteen
               </h3>
               <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.75, margin: 0 }}>
-                For students who enjoy a late-evening bite, Moon Light, the campus night canteen, offers convenient
-                food options after regular dining hours&mdash;adding to the comfort and vibrancy of residential
-                campus life.
+                For students looking for refreshments beyond regular dining hours, MoonSpoon, the campus night
+                canteen, provides convenient food options in the evening. It adds to the comfort of residential
+                campus life by giving students access to refreshments after the main dining facilities close.
               </p>
             </div>
 
-            <p style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', lineHeight: 1.7, margin: 0 }}>
-              Everything you need to eat, connect, and enjoy campus life&mdash;all within the VWU campus.
+            <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-lg)', fontWeight: 800, color: 'var(--color-primary)', marginBottom: '0.5rem' }}>
+              More Than Just a Place to Eat
+            </h3>
+            <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text-light)', lineHeight: 1.8, margin: 0 }}>
+              Campus dining is part of everyday student life. The University&rsquo;s food courts and dining spaces
+              are designed around three essentials:
             </p>
           </div>
 
           <div
             className="mobile-stack-grid"
-            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 'var(--space-4)' }}
+            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 'var(--space-4)', marginTop: 'var(--space-5)' }}
           >
             {VALUE_PROPS.map(({ icon: Icon, label, desc }) => (
               <div
@@ -180,11 +184,15 @@ export default function FoodCourts() {
           <div className="reveal" style={{ marginBottom: 'var(--space-8)' }}>
             <span className="section-label">Campus Dining Spaces</span>
             <h2 className="section-title">
-              Explore <span style={{ color: 'var(--color-accent)' }}>Our Food Courts</span>
+              Explore Our <span style={{ color: 'var(--color-accent)' }}>Campus Food Courts</span>
             </h2>
+            <p style={{ fontSize: 'var(--text-lg)', fontWeight: 700, color: 'var(--color-accent)', marginTop: '0.3rem' }}>
+              Discover Dining Spaces Across the University
+            </p>
             <p style={{ color: 'var(--color-text-light)', maxWidth: 640, marginTop: 'var(--space-2)' }}>
-              {FOOD_COURTS.length} dining spaces spread across the campus — each with its own regulars and its own
-              charm.
+              Explore the food courts, caf&eacute;s, canteens and refreshment outlets located across the Vishnu
+              Women&rsquo;s University campus. Each dining space offers students a convenient place to eat, recharge
+              and connect during the day.
             </p>
           </div>
 
@@ -204,9 +212,13 @@ export default function FoodCourts() {
               <p style={{ fontFamily: 'var(--font-serif)', fontSize: 'var(--text-2xl)', fontStyle: 'italic', color: 'var(--color-white)', lineHeight: 1.4, marginBottom: 'var(--space-4)' }}>
                 &ldquo;Good food brings people together.&rdquo;
               </p>
+              <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-lg)', fontWeight: 800, color: 'var(--color-white)', marginBottom: 'var(--space-2)' }}>
+                A Place to Eat, Relax and Connect
+              </h3>
               <p style={{ color: 'rgba(255,255,255,0.75)', lineHeight: 1.8, maxWidth: 480 }}>
-                At Vishnu Women&rsquo;s University, our food courts are more than dining spaces — they are where
-                friendships grow and memories are made.
+                At Vishnu Women&rsquo;s University, campus dining spaces are more than places to stop for a meal.
+                They form part of everyday student life, offering convenient spaces to eat, take a break and spend
+                time with friends within the campus.
               </p>
             </div>
             <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
@@ -258,6 +270,11 @@ export default function FoodCourts() {
       <section className="section bg-white">
         <div className="container">
           <div className="reveal" style={{ textAlign: 'center' }}>
+            <h2 className="section-title">Discover More of Campus Life</h2>
+            <p style={{ color: 'var(--color-text-light)', maxWidth: 560, margin: '0 auto var(--space-6)' }}>
+              Explore the facilities, spaces and experiences that make everyday life at Vishnu Women&rsquo;s
+              University engaging and convenient.
+            </p>
             <Link to="/campus" className="btn btn-primary">
               Explore Campus Life <ArrowUpRight size={16} style={{ marginLeft: 4 }} />
             </Link>

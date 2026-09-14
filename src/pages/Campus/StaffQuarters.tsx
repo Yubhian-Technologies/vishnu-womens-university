@@ -267,7 +267,7 @@ export default function StaffQuarters() {
               <div className="sq-photo-grid-section sq-animate" data-delay="400">
                 <div className="sq-section-header">
                   <h2 className="sq-section-title">Visual Highlights of Green Meadows</h2>
-                  <p className="sq-section-subtitle">Experience high-quality living, scenic landscapes, and full security on campus.</p>
+                  <p className="sq-section-subtitle">From quiet residential lanes to green open spaces, Green Meadows offers an environment where everyday campus living feels relaxed and connected.</p>
                 </div>
 
                 <div className="sq-photo-cards-grid">
@@ -300,7 +300,7 @@ export default function StaffQuarters() {
                   columns={3}
                   label="Residential Gallery"
                   title="Green Meadows Housing Gallery"
-                  subtitle="Snapshots of the serene housing enclave at Vishnu Women's University."
+                  subtitle="Take a closer look at the residential spaces, tree-lined surroundings, landscaped areas, and shared community spaces that shape everyday life at Green Meadows."
                   showGalleryLink={false}
                 />
               </div>
@@ -310,7 +310,7 @@ export default function StaffQuarters() {
             {/* Sidebar Navigation & Quick Specs */}
             <aside className="sq-sidebar sq-animate" data-delay="250">
               <div className="sq-sidebar-card">
-                <h3 className="sq-sidebar-title">Residential Amenities &amp; Facts</h3>
+                <h3 className="sq-sidebar-title">Residential Amenities</h3>
                 <ul className="sq-quick-facts">
                   {amenitiesList.map((am, i) => (
                     <li key={i}>

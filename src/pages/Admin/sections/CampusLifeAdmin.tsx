@@ -119,7 +119,7 @@ const KNOWN_PAGES: { slug: string; title: string; group: CampusLifeItemDoc['grou
   { slug: 'state-of-the-art-labs', title: 'State-of-the-art Labs', group: 'facility' },
   { slug: 'central-library', title: 'Central Library', group: 'facility' },
   { slug: 'campus-book-stores', title: 'Campus Book Stores', group: 'facility' },
-  { slug: 'wifi-campus', title: 'Wi-Fi Campus', group: 'facility' },
+  { slug: 'wifi-campus', title: 'Wi-Fi Enabled Campus', group: 'facility' },
   { slug: 'campus-hostels', title: 'Campus Hostels', group: 'facility' },
   { slug: 'food-courts', title: 'Food Courts', group: 'facility' },
   { slug: 'fitness-centre', title: 'VISHNU Fitness Centre', group: 'facility' },
