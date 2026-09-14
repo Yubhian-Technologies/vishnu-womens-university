@@ -7,53 +7,57 @@ import type { ContentBlockDoc } from './ContentBlocksAdmin';
 const PAGE = 'staff-quarters';
 
 export const DEFAULT_SQ_STATS = [
-  { value: '100+', label: 'Faculty Houses', sub: 'Spacious Residential Cluster', icon: 'Building2' },
-  { value: '24 / 7', label: 'Guarded Security', sub: 'Round-the-clock Patrols', icon: 'ShieldCheck' },
-  { value: '100%', label: 'Water & Power', sub: 'Zero Utility Disruptions', icon: 'Zap' },
-  { value: 'Green', label: 'Scenic Meadows', sub: 'Lake & Pond Frontage', icon: 'Trees' },
+  { value: '100+', label: 'Residences', sub: 'Faculty & Staff Housing', icon: 'Building2' },
+  { value: '24/7', label: 'Security', sub: 'Regular Campus Patrols', icon: 'ShieldCheck' },
+  { value: 'Reliable', label: 'Utilities', sub: 'Backup Power & RO-Treated Drinking Water', icon: 'Zap' },
+  { value: 'Green', label: 'Surroundings', sub: 'Landscaped Spaces & Natural Pond', icon: 'Trees' },
 ];
 
 export const DEFAULT_SQ_ABOUT = {
   badge: 'RESIDENTIAL COMMUNITY • CAMPUS LIVING',
-  title: 'A Peaceful Sanctuary for Faculty & Families',
-  subtitle: 'Experience high-standard living amidst scenic greenery, natural ponds, and a vibrant academic community.',
-  story: `Living on campus at Vishnu Women's University means being part of a warm, vibrant, and secure residential community. Green Meadows, the faculty and staff residential enclave, has been thoughtfully designed to provide our educators and their families with the comfort, peace of mind, and modern conveniences they deserve.\n\nSurrounded by landscaped gardens and overlooking a sparkling natural pond, the quarters offer a serene retreat after a productive day of teaching, mentoring, and research. With 24/7 guarded security, uninterrupted water and power supply, and recreational spaces, life at Green Meadows balances work and leisure effortlessly.\n\nFrom festive gatherings and community events to quiet evening walks along the water's edge, Green Meadows fosters strong bonds of camaraderie among faculty members from across diverse disciplines.`,
+  title: 'Green Meadows Residential Community',
+  subtitle: 'A Comfortable Community to Call Home',
+  story: `Green Meadows is a dedicated residential community developed for the University's faculty and staff. With approximately 100 residential houses, landscaped surroundings and convenient access to University facilities, the community provides a comfortable setting for everyday living close to the academic campus.\n\nDesigned with families in mind, Green Meadows combines residential convenience with green open spaces, walking areas and access to essential campus services.`,
 };
 
 export const DEFAULT_SQ_FEATURES = [
   {
     title: 'Green Meadows Landscape',
     tag: 'Nature & Scenery',
-    desc: 'Surrounded by lush greenery, manicured lawns, and a natural pond directly in front, creating a calm and refreshing atmosphere for inmate families.',
+    desc: 'Tree-lined roads and landscaped surroundings give the residential community a calm, welcoming character.',
   },
   {
-    title: '24-Hour Guarded Security',
+    title: '24/7 Security',
     tag: 'Total Safety',
-    desc: 'Dedicated 24/7 security personnel patrol the premises continuously to guarantee complete safety and peace of mind for every family.',
+    desc: 'Round-the-clock security and regular campus patrols support a safe residential environment for faculty, staff, and their families.',
   },
   {
-    title: 'Modern Living Abode',
+    title: 'Comfortable Residences',
     tag: 'High Standards',
-    desc: 'Built with high standards of modern architecture, featuring spacious layouts, contemporary amenities, and proper ventilation.',
+    desc: 'The residential spaces are designed around everyday comfort, with practical layouts and easy access to University facilities.',
   },
   {
-    title: 'Scenic Pond Frontage',
+    title: 'Pond-Side Surroundings',
     tag: 'Serene Atmosphere',
-    desc: 'The sparkling pond right in front of Green Meadows adds natural elegance, cool breezes, and peaceful walking pathways.',
+    desc: 'The natural pond and nearby walking areas create pleasant spaces for residents to relax and spend time outdoors.',
   },
   {
-    title: 'Warm Faculty Community',
+    title: 'A Close-Knit Community',
     tag: 'Camaraderie',
-    desc: 'Fosters a close-knit, supportive residential community among faculty and staff members within the safe perimeter of the campus.',
+    desc: 'Green Meadows brings together faculty and staff from across the University, creating opportunities for neighbours and families to connect naturally.',
   },
 ];
 
 export const DEFAULT_SQ_AMENITIES = [
-  'Uninterrupted Power Backup & RO Drinking Water',
-  '24/7 Gated Security & Regular Campus Patrols',
-  'Lush Green Lawns, Natural Pond & Walking Track',
-  'Children Play Zone & Safe Neighbourhood',
-  'High-Speed Campus Wi-Fi & Maintenance Support',
+  '24/7 Security & Campus Patrols for a monitored residential environment',
+  'Backup Power Supply for continuity of essential services',
+  'RO-Treated Drinking Water for residents',
+  'Campus Wi-Fi Connectivity for convenient digital access',
+  'Landscaped Green Spaces across the residential community',
+  'Natural Pond & Walking Areas for evening walks and quiet recreation',
+  "Children's Play Area for resident families",
+  'Maintenance Support for residences and common areas',
+  'Easy Access to Campus Facilities for faculty and staff',
 ];
 
 function useLoadedState<T>(loading: boolean, computeInitial: () => T) {

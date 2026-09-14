@@ -13,12 +13,21 @@ import { PHOTO_NEEDED_PLACEHOLDER } from '../../lib/photoPlaceholder';
 import { hasCustomSectionContent } from '../../lib/customSections';
 import { findCampusFacilityBySlug } from './campusFacilities.data';
 import type { CampusLifeItemDoc } from '../Admin/sections/CampusLifeAdmin';
+import type { FaqDoc } from '../Admin/sections/FaqAdmin';
 import {
   DEFAULT_TRAVEL_CONTACTS,
   DEFAULT_TRAVEL_ABOUT,
   DEFAULT_TRAVEL_SERVICES,
 } from '../Admin/sections/TravelDeskAdmin';
 import './TravelDesk.css';
+
+const DEFAULT_TRAVEL_FAQS: Pick<FaqDoc, 'question' | 'answer'>[] = [
+  { question: 'Where is the Campus Travel Desk located?', answer: "The Travel Desk is located opposite Central Square, adjacent to the ICICI ATM on the Vishnu Women's University campus." },
+  { question: 'What services are available at the Travel Desk?', answer: 'The desk provides bus, train, and flight ticket bookings, passport and visa assistance, hotel bookings, holiday packages, document attestation, and overseas education guidance.' },
+  { question: 'What are the Travel Desk working hours?', answer: 'The Travel Desk is open from 4:00 PM to 7:00 PM from Monday to Saturday and from 11:00 AM to 7:00 PM on Sundays.' },
+  { question: 'Who can use the Campus Travel Desk?', answer: "The facility is available to students, faculty, and staff of Vishnu Women's University." },
+  { question: 'How can I contact the Travel Desk outside working hours?', answer: 'For assistance outside working hours, contact 9624 123 123 or email support@ushodayaholidays.in.' },
+];
 
 // Default Fallback Photos for Travel Desk
 const DEFAULT_TRAVEL_PHOTOS = Array.from({ length: 6 }, (_, i) => ({
@@ -91,6 +100,10 @@ export default function TravelDesk() {
   const title = adminItem?.title || facilityDefault?.title || 'Travel Desk';
   const subtitle = adminItem?.desc || facilityDefault?.heroSubtitle || 'Convenient Travel Support for Local and Outstation Journeys.';
   const customSections = (adminItem?.customSections || []).filter(hasCustomSectionContent);
+
+  const { docs: allFaqs } = useOrderedCollection<FaqDoc>('faqs', 'order');
+  const liveFaqs = allFaqs.filter((f) => f.page === 'travel-desk');
+  const faqs = liveFaqs.length > 0 ? liveFaqs : DEFAULT_TRAVEL_FAQS;
 
   useEffect(() => {
     document.title = `${title} | Campus Life | VWU`;
@@ -228,7 +241,7 @@ export default function TravelDesk() {
               Services <span>Offered</span>
             </h2>
             <p className="td-section-subtitle">
-              Comprehensive travel booking, documentation, and advisory support at your fingertips.
+              Travel booking, documentation, and advisory support conveniently available on campus.
             </p>
           </div>
 
@@ -253,6 +266,32 @@ export default function TravelDesk() {
         </div>
       </section>
 
+      {/* Frequently Asked Questions */}
+      <section className="td-section">
+        <div className="td-container">
+          <div className="td-section-header">
+            <h2 className="td-section-title">
+              Frequently Asked <span>Questions</span>
+            </h2>
+          </div>
+          <div style={{ maxWidth: 760, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            {faqs.map((faq, i) => (
+              <details
+                key={i}
+                style={{ background: 'var(--color-off-white)', borderRadius: '8px', padding: '1rem 1.25rem' }}
+              >
+                <summary style={{ cursor: 'pointer', fontWeight: 600, color: 'var(--color-heading)' }}>
+                  {faq.question}
+                </summary>
+                <p style={{ marginTop: '0.75rem', color: 'var(--color-text-light)', lineHeight: 1.6 }}>
+                  {faq.answer}
+                </p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Optional Custom Sections from Admin */}
       {customSections.length > 0 && (
         <section className="td-section">
@@ -269,7 +308,7 @@ export default function TravelDesk() {
             images={photos}
             title="Travel Desk Gallery"
             label="GALLERY SHOWCASE"
-            subtitle="Glimpses of the campus travel counter and travel assistance services."
+            subtitle="A glimpse of the Travel Desk facilities and assistance available on campus."
           />
         </div>
       </section>
@@ -278,10 +317,10 @@ export default function TravelDesk() {
       <section className="td-cta-section">
         <div className="td-container">
           <h2>Explore More Campus Life Facilities</h2>
-          <p>Discover our central library, hosteller amenities, health care, and sports centers across the VWU campus.</p>
+          <p>Discover the library, hostel facilities, health care, sports centres, and other student amenities across the Vishnu Women's University campus.</p>
           <div className="td-cta-buttons">
-            <Link to="/campus" className="td-btn td-btn-gold">Back to Campus Life</Link>
-            <Link to="/contact" className="td-btn td-btn-outline">Contact Us</Link>
+            <Link to="/campus" className="td-btn td-btn-gold">Back to Campus Life →</Link>
+            <Link to="/contact" className="td-btn td-btn-outline">Contact Us →</Link>
           </div>
         </div>
       </section>

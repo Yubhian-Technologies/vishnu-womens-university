@@ -102,6 +102,7 @@ const TravelDesk = lazyWithRetry(() => import('./pages/Campus/TravelDesk'));
 const StaffQuarters = lazyWithRetry(() => import('./pages/Campus/StaffQuarters'));
 const Clubs = lazyWithRetry(() => import('./pages/Campus/Clubs'));
 const FoodCourts = lazyWithRetry(() => import('./pages/Campus/FoodCourts'));
+const WifiCampus = lazyWithRetry(() => import('./pages/Campus/WifiCampus'));
 const Information = lazyWithRetry(() => import('./pages/Information/Information'));
 const ProgrammesFee = lazyWithRetry(() => import('./pages/Admissions/ProgrammesFee'));
 const AdmissionProcedure = lazyWithRetry(() => import('./pages/Admissions/AdmissionProcedure'));
@@ -237,6 +238,7 @@ function PublicApp() {
             <Route path="/campus/state-of-the-art-labs" element={<StateOfTheArtLabs />} />
             <Route path="/campus/central-library" element={<CentralLibrary />} />
             <Route path="/campus/food-courts" element={<FoodCourts />} />
+            <Route path="/campus/wifi-campus" element={<WifiCampus />} />
             <Route path="/campus/campus-hostels" element={<CampusHostels />} />
             <Route path="/campus/fitness-centre" element={<FitnessCentre />} />
             <Route path="/campus/:slug" element={<CampusLifeDetail />} />
