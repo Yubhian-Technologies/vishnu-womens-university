@@ -23,6 +23,11 @@ export default function IntroVideo() {
       /* ignore quota/private-mode errors */
     }
     setShow(false);
+    try {
+      window.dispatchEvent(new CustomEvent('vwu:intro-finished'));
+    } catch {
+      /* ignore */
+    }
   }, []);
 
   // Respect users who prefer reduced motion — skip the intro outright.

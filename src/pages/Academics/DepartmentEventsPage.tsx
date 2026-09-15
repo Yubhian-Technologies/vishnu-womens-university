@@ -91,7 +91,7 @@ export default function DepartmentEventsPage() {
         {allCards.length === 0 ? (
           <p style={{ color: 'var(--color-text-light)' }}>No events found.</p>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 'var(--space-6)' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(280px, 100%), 1fr))', gap: 'var(--space-6)' }}>
             {allCards.map((card, ci) => (
               <div key={ci} style={{ border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-lg)', overflow: 'hidden', background: 'var(--color-white)', display: 'flex', flexDirection: 'column', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)' }}>
                 {card.imageUrl ? (

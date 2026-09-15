@@ -70,7 +70,7 @@ export default function CampusHostels() {
                 </div>
 
                 <h3 style={{ fontSize: '1.5rem', color: 'var(--color-primary)', marginBottom: '1.5rem' }}>Hostel Facilities at a Glance</h3>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem', marginBottom: '2.5rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))', gap: '1.5rem', marginBottom: '2.5rem' }}>
                   <div style={{ padding: '1.25rem', background: 'var(--color-off-white)', borderRadius: '8px', borderLeft: '4px solid var(--color-primary)' }}>
                     <strong style={{ display: 'block', fontSize: '1.15rem', marginBottom: '0.25rem', color: 'var(--color-heading)' }}>Air-Conditioned Accommodation</strong>
                     <span style={{ color: 'var(--color-text-light)' }}>Dedicated air-conditioned hostel facilities are available for enhanced comfort.</span>
@@ -182,7 +182,7 @@ export default function CampusHostels() {
                   VWU hostels provide essential facilities that support students’ academic needs, recreation and everyday living.
                 </p>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(300px, 100%), 1fr))', gap: '1.5rem' }}>
                   <div style={{ padding: '1.25rem', background: 'var(--color-off-white)', borderRadius: '8px' }}>
                     <strong style={{ display: 'block', fontSize: '1.15rem', marginBottom: '0.25rem', color: 'var(--color-heading)' }}>Wi-Fi Connectivity</strong>
                     <span style={{ color: 'var(--color-text-light)' }}>Internet access is available for academic and learning purposes in accordance with university guidelines.</span>

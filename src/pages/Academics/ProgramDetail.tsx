@@ -438,6 +438,15 @@ function SingleProgramDetail() {
     return () => observer.disconnect();
   }, [quickLinks]);
 
+  // Mobile: auto-scroll the horizontal pill bar so the active link is centered
+  useEffect(() => {
+    if (!activeSectionId) return;
+    const el = document.querySelector(`.dept-quicknav-link[href="#${CSS.escape(activeSectionId)}"]`) as HTMLElement | null;
+    if (el && el.scrollIntoView) {
+      el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }
+  }, [activeSectionId]);
+
   const hasSidebarContent = quickLinks.length > 1 || hasCareerOutcomes;
   // The Quick Navigation sidebar always pairs with whichever of these three
   // sections is physically first on the page — so it never sits next to an

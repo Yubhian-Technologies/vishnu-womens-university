@@ -30,7 +30,7 @@ export default function SocialMedia() {
       {/* Handles grid */}
       <section className="section bg-white">
         <div className="container">
-          <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 'var(--space-5)' }}>
+          <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(260px, 100%), 1fr))', gap: 'var(--space-5)' }}>
             {socialHandles.map((s) => (
               <a
                 key={s.label}

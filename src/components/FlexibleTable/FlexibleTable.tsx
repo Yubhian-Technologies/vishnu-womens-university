@@ -40,12 +40,13 @@ function PaginatedTable({ section }: { section: FlexibleTableSection }) {
 
   return (
     <>
-      <div style={{ overflowX: 'auto', borderRadius: '14px', border: '1.5px solid #e2e8f0', boxShadow: '0 6px 18px rgba(11, 30, 66, 0.05)', background: '#ffffff', margin: '0.75rem 0 1.25rem' }}>
+      <div role="region" aria-label={section.title || 'Data table'} tabIndex={0} style={{ overflow: 'auto', overflowX: 'auto', borderRadius: '14px', border: '1.5px solid #e2e8f0', boxShadow: '0 6px 18px rgba(11, 30, 66, 0.05)', background: '#ffffff', margin: '0.75rem 0 1.25rem' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
+          <caption style={{ position: 'absolute', width: 1, height: 1, padding: 0, margin: -1, overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', border: 0 }}>{section.title || 'Data table'}</caption>
           <thead>
             <tr style={{ background: 'linear-gradient(135deg, #0b1e42 0%, #162d5a 100%)', borderBottom: '3px solid #c9973a' }}>
               {section.headers.map((col, ci) => (
-                <th key={ci} style={{ padding: '0.9rem 1.2rem', textAlign: 'left', color: '#ffffff', fontWeight: 700, whiteSpace: 'nowrap', letterSpacing: '0.02em', fontSize: '0.85rem', textTransform: 'uppercase' }}>
+                <th scope="col" key={ci} style={{ padding: '0.9rem 1.2rem', textAlign: 'left', color: '#ffffff', fontWeight: 700, whiteSpace: 'nowrap', letterSpacing: '0.02em', fontSize: '0.85rem', textTransform: 'uppercase', position: 'sticky', top: 0, zIndex: 1, background: '#0b1e42' }}>
                   {col}
                 </th>
               ))}
@@ -74,7 +75,7 @@ function PaginatedTable({ section }: { section: FlexibleTableSection }) {
             <select
               value={pageSize}
               onChange={(e) => { setPageSize(Number(e.target.value)); setPage(0); }}
-              style={{ padding: '0.3rem 0.5rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-light-gray)', fontSize: 'var(--text-sm)' }}
+              style={{ padding: '0.3rem 0.5rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-light-gray)', fontSize: 'var(--text-sm)', minHeight: '44px', minWidth: '44px' }}
             >
               {PAGE_SIZE_OPTIONS.map((n) => (
                 <option key={n} value={n}>{n}</option>
@@ -87,7 +88,7 @@ function PaginatedTable({ section }: { section: FlexibleTableSection }) {
               type="button"
               onClick={() => setPage((p) => Math.max(0, p - 1))}
               disabled={currentPage === 0}
-              style={{ padding: '0.4rem 0.9rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-light-gray)', background: 'var(--color-white)', color: 'var(--color-primary)', fontWeight: 600, fontSize: 'var(--text-sm)', cursor: currentPage === 0 ? 'not-allowed' : 'pointer', opacity: currentPage === 0 ? 0.5 : 1 }}
+              style={{ padding: '0.4rem 0.9rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-light-gray)', background: 'var(--color-white)', color: 'var(--color-primary)', fontWeight: 600, fontSize: 'var(--text-sm)', cursor: currentPage === 0 ? 'not-allowed' : 'pointer', opacity: currentPage === 0 ? 0.5 : 1, minHeight: '44px', minWidth: '44px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
             >
               Prev
             </button>
@@ -98,7 +99,7 @@ function PaginatedTable({ section }: { section: FlexibleTableSection }) {
               type="button"
               onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
               disabled={currentPage >= totalPages - 1}
-              style={{ padding: '0.4rem 0.9rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-light-gray)', background: 'var(--color-white)', color: 'var(--color-primary)', fontWeight: 600, fontSize: 'var(--text-sm)', cursor: currentPage >= totalPages - 1 ? 'not-allowed' : 'pointer', opacity: currentPage >= totalPages - 1 ? 0.5 : 1 }}
+              style={{ padding: '0.4rem 0.9rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-light-gray)', background: 'var(--color-white)', color: 'var(--color-primary)', fontWeight: 600, fontSize: 'var(--text-sm)', cursor: currentPage >= totalPages - 1 ? 'not-allowed' : 'pointer', opacity: currentPage >= totalPages - 1 ? 0.5 : 1, minHeight: '44px', minWidth: '44px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
             >
               Next
             </button>

@@ -109,13 +109,25 @@
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .success-stories-track {
-    gap: 1rem;
+    gap: 0;
   }
   .success-story-card-wrap {
-    flex-basis: 86%;
-    max-width: 86%;
+    flex: 0 0 100%;
+    max-width: 100%;
+    flex-basis: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .success-stories-track {
+    gap: 0;
+  }
+  .success-story-card-wrap {
+    flex: 0 0 100%;
+    max-width: 100%;
+    flex-basis: 100%;
   }
 }
 

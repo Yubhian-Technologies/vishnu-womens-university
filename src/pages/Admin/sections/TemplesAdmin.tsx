@@ -198,7 +198,7 @@ export default function TemplesAdmin() {
         <>
           <hr />
           <h3>Hero Stat Badges</h3>
-          <div className="admin-form-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
+          <div className="admin-form-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))' }}>
             {stats.map((s, idx) => (
               <div key={idx} style={{ border: '1px solid #e5e7eb', borderRadius: 6, padding: '0.75rem' }}>
                 <div className="admin-field">

@@ -54,6 +54,9 @@ const tableHead: React.CSSProperties = {
   textTransform: 'uppercase',
   padding: 'var(--space-4) var(--space-5)',
   textAlign: 'left',
+  position: 'sticky',
+  top: 0,
+  zIndex: 1,
 };
 const tableCell: React.CSSProperties = {
   padding: 'var(--space-4) var(--space-5)',
@@ -72,7 +75,7 @@ function TableHead({ extra = [] }: { extra?: string[] }) {
     <thead>
       <tr>
         {[...BASE_HEADERS, ...extra].map((label, i) => (
-          <th key={label} style={i >= 3 ? { ...tableHead, textAlign: 'center' } : tableHead}>
+          <th scope="col" key={label} style={i >= 3 ? { ...tableHead, textAlign: 'center' } : tableHead}>
             {label}
           </th>
         ))}
@@ -136,8 +139,9 @@ export default function ProgrammesFee() {
           <span style={{ display: 'inline-block', background: 'var(--color-primary)', color: 'var(--color-white)', fontWeight: 800, fontSize: 'var(--text-sm)', letterSpacing: '0.04em', padding: '0.4rem 1.1rem', borderRadius: 'var(--radius-sm)', marginBottom: 'var(--space-3)' }}>
             VISW
           </span>
-          <div className="reveal" style={{ borderRadius: 'var(--radius-md)', overflowX: 'auto', overflowY: 'hidden', boxShadow: 'var(--shadow-md)' }}>
+          <div role="region" aria-label="B.Tech VISW programmes" tabIndex={0} className="reveal" style={{ borderRadius: 'var(--radius-md)', overflow: 'auto', overflowX: 'auto', overflowY: 'hidden', boxShadow: 'var(--shadow-md)' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', background: 'var(--color-white)' }}>
+              <caption style={{ position: 'absolute', width: 1, height: 1, padding: 0, margin: -1, overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', border: 0 }}>B.Tech VISW programmes</caption>
               <TableHead />
               <tbody>
                 {BTECH_VISW_PROGRAMS.map((p, i) => (
@@ -157,8 +161,9 @@ export default function ProgrammesFee() {
           <span style={{ display: 'inline-block', background: 'var(--color-primary)', color: 'var(--color-white)', fontWeight: 800, fontSize: 'var(--text-sm)', letterSpacing: '0.04em', padding: '0.4rem 1.1rem', borderRadius: 'var(--radius-sm)', margin: 'var(--space-10) 0 var(--space-3)' }}>
             VISWPU
           </span>
-          <div className="reveal" style={{ borderRadius: 'var(--radius-md)', overflowX: 'auto', overflowY: 'hidden', boxShadow: 'var(--shadow-md)' }}>
+          <div role="region" aria-label="B.Tech VISWPU programmes" tabIndex={0} className="reveal" style={{ borderRadius: 'var(--radius-md)', overflow: 'auto', overflowX: 'auto', overflowY: 'hidden', boxShadow: 'var(--shadow-md)' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', background: 'var(--color-white)' }}>
+              <caption style={{ position: 'absolute', width: 1, height: 1, padding: 0, margin: -1, overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', border: 0 }}>B.Tech VISWPU programmes</caption>
               <TableHead />
               <tbody>
                 {VISWPU_BTECH_PROGRAMS.map((p, i) => (
@@ -194,8 +199,9 @@ export default function ProgrammesFee() {
               ))}
             </div>
           </div>
-          <div className="reveal" style={{ borderRadius: 'var(--radius-md)', overflowX: 'auto', overflowY: 'hidden', boxShadow: 'var(--shadow-md)' }}>
+          <div role="region" aria-label="M.Tech programmes" tabIndex={0} className="reveal" style={{ borderRadius: 'var(--radius-md)', overflow: 'auto', overflowX: 'auto', overflowY: 'hidden', boxShadow: 'var(--shadow-md)' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', background: 'var(--color-white)' }}>
+              <caption style={{ position: 'absolute', width: 1, height: 1, padding: 0, margin: -1, overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', border: 0 }}>M.Tech programmes</caption>
               <TableHead />
               <tbody>
                 {MTECH_PROGRAMS.map((p, i) => (
@@ -231,8 +237,9 @@ export default function ProgrammesFee() {
               ))}
             </div>
           </div>
-          <div className="reveal" style={{ borderRadius: 'var(--radius-md)', overflowX: 'auto', overflowY: 'hidden', boxShadow: 'var(--shadow-md)' }}>
+          <div role="region" aria-label="MBA programme" tabIndex={0} className="reveal" style={{ borderRadius: 'var(--radius-md)', overflow: 'auto', overflowX: 'auto', overflowY: 'hidden', boxShadow: 'var(--shadow-md)' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', background: 'var(--color-white)' }}>
+              <caption style={{ position: 'absolute', width: 1, height: 1, padding: 0, margin: -1, overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', border: 0 }}>MBA programme</caption>
               <TableHead extra={['Entrance']} />
               <tbody>
                 <tr style={{ background: 'var(--color-white)' }}>
@@ -255,7 +262,7 @@ export default function ProgrammesFee() {
           <div className="reveal" style={{ marginBottom: 'var(--space-8)' }}>
             <h2 className="section-title">Ph.D. Programs</h2>
           </div>
-          <div className="reveal" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 'var(--space-3)' }}>
+          <div className="reveal" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(260px, 100%), 1fr))', gap: 'var(--space-3)' }}>
             {phdPrograms.map((p) => (
               <div key={p.id} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', padding: 'var(--space-4)', background: 'var(--color-off-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-sm)', borderLeft: '3px solid var(--color-accent)' }}>
                 <span style={{ color: 'var(--color-accent)', fontWeight: 900 }}>PhD</span>

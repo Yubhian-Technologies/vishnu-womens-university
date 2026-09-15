@@ -226,7 +226,7 @@
 /* Photo Marquee Strip */
 .activity-strip {
   overflow: hidden;
-  height: 240px;
+  height: clamp(140px, 22vh, 240px);
   border-top: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 10%, transparent);
   border-bottom: 1px solid color-mix(in srgb, var(--color-primary, #1b4332) 10%, transparent);
   margin: 0;
@@ -271,7 +271,12 @@
   padding: 10px 0;
 }
 
-.activity-track:hover { animation-play-state: paused; }
+.activity-track:hover,
+.activity-track:focus-within { animation-play-state: paused; }
+
+@media (prefers-reduced-motion: reduce) {
+  .activity-track { animation: none !important; }
+}
 
 @keyframes activity-scroll {
   from { transform: translateX(0); }

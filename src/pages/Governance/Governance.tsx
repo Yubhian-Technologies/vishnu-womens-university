@@ -105,8 +105,11 @@ export default function Governance() {
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
+                justifyContent: 'center',
                 gap: '0.5rem',
                 padding: '0.45rem 1.25rem',
+                minHeight: '44px',
+                minWidth: '44px',
                 fontSize: 'var(--text-xs)',
                 fontWeight: 800,
                 letterSpacing: '0.04em',
@@ -157,7 +160,7 @@ export default function Governance() {
                 <p style={{ color: 'var(--color-text-light)', maxWidth: 620, lineHeight: 1.75 }}>{cat.desc}</p>
               </div>
 
-              <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))', gap: 'var(--space-6)' }}>
+              <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(290px, 100%), 1fr))', gap: 'var(--space-6)' }}>
                 {items.map((item) => {
                   const Icon = resolveContentIcon(item.icon) || Landmark;
                   return (

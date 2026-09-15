@@ -12,8 +12,9 @@
 
   position: relative;
   width: 100%;
+  height: 100dvh;
   height: 100vh;
-  min-height: 700px;
+  min-height: clamp(520px, 90dvh, 700px);
   max-height: 1100px;
   overflow: hidden;
   background: var(--hero-teal);
@@ -152,9 +153,12 @@
 
   .hero-center-tagline {
     font-size: clamp(0.92rem, 3.8vw, 1.35rem);
-    height: 2.4rem;
+    min-height: 2.4rem;
+    height: auto;
     margin-bottom: var(--space-4);
-    white-space: nowrap;
+    white-space: normal;
+    text-wrap: balance;
+    overflow-wrap: break-word;
     column-gap: 0.25rem;
   }
 
@@ -267,7 +271,7 @@
 /* ===== Controls ===== */
 .hero-controls {
   position: absolute;
-  bottom: calc(72px + var(--space-6));
+  bottom: calc(72px + var(--space-6) + env(safe-area-inset-bottom, 0px));
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
@@ -291,6 +295,12 @@
   cursor: pointer;
   transition: all var(--transition-base);
   padding: 0;
+  position: relative;
+}
+.hero-dot::before {
+  content: '';
+  position: absolute;
+  inset: -16px;
 }
 
 /* Decorative accent — green, inspired by the VWU mark, used only here */
@@ -543,12 +553,31 @@
 
 @media (max-width: 768px) {
   .hero-slider {
-    min-height: 520px;
+    min-height: clamp(520px, 90dvh, 700px);
   }
   .scroll-indicator {
     display: none;
   }
   .hero-controls {
-    bottom: var(--space-5);
+    bottom: calc(var(--space-5) + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+@media (orientation: landscape) and (max-height: 500px) {
+  .hero-slider {
+    min-height: 100dvh;
+    height: 100dvh;
+  }
+  .hero-center-tagline {
+    font-size: clamp(0.85rem, 2.5vw, 1.1rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-slider .slide,
+  .hero-center-tagline,
+  .hero-progress-fill {
+    transition: none !important;
+    animation: none !important;
   }
 }

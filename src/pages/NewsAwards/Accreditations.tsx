@@ -193,7 +193,7 @@ export default function Accreditations() {
           </div>
 
           {/* Cards grid */}
-          <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 'var(--space-4)' }}>
+          <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(300px, 100%), 1fr))', gap: 'var(--space-4)' }}>
             {filtered.map((item) => (
               <AwardCard key={item.id} item={item} />
             ))}

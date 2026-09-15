@@ -153,9 +153,8 @@ function VmExpandableCard({ title, content }: { title: string; content: string |
           )}
         </div>
       </SmoothCollapse>
-      <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid rgba(0,0,0,0.05)' }}>
-        <span style={{ fontSize: '0.85rem', color: 'var(--color-text-light)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          {expanded ? 'Hide Details' : 'Click to expand'}
+      <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid rgba(0,0,0,0.05)', display: 'flex', justifyContent: 'center' }}>
+        <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: '50%', background: 'rgba(11,30,66,0.06)', color: 'var(--color-primary)' }}>
           <ChevronDown size={14} style={{ transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }} />
         </span>
       </div>
@@ -474,6 +473,15 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
 
     return () => observer.disconnect();
   }, [progLoading, deptLoading, activeProgram?.slug]);
+
+  // Mobile: auto-scroll the horizontal pill bar so the active link is centered
+  useEffect(() => {
+    if (!activeSectionId) return;
+    const el = document.querySelector(`.dept-quicknav-link[href="#${CSS.escape(activeSectionId)}"]`) as HTMLElement | null;
+    if (el && el.scrollIntoView) {
+      el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }
+  }, [activeSectionId]);
 
   if (progLoading && subPrograms.length === 0) {
     return (

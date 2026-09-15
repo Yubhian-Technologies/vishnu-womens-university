@@ -94,7 +94,7 @@ export default function Happenings() {
             <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Recent Events</h2>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 'var(--space-6)' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(300px, 100%), 1fr))', gap: 'var(--space-6)' }}>
             {recent.map((ev) => {
               const article = happeningToArticle(ev);
               return <NewsCard key={ev.id} article={article} />;

@@ -2,8 +2,10 @@
   position: fixed;
   right: var(--space-5);
   bottom: var(--space-5);
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
   border: none;
   border-radius: 50%;
   background: var(--color-primary, #0b1e42);
@@ -70,8 +72,10 @@
   .scroll-top-btn {
     right: var(--space-4);
     bottom: var(--space-4);
-    width: 36px;
-    height: 36px;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
   }
 
   .scroll-top-btn__icon {

@@ -401,8 +401,9 @@ function HigherEducationAccordion() {
                 )}
 
                 {rows.length > 0 ? (
-                  <div style={{ overflowX: 'auto' }}>
+                  <div role="region" aria-label={section.title || 'University list'} tabIndex={0} style={{ overflow: 'auto', overflowX: 'auto' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm)' }}>
+                      <caption style={{ position: 'absolute', width: 1, height: 1, padding: 0, margin: -1, overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', border: 0 }}>{section.title || 'University list'}</caption>
                       <tbody>
                         {rows.map((row, ri) => (
                           <tr key={ri} style={{ background: ri % 2 === 0 ? 'var(--color-off-white)' : 'transparent' }}>
@@ -735,7 +736,7 @@ function BatchTrendChart({ data }: { data: PlacementYear[] }) {
   const lpaPts = rows.map((r, i) => ({ x: xLine(i), y: yLpa(r.highest) }));
 
   return (
-    <div style={{ marginTop: 'var(--space-8)', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 'var(--space-5)' }}>
+    <div style={{ marginTop: 'var(--space-8)', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(300px, 100%), 1fr))', gap: 'var(--space-5)' }}>
       {/* Number of offers — bar chart */}
       <div style={cardStyle}>
         <div style={titleStyle}>Number of offers</div>
@@ -1726,7 +1727,7 @@ export default function PlacementDetail() {
       {skipOverviewSection && item.slug === 'employability-skills' && item.highlights && item.highlights.length > 0 && (
         <section className="section bg-white" style={{ paddingBottom: 'var(--space-6)' }}>
           <div className="container">
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--space-4)' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))', gap: 'var(--space-4)' }}>
               {item.highlights.map((h) => (
                 <div key={h} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-3)', background: 'var(--color-off-white)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4) var(--space-5)' }}>
                   <span style={{ width: 22, height: 22, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
@@ -1745,7 +1746,7 @@ export default function PlacementDetail() {
         <section className="section bg-white" style={{ paddingTop: 'var(--space-6)' }}>
           <div className="container">
             <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-6)' }}>STUDY AT VWU<br/><span style={{ fontSize: 'var(--text-lg)', fontWeight: 400, color: 'var(--color-text-light)' }}>Postgraduate & Doctoral Programmes</span></h2>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 'var(--space-5)' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(300px, 100%), 1fr))', gap: 'var(--space-5)' }}>
               <div style={{ padding: 'var(--space-6)', background: 'var(--color-off-white)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-light-gray)' }}>
                 <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>Postgraduate Programmes</h3>
                 <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6, marginBottom: 'var(--space-4)' }}>VWU offers postgraduate programmes in Computer Science & Engineering, VLSI Design, Power Electronics and Software Engineering, along with an MBA programme.</p>
@@ -1821,7 +1822,7 @@ export default function PlacementDetail() {
         <section className="section bg-white" style={{ paddingTop: 'var(--space-6)' }}>
           <div className="container">
             <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-6)' }}>GSAC SUPPORT<br/><span style={{ fontSize: 'var(--text-lg)', fontWeight: 400, color: 'var(--color-text-light)' }}>Support Across the Study-Abroad Journey</span></h2>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 'var(--space-5)' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(300px, 100%), 1fr))', gap: 'var(--space-5)' }}>
               {[
                 {
                   title: 'University & Programme Guidance',
@@ -1869,7 +1870,7 @@ export default function PlacementDetail() {
               <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(1.5rem, 3vw, 2rem)', fontWeight: 600, color: 'var(--color-white)', margin: '0 0 1.5rem' }}>
                 Beyond the Application
               </h2>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--space-6)' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))', gap: 'var(--space-6)' }}>
                 <div>
                   <h3 style={{ fontSize: 'var(--text-base)', fontWeight: 700, marginBottom: 'var(--space-2)' }}>Application Guidance</h3>
                   <p style={{ fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.9)', lineHeight: 1.6 }}>Students receive structured support through different stages of international university applications.</p>
@@ -1922,7 +1923,7 @@ export default function PlacementDetail() {
               <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(1.5rem, 3vw, 2rem)', fontWeight: 600, color: 'var(--color-white)', margin: '0 0 1.5rem' }}>
                 Pathways We Support
               </h2>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--space-6)' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))', gap: 'var(--space-6)' }}>
                 <div>
                   <h3 style={{ fontSize: 'var(--text-base)', fontWeight: 700, marginBottom: 'var(--space-2)' }}>Postgraduate Preparation</h3>
                   <p style={{ fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.9)', lineHeight: 1.6 }}>Structured guidance supports students preparing for postgraduate entrance examinations and higher-study pathways.</p>
@@ -2131,7 +2132,7 @@ export default function PlacementDetail() {
             <div style={{ marginBottom: 'var(--space-8)' }}>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Congratulations to Our Placed Students</h2>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--space-5)' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))', gap: 'var(--space-5)' }}>
               {successStories.map((s) => (
                 <a
                   key={s.studentName}
@@ -2251,14 +2252,15 @@ export default function PlacementDetail() {
                     <span>entries</span>
                   </div>
                 )}
-                <div style={{ overflowX: 'auto' }}>
+                <div role="region" aria-label="List of Internships" tabIndex={0} style={{ overflow: 'auto', overflowX: 'auto' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm)' }}>
+                    <caption style={{ position: 'absolute', width: 1, height: 1, padding: 0, margin: -1, overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', border: 0 }}>List of Internships</caption>
                     <thead>
                       <tr style={{ background: 'var(--color-accent)' }}>
-                        <th style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900, whiteSpace: 'nowrap' }}>S.No</th>
-                        <th style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900 }}>Company Name</th>
-                        <th style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900, whiteSpace: 'nowrap' }}>Stipend/Month</th>
-                        <th style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900, whiteSpace: 'nowrap' }}>No. of Selects</th>
+                        <th scope="col" style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900, whiteSpace: 'nowrap', position: 'sticky', top: 0, zIndex: 1, background: 'var(--color-accent)' }}>S.No</th>
+                        <th scope="col" style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900, position: 'sticky', top: 0, zIndex: 1, background: 'var(--color-accent)' }}>Company Name</th>
+                        <th scope="col" style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900, whiteSpace: 'nowrap', position: 'sticky', top: 0, zIndex: 1, background: 'var(--color-accent)' }}>Stipend/Month</th>
+                        <th scope="col" style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900, whiteSpace: 'nowrap', position: 'sticky', top: 0, zIndex: 1, background: 'var(--color-accent)' }}>No. of Selects</th>
                       </tr>
                     </thead>
                     <tbody>

@@ -79,8 +79,10 @@
   .popup-close-btn {
     top: 16px;
     left: 16px;
-    width: 36px;
-    height: 36px;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
   }
   
   .popup-overlay {
