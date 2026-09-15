@@ -142,7 +142,7 @@ export default function StudentClubDetail() {
               return (
                 <>
                   <div>{descriptionBlock}</div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 'var(--space-5)', marginTop: 'var(--space-6)' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(260px, 100%), 1fr))', gap: 'var(--space-5)', marginTop: 'var(--space-6)' }}>
                     {images.map((img, i) => (
                       <img loading="lazy"
                         key={img.path || i}

@@ -25,6 +25,7 @@ import './Admin.css';
 export const SECTIONS: { id: string; icon: IconDefinition; label: string }[] = [
   { id: 'overview',       icon: faChartLine, label: 'Overview' },
   { id: 'theme',          icon: faPalette, label: 'Color Theme' },
+  { id: 'feature-popup',  icon: faImage, label: 'Feature Popup' },
   { id: 'banners',        icon: faImage, label: 'Hero Banners' },
   { id: 'landing-pages',  icon: faHouse, label: 'Landing Pages' },
   { id: 'news',           icon: faNewspaper, label: 'News & Events' },
@@ -94,7 +95,7 @@ export const SECTIONS: { id: string; icon: IconDefinition; label: string }[] = [
 export const SECTION_GROUPS: { label: string; ids: string[] }[] = [
   { label: 'Overview', ids: ['overview'] },
   { label: 'Form Submissions & CRM', ids: ['crm', 'contact-messages', 'career-applications', 'admission-inquiries', 'campus-visit-requests', 'career-guidance-interest'] },
-  { label: 'Site Appearance', ids: ['theme', 'banners', 'landing-pages', 'honoured-guests', 'site-photos', 'nav-links', 'content-blocks', 'compliance-docs'] },
+  { label: 'Site Appearance', ids: ['theme', 'feature-popup', 'banners', 'landing-pages', 'honoured-guests', 'site-photos', 'nav-links', 'content-blocks', 'compliance-docs'] },
   { label: 'About & Governance', ids: ['governing-body', 'governance-items', 'annual-reports', 'nirf-reports', 'nba-data', 'core-executives', 'sves-campuses', 'contacts', 'site-contact', 'policies'] },
   { label: 'Academics', ids: ['departments', 'programs', 'schools', 'faculty', 'curriculum', 'downloads'] },
   { label: 'Admissions & Campus Info', ids: ['information'] },

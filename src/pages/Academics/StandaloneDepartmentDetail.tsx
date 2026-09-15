@@ -110,6 +110,15 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
     return () => observer.disconnect();
   }, [quickLinks]);
 
+  // Mobile: auto-scroll the horizontal pill bar so the active link is centered
+  useEffect(() => {
+    if (!activeSectionId) return;
+    const el = document.querySelector(`.dept-quicknav-link[href="#${CSS.escape(activeSectionId)}"]`) as HTMLElement | null;
+    if (el && el.scrollIntoView) {
+      el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }
+  }, [activeSectionId]);
+
   if (!loading && !dept) return <Navigate to="/academics" replace />;
   if (!dept) return null;
 

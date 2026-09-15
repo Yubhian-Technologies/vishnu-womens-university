@@ -63,15 +63,19 @@ export default function FileUploader({
   return (
     <div className={`cld-uploader${compact ? ' cld-uploader--compact' : ''}`}>
       <div
+        role="button"
+        tabIndex={0}
+        aria-label={label}
         className={`cld-uploader__drop ${uploading ? 'cld-uploader__drop--loading' : ''}`}
         onClick={() => !uploading && inputRef.current?.click()}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (!uploading) inputRef.current?.click(); } }}
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => { e.preventDefault(); const f = e.dataTransfer.files?.[0]; if (f) handleFile(f); }}
       >
         {fileName ? (
           <div className="cld-uploader__placeholder">
             <span className="cld-uploader__icon">📄</span>
-            <p>{fileName}</p>
+            <p title={fileName}>{fileName}</p>
             <p className="cld-uploader__hint">Click or drag & drop to replace</p>
           </div>
         ) : (
@@ -94,7 +98,7 @@ export default function FileUploader({
           Change PDF
         </button>
       )}
-      {error && <p className="cld-uploader__error">{error}</p>}
+      {error && <p role="alert" className="cld-uploader__error">{error}</p>}
 
       <input
         ref={inputRef}

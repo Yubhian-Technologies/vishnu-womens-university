@@ -28,6 +28,9 @@ type Errors = Partial<Record<keyof FormState, string>>;
 
 const fieldStyle: React.CSSProperties = {
   width: '100%',
+  maxWidth: '100%',
+  minWidth: 0,
+  boxSizing: 'border-box',
   padding: 'var(--space-3) var(--space-4)',
   border: '1.5px solid var(--color-light-gray)',
   borderRadius: 'var(--radius-sm)',
@@ -97,6 +100,10 @@ export default function CareerGuidanceInterestForm({ tracks = DEFAULT_TRACKS }: 
         borderRadius: 'var(--radius-md)',
         background: 'var(--color-off-white)',
         padding: 'var(--space-6)',
+        maxWidth: '100%',
+        boxSizing: 'border-box',
+        minWidth: 0,
+        overflow: 'hidden',
       }}
     >
       <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: 'var(--text-xl)', fontWeight: 700, color: 'var(--color-primary)', margin: 0 }}>
@@ -106,41 +113,41 @@ export default function CareerGuidanceInterestForm({ tracks = DEFAULT_TRACKS }: 
         Fill in your details and the Career Guidance Cell will get in touch about the training track you're interested in.
       </p>
 
-      <form onSubmit={submit} noValidate style={{ display: 'grid', gap: 'var(--space-4)' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 'var(--space-4)' }}>
-          <div>
+      <form onSubmit={submit} noValidate style={{ display: 'grid', gap: 'var(--space-4)', minWidth: 0, maxWidth: '100%' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(220px, 100%), 1fr))', gap: 'var(--space-4)', minWidth: 0 }}>
+          <div style={{ minWidth: 0 }}>
             <label style={labelStyle} htmlFor="cgi-name">Full Name *</label>
-            <input id="cgi-name" name="fullName" style={fieldStyle} value={form.fullName} onChange={change} placeholder="Your full name" aria-invalid={!!errors.fullName} />
-            {errors.fullName && <span style={errStyle}>{errors.fullName}</span>}
+            <input id="cgi-name" name="fullName" style={fieldStyle} value={form.fullName} onChange={change} placeholder="Your full name" autoComplete="name" aria-invalid={!!errors.fullName} aria-describedby={errors.fullName ? 'err-cgi-name' : undefined} />
+            {errors.fullName && <span id="err-cgi-name" role="alert" style={errStyle}>{errors.fullName}</span>}
           </div>
-          <div>
+          <div style={{ minWidth: 0 }}>
             <label style={labelStyle} htmlFor="cgi-phone">Phone Number *</label>
-            <input id="cgi-phone" name="phone" type="tel" style={fieldStyle} value={form.phone} onChange={change} placeholder="10-digit mobile number" aria-invalid={!!errors.phone} />
-            {errors.phone && <span style={errStyle}>{errors.phone}</span>}
+            <input id="cgi-phone" name="phone" type="tel" style={fieldStyle} value={form.phone} onChange={change} placeholder="10-digit mobile number" autoComplete="tel" aria-invalid={!!errors.phone} aria-describedby={errors.phone ? 'err-cgi-phone' : undefined} />
+            {errors.phone && <span id="err-cgi-phone" role="alert" style={errStyle}>{errors.phone}</span>}
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 'var(--space-4)' }}>
-          <div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(220px, 100%), 1fr))', gap: 'var(--space-4)', minWidth: 0 }}>
+          <div style={{ minWidth: 0 }}>
             <label style={labelStyle} htmlFor="cgi-email">Email Address *</label>
-            <input id="cgi-email" name="email" type="email" style={fieldStyle} value={form.email} onChange={change} placeholder="your@email.com" aria-invalid={!!errors.email} />
-            {errors.email && <span style={errStyle}>{errors.email}</span>}
+            <input id="cgi-email" name="email" type="email" style={fieldStyle} value={form.email} onChange={change} placeholder="your@email.com" autoComplete="email" inputMode="email" aria-invalid={!!errors.email} aria-describedby={errors.email ? 'err-cgi-email' : undefined} />
+            {errors.email && <span id="err-cgi-email" role="alert" style={errStyle}>{errors.email}</span>}
           </div>
-          <div>
+          <div style={{ minWidth: 0 }}>
             <label style={labelStyle} htmlFor="cgi-branch">Branch / Department</label>
-            <input id="cgi-branch" name="branch" style={fieldStyle} value={form.branch} onChange={change} placeholder="e.g. CSE, ECE, MBA" />
+            <input id="cgi-branch" name="branch" style={fieldStyle} value={form.branch} onChange={change} placeholder="e.g. CSE, ECE, MBA" autoComplete="organization" />
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 'var(--space-4)' }}>
-          <div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(220px, 100%), 1fr))', gap: 'var(--space-4)', minWidth: 0 }}>
+          <div style={{ minWidth: 0 }}>
             <label style={labelStyle} htmlFor="cgi-year">Year of Study</label>
             <select id="cgi-year" name="year" style={fieldStyle} value={form.year} onChange={change}>
               <option value="">Select…</option>
               {YEAR_OPTIONS.map((y) => <option key={y} value={y}>{y}</option>)}
             </select>
           </div>
-          <div>
+          <div style={{ minWidth: 0 }}>
             <label style={labelStyle} htmlFor="cgi-track">Interested Track</label>
             <select id="cgi-track" name="track" style={fieldStyle} value={form.track} onChange={change}>
               <option value="">Select…</option>
@@ -160,12 +167,12 @@ export default function CareerGuidanceInterestForm({ tracks = DEFAULT_TRACKS }: 
         </button>
 
         {status === 'success' && (
-          <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-primary)', margin: 0 }}>
+          <p role="status" aria-live="polite" style={{ fontSize: 'var(--text-sm)', color: 'var(--color-primary)', margin: 0 }}>
             Thanks! Your details have been recorded — the Career Guidance Cell will reach out to you soon.
           </p>
         )}
         {status === 'error' && (
-          <p style={{ fontSize: 'var(--text-sm)', color: '#b3261e', margin: 0 }}>
+          <p role="alert" aria-live="assertive" style={{ fontSize: 'var(--text-sm)', color: '#b3261e', margin: 0 }}>
             Something went wrong. Please try again in a moment.
           </p>
         )}

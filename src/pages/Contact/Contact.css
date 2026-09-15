@@ -502,6 +502,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  flex-wrap: wrap;
 }
 
 .contact-map-info {
@@ -578,7 +579,8 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 14px;
+  min-height: 44px;
+  padding: 8px 16px;
   border-radius: var(--radius-full);
   border: 1px solid rgba(0, 0, 0, 0.1);
   background: #f8faf9;
@@ -636,8 +638,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 42px;
-  height: 42px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
   border-radius: 50%;
   background: #f8faf9;
   border: 1px solid rgba(0, 0, 0, 0.1);
@@ -706,6 +710,7 @@
 .form-input-clean,
 .form-select-clean {
   width: 100%;
+  min-height: 44px;
   padding: 10px 14px;
   font-size: var(--text-sm);
   border: 1px solid rgba(0, 0, 0, 0.12);
@@ -1004,7 +1009,8 @@
   color: var(--color-primary);
   text-decoration: none;
   background: color-mix(in srgb, var(--color-primary) 8%, transparent);
-  padding: 6px 12px;
+  min-height: 44px;
+  padding: 10px 14px;
   border-radius: 6px;
   transition: all 150ms ease;
   word-break: break-all;

@@ -422,14 +422,15 @@ export default function GovernanceDetail() {
                     {section.title}
                   </h3>
                 )}
-                <div style={{ overflowX: 'auto' }}>
+                <div role="region" aria-label={section.title || 'Members table'} tabIndex={0} style={{ overflow: 'auto', overflowX: 'auto' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm)' }}>
+                    <caption style={{ position: 'absolute', width: 1, height: 1, padding: 0, margin: -1, overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', border: 0 }}>{section.title || 'Members table'}</caption>
                     <thead>
                       <tr style={{ background: 'var(--color-primary)' }}>
-                        <th style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'left', color: 'var(--color-white)', fontWeight: 700, whiteSpace: 'nowrap' }}>Name</th>
-                        <th style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'left', color: 'var(--color-white)', fontWeight: 700, whiteSpace: 'nowrap' }}>Role</th>
+                        <th scope="col" style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'left', color: 'var(--color-white)', fontWeight: 700, whiteSpace: 'nowrap', position: 'sticky', top: 0, zIndex: 1, background: 'var(--color-primary)' }}>Name</th>
+                        <th scope="col" style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'left', color: 'var(--color-white)', fontWeight: 700, whiteSpace: 'nowrap', position: 'sticky', top: 0, zIndex: 1, background: 'var(--color-primary)' }}>Role</th>
                         {section.rows.some((r) => r.notes) && (
-                          <th style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'left', color: 'var(--color-white)', fontWeight: 700, whiteSpace: 'nowrap' }}>Notes</th>
+                          <th scope="col" style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'left', color: 'var(--color-white)', fontWeight: 700, whiteSpace: 'nowrap', position: 'sticky', top: 0, zIndex: 1, background: 'var(--color-primary)' }}>Notes</th>
                         )}
                       </tr>
                     </thead>
@@ -459,7 +460,7 @@ export default function GovernanceDetail() {
             <div style={{ marginBottom: 'var(--space-8)' }}>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Outcomes & Achievements</h2>
             </div>
-            <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 'var(--space-4)' }}>
+            <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(300px, 100%), 1fr))', gap: 'var(--space-4)' }}>
               {item.outcomes.map((o) => (
                 <div key={o}
                   style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>

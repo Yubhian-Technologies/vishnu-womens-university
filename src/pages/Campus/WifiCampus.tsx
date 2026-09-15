@@ -75,7 +75,7 @@ export default function WifiCampus() {
             <h3 style={{ fontSize: '1.5rem', color: 'var(--color-primary)', marginBottom: '2rem' }}>
               Digital Infrastructure and Key Facilities
             </h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.5rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(260px, 100%), 1fr))', gap: '1.5rem' }}>
               {INFRASTRUCTURE.map(({ icon: Icon, title, desc }) => (
                 <div
                   key={title}

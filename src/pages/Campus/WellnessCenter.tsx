@@ -198,7 +198,7 @@ export default function WellnessCenter() {
           </div>
           <div
             className="mobile-stack-grid"
-            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 'var(--space-3)' }}
+            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(260px, 100%), 1fr))', gap: 'var(--space-3)' }}
           >
             {HELP_TOPICS.map(({ icon: Icon, label }) => (
               <div
@@ -291,7 +291,7 @@ export default function WellnessCenter() {
           </div>
           <div
             className="mobile-stack-grid"
-            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 'var(--space-4)' }}
+            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(300px, 100%), 1fr))', gap: 'var(--space-4)' }}
           >
             {ABOUT_FACTS.map((fact, i) => {
               const isEven = i % 2 === 0;

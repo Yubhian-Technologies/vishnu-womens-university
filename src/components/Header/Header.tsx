@@ -600,7 +600,7 @@ export default function Header() {
             className="navbar-brand-link"
             aria-label="Vishnu Women's University - Home"
           >
-            <img loading="lazy"
+            <img loading="eager" fetchPriority="high" decoding="sync" width={220} height={74}
               src="/images/logo.png"
               alt="Vishnu Women's University"
               className="navbar-logo-img navbar-logo-desktop"

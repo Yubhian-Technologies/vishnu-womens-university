@@ -140,6 +140,8 @@
   text-decoration: none;
   font-weight: 500;
   transition: color 150ms ease;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .vwu-footer-contact-link:hover {
@@ -223,6 +225,8 @@
   gap: 0.35rem;
   width: fit-content;
   line-height: 1.45;
+  min-height: 44px;
+  padding: 6px 0;
   transition: color 150ms ease;
 }
 
@@ -295,8 +299,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -322,7 +328,7 @@
 
 .vwu-footer-bottom {
   border-top: 1px solid var(--footer-border);
-  padding: 1.1rem 0;
+  padding: 1.1rem 0 calc(1.1rem + env(safe-area-inset-bottom, 0px));
   background: rgba(0, 0, 0, 0.15);
 }
 

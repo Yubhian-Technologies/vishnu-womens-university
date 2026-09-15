@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback } from 'react';
+import { useRef, useState, useCallback, useEffect } from 'react';
 import ReactCrop, { type Crop, type PixelCrop, centerCrop, makeAspectCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import { uploadImage, type UploadResult } from '../../lib/storage';
@@ -81,6 +81,7 @@ async function cropImageToBlob(img: HTMLImageElement, px: PixelCrop): Promise<Bl
  */
 export function useImageCropModal(defaultAspect = 16 / 9) {
   const imgRef = useRef<HTMLImageElement>(null);
+  const closeBtnRef = useRef<HTMLButtonElement>(null);
   const pendingUpload = useRef<{ folder: string; onUploaded: (r: UploadResult) => void } | null>(null);
   // The as-selected file, never itself rotated — every rotate step re-derives
   // `cropSrc` from this so repeated rotations don't compound quality loss
@@ -95,6 +96,16 @@ export function useImageCropModal(defaultAspect = 16 / 9) {
   const [rotating,  setRotating]  = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error,     setError]     = useState<string | null>(null);
+
+  // ESC to close + focus close button on open (a11y)
+  useEffect(() => {
+    if (!cropSrc) return;
+    const onKeyDown = (e: KeyboardEvent) => { if (e.key === 'Escape') setCropSrc(null); };
+    document.addEventListener('keydown', onKeyDown);
+    // focus trap sentinel: focus close button when modal opens
+    closeBtnRef.current?.focus();
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [cropSrc]);
 
   const openCrop = (file: File, folder: string, onUploaded: (r: UploadResult) => void) => {
     if (!file.type.startsWith('image/')) { setError('Please select an image file.'); return; }
@@ -168,11 +179,11 @@ export function useImageCropModal(defaultAspect = 16 / 9) {
   };
 
   const cropModal = cropSrc && (
-    <div className="crop-modal-backdrop" onClick={(e) => e.target === e.currentTarget && setCropSrc(null)}>
+    <div role="dialog" aria-modal="true" aria-labelledby="crop-modal-title" className="crop-modal-backdrop" onClick={(e) => e.target === e.currentTarget && setCropSrc(null)}>
       <div className="crop-modal">
         <div className="crop-modal__header">
-          <h3>Crop Image</h3>
-          <button className="crop-modal__close" onClick={() => setCropSrc(null)}>✕</button>
+          <h3 id="crop-modal-title">Crop Image</h3>
+          <button ref={closeBtnRef} className="crop-modal__close" onClick={() => setCropSrc(null)} aria-label="Close crop dialog">✕</button>
         </div>
 
         <div className="crop-aspect-bar">

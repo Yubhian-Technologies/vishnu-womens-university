@@ -300,32 +300,51 @@ export default function Academics() {
               const expanded = expandedDepts.has(dept.id);
               const isTruncated = (dept.description || '').length > 130;
               const linkSlug = deptProgramSlug[dept.id];
-              const body = (
-                <>
-                  <div className="dept-card-top">
-                    <span className="dept-icon"><Icon size={30} strokeWidth={1.75} /></span>
-                    <span className="dept-code">{dept.shortCode}</span>
-                  </div>
+              const cardHeader = (
+                <div className="dept-card-top">
+                  <span className="dept-icon"><Icon size={30} strokeWidth={1.75} /></span>
+                  <span className="dept-code">{dept.shortCode}</span>
+                </div>
+              );
+              return linkSlug ? (
+                <div key={dept.id} className="dept-card dept-card--link" style={{ display: 'flex', flexDirection: 'column' }}>
+                  <Link to={`/academics/${linkSlug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                    {cardHeader}
+                    <h3 className="dept-name">{dept.title}</h3>
+                  </Link>
+                  <p className="dept-desc">{expanded ? dept.description : truncate(dept.description, 130)}</p>
+                  {isTruncated && (
+                    <button
+                      type="button"
+                      onClick={() => toggleDept(dept.id)}
+                      className="dept-expand-toggle"
+                      aria-expanded={expanded}
+                      aria-label={expanded ? 'Show less' : 'Read more about ' + dept.title}
+                    >
+                      {expanded ? 'Show less' : 'Read more'}
+                    </button>
+                  )}
+                  <Link to={`/academics/${linkSlug}`} style={{ textDecoration: 'none', color: 'inherit', marginTop: 'auto' }}>
+                    <span className="dept-card-arrow">Learn More →</span>
+                  </Link>
+                </div>
+              ) : (
+                <div key={dept.id} className="dept-card">
+                  {cardHeader}
                   <h3 className="dept-name">{dept.title}</h3>
                   <p className="dept-desc">{expanded ? dept.description : truncate(dept.description, 130)}</p>
                   {isTruncated && (
                     <button
                       type="button"
-                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleDept(dept.id); }}
+                      onClick={() => toggleDept(dept.id)}
                       className="dept-expand-toggle"
+                      aria-expanded={expanded}
+                      aria-label={expanded ? 'Show less' : 'Read more about ' + dept.title}
                     >
                       {expanded ? 'Show less' : 'Read more'}
                     </button>
                   )}
-                </>
-              );
-              return linkSlug ? (
-                <Link key={dept.id} to={`/academics/${linkSlug}`} className="dept-card dept-card--link">
-                  {body}
-                  <span className="dept-card-arrow" style={{ marginTop: 'auto' }}>Learn More →</span>
-                </Link>
-              ) : (
-                <div key={dept.id} className="dept-card">{body}</div>
+                </div>
               );
             })}
             {departments.length === 0 && (

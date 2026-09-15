@@ -26,7 +26,7 @@
    mismatch between what a mouse user sees and what a touch user gets. */
 .dept-level-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
   gap: var(--space-5);
   align-items: start;
 }
@@ -540,7 +540,7 @@
 
 .thrust-area-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
   gap: var(--space-4);
 }
 
@@ -2840,7 +2840,7 @@ td.pb-activities-num {
 /* ===== Google Material 3 Programme Highlights (Full Circular Pill Cards) ===== */
 .dept-highlights-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
   gap: 0.85rem;
 }
 
@@ -5448,11 +5448,14 @@ td.pb-activities-num {
    ========================================================================== */
 .dept-horizontal-quicknav-section {
   position: sticky;
-  top: calc(var(--topbar-height, 0px) + var(--header-height, 70px));
-  z-index: 950;
+  top: calc(var(--header-height) + 16px + env(safe-area-inset-top, 0px));
+  z-index: 40;
   margin: 0.35rem 0 1.25rem 0;
   padding: 0.25rem 0;
   pointer-events: auto;
+  /* Prevent horizontal overflow bleed */
+  overflow: clip;
+  max-width: 100%;
 }
 
 .dept-horizontal-quicknav-container {
@@ -5484,6 +5487,65 @@ td.pb-activities-num {
   .dept-horizontal-quicknav-pill {
     gap: 0.5rem;
     padding: 0.5rem !important;
+  }
+}
+
+/* Mobile: horizontally scrollable bar with auto-scroll active */
+@media (max-width: 768px) {
+  .dept-horizontal-quicknav-section {
+    margin: 0.25rem 0 1rem 0;
+    padding: 0.15rem 0;
+    /* Allow pill to bleed to safe-area edges */
+    overflow: visible;
+  }
+  .dept-horizontal-quicknav-container {
+    justify-content: flex-start;
+    padding: 0 max(var(--space-4), env(safe-area-inset-left)) 0 max(var(--space-4), env(safe-area-inset-right));
+  }
+  .dept-horizontal-quicknav-pill {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    scroll-padding-inline: var(--space-4);
+    scrollbar-width: none;
+    gap: 0.35rem;
+    padding: 0.35rem !important;
+    border-radius: 9999px !important;
+    /* Fade edges to hint scrollability */
+    -webkit-mask-image: linear-gradient(to right, transparent 0, black 16px, black calc(100% - 16px), transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0, black 16px, black calc(100% - 16px), transparent 100%);
+  }
+  .dept-horizontal-quicknav-pill::-webkit-scrollbar {
+    display: none;
+  }
+  .dept-quicknav-link {
+    flex: 0 0 auto;
+    scroll-snap-align: center;
+    min-height: 44px;
+    padding: 0.45rem 0.85rem;
+    font-size: 0.82rem;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .dept-horizontal-quicknav-pill {
+    gap: 0.3rem;
+    padding: 0.3rem !important;
+  }
+  .dept-quicknav-link {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.8rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dept-horizontal-quicknav-pill {
+    scroll-behavior: auto;
   }
 }
 
@@ -5522,7 +5584,7 @@ td.pb-activities-num {
 /* Compact Academic Degrees Section */
 .dept-compact-program-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
   gap: 1.25rem;
 }
 

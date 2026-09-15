@@ -62,7 +62,7 @@ export default function StateOfTheArtLabs() {
             <h3 style={{ fontSize: '1.5rem', color: 'var(--color-primary)', marginBottom: '2rem' }}>
               Learning Through Practice
             </h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))', gap: '1.5rem' }}>
               <div style={{ padding: '1.5rem', background: 'var(--color-off-white)', borderRadius: '8px', borderLeft: '4px solid var(--color-primary)' }}>
                 <strong style={{ display: 'block', fontSize: '1.25rem', marginBottom: '0.5rem', color: 'var(--color-heading)' }}>Specialised Laboratories</strong>
                 <span style={{ color: 'var(--color-text-light)', lineHeight: 1.6, display: 'block' }}>Department-specific facilities designed to support practical and technical learning.</span>

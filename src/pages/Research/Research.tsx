@@ -55,7 +55,7 @@ export default function Research() {
             <a
               key={cat.key}
               href={`#${cat.key}`}
-              style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: 'var(--space-3) var(--space-5)', fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-text)', textDecoration: 'none', whiteSpace: 'nowrap', borderBottom: '3px solid transparent', transition: 'all var(--transition-fast)' }}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', padding: 'var(--space-3) var(--space-5)', fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-text)', textDecoration: 'none', whiteSpace: 'nowrap', borderBottom: '3px solid transparent', transition: 'all var(--transition-fast)', minHeight: '44px', minWidth: '44px' }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'var(--color-primary)'; (e.currentTarget as HTMLElement).style.borderBottomColor = 'var(--color-accent)'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'var(--color-text)'; (e.currentTarget as HTMLElement).style.borderBottomColor = 'transparent'; }}
             >
@@ -83,7 +83,7 @@ export default function Research() {
                 <p style={{ color: 'var(--color-text-light)', maxWidth: 600, lineHeight: 1.7 }}>{cat.desc}</p>
               </div>
 
-              <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 'var(--space-5)' }}>
+              <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(280px, 100%), 1fr))', gap: 'var(--space-5)' }}>
                 {items.map((item) => {
                   const Icon = resolveContentIcon(item.icon) || cat.icon;
                   const displayTitle = item.title.startsWith('About ') ? item.title.slice(6) : item.title;
