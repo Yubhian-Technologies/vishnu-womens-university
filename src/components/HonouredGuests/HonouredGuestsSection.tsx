@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import SmoothImage from '../SmoothImage/SmoothImage';
 import type { WithId } from '../../hooks/useCollection';
@@ -30,17 +31,80 @@ type HonouredGuestItem = WithId & HonouredGuestDoc;
  */
 export default function HonouredGuestsSection() {
   const { docs: people } = useOrderedCollection<HonouredGuestItem>('honouredGuests', 'order');
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [isPaused, setIsPaused] = useState(false);
+  const reducedMotion = useMemo(
+    () => typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches,
+    []
+  );
+
   if (people.length === 0) return null;
 
   const loop = [...people, ...people];
 
+  const getCardStep = () => {
+    const el = trackRef.current;
+    if (!el) return 320;
+    const card = el.querySelector('.eminent-card') as HTMLElement | null;
+    if (card) {
+      const style = getComputedStyle(el);
+      const gap = parseFloat(style.columnGap || style.gap || '12') || 12;
+      return card.offsetWidth + gap;
+    }
+    return 320;
+  };
+
+  // One-by-one auto-scroll: advance exactly one card, then pause
+  useEffect(() => {
+    if (reducedMotion || people.length <= 1) return;
+    const el = trackRef.current;
+    if (!el) return;
+
+    const timer = setInterval(() => {
+      if (isPaused || !trackRef.current) return;
+      const track = trackRef.current;
+      const atEnd = track.scrollLeft >= track.scrollWidth - track.clientWidth - 8;
+      if (atEnd) {
+        track.scrollTo({ left: 0, behavior: 'smooth' });
+      } else {
+        track.scrollBy({ left: getCardStep(), behavior: 'smooth' });
+      }
+    }, 2600);
+
+    return () => clearInterval(timer);
+  }, [people.length, isPaused, reducedMotion]);
+
   return (
-    <section className="eminent-section" aria-label="Eminent Personalities at VWU">
+    <section
+      className="eminent-section eminent-section--onebyone"
+      aria-label="Eminent Personalities at VWU"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+      onTouchStart={() => setIsPaused(true)}
+      onTouchEnd={() => setTimeout(() => setIsPaused(false), 4000)}
+    >
       <div className="container">
         <h2 className="eminent-title">Eminent Personalities at VWU</h2>
       </div>
       <div className="eminent-marquee">
-        <div className="eminent-track">
+        <div
+          ref={trackRef}
+          className="eminent-track"
+          tabIndex={0}
+          role="region"
+          aria-roledescription="carousel"
+          aria-label="Eminent personalities carousel"
+          onKeyDown={(e) => {
+            if (e.key === 'ArrowRight') {
+              e.preventDefault();
+              trackRef.current?.scrollBy({ left: getCardStep(), behavior: reducedMotion ? 'auto' : 'smooth' });
+            }
+            if (e.key === 'ArrowLeft') {
+              e.preventDefault();
+              trackRef.current?.scrollBy({ left: -getCardStep(), behavior: reducedMotion ? 'auto' : 'smooth' });
+            }
+          }}
+        >
           {loop.map((p, i) => (
             <figure key={`${p.id}-${i}`} className="eminent-card" aria-hidden={i >= people.length}>
               <div className="eminent-photo-wrap">
