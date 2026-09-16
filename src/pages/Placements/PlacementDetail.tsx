@@ -118,6 +118,13 @@ USA, Canada, UK, China, Germany, Australia, Spain
 Mrs. P. Prasanthi, Asst. Professor — Email: [jprasanthi@svecw.edu.in](mailto:jprasanthi@svecw.edu.in) — Phone: [9440111470](tel:9440111470)`,
 };
 
+// Hero subtitle fallback, shown only when the CMS's own Short Description
+// (`item.desc`) is empty — same idea as BODY_OVERRIDES above, just for the
+// hero instead of the body copy.
+const HERO_SUBTITLE_OVERRIDES: Record<string, string> = {
+  'placement-guidelines': 'A practical guide to placement requirements, career preparation and recruitment participation.',
+};
+
 // Higher-studies / competitive-exam training blurb for the Career Guidance
 // Cell page. Rendered unconditionally on that page (below the Overview
 // copy), because the BODY_OVERRIDES entry above only shows when the CMS
@@ -1534,8 +1541,8 @@ export default function PlacementDetail() {
                 </div>
               )}
               <h1 className="dept-hero-title">{item.title}</h1>
-              {item.desc && (
-                <p className="dept-hero-subtitle">{item.desc}</p>
+              {(item.desc || HERO_SUBTITLE_OVERRIDES[item.slug]) && (
+                <p className="dept-hero-subtitle">{item.desc || HERO_SUBTITLE_OVERRIDES[item.slug]}</p>
               )}
 
             </div>

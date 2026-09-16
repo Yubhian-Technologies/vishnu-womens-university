@@ -20,6 +20,9 @@ interface PhotoGridProps {
   variant?: 'collage' | 'grid';
   layout?: 'default' | 'side-text' | 'side-text-reverse';
   showGalleryLink?: boolean;
+  /** Overrides the default "View Full Gallery →" link text/arrow — the
+   *  link itself always goes to /news-awards/gallery regardless. */
+  galleryLinkText?: string;
   className?: string;
 }
 
@@ -33,6 +36,7 @@ export default function PhotoGrid({
   variant = 'collage',
   layout = 'default',
   showGalleryLink = true,
+  galleryLinkText = 'View Full Gallery →',
   className = '',
 }: PhotoGridProps) {
   const [lightbox, setLightbox] = useState<number | null>(null);
@@ -127,7 +131,7 @@ export default function PhotoGrid({
       )}
       {showGalleryLink && (
         <Link to="/news-awards/gallery" className="btn btn-outline photo-text-cta">
-          View Full Gallery →
+          {galleryLinkText}
         </Link>
       )}
     </div>
@@ -185,7 +189,7 @@ export default function PhotoGrid({
       {imageGrid}
       {showGalleryLink && (
         <div className="photo-grid-footer">
-          <Link to="/news-awards/gallery" className="btn btn-outline">View Full Gallery →</Link>
+          <Link to="/news-awards/gallery" className="btn btn-outline">{galleryLinkText}</Link>
         </div>
       )}
 

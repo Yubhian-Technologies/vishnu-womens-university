@@ -411,6 +411,10 @@
   justify-content: center;
 }
 
+.ap-cta__actions--secondary {
+  margin-top: var(--space-4);
+}
+
 /* ---- Responsive ------------------------------------- */
 @media (max-width: 700px) {
   .ap-track__steps {
