@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Layers } from 'lucide-react';
 import PageHero from '../../components/PageHero/PageHero';
+import SmoothImage from '../../components/SmoothImage/SmoothImage';
 import { useOrderedCollection } from '../../hooks/useCollection';
 import { resolveProgramIcon } from '../../lib/programIcons';
 import type { SchoolDoc } from '../Admin/sections/SchoolsAdmin';
@@ -61,21 +62,28 @@ export default function Schools() {
         schools.map((school, i) => (
           <section key={school.id} className={`section ${i % 2 === 0 ? 'bg-white' : 'bg-off-white'}`}>
             <div className="container">
-              <div className="school-header" style={{ marginBottom: 'var(--space-10)' }}>
-                <span className="school-index" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
-                <h2 className="section-title school-title">{school.title}</h2>
-                {SCHOOL_TAGLINES[school.title.trim().toLowerCase()] && (
-                  <p className="school-tagline">{SCHOOL_TAGLINES[school.title.trim().toLowerCase()]}</p>
-                )}
-                {school.description && (
-                  <p className="section-desc">{school.description}</p>
-                )}
-                <div className="academics-stat-row">
-                  <span className="chip-badge">
-                    <Layers size={14} strokeWidth={2} />
-                    {(school.departmentIds || []).length} Department{(school.departmentIds || []).length === 1 ? '' : 's'}
-                  </span>
+              <div className={`school-header${school.imageUrl ? ' school-header--with-image' : ''}`} style={{ marginBottom: 'var(--space-10)' }}>
+                <div className="school-header-text">
+                  <span className="school-index" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+                  <h2 className="section-title school-title">{school.title}</h2>
+                  {SCHOOL_TAGLINES[school.title.trim().toLowerCase()] && (
+                    <p className="school-tagline">{SCHOOL_TAGLINES[school.title.trim().toLowerCase()]}</p>
+                  )}
+                  {school.description && (
+                    <p className="section-desc">{school.description}</p>
+                  )}
+                  <div className="academics-stat-row">
+                    <span className="chip-badge">
+                      <Layers size={14} strokeWidth={2} />
+                      {(school.departmentIds || []).length} Department{(school.departmentIds || []).length === 1 ? '' : 's'}
+                    </span>
+                  </div>
                 </div>
+                {school.imageUrl && (
+                  <div className="school-header-image">
+                    <SmoothImage src={school.imageUrl} alt={school.title} />
+                  </div>
+                )}
               </div>
               <div className="dept-grid">
                 {(school.departmentIds || [])
