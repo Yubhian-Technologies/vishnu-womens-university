@@ -354,6 +354,15 @@
   line-height: 1.1;
 }
 
+.sports-tournaments-subtitle {
+  font-size: 1.05rem;
+  color: rgba(255, 255, 255, 0.75);
+  line-height: 1.7;
+  margin: 0.5rem auto 0;
+  max-width: 640px;
+  font-weight: 400;
+}
+
 .sports-tournaments-slider-wrapper {
   position: relative;
   width: 100%;
@@ -454,10 +463,10 @@
 .sports-achievements-subtitle {
   font-size: 1.05rem;
   color: rgba(255, 255, 255, 0.75);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  margin-top: 6px;
-  font-weight: 700;
+  line-height: 1.7;
+  margin: 10px auto 0;
+  max-width: 640px;
+  font-weight: 400;
 }
 
 /* Medallion Gallery */

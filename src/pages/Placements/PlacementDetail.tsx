@@ -1689,7 +1689,7 @@ export default function PlacementDetail() {
               </div>
             ) : item.slug === 'higher-education' ? (
               <div className="detail-sidebar">
-                <div style={{ position: 'sticky', top: '110px', display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
+                <div style={{ position: 'sticky', top: '110px' }}>
                   <SidebarImageCarousel
                     images={[
                       '/images/placements/global-universities.jpg',
@@ -1697,57 +1697,6 @@ export default function PlacementDetail() {
                     ]}
                     alt="Higher Education partnerships and collaborations"
                   />
-
-                  {/* Student Progression — eyebrow/heading/sub-blurb card,
-                      same pattern as the Placement Support card further down
-                      this file. Purely informational copy; no admin field
-                      backs it since Higher Education has no per-slug CMS
-                      body beyond item.intro. */}
-                  <div style={{
-                    padding: 'var(--space-6)',
-                    background: 'var(--color-off-white)',
-                    borderRadius: 'var(--radius-md)',
-                    border: '1px solid var(--color-light-gray)',
-                  }}>
-                    <p style={{
-                      fontFamily: 'var(--font-sans)',
-                      fontSize: '0.75rem',
-                      fontWeight: 800,
-                      letterSpacing: '0.12em',
-                      textTransform: 'uppercase',
-                      color: 'var(--color-accent)',
-                      margin: '0 0 0.5rem',
-                    }}>
-                      Higher Studies
-                    </p>
-                    <h3 style={{
-                      fontFamily: 'var(--font-serif)',
-                      fontSize: 'clamp(1.15rem, 2.2vw, 1.5rem)',
-                      fontWeight: 600,
-                      color: 'var(--color-primary)',
-                      margin: '0 0 1rem',
-                    }}>
-                      Student Progression
-                    </h3>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-                      <div>
-                        <p style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-text)', margin: '0 0 0.35rem' }}>
-                          International Higher Studies
-                        </p>
-                        <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.7, margin: 0 }}>
-                          Students have progressed to postgraduate study at universities across international destinations.
-                        </p>
-                      </div>
-                      <div>
-                        <p style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-text)', margin: '0 0 0.35rem' }}>
-                          GATE Preparation
-                        </p>
-                        <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.7, margin: 0 }}>
-                          Structured GATE preparation supports students pursuing postgraduate engineering opportunities.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </div>
             ) : item.highlights && item.highlights.length > 0 && (

@@ -28,6 +28,15 @@ interface PageHeroProps {
       image panel, instead of the default full-bleed image with text overlaid
       on top. Opt-in per page — omit to keep the existing look. */
   layout?: 'default' | 'split';
+  /** Pins the heading/subheading to this exact text, ignoring whatever a
+      Hero Banners record for `page` may hold — the banner's image (and
+      carousel, if it has more than one slide) still shows normally. Escape
+      hatch for a page whose CMS banner text is wrong and can't be corrected
+      in /admin (e.g. a scoped admin account without edit rights to that
+      page's banner) — everywhere else, leave unset so admins keep full
+      control of both text and image together. */
+  forceTitle?: string;
+  forceSubtitle?: string;
 }
 
 const INTERVAL = 5000;
@@ -42,6 +51,8 @@ export default function PageHero({
   scrollCtaTargetId,
   hideCta = false,
   layout = 'default',
+  forceTitle,
+  forceSubtitle,
 }: PageHeroProps) {
   const { slides, loading } = usePageBanners(page);
   const [rawCurrent, setCurrent] = useState(0);
@@ -126,7 +137,10 @@ export default function PageHero({
     return () => { document.head.removeChild(link); };
   }, [defaultImage]);
 
-  const slide = allSlides[current];
+  const rawSlide = allSlides[current];
+  const slide = (forceTitle !== undefined || forceSubtitle !== undefined)
+    ? { ...rawSlide, title: forceTitle ?? rawSlide.title, subtitle: forceSubtitle ?? rawSlide.subtitle }
+    : rawSlide;
 
   const slidesMarkup = allSlides.map((s, i) => (
     <div

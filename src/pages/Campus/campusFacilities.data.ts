@@ -153,9 +153,9 @@ Travel Partner: Ushodaya Holidays`,
   {
     slug: 'temples',
     title: 'Temples of God',
-    heroSubtitle: 'A Space for Reflection, Reverence, and Inner Peace.',
+    heroSubtitle: 'A peaceful campus space for reflection, prayer, and inner calm.',
     body: `Worship is putting the spotlight on God. This whole idea is to engage our Vishnu Women's University students in an atmosphere and attitude of reverence and joy. Vishnu Women's University engage students from varied faith and religious traditions as well as students without religious affiliation. So, Vishnu Women's University holds a place for temple of gods in the campus. The temple is built on a high foundation covering an area of 25,000 square feet.`,
-    desc: 'A Space for Reflection, Reverence, and Inner Peace.',
+    desc: 'A peaceful campus space for reflection, prayer, and inner calm.',
   },
   {
     slug: 'health-care',

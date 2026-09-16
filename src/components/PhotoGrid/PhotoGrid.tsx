@@ -182,6 +182,7 @@ export default function PhotoGrid({
     <div className={`photo-grid-wrapper ${className}`}>
       {(label || title) && (
         <div className="photo-grid-header">
+          {label && <span className="section-label" style={{ marginBottom: 'var(--space-3)' }}>{label}</span>}
           {title && <h2 className="section-title">{title}</h2>}
           {subtitle && <p className="section-desc">{subtitle}</p>}
         </div>

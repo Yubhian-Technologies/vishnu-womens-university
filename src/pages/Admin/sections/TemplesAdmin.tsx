@@ -23,20 +23,20 @@ export const DEFAULT_TEMPLES_PILLARS = [
   {
     icon: 'Heart',
     tag: 'Spiritual Inclusivity',
-    title: 'Welcoming All Faiths & Traditions',
-    desc: 'Engages students from varied religious backgrounds, faiths, and personal traditions with open-hearted reverence, respect, and unity.',
+    title: 'Welcoming All Faiths and Traditions',
+    desc: 'The temple complex welcomes students, faculty and staff from diverse faiths, traditions and backgrounds, encouraging mutual respect and an inclusive campus environment.',
   },
   {
     icon: 'Landmark',
     tag: 'Sacred Architecture',
-    title: '25,000 Sq. Ft. Elevated Foundation',
-    desc: 'Built on an imposing elevated foundation, the temple commands a majestic, peaceful presence overlooking the lush green campus environment.',
+    title: '25,000 Sq. Ft. Temple Complex',
+    desc: 'Spread across approximately 25,000 sq. ft., the complex provides dedicated spaces for prayer, reflection and quiet contemplation within the campus.',
   },
   {
     icon: 'Sun',
     tag: 'Peaceful Solace',
-    title: 'Atmosphere of Reverence & Joy',
-    desc: 'A tranquil retreat where students and faculty find stillness, mental balance, positivity, and inner harmony amidst rigorous academic life.',
+    title: 'A Peaceful Space for Reflection',
+    desc: 'The temple complex offers a calm setting where members of the University community can pause, reflect and spend time away from their academic and professional routines.',
   },
 ];
 
