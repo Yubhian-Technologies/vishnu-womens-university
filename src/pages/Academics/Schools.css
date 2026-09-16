@@ -42,6 +42,13 @@
   position: relative;
 }
 
+/* Text sits in its own positioned column so the index numeral (below)
+   stays scoped to it — with a feature photo (school-header--with-image),
+   the numeral shouldn't spill over onto the image next to it. */
+.schools-page .school-header-text {
+  position: relative;
+}
+
 .schools-page .school-index {
   position: absolute;
   top: -0.6em;
@@ -54,6 +61,38 @@
   line-height: 1;
   pointer-events: none;
   user-select: none;
+}
+
+/* School header with an admin-uploaded feature photo — text left, photo
+   right, filling the space that otherwise sits empty next to the text. */
+.schools-page .school-header--with-image {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: var(--space-10);
+  align-items: center;
+}
+
+.schools-page .school-header-image {
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  aspect-ratio: 4 / 3;
+}
+
+.schools-page .school-header-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+@media (max-width: 900px) {
+  .schools-page .school-header--with-image {
+    grid-template-columns: 1fr;
+  }
+  .schools-page .school-header-image {
+    order: -1;
+  }
 }
 
 @media (max-width: 640px) {
