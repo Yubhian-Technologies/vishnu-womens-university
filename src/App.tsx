@@ -115,6 +115,7 @@ const DifferentiatorDetail = lazyWithRetry(() => import('./pages/Differentiators
 const ArVrStudio = lazyWithRetry(() => import('./pages/Differentiators/ArVrStudio'));
 const ConcreteCanoeLab = lazyWithRetry(() => import('./pages/Differentiators/ConcreteCanoeLab'));
 const AdvancedElectricalRdLab = lazyWithRetry(() => import('./pages/Differentiators/AdvancedElectricalRdLab'));
+const AssistiveTechLab = lazyWithRetry(() => import('./pages/Differentiators/AssistiveTechLab'));
 const Placements = lazyWithRetry(() => import('./pages/Placements/Placements'));
 const PlacementDetail = lazyWithRetry(() => import('./pages/Placements/PlacementDetail'));
 const NewsAwards = lazyWithRetry(() => import('./pages/NewsAwards/NewsAwards'));
@@ -262,6 +263,7 @@ function PublicApp() {
             <Route path="/differentiators/ar-vr-studio" element={<ArVrStudio />} />
             <Route path="/differentiators/concrete-canoe-lab" element={<ConcreteCanoeLab />} />
             <Route path="/differentiators/advanced-electrical-rd-lab" element={<AdvancedElectricalRdLab />} />
+            <Route path="/differentiators/assistive-tech-lab" element={<AssistiveTechLab />} />
             <Route path="/differentiators/:slug" element={<DifferentiatorDetail />} />
             <Route path="/placements" element={<Placements />} />
             <Route path="/placements/:slug" element={<PlacementDetail />} />

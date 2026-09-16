@@ -1,0 +1,974 @@
+/* ===== Assistive Technology Lab (ATL) Bespoke Redesign =====
+   Theme: Vishnu Women's University Deep Navy & Gold
+   Palette: Navy (#0B1E42, #07142C, #1E3A8A), Gold (#C9A84C, #C9973A, #E8C96A), Slate & White
+====================================================== */
+
+.atl-page {
+  background-color: var(--color-off-white, #f8fafc);
+  color: var(--color-text, #0f172a);
+  font-family: var(--font-sans, "Source Sans 3", sans-serif);
+  overflow-x: hidden;
+}
+
+/* --- Hero Section --- */
+.atl-hero-section {
+  padding-top: var(--space-4, 1rem);
+  padding-bottom: var(--space-6, 1.5rem);
+}
+
+.atl-hero-card {
+  position: relative;
+  min-height: 460px;
+  border-radius: var(--radius-xl, 24px);
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  padding: var(--space-8, 2rem) var(--space-10, 2.5rem);
+  box-shadow: var(--shadow-lg, 0 10px 40px rgba(0, 0, 0, 0.12));
+  background: linear-gradient(135deg, #07142c 0%, #0b1e42 55%, #162f5d 100%);
+}
+
+@media (max-width: 768px) {
+  .atl-hero-card {
+    min-height: 380px;
+    padding: var(--space-6, 1.5rem) var(--space-5, 1.25rem);
+  }
+}
+
+.atl-hero-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  z-index: 0;
+  transition: transform 0.6s ease;
+}
+
+.atl-hero-card:hover .atl-hero-bg {
+  transform: scale(1.02);
+}
+
+.atl-hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 920px;
+  color: var(--color-white, #ffffff);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8), 0 4px 20px rgba(0, 0, 0, 0.6);
+}
+
+.atl-breadcrumb {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: var(--text-xs, 0.8125rem);
+  color: rgba(255, 255, 255, 0.95);
+  margin-bottom: var(--space-3, 0.75rem);
+  font-weight: 600;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+}
+
+.atl-breadcrumb a {
+  color: rgba(255, 255, 255, 0.95);
+  text-decoration: none;
+  transition: color var(--transition-fast, 150ms ease);
+}
+
+.atl-breadcrumb a:hover {
+  color: var(--color-accent-light, #e8c96a);
+  text-decoration: underline;
+}
+
+.atl-breadcrumb-sep {
+  opacity: 0.8;
+}
+
+.atl-breadcrumb-current {
+  color: var(--color-accent-light, #e8c96a);
+  font-weight: 700;
+}
+
+.atl-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #c9973a 0%, #e8c96a 100%);
+  color: #07142c;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 0.35rem 0.9rem;
+  border-radius: var(--radius-full, 9999px);
+  margin-bottom: var(--space-3, 0.75rem);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+  text-shadow: none;
+}
+
+.atl-hero-title {
+  font-family: var(--font-serif, "Source Serif 4", Georgia, serif);
+  font-size: clamp(2rem, 4vw, 3.25rem);
+  font-weight: 800;
+  line-height: 1.15;
+  color: var(--color-white, #ffffff);
+  margin-bottom: var(--space-3, 0.75rem);
+  letter-spacing: -0.02em;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.9), 0 4px 30px rgba(0, 0, 0, 0.7);
+}
+
+.atl-hero-subtitle {
+  font-size: clamp(0.95rem, 1.8vw, 1.15rem);
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.98);
+  max-width: 800px;
+  font-weight: 500;
+  margin: 0 0 var(--space-4, 1rem) 0;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
+}
+
+/* Quick stats pills on hero */
+.atl-hero-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2, 0.5rem);
+  margin-top: var(--space-3, 0.75rem);
+}
+
+.atl-stat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(7, 20, 44, 0.75);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.35rem 0.8rem;
+  border-radius: var(--radius-full, 9999px);
+  text-shadow: none;
+}
+
+.atl-stat-pill strong {
+  color: var(--color-accent-light, #e8c96a);
+}
+
+/* --- Sticky Sub-Navigation Bar --- */
+.atl-sticky-nav-wrapper {
+  position: sticky;
+  top: var(--topbar-height, 0px);
+  z-index: 90;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--color-light-gray, #e2e8f0);
+  box-shadow: 0 4px 20px rgba(11, 30, 66, 0.06);
+  transition: all var(--transition-base, 250ms ease);
+}
+
+.atl-nav-scroll {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2, 0.5rem);
+  padding: var(--space-3, 0.75rem) 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.atl-nav-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.atl-nav-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: var(--radius-full, 9999px);
+  font-size: var(--text-xs, 0.8125rem);
+  font-weight: 700;
+  color: var(--color-text-light, #475569);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: all var(--transition-fast, 150ms ease);
+  background: transparent;
+  border: 1px solid transparent;
+}
+
+.atl-nav-item:hover {
+  color: var(--color-primary, #0b1e42);
+  background: rgba(11, 30, 66, 0.05);
+  border-color: var(--color-light-gray, #e2e8f0);
+}
+
+.atl-nav-item.active {
+  color: var(--color-primary-dark, #07142c);
+  background: rgba(201, 168, 76, 0.18);
+  border-color: var(--color-accent, #c9a84c);
+  font-weight: 800;
+}
+
+/* --- Section Layout & Typography --- */
+.atl-section {
+  padding: var(--space-12, 3rem) 0;
+  scroll-margin-top: 80px;
+}
+
+.atl-section--alt {
+  background: var(--color-white, #ffffff);
+  border-top: 1px solid var(--color-light-gray, #e2e8f0);
+  border-bottom: 1px solid var(--color-light-gray, #e2e8f0);
+}
+
+.atl-section-header {
+  margin-bottom: var(--space-8, 2rem);
+}
+
+.atl-section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-accent, #c9a84c);
+  margin-bottom: var(--space-2, 0.5rem);
+}
+
+.atl-section-title {
+  font-family: var(--font-serif, "Source Serif 4", Georgia, serif);
+  font-size: clamp(1.6rem, 2.8vw, 2.25rem);
+  font-weight: 800;
+  color: var(--color-primary, #0b1e42);
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+  margin: 0;
+}
+
+.atl-section-lead {
+  font-size: var(--text-base, 1rem);
+  line-height: 1.65;
+  color: var(--color-text-light, #475569);
+  margin-top: var(--space-3, 0.75rem);
+  max-width: 840px;
+}
+
+/* --- Overview Card --- */
+.atl-overview-card {
+  background: var(--color-white, #ffffff);
+  border-radius: var(--radius-lg, 16px);
+  border: 1px solid var(--color-light-gray, #e2e8f0);
+  border-left: 5px solid var(--color-accent, #c9a84c);
+  padding: var(--space-8, 2rem);
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.08));
+  position: relative;
+  overflow: hidden;
+  margin-bottom: var(--space-8, 2rem);
+}
+
+.atl-overview-watermark {
+  position: absolute;
+  top: 1rem;
+  right: 1.5rem;
+  color: rgba(201, 168, 76, 0.12);
+  pointer-events: none;
+}
+
+.atl-prose {
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: var(--color-text, #0f172a);
+}
+
+.atl-prose p {
+  margin-bottom: var(--space-4, 1rem);
+}
+
+.atl-prose p:last-child {
+  margin-bottom: 0;
+}
+
+/* --- Mission & Objectives Grid --- */
+.atl-vm-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-6, 1.5rem);
+}
+
+@media (max-width: 860px) {
+  .atl-vm-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.atl-vm-card {
+  background: var(--color-white, #ffffff);
+  border: 1px solid var(--color-light-gray, #e2e8f0);
+  border-radius: var(--radius-lg, 16px);
+  padding: var(--space-7, 1.75rem);
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.08));
+  transition: transform var(--transition-base, 250ms ease), box-shadow var(--transition-base, 250ms ease);
+}
+
+.atl-vm-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md, 0 4px 16px rgba(0, 0, 0, 0.1));
+}
+
+.atl-vm-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3, 0.75rem);
+  margin-bottom: var(--space-4, 1rem);
+  padding-bottom: var(--space-3, 0.75rem);
+  border-bottom: 1px solid var(--color-light-gray, #e2e8f0);
+}
+
+.atl-vm-icon-box {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-md, 8px);
+  background: rgba(201, 168, 76, 0.15);
+  color: var(--color-accent, #c9a84c);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.atl-vm-title {
+  font-family: var(--font-serif, "Source Serif 4", Georgia, serif);
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--color-primary, #0b1e42);
+  margin: 0;
+}
+
+.atl-checklist {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3, 0.75rem);
+}
+
+.atl-checklist-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3, 0.75rem);
+  font-size: var(--text-sm, 0.9375rem);
+  line-height: 1.55;
+  color: var(--color-text, #0f172a);
+}
+
+.atl-check-badge {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-accent, #c9a84c);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* --- Global Collaboration Spotlight (UMass Lowell) --- */
+.atl-spotlight-card {
+  background: linear-gradient(135deg, #07142c 0%, #0b1e42 60%, #162f5d 100%);
+  border-radius: var(--radius-xl, 24px);
+  padding: var(--space-8, 2rem) var(--space-10, 2.5rem);
+  color: var(--color-white, #ffffff);
+  box-shadow: var(--shadow-lg, 0 10px 40px rgba(0, 0, 0, 0.12));
+  border: 1px solid rgba(201, 168, 76, 0.35);
+  position: relative;
+  overflow: hidden;
+}
+
+.atl-spotlight-card::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(201, 168, 76, 0.18) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+@media (max-width: 768px) {
+  .atl-spotlight-card {
+    padding: var(--space-6, 1.5rem) var(--space-5, 1.25rem);
+  }
+}
+
+.atl-spotlight-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-4, 1rem);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-5, 1.25rem);
+}
+
+.atl-spotlight-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(201, 168, 76, 0.2);
+  border: 1px solid var(--color-accent, #c9a84c);
+  color: var(--color-accent-light, #e8c96a);
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.35rem 0.85rem;
+  border-radius: var(--radius-full, 9999px);
+}
+
+.atl-spotlight-title {
+  font-family: var(--font-serif, "Source Serif 4", Georgia, serif);
+  font-size: clamp(1.5rem, 2.5vw, 2.1rem);
+  font-weight: 800;
+  color: var(--color-white, #ffffff);
+  margin-bottom: var(--space-3, 0.75rem);
+}
+
+.atl-spotlight-desc {
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: rgba(255, 255, 255, 0.92);
+  margin-bottom: var(--space-6, 1.5rem);
+}
+
+.atl-quote-box {
+  background: rgba(255, 255, 255, 0.08);
+  border-left: 4px solid var(--color-accent, #c9a84c);
+  border-radius: 0 var(--radius-md, 8px) var(--radius-md, 8px) 0;
+  padding: var(--space-5, 1.25rem) var(--space-6, 1.5rem);
+  font-size: 1.05rem;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.98);
+  font-style: italic;
+  margin-bottom: var(--space-4, 1rem);
+}
+
+.atl-quote-author {
+  display: block;
+  margin-top: var(--space-2, 0.5rem);
+  font-size: var(--text-sm, 0.9375rem);
+  font-style: normal;
+  font-weight: 800;
+  color: var(--color-accent-light, #e8c96a);
+}
+
+/* --- Devices Portfolio Grid --- */
+.atl-devices-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--space-6, 1.5rem);
+}
+
+.atl-device-card {
+  background: var(--color-white, #ffffff);
+  border: 1px solid var(--color-light-gray, #e2e8f0);
+  border-radius: var(--radius-lg, 16px);
+  padding: var(--space-6, 1.5rem);
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.08));
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all var(--transition-base, 250ms ease);
+}
+
+.atl-device-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md, 0 4px 16px rgba(0, 0, 0, 0.12));
+  border-color: var(--color-accent, #c9a84c);
+}
+
+.atl-device-top {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3, 0.75rem);
+  margin-bottom: var(--space-3, 0.75rem);
+}
+
+.atl-device-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md, 8px);
+  background: rgba(201, 168, 76, 0.15);
+  color: var(--color-accent, #c9a84c);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.atl-device-title {
+  font-family: var(--font-sans, "Source Sans 3", sans-serif);
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--color-primary, #0b1e42);
+  line-height: 1.35;
+  margin: 0;
+}
+
+.atl-device-desc {
+  font-size: var(--text-sm, 0.9375rem);
+  line-height: 1.6;
+  color: var(--color-text-light, #475569);
+  margin: var(--space-2, 0.5rem) 0 0 0;
+}
+
+.atl-device-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.725rem;
+  font-weight: 800;
+  color: var(--color-primary, #0b1e42);
+  background: var(--color-off-white, #f8fafc);
+  border: 1px solid var(--color-light-gray, #e2e8f0);
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-full, 9999px);
+  margin-top: var(--space-4, 1rem);
+  width: fit-content;
+}
+
+/* --- Bridge Courses & Projects Tabs / Accordion --- */
+.atl-trainings-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6, 1.5rem);
+}
+
+.atl-training-year-card {
+  background: var(--color-white, #ffffff);
+  border: 1px solid var(--color-light-gray, #e2e8f0);
+  border-radius: var(--radius-lg, 16px);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.08));
+}
+
+.atl-training-year-header {
+  background: linear-gradient(135deg, rgba(11, 30, 66, 0.04) 0%, rgba(201, 168, 76, 0.1) 100%);
+  padding: var(--space-5, 1.25rem) var(--space-6, 1.5rem);
+  border-bottom: 1px solid var(--color-light-gray, #e2e8f0);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.atl-training-year-title {
+  font-family: var(--font-serif, "Source Serif 4", Georgia, serif);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--color-primary, #0b1e42);
+  margin: 0;
+}
+
+.atl-training-body {
+  padding: var(--space-6, 1.5rem);
+}
+
+.atl-training-projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-4, 1rem);
+  margin-top: var(--space-4, 1rem);
+}
+
+.atl-project-mini-card {
+  background: var(--color-off-white, #f8fafc);
+  border: 1px solid var(--color-light-gray, #e2e8f0);
+  border-left: 3px solid var(--color-accent, #c9a84c);
+  border-radius: var(--radius-md, 8px);
+  padding: var(--space-4, 1rem);
+}
+
+.atl-project-mini-title {
+  font-size: var(--text-sm, 0.9375rem);
+  font-weight: 800;
+  color: var(--color-primary, #0b1e42);
+  margin-bottom: var(--space-2, 0.5rem);
+}
+
+.atl-project-mini-desc {
+  font-size: var(--text-xs, 0.8125rem);
+  color: var(--color-text-light, #475569);
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* --- Tables --- */
+.atl-table-container {
+  border: 1px solid var(--color-light-gray, #e2e8f0);
+  border-radius: var(--radius-md, 8px);
+  overflow-x: auto;
+  background: var(--color-white, #ffffff);
+  margin-top: var(--space-3, 0.75rem);
+}
+
+.atl-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm, 0.9375rem);
+  text-align: left;
+}
+
+.atl-table th {
+  background: var(--color-primary, #0b1e42);
+  color: var(--color-white, #ffffff);
+  font-weight: 700;
+  padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
+  white-space: nowrap;
+  font-size: var(--text-xs, 0.8125rem);
+  text-transform: uppercase;
+  border-bottom: 2px solid var(--color-accent, #c9a84c);
+}
+
+.atl-table td {
+  padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
+  color: var(--color-text, #0f172a);
+  border-bottom: 1px solid var(--color-light-gray, #e2e8f0);
+  vertical-align: top;
+  line-height: 1.5;
+}
+
+.atl-table tr:nth-child(even) td {
+  background: var(--color-off-white, #f8fafc);
+}
+
+/* --- Community Engagement Timeline Cards --- */
+.atl-events-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: var(--space-6, 1.5rem);
+}
+
+.atl-event-card {
+  background: var(--color-white, #ffffff);
+  border: 1px solid var(--color-light-gray, #e2e8f0);
+  border-radius: var(--radius-lg, 16px);
+  padding: var(--space-6, 1.5rem);
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.08));
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all var(--transition-base, 250ms ease);
+}
+
+.atl-event-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md, 0 4px 16px rgba(0, 0, 0, 0.1));
+  border-color: color-mix(in srgb, var(--color-accent) 50%, var(--color-light-gray));
+}
+
+.atl-event-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(201, 168, 76, 0.15);
+  color: #926a17;
+  font-size: 0.725rem;
+  font-weight: 800;
+  padding: 0.25rem 0.7rem;
+  border-radius: var(--radius-full, 9999px);
+  margin-bottom: var(--space-3, 0.75rem);
+  width: fit-content;
+}
+
+.atl-event-title {
+  font-family: var(--font-sans, "Source Sans 3", sans-serif);
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--color-primary, #0b1e42);
+  line-height: 1.35;
+  margin-bottom: var(--space-3, 0.75rem);
+}
+
+.atl-event-desc {
+  font-size: var(--text-sm, 0.9375rem);
+  line-height: 1.6;
+  color: var(--color-text, #0f172a);
+}
+
+/* --- Leadership & Faculty Grid --- */
+.atl-faculty-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-5, 1.25rem);
+}
+
+.atl-faculty-card {
+  background: var(--color-white, #ffffff);
+  border: 1px solid var(--color-light-gray, #e2e8f0);
+  border-radius: var(--radius-lg, 16px);
+  padding: var(--space-6, 1.5rem);
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.08));
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all var(--transition-base, 250ms ease);
+}
+
+.atl-faculty-card--dean {
+  border: 2px solid var(--color-accent, #c9a84c);
+  background: linear-gradient(135deg, rgba(201, 168, 76, 0.05) 0%, #ffffff 100%);
+  grid-column: 1 / -1;
+}
+
+.atl-faculty-role {
+  font-size: 0.725rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-accent, #c9a84c);
+  margin-bottom: var(--space-1, 0.25rem);
+}
+
+.atl-faculty-name {
+  font-family: var(--font-serif, "Source Serif 4", Georgia, serif);
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--color-primary, #0b1e42);
+  margin: 0 0 var(--space-1, 0.25rem) 0;
+}
+
+.atl-faculty-desig {
+  font-size: var(--text-xs, 0.8125rem);
+  color: var(--color-text-light, #475569);
+  font-weight: 600;
+  margin-bottom: var(--space-3, 0.75rem);
+}
+
+.atl-faculty-contact {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: var(--text-xs, 0.8125rem);
+  margin-top: var(--space-2, 0.5rem);
+  padding-top: var(--space-2, 0.5rem);
+  border-top: 1px solid var(--color-light-gray, #e2e8f0);
+}
+
+.atl-faculty-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--color-primary, #0b1e42);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.atl-faculty-link:hover {
+  color: var(--color-accent, #c9a84c);
+}
+
+/* --- Photo Gallery --- */
+.atl-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-4, 1rem);
+}
+
+.atl-gallery-tile {
+  background: var(--color-white, #ffffff);
+  border: 1px solid var(--color-light-gray, #e2e8f0);
+  border-radius: var(--radius-lg, 16px);
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.08));
+  transition: all var(--transition-base, 250ms ease);
+}
+
+.atl-gallery-tile:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md, 0 4px 16px rgba(0, 0, 0, 0.12));
+  border-color: var(--color-accent, #c9a84c);
+}
+
+.atl-gallery-img-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: #0b1e42;
+}
+
+.atl-gallery-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.atl-gallery-tile:hover .atl-gallery-img {
+  transform: scale(1.05);
+}
+
+.atl-gallery-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(7, 20, 44, 0.35);
+  opacity: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  transition: opacity var(--transition-fast, 150ms ease);
+}
+
+.atl-gallery-tile:hover .atl-gallery-overlay {
+  opacity: 1;
+}
+
+.atl-gallery-caption {
+  padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
+  font-size: var(--text-xs, 0.8125rem);
+  color: var(--color-text-light, #475569);
+  line-height: 1.4;
+  font-weight: 600;
+  background: var(--color-white, #ffffff);
+}
+
+/* --- CTA Section --- */
+.atl-cta-section {
+  background: linear-gradient(135deg, #07142c 0%, #0b1e42 60%, #162f5d 100%);
+  padding: var(--space-16, 4rem) 0;
+  color: var(--color-white, #ffffff);
+  text-align: center;
+}
+
+.atl-cta-title {
+  font-family: var(--font-serif, "Source Serif 4", Georgia, serif);
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+  font-weight: 800;
+  color: var(--color-white, #ffffff);
+  margin-bottom: var(--space-3, 0.75rem);
+}
+
+.atl-cta-desc {
+  font-size: var(--text-base, 1rem);
+  color: rgba(255, 255, 255, 0.85);
+  max-width: 580px;
+  margin: 0 auto var(--space-6, 1.5rem);
+  line-height: 1.6;
+}
+
+.atl-cta-buttons {
+  display: flex;
+  gap: var(--space-4, 1rem);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* --- Lightbox Modal --- */
+.atl-lightbox-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(7, 20, 44, 0.95);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6, 1.5rem);
+}
+
+.atl-lightbox-dialog {
+  position: relative;
+  max-width: 90vw;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.atl-lightbox-img {
+  max-width: 100%;
+  max-height: 75vh;
+  object-fit: contain;
+  border-radius: var(--radius-md, 8px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.atl-lightbox-caption {
+  color: #ffffff;
+  margin-top: var(--space-3, 0.75rem);
+  font-size: var(--text-sm, 0.9375rem);
+  text-align: center;
+  max-width: 600px;
+}
+
+.atl-lightbox-close {
+  position: absolute;
+  top: -45px;
+  right: 0;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast, 150ms ease);
+}
+
+.atl-lightbox-close:hover {
+  background: var(--color-accent, #c9a84c);
+  color: #07142c;
+}
+
+.atl-lightbox-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast, 150ms ease);
+}
+
+.atl-lightbox-btn:hover {
+  background: var(--color-accent, #c9a84c);
+  color: #07142c;
+}
+
+.atl-lightbox-btn--prev {
+  left: -60px;
+}
+
+.atl-lightbox-btn--next {
+  right: -60px;
+}
+
+@media (max-width: 768px) {
+  .atl-lightbox-btn--prev {
+    left: 10px;
+  }
+  .atl-lightbox-btn--next {
+    right: 10px;
+  }
+}
