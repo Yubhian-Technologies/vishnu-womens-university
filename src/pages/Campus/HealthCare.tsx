@@ -53,7 +53,7 @@ export default function HealthCare() {
 
   // Dynamic page title & desc overrides from Firestore if present
   const title = adminItem?.title || 'Health Care';
-  const desc = adminItem?.desc || 'Your health, our priority. Campus Life Healthcare is dedicated to keeping our students healthy, safe and supported — because a healthier campus builds a brighter future.';
+  const desc = adminItem?.desc || 'Accessible healthcare services and medical support for students, faculty and staff on campus.';
 
   const customSections = (adminItem?.customSections || []).filter(hasCustomSectionContent);
 
@@ -105,6 +105,36 @@ export default function HealthCare() {
                 className="hc-hero-img"
               />
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Campus Healthcare Services — overview intro + 4 support-type cards,
+          shown ahead of the detailed facilities/staff table below. */}
+      <section className="hc-section bg-white">
+        <div className="hc-container">
+          <h2 className="hc-section-title" style={{ marginBottom: '1.25rem' }}>Campus Healthcare Services</h2>
+          <div style={{ fontSize: '1.1rem', color: 'var(--color-text)', lineHeight: 1.7, maxWidth: '900px' }}>
+            <p style={{ marginBottom: '1.25rem' }}>
+              Vishnu Women&rsquo;s University provides healthcare support within the campus to address routine medical needs, first aid and other essential health requirements of students, faculty and staff.
+            </p>
+            <p>
+              Campus medical facilities provide access to consultation, basic diagnostic services, first aid, pharmacy support and other healthcare services when required.
+            </p>
+          </div>
+
+          <div style={{ marginTop: '2.5rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(260px, 100%), 1fr))', gap: '1.5rem' }}>
+            {[
+              { title: 'Medical Support', desc: 'Access to consultation and essential healthcare services' },
+              { title: 'First Aid & Emergency Support', desc: 'Assistance for immediate medical needs' },
+              { title: 'On-Campus Facilities', desc: 'Healthcare services located within the University campus' },
+              { title: 'Student & Staff Care', desc: 'Support available to members of the University community' },
+            ].map((card) => (
+              <div key={card.title} style={{ padding: '1.5rem', background: 'var(--color-off-white)', borderRadius: '8px', borderLeft: '4px solid var(--color-primary)' }}>
+                <strong style={{ display: 'block', fontSize: '1.15rem', marginBottom: '0.5rem', color: 'var(--color-heading)' }}>{card.title}</strong>
+                <span style={{ color: 'var(--color-text-light)', lineHeight: 1.6, display: 'block' }}>{card.desc}</span>
+              </div>
+            ))}
           </div>
         </div>
       </section>

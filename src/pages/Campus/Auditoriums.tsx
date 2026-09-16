@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-
+import { Link } from "react-router-dom";
 import SEO from "../../components/SEO/SEO";
 import { usePageBanners } from "../../hooks/usePageBanners";
 import { useContentBlocks } from "../../hooks/useContentBlocks";
@@ -295,10 +295,11 @@ export default function Auditoriums() {
         <section className="aud-gallery-section bg-off-white">
           <div className="container">
             <div className="aud-gallery-header">
-              <span className="section-label">Gallery</span>
+              <h2 className="section-title">Inside Our Auditoriums</h2>
               <p>
-                A closer look at the venues that host VWU&rsquo;s academic,
-                cultural, and institutional life.
+                Explore the venues that host academic programmes, cultural
+                events and student activities at Vishnu Women&rsquo;s
+                University.
               </p>
             </div>
             <div className="aud-collage-grid">
@@ -315,9 +316,27 @@ export default function Auditoriums() {
                 </div>
               ))}
             </div>
+            <div style={{ textAlign: 'center', marginTop: 'var(--space-8)' }}>
+              <Link to="/news-awards/gallery" className="btn btn-outline">View Full Gallery →</Link>
+            </div>
           </div>
         </section>
       )}
+
+      <section style={{ background: 'var(--color-primary)', padding: 'var(--space-14) 0' }}>
+        <div className="container" style={{ textAlign: 'center', color: 'var(--color-white)' }}>
+          <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-2)' }}>
+            Explore More Campus Facilities
+          </h2>
+          <p style={{ fontSize: '1.1rem', opacity: 0.9, maxWidth: '600px', margin: '0 auto var(--space-6)' }}>
+            Discover the spaces and facilities that support learning, collaboration and student life at Vishnu Women&rsquo;s University.
+          </p>
+          <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
+            <Link to="/campus" className="btn btn-accent">Explore Campus Facilities</Link>
+            <Link to="/student-life" className="btn btn-secondary">Discover Student Life</Link>
+          </div>
+        </div>
+      </section>
     </main>
   );
 }

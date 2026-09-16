@@ -306,11 +306,14 @@ export default function Sports() {
           <div className="container">
             <div className="sports-tournaments-header">
               <span className="sports-explore-eyebrow">
-                <Trophy size={14} /> Campus Competitions
+                <Trophy size={14} /> Campus Sports & Competitions
               </span>
               <h2 className="sports-tournaments-title">
-                {settingsDoc?.tournaments?.title || 'COLLEGEWISE TOURNAMENTS'}
+                Sports Events & Competitions
               </h2>
+              <p className="sports-tournaments-subtitle">
+                Explore highlights from campus sports events, team competitions and opportunities that encourage students to participate, compete and grow through sport
+              </p>
             </div>
           </div>
 
@@ -324,13 +327,13 @@ export default function Sports() {
           <div className="container">
             <div className="sports-achievements-header">
               <span className="sports-explore-eyebrow">
-                <Trophy size={14} /> Athletic Excellence
+                <Trophy size={14} /> Student Sports Achievements
               </span>
               <h2 className="sports-achievements-title">
                 {settingsDoc?.achievements?.title || 'HALL OF CHAMPIONS'}
               </h2>
               <p className="sports-achievements-subtitle">
-                CELEBRATING OUR ATHLETIC LEGACY
+                Celebrating the achievements of students and teams who demonstrate skill, commitment and sporting excellence across competitive events.
               </p>
             </div>
 
