@@ -263,38 +263,38 @@ function ResearchSection({
               </button>
             </div>
 
-            {/* Slide */}
-            <div className="dept-research-slide" key={slide}>
-              {/* Photo */}
-              <div className="dept-research-slide-photo">
-                {slideImg ? (
-                  <img src={slideImg} alt={`${deptName} research — ${current.title}`} className="dept-research-slide-img" loading="lazy" />
-                ) : (
-                  <div className="dept-research-slide-placeholder">
-                    <Microscope size={64} strokeWidth={1} style={{ color: '#94a3b8' }} />
-                  </div>
-                )}
-              </div>
-
-              {/* Caption overlay */}
-              <div className="dept-research-slide-caption">
-                <h3 className="dept-research-slide-title">{current.title}</h3>
-                <p className="dept-research-slide-desc">{current.desc}</p>
+            {/* Slides Track */}
+            <div className="dept-research-slides-viewport">
+              <div 
+                className="dept-research-slides-track" 
+                style={{ transform: `translateX(-${slide * 100}%)` }}
+              >
+                {slides.map((s, i) => {
+                  const sImg = s.imageUrl || heroImage;
+                  return (
+                    <div className="dept-research-slide" key={i}>
+                      {/* Photo */}
+                      <div className="dept-research-slide-photo">
+                        {sImg ? (
+                          <img src={sImg} alt={`${deptName} research — ${s.title}`} className="dept-research-slide-img" loading="lazy" />
+                        ) : (
+                          <div className="dept-research-slide-placeholder">
+                            <Microscope size={64} strokeWidth={1} style={{ color: '#94a3b8' }} />
+                          </div>
+                        )}
+                      </div>
+        
+                      {/* Caption overlay */}
+                      <div className="dept-research-slide-caption">
+                        <h3 className="dept-research-slide-title">{s.title}</h3>
+                        <p className="dept-research-slide-desc">{s.desc}</p>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
-            {/* Dot indicators */}
-            <div className="dept-research-dots">
-              {slides.map((_, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => setSlide(i)}
-                  className={`dept-research-dot${i === slide ? ' active' : ''}`}
-                  aria-label={`Go to slide ${i + 1}`}
-                />
-              ))}
-            </div>
           </div>
           )}
 

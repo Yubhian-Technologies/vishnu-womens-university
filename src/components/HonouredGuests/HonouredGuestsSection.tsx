@@ -38,22 +38,6 @@ export default function HonouredGuestsSection() {
     []
   );
 
-  if (people.length === 0) return null;
-
-  const loop = [...people, ...people];
-
-  const getCardStep = () => {
-    const el = trackRef.current;
-    if (!el) return 320;
-    const card = el.querySelector('.eminent-card') as HTMLElement | null;
-    if (card) {
-      const style = getComputedStyle(el);
-      const gap = parseFloat(style.columnGap || style.gap || '12') || 12;
-      return card.offsetWidth + gap;
-    }
-    return 320;
-  };
-
   // One-by-one auto-scroll: advance exactly one card, then pause
   useEffect(() => {
     if (reducedMotion || people.length <= 1) return;
@@ -73,6 +57,22 @@ export default function HonouredGuestsSection() {
 
     return () => clearInterval(timer);
   }, [people.length, isPaused, reducedMotion]);
+
+  if (people.length === 0) return null;
+
+  const loop = [...people, ...people];
+
+  const getCardStep = () => {
+    const el = trackRef.current;
+    if (!el) return 320;
+    const card = el.querySelector('.eminent-card') as HTMLElement | null;
+    if (card) {
+      const style = getComputedStyle(el);
+      const gap = parseFloat(style.columnGap || style.gap || '12') || 12;
+      return card.offsetWidth + gap;
+    }
+    return 320;
+  };
 
   return (
     <section

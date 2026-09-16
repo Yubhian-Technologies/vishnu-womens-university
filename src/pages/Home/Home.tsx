@@ -111,6 +111,35 @@ function useTilt(strength = 12) {
   return { ref, onMouseMove: onMove, onMouseLeave: onLeave };
 }
 
+/* ── Subcomponents ────────────────────────────────────────── */
+function StudyCardItem({ card, photo, color }: { card: ContentBlockDoc; photo?: { src: string; alt: string; caption: string }; color: string }) {
+  const Icon = resolveContentIcon(card.icon) || Laptop;
+  const tilt = useTilt(10);
+  
+  return (
+    <div
+      className="study-card"
+      {...tilt}
+      style={{ '--card-color': color } as React.CSSProperties}
+    >
+      <div className="study-card-image-wrap">
+        {photo && <SmoothImage src={photo.src} alt={photo.alt} className="study-card-image" loading="lazy" decoding="async" />}
+        <div className="study-card-overlay" style={{ background: `linear-gradient(to top, color-mix(in srgb, ${color} 80%, transparent) 0%, transparent 65%)` }} />
+        <div className="study-card-icon"><Icon size={24} strokeWidth={1.75} color="var(--color-primary-dark)" /></div>
+        <div className="study-card-shine" />
+      </div>
+      <div className="study-card-body">
+        <h3 className="study-card-title">{card.title}</h3>
+        <p className="study-card-desc">{card.desc}</p>
+        <Link to={studyCardHref(card)} className="study-card-link">
+          {card.value}
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+        </Link>
+      </div>
+    </div>
+  );
+}
+
 
 
 /* ── Component ────────────────────────────────────────────── */
@@ -165,10 +194,6 @@ export default function Home() {
     return () => observer.disconnect();
   }, []);
 
-  const tilt1 = useTilt(10);
-  const tilt2 = useTilt(10);
-  const tilt3 = useTilt(10);
-  const tilts = [tilt1, tilt2, tilt3];
 
   return (
     <main className="home-page">
@@ -222,32 +247,9 @@ export default function Home() {
           </div>
           <div className="study-grid">
             {studyCards.map((card, i) => {
-              const Icon = resolveContentIcon(card.icon) || Laptop;
               const photo = studyCardPhotos.length > 0 ? studyCardPhotos[i % studyCardPhotos.length] : undefined;
               const color = STUDY_CARD_COLORS[i % STUDY_CARD_COLORS.length];
-              return (
-                <div
-                  key={card.id}
-                  className="study-card"
-                  {...tilts[i]}
-                  style={{ '--card-color': color } as React.CSSProperties}
-                >
-                  <div className="study-card-image-wrap">
-                    {photo && <SmoothImage src={photo.src} alt={photo.alt} className="study-card-image" loading="lazy" decoding="async" />}
-                    <div className="study-card-overlay" style={{ background: `linear-gradient(to top, color-mix(in srgb, ${color} 80%, transparent) 0%, transparent 65%)` }} />
-                    <div className="study-card-icon"><Icon size={24} strokeWidth={1.75} color="var(--color-primary-dark)" /></div>
-                    <div className="study-card-shine" />
-                  </div>
-                  <div className="study-card-body">
-                    <h3 className="study-card-title">{card.title}</h3>
-                    <p className="study-card-desc">{card.desc}</p>
-                    <Link to={studyCardHref(card)} className="study-card-link">
-                      {card.value}
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                    </Link>
-                  </div>
-                </div>
-              );
+              return <StudyCardItem key={card.id} card={card} photo={photo} color={color} />;
             })}
           </div>
         </div>
