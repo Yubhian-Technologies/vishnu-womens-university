@@ -112,7 +112,7 @@ function useTilt(strength = 12) {
 }
 
 /* ── Subcomponents ────────────────────────────────────────── */
-function StudyCardItem({ card, photo, color }: { card: ContentBlockDoc; photo?: { src: string; alt: string; caption: string }; color: string }) {
+function StudyCardItem({ card, photo, color }: { card: ContentBlockDoc; photo?: { src: string; alt: string; caption?: string }; color: string }) {
   const Icon = resolveContentIcon(card.icon) || Laptop;
   const tilt = useTilt(10);
   

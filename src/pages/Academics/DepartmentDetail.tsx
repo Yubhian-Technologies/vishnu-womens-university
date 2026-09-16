@@ -202,7 +202,6 @@ function ResearchSection({
   if (stats.length === 0 && slides.length === 0) return null;
 
   const current = total > 0 ? slides[Math.min(slide, total - 1)] : null;
-  const slideImg = current?.imageUrl || heroImage;
 
   return (
     <section id={id} className="section dept-research-section" aria-labelledby="research-heading" style={{ scrollMarginTop: navOffset }}>
