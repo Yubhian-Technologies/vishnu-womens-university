@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Droplets, Recycle, FlaskConical, Leaf, IndianRupee, CalendarDays,
-  Sparkles, ShieldCheck, Waves, Factory, ArrowRight, Camera
+  Droplets, Recycle, FlaskConical, IndianRupee, CalendarDays,
+  ShieldCheck, Waves, Factory, ArrowRight
 } from 'lucide-react';
 import SEO from '../../components/SEO/SEO';
 import PageHero from '../../components/PageHero/PageHero';
@@ -94,7 +94,6 @@ export default function SewageTreatment() {
         page="campus-sewage-treatment-plants"
         defaultTitle={pageTitle}
         defaultSubtitle="A zero-discharge campus — every drop of sewage generated is treated on site and returned to the land as irrigation for campus and highway greenery."
-        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Campus Life', to: '/campus' }, { label: pageTitle }]}
         hideCta={true}
       />
 
@@ -129,10 +128,6 @@ export default function SewageTreatment() {
       <section className="stp-section stp-vision-section">
         <div className="stp-container">
           <div className="stp-header">
-            <div className="stp-badge">
-              <Leaf size={14} />
-              <span>SUSTAINABLE VISION</span>
-            </div>
             <h2 className="stp-title">
               Water is a Precious <span>Natural Resource</span>
             </h2>
@@ -182,30 +177,22 @@ export default function SewageTreatment() {
               {/* Interleaved Photo Slot 1 & 2 */}
               <div className="stp-vision-sidebar">
                 <div className="stp-media-card">
-                  <img
+                  <img loading="lazy"
                     src={getPhotoSrc(0)}
                     alt="VWU Sewage Treatment Plant View"
                     className="stp-media-img"
                     onError={(e) => { e.currentTarget.src = DEFAULT_PHOTOS[0].src; }}
                   />
-                  <div className="stp-media-badge">
-                    <Camera size={16} />
-                    <span>On-Site 200 KLD MBBR Plant</span>
                   </div>
-                </div>
 
                 <div className="stp-media-card">
-                  <img
+                  <img loading="lazy"
                     src={getPhotoSrc(1)}
                     alt="VWU Sewage Treatment Water Recycling"
                     className="stp-media-img"
                     onError={(e) => { e.currentTarget.src = DEFAULT_PHOTOS[1].src; }}
                   />
-                  <div className="stp-media-badge">
-                    <Sparkles size={16} />
-                    <span>Treated Effluent Distribution</span>
                   </div>
-                </div>
               </div>
             </div>
           </div>
@@ -216,10 +203,6 @@ export default function SewageTreatment() {
       <section className="stp-section stp-dst-section">
         <div className="stp-container">
           <div className="stp-header">
-            <div className="stp-badge">
-              <Sparkles size={14} />
-              <span>DST NEW DELHI FUNDED PROJECT</span>
-            </div>
             <h2 className="stp-title">
               DST-Funded <span>Treatment Plants</span>
             </h2>
@@ -235,17 +218,13 @@ export default function SewageTreatment() {
 
             {/* Interleaved Photo Slot 3 */}
             <div className="stp-media-card">
-              <img
+              <img loading="lazy"
                 src={getPhotoSrc(2)}
                 alt="DST Funded Sewage Treatment Installation"
                 className="stp-media-img"
                 onError={(e) => { e.currentTarget.src = DEFAULT_PHOTOS[2].src; }}
               />
-              <div className="stp-media-badge">
-                <ShieldCheck size={16} />
-                <span>DST Sanctioned Facility • Rs. 170+ Lakh Project</span>
               </div>
-            </div>
           </div>
 
           <div className="stp-spec-grid">
@@ -268,10 +247,6 @@ export default function SewageTreatment() {
       <section className="stp-section stp-method-section">
         <div className="stp-container">
           <div className="stp-header">
-            <div className="stp-badge">
-              <FlaskConical size={14} />
-              <span>ADVANCED CLEAN-TECH METHODOLOGY</span>
-            </div>
             <h2 className="stp-title">
               MBBR Technology <span>with Probiotics</span>
             </h2>
@@ -285,7 +260,7 @@ export default function SewageTreatment() {
               <div className="stp-process-num">01</div>
               {/* Interleaved Photo Slot 4 */}
               <div className="stp-process-img-box">
-                <img
+                <img loading="lazy"
                   src={getPhotoSrc(3)}
                   alt="Zonal Drainage Network"
                   onError={(e) => { e.currentTarget.src = DEFAULT_PHOTOS[0].src; }}
@@ -301,7 +276,7 @@ export default function SewageTreatment() {
               <div className="stp-process-num">02</div>
               {/* Interleaved Photo Slot 5 */}
               <div className="stp-process-img-box">
-                <img
+                <img loading="lazy"
                   src={getPhotoSrc(4)}
                   alt="MBBR Biofilm Reactor"
                   onError={(e) => { e.currentTarget.src = DEFAULT_PHOTOS[1].src; }}
@@ -317,7 +292,7 @@ export default function SewageTreatment() {
               <div className="stp-process-num">03</div>
               {/* Interleaved Photo Slot 6 */}
               <div className="stp-process-img-box">
-                <img
+                <img loading="lazy"
                   src={getPhotoSrc(5)}
                   alt="BIS Quality Water Testing"
                   onError={(e) => { e.currentTarget.src = DEFAULT_PHOTOS[2].src; }}
@@ -336,10 +311,6 @@ export default function SewageTreatment() {
       <section className="stp-section stp-impact-section">
         <div className="stp-container">
           <div className="stp-header">
-            <div className="stp-badge">
-              <Leaf size={14} />
-              <span>ENVIRONMENTAL IMPACT</span>
-            </div>
             <h2 className="stp-title">
               Treated Water, <span>Put Back to Work</span>
             </h2>
@@ -352,7 +323,7 @@ export default function SewageTreatment() {
             <div className="stp-impact-media-card">
               {/* Interleaved Photo Slot 7 */}
               <div className="stp-impact-img-box">
-                <img
+                <img loading="lazy"
                   src={getPhotoSrc(6)}
                   alt="Campus Greenery Irrigation"
                   onError={(e) => { e.currentTarget.src = DEFAULT_PHOTOS[0].src; }}
@@ -370,7 +341,7 @@ export default function SewageTreatment() {
             <div className="stp-impact-media-card">
               {/* Interleaved Photo Slot 8 */}
               <div className="stp-impact-img-box">
-                <img
+                <img loading="lazy"
                   src={getPhotoSrc(7)}
                   alt="2.5 KM Adopted Highway Greenery"
                   onError={(e) => { e.currentTarget.src = DEFAULT_PHOTOS[1].src; }}

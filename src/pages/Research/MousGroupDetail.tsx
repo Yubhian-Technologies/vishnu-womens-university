@@ -64,7 +64,7 @@ export default function MousGroupDetail() {
                 <>
                   <span className="pb-grid-logo">
                     {p.imageUrl ? (
-                      <img src={p.imageUrl} alt={p.label} />
+                      <img loading="lazy" src={p.imageUrl} alt={p.label} />
                     ) : (
                       <span className="pb-grid-logo-fallback">{p.label}</span>
                     )}

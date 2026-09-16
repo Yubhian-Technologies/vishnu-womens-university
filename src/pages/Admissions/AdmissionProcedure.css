@@ -85,7 +85,8 @@
   font-size: var(--text-base);
   font-weight: 700;
   color: var(--color-text-light);
-  padding: var(--space-3) 0;
+  min-height: 44px;
+  padding: 0.75rem 0;
   margin-bottom: -2px;
   border-bottom: 2px solid transparent;
   transition: color var(--transition-fast), border-color var(--transition-fast);
@@ -144,7 +145,8 @@
   font-family: var(--font-sans);
   font-size: var(--text-sm);
   font-weight: 700;
-  padding: var(--space-2) var(--space-5);
+  min-height: 44px;
+  padding: 0.65rem 1.25rem;
   border-radius: var(--radius-full);
   border: 1.5px solid var(--color-light-gray);
   background: var(--color-white);
@@ -431,13 +433,17 @@
     gap: var(--space-3);
   }
   .ap-track__step:not(:last-child)::after {
-    top: 34px;
-    left: 16px;
+    top: 44px;
+    left: 21px;
     width: 2px;
-    height: calc(100% + var(--space-4) - 34px);
+    height: calc(100% + var(--space-4) - 44px);
   }
   .ap-track__name {
     max-width: none;
+  }
+  .ap-track__num {
+    width: 44px;
+    height: 44px;
   }
 
   .ap-docs__grid {

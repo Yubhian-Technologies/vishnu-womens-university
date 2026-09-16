@@ -60,7 +60,7 @@ function ZoomPreview({ url, alt, onClose }: { url: string; alt: string; onClose:
       >
         <X size={18} />
       </button>
-      <img
+      <img loading="lazy"
         src={url}
         alt={alt}
         onClick={(e) => e.stopPropagation()}
@@ -118,7 +118,7 @@ export default function PhotoCarouselStrip({ cards, pixelsPerSecond = 60 }: Prop
 
   const renderCard = (card: PhotoCarouselCard, key: string) => (
     <div key={key} style={{ flex: `0 0 ${CARD_WIDTH}px`, marginRight: 'var(--space-5)' }}>
-      <img
+      <img loading="lazy"
         src={card.imageUrl}
         alt={card.name || 'Photo'}
         onClick={() => setZoomed({ url: card.imageUrl, alt: card.name || 'Photo' })}

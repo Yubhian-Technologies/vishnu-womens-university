@@ -19,7 +19,7 @@ interface PageHeroProps {
   defaultImage?: string;
   defaultTitle: string;
   defaultSubtitle?: string;
-  breadcrumb: BreadcrumbItem[];
+  breadcrumb?: BreadcrumbItem[];
   size?: 'large' | 'medium' | 'small';
   /** When set, the CTA button scrolls to this element id instead of following ctaLink. */
   scrollCtaTargetId?: string;
@@ -148,9 +148,11 @@ export default function PageHero({
 
   const textMarkup = (
     <>
-      <div className="breadcrumb animate-fade-in">
-        <Breadcrumbs items={breadcrumb} />
-      </div>
+      {breadcrumb && breadcrumb.length > 0 && (
+        <div className="breadcrumb animate-fade-in">
+          <Breadcrumbs items={breadcrumb} />
+        </div>
+      )}
 
       {showText && (
         <>

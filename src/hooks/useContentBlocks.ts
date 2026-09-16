@@ -70,5 +70,9 @@ const DEFAULT_EAPCET_CODE = 'VISW, VISWPU';
 export function useEapcetCode(): string {
   const stats = useContentBlocks('admission-procedure', 'stats');
   const item = stats.find((s) => (s.title || '').toLowerCase().includes('eapcet'));
-  return item?.value || DEFAULT_EAPCET_CODE;
+  const value = item?.value || DEFAULT_EAPCET_CODE;
+  // Normalize comma spacing regardless of how the admin typed it (e.g.
+  // "VISW,VISWPU" with no space) — this is quoted verbatim in several
+  // places across the site, so fixing it here fixes every one of them.
+  return value.replace(/,\s*/g, ', ');
 }

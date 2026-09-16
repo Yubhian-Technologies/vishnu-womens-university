@@ -32,6 +32,7 @@ import '../gsac-shared.css';
 // heading without renaming the page everywhere.
 const ABOUT_TITLE_OVERRIDES: Record<string, string> = {
   'placement-details': 'Placement Cell',
+  'higher-education': 'Preparing for the Next Academic Step',
 };
 
 // GSAC's "Global Opportunities" stat row — shown when an admin hasn't
@@ -96,26 +97,14 @@ The Cell focuses on improving employability, industry readiness, and overall pro
 **Scope of Activities:** The Cell organizes on-campus and off-campus recruitment drives, coordinates internships and industry interaction programs, conducts aptitude, technical, communication, soft-skills, and career guidance programs, organizes mock interviews, pre-placement talks, and placement preparation activities, and maintains and publishes placement statistics, reports, and recruitment trends.
 
 **Stakeholders:** Students (UG and PG across all disciplines), Corporate Recruiters and Industry Partners, Parents and Guardians, Faculty and University Leadership, Alumni, and Regulatory and Accreditation Bodies.`,
-  'gsac': `Students who aspire to travel abroad for higher studies usually approach consulting firms and spend a lot of their time and money in understanding the destinations, universities and courses abroad. In an attempt to support such students of SVES institutions, Graduate Study Abroad Center (GSAC) is formed. It guides and gives necessary support to the students and their parents to find the right destination, university and course to fulfil their dream of studying abroad.
+  'gsac': `The Graduate Study Abroad Center (GSAC) supports students pursuing higher education abroad through structured, institution-backed guidance at no additional cost. Students receive support in choosing courses, universities and study destinations aligned with their academic profile and career goals.
 
-GSAC has been initiated to make the students self-reliant, after observing a segment of students who need that hand holding in terms of GRE/TOEFL/IELTS training and application processing. It also supports the students who receive their admit cards and Visa by connecting them with the alumni there so that they would have the confidence and someone whom they know before reaching.
+GSAC provides guidance across the study-abroad journey, including GRE, TOEFL and IELTS preparation, university applications, scholarships, education loan facilitation, pre-departure support and alumni connections abroad.
 
-Centralized GSAC Cell operates from SVES Head Office having it's SPOCs at each of SVES Institutions.
+The Centre operates from the SVES Head Office, with designated Single Points of Contact (SPOCs) across participating SVES institutions.`,
+  'higher-education': `VWU encourages students to consider higher studies as part of their long-term academic and professional development. Opportunities include postgraduate programmes, doctoral research and preparation for competitive examinations.
 
-**Services Offered:**
-
-- **Counselling:** GSAC spoc at the respective colleges will guide the students with different courses that they could pursue in different locations depending on the students profile.
-- **Student Loans:** GSAC helps students to get education loans through its associated bankers.
-- **Scholarships:** GSAC would help the students with details on the scholarship availability and also support them in applying for the same.
-- **Pre Departure Grooming Programs:** GSAC conducts orientation programs for the students travelling to different countries. The programs could be on culture and people there, money management abroad, safety and security measures, talking to women there etc.
-
-**Destinations:**
-
-USA, Canada, UK, China, Germany, Australia, Spain
-
-**Contact Details:**
-
-Mrs. P. Prasanthi, Asst. Professor — Email: [jprasanthi@svecw.edu.in](mailto:jprasanthi@svecw.edu.in) — Phone: [9440111470](tel:9440111470)`,
+Students can pursue advanced study at VWU or explore higher education opportunities at universities in India and abroad.`
 };
 
 // Hero subtitle fallback, shown only when the CMS's own Short Description
@@ -240,7 +229,7 @@ function PartnerLogo({ name, uploadedUrl }: { name: string; uploadedUrl?: string
           {name.charAt(0)}
         </span>
       ) : (
-        <img
+        <img loading="lazy"
           src={logoOverride || `https://www.google.com/s2/favicons?domain=${domain}&sz=128`}
           alt={name}
           className="partner-logo-img"
@@ -419,8 +408,9 @@ function HigherEducationAccordion() {
                 )}
 
                 {rows.length > 0 ? (
-                  <div style={{ overflowX: 'auto' }}>
+                  <div role="region" aria-label={section.title || 'University list'} tabIndex={0} style={{ overflow: 'auto', overflowX: 'auto' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm)' }}>
+                      <caption style={{ position: 'absolute', width: 1, height: 1, padding: 0, margin: -1, overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', border: 0 }}>{section.title || 'University list'}</caption>
                       <tbody>
                         {rows.map((row, ri) => (
                           <tr key={ri} style={{ background: ri % 2 === 0 ? 'var(--color-off-white)' : 'transparent' }}>
@@ -753,7 +743,7 @@ function BatchTrendChart({ data }: { data: PlacementYear[] }) {
   const lpaPts = rows.map((r, i) => ({ x: xLine(i), y: yLpa(r.highest) }));
 
   return (
-    <div style={{ marginTop: 'var(--space-8)', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 'var(--space-5)' }}>
+    <div style={{ marginTop: 'var(--space-8)', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(300px, 100%), 1fr))', gap: 'var(--space-5)' }}>
       {/* Number of offers — bar chart */}
       <div style={cardStyle}>
         <div style={titleStyle}>Number of offers</div>
@@ -914,7 +904,7 @@ function TeamRosterRow({
             </div>
           ) : bio ? (
             <div style={{ display: 'flex', gap: 'var(--space-5)', flexWrap: 'wrap' }}>
-              <img
+              <img loading="lazy"
                 src={tpoPhotoMap.get(row.name) || PHOTO_NEEDED_PLACEHOLDER}
                 alt={row.name}
                 style={{ width: 160, height: 190, objectFit: 'cover', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-light-gray)', flexShrink: 0 }}
@@ -987,7 +977,7 @@ function TeamRosterRow({
               {((iloPhotoMap?.get(row.name)) || []).length > 0 && (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 'var(--space-3)' }}>
                   {((iloPhotoMap?.get(row.name)) || []).map((p, pi) => (
-                    <img
+                    <img loading="lazy"
                       key={p.path || pi}
                       src={p.url}
                       alt={`${row.name} office ${pi + 1}`}
@@ -1421,7 +1411,7 @@ export default function PlacementDetail() {
   // Recruiters drops it per request — the recruiter logo grid below is the
   // page's actual point, and Outcomes was just repeating the Overview text.
   const activeOutcomes = (item.outcomes || []).filter((o) => !o.includes('2015-2019') && !o.includes('2015–2019'));
-  const showOutcomes = activeOutcomes.length > 0 && item.slug !== 'placement-highlights' && item.slug !== 'our-recruiters' && item.slug !== 'tpo-team' && item.slug !== 'industry-liaison-offices' && item.slug !== 'gsac';
+  const showOutcomes = activeOutcomes.length > 0 && item.slug !== 'placement-highlights' && item.slug !== 'our-recruiters' && item.slug !== 'tpo-team' && item.slug !== 'industry-liaison-offices' && item.slug !== 'career-guidance-cell' && item.slug !== 'gsac';
   // Shared markup for the below-Overview spot every non-Placement-Cell page
   // uses. Placement Cell renders its own combined Summary+chart block near
   // the hero instead (see placementCellSummarySection below) — it needs the
@@ -1540,9 +1530,14 @@ export default function PlacementDetail() {
                   <Icon size={14} /> Placements & Careers
                 </div>
               )}
-              <h1 className="dept-hero-title">{item.title}</h1>
-              {(item.desc || HERO_SUBTITLE_OVERRIDES[item.slug]) && (
-                <p className="dept-hero-subtitle">{item.desc || HERO_SUBTITLE_OVERRIDES[item.slug]}</p>
+              <h1 className="dept-hero-title">{item.slug === 'gsac' ? 'Graduate Study Abroad Center – GSAC' : item.title}</h1>
+              {(item.desc || HERO_SUBTITLE_OVERRIDES[item.slug] || item.slug === 'gsac' || item.slug === 'career-guidance-cell' || item.slug === 'higher-education') && (
+                <p className="dept-hero-subtitle">
+                  {item.slug === 'gsac' ? 'Guidance and support for students exploring postgraduate study opportunities around the world.' :
+                   item.slug === 'career-guidance-cell' ? 'Helping students explore career pathways, higher studies and competitive examinations through structured guidance and preparation.' :
+                   item.slug === 'higher-education' ? 'Pathways and academic support for students planning postgraduate study, research and advanced learning.' :
+                   item.desc || HERO_SUBTITLE_OVERRIDES[item.slug]}
+                </p>
               )}
 
             </div>
@@ -1590,6 +1585,39 @@ export default function PlacementDetail() {
                 <p className={item.slug === 'gsac' ? 'gsac-body-card' : undefined} style={item.slug === 'gsac' ? undefined : { fontSize: 'var(--text-lg)', color: 'var(--color-text)', lineHeight: 1.75 }}>
                   {item.desc}
                 </p>
+              )}
+
+              {/* Career Pathways — Career Guidance Cell specifically */}
+              {item.slug === 'career-guidance-cell' && !hasBodyOverride && (
+                <div style={{ marginTop: 'var(--space-8)', marginBottom: 'var(--space-8)' }}>
+                  <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.75rem', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-accent)', margin: '0 0 0.5rem' }}>
+                    CAREER PATHWAYS
+                  </p>
+                  <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.5rem', fontWeight: 700, color: 'var(--color-primary)', margin: '0 0 1.5rem' }}>
+                    Explore Your Next Step
+                  </h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+                    <div style={{ background: 'var(--color-off-white)', padding: 'var(--space-5)', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-light-gray)' }}>
+                      <h4 style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>Career & Placement Preparation</h4>
+                      <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6, marginBottom: 'var(--space-3)' }}>Guidance on career planning, interview readiness, communication and professional development.</p>
+                      <Link to="/placements" style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-primary)', textDecoration: 'none' }}>Explore Placement Support &rarr;</Link>
+                    </div>
+                    <div style={{ background: 'var(--color-off-white)', padding: 'var(--space-5)', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-light-gray)' }}>
+                      <h4 style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>Higher Studies</h4>
+                      <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6, marginBottom: 'var(--space-3)' }}>Support for students considering postgraduate programmes, research and relevant entrance examinations.</p>
+                      <Link to="/placements/higher-education" style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-primary)', textDecoration: 'none' }}>Explore Higher Studies &rarr;</Link>
+                    </div>
+                    <div style={{ background: 'var(--color-off-white)', padding: 'var(--space-5)', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-light-gray)' }}>
+                      <h4 style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>Study Abroad</h4>
+                      <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6, marginBottom: 'var(--space-3)' }}>Students planning international postgraduate study can access dedicated guidance through the Graduate Study Abroad Center.</p>
+                      <Link to="/placements/gsac" style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-primary)', textDecoration: 'none' }}>Explore GSAC &rarr;</Link>
+                    </div>
+                    <div style={{ background: 'var(--color-off-white)', padding: 'var(--space-5)', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-light-gray)' }}>
+                      <h4 style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>Competitive Examinations</h4>
+                      <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6, marginBottom: 0 }}>Preparation and guidance are available for selected national-level competitive and public-service examinations.</p>
+                    </div>
+                  </div>
+                </div>
               )}
 
               {/* Career Guidance Cell — higher-studies / competitive-exam
@@ -1646,7 +1674,7 @@ export default function PlacementDetail() {
             ) : item.slug === 'gsac' ? (
               <div className="detail-sidebar">
                 <div className="gsac-globe-card">
-                  <img src="/images/dot world map.webp" alt="" aria-hidden="true" className="gsac-globe-map" />
+                  <img loading="lazy" src="/images/dot world map.webp" alt="" aria-hidden="true" className="gsac-globe-map" />
                   <h3 className="gsac-globe-title">Global<br />Opportunities<br />Brighter Futures</h3>
                   <div className="gsac-globe-divider" aria-hidden="true" />
                   <div className="gsac-globe-stats">
@@ -1661,7 +1689,7 @@ export default function PlacementDetail() {
               </div>
             ) : item.slug === 'higher-education' ? (
               <div className="detail-sidebar">
-                <div style={{ position: 'sticky', top: '110px' }}>
+                <div style={{ position: 'sticky', top: '110px', display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
                   <SidebarImageCarousel
                     images={[
                       '/images/placements/global-universities.jpg',
@@ -1669,6 +1697,57 @@ export default function PlacementDetail() {
                     ]}
                     alt="Higher Education partnerships and collaborations"
                   />
+
+                  {/* Student Progression — eyebrow/heading/sub-blurb card,
+                      same pattern as the Placement Support card further down
+                      this file. Purely informational copy; no admin field
+                      backs it since Higher Education has no per-slug CMS
+                      body beyond item.intro. */}
+                  <div style={{
+                    padding: 'var(--space-6)',
+                    background: 'var(--color-off-white)',
+                    borderRadius: 'var(--radius-md)',
+                    border: '1px solid var(--color-light-gray)',
+                  }}>
+                    <p style={{
+                      fontFamily: 'var(--font-sans)',
+                      fontSize: '0.75rem',
+                      fontWeight: 800,
+                      letterSpacing: '0.12em',
+                      textTransform: 'uppercase',
+                      color: 'var(--color-accent)',
+                      margin: '0 0 0.5rem',
+                    }}>
+                      Higher Studies
+                    </p>
+                    <h3 style={{
+                      fontFamily: 'var(--font-serif)',
+                      fontSize: 'clamp(1.15rem, 2.2vw, 1.5rem)',
+                      fontWeight: 600,
+                      color: 'var(--color-primary)',
+                      margin: '0 0 1rem',
+                    }}>
+                      Student Progression
+                    </h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+                      <div>
+                        <p style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-text)', margin: '0 0 0.35rem' }}>
+                          International Higher Studies
+                        </p>
+                        <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.7, margin: 0 }}>
+                          Students have progressed to postgraduate study at universities across international destinations.
+                        </p>
+                      </div>
+                      <div>
+                        <p style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-text)', margin: '0 0 0.35rem' }}>
+                          GATE Preparation
+                        </p>
+                        <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.7, margin: 0 }}>
+                          Structured GATE preparation supports students pursuing postgraduate engineering opportunities.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             ) : item.highlights && item.highlights.length > 0 && (
@@ -1706,7 +1785,7 @@ export default function PlacementDetail() {
       {skipOverviewSection && item.slug === 'employability-skills' && item.highlights && item.highlights.length > 0 && (
         <section className="section bg-white" style={{ paddingBottom: 'var(--space-6)' }}>
           <div className="container">
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--space-4)' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))', gap: 'var(--space-4)' }}>
               {item.highlights.map((h) => (
                 <div key={h} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-3)', background: 'var(--color-off-white)', border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4) var(--space-5)' }}>
                   <span style={{ width: 22, height: 22, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
@@ -1720,11 +1799,229 @@ export default function PlacementDetail() {
         </section>
       )}
 
+      {/* Study at VWU Section */}
+      {item.slug === 'higher-education' && (
+        <section className="section bg-white" style={{ paddingTop: 'var(--space-6)' }}>
+          <div className="container">
+            <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-6)' }}>STUDY AT VWU<br/><span style={{ fontSize: 'var(--text-lg)', fontWeight: 400, color: 'var(--color-text-light)' }}>Postgraduate & Doctoral Programmes</span></h2>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(300px, 100%), 1fr))', gap: 'var(--space-5)' }}>
+              <div style={{ padding: 'var(--space-6)', background: 'var(--color-off-white)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-light-gray)' }}>
+                <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>Postgraduate Programmes</h3>
+                <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6, marginBottom: 'var(--space-4)' }}>VWU offers postgraduate programmes in Computer Science & Engineering, VLSI Design, Power Electronics and Software Engineering, along with an MBA programme.</p>
+                <Link to="/academics/pg" style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-primary)', textDecoration: 'none' }}>Explore Postgraduate Programmes &rarr;</Link>
+              </div>
+              <div style={{ padding: 'var(--space-6)', background: 'var(--color-off-white)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-light-gray)' }}>
+                <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>Doctoral Programmes</h3>
+                <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6, marginBottom: 'var(--space-4)' }}>Doctoral research opportunities are available in CSE, ECE and EEE, supported by specialised academic and research facilities.</p>
+                <Link to="/academics/doctoral" style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-primary)', textDecoration: 'none' }}>Explore Doctoral Programmes &rarr;</Link>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Higher Studies Preparation */}
+      {item.slug === 'higher-education' && (
+        <section className="section bg-white" style={{ paddingTop: 'var(--space-6)' }}>
+          <div className="container">
+            <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-4)' }}>HIGHER STUDIES PREPARATION<br/><span style={{ fontSize: 'var(--text-lg)', fontWeight: 400, color: 'var(--color-text-light)' }}>Preparing for Competitive Examinations</span></h2>
+            <p style={{ fontSize: 'var(--text-lg)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-6)' }}>
+              Students planning postgraduate study can access structured academic support for relevant competitive examinations.
+            </p>
+            <div style={{ padding: 'var(--space-6)', background: 'var(--color-off-white)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-light-gray)' }}>
+              <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>GATE Preparation</h3>
+              <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6, marginBottom: 'var(--space-4)' }}>Focused preparation supports students pursuing postgraduate engineering programmes and research pathways through GATE.</p>
+              <Link to="/placements/career-guidance-cell" style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-primary)', textDecoration: 'none' }}>Explore GATE Support &rarr;</Link>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* University list accordion — only on the Higher Education sub-page */}
       {item.slug === 'higher-education' && (
         <section className="section bg-white" style={{ paddingTop: 'var(--space-6)' }}>
           <div className="container">
+            <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-4)' }}>GLOBAL ACADEMIC PATHWAYS<br/><span style={{ fontSize: 'var(--text-lg)', fontWeight: 400, color: 'var(--color-text-light)' }}>Explore Universities by Destination</span></h2>
+            <p style={{ fontSize: 'var(--text-lg)', color: 'var(--color-text)', lineHeight: 1.75, marginBottom: 'var(--space-6)' }}>
+              Students considering postgraduate study abroad can browse universities across different study destinations as a starting point for their higher-studies research.<br/>
+              <span style={{ fontSize: 'var(--text-base)', fontWeight: 600, display: 'inline-block', marginTop: 'var(--space-3)' }}>USA | UK | Canada | Australia | Japan</span>
+            </p>
             <HigherEducationAccordion />
+          </div>
+        </section>
+      )}
+
+      {/* International Study Support CTA */}
+      {item.slug === 'higher-education' && (
+        <section className="section bg-white" style={{ paddingTop: 'var(--space-6)' }}>
+          <div className="container">
+            <div style={{ padding: 'var(--space-8)', background: 'var(--color-off-white)', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-light-gray)', textAlign: 'center' }}>
+              <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.75rem', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-accent)', margin: '0 0 0.5rem' }}>
+                INTERNATIONAL STUDY SUPPORT
+              </p>
+              <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(1.25rem, 2.5vw, 1.75rem)', fontWeight: 600, color: 'var(--color-primary)', margin: '0 0 0.75rem' }}>
+                Considering Higher Studies Abroad?
+              </h3>
+              <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', margin: '0 auto 1.5rem', maxWidth: 600, lineHeight: 1.6 }}>
+                Students planning postgraduate education overseas can access dedicated guidance through the Graduate Study Abroad Center (GSAC).
+              </p>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-4)', flexWrap: 'wrap' }}>
+                <Link to="/placements/gsac" className="btn btn-primary" style={{ padding: '0.75rem 1.5rem' }}>
+                  Explore GSAC &rarr;
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* GSAC Support Section */}
+      {item.slug === 'gsac' && (
+        <section className="section bg-white" style={{ paddingTop: 'var(--space-6)' }}>
+          <div className="container">
+            <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-6)' }}>GSAC SUPPORT<br/><span style={{ fontSize: 'var(--text-lg)', fontWeight: 400, color: 'var(--color-text-light)' }}>Support Across the Study-Abroad Journey</span></h2>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(300px, 100%), 1fr))', gap: 'var(--space-5)' }}>
+              {[
+                {
+                  title: 'University & Programme Guidance',
+                  desc: 'Support in identifying universities and programmes aligned with academic interests and career plans.'
+                },
+                {
+                  title: 'Test Preparation',
+                  desc: 'Guidance and preparation support for examinations such as GRE, TOEFL and IELTS.'
+                },
+                {
+                  title: 'Applications & Scholarships',
+                  desc: 'Assistance with university applications and available scholarship opportunities.'
+                },
+                {
+                  title: 'Financial Guidance',
+                  desc: 'Information and support related to education financing and partner-bank processes.'
+                },
+                {
+                  title: 'Pre-Departure Preparation',
+                  desc: 'Guidance on cultural adjustment, financial planning, safety and preparing for life in a new country.'
+                },
+                {
+                  title: 'Alumni Connect',
+                  desc: 'Opportunities to connect with VWU alumni studying or working in destination countries.'
+                }
+              ].map((s) => (
+                <div key={s.title} style={{ padding: 'var(--space-6)', background: 'var(--color-off-white)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-light-gray)' }}>
+                  <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: 'var(--space-3)' }}>{s.title}</h3>
+                  <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', lineHeight: 1.6, margin: 0 }}>{s.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* GSAC Student Support (Impact) Section */}
+      {item.slug === 'gsac' && (
+        <section className="section bg-white" style={{ paddingTop: 'var(--space-6)' }}>
+          <div className="container">
+            <div style={{ background: 'var(--color-primary-light)', padding: 'var(--space-8)', borderRadius: 'var(--radius-lg)', color: 'var(--color-white)' }}>
+              <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.75rem', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.7)', margin: '0 0 0.5rem' }}>
+                STUDENT SUPPORT
+              </p>
+              <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(1.5rem, 3vw, 2rem)', fontWeight: 600, color: 'var(--color-white)', margin: '0 0 1.5rem' }}>
+                Beyond the Application
+              </h2>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))', gap: 'var(--space-6)' }}>
+                <div>
+                  <h3 style={{ fontSize: 'var(--text-base)', fontWeight: 700, marginBottom: 'var(--space-2)' }}>Application Guidance</h3>
+                  <p style={{ fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.9)', lineHeight: 1.6 }}>Students receive structured support through different stages of international university applications.</p>
+                </div>
+                <div>
+                  <h3 style={{ fontSize: 'var(--text-base)', fontWeight: 700, marginBottom: 'var(--space-2)' }}>Destination Support</h3>
+                  <p style={{ fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.9)', lineHeight: 1.6 }}>Admitted students can connect with alumni who have experience studying or working abroad.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* GSAC CTA Section */}
+      {item.slug === 'gsac' && (
+        <section className="section bg-white" style={{ paddingTop: 'var(--space-6)' }}>
+          <div className="container">
+            <div style={{ padding: 'var(--space-8)', background: 'var(--color-off-white)', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-light-gray)', textAlign: 'center' }}>
+              <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.75rem', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-accent)', margin: '0 0 0.5rem' }}>
+                HIGHER STUDIES
+              </p>
+              <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(1.25rem, 2.5vw, 1.75rem)', fontWeight: 600, color: 'var(--color-primary)', margin: '0 0 0.75rem' }}>
+                Planning to Study Abroad?
+              </h3>
+              <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', margin: '0 auto 1.5rem', maxWidth: 600, lineHeight: 1.6 }}>
+                Explore the guidance available through GSAC or connect with the team to understand your next steps.
+              </p>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-4)', flexWrap: 'wrap' }}>
+                <Link to="/placements/higher-education" className="btn btn-primary" style={{ padding: '0.75rem 1.5rem' }}>
+                  Explore Higher Studies Support &rarr;
+                </Link>
+                <Link to="/contact" className="btn btn-outline" style={{ padding: '0.75rem 1.5rem' }}>
+                  Contact GSAC &rarr;
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Career Guidance Cell Student Support (Impact) Section */}
+      {item.slug === 'career-guidance-cell' && (
+        <section className="section bg-white" style={{ paddingTop: 'var(--space-6)' }}>
+          <div className="container">
+            <div style={{ background: 'var(--color-primary-light)', padding: 'var(--space-8)', borderRadius: 'var(--radius-lg)', color: 'var(--color-white)' }}>
+              <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.75rem', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.7)', margin: '0 0 0.5rem' }}>
+                STUDENT SUPPORT
+              </p>
+              <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(1.5rem, 3vw, 2rem)', fontWeight: 600, color: 'var(--color-white)', margin: '0 0 1.5rem' }}>
+                Pathways We Support
+              </h2>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))', gap: 'var(--space-6)' }}>
+                <div>
+                  <h3 style={{ fontSize: 'var(--text-base)', fontWeight: 700, marginBottom: 'var(--space-2)' }}>Postgraduate Preparation</h3>
+                  <p style={{ fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.9)', lineHeight: 1.6 }}>Structured guidance supports students preparing for postgraduate entrance examinations and higher-study pathways.</p>
+                </div>
+                <div>
+                  <h3 style={{ fontSize: 'var(--text-base)', fontWeight: 700, marginBottom: 'var(--space-2)' }}>International Higher Studies</h3>
+                  <p style={{ fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.9)', lineHeight: 1.6 }}>Students considering international postgraduate education can access test preparation and dedicated study-abroad guidance through GSAC.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Career Guidance Cell CTA Section */}
+      {item.slug === 'career-guidance-cell' && (
+        <section className="section bg-white" style={{ paddingTop: 'var(--space-6)' }}>
+          <div className="container">
+            <div style={{ padding: 'var(--space-8)', background: 'var(--color-off-white)', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-light-gray)', textAlign: 'center' }}>
+              <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.75rem', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-accent)', margin: '0 0 0.5rem' }}>
+                NEXT STEPS
+              </p>
+              <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(1.25rem, 2.5vw, 1.75rem)', fontWeight: 600, color: 'var(--color-primary)', margin: '0 0 0.75rem' }}>
+                Find the Right Path Forward
+              </h3>
+              <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', margin: '0 auto 1.5rem', maxWidth: 600, lineHeight: 1.6 }}>
+                Explore the guidance and support available for careers, higher studies and competitive examinations.
+              </p>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-4)', flexWrap: 'wrap' }}>
+                <Link to="/placements/higher-education" className="btn btn-primary" style={{ padding: '0.75rem 1.5rem' }}>
+                  Explore Higher Studies &rarr;
+                </Link>
+                <Link to="/placements/gsac" className="btn btn-outline" style={{ padding: '0.75rem 1.5rem' }}>
+                  Explore GSAC &rarr;
+                </Link>
+                <Link to="/placements" className="btn btn-outline" style={{ padding: '0.75rem 1.5rem', border: 'none', background: 'transparent' }}>
+                  Back to Placements & Careers &rarr;
+                </Link>
+              </div>
+            </div>
           </div>
         </section>
       )}
@@ -1893,7 +2190,7 @@ export default function PlacementDetail() {
             <div style={{ marginBottom: 'var(--space-8)' }}>
               <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Congratulations to Our Placed Students</h2>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--space-5)' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))', gap: 'var(--space-5)' }}>
               {successStories.map((s) => (
                 <a
                   key={s.studentName}
@@ -2013,14 +2310,15 @@ export default function PlacementDetail() {
                     <span>entries</span>
                   </div>
                 )}
-                <div style={{ overflowX: 'auto' }}>
+                <div role="region" aria-label="List of Internships" tabIndex={0} style={{ overflow: 'auto', overflowX: 'auto' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm)' }}>
+                    <caption style={{ position: 'absolute', width: 1, height: 1, padding: 0, margin: -1, overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', border: 0 }}>List of Internships</caption>
                     <thead>
                       <tr style={{ background: 'var(--color-accent)' }}>
-                        <th style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900, whiteSpace: 'nowrap' }}>S.No</th>
-                        <th style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900 }}>Company Name</th>
-                        <th style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900, whiteSpace: 'nowrap' }}>Stipend/Month</th>
-                        <th style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900, whiteSpace: 'nowrap' }}>No. of Selects</th>
+                        <th scope="col" style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900, whiteSpace: 'nowrap', position: 'sticky', top: 0, zIndex: 1, background: 'var(--color-accent)' }}>S.No</th>
+                        <th scope="col" style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900, position: 'sticky', top: 0, zIndex: 1, background: 'var(--color-accent)' }}>Company Name</th>
+                        <th scope="col" style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900, whiteSpace: 'nowrap', position: 'sticky', top: 0, zIndex: 1, background: 'var(--color-accent)' }}>Stipend/Month</th>
+                        <th scope="col" style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', color: 'var(--color-primary-dark)', fontWeight: 900, whiteSpace: 'nowrap', position: 'sticky', top: 0, zIndex: 1, background: 'var(--color-accent)' }}>No. of Selects</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -2202,13 +2500,15 @@ export default function PlacementDetail() {
             </div>
           ) : (
             <div>
-              <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>
-                Explore More Placement Resources
+              <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-3)' }}>
+                Continue Your Career Preparation
               </h2>
+              <p style={{ color: 'rgba(255,255,255,0.75)', maxWidth: 520, margin: '0 auto var(--space-6)', lineHeight: 1.7 }}>
+                Explore placement guidance, career preparation and the team supporting campus recruitment at VWU.
+              </p>
               <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
-                <Link to="/placements/placement-highlights" className="btn btn-accent">Placement Highlights →</Link>
-                <Link to="/placements/our-recruiters" className="btn btn-secondary">Our Recruiters →</Link>
-                <Link to="/placements" className="btn btn-secondary">Back to Placements →</Link>
+                <Link to="/placements" className="btn btn-accent">Explore Placements →</Link>
+                <Link to="/placements/tpo-team" className="btn btn-secondary">Meet the Placement Team →</Link>
               </div>
             </div>
           )}

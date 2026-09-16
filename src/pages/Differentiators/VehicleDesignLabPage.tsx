@@ -92,7 +92,7 @@ export default function VehicleDesignLabPage({ sections }: VehicleDesignLabPageP
     const photo = galleryItems[index % galleryItems.length];
     return (
       <div className="vdl-photo-frame" onClick={() => setLightboxImg(photo.url)}>
-        <img src={photo.url} alt={photo.label} className="vdl-photo-frame-img" />
+        <img loading="lazy" src={photo.url} alt={photo.label} className="vdl-photo-frame-img" />
         <div className="vdl-photo-frame-caption">
           <span>{photo.label}</span>
           <Maximize2 size={13} />
@@ -427,7 +427,7 @@ export default function VehicleDesignLabPage({ sections }: VehicleDesignLabPageP
               {achievementCards.map((card) => (
                 <div key={card.id} className="vdl-comp-card">
                   {card.imageUrl && (
-                    <img
+                    <img loading="lazy"
                       src={card.imageUrl}
                       alt={card.label}
                       style={{ width: '100%', aspectRatio: '4 / 3', objectFit: 'cover', borderRadius: 'var(--radius-md, 8px)', marginBottom: 'var(--space-2)' }}
@@ -498,7 +498,7 @@ export default function VehicleDesignLabPage({ sections }: VehicleDesignLabPageP
             <div className="vdl-gallery-grid">
               {galleryItems.map((photo, idx) => (
                 <div key={idx} className="vdl-gallery-card" onClick={() => setLightboxImg(photo.url)}>
-                  <img src={photo.url} alt={photo.label} className="vdl-gallery-img" />
+                  <img loading="lazy" src={photo.url} alt={photo.label} className="vdl-gallery-img" />
                   <div className="vdl-gallery-overlay">
                     <span>{photo.label}</span>
                   </div>
@@ -516,7 +516,7 @@ export default function VehicleDesignLabPage({ sections }: VehicleDesignLabPageP
             <button className="meda-lightbox-close" onClick={() => setLightboxImg(null)}>
               <X size={28} />
             </button>
-            <img src={lightboxImg} alt="Vehicle Design Lab Photo" className="meda-lightbox-img" />
+            <img loading="lazy" src={lightboxImg} alt="Vehicle Design Lab Photo" className="meda-lightbox-img" />
           </div>
         </div>
       )}

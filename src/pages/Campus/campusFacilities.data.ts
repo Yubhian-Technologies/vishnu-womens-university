@@ -83,23 +83,22 @@ With all the right ambiance, the addition of a well-known book shop ‘Higginbot
   },
   {
     slug: 'wifi-campus',
-    title: 'Wi-Fi Campus',
-    heroSubtitle: 'Seamless Connectivity for Learning, Research, and Communication.',
-    body: `# Wi-Fi Campus
+    title: 'Wi-Fi Enabled Campus',
+    heroSubtitle: 'Seamless Connectivity for Learning, Research and Collaboration',
+    body: `# Wi-Fi Enabled Campus
 
-Vishnu Women's University is one of the few Universities, which can boast of its state-of-the-art computing resources and network across the campus. It has IT Infrastructure that can support 3000+ computer terminals, probably one of the largest wi-fi infrastructure. Following are a few highlighting features:
+Vishnu Women's University provides a digitally enabled campus supported by high-speed internet, campus-wide Wi-Fi and advanced computing infrastructure, capable of supporting 3,000+ computing devices. Key facilities include:
 
-- Completely Wi-Fi Campus with 250+ access point, supported on the technology from RUCKUS
-- 1500 Mbps of bandwidth for internet with dedicated leased line
-- 1700 + workstations supported by Xeon based Rack Servers
-- Powerful servers from Lenovo for 100% redundancy and efficient data management
-- 20 Km fibre backbone for providing 10GB seamless connectivity
-- ARUNA 8320G core switch to provide the needed scalability and traffic control
-- SOPHOS High end firewall security featured network
-- 24hrs Power Back Up -320 KVA of online uninterrupted power supply(UPS)
-- 700+ CCTV cameras for 24 hours surveillance to ensure on campus safety and security
-- High end Biometric systems for attendance`,
-    desc: 'Seamless Connectivity for Learning, Research, and Communication.',
+- Campus-Wide Wi-Fi: 300+ RUCKUS access points
+- High-Speed Internet: 1,530 Mbps of dedicated bandwidth
+- Advanced Computing Infrastructure: 1,700+ workstations on Xeon-based rack servers
+- Reliable Server Infrastructure: enterprise-grade Lenovo servers
+- High-Speed Fibre Network: 20-km fibre-optic backbone, up to 10 Gbps
+- High-Performance Campus Network: ARUBA enterprise network infrastructure
+- Secure Campus Network: advanced SOPHOS firewall infrastructure
+- Reliable Power Support: 320 KVA online UPS systems
+- Campus Security Infrastructure: 700+ CCTV cameras`,
+    desc: 'Seamless Connectivity for Learning, Research and Collaboration',
   },
   {
     slug: 'campus-hostels',
@@ -141,13 +140,15 @@ The Green Meadows has security personnel who patrol 24 hours. Water and current 
   {
     slug: 'travel-desk',
     title: 'Travel Desk',
-    heroSubtitle: 'Convenient Travel Support for Local and Outstation Journeys.',
-    body: `A dedicated Travel Desk is now available on campus, conveniently located opposite Central Square and adjacent to the ICICI ATM. It offers a wide range of services including ticket bookings (bus, train, air), passport and visa assistance, holiday packages, hotel bookings, attestation services, and overseas education guidance.
+    heroSubtitle: 'Travel Planning, Right on Campus',
+    body: `Located opposite Central Square, adjacent to the ICICI ATM, the Travel Desk at Vishnu Women's University supports students, faculty, and staff with travel bookings, documentation, accommodation, and overseas travel requirements.
 
-The desk operates daily from **4:00 PM to 7:00 PM**, and on **Sundays from 11:00 AM to 7:00 PM**. For assistance outside working hours, you can contact **9624 123 123** or email **support@ushodayaholidays.in**.
+It offers a wide range of services including ticket bookings (bus, train, air), passport and visa assistance, holiday packages, hotel bookings, attestation services, and overseas education guidance.
 
-This facility is designed to simplify travel and documentation needs for students, faculty, and staff.`,
-    desc: 'Convenient Travel Support for Local and Outstation Journeys.',
+The desk operates **Monday–Saturday: 4:00 PM–7:00 PM**, and **Sunday: 11:00 AM–7:00 PM**. For assistance outside working hours, contact **9624 123 123** or email **support@ushodayaholidays.in**.
+
+Travel Partner: Ushodaya Holidays`,
+    desc: 'Travel Planning, Right on Campus',
   },
   {
     slug: 'temples',
@@ -238,9 +239,9 @@ The University Television & Broadcast Media Center at Vishnu Women's University 
 export const RELOCATED_FACILITIES: CampusFacility[] = [
   {
     slug: 'smart-classrooms',
-    title: 'Smart Class Rooms',
-    heroSubtitle: 'Technology-Enabled Classrooms for Engaging Learning.',
-    desc: 'Technology-Enabled Classrooms for Engaging Learning.',
+    title: 'Smart Classrooms at Vishnu Women’s University',
+    heroSubtitle: 'Technology-enabled learning spaces designed for interaction, collaboration and active participation.',
+    desc: 'Technology-enabled learning spaces designed for interaction, collaboration and active participation.',
   },
   {
     slug: 'state-of-the-art-labs',

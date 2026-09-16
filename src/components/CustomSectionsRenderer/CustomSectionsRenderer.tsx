@@ -201,7 +201,7 @@ function PersonPanelList({ people }: { people: CustomSection[] }) {
               <SmoothCollapse open={isOpen}>
                 <div style={{ padding: 'var(--space-5)', background: 'var(--color-white)', border: '1px solid var(--color-light-gray)', borderTop: 'none', display: 'flex', gap: 'var(--space-4)', alignItems: 'flex-start', flexWrap: 'wrap' }}>
                   {person.photo?.imageUrl && (
-                    <img
+                    <img loading="lazy"
                       src={person.photo.imageUrl}
                       alt={person.label}
                       style={{ width: 70, height: 70, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '1px solid var(--color-light-gray)' }}
@@ -223,7 +223,7 @@ function PersonPanelList({ people }: { people: CustomSection[] }) {
 export function CustomSectionsPills({ sections }: { sections: CustomSection[] }) {
   const visible = sections.filter(hasCustomSectionContent);
   if (visible.length === 0) return null;
-  return <PillSwitcher sections={visible} />;
+  return <TabsRenderer sections={visible} />;
 }
 
 // Differentiators detail page — every section WITHOUT placement:'intro'
@@ -284,8 +284,8 @@ export function CustomSectionsAccordion({ sections, startIndex = 1 }: { sections
 // HOD tab) can render one admin-picked CustomSection's body — including its
 // sub-sections, tables, and pill switcher — without pulling in one of the
 // full layout wrappers above (which each impose their own heading/spacing).
-export function SectionSubtree({ section, depth = 0, navOffset = DEFAULT_NAV_OFFSET }: { section: CustomSection; depth?: number; navOffset?: string }) {
-  const body = <CustomSectionBody section={section} />;
+export function SectionSubtree({ section, depth = 0, navOffset = DEFAULT_NAV_OFFSET, departmentSlug, categorySlug }: { section: CustomSection; depth?: number; navOffset?: string; departmentSlug?: string; categorySlug?: string }) {
+  const body = <CustomSectionBody section={section} departmentSlug={departmentSlug} categorySlug={categorySlug} />;
   const visibleSubs = (section.subSections || []).filter(hasCustomSectionContent);
   if (visibleSubs.length === 0) return body;
 
@@ -294,7 +294,7 @@ export function SectionSubtree({ section, depth = 0, navOffset = DEFAULT_NAV_OFF
       <div>
         {body}
         <div style={{ marginTop: 'var(--space-5)' }}>
-          <PillSwitcher sections={visibleSubs} depth={depth + 1} navOffset={navOffset} />
+          <TabsRenderer sections={visibleSubs} depth={depth + 1} navOffset={navOffset} departmentSlug={departmentSlug} categorySlug={categorySlug} />
         </div>
       </div>
     );
@@ -307,13 +307,13 @@ export function SectionSubtree({ section, depth = 0, navOffset = DEFAULT_NAV_OFF
         // id+scrollMarginTop lets a Quick Links entry for this subsection
         // (see toQuickLinkItems in lib/customSections.ts) jump straight to
         // it with a plain anchor — every stacked subsection is always in the
-        // DOM, unlike a pill's, which needs PillSwitcher's hash-sync below.
+        // DOM, unlike a pill's, which needs TabsRenderer's hash-sync below.
         <div key={`${sub.id}-${subIndex}`} id={sub.id} style={{ marginTop: depth === 0 ? 'var(--space-6)' : 'var(--space-4)', scrollMarginTop: navOffset }}>
           <h4 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: sub.boldHeading ? 800 : 700, color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>
             {sub.label}
           </h4>
           <SectionSubtitle subtitle={sub.subtitle} />
-          <SectionSubtree section={sub} depth={depth + 1} navOffset={navOffset} />
+          <SectionSubtree section={sub} depth={depth + 1} navOffset={navOffset} departmentSlug={departmentSlug} categorySlug={categorySlug} />
         </div>
       ))}
     </div>
@@ -326,7 +326,7 @@ export function SectionSubtree({ section, depth = 0, navOffset = DEFAULT_NAV_OFF
 // one's content shown below, rendered through SectionSubtree so further
 // nesting (a pill whose own content is itself split into pieces) keeps
 // working at any depth.
-function PillSwitcher({ sections, depth = 0, navOffset = DEFAULT_NAV_OFFSET }: { sections: CustomSection[]; depth?: number; navOffset?: string }) {
+function TabsRenderer({ sections, depth = 0, navOffset = DEFAULT_NAV_OFFSET, departmentSlug, categorySlug }: { sections: CustomSection[]; depth?: number; navOffset?: string; departmentSlug?: string; categorySlug?: string }) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const active = sections.find((s) => s.id === activeId) ?? sections[0];
   const scrollPendingRef = useRef(false);
@@ -392,7 +392,7 @@ function PillSwitcher({ sections, depth = 0, navOffset = DEFAULT_NAV_OFFSET }: {
         </div>
         <SectionSubtitle subtitle={active.subtitle} />
         <div style={{ marginTop: 'var(--space-3)' }}>
-          <SectionSubtree section={active} depth={depth} navOffset={navOffset} />
+          <SectionSubtree section={active} depth={depth} navOffset={navOffset} departmentSlug={departmentSlug} categorySlug={categorySlug} />
         </div>
       </div>
     </div>
@@ -450,7 +450,7 @@ function PhotoLightbox({ photos, index, onClose, onNavigate }: {
         </>
       )}
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-3)', maxWidth: '100%', maxHeight: '100%' }}>
-        <img
+        <img loading="lazy"
           src={photos[index].imageUrl}
           alt=""
           onClick={(e) => e.stopPropagation()}
@@ -485,7 +485,7 @@ function GalleryGrid({ photos }: { photos: CustomSectionPhoto[] }) {
               overflow: 'hidden', cursor: 'zoom-in', aspectRatio: '4 / 3', background: 'var(--color-off-white)',
             }}
           >
-            <img src={p.imageUrl} alt={p.caption || ''} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+            <img loading="lazy" src={p.imageUrl} alt={p.caption || ''} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
             {p.caption && (
               <span
                 style={{
@@ -545,7 +545,7 @@ function StaticGalleryStrip({ photos }: { photos: CustomSectionPhoto[] }) {
             }}
           >
             <div style={{ width: '100%', height: 160, borderRadius: 10, overflow: 'hidden', background: '#f1f5f9' }}>
-              <img src={p.imageUrl} alt={p.caption || ''} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+              <img loading="lazy" src={p.imageUrl} alt={p.caption || ''} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
             </div>
             {p.caption && (
               <span
@@ -575,8 +575,8 @@ function StaticGalleryStrip({ photos }: { photos: CustomSectionPhoto[] }) {
   );
 }
 
-function CustomSectionBody({ section }: { section: CustomSection }) {
-  let body: ReactNode = <CustomSectionBodyContent section={section} />;
+function CustomSectionBody({ section, departmentSlug, categorySlug }: { section: CustomSection; departmentSlug?: string; categorySlug?: string }) {
+  let body: ReactNode = <CustomSectionBodyContent section={section} departmentSlug={departmentSlug} categorySlug={categorySlug} />;
   // A section can carry photos alongside whatever its primary contentType
   // is (see CustomSectionEditor.tsx's always-available "Photos" block) —
   // contentType 'gallery' already renders these via the switch above, so
@@ -595,7 +595,7 @@ function CustomSectionBody({ section }: { section: CustomSection }) {
   if (!section.photo?.imageUrl) return body;
   return (
     <div style={{ display: 'flex', gap: 'var(--space-5)', alignItems: 'flex-start', flexWrap: 'wrap' }}>
-      <img
+      <img loading="lazy"
         src={section.photo.imageUrl}
         alt={section.label}
         style={{ width: 90, height: 90, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '1px solid var(--color-light-gray)' }}
@@ -605,7 +605,9 @@ function CustomSectionBody({ section }: { section: CustomSection }) {
   );
 }
 
-function CustomSectionBodyContent({ section }: { section: CustomSection }) {
+import HorizontalEventsShowcase from '../HorizontalEventsShowcase/HorizontalEventsShowcase';
+
+function CustomSectionBodyContent({ section, departmentSlug, categorySlug }: { section: CustomSection; departmentSlug?: string; categorySlug?: string }) {
   if (section.contentType === 'text') {
     if (!section.textContent?.trim()) return null;
     return (
@@ -681,12 +683,23 @@ function CustomSectionBodyContent({ section }: { section: CustomSection }) {
   if (section.contentType === 'imageCards') {
     const cards = (section.imageCards || []).filter((c) => c.imageUrl || c.title.trim() || c.description.trim());
     if (cards.length === 0) return null;
+    
+    if (departmentSlug && categorySlug) {
+      return (
+        <HorizontalEventsShowcase 
+          cards={cards} 
+          departmentSlug={departmentSlug} 
+          categorySlug={categorySlug} 
+        />
+      );
+    }
+    
     return (
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 'var(--space-5)' }}>
         {cards.map((card, ci) => (
           <div key={ci} style={{ border: '1px solid var(--color-light-gray)', borderRadius: 'var(--radius-md)', overflow: 'hidden', background: 'var(--color-white)' }}>
             {card.imageUrl && (
-              <img src={card.imageUrl} alt={card.title} style={{ width: '100%', aspectRatio: '4 / 3', objectFit: 'cover', display: 'block' }} />
+              <img loading="lazy" src={card.imageUrl} alt={card.title} style={{ width: '100%', aspectRatio: '4 / 3', objectFit: 'cover', display: 'block' }} />
             )}
             <div style={{ padding: 'var(--space-3) var(--space-4)' }}>
               {card.title && (

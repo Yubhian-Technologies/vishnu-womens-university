@@ -98,7 +98,7 @@ export default function EventDetailModal({ event, categoryColor, onClose }: Prop
               <ChevronLeft size={26} />
             </button>
           )}
-          <img
+          <img loading="lazy"
             src={gallery[lightboxIndex].url}
             alt={gallery[lightboxIndex].caption || event.title}
             onClick={(e) => e.stopPropagation()}

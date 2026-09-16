@@ -207,7 +207,7 @@ export default function IicPage({ item }: IicPageProps) {
                   <div className="iic-council-roster-grid">
                     {councilMembers.map((m) => (
                       <div key={m.id} className="iic-council-card">
-                        <img
+                        <img loading="lazy"
                           src={m.imageUrl || PHOTO_NEEDED_PLACEHOLDER}
                           alt={m.name}
                           className="iic-council-avatar"

@@ -52,19 +52,26 @@ export interface LabItem {
   pdfStoragePath?: string;
   imageUrl?: string;
   imageStoragePath?: string;
-  // Optional short video (e.g. a lab walkthrough) shown instead of the
+  // Optional YouTube video URL (e.g. a lab walkthrough) shown instead of the
   // static image on the public Academic Infrastructure carousel when set —
   // see LabsCarousel.tsx, which uses `imageUrl` as its poster frame so the
   // clip itself only loads once a visitor presses play.
-  videoUrl?: string;
-  videoStoragePath?: string;
+  youtubeUrl?: string;
 }
 
 // Older programme docs stored labs as plain strings (no PDF) — normalize
 // either shape to the richer one at read time so existing data keeps
 // rendering without a migration, same approach as normalizeSubject above.
 export function normalizeLab(l: string | LabItem): LabItem {
-  return typeof l === 'string' ? { name: l } : l;
+  if (typeof l === 'string') return { name: l };
+  // Backward compat: old docs stored videoUrl/videoStoragePath, new ones use youtubeUrl
+  const lab = { ...l } as LabItem;
+  if (!(lab as any).youtubeUrl && (lab as any).videoUrl) {
+    (lab as any).youtubeUrl = (lab as any).videoUrl;
+  }
+  delete (lab as any).videoUrl;
+  delete (lab as any).videoStoragePath;
+  return lab;
 }
 
 export interface MindMapImage {
@@ -972,7 +979,7 @@ export default function ProgramsAdmin() {
               <div className="admin-image-grid" style={{ marginBottom: '0.75rem' }}>
                 {mindMapImages.map((img, mi) => (
                   <div key={mi} className="admin-image-card">
-                    <img src={img.url} alt="" />
+                    <img loading="lazy" src={img.url} alt="" />
                     <div className="admin-image-card__actions">
                       <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveMindMapImage(mi, -1)} disabled={mi === 0} title="Move up">↑</button>
                       <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveMindMapImage(mi, 1)} disabled={mi === mindMapImages.length - 1} title="Move down">↓</button>

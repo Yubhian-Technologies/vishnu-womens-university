@@ -110,6 +110,15 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
     return () => observer.disconnect();
   }, [quickLinks]);
 
+  // Mobile: auto-scroll the horizontal pill bar so the active link is centered
+  useEffect(() => {
+    if (!activeSectionId) return;
+    const el = document.querySelector(`.dept-quicknav-link[href="#${CSS.escape(activeSectionId)}"]`) as HTMLElement | null;
+    if (el && el.scrollIntoView) {
+      el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }
+  }, [activeSectionId]);
+
   if (!loading && !dept) return <Navigate to="/academics" replace />;
   if (!dept) return null;
 
@@ -157,11 +166,11 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
                 <div className="dept-fact-icon-badge">
                   <Hash size={14} strokeWidth={2.4} />
                 </div>
-                <span className="dept-fact-col-title">AP EAPCET Code</span>
+                <span className="dept-fact-col-title">APEAPCET / ICET / ECET Code</span>
               </div>
               <div className="dept-fact-items-window">
                 <div className="dept-fact-static-list">
-                  <Link to="/admissions" className="dept-fact-chip-link" aria-label="View AP EAPCET college codes and admissions details">
+                  <Link to="/admissions" className="dept-fact-chip-link" aria-label="View APEAPCET / ICET / ECET college codes and admissions details">
                     <div className="dept-fact-chip-entry">
                       <span className="dept-fact-chip-sub">College Code</span>
                       <span className="dept-fact-chip-val">{eapcetCode}</span>
@@ -329,8 +338,10 @@ export default function StandaloneDepartmentDetail({ dept: group }: Props) {
       <CustomSectionsRenderer sections={visibleCustomSections} navOffset={NAV_OFFSET} />
 
       {/* News & Events — Compact Collapsible Academic-Year List */}
-      {hasNewsEvents && <NewsEventsTabs categories={newsEventsCategories} navOffset={NAV_OFFSET} />}
-
+      {hasNewsEvents && (
+        <NewsEventsTabs categories={newsEventsCategories} navOffset={NAV_OFFSET} departmentSlug={group.key} />
+      )}
+      
       {/* Department Library */}
       {hasLibrary && (
         <section id="library" className="section bg-off-white" style={{ scrollMarginTop: NAV_OFFSET }}>

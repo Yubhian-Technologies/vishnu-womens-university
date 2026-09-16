@@ -12,9 +12,9 @@ import type { CustomSection } from '../../lib/customSections';
 // Fixed department tab order (per design decision, not derived from data) —
 // each tab's `departments` lists every raw `department` field value (as
 // entered via /admin → Faculty/Programs) that should count toward it, since
-// real records use varying spellings (e.g. "Mechanical" not "ME", "AI&ML"/
-// "AI&DS" instead of a single "AI"). A tab simply doesn't render if none of
-// its departments currently have any faculty.
+// real records use varying spellings (e.g. "Mechanical" not "ME"). A tab
+// simply doesn't render if none of its departments currently have any
+// faculty.
 // Kept in sync with DEPARTMENT_GROUPS/STANDALONE_DEPARTMENTS' own
 // facultyDepartments lists in lib/departmentGroups.ts — this page has its
 // own copy (different shape: a fixed tab label, not a program-slug group)
@@ -24,7 +24,7 @@ import type { CustomSection } from '../../lib/customSections';
 // tab even though every other page that reads facultyDepartments shows them.
 const DEPARTMENT_GROUPS: { label: string; departments: string[] }[] = [
   { label: 'CSE', departments: ['CSE'] },
-  { label: 'AI', departments: ['AI', 'AI&ML', 'AI&DS'] },
+  { label: 'AI', departments: ['AI'] },
   { label: 'IT', departments: ['IT', 'Information Technology'] },
   { label: 'ECE', departments: ['ECE'] },
   { label: 'EEE', departments: ['EEE', 'Electrical & Electronics Engineering'] },

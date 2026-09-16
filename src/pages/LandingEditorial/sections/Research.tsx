@@ -83,7 +83,7 @@ export default function Research({ featureImageUrl, featureImageAlt, spotlightVi
                   <video src={spotlightVideoUrl} poster={spotlightPosterUrl} controls playsInline aria-label={spotlightPosterAlt} />
                 ) : (
                   <>
-                    <img src={spotlightPosterUrl} alt={spotlightPosterAlt} />
+                    <img loading="lazy" src={spotlightPosterUrl} alt={spotlightPosterAlt} />
                     <span className="lpe-research-video-card__play" aria-hidden="true"><Play size={20} fill="currentColor" /></span>
                     <div className="lpe-research-video-card__chrome">
                       <span className="lpe-research-video-card__label">Research Spotlight</span>

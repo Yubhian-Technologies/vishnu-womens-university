@@ -17,6 +17,7 @@ const EMPTY: Omit<FaqDoc, 'id'> = { page: 'admissions', question: '', answer: ''
 // up a new page's FAQ section.
 const PAGES = [
   { value: 'admissions', label: 'Admissions' },
+  { value: 'travel-desk', label: 'Campus Life: Travel Desk' },
 ];
 
 export default function FaqAdmin() {

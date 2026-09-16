@@ -167,7 +167,7 @@ export default function LandingPagesAdmin() {
         {cards.map((c) => (
           <div key={c.doc.id} className="admin-card">
             <div className="admin-image-card" style={{ marginBottom: '1rem' }}>
-              <img src={c.doc.previewImage} alt={c.doc.name} />
+              <img loading="lazy" src={c.doc.previewImage} alt={c.doc.name} />
               <div className="admin-image-card__info">
                 {editingId === c.doc.id ? (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', width: '100%' }}>
@@ -232,7 +232,7 @@ export default function LandingPagesAdmin() {
                   const current = c.doc.images?.[slot.key];
                   return (
                     <div key={slot.key} className="admin-image-card">
-                      <img src={current?.url || slot.defaultUrl} alt={current?.alt || slot.label} />
+                      <img loading="lazy" src={current?.url || slot.defaultUrl} alt={current?.alt || slot.label} />
                       <div className="admin-image-card__info">
                         <strong>{slot.label}</strong>
                         {!current && <span className="admin-badge admin-badge--gray admin-badge--sm">Default</span>}
@@ -262,7 +262,7 @@ export default function LandingPagesAdmin() {
                       {current?.url ? (
                         <video src={current.url} poster={poster} muted loop playsInline controls style={{ width: '100%', maxHeight: 220, objectFit: 'cover' }} />
                       ) : (
-                        <img src={poster || c.doc.previewImage} alt={slot.label} />
+                        <img loading="lazy" src={poster || c.doc.previewImage} alt={slot.label} />
                       )}
                       <div className="admin-image-card__info">
                         <strong>{slot.label}</strong>

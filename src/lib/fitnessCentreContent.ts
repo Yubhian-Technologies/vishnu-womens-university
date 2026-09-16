@@ -48,14 +48,14 @@ export const FITNESS_PILLAR_ICONS = [
 
 export const DEFAULT_FITNESS_CENTRE_DATA: FitnessCentreData = {
   // Four Pillars
-  pillarsTag: 'CAMPUS FITNESS FOCUS',
-  pillarsTitle: 'Four Pillars of Vishnu Fitness Centre',
-  pillarsSubtitle: 'Building endurance, competitive excellence, and long-term wellness for every student.',
+  pillarsTag: 'FITNESS & WELLNESS AT A GLANCE',
+  pillarsTitle: 'Fitness & Wellness at a Glance',
+  pillarsSubtitle: 'Supporting fitness, wellness and an active lifestyle at Vishnu Women\u2019s University.',
   pillars: [
-    { icon: 'Dumbbell', title: 'Modern Equipment', desc: 'Sophisticated gym machines' },
-    { icon: 'Award', title: 'Trained Instructors', desc: 'Professional supervision' },
-    { icon: 'Trophy', title: 'Tournament Champions', desc: 'Inter-collegiate triumph' },
-    { icon: 'Sparkles', title: 'Yoga & Mind Balance', desc: 'Flexibility & stress relief' },
+    { icon: 'Dumbbell', title: 'Modern Fitness Equipment', desc: 'Training equipment for strength, cardio and general fitness.' },
+    { icon: 'Award', title: 'Trained Instructors', desc: 'Guidance and supervision to support safe and effective workouts.' },
+    { icon: 'Trophy', title: 'Sports & Competitive Fitness', desc: 'Facilities that complement students\u2019 participation in inter-collegiate, inter-university and state-level competitions.' },
+    { icon: 'Sparkles', title: 'Yoga & Wellness', desc: 'Yoga and wellness activities that support flexibility, balance and overall well-being.' },
   ],
   polaroidPhotos: [
     { imageUrl: '', alt: 'Fitness Centre Facility 1' },
@@ -65,19 +65,19 @@ export const DEFAULT_FITNESS_CENTRE_DATA: FitnessCentreData = {
   ],
 
   // Health & Vitality
-  vitalityTag: 'HEALTH & VITALITY',
-  vitalityTitle: 'A Strong Mind Resides in a Healthy Body',
+  vitalityTag: 'FITNESS FOR AN ACTIVE CAMPUS LIFE',
+  vitalityTitle: 'Fitness for an Active Campus Life',
   vitalityParagraph1:
-    'A strong mind resides in a healthy body. This saying has never been more significant. The fast pace of modern lifestyle has led to an unimaginable amount of physical and psychological stress on human body and mind. Consequently, demand for trained fitness instructors has increased manifold. Vishnu Fitness Center with its sophisticated modern equipment improves physical fitness for sound health.',
+    'The Vishnu Fitness Centre provides students with a dedicated space to stay active, build physical fitness and make wellness part of everyday campus life.\n\nEquipped with modern training facilities and supported by trained instructors, the centre caters to different fitness needs while complementing the University\u2019s wider sports and wellness initiatives.',
   vitalityParagraph2:
-    'Students often compete in Inter-Collegiate, Inter-University and State Level tournaments and win prizes and medals. Vishnu Fitness Center is a source of health generation and physical stamina. All types of sports and games have a place on this campus. Even Yoga training is provided, emphasizing the physical and mental fitness of students.',
+    'More Than a Workout\n\nRegular physical activity supports endurance, strength and overall well-being. Along with fitness training, students can participate in yoga and wellness activities, creating opportunities to balance physical activity with relaxation and mental well-being.\n\nThe fitness environment also supports students involved in competitive sports, including participation in inter-collegiate, inter-university and state-level events.',
   vitalityImageUrl: '',
   vitalityStoragePath: '',
 
   // Facility Gallery
   galleryTag: 'FACILITY GALLERY',
-  galleryTitle: 'Fitness Centre in Action',
-  gallerySubtitle: 'VISHNU Fitness Centre',
+  galleryTitle: 'Inside the Vishnu Fitness Centre',
+  gallerySubtitle: 'Explore the equipment, training spaces and fitness activities available to students at Vishnu Women\u2019s University.',
 };
 
 export function toFitnessCentreForm(data?: Partial<FitnessCentreData>): FitnessCentreData {

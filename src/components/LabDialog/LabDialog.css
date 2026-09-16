@@ -36,14 +36,21 @@
   background: var(--color-off-white);
   border: 1px solid var(--color-light-gray);
   color: var(--color-primary);
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
   border-radius: 50%;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: background var(--transition-fast), transform var(--transition-fast);
+}
+.lab-dialog-close::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
 }
 .lab-dialog-close:hover { background: var(--color-white); transform: rotate(90deg); }
 

@@ -70,7 +70,7 @@ export default function TpoTeamPhotosAdmin() {
           return (
             <div key={name} className="admin-image-card">
               {imageUrl ? (
-                <img src={imageUrl} alt={name} />
+                <img loading="lazy" src={imageUrl} alt={name} />
               ) : (
                 <div className="admin-image-card__empty">No photo set</div>
               )}

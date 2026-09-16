@@ -75,11 +75,6 @@ export default function Television() {
         page="campus-television"
         defaultTitle={pageTitle}
         defaultSubtitle={pageDesc}
-        breadcrumb={[
-          { label: 'Home', to: '/' },
-          { label: 'Campus Life', to: '/campus' },
-          { label: pageTitle },
-        ]}
         hideCta={true}
       />
 
@@ -99,7 +94,6 @@ export default function Television() {
         <section className="tv-section">
           <div className="tv-container">
             <div className="tv-section-header">
-              <div className="tv-badge">Broadcasting</div>
               <h2 className="tv-section-title">Programming &amp; Content</h2>
             </div>
 
@@ -128,7 +122,6 @@ export default function Television() {
         <section className="tv-section" id="facilities">
           <div className="tv-container">
             <div className="tv-section-header">
-              <div className="tv-badge">Infrastructure</div>
               <h2 className="tv-section-title">Production Facilities</h2>
               <p className="tv-section-subtitle">Studio technology and equipment</p>
             </div>
@@ -148,7 +141,7 @@ export default function Television() {
             {activeFacility && (
               <div className="tv-tech-card">
                 <div className="tv-tech-img-box">
-                  <img
+                  <img loading="lazy"
                     src={photos[1]?.src || PHOTO_NEEDED_PLACEHOLDER}
                     alt={activeFacility.title}
                     className="tv-tech-img"

@@ -75,6 +75,11 @@
   cursor: pointer;
   color: #555;
   transition: border-color 0.2s;
+  min-height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .cld-uploader__change:hover { border-color: var(--color-accent, #c8a03c); color: #222; }
@@ -130,6 +135,11 @@
   padding: 0.15rem 0.55rem;
   font-size: 0.8rem;
   align-self: auto;
+  min-height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* ── Crop Modal ────────────────────────────────────── */
@@ -185,8 +195,10 @@
 .crop-modal__close {
   background: #f1f3f5;
   border: none;
-  width: 30px;
-  height: 30px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
   border-radius: 50%;
   font-size: 0.8rem;
   cursor: pointer;
@@ -194,6 +206,12 @@
   align-items: center;
   justify-content: center;
   transition: background 0.15s;
+  position: relative;
+}
+.crop-modal__close::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
 }
 .crop-modal__close:hover { background: #e2e6ea; }
 
@@ -226,6 +244,11 @@
   cursor: pointer;
   color: #444;
   transition: all 0.15s;
+  min-height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .crop-aspect-btn:hover { border-color: #aaa; }

@@ -78,7 +78,7 @@ export default function IloOfficePhotosAdmin() {
             <div className="admin-image-grid">
               {photos.map((p, i) => (
                 <div key={p.path || i} className="admin-image-card">
-                  <img src={p.url} alt={`${office} office ${i + 1}`} />
+                  <img loading="lazy" src={p.url} alt={`${office} office ${i + 1}`} />
                   <div className="admin-image-card__actions">
                     <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removePhoto(office, i)}>
                       Remove

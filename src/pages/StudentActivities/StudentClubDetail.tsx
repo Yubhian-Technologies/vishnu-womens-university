@@ -129,7 +129,7 @@ export default function StudentClubDetail() {
               return (
                 <div className="grid-img-text" style={{ alignItems: 'start' }}>
                   <div>{descriptionBlock}</div>
-                  <img
+                  <img loading="lazy"
                     src={images[0].url}
                     alt={club.name}
                     style={{ width: '100%', height: 'auto', display: 'block', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-light-gray)', boxShadow: 'var(--shadow-md)' }}
@@ -142,9 +142,9 @@ export default function StudentClubDetail() {
               return (
                 <>
                   <div>{descriptionBlock}</div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 'var(--space-5)', marginTop: 'var(--space-6)' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(260px, 100%), 1fr))', gap: 'var(--space-5)', marginTop: 'var(--space-6)' }}>
                     {images.map((img, i) => (
-                      <img
+                      <img loading="lazy"
                         key={img.path || i}
                         src={img.url}
                         alt={`${club.name} ${i + 1}`}

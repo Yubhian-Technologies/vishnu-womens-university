@@ -4,4 +4,7 @@
 // page's virtual tour. Still a heavy download — re-encoding to a lower bitrate
 // helps more than anything else — so defer/lazy-load the fetch at call sites.
 export const HERO_VIDEO_SRC =
-  'https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/VWU%20CAMPUS%20VIEW.mp4?alt=media&token=72282016-025d-4fd2-b51a-19c94a30e950';
+  'https://res.cloudinary.com/dgvuwuiqz/video/upload/f_auto,q_auto/v1789233937/VWU_CAMPUS_VIEW_3_lzoss5.mp4';
+
+export const HERO_POSTER_SRC =
+  'https://res.cloudinary.com/dgvuwuiqz/video/upload/f_auto,q_auto,so_0/v1789233937/VWU_CAMPUS_VIEW_3_lzoss5.jpg';

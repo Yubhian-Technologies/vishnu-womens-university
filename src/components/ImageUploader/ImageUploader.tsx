@@ -41,13 +41,17 @@ export default function ImageUploader({
       {/* ── Drop zone ── */}
       <div className="cld-uploader">
         <div
+          role="button"
+          tabIndex={0}
+          aria-label={label}
           className={`cld-uploader__drop ${uploading ? 'cld-uploader__drop--loading' : ''}`}
           onClick={() => !uploading && inputRef.current?.click()}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (!uploading) inputRef.current?.click(); } }}
           onDragOver={(e) => e.preventDefault()}
           onDrop={(e) => { e.preventDefault(); const f = e.dataTransfer.files?.[0]; if (f) handleFile(f); }}
         >
           {preview ? (
-            <img src={preview} alt="Preview" className="cld-uploader__preview" />
+            <img loading="lazy" src={preview} alt={`Preview for ${label}`} className="cld-uploader__preview" />
           ) : (
             <div className="cld-uploader__placeholder">
               <span className="cld-uploader__icon">🖼️</span>
@@ -68,7 +72,7 @@ export default function ImageUploader({
             Change Image
           </button>
         )}
-        {error && <p className="cld-uploader__error">{error}</p>}
+        {error && <p role="alert" className="cld-uploader__error">{error}</p>}
 
         <input
           ref={inputRef}

@@ -105,7 +105,7 @@ export default function RuralWomenTechParkPage({
       <section className="rwtp-hero-container">
         <div className="rwtp-hero-card">
           {/* Background Photo */}
-          <img
+          <img loading="lazy"
             src={item.heroImage || 'https://images.unsplash.com/photo-1590650516494-0c8e4a4dd67e?w=1600&auto=format&fit=crop&q=80'}
             alt={item.title || 'Rural Women Technology Park'}
             className="rwtp-hero-bg-img"

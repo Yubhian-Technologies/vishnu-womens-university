@@ -777,7 +777,7 @@ export default function PlacementItemsAdmin() {
                 <div className="admin-image-grid" style={{ marginBottom: '0.75rem' }}>
                   {notablePeople.map((person, i) => (
                     <div key={person.storagePath || i} className="admin-image-card">
-                      <img src={person.imageUrl} alt={person.name || `Person ${i + 1}`} />
+                      <img loading="lazy" src={person.imageUrl} alt={person.name || `Person ${i + 1}`} />
                       <input
                         value={person.name}
                         onChange={(e) => updatePerson(i, 'name', e.target.value)}

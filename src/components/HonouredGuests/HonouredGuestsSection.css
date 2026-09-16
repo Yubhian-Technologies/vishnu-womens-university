@@ -44,18 +44,34 @@
 .eminent-track {
   display: flex;
   gap: var(--space-3);
-  width: max-content;
-  animation: eminent-scroll 40s linear infinite;
-  will-change: transform;
+  width: auto;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 0.5rem;
+  will-change: scroll-position;
 }
 
-.eminent-track:hover {
-  animation-play-state: paused;
+.eminent-track::-webkit-scrollbar {
+  display: none;
 }
 
-@keyframes eminent-scroll {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
+.eminent-track:focus-visible {
+  outline: 2px solid var(--color-primary-dark);
+  outline-offset: 4px;
+}
+
+/* One-by-one mode: no continuous marquee — JS advances exactly one card per tick */
+.eminent-section--onebyone .eminent-track {
+  animation: none;
+}
+
+.eminent-section--onebyone .eminent-card {
+  scroll-snap-align: start;
 }
 
 /* Reduced motion: no auto-scroll, but keep it a single swipeable row

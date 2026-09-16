@@ -65,6 +65,10 @@ function useLoadedState<T>(loading: boolean, computeInitial: () => T) {
 }
 
 export default function AuditoriumsAdmin() {
+  // Collapsed by default — this admin section can host several of these
+  // page-body cards (Auditoriums, Wellness, ...), and having every one's
+  // full form open at once made the Campus Life screen unusably long.
+  const [expanded, setExpanded] = useState(false);
   const { docs: allBlocks, loading } = useOrderedCollection<ContentBlockDoc>('contentBlocks', 'order');
   const blocks = allBlocks.filter((b) => b.page === PAGE);
   const hero = blocks.find((b) => b.section === 'hero');
@@ -196,14 +200,19 @@ export default function AuditoriumsAdmin() {
 
   return (
     <div className="admin-card">
-      <h2 className="admin-card__title">Auditoriums — Page Body</h2>
+      <div className="admin-card__toolbar">
+        <h2 className="admin-card__title">Auditoriums — Page Body</h2>
+        <button type="button" className="admin-btn admin-btn--sm" onClick={() => setExpanded((v) => !v)}>
+          {expanded ? 'Done' : 'Edit'}
+        </button>
+      </div>
       <p className="admin-field__hint">
         Auditoriums (<code>/campus/auditoriums</code>) is a bespoke page with its own layout, so its body content is
         edited right here instead of the generic Page Content Blocks screen. Its hero banner image/title and photo
         gallery are still managed from Admin → Hero Banners and Admin → Website Photos respectively.
       </p>
 
-      {loading ? <p className="admin-loading">Loading…</p> : (
+      {expanded && (loading ? <p className="admin-loading">Loading…</p> : (
         <>
           <hr />
           <h3>Hero Extra Text</h3>
@@ -277,7 +286,7 @@ export default function AuditoriumsAdmin() {
             </button>
           </div>
         </>
-      )}
+      ))}
     </div>
   );
 }

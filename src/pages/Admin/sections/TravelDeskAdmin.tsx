@@ -10,8 +10,8 @@ const PAGE = 'travel-desk';
 export const DEFAULT_TRAVEL_CONTACTS = {
   location: 'Opposite Central Square',
   locationSub: 'Adjacent to ICICI ATM',
-  timings: '4:00 PM – 7:00 PM',
-  timingsSub: 'Daily & Sunday Hours',
+  timings: 'Mon–Sat: 4:00 PM–7:00 PM',
+  timingsSub: 'Sun: 11:00 AM–7:00 PM',
   phone: '9624 123 123',
   email: 'support@ushodayaholidays.in',
   partner: 'Ushodaya Holidays',
@@ -20,9 +20,9 @@ export const DEFAULT_TRAVEL_CONTACTS = {
 export const DEFAULT_TRAVEL_ABOUT = {
   badge: 'CONVENIENT SERVICES',
   title: 'About the Travel Desk',
-  subtitle: 'Designed to simplify travel and documentation needs for students, faculty, and staff.',
-  paragraph1: 'A dedicated Travel Desk is now available on campus, conveniently located opposite Central Square and adjacent to the ICICI ATM. It offers a wide range of services including ticket bookings (bus, train, air), passport and visa assistance, holiday packages, hotel bookings, attestation services, and overseas education guidance.',
-  paragraph2: 'This facility is designed to simplify travel and documentation needs for students, faculty, and staff, ensuring safe, hassle-free journey planning without needing to leave the campus.',
+  subtitle: 'Making travel planning and related formalities more convenient for the university community.',
+  paragraph1: 'The Campus Travel Desk at Vishnu Women’s University provides students, faculty, and staff with easy access to a range of travel-related services within the campus. From booking bus, train, and flight tickets to assistance with passports, visas, hotel reservations, holiday packages, document attestation, and overseas education requirements, the Travel Desk brings essential support together in one convenient place.',
+  paragraph2: 'With these services available on campus, members of the university community can plan their journeys and manage travel-related formalities more conveniently. Travel Partner: Ushodaya Holidays.',
   timingMonSat: '4:00 PM to 7:00 PM',
   timingSun: '11:00 AM to 7:00 PM',
 };
@@ -31,32 +31,32 @@ export const DEFAULT_TRAVEL_SERVICES = [
   {
     icon: 'Ticket',
     title: 'Ticket Bookings',
-    desc: 'Hassle-free reservations for Bus, Train, and Flight tickets for local and outstation journeys.',
+    desc: 'Book bus, train, and flight tickets conveniently through the Campus Travel Desk for local and outstation journeys.',
   },
   {
     icon: 'Globe',
     title: 'Passport & Visa Assistance',
-    desc: 'Complete documentation support and guidance for new passport applications and visa processing.',
+    desc: 'Get assistance with passport applications, visa documentation, and related travel formalities.',
   },
   {
     icon: 'Compass',
     title: 'Holiday Packages',
-    desc: 'Customized vacation and holiday packages designed for individuals, families, and student groups.',
+    desc: 'Explore customised holiday and tour packages for individuals, families, and student groups.',
   },
   {
     icon: 'Building',
     title: 'Hotel Bookings',
-    desc: 'Verified hotel reservations and budget-friendly stay arrangements across major destinations.',
+    desc: 'Get assistance with hotel reservations and accommodation options across major destinations.',
   },
   {
     icon: 'FileCheck',
     title: 'Attestation Services',
-    desc: 'Professional document verification and attestation support for official travel requirements.',
+    desc: 'Access document attestation and verification assistance for travel, education, and other official requirements.',
   },
   {
     icon: 'GraduationCap',
     title: 'Overseas Education Guidance',
-    desc: 'Expert guidance for international travel, university visits, and overseas education procedures.',
+    desc: 'Receive guidance related to international travel, university visits, documentation, and overseas education requirements.',
   },
 ];
 

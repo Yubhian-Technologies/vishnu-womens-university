@@ -18,13 +18,14 @@ interface Props {
    *  when this is nested inside another tab (e.g. the Programme Hub) that
    *  already provides its own label and show/hide affordance. */
   embedded?: boolean;
+  departmentSlug?: string;
 }
 
 function isUrl(text: string): boolean {
   return /^(https?:\/\/|\/|.*\.pdf$)/i.test(text.trim());
 }
 
-export default function NewsEventsTabs({ categories, navOffset, embedded }: Props) {
+export default function NewsEventsTabs({ categories, navOffset, embedded, departmentSlug }: Props) {
   const withContent = categories.filter((c) => c.years.length > 0);
   const [activeKey, setActiveKey] = useState<string | null>(null);
   const [expandedYearIndex, setExpandedYearIndex] = useState<number | null>(0);
@@ -184,7 +185,7 @@ export default function NewsEventsTabs({ categories, navOffset, embedded }: Prop
                             <div key={ci} className="news-events-media-card">
                               {card.imageUrl && (
                                 <div className="news-events-card-img-wrap">
-                                  <img src={card.imageUrl} alt={card.title || 'News & Events'} className="news-events-card-img" />
+                                  <img loading="lazy" src={card.imageUrl} alt={card.title || 'News & Events'} className="news-events-card-img" />
                                 </div>
                               )}
                               <div className="news-events-card-body">
@@ -198,7 +199,7 @@ export default function NewsEventsTabs({ categories, navOffset, embedded }: Prop
 
                       {showText && <p className="news-events-text-block">{yr.text}</p>}
 
-                      {showSection && <SectionSubtree section={yr.section!} />}
+                      {showSection && <SectionSubtree section={yr.section!} departmentSlug={departmentSlug} categorySlug={active.key} />}
 
                       {!showTable && !showCards && !showText && !showSection && (
                         <p className="news-events-empty-text">Nothing added for this academic year yet.</p>

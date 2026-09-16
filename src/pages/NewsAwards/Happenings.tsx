@@ -58,7 +58,7 @@ export default function Happenings() {
                 <div key={ev.id}
                   style={{ background: 'var(--color-primary)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
                   {ev.imageUrl && (
-                    <img src={ev.imageUrl} alt={ev.title} style={{ width: '100%', height: 160, objectFit: 'cover', display: 'block' }} />
+                    <img loading="lazy" src={ev.imageUrl} alt={ev.title} style={{ width: '100%', height: 160, objectFit: 'cover', display: 'block' }} />
                   )}
                   <div style={{ padding: 'var(--space-6)', display: 'flex', gap: 'var(--space-4)', alignItems: 'flex-start' }}>
                     <CalendarDays size={28} strokeWidth={1.75} style={{ flexShrink: 0, color: 'var(--color-accent)' }} />
@@ -94,7 +94,7 @@ export default function Happenings() {
             <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Recent Events</h2>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 'var(--space-6)' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(300px, 100%), 1fr))', gap: 'var(--space-6)' }}>
             {recent.map((ev) => {
               const article = happeningToArticle(ev);
               return <NewsCard key={ev.id} article={article} />;

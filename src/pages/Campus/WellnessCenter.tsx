@@ -72,7 +72,6 @@ export default function WellnessCenter() {
         page="campus-wellness-center"
         defaultTitle="Wellness Center"
         defaultSubtitle="A space where you can be yourself and talk about the things that really matter to you."
-        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Campus Life', to: '/campus' }, { label: 'Wellness Center' }]}
         hideCta={true}
       />
 
@@ -199,7 +198,7 @@ export default function WellnessCenter() {
           </div>
           <div
             className="mobile-stack-grid"
-            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 'var(--space-3)' }}
+            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(260px, 100%), 1fr))', gap: 'var(--space-3)' }}
           >
             {HELP_TOPICS.map(({ icon: Icon, label }) => (
               <div
@@ -292,7 +291,7 @@ export default function WellnessCenter() {
           </div>
           <div
             className="mobile-stack-grid"
-            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 'var(--space-4)' }}
+            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(300px, 100%), 1fr))', gap: 'var(--space-4)' }}
           >
             {ABOUT_FACTS.map((fact, i) => {
               const isEven = i % 2 === 0;

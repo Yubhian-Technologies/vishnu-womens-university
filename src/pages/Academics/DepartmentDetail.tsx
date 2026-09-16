@@ -130,6 +130,51 @@ function ExpandableGroup({ items, renderItem, threshold = 4 }: {
   );
 }
 
+function VmExpandableCard({ title, content }: { title: string; content: string | string[] }) {
+  const [expanded, setExpanded] = useState(false);
+  const isArray = Array.isArray(content);
+  return (
+    <div 
+      className="dept-vm-card" 
+      onClick={() => setExpanded(!expanded)}
+      style={{ cursor: 'pointer' }}
+    >
+      <div className="dept-vm-card-top">
+        <h3 className="dept-vm-title" style={{ fontSize: '1.25rem', margin: 0, color: 'var(--color-primary)' }}>{title}</h3>
+      </div>
+      <SmoothCollapse open={expanded}>
+        <div style={{ paddingTop: '0.5rem' }}>
+          {isArray ? (
+            <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+              {content.map((c, i) => (
+                <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem' }}>
+                  <span style={{ width: 18, height: 18, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
+                    <svg width="9" height="9" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                  </span>
+                  <span style={{ color: 'var(--color-text)', lineHeight: 1.6 }}>{c}</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+              <li style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem' }}>
+                <span style={{ width: 18, height: 18, borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
+                  <svg width="9" height="9" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                </span>
+                <span style={{ color: 'var(--color-text)', lineHeight: 1.6 }}>{content}</span>
+              </li>
+            </ul>
+          )}
+        </div>
+      </SmoothCollapse>
+      <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid rgba(0,0,0,0.05)', display: 'flex', justifyContent: 'center' }}>
+        <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: '50%', background: 'rgba(11,30,66,0.06)', color: 'var(--color-primary)' }}>
+          <ChevronDown size={14} style={{ transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }} />
+        </span>
+      </div>
+    </div>
+  );
+}
 
 // ─── Research & Innovation Section ───────────────────────────────────────────
 // Mirrors the LPU-style "Pioneers of research & innovation" template. Reads
@@ -142,11 +187,15 @@ function ResearchSection({
   heroImage,
   stats = [],
   slides = [],
+  navOffset,
+  id = "research",
 }: {
   deptName: string;
   heroImage: string;
   stats?: ResearchStat[];
   slides?: ResearchSlide[];
+  navOffset?: number | string;
+  id?: string;
 }) {
   const [slide, setSlide] = useState(0);
   const total = slides.length;
@@ -167,10 +216,9 @@ function ResearchSection({
   if (stats.length === 0 && slides.length === 0) return null;
 
   const current = total > 0 ? slides[Math.min(slide, total - 1)] : null;
-  const slideImg = current?.imageUrl || heroImage;
 
   return (
-    <section className="section dept-research-section" aria-labelledby="research-heading">
+    <section id={id} className="section dept-research-section" aria-labelledby="research-heading" style={{ scrollMarginTop: navOffset }}>
       <div className="container">
         {/* ── Header row ── */}
         <div className="dept-research-header-row">
@@ -228,38 +276,38 @@ function ResearchSection({
               </button>
             </div>
 
-            {/* Slide */}
-            <div className="dept-research-slide" key={slide}>
-              {/* Photo */}
-              <div className="dept-research-slide-photo">
-                {slideImg ? (
-                  <img src={slideImg} alt={`${deptName} research — ${current.title}`} className="dept-research-slide-img" />
-                ) : (
-                  <div className="dept-research-slide-placeholder">
-                    <Microscope size={64} strokeWidth={1} style={{ color: '#94a3b8' }} />
-                  </div>
-                )}
-              </div>
-
-              {/* Caption overlay */}
-              <div className="dept-research-slide-caption">
-                <h3 className="dept-research-slide-title">{current.title}</h3>
-                <p className="dept-research-slide-desc">{current.desc}</p>
+            {/* Slides Track */}
+            <div className="dept-research-slides-viewport">
+              <div 
+                className="dept-research-slides-track" 
+                style={{ transform: `translateX(-${slide * 100}%)` }}
+              >
+                {slides.map((s, i) => {
+                  const sImg = s.imageUrl || heroImage;
+                  return (
+                    <div className="dept-research-slide" key={i}>
+                      {/* Photo */}
+                      <div className="dept-research-slide-photo">
+                        {sImg ? (
+                          <img src={sImg} alt={`${deptName} research — ${s.title}`} className="dept-research-slide-img" loading="lazy" />
+                        ) : (
+                          <div className="dept-research-slide-placeholder">
+                            <Microscope size={64} strokeWidth={1} style={{ color: '#94a3b8' }} />
+                          </div>
+                        )}
+                      </div>
+        
+                      {/* Caption overlay */}
+                      <div className="dept-research-slide-caption">
+                        <h3 className="dept-research-slide-title">{s.title}</h3>
+                        <p className="dept-research-slide-desc">{s.desc}</p>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
-            {/* Dot indicators */}
-            <div className="dept-research-dots">
-              {slides.map((_, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => setSlide(i)}
-                  className={`dept-research-dot${i === slide ? ' active' : ''}`}
-                  aria-label={`Go to slide ${i + 1}`}
-                />
-              ))}
-            </div>
           </div>
           )}
 
@@ -439,6 +487,15 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     return () => observer.disconnect();
   }, [progLoading, deptLoading, activeProgram?.slug]);
 
+  // Mobile: auto-scroll the horizontal pill bar so the active link is centered
+  useEffect(() => {
+    if (!activeSectionId) return;
+    const el = document.querySelector(`.dept-quicknav-link[href="#${CSS.escape(activeSectionId)}"]`) as HTMLElement | null;
+    if (el && el.scrollIntoView) {
+      el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }
+  }, [activeSectionId]);
+
   if (progLoading && subPrograms.length === 0) {
     return (
       <RouteFallback />
@@ -463,7 +520,8 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
   const primary = subPrograms[0];
   const clean = (v?: string) => (v && v !== '—' ? v : '');
   const shared = {
-    heroImage: dept?.heroImage || primary?.heroImage || activeProgram.heroImage || '',
+    overviewImage: dept?.heroImage || '',
+    pageHeroImage: primary?.heroImage || activeProgram.heroImage || '',
     // Department-only — never falls back to a programme's own About, which
     // now shows per-programme in the toggle section instead (see
     // "About the Programme" below). `description` is the same card blurb
@@ -765,7 +823,8 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
     faqs.length > 0 && { id: 'faq', label: 'FAQs' },
   ].filter(Boolean) as { id: string; label: string }[];
 
-  const heroImage = shared.heroImage;
+  const pageHeroImage = shared.pageHeroImage;
+  const overviewImage = shared.overviewImage || pageHeroImage;
   const pageUrl = `/academics/${activeProgram.slug}`;
   const pageDesc = shared.about
     ? (shared.about.length > 155 ? `${shared.about.slice(0, 155)}...` : shared.about)
@@ -787,13 +846,16 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
 
   return (
     <main className="page-wrapper dept-detail-page">
-      <SEO title={`${deptName} | Vishnu Women's University`} description={pageDesc} canonicalPath={pageUrl} ogImage={heroImage} jsonLd={jsonLd} />
+      <SEO title={`${deptName} | Vishnu Women's University`} description={pageDesc} canonicalPath={pageUrl} ogImage={pageHeroImage} jsonLd={jsonLd} />
 
-      {/* Hero — plain gradient card, no attached image (image now lives
-          beside the Department Overview text below instead). */}
+      {/* Hero — same rounded image-card treatment for every department */}
       <section className="dept-hero-section">
         <div className="container">
           <div className="dept-hero-card">
+            {pageHeroImage && (
+              <SmoothImage src={pageHeroImage} alt={deptName} className="dept-hero-bg-img" loading="eager" decoding="sync" />
+            )}
+            <div className="dept-hero-overlay" />
             <div className="dept-hero-content">
               <h1 className="dept-hero-title">{deptName}</h1>
               <p className="dept-hero-subtitle">
@@ -859,9 +921,9 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                     </p>
                   </div>
 
-                  {heroImage && (
+                  {overviewImage && (
                     <div className="dept-about-media">
-                      <SmoothImage src={heroImage} alt={deptName} className="dept-about-media-img" loading="eager" fetchPriority="high" />
+                      <SmoothImage src={overviewImage} alt={deptName} className="dept-about-media-img" loading="eager" fetchPriority="high" />
                     </div>
                   )}
                 </div>
@@ -892,11 +954,33 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
         </section>
       )}
 
+      {/* Vision & Mission Expandable Cards */}
+      {(shared.vision || shared.mission.length > 0) && (
+        <section id="vision-mission" className="section bg-light" style={{ scrollMarginTop: NAV_OFFSET, padding: 'var(--space-8) 0' }}>
+          <div className="container">
+            <div className="dept-vm-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem' }}>
+              {shared.vision && (
+                <VmExpandableCard 
+                  title="Our Vision" 
+                  content={shared.vision} 
+                />
+              )}
+              {shared.mission.length > 0 && (
+                <VmExpandableCard 
+                  title="Our Mission" 
+                  content={shared.mission} 
+                />
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Core Values — moved out from HOD section directly after Department Overview.
           Department Vision / Mission Statements cards were removed here; this
           section now only ever shows Institutional Core Values. */}
       {hasCoreValues && (
-        <section id="vision-mission" className="section dept-section-navy" style={{ scrollMarginTop: NAV_OFFSET }}>
+        <section id="core-values" className="section dept-section-navy" style={{ scrollMarginTop: NAV_OFFSET }}>
           <div className="container">
             <div style={{ marginBottom: 'var(--space-6)' }}>
               <h2 className="section-title">Our Core Values</h2>
@@ -1262,11 +1346,8 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
           override (dept.established / dept.accreditation) still wins as a
           single dept-wide entry, same fallback the previous grid used. */}
       {(() => {
-        const deptEst = clean(dept?.established);
-        const validEst = subPrograms.filter((p) => clean(p.established));
-        const establishmentItems: ProfileListItem[] = deptEst
-          ? [{ id: 'dept-est', label: deptName, value: deptEst }]
-          : validEst.map((p) => ({ id: p.id, label: p.shortName || p.name, value: clean(p.established) }));
+        const deptEstList = dept?.academicJourneyList || [];
+        const establishmentItems: ProfileListItem[] = deptEstList.map((aj, i) => ({ id: `dept-aj-${i}`, label: aj.label, value: aj.year }));
 
         const deptAcc = clean(dept?.accreditation);
         const deptAccImage = dept?.accreditationImage || '';
@@ -1275,9 +1356,8 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
           ? [{ id: 'dept-acc', label: deptName, value: deptAcc, image: deptAccImage }]
           : validAcc.map((p) => ({ id: p.id, label: p.shortName || p.name, value: clean(p.accreditation), image: p.accreditationImage || '' }));
 
-        const intakeItems: ProfileListItem[] = subPrograms
-          .filter((p) => p.intake && p.intake > 0)
-          .map((p) => ({ id: p.id, label: p.shortName || p.name, value: p.intake }));
+        const deptIntakeList = dept?.programmeIntakeList || [];
+        const intakeItems: ProfileListItem[] = deptIntakeList.map((pi, i) => ({ id: `dept-pi-${i}`, label: pi.program, value: pi.intake }));
 
         const hasJourneyRow = establishmentItems.length > 0 || intakeItems.length > 0;
         // AP EAPCET Code panel below always renders, so this row is never empty.
@@ -1348,7 +1428,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                         <div className="dept-accreditation-image-section">
                           {accreditationItems.filter((item) => item.image).map((item) => (
                             <div key={item.id} className="dept-accreditation-image-wrapper">
-                              <img src={item.image} alt={`${item.label} accreditation`} />
+                              <img loading="lazy" src={item.image} alt={`${item.label} accreditation`} />
                               <span className="dept-accreditation-image-label">{item.label}</span>
                             </div>
                           ))}
@@ -1383,7 +1463,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
 
                   <Link to="/admissions" className="dept-profile-panel dept-profile-eapcet">
                     <div className="dept-profile-panel-head">
-                      <h3>Applying via AP EAPCET?</h3>
+                      <h3>Applying via APEAPCET / ICET / ECET?</h3>
                     </div>
                     <div className="dept-eapcet-body">
                       <span className="dept-eapcet-code">{eapcetCode}</span>
@@ -1405,7 +1485,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
         <LabsCarousel
           labs={shared.labs}
           navOffset={NAV_OFFSET}
-          fallbackImage={shared.heroImage}
+          fallbackImage={pageHeroImage}
           title="Academic Infrastructure & Learning Facilities"
           description={`Explore the laboratories, studios, and campus infrastructure that support hands-on learning in ${deptName} — from specialized equipment to dedicated project and research spaces.`}
         />
@@ -1416,7 +1496,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
           Left: 2×2 stat cards. Right: auto-advancing research slide carousel.
           Data comes from this department's own doc (Admin → Academic
           Departments → Research & Innovation) — see ResearchSection above. */}
-      <ResearchSection deptName={deptName} heroImage={heroImage} stats={dept?.researchStats} slides={dept?.researchSlides} />
+      <ResearchSection deptName={deptName} heroImage={pageHeroImage} stats={dept?.researchStats} slides={dept?.researchSlides} navOffset={NAV_OFFSET} />
 
       {/* Tie-Ups & MoUs — admin-entered partner/institution names
           (dept.tieUpsMous), same rectangular tile grid as Top Recruiters
@@ -1603,7 +1683,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
                           className="dept-mindmap-thumb"
                           aria-label={`View mind map image ${i + 1}`}
                         >
-                          <img src={img.url} alt={`${activeProgram.shortName || activeProgram.name} mind map ${i + 1}`} />
+                          <img loading="lazy" src={img.url} alt={`${activeProgram.shortName || activeProgram.name} mind map ${i + 1}`} />
                         </a>
                       ))}
                       {activeProgram.mindMapPdfUrl && (
@@ -1939,7 +2019,7 @@ export default function DepartmentDetail({ group, activeSlug }: Props) {
           into its own standalone section. NewsEventsTabs renders its own
           section/container + collapsible header when not embedded. */}
       {hasNewsEvents && (
-        <NewsEventsTabs categories={newsEventsCategories} navOffset={NAV_OFFSET} />
+        <NewsEventsTabs categories={newsEventsCategories} navOffset={NAV_OFFSET} departmentSlug={group.key} />
       )}
 
       {/* Testimonials — a bold navy "quote wall" (matching the Core Values

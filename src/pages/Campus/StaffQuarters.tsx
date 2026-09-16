@@ -154,11 +154,6 @@ export default function StaffQuarters() {
         page="campus-staff-quarters"
         defaultTitle={adminItem?.title || 'Faculty & Staff Residential Facilities'}
         defaultSubtitle={adminItem?.desc || aboutData.subtitle}
-        breadcrumb={[
-          { label: 'Home', to: '/' },
-          { label: 'Campus Life', to: '/campus' },
-          { label: adminItem?.title || 'Staff Quarters' },
-        ]}
         hideCta={true}
       />
 
@@ -167,15 +162,12 @@ export default function StaffQuarters() {
         <div className="container">
           <div className="sq-hero-gallery-card sq-animate" data-delay="100">
             <div className="sq-main-photo-stage">
-              <img
+              <img loading="lazy"
                 src={getPhotoSrc(activePhotoIdx)}
                 alt={DEFAULT_PHOTOS[activePhotoIdx]?.alt || 'Green Meadows Quarters'}
                 className="sq-stage-img"
               />
               <div className="sq-stage-overlay">
-                <div className="sq-stage-badge">
-                  <Sparkles size={16} /> Featured Residential View
-                </div>
                 <h3 className="sq-stage-caption">
                   {photos[activePhotoIdx]?.caption || DEFAULT_PHOTOS[activePhotoIdx]?.caption}
                 </h3>
@@ -190,7 +182,7 @@ export default function StaffQuarters() {
                   onClick={() => setActivePhotoIdx(idx)}
                   className={`sq-thumb-btn ${activePhotoIdx === idx ? 'active' : ''}`}
                 >
-                  <img src={getPhotoSrc(idx)} alt={p.alt} />
+                  <img loading="lazy" src={getPhotoSrc(idx)} alt={p.alt} />
                   <span className="sq-thumb-number">0{idx + 1}</span>
                 </button>
               ))}
@@ -231,13 +223,10 @@ export default function StaffQuarters() {
               {/* 1. Chairman's Vision Hero Card with Full Background Photo Overlay */}
               <div className="sq-vision-hero-card sq-animate" data-delay="100">
                 <div className="sq-vision-bg-image">
-                  <img src={getPhotoSrc(0)} alt="Green Meadows Housing Vision" />
+                  <img loading="lazy" src={getPhotoSrc(0)} alt="Green Meadows Housing Vision" />
                   <div className="sq-vision-overlay"></div>
                 </div>
                 <div className="sq-vision-content">
-                  <div className="sq-vision-badge">
-                    <Award size={16} /> {aboutData.badge}
-                  </div>
                   <blockquote className="sq-vision-quote">
                     “Of three basic human needs, accommodation has got the highest priority in this modern world of high standards of living.”
                   </blockquote>
@@ -250,11 +239,8 @@ export default function StaffQuarters() {
               {/* 2. Living at Green Meadows Story Section */}
               <div className="sq-feature-hero-card sq-animate" data-delay="200">
                 <div className="sq-card-image-col">
-                  <img src={getPhotoSrc(2)} alt="Green Meadows Pond & Scenery" />
-                  <div className="sq-image-badge">
-                    <Trees size={14} /> Scenic Pond Frontage
+                  <img loading="lazy" src={getPhotoSrc(2)} alt="Green Meadows Pond & Scenery" />
                   </div>
-                </div>
                 <div className="sq-card-text-col">
                   <div className="sq-card-tag">
                     <Building2 size={16} /> {aboutData.title}
@@ -281,14 +267,14 @@ export default function StaffQuarters() {
               <div className="sq-photo-grid-section sq-animate" data-delay="400">
                 <div className="sq-section-header">
                   <h2 className="sq-section-title">Visual Highlights of Green Meadows</h2>
-                  <p className="sq-section-subtitle">Experience high-quality living, scenic landscapes, and full security on campus.</p>
+                  <p className="sq-section-subtitle">From quiet residential lanes to green open spaces, Green Meadows offers an environment where everyday campus living feels relaxed and connected.</p>
                 </div>
 
                 <div className="sq-photo-cards-grid">
                   {featuresList.map((item, idx) => (
                     <div key={idx} className="sq-photo-card">
                       <div className="sq-photo-card-img-wrap">
-                        <img src={getPhotoSrc(item.imgIndex)} alt={item.title} />
+                        <img loading="lazy" src={getPhotoSrc(item.imgIndex)} alt={item.title} />
                         <span className="sq-photo-card-tag">{item.tag}</span>
                       </div>
                       <div className="sq-photo-card-content">
@@ -314,7 +300,7 @@ export default function StaffQuarters() {
                   columns={3}
                   label="Residential Gallery"
                   title="Green Meadows Housing Gallery"
-                  subtitle="Snapshots of the serene housing enclave at Vishnu Women's University."
+                  subtitle="Take a closer look at the residential spaces, tree-lined surroundings, landscaped areas, and shared community spaces that shape everyday life at Green Meadows."
                   showGalleryLink={false}
                 />
               </div>
@@ -324,7 +310,7 @@ export default function StaffQuarters() {
             {/* Sidebar Navigation & Quick Specs */}
             <aside className="sq-sidebar sq-animate" data-delay="250">
               <div className="sq-sidebar-card">
-                <h3 className="sq-sidebar-title">Residential Amenities &amp; Facts</h3>
+                <h3 className="sq-sidebar-title">Residential Amenities</h3>
                 <ul className="sq-quick-facts">
                   {amenitiesList.map((am, i) => (
                     <li key={i}>

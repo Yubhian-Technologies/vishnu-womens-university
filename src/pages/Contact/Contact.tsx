@@ -120,7 +120,7 @@ const DEFAULT_INFO_CARDS = [
   {
     id: 'default-info-4',
     title: 'Admissions Quick Info',
-    desc: 'AP EAPCET Code: VISW, VISWPU\nEmail: admissions@vwu.edu.in\nHelpline: +91 8816 250864',
+    desc: 'APEAPCET / ICET / ECET Code: VISW, VISWPU\nEmail: admissions@vwu.edu.in\nHelpline: +91 8816 250864',
     value: 'Mon – Sat: 9:00 AM – 5:00 PM IST',
     slug: 'Admissions Desk',
     icon: 'GraduationCap',
@@ -581,6 +581,8 @@ export default function Contact() {
                       value={form.category}
                       onChange={handleChange}
                       className="form-select-clean"
+                      aria-describedby={errors.category ? 'err-cf-category' : undefined}
+                      aria-invalid={!!errors.category}
                     >
                       {CATEGORY_OPTIONS.map((cat) => (
                         <option key={cat} value={cat}>{cat}</option>
@@ -599,9 +601,12 @@ export default function Contact() {
                         placeholder="e.g. Ananya Sharma"
                         value={form.name}
                         onChange={handleChange}
+                        autoComplete="name"
+                        aria-invalid={!!errors.name}
+                        aria-describedby={errors.name ? 'err-cf-name' : undefined}
                         className={`form-input-clean ${errors.name ? 'form-input--error' : ''}`}
                       />
-                      {errors.name && <span className="form-error-text">{errors.name}</span>}
+                      {errors.name && <span id="err-cf-name" role="alert" className="form-error-text">{errors.name}</span>}
                     </div>
 
                     {/* Email */}
@@ -614,9 +619,13 @@ export default function Contact() {
                         placeholder="ananya@example.com"
                         value={form.email}
                         onChange={handleChange}
+                        autoComplete="email"
+                        inputMode="email"
+                        aria-invalid={!!errors.email}
+                        aria-describedby={errors.email ? 'err-cf-email' : undefined}
                         className={`form-input-clean ${errors.email ? 'form-input--error' : ''}`}
                       />
-                      {errors.email && <span className="form-error-text">{errors.email}</span>}
+                      {errors.email && <span id="err-cf-email" role="alert" className="form-error-text">{errors.email}</span>}
                     </div>
                   </div>
 
@@ -631,9 +640,12 @@ export default function Contact() {
                         placeholder="+91 98765 43210"
                         value={form.phone}
                         onChange={handleChange}
+                        autoComplete="tel"
+                        aria-invalid={!!errors.phone}
+                        aria-describedby={errors.phone ? 'err-cf-phone' : undefined}
                         className={`form-input-clean ${errors.phone ? 'form-input--error' : ''}`}
                       />
-                      {errors.phone && <span className="form-error-text">{errors.phone}</span>}
+                      {errors.phone && <span id="err-cf-phone" role="alert" className="form-error-text">{errors.phone}</span>}
                     </div>
 
                     {/* Subject */}
@@ -646,9 +658,11 @@ export default function Contact() {
                         placeholder="e.g. Admission Query"
                         value={form.subject}
                         onChange={handleChange}
+                        aria-invalid={!!errors.subject}
+                        aria-describedby={errors.subject ? 'err-cf-subject' : undefined}
                         className={`form-input-clean ${errors.subject ? 'form-input--error' : ''}`}
                       />
-                      {errors.subject && <span className="form-error-text">{errors.subject}</span>}
+                      {errors.subject && <span id="err-cf-subject" role="alert" className="form-error-text">{errors.subject}</span>}
                     </div>
                   </div>
 
@@ -662,13 +676,15 @@ export default function Contact() {
                       placeholder="Write your questions or message details here..."
                       value={form.message}
                       onChange={handleChange}
+                      aria-invalid={!!errors.message}
+                      aria-describedby={errors.message ? 'err-cf-message' : undefined}
                       className={`form-input-clean form-textarea-clean ${errors.message ? 'form-input--error' : ''}`}
                     />
-                    {errors.message && <span className="form-error-text">{errors.message}</span>}
+                    {errors.message && <span id="err-cf-message" role="alert" className="form-error-text">{errors.message}</span>}
                   </div>
 
                   {submitError && (
-                    <div className="form-alert-error">
+                    <div className="form-alert-error" role="alert" aria-live="assertive">
                       <AlertCircle size={16} />
                       <span>{submitError}</span>
                     </div>

@@ -158,9 +158,14 @@ export default function CampusLifeDetail({ slug: slugProp }: { slug?: string }) 
       {!EVENTS_SHOWCASE_SLUGS.has(slug) && (
         <section style={{ background: 'var(--color-primary)', padding: 'var(--space-14) 0' }}>
           <div className="container" style={{ textAlign: 'center' }}>
-            <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>
-              {isActivity ? 'Explore More Student Activities' : 'Explore More of Campus Life'}
+            <h2 style={{ color: 'var(--color-white)', marginBottom: slug === 'campus-book-stores' ? 'var(--space-2)' : 'var(--space-4)' }}>
+              {slug === 'campus-book-stores' ? 'Explore More Campus Facilities' : (isActivity ? 'Explore More Student Activities' : 'Explore More of Campus Life')}
             </h2>
+            {slug === 'campus-book-stores' && (
+              <p style={{ color: 'var(--color-white)', fontSize: '1.1rem', opacity: 0.9, maxWidth: '600px', margin: '0 auto var(--space-6)' }}>
+                Discover the spaces and services that support learning and everyday student life at Vishnu Women's University.
+              </p>
+            )}
             <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
               {isActivity ? (
                 <>
@@ -171,8 +176,8 @@ export default function CampusLifeDetail({ slug: slugProp }: { slug?: string }) 
                 </>
               ) : (
                 <>
-                  <Link to="/campus" className="btn btn-accent">Back to Campus Life</Link>
-                  <Link to="/student-life" className="btn btn-secondary">Student Life</Link>
+                  <Link to="/campus" className="btn btn-accent">{slug === 'campus-book-stores' ? 'Explore Campus Facilities' : 'Back to Campus Life'}</Link>
+                  <Link to="/student-life" className="btn btn-secondary">{slug === 'campus-book-stores' ? 'Discover Student Life' : 'Student Life'}</Link>
                 </>
               )}
             </div>

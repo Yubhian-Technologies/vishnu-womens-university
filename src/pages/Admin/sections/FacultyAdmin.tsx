@@ -146,11 +146,22 @@ export default function FacultyAdmin() {
     programs.forEach((p) => add(p.department));
     faculty.forEach((f) => add(f.department));
     FOUNDATION_DEPARTMENTS.forEach(add);
+    // A scoped account's own department must always be pickable — even
+    // before any Program or Faculty record exists for it yet (e.g. a
+    // brand-new department being onboarded). Without this, a scoped
+    // account whose department has zero existing records got an empty
+    // Department <select> (no way to pick their own department at all),
+    // so `form.department`/`bulkDept`/`jsonDept` could only ever hold some
+    // *other* department's tag, and save()'s scope check below rejected
+    // every attempt — looking exactly like the granted "Write" permission
+    // had no effect, and the "Faculty (0)" heading further down came from
+    // this same always-empty filter.
+    if (scopedShortCode) departmentTagsForShortCode(scopedShortCode).forEach(add);
     // A scoped account only ever gets its own department as a pickable
     // option, so it can't add/move a faculty record into another one.
     return scopedDeptTags ? names.filter((n) => matchesScopedDept(n)) : names;
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [programs, faculty, scopedDeptTags]);
+  }, [programs, faculty, scopedDeptTags, scopedShortCode]);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   // Snapshot of `form` taken when "Edit" was clicked (see startEdit) —
   // save() diffs against this so Update only writes fields actually changed
@@ -228,6 +239,27 @@ export default function FacultyAdmin() {
   const [jsonText, setJsonText] = useState('');
   const [jsonImporting, setJsonImporting] = useState(false);
   const [jsonResult, setJsonResult] = useState<string | null>(null);
+
+  // A scoped account's department pickers (Add/Edit, Bulk Import, JSON
+  // Import) default to the hardcoded 'CSE' above — for any other
+  // department, a <select> whose current value has no matching <option>
+  // just visually falls back to the first option without firing onChange,
+  // so the underlying state silently stays 'CSE' until the dropdown is
+  // manually touched. Save then rejects it as outside scope, which looks
+  // identical to the granted "Write" permission doing nothing. Once the
+  // scoped department resolves to a real pickable name (see
+  // departmentNames above), correct any picker that isn't already inside
+  // scope — but never while an edit is open, so this can't stomp on a
+  // record already being edited into a different (still-in-scope) tag.
+  useEffect(() => {
+    if (!scopedDeptTags) return;
+    const ownDept = departmentNames[0];
+    if (!ownDept) return;
+    if (!editing) setForm((p) => (matchesScopedDept(p.department) ? p : { ...p, department: ownDept }));
+    setBulkDept((d) => (matchesScopedDept(d) ? d : ownDept));
+    setJsonDept((d) => (matchesScopedDept(d) ? d : ownDept));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scopedDeptTags, departmentNames, editing]);
 
   const set = (k: keyof FormState, v: string | number | CustomSection[]) => setForm((p) => ({ ...p, [k]: v }));
   const handleImage = (r: UploadResult) => setForm((p) => ({ ...p, imageUrl: r.url, storagePath: r.path }));
@@ -917,7 +949,7 @@ export default function FacultyAdmin() {
                                 onMouseDown={(e) => e.stopPropagation()}
                               />
                             </td>
-                            <td>{f.imageUrl ? <img src={f.imageUrl} alt="" className="admin-table__avatar" /> : '👤'}</td>
+                            <td>{f.imageUrl ? <img loading="lazy" src={f.imageUrl} alt="" className="admin-table__avatar" /> : '👤'}</td>
                             <td>{f.name}</td>
                             <td>
                               <span className="admin-badge admin-badge--sm">{f.designation}</span>

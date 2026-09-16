@@ -1,11 +1,11 @@
-import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import SEO from '../../components/SEO/SEO';
-import { usePageBanners } from '../../hooks/usePageBanners';
-import { useContentBlocks } from '../../hooks/useContentBlocks';
-import { useSitePhotos } from '../../hooks/useSitePhotos';
-import type { PhotoItem } from '../../components/PhotoGrid/PhotoGrid';
-import './Auditoriums.css';
+import { useEffect } from "react";
+
+import SEO from "../../components/SEO/SEO";
+import { usePageBanners } from "../../hooks/usePageBanners";
+import { useContentBlocks } from "../../hooks/useContentBlocks";
+import { useSitePhotos } from "../../hooks/useSitePhotos";
+import type { PhotoItem } from "../../components/PhotoGrid/PhotoGrid";
+import "./Auditoriums.css";
 
 // Bespoke page (not the generic CampusLifeDetail.tsx -> campusLifeItems
 // renderer every other Campus Life facility uses) — intercepts
@@ -16,97 +16,171 @@ import './Auditoriums.css';
 // campusFacilities.data.ts) — nothing new needed there. Everything else
 // (tagline/caption, the two tile rows, the About section, and the gallery)
 // is wired to new Content Blocks / Site Photos sections below.
-const DEFAULT_HERO_IMAGE = 'https://images.unsplash.com/photo-1580881783365-1e6d599c39e0?w=1600&q=80';
-const DEFAULT_HERO_TITLE = 'Auditoriums';
-const DEFAULT_HERO_SUBTITLE = 'Versatile Spaces for Academic, Cultural, and Institutional Events';
-const DEFAULT_HERO_TAGLINE = 'Ideas · Events · People · Possibilities';
-const DEFAULT_HERO_CAPTION = 'A Space for Every Big Idea';
-const DEFAULT_HERO_SCREEN = 'Ideas\nInspire\nPeople';
+const DEFAULT_HERO_IMAGE =
+  "https://images.unsplash.com/photo-1580881783365-1e6d599c39e0?w=1600&q=80";
+const DEFAULT_HERO_TITLE = "Auditoriums at Vishnu Women’s University";
+const DEFAULT_HERO_SUBTITLE = "Versatile venues for academic events, cultural programmes, student activities and institutional gatherings.";
+const DEFAULT_HERO_TAGLINE = "Ideas · Events · People · Possibilities";
+const DEFAULT_HERO_CAPTION = "A Space for Every Big Idea";
+const DEFAULT_HERO_SCREEN = "Ideas\nInspire\nPeople";
 
 const DEFAULT_TOP_FEATURES = [
-  { id: 'tf1', title: 'Academic Events', desc: 'Seminars, lectures, conferences' },
-  { id: 'tf2', title: 'Cultural Programmes', desc: 'Celebrations, performances' },
-  { id: 'tf3', title: 'Student Activities', desc: 'Workshops, debates, discussions' },
-  { id: 'tf4', title: 'Modern Facilities', desc: 'Audio-visual systems, projectors' },
+  {
+    id: "tf1",
+    title: "Academic Events",
+    desc: "Seminars, lectures and conferences",
+  },
+  {
+    id: "tf2",
+    title: "Cultural Programmes",
+    desc: "Performances, celebrations and events",
+  },
+  {
+    id: "tf3",
+    title: "Student Activities",
+    desc: "Workshops, debates and discussions",
+  },
+  {
+    id: "tf4",
+    title: "Modern Facilities",
+    desc: "Audio-visual systems and presentation facilities",
+  },
 ];
 
 const DEFAULT_BOTTOM_STATS = [
-  { id: 'bs1', title: 'Multiple Venues', desc: 'Indoor, Open-Air, Mini-Auditorium, Seminar Halls' },
-  { id: 'bs2', title: 'Up to 250', desc: 'Seating capacity (in Seminar Halls)' },
-  { id: 'bs3', title: 'Modern AV Setup', desc: 'Projectors, sound systems, internet connectivity' },
-  { id: 'bs4', title: 'Comfortable & Accessible', desc: 'Air-conditioned spaces with modern facilities' },
+  {
+    id: "bs1",
+    title: "Multiple Venues",
+    desc: "Indoor, Open-Air, Mini-Auditorium, Seminar Halls",
+  },
+  {
+    id: "bs2",
+    title: "Up to 250",
+    desc: "Seating capacity (in Seminar Halls)",
+  },
+  {
+    id: "bs3",
+    title: "Modern AV Setup",
+    desc: "Projectors, sound systems, internet connectivity",
+  },
+  {
+    id: "bs4",
+    title: "Comfortable & Accessible",
+    desc: "Air-conditioned spaces with modern facilities",
+  },
 ];
 
 // Kept in sync with the real, existing copy about VWU's auditoriums
 // (src/pages/Campus/campusFacilities.data.ts) rather than generic
 // placeholder text.
-const DEFAULT_ABOUT_HEADING = "Auditoriums at Vishnu Women's University";
+const DEFAULT_ABOUT_HEADING = "Spaces for Learning, Expression and Engagement";
 const DEFAULT_ABOUT_BODY = [
-  "Vishnu Women's University houses an Indoor Auditorium, Open-Air Auditorium, Mini-Auditorium, and numerous Seminar Halls that support the cultural programmes, seminars, debates, plays, and other events held throughout the year — bringing students together to share, discuss, and explore knowledge in their areas of learning.",
-  'The Smt. B. Seetha Indoor Auditorium is centrally air-conditioned, fully sound-proofed, and equipped with the latest technology for audio/video presentations. The Open-Air Auditorium and Mini-Auditorium host a wide variety of student activities, while the Seminar Halls provide flexible, well-equipped spaces for smaller academic and collaborative sessions.',
+  "Vishnu Women’s University offers an Indoor Auditorium, Open-Air Auditorium, Mini-Auditorium and Seminar Halls for academic, cultural and student activities throughout the year.",
+  "The venues support seminars, conferences, debates, workshops, performances and institutional events, providing flexible spaces for both large gatherings and smaller interactive sessions.",
 ];
-const DEFAULT_ABOUT_QUOTE = 'More than just halls, our auditoriums bring people, ideas, and opportunities together.';
+const DEFAULT_ABOUT_QUOTE =
+  "More than just halls, our auditoriums bring people, ideas, and opportunities together.";
 const DEFAULT_ABOUT_ATTRIBUTION = "Vishnu Women's University";
-const DEFAULT_ABOUT_IMAGE = 'https://images.unsplash.com/photo-1519452575417-564c1401ecc0?w=900&q=80';
+const DEFAULT_ABOUT_IMAGE =
+  "https://images.unsplash.com/photo-1519452575417-564c1401ecc0?w=900&q=80";
 
 // 10 photos matching the 10 slots of the organic cluster collage layout (Image 1 style)
 const DEFAULT_GALLERY: PhotoItem[] = [
-  { src: 'https://images.unsplash.com/photo-1580881783365-1e6d599c39e0?w=500&h=750&fit=crop&q=80', alt: 'Auditorium interior', caption: 'Main Auditorium' },
-  { src: 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=450&h=680&fit=crop&q=80', alt: 'Guest lecture in session', caption: 'Guest Lecture' },
-  { src: 'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=600&h=380&fit=crop&q=80', alt: 'Seminar hall in session', caption: 'Seminar Hall' },
-  { src: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=760&h=620&fit=crop&q=80', alt: 'Cultural programme performance', caption: 'Cultural Programme' },
-  { src: 'https://images.unsplash.com/photo-1475721042765-52a63b1e2f34?w=450&h=700&fit=crop&q=80', alt: 'Open-air auditorium', caption: 'Open-Air Auditorium' },
-  { src: 'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=420&h=420&fit=crop&q=80', alt: 'Panel discussion on stage', caption: 'Panel Discussion' },
-  { src: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=520&h=560&fit=crop&q=80', alt: 'Audience at a campus event', caption: 'Student Audience' },
-  { src: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=420&h=620&fit=crop&q=80', alt: 'Students collaborating', caption: 'Collaborative Session' },
-  { src: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=560&h=440&fit=crop&q=80', alt: 'Campus event gathering', caption: 'Campus Gathering' },
-  { src: 'https://images.unsplash.com/photo-1511578314322-379afb476865?w=500&h=700&fit=crop&q=80', alt: 'Outdoor campus event', caption: 'Outdoor Venue' },
+  {
+    src: "https://images.unsplash.com/photo-1580881783365-1e6d599c39e0?w=500&h=750&fit=crop&q=80",
+    alt: "Auditorium interior",
+    caption: "Main Auditorium",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=450&h=680&fit=crop&q=80",
+    alt: "Guest lecture in session",
+    caption: "Guest Lecture",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=600&h=380&fit=crop&q=80",
+    alt: "Seminar hall in session",
+    caption: "Seminar Hall",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=760&h=620&fit=crop&q=80",
+    alt: "Cultural programme performance",
+    caption: "Cultural Programme",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1475721042765-52a63b1e2f34?w=450&h=700&fit=crop&q=80",
+    alt: "Open-air auditorium",
+    caption: "Open-Air Auditorium",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=420&h=420&fit=crop&q=80",
+    alt: "Panel discussion on stage",
+    caption: "Panel Discussion",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=520&h=560&fit=crop&q=80",
+    alt: "Audience at a campus event",
+    caption: "Student Audience",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=420&h=620&fit=crop&q=80",
+    alt: "Students collaborating",
+    caption: "Collaborative Session",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=560&h=440&fit=crop&q=80",
+    alt: "Campus event gathering",
+    caption: "Campus Gathering",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1511578314322-379afb476865?w=500&h=700&fit=crop&q=80",
+    alt: "Outdoor campus event",
+    caption: "Outdoor Venue",
+  },
 ];
 
-// Tile background/text colours cycled across the two feature-tile rows —
-// kept local to this page, same small hand-picked-palette convention used
-// elsewhere (e.g. Clubs.tsx / Wellness.tsx), not a shared design token since
-// it's purely decorative to this layout.
-const TOP_TILE_COLORS = [
-  { bg: '#FDF6E3', fg: '#6D5415' },
-  { bg: '#F3ECFB', fg: '#533184' },
-  { bg: '#E9F1FC', fg: '#21437C' },
-  { bg: '#EAF7EE', fg: '#235E3A' },
-];
 const BOTTOM_TILE_COLORS = [
-  { bg: '#FDF6E3', fg: '#6D5415' },
-  { bg: '#EAF7EE', fg: '#235E3A' },
-  { bg: '#E9F1FC', fg: '#21437C' },
-  { bg: '#F1F3F5', fg: '#343A40' },
+  { bg: "#FDF6E3", fg: "#6D5415" },
+  { bg: "#EAF7EE", fg: "#235E3A" },
+  { bg: "#E9F1FC", fg: "#21437C" },
+  { bg: "#F1F3F5", fg: "#343A40" },
 ];
 
 export default function Auditoriums() {
-  const { slides: heroSlides } = usePageBanners('campus-auditoriums');
-  const heroExtra = useContentBlocks('auditoriums', 'hero')[0];
-  const liveTopFeatures = useContentBlocks('auditoriums', 'topFeatures');
-  const liveBottomStats = useContentBlocks('auditoriums', 'bottomStats');
-  const about = useContentBlocks('auditoriums', 'about')[0];
-  const galleryPhotos = useSitePhotos('campus', 'auditoriums', DEFAULT_GALLERY);
+  const { slides: heroSlides } = usePageBanners("campus-auditoriums");
+  const heroExtra = useContentBlocks("auditoriums", "hero")[0];
+  const liveTopFeatures = useContentBlocks("auditoriums", "topFeatures");
+  const liveBottomStats = useContentBlocks("auditoriums", "bottomStats");
+  const about = useContentBlocks("auditoriums", "about")[0];
+  const galleryPhotos = useSitePhotos("campus", "auditoriums", DEFAULT_GALLERY);
 
-  const topFeatures = liveTopFeatures.length > 0 ? liveTopFeatures : DEFAULT_TOP_FEATURES;
-  const bottomStats = liveBottomStats.length > 0 ? liveBottomStats : DEFAULT_BOTTOM_STATS;
+  const topFeatures =
+    liveTopFeatures.length > 0 ? liveTopFeatures : DEFAULT_TOP_FEATURES;
+  const bottomStats =
+    liveBottomStats.length > 0 ? liveBottomStats : DEFAULT_BOTTOM_STATS;
 
   const heroSlide = heroSlides[0];
   const heroImage = heroSlide?.imageUrl || DEFAULT_HERO_IMAGE;
   const heroTitle = heroSlide?.title || DEFAULT_HERO_TITLE;
   const heroSubtitle = heroSlide?.subtitle || DEFAULT_HERO_SUBTITLE;
-  const heroTagline = (heroExtra?.value || DEFAULT_HERO_TAGLINE).split('·').map((s) => s.trim()).filter(Boolean);
+  const heroTagline = (heroExtra?.value || DEFAULT_HERO_TAGLINE)
+    .split("·")
+    .map((s) => s.trim())
+    .filter(Boolean);
   const heroCaption = heroExtra?.title || DEFAULT_HERO_CAPTION;
-  const heroScreenLines = (heroExtra?.desc || DEFAULT_HERO_SCREEN).split('\n').filter(Boolean);
+  const heroScreenLines = (heroExtra?.desc || DEFAULT_HERO_SCREEN)
+    .split("\n")
+    .filter(Boolean);
 
   const aboutHeading = about?.title || DEFAULT_ABOUT_HEADING;
-  const aboutBody = about?.desc ? about.desc.split('\n').filter(Boolean) : DEFAULT_ABOUT_BODY;
+  const aboutBody = about?.desc
+    ? about.desc.split("\n").filter(Boolean)
+    : DEFAULT_ABOUT_BODY;
   const aboutQuote = about?.value || DEFAULT_ABOUT_QUOTE;
   const aboutAttribution = about?.icon || DEFAULT_ABOUT_ATTRIBUTION;
   const aboutImage = about?.slug || DEFAULT_ABOUT_IMAGE;
 
   useEffect(() => {
-    document.title = 'Auditoriums | Campus Life | VWU';
+    document.title = "Auditoriums | Campus Life | VWU";
   }, []);
 
   return (
@@ -121,42 +195,53 @@ export default function Auditoriums() {
       <section className="aud-hero-section">
         <div className="aud-hero-card">
           <div className="aud-hero-text">
-            <div className="aud-hero-breadcrumb">
-              <Link to="/">Home</Link>
-              <span>/</span>
-              <Link to="/campus">Campus Life</Link>
-              <span>/</span>
-              <strong>Auditoriums</strong>
-            </div>
             <h1 className="aud-hero-title">{heroTitle}</h1>
             <p className="aud-hero-subtitle">{heroSubtitle}</p>
             <div className="aud-hero-tagline">
-              {heroTagline.map((word) => <span key={word}>{word}</span>)}
+              {heroTagline.map((word) => (
+                <span key={word}>{word}</span>
+              ))}
             </div>
           </div>
           <div className="aud-hero-media">
-            <img src={heroImage} alt="" className="aud-hero-bg-img" />
+            <img loading="lazy" src={heroImage} alt="" className="aud-hero-bg-img" />
             <div className="aud-hero-media-overlay" />
             <div className="aud-hero-screen" aria-hidden="true">
-              {heroScreenLines.map((line, i) => <p key={i}>{line}</p>)}
+              {heroScreenLines.map((line, i) => (
+                <p key={i}>{line}</p>
+              ))}
             </div>
             <div className="aud-hero-caption">{heroCaption}</div>
           </div>
         </div>
       </section>
 
-      {/* Top feature tiles */}
-      <div className="aud-tiles-row">
-        {topFeatures.map((f, i) => {
-          const color = TOP_TILE_COLORS[i % TOP_TILE_COLORS.length];
-          return (
-            <div key={f.id} className="aud-tile" style={{ background: color.bg }}>
-              <p className="aud-tile-title" style={{ color: color.fg }}>{f.title}</p>
-              <p className="aud-tile-desc" style={{ color: color.fg }}>{f.desc}</p>
+      {/* Custom Auditoriums List Section */}
+      <section className="section bg-off-white">
+        <div className="container">
+          <div style={{ maxWidth: '900px', margin: '0 auto', padding: '2rem 0' }}>
+            <h2 className="section-title" style={{ fontSize: '2rem', marginBottom: '1rem', color: 'var(--color-heading)' }}>
+              {heroTitle}
+            </h2>
+            <p style={{ fontSize: '1.15rem', color: 'var(--color-text)', lineHeight: 1.7, marginBottom: '3rem' }}>
+              {heroSubtitle}
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+              {topFeatures.map((f) => (
+                <div key={f.id} style={{ borderLeft: '4px solid var(--color-primary)', paddingLeft: '1.5rem' }}>
+                  <h3 style={{ fontSize: '1.25rem', color: 'var(--color-heading)', marginBottom: '0.5rem' }}>
+                    {f.title}
+                  </h3>
+                  <p style={{ fontSize: '1.1rem', color: 'var(--color-text-light)' }}>
+                    {f.desc}
+                  </p>
+                </div>
+              ))}
             </div>
-          );
-        })}
-      </div>
+          </div>
+        </div>
+      </section>
 
       {/* About */}
       <section className="section bg-white">
@@ -166,7 +251,9 @@ export default function Auditoriums() {
               <span className="section-label">About Our Auditoriums</span>
               <h2 className="aud-about-heading">{aboutHeading}</h2>
               <div className="aud-about-body">
-                {aboutBody.map((para, i) => <p key={i}>{para}</p>)}
+                {aboutBody.map((para, i) => (
+                  <p key={i}>{para}</p>
+                ))}
               </div>
             </div>
             <div className="aud-about-media">
@@ -187,9 +274,17 @@ export default function Auditoriums() {
         {bottomStats.map((s, i) => {
           const color = BOTTOM_TILE_COLORS[i % BOTTOM_TILE_COLORS.length];
           return (
-            <div key={s.id} className="aud-tile" style={{ background: color.bg }}>
-              <p className="aud-tile-title" style={{ color: color.fg }}>{s.title}</p>
-              <p className="aud-tile-desc" style={{ color: color.fg }}>{s.desc}</p>
+            <div
+              key={s.id}
+              className="aud-tile"
+              style={{ background: color.bg }}
+            >
+              <p className="aud-tile-title" style={{ color: color.fg }}>
+                {s.title}
+              </p>
+              <p className="aud-tile-desc" style={{ color: color.fg }}>
+                {s.desc}
+              </p>
             </div>
           );
         })}
@@ -201,12 +296,22 @@ export default function Auditoriums() {
           <div className="container">
             <div className="aud-gallery-header">
               <span className="section-label">Gallery</span>
-              <p>A closer look at the venues that host VWU&rsquo;s academic, cultural, and institutional life.</p>
+              <p>
+                A closer look at the venues that host VWU&rsquo;s academic,
+                cultural, and institutional life.
+              </p>
             </div>
             <div className="aud-collage-grid">
               {galleryPhotos.slice(0, 6).map((photo, i) => (
-                <div key={photo.src || i} className={`aud-collage-item aud-collage-item-${i + 1}`}>
-                  <img src={photo.src} alt={photo.alt || `Auditorium gallery photo ${i + 1}`} loading="lazy" />
+                <div
+                  key={photo.src || i}
+                  className={`aud-collage-item aud-collage-item-${i + 1}`}
+                >
+                  <img
+                    src={photo.src}
+                    alt={photo.alt || `Auditorium gallery photo ${i + 1}`}
+                    loading="lazy"
+                  />
                 </div>
               ))}
             </div>

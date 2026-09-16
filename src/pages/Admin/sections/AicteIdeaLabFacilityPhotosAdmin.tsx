@@ -65,7 +65,7 @@ export default function AicteIdeaLabFacilityPhotosAdmin() {
       <div className="admin-image-grid">
         {photos.map((p) => (
           <div key={p.id} className="admin-image-card">
-            <img src={p.imageUrl} alt="" />
+            <img loading="lazy" src={p.imageUrl} alt="" />
             <div className="admin-image-card__actions">
               <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removePhoto(p)}>
                 Remove

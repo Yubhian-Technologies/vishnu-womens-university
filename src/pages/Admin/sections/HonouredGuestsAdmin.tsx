@@ -100,7 +100,7 @@ export default function HonouredGuestsAdmin() {
               <tbody>
                 {guests.map((g) => (
                   <tr key={g.id}>
-                    <td>{g.imageUrl ? <img src={g.imageUrl} alt="" className="admin-table__avatar" /> : '👤'}</td>
+                    <td>{g.imageUrl ? <img loading="lazy" src={g.imageUrl} alt="" className="admin-table__avatar" /> : '👤'}</td>
                     <td>{g.name}</td>
                     <td>{g.role}</td>
                     <td>{g.order}</td>

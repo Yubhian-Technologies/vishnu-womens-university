@@ -266,7 +266,7 @@ export function FeAboutHodSection({ department }: { department: string }) {
   return (
     <div>
       <div style={{ display: 'flex', gap: 'var(--space-6)', flexWrap: 'wrap', marginBottom: 'var(--space-8)' }}>
-        <img
+        <img loading="lazy"
           src={hod.imageUrl || PHOTO_NEEDED_PLACEHOLDER}
           alt={hod.name}
           style={{ width: 160, height: 180, objectFit: 'cover', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-light-gray)', flexShrink: 0 }}
@@ -466,7 +466,7 @@ function OneLabSection({ lab }: { lab: LabInfo }) {
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 'var(--space-4)' }}>
         {Array.from({ length: lab.photoCount }).map((_, i) => (
-          <img
+          <img loading="lazy"
             key={i}
             src={PHOTO_NEEDED_PLACEHOLDER}
             alt={lab.title}

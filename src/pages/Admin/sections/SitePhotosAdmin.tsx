@@ -831,7 +831,7 @@ export default function SitePhotosAdmin() {
               const isCustom = !!live;
               return (
                 <div key={i} className="admin-image-card">
-                  <img src={img.imageUrl} alt={img.alt} />
+                  <img loading="lazy" src={img.imageUrl} alt={img.alt} />
                   <ReadOnlyGate readOnly={!pageEditable}>
                   {editingSlot === i ? (
                     <div className="admin-image-card__info" style={{ gap: '0.4rem' }}>
@@ -901,7 +901,7 @@ export default function SitePhotosAdmin() {
           <div className="admin-image-grid" style={{ marginTop: '1rem' }}>
             {extras.map((p) => (
               <div key={p.id} className="admin-image-card">
-                <img src={p.imageUrl} alt={p.alt} />
+                <img loading="lazy" src={p.imageUrl} alt={p.alt} />
                 <div className="admin-image-card__info">
                   <strong>{p.caption || p.alt}</strong>
                 </div>

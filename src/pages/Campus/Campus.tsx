@@ -93,7 +93,6 @@ export default function Campus() {
         page="campus"
         defaultTitle="Campus Life at VWU"
         defaultSubtitle="An 80-acre campus in Bhimavaram where learning, wellness, and community life come together."
-        breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Campus Life' }]}
         hideCta={true}
       />
 
@@ -179,16 +178,9 @@ export default function Campus() {
         <div className="container">
           <PhotoGrid
             images={campusGalleryPhotos}
-            label="Gallery"
-            title="A Glimpse of VWU Campus"
-            subtitle="Explore the spaces and moments that define everyday life at Vishnu Women's University — from labs and classrooms to courts and canteens."
-            highlights={[
-              'Main auditorium seats 2,000+ students',
-              '24×7 secured campus with CCTV monitoring',
-              'Dedicated travel desk & transport network',
-              'On-campus temples, ATM & photocopying services',
-              'Fully accessible infrastructure for all students',
-            ]}
+            label="Campus Facilities Gallery"
+            title="Explore the Spaces That Support Campus Life"
+            subtitle="Take a closer look at the infrastructure, services, learning spaces, and shared facilities across Vishnu Women’s University."
             columns={4}
             layout="side-text"
           />
@@ -229,13 +221,13 @@ export default function Campus() {
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-16) 0' }}>
         <div className="container" style={{ textAlign: 'center' }}>
           <div className="reveal">
-            <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>Come See Our Campus</h2>
-            <p style={{ color: 'rgba(255,255,255,0.8)', maxWidth: 500, margin: '0 auto var(--space-8)' }}>
-              Schedule a campus visit to tour the facilities in person, meet our faculty, and get a clear picture of life at VWU.
+            <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>Explore More of Campus Life</h2>
+            <p style={{ color: 'rgba(255,255,255,0.8)', maxWidth: 600, margin: '0 auto var(--space-8)' }}>
+              Discover more of the facilities, services, and experiences that shape everyday life at Vishnu Women’s University.
             </p>
             <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Link to="/admissions" className="btn btn-accent btn-lg">Schedule a Visit</Link>
-              <Link to="/student-life" className="btn btn-secondary btn-lg">Student Life</Link>
+              <Link to="/campus" className="btn btn-accent btn-lg">Back to Campus Life</Link>
+              <Link to="/student-life" className="btn btn-secondary btn-lg">Explore Student Life</Link>
             </div>
           </div>
         </div>

@@ -427,42 +427,45 @@ export default function AdmissionApplyForm() {
         <form onSubmit={handleSendOtp} className="adm-form" noValidate>
           <div className="adm-form-row">
             <div className="adm-form-group">
-              <label>First Name</label>
+              <label htmlFor="adm-firstName">First Name</label>
               <input
-                type="text" name="firstName" placeholder="First name"
+                id="adm-firstName" type="text" name="firstName" placeholder="First name" autoComplete="given-name"
                 value={requestForm.firstName} onChange={handleRequestFormChange}
                 className={requestErrors.firstName ? 'has-error' : undefined}
                 aria-invalid={!!requestErrors.firstName}
+                aria-describedby={requestErrors.firstName ? 'err-adm-firstName' : undefined}
               />
-              {requestErrors.firstName && <span className="adm-form-error">{requestErrors.firstName}</span>}
+              {requestErrors.firstName && <span id="err-adm-firstName" role="alert" className="adm-form-error">{requestErrors.firstName}</span>}
             </div>
             <div className="adm-form-group">
-              <label>Last Name</label>
+              <label htmlFor="adm-lastName">Last Name</label>
               <input
-                type="text" name="lastName" placeholder="Last name"
+                id="adm-lastName" type="text" name="lastName" placeholder="Last name" autoComplete="family-name"
                 value={requestForm.lastName} onChange={handleRequestFormChange}
                 className={requestErrors.lastName ? 'has-error' : undefined}
                 aria-invalid={!!requestErrors.lastName}
+                aria-describedby={requestErrors.lastName ? 'err-adm-lastName' : undefined}
               />
-              {requestErrors.lastName && <span className="adm-form-error">{requestErrors.lastName}</span>}
+              {requestErrors.lastName && <span id="err-adm-lastName" role="alert" className="adm-form-error">{requestErrors.lastName}</span>}
             </div>
           </div>
 
           <div className="adm-form-row">
             <div className="adm-form-group">
-              <label>Mobile Number</label>
+              <label htmlFor="adm-phone">Mobile Number</label>
               <input
-                type="tel" name="phone" placeholder="+91 98765 43210"
+                id="adm-phone" type="tel" name="phone" placeholder="+91 98765 43210" autoComplete="tel"
                 value={requestForm.phone} onChange={handleRequestFormChange}
                 className={requestErrors.phone ? 'has-error' : undefined}
                 aria-invalid={!!requestErrors.phone}
+                aria-describedby={requestErrors.phone ? 'err-adm-phone' : undefined}
               />
-              {requestErrors.phone && <span className="adm-form-error">{requestErrors.phone}</span>}
+              {requestErrors.phone && <span id="err-adm-phone" role="alert" className="adm-form-error">{requestErrors.phone}</span>}
             </div>
             <div className="adm-form-group">
-              <label>Purpose</label>
+              <label htmlFor="adm-purpose">Purpose</label>
               <select
-                name="purpose"
+                id="adm-purpose" name="purpose"
                 value={requestForm.purpose}
                 onChange={(e) => {
                   const val = e.target.value;
@@ -485,20 +488,21 @@ export default function AdmissionApplyForm() {
                 }}
                 className={requestErrors.purpose ? 'has-error' : undefined}
                 aria-invalid={!!requestErrors.purpose}
+                aria-describedby={requestErrors.purpose ? 'err-adm-purpose' : undefined}
               >
                 <option value="">Select purpose...</option>
                 {PURPOSE_OPTIONS.map((p) => <option key={p}>{p}</option>)}
               </select>
-              {requestErrors.purpose && <span className="adm-form-error">{requestErrors.purpose}</span>}
+              {requestErrors.purpose && <span id="err-adm-purpose" role="alert" className="adm-form-error">{requestErrors.purpose}</span>}
             </div>
           </div>
 
           {isCourseRelevant(requestForm) && (
           <div className="adm-form-row">
             <div className="adm-form-group">
-              <label>Course</label>
+              <label htmlFor="adm-degreeLevel">Course</label>
               <select
-                name="degreeLevel"
+                id="adm-degreeLevel" name="degreeLevel"
                 value={requestForm.degreeLevel}
                 onChange={(e) => {
                   const val = e.target.value;
@@ -515,6 +519,7 @@ export default function AdmissionApplyForm() {
                 }}
                 className={requestErrors.degreeLevel ? 'has-error' : undefined}
                 aria-invalid={!!requestErrors.degreeLevel}
+                aria-describedby={requestErrors.degreeLevel ? 'err-adm-degreeLevel' : undefined}
               >
                 <option value="">Select course...</option>
                 {PROGRAM_LEVEL_OPTIONS.map((opt) => (
@@ -523,18 +528,19 @@ export default function AdmissionApplyForm() {
                   </option>
                 ))}
               </select>
-              {requestErrors.degreeLevel && <span className="adm-form-error">{requestErrors.degreeLevel}</span>}
+              {requestErrors.degreeLevel && <span id="err-adm-degreeLevel" role="alert" className="adm-form-error">{requestErrors.degreeLevel}</span>}
             </div>
 
             <div className="adm-form-group">
-              <label>Program</label>
+              <label htmlFor="adm-program">Program</label>
               <select
-                name="program"
+                id="adm-program" name="program"
                 value={requestForm.program}
                 onChange={handleRequestFormChange}
                 disabled={!requestForm.degreeLevel}
                 className={requestErrors.program ? 'has-error' : undefined}
                 aria-invalid={!!requestErrors.program}
+                aria-describedby={requestErrors.program ? 'err-adm-program' : undefined}
               >
                 <option value="">
                   {requestForm.degreeLevel ? 'Select a program...' : 'Select course first'}
@@ -546,48 +552,51 @@ export default function AdmissionApplyForm() {
                     </option>
                   ))}
               </select>
-              {requestErrors.program && <span className="adm-form-error">{requestErrors.program}</span>}
+              {requestErrors.program && <span id="err-adm-program" role="alert" className="adm-form-error">{requestErrors.program}</span>}
             </div>
           </div>
-          )}
+           )}
 
           <div className="adm-form-row">
             <div className="adm-form-group">
-              <label>Email</label>
+              <label htmlFor="adm-email">Email</label>
               <input
-                type="email" name="email" placeholder="you@example.com" inputMode="email" autoComplete="email"
+                id="adm-email" type="email" name="email" placeholder="you@example.com" inputMode="email" autoComplete="email"
                 value={requestForm.email} onChange={handleRequestFormChange}
                 className={requestErrors.email ? 'has-error' : undefined}
                 aria-invalid={!!requestErrors.email}
+                aria-describedby={requestErrors.email ? 'err-adm-email' : undefined}
               />
-              {requestErrors.email && <span className="adm-form-error">{requestErrors.email}</span>}
+              {requestErrors.email && <span id="err-adm-email" role="alert" className="adm-form-error">{requestErrors.email}</span>}
             </div>
             <div className="adm-form-group">
-              <label>State</label>
+              <label htmlFor="adm-state">State</label>
               <select
-                name="state" value={requestForm.state} onChange={handleRequestFormChange}
+                id="adm-state" name="state" value={requestForm.state} onChange={handleRequestFormChange} autoComplete="address-level1"
                 className={requestErrors.state ? 'has-error' : undefined}
                 aria-invalid={!!requestErrors.state}
+                aria-describedby={requestErrors.state ? 'err-adm-state' : undefined}
               >
                 <option value="">Select state...</option>
                 {INDIAN_STATES.map((s) => <option key={s}>{s}</option>)}
               </select>
-              {requestErrors.state && <span className="adm-form-error">{requestErrors.state}</span>}
+              {requestErrors.state && <span id="err-adm-state" role="alert" className="adm-form-error">{requestErrors.state}</span>}
             </div>
           </div>
 
           <div className="adm-form-row adm-form-row--full">
             <div className="adm-form-group">
-              <label>How did you hear about VWU?</label>
+              <label htmlFor="adm-hearAbout">How did you hear about VWU?</label>
               <select
-                name="hearAbout" value={requestForm.hearAbout} onChange={handleRequestFormChange}
+                id="adm-hearAbout" name="hearAbout" value={requestForm.hearAbout} onChange={handleRequestFormChange}
                 className={requestErrors.hearAbout ? 'has-error' : undefined}
                 aria-invalid={!!requestErrors.hearAbout}
+                aria-describedby={requestErrors.hearAbout ? 'err-adm-hearAbout' : undefined}
               >
                 <option value="">Select an option...</option>
                 {HEAR_ABOUT_OPTIONS.map((h) => <option key={h}>{h}</option>)}
               </select>
-              {requestErrors.hearAbout && <span className="adm-form-error">{requestErrors.hearAbout}</span>}
+              {requestErrors.hearAbout && <span id="err-adm-hearAbout" role="alert" className="adm-form-error">{requestErrors.hearAbout}</span>}
             </div>
           </div>
 
@@ -595,33 +604,35 @@ export default function AdmissionApplyForm() {
             <div className="adm-form-row adm-form-row--full">
               {isCourseRelevant(requestForm) && isCustomProgramRequired(requestForm) && (
                 <div className="adm-form-group">
-                  <label>Specify Program Name</label>
+                  <label htmlFor="adm-customProgram">Specify Program Name</label>
                   <input
-                    type="text"
+                    id="adm-customProgram" type="text"
                     name="customProgram"
                     placeholder="Enter custom program name..."
                     value={requestForm.customProgram}
                     onChange={handleRequestFormChange}
                     className={requestErrors.customProgram ? 'has-error' : undefined}
                     aria-invalid={!!requestErrors.customProgram}
+                    aria-describedby={requestErrors.customProgram ? 'err-adm-customProgram' : undefined}
                   />
                   {requestErrors.customProgram && (
-                    <span className="adm-form-error">{requestErrors.customProgram}</span>
+                    <span id="err-adm-customProgram" role="alert" className="adm-form-error">{requestErrors.customProgram}</span>
                   )}
                 </div>
               )}
 
               {requestForm.purpose === 'Other' && (
                 <div className="adm-form-group">
-                  <label>Please specify</label>
+                  <label htmlFor="adm-purposeOther">Please specify</label>
                   <input
-                    type="text" name="purposeOther" placeholder="Tell us your purpose"
+                    id="adm-purposeOther" type="text" name="purposeOther" placeholder="Tell us your purpose"
                     value={requestForm.purposeOther} onChange={handleRequestFormChange}
                     className={requestErrors.purposeOther ? 'has-error' : undefined}
                     aria-invalid={!!requestErrors.purposeOther}
+                    aria-describedby={requestErrors.purposeOther ? 'err-adm-purposeOther' : undefined}
                     autoFocus
                   />
-                  {requestErrors.purposeOther && <span className="adm-form-error">{requestErrors.purposeOther}</span>}
+                  {requestErrors.purposeOther && <span id="err-adm-purposeOther" role="alert" className="adm-form-error">{requestErrors.purposeOther}</span>}
                 </div>
               )}
             </div>
@@ -634,8 +645,8 @@ export default function AdmissionApplyForm() {
             {sendingOtp ? 'Sending OTP…' : 'Send OTP'}
           </button>
           {otpError && (
-            <div className="adm-otp-error-container">
-              <span className="adm-otp-error-text">{otpError}</span>
+            <div className="adm-otp-error-container" role="alert" aria-live="assertive">
+              <span id="err-adm-otp-send" className="adm-otp-error-text">{otpError}</span>
               <button
                 type="button"
                 className="adm-direct-submit-btn"
@@ -653,15 +664,17 @@ export default function AdmissionApplyForm() {
             We&rsquo;ve sent a 6-digit code to <strong>{requestForm.phone}</strong>.
           </p>
           <div className="adm-form-group">
-            <label>Enter OTP</label>
+            <label htmlFor="adm-otp">Enter OTP</label>
             <input
-              type="text" placeholder="Enter OTP" maxLength={6} inputMode="numeric"
+              id="adm-otp" type="text" placeholder="Enter OTP" maxLength={6} inputMode="numeric" autoComplete="one-time-code" pattern="\d{6}"
               value={otp} onChange={(e) => { setOtp(e.target.value); if (otpError) setOtpError(null); }}
               className={otpError ? 'has-error' : undefined}
+              aria-invalid={!!otpError}
+              aria-describedby={otpError ? 'err-adm-otp' : undefined}
               autoFocus
             />
           </div>
-          {otpError && <span className="adm-form-error">{otpError}</span>}
+          {otpError && <span id="err-adm-otp" role="alert" className="adm-form-error">{otpError}</span>}
 
           <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={verifying}>
             {verifying ? 'Verifying…' : 'Verify & Submit'}

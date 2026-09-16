@@ -12,6 +12,7 @@ import SEO from './components/SEO/SEO';
 import ThemeOverrides from './components/ThemeOverrides/ThemeOverrides';
 import FirestoreErrorBanner from './components/FirestoreErrorBanner/FirestoreErrorBanner';
 import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
+import PopupOverlay from './components/PopupOverlay/PopupOverlay';
 import { smoothScrollTo } from './lib/smoothScroll';
 
 // A failed dynamic import() is almost always a stale chunk after a new deploy:
@@ -62,6 +63,7 @@ const AcademicDownloads = lazyWithRetry(() => import('./pages/Academics/Download
 const CurriculumMatrix = lazyWithRetry(() => import('./pages/Academics/CurriculumMatrix'));
 const Schools = lazyWithRetry(() => import('./pages/Academics/Schools'));
 const Departments = lazyWithRetry(() => import('./pages/Academics/Departments'));
+const DepartmentEventsPage = lazyWithRetry(() => import('./pages/Academics/DepartmentEventsPage'));
 const Programs = lazyWithRetry(() => import('./pages/Academics/Programs'));
 const Admissions = lazyWithRetry(() => import('./pages/Admissions/Admissions'));
 const CampusVisit = lazyWithRetry(() => import('./pages/CampusVisit/CampusVisit'));
@@ -88,6 +90,10 @@ const SewageTreatment = lazyWithRetry(() => import('./pages/Campus/SewageTreatme
 const WellnessCenter = lazyWithRetry(() => import('./pages/Campus/WellnessCenter'));
 const Wellness = lazyWithRetry(() => import('./pages/Campus/Wellness'));
 const Auditoriums = lazyWithRetry(() => import('./pages/Campus/Auditoriums'));
+const SmartClassrooms = lazyWithRetry(() => import('./pages/Campus/SmartClassrooms'));
+const StateOfTheArtLabs = lazyWithRetry(() => import('./pages/Campus/StateOfTheArtLabs'));
+const CentralLibrary = lazyWithRetry(() => import('./pages/Campus/CentralLibrary'));
+const CampusHostels = lazyWithRetry(() => import('./pages/Campus/CampusHostels'));
 const FitnessCentre = lazyWithRetry(() => import('./pages/Campus/FitnessCentre'));
 const Television = lazyWithRetry(() => import('./pages/Campus/Television'));
 const HealthCare = lazyWithRetry(() => import('./pages/Campus/HealthCare'));
@@ -96,6 +102,7 @@ const TravelDesk = lazyWithRetry(() => import('./pages/Campus/TravelDesk'));
 const StaffQuarters = lazyWithRetry(() => import('./pages/Campus/StaffQuarters'));
 const Clubs = lazyWithRetry(() => import('./pages/Campus/Clubs'));
 const FoodCourts = lazyWithRetry(() => import('./pages/Campus/FoodCourts'));
+const WifiCampus = lazyWithRetry(() => import('./pages/Campus/WifiCampus'));
 const Information = lazyWithRetry(() => import('./pages/Information/Information'));
 const ProgrammesFee = lazyWithRetry(() => import('./pages/Admissions/ProgrammesFee'));
 const AdmissionProcedure = lazyWithRetry(() => import('./pages/Admissions/AdmissionProcedure'));
@@ -108,6 +115,7 @@ const DifferentiatorDetail = lazyWithRetry(() => import('./pages/Differentiators
 const ArVrStudio = lazyWithRetry(() => import('./pages/Differentiators/ArVrStudio'));
 const ConcreteCanoeLab = lazyWithRetry(() => import('./pages/Differentiators/ConcreteCanoeLab'));
 const AdvancedElectricalRdLab = lazyWithRetry(() => import('./pages/Differentiators/AdvancedElectricalRdLab'));
+const AssistiveTechLab = lazyWithRetry(() => import('./pages/Differentiators/AssistiveTechLab'));
 const Placements = lazyWithRetry(() => import('./pages/Placements/Placements'));
 const PlacementDetail = lazyWithRetry(() => import('./pages/Placements/PlacementDetail'));
 const NewsAwards = lazyWithRetry(() => import('./pages/NewsAwards/NewsAwards'));
@@ -173,6 +181,7 @@ function PublicApp() {
           lazy-loaded page all download and render in parallel beneath it.
           No lag, no second loading screen behind the video. */}
       <IntroVideo />
+      <PopupOverlay />
       <Header />
       <ErrorBoundary>
         <Suspense fallback={<RouteFallback />}>
@@ -185,6 +194,7 @@ function PublicApp() {
             <Route path="/academics/freshman-engineering" element={<FreshmanEngineering />} />
             <Route path="/academics/schools" element={<Schools />} />
             <Route path="/academics/departments" element={<Departments />} />
+            <Route path="/academics/departments/:slug/events/:categorySlug" element={<DepartmentEventsPage />} />
             <Route path="/academics/programs" element={<Programs />} />
             <Route path="/academics/:slug" element={<ProgramDetail />} />
             <Route path="/faculty" element={<Faculty />} />
@@ -225,7 +235,12 @@ function PublicApp() {
             <Route path="/campus/sports/:id" element={<SportsDetail />} />
             <Route path="/campus/clubs" element={<Clubs />} />
             <Route path="/campus/auditoriums" element={<Auditoriums />} />
+            <Route path="/campus/smart-classrooms" element={<SmartClassrooms />} />
+            <Route path="/campus/state-of-the-art-labs" element={<StateOfTheArtLabs />} />
+            <Route path="/campus/central-library" element={<CentralLibrary />} />
             <Route path="/campus/food-courts" element={<FoodCourts />} />
+            <Route path="/campus/wifi-campus" element={<WifiCampus />} />
+            <Route path="/campus/campus-hostels" element={<CampusHostels />} />
             <Route path="/campus/fitness-centre" element={<FitnessCentre />} />
             <Route path="/campus/:slug" element={<CampusLifeDetail />} />
             <Route path="/information" element={<Information />} />
@@ -248,6 +263,7 @@ function PublicApp() {
             <Route path="/differentiators/ar-vr-studio" element={<ArVrStudio />} />
             <Route path="/differentiators/concrete-canoe-lab" element={<ConcreteCanoeLab />} />
             <Route path="/differentiators/advanced-electrical-rd-lab" element={<AdvancedElectricalRdLab />} />
+            <Route path="/differentiators/assistive-tech-lab" element={<AssistiveTechLab />} />
             <Route path="/differentiators/:slug" element={<DifferentiatorDetail />} />
             <Route path="/placements" element={<Placements />} />
             <Route path="/placements/:slug" element={<PlacementDetail />} />
@@ -298,7 +314,7 @@ function MaintenancePage() {
         background: 'var(--color-bg, #fff)',
       }}
     >
-      <img
+      <img loading="lazy"
         src="/vwu-logo.png"
         alt="Vishnu Women's University"
         style={{ height: 80, marginBottom: '2rem', objectFit: 'contain' }}

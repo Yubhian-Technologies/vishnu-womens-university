@@ -175,7 +175,7 @@ export default function GoverningBodyAdmin() {
                     style={{ opacity: dragIndex === i ? 0.5 : 1, cursor: 'grab' }}
                   >
                     <td style={{ color: 'var(--color-text-light, #9ca3af)', fontSize: '1.1rem', userSelect: 'none' }}>⠿</td>
-                    <td>{m.photoUrl ? <img src={m.photoUrl} alt="" className="admin-table__avatar" /> : '👤'}</td>
+                    <td>{m.photoUrl ? <img loading="lazy" src={m.photoUrl} alt="" className="admin-table__avatar" /> : '👤'}</td>
                     <td>{m.name}</td>
                     <td>{m.position}</td>
                     <td><span className="admin-badge admin-badge--sm">{m.category}</span></td>

@@ -7,7 +7,8 @@ import type { ProgramDoc } from '../../pages/Admin/sections/ProgramsAdmin';
 import { DIFFERENTIATOR_CATEGORIES } from '../../pages/Admin/sections/DifferentiatorsAdmin';
 import type { DifferentiatorItemDoc } from '../../pages/Admin/sections/DifferentiatorsAdmin';
 import type { PlacementItemDoc } from '../../pages/Admin/sections/PlacementItemsAdmin';
-import type { CampusLifeItemDoc } from '../../pages/Admin/sections/CampusLifeAdmin';
+import { DEFAULT_CAMPUS_LIFE_QUICK_LINKS } from '../../pages/Admin/sections/CampusLifeAdmin';
+import type { CampusLifeItemDoc, CampusLifeQuickLinkDoc } from '../../pages/Admin/sections/CampusLifeAdmin';
 import SmoothCollapse from '../SmoothCollapse/SmoothCollapse';
 import './Header.css';
 
@@ -120,6 +121,8 @@ const navItemsData: NavItem[] = [
           { label: 'Programmes', path: '/academics/programs' },
           { label: 'Faculty Directory', path: '/faculty' },
           { label: 'Results Analysis', path: '/result-analysis' },
+          { label: 'Smart Classrooms', path: '/campus/smart-classrooms' },
+          { label: 'Central Library', path: '/campus/central-library' },
           { label: 'Examinations Portal', path: 'https://www.svecwexams.in/', external: true },
         ],
       },
@@ -132,7 +135,6 @@ const navItemsData: NavItem[] = [
           { label: 'List of Holidays', path: '/information#holidays' },
           { label: 'Counselling Scheme', path: '/information#counselling' },
           { label: 'ICT Platforms', path: '/information#ict-platforms' },
-          { label: 'Smart Class Rooms', path: '/campus/smart-classrooms' },
           { label: 'State-of-the-art Labs', path: '/campus/state-of-the-art-labs' },
           { label: 'Other Practices', path: '/information#other-practices' },
         ],
@@ -245,14 +247,10 @@ const navItemsData: NavItem[] = [
     // plain external link.
     children: [
       { label: 'Sewage Treatment Plants', path: '/campus/sewage-treatment-plants' },
-      { label: 'Wellness Center', path: '/campus/wellness-center' },
-      { label: 'Wellness', path: '/campus/wellness' },
+      { label: 'Wellness Centre', path: '/campus/wellness' },
       { label: 'Vishnu TV Academy', path: '/vishnu-tv-academy' },
-      { label: 'Clubs', path: '/campus/clubs' },
-      { label: 'Student Clubs', path: '/student-clubs' },
-      { label: 'Arts & Culture', path: '/arts-culture' },
+      { label: 'Student Clubs', path: '/campus/clubs' },
       { label: 'Vishnu School of Music', path: 'https://svesschoolofmusic.in/', external: true },
-      { label: 'Sports & Games', path: '/sports-games' },
       { label: 'Social Services', path: '/social-services' },
     ],
   },
@@ -404,6 +402,17 @@ export default function Header() {
   const campusFacilityNavItems: NavChild[] = campusLifeItems
     .filter((it) => it.group === 'facility')
     .map((it) => ({ label: it.title, path: `/campus/${it.slug}` }));
+  // The Campus Life dropdown's handful of fixed-route entries (Wellness
+  // Centre, Student Clubs, ...) — admin-editable via Admin -> Campus Life ->
+  // "Campus Life Menu — Other Links". Falls back to the original hardcoded
+  // list (still declared in navItemsData below, for isEnabledNavPath's
+  // static scan) while that collection is loading or empty, so removing
+  // this admin section's data can never blank the menu.
+  const { docs: campusLifeQuickLinkDocs, loading: quickLinksLoading } = useOrderedCollection<CampusLifeQuickLinkDoc>('campusLifeQuickLinks', 'order');
+  const campusLifeQuickLinks: NavChild[] = (quickLinksLoading || campusLifeQuickLinkDocs.length === 0
+    ? DEFAULT_CAMPUS_LIFE_QUICK_LINKS
+    : campusLifeQuickLinkDocs
+  ).map((l) => ({ label: l.label, path: l.path, external: l.external }));
 
   // Entrance transition trigger (150ms after load)
   useEffect(() => {
@@ -504,15 +513,17 @@ export default function Header() {
         children: placementItems.map((p): NavChild =>
           p.external && p.url
             ? { label: p.title, path: p.url, external: true, hideExternalIcon: true }
-            : { label: p.title, path: `/placements/${p.slug}`, external: true, hideExternalIcon: true }
+            : { label: p.title, path: `/placements/${p.slug}` }
         ),
       };
     }
     if (item.label === 'Campus Life' && item.children) {
       // Every "facility" page added from Admin -> Campus Life shows up here
-      // automatically — item.children at this point holds only the handful
-      // of entries with no campusLifeItems equivalent (see navItemsData).
-      return { ...item, children: [...campusFacilityNavItems, ...item.children] };
+      // automatically, followed by the admin-editable "Other Links" list
+      // (campusLifeQuickLinks) — item.children (navItemsData's hardcoded
+      // list) is intentionally unused here now; it stays only so
+      // isEnabledNavPath's static scan still recognizes these paths.
+      return { ...item, children: [...campusFacilityNavItems, ...campusLifeQuickLinks] };
     }
     return item;
   });
@@ -589,7 +600,7 @@ export default function Header() {
             className="navbar-brand-link"
             aria-label="Vishnu Women's University - Home"
           >
-            <img
+            <img loading="eager" fetchPriority="high" decoding="sync" width={220} height={74}
               src="/images/logo.png"
               alt="Vishnu Women's University"
               className="navbar-logo-img navbar-logo-desktop"
@@ -695,7 +706,7 @@ export default function Header() {
               {activeItemData.groups && (
                 <div className="mega-groups-container">
                   {activeItemData.groups.map((group, gIdx) => {
-                    const isCol2 = group.items.length >= 8;
+                    const isCol2 = group.items.length >= 9;
                     return (
                       <div
                         key={group.groupLabel}

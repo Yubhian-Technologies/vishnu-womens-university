@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { usePageBanners } from '../../hooks/usePageBanners';
 import { useContentBlocks } from '../../hooks/useContentBlocks';
-import { HERO_VIDEO_SRC } from '../../lib/heroVideo';
+import { HERO_VIDEO_SRC, HERO_POSTER_SRC } from '../../lib/heroVideo';
 import './HeroSlider.css';
 
 // HERO_VIDEO_SRC lives in src/lib/heroVideo.ts so the Campus Visit page's
@@ -91,7 +91,6 @@ export default function HeroSlider() {
   const [progressWidth, setProgressWidth] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
-  const [videoReady, setVideoReady] = useState(false);
   // Only slides a visitor has actually reached get their photo downloaded —
   // admin-uploaded banner slides append photos after the 4 static marketing
   // slides, so without this every one of them would load on first paint
@@ -99,19 +98,23 @@ export default function HeroSlider() {
   const [visited, setVisited] = useState<Set<number>>(new Set([0]));
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Defer the video fetch until the browser is idle (or a short timeout, on
-  // browsers without requestIdleCallback) so it doesn't compete with the JS
-  // bundle for bandwidth while the page is still becoming interactive. The
-  // hero has a solid brand-colour background (.hero-slider) as a fallback
-  // in the meantime, so there's no blank flash.
+  // The video element renders immediately now since Cloudinary handles
+  // fast CDN delivery and auto-optimization. We rely on the poster image
+  // for instant visual feedback.
+
+  // Force strict muted/autoplay state to bypass iOS Safari restrictive policies
+  // that sometimes cause a giant play button to appear on top of background videos.
   useEffect(() => {
-    const ric = (window as unknown as { requestIdleCallback?: (cb: () => void) => number }).requestIdleCallback;
-    const handle = ric ? ric(() => setVideoReady(true)) : window.setTimeout(() => setVideoReady(true), 1200);
-    return () => {
-      const cic = (window as unknown as { cancelIdleCallback?: (h: number) => void }).cancelIdleCallback;
-      if (ric && cic) cic(handle as number);
-      else window.clearTimeout(handle as number);
-    };
+    if (videoRef.current) {
+      videoRef.current.defaultMuted = true;
+      videoRef.current.muted = true;
+      const playPromise = videoRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {
+          // Autoplay prevented; fallback background continues to show silently
+        });
+      }
+    }
   }, []);
 
   // Admin-uploaded Hero Banners (page="home") are appended after the fixed
@@ -185,21 +188,19 @@ export default function HeroSlider() {
   return (
     <section className="hero-slider" aria-label="Featured content">
 
-      {/* Background video — src only set once idle (see effect above), so the
-          browser doesn't fetch it until the rest of the page is usable */}
-      {videoReady && (
-        <video
-          ref={videoRef}
-          className="hero-video"
-          src={HERO_VIDEO_SRC}
-          preload="metadata"
-          autoPlay
-          muted
-          loop
-          playsInline
-          aria-hidden="true"
-        />
-      )}
+      {/* Background video — rendered immediately with a highly-optimized poster image */}
+      <video
+        ref={videoRef}
+        className="hero-video"
+        src={HERO_VIDEO_SRC}
+        poster={HERO_POSTER_SRC}
+        preload="auto"
+        autoPlay
+        muted
+        loop
+        playsInline
+        aria-hidden="true"
+      />
 
       {/* Center Tagline & Clean Sleek Search */}
       <div className="hero-center-panel">
@@ -230,7 +231,7 @@ export default function HeroSlider() {
             <div className={`slide-inner${slide.image ? ' slide-inner--with-image' : ''}`}>
               {slide.image && (
                 <div className="slide-photo-wrap">
-                  {visited.has(i) && <img src={slide.image} alt={slide.heading} className="slide-photo" />}
+                  {visited.has(i) && <img loading="lazy" src={slide.image} alt={slide.heading} className="slide-photo" />}
                 </div>
               )}
             </div>

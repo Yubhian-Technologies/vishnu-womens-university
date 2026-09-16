@@ -125,7 +125,7 @@ export default function SportsFacilityAdmin() {
               <tbody>
                 {items.map((item) => (
                   <tr key={item.id}>
-                    <td>{item.imageUrl ? <img src={item.imageUrl} alt="" className="admin-table__avatar" /> : '🏟️'}</td>
+                    <td>{item.imageUrl ? <img loading="lazy" src={item.imageUrl} alt="" className="admin-table__avatar" /> : '🏟️'}</td>
                     <td>
                       <strong>{item.title}</strong>
                       {item.tagsString && <div style={{ fontSize: '0.8rem', color: '#64748b' }}>{item.tagsString}</div>}

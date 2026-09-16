@@ -38,12 +38,12 @@ const EMPTY: Omit<ContentBlockDoc, 'id'> = { page: '', section: '', value: '', t
 
 // Sections whose "slug" field is an uploaded avatar/photo rather than a
 // pasted URL or anchor link — shows an ImageUploader instead of a text input.
-const IMAGE_SLUG_SECTIONS = new Set(['home::testimonials', 'clubs::testimonials', 'wellness::counsellor']);
+const IMAGE_SLUG_SECTIONS = new Set(['home::testimonials', 'clubs::testimonials']);
 
 // Sections whose "icon" field is a short free-text badge label (e.g.
 // "Featured Leader") rather than a picked icon from the shared icon set —
 // shows a text input instead of the icon <select>. Leave blank for no badge.
-const TEXT_ICON_SECTIONS = new Set(['clubs::testimonials', 'wellness::counsellor']);
+const TEXT_ICON_SECTIONS = new Set(['clubs::testimonials']);
 
 // Every (page, section) pair currently wired up to read from this
 // collection. Add a new entry here first when wiring a new list.
@@ -121,8 +121,10 @@ export const CONTENT_BLOCK_SECTIONS: { page: string; section: string; label: str
   { page: 'central-library', section: 'eDatabasesOpenCourseware', label: 'Central Library — e-Databases: Open Courseware (Slug field = optional URL)' },
   { page: 'placements', section: 'stats', label: 'Placements — Stats Bar' },
   { page: 'events', section: 'stats', label: 'Events — Stats Bar' },
-  { page: 'wellness', section: 'counsellor', label: 'Wellness — Meet Our Counsellor (single item: Title=Name, Value=Role/Credentials line, Desc=Bio, Icon field=Quote text, Photo=headshot)' },
-  { page: 'wellness', section: 'impactStats', label: 'Wellness — Our Impact Stats (Value=Number e.g. "500+", Title=Label, Icon=optional icon shown after the number, e.g. Heart)' },
+  // Wellness used to be here too — it's now edited from its own dedicated
+  // form in Admin → Campus Life (WellnessAdmin.tsx), same as Auditoriums.
+  // Same underlying `contentBlocks` docs (page: 'wellness'), just a
+  // friendlier home.
   // Auditoriums used to be here too — it's now edited from its own
   // dedicated form in Admin → Campus Life (AuditoriumsAdmin.tsx), since it's
   // a bespoke page rather than a generic template. Same underlying

@@ -346,7 +346,7 @@ export default function StudentClubsAdmin() {
             <div className="admin-image-grid">
               {images.map((img, i) => (
                 <div key={img.path || i} className="admin-image-card">
-                  <img src={img.url} alt={`Club image ${i + 1}`} />
+                  <img loading="lazy" src={img.url} alt={`Club image ${i + 1}`} />
                   <div className="admin-image-card__actions">
                     <label className="admin-btn admin-btn--sm" style={{ opacity: uploadingSlot !== null ? 0.5 : 1 }}>
                       {uploadingSlot === i ? 'Uploading…' : 'Replace'}
@@ -601,7 +601,7 @@ export default function StudentClubsAdmin() {
                     <td>
                       {c.images && c.images.length > 0 ? (
                         <>
-                          <img src={c.images[0].url} alt="" className="admin-table__avatar" />
+                          <img loading="lazy" src={c.images[0].url} alt="" className="admin-table__avatar" />
                           {c.images.length > 1 && <span className="admin-badge admin-badge--sm">+{c.images.length - 1}</span>}
                         </>
                       ) : '—'}

@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { useOrderedCollection } from '../../../hooks/useCollection';
+import ImageUploader from '../../../components/ImageUploader/ImageUploader';
+import { deleteFile, type UploadResult } from '../../../lib/storage';
 import type { DepartmentDoc } from './DepartmentsAdmin';
 
 // Backs the "Schools" grid on the public /academics/schools page — each
@@ -14,9 +16,14 @@ export interface SchoolDoc {
   description: string;
   order: number;
   departmentIds: string[];
+  /** Optional feature photo shown beside the title/description on the
+   *  public page — the header renders as a single column of text when
+   *  this is empty, same as before this field existed. */
+  imageUrl?: string;
+  imageStoragePath?: string;
 }
 
-const EMPTY: Omit<SchoolDoc, 'id'> = { title: '', description: '', order: 0, departmentIds: [] };
+const EMPTY: Omit<SchoolDoc, 'id'> = { title: '', description: '', order: 0, departmentIds: [], imageUrl: '', imageStoragePath: '' };
 
 export default function SchoolsAdmin() {
   const { docs: schools, loading } = useOrderedCollection<SchoolDoc>('schools', 'order');
@@ -28,6 +35,19 @@ export default function SchoolsAdmin() {
   const [dragIndex, setDragIndex] = useState<number | null>(null);
 
   const set = (k: string, v: string | number | string[]) => setForm((p) => ({ ...p, [k]: v }));
+
+  const handleImage = (r: UploadResult) => setForm((p) => ({ ...p, imageUrl: r.url, imageStoragePath: r.path }));
+  const removeImage = async () => {
+    if (!form.imageUrl) return;
+    if (!confirm('Remove this photo? This cannot be undone.')) return;
+    try {
+      if (form.imageStoragePath) await deleteFile(form.imageStoragePath);
+    } catch (e) {
+      alert(`Couldn't delete the photo from storage: ${(e as Error).message}`);
+      return;
+    }
+    setForm((p) => ({ ...p, imageUrl: '', imageStoragePath: '' }));
+  };
 
   const toggleDepartment = (id: string) => {
     set('departmentIds', form.departmentIds.includes(id)
@@ -64,12 +84,17 @@ export default function SchoolsAdmin() {
 
   const startEdit = (s: SchoolDoc) => {
     setEditing(s.id);
-    setForm({ title: s.title, description: s.description || '', order: s.order, departmentIds: s.departmentIds || [] });
+    setForm({
+      title: s.title, description: s.description || '', order: s.order, departmentIds: s.departmentIds || [],
+      imageUrl: s.imageUrl || '', imageStoragePath: s.imageStoragePath || '',
+    });
   };
 
   const remove = async (id: string) => {
     if (!confirm('Delete this school?')) return;
     try {
+      const storagePath = schools.find((s) => s.id === id)?.imageStoragePath;
+      if (storagePath) await deleteFile(storagePath);
       await deleteDoc(doc(db, 'schools', id));
     } catch (e) {
       alert(`Couldn't delete: ${(e as Error).message}`);
@@ -96,6 +121,19 @@ export default function SchoolsAdmin() {
           <div className="admin-field admin-field--full">
             <label htmlFor="field-description">Description</label>
             <textarea id="field-description" rows={4} value={form.description} onChange={(e) => set('description', e.target.value)} placeholder="Brings together the university's computing and data-focused departments…" />
+          </div>
+          <div className="admin-field" style={{ maxWidth: 320 }}>
+            <label>Feature Photo</label>
+            <p className="admin-field__hint" style={{ marginTop: 0, marginBottom: '0.5rem' }}>
+              Optional. Shown beside the title/description on the public page — the section shows text only
+              (as it always has) when no photo is set.
+            </p>
+            <ImageUploader folder="vwu/schools" currentUrl={form.imageUrl} onUploaded={handleImage} label="Upload Photo" aspect={4 / 3} />
+            {form.imageUrl && (
+              <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" style={{ marginTop: '0.5rem' }} onClick={removeImage}>
+                Remove Photo
+              </button>
+            )}
           </div>
           <div className="admin-field admin-field--full">
             <label>Departments under this school</label>

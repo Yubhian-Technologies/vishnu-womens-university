@@ -195,7 +195,7 @@ const PAGE_TEXT_DEFAULTS: Record<string, { title: string; subtitle?: string }> =
   'campus-wellness-center': { title: 'Wellness Center', subtitle: 'A space where you can be yourself and talk about the things that really matter to you.' },
   'campus-wellness': { title: 'Your Wellbeing Matters', subtitle: 'At WellCentre, we provide a safe, supportive and judgement-free space for you to pause, talk and grow.' },
   'campus-sewage-treatment-plants': { title: 'Sewage Treatment Plants', subtitle: 'A zero-discharge campus — every drop of sewage generated is treated on site and returned to the land as irrigation for campus and highway greenery.' },
-  'campus-food-courts': { title: 'Food Courts', subtitle: 'Hygienic Dining with Variety and Convenience.' },
+  'campus-food-courts': { title: 'Food Courts & Campus Dining', subtitle: 'Fresh, Convenient and Varied Dining Across Campus' },
 };
 
 function groupOfPage(pageValue: string): string | undefined {
@@ -462,7 +462,7 @@ function PageBannersAdmin() {
             <div className="admin-image-grid">
               {banners.filter((b) => activeGroup.values.includes(b.page ?? 'home')).map((b) => (
                 <div key={b.id} className="admin-image-card">
-                  <img src={b.imageUrl} alt={b.title} />
+                  <img loading="lazy" src={b.imageUrl} alt={b.title} />
                   <div className="admin-image-card__info">
                     <strong>{b.title}</strong>
                     <span className="admin-badge admin-badge--sm" style={{ marginTop: 4, alignSelf: 'flex-start' }}>

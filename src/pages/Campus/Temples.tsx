@@ -103,11 +103,6 @@ export default function Temples() {
         page="campus-temples"
         defaultTitle={title}
         defaultSubtitle={subtitle}
-        breadcrumb={[
-          { label: 'Home', to: '/' },
-          { label: 'Campus Life', to: '/campus' },
-          { label: title },
-        ]}
         hideCta={true}
       />
 
@@ -116,10 +111,6 @@ export default function Temples() {
         <div className="tmpl-container">
           <div className="tmpl-hero-grid">
             <div className="tmpl-hero-content">
-              <div className="tmpl-badge">
-                <Sparkles size={14} />
-                <span>SACRED SANCTUARY • CAMPUS REVERENCE</span>
-              </div>
               <h1 className="tmpl-hero-title">
                 {title.includes('God') ? (
                   <>
@@ -151,7 +142,7 @@ export default function Temples() {
             </div>
 
             <div className="tmpl-hero-img-box">
-              <img
+              <img loading="lazy"
                 src={photos[0]?.src || PHOTO_NEEDED_PLACEHOLDER}
                 alt="Temples of God"
                 className="tmpl-hero-img"
@@ -165,7 +156,6 @@ export default function Temples() {
       <section className="tmpl-section">
         <div className="tmpl-container">
           <div className="tmpl-section-header">
-            <div className="tmpl-badge">{aboutData.badge}</div>
             <h2 className="tmpl-section-title">
               {aboutData.title}
             </h2>
@@ -201,7 +191,6 @@ export default function Temples() {
       <section className="tmpl-section tmpl-highlights-section">
         <div className="tmpl-container">
           <div className="tmpl-section-header">
-            <div className="tmpl-badge">SACRED ARCHITECTURE</div>
             <h2 className="tmpl-section-title">
               Sanctuary <span>Highlights</span>
             </h2>
@@ -242,7 +231,6 @@ export default function Temples() {
       <section className="tmpl-section tmpl-reflection-section">
         <div className="tmpl-container">
           <div className="tmpl-section-header">
-            <div className="tmpl-badge">HOLISTIC WELLBEING • CAMPUS SANCTUARY</div>
             <h2 className="tmpl-section-title">
               A Space for Reverence, <span>Reflection & Inner Peace</span>
             </h2>

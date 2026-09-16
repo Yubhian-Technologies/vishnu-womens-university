@@ -26,7 +26,7 @@ import './Clubs.css';
 const DEFAULT_HERO_IMAGE = 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=1600&q=80';
 const DEFAULT_HERO_HEADLINE = 'FIND YOUR\nPASSION\nHERE';
 const DEFAULT_HERO_BODY = "From technology to the arts, service to sport — VWU's clubs celebrate curiosity, creativity, and the spirit of community.";
-const DEFAULT_HERO_BADGE = 'Campus Life';
+
 const DEFAULT_HERO_TAGLINE = 'Where Every Passion Finds Its Place.';
 const DEFAULT_HERO_CORNER = 'Every Passion.\nOne Community.';
 
@@ -260,7 +260,7 @@ export default function Clubs() {
   const heroBody = heroSlide?.subtitle || DEFAULT_HERO_BODY;
   const heroCta1Label = heroSlide?.ctaLabel || 'Explore Clubs';
   const heroCta1Link = heroSlide?.ctaLink || '';
-  const heroBadge = heroExtra?.value || DEFAULT_HERO_BADGE;
+  
   const heroTagline = heroExtra?.title || DEFAULT_HERO_TAGLINE;
   const heroCornerLines = (heroExtra?.desc || DEFAULT_HERO_CORNER).split('\n').filter(Boolean);
   const heroCta2Link = heroExtra?.slug || '/events';
@@ -310,7 +310,7 @@ export default function Clubs() {
           Content Blocks ("Clubs — Hero Extra Text"). */}
       <section className="clubs-hero-section">
           <div className="clubs-hero-card">
-            <img src={heroImage} alt="" className="clubs-hero-bg-img" />
+            <img loading="lazy" src={heroImage} alt="" className="clubs-hero-bg-img" />
             <div className="clubs-hero-overlay" />
 
             <div className="clubs-hero-corner" aria-hidden="true">
@@ -318,10 +318,7 @@ export default function Clubs() {
             </div>
 
             <div className="clubs-hero-content">
-              <div className="clubs-hero-badge-row">
-                <span className="clubs-hero-badge-dash" />
-                <span className="clubs-hero-badge-text">{heroBadge}</span>
-              </div>
+
 
               <h1 className="clubs-hero-headline">
                 {heroHeadlineLines.map((line, i) => (
@@ -524,7 +521,7 @@ export default function Clubs() {
                   {Array.from({ length: 5 }, (_, i) => <Star key={i} size={13} fill="currentColor" />)}
                   <span>5.0 Star Story</span>
                 </div>
-                {activeStory.icon && <span className="clubs-story-badge">{activeStory.icon}</span>}
+
               </div>
 
               <Quote size={30} className="clubs-story-quote-icon" />
@@ -532,7 +529,7 @@ export default function Clubs() {
 
               <div className="clubs-story-author">
                 {activeStory.slug && activeStory.slug.startsWith('http') ? (
-                  <img src={activeStory.slug} alt={activeStory.title} className="clubs-story-avatar" />
+                  <img loading="lazy" src={activeStory.slug} alt={activeStory.title} className="clubs-story-avatar" />
                 ) : (
                   <div className="clubs-story-avatar clubs-story-avatar--initials">
                     {activeStory.title.split(' ').slice(0, 2).map((n) => n[0]).join('').toUpperCase()}
@@ -582,7 +579,7 @@ export default function Clubs() {
                 </div>
                 {collagePhotos.map((photo, i) => (
                   <div key={photo.src} className={`clubs-collage-polaroid clubs-collage-polaroid--${i}`}>
-                    <img src={photo.src} alt={photo.alt} />
+                    <img loading="lazy" src={photo.src} alt={photo.alt} />
                     <span>{photo.caption || photo.alt}</span>
                   </div>
                 ))}
@@ -596,7 +593,7 @@ export default function Clubs() {
                   <h3>Why Join Clubs?</h3>
                   <p>The VWU holistic development advantage</p>
                 </div>
-                <span className="clubs-why-join-badge">{whyJoinItems.length} Pillars</span>
+
               </div>
               <ul className="clubs-why-join-list">
                 {whyJoinItems.map((item, i) => {
