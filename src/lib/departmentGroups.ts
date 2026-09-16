@@ -27,8 +27,11 @@ export interface DepartmentGroup {
   /**
    * `faculty` docs whose `department` is one of these belong to this department.
    * Needed because the two programs share one faculty list but their own
-   * `department` fields don't line up with the faculty tags (e.g. the AI
-   * programs are `department: "AI"` while faculty are tagged "AI&ML" / "AI&DS").
+   * `department` fields don't always line up with the faculty tags. AI
+   * faculty were historically tagged "AI&ML" / "AI&DS" but have all since
+   * been retagged to plain "AI" (see FacultyAdmin.tsx's one-time "Merge
+   * AI&ML/AI&DS → AI" cleanup) — those two legacy spellings are deliberately
+   * not listed here any more.
    */
   facultyDepartments: string[];
 }
@@ -67,7 +70,7 @@ export function standaloneDepartmentForSlug(slug?: string): StandaloneDepartment
 // Slugs verified against the live `programs` collection. Note EVT's slug is
 // uppercase. `facultyDepartments` verified against the `faculty` collection.
 export const DEPARTMENT_GROUPS: DepartmentGroup[] = [
-  { key: 'ai', deptShortCode: 'AI', programSlugs: ['ai-ds', 'ai-ml'], facultyDepartments: ['AI&DS', 'AI&ML'] },
+  { key: 'ai', deptShortCode: 'AI', programSlugs: ['ai-ds', 'ai-ml'], facultyDepartments: ['AI'] },
   { key: 'cse', deptShortCode: 'CSE', programSlugs: ['cse', 'cyber-security', 'mtech-cse', 'mtech-software-engineering'], facultyDepartments: ['CSE'] },
   { key: 'ece', deptShortCode: 'ECE', programSlugs: ['ece', 'EVT', 'mtech-vlsi'], facultyDepartments: ['ECE'] },
   { key: 'mechanical', deptShortCode: 'ME', programSlugs: ['me'], facultyDepartments: ['Mechanical', 'ME'] },
