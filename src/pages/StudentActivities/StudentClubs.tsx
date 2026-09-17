@@ -7,6 +7,7 @@ import { useContentBlocks } from '../../hooks/useContentBlocks';
 import { useClubCategories } from '../../lib/clubCategories';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import { slugify } from '../../lib/slugify';
+import { clubDesc } from '../../lib/clubDescriptionOverrides';
 import type { ClubDoc } from '../Admin/sections/StudentClubsAdmin';
 
 export default function StudentClubs() {
@@ -82,7 +83,7 @@ export default function StudentClubs() {
                   onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-mid-gray)'; (e.currentTarget as HTMLElement).style.boxShadow = 'none'; }}
                 >
                   <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 900, color: 'var(--color-primary)', marginBottom: 'var(--space-2)', lineHeight: 1.3 }}>{club.name}</h3>
-                  <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6 }}>{club.desc}</p>
+                  <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-light)', lineHeight: 1.6 }}>{clubDesc(club)}</p>
                 </Link>
               ))}
             </div>
@@ -94,7 +95,10 @@ export default function StudentClubs() {
       <section style={{ background: 'var(--color-primary)', padding: 'var(--space-14) 0' }}>
         <div className="container" style={{ textAlign: 'center' }}>
           <div className="reveal">
-            <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-4)' }}>Explore More Student Activities</h2>
+            <h2 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-2)' }}>Explore Student Clubs at VWU</h2>
+            <p style={{ color: 'var(--color-white)', fontSize: '1.1rem', opacity: 0.9, maxWidth: '700px', margin: '0 auto var(--space-6)' }}>
+              Whether students want to build technical skills, perform on stage, contribute to the community or develop new interests, there is space to participate, collaborate and grow.
+            </p>
             <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
               <Link to="/vishnu-tv-academy" className="btn btn-accent">Vishnu TV Academy</Link>
               <Link to="/social-services" className="btn btn-secondary">Social Services</Link>

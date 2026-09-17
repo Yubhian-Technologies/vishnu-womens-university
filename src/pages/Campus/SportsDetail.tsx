@@ -57,7 +57,7 @@ export default function SportsDetail() {
       {sport.about && (
         <section className="sports-detail__section">
           <div className="container sports-detail__about">
-            <h2 className="sports-detail__section-title">About {sport.title}</h2>
+            <h2 className="sports-detail__section-title">{sport.title}</h2>
             {sport.about.split('\n').filter((p) => p.trim()).map((para, i) => (
               <p key={i} className="sports-detail__about-para">{para}</p>
             ))}
