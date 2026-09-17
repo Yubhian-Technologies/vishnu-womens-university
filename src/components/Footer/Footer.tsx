@@ -1,6 +1,6 @@
 import { useState, useId } from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, Phone, Mail, ExternalLink, ChevronDown, Navigation } from 'lucide-react';
+import { MapPin, Phone, Mail, ExternalLink, ChevronDown, Navigation, ArrowRight } from 'lucide-react';
 import { useSiteContact, telHref } from '../../hooks/useSiteContact';
 import { InstagramIcon, FacebookIcon, TwitterIcon, LinkedInIcon, YouTubeIcon } from './SocialIcons';
 import SmoothCollapse from '../SmoothCollapse/SmoothCollapse';
@@ -20,14 +20,22 @@ const SOCIAL_LINKS = [
 
 const UNIVERSITY_LINKS: { label: string; href: string; disabled?: boolean; external?: boolean }[] = [
   { label: 'About VWU', href: '/about' },
+  { label: 'Vision & Mission', href: '/vision-mission' },
+  { label: 'President\'s Desk', href: '/governance' },
   { label: 'Governance & Leadership', href: '/governance', disabled: true },
+  { label: 'Accreditation & Rankings', href: '/news-awards/accreditations-awards' },
+  { label: 'History & Legacy', href: '/about-sves' },
   { label: 'Campus Facilities', href: '/campus-facilities', disabled: true },
   { label: 'Careers at VWU', href: '/careers' },
+  { label: 'Institutional Innovation Council', href: '/student-clubs/iic' },
   { label: 'Alumni', href: 'https://alumni.srivishnu.edu.in/', external: true },
   { label: 'Contact Us', href: '/contact' },
 ];
 
 const ACADEMIC_LINKS: { label: string; href: string; external?: boolean }[] = [
+  { label: 'Departments', href: '/departments' },
+  { label: 'Schools', href: '/schools' },
+  { label: 'Programs', href: '/programs' },
   { label: 'Academic Programmes', href: '/academics' },
   { label: 'Fee Structure', href: '/programmes-fee-structure' },
   { label: 'Examinations Portal', href: 'https://www.svecwexams.in/', external: true },
@@ -41,7 +49,13 @@ const ACADEMIC_LINKS: { label: string; href: string; external?: boolean }[] = [
 
 const STUDENT_SERVICE_LINKS: { label: string; href: string; external?: boolean }[] = [
   { label: 'Student Life & Clubs', href: '/student-life' },
+  { label: 'Hostels & Dining', href: '/campus/campus-hostels' },
+  { label: 'Sports & Athletics', href: '/campus/sports' },
   { label: "Vishnu's Wellness Center", href: 'https://vishnuwellness.in/', external: true },
+  { label: 'Transport Facility', href: '/campus/travel-desk' },
+  { label: 'Library & Information Center', href: '/campus/central-library' },
+  { label: 'Anti-Ragging Cell', href: '/anti-ragging' },
+  { label: 'Grievance Redressal', href: '/policies-procedures' },
   { label: "Students' Feedback", href: 'https://forms.gle/UuURnxKUZw7wW1NW9', external: true },
   { label: "Parents' Feedback", href: 'https://forms.gle/eT2QF3WNJZDwpEzj8', external: true },
   { label: "Faculty's Feedback", href: 'https://forms.gle/K89PMmjNbJNGSVEa9', external: true },
@@ -49,8 +63,12 @@ const STUDENT_SERVICE_LINKS: { label: string; href: string; external?: boolean }
 ];
 
 const COMPLIANCE_LINKS: { label: string; href: string; external?: boolean }[] = [
+  { label: 'Mandatory Disclosures', href: '/disclosures/ugc' },
+  { label: 'NIRF Data', href: '/information' },
+  { label: 'NAAC Certificate', href: '/news-awards/accreditations-awards' },
   { label: 'Infrastructure & Facilities', href: 'https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2FSVECWCollegeFeePayment.pdf?alt=media&token=196d3e64-8e1b-4d11-963e-7363c9be4000' },
   { label: 'Institutional Data', href: 'https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2FSVECWAuditStatements.pdf?alt=media&token=949e45f9-c171-404a-8578-9c5b0114f92f' },
+  { label: 'Audit Statements', href: 'https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2FSVECWAuditStatements.pdf?alt=media&token=949e45f9-c171-404a-8578-9c5b0114f92f', external: true },
   { label: 'College Fee Payment', href: 'https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2FSVECWCollegeFeePayment.pdf?alt=media&token=196d3e64-8e1b-4d11-963e-7363c9be4000' },
   { label: 'Hostel Fee Payment', href: 'https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2FSVECWHostelFeePayment.pdf?alt=media&token=166d9223-5e4e-4a56-918e-45e9f32243c1' },
   { label: 'Building Plans', href: 'https://firebasestorage.googleapis.com/v0/b/vishnu-womens-university.firebasestorage.app/o/downloads%2FSVECWBuildingPlans.pdf?alt=media&token=6652dd95-c77b-4fe0-9535-326db47e485e' },
@@ -130,6 +148,12 @@ export default function Footer() {
               </Link>
               <h2 className="vwu-footer-uni-name">విష్ణు మహిళా విశ్వవిద్యాలయం</h2>
             </div>
+            
+            <div className="vwu-footer-tagline">
+              <span className="vwu-footer-tagline-highlight">Her Education. Her Confidence. Her Future.</span>
+              Her University &mdash; Vishnu Women's University.
+            </div>
+
             <p className="vwu-footer-mission">
               Empowering women scholars through excellence in engineering education,
               interdisciplinary research, and transformative leadership.
@@ -158,6 +182,15 @@ export default function Footer() {
                 <a href={`mailto:${email}`} className="vwu-footer-contact-link">{email}</a>
               </div>
             </address>
+
+            <div className="vwu-footer-cta">
+              <h4 className="vwu-footer-cta-title">Begin Your Journey</h4>
+              <p className="vwu-footer-cta-text">Admissions are open for the upcoming academic session.</p>
+              <Link to="/apply-now" className="vwu-footer-cta-btn">
+                Apply Now
+                <ArrowRight size={16} aria-hidden="true" />
+              </Link>
+            </div>
           </div>
 
           {/* Navigation Columns */}

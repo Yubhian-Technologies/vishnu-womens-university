@@ -510,7 +510,7 @@ export default function About() {
               <p style={{ color: 'var(--color-text-light)', lineHeight: 1.8, marginBottom: 'var(--space-4)' }}>
                 From advanced learning spaces and seamless connectivity to sports, wellness, residential, dining, and spiritual facilities, VWU offers a thoughtfully designed campus ecosystem that supports learning, well-being, belonging, and holistic student development.
               </p>
-              <div className="about-pillars-grid" style={{ marginBottom: 'var(--space-5)', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}>
+              <div className="about-pillars-grid" style={{ marginBottom: 'var(--space-5)' }}>
                 {[
                   { title: 'Modern Campus Facilities', desc: 'Smart classrooms, well-equipped labs, and world-class infrastructure.', icon: Building2, bg: '#E8EEF7', fg: 'var(--color-primary)' },
                   { title: 'High-Speed Connectivity', desc: 'Seamless digital access for a smarter tomorrow.', icon: Wifi, bg: '#E4F0EA', fg: '#2F7D5D' },

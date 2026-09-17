@@ -111,6 +111,23 @@
   max-width: 440px;
 }
 
+.vwu-footer-tagline {
+  font-size: 0.95rem;
+  color: var(--footer-text);
+  line-height: 1.5;
+  margin: 0.25rem 0;
+  max-width: 440px;
+}
+
+.vwu-footer-tagline-highlight {
+  color: var(--footer-accent);
+  font-weight: 600;
+  display: block;
+  font-size: 1.05rem;
+  margin-bottom: 0.15rem;
+  letter-spacing: 0.01em;
+}
+
 /* Address / Contact */
 .vwu-footer-address {
   font-style: normal;
@@ -180,6 +197,55 @@
   outline: 2px solid var(--footer-accent);
   outline-offset: 2px;
   border-radius: 2px;
+}
+
+/* ── Admissions CTA ── */
+.vwu-footer-cta {
+  margin-top: 2rem;
+  padding-top: 1.75rem;
+  border-top: 1px solid var(--footer-border);
+}
+
+.vwu-footer-cta-title {
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--footer-heading);
+  margin: 0 0 0.4rem;
+}
+
+.vwu-footer-cta-text {
+  font-size: 0.85rem;
+  color: var(--footer-text);
+  margin: 0 0 1.15rem;
+  line-height: 1.5;
+}
+
+.vwu-footer-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--footer-accent);
+  color: var(--footer-bg);
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 0.65rem 1.25rem;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: all 200ms ease;
+  width: fit-content;
+}
+
+.vwu-footer-cta-btn:hover {
+  background: #ffffff;
+  color: var(--footer-bg);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(255, 255, 255, 0.15);
+}
+
+.vwu-footer-cta-btn:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 3px;
 }
 
 /* ── Navigation Columns ── */
@@ -430,6 +496,38 @@
   .vwu-footer-nav {
     grid-template-columns: repeat(2, 1fr);
     gap: 2rem;
+  }
+}
+
+/* ==========================================================================
+   RESPONSIVE — Large Desktop (≥1281px)
+   ========================================================================== */
+
+@media (min-width: 1281px) {
+  .vwu-footer-inner {
+    max-width: 1440px;
+  }
+
+  .vwu-footer-main .vwu-footer-inner {
+    grid-template-columns: 1.25fr 2.75fr;
+    gap: 5rem;
+  }
+
+  .vwu-footer-logo {
+    height: 72px;
+  }
+
+  .vwu-footer-uni-name {
+    font-size: 1.35rem;
+  }
+
+  .vwu-footer-mission {
+    font-size: 0.95rem;
+    max-width: 500px;
+  }
+
+  .vwu-footer-nav {
+    gap: 3rem;
   }
 }
 
