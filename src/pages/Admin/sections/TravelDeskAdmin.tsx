@@ -19,7 +19,7 @@ export const DEFAULT_TRAVEL_CONTACTS = {
 
 export const DEFAULT_TRAVEL_ABOUT = {
   badge: 'CONVENIENT SERVICES',
-  title: 'About the Travel Desk',
+  title: 'Travel Desk',
   subtitle: 'Making travel planning and related formalities more convenient for the university community.',
   paragraph1: 'The Campus Travel Desk at Vishnu Women’s University provides students, faculty, and staff with easy access to a range of travel-related services within the campus. From booking bus, train, and flight tickets to assistance with passports, visas, hotel reservations, holiday packages, document attestation, and overseas education requirements, the Travel Desk brings essential support together in one convenient place.',
   paragraph2: 'With these services available on campus, members of the university community can plan their journeys and manage travel-related formalities more conveniently. Travel Partner: Ushodaya Holidays.',
@@ -309,7 +309,7 @@ export default function TravelDeskAdmin() {
                 id="td-abt-title"
                 value={aboutForm.title}
                 onChange={(e) => setAboutForm((p) => ({ ...p, title: e.target.value }))}
-                placeholder="About the Travel Desk"
+                placeholder="Travel Desk"
               />
             </div>
             <div className="admin-field admin-field--full">

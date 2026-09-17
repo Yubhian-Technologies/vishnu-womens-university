@@ -17,6 +17,7 @@ import { slugify } from '../../lib/slugify';
 import type { PhotoItem } from '../../components/PhotoGrid/PhotoGrid';
 import type { ClubDoc } from '../Admin/sections/StudentClubsAdmin';
 import { useClubCategories } from '../../lib/clubCategories';
+import { clubDesc } from '../../lib/clubDescriptionOverrides';
 import './Clubs.css';
 
 // Defaults shown until an admin sets a real "clubs" Hero Banner (title,
@@ -24,8 +25,8 @@ import './Clubs.css';
 // Block (badge, script tagline, corner text, 2nd button link) — same
 // graceful-fallback pattern as the stats/testimonials sections below.
 const DEFAULT_HERO_IMAGE = 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=1600&q=80';
-const DEFAULT_HERO_HEADLINE = 'FIND YOUR\nPASSION\nHERE';
-const DEFAULT_HERO_BODY = "From technology to the arts, service to sport — VWU's clubs celebrate curiosity, creativity, and the spirit of community.";
+const DEFAULT_HERO_HEADLINE = 'Explore Student Clubs at VWU';
+const DEFAULT_HERO_BODY = "Whether students want to build technical skills, perform on stage, contribute to the community or develop new interests, there is space to participate, collaborate and grow.";
 
 const DEFAULT_HERO_TAGLINE = 'Where Every Passion Finds Its Place.';
 const DEFAULT_HERO_CORNER = 'Every Passion.\nOne Community.';
@@ -478,7 +479,7 @@ export default function Clubs() {
                   </div>
                   <div className="clubs-wiggly-body">
                     <h3 className="clubs-wiggly-name">{club.name}</h3>
-                    <p className="clubs-wiggly-desc">{club.desc}</p>
+                    <p className="clubs-wiggly-desc">{clubDesc(club)}</p>
                     <span className="clubs-wiggly-link">
                       View Club
                       <span className="clubs-wiggly-link-arrow"><ArrowRight size={12} /></span>
@@ -630,9 +631,9 @@ export default function Clubs() {
           <div className="container">
             <div className="clubs-gallery-header">
               <span className="section-label"><Sparkles size={14} /> Club Gallery</span>
-              <h2 className="clubs-gallery-title">Moments Across Our Clubs</h2>
+              <h2 className="clubs-gallery-title">Club Life at Vishnu Women&rsquo;s University</h2>
               <p className="clubs-gallery-subtitle">
-                A glimpse of the workshops, festivals, and outreach that define campus life at VWU.
+                A glimpse of workshops, competitions, performances, outreach activities and student-led events across the University.
               </p>
             </div>
             <ClubsGalleryCarousel photos={galleryPhotos} />
@@ -643,19 +644,20 @@ export default function Clubs() {
       {/* CTA */}
       <section className="clubs-cta-section">
         <div className="container clubs-cta-inner reveal">
-          <p className="clubs-cta-script">Your Passion<br />Our Community</p>
           <div className="clubs-cta-main">
-            <h2 className="clubs-cta-heading">Join a Club Today</h2>
-            <p className="clubs-cta-subtitle">Connect. Collaborate. Create.</p>
+            <h2 className="clubs-cta-heading">Find a Club That Interests You</h2>
+            <p className="clubs-cta-subtitle">
+              Explore the clubs, discover activities that match your interests and connect with the respective student coordinators or faculty mentors to learn how to participate.
+            </p>
             <div className="clubs-cta-actions">
               <button
                 type="button"
                 className="btn clubs-cta-btn clubs-cta-btn--primary"
                 onClick={() => { setActiveCategory(null); smoothScrollTo('#clubs-grid'); }}
               >
-                View All Clubs
+                Explore All Clubs &rarr;
               </button>
-              <Link to="/events" className="btn clubs-cta-btn clubs-cta-btn--outline">Upcoming Events</Link>
+              <Link to="/events" className="btn clubs-cta-btn clubs-cta-btn--outline">View Upcoming Events &rarr;</Link>
             </div>
           </div>
         </div>

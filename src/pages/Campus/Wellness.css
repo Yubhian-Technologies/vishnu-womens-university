@@ -697,19 +697,22 @@
   color: #ffffff;
 }
 
-.btn-cta-primary span {
+.btn-cta-primary span,
+.btn-cta-secondary span {
   font-size: 1.1rem;
   line-height: 1;
   transition: transform 0.2s ease;
 }
 
-.btn-cta-primary:hover span {
+.btn-cta-primary:hover span,
+.btn-cta-secondary:hover span {
   transform: translateX(3px);
 }
 
 .btn-cta-secondary {
   display: inline-flex;
   align-items: center;
+  gap: 0.6rem;
   background-color: #ffffff;
   color: #1E293B;
   font-family: var(--font-sans);

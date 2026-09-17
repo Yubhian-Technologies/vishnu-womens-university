@@ -10,6 +10,7 @@ import { hasCustomSectionContent } from '../../lib/customSections';
 import { findCampusFacilityBySlug } from '../Campus/campusFacilities.data';
 import VwuSportsSection from '../../components/VwuSportsSection/VwuSportsSection';
 import CampusEventsShowcase from '../../components/CampusEventsShowcase/CampusEventsShowcase';
+import FlexibleTable from '../../components/FlexibleTable/FlexibleTable';
 import type { CampusLifeItemDoc } from '../Admin/sections/CampusLifeAdmin';
 import '../detail-layout.css';
 import '../Campus/tabbed-section.css';
@@ -19,7 +20,7 @@ import '../Campus/tabbed-section.css';
 // before an admin has entered anything; Hero Banners in /admin overrides
 // title/subtitle exactly the same way it does for every other page.
 const ACTIVITY_DEFAULTS: Record<string, { title: string; subtitle: string }> = {
-  'vishnu-tv-academy': { title: 'Vishnu TV Academy', subtitle: 'Student-run and student-driven — the only dedicated campus TV Academy in Andhra Pradesh.' },
+  'vishnu-tv-academy': { title: 'Vishnu TV Academy', subtitle: 'Student-led media production, storytelling and broadcast learning at Vishnu Women’s University.' },
   'arts-culture': { title: 'Arts & Culture', subtitle: 'Nurturing creativity, preserving heritage, and building a sense of belonging — developing responsible and culturally grounded leaders.' },
   'sports-games': { title: 'Sports & Games', subtitle: 'Building Strength, Skill, Teamwork, and Sporting Spirit.' },
   'social-services': { title: 'Social Services', subtitle: 'The National Service Scheme at VWU shapes engineers who are equally committed to their craft and to the communities they serve.' },
@@ -55,6 +56,202 @@ const SWIMMING_POOL_FACILITIES: { title: string; desc: string }[] = [
   { title: 'Poolside Amenities', desc: 'The surrounding poolside area provides space for students to prepare, relax and spend time between swimming sessions.' },
   { title: 'Nearby Refreshments', desc: 'A refreshment facility located close to the pool offers students convenient access to food and beverages before or after their activities.' },
 ];
+
+// Vishnu TV Academy — "About" is an admin-entered CustomSection (seeded
+// once from campusLifeLegacySeeds.ts, then edited live in Firestore), so a
+// code-side default wouldn't reach the page. Hardcoded here the same way as
+// Swimming Pool's content above; the CMS "About" section (matched by its
+// original label, not position, so re-labelling it in admin doesn't create
+// a duplicate) is filtered out below so this replaces it rather than adding
+// a second "About" block.
+const VISHNU_TV_ABOUT_PARAGRAPHS = [
+  'Vishnu TV Academy is a student-centred media initiative that gives students practical exposure to content development, video production, presentation and visual storytelling.',
+  'Developed as an extension of the creative ecosystem established through Radio Vishnu 90.4, the Academy enables students to take an active role in creating media for the campus community. Radio Vishnu itself has a long-standing community and educational focus, with student-developed programming forming an important part of its activities.',
+  'At Vishnu TV Academy, students engage with the production process from the development of an idea to the creation of the final programme. Through these experiences, they develop communication, collaboration and media-production skills while documenting academic activities, campus events and issues of wider social relevance.',
+];
+
+function VishnuTvAboutSection() {
+  return (
+    <section className="section bg-white">
+      <div className="container">
+        <div style={{ marginBottom: 'var(--space-8)' }}>
+          <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Vishnu TV Academy</h2>
+          <p style={{ margin: '0.3rem 0 0', color: 'var(--color-text-light)', fontSize: 'var(--text-sm)', fontWeight: 600 }}>
+            Learning Media by Creating It
+          </p>
+        </div>
+        {VISHNU_TV_ABOUT_PARAGRAPHS.map((para, i) => (
+          <p key={i} style={{ color: 'var(--color-text)', lineHeight: 1.8, marginBottom: i < VISHNU_TV_ABOUT_PARAGRAPHS.length - 1 ? 'var(--space-4)' : 0 }}>
+            {para}
+          </p>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// Vishnu TV Academy — "Four Pillars of Vishnu TV" is likewise an
+// admin-entered Table CustomSection seeded once and left unedited; same fix
+// as About above.
+const VISHNU_TV_PILLARS: [string, string][] = [
+  ['Education', 'Academic and knowledge-focused content including guest lectures, laboratory demonstrations, classroom presentations, seminars and workshops.'],
+  ['Entertainment', 'Student-created programmes and campus features that provide opportunities for creativity, presentation and collaborative production.'],
+  ['Events', 'Video coverage and documentation of symposia, cultural programmes, sports activities, institutional events and other significant campus occasions.'],
+  ['Campus News', 'Student-led coverage of campus developments, activities and institutional updates, encouraging students to practise responsible communication and reporting.'],
+];
+
+function VishnuTvPillarsSection() {
+  return (
+    <section className="section bg-off-white">
+      <div className="container">
+        <div style={{ marginBottom: 'var(--space-8)' }}>
+          <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Four Pillars of Vishnu TV</h2>
+        </div>
+        <FlexibleTable sections={[{ title: '', headers: ['Title', 'Description'], rows: VISHNU_TV_PILLARS.map(([t, d]) => [t, d]) }]} />
+      </div>
+    </section>
+  );
+}
+
+// Vishnu TV Academy — "From Idea to Production", a new section (no CMS
+// equivalent to replace) shown right after the Four Pillars table.
+const VISHNU_TV_PROCESS_STEPS = [
+  'Concept & Research',
+  'Script Development',
+  'Presentation & Anchoring',
+  'Filming',
+  'Editing & Post-production',
+  'Final Programme',
+];
+
+function VishnuTvProcessSection() {
+  return (
+    <section className="section bg-white">
+      <div className="container">
+        <div style={{ marginBottom: 'var(--space-6)' }}>
+          <h2 className="section-title" style={{ fontSize: '1.75rem' }}>From Idea to Production</h2>
+        </div>
+        <p style={{ color: 'var(--color-text)', lineHeight: 1.8, marginBottom: 'var(--space-6)' }}>
+          Vishnu TV Academy gives students opportunities to participate in different stages of media creation, helping transform ideas into structured audio-visual content.
+        </p>
+
+        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-6)' }}>
+          {VISHNU_TV_PROCESS_STEPS.map((step, i) => (
+            <div key={step} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+              <span style={{
+                display: 'inline-flex', alignItems: 'center', padding: '0.6rem 1.1rem', borderRadius: 'var(--radius-full)',
+                background: 'var(--color-off-white)', border: '1px solid var(--color-light-gray)',
+                color: 'var(--color-primary)', fontWeight: 700, fontSize: 'var(--text-sm)', whiteSpace: 'nowrap',
+              }}>
+                {step}
+              </span>
+              {i < VISHNU_TV_PROCESS_STEPS.length - 1 && (
+                <span aria-hidden="true" style={{ color: 'var(--color-accent)', fontWeight: 700 }}>&rarr;</span>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <p style={{ color: 'var(--color-text)', lineHeight: 1.8 }}>
+          Through participation in productions, students gain practical exposure to areas such as story development, interviewing, anchoring, camera-based production, journalism, editing, teamwork and digital communication.
+        </p>
+      </div>
+    </section>
+  );
+}
+
+// Vishnu TV Academy — "Documentaries with Social Relevance", shown right
+// after "From Idea to Production". The 6 themes render as compact cards
+// (not a tick list) per an explicit request.
+const VISHNU_TV_DOCUMENTARY_THEMES: { title: string; desc: string }[] = [
+  { title: 'Health & Hygiene', desc: 'Awareness-focused stories around health, hygiene and healthy practices.' },
+  { title: 'Personality Development', desc: 'Student-focused content that encourages confidence, self-awareness, communication and personal growth.' },
+  { title: 'Child Labour Awareness', desc: 'Documentaries that highlight the social impact of child labour and promote awareness of education, rights and responsible communities.' },
+  { title: 'Women’s Education & Empowerment', desc: 'Stories highlighting education, opportunity, participation and empowerment.' },
+  { title: 'Environmental Concerns', desc: 'Productions that draw attention to environmental responsibility, conservation and sustainable practices.' },
+  { title: 'Social Issues', desc: 'Documentaries that explore relevant community concerns and encourage informed discussion, awareness and social responsibility.' },
+];
+
+function VishnuTvDocumentariesSection() {
+  return (
+    <section className="section bg-off-white">
+      <div className="container">
+        <div style={{ marginBottom: 'var(--space-6)' }}>
+          <span className="section-label">Documentaries with Social Relevance</span>
+          <h2 className="section-title" style={{ marginTop: 'var(--space-3)' }}>Stories Beyond the Campus</h2>
+        </div>
+        <p style={{ color: 'var(--color-text)', lineHeight: 1.8, marginBottom: 'var(--space-4)' }}>
+          Student productions also explore issues with educational and social relevance, using documentary storytelling to connect communication skills with wider community awareness.
+        </p>
+        <p style={{ color: 'var(--color-text)', lineHeight: 1.8, marginBottom: 'var(--space-8)' }}>
+          Themes addressed through Vishnu TV productions include health and hygiene, personality development, child-labour awareness, women&rsquo;s education and empowerment, environmental concerns and broader social issues.
+        </p>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))', gap: 'var(--space-5)' }}>
+          {VISHNU_TV_DOCUMENTARY_THEMES.map((t) => (
+            <div key={t.title} style={{ padding: 'var(--space-5)', background: 'var(--color-white)', borderRadius: '8px', borderLeft: '4px solid var(--color-primary)' }}>
+              <strong style={{ display: 'block', fontSize: '1.05rem', marginBottom: 'var(--space-2)', color: 'var(--color-heading)' }}>{t.title}</strong>
+              <span style={{ color: 'var(--color-text-light)', lineHeight: 1.6, display: 'block' }}>{t.desc}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// Vishnu TV Academy — "Student Media Production", replacing the old
+// "Production Types" tick list with a card grid per an explicit request.
+const VISHNU_TV_PRODUCTION_TYPES = [
+  'Documentary Films',
+  'Academic Recordings',
+  'Laboratory Demonstrations',
+  'Seminars & Workshops',
+  'Student Programmes',
+  'Campus Events & Experiences',
+];
+
+function VishnuTvProductionTypesSection() {
+  return (
+    <section className="section bg-white">
+      <div className="container">
+        <div style={{ marginBottom: 'var(--space-6)' }}>
+          <h2 className="section-title" style={{ fontSize: '1.75rem' }}>Student Media Production</h2>
+        </div>
+        <p style={{ color: 'var(--color-text)', lineHeight: 1.8, marginBottom: 'var(--space-8)' }}>
+          Students contribute to a range of academic, institutional and creative media productions, including documentary films, guest-lecture recordings, laboratory demonstration videos, seminar and workshop coverage, classroom presentations and student-developed programmes.
+        </p>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(220px, 100%), 1fr))', gap: 'var(--space-4)' }}>
+          {VISHNU_TV_PRODUCTION_TYPES.map((title) => (
+            <div key={title} style={{ padding: 'var(--space-5)', background: 'var(--color-off-white)', borderRadius: 'var(--radius-md)', textAlign: 'center' }}>
+              <span style={{ fontWeight: 700, color: 'var(--color-primary)', fontSize: 'var(--text-base)' }}>{title}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// Vishnu TV Academy — closing tagline/callout, shown right after Student
+// Media Production.
+function VishnuTvClosingSection() {
+  return (
+    <section className="section bg-off-white">
+      <div className="container">
+        <div style={{ background: 'var(--color-white)', padding: 'var(--space-8)', borderRadius: 'var(--radius-lg)', textAlign: 'center', maxWidth: '900px', margin: '0 auto' }}>
+          <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-3)' }}>
+            Create. Communicate. Collaborate.
+          </h2>
+          <p style={{ fontSize: '1.05rem', color: 'var(--color-text)', lineHeight: 1.7 }}>
+            Students gain practical exposure to storytelling, anchoring, journalism, filmmaking, scriptwriting, editing, communication and teamwork through hands-on media production.
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 function SwimmingPoolContent() {
   return (
@@ -193,7 +390,26 @@ export default function CampusLifeDetail({ slug: slugProp }: { slug?: string }) 
           </div>
         </section>
       ) : (
-        <CustomSectionsRenderer sections={visibleSections} navOffset={NAV_OFFSET} />
+        <>
+          {slug === 'vishnu-tv-academy' && (
+            <>
+              <VishnuTvAboutSection />
+              <VishnuTvPillarsSection />
+              <VishnuTvProcessSection />
+              <VishnuTvDocumentariesSection />
+              <VishnuTvProductionTypesSection />
+              <VishnuTvClosingSection />
+            </>
+          )}
+          <CustomSectionsRenderer
+            sections={
+              slug === 'vishnu-tv-academy'
+                ? visibleSections.filter((s) => !['about', 'four pillars of vishnu tv', 'documentary topics', 'production types'].includes(s.label.trim().toLowerCase()))
+                : visibleSections
+            }
+            navOffset={NAV_OFFSET}
+          />
+        </>
       )}
 
       {/* "Sports & Games at VWU" — relocated here from /student-life. */}
@@ -221,12 +437,17 @@ export default function CampusLifeDetail({ slug: slugProp }: { slug?: string }) 
       {!EVENTS_SHOWCASE_SLUGS.has(slug) && (
         <section style={{ background: 'var(--color-primary)', padding: 'var(--space-14) 0' }}>
           <div className="container" style={{ textAlign: 'center' }}>
-            <h2 style={{ color: 'var(--color-white)', marginBottom: slug === 'campus-book-stores' ? 'var(--space-2)' : 'var(--space-4)' }}>
-              {slug === 'campus-book-stores' ? 'Explore More Campus Facilities' : slug === 'swimming-pool' ? 'Dive into More of Campus Life' : (isActivity ? 'Explore More Student Activities' : 'Explore More of Campus Life')}
+            <h2 style={{ color: 'var(--color-white)', marginBottom: (slug === 'campus-book-stores' || slug === 'vishnu-tv-academy') ? 'var(--space-2)' : 'var(--space-4)' }}>
+              {slug === 'campus-book-stores' ? 'Explore More Campus Facilities' : slug === 'swimming-pool' ? 'Dive into More of Campus Life' : slug === 'vishnu-tv-academy' ? 'Explore Student Life at Vishnu Women’s University' : (isActivity ? 'Explore More Student Activities' : 'Explore More of Campus Life')}
             </h2>
             {slug === 'campus-book-stores' && (
               <p style={{ color: 'var(--color-white)', fontSize: '1.1rem', opacity: 0.9, maxWidth: '600px', margin: '0 auto var(--space-6)' }}>
                 Discover the spaces and services that support learning and everyday student life at Vishnu Women's University.
+              </p>
+            )}
+            {slug === 'vishnu-tv-academy' && (
+              <p style={{ color: 'var(--color-white)', fontSize: '1.1rem', opacity: 0.9, maxWidth: '600px', margin: '0 auto var(--space-6)' }}>
+                Discover more opportunities for creativity, collaboration and student participation across the University.
               </p>
             )}
             <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>

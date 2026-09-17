@@ -7,6 +7,7 @@ import { useClubCategories } from '../../lib/clubCategories';
 import { resolveContentIcon } from '../../lib/contentIcons';
 import RouteFallback from '../../components/RouteFallback/RouteFallback';
 import { slugify } from '../../lib/slugify';
+import { clubDesc } from '../../lib/clubDescriptionOverrides';
 import type { ClubDoc } from '../Admin/sections/StudentClubsAdmin';
 import '../detail-layout.css';
 
@@ -80,7 +81,7 @@ export default function StudentClubDetail() {
               </div>
               <h1 className="dept-hero-title">{club.name}</h1>
               {club.desc && (
-                <p className="dept-hero-subtitle">{club.desc.slice(0, 160)}{club.desc.length > 160 ? '...' : ''}</p>
+                <p className="dept-hero-subtitle">{clubDesc(club).slice(0, 160)}{clubDesc(club).length > 160 ? '...' : ''}</p>
               )}
               <div className="dept-hero-cta">
                 <Link to="/student-clubs" className="btn-hero-gold">All Clubs</Link>
@@ -108,7 +109,7 @@ export default function StudentClubDetail() {
             const descriptionBlock = (
               <>
                 <p style={{ fontSize: 'var(--text-lg)', color: 'var(--color-text)', lineHeight: 1.75 }}>
-                  {club.desc || 'More details about this club are coming soon.'}
+                  {club.desc ? clubDesc(club) : 'More details about this club are coming soon.'}
                 </p>
                 {club.pdfUrl && (
                   <a

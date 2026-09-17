@@ -33,7 +33,7 @@ const DEFAULT_COUNSELLOR_NAME = 'Devika Babu';
 const DEFAULT_COUNSELLOR_ROLE = 'Student Counsellor | M.Sc. Psychology';
 const DEFAULT_COUNSELLOR_PHOTO = '/images/1000074551.jpg';
 // Carried over verbatim from the Wellness Center page's counsellor bio.
-const DEFAULT_COUNSELLOR_BIO = 'Devika brings a warm, judgment-free approach to every conversation — whether you’re working through anxiety, relationship concerns, a difficult transition, or simply need someone to listen. Her counselling space is built on one rule: you don’t need the "right words" to talk to her, and her door is always open — for a stressful day, a big win, or anything in between.';
+const DEFAULT_COUNSELLOR_BIO = 'Devika Babu brings a warm, respectful and non-judgemental environment in which students can speak openly about the concerns affecting their wellbeing.\n\nStudents may seek support for stress, anxiety, relationship concerns, academic pressure, difficult transitions, self-confidence or simply the need to talk through an experience with someone who will listen.\n\nHer approach focuses on listening, understanding each student’s circumstances and helping students identify practical ways to manage challenges and move forward with greater clarity and confidence.';
 const DEFAULT_COUNSELLOR_QUOTE = 'Creating a space where you can be yourself and talk about the things that really matter to you.';
 
 // Pastel icon-tile colours cycled across the Services/Support cards and the
@@ -49,10 +49,10 @@ const PASTEL = [
 ];
 
 const HERO_STATS = [
-  { icon: Shield, title: 'Safe Space', sub: 'Always supportive', color: PASTEL[1] },
-  { icon: UsersRound, title: 'Qualified Professionals', sub: 'Experts who care', color: PASTEL[1] },
-  { icon: Lock, title: 'Confidential & Secure', sub: 'Your privacy matters', color: PASTEL[3] },
-  { icon: Leaf, title: 'For Every Student', sub: 'Because you matter', color: PASTEL[2] },
+  { icon: Shield, title: 'Safe & Supportive', sub: 'A welcoming space to talk openly.', color: PASTEL[1] },
+  { icon: UsersRound, title: 'Professional Guidance', sub: 'Support from trained counselling professionals.', color: PASTEL[1] },
+  { icon: Lock, title: 'Confidential Support', sub: 'Your privacy and concerns are treated with care.', color: PASTEL[3] },
+  { icon: Leaf, title: 'Open to Every Student', sub: 'Wellbeing support for students across the University.', color: PASTEL[2] },
 ];
 
 // Same pastel backgrounds as PASTEL, but with a richer/darker icon colour
@@ -67,26 +67,26 @@ const SERVICE_PASTEL = [
 ];
 
 const SERVICES = [
-  { icon: ChatCircleDotsIcon, title: 'Individual Counselling', desc: 'One-on-one support for your unique concerns.', color: SERVICE_PASTEL[0] },
-  { icon: UsersIcon, title: 'Group Sessions', desc: 'Connect, share and grow together.', color: SERVICE_PASTEL[1] },
-  { icon: LeafIcon, title: 'Stress & Anxiety Support', desc: 'Tools and guidance to navigate challenges.', color: SERVICE_PASTEL[2] },
-  { icon: TrendUpIcon, title: 'Personal Growth', desc: 'Build confidence and a happier you.', color: SERVICE_PASTEL[3] },
-  { icon: CalendarIcon, title: 'Workshops & Events', desc: 'Learn, engage and take charge of your well-being.', color: SERVICE_PASTEL[4] },
-  { icon: PhoneIcon, title: 'Crisis Support', desc: 'Immediate assistance when you need it.', color: SERVICE_PASTEL[0] },
+  { icon: ChatCircleDotsIcon, title: 'Individual Counselling', desc: 'One-to-one conversations focused on your concerns, experiences and wellbeing needs.', color: SERVICE_PASTEL[0] },
+  { icon: UsersIcon, title: 'Group Sessions', desc: 'Supportive group-based sessions that encourage reflection, connection and shared learning.', color: SERVICE_PASTEL[1] },
+  { icon: LeafIcon, title: 'Stress & Anxiety Support', desc: 'Practical strategies to understand stress, manage anxiety and respond to everyday pressures more effectively.', color: SERVICE_PASTEL[2] },
+  { icon: TrendUpIcon, title: 'Personal Growth', desc: 'Guidance to strengthen self-awareness, confidence, resilience and personal development.', color: SERVICE_PASTEL[3] },
+  { icon: CalendarIcon, title: 'Workshops & Wellbeing Programmes', desc: 'Interactive sessions on mental health, emotional wellbeing, relationships, coping skills and other student-focused themes.', color: SERVICE_PASTEL[4] },
+  { icon: PhoneIcon, title: 'Urgent Support & Referral', desc: 'Guidance when a concern requires timely attention, including referral to appropriate support services where necessary.', color: SERVICE_PASTEL[0] },
 ];
 
 // Uses SERVICE_PASTEL (not PASTEL) for the same darker icon treatment as
 // Our Services — PASTEL stays untouched since the hero stats bar still
 // reads from it.
 const SUPPORT_AREAS = [
-  { icon: BrainIcon, title: 'Anxiety & Stress', desc: 'Find calm and coping tools', color: SERVICE_PASTEL[0] },
-  { icon: HandHeartIcon, title: 'Relationships', desc: 'Navigate connections', color: SERVICE_PASTEL[1] },
-  { icon: GraduationCapIcon, title: 'Academic Pressure', desc: 'Manage expectations', color: SERVICE_PASTEL[3] },
-  { icon: StarIcon, title: 'Self-Esteem', desc: 'Build confidence', color: SERVICE_PASTEL[4] },
-  { icon: PlantIcon, title: 'Life Transitions', desc: 'Adjust to change', color: SERVICE_PASTEL[2] },
-  { icon: UsersThreeIcon, title: 'Social Challenges', desc: 'Feel more connected', color: SERVICE_PASTEL[0] },
-  { icon: SparkleIcon, title: 'Mood & Wellbeing', desc: 'Find balance', color: SERVICE_PASTEL[1] },
-  { icon: QuestionIcon, title: 'Other Concerns', desc: "We're here for you", color: SERVICE_PASTEL[3] },
+  { icon: BrainIcon, title: 'Stress & Anxiety', desc: 'Understand stress and develop practical coping strategies.', color: SERVICE_PASTEL[0] },
+  { icon: HandHeartIcon, title: 'Relationships', desc: 'Navigate communication, boundaries and interpersonal concerns.', color: SERVICE_PASTEL[1] },
+  { icon: GraduationCapIcon, title: 'Academic Pressure', desc: 'Manage expectations, workload, performance-related stress and academic demands.', color: SERVICE_PASTEL[3] },
+  { icon: StarIcon, title: 'Self-Esteem & Confidence', desc: 'Develop a healthier sense of self and greater personal confidence.', color: SERVICE_PASTEL[4] },
+  { icon: PlantIcon, title: 'Life Transitions', desc: 'Adjust to change, new responsibilities and important stages of university life.', color: SERVICE_PASTEL[2] },
+  { icon: UsersThreeIcon, title: 'Social Connection', desc: 'Work through loneliness, social difficulties and challenges in connecting with others.', color: SERVICE_PASTEL[0] },
+  { icon: SparkleIcon, title: 'Mood & Emotional Wellbeing', desc: 'Understand emotional experiences and develop healthier ways of responding to them.', color: SERVICE_PASTEL[1] },
+  { icon: QuestionIcon, title: 'Other Personal Concerns', desc: 'Talk through concerns that may be affecting your wellbeing, even when they do not fit into a particular category.', color: SERVICE_PASTEL[3] },
 ];
 
 const DEFAULT_IMPACT_STATS = [
@@ -139,8 +139,7 @@ export default function Wellness() {
               <span>Matters</span>
             </h1>
             <p className="wellness-hero-body">
-              At WellCentre, we provide a safe, supportive and judgement-free space for you to pause, talk and grow.
-              You&rsquo;re not alone &mdash; we&rsquo;re here for you.
+              The WellCentre at Vishnu Women&rsquo;s University provides a safe, supportive and non-judgemental space where students can talk, reflect and seek guidance.
             </p>
             <div className="wellness-hero-actions">
               <Link to="/contact" className="btn-hero-gold">Book a Session</Link>
@@ -180,8 +179,7 @@ export default function Wellness() {
               </h2>
             </div>
             <p>
-              From managing stress to finding clarity, our services are designed to support your emotional, mental
-              and personal well-being.
+              University life brings opportunities, responsibilities and, at times, challenges. The WellCentre provides a range of student counselling and wellbeing services designed to support emotional wellbeing, personal development and a positive university experience.
             </p>
           </div>
           <div className="grid-3 mobile-stack-grid">
@@ -215,10 +213,12 @@ export default function Wellness() {
         <div className="container">
           <div className="wellness-counsellor-grid">
             <div>
-              <h2 className="wellness-counsellor-heading">Meet Our Counsellor</h2>
+              <h2 className="wellness-counsellor-heading">Meet Our Student Counsellor</h2>
               <h3 className="wellness-counsellor-name">{counsellorName}</h3>
               <p className="wellness-counsellor-role">{counsellorRole}</p>
-              <p className="wellness-counsellor-bio">{counsellorBio}</p>
+              {counsellorBio.split('\n\n').map((para, i) => (
+                <p key={i} className="wellness-counsellor-bio">{para}</p>
+              ))}
               <blockquote className="wellness-counsellor-quote">
                 &ldquo;{counsellorQuote}&rdquo;
                 <cite>&mdash; {counsellorName}</cite>
@@ -254,7 +254,7 @@ export default function Wellness() {
               <span className="section-label">Support Areas</span>
               <h2 className="section-title" style={{ marginTop: 'var(--space-3)', marginBottom: 0 }}>We Support You Through</h2>
             </div>
-            <p>No matter what you&rsquo;re going through, you&rsquo;re not alone. Explore the areas we can help you with.</p>
+            <p>The WellCentre supports students across a wide range of personal, academic, social and emotional wellbeing concerns.</p>
           </div>
           <div className="grid-4 mobile-stack-grid">
             {SUPPORT_AREAS.map((s) => (
@@ -276,6 +276,10 @@ export default function Wellness() {
         <div className="wellness-impact-overlay" />
         <div className="container wellness-impact-content">
           <span className="section-label section-label--dark">Our Impact</span>
+          <h2 style={{ color: 'var(--color-white)', margin: 'var(--space-4) 0 0' }}>Our Reach and Impact</h2>
+          <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: 'var(--text-base)', lineHeight: 1.7, maxWidth: '760px', margin: 'var(--space-3) auto 0' }}>
+            Through individual support, group engagement and wellbeing initiatives, the WellCentre contributes to a campus environment in which students are encouraged to seek help, develop coping skills and take an active role in their wellbeing.
+          </p>
           <div className="wellness-impact-grid">
             {impactStats.map((s) => {
               const Icon = resolveContentIcon(s.icon);
@@ -302,7 +306,10 @@ export default function Wellness() {
               <span className="wellness-cta-eyebrow">It&rsquo;s Okay</span>
               <h2 className="wellness-cta-heading">To Ask for Help</h2>
               <p className="wellness-cta-body">
-                Your mental health matters. Reach out, book a session, or simply say hello &mdash; we&rsquo;re here for you.
+                Seeking support is a positive step towards taking care of your mental and emotional wellbeing.
+              </p>
+              <p className="wellness-cta-body">
+                Whether you would like to discuss a specific concern, manage an ongoing challenge or simply have a conversation with someone who will listen, the Vishnu Women&rsquo;s University WellCentre is here to support you.
               </p>
             </div>
 
@@ -312,10 +319,10 @@ export default function Wellness() {
             {/* Middle Action Buttons Column */}
             <div className="wellness-cta-actions-col">
               <Link to="/contact" className="btn-cta-primary">
-                Book a Session <span>&rarr;</span>
+                Book a Counselling Session <span>&rarr;</span>
               </Link>
               <Link to="/contact" className="btn-cta-secondary">
-                Contact Us
+                Contact the WellCentre <span>&rarr;</span>
               </Link>
             </div>
 

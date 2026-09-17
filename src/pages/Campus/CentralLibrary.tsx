@@ -48,7 +48,7 @@ export default function CentralLibrary() {
           {/* About Section */}
           <div style={{ marginBottom: '3rem' }}>
             <h2 className="section-title" style={{ fontSize: '1.75rem', marginBottom: '1.5rem' }}>
-              About the Central Library
+              Central Library
             </h2>
             <div style={{ fontSize: '1.1rem', color: 'var(--color-text)', lineHeight: 1.7, maxWidth: '900px' }}>
               <p style={{ marginBottom: '1rem' }}>

@@ -78,7 +78,7 @@ export default function TravelDesk() {
 
   const aboutData = {
     badge: aboutDoc?.value || DEFAULT_TRAVEL_ABOUT.badge,
-    title: aboutDoc?.title || DEFAULT_TRAVEL_ABOUT.title,
+    title: (aboutDoc?.title && aboutDoc.title !== 'About the Travel Desk' ? aboutDoc.title : DEFAULT_TRAVEL_ABOUT.title),
     subtitle: aboutDoc?.slug || DEFAULT_TRAVEL_ABOUT.subtitle,
     paragraphs: aboutDoc?.desc ? aboutDoc.desc.split('\n\n') : [DEFAULT_TRAVEL_ABOUT.paragraph1, DEFAULT_TRAVEL_ABOUT.paragraph2],
     timingMonSat: aboutDoc?.icon || DEFAULT_TRAVEL_ABOUT.timingMonSat,

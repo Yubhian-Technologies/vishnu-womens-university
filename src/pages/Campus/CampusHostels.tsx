@@ -248,16 +248,13 @@ export default function CampusHostels() {
       {photos.length > 0 && photos[0].src !== PHOTO_NEEDED_PLACEHOLDER && (
         <section className="section bg-off-white">
           <div className="container">
-            <PhotoGrid 
-              images={photos} 
-              title="Inside Our Campus Hostels" 
+            <PhotoGrid
+              images={photos}
+              title="Inside Our Campus Hostels"
               subtitle="Explore the residential spaces and facilities that support everyday student life at Vishnu Women’s University."
-              columns={3} 
-              layout="default" 
+              columns={3}
+              layout="default"
             />
-            <div style={{ textAlign: 'center', marginTop: '3rem' }}>
-              <a href="#" className="btn btn-outline" onClick={(e) => e.preventDefault()}>View Full Gallery</a>
-            </div>
           </div>
         </section>
       )}

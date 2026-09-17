@@ -1155,10 +1155,12 @@
 }
 
 .clubs-cta-subtitle {
-  font-size: var(--text-sm);
-  font-weight: 600;
+  font-size: var(--text-base);
+  font-weight: 500;
+  line-height: 1.6;
   color: rgba(26, 37, 64, 0.72);
-  margin: 0 0 var(--space-5);
+  max-width: 640px;
+  margin: 0 auto var(--space-5);
 }
 
 .clubs-cta-actions {

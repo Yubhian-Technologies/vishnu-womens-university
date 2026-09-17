@@ -194,9 +194,6 @@ export default function FitnessCentre() {
               </p>
             </div>
             <PhotoGrid images={photos} label="" title="" columns={3} layout="default" />
-            <div style={{ textAlign: 'center', marginTop: '3rem' }}>
-              <a href="#" className="fc-btn-outline" onClick={(e) => e.preventDefault()}>View Full Gallery</a>
-            </div>
           </div>
         </section>
       )}
