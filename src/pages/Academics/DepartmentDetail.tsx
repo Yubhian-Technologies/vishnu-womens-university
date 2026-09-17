@@ -197,13 +197,27 @@ function ResearchSection({
   navOffset?: number | string;
   id?: string;
 }) {
-  const [slide, setSlide] = useState(0);
   const total = slides.length;
-  const prev = () => setSlide((s) => (s - 1 + total) % total);
-  const next = () => setSlide((s) => (s + 1) % total);
+  // True circular loop: a clone of the last slide is prepended and a clone
+  // of the first slide is appended, so wrapping in either direction keeps
+  // sliding the same way it was already going. Without this, jumping the
+  // index straight from `total-1` back to `0` changes translateX from
+  // -(total-1)*100% to 0% in one step — the CSS transition then animates
+  // that as a fast slide *backward* through every other slide to get there,
+  // instead of continuing forward into what looks like the same slide.
+  const extended = total > 1 ? [slides[total - 1], ...slides, slides[0]] : slides;
+  // Index into `extended` — starts at 1 (the real first slide) when looping,
+  // since position 0 is the prepended last-slide clone.
+  const [index, setIndex] = useState(total > 1 ? 1 : 0);
+  // Turned off for exactly one render to snap invisibly off a clone onto
+  // its real counterpart, then turned back on before the next real move.
+  const [withTransition, setWithTransition] = useState(true);
 
-  // Reset active slide index when slide list changes (admin update)
-  useEffect(() => { setSlide(0); }, [total]);
+  const prev = () => { if (total > 1) setIndex((i) => i - 1); };
+  const next = () => { if (total > 1) setIndex((i) => i + 1); };
+
+  // Reset to the first slide when the slide list changes (admin update)
+  useEffect(() => { setIndex(total > 1 ? 1 : 0); setWithTransition(true); }, [total]);
 
   // Auto-advance every 4.5 s — nothing to advance through with 0 or 1 slide.
   useEffect(() => {
@@ -213,9 +227,30 @@ function ResearchSection({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [total]);
 
+  // Landed on a clone (either end) — snap without animating to the real
+  // slide it's standing in for, so the loop point is invisible.
+  const handleTrackTransitionEnd = () => {
+    if (total <= 1) return;
+    if (index === extended.length - 1) {
+      setWithTransition(false);
+      setIndex(1);
+    } else if (index === 0) {
+      setWithTransition(false);
+      setIndex(total);
+    }
+  };
+
+  // Re-enable the transition on the next frame after an invisible snap, so
+  // the next real slide change animates again.
+  useEffect(() => {
+    if (withTransition) return;
+    const raf = requestAnimationFrame(() => setWithTransition(true));
+    return () => cancelAnimationFrame(raf);
+  }, [withTransition]);
+
   if (stats.length === 0 && slides.length === 0) return null;
 
-  const current = total > 0 ? slides[Math.min(slide, total - 1)] : null;
+  const hasSlides = total > 0;
 
   return (
     <section id={id} className="section dept-research-section" aria-labelledby="research-heading" style={{ scrollMarginTop: navOffset }}>
@@ -254,7 +289,7 @@ function ResearchSection({
           )}
 
           {/* Right — photo + dark caption carousel */}
-          {current && (
+          {hasSlides && (
           <div className="dept-research-slider-wrap">
             {/* Arrow buttons */}
             <div className="dept-research-arrows">
@@ -278,11 +313,15 @@ function ResearchSection({
 
             {/* Slides Track */}
             <div className="dept-research-slides-viewport">
-              <div 
-                className="dept-research-slides-track" 
-                style={{ transform: `translateX(-${slide * 100}%)` }}
+              <div
+                className="dept-research-slides-track"
+                onTransitionEnd={handleTrackTransitionEnd}
+                style={{
+                  transform: `translateX(-${index * 100}%)`,
+                  transition: withTransition ? undefined : 'none',
+                }}
               >
-                {slides.map((s, i) => {
+                {extended.map((s, i) => {
                   const sImg = s.imageUrl || heroImage;
                   return (
                     <div className="dept-research-slide" key={i}>
