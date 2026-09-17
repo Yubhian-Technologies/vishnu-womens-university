@@ -94,7 +94,7 @@
 
 @media (min-width: 1440px) {
   .navbar-pill {
-    height: 84px !important;
+    height: 104px !important;
     gap: 1.25rem;
     padding: 0 !important;
   }

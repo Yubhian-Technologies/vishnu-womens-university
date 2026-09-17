@@ -110,7 +110,7 @@ export default function TravelDesk() {
   }, [title]);
 
   return (
-    <main className="travel-desk-page">
+    <main className="travel-desk-page page-wrapper">
       <PageHero
         page="campus-travel-desk"
         defaultTitle={title}

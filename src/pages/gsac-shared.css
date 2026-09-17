@@ -294,7 +294,7 @@
 
 .gsac-hero-section {
   padding: 0;
-  margin-top: -1rem; /* Pull up to match navbar bottom */
+  margin-top: 0;
 }
 
 .gsac-hero-card {
