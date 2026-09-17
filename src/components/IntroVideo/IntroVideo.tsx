@@ -77,7 +77,11 @@ export default function IntroVideo() {
               layout
               src="/images/logo.png"
               alt="Vishnu Women's University Logo"
-              style={{ height: 'clamp(80px, 12vw, 157px)', width: 'auto' }}
+              style={{ 
+                height: 'clamp(80px, 12vw, 157px)', 
+                width: 'auto',
+                borderRadius: 'clamp(8px, 1.5vw, 16px)' /* Clips the black artifact corners from the image file */
+              }}
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.8, ease: 'easeOut' }}

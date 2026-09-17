@@ -192,8 +192,12 @@ The Green Meadows has security personnel who patrol 24 hours. Water and current 
 The desk operates daily from 4:00 PM to 7:00 PM, and on Sundays from 11:00 AM to 7:00 PM. For assistance outside working hours, you can contact 9624 123 123 or email support@ushodayaholidays.in.
 
 This facility is designed to simplify travel and documentation needs for students, faculty, and staff.`,
-  'temples': `Worship is putting the spotlight on God. This whole idea is to engage our Vishnu Women's University students in an atmosphere and attitude of reverence and joy. Vishnu Women's University engage students from varied faith and religious traditions as well as students without religious affiliation. So, Vishnu Women's University holds a place for temple of gods in the campus. The temple is built on a high foundation covering an area of 25,000 square feet.`,
-  'health-care': `The Health Care Centre at Vishnu Women's University provides accessible medical care and essential health support to students and staff throughout the academic year. The Centre offers medical consultation, first aid, basic clinical testing, emergency support, and inpatient care.
+  'temples': `The Temples of God at Vishnu Women's University offer students, faculty, and staff a peaceful space for prayer, contemplation, and quiet reflection within the campus.
+
+Spread across approximately 25,000 sq. ft., the temple complex provides a serene setting where members of the university community can step away from their daily routines, spend time in reflection, and experience moments of calm.
+
+The space welcomes people from diverse faiths, traditions, and backgrounds while encouraging mutual respect and an inclusive campus environment.`,
+  'health-care': `The University provides accessible healthcare services through dedicated medical facilities located across the campus, addressing the routine medical needs, first aid and other essential health requirements of students, faculty and staff. Campus medical facilities provide access to consultation, basic diagnostic services, first aid, pharmacy support and other healthcare services when required.
 
 - General Medical Consultation and OPD Services
 - First Aid and Emergency Care
@@ -217,10 +221,23 @@ Specialist doctors visit the campus at scheduled times to provide additional hea
 Medical and nursing personnel are available round the clock for emergency assistance, ensuring timely healthcare support beyond regular consultation hours.
 
 The University is committed to maintaining a safe, healthy, and supportive campus environment, with healthcare facilities designed to meet the everyday and emergency medical needs of its students and staff.`,
-  'swimming-pool': `Whether you want to relax after a long day at studies are maintain a healthy life style, the newly opened swimming pool, next the sports complex is the ideal place for swimming enthusiasts. A world class pool with 80 feet length 40 feet width six lanes containing 4,05,000 liters of water provides excellent opportunities.
+  'swimming-pool': `The swimming pool at Vishnu Women's University provides students with a dedicated space for aquatic training, fitness and recreation. Located near the Sports Complex, the facility supports both beginners and experienced swimmers while encouraging swimming as part of an active and balanced campus lifestyle.
 
-The latest technological features, round the clock water circulation and purification plants, life saving apparatus and pool side equipment is an superb facility that only Vishnu Women's University has. Individualized assistance in developing skills in all the four strokes by the coach is available. In addition the well equipped Eat Out provides the right ambiance for a pool side party.`,
-  'campus-security': `It gives utmost importance to safety and security of students. A special wing is established for patrolling the campus in all aspects. Round the clock, security personnel are vigilant throughout the day. These security guards create peace of mind by providing safety to the inmate of the campus.`,
+The 80 ft × 40 ft swimming pool features six lanes with coaching support, modern water circulation and purification systems, lifesaving apparatus and poolside equipment. A refreshment facility close to the pool offers convenient access to food and beverages.
+
+The swimming pool forms part of the University's wider sports and wellness infrastructure, giving students another opportunity to stay active, develop new skills and make recreation part of everyday campus life.`,
+  'campus-security': `Vishnu Women's University is committed to providing a safe and secure campus environment for students, faculty, staff, and visitors. Campus security is supported through trained personnel, CCTV surveillance, regular patrolling, a dedicated Command Control Centre, and preventive safety measures.
+
+## Key Security Facilities & Measures
+
+- 24×7 Security Personnel: Trained security personnel provide round-the-clock security across key areas of the campus.
+- Women Security Personnel: Dedicated women security personnel strengthen student safety and provide support across residential and other important campus areas.
+- CCTV Surveillance: An extensive CCTV network enables continuous monitoring of key locations across the campus.
+- Command Control Centre: CCTV feeds are monitored through a dedicated Command Control Centre to support coordinated supervision and timely response.
+- Campus Patrolling: Security teams conduct regular patrols across academic, residential, sports, and common areas.
+- Anti-Ragging Measures: Dedicated Anti-Ragging Squads and preventive measures help maintain a safe, respectful, and inclusive campus environment.
+
+Through trained personnel, technology, and proactive safety measures, Vishnu Women's University works to create a secure campus where students can learn, participate, and grow with confidence.`,
 };
 
 function seedFacility(slug: string): () => SeedResult {
@@ -273,6 +290,98 @@ function seedWifiCampus(): SeedResult {
     label: 'A Connected and Future-Ready Campus',
     contentType: 'text',
     textContent: 'Together, high-speed connectivity, advanced computing resources, secure network infrastructure and reliable digital services create a resilient and future-ready campus. These facilities support students and faculty in accessing resources, collaborating effectively and participating in technology-driven learning and research.',
+  });
+
+  return { customSections: sections };
+}
+
+// Swimming Pool — bespoke rather than seedFacility(), since its "Pool at a
+// Glance" digest and six-item "Facilities & Support" grid are separate
+// labelled items that facilitySections() would flatten into plain text.
+function seedSwimmingPool(): SeedResult {
+  const sections: CustomSection[] = [];
+
+  push(sections, {
+    label: 'Swimming Pool',
+    subtitle: 'Train. Stay Active. Recharge.',
+    contentType: 'text',
+    textContent: "The swimming pool at Vishnu Women's University provides students with a dedicated space for aquatic training, fitness and recreation. Located near the Sports Complex, the facility supports both beginners and experienced swimmers while encouraging swimming as part of an active and balanced campus lifestyle.",
+  });
+
+  push(sections, {
+    label: 'Pool at a Glance',
+    contentType: 'list',
+    listText: [
+      '80 ft × 40 ft swimming pool',
+      'Six lanes',
+      'Coaching support',
+      'Water circulation and purification systems',
+    ].join('\n'),
+  });
+
+  const facilities: [string, string][] = [
+    ['Six-Lane Swimming Pool', 'The 80 ft × 40 ft pool provides dedicated lanes for structured practice, fitness swimming and recreational use.'],
+    ['Professional Coaching', 'Experienced coaching support helps students develop swimming techniques across the major strokes while building confidence, endurance and water skills.'],
+    ['Water Quality & Maintenance', 'Modern circulation and purification systems support regular water maintenance and help provide a clean swimming environment.'],
+    ['Safety Facilities', 'The pool area is equipped with essential lifesaving and poolside safety equipment to support safe aquatic activity.'],
+    ['Poolside Amenities', 'The surrounding poolside area provides space for students to prepare, relax and spend time between swimming sessions.'],
+    ['Nearby Refreshments', 'A refreshment facility located close to the pool offers students convenient access to food and beverages before or after their activities.'],
+  ];
+  push(sections, {
+    label: 'Facilities & Support',
+    contentType: 'text',
+    textContent: '',
+    subSections: facilities.map(([title, desc]) => ({
+      id: generateSectionId(title, []),
+      label: title,
+      contentType: 'text',
+      textContent: desc,
+    })),
+  });
+
+  push(sections, {
+    label: 'Supporting an Active Campus Lifestyle',
+    contentType: 'text',
+    textContent: "The swimming pool forms part of the University's wider sports and wellness infrastructure, giving students another opportunity to stay active, develop new skills and make recreation part of everyday campus life.",
+  });
+
+  return { customSections: sections };
+}
+
+function seedCampusSecurity(): SeedResult {
+  const sections: CustomSection[] = [];
+
+  push(sections, {
+    label: 'Campus Security',
+    subtitle: 'Ensuring a Safe, Secure, and Vigilant Campus',
+    contentType: 'text',
+    textContent: "Vishnu Women's University is committed to providing a safe and secure campus environment for students, faculty, staff, and visitors. Campus security is supported through trained personnel, CCTV surveillance, regular patrolling, a dedicated Command Control Centre, and preventive safety measures.",
+  });
+
+  const facilities: [string, string][] = [
+    ['24×7 Security Personnel', 'Trained security personnel provide round-the-clock security across key areas of the campus.'],
+    ['Women Security Personnel', 'Dedicated women security personnel strengthen student safety and provide support across residential and other important campus areas.'],
+    ['CCTV Surveillance', 'An extensive CCTV network enables continuous monitoring of key locations across the campus.'],
+    ['Command Control Centre', 'CCTV feeds are monitored through a dedicated Command Control Centre to support coordinated supervision and timely response.'],
+    ['Campus Patrolling', 'Security teams conduct regular patrols across academic, residential, sports, and common areas.'],
+    ['Anti-Ragging Measures', 'Dedicated Anti-Ragging Squads and preventive measures help maintain a safe, respectful, and inclusive campus environment.'],
+  ];
+  push(sections, {
+    label: 'Key Security Facilities & Measures',
+    contentType: 'text',
+    textContent: '',
+    subSections: facilities.map(([title, desc]) => ({
+      id: generateSectionId(title, []),
+      label: title,
+      contentType: 'list',
+      listText: desc,
+    })),
+  });
+
+  push(sections, {
+    label: 'Supporting a Safe Campus',
+    contentType: 'text',
+    textContent: "Through trained personnel, technology, and proactive safety measures, Vishnu Women's University works to create a secure campus where students can learn, participate, and grow with confidence.",
   });
 
   return { customSections: sections };
@@ -850,25 +959,25 @@ function seedVishnuTV(): SeedResult {
 function seedArtsCulture(): SeedResult {
   const sections: CustomSection[] = [];
   push(sections, {
-    label: 'Our Philosophy', subtitle: 'Culture is the Heart of Education', contentType: 'text',
-    textContent: '"A healthy Nation would be built only when we have a strong force of cultured and responsible youngsters."\n\nAt VWU, learning extends well beyond the classroom. Cultural participation, artistic expression, and social awareness are treated as integral to a complete education — not supplementary, but essential.\n\nCampus life is shaped by the spirit of "Vasudhaika Kutumbakam" — the world is one family — and every Indian festival is observed with the energy and inclusivity that defines VWU as a community.',
+    label: 'Arts, Culture & Campus Life', subtitle: 'Learning, creativity and community beyond the classroom', contentType: 'text',
+    textContent: "At Vishnu Women’s University, campus life extends beyond academics. Cultural festivals, performing arts, student-led activities and annual celebrations give students opportunities to express their creativity, build confidence, connect with peers and become active members of the university community.",
   });
   push(sections, {
-    label: 'Cultural Initiatives', contentType: 'table',
+    label: 'Cultural Initiatives', subtitle: 'Arts & Cultural Opportunities for Students', contentType: 'table',
     tableText: cardsTable([
-      { title: 'Festival Celebrations', desc: 'VWU celebrates every Indian festival with genuine enthusiasm and collective participation, embodying the spirit of "Vasudhaika Kutumbakam" — the world is one family.' },
-      { title: 'Artistic Development', desc: 'Students with a passion for the arts receive encouragement, guidance, and access to facilities for painting, photography, music, and decorative arts, growing their talent alongside their technical studies.' },
-      { title: 'Performing Arts', desc: 'Dance, drama, and music are central to campus culture. Dedicated clubs and regular events give students the stage to develop their talents and share them with the wider community.' },
-      { title: 'Photography & Film', desc: 'The Flash It Out Club and Vishnu TV Academy offer students real creative outlets for photography and filmmaking, telling stories from campus life and beyond.' },
+      { title: 'Festival Celebrations', desc: 'Campus celebrations bring students together to experience traditions, share cultures and strengthen the sense of community across the university.' },
+      { title: 'Artistic Development', desc: 'Students can develop their interests in painting, photography, music and crafts through opportunities for creative exploration and participation.' },
+      { title: 'Performing Arts', desc: 'Dance, drama and music activities provide students with platforms to perform, collaborate and develop confidence through shared creative experiences.' },
+      { title: 'Photography & Film', desc: 'Photography and film initiatives encourage students to document campus experiences, experiment with visual storytelling and develop their creative perspective.' },
     ]),
   });
   push(sections, {
-    label: 'Our Annual Celebrations', subtitle: 'Signature Events', contentType: 'table',
-    tableText: cardsTable([
-      { title: 'Annual Day', desc: "VWU's flagship annual celebration — a showcase of student talent through cultural performances, institutional awards, and recognition of academic and co-curricular achievement." },
-      { title: 'Medha Milan', desc: 'A national-level technical symposium drawing students from across Andhra Pradesh and Telangana for competitions, paper presentations, and cultural programs.' },
-      { title: 'Sports Day', desc: 'The annual Sports Day that honours athletic achievement and healthy competition — featuring track events, field sports, and special recognition for standout performers.' },
-    ]),
+    label: 'Campus Events & Annual Celebrations', contentType: 'text',
+    textContent: 'From university milestones and cultural festivals to annual programmes and sports events, campus celebrations create memorable experiences and bring the VWU community together throughout the academic year.',
+  });
+  push(sections, {
+    label: 'Experience Life at VWU', contentType: 'text',
+    textContent: 'Explore moments from cultural programmes, student activities, celebrations and campus events that reflect the vibrant student experience at Vishnu Women’s University.',
   });
   return { customSections: sections };
 }
@@ -987,8 +1096,8 @@ export const CAMPUS_LIFE_LEGACY_SEEDS: Record<string, () => SeedResult> = {
   'travel-desk': seedFacility('travel-desk'),
   'temples': seedFacility('temples'),
   'health-care': seedFacility('health-care'),
-  'swimming-pool': seedFacility('swimming-pool'),
-  'campus-security': seedFacility('campus-security'),
+  'swimming-pool': seedSwimmingPool,
+  'campus-security': seedCampusSecurity,
   'central-library': seedCentralLibrary,
   'campus-hostels': seedCampusHostels,
   'other-facilities': seedOtherFacilities,

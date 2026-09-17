@@ -21,7 +21,7 @@ import '../Campus/tabbed-section.css';
 // title/subtitle exactly the same way it does for every other page.
 const ACTIVITY_DEFAULTS: Record<string, { title: string; subtitle: string }> = {
   'vishnu-tv-academy': { title: 'Vishnu TV Academy', subtitle: 'Student-led media production, storytelling and broadcast learning at Vishnu Women’s University.' },
-  'arts-culture': { title: 'Arts & Culture', subtitle: 'Nurturing creativity, preserving heritage, and building a sense of belonging — developing responsible and culturally grounded leaders.' },
+  'arts-culture': { title: 'Arts, Culture & Campus Life at Vishnu Women’s University', subtitle: 'Learning, creativity and community beyond the classroom' },
   'sports-games': { title: 'Sports & Games', subtitle: 'Building Strength, Skill, Teamwork, and Sporting Spirit.' },
   'social-services': { title: 'Social Services', subtitle: 'The National Service Scheme at VWU shapes engineers who are equally committed to their craft and to the communities they serve.' },
   'campus-magazines': { title: 'Campus Magazines', subtitle: 'Three publications that document academic achievements, student creativity, and the story of campus life at VWU and across SVES.' },
@@ -443,6 +443,11 @@ export default function CampusLifeDetail({ slug: slugProp }: { slug?: string }) 
             {slug === 'campus-book-stores' && (
               <p style={{ color: 'var(--color-white)', fontSize: '1.1rem', opacity: 0.9, maxWidth: '600px', margin: '0 auto var(--space-6)' }}>
                 Discover the spaces and services that support learning and everyday student life at Vishnu Women's University.
+              </p>
+            )}
+            {slug === 'campus-security' && (
+              <p style={{ color: 'var(--color-white)', fontSize: '1.1rem', opacity: 0.9, maxWidth: '600px', margin: '0 auto var(--space-6)' }}>
+                Discover the facilities, experiences, and support systems that make student life at Vishnu Women's University enriching and engaging.
               </p>
             )}
             {slug === 'vishnu-tv-academy' && (

@@ -121,8 +121,6 @@ const navItemsData: NavItem[] = [
           { label: 'Programmes', path: '/academics/programs' },
           { label: 'Faculty Directory', path: '/faculty' },
           { label: 'Results Analysis', path: '/result-analysis' },
-          { label: 'Smart Classrooms', path: '/campus/smart-classrooms' },
-          { label: 'Central Library', path: '/campus/central-library' },
           { label: 'Examinations Portal', path: 'https://www.svecwexams.in/', external: true },
         ],
       },

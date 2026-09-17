@@ -160,7 +160,7 @@ Travel Partner: Ushodaya Holidays`,
   {
     slug: 'health-care',
     title: 'Health Care',
-    heroSubtitle: 'Quality Healthcare, Close to Campus — accessible medical care and essential health support for students and staff throughout the academic year.',
+    heroSubtitle: 'Accessible healthcare services and medical support for students, faculty and staff on campus.',
     body: `The Health Care Centre at Vishnu Women's University provides accessible medical care and essential health support to students and staff throughout the academic year. The Centre offers medical consultation, first aid, basic clinical testing, emergency support, and inpatient care.
 
 - General Medical Consultation and OPD Services
@@ -185,7 +185,7 @@ Specialist doctors visit the campus at scheduled times to provide additional hea
 Medical and nursing personnel are available round the clock for emergency assistance, ensuring timely healthcare support beyond regular consultation hours.
 
 The University is committed to maintaining a safe, healthy, and supportive campus environment, with healthcare facilities designed to meet the everyday and emergency medical needs of its students and staff.`,
-    desc: 'Quality Healthcare, Close to Campus — accessible medical care and essential health support for students and staff throughout the academic year.',
+    desc: 'Accessible healthcare services and medical support for students, faculty and staff on campus.',
   },
   {
     slug: 'sports',
@@ -201,18 +201,31 @@ The facilities support everyday fitness sessions as well as inter-collegiate and
   {
     slug: 'swimming-pool',
     title: 'Swimming Pool',
-    heroSubtitle: 'Fitness, Recreation, and Wellness Through Swimming.',
-    body: `Whether you want to relax after a long day at studies are maintain a healthy life style, the newly opened swimming pool, next the sports complex is the ideal place for swimming enthusiasts. A world class pool with 80 feet length 40 feet width six lanes containing 4,05,000 liters of water provides excellent opportunities.
+    heroSubtitle: 'A dedicated campus facility for swimming, fitness, recreation and aquatic training.',
+    body: `The swimming pool at Vishnu Women's University provides students with a dedicated space for aquatic training, fitness and recreation. Located near the Sports Complex, the facility supports both beginners and experienced swimmers while encouraging swimming as part of an active and balanced campus lifestyle.
 
-The latest technological features, round the clock water circulation and purification plants, life saving apparatus and pool side equipment is an superb facility that only Vishnu Women's University has. Individualized assistance in developing skills in all the four strokes by the coach is available. In addition the well equipped Eat Out provides the right ambiance for a pool side party.`,
-    desc: 'Fitness, Recreation, and Wellness Through Swimming.',
+The 80 ft × 40 ft swimming pool features six lanes with coaching support, modern water circulation and purification systems, lifesaving apparatus and poolside equipment. A refreshment facility close to the pool offers convenient access to food and beverages.
+
+The swimming pool forms part of the University's wider sports and wellness infrastructure, giving students another opportunity to stay active, develop new skills and make recreation part of everyday campus life.`,
+    desc: 'A dedicated campus facility for swimming, fitness, recreation and aquatic training.',
   },
   {
     slug: 'campus-security',
-    title: 'Campus Security',
-    heroSubtitle: 'Safe, Secure, and Vigilant Campus Environment.',
-    body: `It gives utmost importance to safety and security of students. A special wing is established for patrolling the campus in all aspects. Round the clock, security personnel are vigilant throughout the day. These security guards create peace of mind by providing safety to the inmate of the campus.`,
-    desc: 'Safe, Secure, and Vigilant Campus Environment.',
+    title: 'Campus Security and Student Safety',
+    heroSubtitle: 'Ensuring a safe, secure, and vigilant environment for every student, every day.',
+    body: `Vishnu Women's University is committed to providing a safe and secure campus environment for students, faculty, staff, and visitors. Campus security is supported through trained personnel, CCTV surveillance, regular patrolling, a dedicated Command Control Centre, and preventive safety measures.
+
+Key Security Facilities & Measures
+
+- 24×7 Security Personnel: Trained security personnel provide round-the-clock security across key areas of the campus.
+- Women Security Personnel: Dedicated women security personnel strengthen student safety and provide support across residential and other important campus areas.
+- CCTV Surveillance: An extensive CCTV network enables continuous monitoring of key locations across the campus.
+- Command Control Centre: CCTV feeds are monitored through a dedicated Command Control Centre to support coordinated supervision and timely response.
+- Campus Patrolling: Security teams conduct regular patrols across academic, residential, sports, and common areas.
+- Anti-Ragging Measures: Dedicated Anti-Ragging Squads and preventive measures help maintain a safe, respectful, and inclusive campus environment.
+
+Through trained personnel, technology, and proactive safety measures, Vishnu Women's University works to create a secure campus where students can learn, participate, and grow with confidence.`,
+    desc: 'Ensuring a safe, secure, and vigilant environment for every student, every day.',
   },
   {
     slug: 'other-facilities',
