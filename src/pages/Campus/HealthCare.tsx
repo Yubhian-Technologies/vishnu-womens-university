@@ -63,7 +63,7 @@ export default function HealthCare() {
   }, [title]);
 
   return (
-    <main className="hc-page">
+    <main className="hc-page page-wrapper">
       <PageHero
         page="campus-health-care"
         defaultTitle={title}

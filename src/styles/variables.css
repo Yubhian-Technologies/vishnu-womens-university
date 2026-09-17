@@ -89,17 +89,17 @@
 
   /* Layout */
   --max-width: 1280px;
-  --header-height: 104px;
+  --header-height: 118px;
   --topbar-height: 0px;
 }
 
 @media (max-width: 1199px) {
   :root {
-    --header-height: 96px;
+    --header-height: 128px;
   }
 }
 @media (max-width: 640px) {
   :root {
-    --header-height: 90px;
+    --header-height: 120px;
   }
 }

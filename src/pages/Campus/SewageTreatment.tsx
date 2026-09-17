@@ -83,7 +83,7 @@ export default function SewageTreatment() {
   }, []);
 
   return (
-    <main className="stp-page">
+    <main className="stp-page page-wrapper">
       <SEO
         title="Sewage Treatment Plants — Zero Discharge Campus | Vishnu Women's University"
         description="Two DST-funded 200 KLD sewage treatment plants using MBBR technology make the VWU campus a zero-discharge campus, with treated effluent reused for campus and highway greenery."

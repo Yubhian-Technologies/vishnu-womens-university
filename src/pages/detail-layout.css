@@ -4210,7 +4210,7 @@ td.pb-activities-num {
 /* ===== Department Hero — rounded image card, dark gradient, gold CTA
    (LPU-reference card hero, shared by AI / CSE / ECE) ===== */
 .dept-hero-section {
-  padding-top: 14px !important;
+  padding-top: 0 !important;
   padding-bottom: 0.5rem;
 }
 

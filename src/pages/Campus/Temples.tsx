@@ -101,7 +101,7 @@ export default function Temples() {
   }, [title]);
 
   return (
-    <main className="temple-page">
+    <main className="temple-page page-wrapper">
       <PageHero
         page="campus-temples"
         defaultTitle={title}

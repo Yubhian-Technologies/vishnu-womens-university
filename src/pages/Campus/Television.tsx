@@ -70,7 +70,7 @@ export default function Television() {
   }, [pageTitle]);
 
   return (
-    <main className="tv-page">
+    <main className="tv-page page-wrapper">
       <PageHero
         page="campus-television"
         defaultTitle={pageTitle}
